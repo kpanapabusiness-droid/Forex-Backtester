@@ -1,0 +1,84 @@
+run_name: "single_run_default"
+
+data:
+  dir: "data/daily"
+  pairs: ["EUR_USD"]
+
+data_dir: "data/daily"
+pairs: ["EUR_USD"]
+
+risk:
+  starting_balance: 10000.0
+  per_trade_risk_pct: 1.0
+
+tracking:
+  in_sim_equity: true
+  write_per_bar_equity: true
+  verbose_logs: false
+
+validation:
+  enabled: false
+  strict_contract: false
+
+indicators:
+  c1: "coral"       # resolver maps to c1_coral
+  use_c2: true
+  c2: "coral"       # resolver maps to c1_coral for C2 as well
+  use_baseline: false
+  baseline: "ema"
+  use_volume: false
+  volume: "sma"
+  use_exit: false
+  exit: "atr_trailing"
+
+indicator_params: {}
+
+rules:
+  one_candle_rule: false
+  pullback_rule: false
+  bridge_too_far_pips: 0
+  baseline_catalyst_same_day: false
+
+continuation:
+  enabled: true
+  cooldown_bars: 0
+  max_retries: 1
+  require_c2_on_continuation: false
+
+exit:
+  tp1_rr: 1.0
+  partial_tp1: 0.5
+  break_even_after_tp1: true
+  trailing_stop_enabled: true
+  trailing_atr_mult: 1.5
+  trailing_from_entry_atr: true
+  exit_on_c1_reverse: true
+  exit_on_baseline_cross: true
+  use_exit_indicator: false
+
+cache:
+  enabled: true
+  dir: "Cache"
+  format: "parquet"
+  scope_key: null
+
+walk_forward:
+  enabled: true
+  run_name: "wfo_nb_smoke"
+  seed: 42
+  start: "2019-01-01"
+  end:   "2023-12-31"
+  train_years: 2
+  test_years: 1
+  step_years: 1
+  mode: "dates"
+  train_bars: 200
+  test_bars: 50
+
+monte_carlo:
+  enabled: true
+  iterations: 300
+  horizon: "oos"
+  use_daily_returns: true       # we'll also produce equity in this smoke
+  save_samples: false
+  seed: 42

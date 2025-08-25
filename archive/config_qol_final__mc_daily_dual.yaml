@@ -1,0 +1,91 @@
+# config_qol_final__mc_daily_dual.yaml
+data:
+  dir: data/daily
+
+pairs:
+  - EUR_USD
+
+spreads:
+  # Used if you don't have per-pair spreads
+  default_pips: 0.8
+  # Only used if you scale risk/position by ATR; safe default
+  atr_mult: 1.0
+
+indicators:
+  c1: twiggs_money_flow
+  c2: coral
+  baseline: ema
+  volume: null
+  exit: atr_trail
+
+  use_c2: true
+  use_baseline: true
+  use_volume: false
+  use_exit: true
+
+# >>>>>> IMPORTANT: parameters passed into indicator functions <<<<<<
+indicator_params:
+  # Baseline: indicators.baseline_funcs.ema(close, length=...)
+  baseline_ema:
+    length: 200
+
+  # Confirmation 1: indicators.confirmation_funcs.twiggs_money_flow(...)
+  # Most implementations accept 'length'; if yours needs additional args, add them here.
+  c1_twiggs_money_flow:
+    length: 21
+
+  # Confirmation 2: indicators.confirmation_funcs.coral(...).
+  # Typical signatures accept 'length'. Adjust if your function uses different names.
+  c2_coral:
+    length: 21
+
+  # Exit: indicators.exit_funcs.atr_trail(...)
+  # Different codebases name these slightly differently; include common synonyms.
+  exit_atr_trail:
+    length: 14         # if the function expects generic 'length'
+    atr_length: 14     # if it expects 'atr_length'
+    mult: 3.0          # if it expects 'mult'
+    atr_mult: 3.0      # if it expects 'atr_mult'
+
+rules:
+  # How you use the baseline; 'trend' means align with baseline direction
+  baseline_mode: trend
+  # Deferrals / filters used in your logs
+  one_bar_deferral: true
+  allow_reentry_after_close: false
+
+exit:
+  # High-level exit switches (indicator exit still configured via indicator_params)
+  exit_on_exit_signal: true
+  exit_on_c1_reversal: false
+  exit_on_c2_reversal: false
+
+continuation:
+  enabled: true
+  pullback_ok: false
+  require_c2_volatility: true
+
+tracking:
+  tag_run_as_latest: true
+  write_main_as_latest: true
+
+walk_forward:
+  enabled: true
+  mode: dates                 # your earlier folds were date-based windows
+  train_start: 2019-01-01
+  train_end:   2020-12-31
+  test_start:  2021-01-01
+  test_end:    2021-12-31
+  # For rolling folds (what you were running), switch to bars and set bar counts:
+  # mode: bars
+  # train_bars: 500
+  # test_bars:  250
+  seed: 42
+  run_name: wfo_qol_final
+
+monte_carlo:
+  enabled: true
+  auto_after_wfo: true
+  iterations: 300
+  use_daily_returns: true
+  modes: [per_trade, daily, trades]

@@ -1,0 +1,113 @@
+batch_test:
+  default_params:
+    length: 21
+    smooth: 3
+  indicators:
+    aroon:
+      length: 21
+    aso:
+      length: 21
+    band_pass_filter:
+      length: 21
+    bears_bulls_impulse:
+      length: 21
+    chandelier_exit:
+      length: 21
+    coral:
+      length: 21
+    cyber_cycle:
+      length: 21
+    decycler_oscillator:
+      length: 21
+    disparity_index:
+      length: 21
+    doda_stochastic:
+      length: 21
+    dpo_histogram:
+      length: 21
+    ease_of_movement:
+      length: 21
+    ehlers_cg:
+      length: 21
+    ehlers_deli:
+      length: 21
+    ehlers_eot:
+      length: 21
+    ehlers_reverse_ema:
+      length: 21
+    ehlers_roofing_filter:
+      length: 21
+    ergodic_tvi:
+      length: 21
+    fisher_transform:
+      length: 21
+    forecast:
+      length: 21
+    glitch_index:
+      length: 21
+    grucha_percentage_index:
+      length: 21
+    hacolt_lines:
+      length: 21
+    hlc_trend:
+      length: 21
+    is_calculation:
+      length: 21
+    kalman_filter:
+      length: 21
+    kuskus_starlight:
+      length: 21
+    laguerre:
+      length: 21
+    linear_regression_slope:
+      length: 21
+    lwpi:
+      length: 21
+    metro_advanced:
+      length: 21
+    perfect_trend_line:
+      length: 21
+    polarized_fractal_efficiency:
+      length: 21
+    price_momentum_oscillator:
+      length: 21
+    schaff_trend_cycle:
+      length: 21
+    sherif_hilo:
+      length: 21
+    smooth_step:
+      length: 21
+    smoothed_momentum:
+      length: 21
+    supertrend:
+      length: 21
+    third_gen_ma:
+      length: 21
+    top_bottom_nr:
+      length: 21
+    top_trend:
+      length: 21
+    tp_trend_pivot:
+      length: 21
+    trend_akkam:
+      length: 21
+    trend_continuation:
+      length: 21
+    trend_lord:
+      length: 21
+    trendilo:
+      length: 21
+    ttf:
+      length: 21
+    turtle_trading_channel:
+      length: 21
+    twiggs_money_flow:
+      length: 21
+    vortex_indicator:
+      length: 21
+    vulkan_profit:
+      length: 21
+    wpr_ma:
+      length: 21
+    zerolag_macd:
+      length: 21

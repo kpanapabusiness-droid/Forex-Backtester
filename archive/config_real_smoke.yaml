@@ -1,0 +1,87 @@
+strategy_version: forex_backtester_v1.9.7
+pairs:
+- EUR_USD
+- GBP_JPY
+timeframe: D
+data_dir: data/daily
+indicators:
+  c1: twiggs_money_flow
+  use_c2: true
+  use_baseline: true
+  use_volume: false
+  use_exit: false
+  c2: adx
+  baseline: ema
+  volume: sma
+  exit: atr_trailing
+indicator_params:
+  indicators.confirmation_funcs.c1_twiggs_money_flow:
+    length: 14
+  indicators.confirmation_funcs.c2_coral:
+    period: 21
+  indicators.baseline_funcs.baseline_ema:
+    period: 200
+  indicators.volume_funcs.volume_sma:
+    period: 20
+    min_mult: 1.0
+  indicators.exit_funcs.exit_atr_trailing:
+    atr_period: 14
+    atr_mult: 1.5
+rules:
+  one_candle_rule: true
+  pullback_rule: false
+  bridge_too_far_days: 7
+  allow_baseline_as_catalyst: false
+exit:
+  use_trailing_stop: true
+  move_to_breakeven_after_atr: true
+  exit_on_c1_reversal: true
+  exit_on_baseline_cross: true
+  exit_on_exit_signal: false
+continuation:
+  allow_continuation: false
+  skip_volume_check: false
+  skip_pullback_check: false
+  block_if_crossed_baseline_since_entry: false
+tracking:
+  track_win_loss_scratch: true
+  track_roi: true
+  track_drawdown: true
+  in_sim_equity: true
+  verbose_logs: false
+filters:
+  dbcvix:
+    enabled: false
+    mode: reduce
+    threshold: null
+    reduce_risk_to: 1.0
+    source: synthetic
+    csv_path: data/external/dbcvix_synth.csv
+    column: cvix_synth
+spreads:
+  enabled: false
+  default_pips: 0.0
+  per_pair: {}
+  mode: fixed
+  atr_mult: 0.0
+cache:
+  enabled: true
+  dir: Cache
+  format: parquet
+  scope_key: null
+  roles: null
+validation:
+  enabled: true
+  fail_fast: true
+  strict_contract: false
+output:
+  results_dir: results
+risk:
+  starting_balance: 10000.0
+  risk_per_trade_pct: 2.0
+walk_forward:
+  start: '2019-01-01'
+  end: '2023-12-31'
+  train_years: 2
+  test_years: 1
+  step_years: 1

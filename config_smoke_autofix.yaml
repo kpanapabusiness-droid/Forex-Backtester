@@ -1,0 +1,89 @@
+data:
+  dir: /Users/keanupanapa/Notebooks/Forex_Backtester/data/daily
+  start: '2018-01-01'
+  end: '2024-12-31'
+pairs:
+- EUR_USD
+- USD_JPY
+- GBP_USD
+- USD_CHF
+- USD_CAD
+- AUD_USD
+- NZD_USD
+- EUR_JPY
+- GBP_JPY
+- AUD_JPY
+- NZD_JPY
+- EUR_GBP
+- EUR_AUD
+- AUD_NZD
+- CAD_JPY
+- CHF_JPY
+- EUR_CAD
+- GBP_CAD
+- EUR_CHF
+- GBP_CHF
+timeframe: D
+dates:
+  start: '2010-01-01'
+  end: '2024-12-31'
+indicators:
+  c1: c1_twiggs_money_flow
+  c2: null
+  baseline: null
+  volume: null
+  exit: null
+  use_c2: false
+  use_baseline: true
+  use_volume: false
+  use_exit: false
+strategy:
+  one_candle_rule: false
+  pullback_rule: false
+  bridge_too_far_days: 7
+  allow_baseline_as_catalyst: false
+entry:
+  atr_mult_entry: 2.0
+  atr_mult_sl: 1.5
+  atr_mult_tp: 1.0
+  atr_multiple: 2.0
+exit:
+  use_trailing_stop: true
+  move_to_breakeven_after_atr: true
+  exit_on_c1_reversal: true
+  exit_on_baseline_cross: false
+  exit_on_exit_signal: false
+continuation:
+  allow_continuation: false
+risk:
+  base_risk: 0.02
+  per_trade_pct: 0.02
+spreads:
+  enabled: false
+  default_pips: 0.0
+tracking:
+  track_win_loss_scratch: true
+  track_roi: true
+  track_drawdown: true
+  in_sim_equity: true
+walk_forward:
+  enabled: true
+  train_years: 4
+  test_months: 6
+  start: '2015-01-01'
+  end: '2024-12-31'
+rules:
+  one_candle_rule: false
+  pullback_rule: false
+  bridge_too_far_days: 7
+  allow_baseline_as_catalyst: false
+risk_filters:
+  dbcvix:
+    enabled: false
+    mode: reduce
+    threshold: 0.0
+    reduce_risk_to: 0.01
+    source: synthetic
+date_range:
+  start: '2018-01-01'
+  end: '2022-12-31'

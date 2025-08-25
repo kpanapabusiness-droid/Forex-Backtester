@@ -1,0 +1,32 @@
+# OS / IDE
+.DS_Store
+.vscode/
+.idea/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.ipynb_checkpoints/
+
+# Envs / secrets
+.env
+.venv/
+.envrc
+
+# Data & caches
+data/
+data_raw/
+cache/
+Cache/
+results/
+results_history/
+
+# Generated artifacts
+*.parquet
+*.feather
+*.sqlite
+*.db
+
+# Aider / agents
+.aider*
+.aiderignore

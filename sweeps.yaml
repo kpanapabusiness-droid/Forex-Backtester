@@ -1,0 +1,56 @@
+# sweeps.yaml — C1 discovery only, EUR/USD 2021–2024
+
+role_filters: ["c1"]
+
+discover:
+  c1: true
+  c2: false
+  baseline: false
+  volume: false
+  exit: false
+
+allowlist:
+  c1: []
+blocklist:
+  c1: []
+
+roles:
+  c1: []   # auto-discover all C1 funcs, no manual extras
+
+default_params:
+  c1:
+    length: [14, 21, 28]   # generic grids if indicator supports them
+    period: [14, 21]
+
+static_overrides:
+  pairs: ["EUR_USD"]
+  timeframe: "D"
+  dates:
+    start: "2021-01-01"
+    end:   "2024-12-31"
+  spreads:
+    enabled: false
+  dbcvix:
+    enabled: false
+  rules:
+    one_candle_rule: false
+    pullback_rule: false
+  tracking:
+    track_win_loss_scratch: true
+    track_roi: true
+    track_drawdown: true
+
+parallel:
+  workers: auto
+  max_runs: null
+  early_stop:
+    enable: false
+    min_bars: 0
+    roi_pct_floor: -50
+    max_dd_cap: 80
+
+scoring:
+  roi_pct_w: 1.0
+  max_dd_w: 0.7
+  trades_penalty_w: 0.0
+  min_trades: 0

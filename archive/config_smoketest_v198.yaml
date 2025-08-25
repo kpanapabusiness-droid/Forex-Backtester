@@ -1,0 +1,46 @@
+strategy_version: "forex_backtester_v1.9.8"
+
+# --- Data / scope ---
+pairs: ["EUR_USD"]
+timeframe: "D"
+data:
+  dir: "data/daily"
+
+# --- Indicators ---
+indicators:
+  c1: "c1_twiggs_money_flow"
+  use_c2: false
+  use_baseline: true
+  baseline: "baseline_ema"
+  use_volume: false
+  use_exit: false
+
+# --- Rules ---
+rules:
+  one_candle_rule: false
+  pullback_rule: false
+  allow_baseline_as_catalyst: false
+  bridge_too_far_days: 7
+
+# --- Risk & exits (defaults that won't explode) ---
+risk:
+  risk_per_trade: 0.02
+entry:
+  atr_multiple_for_entry_distance: 2.0
+  sl_atr_multiple: 1.5
+  tp1_atr_multiple: 1.0
+exit:
+  use_trailing_stop: true
+  move_to_breakeven_after_atr: true
+  exit_on_c1_reversal: true
+  exit_on_baseline_cross: false
+  exit_on_exit_signal: false
+
+# --- Tracking ---
+tracking:
+  in_sim_equity: true
+  verbose_logs: true
+
+# --- Spreads (OFF for smoke) ---
+spreads:
+  enabled: false

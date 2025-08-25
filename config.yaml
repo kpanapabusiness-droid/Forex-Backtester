@@ -1,0 +1,52 @@
+# MINIMUM schema-friendly fields (merge into config.yaml)
+
+pairs: ["EUR_USD", "USD_JPY", "GBP_USD", "USD_CHF"]
+timeframe: "D"
+data:
+  dir: "data/daily"
+
+indicators:
+  c1: "c1_twiggs_money_flow"     # or any valid C1 in indicators.confirmation_funcs
+  use_c2: false
+  use_baseline: true
+  baseline: "baseline_ema"       # or baseline: { name: "baseline_ema", params: { period: 50 } }
+  use_volume: false
+  use_exit: false
+
+rules:
+  one_candle_rule: false
+  pullback_rule: false
+  bridge_too_far_days: 7
+  allow_baseline_as_catalyst: false
+
+entry:
+  atr_multiple: 2.0
+
+exit:
+  use_trailing_stop: true
+  move_to_breakeven_after_atr: true
+  exit_on_c1_reversal: true
+  exit_on_baseline_cross: false
+  exit_on_exit_signal: false
+
+spreads:
+  enabled: false
+  default_pips: 1.0
+
+tracking:
+  in_sim_equity: true
+  track_win_loss_scratch: true
+  track_roi: true
+  track_drawdown: true
+
+risk_filters:
+  dbcvix:
+    enabled: false
+    mode: "reduce"
+    threshold: 0.0
+    reduce_risk_to: 0.01
+    source: "synthetic"
+
+date_range:
+  start: "2018-01-01"
+  end: "2022-12-31"

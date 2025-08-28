@@ -18,7 +18,6 @@ import argparse
 import contextlib
 import datetime as dt
 import importlib
-import inspect
 import json
 import sys
 import time
@@ -36,17 +35,31 @@ RESULTS_ROOT = PROJECT_ROOT / "results"
 DATA_DEFAULT = PROJECT_ROOT / "data" / "daily"
 CACHE_DIRS = [PROJECT_ROOT / ".cache", PROJECT_ROOT / "Cache", PROJECT_ROOT / "cache"]
 
-def info(msg): print(f"ℹ️  {msg}")
-def ok(msg):   print(f"✅ {msg}")
-def warn(msg): print(f"⚠️  {msg}")
-def err(msg):  print(f"❌ {msg}")
+
+def info(msg):
+    print(f"ℹ️  {msg}")
+
+
+def ok(msg):
+    print(f"✅ {msg}")
+
+
+def warn(msg):
+    print(f"⚠️  {msg}")
+
+
+def err(msg):
+    print(f"❌ {msg}")
+
 
 def now_ts() -> str:
     return dt.datetime.now().strftime("%Y%m%d_%H%M%S")
 
+
 def write_yaml(p: Path, data: dict):
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(yaml.safe_dump(data, sort_keys=False), encoding="utf-8")
+
 
 def read_text(p: Path) -> str:
     try:
@@ -54,13 +67,17 @@ def read_text(p: Path) -> str:
     except Exception:
         return p.read_text(errors="ignore")
 
+
 # ----------------------------- environment ---------------------------------
 def check_environment():
     print(BANNER)
     info(f"Python: {sys.version.split()[0]}")
-    import pandas as _pd, numpy as _np
+    import numpy as _np
+    import pandas as _pd
+
     info(f"pandas: {_pd.__version__} | numpy: {_np.__version__}")
     info(f"CWD: {PROJECT_ROOT}")
+
 
 def import_optional(name: str):
     try:
@@ -68,6 +85,7 @@ def import_optional(name: str):
     except Exception as e:
         warn(f"Import failed: {name} — {e}")
         return None
+
 
 def import_core() -> Dict[str, Any]:
     mods = {}
@@ -85,19 +103,28 @@ def import_core() -> Dict[str, Any]:
     ok("Core modules imported (best-effort).")
     return mods
 
+
 # ------------------------------ data utils ---------------------------------
 def synthetic_prices(n: int = 900, seed: int = 13) -> pd.DataFrame:
     rng = np.random.default_rng(seed)
     dates = pd.date_range("2017-01-01", periods=n, freq="D")
     base = 1.12 + np.cumsum(rng.normal(0, 0.001, n))
     high = base + np.abs(rng.normal(0, 0.0009, n))
-    low  = base - np.abs(rng.normal(0, 0.0009, n))
+    low = base - np.abs(rng.normal(0, 0.0009, n))
     close = base + rng.normal(0, 0.00025, n)
     open_ = np.r_[close[0], close[:-1]]
     vol = rng.integers(800, 5000, size=n)
-    return pd.DataFrame({"date": dates.normalize(),
-                         "open": open_, "high": high, "low": low, "close": close,
-                         "volume": vol})
+    return pd.DataFrame(
+        {
+            "date": dates.normalize(),
+            "open": open_,
+            "high": high,
+            "low": low,
+            "close": close,
+            "volume": vol,
+        }
+    )
+
 
 def autodetect_pairs(data_dir: Path) -> List[str]:
     if not data_dir.exists():
@@ -108,6 +135,7 @@ def autodetect_pairs(data_dir: Path) -> List[str]:
         if "_" in name:
             pairs.append(name)
     return pairs
+
 
 def ensure_prices_for(pairs: List[str], run_dir: Path) -> Path:
     missing = []
@@ -125,7 +153,9 @@ def ensure_prices_for(pairs: List[str], run_dir: Path) -> Path:
         (synth_dir / f"{pair}.csv").write_text(df.to_csv(index=False), encoding="utf-8")
     ok(f"Synthetic OHLCV generated @ {synth_dir}")
     return synth_dir
-#----------------------------metric helper--------------------------------#
+
+
+# ----------------------------metric helper--------------------------------#
 # --- simple metrics fallback from equity_curve.csv ---
 def _compute_basic_metrics_from_equity(equity_csv: Path) -> Dict[str, float]:
     df = pd.read_csv(equity_csv)
@@ -145,7 +175,10 @@ def _compute_basic_metrics_from_equity(equity_csv: Path) -> Dict[str, float]:
     sharpe = (mean / (std + 1e-12)) * np.sqrt(ann_factor) if std > 0 else 0.0
     sortino = (mean / (downside + 1e-12)) * np.sqrt(ann_factor) if downside > 0 else 0.0
 
-    years = max((pd.to_datetime(df["date"]).iloc[-1] - pd.to_datetime(df["date"]).iloc[0]).days / 365.25, 1e-9)
+    years = max(
+        (pd.to_datetime(df["date"]).iloc[-1] - pd.to_datetime(df["date"]).iloc[0]).days / 365.25,
+        1e-9,
+    )
     cagr = (equity[-1] / equity[0]) ** (1.0 / years) - 1.0 if equity[0] > 0 else 0.0
     max_dd = 0.0
     peak = -np.inf
@@ -153,13 +186,20 @@ def _compute_basic_metrics_from_equity(equity_csv: Path) -> Dict[str, float]:
         peak = max(peak, v)
         max_dd = min(max_dd, (v / peak - 1.0) if peak > 0 else 0.0)
 
-    return {"CAGR": float(cagr), "Sharpe": float(sharpe), "Sortino": float(sortino), "MaxDD": float(max_dd)}
+    return {
+        "CAGR": float(cagr),
+        "Sharpe": float(sharpe),
+        "Sortino": float(sortino),
+        "MaxDD": float(max_dd),
+    }
 
 
 # --------------------------- indicators utils -------------------------------
 def sniff_functions(mod, prefix: str) -> List[str]:
-    if not mod: return []
+    if not mod:
+        return []
     return [n for n in dir(mod) if n.startswith(prefix) and callable(getattr(mod, n))]
+
 
 def choose_indicators(core: Dict[str, Any]) -> Dict[str, Optional[str]]:
     c_mod = core.get("indicators.confirmation_funcs")
@@ -173,9 +213,15 @@ def choose_indicators(core: Dict[str, Any]) -> Dict[str, Optional[str]]:
     info(f"Indicator pool — C1: {len(c1s)}, Baseline: {len(baselines)}, Exit: {len(exits)}")
 
     pick = {
-        "c1": "c1_twiggs_money_flow" if "c1_twiggs_money_flow" in c1s else (c1s[0] if c1s else None),
-        "baseline": "baseline_ema" if "baseline_ema" in baselines else (baselines[0] if baselines else None),
-        "exit": "exit_twiggs_money_flow" if "exit_twiggs_money_flow" in exits else (exits[0] if exits else None),
+        "c1": "c1_twiggs_money_flow"
+        if "c1_twiggs_money_flow" in c1s
+        else (c1s[0] if c1s else None),
+        "baseline": "baseline_ema"
+        if "baseline_ema" in baselines
+        else (baselines[0] if baselines else None),
+        "exit": "exit_twiggs_money_flow"
+        if "exit_twiggs_money_flow" in exits
+        else (exits[0] if exits else None),
     }
     if not pick["c1"]:
         warn("No C1 indicators found; entries may be empty.")
@@ -184,6 +230,7 @@ def choose_indicators(core: Dict[str, Any]) -> Dict[str, Optional[str]]:
     if not pick["exit"]:
         warn("No exit indicator found; exit-signal path limited.")
     return pick
+
 
 # -------------------------- config construction -----------------------------
 def build_config(
@@ -213,7 +260,12 @@ def build_config(
             "bridge_too_far_days": 7,
             "allow_baseline_as_catalyst": False,
             # nested continuation for stricter schemas
-            "continuation": {"enabled": True, "lookback": 5, "max_adds": 0, "allow_reentries": False},
+            "continuation": {
+                "enabled": True,
+                "lookback": 5,
+                "max_adds": 0,
+                "allow_reentries": False,
+            },
         },
         # top-level continuation for alternate schemas
         "continuation": {"enabled": True, "lookback": 5, "max_adds": 0, "allow_reentries": False},
@@ -227,11 +279,25 @@ def build_config(
         },
         "spreads": {"enabled": False, "default_pips": 1.0},
         "risk": {"per_trade_pct": 0.02},
-        "tracking": {"in_sim_equity": True, "track_win_loss_scratch": True, "track_roi": True, "track_drawdown": True},
-        "risk_filters": {"dbcvix": {"enabled": False, "mode": "reduce", "threshold": 0.0, "reduce_risk_to": 0.01, "source": "synthetic"}},
+        "tracking": {
+            "in_sim_equity": True,
+            "track_win_loss_scratch": True,
+            "track_roi": True,
+            "track_drawdown": True,
+        },
+        "risk_filters": {
+            "dbcvix": {
+                "enabled": False,
+                "mode": "reduce",
+                "threshold": 0.0,
+                "reduce_risk_to": 0.01,
+                "source": "synthetic",
+            }
+        },
         "walk_forward": {"enabled": False},
         "cache": {"enabled": True},
     }
+
 
 def deep_update(base: dict, patch: dict) -> dict:
     for k, v in patch.items():
@@ -240,6 +306,7 @@ def deep_update(base: dict, patch: dict) -> dict:
         else:
             base[k] = v
     return base
+
 
 # --------------------------- run utilities ----------------------------------
 def run_backtest_with_snapshot(core: Dict[str, Any], cfg: dict, run_dir: Path, label: str) -> Path:
@@ -255,6 +322,7 @@ def run_backtest_with_snapshot(core: Dict[str, Any], cfg: dict, run_dir: Path, l
         bt.run_backtest(str(snap))
     ok(f"Backtest '{label}' finished in {time.time() - t0:.2f}s.")
     return snap
+
 
 def run_wfo_small(core: Dict[str, Any], cfg: dict, run_dir: Path) -> Optional[Path]:
     wf = core.get("walk_forward")
@@ -273,9 +341,7 @@ def run_wfo_small(core: Dict[str, Any], cfg: dict, run_dir: Path) -> Optional[Pa
         or "2018-01-01"
     )
     end = (
-        cfg_wf.get("data", {}).get("end")
-        or cfg_wf.get("date_range", {}).get("end")
-        or "2022-12-31"
+        cfg_wf.get("data", {}).get("end") or cfg_wf.get("date_range", {}).get("end") or "2022-12-31"
     )
     cfg_wf.setdefault("data", {})
     cfg_wf["data"]["start"] = str(start)
@@ -288,15 +354,18 @@ def run_wfo_small(core: Dict[str, Any], cfg: dict, run_dir: Path) -> Optional[Pa
     cfg_wf["data"].setdefault("timeframe", cfg_wf.get("timeframe", "D"))
 
     # 3) tiny rolling split
-    deep_update(cfg_wf, {
-        "walk_forward": {
-            "enabled": True,
-            "train_months": 18,
-            "test_months": 6,
-            "roll_months": 6,
-            "run_name": "wfo_default"
-        }
-    })
+    deep_update(
+        cfg_wf,
+        {
+            "walk_forward": {
+                "enabled": True,
+                "train_months": 18,
+                "test_months": 6,
+                "roll_months": 6,
+                "run_name": "wfo_default",
+            }
+        },
+    )
 
     # Keep a snapshot in case any fallback entrypoint needs a file path
     snap = run_dir / "config_wfo_small.yaml"
@@ -323,25 +392,26 @@ def run_wfo_small(core: Dict[str, Any], cfg: dict, run_dir: Path) -> Optional[Pa
         if not callable(fn):
             continue
         for call in (
-            lambda: fn(cfg_wf),                                     # positional dict
-            lambda: fn(config=cfg_wf),                              # kw: config
-            lambda: fn(cfg=cfg_wf),                                 # kw: cfg
-            lambda: fn(str(snap)),                                  # positional path
-            lambda: fn(config_path=str(snap)),                      # kw: config_path
-            lambda: fn(),                                           # zero-arg
+            lambda: fn(cfg_wf),  # positional dict
+            lambda: fn(config=cfg_wf),  # kw: config
+            lambda: fn(cfg=cfg_wf),  # kw: cfg
+            lambda: fn(str(snap)),  # positional path
+            lambda: fn(config_path=str(snap)),  # kw: config_path
+            lambda: fn(),  # zero-arg
         ):
             try:
                 call()
                 ok(f"WFO tiny finished in {time.time() - t0:.2f}s.")
                 return snap
             except TypeError as te:
-                last_err = te; continue
+                last_err = te
+                continue
             except Exception as e:
-                last_err = e; continue
+                last_err = e
+                continue
 
     warn(f"WFO callable(s) present but none of the signatures worked; last error: {last_err}")
     return None
-
 
     def attempts(fn):
         # 1) dict positional
@@ -387,12 +457,17 @@ def ensure_dbcvix_csv(run_dir: Path) -> Path:
     if not out.exists():
         dates = pd.date_range("2018-01-01", periods=500, freq="D")
         # regime: low (0.02) -> mid (0.08) -> high spikes (0.15) -> repeat
-        vals = np.tile(np.r_[np.full(120, 0.02), np.full(120, 0.08), np.full(60, 0.15), np.full(200, 0.04)], 1)[:len(dates)]
+        vals = np.tile(
+            np.r_[np.full(120, 0.02), np.full(120, 0.08), np.full(60, 0.15), np.full(200, 0.04)], 1
+        )[: len(dates)]
         df = pd.DataFrame({"date": dates, "value": vals})
         df.to_csv(out, index=False)
     return out
 
-def enable_dbcvix_in_cfg(cfg: dict, csv_path: Path, *, mode: str, threshold: float, reduce_to: float | None = None) -> dict:
+
+def enable_dbcvix_in_cfg(
+    cfg: dict, csv_path: Path, *, mode: str, threshold: float, reduce_to: float | None = None
+) -> dict:
     """
     Update cfg to point to a CSV‑backed DBCVIX risk filter. We try a couple of
     common key names so it works across minor API variations.
@@ -401,11 +476,11 @@ def enable_dbcvix_in_cfg(cfg: dict, csv_path: Path, *, mode: str, threshold: flo
     rf = cfg2.setdefault("risk_filters", {}).setdefault("dbcvix", {})
     # mandatory
     rf["enabled"] = True
-    rf["mode"] = mode                # "reduce" or "block"
+    rf["mode"] = mode  # "reduce" or "block"
     rf["threshold"] = float(threshold)
 
     # optional keys across variants
-    rf["source"] = "csv"             # often respected
+    rf["source"] = "csv"  # often respected
     rf["path"] = str(csv_path)
     rf.setdefault("file", str(csv_path))
     rf.setdefault("filepath", str(csv_path))
@@ -418,13 +493,28 @@ def enable_dbcvix_in_cfg(cfg: dict, csv_path: Path, *, mode: str, threshold: flo
         rf.setdefault("risk_to", rf["reduce_risk_to"])
     return cfg2
 
+
 # --------------------------- artifact checks --------------------------------
 REQUIRED_TRADE_COLS = {
-    "pair","date_open","date_close","direction","entry_price","exit_price",
-    "atr_entry","tp1_price","sl_price","exit_reason",
-    "tp1_at_entry_price","sl_at_entry_price","sl_at_exit_price",
-    "spread_pips_used","is_win","is_loss","is_scratch",
+    "pair",
+    "date_open",
+    "date_close",
+    "direction",
+    "entry_price",
+    "exit_price",
+    "atr_entry",
+    "tp1_price",
+    "sl_price",
+    "exit_reason",
+    "tp1_at_entry_price",
+    "sl_at_entry_price",
+    "sl_at_exit_price",
+    "spread_pips_used",
+    "is_win",
+    "is_loss",
+    "is_scratch",
 }
+
 
 def locate_artifacts(root: Path) -> Tuple[Path, Path, Path]:
     trades = sorted(root.rglob("trades.csv"), key=lambda p: p.stat().st_mtime, reverse=True)
@@ -434,6 +524,7 @@ def locate_artifacts(root: Path) -> Tuple[Path, Path, Path]:
         raise FileNotFoundError("Missing artifacts (trades/summary/equity).")
     return trades[0], summary[0], equity[0]
 
+
 def read_summary_map(path: Path) -> Dict[str, str]:
     out = {}
     for ln in read_text(path).splitlines():
@@ -441,6 +532,7 @@ def read_summary_map(path: Path) -> Dict[str, str]:
             k, v = ln.split(":", 1)
             out[k.strip().lower()] = v.strip()
     return out
+
 
 # ---------- ADAPTIVE trades validator (aliases + soft classification) -------
 def validate_trades(trades_csv: Path):
@@ -503,17 +595,23 @@ def validate_trades(trades_csv: Path):
         for f in [iw, il, isc]:
             assert df[f].isin([0, 1, True, False]).all(), f"{f} must be 0/1/bool"
         total = len(df)
-        s = {"wins": int(df[iw].sum()), "losses": int(df[il].sum()), "scratches": int(df[isc].sum())}
+        s = {
+            "wins": int(df[iw].sum()),
+            "losses": int(df[il].sum()),
+            "scratches": int(df[isc].sum()),
+        }
         assert s["wins"] + s["losses"] + s["scratches"] == total, "win+loss+scratch != total"
         ok(f"Classification totals OK: {s} == {total}")
     else:
         warn("is_win/is_loss/is_scratch not present — skipping classification invariant.")
+
 
 def validate_equity(equity_csv: Path):
     edf = pd.read_csv(equity_csv)
     assert {"date", "equity"}.issubset(edf.columns), "equity_curve needs date,equity"
     assert edf["equity"].isna().sum() == 0, "Equity NaNs found"
     ok(f"Equity curve OK (rows={len(edf)}).")
+
 
 def parse_roi_pct(summary_txt: Path) -> Optional[float]:
     m = read_summary_map(summary_txt)
@@ -526,7 +624,8 @@ def parse_roi_pct(summary_txt: Path) -> Optional[float]:
                 pass
     return None
 
-def assert_spread_effect(base_art: Tuple[Path,Path,Path], spread_art: Tuple[Path,Path,Path]):
+
+def assert_spread_effect(base_art: Tuple[Path, Path, Path], spread_art: Tuple[Path, Path, Path]):
     b = parse_roi_pct(base_art[1])
     s = parse_roi_pct(spread_art[1])
     if b is not None and s is not None:
@@ -534,12 +633,15 @@ def assert_spread_effect(base_art: Tuple[Path,Path,Path], spread_art: Tuple[Path
         ok(f"Spread effect OK: baseline ROI%={b:.2f} vs spread ROI%={s:.2f}")
     df = pd.read_csv(spread_art[0])
     if "spread_pips_used" in df.columns and len(df):
-        assert (df["spread_pips_used"].fillna(0) > 0).any(), "Expected positive spread usage in spread run."
+        assert (
+            df["spread_pips_used"].fillna(0) > 0
+        ).any(), "Expected positive spread usage in spread run."
         ok("spread_pips_used > 0 present in spread run.")
 
+
 # ---------- signature-aware validators --------------------------------------
-import inspect
 import pandas as _pd
+
 
 def _read_artifacts_as_dfs(art):
     trades_df, equity_df = None, None
@@ -553,7 +655,8 @@ def _read_artifacts_as_dfs(art):
         pass
     return trades_df, equity_df
 
-def try_validators(core: Dict[str,Any], art: Tuple[Path,Path,Path]):
+
+def try_validators(core: Dict[str, Any], art: Tuple[Path, Path, Path]):
     vutil = core.get("validators_util")
     if not vutil:
         warn("validators_util not importable.")
@@ -591,7 +694,7 @@ def try_validators(core: Dict[str,Any], art: Tuple[Path,Path,Path]):
                 continue
             except Exception as e:
                 # If it failed with a path due to expecting a DF, the DF attempt is next.
-                last_err = str(e)
+                str(e)
                 continue
 
         if not tried_any:
@@ -602,12 +705,13 @@ def try_validators(core: Dict[str,Any], art: Tuple[Path,Path,Path]):
 
 
 # ------------------------------ cache check ---------------------------------
-def check_cache(core: Dict[str,Any], cfg: dict, run_dir: Path):
+def check_cache(core: Dict[str, Any], cfg: dict, run_dir: Path):
     for cdir in CACHE_DIRS:
         if cdir.exists():
             for p in cdir.rglob("*"):
                 with contextlib.suppress(Exception):
-                    if p.is_file(): p.unlink()
+                    if p.is_file():
+                        p.unlink()
     run_backtest_with_snapshot(core, cfg, run_dir, "cache_pass1")
     before = sum(1 for _ in sum((list(d.rglob("*.parquet")) for d in CACHE_DIRS if d.exists()), []))
     t0 = time.time()
@@ -620,10 +724,11 @@ def check_cache(core: Dict[str,Any], cfg: dict, run_dir: Path):
         warn("Cache files decreased; verify cache wiring.")
     ok(f"Second run elapsed={dt2:.2f}s (should benefit from cache).")
 
+
 # ------------------------------ main ----------------------------------------
 def main():
     ap = argparse.ArgumentParser(description="Self-contained smoketest (no config.yaml needed)")
-    ap.add_argument("--mode", choices=["fast","full"], default="fast")
+    ap.add_argument("--mode", choices=["fast", "full"], default="fast")
     args = ap.parse_args()
 
     check_environment()
@@ -633,11 +738,13 @@ def main():
 
     detected_pairs = autodetect_pairs(DATA_DEFAULT)
     if args.mode == "fast":
-        pairs = (detected_pairs[:4] if detected_pairs else ["EUR_USD","USD_JPY","GBP_USD","USD_CHF"])
+        pairs = (
+            detected_pairs[:4] if detected_pairs else ["EUR_USD", "USD_JPY", "GBP_USD", "USD_CHF"]
+        )
         date_start, date_end = "2018-01-01", "2022-12-31"
         ok(f"FAST: pairs={pairs} window=({date_start} → {date_end})")
     else:
-        pairs = detected_pairs or ["EUR_USD","USD_JPY","GBP_USD","USD_CHF","AUD_USD","NZD_USD"]
+        pairs = detected_pairs or ["EUR_USD", "USD_JPY", "GBP_USD", "USD_CHF", "AUD_USD", "NZD_USD"]
         date_start, date_end = "2015-01-01", "2024-12-31"
         ok(f"FULL: pairs={pairs} window=({date_start} → {date_end})")
 
@@ -649,7 +756,8 @@ def main():
     cfg = build_config(pairs, date_start, date_end, picks, data_dir)
 
     # 1) Baseline
-    print(SEP); info("1) Baseline run")
+    print(SEP)
+    info("1) Baseline run")
     run_backtest_with_snapshot(core, cfg, run_root, "baseline")
     base_art = locate_artifacts(RESULTS_ROOT)
     validate_trades(base_art[0])
@@ -657,7 +765,8 @@ def main():
     try_validators(core, base_art)
 
     # 2) Spread-on
-    print(SEP); info("2) Spread-on run")
+    print(SEP)
+    info("2) Spread-on run")
     cfg_spread = json.loads(json.dumps(cfg))
     cfg_spread["spreads"]["enabled"] = True
     run_backtest_with_snapshot(core, cfg_spread, run_root, "spread_on")
@@ -666,11 +775,14 @@ def main():
     assert_spread_effect(base_art, spread_art)
 
     # 3) DBCVIX reduce & block (with real CSV so it actually triggers)
-    print(SEP); info("3) DBCVIX reduce & block (with CSV so it triggers)")
+    print(SEP)
+    info("3) DBCVIX reduce & block (with CSV so it triggers)")
     dbcvix_csv = ensure_dbcvix_csv(run_root)
 
     # Reduce: trigger when value >= 0.06 → cuts risk to 1%
-    cfg_reduce = enable_dbcvix_in_cfg(cfg, dbcvix_csv, mode="reduce", threshold=0.06, reduce_to=0.01)
+    cfg_reduce = enable_dbcvix_in_cfg(
+        cfg, dbcvix_csv, mode="reduce", threshold=0.06, reduce_to=0.01
+    )
     run_backtest_with_snapshot(core, cfg_reduce, run_root, "dbcvix_reduce")
     reduce_art = locate_artifacts(RESULTS_ROOT)
     validate_trades(reduce_art[0])
@@ -684,29 +796,38 @@ def main():
     # Optional quick delta report (best-effort)
     try:
         base_df = pd.read_csv(base_art[0])
-        red_df  = pd.read_csv(reduce_art[0])
-        blk_df  = pd.read_csv(block_art[0])
-        info(f"DBCVIX deltas — baseline trades: {len(base_df)}, reduce: {len(red_df)}, block: {len(blk_df)}")
+        red_df = pd.read_csv(reduce_art[0])
+        blk_df = pd.read_csv(block_art[0])
+        info(
+            f"DBCVIX deltas — baseline trades: {len(base_df)}, reduce: {len(red_df)}, block: {len(blk_df)}"
+        )
     except Exception:
         pass
 
-
     # 4) Cache presence & timing
-    print(SEP); info("4) Cache presence & timing")
+    print(SEP)
+    info("4) Cache presence & timing")
     check_cache(core, cfg, run_root)
 
     # 5) Tiny Walk-Forward (if available)
-    print(SEP); info("5) Tiny Walk-Forward (if available)")
+    print(SEP)
+    info("5) Tiny Walk-Forward (if available)")
     wf_snap = run_wfo_small(core, cfg, run_root)
     if wf_snap:
         ok(f"WFO snapshot: {wf_snap}")
 
     # 6) analytics.metrics recompute (robust search)
-    print(SEP); info("6) analytics.metrics recompute (best-effort)")
+    print(SEP)
+    info("6) analytics.metrics recompute (best-effort)")
     met = core.get("analytics.metrics")
     reported = False
     if met:
-        for fname in ["compute_metrics_from_equity", "compute_from_equity", "compute_metrics", "metrics_from_equity"]:
+        for fname in [
+            "compute_metrics_from_equity",
+            "compute_from_equity",
+            "compute_metrics",
+            "metrics_from_equity",
+        ]:
             if hasattr(met, fname):
                 try:
                     stats = getattr(met, fname)(str(base_art[2]))
@@ -716,7 +837,11 @@ def main():
                 except Exception as e:
                     warn(f"analytics.metrics.{fname} failed: {e}")
         if not reported:
-            like = [n for n in dir(met) if ("metric" in n.lower() or "equity" in n.lower()) and callable(getattr(met, n))]
+            like = [
+                n
+                for n in dir(met)
+                if ("metric" in n.lower() or "equity" in n.lower()) and callable(getattr(met, n))
+            ]
             if like:
                 warn(f"No standard metrics function matched. Found callable candidates: {like[:8]}")
     if not reported:

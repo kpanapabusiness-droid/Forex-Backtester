@@ -3,9 +3,10 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-from typing import Optional, Tuple, Dict, Any, List
 import math
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
+
 import numpy as np
 import pandas as pd
 
@@ -29,7 +30,9 @@ def _sharpe_sortino(daily_returns: np.ndarray, eps: float = 1e-12) -> Tuple[floa
     downside_std = float(np.nanstd(downside, ddof=1)) if downside.size > 0 else 0.0
 
     sharpe_daily = mu / (sigma + eps) if sigma > 0 else float("inf") if mu > 0 else 0.0
-    sortino_daily = mu / (downside_std + eps) if downside_std > 0 else float("inf") if mu > 0 else 0.0
+    sortino_daily = (
+        mu / (downside_std + eps) if downside_std > 0 else float("inf") if mu > 0 else 0.0
+    )
 
     sharpe_ann = sharpe_daily * math.sqrt(252.0)
     sortino_ann = sortino_daily * math.sqrt(252.0)
@@ -85,7 +88,9 @@ def _results_dir_from_cfg(cfg: dict) -> Path:
 
 
 def _starting_balance_from_cfg(cfg: dict) -> float:
-    return float((cfg.get("risk") or {}).get("starting_balance", cfg.get("starting_balance", 10_000.0)))
+    return float(
+        (cfg.get("risk") or {}).get("starting_balance", cfg.get("starting_balance", 10_000.0))
+    )
 
 
 # ------------------------- Public API -------------------------
@@ -93,7 +98,7 @@ def run_monte_carlo(
     cfg: dict,
     equity_df: Optional[pd.DataFrame] = None,
     trades_df: Optional[pd.DataFrame] = None,
-    results_dir_override: Optional[Path | str] = None,   # <-- NEW: force output folder
+    results_dir_override: Optional[Path | str] = None,  # <-- NEW: force output folder
 ) -> Dict[str, Any]:
     """
     Monte Carlo on equity (daily) or per-trade series.
@@ -115,6 +120,7 @@ def run_monte_carlo(
 
     Returns a dict with quantiles for ROI%, MaxDD%, MAR and (if daily) Sharpe/Sortino medians.
     """
+
     # --- local helper to avoid NameError if not defined elsewhere ---
     def _starting_balance_from_cfg_local(c: dict) -> Optional[float]:
         risk = (c or {}).get("risk") or {}
@@ -152,8 +158,38 @@ def run_monte_carlo(
     rng = np.random.default_rng(int(seed)) if seed is not None else np.random.default_rng()
 
     # Resolve output folder
-    results_dir = Path(results_dir_override) if results_dir_override else _results_dir_from_cfg_robust(cfg)
+    results_dir = (
+        Path(results_dir_override) if results_dir_override else _results_dir_from_cfg_robust(cfg)
+    )
+    # Backward-compatible: if a pointer exists, use the actual directory it references
+    try:
+        ptr = results_dir / ".source_dir"
+        if ptr.exists():
+            target = Path(ptr.read_text(encoding="utf-8").strip())
+            if target.exists():
+                results_dir = target
+    except Exception:
+        pass
     results_dir.mkdir(parents=True, exist_ok=True)
+
+    # Fallback: discover a pointer under results/*/.source_dir if selected dir has no artifacts
+    try:
+        eq_exists = (results_dir / "equity_curve.csv").exists()
+        tr_exists = (results_dir / "trades.csv").exists()
+        if not (eq_exists or tr_exists):
+            root = Path("results")
+            for ptr in root.glob("*/.source_dir"):
+                try:
+                    target = Path(ptr.read_text(encoding="utf-8").strip())
+                except Exception:
+                    continue
+                if target.exists() and (
+                    (target / "equity_curve.csv").exists() or (target / "trades.csv").exists()
+                ):
+                    results_dir = target
+                    break
+    except Exception:
+        pass
 
     # Load sources if not supplied
     if equity_df is None:
@@ -192,7 +228,9 @@ def run_monte_carlo(
             else:
                 print("ℹ️  Daily series too short after cleaning; falling back to per-trade mode.")
         else:
-            print("ℹ️  Equity curve insufficient or contains non-positive values; falling back to per-trade mode.")
+            print(
+                "ℹ️  Equity curve insufficient or contains non-positive values; falling back to per-trade mode."
+            )
 
     # Fall back to per-trade mode if needed
     if series is None and trades_df is not None and "pnl" in trades_df.columns:
@@ -274,22 +312,30 @@ def run_monte_carlo(
         "mar_median": q(mar_list, 50),
     }
     if series_type == "daily":
-        summary.update({
-            "sharpe_median": q(sharpe_list, 50),
-            "sortino_median": q(sortino_list, 50),
-        })
+        summary.update(
+            {
+                "sharpe_median": q(sharpe_list, 50),
+                "sortino_median": q(sortino_list, 50),
+            }
+        )
 
     # Mode suffix for duplicates
     mode_suffix = "daily" if series_type == "daily" else "trades"
 
     # Save optional samples (canonical + mode-specific)
     if save_samples:
-        samples_df = pd.DataFrame({
-            "roi_pct": roi_list,
-            "maxdd_pct": maxdd_list,
-            "mar": mar_list,
-            **({"sharpe": sharpe_list, "sortino": sortino_list} if series_type == "daily" else {}),
-        })
+        samples_df = pd.DataFrame(
+            {
+                "roi_pct": roi_list,
+                "maxdd_pct": maxdd_list,
+                "mar": mar_list,
+                **(
+                    {"sharpe": sharpe_list, "sortino": sortino_list}
+                    if series_type == "daily"
+                    else {}
+                ),
+            }
+        )
         samples_path = results_dir / "mc_samples.csv"
         samples_df.to_csv(samples_path, index=False)
         print(f"✅ Wrote MC samples: {samples_path}")
@@ -316,7 +362,9 @@ def run_monte_carlo(
         f.write(f"ROI%  (P50)  : {fmt(summary['roi_pct_median'])}\n")
         f.write(f"ROI%   P5/P95: {fmt(summary['roi_pct_p5'])} / {fmt(summary['roi_pct_p95'])}\n")
         f.write(f"MaxDD% (P50) : {fmt(summary['maxdd_pct_median'])}\n")
-        f.write(f"MaxDD% P5/P95: {fmt(summary['maxdd_pct_p5'])} / {fmt(summary['maxdd_pct_p95'])}\n")
+        f.write(
+            f"MaxDD% P5/P95: {fmt(summary['maxdd_pct_p5'])} / {fmt(summary['maxdd_pct_p95'])}\n"
+        )
         f.write(f"MAR   (P50)  : {fmt(summary['mar_median'])}\n")
         if "sharpe_median" in summary:
             f.write(f"Sharpe(P50)  : {fmt(summary['sharpe_median'])}\n")
@@ -334,16 +382,16 @@ def run_monte_carlo(
     return summary
 
 
-
-
-def run_monte_carlo_modes(cfg: dict | None = None,
-                          results_dir: str | os.PathLike | None = None,
-                          equity_csv: str | os.PathLike | None = None,
-                          trades_csv: str | os.PathLike | None = None,
-                          iterations: int | None = None,
-                          horizon: str | int | None = None,
-                          rng_seed: int | None = None,
-                          progress: bool = True) -> dict:
+def run_monte_carlo_modes(
+    cfg: dict | None = None,
+    results_dir: str | os.PathLike | None = None,
+    equity_csv: str | os.PathLike | None = None,
+    trades_csv: str | os.PathLike | None = None,
+    iterations: int | None = None,
+    horizon: str | int | None = None,
+    rng_seed: int | None = None,
+    progress: bool = True,
+) -> dict:
     """
     Convenience helper to run Monte Carlo in multiple modes (per-trade and/or daily)
     based on cfg["monte_carlo"]["modes"]. Falls back to a single mode if not provided.
@@ -352,8 +400,8 @@ def run_monte_carlo_modes(cfg: dict | None = None,
     mc_cfg = (cfg or {}).get("monte_carlo", {}) if cfg else {}
     # Resolve inputs
     _results_dir = results_dir or _results_dir_from_cfg_or_default(cfg)
-    _equity_csv  = equity_csv or os.path.join(_results_dir, "equity_curve.csv")
-    _trades_csv  = trades_csv or os.path.join(_results_dir, "trades.csv")
+    _equity_csv = equity_csv or os.path.join(_results_dir, "equity_curve.csv")
+    _trades_csv = trades_csv or os.path.join(_results_dir, "trades.csv")
 
     modes = mc_cfg.get("modes")
     if not modes:
@@ -362,7 +410,7 @@ def run_monte_carlo_modes(cfg: dict | None = None,
 
     out = {}
     for mode in modes:
-        use_daily = (mode.lower() in ["daily", "per_day", "equity", "equity_daily"])
+        use_daily = mode.lower() in ["daily", "per_day", "equity", "equity_daily"]
         res = run_monte_carlo(
             cfg=cfg,
             results_dir=_results_dir,

@@ -1,0 +1,132 @@
+---
+alwaysApply: true
+---
+
+# Cursor Rules — Forex_Backtester
+
+## North Star
+- Keep the system CONFIG-DRIVEN. No hardcoded params. All knobs come from YAML.
+- Preserve indicator & audit contracts. Never “simplify” them away.
+
+## File Boundaries
+- indicators/: production-only indicator logic in:
+  - confirmation_funcs.py (C1/C2), baseline_funcs.py, volume_funcs.py, exit_funcs.py
+- core: backtester.py, signal_logic.py, utils.py, validators_*.py, analytics/
+- results/: trades.csv, summary.txt, equity_curve.csv (and history subfolders)
+- No new indicator files per-indicator; add functions to the correct *_funcs.py.
+
+## Indicator Contracts (must always hold)
+- Confirmation (C1/C2): def c1_<name>(df, *, signal_col="c1_signal", **kwargs)->df
+  - Writes df[signal_col] in {-1,0,+1}. Return df.
+- Baseline: def baseline_<name>(df, *, signal_col="baseline_signal", **kwargs)->df
+  - Must write BOTH df["baseline"] and df[signal_col] in {-1,0,+1}. Return df.
+- Volume: same pattern; writes {-1,0,+1}.
+- Exit indicators: def exit_<name>(df, *, signal_col="exit_signal", **kwargs)->df
+  - Writes {0,1} ONLY to df[signal_col]. Return df.
+- All indicators accept named params with defaults + **kwargs and never read global config directly.
+
+## Signal & Trade Logic Guardrails
+- One-Candle + Pullback: mutually exclusive; enforce exactly as config specifies.
+- “Bridge Too Far”: cancel baseline-triggered entries if C1 last signaled ≥ N days (config).
+- Entry/Exit invariants:
+  - If TP1 (1x ATR) hits: classify as WIN regardless of later outcome.
+  - Losses only if SL before TP1; else SCRATCH.
+- Trailing Stop:
+  - Activates only after +2xATR move.
+  - Trails 1.5x ATR BEHIND price using ATR at entry (immutable), update current_sl only.
+- Audit integrity (immutable fields):
+  - tp1_at_entry_price, sl_at_entry_price are set at entry and NEVER mutated.
+  - Use current_sl for BE/TS updates; set sl_at_exit_price at exit time.
+- Spreads:
+  - Enabling spreads may change PnL, NEVER trade counts or exit reasons.
+
+## Config-Driven Everything
+- Read all knobs from YAML (pairs, timeframe, indicators, rule toggles, risk, spreads, DBCVIX, etc.).
+- No feature adds that bypass config. Add schema and defaults if needed.
+
+## TDD & CI
+- For ANY patch:
+  - Add/adjust tests under tests/.
+  - Keep changes ≤3 files or ≤100 LOC in Cursor; else switch to Aider.
+  - Run: ruff + pytest + smoke (must pass locally) before opening PR.
+- GitHub Actions is the truth; PR must be green to merge.
+
+## Safety & Math
+- Add np.clip safeguards before log/div operations.
+- Avoid lookahead; no use of future bars in signal or trade decisions.
+
+## Do NOT
+- Do not change return signatures or contracts.
+- Do not mutate immutable audit fields.
+- Do not hardcode params or paths.
+- Do not split indicators into per-file modules.
+
+## Quick Commands (assume repo root)
+- Run smoke: `pytest -q` (plus minimal backtest smoke)
+- Full backtest: `python backtester.py -c config.yaml`
+- Batch sweeps: `python batch_sweeper.py -c sweeps.yaml`
+- Walk-forward: `python walk_forward.py -c config.yaml`
+# Cursor Rules — Forex_Backtester
+
+## North Star
+- Keep the system CONFIG-DRIVEN. No hardcoded params. All knobs come from YAML.
+- Preserve indicator & audit contracts. Never “simplify” them away.
+
+## File Boundaries
+- indicators/: production-only indicator logic in:
+  - confirmation_funcs.py (C1/C2), baseline_funcs.py, volume_funcs.py, exit_funcs.py
+- core: backtester.py, signal_logic.py, utils.py, validators_*.py, analytics/
+- results/: trades.csv, summary.txt, equity_curve.csv (and history subfolders)
+- No new indicator files per-indicator; add functions to the correct *_funcs.py.
+
+## Indicator Contracts (must always hold)
+- Confirmation (C1/C2): def c1_<name>(df, *, signal_col="c1_signal", **kwargs)->df
+  - Writes df[signal_col] in {-1,0,+1}. Return df.
+- Baseline: def baseline_<name>(df, *, signal_col="baseline_signal", **kwargs)->df
+  - Must write BOTH df["baseline"] and df[signal_col] in {-1,0,+1}. Return df.
+- Volume: same pattern; writes {-1,0,+1}.
+- Exit indicators: def exit_<name>(df, *, signal_col="exit_signal", **kwargs)->df
+  - Writes {0,1} ONLY to df[signal_col]. Return df.
+- All indicators accept named params with defaults + **kwargs and never read global config directly.
+
+## Signal & Trade Logic Guardrails
+- One-Candle + Pullback: mutually exclusive; enforce exactly as config specifies.
+- “Bridge Too Far”: cancel baseline-triggered entries if C1 last signaled ≥ N days (config).
+- Entry/Exit invariants:
+  - If TP1 (1x ATR) hits: classify as WIN regardless of later outcome.
+  - Losses only if SL before TP1; else SCRATCH.
+- Trailing Stop:
+  - Activates only after +2xATR move.
+  - Trails 1.5x ATR BEHIND price using ATR at entry (immutable), update current_sl only.
+- Audit integrity (immutable fields):
+  - tp1_at_entry_price, sl_at_entry_price are set at entry and NEVER mutated.
+  - Use current_sl for BE/TS updates; set sl_at_exit_price at exit time.
+- Spreads:
+  - Enabling spreads may change PnL, NEVER trade counts or exit reasons.
+
+## Config-Driven Everything
+- Read all knobs from YAML (pairs, timeframe, indicators, rule toggles, risk, spreads, DBCVIX, etc.).
+- No feature adds that bypass config. Add schema and defaults if needed.
+
+## TDD & CI
+- For ANY patch:
+  - Add/adjust tests under tests/.
+  - Keep changes ≤3 files or ≤100 LOC in Cursor; else switch to Aider.
+  - Run: ruff + pytest + smoke (must pass locally) before opening PR.
+- GitHub Actions is the truth; PR must be green to merge.
+
+## Safety & Math
+- Add np.clip safeguards before log/div operations.
+- Avoid lookahead; no use of future bars in signal or trade decisions.
+
+## Do NOT
+- Do not change return signatures or contracts.
+- Do not mutate immutable audit fields.
+- Do not hardcode params or paths.
+- Do not split indicators into per-file modules.
+
+## Quick Commands (assume repo root)
+- Run smoke: `pytest -q` (plus minimal backtest smoke)
+- Full backtest: `python backtester.py -c config.yaml`
+- Batch sweeps: `python batch_sweeper.py -c sweeps.yaml`
+- Walk-forward: `python walk_forward.py -c config.yaml`

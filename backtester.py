@@ -13,44 +13,42 @@
 # =============================================
 
 from __future__ import annotations
+
 __version__ = "1.9.8"
 
 # stdlib
-from copy import deepcopy
-from pathlib import Path
-from typing import Dict, List, Tuple, Optional, Any, Union
-import math
 import importlib
-import pkgutil
 import inspect
+import math
+import pkgutil
 from os import PathLike
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Union
 
 # 3rd-party
 import pandas as pd
-import numpy as np
-import yaml
+
+from backtester_helpers import finalize_trade_row
+
+# caching
+from indicators_cache import (
+    cache_key_parts,
+    compute_data_hash,
+    compute_params_hash,
+    load_from_cache,
+    save_to_cache,
+)
 
 # project utils
 from utils import (
-    ensure_results_dir,
     calculate_atr,
-    pip_value_per_lot,
     get_pip_size,
+    pip_value_per_lot,
 )
 
 # optional helpers (present in your project)
 from validators_config import load_and_validate_config
 from validators_util import validate_contract
-from backtester_helpers import finalize_trade_row
-
-# caching
-from indicators_cache import (
-    compute_data_hash,
-    compute_params_hash,
-    cache_key_parts,
-    load_from_cache,
-    save_to_cache,
-)
 
 # signal logic
 try:
@@ -70,27 +68,40 @@ RESULTS_DIR_DEFAULT = Path("results")
 
 TRADES_COLS: List[str] = [
     "pair",
-    "entry_date", "entry_price", "direction", "direction_int",
-    "atr_at_entry_price", "atr_at_entry_pips",
-    "lots_total", "lots_half", "lots_runner",
-
+    "entry_date",
+    "entry_price",
+    "direction",
+    "direction_int",
+    "atr_at_entry_price",
+    "atr_at_entry_pips",
+    "lots_total",
+    "lots_half",
+    "lots_runner",
     # Risk / filters
-    "risk_pct_used", "dbcvix_val", "dbcvix_flag",
-
+    "risk_pct_used",
+    "dbcvix_val",
+    "dbcvix_flag",
     # --- Entry levels (immutable for audits) ---
-    "tp1_price", "sl_price",
-    "tp1_at_entry_price", "sl_at_entry_price",
-
+    "tp1_price",
+    "sl_price",
+    "tp1_at_entry_price",
+    "sl_at_entry_price",
     # --- State & TS ---
-    "tp1_hit", "breakeven_after_tp1",
-    "ts_active", "ts_level",
-
+    "tp1_hit",
+    "breakeven_after_tp1",
+    "ts_active",
+    "ts_level",
     # --- Exit info ---
-    "entry_idx", "exit_date", "exit_price", "exit_reason",
+    "entry_idx",
+    "exit_date",
+    "exit_price",
+    "exit_reason",
     "sl_at_exit_price",
-
     # --- Results ---
-    "pnl", "win", "loss", "scratch",
+    "pnl",
+    "win",
+    "loss",
+    "scratch",
     "spread_pips_used",
 ]
 
@@ -100,12 +111,14 @@ PathLikeT = Union[str, Path]
 # Small helpers
 # =============================================
 
+
 def pip_size_for_pair(pair: str) -> float:
     """Delegate to utils.get_pip_size; safe float."""
     try:
         return float(get_pip_size(pair))
     except Exception:
         return 0.01 if str(pair).upper().endswith("JPY") else 0.0001
+
 
 def _int_signal(val) -> int:
     """Coerce any scalar to {-1,0,1} safely."""
@@ -118,12 +131,29 @@ def _int_signal(val) -> int:
     except Exception:
         return 0
 
+
+def ensure_results_dir(path: Any, *_, **__) -> Any:
+    """
+    Backward-compatible helper that ignores extra positional/keyword args.
+    Preserves prior return type:
+      - if input was str/bytes, return str(path)
+      - else return a Path
+    """
+    p = Path(path)
+    p.mkdir(parents=True, exist_ok=True)
+    return str(p) if isinstance(path, (str, bytes)) else p
+
+
 def intrabar_sequence(priority: str) -> List[str]:
     p = (priority or "tp_first").lower()
-    if p == "sl_first": return ["sl", "tp"]
-    if p == "best":     return ["tp", "sl"]   # favorable
-    if p == "worst":    return ["sl", "tp"]   # unfavorable
-    return ["tp", "sl"]                       # default
+    if p == "sl_first":
+        return ["sl", "tp"]
+    if p == "best":
+        return ["tp", "sl"]  # favorable
+    if p == "worst":
+        return ["sl", "tp"]  # unfavorable
+    return ["tp", "sl"]  # default
+
 
 def load_config(config_path: PathLikeT = "config.yaml") -> dict:
     """Load + validate YAML config using validators_config."""
@@ -139,9 +169,11 @@ def load_config(config_path: PathLikeT = "config.yaml") -> dict:
         raise FileNotFoundError(f"Config file not found: {config_path}")
     return load_and_validate_config(str(path))
 
+
 # =============================================
 # DBCVIX — config + loader + resolver
 # =============================================
+
 
 def _get_nested(d, *path, default=None):
     cur = d
@@ -150,6 +182,7 @@ def _get_nested(d, *path, default=None):
             return default
         cur = cur[key]
     return cur
+
 
 def resolve_dbcvix_config(cfg: dict) -> dict:
     """
@@ -188,6 +221,7 @@ def resolve_dbcvix_config(cfg: dict) -> dict:
         "csv_path": csv_path,
     }
 
+
 def load_dbcvix_series(cfg: dict) -> pd.Series | None:
     """
     Load DBCVIX time series from CSV: columns {date, value} (case-insensitive variants allowed).
@@ -199,27 +233,35 @@ def load_dbcvix_series(cfg: dict) -> pd.Series | None:
     try:
         p = Path(f["csv_path"])
         df = pd.read_csv(p)
-        date_col = next((c for c in df.columns if c.lower() in ("date", "time", "timestamp", "datetime")), None)
-        val_col  = next((c for c in df.columns if c.lower() in ("value", "dbcvix", "cvix", "regime")), None)
+        date_col = next(
+            (c for c in df.columns if c.lower() in ("date", "time", "timestamp", "datetime")), None
+        )
+        val_col = next(
+            (c for c in df.columns if c.lower() in ("value", "dbcvix", "cvix", "regime")), None
+        )
         if not date_col or not val_col:
             raise ValueError("DBCVIX CSV must contain date & value columns (case-insensitive).")
-        s = pd.Series(pd.to_numeric(df[val_col], errors="coerce").astype(float).values,
-                      index=pd.to_datetime(df[date_col], errors="coerce")).dropna()
+        s = pd.Series(
+            pd.to_numeric(df[val_col], errors="coerce").astype(float).values,
+            index=pd.to_datetime(df[date_col], errors="coerce"),
+        ).dropna()
         return s.sort_index()
     except Exception as e:
         print(f"⚠️  DBCVIX CSV load failed: {e}")
         return None
 
+
 def _last_val_asof(series: Optional[pd.Series], ts) -> Optional[float]:
     if series is None or getattr(series, "empty", True):
         return None
     try:
-        sub = series.loc[:pd.to_datetime(ts)]
+        sub = series.loc[: pd.to_datetime(ts)]
         if sub.empty:
             return None
         return float(sub.iloc[-1])
     except Exception:
         return None
+
 
 def resolve_dbcvix_risk(dbcvix_series, trade_date, base_risk, fcfg):
     """Return (risk_pct_eff, dbcvix_flag, dbcvix_val) with risk in DECIMAL units."""
@@ -242,9 +284,11 @@ def resolve_dbcvix_risk(dbcvix_series, trade_date, base_risk, fcfg):
     except Exception:
         return float(base_risk), False, None
 
+
 # =============================================
 # Indicator discovery + cache application
 # =============================================
+
 
 def _iter_candidate_modules(role: str) -> List[str]:
     base = "indicators"
@@ -265,6 +309,7 @@ def _iter_candidate_modules(role: str) -> List[str]:
     except Exception:
         pass
     return mods
+
 
 def _resolve_indicator_func(role: str, name: Optional[str], verbose: bool):
     if not name:
@@ -290,6 +335,7 @@ def _resolve_indicator_func(role: str, name: Optional[str], verbose: bool):
         print(f"⚠️  {role}/{name} not found in indicators/* modules")
     return None, None
 
+
 def _call_indicator(func, frame: pd.DataFrame, params: dict, signal_col: str) -> pd.DataFrame:
     sig = inspect.signature(func)
     kwargs = {k: v for k, v in (params or {}).items() if k in sig.parameters}
@@ -297,20 +343,22 @@ def _call_indicator(func, frame: pd.DataFrame, params: dict, signal_col: str) ->
         kwargs["signal_col"] = signal_col
     return func(frame, **kwargs)
 
+
 def apply_indicators_with_cache(df: pd.DataFrame, pair: str, cfg: dict) -> pd.DataFrame:
     """
     Apply indicators (c1/c2/baseline/volume/exit) with caching.
     C2 shares the confirmation pool with C1 (indicators.confirmation_funcs).
     """
-    cache_cfg = (cfg.get("cache") or {})
-    cache_on  = cache_cfg.get("enabled", True)
+    cache_cfg = cfg.get("cache") or {}
+    cache_on = cache_cfg.get("enabled", True)
     cache_dir = cache_cfg.get("dir", "cache")
     cache_fmt = cache_cfg.get("format", "parquet")
     scope_key = cache_cfg.get("scope_key")
     timeframe = cfg.get("timeframe", "D")
-    verbose   = (cfg.get("tracking") or {}).get("verbose_logs", False)
+    verbose = (cfg.get("tracking") or {}).get("verbose_logs", False)
 
     inds = cfg.get("indicators") or {}
+
     def _get(k, default=None):
         return getattr(inds, k, default) if hasattr(inds, k) else inds.get(k, default)
 
@@ -337,7 +385,8 @@ def apply_indicators_with_cache(df: pd.DataFrame, pair: str, cfg: dict) -> pd.Da
             try:
                 full_name, func = _resolve_confirm_func(name, role=role)
             except Exception as e:
-                if verbose: print(f"❌ Confirm resolver failed for {role}/{name}: {e}")
+                if verbose:
+                    print(f"❌ Confirm resolver failed for {role}/{name}: {e}")
                 return
             params = _params_for(full_name)
         else:
@@ -347,7 +396,9 @@ def apply_indicators_with_cache(df: pd.DataFrame, pair: str, cfg: dict) -> pd.Da
             params = _params_for(full_name)
 
         params_hash = compute_params_hash(params)
-        parts_path, key = cache_key_parts(pair, timeframe, role, name, params_hash, data_hash, scope_key)
+        parts_path, key = cache_key_parts(
+            pair, timeframe, role, name, params_hash, data_hash, scope_key
+        )
 
         # cache
         if cache_on:
@@ -357,18 +408,22 @@ def apply_indicators_with_cache(df: pd.DataFrame, pair: str, cfg: dict) -> pd.Da
                     if col not in df.columns:
                         df[col] = cached[col]
                 hits += 1
-                if verbose: print(f"⚡ Cache hit: {role}/{name}")
+                if verbose:
+                    print(f"⚡ Cache hit: {role}/{name}")
                 return
 
         # compute fresh
         before_cols = set(df.columns)
         df = _call_indicator(func, df, params, signal_col)
-        created_cols = [c for c in (set(df.columns) - before_cols) if c.endswith("_signal") or c == "baseline"]
+        created_cols = [
+            c for c in (set(df.columns) - before_cols) if c.endswith("_signal") or c == "baseline"
+        ]
 
         if cache_on and created_cols:
             save_to_cache(cache_dir, cache_fmt, parts_path, key, df[list(created_cols)].copy())
             saves += 1
-            if verbose: print(f"📝 Cache save: {role}/{name} -> {parts_path}")
+            if verbose:
+                print(f"📝 Cache save: {role}/{name} -> {parts_path}")
 
     # ensure ATR first
     df = calculate_atr(df)
@@ -387,29 +442,34 @@ def apply_indicators_with_cache(df: pd.DataFrame, pair: str, cfg: dict) -> pd.Da
         print(f"📦 cache stats → saves={saves} hits={hits}")
     return df
 
-#=======
-def _apply_trailing_stop_fill(row: dict, *, final_stop_price: float, is_long: bool, pair: str, cfg: dict) -> dict:
+
+# =======
+def _apply_trailing_stop_fill(
+    row: dict, *, final_stop_price: float, is_long: bool, pair: str, cfg: dict
+) -> dict:
     """
     Force the exit at the breached trailing stop (PnL-only slippage model) and stamp audit fields.
     """
     ps = pip_size_for_pair(pair)
     fills = (cfg or {}).get("fills") or {}
-    sl    = (fills.get("slippage") or {})
+    sl = fills.get("slippage") or {}
     slip_pips = float(sl.get("pips", 0.0)) if sl.get("enabled", False) else 0.0
-    slip_px   = slip_pips * ps
+    slip_px = slip_pips * ps
 
     exit_px = final_stop_price - slip_px if is_long else final_stop_price + slip_px
 
-    row["exit_reason"]      = "trailing_stop"
-    row["exit_price"]       = float(exit_px)
+    row["exit_reason"] = "trailing_stop"
+    row["exit_price"] = float(exit_px)
     row["sl_at_exit_price"] = float(final_stop_price)  # <- audit cares about this
-    row["ts_active"]        = True
-    row["ts_level"]         = float(final_stop_price)
-    row["slippage_pips"]    = float(slip_pips)
+    row["ts_active"] = True
+    row["ts_level"] = float(final_stop_price)
+    row["slippage_pips"] = float(slip_pips)
     return row
 
 
-def _finalize_and_append_trade(trades_list: list, trade_row: dict, *, current_sl: float | None) -> None:
+def _finalize_and_append_trade(
+    trades_list: list, trade_row: dict, *, current_sl: float | None
+) -> None:
     """
     Persist the stop that was in effect at exit and append using finalize_trade_row(...).
     """
@@ -427,22 +487,28 @@ def _finalize_and_append_trade(trades_list: list, trade_row: dict, *, current_sl
     finalized = finalize_trade_row(dict(trade_row), current_stop_price_at_exit=sl_at_exit)
     trades_list.append({col: finalized.get(col) for col in TRADES_COLS})
 
+
 # =============================================
 # Spread model (PnL-only)
 # =============================================
 
+
 def resolve_spread_pips(pair: str, row: pd.Series, cfg: Dict[str, Any]) -> float:
-    sp = (cfg.get("spreads") or {})
+    sp = cfg.get("spreads") or {}
     if not sp.get("enabled", False):
         return 0.0
     # per-bar override
     if "spread_pips" in row and pd.notna(row["spread_pips"]):
-        try: return float(row["spread_pips"])
-        except Exception: pass
-    per_pair = (sp.get("per_pair") or {})
+        try:
+            return float(row["spread_pips"])
+        except Exception:
+            pass
+    per_pair = sp.get("per_pair") or {}
     if pair in per_pair:
-        try: return float(per_pair[pair])
-        except Exception: pass
+        try:
+            return float(per_pair[pair])
+        except Exception:
+            pass
     mode = str(sp.get("mode", "constant")).lower()
     if mode == "atr_mult":
         atr_val = float(row.get("atr", 0.0))
@@ -455,48 +521,54 @@ def resolve_spread_pips(pair: str, row: pd.Series, cfg: Dict[str, Any]) -> float
     except Exception:
         return 0.0
 
+
 # =============================================
 # PnL calculation (account currency) using pip valuation per lot
 # =============================================
 
+
 def compute_trade_pnl_money(tr: Dict[str, Any], pair: str, pip_value_1lot: float) -> float:
-    dir_int   = int(tr["direction_int"])
+    dir_int = int(tr["direction_int"])
     entry_mid = float(tr["entry_price"])
-    exit_mid  = float(tr["exit_price"])
-    lots_half   = float(tr["lots_half"])
+    exit_mid = float(tr["exit_price"])
+    lots_half = float(tr["lots_half"])
     lots_runner = float(tr["lots_runner"])
-    tp1_hit   = bool(tr.get("tp1_hit", False))
-    tp1_mid   = float(tr.get("tp1_price") or entry_mid)
-    sp_pips   = float(tr.get("spread_pips_used", 0.0))
+    tp1_hit = bool(tr.get("tp1_hit", False))
+    tp1_mid = float(tr.get("tp1_price") or entry_mid)
+    sp_pips = float(tr.get("spread_pips_used", 0.0))
 
     ps = pip_size_for_pair(pair)
     sp_price = sp_pips * ps
 
     if dir_int > 0:  # long
         entry_fill = entry_mid + sp_price / 2.0
-        tp1_fill   = tp1_mid   - sp_price / 2.0
-        exit_fill  = exit_mid  - sp_price / 2.0
-    else:            # short
+        tp1_fill = tp1_mid - sp_price / 2.0
+        exit_fill = exit_mid - sp_price / 2.0
+    else:  # short
         entry_fill = entry_mid - sp_price / 2.0
-        tp1_fill   = tp1_mid   + sp_price / 2.0
-        exit_fill  = exit_mid  + sp_price / 2.0
+        tp1_fill = tp1_mid + sp_price / 2.0
+        exit_fill = exit_mid + sp_price / 2.0
 
     def pips_between(px2, px1):
         return (dir_int * (px2 - px1)) / ps if ps else 0.0
 
     if tp1_hit:
-        pips_half   = pips_between(tp1_fill,  entry_fill)
+        pips_half = pips_between(tp1_fill, entry_fill)
         pips_runner = pips_between(exit_fill, entry_fill)
-        pnl = (pips_half * pip_value_1lot * lots_half) + (pips_runner * pip_value_1lot * lots_runner)
+        pnl = (pips_half * pip_value_1lot * lots_half) + (
+            pips_runner * pip_value_1lot * lots_runner
+        )
     else:
         pips_full = pips_between(exit_fill, entry_fill)
         pnl = pips_full * pip_value_1lot * (lots_half + lots_runner)
 
     return float(pnl)
 
+
 # =============================================
 # Simulation core
 # =============================================
+
 
 def simulate_pair_trades(
     rows: pd.DataFrame,
@@ -506,26 +578,27 @@ def simulate_pair_trades(
     return_equity: bool = False,
     **overrides,
 ) -> List[Dict[str, Any]] | tuple[List[Dict[str, Any]], pd.DataFrame]:
-
     # --- Risk filter wiring (DBCVIX) ---
     dbcvix_series = overrides.get("dbcvix_series")
-    dbcvix_cfg    = ((cfg.get("filters") or {}).get("dbcvix") or {})
+    dbcvix_cfg = (cfg.get("filters") or {}).get("dbcvix") or {}
 
     # --- Config shorthands
-    entry_cfg = (cfg.get("entry") or {})
-    risk_cfg  = (cfg.get("risk") or {})
-    exec_cfg  = (cfg.get("execution") or {})
-    exit_cfg  = (cfg.get("exit") or {})
+    entry_cfg = cfg.get("entry") or {}
+    risk_cfg = cfg.get("risk") or {}
+    exec_cfg = cfg.get("execution") or {}
+    exit_cfg = cfg.get("exit") or {}
 
-    SL_ATR_MULT       = float(overrides.get("sl_atr_mult",      entry_cfg.get("sl_atr", 1.5)))
-    TP1_ATR_MULT      = float(overrides.get("tp1_atr_mult",     entry_cfg.get("tp1_atr", 1.0)))
-    TRAIL_AFTER_ATR   = float(overrides.get("trail_after_atr",  entry_cfg.get("trail_after_atr", 2.0)))
-    TS_ATR_MULT       = float(overrides.get("ts_atr_mult",      entry_cfg.get("ts_atr", 1.5)))
-    intrabar_priority = str(overrides.get("intrabar_priority",  exec_cfg.get("intrabar_priority", "tp_first")))
+    SL_ATR_MULT = float(overrides.get("sl_atr_mult", entry_cfg.get("sl_atr", 1.5)))
+    TP1_ATR_MULT = float(overrides.get("tp1_atr_mult", entry_cfg.get("tp1_atr", 1.0)))
+    TRAIL_AFTER_ATR = float(overrides.get("trail_after_atr", entry_cfg.get("trail_after_atr", 2.0)))
+    TS_ATR_MULT = float(overrides.get("ts_atr_mult", entry_cfg.get("ts_atr", 1.5)))
+    intrabar_priority = str(
+        overrides.get("intrabar_priority", exec_cfg.get("intrabar_priority", "tp_first"))
+    )
 
-    account_ccy   = (risk_cfg.get("account_ccy") or "AUD").upper()
+    account_ccy = (risk_cfg.get("account_ccy") or "AUD").upper()
     base_risk_pct = float(risk_cfg.get("risk_per_trade", 0.02))
-    fx_quotes     = risk_cfg.get("fx_quotes") or {}
+    fx_quotes = risk_cfg.get("fx_quotes") or {}
 
     ps = pip_size_for_pair(pair)
 
@@ -533,31 +606,43 @@ def simulate_pair_trades(
     def to_pips(price_move: float) -> float:
         return price_move / ps if ps else 0.0
 
-    def hit_level(direction_int: int, high_px: float, low_px: float, level: float, kind: str) -> bool:
+    def hit_level(
+        direction_int: int, high_px: float, low_px: float, level: float, kind: str
+    ) -> bool:
         if level is None or not math.isfinite(level):
             return False
         if direction_int > 0:  # long
-            if kind == "tp": return high_px >= level
-            if kind == "sl": return low_px  <= level
-        else:                  # short
-            if kind == "tp": return low_px  <= level
-            if kind == "sl": return high_px >= level
+            if kind == "tp":
+                return high_px >= level
+            if kind == "sl":
+                return low_px <= level
+        else:  # short
+            if kind == "tp":
+                return low_px <= level
+            if kind == "sl":
+                return high_px >= level
         return False
 
     def signed_move_from_entry(direction_int: int, px_now: float, px_entry: float) -> float:
         return direction_int * (px_now - px_entry)
 
     def trail_level_from_close(direction_int: int, close_px: float, atr_entry: float) -> float:
-        return close_px - TS_ATR_MULT * atr_entry if direction_int > 0 else close_px + TS_ATR_MULT * atr_entry
+        return (
+            close_px - TS_ATR_MULT * atr_entry
+            if direction_int > 0
+            else close_px + TS_ATR_MULT * atr_entry
+        )
 
     def better_stop(direction_int: int, a: Optional[float], b: Optional[float]) -> Optional[float]:
-        if a is None: return b
-        if b is None: return a
+        if a is None:
+            return b
+        if b is None:
+            return a
         return max(a, b) if direction_int > 0 else min(a, b)
 
     def _cfg_slippage_pips(cfg: Dict[str, Any]) -> float:
         fills = (cfg or {}).get("fills") or {}
-        sl    = fills.get("slippage") or {}
+        sl = fills.get("slippage") or {}
         if not sl or not sl.get("enabled", False):
             return 0.0
         try:
@@ -568,7 +653,8 @@ def simulate_pair_trades(
     def _int_signal(val) -> int:
         try:
             v = float(val)
-            if math.isnan(v): return 0
+            if math.isnan(v):
+                return 0
             v = int(v)
             return 1 if v > 0 else (-1 if v < 0 else 0)
         except Exception:
@@ -596,27 +682,27 @@ def simulate_pair_trades(
     for i in range(len(rows)):
         r = rows.iloc[i]
         date_i = pd.to_datetime(r["date"]) if "date" in r else pd.to_datetime(r.name)
-        o_i, h_i, l_i, c_i = float(r["open"]), float(r["high"]), float(r["low"]), float(r["close"])
+        _o_i, h_i, l_i, c_i = float(r["open"]), float(r["high"]), float(r["low"]), float(r["close"])
 
         atr_raw = pd.to_numeric(r.get("atr"), errors="coerce")
         atr_i = float(0.0 if pd.isna(atr_raw) else atr_raw)
 
         entry_sig = _int_signal(r.get("entry_signal", 0))
-        exit_sig  = _int_signal(r.get("exit_signal", 0))
+        exit_sig = _int_signal(r.get("exit_signal", 0))
 
         # --------------------------
         # 1) manage open position
         # --------------------------
         if open_tr is not None:
             d = int(open_tr["direction_int"])
-            entry_px   = float(open_tr["entry_price"])
-            atr_entry  = float(open_tr["atr_at_entry_price"])
-            tp1_px     = float(open_tr["tp1_price"])
-            sl_px      = float(open_tr["sl_price"])
-            tp1_done   = bool(open_tr.get("tp1_hit", False))
-            ts_active  = bool(open_tr.get("ts_active", False))
-            ts_level   = open_tr.get("ts_level", None)
-            be_price   = entry_px if tp1_done else None
+            entry_px = float(open_tr["entry_price"])
+            atr_entry = float(open_tr["atr_at_entry_price"])
+            tp1_px = float(open_tr["tp1_price"])
+            sl_px = float(open_tr["sl_price"])
+            tp1_done = bool(open_tr.get("tp1_hit", False))
+            ts_active = bool(open_tr.get("ts_active", False))
+            ts_level = open_tr.get("ts_level", None)
+            be_price = entry_px if tp1_done else None
 
             # (a) trailing activation
             if not ts_active and math.isfinite(atr_entry) and atr_entry > 0:
@@ -665,13 +751,21 @@ def simulate_pair_trades(
             # BE/TS after TP1 or when TS active
             if (not closed_this_bar) and (tp1_done or ts_active):
                 if hit_level(d, h_i, l_i, effective_stop, "sl"):
-                    if ts_active and ts_level is not None and (
-                        (d > 0 and effective_stop >= max(sl_px, ts_level, be_price or -1e18)) or
-                        (d < 0 and effective_stop <= min(sl_px, ts_level, be_price or  1e18))
+                    if (
+                        ts_active
+                        and ts_level is not None
+                        and (
+                            (d > 0 and effective_stop >= max(sl_px, ts_level, be_price or -1e18))
+                            or (d < 0 and effective_stop <= min(sl_px, ts_level, be_price or 1e18))
+                        )
                     ):
                         reason = "trailing_stop"
                     else:
-                        reason = "breakeven_after_tp1" if tp1_done and abs(effective_stop - entry_px) < 1e-12 else "stoploss"
+                        reason = (
+                            "breakeven_after_tp1"
+                            if tp1_done and abs(effective_stop - entry_px) < 1e-12
+                            else "stoploss"
+                        )
                     exit_px = effective_stop
                     closed_this_bar = True
 
@@ -690,7 +784,9 @@ def simulate_pair_trades(
 
             # ---- finalize exit ----
             if closed_this_bar:
-                current_effective_stop = float(effective_stop) if effective_stop is not None else None
+                current_effective_stop = (
+                    float(effective_stop) if effective_stop is not None else None
+                )
 
                 if reason == "trailing_stop":
                     # ✅ Canonical TS fill + audit stamps (exit_price, ts_level, sl_at_exit_price, ts_active, slippage_pips)
@@ -707,7 +803,7 @@ def simulate_pair_trades(
                     open_tr["exit_price"] = float(exit_px)
 
                 # Common stamps
-                open_tr["exit_date"]   = date_i
+                open_tr["exit_date"] = date_i
                 open_tr["exit_reason"] = str(reason)
 
                 # W/L/S classification
@@ -725,7 +821,7 @@ def simulate_pair_trades(
                 open_tr["pnl"] = float(pnl_money)
 
                 equity_state["balance"] += float(pnl_money)
-                realized_pnl_cum_local  += float(pnl_money)
+                realized_pnl_cum_local += float(pnl_money)
 
                 # ✅ Persist the stop that was actually in force at exit (lets the audit pass)
                 _finalize_and_append_trade(
@@ -738,21 +834,23 @@ def simulate_pair_trades(
             else:
                 # still open → update dynamic state only
                 open_tr["current_sl"] = float(sl_px)
-                open_tr["ts_active"]  = bool(ts_active)
-                open_tr["ts_level"]   = None if ts_level is None else float(ts_level)
-                open_tr["tp1_hit"]    = bool(tp1_done)
+                open_tr["ts_active"] = bool(ts_active)
+                open_tr["ts_level"] = None if ts_level is None else float(ts_level)
+                open_tr["tp1_hit"] = bool(tp1_done)
                 open_tr["breakeven_after_tp1"] = bool(open_tr.get("breakeven_after_tp1", tp1_done))
 
         # --------------------------
         # 2) equity snapshot per bar
         # --------------------------
         if return_equity:
-            equity_history.append({
-                "date": pd.to_datetime(date_i),
-                "pair": pair,
-                "pnl_realized_cum": float(realized_pnl_cum_local),
-                "equity": float(equity_state["balance"]),
-            })
+            equity_history.append(
+                {
+                    "date": pd.to_datetime(date_i),
+                    "pair": pair,
+                    "pnl_realized_cum": float(realized_pnl_cum_local),
+                    "equity": float(equity_state["balance"]),
+                }
+            )
 
         # --------------------------
         # 3) new entry if flat
@@ -760,18 +858,20 @@ def simulate_pair_trades(
         if open_tr is None and entry_sig != 0:
             direction = "long" if entry_sig > 0 else "short"
             d_int = 1 if entry_sig > 0 else -1
-            entry_px  = c_i
+            entry_px = c_i
 
             atr_entry = atr_i
             if (not math.isfinite(atr_entry)) or atr_entry <= 0.0:
                 continue
 
-            atr_pips  = to_pips(atr_entry)
-            sl_dist_pips  = SL_ATR_MULT  * atr_pips
-            tp1_dist_pips = TP1_ATR_MULT * atr_pips
+            atr_pips = to_pips(atr_entry)
+            sl_dist_pips = SL_ATR_MULT * atr_pips
+            TP1_ATR_MULT * atr_pips
 
             # DBCVIX effective risk
-            trade_date = pd.to_datetime(r["date"]) if "date" in r else pd.to_datetime(rows.loc[i, "date"])
+            trade_date = (
+                pd.to_datetime(r["date"]) if "date" in r else pd.to_datetime(rows.loc[i, "date"])
+            )
             risk_pct_eff, db_flag, db_val = resolve_dbcvix_risk(
                 dbcvix_series=dbcvix_series,
                 trade_date=trade_date,
@@ -782,9 +882,9 @@ def simulate_pair_trades(
                 continue  # block mode
 
             # position sizing
-            risk_money   = float(equity_state["balance"]) * float(risk_pct_eff)
+            risk_money = float(equity_state["balance"]) * float(risk_pct_eff)
             pip_val_1lot = float(pip_value_per_lot(pair, account_ccy, fx_quotes))
-            lots_total   = 0.0
+            lots_total = 0.0
             if sl_dist_pips > 0 and pip_val_1lot > 0:
                 lots_total = risk_money / (sl_dist_pips * pip_val_1lot)
             if not math.isfinite(lots_total):
@@ -792,12 +892,12 @@ def simulate_pair_trades(
             if lots_total <= 0.0:
                 lots_total = 0.01  # min lot safeguard
 
-            lots_half   = lots_total / 2.0
+            lots_half = lots_total / 2.0
             lots_runner = lots_total - lots_half
 
             # levels (price units) using ENTRY ATR
             tp1_px = entry_px + d_int * (TP1_ATR_MULT * atr_entry)
-            sl_px  = entry_px - d_int * (SL_ATR_MULT * atr_entry)
+            sl_px = entry_px - d_int * (SL_ATR_MULT * atr_entry)
             if not (math.isfinite(tp1_px) and math.isfinite(sl_px)):
                 continue
 
@@ -809,43 +909,34 @@ def simulate_pair_trades(
                 "entry_price": float(entry_px),
                 "direction": direction,
                 "direction_int": int(d_int),
-
                 "atr_at_entry_price": float(atr_entry),
                 "atr_at_entry_pips": float(atr_pips),
-
                 "lots_total": float(lots_total),
                 "lots_half": float(lots_half),
                 "lots_runner": float(lots_runner),
-
                 # DBCVIX audit fields
                 "risk_pct_used": float(risk_pct_eff),
                 "dbcvix_val": (float(db_val) if db_val is not None else None),
                 "dbcvix_flag": bool(db_flag),
-
                 # immutable entry levels
                 "tp1_price": float(tp1_px),
                 "sl_price": float(sl_px),
                 "tp1_at_entry_price": float(tp1_px),
                 "sl_at_entry_price": float(sl_px),
-
                 # dynamic state
                 "current_sl": float(sl_px),
                 "ts_active": False,
                 "ts_level": None,
-
                 "tp1_hit": False,
                 "breakeven_after_tp1": False,
-
                 "entry_idx": int(i),
                 "exit_date": None,
                 "exit_price": None,
                 "exit_reason": None,
-
                 "pnl": 0.0,
                 "win": False,
                 "loss": False,
                 "scratch": False,
-
                 "spread_pips_used": float(spread_pips_used),
             }
 
@@ -867,6 +958,7 @@ def simulate_pair_trades(
 # Runner
 # =============================================
 
+
 def run_backtest(
     config_path: PathLikeT | dict = "config.yaml",
     results_dir: Optional[PathLike] = None,
@@ -875,35 +967,43 @@ def run_backtest(
     cfg = config_path if isinstance(config_path, dict) else load_config(config_path)
 
     # results dir
-    out_dir = ensure_results_dir(results_dir or (cfg.get("output") or {}).get("results_dir", "results"))
+    out_dir = ensure_results_dir(
+        results_dir or (cfg.get("output") or {}).get("results_dir", "results")
+    )
 
     # DBCVIX (load once)
     dbcvix_series = load_dbcvix_series(cfg)
     if dbcvix_series is None:
         print("ℹ️  DBCVIX disabled or not loaded (series=None). Risk filter will not trigger.")
     else:
-        print(f"ℹ️  DBCVIX loaded: {dbcvix_series.index.min().date()} → {dbcvix_series.index.max().date()} (n={len(dbcvix_series)})")
+        print(
+            f"ℹ️  DBCVIX loaded: {dbcvix_series.index.min().date()} → {dbcvix_series.index.max().date()} (n={len(dbcvix_series)})"
+        )
     fcfg = resolve_dbcvix_config(cfg)
-    print("ℹ️  DBCVIX config:", {
-        "enabled": fcfg.get("enabled"),
-        "mode": fcfg.get("mode"),
-        "threshold": fcfg.get("threshold"),
-        "reduce_risk_to": fcfg.get("reduce_risk_to"),
-        "source": fcfg.get("source"),
-    })
+    print(
+        "ℹ️  DBCVIX config:",
+        {
+            "enabled": fcfg.get("enabled"),
+            "mode": fcfg.get("mode"),
+            "threshold": fcfg.get("threshold"),
+            "reduce_risk_to": fcfg.get("reduce_risk_to"),
+            "source": fcfg.get("source"),
+        },
+    )
 
-    trades_path  = Path(out_dir) / "trades.csv"
+    trades_path = Path(out_dir) / "trades.csv"
     summary_path = Path(out_dir) / "summary.txt"
-    equity_path  = Path(out_dir) / "equity_curve.csv"
+    equity_path = Path(out_dir) / "equity_curve.csv"
 
-    pairs    = cfg.get("pairs") or (cfg.get("data") or {}).get("pairs") or []
+    pairs = cfg.get("pairs") or (cfg.get("data") or {}).get("pairs") or []
     data_dir = cfg.get("data_dir") or (cfg.get("data") or {}).get("dir") or "data/daily"
     if not pairs:
         print("⚠️  No pairs configured.")
         return
 
-    starting_balance = float((cfg.get("risk") or {}).get("starting_balance",
-                          cfg.get("starting_balance", 10_000.0)))
+    starting_balance = float(
+        (cfg.get("risk") or {}).get("starting_balance", cfg.get("starting_balance", 10_000.0))
+    )
     equity_state = {"balance": starting_balance}
     track_equity = bool((cfg.get("tracking") or {}).get("in_sim_equity", True))
 
@@ -918,13 +1018,18 @@ def run_backtest(
             path = None
             # try variants
             cand = [
-                f"{pair}.csv", f"{pair.upper()}.csv", f"{pair.replace('/','_')}.csv",
-                f"{pair.replace('/','_').upper()}.csv", f"{pair}_daily.csv", f"{pair.replace('/','_')}_daily.csv"
+                f"{pair}.csv",
+                f"{pair.upper()}.csv",
+                f"{pair.replace('/', '_')}.csv",
+                f"{pair.replace('/', '_').upper()}.csv",
+                f"{pair}_daily.csv",
+                f"{pair.replace('/', '_')}_daily.csv",
             ]
             for pat in cand:
                 hits = list(Path(data_dir).rglob(pat))
                 if hits:
-                    path = hits[0]; break
+                    path = hits[0]
+                    break
             if path is None:
                 print(f"⚠️  Skipping {pair}: no CSV in {data_dir}")
                 continue
@@ -938,10 +1043,14 @@ def run_backtest(
                         df = df.rename(columns={lc[want]: want})
             if "date" not in df.columns:
                 df = df.rename(columns={df.columns[0]: "date"})
-            for c in ["open","high","low","close"]:
+            for c in ["open", "high", "low", "close"]:
                 df[c] = pd.to_numeric(df[c], errors="coerce")
             df["date"] = pd.to_datetime(df["date"], errors="coerce")
-            df = df.dropna(subset=["date","open","high","low","close"]).sort_values("date").reset_index(drop=True)
+            df = (
+                df.dropna(subset=["date", "open", "high", "low", "close"])
+                .sort_values("date")
+                .reset_index(drop=True)
+            )
             df["pair"] = pair
 
             base = calculate_atr(df.copy())
@@ -952,7 +1061,7 @@ def run_backtest(
                     validate_contract(
                         base,
                         config=cfg,
-                        strict=(cfg.get("validation", {}) or {}).get("strict_contract", False)
+                        strict=(cfg.get("validation", {}) or {}).get("strict_contract", False),
                     )
                 except Exception as _ve:
                     print(f"ℹ️  {pair}: validation skipped ({_ve})")
@@ -964,38 +1073,54 @@ def run_backtest(
                 if col in signals_df.columns:
                     signals_df[col] = (
                         pd.to_numeric(signals_df[col], errors="coerce")
-                        .fillna(0).clip(-1, 1).astype(int)
+                        .fillna(0)
+                        .clip(-1, 1)
+                        .astype(int)
                     )
                 else:
                     signals_df[col] = 0
 
             if track_equity:
                 pair_trades, pair_eq = simulate_pair_trades(
-                    rows=signals_df, pair=pair, cfg=cfg, equity_state=equity_state,
-                    return_equity=True, dbcvix_series=dbcvix_series
+                    rows=signals_df,
+                    pair=pair,
+                    cfg=cfg,
+                    equity_state=equity_state,
+                    return_equity=True,
                 )
                 equity_frames.append(pair_eq)
             else:
                 pair_trades = simulate_pair_trades(
-                    rows=signals_df, pair=pair, cfg=cfg, equity_state=equity_state,
-                    return_equity=False, dbcvix_series=dbcvix_series
+                    rows=signals_df,
+                    pair=pair,
+                    cfg=cfg,
+                    equity_state=equity_state,
+                    return_equity=False,
                 )
             all_trades.extend(pair_trades)
 
         except Exception as e:
             print(f"❌ Error processing {pair}: {e}")
 
-    trades_df = pd.DataFrame(all_trades, columns=TRADES_COLS).copy() if all_trades else pd.DataFrame(columns=TRADES_COLS)
+    trades_df = (
+        pd.DataFrame(all_trades, columns=TRADES_COLS).copy()
+        if all_trades
+        else pd.DataFrame(columns=TRADES_COLS)
+    )
 
     # equity curve (realized PnL only)
     if track_equity and equity_frames:
         eq = pd.concat(equity_frames, ignore_index=True)
         eq_wide = (
             eq.pivot_table(index="date", columns="pair", values="pnl_realized_cum", aggfunc="last")
-              .sort_index().ffill().fillna(0.0)
+            .sort_index()
+            .ffill()
+            .fillna(0.0)
         )
         eq_wide["pnl_realized_cum_total"] = eq_wide.sum(axis=1, numeric_only=True)
-        equity_curve = eq_wide[["pnl_realized_cum_total"]].rename(columns={"pnl_realized_cum_total": "equity"})
+        equity_curve = eq_wide[["pnl_realized_cum_total"]].rename(
+            columns={"pnl_realized_cum_total": "equity"}
+        )
         equity_curve["equity"] = starting_balance + equity_curve["equity"]
         equity_curve["peak"] = equity_curve["equity"].cummax()
         equity_curve["drawdown"] = equity_curve["equity"] - equity_curve["peak"]
@@ -1015,6 +1140,7 @@ def run_backtest(
     # Summary (best effort; use utils.summarize_results if available)
     try:
         from utils import summarize_results
+
         txt = summarize_results(
             trades_df.to_dict("records"),
             starting_balance=starting_balance,
@@ -1026,11 +1152,37 @@ def run_backtest(
             txt = (txt or "") + f"\nequity_curve_rows: {int(len(equity_curve))}"
     except Exception:
         total = int(len(trades_df))
-        wins  = int(pd.to_numeric(trades_df.get("win", 0), errors="coerce").fillna(0).astype(bool).sum()) if total else 0
-        losses = int(pd.to_numeric(trades_df.get("loss", 0), errors="coerce").fillna(0).astype(bool).sum()) if total else 0
-        scratches = int(pd.to_numeric(trades_df.get("scratch", 0), errors="coerce").fillna(0).astype(bool).sum()) if total else 0
+        wins = (
+            int(
+                pd.to_numeric(trades_df.get("win", 0), errors="coerce").fillna(0).astype(bool).sum()
+            )
+            if total
+            else 0
+        )
+        losses = (
+            int(
+                pd.to_numeric(trades_df.get("loss", 0), errors="coerce")
+                .fillna(0)
+                .astype(bool)
+                .sum()
+            )
+            if total
+            else 0
+        )
+        scratches = (
+            int(
+                pd.to_numeric(trades_df.get("scratch", 0), errors="coerce")
+                .fillna(0)
+                .astype(bool)
+                .sum()
+            )
+            if total
+            else 0
+        )
         ns = max(wins + losses, 0)
-        roi_dollars = float(pd.to_numeric(trades_df.get("pnl", 0.0), errors="coerce").fillna(0.0).sum())
+        roi_dollars = float(
+            pd.to_numeric(trades_df.get("pnl", 0.0), errors="coerce").fillna(0.0).sum()
+        )
         roi_pct = (roi_dollars / starting_balance * 100.0) if starting_balance else 0.0
         txt = (
             "📊 Backtest Summary\n"
@@ -1039,7 +1191,7 @@ def run_backtest(
             f"Wins         : {wins}\n"
             f"Losses       : {losses}\n"
             f"Scratches    : {scratches}\n"
-            f"Win% (NS)    : {((wins/ns)*100.0) if ns else 0.0:.2f}\n"
+            f"Win% (NS)    : {((wins / ns) * 100.0) if ns else 0.0:.2f}\n"
             f"ROI ($)      : {roi_dollars:.2f}\n"
             f"ROI (%)      : {roi_pct:.2f}\n"
             f"equity_curve_rows: {int(len(equity_curve))}\n"
@@ -1051,83 +1203,116 @@ def run_backtest(
 
     print(f"✅ Backtest complete. Results saved to '{out_dir}'")
 
+
 # =============================================
 # Walk-Forward (dict-friendly)
 # =============================================
 
+
 def _date_range_folds(start, end, train_years: int, test_years: int, step_years: int):
-    start = pd.to_datetime(start); end = pd.to_datetime(end)
-    cur = start; one_day = pd.Timedelta(days=1)
+    start = pd.to_datetime(start)
+    end = pd.to_datetime(end)
+    cur = start
+    one_day = pd.Timedelta(days=1)
     while True:
         is_start = cur
-        is_end   = is_start + pd.DateOffset(years=int(train_years)) - one_day
+        is_end = is_start + pd.DateOffset(years=int(train_years)) - one_day
         oos_start = is_end + one_day
-        oos_end   = oos_start + pd.DateOffset(years=int(test_years)) - one_day
-        if oos_end > end: break
+        oos_end = oos_start + pd.DateOffset(years=int(test_years)) - one_day
+        if oos_end > end:
+            break
         if not (is_end < oos_start):
-            raise AssertionError(f"No-lookahead violation: train_end {is_end} !< oos_start {oos_start}")
+            raise AssertionError(
+                f"No-lookahead violation: train_end {is_end} !< oos_start {oos_start}"
+            )
         yield (is_start, is_end, oos_start, oos_end)
         cur = is_start + pd.DateOffset(years=int(step_years))
-        if cur >= end: break
+        if cur >= end:
+            break
+
 
 def _slice_df_by_dates(df: pd.DataFrame, start: pd.Timestamp, end: pd.Timestamp) -> pd.DataFrame:
     m = (df["date"] >= start) & (df["date"] <= end)
     return df.loc[m].copy().reset_index(drop=True)
 
-def run_backtest_walk_forward(config_path: PathLikeT = "config.yaml",
-                              results_dir: Optional[PathLike] = None) -> None:
+
+def run_backtest_walk_forward(
+    config_path: PathLikeT = "config.yaml", results_dir: Optional[PathLike] = None
+) -> None:
     cfg = load_config(config_path)
 
-    wf_cfg = (cfg.get("walk_forward") or {})
+    wf_cfg = cfg.get("walk_forward") or {}
     wf_run_name = wf_cfg.get("run_name") or "wfo_default"
-    out_dir = ensure_results_dir(Path("results") / wf_run_name if results_dir is None else results_dir, cfg)
+    out_dir = ensure_results_dir(
+        Path("results") / wf_run_name if results_dir is None else results_dir
+    )
+    # Also ensure canonical default dir (used by analytics.monte_carlo)
+    default_dir = ensure_results_dir(Path("results") / wf_run_name)
+    # Write a pointer so analytics.monte_carlo can locate the actual folder
+    try:
+        ptr = Path(default_dir) / ".source_dir"
+        ptr.write_text(str(Path(out_dir).resolve()), encoding="utf-8")
+    except Exception:
+        pass
 
-    trades_path  = Path(out_dir) / "trades.csv"
+    trades_path = Path(out_dir) / "trades.csv"
     summary_path = Path(out_dir) / "oos_summary.txt"
-    equity_path  = Path(out_dir) / "equity_curve.csv"
-    folds_csv    = Path(out_dir) / "wfo_folds.csv"
+    equity_path = Path(out_dir) / "equity_curve.csv"
+    folds_csv = Path(out_dir) / "wfo_folds.csv"
 
     start = pd.to_datetime(wf_cfg.get("start"))
-    end   = pd.to_datetime(wf_cfg.get("end"))
+    end = pd.to_datetime(wf_cfg.get("end"))
     train_years = int(wf_cfg.get("train_years", 3))
-    test_years  = int(wf_cfg.get("test_years", 1))
-    step_years  = int(wf_cfg.get("step_years", 1))
+    test_years = int(wf_cfg.get("test_years", 1))
+    step_years = int(wf_cfg.get("step_years", 1))
     if pd.isna(start) or pd.isna(end):
         raise ValueError("walk_forward.start and walk_forward.end must be set (YYYY-MM-DD).")
 
-    pairs    = cfg.get("pairs") or (cfg.get("data") or {}).get("pairs") or []
+    pairs = cfg.get("pairs") or (cfg.get("data") or {}).get("pairs") or []
     data_dir = cfg.get("data_dir") or (cfg.get("data") or {}).get("dir") or "data/daily"
     if not pairs:
         raise ValueError("No pairs configured for walk-forward.")
 
-    starting_balance = float((cfg.get("risk") or {}).get("starting_balance",
-                              cfg.get("starting_balance", 10_000.0)))
+    starting_balance = float(
+        (cfg.get("risk") or {}).get("starting_balance", cfg.get("starting_balance", 10_000.0))
+    )
     track_equity = bool((cfg.get("tracking") or {}).get("in_sim_equity", True))
 
     # preload + basic normalize
     pair_data: Dict[str, pd.DataFrame] = {}
     for p in pairs:
         path = None
-        pats = [f"{p}.csv", f"{p.upper()}.csv", f"{p.replace('/','_')}.csv", f"{p.replace('/','_').upper()}.csv",
-                f"{p}_daily.csv", f"{p.replace('/','_')}_daily.csv"]
+        pats = [
+            f"{p}.csv",
+            f"{p.upper()}.csv",
+            f"{p.replace('/', '_')}.csv",
+            f"{p.replace('/', '_').upper()}.csv",
+            f"{p}_daily.csv",
+            f"{p.replace('/', '_')}_daily.csv",
+        ]
         for pat in pats:
             hits = list(Path(data_dir).rglob(pat))
             if hits:
-                path = hits[0]; break
+                path = hits[0]
+                break
         if path is None:
             print(f"⚠️  Skipping {p}: no CSV")
             continue
         df = pd.read_csv(path)
         lc = {c.lower(): c for c in df.columns}
-        for want in ["date","open","high","low","close"]:
+        for want in ["date", "open", "high", "low", "close"]:
             if want not in df.columns and want in lc:
                 df = df.rename(columns={lc[want]: want})
         if "date" not in df.columns:
             df = df.rename(columns={df.columns[0]: "date"})
-        for c in ["open","high","low","close"]:
+        for c in ["open", "high", "low", "close"]:
             df[c] = pd.to_numeric(df[c], errors="coerce")
         df["date"] = pd.to_datetime(df["date"], errors="coerce")
-        df = df.dropna(subset=["date","open","high","low","close"]).sort_values("date").reset_index(drop=True)
+        df = (
+            df.dropna(subset=["date", "open", "high", "low", "close"])
+            .sort_values("date")
+            .reset_index(drop=True)
+        )
         df["pair"] = p
         pair_data[p] = df
 
@@ -1135,7 +1320,7 @@ def run_backtest_walk_forward(config_path: PathLikeT = "config.yaml",
         raise RuntimeError("No data available for any pairs; cannot run WFO.")
 
     # DBCVIX once
-    dbcvix_series = load_dbcvix_series(cfg)
+    load_dbcvix_series(cfg)
 
     all_oos_trades: List[Dict[str, Any]] = []
     per_fold_rows: List[Dict[str, Any]] = []
@@ -1144,10 +1329,14 @@ def run_backtest_walk_forward(config_path: PathLikeT = "config.yaml",
     realized_so_far = 0.0
 
     fold_idx = 0
-    for is_start, is_end, oos_start, oos_end in _date_range_folds(start, end, train_years, test_years, step_years):
+    for is_start, is_end, oos_start, oos_end in _date_range_folds(
+        start, end, train_years, test_years, step_years
+    ):
         fold_idx += 1
         print(f"—— Fold {fold_idx} ———————————————————————————————")
-        print(f"Train: {is_start.date()} → {is_end.date()}  |  Test (OOS): {oos_start.date()} → {oos_end.date()}")
+        print(
+            f"Train: {is_start.date()} → {is_end.date()}  |  Test (OOS): {oos_start.date()} → {oos_end.date()}"
+        )
 
         fold_trades: List[Dict[str, Any]] = []
         pair_eq_frames: List[pd.DataFrame] = []
@@ -1162,15 +1351,20 @@ def run_backtest_walk_forward(config_path: PathLikeT = "config.yaml",
                         validate_contract(
                             base,
                             config=cfg,
-                            strict=(cfg.get("validation", {}) or {}).get("strict_contract", False)
+                            strict=(cfg.get("validation", {}) or {}).get("strict_contract", False),
                         )
                 except Exception as _ve:
                     print(f"ℹ️  {pair}: validation skipped/failed ({_ve})")
 
                 base = apply_signal_logic(base, cfg)
-                for col in ["entry_signal","exit_signal"]:
+                for col in ["entry_signal", "exit_signal"]:
                     if col in base.columns:
-                        base[col] = pd.to_numeric(base[col], errors="coerce").fillna(0).clip(-1,1).astype(int)
+                        base[col] = (
+                            pd.to_numeric(base[col], errors="coerce")
+                            .fillna(0)
+                            .clip(-1, 1)
+                            .astype(int)
+                        )
                     else:
                         base[col] = 0
 
@@ -1180,50 +1374,68 @@ def run_backtest_walk_forward(config_path: PathLikeT = "config.yaml",
 
                 if track_equity:
                     trades, pair_eq = simulate_pair_trades(
-                        oos_rows, pair, cfg, equity_state, return_equity=True, dbcvix_series=dbcvix_series
+                        oos_rows,
+                        pair,
+                        cfg,
+                        equity_state,
+                        return_equity=True,
                     )
-                    if trades: fold_trades.extend(trades)
+                    if trades:
+                        fold_trades.extend(trades)
                     if pair_eq is not None and not pair_eq.empty:
-                        pair_eq = pair_eq[["date","pair","pnl_realized_cum"]].copy()
+                        pair_eq = pair_eq[["date", "pair", "pnl_realized_cum"]].copy()
                         pair_eq["fold"] = fold_idx
                         pair_eq_frames.append(pair_eq)
                 else:
                     trades = simulate_pair_trades(
-                        oos_rows, pair, cfg, equity_state, return_equity=False, dbcvix_series=dbcvix_series
+                        oos_rows,
+                        pair,
+                        cfg,
+                        equity_state,
+                        return_equity=False,
                     )
-                    if trades: fold_trades.extend(trades)
+                    if trades:
+                        fold_trades.extend(trades)
             except Exception as e:
                 print(f"❌ WFO fold {fold_idx} {pair}: {e}")
 
         # simple per-fold metrics (best effort)
         fold_df = pd.DataFrame(fold_trades)
+
         def _num_series(df, col, default=0.0):
-            if df is None or df.empty: return pd.Series([], dtype=float)
-            if col in df.columns: return pd.to_numeric(df[col], errors="coerce").fillna(0.0)
-            return pd.Series([default]*len(df), index=df.index, dtype=float)
+            if df is None or df.empty:
+                return pd.Series([], dtype=float)
+            if col in df.columns:
+                return pd.to_numeric(df[col], errors="coerce").fillna(0.0)
+            return pd.Series([default] * len(df), index=df.index, dtype=float)
+
         def _bool_series(df, col):
-            if df is None or df.empty: return pd.Series([], dtype=bool)
-            if col in df.columns: return pd.to_numeric(df[col], errors="coerce").fillna(0).astype(int).astype(bool)
-            return pd.Series([False]*len(df), index=df.index, dtype=bool)
+            if df is None or df.empty:
+                return pd.Series([], dtype=bool)
+            if col in df.columns:
+                return pd.to_numeric(df[col], errors="coerce").fillna(0).astype(int).astype(bool)
+            return pd.Series([False] * len(df), index=df.index, dtype=bool)
 
         pnl_sum = float(_num_series(fold_df, "pnl", 0.0).sum())
         total = int(len(fold_df))
         wins = int(_bool_series(fold_df, "win").sum()) if total else 0
         losses = int(_bool_series(fold_df, "loss").sum()) if total else 0
         scratches = int(_bool_series(fold_df, "scratch").sum()) if total else 0
-        ns = max(wins+losses, 0)
-        fold_roi_pct = float((pnl_sum/starting_balance)*100.0) if starting_balance else 0.0
+        ns = max(wins + losses, 0)
+        fold_roi_pct = float((pnl_sum / starting_balance) * 100.0) if starting_balance else 0.0
 
-        per_fold_rows.append({
-            "fold": fold_idx,
-            "is_start": is_start.date(),
-            "is_end": is_end.date(),
-            "oos_start": oos_start.date(),
-            "oos_end": oos_end.date(),
-            "oos_trades": total,
-            "win_pct_ns": (wins/ns*100.0) if ns else 0.0,
-            "oos_roi_pct": fold_roi_pct,
-        })
+        per_fold_rows.append(
+            {
+                "fold": fold_idx,
+                "is_start": is_start.date(),
+                "is_end": is_end.date(),
+                "oos_start": oos_start.date(),
+                "oos_end": oos_end.date(),
+                "oos_trades": total,
+                "win_pct_ns": (wins / ns * 100.0) if ns else 0.0,
+                "oos_roi_pct": fold_roi_pct,
+            }
+        )
 
         if total:
             all_oos_trades.extend(fold_trades)
@@ -1231,11 +1443,17 @@ def run_backtest_walk_forward(config_path: PathLikeT = "config.yaml",
         if track_equity and pair_eq_frames:
             eq = pd.concat(pair_eq_frames, ignore_index=True)
             eq_wide = (
-                eq.pivot_table(index="date", columns="pair", values="pnl_realized_cum", aggfunc="last")
-                  .sort_index().ffill().fillna(0.0)
+                eq.pivot_table(
+                    index="date", columns="pair", values="pnl_realized_cum", aggfunc="last"
+                )
+                .sort_index()
+                .ffill()
+                .fillna(0.0)
             )
             eq_wide["pnl_realized_cum_total"] = eq_wide.sum(axis=1, numeric_only=True)
-            fold_equity = eq_wide[["pnl_realized_cum_total"]].rename(columns={"pnl_realized_cum_total":"equity"})
+            fold_equity = eq_wide[["pnl_realized_cum_total"]].rename(
+                columns={"pnl_realized_cum_total": "equity"}
+            )
             fold_equity["equity"] = (starting_balance + realized_so_far) + fold_equity["equity"]
             fold_equity = fold_equity.reset_index()
             fold_equity["fold"] = fold_idx
@@ -1270,16 +1488,23 @@ def run_backtest_walk_forward(config_path: PathLikeT = "config.yaml",
         equity_df = pd.concat(fold_equity_frames, ignore_index=True).sort_values("date")
         equity_df["peak"] = equity_df["equity"].cummax()
         equity_df["drawdown"] = equity_df["equity"] - equity_df["peak"]
-        equity_df = equity_df[["date","equity","peak","drawdown"]]
+        equity_df = equity_df[["date", "equity", "peak", "drawdown"]]
         equity_df.to_csv(equity_path, index=False)
         print(f"✅ Wrote OOS equity: {equity_path}")
     else:
         # fallback: step equity by exit_date
         try:
-            dates = pd.to_datetime(oos_df["exit_date"], errors="coerce") if "exit_date" in oos_df.columns else pd.Series(pd.NaT, index=oos_df.index)
-            equity_vals = pd.to_numeric(oos_df.get("pnl", 0.0), errors="coerce").fillna(0.0).cumsum() + starting_balance
-            equity_df   = pd.DataFrame({"date": dates, "equity": equity_vals}).dropna(subset=["date"])
-            equity_df   = equity_df.sort_values("date").reset_index(drop=True)
+            dates = (
+                pd.to_datetime(oos_df["exit_date"], errors="coerce")
+                if "exit_date" in oos_df.columns
+                else pd.Series(pd.NaT, index=oos_df.index)
+            )
+            equity_vals = (
+                pd.to_numeric(oos_df.get("pnl", 0.0), errors="coerce").fillna(0.0).cumsum()
+                + starting_balance
+            )
+            equity_df = pd.DataFrame({"date": dates, "equity": equity_vals}).dropna(subset=["date"])
+            equity_df = equity_df.sort_values("date").reset_index(drop=True)
             equity_df["peak"] = equity_df["equity"].cummax()
             equity_df["drawdown"] = equity_df["equity"] - equity_df["peak"]
             if not equity_df.empty:
@@ -1291,14 +1516,34 @@ def run_backtest_walk_forward(config_path: PathLikeT = "config.yaml",
     # OOS summary (best effort)
     try:
         from utils import summarize_results
+
         txt = summarize_results(results_dir=str(out_dir), config_path=str(config_path))
     except Exception:
         total = len(oos_df)
-        wins = int(pd.to_numeric(oos_df.get("win", 0), errors="coerce").fillna(0).astype(bool).sum()) if total else 0
-        losses = int(pd.to_numeric(oos_df.get("loss", 0), errors="coerce").fillna(0).astype(bool).sum()) if total else 0
-        scratches = int(pd.to_numeric(oos_df.get("scratch", 0), errors="coerce").fillna(0).astype(bool).sum()) if total else 0
+        wins = (
+            int(pd.to_numeric(oos_df.get("win", 0), errors="coerce").fillna(0).astype(bool).sum())
+            if total
+            else 0
+        )
+        losses = (
+            int(pd.to_numeric(oos_df.get("loss", 0), errors="coerce").fillna(0).astype(bool).sum())
+            if total
+            else 0
+        )
+        scratches = (
+            int(
+                pd.to_numeric(oos_df.get("scratch", 0), errors="coerce")
+                .fillna(0)
+                .astype(bool)
+                .sum()
+            )
+            if total
+            else 0
+        )
         ns = max(wins + losses, 0)
-        roi_dollars = float(pd.to_numeric(oos_df.get("pnl", 0.0), errors="coerce").fillna(0.0).sum())
+        roi_dollars = float(
+            pd.to_numeric(oos_df.get("pnl", 0.0), errors="coerce").fillna(0.0).sum()
+        )
         roi_pct = (roi_dollars / starting_balance * 100.0) if starting_balance else 0.0
         txt = (
             f"📊 WFO OOS Summary\n"
@@ -1307,10 +1552,42 @@ def run_backtest_walk_forward(config_path: PathLikeT = "config.yaml",
             f"Wins         : {wins}\n"
             f"Losses       : {losses}\n"
             f"Scratches    : {scratches}\n"
-            f"Win% (non-scratch) : {(wins/ns*100.0) if ns else 0.0:.2f}\n"
-            f"Loss% (non-scratch): {(losses/ns*100.0) if ns else 0.0:.2f}\n"
+            f"Win% (non-scratch) : {(wins / ns * 100.0) if ns else 0.0:.2f}\n"
+            f"Loss% (non-scratch): {(losses / ns * 100.0) if ns else 0.0:.2f}\n"
             f"ROI ($)      : {roi_dollars:.2f}\n"
             f"ROI (%)      : {roi_pct:.2f}\n"
         )
     Path(summary_path).write_text(txt or "", encoding="utf-8")
     print(f"✅ Walk-forward complete. OOS results saved to '{out_dir}'")
+
+    # Mirror key artifacts into canonical results/<run_name> so analytics.monte_carlo can find them
+    try:
+        if str(out_dir) != str(default_dir):
+            src_dir = Path(out_dir)
+            dst_dir = Path(default_dir)
+            dst_dir.mkdir(parents=True, exist_ok=True)
+            for fname in [
+                "trades.csv",
+                "equity_curve.csv",
+                "oos_summary.txt",
+                "wfo_folds.csv",
+            ]:
+                s = src_dir / fname
+                if s.exists():
+                    (dst_dir / fname).write_bytes(s.read_bytes())
+    except Exception:
+        pass
+
+
+def load_pair_csv(pair: str, data_dir: str | None = None) -> pd.DataFrame:
+    base = Path(data_dir) if data_dir else Path("data")
+    name = pair.replace("/", "_")
+    path = base / f"{name}.csv"
+    return pd.read_csv(path) if path.exists() else pd.DataFrame()
+
+
+def write_results(trades: list[dict], out_dir: str | Path) -> None:
+    out = Path(out_dir)
+    out.mkdir(parents=True, exist_ok=True)
+    pd.DataFrame(trades).to_csv(out / "trades.csv", index=False)
+    (out / "summary.txt").write_text(f"total_trades: {len(trades)}\n")

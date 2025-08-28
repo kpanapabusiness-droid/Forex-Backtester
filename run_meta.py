@@ -1,6 +1,7 @@
-import json
 import hashlib
+import json
 import time
+
 
 def make_run_id(config: dict) -> str:
     core = json.dumps(config, sort_keys=True, default=str).encode()

@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-import json            # ✅ required for dumps in hashing/logs
 import hashlib
+import json  # ✅ required for dumps in hashing/logs
 from pathlib import Path
-from typing import Dict, Any, Optional, Tuple, Iterable
+from typing import Any, Dict, Iterable, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -38,20 +38,23 @@ _INDEX_COL = "__index__"
 # --- Shared confirmation resolver (C1 and C2 use the same pool) ---
 import importlib
 
+
 def _resolve_params(cfg: dict, fq_candidates: list[str]) -> dict:
     """
     Fetch params from cfg['indicator_params'] using the first matching FQ name,
     else return {}. This lets 'c2_x' reuse 'c1_x' params if only those are defined.
     """
-    params_map = (cfg.get("indicator_params") or {})
+    params_map = cfg.get("indicator_params") or {}
     for fq in fq_candidates:
         if fq in params_map:
             return params_map[fq] or {}
     return {}
 
+
 # =========================
 #  Hashing helpers
 # =========================
+
 
 def _human_size(nbytes: int) -> str:
     units = ["B", "KB", "MB", "GB", "TB"]
@@ -98,7 +101,9 @@ def compute_params_hash(params: Dict | None) -> str:
     """
     Stable hash of indicator params. Handles exotic values via default=str.
     """
-    norm = json.dumps(params or {}, sort_keys=True, separators=(",", ":"), ensure_ascii=False, default=str)
+    norm = json.dumps(
+        params or {}, sort_keys=True, separators=(",", ":"), ensure_ascii=False, default=str
+    )
     return hashlib.sha256(norm.encode("utf-8")).hexdigest()[:16]
 
 
@@ -106,11 +111,12 @@ def compute_params_hash(params: Dict | None) -> str:
 #  Key building
 # =========================
 
+
 def cache_key_parts(
     pair: str,
     timeframe: str,
-    role: str,                 # "c1", "c2", "baseline", "volume", "exit"
-    name: str,                 # e.g. "twiggs_money_flow"
+    role: str,  # "c1", "c2", "baseline", "volume", "exit"
+    name: str,  # e.g. "twiggs_money_flow"
     params_hash: str,
     data_hash: str,
     scope_key: Optional[str] = None,
@@ -130,7 +136,10 @@ def _artifact_path(cache_dir: Path, parts_path: Path, key: str, fmt: str) -> Pat
 #  Load / Save
 # =========================
 
-def load_from_cache(cache_dir: str | Path, fmt: str, parts_path: Path, key: str) -> Optional[pd.DataFrame]:
+
+def load_from_cache(
+    cache_dir: str | Path, fmt: str, parts_path: Path, key: str
+) -> Optional[pd.DataFrame]:
     path = _artifact_path(Path(cache_dir), parts_path, key, fmt)
     if not path.exists():
         return None
@@ -149,8 +158,10 @@ def load_from_cache(cache_dir: str | Path, fmt: str, parts_path: Path, key: str)
         return df
 
 
-def save_to_cache(cache_dir: str | Path, fmt: str, parts_path: Path, key: str, df: pd.DataFrame) -> Path:
-    outdir = (Path(cache_dir) / parts_path)
+def save_to_cache(
+    cache_dir: str | Path, fmt: str, parts_path: Path, key: str, df: pd.DataFrame
+) -> Path:
+    outdir = Path(cache_dir) / parts_path
     outdir.mkdir(parents=True, exist_ok=True)
     path = _artifact_path(Path(cache_dir), parts_path, key, fmt)
 
@@ -168,6 +179,7 @@ def save_to_cache(cache_dir: str | Path, fmt: str, parts_path: Path, key: str, d
 # =========================
 #  Maintenance
 # =========================
+
 
 def _iter_cache_files(cache_dir: str | Path) -> Iterable[Path]:
     root = Path(cache_dir)
@@ -240,9 +252,8 @@ def describe_cache(cache_dir: str | Path) -> Dict[str, Any]:
 
 # --- Resolver helpers (single, canonical versions) ---
 # --- Resolver + caller helpers (canonical, no duplicates) ---
-from typing import Optional, Tuple, Callable
-import importlib
-import pandas as pd
+from typing import Callable
+
 
 def _resolve_confirm_func(short_name: str, role: str = "c1") -> Tuple[str, Callable]:
     """
@@ -260,7 +271,10 @@ def _resolve_confirm_func(short_name: str, role: str = "c1") -> Tuple[str, Calla
         f"Function '{candidates[0]}' not found in module 'indicators.confirmation_funcs'. Tried {candidates}."
     )
 
-def _resolve_indicator_func(role: str, short_name: str, verbose: bool = False) -> Tuple[Optional[str], Optional[Callable]]:
+
+def _resolve_indicator_func(
+    role: str, short_name: str, verbose: bool = False
+) -> Tuple[Optional[str], Optional[Callable]]:
     """
     Generic resolver for non-confirmation roles (baseline/volume/exit).
     Uses backtester_helpers._resolve_indicator_func if available; else local fallback.
@@ -268,14 +282,15 @@ def _resolve_indicator_func(role: str, short_name: str, verbose: bool = False) -
     # Prefer centralized helper if your project has it
     try:
         from backtester_helpers import _resolve_indicator_func as _bh_resolve_indicator_func
+
         return _bh_resolve_indicator_func(role, short_name, verbose)
     except Exception:
         pass
 
     role_to_module = {
         "baseline": "indicators.baseline_funcs",
-        "volume":   "indicators.volume_funcs",
-        "exit":     "indicators.exit_funcs",
+        "volume": "indicators.volume_funcs",
+        "exit": "indicators.exit_funcs",
     }
     mod_name = role_to_module.get(role)
     if not mod_name:
@@ -298,7 +313,10 @@ def _resolve_indicator_func(role: str, short_name: str, verbose: bool = False) -
         print(f"❌ {mod_name}: none of {[f'{role}_{short}', short]} found")
     return (None, None)
 
-def _call_indicator(func: Optional[Callable], df: pd.DataFrame, params: dict, signal_col: str) -> pd.DataFrame:
+
+def _call_indicator(
+    func: Optional[Callable], df: pd.DataFrame, params: dict, signal_col: str
+) -> pd.DataFrame:
     """
     Unified call wrapper.
     - If backtester_helpers._call_indicator exists, use it (project canonical).
@@ -354,19 +372,21 @@ def apply_indicators_with_cache(df: pd.DataFrame, pair: str, cfg: dict) -> pd.Da
     If an indicator ignores `signal_col` and writes to 'c1_signal' only, we synthesize 'c2_signal'
     by copying 'c1_signal' so downstream logic never KeyErrors.
     """
-    cache_cfg = (cfg.get("cache") or {})
-    cache_on  = cache_cfg.get("enabled", True)
+    cache_cfg = cfg.get("cache") or {}
+    cache_on = cache_cfg.get("enabled", True)
     cache_dir = cache_cfg.get("dir", "cache")
     cache_fmt = cache_cfg.get("format", "parquet")
     scope_key = cache_cfg.get("scope_key")
     timeframe = cfg.get("timeframe", "D")
-    verbose   = (cfg.get("tracking") or {}).get("verbose_logs", False)
+    verbose = (cfg.get("tracking") or {}).get("verbose_logs", False)
 
     roles_filter = set((cfg.get("cache") or {}).get("roles") or [])
+
     def role_enabled(role: str) -> bool:
         return not roles_filter or role in roles_filter
 
     inds = cfg.get("indicators") or {}
+
     def _get(k, default=None):
         return getattr(inds, k, default) if hasattr(inds, k) else inds.get(k, default)
 
@@ -394,7 +414,9 @@ def apply_indicators_with_cache(df: pd.DataFrame, pair: str, cfg: dict) -> pd.Da
             params = (cfg.get("indicator_params") or {}).get(full_name, {}) or {}
 
         params_hash = compute_params_hash(params)
-        parts_path, key = cache_key_parts(pair, timeframe, role, name, params_hash, data_hash, scope_key)
+        parts_path, key = cache_key_parts(
+            pair, timeframe, role, name, params_hash, data_hash, scope_key
+        )
 
         # Try cache
         if cache_on:
@@ -417,9 +439,14 @@ def apply_indicators_with_cache(df: pd.DataFrame, pair: str, cfg: dict) -> pd.Da
             if role == "c2" and "c1_signal" in df.columns:
                 # Mirror c1 as a pragmatic fallback so downstream logic has c2_signal
                 if verbose:
-                    print("ℹ️  C2 fallback: copying c1_signal → c2_signal (indicator ignored signal_col)")
+                    print(
+                        "ℹ️  C2 fallback: copying c1_signal → c2_signal (indicator ignored signal_col)"
+                    )
                 df[signal_col] = (
-                    pd.to_numeric(df["c1_signal"], errors="coerce").fillna(0).clip(-1, 1).astype(int)
+                    pd.to_numeric(df["c1_signal"], errors="coerce")
+                    .fillna(0)
+                    .clip(-1, 1)
+                    .astype(int)
                 )
             else:
                 # Create a neutral column (all zeros) to avoid KeyError
@@ -428,9 +455,13 @@ def apply_indicators_with_cache(df: pd.DataFrame, pair: str, cfg: dict) -> pd.Da
                 df[signal_col] = 0
 
         # Normalize to int ∈ {-1,0,1}
-        df[signal_col] = pd.to_numeric(df[signal_col], errors="coerce").fillna(0).clip(-1, 1).astype(int)
+        df[signal_col] = (
+            pd.to_numeric(df[signal_col], errors="coerce").fillna(0).clip(-1, 1).astype(int)
+        )
 
-        created_cols = [c for c in (set(df.columns) - before_cols) if (c.endswith("_signal") or c == "baseline")]
+        created_cols = [
+            c for c in (set(df.columns) - before_cols) if (c.endswith("_signal") or c == "baseline")
+        ]
 
         if cache_on and created_cols:
             save_to_cache(cache_dir, cache_fmt, parts_path, key, df[list(created_cols)].copy())

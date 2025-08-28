@@ -8,26 +8,20 @@
 # - composite score column
 # ------------------------------------------------------------
 
-import os
-import sys
-import json
-import yaml
-import itertools
 import csv
 import importlib
 import inspect
-from datetime import datetime
-from pathlib import Path
-import pandas as pd
-import numpy as np
-import concurrent.futures
-from concurrent.futures import ProcessPoolExecutor
-from concurrent.futures import as_completed
+import itertools
+import json
 import multiprocessing as mp
 import tempfile
 import traceback
+from concurrent.futures import ProcessPoolExecutor, as_completed
+from datetime import datetime
+from pathlib import Path
 
-
+import pandas as pd
+import yaml
 
 # --- Project paths
 ROOT = Path(__file__).parent
@@ -39,19 +33,30 @@ CONSOLIDATED = RESULTS / "c1_batch_results.csv"  # keep name for continuity
 
 # --- Indicator modules and prefixes per role
 ROLE_META = {
-    "c1":       {"module": "indicators.confirmation_funcs", "prefix": "c1_"},
-    "c2":       {"module": "indicators.confirmation_funcs", "prefix": "c2_"},
-    "baseline": {"module": "indicators.baseline_funcs",     "prefix": "baseline_"},
-    "volume":   {"module": "indicators.volume_funcs",       "prefix": "volume_"},
-    "exit":     {"module": "indicators.exit_funcs",         "prefix": "exit_"},
+    "c1": {"module": "indicators.confirmation_funcs", "prefix": "c1_"},
+    "c2": {"module": "indicators.confirmation_funcs", "prefix": "c2_"},
+    "baseline": {"module": "indicators.baseline_funcs", "prefix": "baseline_"},
+    "volume": {"module": "indicators.volume_funcs", "prefix": "volume_"},
+    "exit": {"module": "indicators.exit_funcs", "prefix": "exit_"},
 }
 
 # --- Consolidated CSV schema
 FIELDNAMES = [
-    "run_slug","timestamp","roles","params",
-    "total_trades","wins","losses","scratches",
-    "win_rate_ns","loss_rate_ns","scratch_rate_tot",
-    "roi_dollars","roi_pct","max_dd_pct","expectancy",
+    "run_slug",
+    "timestamp",
+    "roles",
+    "params",
+    "total_trades",
+    "wins",
+    "losses",
+    "scratches",
+    "win_rate_ns",
+    "loss_rate_ns",
+    "scratch_rate_tot",
+    "roi_dollars",
+    "roi_pct",
+    "max_dd_pct",
+    "expectancy",
     "score",
 ]
 
@@ -70,14 +75,18 @@ SUMMARY_KEY_MAP = {
     "expectancy": ["Expectancy"],
 }
 
+
 def _num(s):
-    if s is None: return None
+    if s is None:
+        return None
     m = re.search(r"-?\d+(?:\.\d+)?", str(s))
     return float(m.group(0)) if m else None
 
+
 def parse_summary_text(txt: str) -> dict:
     out = {}
-    if not txt: return out
+    if not txt:
+        return out
     lines = [line.strip() for line in txt.splitlines() if line.strip()]
     for canon_key, labels in SUMMARY_KEY_MAP.items():
         val = None
@@ -87,18 +96,31 @@ def parse_summary_text(txt: str) -> dict:
                     parts = re.split(r":", ln, maxsplit=1)
                     val = _num(parts[1] if len(parts) == 2 else ln)
                     break
-            if val is not None: break
-        if val is not None: out[canon_key] = val
+            if val is not None:
+                break
+        if val is not None:
+            out[canon_key] = val
     return out
+
 
 def compute_metrics_from_trades(trades_csv_path: Path, starting_balance: float = 10000.0) -> dict:
     if not trades_csv_path.exists():
         return {}
     df = pd.read_csv(trades_csv_path)
     if df.empty:
-        return {"total_trades":0,"wins":0,"losses":0,"scratches":0,
-                "win_rate_ns":0.0,"loss_rate_ns":0.0,"scratch_rate_tot":0.0,
-                "roi_dollars":0.0,"roi_pct":0.0,"max_dd_pct":0.0,"expectancy":0.0}
+        return {
+            "total_trades": 0,
+            "wins": 0,
+            "losses": 0,
+            "scratches": 0,
+            "win_rate_ns": 0.0,
+            "loss_rate_ns": 0.0,
+            "scratch_rate_tot": 0.0,
+            "roi_dollars": 0.0,
+            "roi_pct": 0.0,
+            "max_dd_pct": 0.0,
+            "expectancy": 0.0,
+        }
     total = len(df)
     wins = int(df.get("win", False).fillna(False).astype(bool).sum())
     losses = int(df.get("loss", False).fillna(False).astype(bool).sum())
@@ -106,41 +128,46 @@ def compute_metrics_from_trades(trades_csv_path: Path, starting_balance: float =
     non_scratch = max(wins + losses, 0)
     pnl = df.get("pnl", 0.0).fillna(0.0)
     roi_dollars = float(pnl.sum())
-    roi_pct = (roi_dollars/10000.0*100.0)
+    roi_pct = roi_dollars / 10000.0 * 100.0
     cum = pnl.cumsum() + 10000.0
     peak = cum.cummax()
     dd = (peak - cum) / peak.replace(0, 1)
-    max_dd_pct = float(dd.max()*100.0) if len(dd) else 0.0
+    max_dd_pct = float(dd.max() * 100.0) if len(dd) else 0.0
     return {
         "total_trades": total,
         "wins": wins,
         "losses": losses,
         "scratches": scratches,
-        "win_rate_ns": round((wins/non_scratch*100.0) if non_scratch else 0.0, 2),
-        "loss_rate_ns": round((losses/non_scratch*100.0) if non_scratch else 0.0, 2),
-        "scratch_rate_tot": round((scratches/total*100.0) if total else 0.0, 2),
+        "win_rate_ns": round((wins / non_scratch * 100.0) if non_scratch else 0.0, 2),
+        "loss_rate_ns": round((losses / non_scratch * 100.0) if non_scratch else 0.0, 2),
+        "scratch_rate_tot": round((scratches / total * 100.0) if total else 0.0, 2),
         "roi_dollars": round(roi_dollars, 2),
         "roi_pct": round(roi_pct, 2),
         "max_dd_pct": round(max_dd_pct, 2),
-        "expectancy": round((roi_dollars/non_scratch) if non_scratch else 0.0, 6),
+        "expectancy": round((roi_dollars / non_scratch) if non_scratch else 0.0, 6),
     }
+
 
 def parse_summary_or_trades(results_dir: Path) -> dict:
     s = results_dir / "summary.txt"
     t = results_dir / "trades.csv"
     if s.exists():
         m = parse_summary_text(s.read_text())
-        if m: return m
+        if m:
+            return m
     return compute_metrics_from_trades(t)
+
 
 # --- YAML helpers
 def load_yaml(path: Path):
     with open(path, "r", encoding="utf-8") as f:
         return yaml.safe_load(f)
 
+
 def save_yaml(obj, path: Path):
     with open(path, "w", encoding="utf-8") as f:
         yaml.safe_dump(obj, f, sort_keys=False)
+
 
 # --- Indicator autodiscovery
 def discover_indicators(role: str) -> list[str]:
@@ -154,9 +181,10 @@ def discover_indicators(role: str) -> list[str]:
     names = []
     for name, obj in inspect.getmembers(mod, inspect.isfunction):
         if name.startswith(prefix):
-            base = name[len(prefix):]
+            base = name[len(prefix) :]
             names.append(base)
     return sorted(set(names))
+
 
 # --- Sweep helpers
 def flatten_param_grid(param_dict):
@@ -165,6 +193,7 @@ def flatten_param_grid(param_dict):
     keys = list(param_dict.keys())
     vals = [v if isinstance(v, (list, tuple)) else [v] for v in param_dict.values()]
     return [dict(zip(keys, c)) for c in itertools.product(*vals)]
+
 
 def build_role_choices(sweeps: dict, role: str) -> list[dict]:
     """
@@ -177,7 +206,11 @@ def build_role_choices(sweeps: dict, role: str) -> list[dict]:
         discovered = discover_indicators(role)
 
     # 2) merge manual names
-    manual = [e.get("name") for e in (sweeps.get("roles", {}).get(role) or []) if isinstance(e, dict) and e.get("name")]
+    manual = [
+        e.get("name")
+        for e in (sweeps.get("roles", {}).get(role) or [])
+        if isinstance(e, dict) and e.get("name")
+    ]
     all_names = sorted(set(discovered + manual))
 
     # 3) apply allowlist/blocklist
@@ -191,7 +224,7 @@ def build_role_choices(sweeps: dict, role: str) -> list[dict]:
     # 4) params: union of manual params for that name + default_params[role]
     defaults = sweeps.get("default_params", {}).get(role) or {}
     manual_map = {}
-    for e in (sweeps.get("roles", {}).get(role) or []):
+    for e in sweeps.get("roles", {}).get(role) or []:
         if isinstance(e, dict) and e.get("name"):
             manual_map.setdefault(e["name"], []).append(e.get("params") or {})
 
@@ -206,9 +239,11 @@ def build_role_choices(sweeps: dict, role: str) -> list[dict]:
         out = [{"name": None, "params": {}}]
     return out
 
+
 def set_indicator(config: dict, role: str, name: str | None):
     config.setdefault("indicators", {})
-    config["indicators"][role] = (False if name is None else name)
+    config["indicators"][role] = False if name is None else name
+
 
 def set_indicator_params(config: dict, role: str, name: str | None, params: dict):
     if name is None:
@@ -219,6 +254,7 @@ def set_indicator_params(config: dict, role: str, name: str | None, params: dict
     merged = dict(config["indicator_params"].get(func_name, {}))
     merged.update(params or {})
     config["indicator_params"][func_name] = merged
+
 
 def calc_score(metrics: dict, scoring: dict) -> float:
     """Composite score: higher is better. roi% - w*maxDD - trades penalty."""
@@ -232,6 +268,7 @@ def calc_score(metrics: dict, scoring: dict) -> float:
     penalty = pen_w * max(0.0, (min_tr - trades))
     return round(w_roi * roi - w_dd * mdd - penalty, 4)
 
+
 def append_consolidated(rows: list[dict]):
     CONSOLIDATED.parent.mkdir(parents=True, exist_ok=True)
     newfile = not CONSOLIDATED.exists()
@@ -243,10 +280,11 @@ def append_consolidated(rows: list[dict]):
             safe_row = {k: row.get(k, "") for k in FIELDNAMES}
             w.writerow(safe_row)
 
+
 def worker_job(run_id: int, base_config_path: Path, merged_cfg: dict, run_slug: str) -> dict:
     from backtester import run_backtest
 
-    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    datetime.now().strftime("%Y%m%d_%H%M%S")
     run_tmp = Path(tempfile.mkdtemp(prefix=f"sweep_{run_id}_"))
     config_path = run_tmp / "config.yml"
 
@@ -265,7 +303,6 @@ def worker_job(run_id: int, base_config_path: Path, merged_cfg: dict, run_slug: 
     run_backtest(config_path=str(config_path), results_dir=str(results_dir))
 
     # Read metrics from results_dir, archive to history, etc...
-
 
     # metrics
     metrics = parse_summary_or_trades(results_dir)
@@ -286,6 +323,7 @@ def worker_job(run_id: int, base_config_path: Path, merged_cfg: dict, run_slug: 
 
     return metrics
 
+
 def main(sweeps_path=SWEEPS):
     assert CONFIG.exists(), f"config.yaml not found at {CONFIG}"
     assert sweeps_path.exists(), f"sweeps.yaml not found at {sweeps_path}"
@@ -305,10 +343,14 @@ def main(sweeps_path=SWEEPS):
             role_choices[role] = [{"name": None, "params": {}}]
 
     # Cartesian product of choices
-    combos = list(itertools.product(*[
-        [(role, choice) for choice in role_choices[role]]
-        for role in ["c1","c2","baseline","volume","exit"]
-    ]))
+    combos = list(
+        itertools.product(
+            *[
+                [(role, choice) for choice in role_choices[role]]
+                for role in ["c1", "c2", "baseline", "volume", "exit"]
+            ]
+        )
+    )
 
     # Apply caps
     max_runs = sweeps.get("parallel", {}).get("max_runs")
@@ -394,9 +436,12 @@ def main(sweeps_path=SWEEPS):
 
     append_consolidated(rows_to_append)
 
-    print(f"\n✅ Sweep finished. Runs: {len(rows_to_append)} | Started: {started} | Ended: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print(
+        f"\n✅ Sweep finished. Runs: {len(rows_to_append)} | Started: {started} | Ended: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+    )
     print(f"📁 Consolidated CSV: {CONSOLIDATED}")
     print(f"🗂️ History folder:   {HISTORY}")
+
 
 if __name__ == "__main__":
     main()

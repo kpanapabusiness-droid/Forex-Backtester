@@ -1,0 +1,17 @@
+line-length = 100
+target-version = "py312"
+
+exclude = [
+  "notebooks/**",
+  "results/**",
+  "results_history/**",
+  "data/**",
+  "cache/**",
+  ".venv/**",
+  ".git/**",
+  "__pycache__/**"
+]
+
+[lint]
+select = ["E", "F", "I"]
+ignore = ["E501"]

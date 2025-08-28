@@ -1,0 +1,16 @@
+line-length = 100
+target-version = "py312"
+
+exclude = [
+  "notebooks/**",
+  "results/**",
+  "results_history/**",
+  "data/**",
+  "cache/**",
+  ".venv/**",
+  ".git/**",
+  "__pycache__/**",
+]
+
+select = ["E", "F", "I"]   # errors/flake, import, etc.
+ignore = []

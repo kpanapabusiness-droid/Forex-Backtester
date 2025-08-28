@@ -6,10 +6,10 @@
 # ---------------------------------------------------------
 from __future__ import annotations
 
-from typing import Callable, Dict, Tuple, List, Any, Optional, Iterable, Union
-from functools import lru_cache
 import importlib
+from functools import lru_cache
 from inspect import getmembers, isfunction
+from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Union
 
 __all__ = [
     "apply_indicators",
@@ -41,12 +41,14 @@ _SIGNAL_COL_BY_ROLE = {
 _ROLES = ("baseline", "c1", "c2", "volume", "exit")
 _CONTAINER_KEYS = ("indicators", "pipeline", "steps", "specs", "list")
 
+
 def _normalize_short_name(role: str, name: str) -> str:
     """Allow users to pass either 'ema' or 'baseline_ema' etc."""
     if not name:
         raise ImportError(f"No indicator short name provided for role '{role}'.")
     pref = f"{role}_"
-    return name[len(pref):] if name.startswith(pref) else name
+    return name[len(pref) :] if name.startswith(pref) else name
+
 
 @lru_cache(maxsize=None)
 def _resolve_module(role: str):
@@ -54,6 +56,7 @@ def _resolve_module(role: str):
     if not mod_name:
         raise ImportError(f"Unknown indicator role '{role}'. Known: {sorted(_ROLE_TO_MODULE)}")
     return importlib.import_module(mod_name)
+
 
 @lru_cache(maxsize=None)
 def _resolve_func(role: str, short_name: str) -> Tuple[Callable, str]:
@@ -70,12 +73,14 @@ def _resolve_func(role: str, short_name: str) -> Tuple[Callable, str]:
         )
     return funcs[target], f"{mod.__name__}.{target}"
 
+
 # ========================== Compact config detection =========================
 def _is_compact_indicator_dict(d: Dict[str, Any]) -> bool:
     """True if dict looks like {'c1': '...', 'baseline': ..., 'use_exit': ...} (no 'role')."""
     if not isinstance(d, dict) or "role" in d:
         return False
     return any(k in d for k in _ROLES)
+
 
 def _expand_compact_indicator_config(cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
     """
@@ -101,7 +106,9 @@ def _expand_compact_indicator_config(cfg: Dict[str, Any]) -> List[Dict[str, Any]
         name = None
         params: Dict[str, Any] = {}
         if isinstance(val, dict):
-            name = val.get("name") or val.get("short_name") or val.get("indicator") or val.get("func")
+            name = (
+                val.get("name") or val.get("short_name") or val.get("indicator") or val.get("func")
+            )
             if isinstance(val.get("params"), dict):
                 params = dict(val["params"])
             elif isinstance(val.get("config"), dict):
@@ -140,9 +147,15 @@ def _expand_compact_indicator_config(cfg: Dict[str, Any]) -> List[Dict[str, Any]
 
     return [enabled[r] for r in ordered_roles]
 
+
 # =============== Recursive container normalization/flattening ===============
 def _is_spec_dict(d: Dict[str, Any]) -> bool:
-    return isinstance(d, dict) and "role" in d and any(k in d for k in ("name", "short_name", "indicator"))
+    return (
+        isinstance(d, dict)
+        and "role" in d
+        and any(k in d for k in ("name", "short_name", "indicator"))
+    )
+
 
 def _flatten_specs(obj: Any) -> List[Any]:
     """
@@ -191,8 +204,9 @@ def _flatten_specs(obj: Any) -> List[Any]:
     # Fallback: ignore unknown types
     return out
 
+
 def _normalize_indicator_container(
-    indicator_configs: Union[Iterable[Any], Dict[str, Any]]
+    indicator_configs: Union[Iterable[Any], Dict[str, Any]],
 ) -> List[Any]:
     """
     Accept either:
@@ -204,9 +218,10 @@ def _normalize_indicator_container(
     """
     return _flatten_specs(indicator_configs)
 
+
 # ------------------------ Flexible spec parsing -----------------------------
 def _parse_indicator_spec(
-    spec: Union[Tuple[Any, ...], Dict[str, Any]]
+    spec: Union[Tuple[Any, ...], Dict[str, Any]],
 ) -> Tuple[str, str, Dict[str, Any]]:
     """
     Normalize to (role, short_name, params) from:
@@ -241,11 +256,12 @@ def _parse_indicator_spec(
 
     raise TypeError(f"Unsupported indicator spec type: {type(spec).__name__} -> {spec!r}")
 
+
 # -----------------------------------------------------------------------------
 
+
 def apply_indicators(
-    df,
-    indicator_configs: Union[Iterable[Union[Tuple[Any, ...], Dict[str, Any]]], Dict[str, Any]]
+    df, indicator_configs: Union[Iterable[Union[Tuple[Any, ...], Dict[str, Any]]], Dict[str, Any]]
 ):
     """
     Apply a list/iterable/dict of indicator specs to df in order.
@@ -274,7 +290,9 @@ def apply_indicators(
         role, short_name, params = _parse_indicator_spec(raw_spec)
 
         if role not in _SIGNAL_COL_BY_ROLE:
-            raise ImportError(f"Unknown indicator role '{role}'. Known: {sorted(_SIGNAL_COL_BY_ROLE)}")
+            raise ImportError(
+                f"Unknown indicator role '{role}'. Known: {sorted(_SIGNAL_COL_BY_ROLE)}"
+            )
 
         sig_col = _SIGNAL_COL_BY_ROLE[role]
         fn, fq_name = _resolve_func(role, short_name)
@@ -294,11 +312,13 @@ def apply_indicators(
     df.attrs["applied_indicators"] = applied
     return df
 
+
 # =========================================================
 # Signal coercion / hygiene
 # =========================================================
 def _clip_to_set(series, valid=(-1, 0, 1)):
     return series.where(series.isin(valid), 0)
+
 
 def coerce_entry_exit_signals(df):
     """Ensure canonical signal columns exist and are clean."""
@@ -308,6 +328,7 @@ def coerce_entry_exit_signals(df):
         df[col] = _clip_to_set(df[col].fillna(0))
     # baseline may be added by baseline module; no-op here
     return df
+
 
 # =========================================================
 # >>> Serialization hygiene: persist final stop at exit <<<
@@ -358,10 +379,9 @@ def finalize_trade_row(
 
     return row
 
+
 def build_and_finalize_trade_row(
-    raw_row: Dict[str, Any],
-    *,
-    current_stop_price_at_exit: Optional[float] = None
+    raw_row: Dict[str, Any], *, current_stop_price_at_exit: Optional[float] = None
 ) -> Dict[str, Any]:
     """Helper for callsites that want a copy before finalization."""
     row = dict(raw_row)  # shallow copy

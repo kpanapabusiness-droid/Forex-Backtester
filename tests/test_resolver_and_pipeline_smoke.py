@@ -1,12 +1,12 @@
 # tests/test_resolver_and_pipeline_smoke.py
 # v1.9.8 — resolver + WFO/MC pipeline smoke tests (fast, deterministic)
 
-from pathlib import Path
+import importlib
 import textwrap
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
-import importlib
-import yaml
 
 
 # ------------------------
@@ -17,24 +17,27 @@ def _synthetic_ohlcv(start="2017-01-02", periods=1200, freq="B", seed=7):
     dates = pd.date_range(start=start, periods=periods, freq=freq)
     base = 1.20 + np.cumsum(rng.normal(0, 0.0005, size=len(dates)))
     high = base + np.abs(rng.normal(0.0004, 0.0002, size=len(dates)))
-    low  = base - np.abs(rng.normal(0.0004, 0.0002, size=len(dates)))
+    low = base - np.abs(rng.normal(0.0004, 0.0002, size=len(dates)))
     open_ = base + rng.normal(0.0, 0.0002, size=len(dates))
     close = base + rng.normal(0.0, 0.0002, size=len(dates))
     vol = rng.integers(100, 500, size=len(dates))
-    df = pd.DataFrame({
-        "date": dates,
-        "open": open_,
-        "high": high,
-        "low": low,
-        "close": close,
-        "volume": vol,
-        "spread": 0.0001,
-    })
+    df = pd.DataFrame(
+        {
+            "date": dates,
+            "open": open_,
+            "high": high,
+            "low": low,
+            "close": close,
+            "volume": vol,
+            "spread": 0.0001,
+        }
+    )
     return df
 
 
 def _write_cfg(tmp: Path, run_name="wfo_smoke_pytest"):
-    cfg = textwrap.dedent(f"""
+    cfg = (
+        textwrap.dedent(f"""
     run_name: "single_run_default"
 
     data:
@@ -119,7 +122,9 @@ def _write_cfg(tmp: Path, run_name="wfo_smoke_pytest"):
       use_daily_returns: false   # per-trade shuffle (works even if no per-bar equity)
       save_samples: false
       seed: 42
-    """).strip() + "\n"
+    """).strip()
+        + "\n"
+    )
     p = tmp / "config.yaml"
     p.write_text(cfg, encoding="utf-8")
     return p
@@ -131,6 +136,7 @@ def _write_cfg(tmp: Path, run_name="wfo_smoke_pytest"):
 def test_confirm_resolver_shared_pool():
     import indicators.confirmation_funcs as cf
     import indicators_cache
+
     importlib.reload(indicators_cache)  # ensure latest patch loaded
 
     assert hasattr(cf, "c1_coral"), "Expected c1_coral to exist"
@@ -147,9 +153,10 @@ def test_wfo_mc_pipeline_smoke(tmp_path, monkeypatch):
     # Imports
     import backtester
     import indicators_cache
+    import signal_logic as _slogic
     import utils as _utils
     import validators_util as _vutil
-    import signal_logic as _slogic
+
     importlib.reload(backtester)
     importlib.reload(indicators_cache)
 
@@ -160,24 +167,30 @@ def test_wfo_mc_pipeline_smoke(tmp_path, monkeypatch):
     # 1) Data loader
     def load_pair_csv_stub(pair, data_dir=None):
         return df_syn.copy()
+
     monkeypatch.setattr(backtester, "load_pair_csv", load_pair_csv_stub, raising=True)
 
     # 2) Lightweight ATR
     def calculate_atr_stub(df, period: int = 14):
         df = df.copy()
         prev_close = df["close"].shift(1)
-        tr = pd.concat([
-            (df["high"] - df["low"]).abs(),
-            (df["high"] - prev_close).abs(),
-            (df["low"] - prev_close).abs(),
-        ], axis=1).max(axis=1)
+        tr = pd.concat(
+            [
+                (df["high"] - df["low"]).abs(),
+                (df["high"] - prev_close).abs(),
+                (df["low"] - prev_close).abs(),
+            ],
+            axis=1,
+        ).max(axis=1)
         df["atr"] = tr.rolling(period, min_periods=1).mean()
         return df
+
     monkeypatch.setattr(_utils, "calculate_atr", calculate_atr_stub, raising=True)
 
     # 3) Validators no-op
     def validate_contract_stub(df, config=None, strict=False):
         return True
+
     monkeypatch.setattr(_vutil, "validate_contract", validate_contract_stub, raising=True)
 
     # 4) Signal logic (just ensure expected cols exist)
@@ -186,6 +199,7 @@ def test_wfo_mc_pipeline_smoke(tmp_path, monkeypatch):
         df["entry_signal"] = df.get("entry_signal", 0)
         df["exit_signal"] = df.get("exit_signal", 0)
         return df
+
     monkeypatch.setattr(_slogic, "apply_signal_logic", apply_signal_logic_stub, raising=True)
 
     # 5) Let apply_indicators_with_cache run through indicators_cache,
@@ -204,6 +218,7 @@ def test_wfo_mc_pipeline_smoke(tmp_path, monkeypatch):
         if signal_col == "baseline_signal" and "baseline" not in df.columns:
             df["baseline"] = df["close"].rolling(50, min_periods=1).mean()
         return df
+
     monkeypatch.setattr(indicators_cache, "_call_indicator", _call_indicator_stub, raising=True)
 
     # 6) Deterministic simulator that produces trades and per-bar realized equity
@@ -221,24 +236,24 @@ def test_wfo_mc_pipeline_smoke(tmp_path, monkeypatch):
             loss = int(pnl < 0)
             scratch = int(pnl == 0)
             exit_dt = pd.to_datetime(rows.loc[idx, "date"])
-            trades.append({
-                "pair": pair,
-                "pnl": pnl,
-                "win": win,
-                "loss": loss,
-                "scratch": scratch,
-                "exit_date": exit_dt,
-            })
+            trades.append(
+                {
+                    "pair": pair,
+                    "pnl": pnl,
+                    "win": win,
+                    "loss": loss,
+                    "scratch": scratch,
+                    "exit_date": exit_dt,
+                }
+            )
             pnl_daily[idx:] += pnl / max(1, (n - idx))
 
         eq = None
         if return_equity:
             realized_cum = np.cumsum(pnl_daily)
-            eq = pd.DataFrame({
-                "date": rows["date"],
-                "pair": pair,
-                "pnl_realized_cum": realized_cum
-            })
+            eq = pd.DataFrame(
+                {"date": rows["date"], "pair": pair, "pnl_realized_cum": realized_cum}
+            )
         return trades, eq
 
     monkeypatch.setattr(backtester, "simulate_pair_trades", simulate_pair_trades_stub, raising=True)
@@ -249,9 +264,9 @@ def test_wfo_mc_pipeline_smoke(tmp_path, monkeypatch):
     backtester.run_backtest_walk_forward(config_path=str(cfg_path), results_dir=str(out_dir))
 
     # Check artifacts
-    folds_csv   = out_dir / "wfo_folds.csv"
-    trades_csv  = out_dir / "trades.csv"
-    equity_csv  = out_dir / "equity_curve.csv"
+    folds_csv = out_dir / "wfo_folds.csv"
+    trades_csv = out_dir / "trades.csv"
+    equity_csv = out_dir / "equity_curve.csv"
     summary_txt = out_dir / "oos_summary.txt"
 
     assert folds_csv.exists(), "wfo_folds.csv not written"
@@ -264,8 +279,8 @@ def test_wfo_mc_pipeline_smoke(tmp_path, monkeypatch):
     assert not eq.empty and "equity" in eq.columns
 
     # --- Run Monte Carlo (per-trade mode for robustness) ---
-    from backtester import load_config
     from analytics.monte_carlo import run_monte_carlo
+    from backtester import load_config
 
     cfg = load_config(str(cfg_path))
     # keep horizon=oos; per-trade shuffling is set in cfg writer above

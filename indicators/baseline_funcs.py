@@ -10,27 +10,32 @@
 # =============================================
 
 from __future__ import annotations
+
 import numpy as np
 import pandas as pd
 
 # ---------- helpers ----------
 
-def set_signal(df: pd.DataFrame, baseline_col: str, signal_col: str = "baseline_signal") -> pd.DataFrame:
+
+def set_signal(
+    df: pd.DataFrame, baseline_col: str, signal_col: str = "baseline_signal"
+) -> pd.DataFrame:
     """Set {+1,0,-1} based on close vs baseline."""
-    sig = np.where(df["close"] > df[baseline_col], 1,
-          np.where(df["close"] < df[baseline_col], -1, 0))
+    sig = np.where(
+        df["close"] > df[baseline_col],
+        1,
+        np.where(df["close"] < df[baseline_col], -1, 0),
+    )
     df[signal_col] = sig.astype("int8")
     return df
 
+
 # indicators/baseline_funcs.py
-import numpy as np
-import pandas as pd
 
 # If you already have this helper elsewhere in this file, keep ONE copy.
 # It must accept (series, length).
 # indicators/baseline_funcs.py
-import numpy as np
-import pandas as pd
+
 
 def ema(
     x,
@@ -38,7 +43,7 @@ def ema(
     *,
     period: int | None = None,
     signal_col: str = "baseline_signal",
-    **kwargs
+    **kwargs,
 ):
     """
     Dual-use EMA:
@@ -70,8 +75,9 @@ def ema(
         alpha = 2.0 / (L + 1.0)
         base = df["close"].astype(float).ewm(alpha=alpha, adjust=False).mean()
         df["baseline"] = base
-        df[signal_col] = np.where(df["close"] > base, 1,
-                           np.where(df["close"] < base, -1, 0)).astype("int8")
+        df[signal_col] = np.where(
+            df["close"] > base, 1, np.where(df["close"] < base, -1, 0)
+        ).astype("int8")
         return df
 
     raise TypeError("ema() expected pd.Series or pd.DataFrame as first argument.")
@@ -82,7 +88,7 @@ def baseline_ema(
     *,
     period: int = 200,
     signal_col: str = "baseline_signal",
-    **kwargs
+    **kwargs,
 ) -> pd.DataFrame:
     """
     Baseline = EMA(period) on close.
@@ -103,8 +109,11 @@ def baseline_ema(
     out["baseline"] = base
 
     # Directional signal: +1 if close > baseline, -1 if close < baseline, else 0
-    sig = np.where(out["close"] > out["baseline"], 1,
-          np.where(out["close"] < out["baseline"], -1, 0)).astype("int8")
+    sig = np.where(
+        out["close"] > out["baseline"],
+        1,
+        np.where(out["close"] < out["baseline"], -1, 0),
+    ).astype("int8")
     out[signal_col] = sig
 
     return out
@@ -117,9 +126,11 @@ def wma(s: pd.Series, length: int) -> pd.Series:
     w = np.arange(1, length + 1, dtype=float)
     return s.rolling(length).apply(lambda x: float(np.dot(x, w) / w.sum()), raw=True)
 
+
 def sma(s: pd.Series, length: int) -> pd.Series:
     length = max(int(length), 1)
     return s.rolling(length).mean()
+
 
 def tma(s: pd.Series, length: int) -> pd.Series:
     """Triangular MA via triangular weights."""
@@ -133,6 +144,7 @@ def tma(s: pd.Series, length: int) -> pd.Series:
     w = w / w.sum()
     return s.rolling(length).apply(lambda x: float(np.dot(x, w)), raw=True)
 
+
 def gaussian_weights(length: int, sigma: float) -> np.ndarray:
     length = max(int(length), 1)
     sigma = max(float(sigma), 1e-6)
@@ -142,12 +154,14 @@ def gaussian_weights(length: int, sigma: float) -> np.ndarray:
     w /= w.sum()
     return w
 
+
 def gaussian_filter(s: pd.Series, length: int, sigma: float) -> pd.Series:
     w = gaussian_weights(length, sigma)
     L = len(w)
     if L <= 1:
         return s.copy()
     return s.rolling(L).apply(lambda x: float(np.dot(x, w)), raw=True)
+
 
 def rolling_linreg_midline(s: pd.Series, length: int) -> pd.Series:
     """Rolling linear regression midline (value at rightmost bar of window)."""
@@ -165,9 +179,11 @@ def rolling_linreg_midline(s: pd.Series, length: int) -> pd.Series:
 
     return s.rolling(length).apply(_last_fit, raw=True)
 
+
 def safe_log(x, eps: float = 1e-12) -> np.ndarray | float:
     """Log with clamp to avoid -inf/+inf and NaNs."""
     return np.log(np.clip(x, eps, None))
+
 
 # ---- helper aliases (to match any internal underscore calls) ----
 _set_signal = set_signal
@@ -182,18 +198,20 @@ _rolling_linreg_midline = rolling_linreg_midline
 
 # ---------- baseline implementations ----------
 
+
 def baseline_ema(
     df: pd.DataFrame,
     *,
     length: int = 200,
     price: str = "close",
     signal_col: str = "baseline_signal",
-    **kwargs
+    **kwargs,
 ) -> pd.DataFrame:
     """Simple EMA baseline."""
     s = df[price].astype(float)
     df["baseline"] = _ema(s, length)
     return _set_signal(df, "baseline", signal_col)
+
 
 # 📈 fantailvma3.mq4  (approx: variable EMA * 3)
 def baseline_fantailvma3(
@@ -205,7 +223,7 @@ def baseline_fantailvma3(
     alpha_max: float = 0.5,
     signal_col: str = "baseline_signal",
     price: str = "close",
-    **kwargs
+    **kwargs,
 ) -> pd.DataFrame:
     """Fantail VMA (approx): triple variable-EMA where alpha adapts to recent ROC magnitude."""
     s = df[price].astype(float)
@@ -222,7 +240,7 @@ def baseline_fantailvma3(
         acc = np.nan
         for i in range(len(x)):
             xi = x[i]
-            ai = a[i] if np.isfinite(a[i]) else (a[i-1] if i > 0 else base_alpha)
+            ai = a[i] if np.isfinite(a[i]) else (a[i - 1] if i > 0 else base_alpha)
             if not np.isfinite(xi):
                 y[i] = acc
                 continue
@@ -240,6 +258,7 @@ def baseline_fantailvma3(
     df["baseline"] = pd.Series(e3, index=df.index)
     return _set_signal(df, "baseline", signal_col)
 
+
 # 📈 VIDYA (Chande) using CMO
 def baseline_vidya(
     df: pd.DataFrame,
@@ -248,7 +267,7 @@ def baseline_vidya(
     cmo_length: int = 9,
     signal_col: str = "baseline_signal",
     price: str = "close",
-    **kwargs
+    **kwargs,
 ) -> pd.DataFrame:
     """VIDYA: alpha = |CMO| * (2/(length+1))."""
     s = df[price].astype(float)
@@ -274,6 +293,7 @@ def baseline_vidya(
     df["baseline"] = pd.Series(y, index=df.index)
     return _set_signal(df, "baseline", signal_col)
 
+
 # 📈 FRAMA (approx)
 def baseline_frama_indicator(
     df: pd.DataFrame,
@@ -282,7 +302,7 @@ def baseline_frama_indicator(
     fast: float = 4.0,
     slow: float = 300.0,
     signal_col: str = "baseline_signal",
-    **kwargs
+    **kwargs,
 ) -> pd.DataFrame:
     """Ehlers FRAMA approximation."""
     h = df["high"].astype(float)
@@ -291,8 +311,8 @@ def baseline_frama_indicator(
     half = max(n // 2, 1)
 
     L1 = (h.rolling(half).max() - l.rolling(half).min()).shift(half)
-    L2 = (h.rolling(half).max() - l.rolling(half).min())
-    L3 = (h.rolling(n).max() - l.rolling(n).min())
+    L2 = h.rolling(half).max() - l.rolling(half).min()
+    L3 = h.rolling(n).max() - l.rolling(n).min()
 
     L1 = L1.replace(0, np.nan)
     L2 = L2.replace(0, np.nan)
@@ -319,6 +339,7 @@ def baseline_frama_indicator(
     df["baseline"] = pd.Series(y, index=df.index)
     return _set_signal(df, "baseline", signal_col)
 
+
 # 📈 ALMA
 def baseline_alma_indicator(
     df: pd.DataFrame,
@@ -328,7 +349,7 @@ def baseline_alma_indicator(
     sigma: float = 6.0,
     price: str = "close",
     signal_col: str = "baseline_signal",
-    **kwargs
+    **kwargs,
 ) -> pd.DataFrame:
     """ALMA baseline."""
     s = df[price].astype(float)
@@ -340,6 +361,7 @@ def baseline_alma_indicator(
     df["baseline"] = alma
     return _set_signal(df, "baseline", signal_col)
 
+
 # 📈 T3 MA (Tillson)
 def baseline_t3_ma(
     df: pd.DataFrame,
@@ -348,31 +370,32 @@ def baseline_t3_ma(
     vfactor: float = 0.7,
     price: str = "close",
     signal_col: str = "baseline_signal",
-    **kwargs
+    **kwargs,
 ) -> pd.DataFrame:
     """Tillson T3 moving average."""
     s = df[price].astype(float)
     n = max(int(length), 1)
-    e1 = _ema(s, n); e2 = _ema(e1, n); e3 = _ema(e2, n)
-    e4 = _ema(e3, n); e5 = _ema(e4, n); e6 = _ema(e5, n)
+    e1 = _ema(s, n)
+    e2 = _ema(e1, n)
+    e3 = _ema(e2, n)
+    e4 = _ema(e3, n)
+    e5 = _ema(e4, n)
+    e6 = _ema(e5, n)
 
     v = float(vfactor)
-    c1 = -v**3
-    c2 = 3*v**2 + 3*v**3
-    c3 = -6*v**2 - 3*v - 3*v**3
-    c4 = 1 + 3*v + v**3 + 3*v**2
+    c1 = -(v**3)
+    c2 = 3 * v**2 + 3 * v**3
+    c3 = -6 * v**2 - 3 * v - 3 * v**3
+    c4 = 1 + 3 * v + v**3 + 3 * v**2
 
-    t3 = c1*e6 + c2*e5 + c3*e4 + c4*e3
+    t3 = c1 * e6 + c2 * e5 + c3 * e4 + c4 * e3
     df["baseline"] = t3
     return _set_signal(df, "baseline", signal_col)
 
+
 # 📈 Tether Line (Donchian midline)
 def baseline_tether_line(
-    df: pd.DataFrame,
-    *,
-    length: int = 20,
-    signal_col: str = "baseline_signal",
-    **kwargs
+    df: pd.DataFrame, *, length: int = 20, signal_col: str = "baseline_signal", **kwargs
 ) -> pd.DataFrame:
     """Donchian channel midline."""
     hi = df["high"].rolling(length).max()
@@ -380,6 +403,7 @@ def baseline_tether_line(
     mid = (hi + lo) / 2.0
     df["baseline"] = mid
     return _set_signal(df, "baseline", signal_col)
+
 
 # 📈 Range Filter (ATR step)
 def baseline_range_filter_modified(
@@ -389,7 +413,7 @@ def baseline_range_filter_modified(
     atr_mult: float = 1.0,
     price: str = "close",
     signal_col: str = "baseline_signal",
-    **kwargs
+    **kwargs,
 ) -> pd.DataFrame:
     """Range Filter (approx): baseline steps when price moves beyond +/- ATR*mult."""
     tr1 = (df["high"] - df["low"]).abs()
@@ -401,7 +425,8 @@ def baseline_range_filter_modified(
     s = df[price].astype(float).values
     rng = (atr * float(atr_mult)).values
 
-    y = np.empty_like(s); y[:] = np.nan
+    y = np.empty_like(s)
+    y[:] = np.nan
     baseline = np.nan
     for i in range(len(s)):
         x = s[i]
@@ -418,6 +443,7 @@ def baseline_range_filter_modified(
     df["baseline"] = pd.Series(y, index=df.index)
     return _set_signal(df, "baseline", signal_col)
 
+
 # 📈 Geometric Mean MA
 def baseline_geomin_ma(
     df: pd.DataFrame,
@@ -425,13 +451,14 @@ def baseline_geomin_ma(
     length: int = 20,
     price: str = "close",
     signal_col: str = "baseline_signal",
-    **kwargs
+    **kwargs,
 ) -> pd.DataFrame:
     """Geometric mean over window."""
     s = df[price].astype(float)
     gm = (pd.Series(_safe_log(s), index=s.index).rolling(length).mean()).apply(np.exp)
     df["baseline"] = gm
     return _set_signal(df, "baseline", signal_col)
+
 
 # 📈 Sine-weighted MA
 def baseline_sinewma(
@@ -440,7 +467,7 @@ def baseline_sinewma(
     length: int = 20,
     price: str = "close",
     signal_col: str = "baseline_signal",
-    **kwargs
+    **kwargs,
 ) -> pd.DataFrame:
     """Sine-weighted moving average."""
     s = df[price].astype(float)
@@ -451,6 +478,7 @@ def baseline_sinewma(
     df["baseline"] = out
     return _set_signal(df, "baseline", signal_col)
 
+
 # 📈 Triangular MA (general)
 def baseline_trimagen(
     df: pd.DataFrame,
@@ -458,11 +486,12 @@ def baseline_trimagen(
     length: int = 20,
     price: str = "close",
     signal_col: str = "baseline_signal",
-    **kwargs
+    **kwargs,
 ) -> pd.DataFrame:
     s = df[price].astype(float)
     df["baseline"] = _tma(s, length)
     return _set_signal(df, "baseline", signal_col)
+
 
 # 📈 Gaussian filter
 def baseline_gd(
@@ -472,11 +501,12 @@ def baseline_gd(
     sigma: float = 3.0,
     price: str = "close",
     signal_col: str = "baseline_signal",
-    **kwargs
+    **kwargs,
 ) -> pd.DataFrame:
     s = df[price].astype(float)
     df["baseline"] = _gaussian_filter(s, length, sigma)
     return _set_signal(df, "baseline", signal_col)
+
 
 # 📈 Regression channel midline
 def baseline_gchannel(
@@ -485,11 +515,12 @@ def baseline_gchannel(
     length: int = 100,
     price: str = "close",
     signal_col: str = "baseline_signal",
-    **kwargs
+    **kwargs,
 ) -> pd.DataFrame:
     s = df[price].astype(float)
     df["baseline"] = _rolling_linreg_midline(s, length)
     return _set_signal(df, "baseline", signal_col)
+
 
 # 📈 HMA (Hull MA)
 def baseline_hma(
@@ -498,16 +529,17 @@ def baseline_hma(
     length: int = 55,
     price: str = "close",
     signal_col: str = "baseline_signal",
-    **kwargs
+    **kwargs,
 ) -> pd.DataFrame:
     s = df[price].astype(float)
     n = max(int(length), 1)
     wma_n = _wma(s, n)
     wma_half = _wma(s, max(n // 2, 1))
-    diff = (2 * wma_half - wma_n)
+    diff = 2 * wma_half - wma_n
     hma = _wma(diff, max(int(np.sqrt(n)), 1))
     df["baseline"] = hma
     return _set_signal(df, "baseline", signal_col)
+
 
 # 📈 McGinley Dynamic
 def baseline_mcginley_dynamic(
@@ -517,10 +549,11 @@ def baseline_mcginley_dynamic(
     k: float = 0.6,
     price: str = "close",
     signal_col: str = "baseline_signal",
-    **kwargs
+    **kwargs,
 ) -> pd.DataFrame:
     s = df[price].astype(float).values
-    y = np.empty_like(s); y[:] = np.nan
+    y = np.empty_like(s)
+    y[:] = np.nan
     md = np.nan
     L = max(int(length), 1)
     k = float(k)
@@ -529,12 +562,13 @@ def baseline_mcginley_dynamic(
             md = x
         else:
             ratio = np.clip(x / (md if md != 0 else 1e-12), 1e-6, 1e6)
-            denom = k * L * (ratio ** 4)
+            denom = k * L * (ratio**4)
             denom = denom if np.isfinite(denom) and denom != 0 else 1.0
             md = md + (x - md) / denom
         y[i] = md
     df["baseline"] = pd.Series(y, index=range(len(s)))
     return _set_signal(df, "baseline", signal_col)
+
 
 # 📈 Ehlers Two-Pole Super Smoother
 def baseline_ehlers_two_pole_super_smoother_filter(
@@ -543,7 +577,7 @@ def baseline_ehlers_two_pole_super_smoother_filter(
     period: int = 20,
     price: str = "close",
     signal_col: str = "baseline_signal",
-    **kwargs
+    **kwargs,
 ) -> pd.DataFrame:
     s = df[price].astype(float).values
     per = max(int(period), 2)
@@ -554,16 +588,18 @@ def baseline_ehlers_two_pole_super_smoother_filter(
     c3 = -(a1 * a1)
     c1 = 1 - c2 - c3
 
-    y = np.empty_like(s); y[:] = np.nan
+    y = np.empty_like(s)
+    y[:] = np.nan
     for i in range(len(s)):
         x0 = s[i]
-        x1 = s[i-1] if i > 0 else s[i]
-        y1 = y[i-1] if i > 0 and np.isfinite(y[i-1]) else x1
-        y2 = y[i-2] if i > 1 and np.isfinite(y[i-2]) else y1
+        x1 = s[i - 1] if i > 0 else s[i]
+        y1 = y[i - 1] if i > 0 and np.isfinite(y[i - 1]) else x1
+        y2 = y[i - 2] if i > 1 and np.isfinite(y[i - 2]) else y1
         y[i] = c1 * (x0 + x1) / 2.0 + c2 * y1 + c3 * y2
 
     df["baseline"] = pd.Series(y, index=range(len(s)))
     return _set_signal(df, "baseline", signal_col)
+
 
 # 📈 ATR-based EMA variant
 def baseline_atr_based_ema_variant_1(
@@ -576,7 +612,7 @@ def baseline_atr_based_ema_variant_1(
     alpha_max: float = 0.5,
     price: str = "close",
     signal_col: str = "baseline_signal",
-    **kwargs
+    **kwargs,
 ) -> pd.DataFrame:
     s = df[price].astype(float)
     tr1 = (df["high"] - df["low"]).abs()
@@ -591,7 +627,8 @@ def baseline_atr_based_ema_variant_1(
     base_alpha = 2.0 / (max(int(length), 1) + 1.0)
     alpha = (base_alpha * ratio).clip(alpha_min, alpha_max).values
 
-    y = np.empty_like(s.values); y[:] = np.nan
+    y = np.empty_like(s.values)
+    y[:] = np.nan
     acc = np.nan
     for i, xi in enumerate(s.values):
         ai = alpha[i] if np.isfinite(alpha[i]) else base_alpha

@@ -2,7 +2,9 @@
 # v1.9.8+ — Hardened metrics: never emit NaN/inf; risk-free = 0%
 
 from __future__ import annotations
+
 import math
+
 import numpy as np
 import pandas as pd
 
@@ -12,11 +14,13 @@ TRADING_DAYS = 252  # annualization factor for daily returns
 try:
     from utils import coerce_series_numeric
 except Exception:
+
     def coerce_series_numeric(s: pd.Series) -> pd.Series:
         if s is None or not isinstance(s, pd.Series) or s.empty:
             return pd.Series(dtype=float)
         s = pd.to_numeric(s, errors="coerce").replace([np.inf, -np.inf], np.nan).fillna(0.0)
         return s.astype(float)
+
 
 def _coerce_df(equity_df: pd.DataFrame) -> pd.DataFrame:
     df = equity_df.copy()
@@ -27,6 +31,7 @@ def _coerce_df(equity_df: pd.DataFrame) -> pd.DataFrame:
     df = df.dropna(subset=["date", "equity"]).sort_values("date").reset_index(drop=True)
     return df
 
+
 def _daily_equity(equity_df: pd.DataFrame) -> pd.DataFrame:
     """
     If your equity curve is per-bar, collapse to end-of-day by taking the last
@@ -35,25 +40,25 @@ def _daily_equity(equity_df: pd.DataFrame) -> pd.DataFrame:
     df = _coerce_df(equity_df)
     eod = (
         df.assign(day=df["date"].dt.floor("D"))
-          .groupby("day", as_index=False)["equity"].last()
-          .rename(columns={"day": "date"})
+        .groupby("day", as_index=False)["equity"]
+        .last()
+        .rename(columns={"day": "date"})
     )
     return eod
 
+
 def compute_daily_returns(equity_df: pd.DataFrame) -> pd.Series:
     eod = _daily_equity(equity_df)
-    eod["ret"] = (
-        eod["equity"].pct_change()
-        .replace([np.inf, -np.inf], np.nan)
-        .fillna(0.0)
-    )
+    eod["ret"] = eod["equity"].pct_change().replace([np.inf, -np.inf], np.nan).fillna(0.0)
     return eod.set_index("date")["ret"]
+
 
 def _sanitize_returns(returns: pd.Series) -> pd.Series:
     r = coerce_series_numeric(returns if isinstance(returns, pd.Series) else pd.Series(returns))
     if r.empty:
         return r
     return r.replace([np.inf, -np.inf], np.nan).fillna(0.0)
+
 
 def sharpe_ratio(returns: pd.Series, rf_annual: float = 0.0) -> float:
     r = _sanitize_returns(returns)
@@ -66,6 +71,7 @@ def sharpe_ratio(returns: pd.Series, rf_annual: float = 0.0) -> float:
         return 0.0
     mu = excess.mean()
     return float(mu / vol * math.sqrt(TRADING_DAYS)) if np.isfinite(mu) else 0.0
+
 
 def sortino_ratio(returns: pd.Series, rf_annual: float = 0.0) -> float:
     r = _sanitize_returns(returns)
@@ -80,12 +86,13 @@ def sortino_ratio(returns: pd.Series, rf_annual: float = 0.0) -> float:
         return 0.0
     return float(mu / ds * math.sqrt(TRADING_DAYS))
 
+
 def cagr(equity_df: pd.DataFrame) -> float:
     df = _coerce_df(equity_df)
     if df.empty:
         return 0.0
     start_val = float(df["equity"].iloc[0])
-    end_val   = float(df["equity"].iloc[-1])
+    end_val = float(df["equity"].iloc[-1])
     if not np.isfinite(start_val) or start_val <= 0:
         return 0.0
     days = (df["date"].iloc[-1] - df["date"].iloc[0]).days
@@ -99,6 +106,7 @@ def cagr(equity_df: pd.DataFrame) -> float:
     except Exception:
         return 0.0
 
+
 def max_drawdown_pct(equity_df: pd.DataFrame) -> float:
     df = _coerce_df(equity_df)
     if df.empty:
@@ -108,12 +116,14 @@ def max_drawdown_pct(equity_df: pd.DataFrame) -> float:
     dd = dd.replace([np.inf, -np.inf], np.nan).fillna(0.0)
     return float(dd.min()) if not dd.empty and np.isfinite(dd.min()) else 0.0
 
+
 def volatility_annualized(returns: pd.Series) -> float:
     r = _sanitize_returns(returns)
     if r.empty:
         return 0.0
     sigma = r.std(ddof=1)
     return float(sigma * math.sqrt(TRADING_DAYS)) if np.isfinite(sigma) else 0.0
+
 
 def skewness(returns: pd.Series) -> float:
     r = _sanitize_returns(returns)
@@ -122,12 +132,14 @@ def skewness(returns: pd.Series) -> float:
     v = float(r.skew())
     return v if np.isfinite(v) else 0.0
 
+
 def kurtosis(returns: pd.Series) -> float:
     r = _sanitize_returns(returns)
     if r.empty:
         return 0.0
     v = float(r.kurt())
     return v if np.isfinite(v) else 0.0
+
 
 def mar_ratio(equity_df: pd.DataFrame) -> float:
     c = cagr(equity_df)
@@ -137,19 +149,23 @@ def mar_ratio(equity_df: pd.DataFrame) -> float:
     denom = abs(mdd_pct) / 100.0
     return float(c / denom) if denom > 0 else 0.0
 
+
 def average_trade_duration_days(trades_df: pd.DataFrame) -> float:
     if trades_df is None or len(trades_df) == 0:
         return 0.0
     try:
         t = trades_df.copy()
         t["entry_date"] = pd.to_datetime(t["entry_date"], errors="coerce")
-        t["exit_date"]  = pd.to_datetime(t["exit_date"],  errors="coerce")
+        t["exit_date"] = pd.to_datetime(t["exit_date"], errors="coerce")
         d = (t["exit_date"] - t["entry_date"]).dt.days.dropna()
         return float(d.mean()) if not d.empty else 0.0
     except Exception:
         return 0.0
 
-def compute_all(equity_df: pd.DataFrame, trades_df: pd.DataFrame | None = None, rf_annual: float = 0.0) -> dict:
+
+def compute_all(
+    equity_df: pd.DataFrame, trades_df: pd.DataFrame | None = None, rf_annual: float = 0.0
+) -> dict:
     rets = compute_daily_returns(equity_df)
     out = {
         "Sharpe": sharpe_ratio(rets, rf_annual),

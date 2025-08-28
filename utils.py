@@ -3,10 +3,8 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Optional, Tuple, Dict, Any, Iterable
+from typing import Any, Dict, Iterable, Optional, Tuple
 
-import json
-import math
 import numpy as np
 import pandas as pd
 
@@ -52,8 +50,8 @@ TRADES_COLS: list[str] = [
     "pair",
     "entry_date",
     "entry_price",
-    "direction",            # "long"/"short" or ±1 (direction_int holds numeric)
-    "direction_int",        # +1 / -1
+    "direction",  # "long"/"short" or ±1 (direction_int holds numeric)
+    "direction_int",  # +1 / -1
     "atr_at_entry_price",
     "atr_at_entry_pips",
     "lots_total",
@@ -61,8 +59,8 @@ TRADES_COLS: list[str] = [
     "lots_runner",
     "tp1_price",
     "sl_price",
-    "tp1_at_entry_price",   # immutable: TP1 as set on entry
-    "sl_at_entry_price",    # immutable: SL  as set on entry
+    "tp1_at_entry_price",  # immutable: TP1 as set on entry
+    "sl_at_entry_price",  # immutable: SL  as set on entry
     "tp1_hit",
     "breakeven_after_tp1",
     "ts_active",
@@ -71,8 +69,8 @@ TRADES_COLS: list[str] = [
     "exit_date",
     "exit_price",
     "exit_reason",
-    "sl_at_exit_price",     # dynamic stop level at exit (BE/TS)
-    "spread_pips_used",     # v1.9.3 spread modeling (PnL-only)
+    "sl_at_exit_price",  # dynamic stop level at exit (BE/TS)
+    "spread_pips_used",  # v1.9.3 spread modeling (PnL-only)
     "pnl",
     "win",
     "loss",
@@ -83,11 +81,13 @@ TRADES_COLS: list[str] = [
 #  File / Path helpers
 # =========================
 
+
 def ensure_results_dir(results_dir: str | Path) -> Path:
     """Create the results dir if missing and return the Path."""
     p = Path(results_dir)
     p.mkdir(parents=True, exist_ok=True)
     return p
+
 
 def safe_read_csv(path: str | Path) -> Optional[pd.DataFrame]:
     """Read CSV if it exists; otherwise return None."""
@@ -99,16 +99,21 @@ def safe_read_csv(path: str | Path) -> Optional[pd.DataFrame]:
     except Exception:
         return None
 
+
 def read_yaml(path: str | Path) -> dict:
     import yaml
+
     with open(path, "r", encoding="utf-8") as f:
         return yaml.safe_load(f) or {}
 
+
 def write_yaml(path: str | Path, data: dict) -> None:
     import yaml
+
     Path(path).parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
         yaml.safe_dump(data, f, sort_keys=False, allow_unicode=True)
+
 
 def _possible_filenames_for_pair(pair: str) -> Iterable[str]:
     """
@@ -122,6 +127,7 @@ def _possible_filenames_for_pair(pair: str) -> Iterable[str]:
     elif "_" in pair:
         yield f"{pair.replace('_', '')}.csv"
         yield f"{pair.replace('_', '/')}.csv"
+
 
 def load_pair_csv(pair: str, data_dir: str | Path) -> pd.DataFrame:
     """
@@ -149,13 +155,13 @@ def load_pair_csv(pair: str, data_dir: str | Path) -> pd.DataFrame:
                 if c in df.columns:
                     df[c] = pd.to_numeric(df[c], errors="coerce")
             return df
-    raise FileNotFoundError(
-        f"No CSV found for pair {pair} in {data_dir}. Tried: {tried}"
-    )
+    raise FileNotFoundError(f"No CSV found for pair {pair} in {data_dir}. Tried: {tried}")
+
 
 # =========================
 #  FX / Pip helpers
 # =========================
+
 
 def get_pip_size(pair: str) -> float:
     """
@@ -167,15 +173,19 @@ def get_pip_size(pair: str) -> float:
         return 0.01
     return 0.0001
 
+
 def price_to_pips(pair: str, price_diff: float) -> float:
     return float(price_diff / get_pip_size(pair))
+
 
 def pips_to_price(pair: str, pips: float) -> float:
     return float(pips * get_pip_size(pair))
 
+
 # =========================
 #  Indicators / Math
 # =========================
+
 
 def calculate_atr(df: pd.DataFrame, period: int = 14) -> pd.DataFrame:
     """
@@ -199,17 +209,20 @@ def calculate_atr(df: pd.DataFrame, period: int = 14) -> pd.DataFrame:
     df["atr"] = tr.rolling(period, min_periods=period).mean()
     return df
 
+
 # =========================
 #  SAFE METRICS HARDENING (v1.9.8+)
 # =========================
 
 EPS = 1e-12
 
+
 def _safe_is_num(x) -> bool:
     try:
         return np.isfinite(float(x))
     except Exception:
         return False
+
 
 def safe_ratio(num, den, default: float = 0.0) -> float:
     try:
@@ -220,11 +233,13 @@ def safe_ratio(num, den, default: float = 0.0) -> float:
     except Exception:
         return float(default)
 
+
 def coerce_series_numeric(s: pd.Series) -> pd.Series:
     if s is None or not isinstance(s, pd.Series) or s.empty:
         return pd.Series(dtype=float)
     s = pd.to_numeric(s, errors="coerce").replace([np.inf, -np.inf], np.nan).fillna(0.0)
     return s.astype(float)
+
 
 def safe_pct(x, default: float = 0.0) -> float:
     try:
@@ -234,6 +249,7 @@ def safe_pct(x, default: float = 0.0) -> float:
     except Exception:
         return float(default)
 
+
 def safe_roi_pct(equity_start, equity_end) -> float:
     # Clamp catastrophic outcomes deterministically.
     if not _safe_is_num(equity_start) or float(equity_start) <= 0:
@@ -241,6 +257,7 @@ def safe_roi_pct(equity_start, equity_end) -> float:
     if not _safe_is_num(equity_end) or float(equity_end) <= 0:
         return -100.0
     return (float(equity_end) / float(equity_start) - 1.0) * 100.0
+
 
 def safe_max_drawdown_pct(equity: pd.Series) -> float:
     eq = coerce_series_numeric(equity)
@@ -251,24 +268,33 @@ def safe_max_drawdown_pct(equity: pd.Series) -> float:
     dd = dd.replace([np.inf, -np.inf], np.nan).fillna(0.0)
     return float(dd.min()) if not dd.empty and np.isfinite(dd.min()) else 0.0
 
+
 def safe_expectancy(avg_win: float, avg_loss: float, win_rate_ns: float) -> float:
     # Expectancy per trade (in $ or R); robust to zeros and weird inputs.
     wl = 1.0 - win_rate_ns
-    if not _safe_is_num(avg_win):  avg_win = 0.0
-    if not _safe_is_num(avg_loss): avg_loss = 0.0
-    if not _safe_is_num(win_rate_ns): win_rate_ns = 0.0
-    if not _safe_is_num(wl): wl = 0.0
+    if not _safe_is_num(avg_win):
+        avg_win = 0.0
+    if not _safe_is_num(avg_loss):
+        avg_loss = 0.0
+    if not _safe_is_num(win_rate_ns):
+        win_rate_ns = 0.0
+    if not _safe_is_num(wl):
+        wl = 0.0
     return float(avg_win) * float(win_rate_ns) - float(avg_loss) * float(wl)
+
 
 # =========================
 #  Reporting / Summaries
 # =========================
 
+
 def _read_csv_if_exists(path: Path) -> Optional[pd.DataFrame]:
     return pd.read_csv(path) if Path(path).exists() else None
 
+
 def _fmt_pct(x: float, decimals: int = 2) -> str:
     return f"{x:.{decimals}f}"
+
 
 def summarize_results(
     results_dir: str | Path,
@@ -293,15 +319,23 @@ def summarize_results(
     scratches = int(trades["scratch"].sum()) if "scratch" in trades else 0
     ns_count = int(wins + losses)
 
-    win_pct_ns  = 100.0 * safe_ratio(wins,  ns_count, default=0.0)
+    win_pct_ns = 100.0 * safe_ratio(wins, ns_count, default=0.0)
     loss_pct_ns = 100.0 * safe_ratio(losses, ns_count, default=0.0)
     scratch_pct_total = 100.0 * safe_ratio(scratches, total, default=0.0)
 
     # Expectancy (per trade, $) on non-scratch set
     if ns_count > 0:
-        non_scratch = trades.loc[trades["scratch"] == False] if "scratch" in trades.columns else trades
-        avg_win  = float(non_scratch.loc[non_scratch["win"] == True,  "pnl"].mean()) if "pnl" in non_scratch.columns else 0.0
-        avg_loss = float(non_scratch.loc[non_scratch["win"] == False, "pnl"].mean()) if "pnl" in non_scratch.columns else 0.0
+        non_scratch = trades.loc[not trades["scratch"]] if "scratch" in trades.columns else trades
+        avg_win = (
+            float(non_scratch.loc[non_scratch["win"], "pnl"].mean())
+            if "pnl" in non_scratch.columns
+            else 0.0
+        )
+        avg_loss = (
+            float(non_scratch.loc[not non_scratch["win"], "pnl"].mean())
+            if "pnl" in non_scratch.columns
+            else 0.0
+        )
         expectancy = safe_expectancy(avg_win, abs(avg_loss), win_pct_ns / 100.0)
     else:
         expectancy = 0.0
@@ -367,10 +401,19 @@ def summarize_results(
 
             eq["peak"] = eq["equity"].cummax()
             dd_series = (eq["equity"] / eq["peak"] - 1.0) * 100.0
-            max_dd_pct = float(dd_series.min()) if not dd_series.empty and np.isfinite(dd_series.min()) else 0.0
+            max_dd_pct = (
+                float(dd_series.min())
+                if not dd_series.empty and np.isfinite(dd_series.min())
+                else 0.0
+            )
 
             # CAGR & MAR (use dates to count years)
-            days = max(1, int((pd.to_datetime(eq["date"].iloc[-1]) - pd.to_datetime(eq["date"].iloc[0])).days))
+            days = max(
+                1,
+                int(
+                    (pd.to_datetime(eq["date"].iloc[-1]) - pd.to_datetime(eq["date"].iloc[0])).days
+                ),
+            )
             years = days / 365.25
             if start_eq > 0 and end_eq > 0 and years > 0:
                 cagr = (end_eq / start_eq) ** (1 / years) - 1
@@ -403,7 +446,7 @@ def summarize_results(
                     "----------------------",
                     f"Sharpe: {sharpe:.4f}",
                     f"Sortino: {sortino:.4f}",
-                    f"Volatility (ann.): {vol_ann*100:.4f}%",
+                    f"Volatility (ann.): {vol_ann * 100:.4f}%",
                     f"CAGR: {cagr:.4f}",
                     f"Max DD (%): {max_dd_pct:.2f}",
                     f"MAR: {mar:.4f}",
@@ -418,6 +461,7 @@ def summarize_results(
         lines.append("\n[SUMMARY] No equity_curve.csv → performance metrics skipped (defaults)")
 
     return "\n".join(lines), metrics
+
 
 def write_summary(results_dir: str | Path, cfg: Optional[Dict[str, Any]] = None) -> Path:
     """
@@ -437,6 +481,7 @@ def write_summary(results_dir: str | Path, cfg: Optional[Dict[str, Any]] = None)
     out.write_text(text, encoding="utf-8")
     return out
 
+
 def print_last_summary(
     results_dir: str | Path = "results",
     config_path: str | Path = "config.yaml",
@@ -445,7 +490,10 @@ def print_last_summary(
     text, _ = summarize_results(results_dir)
     print(text)
 
-def pip_value_per_lot(pair: str, account_ccy: str, fx_quotes: dict | None = None, lot_size: int = 100_000) -> float:
+
+def pip_value_per_lot(
+    pair: str, account_ccy: str, fx_quotes: dict | None = None, lot_size: int = 100_000
+) -> float:
     """Return *account-currency* pip value for a standard lot.
     - pair: e.g. 'EUR_USD', 'USDJPY', 'GBP/JPY'
     - account_ccy: e.g. 'USD'
@@ -457,6 +505,7 @@ def pip_value_per_lot(pair: str, account_ccy: str, fx_quotes: dict | None = None
       3) Else convert via quote->account rate from fx_quotes. If only account->quote exists, invert it.
          If no rate is found, fall back to returning quote pip value (best-effort).
     """
+
     def _norm_pair(a: str, b: str) -> list[str]:
         ab = f"{a}{b}"
         ab_us = f"{a}_{b}"
@@ -480,7 +529,7 @@ def pip_value_per_lot(pair: str, account_ccy: str, fx_quotes: dict | None = None
         return None
 
     norm = pair.replace("_", "").replace("/", "").upper()
-    base = norm[:3]
+    norm[:3]
     quote = norm[-3:]
     pip_quote_per_lot = get_pip_size(pair) * float(lot_size)
 
@@ -492,6 +541,7 @@ def pip_value_per_lot(pair: str, account_ccy: str, fx_quotes: dict | None = None
         # best-effort fallback: return quote-ccy value (prevents crashes)
         return pip_quote_per_lot
     return pip_quote_per_lot * float(rate)
+
 
 if __name__ == "__main__":
     # Optional: ad‑hoc checks

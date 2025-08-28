@@ -1,22 +1,20 @@
-from typing import Optional, List
-
 # validators_config.py
-
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Literal
-from pydantic import BaseModel, Field, ValidationError, field_validator
+from typing import Any, Dict, List, Literal, Optional
+
 import yaml
-import json
+from pydantic import BaseModel, Field, ValidationError, field_validator
+
 
 class MonteCarloModel(BaseModel):
     enabled: bool = False
     iterations: int = 300
-    horizon: str = "oos"                       # "oos" or an integer days/trades depending on mode
-    use_daily_returns: Optional[bool] = None      # if provided and True -> daily; False -> per-trade
-    modes: Optional[List[str]] = None             # e.g., ["trades","daily"] to run both
-    auto_after_wfo: bool = False               # automatically run right after WFO
-    save_mode_specific: bool = True            # write mc_summary_{mode}.txt & mc_samples_{mode}.csv
-    save_main_as_latest: bool = True           # always write mc_summary.txt & mc_samples.csv as latest
+    horizon: str = "oos"  # "oos" or an integer days/trades depending on mode
+    use_daily_returns: Optional[bool] = None  # if provided and True -> daily; False -> per-trade
+    modes: Optional[List[str]] = None  # e.g., ["trades","daily"] to run both
+    auto_after_wfo: bool = False  # automatically run right after WFO
+    save_mode_specific: bool = True  # write mc_summary_{mode}.txt & mc_samples_{mode}.csv
+    save_main_as_latest: bool = True  # always write mc_summary.txt & mc_samples.csv as latest
     rng_seed: Optional[int] = None
 
 
@@ -26,6 +24,7 @@ Pair = str  # e.g., "EUR_USD"
 # -------------------------
 # Sub-config models
 # -------------------------
+
 
 class Spreads(BaseModel):
     enabled: bool = False
@@ -95,18 +94,20 @@ class ValidationCfg(BaseModel):
     strict_contract: bool = False  # used by validators_util.validate_contract
 
 
-
 class DbcvixCfg(BaseModel):
     enabled: bool = False
-    mode: Optional[Literal["reduce","block"]] = "reduce"
+    mode: Optional[Literal["reduce", "block"]] = "reduce"
     threshold: Optional[float] = None
     reduce_risk_to: float = 1.0
-    source: Literal["synthetic","manual_csv","refinitiv","bloomberg"] = "synthetic"
+    source: Literal["synthetic", "manual_csv", "refinitiv", "bloomberg"] = "synthetic"
     csv_path: str = "data/external/dbcvix_synth.csv"
     column: str = "cvix_synth"
 
+
 class FiltersCfg(BaseModel):
     dbcvix: DbcvixCfg = DbcvixCfg()
+
+
 class OutputCfg(BaseModel):
     results_dir: str = "results"
 
@@ -119,7 +120,7 @@ class RiskCfg(BaseModel):
 class WalkForwardCfg(BaseModel):
     # Keep strings; the runner turns these into timestamps with pandas
     start: Optional[str] = None  # "YYYY-MM-DD"
-    end: Optional[str] = None    # "YYYY-MM-DD"
+    end: Optional[str] = None  # "YYYY-MM-DD"
     train_years: int = 3
     test_years: int = 1
     step_years: int = 1
@@ -128,6 +129,7 @@ class WalkForwardCfg(BaseModel):
 # -------------------------
 # Root config model
 # -------------------------
+
 
 class Config(BaseModel):
     monte_carlo: MonteCarloModel = MonteCarloModel()
@@ -146,7 +148,7 @@ class Config(BaseModel):
     exit: Exit
     continuation: Continuation
     tracking: Tracking
-    
+
     filters: FiltersCfg = FiltersCfg()
     spreads: Spreads = Spreads()
 
@@ -187,6 +189,7 @@ class Config(BaseModel):
 # -------------------------
 # Public helpers
 # -------------------------
+
 
 def validate_config(cfg: dict) -> dict:
     """Validate a raw dict and return a normalized dict with defaults."""

@@ -1,12 +1,12 @@
 # walk_forward.py — v1.9.8+ (hardened metrics, dict-friendly, no circular imports)
 from __future__ import annotations
 
+import math
+from copy import deepcopy
 from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
 from typing import List
-from copy import deepcopy
-from datetime import datetime
-import math
 
 import numpy as np
 import pandas as pd
@@ -16,11 +16,13 @@ import pandas as pd
 # ============================================================
 EPS = 1e-12
 
+
 def _safe_is_num(x) -> bool:
     try:
         return np.isfinite(float(x))
     except Exception:
         return False
+
 
 def _safe_ratio(num, den, default: float = 0.0) -> float:
     try:
@@ -31,11 +33,13 @@ def _safe_ratio(num, den, default: float = 0.0) -> float:
     except Exception:
         return float(default)
 
+
 def _coerce_series_numeric(s: pd.Series) -> pd.Series:
     if s is None or not isinstance(s, pd.Series) or s.empty:
         return pd.Series(dtype=float)
     s = pd.to_numeric(s, errors="coerce").replace([np.inf, -np.inf], np.nan).fillna(0.0)
     return s.astype(float)
+
 
 def _safe_roi_pct(equity_start, equity_end) -> float:
     # If equity_end <= 0 and a valid positive start → treat as wipeout: -100%
@@ -44,6 +48,7 @@ def _safe_roi_pct(equity_start, equity_end) -> float:
     if not _safe_is_num(equity_end) or float(equity_end) <= 0:
         return -100.0
     return (float(equity_end) / float(equity_start) - 1.0) * 100.0
+
 
 def _safe_max_drawdown_pct(equity: pd.Series) -> float:
     eq = _coerce_series_numeric(equity)
@@ -54,21 +59,26 @@ def _safe_max_drawdown_pct(equity: pd.Series) -> float:
     dd = dd.replace([np.inf, -np.inf], np.nan).fillna(0.0)
     return float(dd.min()) if not dd.empty and np.isfinite(dd.min()) else 0.0
 
+
 def _safe_expectancy(avg_win: float, avg_loss: float, win_rate_ns_frac: float) -> float:
     # Expectancy per trade (same units as your 'pnl' column). avg_loss should be positive magnitude.
     try:
-        aw = float(avg_win);    aw = aw if np.isfinite(aw) else 0.0
+        aw = float(avg_win)
+        aw = aw if np.isfinite(aw) else 0.0
     except Exception:
         aw = 0.0
     try:
-        al = float(avg_loss);   al = al if np.isfinite(al) else 0.0
+        al = float(avg_loss)
+        al = al if np.isfinite(al) else 0.0
     except Exception:
         al = 0.0
     try:
-        wr = float(win_rate_ns_frac); wr = wr if np.isfinite(wr) and 0.0 <= wr <= 1.0 else 0.0
+        wr = float(win_rate_ns_frac)
+        wr = wr if np.isfinite(wr) and 0.0 <= wr <= 1.0 else 0.0
     except Exception:
         wr = 0.0
     return aw * wr - al * (1.0 - wr)
+
 
 def _safe_float(x: float, default: float = 0.0) -> float:
     try:
@@ -77,6 +87,7 @@ def _safe_float(x: float, default: float = 0.0) -> float:
     except Exception:
         return float(default)
 
+
 # ============================================================
 # Utilities (local, no cycles)
 # ============================================================
@@ -84,6 +95,7 @@ def _ensure_results_dir(p) -> Path:
     p = Path(p)
     p.mkdir(parents=True, exist_ok=True)
     return p
+
 
 def _parse_date(x) -> pd.Timestamp:
     if isinstance(x, pd.Timestamp):
@@ -95,6 +107,7 @@ def _parse_date(x) -> pd.Timestamp:
         return pd.to_datetime(x, unit="D", origin="unix", errors="coerce")
     return pd.to_datetime(str(x), errors="coerce")
 
+
 @dataclass(frozen=True)
 class Fold:
     idx: int
@@ -102,6 +115,7 @@ class Fold:
     train_end: pd.Timestamp
     test_start: pd.Timestamp
     test_end: pd.Timestamp
+
 
 # ============================================================
 # Fold generation (explicit or auto)
@@ -134,34 +148,37 @@ def generate_folds(cfg: dict) -> List[Fold]:
             if pd.isna(ts) or pd.isna(te) or pd.isna(os) or pd.isna(oe):
                 raise ValueError(f"Invalid dates in explicit fold {i}: {f}")
             if not (ts < te and te <= os and os < oe):
-                raise ValueError(f"Fold {i} order invalid (expect train_start < train_end <= test_start < test_end): {f}")
+                raise ValueError(
+                    f"Fold {i} order invalid (expect train_start < train_end <= test_start < test_end): {f}"
+                )
             folds.append(Fold(i, ts, te, os, oe))
         return folds
 
     # 2) Auto from windows + data bounds
-    train_years  = int(wf.get("train_years", 2))
-    test_months  = int(wf.get("test_months", 6))
-    step_months  = int(wf.get("step_months", test_months))
+    train_years = int(wf.get("train_years", 2))
+    test_months = int(wf.get("test_months", 6))
+    step_months = int(wf.get("step_months", test_months))
 
     start = _parse_date(data.get("start"))
-    end   = _parse_date(data.get("end"))
+    end = _parse_date(data.get("end"))
 
     if pd.isna(start) or pd.isna(end):
         raise ValueError("Auto WFO requires data.start and data.end in config (ISO date strings).")
 
     from pandas.tseries.offsets import DateOffset
+
     train_len = DateOffset(years=train_years)
-    test_len  = DateOffset(months=test_months)
-    step_len  = DateOffset(months=step_months)
+    test_len = DateOffset(months=test_months)
+    step_len = DateOffset(months=step_months)
 
     folds: List[Fold] = []
     i = 1
     cursor = start + train_len  # first train end
     while True:
         train_start = cursor - train_len
-        train_end   = cursor
-        test_start  = train_end
-        test_end    = test_start + test_len
+        train_end = cursor
+        test_start = train_end
+        test_end = test_start + test_len
 
         # Bounds check
         if test_end > end:
@@ -176,6 +193,7 @@ def generate_folds(cfg: dict) -> List[Fold]:
         cursor = cursor + step_len
 
     return folds
+
 
 # ============================================================
 # Backtester call (local import to avoid cycles)
@@ -192,7 +210,7 @@ def _call_backtester(cfg: dict, *, start_date, end_date, run_name: str):
     # Apply OOS window (match your project's data schema)
     data = cfg_fold.setdefault("data", {})
     data["start"] = str(pd.to_datetime(start_date).date())
-    data["end"]   = str(pd.to_datetime(end_date).date())
+    data["end"] = str(pd.to_datetime(end_date).date())
 
     # Point outputs to fold subdir under results
     out = cfg_fold.setdefault("output", {})
@@ -205,6 +223,7 @@ def _call_backtester(cfg: dict, *, start_date, end_date, run_name: str):
     # Run (backtester accepts dicts since v1.9.8)
     run_backtest(cfg_fold)
 
+
 # ============================================================
 # Optional Monte Carlo (import guarded)
 # ============================================================
@@ -214,6 +233,7 @@ try:
 except Exception:
     run_monte_carlo = None
     run_monte_carlo_modes = None
+
 
 # ============================================================
 # Main WFO Orchestration
@@ -245,19 +265,25 @@ def run_wfo(cfg: dict):
 
     folds = generate_folds(cfg)
     if not folds:
-        raise RuntimeError("No valid folds generated. Check your data coverage or walk_forward settings.")
+        raise RuntimeError(
+            "No valid folds generated. Check your data coverage or walk_forward settings."
+        )
 
     fold_records = []
     oos_equity_frames: List[pd.DataFrame] = []
 
     for f in folds:
         print(f"—— Fold {f.idx} ———————————————————————————————")
-        print(f"Train: {f.train_start.date()} → {f.train_end.date()}  |  Test (OOS): {f.test_start.date()} → {f.test_end.date()}")
+        print(
+            f"Train: {f.train_start.date()} → {f.train_end.date()}  |  Test (OOS): {f.test_start.date()} → {f.test_end.date()}"
+        )
         fold_run_name = f"{run_name}/fold_{f.idx:02d}"
 
         # Call the backtester for the OOS window
         try:
-            _call_backtester(cfg, start_date=f.test_start, end_date=f.test_end, run_name=fold_run_name)
+            _call_backtester(
+                cfg, start_date=f.test_start, end_date=f.test_end, run_name=fold_run_name
+            )
         except Exception as e:
             print(f"⚠️  Backtester call failed for fold {f.idx}: {e}")
 
@@ -283,10 +309,14 @@ def run_wfo(cfg: dict):
         # Expectancy ($/trade) using 'pnl' over non-scratch set
         expectancy = 0.0
         if ns_count > 0 and not trades_df.empty:
-            ns_df = trades_df.loc[trades_df["scratch"] == False] if "scratch" in trades_df.columns else trades_df
+            ns_df = (
+                trades_df.loc[not trades_df["scratch"]]
+                if "scratch" in trades_df.columns
+                else trades_df
+            )
             if not ns_df.empty and "pnl" in ns_df.columns and "win" in ns_df.columns:
-                avg_win  = float(ns_df.loc[ns_df["win"] == True,  "pnl"].mean()  or 0.0)
-                avg_loss = abs(float(ns_df.loc[ns_df["win"] == False, "pnl"].mean() or 0.0))
+                avg_win = float(ns_df.loc[ns_df["win"], "pnl"].mean() or 0.0)
+                avg_loss = abs(float(ns_df.loc[not ns_df["win"], "pnl"].mean() or 0.0))
                 expectancy = _safe_expectancy(avg_win, avg_loss, win_rate_ns)
         else:
             print(f"[WFO] Fold {f.idx}: non_scratch=0 → win%/loss%/expectancy coerced to 0.0")
@@ -295,7 +325,11 @@ def run_wfo(cfg: dict):
         roi_pct = 0.0
         max_dd_pct = 0.0
         if not equity_df.empty and "equity" in equity_df.columns:
-            eq = pd.to_numeric(equity_df["equity"], errors="coerce").replace([np.inf, -np.inf], np.nan).dropna()
+            eq = (
+                pd.to_numeric(equity_df["equity"], errors="coerce")
+                .replace([np.inf, -np.inf], np.nan)
+                .dropna()
+            )
             if not eq.empty:
                 roi_pct = _safe_roi_pct(eq.iloc[0], eq.iloc[-1])
                 max_dd_pct = _safe_max_drawdown_pct(eq)
@@ -308,22 +342,24 @@ def run_wfo(cfg: dict):
             print(f"[WFO] Fold {f.idx}: missing equity_curve.csv → ROI%/MaxDD% set to 0.0")
 
         # Record (all numeric / finite)
-        fold_records.append({
-            "fold_idx": int(f.idx),
-            "train_start": f.train_start.date(),
-            "train_end": f.train_end.date(),
-            "test_start": f.test_start.date(),
-            "test_end": f.test_end.date(),
-            "trades": int(total_trades),
-            "wins": int(wins),
-            "losses": int(losses),
-            "scratches": int(scratches),
-            "win_pct_ns": _safe_float(win_pct_ns, 0.0),
-            "loss_pct_ns": _safe_float(loss_pct_ns, 0.0),
-            "expectancy": _safe_float(expectancy, 0.0),
-            "roi_pct": _safe_float(roi_pct, 0.0),
-            "max_dd_pct": _safe_float(max_dd_pct, 0.0),
-        })
+        fold_records.append(
+            {
+                "fold_idx": int(f.idx),
+                "train_start": f.train_start.date(),
+                "train_end": f.train_end.date(),
+                "test_start": f.test_start.date(),
+                "test_end": f.test_end.date(),
+                "trades": int(total_trades),
+                "wins": int(wins),
+                "losses": int(losses),
+                "scratches": int(scratches),
+                "win_pct_ns": _safe_float(win_pct_ns, 0.0),
+                "loss_pct_ns": _safe_float(loss_pct_ns, 0.0),
+                "expectancy": _safe_float(expectancy, 0.0),
+                "roi_pct": _safe_float(roi_pct, 0.0),
+                "max_dd_pct": _safe_float(max_dd_pct, 0.0),
+            }
+        )
 
     # Build dataframe and sanitize columns
     folds_df = pd.DataFrame(fold_records)
@@ -362,11 +398,21 @@ def run_wfo(cfg: dict):
             return 0.0
 
     if not folds_df.empty:
-        avg_win_pct_ns    = _nan_to_zero(folds_df["win_pct_ns"].mean()) if "win_pct_ns" in folds_df else 0.0
-        avg_loss_pct_ns   = _nan_to_zero(folds_df["loss_pct_ns"].mean()) if "loss_pct_ns" in folds_df else 0.0
-        median_roi_pct    = _nan_to_zero(folds_df["roi_pct"].median()) if "roi_pct" in folds_df else 0.0
-        median_max_dd_pct = _nan_to_zero(folds_df["max_dd_pct"].median()) if "max_dd_pct" in folds_df else 0.0
-        median_expectancy = _nan_to_zero(folds_df["expectancy"].median()) if "expectancy" in folds_df else 0.0
+        avg_win_pct_ns = (
+            _nan_to_zero(folds_df["win_pct_ns"].mean()) if "win_pct_ns" in folds_df else 0.0
+        )
+        avg_loss_pct_ns = (
+            _nan_to_zero(folds_df["loss_pct_ns"].mean()) if "loss_pct_ns" in folds_df else 0.0
+        )
+        median_roi_pct = (
+            _nan_to_zero(folds_df["roi_pct"].median()) if "roi_pct" in folds_df else 0.0
+        )
+        median_max_dd_pct = (
+            _nan_to_zero(folds_df["max_dd_pct"].median()) if "max_dd_pct" in folds_df else 0.0
+        )
+        median_expectancy = (
+            _nan_to_zero(folds_df["expectancy"].median()) if "expectancy" in folds_df else 0.0
+        )
 
         agg = {
             "folds": int(len(folds_df)),
@@ -413,7 +459,10 @@ def run_wfo(cfg: dict):
                     print("🎯 Auto MC: running modes ->", mc_modes)
                     run_monte_carlo_modes(cfg=cfg, results_dir=results_dir, progress=True)  # type: ignore
                 elif run_monte_carlo is not None:
-                    print("🎯 Auto MC: running single mode (use_daily_returns=%s)" % bool(mc_cfg.get("use_daily_returns")))
+                    print(
+                        "🎯 Auto MC: running single mode (use_daily_returns=%s)"
+                        % bool(mc_cfg.get("use_daily_returns"))
+                    )
                     run_monte_carlo(cfg=cfg, results_dir=results_dir, progress=True)  # type: ignore
         except Exception as e:
             print("⚠️  Auto MC failed:", e)
@@ -421,7 +470,9 @@ def run_wfo(cfg: dict):
 
     return folds_df, oos_equity_df
 
+
 # --- Minimal public WFO wrapper for smoketest compatibility ---
+
 
 def run_backtest_walk_forward(config_path: str | None = None):
     """
@@ -429,8 +480,6 @@ def run_backtest_walk_forward(config_path: str | None = None):
     It adapts to whatever you already have in this module.
     Tries a few common internal functions and call signatures.
     """
-    import json
-    from pathlib import Path
 
     # If you already know your internal call, just wire it here and return:
     # return my_internal_wfo(config_path=config_path)
@@ -438,10 +487,10 @@ def run_backtest_walk_forward(config_path: str | None = None):
     # Otherwise, autodetect a callable:
     candidates = []
     for name in [
-        "run_walk_forward",   # common alt
-        "walk_forward",       # some repos use this
-        "run",                # generic
-        "main",               # script-style
+        "run_walk_forward",  # common alt
+        "walk_forward",  # some repos use this
+        "run",  # generic
+        "main",  # script-style
     ]:
         fn = globals().get(name)
         if callable(fn):
@@ -466,7 +515,6 @@ def run_backtest_walk_forward(config_path: str | None = None):
 
     raise AttributeError(
         f"No compatible WFO callable worked in walk_forward.py; "
-        f"looked for { [c.__name__ for c in candidates] or 'none found' }. "
+        f"looked for {[c.__name__ for c in candidates] or 'none found'}. "
         f"Last error: {last_err}"
     )
-

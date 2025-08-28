@@ -1,7 +1,9 @@
 # indicators/exit_funcs.py
 from __future__ import annotations
+
 import numpy as np
 import pandas as pd
+
 
 def _safe_twiggs_money_flow(df: pd.DataFrame, period: int) -> pd.Series:
     """
@@ -12,19 +14,20 @@ def _safe_twiggs_money_flow(df: pd.DataFrame, period: int) -> pd.Series:
     period = max(int(period), 1)
 
     close = pd.to_numeric(df["close"], errors="coerce")
-    high  = pd.to_numeric(df["high"],  errors="coerce")
-    low   = pd.to_numeric(df["low"],   errors="coerce")
-    vol   = pd.to_numeric(df["volume"],errors="coerce").astype(float)
+    high = pd.to_numeric(df["high"], errors="coerce")
+    low = pd.to_numeric(df["low"], errors="coerce")
+    vol = pd.to_numeric(df["volume"], errors="coerce").astype(float)
 
     up_move = (close - low) - (high - close)
     adv = up_move * vol
 
     # Wilder-style smoothing (EMA with alpha=1/period)
     flow_ema = adv.ewm(alpha=1.0 / period, adjust=False).mean()
-    vol_ema  = vol.ewm(alpha=1.0 / period, adjust=False).mean().replace(0, np.nan)
+    vol_ema = vol.ewm(alpha=1.0 / period, adjust=False).mean().replace(0, np.nan)
 
     tmf = (flow_ema / vol_ema).replace([np.inf, -np.inf], np.nan).fillna(0.0)
     return tmf
+
 
 def exit_twiggs_money_flow(
     df: pd.DataFrame,
@@ -59,9 +62,11 @@ def exit_twiggs_money_flow(
         curr = np.sign(tmf)
     else:
         thr = float(max(threshold, 0.0))
+
         # classify to {-1,0,1} using bands
         def classify(x: pd.Series) -> pd.Series:
             return np.where(x > +thr, 1, np.where(x < -thr, -1, 0))
+
         prev = classify(tmf.shift(1).fillna(0.0))
         curr = classify(tmf)
 

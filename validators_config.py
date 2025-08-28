@@ -117,6 +117,11 @@ class RiskCfg(BaseModel):
     risk_per_trade_pct: float = 2.0
 
 
+class DateRange(BaseModel):
+    start: Optional[str] = None
+    end: Optional[str] = None
+
+
 class WalkForwardCfg(BaseModel):
     # Keep strings; the runner turns these into timestamps with pandas
     start: Optional[str] = None  # "YYYY-MM-DD"
@@ -146,7 +151,7 @@ class Config(BaseModel):
 
     rules: Rules
     exit: Exit
-    continuation: Continuation
+    continuation: Continuation = Continuation()
     tracking: Tracking
 
     filters: FiltersCfg = FiltersCfg()
@@ -157,6 +162,8 @@ class Config(BaseModel):
     validation: ValidationCfg = ValidationCfg()
     output: OutputCfg = OutputCfg()
     risk: RiskCfg = RiskCfg()
+    # Optional top-level date window for convenience (fallback for WFO)
+    date_range: Optional[DateRange] = None
     walk_forward: Optional[WalkForwardCfg] = None
 
     # -------- Validators --------

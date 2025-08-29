@@ -413,36 +413,6 @@ def run_wfo_small(core: Dict[str, Any], cfg: dict, run_dir: Path) -> Optional[Pa
     warn(f"WFO callable(s) present but none of the signatures worked; last error: {last_err}")
     return None
 
-    def attempts(fn):
-        # 1) dict positional
-        yield lambda: fn(cfg_wf)
-        # 2) dict keywords with common arg names
-        for kw in ("cfg", "config", "config_dict"):
-            yield lambda fn=fn, kw=kw: fn(**{kw: cfg_wf})
-        # 3) path positional
-        yield lambda: fn(str(snap))
-        # 4) path keyword
-        for kw in ("config_path", "path"):
-            yield lambda fn=fn, kw=kw: fn(**{kw: str(snap)})
-        # 5) zero-arg (maybe reads env/argv)
-        yield lambda: fn()
-
-    for target in callables:
-        for call in attempts(target):
-            try:
-                call()
-                ok(f"WFO tiny finished in {time.time() - t0:.2f}s.")
-                return snap
-            except TypeError as te:
-                last_err = te
-                continue
-            except Exception as e:
-                last_err = e
-                continue
-
-    warn(f"WFO callable(s) present but none of the signatures worked; last error: {last_err}")
-    return None
-
 
 # --------------------------- DBCVIX helpers ---------------------------------
 def ensure_dbcvix_csv(run_dir: Path) -> Path:
@@ -640,17 +610,16 @@ def assert_spread_effect(base_art: Tuple[Path, Path, Path], spread_art: Tuple[Pa
 
 
 # ---------- signature-aware validators --------------------------------------
-import pandas as _pd
 
 
 def _read_artifacts_as_dfs(art):
     trades_df, equity_df = None, None
     try:
-        trades_df = _pd.read_csv(art[0])
+        trades_df = pd.read_csv(art[0])
     except Exception:
         pass
     try:
-        equity_df = _pd.read_csv(art[2])
+        equity_df = pd.read_csv(art[2])
     except Exception:
         pass
     return trades_df, equity_df

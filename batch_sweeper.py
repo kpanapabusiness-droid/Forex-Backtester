@@ -14,6 +14,8 @@ import inspect
 import itertools
 import json
 import multiprocessing as mp
+import re
+import shutil
 import tempfile
 import traceback
 from concurrent.futures import ProcessPoolExecutor, as_completed

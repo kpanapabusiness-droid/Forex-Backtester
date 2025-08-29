@@ -87,6 +87,8 @@ def baseline_ema(
     df: pd.DataFrame,
     *,
     period: int = 200,
+    length: int | None = None,
+    price: str = "close",
     signal_col: str = "baseline_signal",
     **kwargs,
 ) -> pd.DataFrame:
@@ -97,13 +99,14 @@ def baseline_ema(
       - df[signal_col] ∈ {-1,0,+1}: direction (close vs baseline)
     """
     # Defensive: ensure required columns exist
-    if "close" not in df.columns:
-        raise ValueError("baseline_ema requires a 'close' column on the input DataFrame.")
+    if price not in df.columns:
+        raise ValueError("baseline_ema requires a price column on the input DataFrame.")
 
-    p = max(int(period), 1)
+    p = int(length) if length is not None else int(period)
+    p = max(p, 1)
 
-    # IMPORTANT: pass length=period to the helper
-    base = ema(df["close"].astype(float), length=p)
+    # IMPORTANT: pass length to the helper
+    base = ema(df[price].astype(float), length=p)
 
     out = df.copy()
     out["baseline"] = base
@@ -199,20 +202,6 @@ _rolling_linreg_midline = rolling_linreg_midline
 # ---------- baseline implementations ----------
 
 
-def baseline_ema(
-    df: pd.DataFrame,
-    *,
-    length: int = 200,
-    price: str = "close",
-    signal_col: str = "baseline_signal",
-    **kwargs,
-) -> pd.DataFrame:
-    """Simple EMA baseline."""
-    s = df[price].astype(float)
-    df["baseline"] = _ema(s, length)
-    return _set_signal(df, "baseline", signal_col)
-
-
 # 📈 fantailvma3.mq4  (approx: variable EMA * 3)
 def baseline_fantailvma3(
     df: pd.DataFrame,
@@ -306,13 +295,13 @@ def baseline_frama_indicator(
 ) -> pd.DataFrame:
     """Ehlers FRAMA approximation."""
     h = df["high"].astype(float)
-    l = df["low"].astype(float)
+    low = df["low"].astype(float)
     n = max(int(length), 2)
     half = max(n // 2, 1)
 
-    L1 = (h.rolling(half).max() - l.rolling(half).min()).shift(half)
-    L2 = h.rolling(half).max() - l.rolling(half).min()
-    L3 = h.rolling(n).max() - l.rolling(n).min()
+    L1 = (h.rolling(half).max() - low.rolling(half).min()).shift(half)
+    L2 = h.rolling(half).max() - low.rolling(half).min()
+    L3 = h.rolling(n).max() - low.rolling(n).min()
 
     L1 = L1.replace(0, np.nan)
     L2 = L2.replace(0, np.nan)

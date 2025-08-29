@@ -1260,8 +1260,11 @@ def run_backtest_walk_forward(
     equity_path = Path(out_dir) / "equity_curve.csv"
     folds_csv = Path(out_dir) / "wfo_folds.csv"
 
-    start = pd.to_datetime(wf_cfg.get("start"))
-    end = pd.to_datetime(wf_cfg.get("end"))
+    # Tolerate missing walk_forward window by falling back to top-level date_range
+    start_raw = wf_cfg.get("start") or ((cfg.get("date_range") or {}).get("start"))
+    end_raw = wf_cfg.get("end") or ((cfg.get("date_range") or {}).get("end"))
+    start = pd.to_datetime(start_raw) if start_raw else pd.NaT
+    end = pd.to_datetime(end_raw) if end_raw else pd.NaT
     train_years = int(wf_cfg.get("train_years", 3))
     test_years = int(wf_cfg.get("test_years", 1))
     step_years = int(wf_cfg.get("step_years", 1))

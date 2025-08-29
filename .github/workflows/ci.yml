@@ -14,6 +14,7 @@ jobs:
           cache: 'pip'
 
       - name: Install dependencies
+        shell: bash
         run: |
           python -m pip install -U pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
@@ -23,44 +24,55 @@ jobs:
         id: ruff
         shell: bash
         run: |
-          bash -o pipefail -c 'ruff check . 2>&1 | tee ruff.log'
-          echo "RUFF_EXIT=$?" >> $GITHUB_OUTPUT
+          set +e
+          ruff check . 2>&1 | tee ruff.log
+          code=$?
+          echo "RUFF_EXIT=$code" >> "$GITHUB_OUTPUT"
+          exit 0
 
       - name: Pytest
         id: pytest
         shell: bash
         run: |
-          bash -o pipefail -c 'pytest -q 2>&1 | tee pytest.log'
-          echo "PYTEST_EXIT=$?" >> $GITHUB_OUTPUT
+          set +e
+          pytest -q 2>&1 | tee pytest.log
+          code=$?
+          echo "PYTEST_EXIT=$code" >> "$GITHUB_OUTPUT"
+          exit 0
 
       - name: Smoke test
         id: smoke
         shell: bash
         run: |
-          bash -o pipefail -c 'python smoke_test_full_v198.py -q 2>&1 | tee smoke.log'
-          echo "SMOKE_EXIT=$?" >> $GITHUB_OUTPUT
+          set +e
+          python smoke_test_full_v198.py -q 2>&1 | tee smoke.log
+          code=$?
+          echo "SMOKE_EXIT=$code" >> "$GITHUB_OUTPUT"
+          exit 0
 
       - name: Mark job failed if any step failed
+        if: always()
+        shell: bash
         run: |
-          set -e
-          if [ "${{ steps.ruff.outputs.RUFF_EXIT }}" != "0" ]; then exit 1; fi
-          if [ "${{ steps.pytest.outputs.PYTEST_EXIT }}" != "0" ]; then exit 1; fi
-          if [ "${{ steps.smoke.outputs.SMOKE_EXIT }}" != "0" ]; then exit 1; fi
+          r="${{ steps.ruff.outputs.RUFF_EXIT }}"
+          p="${{ steps.pytest.outputs.PYTEST_EXIT }}"
+          s="${{ steps.smoke.outputs.SMOKE_EXIT }}"
+          if [ "$r" != "0" ] || [ "$p" != "0" ] || [ "$s" != "0" ]; then
+            echo "Failing: ruff=$r pytest=$p smoke=$s"
+            exit 1
+          fi
 
       - name: Ensure jq is available
+        if: failure()
         run: sudo apt-get update && sudo apt-get install -y jq
 
       - name: Verify Discord webhook is present
         if: failure()
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        shell: bash
         run: |
-          if [ -z "${DISCORD_WEBHOOK_URL}" ]; then
-            echo "Discord webhook secret is missing"
-            exit 1
-          else
-            echo "Discord webhook secret is set"
-          fi
+          test -n "$DISCORD_WEBHOOK_URL" && echo "Discord webhook secret is set" || (echo "Discord webhook secret is missing"; exit 1)
 
       - name: Post to Discord on failure
         if: failure()
@@ -69,9 +81,9 @@ jobs:
         shell: bash
         run: |
           RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          RUFF_EXIT="${{ steps.ruff.outputs.RUFF_EXIT }}"
-          PY_EXIT="${{ steps.pytest.outputs.PYTEST_EXIT }}"
-          SM_EXIT="${{ steps.smoke.outputs.SMOKE_EXIT }}"
+          r="${{ steps.ruff.outputs.RUFF_EXIT }}"
+          p="${{ steps.pytest.outputs.PYTEST_EXIT }}"
+          s="${{ steps.smoke.outputs.SMOKE_EXIT }}"
 
           py_tail="$(if [ -s pytest.log ]; then tail -n 120 pytest.log; else echo 'pytest.log is empty'; fi)"
           sm_tail="$(if [ -s smoke.log ]; then tail -n 100 smoke.log; else echo 'smoke.log is empty'; fi)"
@@ -81,8 +93,8 @@ jobs:
           sm_tail="$(printf "%s" "$sm_tail" | sed 's/`/\\`/g')"
           ruff_tail="$(printf "%s" "$ruff_tail" | sed 's/`/\\`/g')"
 
-          BODY="**CI failed**: ${{ github.repository }} • ${{ github.ref_name }}\n<$RUN_URL>\n\nExits: ruff=$RUFF_EXIT pytest=$PY_EXIT smoke=$SM_EXIT\n\nPytest:\n\`\`\`\n$py_tail\n\`\`\`\n\nSmoke:\n\`\`\`\n$sm_tail\n\`\`\`\n\nRuff:\n\`\`\`\n$ruff_tail\n\`\`\`"
+          BODY="**CI failed**: ${{ github.repository }} • ${{ github.ref_name }}\n<$RUN_URL>\n\nExits: ruff=$r pytest=$p smoke=$s\n\nPytest:\n\`\`\`\n$py_tail\n\`\`\`\n\nSmoke:\n\`\`\`\n$sm_tail\n\`\`\`\n\nRuff:\n\`\`\`\n$ruff_tail\n\`\`\`"
           BODY="$(printf "%s" "$BODY" | head -c 1900)"
 
-          jq -n --arg content "$BODY" '{content:$content}' > payload.json
+          echo "$BODY" | jq -Rs '{content: .}' > payload.json
           curl -fsS -H "Content-Type: application/json" -d @payload.json "$DISCORD_WEBHOOK_URL"

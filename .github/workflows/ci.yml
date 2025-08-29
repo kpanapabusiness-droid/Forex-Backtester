@@ -16,6 +16,25 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt || true
           pip install pytest ruff pandas numpy pyyaml pydantic>=2
+      - name: Prepare test data
+        run: |
+          mkdir -p data/daily
+          python - <<'PY'
+          import pandas as pd, numpy as np
+          pairs = ["EUR_USD","USD_JPY","GBP_USD","USD_CHF"]
+          dates = pd.date_range("2019-01-01", periods=400, freq="D")
+          base = np.linspace(1.0, 1.2, len(dates))
+          for pair in pairs:
+              df = pd.DataFrame({
+                  "date": dates,
+                  "open": base,
+                  "high": base + 0.01,
+                  "low": base - 0.01,
+                  "close": base + 0.005,
+                  "volume": np.full(len(dates), 2000, dtype=int),
+              })
+              df.to_csv(f"data/daily/{pair}.csv", index=False)
+          PY
       - name: Lint
         run: ruff check .
       - name: Tests

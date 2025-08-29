@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import math
+import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -399,7 +400,7 @@ def run_monte_carlo_modes(
     """
     mc_cfg = (cfg or {}).get("monte_carlo", {}) if cfg else {}
     # Resolve inputs
-    _results_dir = results_dir or _results_dir_from_cfg_or_default(cfg)
+    _results_dir = results_dir or _results_dir_from_cfg(cfg or {})
     _equity_csv = equity_csv or os.path.join(_results_dir, "equity_curve.csv")
     _trades_csv = trades_csv or os.path.join(_results_dir, "trades.csv")
 

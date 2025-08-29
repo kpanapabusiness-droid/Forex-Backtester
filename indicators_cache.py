@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import hashlib
-import json  # ✅ required for dumps in hashing/logs
+import importlib
+import json
 from pathlib import Path
-from typing import Any, Dict, Iterable, Optional, Tuple
+from typing import Any, Callable, Dict, Iterable, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -34,9 +35,6 @@ Integrates in backtester.apply_indicators().
 
 # Hidden index column used only for feather (since it doesn't preserve index)
 _INDEX_COL = "__index__"
-
-# --- Shared confirmation resolver (C1 and C2 use the same pool) ---
-import importlib
 
 
 def _resolve_params(cfg: dict, fq_candidates: list[str]) -> dict:
@@ -143,19 +141,23 @@ def load_from_cache(
     path = _artifact_path(Path(cache_dir), parts_path, key, fmt)
     if not path.exists():
         return None
-    if fmt == "parquet":
-        return pd.read_parquet(path)  # preserves index
-    else:
-        df = pd.read_feather(path)
-        # For feather, restore index if we stored it
-        if _INDEX_COL in df.columns:
-            idx = pd.to_datetime(df[_INDEX_COL], errors="ignore")
-            df = df.drop(columns=[_INDEX_COL])
-            if isinstance(idx, pd.DatetimeIndex):
-                df = df.set_index(idx)
-            else:
-                df = df.set_index(pd.Index(idx, name=None))
-        return df
+    try:
+        if fmt == "parquet":
+            return pd.read_parquet(path)  # preserves index
+        else:
+            df = pd.read_feather(path)
+            # For feather, restore index if we stored it
+            if _INDEX_COL in df.columns:
+                idx = pd.to_datetime(df[_INDEX_COL], errors="ignore")
+                df = df.drop(columns=[_INDEX_COL])
+                if isinstance(idx, pd.DatetimeIndex):
+                    df = df.set_index(idx)
+                else:
+                    df = df.set_index(pd.Index(idx, name=None))
+            return df
+    except Exception:
+        # Best-effort cache: if engine missing or read fails, behave as no-cache
+        return None
 
 
 def save_to_cache(
@@ -165,14 +167,18 @@ def save_to_cache(
     outdir.mkdir(parents=True, exist_ok=True)
     path = _artifact_path(Path(cache_dir), parts_path, key, fmt)
 
-    if fmt == "parquet":
-        # Keep index; compress to save space
-        df.to_parquet(path, index=True, compression="snappy")
-    else:
-        # Feather cannot store index; tuck it into a hidden column so we can restore it on load
-        tmp = df.copy()
-        tmp[_INDEX_COL] = df.index.astype(str)
-        tmp.reset_index(drop=True).to_feather(path)
+    try:
+        if fmt == "parquet":
+            # Keep index; compress to save space
+            df.to_parquet(path, index=True, compression="snappy")
+        else:
+            # Feather cannot store index; tuck it into a hidden column so we can restore it on load
+            tmp = df.copy()
+            tmp[_INDEX_COL] = df.index.astype(str)
+            tmp.reset_index(drop=True).to_feather(path)
+    except Exception:
+        # Best-effort cache: ignore write errors (e.g., missing pyarrow/fastparquet)
+        pass
     return path
 
 
@@ -252,7 +258,6 @@ def describe_cache(cache_dir: str | Path) -> Dict[str, Any]:
 
 # --- Resolver helpers (single, canonical versions) ---
 # --- Resolver + caller helpers (canonical, no duplicates) ---
-from typing import Callable
 
 
 def _resolve_confirm_func(short_name: str, role: str = "c1") -> Tuple[str, Callable]:

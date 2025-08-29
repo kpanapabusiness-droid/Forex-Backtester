@@ -34,7 +34,7 @@ def evaluate_run(summary_path="results/summary.txt"):
             if "ROI" in line:
                 try:
                     return float(line.split(":")[-1].strip().replace("%", ""))
-                except:
+                except Exception:
                     return -999.0
     return -999.0
 

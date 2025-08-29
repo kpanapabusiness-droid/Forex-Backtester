@@ -24,14 +24,14 @@ def volume_adx(
     Uses classic +DI/-DI/ADX construction (no external libs).
     """
     h = df["high"].astype(float)
-    l = df["low"].astype(float)
+    low = df["low"].astype(float)
     c = df["close"].astype(float)
 
-    up, down = h.diff(), -l.diff()
+    up, down = h.diff(), -low.diff()
     plus_dm = ((up > down) & (up > 0)).astype(float) * up.clip(lower=0)
     minus_dm = ((down > up) & (down > 0)).astype(float) * down.clip(lower=0)
 
-    tr = pd.concat([(h - l).abs(), (h - c.shift()).abs(), (l - c.shift()).abs()], axis=1).max(
+    tr = pd.concat([(h - low).abs(), (h - c.shift()).abs(), (low - c.shift()).abs()], axis=1).max(
         axis=1
     )
     atr = _wilder_rma(tr, length).replace(0, np.nan)
@@ -63,9 +63,9 @@ def volume_volatility_ratio(
     Interpreted as 'market is active enough' (volatility/participation proxy).
     """
     h = df["high"].astype(float)
-    l = df["low"].astype(float)
+    low = df["low"].astype(float)
     c = df[price].astype(float)
-    tr = pd.concat([(h - l).abs(), (h - c.shift()).abs(), (l - c.shift()).abs()], axis=1).max(
+    tr = pd.concat([(h - low).abs(), (h - c.shift()).abs(), (low - c.shift()).abs()], axis=1).max(
         axis=1
     )
     atr = _wilder_rma(tr, max(int(length), 1))

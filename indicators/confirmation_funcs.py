@@ -44,7 +44,7 @@ def c1_trend_akkam(df, period=14, signal_col="c1_signal", **kwargs):
 def c1_kalman_filter(df, smoothing=0.2, signal_col="c1_signal", **kwargs):
     try:
         smoothing = float(smoothing)
-    except:
+    except Exception:
         smoothing = 0.2
     smoothing = max(0.001, min(smoothing, 1.0))
     df["kalman"] = df["close"].ewm(alpha=smoothing, adjust=False).mean()

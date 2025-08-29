@@ -8,8 +8,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Allow the job to continue even if setup fails (we still want logs + Discord)
       - name: Setup Python
+        id: setup
         uses: actions/setup-python@v5
+        continue-on-error: true
         with:
           python-version: '3.12'
           cache: 'pip'
@@ -29,6 +32,7 @@ jobs:
 
       - name: Ruff
         id: ruff
+        if: always()
         shell: bash
         run: |
           set +e
@@ -39,6 +43,7 @@ jobs:
 
       - name: Pytest (single file, clean env)
         id: pytest
+        if: always()
         env:
           PYTEST_DISABLE_PLUGIN_AUTOLOAD: "1"
           PYTHONPATH: ${{ github.workspace }}
@@ -50,13 +55,14 @@ jobs:
           echo '--- PYTEST VERSION ---' | tee -a pytest.log
           python -m pytest --version 2>&1 | tee -a pytest.log
           echo '--- LIST tests/ ---' | tee -a pytest.log
-          ls -la tests 2>&1 | tee -a pytest.log
+          ls -la tests 2>&1 | tee -a pytest.log || true
           echo '--- RUN tests/test_ci_notify_fail.py ---' | tee -a pytest.log
           python -m pytest -q -c /dev/null tests/test_ci_notify_fail.py 2>&1 | tee -a pytest.log
           echo "PYTEST_EXIT=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
 
       - name: Smoke (optional)
         id: smoke
+        if: always()
         shell: bash
         run: |
           set +e
@@ -69,11 +75,12 @@ jobs:
         if: always()
         shell: bash
         run: |
+          sp="${{ steps.setup.outcome }}"
           r="${{ steps.ruff.outputs.RUFF_EXIT }}"
           p="${{ steps.pytest.outputs.PYTEST_EXIT }}"
           s="${{ steps.smoke.outputs.SMOKE_EXIT }}"
-          echo "exits: ruff=$r pytest=$p smoke=$s"
-          if [ "$r" != "0" ] || [ "$p" != "0" ] || [ "$s" != "0" ]; then exit 1; fi
+          echo "exits: setup=$sp ruff=$r pytest=$p smoke=$s"
+          if [ "$sp" = "failure" ] || [ "$r" != "0" ] || [ "$p" != "0" ] || [ "$s" != "0" ]; then exit 1; fi
 
       - name: Ensure jq
         if: failure()
@@ -86,6 +93,7 @@ jobs:
         shell: bash
         run: |
           RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          sp="${{ steps.setup.outcome }}"
           r="${{ steps.ruff.outputs.RUFF_EXIT }}"
           p="${{ steps.pytest.outputs.PYTEST_EXIT }}"
           s="${{ steps.smoke.outputs.SMOKE_EXIT }}"
@@ -100,7 +108,7 @@ jobs:
             eval "$v=\"$(printf \"%s\" \"$val\" | sed 's/`/\\`/g')\""
           done
 
-          BODY="**CI failed**: ${{ github.repository }} • ${{ github.ref_name }}\n<$RUN_URL>\n\nexits: ruff=$r pytest=$p smoke=$s\n\nPytest:\n\`\`\`\n$py_tail\n\`\`\`\n\nRuff:\n\`\`\`\n$rf_tail\n\`\`\`\n\nInstall:\n\`\`\`\n$inst_tail\n\`\`\`\n\nSmoke:\n\`\`\`\n$sm_tail\n\`\`\`"
+          BODY="**CI failed**: ${{ github.repository }} • ${{ github.ref_name }}\n<$RUN_URL>\n\nsetup=$sp • exits: ruff=$r pytest=$p smoke=$s\n\nPytest:\n\`\`\`\n$py_tail\n\`\`\`\n\nRuff:\n\`\`\`\n$rf_tail\n\`\`\`\n\nInstall:\n\`\`\`\n$inst_tail\n\`\`\`\n\nSmoke:\n\`\`\`\n$sm_tail\n\`\`\`"
           BODY="$(printf "%s" "$BODY" | head -c 1900)"
           echo "$BODY" | jq -Rs '{content: .}' > payload.json
           curl -fsS -H "Content-Type: application/json" -d @payload.json "$DISCORD_WEBHOOK_URL"

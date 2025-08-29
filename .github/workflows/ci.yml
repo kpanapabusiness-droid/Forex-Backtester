@@ -8,7 +8,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Setup Python but don't stop the job if this fails
       - id: setup_python
         name: Setup Python 3.12
         uses: actions/setup-python@v5
@@ -17,7 +16,6 @@ jobs:
           python-version: '3.12'
           cache: 'pip'
 
-      # Always run env diagnostics so we have something to send if early steps fail
       - name: Diagnostics
         if: always()
         shell: bash
@@ -60,25 +58,25 @@ jobs:
           echo "RUFF_EXIT=$?" >> "$GITHUB_OUTPUT"
           exit 0
 
-      - name: Pytest
+      - name: Pytest (ignore repo config)
         id: pytest
         if: always()
         shell: bash
         run: |
           set +e
           : > pytest.log
-          bash -o pipefail -c 'pytest -q 2>&1 | tee -a pytest.log'
+          bash -o pipefail -c 'pytest -q -c /dev/null 2>&1 | tee -a pytest.log'
           echo "PYTEST_EXIT=$?" >> "$GITHUB_OUTPUT"
           exit 0
 
-      - name: Smoke test
+      - name: Smoke test (no -q)
         id: smoke
         if: always()
         shell: bash
         run: |
           set +e
           : > smoke.log
-          bash -o pipefail -c 'python smoke_test_full_v198.py -q 2>&1 | tee -a smoke.log'
+          bash -o pipefail -c 'python smoke_test_full_v198.py 2>&1 | tee -a smoke.log'
           echo "SMOKE_EXIT=$?" >> "$GITHUB_OUTPUT"
           exit 0
 
@@ -92,7 +90,6 @@ jobs:
           p="${{ steps.pytest.outputs.PYTEST_EXIT }}"
           s="${{ steps.smoke.outputs.SMOKE_EXIT }}"
           echo "outcomes: setup_python=$sp install=$i ruff=$r pytest=$p smoke=$s"
-          # Fail if setup_python failed OR any exit code is non-zero
           if [ "$sp" = "failure" ] || [ "$i" != "0" ] || [ "$r" != "0" ] || [ "$p" != "0" ] || [ "$s" != "0" ]; then
             exit 1
           fi
@@ -116,8 +113,8 @@ jobs:
 
           diag_tail="$(if [ -s diag.log ]; then tail -n 80 diag.log; else echo 'diag.log is empty'; fi)"
           inst_tail="$(if [ -s install.log ]; then tail -n 80 install.log; else echo 'install.log is empty'; fi)"
-          py_tail="$(if [ -s pytest.log ]; then tail -n 120 pytest.log; else echo 'pytest.log is empty'; fi)"
-          sm_tail="$(if [ -s smoke.log ]; then tail -n 100 smoke.log; else echo 'smoke.log is empty'; fi)"
+          py_tail="$(if [ -s pytest.log ]; then tail -n 150 pytest.log; else echo 'pytest.log is empty'; fi)"
+          sm_tail="$(if [ -s smoke.log ]; then tail -n 120 smoke.log; else echo 'smoke.log is empty'; fi)"
           rf_tail="$(if [ -s ruff.log ]; then tail -n 80 ruff.log; else echo 'ruff.log is empty'; fi)"
 
           for v in diag_tail inst_tail py_tail sm_tail rf_tail; do

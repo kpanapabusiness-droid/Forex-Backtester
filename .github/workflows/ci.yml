@@ -15,7 +15,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt || true
-          pip install pytest ruff pandas numpy pyyaml pydantic>=2
+          pip install pytest ruff pandas numpy pyyaml pydantic>=2 pyarrow
       - name: Prepare test data
         run: |
           mkdir -p data/daily

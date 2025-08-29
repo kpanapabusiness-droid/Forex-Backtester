@@ -25,7 +25,7 @@ jobs:
           set -o pipefail
           : > install.log
           python -m pip install -U pip 2>&1 | tee -a install.log
-          pip install -U pytest ruff numpy 2>&1 | tee -a install.log
+          pip install -U pytest ruff numpy pandas 2>&1 | tee -a install.log
           if [ -f requirements.txt ]; then pip install -r requirements.txt 2>&1 | tee -a install.log; fi
           if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt 2>&1 | tee -a install.log; fi
           echo "INSTALL_EXIT=0" >> "$GITHUB_OUTPUT"

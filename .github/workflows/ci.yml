@@ -14,23 +14,27 @@ jobs:
           cache: 'pip'
 
       - name: Install base test deps
+        id: install
         shell: bash
         run: |
-          python -m pip install -U pip
-          pip install -U pytest ruff
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
+          set +e
+          : > install.log
+          bash -o pipefail -c 'python -m pip install -U pip 2>&1 | tee -a install.log'; a=$?
+          bash -o pipefail -c 'pip install -U pytest ruff 2>&1 | tee -a install.log'; b=$?
+          if [ -f requirements.txt ]; then bash -o pipefail -c 'pip install -r requirements.txt 2>&1 | tee -a install.log'; c=$?; else c=0; fi
+          if [ -f requirements-dev.txt ]; then bash -o pipefail -c 'pip install -r requirements-dev.txt 2>&1 | tee -a install.log'; d=$?; else d=0; fi
+          code=$(( a!=0 || b!=0 || c!=0 || d!=0 ))
+          echo "INSTALL_EXIT=$code" >> "$GITHUB_OUTPUT"
+          exit 0
 
       - name: Ruff
         id: ruff
         shell: bash
         run: |
           set +e
-          set -o pipefail
-          echo '--- RUFF START ---' > ruff.log
-          ruff check . 2>&1 | tee -a ruff.log
-          code=${PIPESTATUS[0]}
-          echo "RUFF_EXIT=$code" >> "$GITHUB_OUTPUT"
+          : > ruff.log
+          bash -o pipefail -c 'ruff check . 2>&1 | tee -a ruff.log'
+          echo "RUFF_EXIT=$?" >> "$GITHUB_OUTPUT"
           exit 0
 
       - name: Pytest
@@ -38,11 +42,9 @@ jobs:
         shell: bash
         run: |
           set +e
-          set -o pipefail
-          echo '--- PYTEST START ---' > pytest.log
-          pytest -q 2>&1 | tee -a pytest.log
-          code=${PIPESTATUS[0]}
-          echo "PYTEST_EXIT=$code" >> "$GITHUB_OUTPUT"
+          : > pytest.log
+          bash -o pipefail -c 'pytest -q 2>&1 | tee -a pytest.log'
+          echo "PYTEST_EXIT=$?" >> "$GITHUB_OUTPUT"
           exit 0
 
       - name: Smoke test
@@ -50,11 +52,9 @@ jobs:
         shell: bash
         run: |
           set +e
-          set -o pipefail
-          echo '--- SMOKE START ---' > smoke.log
-          python smoke_test_full_v198.py -q 2>&1 | tee -a smoke.log
-          code=${PIPESTATUS[0]}
-          echo "SMOKE_EXIT=$code" >> "$GITHUB_OUTPUT"
+          : > smoke.log
+          bash -o pipefail -c 'python smoke_test_full_v198.py -q 2>&1 | tee -a smoke.log'
+          echo "SMOKE_EXIT=$?" >> "$GITHUB_OUTPUT"
           exit 0
 
       - name: Mark job failed if any step failed
@@ -64,8 +64,9 @@ jobs:
           r="${{ steps.ruff.outputs.RUFF_EXIT }}"
           p="${{ steps.pytest.outputs.PYTEST_EXIT }}"
           s="${{ steps.smoke.outputs.SMOKE_EXIT }}"
-          echo "Recorded exits: ruff=$r pytest=$p smoke=$s"
-          if [ "$r" != "0" ] || [ "$p" != "0" ] || [ "$s" != "0" ]; then
+          i="${{ steps.install.outputs.INSTALL_EXIT }}"
+          echo "Recorded exits: install=$i ruff=$r pytest=$p smoke=$s"
+          if [ "$i" != "0" ] || [ "$r" != "0" ] || [ "$p" != "0" ] || [ "$s" != "0" ]; then
             exit 1
           fi
 
@@ -80,17 +81,22 @@ jobs:
         shell: bash
         run: |
           RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          r="${{ steps.ruff.outputs.RUFF_EXIT }}"; p="${{ steps.pytest.outputs.PYTEST_EXIT }}"; s="${{ steps.smoke.outputs.SMOKE_EXIT }}"
+          i="${{ steps.install.outputs.INSTALL_EXIT }}"
+          r="${{ steps.ruff.outputs.RUFF_EXIT }}"
+          p="${{ steps.pytest.outputs.PYTEST_EXIT }}"
+          s="${{ steps.smoke.outputs.SMOKE_EXIT }}"
 
+          inst_tail="$(if [ -s install.log ]; then tail -n 80 install.log; else echo 'install.log is empty'; fi)"
           py_tail="$(if [ -s pytest.log ]; then tail -n 150 pytest.log; else echo 'pytest.log is empty'; fi)"
           sm_tail="$(if [ -s smoke.log ]; then tail -n 120 smoke.log; else echo 'smoke.log is empty'; fi)"
           rf_tail="$(if [ -s ruff.log ]; then tail -n 80 ruff.log; else echo 'ruff.log is empty'; fi)"
 
-          py_tail="$(printf "%s" "$py_tail" | sed 's/`/\\`/g')"
-          sm_tail="$(printf "%s" "$sm_tail" | sed 's/`/\\`/g')"
-          rf_tail="$(printf "%s" "$rf_tail" | sed 's/`/\\`/g')"
+          for v in inst_tail py_tail sm_tail rf_tail; do
+            eval "val=\${$v}"
+            eval "$v=\"$(printf "%s" "$val" | sed 's/`/\\`/g')\""
+          done
 
-          BODY="**CI failed**: ${{ github.repository }} • ${{ github.ref_name }}\n<$RUN_URL>\n\nExits: ruff=$r pytest=$p smoke=$s\n\nPytest:\n\`\`\`\n$py_tail\n\`\`\`\n\nSmoke:\n\`\`\`\n$sm_tail\n\`\`\`\n\nRuff:\n\`\`\`\n$rf_tail\n\`\`\`"
+          BODY="**CI failed**: ${{ github.repository }} • ${{ github.ref_name }}\n<$RUN_URL>\n\nExits: install=$i ruff=$r pytest=$p smoke=$s\n\nInstall:\n\`\`\`\n$inst_tail\n\`\`\`\n\nPytest:\n\`\`\`\n$py_tail\n\`\`\`\n\nSmoke:\n\`\`\`\n$sm_tail\n\`\`\`\n\nRuff:\n\`\`\`\n$rf_tail\n\`\`\`"
           BODY="$(printf "%s" "$BODY" | head -c 1900)"
 
           echo "$BODY" | jq -Rs '{content: .}' > payload.json

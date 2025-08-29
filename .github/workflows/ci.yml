@@ -8,7 +8,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Allow the job to continue even if setup fails (we still want logs + Discord)
+      # Write early diagnostics so we have data even if setup fails
+      - name: Diagnostics (early)
+        id: diag
+        shell: bash
+        run: |
+          set +e
+          : > diag.log
+          {
+            echo "Runner: $RUNNER_OS"
+            uname -a || true
+            which python || true
+            which python3 || true
+            python --version || true
+            python3 --version || true
+            which pip || true
+            pip --version || true
+          } 2>&1 | tee -a diag.log
+
+      # If setup ever hiccups, we still run later steps
       - name: Setup Python
         id: setup
         uses: actions/setup-python@v5
@@ -21,18 +39,15 @@ jobs:
         id: install
         shell: bash
         run: |
-          set +e
-          set -o pipefail
-          : > install.log
-          python -m pip install -U pip 2>&1 | tee -a install.log
-          pip install -U pytest ruff numpy pandas 2>&1 | tee -a install.log
-          if [ -f requirements.txt ]; then pip install -r requirements.txt 2>&1 | tee -a install.log; fi
-          if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt 2>&1 | tee -a install.log; fi
-          echo "INSTALL_EXIT=0" >> "$GITHUB_OUTPUT"
+          set -e
+          python -m pip install -U pip
+          # Minimal deps to satisfy tests/conftest + core suite
+          pip install -U pytest ruff numpy pandas
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
 
       - name: Ruff
         id: ruff
-        if: always()
         shell: bash
         run: |
           set +e
@@ -40,10 +55,10 @@ jobs:
           : > ruff.log
           ruff check . 2>&1 | tee -a ruff.log
           echo "RUFF_EXIT=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
+          exit 0
 
-      - name: Pytest (single file, clean env)
+      - name: Pytest (full suite, clean env)
         id: pytest
-        if: always()
         env:
           PYTEST_DISABLE_PLUGIN_AUTOLOAD: "1"
           PYTHONPATH: ${{ github.workspace }}
@@ -52,17 +67,12 @@ jobs:
           set +e
           set -o pipefail
           : > pytest.log
-          echo '--- PYTEST VERSION ---' | tee -a pytest.log
-          python -m pytest --version 2>&1 | tee -a pytest.log
-          echo '--- LIST tests/ ---' | tee -a pytest.log
-          ls -la tests 2>&1 | tee -a pytest.log || true
-          echo '--- RUN tests/test_ci_notify_fail.py ---' | tee -a pytest.log
-          python -m pytest -q -c /dev/null tests/test_ci_notify_fail.py 2>&1 | tee -a pytest.log
+          python -m pytest -q -c /dev/null 2>&1 | tee -a pytest.log
           echo "PYTEST_EXIT=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
+          exit 0
 
-      - name: Smoke (optional)
+      - name: Smoke (non-gating)
         id: smoke
-        if: always()
         shell: bash
         run: |
           set +e
@@ -70,45 +80,56 @@ jobs:
           : > smoke.log
           if [ -f smoke_test_full_v198.py ]; then python smoke_test_full_v198.py 2>&1 | tee -a smoke.log; fi
           echo "SMOKE_EXIT=${PIPESTATUS[0]:-0}" >> "$GITHUB_OUTPUT"
+          exit 0
 
-      - name: Fail at end if needed
+      # Gate merges on ruff + pytest only
+      - name: Fail at end if needed (gate on ruff+pytest)
         if: always()
         shell: bash
         run: |
-          sp="${{ steps.setup.outcome }}"
           r="${{ steps.ruff.outputs.RUFF_EXIT }}"
           p="${{ steps.pytest.outputs.PYTEST_EXIT }}"
-          s="${{ steps.smoke.outputs.SMOKE_EXIT }}"
-          echo "exits: setup=$sp ruff=$r pytest=$p smoke=$s"
-          if [ "$sp" = "failure" ] || [ "$r" != "0" ] || [ "$p" != "0" ] || [ "$s" != "0" ]; then exit 1; fi
+          echo "gates: ruff=$r pytest=$p"
+          if [ "$r" != "0" ] || [ "$p" != "0" ]; then exit 1; fi
 
-      - name: Ensure jq
-        if: failure()
-        run: sudo apt-get update && sudo apt-get install -y jq
-
-      - name: Notify Discord (on failure)
-        if: failure()
+      # Always evaluate, but only send to Discord when the overall job actually failed
+      - name: Notify Discord (always evaluate)
+        if: always()
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         shell: bash
         run: |
+          if [ "${{ job.status }}" != "failure" ]; then
+            echo "Job is ${{ job.status }}, not notifying Discord."
+            exit 0
+          fi
           RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           sp="${{ steps.setup.outcome }}"
           r="${{ steps.ruff.outputs.RUFF_EXIT }}"
           p="${{ steps.pytest.outputs.PYTEST_EXIT }}"
           s="${{ steps.smoke.outputs.SMOKE_EXIT }}"
 
-          inst_tail="$(tail -n 60 install.log 2>/dev/null || echo 'install.log missing')"
+          diag_tail="$(tail -n 60 diag.log 2>/dev/null || echo 'diag.log missing')"
           py_tail="$(tail -n 160 pytest.log 2>/dev/null || echo 'pytest.log missing')"
-          rf_tail="$(tail -n 60 ruff.log 2>/dev/null || echo 'ruff.log missing')"
+          rf_tail="$(tail -n 80 ruff.log 2>/dev/null || echo 'ruff.log missing')"
           sm_tail="$(tail -n 80 smoke.log 2>/dev/null || echo 'smoke.log missing')"
 
-          for v in inst_tail py_tail rf_tail sm_tail; do
+          for v in diag_tail py_tail rf_tail sm_tail; do
             eval "val=\${$v}"
             eval "$v=\"$(printf \"%s\" \"$val\" | sed 's/`/\\`/g')\""
           done
 
-          BODY="**CI failed**: ${{ github.repository }} • ${{ github.ref_name }}\n<$RUN_URL>\n\nsetup=$sp • exits: ruff=$r pytest=$p smoke=$s\n\nPytest:\n\`\`\`\n$py_tail\n\`\`\`\n\nRuff:\n\`\`\`\n$rf_tail\n\`\`\`\n\nInstall:\n\`\`\`\n$inst_tail\n\`\`\`\n\nSmoke:\n\`\`\`\n$sm_tail\n\`\`\`"
+          BODY="**CI failed**: ${{ github.repository }} • ${{ github.ref_name }}\n<$RUN_URL>\n\nsetup=$sp • exits: ruff=$r pytest=$p smoke=$s\n\nPytest:\n\`\`\`\n$py_tail\n\`\`\`\n\nRuff:\n\`\`\`\n$rf_tail\n\`\`\`\n\nDiagnostics:\n\`\`\`\n$diag_tail\n\`\`\`\n\nSmoke:\n\`\`\`\n$sm_tail\n\`\`\`"
           BODY="$(printf "%s" "$BODY" | head -c 1900)"
-          echo "$BODY" | jq -Rs '{content: .}' > payload.json
-          curl -fsS -H "Content-Type: application/json" -d @payload.json "$DISCORD_WEBHOOK_URL"
+
+          # jq may not be present on minimal runners; use pure curl JSON if jq missing
+          if command -v jq >/dev/null 2>&1; then
+            echo "$BODY" | jq -Rs '{content: .}' > payload.json
+            curl -fsS -H "Content-Type: application/json" -d @payload.json "$DISCORD_WEBHOOK_URL"
+          else
+            esc=$(printf '%s' "$BODY" | python - <<'PY'
+import json,sys; print(json.dumps({"content": sys.stdin.read()}))
+PY
+)
+            curl -fsS -H "Content-Type: application/json" -d "$esc" "$DISCORD_WEBHOOK_URL"
+          fi

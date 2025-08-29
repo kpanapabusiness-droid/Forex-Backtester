@@ -8,13 +8,35 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      # Setup Python but don't stop the job if this fails
+      - id: setup_python
+        name: Setup Python 3.12
+        uses: actions/setup-python@v5
+        continue-on-error: true
         with:
           python-version: '3.12'
           cache: 'pip'
 
+      # Always run env diagnostics so we have something to send if early steps fail
+      - name: Diagnostics
+        if: always()
+        shell: bash
+        run: |
+          : > diag.log
+          {
+            echo "Runner: $RUNNER_OS"
+            uname -a || true
+            which python || true
+            which python3 || true
+            python --version || true
+            python3 --version || true
+            which pip || true
+            pip --version || true
+          } 2>&1 | tee -a diag.log
+
       - name: Install base test deps
         id: install
+        if: always()
         shell: bash
         run: |
           set +e
@@ -29,6 +51,7 @@ jobs:
 
       - name: Ruff
         id: ruff
+        if: always()
         shell: bash
         run: |
           set +e
@@ -39,6 +62,7 @@ jobs:
 
       - name: Pytest
         id: pytest
+        if: always()
         shell: bash
         run: |
           set +e
@@ -49,6 +73,7 @@ jobs:
 
       - name: Smoke test
         id: smoke
+        if: always()
         shell: bash
         run: |
           set +e
@@ -61,12 +86,14 @@ jobs:
         if: always()
         shell: bash
         run: |
+          sp="${{ steps.setup_python.outcome }}"
+          i="${{ steps.install.outputs.INSTALL_EXIT }}"
           r="${{ steps.ruff.outputs.RUFF_EXIT }}"
           p="${{ steps.pytest.outputs.PYTEST_EXIT }}"
           s="${{ steps.smoke.outputs.SMOKE_EXIT }}"
-          i="${{ steps.install.outputs.INSTALL_EXIT }}"
-          echo "Recorded exits: install=$i ruff=$r pytest=$p smoke=$s"
-          if [ "$i" != "0" ] || [ "$r" != "0" ] || [ "$p" != "0" ] || [ "$s" != "0" ]; then
+          echo "outcomes: setup_python=$sp install=$i ruff=$r pytest=$p smoke=$s"
+          # Fail if setup_python failed OR any exit code is non-zero
+          if [ "$sp" = "failure" ] || [ "$i" != "0" ] || [ "$r" != "0" ] || [ "$p" != "0" ] || [ "$s" != "0" ]; then
             exit 1
           fi
 
@@ -81,23 +108,24 @@ jobs:
         shell: bash
         run: |
           RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          sp="${{ steps.setup_python.outcome }}"
           i="${{ steps.install.outputs.INSTALL_EXIT }}"
           r="${{ steps.ruff.outputs.RUFF_EXIT }}"
           p="${{ steps.pytest.outputs.PYTEST_EXIT }}"
           s="${{ steps.smoke.outputs.SMOKE_EXIT }}"
 
+          diag_tail="$(if [ -s diag.log ]; then tail -n 80 diag.log; else echo 'diag.log is empty'; fi)"
           inst_tail="$(if [ -s install.log ]; then tail -n 80 install.log; else echo 'install.log is empty'; fi)"
-          py_tail="$(if [ -s pytest.log ]; then tail -n 150 pytest.log; else echo 'pytest.log is empty'; fi)"
-          sm_tail="$(if [ -s smoke.log ]; then tail -n 120 smoke.log; else echo 'smoke.log is empty'; fi)"
+          py_tail="$(if [ -s pytest.log ]; then tail -n 120 pytest.log; else echo 'pytest.log is empty'; fi)"
+          sm_tail="$(if [ -s smoke.log ]; then tail -n 100 smoke.log; else echo 'smoke.log is empty'; fi)"
           rf_tail="$(if [ -s ruff.log ]; then tail -n 80 ruff.log; else echo 'ruff.log is empty'; fi)"
 
-          for v in inst_tail py_tail sm_tail rf_tail; do
+          for v in diag_tail inst_tail py_tail sm_tail rf_tail; do
             eval "val=\${$v}"
             eval "$v=\"$(printf "%s" "$val" | sed 's/`/\\`/g')\""
           done
 
-          BODY="**CI failed**: ${{ github.repository }} • ${{ github.ref_name }}\n<$RUN_URL>\n\nExits: install=$i ruff=$r pytest=$p smoke=$s\n\nInstall:\n\`\`\`\n$inst_tail\n\`\`\`\n\nPytest:\n\`\`\`\n$py_tail\n\`\`\`\n\nSmoke:\n\`\`\`\n$sm_tail\n\`\`\`\n\nRuff:\n\`\`\`\n$rf_tail\n\`\`\`"
+          BODY="**CI failed**: ${{ github.repository }} • ${{ github.ref_name }}\n<$RUN_URL>\n\nsetup_python=$sp • exits: install=$i ruff=$r pytest=$p smoke=$s\n\nDiag:\n\`\`\`\n$diag_tail\n\`\`\`\n\nInstall:\n\`\`\`\n$inst_tail\n\`\`\`\n\nPytest:\n\`\`\`\n$py_tail\n\`\`\`\n\nSmoke:\n\`\`\`\n$sm_tail\n\`\`\`\n\nRuff:\n\`\`\`\n$rf_tail\n\`\`\`"
           BODY="$(printf "%s" "$BODY" | head -c 1900)"
-
           echo "$BODY" | jq -Rs '{content: .}' > payload.json
           curl -fsS -H "Content-Type: application/json" -d @payload.json "$DISCORD_WEBHOOK_URL"

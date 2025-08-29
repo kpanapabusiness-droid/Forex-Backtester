@@ -38,30 +38,27 @@ jobs:
       - name: Ensure jq is available
         run: sudo apt-get update && sudo apt-get install -y jq
 
+      - name: Verify Discord webhook is present
+        if: failure()
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          if [ -z "${DISCORD_WEBHOOK_URL}" ]; then
+            echo "Discord webhook secret is missing"
+            exit 1
+          else
+            echo "Discord webhook secret is set"
+          fi
+
       - name: Post to Discord on failure
         if: failure()
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
-          tail -n 200 pytest.log > _pytest_tail.txt || true
-          tail -n 120 smoke.log > _smoke_tail.txt || true
-          {
-            echo "**CI failed**: ${GITHUB_REPOSITORY} • ${GITHUB_REF_NAME}";
-            if [ -n "${{ github.event.pull_request.html_url }}" ]; then
-              echo "<${{ github.event.pull_request.html_url }}">;
-            else
-              echo "<${{ github.event.head_commit.url }}">;
-            fi
-            echo;
-            echo "Pytest:";
-            echo '```';
-            cat _pytest_tail.txt;
-            echo '```';
-            echo;
-            echo "Smoke:";
-            echo '```';
-            cat _smoke_tail.txt;
-            echo '```';
-          } > _body.txt
-          jq -Rs '{content: .}' < _body.txt > payload.json
-          curl -X POST -H "Content-Type: application/json" -d @payload.json "${DISCORD_WEBHOOK_URL}"
+          PY_TAIL=$(tail -n 80 pytest.log | sed 's/`/\\`/g')
+          SM_TAIL=$(tail -n 60 smoke.log  | sed 's/`/\\`/g')
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          BODY="**CI failed**: ${{ github.repository }} • ${{ github.ref_name }}\n<$RUN_URL>\n\nPytest:\n\`\`\`\n$PY_TAIL\n\`\`\`\n\nSmoke:\n\`\`\`\n$SM_TAIL\n\`\`\`"
+          BODY=$(printf "%s" "$BODY" | head -c 1900)
+          jq -n --arg content "$BODY" '{content:$content}' > payload.json
+          curl -fsS -H "Content-Type: application/json" -d @payload.json "$DISCORD_WEBHOOK_URL"

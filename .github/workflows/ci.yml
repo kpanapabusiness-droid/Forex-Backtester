@@ -58,15 +58,21 @@ jobs:
           echo "RUFF_EXIT=$?" >> "$GITHUB_OUTPUT"
           exit 0
 
-      - name: Pytest (ignore repo config)
+      - name: Pytest (clean env, ignore repo config)
         id: pytest
         if: always()
+        env:
+          PYTEST_DISABLE_PLUGIN_AUTOLOAD: "1"
         shell: bash
         run: |
           set +e
           : > pytest.log
-          bash -o pipefail -c 'pytest -q -c /dev/null 2>&1 | tee -a pytest.log'
-          echo "PYTEST_EXIT=$?" >> "$GITHUB_OUTPUT"
+          echo '--- PYTEST VERSION ---' | tee -a pytest.log
+          python -m pytest --version 2>&1 | tee -a pytest.log
+          echo '--- RUN TESTS ---' | tee -a pytest.log
+          python -m pytest -q -c /dev/null 2>&1 | tee -a pytest.log
+          code=${PIPESTATUS[0]}
+          echo "PYTEST_EXIT=$code" >> "$GITHUB_OUTPUT"
           exit 0
 
       - name: Smoke test (no -q)
@@ -119,7 +125,7 @@ jobs:
 
           for v in diag_tail inst_tail py_tail sm_tail rf_tail; do
             eval "val=\${$v}"
-            eval "$v=\"$(printf "%s" "$val" | sed 's/`/\\`/g')\""
+            eval "$v=\"$(printf \"%s\" \"$val\" | sed 's/`/\\`/g')\""
           done
 
           BODY="**CI failed**: ${{ github.repository }} • ${{ github.ref_name }}\n<$RUN_URL>\n\nsetup_python=$sp • exits: install=$i ruff=$r pytest=$p smoke=$s\n\nDiag:\n\`\`\`\n$diag_tail\n\`\`\`\n\nInstall:\n\`\`\`\n$inst_tail\n\`\`\`\n\nPytest:\n\`\`\`\n$py_tail\n\`\`\`\n\nSmoke:\n\`\`\`\n$sm_tail\n\`\`\`\n\nRuff:\n\`\`\`\n$rf_tail\n\`\`\`"

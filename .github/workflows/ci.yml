@@ -20,20 +20,32 @@ jobs:
           if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
 
       - name: Ruff
-        run: ruff check . | tee ruff.log || true
+        id: ruff
+        shell: bash
+        run: |
+          bash -o pipefail -c 'ruff check . 2>&1 | tee ruff.log'
+          echo "RUFF_EXIT=$?" >> $GITHUB_OUTPUT
 
       - name: Pytest
-        run: pytest -q 2>&1 | tee pytest.log || true
+        id: pytest
+        shell: bash
+        run: |
+          bash -o pipefail -c 'pytest -q 2>&1 | tee pytest.log'
+          echo "PYTEST_EXIT=$?" >> $GITHUB_OUTPUT
 
       - name: Smoke test
-        run: python smoke_test_full_v198.py -q 2>&1 | tee smoke.log || true
+        id: smoke
+        shell: bash
+        run: |
+          bash -o pipefail -c 'python smoke_test_full_v198.py -q 2>&1 | tee smoke.log'
+          echo "SMOKE_EXIT=$?" >> $GITHUB_OUTPUT
 
       - name: Mark job failed if any step failed
         run: |
           set -e
-          if grep -Eiq "error" ruff.log; then exit 1; fi
-          if grep -Eiq "FAILED|FAILURES|failed|error|traceback|AssertionError" pytest.log; then exit 1; fi
-          if grep -Eiq "Traceback|ERROR|failed|AssertionError" smoke.log; then exit 1; fi
+          if [ "${{ steps.ruff.outputs.RUFF_EXIT }}" != "0" ]; then exit 1; fi
+          if [ "${{ steps.pytest.outputs.PYTEST_EXIT }}" != "0" ]; then exit 1; fi
+          if [ "${{ steps.smoke.outputs.SMOKE_EXIT }}" != "0" ]; then exit 1; fi
 
       - name: Ensure jq is available
         run: sudo apt-get update && sudo apt-get install -y jq
@@ -54,11 +66,23 @@ jobs:
         if: failure()
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        shell: bash
         run: |
-          PY_TAIL=$(tail -n 80 pytest.log | sed 's/`/\\`/g')
-          SM_TAIL=$(tail -n 60 smoke.log  | sed 's/`/\\`/g')
           RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          BODY="**CI failed**: ${{ github.repository }} • ${{ github.ref_name }}\n<$RUN_URL>\n\nPytest:\n\`\`\`\n$PY_TAIL\n\`\`\`\n\nSmoke:\n\`\`\`\n$SM_TAIL\n\`\`\`"
-          BODY=$(printf "%s" "$BODY" | head -c 1900)
+          RUFF_EXIT="${{ steps.ruff.outputs.RUFF_EXIT }}"
+          PY_EXIT="${{ steps.pytest.outputs.PYTEST_EXIT }}"
+          SM_EXIT="${{ steps.smoke.outputs.SMOKE_EXIT }}"
+
+          py_tail="$(if [ -s pytest.log ]; then tail -n 120 pytest.log; else echo 'pytest.log is empty'; fi)"
+          sm_tail="$(if [ -s smoke.log ]; then tail -n 100 smoke.log; else echo 'smoke.log is empty'; fi)"
+          ruff_tail="$(if [ -s ruff.log ]; then tail -n 60 ruff.log; else echo 'ruff.log is empty'; fi)"
+
+          py_tail="$(printf "%s" "$py_tail" | sed 's/`/\\`/g')"
+          sm_tail="$(printf "%s" "$sm_tail" | sed 's/`/\\`/g')"
+          ruff_tail="$(printf "%s" "$ruff_tail" | sed 's/`/\\`/g')"
+
+          BODY="**CI failed**: ${{ github.repository }} • ${{ github.ref_name }}\n<$RUN_URL>\n\nExits: ruff=$RUFF_EXIT pytest=$PY_EXIT smoke=$SM_EXIT\n\nPytest:\n\`\`\`\n$py_tail\n\`\`\`\n\nSmoke:\n\`\`\`\n$sm_tail\n\`\`\`\n\nRuff:\n\`\`\`\n$ruff_tail\n\`\`\`"
+          BODY="$(printf "%s" "$BODY" | head -c 1900)"
+
           jq -n --arg content "$BODY" '{content:$content}' > payload.json
           curl -fsS -H "Content-Type: application/json" -d @payload.json "$DISCORD_WEBHOOK_URL"

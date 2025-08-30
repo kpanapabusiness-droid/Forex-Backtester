@@ -408,7 +408,7 @@ def get_indicator_params(config: dict, candidates: list[str]) -> dict:
         if k in ip and isinstance(ip[k], dict):
             return ip[k]
     return {}
-    
+
 # Resolve a confirmation function for C1/C2 from the shared pool.
 # Tries c{role}_<name>, then falls back to c1_<name>.
 def _resolve_confirmation_func(name: str, role: str = "c2"):
@@ -515,7 +515,7 @@ def resolve_spread_pips(pair: str, row: pd.Series, cfg: Dict[str, Any]) -> float
         return float(sp.get("default_pips", 0.0))
     except Exception:
         return 0.0
-        
+
 # === In-sim equity helpers (realized PnL only) ===
 def _extract_bar_timestamp(row):
     # Prefer an explicit datetime-like column if you have one:
@@ -1540,7 +1540,7 @@ def run_backtest(
         print(f"ℹ️  DBCVIX loaded: {dbcvix_series.index.min().date()} → {dbcvix_series.index.max().date()} "
               f"(n={len(dbcvix_series)})")
 
-    
+
     fcfg = ((cfg.get("filters") or {}).get("dbcvix") or {})
     print("ℹ️  DBCVIX config:", {
         "enabled": fcfg.get("enabled"),
@@ -1549,7 +1549,7 @@ def run_backtest(
         "reduce_risk_to": fcfg.get("reduce_risk_to"),
         "source": fcfg.get("source"),
     })
-    
+
     if dbcvix_series is not None:
         # show a value around a known entry date window to prove lookups work
         sample_dates = [pd.Timestamp("2020-02-05"), pd.Timestamp("2024-10-17")]
@@ -1628,7 +1628,7 @@ def run_backtest(
                     )
                 else:
                     signals_df[col] = 0
-                    
+
             # Simulate (optionally collecting per-bar realized PnL for this pair)
             if track_equity:
                 pair_trades, pair_eq = simulate_pair_trades(

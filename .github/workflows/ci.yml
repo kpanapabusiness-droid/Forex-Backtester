@@ -82,14 +82,20 @@ jobs:
           p="${{ steps.pytest.outputs.PYTEST_EXIT }}"
           py_tail="$(tail -n 160 pytest.log 2>/dev/null || echo 'pytest.log missing')"
           rf_tail="$(tail -n 80 ruff.log 2>/dev/null || echo 'ruff.log missing')"
-          # JSON-encode via Python (no jq dependency)
+          export R_EXIT="$r" P_EXIT="$p" PY_TAIL="$py_tail" RF_TAIL="$rf_tail"
           python - <<'PY'
-import json, os, sys
-body = f"**CI failed**: {os.environ.get('GITHUB_REPOSITORY')} • {os.environ.get('GITHUB_REF_NAME')}\n<{os.environ.get('GITHUB_SERVER_URL')}/{os.environ.get('GITHUB_REPOSITORY')}/actions/runs/{os.environ.get('GITHUB_RUN_ID')}>\n\nexits: ruff={os.environ.get('r')} pytest={os.environ.get('p')}\n\nPytest:\n```\n{os.environ.get('py_tail','')}\n```\n\nRuff:\n```\n{os.environ.get('rf_tail','')}\n```"
-payload = json.dumps({"content": body})
-webhook = os.environ["DISCORD_WEBHOOK_URL"]
-import urllib.request
-req = urllib.request.Request(webhook, data=payload.encode(), headers={"Content-Type":"application/json"})
+import os, json, urllib.request
+repo = os.environ.get("GITHUB_REPOSITORY","")
+ref  = os.environ.get("GITHUB_REF_NAME","")
+server = os.environ.get("GITHUB_SERVER_URL","https://github.com")
+run_id = os.environ.get("GITHUB_RUN_ID","")
+r = os.environ.get("R_EXIT",""); p = os.environ.get("P_EXIT","")
+py_tail = os.environ.get("PY_TAIL",""); rf_tail = os.environ.get("RF_TAIL","")
+body = (f"**CI failed**: {repo} • {ref}\n<{server}/{repo}/actions/runs/{run_id}>\n\n"
+        f"exits: ruff={r} pytest={p}\n\nPytest:\n```\\n{py_tail}\n```\n\nRuff:\n```\\n{rf_tail}\n```")
+data = json.dumps({"content": body}).encode()
+req = urllib.request.Request(os.environ["DISCORD_WEBHOOK_URL"], data=data,
+                             headers={"Content-Type":"application/json"})
 with urllib.request.urlopen(req) as resp:
-    sys.stdout.write(str(resp.status))
+    print(resp.status)
 PY

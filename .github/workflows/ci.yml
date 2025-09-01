@@ -7,95 +7,17 @@ jobs:
   tests:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
           cache: 'pip'
 
-      - name: Install
-        id: install
-        shell: bash
+      - name: Install dependencies
         run: |
-          set -e
           python -m pip install -U pip
-          pip install -U pytest ruff numpy pandas pyarrow
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
 
-      - name: Ruff
-        id: ruff
-        shell: bash
-        run: |
-          set +e
-          set -o pipefail
-          : > ruff.log
-          ruff check . 2>&1 | tee -a ruff.log
-          echo "RUFF_EXIT=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
-          exit 0
-
-      - name: Pytest (full suite, skip e2e for now)
-        id: pytest
-        env:
-          PYTEST_DISABLE_PLUGIN_AUTOLOAD: "1"
-          PYTHONPATH: ${{ github.workspace }}
-        shell: bash
-        run: |
-          set +e
-          set -o pipefail
-          : > pytest.log
-          python -m pytest -q -c /dev/null -k "not smoke_end_to_end" 2>&1 | tee -a pytest.log
-          echo "PYTEST_EXIT=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
-          exit 0
-
-      - name: Smoke (non-gating)
-        id: smoke
-        shell: bash
-        run: |
-          set +e
-          set -o pipefail
-          : > smoke.log
-          if [ -f smoke_test_full_v198.py ]; then python smoke_test_full_v198.py 2>&1 | tee -a smoke.log; fi
-          echo "SMOKE_EXIT=${PIPESTATUS[0]:-0}" >> "$GITHUB_OUTPUT"
-          exit 0
-
-      - name: Fail at end if needed (gate on ruff+pytest)
-        if: always()
-        shell: bash
-        run: |
-          r="${{ steps.ruff.outputs.RUFF_EXIT }}"
-          p="${{ steps.pytest.outputs.PYTEST_EXIT }}"
-          echo "gates: ruff=$r pytest=$p"
-          if [ "$r" != "0" ] || [ "$p" != "0" ]; then exit 1; fi
-
-      - name: Notify Discord (on failure)
-        if: failure()
-        env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-        shell: bash
-        run: |
-          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          r="${{ steps.ruff.outputs.RUFF_EXIT }}"
-          p="${{ steps.pytest.outputs.PYTEST_EXIT }}"
-          py_tail="$(tail -n 160 pytest.log 2>/dev/null || echo 'pytest.log missing')"
-          rf_tail="$(tail -n 80 ruff.log 2>/dev/null || echo 'ruff.log missing')"
-          export R_EXIT="$r" P_EXIT="$p" PY_TAIL="$py_tail" RF_TAIL="$rf_tail"
-          python - <<'PY'
-import os, json, urllib.request
-repo = os.environ.get("GITHUB_REPOSITORY","")
-ref  = os.environ.get("GITHUB_REF_NAME","")
-server = os.environ.get("GITHUB_SERVER_URL","https://github.com")
-run_id = os.environ.get("GITHUB_RUN_ID","")
-r = os.environ.get("R_EXIT",""); p = os.environ.get("P_EXIT","")
-py_tail = os.environ.get("PY_TAIL",""); rf_tail = os.environ.get("RF_TAIL","")
-body = (f"**CI failed**: {repo} • {ref}\n<{server}/{repo}/actions/runs/{run_id}>\n\n"
-        f"exits: ruff={r} pytest={p}\n\nPytest:\n```\\n{py_tail}\n```\n\nRuff:\n```\\n{rf_tail}\n```")
-data = json.dumps({"content": body}).encode()
-req = urllib.request.Request(os.environ["DISCORD_WEBHOOK_URL"], data=data,
-                             headers={"Content-Type":"application/json"})
-with urllib.request.urlopen(req) as resp:
-    print(resp.status)
-PY
+      - name: Run pytest
+        run: pytest

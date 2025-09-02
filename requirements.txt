@@ -1,2 +1,3 @@
 pytest
 pydantic>=2
+numpy>=1.24

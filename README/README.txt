@@ -85,3 +85,5 @@ Open config.yaml and set up your system. Example:
       summary_stats: true
 
 Change only the indicators or rules
+
+CI probe: 2025-09-03T23:34:21Z

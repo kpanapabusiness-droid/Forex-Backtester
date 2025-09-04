@@ -55,7 +55,6 @@ jobs:
           : > ruff.log
           ruff check . 2>&1 | tee -a ruff.log
           echo "RUFF_EXIT=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
-          exit 0
 
       - name: Pytest (full suite, clean env)
         id: pytest
@@ -69,7 +68,6 @@ jobs:
           : > pytest.log
           python -m pytest -q -c /dev/null 2>&1 | tee -a pytest.log
           echo "PYTEST_EXIT=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
-          exit 0
 
       - name: Smoke (non-gating)
         id: smoke
@@ -80,7 +78,6 @@ jobs:
           : > smoke.log
           if [ -f smoke_test_full_v198.py ]; then python smoke_test_full_v198.py 2>&1 | tee -a smoke.log; fi
           echo "SMOKE_EXIT=${PIPESTATUS[0]:-0}" >> "$GITHUB_OUTPUT"
-          exit 0
 
       # Gate merges on ruff + pytest only
       - name: Fail at end if needed (gate on ruff+pytest)
@@ -90,7 +87,7 @@ jobs:
           r="${{ steps.ruff.outputs.RUFF_EXIT }}"
           p="${{ steps.pytest.outputs.PYTEST_EXIT }}"
           echo "gates: ruff=$r pytest=$p"
-          if [ "$r" != "0" ] || [ "$p" != "0" ]; then exit 1; fi
+          if [ "${r:-0}" != "0" ] || [ "${p:-0}" != "0" ]; then exit 1; fi
 
       # Always evaluate, but only send to Discord when the overall job actually failed
       - name: Notify Discord (always evaluate)
@@ -128,8 +125,8 @@ jobs:
             curl -fsS -H "Content-Type: application/json" -d @payload.json "$DISCORD_WEBHOOK_URL"
           else
             esc=$(printf '%s' "$BODY" | python - <<'PY'
-import json,sys; print(json.dumps({"content": sys.stdin.read()}))
-PY
-)
+            import json,sys; print(json.dumps({"content": sys.stdin.read()}))
+            PY
+            )
             curl -fsS -H "Content-Type: application/json" -d "$esc" "$DISCORD_WEBHOOK_URL"
           fi

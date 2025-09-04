@@ -87,3 +87,5 @@ Open config.yaml and set up your system. Example:
 Change only the indicators or rules
 
 CI probe: 2025-09-03T23:34:21Z
+
+Discord CI test trigger: 2025-09-04T01:18:18Z

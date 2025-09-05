@@ -86,6 +86,13 @@ jobs:
           s="${{ steps.smoke.outputs.SMOKE_EXIT }}"
           if [ "${r:-0}" != "0" ] || [ "${p:-0}" != "0" ] || [ "${s:-0}" != "0" ]; then exit 1; fi
 
+      - name: Debug Discord Secret
+        if: always()
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          echo "Secret length: ${#DISCORD_WEBHOOK_URL}"
+
       - name: Notify Discord on failure
         if: failure()
         env:

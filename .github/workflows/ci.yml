@@ -2,13 +2,13 @@ name: CI
 on:
   pull_request:
   push:
+  workflow_dispatch:
 jobs:
   tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      # Write early diagnostics so we have data even if setup fails
       - name: Diagnostics (early)
         id: diag
         shell: bash
@@ -17,6 +17,7 @@ jobs:
           : > diag.log
           {
             echo "Runner: $RUNNER_OS"
+            echo "Event: ${GITHUB_EVENT_NAME}"
             uname -a || true
             which python || true
             which python3 || true
@@ -26,7 +27,6 @@ jobs:
             pip --version || true
           } 2>&1 | tee -a diag.log
 
-      # If setup ever hiccups, we still run later steps
       - name: Setup Python
         id: setup
         uses: actions/setup-python@v5
@@ -41,10 +41,8 @@ jobs:
         run: |
           set -e
           python -m pip install -U pip
-          # Minimal deps to satisfy tests/conftest + core suite
-          pip install -U pytest ruff numpy pandas
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       - name: Ruff
         id: ruff
@@ -55,7 +53,6 @@ jobs:
           : > ruff.log
           ruff check . 2>&1 | tee -a ruff.log
           echo "RUFF_EXIT=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
-          exit 0
 
       - name: Pytest (full suite, clean env)
         id: pytest
@@ -69,9 +66,8 @@ jobs:
           : > pytest.log
           python -m pytest -q -c /dev/null 2>&1 | tee -a pytest.log
           echo "PYTEST_EXIT=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
-          exit 0
 
-      - name: Smoke (non-gating)
+      - name: Smoke
         id: smoke
         shell: bash
         run: |
@@ -80,56 +76,55 @@ jobs:
           : > smoke.log
           if [ -f smoke_test_full_v198.py ]; then python smoke_test_full_v198.py 2>&1 | tee -a smoke.log; fi
           echo "SMOKE_EXIT=${PIPESTATUS[0]:-0}" >> "$GITHUB_OUTPUT"
-          exit 0
 
-      # Gate merges on ruff + pytest only
-      - name: Fail at end if needed (gate on ruff+pytest)
+      - name: Fail at end if needed (gate on ruff+pytest+smoke)
         if: always()
         shell: bash
         run: |
           r="${{ steps.ruff.outputs.RUFF_EXIT }}"
           p="${{ steps.pytest.outputs.PYTEST_EXIT }}"
-          echo "gates: ruff=$r pytest=$p"
-          if [ "$r" != "0" ] || [ "$p" != "0" ]; then exit 1; fi
+          s="${{ steps.smoke.outputs.SMOKE_EXIT }}"
+          if [ "${r:-0}" != "0" ] || [ "${p:-0}" != "0" ] || [ "${s:-0}" != "0" ]; then exit 1; fi
 
-      # Always evaluate, but only send to Discord when the overall job actually failed
-      - name: Notify Discord (always evaluate)
-        if: always()
+      - name: Notify Discord on failure
+        if: failure()
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         shell: bash
         run: |
-          if [ "${{ job.status }}" != "failure" ]; then
-            echo "Job is ${{ job.status }}, not notifying Discord."
-            exit 0
-          fi
           RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           sp="${{ steps.setup.outcome }}"
           r="${{ steps.ruff.outputs.RUFF_EXIT }}"
           p="${{ steps.pytest.outputs.PYTEST_EXIT }}"
           s="${{ steps.smoke.outputs.SMOKE_EXIT }}"
 
-          diag_tail="$(tail -n 60 diag.log 2>/dev/null || echo 'diag.log missing')"
-          py_tail="$(tail -n 160 pytest.log 2>/dev/null || echo 'pytest.log missing')"
+          diag_tail="$(tail -n 40 diag.log 2>/dev/null || echo 'diag.log missing')"
+          py_tail="$(tail -n 140 pytest.log 2>/dev/null || echo 'pytest.log missing')"
           rf_tail="$(tail -n 80 ruff.log 2>/dev/null || echo 'ruff.log missing')"
           sm_tail="$(tail -n 80 smoke.log 2>/dev/null || echo 'smoke.log missing')"
 
-          for v in diag_tail py_tail rf_tail sm_tail; do
-            eval "val=\${$v}"
-            eval "$v=\"$(printf \"%s\" \"$val\" | sed 's/`/\\`/g')\""
-          done
-
-          BODY="**CI failed**: ${{ github.repository }} • ${{ github.ref_name }}\n<$RUN_URL>\n\nsetup=$sp • exits: ruff=$r pytest=$p smoke=$s\n\nPytest:\n\`\`\`\n$py_tail\n\`\`\`\n\nRuff:\n\`\`\`\n$rf_tail\n\`\`\`\n\nDiagnostics:\n\`\`\`\n$diag_tail\n\`\`\`\n\nSmoke:\n\`\`\`\n$sm_tail\n\`\`\`"
-          BODY="$(printf "%s" "$BODY" | head -c 1900)"
-
-          # jq may not be present on minimal runners; use pure curl JSON if jq missing
-          if command -v jq >/dev/null 2>&1; then
-            echo "$BODY" | jq -Rs '{content: .}' > payload.json
-            curl -fsS -H "Content-Type: application/json" -d @payload.json "$DISCORD_WEBHOOK_URL"
-          else
-            esc=$(printf '%s' "$BODY" | python - <<'PY'
-import json,sys; print(json.dumps({"content": sys.stdin.read()}))
-PY
-)
-            curl -fsS -H "Content-Type: application/json" -d "$esc" "$DISCORD_WEBHOOK_URL"
-          fi
+          export RUN_URL sp r p s diag_tail py_tail rf_tail sm_tail
+          python - <<'PY'
+          import os, json, urllib.request
+          repo=os.environ.get('GITHUB_REPOSITORY','')
+          ref=os.environ.get('GITHUB_REF_NAME','')
+          run=os.environ.get('RUN_URL','')
+          sp=os.environ.get('sp','')
+          r=os.environ.get('r','')
+          p=os.environ.get('p','')
+          s=os.environ.get('s','')
+          diag=os.environ.get('diag_tail','')
+          py=os.environ.get('py_tail','')
+          rf=os.environ.get('rf_tail','')
+          sm=os.environ.get('sm_tail','')
+          body=(f"**CI failed**: {repo} • {ref}\n{run}\n\n"
+                f"setup={sp} • exits: ruff={r} pytest={p} smoke={s}\n\n"
+                f"Pytest:\n```\n{py}\n```\n\n"
+                f"Ruff:\n```\n{rf}\n```\n\n"
+                f"Diagnostics:\n```\n{diag}\n```\n\n"
+                f"Smoke:\n```\n{sm}\n```")
+          data=json.dumps({"content": body}).encode()
+          req=urllib.request.Request(os.environ['DISCORD_WEBHOOK_URL'], data=data, headers={'Content-Type':'application/json'})
+          with urllib.request.urlopen(req) as resp:
+              print(resp.status)
+          PY

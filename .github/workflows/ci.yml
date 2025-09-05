@@ -90,22 +90,13 @@ jobs:
         if: always()
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-        shell: bash
         run: |
-          if [ -z "${DISCORD_WEBHOOK_URL}" ]; then
-            echo "❌ Secret not set"
-            exit 1
-          fi
-          echo "✅ Secret length: ${#DISCORD_WEBHOOK_URL}"
-          case "${DISCORD_WEBHOOK_URL}" in
-            https://discord.com/api/webhooks/*) echo "✅ Secret looks like a Discord webhook URL" ;;
-            *) echo "⚠️ Secret does not match expected format" ;;
-          esac
+          echo "Secret length: ${#DISCORD_WEBHOOK_URL}"
 
       - name: Notify Discord on failure
         if: failure()
         env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         shell: bash
         run: |
           RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
@@ -140,7 +131,8 @@ jobs:
                 f"Diagnostics:\n```\n{diag}\n```\n\n"
                 f"Smoke:\n```\n{sm}\n```")
           data=json.dumps({"content": body}).encode()
-          req=urllib.request.Request(os.environ['DISCORD_WEBHOOK_URL'], data=data, headers={'Content-Type':'application/json'})
+          webhook=os.environ['DISCORD_WEBHOOK']
+          req=urllib.request.Request(webhook, data=data, headers={'Content-Type':'application/json'})
           with urllib.request.urlopen(req) as resp:
               print(resp.status)
           PY

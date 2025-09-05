@@ -90,8 +90,17 @@ jobs:
         if: always()
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        shell: bash
         run: |
-          echo "Secret length: ${#DISCORD_WEBHOOK_URL}"
+          if [ -z "${DISCORD_WEBHOOK_URL}" ]; then
+            echo "❌ Secret not set"
+            exit 1
+          fi
+          echo "✅ Secret length: ${#DISCORD_WEBHOOK_URL}"
+          case "${DISCORD_WEBHOOK_URL}" in
+            https://discord.com/api/webhooks/*) echo "✅ Secret looks like a Discord webhook URL" ;;
+            *) echo "⚠️ Secret does not match expected format" ;;
+          esac
 
       - name: Notify Discord on failure
         if: failure()

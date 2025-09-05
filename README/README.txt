@@ -85,3 +85,5 @@ Open config.yaml and set up your system. Example:
       summary_stats: true
 
 Change only the indicators or rules
+
+CI rerun trigger: 2025-09-05T04:34:54Z

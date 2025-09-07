@@ -40,11 +40,7 @@ def _write_cfg(tmp: Path, run_name="wfo_smoke_pytest"):
         textwrap.dedent(f"""
     run_name: "single_run_default"
 
-    data:
-      dir: "data/daily"
-      pairs: ["EUR_USD"]
-
-    data_dir: "data/daily"
+    data_dir: "data/test"
     pairs: ["EUR_USD"]
 
     risk:

@@ -116,7 +116,7 @@ jobs:
 
           for v in diag_tail py_tail rf_tail sm_tail; do
             eval "val=\${$v}"
-            eval "$v=\"$(printf \"%s\" \"$val\" | sed 's/`/\\`/g')\""
+            eval "$v=\"$(printf \"%s\" \"$val\" | sed 's/`/\\`/g; s/(/\\\\(/g; s/)/\\\\)/g')\""
           done
 
           BODY="**CI failed**: ${{ github.repository }} • ${{ github.ref_name }}\n<$RUN_URL>\n\nsetup=$sp • exits: ruff=$r pytest=$p smoke=$s\n\nPytest:\n\`\`\`\n$py_tail\n\`\`\`\n\nRuff:\n\`\`\`\n$rf_tail\n\`\`\`\n\nDiagnostics:\n\`\`\`\n$diag_tail\n\`\`\`\n\nSmoke:\n\`\`\`\n$sm_tail\n\`\`\`"

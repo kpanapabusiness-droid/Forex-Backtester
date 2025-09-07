@@ -116,22 +116,17 @@ jobs:
 
           for v in diag_tail py_tail rf_tail sm_tail; do
             eval "val=\${$v}"
-            eval "$v=\"$(printf \"%s\" \"$val\" | sed 's/`/\\`/g; s/(/\\\\(/g; s/)/\\\\)/g')\""
+            eval "$v=\"$(printf \"%s\" \"$val\" | sed 's/`/\\`/g')\""
           done
 
           BODY="**CI failed**: ${{ github.repository }} • ${{ github.ref_name }}\n<$RUN_URL>\n\nsetup=$sp • exits: ruff=$r pytest=$p smoke=$s\n\nPytest:\n\`\`\`\n$py_tail\n\`\`\`\n\nRuff:\n\`\`\`\n$rf_tail\n\`\`\`\n\nDiagnostics:\n\`\`\`\n$diag_tail\n\`\`\`\n\nSmoke:\n\`\`\`\n$sm_tail\n\`\`\`"
           BODY="$(printf "%s" "$BODY" | head -c 1900)"
 
           # jq may not be present on minimal runners; use pure curl JSON if jq missing
-          # Simplified version to debug Discord webhook issues
-          echo "Attempting Discord notification... (retry 2)"
           if command -v jq >/dev/null 2>&1; then
             echo "$BODY" | jq -Rs '{content: .}' > payload.json
-            echo "Using jq method"
-            curl -v -H "Content-Type: application/json" -d @payload.json "$DISCORD_WEBHOOK_URL"
+            curl -fsS -H "Content-Type: application/json" -d @payload.json "$DISCORD_WEBHOOK_URL"
           else
             esc=$(printf '%s' "$BODY" | python -c "import json,sys; print(json.dumps({'content': sys.stdin.read()}))")
-            echo "Using python method"
-            curl -v -H "Content-Type: application/json" -d "$esc" "$DISCORD_WEBHOOK_URL"
+            curl -fsS -H "Content-Type: application/json" -d "$esc" "$DISCORD_WEBHOOK_URL"
           fi
-          echo "Discord notification attempt completed"

@@ -2,7 +2,4 @@ numpy
 pandas
 pytest
 ruff
-numpy
-pandas
-pytest
-ruff
+pyyaml

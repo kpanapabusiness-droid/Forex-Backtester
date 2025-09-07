@@ -15,6 +15,7 @@ __pycache__/
 
 # Data & caches
 data/
+!data/test/
 data_raw/
 cache/
 Cache/

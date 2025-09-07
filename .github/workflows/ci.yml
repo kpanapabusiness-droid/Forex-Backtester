@@ -114,10 +114,11 @@ jobs:
           rf_tail="$(tail -n 80 ruff.log 2>/dev/null || echo 'ruff.log missing')"
           sm_tail="$(tail -n 80 smoke.log 2>/dev/null || echo 'smoke.log missing')"
 
-          for v in diag_tail py_tail rf_tail sm_tail; do
-            eval "val=\${$v}"
-            eval "$v=\"$(printf \"%s\" \"$val\" | sed 's/`/\\`/g')\""
-          done
+          # Escape backticks for Discord markdown
+          diag_tail="$(printf "%s" "$diag_tail" | sed 's/`/\\`/g')"
+          py_tail="$(printf "%s" "$py_tail" | sed 's/`/\\`/g')"
+          rf_tail="$(printf "%s" "$rf_tail" | sed 's/`/\\`/g')"
+          sm_tail="$(printf "%s" "$sm_tail" | sed 's/`/\\`/g')"
 
           BODY="**CI failed**: ${{ github.repository }} • ${{ github.ref_name }}\n<$RUN_URL>\n\nsetup=$sp • exits: ruff=$r pytest=$p smoke=$s\n\nPytest:\n\`\`\`\n$py_tail\n\`\`\`\n\nRuff:\n\`\`\`\n$rf_tail\n\`\`\`\n\nDiagnostics:\n\`\`\`\n$diag_tail\n\`\`\`\n\nSmoke:\n\`\`\`\n$sm_tail\n\`\`\`"
           BODY="$(printf "%s" "$BODY" | head -c 1900)"

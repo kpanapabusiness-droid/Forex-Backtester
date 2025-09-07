@@ -1,21 +1,112 @@
+import textwrap
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import pytest
 
 
-def _cfg_path():
-    p = Path("config.yaml")
-    assert p.exists()
-    return str(p)
+def _synthetic_ohlcv(start="2017-01-02", periods=1200, freq="B", seed=7):
+    """Generate synthetic OHLCV data for testing."""
+    rng = np.random.default_rng(seed)
+    dates = pd.date_range(start=start, periods=periods, freq=freq)
+    base = 1.20 + np.cumsum(rng.normal(0, 0.0005, size=len(dates)))
+    high = base + np.abs(rng.normal(0.0004, 0.0002, size=len(dates)))
+    low = base - np.abs(rng.normal(0.0004, 0.0002, size=len(dates)))
+    open_ = base + rng.normal(0.0, 0.0002, size=len(dates))
+    close = base + rng.normal(0.0, 0.0002, size=len(dates))
+    vol = rng.integers(100, 500, size=len(dates))
+    df = pd.DataFrame(
+        {
+            "date": dates,
+            "open": open_,
+            "high": high,
+            "low": low,
+            "close": close,
+            "volume": vol,
+            "spread": 0.0001,
+        }
+    )
+    return df
 
 
-def test_smoke_backtest_outputs(tmp_path):
+def _write_test_cfg(tmp_path: Path):
+    """Write a test config that uses synthetic data."""
+    cfg = textwrap.dedent("""
+    pairs: ["EUR_USD"]
+    timeframe: "D"
+    data:
+      dir: "data/daily"
+
+    indicators:
+      c1: "c1_twiggs_money_flow"
+      use_c2: false
+      use_baseline: true
+      baseline: "baseline_ema"
+      use_volume: false
+      use_exit: false
+
+    rules:
+      one_candle_rule: false
+      pullback_rule: false
+      bridge_too_far_days: 7
+      allow_baseline_as_catalyst: false
+
+    entry:
+      atr_multiple: 2.0
+
+    exit:
+      use_trailing_stop: true
+      move_to_breakeven_after_atr: true
+      exit_on_c1_reversal: true
+      exit_on_baseline_cross: false
+      exit_on_exit_signal: false
+
+    spreads:
+      enabled: false
+      default_pips: 1.0
+
+    tracking:
+      in_sim_equity: true
+      track_win_loss_scratch: true
+      track_roi: true
+      track_drawdown: true
+
+    risk_filters:
+      dbcvix:
+        enabled: false
+        mode: "reduce"
+        threshold: 0.0
+        reduce_risk_to: 0.01
+        source: "synthetic"
+
+    date_range:
+      start: "2018-01-01"
+      end: "2022-12-31"
+    """).strip()
+
+    cfg_path = tmp_path / "config.yaml"
+    cfg_path.write_text(cfg, encoding="utf-8")
+    return str(cfg_path)
+
+
+def test_smoke_backtest_outputs(tmp_path, monkeypatch):
     import backtester as bt
+
+    # Create test config
+    cfg_path = _write_test_cfg(tmp_path)
+
+    # Create synthetic data directory and files
+    data_dir = tmp_path / "data" / "daily"
+    data_dir.mkdir(parents=True, exist_ok=True)
+
+    # Generate synthetic data for EUR_USD
+    df_syn = _synthetic_ohlcv(periods=1400, seed=11)
+    (data_dir / "EUR_USD.csv").write_text(df_syn.to_csv(index=False), encoding="utf-8")
 
     out_dir = tmp_path / "results_smoke"
     out_dir.mkdir(parents=True, exist_ok=True)
-    bt.run_backtest(config_path=_cfg_path(), results_dir=str(out_dir))
+    bt.run_backtest(config_path=cfg_path, results_dir=str(out_dir))
     trades = out_dir / "trades.csv"
     equity = out_dir / "equity_curve.csv"
     summary = out_dir / "summary.txt"
@@ -35,12 +126,23 @@ def test_smoke_backtest_outputs(tmp_path):
         assert (df_eq["drawdown"].dropna() <= 0).all()
 
 
-def test_smoke_walk_forward(tmp_path):
+def test_smoke_walk_forward(tmp_path, monkeypatch):
     import backtester as bt
+
+    # Create test config
+    cfg_path = _write_test_cfg(tmp_path)
+
+    # Create synthetic data directory and files
+    data_dir = tmp_path / "data" / "daily"
+    data_dir.mkdir(parents=True, exist_ok=True)
+
+    # Generate synthetic data for EUR_USD
+    df_syn = _synthetic_ohlcv(periods=1400, seed=11)
+    (data_dir / "EUR_USD.csv").write_text(df_syn.to_csv(index=False), encoding="utf-8")
 
     out_dir = tmp_path / "results_wfo"
     out_dir.mkdir(parents=True, exist_ok=True)
-    bt.run_backtest_walk_forward(config_path=_cfg_path(), results_dir=str(out_dir))
+    bt.run_backtest_walk_forward(config_path=cfg_path, results_dir=str(out_dir))
     trades = out_dir / "trades.csv"
     equity = out_dir / "equity_curve.csv"
     assert trades.exists()
@@ -51,13 +153,24 @@ def test_smoke_walk_forward(tmp_path):
     assert {"date", "equity"}.issubset(set(df_eq.columns))
 
 
-def test_smoke_monte_carlo(tmp_path):
+def test_smoke_monte_carlo(tmp_path, monkeypatch):
     mc = pytest.importorskip("analytics.monte_carlo")
     import backtester as bt
 
+    # Create test config
+    cfg_path = _write_test_cfg(tmp_path)
+
+    # Create synthetic data directory and files
+    data_dir = tmp_path / "data" / "daily"
+    data_dir.mkdir(parents=True, exist_ok=True)
+
+    # Generate synthetic data for EUR_USD
+    df_syn = _synthetic_ohlcv(periods=1400, seed=11)
+    (data_dir / "EUR_USD.csv").write_text(df_syn.to_csv(index=False), encoding="utf-8")
+
     out_dir = tmp_path / "results_mc"
     out_dir.mkdir(parents=True, exist_ok=True)
-    bt.run_backtest(config_path=_cfg_path(), results_dir=str(out_dir))
+    bt.run_backtest(config_path=cfg_path, results_dir=str(out_dir))
     trades = out_dir / "trades.csv"
     assert trades.exists()
     try:

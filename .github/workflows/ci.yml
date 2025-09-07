@@ -127,9 +127,6 @@ jobs:
             echo "$BODY" | jq -Rs '{content: .}' > payload.json
             curl -fsS -H "Content-Type: application/json" -d @payload.json "$DISCORD_WEBHOOK_URL"
           else
-            esc=$(printf '%s' "$BODY" | python - <<'PY'
-import json,sys; print(json.dumps({"content": sys.stdin.read()}))
-PY
-)
+            esc=$(printf '%s' "$BODY" | python -c "import json,sys; print(json.dumps({'content': sys.stdin.read()}))")
             curl -fsS -H "Content-Type: application/json" -d "$esc" "$DISCORD_WEBHOOK_URL"
           fi

@@ -123,27 +123,15 @@ jobs:
           BODY="$(printf "%s" "$BODY" | head -c 1900)"
 
           # jq may not be present on minimal runners; use pure curl JSON if jq missing
-          # Add retry logic for Discord webhook reliability
-          for attempt in 1 2 3; do
-            echo "Discord notification attempt $attempt/3"
-            if command -v jq >/dev/null 2>&1; then
-              echo "$BODY" | jq -Rs '{content: .}' > payload.json
-              if curl -fsS -H "Content-Type: application/json" -d @payload.json "$DISCORD_WEBHOOK_URL"; then
-                echo "Discord notification sent successfully"
-                break
-              fi
-            else
-              esc=$(printf '%s' "$BODY" | python -c "import json,sys; print(json.dumps({'content': sys.stdin.read()}))")
-              if curl -fsS -H "Content-Type: application/json" -d "$esc" "$DISCORD_WEBHOOK_URL"; then
-                echo "Discord notification sent successfully"
-                break
-              fi
-            fi
-            if [ $attempt -lt 3 ]; then
-              echo "Discord notification failed, retrying in 2 seconds..."
-              sleep 2
-            else
-              echo "Discord notification failed after 3 attempts"
-              exit 1
-            fi
-          done
+          # Simplified version to debug Discord webhook issues
+          echo "Attempting Discord notification..."
+          if command -v jq >/dev/null 2>&1; then
+            echo "$BODY" | jq -Rs '{content: .}' > payload.json
+            echo "Using jq method"
+            curl -v -H "Content-Type: application/json" -d @payload.json "$DISCORD_WEBHOOK_URL"
+          else
+            esc=$(printf '%s' "$BODY" | python -c "import json,sys; print(json.dumps({'content': sys.stdin.read()}))")
+            echo "Using python method"
+            curl -v -H "Content-Type: application/json" -d "$esc" "$DISCORD_WEBHOOK_URL"
+          fi
+          echo "Discord notification attempt completed"

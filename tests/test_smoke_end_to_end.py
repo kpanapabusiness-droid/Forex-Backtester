@@ -7,11 +7,14 @@ import pytest
 
 def _write_test_cfg(tmp_path: Path):
     """Write a test config that uses test data directory."""
-    cfg = textwrap.dedent("""
+    # Get absolute path to test data directory
+    test_data_dir = Path(__file__).parent.parent / "data" / "test"
+
+    cfg = textwrap.dedent(f"""
     pairs: ["EUR_USD", "USD_JPY", "GBP_USD", "USD_CHF"]
     timeframe: "D"
     data:
-      dir: "data/test"
+      dir: "{test_data_dir}"
 
     indicators:
       c1: "c1_twiggs_money_flow"

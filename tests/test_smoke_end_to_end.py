@@ -13,8 +13,7 @@ def _write_test_cfg(tmp_path: Path):
     cfg = textwrap.dedent(f"""
     pairs: ["EUR_USD", "USD_JPY", "GBP_USD", "USD_CHF"]
     timeframe: "D"
-    data:
-      dir: "{test_data_dir}"
+    data_dir: "{test_data_dir}"
 
     indicators:
       c1: "c1_twiggs_money_flow"

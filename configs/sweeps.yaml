@@ -1,5 +1,4 @@
-# sweeps.yaml — C1 discovery only, EUR/USD 2021–2024
-
+# C1-only sweep configuration
 role_filters: ["c1"]
 
 discover:
@@ -10,28 +9,29 @@ discover:
   exit: false
 
 allowlist:
-  c1: []
+  c1: ["c1_supertrend", "c1_twiggs_money_flow", "c1_disparity_index", "c1_aroon", "c1_doda_stochastic", "c1_vortex_indicator", "c1_forecast", "c1_ttf", "c1_zerolag_macd"]
 blocklist:
   c1: []
 
 roles:
-  c1: []   # auto-discover all C1 funcs, no manual extras
+  c1: []   # auto-discover from allowlist
 
 default_params:
-  c1:
-    length: [14, 21, 28]   # generic grids if indicator supports them
-    period: [14, 21]
+  c1: {}
 
 static_overrides:
-  pairs: ["EUR_USD"]
+  pairs: ["EUR_USD", "GBP_USD", "USD_JPY", "AUD_USD", "USD_CHF", "USD_CAD", "NZD_USD", "EUR_JPY", "GBP_JPY", "AUD_JPY", "EUR_GBP", "AUD_NZD"]
   timeframe: "D"
-  dates:
-    start: "2021-01-01"
-    end:   "2024-12-31"
+  date_range:
+    start: "2015-01-01"
+    end: "2024-12-31"
+  output:
+    results_dir: "results_history/c1_sweep"
   spreads:
     enabled: false
-  dbcvix:
-    enabled: false
+  filters:
+    dbcvix:
+      enabled: false
   rules:
     one_candle_rule: false
     pullback_rule: false
@@ -43,11 +43,6 @@ static_overrides:
 parallel:
   workers: auto
   max_runs: null
-  early_stop:
-    enable: false
-    min_bars: 0
-    roi_pct_floor: -50
-    max_dd_cap: 80
 
 scoring:
   roi_pct_w: 1.0

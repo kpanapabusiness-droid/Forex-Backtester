@@ -85,6 +85,34 @@ def _num(s):
     return float(m.group(0)) if m else None
 
 
+def _none_if_falsey(x):
+    if x is False or x is None:
+        return None
+    s = str(x).strip().lower()
+    if s in {"false", "0", "none", "null", ""}:
+        return None
+    return x
+
+
+def _sanitize_indicators(ind):
+    c1_val = ind.get("c1")
+    # For c1, if it's False/None, we need a valid string - use a default
+    if (
+        c1_val is False
+        or c1_val is None
+        or str(c1_val).strip().lower() in {"false", "0", "none", "null", ""}
+    ):
+        c1_val = "c1_twiggs_money_flow"  # Default C1 indicator
+
+    return {
+        "c1": c1_val,
+        "c2": _none_if_falsey(ind.get("c2")),
+        "baseline": _none_if_falsey(ind.get("baseline")),
+        "volume": _none_if_falsey(ind.get("volume")),
+        "exit": _none_if_falsey(ind.get("exit")),
+    }
+
+
 def parse_summary_text(txt: str) -> dict:
     out = {}
     if not txt:
@@ -296,6 +324,11 @@ def worker_job(run_id: int, base_config_path: Path, merged_cfg: dict, run_slug: 
     # Keep this (nice to have) so runs are self-describing if someone inspects the config:
     merged_cfg = dict(merged_cfg)
     merged_cfg.setdefault("output", {})["results_dir"] = str(results_dir)
+
+    # Sanitize indicators block before validation
+    if "indicators" in merged_cfg:
+        raw_indicators = merged_cfg["indicators"]
+        merged_cfg["indicators"] = _sanitize_indicators(raw_indicators)
 
     # Write temp config
     with open(config_path, "w", encoding="utf-8") as f:

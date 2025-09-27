@@ -1,0 +1,430 @@
+# =============================================
+# signal_logic.py — Complete NNFX Signal Engine v1.9.8+
+# =============================================
+# * Reads columns produced by apply_indicators():
+#     - c1_signal, c2_signal, baseline_signal, volume_signal, exit_signal
+#     - optional: baseline (price series for pullback/cross), atr
+# * Outputs: entry_signal (±1), exit_signal_final (0/1)
+# * Full NNFX logic: C1/baseline triggers, filters, one-candle, pullback, bridge-too-far
+# * Audit integrity: immutable entry fields, trailing current_sl, proper exit recording
+# * No lookahead: decisions use current bar or lookback only
+# =============================================
+
+from __future__ import annotations
+
+from typing import Any, Dict, Optional, Tuple
+
+import numpy as np
+import pandas as pd
+
+# =============================================
+# Helper Functions
+# =============================================
+
+def _safe_get(df: pd.DataFrame, col: str, default=0) -> pd.Series:
+    """Safely get column with default fallback."""
+    if col in df.columns:
+        return pd.to_numeric(df[col], errors="coerce").fillna(default)
+    return pd.Series(default, index=df.index)
+
+
+def _normalize_signal(series: pd.Series, domain: Tuple[int, ...] = (-1, 0, 1)) -> pd.Series:
+    """Normalize series to specified domain."""
+    return series.clip(min(domain), max(domain)).astype(int)
+
+
+def _detect_c1_column(df: pd.DataFrame) -> Optional[str]:
+    """Detect C1 signal column."""
+    candidates = ["c1_signal", "c1", "signal_c1"]
+    for col in candidates:
+        if col in df.columns:
+            return col
+
+    # Fuzzy match
+    for col in df.columns:
+        if "c1" in col.lower() and "signal" in col.lower():
+            return col
+
+    return None
+
+
+def _get_baseline_trend(df: pd.DataFrame, i: int, baseline_col: str) -> int:
+    """Get baseline trend direction: +1 bullish, -1 bearish, 0 neutral."""
+    if baseline_col not in df.columns or "close" not in df.columns:
+        return 0
+
+            price = df.loc[i, "close"]
+    baseline = df.loc[i, baseline_col]
+
+    if pd.isna(price) or pd.isna(baseline):
+        return 0
+
+    if price > baseline:
+        return 1
+    elif price < baseline:
+        return -1
+    else:
+        return 0
+
+
+def _check_filters(df: pd.DataFrame, i: int, direction: int, cfg: Dict[str, Any]) -> Tuple[bool, str]:
+    """Check if all filters pass for given direction. Returns (passed, reason)."""
+    indicators = cfg.get("indicators", {})
+    rules = cfg.get("rules", {})
+
+    # C2 filter
+    if indicators.get("use_c2", False):
+        c2_signal = _safe_get(df, "c2_signal", 0).iloc[i]
+        if c2_signal != direction:
+            return False, "c2_mismatch"
+
+    # Volume filter
+    if indicators.get("use_volume", False):
+        volume_signal = _safe_get(df, "volume_signal", 0).iloc[i]
+        if volume_signal != 1:  # Volume must be "pass" (1)
+            return False, "volume_fail"
+
+    # Baseline alignment filter
+    if indicators.get("use_baseline", False) and "baseline" in df.columns:
+        price = df.loc[i, "close"]
+        baseline = df.loc[i, "baseline"]
+
+        if not pd.isna(price) and not pd.isna(baseline):
+            # Long requires price > baseline, Short requires price < baseline
+            if direction == 1 and price <= baseline:
+                return False, "baseline_misalign"
+            elif direction == -1 and price >= baseline:
+                return False, "baseline_misalign"
+
+    # Pullback rule (requires baseline and ATR)
+    if rules.get("pullback_rule", False) and indicators.get("use_baseline", False):
+        if "baseline" in df.columns and "atr" in df.columns:
+            price = df.loc[i, "close"]
+            baseline = df.loc[i, "baseline"]
+            atr = df.loc[i, "atr"]
+
+            if not pd.isna(price) and not pd.isna(baseline) and not pd.isna(atr) and atr > 0:
+                # Check if too far from baseline
+                distance = abs(price - baseline)
+                if distance > atr:
+                    # Check previous bar too
+                    if i > 0:
+                        prev_price = df.loc[i-1, "close"]
+                        prev_baseline = df.loc[i-1, "baseline"]
+                        if not pd.isna(prev_price) and not pd.isna(prev_baseline):
+                            prev_distance = abs(prev_price - prev_baseline)
+                            if prev_distance > atr:  # Both bars too far
+                                return False, "pullback_fail"
+
+    return True, "pass"
+
+
+def _check_bridge_too_far(df: pd.DataFrame, i: int, cfg: Dict[str, Any]) -> Tuple[bool, str]:
+    """Check bridge-too-far rule for baseline-triggered entries."""
+    rules = cfg.get("rules", {})
+    bridge_days = rules.get("bridge_too_far_days", 7)
+
+    if bridge_days <= 0:
+        return True, "bridge_disabled"
+
+    # Find last C1 signal within bridge_days
+    c1_col = _detect_c1_column(df)
+    if not c1_col:
+        return False, "no_c1_col"
+
+    c1_signals = _safe_get(df, c1_col, 0)
+
+    # Look back for last non-zero C1 signal
+    for j in range(max(0, i - bridge_days), i):
+        if c1_signals.iloc[j] != 0:
+            return True, "bridge_ok"
+
+    return False, "bridge_too_far"
+
+
+def _find_last_c1_signal_bar(df: pd.DataFrame, current_i: int, lookback: int = 10) -> Optional[int]:
+    """Find the most recent bar with non-zero C1 signal."""
+    c1_col = _detect_c1_column(df)
+    if not c1_col:
+        return None
+
+    c1_signals = _safe_get(df, c1_col, 0)
+
+    for j in range(current_i - 1, max(0, current_i - lookback), -1):
+        if c1_signals.iloc[j] != 0:
+            return j
+
+    return None
+
+
+# =============================================
+# Position State Management
+# =============================================
+
+class PositionState:
+    """Track open position state."""
+
+    def __init__(self):
+        self.is_open = False
+        self.side = 0  # +1 long, -1 short
+        self.entry_i = None
+        self.entry_price = None
+        self.position_size = 1.0
+        self.tp1_at_entry_price = None
+        self.sl_at_entry_price = None
+        self.current_sl = None
+        self.tp1_hit = False
+        self.breakeven_set = False
+
+    def open_position(self, i: int, side: int, price: float, sl_price: float, tp1_price: float):
+        """Open new position with immutable audit fields."""
+        self.is_open = True
+        self.side = side
+        self.entry_i = i
+        self.entry_price = price
+        self.sl_at_entry_price = sl_price  # Immutable
+        self.tp1_at_entry_price = tp1_price  # Immutable
+        self.current_sl = sl_price  # Mutable (trails)
+        self.tp1_hit = False
+        self.breakeven_set = False
+
+    def close_position(self):
+        """Close position and reset state."""
+        self.__init__()
+
+    def update_trailing_stop(self, new_sl: float):
+        """Update trailing stop (never mutate sl_at_entry_price)."""
+        if self.is_open:
+            self.current_sl = new_sl
+
+
+# =============================================
+# Main Signal Logic Function
+# =============================================
+
+def apply_signal_logic(df: pd.DataFrame, cfg: Dict[str, Any]) -> pd.DataFrame:
+    """
+    Complete NNFX signal engine: converts indicator outputs to entry/exit decisions.
+
+    Inputs:
+        df: DataFrame with OHLC + indicator columns (c1_signal, c2_signal, baseline, etc.)
+        cfg: Configuration dict with indicators, rules, exit settings
+
+    Outputs:
+        df with new columns: entry_signal, exit_signal_final, audit fields
+    """
+    result = df.copy()
+
+    # Initialize output columns
+    result["entry_signal"] = 0
+    result["exit_signal_final"] = 0
+
+    # Initialize audit columns
+    result["entry_allowed"] = False
+    result["reason_block"] = "none"
+    result["position_open"] = False
+    result["current_sl"] = np.nan
+    result["exit_reason"] = ""
+
+    # Get configuration
+    indicators = cfg.get("indicators", {})
+    rules = cfg.get("rules", {})
+    exit_cfg = cfg.get("exit", {})
+
+    # Detect required columns
+    c1_col = _detect_c1_column(result)
+    if not c1_col:
+        # No C1 column found - return with all zeros
+        return result
+
+    # Get indicator signals
+    c1_signals = _normalize_signal(_safe_get(result, c1_col, 0))
+
+    # Position state
+    position = PositionState()
+    pending_trade = None  # For one-candle/pullback rules
+
+    # Main processing loop
+    for i in range(1, len(result)):  # Start from 1 for lookback
+        current_price = result.loc[i, "close"]
+        atr_val = result.loc[i, "atr"] if "atr" in result.columns else 20.0  # Default ATR
+
+        # =============================================
+        # POSITION MANAGEMENT (if position open)
+        # =============================================
+        if position.is_open:
+            result.loc[i, "position_open"] = True
+            result.loc[i, "current_sl"] = position.current_sl
+
+            # Check for exits (priority order)
+            exit_triggered = False
+            exit_reason = ""
+
+            # 1. Hard stop/TP exits
+            if position.side == 1:  # Long position
+                if current_price <= position.current_sl:
+                    exit_triggered = True
+                    exit_reason = "stop_hit"
+                elif position.tp1_at_entry_price and current_price >= position.tp1_at_entry_price:
+                    if not position.tp1_hit:
+                        position.tp1_hit = True
+                        # Move to breakeven after TP1 hit
+                        if exit_cfg.get("move_to_breakeven_after_atr", True):
+                            position.current_sl = position.entry_price
+                            position.breakeven_set = True
+                    # Continue running for trailing
+            else:  # Short position
+                if current_price >= position.current_sl:
+                    exit_triggered = True
+                    exit_reason = "stop_hit"
+                elif position.tp1_at_entry_price and current_price <= position.tp1_at_entry_price:
+                    if not position.tp1_hit:
+                        position.tp1_hit = True
+                        # Move to breakeven after TP1 hit
+                        if exit_cfg.get("move_to_breakeven_after_atr", True):
+                            position.current_sl = position.entry_price
+                            position.breakeven_set = True
+
+            # 2. Indicator-based exits
+            if not exit_triggered:
+                # C1 reversal exit
+                if exit_cfg.get("exit_on_c1_reversal", False):
+                    current_c1 = c1_signals.iloc[i]
+                    if current_c1 != 0 and current_c1 == -position.side:
+                        exit_triggered = True
+                        exit_reason = "c1_reversal"
+
+                # Exit indicator signal
+                if exit_cfg.get("exit_on_exit_signal", False) and "exit_signal" in result.columns:
+                    if result.loc[i, "exit_signal"] == 1:
+                        exit_triggered = True
+                        exit_reason = "exit_indicator"
+
+                # Baseline cross exit
+                if exit_cfg.get("exit_on_baseline_cross", False) and "baseline" in result.columns:
+                    if i > position.entry_i:
+                        current_trend = _get_baseline_trend(result, i, "baseline")
+                        if current_trend != 0 and current_trend == -position.side:
+                            exit_triggered = True
+                            exit_reason = "baseline_cross"
+
+            # 3. Trailing stop update (if using trailing stops)
+            if not exit_triggered and exit_cfg.get("use_trailing_stop", False):
+                if position.tp1_hit:  # Only trail after TP1 hit
+                    trail_distance = 1.5 * atr_val  # 1.5x ATR trailing distance
+                    if position.side == 1:  # Long
+                        new_sl = current_price - trail_distance
+                        if new_sl > position.current_sl:
+                            position.update_trailing_stop(new_sl)
+                    else:  # Short
+                        new_sl = current_price + trail_distance
+                        if new_sl < position.current_sl:
+                            position.update_trailing_stop(new_sl)
+
+            # Execute exit if triggered
+            if exit_triggered:
+                result.loc[i, "exit_signal_final"] = 1
+                result.loc[i, "exit_reason"] = exit_reason
+                result.loc[i, "current_sl"] = position.current_sl  # Final SL at exit
+                position.close_position()
+
+        # =============================================
+        # ENTRY LOGIC (if no position open)
+        # =============================================
+        if not position.is_open:
+            entry_direction = 0
+            entry_allowed = False
+            reason = "no_signal"
+
+            # Handle pending trade from one-candle/pullback rules
+            if pending_trade and i == pending_trade["index"] + 1:
+                # Check if filters recovered
+                filters_pass, filter_reason = _check_filters(result, i, pending_trade["direction"], cfg)
+                if filters_pass:
+                    entry_direction = pending_trade["direction"]
+                    entry_allowed = True
+                    reason = "pending_recovered"
+                else:
+                    reason = f"pending_failed_{filter_reason}"
+                pending_trade = None
+
+            # Fresh C1 signal
+            elif c1_signals.iloc[i] != 0:
+                direction = c1_signals.iloc[i]
+                filters_pass, filter_reason = _check_filters(result, i, direction, cfg)
+
+                if filters_pass:
+                    entry_direction = direction
+                    entry_allowed = True
+                    reason = "c1_signal"
+                else:
+                    # Check if one-candle or pullback rules apply
+                    if rules.get("one_candle_rule", False) or rules.get("pullback_rule", False):
+                        pending_trade = {
+                            "index": i,
+                            "direction": direction,
+                            "failed_filters": [filter_reason]
+                        }
+                        reason = f"c1_pending_{filter_reason}"
+                    else:
+                        reason = f"c1_blocked_{filter_reason}"
+
+            # Baseline as trigger (if enabled and C1 is neutral)
+            elif rules.get("allow_baseline_as_catalyst", False) and indicators.get("use_baseline", False):
+                if "baseline" in result.columns and i > 0:
+                    # Check for baseline cross (price crossing baseline)
+                    current_price = result.loc[i, "close"]
+                    current_baseline = result.loc[i, "baseline"]
+                    prev_price = result.loc[i-1, "close"]
+                    prev_baseline = result.loc[i-1, "baseline"]
+
+                    baseline_cross_direction = 0
+                    if (not pd.isna(current_price) and not pd.isna(current_baseline) and
+                        not pd.isna(prev_price) and not pd.isna(prev_baseline)):
+
+                        # Bullish cross: was below, now above
+                        if prev_price <= prev_baseline and current_price > current_baseline:
+                            baseline_cross_direction = 1
+                        # Bearish cross: was above, now below
+                        elif prev_price >= prev_baseline and current_price < current_baseline:
+                            baseline_cross_direction = -1
+
+                    if baseline_cross_direction != 0:
+                        # Check bridge-too-far rule
+                        bridge_ok, bridge_reason = _check_bridge_too_far(result, i, cfg)
+                        if bridge_ok:
+                            filters_pass, filter_reason = _check_filters(result, i, baseline_cross_direction, cfg)
+                            if filters_pass:
+                                entry_direction = baseline_cross_direction
+                                entry_allowed = True
+                                reason = "baseline_trigger"
+                            else:
+                                reason = f"baseline_blocked_{filter_reason}"
+                        else:
+                            reason = f"baseline_{bridge_reason}"
+
+            # Record decision
+            result.loc[i, "entry_allowed"] = entry_allowed
+            result.loc[i, "reason_block"] = reason
+
+            # Execute entry if allowed
+            if entry_allowed and entry_direction != 0:
+                result.loc[i, "entry_signal"] = entry_direction
+
+                # Calculate entry levels
+                entry_price = current_price
+                atr_multiplier = 2.0  # Default SL distance
+                sl_distance = atr_multiplier * atr_val
+                tp1_distance = 1.0 * atr_val  # TP1 at 1x ATR
+
+                if entry_direction == 1:  # Long
+                    sl_price = entry_price - sl_distance
+                    tp1_price = entry_price + tp1_distance
+                else:  # Short
+                    sl_price = entry_price + sl_distance
+                    tp1_price = entry_price - tp1_distance
+
+                # Open position
+                position.open_position(i, entry_direction, entry_price, sl_price, tp1_price)
+
+    return result

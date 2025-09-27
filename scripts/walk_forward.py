@@ -1,15 +1,22 @@
 # walk_forward.py — v1.9.8+ (hardened metrics, dict-friendly, no circular imports)
 from __future__ import annotations
 
-import math
-from copy import deepcopy
-from dataclasses import dataclass
-from datetime import datetime
+import sys
 from pathlib import Path
-from typing import List
 
-import numpy as np
-import pandas as pd
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+import math  # noqa: E402
+from copy import deepcopy  # noqa: E402
+from dataclasses import dataclass  # noqa: E402
+from datetime import datetime  # noqa: E402
+from pathlib import Path  # noqa: E402
+from typing import List  # noqa: E402
+
+import numpy as np  # noqa: E402
+import pandas as pd  # noqa: E402
 
 # ============================================================
 # Local safe helpers (inline to avoid any import cycles)
@@ -203,7 +210,9 @@ def _call_backtester(cfg: dict, *, start_date, end_date, run_name: str):
     Local import of backtester to avoid circular dependency.
     Accepts a dict, sets date window + per‑fold results dir, then runs the backtest.
     """
-    from backtester import run_backtest  # local import prevents circular import at module level
+    from core.backtester import (
+        run_backtest,  # local import prevents circular import at module level
+    )
 
     cfg_fold = deepcopy(cfg)
 
@@ -310,13 +319,13 @@ def run_wfo(cfg: dict):
         expectancy = 0.0
         if ns_count > 0 and not trades_df.empty:
             ns_df = (
-                trades_df.loc[not trades_df["scratch"]]
+                trades_df.loc[~trades_df["scratch"]]
                 if "scratch" in trades_df.columns
                 else trades_df
             )
             if not ns_df.empty and "pnl" in ns_df.columns and "win" in ns_df.columns:
                 avg_win = float(ns_df.loc[ns_df["win"], "pnl"].mean() or 0.0)
-                avg_loss = abs(float(ns_df.loc[not ns_df["win"], "pnl"].mean() or 0.0))
+                avg_loss = abs(float(ns_df.loc[~ns_df["win"], "pnl"].mean() or 0.0))
                 expectancy = _safe_expectancy(avg_win, avg_loss, win_rate_ns)
         else:
             print(f"[WFO] Fold {f.idx}: non_scratch=0 → win%/loss%/expectancy coerced to 0.0")

@@ -68,7 +68,7 @@ def _write_test_cfg(tmp_path: Path):
 
 
 def test_smoke_backtest_outputs(tmp_path):
-    import backtester as bt
+    from core import backtester as bt
 
     # Create test config that points to test data
     cfg_path = _write_test_cfg(tmp_path)
@@ -96,7 +96,7 @@ def test_smoke_backtest_outputs(tmp_path):
 
 
 def test_smoke_walk_forward(tmp_path):
-    import backtester as bt
+    from core import backtester as bt
 
     # Create test config that points to test data
     cfg_path = _write_test_cfg(tmp_path)
@@ -116,7 +116,7 @@ def test_smoke_walk_forward(tmp_path):
 
 def test_smoke_monte_carlo(tmp_path):
     mc = pytest.importorskip("analytics.monte_carlo")
-    import backtester as bt
+    from core import backtester as bt
 
     # Create test config that points to test data
     cfg_path = _write_test_cfg(tmp_path)

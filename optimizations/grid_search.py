@@ -13,7 +13,7 @@ import yaml
 # =========================================
 # 📂 CONFIG HELPERS
 # =========================================
-def load_base_config(path="config.yaml"):
+def load_base_config(path="configs/config.yaml"):
     with open(path, "r") as f:
         return yaml.safe_load(f)
 
@@ -66,7 +66,7 @@ def run_grid_search():
         write_temp_config(config, temp_path)
 
         print(f"\n🚀 Running config: {c1}, vol={vol}, base={base}, SL={sl}, TP={tp}")
-        subprocess.run(["python", "backtester.py", temp_path])
+        subprocess.run(["python", "core/backtester.py", temp_path])
 
         roi = evaluate_run()
         all_runs.append((roi, combo))

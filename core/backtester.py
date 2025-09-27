@@ -28,7 +28,14 @@ from typing import Any, Dict, List, Optional, Union
 # 3rd-party
 import pandas as pd
 
-from backtester_helpers import finalize_trade_row
+from core.backtester_helpers import finalize_trade_row
+
+# project utils
+from core.utils import (
+    calculate_atr,
+    get_pip_size,
+    pip_value_per_lot,
+)
 
 # caching
 from indicators_cache import (
@@ -39,23 +46,16 @@ from indicators_cache import (
     save_to_cache,
 )
 
-# project utils
-from utils import (
-    calculate_atr,
-    get_pip_size,
-    pip_value_per_lot,
-)
-
 # optional helpers (present in your project)
 from validators_config import load_and_validate_config
 from validators_util import validate_contract
 
 # signal logic
 try:
-    from signal_logic import apply_signal_logic  # required
+    from core.signal_logic import apply_signal_logic  # required
 except Exception as e:
     raise ImportError(
-        "Could not import 'apply_signal_logic' from signal_logic.py. "
+        "Could not import 'apply_signal_logic' from core.signal_logic.py. "
         "Ensure it defines: def apply_signal_logic(df: pd.DataFrame, config: dict) -> pd.DataFrame\n"
         f"Underlying error: {e}"
     )
@@ -155,13 +155,13 @@ def intrabar_sequence(priority: str) -> List[str]:
     return ["tp", "sl"]  # default
 
 
-def load_config(config_path: PathLikeT = "config.yaml") -> dict:
+def load_config(config_path: PathLikeT = "configs/config.yaml") -> dict:
     """Load + validate YAML config using validators_config."""
     path = Path(config_path)
     if not path.exists():
         # search upward a bit
         for root in (Path.cwd(), Path.cwd().parent, Path.cwd().parent.parent):
-            cand = root / "config.yaml"
+            cand = root / "configs" / "config.yaml"
             if cand.exists():
                 path = cand
                 break
@@ -960,7 +960,7 @@ def simulate_pair_trades(
 
 
 def run_backtest(
-    config_path: PathLikeT | dict = "config.yaml",
+    config_path: PathLikeT | dict = "configs/config.yaml",
     results_dir: Optional[PathLike] = None,
 ):
     # load config
@@ -1237,7 +1237,7 @@ def _slice_df_by_dates(df: pd.DataFrame, start: pd.Timestamp, end: pd.Timestamp)
 
 
 def run_backtest_walk_forward(
-    config_path: PathLikeT = "config.yaml", results_dir: Optional[PathLike] = None
+    config_path: PathLikeT = "configs/config.yaml", results_dir: Optional[PathLike] = None
 ) -> None:
     cfg = load_config(config_path)
 
@@ -1518,7 +1518,7 @@ def run_backtest_walk_forward(
 
     # OOS summary (best effort)
     try:
-        from utils import summarize_results
+        from core.utils import summarize_results
 
         txt = summarize_results(results_dir=str(out_dir), config_path=str(config_path))
     except Exception:

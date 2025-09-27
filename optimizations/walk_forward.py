@@ -13,7 +13,7 @@ import yaml
 # =========================================
 # 📂 CONFIG HELPERS
 # =========================================
-def load_base_config(path="config.yaml"):
+def load_base_config(path="configs/config.yaml"):
     with open(path, "r") as f:
         return yaml.safe_load(f)
 
@@ -55,7 +55,7 @@ def run_walk_forward(pair, window=250, step=50):
         write_temp_config(config, temp_config_path)
 
         print(f"\n🚀 Running Walk Forward Segment {segment}...")
-        result = subprocess.run(["python", "backtester.py", temp_config_path])
+        result = subprocess.run(["python", "core/backtester.py", temp_config_path])
         if result.returncode != 0:
             print(f"❌ Segment {segment} failed.")
 

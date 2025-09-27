@@ -26,9 +26,9 @@ import pandas as pd
 import yaml
 
 # --- Project paths
-ROOT = Path(__file__).parent
-CONFIG = ROOT / "config.yaml"
-SWEEPS = ROOT / "sweeps.yaml"
+ROOT = Path(__file__).parent.parent  # scripts/ -> project root
+CONFIG = ROOT / "configs" / "config.yaml"
+SWEEPS = ROOT / "configs" / "sweeps.yaml"
 RESULTS = ROOT / "results"
 HISTORY = RESULTS / "results_history"
 CONSOLIDATED = RESULTS / "c1_batch_results.csv"  # keep name for continuity
@@ -284,7 +284,7 @@ def append_consolidated(rows: list[dict]):
 
 
 def worker_job(run_id: int, base_config_path: Path, merged_cfg: dict, run_slug: str) -> dict:
-    from backtester import run_backtest
+    from core.backtester import run_backtest
 
     datetime.now().strftime("%Y%m%d_%H%M%S")
     run_tmp = Path(tempfile.mkdtemp(prefix=f"sweep_{run_id}_"))

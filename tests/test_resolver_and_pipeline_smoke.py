@@ -147,11 +147,11 @@ def test_confirm_resolver_shared_pool():
 # ---------------------------------------------------
 def test_wfo_mc_pipeline_smoke(tmp_path, monkeypatch):
     # Imports
-    import backtester
     import indicators_cache
-    import signal_logic as _slogic
-    import utils as _utils
     import validators_util as _vutil
+    from core import backtester
+    from core import signal_logic as _slogic
+    from core import utils as _utils
 
     importlib.reload(backtester)
     importlib.reload(indicators_cache)
@@ -276,7 +276,7 @@ def test_wfo_mc_pipeline_smoke(tmp_path, monkeypatch):
 
     # --- Run Monte Carlo (per-trade mode for robustness) ---
     from analytics.monte_carlo import run_monte_carlo
-    from backtester import load_config
+    from core.backtester import load_config
 
     cfg = load_config(str(cfg_path))
     # keep horizon=oos; per-trade shuffling is set in cfg writer above

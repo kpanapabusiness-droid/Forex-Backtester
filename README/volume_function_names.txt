@@ -1,7 +1,0 @@
-volume_william_vix_fix
-volume_volatility_ratio
-volume_silence
-volume_ttms
-volume_normalized_volume
-volume_stiffness_indicator
-volume_adx

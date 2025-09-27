@@ -1,4 +1,4 @@
-# C1-only sweep configuration
+# C1-only sweep configuration for Top-5 discovery (2015-2024)
 role_filters: ["c1"]
 
 discover:
@@ -9,7 +9,62 @@ discover:
   exit: false
 
 allowlist:
-  c1: ["c1_supertrend", "c1_twiggs_money_flow", "c1_disparity_index", "c1_aroon", "c1_doda_stochastic", "c1_vortex_indicator", "c1_forecast", "c1_ttf", "c1_zerolag_macd"]
+  c1: [
+    "twiggs_money_flow",
+    "disparity_index",
+    "trend_akkam",
+    "kalman_filter",
+    "fisher_transform",
+    "ehlers_eot",
+    "coral",
+    "chandelier_exit",
+    "glitch_index",
+    "metro_advanced",
+    "ehlers_roofing_filter",
+    "perfect_trend_line",
+    "hacolt_lines",
+    "band_pass_filter",
+    "ehlers_deli",
+    "forecast",
+    "grucha_percentage_index",
+    "turtle_trading_channel",
+    "smoothed_momentum",
+    "polarized_fractal_efficiency",
+    "ttf",
+    "doda_stochastic",
+    "ehlers_reverse_ema",
+    "top_bottom_nr",
+    "price_momentum_oscillator",
+    "sherif_hilo",
+    "ergodic_tvi",
+    "dpo_histogram",
+    "lwpi",
+    "aroon",
+    "bears_bulls_impulse",
+    "smooth_step",
+    "ehlers_cg",
+    "trend_continuation",
+    "cyber_cycle",
+    "is_calculation",
+    "supertrend",
+    "decycler_oscillator",
+    "linear_regression_slope",
+    "trendilo",
+    "third_gen_ma",
+    "vulkan_profit",
+    "top_trend",
+    "vortex_indicator",
+    "schaff_trend_cycle",
+    "laguerre",
+    "tp_trend_pivot",
+    "wpr_ma",
+    "zerolag_macd",
+    "ease_of_movement",
+    "trend_lord",
+    "hlc_trend",
+    "aso",
+    "kuskus_starlight"
+  ]
 blocklist:
   c1: []
 
@@ -26,7 +81,7 @@ static_overrides:
     start: "2015-01-01"
     end: "2024-12-31"
   output:
-    results_dir: "results_history/c1_sweep"
+    results_dir: "results_history/c1_only_2015_2024"
   spreads:
     enabled: false
   filters:
@@ -35,10 +90,12 @@ static_overrides:
   rules:
     one_candle_rule: false
     pullback_rule: false
+    c1_only_entries: true
   tracking:
     track_win_loss_scratch: true
     track_roi: true
     track_drawdown: true
+    track_equity_curve: true
 
 parallel:
   workers: auto
@@ -49,3 +106,21 @@ scoring:
   max_dd_w: 0.7
   trades_penalty_w: 0.0
   min_trades: 0
+
+# Leaderboard and filtering
+metrics:
+  leaderboard_keys: ["MAR", "ROI_pct", "MaxDD_pct", "Win_pct", "Loss_pct", "Scratch_pct", "Expectancy", "Trades", "Sharpe", "Sortino"]
+  sort_by: ["MAR:desc", "ROI_pct:desc", "MaxDD_pct:asc"]
+  guards:
+    maxdd_pct_lte: 40.0
+    mar_gte: 0.20
+
+# Pruning and snapshots
+prune:
+  keep_top_k: 5
+  rank_keys: ["MAR:desc", "ROI_pct:desc", "MaxDD_pct:asc"]
+  keep_top_n_per_indicator: 1
+
+snapshots:
+  enabled: true
+  path: "results_history/run_snapshots"

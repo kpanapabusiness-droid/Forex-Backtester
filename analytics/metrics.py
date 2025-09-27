@@ -213,3 +213,36 @@ def metrics_from_equity(equity_df, trades_df=None, rf_annual: float = 0.0) -> di
     if isinstance(trades_df, (str, Path)):
         trades_df = pd.read_csv(trades_df)
     return compute_all(equity_df, trades_df, rf_annual)
+
+
+def compute_rates(total_trades: int, wins: int, losses: int, scratches: int) -> dict:
+    """
+    Compute win/loss/scratch rates with canonical definitions:
+    - win_rate, loss_rate: based on non-scratch trades (wins+losses)
+    - scratch_rate: based on total trades
+    """
+    non_scratch = max(wins + losses, 0)
+    base_total = max(total_trades, 0)
+
+    if non_scratch > 0:
+        win_rate_ns = wins / non_scratch
+        loss_rate_ns = losses / non_scratch
+    else:
+        win_rate_ns = 0.0
+        loss_rate_ns = 0.0
+
+    scratch_rate_tot = (scratches / base_total) if base_total > 0 else 0.0
+
+    # Public canonical rates for the table:
+    win_rate = win_rate_ns
+    loss_rate = loss_rate_ns
+    scratch_rate = scratch_rate_tot
+
+    return {
+        "win_rate_ns": win_rate_ns,
+        "loss_rate_ns": loss_rate_ns,
+        "scratch_rate_tot": scratch_rate_tot,
+        "win_rate": win_rate,
+        "loss_rate": loss_rate,
+        "scratch_rate": scratch_rate,
+    }

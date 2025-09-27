@@ -319,9 +319,25 @@ def summarize_results(
     scratches = int(trades["scratch"].sum()) if "scratch" in trades else 0
     ns_count = int(wins + losses)
 
-    win_pct_ns = 100.0 * safe_ratio(wins, ns_count, default=0.0)
-    loss_pct_ns = 100.0 * safe_ratio(losses, ns_count, default=0.0)
-    scratch_pct_total = 100.0 * safe_ratio(scratches, total, default=0.0)
+    # Use compute_rates for consistent rate calculations
+    try:
+        from analytics.metrics import compute_rates
+
+        rates = compute_rates(total, wins, losses, scratches)
+        win_pct_ns = rates["win_rate_ns"] * 100.0
+        loss_pct_ns = rates["loss_rate_ns"] * 100.0
+        scratch_pct_total = rates["scratch_rate_tot"] * 100.0
+        win_pct = rates["win_rate"] * 100.0
+        loss_pct = rates["loss_rate"] * 100.0
+        scratch_pct = rates["scratch_rate"] * 100.0
+    except ImportError:
+        # Fallback calculation
+        win_pct_ns = 100.0 * safe_ratio(wins, ns_count, default=0.0)
+        loss_pct_ns = 100.0 * safe_ratio(losses, ns_count, default=0.0)
+        scratch_pct_total = 100.0 * safe_ratio(scratches, total, default=0.0)
+        win_pct = win_pct_ns
+        loss_pct = loss_pct_ns
+        scratch_pct = scratch_pct_total
 
     # Expectancy (per trade, $) on non-scratch set
     if ns_count > 0:
@@ -370,6 +386,9 @@ def summarize_results(
         "win_rate_ns": win_pct_ns,
         "loss_rate_ns": loss_pct_ns,
         "scratch_rate_tot": scratch_pct_total,
+        "win_rate": win_pct,
+        "loss_rate": loss_pct,
+        "scratch_rate": scratch_pct,
         "expectancy": expectancy,
         "roi_dollars": roi_dollars,
         "roi_pct": roi_pct if roi_pct is not None and np.isfinite(roi_pct) else 0.0,

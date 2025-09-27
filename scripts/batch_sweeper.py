@@ -25,6 +25,31 @@ from pathlib import Path
 import pandas as pd
 import yaml
 
+# Import compute_rates from analytics
+try:
+    from analytics.metrics import compute_rates
+except ImportError:
+    # Fallback if import fails
+    def compute_rates(total_trades: int, wins: int, losses: int, scratches: int) -> dict:
+        non_scratch = max(wins + losses, 0)
+        base_total = max(total_trades, 0)
+        if non_scratch > 0:
+            win_rate_ns = wins / non_scratch
+            loss_rate_ns = losses / non_scratch
+        else:
+            win_rate_ns = 0.0
+            loss_rate_ns = 0.0
+        scratch_rate_tot = (scratches / base_total) if base_total > 0 else 0.0
+        return {
+            "win_rate_ns": win_rate_ns,
+            "loss_rate_ns": loss_rate_ns,
+            "scratch_rate_tot": scratch_rate_tot,
+            "win_rate": win_rate_ns,
+            "loss_rate": loss_rate_ns,
+            "scratch_rate": scratch_rate_tot,
+        }
+
+
 # --- Project paths
 ROOT = Path(__file__).parent.parent  # scripts/ -> project root
 CONFIG = ROOT / "configs" / "config.yaml"
@@ -55,6 +80,9 @@ FIELDNAMES = [
     "win_rate_ns",
     "loss_rate_ns",
     "scratch_rate_tot",
+    "win_rate",
+    "loss_rate",
+    "scratch_rate",
     "roi_dollars",
     "roi_pct",
     "max_dd_pct",
@@ -71,6 +99,9 @@ SUMMARY_KEY_MAP = {
     "win_rate_ns": ["Win% (NS)", "Win% (non-scratch)"],
     "loss_rate_ns": ["Loss% (NS)", "Loss% (non-scratch)"],
     "scratch_rate_tot": ["Scratch% (of total)", "Scratch%"],
+    "win_rate": ["Win%"],
+    "loss_rate": ["Loss%"],
+    "scratch_rate": ["Scratch%"],
     "roi_dollars": ["ROI ($)"],
     "roi_pct": ["ROI (%)"],
     "max_dd_pct": ["Max DD (%)", "max_dd_pct"],
@@ -138,14 +169,13 @@ def compute_metrics_from_trades(trades_csv_path: Path, starting_balance: float =
         return {}
     df = pd.read_csv(trades_csv_path)
     if df.empty:
+        rates = compute_rates(0, 0, 0, 0)
         return {
             "total_trades": 0,
             "wins": 0,
             "losses": 0,
             "scratches": 0,
-            "win_rate_ns": 0.0,
-            "loss_rate_ns": 0.0,
-            "scratch_rate_tot": 0.0,
+            **{k: round(v * 100.0, 2) for k, v in rates.items()},  # Convert to percentages
             "roi_dollars": 0.0,
             "roi_pct": 0.0,
             "max_dd_pct": 0.0,
@@ -163,14 +193,16 @@ def compute_metrics_from_trades(trades_csv_path: Path, starting_balance: float =
     peak = cum.cummax()
     dd = (peak - cum) / peak.replace(0, 1)
     max_dd_pct = float(dd.max() * 100.0) if len(dd) else 0.0
+
+    # Use compute_rates for consistent rate calculations
+    rates = compute_rates(total, wins, losses, scratches)
+
     return {
         "total_trades": total,
         "wins": wins,
         "losses": losses,
         "scratches": scratches,
-        "win_rate_ns": round((wins / non_scratch * 100.0) if non_scratch else 0.0, 2),
-        "loss_rate_ns": round((losses / non_scratch * 100.0) if non_scratch else 0.0, 2),
-        "scratch_rate_tot": round((scratches / total * 100.0) if total else 0.0, 2),
+        **{k: round(v * 100.0, 2) for k, v in rates.items()},  # Convert to percentages
         "roi_dollars": round(roi_dollars, 2),
         "roi_pct": round(roi_pct, 2),
         "max_dd_pct": round(max_dd_pct, 2),
@@ -461,6 +493,9 @@ def main(sweeps_path=SWEEPS):
                 "win_rate_ns": metrics.get("win_rate_ns", 0.0),
                 "loss_rate_ns": metrics.get("loss_rate_ns", 0.0),
                 "scratch_rate_tot": metrics.get("scratch_rate_tot", 0.0),
+                "win_rate": metrics.get("win_rate", 0.0),
+                "loss_rate": metrics.get("loss_rate", 0.0),
+                "scratch_rate": metrics.get("scratch_rate", 0.0),
                 "roi_dollars": metrics.get("roi_dollars", 0.0),
                 "roi_pct": metrics.get("roi_pct", 0.0),
                 "max_dd_pct": metrics.get("max_dd_pct", 0.0),

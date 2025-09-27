@@ -31,4 +31,4 @@ def test_exit_on_c1_reversal_disabled():
     df = _df_with_signals()
     cfg = {"indicators": {}, "rules": {}, "exit": {"exit_on_c1_reversal": False}}
     out = apply_signal_logic(df, cfg)
-    assert pd.isna(out.loc[3, "exit_signal"])
+    assert out.loc[3, "exit_signal"] == 0  # Should be 0 (int) when disabled, not NaN

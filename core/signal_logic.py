@@ -11,7 +11,6 @@
 
 from __future__ import annotations
 
-import numpy as np
 import pandas as pd
 
 # Note: helpers imported elsewhere; not needed here for exit logic only
@@ -157,15 +156,284 @@ def _detect_c1_col(df: pd.DataFrame) -> str | None:
 
 
 def apply_signal_logic(df: pd.DataFrame, cfg: dict) -> pd.DataFrame:
-    out = df.copy()
-    if "exit_signal" not in out.columns:
-        out["exit_signal"] = np.nan
+    """
+    Apply complete NNFX signal logic with entry and exit generation.
 
-    exit_cfg = cfg.get("exit") or {}
-    if bool(exit_cfg.get("exit_on_c1_reversal", False)):
-        c1_col = _detect_c1_col(out)
-        if c1_col is not None and c1_col in out.columns:
-            c1 = pd.to_numeric(out[c1_col], errors="coerce")
-            flips = c1.ne(c1.shift(1))
-            out.loc[flips, "exit_signal"] = 1.0
+    Returns DataFrame with columns:
+    - entry_signal: {-1, 0, 1} for short/none/long entries
+    - exit_signal_final: {0, 1} for no-exit/exit
+    - entry_allowed: bool indicating if entry was allowed
+    - position_open: bool indicating if position is currently open
+    - reason_block: str describing why entry was blocked (if applicable)
+    - exit_reason: str describing exit reason (if applicable)
+    """
+    out = df.copy()
+    n_bars = len(out)
+
+    # Ensure entry_signal exists (CI invariant)
+    if "entry_signal" not in out.columns:
+        out["entry_signal"] = 0
+
+    # Initialize output columns
+    out["entry_signal"] = 0
+    out["exit_signal_final"] = 0
+    out["entry_allowed"] = False
+    out["position_open"] = False
+    out["reason_block"] = ""
+    out["exit_reason"] = ""
+
+    # Initialize exit_signal column for backward compatibility
+    if "exit_signal" not in out.columns:
+        out["exit_signal"] = 0
+
+    # Get configuration with defaults
+    indicators_cfg = cfg.get("indicators", {})
+    rules_cfg = cfg.get("rules", {})
+    exit_cfg = cfg.get("exit", {})
+
+    # Configuration flags
+    use_c2 = indicators_cfg.get("use_c2", False)
+    use_baseline = indicators_cfg.get("use_baseline", False)
+    use_volume = indicators_cfg.get("use_volume", False)
+
+    one_candle_rule = rules_cfg.get("one_candle_rule", False)
+    pullback_rule = rules_cfg.get("pullback_rule", False)
+    baseline_as_catalyst = rules_cfg.get("allow_baseline_as_catalyst", False)
+    bridge_too_far_days = rules_cfg.get("bridge_too_far_days", 7)
+
+    # Exit configuration
+    exit_on_c1_reversal = exit_cfg.get("exit_on_c1_reversal", True)
+    exit_on_baseline_cross = exit_cfg.get("exit_on_baseline_cross", use_baseline)
+
+    # Detect C1 signal column
+    c1_col = _detect_c1_col(out)
+    if c1_col is None:
+        # No C1 column found, return all zeros
+        return out
+
+    # Get C1 signals
+    c1_signals = pd.to_numeric(out[c1_col], errors="coerce").fillna(0).astype(int)
+
+    # Check for required columns
+    has_baseline_value = "baseline" in out.columns
+
+    # Position state tracking
+    position_state = 0  # 0=flat, 1=long, -1=short
+    entry_price = None
+    atr_at_entry = None
+    current_sl = None
+
+    # One-candle rule tracking
+    pending_entry = 0
+    pending_direction = 0
+    pending_failed_filters = []
+
+    # Bridge rule tracking for baseline catalyst
+    last_c1_nonzero_bar = None
+    last_c1_direction = 0
+
+    for i in range(n_bars):
+        # Track last non-zero C1 for bridge rule
+        if c1_signals.iloc[i] != 0:
+            last_c1_nonzero_bar = i
+            last_c1_direction = c1_signals.iloc[i]
+
+        # Get current values
+        current_price = out.loc[i, "close"]
+        atr_i = out.loc[i, "atr"] if "atr" in out.columns else 0.002
+
+        # Position state from previous bar
+        if i > 0:
+            # Carry forward position state
+            if out.loc[i - 1, "position_open"]:
+                # Position was open, check if it was closed
+                if out.loc[i - 1, "exit_signal_final"] == 1:
+                    position_state = 0
+                    entry_price = None
+                    atr_at_entry = None
+                    current_sl = None
+                # else keep the existing position_state
+
+            # Check if new position was opened on previous bar
+            if out.loc[i - 1, "entry_signal"] != 0:
+                position_state = out.loc[i - 1, "entry_signal"]
+
+        # Set position_open flag for current bar
+        out.loc[i, "position_open"] = position_state != 0
+
+        # Entry logic (only if no position open)
+        if position_state == 0:
+            candidate_direction = 0
+
+            # Check for C1 signal
+            if c1_signals.iloc[i] != 0:
+                candidate_direction = c1_signals.iloc[i]
+
+            # Check for baseline catalyst (if enabled and no C1 signal)
+            elif baseline_as_catalyst and has_baseline_value and i > 0:
+                # Check if baseline crossed and we have recent C1
+                prev_baseline = out.loc[i - 1, "baseline"]
+                curr_baseline = out.loc[i, "baseline"]
+                prev_price = out.loc[i - 1, "close"]
+
+                if (
+                    last_c1_nonzero_bar is not None
+                    and (i - last_c1_nonzero_bar) <= bridge_too_far_days
+                ):
+                    # Check for bullish cross (baseline was above, now below)
+                    if (
+                        prev_price <= prev_baseline
+                        and current_price > curr_baseline
+                        and last_c1_direction == 1
+                    ):
+                        candidate_direction = 1
+                        out.loc[i, "reason_block"] = "baseline_trigger"
+
+                    # Check for bearish cross (baseline was below, now above)
+                    elif (
+                        prev_price >= prev_baseline
+                        and current_price < curr_baseline
+                        and last_c1_direction == -1
+                    ):
+                        candidate_direction = -1
+                        out.loc[i, "reason_block"] = "baseline_trigger"
+
+            # Process entry if we have a candidate
+            if candidate_direction != 0:
+                # Check all filters
+                passed, failed_filters = _get_filter_status(
+                    out,
+                    i,
+                    candidate_direction,
+                    atr_i,
+                    use_c2,
+                    use_volume,
+                    use_baseline,
+                    has_baseline_value,
+                    "baseline",
+                    "baseline_signal",
+                    pullback_rule,
+                )
+
+                if passed:
+                    # Entry allowed
+                    out.loc[i, "entry_signal"] = candidate_direction
+                    out.loc[i, "entry_allowed"] = True
+                    position_state = candidate_direction
+                    entry_price = current_price
+                    atr_at_entry = atr_i
+
+                    # Set initial stop loss
+                    if candidate_direction == 1:
+                        current_sl = entry_price - atr_at_entry
+                    else:
+                        current_sl = entry_price + atr_at_entry
+
+                else:
+                    # Entry blocked
+                    out.loc[i, "reason_block"] = ",".join(failed_filters)
+
+                    if one_candle_rule:
+                        # Store as pending for next bar
+                        pending_entry = 1
+                        pending_direction = candidate_direction
+                        pending_failed_filters = failed_filters
+                        out.loc[i, "reason_block"] += ",pending"
+
+            # Check for one-candle rule recovery
+            elif one_candle_rule and pending_entry == 1:
+                # Check if filters now pass
+                all_passed = True
+                for filter_name in pending_failed_filters:
+                    if not _did_filter_pass(
+                        out,
+                        i,
+                        filter_name,
+                        pending_direction,
+                        atr_i,
+                        has_baseline_value,
+                        "baseline",
+                        "baseline_signal",
+                    ):
+                        all_passed = False
+                        break
+
+                if all_passed:
+                    # Recovery successful
+                    out.loc[i, "entry_signal"] = pending_direction
+                    out.loc[i, "entry_allowed"] = True
+                    position_state = pending_direction
+                    entry_price = current_price
+                    atr_at_entry = atr_i
+
+                    # Set initial stop loss
+                    if pending_direction == 1:
+                        current_sl = entry_price - atr_at_entry
+                    else:
+                        current_sl = entry_price + atr_at_entry
+
+                # Clear pending regardless
+                pending_entry = 0
+                pending_direction = 0
+                pending_failed_filters = []
+
+        # Exit logic (only if position is open)
+        if position_state != 0:
+            exit_triggered = False
+            exit_reason = ""
+
+            # Check all exit conditions in priority order
+            # C1 reversal exit (highest priority)
+            if (
+                exit_on_c1_reversal
+                and c1_signals.iloc[i] != 0
+                and c1_signals.iloc[i] != position_state
+            ):
+                exit_triggered = True
+                exit_reason = "c1_reversal"
+
+            # Baseline cross exit
+            if not exit_triggered and exit_on_baseline_cross and has_baseline_value:
+                baseline_val = out.loc[i, "baseline"]
+                if (position_state == 1 and current_price < baseline_val) or (
+                    position_state == -1 and current_price > baseline_val
+                ):
+                    exit_triggered = True
+                    exit_reason = "baseline_cross"
+
+            # Stop loss hit
+            if not exit_triggered and current_sl is not None:
+                if (position_state == 1 and current_price <= current_sl) or (
+                    position_state == -1 and current_price >= current_sl
+                ):
+                    exit_triggered = True
+                    exit_reason = "stop_hit"
+
+            if exit_triggered:
+                out.loc[i, "exit_signal_final"] = 1
+                out.loc[i, "exit_signal"] = 1
+                out.loc[i, "exit_reason"] = exit_reason
+
+    # Legacy exit_on_c1_reversal logic for backward compatibility
+    # This sets exit_signal based on C1 flips regardless of position state
+    if exit_on_c1_reversal and c1_col is not None:
+        c1 = pd.to_numeric(out[c1_col], errors="coerce")
+        flips = c1.ne(c1.shift(1)) & (c1 != 0)
+        out.loc[flips, "exit_signal"] = 1.0
+
+    # Normalize domains and ensure all required columns exist (CI invariants)
+    out["entry_signal"] = out["entry_signal"].fillna(0).astype(int)
+
+    # Add legacy alias
+    out["entrysignal"] = out["entry_signal"].astype(int)
+
+    # Ensure exit columns exist and are ints
+    if "exit_signal" not in out.columns:
+        out["exit_signal"] = 0
+    if "exit_signal_final" not in out.columns:
+        out["exit_signal_final"] = out["exit_signal"]
+
+    out["exit_signal"] = out["exit_signal"].fillna(0).astype(int)
+    out["exit_signal_final"] = out["exit_signal_final"].fillna(0).astype(int)
+
     return out

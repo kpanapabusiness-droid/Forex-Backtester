@@ -118,6 +118,8 @@ Forex_Backtester/
 ```bash
 # Smoke test
 python scripts/smoke_test_selfcontained_v198.py --mode fast
+# Or with quiet output:
+python scripts/smoke_test_selfcontained_v198.py -q --mode fast
 
 # Main backtest
 python core/backtester.py configs/config.yaml

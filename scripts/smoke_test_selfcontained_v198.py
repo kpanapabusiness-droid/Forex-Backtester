@@ -38,9 +38,13 @@ CACHE_DIRS = [PROJECT_ROOT / ".cache", PROJECT_ROOT / "Cache", PROJECT_ROOT / "c
 # Add project root to Python path for imports
 sys.path.insert(0, str(PROJECT_ROOT))
 
+# Global quiet flag (set by main function)
+_QUIET = False
+
 
 def info(msg):
-    print(f"ℹ️  {msg}")
+    if not _QUIET:
+        print(f"ℹ️  {msg}")
 
 
 def ok(msg):
@@ -699,9 +703,14 @@ def check_cache(core: Dict[str, Any], cfg: dict, run_dir: Path):
 
 # ------------------------------ main ----------------------------------------
 def main():
+    global _QUIET
     ap = argparse.ArgumentParser(description="Self-contained smoketest (no config.yaml needed)")
     ap.add_argument("--mode", choices=["fast", "full"], default="fast")
+    ap.add_argument("-q", "--quiet", action="store_true", help="Suppress non-essential output")
     args = ap.parse_args()
+
+    # Set global quiet flag
+    _QUIET = args.quiet
 
     check_environment()
     core = import_core()

@@ -59,6 +59,8 @@ Forex_Backtester/
 ### 1. Run Smoke Test
 ```bash
 python scripts/smoke_test_selfcontained_v198.py --mode fast
+# Or with quiet output:
+python scripts/smoke_test_selfcontained_v198.py -q --mode fast
 ```
 
 ### 2. Basic Backtest
@@ -207,7 +209,7 @@ ruff check .
 ### Adding New Indicators
 1. Add function to appropriate `indicators/*_funcs.py` file
 2. Follow the indicator contract for that role
-3. Test with smoke test: `python scripts/smoke_test_selfcontained_v198.py --mode fast`
+3. Test with smoke test: `python scripts/smoke_test_selfcontained_v198.py --mode fast` (add `-q` for quiet output)
 
 ### TDD Workflow
 1. Write failing test first

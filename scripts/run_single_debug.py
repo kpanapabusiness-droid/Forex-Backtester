@@ -30,7 +30,11 @@ import yaml
 PROJECT_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
+import pandas as pd  # noqa: E402
+
 from core.backtester import run_backtest  # noqa: E402
+from core.utils import calculate_atr  # noqa: E402
+from indicators_cache import apply_indicators_with_cache  # noqa: E402
 
 
 def create_minimal_config(
@@ -157,6 +161,210 @@ def print_trades_summary(trades_file: Path) -> None:
         print(f"   ❌ Error reading trades: {e}")
 
 
+def generate_entry_signals(df: pd.DataFrame, cfg: Dict[str, Any]) -> pd.DataFrame:
+    """Generate entry signals from C1 and baseline indicators following NNFX rules."""
+    result = df.copy()
+
+    # Initialize entry signal column
+    result["entry_signal"] = 0
+
+    # Get C1 signal column
+    c1_col = "c1_signal"
+    if c1_col not in result.columns:
+        return result
+
+    # Get baseline info
+    use_baseline = cfg.get("indicators", {}).get("use_baseline", False)
+    baseline_col = "baseline"  # The price series
+
+    # Simple entry logic: C1 signal must align with baseline trend
+    for i in range(1, len(result)):  # Start from 1 to avoid lookback issues
+        c1_signal = result.loc[i, c1_col]
+
+        if c1_signal == 0:
+            continue
+
+        # Check baseline alignment if enabled
+        entry_allowed = True
+        if use_baseline and baseline_col in result.columns:
+            price = result.loc[i, "close"]
+            baseline_value = result.loc[i, baseline_col]
+
+            # Long: price above baseline, Short: price below baseline
+            if c1_signal == 1 and price <= baseline_value:
+                entry_allowed = False
+            elif c1_signal == -1 and price >= baseline_value:
+                entry_allowed = False
+
+        if entry_allowed:
+            result.loc[i, "entry_signal"] = c1_signal
+
+    return result
+
+
+def create_decision_log(df: pd.DataFrame, cfg: Dict[str, Any]) -> pd.DataFrame:
+    """Create per-bar decision log for debugging."""
+    decisions = []
+
+    # Get relevant columns
+    c1_col = "c1_signal"
+    baseline_col = "baseline"
+    entry_col = "entry_signal"
+
+    use_baseline = cfg.get("indicators", {}).get("use_baseline", False)
+
+    for i in range(len(df)):
+        row = df.iloc[i]
+        ts = row.get("date", row.name)
+
+        c1_signal = row.get(c1_col, 0)
+        baseline_trend = "neutral"
+        entry_signal = row.get(entry_col, 0)
+        entry_allowed = False
+        reason = "no_c1"
+
+        # Determine baseline trend
+        if use_baseline and baseline_col in df.columns:
+            price = row.get("close", 0)
+            baseline_value = row.get(baseline_col, 0)
+            baseline_trend = (
+                "bullish"
+                if price > baseline_value
+                else "bearish"
+                if price < baseline_value
+                else "neutral"
+            )
+
+        # Determine entry decision
+        if c1_signal != 0:
+            if not use_baseline:
+                entry_allowed = True
+                reason = "c1_signal"
+            elif baseline_col in df.columns:
+                price = row.get("close", 0)
+                baseline_value = row.get(baseline_col, 0)
+
+                if c1_signal == 1 and price > baseline_value:
+                    entry_allowed = True
+                    reason = "c1_bullish_aligned"
+                elif c1_signal == -1 and price < baseline_value:
+                    entry_allowed = True
+                    reason = "c1_bearish_aligned"
+                else:
+                    entry_allowed = False
+                    reason = "wrong_trend"
+            else:
+                entry_allowed = False
+                reason = "no_baseline_data"
+
+        decisions.append(
+            {
+                "ts": ts,
+                "c1_signal": c1_signal,
+                "baseline_trend": baseline_trend,
+                "entry_signal": entry_signal,
+                "entry_allowed": entry_allowed,
+                "reason": reason,
+            }
+        )
+
+    return pd.DataFrame(decisions)
+
+
+def export_indicator_series(df: pd.DataFrame, output_file: Path) -> None:
+    """Export indicator series to CSV."""
+    # Select relevant columns for export
+    export_cols = ["date"] if "date" in df.columns else []
+
+    # Add OHLC if available
+    for col in ["open", "high", "low", "close"]:
+        if col in df.columns:
+            export_cols.append(col)
+
+    # Add indicator columns
+    for col in df.columns:
+        if "signal" in col.lower() or col == "baseline" or col == "atr":
+            export_cols.append(col)
+
+    # Create export dataframe
+    export_df = df[export_cols].copy()
+
+    # Rename columns for clarity
+    if "close" in export_df.columns:
+        export_df = export_df.rename(columns={"close": "price"})
+
+    # Save to CSV
+    output_file.parent.mkdir(parents=True, exist_ok=True)
+    export_df.to_csv(output_file, index=False)
+
+
+def run_backtest_with_debug(
+    config: Dict[str, Any],
+    output_dir: Path,
+    debug_decisions: bool = False,
+    export_indicator: bool = False,
+):
+    """Run backtest with optional debugging features."""
+    from core.utils import load_pair_csv
+
+    # Get pair and data directory
+    pairs = config.get("pairs", [])
+    if not pairs:
+        raise ValueError("No pairs configured")
+
+    pair = pairs[0]  # Single pair for debug
+    data_dir = config.get("data_dir", "data/daily")
+
+    # Load data
+    data_file = Path(data_dir) / f"{pair}.csv"
+    if not data_file.exists():
+        print(f"⚠️  Data file not found: {data_file}")
+        # Run normal backtest which will handle the error
+        run_backtest(config, results_dir=str(output_dir))
+        return
+
+    # Load and process data
+    df = load_pair_csv(pair, Path(data_dir))
+    if df.empty:
+        print(f"⚠️  Empty data file: {data_file}")
+        run_backtest(config, results_dir=str(output_dir))
+        return
+
+    # Apply indicators
+    df = calculate_atr(df)
+    df = apply_indicators_with_cache(df, pair, config)
+
+    # Generate entry signals (this is the missing piece!)
+    df = generate_entry_signals(df, config)
+
+    # Export indicator series if requested
+    if export_indicator:
+        export_indicator_series(df, output_dir / "indicator_series.csv")
+
+    # Create decision log if requested
+    if debug_decisions:
+        decision_df = create_decision_log(df, config)
+        decision_df.to_csv(output_dir / "decisions.csv", index=False)
+
+    # Run normal backtest with the processed data
+    # We'll modify the config to point to a temporary processed file
+    temp_data_file = output_dir / f"processed_{pair}.csv"
+    temp_data_file.parent.mkdir(parents=True, exist_ok=True)
+    df.to_csv(temp_data_file, index=False)
+
+    # Update config to use processed data
+    temp_config = config.copy()
+    temp_config["data_dir"] = str(output_dir)
+    temp_config["pairs"] = [f"processed_{pair}"]
+
+    # Run backtest
+    run_backtest(temp_config, results_dir=str(output_dir))
+
+    # Clean up temp file
+    if temp_data_file.exists():
+        temp_data_file.unlink()
+
+
 def print_summary_stats(summary_file: Path) -> None:
     """Parse and print key stats from summary.txt."""
     try:
@@ -203,6 +411,16 @@ Examples:
     parser.add_argument(
         "--exit", default="atr_trailing", help="Exit indicator (default: atr_trailing)"
     )
+    parser.add_argument(
+        "--debug-decisions",
+        action="store_true",
+        help="Enable per-bar decision logging to decisions.csv",
+    )
+    parser.add_argument(
+        "--export-indicator",
+        action="store_true",
+        help="Export indicator series to indicator_series.csv",
+    )
 
     args = parser.parse_args()
 
@@ -242,8 +460,17 @@ Examples:
         # Run backtest
         print("\n⚙️  Running backtest...")
 
-        # Run the backtest with results_dir parameter
-        run_backtest(config, results_dir=str(output_dir))
+        # Run backtest with debug features if enabled
+        if args.debug_decisions or args.export_indicator:
+            run_backtest_with_debug(
+                config,
+                output_dir,
+                debug_decisions=args.debug_decisions,
+                export_indicator=args.export_indicator,
+            )
+        else:
+            # Run the backtest with results_dir parameter
+            run_backtest(config, results_dir=str(output_dir))
 
         print("✅ Backtest completed!")
 
@@ -251,11 +478,23 @@ Examples:
         trades_file = output_dir / "trades.csv"
         summary_file = output_dir / "summary.txt"
         equity_file = output_dir / "equity_curve.csv"
+        decisions_file = output_dir / "decisions.csv"
+        indicator_file = output_dir / "indicator_series.csv"
 
         print("\n📁 Output files:")
-        for file_path in [trades_file, summary_file, equity_file, config_file]:
+        standard_files = [trades_file, summary_file, equity_file, config_file]
+        for file_path in standard_files:
             status = "✅" if file_path.exists() else "❌"
             print(f"   {status} {file_path}")
+
+        # Check debug files if enabled
+        if args.debug_decisions:
+            status = "✅" if decisions_file.exists() else "❌"
+            print(f"   {status} {decisions_file}")
+
+        if args.export_indicator:
+            status = "✅" if indicator_file.exists() else "❌"
+            print(f"   {status} {indicator_file}")
 
         # Print summary stats
         if summary_file.exists():

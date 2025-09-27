@@ -28,6 +28,12 @@ results_history/
 *.sqlite
 *.db
 
+# Ignore test artifacts
+*.csv
+*.txt
+*.png
+*.log
+
 # Aider / agents
 .aider*
 .aiderignore

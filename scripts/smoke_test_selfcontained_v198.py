@@ -30,10 +30,13 @@ import yaml
 
 BANNER = "=== Forex Backtester v1.9.8 — SELF-CONTAINED POWERHOUSE SMOKE ==="
 SEP = "-" * 72
-PROJECT_ROOT = Path.cwd()
+PROJECT_ROOT = Path(__file__).parent.parent  # scripts/ -> project root
 RESULTS_ROOT = PROJECT_ROOT / "results"
 DATA_DEFAULT = PROJECT_ROOT / "data" / "daily"
 CACHE_DIRS = [PROJECT_ROOT / ".cache", PROJECT_ROOT / "Cache", PROJECT_ROOT / "cache"]
+
+# Add project root to Python path for imports
+sys.path.insert(0, str(PROJECT_ROOT))
 
 
 def info(msg):
@@ -90,8 +93,8 @@ def import_optional(name: str):
 def import_core() -> Dict[str, Any]:
     mods = {}
     for m in [
-        "backtester",
-        "walk_forward",
+        "core.backtester",
+        "scripts.walk_forward",
         "validators_util",
         "analytics.metrics",
         "indicators.confirmation_funcs",
@@ -312,7 +315,7 @@ def deep_update(base: dict, patch: dict) -> dict:
 def run_backtest_with_snapshot(core: Dict[str, Any], cfg: dict, run_dir: Path, label: str) -> Path:
     snap = run_dir / f"config_{label}.yaml"
     write_yaml(snap, cfg)
-    bt = core.get("backtester")
+    bt = core.get("core.backtester")
     if not bt:
         raise RuntimeError("backtester module not importable.")
     t0 = time.time()
@@ -325,7 +328,7 @@ def run_backtest_with_snapshot(core: Dict[str, Any], cfg: dict, run_dir: Path, l
 
 
 def run_wfo_small(core: Dict[str, Any], cfg: dict, run_dir: Path) -> Optional[Path]:
-    wf = core.get("walk_forward")
+    wf = core.get("scripts.walk_forward")
     if not wf:
         warn("walk_forward not importable; skipping WFO.")
         return None

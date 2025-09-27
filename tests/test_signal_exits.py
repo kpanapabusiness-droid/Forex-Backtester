@@ -1,6 +1,6 @@
 import pandas as pd
 
-from signal_logic import apply_signal_logic
+from core.signal_logic import apply_signal_logic
 
 
 def _df_with_signals():

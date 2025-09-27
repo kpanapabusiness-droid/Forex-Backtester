@@ -2,7 +2,7 @@ import os
 import shutil
 import tempfile
 
-import backtester
+from core import backtester
 
 
 def test_write_results_creates_files():

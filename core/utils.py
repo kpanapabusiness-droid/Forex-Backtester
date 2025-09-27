@@ -484,7 +484,7 @@ def write_summary(results_dir: str | Path, cfg: Optional[Dict[str, Any]] = None)
 
 def print_last_summary(
     results_dir: str | Path = "results",
-    config_path: str | Path = "config.yaml",
+    config_path: str | Path = "configs/config.yaml",
 ) -> None:
     """Convenience printer for notebooks."""
     text, _ = summarize_results(results_dir)

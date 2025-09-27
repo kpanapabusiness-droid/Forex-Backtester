@@ -204,7 +204,7 @@ def validate_config(cfg: dict) -> dict:
     return model.model_dump(mode="python")
 
 
-def load_and_validate_config(config_path: str = "config.yaml") -> dict:
+def load_and_validate_config(config_path: str = "configs/config.yaml") -> dict:
     """
     Load YAML and validate/normalize it.
     Raises ValueError with a readable, multi-line error if validation fails.

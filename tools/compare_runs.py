@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pandas as pd
 
-import backtester
+from core import backtester
 
 
 def load_metrics(run_path: Path):
@@ -37,7 +37,7 @@ def main():
     parser.add_argument("--b", help="run_id B (newer)")
     args = parser.parse_args()
 
-    cfg = backtester.load_config("config.yaml")
+    cfg = backtester.load_config("configs/config.yaml")
     hist_cfg = args.history or cfg.get("results_history_dir", "results/results_history")
     hist_dir = (backtester.ROOT / hist_cfg).resolve()
 

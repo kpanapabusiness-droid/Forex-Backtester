@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import math
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -184,3 +185,31 @@ def compute_all(
         if v is None or not np.isfinite(float(v)):
             out[k] = 0.0
     return out
+
+
+# Aliases for smoke test compatibility
+def compute_metrics_from_equity(equity_df, trades_df=None, rf_annual: float = 0.0) -> dict:
+    """Alias for compute_all() for smoke test compatibility."""
+    if isinstance(equity_df, (str, Path)):
+        equity_df = pd.read_csv(equity_df)
+    if isinstance(trades_df, (str, Path)):
+        trades_df = pd.read_csv(trades_df)
+    return compute_all(equity_df, trades_df, rf_annual)
+
+
+def compute_metrics(equity_df, trades_df=None, rf_annual: float = 0.0) -> dict:
+    """Alias for compute_all() for smoke test compatibility."""
+    if isinstance(equity_df, (str, Path)):
+        equity_df = pd.read_csv(equity_df)
+    if isinstance(trades_df, (str, Path)):
+        trades_df = pd.read_csv(trades_df)
+    return compute_all(equity_df, trades_df, rf_annual)
+
+
+def metrics_from_equity(equity_df, trades_df=None, rf_annual: float = 0.0) -> dict:
+    """Alias for compute_all() for smoke test compatibility."""
+    if isinstance(equity_df, (str, Path)):
+        equity_df = pd.read_csv(equity_df)
+    if isinstance(trades_df, (str, Path)):
+        trades_df = pd.read_csv(trades_df)
+    return compute_all(equity_df, trades_df, rf_annual)

@@ -978,10 +978,18 @@ def run_backtest(
     # load config
     cfg = config_path if isinstance(config_path, dict) else load_config(config_path)
 
-    # results dir
-    out_dir = ensure_results_dir(
-        results_dir or (cfg.get("output") or {}).get("results_dir", "results")
+    # results dir - check both output.results_dir and outputs.dir for compatibility
+    configured_dir = (
+        results_dir
+        or (cfg.get("outputs") or {}).get("dir")  # New format (MT5 parity)
+        or (cfg.get("output") or {}).get("results_dir")  # Legacy format
+        or "results"
     )
+    out_dir = ensure_results_dir(configured_dir)
+
+    # Log results directory for diagnostics
+    run_slug = Path(out_dir).name if Path(out_dir).name != "results" else "default"
+    print(f"[RESULTS DIR] slug={run_slug} path={Path(out_dir).resolve()} created_by=engine")
 
     # DBCVIX (load once)
     dbcvix_series = load_dbcvix_series(cfg)
@@ -1003,7 +1011,6 @@ def run_backtest(
         },
     )
 
-    trades_path = Path(out_dir) / "trades.csv"
     summary_path = Path(out_dir) / "summary.txt"
     equity_path = Path(out_dir) / "equity_curve.csv"
 
@@ -1240,8 +1247,8 @@ def run_backtest(
     elif len(trades_df) == 0:
         print("[OUT CHECK] no trades generated")
 
-    # write artifacts
-    trades_df.to_csv(trades_path, index=False)
+    # Write trades CSV with comprehensive diagnostics
+    write_trades_csv_with_diagnostics(trades_df, out_dir, cfg, run_slug)
 
     # Summary (best effort; use utils.summarize_results if available)
     try:
@@ -1695,8 +1702,114 @@ def load_pair_csv(pair: str, data_dir: str | None = None) -> pd.DataFrame:
     return pd.read_csv(path) if path.exists() else pd.DataFrame()
 
 
+def write_trades_csv_with_diagnostics(
+    trades_df: pd.DataFrame, out_dir: str | Path, cfg: dict, run_slug: str = "default"
+) -> bool:
+    """
+    Centralized trades CSV writer with comprehensive diagnostics.
+
+    Decision tree:
+    1. Schema validation → 2. Empty check → 3. Flag check → 4. Dir ensure → 5. Atomic write
+
+    Returns:
+        bool: True if written successfully, False if skipped or failed
+    """
+    import os
+    import tempfile
+    from pathlib import Path
+
+    out_path = Path(out_dir).resolve()
+    trades_path = out_path / "trades.csv"
+
+    # Determine write flag from config hierarchy
+    outputs_cfg = cfg.get("outputs", {})
+    write_flag = outputs_cfg.get("write_trades_csv", True)  # Default True
+
+    # Check for debug logging
+    log_debug = os.environ.get("LOG_LEVEL") == "DEBUG"
+
+    # Log decision inputs
+    print(
+        f"[WRITE TRADES] rows={len(trades_df)} path={trades_path} write_trades_csv={write_flag} dir_exists={out_path.exists()} slug={run_slug}"
+    )
+
+    # Schema validation
+    required_cols = ["pair", "entry_date", "direction_int"]  # Minimal required
+    missing_cols = [col for col in required_cols if col not in trades_df.columns]
+    if missing_cols:
+        print(f"[WRITE TRADES SKIP] reason=schema_invalid missing_fields={missing_cols}")
+        return False
+
+    # Empty check
+    if len(trades_df) == 0:
+        print("[WRITE TRADES SKIP] reason=empty")
+        return False
+
+    # Flag check
+    if not write_flag:
+        print("[WRITE TRADES SKIP] reason=flag_off")
+        return False
+
+    try:
+        # Ensure directory exists
+        out_path.mkdir(parents=True, exist_ok=True)
+
+        # Prepare DataFrame for serialization
+        df_clean = trades_df.copy()
+
+        # Normalize datetime columns to ISO strings
+        for col in df_clean.columns:
+            if col.endswith("_date") or col.endswith("_time"):
+                if col in df_clean.columns:
+                    df_clean[col] = pd.to_datetime(df_clean[col]).dt.strftime("%Y-%m-%d %H:%M:%S")
+
+        # Reset index to ensure clean CSV
+        df_clean = df_clean.reset_index(drop=True)
+
+        # Atomic write: temp file -> rename
+        with tempfile.NamedTemporaryFile(
+            mode="w", dir=out_path, prefix=".trades_tmp_", suffix=".csv", delete=False
+        ) as tmp_file:
+            df_clean.to_csv(tmp_file.name, index=False)
+            temp_path = Path(tmp_file.name)
+
+        # Atomic rename
+        temp_path.rename(trades_path)
+
+        print(f"[WRITE TRADES OK] wrote={len(trades_df)} path={trades_path}")
+
+        # Debug: list directory contents
+        if log_debug:
+            files = list(out_path.glob("*"))
+            print(f"[DEBUG] Results dir contents: {[f.name for f in files]}")
+
+        return True
+
+    except Exception as e:
+        print(
+            f"[WRITE TRADES ERROR] reason=serialization_failed exception={type(e).__name__}:{str(e)}"
+        )
+        # Clean up temp file if it exists
+        try:
+            if "temp_path" in locals() and temp_path.exists():
+                temp_path.unlink()
+        except Exception:
+            pass
+        return False
+
+
 def write_results(trades: list[dict], out_dir: str | Path) -> None:
+    """Legacy writer - converts list to DataFrame and uses new writer"""
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
-    pd.DataFrame(trades).to_csv(out / "trades.csv", index=False)
+
+    if trades:
+        trades_df = pd.DataFrame(trades)
+        # Use new writer with minimal config
+        cfg = {"outputs": {"write_trades_csv": True}}
+        write_trades_csv_with_diagnostics(trades_df, out_dir, cfg, "legacy")
+    else:
+        print("[WRITE TRADES SKIP] reason=empty")
+
+    # Still write summary for compatibility
     (out / "summary.txt").write_text(f"total_trades: {len(trades)}\n")

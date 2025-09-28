@@ -14,6 +14,8 @@ This project helps you test and evaluate different trading indicators and system
 - Perform Monte Carlo analysis
 - Visualize performance and save results
 
+📖 **For complete trading logic specification, see [Golden Standard Logic](GOLDEN_STANDARD_LOGIC.md)**
+
 ## 📁 Project Structure
 
 ```

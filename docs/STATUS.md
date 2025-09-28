@@ -147,6 +147,9 @@ def exit_<name>(df, *, signal_col="exit_signal", **kwargs) -> pd.DataFrame
 **Results & Spread**:
 - `pnl`, `win`, `loss`, `scratch`, `spread_pips_used`
 
+**Empty File Behavior**:
+When no trades are generated, `trades.csv` is still created with all standard column headers but zero data rows. This maintains backward compatibility with scripts and tools that expect the file to exist. The writer logs `[WRITE TRADES SKIP] reason=empty` followed by `[WRITE TRADES OK] wrote=0 path=... (empty file with headers)`.
+
 ### equity_curve.csv Fields
 - `date`, `equity`, `peak`, `drawdown`
 - Real-time equity progression with running drawdown calculation

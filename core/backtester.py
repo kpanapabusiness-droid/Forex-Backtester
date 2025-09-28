@@ -349,8 +349,11 @@ def apply_indicators_with_cache(df: pd.DataFrame, pair: str, cfg: dict) -> pd.Da
     Apply indicators (c1/c2/baseline/volume/exit) with caching.
     C2 shares the confirmation pool with C1 (indicators.confirmation_funcs).
     """
+    import os
+
     cache_cfg = cfg.get("cache") or {}
-    cache_on = cache_cfg.get("enabled", True)
+    # Honor FB_NO_CACHE env var or config cache.enabled setting
+    cache_on = os.environ.get("FB_NO_CACHE") != "1" and cache_cfg.get("enabled", True)
     cache_dir = cache_cfg.get("dir", "cache")
     cache_fmt = cache_cfg.get("format", "parquet")
     scope_key = cache_cfg.get("scope_key")
@@ -440,6 +443,15 @@ def apply_indicators_with_cache(df: pd.DataFrame, pair: str, cfg: dict) -> pd.Da
 
     if verbose:
         print(f"📦 cache stats → saves={saves} hits={hits}")
+
+    # CACHE diagnostic for parity runs
+    if not cache_on:
+        print(
+            f"[CACHE] disabled (FB_NO_CACHE={os.environ.get('FB_NO_CACHE', 'unset')} config_enabled={cache_cfg.get('enabled', True)})"
+        )
+    elif hits > 0 or saves > 0:
+        print(f"[CACHE] used saves={saves} hits={hits}")
+
     return df
 
 
@@ -966,10 +978,18 @@ def run_backtest(
     # load config
     cfg = config_path if isinstance(config_path, dict) else load_config(config_path)
 
-    # results dir
-    out_dir = ensure_results_dir(
-        results_dir or (cfg.get("output") or {}).get("results_dir", "results")
+    # results dir - check both output.results_dir and outputs.dir for compatibility
+    configured_dir = (
+        results_dir
+        or (cfg.get("outputs") or {}).get("dir")  # New format (MT5 parity)
+        or (cfg.get("output") or {}).get("results_dir")  # Legacy format
+        or "results"
     )
+    out_dir = ensure_results_dir(configured_dir)
+
+    # Log results directory for diagnostics
+    run_slug = Path(out_dir).name if Path(out_dir).name != "results" else "default"
+    print(f"[RESULTS DIR] slug={run_slug} path={Path(out_dir).resolve()} created_by=engine")
 
     # DBCVIX (load once)
     dbcvix_series = load_dbcvix_series(cfg)
@@ -991,7 +1011,6 @@ def run_backtest(
         },
     )
 
-    trades_path = Path(out_dir) / "trades.csv"
     summary_path = Path(out_dir) / "summary.txt"
     equity_path = Path(out_dir) / "equity_curve.csv"
 
@@ -1053,6 +1072,26 @@ def run_backtest(
             )
             df["pair"] = pair
 
+            # Apply date filtering if specified in config
+            date_start = cfg.get("date_from") or (cfg.get("date_range") or {}).get("start")
+            date_end = cfg.get("date_to") or (cfg.get("date_range") or {}).get("end")
+
+            if date_start and date_end:
+                from core.utils import slice_df_by_dates
+
+                df, (first_ts, last_ts, rows_before, rows_after) = slice_df_by_dates(
+                    df, date_start, date_end
+                )
+
+                if rows_after == 0:
+                    raise ValueError(
+                        f"Date slice produced empty dataset for {date_start}..{date_end}"
+                    )
+
+                print(
+                    f"ℹ️  {pair}: Date filtered {rows_before} → {rows_after} rows ({first_ts.date()} to {last_ts.date()})"
+                )
+
             base = calculate_atr(df.copy())
             base = apply_indicators_with_cache(base, pair, cfg)
 
@@ -1065,6 +1104,38 @@ def run_backtest(
                     )
                 except Exception as _ve:
                     print(f"ℹ️  {pair}: validation skipped ({_ve})")
+
+            # Enforce final slice immediately before trading (safety gate)
+            date_start = cfg.get("date_from") or (cfg.get("date_range") or {}).get("start")
+            date_end = cfg.get("date_to") or (cfg.get("date_range") or {}).get("end")
+
+            if date_start and date_end:
+                from core.utils import slice_df_by_dates
+
+                base, (first_ts, last_ts, rows_before, rows_after) = slice_df_by_dates(
+                    base, date_start, date_end
+                )
+
+                if rows_after == 0:
+                    raise ValueError(
+                        f"Final slice produced empty dataset for {date_start}..{date_end}"
+                    )
+
+                print(
+                    f"[SLICE ENFORCE] rows_before={rows_before} rows_after={rows_after} first={first_ts.date()} last={last_ts.date()}"
+                )
+
+            # ENGINE INPUT diagnostic
+            if len(base) > 0:
+                first_date = base["date"].iloc[0]
+                last_date = base["date"].iloc[-1]
+                window_start = cfg.get("date_from") or (cfg.get("date_range") or {}).get(
+                    "start", "N/A"
+                )
+                window_end = cfg.get("date_to") or (cfg.get("date_range") or {}).get("end", "N/A")
+                print(
+                    f"[ENGINE INPUT] first={pd.to_datetime(first_date).date()} last={pd.to_datetime(last_date).date()} rows={len(base)} window={window_start}..{window_end}"
+                )
 
             signals_df = apply_signal_logic(base, cfg)
 
@@ -1079,6 +1150,23 @@ def run_backtest(
                     )
                 else:
                     signals_df[col] = 0
+
+            # Add date range guard before trading simulation
+            date_start = cfg.get("date_from") or (cfg.get("date_range") or {}).get("start")
+            date_end = cfg.get("date_to") or (cfg.get("date_range") or {}).get("end")
+
+            if date_start and date_end and len(signals_df) > 0:
+                # Enforce date range on signals_df before trading simulation
+                signal_dates = pd.to_datetime(signals_df["date"])
+                start_ts = pd.to_datetime(date_start)
+                end_ts = pd.to_datetime(date_end)
+                mask = (signal_dates >= start_ts) & (signal_dates <= end_ts)
+
+                if not mask.all():
+                    print(
+                        f"⚠️  WARNING: signals_df contains {(~mask).sum()} rows outside {date_start}..{date_end}, filtering before trading"
+                    )
+                    signals_df = signals_df[mask].copy().reset_index(drop=True)
 
             if track_equity:
                 pair_trades, pair_eq = simulate_pair_trades(
@@ -1134,8 +1222,33 @@ def run_backtest(
             trades_df[c] = pd.NA
     trades_df = trades_df.reindex(columns=TRADES_COLS)
 
-    # write artifacts
-    trades_df.to_csv(trades_path, index=False)
+    # Filter output trades to date range (safety gate)
+    date_start = cfg.get("date_from") or (cfg.get("date_range") or {}).get("start")
+    date_end = cfg.get("date_to") or (cfg.get("date_range") or {}).get("end")
+
+    if date_start and date_end and len(trades_df) > 0:
+        start_ts = pd.to_datetime(date_start)
+        end_ts = pd.to_datetime(date_end)
+
+        # Filter trades by entry_date
+        if "entry_date" in trades_df.columns:
+            entry_dates = pd.to_datetime(trades_df["entry_date"])
+            mask = (entry_dates >= start_ts) & (entry_dates <= end_ts)
+            trades_df = trades_df[mask].copy()
+
+        print(f"[TRADES FILTER] kept={len(trades_df)} start={date_start} end={date_end}")
+
+    # OUT CHECK diagnostic
+    if len(trades_df) > 0 and "entry_date" in trades_df.columns:
+        entry_dates = pd.to_datetime(trades_df["entry_date"])
+        min_date = entry_dates.min()
+        max_date = entry_dates.max()
+        print(f"[OUT CHECK] first={min_date.date()} last={max_date.date()} rows={len(trades_df)}")
+    elif len(trades_df) == 0:
+        print("[OUT CHECK] no trades generated")
+
+    # Write trades CSV with comprehensive diagnostics
+    write_trades_csv_with_diagnostics(trades_df, out_dir, cfg, run_slug)
 
     # Summary (best effort; use utils.summarize_results if available)
     try:
@@ -1589,8 +1702,126 @@ def load_pair_csv(pair: str, data_dir: str | None = None) -> pd.DataFrame:
     return pd.read_csv(path) if path.exists() else pd.DataFrame()
 
 
+def write_trades_csv_with_diagnostics(
+    trades_df: pd.DataFrame, out_dir: str | Path, cfg: dict, run_slug: str = "default"
+) -> bool:
+    """
+    Centralized trades CSV writer with comprehensive diagnostics.
+
+    Decision tree:
+    1. Schema validation → 2. Empty check → 3. Flag check → 4. Dir ensure → 5. Atomic write
+
+    Returns:
+        bool: True if written successfully, False if skipped or failed
+    """
+    import os
+    import tempfile
+    from pathlib import Path
+
+    out_path = Path(out_dir).resolve()
+    trades_path = out_path / "trades.csv"
+
+    # Determine write flag from config hierarchy
+    outputs_cfg = cfg.get("outputs", {})
+    write_flag = outputs_cfg.get("write_trades_csv", True)  # Default True
+
+    # Check for debug logging
+    log_debug = os.environ.get("LOG_LEVEL") == "DEBUG"
+
+    # Log decision inputs
+    print(
+        f"[WRITE TRADES] rows={len(trades_df)} path={trades_path} write_trades_csv={write_flag} dir_exists={out_path.exists()} slug={run_slug}"
+    )
+
+    # Empty check FIRST - but create empty CSV with headers for compatibility
+    if len(trades_df) == 0:
+        print("[WRITE TRADES SKIP] reason=empty")
+
+        # Create empty CSV with standard headers for compatibility
+        try:
+            out_path.mkdir(parents=True, exist_ok=True)
+            empty_df = pd.DataFrame(columns=TRADES_COLS)
+            empty_df.to_csv(trades_path, index=False)
+            print(f"[WRITE TRADES OK] wrote=0 path={trades_path} (empty file with headers)")
+            return True
+        except Exception as e:
+            print(
+                f"[WRITE TRADES ERROR] reason=empty_file_creation_failed exception={type(e).__name__}:{str(e)}"
+            )
+            return False
+
+    # Schema validation (only for non-empty DataFrames)
+    required_cols = ["pair", "entry_date", "direction_int"]  # Minimal required
+    missing_cols = [col for col in required_cols if col not in trades_df.columns]
+    if missing_cols:
+        print(f"[WRITE TRADES SKIP] reason=schema_invalid missing_fields={missing_cols}")
+        return False
+
+    # Flag check
+    if not write_flag:
+        print("[WRITE TRADES SKIP] reason=flag_off")
+        return False
+
+    try:
+        # Ensure directory exists
+        out_path.mkdir(parents=True, exist_ok=True)
+
+        # Prepare DataFrame for serialization
+        df_clean = trades_df.copy()
+
+        # Normalize datetime columns to ISO strings
+        for col in df_clean.columns:
+            if col.endswith("_date") or col.endswith("_time"):
+                if col in df_clean.columns:
+                    df_clean[col] = pd.to_datetime(df_clean[col]).dt.strftime("%Y-%m-%d %H:%M:%S")
+
+        # Reset index to ensure clean CSV
+        df_clean = df_clean.reset_index(drop=True)
+
+        # Atomic write: temp file -> rename
+        with tempfile.NamedTemporaryFile(
+            mode="w", dir=out_path, prefix=".trades_tmp_", suffix=".csv", delete=False
+        ) as tmp_file:
+            df_clean.to_csv(tmp_file.name, index=False)
+            temp_path = Path(tmp_file.name)
+
+        # Atomic rename
+        temp_path.rename(trades_path)
+
+        print(f"[WRITE TRADES OK] wrote={len(trades_df)} path={trades_path}")
+
+        # Debug: list directory contents
+        if log_debug:
+            files = list(out_path.glob("*"))
+            print(f"[DEBUG] Results dir contents: {[f.name for f in files]}")
+
+        return True
+
+    except Exception as e:
+        print(
+            f"[WRITE TRADES ERROR] reason=serialization_failed exception={type(e).__name__}:{str(e)}"
+        )
+        # Clean up temp file if it exists
+        try:
+            if "temp_path" in locals() and temp_path.exists():
+                temp_path.unlink()
+        except Exception:
+            pass
+        return False
+
+
 def write_results(trades: list[dict], out_dir: str | Path) -> None:
+    """Legacy writer - converts list to DataFrame and uses new writer"""
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
-    pd.DataFrame(trades).to_csv(out / "trades.csv", index=False)
+
+    if trades:
+        trades_df = pd.DataFrame(trades)
+        # Use new writer with minimal config
+        cfg = {"outputs": {"write_trades_csv": True}}
+        write_trades_csv_with_diagnostics(trades_df, out_dir, cfg, "legacy")
+    else:
+        print("[WRITE TRADES SKIP] reason=empty")
+
+    # Still write summary for compatibility
     (out / "summary.txt").write_text(f"total_trades: {len(trades)}\n")

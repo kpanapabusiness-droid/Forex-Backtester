@@ -6,8 +6,11 @@ Runs a single backtest using the MT5 parity configuration to generate
 results for comparison with MT5 backtest reports.
 """
 
+import os
 import sys
 from pathlib import Path
+
+import yaml
 
 # Add project root to path
 project_root = Path(__file__).parent.parent
@@ -17,20 +20,89 @@ sys.path.insert(0, str(project_root))
 from core.backtester import run_backtest  # noqa: E402
 
 
+def validate_mt5_parity_config(cfg):
+    """Validate that config matches exact MT5 EA settings."""
+    # Critical validations - must match MT5 EA exactly
+    assert cfg["roles"]["c1"] == "sma_cross", f"Expected c1=sma_cross, got {cfg['roles']['c1']}"
+    assert cfg["timeframe"] == "D1", f"Expected timeframe=D1, got {cfg['timeframe']}"
+    assert cfg["symbol"] == "EURUSD", f"Expected symbol=EURUSD, got {cfg['symbol']}"
+    assert cfg["c1"]["fast_period"] == 20, (
+        f"Expected fast_period=20, got {cfg['c1']['fast_period']}"
+    )
+    assert cfg["c1"]["slow_period"] == 50, (
+        f"Expected slow_period=50, got {cfg['c1']['slow_period']}"
+    )
+    assert cfg["spread"]["enabled"] is False, (
+        f"Expected spread disabled, got {cfg['spread']['enabled']}"
+    )
+    assert cfg["commission"]["enabled"] is False, (
+        f"Expected commission disabled, got {cfg['commission']['enabled']}"
+    )
+    assert cfg["slippage_pips"] in [0, 0.0], f"Expected slippage_pips=0, got {cfg['slippage_pips']}"
+
+    # Engine validations for cross-only behavior
+    engine = cfg.get("engine", {})
+    assert engine.get("cross_only") is True, (
+        f"Expected cross_only=true, got {engine.get('cross_only')}"
+    )
+    assert engine.get("reverse_on_signal") is True, (
+        f"Expected reverse_on_signal=true, got {engine.get('reverse_on_signal')}"
+    )
+    assert engine.get("allow_pyramiding") is False, (
+        f"Expected allow_pyramiding=false, got {engine.get('allow_pyramiding')}"
+    )
+
+
 def main():
     """Run MT5 parity backtest with fixed configuration."""
     config_path = "configs/validation/mt5_parity_d1.yaml"
+
+    # Hard disable cache for parity runs
+    os.environ["FB_NO_CACHE"] = "1"
+
+    # Clean cache directory for parity runs
+    cache_dir = Path("cache")
+    if cache_dir.exists():
+        import shutil
+
+        shutil.rmtree(cache_dir)
+        print("🗑️  Cleared cache directory for parity run")
 
     print("🚀 Running MT5 parity backtest...")
     print(f"   Config: {config_path}")
 
     try:
+        # Load and validate config
+        with open(config_path, "r") as f:
+            cfg = yaml.safe_load(f)
+
+        # Validate critical settings
+        validate_mt5_parity_config(cfg)
+
+        # Validate cache settings (warn if not disabled, but env wins)
+        cache_cfg = cfg.get("cache", {})
+        if cache_cfg.get("enabled", True):
+            print("⚠️  WARNING: config has cache enabled, but FB_NO_CACHE=1 overrides")
+
+        # Assert date range is present
+        date_start = cfg.get("date_from") or (cfg.get("date_range") or {}).get("start")
+        date_end = cfg.get("date_to") or (cfg.get("date_range") or {}).get("end")
+        assert date_start and date_end, (
+            "Date range must be specified in config (date_from/date_to or date_range.start/end)"
+        )
+
+        # Print effective config summary
+        engine = cfg.get("engine", {})
+        print(
+            f"[MT5 PARITY] {cfg['symbol']} {cfg['timeframe']} {date_start}→{date_end} c1={cfg['roles']['c1']}({cfg['c1']['fast_period']},{cfg['c1']['slow_period']}) costs=0 cross_only={int(engine.get('cross_only', False))} next_open={int(engine.get('fill_on_next_bar_open', False))} reverse={int(engine.get('reverse_on_signal', False))}"
+        )
+
         # Run backtest - results_dir will be taken from config outputs.dir
-        run_backtest(config_path)
+        run_backtest(cfg)
         print("✅ MT5 parity backtest completed!")
 
         # Verify output files
-        results_dir = Path("results/validation/mt5_parity_d1")
+        results_dir = Path(cfg["outputs"]["dir"])
         trades_file = results_dir / "trades.csv"
         equity_file = results_dir / "equity_curve.csv"
 

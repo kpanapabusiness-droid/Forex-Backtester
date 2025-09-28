@@ -22,18 +22,28 @@ def load_our_trades(results_dir: Path) -> pd.DataFrame:
 
     df = pd.read_csv(trades_file)
 
+    # Validate metadata/content
+    if len(df) == 0:
+        raise ValueError("Our trades file is empty - no trades generated")
+
+    # Check symbol consistency (accept both EUR_USD and EURUSD formats)
+    unique_symbols = df["pair"].unique()
+    expected_symbols = ["EURUSD", "EUR_USD"]
+    if len(unique_symbols) != 1 or unique_symbols[0] not in expected_symbols:
+        raise ValueError(f"Expected symbol=EURUSD or EUR_USD only, found: {unique_symbols}")
+
     # Normalize to unified schema
     unified = pd.DataFrame()
-    unified["open_time"] = pd.to_datetime(df["entry_time"])
-    unified["close_time"] = pd.to_datetime(df["exit_time"])
+    unified["open_time"] = pd.to_datetime(df["entry_date"])
+    unified["close_time"] = pd.to_datetime(df["exit_date"])
     unified["symbol"] = df["pair"]
-    unified["side"] = df["direction"]  # Assuming already +1/-1
+    unified["side"] = df["direction_int"]  # Use direction_int which should be +1/-1
     unified["open_price"] = df["entry_price"]
     unified["close_price"] = df["exit_price"]
     unified["sl"] = df.get("sl_at_entry_price", np.nan)
     unified["tp"] = df.get("tp1_at_entry_price", np.nan)
-    unified["pnl_pips"] = df["pnl_pips"]
-    unified["pnl_currency"] = df["pnl_currency"]
+    unified["pnl_pips"] = df["pnl"] / 10  # Convert to pips (assuming 4-digit pairs)
+    unified["pnl_currency"] = df["pnl"]
     unified["tag"] = df.get("exit_reason", "unknown")
 
     return unified
@@ -252,6 +262,7 @@ def main():
     print(f"   Price tolerance: {args.price_tol}")
     print(f"   PnL tolerance: {args.pnl_pct_tol}")
     print(f"   Time tolerance: {args.time_tol_bars} bars")
+    print("Comparing EURUSD D1 2022-01-01..2024-12-31 | strategy=sma_cross(20,50)")
 
     try:
         # Load trades
@@ -261,6 +272,14 @@ def main():
 
         print(f"   Our trades: {len(our_trades)}")
         print(f"   MT5 trades: {len(mt5_trades)}")
+
+        # Warn if trade count deviates >50% from MT5 (fast fail hint)
+        if len(mt5_trades) > 0:
+            deviation = abs(len(our_trades) - len(mt5_trades)) / len(mt5_trades)
+            if deviation > 0.5:
+                print(
+                    f"⚠️  WARNING: Trade count deviation {deviation:.1%} > 50% - strategies may be different"
+                )
 
         # Match trades
         print("\n🔗 Matching trades...")

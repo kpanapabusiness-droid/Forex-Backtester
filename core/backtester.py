@@ -1740,24 +1740,7 @@ def write_trades_csv_with_diagnostics(
         # Create empty CSV with standard headers for compatibility
         try:
             out_path.mkdir(parents=True, exist_ok=True)
-            empty_df = pd.DataFrame(
-                columns=[
-                    "pair",
-                    "entry_date",
-                    "entry_price",
-                    "direction",
-                    "direction_int",
-                    "atr_at_entry_price",
-                    "lots_total",
-                    "exit_date",
-                    "exit_price",
-                    "exit_reason",
-                    "pnl",
-                    "win",
-                    "loss",
-                    "scratch",
-                ]
-            )
+            empty_df = pd.DataFrame(columns=TRADES_COLS)
             empty_df.to_csv(trades_path, index=False)
             print(f"[WRITE TRADES OK] wrote=0 path={trades_path} (empty file with headers)")
             return True

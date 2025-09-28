@@ -1053,6 +1053,26 @@ def run_backtest(
             )
             df["pair"] = pair
 
+            # Apply date filtering if specified in config
+            date_start = cfg.get("date_from") or (cfg.get("date_range") or {}).get("start")
+            date_end = cfg.get("date_to") or (cfg.get("date_range") or {}).get("end")
+
+            if date_start and date_end:
+                from core.utils import slice_df_by_dates
+
+                df, (first_ts, last_ts, rows_before, rows_after) = slice_df_by_dates(
+                    df, date_start, date_end
+                )
+
+                if rows_after == 0:
+                    raise ValueError(
+                        f"Date slice produced empty dataset for {date_start}..{date_end}"
+                    )
+
+                print(
+                    f"ℹ️  {pair}: Date filtered {rows_before} → {rows_after} rows ({first_ts.date()} to {last_ts.date()})"
+                )
+
             base = calculate_atr(df.copy())
             base = apply_indicators_with_cache(base, pair, cfg)
 

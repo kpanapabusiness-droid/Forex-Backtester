@@ -24,6 +24,8 @@ __all__ = [
     "pip_value_per_lot",
     # Indicators / math
     "calculate_atr",
+    # Date utilities
+    "slice_df_by_dates",
     # Reporting
     "summarize_results",
     "write_summary",
@@ -208,6 +210,62 @@ def calculate_atr(df: pd.DataFrame, period: int = 14) -> pd.DataFrame:
 
     df["atr"] = tr.rolling(period, min_periods=period).mean()
     return df
+
+
+def slice_df_by_dates(
+    df: pd.DataFrame, start, end, inclusive: str = "both"
+) -> Tuple[pd.DataFrame, Tuple]:
+    """
+    Slice DataFrame by date range with enhanced metadata.
+
+    Args:
+        df: DataFrame with 'date' column
+        start: Start date (str YYYY-MM-DD, datetime, or date)
+        end: End date (str YYYY-MM-DD, datetime, or date)
+        inclusive: "both", "left", "right", or "neither"
+
+    Returns:
+        Tuple of (sliced_df, (first_ts, last_ts, rows_before, rows_after))
+    """
+    if "date" not in df.columns:
+        raise ValueError("DataFrame must have 'date' column for slicing")
+
+    # Convert dates to pandas datetime
+    start_ts = pd.to_datetime(start)
+    end_ts = pd.to_datetime(end)
+
+    # Ensure date column is datetime
+    df_dates = pd.to_datetime(df["date"])
+
+    rows_before = len(df)
+
+    # Apply slicing based on inclusive parameter
+    if inclusive == "both":
+        mask = (df_dates >= start_ts) & (df_dates <= end_ts)
+    elif inclusive == "left":
+        mask = (df_dates >= start_ts) & (df_dates < end_ts)
+    elif inclusive == "right":
+        mask = (df_dates > start_ts) & (df_dates <= end_ts)
+    elif inclusive == "neither":
+        mask = (df_dates > start_ts) & (df_dates < end_ts)
+    else:
+        raise ValueError(
+            f"inclusive must be 'both', 'left', 'right', or 'neither', got {inclusive}"
+        )
+
+    sliced_df = df.loc[mask].copy().reset_index(drop=True)
+    rows_after = len(sliced_df)
+
+    # Get first and last timestamps from sliced data
+    if rows_after > 0:
+        first_ts = sliced_df["date"].iloc[0]
+        last_ts = sliced_df["date"].iloc[-1]
+    else:
+        first_ts = None
+        last_ts = None
+
+    metadata = (first_ts, last_ts, rows_before, rows_after)
+    return sliced_df, metadata
 
 
 # =========================

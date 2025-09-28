@@ -67,10 +67,17 @@ def main():
         # Validate critical settings
         validate_mt5_parity_config(cfg)
 
+        # Assert date range is present
+        date_start = cfg.get("date_from") or (cfg.get("date_range") or {}).get("start")
+        date_end = cfg.get("date_to") or (cfg.get("date_range") or {}).get("end")
+        assert date_start and date_end, (
+            "Date range must be specified in config (date_from/date_to or date_range.start/end)"
+        )
+
         # Print effective config summary
         engine = cfg.get("engine", {})
         print(
-            f"[MT5 PARITY] {cfg['symbol']} {cfg['timeframe']} {cfg['date_from']}→{cfg['date_to']} c1={cfg['roles']['c1']}({cfg['c1']['fast_period']},{cfg['c1']['slow_period']}) cross_only={int(engine.get('cross_only', False))} next_open_fills={int(engine.get('fill_on_next_bar_open', False))} reverse={int(engine.get('reverse_on_signal', False))} pyramiding={int(engine.get('allow_pyramiding', True))} costs=0"
+            f"[MT5 PARITY] {cfg['symbol']} {cfg['timeframe']} {date_start}→{date_end} c1={cfg['roles']['c1']}({cfg['c1']['fast_period']},{cfg['c1']['slow_period']}) costs=0 cross_only={int(engine.get('cross_only', False))} next_open={int(engine.get('fill_on_next_bar_open', False))} reverse={int(engine.get('reverse_on_signal', False))}"
         )
 
         # Run backtest - results_dir will be taken from config outputs.dir

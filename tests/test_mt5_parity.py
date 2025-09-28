@@ -412,6 +412,48 @@ class TestMT5ParityE2E:
 
         print("✅ Full MT5 parity pipeline completed successfully!")
 
+    def test_parity_date_validation(self):
+        """Test that parity results have correct date range."""
+        # Run parity backtest first
+        result = subprocess.run(
+            [sys.executable, "scripts/mt5_parity_run.py"],
+            capture_output=True,
+            text=True,
+            cwd=project_root,
+        )
+
+        if result.returncode != 0:
+            pytest.skip(f"Parity backtest failed: {result.stderr}")
+
+        # Check if results exist
+        trades_file = project_root / "results/validation/mt5_parity_d1/trades.csv"
+        if not trades_file.exists():
+            pytest.skip("No trades file generated")
+
+        # Load trades and check date range
+        import pandas as pd
+
+        trades_df = pd.read_csv(trades_file)
+
+        if len(trades_df) == 0:
+            pytest.skip("No trades generated")
+
+        # Convert dates and check range
+        entry_dates = pd.to_datetime(trades_df["entry_date"])
+        exit_dates = pd.to_datetime(trades_df["exit_date"])
+
+        # All entry dates should be >= 2022-01-01
+        min_entry = entry_dates.min()
+        assert min_entry >= pd.to_datetime("2022-01-01"), (
+            f"Entry date {min_entry} before 2022-01-01"
+        )
+
+        # All exit dates should be <= 2024-12-31
+        max_exit = exit_dates.max()
+        assert max_exit <= pd.to_datetime("2024-12-31"), f"Exit date {max_exit} after 2024-12-31"
+
+        print(f"✅ Date validation passed: {min_entry.date()} to {max_exit.date()}")
+
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

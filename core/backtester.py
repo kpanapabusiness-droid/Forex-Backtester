@@ -760,7 +760,20 @@ def simulate_pair_trades(
                     if ts_active and ts_level is not None:
                         effective_stop = better_stop(d, effective_stop, ts_level)
 
-            # BE/TS after TP1 or when TS active
+            # Golden Standard: System exits (C1 reversal) take priority over BE/TS
+            if (not closed_this_bar) and exit_sig != 0:
+                if exit_cfg.get("exit_on_exit_signal", False):
+                    reason = "exit_indicator"
+                elif exit_cfg.get("exit_on_c1_reversal", True):
+                    reason = "c1_reversal"
+                elif exit_cfg.get("exit_on_baseline_cross", False):
+                    reason = "baseline_cross"
+                else:
+                    reason = "exit_indicator"
+                exit_px = c_i
+                closed_this_bar = True
+
+            # BE/TS after TP1 or when TS active (only if no system exit)
             if (not closed_this_bar) and (tp1_done or ts_active):
                 if hit_level(d, h_i, l_i, effective_stop, "sl"):
                     if (
@@ -780,19 +793,6 @@ def simulate_pair_trades(
                         )
                     exit_px = effective_stop
                     closed_this_bar = True
-
-            # Indicator/logic exit at close if still open
-            if (not closed_this_bar) and exit_sig != 0:
-                if exit_cfg.get("exit_on_exit_signal", False):
-                    reason = "exit_indicator"
-                elif exit_cfg.get("exit_on_c1_reversal", True):
-                    reason = "c1_reversal"
-                elif exit_cfg.get("exit_on_baseline_cross", False):
-                    reason = "baseline_cross"
-                else:
-                    reason = "exit_indicator"
-                exit_px = c_i
-                closed_this_bar = True
 
             # ---- finalize exit ----
             if closed_this_bar:

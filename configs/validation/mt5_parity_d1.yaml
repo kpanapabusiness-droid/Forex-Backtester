@@ -1,0 +1,30 @@
+symbol: EURUSD
+timeframe: D1
+date_from: 2022-01-01
+date_to: 2024-12-31
+lot_size:
+  mode: fixed
+  value: 0.10
+spread:
+  enabled: false
+  mode: fixed
+  value_pips: 0.0
+commission:
+  enabled: false
+  per_lot: 0.0
+slippage_pips: 0.0
+engine:
+  fill_on_next_bar_open: true
+roles:
+  c1: sma_cross
+  c2: null
+  baseline: null
+  volume: null
+  exit: null
+c1:
+  fast_period: 20
+  slow_period: 50
+outputs:
+  dir: results/validation/mt5_parity_d1
+  write_trades_csv: true
+  write_equity_csv: true

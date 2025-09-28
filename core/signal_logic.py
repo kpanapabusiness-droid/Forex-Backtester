@@ -238,6 +238,14 @@ def apply_signal_logic(df: pd.DataFrame, cfg: dict) -> pd.DataFrame:
     last_c1_nonzero_bar = None
     last_c1_direction = 0
 
+    # ENGINE LOOP diagnostic - print once at start of loop
+    if n_bars > 0:
+        first_date = out["date"].iloc[0]
+        last_date = out["date"].iloc[-1]
+        print(
+            f"[ENGINE LOOP] first={pd.to_datetime(first_date).date()} last={pd.to_datetime(last_date).date()} rows={n_bars}"
+        )
+
     for i in range(n_bars):
         # Track last non-zero C1 for bridge rule
         if c1_signals.iloc[i] != 0:

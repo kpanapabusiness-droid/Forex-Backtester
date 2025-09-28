@@ -443,6 +443,15 @@ def apply_indicators_with_cache(df: pd.DataFrame, pair: str, cfg: dict) -> pd.Da
 
     if verbose:
         print(f"📦 cache stats → saves={saves} hits={hits}")
+
+    # CACHE diagnostic for parity runs
+    if not cache_on:
+        print(
+            f"[CACHE] disabled (FB_NO_CACHE={os.environ.get('FB_NO_CACHE', 'unset')} config_enabled={cache_cfg.get('enabled', True)})"
+        )
+    elif hits > 0 or saves > 0:
+        print(f"[CACHE] used saves={saves} hits={hits}")
+
     return df
 
 
@@ -1109,6 +1118,18 @@ def run_backtest(
                     f"[SLICE ENFORCE] rows_before={rows_before} rows_after={rows_after} first={first_ts.date()} last={last_ts.date()}"
                 )
 
+            # ENGINE INPUT diagnostic
+            if len(base) > 0:
+                first_date = base["date"].iloc[0]
+                last_date = base["date"].iloc[-1]
+                window_start = cfg.get("date_from") or (cfg.get("date_range") or {}).get(
+                    "start", "N/A"
+                )
+                window_end = cfg.get("date_to") or (cfg.get("date_range") or {}).get("end", "N/A")
+                print(
+                    f"[ENGINE INPUT] first={pd.to_datetime(first_date).date()} last={pd.to_datetime(last_date).date()} rows={len(base)} window={window_start}..{window_end}"
+                )
+
             signals_df = apply_signal_logic(base, cfg)
 
             # normalize entry/exit to {-1,0,1}
@@ -1122,6 +1143,23 @@ def run_backtest(
                     )
                 else:
                     signals_df[col] = 0
+
+            # Add date range guard before trading simulation
+            date_start = cfg.get("date_from") or (cfg.get("date_range") or {}).get("start")
+            date_end = cfg.get("date_to") or (cfg.get("date_range") or {}).get("end")
+
+            if date_start and date_end and len(signals_df) > 0:
+                # Enforce date range on signals_df before trading simulation
+                signal_dates = pd.to_datetime(signals_df["date"])
+                start_ts = pd.to_datetime(date_start)
+                end_ts = pd.to_datetime(date_end)
+                mask = (signal_dates >= start_ts) & (signal_dates <= end_ts)
+
+                if not mask.all():
+                    print(
+                        f"⚠️  WARNING: signals_df contains {(~mask).sum()} rows outside {date_start}..{date_end}, filtering before trading"
+                    )
+                    signals_df = signals_df[mask].copy().reset_index(drop=True)
 
             if track_equity:
                 pair_trades, pair_eq = simulate_pair_trades(
@@ -1192,6 +1230,15 @@ def run_backtest(
             trades_df = trades_df[mask].copy()
 
         print(f"[TRADES FILTER] kept={len(trades_df)} start={date_start} end={date_end}")
+
+    # OUT CHECK diagnostic
+    if len(trades_df) > 0 and "entry_date" in trades_df.columns:
+        entry_dates = pd.to_datetime(trades_df["entry_date"])
+        min_date = entry_dates.min()
+        max_date = entry_dates.max()
+        print(f"[OUT CHECK] first={min_date.date()} last={max_date.date()} rows={len(trades_df)}")
+    elif len(trades_df) == 0:
+        print("[OUT CHECK] no trades generated")
 
     # write artifacts
     trades_df.to_csv(trades_path, index=False)

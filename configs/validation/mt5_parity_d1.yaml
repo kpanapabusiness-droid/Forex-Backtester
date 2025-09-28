@@ -22,6 +22,12 @@ engine:
   cross_only: true
   allow_pyramiding: false
   reverse_on_signal: true
+indicators:
+  c1: "sma_cross"
+  use_c2: false
+  use_baseline: false
+  use_volume: false
+  use_exit: false
 roles:
   c1: sma_cross
   c2: null

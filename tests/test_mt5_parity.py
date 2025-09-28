@@ -148,8 +148,10 @@ class TestMT5CrossOnlyEngine:
     def test_cross_only_engine_behavior(self):
         """Test cross-only engine with toy data to verify single position and reversals."""
         # Create simple test data with known crosses
+        dates = pd.date_range(start="2022-01-01", periods=9, freq="D")
         df = pd.DataFrame(
             {
+                "date": dates,
                 "close": [1.1000, 1.1010, 1.1020, 1.1030, 1.1040, 1.1030, 1.1020, 1.1010, 1.1000],
                 "high": [1.1005, 1.1015, 1.1025, 1.1035, 1.1045, 1.1035, 1.1025, 1.1015, 1.1005],
                 "low": [1.0995, 1.1005, 1.1015, 1.1025, 1.1035, 1.1025, 1.1015, 1.1005, 1.0995],

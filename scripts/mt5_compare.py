@@ -273,6 +273,14 @@ def main():
         print(f"   Our trades: {len(our_trades)}")
         print(f"   MT5 trades: {len(mt5_trades)}")
 
+        # Warn if trade count deviates >50% from MT5 (fast fail hint)
+        if len(mt5_trades) > 0:
+            deviation = abs(len(our_trades) - len(mt5_trades)) / len(mt5_trades)
+            if deviation > 0.5:
+                print(
+                    f"⚠️  WARNING: Trade count deviation {deviation:.1%} > 50% - strategies may be different"
+                )
+
         # Match trades
         print("\n🔗 Matching trades...")
         matches, unmatched_ours, unmatched_mt5 = match_trades(

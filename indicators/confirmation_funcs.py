@@ -558,13 +558,17 @@ def c1_kuskus_starlight(df, period=14, signal_col="c1_signal", **kwargs):
 
 
 def c1_sma_cross(df, fast_period=20, slow_period=50, signal_col="c1_signal", **kwargs):
-    """SMA crossover strategy: fast SMA crosses above/below slow SMA."""
+    """SMA crossover strategy: signals only on cross events, not continuous state."""
     fast_sma = df["close"].rolling(window=fast_period).mean()
     slow_sma = df["close"].rolling(window=slow_period).mean()
 
+    # Cross events only - not continuous state
+    cross_up = (fast_sma.shift(1) <= slow_sma.shift(1)) & (fast_sma > slow_sma)
+    cross_down = (fast_sma.shift(1) >= slow_sma.shift(1)) & (fast_sma < slow_sma)
+
     df[signal_col] = 0
-    df.loc[fast_sma > slow_sma, signal_col] = 1  # Bullish when fast > slow
-    df.loc[fast_sma < slow_sma, signal_col] = -1  # Bearish when fast < slow
+    df.loc[cross_up, signal_col] = 1  # Signal +1 only on cross up event
+    df.loc[cross_down, signal_col] = -1  # Signal -1 only on cross down event
 
     return df
 

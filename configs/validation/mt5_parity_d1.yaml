@@ -3,6 +3,9 @@ pairs: ["EUR_USD"]
 timeframe: D1
 date_from: 2022-01-01
 date_to: 2024-12-31
+date_range:
+  start: 2022-01-01
+  end: 2024-12-31
 lot_size:
   mode: fixed
   value: 0.10
@@ -16,6 +19,9 @@ commission:
 slippage_pips: 0.0
 engine:
   fill_on_next_bar_open: true
+  cross_only: true
+  allow_pyramiding: false
+  reverse_on_signal: true
 roles:
   c1: sma_cross
   c2: null

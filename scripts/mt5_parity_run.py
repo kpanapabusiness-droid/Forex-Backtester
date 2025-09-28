@@ -39,6 +39,18 @@ def validate_mt5_parity_config(cfg):
     )
     assert cfg["slippage_pips"] in [0, 0.0], f"Expected slippage_pips=0, got {cfg['slippage_pips']}"
 
+    # Engine validations for cross-only behavior
+    engine = cfg.get("engine", {})
+    assert engine.get("cross_only") is True, (
+        f"Expected cross_only=true, got {engine.get('cross_only')}"
+    )
+    assert engine.get("reverse_on_signal") is True, (
+        f"Expected reverse_on_signal=true, got {engine.get('reverse_on_signal')}"
+    )
+    assert engine.get("allow_pyramiding") is False, (
+        f"Expected allow_pyramiding=false, got {engine.get('allow_pyramiding')}"
+    )
+
 
 def main():
     """Run MT5 parity backtest with fixed configuration."""
@@ -56,8 +68,9 @@ def main():
         validate_mt5_parity_config(cfg)
 
         # Print effective config summary
+        engine = cfg.get("engine", {})
         print(
-            f"[MT5 PARITY] {cfg['symbol']} {cfg['timeframe']} {cfg['date_from']}→{cfg['date_to']} c1={cfg['roles']['c1']}({cfg['c1']['fast_period']},{cfg['c1']['slow_period']}) lots=0.10 costs=0"
+            f"[MT5 PARITY] {cfg['symbol']} {cfg['timeframe']} {cfg['date_from']}→{cfg['date_to']} c1={cfg['roles']['c1']}({cfg['c1']['fast_period']},{cfg['c1']['slow_period']}) cross_only={int(engine.get('cross_only', False))} next_open_fills={int(engine.get('fill_on_next_bar_open', False))} reverse={int(engine.get('reverse_on_signal', False))} pyramiding={int(engine.get('allow_pyramiding', True))} costs=0"
         )
 
         # Run backtest - results_dir will be taken from config outputs.dir

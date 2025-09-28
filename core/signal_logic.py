@@ -190,6 +190,7 @@ def apply_signal_logic(df: pd.DataFrame, cfg: dict) -> pd.DataFrame:
     indicators_cfg = cfg.get("indicators", {})
     rules_cfg = cfg.get("rules", {})
     exit_cfg = cfg.get("exit", {})
+    engine_cfg = cfg.get("engine", {})
 
     # Configuration flags
     use_c2 = indicators_cfg.get("use_c2", False)
@@ -200,6 +201,11 @@ def apply_signal_logic(df: pd.DataFrame, cfg: dict) -> pd.DataFrame:
     pullback_rule = rules_cfg.get("pullback_rule", False)
     baseline_as_catalyst = rules_cfg.get("allow_baseline_as_catalyst", False)
     bridge_too_far_days = rules_cfg.get("bridge_too_far_days", 7)
+
+    # Engine configuration
+    cross_only = engine_cfg.get("cross_only", False)
+    reverse_on_signal = engine_cfg.get("reverse_on_signal", False)
+    allow_pyramiding = engine_cfg.get("allow_pyramiding", True)
 
     # Exit configuration
     exit_on_c1_reversal = exit_cfg.get("exit_on_c1_reversal", True)
@@ -261,8 +267,36 @@ def apply_signal_logic(df: pd.DataFrame, cfg: dict) -> pd.DataFrame:
         # Set position_open flag for current bar
         out.loc[i, "position_open"] = position_state != 0
 
-        # Entry logic (only if no position open)
-        if position_state == 0:
+        # Cross-only engine: simplified logic for MT5 parity
+        if cross_only:
+            # Only act on C1 cross events (non-zero signals)
+            if c1_signals.iloc[i] != 0:
+                signal_direction = c1_signals.iloc[i]
+
+                if position_state == 0:
+                    # No position: open new position
+                    out.loc[i, "entry_signal"] = signal_direction
+                    out.loc[i, "entry_allowed"] = True
+                    position_state = signal_direction
+                    entry_price = current_price
+                    atr_at_entry = atr_i
+
+                elif reverse_on_signal and position_state != signal_direction:
+                    # Reverse position: close current and open opposite
+                    out.loc[i, "exit_signal_final"] = 1
+                    out.loc[i, "exit_reason"] = "reverse_signal"
+                    out.loc[i, "entry_signal"] = signal_direction
+                    out.loc[i, "entry_allowed"] = True
+                    position_state = signal_direction
+                    entry_price = current_price
+                    atr_at_entry = atr_i
+
+                # If same direction and not allowing pyramiding, do nothing
+                elif position_state == signal_direction and not allow_pyramiding:
+                    out.loc[i, "reason_block"] = "no_pyramiding"
+
+        # Standard NNFX entry logic (only if no position open)
+        elif position_state == 0:
             candidate_direction = 0
 
             # Check for C1 signal

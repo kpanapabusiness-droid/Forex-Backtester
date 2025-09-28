@@ -41,6 +41,155 @@ class TestMT5ParityConfig:
         assert cfg["slippage_pips"] in [0, 0.0], "MT5 parity must have zero slippage"
 
 
+class TestMT5CrossOnlyEngine:
+    """Unit tests for cross-only engine behavior."""
+
+    def test_sma_cross_events_only(self):
+        """Test that SMA cross generates signals only on cross events, not continuous state."""
+        # Create toy price series with known SMA crosses
+
+        # Price series designed to create specific SMA crosses
+        prices = [
+            1.1000,
+            1.1010,
+            1.1020,
+            1.1030,
+            1.1040,  # Rising trend
+            1.1050,
+            1.1060,
+            1.1070,
+            1.1080,
+            1.1090,  # Continue rising
+            1.1100,
+            1.1110,
+            1.1120,
+            1.1130,
+            1.1140,  # More rising
+            1.1150,
+            1.1160,
+            1.1170,
+            1.1180,
+            1.1190,  # Peak
+            1.1200,
+            1.1190,
+            1.1180,
+            1.1170,
+            1.1160,  # Start falling
+            1.1150,
+            1.1140,
+            1.1130,
+            1.1120,
+            1.1110,  # Continue falling
+            1.1100,
+            1.1090,
+            1.1080,
+            1.1070,
+            1.1060,  # More falling
+            1.1050,
+            1.1040,
+            1.1030,
+            1.1020,
+            1.1010,  # Bottom
+            1.1000,
+            1.0990,
+            1.0980,
+            1.0970,
+            1.0960,  # Continue down
+            1.0950,
+            1.0960,
+            1.0970,
+            1.0980,
+            1.0990,  # Start rising again
+            1.1000,
+            1.1010,
+            1.1020,
+            1.1030,
+            1.1040,
+        ]  # Rising again
+
+        df = pd.DataFrame(
+            {
+                "close": prices,
+                "high": [p + 0.0005 for p in prices],
+                "low": [p - 0.0005 for p in prices],
+                "open": prices,
+            }
+        )
+
+        # Add project root to path for imports
+        import sys
+        from pathlib import Path
+
+        project_root = Path(__file__).parent.parent
+        sys.path.insert(0, str(project_root))
+
+        from indicators.confirmation_funcs import c1_sma_cross
+
+        # Apply SMA cross indicator
+        result = c1_sma_cross(df, fast_period=5, slow_period=10, signal_col="c1_signal")
+
+        # Check that signals are only -1, 0, or +1
+        unique_signals = result["c1_signal"].unique()
+        assert all(s in [-1, 0, 1] for s in unique_signals), f"Invalid signals: {unique_signals}"
+
+        # Check that we have some cross events (not all zeros)
+        non_zero_signals = result[result["c1_signal"] != 0]
+        assert len(non_zero_signals) > 0, "No cross events detected"
+
+        # Check that signals are sparse (not continuous state)
+        signal_density = len(non_zero_signals) / len(result)
+        assert signal_density < 0.5, (
+            f"Too many signals ({signal_density:.2f}), should be sparse cross events"
+        )
+
+        # Verify no NaN values
+        assert not result["c1_signal"].isna().any(), "Signal column contains NaN values"
+
+    def test_cross_only_engine_behavior(self):
+        """Test cross-only engine with toy data to verify single position and reversals."""
+        # Create simple test data with known crosses
+        df = pd.DataFrame(
+            {
+                "close": [1.1000, 1.1010, 1.1020, 1.1030, 1.1040, 1.1030, 1.1020, 1.1010, 1.1000],
+                "high": [1.1005, 1.1015, 1.1025, 1.1035, 1.1045, 1.1035, 1.1025, 1.1015, 1.1005],
+                "low": [1.0995, 1.1005, 1.1015, 1.1025, 1.1035, 1.1025, 1.1015, 1.1005, 1.0995],
+                "open": [1.1000, 1.1010, 1.1020, 1.1030, 1.1040, 1.1030, 1.1020, 1.1010, 1.1000],
+                "atr": [0.001] * 9,
+            }
+        )
+
+        # Manually set cross signals: cross up at index 2, cross down at index 6
+        df["c1_signal"] = [0, 0, 1, 0, 0, 0, -1, 0, 0]
+
+        # Test config for cross-only engine
+        config = {
+            "engine": {"cross_only": True, "reverse_on_signal": True, "allow_pyramiding": False},
+            "indicators": {"use_c2": False, "use_baseline": False, "use_volume": False},
+            "rules": {"one_candle_rule": False, "pullback_rule": False},
+            "exit": {"exit_on_c1_reversal": True},
+        }
+
+        # Import signal logic
+        from core.signal_logic import apply_signal_logic
+
+        result = apply_signal_logic(df, config)
+
+        # Should have exactly 2 entry signals (long at index 2, short at index 6)
+        entry_signals = result[result["entry_signal"] != 0]
+        assert len(entry_signals) == 2, f"Expected 2 entries, got {len(entry_signals)}"
+
+        # First entry should be long (+1) at index 2
+        assert result.loc[2, "entry_signal"] == 1, "Expected long entry at index 2"
+        assert result.loc[2, "entry_allowed"], "Entry should be allowed at index 2"
+
+        # Second entry should be short (-1) at index 6 with simultaneous exit
+        assert result.loc[6, "entry_signal"] == -1, "Expected short entry at index 6"
+        assert result.loc[6, "exit_signal_final"] == 1, "Expected exit signal at index 6 (reversal)"
+        assert result.loc[6, "exit_reason"] == "reverse_signal", (
+            "Exit reason should be reverse_signal"
+        )
+
+
 class TestMT5Comparator:
     """Unit tests for MT5 comparison logic using synthetic data."""
 

@@ -24,16 +24,16 @@ def load_our_trades(results_dir: Path) -> pd.DataFrame:
 
     # Normalize to unified schema
     unified = pd.DataFrame()
-    unified["open_time"] = pd.to_datetime(df["entry_time"])
-    unified["close_time"] = pd.to_datetime(df["exit_time"])
+    unified["open_time"] = pd.to_datetime(df["entry_date"])
+    unified["close_time"] = pd.to_datetime(df["exit_date"])
     unified["symbol"] = df["pair"]
-    unified["side"] = df["direction"]  # Assuming already +1/-1
+    unified["side"] = df["direction_int"]  # Use direction_int which should be +1/-1
     unified["open_price"] = df["entry_price"]
     unified["close_price"] = df["exit_price"]
     unified["sl"] = df.get("sl_at_entry_price", np.nan)
     unified["tp"] = df.get("tp1_at_entry_price", np.nan)
-    unified["pnl_pips"] = df["pnl_pips"]
-    unified["pnl_currency"] = df["pnl_currency"]
+    unified["pnl_pips"] = df["pnl"] / 10  # Convert to pips (assuming 4-digit pairs)
+    unified["pnl_currency"] = df["pnl"]
     unified["tag"] = df.get("exit_reason", "unknown")
 
     return unified

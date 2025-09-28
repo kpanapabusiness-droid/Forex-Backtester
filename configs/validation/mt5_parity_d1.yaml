@@ -1,30 +1,62 @@
-symbol: EURUSD
-timeframe: D1
-date_from: 2022-01-01
-date_to: 2024-12-31
-lot_size:
-  mode: fixed
-  value: 0.10
-spread:
+pairs: ["EUR_USD"]
+timeframe: "D"
+data:
+  dir: "data/daily"
+
+indicators:
+  c1: "c1_twiggs_money_flow"
+  use_c2: false
+  use_baseline: false
+  use_volume: false
+  use_exit: false
+
+c1_twiggs_money_flow:
+  length: 15
+
+rules:
+  one_candle_rule: false
+  pullback_rule: false
+  bridge_too_far_days: 7
+  allow_baseline_as_catalyst: false
+
+entry:
+  atr_multiple: 2.0
+
+exit:
+  use_trailing_stop: true
+  move_to_breakeven_after_atr: true
+  exit_on_c1_reversal: true
+  exit_on_baseline_cross: false
+  exit_on_exit_signal: false
+
+spreads:
   enabled: false
-  mode: fixed
-  value_pips: 0.0
-commission:
-  enabled: false
-  per_lot: 0.0
-slippage_pips: 0.0
-engine:
-  fill_on_next_bar_open: true
-roles:
-  c1: sma_cross
-  c2: null
-  baseline: null
-  volume: null
-  exit: null
-c1:
-  fast_period: 20
-  slow_period: 50
-outputs:
-  dir: results/validation/mt5_parity_d1
-  write_trades_csv: true
-  write_equity_csv: true
+  default_pips: 0.0
+
+tracking:
+  in_sim_equity: true
+  track_win_loss_scratch: true
+  track_roi: true
+  track_drawdown: true
+
+risk_filters:
+  dbcvix:
+    enabled: false
+    mode: "reduce"
+    threshold: 0.0
+    reduce_risk_to: 0.01
+    source: "synthetic"
+
+date_range:
+  start: "2022-01-01"
+  end: "2024-12-31"
+
+risk:
+  starting_balance: 10000.0
+  risk_percent: 2.0
+  lot_size:
+    mode: fixed
+    value: 0.10
+
+output:
+  results_dir: "results/validation/mt5_parity_d1"

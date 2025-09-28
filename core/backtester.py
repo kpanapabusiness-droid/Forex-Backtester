@@ -349,8 +349,11 @@ def apply_indicators_with_cache(df: pd.DataFrame, pair: str, cfg: dict) -> pd.Da
     Apply indicators (c1/c2/baseline/volume/exit) with caching.
     C2 shares the confirmation pool with C1 (indicators.confirmation_funcs).
     """
+    import os
+
     cache_cfg = cfg.get("cache") or {}
-    cache_on = cache_cfg.get("enabled", True)
+    # Honor FB_NO_CACHE env var or config cache.enabled setting
+    cache_on = os.environ.get("FB_NO_CACHE") != "1" and cache_cfg.get("enabled", True)
     cache_dir = cache_cfg.get("dir", "cache")
     cache_fmt = cache_cfg.get("format", "parquet")
     scope_key = cache_cfg.get("scope_key")
@@ -1086,6 +1089,26 @@ def run_backtest(
                 except Exception as _ve:
                     print(f"ℹ️  {pair}: validation skipped ({_ve})")
 
+            # Enforce final slice immediately before trading (safety gate)
+            date_start = cfg.get("date_from") or (cfg.get("date_range") or {}).get("start")
+            date_end = cfg.get("date_to") or (cfg.get("date_range") or {}).get("end")
+
+            if date_start and date_end:
+                from core.utils import slice_df_by_dates
+
+                base, (first_ts, last_ts, rows_before, rows_after) = slice_df_by_dates(
+                    base, date_start, date_end
+                )
+
+                if rows_after == 0:
+                    raise ValueError(
+                        f"Final slice produced empty dataset for {date_start}..{date_end}"
+                    )
+
+                print(
+                    f"[SLICE ENFORCE] rows_before={rows_before} rows_after={rows_after} first={first_ts.date()} last={last_ts.date()}"
+                )
+
             signals_df = apply_signal_logic(base, cfg)
 
             # normalize entry/exit to {-1,0,1}
@@ -1153,6 +1176,22 @@ def run_backtest(
         if c not in trades_df.columns:
             trades_df[c] = pd.NA
     trades_df = trades_df.reindex(columns=TRADES_COLS)
+
+    # Filter output trades to date range (safety gate)
+    date_start = cfg.get("date_from") or (cfg.get("date_range") or {}).get("start")
+    date_end = cfg.get("date_to") or (cfg.get("date_range") or {}).get("end")
+
+    if date_start and date_end and len(trades_df) > 0:
+        start_ts = pd.to_datetime(date_start)
+        end_ts = pd.to_datetime(date_end)
+
+        # Filter trades by entry_date
+        if "entry_date" in trades_df.columns:
+            entry_dates = pd.to_datetime(trades_df["entry_date"])
+            mask = (entry_dates >= start_ts) & (entry_dates <= end_ts)
+            trades_df = trades_df[mask].copy()
+
+        print(f"[TRADES FILTER] kept={len(trades_df)} start={date_start} end={date_end}")
 
     # write artifacts
     trades_df.to_csv(trades_path, index=False)

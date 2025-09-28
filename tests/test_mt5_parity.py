@@ -452,6 +452,18 @@ class TestMT5ParityE2E:
         max_exit = exit_dates.max()
         assert max_exit <= pd.to_datetime("2024-12-31"), f"Exit date {max_exit} after 2024-12-31"
 
+        # Additional check: all trades should be within the expected range
+        min_expected = pd.to_datetime("2022-01-01")
+        max_expected = pd.to_datetime("2024-12-31")
+
+        # Check that ALL entry dates are within range
+        out_of_range_entries = entry_dates[
+            (entry_dates < min_expected) | (entry_dates > max_expected)
+        ]
+        assert len(out_of_range_entries) == 0, (
+            f"Found {len(out_of_range_entries)} trades with entry dates outside 2022-2024 range"
+        )
+
         print(f"✅ Date validation passed: {min_entry.date()} to {max_exit.date()}")
 
 

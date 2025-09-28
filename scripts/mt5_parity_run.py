@@ -6,6 +6,7 @@ Runs a single backtest using the MT5 parity configuration to generate
 results for comparison with MT5 backtest reports.
 """
 
+import os
 import sys
 from pathlib import Path
 
@@ -56,6 +57,17 @@ def main():
     """Run MT5 parity backtest with fixed configuration."""
     config_path = "configs/validation/mt5_parity_d1.yaml"
 
+    # Hard disable cache for parity runs
+    os.environ["FB_NO_CACHE"] = "1"
+
+    # Clean cache directory for parity runs
+    cache_dir = Path("cache")
+    if cache_dir.exists():
+        import shutil
+
+        shutil.rmtree(cache_dir)
+        print("🗑️  Cleared cache directory for parity run")
+
     print("🚀 Running MT5 parity backtest...")
     print(f"   Config: {config_path}")
 
@@ -66,6 +78,11 @@ def main():
 
         # Validate critical settings
         validate_mt5_parity_config(cfg)
+
+        # Validate cache settings (warn if not disabled, but env wins)
+        cache_cfg = cfg.get("cache", {})
+        if cache_cfg.get("enabled", True):
+            print("⚠️  WARNING: config has cache enabled, but FB_NO_CACHE=1 overrides")
 
         # Assert date range is present
         date_start = cfg.get("date_from") or (cfg.get("date_range") or {}).get("start")

@@ -31,6 +31,8 @@ roles:
 c1:
   fast_period: 20
   slow_period: 50
+cache:
+  enabled: false
 outputs:
   dir: results/validation/mt5_parity_d1
   write_trades_csv: true

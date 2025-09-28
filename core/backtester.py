@@ -1733,16 +1733,45 @@ def write_trades_csv_with_diagnostics(
         f"[WRITE TRADES] rows={len(trades_df)} path={trades_path} write_trades_csv={write_flag} dir_exists={out_path.exists()} slug={run_slug}"
     )
 
-    # Schema validation
+    # Empty check FIRST - but create empty CSV with headers for compatibility
+    if len(trades_df) == 0:
+        print("[WRITE TRADES SKIP] reason=empty")
+
+        # Create empty CSV with standard headers for compatibility
+        try:
+            out_path.mkdir(parents=True, exist_ok=True)
+            empty_df = pd.DataFrame(
+                columns=[
+                    "pair",
+                    "entry_date",
+                    "entry_price",
+                    "direction",
+                    "direction_int",
+                    "atr_at_entry_price",
+                    "lots_total",
+                    "exit_date",
+                    "exit_price",
+                    "exit_reason",
+                    "pnl",
+                    "win",
+                    "loss",
+                    "scratch",
+                ]
+            )
+            empty_df.to_csv(trades_path, index=False)
+            print(f"[WRITE TRADES OK] wrote=0 path={trades_path} (empty file with headers)")
+            return True
+        except Exception as e:
+            print(
+                f"[WRITE TRADES ERROR] reason=empty_file_creation_failed exception={type(e).__name__}:{str(e)}"
+            )
+            return False
+
+    # Schema validation (only for non-empty DataFrames)
     required_cols = ["pair", "entry_date", "direction_int"]  # Minimal required
     missing_cols = [col for col in required_cols if col not in trades_df.columns]
     if missing_cols:
         print(f"[WRITE TRADES SKIP] reason=schema_invalid missing_fields={missing_cols}")
-        return False
-
-    # Empty check
-    if len(trades_df) == 0:
-        print("[WRITE TRADES SKIP] reason=empty")
         return False
 
     # Flag check

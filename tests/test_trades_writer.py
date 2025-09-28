@@ -96,7 +96,7 @@ class TestTradesWriter:
 
     def test_trades_writer_empty_data(self, tmp_path, capsys):
         """
-        Edge case: writer should skip when DataFrame is empty.
+        Edge case: writer should create empty CSV with headers for compatibility.
         """
         # Arrange
         empty_df = pd.DataFrame(columns=["pair", "entry_date", "direction_int"])
@@ -106,11 +106,55 @@ class TestTradesWriter:
         result = write_trades_csv_with_diagnostics(empty_df, tmp_path, config, "test_run")
 
         # Assert
-        assert result is False, "Writer should return False for empty data"
+        assert result is True, "Writer should return True for empty data (success)"
+
+        # Check file DOES exist with headers (for compatibility)
+        trades_file = tmp_path / "trades.csv"
+        assert trades_file.exists(), "trades.csv should be created with headers for empty data"
+
+        # Verify it's empty but has headers
+        written_df = pd.read_csv(trades_file)
+        assert len(written_df) == 0, "Should have 0 rows"
+        assert len(written_df.columns) > 0, "Should have column headers"
 
         # Check logs
         captured = capsys.readouterr()
         assert "[WRITE TRADES SKIP] reason=empty" in captured.out, "Should log empty skip"
+        assert "[WRITE TRADES OK] wrote=0" in captured.out, (
+            "Should log successful empty file creation"
+        )
+
+    def test_trades_writer_empty_no_schema(self, tmp_path, capsys):
+        """
+        Critical test: empty DataFrame without required columns should still be success.
+        This is the exact scenario that was failing in CI.
+        """
+        # Arrange - empty DataFrame with no columns at all (like from failed backtest)
+        empty_df = pd.DataFrame()  # No columns, no rows
+        config = {"outputs": {"write_trades_csv": True}}
+
+        # Act
+        result = write_trades_csv_with_diagnostics(empty_df, tmp_path, config, "test_run")
+
+        # Assert
+        assert result is True, "Writer should return True for empty DataFrame (even without schema)"
+
+        # Check file DOES exist with standard headers (for compatibility)
+        trades_file = tmp_path / "trades.csv"
+        assert trades_file.exists(), "trades.csv should be created with headers for empty data"
+
+        # Verify it's empty but has headers
+        written_df = pd.read_csv(trades_file)
+        assert len(written_df) == 0, "Should have 0 rows"
+        assert len(written_df.columns) > 0, "Should have column headers"
+
+        # Check logs - should show empty skip, NOT schema error
+        captured = capsys.readouterr()
+        assert "[WRITE TRADES SKIP] reason=empty" in captured.out, "Should log empty skip"
+        assert "schema_invalid" not in captured.out, "Should NOT log schema error for empty data"
+        assert "[WRITE TRADES OK] wrote=0" in captured.out, (
+            "Should log successful empty file creation"
+        )
 
     def test_trades_writer_schema_invalid(self, tmp_path, capsys):
         """

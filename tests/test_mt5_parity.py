@@ -8,6 +8,7 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
+import yaml
 
 # Add project root to path for imports
 project_root = Path(__file__).parent.parent
@@ -15,6 +16,29 @@ sys.path.insert(0, str(project_root))
 
 # Import after path setup
 from scripts.mt5_compare import compare_totals, match_trades  # noqa: E402
+
+
+class TestMT5ParityConfig:
+    """Unit tests for MT5 parity configuration validation."""
+
+    def test_mt5_parity_config_validation(self):
+        """Test that MT5 parity config has exact required settings."""
+        config_path = project_root / "configs/validation/mt5_parity_d1.yaml"
+
+        with open(config_path, "r") as f:
+            cfg = yaml.safe_load(f)
+
+        # Critical assertions - these must never change
+        assert cfg["roles"]["c1"] == "sma_cross", "MT5 parity must use sma_cross indicator"
+        assert cfg["c1"]["fast_period"] == 20, "MT5 parity fast SMA must be 20"
+        assert cfg["c1"]["slow_period"] == 50, "MT5 parity slow SMA must be 50"
+        assert cfg["symbol"] == "EURUSD", "MT5 parity must use EURUSD"
+        assert cfg["timeframe"] == "D1", "MT5 parity must use D1 timeframe"
+        assert str(cfg["date_from"]) == "2022-01-01", "MT5 parity start date must be 2022-01-01"
+        assert str(cfg["date_to"]) == "2024-12-31", "MT5 parity end date must be 2024-12-31"
+        assert cfg["spread"]["enabled"] is False, "MT5 parity must have spreads disabled"
+        assert cfg["commission"]["enabled"] is False, "MT5 parity must have commission disabled"
+        assert cfg["slippage_pips"] in [0, 0.0], "MT5 parity must have zero slippage"
 
 
 class TestMT5Comparator:

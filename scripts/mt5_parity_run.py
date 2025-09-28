@@ -9,12 +9,35 @@ results for comparison with MT5 backtest reports.
 import sys
 from pathlib import Path
 
+import yaml
+
 # Add project root to path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 # Import after path setup
 from core.backtester import run_backtest  # noqa: E402
+
+
+def validate_mt5_parity_config(cfg):
+    """Validate that config matches exact MT5 EA settings."""
+    # Critical validations - must match MT5 EA exactly
+    assert cfg["roles"]["c1"] == "sma_cross", f"Expected c1=sma_cross, got {cfg['roles']['c1']}"
+    assert cfg["timeframe"] == "D1", f"Expected timeframe=D1, got {cfg['timeframe']}"
+    assert cfg["symbol"] == "EURUSD", f"Expected symbol=EURUSD, got {cfg['symbol']}"
+    assert cfg["c1"]["fast_period"] == 20, (
+        f"Expected fast_period=20, got {cfg['c1']['fast_period']}"
+    )
+    assert cfg["c1"]["slow_period"] == 50, (
+        f"Expected slow_period=50, got {cfg['c1']['slow_period']}"
+    )
+    assert cfg["spread"]["enabled"] is False, (
+        f"Expected spread disabled, got {cfg['spread']['enabled']}"
+    )
+    assert cfg["commission"]["enabled"] is False, (
+        f"Expected commission disabled, got {cfg['commission']['enabled']}"
+    )
+    assert cfg["slippage_pips"] in [0, 0.0], f"Expected slippage_pips=0, got {cfg['slippage_pips']}"
 
 
 def main():
@@ -25,12 +48,24 @@ def main():
     print(f"   Config: {config_path}")
 
     try:
+        # Load and validate config
+        with open(config_path, "r") as f:
+            cfg = yaml.safe_load(f)
+
+        # Validate critical settings
+        validate_mt5_parity_config(cfg)
+
+        # Print effective config summary
+        print(
+            f"[MT5 PARITY] {cfg['symbol']} {cfg['timeframe']} {cfg['date_from']}→{cfg['date_to']} c1={cfg['roles']['c1']}({cfg['c1']['fast_period']},{cfg['c1']['slow_period']}) lots=0.10 costs=0"
+        )
+
         # Run backtest - results_dir will be taken from config outputs.dir
-        run_backtest(config_path)
+        run_backtest(cfg)
         print("✅ MT5 parity backtest completed!")
 
         # Verify output files
-        results_dir = Path("results/validation/mt5_parity_d1")
+        results_dir = Path(cfg["outputs"]["dir"])
         trades_file = results_dir / "trades.csv"
         equity_file = results_dir / "equity_curve.csv"
 

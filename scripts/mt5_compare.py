@@ -22,6 +22,16 @@ def load_our_trades(results_dir: Path) -> pd.DataFrame:
 
     df = pd.read_csv(trades_file)
 
+    # Validate metadata/content
+    if len(df) == 0:
+        raise ValueError("Our trades file is empty - no trades generated")
+
+    # Check symbol consistency (accept both EUR_USD and EURUSD formats)
+    unique_symbols = df["pair"].unique()
+    expected_symbols = ["EURUSD", "EUR_USD"]
+    if len(unique_symbols) != 1 or unique_symbols[0] not in expected_symbols:
+        raise ValueError(f"Expected symbol=EURUSD or EUR_USD only, found: {unique_symbols}")
+
     # Normalize to unified schema
     unified = pd.DataFrame()
     unified["open_time"] = pd.to_datetime(df["entry_date"])
@@ -252,6 +262,7 @@ def main():
     print(f"   Price tolerance: {args.price_tol}")
     print(f"   PnL tolerance: {args.pnl_pct_tol}")
     print(f"   Time tolerance: {args.time_tol_bars} bars")
+    print("Comparing EURUSD D1 2022-01-01..2024-12-31 | strategy=sma_cross(20,50)")
 
     try:
         # Load trades

@@ -37,3 +37,8 @@ results_history/
 # Aider / agents
 .aider*
 .aiderignore
+
+# MT5 exports (machine-specific)
+mt5/**
+!mt5/.gitkeep
+!mt5/README.md

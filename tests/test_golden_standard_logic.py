@@ -103,11 +103,10 @@ class TestGoldenStandardLogic:
             "SL audit field immutable"
         )
 
-        # Verify exit details (current implementation may exit at breakeven)
-        # Golden Standard: should exit on C1 reversal after TP1
-        # Current: may exit at breakeven instead
-        assert trade["exit_reason"] in ["c1_reversal", "breakeven_after_tp1"], (
-            f"Should exit on C1 reversal or breakeven, got {trade['exit_reason']}"
+        # Verify strict exit priority: post-TP1 C1 reversal should exit at C1 reversal
+        # Golden Standard: C1 reversal takes priority over breakeven after TP1
+        assert trade["exit_reason"] == "c1_reversal", (
+            f"Golden Standard violation: Post-TP1 C1 reversal must exit as 'c1_reversal', got '{trade['exit_reason']}'"
         )
         assert "sl_at_exit_price" in trade, "Should record final SL at exit"
 
@@ -241,9 +240,19 @@ class TestGoldenStandardLogic:
 
         # Verify exit details
         assert trade["exit_reason"] == "c1_reversal", "Should exit on C1 reversal"
-        # Note: PnL may be higher than expected due to current implementation
-        # Golden Standard: should be near breakeven for SCRATCH trades
-        print(f"SCRATCH trade PnL: {trade['pnl']} (Golden Standard expects near 0)")
+
+        # Verify strict SCRATCH PnL requirement: must be ≈ 0 within tolerance
+        # Golden Standard: Pre-TP1 SCRATCH should have minimal PnL impact
+        spread_tolerance = 2.0  # pips - account for spread + small timing effects
+        pip_size = 0.0001  # EUR_USD pip size
+        max_pnl_tolerance = (
+            spread_tolerance * pip_size * 100000 + 1e-9
+        )  # Convert to account currency
+
+        assert abs(trade["pnl"]) <= max_pnl_tolerance, (
+            f"Golden Standard violation: Pre-TP1 SCRATCH PnL must be ≈0, got {trade['pnl']:.2f} "
+            f"(tolerance: ±{max_pnl_tolerance:.2f})"
+        )
 
     def test_trailing_stop_strict_close_to_close(self):
         """
@@ -335,12 +344,31 @@ class TestGoldenStandardLogic:
         # Verify TP1 was hit first
         assert trade["tp1_hit"], "TP1 should have been hit"
 
-        # Document current vs Golden Standard behavior
-        # Golden Standard: Trailing stop should activate after close > 2×ATR
-        # Current implementation: May not implement strict close-to-close trailing
-        print(f"Trailing stop active: {trade.get('ts_active', False)}")
-        print(f"Exit reason: {trade['exit_reason']}")
-        print(f"TP1 hit: {trade['tp1_hit']}")
+        # Verify strict trailing stop activation and behavior
+        # Golden Standard: TS activates when BAR CLOSE moves past ±2×ATR from entry
+        # Entry: 1.0000, ATR: 0.002, so 2×ATR = 0.004
+        # Bar 3 close: 1.0040 = entry + 2×ATR → should activate TS
+        assert trade.get("ts_active", False), (
+            "Golden Standard violation: Trailing stop must activate when close > entry + 2×ATR "
+            "(entry=1.0000, close=1.0040, 2×ATR=0.004)"
+        )
+
+        # Verify strict trailing stop exit reason
+        # Golden Standard: When TS is active and hit, exit reason must be 'trailing_stop'
+        assert trade["exit_reason"] == "trailing_stop", (
+            f"Golden Standard violation: Active trailing stop exit must be 'trailing_stop', "
+            f"got '{trade['exit_reason']}'"
+        )
+
+        # Verify trailing stop level calculation
+        # Golden Standard: Trail distance = 1.5×ATR from entry ATR
+        # Expected TS level ≈ 1.0040 - 1.5×0.002 = 1.0010 (from highest close)
+        expected_ts_level = 1.0040 - (1.5 * 0.002)  # 1.0010
+        assert "ts_level" in trade, "Must record trailing stop level"
+        assert trade["ts_level"] == pytest.approx(expected_ts_level, abs=1e-6), (
+            f"Golden Standard violation: TS level must be 1.5×ATR behind highest close, "
+            f"expected ≈{expected_ts_level:.6f}, got {trade.get('ts_level', 'None')}"
+        )
 
         # Verify WIN classification (TP1 hit, so WIN regardless of exit method)
         assert trade["win"], "Trade should remain WIN (TP1 hit)"
@@ -350,13 +378,103 @@ class TestGoldenStandardLogic:
         # Verify positive PnL (TP1 guarantees some profit)
         assert trade["pnl"] > 0, "Should have positive PnL (TP1 + runner profit)"
 
-        # Document expected vs actual behavior
-        if not trade.get("ts_active", False):
-            print("⚠️  Golden Standard gap: Trailing stop not activated as expected")
-        if trade["exit_reason"] != "trailing_stop":
-            print(
-                f"⚠️  Golden Standard gap: Expected trailing_stop exit, got {trade['exit_reason']}"
-            )
+    def test_post_tp1_exit_priority_breakeven_vs_trailing_stop(self):
+        """
+        Post-TP1 exit priority: TS active → 'trailing_stop', TS inactive + at entry → 'breakeven_after_tp1'.
+
+        Scenario:
+        - Entry at 1.0000, TP1 hit at 1.0020
+        - Price returns to entry (1.0000) without activating TS (no 2×ATR move)
+        - Expected: exit_reason = 'breakeven_after_tp1' (TS not active)
+        """
+        bars = [
+            # Bar 0: Setup
+            {
+                "date": "2023-01-01",
+                "open": 1.0000,
+                "high": 1.0000,
+                "low": 1.0000,
+                "close": 1.0000,
+                "c1_signal": 0,
+                "baseline": 0.9990,
+                "baseline_signal": 1,
+            },
+            # Bar 1: Entry signal
+            {
+                "date": "2023-01-02",
+                "open": 1.0000,
+                "high": 1.0005,
+                "low": 0.9995,
+                "close": 1.0000,
+                "c1_signal": 1,
+                "baseline": 0.9990,
+                "baseline_signal": 1,
+            },
+            # Bar 2: TP1 hit
+            {
+                "date": "2023-01-03",
+                "open": 1.0000,
+                "high": 1.0025,
+                "low": 1.0000,
+                "close": 1.0020,
+                "c1_signal": 1,
+                "baseline": 0.9990,
+                "baseline_signal": 1,
+            },
+            # Bar 3: Move up but not enough for TS activation (< 2×ATR)
+            {
+                "date": "2023-01-04",
+                "open": 1.0020,
+                "high": 1.0035,
+                "low": 1.0020,
+                "close": 1.0030,  # Only 1.5×ATR from entry, not 2×ATR
+                "c1_signal": 1,
+                "baseline": 0.9990,
+                "baseline_signal": 1,
+            },
+            # Bar 4: Return to entry price (breakeven)
+            {
+                "date": "2023-01-05",
+                "open": 1.0030,
+                "high": 1.0030,
+                "low": 0.9995,
+                "close": 1.0000,  # Back to entry, should hit breakeven
+                "c1_signal": 1,
+                "baseline": 0.9990,
+                "baseline_signal": 1,
+            },
+        ]
+
+        df = create_synthetic_ohlc(bars, atr_value=0.002)
+        result = run_synthetic_backtest(df)
+
+        trades = result["trades"]
+        assert len(trades) == 1, f"Expected 1 trade, got {len(trades)}"
+
+        trade = trades[0]
+
+        # Verify TP1 was hit
+        assert trade["tp1_hit"], "TP1 should have been hit"
+
+        # Verify TS was NOT activated (never reached 2×ATR)
+        # Golden Standard: TS activates only when close > entry ± 2×ATR
+        # Max close was 1.0030 = entry + 1.5×ATR, not enough for activation
+        assert not trade.get("ts_active", False), (
+            "Golden Standard violation: TS should not activate without 2×ATR close move "
+            "(entry=1.0000, max_close=1.0030, 2×ATR=0.004)"
+        )
+
+        # Verify strict exit priority: no TS active + at entry = breakeven
+        # Golden Standard: When TS inactive and price returns to entry, reason = 'breakeven_after_tp1'
+        assert trade["exit_reason"] == "breakeven_after_tp1", (
+            f"Golden Standard violation: Post-TP1 return to entry without TS must be 'breakeven_after_tp1', "
+            f"got '{trade['exit_reason']}'"
+        )
+
+        # Verify WIN classification (TP1 hit)
+        assert trade["win"], "Trade should be WIN (TP1 hit)"
+        assert not trade["loss"], "Trade should not be LOSS"
+        assert not trade["scratch"], "Trade should not be SCRATCH"
 
     def test_continuation_trade_without_volume_or_atr_distance(self):
         """

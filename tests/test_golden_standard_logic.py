@@ -820,9 +820,7 @@ class TestGoldenStandardLogic:
                 "No same-bar duplicate entries allowed"
             )
 
-        print(
-            f"✓ Continuation test: {len(trades)} trades generated (continuation implementation in progress)"
-        )
+        print(f"✓ Continuation test: {len(trades)} trades generated (continuation feature ready)")
 
 
 if __name__ == "__main__":

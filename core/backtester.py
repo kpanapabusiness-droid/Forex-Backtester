@@ -778,15 +778,10 @@ def simulate_pair_trades(
                 exit_px = c_i
                 closed_this_bar = True
 
-            # BE/TS after TP1 or when TS active (only if no system exit)
+            # BE/TS after TP1 or when TS active (lower priority than system exits)
             # Skip same-bar breakeven check if TP1 just hit this bar
             tp1_hit_this_bar = tp1_done and not bool(open_tr.get("tp1_hit", False))
-            if (
-                (not closed_this_bar)
-                and not has_system_exit
-                and (tp1_done or ts_active)
-                and not tp1_hit_this_bar
-            ):
+            if (not closed_this_bar) and (tp1_done or ts_active) and not tp1_hit_this_bar:
                 if hit_level(d, h_i, l_i, effective_stop, "sl"):
                     if (
                         ts_active
@@ -808,6 +803,11 @@ def simulate_pair_trades(
 
             # ---- finalize exit ----
             if closed_this_bar:
+                # DEBUG: Log trade closure
+                if pair == "EUR_USD":
+                    print(
+                        f"DEBUG: Trade closing on Bar {i}, reason={reason}, tp1_done={tp1_done}, ts_active={ts_active}"
+                    )
                 current_effective_stop = (
                     float(effective_stop) if effective_stop is not None else None
                 )

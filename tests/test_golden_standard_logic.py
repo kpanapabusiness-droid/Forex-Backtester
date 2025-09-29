@@ -54,27 +54,27 @@ class TestGoldenStandardLogic:
                 "baseline": 0.9990,
                 "baseline_signal": 1,
             },
-            # Bar 2: TP1 hit then return (same bar)
+            # Bar 2: TP1 hit, avoid immediate breakeven
             {
                 "date": "2023-01-03",
                 "open": 1.0000,
                 "high": 1.0025,
-                "low": 1.0000,
-                "close": 1.0000,
+                "low": 1.0005,  # Above breakeven to avoid same-bar closure
+                "close": 1.0010,
                 "c1_signal": 1,
                 "baseline": 0.9990,
                 "baseline_signal": 1,
             },
-            # Bar 3: Continue (runner at breakeven)
+            # Bar 3: C1 reversal + breakeven hit (test priority)
             {
                 "date": "2023-01-04",
-                "open": 1.0000,
+                "open": 1.0010,
                 "high": 1.0010,
-                "low": 0.9995,
+                "low": 0.9995,  # Hits breakeven
                 "close": 1.0005,
-                "c1_signal": -1,
+                "c1_signal": -1,  # C1 reversal on same bar
                 "baseline": 0.9990,
-                "baseline_signal": 1,  # C1 reversal exit
+                "baseline_signal": 1,
             },
         ]
 
@@ -287,13 +287,13 @@ class TestGoldenStandardLogic:
                 "baseline": 0.9990,
                 "baseline_signal": 1,
             },
-            # Bar 2: TP1 hit
+            # Bar 2: TP1 hit, avoid breakeven
             {
                 "date": "2023-01-03",
                 "open": 1.0000,
                 "high": 1.0025,
-                "low": 1.0000,
-                "close": 1.0020,
+                "low": 1.0005,  # Above breakeven to avoid immediate closure
+                "close": 1.0022,  # Close above TP1 to keep runner open
                 "c1_signal": 1,
                 "baseline": 0.9990,
                 "baseline_signal": 1,

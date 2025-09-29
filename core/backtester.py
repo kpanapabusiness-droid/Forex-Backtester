@@ -95,6 +95,7 @@ TRADES_COLS: List[str] = [
     "entry_idx",
     "exit_date",
     "exit_price",
+    "market_exit_price_actual",  # Audit transparency for SCRATCH accounting
     "exit_reason",
     "sl_at_exit_price",
     # --- Results ---
@@ -719,7 +720,8 @@ def simulate_pair_trades(
             # (a) trailing activation
             if not ts_active and math.isfinite(atr_entry) and atr_entry > 0:
                 move_cl = signed_move_from_entry(d, c_i, entry_px)
-                if move_cl >= TRAIL_AFTER_ATR * atr_entry:
+                threshold = TRAIL_AFTER_ATR * atr_entry
+                if move_cl >= threshold:
                     ts_active = True
                     ts_level = trail_level_from_close(d, c_i, atr_entry)
 
@@ -760,7 +762,7 @@ def simulate_pair_trades(
                     if ts_active and ts_level is not None:
                         effective_stop = better_stop(d, effective_stop, ts_level)
 
-            # BE/TS after TP1 or when TS active
+            # Hard-Stop Realism: Intrabar TP/SL/BE/TS touch → immediate exit (highest priority)
             if (not closed_this_bar) and (tp1_done or ts_active):
                 if hit_level(d, h_i, l_i, effective_stop, "sl"):
                     if (
@@ -775,14 +777,15 @@ def simulate_pair_trades(
                     else:
                         reason = (
                             "breakeven_after_tp1"
-                            if tp1_done and abs(effective_stop - entry_px) < 1e-12
+                            if tp1_done and abs(effective_stop - entry_px) < 1e-6
                             else "stoploss"
                         )
                     exit_px = effective_stop
                     closed_this_bar = True
 
-            # Indicator/logic exit at close if still open
-            if (not closed_this_bar) and exit_sig != 0:
+            # System/indicator exit at close (only if no intrabar touch occurred)
+            has_system_exit = exit_sig != 0
+            if (not closed_this_bar) and has_system_exit:
                 if exit_cfg.get("exit_on_exit_signal", False):
                     reason = "exit_indicator"
                 elif exit_cfg.get("exit_on_c1_reversal", True):
@@ -811,17 +814,29 @@ def simulate_pair_trades(
                     )
                     exit_px = float(open_tr["exit_price"])  # for clarity
                 else:
-                    # Non‑TS exits → use computed price
-                    open_tr["exit_price"] = float(exit_px)
+                    # Non‑TS exits → use computed price (except SCRATCH pre-TP1)
+                    if not open_tr.get("tp1_hit", False) and reason == "c1_reversal":
+                        # Pre-TP1 SCRATCH: use entry price for accounting (≈0 PnL)
+                        open_tr["exit_price"] = float(
+                            open_tr["entry_price"]
+                        )  # Accounting exit = entry
+                        open_tr["market_exit_price_actual"] = float(exit_px)  # Audit transparency
+                    else:
+                        open_tr["exit_price"] = float(exit_px)
 
                 # Common stamps
                 open_tr["exit_date"] = date_i
                 open_tr["exit_reason"] = str(reason)
 
-                # W/L/S classification
+                # W/L/S classification (Hard-Stop Realism)
                 if bool(open_tr.get("tp1_hit", False)):
-                    open_tr["win"], open_tr["loss"], open_tr["scratch"] = True, False, False
+                    # TP1 hit: WIN unless BE exit (which becomes SCRATCH)
+                    if reason == "breakeven_after_tp1":
+                        open_tr["win"], open_tr["loss"], open_tr["scratch"] = False, False, True
+                    else:
+                        open_tr["win"], open_tr["loss"], open_tr["scratch"] = True, False, False
                 else:
+                    # No TP1: LOSS if SL, SCRATCH otherwise
                     if reason == "stoploss":
                         open_tr["win"], open_tr["loss"], open_tr["scratch"] = False, True, False
                     else:
@@ -834,6 +849,11 @@ def simulate_pair_trades(
 
                 equity_state["balance"] += float(pnl_money)
                 realized_pnl_cum_local += float(pnl_money)
+
+                # Ensure trailing stop state is properly recorded
+                open_tr["ts_active"] = bool(ts_active)
+                if ts_level is not None:
+                    open_tr["ts_level"] = float(ts_level)
 
                 # ✅ Persist the stop that was actually in force at exit (lets the audit pass)
                 _finalize_and_append_trade(

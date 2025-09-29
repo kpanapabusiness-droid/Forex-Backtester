@@ -762,31 +762,8 @@ def simulate_pair_trades(
                     if ts_active and ts_level is not None:
                         effective_stop = better_stop(d, effective_stop, ts_level)
 
-            # Check for system exit signals first (highest priority)
-            has_system_exit = exit_sig != 0
-
-            # Indicator/logic exit at close (highest priority)
-            if (not closed_this_bar) and has_system_exit:
-                if exit_cfg.get("exit_on_exit_signal", False):
-                    reason = "exit_indicator"
-                elif exit_cfg.get("exit_on_c1_reversal", True):
-                    reason = "c1_reversal"
-                elif exit_cfg.get("exit_on_baseline_cross", False):
-                    reason = "baseline_cross"
-                else:
-                    reason = "exit_indicator"
-                exit_px = c_i
-                closed_this_bar = True
-
-            # BE/TS after TP1 or when TS active (only if no system exit)
-            # Skip same-bar breakeven check if TP1 just hit this bar
-            tp1_hit_this_bar = tp1_done and not bool(open_tr.get("tp1_hit", False))
-            if (
-                (not closed_this_bar)
-                and not has_system_exit
-                and (tp1_done or ts_active)
-                and not tp1_hit_this_bar
-            ):
+            # Hard-Stop Realism: Intrabar TP/SL/BE/TS touch → immediate exit (highest priority)
+            if (not closed_this_bar) and (tp1_done or ts_active):
                 if hit_level(d, h_i, l_i, effective_stop, "sl"):
                     if (
                         ts_active
@@ -805,6 +782,20 @@ def simulate_pair_trades(
                         )
                     exit_px = effective_stop
                     closed_this_bar = True
+
+            # System/indicator exit at close (only if no intrabar touch occurred)
+            has_system_exit = exit_sig != 0
+            if (not closed_this_bar) and has_system_exit:
+                if exit_cfg.get("exit_on_exit_signal", False):
+                    reason = "exit_indicator"
+                elif exit_cfg.get("exit_on_c1_reversal", True):
+                    reason = "c1_reversal"
+                elif exit_cfg.get("exit_on_baseline_cross", False):
+                    reason = "baseline_cross"
+                else:
+                    reason = "exit_indicator"
+                exit_px = c_i
+                closed_this_bar = True
 
             # ---- finalize exit ----
             if closed_this_bar:
@@ -837,10 +828,15 @@ def simulate_pair_trades(
                 open_tr["exit_date"] = date_i
                 open_tr["exit_reason"] = str(reason)
 
-                # W/L/S classification
+                # W/L/S classification (Hard-Stop Realism)
                 if bool(open_tr.get("tp1_hit", False)):
-                    open_tr["win"], open_tr["loss"], open_tr["scratch"] = True, False, False
+                    # TP1 hit: WIN unless BE exit (which becomes SCRATCH)
+                    if reason == "breakeven_after_tp1":
+                        open_tr["win"], open_tr["loss"], open_tr["scratch"] = False, False, True
+                    else:
+                        open_tr["win"], open_tr["loss"], open_tr["scratch"] = True, False, False
                 else:
+                    # No TP1: LOSS if SL, SCRATCH otherwise
                     if reason == "stoploss":
                         open_tr["win"], open_tr["loss"], open_tr["scratch"] = False, True, False
                     else:

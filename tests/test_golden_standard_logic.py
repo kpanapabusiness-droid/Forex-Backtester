@@ -1,14 +1,15 @@
 """
-Golden Standard Logic Tests - Deterministic verification of NNFX trading rules.
+Hard-Stop Realism Tests - Deterministic verification of NNFX trading rules.
 
 Tests use synthetic OHLC data to trigger specific scenarios and verify:
-- TP1 → Breakeven → WIN classification
+- Intrabar TP/SL/BE/TS touch → immediate exit (hard-stop realism)
+- TP1 → BE same bar → exit if BE touched intrabar
 - SL before TP1 → LOSS classification
-- System exits before TP1 → SCRATCH classification
-- Strict trailing stop (close-to-close activation/updates)
-- Continuation trades (no volume/distance requirements)
+- System exits before TP1 → SCRATCH classification (≈0 PnL)
+- Trailing stop: close-based activation/updates, intrabar exits
+- BE activation: immediate on TP1 bar, effective same bar
 - Spreads affect PnL only, not trade counts
-- Correlation scope (ignored in unit tests)
+- Audit invariants: immutable entry levels, proper exit recording
 """
 
 from __future__ import annotations
@@ -18,18 +19,18 @@ import pytest
 from tests.utils_synth import create_synthetic_ohlc, run_synthetic_backtest
 
 
-class TestGoldenStandardLogic:
-    """Test suite enforcing Golden Standard trading logic."""
+class TestHardStopRealism:
+    """Test suite enforcing Hard-Stop Realism trading logic."""
 
-    def test_tp1_moves_runner_to_be_same_bar_and_classifies_win(self):
+    def test_tp1_moves_runner_to_be_same_bar_immediate_exit(self):
         """
-        TP1 hit → half close at TP1, runner SL moves to breakeven same bar → WIN.
+        Hard-Stop Realism: TP1 hit → BE set same bar → immediate exit if BE touched intrabar.
 
         Scenario:
         - Entry at 1.0000 (C1 signal +1)
         - TP1 at 1.0020 (1×ATR), SL at 0.9970 (1.5×ATR)
-        - Bar 2: High touches TP1, then returns to entry level
-        - Expected: Half closed at TP1, runner SL = entry price, classification = WIN
+        - Bar 2: High touches TP1, low touches BE (1.0000) same bar
+        - Expected: Immediate exit as breakeven_after_tp1, SCRATCH classification
         """
         bars = [
             # Bar 0: Setup
@@ -90,10 +91,10 @@ class TestGoldenStandardLogic:
         assert trade["tp1_hit"], "TP1 should have been hit"
         assert trade["breakeven_after_tp1"], "Should move to breakeven after TP1"
 
-        # Verify WIN classification (TP1 determines outcome)
-        assert trade["win"], "Trade should be classified as WIN"
+        # Verify SCRATCH classification (hard-stop realism: BE touched same bar)
+        assert not trade["win"], "Trade should not be WIN (BE hit same bar)"
         assert not trade["loss"], "Trade should not be LOSS"
-        assert not trade["scratch"], "Trade should not be SCRATCH"
+        assert trade["scratch"], "Trade should be SCRATCH (breakeven exit)"
 
         # Verify immutable audit fields
         assert trade["tp1_at_entry_price"] == pytest.approx(1.0020, abs=1e-6), (
@@ -103,10 +104,9 @@ class TestGoldenStandardLogic:
             "SL audit field immutable"
         )
 
-        # Verify strict exit priority: post-TP1 C1 reversal should exit at C1 reversal
-        # Golden Standard: C1 reversal takes priority over breakeven after TP1
-        assert trade["exit_reason"] == "c1_reversal", (
-            f"Golden Standard violation: Post-TP1 C1 reversal must exit as 'c1_reversal', got '{trade['exit_reason']}'"
+        # Verify hard-stop realism: BE touched intrabar → immediate exit
+        assert trade["exit_reason"] == "breakeven_after_tp1", (
+            f"Hard-Stop Realism: BE touched same bar as TP1 → immediate exit, got '{trade['exit_reason']}'"
         )
         assert "sl_at_exit_price" in trade, "Should record final SL at exit"
 
@@ -178,12 +178,12 @@ class TestGoldenStandardLogic:
 
     def test_pre_tp1_system_exit_is_scratch(self):
         """
-        System exit before TP1 (C1 reversal/baseline cross) → SCRATCH classification.
+        Hard-Stop Realism: System exit before TP1 → SCRATCH classification (≈0 PnL).
 
         Scenario:
         - Entry at 1.0000, TP1 at 1.0020, SL at 0.9970
-        - C1 reversal before TP1 is hit
-        - Expected: Full position closed, classification = SCRATCH
+        - C1 reversal before TP1 is hit (no intrabar TP/SL touch)
+        - Expected: Full position closed, SCRATCH classification, ≈0 PnL
         """
         bars = [
             # Bar 0: Setup
@@ -254,15 +254,16 @@ class TestGoldenStandardLogic:
             f"(tolerance: ±{max_pnl_tolerance:.2f})"
         )
 
-    def test_trailing_stop_strict_close_to_close(self):
+    def test_trailing_stop_hard_stop_realism(self):
         """
-        Trailing stop: activate on CLOSE > 2×ATR, trail 1.5×ATR, update only on closes.
+        Hard-Stop Realism: TS activation on close, updates on close, exits intrabar when touched.
 
         Scenario:
         - Entry at 1.0000, TP1 hit at 1.0020
+        - TP1 bar: low stays above BE (1.0000) to avoid immediate exit
         - Close moves to 1.0040 (2×ATR) → trail activates at 1.0010 (1.5×ATR behind)
-        - Intra-bar spike down doesn't affect trail
-        - Close drops to hit trail → classification remains WIN
+        - Later bar: intrabar low touches TS → immediate exit
+        - Expected: TS active, exit_reason=trailing_stop, WIN classification
         """
         bars = [
             # Bar 0: Setup
@@ -287,12 +288,12 @@ class TestGoldenStandardLogic:
                 "baseline": 0.9990,
                 "baseline_signal": 1,
             },
-            # Bar 2: TP1 hit
+            # Bar 2: TP1 hit, low stays above BE to avoid immediate exit
             {
                 "date": "2023-01-03",
                 "open": 1.0000,
                 "high": 1.0025,
-                "low": 1.0000,
+                "low": 1.0005,  # Above BE (1.0000) to prevent same-bar exit
                 "close": 1.0020,
                 "c1_signal": 1,
                 "baseline": 0.9990,
@@ -320,13 +321,13 @@ class TestGoldenStandardLogic:
                 "baseline": 0.9990,
                 "baseline_signal": 1,
             },
-            # Bar 5: Hit trailing stop on close
+            # Bar 5: Hit trailing stop intrabar (TS level ≈ 1.0010)
             {
                 "date": "2023-01-06",
                 "open": 1.0035,
                 "high": 1.0035,
-                "low": 1.0005,
-                "close": 1.0005,
+                "low": 1.0008,  # Touches TS level (1.0040 - 1.5×0.002 = 1.0010) intrabar
+                "close": 1.0015,
                 "c1_signal": 1,
                 "baseline": 0.9990,
                 "baseline_signal": 1,
@@ -344,29 +345,27 @@ class TestGoldenStandardLogic:
         # Verify TP1 was hit first
         assert trade["tp1_hit"], "TP1 should have been hit"
 
-        # Verify strict trailing stop activation and behavior
-        # Golden Standard: TS activates when BAR CLOSE moves past ±2×ATR from entry
+        # Verify trailing stop activation and behavior (Hard-Stop Realism)
+        # TS activates when BAR CLOSE moves past ±2×ATR from entry
         # Entry: 1.0000, ATR: 0.002, so 2×ATR = 0.004
         # Bar 3 close: 1.0040 = entry + 2×ATR → should activate TS
         assert trade.get("ts_active", False), (
-            "Golden Standard violation: Trailing stop must activate when close > entry + 2×ATR "
+            "Hard-Stop Realism: Trailing stop must activate when close > entry + 2×ATR "
             "(entry=1.0000, close=1.0040, 2×ATR=0.004)"
         )
 
-        # Verify strict trailing stop exit reason
-        # Golden Standard: When TS is active and hit, exit reason must be 'trailing_stop'
+        # Verify trailing stop exit reason (intrabar touch → immediate exit)
         assert trade["exit_reason"] == "trailing_stop", (
-            f"Golden Standard violation: Active trailing stop exit must be 'trailing_stop', "
-            f"got '{trade['exit_reason']}'"
+            f"Hard-Stop Realism: TS touched intrabar → immediate exit, got '{trade['exit_reason']}'"
         )
 
         # Verify trailing stop level calculation
-        # Golden Standard: Trail distance = 1.5×ATR from entry ATR
+        # Trail distance = 1.5×ATR from entry ATR
         # Expected TS level ≈ 1.0040 - 1.5×0.002 = 1.0010 (from highest close)
         expected_ts_level = 1.0040 - (1.5 * 0.002)  # 1.0010
         assert "ts_level" in trade, "Must record trailing stop level"
         assert trade["ts_level"] == pytest.approx(expected_ts_level, abs=1e-6), (
-            f"Golden Standard violation: TS level must be 1.5×ATR behind highest close, "
+            f"Hard-Stop Realism: TS level must be 1.5×ATR behind highest close, "
             f"expected ≈{expected_ts_level:.6f}, got {trade.get('ts_level', 'None')}"
         )
 
@@ -380,12 +379,12 @@ class TestGoldenStandardLogic:
 
     def test_post_tp1_exit_priority_breakeven_vs_trailing_stop(self):
         """
-        Post-TP1 exit priority: TS active → 'trailing_stop', TS inactive + at entry → 'breakeven_after_tp1'.
+        Hard-Stop Realism: BE exit priority when TS not active → SCRATCH classification.
 
         Scenario:
         - Entry at 1.0000, TP1 hit at 1.0020
         - Price returns to entry (1.0000) without activating TS (no 2×ATR move)
-        - Expected: exit_reason = 'breakeven_after_tp1' (TS not active)
+        - Expected: exit_reason = 'breakeven_after_tp1', SCRATCH classification
         """
         bars = [
             # Bar 0: Setup
@@ -471,10 +470,10 @@ class TestGoldenStandardLogic:
             f"got '{trade['exit_reason']}'"
         )
 
-        # Verify WIN classification (TP1 hit)
-        assert trade["win"], "Trade should be WIN (TP1 hit)"
+        # Verify SCRATCH classification (Hard-Stop Realism: BE exit = SCRATCH)
+        assert not trade["win"], "Trade should not be WIN (breakeven exit)"
         assert not trade["loss"], "Trade should not be LOSS"
-        assert not trade["scratch"], "Trade should not be SCRATCH"
+        assert trade["scratch"], "Trade should be SCRATCH (breakeven exit)"
 
     def test_continuation_trade_without_volume_or_atr_distance(self):
         """

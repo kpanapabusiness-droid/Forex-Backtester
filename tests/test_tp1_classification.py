@@ -16,19 +16,19 @@ from tests.utils_synth import create_synthetic_ohlc, run_synthetic_backtest
 class TestTP1Classification:
     """Test suite for TP1-based conceptual classification."""
 
-    def test_tp1_hit_then_sl_runner_still_win(self):
+    def test_tp1_hit_then_be_exit_is_scratch(self):
         """
-        TP1 hit → runner SL hit → should still be WIN classification.
+        Hard-Stop Realism: TP1 hit → BE exit → SCRATCH classification.
 
-        This tests the core requirement: if TP1 is touched, the conceptual
-        trade is a WIN regardless of what happens to the runner.
+        This tests the hard-stop realism rule: breakeven exits are always SCRATCH,
+        even if TP1 was hit previously.
 
         Scenario:
         - Entry at 1.0000, TP1 at 1.0020, SL at 0.9970
         - TP1 hit (half closed)
         - Runner moves to breakeven (1.0000)
         - Price drops to hit runner SL at breakeven
-        - Expected: WIN classification (TP1 determines outcome)
+        - Expected: SCRATCH classification (BE exit overrides TP1 for classification)
         """
         bars = [
             # Bar 0: Setup
@@ -94,10 +94,10 @@ class TestTP1Classification:
             f"Expected SL-related exit, got '{trade['exit_reason']}'"
         )
 
-        # CORE TEST: TP1 hit means WIN classification regardless of runner outcome
-        assert trade["win"], "Trade should be WIN (TP1 hit determines classification)"
-        assert not trade["loss"], "Trade should not be LOSS (TP1 hit overrides runner SL)"
-        assert not trade["scratch"], "Trade should not be SCRATCH (TP1 hit overrides runner SL)"
+        # CORE TEST: Hard-Stop Realism: BE exit = SCRATCH (even if TP1 hit)
+        assert not trade["win"], "Trade should not be WIN (breakeven exit = SCRATCH)"
+        assert not trade["loss"], "Trade should not be LOSS"
+        assert trade["scratch"], "Trade should be SCRATCH (breakeven exit, regardless of TP1)"
 
         # Verify PnL includes both halves (half profit from TP1, runner loss from SL)
         # Half should be profitable (TP1), runner should be breakeven or small loss

@@ -762,7 +762,21 @@ def simulate_pair_trades(
                     if ts_active and ts_level is not None:
                         effective_stop = better_stop(d, effective_stop, ts_level)
 
-            # Hard-Stop Realism: Intrabar TP/SL/BE/TS touch → immediate exit (highest priority)
+            # Golden Standard: System exits (C1 reversal) take priority over BE/TS
+            has_system_exit = exit_sig != 0
+            if (not closed_this_bar) and has_system_exit:
+                if exit_cfg.get("exit_on_exit_signal", False):
+                    reason = "exit_indicator"
+                elif exit_cfg.get("exit_on_c1_reversal", True):
+                    reason = "c1_reversal"
+                elif exit_cfg.get("exit_on_baseline_cross", False):
+                    reason = "baseline_cross"
+                else:
+                    reason = "exit_indicator"
+                exit_px = c_i
+                closed_this_bar = True
+
+            # Hard-Stop Realism: Intrabar TP/SL/BE/TS touch → immediate exit (lower priority than system exits)
             if (not closed_this_bar) and (tp1_done or ts_active):
                 if hit_level(d, h_i, l_i, effective_stop, "sl"):
                     if (
@@ -782,20 +796,6 @@ def simulate_pair_trades(
                         )
                     exit_px = effective_stop
                     closed_this_bar = True
-
-            # System/indicator exit at close (only if no intrabar touch occurred)
-            has_system_exit = exit_sig != 0
-            if (not closed_this_bar) and has_system_exit:
-                if exit_cfg.get("exit_on_exit_signal", False):
-                    reason = "exit_indicator"
-                elif exit_cfg.get("exit_on_c1_reversal", True):
-                    reason = "c1_reversal"
-                elif exit_cfg.get("exit_on_baseline_cross", False):
-                    reason = "baseline_cross"
-                else:
-                    reason = "exit_indicator"
-                exit_px = c_i
-                closed_this_bar = True
 
             # ---- finalize exit ----
             if closed_this_bar:

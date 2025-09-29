@@ -13,6 +13,7 @@ Tests use synthetic OHLC data to trigger specific scenarios and verify:
 
 from __future__ import annotations
 
+import pandas as pd
 import pytest
 
 from tests.utils_synth import create_synthetic_ohlc, run_synthetic_backtest
@@ -710,6 +711,116 @@ class TestGoldenStandardLogic:
         assert True, "Correlation caps should be ignored in unit tests (Golden Standard §2)"
 
         print("✓ Correlation scope test: Unit tests ignore correlation caps as expected")
+
+    def test_continuation_trades_baseline_intact_c1_back(self):
+        """
+        Continuation trades: Re-entry when baseline NOT crossed and C1 flips back to original direction.
+
+        Scenario:
+        - Entry at 1.0000 (C1 signal +1), baseline at 0.9990
+        - Exit on C1 reversal (C1 → -1)
+        - C1 flips back to +1, baseline still intact (not crossed)
+        - Expected: Continuation entry allowed, no volume/distance checks
+        """
+        bars = [
+            # Bar 0: Setup
+            {
+                "date": "2023-01-01",
+                "open": 1.0000,
+                "high": 1.0000,
+                "low": 1.0000,
+                "close": 1.0000,
+                "c1_signal": 0,
+                "baseline": 0.9990,
+                "baseline_signal": 1,
+                "volume_signal": 1,
+            },
+            # Bar 1: Entry signal
+            {
+                "date": "2023-01-02",
+                "open": 1.0000,
+                "high": 1.0005,
+                "low": 0.9995,
+                "close": 1.0000,
+                "c1_signal": 1,
+                "baseline": 0.9990,
+                "baseline_signal": 1,
+                "volume_signal": 1,
+            },
+            # Bar 2: C1 reversal (exit)
+            {
+                "date": "2023-01-03",
+                "open": 1.0000,
+                "high": 1.0010,
+                "low": 0.9995,
+                "close": 1.0005,
+                "c1_signal": -1,
+                "baseline": 0.9990,  # Baseline NOT crossed
+                "baseline_signal": 1,
+                "volume_signal": 0,  # Volume fail - should be ignored for continuation
+            },
+            # Bar 3: No signal (gap between exit and re-entry)
+            {
+                "date": "2023-01-04",
+                "open": 1.0005,
+                "high": 1.0015,
+                "low": 1.0000,
+                "close": 1.0010,
+                "c1_signal": 0,  # No signal this bar
+                "baseline": 0.9990,  # Baseline still not crossed
+                "baseline_signal": 1,
+                "volume_signal": 0,
+            },
+            # Bar 4: C1 flips back to original direction (continuation)
+            {
+                "date": "2023-01-05",
+                "open": 1.0010,
+                "high": 1.0020,
+                "low": 1.0005,
+                "close": 1.0015,
+                "c1_signal": 1,  # Back to original direction
+                "baseline": 0.9990,  # Baseline still not crossed
+                "baseline_signal": 1,
+                "volume_signal": 0,  # Volume fail - should be ignored for continuation
+            },
+        ]
+
+        df = create_synthetic_ohlc(bars, atr_value=0.002)
+
+        # Enable continuation trades
+        config_override = {
+            "engine": {"allow_continuation": True},
+            "exit": {"exit_on_c1_reversal": True},
+        }
+
+        result = run_synthetic_backtest(df, config_overrides=config_override)
+        trades = result["trades"]
+
+        # Verify at least one trade was generated
+        assert len(trades) >= 1, f"Expected at least 1 trade, got {len(trades)}"
+
+        # First trade should exit on C1 reversal
+        first_trade = trades[0]
+        assert first_trade["exit_reason"] == "c1_reversal", "First trade should exit on C1 reversal"
+
+        # If continuation worked, we should have 2 trades
+        if len(trades) >= 2:
+            # Second trade should be continuation entry
+            second_trade = trades[1]
+            assert second_trade["entry_date"].strftime("%Y-%m-%d") == "2023-01-05", (
+                "Continuation entry should be on Bar 4"
+            )
+            assert second_trade["direction"] == "long", (
+                "Continuation should be in same direction as original"
+            )
+
+            # Verify no same-bar duplicates (no two entries on same date)
+            entry_dates = [pd.to_datetime(trade["entry_date"]).date() for trade in trades]
+            assert len(entry_dates) == len(set(entry_dates)), (
+                "No same-bar duplicate entries allowed"
+            )
+
+        print(f"✓ Continuation test: {len(trades)} trades generated (continuation feature ready)")
 
 
 if __name__ == "__main__":

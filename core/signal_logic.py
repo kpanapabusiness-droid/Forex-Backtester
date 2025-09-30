@@ -202,6 +202,11 @@ def apply_signal_logic(df: pd.DataFrame, cfg: dict) -> pd.DataFrame:
     baseline_as_catalyst = rules_cfg.get("allow_baseline_as_catalyst", False)
     bridge_too_far_days = rules_cfg.get("bridge_too_far_days", 7)
 
+    # GS vNext: Entry constraints enforcement
+    # One-Candle vs Pullback mutually exclusive
+    if one_candle_rule and pullback_rule:
+        raise ValueError("One-Candle and Pullback rules are mutually exclusive - enable only one")
+
     # Engine configuration
     cross_only = engine_cfg.get("cross_only", False)
     reverse_on_signal = engine_cfg.get("reverse_on_signal", False)
@@ -346,30 +351,43 @@ def apply_signal_logic(df: pd.DataFrame, cfg: dict) -> pd.DataFrame:
                 curr_baseline = out.loc[i, "baseline"]
                 prev_price = out.loc[i - 1, "close"]
 
-                if (
-                    last_c1_nonzero_bar is not None
-                    and (i - last_c1_nonzero_bar) <= bridge_too_far_days
-                ):
-                    # Check for bullish cross (baseline was above, now below)
-                    if (
-                        prev_price <= prev_baseline
-                        and current_price > curr_baseline
-                        and last_c1_direction == 1
-                    ):
-                        candidate_direction = 1
-                        out.loc[i, "reason_block"] = "baseline_trigger"
+                # Bridge-Too-Far: check if last C1 cross is recent enough
+                if last_c1_nonzero_bar is not None:
+                    bars_since_c1 = i - last_c1_nonzero_bar
 
-                    # Check for bearish cross (baseline was below, now above)
-                    elif (
-                        prev_price >= prev_baseline
-                        and current_price < curr_baseline
-                        and last_c1_direction == -1
-                    ):
-                        candidate_direction = -1
-                        out.loc[i, "reason_block"] = "baseline_trigger"
+                    if bars_since_c1 >= bridge_too_far_days:
+                        # Bridge Too Far: last C1 signal was too long ago
+                        out.loc[i, "reason_block"] = f"bridge_too_far_{bars_since_c1}_bars"
+                    else:
+                        # Recent enough C1: check for baseline cross
+                        # Check for bullish cross (baseline was above, now below)
+                        if (
+                            prev_price <= prev_baseline
+                            and current_price > curr_baseline
+                            and last_c1_direction == 1
+                        ):
+                            candidate_direction = 1
+                            out.loc[i, "reason_block"] = "baseline_trigger"
+
+                        # Check for bearish cross (baseline was below, now above)
+                        elif (
+                            prev_price >= prev_baseline
+                            and current_price < curr_baseline
+                            and last_c1_direction == -1
+                        ):
+                            candidate_direction = -1
+                            out.loc[i, "reason_block"] = "baseline_trigger"
 
             # Process entry if we have a candidate
             if candidate_direction != 0:
+                # Determine if this is a baseline-catalyst entry (skip One-Candle/Pullback rules)
+                is_baseline_catalyst = (
+                    baseline_as_catalyst and out.loc[i, "reason_block"] == "baseline_trigger"
+                )
+
+                # For baseline-catalyst entries, don't apply pullback rule
+                effective_pullback_rule = pullback_rule and not is_baseline_catalyst
+
                 # Check all filters
                 passed, failed_filters = _get_filter_status(
                     out,
@@ -382,7 +400,7 @@ def apply_signal_logic(df: pd.DataFrame, cfg: dict) -> pd.DataFrame:
                     has_baseline_value,
                     "baseline",
                     "baseline_signal",
-                    pullback_rule,
+                    effective_pullback_rule,
                 )
 
                 if passed:
@@ -408,7 +426,8 @@ def apply_signal_logic(df: pd.DataFrame, cfg: dict) -> pd.DataFrame:
                     # Entry blocked
                     out.loc[i, "reason_block"] = ",".join(failed_filters)
 
-                    if one_candle_rule:
+                    # One-Candle rule only applies to C1 signals, not baseline-catalyst entries
+                    if one_candle_rule and not is_baseline_catalyst:
                         # Store as pending for next bar
                         pending_entry = 1
                         pending_direction = candidate_direction

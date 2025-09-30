@@ -104,6 +104,8 @@ TRADES_COLS: List[str] = [
     "loss",
     "scratch",
     "spread_pips_used",
+    # --- Thread tracking ---
+    "thread_id",
 ]
 
 PathLikeT = Union[str, Path]
@@ -600,6 +602,7 @@ def simulate_pair_trades(
     risk_cfg = cfg.get("risk") or {}
     exec_cfg = cfg.get("execution") or {}
     exit_cfg = cfg.get("exit") or {}
+    engine_cfg = cfg.get("engine") or {}
 
     SL_ATR_MULT = float(overrides.get("sl_atr_mult", entry_cfg.get("sl_atr", 1.5)))
     TP1_ATR_MULT = float(overrides.get("tp1_atr_mult", entry_cfg.get("tp1_atr", 1.0)))
@@ -608,6 +611,10 @@ def simulate_pair_trades(
     intrabar_priority = str(
         overrides.get("intrabar_priority", exec_cfg.get("intrabar_priority", "tp_first"))
     )
+
+    # Engine configuration
+    allow_continuation = engine_cfg.get("allow_continuation", True)
+    duplicate_open_policy = engine_cfg.get("duplicate_open_policy", "block")
 
     account_ccy = (risk_cfg.get("account_ccy") or "AUD").upper()
     base_risk_pct = float(risk_cfg.get("risk_per_trade", 0.02))
@@ -680,6 +687,13 @@ def simulate_pair_trades(
     realized_pnl_cum_local: float = 0.0
     equity_history: List[Dict[str, Any]] = []
     order = intrabar_sequence(intrabar_priority)
+
+    # Duplicate-open guard: track entry events by (timestamp/bar_index, instrument, side)
+    entry_events_per_bar: dict[tuple, bool] = {}
+
+    # Thread tracking for conceptual WL/S counting
+    current_thread_id: Optional[int] = None
+    thread_counter: int = 0
 
     # Ensure time‑sorted
     rows = rows.copy()
@@ -892,6 +906,12 @@ def simulate_pair_trades(
                 )
                 open_tr = None
 
+                # Check if thread should be closed (no continuation possibility)
+                # For now, keep thread open if allow_continuation is enabled
+                # Thread will close when baseline is crossed or signal direction changes
+                if not allow_continuation:
+                    current_thread_id = None
+
             else:
                 # still open → update dynamic state only
                 open_tr["current_sl"] = float(sl_px)
@@ -919,6 +939,13 @@ def simulate_pair_trades(
         if open_tr is None and entry_sig != 0:
             direction = "long" if entry_sig > 0 else "short"
             d_int = 1 if entry_sig > 0 else -1
+
+            # Duplicate-open guard: check if entry event already happened for this bar/instrument/side
+            entry_key = (i, pair, d_int)  # (bar_index, instrument, side)
+            if duplicate_open_policy == "block" and entry_key in entry_events_per_bar:
+                # Block duplicate entry event on same bar/side
+                continue
+
             entry_px = c_i
 
             atr_entry = atr_i
@@ -1000,6 +1027,15 @@ def simulate_pair_trades(
                 "scratch": False,
                 "spread_pips_used": float(spread_pips_used),
             }
+
+            # Register this entry event to prevent duplicates on same bar/side
+            entry_events_per_bar[entry_key] = True
+
+            # Assign thread ID for conceptual trade tracking
+            if current_thread_id is None:
+                thread_counter += 1
+                current_thread_id = thread_counter
+            open_tr["thread_id"] = current_thread_id
 
     # --------------------------
     # return (optionally equity)

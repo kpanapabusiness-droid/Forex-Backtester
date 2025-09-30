@@ -22,6 +22,10 @@ rules:
 entry:
   atr_multiple: 2.0
 
+engine:
+  allow_continuation: true
+  duplicate_open_policy: "block"
+
 exit:
   use_trailing_stop: true
   move_to_breakeven_after_atr: true

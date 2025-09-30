@@ -10,6 +10,15 @@ from typing import Any, Dict, List
 import pandas as pd
 
 
+def _deep_update(base: dict, patch: dict) -> None:
+    """Deep update base dict with patch dict in-place."""
+    for k, v in patch.items():
+        if isinstance(v, dict) and isinstance(base.get(k), dict):
+            _deep_update(base[k], v)
+        else:
+            base[k] = v
+
+
 def create_synthetic_ohlc(
     bars: List[Dict[str, Any]], pair: str = "EUR_USD", atr_value: float = 0.002
 ) -> pd.DataFrame:
@@ -104,6 +113,10 @@ def run_synthetic_backtest(
             "allow_baseline_as_catalyst": False,
         },
         "entry": {"sl_atr": 1.5, "tp1_atr": 1.0, "trail_after_atr": 2.0, "ts_atr": 1.5},
+        "engine": {
+            "allow_continuation": False,
+            "duplicate_open_policy": "block",
+        },
         "exit": {
             "use_trailing_stop": True,
             "move_to_breakeven_after_atr": True,
@@ -121,9 +134,9 @@ def run_synthetic_backtest(
         "tracking": {"in_sim_equity": True},
     }
 
-    # Apply overrides
+    # Apply overrides (deep merge for nested configs)
     if config_overrides:
-        base_config.update(config_overrides)
+        _deep_update(base_config, config_overrides)
 
     # Apply signal logic (pass-through for synthetic data)
     signals_df = apply_signal_logic(df.copy(), base_config)

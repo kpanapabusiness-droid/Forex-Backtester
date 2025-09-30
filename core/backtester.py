@@ -762,45 +762,67 @@ def simulate_pair_trades(
                     if ts_active and ts_level is not None:
                         effective_stop = better_stop(d, effective_stop, ts_level)
 
-            # Golden Standard: System exits (C1 reversal) take priority over BE/TS
+            # GS vNext: Post-TP1 exit priority: trailing_stop > c1_reversal > breakeven_after_tp1
+            # Pre-TP1: system exits (C1 reversal) take priority over hard stops
             has_system_exit = exit_sig != 0
-            if (not closed_this_bar) and has_system_exit:
-                if exit_cfg.get("exit_on_exit_signal", False):
-                    reason = "exit_indicator"
-                elif exit_cfg.get("exit_on_c1_reversal", True):
-                    reason = "c1_reversal"
-                elif exit_cfg.get("exit_on_baseline_cross", False):
-                    reason = "baseline_cross"
-                else:
-                    reason = "exit_indicator"
 
-                # Pre-TP1 system exits execute at entry price for ~0 PnL (spread-only)
-                # Post-TP1 system exits execute at current close price
-                if not tp1_done:
-                    exit_px = entry_px  # Execute at entry → scratch PnL ≈ 0 (spread-only)
-                else:
-                    exit_px = c_i  # Post-TP1: execute at close price as before
+            if tp1_done:
+                # Post-TP1 priority: Check trailing stop first, then C1 reversal, then breakeven
 
-                closed_this_bar = True
-
-            # Hard-Stop Realism: Intrabar TP/SL/BE/TS touch → immediate exit (lower priority than system exits)
-            if (not closed_this_bar) and (tp1_done or ts_active):
-                if hit_level(d, h_i, l_i, effective_stop, "sl"):
-                    if (
-                        ts_active
-                        and ts_level is not None
-                        and (
-                            (d > 0 and effective_stop >= max(sl_px, ts_level, be_price or -1e18))
-                            or (d < 0 and effective_stop <= min(sl_px, ts_level, be_price or 1e18))
-                        )
+                # 1. Trailing stop (highest priority post-TP1)
+                if (
+                    (not closed_this_bar)
+                    and ts_active
+                    and hit_level(d, h_i, l_i, effective_stop, "sl")
+                ):
+                    if ts_level is not None and (
+                        (d > 0 and effective_stop >= max(sl_px, ts_level, be_price or -1e18))
+                        or (d < 0 and effective_stop <= min(sl_px, ts_level, be_price or 1e18))
                     ):
                         reason = "trailing_stop"
+                        exit_px = effective_stop
+                        closed_this_bar = True
+
+                # 2. C1 reversal (second priority post-TP1)
+                if (not closed_this_bar) and has_system_exit:
+                    if exit_cfg.get("exit_on_exit_signal", False):
+                        reason = "exit_indicator"
+                    elif exit_cfg.get("exit_on_c1_reversal", True):
+                        reason = "c1_reversal"
+                    elif exit_cfg.get("exit_on_baseline_cross", False):
+                        reason = "baseline_cross"
                     else:
-                        reason = (
-                            "breakeven_after_tp1"
-                            if tp1_done and abs(effective_stop - entry_px) < 1e-6
-                            else "stoploss"
-                        )
+                        reason = "exit_indicator"
+                    exit_px = c_i  # Post-TP1: execute at close price
+                    closed_this_bar = True
+
+                # 3. Breakeven (lowest priority post-TP1)
+                if (not closed_this_bar) and hit_level(d, h_i, l_i, effective_stop, "sl"):
+                    reason = (
+                        "breakeven_after_tp1"
+                        if abs(effective_stop - entry_px) < 1e-6
+                        else "stoploss"
+                    )
+                    exit_px = effective_stop
+                    closed_this_bar = True
+
+            else:
+                # Pre-TP1: System exits (C1 reversal) take priority over hard stops
+                if (not closed_this_bar) and has_system_exit:
+                    if exit_cfg.get("exit_on_exit_signal", False):
+                        reason = "exit_indicator"
+                    elif exit_cfg.get("exit_on_c1_reversal", True):
+                        reason = "c1_reversal"
+                    elif exit_cfg.get("exit_on_baseline_cross", False):
+                        reason = "baseline_cross"
+                    else:
+                        reason = "exit_indicator"
+                    exit_px = entry_px  # Pre-TP1: execute at entry → scratch PnL ≈ 0 (spread-only)
+                    closed_this_bar = True
+
+                # Hard-Stop Realism: Intrabar TP/SL touch → immediate exit (lower priority than system exits)
+                if (not closed_this_bar) and hit_level(d, h_i, l_i, effective_stop, "sl"):
+                    reason = "stoploss"
                     exit_px = effective_stop
                     closed_this_bar = True
 

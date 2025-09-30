@@ -350,13 +350,13 @@ class TestApplySignalLogic:
         assert result["entry_signal"].isin([-1, 0, 1]).all()
         assert result["exit_signal_final"].isin([0, 1]).all()
 
-        # Test config with all features enabled
+        # Test config with all features enabled (but not conflicting rules)
         full_config = create_test_config(
             use_c2=True,
             use_baseline=True,
             use_volume=True,
             one_candle_rule=True,
-            pullback_rule=True,
+            pullback_rule=False,  # Can't enable both One-Candle and Pullback
             baseline_as_catalyst=True,
         )
 

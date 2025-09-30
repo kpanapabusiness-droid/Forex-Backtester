@@ -770,7 +770,14 @@ def simulate_pair_trades(
                     reason = "baseline_cross"
                 else:
                     reason = "exit_indicator"
-                exit_px = c_i
+
+                # Pre-TP1 system exits execute at entry price for ~0 PnL (spread-only)
+                # Post-TP1 system exits execute at current close price
+                if not tp1_done:
+                    exit_px = entry_px  # Execute at entry → scratch PnL ≈ 0 (spread-only)
+                else:
+                    exit_px = c_i  # Post-TP1: execute at close price as before
+
                 closed_this_bar = True
 
             # BE/TS after TP1 or when TS active (only if no system exit)

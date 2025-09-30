@@ -104,6 +104,8 @@ TRADES_COLS: List[str] = [
     "loss",
     "scratch",
     "spread_pips_used",
+    # --- Thread tracking ---
+    "thread_id",
 ]
 
 PathLikeT = Union[str, Path]
@@ -600,6 +602,7 @@ def simulate_pair_trades(
     risk_cfg = cfg.get("risk") or {}
     exec_cfg = cfg.get("execution") or {}
     exit_cfg = cfg.get("exit") or {}
+    engine_cfg = cfg.get("engine") or {}
 
     SL_ATR_MULT = float(overrides.get("sl_atr_mult", entry_cfg.get("sl_atr", 1.5)))
     TP1_ATR_MULT = float(overrides.get("tp1_atr_mult", entry_cfg.get("tp1_atr", 1.0)))
@@ -608,6 +611,10 @@ def simulate_pair_trades(
     intrabar_priority = str(
         overrides.get("intrabar_priority", exec_cfg.get("intrabar_priority", "tp_first"))
     )
+
+    # Engine configuration
+    allow_continuation = engine_cfg.get("allow_continuation", True)
+    duplicate_open_policy = engine_cfg.get("duplicate_open_policy", "block")
 
     account_ccy = (risk_cfg.get("account_ccy") or "AUD").upper()
     base_risk_pct = float(risk_cfg.get("risk_per_trade", 0.02))
@@ -680,6 +687,13 @@ def simulate_pair_trades(
     realized_pnl_cum_local: float = 0.0
     equity_history: List[Dict[str, Any]] = []
     order = intrabar_sequence(intrabar_priority)
+
+    # Duplicate-open guard: track entry events by (timestamp/bar_index, instrument, side)
+    entry_events_per_bar: dict[tuple, bool] = {}
+
+    # Thread tracking for conceptual WL/S counting
+    current_thread_id: Optional[int] = None
+    thread_counter: int = 0
 
     # Ensure time‑sorted
     rows = rows.copy()
@@ -762,38 +776,67 @@ def simulate_pair_trades(
                     if ts_active and ts_level is not None:
                         effective_stop = better_stop(d, effective_stop, ts_level)
 
-            # Golden Standard: System exits (C1 reversal) take priority over BE/TS
+            # GS vNext: Post-TP1 exit priority: trailing_stop > c1_reversal > breakeven_after_tp1
+            # Pre-TP1: system exits (C1 reversal) take priority over hard stops
             has_system_exit = exit_sig != 0
-            if (not closed_this_bar) and has_system_exit:
-                if exit_cfg.get("exit_on_exit_signal", False):
-                    reason = "exit_indicator"
-                elif exit_cfg.get("exit_on_c1_reversal", True):
-                    reason = "c1_reversal"
-                elif exit_cfg.get("exit_on_baseline_cross", False):
-                    reason = "baseline_cross"
-                else:
-                    reason = "exit_indicator"
-                exit_px = c_i
-                closed_this_bar = True
 
-            # Hard-Stop Realism: Intrabar TP/SL/BE/TS touch → immediate exit (lower priority than system exits)
-            if (not closed_this_bar) and (tp1_done or ts_active):
-                if hit_level(d, h_i, l_i, effective_stop, "sl"):
-                    if (
-                        ts_active
-                        and ts_level is not None
-                        and (
-                            (d > 0 and effective_stop >= max(sl_px, ts_level, be_price or -1e18))
-                            or (d < 0 and effective_stop <= min(sl_px, ts_level, be_price or 1e18))
-                        )
+            if tp1_done:
+                # Post-TP1 priority: Check trailing stop first, then C1 reversal, then breakeven
+
+                # 1. Trailing stop (highest priority post-TP1)
+                if (
+                    (not closed_this_bar)
+                    and ts_active
+                    and hit_level(d, h_i, l_i, effective_stop, "sl")
+                ):
+                    if ts_level is not None and (
+                        (d > 0 and effective_stop >= max(sl_px, ts_level, be_price or -1e18))
+                        or (d < 0 and effective_stop <= min(sl_px, ts_level, be_price or 1e18))
                     ):
                         reason = "trailing_stop"
+                        exit_px = effective_stop
+                        closed_this_bar = True
+
+                # 2. C1 reversal (second priority post-TP1)
+                if (not closed_this_bar) and has_system_exit:
+                    if exit_cfg.get("exit_on_exit_signal", False):
+                        reason = "exit_indicator"
+                    elif exit_cfg.get("exit_on_c1_reversal", True):
+                        reason = "c1_reversal"
+                    elif exit_cfg.get("exit_on_baseline_cross", False):
+                        reason = "baseline_cross"
                     else:
-                        reason = (
-                            "breakeven_after_tp1"
-                            if tp1_done and abs(effective_stop - entry_px) < 1e-6
-                            else "stoploss"
-                        )
+                        reason = "exit_indicator"
+                    exit_px = c_i  # Post-TP1: execute at close price
+                    closed_this_bar = True
+
+                # 3. Breakeven (lowest priority post-TP1)
+                if (not closed_this_bar) and hit_level(d, h_i, l_i, effective_stop, "sl"):
+                    reason = (
+                        "breakeven_after_tp1"
+                        if abs(effective_stop - entry_px) < 1e-6
+                        else "stoploss"
+                    )
+                    exit_px = effective_stop
+                    closed_this_bar = True
+
+            else:
+                # Pre-TP1: System exits (C1 reversal) take priority over hard stops
+                if (not closed_this_bar) and has_system_exit:
+                    if exit_cfg.get("exit_on_exit_signal", False):
+                        reason = "exit_indicator"
+                    elif exit_cfg.get("exit_on_c1_reversal", True):
+                        reason = "c1_reversal"
+                    elif exit_cfg.get("exit_on_baseline_cross", False):
+                        reason = "baseline_cross"
+                    else:
+                        reason = "exit_indicator"
+                    exit_px = entry_px  # Pre-TP1: execute at entry → scratch PnL ≈ 0 (spread-only)
+                    closed_this_bar = True
+
+                # Hard-Stop Realism: Intrabar TP/SL touch → immediate exit (lower priority than system exits)
+                if (not closed_this_bar) and hit_level(d, h_i, l_i, effective_stop, "sl"):
+                    reason = "stoploss"
                     exit_px = effective_stop
                     closed_this_bar = True
 
@@ -828,13 +871,10 @@ def simulate_pair_trades(
                 open_tr["exit_date"] = date_i
                 open_tr["exit_reason"] = str(reason)
 
-                # W/L/S classification (Hard-Stop Realism)
+                # W/L/S classification (Golden Standard)
                 if bool(open_tr.get("tp1_hit", False)):
-                    # TP1 hit: WIN unless BE exit (which becomes SCRATCH)
-                    if reason == "breakeven_after_tp1":
-                        open_tr["win"], open_tr["loss"], open_tr["scratch"] = False, False, True
-                    else:
-                        open_tr["win"], open_tr["loss"], open_tr["scratch"] = True, False, False
+                    # TP1 hit: WIN (thread-scoped) - runner outcome irrelevant
+                    open_tr["win"], open_tr["loss"], open_tr["scratch"] = True, False, False
                 else:
                     # No TP1: LOSS if SL, SCRATCH otherwise
                     if reason == "stoploss":
@@ -863,6 +903,12 @@ def simulate_pair_trades(
                 )
                 open_tr = None
 
+                # Check if thread should be closed (no continuation possibility)
+                # For now, keep thread open if allow_continuation is enabled
+                # Thread will close when baseline is crossed or signal direction changes
+                if not allow_continuation:
+                    current_thread_id = None
+
             else:
                 # still open → update dynamic state only
                 open_tr["current_sl"] = float(sl_px)
@@ -890,6 +936,13 @@ def simulate_pair_trades(
         if open_tr is None and entry_sig != 0:
             direction = "long" if entry_sig > 0 else "short"
             d_int = 1 if entry_sig > 0 else -1
+
+            # Duplicate-open guard: check if entry event already happened for this bar/instrument/side
+            entry_key = (i, pair, d_int)  # (bar_index, instrument, side)
+            if duplicate_open_policy == "block" and entry_key in entry_events_per_bar:
+                # Block duplicate entry event on same bar/side
+                continue
+
             entry_px = c_i
 
             atr_entry = atr_i
@@ -971,6 +1024,15 @@ def simulate_pair_trades(
                 "scratch": False,
                 "spread_pips_used": float(spread_pips_used),
             }
+
+            # Register this entry event to prevent duplicates on same bar/side
+            entry_events_per_bar[entry_key] = True
+
+            # Assign thread ID for conceptual trade tracking
+            if current_thread_id is None:
+                thread_counter += 1
+                current_thread_id = thread_counter
+            open_tr["thread_id"] = current_thread_id
 
     # --------------------------
     # return (optionally equity)

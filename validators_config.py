@@ -64,6 +64,11 @@ class Exit(BaseModel):
     exit_on_exit_signal: bool = False
 
 
+class Engine(BaseModel):
+    allow_continuation: bool = True
+    duplicate_open_policy: Literal["block", "allow"] = "block"
+
+
 class Continuation(BaseModel):
     allow_continuation: bool = False
     skip_volume_check: bool = False
@@ -151,6 +156,7 @@ class Config(BaseModel):
 
     rules: Rules
     exit: Exit
+    engine: Engine = Engine()
     continuation: Continuation = Continuation()
     tracking: Tracking
 

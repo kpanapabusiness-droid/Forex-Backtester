@@ -93,10 +93,10 @@ Authoritative spec for entries, exits, sizing, classification, and reporting. Al
 
 We treat the two halves as **one conceptual trade** for classification, but both halves affect PnL.
 
-**Classification (TP1 leg sets the label)**
-- **WIN**: TP1 (Half A) was hit at any time.
-- **LOSS**: SL hit **before** TP1 (full size).
-- **SCRATCH**: Exited **before** TP1 by system signal (C1 flip, baseline cross, exit indicator), full size closed.
+**Classification (Golden Standard - Thread-Scoped)**
+- **WIN**: TP1 touched at any point in the thread, regardless of runner outcome (BE/TS/SL).
+- **LOSS**: SL touched before TP1 ever touched.
+- **SCRATCH**: Trade closed before either TP1 or SL touched (system exits only).
 
 **Reporting**
 - **Win/Loss/Scratch %** → determined **only by the TP1 leg** outcome for the conceptual trade.
@@ -119,7 +119,7 @@ We treat the two halves as **one conceptual trade** for classification, but both
 ## 6) Minimal Acceptance Tests (must pass)
 
 1. **TP1 → BE (same bar)**
-   - Hits TP1, closes Half A, Half B SL = entry price immediately; classification = **WIN**.
+   - Hits TP1, closes Half A, Half B SL = entry price immediately; classification = **WIN** (Golden Standard).
 
 2. **SL before TP1**
    - Price hits SL without touching TP1; full size closed; classification = **LOSS**.

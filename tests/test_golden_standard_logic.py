@@ -31,7 +31,7 @@ class TestHardStopRealism:
         - Entry at 1.0000 (C1 signal +1)
         - TP1 at 1.0020 (1×ATR), SL at 0.9970 (1.5×ATR)
         - Bar 2: High touches TP1, low touches BE (1.0000) same bar
-        - Expected: Immediate exit as breakeven_after_tp1, SCRATCH classification
+        - Expected: Immediate exit as breakeven_after_tp1, WIN classification (Golden Standard)
         """
         bars = [
             # Bar 0: Setup
@@ -92,10 +92,10 @@ class TestHardStopRealism:
         assert trade["tp1_hit"], "TP1 should have been hit"
         assert trade["breakeven_after_tp1"], "Should move to breakeven after TP1"
 
-        # Verify SCRATCH classification (hard-stop realism: BE touched same bar)
-        assert not trade["win"], "Trade should not be WIN (BE hit same bar)"
+        # Verify WIN classification (Golden Standard: TP1 hit = WIN)
+        assert trade["win"], "Trade should be WIN (TP1 hit, Golden Standard)"
         assert not trade["loss"], "Trade should not be LOSS"
-        assert trade["scratch"], "Trade should be SCRATCH (breakeven exit)"
+        assert not trade["scratch"], "Trade should not be SCRATCH (TP1 hit)"
 
         # Verify immutable audit fields
         assert trade["tp1_at_entry_price"] == pytest.approx(1.0020, abs=1e-6), (
@@ -395,7 +395,7 @@ class TestHardStopRealism:
         Scenario:
         - Entry at 1.0000, TP1 hit at 1.0020
         - Price returns to entry (1.0000) without activating TS (no 2×ATR move)
-        - Expected: exit_reason = 'breakeven_after_tp1', SCRATCH classification
+        - Expected: exit_reason = 'breakeven_after_tp1', WIN classification (Golden Standard)
         """
         bars = [
             # Bar 0: Setup
@@ -481,10 +481,10 @@ class TestHardStopRealism:
             f"got '{trade['exit_reason']}'"
         )
 
-        # Verify SCRATCH classification (Hard-Stop Realism: BE exit = SCRATCH)
-        assert not trade["win"], "Trade should not be WIN (breakeven exit)"
+        # Verify WIN classification (Golden Standard: TP1 hit = WIN)
+        assert trade["win"], "Trade should be WIN (TP1 hit, Golden Standard)"
         assert not trade["loss"], "Trade should not be LOSS"
-        assert trade["scratch"], "Trade should be SCRATCH (breakeven exit)"
+        assert not trade["scratch"], "Trade should not be SCRATCH (TP1 hit)"
 
     def test_continuation_trade_without_volume_or_atr_distance(self):
         """

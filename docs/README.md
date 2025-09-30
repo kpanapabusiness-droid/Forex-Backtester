@@ -16,6 +16,18 @@ This project helps you test and evaluate different trading indicators and system
 
 📖 **For complete trading logic specification, see [Golden Standard Logic](GOLDEN_STANDARD_LOGIC.md)**
 
+## 🎯 Hard-Stop Realism (Current Standard)
+
+The backtester implements **Hard-Stop Realism** for exit arbitration:
+
+- **Intrabar TP/SL/BE/TS touch → immediate exit** (highest priority)
+- **Trailing Stop**: activation & updates on **closes only** (monotone, never loosens)
+- **Breakeven (BE)**: becomes **effective the same bar** TP1 is first hit
+- **System exits** (C1 reversal, baseline cross): only if no intrabar touch occurred
+- **Pre-TP1 SCRATCH**: C1 reversal before TP1 → PnL ≈ 0 within tolerance
+
+This aligns backtests with broker-style hard stops and avoids ambiguity between intrabar touches and close-level system signals.
+
 ## 📁 Project Structure
 
 ```

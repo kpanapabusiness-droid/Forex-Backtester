@@ -1,4 +1,6 @@
-# Forex Backtester v1.9.8
+# Forex Backtester v2.0.0
+
+**Current Stable: v2.0.0 (2025-09-30)** | [Changelog](../CHANGELOG.md)
 
 A comprehensive NNFX-style forex backtesting system with advanced features for testing trading strategies.
 

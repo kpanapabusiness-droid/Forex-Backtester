@@ -12,9 +12,12 @@ Post-TP1 exit priority:
 - Else if price returns to entry → 'breakeven_after_tp1'.
 """
 
+import inspect
+
 import pandas as pd
 import pytest
 
+from core import backtester as backtester_module
 from core.signal_logic import apply_signal_logic
 
 
@@ -342,29 +345,27 @@ class TestPostTP1ExitPriority:
         # This is a basic test to ensure the priority logic exists
         # The actual priority testing requires complex integration scenarios
 
-        # Read the backtester.py file to verify the priority logic exists
-        with open("/Users/keanupanapa/Notebooks/Forex_Backtester/core/backtester.py", "r") as f:
-            content = f.read()
+        # Get the source code of the backtester module
+        source = inspect.getsource(backtester_module)
 
         # Check that the post-TP1 priority logic is present
-        assert "Post-TP1 exit priority" in content
-        assert "trailing_stop > c1_reversal > breakeven_after_tp1" in content
+        assert "Post-TP1 exit priority" in source
+        assert "trailing_stop > c1_reversal > breakeven_after_tp1" in source
 
         # Check that the priority structure exists
-        assert "if tp1_done:" in content
-        assert "# 1. Trailing stop (highest priority post-TP1)" in content
-        assert "# 2. C1 reversal (second priority post-TP1)" in content
-        assert "# 3. Breakeven (lowest priority post-TP1)" in content
+        assert "if tp1_done:" in source
+        assert "# 1. Trailing stop (highest priority post-TP1)" in source
+        assert "# 2. C1 reversal (second priority post-TP1)" in source
+        assert "# 3. Breakeven (lowest priority post-TP1)" in source
 
     def test_pre_tp1_logic_preserved(self):
         """Verify that pre-TP1 logic is preserved (system exits > hard stops)."""
-        # Read the backtester.py file to verify the pre-TP1 logic is preserved
-        with open("/Users/keanupanapa/Notebooks/Forex_Backtester/core/backtester.py", "r") as f:
-            content = f.read()
+        # Get the source code of the backtester module
+        source = inspect.getsource(backtester_module)
 
         # Check that pre-TP1 logic is preserved
-        assert "else:" in content  # The else block for pre-TP1
-        assert "# Pre-TP1: System exits (C1 reversal) take priority over hard stops" in content
+        assert "else:" in source  # The else block for pre-TP1
+        assert "# Pre-TP1: System exits (C1 reversal) take priority over hard stops" in source
 
 
 def test_integration_all_constraints():

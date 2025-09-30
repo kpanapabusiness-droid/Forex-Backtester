@@ -1,10 +1,12 @@
-# Forex Backtester v1.9.8 — Current Status
+Released v2.0.0 on 2025-09-30 (Australia/Sydney)
 
-*Last updated: 2025-01-27*
+# Forex Backtester v2.0.0 — Current Status
+
+*Last updated: 2025-09-30*
 
 ## 1. Version & Scope
 
-**Version**: v1.9.8 (baseline + cleanup/structure re-org)
+**Version**: v2.0.0 (stable baseline release)
 
 This is a mature, production-ready NNFX-style forex backtesting system. The current version represents a stable baseline with no functional logic changes from v1.9.x series. Key characteristics:
 

@@ -871,13 +871,10 @@ def simulate_pair_trades(
                 open_tr["exit_date"] = date_i
                 open_tr["exit_reason"] = str(reason)
 
-                # W/L/S classification (Hard-Stop Realism)
+                # W/L/S classification (Golden Standard)
                 if bool(open_tr.get("tp1_hit", False)):
-                    # TP1 hit: WIN unless BE exit (which becomes SCRATCH)
-                    if reason == "breakeven_after_tp1":
-                        open_tr["win"], open_tr["loss"], open_tr["scratch"] = False, False, True
-                    else:
-                        open_tr["win"], open_tr["loss"], open_tr["scratch"] = True, False, False
+                    # TP1 hit: WIN (thread-scoped) - runner outcome irrelevant
+                    open_tr["win"], open_tr["loss"], open_tr["scratch"] = True, False, False
                 else:
                     # No TP1: LOSS if SL, SCRATCH otherwise
                     if reason == "stoploss":

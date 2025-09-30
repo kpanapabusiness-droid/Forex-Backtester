@@ -218,17 +218,13 @@ class TestDuplicateOpenGuard:
             f"Expected 1 thread ID, got {len(unique_threads)}: {unique_threads}"
         )
 
-        # Conceptual WL/S should be based on TP1 outcome AND exit reason
-        # TP1 hit + breakeven_after_tp1 = SCRATCH (Hard-Stop Realism)
-        # TP1 hit + other exits = WIN
+        # Conceptual WL/S should be based on TP1 outcome (Golden Standard)
+        # TP1 hit = WIN (thread-scoped) - runner outcome irrelevant
         tp1_hit_trades = [t for t in trades if t.get("tp1_hit", False)]
         if tp1_hit_trades:
-            # Verify proper WL/S classification based on Hard-Stop Realism rules
+            # Verify proper WL/S classification based on Golden Standard
             for trade in tp1_hit_trades:
-                if trade.get("exit_reason") == "breakeven_after_tp1":
-                    assert trade.get("scratch", False), "breakeven_after_tp1 should be SCRATCH"
-                else:
-                    assert trade.get("win", False), "TP1 hit + non-BE exit should be WIN"
+                assert trade.get("win", False), "Any TP1 hit should be WIN (Golden Standard)"
 
     def test_continuations_thread_behavior(self):
         """
@@ -478,3 +474,105 @@ class TestDuplicateOpenGuard:
             assert pnl_spreads_on <= pnl_spreads_off, (
                 f"Spreads should reduce PnL: OFF={pnl_spreads_off:.4f}, ON={pnl_spreads_on:.4f}"
             )
+
+    def test_be_after_tp1_is_win(self):
+        """
+        Test that TP1 hit followed by breakeven exit is classified as WIN.
+
+        Golden Standard: If TP1 is hit at any point in the thread, it's WIN
+        regardless of the runner's subsequent outcome (BE/TS/SL).
+
+        Scenario:
+        - Single entry event
+        - TP1 hit (partial close)
+        - Runner returns to breakeven and exits
+        - Should be classified as WIN due to TP1 hit
+        """
+        bars = [
+            # Bar 0: Setup
+            {
+                "date": "2023-01-01",
+                "open": 1.0000,
+                "high": 1.0005,
+                "low": 0.9995,
+                "close": 1.0000,
+                "c1_signal": 0,
+                "baseline": 0.9990,
+                "baseline_signal": 1,
+                "volume_signal": 1,
+            },
+            # Bar 1: Entry signal
+            {
+                "date": "2023-01-02",
+                "open": 1.0000,
+                "high": 1.0010,
+                "low": 0.9995,
+                "close": 1.0005,
+                "c1_signal": 1,
+                "baseline": 0.9990,
+                "baseline_signal": 1,
+                "volume_signal": 1,
+            },
+            # Bar 2: TP1 hit - this should trigger TP1 leg closure
+            {
+                "date": "2023-01-03",
+                "open": 1.0005,
+                "high": 1.0025,  # High enough to hit TP1 (1x ATR = 0.002 from entry ~1.0005)
+                "low": 1.0000,
+                "close": 1.0020,
+                "c1_signal": 0,
+                "baseline": 0.9990,
+                "baseline_signal": 1,
+                "volume_signal": 1,
+            },
+            # Bar 3: Runner returns to breakeven
+            {
+                "date": "2023-01-04",
+                "open": 1.0020,
+                "high": 1.0025,
+                "low": 1.0000,  # Low touches breakeven (entry price)
+                "close": 1.0002,
+                "c1_signal": 0,
+                "baseline": 0.9990,
+                "baseline_signal": 1,
+                "volume_signal": 1,
+            },
+        ]
+
+        df = create_synthetic_ohlc(bars, atr_value=0.002)
+
+        config_override = {
+            "engine": {
+                "duplicate_open_policy": "block",
+                "allow_continuation": False,
+            },
+            "exit": {"exit_on_c1_reversal": False},  # Let it exit on BE
+        }
+
+        result = run_synthetic_backtest(df, config_overrides=config_override)
+        trades = result["trades"]
+
+        # Should have exactly one trade
+        assert len(trades) == 1, f"Expected exactly 1 trade, got {len(trades)}"
+
+        trade = trades[0]
+
+        # Verify TP1 was hit
+        assert trade.get("tp1_hit", False), "TP1 should have been hit"
+
+        # Verify exit reason is breakeven after TP1
+        assert trade.get("exit_reason") == "breakeven_after_tp1", (
+            f"Expected breakeven_after_tp1 exit, got {trade.get('exit_reason')}"
+        )
+
+        # CORE TEST: Golden Standard - TP1 hit = WIN (runner outcome irrelevant)
+        assert trade.get("win", False), "Trade should be WIN (TP1 hit, Golden Standard)"
+        assert not trade.get("loss", False), "Trade should not be LOSS"
+        assert not trade.get("scratch", False), "Trade should not be SCRATCH (TP1 hit)"
+
+        # Verify thread tracking
+        assert trade.get("thread_id") is not None, "Trade should have thread_id assigned"
+
+        # PnL should be positive from TP1 leg minus any runner loss/costs
+        # (This verifies the TP1 leg was profitable even if runner broke even)
+        assert trade.get("pnl", 0) >= 0, "PnL should be non-negative (TP1 profit >= runner loss)"

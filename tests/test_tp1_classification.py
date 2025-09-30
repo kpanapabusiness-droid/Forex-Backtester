@@ -94,10 +94,10 @@ class TestTP1Classification:
             f"Expected SL-related exit, got '{trade['exit_reason']}'"
         )
 
-        # CORE TEST: Hard-Stop Realism: BE exit = SCRATCH (even if TP1 hit)
-        assert not trade["win"], "Trade should not be WIN (breakeven exit = SCRATCH)"
+        # CORE TEST: Golden Standard: TP1 hit = WIN (runner outcome irrelevant)
+        assert trade["win"], "Trade should be WIN (TP1 hit, Golden Standard)"
         assert not trade["loss"], "Trade should not be LOSS"
-        assert trade["scratch"], "Trade should be SCRATCH (breakeven exit, regardless of TP1)"
+        assert not trade["scratch"], "Trade should not be SCRATCH (TP1 hit)"
 
         # Verify PnL includes both halves (half profit from TP1, runner loss from SL)
         # Half should be profitable (TP1), runner should be breakeven or small loss

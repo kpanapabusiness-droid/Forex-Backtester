@@ -157,13 +157,8 @@ class TestContinuationsWLSInvariant:
                 # in any trade within the thread
                 if outcome["tp1_hit"]:
                     # If TP1 was hit, should be WIN (unless breakeven exit)
-                    has_breakeven = any(
-                        t.get("exit_reason") == "breakeven_after_tp1" for t in outcome["trades"]
-                    )
-                    if has_breakeven:
-                        assert outcome["scratch"], "Thread with TP1 + breakeven should be SCRATCH"
-                    else:
-                        assert outcome["win"], "Thread with TP1 (no breakeven) should be WIN"
+                    # Golden Standard: TP1 hit = WIN regardless of runner outcome
+                    assert outcome["win"], "Thread with TP1 hit should be WIN (Golden Standard)"
                 else:
                     # No TP1 hit - should be LOSS or SCRATCH based on exit reason
                     has_sl = any(

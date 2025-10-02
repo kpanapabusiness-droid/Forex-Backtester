@@ -1,0 +1,17 @@
+pair: EURUSD
+timeframe: D
+from: 2020-01-01
+to: 2021-12-31
+roles:
+  c1: c1_fisher_transform
+  c2: null
+  baseline: null
+  volume: null
+  exit: null
+params:
+  c1:
+    period: 9
+risk:
+  use_spread: false
+  commission_per_lot: 0.0
+output_dir: parity/runs/c1_fisher_EURUSD_D1_2020_2021

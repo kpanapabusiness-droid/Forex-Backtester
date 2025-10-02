@@ -1,0 +1,22 @@
+pair: EURUSD
+timeframe: D
+from: 2020-01-01
+to: 2021-12-31
+roles:
+  c1: c1_supertrend
+  c2: null
+  baseline: null
+  volume: null
+  exit: exit_chandelier_atr
+params:
+  c1:
+    atr_period: 10
+    multiplier: 3.0
+  exit:
+    atr_period: 22
+    multiple: 3.0
+    direction_lock: true
+risk:
+  use_spread: false
+  commission_per_lot: 0.0
+output_dir: parity/runs/exit_chandelier_EURUSD_D1_2020_2021

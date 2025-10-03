@@ -366,15 +366,81 @@ def c1_is_calculation(df, period=10, signal_col="c1_signal", **kwargs):
     return df
 
 
-def c1_supertrend(df, atr_period=10, multiplier=3, signal_col="c1_signal", **kwargs):
-    atr = df["high"].rolling(atr_period).max() - df["low"].rolling(atr_period).min()
+def c1_supertrend(df, atr_period=10, multiplier=3.0, signal_col="c1_signal", **kwargs):
+    """
+    Proper Supertrend indicator implementation.
+
+    Args:
+        df: DataFrame with OHLC data
+        atr_period: Period for ATR calculation (default: 10)
+        multiplier: ATR multiplier for bands (default: 3.0)
+        signal_col: Output signal column name (default: "c1_signal")
+
+    Returns:
+        DataFrame with 'atr' column and signal_col in {-1, +1}
+    """
+    import pandas as pd
+
+    from core.utils import calculate_atr
+
+    # Ensure we have ATR
+    if "atr" not in df.columns:
+        df = calculate_atr(df.copy(), period=atr_period)
+
+    # Calculate basic upper and lower bands
     hl2 = (df["high"] + df["low"]) / 2
-    upper_band = hl2 + multiplier * atr
-    lower_band = hl2 - multiplier * atr
-    df[signal_col] = 0
-    df.loc[df["close"] > upper_band, signal_col] = 1
-    df.loc[df["close"] < lower_band, signal_col] = -1
+    basic_upper = hl2 + multiplier * df["atr"]
+    basic_lower = hl2 - multiplier * df["atr"]
+
+    # Initialize final bands and trend
+    final_upper = basic_upper.copy()
+    final_lower = basic_lower.copy()
+    trend = pd.Series(1, index=df.index, dtype=int)  # Start bullish
+
+    # Calculate final bands with carry-forward rules
+    for i in range(1, len(df)):
+        # Upper band: use basic upper unless it's higher than previous and close was above previous upper
+        if (
+            basic_upper.iloc[i] < final_upper.iloc[i - 1]
+            or df["close"].iloc[i - 1] > final_upper.iloc[i - 1]
+        ):
+            final_upper.iloc[i] = basic_upper.iloc[i]
+        else:
+            final_upper.iloc[i] = final_upper.iloc[i - 1]
+
+        # Lower band: use basic lower unless it's lower than previous and close was below previous lower
+        if (
+            basic_lower.iloc[i] > final_lower.iloc[i - 1]
+            or df["close"].iloc[i - 1] < final_lower.iloc[i - 1]
+        ):
+            final_lower.iloc[i] = basic_lower.iloc[i]
+        else:
+            final_lower.iloc[i] = final_lower.iloc[i - 1]
+
+    # Determine trend direction
+    for i in range(1, len(df)):
+        if df["close"].iloc[i] <= final_lower.iloc[i]:
+            trend.iloc[i] = -1  # Bearish
+        elif df["close"].iloc[i] >= final_upper.iloc[i]:
+            trend.iloc[i] = 1  # Bullish
+        else:
+            trend.iloc[i] = trend.iloc[i - 1]  # Continue previous trend
+
+    # Set signal column - Supertrend follows the trend
+    df[signal_col] = trend
+
+    # Ensure we have the atr column for output
+    if "atr" not in df.columns:
+        df["atr"] = calculate_atr(df.copy(), period=atr_period)["atr"]
+
     return df
+
+
+def supertrend(df, atr_period=10, multiplier=3.0, signal_col="c1_signal", **kwargs):
+    """Alias for c1_supertrend to support short name resolution."""
+    return c1_supertrend(
+        df, atr_period=atr_period, multiplier=multiplier, signal_col=signal_col, **kwargs
+    )
 
 
 def c1_decycler_oscillator(df, period=20, signal_col="c1_signal", **kwargs):

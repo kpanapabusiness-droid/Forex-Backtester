@@ -7,15 +7,11 @@ roles:
   c2: null
   baseline: null
   volume: null
-  exit: exit_chandelier_atr
+  exit: null
 params:
   c1:
     length: 10
-  exit:
-    atr_period: 22
-    multiple: 3.0
-    direction_lock: true
 risk:
   use_spread: false
   commission_per_lot: 0.0
-output_dir: parity/runs/exit_chandelier_EURUSD_D1_2020_2021
+output_dir: parity/runs/c1_fisher_only_EURUSD_D1_2020_2021

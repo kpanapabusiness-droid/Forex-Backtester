@@ -1,0 +1,8 @@
+# Parity Config Path Check
+
+This branch was created to move parity YAML configs from ./parity to ./configs/parity.
+
+Upon investigation, no YAML files were found in the top-level ./parity directory.
+All parity configs are already correctly located in ./configs/parity.
+
+No file moves were necessary.

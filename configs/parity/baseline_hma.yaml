@@ -3,15 +3,14 @@ timeframe: D
 from: 2020-01-01
 to: 2021-12-31
 roles:
-  c1: c1_supertrend
+  c1: c1_fisher_transform
   c2: null
   baseline: baseline_hma
   volume: null
   exit: null
 params:
   c1:
-    atr_period: 10
-    multiplier: 3.0
+    length: 10
   baseline:
     length: 55
 risk:

@@ -1,8 +1,8 @@
-import textwrap
 from pathlib import Path
 
 import pandas as pd
 import pytest
+import yaml
 
 
 def _write_test_cfg(tmp_path: Path):
@@ -10,60 +10,62 @@ def _write_test_cfg(tmp_path: Path):
     # Get absolute path to test data directory
     test_data_dir = Path(__file__).parent.parent / "data" / "test"
 
-    cfg = textwrap.dedent(f"""
-    pairs: ["EUR_USD", "USD_JPY", "GBP_USD", "USD_CHF"]
-    timeframe: "D"
-    data_dir: "{test_data_dir}"
-
-    indicators:
-      c1: "c1_twiggs_money_flow"
-      use_c2: false
-      use_baseline: true
-      baseline: "baseline_ema"
-      use_volume: false
-      use_exit: false
-
-    rules:
-      one_candle_rule: false
-      pullback_rule: false
-      bridge_too_far_days: 7
-      allow_baseline_as_catalyst: false
-
-    entry:
-      atr_multiple: 2.0
-
-    exit:
-      use_trailing_stop: true
-      move_to_breakeven_after_atr: true
-      exit_on_c1_reversal: true
-      exit_on_baseline_cross: false
-      exit_on_exit_signal: false
-
-    spreads:
-      enabled: false
-      default_pips: 1.0
-
-    tracking:
-      in_sim_equity: true
-      track_win_loss_scratch: true
-      track_roi: true
-      track_drawdown: true
-
-    risk_filters:
-      dbcvix:
-        enabled: false
-        mode: "reduce"
-        threshold: 0.0
-        reduce_risk_to: 0.01
-        source: "synthetic"
-
-    date_range:
-      start: "2018-01-01"
-      end: "2022-12-31"
-    """).strip()
+    cfg = {
+        "pairs": ["EUR_USD", "USD_JPY", "GBP_USD", "USD_CHF"],
+        "timeframe": "D",
+        "data_dir": test_data_dir.as_posix(),
+        "indicators": {
+            "c1": "c1_twiggs_money_flow",
+            "use_c2": False,
+            "use_baseline": True,
+            "baseline": "baseline_ema",
+            "use_volume": False,
+            "use_exit": False,
+        },
+        "rules": {
+            "one_candle_rule": False,
+            "pullback_rule": False,
+            "bridge_too_far_days": 7,
+            "allow_baseline_as_catalyst": False,
+        },
+        "entry": {
+            "atr_multiple": 2.0,
+        },
+        "exit": {
+            "use_trailing_stop": True,
+            "move_to_breakeven_after_atr": True,
+            "exit_on_c1_reversal": True,
+            "exit_on_baseline_cross": False,
+            "exit_on_exit_signal": False,
+        },
+        "spreads": {
+            "enabled": False,
+            "default_pips": 1.0,
+        },
+        "tracking": {
+            "in_sim_equity": True,
+            "track_win_loss_scratch": True,
+            "track_roi": True,
+            "track_drawdown": True,
+        },
+        "risk_filters": {
+            "dbcvix": {
+                "enabled": False,
+                "mode": "reduce",
+                "threshold": 0.0,
+                "reduce_risk_to": 0.01,
+                "source": "synthetic",
+            }
+        },
+        "date_range": {
+            "start": "2018-01-01",
+            "end": "2022-12-31",
+        },
+    }
 
     cfg_path = tmp_path / "config.yaml"
-    cfg_path.write_text(cfg, encoding="utf-8")
+    with cfg_path.open("w", encoding="utf-8") as f:
+        yaml.safe_dump(cfg, f, sort_keys=False)
     return str(cfg_path)
 
 

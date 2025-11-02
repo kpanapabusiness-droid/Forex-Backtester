@@ -34,6 +34,7 @@ from core.backtester_helpers import finalize_trade_row
 from core.utils import (
     calculate_atr,
     get_pip_size,
+    normalize_ohlcv_schema,
     pip_value_per_lot,
 )
 
@@ -250,7 +251,7 @@ def load_dbcvix_series(cfg: dict) -> pd.Series | None:
         ).dropna()
         return s.sort_index()
     except Exception as e:
-        print(f"⚠️  DBCVIX CSV load failed: {e}")
+        print(f"DBCVIX CSV load failed: {e}")
         return None
 
 
@@ -335,7 +336,7 @@ def _resolve_indicator_func(role: str, name: Optional[str], verbose: bool):
                 full = n if n.startswith(f"{role}_") else f"{role}_{n}"
                 return full, o
     if verbose:
-        print(f"⚠️  {role}/{name} not found in indicators/* modules")
+        print(f"{role}/{name} not found in indicators/* modules")
     return None, None
 
 
@@ -392,7 +393,7 @@ def apply_indicators_with_cache(df: pd.DataFrame, pair: str, cfg: dict) -> pd.Da
                 full_name, func = _resolve_confirm_func(name, role=role)
             except Exception as e:
                 if verbose:
-                    print(f"❌ Confirm resolver failed for {role}/{name}: {e}")
+                    print(f"Confirm resolver failed for {role}/{name}: {e}")
                 return
             params = _params_for(full_name)
         else:
@@ -445,7 +446,7 @@ def apply_indicators_with_cache(df: pd.DataFrame, pair: str, cfg: dict) -> pd.Da
         run_role("exit", _get("exit"), "exit_signal")
 
     if verbose:
-        print(f"📦 cache stats → saves={saves} hits={hits}")
+        print(f"cache stats -> saves={saves} hits={hits}")
 
     # CACHE diagnostic for parity runs
     if not cache_on:
@@ -1076,14 +1077,14 @@ def run_backtest(
     # DBCVIX (load once)
     dbcvix_series = load_dbcvix_series(cfg)
     if dbcvix_series is None:
-        print("ℹ️  DBCVIX disabled or not loaded (series=None). Risk filter will not trigger.")
+        print("DBCVIX disabled or not loaded (series=None). Risk filter will not trigger.")
     else:
         print(
-            f"ℹ️  DBCVIX loaded: {dbcvix_series.index.min().date()} → {dbcvix_series.index.max().date()} (n={len(dbcvix_series)})"
+            f"DBCVIX loaded: {dbcvix_series.index.min().date()} -> {dbcvix_series.index.max().date()} (n={len(dbcvix_series)})"
         )
     fcfg = resolve_dbcvix_config(cfg)
     print(
-        "ℹ️  DBCVIX config:",
+        "DBCVIX config:",
         {
             "enabled": fcfg.get("enabled"),
             "mode": fcfg.get("mode"),
@@ -1099,7 +1100,7 @@ def run_backtest(
     pairs = cfg.get("pairs") or (cfg.get("data") or {}).get("pairs") or []
     data_dir = cfg.get("data_dir") or (cfg.get("data") or {}).get("dir") or "data/daily"
     if not pairs:
-        print("⚠️  No pairs configured.")
+        print("No pairs configured.")
         return
 
     starting_balance = float(
@@ -1132,21 +1133,10 @@ def run_backtest(
                     path = hits[0]
                     break
             if path is None:
-                print(f"⚠️  Skipping {pair}: no CSV in {data_dir}")
+                print(f"Skipping {pair}: no CSV in {data_dir}")
                 continue
             df = pd.read_csv(path)
-            # normalize basic schema
-            lc = {c.lower(): c for c in df.columns}
-            for want in ["date", "open", "high", "low", "close"]:
-                if want not in df.columns:
-                    # try case-insensitive remap
-                    if want in lc:
-                        df = df.rename(columns={lc[want]: want})
-            if "date" not in df.columns:
-                df = df.rename(columns={df.columns[0]: "date"})
-            for c in ["open", "high", "low", "close"]:
-                df[c] = pd.to_numeric(df[c], errors="coerce")
-            df["date"] = pd.to_datetime(df["date"], errors="coerce")
+            df = normalize_ohlcv_schema(df)
             df = (
                 df.dropna(subset=["date", "open", "high", "low", "close"])
                 .sort_values("date")
@@ -1171,7 +1161,7 @@ def run_backtest(
                     )
 
                 print(
-                    f"ℹ️  {pair}: Date filtered {rows_before} → {rows_after} rows ({first_ts.date()} to {last_ts.date()})"
+                    f"{pair}: Date filtered {rows_before} -> {rows_after} rows ({first_ts.date()} to {last_ts.date()})"
                 )
 
             base = calculate_atr(df.copy())
@@ -1185,7 +1175,7 @@ def run_backtest(
                         strict=(cfg.get("validation", {}) or {}).get("strict_contract", False),
                     )
                 except Exception as _ve:
-                    print(f"ℹ️  {pair}: validation skipped ({_ve})")
+                    print(f"{pair}: validation skipped ({_ve})")
 
             # Enforce final slice immediately before trading (safety gate)
             date_start = cfg.get("date_from") or (cfg.get("date_range") or {}).get("start")
@@ -1246,7 +1236,7 @@ def run_backtest(
 
                 if not mask.all():
                     print(
-                        f"⚠️  WARNING: signals_df contains {(~mask).sum()} rows outside {date_start}..{date_end}, filtering before trading"
+                        f"WARNING: signals_df contains {(~mask).sum()} rows outside {date_start}..{date_end}, filtering before trading"
                     )
                     signals_df = signals_df[mask].copy().reset_index(drop=True)
 
@@ -1270,7 +1260,7 @@ def run_backtest(
             all_trades.extend(pair_trades)
 
         except Exception as e:
-            print(f"❌ Error processing {pair}: {e}")
+            print(f"Error processing {pair}: {e}")
 
     trades_df = (
         pd.DataFrame(all_trades, columns=TRADES_COLS).copy()
@@ -1396,7 +1386,7 @@ def run_backtest(
     if (cfg.get("tracking") or {}).get("in_sim_equity", True) and not equity_curve.empty:
         equity_curve.to_csv(equity_path, index=False)
 
-    print(f"✅ Backtest complete. Results saved to '{out_dir}'")
+    print(f"Backtest complete. Results saved to '{out_dir}'")
 
 
 # =============================================
@@ -1494,18 +1484,10 @@ def run_backtest_walk_forward(
                 path = hits[0]
                 break
         if path is None:
-            print(f"⚠️  Skipping {p}: no CSV")
+            print(f"Skipping {p}: no CSV")
             continue
         df = pd.read_csv(path)
-        lc = {c.lower(): c for c in df.columns}
-        for want in ["date", "open", "high", "low", "close"]:
-            if want not in df.columns and want in lc:
-                df = df.rename(columns={lc[want]: want})
-        if "date" not in df.columns:
-            df = df.rename(columns={df.columns[0]: "date"})
-        for c in ["open", "high", "low", "close"]:
-            df[c] = pd.to_numeric(df[c], errors="coerce")
-        df["date"] = pd.to_datetime(df["date"], errors="coerce")
+        df = normalize_ohlcv_schema(df)
         df = (
             df.dropna(subset=["date", "open", "high", "low", "close"])
             .sort_values("date")
@@ -1533,7 +1515,7 @@ def run_backtest_walk_forward(
         fold_idx += 1
         print(f"—— Fold {fold_idx} ———————————————————————————————")
         print(
-            f"Train: {is_start.date()} → {is_end.date()}  |  Test (OOS): {oos_start.date()} → {oos_end.date()}"
+            f"Train: {is_start.date()} -> {is_end.date()}  |  Test (OOS): {oos_start.date()} -> {oos_end.date()}"
         )
 
         fold_trades: List[Dict[str, Any]] = []
@@ -1552,7 +1534,7 @@ def run_backtest_walk_forward(
                             strict=(cfg.get("validation", {}) or {}).get("strict_contract", False),
                         )
                 except Exception as _ve:
-                    print(f"ℹ️  {pair}: validation skipped/failed ({_ve})")
+                    print(f"{pair}: validation skipped/failed ({_ve})")
 
                 base = apply_signal_logic(base, cfg)
                 for col in ["entry_signal", "exit_signal"]:
@@ -1595,7 +1577,7 @@ def run_backtest_walk_forward(
                     if trades:
                         fold_trades.extend(trades)
             except Exception as e:
-                print(f"❌ WFO fold {fold_idx} {pair}: {e}")
+                print(f"WFO fold {fold_idx} {pair}: {e}")
 
         # simple per-fold metrics (best effort)
         fold_df = pd.DataFrame(fold_trades)
@@ -1709,7 +1691,7 @@ def run_backtest_walk_forward(
                 equity_df.to_csv(equity_path, index=False)
                 print(f"✅ Wrote OOS equity (fallback): {equity_path}")
         except Exception as e:
-            print(f"ℹ️  Equity fallback failed: {e}")
+            print(f"Equity fallback failed: {e}")
 
     # OOS summary (best effort)
     try:
@@ -1791,7 +1773,7 @@ def write_trades_csv_with_diagnostics(
     Centralized trades CSV writer with comprehensive diagnostics.
 
     Decision tree:
-    1. Schema validation → 2. Empty check → 3. Flag check → 4. Dir ensure → 5. Atomic write
+    1. Schema validation -> 2. Empty check -> 3. Flag check -> 4. Dir ensure -> 5. Atomic write
 
     Returns:
         bool: True if written successfully, False if skipped or failed
@@ -1860,35 +1842,49 @@ def write_trades_csv_with_diagnostics(
         # Reset index to ensure clean CSV
         df_clean = df_clean.reset_index(drop=True)
 
-        # Atomic write: temp file -> rename
-        with tempfile.NamedTemporaryFile(
-            mode="w", dir=out_path, prefix=".trades_tmp_", suffix=".csv", delete=False
-        ) as tmp_file:
-            df_clean.to_csv(tmp_file.name, index=False)
-            temp_path = Path(tmp_file.name)
+        # Atomic write: temp file -> rename (Windows-safe)
+        temp_path = None
+        try:
+            with tempfile.NamedTemporaryFile(
+                mode="w", dir=out_path, prefix=".trades_tmp_", suffix=".csv", delete=False
+            ) as tmp_file:
+                df_clean.to_csv(tmp_file.name, index=False)
+                temp_path = Path(tmp_file.name)
 
-        # Atomic rename
-        temp_path.rename(trades_path)
+            # Windows-safe atomic overwrite: unlink existing first, then replace
+            if trades_path.exists():
+                try:
+                    os.remove(trades_path)
+                except FileNotFoundError:
+                    pass  # Already removed or doesn't exist
+            os.replace(temp_path, trades_path)
+            temp_path = None  # Success - don't clean up
 
-        print(f"[WRITE TRADES OK] wrote={len(trades_df)} path={trades_path}")
+            print(f"[WRITE TRADES OK] wrote={len(trades_df)} path={trades_path}")
 
-        # Debug: list directory contents
-        if log_debug:
-            files = list(out_path.glob("*"))
-            print(f"[DEBUG] Results dir contents: {[f.name for f in files]}")
+            # Debug: list directory contents
+            if log_debug:
+                files = list(out_path.glob("*"))
+                print(f"[DEBUG] Results dir contents: {[f.name for f in files]}")
 
-        return True
+            return True
 
+        except Exception as e:
+            print(
+                f"[WRITE TRADES ERROR] reason=serialization_failed exception={type(e).__name__}:{str(e)}"
+            )
+            return False
+        finally:
+            # Clean up temp file if it exists (on exception or if replace failed)
+            if temp_path is not None and temp_path.exists():
+                try:
+                    temp_path.unlink()
+                except Exception:
+                    pass
     except Exception as e:
         print(
-            f"[WRITE TRADES ERROR] reason=serialization_failed exception={type(e).__name__}:{str(e)}"
+            f"[WRITE TRADES ERROR] reason=preparation_failed exception={type(e).__name__}:{str(e)}"
         )
-        # Clean up temp file if it exists
-        try:
-            if "temp_path" in locals() and temp_path.exists():
-                temp_path.unlink()
-        except Exception:
-            pass
         return False
 
 

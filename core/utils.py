@@ -15,6 +15,8 @@ __all__ = [
     # File / path helpers
     "ensure_results_dir",
     "load_pair_csv",
+    "normalize_ohlcv_schema",
+    "normalize_ohlcvschema",  # Backward compatibility alias
     "read_yaml",
     "write_yaml",
     # FX helpers
@@ -131,10 +133,127 @@ def _possible_filenames_for_pair(pair: str) -> Iterable[str]:
         yield f"{pair.replace('_', '/')}.csv"
 
 
+def normalize_ohlcv_schema(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Normalize OHLCV DataFrame to legacy schema: ['date','open','high','low','close','volume'].
+    
+    Supports two input schemas:
+    1. Legacy: date, open, high, low, close, volume
+    2. MT5: time, open, high, low, close, tick_volume, spread, real_volume
+    
+    Mapping rules:
+    - time → date
+    - tick_volume → volume
+    - real_volume is ignored (often 0 for FX)
+    - spread column preserved as optional extra if present
+    
+    Args:
+        df: Input DataFrame with either schema
+        
+    Returns:
+        DataFrame with normalized schema ['date','open','high','low','close','volume']
+        and optionally 'spread' column if present in MT5 schema.
+        All numeric columns coerced to float.
+        Date column parsed robustly (YY-MM-DD and YYYY-MM-DD).
+        
+    Raises:
+        ValueError: If required columns are missing or cannot be coerced.
+    """
+    df = df.copy()
+    required_cols = ["open", "high", "low", "close"]
+    
+    # Detect schema type by checking for MT5-specific columns
+    has_mt5_schema = "tick_volume" in df.columns
+    
+    # Normalize date/time column
+    date_col = None
+    time_variants = ["time", "Time", "date", "Date", "datetime", "timestamp"]
+    for variant in time_variants:
+        if variant in df.columns:
+            date_col = variant
+            break
+    
+    if date_col is None:
+        # Try first column if it looks like a date
+        if len(df.columns) > 0:
+            first_col = df.columns[0]
+            try:
+                pd.to_datetime(df[first_col].iloc[0], errors="raise")
+                date_col = first_col
+            except (ValueError, IndexError):
+                pass
+    
+    if date_col is None:
+        raise ValueError("No date/time column found. Expected one of: time, date, Date, datetime, timestamp")
+    
+    # Rename to 'date' if needed
+    if date_col != "date":
+        df = df.rename(columns={date_col: "date"})
+    
+    # Parse date column robustly (handles YY-MM-DD and YYYY-MM-DD)
+    df["date"] = pd.to_datetime(df["date"], errors="coerce", format="mixed")
+    # Only raise if ALL dates are invalid (some may be missing in real data)
+    if df["date"].isna().all():
+        invalid_sample = df.loc[df["date"].isna(), :].head(3)
+        raise ValueError(f"Failed to parse date column. All dates invalid. Sample: {invalid_sample.to_dict()}")
+    
+    # Handle volume column
+    if has_mt5_schema and "tick_volume" in df.columns:
+        # MT5 schema: map tick_volume → volume
+        if "volume" not in df.columns:
+            df = df.rename(columns={"tick_volume": "volume"})
+        # If both exist, prefer tick_volume for MT5 schema
+        elif "volume" in df.columns and "tick_volume" in df.columns:
+            df = df.drop(columns=["volume"]).rename(columns={"tick_volume": "volume"})
+    # Volume is optional, so if missing we'll add empty column later
+    
+    # Drop real_volume (often 0 for FX, not used)
+    if "real_volume" in df.columns:
+        df = df.drop(columns=["real_volume"])
+    
+    # Keep spread as optional extra column if present (don't drop it)
+    # But ensure it doesn't interfere with required columns
+    
+    # Validate required columns exist
+    missing = [c for c in required_cols if c not in df.columns]
+    if missing:
+        raise ValueError(f"Missing required columns: {missing}. Found columns: {list(df.columns)}")
+    
+    # Coerce numeric columns to float
+    for col in required_cols:
+        if col in df.columns:
+            original_notna = df[col].notna().sum()
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+            # Raise if any originally non-null values became null (coercion failed)
+            coerced_notna = df[col].notna().sum()
+            if coerced_notna < original_notna:
+                invalid_count = original_notna - coerced_notna
+                raise ValueError(f"Column '{col}' contains {invalid_count} non-numeric values that could not be coerced")
+    
+    # Volume is optional - coerce if present, otherwise create empty column
+    if "volume" in df.columns:
+        df["volume"] = pd.to_numeric(df["volume"], errors="coerce")
+    else:
+        df["volume"] = pd.Series(dtype=float, index=df.index)
+    
+    # Select and order columns: required ones first, then volume, then extras (like spread)
+    core_cols = ["date"] + required_cols + ["volume"]
+    extra_cols = [c for c in df.columns if c not in core_cols]
+    df = df[core_cols + extra_cols]
+    
+    return df
+
+
+# Backward compatibility alias (for CI/legacy code using normalize_ohlcvschema without underscore)
+def normalize_ohlcvschema(*args, **kwargs):
+    """Backward-compatible alias for normalize_ohlcv_schema."""
+    return normalize_ohlcv_schema(*args, **kwargs)
+
+
 def load_pair_csv(pair: str, data_dir: str | Path) -> pd.DataFrame:
     """
     Load OHLCV CSV for a given pair. Accepts common naming variants.
-    Expected columns: time (or date/Date/datetime), open, high, low, close[, volume]
+    Supports both legacy and MT5 CSV schemas, normalizes to: date, open, high, low, close, volume.
     """
     data_dir = Path(data_dir)
     tried = []
@@ -143,19 +262,7 @@ def load_pair_csv(pair: str, data_dir: str | Path) -> pd.DataFrame:
         tried.append(str(fpath))
         if fpath.exists():
             df = pd.read_csv(fpath)
-            # Normalize datetime column to "time"
-            time_cols = ["time", "Time", "date", "Date", "datetime", "timestamp"]
-            for c in time_cols:
-                if c in df.columns:
-                    if c != "time":
-                        df = df.rename(columns={c: "time"})
-                    break
-            if "time" in df.columns:
-                df["time"] = pd.to_datetime(df["time"])
-            # Basic column coercions
-            for c in ["open", "high", "low", "close", "volume"]:
-                if c in df.columns:
-                    df[c] = pd.to_numeric(df[c], errors="coerce")
+            df = normalize_ohlcv_schema(df)
             return df
     raise FileNotFoundError(f"No CSV found for pair {pair} in {data_dir}. Tried: {tried}")
 

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
-from typing import List, Tuple
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -31,7 +30,6 @@ def _load_equity(eq_path: Path) -> pd.DataFrame:
         df = df[['date', 'equity']].copy()
     else:
         # Attempt to infer
-        cols = [c.lower() for c in df.columns]
         date_col = next((c for c in df.columns if c.lower() == 'date'), df.columns[0])
         eq_col = next((c for c in df.columns if 'equity' in c.lower()), df.columns[-1])
         df = df[[date_col, eq_col]].copy()

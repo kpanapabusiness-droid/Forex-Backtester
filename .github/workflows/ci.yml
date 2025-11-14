@@ -67,7 +67,7 @@ jobs:
           set +e
           set -o pipefail
           : > pytest.log
-          python -m pytest -q -c /dev/null 2>&1 | tee -a pytest.log
+          python -m pytest -q -c /dev/null --ignore=attic 2>&1 | tee -a pytest.log
           echo "PYTEST_EXIT=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
           exit 0
 

@@ -272,7 +272,7 @@ python -m pytest tests/ -c /dev/null
 - **Cache Dependencies**: Indicator changes require cache invalidation
 - **Parallel Execution**: Batch sweeps benefit from multi-core systems
 
-## 11. Key File Structure
+## 11. Key File Structure (Updated 2025-11-08)
 
 ```
 Forex_Backtester/
@@ -288,20 +288,24 @@ Forex_Backtester/
 │   └── exit_funcs.py          # Exit signal indicators
 ├── analytics/              # Performance analysis
 │   ├── metrics.py          # Sharpe, Sortino, CAGR, drawdown
-│   └── monte_carlo.py      # Trade shuffling & bootstrapping
-├── scripts/                # Execution scripts
+│   ├── monte_carlo.py      # Trade shuffling & bootstrapping
+│   ├── plot_equity_curves.py # Equity curve plotting
+│   └── stability_scan.py   # Stability analysis
+├── scripts/                # Entry point scripts
+│   ├── run_single_debug.py # Single backtest debug runner
+│   ├── run_from_yaml.py    # Run backtest from YAML config
 │   ├── batch_sweeper.py    # Parallel parameter optimization
-│   ├── walk_forward.py     # Out-of-sample validation
-│   ├── run_meta.py         # Meta-analysis utilities
+│   ├── walk_forward.py      # Walk-forward optimization
 │   └── smoke_test_selfcontained_v198.py # Comprehensive testing
 ├── configs/                # Configuration files
-│   ├── config.yaml         # Main strategy config
+│   ├── config.yaml        # Main strategy config
 │   ├── sweeps.yaml         # Parameter sweep definitions
 │   └── batch_config.yaml   # Batch processing settings
-├── tests/                  # Test suite (7 test files)
-├── results/                # Output directory
+├── tests/                  # Test suite (pytest)
+├── results/                # Output directory (only c1_only_exits/** tracked)
 ├── data/daily/             # Market data (OHLCV CSVs)
-└── cache/                  # Indicator computation cache
+├── cache/                  # Indicator computation cache
+└── attic/2025-11-08/       # Quarantined files (legacy scripts, tools, notebooks)
 ```
 
 ---

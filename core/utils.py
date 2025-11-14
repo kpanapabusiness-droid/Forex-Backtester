@@ -477,6 +477,10 @@ def summarize_results(
     if trades is None or trades.empty:
         return "⚠️ No trades.csv found — nothing to summarize.", {}
 
+    # Ensure pnl_dollars column exists (for compatibility with different CSV formats)
+    if "pnl" in trades.columns and "pnl_dollars" not in trades.columns:
+        trades["pnl_dollars"] = trades["pnl"]
+
     # Core counts
     total = int(len(trades))
     wins = int(trades["win"].sum()) if "win" in trades else 0
@@ -506,17 +510,35 @@ def summarize_results(
 
     # Expectancy (per trade, $) on non-scratch set
     if ns_count > 0:
-        non_scratch = trades.loc[not trades["scratch"]] if "scratch" in trades.columns else trades
-        avg_win = (
-            float(non_scratch.loc[non_scratch["win"], "pnl"].mean())
-            if "pnl" in non_scratch.columns
-            else 0.0
-        )
-        avg_loss = (
-            float(non_scratch.loc[not non_scratch["win"], "pnl"].mean())
-            if "pnl" in non_scratch.columns
-            else 0.0
-        )
+        # Filter out scratch trades: use ~ (bitwise NOT) for boolean indexing
+        if "scratch" in trades.columns:
+            # Convert to boolean, handling NaN/None values safely
+            scratch_mask = trades["scratch"].fillna(False).astype(bool)
+            non_scratch = trades.loc[~scratch_mask].copy()
+        else:
+            non_scratch = trades.copy()
+        
+        # Ensure non_scratch is a valid DataFrame (even if empty)
+        if non_scratch.empty:
+            avg_win = 0.0
+            avg_loss = 0.0
+        else:
+            # Calculate avg_win: filter for winning trades
+            if "win" in non_scratch.columns and "pnl" in non_scratch.columns:
+                win_mask = non_scratch["win"].fillna(False).astype(bool)
+                winning_trades = non_scratch.loc[win_mask, "pnl"]
+                avg_win = float(winning_trades.mean()) if not winning_trades.empty else 0.0
+            else:
+                avg_win = 0.0
+            
+            # Calculate avg_loss: filter for losing trades (non-win, non-scratch)
+            if "win" in non_scratch.columns and "pnl" in non_scratch.columns:
+                win_mask = non_scratch["win"].fillna(False).astype(bool)
+                losing_trades = non_scratch.loc[~win_mask, "pnl"]
+                avg_loss = float(losing_trades.mean()) if not losing_trades.empty else 0.0
+            else:
+                avg_loss = 0.0
+        
         expectancy = safe_expectancy(avg_win, abs(avg_loss), win_pct_ns / 100.0)
     else:
         expectancy = 0.0

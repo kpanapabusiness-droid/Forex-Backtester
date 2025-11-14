@@ -1,0 +1,131 @@
+strategy_version: "forex_backtester_v1.9.7"
+
+pair: "EUR_USD"
+from: "2020-01-01"
+to: "2024-12-31"
+output_dir: "results/fisher_transform_test"
+timeframe: "D"
+
+data_dir: "data/daily"
+
+indicators:
+  c1: "fisher_transform"
+  use_c2: false
+  c2: null
+  use_baseline: false
+  baseline: null
+  use_volume: false
+  volume: null
+  use_exit: false
+  exit: null
+
+indicator_params:
+  fisher_transform:
+    length: 9
+    smooth: 3
+
+rules:
+  one_candle_rule: true
+  pullback_rule: false
+  bridge_too_far_days: 7
+  allow_baseline_as_catalyst: false
+
+entry:
+  sl_atr: 1.5
+  tp1_atr: 1.0
+  trail_after_atr: 2.0
+  ts_atr: 1.5
+
+execution:
+  intrabar_priority: "tp_first"
+
+engine:
+  allow_continuation: true
+  duplicate_open_policy: "block"
+
+continuation:
+  allow_continuation: false
+  skip_volume_check: false
+  skip_pullback_check: false
+  block_if_crossed_baseline_since_entry: false
+
+exit:
+  use_trailing_stop: false
+  move_to_breakeven_after_atr: false
+  exit_on_c1_reversal: true
+  exit_on_baseline_cross: false
+  exit_on_exit_signal: false
+
+spreads:
+  enabled: false
+  default_pips: 0.0
+  per_pair: {}
+  mode: "fixed"
+  atr_mult: 0.0
+
+filters:
+  dbcvix:
+    enabled: false
+    mode: "reduce"
+    threshold: null
+    reduce_risk_to: 1.0
+    source: "synthetic"
+    csv_path: "data/external/dbcvix_synth.csv"
+
+risk:
+  starting_balance: 10000.0
+  risk_per_trade_pct: 2.0
+  risk_per_trade: 0.02
+  account_ccy: "AUD"
+  fx_quotes: {}
+
+cache:
+  enabled: true
+  dir: "cache"
+  format: "parquet"
+  scope_key: null
+  roles: null
+
+validation:
+  enabled: true
+  fail_fast: true
+  strict_contract: false
+
+output:
+  results_dir: "results"
+
+outputs:
+  dir: "results"
+  write_trades_csv: true
+
+tracking:
+  track_win_loss_scratch: true
+  track_roi: true
+  track_drawdown: true
+  in_sim_equity: true
+  verbose_logs: false
+
+date_range:
+  start: "2020-01-01"
+  end: "2024-12-31"
+
+date_from: null
+date_to: null
+
+walk_forward:
+  start: null
+  end: null
+  train_years: 3
+  test_years: 1
+  step_years: 1
+
+monte_carlo:
+  enabled: false
+  iterations: 300
+  horizon: "oos"
+  use_daily_returns: null
+  modes: null
+  auto_after_wfo: false
+  save_mode_specific: true
+  save_main_as_latest: true
+  rng_seed: null

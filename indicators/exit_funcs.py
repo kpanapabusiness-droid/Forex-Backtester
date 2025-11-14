@@ -74,3 +74,13 @@ def exit_twiggs_money_flow(
     exit_now = (prev != 0) & (curr != 0) & (prev != curr)
     out[signal_col] = exit_now.astype("int8")
     return out
+
+
+def exit_none(df: pd.DataFrame, *, signal_col: str = "exit_signal", **kwargs) -> pd.DataFrame:
+    """
+    No-exit indicator for parity testing.
+    Writes df[signal_col] ∈ {0} (never exits).
+    """
+    out = df.copy()
+    out[signal_col] = 0
+    return out

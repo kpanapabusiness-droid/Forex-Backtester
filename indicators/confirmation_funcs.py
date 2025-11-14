@@ -662,3 +662,35 @@ def _select_price_series(df: pd.DataFrame, price: int | str = 4) -> pd.Series:
     if key == "weighted":
         return (df["high"] + df["low"] + 2.0 * df["close"]) / 4.0
     return df[key]
+
+
+def c1_rsi(df: pd.DataFrame, period: int = 14, threshold: float = 50.0, signal_col: str = "c1_signal", **kwargs):
+    """
+    Wilder RSI confirmation indicator.
+    Writes df[signal_col] in {-1,0,+1} where:
+    - +1: RSI > threshold (bullish)
+    - -1: RSI < threshold (bearish)  
+    - 0: RSI = threshold (neutral)
+    """
+    if "close" not in df.columns:
+        raise ValueError("Expected 'close' column in df")
+
+    close = df["close"].astype(float)
+    delta = close.diff()
+
+    gain = delta.clip(lower=0.0)
+    loss = -delta.clip(upper=0.0)
+
+    # Wilder's RMA (EMA with alpha=1/period)
+    rma_gain = gain.ewm(alpha=1/period, adjust=False, min_periods=period).mean()
+    rma_loss = loss.ewm(alpha=1/period, adjust=False, min_periods=period).mean()
+
+    rs = rma_gain / rma_loss.replace(0.0, np.nan)
+    rsi = 100.0 - (100.0 / (1.0 + rs))
+
+    df["c1_rsi"] = rsi
+
+    sig = np.where(df["c1_rsi"] > threshold, 1, np.where(df["c1_rsi"] < threshold, -1, 0))
+    df[signal_col] = sig
+
+    return df

@@ -1,0 +1,24 @@
+pair: EURUSD
+timeframe: D
+from: 2020-01-01
+to: 2020-12-31
+data_dir: data/test
+roles:
+  c1: c1_rsi
+  c2: null
+  baseline: null
+  volume: null
+  exit: exit_none
+params:
+  c1:
+    period: 14
+    threshold: 50.0
+    signal_col: c1_signal
+  exit: {}
+risk:
+  use_spread: false
+  commission_per_lot: 0.0
+  fixed_risk_per_trade_pct: 1.0
+logic:
+  close_on_c1_flip: true
+output_dir: parity/runs/c1_rsi_EURUSD_D1_2020

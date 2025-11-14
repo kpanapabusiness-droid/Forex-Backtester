@@ -1,0 +1,10 @@
+attic/**
+results/**
+**/*.ipynb
+.venv/**
+.conda/**
+.mypy_cache/**
+.pytest_cache/**
+build/**
+dist/**
+

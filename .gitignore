@@ -19,7 +19,9 @@ data/
 data_raw/
 cache/
 Cache/
-results/
+results/*
+!results/.gitkeep
+!results/c1_only_exits/**
 results_history/
 
 # Generated artifacts

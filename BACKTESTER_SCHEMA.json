@@ -1,0 +1,384 @@
+{
+  "schema_version": "2.0.0",
+  "keys": [
+    {
+      "key": "pairs",
+      "type": "List[str]",
+      "default": null,
+      "required": true,
+      "module": "engine",
+      "source_file": "validators_config.py",
+      "source_lines": "149"
+    },
+    {
+      "key": "strategy_version",
+      "type": "str",
+      "default": "forex_backtester_v1.9.7",
+      "required": false,
+      "module": "engine",
+      "source_file": "validators_config.py",
+      "source_lines": "146"
+    },
+    {
+      "key": "timeframe",
+      "type": "Literal['D', 'daily', 'H1', 'H4']",
+      "default": "D",
+      "required": false,
+      "module": "engine",
+      "source_file": "validators_config.py",
+      "source_lines": "150"
+    },
+    {
+      "key": "data_dir",
+      "type": "Optional[str]",
+      "default": null,
+      "required": false,
+      "module": "engine",
+      "source_file": "validators_config.py",
+      "source_lines": "151"
+    },
+    {
+      "key": "indicators.c1",
+      "type": "str",
+      "default": null,
+      "required": true,
+      "module": "c1",
+      "source_file": "validators_config.py",
+      "source_lines": "39"
+    },
+    {
+      "key": "indicators.use_c2",
+      "type": "bool",
+      "default": false,
+      "required": false,
+      "module": "c2",
+      "source_file": "validators_config.py",
+      "source_lines": "40"
+    },
+    {
+      "key": "indicators.use_baseline",
+      "type": "bool",
+      "default": false,
+      "required": false,
+      "module": "baseline",
+      "source_file": "validators_config.py",
+      "source_lines": "41"
+    },
+    {
+      "key": "indicators.use_volume",
+      "type": "bool",
+      "default": false,
+      "required": false,
+      "module": "volume",
+      "source_file": "validators_config.py",
+      "source_lines": "42"
+    },
+    {
+      "key": "indicators.use_exit",
+      "type": "bool",
+      "default": false,
+      "required": false,
+      "module": "exit",
+      "source_file": "validators_config.py",
+      "source_lines": "43"
+    },
+    {
+      "key": "indicators.c2",
+      "type": "Optional[str]",
+      "default": null,
+      "required": false,
+      "module": "c2",
+      "source_file": "validators_config.py",
+      "source_lines": "46"
+    },
+    {
+      "key": "indicators.baseline",
+      "type": "Optional[str]",
+      "default": null,
+      "required": false,
+      "module": "baseline",
+      "source_file": "validators_config.py",
+      "source_lines": "47"
+    },
+    {
+      "key": "indicators.volume",
+      "type": "Optional[str]",
+      "default": null,
+      "required": false,
+      "module": "volume",
+      "source_file": "validators_config.py",
+      "source_lines": "48"
+    },
+    {
+      "key": "indicators.exit",
+      "type": "Optional[str]",
+      "default": null,
+      "required": false,
+      "module": "exit",
+      "source_file": "validators_config.py",
+      "source_lines": "49"
+    },
+    {
+      "key": "indicator_params",
+      "type": "Dict[str, Dict[str, Any]]",
+      "default": "{}",
+      "required": false,
+      "module": "indicators",
+      "source_file": "validators_config.py",
+      "source_lines": "155"
+    },
+    {
+      "key": "rules.one_candle_rule",
+      "type": "bool",
+      "default": false,
+      "required": false,
+      "module": "entry",
+      "source_file": "validators_config.py",
+      "source_lines": "53"
+    },
+    {
+      "key": "rules.pullback_rule",
+      "type": "bool",
+      "default": false,
+      "required": false,
+      "module": "entry",
+      "source_file": "validators_config.py",
+      "source_lines": "54"
+    },
+    {
+      "key": "rules.bridge_too_far_days",
+      "type": "int",
+      "default": 7,
+      "required": false,
+      "module": "entry",
+      "source_file": "validators_config.py",
+      "source_lines": "55"
+    },
+    {
+      "key": "rules.allow_baseline_as_catalyst",
+      "type": "bool",
+      "default": false,
+      "required": false,
+      "module": "entry",
+      "source_file": "validators_config.py",
+      "source_lines": "56"
+    },
+    {
+      "key": "exit.use_trailing_stop",
+      "type": "bool",
+      "default": true,
+      "required": false,
+      "module": "exit",
+      "source_file": "validators_config.py",
+      "source_lines": "60"
+    },
+    {
+      "key": "exit.move_to_breakeven_after_atr",
+      "type": "bool",
+      "default": true,
+      "required": false,
+      "module": "exit",
+      "source_file": "validators_config.py",
+      "source_lines": "61"
+    },
+    {
+      "key": "exit.exit_on_c1_reversal",
+      "type": "bool",
+      "default": true,
+      "required": false,
+      "module": "exit",
+      "source_file": "validators_config.py",
+      "source_lines": "62"
+    },
+    {
+      "key": "exit.exit_on_baseline_cross",
+      "type": "bool",
+      "default": false,
+      "required": false,
+      "module": "exit",
+      "source_file": "validators_config.py",
+      "source_lines": "63"
+    },
+    {
+      "key": "exit.exit_on_exit_signal",
+      "type": "bool",
+      "default": false,
+      "required": false,
+      "module": "exit",
+      "source_file": "validators_config.py",
+      "source_lines": "64"
+    },
+    {
+      "key": "entry.sl_atr",
+      "type": "float",
+      "default": 1.5,
+      "required": false,
+      "module": "risk",
+      "source_file": "core/backtester.py",
+      "source_lines": "608"
+    },
+    {
+      "key": "entry.tp1_atr",
+      "type": "float",
+      "default": 1.0,
+      "required": false,
+      "module": "risk",
+      "source_file": "core/backtester.py",
+      "source_lines": "609"
+    },
+    {
+      "key": "entry.trail_after_atr",
+      "type": "float",
+      "default": 2.0,
+      "required": false,
+      "module": "exit",
+      "source_file": "core/backtester.py",
+      "source_lines": "610"
+    },
+    {
+      "key": "entry.ts_atr",
+      "type": "float",
+      "default": 1.5,
+      "required": false,
+      "module": "exit",
+      "source_file": "core/backtester.py",
+      "source_lines": "611"
+    },
+    {
+      "key": "execution.intrabar_priority",
+      "type": "str",
+      "default": "tp_first",
+      "required": false,
+      "module": "execution",
+      "source_file": "core/backtester.py",
+      "source_lines": "613"
+    },
+    {
+      "key": "engine.allow_continuation",
+      "type": "bool",
+      "default": true,
+      "required": false,
+      "module": "engine",
+      "source_file": "validators_config.py",
+      "source_lines": "68"
+    },
+    {
+      "key": "engine.duplicate_open_policy",
+      "type": "Literal['block', 'allow']",
+      "default": "block",
+      "required": false,
+      "module": "engine",
+      "source_file": "validators_config.py",
+      "source_lines": "69"
+    },
+    {
+      "key": "spreads.enabled",
+      "type": "bool",
+      "default": false,
+      "required": false,
+      "module": "costs",
+      "source_file": "validators_config.py",
+      "source_lines": "30"
+    },
+    {
+      "key": "spreads.default_pips",
+      "type": "float",
+      "default": 0.0,
+      "required": false,
+      "module": "costs",
+      "source_file": "validators_config.py",
+      "source_lines": "31"
+    },
+    {
+      "key": "spreads.per_pair",
+      "type": "Dict[Pair, float]",
+      "default": "{}",
+      "required": false,
+      "module": "costs",
+      "source_file": "validators_config.py",
+      "source_lines": "32"
+    },
+    {
+      "key": "spreads.mode",
+      "type": "Literal['fixed', 'atr_mult']",
+      "default": "fixed",
+      "required": false,
+      "module": "costs",
+      "source_file": "validators_config.py",
+      "source_lines": "33"
+    },
+    {
+      "key": "spreads.atr_mult",
+      "type": "float",
+      "default": 0.0,
+      "required": false,
+      "module": "costs",
+      "source_file": "validators_config.py",
+      "source_lines": "34"
+    },
+    {
+      "key": "filters.dbcvix.enabled",
+      "type": "bool",
+      "default": false,
+      "required": false,
+      "module": "risk",
+      "source_file": "validators_config.py",
+      "source_lines": "103"
+    },
+    {
+      "key": "risk.starting_balance",
+      "type": "float",
+      "default": 10000.0,
+      "required": false,
+      "module": "risk",
+      "source_file": "validators_config.py",
+      "source_lines": "121"
+    },
+    {
+      "key": "risk.risk_per_trade_pct",
+      "type": "float",
+      "default": 2.0,
+      "required": false,
+      "module": "risk",
+      "source_file": "validators_config.py",
+      "source_lines": "122"
+    },
+    {
+      "key": "cache.enabled",
+      "type": "bool",
+      "default": true,
+      "required": false,
+      "module": "cache",
+      "source_file": "validators_config.py",
+      "source_lines": "88"
+    },
+    {
+      "key": "tracking.in_sim_equity",
+      "type": "bool",
+      "default": true,
+      "required": false,
+      "module": "tracking",
+      "source_file": "validators_config.py",
+      "source_lines": "83"
+    },
+    {
+      "key": "date_range.start",
+      "type": "Optional[str]",
+      "default": null,
+      "required": false,
+      "module": "engine",
+      "source_file": "validators_config.py",
+      "source_lines": "126"
+    },
+    {
+      "key": "date_range.end",
+      "type": "Optional[str]",
+      "default": null,
+      "required": false,
+      "module": "engine",
+      "source_file": "validators_config.py",
+      "source_lines": "127"
+    }
+  ]
+}
+

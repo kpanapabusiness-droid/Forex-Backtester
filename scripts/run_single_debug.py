@@ -133,7 +133,7 @@ def print_trades_summary(trades_file: Path) -> None:
 
         df = pd.read_csv(trades_file)
 
-        print("\n📊 Trades Summary:")
+        print("\nTrades Summary:")
         print(f"   Total trades: {len(df)}")
 
         if len(df) > 0:
@@ -151,14 +151,14 @@ def print_trades_summary(trades_file: Path) -> None:
 
             if "outcome" in df.columns:
                 outcome_counts = df["outcome"].value_counts()
-                print("\n📈 Outcomes:")
+                print("\nOutcomes:")
                 for outcome, count in outcome_counts.items():
                     print(f"   {outcome}: {count}")
         else:
-            print("   ⚠️  No trades found!")
+            print("   No trades found!")
 
     except Exception as e:
-        print(f"   ❌ Error reading trades: {e}")
+        print(f"   Error reading trades: {e}")
 
 
 def generate_entry_signals(df: pd.DataFrame, cfg: Dict[str, Any]) -> pd.DataFrame:
@@ -318,7 +318,7 @@ def run_backtest_with_debug(
     # Load data
     data_file = Path(data_dir) / f"{pair}.csv"
     if not data_file.exists():
-        print(f"⚠️  Data file not found: {data_file}")
+        print(f"Data file not found: {data_file}")
         # Run normal backtest which will handle the error
         run_backtest(config, results_dir=str(output_dir))
         return
@@ -326,7 +326,7 @@ def run_backtest_with_debug(
     # Load and process data
     df = load_pair_csv(pair, Path(data_dir))
     if df.empty:
-        print(f"⚠️  Empty data file: {data_file}")
+        print(f"Empty data file: {data_file}")
         run_backtest(config, results_dir=str(output_dir))
         return
 
@@ -381,7 +381,7 @@ def print_summary_stats(summary_file: Path) -> None:
                 print(f"   {line.strip()}")
 
     except Exception as e:
-        print(f"   ❌ Error reading summary: {e}")
+        print(f"   Error reading summary: {e}")
 
 
 def main():
@@ -429,7 +429,7 @@ Examples:
     if len(pair) == 6 and "_" not in pair:
         pair = f"{pair[:3]}_{pair[3:]}"
 
-    print("🚀 Running single debug backtest:")
+    print("Running single debug backtest:")
     print(f"   Pair: {pair}")
     print(f"   C1: {args.c1}")
     print(f"   Period: {args.start_date} to {args.end_date}")
@@ -458,7 +458,7 @@ Examples:
 
     try:
         # Run backtest
-        print("\n⚙️  Running backtest...")
+        print("\nRunning backtest...")
 
         # Run backtest with debug features if enabled
         if args.debug_decisions or args.export_indicator:
@@ -472,7 +472,7 @@ Examples:
             # Run the backtest with results_dir parameter
             run_backtest(config, results_dir=str(output_dir))
 
-        print("✅ Backtest completed!")
+        print("Backtest completed!")
 
         # Check output files
         trades_file = output_dir / "trades.csv"
@@ -481,34 +481,34 @@ Examples:
         decisions_file = output_dir / "decisions.csv"
         indicator_file = output_dir / "indicator_series.csv"
 
-        print("\n📁 Output files:")
+        print("\nOutput files:")
         standard_files = [trades_file, summary_file, equity_file, config_file]
         for file_path in standard_files:
-            status = "✅" if file_path.exists() else "❌"
+            status = "OK" if file_path.exists() else "MISSING"
             print(f"   {status} {file_path}")
 
         # Check debug files if enabled
         if args.debug_decisions:
-            status = "✅" if decisions_file.exists() else "❌"
+            status = "OK" if decisions_file.exists() else "MISSING"
             print(f"   {status} {decisions_file}")
 
         if args.export_indicator:
-            status = "✅" if indicator_file.exists() else "❌"
+            status = "OK" if indicator_file.exists() else "MISSING"
             print(f"   {status} {indicator_file}")
 
         # Print summary stats
         if summary_file.exists():
-            print("\n📊 Summary Stats:")
+            print("\nSummary Stats:")
             print_summary_stats(summary_file)
 
         # Print trades summary
         if trades_file.exists():
             print_trades_summary(trades_file)
 
-        print(f"\n🔧 Config used: {config_file}")
+        print(f"\nConfig used: {config_file}")
 
     except Exception as e:
-        print(f"❌ Error running backtest: {e}")
+        print(f"Error running backtest: {e}")
         import traceback
 
         traceback.print_exc()

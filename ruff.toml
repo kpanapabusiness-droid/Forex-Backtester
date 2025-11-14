@@ -10,6 +10,16 @@ exclude = [
   ".venv/**",
   ".git/**",
   "__pycache__/**",
+  "attic/**",
+  "**/*.ipynb",
+]
+
+extend-exclude = [
+  ".conda/**",
+  ".mypy_cache/**",
+  ".pytest_cache/**",
+  "build/**",
+  "dist/**",
 ]
 
 select = ["E", "F", "I"]   # errors/flake, import, etc.

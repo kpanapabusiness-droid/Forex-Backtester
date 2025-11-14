@@ -1,0 +1,116 @@
+# C1-only exits sweep
+
+defaults:
+  pair: [EUR_USD, GBP_USD, USD_JPY, AUD_USD, GBP_JPY, AUD_NZD, EUR_JPY]
+  timeframe: D
+  from: 2016-01-01
+  to: 2025-10-31
+  output_dir: results/c1_only_exits
+  execution:
+    spread_pips: 0
+  rules:
+    one_candle_rule:
+      enabled: false
+  filters:
+    volume:
+      enabled: false
+    dbcvix:
+      enabled: false
+    session:
+      enabled: false
+  baseline:
+    enabled: false
+  exit:
+    enabled: false
+  position_sizing:
+    mode: fixed_r
+  risk:
+    fixed_r: 1.0
+  classification:
+    use_tp1_leg_only: true
+  trades:
+    two_legs_per_signal: true
+    leg_a:
+      tp1_enabled: true
+      breakeven_after_tp1: false
+    leg_b:
+      tp1_enabled: false
+      breakeven_after_tp1: true
+    exit_on_c1_flip: true
+
+  # Trailing stop: enabled using project defaults (distance/logic not hardcoded).
+  # Activation semantics follow engine defaults (trail_after_atr=2.0),
+  # which avoids affecting Leg A's TP1 classification and only engages post-gain.
+  trailing_stop:
+    enabled: true
+    # If leg-specific TS flags are supported by your runner/engine,
+    # prefer these (safe no-ops if ignored):
+    leg_a:
+      enabled: false
+    leg_b:
+      enabled: true
+
+sweep:
+  axes:
+    - name: c1
+      values:
+        - twiggs_money_flow
+        - disparity_index
+        - trend_akkam
+        - kalman_filter
+        - fisher_transform
+        - ehlers_eot
+        - coral
+        - chandelier_exit
+        - glitch_index
+        - metro_advanced
+        - ehlers_roofing_filter
+        - perfect_trend_line
+        - hacolt_lines
+        - band_pass_filter
+        - ehlers_deli
+        - forecast
+        - grucha_percentage_index
+        - turtle_trading_channel
+        - smoothed_momentum
+        - polarized_fractal_efficiency
+        - ttf
+        - doda_stochastic
+        - ehlers_reverse_ema
+        - top_bottom_nr
+        - price_momentum_oscillator
+        - sherif_hilo
+        - ergodic_tvi
+        - dpo_histogram
+        - lwpi
+        - aroon
+        - bears_bulls_impulse
+        - smooth_step
+        - ehlers_cg
+        - trend_continuation
+        - cyber_cycle
+        - is_calculation
+        - supertrend
+        - decycler_oscillator
+        - linear_regression_slope
+        - trendilo
+        - third_gen_ma
+        - vulkan_profit
+        - top_trend
+        - vortex_indicator
+        - schaff_trend_cycle
+        - laguerre
+        - tp_trend_pivot
+        - wpr_ma
+        - zerolag_macd
+        - ease_of_movement
+        - trend_lord
+        - hlc_trend
+        - aso
+        - kuskus_starlight
+        - sma_cross
+        - rsi
+
+output_layout:
+  per_combination_dir: "{pair}/{c1}"
+

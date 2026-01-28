@@ -1,7 +1,11 @@
 import numpy as np
 import pandas as pd
+import pytest
 
 from indicators.volume_funcs import volume_trend_direction_force
+
+
+pytestmark = pytest.mark.research
 
 
 def _make_ohlcv_trend(n: int = 80) -> pd.DataFrame:

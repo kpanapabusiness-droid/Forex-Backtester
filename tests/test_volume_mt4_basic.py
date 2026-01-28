@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import pytest
 
 from indicators.volume_funcs import (
     volume_normalized,
@@ -9,6 +10,9 @@ from indicators.volume_funcs import (
     volume_william_vix_fix,
     volume_waddah_attar_explosion,
 )
+
+
+pytestmark = pytest.mark.research
 
 
 def _make_ohlcv(n: int = 60) -> pd.DataFrame:

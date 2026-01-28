@@ -216,6 +216,7 @@ def apply_signal_logic(df: pd.DataFrame, cfg: dict) -> pd.DataFrame:
     # Exit configuration
     exit_on_c1_reversal = exit_cfg.get("exit_on_c1_reversal", True)
     exit_on_baseline_cross = exit_cfg.get("exit_on_baseline_cross", use_baseline)
+    exit_on_exit_signal = exit_cfg.get("exit_on_exit_signal", False)
 
     # Detect C1 signal column
     c1_col = _detect_c1_col(out)
@@ -503,6 +504,16 @@ def apply_signal_logic(df: pd.DataFrame, cfg: dict) -> pd.DataFrame:
                 ):
                     exit_triggered = True
                     exit_reason = "baseline_cross"
+
+            # Exit indicator (explicit exit signal column)
+            if (
+                not exit_triggered
+                and exit_on_exit_signal
+                and _has_nonnull(out, "exit_signal")
+                and int(out.loc[i, "exit_signal"]) == 1
+            ):
+                exit_triggered = True
+                exit_reason = "exit_indicator"
 
             # Stop loss hit
             if not exit_triggered and current_sl is not None:

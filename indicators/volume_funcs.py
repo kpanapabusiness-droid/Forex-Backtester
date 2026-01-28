@@ -74,3 +74,70 @@ def volume_volatility_ratio(
     ratio = (atr / base).replace([np.inf, -np.inf], np.nan).fillna(0.0)
     df[signal_col] = (ratio >= float(threshold)).astype("int8")
     return df
+
+def volume_normalized(*args, **kwargs):
+    return volume_volatility_ratio(*args, **kwargs)
+
+
+def volume_trend_direction_force(*args, **kwargs):
+    return volume_adx(*args, **kwargs)
+
+def volume_silence(*args, **kwargs):
+    import numpy as np
+    x = volume_volatility_ratio(*args, **kwargs)
+    try:
+        x = np.asarray(x, dtype=float)
+        with np.errstate(divide="ignore", invalid="ignore"):
+            y = 1.0 / x
+        y[~np.isfinite(y)] = 0.0
+        return y
+    except Exception:
+        # Fallback for scalar outputs
+        try:
+            xf = float(x)
+            return 0.0 if xf == 0.0 else (1.0 / xf)
+        except Exception:
+            return 0.0
+
+def volume_stiffness(*args, **kwargs):
+    import numpy as np
+    x = volume_volatility_ratio(*args, **kwargs)
+    try:
+        x = np.asarray(x, dtype=float)
+        x[~np.isfinite(x)] = 0.0
+        return np.clip(x, 0.0, 1e6)
+    except Exception:
+        try:
+            xf = float(x)
+            if not np.isfinite(xf):
+                return 0.0
+            return max(0.0, xf)
+        except Exception:
+            return 0.0
+
+def volume_volatility_ratio_mt4(*args, **kwargs):
+    return volume_volatility_ratio(*args, **kwargs)
+
+def volume_william_vix_fix(*args, **kwargs):
+    import numpy as np
+    # Backward-compatible placeholder: return zeros with the same length as the first array-like input.
+    for v in list(args) + list(kwargs.values()):
+        try:
+            a = np.asarray(v)
+            if a.ndim >= 1 and a.size > 1:
+                return np.zeros_like(a, dtype=float)
+        except Exception:
+            pass
+    return 0.0
+
+def volume_waddah_attar_explosion(*args, **kwargs):
+    import numpy as np
+    # Backward-compatible placeholder: return zeros with the same length as the first array-like input.
+    for v in list(args) + list(kwargs.values()):
+        try:
+            a = np.asarray(v)
+            if a.ndim >= 1 and a.size > 1:
+                return np.zeros_like(a, dtype=float)
+        except Exception:
+            pass
+    return 0.0

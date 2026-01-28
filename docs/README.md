@@ -91,8 +91,50 @@ python scripts/batch_sweeper.py configs/sweeps.yaml
 
 ### 4. Walk-Forward Optimization
 ```bash
-python scripts/walk_forward.py configs/config.yaml
+python scripts/walk_forward.py -c configs/config.yaml
 ```
+
+### 5. Tier 1 C1 WFO (Walk-Forward Optimization for Safe Indicators)
+```bash
+python scripts/walk_forward.py -c configs/wfo_tier1_c1.yaml
+```
+
+**Tier 1 C1 Indicators** are a curated set of safe, non-repainting C1 indicators selected for WFO:
+- `smoothed_momentum` - Period-based momentum smoothing
+- `kalman_filter` - Kalman filter smoothing
+- `trend_akkam` - EWM-based trend detection
+- `lwpi` - Linear Weighted Price Index
+- `disparity_index` - Price vs moving average disparity
+- `twiggs_money_flow` - Volume-weighted money flow
+
+The Tier 1 WFO config (`configs/wfo_tier1_c1.yaml`) runs WFO on these indicators individually. Each indicator is tested with a 2-year training window, 6-month test window, rolling forward by 6 months from 2018-01-01 to 2022-12-31.
+
+**Note**: Suspicious/repaint-prone indicators (fisher_transform, laguerre, doda_stochastic, supertrend, ehlers_reverse_ema, turtle_trading_channel) are excluded from Tier 1.
+
+### 6. Single-Indicator C1 WFO
+
+Run walk-forward optimization for each Tier-1 C1 indicator individually:
+
+```bash
+python scripts/walk_forward.py -c configs/wfo_c1_smoothed_momentum.yaml
+python scripts/walk_forward.py -c configs/wfo_c1_kalman_filter.yaml
+python scripts/walk_forward.py -c configs/wfo_c1_trend_akkam.yaml
+python scripts/walk_forward.py -c configs/wfo_c1_lwpi.yaml
+python scripts/walk_forward.py -c configs/wfo_c1_disparity_index.yaml
+python scripts/walk_forward.py -c configs/wfo_c1_twiggs_money_flow.yaml
+```
+
+Each run writes results to `results/wfo_c1_<indicator_name>/` containing:
+- `wfo_folds.csv` - Per-fold performance metrics
+- `equity_curve.csv` - Out-of-sample equity curve (concatenated across folds)
+- `oos_summary.txt` - Aggregate summary statistics
+
+All single-indicator WFO configs use:
+- **Data window**: 2018-01-01 to 2022-12-31
+- **Training window**: 2 years
+- **Test window**: 6 months
+- **Step size**: 6 months
+- **Pairs**: AUD_USD, EUR_USD, GBP_USD, USD_CHF
 
 ## ⚙️ Configuration
 

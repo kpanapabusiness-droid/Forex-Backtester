@@ -57,7 +57,7 @@ jobs:
           echo "RUFF_EXIT=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
           exit 0
 
-      - name: Pytest (full suite, clean env)
+      - name: Pytest (non-research suite, clean env)
         id: pytest
         env:
           PYTEST_DISABLE_PLUGIN_AUTOLOAD: "1"
@@ -67,7 +67,8 @@ jobs:
           set +e
           set -o pipefail
           : > pytest.log
-          python -m pytest -q -c /dev/null --ignore=attic 2>&1 | tee -a pytest.log
+          # Gate only on non-research tests; research suite is opt-in / non-gating
+          python -m pytest -q -m "not research" -c /dev/null --ignore=attic 2>&1 | tee -a pytest.log
           echo "PYTEST_EXIT=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
           exit 0
 

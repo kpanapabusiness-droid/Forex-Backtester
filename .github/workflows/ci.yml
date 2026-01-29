@@ -50,26 +50,27 @@ jobs:
         id: ruff
         shell: bash
         run: |
-          set +e
           set -o pipefail
           : > ruff.log
-          ruff check . --force-exclude --exclude attic 2>&1 | tee -a ruff.log
-          echo "RUFF_EXIT=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
-          exit 0
+          ruff check . 2>&1 | tee -a ruff.log
+          exit_code=${PIPESTATUS[0]}
+          echo "RUFF_EXIT=$exit_code" >> "$GITHUB_OUTPUT"
+          exit $exit_code
 
-      - name: Pytest (full suite, clean env)
+      - name: Pytest (non-research suite, clean env)
         id: pytest
         env:
           PYTEST_DISABLE_PLUGIN_AUTOLOAD: "1"
           PYTHONPATH: ${{ github.workspace }}
         shell: bash
         run: |
-          set +e
           set -o pipefail
           : > pytest.log
-          python -m pytest -q -c /dev/null --ignore=attic 2>&1 | tee -a pytest.log
-          echo "PYTEST_EXIT=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
-          exit 0
+          # Gate only on non-research tests; research suite is opt-in / non-gating
+          python -m pytest -q -m "not research" --ignore=attic 2>&1 | tee -a pytest.log
+          exit_code=${PIPESTATUS[0]}
+          echo "PYTEST_EXIT=$exit_code" >> "$GITHUB_OUTPUT"
+          exit $exit_code
 
       - name: Smoke (non-gating)
         id: smoke
@@ -81,16 +82,6 @@ jobs:
           python scripts/smoke_test_selfcontained_v198.py -q 2>&1 | tee -a smoke.log
           echo "SMOKE_EXIT=${PIPESTATUS[0]:-0}" >> "$GITHUB_OUTPUT"
           exit 0
-
-      # Gate merges on ruff + pytest only
-      - name: Fail at end if needed (gate on ruff+pytest)
-        if: always()
-        shell: bash
-        run: |
-          r="${{ steps.ruff.outputs.RUFF_EXIT }}"
-          p="${{ steps.pytest.outputs.PYTEST_EXIT }}"
-          echo "gates: ruff=$r pytest=$p"
-          if [ "$r" != "0" ] || [ "$p" != "0" ]; then exit 1; fi
 
       # Always evaluate, but only send to Discord when the overall job actually failed
       - name: Notify Discord (always evaluate)

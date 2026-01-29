@@ -1,0 +1,158 @@
+# Baseline sweep configuration (no volume) - Phase 1
+# Sweeps over all C1s × all 28 pairs × baseline × exit
+role_filters: ["c1", "baseline", "exit"]
+
+discover:
+  c1: true
+  c2: false
+  baseline: false
+  volume: false
+  exit: false
+
+# Use same C1 allowlist as sweeps.yaml for consistency
+allowlist:
+  c1: [
+    "twiggs_money_flow",
+    "disparity_index",
+    "trend_akkam",
+    "kalman_filter",
+    "fisher_transform",
+    "ehlers_eot",
+    "coral",
+    "chandelier_exit",
+    "glitch_index",
+    "metro_advanced",
+    "ehlers_roofing_filter",
+    "perfect_trend_line",
+    "hacolt_lines",
+    "band_pass_filter",
+    "ehlers_deli",
+    "forecast",
+    "grucha_percentage_index",
+    "turtle_trading_channel",
+    "smoothed_momentum",
+    "polarized_fractal_efficiency",
+    "ttf",
+    "doda_stochastic",
+    "ehlers_reverse_ema",
+    "top_bottom_nr",
+    "price_momentum_oscillator",
+    "sherif_hilo",
+    "ergodic_tvi",
+    "dpo_histogram",
+    "lwpi",
+    "aroon",
+    "bears_bulls_impulse",
+    "smooth_step",
+    "ehlers_cg",
+    "trend_continuation",
+    "cyber_cycle",
+    "is_calculation",
+    "supertrend",
+    "decycler_oscillator",
+    "linear_regression_slope",
+    "trendilo",
+    "third_gen_ma",
+    "vulkan_profit",
+    "top_trend",
+    "vortex_indicator",
+    "schaff_trend_cycle",
+    "laguerre",
+    "tp_trend_pivot",
+    "wpr_ma",
+    "zerolag_macd",
+    "ease_of_movement",
+    "trend_lord",
+    "hlc_trend",
+    "aso",
+    "kuskus_starlight"
+  ]
+
+blocklist:
+  c1: []
+
+roles:
+  c1: []   # auto-discover from allowlist
+  baseline: [{"name": "ema", "params": {}}]
+  exit: [{"name": "twiggs_money_flow", "params": {}}]
+
+default_params:
+  c1: {}
+  baseline: {}
+  exit: {}
+
+parallel:
+  workers: 1
+
+pairs:
+  - AUD_CAD
+  - AUD_CHF
+  - AUD_JPY
+  - AUD_NZD
+  - AUD_USD
+  - CAD_JPY
+  - CHF_JPY
+  - EUR_AUD
+  - EUR_CAD
+  - EUR_CHF
+  - EUR_GBP
+  - EUR_JPY
+  - EUR_NZD
+  - EUR_USD
+  - GBP_AUD
+  - GBP_CAD
+  - GBP_CHF
+  - GBP_JPY
+  - GBP_NZD
+  - GBP_USD
+  - NZD_CAD
+  - NZD_CHF
+  - NZD_JPY
+  - NZD_USD
+  - USD_CAD
+  - USD_CHF
+  - USD_JPY
+  - USD_SGD
+
+static_overrides:
+  timeframe: "D"
+  data:
+    dir: "data/daily"
+  rules:
+    one_candle_rule: false
+    pullback_rule: false
+    bridge_too_far_days: 7
+    allow_baseline_as_catalyst: false
+  entry:
+    atr_multiple: 2.0
+  engine:
+    allow_continuation: true
+    duplicate_open_policy: "block"
+  exit:
+    use_trailing_stop: true
+    move_to_breakeven_after_atr: true
+    exit_on_c1_reversal: true
+    exit_on_baseline_cross: false
+    exit_on_exit_signal: true
+  spreads:
+    enabled: false
+    default_pips: 1.0
+  tracking:
+    in_sim_equity: true
+    track_win_loss_scratch: true
+    track_roi: true
+    track_drawdown: true
+  risk_filters:
+    dbcvix:
+      enabled: false
+      mode: "reduce"
+      threshold: 0.0
+      reduce_risk_to: 0.01
+      source: "synthetic"
+  date_range:
+    start: "2020-01-01"
+    end: "2020-12-31"
+  output:
+    results_dir: "results/verify_no_volume"
+
+

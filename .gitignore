@@ -44,3 +44,7 @@ results_history/
 mt5/**
 !mt5/.gitkeep
 !mt5/README.md
+inspect_results.py
+rank_phase1.py
+tmp_find_exit_baselines.py
+Mt4 Volume Indis/

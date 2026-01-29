@@ -1,0 +1,117 @@
+# Walk-Forward Optimization (WFO) Configuration for Tier 1 C1 Indicators
+# ---------------------------------------------------------------------
+# This config runs WFO on a curated set of safe, non-repainting C1 indicators.
+# Tier 1 indicators: smoothed_momentum, kalman_filter, trend_akkam, lwpi, disparity_index, twiggs_money_flow
+#
+# Usage:
+#   python scripts/walk_forward.py -c configs/wfo_tier1_c1.yaml
+#
+# Structure matches the known-good WFO config used in smoke_test_selfcontained_v198.py
+
+pairs:
+  - AUD_USD
+  - EUR_USD
+  - GBP_USD
+  - USD_CHF
+
+timeframe: "D"
+
+data:
+  dir: "data/daily"
+  start: "2018-01-01"  # Overall window start (used by WFO to generate folds)
+  end: "2022-12-31"    # Overall window end (used by WFO to generate folds)
+
+date_range:
+  start: "2018-01-01"  # Also set for backtester compatibility
+  end: "2022-12-31"    # Also set for backtester compatibility
+
+indicators:
+  c1: "c1_smoothed_momentum"  # Default; can be overridden per-indicator in WFO runs
+  use_c2: false
+  use_baseline: false
+  use_volume: false
+  use_exit: false
+
+rules:
+  one_candle_rule: false
+  pullback_rule: false
+  bridge_too_far_days: 7
+  allow_baseline_as_catalyst: false
+
+entry:
+  atr_multiple: 2.0
+
+exit:
+  use_trailing_stop: true
+  move_to_breakeven_after_atr: true
+  exit_on_c1_reversal: true
+  exit_on_baseline_cross: false
+  exit_on_exit_signal: false
+
+spreads:
+  enabled: false
+  default_pips: 1.0
+
+tracking:
+  in_sim_equity: true
+  track_win_loss_scratch: true
+  track_roi: true
+  track_drawdown: true
+
+risk_filters:
+  dbcvix:
+    enabled: false
+    mode: "reduce"
+    threshold: 0.0
+    reduce_risk_to: 0.01
+    source: "synthetic"
+
+risk:
+  starting_balance: 10000.0
+  per_trade_pct: 2.0
+  risk_per_trade: 0.02
+  account_ccy: "USD"
+
+cache:
+  enabled: true
+  dir: "cache"
+  format: "parquet"
+
+walk_forward:
+  enabled: true
+  run_name: "wfo_tier1_c1"
+  train_years: 2      # Training window: 2 years (24 months)
+  test_months: 6      # Out-of-sample test window: 6 months
+  step_months: 6      # Rolling step: 6 months
+  # This will generate folds from 2018-01-01 to 2022-12-31
+  # Each fold: 2 years train, 6 months test, rolling forward by 6 months
+  # Example folds:
+  #   Fold 1: Train 2018-01-01 to 2020-01-01, Test 2020-01-01 to 2020-07-01
+  #   Fold 2: Train 2018-07-01 to 2020-07-01, Test 2020-07-01 to 2021-01-01
+  #   etc.
+
+# Tier 1 C1 indicators to optimize (non-repainting, safe indicators)
+# These will be run individually in separate WFO runs
+# To run WFO for a specific indicator, override indicators.c1 in the config
+tier1_indicators:
+  - "smoothed_momentum"    # period: 10 (default), range: [8, 10, 12]
+  - "kalman_filter"        # smoothing: 0.2 (default), range: [0.15, 0.2, 0.25]
+  - "trend_akkam"          # period: 14 (default), range: [12, 14, 16]
+  - "lwpi"                 # period: 14 (default), range: [12, 14, 16]
+  - "disparity_index"      # period: 13 (default), range: [11, 13, 15]
+  - "twiggs_money_flow"    # length: 15 (default), range: [13, 15, 17]
+
+# Parameter ranges for Tier 1 indicators (for future parameter optimization)
+indicator_params:
+  c1_smoothed_momentum:
+    period: [8, 10, 12]
+  c1_kalman_filter:
+    smoothing: [0.15, 0.2, 0.25]
+  c1_trend_akkam:
+    period: [12, 14, 16]
+  c1_lwpi:
+    period: [12, 14, 16]
+  c1_disparity_index:
+    period: [11, 13, 15]
+  c1_twiggs_money_flow:
+    length: [13, 15, 17]

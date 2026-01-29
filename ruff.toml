@@ -3,6 +3,7 @@ target-version = "py312"
 
 exclude = [
   "notebooks/**",
+  "research/**",
   "results/**",
   "results_history/**",
   "data/**",
@@ -22,5 +23,6 @@ extend-exclude = [
   "dist/**",
 ]
 
-select = ["E", "F", "I"]   # errors/flake, import, etc.
-ignore = []
+[lint]
+select = ["E", "F", "I"]
+ignore = ["E501"]

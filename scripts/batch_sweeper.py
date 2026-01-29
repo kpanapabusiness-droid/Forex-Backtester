@@ -67,12 +67,26 @@ ROLE_META = {
     "exit": {"module": "indicators.exit_funcs", "prefix": "exit_"},
 }
 
-# --- Consolidated CSV schema
+# --- Consolidated CSV schema (canonical, scalar-only)
+# NOTE:
+# - No JSON/blob columns (roles, params, *_json, indicator_params, etc.)
+# - Includes canonical identity keys for joinability across pipelines.
 FIELDNAMES = [
+    # Run identity
+    "run_id",
     "run_slug",
     "timestamp",
-    "roles",
-    "params",
+    # Canonical identity
+    "pair",
+    "timeframe",
+    "from_date",
+    "to_date",
+    "c1",
+    "c2",
+    "baseline",
+    "volume",
+    "exit",
+    # Metrics
     "total_trades",
     "wins",
     "losses",
@@ -462,7 +476,7 @@ def main(sweeps_path=SWEEPS):
     print(f"Using {workers} workers")
     started = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    rows_to_append = []
+    rows_to_append: list[dict] = []
     with ProcessPoolExecutor(max_workers=workers) as ex:
         futures = {}
         for i, (merged_cfg, run_slug, role_names, role_params) in enumerate(jobs):
@@ -481,11 +495,31 @@ def main(sweeps_path=SWEEPS):
             # compute score
             score = calc_score(metrics, sweeps.get("scoring") or {})
 
+            # Extract canonical identity (pair, timeframe, dates, components)
+            try:
+                identity = extract_canonical_identity(merged_cfg, role_names)
+            except Exception as e:  # pragma: no cover - defensive, tests cover happy-path
+                print(f"⚠️  Identity extraction failed for {run_slug}: {e}")
+                identity = {
+                    "pair": "",
+                    "timeframe": "",
+                    "from_date": "",
+                    "to_date": "",
+                    "c1": role_names.get("c1") or "none",
+                    "c2": role_names.get("c2") or "none",
+                    "baseline": role_names.get("baseline") or "none",
+                    "volume": role_names.get("volume") or "none",
+                    "exit": role_names.get("exit") or "",
+                }
+
             row = {
+                # Run identifiers
+                "run_id": run_slug,
                 "run_slug": run_slug,
                 "timestamp": datetime.now().strftime("%Y%m%d_%H%M%S"),
-                "roles": json.dumps(role_names),
-                "params": json.dumps(role_params),
+                # Canonical identity (scalar)
+                **identity,
+                # Metrics
                 "total_trades": metrics.get("total_trades", 0),
                 "wins": metrics.get("wins", 0),
                 "losses": metrics.get("losses", 0),
@@ -515,3 +549,105 @@ def main(sweeps_path=SWEEPS):
 
 if __name__ == "__main__":
     main()
+
+def extract_pairs_from_csv(path, column_name: str = "pair") -> list[str]:
+    """
+    Extract sorted unique values from a CSV column (default: "pair").
+
+    Contract (see tests/test_batch_sweeper_csv_parseable.py):
+      - Raises FileNotFoundError("Pairs source CSV not found") if file missing.
+      - Raises RuntimeError("Column '<name>' not found") if the column is absent.
+      - Raises RuntimeError("No pairs found") if the column has no non-empty values.
+    """
+    csv_path = Path(path)
+
+    if not csv_path.exists():
+        raise FileNotFoundError(f"Pairs source CSV not found: {csv_path}")
+
+    df = pd.read_csv(csv_path)
+
+    if column_name not in df.columns:
+        raise RuntimeError(f"Column '{column_name}' not found in CSV {csv_path}")
+
+    vals = (
+        pd.to_numeric(df[column_name], errors="ignore")
+        if df[column_name].dtype.kind in {"i", "u", "f"}
+        else df[column_name]
+    )
+    series = (
+        vals.astype(str)
+        .map(lambda x: x.strip())
+        .replace({"": pd.NA})
+        .dropna()
+    )
+
+    pairs = sorted(series.unique().tolist())
+    if not pairs:
+        raise RuntimeError(f"No pairs found in column '{column_name}' for {csv_path}")
+
+    return pairs
+
+
+_CANONICAL_ID_KEYS = (
+    "pair",
+    "timeframe",
+    "from_date",
+    "to_date",
+    "c1",
+    "c2",
+    "baseline",
+    "volume",
+    "exit",
+)
+
+
+def extract_canonical_identity(merged_cfg: dict, role_names: dict) -> dict:
+    """Extract canonical identity keys from merged config + role names.
+
+    Tests expect:
+      - extract_canonical_identity(merged_cfg, role_names) to:
+        * Populate pair/timeframe/from_date/to_date.
+        * Always return component keys (c1/c2/baseline/volume/exit) as strings.
+      - Raise ValueError with specific messages when required keys are missing.
+    """
+    # --- Required identity: pair ---
+    pairs = merged_cfg.get("pairs") or []
+    if not isinstance(pairs, list) or not pairs:
+        raise ValueError("Required identity key 'pair' missing")
+    pair = pairs[0]
+    if not pair:
+        raise ValueError("Required identity key 'pair' missing")
+
+    # --- Required identity: timeframe ---
+    timeframe = merged_cfg.get("timeframe")
+    if not timeframe:
+        raise ValueError("Required identity key 'timeframe' missing")
+
+    # --- Required identity: date range ---
+    date_range = merged_cfg.get("date_range") or {}
+    from_date = date_range.get("start")
+    to_date = date_range.get("end")
+    if not from_date or not to_date:
+        raise ValueError("Required identity keys 'from_date'/'to_date' missing")
+
+    # --- Components (always present in identity) ---
+    def _norm_component(name: str, default: str = "none") -> str:
+        val = role_names.get(name)
+        if val is None or val is False or str(val).strip() in {"", "none", "null", "None"}:
+            return default
+        return str(val)
+
+    identity = {
+        "pair": str(pair),
+        "timeframe": str(timeframe),
+        "from_date": str(from_date),
+        "to_date": str(to_date),
+        "c1": _norm_component("c1", default="none"),
+        "c2": _norm_component("c2", default="none"),
+        "baseline": _norm_component("baseline", default="none"),
+        "volume": _norm_component("volume", default="none"),
+        # Exit indicator: keep exact value if provided, else default to canonical exit name
+        "exit": _norm_component("exit", default="exit_twiggs_money_flow"),
+    }
+
+    return identity

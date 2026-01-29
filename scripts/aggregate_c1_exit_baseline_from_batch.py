@@ -122,7 +122,7 @@ def aggregate_baseline(batch_csv: Path, history_dir: Optional[Path] = None, swee
         )
 
     # Print statistics
-    print(f"📊 CSV read statistics:")
+    print("📊 CSV read statistics:")
     print(f"   Total lines (excl. header): {total_lines}")
     print(f"   Loaded rows: {loaded_rows}")
     print(f"   Skipped rows: {skipped_rows}")
@@ -134,7 +134,7 @@ def aggregate_baseline(batch_csv: Path, history_dir: Optional[Path] = None, swee
     if missing_required:
         # LEGACY FALLBACK: Try to extract from roles JSON and config archaeology
         print(f"⚠️  Warning: Missing canonical columns {missing_required}. Using legacy extraction.")
-        print(f"   This should not happen with updated batch_sweeper.py. Please rerun sweeps.")
+        print("   This should not happen with updated batch_sweeper.py. Please rerun sweeps.")
         
         # Extract pair from config archaeology (legacy)
         if "pair" not in df.columns:

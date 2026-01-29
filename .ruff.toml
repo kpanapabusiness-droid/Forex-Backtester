@@ -3,13 +3,15 @@ target-version = "py312"
 
 exclude = [
   "notebooks/**",
+  "attic/**",
+  "research/**",
   "results/**",
   "results_history/**",
   "data/**",
   "cache/**",
   ".venv/**",
   ".git/**",
-  "__pycache__/**"
+  "__pycache__/**",
 ]
 
 [lint]

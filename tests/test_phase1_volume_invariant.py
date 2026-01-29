@@ -9,15 +9,19 @@ Unit tests for the invariant enforcement: trades_with_volume <= trades_without_v
 
 from __future__ import annotations
 
-import pytest
-import pandas as pd
 import sys
 from pathlib import Path
+
+import pandas as pd
+import pytest
 
 PROJECT_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from scripts.phase1_volume_referee import validate_invariant, find_join_keys  # noqa: E402
+from scripts.phase1_volume_referee import (  # noqa: E402
+    find_join_keys,
+    validate_invariant,
+)
 
 
 class TestPhase1VolumeInvariant:
@@ -203,9 +207,6 @@ class TestPhase1VolumeJoinExplosion:
 
     def test_join_explosion_detection(self):
         """Test that join explosion is detected when joined rows > 2x max input."""
-        import pandas as pd
-        from scripts.phase1_volume_referee import find_join_keys
-        
         # Create dataframes that would cause explosion (duplicate keys)
         baseline_df = pd.DataFrame({
             "pair": ["EUR_USD"] * 10,  # 10 rows with same pair

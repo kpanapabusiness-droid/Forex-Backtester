@@ -14,7 +14,6 @@ Usage:
 from __future__ import annotations
 
 import argparse
-import glob
 import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -445,7 +444,9 @@ def main() -> None:
         f.write(f"- Baseline CSV: `{baseline_path}`\n")
         f.write(f"- Volume CSV: `{volume_path}`\n")
         f.write(f"- Matched rows: {len(joined_df)}\n")
-        f.write(f"- ✅ Invariant validated: trades_with_volume <= trades_without_volume\n\n")
+        f.write(
+            "- ✅ Invariant validated: trades_with_volume <= trades_without_volume\n\n"
+        )
 
         f.write("## Deltas by Volume Indicator\n\n")
         if delta_df.empty:

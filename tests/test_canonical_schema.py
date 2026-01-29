@@ -10,18 +10,23 @@ baseline aggregation uses it correctly.
 
 from __future__ import annotations
 
-import json
-import pytest
-import pandas as pd
 import sys
 import tempfile
 from pathlib import Path
 
+import pandas as pd
+import pytest
+
 PROJECT_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from scripts.batch_sweeper import extract_canonical_identity, FIELDNAMES  # noqa: E402
-from scripts.aggregate_c1_exit_baseline_from_batch import aggregate_baseline  # noqa: E402
+from scripts.aggregate_c1_exit_baseline_from_batch import (  # noqa: E402
+    aggregate_baseline,
+)
+from scripts.batch_sweeper import (  # noqa: E402
+    FIELDNAMES,
+    extract_canonical_identity,
+)
 
 
 class TestCanonicalSchema:

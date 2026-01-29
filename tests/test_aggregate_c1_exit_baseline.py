@@ -10,16 +10,20 @@ Unit tests for aggregate_c1_exit_baseline_from_batch.py
 from __future__ import annotations
 
 import json
-import pytest
-import pandas as pd
 import sys
 import tempfile
 from pathlib import Path
 
+import pandas as pd
+import pytest
+
 PROJECT_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from scripts.aggregate_c1_exit_baseline_from_batch import aggregate_baseline, extract_pairs_from_config  # noqa: E402
+from scripts.aggregate_c1_exit_baseline_from_batch import (  # noqa: E402
+    aggregate_baseline,
+    extract_pairs_from_config,
+)
 
 
 class TestAggregateC1ExitBaseline:

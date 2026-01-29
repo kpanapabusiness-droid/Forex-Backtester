@@ -52,7 +52,7 @@ jobs:
         run: |
           set -o pipefail
           : > ruff.log
-          ruff check . --force-exclude --exclude attic 2>&1 | tee -a ruff.log
+          ruff check . 2>&1 | tee -a ruff.log
           exit_code=${PIPESTATUS[0]}
           echo "RUFF_EXIT=$exit_code" >> "$GITHUB_OUTPUT"
           exit $exit_code

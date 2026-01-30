@@ -1,22 +1,24 @@
-# walk_forward.py — v1.9.8+ (hardened metrics, dict-friendly, no circular imports)
+# walk_forward.py — v1.9.8+ (WFO v2 runner + legacy run_wfo)
 from __future__ import annotations
 
+import argparse
+import json
 import sys
+from copy import deepcopy
+from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
+from typing import List
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 import math  # noqa: E402
-from copy import deepcopy  # noqa: E402
-from dataclasses import dataclass  # noqa: E402
-from datetime import datetime  # noqa: E402
-from pathlib import Path  # noqa: E402
-from typing import List  # noqa: E402
 
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
+import yaml  # noqa: E402
 
 # ============================================================
 # Local safe helpers (inline to avoid any import cycles)
@@ -102,6 +104,104 @@ def _ensure_results_dir(p) -> Path:
     p = Path(p)
     p.mkdir(parents=True, exist_ok=True)
     return p
+
+
+# ============================================================
+# WFO v2 runner (strict IS/OOS, same engine, no optimisation)
+# ============================================================
+
+
+def _load_yaml(path: Path) -> dict:
+    with path.open("r", encoding="utf-8-sig") as f:
+        return yaml.safe_load(f) or {}
+
+
+def _load_base_config_for_wfo(base_path: Path, config_file_dir: Path) -> dict:
+    """Load and validate base config; resolve path from config file dir; inject data_dir from data.dir."""
+    resolved = (config_file_dir / base_path).resolve()
+    if not resolved.exists():
+        resolved = (ROOT / base_path).resolve()
+    if not resolved.exists():
+        raise FileNotFoundError(f"base_config not found: {base_path} (tried {config_file_dir / base_path}, {ROOT / base_path})")
+    raw = _load_yaml(resolved)
+    raw.setdefault("data_dir", (raw.get("data") or {}).get("dir") or "data/daily")
+    from validators_config import validate_config  # noqa: E402
+
+    return validate_config(raw)
+
+
+def run_wfo_v2(config_path: str | Path) -> None:
+    """
+    WFO v2 entrypoint: load wfo_v2.yaml, generate folds, run IS then OOS per fold via run_backtest.
+    Writes results/wfo/<run_id>/fold_XX/{in_sample,out_of_sample}/ and fold_dates.json.
+    """
+    from analytics.wfo import generate_folds as wfo_generate_folds  # noqa: E402
+    from analytics.wfo import validate_no_test_overlap  # noqa: E402
+    from core.backtester import run_backtest  # noqa: E402
+
+    path = Path(config_path)
+    if not path.is_absolute():
+        path = (ROOT / path).resolve()
+    if not path.exists():
+        raise FileNotFoundError(f"WFO v2 config not found: {config_path}")
+    config_file_dir = path.parent
+
+    wfo = _load_yaml(path)
+    base_config_path = wfo.get("base_config") or "configs/v1_system.yaml"
+    base = _load_base_config_for_wfo(Path(base_config_path), config_file_dir)
+
+    data_scope = wfo.get("data_scope") or {}
+    base_dr = base.get("date_range") or {}
+    from_date = data_scope.get("from_date") or base_dr.get("start") or "2020-01-01"
+    to_date = data_scope.get("to_date") or base_dr.get("end") or "2021-12-31"
+    fold_scheme = wfo.get("fold_scheme") or {}
+    train_months = int(fold_scheme.get("train_months", 12))
+    test_months = int(fold_scheme.get("test_months", 3))
+    step_months = int(fold_scheme.get("step_months", 3))
+
+    folds = wfo_generate_folds(from_date, to_date, train_months, test_months, step_months)
+    if not folds:
+        raise ValueError("No folds generated; check from_date, to_date and fold_scheme.")
+    validate_no_test_overlap(folds)
+    for f in folds:
+        if f.train_end >= f.test_start:
+            raise ValueError(f"Fold {f.fold_id}: train_end must be < test_start (no leakage).")
+
+    engine_flags = wfo.get("engine") or {}
+    cache_on = bool(engine_flags.get("cache_on", False))
+    spreads_on = bool(engine_flags.get("spreads_on", False))
+    output_root = Path(wfo.get("output_root", "results/wfo_v2"))
+    run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
+    run_dir = _ensure_results_dir(output_root / run_id)
+
+    for f in folds:
+        fold_dir = run_dir / f"fold_{f.fold_id:02d}"
+        fold_dir.mkdir(parents=True, exist_ok=True)
+        fold_dates = {
+            "train_start": str(f.train_start),
+            "train_end": str(f.train_end),
+            "test_start": str(f.test_start),
+            "test_end": str(f.test_end),
+        }
+        (fold_dir / "fold_dates.json").write_text(json.dumps(fold_dates, indent=2), encoding="utf-8")
+
+        is_dir = fold_dir / "in_sample"
+        oos_dir = fold_dir / "out_of_sample"
+        is_dir.mkdir(parents=True, exist_ok=True)
+        oos_dir.mkdir(parents=True, exist_ok=True)
+
+        def _run_cfg(cfg: dict, start: str, end: str, results_dir: Path) -> None:
+            c = deepcopy(cfg)
+            c["date_range"] = {"start": start, "end": end}
+            c["cache"] = (c.get("cache") or {}) | {"enabled": cache_on}
+            (c.setdefault("spreads", {}))["enabled"] = spreads_on
+            (c.setdefault("output", {}))["results_dir"] = str(results_dir)
+            run_backtest(c, results_dir=str(results_dir))
+
+        _run_cfg(base, str(f.train_start), str(f.train_end), is_dir)
+        _run_cfg(base, str(f.test_start), str(f.test_end), oos_dir)
+
+    print(f"WFO v2 complete: {run_dir}")
 
 
 def _parse_date(x) -> pd.Timestamp:
@@ -527,3 +627,18 @@ def run_backtest_walk_forward(config_path: str | None = None):
         f"looked for {[c.__name__ for c in candidates] or 'none found'}. "
         f"Last error: {last_err}"
     )
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="WFO v2 runner: strict IS/OOS folds, same engine.")
+    parser.add_argument(
+        "--config",
+        default="configs/wfo_v2.yaml",
+        help="Path to WFO v2 config (default: configs/wfo_v2.yaml)",
+    )
+    args = parser.parse_args()
+    run_wfo_v2(args.config)
+
+
+if __name__ == "__main__":
+    main()

@@ -27,4 +27,4 @@ engine:
   spreads_on: false
 
 # Output
-output_root: results/wfo_v2
+output_root: results/wfo

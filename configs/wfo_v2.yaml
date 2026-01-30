@@ -1,4 +1,4 @@
-# WFO v2 config scaffold — fold scheme, data scope, placeholders (PR1)
+# WFO v2 config scaffold — fold scheme, data scope (PR1), selection + sweep (PR3)
 # Frozen base system; all trading/indicator logic comes from here.
 base_config: configs/v1_system.yaml
 

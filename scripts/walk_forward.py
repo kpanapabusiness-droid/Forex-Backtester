@@ -285,7 +285,7 @@ def run_wfo_v2(config_path: str | Path) -> None:
     engine_flags = wfo.get("engine") or {}
     cache_on = bool(engine_flags.get("cache_on", False))
     spreads_on = bool(engine_flags.get("spreads_on", False))
-    output_root = Path(wfo.get("output_root", "results/wfo_v2"))
+    output_root = Path(wfo.get("output_root", "results/wfo"))
     run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
     run_dir = _ensure_results_dir(output_root / run_id)
 

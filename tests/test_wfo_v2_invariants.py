@@ -88,9 +88,14 @@ def _write_wfo_v2_invariant_config(tmp_path: Path, with_sweep: bool = True) -> P
         sweep = {
             "role_filters": ["c1"],
             "discover": {"c1": False, "c2": False, "baseline": False, "volume": False, "exit": False},
-            "allowlist": {"c1": ["is_calculation", "supertrend"]},
+            "allowlist": {"c1": ["c1_is_calculation", "c1_supertrend"]},
             "blocklist": {"c1": []},
-            "roles": {"c1": []},
+            "roles": {
+                "c1": [
+                    {"name": "c1_is_calculation", "params": {}},
+                    {"name": "c1_supertrend", "params": {}},
+                ]
+            },
             "default_params": {"c1": {}},
             "static_overrides": {"timeframe": "D", "spreads": {"enabled": False}},
             "parallel": {"workers": 1, "max_runs": None},
@@ -185,3 +190,25 @@ def test_trade_count_stability(tmp_path):
     run_id_dir_2 = run_ids[-1]
     count2 = _get_oos_trade_count(run_id_dir_2)
     assert count1 == count2
+
+
+def test_wfo_v2_sweep_selects_non_null_c1(tmp_path):
+    """WFO v2 sweep must never select c1: null; at least one non-fallback candidate must run."""
+    import json
+
+    from scripts.walk_forward import run_wfo_v2
+
+    wfo_path = _write_wfo_v2_invariant_config(tmp_path, with_sweep=True)
+    run_wfo_v2(wfo_path)
+    run_id_dir = _get_run_dir(tmp_path)
+    assert run_id_dir is not None
+    fold_01 = run_id_dir / "fold_01"
+    is_best_path = fold_01 / "is_best_params.json"
+    assert is_best_path.exists(), "fold_01/is_best_params.json must exist"
+    best = json.loads(is_best_path.read_text(encoding="utf-8"))
+    role_names = best.get("role_names") or {}
+    c1 = role_names.get("c1")
+    assert c1 is not None and c1 != "", "role_names.c1 must not be null or empty"
+    in_sample = fold_01 / "in_sample"
+    run_dirs = sorted(in_sample.iterdir()) if in_sample.exists() else []
+    assert len(run_dirs) >= 2, "sweep must produce at least two candidate runs (no single null fallback)"

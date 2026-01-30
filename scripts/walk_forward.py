@@ -1,14 +1,16 @@
-# walk_forward.py — v1.9.8+ (WFO v2 runner + legacy run_wfo)
+# walk_forward.py — v1.9.8+ (WFO v2 runner + IS optimisation + legacy run_wfo)
 from __future__ import annotations
 
 import argparse
+import hashlib
+import itertools
 import json
 import sys
 from copy import deepcopy
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import List
+from typing import Any, List
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
@@ -130,6 +132,119 @@ def _load_base_config_for_wfo(base_path: Path, config_file_dir: Path) -> dict:
     return validate_config(raw)
 
 
+def _load_sweep_config(sweep_path: Path, config_file_dir: Path) -> dict:
+    resolved = (config_file_dir / sweep_path).resolve()
+    if not resolved.exists():
+        resolved = (ROOT / sweep_path).resolve()
+    if not resolved.exists():
+        raise FileNotFoundError(f"sweep_config not found: {sweep_path}")
+    return _load_yaml(resolved)
+
+
+def _params_fingerprint(role_names: dict, role_params: dict) -> str:
+    """Stable hash of winning params for invariant verification."""
+    blob = json.dumps({"role_names": role_names, "role_params": role_params}, sort_keys=True)
+    return hashlib.sha256(blob.encode()).hexdigest()
+
+
+def _run_is_sweep(
+    base: dict,
+    sweep_cfg: dict,
+    train_start: str,
+    train_end: str,
+    is_dir: Path,
+    cache_on: bool,
+    spreads_on: bool,
+) -> List[tuple]:
+    """Run in-sample sweep on train window; return list of (merged_cfg, metrics, role_names, role_params)."""
+    from core.backtester import run_backtest  # noqa: E402
+    from scripts.batch_sweeper import (  # noqa: E402
+        ROLE_META,
+        build_role_choices,
+        parse_summary_or_trades,
+        set_indicator,
+        set_indicator_params,
+    )
+
+    role_filters = sweep_cfg.get("role_filters") or ["c1"]
+    role_choices = {}
+    for role in ["c1", "c2", "baseline", "volume", "exit"]:
+        if role in role_filters and role in ROLE_META:
+            role_choices[role] = build_role_choices(sweep_cfg, role)
+        else:
+            role_choices[role] = [{"name": None, "params": {}}]
+    combos = list(
+        itertools.product(
+            *[[(r, ch) for ch in role_choices[r]] for r in ["c1", "c2", "baseline", "volume", "exit"]]
+        )
+    )
+    static = sweep_cfg.get("static_overrides") or {}
+    runs: List[tuple] = []
+    for i, combo in enumerate(combos):
+        merged = deepcopy(base)
+        merged["date_range"] = {"start": train_start, "end": train_end}
+        for k, v in static.items():
+            if isinstance(v, dict):
+                merged.setdefault(k, {})
+                merged[k].update(v)
+            else:
+                merged[k] = v
+        role_names, role_params = {}, {}
+        for role, choice in combo:
+            set_indicator(merged, role, choice["name"])
+            set_indicator_params(merged, role, choice["name"], choice["params"])
+            role_names[role] = choice["name"]
+            role_params[role] = choice["params"]
+        run_slug = f"run_{i:02d}"
+        run_dir = is_dir / run_slug
+        run_dir.mkdir(parents=True, exist_ok=True)
+        merged["cache"] = (merged.get("cache") or {}) | {"enabled": cache_on}
+        (merged.setdefault("spreads", {}))["enabled"] = spreads_on
+        (merged.setdefault("output", {}))["results_dir"] = str(run_dir)
+        run_backtest(merged, results_dir=str(run_dir))
+        metrics = parse_summary_or_trades(run_dir)
+        runs.append((merged, metrics, role_names, role_params))
+    return runs
+
+
+def _select_winner(
+    runs: List[tuple],
+    metric: str,
+    tie_break_order: List[str],
+) -> tuple:
+    """Select single winner by metric (desc) then tie_break_order; return (best_merged, best_role_names, best_role_params, selection_record)."""
+    if not runs:
+        raise ValueError("No runs to select from")
+    metric_lower = (metric or "roi_pct").lower()
+    desc_metrics = {"roi_pct", "roi_dollars", "expectancy", "total_trades", "wins", "win_rate_ns", "win_rate"}
+    primary_desc = metric_lower in desc_metrics
+
+    def sort_key(item: tuple) -> tuple:
+        _, metrics, _, _ = item
+        val = metrics.get(metric_lower)
+        if val is None or not isinstance(val, (int, float)):
+            val = float("-inf") if primary_desc else float("inf")
+        keys: List[Any] = [(-val if primary_desc else val,)]
+        for tb in tie_break_order or []:
+            parts = tb.split(":")
+            tb_key = parts[0].strip().lower()
+            asc = len(parts) > 1 and parts[1].strip().lower() == "asc"
+            v = metrics.get(tb_key)
+            if v is None or not isinstance(v, (int, float)):
+                v = float("inf") if asc else float("-inf")
+            keys.append((-v if not asc else v,))
+        return tuple(keys)
+
+    sorted_runs = sorted(runs, key=sort_key)
+    best = sorted_runs[0]
+    merged, metrics, role_names, role_params = best
+    selection_record = [
+        {"run_idx": i, "metrics": m, "role_names": rn, "role_params": rp}
+        for i, (_, m, rn, rp) in enumerate(runs)
+    ]
+    return merged, role_names, role_params, selection_record
+
+
 def run_wfo_v2(config_path: str | Path) -> None:
     """
     WFO v2 entrypoint: load wfo_v2.yaml, generate folds, run IS then OOS per fold via run_backtest.
@@ -174,6 +289,15 @@ def run_wfo_v2(config_path: str | Path) -> None:
     run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
     run_dir = _ensure_results_dir(output_root / run_id)
 
+    selection_cfg = wfo.get("selection") or {}
+    sweep_config_path = wfo.get("sweep_config")
+    selection_metric = selection_cfg.get("metric")
+    tie_break_order = selection_cfg.get("tie_break_order") or []
+    if not isinstance(tie_break_order, list):
+        tie_break_order = []
+
+    use_sweep = bool(sweep_config_path and selection_metric)
+
     for f in folds:
         fold_dir = run_dir / f"fold_{f.fold_id:02d}"
         fold_dir.mkdir(parents=True, exist_ok=True)
@@ -190,16 +314,57 @@ def run_wfo_v2(config_path: str | Path) -> None:
         is_dir.mkdir(parents=True, exist_ok=True)
         oos_dir.mkdir(parents=True, exist_ok=True)
 
-        def _run_cfg(cfg: dict, start: str, end: str, results_dir: Path) -> None:
-            c = deepcopy(cfg)
-            c["date_range"] = {"start": start, "end": end}
-            c["cache"] = (c.get("cache") or {}) | {"enabled": cache_on}
-            (c.setdefault("spreads", {}))["enabled"] = spreads_on
-            (c.setdefault("output", {}))["results_dir"] = str(results_dir)
-            run_backtest(c, results_dir=str(results_dir))
+        if use_sweep:
+            sweep_cfg = _load_sweep_config(Path(sweep_config_path), config_file_dir)
+            runs = _run_is_sweep(
+                deepcopy(base),
+                sweep_cfg,
+                str(f.train_start),
+                str(f.train_end),
+                is_dir,
+                cache_on,
+                spreads_on,
+            )
+            best_merged, best_role_names, best_role_params, selection_record = _select_winner(
+                runs, selection_metric, tie_break_order
+            )
+            is_best_params = {"role_names": best_role_names, "role_params": best_role_params}
+            (fold_dir / "is_best_params.json").write_text(
+                json.dumps(is_best_params, indent=2), encoding="utf-8"
+            )
+            (fold_dir / "is_selection.json").write_text(
+                json.dumps(
+                    {"metric": selection_metric, "tie_break_order": tie_break_order, "runs": selection_record},
+                    indent=2,
+                ),
+                encoding="utf-8",
+            )
+            params_hash = _params_fingerprint(best_role_names, best_role_params)
+            (fold_dir / "params_hash.txt").write_text(params_hash, encoding="utf-8")
 
-        _run_cfg(base, str(f.train_start), str(f.train_end), is_dir)
-        _run_cfg(base, str(f.test_start), str(f.test_end), oos_dir)
+            oos_cfg = deepcopy(best_merged)
+            oos_cfg["date_range"] = {"start": str(f.test_start), "end": str(f.test_end)}
+            oos_cfg["cache"] = (oos_cfg.get("cache") or {}) | {"enabled": cache_on}
+            (oos_cfg.setdefault("spreads", {}))["enabled"] = spreads_on
+            (oos_cfg.setdefault("output", {}))["results_dir"] = str(oos_dir)
+            run_backtest(oos_cfg, results_dir=str(oos_dir))
+            (oos_dir / "params_hash.txt").write_text(params_hash, encoding="utf-8")
+            oos_verify = (oos_dir / "params_hash.txt").read_text(encoding="utf-8").strip()
+            if oos_verify != params_hash:
+                raise ValueError(
+                    f"Fold {f.fold_id}: params hash mismatch (OOS run must use exact IS winner params)"
+                )
+        else:
+            def _run_cfg(cfg: dict, start: str, end: str, results_dir: Path) -> None:
+                c = deepcopy(cfg)
+                c["date_range"] = {"start": start, "end": end}
+                c["cache"] = (c.get("cache") or {}) | {"enabled": cache_on}
+                (c.setdefault("spreads", {}))["enabled"] = spreads_on
+                (c.setdefault("output", {}))["results_dir"] = str(results_dir)
+                run_backtest(c, results_dir=str(results_dir))
+
+            _run_cfg(base, str(f.train_start), str(f.train_end), is_dir)
+            _run_cfg(base, str(f.test_start), str(f.test_end), oos_dir)
 
     print(f"WFO v2 complete: {run_dir}")
 

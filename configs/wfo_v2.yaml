@@ -16,10 +16,11 @@ fold_scheme:
   step_months: 3
   warmup_bars: null   # placeholder for future use
 
-# Selection settings (placeholder — not used in PR1)
+# Selection (PR3: deterministic winner from IS metrics)
 selection:
-  metric: null
-  tie_break_order: []
+  metric: roi_pct
+  tie_break_order: ["max_dd_pct", "total_trades"]
+sweep_config: configs/wfo_v2_sweep.yaml
 
 # Engine flags (cache off for WFO to avoid shared state; spreads optional)
 engine:

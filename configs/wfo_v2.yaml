@@ -1,0 +1,30 @@
+# WFO v2 config scaffold — fold scheme, data scope, placeholders (PR1)
+# Frozen base system; all trading/indicator logic comes from here.
+base_config: configs/v1_system.yaml
+
+# Data scope for walk-forward
+data_scope:
+  pairs: []   # inherit from base or override; empty = use base
+  timeframe: D
+  from_date: "2020-01-01"
+  to_date: "2021-12-31"
+
+# Fold scheme (rolling windows)
+fold_scheme:
+  train_months: 12
+  test_months: 3
+  step_months: 3
+  warmup_bars: null   # placeholder for future use
+
+# Selection settings (placeholder — not used in PR1)
+selection:
+  metric: null
+  tie_break_order: []
+
+# Engine flags (placeholders)
+engine:
+  cache_on: true
+  spreads_on: false
+
+# Output
+output_root: results/wfo_v2

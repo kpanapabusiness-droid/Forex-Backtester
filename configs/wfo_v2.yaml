@@ -21,9 +21,9 @@ selection:
   metric: null
   tie_break_order: []
 
-# Engine flags (placeholders)
+# Engine flags (cache off for WFO to avoid shared state; spreads optional)
 engine:
-  cache_on: true
+  cache_on: false
   spreads_on: false
 
 # Output

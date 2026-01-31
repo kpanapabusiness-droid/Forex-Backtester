@@ -44,6 +44,7 @@ from indicators_cache import (
     compute_data_hash,
     compute_params_hash,
     load_from_cache,
+    params_for_cache_hash,
     save_to_cache,
 )
 
@@ -160,18 +161,13 @@ def intrabar_sequence(priority: str) -> List[str]:
 
 
 def load_config(config_path: PathLikeT = "configs/config.yaml") -> dict:
-    """Load + validate YAML config using validators_config."""
+    """Load exactly the given YAML; no fallback. Missing path raises FileNotFoundError."""
     path = Path(config_path)
+    if not path.is_absolute():
+        path = Path.cwd() / path
     if not path.exists():
-        # search upward a bit
-        for root in (Path.cwd(), Path.cwd().parent, Path.cwd().parent.parent):
-            cand = root / "configs" / "config.yaml"
-            if cand.exists():
-                path = cand
-                break
-    if not path.exists():
-        raise FileNotFoundError(f"Config file not found: {config_path}")
-    return load_and_validate_config(str(path))
+        raise FileNotFoundError(f"Config file not found: {path.resolve()}")
+    return load_and_validate_config(str(path.resolve()))
 
 
 # =============================================
@@ -402,7 +398,7 @@ def apply_indicators_with_cache(df: pd.DataFrame, pair: str, cfg: dict) -> pd.Da
                 return
             params = _params_for(full_name)
 
-        params_hash = compute_params_hash(params)
+        params_hash = compute_params_hash(params_for_cache_hash(role, name, params))
         parts_path, key = cache_key_parts(
             pair, timeframe, role, name, params_hash, data_hash, scope_key
         )
@@ -1903,3 +1899,23 @@ def write_results(trades: list[dict], out_dir: str | Path) -> None:
 
     # Still write summary for compatibility
     (out / "summary.txt").write_text(f"total_trades: {len(trades)}\n")
+
+
+# =============================================
+# CLI
+# =============================================
+if __name__ == "__main__":
+    import argparse
+    import sys
+
+    ap = argparse.ArgumentParser(description="Run backtest from YAML config.")
+    ap.add_argument("-c", "--config", required=True, help="Path to YAML config (required).")
+    ap.add_argument("--results-dir", default=None, help="Override results directory.")
+    args = ap.parse_args()
+    config_path = Path(args.config)
+    if not config_path.is_absolute():
+        config_path = Path.cwd() / config_path
+    if not config_path.exists():
+        print(f"Config file not found: {config_path.resolve()}", file=sys.stderr)
+        sys.exit(2)
+    run_backtest(config_path=str(config_path.resolve()), results_dir=args.results_dir)

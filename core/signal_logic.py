@@ -52,9 +52,10 @@ def _get_filter_status(
     """
     failed = []
 
-    # C2 direction must match
     if use_c2:
-        if df.loc[i, "c2_signal"] != direction:
+        if "c2_signal" not in df.columns:
+            failed.append("c2")
+        elif df.loc[i, "c2_signal"] != direction:
             failed.append("c2")
 
     # Volume must be pass (=1)
@@ -103,6 +104,8 @@ def _did_filter_pass(
 ):
     """Recovery check for One-Candle / Pullback on bar i."""
     if filter_name == "c2":
+        if "c2_signal" not in df.columns:
+            return False
         return df.loc[i, "c2_signal"] == direction
     elif filter_name == "volume":
         return df.loc[i, "volume_signal"] == 1

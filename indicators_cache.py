@@ -105,6 +105,17 @@ def compute_params_hash(params: Dict | None) -> str:
     return hashlib.sha256(norm.encode("utf-8")).hexdigest()[:16]
 
 
+def params_for_cache_hash(role: str, name: str, params: Dict | None = None) -> Dict:
+    """
+    Include role and name in params so cache key / params hash differs when
+    use_c2 or c2 name (or any indicator identity) differs.
+    """
+    out = dict(params or {})
+    out["_role"] = role
+    out["_name"] = name
+    return out
+
+
 # =========================
 #  Key building
 # =========================

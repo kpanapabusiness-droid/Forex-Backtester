@@ -270,13 +270,16 @@ def test_wfo_v2_refuses_null_baseline_when_use_baseline_true():
     assert "use_baseline" in msg or "baseline" in msg
 
 
-def test_wfo_phase5_config_folds_and_base_indicators():
-    """Load configs/wfo_phase5.yaml; assert 4 explicit folds and base has baseline/exit (not null)."""
+def test_wfo_phase5_config_folds_and_base_indicators(tmp_path):
+    """Load configs/wfo_phase5.yaml; assert 4 explicit folds and base has baseline/exit (not null).
+    Hermetic: override data dir to tmp_path so CI (no data/daily) passes without weakening validation.
+    """
     from pathlib import Path
 
     import pytest
 
-    from scripts.walk_forward import _get_folds_for_wfo, _load_base_config_for_wfo, _load_yaml
+    from scripts.walk_forward import _get_folds_for_wfo, _load_yaml
+    from validators_config import validate_config
 
     root = Path(__file__).resolve().parents[1]
     wfo_path = root / "configs" / "wfo_phase5.yaml"
@@ -284,7 +287,20 @@ def test_wfo_phase5_config_folds_and_base_indicators():
         pytest.skip("configs/wfo_phase5.yaml not found")
     wfo = _load_yaml(wfo_path)
     base_config_path = wfo.get("base_config") or "configs/v1_system.yaml"
-    base = _load_base_config_for_wfo(Path(base_config_path), wfo_path.parent)
+    resolved_base = (wfo_path.parent / base_config_path).resolve()
+    if not resolved_base.exists():
+        resolved_base = (root / base_config_path).resolve()
+    if not resolved_base.exists():
+        pytest.skip(f"base config not found: {base_config_path}")
+    with resolved_base.open("r", encoding="utf-8-sig") as f:
+        base = yaml.safe_load(f) or {}
+    hermetic_data_dir = tmp_path / "data"
+    hermetic_data_dir.mkdir(parents=True, exist_ok=True)
+    if "data" in base and isinstance(base["data"], dict) and "dir" in base["data"]:
+        base["data"] = dict(base["data"])
+        base["data"]["dir"] = str(hermetic_data_dir.resolve())
+    base["data_dir"] = str(hermetic_data_dir.resolve())
+    base = validate_config(base)
     folds = _get_folds_for_wfo(wfo, base)
     assert len(folds) == 4, "wfo_phase5.yaml must define exactly 4 folds"
     ind = base.get("indicators") or {}

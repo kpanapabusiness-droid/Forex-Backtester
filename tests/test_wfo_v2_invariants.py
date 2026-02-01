@@ -212,3 +212,85 @@ def test_wfo_v2_sweep_selects_non_null_c1(tmp_path):
     in_sample = fold_01 / "in_sample"
     run_dirs = sorted(in_sample.iterdir()) if in_sample.exists() else []
     assert len(run_dirs) >= 2, "sweep must produce at least two candidate runs (no single null fallback)"
+
+
+def test_wfo_v2_pinned_baseline_exit_in_is_selection(tmp_path):
+    """Regression: WFO candidate configs include baseline and exit (not null) when base enables them."""
+    import json
+
+    from scripts.walk_forward import run_wfo_v2
+
+    wfo_path = _write_wfo_v2_invariant_config(tmp_path, with_sweep=True)
+    run_wfo_v2(wfo_path)
+    run_id_dir = _get_run_dir(tmp_path)
+    assert run_id_dir is not None
+    assert (run_id_dir / "base_config_used.yaml").exists(), "WFO must write base_config_used.yaml"
+    assert (run_id_dir / "wfo_run_meta.json").exists(), "WFO must write wfo_run_meta.json"
+    meta = json.loads((run_id_dir / "wfo_run_meta.json").read_text(encoding="utf-8"))
+    assert "base_config_path" in meta and "pinned_roles" in meta and "swept_roles" in meta and "folds" in meta
+    assert "baseline" in meta["pinned_roles"] and "exit" in meta["pinned_roles"]
+    assert meta["swept_roles"] == ["c1"]
+    fold_01 = run_id_dir / "fold_01"
+    is_best_path = fold_01 / "is_best_params.json"
+    assert is_best_path.exists()
+    best = json.loads(is_best_path.read_text(encoding="utf-8"))
+    role_names = best.get("role_names") or {}
+    assert role_names.get("baseline") is not None and role_names.get("baseline") != "", (
+        "role_names.baseline must not be null when base has use_baseline=true"
+    )
+    assert role_names.get("exit") is not None and role_names.get("exit") != "", (
+        "role_names.exit must not be null when base has use_exit=true"
+    )
+    is_selection_path = fold_01 / "is_selection.json"
+    assert is_selection_path.exists()
+    selection = json.loads(is_selection_path.read_text(encoding="utf-8"))
+    for run_entry in selection.get("runs", []):
+        rn = run_entry.get("role_names") or {}
+        assert rn.get("baseline") is not None, "is_selection.runs[].role_names.baseline must not be null"
+        assert rn.get("exit") is not None, "is_selection.runs[].role_names.exit must not be null"
+
+
+def test_wfo_v2_refuses_null_baseline_when_use_baseline_true():
+    """WFO base validation: use_baseline=true with baseline=null raises ValueError."""
+    import pytest
+
+    from scripts.walk_forward import _validate_base_indicators
+
+    base_bad = {
+        "indicators": {
+            "use_baseline": True,
+            "baseline": None,
+            "use_exit": True,
+            "exit": "exit_twiggs_money_flow",
+        }
+    }
+    with pytest.raises(ValueError) as exc_info:
+        _validate_base_indicators(base_bad)
+    msg = str(exc_info.value)
+    assert "use_baseline" in msg or "baseline" in msg
+
+
+def test_wfo_phase5_config_folds_and_base_indicators():
+    """Load configs/wfo_phase5.yaml; assert 4 explicit folds and base has baseline/exit (not null)."""
+    from pathlib import Path
+
+    import pytest
+
+    from scripts.walk_forward import _get_folds_for_wfo, _load_base_config_for_wfo, _load_yaml
+
+    root = Path(__file__).resolve().parents[1]
+    wfo_path = root / "configs" / "wfo_phase5.yaml"
+    if not wfo_path.exists():
+        pytest.skip("configs/wfo_phase5.yaml not found")
+    wfo = _load_yaml(wfo_path)
+    base_config_path = wfo.get("base_config") or "configs/v1_system.yaml"
+    base = _load_base_config_for_wfo(Path(base_config_path), wfo_path.parent)
+    folds = _get_folds_for_wfo(wfo, base)
+    assert len(folds) == 4, "wfo_phase5.yaml must define exactly 4 folds"
+    ind = base.get("indicators") or {}
+    assert ind.get("baseline") is not None and str(ind.get("baseline")).strip(), (
+        "Base config (v1_system) must have indicators.baseline set for Phase 5"
+    )
+    assert ind.get("exit") is not None and str(ind.get("exit")).strip(), (
+        "Base config (v1_system) must have indicators.exit set for Phase 5"
+    )

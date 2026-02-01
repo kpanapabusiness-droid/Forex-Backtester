@@ -57,8 +57,27 @@ def test_wfo_aggregation_outputs_and_content(tmp_path: Path):
     assert agg["worst_case_fold"]["fold_id"] == 2
     assert agg["worst_case_fold"]["roi_pct"] == -5.0
 
+    # Aggregate max DD is worst (most negative) fold: min(fold max_dd_pct)
+    assert "aggregate_max_dd_pct" in agg
+    assert agg["aggregate_max_dd_pct"] == 5.0
+
     # Determinism: running again should produce identical aggregate
     aggregate_wfo_run(run_dir)
     agg2 = json.loads(aggregate_json.read_text(encoding="utf-8"))
     assert agg == agg2
+
+
+def test_wfo_aggregate_max_dd_is_worst_fold(tmp_path: Path):
+    """Given fold DDs -5 and -12, aggregate max_dd_pct is -12 (min = worst)."""
+    from analytics.wfo_aggregate import aggregate_wfo_run
+
+    run_dir = tmp_path / "wfo_run"
+    run_dir.mkdir(parents=True, exist_ok=True)
+    _write_fake_fold(run_dir, fold_id=1, roi_pct=10.0, max_dd_pct=-5.0, trades=10)
+    _write_fake_fold(run_dir, fold_id=2, roi_pct=-5.0, max_dd_pct=-12.0, trades=5)
+
+    aggregate_wfo_run(run_dir)
+
+    agg = json.loads((run_dir / "wfo_aggregate.json").read_text(encoding="utf-8"))
+    assert agg["aggregate_max_dd_pct"] == -12.0
 

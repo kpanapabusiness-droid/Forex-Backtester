@@ -51,6 +51,7 @@ Mt4 Volume Indis/
 
 # Local outputs
 results/
+results_phase*/
 __pycache__/
 .ipynb_checkpoints/
 

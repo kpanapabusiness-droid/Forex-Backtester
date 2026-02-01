@@ -90,7 +90,7 @@ def aggregate_wfo_run(run_dir: str | Path) -> None:
 
 
 def _compute_robustness(df: pd.DataFrame) -> Dict[str, Any]:
-    """Compute worst fold, median metrics and a simple consistency score."""
+    """Compute worst fold, median metrics, aggregate max DD (min of fold DDs), consistency score."""
     df_num = df.copy()
     df_num["roi_pct"] = pd.to_numeric(df_num["roi_pct"], errors="coerce").fillna(0.0)
     df_num["max_dd_pct"] = pd.to_numeric(df_num["max_dd_pct"], errors="coerce").fillna(0.0)
@@ -113,6 +113,8 @@ def _compute_robustness(df: pd.DataFrame) -> Dict[str, Any]:
         "total_trades": float(df_num["total_trades"].median()),
     }
 
+    aggregate_max_dd_pct = float(df_num["max_dd_pct"].min()) if "max_dd_pct" in df_num else 0.0
+
     total_folds = int(len(df_num))
     positive = df_num["roi_pct"] > 0
     positive_count = int(positive.sum())
@@ -125,6 +127,7 @@ def _compute_robustness(df: pd.DataFrame) -> Dict[str, Any]:
     return {
         "worst_case_fold": worst_case_fold,
         "median_fold": median_fold,
+        "aggregate_max_dd_pct": aggregate_max_dd_pct,
         "consistency_score": consistency_score,
     }
 

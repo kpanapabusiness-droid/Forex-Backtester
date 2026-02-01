@@ -108,14 +108,30 @@ def cagr(equity_df: pd.DataFrame) -> float:
         return 0.0
 
 
+def compute_max_drawdown_pct(equity: pd.Series) -> float:
+    """
+    Canonical max drawdown from equity series.
+    peak = cummax(E), dd = (E - peak) / peak, max_drawdown_pct = dd.min() * 100 (negative).
+    """
+    if equity is None or (hasattr(equity, "empty") and equity.empty):
+        return 0.0
+    eq = pd.to_numeric(equity, errors="coerce").replace([np.inf, -np.inf], np.nan).dropna()
+    if eq.empty:
+        return 0.0
+    peak = eq.cummax()
+    peak_safe = peak.replace(0.0, np.nan)
+    dd = (eq - peak_safe) / peak_safe
+    dd = dd.replace([np.inf, -np.inf], np.nan).dropna()
+    if dd.empty or not np.isfinite(dd.min()):
+        return 0.0
+    return float(dd.min() * 100.0)
+
+
 def max_drawdown_pct(equity_df: pd.DataFrame) -> float:
     df = _coerce_df(equity_df)
-    if df.empty:
+    if df.empty or "equity" not in df.columns:
         return 0.0
-    peak = df["equity"].cummax()
-    dd = (df["equity"] / peak - 1.0) * 100.0
-    dd = dd.replace([np.inf, -np.inf], np.nan).fillna(0.0)
-    return float(dd.min()) if not dd.empty and np.isfinite(dd.min()) else 0.0
+    return compute_max_drawdown_pct(df["equity"])
 
 
 def volatility_annualized(returns: pd.Series) -> float:

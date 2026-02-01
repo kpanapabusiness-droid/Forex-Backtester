@@ -147,6 +147,55 @@ def _params_fingerprint(role_names: dict, role_params: dict) -> str:
     return hashlib.sha256(blob.encode()).hexdigest()
 
 
+def _validate_base_indicators(base: dict) -> None:
+    """Fail-fast: if base enables a role (use_*), the role name must be set (not null)."""
+    ind = base.get("indicators") or {}
+    use_baseline = ind.get("use_baseline") in (True, "true", 1)
+    use_exit = ind.get("use_exit") in (True, "true", 1)
+    if use_baseline:
+        baseline = ind.get("baseline")
+        if baseline is None or baseline is False or (isinstance(baseline, str) and not baseline.strip()):
+            raise ValueError(
+                "Base config has use_baseline=true but baseline name is missing or null. "
+                "Set indicators.baseline in the base config (e.g. baseline_ema)."
+            )
+    if use_exit:
+        exit_name = ind.get("exit")
+        if exit_name is None or exit_name is False or (isinstance(exit_name, str) and not exit_name.strip()):
+            raise ValueError(
+                "Base config has use_exit=true but exit name is missing or null. "
+                "Set indicators.exit in the base config (e.g. exit_twiggs_money_flow)."
+            )
+
+
+def _validate_role_names(role_names: dict, base: dict) -> None:
+    """Fail-fast: merged role_names must not have null for roles enabled in base."""
+    ind = base.get("indicators") or {}
+    use_baseline = ind.get("use_baseline") in (True, "true", 1)
+    use_exit = ind.get("use_exit") in (True, "true", 1)
+    if use_baseline:
+        baseline = role_names.get("baseline")
+        if baseline is None or baseline is False or (isinstance(baseline, str) and not baseline.strip()):
+            raise ValueError(
+                "use_baseline is true but baseline ended up null in candidate config. "
+                "Ensure base config has indicators.baseline set and it is not overwritten by sweep."
+            )
+    if use_exit:
+        exit_name = role_names.get("exit")
+        if exit_name is None or exit_name is False or (isinstance(exit_name, str) and not exit_name.strip()):
+            raise ValueError(
+                "use_exit is true but exit ended up null in candidate config. "
+                "Ensure base config has indicators.exit set and it is not overwritten by sweep."
+            )
+    for role, name in role_names.items():
+        if name is None and role in ("c1", "c2", "baseline", "volume", "exit"):
+            use_key = f"use_{role}" if role in ("c2", "baseline", "volume", "exit") else None
+            if use_key and ind.get(use_key) in (True, "true", 1):
+                raise ValueError(
+                    f"Role {role} is enabled in base but ended up null (role_names={role_names})."
+                )
+
+
 def _run_is_sweep(
     base: dict,
     sweep_cfg: dict,
@@ -167,12 +216,14 @@ def _run_is_sweep(
     )
 
     role_filters = sweep_cfg.get("role_filters") or ["c1"]
+    base_ind = base.get("indicators") or {}
     role_choices = {}
     for role in ["c1", "c2", "baseline", "volume", "exit"]:
         if role in role_filters and role in ROLE_META:
             role_choices[role] = build_role_choices(sweep_cfg, role)
         else:
-            role_choices[role] = [{"name": None, "params": {}}]
+            pinned_name = base_ind.get(role)
+            role_choices[role] = [{"name": pinned_name, "params": {}}]
     combos = list(
         itertools.product(
             *[[(r, ch) for ch in role_choices[r]] for r in ["c1", "c2", "baseline", "volume", "exit"]]
@@ -195,6 +246,7 @@ def _run_is_sweep(
             set_indicator_params(merged, role, choice["name"], choice["params"])
             role_names[role] = choice["name"]
             role_params[role] = choice["params"]
+        _validate_role_names(role_names, base)
         run_slug = f"run_{i:02d}"
         run_dir = is_dir / run_slug
         run_dir.mkdir(parents=True, exist_ok=True)
@@ -245,12 +297,45 @@ def _select_winner(
     return merged, role_names, role_params, selection_record
 
 
+def _get_folds_for_wfo(wfo: dict, base: dict):
+    """
+    Return list of Fold for WFO run.
+    - If wfo has explicit "folds" list (train_start, train_end, test_start, test_end per entry), use it.
+    - Else use data_scope from_date/to_date and fold_scheme (train_months, test_months, step_months).
+    """
+    from analytics.wfo import Fold as WfoFold  # noqa: E402
+    from analytics.wfo import generate_folds as wfo_generate_folds  # noqa: E402
+
+    explicit = wfo.get("folds")
+    if explicit and len(explicit) > 0:
+        folds_out: List[Any] = []
+        for i, f in enumerate(explicit, start=1):
+            ts = datetime.strptime(str(f.get("train_start")), "%Y-%m-%d").date()
+            te = datetime.strptime(str(f.get("train_end")), "%Y-%m-%d").date()
+            os = datetime.strptime(str(f.get("test_start")), "%Y-%m-%d").date()
+            oe = datetime.strptime(str(f.get("test_end")), "%Y-%m-%d").date()
+            if not (ts < te and te < os and os <= oe):
+                raise ValueError(
+                    f"Explicit fold {i}: expect train_start < train_end < test_start <= test_end; got {f}"
+                )
+            folds_out.append(WfoFold(fold_id=i, train_start=ts, train_end=te, test_start=os, test_end=oe))
+        return folds_out
+    data_scope = wfo.get("data_scope") or {}
+    base_dr = base.get("date_range") or {}
+    from_date = data_scope.get("from_date") or base_dr.get("start") or "2020-01-01"
+    to_date = data_scope.get("to_date") or base_dr.get("end") or "2021-12-31"
+    fold_scheme = wfo.get("fold_scheme") or {}
+    train_months = int(fold_scheme.get("train_months", 12))
+    test_months = int(fold_scheme.get("test_months", 3))
+    step_months = int(fold_scheme.get("step_months", 3))
+    return wfo_generate_folds(from_date, to_date, train_months, test_months, step_months)
+
+
 def run_wfo_v2(config_path: str | Path) -> None:
     """
     WFO v2 entrypoint: load wfo_v2.yaml, generate folds, run IS then OOS per fold via run_backtest.
     Writes results/wfo/<run_id>/fold_XX/{in_sample,out_of_sample}/ and fold_dates.json.
     """
-    from analytics.wfo import generate_folds as wfo_generate_folds  # noqa: E402
     from analytics.wfo import validate_no_test_overlap  # noqa: E402
     from core.backtester import run_backtest  # noqa: E402
 
@@ -264,19 +349,11 @@ def run_wfo_v2(config_path: str | Path) -> None:
     wfo = _load_yaml(path)
     base_config_path = wfo.get("base_config") or "configs/v1_system.yaml"
     base = _load_base_config_for_wfo(Path(base_config_path), config_file_dir)
+    _validate_base_indicators(base)
 
-    data_scope = wfo.get("data_scope") or {}
-    base_dr = base.get("date_range") or {}
-    from_date = data_scope.get("from_date") or base_dr.get("start") or "2020-01-01"
-    to_date = data_scope.get("to_date") or base_dr.get("end") or "2021-12-31"
-    fold_scheme = wfo.get("fold_scheme") or {}
-    train_months = int(fold_scheme.get("train_months", 12))
-    test_months = int(fold_scheme.get("test_months", 3))
-    step_months = int(fold_scheme.get("step_months", 3))
-
-    folds = wfo_generate_folds(from_date, to_date, train_months, test_months, step_months)
+    folds = _get_folds_for_wfo(wfo, base)
     if not folds:
-        raise ValueError("No folds generated; check from_date, to_date and fold_scheme.")
+        raise ValueError("No folds; set folds (explicit list) or fold_scheme + data_scope.")
     validate_no_test_overlap(folds)
     for f in folds:
         if f.train_end >= f.test_start:
@@ -289,6 +366,12 @@ def run_wfo_v2(config_path: str | Path) -> None:
     run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
     run_dir = _ensure_results_dir(output_root / run_id)
 
+    base_config_resolved = (config_file_dir / base_config_path).resolve()
+    if not base_config_resolved.exists():
+        base_config_resolved = (ROOT / base_config_path).resolve()
+    with (run_dir / "base_config_used.yaml").open("w", encoding="utf-8") as f:
+        yaml.safe_dump(base, f, sort_keys=False)
+
     selection_cfg = wfo.get("selection") or {}
     sweep_config_path = wfo.get("sweep_config")
     selection_metric = selection_cfg.get("metric")
@@ -297,6 +380,13 @@ def run_wfo_v2(config_path: str | Path) -> None:
         tie_break_order = []
 
     use_sweep = bool(sweep_config_path and selection_metric)
+    sweep_cfg = _load_sweep_config(Path(sweep_config_path), config_file_dir) if use_sweep else {}
+    role_filters = (sweep_cfg.get("role_filters") or ["c1"]) if use_sweep else []
+    all_roles = ["c1", "c2", "baseline", "volume", "exit"]
+    pinned_roles = [r for r in all_roles if r not in role_filters]
+    swept_roles = list(role_filters)
+
+    fold_meta: List[dict] = []
 
     for f in folds:
         fold_dir = run_dir / f"fold_{f.fold_id:02d}"
@@ -315,7 +405,6 @@ def run_wfo_v2(config_path: str | Path) -> None:
         oos_dir.mkdir(parents=True, exist_ok=True)
 
         if use_sweep:
-            sweep_cfg = _load_sweep_config(Path(sweep_config_path), config_file_dir)
             runs = _run_is_sweep(
                 deepcopy(base),
                 sweep_cfg,
@@ -354,6 +443,8 @@ def run_wfo_v2(config_path: str | Path) -> None:
                 raise ValueError(
                     f"Fold {f.fold_id}: params hash mismatch (OOS run must use exact IS winner params)"
                 )
+            oos_trades_path = oos_dir / "trades.csv"
+            oos_trades = len(pd.read_csv(oos_trades_path)) if oos_trades_path.exists() else 0
         else:
             def _run_cfg(cfg: dict, start: str, end: str, results_dir: Path) -> None:
                 c = deepcopy(cfg)
@@ -365,7 +456,19 @@ def run_wfo_v2(config_path: str | Path) -> None:
 
             _run_cfg(base, str(f.train_start), str(f.train_end), is_dir)
             _run_cfg(base, str(f.test_start), str(f.test_end), oos_dir)
+            oos_trades_path = oos_dir / "trades.csv"
+            oos_trades = len(pd.read_csv(oos_trades_path)) if oos_trades_path.exists() else 0
+        fold_meta.append({"fold_id": f.fold_id, "oos_trades": int(oos_trades)})
 
+    run_meta = {
+        "base_config_path": str(base_config_path),
+        "pinned_roles": pinned_roles,
+        "swept_roles": swept_roles,
+        "folds": fold_meta,
+    }
+    (run_dir / "wfo_run_meta.json").write_text(
+        json.dumps(run_meta, indent=2), encoding="utf-8"
+    )
     print(f"WFO v2 complete: {run_dir}")
 
 
@@ -681,8 +784,8 @@ def run_wfo(cfg: dict):
         median_roi_pct = (
             _nan_to_zero(folds_df["roi_pct"].median()) if "roi_pct" in folds_df else 0.0
         )
-        median_max_dd_pct = (
-            _nan_to_zero(folds_df["max_dd_pct"].median()) if "max_dd_pct" in folds_df else 0.0
+        min_max_dd_pct = (
+            _nan_to_zero(folds_df["max_dd_pct"].min()) if "max_dd_pct" in folds_df else 0.0
         )
         median_expectancy = (
             _nan_to_zero(folds_df["expectancy"].median()) if "expectancy" in folds_df else 0.0
@@ -694,7 +797,7 @@ def run_wfo(cfg: dict):
             "avg_win_pct_ns": avg_win_pct_ns,
             "avg_loss_pct_ns": avg_loss_pct_ns,
             "median_roi_pct": median_roi_pct,
-            "median_max_dd_pct": median_max_dd_pct,
+            "min_max_dd_pct": min_max_dd_pct,
             "median_expectancy": median_expectancy,
         }
     else:
@@ -704,7 +807,7 @@ def run_wfo(cfg: dict):
             "avg_win_pct_ns": 0.0,
             "avg_loss_pct_ns": 0.0,
             "median_roi_pct": 0.0,
-            "median_max_dd_pct": 0.0,
+            "min_max_dd_pct": 0.0,
             "median_expectancy": 0.0,
         }
 
@@ -717,7 +820,7 @@ def run_wfo(cfg: dict):
         f.write(f"Avg Win% (NS)    : {agg['avg_win_pct_ns']:.2f}\n")
         f.write(f"Avg Loss% (NS)   : {agg['avg_loss_pct_ns']:.2f}\n")
         f.write(f"Median ROI%      : {agg['median_roi_pct']:.2f}\n")
-        f.write(f"Median Max DD%   : {agg['median_max_dd_pct']:.2f}\n")
+        f.write(f"Max DD% (worst fold) : {agg['min_max_dd_pct']:.2f}\n")
         f.write(f"Median Expectancy: {agg['median_expectancy']:.2f}\n")
     print(f"✅ Wrote OOS summary: {summary_txt}")
 

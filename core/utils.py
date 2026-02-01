@@ -600,18 +600,15 @@ def summarize_results(
             sortino = (mean / downside_std) * np.sqrt(252) if downside_std > 0 else 0.0
             vol_ann = std * np.sqrt(252)
 
-            # ROI% + DD
+            # ROI% + DD (canonical: analytics.metrics.compute_max_drawdown_pct)
             start_eq = float(eq["equity"].iloc[0])
             end_eq = float(eq["equity"].iloc[-1])
             roi_pct_equity = safe_roi_pct(start_eq, end_eq)
-
-            eq["peak"] = eq["equity"].cummax()
-            dd_series = (eq["equity"] / eq["peak"] - 1.0) * 100.0
-            max_dd_pct = (
-                float(dd_series.min())
-                if not dd_series.empty and np.isfinite(dd_series.min())
-                else 0.0
-            )
+            try:
+                from analytics.metrics import compute_max_drawdown_pct
+                max_dd_pct = compute_max_drawdown_pct(eq["equity"])
+            except Exception:
+                max_dd_pct = 0.0
 
             # CAGR & MAR (use dates to count years)
             days = max(
@@ -654,7 +651,7 @@ def summarize_results(
                     f"Sortino: {sortino:.4f}",
                     f"Volatility (ann.): {vol_ann * 100:.4f}%",
                     f"CAGR: {cagr:.4f}",
-                    f"Max DD (%): {max_dd_pct:.2f}",
+                    f"Max Drawdown (%) : {max_dd_pct:.2f}",
                     f"MAR: {mar:.4f}",
                     f"ROI (%) from equity: {roi_pct_equity:.2f}",
                     f"Skew: {metrics['skew']:.4f}",

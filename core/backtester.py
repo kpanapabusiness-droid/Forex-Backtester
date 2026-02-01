@@ -1318,18 +1318,16 @@ def run_backtest(
     # Write trades CSV with comprehensive diagnostics
     write_trades_csv_with_diagnostics(trades_df, out_dir, cfg, run_slug)
 
-    # Summary (best effort; use utils.summarize_results if available)
-    try:
-        from utils import summarize_results
+    # Write equity_curve first so summarize_results can read it for Max Drawdown
+    if (cfg.get("tracking") or {}).get("in_sim_equity", True) and not equity_curve.empty:
+        equity_curve.to_csv(equity_path, index=False)
 
-        txt = summarize_results(
-            trades_df.to_dict("records"),
-            starting_balance=starting_balance,
-            run_name=str(cfg.get("strategy_version", "default")),
-            results_dir=str(out_dir),
-            cfg=cfg,
-        )
-        if equity_curve is not None:
+    # Summary: single source from core.utils.summarize_results (includes Max Drawdown (%))
+    try:
+        from core.utils import summarize_results
+
+        txt, _ = summarize_results(Path(out_dir), starting_balance=starting_balance)
+        if equity_curve is not None and not equity_curve.empty:
             txt = (txt or "") + f"\nequity_curve_rows: {int(len(equity_curve))}"
     except Exception:
         total = int(len(trades_df))
@@ -1378,9 +1376,6 @@ def run_backtest(
             f"equity_curve_rows: {int(len(equity_curve))}\n"
         )
     Path(summary_path).write_text(txt or "", encoding="utf-8")
-
-    if (cfg.get("tracking") or {}).get("in_sim_equity", True) and not equity_curve.empty:
-        equity_curve.to_csv(equity_path, index=False)
 
     print(f"Backtest complete. Results saved to '{out_dir}'")
 

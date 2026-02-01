@@ -1,4 +1,4 @@
-﻿pairs:
+pairs:
   - AUD_CAD
   - AUD_CHF
   - AUD_JPY
@@ -86,7 +86,7 @@ risk_filters:
 
 risk:
   starting_balance: 10000.0
-  risk_per_trade: 0.01
+  risk_per_trade: 0.005
   account_ccy: USD
 
 output:

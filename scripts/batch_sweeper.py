@@ -118,7 +118,7 @@ SUMMARY_KEY_MAP = {
     "scratch_rate": ["Scratch%"],
     "roi_dollars": ["ROI ($)"],
     "roi_pct": ["ROI (%)"],
-    "max_dd_pct": ["Max DD (%)", "max_dd_pct"],
+    "max_dd_pct": ["Max Drawdown (%)", "Max DD (%)", "max_dd_pct"],
     "expectancy": ["Expectancy"],
 }
 
@@ -228,7 +228,7 @@ def parse_summary_or_trades(results_dir: Path) -> dict:
     s = results_dir / "summary.txt"
     t = results_dir / "trades.csv"
     if s.exists():
-        m = parse_summary_text(s.read_text())
+        m = parse_summary_text(s.read_text(encoding="utf-8"))
         if m:
             return m
     return compute_metrics_from_trades(t)

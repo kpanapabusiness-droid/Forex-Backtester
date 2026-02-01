@@ -503,16 +503,26 @@ def _finalize_and_append_trade(
 # =============================================
 # Spread model (PnL-only)
 # =============================================
+# Data columns: prefer "spread_pips" (already in pips). If absent, use "spread" (MT points)
+# converted via spreads.points_per_pip (default 10: 50 points -> 5 pips). Spreads affect
+# PnL only (execution price), not signal logic or trade count.
 
 
 def resolve_spread_pips(pair: str, row: pd.Series, cfg: Dict[str, Any]) -> float:
     sp = cfg.get("spreads") or {}
     if not sp.get("enabled", False):
         return 0.0
-    # per-bar override
     if "spread_pips" in row and pd.notna(row["spread_pips"]):
         try:
             return float(row["spread_pips"])
+        except Exception:
+            pass
+    if "spread" in row and pd.notna(row["spread"]):
+        try:
+            points = float(row["spread"])
+            divisor = float(sp.get("points_per_pip", 10.0))
+            if divisor > 0 and math.isfinite(points):
+                return points / divisor
         except Exception:
             pass
     per_pair = sp.get("per_pair") or {}
@@ -614,7 +624,13 @@ def simulate_pair_trades(
     duplicate_open_policy = engine_cfg.get("duplicate_open_policy", "block")
 
     account_ccy = (risk_cfg.get("account_ccy") or "AUD").upper()
-    base_risk_pct = float(risk_cfg.get("risk_per_trade", 0.02))
+    # Prefer risk_per_trade (decimal); fallback to risk_per_trade_pct/100 for merged/legacy configs
+    base_risk_pct = risk_cfg.get("risk_per_trade")
+    if base_risk_pct is None and "risk_per_trade_pct" in risk_cfg:
+        base_risk_pct = float(risk_cfg["risk_per_trade_pct"]) / 100.0
+    if base_risk_pct is None:
+        base_risk_pct = 0.02
+    base_risk_pct = float(base_risk_pct)
     fx_quotes = risk_cfg.get("fx_quotes") or {}
 
     ps = pip_size_for_pair(pair)
@@ -1101,6 +1117,18 @@ def run_backtest(
 
     starting_balance = float(
         (cfg.get("risk") or {}).get("starting_balance", cfg.get("starting_balance", 10_000.0))
+    )
+    risk_cfg = cfg.get("risk") or {}
+    # Engine uses risk_per_trade (decimal); validator may output risk_per_trade_pct only
+    risk_per_trade = risk_cfg.get("risk_per_trade")
+    if risk_per_trade is None and "risk_per_trade_pct" in risk_cfg:
+        risk_per_trade = float(risk_cfg["risk_per_trade_pct"]) / 100.0
+    if risk_per_trade is None:
+        risk_per_trade = 0.02
+    risk_per_trade = float(risk_per_trade)
+    print(
+        f"[RISK] starting_balance={starting_balance} risk_per_trade={risk_per_trade}"
+        f" (sizing uses risk.risk_per_trade or risk.risk_per_trade_pct/100)"
     )
     equity_state = {"balance": starting_balance}
     track_equity = bool((cfg.get("tracking") or {}).get("in_sim_equity", True))

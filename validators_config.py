@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional
 
 import yaml
-from pydantic import BaseModel, Field, ValidationError, field_validator
+from pydantic import BaseModel, Field, ValidationError, field_validator, model_validator
 
 
 class MonteCarloModel(BaseModel):
@@ -29,6 +29,10 @@ Pair = str  # e.g., "EUR_USD"
 class Spreads(BaseModel):
     enabled: bool = False
     default_pips: float = 0.0
+    points_per_pip: float = Field(
+        10.0,
+        description="Points-to-pips divisor when using data column 'spread' (MT points). 10 = 50 points -> 5 pips.",
+    )
     per_pair: Dict[Pair, float] = Field(default_factory=dict)
     mode: Literal["fixed", "atr_mult"] = "fixed"
     atr_mult: float = 0.0
@@ -119,7 +123,24 @@ class OutputCfg(BaseModel):
 
 class RiskCfg(BaseModel):
     starting_balance: float = 10_000.0
+    # Engine (backtester) uses risk_per_trade (decimal, e.g. 0.005 = 0.5%). Must be in dump.
+    risk_per_trade: float = 0.02
     risk_per_trade_pct: float = 2.0
+
+    @model_validator(mode="before")
+    @classmethod
+    def normalize_risk_keys(cls, data: Any) -> Any:
+        """Accept YAML key risk_per_trade (decimal) or risk_per_trade_pct; ensure both in output."""
+        if not isinstance(data, dict):
+            return data
+        data = dict(data)
+        if "risk_per_trade" in data:
+            rpt = float(data["risk_per_trade"])
+            data["risk_per_trade_pct"] = rpt * 100.0
+        elif "risk_per_trade_pct" in data:
+            rpp = float(data["risk_per_trade_pct"])
+            data["risk_per_trade"] = rpp / 100.0
+        return data
 
 
 class DateRange(BaseModel):

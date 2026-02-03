@@ -55,3 +55,6 @@ results_phase*/
 __pycache__/
 .ipynb_checkpoints/
 
+# Live bridge (Phase 7)
+live_feed/
+live_out/

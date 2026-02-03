@@ -34,8 +34,8 @@ data:
   dir: data/daily
 
 date_range:
-  start: "2020-01-01"
-  end: "2020-12-31"
+  start: "2019-01-01"
+  end: "2026-01-01"
 
 indicators:
   c1: c1_is_calculation

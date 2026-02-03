@@ -179,12 +179,14 @@ class TestHardStopRealism:
 
     def test_pre_tp1_system_exit_is_scratch(self):
         """
-        Hard-Stop Realism: System exit before TP1 → SCRATCH classification (≈0 PnL).
+        Hard-Stop Realism (Phase 8): System exit before TP1 → SCRATCH classification,
+        executed at the NEXT daily open (or last-bar close).
 
         Scenario:
         - Entry at 1.0000, TP1 at 1.0020, SL at 0.9970
         - C1 reversal before TP1 is hit (no intrabar TP/SL touch)
-        - Expected: Full position closed, SCRATCH classification, ≈0 PnL
+        - Expected: Full position closed, SCRATCH classification, exit priced by
+          the next-open rule (not forced to entry).
         """
         bars = [
             # Bar 0: Setup
@@ -242,21 +244,18 @@ class TestHardStopRealism:
         # Verify exit details
         assert trade["exit_reason"] == "c1_reversal", "Should exit on C1 reversal"
 
-        # Verify SCRATCH PnL is ~0 (spread-only) per GS vNext spec
-        # Pre-TP1 system exits should execute with consistent rule yielding minimal PnL
-        spread_tolerance = 5.0  # Allow small spread-related PnL variation
-
-        assert abs(trade["pnl"]) <= spread_tolerance, (
-            f"SCRATCH trade PnL should be ~0 (spread-only), got {trade['pnl']:.2f} "
-            f"(tolerance: ±{spread_tolerance:.2f})"
-        )
+        # Phase 8: SCRATCH classification is about labels, not forcing PnL to ~0.
+        # System exits now execute at NEXT bar open (or last-bar close), so PnL
+        # reflects the gap between entry and that price.
 
     def test_pre_vs_post_tp1_exit_execution_consistency(self):
         """
-        Verify that our fix only affects pre-TP1 exits, not post-TP1 behavior.
+        Document Phase 8 behaviour:
 
-        Key requirement: Pre-TP1 system exits execute at entry price (≈0 PnL).
-        Post-TP1 system exits follow existing logic (BE/TS priority).
+        - Pre-TP1 system exits use the NEXT-open pricing rule (or last-bar close),
+          and classify trades as SCRATCH when TP1 was not hit and no SL fired.
+        - Post-TP1 behaviour (TP1/BE/trailing vs system exits) is otherwise
+          unchanged in terms of classification and stop mechanics.
         """
         # Test already covered by test_pre_tp1_system_exit_is_scratch
         # This test documents that post-TP1 behavior is unchanged

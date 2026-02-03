@@ -24,8 +24,20 @@ def write_daily_summary(
 ) -> None:
     """
     Write live_out/daily_summary.txt (human readable).
-    per_symbol[symbol] = { "action": "OPEN"|"EXIT"|"HOLD"|"SKIP", "reason": str,
-      optional: "direction", "sl_price", "tp1_price", "orders": 2 }
+
+    per_symbol[symbol] schema (minimal):
+      - action: "OPEN" | "EXIT" | "HOLD" | "SKIP"
+      - reason: str
+
+    Optional Phase 8 fields:
+      - direction: "long" | "short"
+      - sl_price: float
+      - tp1_price: float
+      - sl_action: "HOLD" | "MOVE_TO_BE" | "TRAIL_TO" | "CLOSE_SCRATCH" | "CLOSE_EXIT"
+      - new_sl_price: float | ""
+      - sl_reason: str
+
+    These extras are reporting-only; they do not affect engine trading decisions.
     """
     out_path = Path(out_dir)
     out_path.mkdir(parents=True, exist_ok=True)
@@ -48,6 +60,8 @@ def write_daily_summary(
         rec = per_symbol[sym]
         action = rec.get("action", "HOLD")
         reason = rec.get("reason", "")
+
+        # Primary action line
         line = f"  {sym}: {action}"
         if reason:
             line += f" — {reason}"
@@ -57,6 +71,29 @@ def write_daily_summary(
             tp1 = rec.get("tp1_price")
             line += f" direction={direction} SL={sl} TP1={tp1} (2 orders: TP1 + RUNNER)"
         lines.append(line)
+
+        # Phase 8: per-symbol SL management / reconciliation hints
+        sl_action = rec.get("sl_action")
+        new_sl = rec.get("new_sl_price")
+        sl_reason = rec.get("sl_reason") or ""
+
+        if action == "OPEN":
+            # Static SL management plan for new trades (TP1→BE + trailing)
+            if sl is not None and tp1 is not None:
+                lines.append(
+                    "    SL management: "
+                    "After TP1 hits at TP1, move runner SL to entry; "
+                    "once price has moved +2×ATR from entry, trail SL 1.5×ATR behind close."
+                )
+        # For existing positions or anything providing explicit SL action, surface it
+        if sl_action:
+            detail = f"    sl_action={sl_action}"
+            if new_sl not in (None, ""):
+                detail += f" new_sl_price={new_sl}"
+            if sl_reason:
+                detail += f" reason={sl_reason}"
+            lines.append(detail)
+
     path.write_text("\n".join(lines), encoding="utf-8")
 
 

@@ -724,6 +724,17 @@ def simulate_pair_trades(
         date_i = pd.to_datetime(r["date"]) if "date" in r else pd.to_datetime(r.name)
         _o_i, h_i, l_i, c_i = float(r["open"]), float(r["high"]), float(r["low"]), float(r["close"])
 
+        # Phase 8 realism: next-bar open for system exit pricing.
+        # If there is no next bar (i is last index), fall back to current close.
+        if i + 1 < len(rows):
+            r_next = rows.iloc[i + 1]
+            try:
+                next_open_px = float(r_next["open"])
+            except Exception:
+                next_open_px = c_i
+        else:
+            next_open_px = c_i
+
         atr_raw = pd.to_numeric(r.get("atr"), errors="coerce")
         atr_i = float(0.0 if pd.isna(atr_raw) else atr_raw)
 
@@ -820,7 +831,8 @@ def simulate_pair_trades(
                         reason = "baseline_cross"
                     else:
                         reason = "exit_indicator"
-                    exit_px = c_i  # Post-TP1: execute at close price
+                    # Phase 8: system exits execute at NEXT bar open (or current close if no next bar)
+                    exit_px = next_open_px
                     closed_this_bar = True
 
                 # 3. Breakeven (lowest priority post-TP1)
@@ -844,7 +856,8 @@ def simulate_pair_trades(
                         reason = "baseline_cross"
                     else:
                         reason = "exit_indicator"
-                    exit_px = entry_px  # Pre-TP1: execute at entry → scratch PnL ≈ 0 (spread-only)
+                    # Phase 8: system exits execute at NEXT bar open (or current close if no next bar)
+                    exit_px = next_open_px
                     closed_this_bar = True
 
                 # Hard-Stop Realism: Intrabar TP/SL touch → immediate exit (lower priority than system exits)
@@ -870,15 +883,8 @@ def simulate_pair_trades(
                     )
                     exit_px = float(open_tr["exit_price"])  # for clarity
                 else:
-                    # Non‑TS exits → use computed price (except SCRATCH pre-TP1)
-                    if not open_tr.get("tp1_hit", False) and reason == "c1_reversal":
-                        # Pre-TP1 SCRATCH: use entry price for accounting (≈0 PnL)
-                        open_tr["exit_price"] = float(
-                            open_tr["entry_price"]
-                        )  # Accounting exit = entry
-                        open_tr["market_exit_price_actual"] = float(exit_px)  # Audit transparency
-                    else:
-                        open_tr["exit_price"] = float(exit_px)
+                    # Non‑TS exits → use computed price as resolved above.
+                    open_tr["exit_price"] = float(exit_px)
 
                 # Common stamps
                 open_tr["exit_date"] = date_i

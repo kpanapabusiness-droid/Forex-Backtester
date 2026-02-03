@@ -222,22 +222,55 @@ def run_daily(
         date_val = sig.get("date", timestamp)
 
         if symbol in open_symbols:
+            # Existing MT5 position: we never change engine decisions here, only report.
             if exit_sig != 0:
-                per_symbol[symbol] = {"action": "EXIT", "reason": "signal"}
-                actions.append({
-                    "date_time": timestamp, "action": "EXIT", "symbol": symbol,
-                    "reason": "signal", "run_id": run_id,
-                })
+                per_symbol[symbol] = {
+                    "action": "EXIT",
+                    "reason": "signal",
+                    # Phase 8 SL reporting scaffold: human should close at market.
+                    "sl_action": "CLOSE_EXIT",
+                    "new_sl_price": "",
+                    "sl_reason": "exit_signal",
+                }
+                actions.append(
+                    {
+                        "date_time": timestamp,
+                        "action": "EXIT",
+                        "symbol": symbol,
+                        "reason": "signal",
+                        "run_id": run_id,
+                    }
+                )
             else:
-                per_symbol[symbol] = {"action": "HOLD", "reason": "open_position"}
-                actions.append({
-                    "date_time": timestamp, "action": "HOLD", "symbol": symbol,
-                    "reason": "open_position", "run_id": run_id,
-                })
-            daily_positions.append({
-                "symbol": symbol, "position_type": "open", "decision": per_symbol[symbol]["action"],
-                "reason": per_symbol[symbol].get("reason", ""), "run_id": run_id,
-            })
+                # We do not have full trade state here; default to HOLD for SL.
+                per_symbol[symbol] = {
+                    "action": "HOLD",
+                    "reason": "open_position",
+                    "sl_action": "HOLD",
+                    "new_sl_price": "",
+                    "sl_reason": "open_position",
+                }
+                actions.append(
+                    {
+                        "date_time": timestamp,
+                        "action": "HOLD",
+                        "symbol": symbol,
+                        "reason": "open_position",
+                        "run_id": run_id,
+                    }
+                )
+
+            daily_positions.append(
+                {
+                    "symbol": symbol,
+                    "position_type": "open",
+                    "decision": per_symbol[symbol]["action"],
+                    "reason": per_symbol[symbol].get("reason", ""),
+                    "sl_action": per_symbol[symbol].get("sl_action", ""),
+                    "new_sl_price": per_symbol[symbol].get("new_sl_price", ""),
+                    "run_id": run_id,
+                }
+            )
             continue
 
         if symbol in approved:
@@ -281,38 +314,67 @@ def run_daily(
                 "exit_price_tp1": "", "exit_price_runner": "",
                 "status": "open", "reason": "approved",
             })
-            daily_positions.append({
-                "symbol": symbol, "position_type": "new", "decision": "OPEN",
-                "reason": "approved", "run_id": run_id,
-            })
+            daily_positions.append(
+                {
+                    "symbol": symbol,
+                    "position_type": "new",
+                    "decision": "OPEN",
+                    "reason": "approved",
+                    # Phase 8: we only provide static SL plan for new entries, not dynamic SL updates.
+                    "sl_action": "",
+                    "new_sl_price": "",
+                    "run_id": run_id,
+                }
+            )
         elif symbol in skipped:
             per_symbol[symbol] = {"action": "SKIP", "reason": skipped[symbol]}
             actions.append({
                 "date_time": timestamp, "action": "SKIP", "symbol": symbol,
                 "reason": skipped[symbol], "run_id": run_id,
             })
-            daily_positions.append({
-                "symbol": symbol, "position_type": "none", "decision": "SKIP",
-                "reason": skipped[symbol], "run_id": run_id,
-            })
+            daily_positions.append(
+                {
+                    "symbol": symbol,
+                    "position_type": "none",
+                    "decision": "SKIP",
+                    "reason": skipped[symbol],
+                    "sl_action": "",
+                    "new_sl_price": "",
+                    "run_id": run_id,
+                }
+            )
         else:
             per_symbol[symbol] = {"action": "HOLD", "reason": "no_signal"}
             actions.append({
                 "date_time": timestamp, "action": "HOLD", "symbol": symbol,
                 "reason": "no_signal", "run_id": run_id,
             })
-            daily_positions.append({
-                "symbol": symbol, "position_type": "none", "decision": "HOLD",
-                "reason": "no_signal", "run_id": run_id,
-            })
+            daily_positions.append(
+                {
+                    "symbol": symbol,
+                    "position_type": "none",
+                    "decision": "HOLD",
+                    "reason": "no_signal",
+                    "sl_action": "",
+                    "new_sl_price": "",
+                    "run_id": run_id,
+                }
+            )
 
     for _, row in positions_df.iterrows():
         sym = str(row.get("symbol", "")).upper().replace("_", "")[:6]
         if sym and sym not in [r.get("symbol") for r in daily_positions]:
-            daily_positions.append({
-                "symbol": sym, "position_type": "open", "decision": "HOLD",
-                "reason": "mt5_position", "run_id": run_id,
-            })
+            daily_positions.append(
+                {
+                    "symbol": sym,
+                    "position_type": "open",
+                    "decision": "HOLD",
+                    "reason": "mt5_position",
+                    "sl_action": "HOLD",
+                    "new_sl_price": "",
+                    "run_id": run_id,
+                }
+            )
 
     write_daily_summary(
         out_dir, timestamp_utc, timestamp_melbourne, run_id, per_symbol,

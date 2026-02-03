@@ -6,8 +6,10 @@ base_config: configs/v1_system.yaml
 data_scope:
   pairs: []   # inherit from base or override; empty = use base
   timeframe: D
-  from_date: "2020-01-01"
-  to_date: "2021-12-31"
+  from_date: "2019-01-01"
+  to_date: "2026-01-01"
+  start: "2019-01-01"
+  end: "2026-01-01"
 
 # Fold scheme (rolling windows)
 fold_scheme:

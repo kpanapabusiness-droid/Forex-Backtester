@@ -134,6 +134,8 @@ def _did_filter_pass(
 # -----------------------------
 def _detect_c1_col(df: pd.DataFrame) -> str | None:
     cols = list(df.columns)
+    # Explicitly exclude volume/exit columns from C1 detection to keep volume as pure veto.
+    excluded = {"volume_signal", "exit_signal"}
     lower = {c.lower(): c for c in cols}
 
     for name in ("c1_signal", "c1", "signal_c1"):
@@ -141,16 +143,20 @@ def _detect_c1_col(df: pd.DataFrame) -> str | None:
             return lower[name]
 
     for c in cols:
+        if c in excluded:
+            continue
         cl = c.lower()
         if "c1" in cl and "signal" in cl:
             return c
 
-    signal_like = [c for c in cols if "signal" in c.lower()]
+    signal_like = [c for c in cols if "signal" in c.lower() and c not in excluded]
     if len(signal_like) == 1:
         return signal_like[0]
 
     target = {-1, 0, 1}
     for c in cols:
+        if c in excluded:
+            continue
         s = pd.to_numeric(df[c], errors="coerce")
         uniq = set(s.dropna().unique().tolist())
         if 0 < len(uniq) <= 3 and uniq.issubset(target):
@@ -179,6 +185,9 @@ def apply_signal_logic(df: pd.DataFrame, cfg: dict) -> pd.DataFrame:
 
     # Initialize output columns
     out["entry_signal"] = 0
+    # Track base entry intent BEFORE any volume veto so volume can only ever block, never create trades.
+    # Continuation trades intentionally do not write to this column.
+    out["entry_signal_pre_volume"] = 0
     out["exit_signal_final"] = 0
     out["entry_allowed"] = False
     out["position_open"] = False
@@ -298,6 +307,7 @@ def apply_signal_logic(df: pd.DataFrame, cfg: dict) -> pd.DataFrame:
                 if position_state == 0:
                     # No position: open new position
                     out.loc[i, "entry_signal"] = signal_direction
+                    out.loc[i, "entry_signal_pre_volume"] = signal_direction
                     out.loc[i, "entry_allowed"] = True
                     position_state = signal_direction
                     entry_price = current_price
@@ -308,6 +318,7 @@ def apply_signal_logic(df: pd.DataFrame, cfg: dict) -> pd.DataFrame:
                     out.loc[i, "exit_signal_final"] = 1
                     out.loc[i, "exit_reason"] = "reverse_signal"
                     out.loc[i, "entry_signal"] = signal_direction
+                    out.loc[i, "entry_signal_pre_volume"] = signal_direction
                     out.loc[i, "entry_allowed"] = True
                     position_state = signal_direction
                     entry_price = current_price
@@ -399,7 +410,7 @@ def apply_signal_logic(df: pd.DataFrame, cfg: dict) -> pd.DataFrame:
                     candidate_direction,
                     atr_i,
                     use_c2,
-                    use_volume,
+                    False,  # base entry intent is computed WITHOUT volume; volume is a pure veto later
                     use_baseline,
                     has_baseline_value,
                     "baseline",
@@ -410,6 +421,7 @@ def apply_signal_logic(df: pd.DataFrame, cfg: dict) -> pd.DataFrame:
                 if passed:
                     # Entry allowed
                     out.loc[i, "entry_signal"] = candidate_direction
+                    out.loc[i, "entry_signal_pre_volume"] = candidate_direction
                     out.loc[i, "entry_allowed"] = True
                     position_state = candidate_direction
                     entry_price = current_price
@@ -459,6 +471,7 @@ def apply_signal_logic(df: pd.DataFrame, cfg: dict) -> pd.DataFrame:
                 if all_passed:
                     # Recovery successful
                     out.loc[i, "entry_signal"] = pending_direction
+                    out.loc[i, "entry_signal_pre_volume"] = pending_direction
                     out.loc[i, "entry_allowed"] = True
                     position_state = pending_direction
                     entry_price = current_price
@@ -542,6 +555,27 @@ def apply_signal_logic(df: pd.DataFrame, cfg: dict) -> pd.DataFrame:
                     baseline_crossed_since_entry = False
                 # For other exits (like c1_reversal), keep continuation state for potential re-entry
 
+    # Apply volume veto as a pure gate on base entry intent.
+    # This can only ever zero-out entries that would otherwise exist; it never creates new entries.
+    # Continuation trades are excluded because entry_signal_pre_volume remains 0 for them.
+    if use_volume and "volume_signal" in out.columns:
+        attempted_mask = out["entry_signal_pre_volume"] != 0
+        veto_mask = attempted_mask & (out["volume_signal"] != 1)
+        if veto_mask.any():
+            out.loc[veto_mask, "entry_signal"] = 0
+            out.loc[veto_mask, "entry_allowed"] = False
+            # Append diagnostic for debugging without clobbering existing reasons.
+            current_reasons = out.loc[veto_mask, "reason_block"].astype(str)
+            out.loc[veto_mask, "reason_block"] = current_reasons.mask(
+                current_reasons == "", other=current_reasons + ",volume_veto"
+            )
+
+        # Lightweight debug metric for diagnostics only (no trading logic impact).
+        attempted = int(attempted_mask.sum())
+        vetoed = int(veto_mask.sum())
+        rate = (vetoed / attempted) if attempted > 0 else 0.0
+        print(f"[VOLUME VETO] attempted={attempted} vetoed={vetoed} rate={rate:.4f}")
+
     # Legacy exit_on_c1_reversal logic for backward compatibility
     # This sets exit_signal based on C1 flips regardless of position state
     if exit_on_c1_reversal and c1_col is not None:
@@ -551,6 +585,7 @@ def apply_signal_logic(df: pd.DataFrame, cfg: dict) -> pd.DataFrame:
 
     # Normalize domains and ensure all required columns exist (CI invariants)
     out["entry_signal"] = out["entry_signal"].fillna(0).astype(int)
+    out["entry_signal_pre_volume"] = out["entry_signal_pre_volume"].fillna(0).astype(int)
 
     # Add legacy alias
     out["entrysignal"] = out["entry_signal"].astype(int)

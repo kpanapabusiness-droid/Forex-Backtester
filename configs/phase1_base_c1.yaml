@@ -6,7 +6,7 @@ pairs:
 timeframe: "D"
 
 indicators:
-  c1: "fisher"
+  c1: "c1_fisher_transform"
   use_c2: false
   use_baseline: false
   use_volume: false
@@ -17,15 +17,6 @@ rules:
   pullback_rule: false
   bridge_too_far_days: 7
   allow_baseline_as_catalyst: false
-
-entry:
-  sl_atr: 1.5
-  tp1_atr: 1.0
-  trail_after_atr: 2.0
-  ts_atr: 1.5
-
-execution:
-  intrabar_priority: "tp_first"
 
 exit:
   use_trailing_stop: true

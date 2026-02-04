@@ -1,0 +1,71 @@
+strategy_version: "forex_backtester_v1.9.7"
+
+pairs:
+  - "EUR_USD"
+
+timeframe: "D"
+
+indicators:
+  c1: "fisher"
+  use_c2: false
+  use_baseline: false
+  use_volume: false
+  use_exit: false
+
+rules:
+  one_candle_rule: false
+  pullback_rule: false
+  bridge_too_far_days: 7
+  allow_baseline_as_catalyst: false
+
+entry:
+  sl_atr: 1.5
+  tp1_atr: 1.0
+  trail_after_atr: 2.0
+  ts_atr: 1.5
+
+execution:
+  intrabar_priority: "tp_first"
+
+exit:
+  use_trailing_stop: true
+  move_to_breakeven_after_atr: true
+  exit_on_c1_reversal: true
+  exit_on_baseline_cross: false
+  exit_on_exit_signal: false
+
+tracking:
+  track_win_loss_scratch: true
+  track_roi: true
+  track_drawdown: true
+  in_sim_equity: true
+  verbose_logs: false
+
+spreads:
+  enabled: true
+  default_pips: 0.5
+  per_pair: {}
+  mode: "fixed"
+  atr_mult: 0.0
+
+risk:
+  starting_balance: 10000.0
+  risk_per_trade: 0.005
+
+cache:
+  enabled: true
+  dir: "cache"
+  format: "parquet"
+
+validation:
+  enabled: true
+  fail_fast: true
+  strict_contract: false
+
+output:
+  results_dir: "results"
+
+date_range:
+  start: "2019-01-01"
+  end: "2026-01-01"
+

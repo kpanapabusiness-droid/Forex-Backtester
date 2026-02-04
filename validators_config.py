@@ -121,6 +121,11 @@ class OutputCfg(BaseModel):
     results_dir: str = "results"
 
 
+class OutputsCfg(BaseModel):
+    dir: str = "results"
+    write_trades_csv: bool = True
+
+
 class RiskCfg(BaseModel):
     starting_balance: float = 10_000.0
     # Engine (backtester) uses risk_per_trade (decimal, e.g. 0.005 = 0.5%). Must be in dump.
@@ -187,7 +192,10 @@ class Config(BaseModel):
     # System bits
     cache: CacheCfg = CacheCfg()
     validation: ValidationCfg = ValidationCfg()
+    # Legacy single-output config (kept for backwards compatibility)
     output: OutputCfg = OutputCfg()
+    # Canonical outputs config (dir + flags)
+    outputs: OutputsCfg = OutputsCfg()
     risk: RiskCfg = RiskCfg()
     # Optional top-level date window for convenience (fallback for WFO)
     date_range: Optional[DateRange] = None
@@ -218,6 +226,38 @@ class Config(BaseModel):
     def indicator_params_none_to_empty(cls, v):
         # Treat explicit `null` as {} to avoid annoying failures.
         return {} if v is None else v
+
+    @model_validator(mode="before")
+    @classmethod
+    def normalize_output_keys(cls, data: Any) -> Any:
+        """
+        Normalize legacy/new output keys into a canonical `outputs` block.
+
+        Precedence:
+        - If YAML provides `outputs.dir`, keep it.
+        - Else, if YAML provides legacy `output.results_dir`, map it into `outputs.dir`.
+        - Always ensure `outputs.write_trades_csv` is present (default True) so the
+          engine can read it without special-casing missing keys.
+        """
+        if not isinstance(data, dict):
+            return data
+
+        data = dict(data)
+        raw_outputs = dict(data.get("outputs") or {})
+        raw_output = dict(data.get("output") or {})
+
+        # dir precedence: explicit outputs.dir wins over legacy output.results_dir
+        if "dir" not in raw_outputs:
+            legacy_dir = raw_output.get("results_dir")
+            if legacy_dir is not None:
+                raw_outputs["dir"] = legacy_dir
+
+        # default write_trades_csv if not explicitly provided
+        if "write_trades_csv" not in raw_outputs:
+            raw_outputs["write_trades_csv"] = True
+
+        data["outputs"] = raw_outputs
+        return data
 
 
 # -------------------------

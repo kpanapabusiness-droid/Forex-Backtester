@@ -555,7 +555,7 @@ def baseline_mcginley_dynamic(
             denom = denom if np.isfinite(denom) and denom != 0 else 1.0
             md = md + (x - md) / denom
         y[i] = md
-    df["baseline"] = pd.Series(y, index=range(len(s)))
+    df["baseline"] = pd.Series(y, index=df.index)
     return _set_signal(df, "baseline", signal_col)
 
 
@@ -586,7 +586,7 @@ def baseline_ehlers_two_pole_super_smoother_filter(
         y2 = y[i - 2] if i > 1 and np.isfinite(y[i - 2]) else y1
         y[i] = c1 * (x0 + x1) / 2.0 + c2 * y1 + c3 * y2
 
-    df["baseline"] = pd.Series(y, index=range(len(s)))
+    df["baseline"] = pd.Series(y, index=df.index)
     return _set_signal(df, "baseline", signal_col)
 
 

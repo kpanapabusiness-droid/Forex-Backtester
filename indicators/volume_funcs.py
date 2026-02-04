@@ -83,61 +83,75 @@ def volume_trend_direction_force(*args, **kwargs):
     return volume_adx(*args, **kwargs)
 
 def volume_silence(*args, **kwargs):
-    import numpy as np
+    signal_col = kwargs.get("signal_col", "volume_signal")
     x = volume_volatility_ratio(*args, **kwargs)
     try:
-        x = np.asarray(x, dtype=float)
+        arr = np.asarray(x, dtype=float)
         with np.errstate(divide="ignore", invalid="ignore"):
-            y = 1.0 / x
+            y = 1.0 / arr
         y[~np.isfinite(y)] = 0.0
-        return y
+        col_idx = x.columns.get_loc(signal_col) if signal_col in x.columns else 0
+        y_col = y[:, col_idx] if y.ndim == 2 else np.ravel(y)[: len(x)]
+        sig = pd.Series(np.ravel(y_col)[: len(x)], index=x.index)
+        x = x.copy()
+        x[signal_col] = (sig.astype(float) > 0).astype("int8")
+        return x
     except Exception:
-        # Fallback for scalar outputs
-        try:
-            xf = float(x)
-            return 0.0 if xf == 0.0 else (1.0 / xf)
-        except Exception:
-            return 0.0
+        x = x.copy() if isinstance(x, pd.DataFrame) else args[0].copy() if args else pd.DataFrame()
+        if isinstance(x, pd.DataFrame) and len(x) > 0:
+            x[signal_col] = pd.Series(0, index=x.index, dtype="int8")
+        return x
 
 def volume_stiffness(*args, **kwargs):
-    import numpy as np
+    signal_col = kwargs.get("signal_col", "volume_signal")
     x = volume_volatility_ratio(*args, **kwargs)
     try:
-        x = np.asarray(x, dtype=float)
-        x[~np.isfinite(x)] = 0.0
-        return np.clip(x, 0.0, 1e6)
+        arr = np.asarray(x, dtype=float)
+        arr[~np.isfinite(arr)] = 0.0
+        clipped = np.clip(arr, 0.0, 1e6)
+        col_idx = x.columns.get_loc(signal_col) if signal_col in x.columns else 0
+        y_col = clipped[:, col_idx] if clipped.ndim == 2 else np.ravel(clipped)[: len(x)]
+        sig = pd.Series(np.ravel(y_col)[: len(x)], index=x.index)
+        x = x.copy()
+        x[signal_col] = (sig.astype(float) > 0).astype("int8")
+        return x
     except Exception:
-        try:
-            xf = float(x)
-            if not np.isfinite(xf):
-                return 0.0
-            return max(0.0, xf)
-        except Exception:
-            return 0.0
+        x = x.copy() if isinstance(x, pd.DataFrame) else args[0].copy() if args else pd.DataFrame()
+        if isinstance(x, pd.DataFrame) and len(x) > 0:
+            x[signal_col] = pd.Series(0, index=x.index, dtype="int8")
+        return x
 
 def volume_volatility_ratio_mt4(*args, **kwargs):
     return volume_volatility_ratio(*args, **kwargs)
 
 def volume_william_vix_fix(*args, **kwargs):
-    import numpy as np
-    # Backward-compatible placeholder: return zeros with the same length as the first array-like input.
+    signal_col = kwargs.get("signal_col", "volume_signal")
+    df = args[0].copy() if args and isinstance(args[0], pd.DataFrame) else None
+    if df is not None:
+        df[signal_col] = pd.Series(0, index=df.index, dtype="int8")
+        return df
     for v in list(args) + list(kwargs.values()):
         try:
             a = np.asarray(v)
             if a.ndim >= 1 and a.size > 1:
-                return np.zeros_like(a, dtype=float)
+                n = len(a) if hasattr(a, "__len__") else int(a.size)
+                return pd.DataFrame({signal_col: pd.Series(0, index=range(n), dtype="int8")})
         except Exception:
             pass
-    return 0.0
+    return pd.DataFrame({signal_col: pd.Series([0], dtype="int8")})
 
 def volume_waddah_attar_explosion(*args, **kwargs):
-    import numpy as np
-    # Backward-compatible placeholder: return zeros with the same length as the first array-like input.
+    signal_col = kwargs.get("signal_col", "volume_signal")
+    df = args[0].copy() if args and isinstance(args[0], pd.DataFrame) else None
+    if df is not None:
+        df[signal_col] = pd.Series(0, index=df.index, dtype="int8")
+        return df
     for v in list(args) + list(kwargs.values()):
         try:
             a = np.asarray(v)
             if a.ndim >= 1 and a.size > 1:
-                return np.zeros_like(a, dtype=float)
+                n = len(a) if hasattr(a, "__len__") else int(a.size)
+                return pd.DataFrame({signal_col: pd.Series(0, index=range(n), dtype="int8")})
         except Exception:
             pass
-    return 0.0
+    return pd.DataFrame({signal_col: pd.Series([0], dtype="int8")})

@@ -24,6 +24,62 @@ def c1_twiggs_money_flow(df, length=15, signal_col="c1_signal", **kwargs):
     return df
 
 
+def c1_twiggs_money_flow_mq5(df, period=21, signal_col="c1_signal", **kwargs):
+    """
+    Twiggs Money Flow implementation mirroring the MetaTrader 5 Twiggs_Money_Flow.mq5 logic.
+
+    Uses previous close in the true-range calculation and an EMA-style WMA with k=1/period.
+    """
+    try:
+        period = int(period)
+    except Exception:
+        period = 21
+    if period < 1:
+        period = 1
+
+    k = 1.0 / float(period)
+
+    close = pd.to_numeric(df["close"], errors="coerce")
+    high = pd.to_numeric(df["high"], errors="coerce")
+    low = pd.to_numeric(df["low"], errors="coerce")
+    volume = pd.to_numeric(df["volume"], errors="coerce").fillna(0.0)
+
+    prev_close = close.shift(1)
+    trh = np.maximum(high, prev_close)
+    trl = np.minimum(low, prev_close)
+    tr = trh - trl
+
+    # ADV and volume buffers (tick_volume ≈ volume in backtester schema)
+    adv = np.where(tr != 0.0, volume * (2.0 * close - trl - trh) / tr, 0.0)
+    vol = volume.to_numpy(dtype="float64")
+
+    adv_vals = np.asarray(adv, dtype="float64")
+    n = len(df)
+    wma_adv = np.full(n, np.nan, dtype="float64")
+    wma_vol = np.full(n, np.nan, dtype="float64")
+
+    if n >= period:
+        seed = period - 1
+        wma_adv[seed] = np.nanmean(adv_vals[:period])
+        wma_vol[seed] = np.nanmean(vol[:period])
+        for t in range(seed + 1, n):
+            prev_adv = wma_adv[t - 1]
+            prev_vol = wma_vol[t - 1]
+            wma_adv[t] = (adv_vals[t] - prev_adv) * k + prev_adv
+            wma_vol[t] = (vol[t] - prev_vol) * k + prev_vol
+
+    tmf = np.zeros(n, dtype="float64")
+    valid = (~np.isnan(wma_vol)) & (wma_vol != 0.0)
+    tmf[valid] = wma_adv[valid] / wma_vol[valid]
+    tmf_series = pd.Series(tmf, index=df.index, dtype="float64")
+
+    df["tmf_mq5"] = tmf_series
+    df[signal_col] = 0
+    df.loc[tmf_series > 0.0, signal_col] = 1
+    df.loc[tmf_series < 0.0, signal_col] = -1
+    return df
+
+
 def c1_disparity_index(df, period=13, signal_col="c1_signal", **kwargs):
     ma = df["close"].rolling(window=period).mean()
     disparity = (df["close"] / ma) - 1

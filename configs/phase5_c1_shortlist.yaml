@@ -1,0 +1,9 @@
+c1_allowlist:
+  - "c1_hlc_trend"
+  - "c1_coral"
+  - "c1_forecast"
+  - "c1_top_trend"
+  - "c1_disparity_index"
+  - "c1_hacolt_lines"
+  - "c1_rsi"
+  - "c1_lwpi"

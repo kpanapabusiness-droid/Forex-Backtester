@@ -1,0 +1,20 @@
+strategy_version: "forex_backtester_v1.9.7"
+
+base_config: "phase4_c1_identity_sweep.yaml"
+
+data_scope:
+  from_date: "2019-01-01"
+  to_date: "2026-01-01"
+
+fold_scheme:
+  train_months: 36
+  test_months: 12
+  step_months: 12
+
+engine:
+  cache_on: false
+  spreads_on: true
+
+# output_root will be overridden per‑C1 by the Phase 4 driver.
+output_root: "results/phase4/wfo"
+

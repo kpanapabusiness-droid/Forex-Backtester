@@ -1,0 +1,16 @@
+# Phase 5 — WFO v2 template (same folds and mechanics as Phase 4). No sweep_config.
+# base_config and output_root are set per run by the Phase 5 driver.
+data_scope:
+  from_date: "2019-01-01"
+  to_date: "2026-01-01"
+
+fold_scheme:
+  train_months: 36
+  test_months: 12
+  step_months: 12
+
+engine:
+  cache_on: false
+  spreads_on: true
+
+output_root: "results/phase5"

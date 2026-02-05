@@ -1,0 +1,6 @@
+# Phase 5 — C1 parameter sweep for c1_rsi. C1-only, exit=flip, fixed SL. No threshold tuning.
+# Consumed by Phase 5 driver; outputs to results/phase5/c1_rsi/
+c1_name: "c1_rsi"
+base_config: "phase5_base.yaml"
+param_grid:
+  period: [7, 14, 21]

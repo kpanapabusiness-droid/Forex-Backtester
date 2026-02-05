@@ -1,0 +1,7 @@
+# Phase 5 — C1 parameter sweep for c1_coral. C1-only, exit=flip, fixed SL.
+# Consumed by Phase 5 driver; outputs to results/phase5/c1_coral/
+c1_name: "c1_coral"
+base_config: "phase5_base.yaml"
+param_grid:
+  period: [20, 30, 40]
+  smoothing: [0.4, 0.5]

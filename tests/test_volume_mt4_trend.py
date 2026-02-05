@@ -5,7 +5,7 @@ import pytest
 
 from indicators.volume_funcs import volume_trend_direction_force
 
-
+# MT4/legacy volume behavior; excluded from non-research suite (pytest -m "not research").
 pytestmark = pytest.mark.research
 
 

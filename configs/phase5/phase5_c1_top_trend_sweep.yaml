@@ -1,0 +1,6 @@
+# Phase 5 — C1 parameter sweep for c1_top_trend. C1-only, exit=flip, fixed SL.
+# Consumed by Phase 5 driver; outputs to results/phase5/c1_top_trend/
+c1_name: "c1_top_trend"
+base_config: "phase5_base.yaml"
+param_grid:
+  period: [20, 30, 40]

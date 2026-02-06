@@ -140,18 +140,41 @@ def volume_william_vix_fix(*args, **kwargs):
             pass
     return pd.DataFrame({signal_col: pd.Series([0], dtype="int8")})
 
-def volume_waddah_attar_explosion(*args, **kwargs):
-    signal_col = kwargs.get("signal_col", "volume_signal")
-    df = args[0].copy() if args and isinstance(args[0], pd.DataFrame) else None
-    if df is not None:
-        df[signal_col] = pd.Series(0, index=df.index, dtype="int8")
-        return df
-    for v in list(args) + list(kwargs.values()):
-        try:
-            a = np.asarray(v)
-            if a.ndim >= 1 and a.size > 1:
-                n = len(a) if hasattr(a, "__len__") else int(a.size)
-                return pd.DataFrame({signal_col: pd.Series(0, index=range(n), dtype="int8")})
-        except Exception:
-            pass
-    return pd.DataFrame({signal_col: pd.Series([0], dtype="int8")})
+def volume_waddah_attar_explosion(
+    df: pd.DataFrame,
+    *,
+    sensitivity: float = 150.0,
+    fast_length: int = 20,
+    slow_length: int = 40,
+    channel_length: int = 20,
+    bb_mult: float = 2.0,
+    dead_zone: float = 20.0,
+    signal_col: str = "volume_signal",
+) -> pd.DataFrame:
+    out = df.copy()
+
+    if out.empty:
+        out[signal_col] = pd.Series([], index=out.index, dtype="int8")
+        return out
+
+    if "close" not in out.columns:
+        raise ValueError("volume_waddah_attar_explosion requires column: close")
+
+    close = out["close"].astype(float)
+
+    ema_fast = close.ewm(span=int(fast_length), adjust=False).mean()
+    ema_slow = close.ewm(span=int(slow_length), adjust=False).mean()
+    macd = ema_fast - ema_slow
+
+    t1 = (macd - macd.shift(1)) * float(sensitivity)
+    trend_magnitude = t1.abs()
+
+    basis = close.rolling(int(channel_length), min_periods=int(channel_length)).mean()
+    stdev = close.rolling(int(channel_length), min_periods=int(channel_length)).std(ddof=0)
+    bb_width = (basis + float(bb_mult) * stdev) - (basis - float(bb_mult) * stdev)
+
+    pass_gate = (trend_magnitude > float(dead_zone)) & (trend_magnitude > bb_width)
+
+    gate = pass_gate.astype("int8").reindex(out.index).fillna(0).astype("int8")
+    out[signal_col] = gate
+    return out

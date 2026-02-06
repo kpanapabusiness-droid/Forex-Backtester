@@ -30,6 +30,24 @@ def _has_nonnull(df: pd.DataFrame, col: str) -> bool:
     return (col in df.columns) and (df[col].notna().any())
 
 
+def c1_exit_now(prev_c1: int, curr_c1: int, position_state: int, c1_exit_mode: str) -> bool:
+    """
+    Pure helper: should C1 trigger an exit this bar?
+    - disagree: exit when current C1 is non-zero and opposite to position.
+    - flip_only: exit only on full flip (+1<->-1); neutral (0) never triggers.
+    """
+    if c1_exit_mode == "disagree":
+        return curr_c1 != 0 and curr_c1 != position_state
+    if c1_exit_mode == "flip_only":
+        return (
+            prev_c1 != 0
+            and curr_c1 != 0
+            and prev_c1 != curr_c1
+            and curr_c1 != position_state
+        )
+    return False
+
+
 # -----------------------------
 # Filter checks
 # -----------------------------
@@ -229,15 +247,26 @@ def apply_signal_logic(df: pd.DataFrame, cfg: dict) -> pd.DataFrame:
     exit_on_c1_reversal = exit_cfg.get("exit_on_c1_reversal", True)
     exit_on_baseline_cross = exit_cfg.get("exit_on_baseline_cross", use_baseline)
     exit_on_exit_signal = exit_cfg.get("exit_on_exit_signal", False)
+    c1_exit_mode = exit_cfg.get("c1_exit_mode", "disagree")
+    exit_combine_mode = exit_cfg.get("exit_combine_mode", "single")
+    exit_c1_name = exit_cfg.get("exit_c1_name") or ""
+    if isinstance(exit_c1_name, str):
+        exit_c1_name = exit_c1_name.strip()
+    use_exit_c1_source = bool(exit_c1_name and "exit_c1_signal" in out.columns)
 
-    # Detect C1 signal column
+    # Detect C1 signal column (for entries only)
     c1_col = _detect_c1_col(out)
     if c1_col is None:
         # No C1 column found, return all zeros
         return out
 
-    # Get C1 signals
+    # Get C1 signals (entry C1)
     c1_signals = pd.to_numeric(out[c1_col], errors="coerce").fillna(0).astype(int)
+    # Exit C1 source: when exit_c1_name is set, use exit_c1_signal with Mode Y (flip_only)
+    if use_exit_c1_source:
+        exit_c1_signals = pd.to_numeric(out["exit_c1_signal"], errors="coerce").fillna(0).astype(int)
+    else:
+        exit_c1_signals = c1_signals
 
     # Check for required columns
     has_baseline_value = "baseline" in out.columns
@@ -502,34 +531,37 @@ def apply_signal_logic(df: pd.DataFrame, cfg: dict) -> pd.DataFrame:
             exit_triggered = False
             exit_reason = ""
 
-            # Check all exit conditions in priority order
-            # C1 reversal exit (highest priority)
-            if (
-                exit_on_c1_reversal
-                and c1_signals.iloc[i] != 0
-                and c1_signals.iloc[i] != position_state
-            ):
-                exit_triggered = True
-                exit_reason = "c1_reversal"
+            # C1 exit: when exit_c1_name set use exit_c1_signal; else use entry C1. Mode (flip_only/disagree) from config.
+            exit_src = exit_c1_signals if use_exit_c1_source else c1_signals
+            exit_mode = c1_exit_mode
+            prev_c1 = int(exit_src.iloc[i - 1]) if i >= 1 else 0
+            curr_c1 = int(exit_src.iloc[i])
+            c1_exit_triggered = c1_exit_now(prev_c1, curr_c1, position_state, exit_mode)
 
-            # Baseline cross exit
-            if not exit_triggered and exit_on_baseline_cross and has_baseline_value:
-                baseline_val = out.loc[i, "baseline"]
-                if (position_state == 1 and current_price < baseline_val) or (
-                    position_state == -1 and current_price > baseline_val
-                ):
-                    exit_triggered = True
-                    exit_reason = "baseline_cross"
-
-            # Exit indicator (explicit exit signal column)
-            if (
-                not exit_triggered
-                and exit_on_exit_signal
+            indicator_exit_now = bool(
+                exit_on_exit_signal
                 and _has_nonnull(out, "exit_signal")
                 and int(out.loc[i, "exit_signal"]) == 1
-            ):
-                exit_triggered = True
-                exit_reason = "exit_indicator"
+            )
+
+            if exit_combine_mode == "or":
+                exit_triggered = c1_exit_triggered or indicator_exit_now
+                if exit_triggered:
+                    exit_reason = "exit_indicator" if indicator_exit_now else "c1_reversal"
+            else:
+                if exit_on_c1_reversal and c1_exit_triggered:
+                    exit_triggered = True
+                    exit_reason = "c1_reversal"
+                if not exit_triggered and exit_on_baseline_cross and has_baseline_value:
+                    baseline_val = out.loc[i, "baseline"]
+                    if (position_state == 1 and current_price < baseline_val) or (
+                        position_state == -1 and current_price > baseline_val
+                    ):
+                        exit_triggered = True
+                        exit_reason = "baseline_cross"
+                if not exit_triggered and indicator_exit_now:
+                    exit_triggered = True
+                    exit_reason = "exit_indicator"
 
             # Stop loss hit
             if not exit_triggered and current_sl is not None:
@@ -576,9 +608,8 @@ def apply_signal_logic(df: pd.DataFrame, cfg: dict) -> pd.DataFrame:
         rate = (vetoed / attempted) if attempted > 0 else 0.0
         print(f"[VOLUME VETO] attempted={attempted} vetoed={vetoed} rate={rate:.4f}")
 
-    # Legacy exit_on_c1_reversal logic for backward compatibility
-    # This sets exit_signal based on C1 flips regardless of position state
-    if exit_on_c1_reversal and c1_col is not None:
+    # Legacy exit_on_c1_reversal logic for backward compatibility (disagree only; flip_only uses loop above)
+    if exit_on_c1_reversal and c1_exit_mode != "flip_only" and c1_col is not None:
         c1 = pd.to_numeric(out[c1_col], errors="coerce")
         flips = c1.ne(c1.shift(1)) & (c1 != 0)
         out.loc[flips, "exit_signal"] = 1.0

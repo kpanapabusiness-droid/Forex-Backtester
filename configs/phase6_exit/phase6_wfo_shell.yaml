@@ -1,0 +1,13 @@
+# Phase 6 — WFO v2 shell. Merge with base_config + output_root per variant.
+data_scope:
+  from_date: "2019-01-01"
+  to_date: "2026-01-01"
+
+fold_scheme:
+  train_months: 36
+  test_months: 12
+  step_months: 12
+
+engine:
+  cache_on: false
+  spreads_on: true

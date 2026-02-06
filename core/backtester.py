@@ -392,6 +392,14 @@ def apply_indicators_with_cache(df: pd.DataFrame, pair: str, cfg: dict) -> pd.Da
                     print(f"Confirm resolver failed for {role}/{name}: {e}")
                 return
             params = _params_for(full_name)
+        elif role == "exit_c1":
+            try:
+                full_name, func = _resolve_confirm_func(name, role="c1")
+            except Exception as e:
+                if verbose:
+                    print(f"Confirm resolver failed for exit_c1/{name}: {e}")
+                return
+            params = _params_for(full_name)
         else:
             full_name, func = _resolve_indicator_func(role, name, verbose)
             if func is None:
@@ -440,6 +448,10 @@ def apply_indicators_with_cache(df: pd.DataFrame, pair: str, cfg: dict) -> pd.Da
         run_role("volume", _get("volume"), "volume_signal")
     if _get("use_exit", False) and _get("exit"):
         run_role("exit", _get("exit"), "exit_signal")
+
+    exit_c1_name = (cfg.get("exit") or {}).get("exit_c1_name")
+    if exit_c1_name and isinstance(exit_c1_name, str) and exit_c1_name.strip():
+        run_role("exit_c1", exit_c1_name.strip(), "exit_c1_signal")
 
     if verbose:
         print(f"cache stats -> saves={saves} hits={hits}")

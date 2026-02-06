@@ -66,6 +66,9 @@ class Exit(BaseModel):
     exit_on_c1_reversal: bool = True
     exit_on_baseline_cross: bool = False
     exit_on_exit_signal: bool = False
+    c1_exit_mode: Literal["disagree", "flip_only"] = "disagree"
+    exit_combine_mode: Literal["single", "or"] = "single"
+    exit_c1_name: Optional[str] = None
 
 
 class Engine(BaseModel):

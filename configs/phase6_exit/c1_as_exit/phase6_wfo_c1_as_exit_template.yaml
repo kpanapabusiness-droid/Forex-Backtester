@@ -1,0 +1,13 @@
+# Phase 6.2 — WFO v2 template for C1-as-exit screen. base_config and output_root set per run by runner.
+base_config: "phase6_c1_as_exit_shell.yaml"
+data_scope:
+  from_date: "2019-01-01"
+  to_date: "2026-01-01"
+fold_scheme:
+  train_months: 36
+  test_months: 12
+  step_months: 12
+engine:
+  cache_on: false
+  spreads_on: true
+output_root: "results/phase6_exit/c1_as_exit"

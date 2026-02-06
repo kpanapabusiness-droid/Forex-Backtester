@@ -1,0 +1,13 @@
+# Phase 6 WFO v2 — Variant A (baseline: C1 disagree exit)
+base_config: "phase6_baseline_A_coral_disagree_exit.yaml"
+data_scope:
+  from_date: "2019-01-01"
+  to_date: "2026-01-01"
+fold_scheme:
+  train_months: 36
+  test_months: 12
+  step_months: 12
+engine:
+  cache_on: false
+  spreads_on: true
+output_root: "results/phase6_exit/baseline_A_coral_disagree_exit"

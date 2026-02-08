@@ -148,6 +148,9 @@ def _scratch_stats(trades: pd.DataFrame) -> dict:
 
 def _run_c1_diagnostics(cfg: dict, base_out: Path) -> None:
     c1_list = discover_c1_indicators()
+    whitelist = (cfg.get("phaseB") or {}).get("c1_whitelist")
+    if whitelist:
+        c1_list = [n for n in c1_list if n in whitelist]
     param_grids = (cfg.get("phaseB") or {}).get("param_grids", {}).get("c1")
     overlap_dir = base_out / "overlap"
     overlap_dir.mkdir(parents=True, exist_ok=True)

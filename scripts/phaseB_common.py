@@ -92,6 +92,12 @@ def default_c1_param_grid(c1_name: str) -> List[Dict[str, Any]]:
             {"sensitivity": 150, "fast_length": 20},
             {"sensitivity": 200, "fast_length": 20},
         ],
+        "c1_regime_sm__binary": [{"strength_upper": 0.30, "strength_lower": 0.10}],
+        "c1_regime_sm__neutral_gate": [{"strength_upper": 0.30, "strength_lower": 0.10}],
+        "c1_vol_dir__binary": [{"vol_mult": 1.05}],
+        "c1_vol_dir__neutral_gate": [{"vol_mult": 1.05}],
+        "c1_persist_momo__binary": [{"confirm_bars": 3}, {"confirm_bars": 5}],
+        "c1_persist_momo__neutral_gate": [{"confirm_bars": 3}, {"confirm_bars": 5}],
     }
     if c1_name in grids:
         return grids[c1_name]

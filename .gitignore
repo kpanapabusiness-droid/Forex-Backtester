@@ -22,6 +22,7 @@ Cache/
 results/*
 !results/.gitkeep
 !results/c1_only_exits/**
+results/phaseB/
 results_history/
 
 # Generated artifacts

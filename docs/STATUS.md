@@ -186,6 +186,25 @@ python scripts/smoke_test_selfcontained_v198.py -q --mode fast
 python scripts/smoke_test_selfcontained_v198.py --mode full
 ```
 
+### Phase B — Indicator Quality & Signal Research
+Phase B is a diagnostic pipeline only (no WFO selection, no leaderboard). It evaluates C1 and Volume indicators and produces a quality gate and approved pool for Phase C.
+
+```bash
+# C1 diagnostics (response curves, overlap, scratch/MAE)
+python scripts/phaseB_run_diagnostics.py --config configs/phaseB/phaseB_c1_diagnostics.yaml
+
+# Volume diagnostics (veto response, ON vs OFF, MAE tail)
+python scripts/phaseB_run_diagnostics.py --config configs/phaseB/phaseB_volume_diagnostics.yaml
+
+# Controlled overfit (fold-pair fit/check)
+python scripts/phaseB_run_controlled_overfit.py --config configs/phaseB/phaseB_controlled_overfit.yaml
+
+# Quality gate and approved pool (run after diagnostics)
+python -m analytics.phaseB_quality_gate --input results/phaseB --output results/phaseB
+```
+
+**Done** when: `results/phaseB/quality_gate.csv`, `approved_pool.json`, and `approved_pool.md` exist and tests pass. See `docs/PHASE_B_INDICATOR_QUALITY.md` for metrics and interpretation.
+
 ### Development & Validation
 ```bash
 # Linting (gates CI)

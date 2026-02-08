@@ -106,6 +106,7 @@ TRADES_COLS: List[str] = [
     "loss",
     "scratch",
     "spread_pips_used",
+    "spread_pips_exit",  # Phase A: execution-bar spread at exit (entry bar = spread_pips_used)
     # --- Thread tracking ---
     "thread_id",
 ]
@@ -569,19 +570,26 @@ def compute_trade_pnl_money(tr: Dict[str, Any], pair: str, pip_value_1lot: float
     lots_runner = float(tr["lots_runner"])
     tp1_hit = bool(tr.get("tp1_hit", False))
     tp1_mid = float(tr.get("tp1_price") or entry_mid)
-    sp_pips = float(tr.get("spread_pips_used", 0.0))
+    sp_entry_pips = float(tr.get("spread_pips_used", 0.0))
+    if "spread_pips_exit" not in tr or tr["spread_pips_exit"] is None:
+        raise ValueError(
+            "spread_pips_exit is required for PnL; engine always sets it at close. "
+            "Legacy trade records without it must be handled by a dedicated legacy path."
+        )
+    sp_exit_pips = float(tr["spread_pips_exit"])
 
     ps = pip_size_for_pair(pair)
-    sp_price = sp_pips * ps
+    sp_entry_price = sp_entry_pips * ps
+    sp_exit_price = sp_exit_pips * ps
 
     if dir_int > 0:  # long
-        entry_fill = entry_mid + sp_price / 2.0
-        tp1_fill = tp1_mid - sp_price / 2.0
-        exit_fill = exit_mid - sp_price / 2.0
+        entry_fill = entry_mid + sp_entry_price / 2.0
+        tp1_fill = tp1_mid - sp_entry_price / 2.0
+        exit_fill = exit_mid - sp_exit_price / 2.0
     else:  # short
-        entry_fill = entry_mid - sp_price / 2.0
-        tp1_fill = tp1_mid + sp_price / 2.0
-        exit_fill = exit_mid + sp_price / 2.0
+        entry_fill = entry_mid - sp_entry_price / 2.0
+        tp1_fill = tp1_mid + sp_entry_price / 2.0
+        exit_fill = exit_mid + sp_exit_price / 2.0
 
     def pips_between(px2, px1):
         return (dir_int * (px2 - px1)) / ps if ps else 0.0
@@ -902,6 +910,13 @@ def simulate_pair_trades(
                 open_tr["exit_date"] = date_i
                 open_tr["exit_reason"] = str(reason)
 
+                # Execution-bar spread at exit (Phase A: next-open → bar t+1, intrabar → bar t)
+                if reason in ("c1_reversal", "exit_indicator", "baseline_cross"):
+                    exit_bar_row = rows.iloc[i + 1] if i + 1 < len(rows) else r
+                else:
+                    exit_bar_row = r
+                open_tr["spread_pips_exit"] = float(resolve_spread_pips(pair, exit_bar_row, cfg))
+
                 # W/L/S classification (Golden Standard)
                 if bool(open_tr.get("tp1_hit", False)):
                     # TP1 hit: WIN (thread-scoped) - runner outcome irrelevant
@@ -962,9 +977,16 @@ def simulate_pair_trades(
             )
 
         # --------------------------
-        # 3) new entry if flat
+        # 3) new entry if flat (next-open: fill at bar i+1 open, spread from i+1)
         # --------------------------
         if open_tr is None and entry_sig != 0:
+            # Locked: entry occurs at next bar open; require next bar to exist (no lookahead beyond i+1)
+            if i + 1 >= len(rows):
+                continue
+            r_next = rows.iloc[i + 1]
+            next_open_px = float(r_next["open"])
+            date_next = pd.to_datetime(r_next["date"]) if "date" in r_next else pd.to_datetime(r_next.name)
+
             direction = "long" if entry_sig > 0 else "short"
             d_int = 1 if entry_sig > 0 else -1
 
@@ -974,7 +996,8 @@ def simulate_pair_trades(
                 # Block duplicate entry event on same bar/side
                 continue
 
-            entry_px = c_i
+            entry_px = next_open_px
+            entry_date_used = date_next
 
             atr_entry = atr_i
             if (not math.isfinite(atr_entry)) or atr_entry <= 0.0:
@@ -1017,11 +1040,11 @@ def simulate_pair_trades(
             if not (math.isfinite(tp1_px) and math.isfinite(sl_px)):
                 continue
 
-            spread_pips_used = resolve_spread_pips(pair, r, cfg)
+            spread_pips_used = resolve_spread_pips(pair, r_next, cfg)
 
             open_tr = {
                 "pair": pair,
-                "entry_date": date_i,
+                "entry_date": entry_date_used,
                 "entry_price": float(entry_px),
                 "direction": direction,
                 "direction_int": int(d_int),

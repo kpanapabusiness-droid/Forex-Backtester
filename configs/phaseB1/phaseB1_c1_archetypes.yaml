@@ -1,0 +1,85 @@
+# Phase B.1 — C1 archetypes 1–3 only (6 indicators). Diagnostics, no WFO.
+# Run: python scripts/phaseB_run_diagnostics.py --config configs/phaseB1/phaseB1_c1_archetypes.yaml
+strategy_version: "forex_backtester_v1.9.7"
+
+pairs:
+  - "EUR_USD"
+  - "GBP_USD"
+  - "USD_JPY"
+
+timeframe: "D"
+
+indicators:
+  c1: "c1_regime_sm__binary"
+  use_c2: false
+  use_baseline: false
+  use_volume: false
+  use_exit: false
+
+rules:
+  one_candle_rule: false
+  pullback_rule: false
+  bridge_too_far_days: 7
+  allow_baseline_as_catalyst: false
+
+entry:
+  sl_atr: 1.5
+  tp1_atr: 1.0
+  trail_after_atr: 2.0
+  ts_atr: 1.5
+
+exit:
+  use_trailing_stop: false
+  move_to_breakeven_after_atr: false
+  exit_on_c1_reversal: true
+  exit_on_baseline_cross: false
+  exit_on_exit_signal: false
+
+tracking:
+  track_win_loss_scratch: true
+  track_roi: true
+  track_drawdown: true
+  in_sim_equity: true
+  verbose_logs: false
+
+spreads:
+  enabled: true
+  default_pips: 0.5
+  per_pair: {}
+  mode: "fixed"
+  atr_mult: 0.0
+
+risk:
+  starting_balance: 10000.0
+  risk_per_trade: 0.005
+
+cache:
+  enabled: true
+  dir: "cache"
+  format: "parquet"
+
+validation:
+  enabled: true
+  fail_fast: true
+  strict_contract: false
+
+output:
+  results_dir: "results/phaseB1/c1_archetypes"
+
+outputs:
+  dir: "results/phaseB1/c1_archetypes"
+
+date_range:
+  start: "2019-01-01"
+  end: "2026-01-01"
+
+phaseB:
+  run_name: "phaseB1_c1_archetypes"
+  mode: "c1"
+  c1_whitelist:
+    - "c1_regime_sm__binary"
+    - "c1_regime_sm__neutral_gate"
+    - "c1_vol_dir__binary"
+    - "c1_vol_dir__neutral_gate"
+    - "c1_persist_momo__binary"
+    - "c1_persist_momo__neutral_gate"

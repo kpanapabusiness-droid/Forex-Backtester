@@ -33,7 +33,7 @@ jobs:
         continue-on-error: true
         with:
           python-version: '3.12'
-          cache: 'pip'
+          # Omit cache: 'pip' so CI does not require requirements.txt/pyproject.toml
 
       - name: Install
         id: install

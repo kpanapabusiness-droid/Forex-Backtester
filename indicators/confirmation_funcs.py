@@ -34,6 +34,25 @@ def _ema_series(series: pd.Series, span: int) -> pd.Series:
 
 
 # ---------------------------------------------------------------------------
+# Canonical legacy C1s that remain active
+# ---------------------------------------------------------------------------
+
+
+def c1_coral(df: pd.DataFrame, period: int = 21, signal_col: str = "c1_signal", **kwargs) -> pd.DataFrame:
+    """
+    Coral trend confirmation indicator.
+
+    Original behavior preserved from the pre-Phase-B legacy implementation.
+    """
+    ema1 = df["close"].ewm(span=period, adjust=False).mean()
+    ema2 = ema1.ewm(span=period, adjust=False).mean()
+    df[signal_col] = 0
+    df.loc[df["close"] > ema2, signal_col] = 1
+    df.loc[df["close"] < ema2, signal_col] = -1
+    return df
+
+
+# ---------------------------------------------------------------------------
 # Archetype 1: Regime State Machine (hysteresis)
 # ---------------------------------------------------------------------------
 

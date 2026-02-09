@@ -6,6 +6,10 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
+from indicators.legacy_rejected import (  # type: ignore[attr-defined]
+    confirmation_funcs as _legacy_cf,
+)
+
 
 def _atr_series(df: pd.DataFrame, period: int = 14) -> pd.Series:
     """Causal ATR: rolling mean of True Range. period >= 1."""
@@ -287,3 +291,20 @@ def c1_persist_momo__neutral_gate(
             confirmed[i] = 0
     df[signal_col] = pd.Series(confirmed.astype(int), index=df.index)
     return df
+
+
+# ---------------------------------------------------------------------------
+# Legacy confirmation pool re-exports
+# ---------------------------------------------------------------------------
+# To keep all existing C1s (e.g. c1_supertrend) and helpers (e.g. supertrend) available under
+# indicators.confirmation_funcs, we mirror everything public from legacy_rejected.confirmation_funcs
+# that is not already defined above.
+
+if _legacy_cf is not None:  # pragma: no cover - behaviour validated by tests that import these
+    for _name in dir(_legacy_cf):
+        if _name.startswith("_"):
+            continue
+        if _name in globals():
+            continue
+        globals()[_name] = getattr(_legacy_cf, _name)
+

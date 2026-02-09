@@ -6,9 +6,7 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
-from indicators.legacy_rejected import (  # type: ignore[attr-defined]
-    confirmation_funcs as _legacy_cf,
-)
+from core.utils import calculate_atr
 
 
 def _atr_series(df: pd.DataFrame, period: int = 14) -> pd.Series:
@@ -294,17 +292,91 @@ def c1_persist_momo__neutral_gate(
 
 
 # ---------------------------------------------------------------------------
-# Legacy confirmation pool re-exports
+# Supertrend (canonical C1, independent of legacy_rejected)
 # ---------------------------------------------------------------------------
-# To keep all existing C1s (e.g. c1_supertrend) and helpers (e.g. supertrend) available under
-# indicators.confirmation_funcs, we mirror everything public from legacy_rejected.confirmation_funcs
-# that is not already defined above.
 
-if _legacy_cf is not None:  # pragma: no cover - behaviour validated by tests that import these
-    for _name in dir(_legacy_cf):
-        if _name.startswith("_"):
-            continue
-        if _name in globals():
-            continue
-        globals()[_name] = getattr(_legacy_cf, _name)
+
+def c1_supertrend(
+    df: pd.DataFrame,
+    atr_period: int = 10,
+    multiplier: float = 3.0,
+    signal_col: str = "c1_signal",
+    **kwargs,
+) -> pd.DataFrame:
+    """
+    Proper Supertrend indicator implementation.
+
+    Writes df["atr"] and df[signal_col] in {-1, +1}.
+    """
+    if "close" not in df.columns or "high" not in df.columns or "low" not in df.columns:
+        raise ValueError("Expected 'high', 'low', 'close' columns in df")
+
+    # Ensure we have ATR
+    if "atr" not in df.columns:
+        df = calculate_atr(df.copy(), period=atr_period)
+
+    # Calculate basic upper and lower bands
+    hl2 = (df["high"] + df["low"]) / 2.0
+    basic_upper = hl2 + multiplier * df["atr"]
+    basic_lower = hl2 - multiplier * df["atr"]
+
+    # Initialize final bands and trend
+    final_upper = basic_upper.copy()
+    final_lower = basic_lower.copy()
+    trend = pd.Series(1, index=df.index, dtype=int)  # Start bullish
+
+    # Calculate final bands with carry-forward rules
+    for i in range(1, len(df)):
+        # Upper band: use basic upper unless it's higher than previous and close was above previous upper
+        if (
+            basic_upper.iloc[i] < final_upper.iloc[i - 1]
+            or df["close"].iloc[i - 1] > final_upper.iloc[i - 1]
+        ):
+            final_upper.iloc[i] = basic_upper.iloc[i]
+        else:
+            final_upper.iloc[i] = final_upper.iloc[i - 1]
+
+        # Lower band: use basic lower unless it's lower than previous and close was below previous lower
+        if (
+            basic_lower.iloc[i] > final_lower.iloc[i - 1]
+            or df["close"].iloc[i - 1] < final_lower.iloc[i - 1]
+        ):
+            final_lower.iloc[i] = basic_lower.iloc[i]
+        else:
+            final_lower.iloc[i] = final_lower.iloc[i - 1]
+
+    # Determine trend direction
+    for i in range(1, len(df)):
+        if df["close"].iloc[i] <= final_lower.iloc[i]:
+            trend.iloc[i] = -1  # Bearish
+        elif df["close"].iloc[i] >= final_upper.iloc[i]:
+            trend.iloc[i] = 1  # Bullish
+        else:
+            trend.iloc[i] = trend.iloc[i - 1]  # Continue previous trend
+
+    # Set signal column - Supertrend follows the trend
+    df[signal_col] = trend
+
+    # Ensure we have the atr column for output
+    if "atr" not in df.columns:
+        df["atr"] = calculate_atr(df.copy(), period=atr_period)["atr"]
+
+    return df
+
+
+def supertrend(
+    df: pd.DataFrame,
+    atr_period: int = 10,
+    multiplier: float = 3.0,
+    signal_col: str = "c1_signal",
+    **kwargs,
+) -> pd.DataFrame:
+    """Alias for c1_supertrend to support short name resolution."""
+    return c1_supertrend(
+        df,
+        atr_period=atr_period,
+        multiplier=multiplier,
+        signal_col=signal_col,
+        **kwargs,
+    )
 

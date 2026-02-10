@@ -6,7 +6,7 @@ import pytest
 import yaml
 
 
-def test_phaseC1_base_yaml_loads_and_schema_valid():
+def test_phaseC1_base_yaml_loads_and_schema_valid(tmp_path: Path):
     """phaseC1_base.yaml loads and is schema-valid; outputs.dir under results/phaseC1."""
     from validators_config import validate_config
 
@@ -14,6 +14,11 @@ def test_phaseC1_base_yaml_loads_and_schema_valid():
     if not base_path.exists():
         pytest.skip("configs/phaseC1/phaseC1_base.yaml not present")
     raw = yaml.safe_load(base_path.read_text(encoding="utf-8")) or {}
+
+    data_dir = tmp_path / "daily"
+    data_dir.mkdir(parents=True, exist_ok=True)
+    raw["data_dir"] = str(data_dir)
+
     validated = validate_config(raw)
     assert validated.get("indicators", {}).get("c1")
     assert str(validated.get("outputs", {}).get("dir", "")).startswith("results/phaseC1")

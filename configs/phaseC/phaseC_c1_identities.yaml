@@ -1,0 +1,9 @@
+# Phase C — Authoritative list of 6 approved C1 identities (Phase B.1 output).
+# Runner reads results/phaseB1/approved_pool.json first; if missing, uses this list.
+c1_identities:
+  - c1_persist_momo__binary
+  - c1_persist_momo__neutral_gate
+  - c1_regime_sm__binary
+  - c1_regime_sm__neutral_gate
+  - c1_vol_dir__binary
+  - c1_vol_dir__neutral_gate

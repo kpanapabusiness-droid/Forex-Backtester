@@ -1,8 +1,7 @@
-# Phase B.1 — C1 archetypes 1–3 only (6 indicators). Same runner/metrics as Phase B; explicit c1_whitelist.
-# Excludes legacy/fixture C1s (c1_coral, supertrend, etc.). Outputs under results/phaseB1/.
-# Run: python scripts/phaseB_run_diagnostics.py --config configs/phaseB1/phaseB1_c1_archetypes.yaml
-# Then: python -m analytics.phaseB_quality_gate --input results/phaseB1/c1_archetypes --output results/phaseB1
 strategy_version: "forex_backtester_v1.9.7"
+
+# Phase C.1 — C1 parameter sensitivity base config.
+# System: C1-only entry, fixed SL, exit on C1 full flip. No volume, baseline, C2, exit indicator.
 
 pairs:
   - "EUR_USD"
@@ -36,12 +35,16 @@ pairs:
 
 timeframe: "D"
 
+data_dir: "data/daily"
+
 indicators:
-  c1: "c1_regime_sm__binary"
+  c1: "c1_placeholder"
   use_c2: false
   use_baseline: false
   use_volume: false
   use_exit: false
+
+indicator_params: {}
 
 rules:
   one_candle_rule: false
@@ -91,22 +94,12 @@ validation:
   strict_contract: false
 
 output:
-  results_dir: "results/phaseB1/c1_archetypes"
+  results_dir: "results/phaseC1"
 
 outputs:
-  dir: "results/phaseB1/c1_archetypes"
+  dir: "results/phaseC1"
 
 date_range:
   start: "2019-01-01"
   end: "2026-01-01"
 
-phaseB:
-  run_name: "phaseB1_c1_archetypes"
-  mode: "c1"
-  c1_whitelist:
-    - "c1_regime_sm__binary"
-    - "c1_regime_sm__neutral_gate"
-    - "c1_vol_dir__binary"
-    - "c1_vol_dir__neutral_gate"
-    - "c1_persist_momo__binary"
-    - "c1_persist_momo__neutral_gate"

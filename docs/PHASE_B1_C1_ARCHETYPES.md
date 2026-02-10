@@ -119,7 +119,12 @@ Zero **blocks entry** (no new trade in that direction) and **never forces an exi
   ```bash
   python scripts/phaseB_run_diagnostics.py --config configs/phaseB1/phaseB1_c1_archetypes.yaml
   ```
+- **Run quality gate** (after diagnostics; writes `results/phaseB1/quality_gate.csv`, `approved_pool.json`):
+  ```bash
+  python -m analytics.phaseB_quality_gate --input results/phaseB1/c1_archetypes --output results/phaseB1
+  ```
 - The config uses `phaseB.c1_whitelist` so only these 6 C1s are run; output is under `results/phaseB1/c1_archetypes/`.
+- Fixtures (e.g. c1_coral, supertrend) remain in the codebase and still import/resolve but are **excluded** from Phase B.1; approval is determined only from Phase B.1 quality gate outputs (`results/phaseB1/quality_gate.csv`, `approved_pool.json`).
 
 ## Tests
 

@@ -1,0 +1,29 @@
+# Phase C.1 — WFO v2 shell for C1 parameter variants.
+# base_config and output_root overridden per variant by Phase C.1 runner.
+
+base_config: "phaseC1_base.yaml"
+
+folds:
+  - train_start: "2019-01-01"
+    train_end: "2020-12-31"
+    test_start: "2021-01-01"
+    test_end: "2021-12-31"
+  - train_start: "2019-01-01"
+    train_end: "2021-12-31"
+    test_start: "2022-01-01"
+    test_end: "2022-12-31"
+  - train_start: "2019-01-01"
+    train_end: "2022-12-31"
+    test_start: "2023-01-01"
+    test_end: "2023-12-31"
+  - train_start: "2019-01-01"
+    train_end: "2023-12-31"
+    test_start: "2024-01-01"
+    test_end: "2025-12-31"
+
+engine:
+  cache_on: false
+  spreads_on: true
+
+output_root: "results/phaseC1/wfo_runs"
+

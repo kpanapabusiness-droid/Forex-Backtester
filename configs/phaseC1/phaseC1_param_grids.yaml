@@ -1,0 +1,251 @@
+# Phase C.1 — Bounded C1 sensitivity grids.
+# Each variant id is treated as a distinct C1 identity label for diagnostics and WFO,
+# but all variants map to the existing Phase B.1 archetype implementations.
+
+c1_param_grids:
+  c1_regime_sm__binary:
+    variants:
+      - id: "c1_regime_sm__binary__v01"
+        params:
+          fast: 15
+          slow: 40
+          strength_upper: 0.25
+          strength_lower: 0.08
+          atr_period: 14
+      - id: "c1_regime_sm__binary__v02"
+        params:
+          fast: 15
+          slow: 40
+          strength_upper: 0.22
+          strength_lower: 0.07
+          atr_period: 14
+      - id: "c1_regime_sm__binary__v03"
+        params:
+          fast: 15
+          slow: 50
+          strength_upper: 0.25
+          strength_lower: 0.08
+          atr_period: 14
+      - id: "c1_regime_sm__binary__v04"
+        params:
+          fast: 20
+          slow: 40
+          strength_upper: 0.25
+          strength_lower: 0.08
+          atr_period: 14
+      - id: "c1_regime_sm__binary__v05"
+        params:
+          fast: 20
+          slow: 50
+          strength_upper: 0.25
+          strength_lower: 0.08
+          atr_period: 14
+      - id: "c1_regime_sm__binary__v06"
+        params:
+          fast: 20
+          slow: 50
+          strength_upper: 0.22
+          strength_lower: 0.07
+          atr_period: 14
+
+  c1_regime_sm__neutral_gate:
+    variants:
+      - id: "c1_regime_sm__neutral_gate__v01"
+        params:
+          fast: 15
+          slow: 40
+          strength_upper: 0.25
+          strength_lower: 0.08
+          atr_period: 14
+      - id: "c1_regime_sm__neutral_gate__v02"
+        params:
+          fast: 15
+          slow: 40
+          strength_upper: 0.22
+          strength_lower: 0.07
+          atr_period: 14
+      - id: "c1_regime_sm__neutral_gate__v03"
+        params:
+          fast: 15
+          slow: 50
+          strength_upper: 0.25
+          strength_lower: 0.08
+          atr_period: 14
+      - id: "c1_regime_sm__neutral_gate__v04"
+        params:
+          fast: 20
+          slow: 40
+          strength_upper: 0.25
+          strength_lower: 0.08
+          atr_period: 14
+      - id: "c1_regime_sm__neutral_gate__v05"
+        params:
+          fast: 20
+          slow: 50
+          strength_upper: 0.25
+          strength_lower: 0.08
+          atr_period: 14
+      - id: "c1_regime_sm__neutral_gate__v06"
+        params:
+          fast: 20
+          slow: 50
+          strength_upper: 0.22
+          strength_lower: 0.07
+          atr_period: 14
+
+  c1_vol_dir__binary:
+    variants:
+      - id: "c1_vol_dir__binary__v01"
+        params:
+          fast: 15
+          slow: 40
+          vol_ema: 30
+          vol_mult: 1.02
+          atr_period: 14
+      - id: "c1_vol_dir__binary__v02"
+        params:
+          fast: 15
+          slow: 40
+          vol_ema: 40
+          vol_mult: 1.02
+          atr_period: 14
+      - id: "c1_vol_dir__binary__v03"
+        params:
+          fast: 15
+          slow: 50
+          vol_ema: 30
+          vol_mult: 1.05
+          atr_period: 14
+      - id: "c1_vol_dir__binary__v04"
+        params:
+          fast: 20
+          slow: 50
+          vol_ema: 30
+          vol_mult: 1.02
+          atr_period: 14
+      - id: "c1_vol_dir__binary__v05"
+        params:
+          fast: 20
+          slow: 50
+          vol_ema: 40
+          vol_mult: 1.05
+          atr_period: 14
+      - id: "c1_vol_dir__binary__v06"
+        params:
+          fast: 20
+          slow: 50
+          vol_ema: 50
+          vol_mult: 1.02
+          atr_period: 14
+
+  c1_vol_dir__neutral_gate:
+    variants:
+      - id: "c1_vol_dir__neutral_gate__v01"
+        params:
+          fast: 15
+          slow: 40
+          vol_ema: 30
+          vol_mult: 1.02
+          atr_period: 14
+      - id: "c1_vol_dir__neutral_gate__v02"
+        params:
+          fast: 15
+          slow: 40
+          vol_ema: 40
+          vol_mult: 1.02
+          atr_period: 14
+      - id: "c1_vol_dir__neutral_gate__v03"
+        params:
+          fast: 15
+          slow: 50
+          vol_ema: 30
+          vol_mult: 1.05
+          atr_period: 14
+      - id: "c1_vol_dir__neutral_gate__v04"
+        params:
+          fast: 20
+          slow: 50
+          vol_ema: 30
+          vol_mult: 1.02
+          atr_period: 14
+      - id: "c1_vol_dir__neutral_gate__v05"
+        params:
+          fast: 20
+          slow: 50
+          vol_ema: 40
+          vol_mult: 1.05
+          atr_period: 14
+      - id: "c1_vol_dir__neutral_gate__v06"
+        params:
+          fast: 20
+          slow: 50
+          vol_ema: 50
+          vol_mult: 1.02
+          atr_period: 14
+
+  c1_persist_momo__binary:
+    variants:
+      - id: "c1_persist_momo__binary__v01"
+        params:
+          fast: 15
+          slow: 40
+          confirm_bars: 2
+      - id: "c1_persist_momo__binary__v02"
+        params:
+          fast: 15
+          slow: 40
+          confirm_bars: 1
+      - id: "c1_persist_momo__binary__v03"
+        params:
+          fast: 15
+          slow: 50
+          confirm_bars: 2
+      - id: "c1_persist_momo__binary__v04"
+        params:
+          fast: 20
+          slow: 40
+          confirm_bars: 2
+      - id: "c1_persist_momo__binary__v05"
+        params:
+          fast: 20
+          slow: 50
+          confirm_bars: 2
+      - id: "c1_persist_momo__binary__v06"
+        params:
+          fast: 20
+          slow: 50
+          confirm_bars: 1
+
+  c1_persist_momo__neutral_gate:
+    variants:
+      - id: "c1_persist_momo__neutral_gate__v01"
+        params:
+          fast: 15
+          slow: 40
+          confirm_bars: 2
+      - id: "c1_persist_momo__neutral_gate__v02"
+        params:
+          fast: 15
+          slow: 40
+          confirm_bars: 1
+      - id: "c1_persist_momo__neutral_gate__v03"
+        params:
+          fast: 15
+          slow: 50
+          confirm_bars: 2
+      - id: "c1_persist_momo__neutral_gate__v04"
+        params:
+          fast: 20
+          slow: 40
+          confirm_bars: 2
+      - id: "c1_persist_momo__neutral_gate__v05"
+        params:
+          fast: 20
+          slow: 50
+          confirm_bars: 2
+      - id: "c1_persist_momo__neutral_gate__v06"
+        params:
+          fast: 20
+          slow: 50
+          confirm_bars: 1
+

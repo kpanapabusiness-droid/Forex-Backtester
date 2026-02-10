@@ -1,0 +1,32 @@
+# Phase C — WFO v2 shell. base_config and output_root overridden per identity by runner.
+# No sweep; identity-only. Folds: canonical 4 (train expanding, test 1y each).
+# Fold 1: train 2019-01-01..2020-12-31, test 2021-01-01..2021-12-31
+# Fold 2: train 2019-01-01..2021-12-31, test 2022-01-01..2022-12-31
+# Fold 3: train 2019-01-01..2022-12-31, test 2023-01-01..2023-12-31
+# Fold 4: train 2019-01-01..2023-12-31, test 2024-01-01..2025-12-31
+
+base_config: "phaseC_base.yaml"
+
+folds:
+  - train_start: "2019-01-01"
+    train_end: "2020-12-31"
+    test_start: "2021-01-01"
+    test_end: "2021-12-31"
+  - train_start: "2019-01-01"
+    train_end: "2021-12-31"
+    test_start: "2022-01-01"
+    test_end: "2022-12-31"
+  - train_start: "2019-01-01"
+    train_end: "2022-12-31"
+    test_start: "2023-01-01"
+    test_end: "2023-12-31"
+  - train_start: "2019-01-01"
+    train_end: "2023-12-31"
+    test_start: "2024-01-01"
+    test_end: "2025-12-31"
+
+engine:
+  cache_on: false
+  spreads_on: true
+
+output_root: "results/phaseC/wfo_runs"

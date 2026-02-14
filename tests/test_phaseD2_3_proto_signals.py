@@ -10,6 +10,8 @@ import numpy as np
 import pandas as pd
 import pytest
 
+from tests.conftest import PARQUET_SKIP
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -268,6 +270,7 @@ def test_output_two_rows_per_date_per_signal() -> None:
         assert set(grp["direction"]) == {"long", "short"}
 
 
+@PARQUET_SKIP
 def test_proto_signals_script_e2e(tmp_path: Path) -> None:
     """Full script run produces valid parquet and csv."""
     df = _synthetic_features(25, 5)
@@ -498,6 +501,7 @@ def test_new_signals_nan_produce_signal_zero() -> None:
     assert (out_ratio[out_ratio["date"].isin(nan_dates_ratio)]["signal"] == 0).all()
 
 
+@PARQUET_SKIP
 def test_deterministic_ordering_maintained(tmp_path: Path) -> None:
     """Output order is deterministic: pair, date, direction, signal_name."""
     import yaml

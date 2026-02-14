@@ -10,6 +10,8 @@ import numpy as np
 import pandas as pd
 import pytest
 
+from tests.conftest import PARQUET_SKIP
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -76,6 +78,7 @@ def test_rolling_compression_window_correctness() -> None:
     assert not comp_recent_3.iloc[6]
 
 
+@PARQUET_SKIP
 def test_trigger_fires_at_trigger_bar_not_compression_bar() -> None:
     """With compression at t=2, breakout_up at t=5, K=3: signal fires at t=5 (long)."""
     df = _synthetic_sequence_features(
@@ -169,6 +172,7 @@ def test_ignition_threshold_from_discovery_only() -> None:
     assert p90 < 100.0
 
 
+@PARQUET_SKIP
 def test_two_rows_per_date_per_signal(tmp_path: Path) -> None:
     """For N bars and M signals, output has 2*N*M rows (2 directions per date per signal)."""
     import yaml
@@ -206,6 +210,7 @@ def test_two_rows_per_date_per_signal(tmp_path: Path) -> None:
         assert set(grp["direction"]) == {"long", "short"}
 
 
+@PARQUET_SKIP
 def test_deterministic_ordering(tmp_path: Path) -> None:
     """Output sorted by (signal_name, pair, date, direction)."""
     import yaml

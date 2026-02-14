@@ -13,22 +13,9 @@ import numpy as np
 import pandas as pd
 import pytest
 
+from tests.conftest import PARQUET_SKIP
+
 ROOT = Path(__file__).resolve().parents[1]
-
-
-def has_parquet_engine() -> bool:
-    """True if pyarrow or fastparquet available for pandas.read_parquet."""
-    try:
-        import pyarrow  # noqa: F401
-        return True
-    except ImportError:
-        pass
-    try:
-        import fastparquet  # noqa: F401
-        return True
-    except ImportError:
-        pass
-    return False
 
 
 def _synthetic_labels(n: int = 500) -> pd.DataFrame:
@@ -259,10 +246,7 @@ def test_external_signals_csv_loaded_and_joined(tmp_path: Path) -> None:
     assert b_row["fired"] == 0
 
 
-@pytest.mark.skipif(
-    not has_parquet_engine(),
-    reason="Parquet engine (pyarrow/fastparquet) not installed in CI clean env",
-)
+@PARQUET_SKIP
 def test_external_signals_loaded_and_joined(tmp_path: Path) -> None:
     """External signal parquet is loaded, validated, and included in metrics."""
     from analytics.phaseD2_metrics import compute_metrics
@@ -303,10 +287,7 @@ def test_external_signals_loaded_and_joined(tmp_path: Path) -> None:
     assert mom["fired"] > 0
 
 
-@pytest.mark.skipif(
-    not has_parquet_engine(),
-    reason="Parquet engine (pyarrow/fastparquet) not installed in CI clean env",
-)
+@PARQUET_SKIP
 def test_external_multi_signal_file_preserves_signal_names(tmp_path: Path) -> None:
     """External file with multiple signal_names: each appears separately in metrics."""
     from analytics.phaseD2_metrics import compute_metrics

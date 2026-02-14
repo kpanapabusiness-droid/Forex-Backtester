@@ -3,6 +3,25 @@ import pandas as pd
 import pytest
 
 
+def has_parquet_engine() -> bool:
+    try:
+        import pyarrow  # noqa: F401
+        return True
+    except Exception:
+        pass
+    try:
+        import fastparquet  # noqa: F401
+        return True
+    except Exception:
+        return False
+
+
+PARQUET_SKIP = pytest.mark.skipif(
+    not has_parquet_engine(),
+    reason="Parquet engine (pyarrow/fastparquet) not installed in CI clean env",
+)
+
+
 @pytest.fixture
 def dummy_ohlcv():
     n = 120

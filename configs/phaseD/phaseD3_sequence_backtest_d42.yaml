@@ -1,0 +1,100 @@
+phase: "D3_sequence_backtest_d42"
+
+pairs:
+  - "AUD_CAD"
+  - "AUD_CHF"
+  - "AUD_JPY"
+  - "AUD_NZD"
+  - "AUD_USD"
+  - "CAD_JPY"
+  - "CHF_JPY"
+  - "EUR_AUD"
+  - "EUR_CAD"
+  - "EUR_CHF"
+  - "EUR_GBP"
+  - "EUR_JPY"
+  - "EUR_NZD"
+  - "EUR_USD"
+  - "GBP_AUD"
+  - "GBP_CAD"
+  - "GBP_CHF"
+  - "GBP_JPY"
+  - "GBP_NZD"
+  - "GBP_USD"
+  - "NZD_CAD"
+  - "NZD_CHF"
+  - "NZD_JPY"
+  - "NZD_USD"
+  - "USD_CAD"
+  - "USD_CHF"
+  - "USD_JPY"
+  - "USD_SGD"
+
+timeframe: "D"
+data_dir: "data/daily"
+
+date_range:
+  start: "2019-01-01"
+  end: "2026-01-01"
+
+spreads:
+  enabled: true
+  default_pips: 0.5
+  per_pair: {}
+  mode: "fixed"
+  atr_mult: 0.0
+
+entry:
+  sl_atr: 1.5
+  tp1_atr: 1.0
+  trail_after_atr: 2.0
+  ts_atr: 1.5
+
+exit:
+  use_trailing_stop: true
+  move_to_breakeven_after_tp1: true
+  tp1_move_sl_to_be: false
+  exit_on_c1_reversal: false
+  exit_on_baseline_cross: false
+  exit_on_exit_signal: false
+  time_stop_bars: null
+
+risk:
+  starting_balance: 10000.0
+  risk_per_trade_pct: 0.25
+
+external_signals:
+  path: "results/phaseD2/signals/sequence_proto_signals.parquet"
+  signal_name: "seq_comp3_tratr90"
+
+entry_filter:
+  features_path: "results/phaseD2_2/features/features.parquet"
+  require_breakout_confirm: true
+  breakout_up_col: "breakout_up_20"
+  breakout_dn_col: "breakout_dn_20"
+
+outputs:
+  dir: "results/phaseD3"
+  run_slug: "seq_comp3_tratr90_breakout_confirm"
+  write_trades_csv: true
+
+tracking:
+  in_sim_equity: true
+  track_win_loss_scratch: true
+  track_roi: true
+  track_drawdown: true
+  verbose_logs: false
+
+validation:
+  enabled: false
+  fail_fast: false
+  strict_contract: false
+
+cache:
+  enabled: false
+  dir: "cache"
+  format: "parquet"
+
+filters:
+  dbcvix:
+    enabled: false

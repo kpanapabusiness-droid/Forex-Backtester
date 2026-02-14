@@ -128,6 +128,80 @@
       "source_lines": "155"
     },
     {
+      "key": "indicator_params.c1_compression_expansion_breakout",
+      "type": "Dict",
+      "default": {"L_p": 120, "L_bb": 40, "bb_k": 2.0, "M": 12, "N_c": 8, "q_atr": 0.2, "q_rng": 0.2, "q_bw": 0.2, "alpha": 1.2, "L_atr_slow": 120, "beta": 1.15, "gamma": 0.65, "L_brk": 20},
+      "required": false,
+      "module": "c1",
+      "source_file": "indicators/confirmation_funcs.py",
+      "source_lines": "418"
+    },
+    {
+      "key": "indicator_params.c1_compression_escape_state_machine",
+      "type": "Dict",
+      "default": {"L_p": 252, "L_box": 20, "q_atr": 0.40, "q_rng": 0.40, "q_box": 0.35, "W_enter": 10, "N_enter": 6, "W_exit": 10, "N_exit": 7, "K_max": 30, "alpha": 0.9, "beta": 1.10, "L_slow": 50, "gamma": 0.55, "cooldown_bars": 15},
+      "bounds": {"L_p": [60, 400], "L_box": [10, 60], "q_atr": [0.2, 0.6], "q_rng": [0.2, 0.6], "q_box": [0.2, 0.6], "alpha": [0.7, 1.2], "beta": [1.0, 1.3], "gamma": [0.4, 0.8], "cooldown_bars": [5, 30]},
+      "required": false,
+      "module": "c1",
+      "source_file": "indicators/confirmation_funcs.py",
+      "source_lines": "422"
+    },
+    {
+      "key": "indicator_params.c1_compression_escape_ratio_state_machine",
+      "type": "Dict",
+      "default": {"L_slow": 50, "r_atr": 0.85, "r_rng": 0.85, "r_box": 1.10, "M_enter": 4, "M_exit": 3, "K_max": 40, "cooldown_bars": 10},
+      "bounds": {"r_atr": [0.70, 0.95], "r_rng": [0.70, 0.95], "r_box": [0.90, 1.40], "M_enter": [2, 8], "M_exit": [1, 6], "K_max": [20, 80], "cooldown_bars": [0, 30]},
+      "required": false,
+      "module": "c1",
+      "source_file": "indicators/confirmation_funcs.py",
+      "source_lines": "406"
+    },
+    {
+      "key": "indicator_params.c1_volatility_regime_impulse",
+      "type": "Dict",
+      "default": {"L_rv": 20, "L_slow": 120, "L_f": 10, "L_s": 80, "theta_rv": 1.25, "theta_atr": 1.15, "K": 20, "b_min": 0.5, "gamma": 0.7, "L_dc": 20},
+      "required": false,
+      "module": "c1",
+      "source_file": "indicators/confirmation_funcs.py",
+      "source_lines": "506"
+    },
+    {
+      "key": "indicator_params.c1_liquidity_sweep_rejection",
+      "type": "Dict",
+      "default": {"L_sw": 20, "gamma": 0.65, "alpha": 1.1, "use_expansion_filter": true, "use_compression_filter": false, "L_p": 120, "q_atr": 0.25, "q_rng": 0.25},
+      "required": false,
+      "module": "c1",
+      "source_file": "indicators/confirmation_funcs.py",
+      "source_lines": "585"
+    },
+    {
+      "key": "indicator_params.c1_lsr_v2",
+      "type": "Dict",
+      "default": {"variant": "A_pin", "lookback_n": 20, "sweep_atr": 0.2, "wick_min_frac": 0.65, "body_max_frac": 0.35, "close_pos_min": 0.75, "reclaim_frac": 0.1, "cooldown_bars": 5, "confirm_mode": "break_high", "no_resweep": 1, "cluster_k": 2, "vol_expand_atr": 1.2, "range_cap_atr": 3.0, "min_range_atr": 0.0},
+      "required": false,
+      "module": "c1",
+      "source_file": "indicators/confirmation_funcs.py",
+      "source_lines": "809"
+    },
+    {
+      "key": "indicator_params.c1_pressure_overlap_decay",
+      "type": "Dict",
+      "default": {"L_o": 10, "o_min": 0.6, "L_p": 120, "q_rng": 0.25, "L_e": 5, "eta": 0.65, "o_drop": 0.2, "alpha": 1.1},
+      "required": false,
+      "module": "c1",
+      "source_file": "indicators/confirmation_funcs.py",
+      "source_lines": "660"
+    },
+    {
+      "key": "indicator_params.c1_channel_escape_gradient",
+      "type": "Dict",
+      "default": {"L_va": 60, "q": 0.8, "L_p": 120, "q_va": 0.25, "g1": 3, "g2": 10, "gamma": 0.65},
+      "required": false,
+      "module": "c1",
+      "source_file": "indicators/confirmation_funcs.py",
+      "source_lines": "722"
+    },
+    {
       "key": "rules.one_candle_rule",
       "type": "bool",
       "default": false,

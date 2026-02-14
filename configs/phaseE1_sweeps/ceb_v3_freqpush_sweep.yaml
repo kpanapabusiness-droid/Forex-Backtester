@@ -1,0 +1,27 @@
+# Phase E-1.6: CEB v3 frequency-push corridor sweep.
+# Purpose: Relax compression thresholds (r_atr, r_rng) and box ratio to increase
+# signal frequency. Target: annual_signals_per_pair 24-120, clustering_ratio <= 0.20.
+
+base_config: "../phaseE1/ceb.yaml"
+
+indicators:
+  c1: "c1_compression_escape_ratio_state_machine"
+  c1_params_grid:
+    L_slow: [40, 60]
+    r_atr: [0.95, 1.00, 1.05]
+    r_rng: [0.95, 1.00, 1.05]
+    r_box: [1.35, 1.60]
+    M_enter: [1, 2]
+    M_exit: [3]  # fixed
+    K_max: [80, 120]
+    cooldown_bars: [0]  # fixed
+
+geometry:
+  horizon: 40
+
+evaluation:
+  primary_objective: "3R_before_2R"
+
+date_range:
+  start: "2019-01-01"
+  end: "2026-01-01"

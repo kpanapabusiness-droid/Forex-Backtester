@@ -1,0 +1,22 @@
+# Phase E-1.4: CEB corridor sweep — compression/expansion breakout params
+base_config: "../phaseE1/ceb.yaml"
+
+indicators:
+  c1: "c1_compression_expansion_breakout"
+  c1_params_grid:
+    q_atr: [0.25, 0.30, 0.35]
+    q_rng: [0.25, 0.30, 0.35]
+    q_bw: [0.25, 0.30, 0.35]
+    alpha: [0.9, 1.0, 1.1]
+    beta: [1.05, 1.10, 1.15]
+    gamma: [0.60, 0.65, 0.70]
+
+geometry:
+  horizon: 40
+
+evaluation:
+  primary_objective: "3R_before_2R"
+
+date_range:
+  start: "2019-01-01"
+  end: "2026-01-01"

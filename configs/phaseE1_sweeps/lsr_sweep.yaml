@@ -1,0 +1,20 @@
+# Phase E-1.4: LSR corridor sweep — liquidity sweep rejection params
+base_config: "../phaseE1/lsr.yaml"
+
+indicators:
+  c1: "c1_liquidity_sweep_rejection"
+  c1_params_grid:
+    L_sw: [10, 20, 40]
+    gamma: [0.55, 0.65, 0.75]
+    alpha: [0.9, 1.0, 1.1]
+    use_compression_filter: [false, true]
+
+geometry:
+  horizon: 40
+
+evaluation:
+  primary_objective: "3R_before_2R"
+
+date_range:
+  start: "2019-01-01"
+  end: "2026-01-01"

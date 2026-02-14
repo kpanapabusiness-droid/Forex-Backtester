@@ -1,0 +1,32 @@
+phase: "D2_3_proto_signals"
+
+features_path: "results/phaseD2_2/features/features.parquet"
+
+outputs_dir: "results/phaseD2/signals"
+
+split:
+  discovery_end: "2022-12-31"
+
+bins:
+  n_bins: 10
+  min_per_bin: 200
+
+signals:
+  - name: proto_comp_atrp_low
+    rule: compression_atrp_low
+  - name: proto_ignite_tr_high
+    rule: ignition_tr_high
+  - name: proto_comp_low_atrp_breakout_up
+    rule: compression_atrp_low_breakout_up
+  - name: proto_comp_low_atrp_breakout_dn
+    rule: compression_atrp_low_breakout_dn
+  - name: proto_comp_low_atrp_ignite_high_tr
+    rule: compression_atrp_low_ignition_tr_high
+  - name: proto_comp_atrp_low_pos_pressure_up
+    rule: compression_atrp_low_pos_pressure_up
+  - name: proto_comp_atrp_low_tr_mid_high
+    rule: compression_atrp_low_tr_mid_high
+  - name: proto_comp_atrp_low_tr_atr_ratio_high
+    rule: compression_atrp_low_tr_atr_ratio_high
+  - name: proto_comp_atrp_low_slope_alignment
+    rule: compression_atrp_low_slope_alignment

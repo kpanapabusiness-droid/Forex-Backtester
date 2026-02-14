@@ -1,7 +1,7 @@
-# Phase E-1.3: CEB (Compression Expansion Breakout) archetype evaluation.
-# Inherits from phaseE1_base; system.c1 = c1_compression_expansion_breakout.
+# Phase E-1.7: LSR v2 D-6G evaluation. Cloned from CEB v3 protocol.
+# Same dates/pairs/splits/labels as CEB v3; only C1 and outputs differ.
 
-base_config: "phaseE1_base.yaml"
+base_config: "../phaseE1/phaseE1_base.yaml"
 
 strategy_version: "forex_backtester_v1.9.7"
 
@@ -48,7 +48,20 @@ spreads:
   atr_mult: 0.0
 
 indicators:
-  c1: "c1_compression_escape_ratio_state_machine"
+  c1: "c1_lsr_v2"
+  c1_params:
+    variant: "B_confirm"
+    lookback_n: 20
+    sweep_atr: 0.2
+    wick_min_frac: 0.65
+    body_max_frac: 0.35
+    close_pos_min: 0.75
+    reclaim_frac: 0.1
+    cooldown_bars: 5
+    confirm_mode: "break_high"
+    no_resweep: 1
+    range_cap_atr: 3.0
+    min_range_atr: 0.0
   use_c2: false
   use_baseline: false
   use_volume: false
@@ -99,10 +112,10 @@ validation:
   strict_contract: false
 
 output:
-  results_dir: "results/phaseE1/ceb"
+  results_dir: "results/phaseE/lsr_v2/d6g"
 
 outputs:
-  dir: "results/phaseE1/ceb"
+  dir: "results/phaseE/lsr_v2/d6g"
 
 geometry:
   horizon: 40

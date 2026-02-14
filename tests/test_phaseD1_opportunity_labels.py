@@ -312,12 +312,11 @@ def test_phaseD1_deterministic_outputs_for_same_inputs(tmp_path: Path) -> None:
     out2_sorted.to_csv(csv2, index=False, float_format="%.8f")
     assert csv1.read_bytes() == csv2.read_bytes()
 
-    try:
+    from tests.conftest import has_parquet_engine
+    if has_parquet_engine():
         out1_sorted.to_parquet(pq1, index=False)
         out2_sorted.to_parquet(pq2, index=False)
         assert pq1.read_bytes() == pq2.read_bytes()
-    except ImportError:
-        pytest.skip("pyarrow/fastparquet not installed; skipping parquet determinism check.")
 
     # Label version column must be present and consistent
     assert (out1["label_version"] == LABEL_VERSION).all()

@@ -16,6 +16,21 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def has_parquet_engine() -> bool:
+    """True if pyarrow or fastparquet available for pandas.read_parquet."""
+    try:
+        import pyarrow  # noqa: F401
+        return True
+    except ImportError:
+        pass
+    try:
+        import fastparquet  # noqa: F401
+        return True
+    except ImportError:
+        pass
+    return False
+
+
 def _synthetic_labels(n: int = 500) -> pd.DataFrame:
     """Minimal labels with required columns for D-2."""
     np.random.seed(42)
@@ -200,6 +215,54 @@ def test_metrics_missing_columns_raises() -> None:
         compute_metrics(df)
 
 
+def test_external_signals_csv_loaded_and_joined(tmp_path: Path) -> None:
+    """External signal CSV is loaded, joined, and multiple signal_names preserved."""
+    from analytics.phaseD2_metrics import compute_metrics
+    from scripts.phaseD2_run_lift_harness import (
+        build_control_signals,
+        join_signals_to_labels,
+    )
+
+    labels = _synthetic_labels(200)
+    ext_path = tmp_path / "ext_signals.csv"
+    rows = []
+    for _, row in labels.iterrows():
+        for sig_name in ["proto_a", "proto_b"]:
+            rows.append({
+                "pair": row["pair"],
+                "date": row["date"],
+                "direction": row["direction"],
+                "signal": 1 if sig_name == "proto_a" else 0,
+                "signal_name": sig_name,
+            })
+    ext_df = pd.DataFrame(rows)
+    ext_df.to_csv(ext_path, index=False)
+
+    cfg = {
+        "always_fire": False,
+        "random_fire_enabled": False,
+        "oracle_zones": [],
+        "external_signals": [{"path": str(ext_path)}],
+    }
+    signals = build_control_signals(labels, cfg)
+    joined = join_signals_to_labels(labels, signals, discovery_end="2022-12-31")
+
+    sig_names = set(joined["signal_name"].unique())
+    assert "proto_a" in sig_names
+    assert "proto_b" in sig_names
+
+    metrics = compute_metrics(joined)
+    global_df = metrics["metrics_global"]
+    a_row = global_df[global_df["signal_name"] == "proto_a"].iloc[0]
+    b_row = global_df[global_df["signal_name"] == "proto_b"].iloc[0]
+    assert a_row["fired"] == len(labels)
+    assert b_row["fired"] == 0
+
+
+@pytest.mark.skipif(
+    not has_parquet_engine(),
+    reason="Parquet engine (pyarrow/fastparquet) not installed in CI clean env",
+)
 def test_external_signals_loaded_and_joined(tmp_path: Path) -> None:
     """External signal parquet is loaded, validated, and included in metrics."""
     from analytics.phaseD2_metrics import compute_metrics
@@ -240,6 +303,10 @@ def test_external_signals_loaded_and_joined(tmp_path: Path) -> None:
     assert mom["fired"] > 0
 
 
+@pytest.mark.skipif(
+    not has_parquet_engine(),
+    reason="Parquet engine (pyarrow/fastparquet) not installed in CI clean env",
+)
 def test_external_multi_signal_file_preserves_signal_names(tmp_path: Path) -> None:
     """External file with multiple signal_names: each appears separately in metrics."""
     from analytics.phaseD2_metrics import compute_metrics

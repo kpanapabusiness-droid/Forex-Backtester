@@ -168,11 +168,14 @@ def _to_bool_int(ser: pd.Series) -> pd.Series:
 
 
 def _load_external_signal(path: str | Path, name_override: str | None = None) -> pd.DataFrame:
-    """Load external signal parquet. Validate schema. Override signal_name if config provides."""
+    """Load external signal CSV or parquet. Validate schema. Override signal_name if config provides."""
     p = Path(path)
     if not p.exists():
         raise FileNotFoundError(f"External signal file not found: {p}")
-    df = pd.read_parquet(p)
+    if p.suffix.lower() == ".csv":
+        df = pd.read_csv(p)
+    else:
+        df = pd.read_parquet(p)
     df["date"] = pd.to_datetime(df["date"])
     missing = REQUIRED_SIGNAL_COLS - set(df.columns)
     if missing:

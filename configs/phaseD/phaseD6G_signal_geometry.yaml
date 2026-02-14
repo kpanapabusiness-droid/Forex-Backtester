@@ -1,0 +1,26 @@
+phase: "D6G_signal_geometry"
+
+primary_objective: "3R_before_2R"
+
+signal_sources:
+  modules:
+    - "indicators.confirmation_funcs"
+  csv_dirs:
+    - "results/phaseD"
+    - "results/phaseD2"
+
+signals: "ALL"
+
+# max_signals: 10
+
+split_date: "2023-01-01"
+
+thresholds_y: [1, 2, 3, 4]
+mae_x: [1, 2, 3]
+
+date_range:
+  start: "2019-01-01"
+  end: "2026-01-01"
+
+data:
+  dir: "data/daily"

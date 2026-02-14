@@ -1,0 +1,27 @@
+phase: "D2_5_sequence_proto_signals"
+
+features_path: "results/phaseD2_2/features/features.parquet"
+
+outputs_dir: "results/phaseD2/signals"
+
+split:
+  discovery_end: "2022-12-31"
+
+bins:
+  n_bins: 10
+  min_per_bin: 200
+
+compression:
+  feature: atrp_14
+  bin: 0
+
+sequence:
+  K_list: [3, 5, 10]
+
+ignition:
+  tr_atr_ratio_percentile: 0.90
+
+pressure:
+  thresholds:
+    up: 0.90
+    dn: 0.10

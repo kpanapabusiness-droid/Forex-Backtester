@@ -79,32 +79,8 @@ def volume_normalized(*args, **kwargs):
     return volume_volatility_ratio(*args, **kwargs)
 
 
-def volume_trend_direction_force(
-    df: pd.DataFrame,
-    *,
-    trend_period: int = 20,
-    trigger_up: float = 0.05,
-    trigger_down: float = -0.05,
-    smooth_length: int = 5,
-    signal_col: str = "volume_signal",
-    **kwargs,
-) -> pd.DataFrame:
-    """
-    Pass (1) when ADX trend strength is sufficient. Enforces warmup so first N bars are 0.
-    N = trend_period + smooth_length (deterministic from indicator periods).
-    """
-    out = volume_adx(
-        df,
-        length=trend_period,
-        min_adx=20.0,
-        signal_col=signal_col,
-        **kwargs,
-    )
-    warmup = max(int(trend_period) + max(int(smooth_length), 0), 1)
-    sig = np.asarray(out[signal_col], dtype="int8").copy()
-    sig[: min(warmup, len(sig))] = 0
-    out[signal_col] = pd.Series(sig, index=out.index, dtype="int8")
-    return out
+def volume_trend_direction_force(*args, **kwargs):
+    return volume_adx(*args, **kwargs)
 
 def volume_silence(*args, **kwargs):
     signal_col = kwargs.get("signal_col", "volume_signal")
@@ -174,15 +150,7 @@ def volume_waddah_attar_explosion(
     bb_mult: float = 2.0,
     dead_zone: float = 20.0,
     signal_col: str = "volume_signal",
-    sensitive: float | None = None,
-    **kwargs,
 ) -> pd.DataFrame:
-    if "sensitive" in kwargs:
-        if sensitive is not None:
-            raise ValueError("Provide only one of 'sensitivity' or 'sensitive'; they are aliases.")
-        sensitivity = float(kwargs.pop("sensitive"))
-    elif sensitive is not None:
-        sensitivity = float(sensitive)
     out = df.copy()
 
     if out.empty:

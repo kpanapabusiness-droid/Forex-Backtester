@@ -631,6 +631,17 @@ def simulate_pair_trades(
     exit_cfg = cfg.get("exit") or {}
     engine_cfg = cfg.get("engine") or {}
 
+    time_stop_bars = overrides.get("time_stop_bars")
+    if time_stop_bars is None:
+        time_stop_bars = exit_cfg.get("time_stop_bars")
+    time_stop_bars = int(time_stop_bars) if time_stop_bars is not None else 0
+
+    tp1_move_sl_to_be = exit_cfg.get(
+        "tp1_move_sl_to_be",
+        exit_cfg.get("move_to_breakeven_after_tp1", exit_cfg.get("move_to_breakeven_after_atr", True)),
+    )
+    tp1_move_sl_to_be = bool(tp1_move_sl_to_be)
+
     SL_ATR_MULT = float(overrides.get("sl_atr_mult", entry_cfg.get("sl_atr", 1.5)))
     TP1_ATR_MULT = float(overrides.get("tp1_atr_mult", entry_cfg.get("tp1_atr", 1.0)))
     TRAIL_AFTER_ATR = float(overrides.get("trail_after_atr", entry_cfg.get("trail_after_atr", 2.0)))
@@ -773,7 +784,7 @@ def simulate_pair_trades(
             tp1_done = bool(open_tr.get("tp1_hit", False))
             ts_active = bool(open_tr.get("ts_active", False))
             ts_level = open_tr.get("ts_level", None)
-            be_price = entry_px if tp1_done else None
+            be_price = entry_px if (tp1_done and tp1_move_sl_to_be) else None
 
             # (a) trailing activation
             if not ts_active and math.isfinite(atr_entry) and atr_entry > 0:
@@ -800,15 +811,26 @@ def simulate_pair_trades(
             reason = None
             exit_px = None
 
+            # Time stop: exit at next open after N bars in position
+            if time_stop_bars > 0:
+                bars_held = i - int(open_tr["entry_idx"])
+                if bars_held >= time_stop_bars:
+                    reason = "time_stop"
+                    exit_px = next_open_px
+                    closed_this_bar = True
+
             # TP1 vs SL priority when TP1 not yet done
-            if not tp1_done:
+            if not closed_this_bar and not tp1_done:
                 for ev in order:
                     if ev == "tp" and hit_level(d, h_i, l_i, tp1_px, "tp"):
                         tp1_done = True
-                        be_price = entry_px
-                        sl_px = be_price
+                        if tp1_move_sl_to_be:
+                            be_price = entry_px
+                            sl_px = be_price
+                            open_tr["breakeven_after_tp1"] = True
+                        else:
+                            open_tr["breakeven_after_tp1"] = False
                         open_tr["tp1_hit"] = True
-                        open_tr["breakeven_after_tp1"] = True
                     elif ev == "sl" and hit_level(d, h_i, l_i, effective_stop, "sl"):
                         reason = "stoploss"
                         exit_px = effective_stop
@@ -911,7 +933,7 @@ def simulate_pair_trades(
                 open_tr["exit_reason"] = str(reason)
 
                 # Execution-bar spread at exit (Phase A: next-open → bar t+1, intrabar → bar t)
-                if reason in ("c1_reversal", "exit_indicator", "baseline_cross"):
+                if reason in ("c1_reversal", "exit_indicator", "baseline_cross", "time_stop"):
                     exit_bar_row = rows.iloc[i + 1] if i + 1 < len(rows) else r
                 else:
                     exit_bar_row = r

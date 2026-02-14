@@ -1,0 +1,27 @@
+phase: "D2_lift_harness"
+
+labels_path: "results/phaseD/labels/opportunity_labels.parquet"
+
+outputs_dir: "results/phaseD2"
+
+split_dates:
+  discovery_end: "2022-12-31"
+
+control_signals:
+  always_fire: true
+  random_fire:
+    enabled: true
+    p: 0.05
+    seed: 12345
+  oracle:
+    enabled: true
+    zones:
+      - "zone_b_3r_20"
+      - "zone_c_6r_40"
+
+signals:
+  external:
+    - name: momentum_3bar
+      path: results/phaseD2/signals/momentum_3bar_signals.parquet
+    - path: results/phaseD2/signals/proto_signals.parquet
+    - path: results/phaseD2/signals/sequence_proto_signals.parquet

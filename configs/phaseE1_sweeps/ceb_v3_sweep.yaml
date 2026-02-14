@@ -1,0 +1,26 @@
+# Phase E-1.6: CEB v3 (ratio state machine) corridor sweep.
+# Target: annual_signals_per_pair 24-120, clustering_ratio <= 0.20.
+
+base_config: "../phaseE1/ceb.yaml"
+
+indicators:
+  c1: "c1_compression_escape_ratio_state_machine"
+  c1_params_grid:
+    L_slow: [40, 50]
+    r_atr: [0.90, 0.95]
+    r_rng: [0.90, 0.95]
+    r_box: [1.20, 1.35]
+    M_enter: [2, 3]
+    M_exit: [2]  # fixed; removed from grid to cap combos
+    K_max: [60, 80]
+    cooldown_bars: [0, 5]
+
+geometry:
+  horizon: 40
+
+evaluation:
+  primary_objective: "3R_before_2R"
+
+date_range:
+  start: "2019-01-01"
+  end: "2026-01-01"

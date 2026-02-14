@@ -1,0 +1,30 @@
+# Phase E-1.7: LSR v2 D_volexp refinement sweep.
+base_config: "../phaseE/phaseE_lsr_v2_d6g.yaml"
+
+indicators:
+  c1: "c1_lsr_v2"
+  c1_params_grid:
+    variant: ["D_volexp"]
+    vol_expand_atr: [0.8, 0.9, 1.0, 1.1]
+    sweep_atr: [0.2, 0.3]
+    lookback_n: [15, 20]
+    wick_min_frac: [0.65, 0.75]
+    body_max_frac: [0.35, 0.45]
+    close_pos_min: [0.75, 0.85]
+    reclaim_frac: [0.0, 0.1]
+    cooldown_bars: [5, 8]
+    range_cap_atr: [3.0]
+    min_range_atr: [0.0]
+
+outputs:
+  dir: "results/phaseE/lsr_v2/refine/D_volexp"
+
+geometry:
+  horizon: 40
+
+evaluation:
+  primary_objective: "3R_before_2R"
+
+date_range:
+  start: "2019-01-01"
+  end: "2026-01-01"

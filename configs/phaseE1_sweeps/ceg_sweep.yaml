@@ -1,0 +1,21 @@
+# Phase E-1.4: CEG corridor sweep — channel escape gradient params
+base_config: "../phaseE1/ceg.yaml"
+
+indicators:
+  c1: "c1_channel_escape_gradient"
+  c1_params_grid:
+    q_va: [0.20, 0.25, 0.30]
+    q: [0.75, 0.80, 0.85]
+    gamma: [0.60, 0.65, 0.70]
+    g1: [2, 3, 4]
+    g2: [8, 10, 12]
+
+geometry:
+  horizon: 40
+
+evaluation:
+  primary_objective: "3R_before_2R"
+
+date_range:
+  start: "2019-01-01"
+  end: "2026-01-01"

@@ -1,0 +1,20 @@
+# Phase E-1.4: PBO corridor sweep — pressure overlap decay params
+base_config: "../phaseE1/pbo.yaml"
+
+indicators:
+  c1: "c1_pressure_overlap_decay"
+  c1_params_grid:
+    o_min: [0.45, 0.55, 0.65]
+    o_drop: [0.15, 0.25, 0.35]
+    alpha: [0.9, 1.0, 1.1]
+    eta: [0.60, 0.65, 0.70]
+
+geometry:
+  horizon: 40
+
+evaluation:
+  primary_objective: "3R_before_2R"
+
+date_range:
+  start: "2019-01-01"
+  end: "2026-01-01"

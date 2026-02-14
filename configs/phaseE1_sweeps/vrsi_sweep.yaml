@@ -1,0 +1,20 @@
+# Phase E-1.4: VRSI corridor sweep — volatility regime impulse params
+base_config: "../phaseE1/vrsi.yaml"
+
+indicators:
+  c1: "c1_volatility_regime_impulse"
+  c1_params_grid:
+    theta_rv: [1.10, 1.20, 1.30]
+    theta_atr: [1.05, 1.10, 1.15]
+    b_min: [0.40, 0.50, 0.60]
+    gamma: [0.60, 0.70, 0.80]
+
+geometry:
+  horizon: 40
+
+evaluation:
+  primary_objective: "3R_before_2R"
+
+date_range:
+  start: "2019-01-01"
+  end: "2026-01-01"

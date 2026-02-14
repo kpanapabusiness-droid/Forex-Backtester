@@ -1,0 +1,124 @@
+# Phase E-1.7: LSR v2 D-6G evaluation. Cloned from CEB v3 protocol.
+# Same dates/pairs/splits/labels as CEB v3; only C1 and outputs differ.
+
+base_config: "../phaseE1/phaseE1_base.yaml"
+
+strategy_version: "forex_backtester_v1.9.7"
+
+timeframe: "D"
+date_range:
+  start: "2019-01-01"
+  end: "2026-01-01"
+
+pairs:
+  - "AUD_CAD"
+  - "AUD_CHF"
+  - "AUD_JPY"
+  - "AUD_NZD"
+  - "AUD_USD"
+  - "CAD_CHF"
+  - "CAD_JPY"
+  - "CHF_JPY"
+  - "EUR_AUD"
+  - "EUR_CAD"
+  - "EUR_CHF"
+  - "EUR_GBP"
+  - "EUR_JPY"
+  - "EUR_NZD"
+  - "EUR_USD"
+  - "GBP_AUD"
+  - "GBP_CAD"
+  - "GBP_CHF"
+  - "GBP_JPY"
+  - "GBP_NZD"
+  - "GBP_USD"
+  - "NZD_CAD"
+  - "NZD_CHF"
+  - "NZD_JPY"
+  - "NZD_USD"
+  - "USD_CAD"
+  - "USD_CHF"
+  - "USD_JPY"
+
+spreads:
+  enabled: true
+  default_pips: 0.5
+  per_pair: {}
+  mode: "fixed"
+  atr_mult: 0.0
+
+indicators:
+  c1: "c1_lsr_v2"
+  c1_params:
+    variant: "B_confirm"
+    lookback_n: 20
+    sweep_atr: 0.2
+    wick_min_frac: 0.65
+    body_max_frac: 0.35
+    close_pos_min: 0.75
+    reclaim_frac: 0.1
+    cooldown_bars: 5
+    confirm_mode: "break_high"
+    no_resweep: 1
+    range_cap_atr: 3.0
+    min_range_atr: 0.0
+  use_c2: false
+  use_baseline: false
+  use_volume: false
+  use_exit: false
+  c2: null
+  baseline: null
+  volume: null
+  exit: null
+
+rules:
+  one_candle_rule: false
+  pullback_rule: false
+  bridge_too_far_days: 7
+  allow_baseline_as_catalyst: false
+
+entry:
+  sl_atr: 1.5
+  tp1_atr: 1.0
+  trail_after_atr: 2.0
+  ts_atr: 1.5
+
+exit:
+  use_trailing_stop: false
+  move_to_breakeven_after_atr: false
+  exit_on_c1_reversal: true
+  exit_on_baseline_cross: false
+  exit_on_exit_signal: false
+
+tracking:
+  track_win_loss_scratch: true
+  track_roi: true
+  track_drawdown: true
+  in_sim_equity: true
+  verbose_logs: false
+
+risk:
+  starting_balance: 10000.0
+  risk_per_trade: 0.005
+
+cache:
+  enabled: true
+  dir: "cache"
+  format: "parquet"
+
+validation:
+  enabled: true
+  fail_fast: true
+  strict_contract: false
+
+output:
+  results_dir: "results/phaseE/lsr_v2/d6g"
+
+outputs:
+  dir: "results/phaseE/lsr_v2/d6g"
+
+geometry:
+  horizon: 40
+
+evaluation:
+  primary_objective: "3R_before_2R"

@@ -2,6 +2,8 @@
 
 This registry is the **authoritative source** of graduated archetypes for union testing.
 
+**Ignition Pool Inclusion Rule:** Only archetypes with independently positive validation lift may be unioned.
+
 Each entry must include:
 
 - **Indicator name** — exact function identifier
@@ -57,7 +59,7 @@ Each entry must include:
 | **Indicator/function name** | `c1_lsr_v2` |
 | **Variant** | D_volexp (others rejected for now) |
 | **Graduation Date** | 2026-02-15 (Australia/Melbourne) |
-| **Status** | Graduated (Union-eligible) |
+| **Status** | Archived — Validation Negative (Not Union-Eligible) |
 
 **Structural definition:** stop sweep → rejection → displacement with volatility expansion
 
@@ -94,4 +96,15 @@ Each entry must include:
 - overlap: 0, conflict: 0
 - union coverage: 456 unique events (~30% coverage increase)
 
-**Union status:** Approved for union portfolio inclusion
+### Phase E-2 Union Evaluation Outcome
+
+- Standalone validation_lift: negative
+- P3R_val ≈ 0.1630
+- Union with CEB resulted in:
+    - P3R_val ≈ 0.2235
+    - validation_lift ≈ -0.0026
+- Caused collapse of CEB edge
+- Conclusion: Fails ignition qualification rule
+- Retired from ignition pool
+
+**Union status:** Archived — Not union-eligible (validation negative)

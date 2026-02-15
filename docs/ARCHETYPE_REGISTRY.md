@@ -108,3 +108,59 @@ Each entry must include:
 - Retired from ignition pool
 
 **Union status:** Archived — Not union-eligible (validation negative)
+
+---
+
+## Archived / Failed Archetypes (Not Union-Eligible)
+
+### Archetype C — TPI v2 Compexp State (Compression–Expansion–Reclaim)
+
+**Status:** FAILED — Geometric Misalignment (Permanently Retired; Not Union-Eligible)
+
+| Field | Value |
+|-------|-------|
+| **Indicator/function name** | `c1_tpi_v2_compexp_state` |
+| **Indicator Location** | `indicators/confirmation_funcs.py`, line 1940 |
+| **Graduation Date** | 2026-02-15 |
+
+**Intent (what it tried to do):**
+
+- Detect trend direction
+- Detect pullback to backbone
+- Detect volatility compression
+- Hold phase
+- Fire on expansion + reclaim
+- Target structured continuation ignition from compressed pullbacks
+
+**Final evaluation (D-6G, clean labels, primary objective = P(3R before 2R heat)):**
+
+| Metric | Value |
+|--------|-------|
+| P3R_disc | 0.186 |
+| P3R_val | 0.107 |
+| discovery_lift | -0.189 |
+| validation_lift | -0.513 |
+| Raw signals | ≈24,816 (very high-frequency) |
+| annual_signals_per_pair | ≈0.38 (after alignment filtering) |
+| clustering_ratio | 0.000 |
+| PASS | False |
+
+**Failure reason (locked):**
+
+- Not starvation (unstarve proved pipeline works)
+- Structural misfit on D1 FX: ATR compression ratio ~0.99 median; compression signal not meaningful
+- Fires regime-agnostically (everywhere), does not condition clean opportunity geometry
+- Negative lift on discovery and catastrophically negative on validation
+- Not fixable by tuning; permanently retired
+
+**Key debugging notes (for institutional memory):**
+
+- Fixed structural impossibility: qualified_long based on hold_prev not same-bar pullback
+- Loosened comp_ratio_max up to 1.0 to unstarve
+- Even when unstarved, geometry remained negative → confirms true misalignment
+
+**Decision:**
+
+- Do not tune further
+- Do not include in union tests
+- Keep code for reference only

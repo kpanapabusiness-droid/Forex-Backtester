@@ -1,3 +1,15 @@
+> # ⚠️ SUPERSEDED 2026-05-13
+>
+> This Phase 2 doc was written under L6.0 framing as a fresh arc with pre-committed CH-001 filter, now SUPERSEDED by `L_ARC_PROTOCOL.md` v1.0.
+>
+> **What this phase established (preserved in cross-arc registry):** `concurrent_signals_within_3h ≤ 13` filter produced a passing WFO under L6.0 framing — real edge confirmed. CH-001 is documented in `CANDIDATE_HYPOTHESES.md`.
+>
+> **Under the new protocol:** the filter mechanism is one candidate among several in step 4 of the Arc 1 redo. The threshold of 13 is not pre-anchored — step 3's predictor scan may surface a sharper or different boundary. CH-001 must surface as ≥ Tier 2 predictor in step 3 per the protocol calibration check (`L_ARC_PROTOCOL.md` §15); if it doesn't, the protocol is miscalibrated.
+>
+> **Do not use this doc as authority for new arc work.** Read `L_ARC_PROTOCOL.md` first.
+>
+> ---
+
 # PHASE_L6_ARC1_P2_OPEN — Arc 1 Phase 2: concurrent-density filter (CH-001)
 
 **Phase:** `l6_arc1_p2_concurrent_filter`

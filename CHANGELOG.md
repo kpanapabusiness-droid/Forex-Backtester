@@ -1,5 +1,79 @@
 # Changelog
 
+## L_ARC_PROTOCOL v1.0 LOCKED | 2026-05-13 | METHODOLOGY REDESIGN
+`L_ARC_PROTOCOL.md` v1.0 and `L_ARC_OPERATIONAL_SPEC.md` v1.0 locked. Six-step extractability protocol replaces L6.0 verbatim-as-gate framing.
+- Six steps: verbatim run (plumbing), descriptive trade-path analysis, extractability verdict, filter/exit derivation, re-characterisation, joint WFO
+- Dual-tier WFO disposition: PASS-DEPLOYABLE (worst-fold annualised ROI >5%, mean >8%, DD <8%) / PASS-VIABLE (worst-fold ROI >0%, DD <8%) / clean-null
+- Dual-gate step 3 verdict: AUC AND forward-geometry effect size AND cluster size ≥15% AND fold stability
+- Component-ranked filter candidate scoring (no false-precision composite); held-out fold check on exits (derive folds 1–5, validate folds 6–7)
+- BH haircut as reporting tiers (1/2/3), not gates; Tier 3 candidates require mechanical AND evidence-based justification
+- Operational-cost haircut applied at PASS-DEPLOYABLE evaluation; 5ers schedule version recorded in CSV header
+- Annualisation uses calendar-day formula; folds < 90 OOS days excluded from worst-fold annualisation
+- Arc 1 redo doubles as protocol calibration check (`concurrent_signals_within_3h` must surface as ≥ Tier 2 predictor)
+- Supersedes: L6.0 §9 (no filter rescue, verbatim-as-gate), §14 disposition rules; L6.0 §14.3 feature schema and §4/§5 WFO/pair structure carry forward
+- Arc 1 and Arc 2 reopened for redo under new protocol; PHASE_L6_ARC1_OPEN, _P2_OPEN, _ARC2_OPEN marked SUPERSEDED
+- WORKFLOW.md v2: phase docs co-located in `results/<arc>/` permanently (replaces `docs/` convention)
+- CLAUDE.md, README.md, STATUS.md, SESSION_ZERO.md, NEW_CHAT_HANDOVER.md updated to reference new protocol
+
+## L-ARC OPENED | 2026-05-09 | PLANNED
+Active research direction shifts to the L characterization arc.
+- Bottom-up exploratory data analysis approach
+- Four-layer atlas: univariate, multi-timeframe, cross-pair, conditional structure
+- Output is descriptive (statistics with CIs), not predictive
+- Top-N candidates proceed to signal-testing via pre-registered ranking rule locked in L0
+- Independent of KH-24; evaluates timeframe, direction, signal class, and pair-set fresh
+- L arc proper begins after L0 methodology lock is drafted and signed off in next chat
+- Source of truth: `L_ARC_PLAN.md` (SUPERSEDED on 2026-05-13 — atlas built, registry produced, signal-testing now under `L_ARC_PROTOCOL.md` v1.0)
+
+## KH ARC CLOSED | 2026-05-09 | STRUCTURAL CEILING
+Combined verdict from three diagnostic phases: KH-24 worst-fold ROI of +1.92% is the structural ceiling for that signal.
+- Path A items A1, A5 closed by evidence; A2, A3, A4, A6, A7 deferred
+- Path B1 closed by KI arc (1H port failed: t=0.095)
+- Path B2 superseded by L arc; B3, B4 deferred or gated
+- KH-24 remains live, locked, unchanged on VPS
+- KH research roadmap updated to reflect closure
+- Project research direction pivots to L characterization arc
+
+## KH-29 | 2026-05-09 | EXIT-SIDE DIAGNOSTIC | AMBIGUOUS
+Tested whether fold 7's MFE shrinkage was an exit-logic defect (kijun or trail) or a trend-extension defect.
+- Reference cohort: folds 1+2+3 winners (n=53). Test cohort: fold 7 winners (n=14).
+- Fold 7 median MFE_R 1.695 vs reference 1.961 (gap 0.27R; threshold for clean indictment 0.40R)
+- Fold 7 median realized_R 0.672 vs reference 0.903 (deficit 0.23R; threshold 0.50R)
+- Kijun_d1 exit rate: fold 7 35.7% vs reference 18.9% (+16.8pp; threshold 15pp)
+- Fold 7 kijun-exit cohort capture (0.536) HIGHER than fold 7 trail-exit capture (0.454)
+- All three verdict gates fail by margin. Per locked AMBIGUOUS rule, recommendation is pivot to B2/B3 without further KH-arc work.
+- Outputs: `results/kh29/PHASE_KH29_RESULT.md`, `per_trade_excursions.csv`, `cohort_stats.csv`
+
+## KH-28 | 2026-05-09 | REGIME DIAGNOSTIC | STRUCTURAL
+Tested whether fold 7 weakness is addressable via signal-time regime selection.
+- Candidate variables: R1 cross_pair_atr_ratio, R2 cross_pair_trend_strength, R3 cross_pair_dispersion, R4 pair_atr_ratio (control)
+- Group A: fold 7 losers (n=13). Group B: non-fold-7 winners (n=93).
+- No variable passed both p<0.05 AND protective direction
+- R2 closest miss: right direction, p=0.077, n=13 (underpowered)
+- R1 caveat: JPY-pair dominated by literal spec interpretation; equal-weight per-pair-normalized rebuild not done
+- Trade-level diagnostic: fold 7 win rate matches good folds; deficit is in winning R magnitude (+0.83R vs +1.61R fold 1)
+- Verdict STRUCTURAL on entry side. Triggered KH-29 to test exit side.
+- Outputs: `results/kh28/PHASE_KH28_RESULT.md`, `regime_variables.csv`, `discrimination_results.csv`
+
+## KH-27 | 2026-05-09 | RE-ENTRY PRE-FLIGHT | KILL
+Tested whether extending the exposure cap to re-entries would have prevented fold 7 KH-25 losses.
+- Pre-flight only — no full WFO. Pre-commit gate locked before running.
+- Found re-entries fire AFTER original has exited via kh14_bar6 (10/10 sampled). Original never in open-positions set at re-entry time.
+- 18 OOS re-entries; 0 blocked by extended cap; 0 of 3 fold 7 losses blocked
+- Fold 7 losses are months apart (2025-04-30, 2025-10-01, 2025-12-26) with zero overlapping exposure
+- "Correlated re-entry losses" framing in original KH-25 phase doc not supported by data — erratum added
+- Verdict KILL by locked gate (0 of 3 fold 7 losses blocked). KH-27 full WFO not run.
+- Outputs: `results/kh27_preflight/PHASE_KH27_PREFLIGHT.md`, `reentry_cap_analysis.csv`
+
+## KH-24 | 2026-04-20 | GATE PASS ✓
+First gate-passing result in the KH arc.
+Change: h1_last_bar_close_in_range threshold 0.624 → 0.28
+Base: KH-22 (exposure cap=2 + h1 filter T=0.624)
+Result: worst-fold ROI +1.92% (F7), worst-fold DD 6.37% (F1)
+All 7 OOS folds positive. 214 trades (328 baseline, −35%).
+System lock: `KH24_SYSTEM_LOCK.md`
+This is the new baseline. Do not modify wfo_kh24.yaml.
+
 ## [2.0.0] - 2025-09-30
 - Stable baseline v2.0 release (config-driven, invariant-checked)
 - Golden Standard WL/S classification finalized

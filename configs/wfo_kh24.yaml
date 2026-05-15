@@ -1,0 +1,157 @@
+# wfo_kh24.yaml — KH-24: Currency Exposure Cap=2 + 1H close-in-range filter, threshold=0.28
+# Created: April 2026
+# Base: configs/wfo_kh22.yaml (exposure cap=2, 1H filter at 0.624)
+# Change: kh24_h1_range_threshold: 0.28  (was 0.624 in KH-22)
+# Hypothesis: threshold sweep on KH-22 OOS trades showed T=0.28 produces positive
+#             ROI in all 7 folds. This WFO validates under proper compounded equity.
+#
+# Do NOT modify this file. For further experiments, copy and modify the copy.
+
+phase: KH-24
+description: "4H WFO — exposure cap=2 + 1H close-in-range filter T=0.28, 1% risk, D1 fix applied"
+
+timeframe: "H4"
+data_dir: "data/4hr"
+
+pairs:
+  - "AUD_CAD"
+  - "AUD_CHF"
+  - "AUD_JPY"
+  - "AUD_NZD"
+  - "AUD_USD"
+  - "CAD_CHF"
+  - "CAD_JPY"
+  - "CHF_JPY"
+  - "EUR_AUD"
+  - "EUR_CAD"
+  - "EUR_CHF"
+  - "EUR_GBP"
+  - "EUR_JPY"
+  - "EUR_NZD"
+  - "EUR_USD"
+  - "GBP_AUD"
+  - "GBP_CAD"
+  - "GBP_CHF"
+  - "GBP_JPY"
+  - "GBP_NZD"
+  - "GBP_USD"
+  - "NZD_CAD"
+  - "NZD_CHF"
+  - "NZD_JPY"
+  - "NZD_USD"
+  - "USD_CAD"
+  - "USD_CHF"
+  - "USD_JPY"
+
+signal: kb_exhaustion_bar
+direction: long
+
+indicator_params:
+  kb_exhaustion_bar:
+    long_body_threshold: 0.5
+    long_close_position_max: 0.24
+    atr_period: 14
+    kijun_period: 26
+    distance_cap_atr: 1.0
+    counter_move_bars: 10
+    counter_move_threshold: 0.5
+    volume_lookback: 20
+    volume_multiplier: 1.2
+    use_c8: true               # C8: D1 close > D1 Kijun — ENABLED in baseline
+    no_volume_filter: true     # C7: volume gate DISABLED (production system)
+    d1_regime_filter: true
+    d1_data_dir: "data/daily"
+    d1_kijun_period: 26
+    d1_slope_filter: false
+    choppiness_threshold: 0.0
+    d1_atr_distance_cap: 1.0
+    d1_atr_period: 14
+
+execution:
+  entry: next_bar_open
+  sl_atr_multiplier: 2.0
+  sl_anchor: entry_price
+  trail_atr_multiplier: 1.5
+  trail_anchor: highest_close
+  trail_update: bar_close_only
+  trail_atr_source: signal_bar
+  trail_activation_atr: 2.0
+  trail_activation_basis: close
+
+risk:
+  starting_balance: 10000.0
+  risk_per_trade_pct: 1.0
+  currency_exposure_cap: 2    # inherited from KH-22
+  sl_from_entry: true
+
+spreads:
+  enabled: true
+  mode: "per_bar"
+  default_pips: 0.0
+
+exit:
+  use_trailing_stop: true
+  move_to_breakeven_after_atr: false
+  exit_on_c1_reversal: false         # signal_flip DISABLED
+  exit_on_baseline_cross: false      # kijun_4h DISABLED
+  exit_on_d1_baseline_cross: true    # kijun_d1 active
+
+classification:
+  mode: r_multiple
+
+# KH-24 filter — same implementation as KH-22, threshold reduced 0.624 → 0.28
+kh24_enabled: true
+kh24_h1_range_threshold: 0.28
+
+wfo:
+  n_folds: 7
+  is_months_0: 21
+  oos_months: 9
+  anchored: true
+  start: "2019-01-01"
+  end: "2026-01-01"
+
+  folds:
+    - fold: 1
+      is_start: "2019-01-01"
+      is_end: "2020-10-01"
+      oos_start: "2020-10-01"
+      oos_end: "2021-07-01"
+    - fold: 2
+      is_start: "2019-01-01"
+      is_end: "2021-07-01"
+      oos_start: "2021-07-01"
+      oos_end: "2022-04-01"
+    - fold: 3
+      is_start: "2019-01-01"
+      is_end: "2022-04-01"
+      oos_start: "2022-04-01"
+      oos_end: "2023-01-01"
+    - fold: 4
+      is_start: "2019-01-01"
+      is_end: "2023-01-01"
+      oos_start: "2023-01-01"
+      oos_end: "2023-10-01"
+    - fold: 5
+      is_start: "2019-01-01"
+      is_end: "2023-10-01"
+      oos_start: "2023-10-01"
+      oos_end: "2024-07-01"
+    - fold: 6
+      is_start: "2019-01-01"
+      is_end: "2024-07-01"
+      oos_start: "2024-07-01"
+      oos_end: "2025-04-01"
+    - fold: 7
+      is_start: "2019-01-01"
+      is_end: "2025-04-01"
+      oos_start: "2025-04-01"
+      oos_end: "2026-01-01"
+
+gate:
+  worst_fold_roi_min_pct: 0.0
+  worst_fold_dd_max_pct: 8.0
+
+outputs:
+  dir: "results/kh24"
+  write_trades_csv: true

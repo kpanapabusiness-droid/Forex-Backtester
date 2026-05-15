@@ -1,370 +1,176 @@
-# CLAUDE.md — Forex Backtester Project Brief
-
-> Briefing for a new senior developer (or AI assistant) joining this project.
-> The owner is a **complete beginner with coding and repos** — all instructions must be step-by-step, exact, and leave no guesswork. See `PROJECT_RULES.md` for the full delivery standard.
-
----
-
-## Project Overview
-
-This is a **rule-based Forex backtesting engine** built on the NNFX (No-Nonsense Forex) framework. It simulates multi-indicator trading strategies on historical daily/H1/H4 OHLCV data and produces performance metrics to evaluate strategy quality before any live deployment.
-
-The goal is to **find robust, non-overfitted strategies** that hold up out-of-sample across multiple currency pairs and timeframes. The backtester is the core research tool — everything feeds into it or reads from it.
-
-**What it is NOT:** There is no live trading, broker integration, or real-time data feed. It is a pure research and simulation system.
+# CLAUDE.md — Forex Ignition Rebuild
+> Last updated: 2026-05-13 | Phase: L arc signal testing, Arc 1 redo opens under L_ARC_PROTOCOL v1.0
+> First file any AI assistant reads. Reflects where the project ACTUALLY is.
 
 ---
 
-## Folder Structure
+## Read These First, In Order
 
-```
-Forex-Backtester/
-├── core/                        # Simulation engine (heart of the system)
-│   ├── backtester.py            # Main entry point: loads data, runs simulation loop
-│   ├── signal_logic.py          # Entry/exit signal generation (633 LOC)
-│   ├── backtester_helpers.py    # Trade finalization helpers
-│   └── utils.py                 # ATR calculation, pip conversion, summary helpers
-│
-├── indicators/                  # All trading indicators, organized by role
-│   ├── confirmation_funcs.py    # C1 & C2 confirmation indicators → {-1, 0, +1}
-│   ├── baseline_funcs.py        # Baseline/trend filters → df["baseline"] + {-1,0,+1}
-│   ├── volume_funcs.py          # Volume/AD veto signals → {-1,0,+1} or {0,1}
-│   ├── exit_funcs.py            # Exit rule indicators → {0,1} ONLY
-│   └── legacy_rejected/         # Quarantined indicators (repaint-suspected)
-│
-├── analytics/                   # Performance metrics
-│   ├── metrics.py               # Sharpe, Sortino, CAGR, max DD, MAR, skew, kurtosis
-│   └── monte_carlo.py           # Trade-sequence shuffling for robustness testing
-│
-├── scripts/                     # Runners / entry points
-│   ├── run_single_debug.py      # One backtest with CLI args (pair, date range, indicators)
-│   ├── run_from_yaml.py         # YAML-driven single run
-│   ├── smoke_test_selfcontained_v198.py  # Health check — run this first
-│   ├── batch_sweeper.py         # Parallel parameter sweeps
-│   ├── walk_forward.py          # Walk-forward optimization (WFO)
-│   └── phase{B,C,D}*/           # Research scripts (parameter sensitivity, diagnostics)
-│
-├── configs/                     # YAML strategy configs
-│   ├── config.yaml              # Main config (the one you edit)
-│   ├── sweeps.yaml              # Batch sweep parameter ranges
-│   ├── batch_config.yaml        # Aggregation settings for batch runs
-│   ├── BACKTESTER_TEMPLATE.yaml # Canonical template with all options documented
-│   └── phase*/                  # WFO and phase-specific configs
-│
-├── data/                        # Static market data (never auto-downloaded)
-│   ├── daily/                   # Daily OHLCV CSVs — one file per pair (EUR_USD.csv, etc.)
-│   ├── test/                    # Smaller test datasets (2009–2026)
-│   └── external/                # External indicators (e.g., dbcvix_synth.csv)
-│
-├── results/                     # All output goes here (mostly gitignored)
-│   ├── trades.csv               # Per-trade detail (30 columns)
-│   ├── summary.txt              # Aggregate performance metrics
-│   └── equity_curve.csv         # Time-series equity & drawdown
-│
-├── tests/                       # pytest suite (50+ test files)
-│
-├── validators_config.py         # Pydantic-based YAML config validation
-├── validators_util.py           # Indicator contract enforcement
-├── indicators_cache.py          # Parquet/feather caching layer
-│
-├── BACKTESTER_SCHEMA.json       # Full config schema
-├── BACKTESTER_TEMPLATE.yaml     # Template with all defaults
-├── BACKTESTER_AUDIT.md          # P&L pipeline audit / decision log
-├── PROJECT_RULES.md             # Team playbook — read this early
-└── docs/README.md               # User documentation
-```
+1. **`L_ARC_PROTOCOL.md`** — methodology of record for all L arc signal-testing work. Locked v1.0.
+2. **`L_ARC_OPERATIONAL_SPEC.md`** — deliverables, folder layout, angle catalogues, scoring tables. Locked v1.0.
+3. **`SESSION_ZERO.md`** — 5-minute primer on current state.
+4. **`STATUS.md`** — tight current-state snapshot.
+
+Then, depending on scope:
+- Touching the live system → `docs/KH24_SYSTEM_LOCK.md`
+- Running an L arc step → the arc's `PHASE_L_ARC_N_OPEN.md` under `results/l_arc_N/`
+- Phase close → `WORKFLOW.md` v2
 
 ---
 
-## Key Dependencies
+## CRITICAL: Current State
 
-```
-Python 3.12+
-pandas          # DataFrames & time series
-numpy           # Numerical computing
-pyyaml          # YAML config parsing
-pydantic        # Config validation & typed models
-pytest          # Test framework
-ruff            # Linting & formatting
-```
+**Live system KH-24 is locked, passing, deployed.** Out of scope for L arc work; do not modify without an explicit modification phase.
 
-No broker APIs, no live data feeds, no external databases. All data is local CSV files.
+**Active research: L arc signal testing under `L_ARC_PROTOCOL.md` v1.0.** Arc 1 redo is the current/next phase. Arc 1 redo doubles as the protocol calibration check (`concurrent_signals_within_3h` must surface as ≥ Tier 2 predictor in step 3, or halt and investigate).
 
 ---
 
-## How to Run the Backtester
+## What the Project Is
 
-### 1. Smoke test (fastest validation — run this first after any change)
+A long-only 4H trend-pullback system (KH-24) is in production. Parallel research arcs (the L arc series) are testing the top-N signals from the L characterization atlas (`docs/LCHAR_TOPN_REGISTRY.md`) through a six-step pipeline that ends with a WFO gate. The goal of L arc work is one or more PASS-DEPLOYABLE survivor systems that complement or supersede KH-24.
 
-```bash
-python scripts/smoke_test_selfcontained_v198.py -q --mode fast
-```
-
-Generates its own synthetic data. If this passes, the engine is healthy.
-
-### 2. Single backtest from YAML config
-
-```bash
-python core/backtester.py configs/config.yaml
-```
-
-Outputs to `results/trades.csv`, `results/summary.txt`, `results/equity_curve.csv`.
-
-### 3. Single backtest with CLI args (debug mode)
-
-```bash
-python scripts/run_single_debug.py \
-  --pair EUR_USD \
-  --from 2019-01-01 \
-  --to 2022-12-31 \
-  --timeframe D \
-  --c1 rsi_2 \
-  --c2 macd \
-  --baseline ema_50
-```
-
-### 4. Batch parameter sweep (parallel)
-
-```bash
-python scripts/batch_sweeper.py configs/sweeps.yaml
-```
-
-Results aggregated to `results/batch_summary.csv`.
-
-### 5. Walk-forward optimization (WFO)
-
-```bash
-python scripts/walk_forward.py -c configs/wfo_c1_smoothed_momentum.yaml
-```
-
-Outputs: `results/wfo_c1_<indicator>/wfo_folds.csv`, `oos_summary.txt`, `equity_curve.csv`.
-
-### Disable indicator cache
-
-```bash
-FB_NO_CACHE=1 python core/backtester.py configs/config.yaml
-```
+The signal under test in any given L arc is from the registry. The test follows `L_ARC_PROTOCOL.md` v1.0 exactly. Per-arc deliverables are specified in `L_ARC_OPERATIONAL_SPEC.md` v1.0.
 
 ---
 
-## Data Format
+## Locked Philosophy
 
-**CSV files in `data/daily/`:**
-```
-date,open,high,low,close,volume
-2010-01-02,1.4312,1.43425,1.42926,1.43036,1027
-```
-
-- Required: `open, high, low, close`
-- Optional: `volume` (needed for volume indicators)
-- Common column name variants are auto-normalized
-
-**External data in `data/external/`:**
-```
-date,value
-2010-01-02,15.2
-```
-Used for the DBCVIX volatility filter.
+| Rule | Detail |
+|------|--------|
+| Structure-first | Signal is price structure, not indicator |
+| WFO worst-fold is the only judge at step 6 | Average fold, best fold — irrelevant |
+| Dual-tier disposition at step 6 | PASS-DEPLOYABLE / PASS-VIABLE / clean-null; DD < 8% applies to both PASS tiers |
+| Ex-ante population always | `build_ex_ante_bounded_population` — no exceptions |
+| No lookahead / no repainting | Hard invariant; lookahead-invariant tests required at every step |
+| Config-driven (YAML only) | No hardcoded parameters |
+| Volume = veto only | Never generates trades |
+| Clean labels = evaluation only | Never in population selection |
+| Full distributions, never medians-only | No metric summarised as a single number |
+| Effect size before significance | AUC + forward-geometry effect size both required in step 3 |
+| Within-arc thresholds do not move | Calibration adjustments are cross-arc only, via v1.1 patch |
 
 ---
 
-## Output Metrics & How to Interpret Them
-
-### Trade Statistics
-
-| Metric | What it means | Target |
-|--------|---------------|--------|
-| Win Rate | % of trades that hit TP1 (excl. scratches) | ≥ 45% |
-| Scratch Rate | % of trades that exit at breakeven (C1 reversed pre-TP1) | < 25% |
-| Avg Win / Avg Loss | Mean PnL on wins vs. losses | Ratio ≥ 1.2 |
-| Expectancy | Expected PnL per trade (AvgWin×WinRate − AvgLoss×LossRate) | Positive |
-
-### Return Metrics
-
-| Metric | What it means | Target |
-|--------|---------------|--------|
-| ROI (%) | Total return over the period | ≥ 10% annualized |
-| CAGR (%) | Annualized compound return | ≥ 10% |
-
-### Risk Metrics
-
-| Metric | What it means | Target |
-|--------|---------------|--------|
-| Max Drawdown | Worst peak-to-trough decline (negative %) | ≥ −20% |
-| Sharpe Ratio | Return per unit of total volatility | ≥ 1.0 |
-| Sortino Ratio | Return per unit of downside volatility only | ≥ 1.5 |
-| MAR Ratio | CAGR / |Max Drawdown| — recovery rate | ≥ 1.5 |
-| Volatility (ann.) | Annualized daily return std dev | < 10% |
-
-### Distribution Metrics
-
-| Metric | What it means | Target |
-|--------|---------------|--------|
-| Skewness | > 0 = right-tail wins (rare big wins); < 0 = left-tail losses | ≥ 0.3 |
-| Kurtosis | > 3 = fat tails (surprise moves) | 3–5 |
-
-### Quality Thresholds
-
-**Minimum viable (continue researching):**
-- Win rate ≥ 45%, Sharpe ≥ 0.5, Max DD ≥ −25%, Total trades ≥ 20
-
-**Good (worth pursuing):**
-- Win rate ≥ 52%, Sharpe ≥ 1.0, Max DD ≥ −15%, MAR ≥ 1.5, OOS Sharpe ≥ 0.6
-
-**Excellent (live-ready candidate):**
-- Win rate ≥ 55%, Sharpe ≥ 1.5, Max DD ≥ −10%, MAR ≥ 2.0, consistent across ≥ 3 pairs
-
-**Red flags — reject immediately:**
-- Win rate < 40%, Max DD > −40%, Sharpe < 0.3, any negative expectancy
-- OOS Sharpe < (IS Sharpe × 0.7) — this means overfitting
-
----
-
-## Architecture & Conventions
-
-### NNFX Signal Stack
-
-The engine implements NNFX (No-Nonsense Forex) rules with four indicator roles:
-
-1. **C1 (primary confirmation)** — triggers the entry; must be ±1
-2. **C2 (secondary confirmation)** — optional direction filter; must agree with C1
-3. **Baseline** — price trend filter; close must be on correct side
-4. **Volume** — veto signal; must be +1 (pass) to allow entry
-5. **Exit** — optional early exit indicator
-
-All four are optional except C1. Each has a strict function contract (see below).
-
-### Indicator Contracts (never break these)
-
-Every indicator is a pure function with a fixed signature:
-
-```python
-# C1 / C2
-def c1_<name>(df: pd.DataFrame, *, signal_col: str = "c1_signal", **kwargs) -> pd.DataFrame:
-    # Must write df[signal_col] ∈ {-1, 0, +1}
-    return df
-
-# Baseline
-def baseline_<name>(df, *, signal_col: str = "baseline_signal", **kwargs) -> pd.DataFrame:
-    # Must write df["baseline"] (numeric series) AND df[signal_col] ∈ {-1, 0, +1}
-    return df
-
-# Volume
-def volume_<name>(df, *, signal_col: str = "volume_signal", **kwargs) -> pd.DataFrame:
-    # Must write df[signal_col] ∈ {-1, 0, +1} or {0, 1}
-    return df
-
-# Exit
-def exit_<name>(df, *, signal_col: str = "exit_signal", **kwargs) -> pd.DataFrame:
-    # Must write df[signal_col] ∈ {0, 1} ONLY — no -1
-    return df
-```
-
-`validators_util.py` enforces these contracts on every run.
-
-### Immutable Audit Fields
-
-Once a trade is opened, these fields are **permanently fixed** and must never change:
-- `entry_price`, `entry_date`, `entry_idx`
-- `tp1_at_entry_price`, `sl_at_entry_price` (ATR multiples frozen at entry)
-- `atr_at_entry_price`, `atr_at_entry_pips`
-
-Dynamic stops track in `current_sl`; the final value is recorded as `sl_at_exit_price`.
-
-### Config-Driven Only
-
-No hardcoded strategy parameters. Every tunable value lives in YAML configs. Pydantic (`validators_config.py`) validates the config before any data is loaded.
-
-### No-Lookahead Guarantee
-
-- Indicators are computed on bar `i-1` close, used to signal bar `i`
-- Entries execute at bar `i` close
-- Intrabar TP/SL arbitration is configurable (`tp_first` default)
-
-### Three-Tier Exit Model
-
-1. **Pre-TP1:** Check TP1 → SL → C1 reversal (scratch exit)
-2. **Post-TP1:** Trailing stop → C1 reversal → breakeven
-3. **Intrabar arbitration:** Configurable priority (default: TP first)
-
-### TDD Loop (always follow this)
+## KH-24 System Parameters (Locked, Out of Scope for L Arc)
 
 ```
-Write failing test → minimal patch → pytest -q green → open PR → CI green → merge
+Signal:     kb_exhaustion_bar (c1–c6, c8, c9)
+            c7 DISABLED — volume gate removed
+Direction:  Long only
+Timeframe:  4H with D1 regime filter (one-day lag)
+Pairs:      28 FX currency pairs
+Broker:     5ers
+Data:       data/4hr/, data/daily/, data/1hr/
+Entry:      Bar N+1 open after signal on bar N close
+Stop:       Entry price - 2.0 × ATR(14) [entry price anchor]
+Trail:      Activates at close ≥ entry + 2.0 ATR (close-based)
+            1.5 ATR behind highest close, bar-close updates only
+Exits:      trailing_stop | kijun_d1 | stoploss
+Risk:       1.0% of current reset floor balance (KH-24 era; L arc uses 0.5%)
+Filters:    exposure cap=2; 1H CIR T=0.28
+Spread:     Per-bar MT5 data — never hardcoded
+D1 align:   One-day lag — each 4H bar sees prior calendar day's D1 close
 ```
 
-### CI Requirements (every PR must pass)
+KH-24 WFO gate: PASS. Worst-fold ROI +1.92% (F7); worst-fold DD 6.37% (F1); 214 trades across Oct 2020–Jan 2026; all 7 folds positive. Live on Contabo VPS / 5ers.
 
-```bash
-ruff check .
-pytest -q
-python scripts/smoke_test_selfcontained_v198.py -q --mode fast
+---
+
+## L Arc Configuration (Per L_ARC_PROTOCOL v1.0)
+
+```
+Signal:        Per docs/LCHAR_TOPN_REGISTRY.md entry (currently 5 signals, arcs 1–5)
+Direction:     Long only (all registry signals)
+Timeframe:     1H primary (registry-defined)
+Pairs:         28 FX, same set as KH-24
+Entry:         Bar N+1 open
+SL:            2.0 × ATR(14)_1H from entry price
+Time exit:     Bar N+1+h open (h from registry entry)
+Spread:        configs/spread_floors_5ers.yaml (locked, sha256 in arc-open doc)
+Exposure cap:  Max 1 open position per pair (no currency cap, no concurrent-trade cap)
+Risk:          0.5% of reset floor balance (L6 convention)
+WFO:           7 anchored expanding folds, OOS Oct 2020 – Jan 2026
 ```
 
----
-
-## Tier-1 C1 Indicators (approved, non-repaint)
-
-These have been vetted and are safe for WFO:
-
-- `smoothed_momentum`
-- `kalman_filter`
-- `trend_akkam`
-- `lwpi`
-- `disparity_index`
-- `twiggs_money_flow`
-
-**Quarantined (suspected repaint — do not use):**
-- `fisher_transform`, `laguerre`, `doda_stochastic`, `supertrend`, `ehlers_reverse_ema`, `turtle_trading_channel`
-
-These live in `indicators/legacy_rejected/` and are excluded from WFO configs.
+Cost accounting: spread is the only per-trade cost. Commission/swap/slippage applied as aggregate haircut at PASS-DEPLOYABLE evaluation only (per operational spec §7.4).
 
 ---
 
-## Known Limitations
+## Engine Status
 
-1. **No live trading** — backtester only; no MT4/MT5, Oanda, or other broker integration
-2. **Fixed spreads only** — no dynamic spread modeling; slippage is not modeled beyond entry/exit
-3. **No liquidity constraints** — assumes any position size fills at any price
-4. **No regime detection** — indicators are static; no built-in market regime switching
-5. **Daily data is primary** — H1/H4 supported but less battle-tested
-6. **Single-account simulation** — no portfolio correlation or multi-account modeling
-7. **Repaint risk** — cache system assumes indicators are non-repainting; suspects quarantined but new indicators need manual audit
+- Python backtester: D1 lookahead fix applied (one-day lag). Source of truth.
+- EA v2.01: KH-24 deployed on VPS. No L arc EAs exist yet — porting opens only when a PASS-DEPLOYABLE survivor exists.
+- Determinism: byte-identical outputs on re-run required. CI-enforced.
 
----
-
-## Active Research Areas (TODOs)
-
-- Dynamic spread model (currently only fixed pips)
-- Regime filter (market structure detection in `signal_logic.py`)
-- Monte Carlo with correlation matrix (currently independent shuffles)
-- ML-style opportunity labeling (`docs/PHASE_D6F_CLEAN_LABELS.md`)
-- Feature engineering pipeline (`docs/PHASE_D2_LIFT_HARNESS.md`)
-- Execution bar off-by-one validation (`docs/phase8_execution_truth.md`)
-- Kurtosis overflow guard for extreme trade sequences (`analytics/metrics.py`)
+Key scripts:
+- `scripts/phase_kgl_v2_4h_wfo.py` — WFO runner
+- `scripts/lchar/run_layer4.py` — canonical L registry signal source
+- `configs/wfo_kh24.yaml` — locked KH-24 config (do not modify)
+- `configs/spread_floors_5ers.yaml` — locked spread floor (do not modify)
 
 ---
 
-## Tool Assignments (from PROJECT_RULES.md)
+## What Has Been Permanently Eliminated
+
+- `jd_rf_evt_02_bounded_operational` — forward bias, fabricated results
+- Clean labels in population selection
+- Forward-conditioned dataset construction
+- Indicator-driven C1 sweeps as primary research
+- Exit indicator sweeps (57 tested, zero passed)
+- Full NNFX stack as strategy
+- GPT-4 / Aider for any implementation task
+- Short signals (negative lift confirmed Phase KC; short-mirror exploratory run also failed)
+- `signal_flip` exit (cuts winners); `kijun_4h` exit (fires on normal pullbacks)
+- D1b slope filter (net negative across folds)
+- Choppiness gate (redistributes damage)
+- TP1 half-off structure (inferior to no-TP1)
+- Currency exposure cap (KH era; superseded by exposure cap=2 in KH-22)
+- `agree_count` gate (too rare)
+- FOMC proximity filter (p=0.889)
+- C7 volume gate on 5ers data (broker-specific, no lift validated)
+- Range/ATR ceiling at 1.25× (fold 7 negative)
+- 2% risk on 5ers data (daily cap breach, reset sim breach)
+- Same-day D1 alignment (lookahead; permanently replaced by one-day lag)
+- KH-25 re-entry exposure cap (KH-27 KILL — re-entries fire post-original-exit)
+- 1H timeframe port of KH-24 (KI arc: mean R 0.004, t=0.095)
+- L6.0 verbatim-as-gate framing (replaced by `L_ARC_PROTOCOL.md` v1.0)
+
+---
+
+## Tool Assignments
 
 | Task | Tool |
 |------|------|
-| Bug fix / small patch (≤ 3 files, ≤ 100 LOC) | Cursor |
-| New module / multi-file feature / refactor | Aider |
-| Find where X is used across the repo | Cody |
-| Architecture, acceptance criteria, analysis | ChatGPT |
-| YAML, CI, docs | Cursor |
+| Strategy, research planning, decisions, verdicts | This chat (Opus 4.7) |
+| Multi-file features, atlas computation, WFO runs, cluster fits, predictor scans | Claude Code (Opus 4.7) |
+| Single-file patches, YAML edits, doc updates | Cursor (Sonnet 4.6) |
+| MT5 / MQL5 implementation | Claude Code |
 
-Rule: **one branch = one tool** — don't mix Cursor and Aider on the same branch.
+GPT-4 and Aider are permanently excluded from all implementation work.
 
 ---
 
-## Key Documents to Read First
+## Folder Convention (v2, Locked 2026-05-13)
 
-| Document | Why |
-|----------|-----|
-| `PROJECT_RULES.md` | Delivery standard, guardrails, tool assignments |
-| `BACKTESTER_TEMPLATE.yaml` | All config options with defaults |
-| `BACKTESTER_AUDIT.md` | How the P&L pipeline works internally |
-| `docs/README.md` | Full user guide |
-| `BACKTESTER_SCHEMA.json` | Config schema reference |
+All result documents are co-located with their artefacts under the arc folder.
+- L arc work: `results/l_arc_N/<step_subfolder>/...` per `L_ARC_OPERATIONAL_SPEC.md` §2.
+- Future non-L-arc work: same pattern under `results/<arc_name>/`.
+- `docs/` retained for non-arc-specific system specs (e.g. `docs/KH24_SYSTEM_LOCK.md`).
+
+See `WORKFLOW.md` v2 for details.
+
+---
+
+## Risk Parameters (Prop Firm Constraints)
+
+- Prop firm: 5ers
+- Account constraints: max DD 10%, daily DD 5% — breach closes account permanently
+- Per-trade risk: KH-24 uses 1%; L arc uses 0.5%
+- Step 6 gate: DD < 8% applies to both PASS-DEPLOYABLE and PASS-VIABLE tiers; 8% is safety margin against the 10% prop limit
+
+---
+
+## Methodology in One Line
+
+WFO worst-fold at dual-tier disposition is the only judge of success. Pre-committed gates, accepted results, every phase a documented finding regardless of pass or fail. The protocol is the barrel; chat creativity is the aim within the barrel.

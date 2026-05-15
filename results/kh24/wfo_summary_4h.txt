@@ -1,0 +1,15 @@
+Phase KG-L-V2 — D1 ATR Distance Cap + signal_flip REMOVED — Summary
+Generated: 2026-04-20 23:13
+
+Gate: PASS
+Worst-fold ROI: 1.92%  Worst-fold DD: 6.37%
+Trades/year (OOS): 40.8
+
+--- Fold Results ---
+  Fold 1: 2020-10-01 to 2021-07-01  trades=41  kgj=50  delta=-9  c9_blocked=100  ROI=13.35%  DD=6.37%  PASS
+  Fold 2: 2021-07-01 to 2022-04-01  trades=36  kgj=47  delta=-11  c9_blocked=86  ROI=9.63%  DD=4.45%  PASS
+  Fold 3: 2022-04-01 to 2023-01-01  trades=25  kgj=48  delta=-23  c9_blocked=106  ROI=11.90%  DD=4.43%  PASS
+  Fold 4: 2023-01-01 to 2023-10-01  trades=32  kgj=40  delta=-8  c9_blocked=94  ROI=3.32%  DD=3.80%  PASS
+  Fold 5: 2023-10-01 to 2024-07-01  trades=23  kgj=34  delta=-11  c9_blocked=106  ROI=6.23%  DD=3.09%  PASS
+  Fold 6: 2024-07-01 to 2025-04-01  trades=30  kgj=27  delta=+3  c9_blocked=78  ROI=3.24%  DD=5.03%  PASS
+  Fold 7: 2025-04-01 to 2026-01-01  trades=27  kgj=41  delta=-14  c9_blocked=83  ROI=1.92%  DD=4.06%  PASS

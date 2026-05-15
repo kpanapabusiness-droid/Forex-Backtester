@@ -1,0 +1,177 @@
+# wfo_kh24_short_mirror.yaml — KH-24 short mirror (exploratory only)
+# Created: April 2026
+# Base: configs/wfo_kh24.yaml
+# Purpose: Flip signal direction to SHORT. No gate commitment. Results only.
+#
+# Signal mirrors KH-24 long conditions:
+#   C1:  close > open            (bullish bar)
+#   C2:  body >= 0.5 × ATR       (unchanged)
+#   C3:  (high - close) / range <= 0.24  (close near high)
+#   C4:  close < 4H Kijun(26)
+#   C5:  close >= Kijun - 1.0 × ATR
+#   C6:  (close - close[N-10]) / ATR >= +0.5  (upward momentum)
+#   C8:  prev D1 close < prev D1 Kijun        (bearish D1 regime)
+#   C9:  prev D1 close >= D1 Kijun - 1.0 × D1 ATR
+#
+# Stop/trail:
+#   SL:    entry + 2.0 × ATR (above entry)
+#   Trail: activates when close <= entry - 2.0 × ATR
+#          level: lowest_close + 1.5 × ATR (ratchets down on bar close)
+#
+# kijun_d1 exit: prev D1 close > prev D1 Kijun (bearish trend ended), 1-bar
+# H1 filter:     (h1_high - h1_close) / (h1_high - h1_low) <= 0.28
+#                implemented as: block when CIR < (1 - 0.28) = 0.72
+#
+# Do NOT modify this file. Copy for further experiments.
+
+phase: KH-24-SHORT-MIRROR
+description: "4H WFO — KH-24 short mirror — exploratory, no gate"
+
+timeframe: "H4"
+data_dir: "data/4hr"
+
+direction: short
+
+pairs:
+  - "AUD_CAD"
+  - "AUD_CHF"
+  - "AUD_JPY"
+  - "AUD_NZD"
+  - "AUD_USD"
+  - "CAD_CHF"
+  - "CAD_JPY"
+  - "CHF_JPY"
+  - "EUR_AUD"
+  - "EUR_CAD"
+  - "EUR_CHF"
+  - "EUR_GBP"
+  - "EUR_JPY"
+  - "EUR_NZD"
+  - "EUR_USD"
+  - "GBP_AUD"
+  - "GBP_CAD"
+  - "GBP_CHF"
+  - "GBP_JPY"
+  - "GBP_NZD"
+  - "GBP_USD"
+  - "NZD_CAD"
+  - "NZD_CHF"
+  - "NZD_JPY"
+  - "NZD_USD"
+  - "USD_CAD"
+  - "USD_CHF"
+  - "USD_JPY"
+
+signal: kb_exhaustion_bar
+
+indicator_params:
+  kb_exhaustion_bar:
+    long_body_threshold: 0.5
+    long_close_position_max: 0.24
+    atr_period: 14
+    kijun_period: 26
+    distance_cap_atr: 1.0
+    counter_move_bars: 10
+    counter_move_threshold: 0.5
+    volume_lookback: 20
+    volume_multiplier: 1.2
+    use_c8: true
+    no_volume_filter: true
+    d1_regime_filter: true
+    d1_data_dir: "data/daily"
+    d1_kijun_period: 26
+    d1_slope_filter: false
+    choppiness_threshold: 0.0
+    d1_atr_distance_cap: 1.0
+    d1_atr_period: 14
+
+execution:
+  entry: next_bar_open
+  sl_atr_multiplier: 2.0
+  sl_anchor: entry_price
+  trail_atr_multiplier: 1.5
+  trail_anchor: lowest_close
+  trail_update: bar_close_only
+  trail_atr_source: signal_bar
+  trail_activation_atr: 2.0
+  trail_activation_basis: close
+
+risk:
+  starting_balance: 10000.0
+  risk_per_trade_pct: 1.0
+  currency_exposure_cap: 2
+  sl_from_entry: true
+
+spreads:
+  enabled: true
+  mode: "per_bar"
+  default_pips: 0.0
+
+exit:
+  use_trailing_stop: true
+  move_to_breakeven_after_atr: false
+  exit_on_c1_reversal: false
+  exit_on_baseline_cross: false
+  exit_on_d1_baseline_cross: true
+
+classification:
+  mode: r_multiple
+
+# H1 filter: same implementation as KH-24 (kh24_enabled reuses KH-22 code path)
+# For short direction the engine inverts the CIR comparison:
+#   block when CIR < (1 - 0.28) = 0.72  (close not near high enough)
+kh24_enabled: true
+kh24_h1_range_threshold: 0.28
+
+wfo:
+  n_folds: 7
+  is_months_0: 21
+  oos_months: 9
+  anchored: true
+  start: "2019-01-01"
+  end: "2026-01-01"
+
+  folds:
+    - fold: 1
+      is_start: "2019-01-01"
+      is_end: "2020-10-01"
+      oos_start: "2020-10-01"
+      oos_end: "2021-07-01"
+    - fold: 2
+      is_start: "2019-01-01"
+      is_end: "2021-07-01"
+      oos_start: "2021-07-01"
+      oos_end: "2022-04-01"
+    - fold: 3
+      is_start: "2019-01-01"
+      is_end: "2022-04-01"
+      oos_start: "2022-04-01"
+      oos_end: "2023-01-01"
+    - fold: 4
+      is_start: "2019-01-01"
+      is_end: "2023-01-01"
+      oos_start: "2023-01-01"
+      oos_end: "2023-10-01"
+    - fold: 5
+      is_start: "2019-01-01"
+      is_end: "2023-10-01"
+      oos_start: "2023-10-01"
+      oos_end: "2024-07-01"
+    - fold: 6
+      is_start: "2019-01-01"
+      is_end: "2024-07-01"
+      oos_start: "2024-07-01"
+      oos_end: "2025-04-01"
+    - fold: 7
+      is_start: "2019-01-01"
+      is_end: "2025-04-01"
+      oos_start: "2025-04-01"
+      oos_end: "2026-01-01"
+
+gate:
+  worst_fold_roi_min_pct: 0.0
+  worst_fold_dd_max_pct: 8.0
+
+outputs:
+  dir: "results/kh24_short_mirror"
+  write_trades_csv: true

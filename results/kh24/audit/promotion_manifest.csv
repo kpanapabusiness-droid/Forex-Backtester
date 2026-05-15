@@ -1,0 +1,17 @@
+path,exists_on_phase_kh17,sha256_phase_kh17,exists_on_main,sha256_main_if_present,action,notes
+configs/wfo_kh24.yaml,true,d6cb8a612acaa556dbdeb4b3cb08486c55b4cecaca810dbfae9d44d2ff92e7b0,false,,copy,
+configs/wfo_kh24_short_mirror.yaml,true,87c3a16d0f2c51b96dd9f9f8a1c073923510d0feb334a00f19d3bcf409f82408,false,,copy,KH-24 short-mirror experiment config
+configs/wfo_baseline_clean.yaml,true,66481b1061610b86c7c5f4a638f9fc5f4625653fd3604bebac8ad61443129ed8,false,,copy,Governance-flagged KH-24 baseline config (SESSION_ZERO L61) — KGL_V2 baseline without exposure cap
+docs/KH24_SYSTEM_LOCK.md,true,86bc762b5963a9b32dd58850055d91473c62a3958d3e73ccd06cbe9a57baabfd,false,,copy,
+results/kh24/PHASE_KH24_RESULT.md,true,0145388f907de6f08286c408c85f25bc543acfe6077ab46354a6d64f072b9226,false,,copy,
+results/kh24/kgl_v2_report.md,true,4cd29a717b1ec98bbc065af9afe80e7efebbe79d5366469738a89bb355da63fe,false,,copy,
+results/kh24/trades_all.csv,true,ad1cd965d2e694d5084c34b0c9d9c6e6046635e9b94933b582bd67f08cd3cd37,false,,copy,
+results/kh24/wfo_fold_results_4h.csv,true,b31b739d9d762f3b7cc8e6a3c7891b1c4422557aca095b437c398beed4283fbc,false,,copy,
+results/kh24/wfo_per_pair_4h.csv,true,d3af5ed86d1e940559997c4c91f7afb24ff69d8d0f32eabeeeaeb862616b905c,false,,copy,
+results/kh24/wfo_summary_4h.txt,true,fb705af6b10941749ba6e9801e45c39da39d60372d6b90b6b0ad031167ac55e8,false,,copy,
+scripts/phase_kgl_v2_4h_wfo.py,true,74b59ac1f94fb6a73da78afc811e71c10c74d7d5361d8bf11c92aae17c98e2bc,false,,copy,KH-24 backtester / generator
+signals/__init__.py,true,6829b6d9610d2aab204d03ff02ccd014c8396f94ddfabe862ab367c84db7172e,false,,copy,Required by generator (kb_exhaustion_bar import)
+signals/kb_exhaustion_bar.py,true,901f5374a72f7ecfcf75e8dd6e7265637ed4dc0cf4e2e15234f14ce722a7f47c,false,,copy,KH-24 signal definition (_wilder_atr used by generator)
+tests/test_phase_kgl_v2_context_columns.py,true,060a9bb276ab223743b6c9a1eeb08517fc127cb568d73e4a4322cb33e589c92a,false,,copy,Test for generator
+EA/KH24_EA.mq5,true,072213b38bbfe4ead6ca60ea01f99ae3254ce532b03e90f3ed082a446f050b15,false,,copy,Deployed MT5 EA
+core/utils.py,true,9bdd639eaa6da0d76c0f21d1b1d771fad48ea16a72ffdd6c87e7e57470121e05,true,9bdd639eaa6da0d76c0f21d1b1d771fad48ea16a72ffdd6c87e7e57470121e05,verify_identical,Generator dependency; already byte-identical on main

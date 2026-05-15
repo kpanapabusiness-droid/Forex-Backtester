@@ -3,6 +3,7 @@
 Writes results/l_arc_2/step4/determinism_check.txt with the ledger.
 Hard-fail on any mismatch (exit code 1).
 """
+
 from __future__ import annotations
 
 import sys
@@ -36,7 +37,7 @@ def main() -> int:
     for k in keys:
         s1 = sha_1.get(k, "<missing>")
         s2 = sha_2.get(k, "<missing>")
-        ok = (s1 == s2)
+        ok = s1 == s2
         if not ok:
             mismatch += 1
         marker = "OK" if ok else "MISMATCH"

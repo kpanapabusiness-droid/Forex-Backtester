@@ -21,16 +21,20 @@ def _synthetic_ohlc(n_bars: int = 30, pair: str = "EUR_USD") -> pd.DataFrame:
     low = close - np.abs(np.random.randn(n_bars) * 0.001)
     open_ = np.roll(close, 1)
     open_[0] = close[0]
-    return pd.DataFrame({
-        "date": dates,
-        "open": open_,
-        "high": high,
-        "low": low,
-        "close": close,
-    })
+    return pd.DataFrame(
+        {
+            "date": dates,
+            "open": open_,
+            "high": high,
+            "low": low,
+            "close": close,
+        }
+    )
 
 
-def _synthetic_ohlc_tp1_then_return_to_entry(n_bars: int = 22, base: float = 1.1000, atr_val: float = 0.001) -> pd.DataFrame:
+def _synthetic_ohlc_tp1_then_return_to_entry(
+    n_bars: int = 22, base: float = 1.1000, atr_val: float = 0.001
+) -> pd.DataFrame:
     """
     TP1 hits then price returns to entry. With BE: exit breakeven_after_tp1. Without BE: stay until SL.
     Entry bar 15 open. Bar 15: TP1. Bar 17: return to entry (BE hit if enabled). Bar 18: hit original SL.
@@ -98,13 +102,15 @@ def _synthetic_signals(n_bars: int, entry_at: int, direction: str = "long") -> p
     for i, d in enumerate(dates):
         for dir_name in ("long", "short"):
             sig = 1 if (i == entry_at and dir_name == direction) else 0
-            rows.append({
-                "pair": "EUR_USD",
-                "date": d,
-                "direction": dir_name,
-                "signal": sig,
-                "signal_name": "test_signal",
-            })
+            rows.append(
+                {
+                    "pair": "EUR_USD",
+                    "date": d,
+                    "direction": dir_name,
+                    "signal": sig,
+                    "signal_name": "test_signal",
+                }
+            )
     return pd.DataFrame(rows)
 
 
@@ -295,8 +301,12 @@ def test_tp1_move_sl_to_be_false_keeps_runner(tmp_path: Path) -> None:
     cfg_no_be = {**cfg_be, "exit": {**cfg_be["exit"], "tp1_move_sl_to_be": False}}
     equity = {"balance": 10000.0}
 
-    trades_be = simulate_pair_trades(df.copy(), "EUR_USD", cfg_be, dict(equity), return_equity=False)
-    trades_no_be = simulate_pair_trades(df.copy(), "EUR_USD", cfg_no_be, dict(equity), return_equity=False)
+    trades_be = simulate_pair_trades(
+        df.copy(), "EUR_USD", cfg_be, dict(equity), return_equity=False
+    )
+    trades_no_be = simulate_pair_trades(
+        df.copy(), "EUR_USD", cfg_no_be, dict(equity), return_equity=False
+    )
 
     assert len(trades_be) >= 1 and len(trades_no_be) >= 1
     t_be = trades_be[0]
@@ -364,15 +374,47 @@ def test_apply_breakout_filter_long_kept_short_blocked() -> None:
     """Phase D-4.2: long with breakout_up=1 kept, short with breakout_dn=0 blocked."""
     from scripts.phaseD3_run_sequence_backtest import _apply_breakout_filter
 
-    signals = pd.DataFrame([
-        {"pair": "EUR_USD", "date": pd.Timestamp("2022-01-10"), "direction": "long", "signal": 1, "signal_name": "seq_comp3_tratr90"},
-        {"pair": "EUR_USD", "date": pd.Timestamp("2022-01-10"), "direction": "short", "signal": 1, "signal_name": "seq_comp3_tratr90"},
-        {"pair": "EUR_USD", "date": pd.Timestamp("2022-01-15"), "direction": "short", "signal": 1, "signal_name": "seq_comp3_tratr90"},
-    ])
-    features = pd.DataFrame([
-        {"pair": "EUR_USD", "date": pd.Timestamp("2022-01-10"), "breakout_up_20": 1.0, "breakout_dn_20": 0.0},
-        {"pair": "EUR_USD", "date": pd.Timestamp("2022-01-15"), "breakout_up_20": 0.0, "breakout_dn_20": 0.0},
-    ])
+    signals = pd.DataFrame(
+        [
+            {
+                "pair": "EUR_USD",
+                "date": pd.Timestamp("2022-01-10"),
+                "direction": "long",
+                "signal": 1,
+                "signal_name": "seq_comp3_tratr90",
+            },
+            {
+                "pair": "EUR_USD",
+                "date": pd.Timestamp("2022-01-10"),
+                "direction": "short",
+                "signal": 1,
+                "signal_name": "seq_comp3_tratr90",
+            },
+            {
+                "pair": "EUR_USD",
+                "date": pd.Timestamp("2022-01-15"),
+                "direction": "short",
+                "signal": 1,
+                "signal_name": "seq_comp3_tratr90",
+            },
+        ]
+    )
+    features = pd.DataFrame(
+        [
+            {
+                "pair": "EUR_USD",
+                "date": pd.Timestamp("2022-01-10"),
+                "breakout_up_20": 1.0,
+                "breakout_dn_20": 0.0,
+            },
+            {
+                "pair": "EUR_USD",
+                "date": pd.Timestamp("2022-01-15"),
+                "breakout_up_20": 0.0,
+                "breakout_dn_20": 0.0,
+            },
+        ]
+    )
     out = _apply_breakout_filter(
         signals, features, breakout_up_col="breakout_up_20", breakout_dn_col="breakout_dn_20"
     )
@@ -400,12 +442,27 @@ def test_apply_breakout_filter_nan_fail_closed() -> None:
     """Phase D-4.2: NaN breakout value -> signal becomes 0 (fail closed)."""
     from scripts.phaseD3_run_sequence_backtest import _apply_breakout_filter
 
-    signals = pd.DataFrame([
-        {"pair": "EUR_USD", "date": pd.Timestamp("2022-01-20"), "direction": "long", "signal": 1, "signal_name": "seq_comp3_tratr90"},
-    ])
-    features = pd.DataFrame([
-        {"pair": "EUR_USD", "date": pd.Timestamp("2022-01-20"), "breakout_up_20": np.nan, "breakout_dn_20": 0.0},
-    ])
+    signals = pd.DataFrame(
+        [
+            {
+                "pair": "EUR_USD",
+                "date": pd.Timestamp("2022-01-20"),
+                "direction": "long",
+                "signal": 1,
+                "signal_name": "seq_comp3_tratr90",
+            },
+        ]
+    )
+    features = pd.DataFrame(
+        [
+            {
+                "pair": "EUR_USD",
+                "date": pd.Timestamp("2022-01-20"),
+                "breakout_up_20": np.nan,
+                "breakout_dn_20": 0.0,
+            },
+        ]
+    )
     out = _apply_breakout_filter(
         signals, features, breakout_up_col="breakout_up_20", breakout_dn_col="breakout_dn_20"
     )
@@ -415,16 +472,20 @@ def test_apply_breakout_filter_nan_fail_closed() -> None:
 def test_signals_to_entry_intent() -> None:
     from scripts.phaseD3_run_sequence_backtest import _signals_to_entry_intent
 
-    sig = pd.DataFrame([
-        {"pair": "X", "date": pd.Timestamp("2022-01-01"), "direction": "long", "signal": 1},
-        {"pair": "X", "date": pd.Timestamp("2022-01-01"), "direction": "short", "signal": 0},
-    ])
+    sig = pd.DataFrame(
+        [
+            {"pair": "X", "date": pd.Timestamp("2022-01-01"), "direction": "long", "signal": 1},
+            {"pair": "X", "date": pd.Timestamp("2022-01-01"), "direction": "short", "signal": 0},
+        ]
+    )
     out = _signals_to_entry_intent(sig)
     assert len(out) == 1
     assert out.iloc[0]["entry_signal"] == 1
 
-    sig2 = pd.DataFrame([
-        {"pair": "X", "date": pd.Timestamp("2022-01-02"), "direction": "short", "signal": 1},
-    ])
+    sig2 = pd.DataFrame(
+        [
+            {"pair": "X", "date": pd.Timestamp("2022-01-02"), "direction": "short", "signal": 1},
+        ]
+    )
     out2 = _signals_to_entry_intent(sig2)
     assert out2.iloc[0]["entry_signal"] == -1

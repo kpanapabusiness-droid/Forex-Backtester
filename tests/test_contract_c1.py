@@ -48,9 +48,7 @@ def test_c1_returns_dataframe_aligned(name, func, test_df):
     """C1 must return a DataFrame with same index and length as input."""
     out = _call_c1_with_signal_col(func, test_df, name)
     if not isinstance(out, type(test_df)) or not hasattr(out, "index"):
-        raise AssertionError(
-            f"C1 '{name}' must return a DataFrame; got {type(out).__name__}"
-        )
+        raise AssertionError(f"C1 '{name}' must return a DataFrame; got {type(out).__name__}")
     if len(out) != len(test_df):
         raise AssertionError(
             f"C1 '{name}': output length {len(out)} != input length {len(test_df)}"
@@ -112,7 +110,10 @@ def test_c1_determinism(name, func, test_df):
     s1 = out1[SIGNAL_COL]
     s2 = out2[SIGNAL_COL]
     pd.testing.assert_series_equal(
-        s1, s2, check_names=True, check_exact=False,
+        s1,
+        s2,
+        check_names=True,
+        check_exact=False,
         obj=f"C1 '{name}' determinism",
     )
 

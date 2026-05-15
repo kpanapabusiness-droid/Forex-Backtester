@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Print WFO fold table and worst-fold metrics. Usage: python scripts/print_wfo_metrics.py [wfo_root]"""
+
 import sys
 from pathlib import Path
 
@@ -36,7 +37,9 @@ def main():
         wfo_root = root / wfo_root
     wfo_root = wfo_root.resolve()
 
-    run_dirs = sorted([d for d in wfo_root.iterdir() if d.is_dir()], key=lambda p: p.stat().st_mtime, reverse=True)
+    run_dirs = sorted(
+        [d for d in wfo_root.iterdir() if d.is_dir()], key=lambda p: p.stat().st_mtime, reverse=True
+    )
     if not run_dirs:
         print("No WFO run directories found under", wfo_root)
         return

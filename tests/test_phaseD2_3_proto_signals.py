@@ -29,18 +29,20 @@ def _synthetic_features(
     rows = []
     for i, d in enumerate(dates):
         split = "discovery" if d <= pd.Timestamp("2022-12-31") else "validation"
-        rows.append({
-            "pair": pair,
-            "date": d,
-            "dataset_split": split,
-            "atrp_14": 0.001 + (i * 0.0008),
-            "true_range": 0.001 + (i * 0.0008),
-            "breakout_up_20": 1.0 if i == 2 else 0.0,
-            "breakout_dn_20": 1.0 if i == 5 else 0.0,
-            "pos_in_range_20": max(0.0, min(1.0, 0.3 + i * 0.02)),
-            "tr_atr_ratio": 0.8 + (i * 0.02),
-            "mom_slope_5": 0.0001 * (i - 15),
-        })
+        rows.append(
+            {
+                "pair": pair,
+                "date": d,
+                "dataset_split": split,
+                "atrp_14": 0.001 + (i * 0.0008),
+                "true_range": 0.001 + (i * 0.0008),
+                "breakout_up_20": 1.0 if i == 2 else 0.0,
+                "breakout_dn_20": 1.0 if i == 5 else 0.0,
+                "pos_in_range_20": max(0.0, min(1.0, 0.3 + i * 0.02)),
+                "tr_atr_ratio": 0.8 + (i * 0.02),
+                "mom_slope_5": 0.0001 * (i - 15),
+            }
+        )
     df = pd.DataFrame(rows)
     df["atrp_14"] = df["atrp_14"].astype(float)
     df["true_range"] = df["true_range"].astype(float)
@@ -57,18 +59,20 @@ def _synthetic_features_atrp_low_tr_high() -> pd.DataFrame:
     rows = []
     for i, d in enumerate(dates):
         split = "discovery" if d <= pd.Timestamp("2022-12-31") else "validation"
-        rows.append({
-            "pair": "EUR_USD",
-            "date": d,
-            "dataset_split": split,
-            "atrp_14": atrp[i],
-            "true_range": tr[i],
-            "breakout_up_20": 1.0 if i == 10 else 0.0,
-            "breakout_dn_20": 1.0 if i == 25 else 0.0,
-            "pos_in_range_20": max(0.0, min(1.0, 0.2 + i * 0.015)),
-            "tr_atr_ratio": 0.7 + (i * 0.025),
-            "mom_slope_5": 0.00005 * (i - 25),
-        })
+        rows.append(
+            {
+                "pair": "EUR_USD",
+                "date": d,
+                "dataset_split": split,
+                "atrp_14": atrp[i],
+                "true_range": tr[i],
+                "breakout_up_20": 1.0 if i == 10 else 0.0,
+                "breakout_dn_20": 1.0 if i == 25 else 0.0,
+                "pos_in_range_20": max(0.0, min(1.0, 0.2 + i * 0.015)),
+                "tr_atr_ratio": 0.7 + (i * 0.025),
+                "mom_slope_5": 0.00005 * (i - 25),
+            }
+        )
     return pd.DataFrame(rows)
 
 
@@ -85,9 +89,7 @@ def test_bin_edges_from_discovery_only() -> None:
     from analytics.phaseD2_2_features import compute_bin_edges_from_discovery
 
     df = _synthetic_features(25, 5)
-    edges = compute_bin_edges_from_discovery(
-        df, "atrp_14", n_bins=10, min_per_bin=2
-    )
+    edges = compute_bin_edges_from_discovery(df, "atrp_14", n_bins=10, min_per_bin=2)
     assert edges is not None
     assert len(edges) == 11
 
@@ -110,9 +112,7 @@ def test_proto_comp_atrp_low_fires_both_directions() -> None:
 
     df = _synthetic_features_atrp_low_tr_high()
     df = _ensure_dataset_split(df, "2022-12-31")
-    edges = compute_bin_edges_from_discovery(
-        df, "atrp_14", n_bins=10, min_per_bin=2
-    )
+    edges = compute_bin_edges_from_discovery(df, "atrp_14", n_bins=10, min_per_bin=2)
     assert edges is not None
     atrp_bin = apply_bin_edges(df["atrp_14"], edges)
     atrp_low = (atrp_bin == 0).fillna(False)
@@ -141,9 +141,7 @@ def test_proto_ignite_tr_high_fires_both_directions() -> None:
 
     df = _synthetic_features_atrp_low_tr_high()
     df = _ensure_dataset_split(df, "2022-12-31")
-    edges = compute_bin_edges_from_discovery(
-        df, "true_range", n_bins=10, min_per_bin=2
-    )
+    edges = compute_bin_edges_from_discovery(df, "true_range", n_bins=10, min_per_bin=2)
     assert edges is not None
     tr_bin = apply_bin_edges(df["true_range"], edges)
     tr_high = (tr_bin == 9).fillna(False)
@@ -170,9 +168,7 @@ def test_breakout_up_fires_long_only() -> None:
     df = _synthetic_features(25, 5)
     df.loc[df.index[2], "breakout_up_20"] = 1.0
     df = _ensure_dataset_split(df, "2022-12-31")
-    edges = compute_bin_edges_from_discovery(
-        df, "atrp_14", n_bins=10, min_per_bin=2
-    )
+    edges = compute_bin_edges_from_discovery(df, "atrp_14", n_bins=10, min_per_bin=2)
     atrp_bin = apply_bin_edges(df["atrp_14"], edges)
     atrp_low = (atrp_bin == 0).fillna(False)
 
@@ -199,9 +195,7 @@ def test_breakout_dn_fires_short_only() -> None:
     df = _synthetic_features(25, 5)
     df.loc[df.index[5], "breakout_dn_20"] = 1.0
     df = _ensure_dataset_split(df, "2022-12-31")
-    edges = compute_bin_edges_from_discovery(
-        df, "atrp_14", n_bins=10, min_per_bin=2
-    )
+    edges = compute_bin_edges_from_discovery(df, "atrp_14", n_bins=10, min_per_bin=2)
     atrp_bin = apply_bin_edges(df["atrp_14"], edges)
     atrp_low = (atrp_bin == 0).fillna(False)
 
@@ -227,9 +221,7 @@ def test_nan_features_produce_signal_zero() -> None:
 
     df = _synthetic_features_with_nan()
     df = _ensure_dataset_split(df, "2022-12-31")
-    edges = compute_bin_edges_from_discovery(
-        df, "atrp_14", n_bins=10, min_per_bin=2
-    )
+    edges = compute_bin_edges_from_discovery(df, "atrp_14", n_bins=10, min_per_bin=2)
     atrp_bin = apply_bin_edges(df["atrp_14"], edges)
     atrp_low = (atrp_bin == 0).fillna(False)
 
@@ -256,9 +248,7 @@ def test_output_two_rows_per_date_per_signal() -> None:
 
     df = _synthetic_features(25, 5)
     df = _ensure_dataset_split(df, "2022-12-31")
-    edges = compute_bin_edges_from_discovery(
-        df, "atrp_14", n_bins=10, min_per_bin=2
-    )
+    edges = compute_bin_edges_from_discovery(df, "atrp_14", n_bins=10, min_per_bin=2)
     atrp_bin = apply_bin_edges(df["atrp_14"], edges)
     atrp_low = (atrp_bin == 0).fillna(False)
 
@@ -274,10 +264,20 @@ def test_output_two_rows_per_date_per_signal() -> None:
 def test_proto_signals_script_e2e(tmp_path: Path) -> None:
     """Full script run produces valid parquet and csv."""
     df = _synthetic_features(25, 5)
-    df = df[[
-        "pair", "date", "dataset_split", "atrp_14", "true_range",
-        "breakout_up_20", "breakout_dn_20", "pos_in_range_20", "tr_atr_ratio", "mom_slope_5",
-    ]]
+    df = df[
+        [
+            "pair",
+            "date",
+            "dataset_split",
+            "atrp_14",
+            "true_range",
+            "breakout_up_20",
+            "breakout_dn_20",
+            "pos_in_range_20",
+            "tr_atr_ratio",
+            "mom_slope_5",
+        ]
+    ]
     features_path = tmp_path / "features.parquet"
     df.to_parquet(features_path, index=False)
 
@@ -294,6 +294,7 @@ def test_proto_signals_script_e2e(tmp_path: Path) -> None:
     }
     config_path = tmp_path / "config.yaml"
     import yaml
+
     with config_path.open("w", encoding="utf-8") as f:
         yaml.dump(config, f)
 
@@ -323,11 +324,13 @@ def test_config_validation_fail_fast() -> None:
     with pytest.raises(ValueError, match="discovery_end"):
         _require_config({"features_path": "x", "outputs_dir": "y", "split": {}})
     with pytest.raises(ValueError, match="signals"):
-        _require_config({
-            "features_path": "x",
-            "outputs_dir": "y",
-            "split": {"discovery_end": "2022-12-31"},
-        })
+        _require_config(
+            {
+                "features_path": "x",
+                "outputs_dir": "y",
+                "split": {"discovery_end": "2022-12-31"},
+            }
+        )
 
 
 def test_pos_pressure_signals_fire_correctly() -> None:
@@ -346,9 +349,7 @@ def test_pos_pressure_signals_fire_correctly() -> None:
     df = _ensure_dataset_split(df, "2022-12-31")
     df.loc[df.index[0], "pos_in_range_20"] = 0.90
     df.loc[df.index[1], "pos_in_range_20"] = 0.10
-    edges = compute_bin_edges_from_discovery(
-        df, "atrp_14", n_bins=10, min_per_bin=2
-    )
+    edges = compute_bin_edges_from_discovery(df, "atrp_14", n_bins=10, min_per_bin=2)
     atrp_bin = apply_bin_edges(df["atrp_14"], edges)
     atrp_low = (atrp_bin == 0).fillna(False)
 
@@ -382,9 +383,7 @@ def test_tr_mid_high_70th_percentile_from_discovery() -> None:
     tr_70th = _discovery_percentile_threshold(df, "true_range", q=0.70)
     assert np.isfinite(tr_70th)
 
-    edges = compute_bin_edges_from_discovery(
-        df, "atrp_14", n_bins=10, min_per_bin=2
-    )
+    edges = compute_bin_edges_from_discovery(df, "atrp_14", n_bins=10, min_per_bin=2)
     atrp_bin = apply_bin_edges(df["atrp_14"], edges)
     atrp_low = (atrp_bin == 0).fillna(False)
 
@@ -413,16 +412,12 @@ def test_tr_atr_ratio_condition_works() -> None:
     tr_atr_70th = _discovery_percentile_threshold(df, "tr_atr_ratio", q=0.70)
     assert np.isfinite(tr_atr_70th)
 
-    edges = compute_bin_edges_from_discovery(
-        df, "atrp_14", n_bins=10, min_per_bin=2
-    )
+    edges = compute_bin_edges_from_discovery(df, "atrp_14", n_bins=10, min_per_bin=2)
     atrp_bin = apply_bin_edges(df["atrp_14"], edges)
     atrp_low = (atrp_bin == 0).fillna(False)
 
     spine = _build_spine(df)
-    out = _generate_proto_comp_atrp_low_tr_atr_ratio_high(
-        spine, df, atrp_low, tr_atr_70th
-    )
+    out = _generate_proto_comp_atrp_low_tr_atr_ratio_high(spine, df, atrp_low, tr_atr_70th)
 
     assert out["signal"].isin([0, 1]).all()
     assert len(out) == len(df) * 2
@@ -444,9 +439,7 @@ def test_slope_alignment_works() -> None:
     df = _ensure_dataset_split(df, "2022-12-31")
     df.loc[df.index[0], "mom_slope_5"] = 0.001
     df.loc[df.index[1], "mom_slope_5"] = -0.001
-    edges = compute_bin_edges_from_discovery(
-        df, "atrp_14", n_bins=10, min_per_bin=2
-    )
+    edges = compute_bin_edges_from_discovery(df, "atrp_14", n_bins=10, min_per_bin=2)
     atrp_bin = apply_bin_edges(df["atrp_14"], edges)
     atrp_low = (atrp_bin == 0).fillna(False)
 
@@ -477,9 +470,7 @@ def test_new_signals_nan_produce_signal_zero() -> None:
     df.loc[df.index[0], "pos_in_range_20"] = np.nan
     df.loc[df.index[2], "mom_slope_5"] = np.nan
     df.loc[df.index[3], "tr_atr_ratio"] = np.nan
-    edges = compute_bin_edges_from_discovery(
-        df, "atrp_14", n_bins=10, min_per_bin=2
-    )
+    edges = compute_bin_edges_from_discovery(df, "atrp_14", n_bins=10, min_per_bin=2)
     atrp_bin = apply_bin_edges(df["atrp_14"], edges)
     atrp_low = (atrp_bin == 0).fillna(False)
     tr_atr_70th = _discovery_percentile_threshold(df, "tr_atr_ratio", q=0.70)
@@ -494,9 +485,7 @@ def test_new_signals_nan_produce_signal_zero() -> None:
     nan_dates_slope = df.loc[[df.index[2]], "date"]
     assert (out_slope[out_slope["date"].isin(nan_dates_slope)]["signal"] == 0).all()
 
-    out_ratio = _generate_proto_comp_atrp_low_tr_atr_ratio_high(
-        spine, df, atrp_low, tr_atr_70th
-    )
+    out_ratio = _generate_proto_comp_atrp_low_tr_atr_ratio_high(spine, df, atrp_low, tr_atr_70th)
     nan_dates_ratio = df.loc[[df.index[3]], "date"]
     assert (out_ratio[out_ratio["date"].isin(nan_dates_ratio)]["signal"] == 0).all()
 
@@ -518,7 +507,10 @@ def test_deterministic_ordering_maintained(tmp_path: Path) -> None:
         "bins": {"n_bins": 10, "min_per_bin": 2},
         "signals": [
             {"name": "proto_comp_atrp_low", "rule": "compression_atrp_low"},
-            {"name": "proto_comp_atrp_low_pos_pressure_up", "rule": "compression_atrp_low_pos_pressure_up"},
+            {
+                "name": "proto_comp_atrp_low_pos_pressure_up",
+                "rule": "compression_atrp_low_pos_pressure_up",
+            },
         ],
     }
     config_path = tmp_path / "config.yaml"

@@ -22,7 +22,16 @@ if str(ROOT) not in sys.path:
 
 EVENT_HORIZON = 40
 LABEL_REQUIRED = ["pair", "date", "direction", "dataset_split", "zone_c_6r_40", "t6", "mfe_40_r"]
-ATTR_REQUIRED = ["candidate_id", "pair", "direction", "event_start_date", "dataset_split", "captured", "first_trigger_date", "entry_delay_bars"]
+ATTR_REQUIRED = [
+    "candidate_id",
+    "pair",
+    "direction",
+    "event_start_date",
+    "dataset_split",
+    "captured",
+    "first_trigger_date",
+    "entry_delay_bars",
+]
 
 
 def _load_labels(path: Path) -> pd.DataFrame:
@@ -52,7 +61,9 @@ def _load_attribution(d6b_outdir: Path) -> pd.DataFrame:
     )
     missing = [c for c in ATTR_REQUIRED if c not in df.columns]
     if missing:
-        raise ValueError(f"Attribution missing required columns: {missing}. Found: {list(df.columns)}")
+        raise ValueError(
+            f"Attribution missing required columns: {missing}. Found: {list(df.columns)}"
+        )
     if "params_json" not in df.columns:
         df["params_json"] = df["candidate_id"].astype(str)
     return df
@@ -78,7 +89,9 @@ def _identify_zone_c_events(labels: pd.DataFrame) -> pd.DataFrame:
     starts = labels.groupby(["pair", "direction"], group_keys=True).apply(_starts_in_group)
     if isinstance(starts.index, pd.MultiIndex):
         starts = starts.reset_index(level=["pair", "direction"])
-    out_cols = [c for c in ["pair", "date", "direction", "dataset_split", "mfe_40_r"] if c in starts.columns]
+    out_cols = [
+        c for c in ["pair", "date", "direction", "dataset_split", "mfe_40_r"] if c in starts.columns
+    ]
     out = starts[out_cols].reset_index(drop=True)
     out = out.rename(columns={"date": "start_date", "mfe_40_r": "event_mfe_40_r"})
     return out
@@ -181,11 +194,15 @@ def _merge_events_attribution(
                 if not lbl.empty:
                     t6_at_entry = lbl["t6"].iloc[0]
 
-        if first_trigger_date is None or (isinstance(first_trigger_date, float) and np.isnan(first_trigger_date)):
+        if first_trigger_date is None or (
+            isinstance(first_trigger_date, float) and np.isnan(first_trigger_date)
+        ):
             offset = None
         else:
             first_str = str(first_trigger_date).strip()
-            trig_idx = _date_index(timeline, first_str) if first_str and first_str != "nan" else None
+            trig_idx = (
+                _date_index(timeline, first_str) if first_str and first_str != "nan" else None
+            )
             offset = (trig_idx - start_idx) if trig_idx is not None else None
 
         band = _classify_band(offset, pre_bars, on_bars, late_bars)
@@ -193,21 +210,23 @@ def _merge_events_attribution(
             event_mfe_40_r, float(t6_at_entry) if pd.notna(t6_at_entry) else 0.0, band
         )
 
-        rows.append({
-            "pair": pair,
-            "direction": direction,
-            "dataset_split": dataset_split,
-            "start_date": start_date_str,
-            "event_mfe_40_r": event_mfe_40_r,
-            "candidate_id": str(attr_row["candidate_id"]),
-            "params_json": str(attr_row.get("params_json", attr_row["candidate_id"])),
-            "first_trigger_date": first_trigger_date,
-            "entry_offset_bars": offset if offset is not None else np.nan,
-            "band": band,
-            "t6_at_entry": t6_at_entry,
-            "remaining_frac": remaining_frac,
-            "captured_value_proxy_r": captured_value_proxy_r,
-        })
+        rows.append(
+            {
+                "pair": pair,
+                "direction": direction,
+                "dataset_split": dataset_split,
+                "start_date": start_date_str,
+                "event_mfe_40_r": event_mfe_40_r,
+                "candidate_id": str(attr_row["candidate_id"]),
+                "params_json": str(attr_row.get("params_json", attr_row["candidate_id"])),
+                "first_trigger_date": first_trigger_date,
+                "entry_offset_bars": offset if offset is not None else np.nan,
+                "band": band,
+                "t6_at_entry": t6_at_entry,
+                "remaining_frac": remaining_frac,
+                "captured_value_proxy_r": captured_value_proxy_r,
+            }
+        )
 
     return pd.DataFrame(rows) if rows else pd.DataFrame()
 
@@ -246,8 +265,16 @@ def _build_candidate_summary(event_value_df: pd.DataFrame) -> pd.DataFrame:
 
     grp = df.groupby(["candidate_id", "params_json"], dropna=False)
     events_total = grp.size()
-    events_disc = df[df["dataset_split"] == "discovery"].groupby(["candidate_id", "params_json"], dropna=False).size()
-    events_val = df[df["dataset_split"] == "validation"].groupby(["candidate_id", "params_json"], dropna=False).size()
+    events_disc = (
+        df[df["dataset_split"] == "discovery"]
+        .groupby(["candidate_id", "params_json"], dropna=False)
+        .size()
+    )
+    events_val = (
+        df[df["dataset_split"] == "validation"]
+        .groupby(["candidate_id", "params_json"], dropna=False)
+        .size()
+    )
 
     capture_pre = grp["_pre"].sum() / grp.size() * 100
     capture_on = grp["_on"].sum() / grp.size() * 100
@@ -255,12 +282,20 @@ def _build_candidate_summary(event_value_df: pd.DataFrame) -> pd.DataFrame:
     capture_total = grp["_total_cap"].sum() / grp.size() * 100
 
     captured_subset = df[df["_captured"]]
-    avg_val_given_cap = (
-        captured_subset.groupby(["candidate_id", "params_json"], dropna=False)["captured_value_proxy_r"].mean()
-    )
+    avg_val_given_cap = captured_subset.groupby(["candidate_id", "params_json"], dropna=False)[
+        "captured_value_proxy_r"
+    ].mean()
     ev_proxy = grp["captured_value_proxy_r"].mean()
-    ev_disc = df[df["dataset_split"] == "discovery"].groupby(["candidate_id", "params_json"], dropna=False)["captured_value_proxy_r"].mean()
-    ev_val = df[df["dataset_split"] == "validation"].groupby(["candidate_id", "params_json"], dropna=False)["captured_value_proxy_r"].mean()
+    ev_disc = (
+        df[df["dataset_split"] == "discovery"]
+        .groupby(["candidate_id", "params_json"], dropna=False)["captured_value_proxy_r"]
+        .mean()
+    )
+    ev_val = (
+        df[df["dataset_split"] == "validation"]
+        .groupby(["candidate_id", "params_json"], dropna=False)["captured_value_proxy_r"]
+        .mean()
+    )
 
     median_offset_cap = (
         df[df["_captured"]]
@@ -268,20 +303,22 @@ def _build_candidate_summary(event_value_df: pd.DataFrame) -> pd.DataFrame:
         .median()
     )
 
-    summary = pd.DataFrame({
-        "zoneC_events_total": events_total,
-        "zoneC_events_discovery": events_disc.reindex(events_total.index).fillna(0).astype(int),
-        "zoneC_events_validation": events_val.reindex(events_total.index).fillna(0).astype(int),
-        "capture_pre_pct": capture_pre,
-        "capture_on_pct": capture_on,
-        "capture_late_pct": capture_late,
-        "capture_total_pct": capture_total,
-        "avg_value_given_captured_r": avg_val_given_cap.reindex(events_total.index),
-        "EV_proxy_per_event_r": ev_proxy,
-        "EV_proxy_per_event_discovery_r": ev_disc.reindex(events_total.index),
-        "EV_proxy_per_event_validation_r": ev_val.reindex(events_total.index),
-        "median_entry_offset_bars_captured": median_offset_cap.reindex(events_total.index),
-    }).reset_index()
+    summary = pd.DataFrame(
+        {
+            "zoneC_events_total": events_total,
+            "zoneC_events_discovery": events_disc.reindex(events_total.index).fillna(0).astype(int),
+            "zoneC_events_validation": events_val.reindex(events_total.index).fillna(0).astype(int),
+            "capture_pre_pct": capture_pre,
+            "capture_on_pct": capture_on,
+            "capture_late_pct": capture_late,
+            "capture_total_pct": capture_total,
+            "avg_value_given_captured_r": avg_val_given_cap.reindex(events_total.index),
+            "EV_proxy_per_event_r": ev_proxy,
+            "EV_proxy_per_event_discovery_r": ev_disc.reindex(events_total.index),
+            "EV_proxy_per_event_validation_r": ev_val.reindex(events_total.index),
+            "median_entry_offset_bars_captured": median_offset_cap.reindex(events_total.index),
+        }
+    ).reset_index()
 
     summary = summary.sort_values(["candidate_id", "params_json"]).reset_index(drop=True)
     return summary
@@ -317,20 +354,37 @@ def _write_decision_memo(
             lines.append(f"  capture_on_pct: {r.get('capture_on_pct', np.nan):.1f}%")
             lines.append(f"  capture_late_pct: {r.get('capture_late_pct', np.nan):.1f}%")
             lines.append(f"  EV_proxy_per_event_r: {r.get('EV_proxy_per_event_r', np.nan):.4f}R")
-            lines.append(f"  EV_proxy_per_event_discovery_r: {r.get('EV_proxy_per_event_discovery_r', np.nan):.4f}R")
-            lines.append(f"  EV_proxy_per_event_validation_r: {r.get('EV_proxy_per_event_validation_r', np.nan):.4f}R")
+            lines.append(
+                f"  EV_proxy_per_event_discovery_r: {r.get('EV_proxy_per_event_discovery_r', np.nan):.4f}R"
+            )
+            lines.append(
+                f"  EV_proxy_per_event_validation_r: {r.get('EV_proxy_per_event_validation_r', np.nan):.4f}R"
+            )
 
             ev_val = r.get("EV_proxy_per_event_validation_r", 0.0)
             cap_total = r.get("capture_total_pct", 0.0)
             lines.append("")
             lines.append("Interpretation:")
-            if cap_total is not None and cap_total <= 20 and (ev_val is None or (isinstance(ev_val, float) and np.isfinite(ev_val) and ev_val < 0.1)):
+            if (
+                cap_total is not None
+                and cap_total <= 20
+                and (
+                    ev_val is None
+                    or (isinstance(ev_val, float) and np.isfinite(ev_val) and ev_val < 0.1)
+                )
+            ):
                 lines.append(
                     "  EV_proxy_per_event_r is tiny at low capture (~20%): "
                     "higher capture is needed to realize meaningful value. "
                     "At 20% capture, most event value is left on the table."
                 )
-            elif cap_total is not None and cap_total >= 50 and ev_val is not None and np.isfinite(ev_val) and ev_val > 0.05:
+            elif (
+                cap_total is not None
+                and cap_total >= 50
+                and ev_val is not None
+                and np.isfinite(ev_val)
+                and ev_val > 0.05
+            ):
                 lines.append(
                     "  EV is meaningful already; chasing 60%+ capture may be unnecessary. "
                     "Current capture delivers value; focus on execution/geometry over recall."
@@ -364,7 +418,9 @@ def run_phaseD6C(
     if events.empty:
         raise ValueError("Zero Zone C events found. Check labels and zone_c_6r_40.")
 
-    event_value_df = _build_event_value_df(events, attribution, labels, pre_bars, on_bars, late_bars)
+    event_value_df = _build_event_value_df(
+        events, attribution, labels, pre_bars, on_bars, late_bars
+    )
     summary_df = _build_candidate_summary(event_value_df)
 
     event_path = out_dir / "zoneC_event_value_by_candidate.csv"
@@ -382,9 +438,7 @@ def run_phaseD6C(
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(
-        description="Phase D-6C Value of Capture (analytics only)"
-    )
+    parser = argparse.ArgumentParser(description="Phase D-6C Value of Capture (analytics only)")
     parser.add_argument("--labels", required=True, help="Path to opportunity_labels.csv")
     parser.add_argument("--d6b-outdir", required=True, help="D6B output directory")
     parser.add_argument("--outdir", required=True, help="Output directory")

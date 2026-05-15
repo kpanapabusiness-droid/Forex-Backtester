@@ -6,9 +6,11 @@ from live.exposure_gate import apply_exposure_gate
 
 
 def test_existing_eur_long_blocks_new_eur_long():
-    open_positions = pd.DataFrame([
-        {"symbol": "EURUSD", "type": 0},
-    ])
+    open_positions = pd.DataFrame(
+        [
+            {"symbol": "EURUSD", "type": 0},
+        ]
+    )
     candidate_signals = {"EURUSD": 1, "EURJPY": 1}
     approved, skipped = apply_exposure_gate(open_positions, candidate_signals)
     assert "EURUSD" not in approved
@@ -20,9 +22,11 @@ def test_existing_eur_long_blocks_new_eur_long():
 
 
 def test_opposite_direction_eur_allowed():
-    open_positions = pd.DataFrame([
-        {"symbol": "EURUSD", "type": 0},
-    ])
+    open_positions = pd.DataFrame(
+        [
+            {"symbol": "EURUSD", "type": 0},
+        ]
+    )
     candidate_signals = {"EURUSD": -1}
     approved, skipped = apply_exposure_gate(open_positions, candidate_signals)
     assert "EURUSD" in approved

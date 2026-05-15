@@ -103,7 +103,9 @@ def main() -> None:
         description="Phase 6.3: Run Mode Y and Mode X WFO for each exit finalist."
     )
     parser.add_argument("--finalists", default=str(FINALISTS_CSV), help="Path to finalists.csv.")
-    parser.add_argument("--shell", default=str(SHELL_PATH), help="Shell config (exit block overridden).")
+    parser.add_argument(
+        "--shell", default=str(SHELL_PATH), help="Shell config (exit block overridden)."
+    )
     parser.add_argument("--config-dir", default=str(CONFIG_DIR), help="Generated config directory.")
     parser.add_argument("--results-root", default=str(RESULTS_ROOT), help="Output root for runs.")
     args = parser.parse_args()

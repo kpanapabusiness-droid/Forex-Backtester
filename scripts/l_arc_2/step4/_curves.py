@@ -9,6 +9,7 @@ capture_ratio_i = net_r_i / (fwd_mfe_h_at_h_i / 2.0)
 
 Gate rule for cand 2: drop if mean_net_r(h=240) <= mean_net_r(h=120) - 0.05 R.
 """
+
 from __future__ import annotations
 
 import numpy as np
@@ -47,7 +48,10 @@ def compute_cluster_0_time_exit_curve(
     rows = []
     for h in CURVE_HORIZONS:
         sim = S.simulate_time_exit_h(
-            horizon=h, trade_ids=tids, signals=sub, paths_long=paths,
+            horizon=h,
+            trade_ids=tids,
+            signals=sub,
+            paths_long=paths,
         )
         # Active at h = not SL-hit before h.
         # sim returns exit_reason 'sl_hit' for trades that SL'd at any bar <=h.
@@ -65,19 +69,22 @@ def compute_cluster_0_time_exit_curve(
             cap = np.where(denom > 0, sim2["net_r"].values / denom, np.nan)
         mean_cap = float(np.nanmean(cap))
 
-        rows.append({
-            "h_bars": h,
-            "mean_net_r": mean_net_r,
-            "n_trades_active_at_h": n_active_at_h,
-            "n_trades_sl_before_h": n_sl_before_h,
-            "mean_capture_ratio": mean_cap,
-        })
+        rows.append(
+            {
+                "h_bars": h,
+                "mean_net_r": mean_net_r,
+                "n_trades_active_at_h": n_active_at_h,
+                "n_trades_sl_before_h": n_sl_before_h,
+                "mean_capture_ratio": mean_cap,
+            }
+        )
 
     return pd.DataFrame(rows)
 
 
-def cluster_0_curve_gate_pass(curve_df: pd.DataFrame,
-                              tolerance_r: float = C.CLUSTER0_CURVE_TOLERANCE_R) -> bool:
+def cluster_0_curve_gate_pass(
+    curve_df: pd.DataFrame, tolerance_r: float = C.CLUSTER0_CURVE_TOLERANCE_R
+) -> bool:
     """Gate rule: PASS iff mean_net_r(h=240) > mean_net_r(h=120) - tolerance."""
     r_120 = float(curve_df.loc[curve_df["h_bars"] == 120, "mean_net_r"].iloc[0])
     r_240 = float(curve_df.loc[curve_df["h_bars"] == 240, "mean_net_r"].iloc[0])

@@ -18,6 +18,7 @@ preserved from NaN-drop in clustering per step3 §4.1).
 Determinism: byte-identical CSV on rerun. No randomness; deterministic
 pandas reductions over sorted inputs.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -143,9 +144,7 @@ def compute_filter_row(
     race_pool_vals = race_diff[is_mirror]
     race_post_vals = race_diff[is_mirror & in_post]
     race_pool = float(np.median(race_pool_vals)) if race_pool_vals.size else float("nan")
-    race_post = (
-        float(np.median(race_post_vals)) if race_post_vals.size else float("nan")
-    )
+    race_post = float(np.median(race_post_vals)) if race_post_vals.size else float("nan")
     if race_pool == 0 or (race_pool > 0) != (race_post > 0):
         race_preservation: float | str = race_post - race_pool
         notes.append(
@@ -166,21 +165,15 @@ def compute_filter_row(
     ratios = np.where(valid_ratio, mfe / np.where(mae == 0, 1, mae), np.nan)
     ratio_pool_vals = ratios[pool_mask]
     ratio_post_vals = ratios[post_mask]
-    ratio_pool = (
-        float(np.median(ratio_pool_vals)) if ratio_pool_vals.size else float("nan")
-    )
-    ratio_post = (
-        float(np.median(ratio_post_vals)) if ratio_post_vals.size else float("nan")
-    )
+    ratio_pool = float(np.median(ratio_pool_vals)) if ratio_pool_vals.size else float("nan")
+    ratio_post = float(np.median(ratio_post_vals)) if ratio_post_vals.size else float("nan")
     if ratio_pool == 0:
         ratio_preservation: float | str = ratio_post - ratio_pool
         notes.append("ratio_pool==0; reporting raw diff")
     else:
         ratio_preservation = ratio_post / ratio_pool
     if n_dropped_pool > 5 or n_dropped_post > 5:
-        notes.append(
-            f"dropped mae==0 from ratio: pool={n_dropped_pool} post={n_dropped_post}"
-        )
+        notes.append(f"dropped mae==0 from ratio: pool={n_dropped_pool} post={n_dropped_post}")
 
     # Columns 4 & 5: per-fold concentration lift
     lifts: list[float] = []
@@ -293,9 +286,7 @@ def main() -> int:
     receipts.append("## Pool-level assertions")
     receipts.append(f"n_pool_total     = {n_pool_total} (expected {EXPECTED_POOL_TOTAL})")
     receipts.append(f"n_mirror_pool    = {n_mirror_pool} (expected {EXPECTED_MIRROR_POOL})")
-    receipts.append(
-        f"mirror_fraction  = {mirror_frac:.4f} (expected {EXPECTED_MIRROR_FRAC:.4f})"
-    )
+    receipts.append(f"mirror_fraction  = {mirror_frac:.4f} (expected {EXPECTED_MIRROR_FRAC:.4f})")
     receipts.append(
         f"mirror = trades with K2_kmeans != {TARGET_CLUSTER_ID} "
         "(includes 112 sentinel-(-2) rows preserved from NaN-drop in clustering)"
@@ -307,9 +298,7 @@ def main() -> int:
         OUT_RECEIPTS.write_text("\n".join(receipts) + "\n", encoding="utf-8")
         raise SystemExit(msg)
     if n_mirror_pool != EXPECTED_MIRROR_POOL:
-        msg = (
-            f"POOL DRIFT: n_mirror_pool={n_mirror_pool} != {EXPECTED_MIRROR_POOL}"
-        )
+        msg = f"POOL DRIFT: n_mirror_pool={n_mirror_pool} != {EXPECTED_MIRROR_POOL}"
         receipts.append(f"FATAL: {msg}")
         OUT_RECEIPTS.write_text("\n".join(receipts) + "\n", encoding="utf-8")
         raise SystemExit(msg)

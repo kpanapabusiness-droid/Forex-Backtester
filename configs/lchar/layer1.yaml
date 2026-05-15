@@ -1,0 +1,105 @@
+# L1 — Layer 1 Univariate Atlas configuration
+#
+# Locked at L0 (docs/L0_METHODOLOGY_LOCK.md). Computational specs in this file
+# match the L1 phase prompt; do not modify without an explicit re-planning phase.
+#
+# Output is descriptive, not predictive (L0 §3). The atlas reports; it does not
+# recommend.
+
+arc: L
+phase: L1
+description: "Layer 1 — univariate price structure per pair per timeframe."
+
+# ----------------------------------------------------------------------
+# Data inputs
+# ----------------------------------------------------------------------
+data:
+  # Per-timeframe data directories. Loader: core.utils.load_pair_csv.
+  data_dirs:
+    "1H": "data/1hr"
+    "4H": "data/4hr"
+    "D1": "data/daily"
+  # Atlas window: full available history from Oct 2020 onward (per L_ARC_PLAN).
+  date_start: "2020-10-01"
+  date_end: null            # null = use end of file
+  # Canonical 28-pair NNFX universe (matches configs/data_audit.yaml).
+  pairs:
+    - AUD_CAD
+    - AUD_CHF
+    - AUD_JPY
+    - AUD_NZD
+    - AUD_USD
+    - CAD_CHF
+    - CAD_JPY
+    - CHF_JPY
+    - EUR_AUD
+    - EUR_CAD
+    - EUR_CHF
+    - EUR_GBP
+    - EUR_JPY
+    - EUR_NZD
+    - EUR_USD
+    - GBP_AUD
+    - GBP_CAD
+    - GBP_CHF
+    - GBP_JPY
+    - GBP_NZD
+    - GBP_USD
+    - NZD_CAD
+    - NZD_CHF
+    - NZD_JPY
+    - NZD_USD
+    - USD_CAD
+    - USD_CHF
+    - USD_JPY
+  timeframes: ["1H", "4H", "D1"]
+
+# ----------------------------------------------------------------------
+# Indicator parameters (locked)
+# ----------------------------------------------------------------------
+indicators:
+  atr_period: 14
+  kijun_period: 26
+  sma_period: 20
+
+# ----------------------------------------------------------------------
+# Statistic specs (locked)
+# ----------------------------------------------------------------------
+stats:
+  return_acf_lags: [1, 2, 3, 5, 10, 20]
+  atr_acf_lags: [1, 5, 20, 60]
+  return_percentiles: [1, 5, 10, 25, 50, 75, 90, 95, 99]
+  atr_percentiles: [1, 5, 10, 25, 50, 75, 90, 95, 99]
+  dist_percentiles: [1, 5, 10, 25, 50, 75, 90, 95, 99]
+  # Run-length percentile spec (per L1 phase prompt).
+  run_length_percentiles: [50, 90, 95, 99]
+
+# ----------------------------------------------------------------------
+# Bootstrap (locked)
+# ----------------------------------------------------------------------
+bootstrap:
+  n_resamples: 1000
+  seed: 42
+  ci_level: 0.95
+  method: "percentile"      # CI from percentiles of bootstrap distribution
+  scheme: "iid"             # iid resampling with replacement; documented in result doc
+
+# ----------------------------------------------------------------------
+# Time-of-day / time-of-week (locked)
+# ----------------------------------------------------------------------
+time_effects:
+  # Hour-bin counts per timeframe. D1 disabled per spec.
+  hour_bins:
+    "1H": 24                # 0..23 by bar-start hour
+    "4H": 6                 # {0,4,8,12,16,20} by bar-start hour
+    "D1": null              # disabled
+  dow_days_index: [0, 1, 2, 3, 4]  # Mon..Fri (pandas weekday convention)
+
+# ----------------------------------------------------------------------
+# Output
+# ----------------------------------------------------------------------
+output:
+  csv_path: "results/lchar/atlas/layer1_univariate.csv"
+  float_format: "%.10g"
+  # Sort key for byte-identical output across re-runs.
+  sort_columns: ["pair", "timeframe", "stat_family", "stat_name"]

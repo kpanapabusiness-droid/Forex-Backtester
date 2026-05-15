@@ -2,6 +2,7 @@
 Phase D-6G: Run signal geometry analysis.
 Computes how C1 entry signals condition clean opportunity geometry.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -283,11 +284,13 @@ def _compute_signal_for_pair(
     if SIGNAL_COL not in out.columns:
         out[SIGNAL_COL] = 0
     s = pd.to_numeric(out[SIGNAL_COL], errors="coerce").fillna(0).clip(-1, 1).astype(int)
-    return pd.DataFrame({
-        "pair": pair,
-        "date": out["date"],
-        SIGNAL_COL: s,
-    })
+    return pd.DataFrame(
+        {
+            "pair": pair,
+            "date": out["date"],
+            SIGNAL_COL: s,
+        }
+    )
 
 
 def _load_yaml(path: Path) -> dict:
@@ -342,7 +345,9 @@ def _load_csv_signal(path: Path, root: Path, signal_name: str) -> pd.DataFrame:
 def _run(cfg: dict, clean_path: Path, out_dir: Path) -> None:
     root = Path(cfg.get("project_root") or ROOT)
     sources = cfg.get("signal_sources") or {}
-    modules = sources.get("modules") or cfg.get("signal_modules") or ["indicators.confirmation_funcs"]
+    modules = (
+        sources.get("modules") or cfg.get("signal_modules") or ["indicators.confirmation_funcs"]
+    )
     if not isinstance(modules, list):
         modules = [modules]
     csv_dirs = sources.get("csv_dirs") or []
@@ -362,13 +367,16 @@ def _run(cfg: dict, clean_path: Path, out_dir: Path) -> None:
         data_dir = root / data_dir
     max_signals = cfg.get("max_signals")
     indicator_only = (
-        cfg.get("indicator_only")
-        or (cfg.get("evaluation") or {}).get("mode") == "indicator_only"
+        cfg.get("indicator_only") or (cfg.get("evaluation") or {}).get("mode") == "indicator_only"
     )
 
     out_dir.mkdir(parents=True, exist_ok=True)
     disc_path = out_dir / "discovery_report.json"
-    res_dirs = () if indicator_only else (tuple(csv_dirs) if csv_dirs else ("results/phaseD", "results/phaseD2"))
+    res_dirs = (
+        ()
+        if indicator_only
+        else (tuple(csv_dirs) if csv_dirs else ("results/phaseD", "results/phaseD2"))
+    )
     disc = run_discovery_report(root, disc_path, results_dirs=res_dirs)
     extra_mods = [m for m in disc.get("discovered_modules", []) if m not in modules]
     modules = list(modules) + extra_mods
@@ -385,7 +393,9 @@ def _run(cfg: dict, clean_path: Path, out_dir: Path) -> None:
                 continue
             for csv in dp.rglob("*.csv"):
                 fname = csv.name.lower()
-                if any(k in fname for k in ("signal", "proto", "momentum", "compression", "expansion")):
+                if any(
+                    k in fname for k in ("signal", "proto", "momentum", "compression", "expansion")
+                ):
                     rel = csv.relative_to(root)
                     csv_paths.append((rel, f"csv:{rel.stem}"))
         for p in disc.get("discovered_signal_csv_files", []):
@@ -407,10 +417,15 @@ def _run(cfg: dict, clean_path: Path, out_dir: Path) -> None:
         try:
             mod, func_name = _get_func_for_key(signal_key)
             func = getattr(mod, func_name)
-            df_test = pd.DataFrame({
-                "date": pd.date_range("2020-01-01", periods=30, freq="D"),
-                "open": 1.0, "high": 1.01, "low": 0.99, "close": 1.0,
-            })
+            df_test = pd.DataFrame(
+                {
+                    "date": pd.date_range("2020-01-01", periods=30, freq="D"),
+                    "open": 1.0,
+                    "high": 1.01,
+                    "low": 0.99,
+                    "close": 1.0,
+                }
+            )
             df_test = calculate_atr(df_test, period=14)
             out_test = func(df_test.copy(), signal_col=SIGNAL_COL)
             reason = _validate_signal_output(out_test, signal_key)
@@ -512,9 +527,7 @@ def _run(cfg: dict, clean_path: Path, out_dir: Path) -> None:
     stab_df.sort_values(["signal_name", "direction", "x", "y"]).to_csv(
         out_dir / "pooled_signal_lift_stability.csv", index=False, float_format="%.6f"
     )
-    leaderboard.to_csv(
-        out_dir / "leaderboard_signal_lift.csv", index=False, float_format="%.6f"
-    )
+    leaderboard.to_csv(out_dir / "leaderboard_signal_lift.csv", index=False, float_format="%.6f")
 
     if merged_by_signal:
         _write_signal_events(merged_by_signal, out_dir)

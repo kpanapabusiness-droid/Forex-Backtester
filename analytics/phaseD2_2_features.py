@@ -71,9 +71,7 @@ def stable_percentile_rank(series: pd.Series, window: int) -> pd.Series:
         rank = np.sum(finite <= val)
         return (rank - 1) / max(n - 1, 1) if n > 1 else 0.0
 
-    out = series.rolling(window=window, min_periods=window).apply(
-        _pctile, raw=True
-    )
+    out = series.rolling(window=window, min_periods=window).apply(_pctile, raw=True)
     return out
 
 
@@ -146,9 +144,7 @@ def compute_features_for_pair(
         if np.isfinite(atr_252_std[i]) and atr_252_std[i] > 0:
             atr_z_252[i] = (atr_14[i] - atr_252_mu[i]) / atr_252_std[i]
 
-    atr_pctile_252 = stable_percentile_rank(
-        pd.Series(atr_14, index=df_slice.index), 252
-    ).to_numpy()
+    atr_pctile_252 = stable_percentile_rank(pd.Series(atr_14, index=df_slice.index), 252).to_numpy()
 
     tr = np.maximum(
         h - low_arr,
@@ -178,9 +174,7 @@ def compute_features_for_pair(
     bb_width_pctile_252 = stable_percentile_rank(bb_width_series, 252).to_numpy()
 
     denom_range = max_high_20 - min_low_20
-    denom_range = np.where(
-        np.isfinite(denom_range) & (denom_range > 0), denom_range, np.nan
-    )
+    denom_range = np.where(np.isfinite(denom_range) & (denom_range > 0), denom_range, np.nan)
     pos_in_range_20 = _safe_div(c - min_low_20, denom_range)
     pos_in_range_20 = np.clip(pos_in_range_20, 0.0, 1.0)
 
@@ -218,34 +212,36 @@ def compute_features_for_pair(
     for i in range(n):
         date_val = dates[i]
         dataset_split = "discovery" if pd.Timestamp(date_val) <= cutoff else "validation"
-        rows.append({
-            "pair": pair,
-            "date": date_val,
-            "dataset_split": dataset_split,
-            "ret_1": ret_1[i],
-            "ret_5": ret_5[i],
-            "ret_20": ret_20[i],
-            "mom_slope_5": mom_slope_5[i],
-            "mom_slope_20": mom_slope_20[i],
-            "atr_14": atr_14[i],
-            "atrp_14": atrp_14[i],
-            "atr_z_252": atr_z_252[i],
-            "atr_pctile_252": atr_pctile_252[i],
-            "true_range": true_range[i],
-            "tr_atr_ratio": tr_atr_ratio[i],
-            "range_20": range_20[i],
-            "range_20_atr": range_20_atr[i],
-            "bb_width_20": bb_width_20[i],
-            "bb_width_pctile_252": bb_width_pctile_252[i],
-            "pos_in_range_20": pos_in_range_20[i],
-            "dist_to_high_20_atr": dist_to_high_20_atr[i],
-            "dist_to_low_20_atr": dist_to_low_20_atr[i],
-            "breakout_up_20": breakout_up_20[i],
-            "breakout_dn_20": breakout_dn_20[i],
-            "body_pct": body_pct[i],
-            "upper_wick_pct": upper_wick_pct[i],
-            "lower_wick_pct": lower_wick_pct[i],
-        })
+        rows.append(
+            {
+                "pair": pair,
+                "date": date_val,
+                "dataset_split": dataset_split,
+                "ret_1": ret_1[i],
+                "ret_5": ret_5[i],
+                "ret_20": ret_20[i],
+                "mom_slope_5": mom_slope_5[i],
+                "mom_slope_20": mom_slope_20[i],
+                "atr_14": atr_14[i],
+                "atrp_14": atrp_14[i],
+                "atr_z_252": atr_z_252[i],
+                "atr_pctile_252": atr_pctile_252[i],
+                "true_range": true_range[i],
+                "tr_atr_ratio": tr_atr_ratio[i],
+                "range_20": range_20[i],
+                "range_20_atr": range_20_atr[i],
+                "bb_width_20": bb_width_20[i],
+                "bb_width_pctile_252": bb_width_pctile_252[i],
+                "pos_in_range_20": pos_in_range_20[i],
+                "dist_to_high_20_atr": dist_to_high_20_atr[i],
+                "dist_to_low_20_atr": dist_to_low_20_atr[i],
+                "breakout_up_20": breakout_up_20[i],
+                "breakout_dn_20": breakout_dn_20[i],
+                "body_pct": body_pct[i],
+                "upper_wick_pct": upper_wick_pct[i],
+                "lower_wick_pct": lower_wick_pct[i],
+            }
+        )
 
     out = pd.DataFrame(rows)
     out = out.sort_values(["pair", "date"]).reset_index(drop=True)
@@ -345,19 +341,21 @@ def compute_feature_stats(
         else:
             effect_d = np.nan
         auc = _auc_proxy(pos_vals, neg_vals)
-        rows.append({
-            "feature": feat,
-            "split": split or "global",
-            "target": target_col,
-            "n_pos": n_pos,
-            "n_neg": n_neg,
-            "mean_pos": mean_pos,
-            "mean_neg": mean_neg,
-            "std_pos": std_pos,
-            "std_neg": std_neg,
-            "effect_size_d": effect_d,
-            "auc_proxy": auc,
-        })
+        rows.append(
+            {
+                "feature": feat,
+                "split": split or "global",
+                "target": target_col,
+                "n_pos": n_pos,
+                "n_neg": n_neg,
+                "mean_pos": mean_pos,
+                "mean_neg": mean_neg,
+                "std_pos": std_pos,
+                "std_neg": std_neg,
+                "effect_size_d": effect_d,
+                "auc_proxy": auc,
+            }
+        )
     return pd.DataFrame(rows)
 
 
@@ -384,21 +382,23 @@ def compute_feature_rankings(
             continue
         edges = bin_edges.get(feat)
         if edges is None:
-            rows.append({
-                "feature": feat,
-                "target": target_col,
-                "score": np.nan,
-                "best_bin": np.nan,
-                "lift_disc": np.nan,
-                "lift_val": np.nan,
-                "stability_gap": np.nan,
-                "effect_size_d_disc": np.nan,
-                "effect_size_d_val": np.nan,
-                "auc_disc": np.nan,
-                "auc_val": np.nan,
-                "n_pos_validation": 0,
-                "notes": "no_bin_edges",
-            })
+            rows.append(
+                {
+                    "feature": feat,
+                    "target": target_col,
+                    "score": np.nan,
+                    "best_bin": np.nan,
+                    "lift_disc": np.nan,
+                    "lift_val": np.nan,
+                    "stability_gap": np.nan,
+                    "effect_size_d_disc": np.nan,
+                    "effect_size_d_val": np.nan,
+                    "auc_disc": np.nan,
+                    "auc_val": np.nan,
+                    "n_pos_validation": 0,
+                    "notes": "no_bin_edges",
+                }
+            )
             continue
 
         disc_bin = apply_bin_edges(disc[feat], edges)
@@ -444,21 +444,23 @@ def compute_feature_rankings(
         if stability_gap > 0.2:
             notes.append("unstable")
 
-        rows.append({
-            "feature": feat,
-            "target": target_col,
-            "score": score,
-            "best_bin": best_bin,
-            "lift_disc": best_lift_disc,
-            "lift_val": best_lift_val,
-            "stability_gap": stability_gap,
-            "effect_size_d_disc": effect_d_disc,
-            "effect_size_d_val": effect_d_val,
-            "auc_disc": auc_disc,
-            "auc_val": auc_val,
-            "n_pos_validation": n_pos_val,
-            "notes": ";".join(notes) if notes else "",
-        })
+        rows.append(
+            {
+                "feature": feat,
+                "target": target_col,
+                "score": score,
+                "best_bin": best_bin,
+                "lift_disc": best_lift_disc,
+                "lift_val": best_lift_val,
+                "stability_gap": stability_gap,
+                "effect_size_d_disc": effect_d_disc,
+                "effect_size_d_val": effect_d_val,
+                "auc_disc": auc_disc,
+                "auc_val": auc_val,
+                "n_pos_validation": n_pos_val,
+                "notes": ";".join(notes) if notes else "",
+            }
+        )
 
     out = pd.DataFrame(rows)
     out = out.sort_values("score", ascending=False).reset_index(drop=True)

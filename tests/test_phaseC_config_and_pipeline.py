@@ -52,14 +52,22 @@ def test_phaseC_approved_pool_exact_six_enforced(tmp_path: Path):
         encoding="utf-8",
     )
 
-    approved.write_text(json.dumps({"C1": [
-        "c1_persist_momo__binary",
-        "c1_persist_momo__neutral_gate",
-        "c1_regime_sm__binary",
-        "c1_regime_sm__neutral_gate",
-        "c1_vol_dir__binary",
-        "c1_vol_dir__neutral_gate",
-    ]}, indent=2), encoding="utf-8")
+    approved.write_text(
+        json.dumps(
+            {
+                "C1": [
+                    "c1_persist_momo__binary",
+                    "c1_persist_momo__neutral_gate",
+                    "c1_regime_sm__binary",
+                    "c1_regime_sm__neutral_gate",
+                    "c1_vol_dir__binary",
+                    "c1_vol_dir__neutral_gate",
+                ]
+            },
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
 
     out = _resolve_c1_list(approved, identities)
     assert len(out) == 6
@@ -77,15 +85,19 @@ def test_phaseC_approved_pool_exact_six_enforced(tmp_path: Path):
         _resolve_c1_list(approved, identities)
 
     approved.write_text(
-        json.dumps({"C1": [
-            "c1_persist_momo__binary",
-            "c1_persist_momo__neutral_gate",
-            "c1_regime_sm__binary",
-            "c1_regime_sm__neutral_gate",
-            "c1_vol_dir__binary",
-            "c1_vol_dir__neutral_gate",
-            "c1_unknown",
-        ]}),
+        json.dumps(
+            {
+                "C1": [
+                    "c1_persist_momo__binary",
+                    "c1_persist_momo__neutral_gate",
+                    "c1_regime_sm__binary",
+                    "c1_regime_sm__neutral_gate",
+                    "c1_vol_dir__binary",
+                    "c1_vol_dir__neutral_gate",
+                    "c1_unknown",
+                ]
+            }
+        ),
         encoding="utf-8",
     )
     with pytest.raises(ValueError, match="unknown|exactly"):
@@ -111,12 +123,14 @@ def test_phaseC_leaderboard_worst_fold_and_gates(tmp_path: Path):
         oos = fold_dir / "out_of_sample"
         oos.mkdir(parents=True, exist_ok=True)
         (fold_dir / "fold_dates.json").write_text(
-            json.dumps({
-                "train_start": "2019-01-01",
-                "train_end": "2020-12-31",
-                "test_start": "2021-01-01",
-                "test_end": "2021-12-31",
-            }),
+            json.dumps(
+                {
+                    "train_start": "2019-01-01",
+                    "train_end": "2020-12-31",
+                    "test_start": "2021-01-01",
+                    "test_end": "2021-12-31",
+                }
+            ),
             encoding="utf-8",
         )
         lines = [
@@ -141,7 +155,9 @@ def test_phaseC_leaderboard_worst_fold_and_gates(tmp_path: Path):
     median_roi = _safe_median([r["roi_pct"] for r in fold_rows])
     median_max_dd = _safe_median([r["max_dd_pct"] for r in fold_rows])
     median_trades = _safe_median([r["trades"] for r in fold_rows])
-    pass_reject, reason = _apply_gates("c1_fake", fold_rows, worst, median_roi, median_max_dd, median_trades)
+    pass_reject, reason = _apply_gates(
+        "c1_fake", fold_rows, worst, median_roi, median_max_dd, median_trades
+    )
     assert pass_reject == "REJECT"
     assert "roi" in reason.lower() or "threshold" in reason.lower()
 
@@ -151,7 +167,9 @@ def test_phaseC_leaderboard_worst_fold_and_gates(tmp_path: Path):
     median_roi = _safe_median([r["roi_pct"] for r in fold_rows])
     median_max_dd = _safe_median([r["max_dd_pct"] for r in fold_rows])
     median_trades = _safe_median([r["trades"] for r in fold_rows])
-    pass_reject, reason = _apply_gates("c1_fake", fold_rows, worst, median_roi, median_max_dd, median_trades)
+    pass_reject, reason = _apply_gates(
+        "c1_fake", fold_rows, worst, median_roi, median_max_dd, median_trades
+    )
     assert pass_reject == "PASS"
     assert reason == ""
 

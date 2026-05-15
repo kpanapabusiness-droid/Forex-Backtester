@@ -104,9 +104,7 @@ def extract_wfo_v2_folds(wfo_root: Path) -> None:
     wrote_csv = 0
 
     # Discover per-C1 directories under wfo_root.
-    c1_dirs = sorted(
-        p for p in wfo_root.iterdir() if p.is_dir() and p.name.startswith("wfo_c1_")
-    )
+    c1_dirs = sorted(p for p in wfo_root.iterdir() if p.is_dir() and p.name.startswith("wfo_c1_"))
     for c1_dir in c1_dirs:
         processed_c1 += 1
 
@@ -186,4 +184,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

@@ -1,0 +1,100 @@
+# L2 — Layer 2 Multi-Timeframe Coherence configuration
+#
+# Locked at L0 (docs/L0_METHODOLOGY_LOCK.md). Computational specs in this file
+# match the L2 phase prompt; do not modify without an explicit re-planning phase.
+#
+# Output is descriptive, not predictive (L0 §3). The atlas reports; it does not
+# recommend.
+
+arc: L
+phase: L2
+description: "Layer 2 — multi-timeframe coherence between adjacent timeframes (1H↔4H, 4H↔D1)."
+
+# ----------------------------------------------------------------------
+# Data inputs (same conventions as L1)
+# ----------------------------------------------------------------------
+data:
+  data_dirs:
+    "1H": "data/1hr"
+    "4H": "data/4hr"
+    "D1": "data/daily"
+  date_start: "2020-10-01"
+  date_end: null
+  pairs:
+    - AUD_CAD
+    - AUD_CHF
+    - AUD_JPY
+    - AUD_NZD
+    - AUD_USD
+    - CAD_CHF
+    - CAD_JPY
+    - CHF_JPY
+    - EUR_AUD
+    - EUR_CAD
+    - EUR_CHF
+    - EUR_GBP
+    - EUR_JPY
+    - EUR_NZD
+    - EUR_USD
+    - GBP_AUD
+    - GBP_CAD
+    - GBP_CHF
+    - GBP_JPY
+    - GBP_NZD
+    - GBP_USD
+    - NZD_CAD
+    - NZD_CHF
+    - NZD_JPY
+    - NZD_USD
+    - USD_CAD
+    - USD_CHF
+    - USD_JPY
+
+# ----------------------------------------------------------------------
+# Indicator parameters (locked, same as L1)
+# ----------------------------------------------------------------------
+indicators:
+  atr_period: 14
+  kijun_period: 26
+  sma_period: 20
+
+# ----------------------------------------------------------------------
+# L2 stat specs (locked)
+# ----------------------------------------------------------------------
+stats:
+  # Adjacent-timeframe pairings tested. D1↔W1 is out of scope (W1 not pulled).
+  pairings:
+    - {low: "1H", high: "4H"}
+    - {low: "4H", high: "D1"}
+  # Lead-lag lags: next-{1, 2} bars from a signal (both directions).
+  lead_lag_lags: [1, 2]
+  # Trend definitions reported in parallel.
+  trend_defs: ["kijun", "sma"]
+  # Conditional-ATR percentile bins: D1 ATR deciles → mean 4H ATR within.
+  cond_atr_n_bins: 10
+  # 6-state alignment taxonomy (MECE). Priority order during classification:
+  #   1. neutral_present : any sign in {1H, 4H, D1} is 0
+  #   2. 3_up            : all three signs == +1
+  #   3. 3_down          : all three signs == -1
+  #   4. opposed         : 1H sign != D1 sign (extremes disagree, both non-zero)
+  #   5. 2_up_mixed      : extremes both +1, 4H is -1 (4H is the disagreer)
+  #   6. 2_down_mixed    : extremes both -1, 4H is +1 (4H is the disagreer)
+  alignment_states: ["3_up", "3_down", "2_up_mixed", "2_down_mixed", "opposed", "neutral_present"]
+
+# ----------------------------------------------------------------------
+# Bootstrap (locked, same scheme as L1)
+# ----------------------------------------------------------------------
+bootstrap:
+  n_resamples: 1000
+  seed: 42
+  ci_level: 0.95
+  method: "percentile"
+  scheme: "iid"             # iid resampling on aligned (lower-TF, higher-TF) pairs
+
+# ----------------------------------------------------------------------
+# Output
+# ----------------------------------------------------------------------
+output:
+  csv_path: "results/lchar/atlas/layer2_multitimeframe.csv"
+  float_format: "%.10g"
+  sort_columns: ["pair", "timeframe", "stat_family", "stat_name"]

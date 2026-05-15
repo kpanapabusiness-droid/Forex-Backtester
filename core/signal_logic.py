@@ -39,12 +39,7 @@ def c1_exit_now(prev_c1: int, curr_c1: int, position_state: int, c1_exit_mode: s
     if c1_exit_mode == "disagree":
         return curr_c1 != 0 and curr_c1 != position_state
     if c1_exit_mode == "flip_only":
-        return (
-            prev_c1 != 0
-            and curr_c1 != 0
-            and prev_c1 != curr_c1
-            and curr_c1 != position_state
-        )
+        return prev_c1 != 0 and curr_c1 != 0 and prev_c1 != curr_c1 and curr_c1 != position_state
     return False
 
 
@@ -264,7 +259,9 @@ def apply_signal_logic(df: pd.DataFrame, cfg: dict) -> pd.DataFrame:
     c1_signals = pd.to_numeric(out[c1_col], errors="coerce").fillna(0).astype(int)
     # Exit C1 source: when exit_c1_name is set, use exit_c1_signal with Mode Y (flip_only)
     if use_exit_c1_source:
-        exit_c1_signals = pd.to_numeric(out["exit_c1_signal"], errors="coerce").fillna(0).astype(int)
+        exit_c1_signals = (
+            pd.to_numeric(out["exit_c1_signal"], errors="coerce").fillna(0).astype(int)
+        )
     else:
         exit_c1_signals = c1_signals
 

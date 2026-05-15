@@ -136,35 +136,35 @@ def _possible_filenames_for_pair(pair: str) -> Iterable[str]:
 def normalize_ohlcv_schema(df: pd.DataFrame) -> pd.DataFrame:
     """
     Normalize OHLCV DataFrame to legacy schema: ['date','open','high','low','close','volume'].
-    
+
     Supports two input schemas:
     1. Legacy: date, open, high, low, close, volume
     2. MT5: time, open, high, low, close, tick_volume, spread, real_volume
-    
+
     Mapping rules:
     - time → date
     - tick_volume → volume
     - real_volume is ignored (often 0 for FX)
     - spread column preserved as optional extra if present
-    
+
     Args:
         df: Input DataFrame with either schema
-        
+
     Returns:
         DataFrame with normalized schema ['date','open','high','low','close','volume']
         and optionally 'spread' column if present in MT5 schema.
         All numeric columns coerced to float.
         Date column parsed robustly (YY-MM-DD and YYYY-MM-DD).
-        
+
     Raises:
         ValueError: If required columns are missing or cannot be coerced.
     """
     df = df.copy()
     required_cols = ["open", "high", "low", "close"]
-    
+
     # Detect schema type by checking for MT5-specific columns
     has_mt5_schema = "tick_volume" in df.columns
-    
+
     # Normalize date/time column
     date_col = None
     time_variants = ["time", "Time", "date", "Date", "datetime", "timestamp"]
@@ -172,7 +172,7 @@ def normalize_ohlcv_schema(df: pd.DataFrame) -> pd.DataFrame:
         if variant in df.columns:
             date_col = variant
             break
-    
+
     if date_col is None:
         # Try first column if it looks like a date
         if len(df.columns) > 0:
@@ -182,21 +182,25 @@ def normalize_ohlcv_schema(df: pd.DataFrame) -> pd.DataFrame:
                 date_col = first_col
             except (ValueError, IndexError):
                 pass
-    
+
     if date_col is None:
-        raise ValueError("No date/time column found. Expected one of: time, date, Date, datetime, timestamp")
-    
+        raise ValueError(
+            "No date/time column found. Expected one of: time, date, Date, datetime, timestamp"
+        )
+
     # Rename to 'date' if needed
     if date_col != "date":
         df = df.rename(columns={date_col: "date"})
-    
+
     # Parse date column robustly (handles YY-MM-DD and YYYY-MM-DD)
     df["date"] = pd.to_datetime(df["date"], errors="coerce", format="mixed")
     # Only raise if ALL dates are invalid (some may be missing in real data)
     if df["date"].isna().all():
         invalid_sample = df.loc[df["date"].isna(), :].head(3)
-        raise ValueError(f"Failed to parse date column. All dates invalid. Sample: {invalid_sample.to_dict()}")
-    
+        raise ValueError(
+            f"Failed to parse date column. All dates invalid. Sample: {invalid_sample.to_dict()}"
+        )
+
     # Handle volume column
     if has_mt5_schema and "tick_volume" in df.columns:
         # MT5 schema: map tick_volume → volume
@@ -206,19 +210,19 @@ def normalize_ohlcv_schema(df: pd.DataFrame) -> pd.DataFrame:
         elif "volume" in df.columns and "tick_volume" in df.columns:
             df = df.drop(columns=["volume"]).rename(columns={"tick_volume": "volume"})
     # Volume is optional, so if missing we'll add empty column later
-    
+
     # Drop real_volume (often 0 for FX, not used)
     if "real_volume" in df.columns:
         df = df.drop(columns=["real_volume"])
-    
+
     # Keep spread as optional extra column if present (don't drop it)
     # But ensure it doesn't interfere with required columns
-    
+
     # Validate required columns exist
     missing = [c for c in required_cols if c not in df.columns]
     if missing:
         raise ValueError(f"Missing required columns: {missing}. Found columns: {list(df.columns)}")
-    
+
     # Coerce numeric columns to float
     for col in required_cols:
         if col in df.columns:
@@ -228,19 +232,21 @@ def normalize_ohlcv_schema(df: pd.DataFrame) -> pd.DataFrame:
             coerced_notna = df[col].notna().sum()
             if coerced_notna < original_notna:
                 invalid_count = original_notna - coerced_notna
-                raise ValueError(f"Column '{col}' contains {invalid_count} non-numeric values that could not be coerced")
-    
+                raise ValueError(
+                    f"Column '{col}' contains {invalid_count} non-numeric values that could not be coerced"
+                )
+
     # Volume is optional - coerce if present, otherwise create empty column
     if "volume" in df.columns:
         df["volume"] = pd.to_numeric(df["volume"], errors="coerce")
     else:
         df["volume"] = pd.Series(dtype=float, index=df.index)
-    
+
     # Select and order columns: required ones first, then volume, then extras (like spread)
     core_cols = ["date"] + required_cols + ["volume"]
     extra_cols = [c for c in df.columns if c not in core_cols]
     df = df[core_cols + extra_cols]
-    
+
     return df
 
 
@@ -517,7 +523,7 @@ def summarize_results(
             non_scratch = trades.loc[~scratch_mask].copy()
         else:
             non_scratch = trades.copy()
-        
+
         # Ensure non_scratch is a valid DataFrame (even if empty)
         if non_scratch.empty:
             avg_win = 0.0
@@ -530,7 +536,7 @@ def summarize_results(
                 avg_win = float(winning_trades.mean()) if not winning_trades.empty else 0.0
             else:
                 avg_win = 0.0
-            
+
             # Calculate avg_loss: filter for losing trades (non-win, non-scratch)
             if "win" in non_scratch.columns and "pnl" in non_scratch.columns:
                 win_mask = non_scratch["win"].fillna(False).astype(bool)
@@ -538,7 +544,7 @@ def summarize_results(
                 avg_loss = float(losing_trades.mean()) if not losing_trades.empty else 0.0
             else:
                 avg_loss = 0.0
-        
+
         expectancy = safe_expectancy(avg_win, abs(avg_loss), win_pct_ns / 100.0)
     else:
         expectancy = 0.0
@@ -606,6 +612,7 @@ def summarize_results(
             roi_pct_equity = safe_roi_pct(start_eq, end_eq)
             try:
                 from analytics.metrics import compute_max_drawdown_pct
+
                 max_dd_pct = compute_max_drawdown_pct(eq["equity"])
             except Exception:
                 max_dd_pct = 0.0

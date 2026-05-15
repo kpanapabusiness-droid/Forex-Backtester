@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Print FULL backtest metrics and paths from results dir. Usage: python scripts/print_full_metrics.py [results_dir]"""
+
 import sys
 from pathlib import Path
 
@@ -24,17 +25,33 @@ def main():
         print("\n--- Summary metrics ---")
         for line in text.splitlines():
             line = line.strip()
-            if any(x in line for x in ["Total Trades", "ROI ($)", "ROI (%)", "Max Drawdown", "Wins", "Losses", "Scratches"]):
+            if any(
+                x in line
+                for x in [
+                    "Total Trades",
+                    "ROI ($)",
+                    "ROI (%)",
+                    "Max Drawdown",
+                    "Wins",
+                    "Losses",
+                    "Scratches",
+                ]
+            ):
                 print(" ", line)
     else:
         print(" (summary.txt not found)")
 
     print("\n--- Absolute paths ---")
-    for name, p in [("summary.txt", summary_path), ("trades.csv", trades_path), ("equity_curve.csv", equity_path)]:
+    for name, p in [
+        ("summary.txt", summary_path),
+        ("trades.csv", trades_path),
+        ("equity_curve.csv", equity_path),
+    ]:
         print(f"  {name}: {p}")
 
     if trades_path.exists():
         import pandas as pd
+
         df = pd.read_csv(trades_path)
         pnl = pd.to_numeric(df.get("pnl", 0), errors="coerce").fillna(0)
         total_pnl = float(pnl.sum())
@@ -60,6 +77,7 @@ def main():
         print(f"  Losers   PnL sum:    {lose_pnl:.2f}  (count: {n_lose})")
         print(f"  Scratches PnL sum:   {scratch_pnl:.2f}  (count: {n_scratch})")
     print()
+
 
 if __name__ == "__main__":
     main()

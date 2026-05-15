@@ -22,7 +22,9 @@ def aggregate_wfo_run(run_dir: str | Path) -> None:
     if not run_path.exists():
         msg = f"WFO run directory not found: {run_dir}"
         if "<run_id>" in str(run_dir):
-            msg += " (replace <run_id> with the actual run folder, e.g. results/wfo/20260130_204704)"
+            msg += (
+                " (replace <run_id> with the actual run folder, e.g. results/wfo/20260130_204704)"
+            )
         else:
             parent = run_path.parent
             if parent.exists():
@@ -94,8 +96,8 @@ def _compute_robustness(df: pd.DataFrame) -> Dict[str, Any]:
     df_num = df.copy()
     df_num["roi_pct"] = pd.to_numeric(df_num["roi_pct"], errors="coerce").fillna(0.0)
     df_num["max_dd_pct"] = pd.to_numeric(df_num["max_dd_pct"], errors="coerce").fillna(0.0)
-    df_num["total_trades"] = pd.to_numeric(df_num["total_trades"], errors="coerce").fillna(0).astype(
-        int
+    df_num["total_trades"] = (
+        pd.to_numeric(df_num["total_trades"], errors="coerce").fillna(0).astype(int)
     )
 
     worst_idx = df_num["roi_pct"].idxmin()
@@ -149,4 +151,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

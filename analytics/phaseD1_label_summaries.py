@@ -95,7 +95,9 @@ def run_phaseD1_label_summaries(
     summary_global_path = out_dir / "summary_global.json"
 
     by_pair.to_csv(summary_by_pair_path, index=False, float_format="%.8f")
-    summary_global_path.write_text(json.dumps(global_summary, indent=2, sort_keys=True), encoding="utf-8")
+    summary_global_path.write_text(
+        json.dumps(global_summary, indent=2, sort_keys=True), encoding="utf-8"
+    )
 
     return summary_by_pair_path, summary_global_path
 
@@ -127,4 +129,3 @@ def main(argv: Iterable[str] | None = None) -> None:
 
 if __name__ == "__main__":
     main()
-

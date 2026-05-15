@@ -8,9 +8,7 @@ from __future__ import annotations
 
 from typing import Any
 
-CURRENCY_CODES = frozenset(
-    "AUD CAD CHF EUR GBP JPY NZD USD".split()
-)
+CURRENCY_CODES = frozenset("AUD CAD CHF EUR GBP JPY NZD USD".split())
 
 
 def _currencies_from_symbol(symbol: str) -> tuple[str, str]:
@@ -36,7 +34,9 @@ def _direction_buckets_for_position(symbol: str, direction: str | int) -> set[st
 def _open_exposure_buckets(open_positions_df) -> set[str]:
     """From open positions dataframe, return all currency-direction buckets in use."""
     buckets = set()
-    if open_positions_df is None or (hasattr(open_positions_df, "empty") and open_positions_df.empty):
+    if open_positions_df is None or (
+        hasattr(open_positions_df, "empty") and open_positions_df.empty
+    ):
         return buckets
     for _, row in open_positions_df.iterrows():
         sym = str(row.get("symbol", "")).upper().replace("_", "")[:6]
@@ -68,9 +68,7 @@ def apply_exposure_gate(
     skipped: dict[str, str] = {}
 
     candidates_list = [
-        (sym, d)
-        for sym, d in (candidate_signals or {}).items()
-        if d not in (0, None, "none", "")
+        (sym, d) for sym, d in (candidate_signals or {}).items() if d not in (0, None, "none", "")
     ]
     if not candidates_list:
         return approved, skipped

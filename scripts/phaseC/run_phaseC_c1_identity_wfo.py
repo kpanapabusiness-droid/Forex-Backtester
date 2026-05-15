@@ -167,9 +167,7 @@ def run_phaseC_c1_identity_wfo(
             "timestamp": datetime.utcnow().isoformat() + "Z",
             "git_hash": _git_hash_if_available(),
         }
-        (c1_root / WFO_DONE_MARKER).write_text(
-            json.dumps(done_meta, indent=2), encoding="utf-8"
-        )
+        (c1_root / WFO_DONE_MARKER).write_text(json.dumps(done_meta, indent=2), encoding="utf-8")
         print(f"  Done: {c1_root}")
 
     print("\nPhase C WFO runs complete.")

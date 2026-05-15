@@ -1,0 +1,126 @@
+# DAUDIT-01 — Data Integrity Audit configuration
+# All thresholds, paths, pair list, and tolerances live here.
+# Read-only audit: nothing under data/ is modified.
+#
+# Schema is enforced by validators in scripts/audit_data_integrity.py.
+# Reordering keys does not affect the audit; thresholds are evaluated
+# numerically. The pair list is the canonical 28-pair NNFX set.
+
+# ----------------------------------------------------------------------
+# Inputs
+# ----------------------------------------------------------------------
+data_root: "data"
+
+timeframes:
+  daily:
+    dir: "data/daily"
+    grid: "D"          # 00:00 only
+  w1:
+    dir: "data/w1"
+    grid: "W"          # weekly bar — Sunday or Monday open consistently
+  1hr:
+    dir: "data/1hr"
+    grid: "H1"         # minute=0, second=0
+  4hr:
+    dir: "data/4hr"
+    grid: "H4"         # hour in {0,4,8,12,16,20}
+
+# Canonical 28-pair NNFX set (from data/daily/ ground truth)
+canonical_pairs:
+  - AUD_CAD
+  - AUD_CHF
+  - AUD_JPY
+  - AUD_NZD
+  - AUD_USD
+  - CAD_CHF
+  - CAD_JPY
+  - CHF_JPY
+  - EUR_AUD
+  - EUR_CAD
+  - EUR_CHF
+  - EUR_GBP
+  - EUR_JPY
+  - EUR_NZD
+  - EUR_USD
+  - GBP_AUD
+  - GBP_CAD
+  - GBP_CHF
+  - GBP_JPY
+  - GBP_NZD
+  - GBP_USD
+  - NZD_CAD
+  - NZD_CHF
+  - NZD_JPY
+  - NZD_USD
+  - USD_CAD
+  - USD_CHF
+  - USD_JPY
+
+# ----------------------------------------------------------------------
+# Schema expectations (raw, on-disk MT5 export)
+# ----------------------------------------------------------------------
+schema:
+  required_columns:
+    - time
+    - open
+    - high
+    - low
+    - close
+    - tick_volume
+    - spread
+    - real_volume
+  numeric_columns:
+    - open
+    - high
+    - low
+    - close
+    - tick_volume
+    - spread
+    - real_volume
+
+# ----------------------------------------------------------------------
+# Anomaly screen thresholds (informational only)
+# ----------------------------------------------------------------------
+anomaly:
+  spread_pips_warn_threshold: 50.0   # bars above this raw-pip spread → WARN list
+  return_atr_multiple: 20.0          # |bar return| > N * rolling ATR(14) → WARN
+  atr_window: 14
+  identical_to_prior_bar_warn: true  # count bars whose OHLC equals prior bar
+
+# ----------------------------------------------------------------------
+# Cross-timeframe consistency
+# ----------------------------------------------------------------------
+cross_tf:
+  random_sample_dates_per_pair: 5
+  random_seed: 20260509            # deterministic
+  ohlc_tolerance: 0.0              # CRITICAL if exceeded
+  volume_informational_only: true  # tick_volume diffs reported but not gating
+
+# ----------------------------------------------------------------------
+# Output
+# ----------------------------------------------------------------------
+output:
+  results_dir: "results/data_audit"
+  report_filename: "DATA_AUDIT_REPORT.md"
+  summary_csv: "data_audit_summary.csv"
+  anomalies_subdir: "anomalies"
+  flat_bar_examples_max: 20
+
+# ----------------------------------------------------------------------
+# Gate (pre-committed; do not soften after seeing results)
+# ----------------------------------------------------------------------
+gate:
+  critical_check_ids:
+    - LOAD_FAIL          # normalize_ohlcv_schema() raised
+    - S1_MISSING_COLS    # raw schema columns missing
+    - S2_DTYPE
+    - S3_NAN_OHLC
+    - S3_NAN_TIME
+    - T1_NON_MONOTONIC
+    - T2_DUPLICATE_TS
+    - T3_GRID_MISALIGN
+    - O1_HIGH_VIOLATION
+    - O2_LOW_VIOLATION
+    - O3_HIGH_LT_LOW
+    - O4_NON_POSITIVE_PRICE
+    - X2_AGGREGATION_DIFF

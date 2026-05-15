@@ -99,7 +99,9 @@ def find_join_keys(baseline_df: pd.DataFrame, volume_df: pd.DataFrame) -> List[T
     # Verify required keys are present
     found_key_names = [k[0].lower() for k in join_keys]
     required = ["pair", "c1", "exit"]
-    missing = [r for r in required if r not in found_key_names and f"{r}_name" not in found_key_names]
+    missing = [
+        r for r in required if r not in found_key_names and f"{r}_name" not in found_key_names
+    ]
     if missing:
         raise ValueError(
             f"Missing required join keys: {missing}. "
@@ -160,14 +162,17 @@ def validate_invariant(
     max_violations: int = 20,
 ) -> None:
     """Enforce trades_with_volume <= trades_without_volume."""
-    violations = joined_df[
-        joined_df[trades_col_volume] > joined_df[trades_col_baseline]
-    ].copy()
+    violations = joined_df[joined_df[trades_col_volume] > joined_df[trades_col_baseline]].copy()
 
     if len(violations) > 0:
         # Build error message with key fields
-        key_cols = [c for c in joined_df.columns if c not in [trades_col_baseline, trades_col_volume]]
-        display_cols = key_cols[:5] + [trades_col_baseline, trades_col_volume]  # Show first 5 key cols
+        key_cols = [
+            c for c in joined_df.columns if c not in [trades_col_baseline, trades_col_volume]
+        ]
+        display_cols = key_cols[:5] + [
+            trades_col_baseline,
+            trades_col_volume,
+        ]  # Show first 5 key cols
 
         msg_parts = [
             f"❌ INVARIANT VIOLATION: Found {len(violations)} rows where trades_with_volume > trades_without_volume",
@@ -214,12 +219,19 @@ def compute_deltas(
             "mar": (baseline_cols.get("mar"), volume_cols.get("mar")),
             "expectancy": (baseline_cols.get("expectancy"), volume_cols.get("expectancy")),
         }.items():
-            if base_col and vol_col and base_col in group_df.columns and vol_col in group_df.columns:
+            if (
+                base_col
+                and vol_col
+                and base_col in group_df.columns
+                and vol_col in group_df.columns
+            ):
                 base_vals = pd.to_numeric(group_df[base_col], errors="coerce").fillna(0)
                 vol_vals = pd.to_numeric(group_df[vol_col], errors="coerce").fillna(0)
                 delta = vol_vals - base_vals
                 row[f"delta_{metric}"] = float(delta.mean()) if len(delta) > 0 else 0.0
-                row[f"baseline_{metric}_mean"] = float(base_vals.mean()) if len(base_vals) > 0 else 0.0
+                row[f"baseline_{metric}_mean"] = (
+                    float(base_vals.mean()) if len(base_vals) > 0 else 0.0
+                )
                 row[f"volume_{metric}_mean"] = float(vol_vals.mean()) if len(vol_vals) > 0 else 0.0
 
         # Count matched rows
@@ -299,13 +311,21 @@ def main() -> None:
     print(f"   Volume rows: {len(volume_df)}, columns: {list(volume_df.columns)}")
 
     # Auto-detect columns
-    trades_col_baseline = find_column(baseline_df, ["trades", "total_trades", "n_trades", "trade_count"])
-    trades_col_volume = find_column(volume_df, ["trades", "total_trades", "n_trades", "trade_count"])
+    trades_col_baseline = find_column(
+        baseline_df, ["trades", "total_trades", "n_trades", "trade_count"]
+    )
+    trades_col_volume = find_column(
+        volume_df, ["trades", "total_trades", "n_trades", "trade_count"]
+    )
 
     if not trades_col_baseline:
-        raise SystemExit(f"❌ Could not find trades column in baseline CSV. Available: {list(baseline_df.columns)}")
+        raise SystemExit(
+            f"❌ Could not find trades column in baseline CSV. Available: {list(baseline_df.columns)}"
+        )
     if not trades_col_volume:
-        raise SystemExit(f"❌ Could not find trades column in volume CSV. Available: {list(volume_df.columns)}")
+        raise SystemExit(
+            f"❌ Could not find trades column in volume CSV. Available: {list(volume_df.columns)}"
+        )
 
     baseline_cols = {
         "trades": trades_col_baseline,
@@ -365,8 +385,16 @@ def main() -> None:
     print(f"✅ Joined {len(joined_df)} matching rows")
 
     # Determine final column names after merge
-    final_trades_baseline = trades_col_baseline if trades_col_baseline in joined_df.columns else f"{trades_col_baseline}_baseline"
-    final_trades_volume = trades_col_volume if trades_col_volume in joined_df.columns else f"{trades_col_volume}_volume"
+    final_trades_baseline = (
+        trades_col_baseline
+        if trades_col_baseline in joined_df.columns
+        else f"{trades_col_baseline}_baseline"
+    )
+    final_trades_volume = (
+        trades_col_volume
+        if trades_col_volume in joined_df.columns
+        else f"{trades_col_volume}_volume"
+    )
 
     # Validate invariant
     print("🔍 Validating invariant: trades_with_volume <= trades_without_volume")
@@ -390,11 +418,11 @@ def main() -> None:
 
     # Generate markdown report with decision logic
     decision_md = output_dir / "phase1_volume_decision.md"
-    
+
     # Compute decision
     decision = "KILL"  # Default
     decision_reason = []
-    
+
     if not delta_df.empty:
         # Check if any indicator shows improvement
         improved_indicators = []
@@ -403,14 +431,16 @@ def main() -> None:
             delta_exp = row.get("delta_expectancy", 0.0)
             delta_mar = row.get("delta_mar", 0.0)
             delta_trades = row.get("delta_trades", 0.0)
-            
+
             # KEEP criteria: expectancy + MAR up, trades down or equal
             if delta_exp > 0 and delta_mar > 0 and delta_trades <= 0:
                 improved_indicators.append(vol_name)
-        
+
         if improved_indicators:
             decision = "KEEP"
-            decision_reason.append(f"Indicators showing improvement: {', '.join(improved_indicators)}")
+            decision_reason.append(
+                f"Indicators showing improvement: {', '.join(improved_indicators)}"
+            )
         else:
             # Check for marginal improvements (PARK)
             marginal = []
@@ -420,7 +450,7 @@ def main() -> None:
                 delta_mar = row.get("delta_mar", 0.0)
                 if (delta_exp > 0 and delta_mar <= 0) or (delta_exp <= 0 and delta_mar > 0):
                     marginal.append(vol_name)
-            
+
             if marginal:
                 decision = "PARK"
                 decision_reason.append(f"Marginal/inconsistent improvements: {', '.join(marginal)}")
@@ -429,24 +459,22 @@ def main() -> None:
                 decision_reason.append("No indicators show improvement in both expectancy and MAR")
     else:
         decision_reason.append("No delta data available")
-    
+
     with decision_md.open("w", encoding="utf-8") as f:
         f.write("# Phase 1 Volume Study Decision Report\n\n")
         f.write(f"Generated: {pd.Timestamp.now()}\n\n")
-        
+
         f.write("## Decision\n\n")
         f.write(f"**{decision}**\n\n")
         for reason in decision_reason:
             f.write(f"- {reason}\n")
         f.write("\n")
-        
+
         f.write("## Summary\n\n")
         f.write(f"- Baseline CSV: `{baseline_path}`\n")
         f.write(f"- Volume CSV: `{volume_path}`\n")
         f.write(f"- Matched rows: {len(joined_df)}\n")
-        f.write(
-            "- ✅ Invariant validated: trades_with_volume <= trades_without_volume\n\n"
-        )
+        f.write("- ✅ Invariant validated: trades_with_volume <= trades_without_volume\n\n")
 
         f.write("## Deltas by Volume Indicator\n\n")
         if delta_df.empty:
@@ -454,7 +482,7 @@ def main() -> None:
         else:
             f.write(delta_df.to_markdown(index=False))
             f.write("\n\n")
-            
+
             # Add interpretation
             f.write("### Delta Interpretation\n\n")
             f.write("- **Δ trades**: Positive = more trades with volume (bad if > 0)\n")
@@ -475,4 +503,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

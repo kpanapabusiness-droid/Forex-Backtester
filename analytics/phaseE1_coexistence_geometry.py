@@ -2,6 +2,7 @@
 Phase E-1: Coexistence geometry analysis between two signal sources (e.g. CEB vs LSR).
 Computes overlap ratio, conflict rate, conditional lift, and event-level relations.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -67,9 +68,7 @@ def run(
     ceb_df = ceb_df.rename(columns={"signal": "ceb_signal"})
     lsr_df = lsr_df.rename(columns={"signal": "lsr_signal"})
 
-    merged = ceb_df.merge(
-        lsr_df, on=["pair", "date"], how="outer", suffixes=("_ceb", "_lsr")
-    )
+    merged = ceb_df.merge(lsr_df, on=["pair", "date"], how="outer", suffixes=("_ceb", "_lsr"))
     merged["ceb_signal"] = merged["ceb_signal"].fillna(0).astype(int)
     merged["lsr_signal"] = merged["lsr_signal"].fillna(0).astype(int)
 

@@ -32,17 +32,19 @@ def _synthetic_sequence_features(
     rows = []
     for i, d in enumerate(dates):
         split = "discovery" if pd.Timestamp(d) <= pd.Timestamp(discovery_end) else "validation"
-        rows.append({
-            "pair": pair,
-            "date": d,
-            "dataset_split": split,
-            "atrp_14": atrp[i],
-            "true_range": 0.001 + i * 0.0001,
-            "breakout_up_20": 1.0 if i == breakout_up_at else 0.0,
-            "breakout_dn_20": 1.0 if i == breakout_dn_at else 0.0,
-            "pos_in_range_20": 0.5 + i * 0.02,
-            "tr_atr_ratio": 0.9 + i * 0.05,
-        })
+        rows.append(
+            {
+                "pair": pair,
+                "date": d,
+                "dataset_split": split,
+                "atrp_14": atrp[i],
+                "true_range": 0.001 + i * 0.0001,
+                "breakout_up_20": 1.0 if i == breakout_up_at else 0.0,
+                "breakout_dn_20": 1.0 if i == breakout_dn_at else 0.0,
+                "pos_in_range_20": 0.5 + i * 0.02,
+                "tr_atr_ratio": 0.9 + i * 0.05,
+            }
+        )
     return pd.DataFrame(rows)
 
 
@@ -53,18 +55,14 @@ def test_rolling_compression_window_correctness() -> None:
         _ensure_dataset_split,
     )
 
-    df = _synthetic_sequence_features(
-        n_bars=10, compression_at=2, discovery_end="2022-12-31"
-    )
+    df = _synthetic_sequence_features(n_bars=10, compression_at=2, discovery_end="2022-12-31")
     df = _ensure_dataset_split(df, "2022-12-31")
     from analytics.phaseD2_2_features import (
         apply_bin_edges,
         compute_bin_edges_from_discovery,
     )
 
-    edges = compute_bin_edges_from_discovery(
-        df, "atrp_14", n_bins=10, min_per_bin=1
-    )
+    edges = compute_bin_edges_from_discovery(df, "atrp_14", n_bins=10, min_per_bin=1)
     assert edges is not None
     bin_series = apply_bin_edges(df["atrp_14"], edges)
     is_comp = (bin_series == 0).fillna(False)
@@ -102,6 +100,7 @@ def test_trigger_fires_at_trigger_bar_not_compression_bar() -> None:
             "pressure": {"thresholds": {"up": 0.90, "dn": 0.10}},
         }
         import yaml
+
         config_path = ROOT / "tmp_seq_config.yaml"
         with config_path.open("w", encoding="utf-8") as f:
             yaml.dump(config, f)
@@ -111,9 +110,7 @@ def test_trigger_fires_at_trigger_bar_not_compression_bar() -> None:
         main(["-c", str(config_path)])
 
         out = pd.read_parquet(ROOT / "tmp_seq_out" / "sequence_proto_signals.parquet")
-        breakout_up = out[
-            (out["signal_name"] == "seq_comp3_breakout_up") & (out["signal"] == 1)
-        ]
+        breakout_up = out[(out["signal_name"] == "seq_comp3_breakout_up") & (out["signal"] == 1)]
         if len(breakout_up) > 0:
             dates_fired = breakout_up["date"].unique()
             assert len(dates_fired) >= 1
@@ -128,6 +125,7 @@ def test_trigger_fires_at_trigger_bar_not_compression_bar() -> None:
         out_dir = ROOT / "tmp_seq_out"
         if out_dir.exists():
             import shutil
+
             shutil.rmtree(out_dir)
 
 
@@ -143,29 +141,33 @@ def test_ignition_threshold_from_discovery_only() -> None:
 
     rows = []
     for i, d in enumerate(dates_disc):
-        rows.append({
-            "pair": "EUR_USD",
-            "date": d,
-            "dataset_split": "discovery",
-            "atrp_14": 0.005 + i * 0.0001,
-            "true_range": 0.001,
-            "breakout_up_20": 0.0,
-            "breakout_dn_20": 0.0,
-            "pos_in_range_20": 0.5,
-            "tr_atr_ratio": tr_atr_disc[i],
-        })
+        rows.append(
+            {
+                "pair": "EUR_USD",
+                "date": d,
+                "dataset_split": "discovery",
+                "atrp_14": 0.005 + i * 0.0001,
+                "true_range": 0.001,
+                "breakout_up_20": 0.0,
+                "breakout_dn_20": 0.0,
+                "pos_in_range_20": 0.5,
+                "tr_atr_ratio": tr_atr_disc[i],
+            }
+        )
     for i, d in enumerate(dates_val):
-        rows.append({
-            "pair": "EUR_USD",
-            "date": d,
-            "dataset_split": "validation",
-            "atrp_14": 0.01,
-            "true_range": 0.001,
-            "breakout_up_20": 0.0,
-            "breakout_dn_20": 0.0,
-            "pos_in_range_20": 0.5,
-            "tr_atr_ratio": tr_atr_val[i],
-        })
+        rows.append(
+            {
+                "pair": "EUR_USD",
+                "date": d,
+                "dataset_split": "validation",
+                "atrp_14": 0.01,
+                "true_range": 0.001,
+                "breakout_up_20": 0.0,
+                "breakout_dn_20": 0.0,
+                "pos_in_range_20": 0.5,
+                "tr_atr_ratio": tr_atr_val[i],
+            }
+        )
     _ = pd.DataFrame(rows)
     p90 = float(np.quantile(tr_atr_disc, 0.90))
     assert p90 < 1.5
@@ -252,22 +254,28 @@ def test_config_validation_fail_fast() -> None:
     with pytest.raises(ValueError, match="outputs_dir"):
         _require_config({"features_path": "x"})
     with pytest.raises(ValueError, match="discovery_end"):
-        _require_config({
-            "features_path": "x",
-            "outputs_dir": "y",
-            "split": {},
-        })
+        _require_config(
+            {
+                "features_path": "x",
+                "outputs_dir": "y",
+                "split": {},
+            }
+        )
     with pytest.raises(ValueError, match="compression.feature"):
-        _require_config({
-            "features_path": "x",
-            "outputs_dir": "y",
-            "split": {"discovery_end": "2022-12-31"},
-        })
+        _require_config(
+            {
+                "features_path": "x",
+                "outputs_dir": "y",
+                "split": {"discovery_end": "2022-12-31"},
+            }
+        )
     with pytest.raises(ValueError, match="K_list"):
-        _require_config({
-            "features_path": "x",
-            "outputs_dir": "y",
-            "split": {"discovery_end": "2022-12-31"},
-            "compression": {"feature": "atrp_14", "bin": 0},
-            "sequence": {},
-        })
+        _require_config(
+            {
+                "features_path": "x",
+                "outputs_dir": "y",
+                "split": {"discovery_end": "2022-12-31"},
+                "compression": {"feature": "atrp_14", "bin": 0},
+                "sequence": {},
+            }
+        )

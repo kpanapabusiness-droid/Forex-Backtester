@@ -169,6 +169,7 @@ def main() -> None:
     if starting_balance is None and args.config:
         try:
             import yaml
+
             cfg = yaml.safe_load(Path(args.config).read_text(encoding="utf-8"))
             risk = (cfg or {}).get("risk") or {}
             starting_balance = float(risk.get("starting_balance", 10_000.0))
@@ -186,7 +187,9 @@ def main() -> None:
         seed=args.seed,
         out_dir=args.out_dir,
     )
-    print(f"Trade shuffling complete. n_trades={summary.get('n_trades', 0)} n_sims={summary.get('n_sims', 0)}")
+    print(
+        f"Trade shuffling complete. n_trades={summary.get('n_trades', 0)} n_sims={summary.get('n_sims', 0)}"
+    )
     print(f"Output: {Path(args.out_dir).resolve()}")
 
 

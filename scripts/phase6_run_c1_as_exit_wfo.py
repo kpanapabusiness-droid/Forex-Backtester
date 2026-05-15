@@ -196,10 +196,7 @@ def run_phase6_c1_as_exit_wfo(
     if limit is not None and limit > 0:
         c1_list = c1_list[:limit]
     if only_status:
-        c1_list = [
-            n for n in c1_list
-            if _get_existing_status(results_root / n) == only_status
-        ]
+        c1_list = [n for n in c1_list if _get_existing_status(results_root / n) == only_status]
     generated_dir.mkdir(parents=True, exist_ok=True)
     results_root.mkdir(parents=True, exist_ok=True)
     summary_df = _read_summary_df(results_root)
@@ -214,14 +211,20 @@ def run_phase6_c1_as_exit_wfo(
 
         if not rerun and _is_run_completed(variant_dir):
             counts["SKIPPED"] += 1
-            summary_df = _upsert_summary_row(results_root, summary_df, {
-                "exit_c1_name": exit_c1_name,
-                "status": "SKIPPED",
-                "reason": "already_completed",
-                "run_id": "",
-                "output_dir": str(variant_dir),
-            })
-            print(f"[{idx}/{total}] exit_c1_name={exit_c1_name} status=SKIPPED (reason=already_completed)")
+            summary_df = _upsert_summary_row(
+                results_root,
+                summary_df,
+                {
+                    "exit_c1_name": exit_c1_name,
+                    "status": "SKIPPED",
+                    "reason": "already_completed",
+                    "run_id": "",
+                    "output_dir": str(variant_dir),
+                },
+            )
+            print(
+                f"[{idx}/{total}] exit_c1_name={exit_c1_name} status=SKIPPED (reason=already_completed)"
+            )
             continue
 
         base_name = f"{exit_c1_name}_base.yaml"
@@ -257,13 +260,17 @@ def run_phase6_c1_as_exit_wfo(
                 config_paths=config_paths,
             )
             counts["ERROR"] += 1
-            summary_df = _upsert_summary_row(results_root, summary_df, {
-                "exit_c1_name": exit_c1_name,
-                "status": "ERROR",
-                "reason": reason,
-                "run_id": "",
-                "output_dir": str(variant_dir),
-            })
+            summary_df = _upsert_summary_row(
+                results_root,
+                summary_df,
+                {
+                    "exit_c1_name": exit_c1_name,
+                    "status": "ERROR",
+                    "reason": reason,
+                    "run_id": "",
+                    "output_dir": str(variant_dir),
+                },
+            )
             print(f"[{idx}/{total}] exit_c1_name={exit_c1_name} status=ERROR (reason={reason})")
             continue
         except Exception as e:
@@ -277,13 +284,17 @@ def run_phase6_c1_as_exit_wfo(
                 config_paths=config_paths,
             )
             counts["ERROR"] += 1
-            summary_df = _upsert_summary_row(results_root, summary_df, {
-                "exit_c1_name": exit_c1_name,
-                "status": "ERROR",
-                "reason": reason,
-                "run_id": "",
-                "output_dir": str(variant_dir),
-            })
+            summary_df = _upsert_summary_row(
+                results_root,
+                summary_df,
+                {
+                    "exit_c1_name": exit_c1_name,
+                    "status": "ERROR",
+                    "reason": reason,
+                    "run_id": "",
+                    "output_dir": str(variant_dir),
+                },
+            )
             print(f"[{idx}/{total}] exit_c1_name={exit_c1_name} status=ERROR (reason={reason})")
             continue
 
@@ -298,13 +309,17 @@ def run_phase6_c1_as_exit_wfo(
                 config_paths=config_paths,
             )
             counts["ERROR"] += 1
-            summary_df = _upsert_summary_row(results_root, summary_df, {
-                "exit_c1_name": exit_c1_name,
-                "status": "ERROR",
-                "reason": "no_run_id",
-                "run_id": "",
-                "output_dir": str(variant_dir),
-            })
+            summary_df = _upsert_summary_row(
+                results_root,
+                summary_df,
+                {
+                    "exit_c1_name": exit_c1_name,
+                    "status": "ERROR",
+                    "reason": "no_run_id",
+                    "run_id": "",
+                    "output_dir": str(variant_dir),
+                },
+            )
             print(f"[{idx}/{total}] exit_c1_name={exit_c1_name} status=ERROR (reason=no_run_id)")
             continue
 
@@ -320,27 +335,39 @@ def run_phase6_c1_as_exit_wfo(
                 config_paths=config_paths,
             )
             counts["REJECT"] += 1
-            summary_df = _upsert_summary_row(results_root, summary_df, {
-                "exit_c1_name": exit_c1_name,
-                "status": "REJECT",
-                "reason": "zero_trades",
-                "run_id": run_id,
-                "output_dir": str(variant_dir),
-            })
+            summary_df = _upsert_summary_row(
+                results_root,
+                summary_df,
+                {
+                    "exit_c1_name": exit_c1_name,
+                    "status": "REJECT",
+                    "reason": "zero_trades",
+                    "run_id": run_id,
+                    "output_dir": str(variant_dir),
+                },
+            )
             print(f"[{idx}/{total}] exit_c1_name={exit_c1_name} status=REJECT (reason=zero_trades)")
             continue
 
         counts["OK"] += 1
-        summary_df = _upsert_summary_row(results_root, summary_df, {
-            "exit_c1_name": exit_c1_name,
-            "status": "OK",
-            "reason": "",
-            "run_id": run_id,
-            "output_dir": str(variant_dir),
-        })
-        print(f"[{idx}/{total}] exit_c1_name={exit_c1_name} status=OK (total_trades={total_trades})")
+        summary_df = _upsert_summary_row(
+            results_root,
+            summary_df,
+            {
+                "exit_c1_name": exit_c1_name,
+                "status": "OK",
+                "reason": "",
+                "run_id": run_id,
+                "output_dir": str(variant_dir),
+            },
+        )
+        print(
+            f"[{idx}/{total}] exit_c1_name={exit_c1_name} status=OK (total_trades={total_trades})"
+        )
 
-    print(f"\nPhase 6.2 complete. OK={counts['OK']} REJECT={counts['REJECT']} ERROR={counts['ERROR']} SKIPPED={counts['SKIPPED']}")
+    print(
+        f"\nPhase 6.2 complete. OK={counts['OK']} REJECT={counts['REJECT']} ERROR={counts['ERROR']} SKIPPED={counts['SKIPPED']}"
+    )
 
 
 def parse_args() -> argparse.Namespace:

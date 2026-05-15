@@ -24,9 +24,7 @@ MIN_TRADES_PER_FOLD = 50
 def _latest_run_dir_by_mtime(variant_dir: Path) -> Path | None:
     """Return the run_id dir with latest mtime (not by name)."""
     run_dirs = [
-        p
-        for p in variant_dir.iterdir()
-        if p.is_dir() and (p / "wfo_run_meta.json").exists()
+        p for p in variant_dir.iterdir() if p.is_dir() and (p / "wfo_run_meta.json").exists()
     ]
     if not run_dirs:
         return None
@@ -193,7 +191,8 @@ def build_leaderboard(phase6_root: Path, c1_as_exit_root: Path) -> tuple[pd.Data
         trade_ratio = (total_trades / ref_trades) if ref_trades else float("nan")
         hold_ratio = (
             (agg["median_bars_held"] / ref_hold)
-            if ref_hold and pd.notna(ref_hold) else float("nan")
+            if ref_hold and pd.notna(ref_hold)
+            else float("nan")
         )
         churn_trade = pd.notna(trade_ratio) and trade_ratio > CHURN_TRADE_RATIO_CEILING
         churn_hold = pd.notna(hold_ratio) and hold_ratio < CHURN_HOLD_RATIO_FLOOR

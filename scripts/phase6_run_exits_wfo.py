@@ -42,9 +42,7 @@ def _verify_wfo_artifacts(variant_slug: str) -> None:
     run_dir = run_dirs[0]
     meta = run_dir / "wfo_run_meta.json"
     if not meta.exists():
-        raise FileNotFoundError(
-            f"Phase 6: missing {meta}. WFO v2 must write wfo_run_meta.json."
-        )
+        raise FileNotFoundError(f"Phase 6: missing {meta}. WFO v2 must write wfo_run_meta.json.")
     fold_dirs = [p for p in run_dir.iterdir() if p.is_dir() and p.name.startswith("fold_")]
     if not fold_dirs:
         raise FileNotFoundError(
@@ -75,7 +73,7 @@ def run_phase6_exits_wfo(
         out_dir = results_root / variant_slug
         out_dir.mkdir(parents=True, exist_ok=True)
 
-        print(f"\n{'='*60}")
+        print(f"\n{'=' * 60}")
         print(f"Phase 6 — {label} ({variant_slug})")
         print(f"Config: {wfo_path}")
         print(f"Output: {out_dir}")

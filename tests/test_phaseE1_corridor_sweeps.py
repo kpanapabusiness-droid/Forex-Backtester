@@ -1,4 +1,5 @@
 """Tests for Phase E-1.4 corridor sweeps."""
+
 from __future__ import annotations
 
 import json
@@ -16,6 +17,7 @@ def _params_hash(params: dict) -> str:
 
 def expand_grid(grid: dict) -> list[dict]:
     import itertools
+
     keys = sorted(grid.keys())
     values = [grid[k] for k in keys]
     return [dict(zip(keys, prod)) for prod in itertools.product(*values)]
@@ -53,13 +55,32 @@ def test_max_combos_cap() -> None:
 
 def test_aggregator_sorts_pass_first() -> None:
     import pandas as pd
+
     aggregated = [
-        {"params_hash": "a1", "params_json": "{}", "PASS": False, "reject_reason": "x",
-         "P_3R_before_2R_val": 0.5, "clustering_ratio": 0.1},
-        {"params_hash": "b2", "params_json": "{}", "PASS": True, "reject_reason": "",
-         "P_3R_before_2R_val": 0.4, "clustering_ratio": 0.2},
-        {"params_hash": "c3", "params_json": "{}", "PASS": True, "reject_reason": "",
-         "P_3R_before_2R_val": 0.6, "clustering_ratio": 0.05},
+        {
+            "params_hash": "a1",
+            "params_json": "{}",
+            "PASS": False,
+            "reject_reason": "x",
+            "P_3R_before_2R_val": 0.5,
+            "clustering_ratio": 0.1,
+        },
+        {
+            "params_hash": "b2",
+            "params_json": "{}",
+            "PASS": True,
+            "reject_reason": "",
+            "P_3R_before_2R_val": 0.4,
+            "clustering_ratio": 0.2,
+        },
+        {
+            "params_hash": "c3",
+            "params_json": "{}",
+            "PASS": True,
+            "reject_reason": "",
+            "P_3R_before_2R_val": 0.6,
+            "clustering_ratio": 0.05,
+        },
     ]
     df = pd.DataFrame(aggregated)
     pass_first = df["PASS"].fillna(False).astype(bool)
@@ -82,6 +103,7 @@ def test_aggregator_sorts_pass_first() -> None:
 
 def test_expand_grid_matches_script() -> None:
     from scripts.phaseE1_run_corridor_sweeps import expand_grid as script_expand
+
     grid = {"gamma": [0.6, 0.65], "alpha": [0.9, 1.0]}
     a = expand_grid(grid)
     b = script_expand(grid)
@@ -97,30 +119,40 @@ def test_indicator_only_excludes_csv_signals(tmp_path: Path) -> None:
     csv_dir = tmp_path / "results" / "phaseD"
     csv_dir.mkdir(parents=True)
     proto_csv = csv_dir / "proto_signals.csv"
-    pd.DataFrame({
-        "pair": ["P1", "P1", "P2"],
-        "date": ["2020-01-01", "2020-01-02", "2020-01-01"],
-        "signal": [1, -1, 0],
-    }).to_csv(proto_csv, index=False)
+    pd.DataFrame(
+        {
+            "pair": ["P1", "P1", "P2"],
+            "date": ["2020-01-01", "2020-01-02", "2020-01-01"],
+            "signal": [1, -1, 0],
+        }
+    ).to_csv(proto_csv, index=False)
 
     data_dir = tmp_path / "data" / "daily"
     data_dir.mkdir(parents=True)
-    ohlc = pd.DataFrame({
-        "date": ["2020-01-01", "2020-01-02", "2020-01-03"],
-        "open": 1.0, "high": 1.01, "low": 0.99, "close": 1.0, "volume": 100,
-    })
+    ohlc = pd.DataFrame(
+        {
+            "date": ["2020-01-01", "2020-01-02", "2020-01-03"],
+            "open": 1.0,
+            "high": 1.01,
+            "low": 0.99,
+            "close": 1.0,
+            "volume": 100,
+        }
+    )
     ohlc.to_csv(data_dir / "P1.csv", index=False)
     ohlc.to_csv(data_dir / "P2.csv", index=False)
 
-    clean_df = pd.DataFrame({
-        "pair": ["P1", "P1", "P2"],
-        "date": pd.to_datetime(["2020-01-01", "2020-01-02", "2020-01-01"]),
-        "valid_atr": [True, True, True],
-        "valid_ref": [True, True, True],
-        "valid_h40": [True, True, True],
-        "clean_mfe_long_x1_h40": [1.5, 2.0, 0.5],
-        "clean_mfe_short_x1_h40": [0.5, 1.0, 2.0],
-    })
+    clean_df = pd.DataFrame(
+        {
+            "pair": ["P1", "P1", "P2"],
+            "date": pd.to_datetime(["2020-01-01", "2020-01-02", "2020-01-01"]),
+            "valid_atr": [True, True, True],
+            "valid_ref": [True, True, True],
+            "valid_h40": [True, True, True],
+            "clean_mfe_long_x1_h40": [1.5, 2.0, 0.5],
+            "clean_mfe_short_x1_h40": [0.5, 1.0, 2.0],
+        }
+    )
     clean_path = tmp_path / "clean.csv"
     clean_df.to_csv(clean_path, index=False)
 
@@ -161,14 +193,16 @@ def test_lsr_params_change_signal_count() -> None:
     high = close + np.abs(np.random.randn(n) * 0.005)
     low = close - np.abs(np.random.randn(n) * 0.005)
     open_ = close.shift(1).fillna(close.iloc[0])
-    df = pd.DataFrame({
-        "date": dates,
-        "open": open_,
-        "high": high,
-        "low": low,
-        "close": close,
-        "volume": 100,
-    })
+    df = pd.DataFrame(
+        {
+            "date": dates,
+            "open": open_,
+            "high": high,
+            "low": low,
+            "close": close,
+            "volume": 100,
+        }
+    )
 
     out_5 = c1_liquidity_sweep_rejection(df.copy(), L_sw=5, signal_col="c1_signal")
     out_50 = c1_liquidity_sweep_rejection(df.copy(), L_sw=50, signal_col="c1_signal")

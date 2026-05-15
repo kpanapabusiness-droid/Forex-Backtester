@@ -1,6 +1,7 @@
 """
 Phase E-1: Tests for phaseE1_run_signal_geometry runner.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -76,7 +77,9 @@ date_range:
         with patch("scripts.phaseE1_run_signal_geometry._run") as mock_run:
             with patch("scripts.phaseE1_run_signal_geometry._find_clean_labels") as mock_find:
                 mock_find.return_value = clean_path
-                exit_code = main(["-c", str(config_path), "--clean", str(clean_path), "--outdir", str(out_dir)])
+                exit_code = main(
+                    ["-c", str(config_path), "--clean", str(clean_path), "--outdir", str(out_dir)]
+                )
 
     assert exit_code == 0
     assert out_dir.exists()

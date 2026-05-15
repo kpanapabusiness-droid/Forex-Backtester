@@ -1,6 +1,7 @@
 """
 Phase D-6F: Regression tests for clean label summaries.
 """
+
 from __future__ import annotations
 
 import pandas as pd
@@ -11,17 +12,25 @@ from analytics.phaseD6F_clean_label_summaries import _counts_clean_zoneC_by_year
 
 def _make_synthetic_zonec_df() -> pd.DataFrame:
     """Synthetic DataFrame with clean_zoneC columns across two years."""
-    return pd.DataFrame({
-        "pair": ["EUR_USD"] * 4 + ["GBP_USD"] * 2,
-        "date": pd.to_datetime([
-            "2020-01-01", "2020-06-15", "2021-03-01", "2021-12-31",
-            "2020-02-01", "2021-07-01",
-        ]),
-        "valid_h40": [True] * 6,
-        "clean_zoneC_long_x1": [True, False, True, False, True, False],
-        "clean_zoneC_long_x2": [False, True, False, True, False, True],
-        "clean_zoneC_short_x3": [True, True, False, False, True, False],
-    })
+    return pd.DataFrame(
+        {
+            "pair": ["EUR_USD"] * 4 + ["GBP_USD"] * 2,
+            "date": pd.to_datetime(
+                [
+                    "2020-01-01",
+                    "2020-06-15",
+                    "2021-03-01",
+                    "2021-12-31",
+                    "2020-02-01",
+                    "2021-07-01",
+                ]
+            ),
+            "valid_h40": [True] * 6,
+            "clean_zoneC_long_x1": [True, False, True, False, True, False],
+            "clean_zoneC_long_x2": [False, True, False, True, False, True],
+            "clean_zoneC_short_x3": [True, True, False, False, True, False],
+        }
+    )
 
 
 def test_counts_clean_zoneC_returns_dataframe_no_index_error() -> None:
@@ -51,10 +60,12 @@ def test_counts_clean_zoneC_expected_counts() -> None:
 
 def test_counts_clean_zoneC_no_matching_cols_raises() -> None:
     """Raises ValueError when no zoneC columns exist."""
-    df = pd.DataFrame({
-        "pair": ["X"],
-        "date": pd.to_datetime(["2020-01-01"]),
-        "valid_h40": [True],
-    })
+    df = pd.DataFrame(
+        {
+            "pair": ["X"],
+            "date": pd.to_datetime(["2020-01-01"]),
+            "valid_h40": [True],
+        }
+    )
     with pytest.raises(ValueError, match="No clean_zoneC columns found"):
         _counts_clean_zoneC_by_year_pair(df)

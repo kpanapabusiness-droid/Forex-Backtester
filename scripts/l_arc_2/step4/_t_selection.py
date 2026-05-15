@@ -12,6 +12,7 @@ Output schema (per dispatch):
     n_trades_active_at_t_f1_f5, n_trades_active_at_t_f6_f7,
     frac_cluster_1_already_exited_at_t, selected
 """
+
 from __future__ import annotations
 
 import numpy as np
@@ -31,9 +32,9 @@ def _capture_ratio(net_r: np.ndarray, mfe_atr_h: np.ndarray) -> float:
     return float(np.nanmean(net_r) / denom)
 
 
-def _per_fold_cap_and_r(post: pd.DataFrame,
-                        signals_with_clu: pd.DataFrame,
-                        fwd_mfe_col: str) -> dict:
+def _per_fold_cap_and_r(
+    post: pd.DataFrame, signals_with_clu: pd.DataFrame, fwd_mfe_col: str
+) -> dict:
     """Compute fold-aggregated mean_r and mean capture for a post-mechanism frame.
 
     Returns dict with keys mean_r, capture_ratio per fold subset.
@@ -42,7 +43,8 @@ def _per_fold_cap_and_r(post: pd.DataFrame,
         return {"mean_r": float("nan"), "capture_ratio": float("nan"), "n": 0}
     merged = post.merge(
         signals_with_clu[["trade_id", fwd_mfe_col]],
-        on="trade_id", how="left",
+        on="trade_id",
+        how="left",
     )
     return {
         "mean_r": float(np.nanmean(merged["net_r"].values)),
@@ -69,19 +71,21 @@ def run_t_selection_for_candidate(
         preds = P.fit_predict_cluster_all_folds(signals_with_clu, t)
 
         if preds.empty:
-            rows.append({
-                "t": t,
-                "mean_capture_ratio_f1_f5": float("nan"),
-                "mean_capture_ratio_f6_f7": float("nan"),
-                "mean_r_f1_f5": float("nan"),
-                "mean_r_f6_f7": float("nan"),
-                "fold_6_mean_r": float("nan"),
-                "fold_7_mean_r": float("nan"),
-                "n_trades_active_at_t_f1_f5": 0,
-                "n_trades_active_at_t_f6_f7": 0,
-                "frac_cluster_1_already_exited_at_t": float("nan"),
-                "selected": False,
-            })
+            rows.append(
+                {
+                    "t": t,
+                    "mean_capture_ratio_f1_f5": float("nan"),
+                    "mean_capture_ratio_f6_f7": float("nan"),
+                    "mean_r_f1_f5": float("nan"),
+                    "mean_r_f6_f7": float("nan"),
+                    "fold_6_mean_r": float("nan"),
+                    "fold_7_mean_r": float("nan"),
+                    "n_trades_active_at_t_f1_f5": 0,
+                    "n_trades_active_at_t_f6_f7": 0,
+                    "frac_cluster_1_already_exited_at_t": float("nan"),
+                    "selected": False,
+                }
+            )
             continue
 
         # Run action separately on F1..F5 preds vs F6..F7 preds
@@ -115,21 +119,27 @@ def run_t_selection_for_candidate(
 
         # Tautology rate
         tauto = tautology_df[(tautology_df["slug"] == slug) & (tautology_df["t"] == t)]
-        frac_already = float(tauto["frac_cluster_1_already_exited"].iloc[0]) if len(tauto) > 0 else float("nan")
+        frac_already = (
+            float(tauto["frac_cluster_1_already_exited"].iloc[0])
+            if len(tauto) > 0
+            else float("nan")
+        )
 
-        rows.append({
-            "t": t,
-            "mean_capture_ratio_f1_f5": m15["capture_ratio"],
-            "mean_capture_ratio_f6_f7": m67["capture_ratio"],
-            "mean_r_f1_f5": m15["mean_r"],
-            "mean_r_f6_f7": m67["mean_r"],
-            "fold_6_mean_r": f6_r,
-            "fold_7_mean_r": f7_r,
-            "n_trades_active_at_t_f1_f5": m15["n"],
-            "n_trades_active_at_t_f6_f7": m67["n"],
-            "frac_cluster_1_already_exited_at_t": frac_already,
-            "selected": False,
-        })
+        rows.append(
+            {
+                "t": t,
+                "mean_capture_ratio_f1_f5": m15["capture_ratio"],
+                "mean_capture_ratio_f6_f7": m67["capture_ratio"],
+                "mean_r_f1_f5": m15["mean_r"],
+                "mean_r_f6_f7": m67["mean_r"],
+                "fold_6_mean_r": f6_r,
+                "fold_7_mean_r": f7_r,
+                "n_trades_active_at_t_f1_f5": m15["n"],
+                "n_trades_active_at_t_f6_f7": m67["n"],
+                "frac_cluster_1_already_exited_at_t": frac_already,
+                "selected": False,
+            }
+        )
 
     df = pd.DataFrame(rows)
 

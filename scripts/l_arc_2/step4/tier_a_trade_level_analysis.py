@@ -23,6 +23,7 @@ Conventions:
   - Sub-clustering hash-seed: int(sha256(slug)[:8], 16) per Amendment 11.
   - Numeric formatting in tables: 3 sig figs; percentages to 4 decimals.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -135,6 +136,7 @@ PER_TRADE_COLS = [
 
 # ----------------------------- IO helpers -----------------------------
 
+
 def sha256_file(path: Path) -> str:
     h = hashlib.sha256()
     with open(path, "rb") as f:
@@ -165,6 +167,7 @@ def fmt_pct(x) -> str:
 
 
 # ----------------------------- Trade-path aggregations -----------------------------
+
 
 def build_path_aggregates(trade_paths: pd.DataFrame) -> pd.DataFrame:
     """Per-trade aggregates from trade_paths.csv.
@@ -199,13 +202,12 @@ def build_path_aggregates(trade_paths: pd.DataFrame) -> pd.DataFrame:
         .rename("time_to_trough_mae")
     )
 
-    out = pd.concat(
-        [peak_mfe, peak_mae, time_to_peak_mfe, time_to_trough_mae], axis=1
-    )
+    out = pd.concat([peak_mfe, peak_mae, time_to_peak_mfe, time_to_trough_mae], axis=1)
     return out
 
 
 # ----------------------------- Per-trade build -----------------------------
+
 
 def build_per_trade_csv(
     slug: str,
@@ -223,9 +225,7 @@ def build_per_trade_csv(
     entry_altered = slug in {"delayed_entry_t_gb"}
 
     # Merge candidate -> pool (signals + cluster) -> path aggregates
-    df = cand.merge(
-        pool, on="trade_id", how="left", suffixes=("_cand", "")
-    )
+    df = cand.merge(pool, on="trade_id", how="left", suffixes=("_cand", ""))
     df = df.merge(path_agg, on="trade_id", how="left")
 
     # Resolve sources: prefer candidate's net_r / gross_r / exit_reason; fall
@@ -288,10 +288,7 @@ def build_per_trade_csv(
     is_sl = exit_reason_norm == "sl"
     max_mfe_before_sl = max_mfe_before_exit.where(is_sl, np.nan)
 
-    race_diff = (
-        df["bars_to_plus_1.0_atr_capped_480"]
-        - df["bars_to_minus_1.0_atr_capped_480"]
-    )
+    race_diff = df["bars_to_plus_1.0_atr_capped_480"] - df["bars_to_minus_1.0_atr_capped_480"]
 
     out = pd.DataFrame(
         {
@@ -315,9 +312,7 @@ def build_per_trade_csv(
             "peak_to_final_r_ratio": df["peak_to_final_r_ratio"],
             "fwd_mfe_h24_atr": df["fwd_mfe_h24_atr"],
             "fwd_mae_h24_atr": df["fwd_mae_h24_atr"],
-            "fwd_max_consecutive_directional_bars": df[
-                "fwd_max_consecutive_directional_bars"
-            ],
+            "fwd_max_consecutive_directional_bars": df["fwd_max_consecutive_directional_bars"],
             "bars_to_plus_1atr": df["bars_to_plus_1.0_atr_capped_480"],
             "bars_to_minus_1atr": df["bars_to_minus_1.0_atr_capped_480"],
             "race_diff": race_diff,
@@ -344,12 +339,14 @@ def write_per_trade_csv(slug: str, df: pd.DataFrame) -> str:
 
 # ----------------------------- Aggregations -----------------------------
 
+
 def dist_stats(series: pd.Series) -> dict:
     s = pd.Series(series).dropna()
     if s.empty:
-        return {k: float("nan") for k in
-                ("mean", "std", "min", "p5", "p10", "p25", "p50",
-                 "p75", "p90", "p95", "max")}
+        return {
+            k: float("nan")
+            for k in ("mean", "std", "min", "p5", "p10", "p25", "p50", "p75", "p90", "p95", "max")
+        }
     return {
         "mean": float(s.mean()),
         "std": float(s.std(ddof=0)),
@@ -378,7 +375,7 @@ def per_fold_table(df: pd.DataFrame) -> list[dict]:
         mae_held = sub["mae_held_atr"]
         # capture ratio = net_r / mfe_held (per-trade), valid when mfe_held > 0
         ratio_mask = (mfe_held > 0) & mfe_held.notna() & net_r.notna()
-        cap_ratio = (net_r[ratio_mask] / mfe_held[ratio_mask])
+        cap_ratio = net_r[ratio_mask] / mfe_held[ratio_mask]
         cluster0_frac = float((sub["cluster_id_k2_kmeans"] != 1).mean())
         cluster1_frac = float((sub["cluster_id_k2_kmeans"] == 1).mean())
         rows.append(
@@ -474,7 +471,8 @@ def mfe_before_sl_summary(df: pd.DataFrame) -> dict:
     n_sl = len(sl)
     if n_sl == 0:
         return {
-            "n_sl": 0, "stats": stats,
+            "n_sl": 0,
+            "stats": stats,
             "frac_gt_0_5": float("nan"),
             "frac_gt_1_0": float("nan"),
             "frac_gt_1_5": float("nan"),
@@ -490,17 +488,14 @@ def mfe_before_sl_summary(df: pd.DataFrame) -> dict:
         "frac_gt_0_5": frac_gt_0_5,
         "frac_gt_1_0": frac_gt_1_0,
         "frac_gt_1_5": frac_gt_1_5,
-        "median_time_to_peak_almost_wins": (
-            float(aw.median()) if not aw.empty else float("nan")
-        ),
+        "median_time_to_peak_almost_wins": (float(aw.median()) if not aw.empty else float("nan")),
     }
 
 
 # ----------------------------- Sub-clustering -----------------------------
 
-def subcluster(
-    slug: str, df: pd.DataFrame, signals_full: pd.DataFrame, k: int
-) -> dict:
+
+def subcluster(slug: str, df: pd.DataFrame, signals_full: pd.DataFrame, k: int) -> dict:
     """Run KMeans at K on retained subset. Returns per-cluster summary dict."""
     seed = int(hashlib.sha256(slug.encode()).hexdigest()[:8], 16)
 
@@ -513,9 +508,7 @@ def subcluster(
     feat["time_to_trough_mae"] = df.set_index("trade_id")["time_to_trough_mae"]
 
     # Ordinal-encode mfe_sequence_class_held
-    feat["mfe_sequence_class_held"] = feat["mfe_sequence_class_held"].map(
-        MFE_SEQ_ORDINAL
-    )
+    feat["mfe_sequence_class_held"] = feat["mfe_sequence_class_held"].map(MFE_SEQ_ORDINAL)
 
     feat = feat[SUBCLUSTER_FEATURES]
     valid_mask = feat.notna().all(axis=1)
@@ -568,6 +561,7 @@ def subcluster(
 
 # ----------------------------- Markdown rendering -----------------------------
 
+
 def md_table(headers: list[str], rows: list[list[str]]) -> str:
     aligns = ["---"] * len(headers)
     lines = [
@@ -581,78 +575,100 @@ def md_table(headers: list[str], rows: list[list[str]]) -> str:
 
 def render_per_fold(slug: str, rows: list[dict]) -> str:
     headers = [
-        "Fold", "n_trades", "mean_r", "win_pct", "median_bars_held",
-        "median_mfe_held", "median_mae_held", "median_capture_ratio",
-        "mean_capture_ratio", "cluster_0_fraction", "cluster_1_fraction",
+        "Fold",
+        "n_trades",
+        "mean_r",
+        "win_pct",
+        "median_bars_held",
+        "median_mfe_held",
+        "median_mae_held",
+        "median_capture_ratio",
+        "mean_capture_ratio",
+        "cluster_0_fraction",
+        "cluster_1_fraction",
     ]
     body = []
     for r in rows:
         if r["n"] == 0:
             body.append([str(r["fold"]), "0", "", "", "", "", "", "", "", "", ""])
             continue
-        body.append([
-            str(r["fold"]),
-            str(r["n"]),
-            fmt(r["mean_r"]),
-            fmt_pct(r["win_pct"]),
-            fmt(r["med_bars_held"]),
-            fmt(r["med_mfe_held"]),
-            fmt(r["med_mae_held"]),
-            fmt(r["med_cap"]),
-            fmt(r["mean_cap"]),
-            fmt_pct(r["cluster0_frac"]),
-            fmt_pct(r["cluster1_frac"]),
-        ])
+        body.append(
+            [
+                str(r["fold"]),
+                str(r["n"]),
+                fmt(r["mean_r"]),
+                fmt_pct(r["win_pct"]),
+                fmt(r["med_bars_held"]),
+                fmt(r["med_mfe_held"]),
+                fmt(r["med_mae_held"]),
+                fmt(r["med_cap"]),
+                fmt(r["mean_cap"]),
+                fmt_pct(r["cluster0_frac"]),
+                fmt_pct(r["cluster1_frac"]),
+            ]
+        )
     return md_table(headers, body)
 
 
 def render_exit_mix(rows: list[dict]) -> str:
-    headers = ["exit_reason", "n_trades", "pct_of_total", "mean_r",
-               "mean_bars_held", "mean_mfe_held"]
+    headers = [
+        "exit_reason",
+        "n_trades",
+        "pct_of_total",
+        "mean_r",
+        "mean_bars_held",
+        "mean_mfe_held",
+    ]
     body = [
-        [r["exit_reason"], str(r["n"]), fmt_pct(r["pct"]),
-         fmt(r["mean_r"]), fmt(r["mean_bars_held"]), fmt(r["mean_mfe_held"])]
+        [
+            r["exit_reason"],
+            str(r["n"]),
+            fmt_pct(r["pct"]),
+            fmt(r["mean_r"]),
+            fmt(r["mean_bars_held"]),
+            fmt(r["mean_mfe_held"]),
+        ]
         for r in rows
     ]
     return md_table(headers, body)
 
 
 def render_dist_pair(stats_win: dict, stats_lose: dict, col_label: str) -> str:
-    keys = ["mean", "std", "min", "p5", "p10", "p25", "p50",
-            "p75", "p90", "p95", "max"]
+    keys = ["mean", "std", "min", "p5", "p10", "p25", "p50", "p75", "p90", "p95", "max"]
     headers = ["statistic", "winners", "losers"]
     body = [[k, fmt(stats_win.get(k)), fmt(stats_lose.get(k))] for k in keys]
     return f"**{col_label}**\n\n" + md_table(headers, body)
 
 
 def render_per_pair(rows: list[dict], insuff: dict) -> tuple[str, list[tuple]]:
-    headers = ["pair", "n_trades", "mean_r", "win_pct",
-               "median_bars_held", "flag (n<30)"]
+    headers = ["pair", "n_trades", "mean_r", "win_pct", "median_bars_held", "flag (n<30)"]
     body = []
     rv_list = []
     for r in rows:
-        body.append([
-            r["pair"], str(r["n"]), fmt(r["mean_r"]),
-            fmt_pct(r["win_pct"]), fmt(r["med_bars_held"]),
-            r["flag"],
-        ])
+        body.append(
+            [
+                r["pair"],
+                str(r["n"]),
+                fmt(r["mean_r"]),
+                fmt_pct(r["win_pct"]),
+                fmt(r["med_bars_held"]),
+                r["flag"],
+            ]
+        )
         rv_list.append((r["pair"], r["mean_r"] * r["n"], r["n"], r["mean_r"]))
     if insuff["n"] > 0:
-        mean_r_pool = (
-            insuff["mean_r_sum_weighted"] / insuff["n"]
-            if insuff["n"] else float("nan")
+        mean_r_pool = insuff["mean_r_sum_weighted"] / insuff["n"] if insuff["n"] else float("nan")
+        win_pct_pool = insuff["wins"] / insuff["n"] if insuff["n"] else float("nan")
+        body.append(
+            [
+                "insufficient-n (pooled n<10)",
+                str(insuff["n"]),
+                fmt(mean_r_pool),
+                fmt_pct(win_pct_pool),
+                "",
+                "pooled",
+            ]
         )
-        win_pct_pool = (
-            insuff["wins"] / insuff["n"] if insuff["n"] else float("nan")
-        )
-        body.append([
-            "insufficient-n (pooled n<10)",
-            str(insuff["n"]),
-            fmt(mean_r_pool),
-            fmt_pct(win_pct_pool),
-            "",
-            "pooled",
-        ])
     rv_list.sort(key=lambda t: -abs(t[1]))
     return md_table(headers, body), rv_list[:3]
 
@@ -660,8 +676,13 @@ def render_per_pair(rows: list[dict], insuff: dict) -> tuple[str, list[tuple]]:
 def render_per_session(rows: list[dict]) -> str:
     headers = ["session", "n_trades", "mean_r", "win_pct", "median_bars_held"]
     body = [
-        [r["session"], str(r["n"]), fmt(r["mean_r"]),
-         fmt_pct(r["win_pct"]), fmt(r["med_bars_held"])]
+        [
+            r["session"],
+            str(r["n"]),
+            fmt(r["mean_r"]),
+            fmt_pct(r["win_pct"]),
+            fmt(r["med_bars_held"]),
+        ]
         for r in rows
     ]
     return md_table(headers, body)
@@ -669,21 +690,35 @@ def render_per_session(rows: list[dict]) -> str:
 
 def render_subcluster(slug: str, k: int, result: dict) -> str:
     if "error" in result:
-        return (f"K={k} sub-cluster: {result['error']} "
-                f"(seed={result['seed']}, n_dropped_nan={result['n_dropped_nan']})\n")
+        return (
+            f"K={k} sub-cluster: {result['error']} "
+            f"(seed={result['seed']}, n_dropped_nan={result['n_dropped_nan']})\n"
+        )
     lines = [
-        f"**K={k}** (random_state={result['seed']}, "
-        f"n_dropped_nan={result['n_dropped_nan']})",
+        f"**K={k}** (random_state={result['seed']}, n_dropped_nan={result['n_dropped_nan']})",
         "",
     ]
-    headers = ["sub_cluster_id", "n", "mean_r", "win_pct",
-               "median_bars_held", "median_mfe_held", "median_mae_held",
-               "mirror_fraction_match"]
+    headers = [
+        "sub_cluster_id",
+        "n",
+        "mean_r",
+        "win_pct",
+        "median_bars_held",
+        "median_mfe_held",
+        "median_mae_held",
+        "mirror_fraction_match",
+    ]
     body = [
-        [str(c["sub_cluster_id"]), str(c["n"]), fmt(c["mean_r"]),
-         fmt_pct(c["win_pct"]), fmt(c["med_bars_held"]),
-         fmt(c["med_mfe_held"]), fmt(c["med_mae_held"]),
-         fmt_pct(c["mirror_fraction_match"])]
+        [
+            str(c["sub_cluster_id"]),
+            str(c["n"]),
+            fmt(c["mean_r"]),
+            fmt_pct(c["win_pct"]),
+            fmt(c["med_bars_held"]),
+            fmt(c["med_mfe_held"]),
+            fmt(c["med_mae_held"]),
+            fmt_pct(c["mirror_fraction_match"]),
+        ]
         for c in result["clusters"]
     ]
     lines.append(md_table(headers, body))
@@ -694,10 +729,7 @@ def per_fold_read(rows: list[dict]) -> str:
     pos = [r["fold"] for r in rows if r.get("n", 0) > 0 and r["mean_r"] > 0]
     neg = [r["fold"] for r in rows if r.get("n", 0) > 0 and r["mean_r"] < 0]
     zer = [r["fold"] for r in rows if r.get("n", 0) == 0]
-    sentence = (
-        f"Positive folds: {pos or 'none'}; "
-        f"negative folds: {neg or 'none'}"
-    )
+    sentence = f"Positive folds: {pos or 'none'}; negative folds: {neg or 'none'}"
     if zer:
         sentence += f"; empty folds: {zer}"
     sentence += ". "
@@ -710,10 +742,7 @@ def per_fold_read(rows: list[dict]) -> str:
         elif all(d <= 1e-9 for d in diffs):
             sentence += "Mean R is monotone non-increasing across populated folds."
         else:
-            sign_changes = sum(
-                1 for a, b in zip(diffs[:-1], diffs[1:])
-                if (a > 0) != (b > 0)
-            )
+            sign_changes = sum(1 for a, b in zip(diffs[:-1], diffs[1:]) if (a > 0) != (b > 0))
             sentence += (
                 f"Mean R is non-monotone ({sign_changes} sign change(s) in "
                 "successive fold differences)."
@@ -722,6 +751,7 @@ def per_fold_read(rows: list[dict]) -> str:
 
 
 # ----------------------------- Main -----------------------------
+
 
 def main() -> int:
     t0 = time.time()
@@ -747,15 +777,28 @@ def main() -> int:
 
     # ---- Load inputs ----
     signals_cols = [
-        "trade_id", "pair", "fold_id", "session", "hour_utc", "day_of_week",
-        "net_r", "gross_r", "exit_reason", "bars_held",
-        "mfe_held_atr", "mae_held_atr", "peak_to_final_r_ratio",
-        "fwd_mfe_h24_atr", "fwd_mae_h24_atr",
+        "trade_id",
+        "pair",
+        "fold_id",
+        "session",
+        "hour_utc",
+        "day_of_week",
+        "net_r",
+        "gross_r",
+        "exit_reason",
+        "bars_held",
+        "mfe_held_atr",
+        "mae_held_atr",
+        "peak_to_final_r_ratio",
+        "fwd_mfe_h24_atr",
+        "fwd_mae_h24_atr",
         "fwd_max_consecutive_directional_bars",
         "bars_to_plus_1.0_atr_capped_480",
         "bars_to_minus_1.0_atr_capped_480",
-        "oscillation_count", "monotonicity_ratio",
-        "fwd_realized_range_atr", "fwd_fraction_time_above_entry",
+        "oscillation_count",
+        "monotonicity_ratio",
+        "fwd_realized_range_atr",
+        "fwd_fraction_time_above_entry",
         "mfe_sequence_class_held",
     ]
     signals = pd.read_csv(SIGNALS_CSV, usecols=signals_cols)
@@ -786,13 +829,15 @@ def main() -> int:
     receipts.append("Pool assertions PASS.")
     receipts.append("")
 
-    pool = signals.merge(cluster, on="trade_id", how="inner",
-                         validate="one_to_one")
+    pool = signals.merge(cluster, on="trade_id", how="inner", validate="one_to_one")
 
     # ---- Load trade_paths and aggregate ----
     print("Loading trade_paths.csv ...", flush=True)
     paths_cols = [
-        "trade_id", "bar_offset", "mfe_to_date_atr", "mae_to_date_atr",
+        "trade_id",
+        "bar_offset",
+        "mfe_to_date_atr",
+        "mae_to_date_atr",
         "is_held_bar",
     ]
     trade_paths = pd.read_csv(TRADE_PATHS_CSV, usecols=paths_cols)
@@ -804,9 +849,7 @@ def main() -> int:
 
     # ---- Expected counts from supplemental ----
     supp = pd.read_csv(SUPPLEMENTAL_CSV)
-    expected_n_post = {
-        r.slug: int(r.n_post_total) for r in supp.itertuples()
-    }
+    expected_n_post = {r.slug: int(r.n_post_total) for r in supp.itertuples()}
     receipts.append("## Per-candidate trade counts")
 
     # ---- Per-candidate ----
@@ -816,9 +859,13 @@ def main() -> int:
     out_doc_lines.append("## §1 Header")
     out_doc_lines.append("")
     out_doc_lines.append("- Arc: 2 (kb_exhaustion_bar candidate signal under L_ARC_PROTOCOL v1.0)")
-    out_doc_lines.append("- Step: 4 supplemental — trade-level inputs for Tier A planner-review consumers")
+    out_doc_lines.append(
+        "- Step: 4 supplemental — trade-level inputs for Tier A planner-review consumers"
+    )
     out_doc_lines.append("- Methodology: L_ARC_PROTOCOL v1.0 + v1.2 amendment (A1, A2, A3)")
-    out_doc_lines.append("- Scope: read + join + aggregate over existing step 4 outputs + step 2/3 inputs")
+    out_doc_lines.append(
+        "- Scope: read + join + aggregate over existing step 4 outputs + step 2/3 inputs"
+    )
     out_doc_lines.append("- Candidates: " + ", ".join(SLUGS))
     out_doc_lines.append("")
     out_doc_lines.append("Input sha256:")
@@ -828,16 +875,16 @@ def main() -> int:
     out_doc_lines.append(f"- cluster_assignments.csv: `{sha_clu}`")
     out_doc_lines.append(f"- v1_2_supplemental_columns.csv: `{sha_supp}`")
     out_doc_lines.append("")
-    out_doc_lines.append("Pool conventions: target = K2_kmeans == 1; mirror = K2_kmeans != 1 "
-                        f"(n_target={n_pool - n_mirror}, n_mirror={n_mirror}; "
-                        "mirror includes 112 sentinel `-2` rows preserved from step 3 §4.1 "
-                        "NaN-drop in clustering). Per-trade column "
-                        "`cluster_id_k2_kmeans` carries the raw value (0 / 1 / -2). "
-                        "`cluster_0_fraction` in summary tables means mirror fraction.")
-    out_doc_lines.append("")
     out_doc_lines.append(
-        "Caveats for `delayed_entry_t_gb` (selected t=1):"
+        "Pool conventions: target = K2_kmeans == 1; mirror = K2_kmeans != 1 "
+        f"(n_target={n_pool - n_mirror}, n_mirror={n_mirror}; "
+        "mirror includes 112 sentinel `-2` rows preserved from step 3 §4.1 "
+        "NaN-drop in clustering). Per-trade column "
+        "`cluster_id_k2_kmeans` carries the raw value (0 / 1 / -2). "
+        "`cluster_0_fraction` in summary tables means mirror fraction."
     )
+    out_doc_lines.append("")
+    out_doc_lines.append("Caveats for `delayed_entry_t_gb` (selected t=1):")
     out_doc_lines.append("")
     out_doc_lines.append(
         "- `bars_held = action_bar − t` (=action_bar − 1). action_bar in the "
@@ -916,8 +963,8 @@ def main() -> int:
         fold_worst = min(fold_means) if fold_means else float("nan")
         rv_list = sorted(
             [
-                (p, m, n_) for p, n_, m_, _ in
-                [(r["pair"], r["n"], r["mean_r"], None) for r in per_pair_rows]
+                (p, m, n_)
+                for p, n_, m_, _ in [(r["pair"], r["n"], r["mean_r"], None) for r in per_pair_rows]
                 for m in [m_]
             ],
             key=lambda t: -abs(t[1] * t[2]),
@@ -927,9 +974,7 @@ def main() -> int:
             "mean_r": float(per_trade["net_r"].mean()),
             "win_pct": float((per_trade["net_r"] > 0).mean()),
             "med_bars_held": float(per_trade["bars_held"].median()),
-            "cluster0_frac": float(
-                (per_trade["cluster_id_k2_kmeans"] != 1).mean()
-            ),
+            "cluster0_frac": float((per_trade["cluster_id_k2_kmeans"] != 1).mean()),
             "best_fold": fold_best,
             "worst_fold": fold_worst,
             "top_pair": top_pair,
@@ -940,8 +985,7 @@ def main() -> int:
         # --- Render markdown section ---
         out_doc_lines.append(f"## §2.{section_index} {slug}")
         out_doc_lines.append("")
-        out_doc_lines.append(f"n_post_total: {n_actual} (matches "
-                             "v1_2_supplemental_columns.csv)")
+        out_doc_lines.append(f"n_post_total: {n_actual} (matches v1_2_supplemental_columns.csv)")
         out_doc_lines.append("")
         out_doc_lines.append(f"### §2.{section_index}.1 Per-fold economics")
         out_doc_lines.append("")
@@ -965,8 +1009,12 @@ def main() -> int:
         out_doc_lines.append(f"### §2.{section_index}.3 Run-path distributions (winners vs losers)")
         out_doc_lines.append("")
         for col in [
-            "bars_held", "mfe_held_atr", "mae_held_atr",
-            "peak_to_final_r_ratio", "time_to_peak_mfe", "time_to_trough_mae",
+            "bars_held",
+            "mfe_held_atr",
+            "mae_held_atr",
+            "peak_to_final_r_ratio",
+            "time_to_peak_mfe",
+            "time_to_trough_mae",
         ]:
             w_stats, l_stats = winners_losers_dist(per_trade, col)
             out_doc_lines.append(render_dist_pair(w_stats, l_stats, col))
@@ -998,15 +1046,12 @@ def main() -> int:
         if sl_summary["n_sl"] == 0:
             out_doc_lines.append("No SL exits in retained subset.")
         else:
-            keys = ["mean", "std", "min", "p5", "p10", "p25", "p50",
-                    "p75", "p90", "p95", "max"]
+            keys = ["mean", "std", "min", "p5", "p10", "p25", "p50", "p75", "p90", "p95", "max"]
             headers = ["statistic", "max_mfe_before_sl"]
             body = [[k, fmt(sl_summary["stats"][k])] for k in keys]
             out_doc_lines.append(md_table(headers, body))
             out_doc_lines.append("")
-            out_doc_lines.append(
-                f"- n_sl_trades: {sl_summary['n_sl']}"
-            )
+            out_doc_lines.append(f"- n_sl_trades: {sl_summary['n_sl']}")
             out_doc_lines.append(
                 f"- Fraction reached MFE > 0.5 ATR before SL ('had a chance'): "
                 f"{fmt_pct(sl_summary['frac_gt_0_5'])}"
@@ -1033,8 +1078,7 @@ def main() -> int:
         out_doc_lines.append("")
         if top3:
             top3_str = ", ".join(
-                f"{p} (R-volume={fmt(rv)}, n={n_}, mean_r={fmt(mr)})"
-                for p, rv, n_, mr in top3
+                f"{p} (R-volume={fmt(rv)}, n={n_}, mean_r={fmt(mr)})" for p, rv, n_, mr in top3
             )
             out_doc_lines.append(f"Top-3 by R-volume: {top3_str}.")
         n_flagged = sum(1 for r in per_pair_rows if r["flag"] == "*")
@@ -1064,7 +1108,9 @@ def main() -> int:
         out_doc_lines.append("")
 
         # §2.x.7 Sub-clustering
-        out_doc_lines.append(f"### §2.{section_index}.7 Cluster sub-structure within retained subset")
+        out_doc_lines.append(
+            f"### §2.{section_index}.7 Cluster sub-structure within retained subset"
+        )
         out_doc_lines.append("")
         if n_actual < SUBCLUSTER_THRESHOLD:
             out_doc_lines.append(
@@ -1087,9 +1133,7 @@ def main() -> int:
                         f"sub-cluster {c['sub_cluster_id']} ({sign}, "
                         f"median bars_held={c['med_bars_held']:.3g}, n={c['n']})"
                     )
-                out_doc_lines.append(
-                    f"K=2 read: {modal}. {'; '.join(names)}."
-                )
+                out_doc_lines.append(f"K=2 read: {modal}. {'; '.join(names)}.")
         out_doc_lines.append("")
 
         section_index += 1
@@ -1098,25 +1142,34 @@ def main() -> int:
     out_doc_lines.append("## §3 Cross-candidate comparison")
     out_doc_lines.append("")
     headers = [
-        "Slug", "Mean R (overall)", "Win %", "Median bars_held",
-        "Cluster 0 fraction", "Best fold (mean R)", "Worst fold (mean R)",
-        "Top contributing pair", "SL almost-win frac (MFE>0.5 ATR)",
+        "Slug",
+        "Mean R (overall)",
+        "Win %",
+        "Median bars_held",
+        "Cluster 0 fraction",
+        "Best fold (mean R)",
+        "Worst fold (mean R)",
+        "Top contributing pair",
+        "SL almost-win frac (MFE>0.5 ATR)",
     ]
     body = []
     for slug in SLUGS:
         s = cross_cand_summary[slug]
-        body.append([
-            slug,
-            fmt(s["mean_r"]),
-            fmt_pct(s["win_pct"]),
-            fmt(s["med_bars_held"]),
-            fmt_pct(s["cluster0_frac"]),
-            fmt(s["best_fold"]),
-            fmt(s["worst_fold"]),
-            s["top_pair"],
-            fmt_pct(s["sl_almost_win_frac_0_5"]) if np.isfinite(
-                s["sl_almost_win_frac_0_5"]) else "N/A",
-        ])
+        body.append(
+            [
+                slug,
+                fmt(s["mean_r"]),
+                fmt_pct(s["win_pct"]),
+                fmt(s["med_bars_held"]),
+                fmt_pct(s["cluster0_frac"]),
+                fmt(s["best_fold"]),
+                fmt(s["worst_fold"]),
+                s["top_pair"],
+                fmt_pct(s["sl_almost_win_frac_0_5"])
+                if np.isfinite(s["sl_almost_win_frac_0_5"])
+                else "N/A",
+            ]
+        )
     out_doc_lines.append(md_table(headers, body))
     out_doc_lines.append("")
 
@@ -1131,18 +1184,18 @@ def main() -> int:
     out_doc_lines.append("- Input sha256s logged in receipts file.")
     out_doc_lines.append("- Per-candidate trade count match: PASS for all 3 slugs.")
     out_doc_lines.append("- Pool assertions (n_pool=3993, n_mirror=1137): PASS.")
+    out_doc_lines.append("- Hash-seed convention: `int(sha256(slug)[:8], 16)` per Amendment 11.")
     out_doc_lines.append(
-        "- Hash-seed convention: `int(sha256(slug)[:8], 16)` per Amendment 11."
+        "- Per-pair sample-size discipline: n<10 pooled to "
+        "'insufficient-n'; 10≤n<30 flagged with '*'."
     )
-    out_doc_lines.append("- Per-pair sample-size discipline: n<10 pooled to "
-                         "'insufficient-n'; 10≤n<30 flagged with '*'.")
-    out_doc_lines.append("- No mechanism re-evaluation. Read-only join + aggregate "
-                         "+ secondary sub-clustering on retained subsets.")
+    out_doc_lines.append(
+        "- No mechanism re-evaluation. Read-only join + aggregate "
+        "+ secondary sub-clustering on retained subsets."
+    )
     out_doc_lines.append("- Output CSV sha256:")
     for slug in SLUGS:
-        out_doc_lines.append(
-            f"  - {slug}/trades_with_run_paths.csv: `{csv_sha_map[slug]}`"
-        )
+        out_doc_lines.append(f"  - {slug}/trades_with_run_paths.csv: `{csv_sha_map[slug]}`")
     out_doc_lines.append("")
     out_doc_lines.append("- Output doc sha256 logged in receipts file after this write.")
     out_doc_lines.append("")
@@ -1155,9 +1208,7 @@ def main() -> int:
     receipts.append("## Output sha256")
     receipts.append(f"tier_a_trade_level_analysis.md: {sha_doc}")
     for slug in SLUGS:
-        receipts.append(
-            f"{slug}/trades_with_run_paths.csv: {csv_sha_map[slug]}"
-        )
+        receipts.append(f"{slug}/trades_with_run_paths.csv: {csv_sha_map[slug]}")
     receipts.append("")
     receipts.append(f"wall_time_seconds: {time.time() - t0:.2f}")
     OUT_RECEIPTS.write_text("\n".join(receipts) + "\n", encoding="utf-8")

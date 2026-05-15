@@ -112,8 +112,7 @@ def test_baseline_trades_all_has_context_columns_when_present() -> None:
 
     allowed = {"tokyo", "london", "newyork"}
     assert set(df["session"].unique()) <= allowed, (
-        f"session contains values outside {allowed}: "
-        f"{set(df['session'].unique()) - allowed}"
+        f"session contains values outside {allowed}: {set(df['session'].unique()) - allowed}"
     )
     assert (df["concurrent_signals"] >= 0).all(), "concurrent_signals must be >= 0"
 
@@ -222,8 +221,7 @@ def test_stoploss_exits_have_mae_near_2atr() -> None:
     tolerance = 1e-3
     bad = sl[sl["mae_final"] < 2.0 - tolerance]
     assert len(bad) == 0, (
-        f"{len(bad)}/{len(sl)} stoploss exits have mae_final < 2.0; "
-        f"min={sl['mae_final'].min():.4f}"
+        f"{len(bad)}/{len(sl)} stoploss exits have mae_final < 2.0; min={sl['mae_final'].min():.4f}"
     )
 
 
@@ -287,9 +285,7 @@ def test_kh13_columns_present_in_baseline() -> None:
     df = _load_artifact("baseline_clean")
     missing = [c for c in KH13_REQUIRED_COLUMNS if c not in df.columns]
     if missing:
-        pytest.skip(
-            f"Baseline not yet re-run with KH-13 enrichment; missing {missing}"
-        )
+        pytest.skip(f"Baseline not yet re-run with KH-13 enrichment; missing {missing}")
     # If the artifact was regenerated after KH-13, all columns must be present
     assert not missing
 
@@ -301,8 +297,7 @@ def test_kh13_baseline_no_early_exits() -> None:
         pytest.skip("Required columns absent; run baseline first")
     early = df[df["exit_reason"] == "kh13_early"]
     assert len(early) == 0, (
-        f"Baseline has {len(early)} kh13_early exits; "
-        "USE_KH13_EARLY_EXIT=False must produce zero."
+        f"Baseline has {len(early)} kh13_early exits; USE_KH13_EARLY_EXIT=False must produce zero."
     )
 
 
@@ -385,9 +380,7 @@ def test_kh13_triggered_flag_set_on_non_kh13_exits() -> None:
         pytest.skip("Required columns absent; run wfo_kh13_baseline.yaml first")
 
     # Triggered-but-not-kh13-early: SL or trail hit before bar 3 or after
-    non_early_triggered = df[
-        df["kh13_triggered"] & (df["exit_reason"] != "kh13_early")
-    ]
+    non_early_triggered = df[df["kh13_triggered"] & (df["exit_reason"] != "kh13_early")]
     # These trades must still have non-NaN check values when triggered
     # (triggered means bar 3 was reached, so check values must be set)
     if len(non_early_triggered) > 0:
@@ -414,10 +407,7 @@ def test_kh13_not_triggered_has_nan_check_values_when_exited_early() -> None:
 
     # trailing_stop with bars_held == 2 → fired at bar N+2 close (bar_num=2),
     # bar 3 not yet processed, kh13_triggered must be False.
-    trail_bar2 = df[
-        (df["exit_reason"] == "trailing_stop")
-        & (df["bars_held"] == 2)
-    ]
+    trail_bar2 = df[(df["exit_reason"] == "trailing_stop") & (df["bars_held"] == 2)]
     if len(trail_bar2) == 0:
         pytest.skip("No trailing_stop exits at bars_held=2 in artifact")
     bad = trail_bar2[trail_bar2["kh13_triggered"]]
@@ -504,9 +494,7 @@ def test_kh14_columns_present_in_baseline() -> None:
     df = _load_artifact("baseline_clean")
     missing = [c for c in KH14_REQUIRED_COLUMNS if c not in df.columns]
     if missing:
-        pytest.skip(
-            f"Baseline not yet re-run with KH-14 enrichment; missing {missing}"
-        )
+        pytest.skip(f"Baseline not yet re-run with KH-14 enrichment; missing {missing}")
     assert not missing
 
 
@@ -517,8 +505,7 @@ def test_kh14_baseline_no_bar6_exits() -> None:
         pytest.skip("Required columns absent; run baseline first")
     bar6 = df[df["exit_reason"] == "kh14_bar6"]
     assert len(bar6) == 0, (
-        f"Baseline has {len(bar6)} kh14_bar6 exits; "
-        "USE_KH14_BAR6_EXIT=False must produce zero."
+        f"Baseline has {len(bar6)} kh14_bar6 exits; USE_KH14_BAR6_EXIT=False must produce zero."
     )
 
 
@@ -632,7 +619,7 @@ def test_kh14_state2_is_consistent_with_first_bar_dir() -> None:
     df = _load_artifact("baseline_clean")
     if "kh14_state2" not in df.columns or "first_bar_dir" not in df.columns:
         pytest.skip("Required columns absent; run baseline first")
-    expected = (df["first_bar_dir"].astype(int) == -1)
+    expected = df["first_bar_dir"].astype(int) == -1
     actual = df["kh14_state2"].astype(bool)
     mismatch = (expected != actual).sum()
     assert mismatch == 0, (
@@ -689,9 +676,7 @@ def test_kh14_kh8_fold_csv_has_kh14_column() -> None:
         pytest.skip(f"No kh14_kh8 fold results at {fold_path}; run config first")
 
     fold_df = pd.read_csv(fold_path)
-    assert "n_kh14_bar6" in fold_df.columns, (
-        "wfo_kh14_kh8 fold CSV missing n_kh14_bar6 column"
-    )
+    assert "n_kh14_bar6" in fold_df.columns, "wfo_kh14_kh8 fold CSV missing n_kh14_bar6 column"
 
 
 # ── KH-15A: ATR-conditional position sizing ─────────────────────────────────
@@ -739,8 +724,7 @@ def test_kh15_baseline_no_sized_down_trades() -> None:
         pytest.skip("atr_sized_down column absent; re-run baseline after KH-15 patch")
     n = int(df["atr_sized_down"].astype(bool).sum())
     assert n == 0, (
-        f"Baseline has {n} atr_sized_down=True trades; USE_ATR_SIZING=False "
-        "must produce zero."
+        f"Baseline has {n} atr_sized_down=True trades; USE_ATR_SIZING=False must produce zero."
     )
 
 
@@ -822,9 +806,7 @@ def test_kh15_sized_down_trades_have_high_atr_ratio() -> None:
         df = pd.read_csv(path)
         sized = df[df["atr_sized_down"].astype(bool)]
         bad = sized[sized["atr_ratio"] < thr - 1e-9]
-        assert len(bad) == 0, (
-            f"{subdir}: {len(bad)} sized-down trades have atr_ratio < {thr}"
-        )
+        assert len(bad) == 0, f"{subdir}: {len(bad)} sized-down trades have atr_ratio < {thr}"
     if not ran_any:
         pytest.skip("No KH-15A variant artifacts available yet")
 
@@ -847,10 +829,7 @@ def test_kh15_sized_down_sl_losses_keep_r_multiple_neg1() -> None:
         df = pd.read_csv(path)
         if "atr_sized_down" not in df.columns:
             continue
-        sl = df[
-            (df["exit_reason"] == "stoploss")
-            & (df["atr_sized_down"].astype(bool))
-        ]
+        sl = df[(df["exit_reason"] == "stoploss") & (df["atr_sized_down"].astype(bool))]
         if len(sl) == 0:
             continue
         tolerance = 5e-3
@@ -947,7 +926,9 @@ def test_kh18_config_file_exists_and_enables_flag() -> None:
     root = Path(__file__).resolve().parent.parent
     cfg_path = root / "configs" / "wfo_kh18.yaml"
     if not cfg_path.exists():
-        pytest.skip(f"No KH-18 config at {cfg_path}; KH-18 sibling is out of scope on main (see results/kh24/audit/PHASE_KH24_PROMOTION.md §5)")
+        pytest.skip(
+            f"No KH-18 config at {cfg_path}; KH-18 sibling is out of scope on main (see results/kh24/audit/PHASE_KH24_PROMOTION.md §5)"
+        )
     with open(cfg_path, encoding="utf-8") as f:
         cfg = _yaml.safe_load(f)
     assert cfg.get("kh18_enabled") is True
@@ -998,9 +979,7 @@ def test_kh18_no_scratch_trades_exist() -> None:
     """KH-18 spec explicitly forbids any scratch/state2 entries before the
     re-entry.  Fail if any appear in the artifact."""
     df = _load_kh18_trades()
-    forbidden = df[df["trade_type"].isin(
-        ["state2_scratch", "state2_watch", "original", "state1"]
-    )]
+    forbidden = df[df["trade_type"].isin(["state2_scratch", "state2_watch", "original", "state1"])]
     assert len(forbidden) == 0, (
         f"KH-18 artifact contains forbidden trade_type values: "
         f"{sorted(set(forbidden['trade_type']))}; expected only "
@@ -1031,9 +1010,7 @@ def test_kh18_state1_delayed_sl_is_2_0_atr() -> None:
     if len(s1) == 0:
         pytest.skip("No state1_delayed trades in kh18 artifact")
     bad = s1[(s1["sl_distance_atr"] - 2.0).abs() > 1e-6]
-    assert len(bad) == 0, (
-        f"{len(bad)} state1_delayed trades have sl_distance_atr != 2.0"
-    )
+    assert len(bad) == 0, f"{len(bad)} state1_delayed trades have sl_distance_atr != 2.0"
 
 
 def test_kh18_state2_reentry_sl_is_1_5_atr() -> None:
@@ -1042,9 +1019,7 @@ def test_kh18_state2_reentry_sl_is_1_5_atr() -> None:
     if len(r) == 0:
         pytest.skip("No state2_reentry trades in kh18 artifact")
     bad = r[(r["sl_distance_atr"] - 1.5).abs() > 1e-6]
-    assert len(bad) == 0, (
-        f"{len(bad)} state2_reentry trades have sl_distance_atr != 1.5"
-    )
+    assert len(bad) == 0, f"{len(bad)} state2_reentry trades have sl_distance_atr != 1.5"
 
 
 def test_kh18_matches_kh17_byte_for_byte() -> None:
@@ -1053,12 +1028,21 @@ def test_kh18_matches_kh17_byte_for_byte() -> None:
     loader has drifted and must be fixed before any report is trusted."""
     df18 = _load_kh18_trades().sort_values(["pair", "entry_date"]).reset_index(drop=True)
     df17 = _load_kh17_trades().sort_values(["pair", "entry_date"]).reset_index(drop=True)
-    assert len(df18) == len(df17), (
-        f"Trade count differs KH-18={len(df18)} vs KH-17={len(df17)}"
-    )
-    cmp_cols = [c for c in ("pair", "entry_date", "exit_date", "entry_price",
-                            "exit_price", "r_multiple", "exit_reason",
-                            "trade_type") if c in df18.columns and c in df17.columns]
+    assert len(df18) == len(df17), f"Trade count differs KH-18={len(df18)} vs KH-17={len(df17)}"
+    cmp_cols = [
+        c
+        for c in (
+            "pair",
+            "entry_date",
+            "exit_date",
+            "entry_price",
+            "exit_price",
+            "r_multiple",
+            "exit_reason",
+            "trade_type",
+        )
+        if c in df18.columns and c in df17.columns
+    ]
     diffs = {}
     for c in cmp_cols:
         mask = df18[c].astype(str) != df17[c].astype(str)
@@ -1085,9 +1069,7 @@ def test_kh11a_gate_trades_all_have_falling_slope_when_present() -> None:
         pytest.skip(f"No KH-11A artifact at {gated_path}; run wfo_kh11a.yaml first")
 
     gated = pd.read_csv(gated_path)
-    assert "d1_kijun_slope" in gated.columns, (
-        "KH-11A trades_all.csv missing d1_kijun_slope column"
-    )
+    assert "d1_kijun_slope" in gated.columns, "KH-11A trades_all.csv missing d1_kijun_slope column"
 
     slope_vals = gated["d1_kijun_slope"].astype(str).str.lower()
     rising = gated[slope_vals.isin(["true", "1", "1.0"])]

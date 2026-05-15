@@ -1,0 +1,21 @@
+# Synthetic-harness WFO-v2 config. Pinned at L6+ Arc 1 commit.
+# Used to lock the byte-identicality manifest for run_wfo_v2 across schema-extension
+# commits. NEVER modify without re-locking results/l6/arc1/wfo_v2_regression_manifest.txt.
+
+base_config: wfo_v2_synthetic_harness_base.yaml
+
+data_scope:
+  from_date: '2020-01-01'
+  to_date: '2020-04-30'
+
+fold_scheme:
+  train_months: 3
+  test_months: 1
+  step_months: 1
+
+engine:
+  cache_on: false
+  spreads_on: false
+
+# output_root is supplied by the caller at run time so the regression script can
+# point each invocation at a separate scratch dir; pre-A, pre-B, post.

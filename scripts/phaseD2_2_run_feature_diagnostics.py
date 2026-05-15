@@ -109,11 +109,7 @@ def _file_sha256(path: Path) -> str | None:
 
 
 def _config_hash(cfg: dict) -> str:
-    canon = {
-        k: v
-        for k, v in sorted(cfg.items())
-        if k not in ("labels_path", "outputs_dir")
-    }
+    canon = {k: v for k, v in sorted(cfg.items()) if k not in ("labels_path", "outputs_dir")}
     return hashlib.sha256(json.dumps(canon, sort_keys=True).encode("utf-8")).hexdigest()
 
 
@@ -248,12 +244,8 @@ def _run_from_config(config_path: Path) -> None:
     if not summary_pair.empty:
         summary_pair.to_csv(reports_dir / "feature_summary_by_pair.csv", index=False)
 
-    rankings_b = compute_feature_rankings(
-        joined, bin_edges, ZONE_B, cfg["split"]
-    )
-    rankings_c = compute_feature_rankings(
-        joined, bin_edges, ZONE_C, cfg["split"]
-    )
+    rankings_b = compute_feature_rankings(joined, bin_edges, ZONE_B, cfg["split"])
+    rankings_c = compute_feature_rankings(joined, bin_edges, ZONE_C, cfg["split"])
     rankings_b = rankings_b.head(20)
     rankings_c = rankings_c.head(20)
 

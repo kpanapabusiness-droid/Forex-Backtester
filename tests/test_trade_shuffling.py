@@ -142,6 +142,7 @@ class TestLoadOosTradesFromWfo:
                 run_dir / "fold_01" / "out_of_sample" / "trades.csv", index=False
             )
         import time
+
         time.sleep(0.02)
         (run_new / "touch").write_text("")
         df, resolved_dir, n_folds = load_oos_trades_from_wfo(parent)
@@ -166,7 +167,9 @@ class TestLoadOosTradesFromWfo:
         (parent / "other_file.txt").write_text("x")
         with pytest.raises(ValueError) as exc_info:
             load_oos_trades_from_wfo(parent)
-        assert "No OOS trades" in exc_info.value.args[0] or "no OOS" in exc_info.value.args[0].lower()
+        assert (
+            "No OOS trades" in exc_info.value.args[0] or "no OOS" in exc_info.value.args[0].lower()
+        )
 
     def test_nonexistent_dir_raises(self, tmp_path):
         """Nonexistent wfo_results_dir → ValueError."""

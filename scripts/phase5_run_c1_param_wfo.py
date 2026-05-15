@@ -72,10 +72,7 @@ def _expand_param_grid(param_grid: dict, c1_name: str) -> list[dict]:
     if not param_grid:
         return [{}]
     keys = list(param_grid.keys())
-    vals = [
-        v if isinstance(v, (list, tuple)) else [v]
-        for v in param_grid.values()
-    ]
+    vals = [v if isinstance(v, (list, tuple)) else [v] for v in param_grid.values()]
     combos = [dict(zip(keys, c)) for c in itertools.product(*vals)]
     if c1_name == "c1_hacolt_lines" and "fast_period" in param_grid and "slow_period" in param_grid:
         combos = [c for c in combos if c["fast_period"] < c["slow_period"]]
@@ -119,9 +116,7 @@ def run_phase5_c1_param_wfo(
             )
         sweep = _load_yaml(sweep_path)
         if sweep.get("c1_name") != c1_name:
-            raise ValueError(
-                f"Sweep file {sweep_path.name} must have c1_name: {c1_name!r}."
-            )
+            raise ValueError(f"Sweep file {sweep_path.name} must have c1_name: {c1_name!r}.")
         param_grid = sweep.get("param_grid") or {}
         combos = _expand_param_grid(param_grid, c1_name)
 

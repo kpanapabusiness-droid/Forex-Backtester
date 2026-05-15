@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Phase F: CEB v3 ROI sanity run (SL=2R, trailing, two-leg). Prints compact summary from outputs."""
+
 from __future__ import annotations
 
 import argparse
@@ -99,8 +100,12 @@ def main() -> None:
     root = Path(__file__).resolve().parent.parent
     default_config = root / "configs" / "phaseF_roi_sanity" / "ceb_v3_sl2r_trailing.yaml"
 
-    parser = argparse.ArgumentParser(description="Phase F: CEB v3 ROI sanity run (SL=2R, trailing, two-leg)")
-    parser.add_argument("-c", "--config", type=str, default=str(default_config), help="Path to YAML config")
+    parser = argparse.ArgumentParser(
+        description="Phase F: CEB v3 ROI sanity run (SL=2R, trailing, two-leg)"
+    )
+    parser.add_argument(
+        "-c", "--config", type=str, default=str(default_config), help="Path to YAML config"
+    )
     args = parser.parse_args()
 
     config_path = Path(args.config)
@@ -109,14 +114,20 @@ def main() -> None:
     config_path = config_path.resolve()
 
     cfg = load_config(str(config_path))
-    out_dir = (cfg.get("outputs") or {}).get("dir") or (cfg.get("output") or {}).get("results_dir") or "results"
+    out_dir = (
+        (cfg.get("outputs") or {}).get("dir")
+        or (cfg.get("output") or {}).get("results_dir")
+        or "results"
+    )
     if not Path(out_dir).is_absolute():
         out_dir = str(root / out_dir)
     results_dir = Path(out_dir).resolve()
 
     run_backtest(config_path=str(config_path), results_dir=str(results_dir))
 
-    _, metrics = summarize_results(str(results_dir), starting_balance=cfg.get("risk", {}).get("starting_balance", 10_000.0))
+    _, metrics = summarize_results(
+        str(results_dir), starting_balance=cfg.get("risk", {}).get("starting_balance", 10_000.0)
+    )
     extra = _compute_extra_metrics(results_dir, cfg)
 
     total = metrics.get("total_trades", 0)

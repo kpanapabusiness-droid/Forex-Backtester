@@ -42,4 +42,3 @@ def test_normalize_ftmo_daily_file(tmp_path: Path) -> None:
     # Dates must be in YYYY-MM-DD format
     assert df["time"].iloc[0] == "2019-01-02"
     assert df["time"].iloc[1] == "2019-01-03"
-

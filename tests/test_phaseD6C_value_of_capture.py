@@ -13,7 +13,15 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def _make_synthetic_labels() -> pd.DataFrame:
     """Tiny synthetic labels with Zone C events."""
-    dates = ["2020-01-01", "2020-01-02", "2020-01-03", "2020-01-04", "2020-01-05", "2020-01-06", "2020-01-07"]
+    dates = [
+        "2020-01-01",
+        "2020-01-02",
+        "2020-01-03",
+        "2020-01-04",
+        "2020-01-05",
+        "2020-01-06",
+        "2020-01-07",
+    ]
     rows = []
     for i, d in enumerate(dates):
         for direction in ["long", "short"]:
@@ -21,58 +29,62 @@ def _make_synthetic_labels() -> pd.DataFrame:
             split = "discovery" if i < 4 else "validation"
             t6 = 30.0 if i == 2 else 10.0
             mfe = 8.0 if i == 2 else 2.0
-            rows.append({
-                "pair": "EUR_USD",
-                "date": d,
-                "direction": direction,
-                "dataset_split": split,
-                "zone_c_6r_40": zone_c,
-                "t6": t6,
-                "mfe_40_r": mfe,
-            })
+            rows.append(
+                {
+                    "pair": "EUR_USD",
+                    "date": d,
+                    "direction": direction,
+                    "dataset_split": split,
+                    "zone_c_6r_40": zone_c,
+                    "t6": t6,
+                    "mfe_40_r": mfe,
+                }
+            )
     return pd.DataFrame(rows)
 
 
 def _make_synthetic_attribution() -> pd.DataFrame:
     """Synthetic D6B event attribution. One Zone C event at 2020-01-03 long."""
-    return pd.DataFrame([
-        {
-            "candidate_id": "cand_A",
-            "params_json": '{"P": 20}',
-            "pair": "EUR_USD",
-            "direction": "long",
-            "event_start_date": "2020-01-03",
-            "dataset_split": "discovery",
-            "captured": True,
-            "first_trigger_date": "2020-01-03",
-            "entry_delay_bars": 0,
-            "t6_at_entry": 30.0,
-        },
-        {
-            "candidate_id": "cand_B",
-            "params_json": '{"P": 25}',
-            "pair": "EUR_USD",
-            "direction": "long",
-            "event_start_date": "2020-01-03",
-            "dataset_split": "discovery",
-            "captured": True,
-            "first_trigger_date": "2020-01-04",
-            "entry_delay_bars": 1,
-            "t6_at_entry": 28.0,
-        },
-        {
-            "candidate_id": "cand_C",
-            "params_json": '{"P": 30}',
-            "pair": "EUR_USD",
-            "direction": "long",
-            "event_start_date": "2020-01-03",
-            "dataset_split": "discovery",
-            "captured": False,
-            "first_trigger_date": None,
-            "entry_delay_bars": None,
-            "t6_at_entry": np.nan,
-        },
-    ])
+    return pd.DataFrame(
+        [
+            {
+                "candidate_id": "cand_A",
+                "params_json": '{"P": 20}',
+                "pair": "EUR_USD",
+                "direction": "long",
+                "event_start_date": "2020-01-03",
+                "dataset_split": "discovery",
+                "captured": True,
+                "first_trigger_date": "2020-01-03",
+                "entry_delay_bars": 0,
+                "t6_at_entry": 30.0,
+            },
+            {
+                "candidate_id": "cand_B",
+                "params_json": '{"P": 25}',
+                "pair": "EUR_USD",
+                "direction": "long",
+                "event_start_date": "2020-01-03",
+                "dataset_split": "discovery",
+                "captured": True,
+                "first_trigger_date": "2020-01-04",
+                "entry_delay_bars": 1,
+                "t6_at_entry": 28.0,
+            },
+            {
+                "candidate_id": "cand_C",
+                "params_json": '{"P": 30}',
+                "pair": "EUR_USD",
+                "direction": "long",
+                "event_start_date": "2020-01-03",
+                "dataset_split": "discovery",
+                "captured": False,
+                "first_trigger_date": None,
+                "entry_delay_bars": None,
+                "t6_at_entry": np.nan,
+            },
+        ]
+    )
 
 
 def test_band_classification() -> None:

@@ -1,6 +1,7 @@
 """
 Phase D-6F.1: CLI for opportunity geometry report from clean labels.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -32,7 +33,11 @@ def _parse_args(argv: Iterable[str] | None = None) -> argparse.Namespace:
         description="Phase D-6F.1 — Opportunity geometry report from clean labels.",
     )
     parser.add_argument("--clean", required=True, help="Path to opportunity_labels_clean.csv")
-    parser.add_argument("--outdir", required=True, help="Output directory (e.g. results/phaseD/labels/clean_geometry)")
+    parser.add_argument(
+        "--outdir",
+        required=True,
+        help="Output directory (e.g. results/phaseD/labels/clean_geometry)",
+    )
     parser.add_argument(
         "--split-mode",
         choices=("auto", "explicit"),

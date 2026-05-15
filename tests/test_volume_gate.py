@@ -33,4 +33,3 @@ def test_volume_pure_veto_trade_count(tmp_path: Path) -> None:
     assert trades_on <= trades_off, (
         f"Volume ON produced more trades than OFF: on={trades_on}, off={trades_off}"
     )
-

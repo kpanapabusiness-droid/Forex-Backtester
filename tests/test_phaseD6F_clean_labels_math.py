@@ -2,6 +2,7 @@
 Phase D-6F: Math correctness tests for clean opportunity labels.
 Uses toy OHLC in-memory; no full dataset required.
 """
+
 from __future__ import annotations
 
 import numpy as np
@@ -13,14 +14,16 @@ from labels.clean_opportunity import clean_mfe_before_mae, compute_clean_labels_
 
 def _make_toy_ohlc(n: int) -> pd.DataFrame:
     dates = pd.date_range("2019-01-01", periods=n, freq="D")
-    return pd.DataFrame({
-        "date": dates,
-        "open": np.arange(n, dtype=float) * 10.0,
-        "high": np.arange(n, dtype=float) * 10.0 + 5.0,
-        "low": np.arange(n, dtype=float) * 10.0 - 5.0,
-        "close": np.arange(n, dtype=float) * 10.0,
-        "volume": np.zeros(n),
-    })
+    return pd.DataFrame(
+        {
+            "date": dates,
+            "open": np.arange(n, dtype=float) * 10.0,
+            "high": np.arange(n, dtype=float) * 10.0 + 5.0,
+            "low": np.arange(n, dtype=float) * 10.0 - 5.0,
+            "close": np.arange(n, dtype=float) * 10.0,
+            "volume": np.zeros(n),
+        }
+    )
 
 
 def test_first_breach_cutoff_excludes_breach_bar() -> None:
@@ -38,9 +41,7 @@ def test_first_breach_cutoff_excludes_breach_bar() -> None:
     assert adverse_0 >= 1
     assert favorable_0 > 5
 
-    mfe, breach, _ = clean_mfe_before_mae(
-        highs, lows, ref_px, r_value, "long", x=1, h=3
-    )
+    mfe, breach, _ = clean_mfe_before_mae(highs, lows, ref_px, r_value, "long", x=1, h=3)
     assert breach == 1
     assert mfe == 0.0
 
@@ -52,9 +53,7 @@ def test_no_lookahead_beyond_window() -> None:
     h = 5
     highs = np.array([101.0, 102.0, 103.0, 104.0, 105.0, 999.0])
     lows = np.array([99.0, 98.0, 97.0, 96.0, 95.0, 90.0])
-    mfe_within, _, _ = clean_mfe_before_mae(
-        highs[:h], lows[:h], ref_px, r_value, "long", x=1, h=h
-    )
+    mfe_within, _, _ = clean_mfe_before_mae(highs[:h], lows[:h], ref_px, r_value, "long", x=1, h=h)
     mfe_extra, _, _ = clean_mfe_before_mae(
         highs[: h + 1], lows[: h + 1], ref_px, r_value, "long", x=1, h=h
     )
@@ -84,9 +83,7 @@ def test_symmetry_long_equals_short_on_mirror() -> None:
     ref_px = 100.0
     r_value = 5.0
 
-    mfe_long, b_l, p_l = clean_mfe_before_mae(
-        highs, lows, ref_px, r_value, "long", x=1, h=4
-    )
+    mfe_long, b_l, p_l = clean_mfe_before_mae(highs, lows, ref_px, r_value, "long", x=1, h=4)
     high_mirror = c - lows
     low_mirror = c - highs
     ref_mirror = c - ref_px
@@ -123,14 +120,16 @@ def test_clean_mfe_3r_before_mae_2r_true_when_3r_first() -> None:
 def test_clean_mfe_3r_before_mae_2r_synthetic_path() -> None:
     """compute_clean_labels_for_pair produces clean_mfe_3r_before_mae_2r columns."""
     n = 50
-    df = pd.DataFrame({
-        "date": pd.date_range("2019-01-01", periods=n, freq="D"),
-        "open": 100.0,
-        "high": 105.0,
-        "low": 95.0,
-        "close": 100.0,
-        "volume": 0,
-    })
+    df = pd.DataFrame(
+        {
+            "date": pd.date_range("2019-01-01", periods=n, freq="D"),
+            "open": 100.0,
+            "high": 105.0,
+            "low": 95.0,
+            "close": 100.0,
+            "volume": 0,
+        }
+    )
     out = compute_clean_labels_for_pair(df, "X", date_start="2019-01-01", date_end="2026-01-01")
     assert "clean_mfe_3r_before_mae_2r_long_h10" in out.columns
     assert "clean_mfe_3r_before_mae_2r_short_h40" in out.columns

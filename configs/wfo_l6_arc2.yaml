@@ -1,0 +1,97 @@
+phase: l6_arc2_verbatim
+description: |
+  L6+ Arc 2 — verbatim WFO of L registry rank 2
+  TRIAL__mtf_alignment__2_down_mixed__kijun__h_120
+  Per PHASE_L6_ARC2_OPEN.md and L6_0_METHODOLOGY_LOCK.md v1.1.
+
+signal:
+  type: l4_mtf_alignment_2_down_mixed_kijun
+  signal_tf: 1H
+  family: mtf_alignment
+  state: 2_down_mixed
+  trend_definition: kijun
+  kijun_period: 26
+  lower_tf: 1H
+  middle_tf: 4H
+  higher_tf: D1
+  middle_tf_lag: most_recently_completed
+  higher_tf_lag: most_recently_completed
+  trade_direction: long
+
+entry:
+  bar_offset: 1
+  execution: open
+
+exit:
+  hard_stop:
+    type: absolute_atr
+    atr_period: 14
+    atr_smoothing: wilder
+    atr_tf: 1H
+    multiplier: 2.0
+    anchor: entry
+  time_exit:
+    bars_after_entry: 120
+  trail: null
+  structural_exits: []
+
+filters: []
+
+exposure:
+  max_concurrent_per_pair: 1
+  currency_cap: null
+  daily_dd_guard: null
+
+risk:
+  basis: reset_floor
+  pct_per_trade: 0.01
+  starting_balance: 10000.0
+
+spread_floor:
+  enabled: true
+  source: configs/spread_floors_5ers.yaml
+  expected_body_sha256: a613b4ce641c8d5218490531770a4924204029dedaa80fb24111beb61bd15547
+
+pairs:
+  - AUD_CAD
+  - AUD_CHF
+  - AUD_JPY
+  - AUD_NZD
+  - AUD_USD
+  - CAD_CHF
+  - CAD_JPY
+  - CHF_JPY
+  - EUR_AUD
+  - EUR_CAD
+  - EUR_CHF
+  - EUR_GBP
+  - EUR_JPY
+  - EUR_NZD
+  - EUR_USD
+  - GBP_AUD
+  - GBP_CAD
+  - GBP_CHF
+  - GBP_JPY
+  - GBP_NZD
+  - GBP_USD
+  - NZD_CAD
+  - NZD_CHF
+  - NZD_JPY
+  - NZD_USD
+  - USD_CAD
+  - USD_CHF
+  - USD_JPY
+
+walk_forward:
+  method: anchored_expanding
+  n_folds: 7
+  is_period_years: 4
+  oos_period_months: 9
+  oos_start: '2020-10-01'
+  oos_end: '2026-01-01'
+
+output:
+  results_dir: results/l6/arc2/
+  trades_csv: trades_all.csv
+  fold_results_csv: wfo_fold_results.csv
+  summary_txt: wfo_summary.txt

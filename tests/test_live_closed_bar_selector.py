@@ -1,6 +1,5 @@
 """Tests for closed-bar selection in live.run_daily."""
 
-
 import pandas as pd
 
 from live.run_daily import _select_closed_bar_index
@@ -81,4 +80,3 @@ def test_closed_bar_selector_uses_last_when_last_after_export_day():
 
     idx = _select_closed_bar_index(df, export_day="2025-02-01")
     assert idx == 1
-

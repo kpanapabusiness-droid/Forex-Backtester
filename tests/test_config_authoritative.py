@@ -162,7 +162,15 @@ def test_cli_c_loads_that_file(tmp_path):
     out_dir = tmp_path / "results"
     out_dir.mkdir()
     result = subprocess.run(
-        [sys.executable, "-m", "core.backtester", "-c", str(cfg_path), "--results-dir", str(out_dir)],
+        [
+            sys.executable,
+            "-m",
+            "core.backtester",
+            "-c",
+            str(cfg_path),
+            "--results-dir",
+            str(out_dir),
+        ],
         cwd=str(root),
         capture_output=True,
         text=True,
@@ -173,6 +181,8 @@ def test_cli_c_loads_that_file(tmp_path):
     assert trades_path.exists()
     df = pd.read_csv(trades_path)
     if "pair" in df.columns and len(df) > 0:
-        assert set(df["pair"].unique()).issubset({"EUR_USD"}), "Loaded config pairs should match (only EUR_USD)"
+        assert set(df["pair"].unique()).issubset({"EUR_USD"}), (
+            "Loaded config pairs should match (only EUR_USD)"
+        )
     loaded = load_config(str(cfg_path))
     assert loaded.get("pairs") == ["EUR_USD"]

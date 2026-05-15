@@ -129,7 +129,9 @@ def _trigger_atrp_breakout(row: pd.Series, direction: str, P: float, N: int) -> 
     return row["close"] < pl
 
 
-def _trigger_atr_ratio_release(row: pd.Series, prev_row: pd.Series | None, R_low: float, R_high: float) -> bool:
+def _trigger_atr_ratio_release(
+    row: pd.Series, prev_row: pd.Series | None, R_low: float, R_high: float
+) -> bool:
     if prev_row is None:
         return False
     armed = pd.notna(prev_row.get("atr_ratio_5_50")) and prev_row["atr_ratio_5_50"] <= R_low
@@ -169,7 +171,9 @@ def _evaluate_triggers(metrics: pd.DataFrame, candidate: dict) -> pd.DataFrame:
             triggered = _trigger_atr_ratio_release(row, prev_row, params["R_low"], params["R_high"])
         elif cand_type == "RangeP_breakout":
             triggered = _trigger_rangep_breakout(row, direction, params["P"], params["N"])
-        rows.append({"pair": pair, "date": row["date"], "direction": direction, "triggered": triggered})
+        rows.append(
+            {"pair": pair, "date": row["date"], "direction": direction, "triggered": triggered}
+        )
     return pd.DataFrame(rows)
 
 
@@ -243,9 +247,13 @@ def _run_candidate(
         total_triggers += (triggers_df["triggered"]).sum()
         total_bars += len(timeline)
 
-        for _, ev in events_c[(events_c["pair"] == pair) & (events_c["direction"] == direction)].iterrows():
+        for _, ev in events_c[
+            (events_c["pair"] == pair) & (events_c["direction"] == direction)
+        ].iterrows():
             start_date = ev["date"].strftime("%Y-%m-%d")
-            captured, first_date, delay = _event_captured(start_date, list(td), timeline, capture_bars)
+            captured, first_date, delay = _event_captured(
+                start_date, list(td), timeline, capture_bars
+            )
             t6_at_entry = np.nan
             if first_date and "t6" in labels.columns:
                 match = labels[
@@ -255,17 +263,19 @@ def _run_candidate(
                 ]
                 if not match.empty:
                     t6_at_entry = match["t6"].iloc[0]
-            attribution_rows.append({
-                "candidate_id": candidate_id,
-                "pair": pair,
-                "direction": direction,
-                "event_start_date": start_date,
-                "dataset_split": ev.get("dataset_split", ""),
-                "captured": captured,
-                "first_trigger_date": first_date,
-                "entry_delay_bars": delay,
-                "t6_at_entry": t6_at_entry,
-            })
+            attribution_rows.append(
+                {
+                    "candidate_id": candidate_id,
+                    "pair": pair,
+                    "direction": direction,
+                    "event_start_date": start_date,
+                    "dataset_split": ev.get("dataset_split", ""),
+                    "captured": captured,
+                    "first_trigger_date": first_date,
+                    "entry_delay_bars": delay,
+                    "t6_at_entry": t6_at_entry,
+                }
+            )
 
     attr_df = pd.DataFrame(attribution_rows) if attribution_rows else pd.DataFrame()
     if not attr_df.empty:
@@ -278,7 +288,9 @@ def _run_candidate(
         for split in ["discovery", "validation"]:
             m = attr_df[attr_df["dataset_split"] == split]
             if len(m) > 0:
-                summary_data[f"zoneC_capture_{split}_pct"] = m["captured"].fillna(False).mean() * 100
+                summary_data[f"zoneC_capture_{split}_pct"] = (
+                    m["captured"].fillna(False).mean() * 100
+                )
 
     if not events_b.empty and trigger_by_key:
         zb_captured = []
@@ -303,12 +315,17 @@ def _run_candidate(
     if total_bars > 0:
         summary_data["ignition_rate_per_1000_bars"] = total_triggers / total_bars * 1000
 
-    return pd.DataFrame([summary_data]), pd.DataFrame(attribution_rows) if attribution_rows else pd.DataFrame()
+    return pd.DataFrame([summary_data]), pd.DataFrame(
+        attribution_rows
+    ) if attribution_rows else pd.DataFrame()
 
 
 def _all_triggers_for_candidate(
-    candidate_id: str, params_json: str, labels: pd.DataFrame,
-    ohlcv_by_pair: dict, metrics_by_pair: dict,
+    candidate_id: str,
+    params_json: str,
+    labels: pd.DataFrame,
+    ohlcv_by_pair: dict,
+    metrics_by_pair: dict,
 ):
     params = json.loads(params_json)
     cand_type = params.get("type", "")
@@ -316,13 +333,25 @@ def _all_triggers_for_candidate(
         for direction in ["long", "short"]:
             metrics = metrics_by_pair[pair]
             if cand_type == "ATR_ratio_release":
-                triggers = _evaluate_triggers(metrics, {
-                    "type": cand_type, "params": params, "pair": pair, "direction": direction,
-                })
+                triggers = _evaluate_triggers(
+                    metrics,
+                    {
+                        "type": cand_type,
+                        "params": params,
+                        "pair": pair,
+                        "direction": direction,
+                    },
+                )
             else:
-                triggers = _evaluate_triggers(metrics, {
-                    "type": cand_type, "params": params, "pair": pair, "direction": direction,
-                })
+                triggers = _evaluate_triggers(
+                    metrics,
+                    {
+                        "type": cand_type,
+                        "params": params,
+                        "pair": pair,
+                        "direction": direction,
+                    },
+                )
             yield (pair, direction), triggers
 
 
@@ -334,10 +363,16 @@ def _generate_candidates() -> list[tuple[str, str]]:
     for R_low in ATR_RATIO_R_LOW:
         for R_high in ATR_RATIO_R_HIGH:
             if R_high > R_low:
-                yield f"ATR_ratio_R{R_low}_{R_high}", json.dumps({"type": "ATR_ratio_release", "R_low": R_low, "R_high": R_high})
+                yield (
+                    f"ATR_ratio_R{R_low}_{R_high}",
+                    json.dumps({"type": "ATR_ratio_release", "R_low": R_low, "R_high": R_high}),
+                )
     for P in RANGEP_BREAKOUT_P:
         for N in RANGEP_BREAKOUT_N:
-            yield f"RangeP_breakout_P{P}_N{N}", json.dumps({"type": "RangeP_breakout", "P": P, "N": N})
+            yield (
+                f"RangeP_breakout_P{P}_N{N}",
+                json.dumps({"type": "RangeP_breakout", "P": P, "N": N}),
+            )
 
 
 def run_phaseD6B(
@@ -379,8 +414,15 @@ def run_phaseD6B(
     attribution_rows = []
     for cand_id, params_json in _generate_candidates():
         summ, attr = _run_candidate(
-            cand_id, params_json, labels, ohlcv_by_pair, metrics_by_pair,
-            events_c, events_b, capture_bars, label_timelines,
+            cand_id,
+            params_json,
+            labels,
+            ohlcv_by_pair,
+            metrics_by_pair,
+            events_c,
+            events_b,
+            capture_bars,
+            label_timelines,
         )
         if not summ.empty:
             summary_rows.append(summ.iloc[0])
@@ -430,10 +472,17 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Phase D-6B Ignition Recall (analytics only)")
     parser.add_argument("--labels", required=True, help="Path to opportunity_labels.csv")
     parser.add_argument("--data-dir", required=True, help="OHLCV directory")
-    parser.add_argument("--outdir", default="results/phaseD/d6B_ignition_recall", help="Output directory")
+    parser.add_argument(
+        "--outdir", default="results/phaseD/d6B_ignition_recall", help="Output directory"
+    )
     parser.add_argument("--capture-bars", type=int, default=5, help="Capture window in bars")
     args = parser.parse_args()
-    run_phaseD6B(labels_path=args.labels, data_dir=args.data_dir, out_dir=args.outdir, capture_bars=args.capture_bars)
+    run_phaseD6B(
+        labels_path=args.labels,
+        data_dir=args.data_dir,
+        out_dir=args.outdir,
+        capture_bars=args.capture_bars,
+    )
     return 0
 
 

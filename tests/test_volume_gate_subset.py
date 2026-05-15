@@ -36,10 +36,7 @@ def _identity_set(trades: pd.DataFrame) -> Set[Tuple]:
     for col in cols:
         assert col in trades.columns, f"Missing expected column '{col}' in trades.csv"
 
-    return set(
-        tuple(trades[c].iloc[i] for c in cols)
-        for i in range(len(trades))
-    )
+    return set(tuple(trades[c].iloc[i] for c in cols) for i in range(len(trades)))
 
 
 def test_volume_on_trades_are_subset_of_off(tmp_path: Path) -> None:
@@ -66,4 +63,3 @@ def test_volume_on_trades_are_subset_of_off(tmp_path: Path) -> None:
         "Found trades present with volume ON that are not present with volume OFF. "
         f"Example identities (up to 5): {list(missing)[:5]}"
     )
-

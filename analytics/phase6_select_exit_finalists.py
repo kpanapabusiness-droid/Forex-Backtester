@@ -29,7 +29,12 @@ def select_finalists(
         raise FileNotFoundError(f"Leaderboard not found: {path}")
     df = pd.read_csv(path)
 
-    for col in ("decision", "insufficient_trades_flag", "churn_trade_ratio_flag", "churn_hold_ratio_flag"):
+    for col in (
+        "decision",
+        "insufficient_trades_flag",
+        "churn_trade_ratio_flag",
+        "churn_hold_ratio_flag",
+    ):
         if col not in df.columns:
             raise ValueError(f"Leaderboard missing column: {col}")
 
@@ -50,7 +55,9 @@ def select_finalists(
     dd = pd.to_numeric(passed["worst_fold_max_drawdown_pct"], errors="coerce").fillna(1e9)
     exp = pd.to_numeric(passed["worst_fold_expectancy_r"], errors="coerce").fillna(-1e9)
     passed = passed.assign(_dd=dd, _exp=exp)
-    passed = passed.sort_values(by=["_dd", "_exp"], ascending=[True, False]).drop(columns=["_dd", "_exp"])
+    passed = passed.sort_values(by=["_dd", "_exp"], ascending=[True, False]).drop(
+        columns=["_dd", "_exp"]
+    )
     passed = passed.head(top_n)
 
     out = passed[["exit_c1_name"]].copy()

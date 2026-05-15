@@ -8,6 +8,7 @@ Resolutions per open_questions.md §5, §6:
 - SL hit: first bar k where mae_to_date_atr[k] >= 2.0  → R_gross = -1
 - R_net = R_gross - spread_cost_R  (structural per-trade, ~constant)
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -19,6 +20,7 @@ import pandas as pd
 @dataclass(frozen=True)
 class TradeStaticContext:
     """Per-trade static fields needed by the simulator."""
+
     trade_id: int
     pair: str
     fold_id: int
@@ -30,8 +32,16 @@ class TradeStaticContext:
 
 
 def load_static_context(signals: pd.DataFrame) -> pd.DataFrame:
-    cols = ["trade_id", "pair", "fold_id", "signal_bar_ts",
-            "atr_at_signal_1h", "signal_bar_close", "spread_cost_R", "direction"]
+    cols = [
+        "trade_id",
+        "pair",
+        "fold_id",
+        "signal_bar_ts",
+        "atr_at_signal_1h",
+        "signal_bar_close",
+        "spread_cost_R",
+        "direction",
+    ]
     out = signals[cols].copy()
     # Normalise direction: arc 2 trades are all long; map any string to +1
     if out["direction"].dtype == object:
@@ -46,8 +56,9 @@ def compute_sl_distance_price(atr_at_signal: np.ndarray) -> np.ndarray:
     return 2.0 * atr_at_signal
 
 
-def logret_to_r_units(cum_logret: np.ndarray, entry_price: np.ndarray,
-                      sl_dist_price: np.ndarray) -> np.ndarray:
+def logret_to_r_units(
+    cum_logret: np.ndarray, entry_price: np.ndarray, sl_dist_price: np.ndarray
+) -> np.ndarray:
     """Convert cum_logret_from_entry to R-units using linear P&L convention.
 
     R = (exit_price - entry_price) / SL_distance_price
@@ -74,7 +85,9 @@ def simulate_time_exit_h(
     Returns DataFrame: trade_id, action_bar, exit_reason, gross_r, net_r,
     mfe_at_exit, mae_at_exit.
     """
-    p = paths_long[paths_long["trade_id"].isin(trade_ids) & (paths_long["bar_offset"] <= horizon)].copy()
+    p = paths_long[
+        paths_long["trade_id"].isin(trade_ids) & (paths_long["bar_offset"] <= horizon)
+    ].copy()
     p = p.sort_values(["trade_id", "bar_offset"])
 
     sl_hit_mask = p["mae_to_date_atr"] >= 2.0
@@ -117,13 +130,21 @@ def simulate_time_exit_h(
             mfe_at_exit[i] = mfe_at_last[i] if not np.isnan(mfe_at_last[i]) else np.nan
             mae_at_exit[i] = 2.0
         else:
-            if not np.isnan(horizon_open[i]) and not np.isnan(entry_price[i]) and sl_dist_price[i] > 0:
+            if (
+                not np.isnan(horizon_open[i])
+                and not np.isnan(entry_price[i])
+                and sl_dist_price[i] > 0
+            ):
                 action_bar[i] = float(horizon)
                 gross_r[i] = float((horizon_open[i] - entry_price[i]) / sl_dist_price[i])
                 exit_reason[i] = "time_exit"
                 mfe_at_exit[i] = mfe_at_horizon[i] if not np.isnan(mfe_at_horizon[i]) else np.nan
                 mae_at_exit[i] = mae_at_horizon[i] if not np.isnan(mae_at_horizon[i]) else np.nan
-            elif not np.isnan(last_close[i]) and not np.isnan(entry_price[i]) and sl_dist_price[i] > 0:
+            elif (
+                not np.isnan(last_close[i])
+                and not np.isnan(entry_price[i])
+                and sl_dist_price[i] > 0
+            ):
                 # data_end fallback: exit at last available close (best we can do)
                 action_bar[i] = float(last_off[i])
                 gross_r[i] = float((last_close[i] - entry_price[i]) / sl_dist_price[i])
@@ -139,16 +160,18 @@ def simulate_time_exit_h(
 
     net_r = gross_r - spread_R
 
-    return pd.DataFrame({
-        "trade_id": trade_ids,
-        "action_bar": action_bar,
-        "exit_reason": exit_reason,
-        "gross_r": gross_r,
-        "net_r": net_r,
-        "spread_cost_r": spread_R,
-        "mfe_at_exit": mfe_at_exit,
-        "mae_at_exit": mae_at_exit,
-    })
+    return pd.DataFrame(
+        {
+            "trade_id": trade_ids,
+            "action_bar": action_bar,
+            "exit_reason": exit_reason,
+            "gross_r": gross_r,
+            "net_r": net_r,
+            "spread_cost_r": spread_R,
+            "mfe_at_exit": mfe_at_exit,
+            "mae_at_exit": mae_at_exit,
+        }
+    )
 
 
 def simulate_close_at_bar_t(
@@ -193,8 +216,7 @@ def simulate_close_at_bar_t(
             gross_r[i] = -1.0
             exit_reason[i] = "sl_hit_before_t"
         else:
-            if (np.isnan(bar_t_open[i]) or sl_dist_price[i] <= 0
-                    or np.isnan(entry_price[i])):
+            if np.isnan(bar_t_open[i]) or sl_dist_price[i] <= 0 or np.isnan(entry_price[i]):
                 action_bar[i] = np.nan
                 gross_r[i] = np.nan
                 exit_reason[i] = "missing_bar_t"
@@ -205,16 +227,18 @@ def simulate_close_at_bar_t(
                 exit_reason[i] = "close_at_t"
 
     net_r = gross_r - spread_R
-    return pd.DataFrame({
-        "trade_id": trade_ids,
-        "action_bar": action_bar,
-        "exit_reason": exit_reason,
-        "gross_r": gross_r,
-        "net_r": net_r,
-        "spread_cost_r": spread_R,
-        "mfe_at_exit": mfe_at_t,
-        "mae_at_exit": mae_at_t,
-    })
+    return pd.DataFrame(
+        {
+            "trade_id": trade_ids,
+            "action_bar": action_bar,
+            "exit_reason": exit_reason,
+            "gross_r": gross_r,
+            "net_r": net_r,
+            "spread_cost_r": spread_R,
+            "mfe_at_exit": mfe_at_t,
+            "mae_at_exit": mae_at_t,
+        }
+    )
 
 
 def simulate_delayed_entry(
@@ -232,7 +256,9 @@ def simulate_delayed_entry(
     """
     horizon_from_entry = 120  # h=120 from fire bar (= bar N+1)
     # New entry occurs at bar_offset=t. Hold from t to horizon_from_entry.
-    p = paths_long[paths_long["trade_id"].isin(trade_ids) & (paths_long["bar_offset"] <= horizon_from_entry)].copy()
+    p = paths_long[
+        paths_long["trade_id"].isin(trade_ids) & (paths_long["bar_offset"] <= horizon_from_entry)
+    ].copy()
     p = p.sort_values(["trade_id", "bar_offset"])
 
     # Delayed entry at bar_offset=t's OPEN (consistent with verbatim entry-at-OPEN convention)
@@ -240,9 +266,9 @@ def simulate_delayed_entry(
     new_entry_price = new_entry_row["open"].reindex(trade_ids).values
     new_entry_cum_log = new_entry_row["cum_logret_from_entry"].reindex(trade_ids).values
 
-    static = signals.set_index("trade_id").loc[trade_ids,
-                                                ["atr_at_signal_1h", "spread_cost_R",
-                                                 "atr_ratio_to_baseline"]]
+    static = signals.set_index("trade_id").loc[
+        trade_ids, ["atr_at_signal_1h", "spread_cost_R", "atr_ratio_to_baseline"]
+    ]
     atr_sig = static["atr_at_signal_1h"].values
     spread_R = static["spread_cost_R"].values
     atr_ratio_signal = static["atr_ratio_to_baseline"].values
@@ -273,12 +299,17 @@ def simulate_delayed_entry(
     # SL hit at bar k > t if low at bar k <= SL price.
     after_t = p[p["bar_offset"] > t].copy()
     after_t = after_t.merge(
-        pd.DataFrame({"trade_id": trade_ids,
-                      "new_entry_price": new_entry_price,
-                      "new_sl_price": new_entry_price - new_sl_dist_price,
-                      "new_entry_cum_log": new_entry_cum_log,
-                      "new_sl_dist_price": new_sl_dist_price}),
-        on="trade_id", how="left",
+        pd.DataFrame(
+            {
+                "trade_id": trade_ids,
+                "new_entry_price": new_entry_price,
+                "new_sl_price": new_entry_price - new_sl_dist_price,
+                "new_entry_cum_log": new_entry_cum_log,
+                "new_sl_dist_price": new_sl_dist_price,
+            }
+        ),
+        on="trade_id",
+        how="left",
     )
     after_t["sl_hit"] = after_t["low"] <= after_t["new_sl_price"]
     sl_first_after_t = after_t[after_t["sl_hit"]].groupby("trade_id")["bar_offset"].min()
@@ -311,29 +342,33 @@ def simulate_delayed_entry(
             gross_r[i] = -1.0  # SL hit relative to new entry
             exit_reason[i] = "sl_hit_post_delayed_entry"
         else:
-            if np.isnan(exit_price_120[i]) or new_sl_dist_price[i] <= 0 or np.isnan(new_entry_price[i]):
+            if (
+                np.isnan(exit_price_120[i])
+                or new_sl_dist_price[i] <= 0
+                or np.isnan(new_entry_price[i])
+            ):
                 action_bar[i] = float("nan")
                 gross_r[i] = np.nan
                 exit_reason[i] = "missing_h120"
             else:
                 action_bar[i] = float(horizon_from_entry)
                 # Linear P&L: (exit_open_at_120 - new_entry_open_at_t) / new_sl_dist_price
-                gross_r[i] = float(
-                    (exit_price_120[i] - new_entry_price[i]) / new_sl_dist_price[i]
-                )
+                gross_r[i] = float((exit_price_120[i] - new_entry_price[i]) / new_sl_dist_price[i])
                 exit_reason[i] = "time_exit_delayed"
 
         mfe_out[i] = float(mfe_120[i]) if not np.isnan(mfe_120[i]) else np.nan
         mae_out[i] = float(mae_120[i]) if not np.isnan(mae_120[i]) else np.nan
 
     net_r = gross_r - spread_R
-    return pd.DataFrame({
-        "trade_id": trade_ids,
-        "action_bar": action_bar,
-        "exit_reason": exit_reason,
-        "gross_r": gross_r,
-        "net_r": net_r,
-        "spread_cost_r": spread_R,
-        "mfe_at_exit": mfe_out,
-        "mae_at_exit": mae_out,
-    })
+    return pd.DataFrame(
+        {
+            "trade_id": trade_ids,
+            "action_bar": action_bar,
+            "exit_reason": exit_reason,
+            "gross_r": gross_r,
+            "net_r": net_r,
+            "spread_cost_r": spread_R,
+            "mfe_at_exit": mfe_out,
+            "mae_at_exit": mae_out,
+        }
+    )

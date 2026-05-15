@@ -3,6 +3,7 @@ Phase D-6F.1: Opportunity geometry analysis from clean labels.
 
 Computes: How often does favorable excursion reach Y before adverse reaches X?
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -22,9 +23,15 @@ def _to_bool(s: pd.Series) -> pd.Series:
 
 
 def _valid_mask(df: pd.DataFrame) -> pd.Series:
-    valid_atr = _to_bool(df["valid_atr"]) if "valid_atr" in df.columns else pd.Series(True, index=df.index)
-    valid_ref = _to_bool(df["valid_ref"]) if "valid_ref" in df.columns else pd.Series(True, index=df.index)
-    valid_h40 = _to_bool(df["valid_h40"]) if "valid_h40" in df.columns else pd.Series(True, index=df.index)
+    valid_atr = (
+        _to_bool(df["valid_atr"]) if "valid_atr" in df.columns else pd.Series(True, index=df.index)
+    )
+    valid_ref = (
+        _to_bool(df["valid_ref"]) if "valid_ref" in df.columns else pd.Series(True, index=df.index)
+    )
+    valid_h40 = (
+        _to_bool(df["valid_h40"]) if "valid_h40" in df.columns else pd.Series(True, index=df.index)
+    )
     return valid_atr & valid_ref & valid_h40
 
 
@@ -53,14 +60,16 @@ def compute_pooled_prob_matrix(df: pd.DataFrame) -> pd.DataFrame:
             for y in Y_VALUES:
                 n_hit = int((vals >= y).sum())
                 rate = round(n_hit / n_valid, 6)
-                rows.append({
-                    "direction": direction,
-                    "x": x,
-                    "y": float(y),
-                    "n_valid": n_valid,
-                    "n_hit": n_hit,
-                    "rate": rate,
-                })
+                rows.append(
+                    {
+                        "direction": direction,
+                        "x": x,
+                        "y": float(y),
+                        "n_valid": n_valid,
+                        "n_hit": n_hit,
+                        "rate": rate,
+                    }
+                )
     out = pd.DataFrame(rows)
     if not out.empty:
         out = out.sort_values(["direction", "x", "y"]).reset_index(drop=True)
@@ -92,15 +101,17 @@ def compute_per_pair_prob_matrix(df: pd.DataFrame) -> pd.DataFrame:
             continue
         n_hit = int((vals >= y).sum())
         rate = round(n_hit / n_valid, 6)
-        rows.append({
-            "pair": pair,
-            "direction": direction,
-            "x": x,
-            "y": float(y),
-            "n_valid": n_valid,
-            "n_hit": n_hit,
-            "rate": rate,
-        })
+        rows.append(
+            {
+                "pair": pair,
+                "direction": direction,
+                "x": x,
+                "y": float(y),
+                "n_valid": n_valid,
+                "n_hit": n_hit,
+                "rate": rate,
+            }
+        )
     out = pd.DataFrame(rows)
     if not out.empty:
         out = out.sort_values(["pair", "direction", "x", "y"]).reset_index(drop=True)
@@ -112,7 +123,9 @@ def compute_pooled_quantiles(df: pd.DataFrame) -> pd.DataFrame:
     mask = _valid_mask(df)
     sub = df[mask].copy()
     if sub.empty:
-        return pd.DataFrame(columns=["direction", "x", "n", "mean", "std", "p50", "p75", "p90", "p95", "p99", "max"])
+        return pd.DataFrame(
+            columns=["direction", "x", "n", "mean", "std", "p50", "p75", "p90", "p95", "p99", "max"]
+        )
 
     rows = []
     for direction in DIRECTIONS:
@@ -125,46 +138,8 @@ def compute_pooled_quantiles(df: pd.DataFrame) -> pd.DataFrame:
             n = len(vals)
             if n == 0:
                 continue
-            rows.append({
-                "direction": direction,
-                "x": x,
-                "n": n,
-                "mean": round(float(vals.mean()), 6),
-                "std": round(float(vals.std()) if n > 1 else 0.0, 6),
-                "p50": round(float(vals.quantile(0.50)), 6),
-                "p75": round(float(vals.quantile(0.75)), 6),
-                "p90": round(float(vals.quantile(0.90)), 6),
-                "p95": round(float(vals.quantile(0.95)), 6),
-                "p99": round(float(vals.quantile(0.99)), 6),
-                "max": round(float(vals.max()), 6),
-            })
-    out = pd.DataFrame(rows)
-    if not out.empty:
-        out = out.sort_values(["direction", "x"]).reset_index(drop=True)
-    return out
-
-
-def compute_per_pair_quantiles(df: pd.DataFrame) -> pd.DataFrame:
-    """Per-pair quantiles: pair, direction, x, same stat columns."""
-    mask = _valid_mask(df)
-    sub = df[mask].copy()
-    if sub.empty or "pair" not in sub.columns:
-        return pd.DataFrame(columns=["pair", "direction", "x", "n", "mean", "std", "p50", "p75", "p90", "p95", "p99", "max"])
-
-    rows = []
-    for (pair, grp) in sub.groupby("pair", sort=True):
-        for direction in DIRECTIONS:
-            for x in X_VALUES:
-                col = _get_mfe_col(direction, x)
-                if col not in grp.columns:
-                    continue
-                vals = grp[col].dropna()
-                vals = vals[np.isfinite(vals)]
-                n = len(vals)
-                if n == 0:
-                    continue
-                rows.append({
-                    "pair": pair,
+            rows.append(
+                {
                     "direction": direction,
                     "x": x,
                     "n": n,
@@ -176,7 +151,64 @@ def compute_per_pair_quantiles(df: pd.DataFrame) -> pd.DataFrame:
                     "p95": round(float(vals.quantile(0.95)), 6),
                     "p99": round(float(vals.quantile(0.99)), 6),
                     "max": round(float(vals.max()), 6),
-                })
+                }
+            )
+    out = pd.DataFrame(rows)
+    if not out.empty:
+        out = out.sort_values(["direction", "x"]).reset_index(drop=True)
+    return out
+
+
+def compute_per_pair_quantiles(df: pd.DataFrame) -> pd.DataFrame:
+    """Per-pair quantiles: pair, direction, x, same stat columns."""
+    mask = _valid_mask(df)
+    sub = df[mask].copy()
+    if sub.empty or "pair" not in sub.columns:
+        return pd.DataFrame(
+            columns=[
+                "pair",
+                "direction",
+                "x",
+                "n",
+                "mean",
+                "std",
+                "p50",
+                "p75",
+                "p90",
+                "p95",
+                "p99",
+                "max",
+            ]
+        )
+
+    rows = []
+    for pair, grp in sub.groupby("pair", sort=True):
+        for direction in DIRECTIONS:
+            for x in X_VALUES:
+                col = _get_mfe_col(direction, x)
+                if col not in grp.columns:
+                    continue
+                vals = grp[col].dropna()
+                vals = vals[np.isfinite(vals)]
+                n = len(vals)
+                if n == 0:
+                    continue
+                rows.append(
+                    {
+                        "pair": pair,
+                        "direction": direction,
+                        "x": x,
+                        "n": n,
+                        "mean": round(float(vals.mean()), 6),
+                        "std": round(float(vals.std()) if n > 1 else 0.0, 6),
+                        "p50": round(float(vals.quantile(0.50)), 6),
+                        "p75": round(float(vals.quantile(0.75)), 6),
+                        "p90": round(float(vals.quantile(0.90)), 6),
+                        "p95": round(float(vals.quantile(0.95)), 6),
+                        "p99": round(float(vals.quantile(0.99)), 6),
+                        "max": round(float(vals.max()), 6),
+                    }
+                )
     out = pd.DataFrame(rows)
     if not out.empty:
         out = out.sort_values(["pair", "direction", "x"]).reset_index(drop=True)
@@ -197,12 +229,19 @@ def compute_pooled_stability_prob_matrix(
     mask = _valid_mask(df)
     sub = _add_split(df[mask].copy(), discovery_end)
     if sub.empty:
-        return pd.DataFrame(columns=[
-            "direction", "x", "y",
-            "n_valid_discovery", "rate_discovery",
-            "n_valid_validation", "rate_validation",
-            "delta", "ratio",
-        ])
+        return pd.DataFrame(
+            columns=[
+                "direction",
+                "x",
+                "y",
+                "n_valid_discovery",
+                "rate_discovery",
+                "n_valid_validation",
+                "rate_validation",
+                "delta",
+                "ratio",
+            ]
+        )
 
     rows = []
     for direction in DIRECTIONS:
@@ -224,17 +263,19 @@ def compute_pooled_stability_prob_matrix(
                 delta = round(rate_val - rate_disc, 6)
                 denom = max(rate_disc, 1e-12)
                 ratio = round(rate_val / denom, 6)
-                rows.append({
-                    "direction": direction,
-                    "x": x,
-                    "y": float(y),
-                    "n_valid_discovery": n_disc,
-                    "rate_discovery": rate_disc,
-                    "n_valid_validation": n_val,
-                    "rate_validation": rate_val,
-                    "delta": delta,
-                    "ratio": ratio,
-                })
+                rows.append(
+                    {
+                        "direction": direction,
+                        "x": x,
+                        "y": float(y),
+                        "n_valid_discovery": n_disc,
+                        "rate_discovery": rate_disc,
+                        "n_valid_validation": n_val,
+                        "rate_validation": rate_val,
+                        "delta": delta,
+                        "ratio": ratio,
+                    }
+                )
     out = pd.DataFrame(rows)
     if not out.empty:
         out = out.sort_values(["direction", "x", "y"]).reset_index(drop=True)
@@ -248,15 +289,23 @@ def compute_per_pair_stability_prob_matrix(
     mask = _valid_mask(df)
     sub = _add_split(df[mask].copy(), discovery_end)
     if sub.empty or "pair" not in sub.columns:
-        return pd.DataFrame(columns=[
-            "pair", "direction", "x", "y",
-            "n_valid_discovery", "rate_discovery",
-            "n_valid_validation", "rate_validation",
-            "delta", "ratio",
-        ])
+        return pd.DataFrame(
+            columns=[
+                "pair",
+                "direction",
+                "x",
+                "y",
+                "n_valid_discovery",
+                "rate_discovery",
+                "n_valid_validation",
+                "rate_validation",
+                "delta",
+                "ratio",
+            ]
+        )
 
     rows = []
-    for (pair, grp) in sub.groupby("pair", sort=True):
+    for pair, grp in sub.groupby("pair", sort=True):
         for direction in DIRECTIONS:
             for x in X_VALUES:
                 col = _get_mfe_col(direction, x)
@@ -276,18 +325,20 @@ def compute_per_pair_stability_prob_matrix(
                     delta = round(rate_val - rate_disc, 6)
                     denom = max(rate_disc, 1e-12)
                     ratio = round(rate_val / denom, 6)
-                    rows.append({
-                        "pair": pair,
-                        "direction": direction,
-                        "x": x,
-                        "y": float(y),
-                        "n_valid_discovery": n_disc,
-                        "rate_discovery": rate_disc,
-                        "n_valid_validation": n_val,
-                        "rate_validation": rate_val,
-                        "delta": delta,
-                        "ratio": ratio,
-                    })
+                    rows.append(
+                        {
+                            "pair": pair,
+                            "direction": direction,
+                            "x": x,
+                            "y": float(y),
+                            "n_valid_discovery": n_disc,
+                            "rate_discovery": rate_disc,
+                            "n_valid_validation": n_val,
+                            "rate_validation": rate_val,
+                            "delta": delta,
+                            "ratio": ratio,
+                        }
+                    )
     out = pd.DataFrame(rows)
     if not out.empty:
         out = out.sort_values(["pair", "direction", "x", "y"]).reset_index(drop=True)

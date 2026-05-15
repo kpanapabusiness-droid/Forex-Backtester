@@ -5,6 +5,7 @@ Resolutions per `results/l_arc_2/step4/open_questions.md`:
 - Sentinel -2 trades excluded from cluster-conditional candidates, retained for filters.
 - Spread cost: use signals_features.spread_cost_R as structural per-trade approximation.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -111,6 +112,7 @@ CLUSTER0_CURVE_TOLERANCE_R = 0.05
 
 
 # ---- IO helpers ----
+
 
 def sha256_file(path: Path) -> str:
     h = hashlib.sha256()

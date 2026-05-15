@@ -3,6 +3,7 @@ Phase E-1.4: Corridor sweeps for Phase E archetypes.
 Expands c1_params_grid into combos, runs phaseE1 signal geometry per combo,
 aggregates leaderboard_geometry_lock.csv into results_summary.csv.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -21,6 +22,7 @@ if str(ROOT) not in sys.path:
 
 def _load_yaml(path: Path) -> dict:
     import yaml
+
     with open(path, encoding="utf-8") as f:
         return yaml.safe_load(f) or {}
 
@@ -130,33 +132,37 @@ def main(argv: list[str] | None = None) -> int:
         ret = run_from_config(run_cfg, clean_path, run_out)
         if ret != 0:
             print(f"Warning: Run failed for combo {i + 1}/{len(combos)} params={params}")
-            aggregated.append({
-                "params_hash": phash,
-                "params_json": json.dumps(params, sort_keys=True),
-                "PASS": False,
-                "reject_reason": "run_failed",
-                "P_3R_before_2R_disc": None,
-                "P_3R_before_2R_val": None,
-                "discovery_lift": None,
-                "validation_lift": None,
-                "annual_signals_per_pair": None,
-                "clustering_ratio": None,
-            })
+            aggregated.append(
+                {
+                    "params_hash": phash,
+                    "params_json": json.dumps(params, sort_keys=True),
+                    "PASS": False,
+                    "reject_reason": "run_failed",
+                    "P_3R_before_2R_disc": None,
+                    "P_3R_before_2R_val": None,
+                    "discovery_lift": None,
+                    "validation_lift": None,
+                    "annual_signals_per_pair": None,
+                    "clustering_ratio": None,
+                }
+            )
             continue
         lb_path = run_out / "leaderboard_geometry_lock.csv"
         if not lb_path.exists():
-            aggregated.append({
-                "params_hash": phash,
-                "params_json": json.dumps(params, sort_keys=True),
-                "PASS": False,
-                "reject_reason": "no_leaderboard",
-                "P_3R_before_2R_disc": None,
-                "P_3R_before_2R_val": None,
-                "discovery_lift": None,
-                "validation_lift": None,
-                "annual_signals_per_pair": None,
-                "clustering_ratio": None,
-            })
+            aggregated.append(
+                {
+                    "params_hash": phash,
+                    "params_json": json.dumps(params, sort_keys=True),
+                    "PASS": False,
+                    "reject_reason": "no_leaderboard",
+                    "P_3R_before_2R_disc": None,
+                    "P_3R_before_2R_val": None,
+                    "discovery_lift": None,
+                    "validation_lift": None,
+                    "annual_signals_per_pair": None,
+                    "clustering_ratio": None,
+                }
+            )
             continue
         lb = pd.read_csv(lb_path)
         row = lb.iloc[0].to_dict()

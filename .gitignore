@@ -41,6 +41,9 @@ results_history/
 .aider*
 .aiderignore
 
+# Claude Code runtime state (not committed)
+.claude/scheduled_tasks.lock
+
 # MT5 exports (machine-specific)
 mt5/**
 !mt5/.gitkeep

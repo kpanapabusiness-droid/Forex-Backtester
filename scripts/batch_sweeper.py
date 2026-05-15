@@ -550,6 +550,7 @@ def main(sweeps_path=SWEEPS):
 if __name__ == "__main__":
     main()
 
+
 def extract_pairs_from_csv(path, column_name: str = "pair") -> list[str]:
     """
     Extract sorted unique values from a CSV column (default: "pair").
@@ -574,12 +575,7 @@ def extract_pairs_from_csv(path, column_name: str = "pair") -> list[str]:
         if df[column_name].dtype.kind in {"i", "u", "f"}
         else df[column_name]
     )
-    series = (
-        vals.astype(str)
-        .map(lambda x: x.strip())
-        .replace({"": pd.NA})
-        .dropna()
-    )
+    series = vals.astype(str).map(lambda x: x.strip()).replace({"": pd.NA}).dropna()
 
     pairs = sorted(series.unique().tolist())
     if not pairs:

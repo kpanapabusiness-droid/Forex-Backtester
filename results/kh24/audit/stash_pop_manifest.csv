@@ -1,0 +1,162 @@
+path,category,action,reasoning
+.claude/scheduled_tasks.lock,scratch_unclear,leave_untracked,Claude Code scheduled-tasks state lock — likely should be gitignored not tracked
+L_ARC_PROTOCOL_v1.1_AMENDMENT.md,protocol_governance,commit,L_ARC governance doc per prompt rubric
+L_ARC_PROTOCOL_v1.2_AMENDMENT.md,protocol_governance,commit,L_ARC governance doc per prompt rubric
+configs/data_audit.yaml,locked_configs,commit,YAML config referenced by governance docs and/or active arcs
+configs/l4_characterisation.yaml,locked_configs,commit,YAML config referenced by governance docs and/or active arcs
+configs/lchar/deferred_candidates.yaml,locked_configs,commit,YAML config referenced by governance docs and/or active arcs
+configs/lchar/layer1.yaml,locked_configs,commit,YAML config referenced by governance docs and/or active arcs
+configs/lchar/layer2.yaml,locked_configs,commit,YAML config referenced by governance docs and/or active arcs
+configs/lchar/layer3.yaml,locked_configs,commit,YAML config referenced by governance docs and/or active arcs
+configs/lchar/layer4.yaml,locked_configs,commit,YAML config referenced by governance docs and/or active arcs
+configs/lchar/layer5.yaml,locked_configs,commit,YAML config referenced by governance docs and/or active arcs
+configs/wfo_l6_arc1.yaml,locked_configs,commit,YAML config referenced by governance docs and/or active arcs
+configs/wfo_l6_arc1_p2.yaml,locked_configs,commit,YAML config referenced by governance docs and/or active arcs
+configs/wfo_l6_arc2.yaml,locked_configs,commit,YAML config referenced by governance docs and/or active arcs
+configs/wfo_l_arc1_verbatim.yaml,locked_configs,commit,YAML config referenced by governance docs and/or active arcs
+configs/wfo_l_arc2_verbatim.yaml,locked_configs,commit,YAML config referenced by governance docs and/or active arcs
+configs/wfo_l_arc3_verbatim.yaml,locked_configs,commit,YAML config referenced by governance docs and/or active arcs
+core/signals/__init__.py,scratch_unclear,commit,L-arc signal definitions (registry top-N) — engine code feeding active arcs
+core/signals/l4_mtf_alignment_2_down_mixed_kijun.py,scratch_unclear,commit,L-arc signal definitions (registry top-N) — engine code feeding active arcs
+core/signals/l4_univariate_extreme.py,scratch_unclear,commit,L-arc signal definitions (registry top-N) — engine code feeding active arcs
+core/signals/l4_volatility_regime_d1_atr_top_decile_any.py,scratch_unclear,commit,L-arc signal definitions (registry top-N) — engine code feeding active arcs
+core/spread_floor.py,scratch_unclear,commit,Spread-floor application logic — used by backtester for configs/spread_floors_5ers.yaml
+docs/CANDIDATES.md,scratch_unclear,commit,Project-level candidate registry — adjacent to governance but not strictly L_ARC_*
+docs/CLAUDE_PROJECT_INSTRUCTIONS.md,scratch_unclear,commit,AI assistant instructions — not L_ARC governance but operationally relevant
+docs/L_ARC_DEFERRED_CANDIDATES.md,protocol_governance,commit,L_ARC governance doc per prompt rubric
+docs/L_ARC_FEATURE_REGISTRY.md,protocol_governance,commit,L_ARC governance doc per prompt rubric
+docs/PHASE_L6_ARC2_P3_OPEN.md,scratch_unclear,commit,L6-era arc phase doc (closed/superseded by v1.0 protocol per L_ARC_PROTOCOL.md preamble) — keep as historical record?
+docs/PHASE_L6_ARC2_P3_RESULT.md,scratch_unclear,commit,L6-era arc phase doc (closed/superseded by v1.0 protocol per L_ARC_PROTOCOL.md preamble) — keep as historical record?
+project_brief.md,scratch_unclear,commit,Top-level project brief — long-form history doc
+scripts/audit_data_integrity.py,scratch_unclear,commit,Data integrity audit script
+scripts/l_arc_1/determinism_check.py,scratch_unclear,commit,L Arc 1 (redo) pipeline source — step1/step2/step3 closed CLOSE 2026-05-14
+scripts/l_arc_1/finalize_step1.py,scratch_unclear,commit,L Arc 1 (redo) pipeline source — step1/step2/step3 closed CLOSE 2026-05-14
+scripts/l_arc_1/signal_revalidation.py,scratch_unclear,commit,L Arc 1 (redo) pipeline source — step1/step2/step3 closed CLOSE 2026-05-14
+scripts/l_arc_1/step2/__init__.py,scratch_unclear,commit,L Arc 1 (redo) pipeline source — step1/step2/step3 closed CLOSE 2026-05-14
+scripts/l_arc_1/step2/_distributions.py,scratch_unclear,commit,L Arc 1 (redo) pipeline source — step1/step2/step3 closed CLOSE 2026-05-14
+scripts/l_arc_1/step2/_fix_time_features.py,scratch_unclear,commit,L Arc 1 (redo) pipeline source — step1/step2/step3 closed CLOSE 2026-05-14
+scripts/l_arc_1/step2/_io.py,scratch_unclear,commit,L Arc 1 (redo) pipeline source — step1/step2/step3 closed CLOSE 2026-05-14
+scripts/l_arc_1/step2/phase_a_features.py,scratch_unclear,commit,L Arc 1 (redo) pipeline source — step1/step2/step3 closed CLOSE 2026-05-14
+scripts/l_arc_1/step2/phase_a_lookahead.py,scratch_unclear,commit,L Arc 1 (redo) pipeline source — step1/step2/step3 closed CLOSE 2026-05-14
+scripts/l_arc_1/step2/phase_b_marginals.py,scratch_unclear,commit,L Arc 1 (redo) pipeline source — step1/step2/step3 closed CLOSE 2026-05-14
+scripts/l_arc_1/step2/phase_c_conditional.py,scratch_unclear,commit,L Arc 1 (redo) pipeline source — step1/step2/step3 closed CLOSE 2026-05-14
+scripts/l_arc_1/step2/phase_d_stability.py,scratch_unclear,commit,L Arc 1 (redo) pipeline source — step1/step2/step3 closed CLOSE 2026-05-14
+scripts/l_arc_1/step2/phase_e_shadows.py,scratch_unclear,commit,L Arc 1 (redo) pipeline source — step1/step2/step3 closed CLOSE 2026-05-14
+scripts/l_arc_1/step2/phase_f_cost_stress.py,scratch_unclear,commit,L Arc 1 (redo) pipeline source — step1/step2/step3 closed CLOSE 2026-05-14
+scripts/l_arc_1/step2/phase_g_random.py,scratch_unclear,commit,L Arc 1 (redo) pipeline source — step1/step2/step3 closed CLOSE 2026-05-14
+scripts/l_arc_1/step2/phase_h_held_bar.py,scratch_unclear,commit,L Arc 1 (redo) pipeline source — step1/step2/step3 closed CLOSE 2026-05-14
+scripts/l_arc_1/step2/phase_i_report.py,scratch_unclear,commit,L Arc 1 (redo) pipeline source — step1/step2/step3 closed CLOSE 2026-05-14
+scripts/l_arc_1/step2/run_determinism_check.py,scratch_unclear,commit,L Arc 1 (redo) pipeline source — step1/step2/step3 closed CLOSE 2026-05-14
+scripts/l_arc_1/step2/run_step2.py,scratch_unclear,commit,L Arc 1 (redo) pipeline source — step1/step2/step3 closed CLOSE 2026-05-14
+scripts/l_arc_1/step3/__init__.py,scratch_unclear,commit,L Arc 1 (redo) pipeline source — step1/step2/step3 closed CLOSE 2026-05-14
+scripts/l_arc_1/step3/_clustering.py,scratch_unclear,commit,L Arc 1 (redo) pipeline source — step1/step2/step3 closed CLOSE 2026-05-14
+scripts/l_arc_1/step3/_common.py,scratch_unclear,commit,L Arc 1 (redo) pipeline source — step1/step2/step3 closed CLOSE 2026-05-14
+scripts/l_arc_1/step3/_data.py,scratch_unclear,commit,L Arc 1 (redo) pipeline source — step1/step2/step3 closed CLOSE 2026-05-14
+scripts/l_arc_1/step3/_haircut.py,scratch_unclear,commit,L Arc 1 (redo) pipeline source — step1/step2/step3 closed CLOSE 2026-05-14
+scripts/l_arc_1/step3/_pca.py,scratch_unclear,commit,L Arc 1 (redo) pipeline source — step1/step2/step3 closed CLOSE 2026-05-14
+scripts/l_arc_1/step3/_predictor.py,scratch_unclear,commit,L Arc 1 (redo) pipeline source — step1/step2/step3 closed CLOSE 2026-05-14
+scripts/l_arc_1/step3/determinism_check.py,scratch_unclear,commit,L Arc 1 (redo) pipeline source — step1/step2/step3 closed CLOSE 2026-05-14
+scripts/l_arc_1/step3/run_step3.py,scratch_unclear,commit,L Arc 1 (redo) pipeline source — step1/step2/step3 closed CLOSE 2026-05-14
+scripts/l_arc_1/step3/summarise.py,scratch_unclear,commit,L Arc 1 (redo) pipeline source — step1/step2/step3 closed CLOSE 2026-05-14
+scripts/l_arc_1/step3/triage_extract.py,scratch_unclear,commit,L Arc 1 (redo) pipeline source — step1/step2/step3 closed CLOSE 2026-05-14
+scripts/l_arc_2/determinism_check.py,scratch_unclear,commit,L Arc 2 pipeline source — currently active per STATUS.md
+scripts/l_arc_2/finalize_step1.py,scratch_unclear,commit,L Arc 2 pipeline source — currently active per STATUS.md
+scripts/l_arc_2/signal_revalidation.py,scratch_unclear,commit,L Arc 2 pipeline source — currently active per STATUS.md
+scripts/l_arc_2/step2/__init__.py,scratch_unclear,commit,L Arc 2 pipeline source — currently active per STATUS.md
+scripts/l_arc_2/step2/_io.py,scratch_unclear,commit,L Arc 2 pipeline source — currently active per STATUS.md
+scripts/l_arc_2/step2/phase_a_features.py,scratch_unclear,commit,L Arc 2 pipeline source — currently active per STATUS.md
+scripts/l_arc_2/step2/phase_a_lookahead.py,scratch_unclear,commit,L Arc 2 pipeline source — currently active per STATUS.md
+scripts/l_arc_2/step2/phase_b_marginals.py,scratch_unclear,commit,L Arc 2 pipeline source — currently active per STATUS.md
+scripts/l_arc_2/step2/phase_c_conditional.py,scratch_unclear,commit,L Arc 2 pipeline source — currently active per STATUS.md
+scripts/l_arc_2/step2/phase_d_stability.py,scratch_unclear,commit,L Arc 2 pipeline source — currently active per STATUS.md
+scripts/l_arc_2/step2/phase_e_shadows.py,scratch_unclear,commit,L Arc 2 pipeline source — currently active per STATUS.md
+scripts/l_arc_2/step2/phase_f_cost_stress.py,scratch_unclear,commit,L Arc 2 pipeline source — currently active per STATUS.md
+scripts/l_arc_2/step2/phase_g_random.py,scratch_unclear,commit,L Arc 2 pipeline source — currently active per STATUS.md
+scripts/l_arc_2/step2/phase_h_held_bar.py,scratch_unclear,commit,L Arc 2 pipeline source — currently active per STATUS.md
+scripts/l_arc_2/step2/phase_i_report.py,scratch_unclear,commit,L Arc 2 pipeline source — currently active per STATUS.md
+scripts/l_arc_2/step2/run_determinism_check.py,scratch_unclear,commit,L Arc 2 pipeline source — currently active per STATUS.md
+scripts/l_arc_2/step2/run_step2.py,scratch_unclear,commit,L Arc 2 pipeline source — currently active per STATUS.md
+scripts/l_arc_2/step3/__init__.py,scratch_unclear,commit,L Arc 2 pipeline source — currently active per STATUS.md
+scripts/l_arc_2/step3/_clustering.py,scratch_unclear,commit,L Arc 2 pipeline source — currently active per STATUS.md
+scripts/l_arc_2/step3/_common.py,scratch_unclear,commit,L Arc 2 pipeline source — currently active per STATUS.md
+scripts/l_arc_2/step3/_data.py,scratch_unclear,commit,L Arc 2 pipeline source — currently active per STATUS.md
+scripts/l_arc_2/step3/_haircut.py,scratch_unclear,commit,L Arc 2 pipeline source — currently active per STATUS.md
+scripts/l_arc_2/step3/_pca.py,scratch_unclear,commit,L Arc 2 pipeline source — currently active per STATUS.md
+scripts/l_arc_2/step3/_predictor.py,scratch_unclear,commit,L Arc 2 pipeline source — currently active per STATUS.md
+scripts/l_arc_2/step3/determinism_check.py,scratch_unclear,commit,L Arc 2 pipeline source — currently active per STATUS.md
+scripts/l_arc_2/step3/run_step3.py,scratch_unclear,commit,L Arc 2 pipeline source — currently active per STATUS.md
+scripts/l_arc_3/__init__.py,scratch_unclear,commit,L Arc 3 pipeline source — addenda exist per file names
+scripts/l_arc_3/determinism_check.py,scratch_unclear,commit,L Arc 3 pipeline source — addenda exist per file names
+scripts/l_arc_3/finalize_step1.py,scratch_unclear,commit,L Arc 3 pipeline source — addenda exist per file names
+scripts/l_arc_3/fire_clustering_diagnostic.py,scratch_unclear,commit,L Arc 3 pipeline source — addenda exist per file names
+scripts/l_arc_3/signal_revalidation.py,scratch_unclear,commit,L Arc 3 pipeline source — addenda exist per file names
+scripts/l_arc_3/step2/__init__.py,scratch_unclear,commit,L Arc 3 pipeline source — addenda exist per file names
+scripts/l_arc_3/step2/_io.py,scratch_unclear,commit,L Arc 3 pipeline source — addenda exist per file names
+scripts/l_arc_3/step2/phase_a_features.py,scratch_unclear,commit,L Arc 3 pipeline source — addenda exist per file names
+scripts/l_arc_3/step2/phase_a_lookahead.py,scratch_unclear,commit,L Arc 3 pipeline source — addenda exist per file names
+scripts/l_arc_3/step2/phase_b_marginals.py,scratch_unclear,commit,L Arc 3 pipeline source — addenda exist per file names
+scripts/l_arc_3/step2/phase_c_conditional.py,scratch_unclear,commit,L Arc 3 pipeline source — addenda exist per file names
+scripts/l_arc_3/step2/phase_d_stability.py,scratch_unclear,commit,L Arc 3 pipeline source — addenda exist per file names
+scripts/l_arc_3/step2/phase_e_shadows.py,scratch_unclear,commit,L Arc 3 pipeline source — addenda exist per file names
+scripts/l_arc_3/step2/phase_f_cost_stress.py,scratch_unclear,commit,L Arc 3 pipeline source — addenda exist per file names
+scripts/l_arc_3/step2/phase_g_random.py,scratch_unclear,commit,L Arc 3 pipeline source — addenda exist per file names
+scripts/l_arc_3/step2/phase_h_held_bar.py,scratch_unclear,commit,L Arc 3 pipeline source — addenda exist per file names
+scripts/l_arc_3/step2/phase_i_report.py,scratch_unclear,commit,L Arc 3 pipeline source — addenda exist per file names
+scripts/l_arc_3/step2/phase_j_arc3_addenda.py,scratch_unclear,commit,L Arc 3 pipeline source — addenda exist per file names
+scripts/l_arc_3/step2/run_determinism_check.py,scratch_unclear,commit,L Arc 3 pipeline source — addenda exist per file names
+scripts/l_arc_3/step2/run_step2.py,scratch_unclear,commit,L Arc 3 pipeline source — addenda exist per file names
+scripts/l_arc_3/step3/__init__.py,scratch_unclear,commit,L Arc 3 pipeline source — addenda exist per file names
+scripts/l_arc_3/step3/_clustering.py,scratch_unclear,commit,L Arc 3 pipeline source — addenda exist per file names
+scripts/l_arc_3/step3/_common.py,scratch_unclear,commit,L Arc 3 pipeline source — addenda exist per file names
+scripts/l_arc_3/step3/_data.py,scratch_unclear,commit,L Arc 3 pipeline source — addenda exist per file names
+scripts/l_arc_3/step3/_haircut.py,scratch_unclear,commit,L Arc 3 pipeline source — addenda exist per file names
+scripts/l_arc_3/step3/_pca.py,scratch_unclear,commit,L Arc 3 pipeline source — addenda exist per file names
+scripts/l_arc_3/step3/_predictor.py,scratch_unclear,commit,L Arc 3 pipeline source — addenda exist per file names
+scripts/l_arc_3/step3/determinism_check.py,scratch_unclear,commit,L Arc 3 pipeline source — addenda exist per file names
+scripts/l_arc_3/step3/phase_j_arc3_addenda.py,scratch_unclear,commit,L Arc 3 pipeline source — addenda exist per file names
+scripts/l_arc_3/step3/run_step3.py,scratch_unclear,commit,L Arc 3 pipeline source — addenda exist per file names
+scripts/lchar/__init__.py,scratch_unclear,commit,LCHAR atlas + Arc 2 v1.1/v1.2 analysis source — feeds LCHAR_TOPN_REGISTRY.md
+scripts/lchar/arc2_band_behavior.py,scratch_unclear,commit,LCHAR atlas + Arc 2 v1.1/v1.2 analysis source — feeds LCHAR_TOPN_REGISTRY.md
+scripts/lchar/arc2_characterisation.py,scratch_unclear,commit,LCHAR atlas + Arc 2 v1.1/v1.2 analysis source — feeds LCHAR_TOPN_REGISTRY.md
+scripts/lchar/arc2_characterisation_v1_1.py,scratch_unclear,commit,LCHAR atlas + Arc 2 v1.1/v1.2 analysis source — feeds LCHAR_TOPN_REGISTRY.md
+scripts/lchar/arc2_counterfactual_sweep_round_1.py,scratch_unclear,commit,LCHAR atlas + Arc 2 v1.1/v1.2 analysis source — feeds LCHAR_TOPN_REGISTRY.md
+scripts/lchar/arc2_counterfactual_sweep_round_1_v2.py,scratch_unclear,commit,LCHAR atlas + Arc 2 v1.1/v1.2 analysis source — feeds LCHAR_TOPN_REGISTRY.md
+scripts/lchar/arc2_entry_filter_bivariate.py,scratch_unclear,commit,LCHAR atlas + Arc 2 v1.1/v1.2 analysis source — feeds LCHAR_TOPN_REGISTRY.md
+scripts/lchar/arc2_entry_filter_univariate.py,scratch_unclear,commit,LCHAR atlas + Arc 2 v1.1/v1.2 analysis source — feeds LCHAR_TOPN_REGISTRY.md
+scripts/lchar/arc2_exit_counterfactuals_round2.py,scratch_unclear,commit,LCHAR atlas + Arc 2 v1.1/v1.2 analysis source — feeds LCHAR_TOPN_REGISTRY.md
+scripts/lchar/arc2_exit_sweep_filtered.py,scratch_unclear,commit,LCHAR atlas + Arc 2 v1.1/v1.2 analysis source — feeds LCHAR_TOPN_REGISTRY.md
+scripts/lchar/arc2_extended_analysis.py,scratch_unclear,commit,LCHAR atlas + Arc 2 v1.1/v1.2 analysis source — feeds LCHAR_TOPN_REGISTRY.md
+scripts/lchar/arc2_gate_exit_analysis.py,scratch_unclear,commit,LCHAR atlas + Arc 2 v1.1/v1.2 analysis source — feeds LCHAR_TOPN_REGISTRY.md
+scripts/lchar/arc2_path_by_subset.py,scratch_unclear,commit,LCHAR atlas + Arc 2 v1.1/v1.2 analysis source — feeds LCHAR_TOPN_REGISTRY.md
+scripts/lchar/arc2_path_categories.py,scratch_unclear,commit,LCHAR atlas + Arc 2 v1.1/v1.2 analysis source — feeds LCHAR_TOPN_REGISTRY.md
+scripts/lchar/arc2_path_detail_distributions.py,scratch_unclear,commit,LCHAR atlas + Arc 2 v1.1/v1.2 analysis source — feeds LCHAR_TOPN_REGISTRY.md
+scripts/lchar/arc2_path_excursion_descriptives.py,scratch_unclear,commit,LCHAR atlas + Arc 2 v1.1/v1.2 analysis source — feeds LCHAR_TOPN_REGISTRY.md
+scripts/lchar/arc2_per_bar_paths.py,scratch_unclear,commit,LCHAR atlas + Arc 2 v1.1/v1.2 analysis source — feeds LCHAR_TOPN_REGISTRY.md
+scripts/lchar/arc2_per_bar_paths_v1_2_1.py,scratch_unclear,commit,LCHAR atlas + Arc 2 v1.1/v1.2 analysis source — feeds LCHAR_TOPN_REGISTRY.md
+scripts/lchar/arc2_per_fold_clusters.py,scratch_unclear,commit,LCHAR atlas + Arc 2 v1.1/v1.2 analysis source — feeds LCHAR_TOPN_REGISTRY.md
+scripts/lchar/arc2_phase3_wfo.py,scratch_unclear,commit,LCHAR atlas + Arc 2 v1.1/v1.2 analysis source — feeds LCHAR_TOPN_REGISTRY.md
+scripts/lchar/arc2_tp1r_quick.py,scratch_unclear,commit,LCHAR atlas + Arc 2 v1.1/v1.2 analysis source — feeds LCHAR_TOPN_REGISTRY.md
+scripts/lchar/arc2_trade_curves.py,scratch_unclear,commit,LCHAR atlas + Arc 2 v1.1/v1.2 analysis source — feeds LCHAR_TOPN_REGISTRY.md
+scripts/lchar/arc2_trade_paths_by_block_b.py,scratch_unclear,commit,LCHAR atlas + Arc 2 v1.1/v1.2 analysis source — feeds LCHAR_TOPN_REGISTRY.md
+scripts/lchar/arc2_trajectory_appendix.py,scratch_unclear,commit,LCHAR atlas + Arc 2 v1.1/v1.2 analysis source — feeds LCHAR_TOPN_REGISTRY.md
+scripts/lchar/arc2_winner_path_analysis.py,scratch_unclear,commit,LCHAR atlas + Arc 2 v1.1/v1.2 analysis source — feeds LCHAR_TOPN_REGISTRY.md
+scripts/lchar/compute_spread_floors.py,scratch_unclear,commit,LCHAR atlas + Arc 2 v1.1/v1.2 analysis source — feeds LCHAR_TOPN_REGISTRY.md
+scripts/lchar/extract_deferred_candidates.py,scratch_unclear,commit,LCHAR atlas + Arc 2 v1.1/v1.2 analysis source — feeds LCHAR_TOPN_REGISTRY.md
+scripts/lchar/finalize_manifest.py,scratch_unclear,commit,LCHAR atlas + Arc 2 v1.1/v1.2 analysis source — feeds LCHAR_TOPN_REGISTRY.md
+scripts/lchar/generate_l4_char_reports.py,scratch_unclear,commit,LCHAR atlas + Arc 2 v1.1/v1.2 analysis source — feeds LCHAR_TOPN_REGISTRY.md
+scripts/lchar/l4_characterisation.py,scratch_unclear,commit,LCHAR atlas + Arc 2 v1.1/v1.2 analysis source — feeds LCHAR_TOPN_REGISTRY.md
+scripts/lchar/magnitude_distribution.py,scratch_unclear,commit,LCHAR atlas + Arc 2 v1.1/v1.2 analysis source — feeds LCHAR_TOPN_REGISTRY.md
+scripts/lchar/run_l4_characterisation.py,scratch_unclear,commit,LCHAR atlas + Arc 2 v1.1/v1.2 analysis source — feeds LCHAR_TOPN_REGISTRY.md
+scripts/lchar/run_layer1.py,scratch_unclear,commit,LCHAR atlas + Arc 2 v1.1/v1.2 analysis source — feeds LCHAR_TOPN_REGISTRY.md
+scripts/lchar/run_layer2.py,scratch_unclear,commit,LCHAR atlas + Arc 2 v1.1/v1.2 analysis source — feeds LCHAR_TOPN_REGISTRY.md
+scripts/lchar/run_layer3.py,scratch_unclear,commit,LCHAR atlas + Arc 2 v1.1/v1.2 analysis source — feeds LCHAR_TOPN_REGISTRY.md
+scripts/lchar/run_layer4.py,scratch_unclear,commit,LCHAR atlas + Arc 2 v1.1/v1.2 analysis source — feeds LCHAR_TOPN_REGISTRY.md
+scripts/lchar/run_layer5_selection.py,scratch_unclear,commit,LCHAR atlas + Arc 2 v1.1/v1.2 analysis source — feeds LCHAR_TOPN_REGISTRY.md
+scripts/normalize_w1_data.py,scratch_unclear,commit,W1 data normalisation utility
+tests/fixtures/wfo_v2_synthetic_harness.yaml,scratch_unclear,commit,WFO v2 synthetic test fixtures
+tests/fixtures/wfo_v2_synthetic_harness_base.yaml,scratch_unclear,commit,WFO v2 synthetic test fixtures
+tests/fixtures/wfo_v2_synthetic_harness_driver.py,scratch_unclear,commit,WFO v2 synthetic test fixtures
+tests/fixtures/wfo_v2_synthetic_harness_generate.py,scratch_unclear,commit,WFO v2 synthetic test fixtures
+tests/test_concurrent_filter_no_lookahead.py,scratch_unclear,commit,Lookahead-invariant test for concurrent_signals filter (Arc 1 CH-001 hardening)
+tests/test_data_audit.py,scratch_unclear,commit,Data audit test (pairs with configs/data_audit.yaml)
+tests/test_spread_floors_lock.py,scratch_unclear,commit,Spread-floors lock test (pairs with configs/spread_floors_5ers.yaml — already on main)

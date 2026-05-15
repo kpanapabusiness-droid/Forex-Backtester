@@ -1,6 +1,7 @@
 """
 Phase D-6F.1: Tests for clean geometry analysis.
 """
+
 from __future__ import annotations
 
 import pandas as pd
@@ -18,24 +19,34 @@ from analytics.phaseD6F1_clean_geometry import (
 
 def _make_synthetic_df() -> pd.DataFrame:
     """Synthetic clean labels with known geometry."""
-    return pd.DataFrame({
-        "pair": ["PAIR_A"] * 6 + ["PAIR_B"] * 4,
-        "date": pd.to_datetime([
-            "2020-01-01", "2020-06-01", "2020-12-31",
-            "2021-01-01", "2021-06-01", "2021-12-31",
-            "2022-06-01", "2022-12-31",
-            "2023-01-01", "2023-06-01",
-        ]),
-        "valid_atr": [True] * 10,
-        "valid_ref": [True] * 10,
-        "valid_h40": [True] * 10,
-        "clean_mfe_long_x1_h40": [0.5, 1.2, 2.0, 3.0, 4.0, 7.0, 1.0, 2.5, 5.0, 0.3],
-        "clean_mfe_long_x2_h40": [0.3, 0.8, 1.5, 2.0, 3.0, 6.0, 0.5, 1.0, 4.0, 0.0],
-        "clean_mfe_long_x3_h40": [0.0, 0.5, 1.0, 1.2, 2.0, 5.0, 0.0, 0.5, 3.0, 0.0],
-        "clean_mfe_short_x1_h40": [1.0, 0.5, 2.5, 0.8, 1.5, 2.0, 0.7, 1.2, 0.4, 0.6],
-        "clean_mfe_short_x2_h40": [0.5, 0.0, 1.5, 0.3, 0.8, 1.0, 0.2, 0.6, 0.0, 0.0],
-        "clean_mfe_short_x3_h40": [0.0, 0.0, 0.8, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0],
-    })
+    return pd.DataFrame(
+        {
+            "pair": ["PAIR_A"] * 6 + ["PAIR_B"] * 4,
+            "date": pd.to_datetime(
+                [
+                    "2020-01-01",
+                    "2020-06-01",
+                    "2020-12-31",
+                    "2021-01-01",
+                    "2021-06-01",
+                    "2021-12-31",
+                    "2022-06-01",
+                    "2022-12-31",
+                    "2023-01-01",
+                    "2023-06-01",
+                ]
+            ),
+            "valid_atr": [True] * 10,
+            "valid_ref": [True] * 10,
+            "valid_h40": [True] * 10,
+            "clean_mfe_long_x1_h40": [0.5, 1.2, 2.0, 3.0, 4.0, 7.0, 1.0, 2.5, 5.0, 0.3],
+            "clean_mfe_long_x2_h40": [0.3, 0.8, 1.5, 2.0, 3.0, 6.0, 0.5, 1.0, 4.0, 0.0],
+            "clean_mfe_long_x3_h40": [0.0, 0.5, 1.0, 1.2, 2.0, 5.0, 0.0, 0.5, 3.0, 0.0],
+            "clean_mfe_short_x1_h40": [1.0, 0.5, 2.5, 0.8, 1.5, 2.0, 0.7, 1.2, 0.4, 0.6],
+            "clean_mfe_short_x2_h40": [0.5, 0.0, 1.5, 0.3, 0.8, 1.0, 0.2, 0.6, 0.0, 0.0],
+            "clean_mfe_short_x3_h40": [0.0, 0.0, 0.8, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0],
+        }
+    )
 
 
 def test_probability_table_correctness() -> None:
@@ -124,5 +135,18 @@ def test_per_pair_quantiles_columns() -> None:
     """Per-pair quantiles has expected stat columns."""
     df = _make_synthetic_df()
     q = compute_per_pair_quantiles(df)
-    expected = {"pair", "direction", "x", "n", "mean", "std", "p50", "p75", "p90", "p95", "p99", "max"}
+    expected = {
+        "pair",
+        "direction",
+        "x",
+        "n",
+        "mean",
+        "std",
+        "p50",
+        "p75",
+        "p90",
+        "p95",
+        "p99",
+        "max",
+    }
     assert expected.issubset(set(q.columns))

@@ -46,9 +46,9 @@ def test_wfo_aggregation_outputs_and_content(tmp_path: Path):
 
     df = pd.read_csv(summary_csv)
     assert len(df) == 3
-    assert set(["fold_id", "train_start", "test_start", "roi_pct", "max_dd_pct", "total_trades"]).issubset(
-        df.columns
-    )
+    assert set(
+        ["fold_id", "train_start", "test_start", "roi_pct", "max_dd_pct", "total_trades"]
+    ).issubset(df.columns)
 
     agg = json.loads(aggregate_json.read_text(encoding="utf-8"))
     assert "worst_case_fold" in agg
@@ -80,4 +80,3 @@ def test_wfo_aggregate_max_dd_is_worst_fold(tmp_path: Path):
 
     agg = json.loads((run_dir / "wfo_aggregate.json").read_text(encoding="utf-8"))
     assert agg["aggregate_max_dd_pct"] == -12.0
-

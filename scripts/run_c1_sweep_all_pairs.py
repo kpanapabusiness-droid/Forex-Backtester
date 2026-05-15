@@ -220,7 +220,9 @@ def main():
 
     # Generate all (pair, C1) combinations
     combos = list(itertools.product(pairs, c1_indicators))
-    print(f"\n📊 Total runs: {len(combos)} ({len(pairs)} pairs × {len(c1_indicators)} C1 indicators)")
+    print(
+        f"\n📊 Total runs: {len(combos)} ({len(pairs)} pairs × {len(c1_indicators)} C1 indicators)"
+    )
 
     # Determine workers
     if args.workers:
@@ -269,4 +271,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

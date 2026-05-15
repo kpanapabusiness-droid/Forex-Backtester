@@ -114,4 +114,3 @@ def test_cli_results_dir_overrides_yaml(tmp_path: Path) -> None:
 
     trades_yaml = yaml_out / "trades.csv"
     assert not trades_yaml.exists(), "YAML outputs.dir must be ignored when CLI results_dir is set"
-

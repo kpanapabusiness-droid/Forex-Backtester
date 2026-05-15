@@ -1,0 +1,93 @@
+# L5 — Layer 5 Top-N Selection configuration
+#
+# Locked at L0 (docs/L0_METHODOLOGY_LOCK.md §4 ranking + tie-break, §5 N=5
+# threshold semantics). L5 does no new statistical work — it reads the L4
+# atlas CSV and emits the mechanical top-N registry.
+
+arc: L
+phase: L5
+description: "Layer 5 — atlas synthesis and top-N candidate registry. Mechanical selection only."
+
+# ----------------------------------------------------------------------
+# Inputs (read-only — L4's CSV is the only data source)
+# ----------------------------------------------------------------------
+input:
+  l4_csv: "results/lchar/atlas/layer4_conditional.csv"
+
+# ----------------------------------------------------------------------
+# Selection (L0-locked)
+# ----------------------------------------------------------------------
+selection:
+  # Sort by descending DSR; tie-break by descending Sharpe; further by
+  # descending n_obs_pooled. Stable sort (mergesort).
+  sort_columns: ["dsr", "sharpe", "n_obs_pooled"]
+  sort_ascending: [false, false, false]
+  sort_kind: "mergesort"
+
+  # Top-N (L0 §5: N = 5)
+  n_top: 5
+
+  # Threshold for L6+ proceed-flag (L0 §5: DSR strictly greater than 0.95).
+  threshold: 0.95
+  threshold_strict_gt: true
+
+# ----------------------------------------------------------------------
+# Output
+# ----------------------------------------------------------------------
+output:
+  registry_md: "LCHAR_TOPN_REGISTRY.md"
+  registry_data_json: "results/lchar/_l5_registry_data.json"
+
+# ----------------------------------------------------------------------
+# Human-readable condition descriptions (used by registry generator)
+# ----------------------------------------------------------------------
+condition_descriptions:
+  # univariate_extreme bases
+  bar_range_top_decile: "Bar range (high − low) in top decile of trailing 100 bars (per pair × signal_TF)"
+  dist_kijun_top_decile_mag: "|close − Kijun(26)| / ATR(14) in top decile of trailing 100 bars"
+  dist_sma_top_decile_mag: "|close − SMA(20)| / ATR(14) in top decile of trailing 100 bars"
+  abs_return_top_decile: "|log return| in top decile of trailing 100 bars"
+  # volatility_regime bases
+  d1_atr_top_decile: "D1 ATR(14) in top decile of trailing 100 D1 bars (lower-TF signals use L2 most-recently-completed lookback)"
+  d1_atr_bottom_decile: "D1 ATR(14) in bottom decile of trailing 100 D1 bars (lower-TF signals use L2 most-recently-completed lookback)"
+  # mtf_alignment states (signal_TF = 1H)
+  "3_up": "All three timeframes (1H, 4H_mr, D1_mr) trending up under the trend definition"
+  "3_down": "All three timeframes trending down under the trend definition"
+  "2_up_mixed": "Extremes (1H and D1_mr) both up, 4H_mr down — mixed-up state"
+  "2_down_mixed": "Extremes both down, 4H_mr up — mixed-down state"
+  opposed: "1H and D1_mr have opposite non-zero signs (extremes disagree, both non-zero)"
+  # cross_pair bases
+  risk_basket_corr_top_decile_mag: "Rolling 60-bar |risk-on / risk-off basket correlation| in top decile of trailing 100 bars"
+  risk_basket_corr_bottom_decile_mag: "Rolling 60-bar |risk-on / risk-off basket correlation| in bottom decile of trailing 100 bars"
+  matrix_frobenius_shift_top_decile: "Universe rolling-correlation-matrix Frobenius shift ‖C_t − C_{t−1}‖_F in top decile of trailing 100 bars"
+  usd_strength_extreme: "USD daily strength rank ∈ {1, 8} (USD-containing pairs only; lower-TF lookback to most-recently-completed D1)"
+  # dow bases
+  dow_top_mean_abs_return_day: "Weekday(t) equals the per-pair top-mean-|return| weekday (full-sample retrospective, see L4 caveat 2)"
+  dow_bottom_mean_abs_return_day: "Weekday(t) equals the per-pair bottom-mean-|return| weekday (full-sample retrospective)"
+  # run_length bases
+  up_run_5plus: "Current up-run length ≥ 5 (consecutive bars with positive log return)"
+  down_run_5plus: "Current down-run length ≥ 5 (consecutive bars with negative log return)"
+
+direction_descriptions:
+  pos: "signal bar close > open"
+  neg: "signal bar close < open"
+  kijun: "Kijun-sign trend definition"
+  sma: "SMA-sign trend definition"
+  any: "no direction sub-filter"
+
+# ----------------------------------------------------------------------
+# Horizon natural-time labels (for registry readability)
+# ----------------------------------------------------------------------
+horizon_labels:
+  "1H":
+    1: "1 bar = 1 hour"
+    24: "24 bars = 1 day"
+    120: "120 bars = 5 trading days = ~1 week"
+  "4H":
+    1: "1 bar = 4 hours"
+    6: "6 bars = 1 day"
+    30: "30 bars = 5 trading days = ~1 week"
+  "D1":
+    1: "1 bar = 1 day"
+    5: "5 bars = 1 week"
+    20: "20 bars = ~1 trading month"

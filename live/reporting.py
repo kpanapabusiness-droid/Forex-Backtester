@@ -172,13 +172,24 @@ def write_daily_positions_csv(
 def trade_history_columns() -> list[str]:
     """Column list for trade_history.csv ledger."""
     return [
-        "signal_id", "run_id", "date_time_decision", "symbol", "direction",
-        "sl_price", "tp1_price",
-        "tp1_ticket", "runner_ticket",
-        "entry_price_tp1", "entry_price_runner",
-        "entry_time", "exit_time_tp1", "exit_time_runner",
-        "exit_price_tp1", "exit_price_runner",
-        "status", "reason",
+        "signal_id",
+        "run_id",
+        "date_time_decision",
+        "symbol",
+        "direction",
+        "sl_price",
+        "tp1_price",
+        "tp1_ticket",
+        "runner_ticket",
+        "entry_price_tp1",
+        "entry_price_runner",
+        "entry_time",
+        "exit_time_tp1",
+        "exit_time_runner",
+        "exit_price_tp1",
+        "exit_price_runner",
+        "status",
+        "reason",
     ]
 
 

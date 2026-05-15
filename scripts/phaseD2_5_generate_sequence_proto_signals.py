@@ -110,11 +110,13 @@ def _build_spine(df: pd.DataFrame) -> pd.DataFrame:
     rows = []
     for _, row in df.iterrows():
         for direction in DIRECTIONS:
-            rows.append({
-                "pair": row["pair"],
-                "date": row["date"],
-                "direction": direction,
-            })
+            rows.append(
+                {
+                    "pair": row["pair"],
+                    "date": row["date"],
+                    "direction": direction,
+                }
+            )
     return pd.DataFrame(rows)
 
 
@@ -158,9 +160,7 @@ def _run_from_config(config_path: Path) -> None:
         df, comp_feature, n_bins=n_bins, min_per_bin=min_per_bin
     )
     if edges is None:
-        raise ValueError(
-            f"Insufficient discovery data for {comp_feature} bin edges."
-        )
+        raise ValueError(f"Insufficient discovery data for {comp_feature} bin edges.")
 
     bin_series = apply_bin_edges(df[comp_feature], edges)
     is_compression = (bin_series == comp_bin).fillna(False)
@@ -247,9 +247,9 @@ def _run_from_config(config_path: Path) -> None:
     combined["direction"] = pd.Categorical(
         combined["direction"], categories=list(DIRECTIONS), ordered=True
     )
-    combined = combined.sort_values(
-        ["signal_name", "pair", "date", "direction"]
-    ).reset_index(drop=True)
+    combined = combined.sort_values(["signal_name", "pair", "date", "direction"]).reset_index(
+        drop=True
+    )
 
     out_dir = Path(cfg["outputs_dir"])
     if not out_dir.is_absolute():
@@ -261,9 +261,7 @@ def _run_from_config(config_path: Path) -> None:
     combined.to_parquet(parquet_path, index=False)
     combined.to_csv(csv_path, index=False)
 
-    print(
-        f"Phase D2.5 sequence proto-signals completed. Outputs: {parquet_path}, {csv_path}"
-    )
+    print(f"Phase D2.5 sequence proto-signals completed. Outputs: {parquet_path}, {csv_path}")
 
 
 def _parse_args(argv: Iterable[str] | None = None) -> argparse.Namespace:

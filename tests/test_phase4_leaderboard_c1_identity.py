@@ -154,4 +154,3 @@ def test_phase4_leaderboard_insufficient_data_reject(tmp_path):
     assert row["c1_name"] == "sparse"
     assert row["status"] == "REJECT"
     assert row["reject_reason"] == "insufficient_data"
-

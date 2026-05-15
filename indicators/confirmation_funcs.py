@@ -38,7 +38,9 @@ def _ema_series(series: pd.Series, span: int) -> pd.Series:
 # ---------------------------------------------------------------------------
 
 
-def c1_coral(df: pd.DataFrame, period: int = 21, signal_col: str = "c1_signal", **kwargs) -> pd.DataFrame:
+def c1_coral(
+    df: pd.DataFrame, period: int = 21, signal_col: str = "c1_signal", **kwargs
+) -> pd.DataFrame:
     """
     Coral trend confirmation indicator.
 
@@ -686,12 +688,12 @@ def c1_compression_expansion_breakout(
     std_close = close.rolling(L_bb, min_periods=L_bb).std(ddof=0)
     bb_upper = sma_close + bb_k * std_close
     bb_lower = sma_close - bb_k * std_close
-    bb_width = (bb_upper - bb_lower) / np.clip(sma_close.replace(0, np.nan).ffill().bfill(), 1e-12, None)
+    bb_width = (bb_upper - bb_lower) / np.clip(
+        sma_close.replace(0, np.nan).ffill().bfill(), 1e-12, None
+    )
     bw_pct = _rolling_percentile_rank(bb_width, L_p)
 
-    compressed = (
-        (atr_pct <= q_atr) & (rng_pct <= q_rng) & (bw_pct <= q_bw)
-    ).fillna(False)
+    compressed = ((atr_pct <= q_atr) & (rng_pct <= q_rng) & (bw_pct <= q_bw)).fillna(False)
 
     comp_count = compressed.rolling(M, min_periods=M).sum()
     in_compression = comp_count >= N_c
@@ -706,17 +708,9 @@ def c1_compression_expansion_breakout(
     close_loc_long = (close - low) / denom
     close_loc_short = (high - close) / denom
 
-    long_trigger = (
-        in_compression
-        & ignition_base
-        & (close_loc_long >= gamma)
-        & (close > prior_hhv)
-    )
+    long_trigger = in_compression & ignition_base & (close_loc_long >= gamma) & (close > prior_hhv)
     short_trigger = (
-        in_compression
-        & ignition_base
-        & (close_loc_short >= gamma)
-        & (close < prior_llv)
+        in_compression & ignition_base & (close_loc_short >= gamma) & (close < prior_llv)
     )
 
     out = pd.Series(0, index=df.index, dtype=np.int8)
@@ -760,9 +754,7 @@ def c1_volatility_regime_impulse(
     log_ret = np.log(close / safe_prev)
 
     r_sq = log_ret**2
-    rv = np.sqrt(
-        r_sq.rolling(L_rv, min_periods=L_rv).mean().replace(0, np.nan).ffill().bfill()
-    )
+    rv = np.sqrt(r_sq.rolling(L_rv, min_periods=L_rv).mean().replace(0, np.nan).ffill().bfill())
     rv_slow = rv.rolling(L_slow, min_periods=L_slow).mean()
     rv_ratio = rv / np.clip(rv_slow.replace(0, np.nan).ffill().bfill(), 1e-12, None)
 
@@ -1225,4 +1217,3 @@ def supertrend(
         signal_col=signal_col,
         **kwargs,
     )
-

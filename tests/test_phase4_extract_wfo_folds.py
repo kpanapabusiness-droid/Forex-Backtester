@@ -6,7 +6,9 @@ import pandas as pd
 from analytics.phase4_extract_wfo_folds import extract_wfo_v2_folds
 
 
-def _write_summary(path: Path, *, roi_pct: float, max_dd_pct: float, trades: int, scratches: int) -> None:
+def _write_summary(
+    path: Path, *, roi_pct: float, max_dd_pct: float, trades: int, scratches: int
+) -> None:
     text = "\n".join(
         [
             f"Total Trades: {trades}",
@@ -89,4 +91,3 @@ def test_phase4_extract_wfo_folds_creates_normalized_csv(tmp_path):
         assert row["max_dd_pct"] == max_dd_pct
         assert row["trades"] == trades
         assert row["scratches"] == scratches
-

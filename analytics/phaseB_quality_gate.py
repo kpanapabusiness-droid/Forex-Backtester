@@ -42,8 +42,12 @@ def _collect_c1_metrics(root: Path) -> List[Dict[str, Any]]:
         if resp_path.exists():
             df = pd.read_csv(resp_path)
             if not df.empty:
-                metrics["total_trades_max"] = int(df["total_trades"].max()) if "total_trades" in df.columns else 0
-                metrics["scratch_rate_max"] = float(df["scratch_rate"].max()) if "scratch_rate" in df.columns else 0.0
+                metrics["total_trades_max"] = (
+                    int(df["total_trades"].max()) if "total_trades" in df.columns else 0
+                )
+                metrics["scratch_rate_max"] = (
+                    float(df["scratch_rate"].max()) if "scratch_rate" in df.columns else 0.0
+                )
         if scratch_path.exists():
             df = pd.read_csv(scratch_path)
             if not df.empty and "scratches" in df.columns:
@@ -76,8 +80,12 @@ def _collect_volume_metrics(root: Path) -> List[Dict[str, Any]]:
         if on_off_path.exists():
             df = pd.read_csv(on_off_path)
             if not df.empty:
-                metrics["trades_on_max"] = int(df["trades_on"].max()) if "trades_on" in df.columns else 0
-                metrics["trades_off_max"] = int(df["trades_off"].max()) if "trades_off" in df.columns else 0
+                metrics["trades_on_max"] = (
+                    int(df["trades_on"].max()) if "trades_on" in df.columns else 0
+                )
+                metrics["trades_off_max"] = (
+                    int(df["trades_off"].max()) if "trades_off" in df.columns else 0
+                )
         out.append(metrics)
     return out
 
@@ -97,8 +105,12 @@ def _collect_overfit_metrics(root: Path) -> Dict[str, Dict[str, Any]]:
         if df.empty:
             continue
         by_indicator[name_dir.name] = {
-            "check_trades_mean": float(df["check_trades"].mean()) if "check_trades" in df.columns else 0,
-            "check_roi_mean": float(df["check_roi_pct"].mean()) if "check_roi_pct" in df.columns else 0,
+            "check_trades_mean": float(df["check_trades"].mean())
+            if "check_trades" in df.columns
+            else 0,
+            "check_roi_mean": float(df["check_roi_pct"].mean())
+            if "check_roi_pct" in df.columns
+            else 0,
             "fold_count": len(df),
         }
     return by_indicator
@@ -143,25 +155,29 @@ def run_quality_gate(input_root: Path, output_root: Path) -> pd.DataFrame:
         key_metrics = {k: v for k, v in m.items() if k not in ("indicator_role", "indicator_name")}
         key_metrics.update(overfit.get(name, {}))
         decision, reasons, eligible = _decide([], key_metrics, "C1")
-        rows.append({
-            "indicator_role": "C1",
-            "indicator_name": name,
-            "decision": decision,
-            "reasons": "|".join(sorted(reasons)),
-            "key_metrics_json": json.dumps(key_metrics, sort_keys=True),
-            "eligible_for_phaseC": eligible,
-        })
+        rows.append(
+            {
+                "indicator_role": "C1",
+                "indicator_name": name,
+                "decision": decision,
+                "reasons": "|".join(sorted(reasons)),
+                "key_metrics_json": json.dumps(key_metrics, sort_keys=True),
+                "eligible_for_phaseC": eligible,
+            }
+        )
     for m in vol_metrics:
         key_metrics = {k: v for k, v in m.items() if k not in ("indicator_role", "indicator_name")}
         decision, reasons, eligible = _decide([], key_metrics, "volume")
-        rows.append({
-            "indicator_role": "volume",
-            "indicator_name": m["indicator_name"],
-            "decision": decision,
-            "reasons": "|".join(sorted(reasons)),
-            "key_metrics_json": json.dumps(key_metrics, sort_keys=True),
-            "eligible_for_phaseC": eligible,
-        })
+        rows.append(
+            {
+                "indicator_role": "volume",
+                "indicator_name": m["indicator_name"],
+                "decision": decision,
+                "reasons": "|".join(sorted(reasons)),
+                "key_metrics_json": json.dumps(key_metrics, sort_keys=True),
+                "eligible_for_phaseC": eligible,
+            }
+        )
     df = pd.DataFrame(rows)
     df = df.sort_values(by=["indicator_role", "indicator_name"], kind="mergesort")
     gate_path = output_root / "quality_gate.csv"

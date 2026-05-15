@@ -11,6 +11,7 @@ Pattern mirrors `scripts/l_arc_2/step3/_data.build_t_matrix`:
 - Held-bar context @ t (z-scored).
 - Fill NaN with median, then 0 for any remaining.
 """
+
 from __future__ import annotations
 
 import numpy as np
@@ -21,37 +22,58 @@ from . import _common as C
 from . import _data as D
 
 SIGNAL_TIME_NUMERIC = (
-    "signal_bar_open", "signal_bar_close", "signal_bar_high", "signal_bar_low",
-    "signal_bar_log_return", "signal_bar_abs_log_return",
-    "signal_bar_volume", "signal_bar_volume_nan",
-    "atr_at_signal_1h", "atr_baseline_1h_200", "atr_ratio_to_baseline",
-    "cum_logret_1h_3", "cum_logret_1h_6",
-    "cum_logret_1h_24", "cum_logret_1h_72", "cum_logret_1h_168",
+    "signal_bar_open",
+    "signal_bar_close",
+    "signal_bar_high",
+    "signal_bar_low",
+    "signal_bar_log_return",
+    "signal_bar_abs_log_return",
+    "signal_bar_volume",
+    "signal_bar_volume_nan",
+    "atr_at_signal_1h",
+    "atr_baseline_1h_200",
+    "atr_ratio_to_baseline",
+    "cum_logret_1h_3",
+    "cum_logret_1h_6",
+    "cum_logret_1h_24",
+    "cum_logret_1h_72",
+    "cum_logret_1h_168",
     "vol_realized_1h_24h",
-    "dist_close_to_high30_atr", "dist_close_to_low30_atr",
-    "hour_utc", "day_of_week",
-    "hour_in_4h_bar", "bars_to_next_4h_close",
-    "hour_in_d1_bar", "bars_to_next_d1_close",
-    "concurrent_signals_same_bar", "concurrent_signals_within_3h",
-    "currency_basket_3h_USD", "currency_basket_3h_EUR",
-    "currency_basket_3h_JPY", "currency_basket_3h_GBP",
-    "trade_overlap_at_execution_time", "sequential_same_pair_density_24h",
+    "dist_close_to_high30_atr",
+    "dist_close_to_low30_atr",
+    "hour_utc",
+    "day_of_week",
+    "hour_in_4h_bar",
+    "bars_to_next_4h_close",
+    "hour_in_d1_bar",
+    "bars_to_next_d1_close",
+    "concurrent_signals_same_bar",
+    "concurrent_signals_within_3h",
+    "currency_basket_3h_USD",
+    "currency_basket_3h_EUR",
+    "currency_basket_3h_JPY",
+    "currency_basket_3h_GBP",
+    "trade_overlap_at_execution_time",
+    "sequential_same_pair_density_24h",
     "trigger_magnitude_decile",
     "vol_realized_1h_24h_decile",
 )
 
 SIGNAL_TIME_CATEGORICAL = (
-    "pair", "session", "vol_regime", "pre_momentum_bin",
-    "cum_logret_1h_6_bin", "cum_logret_1h_24_bin", "cum_logret_1h_168_bin",
+    "pair",
+    "session",
+    "vol_regime",
+    "pre_momentum_bin",
+    "cum_logret_1h_6_bin",
+    "cum_logret_1h_24_bin",
+    "cum_logret_1h_168_bin",
 )
 
 
 def _onehot(series: pd.Series, prefix: str) -> pd.DataFrame:
     s = series.fillna("__nan__").astype(str)
     levels = sorted(s.unique().tolist())
-    return pd.DataFrame(
-        {f"{prefix}__{lev}": (s == lev).astype(np.int8) for lev in levels}
-    )
+    return pd.DataFrame({f"{prefix}__{lev}": (s == lev).astype(np.int8) for lev in levels})
 
 
 def _zscore_block(num: pd.DataFrame) -> pd.DataFrame:
@@ -148,13 +170,22 @@ def fit_predict_cluster(signals_df: pd.DataFrame, t: int) -> pd.DataFrame:
 
     if len(X_fit) == 0 or len(np.unique(y_fit)) < 2:
         # No training data — return empty predictions
-        return pd.DataFrame(columns=[
-            "trade_id", "fold", "true_cluster", "p_cluster_1",
-            "predicted_cluster", "bars_already_held_at_t", "already_exited_before_t",
-        ])
+        return pd.DataFrame(
+            columns=[
+                "trade_id",
+                "fold",
+                "true_cluster",
+                "p_cluster_1",
+                "predicted_cluster",
+                "bars_already_held_at_t",
+                "already_exited_before_t",
+            ]
+        )
 
     clf = HistGradientBoostingClassifier(
-        max_iter=200, max_depth=3, learning_rate=0.05,
+        max_iter=200,
+        max_depth=3,
+        learning_rate=0.05,
         random_state=C.HGB_RANDOM_STATE,
     )
     clf.fit(X_fit, y_fit)
@@ -162,10 +193,17 @@ def fit_predict_cluster(signals_df: pd.DataFrame, t: int) -> pd.DataFrame:
     # Predict on F6/F7 active-valid trades
     X_pred = X_full[pred_mask]
     if len(X_pred) == 0:
-        return pd.DataFrame(columns=[
-            "trade_id", "fold", "true_cluster", "p_cluster_1",
-            "predicted_cluster", "bars_already_held_at_t", "already_exited_before_t",
-        ])
+        return pd.DataFrame(
+            columns=[
+                "trade_id",
+                "fold",
+                "true_cluster",
+                "p_cluster_1",
+                "predicted_cluster",
+                "bars_already_held_at_t",
+                "already_exited_before_t",
+            ]
+        )
 
     proba = clf.predict_proba(X_pred)
     # Make sure class 1 column index is found robustly
@@ -178,15 +216,17 @@ def fit_predict_cluster(signals_df: pd.DataFrame, t: int) -> pd.DataFrame:
 
     pred_cluster = (p1 >= 0.5).astype(int)
 
-    out = pd.DataFrame({
-        "trade_id": df.loc[pred_mask, "trade_id"].values,
-        "fold": fold[pred_mask],
-        "true_cluster": cluster[pred_mask].astype(int),
-        "p_cluster_1": p1,
-        "predicted_cluster": pred_cluster,
-        "bars_already_held_at_t": np.full(int(pred_mask.sum()), t, dtype=int),
-        "already_exited_before_t": (bars_held[pred_mask] < t).astype(int),
-    })
+    out = pd.DataFrame(
+        {
+            "trade_id": df.loc[pred_mask, "trade_id"].values,
+            "fold": fold[pred_mask],
+            "true_cluster": cluster[pred_mask].astype(int),
+            "p_cluster_1": p1,
+            "predicted_cluster": pred_cluster,
+            "bars_already_held_at_t": np.full(int(pred_mask.sum()), t, dtype=int),
+            "already_exited_before_t": (bars_held[pred_mask] < t).astype(int),
+        }
+    )
     return out.sort_values("trade_id").reset_index(drop=True)
 
 
@@ -224,7 +264,9 @@ def fit_predict_cluster_all_folds(signals_df: pd.DataFrame, t: int) -> pd.DataFr
         if len(np.unique(y_train)) < 2:
             continue
         clf = HistGradientBoostingClassifier(
-            max_iter=200, max_depth=3, learning_rate=0.05,
+            max_iter=200,
+            max_depth=3,
+            learning_rate=0.05,
             random_state=C.HGB_RANDOM_STATE,
         )
         clf.fit(X_full[train_mask], y_train)
@@ -236,15 +278,17 @@ def fit_predict_cluster_all_folds(signals_df: pd.DataFrame, t: int) -> pd.DataFr
         else:
             p1 = np.zeros(int(test_mask.sum()))
         pred = (p1 >= 0.5).astype(int)
-        sub = pd.DataFrame({
-            "trade_id": df.loc[test_mask, "trade_id"].values,
-            "fold": fold[test_mask],
-            "true_cluster": cluster[test_mask].astype(int),
-            "p_cluster_1": p1,
-            "predicted_cluster": pred,
-            "bars_already_held_at_t": np.full(int(test_mask.sum()), t, dtype=int),
-            "already_exited_before_t": (bars_held[test_mask] < t).astype(int),
-        })
+        sub = pd.DataFrame(
+            {
+                "trade_id": df.loc[test_mask, "trade_id"].values,
+                "fold": fold[test_mask],
+                "true_cluster": cluster[test_mask].astype(int),
+                "p_cluster_1": p1,
+                "predicted_cluster": pred,
+                "bars_already_held_at_t": np.full(int(test_mask.sum()), t, dtype=int),
+                "already_exited_before_t": (bars_held[test_mask] < t).astype(int),
+            }
+        )
         rows.append(sub)
 
     # ---- F6/F7 from F1..F5-fit model ----
@@ -254,7 +298,9 @@ def fit_predict_cluster_all_folds(signals_df: pd.DataFrame, t: int) -> pd.DataFr
         y_fit = cluster[fit_all_mask].astype(int)
         if len(np.unique(y_fit)) >= 2:
             clf = HistGradientBoostingClassifier(
-                max_iter=200, max_depth=3, learning_rate=0.05,
+                max_iter=200,
+                max_depth=3,
+                learning_rate=0.05,
                 random_state=C.HGB_RANDOM_STATE,
             )
             clf.fit(X_full[fit_all_mask], y_fit)
@@ -266,22 +312,31 @@ def fit_predict_cluster_all_folds(signals_df: pd.DataFrame, t: int) -> pd.DataFr
             else:
                 p1 = np.zeros(int(val_mask.sum()))
             pred = (p1 >= 0.5).astype(int)
-            sub = pd.DataFrame({
-                "trade_id": df.loc[val_mask, "trade_id"].values,
-                "fold": fold[val_mask],
-                "true_cluster": cluster[val_mask].astype(int),
-                "p_cluster_1": p1,
-                "predicted_cluster": pred,
-                "bars_already_held_at_t": np.full(int(val_mask.sum()), t, dtype=int),
-                "already_exited_before_t": (bars_held[val_mask] < t).astype(int),
-            })
+            sub = pd.DataFrame(
+                {
+                    "trade_id": df.loc[val_mask, "trade_id"].values,
+                    "fold": fold[val_mask],
+                    "true_cluster": cluster[val_mask].astype(int),
+                    "p_cluster_1": p1,
+                    "predicted_cluster": pred,
+                    "bars_already_held_at_t": np.full(int(val_mask.sum()), t, dtype=int),
+                    "already_exited_before_t": (bars_held[val_mask] < t).astype(int),
+                }
+            )
             rows.append(sub)
 
     if not rows:
-        return pd.DataFrame(columns=[
-            "trade_id", "fold", "true_cluster", "p_cluster_1",
-            "predicted_cluster", "bars_already_held_at_t", "already_exited_before_t",
-        ])
+        return pd.DataFrame(
+            columns=[
+                "trade_id",
+                "fold",
+                "true_cluster",
+                "p_cluster_1",
+                "predicted_cluster",
+                "bars_already_held_at_t",
+                "already_exited_before_t",
+            ]
+        )
     return pd.concat(rows, axis=0, ignore_index=True).sort_values("trade_id").reset_index(drop=True)
 
 
@@ -343,7 +398,9 @@ def fit_predict_cluster_anchored_expanding(signals_df: pd.DataFrame, t: int) -> 
         if len(np.unique(y_train)) < 2:
             continue
         clf = HistGradientBoostingClassifier(
-            max_iter=200, max_depth=3, learning_rate=0.05,
+            max_iter=200,
+            max_depth=3,
+            learning_rate=0.05,
             random_state=C.HGB_RANDOM_STATE,
         )
         clf.fit(X_full[train_mask], y_train)
@@ -355,15 +412,17 @@ def fit_predict_cluster_anchored_expanding(signals_df: pd.DataFrame, t: int) -> 
         else:
             p1 = np.zeros(int(test_mask.sum()))
         pred = (p1 >= 0.5).astype(int)
-        sub = pd.DataFrame({
-            "trade_id": df.loc[test_mask, "trade_id"].values,
-            "fold": fold[test_mask],
-            "true_cluster": cluster[test_mask].astype(int),
-            "p_cluster_1": p1,
-            "predicted_cluster": pred,
-            "bars_already_held_at_t": np.full(int(test_mask.sum()), t, dtype=int),
-            "already_exited_before_t": (bars_held[test_mask] < t).astype(int),
-        })
+        sub = pd.DataFrame(
+            {
+                "trade_id": df.loc[test_mask, "trade_id"].values,
+                "fold": fold[test_mask],
+                "true_cluster": cluster[test_mask].astype(int),
+                "p_cluster_1": p1,
+                "predicted_cluster": pred,
+                "bars_already_held_at_t": np.full(int(test_mask.sum()), t, dtype=int),
+                "already_exited_before_t": (bars_held[test_mask] < t).astype(int),
+            }
+        )
         rows.append(sub)
 
     # ---- F6/F7 from pooled F1..F5 fit (mirrors fit_predict_cluster) ----
@@ -373,7 +432,9 @@ def fit_predict_cluster_anchored_expanding(signals_df: pd.DataFrame, t: int) -> 
         y_fit = cluster[fit_mask].astype(int)
         if len(np.unique(y_fit)) >= 2:
             clf = HistGradientBoostingClassifier(
-                max_iter=200, max_depth=3, learning_rate=0.05,
+                max_iter=200,
+                max_depth=3,
+                learning_rate=0.05,
                 random_state=C.HGB_RANDOM_STATE,
             )
             clf.fit(X_full[fit_mask], y_fit)
@@ -385,20 +446,29 @@ def fit_predict_cluster_anchored_expanding(signals_df: pd.DataFrame, t: int) -> 
             else:
                 p1 = np.zeros(int(pred_mask.sum()))
             pred = (p1 >= 0.5).astype(int)
-            sub = pd.DataFrame({
-                "trade_id": df.loc[pred_mask, "trade_id"].values,
-                "fold": fold[pred_mask],
-                "true_cluster": cluster[pred_mask].astype(int),
-                "p_cluster_1": p1,
-                "predicted_cluster": pred,
-                "bars_already_held_at_t": np.full(int(pred_mask.sum()), t, dtype=int),
-                "already_exited_before_t": (bars_held[pred_mask] < t).astype(int),
-            })
+            sub = pd.DataFrame(
+                {
+                    "trade_id": df.loc[pred_mask, "trade_id"].values,
+                    "fold": fold[pred_mask],
+                    "true_cluster": cluster[pred_mask].astype(int),
+                    "p_cluster_1": p1,
+                    "predicted_cluster": pred,
+                    "bars_already_held_at_t": np.full(int(pred_mask.sum()), t, dtype=int),
+                    "already_exited_before_t": (bars_held[pred_mask] < t).astype(int),
+                }
+            )
             rows.append(sub)
 
     if not rows:
-        return pd.DataFrame(columns=[
-            "trade_id", "fold", "true_cluster", "p_cluster_1",
-            "predicted_cluster", "bars_already_held_at_t", "already_exited_before_t",
-        ])
+        return pd.DataFrame(
+            columns=[
+                "trade_id",
+                "fold",
+                "true_cluster",
+                "p_cluster_1",
+                "predicted_cluster",
+                "bars_already_held_at_t",
+                "already_exited_before_t",
+            ]
+        )
     return pd.concat(rows, axis=0, ignore_index=True).sort_values("trade_id").reset_index(drop=True)

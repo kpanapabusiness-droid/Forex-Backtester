@@ -1,4 +1,5 @@
 """Phase 5 — Leaderboard schema, determinism, and rejection tagging."""
+
 from pathlib import Path
 
 import yaml
@@ -10,14 +11,18 @@ from analytics.phase5_leaderboard import (
 )
 
 
-def _write_summary(path: Path, roi_pct: float, max_dd_pct: float, trades: int, scratches: int) -> None:
+def _write_summary(
+    path: Path, roi_pct: float, max_dd_pct: float, trades: int, scratches: int
+) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    text = "\n".join([
-        f"Total Trades: {trades}",
-        f"Scratches: {scratches}",
-        f"ROI (%): {roi_pct}",
-        f"Max DD (%): {max_dd_pct}",
-    ])
+    text = "\n".join(
+        [
+            f"Total Trades: {trades}",
+            f"Scratches: {scratches}",
+            f"ROI (%): {roi_pct}",
+            f"Max DD (%): {max_dd_pct}",
+        ]
+    )
     path.write_text(text, encoding="utf-8")
 
 
@@ -75,12 +80,18 @@ def test_phase5_leaderboard_reject_zero_trades_in_fold(tmp_path):
     (run_dir / "fold_01" / "out_of_sample").mkdir(parents=True, exist_ok=True)
     _write_summary(
         run_dir / "fold_01" / "out_of_sample" / "summary.txt",
-        roi_pct=0.0, max_dd_pct=0.0, trades=10, scratches=0,
+        roi_pct=0.0,
+        max_dd_pct=0.0,
+        trades=10,
+        scratches=0,
     )
     (run_dir / "fold_02" / "out_of_sample").mkdir(parents=True, exist_ok=True)
     _write_summary(
         run_dir / "fold_02" / "out_of_sample" / "summary.txt",
-        roi_pct=0.0, max_dd_pct=0.0, trades=0, scratches=0,
+        roi_pct=0.0,
+        max_dd_pct=0.0,
+        trades=0,
+        scratches=0,
     )
     df = build_leaderboard(phase5)
     assert len(df) == 1
@@ -99,7 +110,9 @@ def test_phase5_leaderboard_reject_scratch_rate_above_ceiling(tmp_path):
         oos.mkdir(parents=True, exist_ok=True)
         trades = 20
         scratches = int(trades * (SCRATCH_RATE_MEAN_CEILING + 0.1))
-        _write_summary(oos / "summary.txt", roi_pct=1.0, max_dd_pct=-2.0, trades=trades, scratches=scratches)
+        _write_summary(
+            oos / "summary.txt", roi_pct=1.0, max_dd_pct=-2.0, trades=trades, scratches=scratches
+        )
     df = build_leaderboard(phase5)
     assert len(df) == 1
     row = df.iloc[0]

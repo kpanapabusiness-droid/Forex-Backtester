@@ -133,9 +133,13 @@ def test_different_risk_per_trade_changes_roi_same_trade_count(tmp_path):
 
     t_high = pd.read_csv(out_high / "trades.csv")
     t_low = pd.read_csv(out_low / "trades.csv")
-    assert len(t_high) == len(t_low), "Trade count must be unchanged when only risk_per_trade differs"
+    assert len(t_high) == len(t_low), (
+        "Trade count must be unchanged when only risk_per_trade differs"
+    )
     if len(t_high) == 0:
-        pytest.skip("No trades generated; cannot compare ROI across different risk_per_trade values.")
+        pytest.skip(
+            "No trades generated; cannot compare ROI across different risk_per_trade values."
+        )
 
     roi_high = t_high["pnl"].sum()
     roi_low = t_low["pnl"].sum()

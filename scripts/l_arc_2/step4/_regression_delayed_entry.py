@@ -15,6 +15,7 @@ Two entry points:
   verify Drift 2 fix (new function's F6/F7 branch is byte-identical to
   the old function's output).
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -103,8 +104,10 @@ def main_anchored_expanding_f6_f7() -> None:
     print("F2..F5 predictions (informational, not in this check):")
     print(f"  total active+valid rows scored: {len(f2_f5)}")
     print(f"  per-fold counts: {f2_f5['fold'].value_counts().sort_index().to_dict()}")
-    print(f"  predicted cluster 0 (mirror) per fold: "
-          f"{f2_f5[f2_f5['predicted_cluster']==0]['fold'].value_counts().sort_index().to_dict()}")
+    print(
+        f"  predicted cluster 0 (mirror) per fold: "
+        f"{f2_f5[f2_f5['predicted_cluster'] == 0]['fold'].value_counts().sort_index().to_dict()}"
+    )
 
 
 if __name__ == "__main__":

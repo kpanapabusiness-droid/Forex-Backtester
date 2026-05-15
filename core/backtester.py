@@ -638,7 +638,9 @@ def simulate_pair_trades(
 
     tp1_move_sl_to_be = exit_cfg.get(
         "tp1_move_sl_to_be",
-        exit_cfg.get("move_to_breakeven_after_tp1", exit_cfg.get("move_to_breakeven_after_atr", True)),
+        exit_cfg.get(
+            "move_to_breakeven_after_tp1", exit_cfg.get("move_to_breakeven_after_atr", True)
+        ),
     )
     tp1_move_sl_to_be = bool(tp1_move_sl_to_be)
 
@@ -1007,7 +1009,9 @@ def simulate_pair_trades(
                 continue
             r_next = rows.iloc[i + 1]
             next_open_px = float(r_next["open"])
-            date_next = pd.to_datetime(r_next["date"]) if "date" in r_next else pd.to_datetime(r_next.name)
+            date_next = (
+                pd.to_datetime(r_next["date"]) if "date" in r_next else pd.to_datetime(r_next.name)
+            )
 
             direction = "long" if entry_sig > 0 else "short"
             d_int = 1 if entry_sig > 0 else -1

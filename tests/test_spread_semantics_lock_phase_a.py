@@ -53,12 +53,39 @@ def _minimal_cfg(spread_enabled: bool = False, default_pips: float = 0.0, use_vo
 def test_spread_zero_invariant_no_cost_leakage():
     """With spread set to zero: trade count unchanged vs baseline, fills equal mid, no residual cost."""
     bars = [
-        {"date": "2020-01-01", "open": 1.10, "high": 1.10, "low": 1.10, "close": 1.10, "atr": 0.01,
-         "baseline_signal": 1, "c1_signal": 1, "exit_signal": 0},
-        {"date": "2020-01-02", "open": 1.10, "high": 1.12, "low": 1.09, "close": 1.11, "atr": 0.01,
-         "baseline_signal": 0, "c1_signal": -1, "exit_signal": -1},
-        {"date": "2020-01-03", "open": 1.02, "high": 1.03, "low": 1.01, "close": 1.02, "atr": 0.01,
-         "baseline_signal": 0, "c1_signal": 0, "exit_signal": 0},
+        {
+            "date": "2020-01-01",
+            "open": 1.10,
+            "high": 1.10,
+            "low": 1.10,
+            "close": 1.10,
+            "atr": 0.01,
+            "baseline_signal": 1,
+            "c1_signal": 1,
+            "exit_signal": 0,
+        },
+        {
+            "date": "2020-01-02",
+            "open": 1.10,
+            "high": 1.12,
+            "low": 1.09,
+            "close": 1.11,
+            "atr": 0.01,
+            "baseline_signal": 0,
+            "c1_signal": -1,
+            "exit_signal": -1,
+        },
+        {
+            "date": "2020-01-03",
+            "open": 1.02,
+            "high": 1.03,
+            "low": 1.01,
+            "close": 1.02,
+            "atr": 0.01,
+            "baseline_signal": 0,
+            "c1_signal": 0,
+            "exit_signal": 0,
+        },
     ]
     df = create_synthetic_ohlc(bars)
     base = _minimal_cfg(spread_enabled=False)
@@ -82,12 +109,39 @@ def test_spread_zero_invariant_no_cost_leakage():
 def test_spread_scaling_is_linear_entry_and_exit():
     """Same scenario with spread 1x vs 2x: same trade count; per-trade PnL more negative with 2x; delta ~ one extra round-trip."""
     bars = [
-        {"date": "2020-01-01", "open": 1.10, "high": 1.10, "low": 1.10, "close": 1.10, "atr": 0.01,
-         "baseline_signal": 1, "c1_signal": 1, "exit_signal": 0},
-        {"date": "2020-01-02", "open": 1.10, "high": 1.12, "low": 1.09, "close": 1.11, "atr": 0.01,
-         "baseline_signal": 0, "c1_signal": -1, "exit_signal": -1},
-        {"date": "2020-01-03", "open": 1.02, "high": 1.03, "low": 1.01, "close": 1.02, "atr": 0.01,
-         "baseline_signal": 0, "c1_signal": 0, "exit_signal": 0},
+        {
+            "date": "2020-01-01",
+            "open": 1.10,
+            "high": 1.10,
+            "low": 1.10,
+            "close": 1.10,
+            "atr": 0.01,
+            "baseline_signal": 1,
+            "c1_signal": 1,
+            "exit_signal": 0,
+        },
+        {
+            "date": "2020-01-02",
+            "open": 1.10,
+            "high": 1.12,
+            "low": 1.09,
+            "close": 1.11,
+            "atr": 0.01,
+            "baseline_signal": 0,
+            "c1_signal": -1,
+            "exit_signal": -1,
+        },
+        {
+            "date": "2020-01-03",
+            "open": 1.02,
+            "high": 1.03,
+            "low": 1.01,
+            "close": 1.02,
+            "atr": 0.01,
+            "baseline_signal": 0,
+            "c1_signal": 0,
+            "exit_signal": 0,
+        },
     ]
     df = create_synthetic_ohlc(bars)
     cfg_1x = _minimal_cfg(spread_enabled=True, default_pips=1.0)
@@ -106,18 +160,50 @@ def test_spread_scaling_is_linear_entry_and_exit():
     lots = float(r1["trades"][0]["lots_total"])
     extra_pips_2x_vs_1x = 1.0
     expected_delta = -extra_pips_2x_vs_1x * pip_val * lots
-    assert (pnl_2x - pnl_1x) == pytest.approx(expected_delta, abs=0.5), "delta ~ one extra pip cost (0.5 entry + 0.5 exit)"
+    assert (pnl_2x - pnl_1x) == pytest.approx(expected_delta, abs=0.5), (
+        "delta ~ one extra pip cost (0.5 entry + 0.5 exit)"
+    )
 
 
 def test_entry_fill_uses_execution_bar_spread_t_plus_one():
     """Entry at next bar open (t+1): entry_date = bar t+1, entry_price = open(t+1), spread_pips_used = spread(t+1)."""
     bars = [
-        {"date": "2020-01-01", "open": 1.10, "high": 1.10, "low": 1.10, "close": 1.10, "atr": 0.01,
-         "spread_pips": 2.0, "baseline_signal": 1, "c1_signal": 1, "exit_signal": 0},
-        {"date": "2020-01-02", "open": 1.105, "high": 1.12, "low": 1.09, "close": 1.11, "atr": 0.01,
-         "spread_pips": 8.0, "baseline_signal": 0, "c1_signal": -1, "exit_signal": -1},
-        {"date": "2020-01-03", "open": 1.02, "high": 1.03, "low": 1.01, "close": 1.02, "atr": 0.01,
-         "spread_pips": 1.0, "baseline_signal": 0, "c1_signal": 0, "exit_signal": 0},
+        {
+            "date": "2020-01-01",
+            "open": 1.10,
+            "high": 1.10,
+            "low": 1.10,
+            "close": 1.10,
+            "atr": 0.01,
+            "spread_pips": 2.0,
+            "baseline_signal": 1,
+            "c1_signal": 1,
+            "exit_signal": 0,
+        },
+        {
+            "date": "2020-01-02",
+            "open": 1.105,
+            "high": 1.12,
+            "low": 1.09,
+            "close": 1.11,
+            "atr": 0.01,
+            "spread_pips": 8.0,
+            "baseline_signal": 0,
+            "c1_signal": -1,
+            "exit_signal": -1,
+        },
+        {
+            "date": "2020-01-03",
+            "open": 1.02,
+            "high": 1.03,
+            "low": 1.01,
+            "close": 1.02,
+            "atr": 0.01,
+            "spread_pips": 1.0,
+            "baseline_signal": 0,
+            "c1_signal": 0,
+            "exit_signal": 0,
+        },
     ]
     df = create_synthetic_ohlc(bars)
     if "spread_pips" not in df.columns:
@@ -128,7 +214,9 @@ def test_entry_fill_uses_execution_bar_spread_t_plus_one():
     assert len(res["trades"]) >= 1
     t = res["trades"][0]
     bar_t_plus_one_date = pd.Timestamp("2020-01-02")
-    assert pd.Timestamp(t["entry_date"]) == bar_t_plus_one_date, "entry_time must be bar t+1 timestamp"
+    assert pd.Timestamp(t["entry_date"]) == bar_t_plus_one_date, (
+        "entry_time must be bar t+1 timestamp"
+    )
     assert float(t["entry_price"]) == pytest.approx(1.105, abs=1e-6), "entry fill = open(t+1)"
     assert float(t["spread_pips_used"]) == pytest.approx(8.0, abs=0.01), "entry uses spread(t+1)"
 
@@ -136,12 +224,42 @@ def test_entry_fill_uses_execution_bar_spread_t_plus_one():
 def test_next_open_system_exit_uses_execution_bar_spread_t_plus_one():
     """System exit at next open → exit fill uses spread from bar t+1 (execution bar of the exit)."""
     bars = [
-        {"date": "2020-01-01", "open": 1.10, "high": 1.10, "low": 1.10, "close": 1.10, "atr": 0.01,
-         "spread_pips": 1.0, "baseline_signal": 1, "c1_signal": 1, "exit_signal": 0},
-        {"date": "2020-01-02", "open": 1.10, "high": 1.12, "low": 1.09, "close": 1.11, "atr": 0.01,
-         "spread_pips": 2.0, "baseline_signal": 0, "c1_signal": -1, "exit_signal": -1},
-        {"date": "2020-01-03", "open": 1.02, "high": 1.03, "low": 1.01, "close": 1.02, "atr": 0.01,
-         "spread_pips": 6.0, "baseline_signal": 0, "c1_signal": 0, "exit_signal": 0},
+        {
+            "date": "2020-01-01",
+            "open": 1.10,
+            "high": 1.10,
+            "low": 1.10,
+            "close": 1.10,
+            "atr": 0.01,
+            "spread_pips": 1.0,
+            "baseline_signal": 1,
+            "c1_signal": 1,
+            "exit_signal": 0,
+        },
+        {
+            "date": "2020-01-02",
+            "open": 1.10,
+            "high": 1.12,
+            "low": 1.09,
+            "close": 1.11,
+            "atr": 0.01,
+            "spread_pips": 2.0,
+            "baseline_signal": 0,
+            "c1_signal": -1,
+            "exit_signal": -1,
+        },
+        {
+            "date": "2020-01-03",
+            "open": 1.02,
+            "high": 1.03,
+            "low": 1.01,
+            "close": 1.02,
+            "atr": 0.01,
+            "spread_pips": 6.0,
+            "baseline_signal": 0,
+            "c1_signal": 0,
+            "exit_signal": 0,
+        },
     ]
     df = create_synthetic_ohlc(bars)
     if "spread_pips" not in df.columns:
@@ -152,18 +270,50 @@ def test_next_open_system_exit_uses_execution_bar_spread_t_plus_one():
     assert len(res["trades"]) >= 1
     t = res["trades"][0]
     assert t["exit_reason"] in ("c1_reversal", "exit_indicator", "scratch")
-    assert float(t["spread_pips_exit"]) == pytest.approx(6.0, abs=0.01), "system exit uses next bar (t+1) spread"
+    assert float(t["spread_pips_exit"]) == pytest.approx(6.0, abs=0.01), (
+        "system exit uses next bar (t+1) spread"
+    )
 
 
 def test_intrabar_stop_exit_uses_current_bar_spread_t():
     """Intrabar SL triggers on bar t → exit fill uses spread from bar t."""
     bars = [
-        {"date": "2020-01-01", "open": 1.10, "high": 1.10, "low": 1.10, "close": 1.10, "atr": 0.01,
-         "spread_pips": 1.0, "baseline_signal": 1, "c1_signal": 1, "exit_signal": 0},
-        {"date": "2020-01-02", "open": 1.10, "high": 1.10, "low": 1.08, "close": 1.08, "atr": 0.01,
-         "spread_pips": 3.0, "baseline_signal": 0, "c1_signal": 0, "exit_signal": 0},
-        {"date": "2020-01-03", "open": 1.07, "high": 1.09, "low": 1.06, "close": 1.07, "atr": 0.01,
-         "spread_pips": 9.0, "baseline_signal": 0, "c1_signal": 0, "exit_signal": 0},
+        {
+            "date": "2020-01-01",
+            "open": 1.10,
+            "high": 1.10,
+            "low": 1.10,
+            "close": 1.10,
+            "atr": 0.01,
+            "spread_pips": 1.0,
+            "baseline_signal": 1,
+            "c1_signal": 1,
+            "exit_signal": 0,
+        },
+        {
+            "date": "2020-01-02",
+            "open": 1.10,
+            "high": 1.10,
+            "low": 1.08,
+            "close": 1.08,
+            "atr": 0.01,
+            "spread_pips": 3.0,
+            "baseline_signal": 0,
+            "c1_signal": 0,
+            "exit_signal": 0,
+        },
+        {
+            "date": "2020-01-03",
+            "open": 1.07,
+            "high": 1.09,
+            "low": 1.06,
+            "close": 1.07,
+            "atr": 0.01,
+            "spread_pips": 9.0,
+            "baseline_signal": 0,
+            "c1_signal": 0,
+            "exit_signal": 0,
+        },
     ]
     df = create_synthetic_ohlc(bars)
     if "spread_pips" not in df.columns:
@@ -174,16 +324,38 @@ def test_intrabar_stop_exit_uses_current_bar_spread_t():
     assert len(res["trades"]) >= 1
     t = res["trades"][0]
     assert (t.get("exit_reason") or "").lower() == "stoploss", "expect intrabar SL"
-    assert float(t["spread_pips_exit"]) == pytest.approx(3.0, abs=0.01), "intrabar exit uses bar t spread"
+    assert float(t["spread_pips_exit"]) == pytest.approx(3.0, abs=0.01), (
+        "intrabar exit uses bar t spread"
+    )
 
 
 def test_volume_vetoed_entries_create_no_trade_and_pay_no_spread():
     """Volume veto = always veto → no trade rows, no PnL, no spread charged."""
     bars = [
-        {"date": "2020-01-01", "open": 1.10, "high": 1.10, "low": 1.10, "close": 1.10, "atr": 0.01,
-         "baseline_signal": 1, "c1_signal": 1, "volume_signal": 0, "exit_signal": 0},
-        {"date": "2020-01-02", "open": 1.10, "high": 1.12, "low": 1.09, "close": 1.11, "atr": 0.01,
-         "baseline_signal": 0, "c1_signal": 0, "volume_signal": 0, "exit_signal": 0},
+        {
+            "date": "2020-01-01",
+            "open": 1.10,
+            "high": 1.10,
+            "low": 1.10,
+            "close": 1.10,
+            "atr": 0.01,
+            "baseline_signal": 1,
+            "c1_signal": 1,
+            "volume_signal": 0,
+            "exit_signal": 0,
+        },
+        {
+            "date": "2020-01-02",
+            "open": 1.10,
+            "high": 1.12,
+            "low": 1.09,
+            "close": 1.11,
+            "atr": 0.01,
+            "baseline_signal": 0,
+            "c1_signal": 0,
+            "volume_signal": 0,
+            "exit_signal": 0,
+        },
     ]
     df = create_synthetic_ohlc(bars)
     cfg = _minimal_cfg(spread_enabled=True, default_pips=2.0, use_volume=True)
@@ -198,12 +370,39 @@ def test_volume_vetoed_entries_create_no_trade_and_pay_no_spread():
 def test_no_double_count_spread_not_applied_in_pnl_and_fill_prices():
     """PnL computed from fills (mid ± S/2) matches reported PnL; no extra spread term."""
     bars = [
-        {"date": "2020-01-01", "open": 1.10, "high": 1.10, "low": 1.10, "close": 1.10, "atr": 0.01,
-         "baseline_signal": 1, "c1_signal": 1, "exit_signal": 0},
-        {"date": "2020-01-02", "open": 1.10, "high": 1.12, "low": 1.09, "close": 1.11, "atr": 0.01,
-         "baseline_signal": 0, "c1_signal": -1, "exit_signal": -1},
-        {"date": "2020-01-03", "open": 1.02, "high": 1.03, "low": 1.01, "close": 1.02, "atr": 0.01,
-         "baseline_signal": 0, "c1_signal": 0, "exit_signal": 0},
+        {
+            "date": "2020-01-01",
+            "open": 1.10,
+            "high": 1.10,
+            "low": 1.10,
+            "close": 1.10,
+            "atr": 0.01,
+            "baseline_signal": 1,
+            "c1_signal": 1,
+            "exit_signal": 0,
+        },
+        {
+            "date": "2020-01-02",
+            "open": 1.10,
+            "high": 1.12,
+            "low": 1.09,
+            "close": 1.11,
+            "atr": 0.01,
+            "baseline_signal": 0,
+            "c1_signal": -1,
+            "exit_signal": -1,
+        },
+        {
+            "date": "2020-01-03",
+            "open": 1.02,
+            "high": 1.03,
+            "low": 1.01,
+            "close": 1.02,
+            "atr": 0.01,
+            "baseline_signal": 0,
+            "c1_signal": 0,
+            "exit_signal": 0,
+        },
     ]
     df = create_synthetic_ohlc(bars)
     cfg = _minimal_cfg(spread_enabled=True, default_pips=1.0)
@@ -222,12 +421,39 @@ def test_no_double_count_spread_not_applied_in_pnl_and_fill_prices():
 def test_full_vs_wfo_parity_trade_for_trade_spread_semantics(tmp_path: Path):
     """FULL vs WFO parity: same window → same trades (entry/exit time, direction, prices, pnl, spread fields)."""
     bars = [
-        {"date": "2020-01-01", "open": 1.10, "high": 1.10, "low": 1.10, "close": 1.10, "atr": 0.01,
-         "baseline_signal": 1, "c1_signal": 1, "exit_signal": 0},
-        {"date": "2020-01-02", "open": 1.10, "high": 1.12, "low": 1.09, "close": 1.11, "atr": 0.01,
-         "baseline_signal": 0, "c1_signal": -1, "exit_signal": -1},
-        {"date": "2020-01-03", "open": 1.02, "high": 1.03, "low": 1.01, "close": 1.02, "atr": 0.01,
-         "baseline_signal": 0, "c1_signal": 0, "exit_signal": 0},
+        {
+            "date": "2020-01-01",
+            "open": 1.10,
+            "high": 1.10,
+            "low": 1.10,
+            "close": 1.10,
+            "atr": 0.01,
+            "baseline_signal": 1,
+            "c1_signal": 1,
+            "exit_signal": 0,
+        },
+        {
+            "date": "2020-01-02",
+            "open": 1.10,
+            "high": 1.12,
+            "low": 1.09,
+            "close": 1.11,
+            "atr": 0.01,
+            "baseline_signal": 0,
+            "c1_signal": -1,
+            "exit_signal": -1,
+        },
+        {
+            "date": "2020-01-03",
+            "open": 1.02,
+            "high": 1.03,
+            "low": 1.01,
+            "close": 1.02,
+            "atr": 0.01,
+            "baseline_signal": 0,
+            "c1_signal": 0,
+            "exit_signal": 0,
+        },
     ]
     df = create_synthetic_ohlc(bars)
     cfg = _minimal_cfg(spread_enabled=True, default_pips=1.0)
@@ -235,15 +461,29 @@ def test_full_vs_wfo_parity_trade_for_trade_spread_semantics(tmp_path: Path):
     signals = apply_signal_logic(df.copy(), cfg)
     for col in ["entry_signal", "exit_signal"]:
         if col in signals.columns:
-            signals[col] = pd.to_numeric(signals[col], errors="coerce").fillna(0).clip(-1, 1).astype(int)
+            signals[col] = (
+                pd.to_numeric(signals[col], errors="coerce").fillna(0).clip(-1, 1).astype(int)
+            )
 
-    full_trades = simulate_pair_trades(rows=signals, pair="EUR_USD", cfg=cfg, equity_state=equity_state.copy())
+    full_trades = simulate_pair_trades(
+        rows=signals, pair="EUR_USD", cfg=cfg, equity_state=equity_state.copy()
+    )
 
     equity_state2 = {"balance": cfg["risk"]["starting_balance"]}
-    wfo_trades = simulate_pair_trades(rows=signals, pair="EUR_USD", cfg=cfg, equity_state=equity_state2)
+    wfo_trades = simulate_pair_trades(
+        rows=signals, pair="EUR_USD", cfg=cfg, equity_state=equity_state2
+    )
 
     assert len(full_trades) == len(wfo_trades)
-    key_cols = ["entry_date", "exit_date", "direction", "entry_price", "exit_price", "pnl", "spread_pips_used"]
+    key_cols = [
+        "entry_date",
+        "exit_date",
+        "direction",
+        "entry_price",
+        "exit_price",
+        "pnl",
+        "spread_pips_used",
+    ]
     optional = ["spread_pips_exit"]
     for a, b in zip(full_trades, wfo_trades):
         for k in key_cols:
@@ -255,4 +495,8 @@ def test_full_vs_wfo_parity_trade_for_trade_spread_semantics(tmp_path: Path):
                     assert va == vb, f"{k} full vs wfo"
         for k in optional:
             if k in a and k in b:
-                assert a[k] == pytest.approx(b[k], abs=1e-9) if isinstance(a[k], (int, float)) else a[k] == b[k]
+                assert (
+                    a[k] == pytest.approx(b[k], abs=1e-9)
+                    if isinstance(a[k], (int, float))
+                    else a[k] == b[k]
+                )

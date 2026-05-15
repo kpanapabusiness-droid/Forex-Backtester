@@ -6,11 +6,13 @@ import pytest
 def has_parquet_engine() -> bool:
     try:
         import pyarrow  # noqa: F401
+
         return True
     except Exception:
         pass
     try:
         import fastparquet  # noqa: F401
+
         return True
     except Exception:
         return False

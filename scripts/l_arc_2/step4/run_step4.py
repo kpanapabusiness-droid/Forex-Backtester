@@ -8,6 +8,7 @@ Order of execution:
 5. Lookahead trivial-pass logging.
 6. Run manifest.
 """
+
 from __future__ import annotations
 
 import subprocess
@@ -41,6 +42,7 @@ def _git_commit() -> str:
 
 def _versions() -> dict:
     import sklearn
+
     return {
         "python": sys.version.split()[0],
         "numpy": np.__version__,
@@ -62,11 +64,14 @@ def _input_sha_block() -> dict:
 
     # Optional step3 inputs noted in dispatch
     step3_dir = C.STEP3_DIR
-    for fname in ("filter_dry_run.csv", "cross_arc_portfolio_family.csv",
-                  "predictor_AUC_by_cluster_by_t.csv"):
+    for fname in (
+        "filter_dry_run.csv",
+        "cross_arc_portfolio_family.csv",
+        "predictor_AUC_by_cluster_by_t.csv",
+    ):
         p = step3_dir / fname
         if p.exists():
-            paths[f"step3_{fname.replace('.csv','')}"] = p
+            paths[f"step3_{fname.replace('.csv', '')}"] = p
 
     out = {}
     for k, p in paths.items():
@@ -86,7 +91,11 @@ def main() -> dict:
     # ---- Load inputs (deterministic, sorted) ----
     signals = D.load_signals().sort_values("trade_id").reset_index(drop=True)
     clusters = D.load_clusters().sort_values("trade_id").reset_index(drop=True)
-    signals_clu = signals.merge(clusters, on="trade_id", how="left").sort_values("trade_id").reset_index(drop=True)
+    signals_clu = (
+        signals.merge(clusters, on="trade_id", how="left")
+        .sort_values("trade_id")
+        .reset_index(drop=True)
+    )
     paths_120 = D.load_paths_long(max_offset=120)
     paths_240 = D.load_paths_long(max_offset=240)
 
@@ -98,7 +107,9 @@ def main() -> dict:
     print("[1/6] Pre-eval gate: cluster_0_time_exit_curve")
     curve_df = CV.compute_cluster_0_time_exit_curve(signals, paths_240, clusters)
     curve_path = C.candidate_dir("exit_cluster_cond_gb_h240") / "cluster_0_time_exit_curve.csv"
-    sha_ledger["exit_cluster_cond_gb_h240/cluster_0_time_exit_curve.csv"] = C.write_csv(curve_df, curve_path)
+    sha_ledger["exit_cluster_cond_gb_h240/cluster_0_time_exit_curve.csv"] = C.write_csv(
+        curve_df, curve_path
+    )
     cand2_passes_gate = CV.cluster_0_curve_gate_pass(curve_df)
     print(f"       cand 2 gate: {'PASS' if cand2_passes_gate else 'FAIL (DROPPED)'}")
     print(curve_df.to_string(index=False))
@@ -123,8 +134,12 @@ def main() -> dict:
             print(f"       {slug}: gate FAILED, skipping t-selection")
             continue
         print(f"       {slug}: running t-selection ...")
-        ts_df = TS.run_t_selection_for_candidate(slug, signals_clu, paths_240 if C.HORIZON_BARS[slug] == 240 else paths_120, tauto_df)
-        sha_ledger[f"{slug}/t_selection.csv"] = C.write_csv(ts_df, C.candidate_dir(slug) / "t_selection.csv")
+        ts_df = TS.run_t_selection_for_candidate(
+            slug, signals_clu, paths_240 if C.HORIZON_BARS[slug] == 240 else paths_120, tauto_df
+        )
+        sha_ledger[f"{slug}/t_selection.csv"] = C.write_csv(
+            ts_df, C.candidate_dir(slug) / "t_selection.csv"
+        )
         selected_rows = ts_df[ts_df["selected"]]
         if len(selected_rows) == 0:
             selected_t_by_slug[slug] = None
@@ -154,10 +169,22 @@ def main() -> dict:
         elif slug == "exit_cluster_cond_gb":
             t_star = selected_t_by_slug.get(slug)
             if t_star is None:
-                post = pd.DataFrame(columns=[
-                    "trade_id", "fold", "pair", "fire_bar", "action_bar", "exit_bar",
-                    "exit_reason", "net_r", "gross_r", "spread_cost_r", "mfe_at_exit", "mae_at_exit"
-                ])
+                post = pd.DataFrame(
+                    columns=[
+                        "trade_id",
+                        "fold",
+                        "pair",
+                        "fire_bar",
+                        "action_bar",
+                        "exit_bar",
+                        "exit_reason",
+                        "net_r",
+                        "gross_r",
+                        "spread_cost_r",
+                        "mfe_at_exit",
+                        "mae_at_exit",
+                    ]
+                )
                 dropped_by_slug[slug] = (True, "no valid t selected")
             else:
                 preds = P.fit_predict_cluster(signals_clu, t_star)
@@ -165,10 +192,22 @@ def main() -> dict:
                 dropped_by_slug[slug] = (False, "")
         elif slug == "exit_cluster_cond_gb_h240":
             if not cand2_passes_gate:
-                post = pd.DataFrame(columns=[
-                    "trade_id", "fold", "pair", "fire_bar", "action_bar", "exit_bar",
-                    "exit_reason", "net_r", "gross_r", "spread_cost_r", "mfe_at_exit", "mae_at_exit"
-                ])
+                post = pd.DataFrame(
+                    columns=[
+                        "trade_id",
+                        "fold",
+                        "pair",
+                        "fire_bar",
+                        "action_bar",
+                        "exit_bar",
+                        "exit_reason",
+                        "net_r",
+                        "gross_r",
+                        "spread_cost_r",
+                        "mfe_at_exit",
+                        "mae_at_exit",
+                    ]
+                )
                 dropped_by_slug[slug] = (True, "cluster_0_time_exit_curve gate FAILED")
             else:
                 t_star = selected_t_by_slug.get(slug)
@@ -200,19 +239,23 @@ def main() -> dict:
         horizon = C.HORIZON_BARS[slug]
         fwd_mfe_col = f"fwd_mfe_h{horizon}_atr"
         if dropped_by_slug[slug][0]:
-            eval_df = pd.DataFrame({
-                "fold_id": list(C.ALL_FOLDS),
-                "n_trades": [0] * len(C.ALL_FOLDS),
-                "mean_net_r": [float("nan")] * len(C.ALL_FOLDS),
-                "mean_gross_r": [float("nan")] * len(C.ALL_FOLDS),
-                "win_pct": [float("nan")] * len(C.ALL_FOLDS),
-                "mean_capture_ratio": [float("nan")] * len(C.ALL_FOLDS),
-                "status": ["DROPPED: " + dropped_by_slug[slug][1]] * len(C.ALL_FOLDS),
-            })
+            eval_df = pd.DataFrame(
+                {
+                    "fold_id": list(C.ALL_FOLDS),
+                    "n_trades": [0] * len(C.ALL_FOLDS),
+                    "mean_net_r": [float("nan")] * len(C.ALL_FOLDS),
+                    "mean_gross_r": [float("nan")] * len(C.ALL_FOLDS),
+                    "win_pct": [float("nan")] * len(C.ALL_FOLDS),
+                    "mean_capture_ratio": [float("nan")] * len(C.ALL_FOLDS),
+                    "status": ["DROPPED: " + dropped_by_slug[slug][1]] * len(C.ALL_FOLDS),
+                }
+            )
         else:
             eval_df = CMP.per_fold_breakdown_csv(post, signals_clu, fwd_mfe_col)
             eval_df["status"] = "OK"
-        sha_ledger[f"{slug}/evaluation_metrics.csv"] = C.write_csv(eval_df, C.candidate_dir(slug) / "evaluation_metrics.csv")
+        sha_ledger[f"{slug}/evaluation_metrics.csv"] = C.write_csv(
+            eval_df, C.candidate_dir(slug) / "evaluation_metrics.csv"
+        )
         print(f"n={len(post)}")
 
     # ============================================================
@@ -227,17 +270,22 @@ def main() -> dict:
             row = CMP.build_component_row_filter(slug, signals_clu, post_by_slug[slug])
         else:
             row = CMP.build_component_row_exit_or_delayed(
-                slug, signals_clu, post_by_slug[slug],
+                slug,
+                signals_clu,
+                post_by_slug[slug],
                 selected_t=selected_t_by_slug.get(slug),
-                dropped=dropped, dropped_reason=reason,
+                dropped=dropped,
+                dropped_reason=reason,
             )
         rows.append(row)
 
     comp_df = pd.DataFrame(rows)
+
     # Sort by mechanism_class then viability descending (viable=True first)
     def _viability_key(r) -> tuple:
         v_ct = r.get("viable_component_table", "")
         v_ho = r.get("viable_held_out_check", "")
+
         # True > False > "" in our ordering: convert to numeric
         def _score(x):
             if x is True:
@@ -245,13 +293,19 @@ def main() -> dict:
             if x is False:
                 return 0
             return 1
+
         return (str(r["mechanism_class"]), -(_score(v_ct) + _score(v_ho)))
+
     comp_df["__sort"] = comp_df.apply(_viability_key, axis=1)
     comp_df = comp_df.sort_values("__sort").drop(columns="__sort").reset_index(drop=True)
 
-    sha_ledger["candidate_component_table.csv"] = C.write_csv(comp_df, C.OUT_DIR / "candidate_component_table.csv")
+    sha_ledger["candidate_component_table.csv"] = C.write_csv(
+        comp_df, C.OUT_DIR / "candidate_component_table.csv"
+    )
     md = CMP.component_table_markdown(comp_df)
-    sha_ledger["candidate_component_table.md"] = C.write_text(md, C.OUT_DIR / "candidate_component_table.md")
+    sha_ledger["candidate_component_table.md"] = C.write_text(
+        md, C.OUT_DIR / "candidate_component_table.md"
+    )
 
     # ============================================================
     # 6. Lookahead trivial-pass logging + run manifest
@@ -292,7 +346,9 @@ def main() -> dict:
         txt = f"lookahead test: passed={lookahead_log[slug]['passed']}\n"
         txt += f"category: {lookahead_log[slug]['category']}\n"
         txt += f"rationale: {lookahead_log[slug]['rationale']}\n"
-        sha_ledger[f"{slug}/lookahead_test.txt"] = C.write_text(txt, C.candidate_dir(slug) / "lookahead_test.txt")
+        sha_ledger[f"{slug}/lookahead_test.txt"] = C.write_text(
+            txt, C.candidate_dir(slug) / "lookahead_test.txt"
+        )
 
     # Run manifest
     manifest = {
@@ -301,7 +357,9 @@ def main() -> dict:
         "versions": _versions(),
         "inputs": _input_sha_block(),
         "outputs_sha256": sha_ledger,
-        "selected_t_by_slug": {k: (int(v) if v is not None else None) for k, v in selected_t_by_slug.items()},
+        "selected_t_by_slug": {
+            k: (int(v) if v is not None else None) for k, v in selected_t_by_slug.items()
+        },
         "cand2_gate_passed": bool(cand2_passes_gate),
         "lookahead_log": lookahead_log,
     }

@@ -1,6 +1,6 @@
 # Phase KG-L-V2 Report: D1 ATR Cap + signal_flip Exit Removed
 
-> Generated: 2026-04-20
+> Generated: 2026-05-15
 > Base: KG-L-V1 (KG-J + trail fix + classification fix + cond_9)
 >
 > **V2 additional change — signal_flip exit REMOVED:**

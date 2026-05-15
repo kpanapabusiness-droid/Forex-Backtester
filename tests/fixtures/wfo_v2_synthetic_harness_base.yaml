@@ -1,0 +1,81 @@
+# Synthetic-harness base config for run_wfo_v2 generic-regression manifest.
+# Locked at L6+ Arc 1 commit. Never modify without re-locking the manifest.
+# Legacy NNFX path only — no spread_floor, no signal.type, no L4 keys.
+
+pairs:
+  - EUR_USD
+timeframe: D
+data_dir: tests/fixtures/wfo_v2_synthetic_harness_data
+
+indicators:
+  c1: coral
+  use_c2: false
+  use_baseline: false
+  use_volume: false
+  use_exit: false
+
+rules:
+  one_candle_rule: false
+  pullback_rule: false
+  bridge_too_far_days: 7
+  allow_baseline_as_catalyst: false
+
+exit:
+  use_trailing_stop: true
+  move_to_breakeven_after_atr: true
+  exit_on_c1_reversal: true
+  exit_on_baseline_cross: false
+  exit_on_exit_signal: false
+
+entry:
+  sl_atr: 1.5
+  tp1_atr: 1.0
+  trail_after_atr: 2.0
+  ts_atr: 1.5
+
+execution:
+  intrabar_priority: tp_first
+
+engine:
+  allow_continuation: true
+  duplicate_open_policy: block
+
+continuation:
+  allow_continuation: false
+  skip_volume_check: false
+  skip_pullback_check: false
+  block_if_crossed_baseline_since_entry: false
+
+spreads:
+  enabled: false
+  default_pips: 0.0
+
+filters:
+  dbcvix:
+    enabled: false
+
+cache:
+  enabled: false
+
+validation:
+  enabled: true
+  fail_fast: true
+  strict_contract: false
+
+risk:
+  starting_balance: 10000.0
+  risk_per_trade_pct: 2.0
+
+tracking:
+  in_sim_equity: true
+  track_win_loss_scratch: true
+  track_roi: true
+  track_drawdown: true
+  verbose_logs: false
+
+output:
+  results_dir: results
+
+date_range:
+  start: '2020-01-01'
+  end: '2020-04-30'

@@ -27,13 +27,10 @@ Loader normalisation reused from `scripts/v1_3_calibration/load_paths.py`
 """
 from __future__ import annotations
 
-from pathlib import Path
-
 import numpy as np
 import pandas as pd
 
 from scripts.v1_3_calibration.load_paths import load_paths
-
 
 PERCENTILES = (5, 25, 50, 75, 95)
 FEATURE_COLS = (

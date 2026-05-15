@@ -10,6 +10,11 @@ from pathlib import Path
 
 import pandas as pd
 
+from scripts.v2_0_diagnostic.cluster import K_VALUES
+from scripts.v2_0_diagnostic.overlap import DUAL_GATE_PASSING
+
+DATASETS = ("kh24", "arc1", "arc2")
+
 
 def _df_to_md(df: pd.DataFrame) -> str:
     """Render DataFrame as GitHub-flavored markdown table (no tabulate dep)."""
@@ -32,13 +37,6 @@ def _df_to_md(df: pd.DataFrame) -> str:
                 vals.append(str(v))
         body_rows.append("| " + " | ".join(vals) + " |")
     return "\n".join([header, sep, *body_rows])
-
-from scripts.v2_0_diagnostic.cluster import K_VALUES
-from scripts.v2_0_diagnostic.path_features import FEATURE_COLS
-from scripts.v2_0_diagnostic.overlap import DUAL_GATE_PASSING
-
-
-DATASETS = ("kh24", "arc1", "arc2")
 
 
 def _sha256(p: Path) -> str:
@@ -406,7 +404,7 @@ def _combined_paragraph(name: str, info: dict, evidence: pd.DataFrame) -> str:
         f"to `{bot['label']}` ({bot['size_fraction_of_pool']*100:.1f}% of pool).",
     ]
     if ev_count == 0:
-        bits.append(f"No archetype across any of K in {{3,4,5,6,7}} qualifies as v2.0 evidence "
+        bits.append("No archetype across any of K in {3,4,5,6,7} qualifies as v2.0 evidence "
                     "under the first-pass priors (§8 empty for this dataset).")
     else:
         bits.append(f"{ev_count} tuple(s) across all K qualify under first-pass priors — see §8.")

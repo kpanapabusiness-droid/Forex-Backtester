@@ -24,7 +24,6 @@ from sklearn.preprocessing import StandardScaler
 
 from scripts.v2_0_diagnostic.path_features import FEATURE_COLS
 
-
 K_VALUES = (3, 4, 5, 6, 7)
 
 

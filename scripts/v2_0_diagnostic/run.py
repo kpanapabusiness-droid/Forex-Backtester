@@ -26,18 +26,16 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
-from scripts.v1_3_calibration.load_paths import load_paths  # noqa: E402
-from scripts.v2_0_diagnostic import (  # noqa: E402
-    cluster as C,
-    characterize as CH,
-    entry_features as EF,
-    evidence as EV,
-    labels as LB,
-    overlap as OV,
-    path_features as PF,
-    predictability as PR,
-    report as RP,
-)
+from scripts.v1_3_calibration.load_paths import load_paths  # noqa: E402, F401
+from scripts.v2_0_diagnostic import characterize as CH  # noqa: E402
+from scripts.v2_0_diagnostic import cluster as C  # noqa: E402
+from scripts.v2_0_diagnostic import entry_features as EF  # noqa: E402
+from scripts.v2_0_diagnostic import evidence as EV  # noqa: E402
+from scripts.v2_0_diagnostic import labels as LB  # noqa: E402
+from scripts.v2_0_diagnostic import overlap as OV  # noqa: E402
+from scripts.v2_0_diagnostic import path_features as PF  # noqa: E402
+from scripts.v2_0_diagnostic import predictability as PR  # noqa: E402
+from scripts.v2_0_diagnostic import report as RP  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 OUT_ROOT  = REPO_ROOT / "results" / "v2_0_diagnostic"
@@ -65,23 +63,19 @@ def run() -> None:
         out_dir = OUT_ROOT / name
         _ensure_dir(out_dir)
 
-        # Step 1: path-shape features
+        # Step 1: path-shape features (compute directly to avoid re-loading).
         paths, meta = load_paths(name)
         print(f"  loaded {len(meta)} trades, {len(paths)} per-bar rows")
-        features, feat_dist, degen = PF.run_for_dataset(name) if False else (
-            None, None, None,
-        )
-        # Compute features directly with loaded paths to avoid re-loading.
-        features = PF.compute_path_features(paths, meta)
+        features  = PF.compute_path_features(paths, meta)
         feat_dist = PF.summarise_distributions(features)
         degen     = PF.degenerate_flags(features)
         _write_csv(features,  out_dir / "path_features.csv")
         _write_csv(feat_dist, out_dir / "path_features_distributions.csv")
         _write_csv(degen,     out_dir / "path_features_degeneracy.csv")
-        print(f"  path-shape features written")
+        print("  path-shape features written")
 
         # Step 4 (a): entry features
-        print(f"  computing entry features...")
+        print("  computing entry features...")
         entry_feats = EF.compute_entry_features(name)
         _write_csv(entry_feats, out_dir / "entry_features_basic.csv")
 

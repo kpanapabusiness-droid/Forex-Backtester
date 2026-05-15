@@ -1,0 +1,5 @@
+feature,is_degenerate,top_value,top_share
+monotonicity_ratio_in_profit,False,0.0,0.2867518156774355
+local_peaks_count,False,0.0,0.2231404958677686
+pullback_magnitude_median,False,0.0,0.7625845229151015
+time_to_peak_mfe_relative,False,0.0,0.2231404958677686

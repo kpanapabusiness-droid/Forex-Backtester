@@ -64,6 +64,10 @@ results/*
 # the chat can read CALIBRATION_REPORT.md when locking v1.3 floors
 !results/v1_3_calibration/
 !results/v1_3_calibration/**
+# v2.0 archetype clustering diagnostic — path-shape evidence-gathering
+# on KH-24 + Arc 1 + Arc 2 (diagnostic only; no protocol revision)
+!results/v2_0_diagnostic/
+!results/v2_0_diagnostic/**
 results_phase*/
 __pycache__/
 .ipynb_checkpoints/

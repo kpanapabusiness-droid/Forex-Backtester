@@ -98,6 +98,118 @@ def _rolling_median_prior(series: pd.Series, window: int) -> pd.Series:
     """
     return series.shift(1).rolling(window=window, min_periods=window).median()
 
+
+# ── v1.3 capturability extension ────────────────────────────────────────────
+# Per-bar trade-paths for capturability calibration. ATR-normalised on
+# signal-bar 4H ATR(14) (same anchor as the legacy mfe_final / mae_final),
+# but signed so that high_r/low_r/close_r preserve direction. Forward window
+# extends to 240 bars from entry regardless of exit, giving capture-ceiling
+# data for longer-time-exit reconstructions.
+PATH_FORWARD_BARS = 240
+
+
+def _init_bar_path(direction: str, entry_px: float, atr: float,
+                   hi_e: float, lo_e: float, c_e: float) -> list[dict]:
+    """Seed bar_path with the entry-bar row (bar_offset=0, is_held=1).
+
+    Long convention: high_r = (high - entry) / atr; low_r/close_r mirror.
+    For long, high_r >= 0 and low_r <= 0 at the entry bar by OHLC invariants.
+    Short flips the sign so positive = favourable to the trade direction.
+    """
+    if direction == "short":
+        hr = (entry_px - hi_e) / atr
+        lr = (entry_px - lo_e) / atr
+        cr = (entry_px - c_e) / atr
+    else:
+        hr = (hi_e - entry_px) / atr
+        lr = (lo_e - entry_px) / atr
+        cr = (c_e - entry_px) / atr
+    return [{
+        "bar_offset":    0,
+        "high_r":        hr,
+        "low_r":         lr,
+        "close_r":       cr,
+        "mfe_so_far_r":  hr,
+        "mae_so_far_r":  lr,
+        "is_held":       1,
+    }]
+
+
+def _flatten_bar_path_for_trade(
+    trade: dict,
+    exit_bar: int,
+    pair_cache: dict,
+    direction: str,
+    out_rows: list[dict],
+    forward_bars: int = PATH_FORWARD_BARS,
+) -> None:
+    """Emit one row per (trade_id, bar_offset) into ``out_rows``.
+
+    Held window (bar_offset 0..bars_held) comes from ``trade["bar_path"]``,
+    accumulated in the hold loop. Forward window (bar_offset bars_held+1..
+    forward_bars) is computed here against the same pair_cache the simulation
+    used; ATR anchor and entry price are the immutable signal-bar values
+    already pinned on the trade dict. Forward-window rows carry is_held=0.
+
+    No lookahead invariant: bar_offset=t reads pair_cache[pair][...][entry_idx+t]
+    only — strictly past relative to t, never future.
+    """
+    pair       = trade["pair"]
+    cached     = pair_cache[pair]
+    n          = len(cached["o"])
+    entry_idx  = trade["entry_idx"]
+    entry_px   = trade["entry_px"]
+    a          = trade["atr"]
+    trade_id   = f"{pair}_{trade['entry_date']}"
+
+    # Held rows already accumulated.
+    last = trade["bar_path"][-1]
+    mfe_sf = last["mfe_so_far_r"]
+    mae_sf = last["mae_so_far_r"]
+    for r in trade["bar_path"]:
+        out_rows.append({
+            "trade_id":     trade_id,
+            "pair":         pair,
+            "bar_offset":   r["bar_offset"],
+            "high_r":       r["high_r"],
+            "low_r":        r["low_r"],
+            "close_r":      r["close_r"],
+            "mfe_so_far_r": r["mfe_so_far_r"],
+            "mae_so_far_r": r["mae_so_far_r"],
+            "is_held":      r["is_held"],
+        })
+
+    # Forward window — runs past exit_bar to entry_idx+forward_bars (or end of
+    # data). Same per-bar excursion math as the held path, just with is_held=0.
+    target_end = min(entry_idx + forward_bars, n - 1)
+    for bar_idx in range(exit_bar + 1, target_end + 1):
+        hi = cached["h"][bar_idx]
+        lo = cached["lo"][bar_idx]
+        cl = cached["c"][bar_idx]
+        if direction == "short":
+            hr = (entry_px - hi) / a
+            lr = (entry_px - lo) / a
+            cr = (entry_px - cl) / a
+        else:
+            hr = (hi - entry_px) / a
+            lr = (lo - entry_px) / a
+            cr = (cl - entry_px) / a
+        if hr > mfe_sf:
+            mfe_sf = hr
+        if lr < mae_sf:
+            mae_sf = lr
+        out_rows.append({
+            "trade_id":     trade_id,
+            "pair":         pair,
+            "bar_offset":   bar_idx - entry_idx,
+            "high_r":       hr,
+            "low_r":        lr,
+            "close_r":      cr,
+            "mfe_so_far_r": mfe_sf,
+            "mae_so_far_r": mae_sf,
+            "is_held":      0,
+        })
+
 ALL_PAIRS = [
     "AUD_CAD", "AUD_CHF", "AUD_JPY", "AUD_NZD", "AUD_USD",
     "CAD_CHF", "CAD_JPY", "CHF_JPY",
@@ -1087,7 +1199,7 @@ def _kijun_d1_should_exit(
 def _simulate_kgl_v2(
     pair_cache: dict,
     restrict_dates: tuple[pd.Timestamp, pd.Timestamp] | None = None,
-) -> tuple[list[dict], list[dict]]:
+) -> tuple[list[dict], list[dict], list[dict]]:
     """
     Unified simulation — V2 variant.
 
@@ -1114,6 +1226,7 @@ def _simulate_kgl_v2(
     currency_exposure: dict[str, int] = defaultdict(int)
     open_trades:       list[dict]     = []
     completed_trades:  list[dict]     = []
+    bar_paths_data:    list[dict]     = []  # v1.3: flat per-(trade_id, bar_offset) rows
     blocked_events:    list[dict]     = []
     reentry_watches:   dict[str, dict] = {}  # pair -> watch state for KH-16
     # KH-17: three-stage state per pair.
@@ -1169,6 +1282,37 @@ def _simulate_kgl_v2(
                 trade["mae_run"] = _mae_bar
             if _mfe_bar > trade["mfe_run"]:
                 trade["mfe_run"] = _mfe_bar
+            # v1.3: per-bar trade-path emission. Signed (high - entry)/atr,
+            # (low - entry)/atr, (close - entry)/atr; running max/min track
+            # mfe_so_far_r / mae_so_far_r and pin time_to_peak_mfe /
+            # time_to_trough_mae as bar offsets (0 = entry bar).
+            _bar_off_v13 = j - trade["entry_idx"]
+            if SIGNAL_DIRECTION == "short":
+                _hr_v13 = (_ep_trk - hi_j) / _a_trk
+                _lr_v13 = (_ep_trk - lo_j) / _a_trk
+                _cr_v13 = (_ep_trk - c_j)  / _a_trk
+            else:
+                _hr_v13 = (hi_j - _ep_trk) / _a_trk
+                _lr_v13 = (lo_j - _ep_trk) / _a_trk
+                _cr_v13 = (c_j  - _ep_trk) / _a_trk
+            _last_p_v13 = trade["bar_path"][-1]
+            _mfe_sf_v13 = _last_p_v13["mfe_so_far_r"]
+            _mae_sf_v13 = _last_p_v13["mae_so_far_r"]
+            if _hr_v13 > _mfe_sf_v13:
+                _mfe_sf_v13 = _hr_v13
+                trade["time_to_peak_mfe"] = _bar_off_v13
+            if _lr_v13 < _mae_sf_v13:
+                _mae_sf_v13 = _lr_v13
+                trade["time_to_trough_mae"] = _bar_off_v13
+            trade["bar_path"].append({
+                "bar_offset":   _bar_off_v13,
+                "high_r":       _hr_v13,
+                "low_r":        _lr_v13,
+                "close_r":      _cr_v13,
+                "mfe_so_far_r": _mfe_sf_v13,
+                "mae_so_far_r": _mae_sf_v13,
+                "is_held":      1,
+            })
             _bar_num = j - trade["entry_idx"] + 1
             if _bar_num >= 3 and math.isnan(trade["mae_at_3"]):
                 trade["mae_at_3"] = trade["mae_run"]
@@ -1318,6 +1462,42 @@ def _simulate_kgl_v2(
                     exit_reason = "kijun_d1"
 
             if exit_reason is not None:
+                # v1.3: when the exit fills at the next bar's open
+                # (exit_bar > j), the regular per-bar emission stopped at
+                # bar_offset = j - entry_idx; append a held row at
+                # bar_offset = bars_held using exit_bar's full H/L so the
+                # held window covers entry through exit inclusive.
+                if exit_bar > j:
+                    _hi_e_v13 = cached["h"][exit_bar]
+                    _lo_e_v13 = cached["lo"][exit_bar]
+                    _cl_e_v13 = cached["c"][exit_bar]
+                    if SIGNAL_DIRECTION == "short":
+                        _hr_v13 = (entry_px - _hi_e_v13) / a
+                        _lr_v13 = (entry_px - _lo_e_v13) / a
+                        _cr_v13 = (entry_px - _cl_e_v13) / a
+                    else:
+                        _hr_v13 = (_hi_e_v13 - entry_px) / a
+                        _lr_v13 = (_lo_e_v13 - entry_px) / a
+                        _cr_v13 = (_cl_e_v13 - entry_px) / a
+                    _last_p_v13 = trade["bar_path"][-1]
+                    _mfe_sf_v13 = _last_p_v13["mfe_so_far_r"]
+                    _mae_sf_v13 = _last_p_v13["mae_so_far_r"]
+                    if _hr_v13 > _mfe_sf_v13:
+                        _mfe_sf_v13 = _hr_v13
+                        trade["time_to_peak_mfe"] = exit_bar - entry_idx
+                    if _lr_v13 < _mae_sf_v13:
+                        _mae_sf_v13 = _lr_v13
+                        trade["time_to_trough_mae"] = exit_bar - entry_idx
+                    trade["bar_path"].append({
+                        "bar_offset":   exit_bar - entry_idx,
+                        "high_r":       _hr_v13,
+                        "low_r":        _lr_v13,
+                        "close_r":      _cr_v13,
+                        "mfe_so_far_r": _mfe_sf_v13,
+                        "mae_so_far_r": _mae_sf_v13,
+                        "is_held":      1,
+                    })
+
                 risk_pp     = trade["risk_pp"]
                 pos_size    = trade["pos_size"]
                 spread_cost = trade["spread_cost"]
@@ -1400,7 +1580,17 @@ def _simulate_kgl_v2(
                     "original_entry_price_ref": trade.get("original_entry_price",
                                                           float("nan")),
                     **trade["signal_ctx"],
+                    # v1.3 sidecars: re-positioned in the post-pass after
+                    # concurrent_signals so trade_id / time_to_peak_mfe /
+                    # time_to_trough_mae land at the END of the legacy column
+                    # set (preserves byte-identity of the legacy subset).
+                    "_v13_time_to_peak_mfe":   int(trade["time_to_peak_mfe"]),
+                    "_v13_time_to_trough_mae": int(trade["time_to_trough_mae"]),
                 })
+                _flatten_bar_path_for_trade(
+                    trade, exit_bar, pair_cache,
+                    SIGNAL_DIRECTION, bar_paths_data,
+                )
 
                 base, quote = PAIR_CURRENCIES[pair]
                 if SIGNAL_DIRECTION == "short":
@@ -1527,6 +1717,13 @@ def _simulate_kgl_v2(
                         "atr_sized_down":        False,
                         "trade_type":            "reentry",
                         "original_entry_price":  watch["original_entry_price"],
+                        "bar_path":              _init_bar_path(
+                            SIGNAL_DIRECTION, re_px, a_re,
+                            re_cac["h"][re_idx], re_cac["lo"][re_idx],
+                            re_cac["c"][re_idx],
+                        ),
+                        "time_to_peak_mfe":      0,
+                        "time_to_trough_mae":    0,
                     })
                     del reentry_watches[re_pair]
                 else:
@@ -1644,6 +1841,13 @@ def _simulate_kgl_v2(
                         "atr_sized_down":        False,
                         "trade_type":            "state1_delayed",
                         "original_entry_price":  float("nan"),
+                        "bar_path":              _init_bar_path(
+                            SIGNAL_DIRECTION, e_px, a_f,
+                            cac17["h"][e_idx], cac17["lo"][e_idx],
+                            cac17["c"][e_idx],
+                        ),
+                        "time_to_peak_mfe":      0,
+                        "time_to_trough_mae":    0,
                     })
                     _kh17_s1_fired += 1
                     del kh17_pending[p17]
@@ -1810,6 +2014,13 @@ def _simulate_kgl_v2(
                         "atr_sized_down":        False,
                         "trade_type":            "state2_reentry",
                         "original_entry_price":  ref_px,
+                        "bar_path":              _init_bar_path(
+                            SIGNAL_DIRECTION, r_px, a_r,
+                            cac17["h"][re_idx], cac17["lo"][re_idx],
+                            cac17["c"][re_idx],
+                        ),
+                        "time_to_peak_mfe":      0,
+                        "time_to_trough_mae":    0,
                     })
                     del kh17_watches[p17]
                 else:
@@ -2096,6 +2307,11 @@ def _simulate_kgl_v2(
                 "atr_sized_down":      atr_sized_down_flag,
                 "trade_type":          "original",
                 "original_entry_price": float("nan"),
+                "bar_path":            _init_bar_path(
+                    SIGNAL_DIRECTION, entry_px, a, hi_entry, lo_entry, c_entry,
+                ),
+                "time_to_peak_mfe":    0,
+                "time_to_trough_mae":  0,
             })
 
     # Close any remaining open trades at last available close
@@ -2199,7 +2415,14 @@ def _simulate_kgl_v2(
             "trade_type":        trade.get("trade_type", "original"),
             "original_entry_price_ref": trade.get("original_entry_price", float("nan")),
             **trade["signal_ctx"],
+            # v1.3 sidecars (re-positioned after concurrent_signals in post-pass)
+            "_v13_time_to_peak_mfe":   int(trade["time_to_peak_mfe"]),
+            "_v13_time_to_trough_mae": int(trade["time_to_trough_mae"]),
         })
+        _flatten_bar_path_for_trade(
+            trade, exit_bar, pair_cache,
+            SIGNAL_DIRECTION, bar_paths_data,
+        )
 
     # ── KH-17 Phase 1.7 diagnostics ──────────────────────────────────────────
     if KH17_ENABLED:
@@ -2232,9 +2455,18 @@ def _simulate_kgl_v2(
         ts = t.pop("signal_bar_ts", None)
         n_concurrent = signals_per_ts.get(ts, 1) - 1 if ts is not None else 0
         t["concurrent_signals"] = int(max(n_concurrent, 0))
+        # v1.3: emit the three new per-trade columns at the END so the legacy
+        # 39-column subset stays in its locked order. trade_id is derived from
+        # (pair, entry_date) per the audit; time_to_peak_mfe / time_to_trough_mae
+        # were pinned bar-by-bar during the hold loop and reach us as sidecars.
+        _ttp = t.pop("_v13_time_to_peak_mfe", 0)
+        _ttt = t.pop("_v13_time_to_trough_mae", 0)
+        t["trade_id"]            = f"{t['pair']}_{t['entry_date']}"
+        t["time_to_peak_mfe"]    = int(_ttp)
+        t["time_to_trough_mae"]  = int(_ttt)
 
     completed_trades.sort(key=lambda t: t["entry_date"])
-    return completed_trades, blocked_events
+    return completed_trades, blocked_events, bar_paths_data
 
 
 # ── OOS metrics ───────────────────────────────────────────────────────────────
@@ -2363,6 +2595,7 @@ def _run_wfo(
     pair_cache: dict,
     all_trades: list[dict],
     blocked_events: list[dict],
+    bar_paths_data: list[dict] | None = None,
 ) -> tuple[pd.DataFrame, pd.DataFrame, dict]:
 
     fold_blocked: dict[int, int] = {}
@@ -2447,6 +2680,14 @@ def _run_wfo(
     per_pair_df.to_csv(OUT_ROOT / "wfo_per_pair_4h.csv", index=False)
     if all_trades:
         pd.DataFrame(all_trades).to_csv(OUT_ROOT / "trades_all.csv", index=False)
+    # v1.3: per-bar trade-paths artefact for capturability calibration. One
+    # row per (trade_id, bar_offset). is_held=1 covers entry through exit;
+    # is_held=0 extends to bar_offset=PATH_FORWARD_BARS (or end of data) so
+    # capture-ceilings under longer time exits can be reconstructed.
+    if bar_paths_data:
+        pd.DataFrame(bar_paths_data).to_csv(
+            OUT_ROOT / "trades_paths.csv", index=False
+        )
 
     oos_total       = int(fold_df["n_trades"].sum())
     oos_years       = WFO_N_FOLDS * WFO_OOS_MONTHS / 12.0
@@ -3072,7 +3313,7 @@ def run_kgl_v2() -> None:
     print(f"  cond_9 blocked:        {total_cond9} ({pct_cond9_blocked:.1f}% of D1a-passing)")
 
     print("\n  Running full unified simulation ...")
-    all_trades, blocked_events = _simulate_kgl_v2(pair_cache)
+    all_trades, blocked_events, bar_paths_data = _simulate_kgl_v2(pair_cache)
 
     total_exp_blocked = len([b for b in blocked_events if "exposure" in b.get("reason", "")])
     print(f"  Simulation complete: {len(all_trades)} trades completed, "
@@ -3118,7 +3359,9 @@ def run_kgl_v2() -> None:
                 print(f"  SL distance check: all {len(sl_dists)} trades exactly {SL_MULT:.1f}×ATR — PASS")
 
     print("\n  WFO fold results:")
-    fold_df, per_pair_df, stats = _run_wfo(pair_cache, all_trades, blocked_events)
+    fold_df, per_pair_df, stats = _run_wfo(
+        pair_cache, all_trades, blocked_events, bar_paths_data,
+    )
 
     # ── cond_9 sensitivity summary ────────────────────────────────────────────
     print(f"\n=== cond_9 Sensitivity (threshold={D1_ATR_DIST_CAP}x) ===")
@@ -3314,6 +3557,7 @@ def run_kgl_v2() -> None:
     print("    wfo_per_pair_4h.csv")
     print("    wfo_summary_4h.txt")
     print("    trades_all.csv")
+    print("    trades_paths.csv  (v1.3 per-bar capturability extension)")
     print("    kgl_v2_report.md")
     print("\n=== KG-L-V2 complete ===")
 

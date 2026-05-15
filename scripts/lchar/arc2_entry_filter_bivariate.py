@@ -20,8 +20,6 @@ Output: results/l6/arc2/characterisation/extended/entry_filter_bivariate/
 from __future__ import annotations
 
 import hashlib
-import io
-import os
 import re
 import subprocess
 import sys
@@ -41,20 +39,13 @@ if str(REPO_ROOT) not in sys.path:
 # ---------------------------------------------------------------------------
 
 LOCKED_SHA256: Dict[str, str] = {
-    "results/l6/arc2/characterisation/v1_1_full/signals_features.csv":
-        "71b39383632bd695b878add8b331b76bcd231ab5b9adba9eea03d69f8762483e",
-    "results/l6/arc2/characterisation/v1_2_1_full/trade_index.csv":
-        "9f841c5b29e87ed90d34c9617431978baf3041459797cedef02fa16c27e3abb5",
-    "results/l6/arc2/characterisation/extended/entry_filter_univariate/block_M_kijun_distances.csv":
-        "4a61407f0f1fc1b74486f0614928e776201dc6469d874db8393e689d20cdb2ff",
-    "results/l6/arc2/characterisation/extended/entry_filter_univariate/block_L_all_features_summary.csv":
-        "32a735c7bdccd135d6afa2b5e17d7504b2bc144c7f06e3098acce5c7766378a0",
-    "core/signals/l4_mtf_alignment_2_down_mixed_kijun.py":
-        "3c8d0f5d4b446f84359ab0663df36869f15b47cf1bf18fbc6caff807dc5134e3",
-    "configs/wfo_l6_arc2.yaml":
-        "25917151bc84a73885eeea9ca9c4cc15b1c277ba793706b158abd3aee0ab6328",
-    "L6_0_METHODOLOGY_LOCK.md":
-        "4fd870b1d17380e4fc4fbfda5a43f7775d313c7a5f50dbfd1f06a3e49c519c26",
+    "results/l6/arc2/characterisation/v1_1_full/signals_features.csv": "71b39383632bd695b878add8b331b76bcd231ab5b9adba9eea03d69f8762483e",
+    "results/l6/arc2/characterisation/v1_2_1_full/trade_index.csv": "9f841c5b29e87ed90d34c9617431978baf3041459797cedef02fa16c27e3abb5",
+    "results/l6/arc2/characterisation/extended/entry_filter_univariate/block_M_kijun_distances.csv": "4a61407f0f1fc1b74486f0614928e776201dc6469d874db8393e689d20cdb2ff",
+    "results/l6/arc2/characterisation/extended/entry_filter_univariate/block_L_all_features_summary.csv": "32a735c7bdccd135d6afa2b5e17d7504b2bc144c7f06e3098acce5c7766378a0",
+    "core/signals/l4_mtf_alignment_2_down_mixed_kijun.py": "3c8d0f5d4b446f84359ab0663df36869f15b47cf1bf18fbc6caff807dc5134e3",
+    "configs/wfo_l6_arc2.yaml": "25917151bc84a73885eeea9ca9c4cc15b1c277ba793706b158abd3aee0ab6328",
+    "L6_0_METHODOLOGY_LOCK.md": "4fd870b1d17380e4fc4fbfda5a43f7775d313c7a5f50dbfd1f06a3e49c519c26",
 }
 
 # Exact baselines per prompt §3 — do NOT recompute.
@@ -74,10 +65,22 @@ BOUNDARY_TOL: float = 5e-5
 
 # Univariate marginal cell sizes (per univariate report, gate 8).
 EXPECTED_Q_SIZES_BY_Q: Dict[str, int] = {
-    "Q1": 799, "Q2": 799, "Q3": 799, "Q4": 798, "Q5": 798,
+    "Q1": 799,
+    "Q2": 799,
+    "Q3": 799,
+    "Q4": 798,
+    "Q5": 798,
 }
 
-OUT_DIR: Path = REPO_ROOT / "results" / "l6" / "arc2" / "characterisation" / "extended" / "entry_filter_bivariate"
+OUT_DIR: Path = (
+    REPO_ROOT
+    / "results"
+    / "l6"
+    / "arc2"
+    / "characterisation"
+    / "extended"
+    / "entry_filter_bivariate"
+)
 
 
 # ---------------------------------------------------------------------------
@@ -137,7 +140,7 @@ def _make_quintile_labels(
     bounds: List[Tuple[float, float]] = []
     cursor = 0
     for qi, sz in enumerate(sizes):
-        seg = df.iloc[cursor:cursor + sz]
+        seg = df.iloc[cursor : cursor + sz]
         labels.extend([f"Q{qi + 1}"] * sz)
         bounds.append((float(seg["v"].min()), float(seg["v"].max())))
         cursor += sz
@@ -162,8 +165,7 @@ def _write_csv(df: pd.DataFrame, path: Path, float_fmt: str = "%.10g") -> None:
 
 def _df_to_md(df: pd.DataFrame, float_fmt: str = "{:.6f}") -> str:
     cols = list(df.columns)
-    out = ["| " + " | ".join(cols) + " |",
-           "| " + " | ".join(["---"] * len(cols)) + " |"]
+    out = ["| " + " | ".join(cols) + " |", "| " + " | ".join(["---"] * len(cols)) + " |"]
     for _, row in df.iterrows():
         cells = []
         for c in cols:
@@ -238,7 +240,10 @@ def _build_pass(*, write_manifest: bool, run_label: str) -> Dict:
     # --- Load inputs ---
     sf_path = REPO_ROOT / "results/l6/arc2/characterisation/v1_1_full/signals_features.csv"
     ti_path = REPO_ROOT / "results/l6/arc2/characterisation/v1_2_1_full/trade_index.csv"
-    bm_path = REPO_ROOT / "results/l6/arc2/characterisation/extended/entry_filter_univariate/block_M_kijun_distances.csv"
+    bm_path = (
+        REPO_ROOT
+        / "results/l6/arc2/characterisation/extended/entry_filter_univariate/block_M_kijun_distances.csv"
+    )
 
     sf = pd.read_csv(sf_path)
     ti = pd.read_csv(ti_path)
@@ -247,7 +252,9 @@ def _build_pass(*, write_manifest: bool, run_label: str) -> Dict:
     # --- Filter to taken; merge ---
     sf_taken = sf[sf["taken"] == True].copy()  # noqa: E712
     sf_taken = sf_taken.rename(columns={"time": "signal_bar_ts"})
-    sf_taken["signal_bar_ts"] = pd.to_datetime(sf_taken["signal_bar_ts"]).dt.strftime("%Y-%m-%dT%H:%M:%S")
+    sf_taken["signal_bar_ts"] = pd.to_datetime(sf_taken["signal_bar_ts"]).dt.strftime(
+        "%Y-%m-%dT%H:%M:%S"
+    )
     ti["signal_bar_ts"] = pd.to_datetime(ti["signal_bar_ts"]).dt.strftime("%Y-%m-%dT%H:%M:%S")
 
     taken = sf_taken.merge(
@@ -350,20 +357,22 @@ def _build_pass(*, write_manifest: bool, run_label: str) -> Dict:
                 thin = "thin"
             else:
                 thin = ""
-            cell_rows.append({
-                "Q_A_concurrent": qa,
-                "Q_B_dist_d1": qb,
-                "n": n,
-                "sl_rate": sl_rate,
-                "te_rate": te_rate,
-                "de_rate": de_rate,
-                "mean_R": mean_R,
-                "median_R": median_R,
-                "pct_reached_1R_mfe": pct_reached_1R,
-                "sl_rate_lift_vs_baseline": sl_rate_lift,
-                "mean_R_lift_vs_baseline": mean_R_lift,
-                "thin_cells": thin,
-            })
+            cell_rows.append(
+                {
+                    "Q_A_concurrent": qa,
+                    "Q_B_dist_d1": qb,
+                    "n": n,
+                    "sl_rate": sl_rate,
+                    "te_rate": te_rate,
+                    "de_rate": de_rate,
+                    "mean_R": mean_R,
+                    "median_R": median_R,
+                    "pct_reached_1R_mfe": pct_reached_1R,
+                    "sl_rate_lift_vs_baseline": sl_rate_lift,
+                    "mean_R_lift_vs_baseline": mean_R_lift,
+                    "thin_cells": thin,
+                }
+            )
     cells = pd.DataFrame(cell_rows)
 
     # --- Gate 3 (§8): bivariate cell-count sum = 3,993 ---
@@ -408,11 +417,13 @@ def _build_pass(*, write_manifest: bool, run_label: str) -> Dict:
     # Reconstructed from cells.
     cells_with_slcount = cells.assign(sl_count=cells["n"] * cells["sl_rate"])
     recon_a = cells_with_slcount.groupby("Q_A_concurrent", as_index=False).agg(
-        sl_count_sum=("sl_count", "sum"), n_sum=("n", "sum"),
+        sl_count_sum=("sl_count", "sum"),
+        n_sum=("n", "sum"),
     )
     recon_a["sl_rate_recon"] = recon_a["sl_count_sum"] / recon_a["n_sum"]
     recon_b = cells_with_slcount.groupby("Q_B_dist_d1", as_index=False).agg(
-        sl_count_sum=("sl_count", "sum"), n_sum=("n", "sum"),
+        sl_count_sum=("sl_count", "sum"),
+        n_sum=("n", "sum"),
     )
     recon_b["sl_rate_recon"] = recon_b["sl_count_sum"] / recon_b["n_sum"]
 
@@ -424,15 +435,17 @@ def _build_pass(*, write_manifest: bool, run_label: str) -> Dict:
                 f"Q_A_concurrent {row['Q_A_concurrent']}: sl_rate_direct={row['sl_rate_direct']} "
                 f"!= sl_rate_recon={row['sl_rate_recon']} (diff={diff:.3e})"
             )
-        margin_recon_disp.append({
-            "axis": "Q_A_concurrent",
-            "cell": row["Q_A_concurrent"],
-            "n_direct": int(row["n_direct"]),
-            "n_recon": int(row["n_sum"]),
-            "sl_rate_direct": float(row["sl_rate_direct"]),
-            "sl_rate_recon": float(row["sl_rate_recon"]),
-            "abs_diff": diff,
-        })
+        margin_recon_disp.append(
+            {
+                "axis": "Q_A_concurrent",
+                "cell": row["Q_A_concurrent"],
+                "n_direct": int(row["n_direct"]),
+                "n_recon": int(row["n_sum"]),
+                "sl_rate_direct": float(row["sl_rate_direct"]),
+                "sl_rate_recon": float(row["sl_rate_recon"]),
+                "abs_diff": diff,
+            }
+        )
     for _, row in direct_b.merge(recon_b, on="Q_B_dist_d1").iterrows():
         diff = abs(float(row["sl_rate_direct"]) - float(row["sl_rate_recon"]))
         if diff > 1e-12:
@@ -440,15 +453,17 @@ def _build_pass(*, write_manifest: bool, run_label: str) -> Dict:
                 f"Q_B_dist_d1 {row['Q_B_dist_d1']}: sl_rate_direct={row['sl_rate_direct']} "
                 f"!= sl_rate_recon={row['sl_rate_recon']} (diff={diff:.3e})"
             )
-        margin_recon_disp.append({
-            "axis": "Q_B_dist_d1",
-            "cell": row["Q_B_dist_d1"],
-            "n_direct": int(row["n_direct"]),
-            "n_recon": int(row["n_sum"]),
-            "sl_rate_direct": float(row["sl_rate_direct"]),
-            "sl_rate_recon": float(row["sl_rate_recon"]),
-            "abs_diff": diff,
-        })
+        margin_recon_disp.append(
+            {
+                "axis": "Q_B_dist_d1",
+                "cell": row["Q_B_dist_d1"],
+                "n_direct": int(row["n_direct"]),
+                "n_recon": int(row["n_sum"]),
+                "sl_rate_direct": float(row["sl_rate_direct"]),
+                "sl_rate_recon": float(row["sl_rate_recon"]),
+                "abs_diff": diff,
+            }
+        )
 
     if marg_mismatch:
         raise RuntimeError(
@@ -471,13 +486,15 @@ def _build_pass(*, write_manifest: bool, run_label: str) -> Dict:
                 n_f = int(len(sub_f))
                 sl_f = float((sub_f["er_short"] == "SL").mean()) if n_f > 0 else float("nan")
                 sl_rate_per_fold.append((int(fold), n_f, sl_f))
-                per_fold_rows.append({
-                    "Q_A_concurrent": qa,
-                    "Q_B_dist_d1": qb,
-                    "fold_id": int(fold),
-                    "n_fold": n_f,
-                    "sl_rate_fold": sl_f,
-                })
+                per_fold_rows.append(
+                    {
+                        "Q_A_concurrent": qa,
+                        "Q_B_dist_d1": qb,
+                        "fold_id": int(fold),
+                        "n_fold": n_f,
+                        "sl_rate_fold": sl_f,
+                    }
+                )
             qualifying = [(f, n, sl) for (f, n, sl) in sl_rate_per_fold if n >= 10]
             folds_n_ge_10 = len(qualifying)
             folds_below = sum(1 for (_, _, sl) in qualifying if sl < BASELINE_SL_RATE)
@@ -492,21 +509,27 @@ def _build_pass(*, write_manifest: bool, run_label: str) -> Dict:
                 stability_flag = "stable"
             else:
                 stability_flag = "variable"
-            stability_rows.append({
-                "Q_A_concurrent": qa,
-                "Q_B_dist_d1": qb,
-                "folds_with_n_ge_10": folds_n_ge_10,
-                "folds_sl_rate_below_baseline": folds_below,
-                "folds_sl_rate_above_baseline": folds_above,
-                "sl_rate_variance_across_folds": variance,
-                "stability_flag": stability_flag,
-            })
-    per_fold_df = pd.DataFrame(per_fold_rows).sort_values(
-        ["Q_A_concurrent", "Q_B_dist_d1", "fold_id"]
-    ).reset_index(drop=True)
-    stability_df = pd.DataFrame(stability_rows).sort_values(
-        ["Q_A_concurrent", "Q_B_dist_d1"]
-    ).reset_index(drop=True)
+            stability_rows.append(
+                {
+                    "Q_A_concurrent": qa,
+                    "Q_B_dist_d1": qb,
+                    "folds_with_n_ge_10": folds_n_ge_10,
+                    "folds_sl_rate_below_baseline": folds_below,
+                    "folds_sl_rate_above_baseline": folds_above,
+                    "sl_rate_variance_across_folds": variance,
+                    "stability_flag": stability_flag,
+                }
+            )
+    per_fold_df = (
+        pd.DataFrame(per_fold_rows)
+        .sort_values(["Q_A_concurrent", "Q_B_dist_d1", "fold_id"])
+        .reset_index(drop=True)
+    )
+    stability_df = (
+        pd.DataFrame(stability_rows)
+        .sort_values(["Q_A_concurrent", "Q_B_dist_d1"])
+        .reset_index(drop=True)
+    )
 
     # --- Write CSVs ---
     _write_csv(cells, OUT_DIR / "block_P_bivariate_cells.csv")
@@ -559,7 +582,9 @@ def _build_pass(*, write_manifest: bool, run_label: str) -> Dict:
         for name in sorted(out_sha):
             manifest_lines.append(f"  {out_sha[name]}  {name}")
         manifest_lines.append("")
-        (OUT_DIR / "run_manifest.txt").write_text("\n".join(manifest_lines) + "\n", encoding="utf-8")
+        (OUT_DIR / "run_manifest.txt").write_text(
+            "\n".join(manifest_lines) + "\n", encoding="utf-8"
+        )
 
     wallclock_s = _time.time() - t0
     return {
@@ -624,8 +649,8 @@ def _build_report(
     lines.append("")
     lines.append("Quintile boundaries (min, max) actually observed in this run:")
     lines.append("")
-    qa_b = ", ".join(f"Q{i+1}=[{lo:.4f},{hi:.4f}]" for i, (lo, hi) in enumerate(qa_bounds))
-    qb_b = ", ".join(f"Q{i+1}=[{lo:.4f},{hi:.4f}]" for i, (lo, hi) in enumerate(qb_bounds))
+    qa_b = ", ".join(f"Q{i + 1}=[{lo:.4f},{hi:.4f}]" for i, (lo, hi) in enumerate(qa_bounds))
+    qb_b = ", ".join(f"Q{i + 1}=[{lo:.4f},{hi:.4f}]" for i, (lo, hi) in enumerate(qb_bounds))
     lines.append(f"- `concurrent_signals_same_bar`: {qa_b}")
     lines.append(f"- `dist_d1_kijun_atr`: {qb_b}")
     lines.append("")
@@ -641,8 +666,10 @@ def _build_report(
         "{Q1: 799, Q2: 799, Q3: 799, Q4: 798, Q5: 798}."
     )
     lines.append("")
-    lines.append("Disposition: **PASS** — every marginal n matches the expected size and "
-                 "every reconstructed sl_rate matches the direct sl_rate to 1e-12.")
+    lines.append(
+        "Disposition: **PASS** — every marginal n matches the expected size and "
+        "every reconstructed sl_rate matches the direct sl_rate to 1e-12."
+    )
     lines.append("")
     margin_disp = margin_recon_df.copy()
     margin_disp["sl_rate_direct"] = margin_disp["sl_rate_direct"].round(10)
@@ -688,20 +715,19 @@ def _build_report(
     n_very_thin = int(thin_counts.get("very_thin", 0))
     n_thin = int(thin_counts.get("thin", 0))
     n_ok = int(thin_counts.get("", 0))
-    lines.append(
-        f"- very_thin (n < 30): **{n_very_thin}** cells"
-    )
-    lines.append(
-        f"- thin (30 ≤ n < 100): **{n_thin}** cells"
-    )
-    lines.append(
-        f"- ≥ 100: **{n_ok}** cells"
-    )
+    lines.append(f"- very_thin (n < 30): **{n_very_thin}** cells")
+    lines.append(f"- thin (30 ≤ n < 100): **{n_thin}** cells")
+    lines.append(f"- ≥ 100: **{n_ok}** cells")
     lines.append("")
     if n_very_thin > 0 or n_thin > 0:
-        thin_disp = cells[cells["thin_cells"] != ""][[
-            "Q_A_concurrent", "Q_B_dist_d1", "n", "thin_cells",
-        ]].reset_index(drop=True)
+        thin_disp = cells[cells["thin_cells"] != ""][
+            [
+                "Q_A_concurrent",
+                "Q_B_dist_d1",
+                "n",
+                "thin_cells",
+            ]
+        ].reset_index(drop=True)
         lines.append("Thin / very-thin cells:")
         lines.append("")
         lines.append(_df_to_md(thin_disp, "{:.4f}"))
@@ -716,19 +742,28 @@ def _build_report(
     )
     lines.append("")
     desc_rows = []
-    for metric in ("n", "sl_rate", "te_rate", "mean_R", "median_R",
-                   "pct_reached_1R_mfe", "sl_rate_lift_vs_baseline",
-                   "mean_R_lift_vs_baseline"):
+    for metric in (
+        "n",
+        "sl_rate",
+        "te_rate",
+        "mean_R",
+        "median_R",
+        "pct_reached_1R_mfe",
+        "sl_rate_lift_vs_baseline",
+        "mean_R_lift_vs_baseline",
+    ):
         s = cells[metric].astype(float)
-        desc_rows.append({
-            "metric": metric,
-            "min": float(s.min()),
-            "q25": float(s.quantile(0.25)),
-            "median": float(s.median()),
-            "q75": float(s.quantile(0.75)),
-            "max": float(s.max()),
-            "mean": float(s.mean()),
-        })
+        desc_rows.append(
+            {
+                "metric": metric,
+                "min": float(s.min()),
+                "q25": float(s.quantile(0.25)),
+                "median": float(s.median()),
+                "q75": float(s.quantile(0.75)),
+                "max": float(s.max()),
+                "mean": float(s.mean()),
+            }
+        )
     lines.append(_df_to_md(pd.DataFrame(desc_rows), "{:.4f}"))
     lines.append("")
 
@@ -745,40 +780,58 @@ def _build_report(
     lines.append("")
 
     merged = cells.merge(
-        stability_df[["Q_A_concurrent", "Q_B_dist_d1", "stability_flag",
-                      "folds_with_n_ge_10", "folds_sl_rate_below_baseline",
-                      "folds_sl_rate_above_baseline"]],
+        stability_df[
+            [
+                "Q_A_concurrent",
+                "Q_B_dist_d1",
+                "stability_flag",
+                "folds_with_n_ge_10",
+                "folds_sl_rate_below_baseline",
+                "folds_sl_rate_above_baseline",
+            ]
+        ],
         on=["Q_A_concurrent", "Q_B_dist_d1"],
         how="left",
     )
 
     def _rank_table(df_sub: pd.DataFrame, by: str, ascending: bool, k: int = 5) -> pd.DataFrame:
         d = df_sub.sort_values(by, ascending=ascending).head(k).copy()
-        return d[[
-            "Q_A_concurrent", "Q_B_dist_d1", "n", "mean_R", "mean_R_lift_vs_baseline",
-            "sl_rate", "sl_rate_lift_vs_baseline", "pct_reached_1R_mfe",
-            "stability_flag", "folds_sl_rate_below_baseline", "folds_with_n_ge_10",
-        ]]
+        return d[
+            [
+                "Q_A_concurrent",
+                "Q_B_dist_d1",
+                "n",
+                "mean_R",
+                "mean_R_lift_vs_baseline",
+                "sl_rate",
+                "sl_rate_lift_vs_baseline",
+                "pct_reached_1R_mfe",
+                "stability_flag",
+                "folds_sl_rate_below_baseline",
+                "folds_with_n_ge_10",
+            ]
+        ]
 
     # (a) Top 5 cells by mean_R lift (descending = highest lift first).
     lines.append("### (a) Top 5 cells by mean_R lift vs baseline")
     lines.append("")
-    lines.append(_df_to_md(_rank_table(merged, "mean_R_lift_vs_baseline", ascending=False),
-                           "{:.4f}"))
+    lines.append(
+        _df_to_md(_rank_table(merged, "mean_R_lift_vs_baseline", ascending=False), "{:.4f}")
+    )
     lines.append("")
 
     # (b) Top 5 cells by SL rate lift below baseline (= most negative lift first).
     lines.append("### (b) Top 5 cells by SL rate lift below baseline (most negative lift)")
     lines.append("")
-    lines.append(_df_to_md(_rank_table(merged, "sl_rate_lift_vs_baseline", ascending=True),
-                           "{:.4f}"))
+    lines.append(
+        _df_to_md(_rank_table(merged, "sl_rate_lift_vs_baseline", ascending=True), "{:.4f}")
+    )
     lines.append("")
 
     # (c) Top 5 cells by pct_reached_1R_mfe.
     lines.append("### (c) Top 5 cells by pct_reached_1R_mfe")
     lines.append("")
-    lines.append(_df_to_md(_rank_table(merged, "pct_reached_1R_mfe", ascending=False),
-                           "{:.4f}"))
+    lines.append(_df_to_md(_rank_table(merged, "pct_reached_1R_mfe", ascending=False), "{:.4f}"))
     lines.append("")
 
     return "\n".join(lines) + "\n"
@@ -791,11 +844,15 @@ def _build_report(
 
 def _git_head() -> str:
     try:
-        out = subprocess.check_output(
-            ["git", "rev-parse", "HEAD"],
-            cwd=str(REPO_ROOT),
-            stderr=subprocess.DEVNULL,
-        ).decode().strip()
+        out = (
+            subprocess.check_output(
+                ["git", "rev-parse", "HEAD"],
+                cwd=str(REPO_ROOT),
+                stderr=subprocess.DEVNULL,
+            )
+            .decode()
+            .strip()
+        )
         return out
     except Exception:
         return "<unavailable>"
@@ -852,10 +909,15 @@ def main() -> Dict:
             f"HALT (gate 9): HEAD changed during run: {head_at_start} -> {head_at_end}"
         )
     try:
-        staged = subprocess.check_output(
-            ["git", "diff", "--cached", "--name-only"],
-            cwd=str(REPO_ROOT), stderr=subprocess.DEVNULL,
-        ).decode().strip()
+        staged = (
+            subprocess.check_output(
+                ["git", "diff", "--cached", "--name-only"],
+                cwd=str(REPO_ROOT),
+                stderr=subprocess.DEVNULL,
+            )
+            .decode()
+            .strip()
+        )
     except Exception:
         staged = ""
     # We're not allowed to STAGE anything from this run. The repo may have
@@ -915,29 +977,42 @@ if __name__ == "__main__":
     # Headline cells: top stable cell by mean_R lift with n >= 50, and (Q5, Q3).
     cells = receipt["cells"]
     stab = receipt["stability_df"]
-    merged = cells.merge(stab[["Q_A_concurrent", "Q_B_dist_d1", "stability_flag",
-                                "folds_with_n_ge_10",
-                                "folds_sl_rate_below_baseline"]],
-                          on=["Q_A_concurrent", "Q_B_dist_d1"], how="left")
+    merged = cells.merge(
+        stab[
+            [
+                "Q_A_concurrent",
+                "Q_B_dist_d1",
+                "stability_flag",
+                "folds_with_n_ge_10",
+                "folds_sl_rate_below_baseline",
+            ]
+        ],
+        on=["Q_A_concurrent", "Q_B_dist_d1"],
+        how="left",
+    )
     stable_50 = merged[(merged["stability_flag"] == "stable") & (merged["n"] >= 50)]
     if len(stable_50) > 0:
         top = stable_50.sort_values("mean_R_lift_vs_baseline", ascending=False).iloc[0]
         print()
         print("Top stable cell (n>=50) by mean_R lift:")
-        print(f"  (Q_A={top['Q_A_concurrent']}, Q_B={top['Q_B_dist_d1']})  "
-              f"n={int(top['n'])}, mean_R={top['mean_R']:.4f}, "
-              f"mean_R_lift={top['mean_R_lift_vs_baseline']:.4f}, "
-              f"sl_rate={top['sl_rate']:.4f}, "
-              f"sl_rate_lift={top['sl_rate_lift_vs_baseline']:.4f}, "
-              f"folds_below_baseline/folds_n_ge_10 = "
-              f"{int(top['folds_sl_rate_below_baseline'])}/{int(top['folds_with_n_ge_10'])}")
+        print(
+            f"  (Q_A={top['Q_A_concurrent']}, Q_B={top['Q_B_dist_d1']})  "
+            f"n={int(top['n'])}, mean_R={top['mean_R']:.4f}, "
+            f"mean_R_lift={top['mean_R_lift_vs_baseline']:.4f}, "
+            f"sl_rate={top['sl_rate']:.4f}, "
+            f"sl_rate_lift={top['sl_rate_lift_vs_baseline']:.4f}, "
+            f"folds_below_baseline/folds_n_ge_10 = "
+            f"{int(top['folds_sl_rate_below_baseline'])}/{int(top['folds_with_n_ge_10'])}"
+        )
     q5q3 = merged[(merged["Q_A_concurrent"] == "Q5") & (merged["Q_B_dist_d1"] == "Q3")]
     if len(q5q3) > 0:
         q = q5q3.iloc[0]
         print()
         print("(Q5, Q3) cell:")
-        print(f"  n={int(q['n'])}, mean_R={q['mean_R']:.4f}, "
-              f"mean_R_lift={q['mean_R_lift_vs_baseline']:.4f}, "
-              f"sl_rate={q['sl_rate']:.4f}, "
-              f"sl_rate_lift={q['sl_rate_lift_vs_baseline']:.4f}, "
-              f"stability_flag={q['stability_flag']}")
+        print(
+            f"  n={int(q['n'])}, mean_R={q['mean_R']:.4f}, "
+            f"mean_R_lift={q['mean_R_lift_vs_baseline']:.4f}, "
+            f"sl_rate={q['sl_rate']:.4f}, "
+            f"sl_rate_lift={q['sl_rate_lift_vs_baseline']:.4f}, "
+            f"stability_flag={q['stability_flag']}"
+        )

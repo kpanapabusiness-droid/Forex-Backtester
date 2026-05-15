@@ -16,7 +16,13 @@ def _minimal_ceb_v3_config(tmp_path: Path, out_dir: Path) -> dict:
         "timeframe": "D",
         "date_range": {"start": "2020-01-01", "end": "2020-06-30"},
         "pairs": ["EUR_USD"],
-        "spreads": {"enabled": True, "default_pips": 0.5, "per_pair": {}, "mode": "fixed", "atr_mult": 0.0},
+        "spreads": {
+            "enabled": True,
+            "default_pips": 0.5,
+            "per_pair": {},
+            "mode": "fixed",
+            "atr_mult": 0.0,
+        },
         "indicators": {
             "c1": "c1_compression_escape_ratio_state_machine",
             "use_c2": False,
@@ -86,7 +92,12 @@ def test_phaseF_run_ceb_roi_sanity_produces_outputs(tmp_path: Path) -> None:
 
     env = {**os.environ, "PYTHONPATH": str(root)}
     result = subprocess.run(
-        [sys.executable, str(root / "scripts" / "phaseF_run_ceb_roi_sanity.py"), "-c", str(cfg_path)],
+        [
+            sys.executable,
+            str(root / "scripts" / "phaseF_run_ceb_roi_sanity.py"),
+            "-c",
+            str(cfg_path),
+        ],
         cwd=str(root),
         env=env,
         capture_output=True,

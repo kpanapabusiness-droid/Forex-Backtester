@@ -58,9 +58,7 @@ def test_volume_returns_dataframe_aligned(name, func, test_df):
     """Volume must return a DataFrame with same index and length as input."""
     out = _call_volume_with_signal_col(func, test_df, name)
     if not isinstance(out, pd.DataFrame):
-        raise AssertionError(
-            f"Volume '{name}' must return a DataFrame; got {type(out).__name__}"
-        )
+        raise AssertionError(f"Volume '{name}' must return a DataFrame; got {type(out).__name__}")
     if len(out) != len(test_df):
         raise AssertionError(
             f"Volume '{name}': output length {len(out)} != input length {len(test_df)}"
@@ -120,7 +118,10 @@ def test_volume_determinism(name, func, test_df):
     s1 = out1[SIGNAL_COL]
     s2 = out2[SIGNAL_COL]
     pd.testing.assert_series_equal(
-        s1, s2, check_names=True, check_exact=False,
+        s1,
+        s2,
+        check_names=True,
+        check_exact=False,
         obj=f"Volume '{name}' determinism",
     )
 

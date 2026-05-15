@@ -139,7 +139,7 @@ def _trailing_top_decile(series: pd.Series, window: int, q: float) -> np.ndarray
     prior on bar t. NaN→False where the trailing window is incomplete.
     """
     threshold = series.shift(1).rolling(window, min_periods=window).quantile(q)
-    return (series.to_numpy() > threshold.to_numpy())
+    return series.to_numpy() > threshold.to_numpy()
 
 
 # ---------------------------------------------------------------------------
@@ -253,7 +253,7 @@ def _volatility_regime_d1_atr_top_decile_mask(
     d1_pctrank_aligned = _lookback_d1_to_lower(df_1h, df_d1, d1_pctrank_series)
 
     # NaN → False for the boolean mask; >0.5 to convert float-encoded boolean.
-    mask_1h_top = (np.where(np.isnan(d1_top_aligned), 0.0, d1_top_aligned) > 0.5)
+    mask_1h_top = np.where(np.isnan(d1_top_aligned), 0.0, d1_top_aligned) > 0.5
 
     # Step 4: trial-caller ATR>0 filter at the active D1 bar.
     atr_ok = np.where(np.isnan(d1_atr_aligned), False, d1_atr_aligned > 0.0)
@@ -263,12 +263,8 @@ def _volatility_regime_d1_atr_top_decile_mask(
     # For each signal-firing 1H bar i, the D1 bar used must satisfy
     # ts_D1_used.normalize() < T_N.normalize() — strict prior calendar date.
     floor_d1_of_1h = df_1h[TIME_COL].dt.normalize().to_numpy()
-    idx_d1_by_time = pd.Series(
-        np.arange(len(df_d1), dtype=np.int64), index=df_d1[TIME_COL]
-    )
-    contain_d1 = (
-        df_1h[TIME_COL].dt.normalize().map(idx_d1_by_time).to_numpy(dtype=float)
-    )
+    idx_d1_by_time = pd.Series(np.arange(len(df_d1), dtype=np.int64), index=df_d1[TIME_COL])
+    contain_d1 = df_1h[TIME_COL].dt.normalize().map(idx_d1_by_time).to_numpy(dtype=float)
     valid = ~np.isnan(contain_d1)
     cd = np.where(valid, contain_d1, 0).astype(np.int64)
     mrd = cd - 1
@@ -374,9 +370,7 @@ def _build_quote_to_usd_table(
     return out
 
 
-def _quote_to_usd_at(
-    pair: str, ts: pd.Timestamp, quote_to_usd: Dict[str, pd.Series]
-) -> float:
+def _quote_to_usd_at(pair: str, ts: pd.Timestamp, quote_to_usd: Dict[str, pd.Series]) -> float:
     quote = pair.split("_")[1]
     if quote == "USD":
         return 1.0
@@ -417,8 +411,7 @@ def _spread_pips_at_bar(
         raw_pips = 0.0
     eff = apply_spread_floor_to_pips(cfg, pair, raw_pips)
     was_floored = (
-        spread_state.n_applications > pre_n_apps
-        and spread_state.n_total_entry_bars > pre_total
+        spread_state.n_applications > pre_n_apps and spread_state.n_total_entry_bars > pre_total
     )
     return float(eff), was_floored
 
@@ -469,8 +462,8 @@ def _compute_pair_signals(
     df_1h_raw: pd.DataFrame,
     df_d1_raw: pd.DataFrame,
 ) -> _PairSignalData:
-    mask, d1_atr_aligned, d1_pctrank_aligned = (
-        _volatility_regime_d1_atr_top_decile_mask(df_1h_raw, df_d1_raw, pair=pair)
+    mask, d1_atr_aligned, d1_pctrank_aligned = _volatility_regime_d1_atr_top_decile_mask(
+        df_1h_raw, df_d1_raw, pair=pair
     )
     atr_1h_wilder = _wilder_atr_1h(df_1h_raw, EXEC_ATR_PERIOD)
     return _PairSignalData(
@@ -526,9 +519,7 @@ def _execute_arc3(
     fold_equity: Dict[int, float] = {f.fold_id: float(starting_balance) for f in folds}
     fold_peak: Dict[int, float] = {f.fold_id: float(starting_balance) for f in folds}
     fold_active_month: Dict[int, Optional[Tuple[int, int]]] = {f.fold_id: None for f in folds}
-    fold_risk_usd: Dict[int, float] = {
-        f.fold_id: pct_per_trade * starting_balance for f in folds
-    }
+    fold_risk_usd: Dict[int, float] = {f.fold_id: pct_per_trade * starting_balance for f in folds}
 
     # Global per-pair concurrent guard (persists across folds).
     open_until: Dict[str, pd.Timestamp] = {p: pd.Timestamp.min for p in pair_signals}
@@ -554,51 +545,55 @@ def _execute_arc3(
 
         # Concurrent-per-pair guard (max_concurrent_per_pair = 1).
         if sig_ts < open_until[pair]:
-            sig_log.append({
-                "pair": pair,
-                "signal_bar_ts": sig_ts.isoformat(),
-                "d1_atr14_simple_at_signal": d1_atr_at_sig,
-                "d1_atr14_decile_rank": d1_pctrank_at_sig,
-                "taken": False,
-                "drop_reason": "concurrent_open_position",
-                "fold_id": fold.fold_id,
-            })
+            sig_log.append(
+                {
+                    "pair": pair,
+                    "signal_bar_ts": sig_ts.isoformat(),
+                    "d1_atr14_simple_at_signal": d1_atr_at_sig,
+                    "d1_atr14_decile_rank": d1_pctrank_at_sig,
+                    "taken": False,
+                    "drop_reason": "concurrent_open_position",
+                    "fold_id": fold.fold_id,
+                }
+            )
             continue
 
         # Resolve entry bar index (sig_idx + bar_offset). If unavailable, drop.
         entry_idx = sig_idx + ENTRY_BAR_OFFSET
         if entry_idx >= n:
-            sig_log.append({
-                "pair": pair,
-                "signal_bar_ts": sig_ts.isoformat(),
-                "d1_atr14_simple_at_signal": d1_atr_at_sig,
-                "d1_atr14_decile_rank": d1_pctrank_at_sig,
-                "taken": False,
-                "drop_reason": "no_next_bar",
-                "fold_id": fold.fold_id,
-            })
+            sig_log.append(
+                {
+                    "pair": pair,
+                    "signal_bar_ts": sig_ts.isoformat(),
+                    "d1_atr14_simple_at_signal": d1_atr_at_sig,
+                    "d1_atr14_decile_rank": d1_pctrank_at_sig,
+                    "taken": False,
+                    "drop_reason": "no_next_bar",
+                    "fold_id": fold.fold_id,
+                }
+            )
             continue
 
         atr_at_sig = float(sd.atr_1h_wilder[sig_idx])
         if not math.isfinite(atr_at_sig) or atr_at_sig <= 0:
-            sig_log.append({
-                "pair": pair,
-                "signal_bar_ts": sig_ts.isoformat(),
-                "d1_atr14_simple_at_signal": d1_atr_at_sig,
-                "d1_atr14_decile_rank": d1_pctrank_at_sig,
-                "taken": False,
-                "drop_reason": "atr_unavailable",
-                "fold_id": fold.fold_id,
-            })
+            sig_log.append(
+                {
+                    "pair": pair,
+                    "signal_bar_ts": sig_ts.isoformat(),
+                    "d1_atr14_simple_at_signal": d1_atr_at_sig,
+                    "d1_atr14_decile_rank": d1_pctrank_at_sig,
+                    "taken": False,
+                    "drop_reason": "atr_unavailable",
+                    "fold_id": fold.fold_id,
+                }
+            )
             continue
 
         entry_row = df.iloc[entry_idx]
         entry_mid = float(entry_row["open"])
         entry_pip_size = _pip_size(pair)
 
-        sp_entry_pips, was_floored_e = _spread_pips_at_bar(
-            pair, entry_row, cfg, spread_state
-        )
+        sp_entry_pips, was_floored_e = _spread_pips_at_bar(pair, entry_row, cfg, spread_state)
         entry_fill = entry_mid + direction_int * (sp_entry_pips * entry_pip_size) / 2.0
 
         # SL price = entry_fill − 2.0 × Wilder ATR(14)_1H at bar N (long).
@@ -639,9 +634,7 @@ def _execute_arc3(
 
         if sl_hit_idx >= 0:
             hit_row = df.iloc[sl_hit_idx]
-            sp_exit_pips, was_floored_x = _spread_pips_at_bar(
-                pair, hit_row, cfg, spread_state
-            )
+            sp_exit_pips, was_floored_x = _spread_pips_at_bar(pair, hit_row, cfg, spread_state)
             exit_pip_size = _pip_size(pair)
             exit_fill = sl_price - direction_int * (sp_exit_pips * exit_pip_size) / 2.0
             exit_reason = "stop_loss"
@@ -649,9 +642,7 @@ def _execute_arc3(
             held_bars = sl_hit_idx - entry_idx + 1
         elif time_exit_idx < n:
             te_row = df.iloc[time_exit_idx]
-            sp_exit_pips, was_floored_x = _spread_pips_at_bar(
-                pair, te_row, cfg, spread_state
-            )
+            sp_exit_pips, was_floored_x = _spread_pips_at_bar(pair, te_row, cfg, spread_state)
             exit_pip_size = _pip_size(pair)
             exit_mid = float(te_row["open"])
             exit_fill = exit_mid - direction_int * (sp_exit_pips * exit_pip_size) / 2.0
@@ -661,9 +652,7 @@ def _execute_arc3(
         else:
             last_idx = n - 1
             last_row = df.iloc[last_idx]
-            sp_exit_pips, was_floored_x = _spread_pips_at_bar(
-                pair, last_row, cfg, spread_state
-            )
+            sp_exit_pips, was_floored_x = _spread_pips_at_bar(pair, last_row, cfg, spread_state)
             exit_pip_size = _pip_size(pair)
             exit_close = float(last_row["close"])
             exit_fill = exit_close - direction_int * (sp_exit_pips * exit_pip_size) / 2.0
@@ -685,39 +674,47 @@ def _execute_arc3(
 
         open_until[pair] = exit_bar_ts
 
-        trades.append(_TradeRecord(
-            fold_id=fold.fold_id,
-            pair=pair,
-            signal_bar_ts=sig_ts,
-            entry_bar_ts=pd.Timestamp(entry_row[TIME_COL]),
-            exit_bar_ts=exit_bar_ts,
-            entry_price=entry_fill,
-            exit_price=exit_fill,
-            sl_price=sl_price,
-            atr_1h_wilder_at_signal=atr_at_sig,
-            d1_atr14_simple_at_signal=d1_atr_at_sig if math.isfinite(d1_atr_at_sig) else float("nan"),
-            d1_atr14_decile_rank=d1_pctrank_at_sig if math.isfinite(d1_pctrank_at_sig) else float("nan"),
-            exit_reason=exit_reason,
-            R=R,
-            mae_R=mae_R,
-            mfe_R=mfe_R,
-            position_size_units=position_size_units,
-            spread_pips_entry=sp_entry_pips,
-            spread_pips_exit=sp_exit_pips,
-            spread_floored=bool(was_floored_e or was_floored_x),
-            held_bars=held_bars,
-            pnl_usd=pnl_usd,
-            risk_usd_at_entry=risk_per_trade_usd,
-        ))
-        sig_log.append({
-            "pair": pair,
-            "signal_bar_ts": sig_ts.isoformat(),
-            "d1_atr14_simple_at_signal": d1_atr_at_sig,
-            "d1_atr14_decile_rank": d1_pctrank_at_sig,
-            "taken": True,
-            "drop_reason": "",
-            "fold_id": fold.fold_id,
-        })
+        trades.append(
+            _TradeRecord(
+                fold_id=fold.fold_id,
+                pair=pair,
+                signal_bar_ts=sig_ts,
+                entry_bar_ts=pd.Timestamp(entry_row[TIME_COL]),
+                exit_bar_ts=exit_bar_ts,
+                entry_price=entry_fill,
+                exit_price=exit_fill,
+                sl_price=sl_price,
+                atr_1h_wilder_at_signal=atr_at_sig,
+                d1_atr14_simple_at_signal=d1_atr_at_sig
+                if math.isfinite(d1_atr_at_sig)
+                else float("nan"),
+                d1_atr14_decile_rank=d1_pctrank_at_sig
+                if math.isfinite(d1_pctrank_at_sig)
+                else float("nan"),
+                exit_reason=exit_reason,
+                R=R,
+                mae_R=mae_R,
+                mfe_R=mfe_R,
+                position_size_units=position_size_units,
+                spread_pips_entry=sp_entry_pips,
+                spread_pips_exit=sp_exit_pips,
+                spread_floored=bool(was_floored_e or was_floored_x),
+                held_bars=held_bars,
+                pnl_usd=pnl_usd,
+                risk_usd_at_entry=risk_per_trade_usd,
+            )
+        )
+        sig_log.append(
+            {
+                "pair": pair,
+                "signal_bar_ts": sig_ts.isoformat(),
+                "d1_atr14_simple_at_signal": d1_atr_at_sig,
+                "d1_atr14_decile_rank": d1_pctrank_at_sig,
+                "taken": True,
+                "drop_reason": "",
+                "fold_id": fold.fold_id,
+            }
+        )
 
     return trades, sig_log
 
@@ -736,9 +733,13 @@ def run_arc3_wfo(config_path: str | Path) -> None:
 
     raw = yaml.safe_load(config_path.read_text(encoding="utf-8")) or {}
     from validators_config import validate_config
+
     cfg = validate_config(raw)
 
-    if not isinstance(cfg.get("signal"), dict) or cfg["signal"].get("type") != "l4_volatility_regime_d1_atr_top_decile_any":
+    if (
+        not isinstance(cfg.get("signal"), dict)
+        or cfg["signal"].get("type") != "l4_volatility_regime_d1_atr_top_decile_any"
+    ):
         raise RuntimeError(
             "run_arc3_wfo invoked on a non-Arc-3 config; "
             "use scripts/walk_forward.py main() to dispatch by signal.type"
@@ -803,9 +804,7 @@ def run_arc3_wfo(config_path: str | Path) -> None:
     GATE_DD_PCT = 8.0
     GATE_TRADES_FLOOR = 15
 
-    fold_pnls: Dict[int, List[Tuple[pd.Timestamp, float]]] = {
-        f.fold_id: [] for f in folds
-    }
+    fold_pnls: Dict[int, List[Tuple[pd.Timestamp, float]]] = {f.fold_id: [] for f in folds}
     for tr in trades:
         fold_pnls[tr.fold_id].append((tr.exit_bar_ts, tr.pnl_usd))
 
@@ -858,84 +857,114 @@ def run_arc3_wfo(config_path: str | Path) -> None:
             overall_reasons.append(f"fold {fold.fold_id}: " + "; ".join(why))
         fold_pass_flags.append(fold_pass)
 
-        fold_results.append({
-            "fold_id": fold.fold_id,
-            "oos_start": fold.oos_start.strftime("%Y-%m-%d"),
-            "oos_end": fold.oos_end.strftime("%Y-%m-%d"),
-            "n_trades": n_trades,
-            "roi_pct": round(roi_pct, 6),
-            "max_dd_pct": round(max_dd_pct, 6),
-            "win_pct": round(win_pct, 6),
-            "mean_R": round(mean_R, 6),
-            "sl_hit_rate": round(sl_hit_rate, 6),
-            "time_exit_rate": round(time_exit_rate, 6),
-            "mean_held_bars": round(mean_held, 6),
-            "gate_disposition": "PASS" if fold_pass else "FAIL",
-        })
+        fold_results.append(
+            {
+                "fold_id": fold.fold_id,
+                "oos_start": fold.oos_start.strftime("%Y-%m-%d"),
+                "oos_end": fold.oos_end.strftime("%Y-%m-%d"),
+                "n_trades": n_trades,
+                "roi_pct": round(roi_pct, 6),
+                "max_dd_pct": round(max_dd_pct, 6),
+                "win_pct": round(win_pct, 6),
+                "mean_R": round(mean_R, 6),
+                "sl_hit_rate": round(sl_hit_rate, 6),
+                "time_exit_rate": round(time_exit_rate, 6),
+                "mean_held_bars": round(mean_held, 6),
+                "gate_disposition": "PASS" if fold_pass else "FAIL",
+            }
+        )
 
     overall_pass = all(fold_pass_flags)
 
     # Write trades_verbatim.csv (sorted by event order, deterministic).
     trades_csv = results_dir / output_cfg["trades_csv"]
     trades_cols = [
-        "fold_id", "pair", "signal_bar_ts", "entry_bar_ts", "exit_bar_ts",
-        "entry_price", "exit_price", "sl_price",
-        "atr_1h_wilder_at_signal", "d1_atr14_simple_at_signal", "d1_atr14_decile_rank",
-        "exit_reason", "R", "mae_R", "mfe_R",
-        "position_size_units", "spread_pips_entry", "spread_pips_exit",
-        "spread_floored", "held_bars",
+        "fold_id",
+        "pair",
+        "signal_bar_ts",
+        "entry_bar_ts",
+        "exit_bar_ts",
+        "entry_price",
+        "exit_price",
+        "sl_price",
+        "atr_1h_wilder_at_signal",
+        "d1_atr14_simple_at_signal",
+        "d1_atr14_decile_rank",
+        "exit_reason",
+        "R",
+        "mae_R",
+        "mfe_R",
+        "position_size_units",
+        "spread_pips_entry",
+        "spread_pips_exit",
+        "spread_floored",
+        "held_bars",
     ]
     with trades_csv.open("w", encoding="utf-8", newline="") as f:
         w = csv.writer(f, lineterminator="\n")
         w.writerow(trades_cols)
         for tr in trades:
-            w.writerow([
-                tr.fold_id,
-                tr.pair,
-                tr.signal_bar_ts.isoformat(),
-                tr.entry_bar_ts.isoformat(),
-                tr.exit_bar_ts.isoformat(),
-                f"{tr.entry_price:.10g}",
-                f"{tr.exit_price:.10g}",
-                f"{tr.sl_price:.10g}",
-                f"{tr.atr_1h_wilder_at_signal:.10g}",
-                f"{tr.d1_atr14_simple_at_signal:.10g}",
-                f"{tr.d1_atr14_decile_rank:.10g}",
-                tr.exit_reason,
-                f"{tr.R:.10g}",
-                f"{tr.mae_R:.10g}",
-                f"{tr.mfe_R:.10g}",
-                f"{tr.position_size_units:.10g}",
-                f"{tr.spread_pips_entry:.10g}",
-                f"{tr.spread_pips_exit:.10g}",
-                bool(tr.spread_floored),
-                int(tr.held_bars),
-            ])
+            w.writerow(
+                [
+                    tr.fold_id,
+                    tr.pair,
+                    tr.signal_bar_ts.isoformat(),
+                    tr.entry_bar_ts.isoformat(),
+                    tr.exit_bar_ts.isoformat(),
+                    f"{tr.entry_price:.10g}",
+                    f"{tr.exit_price:.10g}",
+                    f"{tr.sl_price:.10g}",
+                    f"{tr.atr_1h_wilder_at_signal:.10g}",
+                    f"{tr.d1_atr14_simple_at_signal:.10g}",
+                    f"{tr.d1_atr14_decile_rank:.10g}",
+                    tr.exit_reason,
+                    f"{tr.R:.10g}",
+                    f"{tr.mae_R:.10g}",
+                    f"{tr.mfe_R:.10g}",
+                    f"{tr.position_size_units:.10g}",
+                    f"{tr.spread_pips_entry:.10g}",
+                    f"{tr.spread_pips_exit:.10g}",
+                    bool(tr.spread_floored),
+                    int(tr.held_bars),
+                ]
+            )
 
     fold_results_csv = results_dir / output_cfg["fold_results_csv"]
     with fold_results_csv.open("w", encoding="utf-8", newline="") as f:
         w = csv.writer(f, lineterminator="\n")
-        w.writerow([
-            "fold_id", "oos_start", "oos_end", "n_trades",
-            "roi_pct", "max_dd_pct", "win_pct", "mean_R",
-            "sl_hit_rate", "time_exit_rate", "mean_held_bars",
-            "gate_disposition",
-        ])
+        w.writerow(
+            [
+                "fold_id",
+                "oos_start",
+                "oos_end",
+                "n_trades",
+                "roi_pct",
+                "max_dd_pct",
+                "win_pct",
+                "mean_R",
+                "sl_hit_rate",
+                "time_exit_rate",
+                "mean_held_bars",
+                "gate_disposition",
+            ]
+        )
         for fr in fold_results:
-            w.writerow([
-                fr["fold_id"],
-                fr["oos_start"],
-                fr["oos_end"],
-                fr["n_trades"],
-                f"{fr['roi_pct']:.6f}",
-                f"{fr['max_dd_pct']:.6f}",
-                f"{fr['win_pct']:.6f}",
-                f"{fr['mean_R']:.6f}",
-                f"{fr['sl_hit_rate']:.6f}",
-                f"{fr['time_exit_rate']:.6f}",
-                f"{fr['mean_held_bars']:.6f}",
-                fr["gate_disposition"],
-            ])
+            w.writerow(
+                [
+                    fr["fold_id"],
+                    fr["oos_start"],
+                    fr["oos_end"],
+                    fr["n_trades"],
+                    f"{fr['roi_pct']:.6f}",
+                    f"{fr['max_dd_pct']:.6f}",
+                    f"{fr['win_pct']:.6f}",
+                    f"{fr['mean_R']:.6f}",
+                    f"{fr['sl_hit_rate']:.6f}",
+                    f"{fr['time_exit_rate']:.6f}",
+                    f"{fr['mean_held_bars']:.6f}",
+                    fr["gate_disposition"],
+                ]
+            )
 
     summary_path = results_dir / output_cfg["summary_txt"]
     worst_roi = min((fr["roi_pct"] for fr in fold_results), default=0.0)
@@ -982,25 +1011,35 @@ def run_arc3_wfo(config_path: str | Path) -> None:
     signals_log_csv = results_dir / "signals_log.csv"
     with signals_log_csv.open("w", encoding="utf-8", newline="") as f:
         w = csv.writer(f, lineterminator="\n")
-        w.writerow([
-            "pair", "signal_bar_ts",
-            "d1_atr14_simple_at_signal", "d1_atr14_decile_rank",
-            "taken", "drop_reason", "fold_id",
-        ])
+        w.writerow(
+            [
+                "pair",
+                "signal_bar_ts",
+                "d1_atr14_simple_at_signal",
+                "d1_atr14_decile_rank",
+                "taken",
+                "drop_reason",
+                "fold_id",
+            ]
+        )
         for s in sig_log:
+
             def _fmt_float(v: Any) -> str:
                 if v is None or (isinstance(v, float) and not math.isfinite(v)):
                     return ""
                 return f"{float(v):.10g}"
-            w.writerow([
-                s["pair"],
-                s["signal_bar_ts"],
-                _fmt_float(s["d1_atr14_simple_at_signal"]),
-                _fmt_float(s["d1_atr14_decile_rank"]),
-                bool(s["taken"]),
-                s["drop_reason"],
-                s["fold_id"],
-            ])
+
+            w.writerow(
+                [
+                    s["pair"],
+                    s["signal_bar_ts"],
+                    _fmt_float(s["d1_atr14_simple_at_signal"]),
+                    _fmt_float(s["d1_atr14_decile_rank"]),
+                    bool(s["taken"]),
+                    s["drop_reason"],
+                    s["fold_id"],
+                ]
+            )
 
     # Write volatility_regime_bar_identity_check.txt.
     bar_id_path = results_dir / "volatility_regime_bar_identity_check.txt"

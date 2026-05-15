@@ -28,9 +28,6 @@ because it is deterministic (uses a fixed seed) and CPU-cheap (~seconds).
 from __future__ import annotations
 
 import hashlib
-import json
-import math
-import subprocess
 import sys
 from pathlib import Path
 from typing import Dict, List, Tuple
@@ -211,7 +208,9 @@ def run_lookahead_invariant_test(seed: int = 1234, n_samples: int = 100) -> Tupl
         forward_slice = slice(int(nbar) + 1, len(perturbed))
         noise = rng.normal(0.0, 0.01, size=(perturbed.iloc[forward_slice].shape[0], 4))
         for ci, col in enumerate(["open", "high", "low", "close"]):
-            perturbed.loc[forward_slice, col] = perturbed.loc[forward_slice, col].astype(float) + noise[:, ci]
+            perturbed.loc[forward_slice, col] = (
+                perturbed.loc[forward_slice, col].astype(float) + noise[:, ci]
+            )
 
         pert_df = _compute_signals(
             perturbed,
@@ -323,7 +322,7 @@ def write_sanity_checks(
         "=" * 60,
         "",
         f"[{status(revalidation_pass)}] Signal definition 100-bar bit-identical to canonical",
-        f"      Evidence: results/l_arc_1/step1_verbatim/signal_revalidation.txt",
+        "      Evidence: results/l_arc_1/step1_verbatim/signal_revalidation.txt",
         "",
         f"[{status(floor_hash_pass)}] Spread floor sha256 matches arc-open §1 / config",
         f"      Computed body sha256: {floor_hash_observed}",
@@ -457,7 +456,7 @@ def main() -> int:
 
     floor_observed = compute_body_sha256(REPO_ROOT / "configs" / "spread_floors_5ers.yaml")
     floor_expected = cfg["spread_floor"]["expected_body_sha256"]
-    floor_hash_pass = (floor_observed == floor_expected)
+    floor_hash_pass = floor_observed == floor_expected
 
     # Same-bar entries
     tdf = pd.read_csv(trades_path)
@@ -554,7 +553,7 @@ def main() -> int:
             "its receipt is appended to run_manifest.txt as a second section."
         ),
     )
-    print(f"Wrote run_manifest.txt (pre-determinism)")
+    print("Wrote run_manifest.txt (pre-determinism)")
     return 0
 
 

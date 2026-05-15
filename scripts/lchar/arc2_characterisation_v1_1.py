@@ -39,13 +39,11 @@ import argparse
 import csv
 import datetime as _dt
 import hashlib
-import os
-import shutil
 import sys
 import tempfile
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -55,16 +53,40 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from core.signals.l4_mtf_alignment_2_down_mixed_kijun import (  # noqa: E402
+    TIME_COL,
     _load_pair_tf,
     _pip_size,
-    TIME_COL,
 )
 
 PAIRS_DEFAULT: Tuple[str, ...] = (
-    "AUD_CAD", "AUD_CHF", "AUD_JPY", "AUD_NZD", "AUD_USD", "CAD_CHF", "CAD_JPY", "CHF_JPY",
-    "EUR_AUD", "EUR_CAD", "EUR_CHF", "EUR_GBP", "EUR_JPY", "EUR_NZD", "EUR_USD", "GBP_AUD",
-    "GBP_CAD", "GBP_CHF", "GBP_JPY", "GBP_NZD", "GBP_USD", "NZD_CAD", "NZD_CHF", "NZD_JPY",
-    "NZD_USD", "USD_CAD", "USD_CHF", "USD_JPY",
+    "AUD_CAD",
+    "AUD_CHF",
+    "AUD_JPY",
+    "AUD_NZD",
+    "AUD_USD",
+    "CAD_CHF",
+    "CAD_JPY",
+    "CHF_JPY",
+    "EUR_AUD",
+    "EUR_CAD",
+    "EUR_CHF",
+    "EUR_GBP",
+    "EUR_JPY",
+    "EUR_NZD",
+    "EUR_USD",
+    "GBP_AUD",
+    "GBP_CAD",
+    "GBP_CHF",
+    "GBP_JPY",
+    "GBP_NZD",
+    "GBP_USD",
+    "NZD_CAD",
+    "NZD_CHF",
+    "NZD_JPY",
+    "NZD_USD",
+    "USD_CAD",
+    "USD_CHF",
+    "USD_JPY",
 )
 
 HORIZON_MAX = 240
@@ -73,16 +95,11 @@ SENTINEL_NOT_BREACHED = 241
 
 # Locked input sha256s (verified at run start).
 LOCKED_SHAS: Dict[str, str] = {
-    "results/l6/arc2/characterisation/signals_features.csv":
-        "db7bfba42e3d3416ede25aca8ae58327d3de69dd62ca9271c31e935bc741a808",
-    "scripts/lchar/arc2_characterisation.py":
-        "917f12787fc09864434a7e18b3d28993c2886026e516debaa76853dc93496bd6",
-    "core/signals/l4_mtf_alignment_2_down_mixed_kijun.py":
-        "3c8d0f5d4b446f84359ab0663df36869f15b47cf1bf18fbc6caff807dc5134e3",
-    "configs/wfo_l6_arc2.yaml":
-        "25917151bc84a73885eeea9ca9c4cc15b1c277ba793706b158abd3aee0ab6328",
-    "L6_0_METHODOLOGY_LOCK.md":
-        "4fd870b1d17380e4fc4fbfda5a43f7775d313c7a5f50dbfd1f06a3e49c519c26",
+    "results/l6/arc2/characterisation/signals_features.csv": "db7bfba42e3d3416ede25aca8ae58327d3de69dd62ca9271c31e935bc741a808",
+    "scripts/lchar/arc2_characterisation.py": "917f12787fc09864434a7e18b3d28993c2886026e516debaa76853dc93496bd6",
+    "core/signals/l4_mtf_alignment_2_down_mixed_kijun.py": "3c8d0f5d4b446f84359ab0663df36869f15b47cf1bf18fbc6caff807dc5134e3",
+    "configs/wfo_l6_arc2.yaml": "25917151bc84a73885eeea9ca9c4cc15b1c277ba793706b158abd3aee0ab6328",
+    "L6_0_METHODOLOGY_LOCK.md": "4fd870b1d17380e4fc4fbfda5a43f7775d313c7a5f50dbfd1f06a3e49c519c26",
 }
 
 
@@ -132,9 +149,7 @@ def _envelope_walk(
     """
     n = len(highs)
     if entry_idx >= n:
-        raise RuntimeError(
-            f"entry_idx={entry_idx} >= bar count {n}; cannot walk forward"
-        )
+        raise RuntimeError(f"entry_idx={entry_idx} >= bar count {n}; cannot walk forward")
 
     max_k = min(horizon_max, n - entry_idx)
 
@@ -225,8 +240,7 @@ def _compute_new_features_for_taken_trades(
         # Locate the signal bar index in the per-pair 1H series.
         if sig_ts not in pair_time_idx[pair]:
             raise RuntimeError(
-                f"signal_bar_ts {sig_ts} not found in {pair} 1H series — "
-                f"data join failure"
+                f"signal_bar_ts {sig_ts} not found in {pair} 1H series — data join failure"
             )
         sig_idx = pair_time_idx[pair][sig_ts]
         entry_idx = sig_idx + 1  # bar_offset = 1 per Arc 2 config
@@ -390,7 +404,7 @@ def _byte_identicality_check(
     ]
     if not match:
         # Diagnose cell-by-cell.
-        ne_mask = (proj_old.values != proj_new.values)
+        ne_mask = proj_old.values != proj_new.values
         ne_count = int(ne_mask.sum())
         lines.append(f"Cell-level diff count: {ne_count}")
         if ne_count > 0:
@@ -435,7 +449,9 @@ def _validate_gates(
     # Gate 3: Column count
     new_col_count = len(df_new.columns)
     expected_col_count = len(header_old) + len(new_col_order)
-    disposition["gate_3_col_count"] = f"new={new_col_count}, old={len(header_old)}, added={len(new_col_order)}"
+    disposition["gate_3_col_count"] = (
+        f"new={new_col_count}, old={len(header_old)}, added={len(new_col_order)}"
+    )
     if new_col_count != expected_col_count:
         raise RuntimeError(
             f"Gate 3 HALT — column count: new={new_col_count}, expected="
@@ -475,20 +491,21 @@ def _validate_gates(
     disposition["gate_5_null_counts"] = null_summary
     bad_nulls = [c for c, n in null_summary.items() if n > 0]
     if bad_nulls:
-        raise RuntimeError(
-            f"Gate 5 HALT — new-column nulls present in taken trades: {bad_nulls}"
-        )
+        raise RuntimeError(f"Gate 5 HALT — new-column nulls present in taken trades: {bad_nulls}")
 
     # Gate 6: SL-trade first-passage consistency.
     sl_trades = merged[merged["exit_reason"] == "stop_loss"]
     sl_inconsistent = sl_trades[
-        sl_trades["bars_to_minus_2atr_capped_240h"].astype(int) != sl_trades["held_bars"].astype(int)
+        sl_trades["bars_to_minus_2atr_capped_240h"].astype(int)
+        != sl_trades["held_bars"].astype(int)
     ]
     disposition["gate_6_sl_first_passage"] = (
         f"sl_trades={len(sl_trades)}, inconsistent={len(sl_inconsistent)}"
     )
     if len(sl_inconsistent) > 0:
-        sample = sl_inconsistent.head(5)[["pair", "signal_bar_ts", "held_bars", "bars_to_minus_2atr_capped_240h"]]
+        sample = sl_inconsistent.head(5)[
+            ["pair", "signal_bar_ts", "held_bars", "bars_to_minus_2atr_capped_240h"]
+        ]
         raise RuntimeError(
             f"Gate 6 HALT — {len(sl_inconsistent)} SL trades where "
             f"bars_to_minus_2atr_capped_240h != held_bars. Sample:\n{sample}"
@@ -496,14 +513,14 @@ def _validate_gates(
 
     # Gate 7: Time-exit trade first-passage consistency.
     te_trades = merged[merged["exit_reason"] == "time_exit"]
-    te_inconsistent = te_trades[
-        te_trades["bars_to_minus_2atr_capped_240h"].astype(int) <= 120
-    ]
+    te_inconsistent = te_trades[te_trades["bars_to_minus_2atr_capped_240h"].astype(int) <= 120]
     disposition["gate_7_te_first_passage"] = (
         f"te_trades={len(te_trades)}, inconsistent={len(te_inconsistent)}"
     )
     if len(te_inconsistent) > 0:
-        sample = te_inconsistent.head(5)[["pair", "signal_bar_ts", "held_bars", "bars_to_minus_2atr_capped_240h"]]
+        sample = te_inconsistent.head(5)[
+            ["pair", "signal_bar_ts", "held_bars", "bars_to_minus_2atr_capped_240h"]
+        ]
         raise RuntimeError(
             f"Gate 7 HALT — {len(te_inconsistent)} time-exit trades where "
             f"bars_to_minus_2atr_capped_240h <= 120 (SL would have triggered during hold)."
@@ -673,10 +690,13 @@ def run_pipeline(
         # Need fold_id from trades_df
         clamped_with_fold = clamped.merge(
             trades_df[["pair", "signal_bar_ts", "fold_id"]],
-            on=["pair", "signal_bar_ts"], how="left"
+            on=["pair", "signal_bar_ts"],
+            how="left",
         )
         for fid, sub in clamped_with_fold.groupby("fold_id"):
-            audit_lines.append(f"  fold {int(fid)}: {len(sub)} trades clamped (min_clamped_at={int(sub['forward_horizon_clamped_at_bar'].min())})")
+            audit_lines.append(
+                f"  fold {int(fid)}: {len(sub)} trades clamped (min_clamped_at={int(sub['forward_horizon_clamped_at_bar'].min())})"
+            )
     else:
         audit_lines.append("  None — all trades reached the full 240-bar forward window.")
     audit_path = out_dir / "null_audit.txt"
@@ -705,14 +725,17 @@ def main() -> int:
     )
     parser.add_argument(
         "--existing-csv",
-        default=str(REPO_ROOT / "results" / "l6" / "arc2" / "characterisation" / "signals_features.csv"),
+        default=str(
+            REPO_ROOT / "results" / "l6" / "arc2" / "characterisation" / "signals_features.csv"
+        ),
     )
     parser.add_argument(
         "--trades-csv",
         default=str(REPO_ROOT / "results" / "l6" / "arc2" / "trades_all.csv"),
     )
-    parser.add_argument("--single-run", action="store_true",
-                        help="Skip the determinism re-run (development only).")
+    parser.add_argument(
+        "--single-run", action="store_true", help="Skip the determinism re-run (development only)."
+    )
     args = parser.parse_args()
 
     print("=" * 60)
@@ -733,7 +756,9 @@ def main() -> int:
     print(f"\n[Run #1] Output dir: {out_dir}")
     t1 = time.time()
     sha1 = run_pipeline(
-        out_dir=out_dir, existing_csv=existing_csv, trades_csv=trades_csv,
+        out_dir=out_dir,
+        existing_csv=existing_csv,
+        trades_csv=trades_csv,
     )
     elapsed1 = time.time() - t1
     print(f"  Run #1 complete in {elapsed1:.1f}s")
@@ -747,7 +772,9 @@ def main() -> int:
         print(f"\n[Run #2] Output dir (scratch): {scratch}")
         t2 = time.time()
         sha2 = run_pipeline(
-            out_dir=scratch, existing_csv=existing_csv, trades_csv=trades_csv,
+            out_dir=scratch,
+            existing_csv=existing_csv,
+            trades_csv=trades_csv,
             write_aux=False,
         )
         elapsed2 = time.time() - t2
@@ -864,13 +891,17 @@ def _write_pipeline_diff_manifest(
     lines.append("")
     lines.append("Per prompt §3.2 / §3.3:")
     lines.append("- `fwd_mfe_h{h}_atr` = `running_mfe_at_bar_h / atr_1h_wilder_at_signal`, where")
-    lines.append("  `running_mfe_at_bar_k = max(running_mfe_at_bar_{k-1}, high[N+k] - entry_price)`,")
+    lines.append(
+        "  `running_mfe_at_bar_k = max(running_mfe_at_bar_{k-1}, high[N+k] - entry_price)`,"
+    )
     lines.append("  initialised to 0 at k=0, walked for k=1..240. ≥ 0 (favourable for long).")
     lines.append("- `fwd_mae_h{h}_atr` = `running_mae_at_bar_h / atr_1h_wilder_at_signal`, where")
-    lines.append("  `running_mae_at_bar_k = min(running_mae_at_bar_{k-1}, low[N+k] - entry_price)`,")
+    lines.append(
+        "  `running_mae_at_bar_k = min(running_mae_at_bar_{k-1}, low[N+k] - entry_price)`,"
+    )
     lines.append("  initialised to 0 at k=0. ≤ 0 (adverse for long; signed negative).")
     lines.append("")
-    lines.append("Code citation: `scripts/lchar/arc2_characterisation_v1_1.py:_envelope_walk` " )
+    lines.append("Code citation: `scripts/lchar/arc2_characterisation_v1_1.py:_envelope_walk` ")
     lines.append("(lines computing `running_mfe[k]` and `running_mae[k]`).")
     lines.append("")
     lines.append("### 3.2 First-passage bar counts (4 columns)")
@@ -880,10 +911,18 @@ def _write_pipeline_diff_manifest(
     lines.append("Equivalent (and implemented) form: first k where `running_mfe[k] >= N×ATR`")
     lines.append("(since running_mfe is monotone non-decreasing); same for MAE with `<= -N×ATR`.")
     lines.append("")
-    lines.append("- `bars_to_plus_1atr_capped_240h`  : first k with running_mfe[k] ≥ 1×ATR; 241 if never")
-    lines.append("- `bars_to_plus_2atr_capped_240h`  : first k with running_mfe[k] ≥ 2×ATR; 241 if never")
-    lines.append("- `bars_to_minus_1atr_capped_240h` : first k with running_mae[k] ≤ −1×ATR; 241 if never")
-    lines.append("- `bars_to_minus_2atr_capped_240h` : first k with running_mae[k] ≤ −2×ATR; 241 if never")
+    lines.append(
+        "- `bars_to_plus_1atr_capped_240h`  : first k with running_mfe[k] ≥ 1×ATR; 241 if never"
+    )
+    lines.append(
+        "- `bars_to_plus_2atr_capped_240h`  : first k with running_mfe[k] ≥ 2×ATR; 241 if never"
+    )
+    lines.append(
+        "- `bars_to_minus_1atr_capped_240h` : first k with running_mae[k] ≤ −1×ATR; 241 if never"
+    )
+    lines.append(
+        "- `bars_to_minus_2atr_capped_240h` : first k with running_mae[k] ≤ −2×ATR; 241 if never"
+    )
     lines.append("")
     lines.append("### 3.3 Data-end clamping (1 column)")
     lines.append("")
@@ -900,9 +939,15 @@ def _write_pipeline_diff_manifest(
     lines.append("")
     lines.append("```")
     lines.append("pip_size       = 0.01 if pair endswith '_JPY' else 0.0001")
-    lines.append("spread_cost_$  = (sp_entry_pips + sp_exit_pips) * pip_size / 2.0   # half-spread on each leg")
-    lines.append("spread_cost_r  = spread_cost_$ / (2.0 * atr_1h_wilder_at_signal)   # SL distance = 2×ATR")
-    lines.append("gross_r        = R + spread_cost_r                                  # R is the existing net R")
+    lines.append(
+        "spread_cost_$  = (sp_entry_pips + sp_exit_pips) * pip_size / 2.0   # half-spread on each leg"
+    )
+    lines.append(
+        "spread_cost_r  = spread_cost_$ / (2.0 * atr_1h_wilder_at_signal)   # SL distance = 2×ATR"
+    )
+    lines.append(
+        "gross_r        = R + spread_cost_r                                  # R is the existing net R"
+    )
     lines.append("```")
     lines.append("")
     lines.append("The conversion is exact (not imputation) because Arc 2 locks SL multiplier = 2.0")
@@ -913,12 +958,20 @@ def _write_pipeline_diff_manifest(
     lines.append("")
     lines.append("`atr_1h_wilder_at_signal` is read from each trade row of")
     lines.append("`results/l6/arc2/trades_all.csv`, which is the exact value Arc 2's SL execution")
-    lines.append("used at the signal bar. Source: `core/signals/l4_mtf_alignment_2_down_mixed_kijun.py:_execute_arc2`,")
-    lines.append("specifically the line that reads `atr_at_sig = float(sd.atr_1h_wilder[sig_idx])` and is")
+    lines.append(
+        "used at the signal bar. Source: `core/signals/l4_mtf_alignment_2_down_mixed_kijun.py:_execute_arc2`,"
+    )
+    lines.append(
+        "specifically the line that reads `atr_at_sig = float(sd.atr_1h_wilder[sig_idx])` and is"
+    )
     lines.append("then written to the trade record's `atr_1h_wilder_at_signal` field.")
     lines.append("")
-    lines.append("Gate 10 verifies the relationship `entry_price - sl_price == 2.0 × atr_1h_wilder_at_signal`")
-    lines.append(f"across all 3,993 trades: max relative SL-distance error = {disposition.get('gate_10_atr_source', 'n/a')}.")
+    lines.append(
+        "Gate 10 verifies the relationship `entry_price - sl_price == 2.0 × atr_1h_wilder_at_signal`"
+    )
+    lines.append(
+        f"across all 3,993 trades: max relative SL-distance error = {disposition.get('gate_10_atr_source', 'n/a')}."
+    )
     lines.append("This proves the ATR value used by the v1.1 normalisation is identical to the")
     lines.append("value the SL execution used.")
     lines.append("")
@@ -951,7 +1004,9 @@ def _write_pipeline_diff_manifest(
             f"running_mae@held={r['_running_mae_at_held_bars_atr']:.6f}"
         )
     lines.append("")
-    lines.append("Sentinel `241` indicates threshold not breached within 240 bars OR data ended before breach.")
+    lines.append(
+        "Sentinel `241` indicates threshold not breached within 240 bars OR data ended before breach."
+    )
     lines.append("")
     lines.append("## 6. Byte-identicality result")
     lines.append("")
@@ -962,7 +1017,9 @@ def _write_pipeline_diff_manifest(
     lines.append("## 7. Data-end clamping count")
     lines.append("")
     clamped = new_feat[new_feat["forward_horizon_clamped_at_bar"].astype(int) < 240]
-    lines.append(f"Trades with `forward_horizon_clamped_at_bar < 240`: **{len(clamped)}** of 3,993.")
+    lines.append(
+        f"Trades with `forward_horizon_clamped_at_bar < 240`: **{len(clamped)}** of 3,993."
+    )
     if len(clamped) > 0:
         # Bring in fold_id for the breakdown.
         tr_df = pd.read_csv(trades_csv)
@@ -981,13 +1038,17 @@ def _write_pipeline_diff_manifest(
     lines.append("")
     lines.append("## 8. gross_r / spread_cost_r status")
     lines.append("")
-    lines.append("**Remediated.** Derived exactly from `spread_pips_entry`, `spread_pips_exit`, and the")
+    lines.append(
+        "**Remediated.** Derived exactly from `spread_pips_entry`, `spread_pips_exit`, and the"
+    )
     lines.append("locked SL = 2.0 × ATR relationship. No imputation. See §3.4.")
     lines.append("")
     lines.append("## 9. Sentinel convention")
     lines.append("")
-    lines.append("`bars_to_*_capped_240h == 241` means \"threshold not breached within 240 bars OR")
-    lines.append("data ended before breach\". Integer-typed column. Downstream filtering convention:")
+    lines.append('`bars_to_*_capped_240h == 241` means "threshold not breached within 240 bars OR')
+    lines.append(
+        'data ended before breach". Integer-typed column. Downstream filtering convention:'
+    )
     lines.append("`<= 240` = within window; `> 240` = not within window.")
     lines.append("")
     lines.append("## 10. Validation gate dispositions")
@@ -997,21 +1058,33 @@ def _write_pipeline_diff_manifest(
     lines.append("| 1 | Input integrity (5 sha256s) | PASS — all match locked values |")
     lines.append(f"| 2 | Row count parity | PASS — {disposition.get('gate_2_row_count', 'n/a')} |")
     lines.append(f"| 3 | Column count | PASS — {disposition.get('gate_3_col_count', 'n/a')} |")
-    bi = disposition.get('gate_4_byte_identicality', '')
+    bi = disposition.get("gate_4_byte_identicality", "")
     bi_short = "PASS" if "match=True" in bi else "HALT"
     lines.append(f"| 4 | Byte-identicality on existing columns | {bi_short} — {bi} |")
-    lines.append(f"| 5 | New feature nulls (taken trades) | PASS — 0 nulls in all 19 new columns |")
-    lines.append(f"| 6 | SL-trade first-passage consistency | PASS — {disposition.get('gate_6_sl_first_passage', 'n/a')} |")
-    lines.append(f"| 7 | Time-exit trade first-passage consistency | PASS — {disposition.get('gate_7_te_first_passage', 'n/a')} |")
-    lines.append(f"| 8 | Envelope monotonicity | PASS — {disposition.get('gate_8_envelope_monotonicity', 'n/a')} |")
-    lines.append(f"| 9 | Held-window envelope vs realised MFE/MAE | PASS — {disposition.get('gate_9_envelope_vs_realised', 'n/a')} |")
-    lines.append(f"| 10 | ATR source consistency | PASS — {disposition.get('gate_10_atr_source', 'n/a')} |")
+    lines.append("| 5 | New feature nulls (taken trades) | PASS — 0 nulls in all 19 new columns |")
+    lines.append(
+        f"| 6 | SL-trade first-passage consistency | PASS — {disposition.get('gate_6_sl_first_passage', 'n/a')} |"
+    )
+    lines.append(
+        f"| 7 | Time-exit trade first-passage consistency | PASS — {disposition.get('gate_7_te_first_passage', 'n/a')} |"
+    )
+    lines.append(
+        f"| 8 | Envelope monotonicity | PASS — {disposition.get('gate_8_envelope_monotonicity', 'n/a')} |"
+    )
+    lines.append(
+        f"| 9 | Held-window envelope vs realised MFE/MAE | PASS — {disposition.get('gate_9_envelope_vs_realised', 'n/a')} |"
+    )
+    lines.append(
+        f"| 10 | ATR source consistency | PASS — {disposition.get('gate_10_atr_source', 'n/a')} |"
+    )
     if single_run:
         lines.append("| 11 | Determinism | SKIPPED (--single-run flag) |")
     else:
         det_str = ", ".join(f"{k}:{v}" for k, v in determinism.items())
         det_pass = all(v == "match" for v in determinism.values())
-        lines.append(f"| 11 | Determinism (two runs byte-identical) | {'PASS' if det_pass else 'HALT'} — {det_str} |")
+        lines.append(
+            f"| 11 | Determinism (two runs byte-identical) | {'PASS' if det_pass else 'HALT'} — {det_str} |"
+        )
     lines.append("| 12 | Locked artefact integrity | (checked by caller post-run) |")
     lines.append("| 13 | No auto-commit | PASS (script never commits) |")
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")

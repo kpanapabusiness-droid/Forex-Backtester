@@ -1,8 +1,10 @@
+# ruff: noqa: E402  (sys.path.insert needed before project imports)
 """Phase C — conditional breakdowns (op spec §5.9) + 2D joint distributions (§5.10).
 
 Per-stratum aggregates of pool-level metrics across 14 stratification axes.
 Sample-size discipline: n<30 flagged, n<10 pooled into '_insufficient_n'.
 """
+
 from __future__ import annotations
 
 import sys
@@ -15,17 +17,25 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from scripts.l_arc_2.step2._io import H_GRID, STEP2_DIR
+from scripts.l_arc_2.step2._io import STEP2_DIR
 
 COND_DIR = STEP2_DIR / "conditional_breakdowns"
 JOINT_DIR = STEP2_DIR / "joint_distributions"
 
 AGG_METRICS = [
-    "net_r", "gross_r",
-    "mfe_held_atr", "mae_held_atr", "bars_held",
-    "fwd_logret_h24", "fwd_mfe_h24_atr", "fwd_mae_h24_atr",
-    "fwd_logret_h120", "fwd_mfe_h120_atr", "fwd_mae_h120_atr",
-    "fwd_mfe_h240_atr", "fwd_mae_h240_atr",
+    "net_r",
+    "gross_r",
+    "mfe_held_atr",
+    "mae_held_atr",
+    "bars_held",
+    "fwd_logret_h24",
+    "fwd_mfe_h24_atr",
+    "fwd_mae_h24_atr",
+    "fwd_logret_h120",
+    "fwd_mfe_h120_atr",
+    "fwd_mae_h120_atr",
+    "fwd_mfe_h240_atr",
+    "fwd_mae_h240_atr",
     "race_bars_plus1_minus_minus1",
     "fwd_realized_range_atr",
     "fwd_fraction_time_above_entry",
@@ -69,10 +79,24 @@ def _emit_strat(f: pd.DataFrame, strat_col: str, sub: str) -> None:
             d[strat_col] = str(level)
             d["flagged_n_lt_30"] = d["n"] < 30
             rows.append(d)
-        cols = [strat_col, "n", "flagged_n_lt_30", "mean", "std",
-                "min", "p5", "p25", "p50", "p75", "p95", "max"]
+        cols = [
+            strat_col,
+            "n",
+            "flagged_n_lt_30",
+            "mean",
+            "std",
+            "min",
+            "p5",
+            "p25",
+            "p50",
+            "p75",
+            "p95",
+            "max",
+        ]
         pd.DataFrame(rows)[cols].to_csv(
-            out_dir / f"{metric}.csv", index=False, lineterminator="\n",
+            out_dir / f"{metric}.csv",
+            index=False,
+            lineterminator="\n",
         )
 
 
@@ -145,14 +169,22 @@ def run_phase_c() -> None:
     heatmap("mfe_sequence_class_fwd_h24", "net_r", 1, 30, "mfe_sequence_class_fwd_h24__net_r")
     heatmap("mfe_sequence_class_fwd_h120", "net_r", 1, 30, "mfe_sequence_class_fwd_h120__net_r")
     heatmap("concurrent_signals_within_3h", "net_r", 20, 30, "concurrent_signals_within_3h__net_r")
-    heatmap("concurrent_signals_within_3h", "fwd_mae_h24_atr", 20, 30, "concurrent_signals_within_3h__fwd_mae_h24")
+    heatmap(
+        "concurrent_signals_within_3h",
+        "fwd_mae_h24_atr",
+        20,
+        30,
+        "concurrent_signals_within_3h__fwd_mae_h24",
+    )
     heatmap("hour_in_d1_bar", "net_r", 24, 30, "hour_in_d1_bar__net_r")
     heatmap("vol_regime", "fwd_mfe_h24_atr", 1, 30, "vol_regime__fwd_mfe_h24")
     heatmap("cum_logret_1h_24", "net_r", 20, 30, "cum_logret_1h_24__net_r")
     heatmap("cum_logret_1h_168", "net_r", 20, 30, "cum_logret_1h_168__net_r")
     heatmap("vol_realized_1h_24h", "net_r", 20, 30, "vol_realized_1h_24h__net_r")
     heatmap("fwd_realized_range_atr", "net_r", 30, 30, "fwd_realized_range_atr__net_r")
-    heatmap("fwd_fraction_time_above_entry", "net_r", 20, 30, "fwd_fraction_time_above_entry__net_r")
+    heatmap(
+        "fwd_fraction_time_above_entry", "net_r", 20, 30, "fwd_fraction_time_above_entry__net_r"
+    )
 
     print("[Phase C] done.")
 

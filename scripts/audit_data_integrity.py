@@ -283,7 +283,9 @@ def check_dtypes(df: pd.DataFrame, *, tf: str, pair: str) -> list[Finding]:
     for col in ("open", "high", "low", "close"):
         if col not in df.columns:
             findings.append(
-                Finding(tf, pair, CHK_S2_DTYPE, SEV_CRITICAL, f"missing column post-normalize: {col}")
+                Finding(
+                    tf, pair, CHK_S2_DTYPE, SEV_CRITICAL, f"missing column post-normalize: {col}"
+                )
             )
             continue
         if not pd.api.types.is_numeric_dtype(df[col]):
@@ -413,12 +415,12 @@ def check_grid_alignment(
         if bad_mask.any():
             detail = f"{int(bad_mask.sum())} 1H bars not minute=0,second=0"
     elif grid == "H4":
-        bad_mask = (~t.dt.hour.isin([0, 4, 8, 12, 16, 20])) | (t.dt.minute != 0) | (t.dt.second != 0)
+        bad_mask = (
+            (~t.dt.hour.isin([0, 4, 8, 12, 16, 20])) | (t.dt.minute != 0) | (t.dt.second != 0)
+        )
         if bad_mask.any():
             bad_hours = sorted(set(int(h) for h in t.loc[bad_mask].dt.hour.unique()))
-            detail = (
-                f"{int(bad_mask.sum())} 4H bars off-grid; offending hours present: {bad_hours}"
-            )
+            detail = f"{int(bad_mask.sum())} 4H bars off-grid; offending hours present: {bad_hours}"
 
     if detail is None:
         return [], []
@@ -540,7 +542,10 @@ def check_ohlc_inequalities(
     if len(high_vio):
         findings.append(
             Finding(
-                tf, pair, CHK_O1_HIGH_VIOLATION, SEV_CRITICAL,
+                tf,
+                pair,
+                CHK_O1_HIGH_VIOLATION,
+                SEV_CRITICAL,
                 f"{len(high_vio)} bar(s) where high < max(open, close)",
             )
         )
@@ -548,7 +553,10 @@ def check_ohlc_inequalities(
     if len(low_vio):
         findings.append(
             Finding(
-                tf, pair, CHK_O2_LOW_VIOLATION, SEV_CRITICAL,
+                tf,
+                pair,
+                CHK_O2_LOW_VIOLATION,
+                SEV_CRITICAL,
                 f"{len(low_vio)} bar(s) where low > min(open, close)",
             )
         )
@@ -556,7 +564,10 @@ def check_ohlc_inequalities(
     if len(hl_vio):
         findings.append(
             Finding(
-                tf, pair, CHK_O3_HIGH_LT_LOW, SEV_CRITICAL,
+                tf,
+                pair,
+                CHK_O3_HIGH_LT_LOW,
+                SEV_CRITICAL,
                 f"{len(hl_vio)} bar(s) where high < low",
             )
         )
@@ -597,7 +608,10 @@ def check_positive_prices(
     sub = df.loc[bad_mask, ["date", "open", "high", "low", "close"]]
     rows = _ohlc_rows(sub, tf, pair)
     finding = Finding(
-        tf, pair, CHK_O4_NON_POSITIVE_PRICE, SEV_CRITICAL,
+        tf,
+        pair,
+        CHK_O4_NON_POSITIVE_PRICE,
+        SEV_CRITICAL,
         f"{int(bad_mask.sum())} bar(s) with non-positive OHLC",
     )
     return [finding], rows
@@ -612,15 +626,16 @@ def check_flat_bars(
         return [], []
     sub = df[["date", "open", "high", "low", "close"]].dropna()
     flat = sub.loc[
-        (sub["open"] == sub["high"])
-        & (sub["high"] == sub["low"])
-        & (sub["low"] == sub["close"])
+        (sub["open"] == sub["high"]) & (sub["high"] == sub["low"]) & (sub["low"] == sub["close"])
     ]
     if flat.empty:
         return [], []
     rows = _ohlc_rows(flat.head(max_examples), tf, pair)
     finding = Finding(
-        tf, pair, CHK_O5_FLAT_BAR, SEV_WARN,
+        tf,
+        pair,
+        CHK_O5_FLAT_BAR,
+        SEV_WARN,
         f"{len(flat)} flat bar(s); recorded first {len(rows)}",
     )
     return [finding], rows
@@ -644,7 +659,10 @@ def check_spread(
     if not pd.api.types.is_numeric_dtype(spread_raw) or spread_raw.isna().all():
         findings.append(
             Finding(
-                tf, pair, CHK_P1_SPREAD_MISSING, SEV_CRITICAL,
+                tf,
+                pair,
+                CHK_P1_SPREAD_MISSING,
+                SEV_CRITICAL,
                 "spread column not numeric or all NaN",
             )
         )
@@ -660,7 +678,10 @@ def check_spread(
     if pct_zero > 0:
         findings.append(
             Finding(
-                tf, pair, CHK_P2_ZERO_SPREAD, SEV_WARN,
+                tf,
+                pair,
+                CHK_P2_ZERO_SPREAD,
+                SEV_WARN,
                 f"{n_zero} bar(s) with spread==0 ({pct_zero:.2f}%)",
             )
         )
@@ -675,7 +696,10 @@ def check_spread(
         if summary["spread_max_pips"] > threshold_pips:
             findings.append(
                 Finding(
-                    tf, pair, CHK_P3_SPREAD_DIST, SEV_WARN,
+                    tf,
+                    pair,
+                    CHK_P3_SPREAD_DIST,
+                    SEV_WARN,
                     f"max spread {summary['spread_max_pips']:.2f} pips > threshold {threshold_pips}",
                 )
             )
@@ -697,7 +721,10 @@ def check_spread(
         rows.sort(key=lambda x: (x["timestamp"], x["pair"]))
         findings.append(
             Finding(
-                tf, pair, CHK_P4_SPREAD_HIGH, SEV_WARN,
+                tf,
+                pair,
+                CHK_P4_SPREAD_HIGH,
+                SEV_WARN,
                 f"{len(rows)} bar(s) with spread > {threshold_pips} pips",
             )
         )
@@ -749,7 +776,10 @@ def check_anomaly_returns(
         )
     rows.sort(key=lambda r: (r["timestamp"], r["pair"]))
     finding = Finding(
-        tf, pair, CHK_A1_RETURN_SPIKE, SEV_WARN,
+        tf,
+        pair,
+        CHK_A1_RETURN_SPIKE,
+        SEV_WARN,
         f"{len(rows)} bar(s) with |return| > {atr_multiple}*ATR({atr_window})",
     )
     return [finding], rows
@@ -844,9 +874,7 @@ def cross_tf_compare(
         high_norm["date"] = high_norm["date"].dt.floor("D")
     elif target_grid == "H4":
         high_norm["date"] = high_norm["date"].dt.floor("4h")
-    merged = low_agg.merge(
-        high_norm, on="date", how="inner", suffixes=("_agg", "_disk")
-    )
+    merged = low_agg.merge(high_norm, on="date", how="inner", suffixes=("_agg", "_disk"))
     if merged.empty:
         return findings, rows
     merged = merged.loc[~merged["date"].dt.weekday.isin([5, 6])].reset_index(drop=True)
@@ -938,7 +966,9 @@ def audit_one_file(
         norm = normalize_ohlcv_schema(raw)
     except Exception as exc:  # noqa: BLE001
         audit.findings.append(
-            Finding(tf, pair, CHK_LOAD_FAIL, SEV_CRITICAL, f"normalize_ohlcv_schema raised: {exc!r}")
+            Finding(
+                tf, pair, CHK_LOAD_FAIL, SEV_CRITICAL, f"normalize_ohlcv_schema raised: {exc!r}"
+            )
         )
         return audit, None
 
@@ -1064,7 +1094,11 @@ def run_audit(cfg: Mapping[str, Any]) -> dict[str, Any]:
 
         # X2: deterministic per-pair seed (so each pair's draw is reproducible)
         pair_seed = (seed + int(hashlib.md5(pair.encode("utf-8")).hexdigest(), 16)) % (2**32)
-        for low_tf, high_tf, target in (("1hr", "4hr", "H4"), ("4hr", "daily", "D"), ("daily", "w1", "W")):
+        for low_tf, high_tf, target in (
+            ("1hr", "4hr", "H4"),
+            ("4hr", "daily", "D"),
+            ("daily", "w1", "W"),
+        ):
             if low_tf in tfs and high_tf in tfs:
                 f, rows = cross_tf_compare(
                     tfs[low_tf],
@@ -1153,9 +1187,7 @@ def write_outputs(payload: Mapping[str, Any], cfg: Mapping[str, Any]) -> tuple[P
                 "spread_max_pips": a.summary.get("spread_max_pips", ""),
                 "spread_zero_count": a.summary.get("spread_zero_count", ""),
                 "spread_zero_pct": a.summary.get("spread_zero_pct", ""),
-                "n_findings_critical": sum(
-                    1 for f in a.findings if f.severity == SEV_CRITICAL
-                ),
+                "n_findings_critical": sum(1 for f in a.findings if f.severity == SEV_CRITICAL),
                 "n_findings_warn": sum(1 for f in a.findings if f.severity == SEV_WARN),
             }
         )
@@ -1212,8 +1244,12 @@ def render_report(
     lines.append("")
     lines.append("## 1. Discovery")
     lines.append("")
-    lines.append("| timeframe | dir | exists | files | extensions | naming | covered | missing | extras | bytes |")
-    lines.append("|-----------|-----|--------|-------|------------|--------|---------|---------|--------|-------|")
+    lines.append(
+        "| timeframe | dir | exists | files | extensions | naming | covered | missing | extras | bytes |"
+    )
+    lines.append(
+        "|-----------|-----|--------|-------|------------|--------|---------|---------|--------|-------|"
+    )
     for tf in sorted(discovery.keys()):
         d = discovery[tf]
         lines.append(
@@ -1269,8 +1305,10 @@ def render_report(
 
     lines.append("## 5. WARN findings (summary)")
     lines.append("")
-    warn = sorted([f for a in audits for f in a.findings if f.severity == SEV_WARN] +
-                  [f for f in cross_findings if f.severity == SEV_WARN])
+    warn = sorted(
+        [f for a in audits for f in a.findings if f.severity == SEV_WARN]
+        + [f for f in cross_findings if f.severity == SEV_WARN]
+    )
     if not warn:
         lines.append("_None._")
     else:
@@ -1337,17 +1375,38 @@ def _columns_for_check(check_id: str, rows: list[dict[str, Any]]) -> list[str]:
         CHK_O1_HIGH_VIOLATION: ["timeframe", "pair", "timestamp", "open", "high", "low", "close"],
         CHK_O2_LOW_VIOLATION: ["timeframe", "pair", "timestamp", "open", "high", "low", "close"],
         CHK_O3_HIGH_LT_LOW: ["timeframe", "pair", "timestamp", "open", "high", "low", "close"],
-        CHK_O4_NON_POSITIVE_PRICE: ["timeframe", "pair", "timestamp", "open", "high", "low", "close"],
+        CHK_O4_NON_POSITIVE_PRICE: [
+            "timeframe",
+            "pair",
+            "timestamp",
+            "open",
+            "high",
+            "low",
+            "close",
+        ],
         CHK_O5_FLAT_BAR: ["timeframe", "pair", "timestamp", "open", "high", "low", "close"],
         CHK_P4_SPREAD_HIGH: ["timeframe", "pair", "timestamp", "spread_raw", "spread_pips"],
         CHK_A1_RETURN_SPIKE: [
-            "timeframe", "pair", "timestamp", "open", "close", "abs_return", "atr",
+            "timeframe",
+            "pair",
+            "timestamp",
+            "open",
+            "close",
+            "abs_return",
+            "atr",
         ],
         CHK_A2_REPEAT_BAR: ["timeframe", "pair", "timestamp", "open", "high", "low", "close"],
         CHK_X1_RANGE_OVERLAP: ["pair", "timeframe", "first_bar", "last_bar", "bar_count"],
         CHK_X2_AGGREGATION_DIFF: [
-            "pair", "low_tf", "high_tf", "bucket",
-            "open_diff", "high_diff", "low_diff", "close_diff", "volume_diff",
+            "pair",
+            "low_tf",
+            "high_tf",
+            "bucket",
+            "open_diff",
+            "high_diff",
+            "low_diff",
+            "close_diff",
+            "volume_diff",
         ],
         CHK_X3_PAIR_MISSING: ["pair", "missing_timeframes"],
     }

@@ -39,8 +39,14 @@ ARC2_STEP1 = REPO_ROOT / "results" / "l_arc_2" / "step1_verbatim"
 
 def _stats(values: np.ndarray) -> dict:
     if values.size == 0:
-        return {"n": 0, "mean": float("nan"), "median": float("nan"),
-                "p90": float("nan"), "p99": float("nan"), "max": float("nan")}
+        return {
+            "n": 0,
+            "mean": float("nan"),
+            "median": float("nan"),
+            "p90": float("nan"),
+            "p99": float("nan"),
+            "max": float("nan"),
+        }
     return {
         "n": int(values.size),
         "mean": float(np.mean(values)),
@@ -65,9 +71,7 @@ def _consecutive_run_lengths(bar_indices: np.ndarray) -> np.ndarray:
     return counts.astype(int)
 
 
-def _inter_take_gaps_in_1h_bars(
-    take_times: pd.Series, df_1h_index: pd.Series
-) -> np.ndarray:
+def _inter_take_gaps_in_1h_bars(take_times: pd.Series, df_1h_index: pd.Series) -> np.ndarray:
     """For a single pair: sort entry times, compute inter-take gaps measured
     as the count of 1H bars between consecutive entries on that pair.
 
@@ -147,7 +151,9 @@ def _analyse_pool(
     all_gaps: List[int] = []
     for pair, sub in trd_df.groupby("pair"):
         df_1h_idx = _load_pair_1h_index(pair)
-        gaps = _inter_take_gaps_in_1h_bars(sub["entry_time_utc" if "entry_time_utc" in sub.columns else "entry_bar_ts"], df_1h_idx)
+        gaps = _inter_take_gaps_in_1h_bars(
+            sub["entry_time_utc" if "entry_time_utc" in sub.columns else "entry_bar_ts"], df_1h_idx
+        )
         per_pair_gaps[pair] = _stats(gaps)
         all_gaps.extend(gaps.tolist())
     pool_gaps_stats = _stats(np.array(all_gaps, dtype=int))
@@ -220,14 +226,22 @@ def main() -> int:
     lines.append("  Arc 2 is state-conditional — runs should be SHORTER.")
     lines.append("  Direct quantitative comparison is the diagnostic's purpose.")
     lines.append("")
-    lines.extend(_format_table(
-        "## (a) Consecutive 1H fire-bar runs per pair (arc 3) — compared to arc 2 pool",
-        arc3_pair_runs, arc3_pool_runs, arc2_pool_runs,
-    ))
-    lines.extend(_format_table(
-        "## (b) Inter-take 1H bar gaps per pair (arc 3) — compared to arc 2 pool",
-        arc3_pair_gaps, arc3_pool_gaps, arc2_pool_gaps,
-    ))
+    lines.extend(
+        _format_table(
+            "## (a) Consecutive 1H fire-bar runs per pair (arc 3) — compared to arc 2 pool",
+            arc3_pair_runs,
+            arc3_pool_runs,
+            arc2_pool_runs,
+        )
+    )
+    lines.extend(
+        _format_table(
+            "## (b) Inter-take 1H bar gaps per pair (arc 3) — compared to arc 2 pool",
+            arc3_pair_gaps,
+            arc3_pool_gaps,
+            arc2_pool_gaps,
+        )
+    )
 
     OUT_PATH.write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(f"  written: {OUT_PATH}")

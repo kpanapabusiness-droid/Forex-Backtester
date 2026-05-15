@@ -89,8 +89,7 @@ def load_spread_floor(cfg: dict[str, Any]) -> SpreadFloorState:
     path = _resolve_source_path(str(source))
     if not path.exists():
         raise FileNotFoundError(
-            f"spread_floor.source not found: {path}\n"
-            "  see: docs/L6_0_METHODOLOGY_LOCK.md §7"
+            f"spread_floor.source not found: {path}\n  see: docs/L6_0_METHODOLOGY_LOCK.md §7"
         )
 
     actual = compute_body_sha256(path)
@@ -121,9 +120,7 @@ def load_spread_floor(cfg: dict[str, Any]) -> SpreadFloorState:
     )
 
 
-def apply_spread_floor_to_pips(
-    cfg: dict[str, Any], pair: str, pips: float
-) -> float:
+def apply_spread_floor_to_pips(cfg: dict[str, Any], pair: str, pips: float) -> float:
     """Cap-floor a resolved spread (in pips) using cfg's runtime spread-floor state.
 
     No-op semantics when state is absent (legacy/unrelated callers) or disabled.
@@ -148,9 +145,7 @@ def apply_spread_floor_to_pips(
 def format_startup_log(state: SpreadFloorState) -> str:
     src = state.source_path if state.enabled else None
     return (
-        f"SPREAD_FLOOR: enabled={state.enabled}, "
-        f"hash_check={state.hash_check}, "
-        f"floor_source={src}"
+        f"SPREAD_FLOOR: enabled={state.enabled}, hash_check={state.hash_check}, floor_source={src}"
     )
 
 
@@ -158,8 +153,4 @@ def format_summary_log(state: SpreadFloorState) -> str:
     n = state.n_applications
     m = state.n_total_entry_bars
     pct = (n / m) if m > 0 else 0.0
-    return (
-        f"SPREAD_FLOOR_APPLICATIONS: count={n}, "
-        f"total_entry_bars={m}, "
-        f"pct_floored={pct:.6f}"
-    )
+    return f"SPREAD_FLOOR_APPLICATIONS: count={n}, total_entry_bars={m}, pct_floored={pct:.6f}"

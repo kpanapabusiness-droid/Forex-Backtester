@@ -1,3 +1,4 @@
+# ruff: noqa: E402  (sys.path.insert needed before project imports)
 """Orchestrator: run the full L Arc 2 step 2 pipeline.
 
 Phases:
@@ -13,6 +14,7 @@ Phases:
 
 Run with: py -m scripts.l_arc_2.step2.run_step2
 """
+
 from __future__ import annotations
 
 import sys
@@ -24,12 +26,20 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from scripts.l_arc_2.step2 import (
-    phase_a_features, phase_a_lookahead, phase_b_marginals, phase_c_conditional,
-    phase_d_stability, phase_e_shadows, phase_f_cost_stress, phase_g_random,
-    phase_h_held_bar, phase_i_report,
+    phase_a_features,
+    phase_a_lookahead,
+    phase_b_marginals,
+    phase_c_conditional,
+    phase_d_stability,
+    phase_e_shadows,
+    phase_f_cost_stress,
+    phase_g_random,
+    phase_h_held_bar,
+    phase_i_report,
 )
 from scripts.l_arc_2.step2._io import (
-    FORWARD_HORIZON_BARS_DEFAULT, FORWARD_HORIZON_BARS_EXTENDED,
+    FORWARD_HORIZON_BARS_DEFAULT,
+    FORWARD_HORIZON_BARS_EXTENDED,
 )
 
 
@@ -60,7 +70,7 @@ def main() -> None:
     phase_i_report.main(extended=extended)
 
     print("=" * 70)
-    print(f"Pipeline complete in {time.time()-t0:.0f}s")
+    print(f"Pipeline complete in {time.time() - t0:.0f}s")
     print("Outputs under results/l_arc_2/step2_descriptive/")
     print("=" * 70)
 

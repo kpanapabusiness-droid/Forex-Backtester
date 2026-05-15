@@ -8,6 +8,7 @@ Strategy:
   5. Diff. PASS if all match. Write determinism_check.txt.
   6. Restore .run1 names as evidence.
 """
+
 # ruff: noqa: E402, E701, E702, F841, I001, F401
 from __future__ import annotations
 

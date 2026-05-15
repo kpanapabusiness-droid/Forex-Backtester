@@ -1,3 +1,4 @@
+# ruff: noqa: E402  (sys.path.insert needed before project imports)
 """Step 2 — two-consecutive-run byte-identical determinism check.
 
 Strategy: keep a backup copy of the current outputs (.run1), re-run Phase A
@@ -8,9 +9,9 @@ Other phases are deterministic pure functions of Phase A's output, so
 matching A is sufficient for the downstream artefacts; we still re-run B/C/D
 to verify end-to-end byte-identicality.
 """
+
 from __future__ import annotations
 
-import shutil
 import sys
 import time
 from pathlib import Path
@@ -21,7 +22,9 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from scripts.l_arc_1.step2._io import (
-    FORWARD_HORIZON_BARS_EXTENDED, STEP2_DIR, sha256_file,
+    FORWARD_HORIZON_BARS_EXTENDED,
+    STEP2_DIR,
+    sha256_file,
 )
 
 CHECK_FILES = [
@@ -62,17 +65,21 @@ def main() -> None:
     print("[determinism] re-running full pipeline in place...")
     # Run Phase A (re-creates signals_features.csv + trade_paths.csv)
     from scripts.l_arc_1.step2 import phase_a_features
+
     phase_a_features.run_phase_a(H=FORWARD_HORIZON_BARS_EXTENDED)
     # Phase B, C, D
     from scripts.l_arc_1.step2 import phase_b_marginals, phase_c_conditional, phase_d_stability
+
     phase_b_marginals.run_phase_b()
     phase_c_conditional.run_phase_c()
     phase_d_stability.run_stability_check()
     # Phase E, F, G, H
     from scripts.l_arc_1.step2 import phase_e_shadows, phase_f_cost_stress
+
     phase_e_shadows.run_phase_e()
     phase_f_cost_stress.run_phase_f()
     from scripts.l_arc_1.step2 import phase_g_random, phase_h_held_bar
+
     phase_g_random.run_phase_g()
     phase_h_held_bar.run_phase_h()
 
@@ -114,7 +121,9 @@ def main() -> None:
         lines.append("")
     out = STEP2_DIR / "determinism_check.txt"
     out.write_text("\n".join(lines), encoding="utf-8")
-    print(f"[determinism] {'PASS' if passed else 'FAIL'}; took {time.time()-t0:.0f}s; wrote {out}")
+    print(
+        f"[determinism] {'PASS' if passed else 'FAIL'}; took {time.time() - t0:.0f}s; wrote {out}"
+    )
 
 
 if __name__ == "__main__":

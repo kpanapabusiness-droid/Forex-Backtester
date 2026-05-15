@@ -49,14 +49,14 @@ def test_exit_indicator_signal():
     df["atr"] = 1.0
     # Exit indicator signals exit at bar 3
     df["exit_signal"] = pd.Series([0, 0, 0, 1, 0, 0])
-    
+
     cfg = {
         "indicators": {},
         "rules": {},
         "exit": {"exit_on_c1_reversal": False, "exit_on_exit_signal": True},
     }
     out = apply_signal_logic(df, cfg)
-    
+
     # Entry should occur at bar 0 (C1 signal present)
     assert out.loc[0, "entry_signal"] == 1
     # Exit should be triggered by exit indicator at bar 3
@@ -79,14 +79,14 @@ def test_exit_indicator_priority_after_c1_reversal():
     df["atr"] = 1.0
     # Exit indicator also signals at bar 2
     df["exit_signal"] = pd.Series([0, 0, 1, 0, 0, 0])
-    
+
     cfg = {
         "indicators": {},
         "rules": {},
         "exit": {"exit_on_c1_reversal": True, "exit_on_exit_signal": True},
     }
     out = apply_signal_logic(df, cfg)
-    
+
     # Entry at bar 0
     assert out.loc[0, "entry_signal"] == 1
     # Exit at bar 2 should be due to C1 reversal (higher priority)
@@ -109,14 +109,14 @@ def test_exit_indicator_does_not_affect_entries():
     df["atr"] = 1.0
     # Exit indicator signals at bar 1 (after entry at bar 0)
     df["exit_signal"] = pd.Series([0, 1, 0, 0, 0, 0])
-    
+
     cfg = {
         "indicators": {},
         "rules": {},
         "exit": {"exit_on_c1_reversal": False, "exit_on_exit_signal": True},
     }
     out = apply_signal_logic(df, cfg)
-    
+
     # Entry should occur at bar 0 (exit indicator doesn't prevent entries)
     assert out.loc[0, "entry_signal"] == 1
     # Exit should trigger at bar 1 when exit indicator signals (position is open)

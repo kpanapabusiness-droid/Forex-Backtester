@@ -166,7 +166,9 @@ def compute_clean_labels_for_pair(
                     )
                     row[f"clean_mfe_{direction}_x{x}_h{h}"] = mfe
                     if h == 40:
-                        row[f"breach_k_{direction}_x{x}_h40"] = breach if breach is not None else np.nan
+                        row[f"breach_k_{direction}_x{x}_h40"] = (
+                            breach if breach is not None else np.nan
+                        )
                         row[f"peak_k_{direction}_x{x}_h40"] = peak if peak is not None else np.nan
 
                 if valid_h10:

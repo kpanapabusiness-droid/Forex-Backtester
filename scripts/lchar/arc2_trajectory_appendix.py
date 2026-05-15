@@ -40,10 +40,8 @@ Documented operational decisions (re-run with --print-decisions to reproduce):
 from __future__ import annotations
 
 import argparse
-import datetime as _dt
 import hashlib
 import io
-import json
 import os
 import sys
 from collections import OrderedDict
@@ -60,7 +58,6 @@ import matplotlib  # noqa: E402
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
-
 import pyarrow as pa  # noqa: E402
 import pyarrow.parquet as pq  # noqa: E402
 from scipy import stats as sps  # noqa: E402
@@ -80,13 +77,45 @@ SKLEARN_SEED: int = 20260512
 HIERARCHICAL_SUBSAMPLE_N: int = 8000
 
 PAIRS: Tuple[str, ...] = (
-    "AUD_CAD", "AUD_CHF", "AUD_JPY", "AUD_NZD", "AUD_USD", "CAD_CHF", "CAD_JPY", "CHF_JPY",
-    "EUR_AUD", "EUR_CAD", "EUR_CHF", "EUR_GBP", "EUR_JPY", "EUR_NZD", "EUR_USD", "GBP_AUD",
-    "GBP_CAD", "GBP_CHF", "GBP_JPY", "GBP_NZD", "GBP_USD", "NZD_CAD", "NZD_CHF", "NZD_JPY",
-    "NZD_USD", "USD_CAD", "USD_CHF", "USD_JPY",
+    "AUD_CAD",
+    "AUD_CHF",
+    "AUD_JPY",
+    "AUD_NZD",
+    "AUD_USD",
+    "CAD_CHF",
+    "CAD_JPY",
+    "CHF_JPY",
+    "EUR_AUD",
+    "EUR_CAD",
+    "EUR_CHF",
+    "EUR_GBP",
+    "EUR_JPY",
+    "EUR_NZD",
+    "EUR_USD",
+    "GBP_AUD",
+    "GBP_CAD",
+    "GBP_CHF",
+    "GBP_JPY",
+    "GBP_NZD",
+    "GBP_USD",
+    "NZD_CAD",
+    "NZD_CHF",
+    "NZD_JPY",
+    "NZD_USD",
+    "USD_CAD",
+    "USD_CHF",
+    "USD_JPY",
 )
 
-INPUT_SIGNALS_CSV: Path = REPO_ROOT / "results" / "l6" / "arc2" / "characterisation" / "v1_1_full" / "signals_features.csv"
+INPUT_SIGNALS_CSV: Path = (
+    REPO_ROOT
+    / "results"
+    / "l6"
+    / "arc2"
+    / "characterisation"
+    / "v1_1_full"
+    / "signals_features.csv"
+)
 DATA_1H_DIR: Path = REPO_ROOT / "data" / "1hr"
 OUTPUT_DIR: Path = REPO_ROOT / "results" / "l6" / "arc2" / "trajectory_appendix"
 CHARTS_DIR: Path = OUTPUT_DIR / "charts"
@@ -97,11 +126,13 @@ L4_ANCHOR_HIGH: int = 42_601
 TRAJ_HORIZON: int = 240  # bars after entry: t = 0..240 inclusive (241 rows / trade)
 
 # Distributional spec: 0.25R histogram bins from -3R to +12R, plus overflow.
-HIST_BIN_EDGES: np.ndarray = np.concatenate([
-    [-np.inf],
-    np.round(np.arange(-3.0, 12.0 + 0.25 / 2, 0.25), 4),
-    [np.inf],
-])
+HIST_BIN_EDGES: np.ndarray = np.concatenate(
+    [
+        [-np.inf],
+        np.round(np.arange(-3.0, 12.0 + 0.25 / 2, 0.25), 4),
+        [np.inf],
+    ]
+)
 
 DIST_PERCENTILES: Tuple[float, ...] = (1, 5, 10, 25, 50, 75, 90, 95, 99)
 ENVELOPE_PERCENTILES: Tuple[float, ...] = (1, 5, 10, 25, 50, 75, 90, 95, 99)
@@ -183,9 +214,9 @@ def _png_pixel_hash(path: Path) -> str:
     while pos < len(data):
         if pos + 8 > len(data):
             break
-        length = int.from_bytes(data[pos:pos + 4], "big")
-        chunk_type = data[pos + 4:pos + 8]
-        chunk_data = data[pos + 8:pos + 8 + length]
+        length = int.from_bytes(data[pos : pos + 4], "big")
+        chunk_type = data[pos + 4 : pos + 8]
+        chunk_data = data[pos + 8 : pos + 8 + length]
         if chunk_type == b"IDAT":
             out.update(chunk_data)
         pos = pos + 8 + length + 4  # +4 for CRC
@@ -364,22 +395,24 @@ def build_panel_and_shape_features(
             run_mae = np.minimum.accumulate(r_low)
 
             # Build the panel arrays with the t=0 anchor prepended.
-            t_arr = panel_t[:n_post_bars + 1]
+            t_arr = panel_t[: n_post_bars + 1]
             r_close_full = np.concatenate(([0.0], r_close))
             r_high_full = np.concatenate(([0.0], r_high))
             r_low_full = np.concatenate(([0.0], r_low))
             run_mfe_full = np.concatenate(([0.0], run_mfe))
             run_mae_full = np.concatenate(([0.0], run_mae))
 
-            panel_chunks.append({
-                "signal_idx": np.full(len(t_arr), sig_idx, dtype=np.int64),
-                "t": t_arr.astype(np.int32),
-                "r_close": r_close_full.astype(np.float64),
-                "r_high": r_high_full.astype(np.float64),
-                "r_low": r_low_full.astype(np.float64),
-                "running_mfe": run_mfe_full.astype(np.float64),
-                "running_mae": run_mae_full.astype(np.float64),
-            })
+            panel_chunks.append(
+                {
+                    "signal_idx": np.full(len(t_arr), sig_idx, dtype=np.int64),
+                    "t": t_arr.astype(np.int32),
+                    "r_close": r_close_full.astype(np.float64),
+                    "r_high": r_high_full.astype(np.float64),
+                    "r_low": r_low_full.astype(np.float64),
+                    "running_mfe": run_mfe_full.astype(np.float64),
+                    "running_mae": run_mae_full.astype(np.float64),
+                }
+            )
 
             fold_id_val = int(row.fold_id) if pd.notna(row.fold_id) else -1
             # Shape features (over t=1..n_post_bars; t=0 excluded).
@@ -397,27 +430,38 @@ def build_panel_and_shape_features(
                 run_mae=run_mae,
                 n_post_bars=n_post_bars,
                 actual_taken=taken,
-                actual_exit_bar=(int(row.held_bars) if (taken and pd.notna(row.held_bars)) else None),
-                actual_exit_reason=(str(row.exit_reason) if (taken and pd.notna(row.exit_reason)) else None),
+                actual_exit_bar=(
+                    int(row.held_bars) if (taken and pd.notna(row.held_bars)) else None
+                ),
+                actual_exit_reason=(
+                    str(row.exit_reason) if (taken and pd.notna(row.exit_reason)) else None
+                ),
                 fold_id=fold_id_val,
                 clamped=(n_post_bars < horizon),
             )
             shape_rows.append(shape)
 
             # Spot-check: virtual trajectory must run past actual_exit_bar.
-            if taken and pd.notna(row.exit_reason) and str(row.exit_reason) == "stop_loss" and len(spot_checks) < 3:
+            if (
+                taken
+                and pd.notna(row.exit_reason)
+                and str(row.exit_reason) == "stop_loss"
+                and len(spot_checks) < 3
+            ):
                 actual_bar = int(row.held_bars) if pd.notna(row.held_bars) else None
-                spot_checks.append({
-                    "signal_idx": sig_idx,
-                    "pair": pair,
-                    "signal_time": str(sig_time),
-                    "actual_exit_bar": actual_bar,
-                    "panel_last_t": int(t_arr[-1]),
-                    "panel_extends_past_actual_exit": (
-                        actual_bar is not None and t_arr[-1] > actual_bar
-                    ),
-                    "r_close_at_panel_end": float(r_close_full[-1]),
-                })
+                spot_checks.append(
+                    {
+                        "signal_idx": sig_idx,
+                        "pair": pair,
+                        "signal_time": str(sig_time),
+                        "actual_exit_bar": actual_bar,
+                        "panel_last_t": int(t_arr[-1]),
+                        "panel_extends_past_actual_exit": (
+                            actual_bar is not None and t_arr[-1] > actual_bar
+                        ),
+                        "r_close_at_panel_end": float(r_close_full[-1]),
+                    }
+                )
 
     # Concatenate panel chunks.
     panel_dict = {
@@ -433,7 +477,9 @@ def build_panel_and_shape_features(
     # Deterministic order.
     panel = panel.sort_values(by=["signal_idx", "t"], kind="mergesort").reset_index(drop=True)
 
-    shape_df = pd.DataFrame(shape_rows).sort_values("signal_idx", kind="mergesort").reset_index(drop=True)
+    shape_df = (
+        pd.DataFrame(shape_rows).sort_values("signal_idx", kind="mergesort").reset_index(drop=True)
+    )
 
     meta = {
         "dropped_no_signal_bar": dropped_no_signal_bar,
@@ -564,7 +610,9 @@ def _compute_shape_features(
     num_distinct_1r_peaks = _count_distinct_1r_peaks(r_high, 1.0, 0.5)
 
     final_r = float(r_close[-1]) if len(r_close) > 0 else float("nan")
-    retrace_from_peak_mfe = float(peak_mfe_r - r_at(TRAJ_HORIZON)) if not np.isnan(r_at(TRAJ_HORIZON)) else float("nan")
+    retrace_from_peak_mfe = (
+        float(peak_mfe_r - r_at(TRAJ_HORIZON)) if not np.isnan(r_at(TRAJ_HORIZON)) else float("nan")
+    )
     time_to_peak_mfe = peak_mfe_bar  # already the bar; named separately for distribution stats
 
     return {
@@ -592,10 +640,18 @@ def _compute_shape_features(
         "time_to_first_1r_mfe": (int(first_1_mfe_bar) if first_1_mfe_bar is not None else None),
         "time_to_first_2r_mfe": (int(first_2_mfe_bar) if first_2_mfe_bar is not None else None),
         "time_to_first_3r_mfe": (int(first_3_mfe_bar) if first_3_mfe_bar is not None else None),
-        "time_to_first_neg05r_mae": (int(first_neg05_mae_bar) if first_neg05_mae_bar is not None else None),
-        "time_to_first_neg1r_mae": (int(first_neg1_mae_bar) if first_neg1_mae_bar is not None else None),
-        "time_to_first_neg2r_mae": (int(first_neg2_mae_bar) if first_neg2_mae_bar is not None else None),
-        "first_touch_05r_dir": (int(first_touch_05_dir) if first_touch_05_dir is not None else None),
+        "time_to_first_neg05r_mae": (
+            int(first_neg05_mae_bar) if first_neg05_mae_bar is not None else None
+        ),
+        "time_to_first_neg1r_mae": (
+            int(first_neg1_mae_bar) if first_neg1_mae_bar is not None else None
+        ),
+        "time_to_first_neg2r_mae": (
+            int(first_neg2_mae_bar) if first_neg2_mae_bar is not None else None
+        ),
+        "first_touch_05r_dir": (
+            int(first_touch_05_dir) if first_touch_05_dir is not None else None
+        ),
         "first_touch_1r_dir": (int(first_touch_1_dir) if first_touch_1_dir is not None else None),
         "first_touch_2r_dir": (int(first_touch_2_dir) if first_touch_2_dir is not None else None),
         "num_distinct_1r_peaks": int(num_distinct_1r_peaks),
@@ -626,7 +682,9 @@ def describe_distribution(values: np.ndarray, label: str) -> Dict[str, Any]:
     out["mean"] = float(np.mean(arr))
     out["std"] = float(np.std(arr, ddof=1)) if n > 1 else float("nan")
     out["skew"] = float(sps.skew(arr, bias=False)) if n > 2 else float("nan")
-    out["excess_kurt"] = float(sps.kurtosis(arr, fisher=True, bias=False)) if n > 3 else float("nan")
+    out["excess_kurt"] = (
+        float(sps.kurtosis(arr, fisher=True, bias=False)) if n > 3 else float("nan")
+    )
     out["min"] = float(np.min(arr))
     out["max"] = float(np.max(arr))
     pcts = np.percentile(arr, list(DIST_PERCENTILES), method="linear")
@@ -711,13 +769,16 @@ def phase1_pooled_envelope(panel: pd.DataFrame) -> pd.DataFrame:
 
 def phase1_first_touch_crosstab(shape: pd.DataFrame) -> pd.DataFrame:
     """Cross-tab first_touch_{05r,1r,2r}_dir. Counts + P(final_r > 0)."""
+
     def code(v: Any) -> str:
         if v is None or (isinstance(v, float) and not np.isfinite(v)):
             return "never"
         v = int(v)
         return "up" if v > 0 else "down"
 
-    df = shape[["signal_idx", "first_touch_05r_dir", "first_touch_1r_dir", "first_touch_2r_dir", "final_r"]].copy()
+    df = shape[
+        ["signal_idx", "first_touch_05r_dir", "first_touch_1r_dir", "first_touch_2r_dir", "final_r"]
+    ].copy()
     df["c05"] = df["first_touch_05r_dir"].apply(code)
     df["c1"] = df["first_touch_1r_dir"].apply(code)
     df["c2"] = df["first_touch_2r_dir"].apply(code)
@@ -762,8 +823,12 @@ def phase1_chart_envelope(envelope: pd.DataFrame, path: Path) -> None:
 
 def phase1_chart_scatter_mfe_mae(shape: pd.DataFrame, path: Path) -> None:
     fig, ax = plt.subplots(figsize=(7, 7))
-    ax.scatter(shape["peak_mfe_r"], shape["peak_mae_r"], s=2, alpha=0.15, color="C0", rasterized=True)
-    ax.axhline(-1.0, color="red", lw=0.8, linestyle="--", alpha=0.7, label="SL line (peak_mae_r = -1R)")
+    ax.scatter(
+        shape["peak_mfe_r"], shape["peak_mae_r"], s=2, alpha=0.15, color="C0", rasterized=True
+    )
+    ax.axhline(
+        -1.0, color="red", lw=0.8, linestyle="--", alpha=0.7, label="SL line (peak_mae_r = -1R)"
+    )
     ax.set_xlabel("peak_mfe_r")
     ax.set_ylabel("peak_mae_r")
     ax.set_title("peak_mfe_r vs peak_mae_r (per trade)")
@@ -773,9 +838,19 @@ def phase1_chart_scatter_mfe_mae(shape: pd.DataFrame, path: Path) -> None:
 
 def phase1_chart_scatter_end_peak_mfe(shape: pd.DataFrame, path: Path) -> None:
     fig, ax = plt.subplots(figsize=(7, 7))
-    ax.scatter(shape["peak_mfe_r"], shape["r_at_t240"], s=2, alpha=0.15, color="C0", rasterized=True)
+    ax.scatter(
+        shape["peak_mfe_r"], shape["r_at_t240"], s=2, alpha=0.15, color="C0", rasterized=True
+    )
     ax.axhline(0.0, color="black", lw=0.5, linestyle="--", alpha=0.5)
-    ax.plot([0, shape["peak_mfe_r"].max()], [0, shape["peak_mfe_r"].max()], color="red", lw=0.6, linestyle="--", alpha=0.6, label="r_at_t240 = peak_mfe_r")
+    ax.plot(
+        [0, shape["peak_mfe_r"].max()],
+        [0, shape["peak_mfe_r"].max()],
+        color="red",
+        lw=0.6,
+        linestyle="--",
+        alpha=0.6,
+        label="r_at_t240 = peak_mfe_r",
+    )
     ax.set_xlabel("peak_mfe_r")
     ax.set_ylabel("r_at_t240")
     ax.set_title("r_at_t240 vs peak_mfe_r (per trade)")
@@ -908,7 +983,9 @@ def phase2_clustering(
         cols[f"km_k{k}"] = full_col
         hier_col = np.full(n_total, -1, dtype=np.int32)
         # Map subsample assignments back to their signal_idx.
-        sub_positions_in_keep = sub_order  # positions within feat_kept (== positions within keep-mask rows)
+        sub_positions_in_keep = (
+            sub_order  # positions within feat_kept (== positions within keep-mask rows)
+        )
         keep_positions = np.flatnonzero(keep_mask)  # absolute positions in shape
         target_positions = keep_positions[sub_positions_in_keep]
         hier_col[target_positions] = hier_labels_sub[k]
@@ -921,7 +998,7 @@ def phase2_clustering(
     # Cluster trajectory envelopes (long format).
     # Per (k, source, cluster, t, percentile, r_close).
     long_rows: List[Dict[str, Any]] = []
-    panel_signal_to_t = panel.set_index(["signal_idx", "t"])["r_close"]
+    panel.set_index(["signal_idx", "t"])["r_close"]
 
     # Build a quick per-signal r_close-by-t numpy view to avoid index overhead.
     # Group panel by signal_idx.
@@ -953,15 +1030,17 @@ def phase2_clustering(
                         continue
                     pct_vals = np.percentile(finite, pcts, method="linear")
                     for p, v in zip(pcts, pct_vals):
-                        long_rows.append({
-                            "k": k,
-                            "source": source,
-                            "cluster": int(cid),
-                            "n_cluster": int(len(member_sigs)),
-                            "t": int(t),
-                            "percentile": int(p),
-                            "r_close": float(v),
-                        })
+                        long_rows.append(
+                            {
+                                "k": k,
+                                "source": source,
+                                "cluster": int(cid),
+                                "n_cluster": int(len(member_sigs)),
+                                "t": int(t),
+                                "percentile": int(p),
+                                "r_close": float(v),
+                            }
+                        )
     trajectories = pd.DataFrame(long_rows)
 
     meta = {
@@ -1005,7 +1084,8 @@ def phase2_chart_cluster_envelopes(
         nrows=int(np.ceil(len(clusters) / 2)),
         ncols=2,
         figsize=(12, 3 * int(np.ceil(len(clusters) / 2))),
-        sharex=True, sharey=True,
+        sharex=True,
+        sharey=True,
     )
     axes = np.atleast_1d(axes).flatten()
     for i, cid in enumerate(clusters):
@@ -1051,7 +1131,7 @@ def phase3_mfe_band_conditionals(
     sig_to_arr: Dict[int, Tuple[np.ndarray, np.ndarray, np.ndarray]] = {}
     panel_sorted = panel.sort_values(["signal_idx", "t"], kind="mergesort")
     for s_idx, grp in panel_sorted.groupby("signal_idx", sort=False):
-        ts = grp["t"].to_numpy(dtype=np.int64)
+        grp["t"].to_numpy(dtype=np.int64)
         rc = grp["r_close"].to_numpy(dtype=np.float64)
         run_mfe = grp["running_mfe"].to_numpy(dtype=np.float64)
         run_mae = grp["running_mae"].to_numpy(dtype=np.float64)
@@ -1059,9 +1139,9 @@ def phase3_mfe_band_conditionals(
 
     # Pre-compute peak_mfe_r per signal_idx.
     s2peak_mfe = shape.set_index("signal_idx")["peak_mfe_r"].to_dict()
-    s2peak_mae = shape.set_index("signal_idx")["peak_mae_r"].to_dict()
+    shape.set_index("signal_idx")["peak_mae_r"].to_dict()
     s2r240 = shape.set_index("signal_idx")["r_at_t240"].to_dict()
-    s2sl_hit = shape.set_index("signal_idx")["virtual_sl_hit"].to_dict()
+    shape.set_index("signal_idx")["virtual_sl_hit"].to_dict()
 
     for i, X in enumerate(MFE_BANDS_R):
         reached_sigs: List[int] = []
@@ -1097,16 +1177,24 @@ def phase3_mfe_band_conditionals(
         first_touch_arr = np.array(first_touch_bars, dtype=np.float64)
         sub_mae_arr = np.array(subsequent_mae, dtype=np.float64)
 
-        rows.append({
-            "band_R": X,
-            "n_total": int(n_total),
-            "n_reached": int(n_reached),
-            "p_reached": float(p_reached),
-            "p_retrace_to_or_below_0_after_touch": float(np.mean(retrace_below_zero)) if retrace_below_zero else float("nan"),
-            "p_virtual_sl_after_touch": float(np.mean(sl_after_touch)) if sl_after_touch else float("nan"),
-            "p_reach_next_band_given_reached": float(np.mean(next_band_reached)) if next_band_reached else float("nan"),
-            "next_band_R": (next_band if next_band is not None else float("nan")),
-        })
+        rows.append(
+            {
+                "band_R": X,
+                "n_total": int(n_total),
+                "n_reached": int(n_reached),
+                "p_reached": float(p_reached),
+                "p_retrace_to_or_below_0_after_touch": float(np.mean(retrace_below_zero))
+                if retrace_below_zero
+                else float("nan"),
+                "p_virtual_sl_after_touch": float(np.mean(sl_after_touch))
+                if sl_after_touch
+                else float("nan"),
+                "p_reach_next_band_given_reached": float(np.mean(next_band_reached))
+                if next_band_reached
+                else float("nan"),
+                "next_band_R": (next_band if next_band is not None else float("nan")),
+            }
+        )
 
         if n_reached >= 1:
             for label, arr in (
@@ -1165,14 +1253,20 @@ def phase3_mae_band_conditionals(
         first_touch_arr = np.array(first_touch_bars, dtype=np.float64)
         post_mfe_arr = np.array(post_touch_mfe, dtype=np.float64)
 
-        rows.append({
-            "band_R": X,
-            "n_total": int(n_total),
-            "n_reached": int(n_reached),
-            "p_reached": float(p_reached),
-            "p_recover_ge_1R_mfe_after_touch": float(np.mean(recover_1r_mfe)) if recover_1r_mfe else float("nan"),
-            "p_virtual_sl_after_touch": float(np.mean(sl_after_touch)) if sl_after_touch else float("nan"),
-        })
+        rows.append(
+            {
+                "band_R": X,
+                "n_total": int(n_total),
+                "n_reached": int(n_reached),
+                "p_reached": float(p_reached),
+                "p_recover_ge_1R_mfe_after_touch": float(np.mean(recover_1r_mfe))
+                if recover_1r_mfe
+                else float("nan"),
+                "p_virtual_sl_after_touch": float(np.mean(sl_after_touch))
+                if sl_after_touch
+                else float("nan"),
+            }
+        )
 
         if n_reached >= 1:
             for label, arr in (
@@ -1298,13 +1392,15 @@ def phase3_time_state_conditionals(panel: pd.DataFrame, shape: pd.DataFrame) -> 
         }
         for prefix, arr in (("r_at_t240", r240_arr), ("peak_mfe_past_t", pmf_arr)):
             if arr.size == 0:
-                rec.update({
-                    f"{prefix}_mean": float("nan"),
-                    f"{prefix}_std": float("nan"),
-                    f"{prefix}_p10": float("nan"),
-                    f"{prefix}_p50": float("nan"),
-                    f"{prefix}_p90": float("nan"),
-                })
+                rec.update(
+                    {
+                        f"{prefix}_mean": float("nan"),
+                        f"{prefix}_std": float("nan"),
+                        f"{prefix}_p10": float("nan"),
+                        f"{prefix}_p50": float("nan"),
+                        f"{prefix}_p90": float("nan"),
+                    }
+                )
             else:
                 rec[f"{prefix}_mean"] = float(np.mean(arr))
                 rec[f"{prefix}_std"] = float(np.std(arr, ddof=1)) if arr.size > 1 else float("nan")
@@ -1354,9 +1450,7 @@ def phase2_cluster_distributions(
     return sections
 
 
-def phase2_cluster_summary_md(
-    shape: pd.DataFrame, cluster_meta: Dict[str, Any]
-) -> str:
+def phase2_cluster_summary_md(shape: pd.DataFrame, cluster_meta: Dict[str, Any]) -> str:
     """Cluster sizes per k, ARI per k, top distinguishing features per cluster."""
     lines: List[str] = [
         "# Arc 2 Trajectory Appendix — Cluster Summary",
@@ -1471,24 +1565,34 @@ def write_report(
     lines.append("| c05 | c1 | c2 | n | P(final_r > 0) |")
     lines.append("|-----|----|----|---|----------------|")
     for r in first_touch_df.itertuples(index=False):
-        lines.append(f"| {r.c05} | {r.c1} | {r.c2} | {int(r.n)} | {_fmt_float(float(r.p_final_r_gt_0))} |")
+        lines.append(
+            f"| {r.c05} | {r.c1} | {r.c2} | {int(r.n)} | {_fmt_float(float(r.p_final_r_gt_0))} |"
+        )
     lines.append("")
 
-    lines.append("### Pooled distributions (peak_mfe_r, peak_mae_r, r_at_t240, time_to_peak_mfe, retrace_from_peak_mfe)")
+    lines.append(
+        "### Pooled distributions (peak_mfe_r, peak_mae_r, r_at_t240, time_to_peak_mfe, retrace_from_peak_mfe)"
+    )
     lines.append("")
     for desc in pooled_dists:
-        lines.append(f"- **{desc['label']}**: N={desc['n']}, "
-                     f"mean={_fmt_float(desc['mean'])}, std={_fmt_float(desc['std'])}, "
-                     f"skew={_fmt_float(desc['skew'])}, excess_kurt={_fmt_float(desc['excess_kurt'])}, "
-                     f"min={_fmt_float(desc['min'])}, max={_fmt_float(desc['max'])}, "
-                     f"p10={_fmt_float(desc['p10'])}, p50={_fmt_float(desc['p50'])}, p90={_fmt_float(desc['p90'])}.")
+        lines.append(
+            f"- **{desc['label']}**: N={desc['n']}, "
+            f"mean={_fmt_float(desc['mean'])}, std={_fmt_float(desc['std'])}, "
+            f"skew={_fmt_float(desc['skew'])}, excess_kurt={_fmt_float(desc['excess_kurt'])}, "
+            f"min={_fmt_float(desc['min'])}, max={_fmt_float(desc['max'])}, "
+            f"p10={_fmt_float(desc['p10'])}, p50={_fmt_float(desc['p50'])}, p90={_fmt_float(desc['p90'])}."
+        )
     lines.append("")
-    lines.append("Full moments + percentiles + histograms in `cluster_distributions.md` (section: pooled).")
+    lines.append(
+        "Full moments + percentiles + histograms in `cluster_distributions.md` (section: pooled)."
+    )
     lines.append("")
 
     lines.append("## Phase 2 — clustering")
     lines.append("")
-    lines.append(f"Hierarchical (Ward) subsample N = {cluster_meta['subsample_n']}; K-means run on full kept N = {cluster_meta['n_full_kept']}.")
+    lines.append(
+        f"Hierarchical (Ward) subsample N = {cluster_meta['subsample_n']}; K-means run on full kept N = {cluster_meta['n_full_kept']}."
+    )
     lines.append("ARI per k (subsample-restricted):")
     lines.append("")
     lines.append("| k | ARI(hier, km) |")
@@ -1496,7 +1600,9 @@ def write_report(
     for k in (4, 6, 8, 10):
         lines.append(f"| {k} | {_fmt_float(cluster_meta['ari_per_k'][k])} |")
     lines.append("")
-    lines.append("Cluster sizes and per-cluster feature means in `cluster_summary.md`. Per-cluster trajectory envelopes in `cluster_trajectories.csv` and `charts/cluster_envelopes_k{4,6,8,10}.png`. Per-cluster distribution tables (full moments + percentiles + histograms) in `cluster_distributions.md`.")
+    lines.append(
+        "Cluster sizes and per-cluster feature means in `cluster_summary.md`. Per-cluster trajectory envelopes in `cluster_trajectories.csv` and `charts/cluster_envelopes_k{4,6,8,10}.png`. Per-cluster distribution tables (full moments + percentiles + histograms) in `cluster_distributions.md`."
+    )
     lines.append("")
 
     lines.append("## Phase 3 — conditional distributions")
@@ -1524,14 +1630,18 @@ def write_report(
             f"{_fmt_float(r.p_virtual_sl_after_touch)} |"
         )
     lines.append("")
-    lines.append("Time-state conditionals: see `time_state_conditionals.csv` (long-format bin distributions of r_at_t240 and peak_mfe_past_t at anchor bars t in {6,12,24,48,72,120}).")
+    lines.append(
+        "Time-state conditionals: see `time_state_conditionals.csv` (long-format bin distributions of r_at_t240 and peak_mfe_past_t at anchor bars t in {6,12,24,48,72,120})."
+    )
     lines.append("")
 
     lines.append("## §14.5 discipline")
     lines.append("")
-    lines.append("This appendix is descriptive only. No filter, exit, or sizing recommendations are made here. "
-                 "Patterns identified are candidate hypotheses for fresh arcs per L6.0 v1.1 §14.2; any such candidate "
-                 "is recorded in `CANDIDATE_HYPOTHESES_DRAFT.md` (draft, not committed to the registry).")
+    lines.append(
+        "This appendix is descriptive only. No filter, exit, or sizing recommendations are made here. "
+        "Patterns identified are candidate hypotheses for fresh arcs per L6.0 v1.1 §14.2; any such candidate "
+        "is recorded in `CANDIDATE_HYPOTHESES_DRAFT.md` (draft, not committed to the registry)."
+    )
 
     _write_text("\n".join(lines) + "\n", path)
 
@@ -1575,7 +1685,9 @@ def write_all_outputs(
     _write_csv(assignments_df, OUTPUT_DIR / "cluster_assignments.csv")
     out_paths.append(OUTPUT_DIR / "cluster_assignments.csv")
 
-    _write_text(phase2_cluster_summary_md(shape_df, cluster_meta), OUTPUT_DIR / "cluster_summary.md")
+    _write_text(
+        phase2_cluster_summary_md(shape_df, cluster_meta), OUTPUT_DIR / "cluster_summary.md"
+    )
     out_paths.append(OUTPUT_DIR / "cluster_summary.md")
 
     _write_csv(trajectories_df, OUTPUT_DIR / "cluster_trajectories.csv")
@@ -1631,7 +1743,9 @@ def write_all_outputs(
     phase2_chart_dendrogram(cluster_meta, CHARTS_DIR / "dendrogram_hierarchical.png")
     out_paths.append(CHARTS_DIR / "dendrogram_hierarchical.png")
     for k in (4, 6, 8, 10):
-        phase2_chart_cluster_envelopes(trajectories_df, k, CHARTS_DIR / f"cluster_envelopes_k{k}.png")
+        phase2_chart_cluster_envelopes(
+            trajectories_df, k, CHARTS_DIR / f"cluster_envelopes_k{k}.png"
+        )
         out_paths.append(CHARTS_DIR / f"cluster_envelopes_k{k}.png")
 
     return out_paths
@@ -1727,11 +1841,13 @@ def write_manifest(
         all_match = True
         for rel, h in hashes.items():
             prior = prior_hashes.get(rel)
-            ok = (prior == h)
+            ok = prior == h
             all_match = all_match and ok
             lines.append(f"- {rel}: {'IDENTICAL' if ok else 'DIVERGED'}")
         lines.append("")
-        lines.append(f"Overall: {'PASS - byte-identical across runs' if all_match else 'FAIL - some files diverged (check PNG pixel-only hashes for chart files)'}")
+        lines.append(
+            f"Overall: {'PASS - byte-identical across runs' if all_match else 'FAIL - some files diverged (check PNG pixel-only hashes for chart files)'}"
+        )
         lines.append("")
 
     text = "\n".join(lines) + "\n"
@@ -1745,17 +1861,25 @@ def write_manifest(
 # ----------------------------------------------------------------------------
 
 
-def run_pipeline(*, run_ordinal: int, prior_hashes: Optional[Dict[str, str]] = None) -> Dict[str, str]:
+def run_pipeline(
+    *, run_ordinal: int, prior_hashes: Optional[Dict[str, str]] = None
+) -> Dict[str, str]:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     CHARTS_DIR.mkdir(parents=True, exist_ok=True)
 
     print(f"[run #{run_ordinal}] Loading signals_features.csv ...", flush=True)
     signals, pop_meta = load_signals()
-    print(f"[run #{run_ordinal}] Signals loaded: {pop_meta['input_signals_features_rows']} rows; in L4 band: {pop_meta['l4_anchor_band_ok']}", flush=True)
+    print(
+        f"[run #{run_ordinal}] Signals loaded: {pop_meta['input_signals_features_rows']} rows; in L4 band: {pop_meta['l4_anchor_band_ok']}",
+        flush=True,
+    )
 
     print(f"[run #{run_ordinal}] Building trajectory panel + shape features ...", flush=True)
     panel, shape_df, panel_meta = build_panel_and_shape_features(signals)
-    print(f"[run #{run_ordinal}] Panel: {panel_meta['n_signals_with_panel']} signals, {panel_meta['n_panel_rows']} rows.", flush=True)
+    print(
+        f"[run #{run_ordinal}] Panel: {panel_meta['n_signals_with_panel']} signals, {panel_meta['n_panel_rows']} rows.",
+        flush=True,
+    )
 
     print(f"[run #{run_ordinal}] Phase 1 — pooled descriptives ...", flush=True)
     envelope_df = phase1_pooled_envelope(panel)
@@ -1817,8 +1941,12 @@ def run_pipeline(*, run_ordinal: int, prior_hashes: Optional[Dict[str, str]] = N
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Arc 2 Baseline Trajectory Appendix")
-    parser.add_argument("--mode", choices=("once", "verify"), default="verify",
-                        help="'verify' runs the pipeline twice and checks byte-identicality; 'once' runs it once.")
+    parser.add_argument(
+        "--mode",
+        choices=("once", "verify"),
+        default="verify",
+        help="'verify' runs the pipeline twice and checks byte-identicality; 'once' runs it once.",
+    )
     args = parser.parse_args()
 
     if args.mode == "once":
@@ -1838,7 +1966,10 @@ def main() -> int:
     if all_match:
         print("[verify] All outputs are byte-identical across the two runs.", flush=True)
     else:
-        print("[verify] Some outputs diverged; check run_manifest.txt for PNG pixel-only fallback hashes.", flush=True)
+        print(
+            "[verify] Some outputs diverged; check run_manifest.txt for PNG pixel-only fallback hashes.",
+            flush=True,
+        )
 
     return 0
 

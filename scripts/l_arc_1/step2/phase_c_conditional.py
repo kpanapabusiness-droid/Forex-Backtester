@@ -1,3 +1,4 @@
+# ruff: noqa: E402  (sys.path.insert needed before project imports)
 """Phase C — conditional breakdowns (op spec §5.9) and 2D joint distributions (§5.10).
 
 Per-stratum aggregates of pool-level metrics:
@@ -10,11 +11,11 @@ into `_insufficient_n` aggregate row.
 
 2D joint distributions written as binned-count heatmaps (op spec §11.2).
 """
+
 from __future__ import annotations
 
 import sys
 from pathlib import Path
-from typing import List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -23,18 +24,25 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from scripts.l_arc_1.step2._io import H_GRID, STEP2_DIR
-
+from scripts.l_arc_1.step2._io import STEP2_DIR
 
 COND_DIR = STEP2_DIR / "conditional_breakdowns"
 JOINT_DIR = STEP2_DIR / "joint_distributions"
 
 # Metrics to aggregate per stratum
 AGG_METRICS = [
-    "net_r", "gross_r", "mfe_held_atr", "mae_held_atr",
-    "fwd_logret_h24", "fwd_mfe_h24_atr", "fwd_mae_h24_atr",
-    "fwd_logret_h120", "fwd_mfe_h120_atr", "fwd_mae_h120_atr",
-    "fwd_mfe_h240_atr", "fwd_mae_h240_atr",
+    "net_r",
+    "gross_r",
+    "mfe_held_atr",
+    "mae_held_atr",
+    "fwd_logret_h24",
+    "fwd_mfe_h24_atr",
+    "fwd_mae_h24_atr",
+    "fwd_logret_h120",
+    "fwd_mfe_h120_atr",
+    "fwd_mae_h120_atr",
+    "fwd_mfe_h240_atr",
+    "fwd_mae_h240_atr",
     "race_bars_plus1_minus_minus1",
     "concurrent_signals_within_3h",
 ]
@@ -78,10 +86,24 @@ def _emit_strat(f: pd.DataFrame, strat_col: str, sub: str) -> None:
             d[strat_col] = str(level)
             d["flagged_n_lt_30"] = d["n"] < 30
             rows.append(d)
-        cols = [strat_col, "n", "flagged_n_lt_30", "mean", "std",
-                "min", "p5", "p25", "p50", "p75", "p95", "max"]
+        cols = [
+            strat_col,
+            "n",
+            "flagged_n_lt_30",
+            "mean",
+            "std",
+            "min",
+            "p5",
+            "p25",
+            "p50",
+            "p75",
+            "p95",
+            "max",
+        ]
         pd.DataFrame(rows)[cols].to_csv(
-            out_dir / f"{metric}.csv", index=False, lineterminator="\n",
+            out_dir / f"{metric}.csv",
+            index=False,
+            lineterminator="\n",
         )
 
 
@@ -143,27 +165,24 @@ def run_phase_c() -> None:
     heatmap("mfe_held_atr", "mae_held_atr", 30, 30, "mfe_held__mae_held")
     heatmap("mfe_held_atr", "bars_held", 30, 5, "mfe_held__bars_held")
     heatmap("mae_held_atr", "bars_held", 30, 5, "mae_held__bars_held")
-    heatmap("fwd_mfe_h24_atr", "fwd_time_to_peak_mfe", 30, 30,
-            "fwd_mfe_h24__time_to_peak_mfe")
+    heatmap("fwd_mfe_h24_atr", "fwd_time_to_peak_mfe", 30, 30, "fwd_mfe_h24__time_to_peak_mfe")
     heatmap("mfe_held_atr", "exit_reason", 30, 1, "mfe_held__exit_reason")
     heatmap("net_r", "bars_held", 30, 5, "net_r__bars_held")
-    heatmap("net_r", "fwd_oscillation_count", 30, 20,
-            "net_r__fwd_oscillation_count")
-    heatmap("first_bar_direction", "net_r", 1, 30,
-            "first_bar_direction__net_r")
-    heatmap("mfe_sequence_class_fwd_h24", "net_r", 1, 30,
-            "mfe_sequence_class_fwd_h24__net_r")
-    heatmap("mfe_sequence_class_fwd_h120", "net_r", 1, 30,
-            "mfe_sequence_class_fwd_h120__net_r")
+    heatmap("net_r", "fwd_oscillation_count", 30, 20, "net_r__fwd_oscillation_count")
+    heatmap("first_bar_direction", "net_r", 1, 30, "first_bar_direction__net_r")
+    heatmap("mfe_sequence_class_fwd_h24", "net_r", 1, 30, "mfe_sequence_class_fwd_h24__net_r")
+    heatmap("mfe_sequence_class_fwd_h120", "net_r", 1, 30, "mfe_sequence_class_fwd_h120__net_r")
     # Additional informative heatmaps
-    heatmap("concurrent_signals_within_3h", "net_r", 20, 30,
-            "concurrent_signals_within_3h__net_r")
-    heatmap("concurrent_signals_within_3h", "fwd_mae_h24_atr", 20, 30,
-            "concurrent_signals_within_3h__fwd_mae_h24")
-    heatmap("hour_in_d1_bar", "net_r", 24, 30,
-            "hour_in_d1_bar__net_r")
-    heatmap("vol_regime", "fwd_mfe_h24_atr", 1, 30,
-            "vol_regime__fwd_mfe_h24")
+    heatmap("concurrent_signals_within_3h", "net_r", 20, 30, "concurrent_signals_within_3h__net_r")
+    heatmap(
+        "concurrent_signals_within_3h",
+        "fwd_mae_h24_atr",
+        20,
+        30,
+        "concurrent_signals_within_3h__fwd_mae_h24",
+    )
+    heatmap("hour_in_d1_bar", "net_r", 24, 30, "hour_in_d1_bar__net_r")
+    heatmap("vol_regime", "fwd_mfe_h24_atr", 1, 30, "vol_regime__fwd_mfe_h24")
 
     print("[Phase C] done.")
 

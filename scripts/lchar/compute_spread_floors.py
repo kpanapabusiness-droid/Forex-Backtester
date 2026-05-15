@@ -72,12 +72,34 @@ import pandas as pd
 # ---------------------------------------------------------------------------
 
 PAIRS: tuple[str, ...] = (
-    "AUD_CAD", "AUD_CHF", "AUD_JPY", "AUD_NZD", "AUD_USD",
-    "CAD_CHF", "CAD_JPY", "CHF_JPY",
-    "EUR_AUD", "EUR_CAD", "EUR_CHF", "EUR_GBP", "EUR_JPY", "EUR_NZD", "EUR_USD",
-    "GBP_AUD", "GBP_CAD", "GBP_CHF", "GBP_JPY", "GBP_NZD", "GBP_USD",
-    "NZD_CAD", "NZD_CHF", "NZD_JPY", "NZD_USD",
-    "USD_CAD", "USD_CHF", "USD_JPY",
+    "AUD_CAD",
+    "AUD_CHF",
+    "AUD_JPY",
+    "AUD_NZD",
+    "AUD_USD",
+    "CAD_CHF",
+    "CAD_JPY",
+    "CHF_JPY",
+    "EUR_AUD",
+    "EUR_CAD",
+    "EUR_CHF",
+    "EUR_GBP",
+    "EUR_JPY",
+    "EUR_NZD",
+    "EUR_USD",
+    "GBP_AUD",
+    "GBP_CAD",
+    "GBP_CHF",
+    "GBP_JPY",
+    "GBP_NZD",
+    "GBP_USD",
+    "NZD_CAD",
+    "NZD_CHF",
+    "NZD_JPY",
+    "NZD_USD",
+    "USD_CAD",
+    "USD_CHF",
+    "USD_JPY",
 )
 TIMEFRAMES: tuple[str, ...] = ("1hr", "4hr", "daily", "w1")
 SPREAD_COLUMN: str = "spread"
@@ -99,6 +121,7 @@ EXPECTED_FILE_COUNT: int = len(PAIRS) * len(TIMEFRAMES)
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _blocker(msg: str) -> None:
     print(f"BLOCKER: {msg}", flush=True)
@@ -173,6 +196,7 @@ def compute_body_sha256(path: Path) -> str:
 # Discovery / validation / computation
 # ---------------------------------------------------------------------------
 
+
 def _discover_and_validate() -> dict[tuple[str, str], Path]:
     files: dict[tuple[str, str], Path] = {}
     missing: list[str] = []
@@ -189,9 +213,7 @@ def _discover_and_validate() -> dict[tuple[str, str], Path]:
             f"{', '.join(missing[:10])}{' ...' if len(missing) > 10 else ''}"
         )
     if len(files) != EXPECTED_FILE_COUNT:
-        _blocker(
-            f"discovered {len(files)} files, expected {EXPECTED_FILE_COUNT}"
-        )
+        _blocker(f"discovered {len(files)} files, expected {EXPECTED_FILE_COUNT}")
     return files
 
 
@@ -203,10 +225,7 @@ def _verify_spread_columns(files: dict[tuple[str, str], Path]) -> None:
             _blocker(f"failed to read header of {pair}/{tf}: {e}")
         cols = list(header.columns)
         if SPREAD_COLUMN not in cols:
-            _blocker(
-                f"{pair}/{tf}: spread column '{SPREAD_COLUMN}' absent "
-                f"(columns: {cols})"
-            )
+            _blocker(f"{pair}/{tf}: spread column '{SPREAD_COLUMN}' absent (columns: {cols})")
 
 
 def _compute_per_pair_stats(
@@ -274,9 +293,7 @@ def _build_body(stats: dict[str, dict]) -> str:
     for pair in PAIRS:  # PAIRS is already alphabetical
         s = stats[pair]
         lines.append(f"  {pair}:")
-        lines.append(
-            f"    min_nonzero_spread_native: {_fmt_float(s['min_nonzero_spread_native'])}"
-        )
+        lines.append(f"    min_nonzero_spread_native: {_fmt_float(s['min_nonzero_spread_native'])}")
         lines.append(f"    n_observations_total: {s['n_observations_total']}")
         lines.append(f"    n_zero_spread: {s['n_zero_spread']}")
         lines.append(f"    n_nonzero_spread: {s['n_nonzero_spread']}")
@@ -285,9 +302,7 @@ def _build_body(stats: dict[str, dict]) -> str:
     return "\n".join(lines)
 
 
-def _build_provenance(
-    files: dict[tuple[str, str], Path], script_sha: str
-) -> str:
+def _build_provenance(files: dict[tuple[str, str], Path], script_sha: str) -> str:
     lines: list[str] = []
     lines.append("provenance:")
     lines.append(f"  pair_count: {len(PAIRS)}")
@@ -318,6 +333,7 @@ def _build_full_yaml(
 # Reporting
 # ---------------------------------------------------------------------------
 
+
 def _print_per_pair_table(stats: dict[str, dict]) -> None:
     header = (
         f"{'pair':<8} | {'min_nonzero_native':>20} | "
@@ -339,14 +355,10 @@ def _print_per_pair_table(stats: dict[str, dict]) -> None:
 
 
 def _print_universe_stats(stats: dict[str, dict]) -> None:
-    pip_values = sorted(
-        _native_to_pips(stats[p]["min_nonzero_spread_native"]) for p in PAIRS
-    )
+    pip_values = sorted(_native_to_pips(stats[p]["min_nonzero_spread_native"]) for p in PAIRS)
     n = len(pip_values)
     median = (
-        pip_values[n // 2]
-        if n % 2 == 1
-        else (pip_values[n // 2 - 1] + pip_values[n // 2]) / 2.0
+        pip_values[n // 2] if n % 2 == 1 else (pip_values[n // 2 - 1] + pip_values[n // 2]) / 2.0
     )
     print(
         f"Universe stats (min_nonzero_in_pips across {n} pairs): "
@@ -369,8 +381,7 @@ def _print_sanity_flags(stats: dict[str, dict]) -> None:
         if s["pct_zero_spread"] > WARN_PCT_ZERO:
             pct = _fmt_pct(s["pct_zero_spread"])
             print(
-                f"WARN: {pair} > 40% zero-spread bars ({pct}), "
-                f"broker-side quantization is severe"
+                f"WARN: {pair} > 40% zero-spread bars ({pct}), broker-side quantization is severe"
             )
             any_warn = True
     if not any_warn:
@@ -380,6 +391,7 @@ def _print_sanity_flags(stats: dict[str, dict]) -> None:
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
+
 
 def main() -> None:
     if OUTPUT_PATH.exists():

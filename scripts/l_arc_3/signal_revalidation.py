@@ -76,9 +76,7 @@ def _load_pair_tf(pair: str, tf_dir: str) -> pd.DataFrame:
     return raw
 
 
-def _canonical_mask_for_pair(
-    df_1h: pd.DataFrame, df_d1: pd.DataFrame
-) -> np.ndarray:
+def _canonical_mask_for_pair(df_1h: pd.DataFrame, df_d1: pd.DataFrame) -> np.ndarray:
     """Compute the volatility_regime / d1_atr_top_decile / any mask using
     only canonical run_layer4.py primitives (no engine module imports for
     the mask logic), aligned to df_1h.index.
@@ -94,16 +92,14 @@ def _canonical_mask_for_pair(
     df_1h_ren = df_1h.rename(columns={"time": "date"}).copy()
 
     atr_d1 = canonical_compute_atr(df_d1_ren, ATR_PERIOD)
-    d1_top_bool = canonical_trailing_top_decile(
-        atr_d1, TRAILING_WINDOW, DECILE_QUANTILE
-    )
+    d1_top_bool = canonical_trailing_top_decile(atr_d1, TRAILING_WINDOW, DECILE_QUANTILE)
     d1_top_bool = np.where(np.isnan(d1_top_bool), False, d1_top_bool).astype(bool)
     d1_top_aligned = canonical_lookback(
         df_1h_ren,
         df_d1_ren,
         pd.Series(d1_top_bool.astype(float), index=df_d1_ren["date"]),
     )
-    mask_top = (np.where(np.isnan(d1_top_aligned), 0.0, d1_top_aligned) > 0.5)
+    mask_top = np.where(np.isnan(d1_top_aligned), 0.0, d1_top_aligned) > 0.5
 
     # Trial-caller ATR>0 filter at the active D1 bar.
     d1_atr_aligned = canonical_lookback(
@@ -129,9 +125,7 @@ def main() -> int:
         df_1h = _load_pair_tf(pair, "1hr")
         df_d1 = _load_pair_tf(pair, "daily")
         canonical_masks[pair] = _canonical_mask_for_pair(df_1h, df_d1)
-        eng_mask, _, _ = _volatility_regime_d1_atr_top_decile_mask(
-            df_1h, df_d1, pair=pair
-        )
+        eng_mask, _, _ = _volatility_regime_d1_atr_top_decile_mask(df_1h, df_d1, pair=pair)
         engine_masks[pair] = eng_mask.astype(bool)
         if len(canonical_masks[pair]) != len(engine_masks[pair]):
             raise RuntimeError(
@@ -155,9 +149,7 @@ def main() -> int:
     n_fires_total = len(fires)
     n_take = min(N_SAMPLES, n_fires_total)
     if n_take == 0:
-        raise RuntimeError(
-            "Arc 3 revalidation: canonical mask fires 0 times across all 28 pairs"
-        )
+        raise RuntimeError("Arc 3 revalidation: canonical mask fires 0 times across all 28 pairs")
     sampled_indices = rng.choice(n_fires_total, size=n_take, replace=False)
     sampled_indices.sort()
     sampled_tuples: list[tuple[str, int]] = [fires[i] for i in sampled_indices]
@@ -236,10 +228,7 @@ def main() -> int:
             lines.append(f"  {d}")
 
     OUT_PATH.write_text("\n".join(lines) + "\n", encoding="utf-8")
-    print(
-        f"signal_revalidation: BIT-IDENTICAL CHECK: "
-        f"{'PASS' if bit_identical else 'FAIL'}"
-    )
+    print(f"signal_revalidation: BIT-IDENTICAL CHECK: {'PASS' if bit_identical else 'FAIL'}")
     print(f"  written: {OUT_PATH}")
     return 0 if bit_identical else 2
 

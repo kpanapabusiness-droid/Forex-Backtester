@@ -30,11 +30,7 @@ def _latest_run_dir(variant_dir: Path) -> Optional[Path]:
     if not variant_dir.exists():
         return None
     run_dirs = sorted(
-        (
-            p
-            for p in variant_dir.iterdir()
-            if p.is_dir() and (p / "wfo_run_meta.json").exists()
-        ),
+        (p for p in variant_dir.iterdir() if p.is_dir() and (p / "wfo_run_meta.json").exists()),
         key=lambda p: p.name,
         reverse=True,
     )
@@ -315,16 +311,18 @@ def build_leaderboard(results_root: Path) -> pd.DataFrame:
     df = pd.DataFrame(rows)
     df = df.sort_values(
         by=["decision", "volume_name"],
-        key=lambda col: col.map(
-            {
-                "BASELINE": 0,
-                "KEEP": 1,
-                "DISCARD": 2,
-                "SKIP": 3,
-            }
-        )
-        if col.name == "decision"
-        else col,
+        key=lambda col: (
+            col.map(
+                {
+                    "BASELINE": 0,
+                    "KEEP": 1,
+                    "DISCARD": 2,
+                    "SKIP": 3,
+                }
+            )
+            if col.name == "decision"
+            else col
+        ),
     ).reset_index(drop=True)
     return df
 
@@ -382,4 +380,3 @@ def main(argv: Optional[List[str]] = None) -> None:
 
 if __name__ == "__main__":
     main()
-

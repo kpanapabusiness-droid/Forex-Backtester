@@ -1,8 +1,10 @@
+# ruff: noqa: E402  (sys.path.insert needed before project imports)
 """Step 2 — two-consecutive-run byte-identical determinism check.
 
 Strategy: snapshot sha256s of current outputs, re-run the full pipeline,
 re-compute sha256s, compare. Pass if all match.
 """
+
 from __future__ import annotations
 
 import sys
@@ -15,7 +17,10 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from scripts.l_arc_2.step2._io import (
-    FORWARD_HORIZON_BARS_DEFAULT, FORWARD_HORIZON_BARS_EXTENDED, STEP2_DIR, sha256_file,
+    FORWARD_HORIZON_BARS_DEFAULT,
+    FORWARD_HORIZON_BARS_EXTENDED,
+    STEP2_DIR,
+    sha256_file,
 )
 
 CHECK_FILES = [
@@ -59,6 +64,7 @@ def main() -> None:
 
     # Determine whether the prior run extended H by checking for fwd_h480 column
     import pandas as pd
+
     f_path = STEP2_DIR / "signals_features.csv"
     extended = False
     if f_path.exists():
@@ -68,14 +74,22 @@ def main() -> None:
 
     print(f"[determinism] re-running full pipeline in place (H={H_run})...")
     from scripts.l_arc_2.step2 import phase_a_features
+
     phase_a_features.run_phase_a(H=H_run)
     from scripts.l_arc_2.step2 import phase_a_lookahead
+
     phase_a_lookahead.run_lookahead_test(H=H_run)
     phase_a_lookahead.write_feature_lag_audit(H=H_run)
     from scripts.l_arc_2.step2 import (
-        phase_b_marginals, phase_c_conditional, phase_d_stability,
-        phase_e_shadows, phase_f_cost_stress, phase_g_random, phase_h_held_bar,
+        phase_b_marginals,
+        phase_c_conditional,
+        phase_d_stability,
+        phase_e_shadows,
+        phase_f_cost_stress,
+        phase_g_random,
+        phase_h_held_bar,
     )
+
     phase_b_marginals.run_phase_b()
     phase_c_conditional.run_phase_c()
     phase_d_stability.run_stability_check()
@@ -96,7 +110,8 @@ def main() -> None:
     passed = len(diffs) == 0
     lines = [
         "L Arc 2 Step 2 — Two-consecutive-run determinism check",
-        "=" * 70, "",
+        "=" * 70,
+        "",
         f"Files checked: {len(CHECK_FILES)}",
         f"Differences:   {len(diffs)}",
         "",
@@ -118,7 +133,9 @@ def main() -> None:
         lines.append("")
     out = STEP2_DIR / "determinism_check.txt"
     out.write_text("\n".join(lines), encoding="utf-8")
-    print(f"[determinism] {'PASS' if passed else 'FAIL'}; took {time.time()-t0:.0f}s; wrote {out}")
+    print(
+        f"[determinism] {'PASS' if passed else 'FAIL'}; took {time.time() - t0:.0f}s; wrote {out}"
+    )
 
 
 if __name__ == "__main__":

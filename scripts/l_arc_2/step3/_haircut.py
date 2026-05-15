@@ -8,10 +8,10 @@ For each (feature, cluster, t-slice):
 - Apply Benjamini-Hochberg correction within (cluster, t-slice) group.
 - Assign Tier 1 / 2 / 3 per op spec §6.7.
 """
+
 from __future__ import annotations
 
 import numpy as np
-import pandas as pd
 from scipy import stats as ss
 
 from . import _common as C
@@ -29,10 +29,13 @@ def univariate_auc(feature: np.ndarray, y: np.ndarray) -> float:
     return float(auc)
 
 
-def permutation_p_value(feature: np.ndarray, y: np.ndarray,
-                        fold_id: np.ndarray,
-                        n_perm: int = C.N_PERMUTATIONS,
-                        seed: int = 0) -> tuple[float, float]:
+def permutation_p_value(
+    feature: np.ndarray,
+    y: np.ndarray,
+    fold_id: np.ndarray,
+    n_perm: int = C.N_PERMUTATIONS,
+    seed: int = 0,
+) -> tuple[float, float]:
     """Fold-preserving permutation p-value for univariate AUC.
 
     Two-sided test on |AUC - 0.5|.

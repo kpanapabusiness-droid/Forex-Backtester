@@ -29,7 +29,9 @@ def main() -> None:
     rows = []
     for i, d in enumerate(dates):
         close = BASE + AMP * math.sin(2.0 * math.pi * i / PERIOD_DAYS)
-        prev_close = BASE + AMP * math.sin(2.0 * math.pi * (i - 1) / PERIOD_DAYS) if i > 0 else close
+        prev_close = (
+            BASE + AMP * math.sin(2.0 * math.pi * (i - 1) / PERIOD_DAYS) if i > 0 else close
+        )
         open_ = prev_close
         high = max(open_, close) + HALF_RANGE
         low = min(open_, close) - HALF_RANGE

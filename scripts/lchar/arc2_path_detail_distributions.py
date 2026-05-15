@@ -42,6 +42,7 @@ import pandas as pd
 
 os.environ["MPLBACKEND"] = "Agg"
 import matplotlib  # noqa: E402
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 from PIL import Image  # noqa: E402
@@ -54,24 +55,15 @@ if str(REPO_ROOT) not in sys.path:
 # Locked input sha256s (gate 1, re-verified as gate 9)
 # ---------------------------------------------------------------------------
 LOCKED_SHAS: Dict[str, str] = {
-    "results/l6/arc2/characterisation/v1_1_full/signals_features.csv":
-        "71b39383632bd695b878add8b331b76bcd231ab5b9adba9eea03d69f8762483e",
-    "results/l6/arc2/characterisation/v1_2_1_full/trade_index.csv":
-        "9f841c5b29e87ed90d34c9617431978baf3041459797cedef02fa16c27e3abb5",
-    "results/l6/arc2/characterisation/v1_2_1_full/per_bar_paths.csv":
-        "7b2acd6ccb98f1fd145a631b318fc95d10f5cf4f42633be9c0b59738fa1696ee",
-    "results/l6/arc2/characterisation/extended/entry_filter_univariate/block_M_kijun_distances.csv":
-        "4a61407f0f1fc1b74486f0614928e776201dc6469d874db8393e689d20cdb2ff",
-    "results/l6/arc2/characterisation/extended/entry_filter_bivariate/block_P_bivariate_cells.csv":
-        "a5e3f8e68aa64d8fd53f752705a33613d9877dbde1f8265cb4a38d753c5e088e",
-    "results/l6/arc2/characterisation/extended/path_by_subset/block_V_subset_category_breakdown.csv":
-        "78633e9904baf2a672d2c8692f4b3557fec0aa3af8044ef3296dde08bad71c02",
-    "core/signals/l4_mtf_alignment_2_down_mixed_kijun.py":
-        "3c8d0f5d4b446f84359ab0663df36869f15b47cf1bf18fbc6caff807dc5134e3",
-    "configs/wfo_l6_arc2.yaml":
-        "25917151bc84a73885eeea9ca9c4cc15b1c277ba793706b158abd3aee0ab6328",
-    "L6_0_METHODOLOGY_LOCK.md":
-        "4fd870b1d17380e4fc4fbfda5a43f7775d313c7a5f50dbfd1f06a3e49c519c26",
+    "results/l6/arc2/characterisation/v1_1_full/signals_features.csv": "71b39383632bd695b878add8b331b76bcd231ab5b9adba9eea03d69f8762483e",
+    "results/l6/arc2/characterisation/v1_2_1_full/trade_index.csv": "9f841c5b29e87ed90d34c9617431978baf3041459797cedef02fa16c27e3abb5",
+    "results/l6/arc2/characterisation/v1_2_1_full/per_bar_paths.csv": "7b2acd6ccb98f1fd145a631b318fc95d10f5cf4f42633be9c0b59738fa1696ee",
+    "results/l6/arc2/characterisation/extended/entry_filter_univariate/block_M_kijun_distances.csv": "4a61407f0f1fc1b74486f0614928e776201dc6469d874db8393e689d20cdb2ff",
+    "results/l6/arc2/characterisation/extended/entry_filter_bivariate/block_P_bivariate_cells.csv": "a5e3f8e68aa64d8fd53f752705a33613d9877dbde1f8265cb4a38d753c5e088e",
+    "results/l6/arc2/characterisation/extended/path_by_subset/block_V_subset_category_breakdown.csv": "78633e9904baf2a672d2c8692f4b3557fec0aa3af8044ef3296dde08bad71c02",
+    "core/signals/l4_mtf_alignment_2_down_mixed_kijun.py": "3c8d0f5d4b446f84359ab0663df36869f15b47cf1bf18fbc6caff807dc5134e3",
+    "configs/wfo_l6_arc2.yaml": "25917151bc84a73885eeea9ca9c4cc15b1c277ba793706b158abd3aee0ab6328",
+    "L6_0_METHODOLOGY_LOCK.md": "4fd870b1d17380e4fc4fbfda5a43f7775d313c7a5f50dbfd1f06a3e49c519c26",
 }
 
 OUTPUT_DIR_REL = "results/l6/arc2/characterisation/extended/path_detail_distributions"
@@ -89,8 +81,12 @@ BLOCK_B_1R_COUNTS: Dict[str, int] = {
     "neither_reached": 1,
 }
 ALL_CATS: Tuple[str, ...] = (
-    "only_up", "up_then_down", "down_then_up",
-    "straight_to_sl", "simultaneous", "neither_reached",
+    "only_up",
+    "up_then_down",
+    "down_then_up",
+    "straight_to_sl",
+    "simultaneous",
+    "neither_reached",
 )
 
 SUBSET_DEFS: List[Tuple[str, Dict[str, Any]]] = [
@@ -134,7 +130,10 @@ II_MAE_BINS: Tuple[Tuple[float, float, str], ...] = (
 # Block JJ: per-category running_close distribution at bar k.
 JJ_K_GRID: Tuple[int, ...] = (5, 10, 15, 20, 25, 30, 40, 60, 90)
 JJ_CATEGORIES_FOR_DIST: Tuple[str, ...] = (
-    "only_up", "up_then_down", "down_then_up", "straight_to_sl",
+    "only_up",
+    "up_then_down",
+    "down_then_up",
+    "straight_to_sl",
 )
 JJ_RECALL_BUDGETS: Tuple[float, ...] = (0.90, 0.95, 0.99)
 
@@ -227,10 +226,10 @@ def _write_csv(df: pd.DataFrame, path: Path, float_fmt: str = "%.10g") -> None:
 # ===========================================================================
 
 
-def _make_quintile_labels(values: pd.Series, tie_break: pd.Series
-                          ) -> Tuple[pd.Series, List[Tuple[float, float]]]:
-    df = pd.DataFrame({"v": values.values, "t": tie_break.values},
-                      index=values.index)
+def _make_quintile_labels(
+    values: pd.Series, tie_break: pd.Series
+) -> Tuple[pd.Series, List[Tuple[float, float]]]:
+    df = pd.DataFrame({"v": values.values, "t": tie_break.values}, index=values.index)
     df = df.sort_values(["v", "t"], kind="stable")
     n = len(df)
     base = n // 5
@@ -240,7 +239,7 @@ def _make_quintile_labels(values: pd.Series, tie_break: pd.Series
     bounds: List[Tuple[float, float]] = []
     cursor = 0
     for qi, sz in enumerate(sizes):
-        seg = df.iloc[cursor:cursor + sz]
+        seg = df.iloc[cursor : cursor + sz]
         labels.extend([f"Q{qi + 1}"] * sz)
         bounds.append((float(seg["v"].min()), float(seg["v"].max())))
         cursor += sz
@@ -251,34 +250,44 @@ def _make_quintile_labels(values: pd.Series, tie_break: pd.Series
 def build_subsets() -> Tuple[pd.DataFrame, Dict[str, np.ndarray]]:
     sf = pd.read_csv(REPO_ROOT / "results/l6/arc2/characterisation/v1_1_full/signals_features.csv")
     ti = pd.read_csv(REPO_ROOT / "results/l6/arc2/characterisation/v1_2_1_full/trade_index.csv")
-    bm = pd.read_csv(REPO_ROOT / "results/l6/arc2/characterisation/extended/entry_filter_univariate/block_M_kijun_distances.csv")
+    bm = pd.read_csv(
+        REPO_ROOT
+        / "results/l6/arc2/characterisation/extended/entry_filter_univariate/block_M_kijun_distances.csv"
+    )
 
     sf_taken = sf[sf["taken"] == True].copy()  # noqa: E712
     sf_taken = sf_taken.rename(columns={"time": "signal_bar_ts"})
-    sf_taken["signal_bar_ts"] = pd.to_datetime(sf_taken["signal_bar_ts"]).dt.strftime("%Y-%m-%dT%H:%M:%S")
+    sf_taken["signal_bar_ts"] = pd.to_datetime(sf_taken["signal_bar_ts"]).dt.strftime(
+        "%Y-%m-%dT%H:%M:%S"
+    )
     ti["signal_bar_ts"] = pd.to_datetime(ti["signal_bar_ts"]).dt.strftime("%Y-%m-%dT%H:%M:%S")
 
     taken = sf_taken.merge(
         ti[["trade_id", "pair", "signal_bar_ts", "atr_1h_wilder_at_signal"]],
-        on=["pair", "signal_bar_ts"], how="left", validate="one_to_one",
+        on=["pair", "signal_bar_ts"],
+        how="left",
+        validate="one_to_one",
     )
     taken = taken.merge(
         bm[["trade_id", "dist_d1_kijun_atr"]],
-        on="trade_id", how="left", validate="one_to_one",
+        on="trade_id",
+        how="left",
+        validate="one_to_one",
     )
     taken = taken.sort_values("trade_id").reset_index(drop=True)
     if len(taken) != 3993:
         raise RuntimeError(f"HALT: taken row count {len(taken)} != 3993")
 
-    qa_labels, _ = _make_quintile_labels(
-        taken["concurrent_signals_same_bar"], taken["trade_id"])
+    qa_labels, _ = _make_quintile_labels(taken["concurrent_signals_same_bar"], taken["trade_id"])
     taken["Q_A_concurrent"] = qa_labels.values
-    qb_labels, _ = _make_quintile_labels(
-        taken["dist_d1_kijun_atr"], taken["trade_id"])
+    qb_labels, _ = _make_quintile_labels(taken["dist_d1_kijun_atr"], taken["trade_id"])
     taken["Q_B_dist_d1"] = qb_labels.values
 
     # Gate 2.1: reproduce 25 block_P cell counts exactly.
-    bp = pd.read_csv(REPO_ROOT / "results/l6/arc2/characterisation/extended/entry_filter_bivariate/block_P_bivariate_cells.csv")
+    bp = pd.read_csv(
+        REPO_ROOT
+        / "results/l6/arc2/characterisation/extended/entry_filter_bivariate/block_P_bivariate_cells.csv"
+    )
     diffs: List[str] = []
     for _, row in bp.iterrows():
         qa = row["Q_A_concurrent"]
@@ -289,26 +298,23 @@ def build_subsets() -> Tuple[pd.DataFrame, Dict[str, np.ndarray]]:
         if got_n != exp_n:
             diffs.append(f"  ({qa},{qb}): expected n={exp_n}, got n={got_n}")
     if diffs:
-        raise RuntimeError("HALT (gate 2.1): block_P cell mismatch:\n"
-                            + "\n".join(diffs))
+        raise RuntimeError("HALT (gate 2.1): block_P cell mismatch:\n" + "\n".join(diffs))
 
     subsets: Dict[str, np.ndarray] = {}
     for sid, spec in SUBSET_DEFS:
         if spec.get("all"):
             mask = pd.Series(True, index=taken.index)
         else:
-            mask = (taken["Q_A_concurrent"].isin(spec["qa"])
-                    & taken["Q_B_dist_d1"].isin(spec["qb"]))
+            mask = taken["Q_A_concurrent"].isin(spec["qa"]) & taken["Q_B_dist_d1"].isin(spec["qb"])
         sub = taken[mask]
         expected_n = int(spec["expected_n"])
         if len(sub) != expected_n:
-            raise RuntimeError(
-                f"HALT (gate 2.2): subset {sid} size {len(sub)} != {expected_n}"
-            )
+            raise RuntimeError(f"HALT (gate 2.2): subset {sid} size {len(sub)} != {expected_n}")
         subsets[sid] = sub["trade_id"].to_numpy(dtype=np.int64)
 
-    labels = taken[["trade_id", "pair", "signal_bar_ts", "fold_id",
-                    "Q_A_concurrent", "Q_B_dist_d1"]].copy()
+    labels = taken[
+        ["trade_id", "pair", "signal_bar_ts", "fold_id", "Q_A_concurrent", "Q_B_dist_d1"]
+    ].copy()
     labels["fold_id"] = labels["fold_id"].astype(int)
     return labels, subsets
 
@@ -361,8 +367,7 @@ def compute_categories(pb: pd.DataFrame, n_trades: int) -> np.ndarray:
         if counts[c] != exp:
             diffs.append(f"  {c}: expected={exp}, got={counts[c]}")
     if diffs:
-        raise RuntimeError("HALT (gate 2.3): Block B 1R counts diverge:\n"
-                            + "\n".join(diffs))
+        raise RuntimeError("HALT (gate 2.3): Block B 1R counts diverge:\n" + "\n".join(diffs))
     return cats
 
 
@@ -371,9 +376,9 @@ def compute_categories(pb: pd.DataFrame, n_trades: int) -> np.ndarray:
 # ===========================================================================
 
 
-def _build_index(pb: pd.DataFrame, n_trades: int
-                 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray,
-                            np.ndarray, np.ndarray]:
+def _build_index(
+    pb: pd.DataFrame, n_trades: int
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Sort per_bar by trade_id, k. Returns (starts, ends, rmfe, rmae, bc)."""
     pb_sorted = pb.sort_values(["trade_id", "k"]).reset_index(drop=True)
     tids = pb_sorted["trade_id"].to_numpy(dtype=np.int64)
@@ -386,10 +391,13 @@ def _build_index(pb: pd.DataFrame, n_trades: int
 
 
 def _per_trade_overall_mae_and_peak(
-        starts: np.ndarray, ends: np.ndarray,
-        rmfe: np.ndarray, rmae: np.ndarray, bc: np.ndarray,
-        n_trades: int) -> Tuple[np.ndarray, np.ndarray, np.ndarray,
-                                  np.ndarray, np.ndarray, np.ndarray]:
+    starts: np.ndarray,
+    ends: np.ndarray,
+    rmfe: np.ndarray,
+    rmae: np.ndarray,
+    bc: np.ndarray,
+    n_trades: int,
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Per-trade reductions.
 
     Returns:
@@ -426,8 +434,7 @@ def _per_trade_overall_mae_and_peak(
 
 
 def _per_trade_BL_H240_final_R(
-        starts: np.ndarray, ends: np.ndarray,
-        rmae: np.ndarray, bc: np.ndarray, n_trades: int
+    starts: np.ndarray, ends: np.ndarray, rmae: np.ndarray, bc: np.ndarray, n_trades: int
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Per-trade BL and H240 exit final_R derivation from per_bar_paths.
 
@@ -482,8 +489,7 @@ def _per_trade_BL_H240_final_R(
 
 
 def compute_block_GG(
-        cats: np.ndarray, overall_mae: np.ndarray,
-        subsets: Dict[str, np.ndarray]
+    cats: np.ndarray, overall_mae: np.ndarray, subsets: Dict[str, np.ndarray]
 ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     per_trade_rows: List[Dict[str, Any]] = []
     hist_rows: List[Dict[str, Any]] = []
@@ -499,14 +505,16 @@ def compute_block_GG(
         n_total = int(len(ou_tids))
         # Per-trade.
         for t, v in zip(ou_tids.tolist(), vals.tolist()):
-            per_trade_rows.append({
-                "subset_id": sid, "trade_id": int(t),
-                "overall_mae_atr": float(v),
-            })
+            per_trade_rows.append(
+                {
+                    "subset_id": sid,
+                    "trade_id": int(t),
+                    "overall_mae_atr": float(v),
+                }
+            )
         # Histogram bins.
         n_underflow = int((vals < GG_BIN_EDGES[0]).sum())
         # Per-bin counts using half-open [left, right) with last bin closed.
-        cum_below_right = 0
         for i in range(len(GG_BIN_EDGES) - 1):
             lo = float(GG_BIN_EDGES[i])
             hi = float(GG_BIN_EDGES[i + 1])
@@ -518,40 +526,56 @@ def compute_block_GG(
             # Cumulative count of trades with overall_mae <= bin right edge
             # (i.e. killed under SL = -hi).
             cum_at_or_below = int((vals <= hi).sum())
-            hist_rows.append({
-                "subset_id": sid,
-                "bin_idx": i,
-                "bin_left_atr": lo,
-                "bin_right_atr": hi,
-                "n_trades_in_bin": n_in,
-                "cumulative_count_at_or_below_right_edge": cum_at_or_below,
-                "pct_cumulative_at_or_below_right_edge": (
-                    cum_at_or_below / n_total if n_total > 0 else float("nan")
-                ),
-            })
-            cum_below_right = cum_at_or_below
+            hist_rows.append(
+                {
+                    "subset_id": sid,
+                    "bin_idx": i,
+                    "bin_left_atr": lo,
+                    "bin_right_atr": hi,
+                    "n_trades_in_bin": n_in,
+                    "cumulative_count_at_or_below_right_edge": cum_at_or_below,
+                    "pct_cumulative_at_or_below_right_edge": (
+                        cum_at_or_below / n_total if n_total > 0 else float("nan")
+                    ),
+                }
+            )
         # Overflow row for trades worse than -2.0 ATR.
-        hist_rows.append({
-            "subset_id": sid,
-            "bin_idx": -1,
-            "bin_left_atr": -float("inf"),
-            "bin_right_atr": float(GG_BIN_EDGES[0]),
-            "n_trades_in_bin": n_underflow,
-            "cumulative_count_at_or_below_right_edge": n_underflow,
-            "pct_cumulative_at_or_below_right_edge": (
-                n_underflow / n_total if n_total > 0 else float("nan")
-            ),
-        })
+        hist_rows.append(
+            {
+                "subset_id": sid,
+                "bin_idx": -1,
+                "bin_left_atr": -float("inf"),
+                "bin_right_atr": float(GG_BIN_EDGES[0]),
+                "n_trades_in_bin": n_underflow,
+                "cumulative_count_at_or_below_right_edge": n_underflow,
+                "pct_cumulative_at_or_below_right_edge": (
+                    n_underflow / n_total if n_total > 0 else float("nan")
+                ),
+            }
+        )
 
         # Summary percentiles.
         if n_total == 0:
             row: Dict[str, Any] = {"subset_id": sid, "n_only_up": 0}
-            for q in ["mean", "std", "median", "q01", "q05", "q10", "q25",
-                      "q75", "q90", "q95", "q99", "min"]:
+            for q in [
+                "mean",
+                "std",
+                "median",
+                "q01",
+                "q05",
+                "q10",
+                "q25",
+                "q75",
+                "q90",
+                "q95",
+                "q99",
+                "min",
+            ]:
                 row[q] = float("nan")
         else:
             row = {
-                "subset_id": sid, "n_only_up": n_total,
+                "subset_id": sid,
+                "n_only_up": n_total,
                 "mean": float(np.mean(vals)),
                 "std": float(np.std(vals, ddof=1)) if n_total > 1 else 0.0,
                 "median": float(np.median(vals)),
@@ -570,15 +594,15 @@ def compute_block_GG(
         # Kill rate.
         for d in GG_SL_CANDIDATES:
             n_killed = int((vals <= -d).sum())
-            kill_rows.append({
-                "subset_id": sid,
-                "SL_distance_atr": float(d),
-                "n_only_up_total": n_total,
-                "n_only_up_killed": n_killed,
-                "pct_only_up_killed": (
-                    n_killed / n_total if n_total > 0 else float("nan")
-                ),
-            })
+            kill_rows.append(
+                {
+                    "subset_id": sid,
+                    "SL_distance_atr": float(d),
+                    "n_only_up_total": n_total,
+                    "n_only_up_killed": n_killed,
+                    "pct_only_up_killed": (n_killed / n_total if n_total > 0 else float("nan")),
+                }
+            )
 
     return (
         pd.DataFrame(per_trade_rows),
@@ -594,8 +618,7 @@ def compute_block_GG(
 
 
 def compute_block_HH(
-        cats: np.ndarray, peak_mfe: np.ndarray,
-        subsets: Dict[str, np.ndarray]
+    cats: np.ndarray, peak_mfe: np.ndarray, subsets: Dict[str, np.ndarray]
 ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     hist_rows: List[Dict[str, Any]] = []
     summary_rows: List[Dict[str, Any]] = []
@@ -615,44 +638,62 @@ def compute_block_HH(
             in_bin = (vals >= lo) & (vals < hi)
             n_in = int(in_bin.sum())
             cum_above = int((vals >= hi).sum())
-            hist_rows.append({
-                "subset_id": sid,
-                "bin_idx": i,
-                "bin_left_atr": lo,
-                "bin_right_atr": hi,
-                "bin_left_R_at_BL_SL": lo / 2.0,
-                "bin_right_R_at_BL_SL": hi / 2.0,
-                "n_trades_in_bin": n_in,
-                "cumulative_count_at_or_above_right_edge": cum_above,
-                "pct_cumulative_at_or_above_right_edge": (
-                    cum_above / n_total if n_total > 0 else float("nan")
-                ),
-            })
+            hist_rows.append(
+                {
+                    "subset_id": sid,
+                    "bin_idx": i,
+                    "bin_left_atr": lo,
+                    "bin_right_atr": hi,
+                    "bin_left_R_at_BL_SL": lo / 2.0,
+                    "bin_right_R_at_BL_SL": hi / 2.0,
+                    "n_trades_in_bin": n_in,
+                    "cumulative_count_at_or_above_right_edge": cum_above,
+                    "pct_cumulative_at_or_above_right_edge": (
+                        cum_above / n_total if n_total > 0 else float("nan")
+                    ),
+                }
+            )
         # Overflow bin >= 40 ATR.
         last_edge = float(HH_BIN_EDGES[-1])
         n_overflow = int((vals >= last_edge).sum())
-        hist_rows.append({
-            "subset_id": sid,
-            "bin_idx": len(HH_BIN_EDGES) - 1,
-            "bin_left_atr": last_edge,
-            "bin_right_atr": float("inf"),
-            "bin_left_R_at_BL_SL": last_edge / 2.0,
-            "bin_right_R_at_BL_SL": float("inf"),
-            "n_trades_in_bin": n_overflow,
-            "cumulative_count_at_or_above_right_edge": 0,
-            "pct_cumulative_at_or_above_right_edge": 0.0,
-        })
+        hist_rows.append(
+            {
+                "subset_id": sid,
+                "bin_idx": len(HH_BIN_EDGES) - 1,
+                "bin_left_atr": last_edge,
+                "bin_right_atr": float("inf"),
+                "bin_left_R_at_BL_SL": last_edge / 2.0,
+                "bin_right_R_at_BL_SL": float("inf"),
+                "n_trades_in_bin": n_overflow,
+                "cumulative_count_at_or_above_right_edge": 0,
+                "pct_cumulative_at_or_above_right_edge": 0.0,
+            }
+        )
 
         # Summary percentiles.
         if n_total == 0:
             row: Dict[str, Any] = {"subset_id": sid, "n_only_up": 0}
-            for q in ["mean", "std", "median",
-                      "q05", "q10", "q25", "q50", "q75", "q80", "q85",
-                      "q90", "q95", "q99", "max"]:
+            for q in [
+                "mean",
+                "std",
+                "median",
+                "q05",
+                "q10",
+                "q25",
+                "q50",
+                "q75",
+                "q80",
+                "q85",
+                "q90",
+                "q95",
+                "q99",
+                "max",
+            ]:
                 row[q] = float("nan")
         else:
             row = {
-                "subset_id": sid, "n_only_up": n_total,
+                "subset_id": sid,
+                "n_only_up": n_total,
                 "mean": float(np.mean(vals)),
                 "std": float(np.std(vals, ddof=1)) if n_total > 1 else 0.0,
                 "median": float(np.median(vals)),
@@ -677,22 +718,22 @@ def compute_block_HH(
             # Of those reaching tp, excess loss = peak - tp.
             excess_per_trade = np.maximum(vals - tp, 0.0)
             mean_excess_all = float(excess_per_trade.mean()) if n_total > 0 else float("nan")
-            tp_rows.append({
-                "subset_id": sid,
-                "tp_atr": float(tp),
-                "tp_R_at_BL_SL": float(tp) / 2.0,
-                "n_only_up_total": n_total,
-                "n_only_up_reaching_tp": n_reach,
-                "pct_only_up_reaching_tp": (
-                    n_reach / n_total if n_total > 0 else float("nan")
-                ),
-                "n_only_up_capped_above_tp": n_reach,  # alias for clarity
-                "pct_only_up_capped_above_tp": (
-                    n_reach / n_total if n_total > 0 else float("nan")
-                ),
-                "expected_capped_loss_atr_per_only_up": mean_excess_all,
-                "expected_capped_loss_R_per_only_up": mean_excess_all / 2.0,
-            })
+            tp_rows.append(
+                {
+                    "subset_id": sid,
+                    "tp_atr": float(tp),
+                    "tp_R_at_BL_SL": float(tp) / 2.0,
+                    "n_only_up_total": n_total,
+                    "n_only_up_reaching_tp": n_reach,
+                    "pct_only_up_reaching_tp": (n_reach / n_total if n_total > 0 else float("nan")),
+                    "n_only_up_capped_above_tp": n_reach,  # alias for clarity
+                    "pct_only_up_capped_above_tp": (
+                        n_reach / n_total if n_total > 0 else float("nan")
+                    ),
+                    "expected_capped_loss_atr_per_only_up": mean_excess_all,
+                    "expected_capped_loss_R_per_only_up": mean_excess_all / 2.0,
+                }
+            )
 
     return (
         pd.DataFrame(hist_rows),
@@ -725,9 +766,12 @@ def _bin_mae(mae_v: float) -> str:
 
 
 def compute_block_II(
-        cats: np.ndarray, peak_mfe: np.ndarray, overall_mae: np.ndarray,
-        close_k120: np.ndarray, final_close: np.ndarray,
-        subsets: Dict[str, np.ndarray]
+    cats: np.ndarray,
+    peak_mfe: np.ndarray,
+    overall_mae: np.ndarray,
+    close_k120: np.ndarray,
+    final_close: np.ndarray,
+    subsets: Dict[str, np.ndarray],
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     cell_rows: List[Dict[str, Any]] = []
     marg_rows: List[Dict[str, Any]] = []
@@ -745,66 +789,71 @@ def compute_block_II(
             np.nan,
             peak_vals - close_k120[ou_arr],
         )
-        peak_bins = np.array([_bin_peak(float(p)) for p in peak_vals.tolist()],
-                              dtype=object)
-        mae_bins = np.array([_bin_mae(float(m)) for m in mae_vals.tolist()],
-                             dtype=object)
+        peak_bins = np.array([_bin_peak(float(p)) for p in peak_vals.tolist()], dtype=object)
+        mae_bins = np.array([_bin_mae(float(m)) for m in mae_vals.tolist()], dtype=object)
         for _, _, pb_label in II_PEAK_BINS:
             for _, _, mb_label in II_MAE_BINS:
                 mask = (peak_bins == pb_label) & (mae_bins == mb_label)
                 n = int(mask.sum())
                 if n == 0:
-                    cell_rows.append({
-                        "subset_id": sid,
-                        "peak_bin": pb_label,
-                        "mae_bin": mb_label,
-                        "n_trades": 0,
-                        "mean_peak_atr": float("nan"),
-                        "mean_mae_atr": float("nan"),
-                        "mean_final_close_R_at_BL_SL": float("nan"),
-                        "mean_giveback_to_k120_atr": float("nan"),
-                        "n_with_giveback": 0,
-                    })
+                    cell_rows.append(
+                        {
+                            "subset_id": sid,
+                            "peak_bin": pb_label,
+                            "mae_bin": mb_label,
+                            "n_trades": 0,
+                            "mean_peak_atr": float("nan"),
+                            "mean_mae_atr": float("nan"),
+                            "mean_final_close_R_at_BL_SL": float("nan"),
+                            "mean_giveback_to_k120_atr": float("nan"),
+                            "n_with_giveback": 0,
+                        }
+                    )
                     continue
                 gv = giveback[mask]
                 gv_valid = gv[~np.isnan(gv)]
-                cell_rows.append({
-                    "subset_id": sid,
-                    "peak_bin": pb_label,
-                    "mae_bin": mb_label,
-                    "n_trades": n,
-                    "mean_peak_atr": float(np.mean(peak_vals[mask])),
-                    "mean_mae_atr": float(np.mean(mae_vals[mask])),
-                    "mean_final_close_R_at_BL_SL": float(np.mean(final_R[mask])),
-                    "mean_giveback_to_k120_atr": (
-                        float(np.mean(gv_valid)) if len(gv_valid) > 0
-                        else float("nan")
-                    ),
-                    "n_with_giveback": int(len(gv_valid)),
-                })
+                cell_rows.append(
+                    {
+                        "subset_id": sid,
+                        "peak_bin": pb_label,
+                        "mae_bin": mb_label,
+                        "n_trades": n,
+                        "mean_peak_atr": float(np.mean(peak_vals[mask])),
+                        "mean_mae_atr": float(np.mean(mae_vals[mask])),
+                        "mean_final_close_R_at_BL_SL": float(np.mean(final_R[mask])),
+                        "mean_giveback_to_k120_atr": (
+                            float(np.mean(gv_valid)) if len(gv_valid) > 0 else float("nan")
+                        ),
+                        "n_with_giveback": int(len(gv_valid)),
+                    }
+                )
 
         # Marginal by mae bin.
         for _, _, mb_label in II_MAE_BINS:
-            mask = (mae_bins == mb_label)
+            mask = mae_bins == mb_label
             n = int(mask.sum())
             if n == 0:
-                marg_rows.append({
+                marg_rows.append(
+                    {
+                        "subset_id": sid,
+                        "mae_bin": mb_label,
+                        "n_trades": 0,
+                        "mean_peak_atr": float("nan"),
+                        "median_peak_atr": float("nan"),
+                        "pct_of_only_up_in_subset": 0.0,
+                    }
+                )
+                continue
+            marg_rows.append(
+                {
                     "subset_id": sid,
                     "mae_bin": mb_label,
-                    "n_trades": 0,
-                    "mean_peak_atr": float("nan"),
-                    "median_peak_atr": float("nan"),
-                    "pct_of_only_up_in_subset": 0.0,
-                })
-                continue
-            marg_rows.append({
-                "subset_id": sid,
-                "mae_bin": mb_label,
-                "n_trades": n,
-                "mean_peak_atr": float(np.mean(peak_vals[mask])),
-                "median_peak_atr": float(np.median(peak_vals[mask])),
-                "pct_of_only_up_in_subset": n / len(ou_arr),
-            })
+                    "n_trades": n,
+                    "mean_peak_atr": float(np.mean(peak_vals[mask])),
+                    "median_peak_atr": float(np.median(peak_vals[mask])),
+                    "pct_of_only_up_in_subset": n / len(ou_arr),
+                }
+            )
 
     return pd.DataFrame(cell_rows), pd.DataFrame(marg_rows)
 
@@ -814,16 +863,16 @@ def compute_block_II(
 # ===========================================================================
 
 
-def _close_at_k(starts: np.ndarray, ends: np.ndarray, bc: np.ndarray,
-                tid: int, k: int) -> float:
+def _close_at_k(starts: np.ndarray, ends: np.ndarray, bc: np.ndarray, tid: int, k: int) -> float:
     s, e = int(starts[tid]), int(ends[tid])
     if e - s >= k:
         return float(bc[s + k - 1])
     return float("nan")
 
 
-def _close_at_k_for_tids(starts: np.ndarray, ends: np.ndarray, bc: np.ndarray,
-                          tid_array: np.ndarray, k: int) -> np.ndarray:
+def _close_at_k_for_tids(
+    starts: np.ndarray, ends: np.ndarray, bc: np.ndarray, tid_array: np.ndarray, k: int
+) -> np.ndarray:
     out = np.full(len(tid_array), np.nan, dtype=np.float64)
     for i, tid in enumerate(tid_array.tolist()):
         s, e = int(starts[tid]), int(ends[tid])
@@ -852,13 +901,15 @@ def _cohens_d(x: np.ndarray, y: np.ndarray) -> float:
 
 
 def compute_block_JJ(
-        starts: np.ndarray, ends: np.ndarray, bc: np.ndarray,
-        cats: np.ndarray, subsets: Dict[str, np.ndarray]
+    starts: np.ndarray,
+    ends: np.ndarray,
+    bc: np.ndarray,
+    cats: np.ndarray,
+    subsets: Dict[str, np.ndarray],
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Returns (per_category_close_at_k_df, only_up_separator_curves_df)."""
     cat_rows: List[Dict[str, Any]] = []
     sep_rows: List[Dict[str, Any]] = []
-    LOSER_CATS = ("up_then_down", "down_then_up", "straight_to_sl")
 
     for sid in SUBSET_IDS:
         tids = subsets[sid]
@@ -877,11 +928,13 @@ def compute_block_JJ(
                 vals_by_cat[c] = vs_valid
                 n = int(len(vs_valid))
                 row: Dict[str, Any] = {
-                    "subset_id": sid, "k": int(k), "category": c, "n": n,
+                    "subset_id": sid,
+                    "k": int(k),
+                    "category": c,
+                    "n": n,
                 }
                 if n == 0:
-                    for q in ["mean", "std", "median",
-                              "q05", "q10", "q25", "q75", "q90", "q95"]:
+                    for q in ["mean", "std", "median", "q05", "q10", "q25", "q75", "q90", "q95"]:
                         row[q] = float("nan")
                 else:
                     row["mean"] = float(np.mean(vs_valid))
@@ -913,27 +966,30 @@ def compute_block_JJ(
 
             for budget in JJ_RECALL_BUDGETS:
                 if n_ou == 0:
-                    sep_rows.append({
-                        "subset_id": sid, "k": int(k),
-                        "recall_only_up_budget": float(budget),
-                        "n_only_up": 0,
-                        "tau_only_up_atr_fill": float("nan"),
-                        "n_only_up_above_tau": 0,
-                        "recall_only_up_actual": float("nan"),
-                        "n_losers_total": n_loser_total,
-                        "n_losers_below_tau": 0,
-                        "pct_losers_below_tau": float("nan"),
-                        "n_up_then_down": n_utd,
-                        "n_up_then_down_below_tau": 0,
-                        "n_down_then_up": n_dtu,
-                        "n_down_then_up_below_tau": 0,
-                        "n_straight_to_sl": n_sts,
-                        "n_straight_to_sl_below_tau": 0,
-                        "cohens_d_only_up_vs_up_then_down": d_utd,
-                        "cohens_d_only_up_vs_down_then_up": d_dtu,
-                        "cohens_d_only_up_vs_straight_to_sl": d_sts,
-                        "cohens_d_only_up_vs_loser_pool": d_losers,
-                    })
+                    sep_rows.append(
+                        {
+                            "subset_id": sid,
+                            "k": int(k),
+                            "recall_only_up_budget": float(budget),
+                            "n_only_up": 0,
+                            "tau_only_up_atr_fill": float("nan"),
+                            "n_only_up_above_tau": 0,
+                            "recall_only_up_actual": float("nan"),
+                            "n_losers_total": n_loser_total,
+                            "n_losers_below_tau": 0,
+                            "pct_losers_below_tau": float("nan"),
+                            "n_up_then_down": n_utd,
+                            "n_up_then_down_below_tau": 0,
+                            "n_down_then_up": n_dtu,
+                            "n_down_then_up_below_tau": 0,
+                            "n_straight_to_sl": n_sts,
+                            "n_straight_to_sl_below_tau": 0,
+                            "cohens_d_only_up_vs_up_then_down": d_utd,
+                            "cohens_d_only_up_vs_down_then_up": d_dtu,
+                            "cohens_d_only_up_vs_straight_to_sl": d_sts,
+                            "cohens_d_only_up_vs_loser_pool": d_losers,
+                        }
+                    )
                     continue
                 # tau = largest value such that >= budget * n_ou trades
                 # have close >= tau. That is the (1 - budget) quantile of
@@ -954,30 +1010,32 @@ def compute_block_JJ(
                 n_dtu_below = int((v_dtu < tau).sum()) if n_dtu > 0 else 0
                 n_sts_below = int((v_sts < tau).sum()) if n_sts > 0 else 0
                 n_losers_below = n_utd_below + n_dtu_below + n_sts_below
-                sep_rows.append({
-                    "subset_id": sid, "k": int(k),
-                    "recall_only_up_budget": float(budget),
-                    "n_only_up": n_ou,
-                    "tau_only_up_atr_fill": tau,
-                    "n_only_up_above_tau": n_above,
-                    "recall_only_up_actual": recall_actual,
-                    "n_losers_total": n_loser_total,
-                    "n_losers_below_tau": n_losers_below,
-                    "pct_losers_below_tau": (
-                        n_losers_below / n_loser_total
-                        if n_loser_total > 0 else float("nan")
-                    ),
-                    "n_up_then_down": n_utd,
-                    "n_up_then_down_below_tau": n_utd_below,
-                    "n_down_then_up": n_dtu,
-                    "n_down_then_up_below_tau": n_dtu_below,
-                    "n_straight_to_sl": n_sts,
-                    "n_straight_to_sl_below_tau": n_sts_below,
-                    "cohens_d_only_up_vs_up_then_down": d_utd,
-                    "cohens_d_only_up_vs_down_then_up": d_dtu,
-                    "cohens_d_only_up_vs_straight_to_sl": d_sts,
-                    "cohens_d_only_up_vs_loser_pool": d_losers,
-                })
+                sep_rows.append(
+                    {
+                        "subset_id": sid,
+                        "k": int(k),
+                        "recall_only_up_budget": float(budget),
+                        "n_only_up": n_ou,
+                        "tau_only_up_atr_fill": tau,
+                        "n_only_up_above_tau": n_above,
+                        "recall_only_up_actual": recall_actual,
+                        "n_losers_total": n_loser_total,
+                        "n_losers_below_tau": n_losers_below,
+                        "pct_losers_below_tau": (
+                            n_losers_below / n_loser_total if n_loser_total > 0 else float("nan")
+                        ),
+                        "n_up_then_down": n_utd,
+                        "n_up_then_down_below_tau": n_utd_below,
+                        "n_down_then_up": n_dtu,
+                        "n_down_then_up_below_tau": n_dtu_below,
+                        "n_straight_to_sl": n_sts,
+                        "n_straight_to_sl_below_tau": n_sts_below,
+                        "cohens_d_only_up_vs_up_then_down": d_utd,
+                        "cohens_d_only_up_vs_down_then_up": d_dtu,
+                        "cohens_d_only_up_vs_straight_to_sl": d_sts,
+                        "cohens_d_only_up_vs_loser_pool": d_losers,
+                    }
+                )
 
     return pd.DataFrame(cat_rows), pd.DataFrame(sep_rows)
 
@@ -995,16 +1053,19 @@ def _position_bin(rc: float) -> Optional[str]:
 
 
 def compute_block_KK(
-        starts: np.ndarray, ends: np.ndarray, bc: np.ndarray,
-        cats: np.ndarray, peak_mfe: np.ndarray,
-        subsets: Dict[str, np.ndarray]
+    starts: np.ndarray,
+    ends: np.ndarray,
+    bc: np.ndarray,
+    cats: np.ndarray,
+    peak_mfe: np.ndarray,
+    subsets: Dict[str, np.ndarray],
 ) -> pd.DataFrame:
     rows: List[Dict[str, Any]] = []
     for sid in SUBSET_IDS:
         tids = subsets[sid]
         tids_arr = np.array([int(t) for t in tids.tolist()], dtype=np.int64)
         cats_for_sub = cats[tids_arr]
-        ou_mask = (cats_for_sub == "only_up")
+        ou_mask = cats_for_sub == "only_up"
         ou_tids = tids_arr[ou_mask]
         for k in KK_K_GRID:
             # Close at bar k for all trades in subset and the only_up subset.
@@ -1013,18 +1074,16 @@ def compute_block_KK(
             peak_ou = peak_mfe[ou_tids]
             # Assign bins.
             bins_all = np.array(
-                [_position_bin(v) if not np.isnan(v) else None
-                 for v in close_all.tolist()],
+                [_position_bin(v) if not np.isnan(v) else None for v in close_all.tolist()],
                 dtype=object,
             )
             bins_ou = np.array(
-                [_position_bin(v) if not np.isnan(v) else None
-                 for v in close_ou.tolist()],
+                [_position_bin(v) if not np.isnan(v) else None for v in close_ou.tolist()],
                 dtype=object,
             )
             for _, _, bin_label in KK_POSITION_BINS:
-                mask_all = (bins_all == bin_label)
-                mask_ou = (bins_ou == bin_label)
+                mask_all = bins_all == bin_label
+                mask_ou = bins_ou == bin_label
                 n_all = int(mask_all.sum())
                 n_ou_in = int(mask_ou.sum())
                 if n_ou_in > 0:
@@ -1038,20 +1097,22 @@ def compute_block_KK(
                     med_peak = float("nan")
                     n_high = 0
                     pct_high = float("nan")
-                rows.append({
-                    "subset_id": sid,
-                    "k": int(k),
-                    "position_bin": bin_label,
-                    "n_only_up_in_bin": n_ou_in,
-                    "mean_peak_mfe_atr": mean_peak,
-                    "median_peak_mfe_atr": med_peak,
-                    "n_only_up_reaching_+10atr": n_high,
-                    "pct_of_only_up_in_bin_reaching_+10atr": pct_high,
-                    "n_all_trades_in_bin": n_all,
-                    "pct_of_all_trades_in_bin_that_are_only_up": (
-                        n_ou_in / n_all if n_all > 0 else float("nan")
-                    ),
-                })
+                rows.append(
+                    {
+                        "subset_id": sid,
+                        "k": int(k),
+                        "position_bin": bin_label,
+                        "n_only_up_in_bin": n_ou_in,
+                        "mean_peak_mfe_atr": mean_peak,
+                        "median_peak_mfe_atr": med_peak,
+                        "n_only_up_reaching_+10atr": n_high,
+                        "pct_of_only_up_in_bin_reaching_+10atr": pct_high,
+                        "n_all_trades_in_bin": n_all,
+                        "pct_of_all_trades_in_bin_that_are_only_up": (
+                            n_ou_in / n_all if n_all > 0 else float("nan")
+                        ),
+                    }
+                )
     return pd.DataFrame(rows)
 
 
@@ -1061,8 +1122,7 @@ def compute_block_KK(
 
 
 def compute_block_LL(
-        cats: np.ndarray, overall_mae: np.ndarray,
-        subsets: Dict[str, np.ndarray]
+    cats: np.ndarray, overall_mae: np.ndarray, subsets: Dict[str, np.ndarray]
 ) -> pd.DataFrame:
     rows: List[Dict[str, Any]] = []
     for sid in SUBSET_IDS:
@@ -1084,62 +1144,68 @@ def compute_block_LL(
                     in_bin = (vals >= lo) & (vals < hi)
                 n_in = int(in_bin.sum())
                 cum_at_or_below = int((vals <= hi).sum())
-                rows.append({
+                rows.append(
+                    {
+                        "subset_id": sid,
+                        "category": cat_label,
+                        "bin_idx": i,
+                        "bin_left_atr": lo,
+                        "bin_right_atr": hi,
+                        "n_trades_in_bin": n_in,
+                        "cumulative_count_at_or_below_right_edge": cum_at_or_below,
+                        "pct_cumulative_at_or_below_right_edge": (
+                            cum_at_or_below / n_total if n_total > 0 else float("nan")
+                        ),
+                        "n_total_category": n_total,
+                        "row_kind": "bin",
+                        "widened_SL_atr": float("nan"),
+                        "n_surviving_widened_SL": -1,
+                        "pct_surviving_widened_SL": float("nan"),
+                    }
+                )
+            # Underflow row for < -10.
+            n_under = int((vals < LL_BIN_EDGES[0]).sum())
+            rows.append(
+                {
                     "subset_id": sid,
                     "category": cat_label,
-                    "bin_idx": i,
-                    "bin_left_atr": lo,
-                    "bin_right_atr": hi,
-                    "n_trades_in_bin": n_in,
-                    "cumulative_count_at_or_below_right_edge": cum_at_or_below,
+                    "bin_idx": -1,
+                    "bin_left_atr": -float("inf"),
+                    "bin_right_atr": float(LL_BIN_EDGES[0]),
+                    "n_trades_in_bin": n_under,
+                    "cumulative_count_at_or_below_right_edge": n_under,
                     "pct_cumulative_at_or_below_right_edge": (
-                        cum_at_or_below / n_total if n_total > 0 else float("nan")
+                        n_under / n_total if n_total > 0 else float("nan")
                     ),
                     "n_total_category": n_total,
-                    "row_kind": "bin",
+                    "row_kind": "bin_underflow",
                     "widened_SL_atr": float("nan"),
                     "n_surviving_widened_SL": -1,
                     "pct_surviving_widened_SL": float("nan"),
-                })
-            # Underflow row for < -10.
-            n_under = int((vals < LL_BIN_EDGES[0]).sum())
-            rows.append({
-                "subset_id": sid,
-                "category": cat_label,
-                "bin_idx": -1,
-                "bin_left_atr": -float("inf"),
-                "bin_right_atr": float(LL_BIN_EDGES[0]),
-                "n_trades_in_bin": n_under,
-                "cumulative_count_at_or_below_right_edge": n_under,
-                "pct_cumulative_at_or_below_right_edge": (
-                    n_under / n_total if n_total > 0 else float("nan")
-                ),
-                "n_total_category": n_total,
-                "row_kind": "bin_underflow",
-                "widened_SL_atr": float("nan"),
-                "n_surviving_widened_SL": -1,
-                "pct_surviving_widened_SL": float("nan"),
-            })
+                }
+            )
             # Widened SL survival rows.
             for d in LL_WIDENED_SL:
                 n_surv = int((vals > -d).sum())
-                rows.append({
-                    "subset_id": sid,
-                    "category": cat_label,
-                    "bin_idx": -2,
-                    "bin_left_atr": float("nan"),
-                    "bin_right_atr": float("nan"),
-                    "n_trades_in_bin": -1,
-                    "cumulative_count_at_or_below_right_edge": -1,
-                    "pct_cumulative_at_or_below_right_edge": float("nan"),
-                    "n_total_category": n_total,
-                    "row_kind": "widened_SL_survival",
-                    "widened_SL_atr": float(d),
-                    "n_surviving_widened_SL": n_surv,
-                    "pct_surviving_widened_SL": (
-                        n_surv / n_total if n_total > 0 else float("nan")
-                    ),
-                })
+                rows.append(
+                    {
+                        "subset_id": sid,
+                        "category": cat_label,
+                        "bin_idx": -2,
+                        "bin_left_atr": float("nan"),
+                        "bin_right_atr": float("nan"),
+                        "n_trades_in_bin": -1,
+                        "cumulative_count_at_or_below_right_edge": -1,
+                        "pct_cumulative_at_or_below_right_edge": float("nan"),
+                        "n_total_category": n_total,
+                        "row_kind": "widened_SL_survival",
+                        "widened_SL_atr": float(d),
+                        "n_surviving_widened_SL": n_surv,
+                        "pct_surviving_widened_SL": (
+                            n_surv / n_total if n_total > 0 else float("nan")
+                        ),
+                    }
+                )
     return pd.DataFrame(rows)
 
 
@@ -1156,10 +1222,14 @@ def _assign_tier(peak_v: float) -> str:
 
 
 def compute_block_MM(
-        starts: np.ndarray, ends: np.ndarray, bc: np.ndarray,
-        cats: np.ndarray, peak_mfe: np.ndarray,
-        close_k120: np.ndarray, final_close: np.ndarray,
-        subsets: Dict[str, np.ndarray]
+    starts: np.ndarray,
+    ends: np.ndarray,
+    bc: np.ndarray,
+    cats: np.ndarray,
+    peak_mfe: np.ndarray,
+    close_k120: np.ndarray,
+    final_close: np.ndarray,
+    subsets: Dict[str, np.ndarray],
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     tier_rows: List[Dict[str, Any]] = []
     path_rows: List[Dict[str, Any]] = []
@@ -1178,48 +1248,51 @@ def compute_block_MM(
             peak_vals - close_k120[ou_arr],
         )
         tier_labels = np.array(
-            [_assign_tier(float(p)) for p in peak_vals.tolist()], dtype=object,
+            [_assign_tier(float(p)) for p in peak_vals.tolist()],
+            dtype=object,
         )
         subset_total_R = float(np.nansum(final_R))
         for _, _, tier_label in MM_TIER_BOUNDS:
-            mask = (tier_labels == tier_label)
+            mask = tier_labels == tier_label
             n = int(mask.sum())
             if n == 0:
-                tier_rows.append({
-                    "subset_id": sid,
-                    "tier": tier_label,
-                    "n_trades": 0,
-                    "mean_peak_atr": float("nan"),
-                    "mean_giveback_to_k120_atr": float("nan"),
-                    "n_with_giveback": 0,
-                    "mean_final_close_R_at_BL_SL": float("nan"),
-                    "total_R_contribution": 0.0,
-                    "pct_of_subset_total_R_contribution": (
-                        0.0 if subset_total_R != 0 else float("nan")
-                    ),
-                })
+                tier_rows.append(
+                    {
+                        "subset_id": sid,
+                        "tier": tier_label,
+                        "n_trades": 0,
+                        "mean_peak_atr": float("nan"),
+                        "mean_giveback_to_k120_atr": float("nan"),
+                        "n_with_giveback": 0,
+                        "mean_final_close_R_at_BL_SL": float("nan"),
+                        "total_R_contribution": 0.0,
+                        "pct_of_subset_total_R_contribution": (
+                            0.0 if subset_total_R != 0 else float("nan")
+                        ),
+                    }
+                )
                 continue
             gv_in = gv_k120[mask]
             gv_valid = gv_in[~np.isnan(gv_in)]
             mean_fr = float(np.mean(final_R[mask]))
             tot_r = float(np.sum(final_R[mask]))
-            tier_rows.append({
-                "subset_id": sid,
-                "tier": tier_label,
-                "n_trades": n,
-                "mean_peak_atr": float(np.mean(peak_vals[mask])),
-                "mean_giveback_to_k120_atr": (
-                    float(np.mean(gv_valid)) if len(gv_valid) > 0
-                    else float("nan")
-                ),
-                "n_with_giveback": int(len(gv_valid)),
-                "mean_final_close_R_at_BL_SL": mean_fr,
-                "total_R_contribution": tot_r,
-                "pct_of_subset_total_R_contribution": (
-                    tot_r / subset_total_R if subset_total_R != 0
-                    else float("nan")
-                ),
-            })
+            tier_rows.append(
+                {
+                    "subset_id": sid,
+                    "tier": tier_label,
+                    "n_trades": n,
+                    "mean_peak_atr": float(np.mean(peak_vals[mask])),
+                    "mean_giveback_to_k120_atr": (
+                        float(np.mean(gv_valid)) if len(gv_valid) > 0 else float("nan")
+                    ),
+                    "n_with_giveback": int(len(gv_valid)),
+                    "mean_final_close_R_at_BL_SL": mean_fr,
+                    "total_R_contribution": tot_r,
+                    "pct_of_subset_total_R_contribution": (
+                        tot_r / subset_total_R if subset_total_R != 0 else float("nan")
+                    ),
+                }
+            )
 
         # Median running_close path per tier across k grid.
         for _, _, tier_label in MM_TIER_BOUNDS:
@@ -1229,25 +1302,24 @@ def compute_block_MM(
                 vs = _close_at_k_for_tids(starts, ends, bc, tier_tids, k)
                 vs_valid = vs[~np.isnan(vs)]
                 n_valid = int(len(vs_valid))
-                path_rows.append({
-                    "subset_id": sid,
-                    "tier": tier_label,
-                    "k": int(k),
-                    "n_tier_total": n_tier,
-                    "n_with_close_at_k": n_valid,
-                    "median_running_close_atr": (
-                        float(np.median(vs_valid)) if n_valid > 0
-                        else float("nan")
-                    ),
-                    "q25_running_close_atr": (
-                        float(np.quantile(vs_valid, 0.25)) if n_valid > 0
-                        else float("nan")
-                    ),
-                    "q75_running_close_atr": (
-                        float(np.quantile(vs_valid, 0.75)) if n_valid > 0
-                        else float("nan")
-                    ),
-                })
+                path_rows.append(
+                    {
+                        "subset_id": sid,
+                        "tier": tier_label,
+                        "k": int(k),
+                        "n_tier_total": n_tier,
+                        "n_with_close_at_k": n_valid,
+                        "median_running_close_atr": (
+                            float(np.median(vs_valid)) if n_valid > 0 else float("nan")
+                        ),
+                        "q25_running_close_atr": (
+                            float(np.quantile(vs_valid, 0.25)) if n_valid > 0 else float("nan")
+                        ),
+                        "q75_running_close_atr": (
+                            float(np.quantile(vs_valid, 0.75)) if n_valid > 0 else float("nan")
+                        ),
+                    }
+                )
 
     return pd.DataFrame(tier_rows), pd.DataFrame(path_rows)
 
@@ -1260,12 +1332,20 @@ def compute_block_MM(
 def _nn_summary_row(vals: np.ndarray) -> Dict[str, float]:
     n = int(len(vals))
     if n == 0:
-        return {"mean": float("nan"), "std": float("nan"),
-                "median": float("nan"),
-                "q05": float("nan"), "q10": float("nan"), "q25": float("nan"),
-                "q50": float("nan"), "q75": float("nan"),
-                "q90": float("nan"), "q95": float("nan"),
-                "q99": float("nan"), "max": float("nan")}
+        return {
+            "mean": float("nan"),
+            "std": float("nan"),
+            "median": float("nan"),
+            "q05": float("nan"),
+            "q10": float("nan"),
+            "q25": float("nan"),
+            "q50": float("nan"),
+            "q75": float("nan"),
+            "q90": float("nan"),
+            "q95": float("nan"),
+            "q99": float("nan"),
+            "max": float("nan"),
+        }
     return {
         "mean": float(np.mean(vals)),
         "std": float(np.std(vals, ddof=1)) if n > 1 else 0.0,
@@ -1282,9 +1362,9 @@ def _nn_summary_row(vals: np.ndarray) -> Dict[str, float]:
     }
 
 
-def _nn_histogram_rows(vals: np.ndarray, subset_id: str,
-                        exit_policy: str, tier: Optional[str] = None
-                        ) -> List[Dict[str, Any]]:
+def _nn_histogram_rows(
+    vals: np.ndarray, subset_id: str, exit_policy: str, tier: Optional[str] = None
+) -> List[Dict[str, Any]]:
     rows: List[Dict[str, Any]] = []
     n_total = int(len(vals))
     n_underflow = int((vals < NN_BIN_EDGES[0]).sum())
@@ -1360,9 +1440,11 @@ def _nn_histogram_rows(vals: np.ndarray, subset_id: str,
 
 
 def compute_block_NN(
-        cats: np.ndarray, peak_mfe: np.ndarray,
-        final_R_BL: np.ndarray, final_R_H240: np.ndarray,
-        subsets: Dict[str, np.ndarray]
+    cats: np.ndarray,
+    peak_mfe: np.ndarray,
+    final_R_BL: np.ndarray,
+    final_R_H240: np.ndarray,
+    subsets: Dict[str, np.ndarray],
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Returns (per_subset_df, per_tier_df).
 
@@ -1385,16 +1467,16 @@ def compute_block_NN(
         # Per-tier.
         peak_vals = peak_mfe[ou_tids]
         tier_labels = np.array(
-            [_assign_tier(float(p)) for p in peak_vals.tolist()], dtype=object,
+            [_assign_tier(float(p)) for p in peak_vals.tolist()],
+            dtype=object,
         )
         for _, _, tier_label in MM_TIER_BOUNDS:
-            mask = (tier_labels == tier_label)
+            mask = tier_labels == tier_label
             tier_tids = ou_tids[mask]
             for policy in NN_EXIT_POLICIES:
                 arr = final_R_BL if policy == "BL" else final_R_H240
                 vals = arr[tier_tids]
-                tier_rows.extend(_nn_histogram_rows(vals, sid, policy,
-                                                     tier=tier_label))
+                tier_rows.extend(_nn_histogram_rows(vals, sid, policy, tier=tier_label))
     return pd.DataFrame(subset_rows), pd.DataFrame(tier_rows)
 
 
@@ -1404,9 +1486,12 @@ def compute_block_NN(
 
 
 def compute_block_KK3(
-        starts: np.ndarray, ends: np.ndarray, bc: np.ndarray,
-        cats: np.ndarray, peak_mfe: np.ndarray,
-        subsets: Dict[str, np.ndarray]
+    starts: np.ndarray,
+    ends: np.ndarray,
+    bc: np.ndarray,
+    cats: np.ndarray,
+    peak_mfe: np.ndarray,
+    subsets: Dict[str, np.ndarray],
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Returns (tier_by_position_df, position_distribution_by_tier_df).
 
@@ -1420,23 +1505,22 @@ def compute_block_KK3(
         tids = subsets[sid]
         tids_arr = np.array([int(t) for t in tids.tolist()], dtype=np.int64)
         cats_sub = cats[tids_arr]
-        ou_mask = (cats_sub == "only_up")
+        ou_mask = cats_sub == "only_up"
         ou_tids = tids_arr[ou_mask]
         peak_ou = peak_mfe[ou_tids]
         tier_ou = np.array(
-            [_assign_tier(float(p)) for p in peak_ou.tolist()], dtype=object,
+            [_assign_tier(float(p)) for p in peak_ou.tolist()],
+            dtype=object,
         )
         for k in KK3_K_GRID:
             close_all = _close_at_k_for_tids(starts, ends, bc, tids_arr, k)
             close_ou = _close_at_k_for_tids(starts, ends, bc, ou_tids, k)
             bins_all = np.array(
-                [_position_bin(v) if not np.isnan(v) else None
-                 for v in close_all.tolist()],
+                [_position_bin(v) if not np.isnan(v) else None for v in close_all.tolist()],
                 dtype=object,
             )
             bins_ou = np.array(
-                [_position_bin(v) if not np.isnan(v) else None
-                 for v in close_ou.tolist()],
+                [_position_bin(v) if not np.isnan(v) else None for v in close_ou.tolist()],
                 dtype=object,
             )
 
@@ -1444,16 +1528,14 @@ def compute_block_KK3(
             sel_tau = KK3_TAU_SELECTIVITY
             sel_per_tier: Dict[str, Dict[str, Any]] = {}
             for tier_label in TIER_LABELS:
-                tier_mask = (tier_ou == tier_label)
+                tier_mask = tier_ou == tier_label
                 vals_tier = close_ou[tier_mask]
                 n_t = int(np.sum(~np.isnan(vals_tier)))
                 n_below = int(np.sum(vals_tier <= sel_tau))
                 sel_per_tier[tier_label] = {
                     "n_only_up_in_tier_with_close_at_k": n_t,
                     "n_only_up_in_tier_below_tau": n_below,
-                    "pct_below_tau": (
-                        n_below / n_t if n_t > 0 else float("nan")
-                    ),
+                    "pct_below_tau": (n_below / n_t if n_t > 0 else float("nan")),
                 }
             # tier_low_plus_mid.
             lpm_mask = (tier_ou == "tier_low") | (tier_ou == "tier_mid")
@@ -1463,15 +1545,13 @@ def compute_block_KK3(
             sel_per_tier["tier_low_plus_mid"] = {
                 "n_only_up_in_tier_with_close_at_k": n_lpm,
                 "n_only_up_in_tier_below_tau": n_lpm_below,
-                "pct_below_tau": (
-                    n_lpm_below / n_lpm if n_lpm > 0 else float("nan")
-                ),
+                "pct_below_tau": (n_lpm_below / n_lpm if n_lpm > 0 else float("nan")),
             }
 
             # Per (subset, k, position_bin) tier breakdown.
             for _, _, bin_label in KK_POSITION_BINS:
-                mask_all = (bins_all == bin_label)
-                mask_ou = (bins_ou == bin_label)
+                mask_all = bins_all == bin_label
+                mask_ou = bins_ou == bin_label
                 n_all = int(mask_all.sum())
                 n_ou_in = int(mask_ou.sum())
                 tier_counts = {tl: 0 for tl in TIER_LABELS}
@@ -1479,28 +1559,30 @@ def compute_block_KK3(
                     tiers_in_bin = tier_ou[mask_ou]
                     for tl in TIER_LABELS:
                         tier_counts[tl] = int((tiers_in_bin == tl).sum())
-                tbyp_rows.append({
-                    "subset_id": sid,
-                    "k": int(k),
-                    "position_bin": bin_label,
-                    "n_total_trades_in_bin": n_all,
-                    "n_only_up_in_bin": n_ou_in,
-                    "n_only_up_tier_low_in_bin": tier_counts["tier_low"],
-                    "n_only_up_tier_mid_in_bin": tier_counts["tier_mid"],
-                    "n_only_up_tier_high_in_bin": tier_counts["tier_high"],
-                    "n_only_up_tier_runner_in_bin": tier_counts["tier_runner"],
-                    # Per-(subset,k) selectivity at tau=-0.5 (constant across
-                    # position bins; duplicated for convenience).
-                    "pct_of_only_up_tier_high_below_tau_-0.5": (
-                        sel_per_tier["tier_high"]["pct_below_tau"]
-                    ),
-                    "pct_of_only_up_tier_runner_below_tau_-0.5": (
-                        sel_per_tier["tier_runner"]["pct_below_tau"]
-                    ),
-                    "pct_of_only_up_tier_low_plus_mid_below_tau_-0.5": (
-                        sel_per_tier["tier_low_plus_mid"]["pct_below_tau"]
-                    ),
-                })
+                tbyp_rows.append(
+                    {
+                        "subset_id": sid,
+                        "k": int(k),
+                        "position_bin": bin_label,
+                        "n_total_trades_in_bin": n_all,
+                        "n_only_up_in_bin": n_ou_in,
+                        "n_only_up_tier_low_in_bin": tier_counts["tier_low"],
+                        "n_only_up_tier_mid_in_bin": tier_counts["tier_mid"],
+                        "n_only_up_tier_high_in_bin": tier_counts["tier_high"],
+                        "n_only_up_tier_runner_in_bin": tier_counts["tier_runner"],
+                        # Per-(subset,k) selectivity at tau=-0.5 (constant across
+                        # position bins; duplicated for convenience).
+                        "pct_of_only_up_tier_high_below_tau_-0.5": (
+                            sel_per_tier["tier_high"]["pct_below_tau"]
+                        ),
+                        "pct_of_only_up_tier_runner_below_tau_-0.5": (
+                            sel_per_tier["tier_runner"]["pct_below_tau"]
+                        ),
+                        "pct_of_only_up_tier_low_plus_mid_below_tau_-0.5": (
+                            sel_per_tier["tier_low_plus_mid"]["pct_below_tau"]
+                        ),
+                    }
+                )
 
             # Per (subset, k, tier) running_close distribution + selectivity.
             for tier_label in TIER_LABELS + ["tier_low_plus_mid"]:
@@ -1517,15 +1599,13 @@ def compute_block_KK3(
                     "n_only_up_in_tier_with_close_at_k": n_t,
                 }
                 if n_t == 0:
-                    for q in ["mean", "std", "median", "q05", "q10", "q25",
-                              "q75", "q90", "q95"]:
+                    for q in ["mean", "std", "median", "q05", "q10", "q25", "q75", "q90", "q95"]:
                         row[q] = float("nan")
                     row["n_below_tau_-0.5"] = 0
                     row["pct_below_tau_-0.5"] = float("nan")
                 else:
                     row["mean"] = float(np.mean(vals_t))
-                    row["std"] = (float(np.std(vals_t, ddof=1))
-                                  if n_t > 1 else 0.0)
+                    row["std"] = float(np.std(vals_t, ddof=1)) if n_t > 1 else 0.0
                     row["median"] = float(np.median(vals_t))
                     row["q05"] = float(np.quantile(vals_t, 0.05))
                     row["q10"] = float(np.quantile(vals_t, 0.10))
@@ -1545,25 +1625,36 @@ def compute_block_KK3(
 # ===========================================================================
 
 
-def render_plots(*,
-                 gg_hist: pd.DataFrame, gg_summary: pd.DataFrame,
-                 hh_hist: pd.DataFrame, hh_summary: pd.DataFrame,
-                 jj_cat: pd.DataFrame, jj_sep: pd.DataFrame,
-                 mm_paths: pd.DataFrame,
-                 plots_dir: Path) -> List[Path]:
+def render_plots(
+    *,
+    gg_hist: pd.DataFrame,
+    gg_summary: pd.DataFrame,
+    hh_hist: pd.DataFrame,
+    hh_summary: pd.DataFrame,
+    jj_cat: pd.DataFrame,
+    jj_sep: pd.DataFrame,
+    mm_paths: pd.DataFrame,
+    plots_dir: Path,
+) -> List[Path]:
     plots_dir.mkdir(parents=True, exist_ok=True)
     paths: List[Path] = []
 
     # Block GG: histogram of only_up overall MAE per subset (3 panels).
     fig, axes = plt.subplots(1, 3, figsize=(15, 4.5), sharey=False)
     for ax, sid in zip(axes, SUBSET_IDS):
-        sub = gg_hist[(gg_hist["subset_id"] == sid)
-                       & (gg_hist["bin_idx"] >= 0)].sort_values("bin_idx")
+        sub = gg_hist[(gg_hist["subset_id"] == sid) & (gg_hist["bin_idx"] >= 0)].sort_values(
+            "bin_idx"
+        )
         n_ou = int(gg_summary[gg_summary["subset_id"] == sid]["n_only_up"].iloc[0])
-        centers = (sub["bin_left_atr"].to_numpy()
-                   + sub["bin_right_atr"].to_numpy()) / 2.0
-        ax.bar(centers, sub["n_trades_in_bin"].to_numpy(),
-                width=0.09, color="#3B6D11", edgecolor="white", linewidth=0.3)
+        centers = (sub["bin_left_atr"].to_numpy() + sub["bin_right_atr"].to_numpy()) / 2.0
+        ax.bar(
+            centers,
+            sub["n_trades_in_bin"].to_numpy(),
+            width=0.09,
+            color="#3B6D11",
+            edgecolor="white",
+            linewidth=0.3,
+        )
         ax.axvline(-1.0, color="red", lw=0.7, ls=":")
         ax.axvline(-1.5, color="red", lw=0.7, ls=":")
         ax.set_title(f"{sid} (n={n_ou})")
@@ -1581,13 +1672,19 @@ def render_plots(*,
     # Block HH: peak MFE histogram per subset.
     fig, axes = plt.subplots(1, 3, figsize=(15, 4.5), sharey=False)
     for ax, sid in zip(axes, SUBSET_IDS):
-        sub = hh_hist[(hh_hist["subset_id"] == sid)
-                       & (np.isfinite(hh_hist["bin_right_atr"]))].sort_values("bin_idx")
+        sub = hh_hist[
+            (hh_hist["subset_id"] == sid) & (np.isfinite(hh_hist["bin_right_atr"]))
+        ].sort_values("bin_idx")
         n_ou = int(hh_summary[hh_summary["subset_id"] == sid]["n_only_up"].iloc[0])
-        centers = (sub["bin_left_atr"].to_numpy()
-                   + sub["bin_right_atr"].to_numpy()) / 2.0
-        ax.bar(centers, sub["n_trades_in_bin"].to_numpy(),
-                width=0.9, color="#3B6D11", edgecolor="white", linewidth=0.3)
+        centers = (sub["bin_left_atr"].to_numpy() + sub["bin_right_atr"].to_numpy()) / 2.0
+        ax.bar(
+            centers,
+            sub["n_trades_in_bin"].to_numpy(),
+            width=0.9,
+            color="#3B6D11",
+            edgecolor="white",
+            linewidth=0.3,
+        )
         # mark a few TP candidates
         for tp in (4.0, 8.0, 12.0, 20.0):
             ax.axvline(tp, color="gray", lw=0.5, ls=":")
@@ -1605,10 +1702,10 @@ def render_plots(*,
 
     # Block JJ: per-category median + IQR running_close paths per subset.
     cat_colors = {
-        "only_up":          "#3B6D11",
-        "up_then_down":     "#A86E10",
-        "down_then_up":     "#1F4E79",
-        "straight_to_sl":   "#8E3D1F",
+        "only_up": "#3B6D11",
+        "up_then_down": "#A86E10",
+        "down_then_up": "#1F4E79",
+        "straight_to_sl": "#8E3D1F",
     }
     for sid in SUBSET_IDS:
         fig, ax = plt.subplots(figsize=(9, 5))
@@ -1622,8 +1719,7 @@ def render_plots(*,
             q25 = sub_c["q25"].to_numpy(dtype=np.float64)
             q75 = sub_c["q75"].to_numpy(dtype=np.float64)
             n0 = int(sub_c["n"].iloc[0])
-            ax.plot(ks, med, color=cat_colors[c], lw=1.5,
-                     label=f"{c} (n~{n0})")
+            ax.plot(ks, med, color=cat_colors[c], lw=1.5, label=f"{c} (n~{n0})")
             ax.fill_between(ks, q25, q75, color=cat_colors[c], alpha=0.15)
         ax.axhline(0.0, color="black", lw=0.5, ls=":")
         ax.axhline(2.0, color="green", lw=0.5, ls=":")
@@ -1643,12 +1739,15 @@ def render_plots(*,
     for sid in SUBSET_IDS:
         sub = jj_sep[jj_sep["subset_id"] == sid]
         fig, ax = plt.subplots(figsize=(9, 4.5))
-        for budget, color in zip(JJ_RECALL_BUDGETS,
-                                  ["#3B6D11", "#A86E10", "#8E3D1F"]):
+        for budget, color in zip(JJ_RECALL_BUDGETS, ["#3B6D11", "#A86E10", "#8E3D1F"]):
             sub_b = sub[sub["recall_only_up_budget"] == budget].sort_values("k")
-            ax.plot(sub_b["k"], sub_b["pct_losers_below_tau"],
-                     marker="o", color=color,
-                     label=f"recall_only_up>={budget:.2f}")
+            ax.plot(
+                sub_b["k"],
+                sub_b["pct_losers_below_tau"],
+                marker="o",
+                color=color,
+                label=f"recall_only_up>={budget:.2f}",
+            )
         ax.set_title(f"Block JJ — only_up separator: pct_losers_below_tau vs k — {sid}")
         ax.set_xlabel("k (bars after entry)")
         ax.set_ylabel("pct of losers below tau")
@@ -1663,9 +1762,9 @@ def render_plots(*,
 
     # Block MM: median path per tier per subset.
     tier_colors = {
-        "tier_low":    "#A86E10",
-        "tier_mid":    "#639922",
-        "tier_high":   "#3B6D11",
+        "tier_low": "#A86E10",
+        "tier_mid": "#639922",
+        "tier_high": "#3B6D11",
         "tier_runner": "#1F4E79",
     }
     for sid in SUBSET_IDS:
@@ -1676,9 +1775,13 @@ def render_plots(*,
             n0 = int(sub_t["n_tier_total"].iloc[0]) if len(sub_t) > 0 else 0
             if n0 == 0:
                 continue
-            ax.plot(sub_t["k"], sub_t["median_running_close_atr"],
-                     marker="o", color=tier_colors[tier],
-                     label=f"{tier} (n={n0})")
+            ax.plot(
+                sub_t["k"],
+                sub_t["median_running_close_atr"],
+                marker="o",
+                color=tier_colors[tier],
+                label=f"{tier} (n={n0})",
+            )
         ax.axhline(0.0, color="black", lw=0.5, ls=":")
         ax.axhline(2.0, color="green", lw=0.5, ls=":")
         ax.set_title(f"Block MM — median running_close path per tier — {sid}")
@@ -1700,14 +1803,14 @@ def render_plots(*,
 # ===========================================================================
 
 
-def _df_to_md(df: pd.DataFrame, float_cols: Optional[Dict[str, str]] = None,
-              default_float: str = "{:.4f}") -> str:
+def _df_to_md(
+    df: pd.DataFrame, float_cols: Optional[Dict[str, str]] = None, default_float: str = "{:.4f}"
+) -> str:
     cols = list(df.columns)
     float_cols = float_cols or {}
     int_cols = {c for c in cols if pd.api.types.is_integer_dtype(df[c].dtype)}
     bool_cols = {c for c in cols if pd.api.types.is_bool_dtype(df[c].dtype)}
-    out = ["| " + " | ".join(cols) + " |",
-           "| " + " | ".join(["---"] * len(cols)) + " |"]
+    out = ["| " + " | ".join(cols) + " |", "| " + " | ".join(["---"] * len(cols)) + " |"]
     for i in range(len(df)):
         cells = []
         for c in cols:
@@ -1732,18 +1835,25 @@ def _df_to_md(df: pd.DataFrame, float_cols: Optional[Dict[str, str]] = None,
     return "\n".join(out)
 
 
-def render_report(*, observed_shas: Dict[str, str],
-                  per_subset_only_up_n: Dict[str, int],
-                  gg_summary: pd.DataFrame, gg_kill: pd.DataFrame,
-                  hh_summary: pd.DataFrame, hh_tp: pd.DataFrame,
-                  ii_cells: pd.DataFrame, ii_marg: pd.DataFrame,
-                  jj_sep: pd.DataFrame,
-                  kk: pd.DataFrame,
-                  ll: pd.DataFrame,
-                  mm_tier: pd.DataFrame,
-                  nn_subset: pd.DataFrame, nn_by_tier: pd.DataFrame,
-                  kk3_tbyp: pd.DataFrame, kk3_pdbt: pd.DataFrame,
-                  ) -> str:
+def render_report(
+    *,
+    observed_shas: Dict[str, str],
+    per_subset_only_up_n: Dict[str, int],
+    gg_summary: pd.DataFrame,
+    gg_kill: pd.DataFrame,
+    hh_summary: pd.DataFrame,
+    hh_tp: pd.DataFrame,
+    ii_cells: pd.DataFrame,
+    ii_marg: pd.DataFrame,
+    jj_sep: pd.DataFrame,
+    kk: pd.DataFrame,
+    ll: pd.DataFrame,
+    mm_tier: pd.DataFrame,
+    nn_subset: pd.DataFrame,
+    nn_by_tier: pd.DataFrame,
+    kk3_tbyp: pd.DataFrame,
+    kk3_pdbt: pd.DataFrame,
+) -> str:
     lines: List[str] = []
     a = lines.append
     a("# Arc 2 — Path-Detail Distributions (Round 3C)")
@@ -1807,15 +1917,45 @@ def render_report(*, observed_shas: Dict[str, str],
     a("")
     a("Per-subset percentile summary:")
     a("")
-    fmt_gg = {c: "{:.3f}" for c in ["mean", "std", "median",
-                                      "q01", "q05", "q10", "q25",
-                                      "q75", "q90", "q95", "q99", "min"]}
-    a(_df_to_md(
-        gg_summary[["subset_id", "n_only_up", "mean", "median",
-                     "q01", "q05", "q10", "q25", "q75", "q90",
-                     "q95", "q99", "min"]],
-        fmt_gg,
-    ))
+    fmt_gg = {
+        c: "{:.3f}"
+        for c in [
+            "mean",
+            "std",
+            "median",
+            "q01",
+            "q05",
+            "q10",
+            "q25",
+            "q75",
+            "q90",
+            "q95",
+            "q99",
+            "min",
+        ]
+    }
+    a(
+        _df_to_md(
+            gg_summary[
+                [
+                    "subset_id",
+                    "n_only_up",
+                    "mean",
+                    "median",
+                    "q01",
+                    "q05",
+                    "q10",
+                    "q25",
+                    "q75",
+                    "q90",
+                    "q95",
+                    "q99",
+                    "min",
+                ]
+            ],
+            fmt_gg,
+        )
+    )
     a("")
     a("### Block GG — only_up kill rate by candidate SL distance")
     a("")
@@ -1827,12 +1967,20 @@ def render_report(*, observed_shas: Dict[str, str],
         "SL_distance_atr": "{:.2f}",
         "pct_only_up_killed": "{:.4f}",
     }
-    a(_df_to_md(
-        gg_kill[["subset_id", "SL_distance_atr",
-                  "n_only_up_total", "n_only_up_killed",
-                  "pct_only_up_killed"]],
-        fmt_kill,
-    ))
+    a(
+        _df_to_md(
+            gg_kill[
+                [
+                    "subset_id",
+                    "SL_distance_atr",
+                    "n_only_up_total",
+                    "n_only_up_killed",
+                    "pct_only_up_killed",
+                ]
+            ],
+            fmt_kill,
+        )
+    )
     a("")
 
     # Block HH
@@ -1844,16 +1992,46 @@ def render_report(*, observed_shas: Dict[str, str],
     a("")
     a("Per-subset percentile summary:")
     a("")
-    fmt_hh = {c: "{:.3f}" for c in ["mean", "std", "median",
-                                      "q05", "q10", "q25", "q50", "q75",
-                                      "q80", "q85", "q90", "q95", "q99",
-                                      "max"]}
-    a(_df_to_md(
-        hh_summary[["subset_id", "n_only_up", "mean", "median",
-                     "q05", "q25", "q75", "q85", "q90",
-                     "q95", "q99", "max"]],
-        fmt_hh,
-    ))
+    fmt_hh = {
+        c: "{:.3f}"
+        for c in [
+            "mean",
+            "std",
+            "median",
+            "q05",
+            "q10",
+            "q25",
+            "q50",
+            "q75",
+            "q80",
+            "q85",
+            "q90",
+            "q95",
+            "q99",
+            "max",
+        ]
+    }
+    a(
+        _df_to_md(
+            hh_summary[
+                [
+                    "subset_id",
+                    "n_only_up",
+                    "mean",
+                    "median",
+                    "q05",
+                    "q25",
+                    "q75",
+                    "q85",
+                    "q90",
+                    "q95",
+                    "q99",
+                    "max",
+                ]
+            ],
+            fmt_hh,
+        )
+    )
     a("")
     a("### Block HH — TP candidate evaluation")
     a("")
@@ -1871,14 +2049,23 @@ def render_report(*, observed_shas: Dict[str, str],
         "expected_capped_loss_atr_per_only_up": "{:.3f}",
         "expected_capped_loss_R_per_only_up": "{:.3f}",
     }
-    a(_df_to_md(
-        hh_tp[["subset_id", "tp_atr", "tp_R_at_BL_SL",
-                "n_only_up_total", "n_only_up_reaching_tp",
-                "pct_only_up_reaching_tp",
-                "expected_capped_loss_atr_per_only_up",
-                "expected_capped_loss_R_per_only_up"]],
-        fmt_tp,
-    ))
+    a(
+        _df_to_md(
+            hh_tp[
+                [
+                    "subset_id",
+                    "tp_atr",
+                    "tp_R_at_BL_SL",
+                    "n_only_up_total",
+                    "n_only_up_reaching_tp",
+                    "pct_only_up_reaching_tp",
+                    "expected_capped_loss_atr_per_only_up",
+                    "expected_capped_loss_R_per_only_up",
+                ]
+            ],
+            fmt_tp,
+        )
+    )
     a("")
 
     # Block II
@@ -1904,12 +2091,23 @@ def render_report(*, observed_shas: Dict[str, str],
             "mean_final_close_R_at_BL_SL": "{:.3f}",
             "mean_giveback_to_k120_atr": "{:.3f}",
         }
-        a(_df_to_md(
-            sub[["peak_bin", "mae_bin", "n_trades", "mean_peak_atr",
-                  "mean_mae_atr", "mean_final_close_R_at_BL_SL",
-                  "mean_giveback_to_k120_atr", "n_with_giveback"]],
-            fmt_ii,
-        ))
+        a(
+            _df_to_md(
+                sub[
+                    [
+                        "peak_bin",
+                        "mae_bin",
+                        "n_trades",
+                        "mean_peak_atr",
+                        "mean_mae_atr",
+                        "mean_final_close_R_at_BL_SL",
+                        "mean_giveback_to_k120_atr",
+                        "n_with_giveback",
+                    ]
+                ],
+                fmt_ii,
+            )
+        )
         a("")
         a(f"### Subset {sid} — marginal peak by mae bin")
         a("")
@@ -1919,11 +2117,20 @@ def render_report(*, observed_shas: Dict[str, str],
             "median_peak_atr": "{:.3f}",
             "pct_of_only_up_in_subset": "{:.4f}",
         }
-        a(_df_to_md(
-            marg[["mae_bin", "n_trades", "mean_peak_atr",
-                   "median_peak_atr", "pct_of_only_up_in_subset"]],
-            fmt_marg,
-        ))
+        a(
+            _df_to_md(
+                marg[
+                    [
+                        "mae_bin",
+                        "n_trades",
+                        "mean_peak_atr",
+                        "median_peak_atr",
+                        "pct_of_only_up_in_subset",
+                    ]
+                ],
+                fmt_marg,
+            )
+        )
         a("")
 
     # Block JJ
@@ -1944,8 +2151,9 @@ def render_report(*, observed_shas: Dict[str, str],
     for sid in SUBSET_IDS:
         a(f"### Subset {sid} — separator curves at recall_only_up>=0.95")
         a("")
-        sub = jj_sep[(jj_sep["subset_id"] == sid)
-                      & (jj_sep["recall_only_up_budget"] == 0.95)].copy()
+        sub = jj_sep[
+            (jj_sep["subset_id"] == sid) & (jj_sep["recall_only_up_budget"] == 0.95)
+        ].copy()
         sub = sub.sort_values("k")
         fmt_jj = {
             "recall_only_up_budget": "{:.2f}",
@@ -1957,28 +2165,49 @@ def render_report(*, observed_shas: Dict[str, str],
             "cohens_d_only_up_vs_straight_to_sl": "{:+.3f}",
             "cohens_d_only_up_vs_loser_pool": "{:+.3f}",
         }
-        a(_df_to_md(
-            sub[["k", "n_only_up", "tau_only_up_atr_fill",
-                  "recall_only_up_actual", "n_losers_total",
-                  "n_losers_below_tau", "pct_losers_below_tau",
-                  "cohens_d_only_up_vs_loser_pool",
-                  "cohens_d_only_up_vs_up_then_down",
-                  "cohens_d_only_up_vs_down_then_up",
-                  "cohens_d_only_up_vs_straight_to_sl"]],
-            fmt_jj,
-        ))
+        a(
+            _df_to_md(
+                sub[
+                    [
+                        "k",
+                        "n_only_up",
+                        "tau_only_up_atr_fill",
+                        "recall_only_up_actual",
+                        "n_losers_total",
+                        "n_losers_below_tau",
+                        "pct_losers_below_tau",
+                        "cohens_d_only_up_vs_loser_pool",
+                        "cohens_d_only_up_vs_up_then_down",
+                        "cohens_d_only_up_vs_down_then_up",
+                        "cohens_d_only_up_vs_straight_to_sl",
+                    ]
+                ],
+                fmt_jj,
+            )
+        )
         a("")
         a(f"### Subset {sid} — separator curves at recall_only_up>=0.99")
         a("")
-        sub = jj_sep[(jj_sep["subset_id"] == sid)
-                      & (jj_sep["recall_only_up_budget"] == 0.99)].copy()
+        sub = jj_sep[
+            (jj_sep["subset_id"] == sid) & (jj_sep["recall_only_up_budget"] == 0.99)
+        ].copy()
         sub = sub.sort_values("k")
-        a(_df_to_md(
-            sub[["k", "n_only_up", "tau_only_up_atr_fill",
-                  "recall_only_up_actual", "n_losers_total",
-                  "n_losers_below_tau", "pct_losers_below_tau"]],
-            fmt_jj,
-        ))
+        a(
+            _df_to_md(
+                sub[
+                    [
+                        "k",
+                        "n_only_up",
+                        "tau_only_up_atr_fill",
+                        "recall_only_up_actual",
+                        "n_losers_total",
+                        "n_losers_below_tau",
+                        "pct_losers_below_tau",
+                    ]
+                ],
+                fmt_jj,
+            )
+        )
         a("")
 
     # Block KK
@@ -2011,15 +2240,23 @@ def render_report(*, observed_shas: Dict[str, str],
                 "pct_of_only_up_in_bin_reaching_+10atr": "{:.4f}",
                 "pct_of_all_trades_in_bin_that_are_only_up": "{:.4f}",
             }
-            a(_df_to_md(
-                sub[["position_bin", "n_only_up_in_bin",
-                      "mean_peak_mfe_atr", "median_peak_mfe_atr",
-                      "n_only_up_reaching_+10atr",
-                      "pct_of_only_up_in_bin_reaching_+10atr",
-                      "n_all_trades_in_bin",
-                      "pct_of_all_trades_in_bin_that_are_only_up"]],
-                fmt_kk,
-            ))
+            a(
+                _df_to_md(
+                    sub[
+                        [
+                            "position_bin",
+                            "n_only_up_in_bin",
+                            "mean_peak_mfe_atr",
+                            "median_peak_mfe_atr",
+                            "n_only_up_reaching_+10atr",
+                            "pct_of_only_up_in_bin_reaching_+10atr",
+                            "n_all_trades_in_bin",
+                            "pct_of_all_trades_in_bin_that_are_only_up",
+                        ]
+                    ],
+                    fmt_kk,
+                )
+            )
             a("")
 
     # Block LL
@@ -2036,18 +2273,25 @@ def render_report(*, observed_shas: Dict[str, str],
     for sid in SUBSET_IDS:
         a(f"### Subset {sid} — widened-SL survival rates")
         a("")
-        sub = ll[(ll["subset_id"] == sid)
-                  & (ll["row_kind"] == "widened_SL_survival")].copy()
+        sub = ll[(ll["subset_id"] == sid) & (ll["row_kind"] == "widened_SL_survival")].copy()
         fmt_ll = {
             "widened_SL_atr": "{:.2f}",
             "pct_surviving_widened_SL": "{:.4f}",
         }
-        a(_df_to_md(
-            sub[["category", "n_total_category",
-                  "widened_SL_atr", "n_surviving_widened_SL",
-                  "pct_surviving_widened_SL"]],
-            fmt_ll,
-        ))
+        a(
+            _df_to_md(
+                sub[
+                    [
+                        "category",
+                        "n_total_category",
+                        "widened_SL_atr",
+                        "n_surviving_widened_SL",
+                        "pct_surviving_widened_SL",
+                    ]
+                ],
+                fmt_ll,
+            )
+        )
         a("")
 
     # Block MM
@@ -2074,14 +2318,22 @@ def render_report(*, observed_shas: Dict[str, str],
             "total_R_contribution": "{:.2f}",
             "pct_of_subset_total_R_contribution": "{:.4f}",
         }
-        a(_df_to_md(
-            sub[["tier", "n_trades", "mean_peak_atr",
-                  "mean_giveback_to_k120_atr",
-                  "mean_final_close_R_at_BL_SL",
-                  "total_R_contribution",
-                  "pct_of_subset_total_R_contribution"]],
-            fmt_mm,
-        ))
+        a(
+            _df_to_md(
+                sub[
+                    [
+                        "tier",
+                        "n_trades",
+                        "mean_peak_atr",
+                        "mean_giveback_to_k120_atr",
+                        "mean_final_close_R_at_BL_SL",
+                        "total_R_contribution",
+                        "pct_of_subset_total_R_contribution",
+                    ]
+                ],
+                fmt_mm,
+            )
+        )
         a("")
 
     # Block NN
@@ -2105,26 +2357,41 @@ def render_report(*, observed_shas: Dict[str, str],
     summ_rows: List[Dict[str, Any]] = []
     for sid in SUBSET_IDS:
         for policy in NN_EXIT_POLICIES:
-            r = nn_subset[(nn_subset["subset_id"] == sid)
-                           & (nn_subset["exit_policy"] == policy)
-                           & (nn_subset["row_kind"] == "summary")].iloc[0]
-            summ_rows.append({
-                "subset_id": sid,
-                "exit_policy": policy,
-                "n_only_up": int(r["n_trades_in_bin"]),
-                "mean_R": float(r["summary_mean"]),
-                "median_R": float(r["summary_median"]),
-                "q05_R": float(r["summary_q05"]),
-                "q25_R": float(r["summary_q25"]),
-                "q75_R": float(r["summary_q75"]),
-                "q90_R": float(r["summary_q90"]),
-                "q95_R": float(r["summary_q95"]),
-                "q99_R": float(r["summary_q99"]),
-                "max_R": float(r["summary_max"]),
-            })
-    fmt_nn = {c: "{:+.3f}" for c in
-               ["mean_R", "median_R", "q05_R", "q25_R", "q75_R",
-                "q90_R", "q95_R", "q99_R", "max_R"]}
+            r = nn_subset[
+                (nn_subset["subset_id"] == sid)
+                & (nn_subset["exit_policy"] == policy)
+                & (nn_subset["row_kind"] == "summary")
+            ].iloc[0]
+            summ_rows.append(
+                {
+                    "subset_id": sid,
+                    "exit_policy": policy,
+                    "n_only_up": int(r["n_trades_in_bin"]),
+                    "mean_R": float(r["summary_mean"]),
+                    "median_R": float(r["summary_median"]),
+                    "q05_R": float(r["summary_q05"]),
+                    "q25_R": float(r["summary_q25"]),
+                    "q75_R": float(r["summary_q75"]),
+                    "q90_R": float(r["summary_q90"]),
+                    "q95_R": float(r["summary_q95"]),
+                    "q99_R": float(r["summary_q99"]),
+                    "max_R": float(r["summary_max"]),
+                }
+            )
+    fmt_nn = {
+        c: "{:+.3f}"
+        for c in [
+            "mean_R",
+            "median_R",
+            "q05_R",
+            "q25_R",
+            "q75_R",
+            "q90_R",
+            "q95_R",
+            "q99_R",
+            "max_R",
+        ]
+    }
     a(_df_to_md(pd.DataFrame(summ_rows), fmt_nn))
     a("")
     a("### Per-tier summary (BL and H240)")
@@ -2135,26 +2402,29 @@ def render_report(*, observed_shas: Dict[str, str],
         tier_summ_rows: List[Dict[str, Any]] = []
         for _, _, tier_label in MM_TIER_BOUNDS:
             for policy in NN_EXIT_POLICIES:
-                r_sub = nn_by_tier[(nn_by_tier["subset_id"] == sid)
-                                     & (nn_by_tier["tier"] == tier_label)
-                                     & (nn_by_tier["exit_policy"] == policy)
-                                     & (nn_by_tier["row_kind"] == "summary")]
+                r_sub = nn_by_tier[
+                    (nn_by_tier["subset_id"] == sid)
+                    & (nn_by_tier["tier"] == tier_label)
+                    & (nn_by_tier["exit_policy"] == policy)
+                    & (nn_by_tier["row_kind"] == "summary")
+                ]
                 if len(r_sub) == 0:
                     continue
                 r = r_sub.iloc[0]
-                tier_summ_rows.append({
-                    "tier": tier_label,
-                    "exit_policy": policy,
-                    "n": int(r["n_trades_in_bin"]),
-                    "mean_R": float(r["summary_mean"]),
-                    "median_R": float(r["summary_median"]),
-                    "q25_R": float(r["summary_q25"]),
-                    "q75_R": float(r["summary_q75"]),
-                    "q95_R": float(r["summary_q95"]),
-                    "max_R": float(r["summary_max"]),
-                })
-        fmt_nnt = {c: "{:+.3f}" for c in
-                    ["mean_R", "median_R", "q25_R", "q75_R", "q95_R", "max_R"]}
+                tier_summ_rows.append(
+                    {
+                        "tier": tier_label,
+                        "exit_policy": policy,
+                        "n": int(r["n_trades_in_bin"]),
+                        "mean_R": float(r["summary_mean"]),
+                        "median_R": float(r["summary_median"]),
+                        "q25_R": float(r["summary_q25"]),
+                        "q75_R": float(r["summary_q75"]),
+                        "q95_R": float(r["summary_q95"]),
+                        "max_R": float(r["summary_max"]),
+                    }
+                )
+        fmt_nnt = {c: "{:+.3f}" for c in ["mean_R", "median_R", "q25_R", "q75_R", "q95_R", "max_R"]}
         a(_df_to_md(pd.DataFrame(tier_summ_rows), fmt_nnt))
         a("")
 
@@ -2174,40 +2444,58 @@ def render_report(*, observed_shas: Dict[str, str],
         for k in KK3_K_GRID:
             a(f"### Subset {sid} at k = {k}")
             a("")
-            sub = kk3_tbyp[(kk3_tbyp["subset_id"] == sid)
-                            & (kk3_tbyp["k"] == int(k))].copy()
+            sub = kk3_tbyp[(kk3_tbyp["subset_id"] == sid) & (kk3_tbyp["k"] == int(k))].copy()
             fmt_kk3 = {
                 "pct_of_only_up_tier_high_below_tau_-0.5": "{:.4f}",
                 "pct_of_only_up_tier_runner_below_tau_-0.5": "{:.4f}",
                 "pct_of_only_up_tier_low_plus_mid_below_tau_-0.5": "{:.4f}",
             }
-            a(_df_to_md(
-                sub[["position_bin", "n_total_trades_in_bin",
-                      "n_only_up_in_bin",
-                      "n_only_up_tier_low_in_bin",
-                      "n_only_up_tier_mid_in_bin",
-                      "n_only_up_tier_high_in_bin",
-                      "n_only_up_tier_runner_in_bin",
-                      "pct_of_only_up_tier_high_below_tau_-0.5",
-                      "pct_of_only_up_tier_runner_below_tau_-0.5",
-                      "pct_of_only_up_tier_low_plus_mid_below_tau_-0.5"]],
-                fmt_kk3,
-            ))
+            a(
+                _df_to_md(
+                    sub[
+                        [
+                            "position_bin",
+                            "n_total_trades_in_bin",
+                            "n_only_up_in_bin",
+                            "n_only_up_tier_low_in_bin",
+                            "n_only_up_tier_mid_in_bin",
+                            "n_only_up_tier_high_in_bin",
+                            "n_only_up_tier_runner_in_bin",
+                            "pct_of_only_up_tier_high_below_tau_-0.5",
+                            "pct_of_only_up_tier_runner_below_tau_-0.5",
+                            "pct_of_only_up_tier_low_plus_mid_below_tau_-0.5",
+                        ]
+                    ],
+                    fmt_kk3,
+                )
+            )
             a("")
-            sub_d = kk3_pdbt[(kk3_pdbt["subset_id"] == sid)
-                              & (kk3_pdbt["k"] == int(k))].copy()
-            fmt_kk3d = {c: "{:+.3f}" for c in
-                         ["mean", "median",
-                          "q05", "q10", "q25", "q75", "q90", "q95"]}
+            sub_d = kk3_pdbt[(kk3_pdbt["subset_id"] == sid) & (kk3_pdbt["k"] == int(k))].copy()
+            fmt_kk3d = {
+                c: "{:+.3f}" for c in ["mean", "median", "q05", "q10", "q25", "q75", "q90", "q95"]
+            }
             fmt_kk3d["pct_below_tau_-0.5"] = "{:.4f}"
             a("Running_close distribution per tier at this k:")
             a("")
-            a(_df_to_md(
-                sub_d[["tier", "n_only_up_in_tier_with_close_at_k",
-                        "mean", "median", "q05", "q25", "q75", "q95",
-                        "n_below_tau_-0.5", "pct_below_tau_-0.5"]],
-                fmt_kk3d,
-            ))
+            a(
+                _df_to_md(
+                    sub_d[
+                        [
+                            "tier",
+                            "n_only_up_in_tier_with_close_at_k",
+                            "mean",
+                            "median",
+                            "q05",
+                            "q25",
+                            "q75",
+                            "q95",
+                            "n_below_tau_-0.5",
+                            "pct_below_tau_-0.5",
+                        ]
+                    ],
+                    fmt_kk3d,
+                )
+            )
             a("")
 
     # Out-of-scope items
@@ -2248,34 +2536,38 @@ def render_report(*, observed_shas: Dict[str, str],
     a("")
     for sid in SUBSET_IDS:
         s = gg_summary[gg_summary["subset_id"] == sid].iloc[0]
-        kill_175 = gg_kill[(gg_kill["subset_id"] == sid)
-                            & (gg_kill["SL_distance_atr"] == 1.75)]["pct_only_up_killed"].iloc[0]
-        kill_150 = gg_kill[(gg_kill["subset_id"] == sid)
-                            & (gg_kill["SL_distance_atr"] == 1.5)]["pct_only_up_killed"].iloc[0]
-        a(f"- {sid}: n_only_up={int(s['n_only_up'])}; q01={s['q01']:+.3f} ATR, "
-          f"q05={s['q05']:+.3f} ATR, q10={s['q10']:+.3f} ATR, "
-          f"median={s['median']:+.3f} ATR, min={s['min']:+.3f} ATR. "
-          f"Kill-rate descriptive references: SL=1.75 ATR kills "
-          f"{kill_175*100:.2f}% of only_up; SL=1.50 ATR kills "
-          f"{kill_150*100:.2f}%.")
+        kill_175 = gg_kill[(gg_kill["subset_id"] == sid) & (gg_kill["SL_distance_atr"] == 1.75)][
+            "pct_only_up_killed"
+        ].iloc[0]
+        kill_150 = gg_kill[(gg_kill["subset_id"] == sid) & (gg_kill["SL_distance_atr"] == 1.5)][
+            "pct_only_up_killed"
+        ].iloc[0]
+        a(
+            f"- {sid}: n_only_up={int(s['n_only_up'])}; q01={s['q01']:+.3f} ATR, "
+            f"q05={s['q05']:+.3f} ATR, q10={s['q10']:+.3f} ATR, "
+            f"median={s['median']:+.3f} ATR, min={s['min']:+.3f} ATR. "
+            f"Kill-rate descriptive references: SL=1.75 ATR kills "
+            f"{kill_175 * 100:.2f}% of only_up; SL=1.50 ATR kills "
+            f"{kill_150 * 100:.2f}%."
+        )
     a("")
 
     a("### Block HH — candidate fixed TP levels")
     a("")
     for sid in SUBSET_IDS:
         s = hh_summary[hh_summary["subset_id"] == sid].iloc[0]
-        tp10 = hh_tp[(hh_tp["subset_id"] == sid)
-                      & (hh_tp["tp_atr"] == 10.0)].iloc[0]
-        tp20 = hh_tp[(hh_tp["subset_id"] == sid)
-                      & (hh_tp["tp_atr"] == 20.0)].iloc[0]
-        a(f"- {sid}: peak MFE q50={s['median']:.2f} ATR (={s['median']/2:.2f}R), "
-          f"q75={s['q75']:.2f} ATR (={s['q75']/2:.2f}R), "
-          f"q90={s['q90']:.2f} ATR (={s['q90']/2:.2f}R), "
-          f"q95={s['q95']:.2f} ATR (={s['q95']/2:.2f}R). "
-          f"TP=10 ATR descriptive references: {tp10['pct_only_up_reaching_tp']*100:.2f}% "
-          f"reach, expected capped loss = {tp10['expected_capped_loss_R_per_only_up']:.2f}R "
-          f"per only_up. TP=20 ATR: {tp20['pct_only_up_reaching_tp']*100:.2f}% reach, "
-          f"expected capped loss = {tp20['expected_capped_loss_R_per_only_up']:.2f}R.")
+        tp10 = hh_tp[(hh_tp["subset_id"] == sid) & (hh_tp["tp_atr"] == 10.0)].iloc[0]
+        tp20 = hh_tp[(hh_tp["subset_id"] == sid) & (hh_tp["tp_atr"] == 20.0)].iloc[0]
+        a(
+            f"- {sid}: peak MFE q50={s['median']:.2f} ATR (={s['median'] / 2:.2f}R), "
+            f"q75={s['q75']:.2f} ATR (={s['q75'] / 2:.2f}R), "
+            f"q90={s['q90']:.2f} ATR (={s['q90'] / 2:.2f}R), "
+            f"q95={s['q95']:.2f} ATR (={s['q95'] / 2:.2f}R). "
+            f"TP=10 ATR descriptive references: {tp10['pct_only_up_reaching_tp'] * 100:.2f}% "
+            f"reach, expected capped loss = {tp10['expected_capped_loss_R_per_only_up']:.2f}R "
+            f"per only_up. TP=20 ATR: {tp20['pct_only_up_reaching_tp'] * 100:.2f}% reach, "
+            f"expected capped loss = {tp20['expected_capped_loss_R_per_only_up']:.2f}R."
+        )
     a("")
 
     a("### Block JJ — early-bar separator candidate (k, tau) descriptive ranges")
@@ -2289,23 +2581,29 @@ def render_report(*, observed_shas: Dict[str, str],
             sub_b = sub[sub["recall_only_up_budget"] == budget]
             if len(sub_b) == 0:
                 continue
-            top = sub_b.sort_values("pct_losers_below_tau",
-                                      ascending=False).iloc[0]
-            rows.append({
-                "recall_only_up_budget": float(budget),
-                "k_at_best": int(top["k"]),
-                "tau_only_up_atr_fill": float(top["tau_only_up_atr_fill"]),
-                "recall_only_up_actual": float(top["recall_only_up_actual"]),
-                "pct_losers_below_tau": float(top["pct_losers_below_tau"]),
-                "cohens_d_vs_loser_pool": float(top["cohens_d_only_up_vs_loser_pool"]),
-            })
-        a(_df_to_md(pd.DataFrame(rows), {
-            "recall_only_up_budget": "{:.2f}",
-            "tau_only_up_atr_fill": "{:+.3f}",
-            "recall_only_up_actual": "{:.4f}",
-            "pct_losers_below_tau": "{:.4f}",
-            "cohens_d_vs_loser_pool": "{:+.3f}",
-        }))
+            top = sub_b.sort_values("pct_losers_below_tau", ascending=False).iloc[0]
+            rows.append(
+                {
+                    "recall_only_up_budget": float(budget),
+                    "k_at_best": int(top["k"]),
+                    "tau_only_up_atr_fill": float(top["tau_only_up_atr_fill"]),
+                    "recall_only_up_actual": float(top["recall_only_up_actual"]),
+                    "pct_losers_below_tau": float(top["pct_losers_below_tau"]),
+                    "cohens_d_vs_loser_pool": float(top["cohens_d_only_up_vs_loser_pool"]),
+                }
+            )
+        a(
+            _df_to_md(
+                pd.DataFrame(rows),
+                {
+                    "recall_only_up_budget": "{:.2f}",
+                    "tau_only_up_atr_fill": "{:+.3f}",
+                    "recall_only_up_actual": "{:.4f}",
+                    "pct_losers_below_tau": "{:.4f}",
+                    "cohens_d_vs_loser_pool": "{:+.3f}",
+                },
+            )
+        )
         a("")
 
     a("### Block KK — early-position conditional-survival reference")
@@ -2316,74 +2614,97 @@ def render_report(*, observed_shas: Dict[str, str],
         sub = kk[(kk["subset_id"] == sid) & (kk["k"] == 20)].copy()
         a("At k = 20:")
         a("")
-        a(_df_to_md(
-            sub[["position_bin", "n_only_up_in_bin",
-                  "pct_of_only_up_in_bin_reaching_+10atr",
-                  "pct_of_all_trades_in_bin_that_are_only_up"]],
-            {"pct_of_only_up_in_bin_reaching_+10atr": "{:.4f}",
-             "pct_of_all_trades_in_bin_that_are_only_up": "{:.4f}"},
-        ))
+        a(
+            _df_to_md(
+                sub[
+                    [
+                        "position_bin",
+                        "n_only_up_in_bin",
+                        "pct_of_only_up_in_bin_reaching_+10atr",
+                        "pct_of_all_trades_in_bin_that_are_only_up",
+                    ]
+                ],
+                {
+                    "pct_of_only_up_in_bin_reaching_+10atr": "{:.4f}",
+                    "pct_of_all_trades_in_bin_that_are_only_up": "{:.4f}",
+                },
+            )
+        )
         a("")
 
     a("### Block LL — widened-SL survival reference")
     a("")
     for sid in SUBSET_IDS:
         for cat_label in LL_CATEGORIES:
-            sub = ll[(ll["subset_id"] == sid)
-                      & (ll["category"] == cat_label)
-                      & (ll["row_kind"] == "widened_SL_survival")].copy()
+            sub = ll[
+                (ll["subset_id"] == sid)
+                & (ll["category"] == cat_label)
+                & (ll["row_kind"] == "widened_SL_survival")
+            ].copy()
             n_cat = int(sub["n_total_category"].iloc[0]) if len(sub) > 0 else 0
-            a(f"- {sid} / {cat_label} (n_total={n_cat}): "
-              + ", ".join(
-                f"SL={r['widened_SL_atr']:.2f} ATR survives {r['pct_surviving_widened_SL']*100:.2f}%"
-                for _, r in sub.iterrows()
-              ) + ".")
+            a(
+                f"- {sid} / {cat_label} (n_total={n_cat}): "
+                + ", ".join(
+                    f"SL={r['widened_SL_atr']:.2f} ATR survives {r['pct_surviving_widened_SL'] * 100:.2f}%"
+                    for _, r in sub.iterrows()
+                )
+                + "."
+            )
     a("")
 
     a("### Block NN — BL vs H240 final R descriptive comparison")
     a("")
     for sid in SUBSET_IDS:
-        bl_summ = nn_subset[(nn_subset["subset_id"] == sid)
-                             & (nn_subset["exit_policy"] == "BL")
-                             & (nn_subset["row_kind"] == "summary")].iloc[0]
-        h_summ = nn_subset[(nn_subset["subset_id"] == sid)
-                            & (nn_subset["exit_policy"] == "H240")
-                            & (nn_subset["row_kind"] == "summary")].iloc[0]
-        a(f"- {sid}: BL median={bl_summ['summary_median']:+.3f}R, "
-          f"mean={bl_summ['summary_mean']:+.3f}R, "
-          f"q95={bl_summ['summary_q95']:+.3f}R, "
-          f"max={bl_summ['summary_max']:+.3f}R. "
-          f"H240 median={h_summ['summary_median']:+.3f}R, "
-          f"mean={h_summ['summary_mean']:+.3f}R, "
-          f"q95={h_summ['summary_q95']:+.3f}R, "
-          f"max={h_summ['summary_max']:+.3f}R. "
-          f"H240 vs BL median delta = "
-          f"{h_summ['summary_median'] - bl_summ['summary_median']:+.3f}R; "
-          f"mean delta = "
-          f"{h_summ['summary_mean'] - bl_summ['summary_mean']:+.3f}R.")
+        bl_summ = nn_subset[
+            (nn_subset["subset_id"] == sid)
+            & (nn_subset["exit_policy"] == "BL")
+            & (nn_subset["row_kind"] == "summary")
+        ].iloc[0]
+        h_summ = nn_subset[
+            (nn_subset["subset_id"] == sid)
+            & (nn_subset["exit_policy"] == "H240")
+            & (nn_subset["row_kind"] == "summary")
+        ].iloc[0]
+        a(
+            f"- {sid}: BL median={bl_summ['summary_median']:+.3f}R, "
+            f"mean={bl_summ['summary_mean']:+.3f}R, "
+            f"q95={bl_summ['summary_q95']:+.3f}R, "
+            f"max={bl_summ['summary_max']:+.3f}R. "
+            f"H240 median={h_summ['summary_median']:+.3f}R, "
+            f"mean={h_summ['summary_mean']:+.3f}R, "
+            f"q95={h_summ['summary_q95']:+.3f}R, "
+            f"max={h_summ['summary_max']:+.3f}R. "
+            f"H240 vs BL median delta = "
+            f"{h_summ['summary_median'] - bl_summ['summary_median']:+.3f}R; "
+            f"mean delta = "
+            f"{h_summ['summary_mean'] - bl_summ['summary_mean']:+.3f}R."
+        )
     a("")
     a("### Block KK3 — tier composition at k=20")
     a("")
     for sid in SUBSET_IDS:
         a(f"#### {sid}")
         a("")
-        sub = kk3_tbyp[(kk3_tbyp["subset_id"] == sid)
-                        & (kk3_tbyp["k"] == 20)].copy()
+        sub = kk3_tbyp[(kk3_tbyp["subset_id"] == sid) & (kk3_tbyp["k"] == 20)].copy()
         a("| position_bin | n_only_up | tier_low | tier_mid | tier_high | tier_runner |")
         a("| --- | --- | --- | --- | --- | --- |")
         for _, r in sub.iterrows():
-            a(f"| {r['position_bin']} | {int(r['n_only_up_in_bin'])} | "
-              f"{int(r['n_only_up_tier_low_in_bin'])} | "
-              f"{int(r['n_only_up_tier_mid_in_bin'])} | "
-              f"{int(r['n_only_up_tier_high_in_bin'])} | "
-              f"{int(r['n_only_up_tier_runner_in_bin'])} |")
+            a(
+                f"| {r['position_bin']} | {int(r['n_only_up_in_bin'])} | "
+                f"{int(r['n_only_up_tier_low_in_bin'])} | "
+                f"{int(r['n_only_up_tier_mid_in_bin'])} | "
+                f"{int(r['n_only_up_tier_high_in_bin'])} | "
+                f"{int(r['n_only_up_tier_runner_in_bin'])} |"
+            )
         # tau=-0.5 selectivity (constant across position bins).
         r0 = sub.iloc[0]
         a("")
-        a(f"At k=20, pct of only_up tier_X with running_close <= -0.5 ATR: ")
-        a(f"tier_high = {r0['pct_of_only_up_tier_high_below_tau_-0.5']*100:.2f}%, "
-          f"tier_runner = {r0['pct_of_only_up_tier_runner_below_tau_-0.5']*100:.2f}%, "
-          f"tier_low_plus_mid = {r0['pct_of_only_up_tier_low_plus_mid_below_tau_-0.5']*100:.2f}%.")
+        a("At k=20, pct of only_up tier_X with running_close <= -0.5 ATR: ")
+        a(
+            f"tier_high = {r0['pct_of_only_up_tier_high_below_tau_-0.5'] * 100:.2f}%, "
+            f"tier_runner = {r0['pct_of_only_up_tier_runner_below_tau_-0.5'] * 100:.2f}%, "
+            f"tier_low_plus_mid = {r0['pct_of_only_up_tier_low_plus_mid_below_tau_-0.5'] * 100:.2f}%."
+        )
         a("")
     a("### Block MM — tier mix and R contribution reference")
     a("")
@@ -2396,7 +2717,7 @@ def render_report(*, observed_shas: Dict[str, str],
                 f"mean_peak={r['mean_peak_atr']:.2f} ATR, "
                 f"mean_final_R={r['mean_final_close_R_at_BL_SL']:+.2f}R, "
                 f"R_contrib={r['total_R_contribution']:+.2f}R "
-                f"({r['pct_of_subset_total_R_contribution']*100:.1f}% of subset)"
+                f"({r['pct_of_subset_total_R_contribution'] * 100:.1f}% of subset)"
             )
         a(f"- {sid}: " + "; ".join(parts) + ".")
     a("")
@@ -2427,8 +2748,7 @@ def check_disposition_discipline(report_text: str) -> List[Tuple[int, str, str]]
 # ===========================================================================
 
 
-def _gate5_GG_bin_sum(gg_hist: pd.DataFrame,
-                       per_subset_only_up_n: Dict[str, int]) -> None:
+def _gate5_GG_bin_sum(gg_hist: pd.DataFrame, per_subset_only_up_n: Dict[str, int]) -> None:
     """GG: bins (incl. underflow) sum to n_only_up per subset."""
     for sid in SUBSET_IDS:
         sub = gg_hist[gg_hist["subset_id"] == sid]
@@ -2436,26 +2756,22 @@ def _gate5_GG_bin_sum(gg_hist: pd.DataFrame,
         exp = per_subset_only_up_n[sid]
         if s != exp:
             raise RuntimeError(
-                f"HALT (gate 5.GG): subset {sid} hist bins sum={s} "
-                f"!= n_only_up={exp}"
+                f"HALT (gate 5.GG): subset {sid} hist bins sum={s} != n_only_up={exp}"
             )
 
 
-def _gate5_HH_bin_sum(hh_hist: pd.DataFrame,
-                       per_subset_only_up_n: Dict[str, int]) -> None:
+def _gate5_HH_bin_sum(hh_hist: pd.DataFrame, per_subset_only_up_n: Dict[str, int]) -> None:
     for sid in SUBSET_IDS:
         sub = hh_hist[hh_hist["subset_id"] == sid]
         s = int(sub["n_trades_in_bin"].sum())
         exp = per_subset_only_up_n[sid]
         if s != exp:
             raise RuntimeError(
-                f"HALT (gate 5.HH): subset {sid} hist bins sum={s} "
-                f"!= n_only_up={exp}"
+                f"HALT (gate 5.HH): subset {sid} hist bins sum={s} != n_only_up={exp}"
             )
 
 
-def _gate5_II_cell_sum(ii_cells: pd.DataFrame,
-                        per_subset_only_up_n: Dict[str, int]) -> None:
+def _gate5_II_cell_sum(ii_cells: pd.DataFrame, per_subset_only_up_n: Dict[str, int]) -> None:
     for sid in SUBSET_IDS:
         if per_subset_only_up_n[sid] == 0:
             continue
@@ -2463,14 +2779,10 @@ def _gate5_II_cell_sum(ii_cells: pd.DataFrame,
         s = int(sub["n_trades"].sum())
         exp = per_subset_only_up_n[sid]
         if s != exp:
-            raise RuntimeError(
-                f"HALT (gate 5.II): subset {sid} cell sum={s} "
-                f"!= n_only_up={exp}"
-            )
+            raise RuntimeError(f"HALT (gate 5.II): subset {sid} cell sum={s} != n_only_up={exp}")
 
 
-def _gate5_MM_tier_sum(mm_tier: pd.DataFrame,
-                        per_subset_only_up_n: Dict[str, int]) -> None:
+def _gate5_MM_tier_sum(mm_tier: pd.DataFrame, per_subset_only_up_n: Dict[str, int]) -> None:
     for sid in SUBSET_IDS:
         if per_subset_only_up_n[sid] == 0:
             continue
@@ -2478,10 +2790,7 @@ def _gate5_MM_tier_sum(mm_tier: pd.DataFrame,
         s = int(sub["n_trades"].sum())
         exp = per_subset_only_up_n[sid]
         if s != exp:
-            raise RuntimeError(
-                f"HALT (gate 5.MM): subset {sid} tier sum={s} "
-                f"!= n_only_up={exp}"
-            )
+            raise RuntimeError(f"HALT (gate 5.MM): subset {sid} tier sum={s} != n_only_up={exp}")
 
 
 def _gate6_JJ_separator(jj_sep: pd.DataFrame) -> None:
@@ -2498,15 +2807,12 @@ def _gate6_JJ_separator(jj_sep: pd.DataFrame) -> None:
             )
 
 
-def _gate_NN1_bin_sum(nn_subset: pd.DataFrame,
-                       per_subset_only_up_n: Dict[str, int]) -> None:
+def _gate_NN1_bin_sum(nn_subset: pd.DataFrame, per_subset_only_up_n: Dict[str, int]) -> None:
     """NN.1: histogram bin counts per (subset, exit_policy) sum to n_only_up."""
-    bin_rows = nn_subset[nn_subset["row_kind"].isin(
-        ["bin", "bin_overflow", "bin_underflow"])]
+    bin_rows = nn_subset[nn_subset["row_kind"].isin(["bin", "bin_overflow", "bin_underflow"])]
     for sid in SUBSET_IDS:
         for policy in NN_EXIT_POLICIES:
-            sub = bin_rows[(bin_rows["subset_id"] == sid)
-                            & (bin_rows["exit_policy"] == policy)]
+            sub = bin_rows[(bin_rows["subset_id"] == sid) & (bin_rows["exit_policy"] == policy)]
             s = int(sub["n_trades_in_bin"].sum())
             exp = per_subset_only_up_n[sid]
             if s != exp:
@@ -2516,8 +2822,7 @@ def _gate_NN1_bin_sum(nn_subset: pd.DataFrame,
                 )
 
 
-def _gate_KK31_tier_sum(kk3_tbyp: pd.DataFrame,
-                         per_subset_only_up_n: Dict[str, int]) -> None:
+def _gate_KK31_tier_sum(kk3_tbyp: pd.DataFrame, per_subset_only_up_n: Dict[str, int]) -> None:
     """KK3.1: tier counts per subset sum to n_only_up per subset.
 
     For each (subset, k), sum across position bins and across tiers must
@@ -2532,12 +2837,15 @@ def _gate_KK31_tier_sum(kk3_tbyp: pd.DataFrame,
     for sid in SUBSET_IDS:
         n_ou = per_subset_only_up_n[sid]
         for k in KK3_K_GRID:
-            sub = kk3_tbyp[(kk3_tbyp["subset_id"] == sid)
-                            & (kk3_tbyp["k"] == int(k))]
-            sum_tiers = int((sub["n_only_up_tier_low_in_bin"].sum()
-                              + sub["n_only_up_tier_mid_in_bin"].sum()
-                              + sub["n_only_up_tier_high_in_bin"].sum()
-                              + sub["n_only_up_tier_runner_in_bin"].sum()))
+            sub = kk3_tbyp[(kk3_tbyp["subset_id"] == sid) & (kk3_tbyp["k"] == int(k))]
+            sum_tiers = int(
+                (
+                    sub["n_only_up_tier_low_in_bin"].sum()
+                    + sub["n_only_up_tier_mid_in_bin"].sum()
+                    + sub["n_only_up_tier_high_in_bin"].sum()
+                    + sub["n_only_up_tier_runner_in_bin"].sum()
+                )
+            )
             sum_ou = int(sub["n_only_up_in_bin"].sum())
             if sum_tiers != sum_ou:
                 raise RuntimeError(
@@ -2554,11 +2862,14 @@ def _gate_KK31_tier_sum(kk3_tbyp: pd.DataFrame,
                 )
 
 
-def _gate_KK32_position_sum(kk3_tbyp: pd.DataFrame,
-                              per_subset_only_up_n: Dict[str, int],
-                              starts: np.ndarray, ends: np.ndarray,
-                              cats: np.ndarray,
-                              subsets: Dict[str, np.ndarray]) -> None:
+def _gate_KK32_position_sum(
+    kk3_tbyp: pd.DataFrame,
+    per_subset_only_up_n: Dict[str, int],
+    starts: np.ndarray,
+    ends: np.ndarray,
+    cats: np.ndarray,
+    subsets: Dict[str, np.ndarray],
+) -> None:
     """KK3.2: n_only_up_in_bin across position bins equals n_only_up minus
     trades clamped before bar k. only_up at k<=120 has running_close > -2 ATR
     so trades with n_bars >= k all fit one of the 4 position bins.
@@ -2574,8 +2885,7 @@ def _gate_KK32_position_sum(kk3_tbyp: pd.DataFrame,
                 s, e = int(starts[tid]), int(ends[tid])
                 if e - s >= k:
                     n_with_valid_close += 1
-            sub = kk3_tbyp[(kk3_tbyp["subset_id"] == sid)
-                            & (kk3_tbyp["k"] == int(k))]
+            sub = kk3_tbyp[(kk3_tbyp["subset_id"] == sid) & (kk3_tbyp["k"] == int(k))]
             sum_ou_in_bins = int(sub["n_only_up_in_bin"].sum())
             if sum_ou_in_bins != n_with_valid_close:
                 raise RuntimeError(
@@ -2613,8 +2923,7 @@ def build_pass(*, out_dir: Path, write_manifest: bool) -> Dict[str, Any]:
 
     # Subsets
     labels, subsets = build_subsets()
-    print("  Subset sizes:", {sid: len(tids) for sid, tids in subsets.items()},
-          flush=True)
+    print("  Subset sizes:", {sid: len(tids) for sid, tids in subsets.items()}, flush=True)
 
     # Per-bar paths
     print("  Loading per_bar_paths.csv...", flush=True)
@@ -2625,13 +2934,14 @@ def build_pass(*, out_dir: Path, write_manifest: bool) -> Dict[str, Any]:
 
     cats = compute_categories(pb, n_trades)
     starts, ends, rmfe, rmae, bc = _build_index(pb, n_trades)
-    print("  Block B categories:",
-          {c: int((cats == c).sum()) for c in ALL_CATS}, flush=True)
+    print("  Block B categories:", {c: int((cats == c).sum()) for c in ALL_CATS}, flush=True)
 
-    overall_mae, peak_mfe, close_k120, final_close, n_bars, peak_k = \
+    overall_mae, peak_mfe, close_k120, final_close, n_bars, peak_k = (
         _per_trade_overall_mae_and_peak(starts, ends, rmfe, rmae, bc, n_trades)
-    final_R_BL, final_R_H240, sl_k_BL, sl_k_H240 = \
-        _per_trade_BL_H240_final_R(starts, ends, rmae, bc, n_trades)
+    )
+    final_R_BL, final_R_H240, sl_k_BL, sl_k_H240 = _per_trade_BL_H240_final_R(
+        starts, ends, rmae, bc, n_trades
+    )
 
     # Per-subset only_up counts.
     per_subset_only_up_n: Dict[str, int] = {}
@@ -2642,20 +2952,19 @@ def build_pass(*, out_dir: Path, write_manifest: bool) -> Dict[str, Any]:
 
     # Block GG
     print("  Computing Block GG...", flush=True)
-    gg_per_trade, gg_hist, gg_summary, gg_kill = compute_block_GG(
-        cats, overall_mae, subsets)
+    gg_per_trade, gg_hist, gg_summary, gg_kill = compute_block_GG(cats, overall_mae, subsets)
     _gate5_GG_bin_sum(gg_hist, per_subset_only_up_n)
 
     # Block HH
     print("  Computing Block HH...", flush=True)
-    hh_hist, hh_summary, hh_tp = compute_block_HH(
-        cats, peak_mfe, subsets)
+    hh_hist, hh_summary, hh_tp = compute_block_HH(cats, peak_mfe, subsets)
     _gate5_HH_bin_sum(hh_hist, per_subset_only_up_n)
 
     # Block II
     print("  Computing Block II...", flush=True)
     ii_cells, ii_marg = compute_block_II(
-        cats, peak_mfe, overall_mae, close_k120, final_close, subsets)
+        cats, peak_mfe, overall_mae, close_k120, final_close, subsets
+    )
     _gate5_II_cell_sum(ii_cells, per_subset_only_up_n)
 
     # Block JJ
@@ -2675,22 +2984,20 @@ def build_pass(*, out_dir: Path, write_manifest: bool) -> Dict[str, Any]:
     # Block MM
     print("  Computing Block MM...", flush=True)
     mm_tier, mm_paths = compute_block_MM(
-        starts, ends, bc, cats, peak_mfe, close_k120, final_close, subsets)
+        starts, ends, bc, cats, peak_mfe, close_k120, final_close, subsets
+    )
     _gate5_MM_tier_sum(mm_tier, per_subset_only_up_n)
 
     # Block NN
     print("  Computing Block NN...", flush=True)
-    nn_subset, nn_by_tier = compute_block_NN(
-        cats, peak_mfe, final_R_BL, final_R_H240, subsets)
+    nn_subset, nn_by_tier = compute_block_NN(cats, peak_mfe, final_R_BL, final_R_H240, subsets)
     _gate_NN1_bin_sum(nn_subset, per_subset_only_up_n)
 
     # Block KK3
     print("  Computing Block KK3...", flush=True)
-    kk3_tbyp, kk3_pdbt = compute_block_KK3(
-        starts, ends, bc, cats, peak_mfe, subsets)
+    kk3_tbyp, kk3_pdbt = compute_block_KK3(starts, ends, bc, cats, peak_mfe, subsets)
     _gate_KK31_tier_sum(kk3_tbyp, per_subset_only_up_n)
-    _gate_KK32_position_sum(kk3_tbyp, per_subset_only_up_n,
-                              starts, ends, cats, subsets)
+    _gate_KK32_position_sum(kk3_tbyp, per_subset_only_up_n, starts, ends, cats, subsets)
 
     # Write CSVs.
     paths = {
@@ -2720,9 +3027,12 @@ def build_pass(*, out_dir: Path, write_manifest: bool) -> Dict[str, Any]:
     # Plots
     print("  Rendering plots...", flush=True)
     plot_paths = render_plots(
-        gg_hist=gg_hist, gg_summary=gg_summary,
-        hh_hist=hh_hist, hh_summary=hh_summary,
-        jj_cat=jj_cat, jj_sep=jj_sep,
+        gg_hist=gg_hist,
+        gg_summary=gg_summary,
+        hh_hist=hh_hist,
+        hh_summary=hh_summary,
+        jj_cat=jj_cat,
+        jj_sep=jj_sep,
         mm_paths=mm_paths,
         plots_dir=out_dir / "plots",
     )
@@ -2732,15 +3042,20 @@ def build_pass(*, out_dir: Path, write_manifest: bool) -> Dict[str, Any]:
     md = render_report(
         observed_shas=observed_shas,
         per_subset_only_up_n=per_subset_only_up_n,
-        gg_summary=gg_summary, gg_kill=gg_kill,
-        hh_summary=hh_summary, hh_tp=hh_tp,
-        ii_cells=ii_cells, ii_marg=ii_marg,
+        gg_summary=gg_summary,
+        gg_kill=gg_kill,
+        hh_summary=hh_summary,
+        hh_tp=hh_tp,
+        ii_cells=ii_cells,
+        ii_marg=ii_marg,
         jj_sep=jj_sep,
         kk=kk,
         ll=ll,
         mm_tier=mm_tier,
-        nn_subset=nn_subset, nn_by_tier=nn_by_tier,
-        kk3_tbyp=kk3_tbyp, kk3_pdbt=kk3_pdbt,
+        nn_subset=nn_subset,
+        nn_by_tier=nn_by_tier,
+        kk3_tbyp=kk3_tbyp,
+        kk3_pdbt=kk3_pdbt,
     )
     md_path = out_dir / "path_detail_distributions.md"
     md_path.write_text(md, encoding="utf-8", newline="\n")
@@ -2749,9 +3064,7 @@ def build_pass(*, out_dir: Path, write_manifest: bool) -> Dict[str, Any]:
     viols = check_disposition_discipline(md)
     if viols:
         msg = "\n  ".join([f"line {ln}: pat='{p}': {tx}" for ln, p, tx in viols])
-        raise RuntimeError(
-            f"HALT (gate 10): disposition discipline violations:\n  {msg}"
-        )
+        raise RuntimeError(f"HALT (gate 10): disposition discipline violations:\n  {msg}")
 
     # Gate 9: locked artefacts unchanged
     _verify_locked("gate 9 (end)")
@@ -2759,8 +3072,7 @@ def build_pass(*, out_dir: Path, write_manifest: bool) -> Dict[str, Any]:
     # Output sha256 manifest
     out_files = list(paths.keys()) + ["path_detail_distributions.md"]
     out_paths_full = [out_dir / n for n in out_files] + plot_paths
-    out_shas = {p.relative_to(REPO_ROOT).as_posix(): _sha256_file(p)
-                for p in out_paths_full}
+    out_shas = {p.relative_to(REPO_ROOT).as_posix(): _sha256_file(p) for p in out_paths_full}
 
     gates = {
         "gate_1_inputs": "ok (9 sha256s match)",
@@ -2839,9 +3151,11 @@ def _compare_files(a: Path, b: Path) -> bool:
 
 def main(argv: Optional[List[str]] = None) -> int:
     import argparse
+
     parser = argparse.ArgumentParser()
-    parser.add_argument("--single-pass", action="store_true",
-                        help="Skip the determinism second pass.")
+    parser.add_argument(
+        "--single-pass", action="store_true", help="Skip the determinism second pass."
+    )
     args = parser.parse_args(argv)
 
     t_start = time.time()
@@ -2876,9 +3190,7 @@ def main(argv: Optional[List[str]] = None) -> int:
                 det_diffs.append(str(src.name))
         shutil.rmtree(snapshot_dir, ignore_errors=True)
         if det_diffs:
-            raise RuntimeError(
-                f"HALT (gate 8): determinism failed; differing files: {det_diffs}"
-            )
+            raise RuntimeError(f"HALT (gate 8): determinism failed; differing files: {det_diffs}")
         det_ok = True
         r1 = r2
 
@@ -2889,8 +3201,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     print("\n=== Validation gates disposition ===", flush=True)
     for k, v in r1["gates"].items():
         print(f"  {k}: {v}", flush=True)
-    print(f"  gate_8_determinism: {'ok' if det_ok else 'single-pass-skipped'}",
-          flush=True)
+    print(f"  gate_8_determinism: {'ok' if det_ok else 'single-pass-skipped'}", flush=True)
 
     # Headline numbers per subset
     gg_summary = r1["gg_summary"]
@@ -2898,34 +3209,41 @@ def main(argv: Optional[List[str]] = None) -> int:
     hh_summary = r1["hh_summary"]
     hh_tp = r1["hh_tp"]
     jj_sep = r1["jj_sep"]
-    kk = r1["kk"]
-    mm_tier = r1["mm_tier"]
+    r1["kk"]
+    r1["mm_tier"]
     nn_subset = r1["nn_subset"]
     kk3_tbyp = r1["kk3_tbyp"]
     print("\n=== Headline numbers per subset ===", flush=True)
     for sid in SUBSET_IDS:
         s_gg = gg_summary[gg_summary["subset_id"] == sid].iloc[0]
         s_hh = hh_summary[hh_summary["subset_id"] == sid].iloc[0]
-        kill_175 = gg_kill[(gg_kill["subset_id"] == sid)
-                            & (gg_kill["SL_distance_atr"] == 1.75)]["pct_only_up_killed"].iloc[0]
-        tp10 = hh_tp[(hh_tp["subset_id"] == sid)
-                      & (hh_tp["tp_atr"] == 10.0)].iloc[0]
-        sep95_k20 = jj_sep[(jj_sep["subset_id"] == sid) & (jj_sep["k"] == 20)
-                            & (jj_sep["recall_only_up_budget"] == 0.95)].iloc[0]
-        bl_summ = nn_subset[(nn_subset["subset_id"] == sid)
-                             & (nn_subset["exit_policy"] == "BL")
-                             & (nn_subset["row_kind"] == "summary")].iloc[0]
-        h_summ = nn_subset[(nn_subset["subset_id"] == sid)
-                            & (nn_subset["exit_policy"] == "H240")
-                            & (nn_subset["row_kind"] == "summary")].iloc[0]
+        kill_175 = gg_kill[(gg_kill["subset_id"] == sid) & (gg_kill["SL_distance_atr"] == 1.75)][
+            "pct_only_up_killed"
+        ].iloc[0]
+        tp10 = hh_tp[(hh_tp["subset_id"] == sid) & (hh_tp["tp_atr"] == 10.0)].iloc[0]
+        sep95_k20 = jj_sep[
+            (jj_sep["subset_id"] == sid)
+            & (jj_sep["k"] == 20)
+            & (jj_sep["recall_only_up_budget"] == 0.95)
+        ].iloc[0]
+        bl_summ = nn_subset[
+            (nn_subset["subset_id"] == sid)
+            & (nn_subset["exit_policy"] == "BL")
+            & (nn_subset["row_kind"] == "summary")
+        ].iloc[0]
+        h_summ = nn_subset[
+            (nn_subset["subset_id"] == sid)
+            & (nn_subset["exit_policy"] == "H240")
+            & (nn_subset["row_kind"] == "summary")
+        ].iloc[0]
         print(
             f"  {sid}: GG q05={s_gg['q05']:+.3f} ATR, q01={s_gg['q01']:+.3f} ATR, "
             f"min={s_gg['min']:+.3f} ATR; SL=1.75 kills "
-            f"{kill_175*100:.2f}% of only_up. "
+            f"{kill_175 * 100:.2f}% of only_up. "
             f"HH q50={s_hh['median']:.2f} ATR, q95={s_hh['q95']:.2f} ATR; "
-            f"TP=10 ATR reached by {tp10['pct_only_up_reaching_tp']*100:.2f}% of only_up. "
+            f"TP=10 ATR reached by {tp10['pct_only_up_reaching_tp'] * 100:.2f}% of only_up. "
             f"JJ k=20 (recall>=0.95): tau={sep95_k20['tau_only_up_atr_fill']:+.2f}, "
-            f"pct_losers_below={sep95_k20['pct_losers_below_tau']*100:.2f}%, "
+            f"pct_losers_below={sep95_k20['pct_losers_below_tau'] * 100:.2f}%, "
             f"d_vs_loser_pool={sep95_k20['cohens_d_only_up_vs_loser_pool']:+.3f}. "
             f"NN: BL med={bl_summ['summary_median']:+.3f}R, mean={bl_summ['summary_mean']:+.3f}R; "
             f"H240 med={h_summ['summary_median']:+.3f}R, mean={h_summ['summary_mean']:+.3f}R "
@@ -2936,12 +3254,11 @@ def main(argv: Optional[List[str]] = None) -> int:
     # KK3 headline.
     print("\n=== KK3 selectivity at tau=-0.5 (subset / k=20) ===", flush=True)
     for sid in SUBSET_IDS:
-        r0 = kk3_tbyp[(kk3_tbyp["subset_id"] == sid)
-                       & (kk3_tbyp["k"] == 20)].iloc[0]
+        r0 = kk3_tbyp[(kk3_tbyp["subset_id"] == sid) & (kk3_tbyp["k"] == 20)].iloc[0]
         print(
-            f"  {sid}: tier_high {r0['pct_of_only_up_tier_high_below_tau_-0.5']*100:.2f}% below; "
-            f"tier_runner {r0['pct_of_only_up_tier_runner_below_tau_-0.5']*100:.2f}% below; "
-            f"tier_low_plus_mid {r0['pct_of_only_up_tier_low_plus_mid_below_tau_-0.5']*100:.2f}% below.",
+            f"  {sid}: tier_high {r0['pct_of_only_up_tier_high_below_tau_-0.5'] * 100:.2f}% below; "
+            f"tier_runner {r0['pct_of_only_up_tier_runner_below_tau_-0.5'] * 100:.2f}% below; "
+            f"tier_low_plus_mid {r0['pct_of_only_up_tier_low_plus_mid_below_tau_-0.5'] * 100:.2f}% below.",
             flush=True,
         )
 
@@ -2957,16 +3274,13 @@ def main(argv: Optional[List[str]] = None) -> int:
             ["git", "rev-parse", "HEAD"], cwd=REPO_ROOT, text=True
         ).strip()
         print(f"  HEAD: {head}", flush=True)
-        st = subprocess.check_output(
-            ["git", "status", "--porcelain"], cwd=REPO_ROOT, text=True
-        )
+        st = subprocess.check_output(["git", "status", "--porcelain"], cwd=REPO_ROOT, text=True)
         for ln in st.splitlines()[:80]:
             print(f"  {ln}", flush=True)
     except Exception as e:
         print(f"  (git unavailable: {e})", flush=True)
 
-    print(f"\n  wallclock {wallclock:.2f}s  peak_RSS_traced_kb {peak_kb:.0f}",
-          flush=True)
+    print(f"\n  wallclock {wallclock:.2f}s  peak_RSS_traced_kb {peak_kb:.0f}", flush=True)
     return 0
 
 

@@ -1,4 +1,4 @@
- # ruff: noqa: I001
+# ruff: noqa: I001
 import numpy as np
 import pandas as pd
 import pytest
@@ -48,5 +48,3 @@ def test_volume_trend_direction_force_basic():
     vals = pd.to_numeric(out["volume_signal"], errors="raise")
     assert set(vals.unique()).issubset({0, 1})
     assert (vals.iloc[:25] == 0).all()
-
-

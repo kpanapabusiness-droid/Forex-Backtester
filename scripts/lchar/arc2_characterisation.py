@@ -29,31 +29,52 @@ import math
 import sys
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
-import yaml
 
 REPO_ROOT: Path = Path(__file__).resolve().parents[2]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from core.signals.l4_mtf_alignment_2_down_mixed_kijun import (  # noqa: E402
+    TIME_COL,
     _attach_kijun_sign,
-    _compute_kijun,
     _load_pair_tf,
     _mtf_alignment_2_down_mixed_kijun,
     _wilder_atr_1h,
-    KIJUN_PERIOD,
-    TIME_COL,
 )
 
 PAIRS_DEFAULT: Tuple[str, ...] = (
-    "AUD_CAD", "AUD_CHF", "AUD_JPY", "AUD_NZD", "AUD_USD", "CAD_CHF", "CAD_JPY", "CHF_JPY",
-    "EUR_AUD", "EUR_CAD", "EUR_CHF", "EUR_GBP", "EUR_JPY", "EUR_NZD", "EUR_USD", "GBP_AUD",
-    "GBP_CAD", "GBP_CHF", "GBP_JPY", "GBP_NZD", "GBP_USD", "NZD_CAD", "NZD_CHF", "NZD_JPY",
-    "NZD_USD", "USD_CAD", "USD_CHF", "USD_JPY",
+    "AUD_CAD",
+    "AUD_CHF",
+    "AUD_JPY",
+    "AUD_NZD",
+    "AUD_USD",
+    "CAD_CHF",
+    "CAD_JPY",
+    "CHF_JPY",
+    "EUR_AUD",
+    "EUR_CAD",
+    "EUR_CHF",
+    "EUR_GBP",
+    "EUR_JPY",
+    "EUR_NZD",
+    "EUR_USD",
+    "GBP_AUD",
+    "GBP_CAD",
+    "GBP_CHF",
+    "GBP_JPY",
+    "GBP_NZD",
+    "GBP_USD",
+    "NZD_CAD",
+    "NZD_CHF",
+    "NZD_JPY",
+    "NZD_USD",
+    "USD_CAD",
+    "USD_CHF",
+    "USD_JPY",
 )
 
 # Forward horizons in 1H bars (descriptive only — does not modify the gated h=120 trade outcome).
@@ -93,9 +114,7 @@ def _wilder_atr_series(df: pd.DataFrame, period: int = 14) -> np.ndarray:
     prev_close = np.empty(n, dtype=float)
     prev_close[0] = np.nan
     prev_close[1:] = close[:-1]
-    tr = np.maximum.reduce(
-        [high - low, np.abs(high - prev_close), np.abs(low - prev_close)]
-    )
+    tr = np.maximum.reduce([high - low, np.abs(high - prev_close), np.abs(low - prev_close)])
     tr[0] = high[0] - low[0]
     atr = np.full(n, np.nan, dtype=float)
     if n < period:
@@ -139,9 +158,7 @@ def _extract_pair_features(
     df_4h = _attach_kijun_sign(df_4h_raw)
     df_d1 = _attach_kijun_sign(df_d1_raw)
 
-    mask, s_1h, s_4h_mr, s_d1_mr = _mtf_alignment_2_down_mixed_kijun(
-        df_1h, df_4h, df_d1, pair=pair
-    )
+    mask, s_1h, s_4h_mr, s_d1_mr = _mtf_alignment_2_down_mixed_kijun(df_1h, df_4h, df_d1, pair=pair)
     atr_1h = _wilder_atr_1h(df_1h)
     n = len(df_1h)
 
@@ -241,7 +258,9 @@ def _extract_pair_features(
     mrd = np.where(val_d1, contain_d1, 0).astype(np.int64) - 1
     in_range_d1 = val_d1 & (mrd >= 0)
 
-    def _gather(df_high: pd.DataFrame, col: str, in_range: np.ndarray, mr_idx: np.ndarray) -> np.ndarray:
+    def _gather(
+        df_high: pd.DataFrame, col: str, in_range: np.ndarray, mr_idx: np.ndarray
+    ) -> np.ndarray:
         arr = df_high[col].to_numpy(dtype=float)
         out = np.full(n, np.nan, dtype=float)
         out[in_range] = arr[mr_idx[in_range]]
@@ -314,7 +333,6 @@ def run_arc2_characterisation(
 
     # 3. Per-pair: compute the signal mask + feature frame and gather features at signal bars.
     per_pair_features: Dict[str, pd.DataFrame] = {}
-    signal_pair_ts_rows: List[Dict[str, Any]] = []
 
     for pair in pairs:
         df_1h = _load_pair_tf(pair, "1hr")
@@ -337,9 +355,11 @@ def run_arc2_characterisation(
     if not per_pair_features:
         raise RuntimeError("Arc 2 characterisation: zero signal-firing bars in signal window")
 
-    all_signals = pd.concat(per_pair_features.values(), axis=0, ignore_index=False).sort_values(
-        [TIME_COL, "pair"]
-    ).reset_index(drop=True)
+    all_signals = (
+        pd.concat(per_pair_features.values(), axis=0, ignore_index=False)
+        .sort_values([TIME_COL, "pair"])
+        .reset_index(drop=True)
+    )
 
     # Cross-pair density at signal bar (same-bar concurrent signals on other pairs).
     bar_counts = all_signals.groupby(TIME_COL).size().to_dict()
@@ -438,52 +458,101 @@ def run_arc2_characterisation(
     # 5. signals_features.csv — primary deliverable. Lock column order
     # deterministically; format floats with fixed precision.
     feat_cols = [
-        "pair", TIME_COL, "fold_id", "fold_disposition", "taken",
-        "hour_utc", "dow", "session",
-        "s_1h", "s_4h_mr", "s_d1_mr",
+        "pair",
+        TIME_COL,
+        "fold_id",
+        "fold_disposition",
+        "taken",
+        "hour_utc",
+        "dow",
+        "session",
+        "s_1h",
+        "s_4h_mr",
+        "s_d1_mr",
         "atr_1h_wilder_at_n",
-        "atr_1h_regime", "atr_1h_regime_bin",
-        "atr_4h_at_mr", "atr_4h_regime_at_mr", "atr_4h_regime_bin",
-        "atr_d1_at_mr", "atr_d1_regime_at_mr", "atr_d1_regime_bin",
+        "atr_1h_regime",
+        "atr_1h_regime_bin",
+        "atr_4h_at_mr",
+        "atr_4h_regime_at_mr",
+        "atr_4h_regime_bin",
+        "atr_d1_at_mr",
+        "atr_d1_regime_at_mr",
+        "atr_d1_regime_bin",
         "log_ret_1h_at_n",
-        "cum_logret_1h_6", "cum_logret_1h_24", "cum_logret_1h_120",
+        "cum_logret_1h_6",
+        "cum_logret_1h_24",
+        "cum_logret_1h_120",
         "pre_momentum_label",
-        "bar_size_atr", "bar_body_atr", "close_position_in_bar",
+        "bar_size_atr",
+        "bar_body_atr",
+        "close_position_in_bar",
         "dist_to_kijun_1h_atr",
-        "dist_to_ema20_1h_atr", "dist_to_ema50_1h_atr",
-        "dist_to_kijun_4h_at_mr_atr", "dist_to_ema20_4h_at_mr_atr",
-        "dist_to_kijun_d1_at_mr_atr", "dist_to_ema20_d1_at_mr_atr",
-        "ts_4h_used", "ts_d1_used",
+        "dist_to_ema20_1h_atr",
+        "dist_to_ema50_1h_atr",
+        "dist_to_kijun_4h_at_mr_atr",
+        "dist_to_ema20_4h_at_mr_atr",
+        "dist_to_kijun_d1_at_mr_atr",
+        "dist_to_ema20_d1_at_mr_atr",
+        "ts_4h_used",
+        "ts_d1_used",
         "concurrent_signals_same_bar",
-        "exit_reason", "R", "mae_R", "mfe_R", "held_bars",
-        "spread_pips_entry", "spread_pips_exit", "spread_floored",
+        "exit_reason",
+        "R",
+        "mae_R",
+        "mfe_R",
+        "held_bars",
+        "spread_pips_entry",
+        "spread_pips_exit",
+        "spread_floored",
     ] + [f"fwd_logret_h{h}" for h in FORWARD_HORIZONS]
 
     out = all_signals[feat_cols].copy()
     # Deterministic float formatting via str.format on selected columns.
     out_path = output_dir / "signals_features.csv"
-    out.to_csv(out_path, index=False, lineterminator="\n", float_format="%.10g", date_format="%Y-%m-%dT%H:%M:%S")
+    out.to_csv(
+        out_path,
+        index=False,
+        lineterminator="\n",
+        float_format="%.10g",
+        date_format="%Y-%m-%dT%H:%M:%S",
+    )
     signals_features_sha = _sha256_file(out_path)
 
     # 6. magnitude_distribution.md — v1.1 locked deliverable.
-    taken_rows = out[out["taken"] == True].copy()
+    taken_rows = out[out["taken"]].copy()
     R_vec = taken_rows["R"].to_numpy(dtype=float)
     mae_vec = taken_rows["mae_R"].to_numpy(dtype=float)
     mfe_vec = taken_rows["mfe_R"].to_numpy(dtype=float)
-    held_vec = taken_rows["held_bars"].to_numpy(dtype=float)
+    taken_rows["held_bars"].to_numpy(dtype=float)
 
     def _stats(v: np.ndarray) -> Dict[str, float]:
         if v.size == 0:
-            return {"n": 0, "mean": np.nan, "std": np.nan, "skew": np.nan, "kurt_excess": np.nan,
-                    "min": np.nan, "p1": np.nan, "p5": np.nan, "p25": np.nan, "p50": np.nan,
-                    "p75": np.nan, "p95": np.nan, "p99": np.nan, "max": np.nan}
+            return {
+                "n": 0,
+                "mean": np.nan,
+                "std": np.nan,
+                "skew": np.nan,
+                "kurt_excess": np.nan,
+                "min": np.nan,
+                "p1": np.nan,
+                "p5": np.nan,
+                "p25": np.nan,
+                "p50": np.nan,
+                "p75": np.nan,
+                "p95": np.nan,
+                "p99": np.nan,
+                "max": np.nan,
+            }
         from scipy import stats as sps
+
         return {
             "n": int(v.size),
             "mean": float(np.mean(v)),
             "std": float(np.std(v, ddof=1)) if v.size > 1 else 0.0,
             "skew": float(sps.skew(v, bias=False)) if v.size > 2 else np.nan,
-            "kurt_excess": float(sps.kurtosis(v, fisher=True, bias=False)) if v.size > 3 else np.nan,
+            "kurt_excess": float(sps.kurtosis(v, fisher=True, bias=False))
+            if v.size > 3
+            else np.nan,
             "min": float(np.min(v)),
             "p1": float(np.percentile(v, 1)),
             "p5": float(np.percentile(v, 5)),
@@ -523,19 +592,64 @@ def run_arc2_characterisation(
     md_lines.append("\n## Net R distribution (taken trades)\n")
     md_lines.append("| stat | value |")
     md_lines.append("|---|---|")
-    for k in ("n","mean","std","skew","kurt_excess","min","p1","p5","p25","p50","p75","p95","p99","max"):
+    for k in (
+        "n",
+        "mean",
+        "std",
+        "skew",
+        "kurt_excess",
+        "min",
+        "p1",
+        "p5",
+        "p25",
+        "p50",
+        "p75",
+        "p95",
+        "p99",
+        "max",
+    ):
         v = R_stats[k]
         md_lines.append(f"| {k} | {v:.6g} |")
     md_lines.append("\n## MAE R distribution (taken trades)\n")
     md_lines.append("| stat | value |")
     md_lines.append("|---|---|")
-    for k in ("n","mean","std","skew","kurt_excess","min","p1","p5","p25","p50","p75","p95","p99","max"):
+    for k in (
+        "n",
+        "mean",
+        "std",
+        "skew",
+        "kurt_excess",
+        "min",
+        "p1",
+        "p5",
+        "p25",
+        "p50",
+        "p75",
+        "p95",
+        "p99",
+        "max",
+    ):
         v = mae_stats[k]
         md_lines.append(f"| {k} | {v:.6g} |")
     md_lines.append("\n## MFE R distribution (taken trades)\n")
     md_lines.append("| stat | value |")
     md_lines.append("|---|---|")
-    for k in ("n","mean","std","skew","kurt_excess","min","p1","p5","p25","p50","p75","p95","p99","max"):
+    for k in (
+        "n",
+        "mean",
+        "std",
+        "skew",
+        "kurt_excess",
+        "min",
+        "p1",
+        "p5",
+        "p25",
+        "p50",
+        "p75",
+        "p95",
+        "p99",
+        "max",
+    ):
         v = mfe_stats[k]
         md_lines.append(f"| {k} | {v:.6g} |")
     md_lines.append("\n## Exit-reason breakdown (taken trades)\n")
@@ -543,14 +657,31 @@ def run_arc2_characterisation(
     md_lines.append("|---|---|---|---|")
     md_lines.append(f"| stop_loss | {n_sl} | {sl_rate:.6f} | {cond_means['stop_loss']:.6f} |")
     md_lines.append(f"| time_exit | {n_te} | {te_rate:.6f} | {cond_means['time_exit']:.6f} |")
-    md_lines.append(f"| data_end  | {n_de} | {n_de/max(1,len(taken_rows)):.6f} | {cond_means['data_end']:.6f} |")
+    md_lines.append(
+        f"| data_end  | {n_de} | {n_de / max(1, len(taken_rows)):.6f} | {cond_means['data_end']:.6f} |"
+    )
     md_lines.append("\n## Wasted-MFE statistic\n")
     md_lines.append("Definition: per trade, max(0, MFE_R) − max(0, R). Trades where the favourable")
     md_lines.append("excursion was not captured by the time exit.\n")
     if wasted_stats is not None:
         md_lines.append("| stat | value |")
         md_lines.append("|---|---|")
-        for k in ("n","mean","std","skew","kurt_excess","min","p1","p5","p25","p50","p75","p95","p99","max"):
+        for k in (
+            "n",
+            "mean",
+            "std",
+            "skew",
+            "kurt_excess",
+            "min",
+            "p1",
+            "p5",
+            "p25",
+            "p50",
+            "p75",
+            "p95",
+            "p99",
+            "max",
+        ):
             v = wasted_stats[k]
             md_lines.append(f"| {k} | {v:.6g} |")
     md_path = output_dir / "magnitude_distribution.md"
@@ -565,21 +696,31 @@ def run_arc2_characterisation(
         n = len(sub)
         m_R = float(sub["R"].mean()) if n > 0 else 0.0
         sl_n = int(np.sum(sub["exit_reason"] == "stop_loss"))
-        regime_rows.append({
-            "session": sess,
-            "pre_momentum_label": pm,
-            "atr_1h_regime_bin": ab,
-            "n": n,
-            "mean_R": round(m_R, 6),
-            "sl_rate": round(sl_n / n if n > 0 else 0.0, 6),
-        })
+        regime_rows.append(
+            {
+                "session": sess,
+                "pre_momentum_label": pm,
+                "atr_1h_regime_bin": ab,
+                "n": n,
+                "mean_R": round(m_R, 6),
+                "sl_rate": round(sl_n / n if n > 0 else 0.0, 6),
+            }
+        )
     regime_path = output_dir / "regime_breakdown.csv"
     with regime_path.open("w", encoding="utf-8", newline="") as f:
         w = csv.writer(f, lineterminator="\n")
         w.writerow(["session", "pre_momentum_label", "atr_1h_regime_bin", "n", "mean_R", "sl_rate"])
         for r in regime_rows:
-            w.writerow([r["session"], r["pre_momentum_label"], r["atr_1h_regime_bin"],
-                        r["n"], f"{r['mean_R']:.6f}", f"{r['sl_rate']:.6f}"])
+            w.writerow(
+                [
+                    r["session"],
+                    r["pre_momentum_label"],
+                    r["atr_1h_regime_bin"],
+                    r["n"],
+                    f"{r['mean_R']:.6f}",
+                    f"{r['sl_rate']:.6f}",
+                ]
+            )
     regime_sha = _sha256_file(regime_path)
 
     # 8. forward_horizon_curves.csv — descriptive forward returns at multiple horizons per
@@ -592,22 +733,43 @@ def run_arc2_characterisation(
             vec = vec[np.isfinite(vec)]
             if vec.size == 0:
                 continue
-            fwd_rows.append({
-                "horizon": h,
-                "session": sess,
-                "pre_momentum_label": pm,
-                "n": int(vec.size),
-                "mean_logret": round(float(vec.mean()), 8),
-                "median_logret": round(float(np.median(vec)), 8),
-                "std_logret": round(float(vec.std(ddof=1)) if vec.size > 1 else 0.0, 8),
-            })
+            fwd_rows.append(
+                {
+                    "horizon": h,
+                    "session": sess,
+                    "pre_momentum_label": pm,
+                    "n": int(vec.size),
+                    "mean_logret": round(float(vec.mean()), 8),
+                    "median_logret": round(float(np.median(vec)), 8),
+                    "std_logret": round(float(vec.std(ddof=1)) if vec.size > 1 else 0.0, 8),
+                }
+            )
     fwd_path = output_dir / "forward_horizon_curves.csv"
     with fwd_path.open("w", encoding="utf-8", newline="") as f:
         w = csv.writer(f, lineterminator="\n")
-        w.writerow(["horizon", "session", "pre_momentum_label", "n", "mean_logret", "median_logret", "std_logret"])
+        w.writerow(
+            [
+                "horizon",
+                "session",
+                "pre_momentum_label",
+                "n",
+                "mean_logret",
+                "median_logret",
+                "std_logret",
+            ]
+        )
         for r in fwd_rows:
-            w.writerow([r["horizon"], r["session"], r["pre_momentum_label"],
-                        r["n"], f"{r['mean_logret']:.8f}", f"{r['median_logret']:.8f}", f"{r['std_logret']:.8f}"])
+            w.writerow(
+                [
+                    r["horizon"],
+                    r["session"],
+                    r["pre_momentum_label"],
+                    r["n"],
+                    f"{r['mean_logret']:.8f}",
+                    f"{r['median_logret']:.8f}",
+                    f"{r['std_logret']:.8f}",
+                ]
+            )
     fwd_sha = _sha256_file(fwd_path)
 
     # 9. pair_breakdown.csv — per-pair aggregations.
@@ -617,21 +779,31 @@ def run_arc2_characterisation(
         m_R = float(sub["R"].mean()) if n > 0 else 0.0
         sl_n = int(np.sum(sub["exit_reason"] == "stop_loss"))
         winR = int(np.sum(sub["R"].to_numpy() > 0))
-        pair_rows.append({
-            "pair": pair,
-            "n": n,
-            "mean_R": round(m_R, 6),
-            "median_R": round(float(sub["R"].median()), 6),
-            "win_rate": round(winR / n if n > 0 else 0.0, 6),
-            "sl_hit_rate": round(sl_n / n if n > 0 else 0.0, 6),
-        })
+        pair_rows.append(
+            {
+                "pair": pair,
+                "n": n,
+                "mean_R": round(m_R, 6),
+                "median_R": round(float(sub["R"].median()), 6),
+                "win_rate": round(winR / n if n > 0 else 0.0, 6),
+                "sl_hit_rate": round(sl_n / n if n > 0 else 0.0, 6),
+            }
+        )
     pair_path = output_dir / "pair_breakdown.csv"
     with pair_path.open("w", encoding="utf-8", newline="") as f:
         w = csv.writer(f, lineterminator="\n")
         w.writerow(["pair", "n", "mean_R", "median_R", "win_rate", "sl_hit_rate"])
         for r in pair_rows:
-            w.writerow([r["pair"], r["n"], f"{r['mean_R']:.6f}", f"{r['median_R']:.6f}",
-                        f"{r['win_rate']:.6f}", f"{r['sl_hit_rate']:.6f}"])
+            w.writerow(
+                [
+                    r["pair"],
+                    r["n"],
+                    f"{r['mean_R']:.6f}",
+                    f"{r['median_R']:.6f}",
+                    f"{r['win_rate']:.6f}",
+                    f"{r['sl_hit_rate']:.6f}",
+                ]
+            )
     pair_sha = _sha256_file(pair_path)
 
     # 10. characterisation_report.md — narrative summary (descriptive only).
@@ -646,12 +818,12 @@ def run_arc2_characterisation(
         "empirical observations only; action-shaped statements go to "
         "`docs/CANDIDATE_HYPOTHESES.md`.**\n"
     )
-    report_lines.append(f"\n## Population\n")
+    report_lines.append("\n## Population\n")
     report_lines.append(f"- Total signals in window: {n_total}")
     report_lines.append(f"- Taken trades (post concurrent-cap): {n_taken}")
     report_lines.append(f"- Dropped (concurrent_open_position + no_next_bar): {n_dropped}")
     report_lines.append(
-        f"- MTF alignment triple (s_1h, s_4h_mr, s_d1_mr) is `(-1, +1, -1)` constant by construction.\n"
+        "- MTF alignment triple (s_1h, s_4h_mr, s_d1_mr) is `(-1, +1, -1)` constant by construction.\n"
     )
     report_lines.append("## Magnitude summary (taken trades)\n")
     report_lines.append(
@@ -662,9 +834,7 @@ def run_arc2_characterisation(
         f"- Median R: {R_stats['p50']:.6f}; p25: {R_stats['p25']:.6f}; "
         f"p75: {R_stats['p75']:.6f}; min: {R_stats['min']:.6f}; max: {R_stats['max']:.6f}"
     )
-    report_lines.append(
-        f"- SL hit rate: {sl_rate:.6f}; time-exit rate: {te_rate:.6f}"
-    )
+    report_lines.append(f"- SL hit rate: {sl_rate:.6f}; time-exit rate: {te_rate:.6f}")
     report_lines.append(
         f"- Conditional means: stop_loss = {cond_means['stop_loss']:.6f}; "
         f"time_exit = {cond_means['time_exit']:.6f}\n"
@@ -717,13 +887,17 @@ def run_arc2_characterisation(
     pm_means = {pm: float(sub["R"].mean()) for pm, sub in taken_rows.groupby("pre_momentum_label")}
     if pm_means:
         report_lines.append(
-            "- Pre-momentum label conditional mean R: " +
-            "; ".join(f"{pm}={v:.4f} (n={len(taken_rows[taken_rows['pre_momentum_label']==pm])})" for pm, v in pm_means.items())
+            "- Pre-momentum label conditional mean R: "
+            + "; ".join(
+                f"{pm}={v:.4f} (n={len(taken_rows[taken_rows['pre_momentum_label'] == pm])})"
+                for pm, v in pm_means.items()
+            )
         )
     report_lines.append(
         f"- Wasted-MFE statistic (held-bar MFE not captured by time exit): "
         f"mean {wasted_stats['mean']:.4f} R per trade (n={wasted_stats['n']})"
-        if wasted_stats is not None else "- Wasted-MFE statistic: insufficient data"
+        if wasted_stats is not None
+        else "- Wasted-MFE statistic: insufficient data"
     )
     report_lines.append("\n## Disposition note\n")
     report_lines.append(
@@ -750,8 +924,12 @@ def run_arc2_characterisation(
     audit_lines.append("-" * 80)
     audit_lines.append("Invariants:")
     audit_lines.append("  - s_1H read at this 1H bar's close (no lag).")
-    audit_lines.append("  - ts_4h_used = 4H bar at index floor(T_N, '4h') -> idx_4h - 1 (strict prior bar).")
-    audit_lines.append("  - ts_d1_used = D1 bar at index floor(T_N, 'D') -> idx_d1 - 1 (strict prior bar).")
+    audit_lines.append(
+        "  - ts_4h_used = 4H bar at index floor(T_N, '4h') -> idx_4h - 1 (strict prior bar)."
+    )
+    audit_lines.append(
+        "  - ts_d1_used = D1 bar at index floor(T_N, 'D') -> idx_d1 - 1 (strict prior bar)."
+    )
     audit_lines.append("  - For each sample row: ts_4h_used must be strictly < floor(T_N, '4h').")
     audit_lines.append("  - For each sample row: ts_d1_used.date() must be strictly < T_N.date().")
     audit_lines.append("")
@@ -780,15 +958,19 @@ def run_arc2_characterisation(
     manifest_lines: List[str] = []
     manifest_lines.append("Arc 2 characterisation — run manifest")
     manifest_lines.append("-" * 60)
-    manifest_lines.append(f"Run timestamp (UTC-naive): {_dt.datetime.now().isoformat(timespec='seconds')}")
+    manifest_lines.append(
+        f"Run timestamp (UTC-naive): {_dt.datetime.now().isoformat(timespec='seconds')}"
+    )
     manifest_lines.append(f"Repo root: {REPO_ROOT}")
     manifest_lines.append("")
     manifest_lines.append("Inputs (sha256):")
     inputs = {
         "results/l6/arc2/trades_all.csv": arc2_trades_path,
         "results/l6/arc2/wfo_fold_results.csv": fold_results_path,
-        "core/signals/l4_mtf_alignment_2_down_mixed_kijun.py":
-            REPO_ROOT / "core" / "signals" / "l4_mtf_alignment_2_down_mixed_kijun.py",
+        "core/signals/l4_mtf_alignment_2_down_mixed_kijun.py": REPO_ROOT
+        / "core"
+        / "signals"
+        / "l4_mtf_alignment_2_down_mixed_kijun.py",
         "configs/wfo_l6_arc2.yaml": REPO_ROOT / "configs" / "wfo_l6_arc2.yaml",
     }
     for k, v in inputs.items():
@@ -834,19 +1016,20 @@ def _cli() -> int:
     print(f"Arc 2 trades: {trades}")
     t1 = time.time()
     sha1 = run_arc2_characterisation(output_dir=out_dir, arc2_trades_path=trades)
-    print(f"Run #1 done in {time.time()-t1:.1f}s")
+    print(f"Run #1 done in {time.time() - t1:.1f}s")
     if not args.single_run:
         # Re-run to scratch dir, verify byte-identical signals_features.csv.
         import tempfile
+
         tmp = Path(tempfile.mkdtemp(prefix="arc2_char_run2_"))
         sha2 = run_arc2_characterisation(output_dir=tmp, arc2_trades_path=trades)
         if sha1["signals_features.csv"] != sha2["signals_features.csv"]:
-            print(f"!!! DETERMINISM FAIL: signals_features.csv differs between runs")
+            print("!!! DETERMINISM FAIL: signals_features.csv differs between runs")
             print(f"  run1: {sha1['signals_features.csv']}")
             print(f"  run2: {sha2['signals_features.csv']}")
             print(f"  scratch: {tmp}")
             return 1
-        print(f"Determinism OK: signals_features.csv byte-identical across runs.")
+        print("Determinism OK: signals_features.csv byte-identical across runs.")
         # Append determinism receipt to run_manifest.txt
         manifest_path = out_dir / "run_manifest.txt"
         existing = manifest_path.read_text(encoding="utf-8")

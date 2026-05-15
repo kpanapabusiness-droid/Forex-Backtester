@@ -55,17 +55,25 @@ def test_join_keys_correctness() -> None:
 
     labels = _synthetic_labels(100)
     signals = generate_always_fire(labels)
-    joined = join_signals_to_labels(
-        labels, signals, discovery_end="2022-12-31"
-    )
+    joined = join_signals_to_labels(labels, signals, discovery_end="2022-12-31")
     assert len(joined) == len(labels)
     assert set(joined.columns) >= {
-        "pair", "date", "direction", "signal", "signal_name",
-        "zone_a_1r_10", "zone_b_3r_20", "zone_c_6r_40",
+        "pair",
+        "date",
+        "direction",
+        "signal",
+        "signal_name",
+        "zone_a_1r_10",
+        "zone_b_3r_20",
+        "zone_c_6r_40",
     }
     pd.testing.assert_frame_equal(
-        joined[["pair", "date", "direction"]].sort_values(["pair", "date", "direction"]).reset_index(drop=True),
-        labels[["pair", "date", "direction"]].sort_values(["pair", "date", "direction"]).reset_index(drop=True),
+        joined[["pair", "date", "direction"]]
+        .sort_values(["pair", "date", "direction"])
+        .reset_index(drop=True),
+        labels[["pair", "date", "direction"]]
+        .sort_values(["pair", "date", "direction"])
+        .reset_index(drop=True),
     )
 
 
@@ -81,7 +89,9 @@ def test_always_fire_lift_one_coverage_one() -> None:
     metrics = compute_metrics(joined)
     cov = compute_coverage(joined)
 
-    af_global = metrics["metrics_global"][metrics["metrics_global"]["signal_name"] == "always_fire"].iloc[0]
+    af_global = metrics["metrics_global"][
+        metrics["metrics_global"]["signal_name"] == "always_fire"
+    ].iloc[0]
     assert af_global["lift_zone_a_1r_10"] == pytest.approx(1.0)
     assert af_global["lift_zone_b_3r_20"] == pytest.approx(1.0)
     assert af_global["lift_zone_c_6r_40"] == pytest.approx(1.0)
@@ -105,7 +115,9 @@ def test_oracle_behaviour() -> None:
     metrics = compute_metrics(joined)
     cov = compute_coverage(joined)
 
-    ora = metrics["metrics_global"][metrics["metrics_global"]["signal_name"] == "oracle_zone_b"].iloc[0]
+    ora = metrics["metrics_global"][
+        metrics["metrics_global"]["signal_name"] == "oracle_zone_b"
+    ].iloc[0]
     assert ora["p_zone_b_3r_20_given_fire"] == pytest.approx(1.0)
     assert ora["lift_zone_b_3r_20"] >= 10.0
 
@@ -136,10 +148,16 @@ def test_split_logic_discovery_vs_validation() -> None:
     for pair in pairs:
         for d in dates:
             for direction in ("long", "short"):
-                rows.append({
-                    "pair": pair, "date": d, "direction": direction,
-                    "zone_a_1r_10": 0, "zone_b_3r_20": 0, "zone_c_6r_40": 0,
-                })
+                rows.append(
+                    {
+                        "pair": pair,
+                        "date": d,
+                        "direction": direction,
+                        "zone_a_1r_10": 0,
+                        "zone_b_3r_20": 0,
+                        "zone_c_6r_40": 0,
+                    }
+                )
     labels = pd.DataFrame(rows)
     labels["dataset_split"] = labels["date"].apply(
         lambda d: "discovery" if d <= pd.Timestamp("2022-12-31") else "validation"
@@ -165,7 +183,9 @@ def test_minimum_sample_gating() -> None:
     joined = join_signals_to_labels(labels, signals, discovery_end="2022-12-31")
 
     metrics = compute_metrics(joined)
-    af = metrics["metrics_global"][metrics["metrics_global"]["signal_name"] == "always_fire"].iloc[0]
+    af = metrics["metrics_global"][metrics["metrics_global"]["signal_name"] == "always_fire"].iloc[
+        0
+    ]
     assert bool(af["min_fire_ok"]) is True
     assert af["fired"] == len(labels)
 
@@ -194,10 +214,15 @@ def test_metrics_missing_columns_raises() -> None:
     """compute_metrics must fail-fast on missing zone columns."""
     from analytics.phaseD2_metrics import compute_metrics
 
-    df = pd.DataFrame({
-        "pair": ["A"], "date": [pd.Timestamp("2020-01-01")], "direction": ["long"],
-        "signal": [1], "signal_name": ["x"],
-    })
+    df = pd.DataFrame(
+        {
+            "pair": ["A"],
+            "date": [pd.Timestamp("2020-01-01")],
+            "direction": ["long"],
+            "signal": [1],
+            "signal_name": ["x"],
+        }
+    )
     with pytest.raises(ValueError, match="Missing zone"):
         compute_metrics(df)
 
@@ -215,13 +240,15 @@ def test_external_signals_csv_loaded_and_joined(tmp_path: Path) -> None:
     rows = []
     for _, row in labels.iterrows():
         for sig_name in ["proto_a", "proto_b"]:
-            rows.append({
-                "pair": row["pair"],
-                "date": row["date"],
-                "direction": row["direction"],
-                "signal": 1 if sig_name == "proto_a" else 0,
-                "signal_name": sig_name,
-            })
+            rows.append(
+                {
+                    "pair": row["pair"],
+                    "date": row["date"],
+                    "direction": row["direction"],
+                    "signal": 1 if sig_name == "proto_a" else 0,
+                    "signal_name": sig_name,
+                }
+            )
     ext_df = pd.DataFrame(rows)
     ext_df.to_csv(ext_path, index=False)
 
@@ -257,13 +284,15 @@ def test_external_signals_loaded_and_joined(tmp_path: Path) -> None:
 
     labels = _synthetic_labels(200)
     ext_path = tmp_path / "ext_signal.parquet"
-    ext_df = pd.DataFrame({
-        "pair": labels["pair"],
-        "date": labels["date"],
-        "direction": labels["direction"],
-        "signal": (labels["pair"] == "EUR_USD").astype(int),
-        "signal_name": "momentum_3bar",
-    })
+    ext_df = pd.DataFrame(
+        {
+            "pair": labels["pair"],
+            "date": labels["date"],
+            "direction": labels["direction"],
+            "signal": (labels["pair"] == "EUR_USD").astype(int),
+            "signal_name": "momentum_3bar",
+        }
+    )
     ext_df.to_parquet(ext_path, index=False)
 
     cfg = {
@@ -273,9 +302,7 @@ def test_external_signals_loaded_and_joined(tmp_path: Path) -> None:
         "external_signals": [{"path": str(ext_path), "name": "momentum_3bar"}],
     }
     signals = build_control_signals(labels, cfg)
-    joined = join_signals_to_labels(
-        labels, signals, discovery_end="2022-12-31"
-    )
+    joined = join_signals_to_labels(labels, signals, discovery_end="2022-12-31")
 
     sig_names = set(joined["signal_name"].unique())
     assert "always_fire" in sig_names
@@ -301,13 +328,15 @@ def test_external_multi_signal_file_preserves_signal_names(tmp_path: Path) -> No
     rows = []
     for _, row in labels.iterrows():
         for sig_name in ["proto_comp_atrp_low", "proto_ignite_tr_high"]:
-            rows.append({
-                "pair": row["pair"],
-                "date": row["date"],
-                "direction": row["direction"],
-                "signal": 1 if sig_name == "proto_comp_atrp_low" else 0,
-                "signal_name": sig_name,
-            })
+            rows.append(
+                {
+                    "pair": row["pair"],
+                    "date": row["date"],
+                    "direction": row["direction"],
+                    "signal": 1 if sig_name == "proto_comp_atrp_low" else 0,
+                    "signal_name": sig_name,
+                }
+            )
     ext_df = pd.DataFrame(rows)
     ext_df.to_parquet(ext_path, index=False)
 
@@ -318,9 +347,7 @@ def test_external_multi_signal_file_preserves_signal_names(tmp_path: Path) -> No
         "external_signals": [{"path": str(ext_path)}],
     }
     signals = build_control_signals(labels, cfg)
-    joined = join_signals_to_labels(
-        labels, signals, discovery_end="2022-12-31"
-    )
+    joined = join_signals_to_labels(labels, signals, discovery_end="2022-12-31")
 
     sig_names = set(joined["signal_name"].unique())
     assert "proto_comp_atrp_low" in sig_names

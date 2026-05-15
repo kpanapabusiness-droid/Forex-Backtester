@@ -1,4 +1,5 @@
 """Phase 6 — Scaffold tests: configs load, C1/exit variant selection; no full backtest."""
+
 from pathlib import Path
 
 import yaml
@@ -73,10 +74,22 @@ def test_phase6_exit_selection_differs_per_variant():
     c = configs["phase6_variant_C_coral_flip_only_exit.yaml"]
     d1 = configs["phase6_variant_D1_tmf_OR_coral_flip_exit.yaml"]
 
-    assert a["use_exit"] is False and a["exit_on_c1_reversal"] is True and a["exit_on_exit_signal"] is False
+    assert (
+        a["use_exit"] is False
+        and a["exit_on_c1_reversal"] is True
+        and a["exit_on_exit_signal"] is False
+    )
     assert a.get("c1_exit_mode") in ("disagree", None)
-    assert b["use_exit"] is True and b["exit"] == "exit_twiggs_money_flow" and b["exit_on_exit_signal"] is True
-    assert c["use_exit"] is False and c["exit_on_c1_reversal"] is True and c.get("c1_exit_mode") == "flip_only"
+    assert (
+        b["use_exit"] is True
+        and b["exit"] == "exit_twiggs_money_flow"
+        and b["exit_on_exit_signal"] is True
+    )
+    assert (
+        c["use_exit"] is False
+        and c["exit_on_c1_reversal"] is True
+        and c.get("c1_exit_mode") == "flip_only"
+    )
     assert c.get("exit_combine_mode") == "single"
     assert d1["use_exit"] is True and d1["exit"] == "exit_twiggs_money_flow"
     assert d1.get("c1_exit_mode") == "flip_only" and d1.get("exit_combine_mode") == "or"

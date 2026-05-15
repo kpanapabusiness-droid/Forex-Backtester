@@ -49,4 +49,3 @@ def test_churn_hard_reject_limits():
     assert _churn_breach(1.00, 0.60) is True
     assert _churn_breach(1.20, 0.80) is False
     assert _churn_breach(float("nan"), float("nan")) is False
-

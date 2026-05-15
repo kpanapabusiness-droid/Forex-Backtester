@@ -313,6 +313,7 @@ def test_phaseD1_deterministic_outputs_for_same_inputs(tmp_path: Path) -> None:
     assert csv1.read_bytes() == csv2.read_bytes()
 
     from tests.conftest import has_parquet_engine
+
     if has_parquet_engine():
         out1_sorted.to_parquet(pq1, index=False)
         out2_sorted.to_parquet(pq2, index=False)
@@ -325,4 +326,3 @@ def test_phaseD1_deterministic_outputs_for_same_inputs(tmp_path: Path) -> None:
     # Clean up temp dirs (defensive; pytest will usually handle this)
     shutil.rmtree(out_dir1, ignore_errors=True)
     shutil.rmtree(out_dir2, ignore_errors=True)
-

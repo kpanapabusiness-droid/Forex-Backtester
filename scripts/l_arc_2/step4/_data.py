@@ -6,6 +6,7 @@
   matrix construction and for simulator (entry price, OHLC, MAE).
 - held_bar_evolution/t{t}.csv: held-bar context features at bar t.
 """
+
 from __future__ import annotations
 
 from functools import lru_cache
@@ -16,17 +17,24 @@ import pandas as pd
 from . import _common as C
 
 PATH_NUMERIC_PER_BAR = (
-    "open", "high", "low", "close",
+    "open",
+    "high",
+    "low",
+    "close",
     "cum_logret_from_entry",
-    "mfe_to_date_atr", "mae_to_date_atr",
+    "mfe_to_date_atr",
+    "mae_to_date_atr",
 )
 
 HELD_CTX_NUMERIC = (
     "atr_regime_ratio",
-    "broker_spread_pips_raw", "broker_spread_pips_floored",
+    "broker_spread_pips_raw",
+    "broker_spread_pips_floored",
     "cross_pair_dispersion_proxy",
-    "basket_cum_logret_USD", "basket_cum_logret_EUR",
-    "basket_cum_logret_JPY", "basket_cum_logret_GBP",
+    "basket_cum_logret_USD",
+    "basket_cum_logret_EUR",
+    "basket_cum_logret_JPY",
+    "basket_cum_logret_GBP",
 )
 
 
@@ -59,9 +67,20 @@ def load_held_ctx(t: int) -> pd.DataFrame:
 
 @lru_cache(maxsize=1)
 def _load_paths_full() -> pd.DataFrame:
-    cols = ["trade_id", "bar_offset", "open", "high", "low", "close",
-            "cum_logret_from_entry", "mfe_to_date_atr", "mae_to_date_atr",
-            "is_held_bar", "is_forward_bar", "data_end_flag"]
+    cols = [
+        "trade_id",
+        "bar_offset",
+        "open",
+        "high",
+        "low",
+        "close",
+        "cum_logret_from_entry",
+        "mfe_to_date_atr",
+        "mae_to_date_atr",
+        "is_held_bar",
+        "is_forward_bar",
+        "data_end_flag",
+    ]
     df = pd.read_csv(C.PATHS_CSV, usecols=cols)
     return df
 

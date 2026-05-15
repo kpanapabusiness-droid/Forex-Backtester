@@ -3,6 +3,7 @@
 Normalize MT5 W1 OHLCV exports under data/raw/W1_export/ to CSV under data/w1/
 matching the on-disk D1 schema: time, open, high, low, close, tick_volume, spread, real_volume.
 """
+
 from __future__ import annotations
 
 import re

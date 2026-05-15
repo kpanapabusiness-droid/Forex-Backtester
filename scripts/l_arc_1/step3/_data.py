@@ -8,7 +8,10 @@ Outputs:
   DataFrame with one-hot expanded categoricals + standardised numerics.
 - load_t_features(t): the 3d held-bar feature set at slice t.
 """
+
 from __future__ import annotations
+
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -23,11 +26,12 @@ def load_signals() -> pd.DataFrame:
     # ---- derive peak_to_final_r_ratio_fwd_h240 (forward-path version) ----
     eps = 1e-6
     realised_atr_h240 = (
-        df["signal_bar_close"].astype(float) * df["fwd_logret_h240"].astype(float)
+        df["signal_bar_close"].astype(float)
+        * df["fwd_logret_h240"].astype(float)
         / df["atr_at_signal_1h"].astype(float)
     )
-    df["peak_to_final_r_ratio_fwd_h240"] = (
-        realised_atr_h240 / np.maximum(df["fwd_mfe_h240_atr"].astype(float), eps)
+    df["peak_to_final_r_ratio_fwd_h240"] = realised_atr_h240 / np.maximum(
+        df["fwd_mfe_h240_atr"].astype(float), eps
     )
 
     # ---- ensure reached_plus_1_atr_within_240 exists ----
@@ -39,7 +43,9 @@ def load_signals() -> pd.DataFrame:
     return df
 
 
-def compute_v11_new_features(df_signals: pd.DataFrame, cache_path: Path | None = None) -> pd.DataFrame:
+def compute_v11_new_features(
+    df_signals: pd.DataFrame, cache_path: Path | None = None
+) -> pd.DataFrame:
     """Compute v1.1 Amendment 4 features from trade_paths.csv.
 
     Returns a DataFrame with columns:
@@ -54,10 +60,13 @@ def compute_v11_new_features(df_signals: pd.DataFrame, cache_path: Path | None =
     if cache_path is not None and cache_path.exists():
         try:
             cached = pd.read_csv(cache_path)
-            if (cached["trade_id"].values == df_signals["trade_id"].values).all() and \
-               set(["fwd_realized_range_atr",
+            if (cached["trade_id"].values == df_signals["trade_id"].values).all() and set(
+                [
+                    "fwd_realized_range_atr",
                     "fwd_fraction_time_above_entry",
-                    "fwd_max_consecutive_directional_bars"]).issubset(cached.columns):
+                    "fwd_max_consecutive_directional_bars",
+                ]
+            ).issubset(cached.columns):
                 return cached
         except Exception:
             pass
@@ -73,7 +82,7 @@ def compute_v11_new_features(df_signals: pd.DataFrame, cache_path: Path | None =
     n_trades = len(tid_unique)
     n_bars = len(paths) // n_trades
     assert n_trades * n_bars == len(paths), (
-        f"paths is not a regular grid: n_trades*n_bars={n_trades*n_bars} != len={len(paths)}"
+        f"paths is not a regular grid: n_trades*n_bars={n_trades * n_bars} != len={len(paths)}"
     )
 
     lr_cum_mat = paths["fwd_logret_cum"].values.reshape(n_trades, n_bars)
@@ -101,14 +110,14 @@ def compute_v11_new_features(df_signals: pd.DataFrame, cache_path: Path | None =
     group_id = np.cumsum(change, axis=1)
     # For each (row, group_id) find length and sign. Concatenate row offset to
     # make global group ids unique.
-    row_offset = (np.arange(n_trades).reshape(-1, 1) * (group_id.max() + 2))
+    row_offset = np.arange(n_trades).reshape(-1, 1) * (group_id.max() + 2)
     global_gid = (group_id + row_offset).ravel()
     signs_flat = signs.ravel()
     # Aggregate per global gid: count + first sign
     # Use bincount; group sizes summed
     counts = np.bincount(global_gid)
     # first-sign per gid = lookup at first occurrence
-    first_idx = np.full(counts.shape[0], -1, dtype=np.int64)
+    np.full(counts.shape[0], -1, dtype=np.int64)
     # The first occurrence of each gid: it's the smallest index where global_gid==gid;
     # since global_gid is monotonically non-decreasing within rows, the first idx of
     # each gid is its starting index. We can compute via np.diff on global_gid.
@@ -132,12 +141,14 @@ def compute_v11_new_features(df_signals: pd.DataFrame, cache_path: Path | None =
         mask = row_signs != 0
         max_run[i] = int(row_counts[mask].max()) if mask.any() else 0
 
-    out = pd.DataFrame({
-        "trade_id": tid_unique,
-        "fwd_realized_range_atr": realized_range,
-        "fwd_fraction_time_above_entry": frac_above,
-        "fwd_max_consecutive_directional_bars": max_run,
-    })
+    out = pd.DataFrame(
+        {
+            "trade_id": tid_unique,
+            "fwd_realized_range_atr": realized_range,
+            "fwd_fraction_time_above_entry": frac_above,
+            "fwd_max_consecutive_directional_bars": max_run,
+        }
+    )
     out = out.set_index("trade_id").reindex(df_signals["trade_id"].values).reset_index()
 
     if cache_path is not None:
@@ -165,6 +176,7 @@ def load_t_features(t: int) -> pd.DataFrame:
 
 
 # ---- predictor feature set ----------------------------------------------
+
 
 def _onehot(series: pd.Series, prefix: str) -> pd.DataFrame:
     s = series.fillna("__nan__").astype(str)
@@ -209,11 +221,15 @@ def build_signal_time_matrix(df: pd.DataFrame, *, return_meta: bool = False):
         # haircut output).
         source_for = {n: n for n in cols_num}
         source_for.update(cat_meta)
-        meta = pd.DataFrame({
-            "feature": feature_names,
-            "source": [source_for.get(n, n) for n in feature_names],
-            "kind": ["numeric" if n in cols_num else "categorical_dummy" for n in feature_names],
-        })
+        meta = pd.DataFrame(
+            {
+                "feature": feature_names,
+                "source": [source_for.get(n, n) for n in feature_names],
+                "kind": [
+                    "numeric" if n in cols_num else "categorical_dummy" for n in feature_names
+                ],
+            }
+        )
         return X.values.astype(np.float64), feature_names, meta
     return X.values.astype(np.float64), feature_names
 
@@ -227,7 +243,8 @@ def build_t_matrix(df_signals: pd.DataFrame, t: int):
     # first-bar features (available at t>=1)
     fb_num = df_signals[["first_bar_range_atr"]].astype(float)
     fb_num = fb_num.fillna(fb_num.median(numeric_only=True))
-    fb_mu = fb_num.mean(); fb_sd = fb_num.std(ddof=0).replace(0, 1.0)
+    fb_mu = fb_num.mean()
+    fb_sd = fb_num.std(ddof=0).replace(0, 1.0)
     fb_num_z = (fb_num - fb_mu) / fb_sd
 
     fb_dir = _onehot(df_signals["first_bar_direction"], "first_bar_direction")
@@ -237,15 +254,21 @@ def build_t_matrix(df_signals: pd.DataFrame, t: int):
     tdf = load_t_features(t).set_index("trade_id").reindex(df_signals["trade_id"].values)
     tnum = tdf[list(C.FWD_CTX_NUMERIC)].astype(float).reset_index(drop=True)
     tnum = tnum.fillna(tnum.median(numeric_only=True))
-    tmu = tnum.mean(); tsd = tnum.std(ddof=0).replace(0, 1.0)
+    tmu = tnum.mean()
+    tsd = tnum.std(ddof=0).replace(0, 1.0)
     tnum_z = (tnum - tmu) / tsd
     # suffix to disambiguate from signal-time
     tnum_z.columns = [f"{c}_t{t}" for c in tnum_z.columns]
 
-    extra = pd.concat([fb_num_z.reset_index(drop=True),
-                       fb_dir.reset_index(drop=True),
-                       fb_bin.reset_index(drop=True),
-                       tnum_z.reset_index(drop=True)], axis=1)
+    extra = pd.concat(
+        [
+            fb_num_z.reset_index(drop=True),
+            fb_dir.reset_index(drop=True),
+            fb_bin.reset_index(drop=True),
+            tnum_z.reset_index(drop=True),
+        ],
+        axis=1,
+    )
     extra_names = extra.columns.tolist()
 
     X_full = np.concatenate([X_st, extra.values.astype(np.float64)], axis=1)
@@ -263,9 +286,13 @@ def build_t_matrix(df_signals: pd.DataFrame, t: int):
         + ["categorical_dummy"] * fb_bin.shape[1]
         + ["numeric"] * len(C.FWD_CTX_NUMERIC)
     )
-    extra_meta = pd.DataFrame({
-        "feature": extra_names, "source": extra_sources, "kind": extra_kinds,
-    })
+    extra_meta = pd.DataFrame(
+        {
+            "feature": extra_names,
+            "source": extra_sources,
+            "kind": extra_kinds,
+        }
+    )
     meta = pd.concat([meta_st, extra_meta], ignore_index=True)
     return X_full, names_full, meta
 
@@ -277,7 +304,8 @@ def build_cluster_features(df: pd.DataFrame):
     """
     num = df[list(C.CLUSTER_FEATURES_NUMERIC)].astype(float)
     num = num.fillna(num.median(numeric_only=True))
-    mu = num.mean(); sd = num.std(ddof=0).replace(0, 1.0)
+    mu = num.mean()
+    sd = num.std(ddof=0).replace(0, 1.0)
     num_z = (num - mu) / sd
 
     cat_frames = [_onehot(df[c], c) for c in C.CLUSTER_FEATURES_CATEGORICAL]

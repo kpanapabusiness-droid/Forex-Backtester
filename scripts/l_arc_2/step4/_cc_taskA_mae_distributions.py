@@ -41,6 +41,7 @@ semantic change; data inputs are byte-identical to pins). The pin
 verification block records observed-vs-pinned blob hashes plus a
 classification of any drift; it does NOT halt.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -88,18 +89,16 @@ CC1_PINNED_FILE = "scripts/l_arc_2/step4/_cc1_winner_path_diagnostic.py"
 
 # Data sha256 pins from dispatch / OPEN doc / CC-1 receipts.
 DATA_SHA256_PINS = {
-    "trades_post_mechanism_f2_f5.csv":
-        "e76bae339e456946c1674a90694e7906aca28596799746b21dcc405de69054be",
-    "trades_post_mechanism.csv":
-        "e909d2c5e95ddf7765b315541db41aacb48def517ab894be0a2e00371483b744",
-    "winner_paths_bar_by_bar.csv":
-        "1680e3ea642044b4a29aa7242e8009fddaf429872e61f8884c4dbe19b9556122",
+    "trades_post_mechanism_f2_f5.csv": "e76bae339e456946c1674a90694e7906aca28596799746b21dcc405de69054be",
+    "trades_post_mechanism.csv": "e909d2c5e95ddf7765b315541db41aacb48def517ab894be0a2e00371483b744",
+    "winner_paths_bar_by_bar.csv": "1680e3ea642044b4a29aa7242e8009fddaf429872e61f8884c4dbe19b9556122",
 }
 
 
 # ============================================================
 # Hashing / pin verification
 # ============================================================
+
 
 def _sha256_file(path: Path) -> str:
     h = hashlib.sha256()
@@ -116,7 +115,8 @@ def _git_commit_head() -> str:
 
 def _git_blob_at_commit(commit: str, path: str) -> str:
     out = subprocess.check_output(
-        ["git", "rev-parse", f"{commit}:{path}"], cwd=str(REPO),
+        ["git", "rev-parse", f"{commit}:{path}"],
+        cwd=str(REPO),
     )
     return out.decode().strip()
 
@@ -134,8 +134,7 @@ def _diff_w_shortstat(commit_a: str, commit_b: str, path: str) -> str | None:
     """
     try:
         out = subprocess.check_output(
-            ["git", "diff", "-w", "--shortstat",
-             f"{commit_a}..{commit_b}", "--", path],
+            ["git", "diff", "-w", "--shortstat", f"{commit_a}..{commit_b}", "--", path],
             cwd=str(REPO),
         )
         return out.decode().strip()
@@ -146,22 +145,14 @@ def _diff_w_shortstat(commit_a: str, commit_b: str, path: str) -> str | None:
 # Per-file drift classification, anchored to PR #124 diff inspection.
 # Classifications: "no_drift" | "lint_cleanup" | "substantive_unknown" | "file_not_at_pin"
 PR_124_DRIFT_CLASSIFICATION = {
-    "scripts/l_arc_2/step4/_predictor.py":
-        "lint_cleanup: removed 1 blank line; no semantic change",
-    "scripts/l_arc_2/step4/_common.py":
-        "lint_cleanup: removed unused `import numpy as np`; no semantic change",
-    "scripts/l_arc_2/step4/_data.py":
-        "lint_cleanup: removed 1 blank line; no semantic change",
-    "scripts/l_arc_2/step4/_actions.py":
-        "lint_cleanup: removed 2 unused imports + 1 unused local var; no semantic change",
-    "scripts/l_arc_2/step4/_simulator.py":
-        "lint_cleanup: removed 2 unused imports + blank lines; no semantic change",
-    "scripts/l_arc_2/step4/run_step4.py":
-        "lint_cleanup: alphabetised imports + 1 f-string with no substitutions converted to str; no semantic change",
-    "scripts/l_arc_2/step4/_cc0_materialise_f2_f5_delayed_entry.py":
-        "lint_cleanup: removed 1 blank line; no semantic change",
-    "scripts/l_arc_2/step4/_cc1_winner_path_diagnostic.py":
-        "lint_cleanup: removed 1 blank line; no semantic change",
+    "scripts/l_arc_2/step4/_predictor.py": "lint_cleanup: removed 1 blank line; no semantic change",
+    "scripts/l_arc_2/step4/_common.py": "lint_cleanup: removed unused `import numpy as np`; no semantic change",
+    "scripts/l_arc_2/step4/_data.py": "lint_cleanup: removed 1 blank line; no semantic change",
+    "scripts/l_arc_2/step4/_actions.py": "lint_cleanup: removed 2 unused imports + 1 unused local var; no semantic change",
+    "scripts/l_arc_2/step4/_simulator.py": "lint_cleanup: removed 2 unused imports + blank lines; no semantic change",
+    "scripts/l_arc_2/step4/run_step4.py": "lint_cleanup: alphabetised imports + 1 f-string with no substitutions converted to str; no semantic change",
+    "scripts/l_arc_2/step4/_cc0_materialise_f2_f5_delayed_entry.py": "lint_cleanup: removed 1 blank line; no semantic change",
+    "scripts/l_arc_2/step4/_cc1_winner_path_diagnostic.py": "lint_cleanup: removed 1 blank line; no semantic change",
 }
 
 
@@ -185,8 +176,7 @@ def _verify_predictor_source_pin() -> dict:
 
         head_blob = _git_blob_at_commit_safe(head, path)
         pin_blob = _git_blob_at_commit_safe(pin_commit, path)
-        match = (head_blob is not None and pin_blob is not None
-                 and head_blob == pin_blob)
+        match = head_blob is not None and pin_blob is not None and head_blob == pin_blob
         if not match:
             all_blob_match = False
 
@@ -194,9 +184,7 @@ def _verify_predictor_source_pin() -> dict:
         drift_classification = None
         if not match and head_blob is not None and pin_blob is not None:
             diff_w_stat = _diff_w_shortstat(pin_commit, head, path)
-            drift_classification = PR_124_DRIFT_CLASSIFICATION.get(
-                path, "substantive_unknown"
-            )
+            drift_classification = PR_124_DRIFT_CLASSIFICATION.get(path, "substantive_unknown")
             if not drift_classification.startswith("lint_cleanup"):
                 all_drift_classified_lint = False
         elif not match:
@@ -237,12 +225,9 @@ def _verify_predictor_source_pin() -> dict:
 def _verify_data_sha256_pins() -> dict:
     """Verify the three data inputs that have pinned sha256s match."""
     paths = {
-        "trades_post_mechanism_f2_f5.csv":
-            STEP5_OUT / "trades_post_mechanism_f2_f5.csv",
-        "trades_post_mechanism.csv":
-            STEP4_OUT / "trades_post_mechanism.csv",
-        "winner_paths_bar_by_bar.csv":
-            STEP5_OUT / "winner_paths_bar_by_bar.csv",
+        "trades_post_mechanism_f2_f5.csv": STEP5_OUT / "trades_post_mechanism_f2_f5.csv",
+        "trades_post_mechanism.csv": STEP4_OUT / "trades_post_mechanism.csv",
+        "winner_paths_bar_by_bar.csv": STEP5_OUT / "winner_paths_bar_by_bar.csv",
     }
     per_file = {}
     all_match = True
@@ -265,6 +250,7 @@ def _verify_data_sha256_pins() -> dict:
 
 def _versions() -> dict:
     import sklearn
+
     return {
         "python": sys.version.split()[0],
         "numpy": np.__version__,
@@ -277,23 +263,25 @@ def _versions() -> dict:
 # Per-trade entry / ATR / sequence computation (mirror CC-1)
 # ============================================================
 
-def _compute_entry_and_atr(trade_ids: np.ndarray,
-                           signals: pd.DataFrame,
-                           paths_long: pd.DataFrame,
-                           held_ctx_t: pd.DataFrame,
-                           t: int = T_STAR) -> pd.DataFrame:
+
+def _compute_entry_and_atr(
+    trade_ids: np.ndarray,
+    signals: pd.DataFrame,
+    paths_long: pd.DataFrame,
+    held_ctx_t: pd.DataFrame,
+    t: int = T_STAR,
+) -> pd.DataFrame:
     """Byte-identical to CC-1._compute_entry_and_atr. Mirror of
     _simulator.simulate_delayed_entry's entry-price + ATR-at-t computation.
     """
     entry_row = paths_long[
-        (paths_long["trade_id"].isin(trade_ids)) &
-        (paths_long["bar_offset"] == t)
+        (paths_long["trade_id"].isin(trade_ids)) & (paths_long["bar_offset"] == t)
     ].set_index("trade_id")
     entry_price = entry_row["open"].reindex(trade_ids).values
 
-    static = signals.set_index("trade_id").loc[trade_ids,
-                                                ["atr_at_signal_1h",
-                                                 "atr_ratio_to_baseline"]]
+    static = signals.set_index("trade_id").loc[
+        trade_ids, ["atr_at_signal_1h", "atr_ratio_to_baseline"]
+    ]
     atr_sig = static["atr_at_signal_1h"].values
     atr_ratio_signal = static["atr_ratio_to_baseline"].values
 
@@ -308,17 +296,18 @@ def _compute_entry_and_atr(trade_ids: np.ndarray,
     )
     atr_at_entry = atr_sig * scale
 
-    return pd.DataFrame({
-        "trade_id": trade_ids,
-        "entry_price": entry_price,
-        "atr_at_entry": atr_at_entry,
-    })
+    return pd.DataFrame(
+        {
+            "trade_id": trade_ids,
+            "entry_price": entry_price,
+            "atr_at_entry": atr_at_entry,
+        }
+    )
 
 
-def _compute_bar_by_bar_sequences(trades: pd.DataFrame,
-                                   paths_long: pd.DataFrame,
-                                   entry_atr_df: pd.DataFrame,
-                                   source_label: str) -> pd.DataFrame:
+def _compute_bar_by_bar_sequences(
+    trades: pd.DataFrame, paths_long: pd.DataFrame, entry_atr_df: pd.DataFrame, source_label: str
+) -> pd.DataFrame:
     """Mirror CC-1._compute_bar_by_bar_sequences. Works for winners OR
     losers — same formula. Bar window: T_STAR through action_bar inclusive.
     For losers, action_bar is the SL-hit bar (per simulator convention).
@@ -336,9 +325,9 @@ def _compute_bar_by_bar_sequences(trades: pd.DataFrame,
 
         exit_bar = int(trade_meta.at[tid, "action_bar"])
         trade_rows = paths_long[
-            (paths_long["trade_id"] == tid) &
-            (paths_long["bar_offset"] >= T_STAR) &
-            (paths_long["bar_offset"] <= exit_bar)
+            (paths_long["trade_id"] == tid)
+            & (paths_long["bar_offset"] >= T_STAR)
+            & (paths_long["bar_offset"] <= exit_bar)
         ].copy()
         trade_rows = trade_rows.sort_values("bar_offset")
 
@@ -348,24 +337,35 @@ def _compute_bar_by_bar_sequences(trades: pd.DataFrame,
         max_held_R = (bar_high - entry_price) / denom
         min_held_R = (bar_low - entry_price) / denom
 
-        piece = pd.DataFrame({
-            "trade_id": tid,
-            "fold": int(trade_meta.at[tid, "fold"]),
-            "source_set": source_label,
-            "bar_offset": trade_rows["bar_offset"].values.astype(int),
-            "bar_high": bar_high,
-            "bar_low": bar_low,
-            "bar_close": bar_close,
-            "max_held_R": max_held_R,
-            "min_held_R": min_held_R,
-        })
+        piece = pd.DataFrame(
+            {
+                "trade_id": tid,
+                "fold": int(trade_meta.at[tid, "fold"]),
+                "source_set": source_label,
+                "bar_offset": trade_rows["bar_offset"].values.astype(int),
+                "bar_high": bar_high,
+                "bar_low": bar_low,
+                "bar_close": bar_close,
+                "max_held_R": max_held_R,
+                "min_held_R": min_held_R,
+            }
+        )
         pieces.append(piece)
 
     if not pieces:
-        return pd.DataFrame(columns=[
-            "trade_id", "fold", "source_set", "bar_offset",
-            "bar_high", "bar_low", "bar_close", "max_held_R", "min_held_R",
-        ])
+        return pd.DataFrame(
+            columns=[
+                "trade_id",
+                "fold",
+                "source_set",
+                "bar_offset",
+                "bar_high",
+                "bar_low",
+                "bar_close",
+                "max_held_R",
+                "min_held_R",
+            ]
+        )
     return pd.concat(pieces, ignore_index=True)
 
 
@@ -373,8 +373,8 @@ def _compute_bar_by_bar_sequences(trades: pd.DataFrame,
 # Task C — per-trade MAE distributions
 # ============================================================
 
-def _mae_distribution_row(per_trade_mae: pd.Series,
-                          population: str, n_total: int) -> dict:
+
+def _mae_distribution_row(per_trade_mae: pd.Series, population: str, n_total: int) -> dict:
     """Build one row of the mae_distributions.csv table.
     per_trade_mae values are min(min_held_R) per trade — already in R units.
     """
@@ -395,11 +395,13 @@ def _mae_distribution_row(per_trade_mae: pd.Series,
     return row
 
 
-def _compute_mae_distributions(winners_f2_f5_bbb: pd.DataFrame,
-                                winners_f6_f7_bbb: pd.DataFrame,
-                                losers_f2_f5_bbb: pd.DataFrame,
-                                losers_f6_f7_bbb: pd.DataFrame,
-                                counts: dict) -> pd.DataFrame:
+def _compute_mae_distributions(
+    winners_f2_f5_bbb: pd.DataFrame,
+    winners_f6_f7_bbb: pd.DataFrame,
+    losers_f2_f5_bbb: pd.DataFrame,
+    losers_f6_f7_bbb: pd.DataFrame,
+    counts: dict,
+) -> pd.DataFrame:
     rows = []
     for label, bbb, total in [
         ("f2_f5_winners", winners_f2_f5_bbb, counts["f2_f5_winners"]),
@@ -415,6 +417,7 @@ def _compute_mae_distributions(winners_f2_f5_bbb: pd.DataFrame,
 # ============================================================
 # Task D — loser path-to-SL (threshold-crossing tables)
 # ============================================================
+
 
 def _path_to_sl_table(losers_bbb: pd.DataFrame, n_total: int) -> pd.DataFrame:
     """For each threshold X (negative R), find each loser's first bar where
@@ -450,8 +453,8 @@ def _path_to_sl_table(losers_bbb: pd.DataFrame, n_total: int) -> pd.DataFrame:
 # Task E — winner intra-trade MAE timing
 # ============================================================
 
-def _winner_mae_timing(winners_bbb_per_set: dict,
-                        winner_counts: dict) -> pd.DataFrame:
+
+def _winner_mae_timing(winners_bbb_per_set: dict, winner_counts: dict) -> pd.DataFrame:
     """For each winner: bar at which MAE occurred (bar of min min_held_R)
     + max_held_R up to that bar inclusive.
     """
@@ -478,12 +481,8 @@ def _winner_mae_timing(winners_bbb_per_set: dict,
             "mean_bar_of_mae": float(np.mean(bars_arr)) if n > 0 else float("nan"),
         }
         for p in TIMING_PERCENTILES:
-            row[f"p{p}_bar_of_mae"] = (
-                float(np.percentile(bars_arr, p)) if n > 0 else float("nan")
-            )
-        row["mean_max_held_R_to_mae_bar"] = (
-            float(np.mean(max_R_arr)) if n > 0 else float("nan")
-        )
+            row[f"p{p}_bar_of_mae"] = float(np.percentile(bars_arr, p)) if n > 0 else float("nan")
+        row["mean_max_held_R_to_mae_bar"] = float(np.mean(max_R_arr)) if n > 0 else float("nan")
         for p in TIMING_PERCENTILES:
             row[f"p{p}_max_held_R_to_mae_bar"] = (
                 float(np.percentile(max_R_arr, p)) if n > 0 else float("nan")
@@ -499,11 +498,12 @@ def _winner_mae_timing(winners_bbb_per_set: dict,
 # Task F — F2-F5 vs F6+F7 comparison summary
 # ============================================================
 
-def _build_comparison(mae_df: pd.DataFrame,
-                       sl_f2_f5: pd.DataFrame,
-                       sl_f6_f7: pd.DataFrame,
-                       timing_df: pd.DataFrame) -> pd.DataFrame:
+
+def _build_comparison(
+    mae_df: pd.DataFrame, sl_f2_f5: pd.DataFrame, sl_f6_f7: pd.DataFrame, timing_df: pd.DataFrame
+) -> pd.DataFrame:
     """Build mae_comparison_f2_f5_vs_f6_f7.csv summary rows."""
+
     def _mae(stat, pop):
         sub = mae_df[mae_df["population"] == pop]
         return float(sub[stat].iloc[0]) if len(sub) else float("nan")
@@ -517,47 +517,63 @@ def _build_comparison(mae_df: pd.DataFrame,
         return float(sub[col].iloc[0]) if len(sub) else float("nan")
 
     rows = []
-    rows.append({
-        "metric": "winner_median_mae_R",
-        "f2_f5": _mae("p50", "f2_f5_winners"),
-        "f6_f7": _mae("p50", "f6_f7_winners"),
-    })
-    rows.append({
-        "metric": "winner_p5_mae_R",
-        "f2_f5": _mae("p5", "f2_f5_winners"),
-        "f6_f7": _mae("p5", "f6_f7_winners"),
-    })
-    rows.append({
-        "metric": "winner_p95_mae_R",
-        "f2_f5": _mae("p95", "f2_f5_winners"),
-        "f6_f7": _mae("p95", "f6_f7_winners"),
-    })
-    rows.append({
-        "metric": "loser_median_bar_at_-0.5R_cross",
-        "f2_f5": _sl(sl_f2_f5, -0.50, "median_first_cross_bar"),
-        "f6_f7": _sl(sl_f6_f7, -0.50, "median_first_cross_bar"),
-    })
-    rows.append({
-        "metric": "loser_median_bar_at_-0.9R_cross",
-        "f2_f5": _sl(sl_f2_f5, -0.90, "median_first_cross_bar"),
-        "f6_f7": _sl(sl_f6_f7, -0.90, "median_first_cross_bar"),
-    })
-    rows.append({
-        "metric": "median_bar_of_winner_mae",
-        "f2_f5": _timing("f2_f5_winners", "p50_bar_of_mae"),
-        "f6_f7": _timing("f6_f7_winners", "p50_bar_of_mae"),
-    })
+    rows.append(
+        {
+            "metric": "winner_median_mae_R",
+            "f2_f5": _mae("p50", "f2_f5_winners"),
+            "f6_f7": _mae("p50", "f6_f7_winners"),
+        }
+    )
+    rows.append(
+        {
+            "metric": "winner_p5_mae_R",
+            "f2_f5": _mae("p5", "f2_f5_winners"),
+            "f6_f7": _mae("p5", "f6_f7_winners"),
+        }
+    )
+    rows.append(
+        {
+            "metric": "winner_p95_mae_R",
+            "f2_f5": _mae("p95", "f2_f5_winners"),
+            "f6_f7": _mae("p95", "f6_f7_winners"),
+        }
+    )
+    rows.append(
+        {
+            "metric": "loser_median_bar_at_-0.5R_cross",
+            "f2_f5": _sl(sl_f2_f5, -0.50, "median_first_cross_bar"),
+            "f6_f7": _sl(sl_f6_f7, -0.50, "median_first_cross_bar"),
+        }
+    )
+    rows.append(
+        {
+            "metric": "loser_median_bar_at_-0.9R_cross",
+            "f2_f5": _sl(sl_f2_f5, -0.90, "median_first_cross_bar"),
+            "f6_f7": _sl(sl_f6_f7, -0.90, "median_first_cross_bar"),
+        }
+    )
+    rows.append(
+        {
+            "metric": "median_bar_of_winner_mae",
+            "f2_f5": _timing("f2_f5_winners", "p50_bar_of_mae"),
+            "f6_f7": _timing("f6_f7_winners", "p50_bar_of_mae"),
+        }
+    )
     # Add population-mismatch context: loser fraction reached SL & winner counts
-    rows.append({
-        "metric": "loser_fraction_reaching_-0.5R",
-        "f2_f5": _sl(sl_f2_f5, -0.50, "fraction_reached"),
-        "f6_f7": _sl(sl_f6_f7, -0.50, "fraction_reached"),
-    })
-    rows.append({
-        "metric": "loser_fraction_reaching_-1.0R",
-        "f2_f5": _sl(sl_f2_f5, -1.00, "fraction_reached"),
-        "f6_f7": _sl(sl_f6_f7, -1.00, "fraction_reached"),
-    })
+    rows.append(
+        {
+            "metric": "loser_fraction_reaching_-0.5R",
+            "f2_f5": _sl(sl_f2_f5, -0.50, "fraction_reached"),
+            "f6_f7": _sl(sl_f6_f7, -0.50, "fraction_reached"),
+        }
+    )
+    rows.append(
+        {
+            "metric": "loser_fraction_reaching_-1.0R",
+            "f2_f5": _sl(sl_f2_f5, -1.00, "fraction_reached"),
+            "f6_f7": _sl(sl_f6_f7, -1.00, "fraction_reached"),
+        }
+    )
 
     out = pd.DataFrame(rows)
     out["delta_f2_f5_minus_f6_f7"] = out["f2_f5"] - out["f6_f7"]
@@ -567,6 +583,7 @@ def _build_comparison(mae_df: pd.DataFrame,
 # ============================================================
 # Main pipeline
 # ============================================================
+
 
 def _load_inputs():
     f2_f5 = pd.read_csv(STEP5_OUT / "trades_post_mechanism_f2_f5.csv")
@@ -590,8 +607,7 @@ def main() -> dict:
     # Data sha256 pins are STRICT — halt on any mismatch.
     if not data_pin["all_data_sha256_match"]:
         raise RuntimeError(
-            f"Data sha256 pin drift detected:\n"
-            f"{json.dumps(data_pin['per_file'], indent=2)}"
+            f"Data sha256 pin drift detected:\n{json.dumps(data_pin['per_file'], indent=2)}"
         )
 
     f2_f5, f6_f7, signals, paths_long, held_ctx = _load_inputs()
@@ -624,36 +640,27 @@ def main() -> dict:
     )
 
     # Bar-by-bar sequences
-    bbb_win_f2_f5 = _compute_bar_by_bar_sequences(
-        win_f2_f5, paths_long, ea_win_f2_f5, "f2_f5"
-    )
-    bbb_win_f6_f7 = _compute_bar_by_bar_sequences(
-        win_f6_f7, paths_long, ea_win_f6_f7, "f6_f7"
-    )
-    bbb_los_f2_f5 = _compute_bar_by_bar_sequences(
-        los_f2_f5, paths_long, ea_los_f2_f5, "f2_f5"
-    )
-    bbb_los_f6_f7 = _compute_bar_by_bar_sequences(
-        los_f6_f7, paths_long, ea_los_f6_f7, "f6_f7"
-    )
+    bbb_win_f2_f5 = _compute_bar_by_bar_sequences(win_f2_f5, paths_long, ea_win_f2_f5, "f2_f5")
+    bbb_win_f6_f7 = _compute_bar_by_bar_sequences(win_f6_f7, paths_long, ea_win_f6_f7, "f6_f7")
+    bbb_los_f2_f5 = _compute_bar_by_bar_sequences(los_f2_f5, paths_long, ea_los_f2_f5, "f2_f5")
+    bbb_los_f6_f7 = _compute_bar_by_bar_sequences(los_f6_f7, paths_long, ea_los_f6_f7, "f6_f7")
 
     # Loser combined frame
     loser_bbb = pd.concat([bbb_los_f2_f5, bbb_los_f6_f7], ignore_index=True)
-    loser_bbb = loser_bbb.sort_values(
-        ["source_set", "trade_id", "bar_offset"]
-    ).reset_index(drop=True)
+    loser_bbb = loser_bbb.sort_values(["source_set", "trade_id", "bar_offset"]).reset_index(
+        drop=True
+    )
 
     # Cross-check vs CC-1 winner_paths_bar_by_bar.csv: our winner bar-by-bar
     # frame should be byte-equivalent. Record sha256 for receipt.
     winner_bbb = pd.concat([bbb_win_f2_f5, bbb_win_f6_f7], ignore_index=True)
-    winner_bbb = winner_bbb.sort_values(
-        ["source_set", "trade_id", "bar_offset"]
-    ).reset_index(drop=True)
+    winner_bbb = winner_bbb.sort_values(["source_set", "trade_id", "bar_offset"]).reset_index(
+        drop=True
+    )
     # Persist a temp materialisation of our winner frame for the cross-check
     # (in-memory only; we don't write a separate CSV).
     winner_bbb_sha = hashlib.sha256(
-        winner_bbb.to_csv(index=False, float_format="%.10g",
-                           lineterminator="\n").encode("utf-8")
+        winner_bbb.to_csv(index=False, float_format="%.10g", lineterminator="\n").encode("utf-8")
     ).hexdigest()
 
     # Task C — per-trade MAE distributions
@@ -684,28 +691,43 @@ def main() -> dict:
         "loser_path_to_sl_f2_f5.csv": STEP5_OUT / "loser_path_to_sl_f2_f5.csv",
         "loser_path_to_sl_f6_f7.csv": STEP5_OUT / "loser_path_to_sl_f6_f7.csv",
         "winner_mae_timing.csv": STEP5_OUT / "winner_mae_timing.csv",
-        "mae_comparison_f2_f5_vs_f6_f7.csv":
-            STEP5_OUT / "mae_comparison_f2_f5_vs_f6_f7.csv",
+        "mae_comparison_f2_f5_vs_f6_f7.csv": STEP5_OUT / "mae_comparison_f2_f5_vs_f6_f7.csv",
     }
-    loser_bbb.to_csv(paths_out["loser_paths_bar_by_bar.csv"],
-                      index=False, float_format="%.10g", lineterminator="\n")
-    mae_df.to_csv(paths_out["mae_distributions.csv"],
-                   index=False, float_format="%.10g", lineterminator="\n")
-    sl_f2_f5.to_csv(paths_out["loser_path_to_sl_f2_f5.csv"],
-                     index=False, float_format="%.10g", lineterminator="\n")
-    sl_f6_f7.to_csv(paths_out["loser_path_to_sl_f6_f7.csv"],
-                     index=False, float_format="%.10g", lineterminator="\n")
-    timing_df.to_csv(paths_out["winner_mae_timing.csv"],
-                      index=False, float_format="%.10g", lineterminator="\n")
-    cmp_df.to_csv(paths_out["mae_comparison_f2_f5_vs_f6_f7.csv"],
-                   index=False, float_format="%.10g", lineterminator="\n")
+    loser_bbb.to_csv(
+        paths_out["loser_paths_bar_by_bar.csv"],
+        index=False,
+        float_format="%.10g",
+        lineterminator="\n",
+    )
+    mae_df.to_csv(
+        paths_out["mae_distributions.csv"], index=False, float_format="%.10g", lineterminator="\n"
+    )
+    sl_f2_f5.to_csv(
+        paths_out["loser_path_to_sl_f2_f5.csv"],
+        index=False,
+        float_format="%.10g",
+        lineterminator="\n",
+    )
+    sl_f6_f7.to_csv(
+        paths_out["loser_path_to_sl_f6_f7.csv"],
+        index=False,
+        float_format="%.10g",
+        lineterminator="\n",
+    )
+    timing_df.to_csv(
+        paths_out["winner_mae_timing.csv"], index=False, float_format="%.10g", lineterminator="\n"
+    )
+    cmp_df.to_csv(
+        paths_out["mae_comparison_f2_f5_vs_f6_f7.csv"],
+        index=False,
+        float_format="%.10g",
+        lineterminator="\n",
+    )
 
     output_shas = {fname: _sha256_file(p) for fname, p in paths_out.items()}
 
     # Cross-check audit: derived winners' frame vs CC-1 file on disk
-    cc1_winner_bbb_sha = _sha256_file(
-        STEP5_OUT / "winner_paths_bar_by_bar.csv"
-    )
+    cc1_winner_bbb_sha = _sha256_file(STEP5_OUT / "winner_paths_bar_by_bar.csv")
     cc1_cross_check = {
         "cc1_winner_paths_bar_by_bar_sha256": cc1_winner_bbb_sha,
         "this_run_winner_bbb_sha256_in_memory": winner_bbb_sha,
@@ -729,19 +751,15 @@ def main() -> dict:
         "cc1_winner_cross_check": cc1_cross_check,
         "inputs": {
             "trades_post_mechanism_f2_f5.csv": {
-                "path":
-                    "results/l_arc_2/step5_recharacterisation/delayed_entry_t_gb/trades_post_mechanism_f2_f5.csv",
-                "sha256":
-                    _sha256_file(STEP5_OUT / "trades_post_mechanism_f2_f5.csv"),
+                "path": "results/l_arc_2/step5_recharacterisation/delayed_entry_t_gb/trades_post_mechanism_f2_f5.csv",
+                "sha256": _sha256_file(STEP5_OUT / "trades_post_mechanism_f2_f5.csv"),
             },
             "trades_post_mechanism_f6_f7.csv": {
-                "path":
-                    "results/l_arc_2/step4/delayed_entry_t_gb/trades_post_mechanism.csv",
+                "path": "results/l_arc_2/step4/delayed_entry_t_gb/trades_post_mechanism.csv",
                 "sha256": _sha256_file(STEP4_OUT / "trades_post_mechanism.csv"),
             },
             "winner_paths_bar_by_bar.csv": {
-                "path":
-                    "results/l_arc_2/step5_recharacterisation/delayed_entry_t_gb/winner_paths_bar_by_bar.csv",
+                "path": "results/l_arc_2/step5_recharacterisation/delayed_entry_t_gb/winner_paths_bar_by_bar.csv",
                 "sha256": cc1_winner_bbb_sha,
             },
             "signals_features.csv": {
@@ -753,8 +771,7 @@ def main() -> dict:
                 "sha256": _sha256_file(C.PATHS_CSV),
             },
             "held_bar_evolution_t1.csv": {
-                "path":
-                    "results/l_arc_2/step2_descriptive/held_bar_evolution/t1.csv",
+                "path": "results/l_arc_2/step2_descriptive/held_bar_evolution/t1.csv",
                 "sha256": _sha256_file(C.HELD_CTX / "t1.csv"),
             },
         },
@@ -774,6 +791,7 @@ def main() -> dict:
 # Task H — execution-side lookahead invariant test
 # ============================================================
 
+
 def lookahead_invariant_test(n_sample: int = 50, seed: int = 23) -> dict:
     """Mirror CC-1's Task H, but sample mixed winners + losers across both
     source sets. Perturb OHLC at bars > k; assert held R at bars <= k is
@@ -782,10 +800,17 @@ def lookahead_invariant_test(n_sample: int = 50, seed: int = 23) -> dict:
     STEP5_OUT.mkdir(parents=True, exist_ok=True)
     f2_f5, f6_f7, signals, paths_long, held_ctx = _load_inputs()
 
-    all_trades = pd.concat([
-        f2_f5.assign(source_set="f2_f5"),
-        f6_f7.assign(source_set="f6_f7"),
-    ], ignore_index=True).sort_values(["source_set", "trade_id"]).reset_index(drop=True)
+    all_trades = (
+        pd.concat(
+            [
+                f2_f5.assign(source_set="f2_f5"),
+                f6_f7.assign(source_set="f6_f7"),
+            ],
+            ignore_index=True,
+        )
+        .sort_values(["source_set", "trade_id"])
+        .reset_index(drop=True)
+    )
     all_trades["is_winner"] = all_trades["net_r"] > 0
 
     rng = np.random.default_rng(seed)
@@ -817,11 +842,15 @@ def lookahead_invariant_test(n_sample: int = 50, seed: int = 23) -> dict:
             continue
         denom = 2.0 * atr_at_entry
 
-        trade_rows = paths_long[
-            (paths_long["trade_id"] == tid) &
-            (paths_long["bar_offset"] >= T_STAR) &
-            (paths_long["bar_offset"] <= exit_bar)
-        ].sort_values("bar_offset").reset_index(drop=True)
+        trade_rows = (
+            paths_long[
+                (paths_long["trade_id"] == tid)
+                & (paths_long["bar_offset"] >= T_STAR)
+                & (paths_long["bar_offset"] <= exit_bar)
+            ]
+            .sort_values("bar_offset")
+            .reset_index(drop=True)
+        )
         n_bars = len(trade_rows)
         if n_bars < 2:
             continue
@@ -829,14 +858,13 @@ def lookahead_invariant_test(n_sample: int = 50, seed: int = 23) -> dict:
         k_idx = int(rng.integers(low=0, high=n_bars - 1))
         k_bar_offset = int(trade_rows.loc[k_idx, "bar_offset"])
 
-        prefix = trade_rows.iloc[:k_idx + 1]
+        prefix = trade_rows.iloc[: k_idx + 1]
         baseline_max_R = (prefix["high"].values - entry_price) / denom
         baseline_min_R = (prefix["low"].values - entry_price) / denom
 
         paths_perturbed = paths_long.copy()
-        perturb_mask = (
-            (paths_perturbed["trade_id"] == tid) &
-            (paths_perturbed["bar_offset"] > k_bar_offset)
+        perturb_mask = (paths_perturbed["trade_id"] == tid) & (
+            paths_perturbed["bar_offset"] > k_bar_offset
         )
         n_perturb = int(perturb_mask.sum())
         if n_perturb == 0:
@@ -854,26 +882,33 @@ def lookahead_invariant_test(n_sample: int = 50, seed: int = 23) -> dict:
             paths_perturbed.loc[perturb_mask, "close"].values + noise_c
         )
 
-        trade_rows_perturbed = paths_perturbed[
-            (paths_perturbed["trade_id"] == tid) &
-            (paths_perturbed["bar_offset"] >= T_STAR) &
-            (paths_perturbed["bar_offset"] <= exit_bar)
-        ].sort_values("bar_offset").reset_index(drop=True)
-        prefix_perturbed = trade_rows_perturbed.iloc[:k_idx + 1]
+        trade_rows_perturbed = (
+            paths_perturbed[
+                (paths_perturbed["trade_id"] == tid)
+                & (paths_perturbed["bar_offset"] >= T_STAR)
+                & (paths_perturbed["bar_offset"] <= exit_bar)
+            ]
+            .sort_values("bar_offset")
+            .reset_index(drop=True)
+        )
+        prefix_perturbed = trade_rows_perturbed.iloc[: k_idx + 1]
         perturbed_max_R = (prefix_perturbed["high"].values - entry_price) / denom
         perturbed_min_R = (prefix_perturbed["low"].values - entry_price) / denom
 
-        if (np.array_equal(baseline_max_R, perturbed_max_R, equal_nan=True) and
-            np.array_equal(baseline_min_R, perturbed_min_R, equal_nan=True)):
+        if np.array_equal(baseline_max_R, perturbed_max_R, equal_nan=True) and np.array_equal(
+            baseline_min_R, perturbed_min_R, equal_nan=True
+        ):
             byte_identical += 1
         else:
             divergent += 1
-            diffs.append({
-                "trade_id": tid,
-                "k_bar_offset": k_bar_offset,
-                "n_prefix_bars": int(k_idx + 1),
-                "n_perturbed_bars": n_perturb,
-            })
+            diffs.append(
+                {
+                    "trade_id": tid,
+                    "k_bar_offset": k_bar_offset,
+                    "n_prefix_bars": int(k_idx + 1),
+                    "n_perturbed_bars": n_perturb,
+                }
+            )
 
     return {
         "sampled": int(byte_identical + divergent),
@@ -925,8 +960,7 @@ def run_full_dispatch() -> dict:
 
     # Task H — lookahead invariant test
     lookahead = lookahead_invariant_test(n_sample=50, seed=23)
-    lookahead_pass = (lookahead["divergent"] == 0
-                      and lookahead["byte_identical"] >= 1)
+    lookahead_pass = lookahead["divergent"] == 0 and lookahead["byte_identical"] >= 1
 
     receipts = {
         "step": "l_arc_2/step5_recharacterisation/delayed_entry_t_gb/CC_taskA_validation",
@@ -964,13 +998,20 @@ def run_full_dispatch() -> dict:
 if __name__ == "__main__":
     receipts = run_full_dispatch()
     print("CC Task A full dispatch summary:")
-    print(json.dumps({
-        "determinism_pass": receipts["task_g_determinism"]["pass"],
-        "lookahead_pass": receipts["task_h_lookahead_invariant"]["pass"],
-        "lookahead_byte_identical":
-            receipts["task_h_lookahead_invariant"]["byte_identical"],
-        "lookahead_divergent":
-            receipts["task_h_lookahead_invariant"]["divergent"],
-        "lookahead_sample_breakdown":
-            receipts["task_h_lookahead_invariant"]["sample_breakdown"],
-    }, indent=2, default=str))
+    print(
+        json.dumps(
+            {
+                "determinism_pass": receipts["task_g_determinism"]["pass"],
+                "lookahead_pass": receipts["task_h_lookahead_invariant"]["pass"],
+                "lookahead_byte_identical": receipts["task_h_lookahead_invariant"][
+                    "byte_identical"
+                ],
+                "lookahead_divergent": receipts["task_h_lookahead_invariant"]["divergent"],
+                "lookahead_sample_breakdown": receipts["task_h_lookahead_invariant"][
+                    "sample_breakdown"
+                ],
+            },
+            indent=2,
+            default=str,
+        )
+    )

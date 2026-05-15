@@ -105,10 +105,7 @@ def _load_base_config_used(run_dir: Path) -> tuple[str, dict]:
 
 def _fold_metrics_for_run(run_dir: Path) -> list[dict]:
     """Parse each fold_XX/out_of_sample in run_dir; return list of metric dicts (sorted by fold)."""
-    fold_dirs = sorted(
-        p for p in run_dir.iterdir()
-        if p.is_dir() and p.name.startswith("fold_")
-    )
+    fold_dirs = sorted(p for p in run_dir.iterdir() if p.is_dir() and p.name.startswith("fold_"))
     rows: list[dict] = []
     for fold_dir in fold_dirs:
         oos_dir = fold_dir / "out_of_sample"

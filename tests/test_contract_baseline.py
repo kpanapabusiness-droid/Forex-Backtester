@@ -49,9 +49,7 @@ def _call_baseline_with_signal_col(func, df, name: str, signal_col: str = SIGNAL
     except Exception as e:
         raise AssertionError(f"Baseline '{name}' failed with: {e}") from e
     if not isinstance(out, pd.DataFrame):
-        raise AssertionError(
-            f"Baseline '{name}' must return a DataFrame; got {type(out).__name__}"
-        )
+        raise AssertionError(f"Baseline '{name}' must return a DataFrame; got {type(out).__name__}")
     if SIGNAL_COL not in out.columns:
         raise AssertionError(
             f"Baseline contract violation: '{name}' must populate '{SIGNAL_COL}'. "
@@ -147,13 +145,17 @@ def test_baseline_determinism(name, func, test_df):
     out1 = _call_baseline_with_signal_col(func, df1, name)
     out2 = _call_baseline_with_signal_col(func, df2, name)
     pd.testing.assert_series_equal(
-        out1[SIGNAL_COL], out2[SIGNAL_COL],
-        check_names=True, check_exact=False,
+        out1[SIGNAL_COL],
+        out2[SIGNAL_COL],
+        check_names=True,
+        check_exact=False,
         obj=f"Baseline '{name}' determinism (signal)",
     )
     pd.testing.assert_series_equal(
-        out1[BASELINE_COL], out2[BASELINE_COL],
-        check_names=True, check_exact=False,
+        out1[BASELINE_COL],
+        out2[BASELINE_COL],
+        check_names=True,
+        check_exact=False,
         obj=f"Baseline '{name}' determinism (baseline)",
     )
 

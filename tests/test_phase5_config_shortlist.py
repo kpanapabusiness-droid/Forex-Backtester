@@ -1,4 +1,5 @@
 """Phase 5 — Verify only 8 sweep configs exist and only for shortlist identities."""
+
 from pathlib import Path
 
 import yaml
@@ -39,9 +40,12 @@ def test_phase5_shortlist_exists_and_has_eight():
 def test_phase5_exactly_eight_sweep_configs():
     assert PHASE5_DIR.exists(), "configs/phase5/ must exist"
     sweep_files = [
-        f for f in PHASE5_DIR.iterdir()
-        if f.is_file() and f.suffix == ".yaml"
-        and f.name.startswith("phase5_c1_") and f.name.endswith("_sweep.yaml")
+        f
+        for f in PHASE5_DIR.iterdir()
+        if f.is_file()
+        and f.suffix == ".yaml"
+        and f.name.startswith("phase5_c1_")
+        and f.name.endswith("_sweep.yaml")
     ]
     assert len(sweep_files) == 8, (
         f"Expected exactly 8 phase5_c1_*_sweep.yaml files, got {len(sweep_files)}: "
@@ -55,9 +59,7 @@ def test_phase5_sweep_configs_only_for_shortlist_identities():
         data = yaml.safe_load(sweep_path.read_text(encoding="utf-8")) or {}
         c1_name = data.get("c1_name")
         assert c1_name is not None, f"{sweep_path.name} must define c1_name"
-        assert c1_name in allowlist, (
-            f"{sweep_path.name} c1_name={c1_name!r} must be in shortlist"
-        )
+        assert c1_name in allowlist, f"{sweep_path.name} c1_name={c1_name!r} must be in shortlist"
         assert c1_name in EXPECTED_C1_NAMES, (
             f"{sweep_path.name} c1_name must be one of {sorted(EXPECTED_C1_NAMES)}"
         )

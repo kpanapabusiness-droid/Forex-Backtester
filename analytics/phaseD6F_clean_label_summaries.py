@@ -1,6 +1,7 @@
 """
 Phase D-6F: Sanity summaries for clean opportunity labels.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -83,14 +84,16 @@ def _legacy_vs_clean_ordering(clean: pd.DataFrame, legacy: pd.DataFrame) -> pd.D
             if cln_col not in m.columns:
                 continue
             cln_rate = _to_bool(m[cln_col]).mean()
-            rows.append({
-                "pair": pair,
-                "direction": direction,
-                "legacy_rate": leg_rate,
-                "clean_rate": cln_rate,
-                "delta": cln_rate - leg_rate,
-                "note": "expected" if cln_rate <= leg_rate else "clean > legacy",
-            })
+            rows.append(
+                {
+                    "pair": pair,
+                    "direction": direction,
+                    "legacy_rate": leg_rate,
+                    "clean_rate": cln_rate,
+                    "delta": cln_rate - leg_rate,
+                    "note": "expected" if cln_rate <= leg_rate else "clean > legacy",
+                }
+            )
     return pd.DataFrame(rows)
 
 
@@ -113,16 +116,22 @@ def _clean_stability_discovery_vs_validation(clean: pd.DataFrame) -> pd.DataFram
                 disc_rate = _to_bool(disc[col]).mean() if len(disc) else np.nan
                 val_rate = _to_bool(val[col]).mean() if len(val) else np.nan
                 ratio = val_rate / disc_rate if disc_rate and np.isfinite(disc_rate) else np.nan
-                delta = val_rate - disc_rate if np.isfinite(val_rate) and np.isfinite(disc_rate) else np.nan
-                rows.append({
-                    "pair": pair,
-                    "direction": direction,
-                    "x": x,
-                    "discovery_rate": disc_rate,
-                    "validation_rate": val_rate,
-                    "ratio": ratio,
-                    "delta": delta,
-                })
+                delta = (
+                    val_rate - disc_rate
+                    if np.isfinite(val_rate) and np.isfinite(disc_rate)
+                    else np.nan
+                )
+                rows.append(
+                    {
+                        "pair": pair,
+                        "direction": direction,
+                        "x": x,
+                        "discovery_rate": disc_rate,
+                        "validation_rate": val_rate,
+                        "ratio": ratio,
+                        "delta": delta,
+                    }
+                )
     return pd.DataFrame(rows)
 
 
@@ -141,19 +150,21 @@ def _clean_mfe_stats(clean: pd.DataFrame) -> pd.DataFrame:
                 s = s[np.isfinite(s)]
                 if len(s) == 0:
                     continue
-                rows.append({
-                    "pair": pair,
-                    "direction": direction,
-                    "x": x,
-                    "count": int(len(s)),
-                    "mean": float(s.mean()),
-                    "std": float(s.std()) if len(s) > 1 else 0.0,
-                    "p50": float(s.quantile(0.50)),
-                    "p75": float(s.quantile(0.75)),
-                    "p90": float(s.quantile(0.90)),
-                    "p95": float(s.quantile(0.95)),
-                    "max": float(s.max()),
-                })
+                rows.append(
+                    {
+                        "pair": pair,
+                        "direction": direction,
+                        "x": x,
+                        "count": int(len(s)),
+                        "mean": float(s.mean()),
+                        "std": float(s.std()) if len(s) > 1 else 0.0,
+                        "p50": float(s.quantile(0.50)),
+                        "p75": float(s.quantile(0.75)),
+                        "p90": float(s.quantile(0.90)),
+                        "p95": float(s.quantile(0.95)),
+                        "max": float(s.max()),
+                    }
+                )
     return pd.DataFrame(rows)
 
 

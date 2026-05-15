@@ -11,6 +11,7 @@ Per docs/PHASE_L6_ARC1_P2_OPEN.md §3.3 (BLOCKING; CI-enforced):
 
 This test fails CI hard on any lookahead leak in `_attach_concurrent_density`.
 """
+
 from __future__ import annotations
 
 import numpy as np
@@ -18,7 +19,6 @@ import pandas as pd
 import pytest
 
 from core.signals.l4_univariate_extreme import _attach_concurrent_density
-
 
 # ---------------------------------------------------------------------------
 # Synthetic harness
@@ -50,6 +50,7 @@ def _make_pair_signals(fires: dict[str, list[int]]) -> dict[str, pd.DataFrame]:
 # Tests
 # ---------------------------------------------------------------------------
 
+
 def test_no_lookahead_future_bar_does_not_leak() -> None:
     """The §3.3 mandated harness: pair Y firing at bar N+1 must NOT change the
     `concurrent_signals_within_3h` value at pair X bar N."""
@@ -79,9 +80,9 @@ def test_window_includes_two_prior_bars_inclusive() -> None:
     n = 50
     pair_signals = _make_pair_signals(
         {
-            "P00": [n],          # X fires at N
-            "P01": [n - 1],      # one other pair fires at N-1
-            "P02": [n - 2],      # one other pair fires at N-2 (inclusive boundary)
+            "P00": [n],  # X fires at N
+            "P01": [n - 1],  # one other pair fires at N-1
+            "P02": [n - 2],  # one other pair fires at N-2 (inclusive boundary)
         }
     )
     _attach_concurrent_density(pair_signals)

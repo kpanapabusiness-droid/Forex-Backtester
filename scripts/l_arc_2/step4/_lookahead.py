@@ -11,6 +11,7 @@ For trivial-pass categories we don't need to perturb because the feature
 extraction provably doesn't consume bars > N (or > t). The docstring per
 candidate eval logs which category each falls under.
 """
+
 from __future__ import annotations
 
 import numpy as np
@@ -41,10 +42,23 @@ def lookahead_test_filter(filter_fn, signals: pd.DataFrame, n_sample: int = 100)
     mask_orig = filter_fn(sub).astype(bool).values
 
     pert = sub.copy()
-    fwd_cols = [c for c in pert.columns if c.startswith("fwd_")
-                or c.startswith("bars_to_") or c in ("bars_held", "net_r", "gross_r", "mfe_R",
-                                                     "mae_R", "exit_reason", "mfe_held_atr",
-                                                     "mae_held_atr")]
+    fwd_cols = [
+        c
+        for c in pert.columns
+        if c.startswith("fwd_")
+        or c.startswith("bars_to_")
+        or c
+        in (
+            "bars_held",
+            "net_r",
+            "gross_r",
+            "mfe_R",
+            "mae_R",
+            "exit_reason",
+            "mfe_held_atr",
+            "mae_held_atr",
+        )
+    ]
     for c in fwd_cols:
         if pd.api.types.is_numeric_dtype(pert[c]):
             pert[c] = pert[c].values * 0.0 + 99.0

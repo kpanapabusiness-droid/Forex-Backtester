@@ -114,9 +114,7 @@ def run_trade_shuffling(
         max_consec = max_consecutive_losses(shuffled_pnl)
         ending_equity = float(equity.iloc[-1]) if len(equity) > 0 else starting_balance
         ending_roi_pct = (
-            (ending_equity / starting_balance - 1.0) * 100.0
-            if starting_balance > 0
-            else 0.0
+            (ending_equity / starting_balance - 1.0) * 100.0 if starting_balance > 0 else 0.0
         )
         worst_ptt = _worst_peak_to_trough_dollars(equity)
         rows.append(

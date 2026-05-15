@@ -12,10 +12,10 @@ Metrics: pooled AUC (leave-one-fold-out concatenated), per-fold AUC, partial AUC
 at worst-decile cutoff (Amendment 9), top-K feature importance, calibration
 (Brier + reliability bins).
 """
+
 from __future__ import annotations
 
 import numpy as np
-import pandas as pd
 from sklearn.ensemble import (
     HistGradientBoostingClassifier,
     RandomForestClassifier,
@@ -34,8 +34,7 @@ def safe_auc(y: np.ndarray, scores: np.ndarray) -> float:
     return float(roc_auc_score(y, scores))
 
 
-def partial_auc_worst_decile(y: np.ndarray, scores: np.ndarray,
-                             cutoff_frac: float = 0.10) -> float:
+def partial_auc_worst_decile(y: np.ndarray, scores: np.ndarray, cutoff_frac: float = 0.10) -> float:
     """Amendment 9: AUC restricted to the worst-decile slice."""
     if len(np.unique(y)) < 2:
         return float("nan")
@@ -57,8 +56,9 @@ def tune_logreg_C(X: np.ndarray, y: np.ndarray, seed: int) -> float:
         aucs = []
         for tr, va in skf.split(X, y):
             try:
-                clf = LogisticRegression(penalty="l2", C=cval, solver="lbfgs",
-                                         max_iter=1000, random_state=seed)
+                clf = LogisticRegression(
+                    penalty="l2", C=cval, solver="lbfgs", max_iter=1000, random_state=seed
+                )
                 clf.fit(X[tr], y[tr])
                 aucs.append(safe_auc(y[va], clf.predict_proba(X[va])[:, 1]))
             except Exception:
@@ -72,23 +72,28 @@ def tune_logreg_C(X: np.ndarray, y: np.ndarray, seed: int) -> float:
 
 def _make_clf(model: str, seed: int):
     if model == "logreg":
-        return LogisticRegression(penalty="l2", C=1.0, solver="lbfgs",
-                                  max_iter=1000, random_state=seed)
+        return LogisticRegression(
+            penalty="l2", C=1.0, solver="lbfgs", max_iter=1000, random_state=seed
+        )
     if model == "tree":
         return DecisionTreeClassifier(max_depth=3, random_state=seed)
     if model == "rf":
-        return RandomForestClassifier(n_estimators=200, max_depth=5,
-                                      random_state=seed, n_jobs=-1)
+        return RandomForestClassifier(n_estimators=200, max_depth=5, random_state=seed, n_jobs=-1)
     if model == "gb":
-        return HistGradientBoostingClassifier(max_iter=200, max_depth=3,
-                                              learning_rate=0.05,
-                                              random_state=seed)
+        return HistGradientBoostingClassifier(
+            max_iter=200, max_depth=3, learning_rate=0.05, random_state=seed
+        )
     raise ValueError(f"Unknown model {model!r}")
 
 
-def run_model_perfold(model: str, X: np.ndarray, y: np.ndarray,
-                      fold_id: np.ndarray, seed: int,
-                      tune_logreg: bool = True) -> dict:
+def run_model_perfold(
+    model: str,
+    X: np.ndarray,
+    y: np.ndarray,
+    fold_id: np.ndarray,
+    seed: int,
+    tune_logreg: bool = True,
+) -> dict:
     """Run a model with per-fold leave-one-fold-out AUC + pooled AUC + importance."""
     folds = np.unique(fold_id)
     perfold_auc = {}
@@ -107,8 +112,9 @@ def run_model_perfold(model: str, X: np.ndarray, y: np.ndarray,
                 tr_is = tr_mask & np.isin(fold_id, [1, 2, 3, 4, 5])
                 if tr_is.sum() >= 50 and len(np.unique(y[tr_is])) > 1:
                     C_use = tune_logreg_C(X[tr_is], y[tr_is], seed=seed + int(f))
-            clf = LogisticRegression(penalty="l2", C=C_use, solver="lbfgs",
-                                     max_iter=1000, random_state=seed + int(f))
+            clf = LogisticRegression(
+                penalty="l2", C=C_use, solver="lbfgs", max_iter=1000, random_state=seed + int(f)
+            )
         else:
             clf = _make_clf(model, seed + int(f))
         clf.fit(X[tr_mask], y[tr_mask])
@@ -130,8 +136,9 @@ def run_model_perfold(model: str, X: np.ndarray, y: np.ndarray,
                 tr_is = tr_mask & np.isin(fold_id, [1, 2, 3, 4, 5])
                 if tr_is.sum() >= 50 and len(np.unique(y[tr_is])) > 1:
                     C_use = tune_logreg_C(X[tr_is], y[tr_is], seed=seed + 7 + int(f))
-            clf = LogisticRegression(penalty="l2", C=C_use, solver="lbfgs",
-                                     max_iter=1000, random_state=seed + 7 + int(f))
+            clf = LogisticRegression(
+                penalty="l2", C=C_use, solver="lbfgs", max_iter=1000, random_state=seed + 7 + int(f)
+            )
         else:
             clf = _make_clf(model, seed + 7 + int(f))
         clf.fit(X[tr_mask], y[tr_mask])
@@ -139,8 +146,11 @@ def run_model_perfold(model: str, X: np.ndarray, y: np.ndarray,
     valid = ~np.isnan(all_scores)
     pooled_auc = safe_auc(y[valid], all_scores[valid]) if valid.any() else float("nan")
     partial_auc = (
-        partial_auc_worst_decile(y[valid], all_scores[valid], cutoff_frac=C.PARTIAL_AUC_DECILE_CUTOFF)
-        if valid.any() else float("nan")
+        partial_auc_worst_decile(
+            y[valid], all_scores[valid], cutoff_frac=C.PARTIAL_AUC_DECILE_CUTOFF
+        )
+        if valid.any()
+        else float("nan")
     )
 
     is_mask = np.isin(fold_id, [1, 2, 3, 4, 5])
@@ -155,8 +165,9 @@ def run_model_perfold(model: str, X: np.ndarray, y: np.ndarray,
             C_use = 1.0
             if tune_logreg and len(tr) >= 50:
                 C_use = tune_logreg_C(Xi[tr], yi[tr], seed=seed + 100)
-            clf = LogisticRegression(penalty="l2", C=C_use, solver="lbfgs",
-                                     max_iter=1000, random_state=seed + 100)
+            clf = LogisticRegression(
+                penalty="l2", C=C_use, solver="lbfgs", max_iter=1000, random_state=seed + 100
+            )
             clf.fit(Xi[tr], yi[tr])
             cv_aucs.append(safe_auc(yi[va], clf.predict_proba(Xi[va])[:, 1]))
 
@@ -164,9 +175,14 @@ def run_model_perfold(model: str, X: np.ndarray, y: np.ndarray,
     if model == "logreg":
         C_use = 1.0
         if tune_logreg:
-            C_use = tune_logreg_C(X[is_mask], y[is_mask], seed=seed + 200) if is_mask.sum() > 50 else 1.0
-        clf_full = LogisticRegression(penalty="l2", C=C_use, solver="lbfgs",
-                                      max_iter=1000, random_state=seed + 200)
+            C_use = (
+                tune_logreg_C(X[is_mask], y[is_mask], seed=seed + 200)
+                if is_mask.sum() > 50
+                else 1.0
+            )
+        clf_full = LogisticRegression(
+            penalty="l2", C=C_use, solver="lbfgs", max_iter=1000, random_state=seed + 200
+        )
         clf_full.fit(X, y)
         coef = clf_full.coef_[0]
         importance = np.abs(coef)
@@ -177,22 +193,25 @@ def run_model_perfold(model: str, X: np.ndarray, y: np.ndarray,
         importance = clf_full.feature_importances_
         cmeta = {}
     elif model == "rf":
-        clf_full = RandomForestClassifier(n_estimators=200, max_depth=5,
-                                          random_state=seed + 200, n_jobs=-1)
+        clf_full = RandomForestClassifier(
+            n_estimators=200, max_depth=5, random_state=seed + 200, n_jobs=-1
+        )
         clf_full.fit(X, y)
         importance = clf_full.feature_importances_
         cmeta = {}
     elif model == "gb":
-        clf_full = HistGradientBoostingClassifier(max_iter=200, max_depth=3,
-                                                  learning_rate=0.05,
-                                                  random_state=seed + 200)
+        clf_full = HistGradientBoostingClassifier(
+            max_iter=200, max_depth=3, learning_rate=0.05, random_state=seed + 200
+        )
         clf_full.fit(X, y)
         from sklearn.inspection import permutation_importance
+
         rng_imp = np.random.default_rng(seed + 300)
         sub_idx = rng_imp.choice(len(X), size=min(2000, len(X)), replace=False)
         try:
-            r = permutation_importance(clf_full, X[sub_idx], y[sub_idx],
-                                       n_repeats=3, random_state=seed + 300, n_jobs=1)
+            r = permutation_importance(
+                clf_full, X[sub_idx], y[sub_idx], n_repeats=3, random_state=seed + 300, n_jobs=1
+            )
             importance = r.importances_mean
         except Exception:
             importance = np.zeros(X.shape[1])

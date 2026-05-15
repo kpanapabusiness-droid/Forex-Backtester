@@ -1,4 +1,4 @@
- # ruff: noqa: I001
+# ruff: noqa: I001
 import numpy as np
 import pandas as pd
 import pytest
@@ -64,9 +64,7 @@ def test_volume_volatility_ratio_mt4_basic():
 
 def test_volume_silence_basic():
     df = _make_ohlcv()
-    out = volume_silence(
-        df.copy(), length=12, buffer_size=24, signal_col="volume_signal"
-    )
+    out = volume_silence(df.copy(), length=12, buffer_size=24, signal_col="volume_signal")
     assert len(out) == len(df)
     _assert_gate(out, warmup=30)
 
@@ -86,9 +84,7 @@ def test_volume_stiffness_basic():
 
 def test_volume_william_vix_fix_basic():
     df = _make_ohlcv()
-    out = volume_william_vix_fix(
-        df.copy(), length=22, threshold=20.0, signal_col="volume_signal"
-    )
+    out = volume_william_vix_fix(df.copy(), length=22, threshold=20.0, signal_col="volume_signal")
     assert len(out) == len(df)
     _assert_gate(out, warmup=22)
 
@@ -106,5 +102,3 @@ def test_volume_waddah_attar_explosion_basic():
     )
     assert len(out) == len(df)
     _assert_gate(out, warmup=60)
-
-

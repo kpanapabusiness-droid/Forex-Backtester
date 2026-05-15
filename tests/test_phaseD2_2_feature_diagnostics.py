@@ -24,14 +24,16 @@ def _make_synthetic_ohlc(n: int, start: str = "2019-01-01") -> pd.DataFrame:
     low = close - np.abs(np.random.randn(n) * 0.001)
     open_ = np.roll(close, 1)
     open_[0] = close[0]
-    df = pd.DataFrame({
-        "date": dates,
-        "open": open_,
-        "high": high,
-        "low": low,
-        "close": close,
-        "volume": np.zeros(n),
-    })
+    df = pd.DataFrame(
+        {
+            "date": dates,
+            "open": open_,
+            "high": high,
+            "low": low,
+            "close": close,
+            "volume": np.zeros(n),
+        }
+    )
     df["high"] = np.maximum(df["high"], np.maximum(df["open"], df["close"]))
     df["low"] = np.minimum(df["low"], np.minimum(df["open"], df["close"]))
     return df
@@ -84,24 +86,20 @@ def test_bin_edge_freeze_discovery_only() -> None:
     np.random.seed(123)
     disc_vals = np.random.randn(300) * 10
     val_vals = np.random.randn(200) * 10 + 5
-    df = pd.DataFrame({
-        "feature_x": np.concatenate([disc_vals, val_vals]),
-        "dataset_split": ["discovery"] * 300 + ["validation"] * 200,
-    })
-    edges = compute_bin_edges_from_discovery(
-        df, "feature_x", n_bins=10, min_per_bin=20
+    df = pd.DataFrame(
+        {
+            "feature_x": np.concatenate([disc_vals, val_vals]),
+            "dataset_split": ["discovery"] * 300 + ["validation"] * 200,
+        }
     )
+    edges = compute_bin_edges_from_discovery(df, "feature_x", n_bins=10, min_per_bin=20)
     assert edges is not None
     assert len(edges) == 11
     assert edges[0] == -np.inf
     assert edges[-1] == np.inf
 
-    disc_bins = apply_bin_edges(
-        df.loc[df["dataset_split"] == "discovery", "feature_x"], edges
-    )
-    val_bins = apply_bin_edges(
-        df.loc[df["dataset_split"] == "validation", "feature_x"], edges
-    )
+    disc_bins = apply_bin_edges(df.loc[df["dataset_split"] == "discovery", "feature_x"], edges)
+    val_bins = apply_bin_edges(df.loc[df["dataset_split"] == "validation", "feature_x"], edges)
     assert disc_bins.min() >= 0
     assert disc_bins.max() <= 9
     assert val_bins.min() >= 0
@@ -122,13 +120,15 @@ def test_determinism_same_input_same_ranking() -> None:
     cfg = _minimal_d22_cfg()
     feats = compute_features_for_pair(df, cfg)
 
-    labels = pd.DataFrame({
-        "pair": ["TEST"] * 798,
-        "date": list(pd.date_range("2019-01-02", periods=399, freq="D")) * 2,
-        "direction": ["long"] * 399 + ["short"] * 399,
-        "zone_b_3r_20": np.random.rand(798) > 0.9,
-        "zone_c_6r_40": np.random.rand(798) > 0.95,
-    })
+    labels = pd.DataFrame(
+        {
+            "pair": ["TEST"] * 798,
+            "date": list(pd.date_range("2019-01-02", periods=399, freq="D")) * 2,
+            "direction": ["long"] * 399 + ["short"] * 399,
+            "zone_b_3r_20": np.random.rand(798) > 0.9,
+            "zone_c_6r_40": np.random.rand(798) > 0.95,
+        }
+    )
     labels["date"] = pd.to_datetime(labels["date"])
     labels["dataset_split"] = labels["date"].apply(
         lambda d: "discovery" if d <= pd.Timestamp("2022-12-31") else "validation"
@@ -146,9 +146,7 @@ def test_determinism_same_input_same_ranking() -> None:
     bin_edges = {}
     for f in FEATURE_NAMES:
         if f in joined.columns:
-            bin_edges[f] = compute_bin_edges_from_discovery(
-                joined, f, n_bins=10, min_per_bin=20
-            )
+            bin_edges[f] = compute_bin_edges_from_discovery(joined, f, n_bins=10, min_per_bin=20)
 
     r1 = compute_feature_rankings(joined, bin_edges, ZONE_B, {"discovery_end": "2022-12-31"})
     r2 = compute_feature_rankings(joined, bin_edges, ZONE_B, {"discovery_end": "2022-12-31"})

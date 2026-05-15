@@ -60,23 +60,37 @@ def compute_metrics(
         f = int(grp_fire_bool.sum())
 
         # Global
-        row_global = _metric_row(
-            name, grp, grp_fire_bool, n, f, split=None, pair=None
-        )
+        row_global = _metric_row(name, grp, grp_fire_bool, n, f, split=None, pair=None)
         results["global"].append(row_global)
 
         # By split
         if "dataset_split" in grp.columns:
             for split_val, sgrp in grp.groupby("dataset_split", sort=True):
                 sf = int(sgrp[signal_col].fillna(0).astype(int).ne(0).sum())
-                row_split = _metric_row(name, sgrp, sgrp[signal_col].fillna(0).astype(int).ne(0).astype(int), len(sgrp), sf, split=split_val, pair=None)
+                row_split = _metric_row(
+                    name,
+                    sgrp,
+                    sgrp[signal_col].fillna(0).astype(int).ne(0).astype(int),
+                    len(sgrp),
+                    sf,
+                    split=split_val,
+                    pair=None,
+                )
                 results["split"].append(row_split)
 
         # By pair
         if "pair" in grp.columns:
             for pair_val, pgrp in grp.groupby("pair", sort=True):
                 pf = int(pgrp[signal_col].fillna(0).astype(int).ne(0).sum())
-                row_pair = _metric_row(name, pgrp, pgrp[signal_col].fillna(0).astype(int).ne(0).astype(int), len(pgrp), pf, split=None, pair=pair_val)
+                row_pair = _metric_row(
+                    name,
+                    pgrp,
+                    pgrp[signal_col].fillna(0).astype(int).ne(0).astype(int),
+                    len(pgrp),
+                    pf,
+                    split=None,
+                    pair=pair_val,
+                )
                 results["pair"].append(row_pair)
 
     return {

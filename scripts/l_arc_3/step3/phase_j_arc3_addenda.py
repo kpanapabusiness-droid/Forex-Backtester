@@ -33,6 +33,7 @@ Descriptive only (op spec §11.5). The ## Verdict text is the ONE place
 where the planner writes action-shaped reasoning; this script only sets up
 the data structure the verdict reads.
 """
+
 # ruff: noqa: E402, E701, E702, F841, I001, F401
 from __future__ import annotations
 
@@ -72,15 +73,27 @@ def _stats_for_arr(arr: np.ndarray) -> Dict[str, float]:
     finite = arr[np.isfinite(arr)]
     n = int(finite.size)
     if n < 2:
-        return {"n": n, "mean": float("nan"), "std": float("nan"),
-                "p5": float("nan"), "p25": float("nan"), "p50": float("nan"),
-                "p75": float("nan"), "p95": float("nan")}
+        return {
+            "n": n,
+            "mean": float("nan"),
+            "std": float("nan"),
+            "p5": float("nan"),
+            "p25": float("nan"),
+            "p50": float("nan"),
+            "p75": float("nan"),
+            "p95": float("nan"),
+        }
     p5, p25, p50, p75, p95 = np.percentile(finite, [5, 25, 50, 75, 95])
-    return {"n": n,
-            "mean": float(np.mean(finite)),
-            "std": float(np.std(finite, ddof=1)),
-            "p5": float(p5), "p25": float(p25), "p50": float(p50),
-            "p75": float(p75), "p95": float(p95)}
+    return {
+        "n": n,
+        "mean": float(np.mean(finite)),
+        "std": float(np.std(finite, ddof=1)),
+        "p5": float(p5),
+        "p25": float(p25),
+        "p50": float(p50),
+        "p75": float(p75),
+        "p95": float(p95),
+    }
 
 
 def cluster_direction_split() -> Path:
@@ -112,16 +125,25 @@ def cluster_direction_split() -> Path:
                 n_dir = len(d_sub)
                 net_r_arr = d_sub["net_r"].to_numpy(dtype=float)
                 s = _stats_for_arr(net_r_arr)
-                rows.append({
-                    "algo": algo, "K": K, "role": role, "cluster_id": cid,
-                    "direction": direction,
-                    "n_in_cluster": n_cluster,
-                    "n_in_direction_within_cluster": n_dir,
-                    "frac_of_cluster": (n_dir / n_cluster) if n_cluster else float("nan"),
-                    "mean_net_r": s["mean"], "std_net_r": s["std"],
-                    "p5_net_r": s["p5"], "p25_net_r": s["p25"], "p50_net_r": s["p50"],
-                    "p75_net_r": s["p75"], "p95_net_r": s["p95"],
-                })
+                rows.append(
+                    {
+                        "algo": algo,
+                        "K": K,
+                        "role": role,
+                        "cluster_id": cid,
+                        "direction": direction,
+                        "n_in_cluster": n_cluster,
+                        "n_in_direction_within_cluster": n_dir,
+                        "frac_of_cluster": (n_dir / n_cluster) if n_cluster else float("nan"),
+                        "mean_net_r": s["mean"],
+                        "std_net_r": s["std"],
+                        "p5_net_r": s["p5"],
+                        "p25_net_r": s["p25"],
+                        "p50_net_r": s["p50"],
+                        "p75_net_r": s["p75"],
+                        "p95_net_r": s["p95"],
+                    }
+                )
     out = OUT / "cluster_direction_split.csv"
     pd.DataFrame(rows).to_csv(out, index=False, lineterminator="\n")
     print(f"  wrote {out}")
@@ -149,11 +171,16 @@ def signal_bar_direction_carry_tiers(perms: int = 200) -> Path:
     rng = np.random.default_rng(rng_base_seed)
 
     for _, t in targets.iterrows():
-        algo = str(t["algo"]); K = int(t["K"])
+        algo = str(t["algo"])
+        K = int(t["K"])
         target_cid = int(t["target_cluster_id"])
         if target_cid in (-999, -2):
             continue
-        col_name = f"K{K}_{algo}" if algo != "hdbscan" else (f"K{K}_hdbscan" if f"K{K}_hdbscan" in merged.columns else "hdbscan")
+        col_name = (
+            f"K{K}_{algo}"
+            if algo != "hdbscan"
+            else (f"K{K}_hdbscan" if f"K{K}_hdbscan" in merged.columns else "hdbscan")
+        )
         if col_name not in merged.columns:
             continue
         y_target = (merged[col_name].values == target_cid).astype(int)
@@ -181,16 +208,23 @@ def signal_bar_direction_carry_tiers(perms: int = 200) -> Path:
             tier = 2
         else:
             tier = 3
-        rows.append({
-            "feature": "signal_bar_direction_is_up",
-            "carry_family": "signal_bar_direction (new pre-registration; arc-3 step-2 finding)",
-            "algo": algo, "K": K, "target_cluster_id": target_cid,
-            "auc_vs_target": auc, "abs_lift_from_0.5": eff,
-            "perm_p_value": p_val, "tier": tier,
-            "n_perms": int(perms), "is_historical_arc1_carrier": False,
-            "is_arc2_carry_promoted_to_mandatory": False,
-            "is_new_pre_registration_arc3": True,
-        })
+        rows.append(
+            {
+                "feature": "signal_bar_direction_is_up",
+                "carry_family": "signal_bar_direction (new pre-registration; arc-3 step-2 finding)",
+                "algo": algo,
+                "K": K,
+                "target_cluster_id": target_cid,
+                "auc_vs_target": auc,
+                "abs_lift_from_0.5": eff,
+                "perm_p_value": p_val,
+                "tier": tier,
+                "n_perms": int(perms),
+                "is_historical_arc1_carrier": False,
+                "is_arc2_carry_promoted_to_mandatory": False,
+                "is_new_pre_registration_arc3": True,
+            }
+        )
 
     out = OUT / "signal_bar_direction_carry.csv"
     pd.DataFrame(rows).to_csv(out, index=False, lineterminator="\n")
@@ -235,7 +269,8 @@ def _build_verdict_table() -> str:
     # Build column keys: (algo, K, role) — only K=2 + HDBSCAN per task spec.
     cols: List[Tuple[str, int, str, int]] = []
     for _, t in target_sel.iterrows():
-        algo = str(t["algo"]); K = int(t["K"])
+        algo = str(t["algo"])
+        K = int(t["K"])
         if algo == "hdbscan" or K == 2:
             for role in ("target", "mirror"):
                 cid = int(t[f"{role}_cluster_id"])
@@ -247,34 +282,61 @@ def _build_verdict_table() -> str:
         if pred_auc.empty:
             return "n/a"
         # signal-time AUC for THIS cluster as target
-        sub = pred_auc[
-            (pred_auc["algo"] == algo) & (pred_auc["K"] == K) &
-            (pred_auc["target_cluster_id"] == cid)
-        ] if "target_cluster_id" in pred_auc.columns else pd.DataFrame()
-        max_st = float("nan") if sub.empty else float(sub["pooled_auc"].max()) if "pooled_auc" in sub.columns else float(sub.select_dtypes(include="number").max().max())
+        sub = (
+            pred_auc[
+                (pred_auc["algo"] == algo)
+                & (pred_auc["K"] == K)
+                & (pred_auc["target_cluster_id"] == cid)
+            ]
+            if "target_cluster_id" in pred_auc.columns
+            else pd.DataFrame()
+        )
+        max_st = (
+            float("nan")
+            if sub.empty
+            else float(sub["pooled_auc"].max())
+            if "pooled_auc" in sub.columns
+            else float(sub.select_dtypes(include="number").max().max())
+        )
         # held-bar AUC
-        sub_t = pred_by_t[
-            (pred_by_t["algo"] == algo) & (pred_by_t["K"] == K) &
-            (pred_by_t["target_cluster_id"] == cid)
-        ] if (not pred_by_t.empty and "target_cluster_id" in pred_by_t.columns) else pd.DataFrame()
-        max_held = float("nan") if sub_t.empty else float(sub_t["pooled_auc"].max()) if "pooled_auc" in sub_t.columns else float("nan")
-        cond_pass = (
-            (np.isfinite(max_st) and max_st > 0.65)
-            or (np.isfinite(max_held) and max_held > 0.70)
+        sub_t = (
+            pred_by_t[
+                (pred_by_t["algo"] == algo)
+                & (pred_by_t["K"] == K)
+                & (pred_by_t["target_cluster_id"] == cid)
+            ]
+            if (not pred_by_t.empty and "target_cluster_id" in pred_by_t.columns)
+            else pd.DataFrame()
+        )
+        max_held = (
+            float("nan")
+            if sub_t.empty
+            else float(sub_t["pooled_auc"].max())
+            if "pooled_auc" in sub_t.columns
+            else float("nan")
+        )
+        cond_pass = (np.isfinite(max_st) and max_st > 0.65) or (
+            np.isfinite(max_held) and max_held > 0.70
         )
         return f"{'PASS' if cond_pass else 'FAIL'} (sig-time max AUC {max_st:.3f}; held t≤20 max AUC {max_held:.3f})"
 
     def _effect_cell(algo: str, K: int, role: str, cid: int) -> str:
         if effect_sz.empty:
             return "n/a"
-        sub = effect_sz[
-            (effect_sz["algo"] == algo) & (effect_sz["K"] == K) &
-            (effect_sz["cluster_id"] == cid)
-        ] if "cluster_id" in effect_sz.columns else pd.DataFrame()
+        sub = (
+            effect_sz[
+                (effect_sz["algo"] == algo)
+                & (effect_sz["K"] == K)
+                & (effect_sz["cluster_id"] == cid)
+            ]
+            if "cluster_id" in effect_sz.columns
+            else pd.DataFrame()
+        )
         if sub.empty:
             return "n/a (no row in cluster_effect_sizes.csv)"
         # Count number of effect-size criteria PASSed (op-spec §8)
-        passes = 0; total = 0
+        passes = 0
+        total = 0
         for col in sub.columns:
             if col.startswith("passes_") and col.endswith("_threshold"):
                 total += 1
@@ -288,10 +350,15 @@ def _build_verdict_table() -> str:
     def _size_cell(algo: str, K: int, role: str, cid: int) -> str:
         if size_elig.empty:
             return "n/a"
-        sub = size_elig[
-            (size_elig["algo"] == algo) & (size_elig["K"] == K) &
-            (size_elig["cluster_id"] == cid)
-        ] if "cluster_id" in size_elig.columns else pd.DataFrame()
+        sub = (
+            size_elig[
+                (size_elig["algo"] == algo)
+                & (size_elig["K"] == K)
+                & (size_elig["cluster_id"] == cid)
+            ]
+            if "cluster_id" in size_elig.columns
+            else pd.DataFrame()
+        )
         if sub.empty:
             return "n/a"
         frac = float(sub.iloc[0].get("frac_of_pool", float("nan")))
@@ -306,23 +373,32 @@ def _build_verdict_table() -> str:
     def _stab_cell(algo: str, K: int, role: str, cid: int) -> str:
         if stability.empty:
             return "n/a"
-        sub = stability[
-            (stability["algo"] == algo) & (stability["K"] == K) &
-            (stability["cluster_id"] == cid)
-        ] if "cluster_id" in stability.columns else pd.DataFrame()
+        sub = (
+            stability[
+                (stability["algo"] == algo)
+                & (stability["K"] == K)
+                & (stability["cluster_id"] == cid)
+            ]
+            if "cluster_id" in stability.columns
+            else pd.DataFrame()
+        )
         if sub.empty:
             return "n/a"
         cv = sub.iloc[0].get("size_cv", float("nan"))
         ari = sub.iloc[0].get("ari_vs_pool", float("nan"))
-        cv_pass = (np.isfinite(cv) and cv < 0.50)
-        ari_pass = (np.isfinite(ari) and ari > 0.30)
+        cv_pass = np.isfinite(cv) and cv < 0.50
+        ari_pass = np.isfinite(ari) and ari > 0.30
         return f"{'PASS' if (cv_pass and ari_pass) else 'FAIL'} (size_CV {cv:.3f}; ARI {ari:.3f})"
 
     lines: List[str] = []
     lines.append("## Verdict")
     lines.append("")
-    lines.append("Dual-gate condition matrix per (algorithm, K, target/mirror) — populated by Phase J from")
-    lines.append("actual Phase A-H outputs. Verdict reasoning is **[planner to write]** below the table.")
+    lines.append(
+        "Dual-gate condition matrix per (algorithm, K, target/mirror) — populated by Phase J from"
+    )
+    lines.append(
+        "actual Phase A-H outputs. Verdict reasoning is **[planner to write]** below the table."
+    )
     lines.append("")
     lines.append("| Condition | " + " | ".join(f"{a} K={k} {r}" for (a, k, r, _) in cols) + " |")
     lines.append("|---" + "|---" * len(cols) + "|")
@@ -375,21 +451,33 @@ def _build_arc3_sections() -> str:
     lines: List[str] = []
 
     # §X variance-actually-wider
-    lines.append("## §X. Arc-open §4 variance-compression prediction INVERTED (step-2 carry-forward)")
+    lines.append(
+        "## §X. Arc-open §4 variance-compression prediction INVERTED (step-2 carry-forward)"
+    )
     lines.append("")
-    lines.append("Per arc-open §4 \"anticipated structural issue — regime-conditioning tautology\",")
-    lines.append("vol-axis and concurrent-signal axis within-pool variance was expected to be COMPRESSED")
-    lines.append("relative to arc 2. Step 2's [variance_compression_report.txt](../step2_descriptive/variance_compression_report.txt)")
+    lines.append('Per arc-open §4 "anticipated structural issue — regime-conditioning tautology",')
+    lines.append(
+        "vol-axis and concurrent-signal axis within-pool variance was expected to be COMPRESSED"
+    )
+    lines.append(
+        "relative to arc 2. Step 2's [variance_compression_report.txt](../step2_descriptive/variance_compression_report.txt)"
+    )
     lines.append("shows the actual measurements:")
     lines.append("")
     lines.append("```")
     lines.append(var_text.strip())
     lines.append("```")
     lines.append("")
-    lines.append("Descriptive observation: every measured feature (vol-axis and concurrent-signal axis)")
-    lines.append("has arc-3 IQR ≥ arc-2 IQR. The §4 \"compression tautology\" framing does not hold;")
-    lines.append("arc 3's within-pool dispersion is WIDER than arc 2's on the predicted-tautology axes.")
-    lines.append("Step 3 phase C signal-time predictor scan reads the actual data, not the §4 expectation.")
+    lines.append(
+        "Descriptive observation: every measured feature (vol-axis and concurrent-signal axis)"
+    )
+    lines.append('has arc-3 IQR ≥ arc-2 IQR. The §4 "compression tautology" framing does not hold;')
+    lines.append(
+        "arc 3's within-pool dispersion is WIDER than arc 2's on the predicted-tautology axes."
+    )
+    lines.append(
+        "Step 3 phase C signal-time predictor scan reads the actual data, not the §4 expectation."
+    )
     lines.append("")
 
     # §Y up/down split structural note
@@ -398,7 +486,9 @@ def _build_arc3_sections() -> str:
     lines.append("Step 2 surfaced a strong directional asymmetry on takes:")
     lines.append("")
     if not ud_pool.empty:
-        lines.append("| direction | n_fires | n_takes | take_rate | frac_of_pool_takes | mean_net_r |")
+        lines.append(
+            "| direction | n_fires | n_takes | take_rate | frac_of_pool_takes | mean_net_r |"
+        )
         lines.append("|---|---:|---:|---:|---:|---:|")
         for _, r in ud_pool.iterrows():
             lines.append(
@@ -429,7 +519,9 @@ def _build_arc3_sections() -> str:
     lines.append("")
 
     # §Z Phase B fold-stability F5/F6 narrative
-    lines.append("## §Z. Phase B fold-stability — F5 / F6 cross-arc divergence (elevated narrative)")
+    lines.append(
+        "## §Z. Phase B fold-stability — F5 / F6 cross-arc divergence (elevated narrative)"
+    )
     lines.append("")
     lines.append("Step 1 flagged fold-5 concurrence (arc 2 +93%, arc 3 +49%) and fold-6 divergence")
     lines.append("(arc 2 marginally positive, arc 3 −48.65%). Phase B reports per-fold cluster")
@@ -442,14 +534,18 @@ def _build_arc3_sections() -> str:
             lines.append(k2.to_string(index=False))
             lines.append("```")
     else:
-        lines.append("(cluster_fold_breakdown.csv not produced — see cluster_stability.csv for summary CV)")
+        lines.append(
+            "(cluster_fold_breakdown.csv not produced — see cluster_stability.csv for summary CV)"
+        )
     lines.append("")
 
     # §AA JPY-vs-non-JPY
     lines.append("## §AA. Phase G JPY vs non-JPY summary")
     lines.append("")
-    lines.append("Per arc-open §4 cross-arc question: \"does any pair appear in the dragger-tail across")
-    lines.append("multiple arcs? Arc 2 surfaced JPY-pairs as a positive-concentration set.\"")
+    lines.append(
+        'Per arc-open §4 cross-arc question: "does any pair appear in the dragger-tail across'
+    )
+    lines.append('multiple arcs? Arc 2 surfaced JPY-pairs as a positive-concentration set."')
     lines.append("")
     lines.append("| set | n | mean_net_r | std_net_r | folds with positive mean R |")
     lines.append("|---|---:|---:|---:|---:|")
@@ -467,16 +563,35 @@ def _build_arc3_sections() -> str:
     lines.append("## §AB. Cross-arc carry status summary")
     lines.append("")
     lines.append("Three carry families evaluated per arc-open §4 mandate:")
-    lines.append("  1. Concurrent-signal sub-family (arc-2 Tier-1 carry, promoted to mandatory for arc 3)")
-    lines.append("  2. Cross-pair / portfolio currency-basket family (arc-1 Tier-1 / arc-2 Tier-2/3 carry)")
+    lines.append(
+        "  1. Concurrent-signal sub-family (arc-2 Tier-1 carry, promoted to mandatory for arc 3)"
+    )
+    lines.append(
+        "  2. Cross-pair / portfolio currency-basket family (arc-1 Tier-1 / arc-2 Tier-2/3 carry)"
+    )
     lines.append("  3. signal_bar_direction (NEW pre-registration per arc-3 step-2 finding)")
     lines.append("")
     lines.append("Carry-1 + Carry-2 (from `cross_arc_portfolio_family.csv`, Phase F):")
     lines.append("")
     if not fam.empty:
-        keep_cols = [c for c in fam.columns if c in ("feature", "algo", "K", "target_cluster_id", "auc_vs_target", "perm_p_value", "tier")]
+        keep_cols = [
+            c
+            for c in fam.columns
+            if c
+            in (
+                "feature",
+                "algo",
+                "K",
+                "target_cluster_id",
+                "auc_vs_target",
+                "perm_p_value",
+                "tier",
+            )
+        ]
         lines.append("```")
-        lines.append(fam[keep_cols].to_string(index=False) if keep_cols else fam.to_string(index=False))
+        lines.append(
+            fam[keep_cols].to_string(index=False) if keep_cols else fam.to_string(index=False)
+        )
         lines.append("```")
     else:
         lines.append("(cross_arc_portfolio_family.csv not produced)")
@@ -485,8 +600,23 @@ def _build_arc3_sections() -> str:
     lines.append("")
     if not sbd.empty:
         lines.append("```")
-        keep_cols = [c for c in sbd.columns if c in ("feature", "algo", "K", "target_cluster_id", "auc_vs_target", "perm_p_value", "tier")]
-        lines.append(sbd[keep_cols].to_string(index=False) if keep_cols else sbd.to_string(index=False))
+        keep_cols = [
+            c
+            for c in sbd.columns
+            if c
+            in (
+                "feature",
+                "algo",
+                "K",
+                "target_cluster_id",
+                "auc_vs_target",
+                "perm_p_value",
+                "tier",
+            )
+        ]
+        lines.append(
+            sbd[keep_cols].to_string(index=False) if keep_cols else sbd.to_string(index=False)
+        )
         lines.append("```")
     else:
         lines.append("(signal_bar_direction_carry.csv not produced)")
@@ -540,11 +670,14 @@ def main(rewrite_phase_doc: bool = False) -> None:
     else:
         print("[Phase J] skipping phase-doc append (use --rewrite-phase-doc to enable).")
         print("[Phase J]   Rationale: append_to_phase_doc()'s split markers are fragile and can")
-        print("[Phase J]   truncate an enriched phase doc. The doc is authored once at step-3 close;")
+        print(
+            "[Phase J]   truncate an enriched phase doc. The doc is authored once at step-3 close;"
+        )
         print("[Phase J]   re-runs only refresh the two arc-3-specific CSVs.")
     print("[Phase J] done.")
 
 
 if __name__ == "__main__":
     import sys
+
     main(rewrite_phase_doc="--rewrite-phase-doc" in sys.argv[1:])

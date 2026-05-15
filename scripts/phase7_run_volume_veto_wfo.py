@@ -101,11 +101,7 @@ def probe_volume_indicator(short_name: str, warmup_bars: int = 50) -> Tuple[bool
     if "volume_signal" not in out.columns:
         return False, "missing_volume_signal"
 
-    sig = (
-        pd.to_numeric(out["volume_signal"], errors="coerce")
-        .fillna(0)
-        .astype("int8")
-    )
+    sig = pd.to_numeric(out["volume_signal"], errors="coerce").fillna(0).astype("int8")
     if len(sig) <= warmup_bars:
         return False, "insufficient_length"
 
@@ -115,7 +111,9 @@ def probe_volume_indicator(short_name: str, warmup_bars: int = 50) -> Tuple[bool
     return False, "no_pass_after_warmup"
 
 
-def _write_discovery_manifest(all_names: List[str], runnable: List[str], reasons: Dict[str, str]) -> None:
+def _write_discovery_manifest(
+    all_names: List[str], runnable: List[str], reasons: Dict[str, str]
+) -> None:
     """Write discovery manifest JSON with all, runnable, and skipped (with reasons).
 
     For Phase 7, any non-runnable indicator is treated as a stub/non-functional
@@ -308,4 +306,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

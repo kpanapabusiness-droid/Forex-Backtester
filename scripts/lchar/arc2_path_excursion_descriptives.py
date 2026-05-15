@@ -38,6 +38,7 @@ import pandas as pd
 
 os.environ["MPLBACKEND"] = "Agg"
 import matplotlib  # noqa: E402
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 from PIL import Image  # noqa: E402
@@ -50,24 +51,15 @@ if str(REPO_ROOT) not in sys.path:
 # Locked input sha256s (gate 1, re-verified as gate 9)
 # ---------------------------------------------------------------------------
 LOCKED_SHAS: Dict[str, str] = {
-    "results/l6/arc2/characterisation/v1_1_full/signals_features.csv":
-        "71b39383632bd695b878add8b331b76bcd231ab5b9adba9eea03d69f8762483e",
-    "results/l6/arc2/characterisation/v1_2_1_full/trade_index.csv":
-        "9f841c5b29e87ed90d34c9617431978baf3041459797cedef02fa16c27e3abb5",
-    "results/l6/arc2/characterisation/v1_2_1_full/per_bar_paths.csv":
-        "7b2acd6ccb98f1fd145a631b318fc95d10f5cf4f42633be9c0b59738fa1696ee",
-    "results/l6/arc2/characterisation/extended/entry_filter_univariate/block_M_kijun_distances.csv":
-        "4a61407f0f1fc1b74486f0614928e776201dc6469d874db8393e689d20cdb2ff",
-    "results/l6/arc2/characterisation/extended/entry_filter_bivariate/block_P_bivariate_cells.csv":
-        "a5e3f8e68aa64d8fd53f752705a33613d9877dbde1f8265cb4a38d753c5e088e",
-    "results/l6/arc2/characterisation/extended/path_by_subset/block_V_subset_category_breakdown.csv":
-        "78633e9904baf2a672d2c8692f4b3557fec0aa3af8044ef3296dde08bad71c02",
-    "core/signals/l4_mtf_alignment_2_down_mixed_kijun.py":
-        "3c8d0f5d4b446f84359ab0663df36869f15b47cf1bf18fbc6caff807dc5134e3",
-    "configs/wfo_l6_arc2.yaml":
-        "25917151bc84a73885eeea9ca9c4cc15b1c277ba793706b158abd3aee0ab6328",
-    "L6_0_METHODOLOGY_LOCK.md":
-        "4fd870b1d17380e4fc4fbfda5a43f7775d313c7a5f50dbfd1f06a3e49c519c26",
+    "results/l6/arc2/characterisation/v1_1_full/signals_features.csv": "71b39383632bd695b878add8b331b76bcd231ab5b9adba9eea03d69f8762483e",
+    "results/l6/arc2/characterisation/v1_2_1_full/trade_index.csv": "9f841c5b29e87ed90d34c9617431978baf3041459797cedef02fa16c27e3abb5",
+    "results/l6/arc2/characterisation/v1_2_1_full/per_bar_paths.csv": "7b2acd6ccb98f1fd145a631b318fc95d10f5cf4f42633be9c0b59738fa1696ee",
+    "results/l6/arc2/characterisation/extended/entry_filter_univariate/block_M_kijun_distances.csv": "4a61407f0f1fc1b74486f0614928e776201dc6469d874db8393e689d20cdb2ff",
+    "results/l6/arc2/characterisation/extended/entry_filter_bivariate/block_P_bivariate_cells.csv": "a5e3f8e68aa64d8fd53f752705a33613d9877dbde1f8265cb4a38d753c5e088e",
+    "results/l6/arc2/characterisation/extended/path_by_subset/block_V_subset_category_breakdown.csv": "78633e9904baf2a672d2c8692f4b3557fec0aa3af8044ef3296dde08bad71c02",
+    "core/signals/l4_mtf_alignment_2_down_mixed_kijun.py": "3c8d0f5d4b446f84359ab0663df36869f15b47cf1bf18fbc6caff807dc5134e3",
+    "configs/wfo_l6_arc2.yaml": "25917151bc84a73885eeea9ca9c4cc15b1c277ba793706b158abd3aee0ab6328",
+    "L6_0_METHODOLOGY_LOCK.md": "4fd870b1d17380e4fc4fbfda5a43f7775d313c7a5f50dbfd1f06a3e49c519c26",
 }
 
 OUTPUT_DIR_REL = "results/l6/arc2/characterisation/extended/path_excursion_descriptives"
@@ -86,8 +78,12 @@ BLOCK_B_1R_COUNTS: Dict[str, int] = {
     "neither_reached": 1,
 }
 ALL_CATS: Tuple[str, ...] = (
-    "only_up", "up_then_down", "down_then_up",
-    "straight_to_sl", "simultaneous", "neither_reached",
+    "only_up",
+    "up_then_down",
+    "down_then_up",
+    "straight_to_sl",
+    "simultaneous",
+    "neither_reached",
 )
 
 # Subsets to characterise (only three for this round).
@@ -157,10 +153,10 @@ def _write_csv(df: pd.DataFrame, path: Path, float_fmt: str = "%.10g") -> None:
 # ===========================================================================
 
 
-def _make_quintile_labels(values: pd.Series, tie_break: pd.Series
-                          ) -> Tuple[pd.Series, List[Tuple[float, float]]]:
-    df = pd.DataFrame({"v": values.values, "t": tie_break.values},
-                      index=values.index)
+def _make_quintile_labels(
+    values: pd.Series, tie_break: pd.Series
+) -> Tuple[pd.Series, List[Tuple[float, float]]]:
+    df = pd.DataFrame({"v": values.values, "t": tie_break.values}, index=values.index)
     df = df.sort_values(["v", "t"], kind="stable")
     n = len(df)
     base = n // 5
@@ -170,7 +166,7 @@ def _make_quintile_labels(values: pd.Series, tie_break: pd.Series
     bounds: List[Tuple[float, float]] = []
     cursor = 0
     for qi, sz in enumerate(sizes):
-        seg = df.iloc[cursor:cursor + sz]
+        seg = df.iloc[cursor : cursor + sz]
         labels.extend([f"Q{qi + 1}"] * sz)
         bounds.append((float(seg["v"].min()), float(seg["v"].max())))
         cursor += sz
@@ -181,34 +177,44 @@ def _make_quintile_labels(values: pd.Series, tie_break: pd.Series
 def build_subsets() -> Tuple[pd.DataFrame, Dict[str, np.ndarray]]:
     sf = pd.read_csv(REPO_ROOT / "results/l6/arc2/characterisation/v1_1_full/signals_features.csv")
     ti = pd.read_csv(REPO_ROOT / "results/l6/arc2/characterisation/v1_2_1_full/trade_index.csv")
-    bm = pd.read_csv(REPO_ROOT / "results/l6/arc2/characterisation/extended/entry_filter_univariate/block_M_kijun_distances.csv")
+    bm = pd.read_csv(
+        REPO_ROOT
+        / "results/l6/arc2/characterisation/extended/entry_filter_univariate/block_M_kijun_distances.csv"
+    )
 
     sf_taken = sf[sf["taken"] == True].copy()  # noqa: E712
     sf_taken = sf_taken.rename(columns={"time": "signal_bar_ts"})
-    sf_taken["signal_bar_ts"] = pd.to_datetime(sf_taken["signal_bar_ts"]).dt.strftime("%Y-%m-%dT%H:%M:%S")
+    sf_taken["signal_bar_ts"] = pd.to_datetime(sf_taken["signal_bar_ts"]).dt.strftime(
+        "%Y-%m-%dT%H:%M:%S"
+    )
     ti["signal_bar_ts"] = pd.to_datetime(ti["signal_bar_ts"]).dt.strftime("%Y-%m-%dT%H:%M:%S")
 
     taken = sf_taken.merge(
         ti[["trade_id", "pair", "signal_bar_ts", "atr_1h_wilder_at_signal"]],
-        on=["pair", "signal_bar_ts"], how="left", validate="one_to_one",
+        on=["pair", "signal_bar_ts"],
+        how="left",
+        validate="one_to_one",
     )
     taken = taken.merge(
         bm[["trade_id", "dist_d1_kijun_atr"]],
-        on="trade_id", how="left", validate="one_to_one",
+        on="trade_id",
+        how="left",
+        validate="one_to_one",
     )
     taken = taken.sort_values("trade_id").reset_index(drop=True)
     if len(taken) != 3993:
         raise RuntimeError(f"HALT: taken row count {len(taken)} != 3993")
 
-    qa_labels, _ = _make_quintile_labels(
-        taken["concurrent_signals_same_bar"], taken["trade_id"])
+    qa_labels, _ = _make_quintile_labels(taken["concurrent_signals_same_bar"], taken["trade_id"])
     taken["Q_A_concurrent"] = qa_labels.values
-    qb_labels, _ = _make_quintile_labels(
-        taken["dist_d1_kijun_atr"], taken["trade_id"])
+    qb_labels, _ = _make_quintile_labels(taken["dist_d1_kijun_atr"], taken["trade_id"])
     taken["Q_B_dist_d1"] = qb_labels.values
 
     # Gate 2.1: reproduce 25 block_P cell counts exactly.
-    bp = pd.read_csv(REPO_ROOT / "results/l6/arc2/characterisation/extended/entry_filter_bivariate/block_P_bivariate_cells.csv")
+    bp = pd.read_csv(
+        REPO_ROOT
+        / "results/l6/arc2/characterisation/extended/entry_filter_bivariate/block_P_bivariate_cells.csv"
+    )
     diffs: List[str] = []
     for _, row in bp.iterrows():
         qa = row["Q_A_concurrent"]
@@ -219,26 +225,23 @@ def build_subsets() -> Tuple[pd.DataFrame, Dict[str, np.ndarray]]:
         if got_n != exp_n:
             diffs.append(f"  ({qa},{qb}): expected n={exp_n}, got n={got_n}")
     if diffs:
-        raise RuntimeError("HALT (gate 2.1): block_P cell mismatch:\n"
-                            + "\n".join(diffs))
+        raise RuntimeError("HALT (gate 2.1): block_P cell mismatch:\n" + "\n".join(diffs))
 
     subsets: Dict[str, np.ndarray] = {}
     for sid, spec in SUBSET_DEFS:
         if spec.get("all"):
             mask = pd.Series(True, index=taken.index)
         else:
-            mask = (taken["Q_A_concurrent"].isin(spec["qa"])
-                    & taken["Q_B_dist_d1"].isin(spec["qb"]))
+            mask = taken["Q_A_concurrent"].isin(spec["qa"]) & taken["Q_B_dist_d1"].isin(spec["qb"])
         sub = taken[mask]
         expected_n = int(spec["expected_n"])
         if len(sub) != expected_n:
-            raise RuntimeError(
-                f"HALT (gate 2.2): subset {sid} size {len(sub)} != {expected_n}"
-            )
+            raise RuntimeError(f"HALT (gate 2.2): subset {sid} size {len(sub)} != {expected_n}")
         subsets[sid] = sub["trade_id"].to_numpy(dtype=np.int64)
 
-    labels = taken[["trade_id", "pair", "signal_bar_ts", "fold_id",
-                    "Q_A_concurrent", "Q_B_dist_d1"]].copy()
+    labels = taken[
+        ["trade_id", "pair", "signal_bar_ts", "fold_id", "Q_A_concurrent", "Q_B_dist_d1"]
+    ].copy()
     labels["fold_id"] = labels["fold_id"].astype(int)
     return labels, subsets
 
@@ -292,8 +295,7 @@ def compute_categories(pb: pd.DataFrame, n_trades: int) -> np.ndarray:
         if counts[c] != exp:
             diffs.append(f"  {c}: expected={exp}, got={counts[c]}")
     if diffs:
-        raise RuntimeError("HALT (gate 2.3): Block B 1R counts diverge:\n"
-                            + "\n".join(diffs))
+        raise RuntimeError("HALT (gate 2.3): Block B 1R counts diverge:\n" + "\n".join(diffs))
     return cats
 
 
@@ -302,9 +304,9 @@ def compute_categories(pb: pd.DataFrame, n_trades: int) -> np.ndarray:
 # ===========================================================================
 
 
-def _build_index(pb: pd.DataFrame, n_trades: int
-                 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray,
-                            np.ndarray, np.ndarray]:
+def _build_index(
+    pb: pd.DataFrame, n_trades: int
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Sort per_bar by trade_id, k. Returns (starts, ends, rmfe, rmae, bc)."""
     pb_sorted = pb.sort_values(["trade_id", "k"]).reset_index(drop=True)
     tids = pb_sorted["trade_id"].to_numpy(dtype=np.int64)
@@ -321,8 +323,9 @@ def _build_index(pb: pd.DataFrame, n_trades: int
 # ===========================================================================
 
 
-def compute_block_DD(starts, ends, rmfe, rmae, cats: np.ndarray,
-                     subsets: Dict[str, np.ndarray]) -> pd.DataFrame:
+def compute_block_DD(
+    starts, ends, rmfe, rmae, cats: np.ndarray, subsets: Dict[str, np.ndarray]
+) -> pd.DataFrame:
     """One row per (subset, trade) for only_up-labelled trades."""
     rows: List[Dict[str, Any]] = []
     for sid, tids in subsets.items():
@@ -333,8 +336,7 @@ def compute_block_DD(starts, ends, rmfe, rmae, cats: np.ndarray,
             mfe_arr = rmfe[s:e]
             mae_arr = rmae[s:e]
             n_bars = e - s
-            row: Dict[str, Any] = {"subset_id": sid, "trade_id": int(tid),
-                                   "n_bars": n_bars}
+            row: Dict[str, Any] = {"subset_id": sid, "trade_id": int(tid), "n_bars": n_bars}
             # First-passage k for each MFE threshold.
             t_thresh: Dict[float, Optional[int]] = {}
             for X in DD_THRESHOLDS_ATR:
@@ -380,14 +382,28 @@ def summarize_block_DD(dd: pd.DataFrame) -> pd.DataFrame:
             n_total = len(sub)
             n_valid = len(vals)
             row: Dict[str, Any] = {
-                "subset_id": sid, "metric": m,
+                "subset_id": sid,
+                "metric": m,
                 "n_only_up_total": n_total,
                 "n_trades_with_value": n_valid,
                 "n_nan": n_total - n_valid,
             }
             if n_valid == 0:
-                for q in ["mean", "std", "median", "q01", "q05", "q10",
-                          "q25", "q75", "q90", "q95", "q99", "min", "max"]:
+                for q in [
+                    "mean",
+                    "std",
+                    "median",
+                    "q01",
+                    "q05",
+                    "q10",
+                    "q25",
+                    "q75",
+                    "q90",
+                    "q95",
+                    "q99",
+                    "min",
+                    "max",
+                ]:
                     row[q] = float("nan")
             else:
                 row["mean"] = float(np.mean(vals))
@@ -412,8 +428,9 @@ def summarize_block_DD(dd: pd.DataFrame) -> pd.DataFrame:
 # ===========================================================================
 
 
-def compute_block_EE(starts, ends, rmfe, rmae, bc, cats: np.ndarray,
-                     subsets: Dict[str, np.ndarray]) -> pd.DataFrame:
+def compute_block_EE(
+    starts, ends, rmfe, rmae, bc, cats: np.ndarray, subsets: Dict[str, np.ndarray]
+) -> pd.DataFrame:
     rows: List[Dict[str, Any]] = []
     for sid, tids in subsets.items():
         for tid in tids.tolist():
@@ -447,35 +464,42 @@ def compute_block_EE(starts, ends, rmfe, rmae, bc, cats: np.ndarray,
                 giveback_frac_k240 = giveback_k240 / peak_mfe if peak_mfe > 0 else float("nan")
             # Max drawdown from peak within trade.
             if peak_idx + 1 < n_bars:
-                lowest_after = float(bc_arr[peak_idx + 1:].min())
+                lowest_after = float(bc_arr[peak_idx + 1 :].min())
                 max_dd_from_peak = peak_mfe - lowest_after
                 max_dd_from_peak = min(max_dd_from_peak, peak_mfe)
             else:
                 max_dd_from_peak = 0.0
-            rows.append({
-                "subset_id": sid, "trade_id": int(tid),
-                "n_bars": n_bars,
-                "peak_mfe_atr": peak_mfe,
-                "peak_mfe_k": peak_k,
-                "final_close_atr_at_k120": close_k120,
-                "final_close_atr_at_k240": close_k240,
-                "final_close_atr": close_final,
-                "clamped_before_k240": clamped_at_k240,
-                "giveback_atr_to_k120": giveback_k120,
-                "giveback_atr_to_k240": giveback_k240,
-                "giveback_atr_as_fraction_of_peak_k120": giveback_frac_k120,
-                "giveback_atr_as_fraction_of_peak_k240": giveback_frac_k240,
-                "max_drawdown_from_peak_within_trade_atr": max_dd_from_peak,
-            })
+            rows.append(
+                {
+                    "subset_id": sid,
+                    "trade_id": int(tid),
+                    "n_bars": n_bars,
+                    "peak_mfe_atr": peak_mfe,
+                    "peak_mfe_k": peak_k,
+                    "final_close_atr_at_k120": close_k120,
+                    "final_close_atr_at_k240": close_k240,
+                    "final_close_atr": close_final,
+                    "clamped_before_k240": clamped_at_k240,
+                    "giveback_atr_to_k120": giveback_k120,
+                    "giveback_atr_to_k240": giveback_k240,
+                    "giveback_atr_as_fraction_of_peak_k120": giveback_frac_k120,
+                    "giveback_atr_as_fraction_of_peak_k240": giveback_frac_k240,
+                    "max_drawdown_from_peak_within_trade_atr": max_dd_from_peak,
+                }
+            )
     return pd.DataFrame(rows)
 
 
 def summarize_block_EE(ee: pd.DataFrame) -> pd.DataFrame:
-    metrics = ["peak_mfe_atr", "peak_mfe_k",
-               "giveback_atr_to_k120", "giveback_atr_to_k240",
-               "giveback_atr_as_fraction_of_peak_k120",
-               "giveback_atr_as_fraction_of_peak_k240",
-               "max_drawdown_from_peak_within_trade_atr"]
+    metrics = [
+        "peak_mfe_atr",
+        "peak_mfe_k",
+        "giveback_atr_to_k120",
+        "giveback_atr_to_k240",
+        "giveback_atr_as_fraction_of_peak_k120",
+        "giveback_atr_as_fraction_of_peak_k240",
+        "max_drawdown_from_peak_within_trade_atr",
+    ]
     rows: List[Dict[str, Any]] = []
     for sid in SUBSET_IDS:
         sub = ee[ee["subset_id"] == sid]
@@ -504,9 +528,9 @@ def summarize_block_EE(ee: pd.DataFrame) -> pd.DataFrame:
 # ===========================================================================
 
 
-def compute_block_FF(starts, ends, bc, cats: np.ndarray,
-                     subsets: Dict[str, np.ndarray]
-                     ) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def compute_block_FF(
+    starts, ends, bc, cats: np.ndarray, subsets: Dict[str, np.ndarray]
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Returns (separator_curves_df, distributions_df)."""
     group_A_cats = ("only_up", "up_then_down")
     group_B_cats = ("down_then_up", "straight_to_sl")
@@ -518,15 +542,14 @@ def compute_block_FF(starts, ends, bc, cats: np.ndarray,
         # Partition trade_ids into Group A, B, or excluded.
         tids_list = tids.tolist()
         groups_for_tid = np.array(
-            ["A" if cats[t] in group_A_cats
-             else ("B" if cats[t] in group_B_cats else "X")
-             for t in tids_list],
+            [
+                "A" if cats[t] in group_A_cats else ("B" if cats[t] in group_B_cats else "X")
+                for t in tids_list
+            ],
             dtype=object,
         )
-        gA = np.array([t for t, g in zip(tids_list, groups_for_tid) if g == "A"],
-                      dtype=np.int64)
-        gB = np.array([t for t, g in zip(tids_list, groups_for_tid) if g == "B"],
-                      dtype=np.int64)
+        gA = np.array([t for t, g in zip(tids_list, groups_for_tid) if g == "A"], dtype=np.int64)
+        gB = np.array([t for t, g in zip(tids_list, groups_for_tid) if g == "B"], dtype=np.int64)
         for k in FF_K_GRID:
             # Gather bar_close_atr at bar k for each trade in A and B.
             # k is 1-indexed (k=1 is first bar after entry); array index k-1.
@@ -542,23 +565,34 @@ def compute_block_FF(starts, ends, bc, cats: np.ndarray,
             vB = vals_at_k(gB)
             vA_valid = vA[~np.isnan(vA)]
             vB_valid = vB[~np.isnan(vB)]
-            nA = len(vA_valid); nB = len(vB_valid)
+            nA = len(vA_valid)
+            nB = len(vB_valid)
             # Distribution rows.
             for q in percentiles:
-                dist_rows.append({
-                    "subset_id": sid, "k": int(k),
-                    "group": "A_go_up", "n": nA,
-                    "percentile": int(q),
-                    "value_atr_fill": float(np.quantile(vA_valid, q / 100.0))
-                    if nA > 0 else float("nan"),
-                })
-                dist_rows.append({
-                    "subset_id": sid, "k": int(k),
-                    "group": "B_go_down", "n": nB,
-                    "percentile": int(q),
-                    "value_atr_fill": float(np.quantile(vB_valid, q / 100.0))
-                    if nB > 0 else float("nan"),
-                })
+                dist_rows.append(
+                    {
+                        "subset_id": sid,
+                        "k": int(k),
+                        "group": "A_go_up",
+                        "n": nA,
+                        "percentile": int(q),
+                        "value_atr_fill": float(np.quantile(vA_valid, q / 100.0))
+                        if nA > 0
+                        else float("nan"),
+                    }
+                )
+                dist_rows.append(
+                    {
+                        "subset_id": sid,
+                        "k": int(k),
+                        "group": "B_go_down",
+                        "n": nB,
+                        "percentile": int(q),
+                        "value_atr_fill": float(np.quantile(vB_valid, q / 100.0))
+                        if nB > 0
+                        else float("nan"),
+                    }
+                )
 
             # Threshold sweep.
             for budget in FF_RECALL_A_BUDGETS:
@@ -584,19 +618,33 @@ def compute_block_FF(starts, ends, bc, cats: np.ndarray,
                         fn_a_at_best = fn_A
                         tn_b_at_best = tn_B
                         fp_b_at_best = fp_B
-                sep_rows.append({
-                    "subset_id": sid, "k": int(k),
-                    "recall_A_budget": float(budget),
-                    "n_group_A": nA, "n_group_B": nB,
-                    "tau_atr_fill": tau_best if tau_best is not None else float("nan"),
-                    "recall_A_at_tau": recall_a_at_best,
-                    "recall_B_at_tau": recall_b_best if recall_b_best >= 0 else float("nan"),
-                    "fn_A_count": float(fn_a_at_best) if fn_a_at_best is not None else float("nan"),
-                    "tn_B_count": float(tn_b_at_best) if tn_b_at_best is not None else float("nan"),
-                    "fp_B_count": float(fp_b_at_best) if fp_b_at_best is not None else float("nan"),
-                    "median_close_atr_group_A": float(np.median(vA_valid)) if nA > 0 else float("nan"),
-                    "median_close_atr_group_B": float(np.median(vB_valid)) if nB > 0 else float("nan"),
-                })
+                sep_rows.append(
+                    {
+                        "subset_id": sid,
+                        "k": int(k),
+                        "recall_A_budget": float(budget),
+                        "n_group_A": nA,
+                        "n_group_B": nB,
+                        "tau_atr_fill": tau_best if tau_best is not None else float("nan"),
+                        "recall_A_at_tau": recall_a_at_best,
+                        "recall_B_at_tau": recall_b_best if recall_b_best >= 0 else float("nan"),
+                        "fn_A_count": float(fn_a_at_best)
+                        if fn_a_at_best is not None
+                        else float("nan"),
+                        "tn_B_count": float(tn_b_at_best)
+                        if tn_b_at_best is not None
+                        else float("nan"),
+                        "fp_B_count": float(fp_b_at_best)
+                        if fp_b_at_best is not None
+                        else float("nan"),
+                        "median_close_atr_group_A": float(np.median(vA_valid))
+                        if nA > 0
+                        else float("nan"),
+                        "median_close_atr_group_B": float(np.median(vB_valid))
+                        if nB > 0
+                        else float("nan"),
+                    }
+                )
     return pd.DataFrame(sep_rows), pd.DataFrame(dist_rows)
 
 
@@ -605,8 +653,9 @@ def compute_block_FF(starts, ends, bc, cats: np.ndarray,
 # ===========================================================================
 
 
-def render_plots(*, dd: pd.DataFrame, ee: pd.DataFrame, ff: pd.DataFrame,
-                 plots_dir: Path) -> List[Path]:
+def render_plots(
+    *, dd: pd.DataFrame, ee: pd.DataFrame, ff: pd.DataFrame, plots_dir: Path
+) -> List[Path]:
     plots_dir.mkdir(parents=True, exist_ok=True)
     paths: List[Path] = []
 
@@ -615,11 +664,15 @@ def render_plots(*, dd: pd.DataFrame, ee: pd.DataFrame, ff: pd.DataFrame,
     for ax, sid in zip(axes, SUBSET_IDS):
         sub = dd[dd["subset_id"] == sid]
         vals = sub["mae_before_mfe_plus_2atr"].dropna().to_numpy(dtype=np.float64)
-        ax.boxplot([vals], tick_labels=["mae_before_+1R"], vert=True,
-                    widths=0.5,
-                    medianprops=dict(color="#3B6D11"),
-                    boxprops=dict(color="#3B6D11"),
-                    whiskerprops=dict(color="#3B6D11"))
+        ax.boxplot(
+            [vals],
+            tick_labels=["mae_before_+1R"],
+            vert=True,
+            widths=0.5,
+            medianprops=dict(color="#3B6D11"),
+            boxprops=dict(color="#3B6D11"),
+            whiskerprops=dict(color="#3B6D11"),
+        )
         ax.set_title(f"{sid} (n={len(vals)})")
         ax.axhline(0.0, color="black", lw=0.5, ls=":")
         ax.axhline(-1.0, color="red", lw=0.5, ls=":")
@@ -640,16 +693,14 @@ def render_plots(*, dd: pd.DataFrame, ee: pd.DataFrame, ff: pd.DataFrame,
         x = sub["peak_mfe_atr"].to_numpy(dtype=np.float64)
         y = sub["giveback_atr_to_k120"].to_numpy(dtype=np.float64)
         mask = ~(np.isnan(x) | np.isnan(y))
-        ax.scatter(x[mask], y[mask], s=10, alpha=0.5, color="#639922",
-                    edgecolors="none")
+        ax.scatter(x[mask], y[mask], s=10, alpha=0.5, color="#639922", edgecolors="none")
         ax.set_title(f"{sid} (n={int(mask.sum())})")
         ax.set_xlabel("peak_mfe_atr (fill-rel)")
         if sid == SUBSET_IDS[0]:
             ax.set_ylabel("giveback_atr_to_k120")
         ax.grid(True, alpha=0.3)
         # 1:1 line (full giveback) and 0.5 line.
-        lim = max(x[mask].max() if mask.any() else 1.0,
-                  y[mask].max() if mask.any() else 1.0)
+        lim = max(x[mask].max() if mask.any() else 1.0, y[mask].max() if mask.any() else 1.0)
         ax.plot([0, lim], [0, lim], color="gray", lw=0.7, ls=":")
         ax.plot([0, lim], [0, 0.5 * lim], color="gray", lw=0.7, ls=":")
     fig.suptitle("Block EE — only_up peak MFE vs giveback to k=120 close")
@@ -663,11 +714,15 @@ def render_plots(*, dd: pd.DataFrame, ee: pd.DataFrame, ff: pd.DataFrame,
     for sid in SUBSET_IDS:
         sub = ff[ff["subset_id"] == sid]
         fig, ax = plt.subplots(figsize=(8, 4.5))
-        for budget, color in zip(FF_RECALL_A_BUDGETS,
-                                  ["#3B6D11", "#A86E10", "#8E3D1F"]):
+        for budget, color in zip(FF_RECALL_A_BUDGETS, ["#3B6D11", "#A86E10", "#8E3D1F"]):
             sub_b = sub[sub["recall_A_budget"] == budget].sort_values("k")
-            ax.plot(sub_b["k"], sub_b["recall_B_at_tau"],
-                     marker="o", color=color, label=f"recall_A>={budget:.2f}")
+            ax.plot(
+                sub_b["k"],
+                sub_b["recall_B_at_tau"],
+                marker="o",
+                color=color,
+                label=f"recall_A>={budget:.2f}",
+            )
         ax.set_title(f"Block FF — recall_B vs k for {sid}")
         ax.set_xlabel("k (bars after entry)")
         ax.set_ylabel("recall_B at tau")
@@ -688,14 +743,14 @@ def render_plots(*, dd: pd.DataFrame, ee: pd.DataFrame, ff: pd.DataFrame,
 # ===========================================================================
 
 
-def _df_to_md(df: pd.DataFrame, float_cols: Optional[Dict[str, str]] = None,
-              default_float: str = "{:.4f}") -> str:
+def _df_to_md(
+    df: pd.DataFrame, float_cols: Optional[Dict[str, str]] = None, default_float: str = "{:.4f}"
+) -> str:
     cols = list(df.columns)
     float_cols = float_cols or {}
     int_cols = {c for c in cols if pd.api.types.is_integer_dtype(df[c].dtype)}
     bool_cols = {c for c in cols if pd.api.types.is_bool_dtype(df[c].dtype)}
-    out = ["| " + " | ".join(cols) + " |",
-           "| " + " | ".join(["---"] * len(cols)) + " |"]
+    out = ["| " + " | ".join(cols) + " |", "| " + " | ".join(["---"] * len(cols)) + " |"]
     for i in range(len(df)):
         cells = []
         for c in cols:
@@ -718,10 +773,15 @@ def _df_to_md(df: pd.DataFrame, float_cols: Optional[Dict[str, str]] = None,
     return "\n".join(out)
 
 
-def render_report(*, observed_shas: Dict[str, str],
-                  dd_summary: pd.DataFrame, ee_summary: pd.DataFrame,
-                  ff: pd.DataFrame, dd_n_only_up: Dict[str, int],
-                  ee_clamped: Dict[str, int]) -> str:
+def render_report(
+    *,
+    observed_shas: Dict[str, str],
+    dd_summary: pd.DataFrame,
+    ee_summary: pd.DataFrame,
+    ff: pd.DataFrame,
+    dd_n_only_up: Dict[str, int],
+    ee_clamped: Dict[str, int],
+) -> str:
     lines: List[str] = []
     a = lines.append
     a("# Arc 2 — Path-Excursion Descriptives (Round 3A)")
@@ -802,18 +862,49 @@ def render_report(*, observed_shas: Dict[str, str],
         "mae_after_mfe_plus_6atr",
         "mae_after_mfe_plus_8atr",
     ]
-    fmt_dd = {c: "{:.3f}" for c in ["mean", "std", "median",
-                                      "q01", "q05", "q10", "q25", "q75",
-                                      "q90", "q95", "q99", "min", "max"]}
+    fmt_dd = {
+        c: "{:.3f}"
+        for c in [
+            "mean",
+            "std",
+            "median",
+            "q01",
+            "q05",
+            "q10",
+            "q25",
+            "q75",
+            "q90",
+            "q95",
+            "q99",
+            "min",
+            "max",
+        ]
+    }
     for sid in SUBSET_IDS:
         a(f"### Subset {sid}")
         a("")
-        sub = dd_summary[(dd_summary["subset_id"] == sid)
-                          & (dd_summary["metric"].isin(key_dd))]
+        sub = dd_summary[(dd_summary["subset_id"] == sid) & (dd_summary["metric"].isin(key_dd))]
         sub = sub.set_index("metric").loc[key_dd].reset_index()
-        a(_df_to_md(sub[["metric", "n_trades_with_value", "n_nan",
-                          "mean", "median", "q05", "q25", "q75",
-                          "q95", "q99", "min"]], fmt_dd))
+        a(
+            _df_to_md(
+                sub[
+                    [
+                        "metric",
+                        "n_trades_with_value",
+                        "n_nan",
+                        "mean",
+                        "median",
+                        "q05",
+                        "q25",
+                        "q75",
+                        "q95",
+                        "q99",
+                        "min",
+                    ]
+                ],
+                fmt_dd,
+            )
+        )
         a("")
 
     # Block EE
@@ -825,24 +916,32 @@ def render_report(*, observed_shas: Dict[str, str],
     a("trade reached the fold data-end before bar 240; for those trades, ")
     a("the k=240 giveback uses the last available bar's close.")
     a("")
-    a("Clamped-before-k240 counts: " + ", ".join(
-        f"{sid}={ee_clamped.get(sid, 0)}" for sid in SUBSET_IDS) + ".")
+    a(
+        "Clamped-before-k240 counts: "
+        + ", ".join(f"{sid}={ee_clamped.get(sid, 0)}" for sid in SUBSET_IDS)
+        + "."
+    )
     a("")
-    key_ee = ["peak_mfe_atr",
-              "giveback_atr_to_k120", "giveback_atr_to_k240",
-              "giveback_atr_as_fraction_of_peak_k120",
-              "giveback_atr_as_fraction_of_peak_k240",
-              "max_drawdown_from_peak_within_trade_atr"]
-    fmt_ee = {c: "{:.3f}" for c in ["mean", "std", "median",
-                                      "q05", "q25", "q75", "q95", "max"]}
+    key_ee = [
+        "peak_mfe_atr",
+        "giveback_atr_to_k120",
+        "giveback_atr_to_k240",
+        "giveback_atr_as_fraction_of_peak_k120",
+        "giveback_atr_as_fraction_of_peak_k240",
+        "max_drawdown_from_peak_within_trade_atr",
+    ]
+    fmt_ee = {c: "{:.3f}" for c in ["mean", "std", "median", "q05", "q25", "q75", "q95", "max"]}
     for sid in SUBSET_IDS:
         a(f"### Subset {sid}")
         a("")
-        sub = ee_summary[(ee_summary["subset_id"] == sid)
-                          & (ee_summary["metric"].isin(key_ee))]
+        sub = ee_summary[(ee_summary["subset_id"] == sid) & (ee_summary["metric"].isin(key_ee))]
         sub = sub.set_index("metric").loc[key_ee].reset_index()
-        a(_df_to_md(sub[["metric", "n_trades", "mean", "median",
-                          "q05", "q25", "q75", "q95", "max"]], fmt_ee))
+        a(
+            _df_to_md(
+                sub[["metric", "n_trades", "mean", "median", "q05", "q25", "q75", "q95", "max"]],
+                fmt_ee,
+            )
+        )
         a("")
 
     # Block FF
@@ -881,12 +980,26 @@ def render_report(*, observed_shas: Dict[str, str],
             sub_k = sub[sub["k"] == k].copy()
             a(f"At k = {k}:")
             a("")
-            a(_df_to_md(sub_k[["recall_A_budget", "n_group_A", "n_group_B",
-                                "tau_atr_fill", "recall_A_at_tau",
-                                "recall_B_at_tau", "fn_A_count",
-                                "tn_B_count", "fp_B_count",
-                                "median_close_atr_group_A",
-                                "median_close_atr_group_B"]], fmt_ff))
+            a(
+                _df_to_md(
+                    sub_k[
+                        [
+                            "recall_A_budget",
+                            "n_group_A",
+                            "n_group_B",
+                            "tau_atr_fill",
+                            "recall_A_at_tau",
+                            "recall_B_at_tau",
+                            "fn_A_count",
+                            "tn_B_count",
+                            "fp_B_count",
+                            "median_close_atr_group_A",
+                            "median_close_atr_group_B",
+                        ]
+                    ],
+                    fmt_ff,
+                )
+            )
             a("")
 
     # Cross-block synthesis
@@ -899,25 +1012,42 @@ def render_report(*, observed_shas: Dict[str, str],
     a("")
     rows = []
     for sid in SUBSET_IDS:
-        dd_med_before = float(dd_summary[(dd_summary["subset_id"] == sid)
-            & (dd_summary["metric"] == "mae_before_mfe_plus_2atr")]["median"].iloc[0])
-        dd_med_after = float(dd_summary[(dd_summary["subset_id"] == sid)
-            & (dd_summary["metric"] == "mae_after_mfe_plus_4atr")]["median"].iloc[0])
-        ee_med_peak = float(ee_summary[(ee_summary["subset_id"] == sid)
-            & (ee_summary["metric"] == "peak_mfe_atr")]["median"].iloc[0])
-        ee_med_gb120 = float(ee_summary[(ee_summary["subset_id"] == sid)
-            & (ee_summary["metric"] == "giveback_atr_to_k120")]["median"].iloc[0])
-        ff_row = ff[(ff["subset_id"] == sid) & (ff["k"] == 20)
-                     & (ff["recall_A_budget"] == 0.95)].iloc[0]
-        rows.append({
-            "subset_id": sid,
-            "DD median mae_before_+1R": dd_med_before,
-            "DD median mae_after_+2R": dd_med_after,
-            "EE median peak_mfe": ee_med_peak,
-            "EE median giveback to k120": ee_med_gb120,
-            "FF k=20 tau (recall_A>=0.95)": float(ff_row["tau_atr_fill"]),
-            "FF k=20 recall_B": float(ff_row["recall_B_at_tau"]),
-        })
+        dd_med_before = float(
+            dd_summary[
+                (dd_summary["subset_id"] == sid)
+                & (dd_summary["metric"] == "mae_before_mfe_plus_2atr")
+            ]["median"].iloc[0]
+        )
+        dd_med_after = float(
+            dd_summary[
+                (dd_summary["subset_id"] == sid)
+                & (dd_summary["metric"] == "mae_after_mfe_plus_4atr")
+            ]["median"].iloc[0]
+        )
+        ee_med_peak = float(
+            ee_summary[(ee_summary["subset_id"] == sid) & (ee_summary["metric"] == "peak_mfe_atr")][
+                "median"
+            ].iloc[0]
+        )
+        ee_med_gb120 = float(
+            ee_summary[
+                (ee_summary["subset_id"] == sid) & (ee_summary["metric"] == "giveback_atr_to_k120")
+            ]["median"].iloc[0]
+        )
+        ff_row = ff[
+            (ff["subset_id"] == sid) & (ff["k"] == 20) & (ff["recall_A_budget"] == 0.95)
+        ].iloc[0]
+        rows.append(
+            {
+                "subset_id": sid,
+                "DD median mae_before_+1R": dd_med_before,
+                "DD median mae_after_+2R": dd_med_after,
+                "EE median peak_mfe": ee_med_peak,
+                "EE median giveback to k120": ee_med_gb120,
+                "FF k=20 tau (recall_A>=0.95)": float(ff_row["tau_atr_fill"]),
+                "FF k=20 recall_B": float(ff_row["recall_B_at_tau"]),
+            }
+        )
     syn = pd.DataFrame(rows)
     a(_df_to_md(syn, {c: "{:.3f}" for c in syn.columns if c != "subset_id"}))
     a("")
@@ -947,25 +1077,32 @@ def render_report(*, observed_shas: Dict[str, str],
     a("")
     for sid in SUBSET_IDS:
         # Before-+1R values (SL anchor)
-        b1 = dd_summary[(dd_summary["subset_id"] == sid)
-            & (dd_summary["metric"] == "mae_before_mfe_plus_2atr")].iloc[0]
-        a(f"- {sid}: median `mae_before_mfe_plus_2atr` = "
-          f"{b1['median']:.3f} ATR; q95 = {b1['q95']:.3f} ATR; "
-          f"q99 = {b1['q99']:.3f} ATR; min = {b1['min']:.3f} ATR "
-          f"(n={int(b1['n_trades_with_value'])}). "
-          f"Candidate initial-SL tightenings (descriptive ranges only): "
-          f"{b1['q95']:.2f} ATR (cuts 5% of only_up at the worst-dip point), "
-          f"{b1['q99']:.2f} ATR (cuts 1%).")
+        b1 = dd_summary[
+            (dd_summary["subset_id"] == sid) & (dd_summary["metric"] == "mae_before_mfe_plus_2atr")
+        ].iloc[0]
+        a(
+            f"- {sid}: median `mae_before_mfe_plus_2atr` = "
+            f"{b1['median']:.3f} ATR; q95 = {b1['q95']:.3f} ATR; "
+            f"q99 = {b1['q99']:.3f} ATR; min = {b1['min']:.3f} ATR "
+            f"(n={int(b1['n_trades_with_value'])}). "
+            f"Candidate initial-SL tightenings (descriptive ranges only): "
+            f"{b1['q95']:.2f} ATR (cuts 5% of only_up at the worst-dip point), "
+            f"{b1['q99']:.2f} ATR (cuts 1%)."
+        )
     a("")
     for sid in SUBSET_IDS:
         # After-+2R values (BE-shift anchor)
-        a4 = dd_summary[(dd_summary["subset_id"] == sid)
-            & (dd_summary["metric"] == "mae_after_mfe_plus_4atr")].iloc[0]
-        a6 = dd_summary[(dd_summary["subset_id"] == sid)
-            & (dd_summary["metric"] == "mae_after_mfe_plus_6atr")].iloc[0]
+        a4 = dd_summary[
+            (dd_summary["subset_id"] == sid) & (dd_summary["metric"] == "mae_after_mfe_plus_4atr")
+        ].iloc[0]
+        a6 = dd_summary[
+            (dd_summary["subset_id"] == sid) & (dd_summary["metric"] == "mae_after_mfe_plus_6atr")
+        ].iloc[0]
         a(f"- {sid}: after +2R (i.e. once MFE has reached +4 ATR), median ")
-        a(f"  `mae_after_mfe_plus_4atr` = {a4['median']:.3f} ATR; q95 = "
-          f"{a4['q95']:.3f} ATR (n={int(a4['n_trades_with_value'])}). After ")
+        a(
+            f"  `mae_after_mfe_plus_4atr` = {a4['median']:.3f} ATR; q95 = "
+            f"{a4['q95']:.3f} ATR (n={int(a4['n_trades_with_value'])}). After "
+        )
         a(f"  +3R, median `mae_after_mfe_plus_6atr` = {a6['median']:.3f} ATR ")
         a(f"  (n={int(a6['n_trades_with_value'])}). Candidate BE-shift ")
         a("  thresholds correspond to the MFE level at which the post-")
@@ -974,19 +1111,27 @@ def render_report(*, observed_shas: Dict[str, str],
     a("### Block EE — candidate values for trail-distance and TP-level parameters")
     a("")
     for sid in SUBSET_IDS:
-        peak = ee_summary[(ee_summary["subset_id"] == sid)
-            & (ee_summary["metric"] == "peak_mfe_atr")].iloc[0]
-        gb = ee_summary[(ee_summary["subset_id"] == sid)
-            & (ee_summary["metric"] == "giveback_atr_to_k120")].iloc[0]
-        gbfrac = ee_summary[(ee_summary["subset_id"] == sid)
-            & (ee_summary["metric"] == "giveback_atr_as_fraction_of_peak_k120")].iloc[0]
-        a(f"- {sid}: median peak MFE = {peak['median']:.3f} ATR; q75 = "
-          f"{peak['q75']:.3f} ATR; q95 = {peak['q95']:.3f} ATR. Median ")
+        peak = ee_summary[
+            (ee_summary["subset_id"] == sid) & (ee_summary["metric"] == "peak_mfe_atr")
+        ].iloc[0]
+        gb = ee_summary[
+            (ee_summary["subset_id"] == sid) & (ee_summary["metric"] == "giveback_atr_to_k120")
+        ].iloc[0]
+        gbfrac = ee_summary[
+            (ee_summary["subset_id"] == sid)
+            & (ee_summary["metric"] == "giveback_atr_as_fraction_of_peak_k120")
+        ].iloc[0]
+        a(
+            f"- {sid}: median peak MFE = {peak['median']:.3f} ATR; q75 = "
+            f"{peak['q75']:.3f} ATR; q95 = {peak['q95']:.3f} ATR. Median "
+        )
         a(f"  giveback to k=120 = {gb['median']:.3f} ATR ")
-        a(f"  ({gbfrac['median']*100:.1f}% of peak); q95 = "
-          f"{gb['q95']:.3f} ATR. Candidate fixed TP levels correspond to ")
-        a(f"  the peak MFE quantiles; candidate trail distances correspond ")
-        a(f"  to giveback quantiles.")
+        a(
+            f"  ({gbfrac['median'] * 100:.1f}% of peak); q95 = "
+            f"{gb['q95']:.3f} ATR. Candidate fixed TP levels correspond to "
+        )
+        a("  the peak MFE quantiles; candidate trail distances correspond ")
+        a("  to giveback quantiles.")
     a("")
     a("### Block FF — candidate (k, tau) early-cut combinations")
     a("")
@@ -1001,21 +1146,28 @@ def render_report(*, observed_shas: Dict[str, str],
             if len(sub_b) == 0:
                 continue
             top = sub_b.sort_values("recall_B_at_tau", ascending=False).iloc[0]
-            rows.append({
-                "recall_A_budget": float(budget),
-                "k": int(top["k"]),
-                "tau_atr_fill": float(top["tau_atr_fill"]),
-                "recall_A_at_tau": float(top["recall_A_at_tau"]),
-                "recall_B_at_tau": float(top["recall_B_at_tau"]),
-                "n_group_A": int(top["n_group_A"]),
-                "n_group_B": int(top["n_group_B"]),
-            })
-        a(_df_to_md(pd.DataFrame(rows), {
-            "tau_atr_fill": "{:.2f}",
-            "recall_A_at_tau": "{:.3f}",
-            "recall_B_at_tau": "{:.3f}",
-            "recall_A_budget": "{:.2f}",
-        }))
+            rows.append(
+                {
+                    "recall_A_budget": float(budget),
+                    "k": int(top["k"]),
+                    "tau_atr_fill": float(top["tau_atr_fill"]),
+                    "recall_A_at_tau": float(top["recall_A_at_tau"]),
+                    "recall_B_at_tau": float(top["recall_B_at_tau"]),
+                    "n_group_A": int(top["n_group_A"]),
+                    "n_group_B": int(top["n_group_B"]),
+                }
+            )
+        a(
+            _df_to_md(
+                pd.DataFrame(rows),
+                {
+                    "tau_atr_fill": "{:.2f}",
+                    "recall_A_at_tau": "{:.3f}",
+                    "recall_B_at_tau": "{:.3f}",
+                    "recall_A_budget": "{:.2f}",
+                },
+            )
+        )
         a("")
     a("Candidate (k, tau) combinations for Round 3B early-cut variants are ")
     a("the (k, tau) pairs above at each recall_A budget. Selection between ")
@@ -1075,7 +1227,7 @@ def _validate_block_FF_arithmetic(ff: pd.DataFrame) -> None:
             raise RuntimeError(
                 "HALT (gate 7): Block FF arithmetic identity broken at "
                 f"subset={row['subset_id']} k={int(row['k'])} budget={row['recall_A_budget']}: "
-                f"tp_A+fn_A={tp_A+fn_A}!={nA} or tn_B+fp_B={tn_B+fp_B}!={nB}"
+                f"tp_A+fn_A={tp_A + fn_A}!={nA} or tn_B+fp_B={tn_B + fp_B}!={nB}"
             )
 
 
@@ -1088,8 +1240,7 @@ def build_pass(*, out_dir: Path, write_manifest: bool) -> Dict[str, Any]:
 
     # Subsets
     labels, subsets = build_subsets()
-    print("  Subset sizes:", {sid: len(tids) for sid, tids in subsets.items()},
-          flush=True)
+    print("  Subset sizes:", {sid: len(tids) for sid, tids in subsets.items()}, flush=True)
 
     # Per-bar paths
     print("  Loading per_bar_paths.csv...", flush=True)
@@ -1100,8 +1251,9 @@ def build_pass(*, out_dir: Path, write_manifest: bool) -> Dict[str, Any]:
 
     cats = compute_categories(pb, n_trades)
     starts, ends, rmfe, rmae, bc = _build_index(pb, n_trades)
-    print(f"  Block B categories: {dict((c, int((cats == c).sum())) for c in ALL_CATS)}",
-          flush=True)
+    print(
+        f"  Block B categories: {dict((c, int((cats == c).sum())) for c in ALL_CATS)}", flush=True
+    )
 
     # Per-subset only_up counts (for the markdown table)
     dd_n_only_up: Dict[str, int] = {}
@@ -1114,32 +1266,33 @@ def build_pass(*, out_dir: Path, write_manifest: bool) -> Dict[str, Any]:
     dd = compute_block_DD(starts, ends, rmfe, rmae, cats, subsets)
     dd_summary = summarize_block_DD(dd)
     # Gate 5: every only_up trade with finite t_mfe_plus_2 has finite mae_before
-    bad = dd[(dd["t_mfe_plus_2atr"] > 0)
-             & (dd["mae_before_mfe_plus_2atr"].isna())]
+    bad = dd[(dd["t_mfe_plus_2atr"] > 0) & (dd["mae_before_mfe_plus_2atr"].isna())]
     if len(bad) > 0:
         raise RuntimeError(
             f"HALT (gate 5): {len(bad)} only_up trades with t_mfe_plus_2atr "
-            f"finite but mae_before NaN")
+            f"finite but mae_before NaN"
+        )
     # Stronger check: by definition only_up trades MUST reach +1R MFE within k<=120.
     # So t_mfe_plus_2atr must be > 0 for all only_up rows.
     bad2 = dd[dd["t_mfe_plus_2atr"] <= 0]
     if len(bad2) > 0:
         raise RuntimeError(
             f"HALT (gate 5): {len(bad2)} only_up trades with t_mfe_plus_2atr <= 0; "
-            f"only_up by definition must reach +1R MFE within k<=120")
+            f"only_up by definition must reach +1R MFE within k<=120"
+        )
 
     # Block EE
     print("  Computing Block EE...", flush=True)
     ee = compute_block_EE(starts, ends, rmfe, rmae, bc, cats, subsets)
     ee_summary = summarize_block_EE(ee)
-    ee_clamped = {sid: int(ee[(ee["subset_id"] == sid)
-                              & (ee["clamped_before_k240"] == True)].shape[0])  # noqa: E712
-                  for sid in SUBSET_IDS}
+    ee_clamped = {
+        sid: int(ee[(ee["subset_id"] == sid) & (ee["clamped_before_k240"] == True)].shape[0])  # noqa: E712
+        for sid in SUBSET_IDS
+    }
     # Gate 6
     bad3 = ee[ee["peak_mfe_atr"].isna()]
     if len(bad3) > 0:
-        raise RuntimeError(
-            f"HALT (gate 6): {len(bad3)} only_up trades with NaN peak_mfe_atr")
+        raise RuntimeError(f"HALT (gate 6): {len(bad3)} only_up trades with NaN peak_mfe_atr")
 
     # Block FF
     print("  Computing Block FF...", flush=True)
@@ -1164,10 +1317,14 @@ def build_pass(*, out_dir: Path, write_manifest: bool) -> Dict[str, Any]:
 
     # Markdown report
     print("  Rendering markdown...", flush=True)
-    md = render_report(observed_shas=observed_shas,
-                       dd_summary=dd_summary, ee_summary=ee_summary,
-                       ff=ff, dd_n_only_up=dd_n_only_up,
-                       ee_clamped=ee_clamped)
+    md = render_report(
+        observed_shas=observed_shas,
+        dd_summary=dd_summary,
+        ee_summary=ee_summary,
+        ff=ff,
+        dd_n_only_up=dd_n_only_up,
+        ee_clamped=ee_clamped,
+    )
     md_path = out_dir / "path_excursion_descriptives.md"
     md_path.write_text(md, encoding="utf-8", newline="\n")
 
@@ -1175,9 +1332,7 @@ def build_pass(*, out_dir: Path, write_manifest: bool) -> Dict[str, Any]:
     viols = check_disposition_discipline(md)
     if viols:
         msg = "\n  ".join([f"line {ln}: pat='{p}': {tx}" for ln, p, tx in viols])
-        raise RuntimeError(
-            f"HALT (gate 10): disposition discipline violations:\n  {msg}"
-        )
+        raise RuntimeError(f"HALT (gate 10): disposition discipline violations:\n  {msg}")
 
     # Gate 9: locked artefacts unchanged
     _verify_locked("gate 9 (end)")
@@ -1185,8 +1340,7 @@ def build_pass(*, out_dir: Path, write_manifest: bool) -> Dict[str, Any]:
     # Output sha256 manifest
     out_files = list(paths.keys()) + ["path_excursion_descriptives.md"]
     out_paths_full = [out_dir / n for n in out_files] + plot_paths
-    out_shas = {p.relative_to(REPO_ROOT).as_posix(): _sha256_file(p)
-                for p in out_paths_full}
+    out_shas = {p.relative_to(REPO_ROOT).as_posix(): _sha256_file(p) for p in out_paths_full}
 
     gates = {
         "gate_1_inputs": "ok (9 sha256s match)",
@@ -1254,9 +1408,11 @@ def _compare_files(a: Path, b: Path) -> bool:
 
 def main(argv: Optional[List[str]] = None) -> int:
     import argparse
+
     parser = argparse.ArgumentParser()
-    parser.add_argument("--single-pass", action="store_true",
-                        help="Skip the determinism second pass.")
+    parser.add_argument(
+        "--single-pass", action="store_true", help="Skip the determinism second pass."
+    )
     args = parser.parse_args(argv)
 
     t_start = time.time()
@@ -1275,8 +1431,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     else:
         # Snapshot pass 1 outputs.
         snapshot_dir = Path(tempfile.mkdtemp(prefix="arc2_pathexc_snap_"))
-        check_files = list((Path(p)
-                            for p in r1["out_shas"].keys()))
+        check_files = list((Path(p) for p in r1["out_shas"].keys()))
         snap_map: Dict[Path, Path] = {}
         for rel in check_files:
             src = REPO_ROOT / rel
@@ -1294,9 +1449,7 @@ def main(argv: Optional[List[str]] = None) -> int:
                 det_diffs.append(str(src.name))
         shutil.rmtree(snapshot_dir, ignore_errors=True)
         if det_diffs:
-            raise RuntimeError(
-                f"HALT (gate 8): determinism failed; differing files: {det_diffs}"
-            )
+            raise RuntimeError(f"HALT (gate 8): determinism failed; differing files: {det_diffs}")
         det_ok = True
         r1 = r2
 
@@ -1307,8 +1460,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     print("\n=== Validation gates disposition ===", flush=True)
     for k, v in r1["gates"].items():
         print(f"  {k}: {v}", flush=True)
-    print(f"  gate_8_determinism: {'ok' if det_ok else 'single-pass-skipped'}",
-          flush=True)
+    print(f"  gate_8_determinism: {'ok' if det_ok else 'single-pass-skipped'}", flush=True)
 
     # Headline numbers per subset
     dd_summary = r1["dd_summary"]
@@ -1316,16 +1468,21 @@ def main(argv: Optional[List[str]] = None) -> int:
     ff = r1["ff"]
     print("\n=== Headline numbers per subset ===", flush=True)
     for sid in SUBSET_IDS:
-        dd_before = dd_summary[(dd_summary["subset_id"] == sid)
-            & (dd_summary["metric"] == "mae_before_mfe_plus_2atr")].iloc[0]
-        dd_after = dd_summary[(dd_summary["subset_id"] == sid)
-            & (dd_summary["metric"] == "mae_after_mfe_plus_4atr")].iloc[0]
-        ee_gb120 = ee_summary[(ee_summary["subset_id"] == sid)
-            & (ee_summary["metric"] == "giveback_atr_to_k120")].iloc[0]
-        ee_gb240 = ee_summary[(ee_summary["subset_id"] == sid)
-            & (ee_summary["metric"] == "giveback_atr_to_k240")].iloc[0]
-        ff_k20 = ff[(ff["subset_id"] == sid) & (ff["k"] == 20)
-                     & (ff["recall_A_budget"] == 0.95)].iloc[0]
+        dd_before = dd_summary[
+            (dd_summary["subset_id"] == sid) & (dd_summary["metric"] == "mae_before_mfe_plus_2atr")
+        ].iloc[0]
+        dd_after = dd_summary[
+            (dd_summary["subset_id"] == sid) & (dd_summary["metric"] == "mae_after_mfe_plus_4atr")
+        ].iloc[0]
+        ee_gb120 = ee_summary[
+            (ee_summary["subset_id"] == sid) & (ee_summary["metric"] == "giveback_atr_to_k120")
+        ].iloc[0]
+        ee_gb240 = ee_summary[
+            (ee_summary["subset_id"] == sid) & (ee_summary["metric"] == "giveback_atr_to_k240")
+        ].iloc[0]
+        ff_k20 = ff[
+            (ff["subset_id"] == sid) & (ff["k"] == 20) & (ff["recall_A_budget"] == 0.95)
+        ].iloc[0]
         print(
             f"  {sid}: DD med mae_before_+1R = {dd_before['median']:+.3f} ATR "
             f"(n={int(dd_before['n_trades_with_value'])}); "
@@ -1350,16 +1507,13 @@ def main(argv: Optional[List[str]] = None) -> int:
             ["git", "rev-parse", "HEAD"], cwd=REPO_ROOT, text=True
         ).strip()
         print(f"  HEAD: {head}", flush=True)
-        st = subprocess.check_output(
-            ["git", "status", "--porcelain"], cwd=REPO_ROOT, text=True
-        )
+        st = subprocess.check_output(["git", "status", "--porcelain"], cwd=REPO_ROOT, text=True)
         for ln in st.splitlines()[:80]:
             print(f"  {ln}", flush=True)
     except Exception as e:
         print(f"  (git unavailable: {e})", flush=True)
 
-    print(f"\n  wallclock {wallclock:.2f}s  peak_RSS_traced_kb {peak_kb:.0f}",
-          flush=True)
+    print(f"\n  wallclock {wallclock:.2f}s  peak_RSS_traced_kb {peak_kb:.0f}", flush=True)
     return 0
 
 

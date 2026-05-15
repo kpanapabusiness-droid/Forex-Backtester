@@ -101,14 +101,16 @@ def test_cooldown_behavior():
     high = close + 0.01
     low = close - 0.01
     open_ = close.shift(1).fillna(close.iloc[0])
-    df = pd.DataFrame({
-        "date": dates,
-        "open": open_,
-        "high": high,
-        "low": low,
-        "close": close,
-        "volume": 100,
-    })
+    df = pd.DataFrame(
+        {
+            "date": dates,
+            "open": open_,
+            "high": high,
+            "low": low,
+            "close": close,
+            "volume": 100,
+        }
+    )
 
     cooldown = 8
     out = c1_compression_escape_state_machine(

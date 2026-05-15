@@ -8,6 +8,7 @@ Strategy:
   5. Diff. PASS if all match. Write determinism_check.txt.
   6. Restore .run1 names as evidence.
 """
+
 from __future__ import annotations
 
 import hashlib

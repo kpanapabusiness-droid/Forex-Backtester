@@ -1,4 +1,5 @@
 """Shared I/O + path helpers for L Arc 1 Step 2."""
+
 from __future__ import annotations
 
 import hashlib
@@ -20,12 +21,34 @@ CONFIG_PATH = REPO_ROOT / "configs" / "wfo_l_arc1_verbatim.yaml"
 DATA_1H_DIR = REPO_ROOT / "data" / "1hr"
 
 PAIRS: List[str] = [
-    "AUD_CAD", "AUD_CHF", "AUD_JPY", "AUD_NZD", "AUD_USD",
-    "CAD_CHF", "CAD_JPY", "CHF_JPY",
-    "EUR_AUD", "EUR_CAD", "EUR_CHF", "EUR_GBP", "EUR_JPY", "EUR_NZD", "EUR_USD",
-    "GBP_AUD", "GBP_CAD", "GBP_CHF", "GBP_JPY", "GBP_NZD", "GBP_USD",
-    "NZD_CAD", "NZD_CHF", "NZD_JPY", "NZD_USD",
-    "USD_CAD", "USD_CHF", "USD_JPY",
+    "AUD_CAD",
+    "AUD_CHF",
+    "AUD_JPY",
+    "AUD_NZD",
+    "AUD_USD",
+    "CAD_CHF",
+    "CAD_JPY",
+    "CHF_JPY",
+    "EUR_AUD",
+    "EUR_CAD",
+    "EUR_CHF",
+    "EUR_GBP",
+    "EUR_JPY",
+    "EUR_NZD",
+    "EUR_USD",
+    "GBP_AUD",
+    "GBP_CAD",
+    "GBP_CHF",
+    "GBP_JPY",
+    "GBP_NZD",
+    "GBP_USD",
+    "NZD_CAD",
+    "NZD_CHF",
+    "NZD_JPY",
+    "NZD_USD",
+    "USD_CAD",
+    "USD_CHF",
+    "USD_JPY",
 ]
 
 FORWARD_HORIZON_BARS_DEFAULT: int = 240
@@ -33,7 +56,7 @@ FORWARD_HORIZON_BARS_EXTENDED: int = 480
 RANDOM_SEED: int = 1234
 
 # Time-exit and SL-distance shadow grids
-ENTRY_DELAYS = [1, 2, 3, 5, 10]       # bar_offset; 1 is the verbatim baseline
+ENTRY_DELAYS = [1, 2, 3, 5, 10]  # bar_offset; 1 is the verbatim baseline
 SL_DISTANCES = [1.0, 1.5, 2.0, 2.5, 3.0]  # ATR multipliers; 2.0 baseline
 TIME_EXIT_H = [1, 3, 6, 12, 24, 48, 120, 240]  # 1 baseline
 H_GRID = [1, 3, 6, 12, 24, 48, 72, 120, 240, 360, 480]
@@ -65,8 +88,14 @@ def load_trades_verbatim() -> pd.DataFrame:
     """Load step 1 trades_verbatim.csv with timestamps as Timestamps."""
     path = STEP1_DIR / "trades_verbatim.csv"
     df = pd.read_csv(path)
-    for col in ("signal_bar_ts", "entry_bar_ts", "exit_bar_ts",
-                "signal_time_utc", "entry_time_utc", "exit_time_utc"):
+    for col in (
+        "signal_bar_ts",
+        "entry_bar_ts",
+        "exit_bar_ts",
+        "signal_time_utc",
+        "entry_time_utc",
+        "exit_time_utc",
+    ):
         if col in df.columns:
             df[col] = pd.to_datetime(df[col])
     if "trade_id" not in df.columns:
@@ -90,7 +119,9 @@ def load_pair_1h(pair: str) -> pd.DataFrame:
     return df
 
 
-def wilder_atr(high: np.ndarray, low: np.ndarray, close: np.ndarray, period: int = 14) -> np.ndarray:
+def wilder_atr(
+    high: np.ndarray, low: np.ndarray, close: np.ndarray, period: int = 14
+) -> np.ndarray:
     """Bit-identical to engine's `_wilder_atr` (Python loop, period-1 simple seed)."""
     n = len(close)
     if n == 0:
@@ -109,8 +140,13 @@ def wilder_atr(high: np.ndarray, low: np.ndarray, close: np.ndarray, period: int
     return atr
 
 
-def compute_signal_mask(df_1h: pd.DataFrame, lookback: int = 100, q: float = 0.90,
-                        direction: str = "neg", atr_period: int = 14) -> Tuple[np.ndarray, np.ndarray]:
+def compute_signal_mask(
+    df_1h: pd.DataFrame,
+    lookback: int = 100,
+    q: float = 0.90,
+    direction: str = "neg",
+    atr_period: int = 14,
+) -> Tuple[np.ndarray, np.ndarray]:
     """Engine-parity signal mask; returns (signal_fired bool, atr_at_signal float)."""
     close = df_1h["close"].astype(float).values
     open_ = df_1h["open"].astype(float).values
@@ -133,8 +169,11 @@ def compute_signal_mask(df_1h: pd.DataFrame, lookback: int = 100, q: float = 0.9
     atr = wilder_atr(high, low, close, atr_period)
     sign_filter = (close < open_) if direction == "neg" else (close > open_)
     fired = (
-        np.isfinite(threshold) & np.isfinite(atr) & np.isfinite(abs_log_return)
-        & (abs_log_return > threshold) & sign_filter
+        np.isfinite(threshold)
+        & np.isfinite(atr)
+        & np.isfinite(abs_log_return)
+        & (abs_log_return > threshold)
+        & sign_filter
     )
     return fired, atr
 
@@ -144,7 +183,9 @@ def ts_index_by_ts(df_1h: pd.DataFrame) -> Dict[pd.Timestamp, int]:
     return {pd.Timestamp(t): i for i, t in enumerate(df_1h["time"].to_numpy())}
 
 
-def floor_pips_for_pair(spread_floor_yaml: Path, pair: str, points_per_pip: float = 10.0) -> Optional[float]:
+def floor_pips_for_pair(
+    spread_floor_yaml: Path, pair: str, points_per_pip: float = 10.0
+) -> Optional[float]:
     data = yaml.safe_load(spread_floor_yaml.read_text(encoding="utf-8")) or {}
     stats = (data.get("floors") or {}).get(pair)
     if not stats:

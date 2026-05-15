@@ -14,11 +14,9 @@ Public entrypoint: `run_l4_wfo(config_path)`.
 from __future__ import annotations
 
 import csv
-import hashlib
-import json
 import math
 import sys
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -31,14 +29,13 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from core.spread_floor import (  # noqa: E402
+    STATE_CFG_KEY,
     SpreadFloorState,
     apply_spread_floor_to_pips,
     format_startup_log,
     format_summary_log,
     load_spread_floor,
-    STATE_CFG_KEY,
 )
-from validators_config import L4Config  # noqa: E402
 
 # ---------------------------------------------------------------------------
 # Constants — all hard-locked at the L4 contract; never derive at runtime.
@@ -290,9 +287,7 @@ def _build_quote_to_usd_table(
     return out
 
 
-def _quote_to_usd_at(
-    pair: str, ts: pd.Timestamp, quote_to_usd: Dict[str, pd.Series]
-) -> float:
+def _quote_to_usd_at(pair: str, ts: pd.Timestamp, quote_to_usd: Dict[str, pd.Series]) -> float:
     quote = pair.split("_")[1]
     if quote == "USD":
         return 1.0
@@ -336,8 +331,7 @@ def _spread_pips_at_bar(
         raw_pips = 0.0
     eff = apply_spread_floor_to_pips(cfg, pair, raw_pips)
     was_floored = (
-        spread_state.n_applications > pre_n_apps
-        and spread_state.n_total_entry_bars > pre_total
+        spread_state.n_applications > pre_n_apps and spread_state.n_total_entry_bars > pre_total
     )
     return float(eff), was_floored
 
@@ -407,9 +401,7 @@ def _attach_concurrent_density(pair_signals: Dict[str, pd.DataFrame]) -> None:
     """
     # Union of all timestamps across all pairs (sorted, unique).
     all_ts = (
-        pd.DatetimeIndex(
-            np.concatenate([df[TIME_COL].values for df in pair_signals.values()])
-        )
+        pd.DatetimeIndex(np.concatenate([df[TIME_COL].values for df in pair_signals.values()]))
         .unique()
         .sort_values()
     )
@@ -579,9 +571,7 @@ def _execute_signals(
                 continue
 
             # Resolve spread at entry (use entry-bar spread)
-            sp_entry_pips, was_floored_e = _spread_pips_at_bar(
-                pair, entry_row, cfg, spread_state
-            )
+            sp_entry_pips, was_floored_e = _spread_pips_at_bar(pair, entry_row, cfg, spread_state)
 
             # Entry fill price (mid + spread/2 for long)
             entry_mid = float(entry_row["open"])
@@ -731,10 +721,14 @@ def run_l4_wfo(config_path: str | Path) -> None:
     raw = yaml.safe_load(config_path.read_text(encoding="utf-8")) or {}
     # Validate via the same dispatcher legacy callers use.
     from validators_config import validate_config
+
     cfg = validate_config(raw)
 
     # Hard-fail dispatch: this entrypoint is L4-only.
-    if not isinstance(cfg.get("signal"), dict) or cfg["signal"].get("type") != "l4_univariate_extreme":
+    if (
+        not isinstance(cfg.get("signal"), dict)
+        or cfg["signal"].get("type") != "l4_univariate_extreme"
+    ):
         raise RuntimeError(
             "run_l4_wfo invoked on a non-L4 config; "
             "use scripts/walk_forward.py main() to dispatch by signal.type"
@@ -939,7 +933,19 @@ def run_l4_wfo(config_path: str | Path) -> None:
     fold_results_csv = results_dir / output_cfg["fold_results_csv"]
     with fold_results_csv.open("w", encoding="utf-8", newline="") as f:
         w = csv.writer(f, lineterminator="\n")
-        w.writerow(["fold_id", "oos_start", "oos_end", "n_trades", "roi_pct", "max_dd_pct", "win_pct", "mean_R", "gate_disposition"])
+        w.writerow(
+            [
+                "fold_id",
+                "oos_start",
+                "oos_end",
+                "n_trades",
+                "roi_pct",
+                "max_dd_pct",
+                "win_pct",
+                "mean_R",
+                "gate_disposition",
+            ]
+        )
         for fr in fold_results:
             w.writerow(
                 [
@@ -964,7 +970,9 @@ def run_l4_wfo(config_path: str | Path) -> None:
     lines.append("=" * 60)
     lines.append("")
     lines.append("Per-fold table:")
-    lines.append("fold_id | oos_start  | oos_end    | n_trades | roi_pct | max_dd_pct | win_pct | mean_R | gate")
+    lines.append(
+        "fold_id | oos_start  | oos_end    | n_trades | roi_pct | max_dd_pct | win_pct | mean_R | gate"
+    )
     lines.append("-" * 100)
     for fr in fold_results:
         lines.append(

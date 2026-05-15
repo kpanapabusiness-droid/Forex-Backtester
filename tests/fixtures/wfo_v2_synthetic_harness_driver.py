@@ -73,6 +73,7 @@ def main() -> int:
 
     try:
         from scripts.walk_forward import run_wfo_v2
+
         run_wfo_v2(tmp_path)
     finally:
         try:

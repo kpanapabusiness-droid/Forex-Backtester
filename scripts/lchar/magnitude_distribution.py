@@ -56,8 +56,22 @@ def r_distribution_row(s: pd.Series) -> dict:
 
 def section_1(df: pd.DataFrame, lines: list[str]) -> None:
     lines.append("## 1. Net R / Gross R distribution\n")
-    cols = ["count", "mean", "std", "skew", "kurtosis", "min",
-            "p1", "p5", "p25", "p50", "p75", "p95", "p99", "max"]
+    cols = [
+        "count",
+        "mean",
+        "std",
+        "skew",
+        "kurtosis",
+        "min",
+        "p1",
+        "p5",
+        "p25",
+        "p50",
+        "p75",
+        "p95",
+        "p99",
+        "max",
+    ]
     header = "| stat | " + " | ".join(cols) + " |"
     sep = "|---" * (len(cols) + 1) + "|"
     lines.append(header)
@@ -104,7 +118,9 @@ def section_2(df: pd.DataFrame, lines: list[str]) -> None:
         pct = cnt / n_total if n_total else float("nan")
         mn_net = sub["net_r"].mean() if cnt else float("nan")
         mn_gross = sub["gross_r"].mean() if cnt else float("nan")
-        lines.append(f"| {label} | {fmt(cnt, 0)} | {fmt(pct, 4)} | {fmt(mn_net)} | {fmt(mn_gross)} |")
+        lines.append(
+            f"| {label} | {fmt(cnt, 0)} | {fmt(pct, 4)} | {fmt(mn_net)} | {fmt(mn_gross)} |"
+        )
     lines.append("")
 
     lines.append("### 2c. Winners-only net_r quantiles\n")
@@ -183,9 +199,7 @@ def section_5(df: pd.DataFrame, lines: list[str]) -> None:
             continue
         s = (df[col] / df["atr_1h_at_n"]).dropna()
         row_vals = [s.quantile(q) for q in qs] + [s.max() if len(s) else float("nan")]
-        lines.append(
-            f"| {H} | {fmt(len(s), 0)} | " + " | ".join(fmt(v) for v in row_vals) + " |"
-        )
+        lines.append(f"| {H} | {fmt(len(s), 0)} | " + " | ".join(fmt(v) for v in row_vals) + " |")
     lines.append("")
 
     lines.append("### 5b. Per structural_pattern\n")

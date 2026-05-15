@@ -13,13 +13,22 @@ def test_phaseB_configs_specify_phaseB_output_dirs() -> None:
         root / "configs" / "phaseB" / "phaseB_controlled_overfit.yaml",
     ]
     import yaml
+
     for path in configs:
         assert path.exists(), f"Config missing: {path}"
         with path.open("r", encoding="utf-8") as f:
             cfg = yaml.safe_load(f)
-        out_dir = (cfg.get("outputs") or {}).get("dir") or (cfg.get("output") or {}).get("results_dir") or ""
-        assert "phaseB" in out_dir, f"Output dir must be under results/phaseB: {out_dir} in {path.name}"
-        assert out_dir.startswith("results/phaseB") or "phaseB" in out_dir, f"Output dir must be under results/phaseB: {out_dir}"
+        out_dir = (
+            (cfg.get("outputs") or {}).get("dir")
+            or (cfg.get("output") or {}).get("results_dir")
+            or ""
+        )
+        assert "phaseB" in out_dir, (
+            f"Output dir must be under results/phaseB: {out_dir} in {path.name}"
+        )
+        assert out_dir.startswith("results/phaseB") or "phaseB" in out_dir, (
+            f"Output dir must be under results/phaseB: {out_dir}"
+        )
 
 
 def test_phaseB_quality_gate_writes_under_output_arg() -> None:

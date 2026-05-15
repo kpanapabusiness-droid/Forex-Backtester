@@ -33,23 +33,41 @@ class TestBatchSweeperCSVParseable:
     def test_consolidated_csv_no_json_columns(self):
         """Test that FIELDNAMES does not include JSON/dict blob columns."""
         # These columns should NOT be in FIELDNAMES (they cause parsing issues)
-        json_columns = ["roles", "params", "components_json", "params_json", "config_overrides", "indicator_params"]
-        
+        json_columns = [
+            "roles",
+            "params",
+            "components_json",
+            "params_json",
+            "config_overrides",
+            "indicator_params",
+        ]
+
         for col in json_columns:
-            assert col not in FIELDNAMES, f"JSON column '{col}' should not be in FIELDNAMES (causes parsing issues)"
+            assert col not in FIELDNAMES, (
+                f"JSON column '{col}' should not be in FIELDNAMES (causes parsing issues)"
+            )
 
     def test_consolidated_csv_has_canonical_keys(self):
         """Test that FIELDNAMES includes all required canonical identity and component keys."""
         required_identity = ["run_id", "pair", "timeframe", "from_date", "to_date"]
         required_components = ["c1", "c2", "baseline", "volume", "exit"]
-        required_metrics = ["total_trades", "wins", "losses", "scratches", "win_rate_ns", "roi_pct", "max_dd_pct", "expectancy"]
-        
+        required_metrics = [
+            "total_trades",
+            "wins",
+            "losses",
+            "scratches",
+            "win_rate_ns",
+            "roi_pct",
+            "max_dd_pct",
+            "expectancy",
+        ]
+
         for key in required_identity:
             assert key in FIELDNAMES, f"Missing required identity key: {key}"
-        
+
         for key in required_components:
             assert key in FIELDNAMES, f"Missing required component key: {key}"
-        
+
         for key in required_metrics:
             assert key in FIELDNAMES, f"Missing required metric key: {key}"
 
@@ -85,51 +103,53 @@ class TestBatchSweeperCSVParseable:
             "expectancy": 0.5,
             "score": 5.0,
         }
-        
+
         with tempfile.TemporaryDirectory() as tmpdir:
             csv_path = Path(tmpdir) / "test_batch_results.csv"
-            
+
             # Write using append_consolidated (simulates batch_sweeper behavior)
             # We need to temporarily set CONSOLIDATED for this test
             from scripts.batch_sweeper import CONSOLIDATED
+
             original_consolidated = CONSOLIDATED
-            
+
             try:
                 # Temporarily override CONSOLIDATED
                 import scripts.batch_sweeper as bs_module
+
                 bs_module.CONSOLIDATED = csv_path
-                
+
                 # Write the row
                 append_consolidated([sample_row])
-                
+
                 # Verify file exists
                 assert csv_path.exists(), "CSV file should be created"
-                
+
                 # Read back with pandas (default engine, no special options)
                 df = pd.read_csv(csv_path)
-                
+
                 # Verify expected column count
                 assert len(df.columns) == len(FIELDNAMES), (
                     f"Expected {len(FIELDNAMES)} columns, got {len(df.columns)}. "
                     f"Columns: {list(df.columns)}"
                 )
-                
+
                 # Verify all FIELDNAMES are present
                 for col in FIELDNAMES:
                     assert col in df.columns, f"Missing column: {col}"
-                
+
                 # Verify data integrity
                 assert len(df) == 1, "Should have exactly one row"
                 assert df.iloc[0]["run_id"] == "test_run_123"
                 assert df.iloc[0]["pair"] == "EUR_USD"
                 assert df.iloc[0]["total_trades"] == 100
                 assert df.iloc[0]["roi_pct"] == 10.0
-                
+
                 # Verify no JSON/dict columns exist
                 json_columns = ["roles", "params"]
                 for col in json_columns:
                     assert col not in df.columns, f"JSON column '{col}' should not be in CSV"
-                
+
             finally:
                 # Restore original CONSOLIDATED
                 bs_module.CONSOLIDATED = original_consolidated
@@ -166,26 +186,28 @@ class TestBatchSweeperCSVParseable:
             "expectancy": 0.5,
             "score": 5.0,
         }
-        
+
         with tempfile.TemporaryDirectory() as tmpdir:
             csv_path = Path(tmpdir) / "test_batch_results.csv"
-            
+
             from scripts.batch_sweeper import CONSOLIDATED
+
             original_consolidated = CONSOLIDATED
-            
+
             try:
                 import scripts.batch_sweeper as bs_module
+
                 bs_module.CONSOLIDATED = csv_path
-                
+
                 append_consolidated([sample_row])
-                
+
                 # Read back with pandas
                 df = pd.read_csv(csv_path)
-                
+
                 # Verify data integrity
                 assert df.iloc[0]["run_id"] == "test_run_with_underscores_123"
                 assert df.iloc[0]["pair"] == "EUR_USD"
-                
+
             finally:
                 bs_module.CONSOLIDATED = original_consolidated
 
@@ -223,30 +245,32 @@ class TestBatchSweeperCSVParseable:
             }
             for i in range(3)
         ]
-        
+
         with tempfile.TemporaryDirectory() as tmpdir:
             csv_path = Path(tmpdir) / "test_batch_results.csv"
-            
+
             from scripts.batch_sweeper import CONSOLIDATED
+
             original_consolidated = CONSOLIDATED
-            
+
             try:
                 import scripts.batch_sweeper as bs_module
+
                 bs_module.CONSOLIDATED = csv_path
-                
+
                 append_consolidated(rows)
-                
+
                 # Read back with pandas
                 df = pd.read_csv(csv_path)
-                
+
                 # Verify row count
                 assert len(df) == 3, f"Expected 3 rows, got {len(df)}"
-                
+
                 # Verify all rows are readable
                 for i in range(3):
                     assert df.iloc[i]["run_id"] == f"test_run_{i}"
                     assert df.iloc[i]["total_trades"] == 100 + i
-                
+
             finally:
                 bs_module.CONSOLIDATED = original_consolidated
 
@@ -254,7 +278,7 @@ class TestBatchSweeperCSVParseable:
         """Test extracting unique pairs from a CSV file."""
         with tempfile.TemporaryDirectory() as tmpdir:
             csv_path = Path(tmpdir) / "test_pairs.csv"
-            
+
             # Create test CSV with pairs (some duplicates to test uniqueness)
             test_data = {
                 "pair": ["EUR_USD", "GBP_USD", "EUR_USD", "AUD_USD", "GBP_USD", "USD_JPY"],
@@ -263,16 +287,16 @@ class TestBatchSweeperCSVParseable:
             }
             df = pd.DataFrame(test_data)
             df.to_csv(csv_path, index=False)
-            
+
             # Extract pairs
             pairs = extract_pairs_from_csv(csv_path, column_name="pair")
-            
+
             # Verify unique and sorted
             assert len(pairs) == 4, f"Expected 4 unique pairs, got {len(pairs)}"
             assert pairs == ["AUD_USD", "EUR_USD", "GBP_USD", "USD_JPY"], (
                 f"Expected sorted unique pairs, got {pairs}"
             )
-            
+
             # Test with custom column name
             csv_path2 = Path(tmpdir) / "test_pairs2.csv"
             test_data2 = {
@@ -281,24 +305,23 @@ class TestBatchSweeperCSVParseable:
             }
             df2 = pd.DataFrame(test_data2)
             df2.to_csv(csv_path2, index=False)
-            
+
             pairs2 = extract_pairs_from_csv(csv_path2, column_name="symbol")
             assert pairs2 == ["AUD_USD", "EUR_USD", "GBP_USD"]
-            
+
             # Test error handling: missing file
             missing_path = Path(tmpdir) / "nonexistent.csv"
             with pytest.raises(FileNotFoundError, match="Pairs source CSV not found"):
                 extract_pairs_from_csv(missing_path)
-            
+
             # Test error handling: missing column
             with pytest.raises(RuntimeError, match="Column 'missing_col' not found"):
                 extract_pairs_from_csv(csv_path, column_name="missing_col")
-            
+
             # Test error handling: empty pairs
             csv_path3 = Path(tmpdir) / "test_empty.csv"
             empty_df = pd.DataFrame({"pair": [], "other": []})
             empty_df.to_csv(csv_path3, index=False)
-            
+
             with pytest.raises(RuntimeError, match="No pairs found"):
                 extract_pairs_from_csv(csv_path3, column_name="pair")
-

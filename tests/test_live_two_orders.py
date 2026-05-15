@@ -1,6 +1,5 @@
 """Test that an approved OPEN produces exactly 2 orders: TP1 and RUNNER."""
 
-
 import pandas as pd
 
 from live.reporting import write_orders_csv

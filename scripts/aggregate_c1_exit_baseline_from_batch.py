@@ -51,7 +51,7 @@ def extract_pairs_from_config(run_slug: str, history_dir: Path) -> List[str]:
     """Extract pair(s) from archived config file in results_history. Returns list of pairs."""
     run_dir = history_dir / run_slug
     config_path = run_dir / "config.yaml"
-    
+
     if config_path.exists():
         try:
             with config_path.open("r", encoding="utf-8") as f:
@@ -69,7 +69,7 @@ def extract_pairs_from_config(run_slug: str, history_dir: Path) -> List[str]:
                 return [pair_val] if pair_val else []
         except Exception:
             pass
-    
+
     return []
 
 
@@ -87,7 +87,9 @@ def get_pairs_from_sweeps_config(sweeps_yaml: Path) -> List[str]:
     return []
 
 
-def aggregate_baseline(batch_csv: Path, history_dir: Optional[Path] = None, sweeps_yaml: Optional[Path] = None) -> pd.DataFrame:
+def aggregate_baseline(
+    batch_csv: Path, history_dir: Optional[Path] = None, sweeps_yaml: Optional[Path] = None
+) -> pd.DataFrame:
     """Read batch CSV and aggregate by canonical keys (pair + c1 + exit + timeframe + from_date + to_date)."""
     if not batch_csv.exists():
         raise FileNotFoundError(f"Batch CSV not found: {batch_csv}")
@@ -105,6 +107,7 @@ def aggregate_baseline(batch_csv: Path, history_dir: Optional[Path] = None, swee
         # Fallback for older pandas versions that don't support on_bad_lines
         # Use error_bad_lines=False, warn_bad_lines=False instead
         import warnings
+
         warnings.filterwarnings("ignore", category=pd.errors.ParserWarning)
         df = pd.read_csv(batch_csv, engine="python", error_bad_lines=False, warn_bad_lines=False)
 
@@ -130,23 +133,23 @@ def aggregate_baseline(batch_csv: Path, history_dir: Optional[Path] = None, swee
     # PRIMARY PATH: Use canonical keys from batch CSV (required)
     required_canonical = ["pair", "c1", "exit"]
     missing_required = [c for c in required_canonical if c not in df.columns]
-    
+
     if missing_required:
         # LEGACY FALLBACK: Try to extract from roles JSON and config archaeology
         print(f"⚠️  Warning: Missing canonical columns {missing_required}. Using legacy extraction.")
         print("   This should not happen with updated batch_sweeper.py. Please rerun sweeps.")
-        
+
         # Extract pair from config archaeology (legacy)
         if "pair" not in df.columns:
             if history_dir is None:
                 history_dir = PROJECT_ROOT / "results" / "results_history"
-            
+
             if history_dir.exists():
                 print(f"   Extracting pair from archived configs in {history_dir}")
                 pair_lists = df["run_slug"].apply(
                     lambda slug: extract_pairs_from_config(slug, history_dir)
                 )
-                
+
                 expanded_rows = []
                 for idx, row in df.iterrows():
                     pairs = pair_lists.iloc[idx]
@@ -156,7 +159,7 @@ def aggregate_baseline(batch_csv: Path, history_dir: Optional[Path] = None, swee
                         new_row = row.copy()
                         new_row["pair"] = pair
                         expanded_rows.append(new_row)
-                
+
                 if expanded_rows:
                     df = pd.DataFrame(expanded_rows)
                 else:
@@ -183,7 +186,7 @@ def aggregate_baseline(batch_csv: Path, history_dir: Optional[Path] = None, swee
                             f"Could not determine 'pair'. Available columns: {list(df.columns)}. "
                             f"Please rerun batch_sweeper.py to generate canonical schema."
                         )
-        
+
         # Extract c1 and exit from roles JSON (legacy)
         if "c1" not in df.columns or "exit" not in df.columns:
             if "roles" in df.columns:
@@ -211,29 +214,38 @@ def aggregate_baseline(batch_csv: Path, history_dir: Optional[Path] = None, swee
         df = df[df["volume"].isin([None, "", "none", False])]
     elif "roles" in df.columns:
         # Legacy: filter from roles JSON
-        df = df[df["roles"].apply(
-            lambda x: json.loads(x).get("volume") in [None, False, "null", "None", ""] 
-            if isinstance(x, str) else True
-        )]
+        df = df[
+            df["roles"].apply(
+                lambda x: (
+                    json.loads(x).get("volume") in [None, False, "null", "None", ""]
+                    if isinstance(x, str)
+                    else True
+                )
+            )
+        ]
 
     # Group by canonical keys - MUST include pair for pair-level granularity
     # This ensures baseline aggregation matches volume aggregation granularity (pair × c1 × exit)
     group_cols = ["pair", "c1", "exit"]
     optional_group_cols = ["timeframe", "from_date", "to_date"]
-    
+
     # Add optional keys if present
     for col in optional_group_cols:
         if col in df.columns:
             group_cols.append(col)
-    
+
     available_group_cols = [c for c in group_cols if c in df.columns]
 
     if not available_group_cols:
         raise ValueError(f"No grouping columns found. Available columns: {list(df.columns)}")
-    
+
     # CRITICAL: pair, c1, and exit are REQUIRED for pair-level aggregation
     # Do NOT pool or average across pairs - each pair must be aggregated separately
-    if "pair" not in available_group_cols or "c1" not in available_group_cols or "exit" not in available_group_cols:
+    if (
+        "pair" not in available_group_cols
+        or "c1" not in available_group_cols
+        or "exit" not in available_group_cols
+    ):
         raise ValueError(
             f"Missing required grouping columns. Required: pair, c1, exit. "
             f"Available: {available_group_cols}. "
@@ -269,7 +281,9 @@ def aggregate_baseline(batch_csv: Path, history_dir: Optional[Path] = None, swee
         mask = non_scratch > 0
         grouped["win_rate_ns"] = 0.0
         if mask.any():
-            grouped.loc[mask, "win_rate_ns"] = (grouped.loc[mask, "wins"] / non_scratch[mask]) * 100.0
+            grouped.loc[mask, "win_rate_ns"] = (
+                grouped.loc[mask, "wins"] / non_scratch[mask]
+            ) * 100.0
 
     # Ensure exit column is normalized
     if "exit" in grouped.columns:
@@ -278,7 +292,7 @@ def aggregate_baseline(batch_csv: Path, history_dir: Optional[Path] = None, swee
     # Ensure pair column is present in output (required for Phase 1 joins)
     if "pair" not in grouped.columns:
         raise ValueError("Output missing 'pair' column - cannot join with volume results")
-    
+
     # Sort by pair, c1, exit
     grouped = grouped.sort_values(available_group_cols)
 
@@ -333,4 +347,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

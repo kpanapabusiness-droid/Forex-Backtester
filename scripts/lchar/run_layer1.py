@@ -59,10 +59,10 @@ DOW_ABBR = ["mon", "tue", "wed", "thu", "fri"]
 # ===========================================================================
 def compute_atr(df: pd.DataFrame, period: int) -> pd.Series:
     h = df["high"].astype(float).to_numpy()
-    l = df["low"].astype(float).to_numpy()
+    lo = df["low"].astype(float).to_numpy()
     c = df["close"].astype(float).to_numpy()
     pc = np.concatenate(([np.nan], c[:-1]))
-    tr = np.nanmax(np.column_stack([h - l, np.abs(h - pc), np.abs(l - pc)]), axis=1)
+    tr = np.nanmax(np.column_stack([h - lo, np.abs(h - pc), np.abs(lo - pc)]), axis=1)
     return pd.Series(tr, index=df.index).rolling(period, min_periods=period).mean()
 
 
@@ -224,7 +224,9 @@ def boot_run_length_stats(
     return out
 
 
-def boot_mean(arr: np.ndarray, rng: np.random.Generator, n_boot: int, alpha: float) -> tuple[float, float, float]:
+def boot_mean(
+    arr: np.ndarray, rng: np.random.Generator, n_boot: int, alpha: float
+) -> tuple[float, float, float]:
     n = arr.size
     if n < 2:
         return float("nan"), float("nan"), float("nan")
@@ -247,7 +249,6 @@ def compute_runs(returns: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     if returns.size == 0:
         return np.array([], dtype=np.int64), np.array([], dtype=np.int64)
     sign = np.sign(returns).astype(np.int64)
-    n = sign.size
     diff = np.diff(sign)
     boundaries = np.concatenate(([True], diff != 0, [True]))
     pos = np.flatnonzero(boundaries)  # indices into [0..n]
@@ -356,7 +357,19 @@ def process_pair_tf(
             n_obs = int(sub.size)
             nm = f"mean_abs_return_h{h:02d}"
             if n_obs < 2:
-                rows.append((pair, tf, "hour_effect", nm, float("nan"), float("nan"), float("nan"), n_obs, "insufficient_observations"))
+                rows.append(
+                    (
+                        pair,
+                        tf,
+                        "hour_effect",
+                        nm,
+                        float("nan"),
+                        float("nan"),
+                        float("nan"),
+                        n_obs,
+                        "insufficient_observations",
+                    )
+                )
                 continue
             v, lo, hi = boot_mean(sub, rng, n_boot, alpha)
             rows.append((pair, tf, "hour_effect", nm, v, lo, hi, n_obs, ""))
@@ -369,7 +382,19 @@ def process_pair_tf(
         n_obs = int(sub.size)
         nm = f"mean_abs_return_dow{d}_{abbr}"
         if n_obs < 2:
-            rows.append((pair, tf, "dow_effect", nm, float("nan"), float("nan"), float("nan"), n_obs, "insufficient_observations"))
+            rows.append(
+                (
+                    pair,
+                    tf,
+                    "dow_effect",
+                    nm,
+                    float("nan"),
+                    float("nan"),
+                    float("nan"),
+                    n_obs,
+                    "insufficient_observations",
+                )
+            )
             continue
         v, lo, hi = boot_mean(sub, rng, n_boot, alpha)
         rows.append((pair, tf, "dow_effect", nm, v, lo, hi, n_obs, ""))
@@ -415,7 +440,10 @@ def run(cfg: dict) -> Path:
                     f"{pair} {tf}: insufficient bars in window {date_start}..{date_end} "
                     f"(got {len(df)}). Cannot compute univariate statistics."
                 )
-            print(f"[L1] {pair} {tf}: bars={len(df)} window={df['date'].iloc[0]:%Y-%m-%d}..{df['date'].iloc[-1]:%Y-%m-%d}", file=sys.stderr)
+            print(
+                f"[L1] {pair} {tf}: bars={len(df)} window={df['date'].iloc[0]:%Y-%m-%d}..{df['date'].iloc[-1]:%Y-%m-%d}",
+                file=sys.stderr,
+            )
             process_pair_tf(df, pair, tf, cfg, rng, rows)
 
     out_df = pd.DataFrame(rows, columns=CSV_COLUMNS)

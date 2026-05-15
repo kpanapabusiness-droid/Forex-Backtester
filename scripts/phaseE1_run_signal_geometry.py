@@ -2,6 +2,7 @@
 Phase E-1: Thin runner for signal geometry evaluation with Phase E1 configs.
 Resolves clean labels path, builds D6G-compatible config, invokes phaseD6G runner.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -47,7 +48,9 @@ def _find_clean_labels(root: Path) -> Path | None:
     return max(candidates, key=lambda p: p.stat().st_mtime)
 
 
-def _build_d6g_config(phase_e1_cfg: dict, c1_name: str, root: Path, c1_params: dict | None = None) -> dict:
+def _build_d6g_config(
+    phase_e1_cfg: dict, c1_name: str, root: Path, c1_params: dict | None = None
+) -> dict:
     """Build D6G-compatible config from Phase E1 config and C1 name."""
     date_range = phase_e1_cfg.get("date_range") or {}
     data_cfg = phase_e1_cfg.get("data") or {}
@@ -67,9 +70,9 @@ def _build_d6g_config(phase_e1_cfg: dict, c1_name: str, root: Path, c1_params: d
             "end": date_range.get("end", "2026-01-01"),
         },
         "data_dir": str(root / data_dir) if not Path(data_dir).is_absolute() else data_dir,
-        "primary_objective": (
-            phase_e1_cfg.get("evaluation") or {}
-        ).get("primary_objective", "3R_before_2R"),
+        "primary_objective": (phase_e1_cfg.get("evaluation") or {}).get(
+            "primary_objective", "3R_before_2R"
+        ),
         "indicator_only": True,
     }
     if c1_params:
@@ -110,7 +113,10 @@ def main(argv: list[str] | None = None) -> int:
     if not c1:
         c1 = (cfg.get("system") or {}).get("c1")
     if not c1 or c1 == "PLACEHOLDER":
-        print("Error: Config must set indicators.c1 or system.c1 to a C1 indicator name.", file=sys.stderr)
+        print(
+            "Error: Config must set indicators.c1 or system.c1 to a C1 indicator name.",
+            file=sys.stderr,
+        )
         return 1
 
     clean_path: Path | None = None

@@ -18,6 +18,7 @@ Two top-level entries:
   - lookahead_invariant_test() → perturbs trade_paths at bar_offset >= 2
     for sampled trades and confirms predictions byte-identical (Task F)
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -67,6 +68,7 @@ CLASSIFIER_HYPERPARAMS = {
 # Hashing helpers
 # ============================================================
 
+
 def _sha256_file(path: Path) -> str:
     h = hashlib.sha256()
     with open(path, "rb") as f:
@@ -101,7 +103,8 @@ def _git_commit() -> str:
 def _git_blob_at_commit(commit: str, path: str) -> str:
     """Return the git blob sha for `path` at `commit`. Raises if not present."""
     out = subprocess.check_output(
-        ["git", "rev-parse", f"{commit}:{path}"], cwd=str(REPO),
+        ["git", "rev-parse", f"{commit}:{path}"],
+        cwd=str(REPO),
     )
     return out.decode().strip()
 
@@ -141,6 +144,7 @@ def _verify_predictor_source_pin() -> dict:
 
 def _versions() -> dict:
     import sklearn
+
     return {
         "python": sys.version.split()[0],
         "numpy": np.__version__,
@@ -152,6 +156,7 @@ def _versions() -> dict:
 # ============================================================
 # Per-fold sha256 capture (mirrors _predictor.py training logic)
 # ============================================================
+
 
 def _capture_per_fold_shas(signals_df: pd.DataFrame, t: int) -> dict:
     """Re-execute the per-fold training/prediction set construction so we
@@ -192,6 +197,7 @@ def _capture_per_fold_shas(signals_df: pd.DataFrame, t: int) -> dict:
 # Materialisation (Task B/C/D)
 # ============================================================
 
+
 def _load_inputs():
     signals = D.load_signals().sort_values("trade_id").reset_index(drop=True)
     clusters = D.load_clusters().sort_values("trade_id").reset_index(drop=True)
@@ -229,9 +235,11 @@ def materialise() -> dict:
     preds_all = P.fit_predict_cluster_anchored_expanding(signals_clu, T_STAR)
 
     # Filter to F2..F5
-    preds_f2_f5 = preds_all[preds_all["fold"].isin([2, 3, 4, 5])].sort_values(
-        "trade_id"
-    ).reset_index(drop=True)
+    preds_f2_f5 = (
+        preds_all[preds_all["fold"].isin([2, 3, 4, 5])]
+        .sort_values("trade_id")
+        .reset_index(drop=True)
+    )
 
     # Identify predicted-mirror trades per fold (predicted_cluster == 0)
     preds_mirror = preds_f2_f5[preds_f2_f5["predicted_cluster"] == 0]
@@ -274,7 +282,7 @@ def materialise() -> dict:
         "folds_materialised": [2, 3, 4, 5],
         "f1_handling": "skipped (pre-F1 history empty for L Arc 2)",
         "f6_f7_handling": "not materialised here; already on disk at "
-                          "results/l_arc_2/step4/delayed_entry_t_gb/trades_post_mechanism.csv",
+        "results/l_arc_2/step4/delayed_entry_t_gb/trades_post_mechanism.csv",
         "classifier_hyperparameters": CLASSIFIER_HYPERPARAMS,
         "classifier_hyperparameter_hash": _classifier_hp_hash(),
         "per_fold": per_fold_shas,
@@ -324,20 +332,34 @@ def materialise() -> dict:
 # Lookahead invariant test (Task F)
 # ============================================================
 
-def _perturb_paths(paths_full: pd.DataFrame, sample_trade_ids: list[int],
-                   bar_offset_floor: int, rng: np.random.Generator) -> pd.DataFrame:
+
+def _perturb_paths(
+    paths_full: pd.DataFrame,
+    sample_trade_ids: list[int],
+    bar_offset_floor: int,
+    rng: np.random.Generator,
+) -> pd.DataFrame:
     """Return a copy of paths_full with OHLC columns randomly perturbed for
     the sampled trade_ids at bar_offset >= bar_offset_floor. Other rows
     unchanged.
     """
     perturbed = paths_full.copy()
-    mask = (perturbed["trade_id"].isin(sample_trade_ids)) & (perturbed["bar_offset"] >= bar_offset_floor)
+    mask = (perturbed["trade_id"].isin(sample_trade_ids)) & (
+        perturbed["bar_offset"] >= bar_offset_floor
+    )
     n_cells = int(mask.sum())
     if n_cells == 0:
         return perturbed
     # Add large random noise so any feature dependency would show through
-    for col in ("open", "high", "low", "close",
-                "cum_logret_from_entry", "mfe_to_date_atr", "mae_to_date_atr"):
+    for col in (
+        "open",
+        "high",
+        "low",
+        "close",
+        "cum_logret_from_entry",
+        "mfe_to_date_atr",
+        "mae_to_date_atr",
+    ):
         noise = rng.normal(loc=0.0, scale=10.0, size=n_cells)
         perturbed.loc[mask, col] = perturbed.loc[mask, col].values + noise
     return perturbed
@@ -364,17 +386,22 @@ def lookahead_invariant_test(n_sample: int = 100, seed: int = 17) -> dict:
     # with active_mask & valid_cluster_mask in F2..F5)
     all_ids = preds_baseline.index.tolist()
     if not all_ids:
-        return {"sampled": 0, "byte_identical": 0, "divergent": 0, "diffs": [],
-                "note": "no F2..F5 trades to sample"}
+        return {
+            "sampled": 0,
+            "byte_identical": 0,
+            "divergent": 0,
+            "diffs": [],
+            "note": "no F2..F5 trades to sample",
+        }
     rng = np.random.default_rng(seed)
-    sample_ids = list(rng.choice(all_ids, size=min(n_sample, len(all_ids)),
-                                  replace=False))
+    sample_ids = list(rng.choice(all_ids, size=min(n_sample, len(all_ids)), replace=False))
     sample_ids_int = [int(x) for x in sample_ids]
 
     # Load paths and perturb at bar_offset >= 2 (predictor reads <= 1)
     paths_full = D._load_paths_full().copy()
-    paths_perturbed = _perturb_paths(paths_full, sample_ids_int,
-                                      bar_offset_floor=T_STAR + 1, rng=rng)
+    paths_perturbed = _perturb_paths(
+        paths_full, sample_ids_int, bar_offset_floor=T_STAR + 1, rng=rng
+    )
 
     # Monkey-patch the loader to return perturbed paths
     original_loader = D._load_paths_full
@@ -401,17 +428,20 @@ def lookahead_invariant_test(n_sample: int = 100, seed: int = 17) -> dict:
         b = preds_baseline.loc[tid]
         p = preds_perturbed.loc[tid]
         # Byte-identity check on the predicted_cluster int
-        if int(b["predicted_cluster"]) == int(p["predicted_cluster"]) and \
-           float(b["p_cluster_1"]) == float(p["p_cluster_1"]):
+        if int(b["predicted_cluster"]) == int(p["predicted_cluster"]) and float(
+            b["p_cluster_1"]
+        ) == float(p["p_cluster_1"]):
             byte_identical += 1
         else:
-            diffs.append({
-                "trade_id": tid,
-                "baseline_p1": float(b["p_cluster_1"]),
-                "perturbed_p1": float(p["p_cluster_1"]),
-                "baseline_class": int(b["predicted_cluster"]),
-                "perturbed_class": int(p["predicted_cluster"]),
-            })
+            diffs.append(
+                {
+                    "trade_id": tid,
+                    "baseline_p1": float(b["p_cluster_1"]),
+                    "perturbed_p1": float(p["p_cluster_1"]),
+                    "baseline_class": int(b["predicted_cluster"]),
+                    "perturbed_class": int(p["predicted_cluster"]),
+                }
+            )
 
     return {
         "sampled": len(sample_ids_int),
@@ -425,9 +455,14 @@ def lookahead_invariant_test(n_sample: int = 100, seed: int = 17) -> dict:
 if __name__ == "__main__":
     m = materialise()
     print("Materialisation manifest summary:")
-    print(json.dumps({
-        "git_commit": m["git_commit"],
-        "per_fold_counts": m["per_fold_predicted_mirror_counts"],
-        "total": m["post_mechanism_n_rows"],
-        "outputs_sha256": m["outputs_sha256"],
-    }, indent=2))
+    print(
+        json.dumps(
+            {
+                "git_commit": m["git_commit"],
+                "per_fold_counts": m["per_fold_predicted_mirror_counts"],
+                "total": m["post_mechanism_n_rows"],
+                "outputs_sha256": m["outputs_sha256"],
+            },
+            indent=2,
+        )
+    )

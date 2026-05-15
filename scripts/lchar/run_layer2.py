@@ -78,10 +78,10 @@ ALIGN_STATES: tuple[str, ...] = (
 # ===========================================================================
 def compute_atr(df: pd.DataFrame, period: int) -> pd.Series:
     h = df["high"].astype(float).to_numpy()
-    l = df["low"].astype(float).to_numpy()
+    lo = df["low"].astype(float).to_numpy()
     c = df["close"].astype(float).to_numpy()
     pc = np.concatenate(([np.nan], c[:-1]))
-    tr = np.nanmax(np.column_stack([h - l, np.abs(h - pc), np.abs(l - pc)]), axis=1)
+    tr = np.nanmax(np.column_stack([h - lo, np.abs(h - pc), np.abs(lo - pc)]), axis=1)
     return pd.Series(tr, index=df.index).rolling(period, min_periods=period).mean()
 
 
@@ -106,8 +106,9 @@ def slice_window(df: pd.DataFrame, date_start: str, date_end) -> pd.DataFrame:
     return df.reset_index(drop=True)
 
 
-def prep_tf(raw_df: pd.DataFrame, atr_p: int, kijun_p: int, sma_p: int,
-            date_start: str, date_end) -> pd.DataFrame:
+def prep_tf(
+    raw_df: pd.DataFrame, atr_p: int, kijun_p: int, sma_p: int, date_start: str, date_end
+) -> pd.DataFrame:
     """Slice + add log_ret, atr, kijun/sma + their signs."""
     df = slice_window(raw_df, date_start, date_end)
     close = df["close"].astype(float).to_numpy()
@@ -138,8 +139,9 @@ def _boot_idx(rng: np.random.Generator, n: int, b: int) -> np.ndarray:
     return rng.integers(0, n, size=(b, n), dtype=np.int64)
 
 
-def boot_corr(x: np.ndarray, y: np.ndarray, rng: np.random.Generator,
-              n_boot: int, alpha: float) -> tuple[float, float, float, int]:
+def boot_corr(
+    x: np.ndarray, y: np.ndarray, rng: np.random.Generator, n_boot: int, alpha: float
+) -> tuple[float, float, float, int]:
     """Pearson correlation point estimate + iid bootstrap percentile CI.
 
     iid resampling jointly on the aligned (x_i, y_i) index pairs.
@@ -169,8 +171,9 @@ def boot_corr(x: np.ndarray, y: np.ndarray, rng: np.random.Generator,
     return pt, lo, hi, n
 
 
-def boot_mean(arr: np.ndarray, rng: np.random.Generator,
-              n_boot: int, alpha: float) -> tuple[float, float, float, int]:
+def boot_mean(
+    arr: np.ndarray, rng: np.random.Generator, n_boot: int, alpha: float
+) -> tuple[float, float, float, int]:
     arr = np.asarray(arr, dtype=float)
     n = arr.size
     if n < 2:
@@ -182,9 +185,13 @@ def boot_mean(arr: np.ndarray, rng: np.random.Generator,
     return pt, lo, hi, n
 
 
-def boot_state_freqs(states: np.ndarray, target_states: Iterable[str],
-                     rng: np.random.Generator, n_boot: int, alpha: float
-                     ) -> dict[str, tuple[float, float, float, int]]:
+def boot_state_freqs(
+    states: np.ndarray,
+    target_states: Iterable[str],
+    rng: np.random.Generator,
+    n_boot: int,
+    alpha: float,
+) -> dict[str, tuple[float, float, float, int]]:
     """Frequency of each state with bootstrap CI from a SINGLE iid resample.
 
     A single resample matrix is generated and reused for every state, so the
@@ -255,9 +262,15 @@ def shift_lookup(arr: np.ndarray, idx: np.ndarray, offset: int) -> np.ndarray:
 # ===========================================================================
 # Per-pair driver
 # ===========================================================================
-def process_pair(pair: str, raw_1h: pd.DataFrame, raw_4h: pd.DataFrame,
-                 raw_d1: pd.DataFrame, cfg: dict, rng: np.random.Generator,
-                 rows: list[tuple]) -> None:
+def process_pair(
+    pair: str,
+    raw_1h: pd.DataFrame,
+    raw_4h: pd.DataFrame,
+    raw_d1: pd.DataFrame,
+    cfg: dict,
+    rng: np.random.Generator,
+    rows: list[tuple],
+) -> None:
     n_boot = int(cfg["bootstrap"]["n_resamples"])
     alpha = 1.0 - float(cfg["bootstrap"]["ci_level"])
     atr_p = int(cfg["indicators"]["atr_period"])
@@ -273,45 +286,61 @@ def process_pair(pair: str, raw_1h: pd.DataFrame, raw_4h: pd.DataFrame,
     # ----- mtf_corr (same-bar aggregation correlations) -----
     floor4h_of_1h = df_1h["date"].dt.floor("4h")
     grp_1h_in_4h = (
-        pd.DataFrame({
-            "floor_4h": floor4h_of_1h.to_numpy(),
-            "log_ret": df_1h["log_ret"].to_numpy(),
-            "atr": df_1h["atr"].to_numpy(),
-        })
+        pd.DataFrame(
+            {
+                "floor_4h": floor4h_of_1h.to_numpy(),
+                "log_ret": df_1h["log_ret"].to_numpy(),
+                "atr": df_1h["atr"].to_numpy(),
+            }
+        )
         .groupby("floor_4h")
         .agg(sum_log_ret=("log_ret", "sum"), mean_atr=("atr", "mean"))
     )
     join_4h = df_4h.set_index("date")[["log_ret", "atr"]].join(grp_1h_in_4h, how="inner").dropna()
     v, lo, hi, n = boot_corr(
-        join_4h["sum_log_ret"].to_numpy(), join_4h["log_ret"].to_numpy(),
-        rng, n_boot, alpha,
+        join_4h["sum_log_ret"].to_numpy(),
+        join_4h["log_ret"].to_numpy(),
+        rng,
+        n_boot,
+        alpha,
     )
     rows.append((pair, "1H", "mtf_corr", "same_bar_returns_1H_to_4H", v, lo, hi, n, ""))
     v, lo, hi, n = boot_corr(
-        join_4h["mean_atr"].to_numpy(), join_4h["atr"].to_numpy(),
-        rng, n_boot, alpha,
+        join_4h["mean_atr"].to_numpy(),
+        join_4h["atr"].to_numpy(),
+        rng,
+        n_boot,
+        alpha,
     )
     rows.append((pair, "1H", "mtf_corr", "atr_within_4H_to_4H_atr", v, lo, hi, n, ""))
 
     floor_d1_of_4h = df_4h["date"].dt.normalize()
     grp_4h_in_d1 = (
-        pd.DataFrame({
-            "floor_d1": floor_d1_of_4h.to_numpy(),
-            "log_ret": df_4h["log_ret"].to_numpy(),
-            "atr": df_4h["atr"].to_numpy(),
-        })
+        pd.DataFrame(
+            {
+                "floor_d1": floor_d1_of_4h.to_numpy(),
+                "log_ret": df_4h["log_ret"].to_numpy(),
+                "atr": df_4h["atr"].to_numpy(),
+            }
+        )
         .groupby("floor_d1")
         .agg(sum_log_ret=("log_ret", "sum"), mean_atr=("atr", "mean"))
     )
     join_d1 = df_d1.set_index("date")[["log_ret", "atr"]].join(grp_4h_in_d1, how="inner").dropna()
     v, lo, hi, n = boot_corr(
-        join_d1["sum_log_ret"].to_numpy(), join_d1["log_ret"].to_numpy(),
-        rng, n_boot, alpha,
+        join_d1["sum_log_ret"].to_numpy(),
+        join_d1["log_ret"].to_numpy(),
+        rng,
+        n_boot,
+        alpha,
     )
     rows.append((pair, "4H", "mtf_corr", "same_bar_returns_4H_to_D1", v, lo, hi, n, ""))
     v, lo, hi, n = boot_corr(
-        join_d1["mean_atr"].to_numpy(), join_d1["atr"].to_numpy(),
-        rng, n_boot, alpha,
+        join_d1["mean_atr"].to_numpy(),
+        join_d1["atr"].to_numpy(),
+        rng,
+        n_boot,
+        alpha,
     )
     rows.append((pair, "4H", "mtf_corr", "atr_within_D1_to_D1_atr", v, lo, hi, n, ""))
 
@@ -340,8 +369,19 @@ def process_pair(pair: str, raw_1h: pd.DataFrame, raw_4h: pd.DataFrame,
         for lag, ret in ((1, ret_4h_lag1), (2, ret_4h_lag2)):
             mask = ~np.isnan(sig) & ~np.isnan(ret) & (sig != 0)
             v, lo, hi, n = boot_corr(sig[mask], ret[mask], rng, n_boot, alpha)
-            rows.append((pair, "1H", "mtf_lead_lag",
-                         f"dir_1H_{trend}_to_next_4H_lag{lag}", v, lo, hi, n, ""))
+            rows.append(
+                (
+                    pair,
+                    "1H",
+                    "mtf_lead_lag",
+                    f"dir_1H_{trend}_to_next_4H_lag{lag}",
+                    v,
+                    lo,
+                    hi,
+                    n,
+                    "",
+                )
+            )
 
     # Higher→Lower (most-recently-completed 4H signal predicts next 1H bars):
     s_k_4h_mr = shift_lookup(s_kijun_4h_arr, contain_4h_v, -1)
@@ -359,8 +399,19 @@ def process_pair(pair: str, raw_1h: pd.DataFrame, raw_4h: pd.DataFrame,
         for lag, ret in ((1, ret_1h_lag1), (2, ret_1h_lag2)):
             mask = ~np.isnan(sig) & ~np.isnan(ret) & (sig != 0)
             v, lo, hi, n = boot_corr(sig[mask], ret[mask], rng, n_boot, alpha)
-            rows.append((pair, "1H", "mtf_lead_lag",
-                         f"dir_4H_{trend}_to_next_1H_lag{lag}", v, lo, hi, n, ""))
+            rows.append(
+                (
+                    pair,
+                    "1H",
+                    "mtf_lead_lag",
+                    f"dir_4H_{trend}_to_next_1H_lag{lag}",
+                    v,
+                    lo,
+                    hi,
+                    n,
+                    "",
+                )
+            )
 
     # ----- mtf_lead_lag for 4H↔D1 (timeframe="4H") -----
     idx_d1_by_date = pd.Series(np.arange(len(df_d1), dtype=np.int64), index=df_d1["date"])
@@ -383,8 +434,19 @@ def process_pair(pair: str, raw_1h: pd.DataFrame, raw_4h: pd.DataFrame,
         for lag, ret in ((1, ret_d1_lag1), (2, ret_d1_lag2)):
             mask = ~np.isnan(sig) & ~np.isnan(ret) & (sig != 0)
             v, lo, hi, n = boot_corr(sig[mask], ret[mask], rng, n_boot, alpha)
-            rows.append((pair, "4H", "mtf_lead_lag",
-                         f"dir_4H_{trend}_to_next_D1_lag{lag}", v, lo, hi, n, ""))
+            rows.append(
+                (
+                    pair,
+                    "4H",
+                    "mtf_lead_lag",
+                    f"dir_4H_{trend}_to_next_D1_lag{lag}",
+                    v,
+                    lo,
+                    hi,
+                    n,
+                    "",
+                )
+            )
 
     s_k_d1_mr = shift_lookup(s_kijun_d1_arr, contain_d1_v, -1)
     s_s_d1_mr = shift_lookup(s_sma_d1_arr, contain_d1_v, -1)
@@ -401,8 +463,19 @@ def process_pair(pair: str, raw_1h: pd.DataFrame, raw_4h: pd.DataFrame,
         for lag, ret in ((1, ret_4h_lag1_lf), (2, ret_4h_lag2_lf)):
             mask = ~np.isnan(sig) & ~np.isnan(ret) & (sig != 0)
             v, lo, hi, n = boot_corr(sig[mask], ret[mask], rng, n_boot, alpha)
-            rows.append((pair, "4H", "mtf_lead_lag",
-                         f"dir_D1_{trend}_to_next_4H_lag{lag}", v, lo, hi, n, ""))
+            rows.append(
+                (
+                    pair,
+                    "4H",
+                    "mtf_lead_lag",
+                    f"dir_D1_{trend}_to_next_4H_lag{lag}",
+                    v,
+                    lo,
+                    hi,
+                    n,
+                    "",
+                )
+            )
 
     # ----- mtf_cond_atr (D1 ATR deciles → mean 4H ATR within) -----
     n_bins = int(cfg["stats"]["cond_atr_n_bins"])
@@ -424,14 +497,24 @@ def process_pair(pair: str, raw_1h: pd.DataFrame, raw_4h: pd.DataFrame,
             mask = (d1_decile_of_4h == dec) & ~np.isnan(atr_4h_arr)
             atrs = atr_4h_arr[mask]
             v, lo, hi, n = boot_mean(atrs, rng, n_boot, alpha)
-            rows.append((pair, "4H", "mtf_cond_atr",
-                         f"4H_atr_in_D1_decile_{dec:02d}", v, lo, hi, n, ""))
+            rows.append(
+                (pair, "4H", "mtf_cond_atr", f"4H_atr_in_D1_decile_{dec:02d}", v, lo, hi, n, "")
+            )
     else:
         for dec in range(1, n_bins + 1):
-            rows.append((pair, "4H", "mtf_cond_atr",
-                         f"4H_atr_in_D1_decile_{dec:02d}",
-                         float("nan"), float("nan"), float("nan"), 0,
-                         "insufficient_d1_bars"))
+            rows.append(
+                (
+                    pair,
+                    "4H",
+                    "mtf_cond_atr",
+                    f"4H_atr_in_D1_decile_{dec:02d}",
+                    float("nan"),
+                    float("nan"),
+                    float("nan"),
+                    0,
+                    "insufficient_d1_bars",
+                )
+            )
 
     # ----- mtf_alignment (1H sampling, 6-state taxonomy, both Kijun and SMA) -----
     floor_d1_of_1h = df_1h["date"].dt.normalize()
@@ -504,8 +587,7 @@ def run(cfg: dict) -> Path:
     csv_path = Path(cfg["output"]["csv_path"])
     csv_path.parent.mkdir(parents=True, exist_ok=True)
     float_format = cfg["output"]["float_format"]
-    out_df.to_csv(csv_path, index=False, float_format=float_format,
-                  na_rep="", lineterminator="\n")
+    out_df.to_csv(csv_path, index=False, float_format=float_format, na_rep="", lineterminator="\n")
     return csv_path
 
 

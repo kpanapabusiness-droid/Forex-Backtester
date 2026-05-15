@@ -6,12 +6,13 @@ via nearest centroid of the subsample's cluster means.
 HDBSCAN: sklearn.cluster.HDBSCAN, min_cluster_size = max(50, ceil(0.05 * n_pool)),
 min_samples=50, EOM selection.
 """
+
 from __future__ import annotations
 
 import numpy as np
 from scipy.cluster.hierarchy import fcluster, linkage
-from sklearn.cluster import KMeans, HDBSCAN
-from sklearn.metrics import silhouette_score, adjusted_rand_score
+from sklearn.cluster import HDBSCAN, KMeans
+from sklearn.metrics import adjusted_rand_score, silhouette_score
 
 from . import _common as C
 
@@ -52,8 +53,9 @@ def fit_hierarchical_ward(X: np.ndarray, k: int, seed: int) -> np.ndarray:
     return labels
 
 
-def silhouette_sample(X: np.ndarray, labels: np.ndarray, seed: int,
-                      sample_size: int = 5000) -> float:
+def silhouette_sample(
+    X: np.ndarray, labels: np.ndarray, seed: int, sample_size: int = 5000
+) -> float:
     n = X.shape[0]
     if sample_size >= n:
         try:

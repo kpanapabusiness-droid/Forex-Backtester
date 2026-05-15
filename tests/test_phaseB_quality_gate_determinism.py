@@ -17,7 +17,9 @@ def test_phaseB_quality_gate_determinism(tmp_path: Path) -> None:
     (input_root / "volume_diagnostics").mkdir()
     d = input_root / "c1_diagnostics" / "c1_coral"
     d.mkdir(parents=True)
-    (d / "signal_stats.json").write_text('{"flip_density": 0.1, "persistence_mean": 5.0}', encoding="utf-8")
+    (d / "signal_stats.json").write_text(
+        '{"flip_density": 0.1, "persistence_mean": 5.0}', encoding="utf-8"
+    )
     (d / "response_curves.csv").write_text(
         "param_idx,params,total_trades,scratches,scratch_rate,hold_bars_mean\n"
         "0,{},100,10,0.1,5.0\n",

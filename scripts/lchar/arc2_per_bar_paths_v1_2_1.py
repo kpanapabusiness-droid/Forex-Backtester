@@ -40,43 +40,57 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from core.signals.l4_mtf_alignment_2_down_mixed_kijun import (  # noqa: E402
-    _load_pair_tf,
     TIME_COL,
+    _load_pair_tf,
 )
 
 PAIRS: Tuple[str, ...] = (
-    "AUD_CAD", "AUD_CHF", "AUD_JPY", "AUD_NZD", "AUD_USD", "CAD_CHF", "CAD_JPY", "CHF_JPY",
-    "EUR_AUD", "EUR_CAD", "EUR_CHF", "EUR_GBP", "EUR_JPY", "EUR_NZD", "EUR_USD", "GBP_AUD",
-    "GBP_CAD", "GBP_CHF", "GBP_JPY", "GBP_NZD", "GBP_USD", "NZD_CAD", "NZD_CHF", "NZD_JPY",
-    "NZD_USD", "USD_CAD", "USD_CHF", "USD_JPY",
+    "AUD_CAD",
+    "AUD_CHF",
+    "AUD_JPY",
+    "AUD_NZD",
+    "AUD_USD",
+    "CAD_CHF",
+    "CAD_JPY",
+    "CHF_JPY",
+    "EUR_AUD",
+    "EUR_CAD",
+    "EUR_CHF",
+    "EUR_GBP",
+    "EUR_JPY",
+    "EUR_NZD",
+    "EUR_USD",
+    "GBP_AUD",
+    "GBP_CAD",
+    "GBP_CHF",
+    "GBP_JPY",
+    "GBP_NZD",
+    "GBP_USD",
+    "NZD_CAD",
+    "NZD_CHF",
+    "NZD_JPY",
+    "NZD_USD",
+    "USD_CAD",
+    "USD_CHF",
+    "USD_JPY",
 )
 
 # Locked input sha256s (gate 1).
 LOCKED_SHAS: Dict[str, str] = {
-    "results/l6/arc2/characterisation/v1_2_full/per_bar_paths.csv":
-        "e1195f0dedb317f6d921d4fa9526c8aa546457f8038f28f37cd656605e6b1960",
-    "results/l6/arc2/characterisation/v1_2_full/trade_index.csv":
-        "9f841c5b29e87ed90d34c9617431978baf3041459797cedef02fa16c27e3abb5",
-    "results/l6/arc2/characterisation/v1_2_full/pipeline_diff_v1_2_manifest.md":
-        "f3094ffd59121bcb0864f72d8f851f99cc44b4e4354d374d5159e671b4f0d530",
-    "scripts/lchar/arc2_per_bar_paths.py":
-        "36bb6f9b0413386bd5d25960f4525084fa93408ecb491232e17396872f1ff821",
-    "core/signals/l4_mtf_alignment_2_down_mixed_kijun.py":
-        "3c8d0f5d4b446f84359ab0663df36869f15b47cf1bf18fbc6caff807dc5134e3",
-    "L6_0_METHODOLOGY_LOCK.md":
-        "4fd870b1d17380e4fc4fbfda5a43f7775d313c7a5f50dbfd1f06a3e49c519c26",
+    "results/l6/arc2/characterisation/v1_2_full/per_bar_paths.csv": "e1195f0dedb317f6d921d4fa9526c8aa546457f8038f28f37cd656605e6b1960",
+    "results/l6/arc2/characterisation/v1_2_full/trade_index.csv": "9f841c5b29e87ed90d34c9617431978baf3041459797cedef02fa16c27e3abb5",
+    "results/l6/arc2/characterisation/v1_2_full/pipeline_diff_v1_2_manifest.md": "f3094ffd59121bcb0864f72d8f851f99cc44b4e4354d374d5159e671b4f0d530",
+    "scripts/lchar/arc2_per_bar_paths.py": "36bb6f9b0413386bd5d25960f4525084fa93408ecb491232e17396872f1ff821",
+    "core/signals/l4_mtf_alignment_2_down_mixed_kijun.py": "3c8d0f5d4b446f84359ab0663df36869f15b47cf1bf18fbc6caff807dc5134e3",
+    "L6_0_METHODOLOGY_LOCK.md": "4fd870b1d17380e4fc4fbfda5a43f7775d313c7a5f50dbfd1f06a3e49c519c26",
 }
 
 # Adjacent locks for gate 12 (post-run integrity check).
 ADJ_LOCKED_SHAS: Dict[str, str] = {
-    "results/l6/arc2/characterisation/v1_1_full/signals_features.csv":
-        "71b39383632bd695b878add8b331b76bcd231ab5b9adba9eea03d69f8762483e",
-    "results/l6/arc2/characterisation/v1_1_full/pipeline_diff_manifest.md":
-        "73969d69c4b3b9033d872ad1e7f3d99c1367c12073a22bd1a27f84a8f07435fc",
-    "configs/wfo_l6_arc2.yaml":
-        "25917151bc84a73885eeea9ca9c4cc15b1c277ba793706b158abd3aee0ab6328",
-    "scripts/lchar/arc2_characterisation_v1_1.py":
-        "5d32627a1c4691ef654315dd5f35401d3a4e811bc20c0d48cd64a33debcb5105",
+    "results/l6/arc2/characterisation/v1_1_full/signals_features.csv": "71b39383632bd695b878add8b331b76bcd231ab5b9adba9eea03d69f8762483e",
+    "results/l6/arc2/characterisation/v1_1_full/pipeline_diff_manifest.md": "73969d69c4b3b9033d872ad1e7f3d99c1367c12073a22bd1a27f84a8f07435fc",
+    "configs/wfo_l6_arc2.yaml": "25917151bc84a73885eeea9ca9c4cc15b1c277ba793706b158abd3aee0ab6328",
+    "scripts/lchar/arc2_characterisation_v1_1.py": "5d32627a1c4691ef654315dd5f35401d3a4e811bc20c0d48cd64a33debcb5105",
 }
 
 # Sample 1H raw data files for gate 12 (representative subset).
@@ -158,9 +172,7 @@ def run_pipeline(
         pair = str(row["pair"])
         sig_ts = pd.Timestamp(row["signal_bar_ts"])
         if sig_ts not in pair_time_idx[pair]:
-            raise RuntimeError(
-                f"trade_id={tid} {pair} signal_bar_ts={sig_ts} not in 1H series"
-            )
+            raise RuntimeError(f"trade_id={tid} {pair} signal_bar_ts={sig_ts} not in 1H series")
         sig_idx = pair_time_idx[pair][sig_ts]
         per_trade[tid] = {
             "pair": pair,
@@ -171,8 +183,10 @@ def run_pipeline(
         }
 
     # ----- Step 5: write v1.2.1 per_bar_paths.csv via text-append -----
-    print("  Writing v1.2.1 per_bar_paths.csv (text-append for byte-identical existing cols)...",
-          flush=True)
+    print(
+        "  Writing v1.2.1 per_bar_paths.csv (text-append for byte-identical existing cols)...",
+        flush=True,
+    )
     out_per_bar = out_dir / "per_bar_paths.csv"
     n_false = 0
     n_true = 0
@@ -217,7 +231,7 @@ def run_pipeline(
                 line_idx += 1
         if line_idx != len(v1_2_lines):
             raise RuntimeError(
-                f"Internal error — wrote {line_idx-1} data rows but v1.2 had {n_data_lines}"
+                f"Internal error — wrote {line_idx - 1} data rows but v1.2 had {n_data_lines}"
             )
 
     # ----- Step 6: copy trade_index.csv byte-verbatim (gate 7) -----
@@ -242,8 +256,10 @@ def run_pipeline(
     # ----- Step 8: write consistency check, null audit -----
     consistency_path = _write_consistency_check(out_dir=out_dir, disp=disp)
     null_audit_path = _write_null_audit(
-        out_dir=out_dir, n_data_lines=n_data_lines,
-        n_false=n_false, n_true=n_true,
+        out_dir=out_dir,
+        n_data_lines=n_data_lines,
+        n_false=n_false,
+        n_true=n_true,
     )
 
     sha_manifest = {
@@ -293,11 +309,19 @@ def _validate_gates_2_to_10(
 
     # ---- Gate 4: column order ----
     expected_pb_order = [
-        "trade_id", "pair", "signal_bar_ts", "fold_id", "k",
-        "running_mfe_atr", "running_mae_atr",
-        "bar_high_atr", "bar_low_atr", "bar_close_atr",
+        "trade_id",
+        "pair",
+        "signal_bar_ts",
+        "fold_id",
+        "k",
+        "running_mfe_atr",
+        "running_mae_atr",
+        "bar_high_atr",
+        "bar_low_atr",
+        "bar_close_atr",
         "is_clamped_data_end",
-        "next_bar_open_atr", "has_next_bar",
+        "next_bar_open_atr",
+        "has_next_bar",
     ]
     disp["gate_4"] = f"pb cols match spec: {pb_header == expected_pb_order}"
     if pb_header != expected_pb_order:
@@ -318,8 +342,9 @@ def _validate_gates_2_to_10(
                 n_null_next_open += 1
             if not fields[-1] or fields[-1].lower() == "nan":
                 n_null_has_next += 1
-    disp["gate_5"] = (f"null_next_bar_open_atr={n_null_next_open}, "
-                      f"null_has_next_bar={n_null_has_next}")
+    disp["gate_5"] = (
+        f"null_next_bar_open_atr={n_null_next_open}, null_has_next_bar={n_null_has_next}"
+    )
     if n_null_next_open > 0 or n_null_has_next > 0:
         raise RuntimeError(
             f"Gate 5 HALT — nulls present: next_bar_open_atr={n_null_next_open}, "
@@ -343,7 +368,7 @@ def _validate_gates_2_to_10(
         suffix = b",next_bar_open_atr,has_next_bar"
         if not header.rstrip(b"\r\n").endswith(suffix):
             raise RuntimeError("Gate 6 HALT — header doesn't end with expected new columns")
-        header_v12_bytes = header.rstrip(b"\r\n")[:-len(suffix)] + b"\n"
+        header_v12_bytes = header.rstrip(b"\r\n")[: -len(suffix)] + b"\n"
         h.update(header_v12_bytes)
         for line in f:
             stripped = line.rstrip(b"\r\n")
@@ -353,8 +378,10 @@ def _validate_gates_2_to_10(
             v12_part = stripped[:i2] + b"\n"
             h.update(v12_part)
     sha_proj = h.hexdigest()
-    disp["gate_6"] = (f"sha_v1.2={sha_v12_existing[:16]}…, sha_proj={sha_proj[:16]}…, "
-                      f"match={sha_proj == sha_v12_existing}")
+    disp["gate_6"] = (
+        f"sha_v1.2={sha_v12_existing[:16]}…, sha_proj={sha_proj[:16]}…, "
+        f"match={sha_proj == sha_v12_existing}"
+    )
     if sha_proj != sha_v12_existing:
         raise RuntimeError(
             f"Gate 6 HALT — byte-identicality projection mismatch.\n"
@@ -365,7 +392,9 @@ def _validate_gates_2_to_10(
     # ---- Gate 7: trade_index.csv unchanged ----
     sha_ti_v12 = _sha256_file(v1_2_trade_index_csv)
     sha_ti_new = _sha256_file(out_trade_index)
-    disp["gate_7"] = f"v1.2_ti={sha_ti_v12[:16]}…, v1.2.1_ti={sha_ti_new[:16]}…, match={sha_ti_v12 == sha_ti_new}"
+    disp["gate_7"] = (
+        f"v1.2_ti={sha_ti_v12[:16]}…, v1.2.1_ti={sha_ti_new[:16]}…, match={sha_ti_v12 == sha_ti_new}"
+    )
     if sha_ti_v12 != sha_ti_new:
         raise RuntimeError(
             f"Gate 7 HALT — trade_index.csv mismatch:\n"
@@ -373,9 +402,11 @@ def _validate_gates_2_to_10(
         )
 
     # ---- Gate 8: has_next_bar plausibility ----
-    disp["gate_8"] = (f"has_next_bar==False count={n_false} of {n_data_lines}; "
-                      f"by_fold={has_next_false_by_fold}; "
-                      f"distinct_trade_ids_with_False={len(set(has_next_false_trade_ids))}")
+    disp["gate_8"] = (
+        f"has_next_bar==False count={n_false} of {n_data_lines}; "
+        f"by_fold={has_next_false_by_fold}; "
+        f"distinct_trade_ids_with_False={len(set(has_next_false_trade_ids))}"
+    )
     # Spec: HALT and diagnose if False count > 50 or unexpected distribution.
     if n_false > 50:
         raise RuntimeError(
@@ -394,39 +425,68 @@ def _validate_gates_2_to_10(
     # from ATR-near-zero or NaN bleeds, while accepting v1.2's empirical
     # extremes.
     GATE_9_CAP = 200
-    disp["gate_9"] = (f"next_bar_open_atr range: [{next_open_min:.4f}, {next_open_max:.4f}] "
-                      f"(cap |x|<{GATE_9_CAP})")
+    disp["gate_9"] = (
+        f"next_bar_open_atr range: [{next_open_min:.4f}, {next_open_max:.4f}] "
+        f"(cap |x|<{GATE_9_CAP})"
+    )
     if abs(next_open_min) > GATE_9_CAP or abs(next_open_max) > GATE_9_CAP:
         # Locate the extreme rows for the diagnostic.
         pb_check = pd.read_csv(out_per_bar)
         hn = pb_check[pb_check["has_next_bar"] == True].copy()  # noqa: E712
         hn["abs_v"] = hn["next_bar_open_atr"].abs()
-        top = hn.nlargest(15, "abs_v")[[
-            "trade_id", "pair", "k", "next_bar_open_atr",
-            "bar_high_atr", "bar_low_atr", "bar_close_atr",
-            "running_mfe_atr", "running_mae_atr",
-        ]]
+        top = hn.nlargest(15, "abs_v")[
+            [
+                "trade_id",
+                "pair",
+                "k",
+                "next_bar_open_atr",
+                "bar_high_atr",
+                "bar_low_atr",
+                "bar_close_atr",
+                "running_mfe_atr",
+                "running_mae_atr",
+            ]
+        ]
         # Cross-reference: do existing v1.2 columns also exceed |x|=50?
         v12_extremes = {
-            "bar_high_atr (v1.2 col)": (float(pb_check["bar_high_atr"].min()),
-                                         float(pb_check["bar_high_atr"].max())),
-            "bar_low_atr (v1.2 col)": (float(pb_check["bar_low_atr"].min()),
-                                        float(pb_check["bar_low_atr"].max())),
-            "bar_close_atr (v1.2 col)": (float(pb_check["bar_close_atr"].min()),
-                                          float(pb_check["bar_close_atr"].max())),
-            "running_mfe_atr (v1.2 col)": (float(pb_check["running_mfe_atr"].min()),
-                                            float(pb_check["running_mfe_atr"].max())),
-            "running_mae_atr (v1.2 col)": (float(pb_check["running_mae_atr"].min()),
-                                            float(pb_check["running_mae_atr"].max())),
+            "bar_high_atr (v1.2 col)": (
+                float(pb_check["bar_high_atr"].min()),
+                float(pb_check["bar_high_atr"].max()),
+            ),
+            "bar_low_atr (v1.2 col)": (
+                float(pb_check["bar_low_atr"].min()),
+                float(pb_check["bar_low_atr"].max()),
+            ),
+            "bar_close_atr (v1.2 col)": (
+                float(pb_check["bar_close_atr"].min()),
+                float(pb_check["bar_close_atr"].max()),
+            ),
+            "running_mfe_atr (v1.2 col)": (
+                float(pb_check["running_mfe_atr"].min()),
+                float(pb_check["running_mfe_atr"].max()),
+            ),
+            "running_mae_atr (v1.2 col)": (
+                float(pb_check["running_mae_atr"].min()),
+                float(pb_check["running_mae_atr"].max()),
+            ),
             "next_bar_open_atr (v1.2.1 NEW)": (next_open_min, next_open_max),
         }
         # Per-extreme-trade lookup
-        ti_check = pd.read_csv(REPO_ROOT / "results/l6/arc2/characterisation/v1_2_full/trade_index.csv")
+        ti_check = pd.read_csv(
+            REPO_ROOT / "results/l6/arc2/characterisation/v1_2_full/trade_index.csv"
+        )
         extreme_tids = top["trade_id"].unique().tolist()
-        ti_extreme = ti_check[ti_check["trade_id"].isin(extreme_tids)][[
-            "trade_id", "pair", "atr_1h_wilder_at_signal", "entry_price",
-            "exit_reason", "held_bars", "fold_id",
-        ]]
+        ti_extreme = ti_check[ti_check["trade_id"].isin(extreme_tids)][
+            [
+                "trade_id",
+                "pair",
+                "atr_1h_wilder_at_signal",
+                "entry_price",
+                "exit_reason",
+                "held_bars",
+                "fold_id",
+            ]
+        ]
         # Write diagnostic.
         diag_path = out_per_bar.parent / "GATE_9_DIAGNOSTIC.md"
         L = [
@@ -448,55 +508,57 @@ def _validate_gates_2_to_10(
         ]
         for col, (lo, hi) in v12_extremes.items():
             L.append(f"| `{col}` | {lo:.4f} | {hi:.4f} |")
-        L.extend([
-            "",
-            "All v1.2 price-normalised columns (`bar_high_atr`, `bar_low_atr`, `bar_close_atr`, "
-            "`running_mae_atr`) already exhibit values down to ~−75 ATR. The new column "
-            "`next_bar_open_atr` is conceptually identical to a one-row-shifted `bar_open` "
-            "(would be column 12 if v1.2 had `bar_open_atr`); it inherits the same scale.",
-            "",
-            "v1.2 did NOT impose a |x|<50 cap and shipped these extremes. The v1.2.1 spec's "
-            "gate 9 cap is therefore inconsistent with the v1.2 baseline — **the cap is too "
-            "tight, not the data**.",
-            "",
-            "## Worked source: tiny-ATR pair USD_CHF (tid=3486)",
-            "",
-            "All 15 most-extreme rows belong to a single trade:",
-            "",
-            "```",
-            ti_extreme.to_string(index=False),
-            "```",
-            "",
-            "Per-trade context: `atr_1h_wilder_at_signal` ≈ 9.6e-4 USD per CHF. "
-            "Entry price ≈ 0.882. After ~195 bars, the bar's open price drifted by "
-            "~7.07 cents (down ≈ 0.071), which is **−74 ATR units** with this trade's "
-            "tiny ATR. This is the well-known scale-of-ATR distortion when ATR is small "
-            "relative to multi-day price drift; the data is faithful, not corrupted.",
-            "",
-            "## Top 15 |next_bar_open_atr| values",
-            "",
-            "```",
-            top.to_string(index=False),
-            "```",
-            "",
-            "## Resolutions for the planner",
-            "",
-            "1. **Relax the cap**, e.g. to `|x| < 100` or `|x| < 200`, matching v1.2's "
-            "implicit tolerance. Recommended.",
-            "2. **Remove the cap entirely**, since v1.2 set no analogous cap on "
-            "`bar_close_atr` / `running_mae_atr` and the data is unmodified.",
-            "3. **Accept HALT** and exclude trade tid=3486 (and any other tiny-ATR "
-            "trades) from the v1.2.1 dataset. Not recommended — would diverge from "
-            "v1.2's row count and break gate 6 byte-identicality.",
-            "",
-            "## Outputs preserved",
-            "",
-            "- `per_bar_paths.csv` (full v1.2.1 with new columns) — written for inspection",
-            "- `trade_index.csv` (byte-verbatim copy of v1.2)",
-            "",
-            "Subsequent steps (consistency check, null audit, manifests, gate 11 "
-            "determinism, gate 12 lock check) were NOT executed.",
-        ])
+        L.extend(
+            [
+                "",
+                "All v1.2 price-normalised columns (`bar_high_atr`, `bar_low_atr`, `bar_close_atr`, "
+                "`running_mae_atr`) already exhibit values down to ~−75 ATR. The new column "
+                "`next_bar_open_atr` is conceptually identical to a one-row-shifted `bar_open` "
+                "(would be column 12 if v1.2 had `bar_open_atr`); it inherits the same scale.",
+                "",
+                "v1.2 did NOT impose a |x|<50 cap and shipped these extremes. The v1.2.1 spec's "
+                "gate 9 cap is therefore inconsistent with the v1.2 baseline — **the cap is too "
+                "tight, not the data**.",
+                "",
+                "## Worked source: tiny-ATR pair USD_CHF (tid=3486)",
+                "",
+                "All 15 most-extreme rows belong to a single trade:",
+                "",
+                "```",
+                ti_extreme.to_string(index=False),
+                "```",
+                "",
+                "Per-trade context: `atr_1h_wilder_at_signal` ≈ 9.6e-4 USD per CHF. "
+                "Entry price ≈ 0.882. After ~195 bars, the bar's open price drifted by "
+                "~7.07 cents (down ≈ 0.071), which is **−74 ATR units** with this trade's "
+                "tiny ATR. This is the well-known scale-of-ATR distortion when ATR is small "
+                "relative to multi-day price drift; the data is faithful, not corrupted.",
+                "",
+                "## Top 15 |next_bar_open_atr| values",
+                "",
+                "```",
+                top.to_string(index=False),
+                "```",
+                "",
+                "## Resolutions for the planner",
+                "",
+                "1. **Relax the cap**, e.g. to `|x| < 100` or `|x| < 200`, matching v1.2's "
+                "implicit tolerance. Recommended.",
+                "2. **Remove the cap entirely**, since v1.2 set no analogous cap on "
+                "`bar_close_atr` / `running_mae_atr` and the data is unmodified.",
+                "3. **Accept HALT** and exclude trade tid=3486 (and any other tiny-ATR "
+                "trades) from the v1.2.1 dataset. Not recommended — would diverge from "
+                "v1.2's row count and break gate 6 byte-identicality.",
+                "",
+                "## Outputs preserved",
+                "",
+                "- `per_bar_paths.csv` (full v1.2.1 with new columns) — written for inspection",
+                "- `trade_index.csv` (byte-verbatim copy of v1.2)",
+                "",
+                "Subsequent steps (consistency check, null audit, manifests, gate 11 "
+                "determinism, gate 12 lock check) were NOT executed.",
+            ]
+        )
         diag_path.write_text("\n".join(L) + "\n", encoding="utf-8")
         print(f"\n=== GATE 9 HALT DIAGNOSTIC written to: {diag_path} ===\n", flush=True)
         raise RuntimeError(
@@ -510,7 +572,7 @@ def _validate_gates_2_to_10(
     # For 1000 random rows, check: next_bar_open_atr at row k-1 lies within
     # [bar_low_atr, bar_high_atr] of row k. Catches off-by-one indexing.
     pb = pd.read_csv(out_per_bar)
-    rng = np.random.default_rng(42)
+    np.random.default_rng(42)
     # Sample 1000 candidate (trade_id, k) pairs where k-1 row exists (k >= 2).
     candidates = pb[pb["k"] >= 2].sample(n=1000, random_state=42)
     n_ok = 0
@@ -542,7 +604,7 @@ def _validate_gates_2_to_10(
     disp["gate_10"] = f"sample={n_ok + n_bad}, ok={n_ok}, bad={n_bad}"
     if n_bad > 0:
         raise RuntimeError(
-            f"Gate 10 HALT — {n_bad} of {n_ok+n_bad} samples violate "
+            f"Gate 10 HALT — {n_bad} of {n_ok + n_bad} samples violate "
             f"next_open ∈ [bar_low, bar_high] of next row.\n"
             + "\n".join("  " + s for s in bad_samples)
         )
@@ -576,8 +638,7 @@ def _write_consistency_check(*, out_dir: Path, disp: Dict[str, Any]) -> Path:
     return out
 
 
-def _write_null_audit(*, out_dir: Path, n_data_lines: int,
-                      n_false: int, n_true: int) -> Path:
+def _write_null_audit(*, out_dir: Path, n_data_lines: int, n_false: int, n_true: int) -> Path:
     L = [
         "v1.2.1 per_bar_paths.csv — null audit",
         "=" * 60,
@@ -585,12 +646,12 @@ def _write_null_audit(*, out_dir: Path, n_data_lines: int,
         f"Total data rows: {n_data_lines:,}",
         "",
         "Per-column null counts (new columns):",
-        f"  next_bar_open_atr: 0 (gate 5 enforces zero nulls)",
-        f"  has_next_bar:      0 (gate 5 enforces zero nulls)",
+        "  next_bar_open_atr: 0 (gate 5 enforces zero nulls)",
+        "  has_next_bar:      0 (gate 5 enforces zero nulls)",
         "",
-        f"has_next_bar value distribution:",
-        f"  True:  {n_true:,} ({100*n_true/n_data_lines:.4f}%)",
-        f"  False: {n_false:,} ({100*n_false/n_data_lines:.4f}%)",
+        "has_next_bar value distribution:",
+        f"  True:  {n_true:,} ({100 * n_true / n_data_lines:.4f}%)",
+        f"  False: {n_false:,} ({100 * n_false / n_data_lines:.4f}%)",
         "",
         "Existing columns (v1.2 passthrough; verified byte-identical via gate 6):",
         "  trade_id, pair, signal_bar_ts, fold_id, k, running_mfe_atr,",
@@ -603,9 +664,13 @@ def _write_null_audit(*, out_dir: Path, n_data_lines: int,
 
 
 def _write_pipeline_diff_manifest(
-    *, out_dir: Path, input_shas: Dict[str, str],
-    out_shas: Dict[str, str], disp: Dict[str, Any],
-    determinism: Dict[str, str], single_run: bool,
+    *,
+    out_dir: Path,
+    input_shas: Dict[str, str],
+    out_shas: Dict[str, str],
+    disp: Dict[str, Any],
+    determinism: Dict[str, str],
+    single_run: bool,
 ) -> Path:
     """Write pipeline_diff_v1_2_1_manifest.md per spec §7."""
     # Spot-check sample rows (k=1, k=120, k=240) for the 3 carry-over trades.
@@ -646,15 +711,15 @@ def _write_pipeline_diff_manifest(
         "Defect remediation. The round-1 counterfactual sweep (`scripts/lchar/"
         "arc2_counterfactual_sweep_round_1.py`) HALTed at gate 4 with two "
         "structural gaps. **Gap B** is a data-availability issue: Arc 2's "
-        "time-exit fill is `df.iloc[entry_idx + 120][\"open\"]` (the OPEN of "
+        'time-exit fill is `df.iloc[entry_idx + 120]["open"]` (the OPEN of '
         "the bar one position after the held window), but the v1.2 "
         "`per_bar_paths.csv` had only bar high/low/close — no open."
     )
     L.append("")
+    L.append("v1.2.1 adds two columns to `per_bar_paths.csv`:")
     L.append(
-        "v1.2.1 adds two columns to `per_bar_paths.csv`:"
+        "- `next_bar_open_atr` (float64) = `(open[entry_idx + k] - entry_price) / atr_1h_wilder_at_signal`"
     )
-    L.append("- `next_bar_open_atr` (float64) = `(open[entry_idx + k] - entry_price) / atr_1h_wilder_at_signal`")
     L.append("- `has_next_bar` (bool) — True iff bar at `entry_idx + k` exists in raw 1H data")
     L.append("")
     L.append(
@@ -662,8 +727,10 @@ def _write_pipeline_diff_manifest(
         "Engines MUST check `has_next_bar` before reading."
     )
     L.append("")
-    L.append("This addresses Gap B only. Gap A (spread cost convention) is a "
-             "spec-level correction in the reissued sweep prompt, not a data gap.")
+    L.append(
+        "This addresses Gap B only. Gap A (spread cost convention) is a "
+        "spec-level correction in the reissued sweep prompt, not a data gap."
+    )
     L.append("")
     L.append("## 2. Method")
     L.append("")
@@ -700,10 +767,14 @@ def _write_pipeline_diff_manifest(
     L.append("")
     L.append("## 4. Sign and sentinel conventions")
     L.append("")
-    L.append("- `next_bar_open_atr`: either sign. Bar's open relative to entry can be above or below.")
+    L.append(
+        "- `next_bar_open_atr`: either sign. Bar's open relative to entry can be above or below."
+    )
     L.append("- `has_next_bar`: True iff `entry_idx + k < n_bars(pair)`.")
-    L.append("- Sentinel for `next_bar_open_atr` when `has_next_bar = False`: **`0.0`**. "
-             "Unsafe to read without checking the flag.")
+    L.append(
+        "- Sentinel for `next_bar_open_atr` when `has_next_bar = False`: **`0.0`**. "
+        "Unsafe to read without checking the flag."
+    )
     L.append("")
     L.append("## 5. Schema documentation")
     L.append("")
@@ -746,10 +817,12 @@ def _write_pipeline_diff_manifest(
     L.append("")
     L.append(g8)
     L.append("")
-    L.append("Expected pattern: 28 clamped trades will have `has_next_bar = False` at their "
-             "last row (data ended; by definition of clamping). Some non-clamped trades at "
-             "k=240 may also have False if raw 1H data ends exactly at bar 240. The total "
-             "count should be small (gate 8 caps at 50).")
+    L.append(
+        "Expected pattern: 28 clamped trades will have `has_next_bar = False` at their "
+        "last row (data ended; by definition of clamping). Some non-clamped trades at "
+        "k=240 may also have False if raw 1H data ends exactly at bar 240. The total "
+        "count should be small (gate 8 caps at 50)."
+    )
     L.append("")
     L.append("## 8. Byte-identicality result (gate 6)")
     L.append("")
@@ -763,7 +836,9 @@ def _write_pipeline_diff_manifest(
     L.append("|---|------|-------------|")
     L.append("| 1 | Input integrity (6 named sha256s) | PASS — all match locked values |")
     L.append(f"| 2 | Row count parity | PASS — {disp.get('gate_2', 'n/a')} |")
-    L.append(f"| 3 | Column count (per_bar=13, trade_index=14) | PASS — {disp.get('gate_3', 'n/a')} |")
+    L.append(
+        f"| 3 | Column count (per_bar=13, trade_index=14) | PASS — {disp.get('gate_3', 'n/a')} |"
+    )
     L.append(f"| 4 | Column order (new cols appended last) | PASS — {disp.get('gate_4', 'n/a')} |")
     L.append(f"| 5 | Null inventory | PASS — {disp.get('gate_5', 'n/a')} |")
     L.append(f"| 6 | Byte-identicality on existing columns | PASS — {g6} |")
@@ -772,12 +847,16 @@ def _write_pipeline_diff_manifest(
     L.append(f"| 9 | `next_bar_open_atr` range plausibility | PASS — {g9} |")
     L.append(f"| 10 | next-open lies within next bar's [low, high] | PASS — {g10} |")
     if single_run:
-        L.append("| 11 | Determinism (2 consecutive runs byte-identical) | SKIPPED (--single-run) |")
+        L.append(
+            "| 11 | Determinism (2 consecutive runs byte-identical) | SKIPPED (--single-run) |"
+        )
     else:
         det_str = ", ".join(f"{k}:{v}" for k, v in determinism.items())
         det_pass = all(v == "match" for v in determinism.values())
-        L.append(f"| 11 | Determinism (2 consecutive runs byte-identical) | "
-                 f"{'PASS' if det_pass else 'HALT'} — {det_str} |")
+        L.append(
+            f"| 11 | Determinism (2 consecutive runs byte-identical) | "
+            f"{'PASS' if det_pass else 'HALT'} — {det_str} |"
+        )
     L.append("| 12 | Locked artefact integrity | PASS (verified by main; see run_manifest.txt) |")
     L.append("| 13 | No auto-commit | PASS (script never commits) |")
     out = out_dir / "pipeline_diff_v1_2_1_manifest.md"
@@ -799,8 +878,9 @@ def main() -> int:
         "--v1-2-trade-index",
         default=str(REPO_ROOT / "results/l6/arc2/characterisation/v1_2_full/trade_index.csv"),
     )
-    parser.add_argument("--single-run", action="store_true",
-                        help="Skip the determinism re-run (development only).")
+    parser.add_argument(
+        "--single-run", action="store_true", help="Skip the determinism re-run (development only)."
+    )
     args = parser.parse_args()
 
     print("=" * 60)
@@ -821,7 +901,8 @@ def main() -> int:
     print(f"\n[Run #1] Output dir: {out_dir}")
     t1 = time.time()
     sha1, disp = run_pipeline(
-        out_dir=out_dir, v1_2_per_bar_csv=v1_2_per_bar,
+        out_dir=out_dir,
+        v1_2_per_bar_csv=v1_2_per_bar,
         v1_2_trade_index_csv=v1_2_trade_index,
     )
     elapsed1 = time.time() - t1
@@ -836,7 +917,8 @@ def main() -> int:
         print(f"\n[Run #2 / Gate 11] Output dir (scratch): {scratch}")
         t2 = time.time()
         sha2, _ = run_pipeline(
-            out_dir=scratch, v1_2_per_bar_csv=v1_2_per_bar,
+            out_dir=scratch,
+            v1_2_per_bar_csv=v1_2_per_bar,
             v1_2_trade_index_csv=v1_2_trade_index,
         )
         elapsed2 = time.time() - t2
@@ -859,8 +941,12 @@ def main() -> int:
 
     # Pipeline-diff manifest (after both runs).
     pipeline_diff = _write_pipeline_diff_manifest(
-        out_dir=out_dir, input_shas=input_shas, out_shas=sha1,
-        disp=disp, determinism=determinism, single_run=args.single_run,
+        out_dir=out_dir,
+        input_shas=input_shas,
+        out_shas=sha1,
+        disp=disp,
+        determinism=determinism,
+        single_run=args.single_run,
     )
     pipeline_diff_sha = _sha256_file(pipeline_diff)
 

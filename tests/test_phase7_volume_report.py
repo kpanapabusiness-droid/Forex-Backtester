@@ -108,4 +108,3 @@ def test_phase7_report_keep_and_discard_logic(tmp_path: Path) -> None:
 
     row_discard = df.loc[df["volume_name"] == "vol_bad"].iloc[0]
     assert row_discard["decision"] == "DISCARD"
-

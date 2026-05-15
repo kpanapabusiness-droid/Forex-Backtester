@@ -87,7 +87,13 @@ def _write_wfo_v2_invariant_config(tmp_path: Path, with_sweep: bool = True) -> P
     if with_sweep:
         sweep = {
             "role_filters": ["c1"],
-            "discover": {"c1": False, "c2": False, "baseline": False, "volume": False, "exit": False},
+            "discover": {
+                "c1": False,
+                "c2": False,
+                "baseline": False,
+                "volume": False,
+                "exit": False,
+            },
             "allowlist": {"c1": ["c1_is_calculation", "c1_supertrend"]},
             "blocklist": {"c1": []},
             "roles": {
@@ -139,6 +145,7 @@ def _get_oos_trade_count(run_id_dir: Path) -> int:
             for line in txt.splitlines():
                 if "Total Trades" in line or "total_trades" in line.lower():
                     import re
+
                     m = re.search(r"\d+", line)
                     if m:
                         return int(m.group(0))
@@ -211,7 +218,9 @@ def test_wfo_v2_sweep_selects_non_null_c1(tmp_path):
     assert c1 is not None and c1 != "", "role_names.c1 must not be null or empty"
     in_sample = fold_01 / "in_sample"
     run_dirs = sorted(in_sample.iterdir()) if in_sample.exists() else []
-    assert len(run_dirs) >= 2, "sweep must produce at least two candidate runs (no single null fallback)"
+    assert len(run_dirs) >= 2, (
+        "sweep must produce at least two candidate runs (no single null fallback)"
+    )
 
 
 def test_wfo_v2_pinned_baseline_exit_in_is_selection(tmp_path):
@@ -227,7 +236,12 @@ def test_wfo_v2_pinned_baseline_exit_in_is_selection(tmp_path):
     assert (run_id_dir / "base_config_used.yaml").exists(), "WFO must write base_config_used.yaml"
     assert (run_id_dir / "wfo_run_meta.json").exists(), "WFO must write wfo_run_meta.json"
     meta = json.loads((run_id_dir / "wfo_run_meta.json").read_text(encoding="utf-8"))
-    assert "base_config_path" in meta and "pinned_roles" in meta and "swept_roles" in meta and "folds" in meta
+    assert (
+        "base_config_path" in meta
+        and "pinned_roles" in meta
+        and "swept_roles" in meta
+        and "folds" in meta
+    )
     assert "baseline" in meta["pinned_roles"] and "exit" in meta["pinned_roles"]
     assert meta["swept_roles"] == ["c1"]
     fold_01 = run_id_dir / "fold_01"
@@ -246,7 +260,9 @@ def test_wfo_v2_pinned_baseline_exit_in_is_selection(tmp_path):
     selection = json.loads(is_selection_path.read_text(encoding="utf-8"))
     for run_entry in selection.get("runs", []):
         rn = run_entry.get("role_names") or {}
-        assert rn.get("baseline") is not None, "is_selection.runs[].role_names.baseline must not be null"
+        assert rn.get("baseline") is not None, (
+            "is_selection.runs[].role_names.baseline must not be null"
+        )
         assert rn.get("exit") is not None, "is_selection.runs[].role_names.exit must not be null"
 
 

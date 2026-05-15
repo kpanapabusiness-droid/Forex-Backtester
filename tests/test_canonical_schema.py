@@ -49,15 +49,15 @@ class TestCanonicalSchema:
             "volume": None,
             "exit": "exit_twiggs_money_flow",
         }
-        
+
         identity = extract_canonical_identity(merged_cfg, role_names)
-        
+
         # Required identity keys
         assert identity["pair"] == "EUR_USD"
         assert identity["timeframe"] == "D"
         assert identity["from_date"] == "2023-01-01"
         assert identity["to_date"] == "2025-01-01"
-        
+
         # Components (always present)
         assert identity["c1"] == "coral"
         assert identity["c2"] == "none"
@@ -72,7 +72,7 @@ class TestCanonicalSchema:
             "date_range": {"start": "2023-01-01", "end": "2025-01-01"},
         }
         role_names = {"c1": "coral"}
-        
+
         with pytest.raises(ValueError, match="Required identity key 'pair' missing"):
             extract_canonical_identity(merged_cfg, role_names)
 
@@ -83,7 +83,7 @@ class TestCanonicalSchema:
             "date_range": {"start": "2023-01-01", "end": "2025-01-01"},
         }
         role_names = {"c1": "coral"}
-        
+
         with pytest.raises(ValueError, match="Required identity key 'timeframe' missing"):
             extract_canonical_identity(merged_cfg, role_names)
 
@@ -94,22 +94,33 @@ class TestCanonicalSchema:
             "timeframe": "D",
         }
         role_names = {"c1": "coral"}
-        
-        with pytest.raises(ValueError, match="Required identity keys 'from_date'/'to_date' missing"):
+
+        with pytest.raises(
+            ValueError, match="Required identity keys 'from_date'/'to_date' missing"
+        ):
             extract_canonical_identity(merged_cfg, role_names)
 
     def test_consolidated_csv_includes_canonical_keys(self):
         """Test that FIELDNAMES includes all canonical identity and component keys."""
         required_identity = ["run_id", "pair", "timeframe", "from_date", "to_date"]
         required_components = ["c1", "c2", "baseline", "volume", "exit"]
-        required_metrics = ["total_trades", "wins", "losses", "scratches", "win_rate_ns", "roi_pct", "max_dd_pct", "expectancy"]
-        
+        required_metrics = [
+            "total_trades",
+            "wins",
+            "losses",
+            "scratches",
+            "win_rate_ns",
+            "roi_pct",
+            "max_dd_pct",
+            "expectancy",
+        ]
+
         for key in required_identity:
             assert key in FIELDNAMES, f"Missing required identity key: {key}"
-        
+
         for key in required_components:
             assert key in FIELDNAMES, f"Missing required component key: {key}"
-        
+
         for key in required_metrics:
             assert key in FIELDNAMES, f"Missing required metric key: {key}"
 
@@ -136,26 +147,26 @@ class TestCanonicalSchema:
             "max_dd_pct": [5.0, 7.0],
             "expectancy": [0.5, 0.6],
         }
-        
+
         with tempfile.TemporaryDirectory() as tmpdir:
             batch_csv = Path(tmpdir) / "batch.csv"
             df_batch = pd.DataFrame(batch_data)
             df_batch.to_csv(batch_csv, index=False)
-            
+
             # Aggregate (should use canonical pair column directly)
             result_df = aggregate_baseline(batch_csv)
-            
+
             # Verify pair column contains real FX pairs
             assert "pair" in result_df.columns
             pairs = result_df["pair"].unique().tolist()
             assert "EUR_USD" in pairs
             assert "GBP_JPY" in pairs
             assert len(pairs) == 2
-            
+
             # Verify grouping columns
             assert "c1" in result_df.columns
             assert "exit" in result_df.columns
-            
+
             # Verify metrics
             assert "total_trades" in result_df.columns
             assert result_df["total_trades"].sum() == 250  # 100 + 150
@@ -182,18 +193,14 @@ class TestCanonicalSchema:
             "max_dd_pct": [5.0, 7.0, 6.0],
             "expectancy": [0.5, 0.6, 0.55],
         }
-        
+
         with tempfile.TemporaryDirectory() as tmpdir:
             batch_csv = Path(tmpdir) / "batch.csv"
             df_batch = pd.DataFrame(batch_data)
             df_batch.to_csv(batch_csv, index=False)
-            
+
             # Aggregate (should filter out run2 with volume)
             result_df = aggregate_baseline(batch_csv)
-            
+
             # Should only have baseline rows (run1 and run3)
             assert result_df["total_trades"].sum() == 300  # 100 + 200 (run2 excluded)
-
-
-
-

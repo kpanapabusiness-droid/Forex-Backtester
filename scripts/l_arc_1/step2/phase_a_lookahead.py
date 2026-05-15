@@ -1,3 +1,4 @@
+# ruff: noqa: E402  (sys.path.insert needed before project imports)
 """Phase A — lookahead-invariant test on forward-horizon features.
 
 Method: pick 100 trades deterministically (seed 1234). For each, perturb
@@ -8,6 +9,7 @@ Per op spec §10.4, also writes a feature_lag_audit.txt extension documenting
 the timestamp lag relationship between each forward-horizon feature and the
 signal-bar timestamp.
 """
+
 from __future__ import annotations
 
 import sys
@@ -22,16 +24,21 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from scripts.l_arc_1.step2._io import (
-    FORWARD_HORIZON_BARS_DEFAULT, PAIRS, RANDOM_SEED, STEP2_DIR,
-    load_pair_1h, load_trades_verbatim,
+    FORWARD_HORIZON_BARS_DEFAULT,
+    RANDOM_SEED,
+    STEP2_DIR,
+    load_pair_1h,
+    load_trades_verbatim,
 )
 from scripts.l_arc_1.step2.phase_a_features import (
-    compute_path_aggregates, per_trade_forward_path,
+    compute_path_aggregates,
+    per_trade_forward_path,
 )
 
 
-def run_lookahead_test(H: int = FORWARD_HORIZON_BARS_DEFAULT,
-                      n_samples: int = 100, seed: int = RANDOM_SEED) -> Tuple[bool, dict]:
+def run_lookahead_test(
+    H: int = FORWARD_HORIZON_BARS_DEFAULT, n_samples: int = 100, seed: int = RANDOM_SEED
+) -> Tuple[bool, dict]:
     """Return (pass, details). Writes lookahead_invariant_features_test.txt."""
     rng = np.random.default_rng(seed)
     trades = load_trades_verbatim()
@@ -74,8 +81,13 @@ def run_lookahead_test(H: int = FORWARD_HORIZON_BARS_DEFAULT,
         # Reference computation
         ref_arr = pair_cache[pair]
         rf_h, rf_l, rf_c, rf_s = per_trade_forward_path(
-            ref_arr["open"], ref_arr["high"], ref_arr["low"], ref_arr["close"],
-            entry_idx, entry_price, H,
+            ref_arr["open"],
+            ref_arr["high"],
+            ref_arr["low"],
+            ref_arr["close"],
+            entry_idx,
+            entry_price,
+            H,
         )
         ref_aggs = compute_path_aggregates(rf_h, rf_l, rf_c, rf_s, atr_at_sig, H)
         aggs_keys_ref = list(ref_aggs.keys())
@@ -92,8 +104,13 @@ def run_lookahead_test(H: int = FORWARD_HORIZON_BARS_DEFAULT,
             pert[col][future_slice] = pert[col][future_slice] + noise[:, ci]
 
         pf_h, pf_l, pf_c, pf_s = per_trade_forward_path(
-            pert["open"], pert["high"], pert["low"], pert["close"],
-            entry_idx, entry_price, H,
+            pert["open"],
+            pert["high"],
+            pert["low"],
+            pert["close"],
+            entry_idx,
+            entry_price,
+            H,
         )
         pert_aggs = compute_path_aggregates(pf_h, pf_l, pf_c, pf_s, atr_at_sig, H)
 
@@ -113,8 +130,9 @@ def run_lookahead_test(H: int = FORWARD_HORIZON_BARS_DEFAULT,
                     diffs.append(k)
         if diffs:
             n_disagree += 1
-            disagreements.append({"trade_id": int(row["trade_id"]),
-                                  "pair": pair, "diffs": diffs[:5]})
+            disagreements.append(
+                {"trade_id": int(row["trade_id"]), "pair": pair, "diffs": diffs[:5]}
+            )
 
     passed = n_disagree == 0
     out_path = STEP2_DIR / "lookahead_invariant_features_test.txt"
@@ -123,8 +141,8 @@ def run_lookahead_test(H: int = FORWARD_HORIZON_BARS_DEFAULT,
         "L Arc 1 Step 2 — Forward-horizon feature lookahead-invariant test (op spec §10.1, prompt Phase A.7)",
         "=" * 95,
         "",
-        f"Method:       perturb OHLC of bars >= entry_idx + H with N(0, 0.05) noise; recompute",
-        f"              forward-horizon path aggregates; require byte-identical (tol 1e-12).",
+        "Method:       perturb OHLC of bars >= entry_idx + H with N(0, 0.05) noise; recompute",
+        "              forward-horizon path aggregates; require byte-identical (tol 1e-12).",
         f"Forward H:    {H} bars",
         f"Samples:      {len(samples)} trades (deterministic seed={seed} via rng.choice)",
         f"Perturb seed: {seed + 1} + trade_id (deterministic)",
@@ -139,9 +157,14 @@ def run_lookahead_test(H: int = FORWARD_HORIZON_BARS_DEFAULT,
             lines.append(f"  trade_id={d['trade_id']} pair={d['pair']} diffs={d['diffs']}")
     out_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
-    return passed, {"n_samples": len(samples), "n_disagree": n_disagree,
-                    "disagreements": disagreements, "seed": seed,
-                    "H": H, "out_path": str(out_path)}
+    return passed, {
+        "n_samples": len(samples),
+        "n_disagree": n_disagree,
+        "disagreements": disagreements,
+        "seed": seed,
+        "H": H,
+        "out_path": str(out_path),
+    }
 
 
 def write_feature_lag_audit(H: int = FORWARD_HORIZON_BARS_DEFAULT) -> Path:
@@ -163,7 +186,7 @@ def write_feature_lag_audit(H: int = FORWARD_HORIZON_BARS_DEFAULT) -> Path:
         "    queried at signal_bar_ts (sig_ts < entry_ts of self ⇒ no self-inclusion).",
         "  - Sequential same-pair density 24h: prior-only signals in (sig_ts - 24h, sig_ts).",
         "",
-        f"Forward-horizon features (in signals_features.csv + trade_paths.csv): forward",
+        "Forward-horizon features (in signals_features.csv + trade_paths.csv): forward",
         f"window of H={H} bars.",
         "  - For each trade at entry_idx = signal_idx + 1, forward-path quantities",
         "    use ONLY bars [entry_idx .. entry_idx + H - 1].",

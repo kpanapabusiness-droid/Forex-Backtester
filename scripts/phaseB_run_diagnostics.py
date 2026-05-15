@@ -103,7 +103,7 @@ def _compute_signal_stats_one_pair(cfg: dict, c1_name: str, params: dict, pair: 
     if date_col:
         df[date_col] = pd.to_datetime(df[date_col], errors="coerce")
         df = df.dropna(subset=[date_col]).sort_values(date_col).set_index(date_col)
-    dr = (cfg.get("date_range") or {})
+    dr = cfg.get("date_range") or {}
     start = pd.Timestamp(dr.get("start", "2019-01-01"))
     end = pd.Timestamp(dr.get("end", "2026-01-01"))
     df = df.loc[(df.index >= start) & (df.index <= end)]
@@ -178,13 +178,25 @@ def _run_c1_diagnostics(cfg: dict, base_out: Path) -> None:
                 response_rows.append({"param_idx": idx, "params": json.dumps(params), **st})
                 scratch_rows.append({"param_idx": idx, **st})
             else:
-                response_rows.append({"param_idx": idx, "params": json.dumps(params), "total_trades": 0})
+                response_rows.append(
+                    {"param_idx": idx, "params": json.dumps(params), "total_trades": 0}
+                )
         if response_rows:
             pd.DataFrame(response_rows).to_csv(out_dir / "response_curves.csv", index=False)
             pd.DataFrame(scratch_rows).to_csv(out_dir / "scratch_mae.csv", index=False)
-        sig_stats = _compute_signal_stats_one_pair(cfg, c1_name, param_list[0] if param_list else {}, first_pair)
-        (out_dir / "signal_stats.json").write_text(json.dumps(sig_stats, indent=2), encoding="utf-8")
-        overlap_rows.append({"c1": c1_name, "flip_density": sig_stats["flip_density"], "persistence_mean": sig_stats["persistence_mean"]})
+        sig_stats = _compute_signal_stats_one_pair(
+            cfg, c1_name, param_list[0] if param_list else {}, first_pair
+        )
+        (out_dir / "signal_stats.json").write_text(
+            json.dumps(sig_stats, indent=2), encoding="utf-8"
+        )
+        overlap_rows.append(
+            {
+                "c1": c1_name,
+                "flip_density": sig_stats["flip_density"],
+                "persistence_mean": sig_stats["persistence_mean"],
+            }
+        )
     if overlap_rows:
         pd.DataFrame(overlap_rows).to_csv(overlap_dir / "c1_overlap_matrix.csv", index=False)
         pd.DataFrame(overlap_rows).to_csv(overlap_dir / "c1_leadlag_summary.csv", index=False)
@@ -225,11 +237,26 @@ def _run_volume_diagnostics(cfg: dict, base_out: Path) -> None:
             c_on["indicators"]["volume"] = vol_short
             c_on.setdefault("indicator_params", {})[vol_name] = params
             _run_backtest(c_on, run_dir)
-            trades_off = pd.read_csv(off_dir / "trades.csv") if (off_dir / "trades.csv").exists() else pd.DataFrame()
-            trades_on = pd.read_csv(run_dir / "trades.csv") if (run_dir / "trades.csv").exists() else pd.DataFrame()
+            trades_off = (
+                pd.read_csv(off_dir / "trades.csv")
+                if (off_dir / "trades.csv").exists()
+                else pd.DataFrame()
+            )
+            trades_on = (
+                pd.read_csv(run_dir / "trades.csv")
+                if (run_dir / "trades.csv").exists()
+                else pd.DataFrame()
+            )
             n_off = len(trades_off)
             n_on = len(trades_on)
-            veto_rows.append({"param_idx": idx, "params": json.dumps(params), "trades_off": n_off, "trades_on": n_on})
+            veto_rows.append(
+                {
+                    "param_idx": idx,
+                    "params": json.dumps(params),
+                    "trades_off": n_off,
+                    "trades_on": n_on,
+                }
+            )
             on_off_rows.append({"param_idx": idx, "trades_off": n_off, "trades_on": n_on})
         if veto_rows:
             pd.DataFrame(veto_rows).to_csv(out_dir / "veto_response_curves.csv", index=False)

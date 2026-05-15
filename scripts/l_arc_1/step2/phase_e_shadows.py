@@ -1,3 +1,4 @@
+# ruff: noqa: E402  (sys.path.insert needed before project imports)
 """Phase E — shadow trade-sets (op spec §5.11).
 
 For each shadow config, re-simulate per-trade outcomes on the same signal-set,
@@ -23,6 +24,7 @@ Outputs (under step2_descriptive/shadow_tradesets/):
   - sl_distance_sweep.csv
   - time_exit_curve.csv
 """
+
 from __future__ import annotations
 
 import sys
@@ -38,8 +40,15 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from scripts.l_arc_1.step2._io import (
-    ENTRY_DELAYS, PAIRS, SL_DISTANCES, STEP2_DIR, TIME_EXIT_H,
-    load_all_floors, load_pair_1h, load_trades_verbatim, pip_size,
+    ENTRY_DELAYS,
+    PAIRS,
+    SL_DISTANCES,
+    STEP2_DIR,
+    TIME_EXIT_H,
+    load_all_floors,
+    load_pair_1h,
+    load_trades_verbatim,
+    pip_size,
 )
 
 SHADOW_DIR = STEP2_DIR / "shadow_tradesets"
@@ -56,11 +65,19 @@ def _floor_spread_pips(raw_pips: float, floor_pips: float) -> float:
     return max(raw_pips, floor_pips)
 
 
-def _simulate_trade(open_arr: np.ndarray, high_arr: np.ndarray, low_arr: np.ndarray,
-                    spread_arr: np.ndarray,
-                    signal_idx: int, atr_at_sig: float,
-                    bar_offset: int, sl_atr_mult: float, h_exit: int,
-                    pair_pip: float, floor_pips: float) -> dict:
+def _simulate_trade(
+    open_arr: np.ndarray,
+    high_arr: np.ndarray,
+    low_arr: np.ndarray,
+    spread_arr: np.ndarray,
+    signal_idx: int,
+    atr_at_sig: float,
+    bar_offset: int,
+    sl_atr_mult: float,
+    h_exit: int,
+    pair_pip: float,
+    floor_pips: float,
+) -> dict:
     """Long-direction shadow trade. Returns dict of outcomes.
 
     Conventions match `core/signals/l4_univariate_extreme._execute_signals`:
@@ -89,13 +106,19 @@ def _simulate_trade(open_arr: np.ndarray, high_arr: np.ndarray, low_arr: np.ndar
             break
 
     if sl_hit_idx >= 0:
-        raw_sp_x = float(spread_arr[sl_hit_idx]) / POINTS_PER_PIP if np.isfinite(spread_arr[sl_hit_idx]) else 0.0
+        raw_sp_x = (
+            float(spread_arr[sl_hit_idx]) / POINTS_PER_PIP
+            if np.isfinite(spread_arr[sl_hit_idx])
+            else 0.0
+        )
         sp_x = _floor_spread_pips(raw_sp_x, floor_pips)
         exit_fill = sl_price - (sp_x * pair_pip) / 2.0
         exit_reason = "stop_loss"
         exit_bar = sl_hit_idx
     else:
-        raw_sp_x = float(spread_arr[x_time]) / POINTS_PER_PIP if np.isfinite(spread_arr[x_time]) else 0.0
+        raw_sp_x = (
+            float(spread_arr[x_time]) / POINTS_PER_PIP if np.isfinite(spread_arr[x_time]) else 0.0
+        )
         sp_x = _floor_spread_pips(raw_sp_x, floor_pips)
         exit_mid = float(open_arr[x_time])
         exit_fill = exit_mid - (sp_x * pair_pip) / 2.0
@@ -127,10 +150,15 @@ def _simulate_trade(open_arr: np.ndarray, high_arr: np.ndarray, low_arr: np.ndar
     }
 
 
-def _run_shadow_config(pair_arrs: Dict[str, dict], pair_ts_idx: Dict[str, Dict[int, int]],
-                       floors: Dict[str, float],
-                       trades: pd.DataFrame, bar_offset: int, sl_atr_mult: float,
-                       h_exit: int) -> pd.DataFrame:
+def _run_shadow_config(
+    pair_arrs: Dict[str, dict],
+    pair_ts_idx: Dict[str, Dict[int, int]],
+    floors: Dict[str, float],
+    trades: pd.DataFrame,
+    bar_offset: int,
+    sl_atr_mult: float,
+    h_exit: int,
+) -> pd.DataFrame:
     """Run shadow simulation over all trades. Returns trade-level DataFrame."""
     rows = []
     sig_ts = pd.to_datetime(trades["signal_bar_ts"]).astype("int64").to_numpy()
@@ -151,18 +179,28 @@ def _run_shadow_config(pair_arrs: Dict[str, dict], pair_ts_idx: Dict[str, Dict[i
         pair_pip = pip_size(pair)
         floor_pips = floors.get(pair, None)
         out = _simulate_trade(
-            d["open"], d["high"], d["low"], d["spread"],
-            sig_idx, atr_at_sig, bar_offset, sl_atr_mult, h_exit,
-            pair_pip, floor_pips,
+            d["open"],
+            d["high"],
+            d["low"],
+            d["spread"],
+            sig_idx,
+            atr_at_sig,
+            bar_offset,
+            sl_atr_mult,
+            h_exit,
+            pair_pip,
+            floor_pips,
         )
         if not out["valid"]:
             continue
-        rows.append({
-            "trade_id": int(tids[k]),
-            "fold_id": int(folds[k]),
-            "pair": pair,
-            **out,
-        })
+        rows.append(
+            {
+                "trade_id": int(tids[k]),
+                "fold_id": int(folds[k]),
+                "pair": pair,
+                **out,
+            }
+        )
     return pd.DataFrame(rows)
 
 
@@ -170,7 +208,7 @@ def _summarise(df: pd.DataFrame, shadow_label: str) -> dict:
     n = len(df)
     if n == 0:
         return {"shadow": shadow_label, "n": 0}
-    exit_mix = df["exit_reason"].value_counts(normalize=True).to_dict()
+    df["exit_reason"].value_counts(normalize=True).to_dict()
     return {
         "shadow": shadow_label,
         "n": int(n),
@@ -204,7 +242,9 @@ def run_phase_e() -> None:
             "high": df["high"].astype(float).values,
             "low": df["low"].astype(float).values,
             "close": df["close"].astype(float).values,
-            "spread": df["spread"].astype(float).values if "spread" in df.columns else np.zeros(len(df)),
+            "spread": df["spread"].astype(float).values
+            if "spread" in df.columns
+            else np.zeros(len(df)),
         }
         ts_int = df["time"].astype("int64").to_numpy()
         pair_ts_idx[pair] = {int(t): i for i, t in enumerate(ts_int)}
@@ -216,49 +256,70 @@ def run_phase_e() -> None:
     entry_curve_rows = []
     for bo in ENTRY_DELAYS:
         t_s = time.time()
-        df = _run_shadow_config(pair_arrs, pair_ts_idx, floors, trades,
-                                bar_offset=bo, sl_atr_mult=2.0, h_exit=1)
+        df = _run_shadow_config(
+            pair_arrs, pair_ts_idx, floors, trades, bar_offset=bo, sl_atr_mult=2.0, h_exit=1
+        )
         label = f"entry_delay__n{bo}_sl2.0_h1"
-        df.to_csv(SHADOW_DIR / "entry_delay" / f"n{bo}.csv",
-                  index=False, lineterminator="\n", float_format="%.6g")
+        df.to_csv(
+            SHADOW_DIR / "entry_delay" / f"n{bo}.csv",
+            index=False,
+            lineterminator="\n",
+            float_format="%.6g",
+        )
         s = _summarise(df, label)
         summaries.append(s)
         entry_curve_rows.append({"bar_offset": bo, **{k: v for k, v in s.items() if k != "shadow"}})
-        print(f"  bo={bo}: n={s.get('n', 0)} mean_R={s.get('mean_net_r', 0):.5f} "
-              f"sl%={s.get('frac_sl_hit', 0)*100:.2f} ({time.time()-t_s:.1f}s)")
+        print(
+            f"  bo={bo}: n={s.get('n', 0)} mean_R={s.get('mean_net_r', 0):.5f} "
+            f"sl%={s.get('frac_sl_hit', 0) * 100:.2f} ({time.time() - t_s:.1f}s)"
+        )
 
-    pd.DataFrame(entry_curve_rows).to_csv(SHADOW_DIR / "entry_delay_curve.csv",
-                                          index=False, lineterminator="\n")
+    pd.DataFrame(entry_curve_rows).to_csv(
+        SHADOW_DIR / "entry_delay_curve.csv", index=False, lineterminator="\n"
+    )
 
     # Sweep SL distance (sl_atr_mult varies; bo=1, h=1)
     print("[Phase E] SL-distance sweep...")
     sl_rows = []
     for mult in SL_DISTANCES:
         t_s = time.time()
-        df = _run_shadow_config(pair_arrs, pair_ts_idx, floors, trades,
-                                bar_offset=1, sl_atr_mult=mult, h_exit=1)
+        df = _run_shadow_config(
+            pair_arrs, pair_ts_idx, floors, trades, bar_offset=1, sl_atr_mult=mult, h_exit=1
+        )
         label = f"sl_distance__n1_sl{mult}_h1"
-        df.to_csv(SHADOW_DIR / "sl_distance" / f"sl{mult}.csv",
-                  index=False, lineterminator="\n", float_format="%.6g")
+        df.to_csv(
+            SHADOW_DIR / "sl_distance" / f"sl{mult}.csv",
+            index=False,
+            lineterminator="\n",
+            float_format="%.6g",
+        )
         s = _summarise(df, label)
         summaries.append(s)
         sl_rows.append({"sl_atr_mult": mult, **{k: v for k, v in s.items() if k != "shadow"}})
-        print(f"  sl={mult}: n={s.get('n', 0)} mean_R={s.get('mean_net_r', 0):.5f} "
-              f"sl%={s.get('frac_sl_hit', 0)*100:.2f} ({time.time()-t_s:.1f}s)")
+        print(
+            f"  sl={mult}: n={s.get('n', 0)} mean_R={s.get('mean_net_r', 0):.5f} "
+            f"sl%={s.get('frac_sl_hit', 0) * 100:.2f} ({time.time() - t_s:.1f}s)"
+        )
 
-    pd.DataFrame(sl_rows).to_csv(SHADOW_DIR / "sl_distance_sweep.csv",
-                                 index=False, lineterminator="\n")
+    pd.DataFrame(sl_rows).to_csv(
+        SHADOW_DIR / "sl_distance_sweep.csv", index=False, lineterminator="\n"
+    )
 
     # Sweep time exit (h varies; bo=1, sl=2.0)
     print("[Phase E] time-exit sweep...")
     te_rows = []
     for h in TIME_EXIT_H:
         t_s = time.time()
-        df = _run_shadow_config(pair_arrs, pair_ts_idx, floors, trades,
-                                bar_offset=1, sl_atr_mult=2.0, h_exit=h)
+        df = _run_shadow_config(
+            pair_arrs, pair_ts_idx, floors, trades, bar_offset=1, sl_atr_mult=2.0, h_exit=h
+        )
         label = f"time_exit__n1_sl2.0_h{h}"
-        df.to_csv(SHADOW_DIR / "time_exit" / f"h{h}.csv",
-                  index=False, lineterminator="\n", float_format="%.6g")
+        df.to_csv(
+            SHADOW_DIR / "time_exit" / f"h{h}.csv",
+            index=False,
+            lineterminator="\n",
+            float_format="%.6g",
+        )
         s = _summarise(df, label)
         summaries.append(s)
         # capture ratio: realised R / fwd_mfe_atr_at_h (per trade), pool median
@@ -277,17 +338,26 @@ def run_phase_e() -> None:
                 median_cap = np.nan
         else:
             median_cap = np.nan
-        te_rows.append({"h": h, "median_capture_ratio_vs_fwd_mfe": median_cap,
-                        **{k: v for k, v in s.items() if k != "shadow"}})
-        print(f"  h={h}: n={s.get('n', 0)} mean_R={s.get('mean_net_r', 0):.5f} "
-              f"sl%={s.get('frac_sl_hit', 0)*100:.2f} cap_med={median_cap:.3f} ({time.time()-t_s:.1f}s)")
+        te_rows.append(
+            {
+                "h": h,
+                "median_capture_ratio_vs_fwd_mfe": median_cap,
+                **{k: v for k, v in s.items() if k != "shadow"},
+            }
+        )
+        print(
+            f"  h={h}: n={s.get('n', 0)} mean_R={s.get('mean_net_r', 0):.5f} "
+            f"sl%={s.get('frac_sl_hit', 0) * 100:.2f} cap_med={median_cap:.3f} ({time.time() - t_s:.1f}s)"
+        )
 
-    pd.DataFrame(te_rows).to_csv(SHADOW_DIR / "time_exit_curve.csv",
-                                 index=False, lineterminator="\n")
+    pd.DataFrame(te_rows).to_csv(
+        SHADOW_DIR / "time_exit_curve.csv", index=False, lineterminator="\n"
+    )
 
-    pd.DataFrame(summaries).to_csv(SHADOW_DIR / "shadow_summary.csv",
-                                   index=False, lineterminator="\n")
-    print(f"[Phase E] done in {time.time()-t0:.1f}s")
+    pd.DataFrame(summaries).to_csv(
+        SHADOW_DIR / "shadow_summary.csv", index=False, lineterminator="\n"
+    )
+    print(f"[Phase E] done in {time.time() - t0:.1f}s")
 
 
 if __name__ == "__main__":

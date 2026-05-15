@@ -20,10 +20,12 @@ def test_signal_correctness_rising_fires_long() -> None:
     """3-bar rising sequence at known index must fire long=1, short=0."""
     from scripts.phaseD2_generate_momentum_signals import _momentum_3bar_signals
 
-    df = pd.DataFrame({
-        "date": pd.date_range("2020-01-01", periods=6, freq="D"),
-        "close": [1.0, 1.1, 1.2, 1.15, 1.25, 1.3],
-    })
+    df = pd.DataFrame(
+        {
+            "date": pd.date_range("2020-01-01", periods=6, freq="D"),
+            "close": [1.0, 1.1, 1.2, 1.15, 1.25, 1.3],
+        }
+    )
     out = _momentum_3bar_signals(df, pair="EUR_USD", signal_name="momentum_3bar")
 
     rows_by_date = out.set_index(["date", "direction"])["signal"].unstack()
@@ -38,10 +40,12 @@ def test_signal_correctness_falling_fires_short() -> None:
     """3-bar falling sequence must fire short=1, long=0."""
     from scripts.phaseD2_generate_momentum_signals import _momentum_3bar_signals
 
-    df = pd.DataFrame({
-        "date": pd.date_range("2020-01-01", periods=5, freq="D"),
-        "close": [1.2, 1.1, 1.0, 0.95, 0.9],
-    })
+    df = pd.DataFrame(
+        {
+            "date": pd.date_range("2020-01-01", periods=5, freq="D"),
+            "close": [1.2, 1.1, 1.0, 0.95, 0.9],
+        }
+    )
     out = _momentum_3bar_signals(df, pair="GBP_USD", signal_name="momentum_3bar")
 
     rows_by_date = out.set_index(["date", "direction"])["signal"].unstack()
@@ -56,10 +60,12 @@ def test_signal_no_fire_when_not_monotonic() -> None:
     """Non-monotonic 3-bar sequence must produce signal=0 for both."""
     from scripts.phaseD2_generate_momentum_signals import _momentum_3bar_signals
 
-    df = pd.DataFrame({
-        "date": pd.date_range("2020-01-01", periods=5, freq="D"),
-        "close": [1.0, 1.1, 1.0, 1.1, 1.0],
-    })
+    df = pd.DataFrame(
+        {
+            "date": pd.date_range("2020-01-01", periods=5, freq="D"),
+            "close": [1.0, 1.1, 1.0, 1.1, 1.0],
+        }
+    )
     out = _momentum_3bar_signals(df, pair="AUD_USD", signal_name="momentum_3bar")
 
     rows_by_date = out.set_index(["date", "direction"])["signal"].unstack()
@@ -73,10 +79,12 @@ def test_two_rows_per_date_contract() -> None:
     from scripts.phaseD2_generate_momentum_signals import _momentum_3bar_signals
 
     n = 10
-    df = pd.DataFrame({
-        "date": pd.date_range("2020-01-01", periods=n, freq="D"),
-        "close": np.linspace(1.0, 1.5, n),
-    })
+    df = pd.DataFrame(
+        {
+            "date": pd.date_range("2020-01-01", periods=n, freq="D"),
+            "close": np.linspace(1.0, 1.5, n),
+        }
+    )
     out = _momentum_3bar_signals(df, pair="USD_JPY", signal_name="momentum_3bar")
 
     assert len(out) == 2 * n
@@ -90,10 +98,12 @@ def test_deterministic_sort_order() -> None:
     """Output sorted by (pair, date, direction) with long before short."""
     from scripts.phaseD2_generate_momentum_signals import _momentum_3bar_signals
 
-    df = pd.DataFrame({
-        "date": pd.date_range("2020-01-01", periods=5, freq="D"),
-        "close": [1.0, 1.1, 1.2, 1.15, 1.1],
-    })
+    df = pd.DataFrame(
+        {
+            "date": pd.date_range("2020-01-01", periods=5, freq="D"),
+            "close": [1.0, 1.1, 1.2, 1.15, 1.1],
+        }
+    )
     out = _momentum_3bar_signals(df, pair="EUR_GBP", signal_name="momentum_3bar")
 
     assert list(out.columns) == ["pair", "date", "direction", "signal", "signal_name"]
@@ -110,10 +120,12 @@ def test_warmup_first_two_bars_signal_zero() -> None:
     """First two dates cannot fire (need t-2); assert signal=0 for both directions."""
     from scripts.phaseD2_generate_momentum_signals import _momentum_3bar_signals
 
-    df = pd.DataFrame({
-        "date": pd.date_range("2020-01-01", periods=5, freq="D"),
-        "close": [1.0, 1.1, 1.2, 1.3, 1.4],
-    })
+    df = pd.DataFrame(
+        {
+            "date": pd.date_range("2020-01-01", periods=5, freq="D"),
+            "close": [1.0, 1.1, 1.2, 1.3, 1.4],
+        }
+    )
     out = _momentum_3bar_signals(df, pair="CHF_JPY", signal_name="momentum_3bar")
 
     rows_by_date = out.set_index(["date", "direction"])["signal"].unstack()

@@ -14,7 +14,6 @@ suggestions. Pure aggregations of the per-signal feature matrix.
 from __future__ import annotations
 
 import argparse
-import csv
 import datetime as _dt
 import hashlib
 import math
@@ -32,10 +31,34 @@ if str(REPO_ROOT) not in sys.path:
 from scripts.lchar.compute_spread_floors import compute_body_sha256  # noqa: E402
 
 ALL_PAIRS: Tuple[str, ...] = (
-    "AUD_CAD", "AUD_CHF", "AUD_JPY", "AUD_NZD", "AUD_USD", "CAD_CHF", "CAD_JPY", "CHF_JPY",
-    "EUR_AUD", "EUR_CAD", "EUR_CHF", "EUR_GBP", "EUR_JPY", "EUR_NZD", "EUR_USD", "GBP_AUD",
-    "GBP_CAD", "GBP_CHF", "GBP_JPY", "GBP_NZD", "GBP_USD", "NZD_CAD", "NZD_CHF", "NZD_JPY",
-    "NZD_USD", "USD_CAD", "USD_CHF", "USD_JPY",
+    "AUD_CAD",
+    "AUD_CHF",
+    "AUD_JPY",
+    "AUD_NZD",
+    "AUD_USD",
+    "CAD_CHF",
+    "CAD_JPY",
+    "CHF_JPY",
+    "EUR_AUD",
+    "EUR_CAD",
+    "EUR_CHF",
+    "EUR_GBP",
+    "EUR_JPY",
+    "EUR_NZD",
+    "EUR_USD",
+    "GBP_AUD",
+    "GBP_CAD",
+    "GBP_CHF",
+    "GBP_JPY",
+    "GBP_NZD",
+    "GBP_USD",
+    "NZD_CAD",
+    "NZD_CHF",
+    "NZD_JPY",
+    "NZD_USD",
+    "USD_CAD",
+    "USD_CHF",
+    "USD_JPY",
 )
 
 
@@ -54,15 +77,33 @@ def _win_rate(s_net_r: pd.Series) -> float:
     return float((s > 0).mean()) * 100.0
 
 
-def _format_table(headers: List[str], rows: List[List[Any]], widths: Optional[List[int]] = None) -> str:
+def _format_table(
+    headers: List[str], rows: List[List[Any]], widths: Optional[List[int]] = None
+) -> str:
     """Render a markdown table with simple deterministic formatting."""
     if not widths:
-        widths = [max(len(str(h)), max((len(str(r[i])) for r in rows), default=0)) for i, h in enumerate(headers)]
+        widths = [
+            max(len(str(h)), max((len(str(r[i])) for r in rows), default=0))
+            for i, h in enumerate(headers)
+        ]
     out_lines = []
-    out_lines.append("| " + " | ".join(f"{h:>{widths[i]}}" if i > 0 else f"{h:<{widths[i]}}" for i, h in enumerate(headers)) + " |")
+    out_lines.append(
+        "| "
+        + " | ".join(
+            f"{h:>{widths[i]}}" if i > 0 else f"{h:<{widths[i]}}" for i, h in enumerate(headers)
+        )
+        + " |"
+    )
     out_lines.append("|" + "|".join(("-" * (widths[i] + 2)) for i in range(len(headers))) + "|")
     for r in rows:
-        out_lines.append("| " + " | ".join(f"{r[i]!s:>{widths[i]}}" if i > 0 else f"{r[i]!s:<{widths[i]}}" for i in range(len(headers))) + " |")
+        out_lines.append(
+            "| "
+            + " | ".join(
+                f"{r[i]!s:>{widths[i]}}" if i > 0 else f"{r[i]!s:<{widths[i]}}"
+                for i in range(len(headers))
+            )
+            + " |"
+        )
     return "\n".join(out_lines)
 
 
@@ -108,27 +149,43 @@ def _label_outcome_table(df: pd.DataFrame, label_col: str) -> pd.DataFrame:
     """
     rows = []
     if label_col not in df.columns:
-        return pd.DataFrame(columns=["label", "n", "mean_net_r", "win_pct",
-                                      "mean_gross_r", "mean_spread_cost_r",
-                                      "mfe_q25", "mfe_q50", "mfe_q75", "mfe_q95",
-                                      "mae_q25", "mae_q50", "mae_q75", "mae_q95"])
+        return pd.DataFrame(
+            columns=[
+                "label",
+                "n",
+                "mean_net_r",
+                "win_pct",
+                "mean_gross_r",
+                "mean_spread_cost_r",
+                "mfe_q25",
+                "mfe_q50",
+                "mfe_q75",
+                "mfe_q95",
+                "mae_q25",
+                "mae_q50",
+                "mae_q75",
+                "mae_q95",
+            ]
+        )
     for label_val, sub in df.groupby(label_col, dropna=False, sort=True):
-        rows.append({
-            "label": str(label_val) if pd.notna(label_val) else "n/a",
-            "n": int(len(sub)),
-            "mean_net_r": _safe_mean(sub["net_r"]),
-            "win_pct": _win_rate(sub["net_r"]),
-            "mean_gross_r": _safe_mean(sub["gross_r"]),
-            "mean_spread_cost_r": _safe_mean(sub["spread_cost_r"]),
-            "mfe_q25": _safe_quantile(sub["mfe_held_atr"], 0.25),
-            "mfe_q50": _safe_quantile(sub["mfe_held_atr"], 0.50),
-            "mfe_q75": _safe_quantile(sub["mfe_held_atr"], 0.75),
-            "mfe_q95": _safe_quantile(sub["mfe_held_atr"], 0.95),
-            "mae_q25": _safe_quantile(sub["mae_held_atr"], 0.25),
-            "mae_q50": _safe_quantile(sub["mae_held_atr"], 0.50),
-            "mae_q75": _safe_quantile(sub["mae_held_atr"], 0.75),
-            "mae_q95": _safe_quantile(sub["mae_held_atr"], 0.95),
-        })
+        rows.append(
+            {
+                "label": str(label_val) if pd.notna(label_val) else "n/a",
+                "n": int(len(sub)),
+                "mean_net_r": _safe_mean(sub["net_r"]),
+                "win_pct": _win_rate(sub["net_r"]),
+                "mean_gross_r": _safe_mean(sub["gross_r"]),
+                "mean_spread_cost_r": _safe_mean(sub["spread_cost_r"]),
+                "mfe_q25": _safe_quantile(sub["mfe_held_atr"], 0.25),
+                "mfe_q50": _safe_quantile(sub["mfe_held_atr"], 0.50),
+                "mfe_q75": _safe_quantile(sub["mfe_held_atr"], 0.75),
+                "mfe_q95": _safe_quantile(sub["mfe_held_atr"], 0.95),
+                "mae_q25": _safe_quantile(sub["mae_held_atr"], 0.25),
+                "mae_q50": _safe_quantile(sub["mae_held_atr"], 0.50),
+                "mae_q75": _safe_quantile(sub["mae_held_atr"], 0.75),
+                "mae_q95": _safe_quantile(sub["mae_held_atr"], 0.95),
+            }
+        )
     return pd.DataFrame(rows)
 
 
@@ -144,33 +201,39 @@ def _decile_outcome_table(df: pd.DataFrame, feat_col: str) -> pd.DataFrame:
         sub = df[mask]
         if len(sub) == 0:
             continue
-        rows.append({
-            "decile": label_val,
-            "n": int(len(sub)),
-            "mean_net_r": _safe_mean(sub["net_r"]),
-            "win_pct": _win_rate(sub["net_r"]),
-            "mean_mfe_held_atr": _safe_mean(sub["mfe_held_atr"]),
-        })
+        rows.append(
+            {
+                "decile": label_val,
+                "n": int(len(sub)),
+                "mean_net_r": _safe_mean(sub["net_r"]),
+                "win_pct": _win_rate(sub["net_r"]),
+                "mean_mfe_held_atr": _safe_mean(sub["mfe_held_atr"]),
+            }
+        )
     return pd.DataFrame(rows)
 
 
 def _regime_breakdown(df: pd.DataFrame) -> pd.DataFrame:
     rows = []
-    for (sp, mtf), sub in df.groupby(["structural_pattern", "mtf_alignment"], dropna=False, sort=True):
-        rows.append({
-            "structural_pattern": str(sp),
-            "mtf_alignment": str(mtf),
-            "n": int(len(sub)),
-            "mean_net_r": _safe_mean(sub["net_r"]),
-            "mean_gross_r": _safe_mean(sub["gross_r"]),
-            "win_pct": _win_rate(sub["net_r"]),
-            "mfe_q50": _safe_quantile(sub["mfe_held_atr"], 0.50),
-            "mfe_q75": _safe_quantile(sub["mfe_held_atr"], 0.75),
-            "mfe_q95": _safe_quantile(sub["mfe_held_atr"], 0.95),
-            "mae_q50": _safe_quantile(sub["mae_held_atr"], 0.50),
-            "mae_q75": _safe_quantile(sub["mae_held_atr"], 0.75),
-            "mae_q95": _safe_quantile(sub["mae_held_atr"], 0.95),
-        })
+    for (sp, mtf), sub in df.groupby(
+        ["structural_pattern", "mtf_alignment"], dropna=False, sort=True
+    ):
+        rows.append(
+            {
+                "structural_pattern": str(sp),
+                "mtf_alignment": str(mtf),
+                "n": int(len(sub)),
+                "mean_net_r": _safe_mean(sub["net_r"]),
+                "mean_gross_r": _safe_mean(sub["gross_r"]),
+                "win_pct": _win_rate(sub["net_r"]),
+                "mfe_q50": _safe_quantile(sub["mfe_held_atr"], 0.50),
+                "mfe_q75": _safe_quantile(sub["mfe_held_atr"], 0.75),
+                "mfe_q95": _safe_quantile(sub["mfe_held_atr"], 0.95),
+                "mae_q50": _safe_quantile(sub["mae_held_atr"], 0.50),
+                "mae_q75": _safe_quantile(sub["mae_held_atr"], 0.75),
+                "mae_q95": _safe_quantile(sub["mae_held_atr"], 0.95),
+            }
+        )
     return pd.DataFrame(rows)
 
 
@@ -183,18 +246,20 @@ def _forward_horizon_curves(df: pd.DataFrame, horizons: List[int]) -> pd.DataFra
         mfe = f"fwd_mfe_h{H}_atr"
         mae = f"fwd_mae_h{H}_atr"
         s = df[col]
-        rows.append({
-            "structural_pattern": "pooled",
-            "horizon_h": H,
-            "n_trades": int(s.notna().sum()),
-            "mean_fwd_logret": _safe_mean(s),
-            "mean_mfe_atr": _safe_mean(df[mfe]),
-            "mean_mae_atr": _safe_mean(df[mae]),
-            "p25_fwd_logret": _safe_quantile(s, 0.25),
-            "p50_fwd_logret": _safe_quantile(s, 0.50),
-            "p75_fwd_logret": _safe_quantile(s, 0.75),
-            "p95_fwd_logret": _safe_quantile(s, 0.95),
-        })
+        rows.append(
+            {
+                "structural_pattern": "pooled",
+                "horizon_h": H,
+                "n_trades": int(s.notna().sum()),
+                "mean_fwd_logret": _safe_mean(s),
+                "mean_mfe_atr": _safe_mean(df[mfe]),
+                "mean_mae_atr": _safe_mean(df[mae]),
+                "p25_fwd_logret": _safe_quantile(s, 0.25),
+                "p50_fwd_logret": _safe_quantile(s, 0.50),
+                "p75_fwd_logret": _safe_quantile(s, 0.75),
+                "p95_fwd_logret": _safe_quantile(s, 0.95),
+            }
+        )
 
     for sp, sub in df.groupby("structural_pattern", dropna=False, sort=True):
         for H in horizons:
@@ -202,18 +267,20 @@ def _forward_horizon_curves(df: pd.DataFrame, horizons: List[int]) -> pd.DataFra
             mfe = f"fwd_mfe_h{H}_atr"
             mae = f"fwd_mae_h{H}_atr"
             s = sub[col]
-            rows.append({
-                "structural_pattern": str(sp),
-                "horizon_h": H,
-                "n_trades": int(s.notna().sum()),
-                "mean_fwd_logret": _safe_mean(s),
-                "mean_mfe_atr": _safe_mean(sub[mfe]),
-                "mean_mae_atr": _safe_mean(sub[mae]),
-                "p25_fwd_logret": _safe_quantile(s, 0.25),
-                "p50_fwd_logret": _safe_quantile(s, 0.50),
-                "p75_fwd_logret": _safe_quantile(s, 0.75),
-                "p95_fwd_logret": _safe_quantile(s, 0.95),
-            })
+            rows.append(
+                {
+                    "structural_pattern": str(sp),
+                    "horizon_h": H,
+                    "n_trades": int(s.notna().sum()),
+                    "mean_fwd_logret": _safe_mean(s),
+                    "mean_mfe_atr": _safe_mean(sub[mfe]),
+                    "mean_mae_atr": _safe_mean(sub[mae]),
+                    "p25_fwd_logret": _safe_quantile(s, 0.25),
+                    "p50_fwd_logret": _safe_quantile(s, 0.50),
+                    "p75_fwd_logret": _safe_quantile(s, 0.75),
+                    "p95_fwd_logret": _safe_quantile(s, 0.95),
+                }
+            )
     return pd.DataFrame(rows)
 
 
@@ -222,24 +289,31 @@ def _pair_breakdown(df: pd.DataFrame) -> pd.DataFrame:
     for pair, sub in df.groupby("pair", sort=True):
         # NaN rates for volume features
         for_nan = {}
-        for col in ("volume_1h_at_n", "volume_4h_at_lag1", "volume_d1_at_lag1", "volume_w1_at_lag1"):
+        for col in (
+            "volume_1h_at_n",
+            "volume_4h_at_lag1",
+            "volume_d1_at_lag1",
+            "volume_w1_at_lag1",
+        ):
             if col in sub.columns:
                 for_nan[col + "_nan_rate"] = float(sub[col].isna().mean())
-        rows.append({
-            "pair": pair,
-            "n": int(len(sub)),
-            "mean_net_r": _safe_mean(sub["net_r"]),
-            "mean_gross_r": _safe_mean(sub["gross_r"]),
-            "mean_spread_cost_r": _safe_mean(sub["spread_cost_r"]),
-            "win_pct": _win_rate(sub["net_r"]),
-            "mfe_q50": _safe_quantile(sub["mfe_held_atr"], 0.50),
-            "mfe_q75": _safe_quantile(sub["mfe_held_atr"], 0.75),
-            "mfe_q95": _safe_quantile(sub["mfe_held_atr"], 0.95),
-            "mae_q50": _safe_quantile(sub["mae_held_atr"], 0.50),
-            "mae_q75": _safe_quantile(sub["mae_held_atr"], 0.75),
-            "mae_q95": _safe_quantile(sub["mae_held_atr"], 0.95),
-            **for_nan,
-        })
+        rows.append(
+            {
+                "pair": pair,
+                "n": int(len(sub)),
+                "mean_net_r": _safe_mean(sub["net_r"]),
+                "mean_gross_r": _safe_mean(sub["gross_r"]),
+                "mean_spread_cost_r": _safe_mean(sub["spread_cost_r"]),
+                "win_pct": _win_rate(sub["net_r"]),
+                "mfe_q50": _safe_quantile(sub["mfe_held_atr"], 0.50),
+                "mfe_q75": _safe_quantile(sub["mfe_held_atr"], 0.75),
+                "mfe_q95": _safe_quantile(sub["mfe_held_atr"], 0.95),
+                "mae_q50": _safe_quantile(sub["mae_held_atr"], 0.50),
+                "mae_q75": _safe_quantile(sub["mae_held_atr"], 0.75),
+                "mae_q95": _safe_quantile(sub["mae_held_atr"], 0.95),
+                **for_nan,
+            }
+        )
     return pd.DataFrame(rows)
 
 
@@ -256,9 +330,15 @@ def _volume_nan_audit(df: pd.DataFrame) -> pd.DataFrame:
         for tf, col in vol_cols.items():
             n = len(sub)
             n_nan = int(sub[col].isna().sum())
-            rows.append({"pair": pair, "tf": tf, "n_total": n,
-                         "n_nan": n_nan,
-                         "nan_rate_pct": (100.0 * n_nan / n) if n > 0 else math.nan})
+            rows.append(
+                {
+                    "pair": pair,
+                    "tf": tf,
+                    "n_total": n,
+                    "n_nan": n_nan,
+                    "nan_rate_pct": (100.0 * n_nan / n) if n > 0 else math.nan,
+                }
+            )
     return pd.DataFrame(rows)
 
 
@@ -266,11 +346,13 @@ def _classification_breakdown(df: pd.DataFrame) -> pd.DataFrame:
     rows = []
     grp_cols = ["structural_pattern", "mtf_alignment", "cluster_label"]
     for vals, sub in df.groupby(grp_cols, dropna=False, sort=True):
-        rows.append({
-            **{c: str(v) for c, v in zip(grp_cols, vals)},
-            "n": int(len(sub)),
-            "pct_of_total": 100.0 * len(sub) / len(df) if len(df) > 0 else math.nan,
-        })
+        rows.append(
+            {
+                **{c: str(v) for c, v in zip(grp_cols, vals)},
+                "n": int(len(sub)),
+                "pct_of_total": 100.0 * len(sub) / len(df) if len(df) > 0 else math.nan,
+            }
+        )
     return pd.DataFrame(rows)
 
 
@@ -298,15 +380,17 @@ def _per_fold_breakdown(df: pd.DataFrame) -> pd.DataFrame:
                 if pooled_pct < 0.02:  # don't report sub-2% labels
                     continue
                 ratio = pct / pooled_pct if pooled_pct > 0 else math.nan
-                rows.append({
-                    "fold_id": str(fid),
-                    "category": cat_col,
-                    "label": str(label),
-                    "fold_pct": 100.0 * pct,
-                    "pooled_pct": 100.0 * pooled_pct,
-                    "lift_ratio": ratio,
-                    "fold_n": int((sub[cat_col].astype(str) == str(label)).sum()),
-                })
+                rows.append(
+                    {
+                        "fold_id": str(fid),
+                        "category": cat_col,
+                        "label": str(label),
+                        "fold_pct": 100.0 * pct,
+                        "pooled_pct": 100.0 * pooled_pct,
+                        "lift_ratio": ratio,
+                        "fold_n": int((sub[cat_col].astype(str) == str(label)).sum()),
+                    }
+                )
     return pd.DataFrame(rows)
 
 
@@ -314,37 +398,47 @@ def _edge_vs_cost(df: pd.DataFrame) -> Dict[str, pd.DataFrame]:
     out: Dict[str, pd.DataFrame] = {}
 
     # Pooled
-    pooled = pd.DataFrame([{
-        "scope": "pooled",
-        "n": int(len(df)),
-        "mean_gross_r": _safe_mean(df["gross_r"]),
-        "mean_spread_cost_r": _safe_mean(df["spread_cost_r"]),
-        "mean_net_r": _safe_mean(df["net_r"]),
-    }])
+    pooled = pd.DataFrame(
+        [
+            {
+                "scope": "pooled",
+                "n": int(len(df)),
+                "mean_gross_r": _safe_mean(df["gross_r"]),
+                "mean_spread_cost_r": _safe_mean(df["spread_cost_r"]),
+                "mean_net_r": _safe_mean(df["net_r"]),
+            }
+        ]
+    )
 
     # Per structural_pattern
     sp_rows = []
     for sp, sub in df.groupby("structural_pattern", dropna=False, sort=True):
-        sp_rows.append({
-            "scope": f"structural_pattern={sp}",
-            "n": int(len(sub)),
-            "mean_gross_r": _safe_mean(sub["gross_r"]),
-            "mean_spread_cost_r": _safe_mean(sub["spread_cost_r"]),
-            "mean_net_r": _safe_mean(sub["net_r"]),
-        })
+        sp_rows.append(
+            {
+                "scope": f"structural_pattern={sp}",
+                "n": int(len(sub)),
+                "mean_gross_r": _safe_mean(sub["gross_r"]),
+                "mean_spread_cost_r": _safe_mean(sub["spread_cost_r"]),
+                "mean_net_r": _safe_mean(sub["net_r"]),
+            }
+        )
 
     # Floored vs not-floored at entry
     floor_rows = []
     if "spread_floored_at_signal" in df.columns:
         for floor_val in [True, False]:
-            sub = df[df["spread_floored_at_signal"].astype(str).str.lower() == str(floor_val).lower()]
-            floor_rows.append({
-                "scope": f"floored_at_entry={floor_val}",
-                "n": int(len(sub)),
-                "mean_gross_r": _safe_mean(sub["gross_r"]),
-                "mean_spread_cost_r": _safe_mean(sub["spread_cost_r"]),
-                "mean_net_r": _safe_mean(sub["net_r"]),
-            })
+            sub = df[
+                df["spread_floored_at_signal"].astype(str).str.lower() == str(floor_val).lower()
+            ]
+            floor_rows.append(
+                {
+                    "scope": f"floored_at_entry={floor_val}",
+                    "n": int(len(sub)),
+                    "mean_gross_r": _safe_mean(sub["gross_r"]),
+                    "mean_spread_cost_r": _safe_mean(sub["spread_cost_r"]),
+                    "mean_net_r": _safe_mean(sub["net_r"]),
+                }
+            )
 
     out["pooled"] = pooled
     out["per_structural_pattern"] = pd.DataFrame(sp_rows)
@@ -361,7 +455,9 @@ def _findings_bullets(df: pd.DataFrame) -> List[str]:
     bullets: List[str] = []
     pooled_net = _safe_mean(df["net_r"])
     pooled_n = int(len(df))
-    bullets.append(f"Pooled mean net_r = {_fmt_num(pooled_net, 4)} R over n={pooled_n} taken trades.")
+    bullets.append(
+        f"Pooled mean net_r = {_fmt_num(pooled_net, 4)} R over n={pooled_n} taken trades."
+    )
 
     # Per structural_pattern
     for sp, sub in df.groupby("structural_pattern", dropna=False, sort=True):
@@ -396,7 +492,9 @@ def _findings_bullets(df: pd.DataFrame) -> List[str]:
     # Spread-floor split
     if "spread_floored_at_signal" in df.columns:
         for floor_val in [True, False]:
-            sub = df[df["spread_floored_at_signal"].astype(str).str.lower() == str(floor_val).lower()]
+            sub = df[
+                df["spread_floored_at_signal"].astype(str).str.lower() == str(floor_val).lower()
+            ]
             if len(sub) < 50:
                 continue
             bullets.append(
@@ -418,7 +516,9 @@ def _findings_bullets(df: pd.DataFrame) -> List[str]:
     return bullets
 
 
-def _arc1_fold_window_count(arc1_signals_log_csv: Path, signal_start: pd.Timestamp, signal_end: pd.Timestamp) -> int:
+def _arc1_fold_window_count(
+    arc1_signals_log_csv: Path, signal_start: pd.Timestamp, signal_end: pd.Timestamp
+) -> int:
     """Count Arc-1 signals_log.csv rows within the characterisation window."""
     if not arc1_signals_log_csv.exists():
         return -1
@@ -443,7 +543,9 @@ def _generate_lag_audit(df: pd.DataFrame, sample_n: int, seed: int) -> str:
     lines.append("  D1: ts_d1_used.date < signal_bar_ts.date  (strict prior calendar day)")
     lines.append("  W1: ts_w1_used < weekstart(signal_bar_ts)  (strict prior week)")
     lines.append("")
-    lines.append("Header: pair signal_bar_ts ts_4h_used ts_d1_used ts_w1_used  4H_PASS  D1_PASS  W1_PASS")
+    lines.append(
+        "Header: pair signal_bar_ts ts_4h_used ts_d1_used ts_w1_used  4H_PASS  D1_PASS  W1_PASS"
+    )
     lines.append("-" * 90)
     fail_count = 0
     for i in indices:
@@ -469,7 +571,7 @@ def _generate_lag_audit(df: pd.DataFrame, sample_n: int, seed: int) -> str:
         )
     lines.append("")
     lines.append(f"Total assertion failures across the {sample_n}-row sample: {fail_count}")
-    lines.append(f"Pooled pipeline-runtime assertion failures (must be zero): SEE pipeline run log")
+    lines.append("Pooled pipeline-runtime assertion failures (must be zero): SEE pipeline run log")
     return "\n".join(lines)
 
 
@@ -487,27 +589,37 @@ def _author_report(
     rerun_run2_sha: str,
 ) -> str:
     pooled_n = int(len(df))
-    pooled_net = _safe_mean(df["net_r"])
-    pooled_gross = _safe_mean(df["gross_r"])
-    pooled_spread = _safe_mean(df["spread_cost_r"])
-    pooled_winp = _win_rate(df["net_r"])
+    _safe_mean(df["net_r"])
+    _safe_mean(df["gross_r"])
+    _safe_mean(df["spread_cost_r"])
+    _win_rate(df["net_r"])
 
     # 1. Header
     lines: List[str] = []
     lines.append("# L4 Univariate-Extreme — Descriptive Characterisation Report")
     lines.append("")
-    lines.append("**Disposition:** descriptive only — no PASS/FAIL, no gate, no filter derivation. ")
-    lines.append("This document is research output, not a tradable system. Per L6.0 §9 / §11 / §13 ")
-    lines.append("any pattern observed below is a candidate hypothesis for a fresh arc with a pre-committed ")
+    lines.append(
+        "**Disposition:** descriptive only — no PASS/FAIL, no gate, no filter derivation. "
+    )
+    lines.append(
+        "This document is research output, not a tradable system. Per L6.0 §9 / §11 / §13 "
+    )
+    lines.append(
+        "any pattern observed below is a candidate hypothesis for a fresh arc with a pre-committed "
+    )
     lines.append("filter, never a derived gate within this exercise.")
     lines.append("")
     lines.append("## 1. Header")
     lines.append("")
     lines.append(f"- **Run timestamp:** {timestamp_str}")
     lines.append(f"- **Git commit:** `{git_commit}`")
-    lines.append(f"- **Signal window:** {signal_start.isoformat()} → {signal_end.isoformat()} (1H bars, inclusive)")
-    lines.append(f"- **Pairs:** all 28 (per L0/L6.0/Arc 1 universe)")
-    lines.append(f"- **Deterministic-rerun confirmation:** {'PASS — byte-identical' if deterministic_rerun_confirmed else 'NOT YET CONFIRMED'}")
+    lines.append(
+        f"- **Signal window:** {signal_start.isoformat()} → {signal_end.isoformat()} (1H bars, inclusive)"
+    )
+    lines.append("- **Pairs:** all 28 (per L0/L6.0/Arc 1 universe)")
+    lines.append(
+        f"- **Deterministic-rerun confirmation:** {'PASS — byte-identical' if deterministic_rerun_confirmed else 'NOT YET CONFIRMED'}"
+    )
     lines.append(f"  - Run #1 signals_features.csv sha256: `{rerun_run1_sha}`")
     lines.append(f"  - Run #2 signals_features.csv sha256: `{rerun_run2_sha}`")
     lines.append("")
@@ -524,8 +636,10 @@ def _author_report(
     lines.append(f"- **Arc 1 signals_log overlap-window count:** {arc1_overlap_count:,}")
     if arc1_overlap_count > 0:
         diff_pct = abs(pooled_n - arc1_overlap_count) / arc1_overlap_count * 100.0
-        lines.append(f"- **Bar-set divergence vs Arc 1 over the same window:** {diff_pct:.4f}% "
-                     f"(target ≤ 0.5% per spec — {'WITHIN' if diff_pct <= 0.5 else 'OUTSIDE'} band)")
+        lines.append(
+            f"- **Bar-set divergence vs Arc 1 over the same window:** {diff_pct:.4f}% "
+            f"(target ≤ 0.5% per spec — {'WITHIN' if diff_pct <= 0.5 else 'OUTSIDE'} band)"
+        )
     else:
         lines.append("- **Bar-set divergence vs Arc 1:** n/a (Arc 1 signals_log unavailable)")
     lines.append("")
@@ -562,12 +676,16 @@ def _author_report(
     lines.append("## 3. Volume null-handling audit")
     lines.append("")
     lines.append("Per-pair × per-TF NaN rates for volume features (volume == 0 in the source data ")
-    lines.append("is treated as NaN; ratios and z-scores propagate NaN). High NaN rates flag pair × ")
+    lines.append(
+        "is treated as NaN; ratios and z-scores propagate NaN). High NaN rates flag pair × "
+    )
     lines.append("session combinations where tick volume is unreliable.")
     lines.append("")
     nan_audit = _volume_nan_audit(df)
     pivot = nan_audit.pivot_table(index="pair", columns="tf", values="nan_rate_pct", aggfunc="mean")
-    lines.append("### 3.1 NaN rate per (pair, TF) — pct of signals with NaN volume at the relevant lag-1 bar")
+    lines.append(
+        "### 3.1 NaN rate per (pair, TF) — pct of signals with NaN volume at the relevant lag-1 bar"
+    )
     lines.append("")
     lines.append("| pair | 1H | 4H | D1 | W1 |")
     lines.append("|------|---:|---:|---:|---:|")
@@ -589,8 +707,10 @@ def _author_report(
     lines.append("| structural_pattern | mtf_alignment | cluster_label | n | pct |")
     lines.append("|---|---|---|---:|---:|")
     for _, r in classn.iterrows():
-        lines.append(f"| {r['structural_pattern']} | {r['mtf_alignment']} | {r['cluster_label']} | "
-                     f"{int(r['n']):,} | {_fmt_num(r['pct_of_total'], 2)}% |")
+        lines.append(
+            f"| {r['structural_pattern']} | {r['mtf_alignment']} | {r['cluster_label']} | "
+            f"{int(r['n']):,} | {_fmt_num(r['pct_of_total'], 2)}% |"
+        )
     lines.append("")
 
     # 5. Conditional outcome tables per label
@@ -599,8 +719,16 @@ def _author_report(
     lines.append("Per-label aggregation: trade count (n), mean net_r, win % (positive net_r),")
     lines.append("mean gross_r (mid-mid), mean spread_cost_r (gross − net), MFE/MAE quantiles.")
     lines.append("")
-    for label_col in ("structural_pattern", "mtf_alignment", "d1_trend_label", "h4_trend_label",
-                       "h1_trend_label", "pre_momentum_label", "cluster_label", "session"):
+    for label_col in (
+        "structural_pattern",
+        "mtf_alignment",
+        "d1_trend_label",
+        "h4_trend_label",
+        "h1_trend_label",
+        "pre_momentum_label",
+        "cluster_label",
+        "session",
+    ):
         if label_col not in df.columns:
             continue
         lines.append(f"### 5.{label_col}")
@@ -610,7 +738,9 @@ def _author_report(
             lines.append("_n/a_")
             lines.append("")
             continue
-        lines.append("| label | n | mean_net_r | win_pct | mean_gross_r | mean_spread_cost_r | mfe_q25 | mfe_q50 | mfe_q75 | mfe_q95 | mae_q25 | mae_q50 | mae_q75 | mae_q95 |")
+        lines.append(
+            "| label | n | mean_net_r | win_pct | mean_gross_r | mean_spread_cost_r | mfe_q25 | mfe_q50 | mfe_q75 | mfe_q95 | mae_q25 | mae_q50 | mae_q75 | mae_q95 |"
+        )
         lines.append("|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|")
         for _, r in tbl.iterrows():
             lines.append(
@@ -626,13 +756,23 @@ def _author_report(
     lines.append("## 6. Conditional outcome by continuous-feature decile")
     lines.append("")
     lines.append("Each continuous feature is binned into deciles (D1=lowest, D10=highest). ")
-    lines.append("Per decile: trade count, mean net_r, win %, mean MFE during held bar (in ATR units).")
+    lines.append(
+        "Per decile: trade count, mean net_r, win %, mean MFE during held bar (in ATR units)."
+    )
     lines.append("")
     decile_features = (
-        "atr_1h_regime", "atr_d1_regime",
-        "cum_logret_d1_5", "dist_to_kijun_d1_atr", "dist_to_ema50_d1_atr",
-        "realized_vol_24h", "volume_d1_ratio", "concurrent_signals_within_3h",
-        "usd_basket_3h", "eur_basket_3h", "jpy_basket_3h", "gbp_basket_3h",
+        "atr_1h_regime",
+        "atr_d1_regime",
+        "cum_logret_d1_5",
+        "dist_to_kijun_d1_atr",
+        "dist_to_ema50_d1_atr",
+        "realized_vol_24h",
+        "volume_d1_ratio",
+        "concurrent_signals_within_3h",
+        "usd_basket_3h",
+        "eur_basket_3h",
+        "jpy_basket_3h",
+        "gbp_basket_3h",
     )
     for feat in decile_features:
         if feat not in df.columns:
@@ -647,22 +787,32 @@ def _author_report(
         lines.append("| decile | n | mean_net_r | win_pct | mean_mfe_held_atr |")
         lines.append("|---|---:|---:|---:|---:|")
         for _, r in tbl.iterrows():
-            lines.append(f"| {r['decile']} | {int(r['n']):,} | {_fmt_num(r['mean_net_r'], 4)} | "
-                         f"{_fmt_num(r['win_pct'], 1)} | {_fmt_num(r['mean_mfe_held_atr'], 3)} |")
+            lines.append(
+                f"| {r['decile']} | {int(r['n']):,} | {_fmt_num(r['mean_net_r'], 4)} | "
+                f"{_fmt_num(r['win_pct'], 1)} | {_fmt_num(r['mean_mfe_held_atr'], 3)} |"
+            )
         lines.append("")
 
     # 7. Forward-horizon mean curves
     lines.append("## 7. Forward-horizon mean curves")
     lines.append("")
-    lines.append("Forward outcomes are measured from entry (bar N+1 open) to bar N+1+H. They are NOT ")
-    lines.append("what Arc 1 traded (Arc 1 holds for 1 bar). These curves are descriptive only — they ")
-    lines.append("answer 'what would the trade have looked like at longer horizons' without modifying ")
+    lines.append(
+        "Forward outcomes are measured from entry (bar N+1 open) to bar N+1+H. They are NOT "
+    )
+    lines.append(
+        "what Arc 1 traded (Arc 1 holds for 1 bar). These curves are descriptive only — they "
+    )
+    lines.append(
+        "answer 'what would the trade have looked like at longer horizons' without modifying "
+    )
     lines.append("Arc 1's verbatim execution.")
     lines.append("")
     fhc = _forward_horizon_curves(df, horizons)
     lines.append("### 7.1 Pooled and per-structural_pattern curves")
     lines.append("")
-    lines.append("| structural_pattern | horizon_h | n_trades | mean_fwd_logret | mean_mfe_atr | mean_mae_atr | p25 | p50 | p75 | p95 |")
+    lines.append(
+        "| structural_pattern | horizon_h | n_trades | mean_fwd_logret | mean_mfe_atr | mean_mae_atr | p25 | p50 | p75 | p95 |"
+    )
     lines.append("|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|")
     for _, r in fhc.iterrows():
         lines.append(
@@ -677,7 +827,9 @@ def _author_report(
     lines.append("## 8. Per-fold-disposition breakdown")
     lines.append("")
     lines.append("For each Arc-1 fold, list categories where the fold's frequency differs ")
-    lines.append("substantially from pooled. lift_ratio = fold_pct / pooled_pct. Reported only when ")
+    lines.append(
+        "substantially from pooled. lift_ratio = fold_pct / pooled_pct. Reported only when "
+    )
     lines.append("pooled_pct ≥ 2% to avoid noise.")
     lines.append("")
     pf = _per_fold_breakdown(df)
@@ -691,9 +843,11 @@ def _author_report(
         pf["abs_lift"] = (pf["lift_ratio"] - 1.0).abs()
         pf_sorted = pf.sort_values(["fold_id", "abs_lift"], ascending=[True, False])
         for _, r in pf_sorted.iterrows():
-            lines.append(f"| {r['fold_id']} | {r['category']} | {r['label']} | "
-                         f"{_fmt_num(r['fold_pct'], 2)}% | {_fmt_num(r['pooled_pct'], 2)}% | "
-                         f"{_fmt_num(r['lift_ratio'], 3)} | {int(r['fold_n']):,} |")
+            lines.append(
+                f"| {r['fold_id']} | {r['category']} | {r['label']} | "
+                f"{_fmt_num(r['fold_pct'], 2)}% | {_fmt_num(r['pooled_pct'], 2)}% | "
+                f"{_fmt_num(r['lift_ratio'], 3)} | {int(r['fold_n']):,} |"
+            )
         lines.append("")
 
     # 9. Edge-vs-cost decomposition
@@ -707,9 +861,11 @@ def _author_report(
     for tbl_name in ("pooled", "per_structural_pattern", "floored_split"):
         tbl = edge[tbl_name]
         for _, r in tbl.iterrows():
-            lines.append(f"| {r['scope']} | {int(r['n']):,} | "
-                         f"{_fmt_num(r['mean_gross_r'], 4)} | {_fmt_num(r['mean_spread_cost_r'], 4)} | "
-                         f"{_fmt_num(r['mean_net_r'], 4)} |")
+            lines.append(
+                f"| {r['scope']} | {int(r['n']):,} | "
+                f"{_fmt_num(r['mean_gross_r'], 4)} | {_fmt_num(r['mean_spread_cost_r'], 4)} | "
+                f"{_fmt_num(r['mean_net_r'], 4)} |"
+            )
     lines.append("")
 
     # 10. Findings summary
@@ -725,16 +881,27 @@ def _author_report(
     lines.append("")
 
     # Counts of cells computed (for top-level findings count)
-    n_label_cells = sum(1 for c in ("structural_pattern", "mtf_alignment", "d1_trend_label",
-                                     "h4_trend_label", "h1_trend_label", "pre_momentum_label",
-                                     "cluster_label", "session")
-                         for v in df[c].dropna().unique() if c in df.columns)
+    n_label_cells = sum(
+        1
+        for c in (
+            "structural_pattern",
+            "mtf_alignment",
+            "d1_trend_label",
+            "h4_trend_label",
+            "h1_trend_label",
+            "pre_momentum_label",
+            "cluster_label",
+            "session",
+        )
+        for v in df[c].dropna().unique()
+        if c in df.columns
+    )
     n_decile_cells = 0
     for f in decile_features:
         if f in df.columns:
             n_decile_cells += 10
     n_pattern_horizon_cells = (df["structural_pattern"].nunique() + 1) * len(horizons)
-    lines.append(f"### 10.1 Cells computed")
+    lines.append("### 10.1 Cells computed")
     lines.append("")
     lines.append(f"- Label cells (sec 5): {n_label_cells}")
     lines.append(f"- Decile cells (sec 6): {n_decile_cells}")
@@ -742,8 +909,12 @@ def _author_report(
     lines.append("")
     lines.append("---")
     lines.append("")
-    lines.append("*End of L4 characterisation report. No system has been derived. No filter has been ")
-    lines.append("pre-committed. No gate has been evaluated. The output is information, not a tradeable ")
+    lines.append(
+        "*End of L4 characterisation report. No system has been derived. No filter has been "
+    )
+    lines.append(
+        "pre-committed. No gate has been evaluated. The output is information, not a tradeable "
+    )
     lines.append("hypothesis. — per task brief / L6.0 §9 / §11 / §13.*")
 
     return "\n".join(lines) + "\n"
@@ -751,7 +922,9 @@ def _author_report(
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--features-csv", default="results/l6/characterisation/signals_features.csv")
+    parser.add_argument(
+        "--features-csv", default="results/l6/characterisation/signals_features.csv"
+    )
     parser.add_argument("--config", default="configs/l4_characterisation.yaml")
     parser.add_argument("--rerun-run1-sha", default="")
     parser.add_argument("--rerun-run2-sha", default="")
@@ -764,6 +937,7 @@ def main() -> int:
         return 2
 
     import yaml as _yaml
+
     config_path = (REPO_ROOT / args.config).resolve()
     raw = _yaml.safe_load(config_path.read_text(encoding="utf-8"))
     out_dir = (REPO_ROOT / raw["characterisation"]["output_dir"]).resolve()
@@ -789,7 +963,9 @@ def main() -> int:
 
     # ----- forward_horizon_curves.csv -----
     fhc_csv = out_dir / "forward_horizon_curves.csv"
-    _forward_horizon_curves(df, horizons).to_csv(fhc_csv, index=False, lineterminator="\n", float_format="%.6f")
+    _forward_horizon_curves(df, horizons).to_csv(
+        fhc_csv, index=False, lineterminator="\n", float_format="%.6f"
+    )
     print(f"Wrote {fhc_csv}")
 
     # ----- pair_breakdown.csv -----
@@ -799,7 +975,9 @@ def main() -> int:
 
     # ----- feature_lag_audit.txt -----
     lag_audit_txt = out_dir / "feature_lag_audit.txt"
-    lag_audit_txt.write_text(_generate_lag_audit(df, sample_n, sample_seed) + "\n", encoding="utf-8")
+    lag_audit_txt.write_text(
+        _generate_lag_audit(df, sample_n, sample_seed) + "\n", encoding="utf-8"
+    )
     print(f"Wrote {lag_audit_txt}")
 
     # ----- characterisation_report.md -----
@@ -814,16 +992,28 @@ def main() -> int:
     input_sha256s = {
         "configs/l4_characterisation.yaml": hashlib.sha256(config_path.read_bytes()).hexdigest(),
         "configs/spread_floors_5ers.yaml (body)": compute_body_sha256(spread_floor_path),
-        "core/signals/l4_univariate_extreme.py": hashlib.sha256(l4_module_path.read_bytes()).hexdigest(),
-        "results/l6/arc1/trades_all.csv": hashlib.sha256(arc1_trades_path.read_bytes()).hexdigest() if arc1_trades_path.exists() else "(missing)",
-        "results/l6/arc1/signals_log.csv": hashlib.sha256(arc1_signals_log.read_bytes()).hexdigest() if arc1_signals_log.exists() else "(missing)",
+        "core/signals/l4_univariate_extreme.py": hashlib.sha256(
+            l4_module_path.read_bytes()
+        ).hexdigest(),
+        "results/l6/arc1/trades_all.csv": hashlib.sha256(arc1_trades_path.read_bytes()).hexdigest()
+        if arc1_trades_path.exists()
+        else "(missing)",
+        "results/l6/arc1/signals_log.csv": hashlib.sha256(arc1_signals_log.read_bytes()).hexdigest()
+        if arc1_signals_log.exists()
+        else "(missing)",
     }
 
     # Get git commit
     import subprocess
+
     try:
-        git_commit = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=str(REPO_ROOT),
-                                              stderr=subprocess.DEVNULL).decode("ascii").strip()
+        git_commit = (
+            subprocess.check_output(
+                ["git", "rev-parse", "HEAD"], cwd=str(REPO_ROOT), stderr=subprocess.DEVNULL
+            )
+            .decode("ascii")
+            .strip()
+        )
     except Exception:
         git_commit = "(unavailable)"
 

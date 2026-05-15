@@ -7,6 +7,7 @@ For each (slug, t) where slug is in {cand 1, 2, 3} and t in T_SWEEP:
 
 Sentinel -2 trades excluded; cluster_id == 1 only.
 """
+
 from __future__ import annotations
 
 import pandas as pd
@@ -24,11 +25,13 @@ def compute_tautology_rows(signals_with_clu: pd.DataFrame) -> pd.DataFrame:
         for t in C.T_SWEEP:
             n_exited = int((sub["bars_held"] <= t).sum())
             frac = float(n_exited / n_c1) if n_c1 > 0 else float("nan")
-            rows.append({
-                "slug": slug,
-                "t": t,
-                "frac_cluster_1_already_exited": frac,
-                "n_cluster_1_total": n_c1,
-                "n_cluster_1_already_exited": n_exited,
-            })
+            rows.append(
+                {
+                    "slug": slug,
+                    "t": t,
+                    "frac_cluster_1_already_exited": frac,
+                    "n_cluster_1_total": n_c1,
+                    "n_cluster_1_already_exited": n_exited,
+                }
+            )
     return pd.DataFrame(rows)

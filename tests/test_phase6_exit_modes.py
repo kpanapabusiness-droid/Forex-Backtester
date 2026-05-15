@@ -1,4 +1,5 @@
 """Phase 6 — Unit tests for c1_exit_mode (disagree vs flip_only) and exit_combine_mode (or)."""
+
 import pandas as pd
 
 from core.signal_logic import apply_signal_logic, c1_exit_now
@@ -60,11 +61,19 @@ def test_disagree_vs_flip_only_integration_neutral_then_opposite():
 
     out_disagree = apply_signal_logic(
         df.copy(),
-        {"indicators": {}, "rules": {}, "exit": {"exit_on_c1_reversal": True, "c1_exit_mode": "disagree"}},
+        {
+            "indicators": {},
+            "rules": {},
+            "exit": {"exit_on_c1_reversal": True, "c1_exit_mode": "disagree"},
+        },
     )
     out_flip = apply_signal_logic(
         df.copy(),
-        {"indicators": {}, "rules": {}, "exit": {"exit_on_c1_reversal": True, "c1_exit_mode": "flip_only"}},
+        {
+            "indicators": {},
+            "rules": {},
+            "exit": {"exit_on_c1_reversal": True, "c1_exit_mode": "flip_only"},
+        },
     )
     # Disagree: at bar 3 curr_c1=-1 != position 1 -> exit
     assert out_disagree.loc[3, "exit_signal_final"] == 1

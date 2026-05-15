@@ -19,7 +19,6 @@ from __future__ import annotations
 
 import filecmp
 import hashlib
-import os
 import re
 import shutil
 import subprocess
@@ -41,26 +40,16 @@ if str(REPO_ROOT) not in sys.path:
 # Locked input sha256s (gate 1, re-verified at end as gate 9)
 # ---------------------------------------------------------------------------
 LOCKED_SHAS: Dict[str, str] = {
-    "results/l6/arc2/characterisation/v1_1_full/signals_features.csv":
-        "71b39383632bd695b878add8b331b76bcd231ab5b9adba9eea03d69f8762483e",
-    "results/l6/arc2/characterisation/v1_2_1_full/trade_index.csv":
-        "9f841c5b29e87ed90d34c9617431978baf3041459797cedef02fa16c27e3abb5",
-    "results/l6/arc2/characterisation/v1_2_1_full/per_bar_paths.csv":
-        "7b2acd6ccb98f1fd145a631b318fc95d10f5cf4f42633be9c0b59738fa1696ee",
-    "results/l6/arc2/characterisation/extended/entry_filter_univariate/block_M_kijun_distances.csv":
-        "4a61407f0f1fc1b74486f0614928e776201dc6469d874db8393e689d20cdb2ff",
-    "results/l6/arc2/characterisation/extended/entry_filter_bivariate/block_P_bivariate_cells.csv":
-        "a5e3f8e68aa64d8fd53f752705a33613d9877dbde1f8265cb4a38d753c5e088e",
-    "results/l6/arc2/characterisation/extended/path_by_subset/block_V_subset_category_breakdown.csv":
-        "78633e9904baf2a672d2c8692f4b3557fec0aa3af8044ef3296dde08bad71c02",
-    "results/l6/arc2/characterisation/extended/counterfactuals/round_1/counterfactual_sweep_round_1.md":
-        "635ad1fdaf26525cd5e27c1d8b4c4d807da44d9d9d7c83afed9c8754dbc6e0b2",
-    "core/signals/l4_mtf_alignment_2_down_mixed_kijun.py":
-        "3c8d0f5d4b446f84359ab0663df36869f15b47cf1bf18fbc6caff807dc5134e3",
-    "configs/wfo_l6_arc2.yaml":
-        "25917151bc84a73885eeea9ca9c4cc15b1c277ba793706b158abd3aee0ab6328",
-    "L6_0_METHODOLOGY_LOCK.md":
-        "4fd870b1d17380e4fc4fbfda5a43f7775d313c7a5f50dbfd1f06a3e49c519c26",
+    "results/l6/arc2/characterisation/v1_1_full/signals_features.csv": "71b39383632bd695b878add8b331b76bcd231ab5b9adba9eea03d69f8762483e",
+    "results/l6/arc2/characterisation/v1_2_1_full/trade_index.csv": "9f841c5b29e87ed90d34c9617431978baf3041459797cedef02fa16c27e3abb5",
+    "results/l6/arc2/characterisation/v1_2_1_full/per_bar_paths.csv": "7b2acd6ccb98f1fd145a631b318fc95d10f5cf4f42633be9c0b59738fa1696ee",
+    "results/l6/arc2/characterisation/extended/entry_filter_univariate/block_M_kijun_distances.csv": "4a61407f0f1fc1b74486f0614928e776201dc6469d874db8393e689d20cdb2ff",
+    "results/l6/arc2/characterisation/extended/entry_filter_bivariate/block_P_bivariate_cells.csv": "a5e3f8e68aa64d8fd53f752705a33613d9877dbde1f8265cb4a38d753c5e088e",
+    "results/l6/arc2/characterisation/extended/path_by_subset/block_V_subset_category_breakdown.csv": "78633e9904baf2a672d2c8692f4b3557fec0aa3af8044ef3296dde08bad71c02",
+    "results/l6/arc2/characterisation/extended/counterfactuals/round_1/counterfactual_sweep_round_1.md": "635ad1fdaf26525cd5e27c1d8b4c4d807da44d9d9d7c83afed9c8754dbc6e0b2",
+    "core/signals/l4_mtf_alignment_2_down_mixed_kijun.py": "3c8d0f5d4b446f84359ab0663df36869f15b47cf1bf18fbc6caff807dc5134e3",
+    "configs/wfo_l6_arc2.yaml": "25917151bc84a73885eeea9ca9c4cc15b1c277ba793706b158abd3aee0ab6328",
+    "L6_0_METHODOLOGY_LOCK.md": "4fd870b1d17380e4fc4fbfda5a43f7775d313c7a5f50dbfd1f06a3e49c519c26",
 }
 
 # trades_all.csv is required for spread lookup but not formally locked here
@@ -86,13 +75,21 @@ BLOCK_B_1R_COUNTS: Dict[str, int] = {
     "neither_reached": 1,
 }
 ALL_CATS: Tuple[str, ...] = (
-    "only_up", "up_then_down", "down_then_up",
-    "straight_to_sl", "simultaneous", "neither_reached",
+    "only_up",
+    "up_then_down",
+    "down_then_up",
+    "straight_to_sl",
+    "simultaneous",
+    "neither_reached",
 )
 
 # Quintile expectations (mirrors arc2_entry_filter_bivariate / path_by_subset).
 EXPECTED_Q_SIZES_BY_Q: Dict[str, int] = {
-    "Q1": 799, "Q2": 799, "Q3": 799, "Q4": 798, "Q5": 798,
+    "Q1": 799,
+    "Q2": 799,
+    "Q3": 799,
+    "Q4": 798,
+    "Q5": 798,
 }
 
 # Subset definitions.
@@ -102,8 +99,7 @@ SUBSET_DEFS: List[Tuple[str, Dict[str, Any]]] = [
     ("S2_q5q3", {"qa": ("Q5",), "qb": ("Q3",), "expected_n": 178}),
     ("S3_q4q2", {"qa": ("Q4",), "qb": ("Q2",), "expected_n": 151}),
     ("S4_q5xq2q3", {"qa": ("Q5",), "qb": ("Q2", "Q3"), "expected_n": 368}),
-    ("S5_q4q5xq2q3", {"qa": ("Q4", "Q5"), "qb": ("Q2", "Q3"),
-                      "expected_n": 682}),
+    ("S5_q4q5xq2q3", {"qa": ("Q4", "Q5"), "qb": ("Q2", "Q3"), "expected_n": 682}),
 ]
 SUBSET_IDS: Tuple[str, ...] = tuple(s[0] for s in SUBSET_DEFS)
 
@@ -170,8 +166,9 @@ def _pip_size(pair: str) -> float:
     return 0.01 if "JPY" in pair else 0.0001
 
 
-def _exit_te_de(*, k_idx: int, T: Dict[str, Any], M: float,
-                exit_atr_fill: float, exit_reason: str) -> Dict[str, Any]:
+def _exit_te_de(
+    *, k_idx: int, T: Dict[str, Any], M: float, exit_atr_fill: float, exit_reason: str
+) -> Dict[str, Any]:
     atr = T["atr"]
     sp_exit = T["sp_exit_pips"]
     pip = T["pip"]
@@ -227,8 +224,7 @@ def _exit_be(*, k_idx: int, T: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
-def _exit_trail(*, k_idx: int, T: Dict[str, Any],
-                trail_level_atr_fill: float) -> Dict[str, Any]:
+def _exit_trail(*, k_idx: int, T: Dict[str, Any], trail_level_atr_fill: float) -> Dict[str, Any]:
     atr = T["atr"]
     sp_exit = T["sp_exit_pips"]
     pip = T["pip"]
@@ -264,28 +260,43 @@ def _exit_tp(*, k_idx: int, T: Dict[str, Any], T_TP_R: float) -> Dict[str, Any]:
     }
 
 
-def variant_BL(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
-               *, time_horizon: int = TIME_HORIZON_DEFAULT) -> Dict[str, Any]:
+def variant_BL(
+    rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T, *, time_horizon: int = TIME_HORIZON_DEFAULT
+) -> Dict[str, Any]:
     for k_idx in range(bavail):
         k = k_idx + 1
         if rmae[k_idx] <= -2.0:
             return _exit_sl(k_idx=k_idx, T=T, M=2.0)
         if k == time_horizon:
             if hnb[k_idx]:
-                return _exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                   exit_atr_fill=nbo[k_idx], exit_reason="time_exit")
+                return _exit_te_de(
+                    k_idx=k_idx, T=T, M=2.0, exit_atr_fill=nbo[k_idx], exit_reason="time_exit"
+                )
             else:
-                return _exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                   exit_atr_fill=bc_[k_idx], exit_reason="data_end")
+                return _exit_te_de(
+                    k_idx=k_idx, T=T, M=2.0, exit_atr_fill=bc_[k_idx], exit_reason="data_end"
+                )
         if k == bavail:
-            return _exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                               exit_atr_fill=bc_[k_idx], exit_reason="data_end")
+            return _exit_te_de(
+                k_idx=k_idx, T=T, M=2.0, exit_atr_fill=bc_[k_idx], exit_reason="data_end"
+            )
     raise RuntimeError("BL did not terminate")
 
 
-def variant_TP(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
-               *, T_TP_R: float,
-               time_horizon: int = TIME_HORIZON_DEFAULT) -> Dict[str, Any]:
+def variant_TP(
+    rmae,
+    rmfe,
+    bl_,
+    bh_,
+    bc_,
+    nbo,
+    hnb,
+    bavail,
+    T,
+    *,
+    T_TP_R: float,
+    time_horizon: int = TIME_HORIZON_DEFAULT,
+) -> Dict[str, Any]:
     tp_threshold_atr_fill = 2.0 * T_TP_R - T["entry_fill_offset_atr"]
     for k_idx in range(bavail):
         k = k_idx + 1
@@ -295,20 +306,35 @@ def variant_TP(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
             return _exit_tp(k_idx=k_idx, T=T, T_TP_R=T_TP_R)
         if k == time_horizon:
             if hnb[k_idx]:
-                return _exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                   exit_atr_fill=nbo[k_idx], exit_reason="time_exit")
+                return _exit_te_de(
+                    k_idx=k_idx, T=T, M=2.0, exit_atr_fill=nbo[k_idx], exit_reason="time_exit"
+                )
             else:
-                return _exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                   exit_atr_fill=bc_[k_idx], exit_reason="data_end")
+                return _exit_te_de(
+                    k_idx=k_idx, T=T, M=2.0, exit_atr_fill=bc_[k_idx], exit_reason="data_end"
+                )
         if k == bavail:
-            return _exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                               exit_atr_fill=bc_[k_idx], exit_reason="data_end")
+            return _exit_te_de(
+                k_idx=k_idx, T=T, M=2.0, exit_atr_fill=bc_[k_idx], exit_reason="data_end"
+            )
     raise RuntimeError("TP did not terminate")
 
 
-def variant_TRAIL(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
-                  *, T_engage_R: float, D_R: float,
-                  time_horizon: int = TIME_HORIZON_DEFAULT) -> Dict[str, Any]:
+def variant_TRAIL(
+    rmae,
+    rmfe,
+    bl_,
+    bh_,
+    bc_,
+    nbo,
+    hnb,
+    bavail,
+    T,
+    *,
+    T_engage_R: float,
+    D_R: float,
+    time_horizon: int = TIME_HORIZON_DEFAULT,
+) -> Dict[str, Any]:
     engage_threshold_atr_fill = 2.0 * T_engage_R - T["entry_fill_offset_atr"]
     trail_active = False
     D_atr = 2.0 * D_R
@@ -322,24 +348,38 @@ def variant_TRAIL(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
         else:
             trail_level_atr_fill = rmfe[k_idx] - D_atr
             if bl_[k_idx] <= trail_level_atr_fill:
-                return _exit_trail(k_idx=k_idx, T=T,
-                                   trail_level_atr_fill=trail_level_atr_fill)
+                return _exit_trail(k_idx=k_idx, T=T, trail_level_atr_fill=trail_level_atr_fill)
         if k == time_horizon:
             if hnb[k_idx]:
-                return _exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                   exit_atr_fill=nbo[k_idx], exit_reason="time_exit")
+                return _exit_te_de(
+                    k_idx=k_idx, T=T, M=2.0, exit_atr_fill=nbo[k_idx], exit_reason="time_exit"
+                )
             else:
-                return _exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                   exit_atr_fill=bc_[k_idx], exit_reason="data_end")
+                return _exit_te_de(
+                    k_idx=k_idx, T=T, M=2.0, exit_atr_fill=bc_[k_idx], exit_reason="data_end"
+                )
         if k == bavail:
-            return _exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                               exit_atr_fill=bc_[k_idx], exit_reason="data_end")
+            return _exit_te_de(
+                k_idx=k_idx, T=T, M=2.0, exit_atr_fill=bc_[k_idx], exit_reason="data_end"
+            )
     raise RuntimeError("TRAIL did not terminate")
 
 
-def variant_BE_TP(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
-                  *, T_BE_R: float, T_TP_R: float,
-                  time_horizon: int = TIME_HORIZON_DEFAULT) -> Dict[str, Any]:
+def variant_BE_TP(
+    rmae,
+    rmfe,
+    bl_,
+    bh_,
+    bc_,
+    nbo,
+    hnb,
+    bavail,
+    T,
+    *,
+    T_BE_R: float,
+    T_TP_R: float,
+    time_horizon: int = TIME_HORIZON_DEFAULT,
+) -> Dict[str, Any]:
     """V08: BE-SL at +T_BE_R mid-rel and fixed TP at +T_TP_R mid-rel.
 
     Before BE armed: hard SL active. After BE armed: BE-SL replaces hard SL.
@@ -367,20 +407,36 @@ def variant_BE_TP(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
             be_active = True
         if k == time_horizon:
             if hnb[k_idx]:
-                return _exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                   exit_atr_fill=nbo[k_idx], exit_reason="time_exit")
+                return _exit_te_de(
+                    k_idx=k_idx, T=T, M=2.0, exit_atr_fill=nbo[k_idx], exit_reason="time_exit"
+                )
             else:
-                return _exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                   exit_atr_fill=bc_[k_idx], exit_reason="data_end")
+                return _exit_te_de(
+                    k_idx=k_idx, T=T, M=2.0, exit_atr_fill=bc_[k_idx], exit_reason="data_end"
+                )
         if k == bavail:
-            return _exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                               exit_atr_fill=bc_[k_idx], exit_reason="data_end")
+            return _exit_te_de(
+                k_idx=k_idx, T=T, M=2.0, exit_atr_fill=bc_[k_idx], exit_reason="data_end"
+            )
     raise RuntimeError("BE_TP did not terminate")
 
 
-def variant_BE_then_TRAIL(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
-                          *, T_BE_R: float, T_engage_R: float, D_R: float,
-                          time_horizon: int = TIME_HORIZON_EXTENDED) -> Dict[str, Any]:
+def variant_BE_then_TRAIL(
+    rmae,
+    rmfe,
+    bl_,
+    bh_,
+    bc_,
+    nbo,
+    hnb,
+    bavail,
+    T,
+    *,
+    T_BE_R: float,
+    T_engage_R: float,
+    D_R: float,
+    time_horizon: int = TIME_HORIZON_EXTENDED,
+) -> Dict[str, Any]:
     """V15: BE-SL armed at +T_BE_R MFE, then trail engaged at +T_engage_R MFE
     with distance D_R below peak. Once trail engages, it supersedes the BE-SL.
     """
@@ -402,8 +458,7 @@ def variant_BE_then_TRAIL(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
         else:  # trail_active
             trail_level_atr_fill = rmfe[k_idx] - D_atr
             if bl_[k_idx] <= trail_level_atr_fill:
-                return _exit_trail(k_idx=k_idx, T=T,
-                                   trail_level_atr_fill=trail_level_atr_fill)
+                return _exit_trail(k_idx=k_idx, T=T, trail_level_atr_fill=trail_level_atr_fill)
         # Activation triggers (delayed to k+1 in Round 1 convention).
         if not trail_active and rmfe[k_idx] >= engage_threshold_atr_fill:
             trail_active = True
@@ -411,14 +466,17 @@ def variant_BE_then_TRAIL(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
             be_active = True
         if k == time_horizon:
             if hnb[k_idx]:
-                return _exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                   exit_atr_fill=nbo[k_idx], exit_reason="time_exit")
+                return _exit_te_de(
+                    k_idx=k_idx, T=T, M=2.0, exit_atr_fill=nbo[k_idx], exit_reason="time_exit"
+                )
             else:
-                return _exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                   exit_atr_fill=bc_[k_idx], exit_reason="data_end")
+                return _exit_te_de(
+                    k_idx=k_idx, T=T, M=2.0, exit_atr_fill=bc_[k_idx], exit_reason="data_end"
+                )
         if k == bavail:
-            return _exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                               exit_atr_fill=bc_[k_idx], exit_reason="data_end")
+            return _exit_te_de(
+                k_idx=k_idx, T=T, M=2.0, exit_atr_fill=bc_[k_idx], exit_reason="data_end"
+            )
     raise RuntimeError("BE_then_TRAIL did not terminate")
 
 
@@ -444,23 +502,19 @@ def _v04(*a):
 
 
 def _v05(*a):
-    return variant_TRAIL(*a, T_engage_R=1.0, D_R=0.5,
-                         time_horizon=TIME_HORIZON_DEFAULT)
+    return variant_TRAIL(*a, T_engage_R=1.0, D_R=0.5, time_horizon=TIME_HORIZON_DEFAULT)
 
 
 def _v06(*a):
-    return variant_TRAIL(*a, T_engage_R=1.0, D_R=1.0,
-                         time_horizon=TIME_HORIZON_DEFAULT)
+    return variant_TRAIL(*a, T_engage_R=1.0, D_R=1.0, time_horizon=TIME_HORIZON_DEFAULT)
 
 
 def _v07(*a):
-    return variant_TRAIL(*a, T_engage_R=1.0, D_R=1.5,
-                         time_horizon=TIME_HORIZON_DEFAULT)
+    return variant_TRAIL(*a, T_engage_R=1.0, D_R=1.5, time_horizon=TIME_HORIZON_DEFAULT)
 
 
 def _v08(*a):
-    return variant_BE_TP(*a, T_BE_R=1.0, T_TP_R=2.0,
-                         time_horizon=TIME_HORIZON_DEFAULT)
+    return variant_BE_TP(*a, T_BE_R=1.0, T_TP_R=2.0, time_horizon=TIME_HORIZON_DEFAULT)
 
 
 def _v09(*a):
@@ -468,13 +522,11 @@ def _v09(*a):
 
 
 def _v10(*a):
-    return variant_TRAIL(*a, T_engage_R=1.0, D_R=0.5,
-                         time_horizon=TIME_HORIZON_EXTENDED)
+    return variant_TRAIL(*a, T_engage_R=1.0, D_R=0.5, time_horizon=TIME_HORIZON_EXTENDED)
 
 
 def _v11(*a):
-    return variant_TRAIL(*a, T_engage_R=1.0, D_R=1.0,
-                         time_horizon=TIME_HORIZON_EXTENDED)
+    return variant_TRAIL(*a, T_engage_R=1.0, D_R=1.0, time_horizon=TIME_HORIZON_EXTENDED)
 
 
 def _v12(*a):
@@ -493,8 +545,9 @@ def _v14(*a):
 
 
 def _v15(*a):
-    return variant_BE_then_TRAIL(*a, T_BE_R=1.0, T_engage_R=2.0, D_R=1.0,
-                                 time_horizon=TIME_HORIZON_EXTENDED)
+    return variant_BE_then_TRAIL(
+        *a, T_BE_R=1.0, T_engage_R=2.0, D_R=1.0, time_horizon=TIME_HORIZON_EXTENDED
+    )
 
 
 VARIANTS: List[Tuple[str, str, Callable[..., Dict[str, Any]], int]] = [
@@ -512,7 +565,12 @@ VARIANTS: List[Tuple[str, str, Callable[..., Dict[str, Any]], int]] = [
     ("V11_TR1_H240", "Trail act +1R, D=1R, TE=k=240", _v11, TIME_HORIZON_EXTENDED),
     ("V12_TP1_H240", "TP=+1R, TE=k=240", _v12, TIME_HORIZON_EXTENDED),
     ("V13_TP2_H240", "TP=+2R, TE=k=240", _v13, TIME_HORIZON_EXTENDED),
-    ("V14_TP1_then_TR1", "TP=+1R if reached, else hold to k=240 with SL", _v14, TIME_HORIZON_EXTENDED),
+    (
+        "V14_TP1_then_TR1",
+        "TP=+1R if reached, else hold to k=240 with SL",
+        _v14,
+        TIME_HORIZON_EXTENDED,
+    ),
     ("V15_BE1_TR1", "BE @ +1R, Trail @ +2R/D=1R, TE=k=240", _v15, TIME_HORIZON_EXTENDED),
 ]
 VARIANT_IDS: Tuple[str, ...] = tuple(v[0] for v in VARIANTS)
@@ -535,15 +593,15 @@ ALL_EXIT_SHORT: Tuple[str, ...] = ("sl", "tp", "trail", "be", "te", "de")
 # ===========================================================================
 
 
-def _make_quintile_labels(values: pd.Series, tie_break: pd.Series
-                          ) -> Tuple[pd.Series, List[Tuple[float, float]]]:
+def _make_quintile_labels(
+    values: pd.Series, tie_break: pd.Series
+) -> Tuple[pd.Series, List[Tuple[float, float]]]:
     """Rank-based quintile bucketing with deterministic tie-break by trade_id.
 
     Mirrors arc2_entry_filter_bivariate._make_quintile_labels and
     arc2_path_by_subset.make_quintile_labels byte-for-byte.
     """
-    df = pd.DataFrame({"v": values.values, "t": tie_break.values},
-                      index=values.index)
+    df = pd.DataFrame({"v": values.values, "t": tie_break.values}, index=values.index)
     df = df.sort_values(["v", "t"], kind="stable")
     n = len(df)
     base = n // 5
@@ -553,7 +611,7 @@ def _make_quintile_labels(values: pd.Series, tie_break: pd.Series
     bounds: List[Tuple[float, float]] = []
     cursor = 0
     for qi, sz in enumerate(sizes):
-        seg = df.iloc[cursor:cursor + sz]
+        seg = df.iloc[cursor : cursor + sz]
         labels.extend([f"Q{qi + 1}"] * sz)
         bounds.append((float(seg["v"].min()), float(seg["v"].max())))
         cursor += sz
@@ -570,34 +628,44 @@ def build_subsets() -> Tuple[pd.DataFrame, Dict[str, np.ndarray]]:
     """
     sf = pd.read_csv(REPO_ROOT / "results/l6/arc2/characterisation/v1_1_full/signals_features.csv")
     ti = pd.read_csv(REPO_ROOT / "results/l6/arc2/characterisation/v1_2_1_full/trade_index.csv")
-    bm = pd.read_csv(REPO_ROOT / "results/l6/arc2/characterisation/extended/entry_filter_univariate/block_M_kijun_distances.csv")
+    bm = pd.read_csv(
+        REPO_ROOT
+        / "results/l6/arc2/characterisation/extended/entry_filter_univariate/block_M_kijun_distances.csv"
+    )
 
     sf_taken = sf[sf["taken"] == True].copy()  # noqa: E712
     sf_taken = sf_taken.rename(columns={"time": "signal_bar_ts"})
-    sf_taken["signal_bar_ts"] = pd.to_datetime(sf_taken["signal_bar_ts"]).dt.strftime("%Y-%m-%dT%H:%M:%S")
+    sf_taken["signal_bar_ts"] = pd.to_datetime(sf_taken["signal_bar_ts"]).dt.strftime(
+        "%Y-%m-%dT%H:%M:%S"
+    )
     ti["signal_bar_ts"] = pd.to_datetime(ti["signal_bar_ts"]).dt.strftime("%Y-%m-%dT%H:%M:%S")
 
     taken = sf_taken.merge(
         ti[["trade_id", "pair", "signal_bar_ts", "atr_1h_wilder_at_signal"]],
-        on=["pair", "signal_bar_ts"], how="left", validate="one_to_one",
+        on=["pair", "signal_bar_ts"],
+        how="left",
+        validate="one_to_one",
     )
     taken = taken.merge(
         bm[["trade_id", "dist_d1_kijun_atr"]],
-        on="trade_id", how="left", validate="one_to_one",
+        on="trade_id",
+        how="left",
+        validate="one_to_one",
     )
     taken = taken.sort_values("trade_id").reset_index(drop=True)
     if len(taken) != 3993:
         raise RuntimeError(f"HALT: taken row count {len(taken)} != 3993")
 
-    qa_labels, _ = _make_quintile_labels(
-        taken["concurrent_signals_same_bar"], taken["trade_id"])
+    qa_labels, _ = _make_quintile_labels(taken["concurrent_signals_same_bar"], taken["trade_id"])
     taken["Q_A_concurrent"] = qa_labels.values
-    qb_labels, _ = _make_quintile_labels(
-        taken["dist_d1_kijun_atr"], taken["trade_id"])
+    qb_labels, _ = _make_quintile_labels(taken["dist_d1_kijun_atr"], taken["trade_id"])
     taken["Q_B_dist_d1"] = qb_labels.values
 
     # Gate 2.1 check: reproduce 25 block_P cell counts exactly.
-    bp_path = REPO_ROOT / "results/l6/arc2/characterisation/extended/entry_filter_bivariate/block_P_bivariate_cells.csv"
+    bp_path = (
+        REPO_ROOT
+        / "results/l6/arc2/characterisation/extended/entry_filter_bivariate/block_P_bivariate_cells.csv"
+    )
     bp = pd.read_csv(bp_path)
     diffs: List[str] = []
     for _, row in bp.iterrows():
@@ -609,8 +677,7 @@ def build_subsets() -> Tuple[pd.DataFrame, Dict[str, np.ndarray]]:
         if got_n != exp_n:
             diffs.append(f"  ({qa},{qb}): expected n={exp_n}, got n={got_n}")
     if diffs:
-        raise RuntimeError("HALT (gate 2.1): block_P cell count mismatch:\n"
-                            + "\n".join(diffs))
+        raise RuntimeError("HALT (gate 2.1): block_P cell count mismatch:\n" + "\n".join(diffs))
 
     # Build subsets.
     subsets: Dict[str, np.ndarray] = {}
@@ -618,19 +685,25 @@ def build_subsets() -> Tuple[pd.DataFrame, Dict[str, np.ndarray]]:
         if spec.get("all"):
             mask = pd.Series(True, index=taken.index)
         else:
-            mask = (taken["Q_A_concurrent"].isin(spec["qa"])
-                    & taken["Q_B_dist_d1"].isin(spec["qb"]))
+            mask = taken["Q_A_concurrent"].isin(spec["qa"]) & taken["Q_B_dist_d1"].isin(spec["qb"])
         sub = taken[mask]
         expected_n = int(spec["expected_n"])
         if len(sub) != expected_n:
-            raise RuntimeError(
-                f"HALT (gate 2.2): subset {sid} size {len(sub)} != {expected_n}"
-            )
+            raise RuntimeError(f"HALT (gate 2.2): subset {sid} size {len(sub)} != {expected_n}")
         subsets[sid] = sub["trade_id"].to_numpy(dtype=np.int64)
 
-    labels = taken[["trade_id", "pair", "signal_bar_ts", "fold_id",
-                    "Q_A_concurrent", "Q_B_dist_d1",
-                    "concurrent_signals_same_bar", "dist_d1_kijun_atr"]].copy()
+    labels = taken[
+        [
+            "trade_id",
+            "pair",
+            "signal_bar_ts",
+            "fold_id",
+            "Q_A_concurrent",
+            "Q_B_dist_d1",
+            "concurrent_signals_same_bar",
+            "dist_d1_kijun_atr",
+        ]
+    ].copy()
     labels["fold_id"] = labels["fold_id"].astype(int)
     return labels, subsets
 
@@ -684,8 +757,7 @@ def compute_categories(pb: pd.DataFrame, n_trades: int) -> np.ndarray:
         if counts[c] != exp:
             diffs.append(f"  {c}: expected={exp}, got={counts[c]}")
     if diffs:
-        raise RuntimeError("HALT: Block B 1R category counts diverge:\n"
-                            + "\n".join(diffs))
+        raise RuntimeError("HALT: Block B 1R category counts diverge:\n" + "\n".join(diffs))
     return cats
 
 
@@ -694,9 +766,9 @@ def compute_categories(pb: pd.DataFrame, n_trades: int) -> np.ndarray:
 # ===========================================================================
 
 
-def run_sweep(*, per_bar_csv: Path, trade_index_csv: Path,
-              trades_all_csv: Path
-              ) -> Tuple[pd.DataFrame, pd.DataFrame, np.ndarray]:
+def run_sweep(
+    *, per_bar_csv: Path, trade_index_csv: Path, trades_all_csv: Path
+) -> Tuple[pd.DataFrame, pd.DataFrame, np.ndarray]:
     """Returns (variant_trades, trade_index_full, categories)."""
     print("  Loading trade_index.csv + trades_all.csv...", flush=True)
     ti = pd.read_csv(trade_index_csv)
@@ -706,7 +778,9 @@ def run_sweep(*, per_bar_csv: Path, trade_index_csv: Path,
 
     ti_full = ti.merge(
         ta[["pair", "signal_bar_ts", "spread_pips_entry", "spread_pips_exit"]],
-        on=["pair", "signal_bar_ts"], how="left", validate="one_to_one",
+        on=["pair", "signal_bar_ts"],
+        how="left",
+        validate="one_to_one",
     )
     if ti_full[["spread_pips_entry", "spread_pips_exit"]].isna().any().any():
         raise RuntimeError("HALT (gate sp-lookup): null sp_entry/sp_exit after merge")
@@ -723,8 +797,12 @@ def run_sweep(*, per_bar_csv: Path, trade_index_csv: Path,
         atr = float(row["atr_1h_wilder_at_signal"])
         entry_fill = float(row["entry_price"])
         per_trade[tid] = {
-            "pair": pair, "atr": atr, "entry_fill": entry_fill,
-            "sp_entry_pips": sp_entry, "sp_exit_pips": sp_exit, "pip": pip,
+            "pair": pair,
+            "atr": atr,
+            "entry_fill": entry_fill,
+            "sp_entry_pips": sp_entry,
+            "sp_exit_pips": sp_exit,
+            "pip": pip,
             "entry_fill_offset_atr": sp_entry * pip / (2 * atr),
             "baseline_spread_cost_r": (sp_entry + sp_exit) * pip / (4 * atr),
             "fold_id": int(row["fold_id"]),
@@ -750,7 +828,9 @@ def run_sweep(*, per_bar_csv: Path, trade_index_csv: Path,
     hnb_all = pb["has_next_bar"].to_numpy(dtype=bool)
 
     cats = compute_categories(pb, n_trades)
-    print(f"  Block B categories: {dict((c, int((cats == c).sum())) for c in ALL_CATS)}", flush=True)
+    print(
+        f"  Block B categories: {dict((c, int((cats == c).sum())) for c in ALL_CATS)}", flush=True
+    )
 
     n_vars = len(VARIANTS)
     total_rows = n_trades * n_vars
@@ -773,9 +853,13 @@ def run_sweep(*, per_bar_csv: Path, trade_index_csv: Path,
     for tid in range(n_trades):
         s, e = int(starts[tid]), int(ends[tid])
         bavail = e - s
-        rmae = rmae_all[s:e]; rmfe = rmfe_all[s:e]
-        bl_ = bl_all[s:e]; bh_ = bh_all[s:e]; bc_ = bc_all[s:e]
-        nbo = nbo_all[s:e]; hnb = hnb_all[s:e]
+        rmae = rmae_all[s:e]
+        rmfe = rmfe_all[s:e]
+        bl_ = bl_all[s:e]
+        bh_ = bh_all[s:e]
+        bc_ = bc_all[s:e]
+        nbo = nbo_all[s:e]
+        hnb = hnb_all[s:e]
         T = per_trade[tid]
         for vid, _, vfn, _ in VARIANTS:
             r = vfn(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T)
@@ -793,16 +877,26 @@ def run_sweep(*, per_bar_csv: Path, trade_index_csv: Path,
             write_idx += 1
         if (tid + 1) % 1000 == 0:
             el = time.time() - t0
-            print(f"    progress: {tid+1}/{n_trades} ({el:.1f}s, {(tid+1)/el:.0f} trades/s)",
-                  flush=True)
+            print(
+                f"    progress: {tid + 1}/{n_trades} ({el:.1f}s, {(tid + 1) / el:.0f} trades/s)",
+                flush=True,
+            )
 
-    variant_trades = pd.DataFrame({
-        "variant_id": out_variant, "trade_id": out_tid, "pair": out_pair,
-        "signal_bar_ts": out_sigts, "fold_id": out_fold,
-        "exit_reason_internal": out_reason, "exit_bar": out_exitbar,
-        "exit_level_atr_fill": out_exitlvl, "gross_R": out_gross,
-        "spread_cost_R": out_spread, "net_R": out_net,
-    })
+    variant_trades = pd.DataFrame(
+        {
+            "variant_id": out_variant,
+            "trade_id": out_tid,
+            "pair": out_pair,
+            "signal_bar_ts": out_sigts,
+            "fold_id": out_fold,
+            "exit_reason_internal": out_reason,
+            "exit_bar": out_exitbar,
+            "exit_level_atr_fill": out_exitlvl,
+            "gross_R": out_gross,
+            "spread_cost_R": out_spread,
+            "net_R": out_net,
+        }
+    )
     variant_trades["exit_reason"] = variant_trades["exit_reason_internal"].map(REASON_MAP)
     if variant_trades["exit_reason"].isna().any():
         raise RuntimeError("HALT: unmapped exit_reason_internal present")
@@ -815,9 +909,9 @@ def run_sweep(*, per_bar_csv: Path, trade_index_csv: Path,
 # ===========================================================================
 
 
-def _captured_metric_per_subset_variant(sub_vt: pd.DataFrame,
-                                        cats: np.ndarray,
-                                        trade_ids: np.ndarray) -> Dict[str, float]:
+def _captured_metric_per_subset_variant(
+    sub_vt: pd.DataFrame, cats: np.ndarray, trade_ids: np.ndarray
+) -> Dict[str, float]:
     """Compute the four captured/avoidance metrics described in Block Z."""
     cat_map = pd.Series(cats[trade_ids], index=trade_ids, name="cat")
     sub_vt = sub_vt.copy()
@@ -843,8 +937,9 @@ def _captured_metric_per_subset_variant(sub_vt: pd.DataFrame,
     return out
 
 
-def aggregate_block_Z(vt: pd.DataFrame, subsets: Dict[str, np.ndarray],
-                      cats: np.ndarray) -> pd.DataFrame:
+def aggregate_block_Z(
+    vt: pd.DataFrame, subsets: Dict[str, np.ndarray], cats: np.ndarray
+) -> pd.DataFrame:
     rows: List[Dict[str, Any]] = []
     by_var = {vid: grp for vid, grp in vt.groupby("variant_id", sort=False)}
     # BL means per subset (V00_BL).
@@ -868,8 +963,7 @@ def aggregate_block_Z(vt: pd.DataFrame, subsets: Dict[str, np.ndarray],
             # Exit-reason exhaustiveness check.
             total = sum(counts.values())
             if total != n:
-                raise RuntimeError(
-                    f"HALT (gate 12): {sid}/{vid} exit reasons sum {total} != n {n}")
+                raise RuntimeError(f"HALT (gate 12): {sid}/{vid} exit reasons sum {total} != n {n}")
             mean_R = float(np.mean(net))
             row = {
                 "subset_id": sid,
@@ -897,12 +991,13 @@ def aggregate_block_Z(vt: pd.DataFrame, subsets: Dict[str, np.ndarray],
     return df
 
 
-def aggregate_block_AA(vt: pd.DataFrame, subsets: Dict[str, np.ndarray]
-                       ) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def aggregate_block_AA(
+    vt: pd.DataFrame, subsets: Dict[str, np.ndarray]
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
     rows: List[Dict[str, Any]] = []
     by_var = {vid: grp for vid, grp in vt.groupby("variant_id", sort=False)}
     bl_vt = by_var["V00_BL"]
-    bl_by_tidfold = bl_vt.set_index("trade_id")
+    bl_vt.set_index("trade_id")
     folds = sorted(vt["fold_id"].unique().tolist())
     # BL per (subset, fold) mean R for reference
     bl_subset_fold_mean: Dict[Tuple[str, int], float] = {}
@@ -930,20 +1025,22 @@ def aggregate_block_AA(vt: pd.DataFrame, subsets: Dict[str, np.ndarray]
                     continue
                 rc = sub_f["exit_reason"].value_counts().to_dict()
                 rates = {r: float(rc.get(r, 0)) / n_f for r in ALL_EXIT_SHORT}
-                rows.append({
-                    "subset_id": sid,
-                    "variant_id": vid,
-                    "fold_id": int(f),
-                    "n_in_fold": n_f,
-                    "mean_R_fold": float(sub_f["net_R"].mean()),
-                    "sl_rate_fold": rates["sl"],
-                    "tp_rate_fold": rates["tp"],
-                    "trail_rate_fold": rates["trail"],
-                    "be_rate_fold": rates["be"],
-                    "te_rate_fold": rates["te"],
-                    "de_rate_fold": rates["de"],
-                    "bl_mean_R_fold": bl_subset_fold_mean.get((sid, f), float("nan")),
-                })
+                rows.append(
+                    {
+                        "subset_id": sid,
+                        "variant_id": vid,
+                        "fold_id": int(f),
+                        "n_in_fold": n_f,
+                        "mean_R_fold": float(sub_f["net_R"].mean()),
+                        "sl_rate_fold": rates["sl"],
+                        "tp_rate_fold": rates["tp"],
+                        "trail_rate_fold": rates["trail"],
+                        "be_rate_fold": rates["be"],
+                        "te_rate_fold": rates["te"],
+                        "de_rate_fold": rates["de"],
+                        "bl_mean_R_fold": bl_subset_fold_mean.get((sid, f), float("nan")),
+                    }
+                )
     per_fold = pd.DataFrame(rows)
 
     # Stability summary per (subset, variant)
@@ -951,13 +1048,12 @@ def aggregate_block_AA(vt: pd.DataFrame, subsets: Dict[str, np.ndarray]
     THIN = 10
     for sid in SUBSET_IDS:
         for vid in VARIANT_IDS:
-            sub = per_fold[(per_fold["subset_id"] == sid)
-                           & (per_fold["variant_id"] == vid)]
+            sub = per_fold[(per_fold["subset_id"] == sid) & (per_fold["variant_id"] == vid)]
             n_folds_thick = int((sub["n_in_fold"] >= THIN).sum())
             above = int((sub["mean_R_fold"] > sub["bl_mean_R_fold"]).sum())
             below = int((sub["mean_R_fold"] < sub["bl_mean_R_fold"]).sum())
             var_mean_R = float(sub["mean_R_fold"].var(ddof=1)) if len(sub) > 1 else 0.0
-            ref = n_folds_thick if n_folds_thick > 0 else len(sub)
+            n_folds_thick if n_folds_thick > 0 else len(sub)
             if vid == "V00_BL":
                 flag = "baseline"
             elif n_folds_thick < 5:
@@ -968,20 +1064,24 @@ def aggregate_block_AA(vt: pd.DataFrame, subsets: Dict[str, np.ndarray]
                 flag = "stable_drag"
             else:
                 flag = "variable"
-            stab_rows.append({
-                "subset_id": sid, "variant_id": vid,
-                "folds_with_n_ge_10": n_folds_thick,
-                "folds_mean_R_above_BL": above,
-                "folds_mean_R_below_BL": below,
-                "fold_variance_mean_R": var_mean_R,
-                "stability_flag": flag,
-            })
+            stab_rows.append(
+                {
+                    "subset_id": sid,
+                    "variant_id": vid,
+                    "folds_with_n_ge_10": n_folds_thick,
+                    "folds_mean_R_above_BL": above,
+                    "folds_mean_R_below_BL": below,
+                    "fold_variance_mean_R": var_mean_R,
+                    "stability_flag": flag,
+                }
+            )
     stab = pd.DataFrame(stab_rows)
     return per_fold, stab
 
 
-def aggregate_block_BB(vt: pd.DataFrame, subsets: Dict[str, np.ndarray],
-                       cats: np.ndarray) -> pd.DataFrame:
+def aggregate_block_BB(
+    vt: pd.DataFrame, subsets: Dict[str, np.ndarray], cats: np.ndarray
+) -> pd.DataFrame:
     rows: List[Dict[str, Any]] = []
     by_var = {vid: grp for vid, grp in vt.groupby("variant_id", sort=False)}
     cat_series = pd.Series(cats, index=np.arange(len(cats)), name="cat")
@@ -1011,22 +1111,26 @@ def aggregate_block_BB(vt: pd.DataFrame, subsets: Dict[str, np.ndarray],
                 sub_c = sub[sub["cat"] == c]
                 n_c = len(sub_c)
                 if n_c == 0:
-                    rows.append({
-                        "subset_id": sid, "variant_id": vid, "category": c,
-                        "n_in_category_within_subset": 0,
-                        "mean_R_variant": float("nan"),
-                        "median_R_variant": float("nan"),
-                        "mean_R_BL": bl_subset_cat_mean[(sid, c)],
-                        "mean_R_diff_vs_BL": float("nan"),
-                        "contribution_to_pooled_R": 0.0,
-                        "pct_exited_sl": float("nan"),
-                        "pct_exited_tp": float("nan"),
-                        "pct_exited_trail": float("nan"),
-                        "pct_exited_be": float("nan"),
-                        "pct_exited_te": float("nan"),
-                        "pct_exited_de": float("nan"),
-                        "captured_metric_value": float("nan"),
-                    })
+                    rows.append(
+                        {
+                            "subset_id": sid,
+                            "variant_id": vid,
+                            "category": c,
+                            "n_in_category_within_subset": 0,
+                            "mean_R_variant": float("nan"),
+                            "median_R_variant": float("nan"),
+                            "mean_R_BL": bl_subset_cat_mean[(sid, c)],
+                            "mean_R_diff_vs_BL": float("nan"),
+                            "contribution_to_pooled_R": 0.0,
+                            "pct_exited_sl": float("nan"),
+                            "pct_exited_tp": float("nan"),
+                            "pct_exited_trail": float("nan"),
+                            "pct_exited_be": float("nan"),
+                            "pct_exited_te": float("nan"),
+                            "pct_exited_de": float("nan"),
+                            "captured_metric_value": float("nan"),
+                        }
+                    )
                     continue
                 net = sub_c["net_R"].to_numpy(dtype=np.float64)
                 rc = sub_c["exit_reason"].value_counts().to_dict()
@@ -1046,51 +1150,77 @@ def aggregate_block_BB(vt: pd.DataFrame, subsets: Dict[str, np.ndarray],
                     cap_val = rates["sl"]
                 else:
                     cap_val = float("nan")
-                rows.append({
-                    "subset_id": sid, "variant_id": vid, "category": c,
-                    "n_in_category_within_subset": n_c,
-                    "mean_R_variant": mean_R,
-                    "median_R_variant": float(np.median(net)),
-                    "mean_R_BL": bl_subset_cat_mean[(sid, c)],
-                    "mean_R_diff_vs_BL": mean_R - bl_subset_cat_mean[(sid, c)],
-                    "contribution_to_pooled_R": contribution,
-                    "pct_exited_sl": rates["sl"],
-                    "pct_exited_tp": rates["tp"],
-                    "pct_exited_trail": rates["trail"],
-                    "pct_exited_be": rates["be"],
-                    "pct_exited_te": rates["te"],
-                    "pct_exited_de": rates["de"],
-                    "captured_metric_value": cap_val,
-                })
+                rows.append(
+                    {
+                        "subset_id": sid,
+                        "variant_id": vid,
+                        "category": c,
+                        "n_in_category_within_subset": n_c,
+                        "mean_R_variant": mean_R,
+                        "median_R_variant": float(np.median(net)),
+                        "mean_R_BL": bl_subset_cat_mean[(sid, c)],
+                        "mean_R_diff_vs_BL": mean_R - bl_subset_cat_mean[(sid, c)],
+                        "contribution_to_pooled_R": contribution,
+                        "pct_exited_sl": rates["sl"],
+                        "pct_exited_tp": rates["tp"],
+                        "pct_exited_trail": rates["trail"],
+                        "pct_exited_be": rates["be"],
+                        "pct_exited_te": rates["te"],
+                        "pct_exited_de": rates["de"],
+                        "captured_metric_value": cap_val,
+                    }
+                )
     return pd.DataFrame(rows)
 
 
-def aggregate_block_CC(block_Z: pd.DataFrame, stab: pd.DataFrame
-                       ) -> pd.DataFrame:
+def aggregate_block_CC(block_Z: pd.DataFrame, stab: pd.DataFrame) -> pd.DataFrame:
     df = block_Z.merge(
-        stab[["subset_id", "variant_id", "stability_flag",
-              "folds_with_n_ge_10", "folds_mean_R_above_BL"]],
-        on=["subset_id", "variant_id"], how="left", validate="one_to_one",
+        stab[
+            [
+                "subset_id",
+                "variant_id",
+                "stability_flag",
+                "folds_with_n_ge_10",
+                "folds_mean_R_above_BL",
+            ]
+        ],
+        on=["subset_id", "variant_id"],
+        how="left",
+        validate="one_to_one",
     )
-    df = df[["subset_id", "variant_id", "n_in_subset", "mean_R",
-             "pooled_lift_vs_BL",
-             "pct_only_up_captured_at_ge_1R",
-             "pct_down_then_up_captured_at_ge_1R",
-             "pct_up_then_down_kept_negative",
-             "folds_mean_R_above_BL", "folds_with_n_ge_10",
-             "stability_flag"]].copy()
-    df.rename(columns={
-        "n_in_subset": "n",
-        "pooled_lift_vs_BL": "mean_R_lift_vs_BL",
-    }, inplace=True)
+    df = df[
+        [
+            "subset_id",
+            "variant_id",
+            "n_in_subset",
+            "mean_R",
+            "pooled_lift_vs_BL",
+            "pct_only_up_captured_at_ge_1R",
+            "pct_down_then_up_captured_at_ge_1R",
+            "pct_up_then_down_kept_negative",
+            "folds_mean_R_above_BL",
+            "folds_with_n_ge_10",
+            "stability_flag",
+        ]
+    ].copy()
+    df.rename(
+        columns={
+            "n_in_subset": "n",
+            "pooled_lift_vs_BL": "mean_R_lift_vs_BL",
+        },
+        inplace=True,
+    )
     # Sort: BL first within each subset, then by lift desc.
-    df["_subset_order"] = df["subset_id"].apply(
-        lambda s: SUBSET_IDS.index(s))
+    df["_subset_order"] = df["subset_id"].apply(lambda s: SUBSET_IDS.index(s))
     df["_is_bl"] = (df["variant_id"] == "V00_BL").astype(int)
-    df = df.sort_values(
-        ["_subset_order", "_is_bl", "mean_R_lift_vs_BL"],
-        ascending=[True, False, False],
-    ).drop(columns=["_subset_order", "_is_bl"]).reset_index(drop=True)
+    df = (
+        df.sort_values(
+            ["_subset_order", "_is_bl", "mean_R_lift_vs_BL"],
+            ascending=[True, False, False],
+        )
+        .drop(columns=["_subset_order", "_is_bl"])
+        .reset_index(drop=True)
+    )
     return df
 
 
@@ -1099,11 +1229,16 @@ def aggregate_block_CC(block_Z: pd.DataFrame, stab: pd.DataFrame
 # ===========================================================================
 
 
-def run_validation_gates(*, vt: pd.DataFrame, ti_full: pd.DataFrame,
-                          block_Z: pd.DataFrame, block_BB: pd.DataFrame,
-                          per_fold: pd.DataFrame,
-                          subsets: Dict[str, np.ndarray],
-                          out_dir: Path) -> Dict[str, Any]:
+def run_validation_gates(
+    *,
+    vt: pd.DataFrame,
+    ti_full: pd.DataFrame,
+    block_Z: pd.DataFrame,
+    block_BB: pd.DataFrame,
+    per_fold: pd.DataFrame,
+    subsets: Dict[str, np.ndarray],
+    out_dir: Path,
+) -> Dict[str, Any]:
     disp: Dict[str, Any] = {}
 
     # Gate 1: locked sha256s already verified.
@@ -1118,24 +1253,29 @@ def run_validation_gates(*, vt: pd.DataFrame, ti_full: pd.DataFrame,
     diff = bl["net_R"].to_numpy(dtype=np.float64) - ti_sorted["R"].to_numpy(dtype=np.float64)
     max_abs = float(np.abs(diff).max())
     TOL = 1e-7
-    disp["gate_3_1"] = {"max_abs_diff_vs_trade_index_R": f"{max_abs:.3e}",
-                        "tolerance": f"{TOL:.0e}",
-                        "pass": bool(max_abs < TOL)}
+    disp["gate_3_1"] = {
+        "max_abs_diff_vs_trade_index_R": f"{max_abs:.3e}",
+        "tolerance": f"{TOL:.0e}",
+        "pass": bool(max_abs < TOL),
+    }
     if max_abs >= TOL:
         raise RuntimeError(f"HALT (gate 3.1): max abs diff {max_abs:.3e} >= {TOL:.0e}")
 
     # Cross-check vs Round 1 v2's variant_summary_pooled BL mean R.
-    r1_pooled = pd.read_csv(REPO_ROOT / "results/l6/arc2/characterisation/extended/counterfactuals/round_1/variant_summary_pooled.csv")
+    r1_pooled = pd.read_csv(
+        REPO_ROOT
+        / "results/l6/arc2/characterisation/extended/counterfactuals/round_1/variant_summary_pooled.csv"
+    )
     r1_bl_mean = float(r1_pooled.loc[r1_pooled["variant_id"] == "BL", "mean_R"].iloc[0])
     here_bl_mean = float(bl["net_R"].mean())
     bl_mean_diff = abs(here_bl_mean - r1_bl_mean)
-    disp["gate_3_1_r1_match"] = {"r1_bl_mean_R": r1_bl_mean,
-                                  "here_bl_mean_R": here_bl_mean,
-                                  "abs_diff": f"{bl_mean_diff:.3e}"}
+    disp["gate_3_1_r1_match"] = {
+        "r1_bl_mean_R": r1_bl_mean,
+        "here_bl_mean_R": here_bl_mean,
+        "abs_diff": f"{bl_mean_diff:.3e}",
+    }
     if bl_mean_diff > 1e-9:
-        raise RuntimeError(
-            f"HALT (gate 3.1 R1 match): BL mean R diff {bl_mean_diff:.3e} > 1e-9"
-        )
+        raise RuntimeError(f"HALT (gate 3.1 R1 match): BL mean R diff {bl_mean_diff:.3e} > 1e-9")
 
     # Gate 3.2: clamped-trade handling.
     # For horizon=240 variants, count trades where bavail < 240.
@@ -1168,22 +1308,29 @@ def run_validation_gates(*, vt: pd.DataFrame, ti_full: pd.DataFrame,
                 if row["exit_reason"] == "te":
                     clamp_bad.append(f"{vid}/{tid}: bavail={ba} < H={H} but exit=te")
     if clamp_bad:
-        raise RuntimeError("HALT (gate 3.2): clamped trades with 'te' exit:\n  "
-                            + "\n  ".join(clamp_bad[:10]))
+        raise RuntimeError(
+            "HALT (gate 3.2): clamped trades with 'te' exit:\n  " + "\n  ".join(clamp_bad[:10])
+        )
     disp["gate_3_2_clamps"] = clamp_counts
 
     # Gate 6: Block BB contribution check.
     # Sum of contribution_to_pooled_R across categories within (subset, variant)
     # must equal block_Z.mean_R for that (subset, variant) within 1e-9.
-    contrib = (block_BB.groupby(["subset_id", "variant_id"])
-               ["contribution_to_pooled_R"].sum().rename("sum_contrib").reset_index())
+    contrib = (
+        block_BB.groupby(["subset_id", "variant_id"])["contribution_to_pooled_R"]
+        .sum()
+        .rename("sum_contrib")
+        .reset_index()
+    )
     z = block_Z[["subset_id", "variant_id", "mean_R"]]
     merged = contrib.merge(z, on=["subset_id", "variant_id"])
     merged["abs_diff"] = (merged["sum_contrib"] - merged["mean_R"]).abs()
     max_contrib_diff = float(merged["abs_diff"].max())
-    disp["gate_6_contrib_consistency"] = {"max_abs_diff": f"{max_contrib_diff:.3e}",
-                                            "tolerance": "1e-9",
-                                            "pass": bool(max_contrib_diff < 1e-9)}
+    disp["gate_6_contrib_consistency"] = {
+        "max_abs_diff": f"{max_contrib_diff:.3e}",
+        "tolerance": "1e-9",
+        "pass": bool(max_contrib_diff < 1e-9),
+    }
     if max_contrib_diff >= 1e-9:
         raise RuntimeError(
             f"HALT (gate 6): block_BB contribution sum diverges from block_Z mean_R by "
@@ -1191,13 +1338,15 @@ def run_validation_gates(*, vt: pd.DataFrame, ti_full: pd.DataFrame,
         )
 
     # Gate 7: subset-mean-R cross-check vs block_P.
-    bp = pd.read_csv(REPO_ROOT / "results/l6/arc2/characterisation/extended/entry_filter_bivariate/block_P_bivariate_cells.csv")
-    bp_lookup = {(r["Q_A_concurrent"], r["Q_B_dist_d1"]): float(r["mean_R"])
-                 for _, r in bp.iterrows()}
+    bp = pd.read_csv(
+        REPO_ROOT
+        / "results/l6/arc2/characterisation/extended/entry_filter_bivariate/block_P_bivariate_cells.csv"
+    )
+    bp_lookup = {
+        (r["Q_A_concurrent"], r["Q_B_dist_d1"]): float(r["mean_R"]) for _, r in bp.iterrows()
+    }
     # For S1_q5q2/S2_q5q3/S3_q4q2 — single-cell subsets.
-    cell_checks = [("S1_q5q2", "Q5", "Q2"),
-                   ("S2_q5q3", "Q5", "Q3"),
-                   ("S3_q4q2", "Q4", "Q2")]
+    cell_checks = [("S1_q5q2", "Q5", "Q2"), ("S2_q5q3", "Q5", "Q3"), ("S3_q4q2", "Q4", "Q2")]
     z_bl = block_Z[block_Z["variant_id"] == "V00_BL"].set_index("subset_id")["mean_R"]
     max_subset_diff = 0.0
     for sid, qa, qb in cell_checks:
@@ -1219,14 +1368,17 @@ def run_validation_gates(*, vt: pd.DataFrame, ti_full: pd.DataFrame,
     # Gate 12: exit-reason exhaustiveness — already enforced in aggregate_block_Z.
     # Verify here by summing the n_exit_reason_* columns.
     Z = block_Z.copy()
-    Z["sum_exits"] = (Z["n_exit_reason_sl"] + Z["n_exit_reason_tp"]
-                     + Z["n_exit_reason_trail"] + Z["n_exit_reason_be"]
-                     + Z["n_exit_reason_te"] + Z["n_exit_reason_de"])
+    Z["sum_exits"] = (
+        Z["n_exit_reason_sl"]
+        + Z["n_exit_reason_tp"]
+        + Z["n_exit_reason_trail"]
+        + Z["n_exit_reason_be"]
+        + Z["n_exit_reason_te"]
+        + Z["n_exit_reason_de"]
+    )
     bad = Z[Z["sum_exits"] != Z["n_in_subset"]]
     if len(bad) > 0:
-        raise RuntimeError(
-            f"HALT (gate 12): {len(bad)} (subset, variant) rows with sum_exits != n"
-        )
+        raise RuntimeError(f"HALT (gate 12): {len(bad)} (subset, variant) rows with sum_exits != n")
     disp["gate_12_exhaustive"] = "ok (all exit_reason sums == n)"
 
     return disp
@@ -1237,12 +1389,10 @@ def run_validation_gates(*, vt: pd.DataFrame, ti_full: pd.DataFrame,
 # ===========================================================================
 
 
-def _df_to_md(df: pd.DataFrame, float_cols: Optional[Dict[str, str]] = None
-              ) -> str:
+def _df_to_md(df: pd.DataFrame, float_cols: Optional[Dict[str, str]] = None) -> str:
     cols = list(df.columns)
     float_cols = float_cols or {}
-    out = ["| " + " | ".join(cols) + " |",
-           "| " + " | ".join(["---"] * len(cols)) + " |"]
+    out = ["| " + " | ".join(cols) + " |", "| " + " | ".join(["---"] * len(cols)) + " |"]
     for _, row in df.iterrows():
         cells = []
         for c in cols:
@@ -1259,10 +1409,16 @@ def _df_to_md(df: pd.DataFrame, float_cols: Optional[Dict[str, str]] = None
     return "\n".join(out)
 
 
-def render_report(*, observed_shas: Dict[str, str],
-                  block_Z: pd.DataFrame, block_AA_stab: pd.DataFrame,
-                  per_fold: pd.DataFrame, block_BB: pd.DataFrame,
-                  block_CC: pd.DataFrame, gates: Dict[str, Any]) -> str:
+def render_report(
+    *,
+    observed_shas: Dict[str, str],
+    block_Z: pd.DataFrame,
+    block_AA_stab: pd.DataFrame,
+    per_fold: pd.DataFrame,
+    block_BB: pd.DataFrame,
+    block_CC: pd.DataFrame,
+    gates: Dict[str, Any],
+) -> str:
     lines: List[str] = []
     a = lines.append
     a("# Arc 2 — Exit-Rule Variant Sweep on Filtered Subsets (Phase 2 Round 2)")
@@ -1379,24 +1535,51 @@ def render_report(*, observed_shas: Dict[str, str],
         a(f"### Subset {sid}")
         a("")
         bl_row = sub[sub["variant_id"] == "V00_BL"].iloc[0]
-        a(f"V00_BL on this subset: n={int(bl_row['n_in_subset'])}, "
-          f"mean_R={bl_row['mean_R']:.4f}.")
+        a(f"V00_BL on this subset: n={int(bl_row['n_in_subset'])}, mean_R={bl_row['mean_R']:.4f}.")
         a("")
         a("Top 3 by mean_R lift vs BL:")
         a("")
-        a(_df_to_md(top3[["variant_id", "n_in_subset", "mean_R",
-                          "pooled_lift_vs_BL", "n_exit_reason_sl",
-                          "n_exit_reason_tp", "n_exit_reason_trail",
-                          "n_exit_reason_be", "n_exit_reason_te",
-                          "n_exit_reason_de"]], fmt))
+        a(
+            _df_to_md(
+                top3[
+                    [
+                        "variant_id",
+                        "n_in_subset",
+                        "mean_R",
+                        "pooled_lift_vs_BL",
+                        "n_exit_reason_sl",
+                        "n_exit_reason_tp",
+                        "n_exit_reason_trail",
+                        "n_exit_reason_be",
+                        "n_exit_reason_te",
+                        "n_exit_reason_de",
+                    ]
+                ],
+                fmt,
+            )
+        )
         a("")
         a("Bottom 3 by mean_R lift vs BL:")
         a("")
-        a(_df_to_md(bot3[["variant_id", "n_in_subset", "mean_R",
-                          "pooled_lift_vs_BL", "n_exit_reason_sl",
-                          "n_exit_reason_tp", "n_exit_reason_trail",
-                          "n_exit_reason_be", "n_exit_reason_te",
-                          "n_exit_reason_de"]], fmt))
+        a(
+            _df_to_md(
+                bot3[
+                    [
+                        "variant_id",
+                        "n_in_subset",
+                        "mean_R",
+                        "pooled_lift_vs_BL",
+                        "n_exit_reason_sl",
+                        "n_exit_reason_tp",
+                        "n_exit_reason_trail",
+                        "n_exit_reason_be",
+                        "n_exit_reason_te",
+                        "n_exit_reason_de",
+                    ]
+                ],
+                fmt,
+            )
+        )
         a("")
 
     # Block AA per-fold highlights
@@ -1404,24 +1587,37 @@ def render_report(*, observed_shas: Dict[str, str],
     a("")
     fmt_aa = {"mean_R_fold": "{:.4f}", "bl_mean_R_fold": "{:.4f}"}
     for sid in SUBSET_IDS:
-        sub = block_Z[(block_Z["subset_id"] == sid)
-                      & (block_Z["variant_id"] != "V00_BL")]
-        top_vids = sub.sort_values("pooled_lift_vs_BL", ascending=False
-                                   ).head(3)["variant_id"].tolist()
+        sub = block_Z[(block_Z["subset_id"] == sid) & (block_Z["variant_id"] != "V00_BL")]
+        top_vids = (
+            sub.sort_values("pooled_lift_vs_BL", ascending=False).head(3)["variant_id"].tolist()
+        )
         a(f"### Subset {sid}")
         a("")
         for vid in top_vids:
-            stab_row = block_AA_stab[(block_AA_stab["subset_id"] == sid)
-                                     & (block_AA_stab["variant_id"] == vid)].iloc[0]
-            a(f"#### {vid} (stability_flag = {stab_row['stability_flag']}, "
-              f"folds_with_n_ge_10 = {int(stab_row['folds_with_n_ge_10'])}, "
-              f"folds_mean_R_above_BL = {int(stab_row['folds_mean_R_above_BL'])})")
+            stab_row = block_AA_stab[
+                (block_AA_stab["subset_id"] == sid) & (block_AA_stab["variant_id"] == vid)
+            ].iloc[0]
+            a(
+                f"#### {vid} (stability_flag = {stab_row['stability_flag']}, "
+                f"folds_with_n_ge_10 = {int(stab_row['folds_with_n_ge_10'])}, "
+                f"folds_mean_R_above_BL = {int(stab_row['folds_mean_R_above_BL'])})"
+            )
             a("")
-            pf = per_fold[(per_fold["subset_id"] == sid)
-                          & (per_fold["variant_id"] == vid)].copy()
-            pf = pf[["fold_id", "n_in_fold", "mean_R_fold", "bl_mean_R_fold",
-                     "sl_rate_fold", "tp_rate_fold", "trail_rate_fold",
-                     "be_rate_fold", "te_rate_fold", "de_rate_fold"]]
+            pf = per_fold[(per_fold["subset_id"] == sid) & (per_fold["variant_id"] == vid)].copy()
+            pf = pf[
+                [
+                    "fold_id",
+                    "n_in_fold",
+                    "mean_R_fold",
+                    "bl_mean_R_fold",
+                    "sl_rate_fold",
+                    "tp_rate_fold",
+                    "trail_rate_fold",
+                    "be_rate_fold",
+                    "te_rate_fold",
+                    "de_rate_fold",
+                ]
+            ]
             a(_df_to_md(pf, fmt_aa))
             a("")
 
@@ -1441,21 +1637,37 @@ def render_report(*, observed_shas: Dict[str, str],
         "captured_metric_value": "{:.3f}",
     }
     for sid in SUBSET_IDS:
-        sub = block_Z[(block_Z["subset_id"] == sid)
-                      & (block_Z["variant_id"] != "V00_BL")]
-        top_vid = sub.sort_values("pooled_lift_vs_BL", ascending=False
-                                  ).head(1)["variant_id"].iloc[0]
+        sub = block_Z[(block_Z["subset_id"] == sid) & (block_Z["variant_id"] != "V00_BL")]
+        top_vid = (
+            sub.sort_values("pooled_lift_vs_BL", ascending=False).head(1)["variant_id"].iloc[0]
+        )
         a(f"### Subset {sid} — top variant {top_vid}")
         a("")
-        bb_sub = block_BB[(block_BB["subset_id"] == sid)
-                          & (block_BB["variant_id"] == top_vid)].copy()
+        bb_sub = block_BB[
+            (block_BB["subset_id"] == sid) & (block_BB["variant_id"] == top_vid)
+        ].copy()
         bb_sub = bb_sub[bb_sub["n_in_category_within_subset"] > 0]
-        a(_df_to_md(bb_sub[["category", "n_in_category_within_subset",
-                            "mean_R_BL", "mean_R_variant", "mean_R_diff_vs_BL",
-                            "pct_exited_sl", "pct_exited_tp",
-                            "pct_exited_trail", "pct_exited_be",
-                            "pct_exited_te", "pct_exited_de",
-                            "captured_metric_value"]], fmt_bb))
+        a(
+            _df_to_md(
+                bb_sub[
+                    [
+                        "category",
+                        "n_in_category_within_subset",
+                        "mean_R_BL",
+                        "mean_R_variant",
+                        "mean_R_diff_vs_BL",
+                        "pct_exited_sl",
+                        "pct_exited_tp",
+                        "pct_exited_trail",
+                        "pct_exited_be",
+                        "pct_exited_te",
+                        "pct_exited_de",
+                        "captured_metric_value",
+                    ]
+                ],
+                fmt_bb,
+            )
+        )
         a("")
 
     # Cross-subset patterns
@@ -1463,20 +1675,26 @@ def render_report(*, observed_shas: Dict[str, str],
     a("")
     # Variants with stable_lift on >= 4 of the S1..S5 subsets.
     five_subsets = [s for s in SUBSET_IDS if s != "S0_pop"]
-    stab_pivot = (block_AA_stab[block_AA_stab["subset_id"].isin(five_subsets)]
-                  .pivot(index="variant_id", columns="subset_id",
-                         values="stability_flag"))
+    stab_pivot = block_AA_stab[block_AA_stab["subset_id"].isin(five_subsets)].pivot(
+        index="variant_id", columns="subset_id", values="stability_flag"
+    )
     n_stable_lift = stab_pivot.eq("stable_lift").sum(axis=1)
     n_stable_drag = stab_pivot.eq("stable_drag").sum(axis=1)
     big_lifters = n_stable_lift[n_stable_lift >= 4].sort_values(ascending=False)
     sole_lifters = n_stable_lift[n_stable_lift == 1]
     big_drags = n_stable_drag[n_stable_drag >= 4].sort_values(ascending=False)
-    a(f"- Variants with `stable_lift` on >= 4 of the 5 filtered subsets (S1..S5): "
-      f"{', '.join(big_lifters.index.tolist()) if len(big_lifters) > 0 else 'none'}.")
-    a(f"- Variants with `stable_lift` on exactly 1 filtered subset (subset-specific): "
-      f"{', '.join(sole_lifters.index.tolist()) if len(sole_lifters) > 0 else 'none'}.")
-    a(f"- Variants with `stable_drag` on >= 4 filtered subsets: "
-      f"{', '.join(big_drags.index.tolist()) if len(big_drags) > 0 else 'none'}.")
+    a(
+        f"- Variants with `stable_lift` on >= 4 of the 5 filtered subsets (S1..S5): "
+        f"{', '.join(big_lifters.index.tolist()) if len(big_lifters) > 0 else 'none'}."
+    )
+    a(
+        f"- Variants with `stable_lift` on exactly 1 filtered subset (subset-specific): "
+        f"{', '.join(sole_lifters.index.tolist()) if len(sole_lifters) > 0 else 'none'}."
+    )
+    a(
+        f"- Variants with `stable_drag` on >= 4 filtered subsets: "
+        f"{', '.join(big_drags.index.tolist()) if len(big_drags) > 0 else 'none'}."
+    )
     a("")
     a("Full stability matrix (rows = variants, cols = S1..S5):")
     a("")
@@ -1506,40 +1724,68 @@ def render_report(*, observed_shas: Dict[str, str],
     for sid in SUBSET_IDS:
         a(f"### {sid}")
         a("")
-        sub = block_Z[(block_Z["subset_id"] == sid)
-                      & (block_Z["variant_id"] != "V00_BL")].copy()
-        sub = sub.merge(block_AA_stab[["subset_id", "variant_id",
-                                       "stability_flag",
-                                       "folds_with_n_ge_10",
-                                       "folds_mean_R_above_BL"]],
-                        on=["subset_id", "variant_id"])
+        sub = block_Z[(block_Z["subset_id"] == sid) & (block_Z["variant_id"] != "V00_BL")].copy()
+        sub = sub.merge(
+            block_AA_stab[
+                [
+                    "subset_id",
+                    "variant_id",
+                    "stability_flag",
+                    "folds_with_n_ge_10",
+                    "folds_mean_R_above_BL",
+                ]
+            ],
+            on=["subset_id", "variant_id"],
+        )
         top5 = sub.sort_values("pooled_lift_vs_BL", ascending=False).head(5)
         a("Top 5 by mean_R lift vs V00_BL:")
         a("")
-        a(_df_to_md(top5[["variant_id", "n_in_subset", "mean_R",
-                          "pooled_lift_vs_BL", "folds_mean_R_above_BL",
-                          "folds_with_n_ge_10", "stability_flag"]],
-                    {"mean_R": "{:.4f}",
-                     "pooled_lift_vs_BL": "{:+.4f}"}))
+        a(
+            _df_to_md(
+                top5[
+                    [
+                        "variant_id",
+                        "n_in_subset",
+                        "mean_R",
+                        "pooled_lift_vs_BL",
+                        "folds_mean_R_above_BL",
+                        "folds_with_n_ge_10",
+                        "stability_flag",
+                    ]
+                ],
+                {"mean_R": "{:.4f}", "pooled_lift_vs_BL": "{:+.4f}"},
+            )
+        )
         a("")
         # Consistency-check candidates: highest mean R lift, stable_lift, all per-fold n>=10
-        consistency = sub[(sub["stability_flag"] == "stable_lift")
-                          & (sub["folds_with_n_ge_10"] >= 7)
-                          & (sub["folds_mean_R_above_BL"] >= 5)]
-        cc_vids = consistency.sort_values("pooled_lift_vs_BL",
-                                          ascending=False)["variant_id"].tolist()
-        a(f"Consistency-check candidates (stable_lift + folds_with_n_ge_10 >= 7 "
-          f"+ folds_mean_R_above_BL >= 5): "
-          f"{', '.join(cc_vids) if cc_vids else 'none meeting all criteria'}.")
+        consistency = sub[
+            (sub["stability_flag"] == "stable_lift")
+            & (sub["folds_with_n_ge_10"] >= 7)
+            & (sub["folds_mean_R_above_BL"] >= 5)
+        ]
+        cc_vids = consistency.sort_values("pooled_lift_vs_BL", ascending=False)[
+            "variant_id"
+        ].tolist()
+        a(
+            f"Consistency-check candidates (stable_lift + folds_with_n_ge_10 >= 7 "
+            f"+ folds_mean_R_above_BL >= 5): "
+            f"{', '.join(cc_vids) if cc_vids else 'none meeting all criteria'}."
+        )
         a("")
     a("Cross-subset summary (descriptive):")
     a("")
-    a(f"- stable_lift on >= 4 of S1..S5: "
-      f"{', '.join(big_lifters.index.tolist()) if len(big_lifters) > 0 else 'none'}.")
-    a(f"- stable_lift on exactly 1 of S1..S5: "
-      f"{', '.join(sole_lifters.index.tolist()) if len(sole_lifters) > 0 else 'none'}.")
-    a(f"- stable_drag on >= 4 of S1..S5: "
-      f"{', '.join(big_drags.index.tolist()) if len(big_drags) > 0 else 'none'}.")
+    a(
+        f"- stable_lift on >= 4 of S1..S5: "
+        f"{', '.join(big_lifters.index.tolist()) if len(big_lifters) > 0 else 'none'}."
+    )
+    a(
+        f"- stable_lift on exactly 1 of S1..S5: "
+        f"{', '.join(sole_lifters.index.tolist()) if len(sole_lifters) > 0 else 'none'}."
+    )
+    a(
+        f"- stable_drag on >= 4 of S1..S5: "
+        f"{', '.join(big_drags.index.tolist()) if len(big_drags) > 0 else 'none'}."
+    )
     a("")
     return "\n".join(lines) + "\n"
 
@@ -1569,8 +1815,7 @@ def check_disposition_discipline(report_text: str) -> List[Tuple[int, str, str]]
 # ===========================================================================
 
 
-def build_pass(*, out_dir: Path, write_manifest: bool,
-               run_label: str) -> Dict[str, Any]:
+def build_pass(*, out_dir: Path, write_manifest: bool, run_label: str) -> Dict[str, Any]:
     t0 = time.time()
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -1614,16 +1859,26 @@ def build_pass(*, out_dir: Path, write_manifest: bool,
     # Validation gates
     print("  Running validation gates...", flush=True)
     gates = run_validation_gates(
-        vt=vt, ti_full=ti_full, block_Z=block_Z, block_BB=block_BB,
-        per_fold=per_fold, subsets=subsets, out_dir=out_dir,
+        vt=vt,
+        ti_full=ti_full,
+        block_Z=block_Z,
+        block_BB=block_BB,
+        per_fold=per_fold,
+        subsets=subsets,
+        out_dir=out_dir,
     )
 
     # Markdown report
     print("  Rendering markdown...", flush=True)
-    md = render_report(observed_shas=observed_shas,
-                       block_Z=block_Z, block_AA_stab=block_AA_stab,
-                       per_fold=per_fold, block_BB=block_BB,
-                       block_CC=block_CC, gates=gates)
+    md = render_report(
+        observed_shas=observed_shas,
+        block_Z=block_Z,
+        block_AA_stab=block_AA_stab,
+        per_fold=per_fold,
+        block_BB=block_BB,
+        block_CC=block_CC,
+        gates=gates,
+    )
     md_path = out_dir / "exit_sweep_filtered.md"
     md_path.write_text(md, encoding="utf-8", newline="\n")
 
@@ -1631,9 +1886,7 @@ def build_pass(*, out_dir: Path, write_manifest: bool,
     viols = check_disposition_discipline(md)
     if viols:
         msg = "\n  ".join([f"line {ln}: pat='{p}': {tx}" for ln, p, tx in viols])
-        raise RuntimeError(
-            f"HALT (gate 10): disposition discipline violations:\n  {msg}"
-        )
+        raise RuntimeError(f"HALT (gate 10): disposition discipline violations:\n  {msg}")
     gates["gate_10_disposition"] = f"ok ({len(viols)} violations outside Planning input)"
 
     # Gate 9: locked artefacts unchanged.
@@ -1642,8 +1895,7 @@ def build_pass(*, out_dir: Path, write_manifest: bool,
 
     # Output sha256 manifest
     out_paths = [z_path, aa_pf_path, aa_stab_path, bb_path, cc_path, md_path]
-    out_shas = {p.relative_to(REPO_ROOT).as_posix(): _sha256_file(p)
-                for p in out_paths}
+    out_shas = {p.relative_to(REPO_ROOT).as_posix(): _sha256_file(p) for p in out_paths}
 
     if write_manifest:
         # Wallclock + peak RSS
@@ -1695,9 +1947,11 @@ def build_pass(*, out_dir: Path, write_manifest: bool,
 
 def main(argv: Optional[List[str]] = None) -> int:
     import argparse
+
     parser = argparse.ArgumentParser()
-    parser.add_argument("--single-pass", action="store_true",
-                        help="Skip the determinism second pass.")
+    parser.add_argument(
+        "--single-pass", action="store_true", help="Skip the determinism second pass."
+    )
     args = parser.parse_args(argv)
 
     t_start = time.time()
@@ -1717,22 +1971,24 @@ def main(argv: Optional[List[str]] = None) -> int:
         # Pass 1 wrote outputs; snapshot them.
         snapshot_dir = Path(tempfile.mkdtemp(prefix="arc2_exit_sweep_snap_"))
         snap_files = {}
-        for p in (out_dir / n for n in [
-            "block_Z_per_subset_per_variant.csv",
-            "block_AA_per_subset_per_variant_per_fold.csv",
-            "block_AA_stability_summary.csv",
-            "block_BB_per_subset_per_variant_per_category.csv",
-            "block_CC_headline_summary.csv",
-            "exit_sweep_filtered.md",
-        ]):
+        for p in (
+            out_dir / n
+            for n in [
+                "block_Z_per_subset_per_variant.csv",
+                "block_AA_per_subset_per_variant_per_fold.csv",
+                "block_AA_stability_summary.csv",
+                "block_BB_per_subset_per_variant_per_category.csv",
+                "block_CC_headline_summary.csv",
+                "exit_sweep_filtered.md",
+            ]
+        ):
             if not p.exists():
                 raise RuntimeError(f"HALT: pass 1 did not write {p}")
             snap_files[p.name] = snapshot_dir / p.name
             shutil.copy2(p, snap_files[p.name])
 
         print("\n=== Pass 2 ===", flush=True)
-        r2 = build_pass(out_dir=out_dir, write_manifest=True,
-                        run_label="pass_2_final")
+        r2 = build_pass(out_dir=out_dir, write_manifest=True, run_label="pass_2_final")
 
         # Determinism check
         det_diffs: List[str] = []
@@ -1742,9 +1998,7 @@ def main(argv: Optional[List[str]] = None) -> int:
                 det_diffs.append(fname)
         shutil.rmtree(snapshot_dir, ignore_errors=True)
         if det_diffs:
-            raise RuntimeError(
-                f"HALT (gate 8): determinism failed; differing files: {det_diffs}"
-            )
+            raise RuntimeError(f"HALT (gate 8): determinism failed; differing files: {det_diffs}")
         det_ok = True
         r1 = r2
 
@@ -1765,8 +2019,10 @@ def main(argv: Optional[List[str]] = None) -> int:
     # Top (subset, variant) by mean_R across all rows except V00_BL
     z_no_bl = block_Z[block_Z["variant_id"] != "V00_BL"].copy()
     top_row = z_no_bl.sort_values("mean_R", ascending=False).iloc[0]
-    top_stab = block_AA_stab[(block_AA_stab["subset_id"] == top_row["subset_id"])
-                              & (block_AA_stab["variant_id"] == top_row["variant_id"])].iloc[0]
+    top_stab = block_AA_stab[
+        (block_AA_stab["subset_id"] == top_row["subset_id"])
+        & (block_AA_stab["variant_id"] == top_row["variant_id"])
+    ].iloc[0]
     print(
         f"  TOP overall by mean_R: subset={top_row['subset_id']}, "
         f"variant={top_row['variant_id']}, n={int(top_row['n_in_subset'])}, "
@@ -1781,8 +2037,10 @@ def main(argv: Optional[List[str]] = None) -> int:
         if len(sub) == 0:
             continue
         top_sub = sub.sort_values("pooled_lift_vs_BL", ascending=False).iloc[0]
-        ts = block_AA_stab[(block_AA_stab["subset_id"] == sid)
-                            & (block_AA_stab["variant_id"] == top_sub["variant_id"])].iloc[0]
+        ts = block_AA_stab[
+            (block_AA_stab["subset_id"] == sid)
+            & (block_AA_stab["variant_id"] == top_sub["variant_id"])
+        ].iloc[0]
         print(
             f"  TOP {sid}: variant={top_sub['variant_id']}, "
             f"lift={top_sub['pooled_lift_vs_BL']:+.4f}, "
@@ -1794,13 +2052,15 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     # Cross-subset: variants stable_lift on >= 4 of S1..S5
     five = [s for s in SUBSET_IDS if s != "S0_pop"]
-    stab_pivot = (block_AA_stab[block_AA_stab["subset_id"].isin(five)]
-                  .pivot(index="variant_id", columns="subset_id",
-                         values="stability_flag"))
+    stab_pivot = block_AA_stab[block_AA_stab["subset_id"].isin(five)].pivot(
+        index="variant_id", columns="subset_id", values="stability_flag"
+    )
     n_stable_lift = stab_pivot.eq("stable_lift").sum(axis=1)
     big = n_stable_lift[n_stable_lift >= 4].sort_values(ascending=False)
-    print(f"  Cross-subset stable_lift >= 4 of S1..S5: "
-          f"{big.to_dict() if len(big) > 0 else 'none'}", flush=True)
+    print(
+        f"  Cross-subset stable_lift >= 4 of S1..S5: {big.to_dict() if len(big) > 0 else 'none'}",
+        flush=True,
+    )
 
     # Output sha manifest
     print("\n=== Output artefact sha256 manifest ===", flush=True)
@@ -1814,16 +2074,13 @@ def main(argv: Optional[List[str]] = None) -> int:
             ["git", "rev-parse", "HEAD"], cwd=REPO_ROOT, text=True
         ).strip()
         print(f"  HEAD: {head}", flush=True)
-        st = subprocess.check_output(
-            ["git", "status", "--porcelain"], cwd=REPO_ROOT, text=True
-        )
+        st = subprocess.check_output(["git", "status", "--porcelain"], cwd=REPO_ROOT, text=True)
         for ln in st.splitlines()[:80]:
             print(f"  {ln}", flush=True)
     except Exception as e:
         print(f"  (git unavailable: {e})", flush=True)
 
-    print(f"\n  wallclock {wallclock:.2f}s  peak_RSS_traced_kb {peak_kb:.0f}",
-          flush=True)
+    print(f"\n  wallclock {wallclock:.2f}s  peak_RSS_traced_kb {peak_kb:.0f}", flush=True)
     return 0
 
 

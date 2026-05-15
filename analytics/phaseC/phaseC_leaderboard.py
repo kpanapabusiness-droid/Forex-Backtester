@@ -31,11 +31,7 @@ def _latest_run_dir(c1_dir: Path) -> Optional[Path]:
     if not c1_dir.exists():
         return None
     run_dirs = sorted(
-        (
-            p
-            for p in c1_dir.iterdir()
-            if p.is_dir() and (p / "wfo_run_meta.json").exists()
-        ),
+        (p for p in c1_dir.iterdir() if p.is_dir() and (p / "wfo_run_meta.json").exists()),
         key=lambda p: p.name,
         reverse=True,
     )
@@ -68,14 +64,16 @@ def _fold_rows_for_run(run_dir: Path) -> List[Dict[str, Any]]:
         scratch_rate = (scratches / trades) if trades > 0 else 0.0
         roi_pct = float(metrics.get("roi_pct") or 0.0)
         max_dd_pct = float(metrics.get("max_dd_pct") or 0.0)
-        rows.append({
-            "fold_id": fold_id,
-            "trades": trades,
-            "scratches": scratches,
-            "scratch_rate": scratch_rate,
-            "roi_pct": roi_pct,
-            "max_dd_pct": max_dd_pct,
-        })
+        rows.append(
+            {
+                "fold_id": fold_id,
+                "trades": trades,
+                "scratches": scratches,
+                "scratch_rate": scratch_rate,
+                "roi_pct": roi_pct,
+                "max_dd_pct": max_dd_pct,
+            }
+        )
     rows.sort(key=lambda r: r["fold_id"])
     return rows
 
@@ -140,11 +138,21 @@ def build_leaderboard(wfo_runs_root: Path) -> pd.DataFrame:
     """
     wfo_runs_root = wfo_runs_root.resolve()
     if not wfo_runs_root.exists():
-        return pd.DataFrame(columns=[
-            "c1_name", "pass_reject", "worst_fold_id", "worst_fold_roi", "worst_fold_max_dd",
-            "worst_fold_trades", "worst_fold_scratch_rate", "median_fold_roi", "median_fold_max_dd",
-            "median_fold_trades", "rejection_reason",
-        ])
+        return pd.DataFrame(
+            columns=[
+                "c1_name",
+                "pass_reject",
+                "worst_fold_id",
+                "worst_fold_roi",
+                "worst_fold_max_dd",
+                "worst_fold_trades",
+                "worst_fold_scratch_rate",
+                "median_fold_roi",
+                "median_fold_max_dd",
+                "median_fold_trades",
+                "rejection_reason",
+            ]
+        )
 
     rows: List[Dict[str, Any]] = []
     for c1_dir in sorted(wfo_runs_root.iterdir()):
@@ -153,36 +161,40 @@ def build_leaderboard(wfo_runs_root: Path) -> pd.DataFrame:
         c1_name = c1_dir.name
         run_dir = _latest_run_dir(c1_dir)
         if run_dir is None:
-            rows.append({
-                "c1_name": c1_name,
-                "pass_reject": "REJECT",
-                "worst_fold_id": 0,
-                "worst_fold_roi": 0.0,
-                "worst_fold_max_dd": 0.0,
-                "worst_fold_trades": 0,
-                "worst_fold_scratch_rate": 0.0,
-                "median_fold_roi": 0.0,
-                "median_fold_max_dd": 0.0,
-                "median_fold_trades": 0,
-                "rejection_reason": "no_wfo_run",
-            })
+            rows.append(
+                {
+                    "c1_name": c1_name,
+                    "pass_reject": "REJECT",
+                    "worst_fold_id": 0,
+                    "worst_fold_roi": 0.0,
+                    "worst_fold_max_dd": 0.0,
+                    "worst_fold_trades": 0,
+                    "worst_fold_scratch_rate": 0.0,
+                    "median_fold_roi": 0.0,
+                    "median_fold_max_dd": 0.0,
+                    "median_fold_trades": 0,
+                    "rejection_reason": "no_wfo_run",
+                }
+            )
             continue
 
         fold_rows = _fold_rows_for_run(run_dir)
         if not fold_rows:
-            rows.append({
-                "c1_name": c1_name,
-                "pass_reject": "REJECT",
-                "worst_fold_id": 0,
-                "worst_fold_roi": 0.0,
-                "worst_fold_max_dd": 0.0,
-                "worst_fold_trades": 0,
-                "worst_fold_scratch_rate": 0.0,
-                "median_fold_roi": 0.0,
-                "median_fold_max_dd": 0.0,
-                "median_fold_trades": 0,
-                "rejection_reason": "no_fold_data",
-            })
+            rows.append(
+                {
+                    "c1_name": c1_name,
+                    "pass_reject": "REJECT",
+                    "worst_fold_id": 0,
+                    "worst_fold_roi": 0.0,
+                    "worst_fold_max_dd": 0.0,
+                    "worst_fold_trades": 0,
+                    "worst_fold_scratch_rate": 0.0,
+                    "median_fold_roi": 0.0,
+                    "median_fold_max_dd": 0.0,
+                    "median_fold_trades": 0,
+                    "rejection_reason": "no_fold_data",
+                }
+            )
             continue
 
         worst = _worst_fold_by_roi(fold_rows)
@@ -191,25 +203,31 @@ def build_leaderboard(wfo_runs_root: Path) -> pd.DataFrame:
         median_trades = _safe_median([r["trades"] for r in fold_rows])
 
         pass_reject, rejection_reason = _apply_gates(
-            c1_name, fold_rows, worst,
-            median_roi, median_max_dd, median_trades,
+            c1_name,
+            fold_rows,
+            worst,
+            median_roi,
+            median_max_dd,
+            median_trades,
         )
 
         worst_roi = float(worst.get("roi_pct") or 0.0)
         worst_max_dd = float(worst.get("max_dd_pct") or 0.0)
-        rows.append({
-            "c1_name": c1_name,
-            "pass_reject": pass_reject,
-            "worst_fold_id": int(worst.get("fold_id") or 0),
-            "worst_fold_roi": worst_roi,
-            "worst_fold_max_dd": worst_max_dd,
-            "worst_fold_trades": int(worst.get("trades") or 0),
-            "worst_fold_scratch_rate": float(worst.get("scratch_rate") or 0.0),
-            "median_fold_roi": median_roi,
-            "median_fold_max_dd": median_max_dd,
-            "median_fold_trades": median_trades,
-            "rejection_reason": rejection_reason,
-        })
+        rows.append(
+            {
+                "c1_name": c1_name,
+                "pass_reject": pass_reject,
+                "worst_fold_id": int(worst.get("fold_id") or 0),
+                "worst_fold_roi": worst_roi,
+                "worst_fold_max_dd": worst_max_dd,
+                "worst_fold_trades": int(worst.get("trades") or 0),
+                "worst_fold_scratch_rate": float(worst.get("scratch_rate") or 0.0),
+                "median_fold_roi": median_roi,
+                "median_fold_max_dd": median_max_dd,
+                "median_fold_trades": median_trades,
+                "rejection_reason": rejection_reason,
+            }
+        )
 
     return pd.DataFrame(rows)
 
@@ -291,7 +309,13 @@ def _try_overlap_matrix(wfo_runs_root: Path, out_path: Path) -> bool:
                 if col not in df.columns:
                     return set()
             for _, r in df.iterrows():
-                keys.add((str(r.get("pair", "")), str(r.get("entry_time", "")), str(r.get("direction", ""))))
+                keys.add(
+                    (
+                        str(r.get("pair", "")),
+                        str(r.get("entry_time", "")),
+                        str(r.get("direction", "")),
+                    )
+                )
         return keys
 
     sets = {}
@@ -347,7 +371,8 @@ def run_phaseC_leaderboard(results_root: Path, write_overlap: bool = True) -> No
             content = md_path.read_text(encoding="utf-8")
             if "overlap" not in content.lower():
                 md_path.write_text(
-                    content.rstrip() + "\n\n(overlap_matrix.csv omitted: missing standard trade keys)\n",
+                    content.rstrip()
+                    + "\n\n(overlap_matrix.csv omitted: missing standard trade keys)\n",
                     encoding="utf-8",
                 )
 

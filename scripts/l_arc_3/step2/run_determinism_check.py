@@ -3,6 +3,7 @@
 Strategy: snapshot sha256s of current outputs, re-run the full pipeline,
 re-compute sha256s, compare. Pass if all match.
 """
+
 # ruff: noqa: E402, E701, E702, F841, I001
 from __future__ import annotations
 
@@ -66,6 +67,7 @@ def main() -> None:
 
     # Determine whether the prior run extended H by checking for fwd_h480 column
     import pandas as pd
+
     f_path = STEP2_DIR / "signals_features.csv"
     extended = False
     if f_path.exists():
@@ -75,8 +77,10 @@ def main() -> None:
 
     print(f"[determinism] re-running full pipeline in place (H={H_run})...")
     from scripts.l_arc_3.step2 import phase_a_features
+
     phase_a_features.run_phase_a(H=H_run)
     from scripts.l_arc_3.step2 import phase_a_lookahead
+
     phase_a_lookahead.run_lookahead_test(H=H_run)
     phase_a_lookahead.write_feature_lag_audit(H=H_run)
     from scripts.l_arc_3.step2 import (
@@ -88,6 +92,7 @@ def main() -> None:
         phase_g_random,
         phase_h_held_bar,
     )
+
     phase_b_marginals.run_phase_b()
     phase_c_conditional.run_phase_c()
     phase_d_stability.run_stability_check()
@@ -99,6 +104,7 @@ def main() -> None:
     # Run it BEFORE the phase doc append step would clobber the doc; the determinism
     # check verifies the two arc-3 deliverables produce byte-identical output across runs.
     from scripts.l_arc_3.step2 import phase_j_arc3_addenda
+
     var_text = phase_j_arc3_addenda.variance_compression_report()
     phase_j_arc3_addenda.up_down_split_report()
     # Note: phase doc append is intentionally NOT re-run during determinism check —
@@ -118,7 +124,8 @@ def main() -> None:
     passed = len(diffs) == 0
     lines = [
         "L Arc 3 Step 2 — Two-consecutive-run determinism check",
-        "=" * 70, "",
+        "=" * 70,
+        "",
         f"Files checked: {len(CHECK_FILES)}",
         f"Differences:   {len(diffs)}",
         "",
@@ -140,7 +147,9 @@ def main() -> None:
         lines.append("")
     out = STEP2_DIR / "determinism_check.txt"
     out.write_text("\n".join(lines), encoding="utf-8")
-    print(f"[determinism] {'PASS' if passed else 'FAIL'}; took {time.time()-t0:.0f}s; wrote {out}")
+    print(
+        f"[determinism] {'PASS' if passed else 'FAIL'}; took {time.time() - t0:.0f}s; wrote {out}"
+    )
 
 
 if __name__ == "__main__":

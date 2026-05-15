@@ -44,7 +44,9 @@ def _require_config(raw: dict, signal_name: str | None) -> dict:
         raise ValueError("Phase D3 config must set external_signals.path.")
     sig = signal_name or ext.get("signal_name")
     if not sig:
-        raise ValueError("Phase D3 requires --signal CLI argument or external_signals.signal_name in config.")
+        raise ValueError(
+            "Phase D3 requires --signal CLI argument or external_signals.signal_name in config."
+        )
     cfg["external_signals_path"] = str(ext["path"])
     cfg["external_signal_name"] = str(sig)
     return cfg
@@ -208,16 +210,20 @@ def _run_from_config(config_path: Path, signal_name: str | None) -> None:
         )
     entry_intent = _signals_to_entry_intent(signals_df)
 
-    starting_balance = float(
-        (cfg.get("risk") or {}).get("starting_balance", 10_000.0)
-    )
+    starting_balance = float((cfg.get("risk") or {}).get("starting_balance", 10_000.0))
     equity_state = {"balance": starting_balance}
     track_equity = True
     all_trades: list = []
     equity_frames: list = []
 
     minimal_cfg = {
-        "indicators": {"c1": None, "use_c2": False, "use_baseline": False, "use_volume": False, "use_exit": False},
+        "indicators": {
+            "c1": None,
+            "use_c2": False,
+            "use_baseline": False,
+            "use_volume": False,
+            "use_exit": False,
+        },
         "entry": cfg.get("entry", {}),
         "exit": cfg.get("exit", {}),
         "risk": cfg.get("risk", {}),
@@ -241,7 +247,11 @@ def _run_from_config(config_path: Path, signal_name: str | None) -> None:
             continue
         df = pd.read_csv(path)
         df = normalize_ohlcv_schema(df)
-        df = df.dropna(subset=["date", "open", "high", "low", "close"]).sort_values("date").reset_index(drop=True)
+        df = (
+            df.dropna(subset=["date", "open", "high", "low", "close"])
+            .sort_values("date")
+            .reset_index(drop=True)
+        )
         df["pair"] = pair
 
         df, _ = slice_df_by_dates(df, date_start, date_end)
@@ -269,9 +279,7 @@ def _run_from_config(config_path: Path, signal_name: str | None) -> None:
             if eq is not None and not eq.empty:
                 equity_frames.append(eq)
         else:
-            trades = simulate_pair_trades(
-                df, pair, minimal_cfg, equity_state, return_equity=False
-            )
+            trades = simulate_pair_trades(df, pair, minimal_cfg, equity_state, return_equity=False)
             all_trades.extend(trades)
 
     trades_df = (
@@ -284,16 +292,12 @@ def _run_from_config(config_path: Path, signal_name: str | None) -> None:
             trades_df[c] = pd.NA
     trades_df = trades_df.reindex(columns=TRADES_COLS)
 
-    write_trades_csv_with_diagnostics(
-        trades_df, out_dir, minimal_cfg, run_slug=signal_name
-    )
+    write_trades_csv_with_diagnostics(trades_df, out_dir, minimal_cfg, run_slug=signal_name)
 
     if track_equity and equity_frames:
         eq = pd.concat(equity_frames, ignore_index=True)
         eq_wide = (
-            eq.pivot_table(
-                index="date", columns="pair", values="pnl_realized_cum", aggfunc="last"
-            )
+            eq.pivot_table(index="date", columns="pair", values="pnl_realized_cum", aggfunc="last")
             .sort_index()
             .ffill()
             .fillna(0.0)
@@ -311,13 +315,19 @@ def _run_from_config(config_path: Path, signal_name: str | None) -> None:
     try:
         from core.utils import summarize_results
 
-        txt, _ = summarize_results(
-            out_dir, starting_balance=starting_balance
-        )
+        txt, _ = summarize_results(out_dir, starting_balance=starting_balance)
     except Exception:
         total = len(trades_df)
-        wins = int(trades_df.get("win", pd.Series(dtype=bool)).fillna(False).astype(bool).sum()) if total else 0
-        losses = int(trades_df.get("loss", pd.Series(dtype=bool)).fillna(False).astype(bool).sum()) if total else 0
+        wins = (
+            int(trades_df.get("win", pd.Series(dtype=bool)).fillna(False).astype(bool).sum())
+            if total
+            else 0
+        )
+        losses = (
+            int(trades_df.get("loss", pd.Series(dtype=bool)).fillna(False).astype(bool).sum())
+            if total
+            else 0
+        )
         roi = float(trades_df.get("pnl", 0).fillna(0).sum())
         txt = (
             f"Total Trades : {total}\n"

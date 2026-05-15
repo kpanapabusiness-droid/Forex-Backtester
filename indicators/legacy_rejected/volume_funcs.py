@@ -75,12 +75,14 @@ def volume_volatility_ratio(
     df[signal_col] = (ratio >= float(threshold)).astype("int8")
     return df
 
+
 def volume_normalized(*args, **kwargs):
     return volume_volatility_ratio(*args, **kwargs)
 
 
 def volume_trend_direction_force(*args, **kwargs):
     return volume_adx(*args, **kwargs)
+
 
 def volume_silence(*args, **kwargs):
     signal_col = kwargs.get("signal_col", "volume_signal")
@@ -102,6 +104,7 @@ def volume_silence(*args, **kwargs):
             x[signal_col] = pd.Series(0, index=x.index, dtype="int8")
         return x
 
+
 def volume_stiffness(*args, **kwargs):
     signal_col = kwargs.get("signal_col", "volume_signal")
     x = volume_volatility_ratio(*args, **kwargs)
@@ -121,8 +124,10 @@ def volume_stiffness(*args, **kwargs):
             x[signal_col] = pd.Series(0, index=x.index, dtype="int8")
         return x
 
+
 def volume_volatility_ratio_mt4(*args, **kwargs):
     return volume_volatility_ratio(*args, **kwargs)
+
 
 def volume_william_vix_fix(*args, **kwargs):
     signal_col = kwargs.get("signal_col", "volume_signal")
@@ -139,6 +144,7 @@ def volume_william_vix_fix(*args, **kwargs):
         except Exception:
             pass
     return pd.DataFrame({signal_col: pd.Series([0], dtype="int8")})
+
 
 def volume_waddah_attar_explosion(
     df: pd.DataFrame,

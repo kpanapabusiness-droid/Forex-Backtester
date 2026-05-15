@@ -29,6 +29,7 @@ the Handover block:
 
 Descriptive only — no recommendations, no verdict language.
 """
+
 # ruff: noqa: E402, E701, E702, F841, I001
 # ruff: noqa: I001
 from __future__ import annotations
@@ -77,20 +78,30 @@ CROSS_PAIR_FEATURES = [
 def _stats(arr: np.ndarray) -> Dict[str, float]:
     finite = arr[np.isfinite(arr)]
     if finite.size < 2:
-        return {"n": int(finite.size), "std": float("nan"), "iqr": float("nan"),
-                "p25": float("nan"), "p50": float("nan"), "p75": float("nan")}
+        return {
+            "n": int(finite.size),
+            "std": float("nan"),
+            "iqr": float("nan"),
+            "p25": float("nan"),
+            "p50": float("nan"),
+            "p75": float("nan"),
+        }
     p25, p50, p75 = np.percentile(finite, [25, 50, 75])
     return {
         "n": int(finite.size),
         "std": float(np.std(finite, ddof=1)),
         "iqr": float(p75 - p25),
-        "p25": float(p25), "p50": float(p50), "p75": float(p75),
+        "p25": float(p25),
+        "p50": float(p50),
+        "p75": float(p75),
     }
 
 
 def _add_signal_bar_range(df: pd.DataFrame) -> None:
     if "signal_bar_high" in df.columns and "signal_bar_low" in df.columns:
-        df["signal_bar_range"] = df["signal_bar_high"].astype(float) - df["signal_bar_low"].astype(float)
+        df["signal_bar_range"] = df["signal_bar_high"].astype(float) - df["signal_bar_low"].astype(
+            float
+        )
 
 
 def variance_compression_report() -> str:
@@ -102,11 +113,19 @@ def variance_compression_report() -> str:
     features = VOL_AXIS_FEATURES + ["signal_bar_range"] + CROSS_PAIR_FEATURES
 
     rows: List[List[str]] = []
-    rows.append([
-        "feature", "n_arc3", "n_arc2",
-        "arc3_std", "arc2_std", "ratio_std_arc3_over_arc2",
-        "arc3_iqr", "arc2_iqr", "ratio_iqr_arc3_over_arc2",
-    ])
+    rows.append(
+        [
+            "feature",
+            "n_arc3",
+            "n_arc2",
+            "arc3_std",
+            "arc2_std",
+            "ratio_std_arc3_over_arc2",
+            "arc3_iqr",
+            "arc2_iqr",
+            "ratio_iqr_arc3_over_arc2",
+        ]
+    )
     for feat in features:
         if feat not in arc3_df.columns or feat not in arc2_df.columns:
             rows.append([feat, "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A"])
@@ -115,11 +134,19 @@ def variance_compression_report() -> str:
         s2 = _stats(arc2_df[feat].to_numpy(dtype=float))
         ratio_std = (s3["std"] / s2["std"]) if (s2["std"] and s2["std"] > 0) else float("nan")
         ratio_iqr = (s3["iqr"] / s2["iqr"]) if (s2["iqr"] and s2["iqr"] > 0) else float("nan")
-        rows.append([
-            feat, str(s3["n"]), str(s2["n"]),
-            f"{s3['std']:.6g}", f"{s2['std']:.6g}", f"{ratio_std:.4f}",
-            f"{s3['iqr']:.6g}", f"{s2['iqr']:.6g}", f"{ratio_iqr:.4f}",
-        ])
+        rows.append(
+            [
+                feat,
+                str(s3["n"]),
+                str(s2["n"]),
+                f"{s3['std']:.6g}",
+                f"{s2['std']:.6g}",
+                f"{ratio_std:.4f}",
+                f"{s3['iqr']:.6g}",
+                f"{s2['iqr']:.6g}",
+                f"{ratio_iqr:.4f}",
+            ]
+        )
 
     # Columnar formatting
     widths = [max(len(r[i]) for r in rows) for i in range(len(rows[0]))]
@@ -130,10 +157,14 @@ def variance_compression_report() -> str:
     lines.append("Reportorial only. Tracks within-pool std and IQR ratios arc 3 / arc 2 on:")
     lines.append("  • 6 vol-axis features — the regime-conditioning tautology axis (arc-open §4)")
     lines.append("  • 1 derived signal_bar_range (high - low) — additional vol-axis check")
-    lines.append("  • 6 cross-pair-density features — the concurrent-signal saturation axis (arc-open §4)")
+    lines.append(
+        "  • 6 cross-pair-density features — the concurrent-signal saturation axis (arc-open §4)"
+    )
     lines.append("")
     lines.append("Interpretation key (read-only — no disposition implications drawn here):")
-    lines.append("  ratio < 1.0 ⇒ arc 3 within-pool dispersion is COMPRESSED relative to arc 2 on that axis")
+    lines.append(
+        "  ratio < 1.0 ⇒ arc 3 within-pool dispersion is COMPRESSED relative to arc 2 on that axis"
+    )
     lines.append("  ratio ~ 1.0 ⇒ comparable dispersion")
     lines.append("  ratio > 1.0 ⇒ arc 3 dispersion is WIDER than arc 2 on that axis")
     lines.append("")
@@ -174,8 +205,11 @@ def up_down_split_report() -> Dict[str, float]:
             "n_takes": n,
             "mean_net_r": float(np.mean(finite)) if n else float("nan"),
             "std_net_r": float(np.std(finite, ddof=1)) if n >= 2 else float("nan"),
-            "p5": float("nan"), "p25": float("nan"), "p50": float("nan"),
-            "p75": float("nan"), "p95": float("nan"),
+            "p5": float("nan"),
+            "p25": float("nan"),
+            "p50": float("nan"),
+            "p75": float("nan"),
+            "p95": float("nan"),
         }
         if n:
             ps = np.percentile(finite, [5, 25, 50, 75, 95])
@@ -190,12 +224,14 @@ def up_down_split_report() -> Dict[str, float]:
             sub = sub_fold[sub_fold["signal_bar_direction"] == direction]
             arr = sub["net_r"].to_numpy(dtype=float)
             arr = arr[np.isfinite(arr)]
-            per_fold.append({
-                "fold_id": int(fid),
-                "direction": direction,
-                "n_takes": int(arr.size),
-                "mean_net_r": float(np.mean(arr)) if arr.size else float("nan"),
-            })
+            per_fold.append(
+                {
+                    "fold_id": int(fid),
+                    "direction": direction,
+                    "n_takes": int(arr.size),
+                    "mean_net_r": float(np.mean(arr)) if arr.size else float("nan"),
+                }
+            )
 
     # Pool totals.
     n_total_takes = int(len(arc3_df))
@@ -255,27 +291,43 @@ def up_down_split_report() -> Dict[str, float]:
     rows_csv: List[Dict[str, object]] = []
     for direction in ("up", "down", "doji"):
         r = rows_dir[direction]
-        rows_csv.append({
-            "scope": "pool",
-            "direction": direction,
-            "n_fires": fires_by_dir[direction],
-            "n_takes": r["n_takes"],
-            "take_rate_within_direction": cap_interaction[direction],
-            "frac_of_pool_takes": rows_dir[direction]["n_takes"] / n_total_takes if n_total_takes else 0.0,
-            "mean_net_r": r["mean_net_r"], "std_net_r": r["std_net_r"],
-            "p5": r["p5"], "p25": r["p25"], "p50": r["p50"], "p75": r["p75"], "p95": r["p95"],
-        })
+        rows_csv.append(
+            {
+                "scope": "pool",
+                "direction": direction,
+                "n_fires": fires_by_dir[direction],
+                "n_takes": r["n_takes"],
+                "take_rate_within_direction": cap_interaction[direction],
+                "frac_of_pool_takes": rows_dir[direction]["n_takes"] / n_total_takes
+                if n_total_takes
+                else 0.0,
+                "mean_net_r": r["mean_net_r"],
+                "std_net_r": r["std_net_r"],
+                "p5": r["p5"],
+                "p25": r["p25"],
+                "p50": r["p50"],
+                "p75": r["p75"],
+                "p95": r["p95"],
+            }
+        )
     for r in per_fold:
-        rows_csv.append({
-            "scope": f"fold_{r['fold_id']}",
-            "direction": r["direction"],
-            "n_fires": "",
-            "n_takes": r["n_takes"],
-            "take_rate_within_direction": "",
-            "frac_of_pool_takes": "",
-            "mean_net_r": r["mean_net_r"], "std_net_r": "",
-            "p5": "", "p25": "", "p50": "", "p75": "", "p95": "",
-        })
+        rows_csv.append(
+            {
+                "scope": f"fold_{r['fold_id']}",
+                "direction": r["direction"],
+                "n_fires": "",
+                "n_takes": r["n_takes"],
+                "take_rate_within_direction": "",
+                "frac_of_pool_takes": "",
+                "mean_net_r": r["mean_net_r"],
+                "std_net_r": "",
+                "p5": "",
+                "p25": "",
+                "p50": "",
+                "p75": "",
+                "p95": "",
+            }
+        )
     pd.DataFrame(rows_csv).to_csv(out_csv, index=False, lineterminator="\n")
     print(f"  wrote {out_csv}")
 
@@ -315,7 +367,7 @@ def time_exit_shape_classification() -> str:
         reason = f"peak at h={peak_h} (> h=120) — plateau-or-late-peak pattern; mirrors arc 2's peak-at-h=240"
     else:
         # peak at h=120 itself — check monotonicity
-        rest = arr[h_vals.index(120):]
+        rest = arr[h_vals.index(120) :]
         if np.all(np.diff(rest) <= 0):
             shape = "A"
             reason = "peak at h=120 then monotonic degradation; exit-only candidates foreclosed"
@@ -340,8 +392,12 @@ def append_arc3_sections_to_phase_doc(
         tail = handover_marker + tail
 
     # Read cross-arc fold info from arc 3 wfo_fold_results.csv + arc 2's.
-    arc3_fold = pd.read_csv(REPO_ROOT / "results" / "l_arc_3" / "step1_verbatim" / "wfo_fold_results.csv")
-    arc2_fold = pd.read_csv(REPO_ROOT / "results" / "l_arc_2" / "step1_verbatim" / "wfo_fold_results.csv")
+    arc3_fold = pd.read_csv(
+        REPO_ROOT / "results" / "l_arc_3" / "step1_verbatim" / "wfo_fold_results.csv"
+    )
+    arc2_fold = pd.read_csv(
+        REPO_ROOT / "results" / "l_arc_2" / "step1_verbatim" / "wfo_fold_results.csv"
+    )
     arc3_fold_5 = arc3_fold[arc3_fold["fold_id"] == 5].iloc[0]
     arc2_fold_5 = arc2_fold[arc2_fold["fold_id"] == 5].iloc[0]
     arc3_fold_6 = arc3_fold[arc3_fold["fold_id"] == 6].iloc[0]
@@ -360,13 +416,17 @@ def append_arc3_sections_to_phase_doc(
     extra.append("```")
     extra.append("")
     extra.append("This section is **descriptive only** (op spec §11.5). The vol-axis ratios and")
-    extra.append("cross-pair-density ratios are emitted as numerical comparisons; no interpretation")
+    extra.append(
+        "cross-pair-density ratios are emitted as numerical comparisons; no interpretation"
+    )
     extra.append("of what they mean for step 3 verdict logic is drawn here.")
     extra.append("")
     extra.append("## 13. Up / down / doji bar split (arc-3-specific)")
     extra.append("")
     h = headline_up_down
-    extra.append("The `any` sub-spec admits up-bar, down-bar, and doji 1H signal bars. Take-side split:")
+    extra.append(
+        "The `any` sub-spec admits up-bar, down-bar, and doji 1H signal bars. Take-side split:"
+    )
     extra.append("")
     extra.append("```")
     extra.append(f"  total takes:  {h['n_total_takes']:>6}")
@@ -376,8 +436,12 @@ def append_arc3_sections_to_phase_doc(
     extra.append(f"  abs. asymmetry (|up - down| / (up + down)): {h['abs_asymmetry']:.4f}")
     extra.append("")
     extra.append("  fires-by-direction (signals_log.csv joined to 1H OHLC):")
-    extra.append(f"    up:   {h['fires_up']:>6}  take-rate-within-direction: {h['take_rate_up']:.4f}")
-    extra.append(f"    down: {h['fires_down']:>6}  take-rate-within-direction: {h['take_rate_down']:.4f}")
+    extra.append(
+        f"    up:   {h['fires_up']:>6}  take-rate-within-direction: {h['take_rate_up']:.4f}"
+    )
+    extra.append(
+        f"    down: {h['fires_down']:>6}  take-rate-within-direction: {h['take_rate_down']:.4f}"
+    )
     extra.append("```")
     extra.append("")
     extra.append("Per-fold-per-direction breakdown in `up_down_split.csv` (scope=`fold_<n>` rows).")
@@ -402,22 +466,32 @@ def append_arc3_sections_to_phase_doc(
     extra.append("  - B: peak shorter than h=120 (opens an early-exit candidate at the peak)")
     extra.append("  - C: plateau across h=24..h=240 or peak at h>120 (arc-2-like)")
     extra.append("")
-    extra.append("Time-exit curve numerics: `results/l_arc_3/step2_descriptive/shadow_tradesets/time_exit_curve.csv`.")
+    extra.append(
+        "Time-exit curve numerics: `results/l_arc_3/step2_descriptive/shadow_tradesets/time_exit_curve.csv`."
+    )
     extra.append("")
     extra.append("## 16. Cross-arc fold-5 / fold-6 callouts")
     extra.append("")
-    extra.append("Descriptive cross-arc comparison (arc 2 vs arc 3) on the two folds flagged at step 1:")
+    extra.append(
+        "Descriptive cross-arc comparison (arc 2 vs arc 3) on the two folds flagged at step 1:"
+    )
     extra.append("")
     extra.append("| fold | metric | Arc 3 | Arc 2 |")
     extra.append("|---:|:---|---:|---:|")
     extra.append(f"| 5 | ROI % | {arc3_fold_5['roi_pct']:+.4f} | {arc2_fold_5['roi_pct']:+.4f} |")
-    extra.append(f"| 5 | max DD % | {arc3_fold_5['max_dd_pct']:.4f} | {arc2_fold_5['max_dd_pct']:.4f} |")
+    extra.append(
+        f"| 5 | max DD % | {arc3_fold_5['max_dd_pct']:.4f} | {arc2_fold_5['max_dd_pct']:.4f} |"
+    )
     extra.append(f"| 5 | mean R | {arc3_fold_5['mean_R']:+.4f} | {arc2_fold_5['mean_R']:+.4f} |")
     extra.append(f"| 6 | ROI % | {arc3_fold_6['roi_pct']:+.4f} | {arc2_fold_6['roi_pct']:+.4f} |")
-    extra.append(f"| 6 | max DD % | {arc3_fold_6['max_dd_pct']:.4f} | {arc2_fold_6['max_dd_pct']:.4f} |")
+    extra.append(
+        f"| 6 | max DD % | {arc3_fold_6['max_dd_pct']:.4f} | {arc2_fold_6['max_dd_pct']:.4f} |"
+    )
     extra.append(f"| 6 | mean R | {arc3_fold_6['mean_R']:+.4f} | {arc2_fold_6['mean_R']:+.4f} |")
     extra.append("")
-    extra.append("Step 3 fold-stability analysis will read these comparisons. No interpretation drawn here.")
+    extra.append(
+        "Step 3 fold-stability analysis will read these comparisons. No interpretation drawn here."
+    )
     extra.append("")
 
     new_doc = head + "\n".join(extra) + "\n" + tail

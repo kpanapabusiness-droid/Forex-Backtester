@@ -10,6 +10,7 @@ Per the resume prompt:
   - No §15 outcome call.
   - No proposals.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -75,12 +76,16 @@ def section_1_directory_inventory() -> tuple[pd.DataFrame, str]:
             continue  # exclude our own outputs
         rel = str(p.relative_to(OUT)).replace("\\", "/")
         stat = p.stat()
-        rows.append({
-            "path": rel,
-            "size_bytes": int(stat.st_size),
-            "sha256": sha256(p),
-            "mtime_utc": datetime.fromtimestamp(stat.st_mtime, tz=timezone.utc).isoformat(timespec="seconds"),
-        })
+        rows.append(
+            {
+                "path": rel,
+                "size_bytes": int(stat.st_size),
+                "sha256": sha256(p),
+                "mtime_utc": datetime.fromtimestamp(stat.st_mtime, tz=timezone.utc).isoformat(
+                    timespec="seconds"
+                ),
+            }
+        )
     df = pd.DataFrame(rows)
     write_csv(df, TRI / "directory_inventory.csv")
     md = "### Section 1 — Directory inventory\n\n" + md_table(df) + "\n"
@@ -107,32 +112,36 @@ def section_2_csw3h_diagnostic() -> tuple[pd.DataFrame, str]:
         row_hc = match.iloc[0]
         n_features_scanned = int(row_hc["n_features_in_scan"])
         # predictor AUCs per model for this (K, algo, cid)
-        pred_sub = pred[(pred["K"] == K) & (pred["algo"] == algo) &
-                        (pred["cluster_id"] == cid)]
+        pred_sub = pred[(pred["K"] == K) & (pred["algo"] == algo) & (pred["cluster_id"] == cid)]
         for _, prow in pred_sub.iterrows():
-            rows.append({
-                "K": int(K), "algo": algo, "cluster_id": int(cid),
-                "model": prow["model"],
-                "ml_pooled_auc": float(prow["pooled_auc"]),
-                "ml_perfold_auc_mean": float(prow["perfold_auc_mean"]),
-                "ml_perfold_auc_std": float(prow["perfold_auc_std"]),
-                "univariate_auc": float(row_hc["univariate_auc"]),
-                "raw_p": float(row_hc["raw_p"]),
-                "bh_p": float(row_hc["bh_p"]),
-                "bh_tier": row_hc["tier"],
-                "rank_in_bh_ordered": rank_bh,
-                "n_features_scanned_for_this_cluster": n_features_scanned,
-                "permutation_count": 500,
-            })
+            rows.append(
+                {
+                    "K": int(K),
+                    "algo": algo,
+                    "cluster_id": int(cid),
+                    "model": prow["model"],
+                    "ml_pooled_auc": float(prow["pooled_auc"]),
+                    "ml_perfold_auc_mean": float(prow["perfold_auc_mean"]),
+                    "ml_perfold_auc_std": float(prow["perfold_auc_std"]),
+                    "univariate_auc": float(row_hc["univariate_auc"]),
+                    "raw_p": float(row_hc["raw_p"]),
+                    "bh_p": float(row_hc["bh_p"]),
+                    "bh_tier": row_hc["tier"],
+                    "rank_in_bh_ordered": rank_bh,
+                    "n_features_scanned_for_this_cluster": n_features_scanned,
+                    "permutation_count": 500,
+                }
+            )
     df = pd.DataFrame(rows)
     write_csv(df, TRI / "concurrent_signals_within_3h_diagnostic.csv")
-    md = ("\n### Section 2 — `concurrent_signals_within_3h` diagnostic\n\n"
-          "Per (K × algo × cluster_id × model). The ML AUCs are the pooled / per-fold AUCs\n"
-          "from the **multivariate** model (all features). The univariate AUC, raw_p, bh_p,\n"
-          "and bh_tier are the **univariate** measures of `concurrent_signals_within_3h`\n"
-          "alone (the unit of multiple-comparison for the BH haircut per op spec §6.7).\n"
-          "Permutation count = 500 (op spec §6.7 floor).\n\n"
-          + md_table(df) + "\n")
+    md = (
+        "\n### Section 2 — `concurrent_signals_within_3h` diagnostic\n\n"
+        "Per (K × algo × cluster_id × model). The ML AUCs are the pooled / per-fold AUCs\n"
+        "from the **multivariate** model (all features). The univariate AUC, raw_p, bh_p,\n"
+        "and bh_tier are the **univariate** measures of `concurrent_signals_within_3h`\n"
+        "alone (the unit of multiple-comparison for the BH haircut per op spec §6.7).\n"
+        "Permutation count = 500 (op spec §6.7 floor).\n\n" + md_table(df) + "\n"
+    )
     return df, md
 
 
@@ -143,49 +152,91 @@ def section_3_top20() -> tuple[pd.DataFrame, str]:
     hc = pd.read_csv(OUT / "look_elsewhere_haircut.csv")
     hc_sig = hc[hc["scan"] == "signal_time"].copy()
     pred = pd.read_csv(OUT / "predictor_AUC_by_cluster.csv")
-    pred_max_auc = pred.groupby(["K", "algo", "cluster_id", ])["pooled_auc"].max().reset_index()
+    pred_max_auc = (
+        pred.groupby(
+            [
+                "K",
+                "algo",
+                "cluster_id",
+            ]
+        )["pooled_auc"]
+        .max()
+        .reset_index()
+    )
     pred_max_auc = pred_max_auc.rename(columns={"pooled_auc": "max_pooled_auc_across_models"})
 
     rows = []
     target_feature = "concurrent_signals_within_3h"
     for K in (2, 3):
         for algo in ("kmeans", "hierarchical"):
-            for cid in sorted(hc_sig[(hc_sig["K"] == K) & (hc_sig["algo"] == algo)]["cluster_id"].unique().tolist()):
-                grp = hc_sig[(hc_sig["K"] == K) & (hc_sig["algo"] == algo) &
-                              (hc_sig["cluster_id"] == cid)].copy()
+            for cid in sorted(
+                hc_sig[(hc_sig["K"] == K) & (hc_sig["algo"] == algo)]["cluster_id"]
+                .unique()
+                .tolist()
+            ):
+                grp = hc_sig[
+                    (hc_sig["K"] == K) & (hc_sig["algo"] == algo) & (hc_sig["cluster_id"] == cid)
+                ].copy()
                 grp = grp.sort_values("bh_p", ascending=True).reset_index(drop=True)
                 grp["rank"] = grp.index + 1
-                csw3h_rank = grp.loc[grp["feature"] == target_feature, "rank"].iloc[0] if (grp["feature"] == target_feature).any() else -1
+                csw3h_rank = (
+                    grp.loc[grp["feature"] == target_feature, "rank"].iloc[0]
+                    if (grp["feature"] == target_feature).any()
+                    else -1
+                )
                 top20 = grp.head(20)
                 for _, r in top20.iterrows():
-                    rows.append({
-                        "K": K, "algo": algo, "cluster_id": int(cid),
-                        "rank": int(r["rank"]),
-                        "feature": r["feature"],
-                        "univariate_auc": float(r["univariate_auc"]),
-                        "raw_p": float(r["raw_p"]),
-                        "bh_p": float(r["bh_p"]),
-                        "tier": r["tier"],
-                        "is_target_csw3h": bool(r["feature"] == target_feature),
-                        "csw3h_rank_in_full_list": int(csw3h_rank),
-                    })
+                    rows.append(
+                        {
+                            "K": K,
+                            "algo": algo,
+                            "cluster_id": int(cid),
+                            "rank": int(r["rank"]),
+                            "feature": r["feature"],
+                            "univariate_auc": float(r["univariate_auc"]),
+                            "raw_p": float(r["raw_p"]),
+                            "bh_p": float(r["bh_p"]),
+                            "tier": r["tier"],
+                            "is_target_csw3h": bool(r["feature"] == target_feature),
+                            "csw3h_rank_in_full_list": int(csw3h_rank),
+                        }
+                    )
     df = pd.DataFrame(rows)
     write_csv(df, TRI / "top20_BH_cleared_per_cluster.csv")
     # K=2 kmeans summary
     md_parts = ["\n### Section 3 — Top-20 BH-cleared predictors per cluster (K=2 + K=3)\n"]
-    md_parts.append("Sorted by BH-corrected p ascending. `csw3h_rank_in_full_list` shows where\n"
-                    "`concurrent_signals_within_3h` sits in the full ranked list for that cluster's\n"
-                    "scan (out of 37 signal-time features).\n")
+    md_parts.append(
+        "Sorted by BH-corrected p ascending. `csw3h_rank_in_full_list` shows where\n"
+        "`concurrent_signals_within_3h` sits in the full ranked list for that cluster's\n"
+        "scan (out of 37 signal-time features).\n"
+    )
     for K in (2, 3):
         for algo in ("kmeans", "hierarchical"):
-            for cid in sorted(df[(df["K"] == K) & (df["algo"] == algo)]["cluster_id"].unique().tolist()):
+            for cid in sorted(
+                df[(df["K"] == K) & (df["algo"] == algo)]["cluster_id"].unique().tolist()
+            ):
                 sub = df[(df["K"] == K) & (df["algo"] == algo) & (df["cluster_id"] == cid)]
                 if sub.empty:
                     continue
                 csw_rank = int(sub["csw3h_rank_in_full_list"].iloc[0])
-                md_parts.append(f"\n#### K={K} {algo} cluster_id={cid} (csw3h rank {csw_rank}/37)\n")
-                md_parts.append(md_table(sub[["rank", "feature", "univariate_auc", "raw_p",
-                                              "bh_p", "tier", "is_target_csw3h"]]))
+                md_parts.append(
+                    f"\n#### K={K} {algo} cluster_id={cid} (csw3h rank {csw_rank}/37)\n"
+                )
+                md_parts.append(
+                    md_table(
+                        sub[
+                            [
+                                "rank",
+                                "feature",
+                                "univariate_auc",
+                                "raw_p",
+                                "bh_p",
+                                "tier",
+                                "is_target_csw3h",
+                            ]
+                        ]
+                    )
+                )
                 md_parts.append("")
     return df, "\n".join(md_parts) + "\n"
 
@@ -197,7 +248,7 @@ def section_4_cluster_identity() -> tuple[pd.DataFrame, str]:
     assignments = pd.read_csv(OUT / "cluster_assignments.csv")
     signals = pd.read_csv(SIGNALS)
     df = signals.merge(assignments, on="trade_id", how="left")
-    n_total = len(df)
+    len(df)
 
     rows = []
     for K in (2, 3, 4):
@@ -209,24 +260,34 @@ def section_4_cluster_identity() -> tuple[pd.DataFrame, str]:
                 mask = df[col] == cid
                 sub = df[mask]
                 exit_mix = sub["exit_reason"].value_counts(normalize=True)
-                rows.append({
-                    "K": K, "algo": algo, "cluster_id": int(cid),
-                    "n_trades": int(mask.sum()),
-                    "pct_of_pool": float(mask.mean()),
-                    "mean_net_r": float(sub["net_r"].mean()),
-                    "median_net_r": float(sub["net_r"].median()),
-                    "median_mfe_held_atr": float(sub["mfe_held_atr"].median()),
-                    "median_mae_held_atr": float(sub["mae_held_atr"].median()),
-                    "median_fwd_mfe_h24_atr": float(sub["fwd_mfe_h24_atr"].median()),
-                    "median_fwd_mae_h24_atr": float(sub["fwd_mae_h24_atr"].median()),
-                    "median_fwd_mfe_h120_atr": float(sub["fwd_mfe_h120_atr"].median()),
-                    "median_fwd_mae_h120_atr": float(sub["fwd_mae_h120_atr"].median()),
-                    "median_race_condition": float(sub["race_bars_plus1_minus_minus1"].median()),
-                    "pct_exit_sl_hit": float(exit_mix.get("stop_loss", 0.0)),
-                    "pct_exit_time_exit": float(exit_mix.get("time_exit", 0.0)),
-                    "mean_concurrent_signals_within_3h": float(sub["concurrent_signals_within_3h"].mean()),
-                    "median_concurrent_signals_within_3h": float(sub["concurrent_signals_within_3h"].median()),
-                })
+                rows.append(
+                    {
+                        "K": K,
+                        "algo": algo,
+                        "cluster_id": int(cid),
+                        "n_trades": int(mask.sum()),
+                        "pct_of_pool": float(mask.mean()),
+                        "mean_net_r": float(sub["net_r"].mean()),
+                        "median_net_r": float(sub["net_r"].median()),
+                        "median_mfe_held_atr": float(sub["mfe_held_atr"].median()),
+                        "median_mae_held_atr": float(sub["mae_held_atr"].median()),
+                        "median_fwd_mfe_h24_atr": float(sub["fwd_mfe_h24_atr"].median()),
+                        "median_fwd_mae_h24_atr": float(sub["fwd_mae_h24_atr"].median()),
+                        "median_fwd_mfe_h120_atr": float(sub["fwd_mfe_h120_atr"].median()),
+                        "median_fwd_mae_h120_atr": float(sub["fwd_mae_h120_atr"].median()),
+                        "median_race_condition": float(
+                            sub["race_bars_plus1_minus_minus1"].median()
+                        ),
+                        "pct_exit_sl_hit": float(exit_mix.get("stop_loss", 0.0)),
+                        "pct_exit_time_exit": float(exit_mix.get("time_exit", 0.0)),
+                        "mean_concurrent_signals_within_3h": float(
+                            sub["concurrent_signals_within_3h"].mean()
+                        ),
+                        "median_concurrent_signals_within_3h": float(
+                            sub["concurrent_signals_within_3h"].median()
+                        ),
+                    }
+                )
     cid_df = pd.DataFrame(rows)
 
     # Annotate which cluster the calibration check used.
@@ -241,15 +302,17 @@ def section_4_cluster_identity() -> tuple[pd.DataFrame, str]:
         # (not the median we report here). Recompute mean from the raw df.
         means = {}
         for cid in (0, 1):
-            mask = (df[f"K2_{algo}"] == cid)
+            mask = df[f"K2_{algo}"] == cid
             means[cid] = float(df.loc[mask, "fwd_mae_h24_atr"].mean())
         selected_cid = max(means, key=means.get)
-        cid_df.loc[(cid_df["K"] == 2) & (cid_df["algo"] == algo) &
-                   (cid_df["cluster_id"] == selected_cid),
-                   "cluster_used_for_calibration_check"] = True
-        cid_df.loc[(cid_df["K"] == 2) & (cid_df["algo"] == algo) &
-                   (cid_df["cluster_id"] == selected_cid),
-                   "calibration_check_selection_rule"] = "max mean(fwd_mae_h24_atr) within K=2 (per run_step3.py main())"
+        cid_df.loc[
+            (cid_df["K"] == 2) & (cid_df["algo"] == algo) & (cid_df["cluster_id"] == selected_cid),
+            "cluster_used_for_calibration_check",
+        ] = True
+        cid_df.loc[
+            (cid_df["K"] == 2) & (cid_df["algo"] == algo) & (cid_df["cluster_id"] == selected_cid),
+            "calibration_check_selection_rule",
+        ] = "max mean(fwd_mae_h24_atr) within K=2 (per run_step3.py main())"
 
     # Characterisation: "high_mae_low_edge" vs "volatility_stratified"
     # high_mae_low_edge: low mean_net_r AND high pct_exit_sl_hit AND high median_fwd_mae
@@ -260,9 +323,9 @@ def section_4_cluster_identity() -> tuple[pd.DataFrame, str]:
     chars = []
     for _, r in cid_df.iterrows():
         # heuristic descriptor — descriptive only per prompt
-        edge_axis = (r["mean_net_r"] - pool_mean_r)  # negative = below-pool edge
-        mae_axis = (r["median_fwd_mae_h24_atr"] - pool_mae24)  # positive = above-pool MAE
-        mfe_axis = (r["median_fwd_mfe_h24_atr"] - pool_mfe24)  # positive = above-pool MFE
+        edge_axis = r["mean_net_r"] - pool_mean_r  # negative = below-pool edge
+        mae_axis = r["median_fwd_mae_h24_atr"] - pool_mae24  # positive = above-pool MAE
+        mfe_axis = r["median_fwd_mfe_h24_atr"] - pool_mfe24  # positive = above-pool MFE
         # symmetric mfe + mae shift with mean_r near pool → volatility-stratified
         symmetric = abs(mfe_axis - mae_axis) < 0.30
         directional = mae_axis > 0.30 and edge_axis < -0.05
@@ -279,26 +342,40 @@ def section_4_cluster_identity() -> tuple[pd.DataFrame, str]:
 
     write_csv(cid_df, TRI / "cluster_identity_audit.csv")
     md_parts = ["\n### Section 4 — Cluster identity audit\n"]
-    md_parts.append("Selection rule used by `run_step3.py` for the calibration-check target:\n"
-                    "`max mean(fwd_mae_h24_atr)` within K=2.\n"
-                    "Characterisation descriptor heuristic:\n"
-                    "  - `high_mae_low_edge`: MAE↑ > pool by ≥0.30 ATR AND meanR < pool by ≥0.05.\n"
-                    "  - `volatility_stratified`: |MFE shift − MAE shift| < 0.30 ATR (symmetric).\n"
-                    "  - `mixed_or_neutral`: neither pure pattern.\n")
+    md_parts.append(
+        "Selection rule used by `run_step3.py` for the calibration-check target:\n"
+        "`max mean(fwd_mae_h24_atr)` within K=2.\n"
+        "Characterisation descriptor heuristic:\n"
+        "  - `high_mae_low_edge`: MAE↑ > pool by ≥0.30 ATR AND meanR < pool by ≥0.05.\n"
+        "  - `volatility_stratified`: |MFE shift − MAE shift| < 0.30 ATR (symmetric).\n"
+        "  - `mixed_or_neutral`: neither pure pattern.\n"
+    )
     for K in (2, 3, 4):
         sub = cid_df[cid_df["K"] == K]
         if sub.empty:
             continue
         md_parts.append(f"\n#### K = {K}\n")
-        md_parts.append(md_table(sub[[
-            "algo", "cluster_id", "n_trades", "pct_of_pool",
-            "mean_net_r", "median_fwd_mfe_h24_atr", "median_fwd_mae_h24_atr",
-            "median_race_condition", "pct_exit_sl_hit",
-            "mean_concurrent_signals_within_3h",
-            "cluster_used_for_calibration_check",
-            "characterisation_descriptor",
-            "filter_to_eligible_ge15pct",
-        ]]))
+        md_parts.append(
+            md_table(
+                sub[
+                    [
+                        "algo",
+                        "cluster_id",
+                        "n_trades",
+                        "pct_of_pool",
+                        "mean_net_r",
+                        "median_fwd_mfe_h24_atr",
+                        "median_fwd_mae_h24_atr",
+                        "median_race_condition",
+                        "pct_exit_sl_hit",
+                        "mean_concurrent_signals_within_3h",
+                        "cluster_used_for_calibration_check",
+                        "characterisation_descriptor",
+                        "filter_to_eligible_ge15pct",
+                    ]
+                ]
+            )
+        )
         md_parts.append("")
     return cid_df, "\n".join(md_parts) + "\n"
 
@@ -331,23 +408,30 @@ def section_5_feature_integrity() -> tuple[pd.DataFrame, str]:
     for k, rep in reported.items():
         act = actual[k]
         match = (abs(act - rep) <= 0.05) if rep != 0 else (act == 0)
-        rows.append({
-            "statistic": k,
-            "step2_reported": rep,
-            "step3_actual": act,
-            "match_within_tolerance": bool(match),
-        })
+        rows.append(
+            {
+                "statistic": k,
+                "step2_reported": rep,
+                "step3_actual": act,
+                "match_within_tolerance": bool(match),
+            }
+        )
     # zero count (info)
-    rows.append({
-        "statistic": "zero_count",
-        "step2_reported": float("nan"),
-        "step3_actual": int((col == 0).sum()),
-        "match_within_tolerance": None,
-    })
+    rows.append(
+        {
+            "statistic": "zero_count",
+            "step2_reported": float("nan"),
+            "step3_actual": int((col == 0).sum()),
+            "match_within_tolerance": None,
+        }
+    )
     df = pd.DataFrame(rows)
     write_csv(df, TRI / "feature_integrity_check.csv")
-    md = ("\n### Section 5 — Feature matrix integrity check on `concurrent_signals_within_3h`\n\n"
-          + md_table(df) + "\n")
+    md = (
+        "\n### Section 5 — Feature matrix integrity check on `concurrent_signals_within_3h`\n\n"
+        + md_table(df)
+        + "\n"
+    )
     return df, md
 
 
@@ -370,43 +454,64 @@ def section_6_sibling_features() -> tuple[pd.DataFrame, str]:
     rows = []
     for K in (2, 3, 4):
         for algo in ("kmeans", "hierarchical"):
-            for cid in sorted(hc_sig[(hc_sig["K"] == K) & (hc_sig["algo"] == algo)]["cluster_id"].unique().tolist()):
-                grp = hc_sig[(hc_sig["K"] == K) & (hc_sig["algo"] == algo) &
-                              (hc_sig["cluster_id"] == cid)].copy()
+            for cid in sorted(
+                hc_sig[(hc_sig["K"] == K) & (hc_sig["algo"] == algo)]["cluster_id"]
+                .unique()
+                .tolist()
+            ):
+                grp = hc_sig[
+                    (hc_sig["K"] == K) & (hc_sig["algo"] == algo) & (hc_sig["cluster_id"] == cid)
+                ].copy()
                 for sib in siblings:
                     row = grp[grp["feature"] == sib]
                     if row.empty:
-                        rows.append({
-                            "K": K, "algo": algo, "cluster_id": int(cid),
-                            "feature": sib,
-                            "univariate_auc": float("nan"),
-                            "raw_p": float("nan"),
-                            "bh_p": float("nan"),
-                            "tier": "absent",
-                        })
+                        rows.append(
+                            {
+                                "K": K,
+                                "algo": algo,
+                                "cluster_id": int(cid),
+                                "feature": sib,
+                                "univariate_auc": float("nan"),
+                                "raw_p": float("nan"),
+                                "bh_p": float("nan"),
+                                "tier": "absent",
+                            }
+                        )
                         continue
                     r = row.iloc[0]
-                    rows.append({
-                        "K": K, "algo": algo, "cluster_id": int(cid),
-                        "feature": sib,
-                        "univariate_auc": float(r["univariate_auc"]),
-                        "raw_p": float(r["raw_p"]),
-                        "bh_p": float(r["bh_p"]),
-                        "tier": r["tier"],
-                    })
+                    rows.append(
+                        {
+                            "K": K,
+                            "algo": algo,
+                            "cluster_id": int(cid),
+                            "feature": sib,
+                            "univariate_auc": float(r["univariate_auc"]),
+                            "raw_p": float(r["raw_p"]),
+                            "bh_p": float(r["bh_p"]),
+                            "tier": r["tier"],
+                        }
+                    )
     df = pd.DataFrame(rows)
     write_csv(df, TRI / "sibling_family_diagnostic.csv")
 
     # Summary: count of cleared T1/T2 per (K, algo, cid) within the sibling family
-    summary = df.groupby(["K", "algo", "cluster_id", "tier"]).size().unstack(fill_value=0).reset_index()
-    md_parts = ["\n### Section 6 — Sibling-family diagnostic\n",
-                "Per (K × algo × cluster_id), tier counts within the 8 cross-pair/portfolio "
-                "features (op spec §5.15):\n\n",
-                md_table(summary), "\n\n",
-                "#### Full table (K=2 highlights)\n",
-                md_table(df[df["K"] == 2][["K", "algo", "cluster_id", "feature",
-                                            "univariate_auc", "raw_p", "bh_p", "tier"]]),
-                "\n"]
+    summary = (
+        df.groupby(["K", "algo", "cluster_id", "tier"]).size().unstack(fill_value=0).reset_index()
+    )
+    md_parts = [
+        "\n### Section 6 — Sibling-family diagnostic\n",
+        "Per (K × algo × cluster_id), tier counts within the 8 cross-pair/portfolio "
+        "features (op spec §5.15):\n\n",
+        md_table(summary),
+        "\n\n",
+        "#### Full table (K=2 highlights)\n",
+        md_table(
+            df[df["K"] == 2][
+                ["K", "algo", "cluster_id", "feature", "univariate_auc", "raw_p", "bh_p", "tier"]
+            ]
+        ),
+        "\n",
+    ]
     return df, "\n".join(md_parts) + "\n"
 
 
@@ -427,25 +532,33 @@ def section_7_k2_split_quality() -> tuple[pd.DataFrame, str]:
         sizes = sorted(sub["n"].tolist())
         split_str = "/".join(str(int(round(100 * x / 45673))) for x in sizes)
         ari_row = ari_tbl[(ari_tbl["K"] == 2) & (ari_tbl["algo"] == algo)].iloc[0]
-        rows.append({
-            "algo": algo,
-            "silhouette_sample5k": sil,
-            "size_smaller_n": int(min(sizes)),
-            "size_larger_n": int(max(sizes)),
-            "split_pct_smaller_larger": split_str,
-            "ari_kmeans_vs_hierarchical_K2": float(ari_row["ari_kmeans_vs_hierarchical_sameK"]),
-        })
+        rows.append(
+            {
+                "algo": algo,
+                "silhouette_sample5k": sil,
+                "size_smaller_n": int(min(sizes)),
+                "size_larger_n": int(max(sizes)),
+                "split_pct_smaller_larger": split_str,
+                "ari_kmeans_vs_hierarchical_K2": float(ari_row["ari_kmeans_vs_hierarchical_sameK"]),
+            }
+        )
 
     # Between-cluster variance per clustering feature (top 5)
     cluster_features_num = (
-        "mfe_held_atr", "mae_held_atr",
-        "fwd_mfe_h24_atr", "fwd_mae_h24_atr",
-        "fwd_mfe_h120_atr", "fwd_mae_h120_atr",
-        "fwd_time_to_peak_mfe", "fwd_time_to_trough_mae",
-        "fwd_oscillation_count", "fwd_monotonicity_ratio",
+        "mfe_held_atr",
+        "mae_held_atr",
+        "fwd_mfe_h24_atr",
+        "fwd_mae_h24_atr",
+        "fwd_mfe_h120_atr",
+        "fwd_mae_h120_atr",
+        "fwd_time_to_peak_mfe",
+        "fwd_time_to_trough_mae",
+        "fwd_oscillation_count",
+        "fwd_monotonicity_ratio",
     )
-    merged = signals.merge(assignments[["trade_id", "K2_kmeans", "K2_hierarchical"]],
-                            on="trade_id", how="left")
+    merged = signals.merge(
+        assignments[["trade_id", "K2_kmeans", "K2_hierarchical"]], on="trade_id", how="left"
+    )
 
     bcv_rows = []
     for algo in ("kmeans", "hierarchical"):
@@ -458,17 +571,24 @@ def section_7_k2_split_quality() -> tuple[pd.DataFrame, str]:
             between_var = float(((means - grand) ** 2 * sizes).sum() / sizes.sum())
             total_var = float(merged[feat].var(ddof=0))
             ratio = between_var / total_var if total_var > 0 else float("nan")
-            bcv_rows.append({
-                "algo": algo, "feature": feat,
-                "between_cluster_variance": between_var,
-                "total_variance": total_var,
-                "bcv_to_total_ratio": ratio,
-            })
+            bcv_rows.append(
+                {
+                    "algo": algo,
+                    "feature": feat,
+                    "between_cluster_variance": between_var,
+                    "total_variance": total_var,
+                    "bcv_to_total_ratio": ratio,
+                }
+            )
     bcv_df = pd.DataFrame(bcv_rows)
     # Top 5 per algo
     top_feats = []
     for algo in ("kmeans", "hierarchical"):
-        sub = bcv_df[bcv_df["algo"] == algo].sort_values("bcv_to_total_ratio", ascending=False).head(5)
+        sub = (
+            bcv_df[bcv_df["algo"] == algo]
+            .sort_values("bcv_to_total_ratio", ascending=False)
+            .head(5)
+        )
         top_feats.append(sub)
     top_df = pd.concat(top_feats, ignore_index=True)
 
@@ -476,10 +596,14 @@ def section_7_k2_split_quality() -> tuple[pd.DataFrame, str]:
     write_csv(qual, TRI / "k2_split_quality.csv")
     write_csv(top_df, TRI / "k2_top5_drivers_by_bcv.csv")
 
-    md_parts = ["\n### Section 7 — K=2 split quality\n",
-                md_table(qual), "\n\n",
-                "#### Top 5 clustering features by between-cluster variance ratio (per algo, K=2)\n",
-                md_table(top_df), "\n"]
+    md_parts = [
+        "\n### Section 7 — K=2 split quality\n",
+        md_table(qual),
+        "\n\n",
+        "#### Top 5 clustering features by between-cluster variance ratio (per algo, K=2)\n",
+        md_table(top_df),
+        "\n",
+    ]
     return qual, "\n".join(md_parts) + "\n"
 
 
@@ -499,8 +623,14 @@ def detect_missing() -> str:
         "filter_dry_run.csv",
     ]
     expected_strat_axes = [
-        "pair", "vol_regime", "session", "day_of_week", "hour_of_day",
-        "hour_in_4h_bar", "hour_in_d1_bar", "pre_momentum_bin",
+        "pair",
+        "vol_regime",
+        "session",
+        "day_of_week",
+        "hour_of_day",
+        "hour_in_4h_bar",
+        "hour_in_d1_bar",
+        "pre_momentum_bin",
         "trigger_magnitude_decile",
     ]
     missing = []
@@ -518,8 +648,10 @@ def detect_missing() -> str:
         ("Phase doc", "PHASE_L_ARC_1_STEP3.md (suppressed per calibration-FAIL halt rule)"),
         ("Step 3 sanity checks", "step3_sanity_checks.txt (gated on phase doc)"),
     ]
-    lines = ["\n### §missing_outputs\n",
-             "Outputs absent or incomplete due to the calibration-FAIL halt at Phase F:\n"]
+    lines = [
+        "\n### §missing_outputs\n",
+        "Outputs absent or incomplete due to the calibration-FAIL halt at Phase F:\n",
+    ]
     for tag, f in missing:
         lines.append(f"- **{tag}:** `{f}`")
     lines.append("")
@@ -633,29 +765,40 @@ Phase G (cluster effect sizes), Phase H (filter dry-run), and
 ---
 """
 
-    body = "\n".join([
-        header,
-        md1,
-        determinism_md.replace("Section 11", "Section 11 — placed at end"),  # no-op rename; we keep the determinism block down below for clarity
-    ])
+    "\n".join(
+        [
+            header,
+            md1,
+            determinism_md.replace(
+                "Section 11", "Section 11 — placed at end"
+            ),  # no-op rename; we keep the determinism block down below for clarity
+        ]
+    )
     # Reorder so determinism shows at the end with section number 11
-    doc = "\n".join([
-        header,
-        md1,
-        missing_md,
-        md2, md3, md4, md5, md6, md7,
-        determinism_md,
-        "\n### Section 12 — §verdict_pending — calibration-check FAIL\n",
-        "No verdict is committed here.",
-        "",
-        "The Phase F outcome was Tier 3 for `concurrent_signals_within_3h` against",
-        "the calibration-check target cluster (K=2 max-MAE cluster at both kmeans",
-        "and hierarchical). Per `L_ARC_PROTOCOL.md` §15 the planner runs the",
-        "outcome (a) / (b) / (c) investigation in a separate doc.",
-        "",
-        "No interpretation of the §15 outcome is offered here.",
-        "",
-    ])
+    doc = "\n".join(
+        [
+            header,
+            md1,
+            missing_md,
+            md2,
+            md3,
+            md4,
+            md5,
+            md6,
+            md7,
+            determinism_md,
+            "\n### Section 12 — §verdict_pending — calibration-check FAIL\n",
+            "No verdict is committed here.",
+            "",
+            "The Phase F outcome was Tier 3 for `concurrent_signals_within_3h` against",
+            "the calibration-check target cluster (K=2 max-MAE cluster at both kmeans",
+            "and hierarchical). Per `L_ARC_PROTOCOL.md` §15 the planner runs the",
+            "outcome (a) / (b) / (c) investigation in a separate doc.",
+            "",
+            "No interpretation of the §15 outcome is offered here.",
+            "",
+        ]
+    )
 
     out_md = OUT / "step3_triage_handover.md"
     out_md.write_text(doc, encoding="utf-8", newline="\n")

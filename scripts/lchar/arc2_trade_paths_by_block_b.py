@@ -16,9 +16,7 @@ from __future__ import annotations
 import argparse
 import datetime as _dt
 import hashlib
-import json
 import os
-import platform
 import random
 import sys
 import time
@@ -32,6 +30,7 @@ import pandas as pd
 # Force matplotlib Agg backend before pyplot import.
 os.environ["MPLBACKEND"] = "Agg"
 import matplotlib  # noqa: E402
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 from matplotlib.collections import LineCollection  # noqa: E402
@@ -44,19 +43,13 @@ if str(REPO_ROOT) not in sys.path:
 # Locked input sha256s (gate 1)
 # ---------------------------------------------------------------------------
 LOCKED_SHAS: Dict[str, str] = {
-    "results/l6/arc2/characterisation/v1_2_1_full/per_bar_paths.csv":
-        "7b2acd6ccb98f1fd145a631b318fc95d10f5cf4f42633be9c0b59738fa1696ee",
-    "results/l6/arc2/characterisation/v1_2_1_full/trade_index.csv":
-        "9f841c5b29e87ed90d34c9617431978baf3041459797cedef02fa16c27e3abb5",
-    "results/l6/arc2/characterisation/v1_1_full/signals_features.csv":
-        "71b39383632bd695b878add8b331b76bcd231ab5b9adba9eea03d69f8762483e",
-    "L6_0_METHODOLOGY_LOCK.md":
-        "4fd870b1d17380e4fc4fbfda5a43f7775d313c7a5f50dbfd1f06a3e49c519c26",
+    "results/l6/arc2/characterisation/v1_2_1_full/per_bar_paths.csv": "7b2acd6ccb98f1fd145a631b318fc95d10f5cf4f42633be9c0b59738fa1696ee",
+    "results/l6/arc2/characterisation/v1_2_1_full/trade_index.csv": "9f841c5b29e87ed90d34c9617431978baf3041459797cedef02fa16c27e3abb5",
+    "results/l6/arc2/characterisation/v1_1_full/signals_features.csv": "71b39383632bd695b878add8b331b76bcd231ab5b9adba9eea03d69f8762483e",
+    "L6_0_METHODOLOGY_LOCK.md": "4fd870b1d17380e4fc4fbfda5a43f7775d313c7a5f50dbfd1f06a3e49c519c26",
 }
 
-OUTPUT_DIR_REL = (
-    "results/l6/arc2/characterisation/extended/trade_paths_by_block_b"
-)
+OUTPUT_DIR_REL = "results/l6/arc2/characterisation/extended/trade_paths_by_block_b"
 
 # Plot constants
 K_MAX = 240
@@ -146,7 +139,10 @@ def load_signals_features(path: Path) -> pd.DataFrame:
     """Load signals_features.csv and filter to taken==True."""
     print("  Loading signals_features.csv...", flush=True)
     usecols = [
-        "pair", "time", "fold_id", "taken",
+        "pair",
+        "time",
+        "fold_id",
+        "taken",
         "bars_to_plus_2atr_capped_240h",
         "bars_to_minus_2atr_capped_240h",
     ]
@@ -165,18 +161,19 @@ def load_trade_index(path: Path) -> pd.DataFrame:
     return ti
 
 
-def join_taken_to_trade_index(
-    sf_taken: pd.DataFrame, ti: pd.DataFrame
-) -> pd.DataFrame:
+def join_taken_to_trade_index(sf_taken: pd.DataFrame, ti: pd.DataFrame) -> pd.DataFrame:
     """Match each trade in trade_index to its signals_features row by (pair, ts).
 
     Returns ti augmented with bp1 / bm1 columns.
     """
-    sf_lookup = sf_taken[[
-        "pair", "time",
-        "bars_to_plus_2atr_capped_240h",
-        "bars_to_minus_2atr_capped_240h",
-    ]].rename(columns={"time": "signal_bar_ts"})
+    sf_lookup = sf_taken[
+        [
+            "pair",
+            "time",
+            "bars_to_plus_2atr_capped_240h",
+            "bars_to_minus_2atr_capped_240h",
+        ]
+    ].rename(columns={"time": "signal_bar_ts"})
 
     merged = ti.merge(
         sf_lookup,
@@ -184,15 +181,15 @@ def join_taken_to_trade_index(
         how="left",
         validate="one_to_one",
     )
-    merged = merged.rename(columns={
-        "bars_to_plus_2atr_capped_240h": "bp1",
-        "bars_to_minus_2atr_capped_240h": "bm1",
-    })
+    merged = merged.rename(
+        columns={
+            "bars_to_plus_2atr_capped_240h": "bp1",
+            "bars_to_minus_2atr_capped_240h": "bm1",
+        }
+    )
     if merged["bp1"].isna().any() or merged["bm1"].isna().any():
         n_miss = int(merged["bp1"].isna().sum() + merged["bm1"].isna().sum())
-        raise RuntimeError(
-            f"Join HALT - {n_miss} rows have unmatched bp1/bm1 after merge"
-        )
+        raise RuntimeError(f"Join HALT - {n_miss} rows have unmatched bp1/bm1 after merge")
     merged["bp1"] = merged["bp1"].astype(np.int64)
     merged["bm1"] = merged["bm1"].astype(np.int64)
     return merged
@@ -205,13 +202,9 @@ def gate_bp1_bm1_validity(ti: pd.DataFrame) -> bool:
     bp1 = ti["bp1"].to_numpy()
     bm1 = ti["bm1"].to_numpy()
     if np.any(bp1 < 1) or np.any(bp1 > 241):
-        raise RuntimeError(
-            f"Gate 5 HALT - bp1 out of [1,241]: min={bp1.min()} max={bp1.max()}"
-        )
+        raise RuntimeError(f"Gate 5 HALT - bp1 out of [1,241]: min={bp1.min()} max={bp1.max()}")
     if np.any(bm1 < 1) or np.any(bm1 > 241):
-        raise RuntimeError(
-            f"Gate 5 HALT - bm1 out of [1,241]: min={bm1.min()} max={bm1.max()}"
-        )
+        raise RuntimeError(f"Gate 5 HALT - bm1 out of [1,241]: min={bm1.min()} max={bm1.max()}")
     return True
 
 
@@ -266,14 +259,10 @@ def gate_exhaustivity(ti_cat: pd.DataFrame) -> Dict[str, int]:
     observed_set = set(counts.keys())
     unknown = observed_set - expected_set
     if unknown:
-        raise RuntimeError(
-            f"Gate 3 HALT - unknown categories observed: {unknown}"
-        )
+        raise RuntimeError(f"Gate 3 HALT - unknown categories observed: {unknown}")
     # check for empty strings (unassigned)
     if (ti_cat["category"] == "").any():
-        raise RuntimeError(
-            "Gate 3 HALT - some trades unassigned (empty category)"
-        )
+        raise RuntimeError("Gate 3 HALT - some trades unassigned (empty category)")
     total = int(sum(counts.values()))
     if total != EXPECTED_TOTAL_TRADES:
         raise RuntimeError(
@@ -325,8 +314,7 @@ def build_per_trade_paths(
         ks = k_arr[s:e]
         cs = close_R_arr[s:e]
         mask = ks <= K_MAX
-        per_trade[tid] = (ks[mask].astype(np.int32),
-                          cs[mask].astype(np.float64))
+        per_trade[tid] = (ks[mask].astype(np.int32), cs[mask].astype(np.float64))
     return per_trade
 
 
@@ -369,14 +357,16 @@ def compute_per_bar_aggregates(
                 med = float(np.median(valid))
                 q25 = float(np.quantile(valid, 0.25))
                 q75 = float(np.quantile(valid, 0.75))
-            rows.append({
-                "category": cat,
-                "k": k,
-                "n_active": n_active,
-                "median_close_R": med,
-                "q25_close_R": q25,
-                "q75_close_R": q75,
-            })
+            rows.append(
+                {
+                    "category": cat,
+                    "k": k,
+                    "n_active": n_active,
+                    "median_close_R": med,
+                    "q25_close_R": q25,
+                    "q75_close_R": q75,
+                }
+            )
             cat_aggs[k] = (med, q25, q75, n_active)
         aggregates[cat] = cat_aggs
 
@@ -433,13 +423,17 @@ def _plot_category(
         rng = random.Random(SAMPLE_SEED)
         plot_tids = sorted(rng.sample(plot_tids, PLOT_SAMPLE_CAP))
         sampling_note[cat] = {
-            "sampled": True, "n_plotted": len(plot_tids),
-            "n_total": len(tids), "seed": SAMPLE_SEED,
+            "sampled": True,
+            "n_plotted": len(plot_tids),
+            "n_total": len(tids),
+            "seed": SAMPLE_SEED,
         }
     else:
         sampling_note[cat] = {
-            "sampled": False, "n_plotted": len(plot_tids),
-            "n_total": len(tids), "seed": None,
+            "sampled": False,
+            "n_plotted": len(plot_tids),
+            "n_total": len(tids),
+            "seed": None,
         }
 
     # Build line segments for LineCollection
@@ -470,12 +464,21 @@ def _plot_category(
     q75 = np.array([aggs[k][2] for k in k_grid])
     valid_med = ~np.isnan(med)
     ax.fill_between(
-        k_grid[valid_med], q25[valid_med], q75[valid_med],
-        color=light, alpha=0.15, zorder=2, linewidth=0,
+        k_grid[valid_med],
+        q25[valid_med],
+        q75[valid_med],
+        color=light,
+        alpha=0.15,
+        zorder=2,
+        linewidth=0,
     )
     ax.plot(
-        k_grid[valid_med], med[valid_med],
-        color=dark, linewidth=2.5, alpha=1.0, zorder=3,
+        k_grid[valid_med],
+        med[valid_med],
+        color=dark,
+        linewidth=2.5,
+        alpha=1.0,
+        zorder=3,
         label="median",
     )
 
@@ -486,9 +489,12 @@ def _plot_category(
     ax.set_title(f"{cat} ({n_str}) - Block B at 1R", fontsize=title_size)
     if annotate:
         ax.text(
-            122, Y_MAX - 0.4,
+            122,
+            Y_MAX - 0.4,
             "k > 120 is post-exit forward observation",
-            fontsize=8, color="dimgray", style="italic",
+            fontsize=8,
+            color="dimgray",
+            style="italic",
             verticalalignment="top",
         )
 
@@ -502,8 +508,7 @@ def render_plots(
     sampling_note: Dict[str, Any] = {}
 
     cat_tids_map: Dict[str, List[int]] = {
-        cat: ti_cat.loc[ti_cat["category"] == cat, "trade_id"]
-                  .astype(int).tolist()
+        cat: ti_cat.loc[ti_cat["category"] == cat, "trade_id"].astype(int).tolist()
         for cat in CATEGORY_META.keys()
     }
 
@@ -513,8 +518,12 @@ def render_plots(
         fname = f"plot_{plot_no:02d}_{cat}.png"
         fig, ax = plt.subplots(figsize=FIG_SIZE, dpi=DPI)
         _plot_category(
-            ax, cat, cat_tids_map[cat], per_trade,
-            aggregates[cat], sampling_note,
+            ax,
+            cat,
+            cat_tids_map[cat],
+            per_trade,
+            aggregates[cat],
+            sampling_note,
         )
         fig.tight_layout()
         fig.savefig(out_dir / fname, dpi=DPI)
@@ -527,9 +536,14 @@ def render_plots(
     for ax, cat in zip(axes.flatten(), order):
         # Reuse sampling_note but ensure deterministic
         _plot_category(
-            ax, cat, cat_tids_map[cat], per_trade,
-            aggregates[cat], sampling_note,
-            title_size=11, annotate=False,
+            ax,
+            cat,
+            cat_tids_map[cat],
+            per_trade,
+            aggregates[cat],
+            sampling_note,
+            title_size=11,
+            annotate=False,
         )
     fig.suptitle("Block B trade paths by category (1R threshold)", fontsize=14)
     fig.tight_layout(rect=(0, 0, 1, 0.97))
@@ -590,9 +604,7 @@ def gate_plot_files(out_dir: Path) -> Dict[str, int]:
             raise RuntimeError(f"Gate 7 HALT - missing {fname}")
         sz = p.stat().st_size
         if sz < 100 * 1024:
-            raise RuntimeError(
-                f"Gate 7 HALT - {fname} size {sz} bytes < 100KB"
-            )
+            raise RuntimeError(f"Gate 7 HALT - {fname} size {sz} bytes < 100KB")
         sizes[fname] = sz
     return sizes
 
@@ -602,9 +614,7 @@ def gate_aggregate_plausibility(
 ) -> None:
     only_up_120 = aggregates["only_up"][120][0]
     if not (only_up_120 > 0):
-        raise RuntimeError(
-            f"Gate 8 HALT - only_up median at k=120 ({only_up_120:.4f}) <= 0"
-        )
+        raise RuntimeError(f"Gate 8 HALT - only_up median at k=120 ({only_up_120:.4f}) <= 0")
     straight_120 = aggregates["straight_to_sl"][120][0]
     if not (straight_120 < -0.5):
         raise RuntimeError(
@@ -654,11 +664,10 @@ def write_report(
     lines.append("|---|---:|---|---:|")
     for cat, meta in CATEGORY_META.items():
         lines.append(
-            f"| {cat} | {counts.get(cat,0)} | "
-            f"{meta['block_b_name']} | {meta['expected_n']} |"
+            f"| {cat} | {counts.get(cat, 0)} | {meta['block_b_name']} | {meta['expected_n']} |"
         )
     for resid in RESIDUAL_CATEGORIES:
-        lines.append(f"| _{resid}_ (residual) | {counts.get(resid,0)} | - | - |")
+        lines.append(f"| _{resid}_ (residual) | {counts.get(resid, 0)} | - | - |")
     lines.append(f"| **Total** | **{sum(counts.values())}** | | **3993** |")
     lines.append("")
 
@@ -670,10 +679,7 @@ def write_report(
         sub = ti_cat[ti_cat["category"] == cat]
         if sub.empty:
             continue
-        lines.append(
-            f"| {cat} | {len(sub)} | {sub['R'].mean():.4f} | "
-            f"{sub['R'].median():.4f} |"
-        )
+        lines.append(f"| {cat} | {len(sub)} | {sub['R'].mean():.4f} | {sub['R'].median():.4f} |")
     lines.append("")
 
     lines.append("## Per-bar median bar_close_R (R-units from entry)")
@@ -691,13 +697,10 @@ def write_report(
     for cat, info in sampling_note.items():
         if info["sampled"]:
             lines.append(
-                f"- `{cat}`: sampled {info['n_plotted']} of {info['n_total']}"
-                f" (seed={info['seed']})"
+                f"- `{cat}`: sampled {info['n_plotted']} of {info['n_total']} (seed={info['seed']})"
             )
         else:
-            lines.append(
-                f"- `{cat}`: plotted all {info['n_total']} (no sampling)"
-            )
+            lines.append(f"- `{cat}`: plotted all {info['n_total']} (no sampling)")
     lines.append("")
 
     p.write_text("\n".join(lines), encoding="utf-8")
@@ -731,7 +734,7 @@ def write_manifest(
     lines.append("=" * 78)
     lines.append("Arc 2 - Per-Trade Paths by Block B Category - run manifest")
     lines.append("=" * 78)
-    lines.append(f"phase: l6_arc2_trade_paths_by_block_b")
+    lines.append("phase: l6_arc2_trade_paths_by_block_b")
     lines.append(f"python: {sys.version.split()[0]}")
     lines.append(f"numpy: {np.__version__}")
     lines.append(f"pandas: {pd.__version__}")
@@ -744,11 +747,11 @@ def write_manifest(
     lines.append("--- CATEGORY COUNTS ---")
     for cat, meta in CATEGORY_META.items():
         lines.append(
-            f"{cat}: {counts.get(cat,0)} (target {meta['expected_n']},"
+            f"{cat}: {counts.get(cat, 0)} (target {meta['expected_n']},"
             f" band [{meta['min_n']},{meta['max_n']}])"
         )
     for resid in RESIDUAL_CATEGORIES:
-        lines.append(f"{resid}: {counts.get(resid,0)}")
+        lines.append(f"{resid}: {counts.get(resid, 0)}")
     lines.append(f"total: {sum(counts.values())}")
     lines.append("")
     lines.append("--- SAMPLING ---")
@@ -761,7 +764,8 @@ def write_manifest(
     lines.append("--- OUTPUT FILE SHA256s ---")
     # Exclude run_manifest.txt itself and _run_perf.txt (volatile)
     out_files = sorted(
-        f for f in out_dir.iterdir()
+        f
+        for f in out_dir.iterdir()
         if f.is_file() and f.name not in ("run_manifest.txt", "_run_perf.txt")
     )
     for f in out_files:
@@ -777,7 +781,9 @@ def write_manifest(
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "--out-dir", type=Path, default=REPO_ROOT / OUTPUT_DIR_REL,
+        "--out-dir",
+        type=Path,
+        default=REPO_ROOT / OUTPUT_DIR_REL,
         help="Output directory (default: results/.../trade_paths_by_block_b)",
     )
     args = parser.parse_args()
@@ -801,22 +807,17 @@ def main() -> int:
 
     print("[Gate 2] Row count parity...", flush=True)
     if len(ti) != EXPECTED_TOTAL_TRADES:
-        raise RuntimeError(
-            f"Gate 2 HALT - trade_index rows {len(ti)} != {EXPECTED_TOTAL_TRADES}"
-        )
+        raise RuntimeError(f"Gate 2 HALT - trade_index rows {len(ti)} != {EXPECTED_TOTAL_TRADES}")
     if len(sf_taken) != EXPECTED_TOTAL_TRADES:
         raise RuntimeError(
-            f"Gate 2 HALT - signals_features taken rows {len(sf_taken)}"
-            f" != {EXPECTED_TOTAL_TRADES}"
+            f"Gate 2 HALT - signals_features taken rows {len(sf_taken)} != {EXPECTED_TOTAL_TRADES}"
         )
     # per_bar_paths row count check
     with pb_path.open("rb") as fp:
         # subtract header
         n_pb = sum(1 for _ in fp) - 1
     if n_pb != EXPECTED_PER_BAR_ROWS:
-        raise RuntimeError(
-            f"Gate 2 HALT - per_bar_paths rows {n_pb} != {EXPECTED_PER_BAR_ROWS}"
-        )
+        raise RuntimeError(f"Gate 2 HALT - per_bar_paths rows {n_pb} != {EXPECTED_PER_BAR_ROWS}")
     print(f"  OK - trade_index={len(ti)}, taken={len(sf_taken)}, per_bar={n_pb}", flush=True)
 
     print("[Merge] Joining signals_features (bp1/bm1) to trade_index...", flush=True)
@@ -833,7 +834,7 @@ def main() -> int:
     print("[Gate 3] Exhaustivity...", flush=True)
     counts = gate_exhaustivity(ti_cat)
     for cat in list(CATEGORY_META.keys()) + list(RESIDUAL_CATEGORIES):
-        print(f"  {cat}: {counts.get(cat,0)}", flush=True)
+        print(f"  {cat}: {counts.get(cat, 0)}", flush=True)
 
     print("[Gate 4] Category counts vs Block B reference (±2.5%)...", flush=True)
     gate_category_counts(counts)
@@ -865,15 +866,24 @@ def main() -> int:
 
     print("[Write] category_assignment.csv...", flush=True)
     assignment_cols = [
-        "trade_id", "pair", "signal_bar_ts", "fold_id",
-        "exit_reason", "held_bars", "bp1", "bm1", "category", "R",
+        "trade_id",
+        "pair",
+        "signal_bar_ts",
+        "fold_id",
+        "exit_reason",
+        "held_bars",
+        "bp1",
+        "bm1",
+        "category",
+        "R",
     ]
     ti_cat[assignment_cols].to_csv(out_dir / "category_assignment.csv", index=False)
 
     print("[Write] per_bar_aggregates_by_category.csv...", flush=True)
     per_bar_agg_df.to_csv(
         out_dir / "per_bar_aggregates_by_category.csv",
-        index=False, float_format="%.10g",
+        index=False,
+        float_format="%.10g",
     )
 
     print("[Plot] Rendering 5 PNGs...", flush=True)
@@ -882,7 +892,7 @@ def main() -> int:
     print("[Gate 7] Plot files exist and > 100KB...", flush=True)
     sizes = gate_plot_files(out_dir)
     for fname, sz in sizes.items():
-        print(f"  {fname}: {sz/1024:.1f} KB", flush=True)
+        print(f"  {fname}: {sz / 1024:.1f} KB", flush=True)
 
     elapsed = time.perf_counter() - t0
     mem_current, mem_peak = tracemalloc.get_traced_memory()
@@ -890,15 +900,12 @@ def main() -> int:
     mem_peak_mb = mem_peak / (1024 * 1024)
 
     print("[Write] paths_by_block_b_report.md...", flush=True)
-    write_report(out_dir, counts, ti_cat, aggregates, sampling_note,
-                 elapsed, mem_peak_mb)
+    write_report(out_dir, counts, ti_cat, aggregates, sampling_note, elapsed, mem_peak_mb)
 
     print("[Write] run_manifest.txt...", flush=True)
-    write_manifest(out_dir, observed_input_shas, counts, sampling_note,
-                   elapsed, mem_peak_mb)
+    write_manifest(out_dir, observed_input_shas, counts, sampling_note, elapsed, mem_peak_mb)
 
-    print(f"[Done] wallclock={elapsed:.2f}s peak_memory={mem_peak_mb:.1f} MB",
-          flush=True)
+    print(f"[Done] wallclock={elapsed:.2f}s peak_memory={mem_peak_mb:.1f} MB", flush=True)
     return 0
 
 

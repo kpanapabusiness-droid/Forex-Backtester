@@ -124,7 +124,9 @@ def _load_base_config_for_wfo(base_path: Path, config_file_dir: Path) -> dict:
     if not resolved.exists():
         resolved = (ROOT / base_path).resolve()
     if not resolved.exists():
-        raise FileNotFoundError(f"base_config not found: {base_path} (tried {config_file_dir / base_path}, {ROOT / base_path})")
+        raise FileNotFoundError(
+            f"base_config not found: {base_path} (tried {config_file_dir / base_path}, {ROOT / base_path})"
+        )
     raw = _load_yaml(resolved)
     raw.setdefault("data_dir", (raw.get("data") or {}).get("dir") or "data/daily")
     from validators_config import validate_config  # noqa: E402
@@ -154,14 +156,22 @@ def _validate_base_indicators(base: dict) -> None:
     use_exit = ind.get("use_exit") in (True, "true", 1)
     if use_baseline:
         baseline = ind.get("baseline")
-        if baseline is None or baseline is False or (isinstance(baseline, str) and not baseline.strip()):
+        if (
+            baseline is None
+            or baseline is False
+            or (isinstance(baseline, str) and not baseline.strip())
+        ):
             raise ValueError(
                 "Base config has use_baseline=true but baseline name is missing or null. "
                 "Set indicators.baseline in the base config (e.g. baseline_ema)."
             )
     if use_exit:
         exit_name = ind.get("exit")
-        if exit_name is None or exit_name is False or (isinstance(exit_name, str) and not exit_name.strip()):
+        if (
+            exit_name is None
+            or exit_name is False
+            or (isinstance(exit_name, str) and not exit_name.strip())
+        ):
             raise ValueError(
                 "Base config has use_exit=true but exit name is missing or null. "
                 "Set indicators.exit in the base config (e.g. exit_twiggs_money_flow)."
@@ -175,14 +185,22 @@ def _validate_role_names(role_names: dict, base: dict) -> None:
     use_exit = ind.get("use_exit") in (True, "true", 1)
     if use_baseline:
         baseline = role_names.get("baseline")
-        if baseline is None or baseline is False or (isinstance(baseline, str) and not baseline.strip()):
+        if (
+            baseline is None
+            or baseline is False
+            or (isinstance(baseline, str) and not baseline.strip())
+        ):
             raise ValueError(
                 "use_baseline is true but baseline ended up null in candidate config. "
                 "Ensure base config has indicators.baseline set and it is not overwritten by sweep."
             )
     if use_exit:
         exit_name = role_names.get("exit")
-        if exit_name is None or exit_name is False or (isinstance(exit_name, str) and not exit_name.strip()):
+        if (
+            exit_name is None
+            or exit_name is False
+            or (isinstance(exit_name, str) and not exit_name.strip())
+        ):
             raise ValueError(
                 "use_exit is true but exit ended up null in candidate config. "
                 "Ensure base config has indicators.exit set and it is not overwritten by sweep."
@@ -226,7 +244,10 @@ def _run_is_sweep(
             role_choices[role] = [{"name": pinned_name, "params": {}}]
     combos = list(
         itertools.product(
-            *[[(r, ch) for ch in role_choices[r]] for r in ["c1", "c2", "baseline", "volume", "exit"]]
+            *[
+                [(r, ch) for ch in role_choices[r]]
+                for r in ["c1", "c2", "baseline", "volume", "exit"]
+            ]
         )
     )
     static = sweep_cfg.get("static_overrides") or {}
@@ -268,7 +289,15 @@ def _select_winner(
     if not runs:
         raise ValueError("No runs to select from")
     metric_lower = (metric or "roi_pct").lower()
-    desc_metrics = {"roi_pct", "roi_dollars", "expectancy", "total_trades", "wins", "win_rate_ns", "win_rate"}
+    desc_metrics = {
+        "roi_pct",
+        "roi_dollars",
+        "expectancy",
+        "total_trades",
+        "wins",
+        "win_rate_ns",
+        "win_rate",
+    }
     primary_desc = metric_lower in desc_metrics
 
     def sort_key(item: tuple) -> tuple:
@@ -318,7 +347,9 @@ def _get_folds_for_wfo(wfo: dict, base: dict):
                 raise ValueError(
                     f"Explicit fold {i}: expect train_start < train_end < test_start <= test_end; got {f}"
                 )
-            folds_out.append(WfoFold(fold_id=i, train_start=ts, train_end=te, test_start=os, test_end=oe))
+            folds_out.append(
+                WfoFold(fold_id=i, train_start=ts, train_end=te, test_start=os, test_end=oe)
+            )
         return folds_out
     data_scope = wfo.get("data_scope") or {}
     base_dr = base.get("date_range") or {}
@@ -397,7 +428,9 @@ def run_wfo_v2(config_path: str | Path) -> None:
             "test_start": str(f.test_start),
             "test_end": str(f.test_end),
         }
-        (fold_dir / "fold_dates.json").write_text(json.dumps(fold_dates, indent=2), encoding="utf-8")
+        (fold_dir / "fold_dates.json").write_text(
+            json.dumps(fold_dates, indent=2), encoding="utf-8"
+        )
 
         is_dir = fold_dir / "in_sample"
         oos_dir = fold_dir / "out_of_sample"
@@ -423,7 +456,11 @@ def run_wfo_v2(config_path: str | Path) -> None:
             )
             (fold_dir / "is_selection.json").write_text(
                 json.dumps(
-                    {"metric": selection_metric, "tie_break_order": tie_break_order, "runs": selection_record},
+                    {
+                        "metric": selection_metric,
+                        "tie_break_order": tie_break_order,
+                        "runs": selection_record,
+                    },
                     indent=2,
                 ),
                 encoding="utf-8",
@@ -446,6 +483,7 @@ def run_wfo_v2(config_path: str | Path) -> None:
             oos_trades_path = oos_dir / "trades.csv"
             oos_trades = len(pd.read_csv(oos_trades_path)) if oos_trades_path.exists() else 0
         else:
+
             def _run_cfg(cfg: dict, start: str, end: str, results_dir: Path) -> None:
                 c = deepcopy(cfg)
                 c["date_range"] = {"start": start, "end": end}
@@ -466,9 +504,7 @@ def run_wfo_v2(config_path: str | Path) -> None:
         "swept_roles": swept_roles,
         "folds": fold_meta,
     }
-    (run_dir / "wfo_run_meta.json").write_text(
-        json.dumps(run_meta, indent=2), encoding="utf-8"
-    )
+    (run_dir / "wfo_run_meta.json").write_text(json.dumps(run_meta, indent=2), encoding="utf-8")
     print(f"WFO v2 complete: {run_dir}")
 
 

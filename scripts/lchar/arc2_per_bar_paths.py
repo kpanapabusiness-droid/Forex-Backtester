@@ -32,7 +32,6 @@ from __future__ import annotations
 import argparse
 import datetime as _dt
 import hashlib
-import os
 import sys
 import tempfile
 import time
@@ -47,15 +46,39 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from core.signals.l4_mtf_alignment_2_down_mixed_kijun import (  # noqa: E402
-    _load_pair_tf,
     TIME_COL,
+    _load_pair_tf,
 )
 
 PAIRS_DEFAULT: Tuple[str, ...] = (
-    "AUD_CAD", "AUD_CHF", "AUD_JPY", "AUD_NZD", "AUD_USD", "CAD_CHF", "CAD_JPY", "CHF_JPY",
-    "EUR_AUD", "EUR_CAD", "EUR_CHF", "EUR_GBP", "EUR_JPY", "EUR_NZD", "EUR_USD", "GBP_AUD",
-    "GBP_CAD", "GBP_CHF", "GBP_JPY", "GBP_NZD", "GBP_USD", "NZD_CAD", "NZD_CHF", "NZD_JPY",
-    "NZD_USD", "USD_CAD", "USD_CHF", "USD_JPY",
+    "AUD_CAD",
+    "AUD_CHF",
+    "AUD_JPY",
+    "AUD_NZD",
+    "AUD_USD",
+    "CAD_CHF",
+    "CAD_JPY",
+    "CHF_JPY",
+    "EUR_AUD",
+    "EUR_CAD",
+    "EUR_CHF",
+    "EUR_GBP",
+    "EUR_JPY",
+    "EUR_NZD",
+    "EUR_USD",
+    "GBP_AUD",
+    "GBP_CAD",
+    "GBP_CHF",
+    "GBP_JPY",
+    "GBP_NZD",
+    "GBP_USD",
+    "NZD_CAD",
+    "NZD_CHF",
+    "NZD_JPY",
+    "NZD_USD",
+    "USD_CAD",
+    "USD_CHF",
+    "USD_JPY",
 )
 
 HORIZON_MAX: int = 240
@@ -64,18 +87,12 @@ SENTINEL_NOT_BREACHED: int = 241
 
 # Per-prompt §1, locked input sha256s verified at run start.
 LOCKED_SHAS: Dict[str, str] = {
-    "results/l6/arc2/characterisation/v1_1_full/signals_features.csv":
-        "71b39383632bd695b878add8b331b76bcd231ab5b9adba9eea03d69f8762483e",
-    "results/l6/arc2/characterisation/v1_1_full/pipeline_diff_manifest.md":
-        "73969d69c4b3b9033d872ad1e7f3d99c1367c12073a22bd1a27f84a8f07435fc",
-    "scripts/lchar/arc2_characterisation_v1_1.py":
-        "5d32627a1c4691ef654315dd5f35401d3a4e811bc20c0d48cd64a33debcb5105",
-    "core/signals/l4_mtf_alignment_2_down_mixed_kijun.py":
-        "3c8d0f5d4b446f84359ab0663df36869f15b47cf1bf18fbc6caff807dc5134e3",
-    "configs/wfo_l6_arc2.yaml":
-        "25917151bc84a73885eeea9ca9c4cc15b1c277ba793706b158abd3aee0ab6328",
-    "L6_0_METHODOLOGY_LOCK.md":
-        "4fd870b1d17380e4fc4fbfda5a43f7775d313c7a5f50dbfd1f06a3e49c519c26",
+    "results/l6/arc2/characterisation/v1_1_full/signals_features.csv": "71b39383632bd695b878add8b331b76bcd231ab5b9adba9eea03d69f8762483e",
+    "results/l6/arc2/characterisation/v1_1_full/pipeline_diff_manifest.md": "73969d69c4b3b9033d872ad1e7f3d99c1367c12073a22bd1a27f84a8f07435fc",
+    "scripts/lchar/arc2_characterisation_v1_1.py": "5d32627a1c4691ef654315dd5f35401d3a4e811bc20c0d48cd64a33debcb5105",
+    "core/signals/l4_mtf_alignment_2_down_mixed_kijun.py": "3c8d0f5d4b446f84359ab0663df36869f15b47cf1bf18fbc6caff807dc5134e3",
+    "configs/wfo_l6_arc2.yaml": "25917151bc84a73885eeea9ca9c4cc15b1c277ba793706b158abd3aee0ab6328",
+    "L6_0_METHODOLOGY_LOCK.md": "4fd870b1d17380e4fc4fbfda5a43f7775d313c7a5f50dbfd1f06a3e49c519c26",
 }
 
 # Spot-check trades carried over from Phase 1 (v1.1 manifest §5) for direct
@@ -130,9 +147,7 @@ def _per_bar_walk(
     """
     n = len(highs)
     if entry_idx >= n:
-        raise RuntimeError(
-            f"entry_idx={entry_idx} >= bar count {n}; cannot walk forward"
-        )
+        raise RuntimeError(f"entry_idx={entry_idx} >= bar count {n}; cannot walk forward")
     max_k = min(horizon_max, n - entry_idx)
 
     bar_high_atr = np.empty(max_k, dtype=np.float64)
@@ -193,11 +208,17 @@ def _build_taken_trade_index(
     # Bring in trade-level fields from trades_all.csv.
     join_cols = ["pair", "signal_bar_ts"]
     bring = [
-        "entry_price", "atr_1h_wilder_at_signal",
-        "held_bars", "exit_reason", "R",
+        "entry_price",
+        "atr_1h_wilder_at_signal",
+        "held_bars",
+        "exit_reason",
+        "R",
     ]
     merged = v1[["trade_id", "pair", "signal_bar_ts", "fold_id"]].merge(
-        tr[join_cols + bring], on=join_cols, how="left", validate="one_to_one",
+        tr[join_cols + bring],
+        on=join_cols,
+        how="left",
+        validate="one_to_one",
     )
     if merged[bring].isna().any().any():
         missing = merged[merged[bring].isna().any(axis=1)]
@@ -260,8 +281,7 @@ def _compute_per_bar_paths(
 
         if sig_ts not in pair_time_idx[pair]:
             raise RuntimeError(
-                f"signal_bar_ts {sig_ts} not found in {pair} 1H series — "
-                f"data join failure"
+                f"signal_bar_ts {sig_ts} not found in {pair} 1H series — data join failure"
             )
         sig_idx = pair_time_idx[pair][sig_ts]
         entry_idx = sig_idx + 1  # bar_offset = 1 per Arc 2 config (matches v1.1).
@@ -295,34 +315,52 @@ def _compute_per_bar_paths(
         bc_chunks.append(walk["bar_close_atr"])
         clamp_chunks.append(clamp_arr)
 
-    per_bar_df = pd.DataFrame({
-        "trade_id": np.concatenate(trade_id_chunks),
-        "pair": np.concatenate(pair_chunks),
-        "signal_bar_ts": np.concatenate(sig_ts_chunks),
-        "fold_id": np.concatenate(fold_chunks),
-        "k": np.concatenate(k_chunks),
-        "running_mfe_atr": np.concatenate(rmfe_chunks),
-        "running_mae_atr": np.concatenate(rmae_chunks),
-        "bar_high_atr": np.concatenate(bh_chunks),
-        "bar_low_atr": np.concatenate(bl_chunks),
-        "bar_close_atr": np.concatenate(bc_chunks),
-        "is_clamped_data_end": np.concatenate(clamp_chunks),
-    })
+    per_bar_df = pd.DataFrame(
+        {
+            "trade_id": np.concatenate(trade_id_chunks),
+            "pair": np.concatenate(pair_chunks),
+            "signal_bar_ts": np.concatenate(sig_ts_chunks),
+            "fold_id": np.concatenate(fold_chunks),
+            "k": np.concatenate(k_chunks),
+            "running_mfe_atr": np.concatenate(rmfe_chunks),
+            "running_mae_atr": np.concatenate(rmae_chunks),
+            "bar_high_atr": np.concatenate(bh_chunks),
+            "bar_low_atr": np.concatenate(bl_chunks),
+            "bar_close_atr": np.concatenate(bc_chunks),
+            "is_clamped_data_end": np.concatenate(clamp_chunks),
+        }
+    )
 
     # Append bars_available to trade_index in spec order.
     out_idx = trade_index.copy()
     out_idx["bars_available"] = pd.Series(bars_available_list, dtype=np.int64)
-    out_idx = out_idx[[
-        "trade_id", "pair", "signal_bar_ts", "fold_id", "entry_price",
-        "atr_1h_wilder_at_signal", "held_bars", "exit_reason", "R", "gross_r",
-        "spread_cost_r", "mfe_R", "mae_R", "bars_available",
-    ]]
+    out_idx = out_idx[
+        [
+            "trade_id",
+            "pair",
+            "signal_bar_ts",
+            "fold_id",
+            "entry_price",
+            "atr_1h_wilder_at_signal",
+            "held_bars",
+            "exit_reason",
+            "R",
+            "gross_r",
+            "spread_cost_r",
+            "mfe_R",
+            "mae_R",
+            "bars_available",
+        ]
+    ]
 
     return per_bar_df, out_idx
 
 
 def _write_outputs(
-    *, out_dir: Path, per_bar_df: pd.DataFrame, trade_index_df: pd.DataFrame,
+    *,
+    out_dir: Path,
+    per_bar_df: pd.DataFrame,
+    trade_index_df: pd.DataFrame,
 ) -> Dict[str, Path]:
     """Write the two CSVs with deterministic float formatting.
 
@@ -342,15 +380,27 @@ def _write_outputs(
         "%Y-%m-%dT%H:%M:%S"
     )
     # Force schema column order.
-    pb_out = pb_out[[
-        "trade_id", "pair", "signal_bar_ts", "fold_id", "k",
-        "running_mfe_atr", "running_mae_atr",
-        "bar_high_atr", "bar_low_atr", "bar_close_atr",
-        "is_clamped_data_end",
-    ]]
+    pb_out = pb_out[
+        [
+            "trade_id",
+            "pair",
+            "signal_bar_ts",
+            "fold_id",
+            "k",
+            "running_mfe_atr",
+            "running_mae_atr",
+            "bar_high_atr",
+            "bar_low_atr",
+            "bar_close_atr",
+            "is_clamped_data_end",
+        ]
+    ]
     per_bar_path = out_dir / "per_bar_paths.csv"
     pb_out.to_csv(
-        per_bar_path, index=False, lineterminator="\n", float_format="%.10g",
+        per_bar_path,
+        index=False,
+        lineterminator="\n",
+        float_format="%.10g",
     )
 
     # ----- trade_index.csv -----
@@ -359,14 +409,30 @@ def _write_outputs(
     ti_out["signal_bar_ts"] = pd.to_datetime(ti_out["signal_bar_ts"]).dt.strftime(
         "%Y-%m-%dT%H:%M:%S"
     )
-    ti_out = ti_out[[
-        "trade_id", "pair", "signal_bar_ts", "fold_id", "entry_price",
-        "atr_1h_wilder_at_signal", "held_bars", "exit_reason", "R", "gross_r",
-        "spread_cost_r", "mfe_R", "mae_R", "bars_available",
-    ]]
+    ti_out = ti_out[
+        [
+            "trade_id",
+            "pair",
+            "signal_bar_ts",
+            "fold_id",
+            "entry_price",
+            "atr_1h_wilder_at_signal",
+            "held_bars",
+            "exit_reason",
+            "R",
+            "gross_r",
+            "spread_cost_r",
+            "mfe_R",
+            "mae_R",
+            "bars_available",
+        ]
+    ]
     trade_index_path = out_dir / "trade_index.csv"
     ti_out.to_csv(
-        trade_index_path, index=False, lineterminator="\n", float_format="%.10g",
+        trade_index_path,
+        index=False,
+        lineterminator="\n",
+        float_format="%.10g",
     )
 
     return {"per_bar_paths.csv": per_bar_path, "trade_index.csv": trade_index_path}
@@ -402,15 +468,33 @@ def _validate_gates(
 
     # ----- Gate 4: column schema completeness in correct order -----
     pb_cols_expected = [
-        "trade_id", "pair", "signal_bar_ts", "fold_id", "k",
-        "running_mfe_atr", "running_mae_atr",
-        "bar_high_atr", "bar_low_atr", "bar_close_atr",
+        "trade_id",
+        "pair",
+        "signal_bar_ts",
+        "fold_id",
+        "k",
+        "running_mfe_atr",
+        "running_mae_atr",
+        "bar_high_atr",
+        "bar_low_atr",
+        "bar_close_atr",
         "is_clamped_data_end",
     ]
     ti_cols_expected = [
-        "trade_id", "pair", "signal_bar_ts", "fold_id", "entry_price",
-        "atr_1h_wilder_at_signal", "held_bars", "exit_reason", "R", "gross_r",
-        "spread_cost_r", "mfe_R", "mae_R", "bars_available",
+        "trade_id",
+        "pair",
+        "signal_bar_ts",
+        "fold_id",
+        "entry_price",
+        "atr_1h_wilder_at_signal",
+        "held_bars",
+        "exit_reason",
+        "R",
+        "gross_r",
+        "spread_cost_r",
+        "mfe_R",
+        "mae_R",
+        "bars_available",
     ]
     pb_cols = list(per_bar_df.columns)
     ti_cols = list(trade_index_df.columns)
@@ -430,8 +514,13 @@ def _validate_gates(
     # ----- Gate 5: zero nulls in MFE/MAE/per-bar excursion columns -----
     null_summary = {
         c: int(per_bar_df[c].isna().sum())
-        for c in ["running_mfe_atr", "running_mae_atr",
-                  "bar_high_atr", "bar_low_atr", "bar_close_atr"]
+        for c in [
+            "running_mfe_atr",
+            "running_mae_atr",
+            "bar_high_atr",
+            "bar_low_atr",
+            "bar_close_atr",
+        ]
     }
     disp["gate_5_null_summary"] = null_summary
     bad = [c for c, n in null_summary.items() if n > 0]
@@ -443,13 +532,12 @@ def _validate_gates(
     rmfe = pb_sorted["running_mfe_atr"].to_numpy(dtype=np.float64)
     tid = pb_sorted["trade_id"].to_numpy(dtype=np.int64)
     diffs = np.diff(rmfe)
-    boundary = (np.diff(tid) != 0)
+    boundary = np.diff(tid) != 0
     intra_trade = ~boundary
     intra_diffs = diffs[intra_trade]
     mfe_violations = int((intra_diffs < -1e-12).sum())
     disp["gate_6_mfe_monotonicity"] = (
-        f"intra-trade diffs evaluated={intra_trade.sum()}, "
-        f"violations(<-1e-12)={mfe_violations}"
+        f"intra-trade diffs evaluated={intra_trade.sum()}, violations(<-1e-12)={mfe_violations}"
     )
     if mfe_violations > 0:
         bad_idx = np.where((intra_diffs < -1e-12))[0][:5]
@@ -464,8 +552,7 @@ def _validate_gates(
     intra_mae_diffs = diffs_mae[intra_trade]
     mae_violations = int((intra_mae_diffs > 1e-12).sum())
     disp["gate_7_mae_monotonicity"] = (
-        f"intra-trade diffs evaluated={intra_trade.sum()}, "
-        f"violations(>1e-12)={mae_violations}"
+        f"intra-trade diffs evaluated={intra_trade.sum()}, violations(>1e-12)={mae_violations}"
     )
     if mae_violations > 0:
         bad_idx = np.where(intra_mae_diffs > 1e-12)[0][:5]
@@ -534,9 +621,7 @@ def _validate_gates(
             if r_mae > max_rel_mae[h]:
                 max_rel_mae[h] = r_mae
 
-    overall_max_rel = max(
-        max(max_rel_mfe.values()), max(max_rel_mae.values())
-    )
+    overall_max_rel = max(max(max_rel_mfe.values()), max(max_rel_mae.values()))
     disp["gate_9_envelope_consistency"] = {
         "max_abs_mfe_per_h": {h: f"{v:.3e}" for h, v in max_diffs_mfe.items()},
         "max_abs_mae_per_h": {h: f"{v:.3e}" for h, v in max_diffs_mae.items()},
@@ -546,8 +631,7 @@ def _validate_gates(
     }
     if overall_max_rel >= 1e-6:
         raise RuntimeError(
-            f"Gate 9 HALT — envelope consistency: overall max rel diff "
-            f"{overall_max_rel:.3e} ≥ 1e-6"
+            f"Gate 9 HALT — envelope consistency: overall max rel diff {overall_max_rel:.3e} ≥ 1e-6"
         )
 
     # ----- Gate 10: v1.1 ↔ v1.2 first-passage consistency -----
@@ -630,8 +714,7 @@ def _validate_gates(
             if (prefix <= -2.0 + 1e-12).any():
                 bad_before.append(tid_i)
     disp["gate_11_sl_consistency"] = (
-        f"sl_trades={n_sl}, bad_at_held={len(bad_at_held)}, "
-        f"bad_before_held={len(bad_before)}"
+        f"sl_trades={n_sl}, bad_at_held={len(bad_at_held)}, bad_before_held={len(bad_before)}"
     )
     if bad_at_held or bad_before:
         raise RuntimeError(
@@ -657,9 +740,7 @@ def _validate_gates(
             f"trade_index clamped count {n_clamped}"
         )
     if n_clamped != 28:
-        raise RuntimeError(
-            f"Gate 12 HALT — clamped trade count {n_clamped} != expected 28"
-        )
+        raise RuntimeError(f"Gate 12 HALT — clamped trade count {n_clamped} != expected 28")
     if folds_clamped != [7]:
         raise RuntimeError(
             f"Gate 12 HALT — clamped trades not all in fold 7; folds={folds_clamped}"
@@ -668,9 +749,7 @@ def _validate_gates(
     return disp
 
 
-def _write_consistency_check(
-    *, out_dir: Path, disp: Dict[str, Any]
-) -> Path:
+def _write_consistency_check(*, out_dir: Path, disp: Dict[str, Any]) -> Path:
     """Write v1_1_to_v1_2_consistency_check.txt receipt."""
     g9 = disp["gate_9_envelope_consistency"]
     g10 = disp["gate_10_first_passage_consistency"]
@@ -717,10 +796,7 @@ def _write_consistency_check(
         lines.append(f"  {col}: {n}")
     lines.append("")
     total = sum(g10["mismatches_per_col"].values())
-    lines.append(
-        f"Total mismatches: {total}. "
-        f"Disposition: {'PASS' if total == 0 else 'HALT'}."
-    )
+    lines.append(f"Total mismatches: {total}. Disposition: {'PASS' if total == 0 else 'HALT'}.")
     if total > 0:
         lines.append("")
         lines.append("Sample mismatches (trade_id, v1.1 value, v1.2 value):")
@@ -734,7 +810,11 @@ def _write_consistency_check(
 
 
 def _write_null_audit(
-    *, out_dir: Path, per_bar_df: pd.DataFrame, trade_index_df: pd.DataFrame, disp: Dict[str, Any],
+    *,
+    out_dir: Path,
+    per_bar_df: pd.DataFrame,
+    trade_index_df: pd.DataFrame,
+    disp: Dict[str, Any],
 ) -> Path:
     lines = [
         "Null audit — Arc 2 v1.2 per-bar paths",
@@ -773,8 +853,8 @@ def _write_pipeline_diff_manifest(
     trade_index_df: pd.DataFrame,
     single_run: bool,
 ) -> Path:
-    g4_pb = disp["gate_4_pb_cols"]
-    g4_ti = disp["gate_4_ti_cols"]
+    disp["gate_4_pb_cols"]
+    disp["gate_4_ti_cols"]
     g5 = disp["gate_5_null_summary"]
     g9 = disp["gate_9_envelope_consistency"]
     g10 = disp["gate_10_first_passage_consistency"]
@@ -963,45 +1043,45 @@ def _write_pipeline_diff_manifest(
     ]
     for block in spot_blocks:
         lines.extend(block)
-    lines.extend([
-        "",
-        "Cross-reference with v1.1 manifest §5:",
-        "- EUR_JPY: v1.1 fwd_mfe_h120_atr=12.3284 ⇒ v1.2 running_mfe_atr at k=120 must equal 12.328… (within 1e-6 rel).",
-        "- EUR_NZD: v1.1 fwd_mae_h72_atr=−3.6516 ⇒ v1.2 running_mae_atr at k=72 must equal −3.651… (within 1e-6 rel).",
-        "- NZD_JPY: v1.1 fwd_mfe_h6_atr=2.4671 ⇒ v1.2 running_mfe_atr at k=6 must equal 2.467… (within 1e-6 rel).",
-        "",
-        f"## 7. Row count",
-        "",
-        f"Actual `per_bar_paths.csv` row count: **{g3:,}** (expected range [952,188, 958,292]).",
-        "",
-        "## 8. Data-end clamping",
-        "",
-        f"Trades with `bars_available < 240`: **{len(clamped_index)}** (expected 28; all in fold 7 per Phase 1).",
-        "",
-        "Per-trade detail:",
-    ])
+    lines.extend(
+        [
+            "",
+            "Cross-reference with v1.1 manifest §5:",
+            "- EUR_JPY: v1.1 fwd_mfe_h120_atr=12.3284 ⇒ v1.2 running_mfe_atr at k=120 must equal 12.328… (within 1e-6 rel).",
+            "- EUR_NZD: v1.1 fwd_mae_h72_atr=−3.6516 ⇒ v1.2 running_mae_atr at k=72 must equal −3.651… (within 1e-6 rel).",
+            "- NZD_JPY: v1.1 fwd_mfe_h6_atr=2.4671 ⇒ v1.2 running_mfe_atr at k=6 must equal 2.467… (within 1e-6 rel).",
+            "",
+            "## 7. Row count",
+            "",
+            f"Actual `per_bar_paths.csv` row count: **{g3:,}** (expected range [952,188, 958,292]).",
+            "",
+            "## 8. Data-end clamping",
+            "",
+            f"Trades with `bars_available < 240`: **{len(clamped_index)}** (expected 28; all in fold 7 per Phase 1).",
+            "",
+            "Per-trade detail:",
+        ]
+    )
     lines.extend(clamp_lines)
-    lines.extend([
-        "",
-        "## 9. v1.1 ↔ v1.2 consistency",
-        "",
-        "### Gate 9 (envelope reproduction)",
-        "",
-        f"Overall max relative diff across all 6 horizons × 2 sides × 3,993 trades: "
-        f"**{g9['overall_max_rel_diff']}** (tolerance 1e-6).",
-        "",
-        "Per-horizon max abs / rel diff (MFE):",
-    ])
+    lines.extend(
+        [
+            "",
+            "## 9. v1.1 ↔ v1.2 consistency",
+            "",
+            "### Gate 9 (envelope reproduction)",
+            "",
+            f"Overall max relative diff across all 6 horizons × 2 sides × 3,993 trades: "
+            f"**{g9['overall_max_rel_diff']}** (tolerance 1e-6).",
+            "",
+            "Per-horizon max abs / rel diff (MFE):",
+        ]
+    )
     for h in HORIZON_SNAPSHOTS:
-        lines.append(
-            f"- h={h}: abs={g9['max_abs_mfe_per_h'][h]}, rel={g9['max_rel_mfe_per_h'][h]}"
-        )
+        lines.append(f"- h={h}: abs={g9['max_abs_mfe_per_h'][h]}, rel={g9['max_rel_mfe_per_h'][h]}")
     lines.append("")
     lines.append("Per-horizon max abs / rel diff (MAE):")
     for h in HORIZON_SNAPSHOTS:
-        lines.append(
-            f"- h={h}: abs={g9['max_abs_mae_per_h'][h]}, rel={g9['max_rel_mae_per_h'][h]}"
-        )
+        lines.append(f"- h={h}: abs={g9['max_abs_mae_per_h'][h]}, rel={g9['max_rel_mae_per_h'][h]}")
     lines.append("")
     lines.append("### Gate 10 (first-passage exact-integer reproduction)")
     lines.append("")
@@ -1014,7 +1094,9 @@ def _write_pipeline_diff_manifest(
     lines.append("| # | Gate | Disposition |")
     lines.append("|---|------|-------------|")
     lines.append("| 1 | Input integrity (6 sha256s) | PASS — all match locked values |")
-    lines.append(f"| 2 | trade_index.csv row count | PASS — {disp['gate_2_trade_index_rows']} rows |")
+    lines.append(
+        f"| 2 | trade_index.csv row count | PASS — {disp['gate_2_trade_index_rows']} rows |"
+    )
     lines.append(f"| 3 | per_bar_paths.csv row count in [952188, 958292] | PASS — {g3:,} rows |")
     lines.append("| 4 | Column schema completeness | PASS — both CSVs match spec exactly |")
     g5_str = ", ".join(f"{k}={v}" for k, v in g5.items())
@@ -1022,18 +1104,30 @@ def _write_pipeline_diff_manifest(
     lines.append(f"| 6 | Running MFE non-decreasing | PASS — {g6} |")
     lines.append(f"| 7 | Running MAE non-increasing | PASS — {g7} |")
     lines.append(f"| 8 | Sign convention | PASS — {g8} |")
-    lines.append(f"| 9 | v1.1 ↔ v1.2 envelope consistency | PASS — overall max rel diff = {g9['overall_max_rel_diff']} (tol 1e-6) |")
-    lines.append(f"| 10 | v1.1 ↔ v1.2 first-passage consistency | PASS — 0 mismatches across all 4 columns × 3,993 trades |")
+    lines.append(
+        f"| 9 | v1.1 ↔ v1.2 envelope consistency | PASS — overall max rel diff = {g9['overall_max_rel_diff']} (tol 1e-6) |"
+    )
+    lines.append(
+        "| 10 | v1.1 ↔ v1.2 first-passage consistency | PASS — 0 mismatches across all 4 columns × 3,993 trades |"
+    )
     lines.append(f"| 11 | SL-trade execution consistency | PASS — {g11} |")
     lines.append(f"| 12 | Data-end clamping count | PASS — {g12} |")
     if single_run:
-        lines.append("| 13 | Determinism (2 consecutive runs byte-identical) | SKIPPED (--single-run) |")
+        lines.append(
+            "| 13 | Determinism (2 consecutive runs byte-identical) | SKIPPED (--single-run) |"
+        )
     else:
         det_str = ", ".join(f"{k}:{v}" for k, v in determinism.items())
         det_pass = all(v == "match" for v in determinism.values())
-        lines.append(f"| 13 | Determinism (2 consecutive runs byte-identical) | {'PASS' if det_pass else 'HALT'} — {det_str} |")
-    lines.append("| 14 | Locked artefact integrity (post-run sha256 unchanged) | PASS (verified by main; see run_manifest.txt) |")
-    lines.append("| 15 | No auto-commit | PASS (script never commits; main verifies clean staged-only git state) |")
+        lines.append(
+            f"| 13 | Determinism (2 consecutive runs byte-identical) | {'PASS' if det_pass else 'HALT'} — {det_str} |"
+        )
+    lines.append(
+        "| 14 | Locked artefact integrity (post-run sha256 unchanged) | PASS (verified by main; see run_manifest.txt) |"
+    )
+    lines.append(
+        "| 15 | No auto-commit | PASS (script never commits; main verifies clean staged-only git state) |"
+    )
 
     out = out_dir / "pipeline_diff_v1_2_manifest.md"
     out.write_text("\n".join(lines) + "\n", encoding="utf-8")
@@ -1065,12 +1159,15 @@ def run_pipeline(
 
     # Compute per-bar paths.
     per_bar_df, trade_index_with_bavail = _compute_per_bar_paths(
-        trade_index=trade_index, pair_data=pair_data,
+        trade_index=trade_index,
+        pair_data=pair_data,
     )
 
     # Write outputs.
     paths = _write_outputs(
-        out_dir=out_dir, per_bar_df=per_bar_df, trade_index_df=trade_index_with_bavail,
+        out_dir=out_dir,
+        per_bar_df=per_bar_df,
+        trade_index_df=trade_index_with_bavail,
     )
 
     # Validate gates 2-12.
@@ -1084,8 +1181,10 @@ def run_pipeline(
     # Write aux receipts (consistency check + null audit).
     consistency_path = _write_consistency_check(out_dir=out_dir, disp=disp)
     null_audit_path = _write_null_audit(
-        out_dir=out_dir, per_bar_df=per_bar_df,
-        trade_index_df=trade_index_with_bavail, disp=disp,
+        out_dir=out_dir,
+        per_bar_df=per_bar_df,
+        trade_index_df=trade_index_with_bavail,
+        disp=disp,
     )
 
     out_shas = {
@@ -1105,14 +1204,23 @@ def main() -> int:
     )
     parser.add_argument(
         "--v1-1-csv",
-        default=str(REPO_ROOT / "results" / "l6" / "arc2" / "characterisation" / "v1_1_full" / "signals_features.csv"),
+        default=str(
+            REPO_ROOT
+            / "results"
+            / "l6"
+            / "arc2"
+            / "characterisation"
+            / "v1_1_full"
+            / "signals_features.csv"
+        ),
     )
     parser.add_argument(
         "--trades-csv",
         default=str(REPO_ROOT / "results" / "l6" / "arc2" / "trades_all.csv"),
     )
     parser.add_argument(
-        "--single-run", action="store_true",
+        "--single-run",
+        action="store_true",
         help="Skip the determinism re-run (development only).",
     )
     args = parser.parse_args()
@@ -1135,7 +1243,9 @@ def main() -> int:
     print(f"\n[Run #1] Output dir: {out_dir}")
     t1 = time.time()
     sha1, disp, per_bar_df, ti_df = run_pipeline(
-        out_dir=out_dir, v1_1_csv=v1_1_csv, trades_csv=trades_csv,
+        out_dir=out_dir,
+        v1_1_csv=v1_1_csv,
+        trades_csv=trades_csv,
     )
     elapsed1 = time.time() - t1
     print(f"  Run #1 complete in {elapsed1:.1f}s")
@@ -1149,7 +1259,10 @@ def main() -> int:
         print(f"\n[Run #2 / Gate 13] Output dir (scratch): {scratch}")
         t2 = time.time()
         sha2, _, _, _ = run_pipeline(
-            out_dir=scratch, v1_1_csv=v1_1_csv, trades_csv=trades_csv, write_aux=False,
+            out_dir=scratch,
+            v1_1_csv=v1_1_csv,
+            trades_csv=trades_csv,
+            write_aux=False,
         )
         elapsed2 = time.time() - t2
         print(f"  Run #2 complete in {elapsed2:.1f}s")
@@ -1215,10 +1328,13 @@ def main() -> int:
     rm_lines.append(f"  pipeline_diff_v1_2_manifest.md\n    {pipeline_diff_sha}")
     rm_lines.append("")
     rm_lines.append("File sizes (Run #1):")
-    for fname in ["per_bar_paths.csv", "trade_index.csv",
-                  "v1_1_to_v1_2_consistency_check.txt",
-                  "null_audit_v1_2.txt",
-                  "pipeline_diff_v1_2_manifest.md"]:
+    for fname in [
+        "per_bar_paths.csv",
+        "trade_index.csv",
+        "v1_1_to_v1_2_consistency_check.txt",
+        "null_audit_v1_2.txt",
+        "pipeline_diff_v1_2_manifest.md",
+    ]:
         p = out_dir / fname
         if p.exists():
             rm_lines.append(f"  {fname}: {p.stat().st_size:,} bytes")

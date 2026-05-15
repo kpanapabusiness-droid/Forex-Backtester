@@ -16,6 +16,7 @@ Arc 2 differs from arc 1:
 Determinism: all random seeds derive from BASE_SEED. All sorts explicit.
 Hash-based feature seeds per Amendment 11.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -48,26 +49,46 @@ N_FOLDS = 7
 
 # Identity columns (never used as predictors)
 IDENTITY_COLS = (
-    "trade_id", "pair", "fold_id",
-    "signal_bar_ts", "entry_bar_ts", "exit_bar_ts",
+    "trade_id",
+    "pair",
+    "fold_id",
+    "signal_bar_ts",
+    "entry_bar_ts",
+    "exit_bar_ts",
     "direction",
 )
 
 # Trade outcome / held / forward / amendment-4 columns — excluded from predictor sets
 OUTCOME_COLS = (
-    "net_r", "gross_r", "spread_cost_R",
-    "mfe_R", "mae_R", "bars_held", "exit_reason", "exit_reason_engine",
-    "spread_pips_entry", "spread_pips_exit", "spread_floored",
-    "sl_distance_atr", "sl_distance_price",
-    "mfe_held_atr", "mae_held_atr",
-    "peak_to_final_r_ratio", "mfe_to_mae_ratio_held",
+    "net_r",
+    "gross_r",
+    "spread_cost_R",
+    "mfe_R",
+    "mae_R",
+    "bars_held",
+    "exit_reason",
+    "exit_reason_engine",
+    "spread_pips_entry",
+    "spread_pips_exit",
+    "spread_floored",
+    "sl_distance_atr",
+    "sl_distance_price",
+    "mfe_held_atr",
+    "mae_held_atr",
+    "peak_to_final_r_ratio",
+    "mfe_to_mae_ratio_held",
     "r_given_back_from_peak",
     "mfe_sequence_class_held",
-    "time_to_peak_mfe", "time_to_trough_mae", "time_from_peak_to_exit",
-    "oscillation_count", "monotonicity_ratio",
-    "max_consecutive_with", "max_consecutive_against",
+    "time_to_peak_mfe",
+    "time_to_trough_mae",
+    "time_from_peak_to_exit",
+    "oscillation_count",
+    "monotonicity_ratio",
+    "max_consecutive_with",
+    "max_consecutive_against",
     "acf1_returns_during_hold",
-    "data_end_flag", "forward_window_bars_available",
+    "data_end_flag",
+    "forward_window_bars_available",
     # Amendment 4 (forward-derived, NOT signal-time)
     "fwd_realized_range_atr",
     "fwd_fraction_time_above_entry",
@@ -79,21 +100,39 @@ OUTCOME_COLS = (
 # adds the 4 NEW pre-signal context cols (cum_logret_1h_24/72/168, vol_realized_1h_24h)
 # and vol_realized_1h_24h_decile.
 SIGNAL_TIME_NUMERIC = (
-    "signal_bar_open", "signal_bar_close", "signal_bar_high", "signal_bar_low",
-    "signal_bar_log_return", "signal_bar_abs_log_return",
-    "signal_bar_volume", "signal_bar_volume_nan",
-    "atr_at_signal_1h", "atr_baseline_1h_200", "atr_ratio_to_baseline",
-    "cum_logret_1h_3", "cum_logret_1h_6",
-    "cum_logret_1h_24", "cum_logret_1h_72", "cum_logret_1h_168",
+    "signal_bar_open",
+    "signal_bar_close",
+    "signal_bar_high",
+    "signal_bar_low",
+    "signal_bar_log_return",
+    "signal_bar_abs_log_return",
+    "signal_bar_volume",
+    "signal_bar_volume_nan",
+    "atr_at_signal_1h",
+    "atr_baseline_1h_200",
+    "atr_ratio_to_baseline",
+    "cum_logret_1h_3",
+    "cum_logret_1h_6",
+    "cum_logret_1h_24",
+    "cum_logret_1h_72",
+    "cum_logret_1h_168",
     "vol_realized_1h_24h",
-    "dist_close_to_high30_atr", "dist_close_to_low30_atr",
-    "hour_utc", "day_of_week",
-    "hour_in_4h_bar", "bars_to_next_4h_close",
-    "hour_in_d1_bar", "bars_to_next_d1_close",
-    "concurrent_signals_same_bar", "concurrent_signals_within_3h",
-    "currency_basket_3h_USD", "currency_basket_3h_EUR",
-    "currency_basket_3h_JPY", "currency_basket_3h_GBP",
-    "trade_overlap_at_execution_time", "sequential_same_pair_density_24h",
+    "dist_close_to_high30_atr",
+    "dist_close_to_low30_atr",
+    "hour_utc",
+    "day_of_week",
+    "hour_in_4h_bar",
+    "bars_to_next_4h_close",
+    "hour_in_d1_bar",
+    "bars_to_next_d1_close",
+    "concurrent_signals_same_bar",
+    "concurrent_signals_within_3h",
+    "currency_basket_3h_USD",
+    "currency_basket_3h_EUR",
+    "currency_basket_3h_JPY",
+    "currency_basket_3h_GBP",
+    "trade_overlap_at_execution_time",
+    "sequential_same_pair_density_24h",
     "trigger_magnitude_decile",
     "vol_realized_1h_24h_decile",
 )
@@ -101,8 +140,13 @@ SIGNAL_TIME_NUMERIC = (
 # Categorical signal-time predictors (one-hot encoded). Arc 2 adds the 3 new bin
 # categoricals (cum_logret_1h_6_bin already existed for arc 1; arc 2 also has 24 + 168).
 SIGNAL_TIME_CATEGORICAL = (
-    "pair", "session", "vol_regime", "pre_momentum_bin",
-    "cum_logret_1h_6_bin", "cum_logret_1h_24_bin", "cum_logret_1h_168_bin",
+    "pair",
+    "session",
+    "vol_regime",
+    "pre_momentum_bin",
+    "cum_logret_1h_6_bin",
+    "cum_logret_1h_24_bin",
+    "cum_logret_1h_168_bin",
 )
 
 # Forward / held-bar context numeric features (identical schema in both
@@ -110,17 +154,24 @@ SIGNAL_TIME_CATEGORICAL = (
 # Phase D uses held_bar_evolution per task spec.
 HELD_CTX_NUMERIC = (
     "atr_regime_ratio",
-    "broker_spread_pips_raw", "broker_spread_pips_floored",
+    "broker_spread_pips_raw",
+    "broker_spread_pips_floored",
     "cross_pair_dispersion_proxy",
-    "basket_cum_logret_USD", "basket_cum_logret_EUR",
-    "basket_cum_logret_JPY", "basket_cum_logret_GBP",
+    "basket_cum_logret_USD",
+    "basket_cum_logret_EUR",
+    "basket_cum_logret_JPY",
+    "basket_cum_logret_GBP",
 )
 
 # Per-bar path columns from trade_paths.csv (available from bar_offset=0 onward).
 PATH_NUMERIC_PER_BAR = (
-    "open", "high", "low", "close",
+    "open",
+    "high",
+    "low",
+    "close",
     "cum_logret_from_entry",
-    "mfe_to_date_atr", "mae_to_date_atr",
+    "mfe_to_date_atr",
+    "mae_to_date_atr",
 )
 
 HELD_BAR_TS = (1, 3, 5, 10, 20)
@@ -174,9 +225,11 @@ SIZE_FLOOR_EXIT_OR_DELAYED_ENTRY = 0.05
 # v1.1 Amendment 5: PCA pre-check
 PCA_REDUNDANCY_THRESHOLD = 0.85
 
+
 # v1.1 Amendment 2: Phase G/H eligibility — top-K by raw AUC per target.
 def phase_gh_top_k(n_features_scanned: int) -> int:
     return max(20, n_features_scanned // 2)
+
 
 # v1.1 Amendment 9: partial AUC at worst-decile cutoff
 PARTIAL_AUC_DECILE_CUTOFF = 0.10
@@ -206,6 +259,7 @@ ES_THRESHOLDS = {
 BH_TIER_1 = 0.05
 BH_TIER_2 = 0.20
 
+
 # v1.1 Amendment 11: deterministic permutation seeds
 def perm_seed_for_feature(fname: str, base_offset: int = 0) -> int:
     h = _hashlib.sha256(fname.encode("utf-8")).hexdigest()[:8]
@@ -213,6 +267,7 @@ def perm_seed_for_feature(fname: str, base_offset: int = 0) -> int:
 
 
 # --- IO helpers ---------------------------------------------------------
+
 
 def sha256_file(path: Path) -> str:
     h = hashlib.sha256()
@@ -244,11 +299,33 @@ def fmt_dist_stats(values: np.ndarray, label_prefix: str = "") -> dict:
     v = np.asarray(values, dtype=float)
     v = v[~np.isnan(v)]
     if v.size == 0:
-        return {f"{label_prefix}{k}": float("nan") for k in
-                ("n", "mean", "std", "skew", "kurt", "min",
-                 "p1", "p5", "p10", "p20", "p30", "p40", "p50", "p60",
-                 "p70", "p80", "p90", "p95", "p99", "max")}
+        return {
+            f"{label_prefix}{k}": float("nan")
+            for k in (
+                "n",
+                "mean",
+                "std",
+                "skew",
+                "kurt",
+                "min",
+                "p1",
+                "p5",
+                "p10",
+                "p20",
+                "p30",
+                "p40",
+                "p50",
+                "p60",
+                "p70",
+                "p80",
+                "p90",
+                "p95",
+                "p99",
+                "max",
+            )
+        }
     from scipy import stats as ss
+
     pcts = (1, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 99)
     quants = np.percentile(v, pcts)
     out = {

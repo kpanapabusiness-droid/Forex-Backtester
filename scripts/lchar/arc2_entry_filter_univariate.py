@@ -32,16 +32,11 @@ if str(REPO_ROOT) not in sys.path:
 # ---------------------------------------------------------------------------
 
 LOCKED_SHA256: Dict[str, str] = {
-    "results/l6/arc2/characterisation/v1_1_full/signals_features.csv":
-        "71b39383632bd695b878add8b331b76bcd231ab5b9adba9eea03d69f8762483e",
-    "results/l6/arc2/characterisation/v1_2_1_full/trade_index.csv":
-        "9f841c5b29e87ed90d34c9617431978baf3041459797cedef02fa16c27e3abb5",
-    "core/signals/l4_mtf_alignment_2_down_mixed_kijun.py":
-        "3c8d0f5d4b446f84359ab0663df36869f15b47cf1bf18fbc6caff807dc5134e3",
-    "configs/wfo_l6_arc2.yaml":
-        "25917151bc84a73885eeea9ca9c4cc15b1c277ba793706b158abd3aee0ab6328",
-    "L6_0_METHODOLOGY_LOCK.md":
-        "4fd870b1d17380e4fc4fbfda5a43f7775d313c7a5f50dbfd1f06a3e49c519c26",
+    "results/l6/arc2/characterisation/v1_1_full/signals_features.csv": "71b39383632bd695b878add8b331b76bcd231ab5b9adba9eea03d69f8762483e",
+    "results/l6/arc2/characterisation/v1_2_1_full/trade_index.csv": "9f841c5b29e87ed90d34c9617431978baf3041459797cedef02fa16c27e3abb5",
+    "core/signals/l4_mtf_alignment_2_down_mixed_kijun.py": "3c8d0f5d4b446f84359ab0663df36869f15b47cf1bf18fbc6caff807dc5134e3",
+    "configs/wfo_l6_arc2.yaml": "25917151bc84a73885eeea9ca9c4cc15b1c277ba793706b158abd3aee0ab6328",
+    "L6_0_METHODOLOGY_LOCK.md": "4fd870b1d17380e4fc4fbfda5a43f7775d313c7a5f50dbfd1f06a3e49c519c26",
 }
 
 KIJUN_PERIOD: int = 26
@@ -50,7 +45,15 @@ KIJUN_PERIOD: int = 26
 POP_SL_RATE_BASELINE: float = 0.7603305785123967
 POP_MEAN_R_BASELINE: float = -0.019241250301994976
 
-OUT_DIR = REPO_ROOT / "results" / "l6" / "arc2" / "characterisation" / "extended" / "entry_filter_univariate"
+OUT_DIR = (
+    REPO_ROOT
+    / "results"
+    / "l6"
+    / "arc2"
+    / "characterisation"
+    / "extended"
+    / "entry_filter_univariate"
+)
 
 
 # ---------------------------------------------------------------------------
@@ -162,9 +165,7 @@ def _compute_block_m_distances(taken: pd.DataFrame) -> pd.DataFrame:
 
             sig_idx = idx_1h_by_time.get(sig_ts, None)
             if sig_idx is None:
-                raise RuntimeError(
-                    f"Block M: 1H bar for ({pair}, {sig_ts}) not found in raw data"
-                )
+                raise RuntimeError(f"Block M: 1H bar for ({pair}, {sig_ts}) not found in raw data")
             sig_idx = int(sig_idx)
 
             close_1h_at_N = float(close_1h[sig_idx])
@@ -178,9 +179,7 @@ def _compute_block_m_distances(taken: pd.DataFrame) -> pd.DataFrame:
                 )
             mr4 = int(c4) - 1
             if mr4 < 0:
-                raise RuntimeError(
-                    f"Block M: 4H lag-1 index negative for ({pair}, {sig_ts})"
-                )
+                raise RuntimeError(f"Block M: 4H lag-1 index negative for ({pair}, {sig_ts})")
             # Lookahead invariant — ts_4h at mr4 must be strictly < floor4h_ts.
             if not (pd.Timestamp(ts_4h_arr[mr4]) < floor4h_ts):
                 raise RuntimeError(
@@ -198,9 +197,7 @@ def _compute_block_m_distances(taken: pd.DataFrame) -> pd.DataFrame:
                 )
             mrd = int(cd) - 1
             if mrd < 0:
-                raise RuntimeError(
-                    f"Block M: D1 lag-1 index negative for ({pair}, {sig_ts})"
-                )
+                raise RuntimeError(f"Block M: D1 lag-1 index negative for ({pair}, {sig_ts})")
             if not (pd.Timestamp(ts_d1_arr[mrd]) < floor_d1_ts):
                 raise RuntimeError(
                     f"Block M: D1 lag-1 lookahead violated for ({pair}, {sig_ts}): "
@@ -212,15 +209,17 @@ def _compute_block_m_distances(taken: pd.DataFrame) -> pd.DataFrame:
             d1h = (close_1h_at_N - kij1) / atr_div
             d4h = (close_4h_at_mr4 - kij4) / atr_div
             ddd = (close_d1_at_mrd - kijd) / atr_div
-            rows.append({
-                "trade_id": int(tr["trade_id"]),
-                "pair": pair,
-                "signal_bar_ts": tr["signal_bar_ts"],
-                "fold_id": int(tr["fold_id"]),
-                "dist_1h_kijun_atr": d1h,
-                "dist_4h_kijun_atr": d4h,
-                "dist_d1_kijun_atr": ddd,
-            })
+            rows.append(
+                {
+                    "trade_id": int(tr["trade_id"]),
+                    "pair": pair,
+                    "signal_bar_ts": tr["signal_bar_ts"],
+                    "fold_id": int(tr["fold_id"]),
+                    "dist_1h_kijun_atr": d1h,
+                    "dist_4h_kijun_atr": d4h,
+                    "dist_d1_kijun_atr": ddd,
+                }
+            )
 
     out = pd.DataFrame(rows).sort_values(["trade_id"]).reset_index(drop=True)
     return out
@@ -231,7 +230,9 @@ def _compute_block_m_distances(taken: pd.DataFrame) -> pd.DataFrame:
 # ---------------------------------------------------------------------------
 
 
-def _make_quintile_labels(values: pd.Series, tie_break: pd.Series) -> Tuple[pd.Series, List[Tuple[float, float]]]:
+def _make_quintile_labels(
+    values: pd.Series, tie_break: pd.Series
+) -> Tuple[pd.Series, List[Tuple[float, float]]]:
     """Rank-based quintile bucketing with deterministic tie-breaking.
 
     Ranks values ascending. Ties are broken by the order induced by `tie_break`
@@ -253,7 +254,7 @@ def _make_quintile_labels(values: pd.Series, tie_break: pd.Series) -> Tuple[pd.S
     boundaries = []
     cursor = 0
     for qi, sz in enumerate(sizes):
-        seg = df.iloc[cursor:cursor + sz]
+        seg = df.iloc[cursor : cursor + sz]
         labels.extend([f"Q{qi + 1}"] * sz)
         boundaries.append((float(seg["v"].min()), float(seg["v"].max())))
         cursor += sz
@@ -273,15 +274,25 @@ def _block_l_pooled(
              mean_R, median_R, sl_rate_lift_vs_baseline, mean_R_lift_vs_baseline.
     """
     g = taken.groupby(cell_col, dropna=False)
-    out = pd.DataFrame({
-        "n": g.size(),
-        "sl_rate": g.apply(lambda d: float((d["exit_reason"] == "stop_loss").mean()), include_groups=False),
-        "te_rate": g.apply(lambda d: float((d["exit_reason"] == "time_exit").mean()), include_groups=False),
-        "de_rate": g.apply(lambda d: float((d["exit_reason"] == "data_end").mean()), include_groups=False),
-        "pct_reached_1R_mfe": g.apply(lambda d: float((d["mfe_R"] >= 1.0).mean()), include_groups=False),
-        "mean_R": g["R"].mean(),
-        "median_R": g["R"].median(),
-    })
+    out = pd.DataFrame(
+        {
+            "n": g.size(),
+            "sl_rate": g.apply(
+                lambda d: float((d["exit_reason"] == "stop_loss").mean()), include_groups=False
+            ),
+            "te_rate": g.apply(
+                lambda d: float((d["exit_reason"] == "time_exit").mean()), include_groups=False
+            ),
+            "de_rate": g.apply(
+                lambda d: float((d["exit_reason"] == "data_end").mean()), include_groups=False
+            ),
+            "pct_reached_1R_mfe": g.apply(
+                lambda d: float((d["mfe_R"] >= 1.0).mean()), include_groups=False
+            ),
+            "mean_R": g["R"].mean(),
+            "median_R": g["R"].median(),
+        }
+    )
     out["sl_rate_lift_vs_baseline"] = out["sl_rate"] - POP_SL_RATE_BASELINE
     out["mean_R_lift_vs_baseline"] = out["mean_R"] - POP_MEAN_R_BASELINE
     out = out.reset_index().rename(columns={cell_col: "cell"})
@@ -300,14 +311,16 @@ def _block_l_per_fold(
     for (cell, fold), d in g:
         n = int(len(d))
         sl_rate = float((d["exit_reason"] == "stop_loss").mean()) if n > 0 else float("nan")
-        rows.append({
-            "feature": feature,
-            "cell": cell,
-            "fold_id": int(fold),
-            "n": n,
-            "sl_rate": sl_rate,
-            "thin_flag": "thin" if n < 10 else "",
-        })
+        rows.append(
+            {
+                "feature": feature,
+                "cell": cell,
+                "fold_id": int(fold),
+                "n": n,
+                "sl_rate": sl_rate,
+                "thin_flag": "thin" if n < 10 else "",
+            }
+        )
     out = pd.DataFrame(rows).sort_values(["cell", "fold_id"]).reset_index(drop=True)
     return out
 
@@ -319,19 +332,41 @@ def _block_l_per_fold(
 
 def _block_o_mfe_survivor(taken: pd.DataFrame) -> pd.DataFrame:
     thresholds = [
-        0.05, 0.10, 0.20, 0.30, 0.40, 0.50, 0.60, 0.70, 0.80, 0.90,
-        1.00, 1.10, 1.20, 1.30, 1.40, 1.50, 1.60, 1.70, 1.80, 1.90,
-        2.00, 2.50, 3.00,
+        0.05,
+        0.10,
+        0.20,
+        0.30,
+        0.40,
+        0.50,
+        0.60,
+        0.70,
+        0.80,
+        0.90,
+        1.00,
+        1.10,
+        1.20,
+        1.30,
+        1.40,
+        1.50,
+        1.60,
+        1.70,
+        1.80,
+        1.90,
+        2.00,
+        2.50,
+        3.00,
     ]
     n_total = len(taken)
     rows = []
     for t in thresholds:
         n_surv = int((taken["mfe_R"] >= t).sum())
-        rows.append({
-            "threshold_R": t,
-            "n_survivors": n_surv,
-            "pct_of_taken": n_surv / n_total if n_total > 0 else 0.0,
-        })
+        rows.append(
+            {
+                "threshold_R": t,
+                "n_survivors": n_surv,
+                "pct_of_taken": n_surv / n_total if n_total > 0 else 0.0,
+            }
+        )
     return pd.DataFrame(rows)
 
 
@@ -435,13 +470,13 @@ def _build_report(
             first_below = first_below.iloc[0]
             lines.append(
                 f"The pct_of_taken cohort crosses 50% between thresholds "
-                f"{last_50['threshold_R']:.2f}R (pct={last_50['pct_of_taken']*100:.2f}%) "
-                f"and {first_below['threshold_R']:.2f}R (pct={first_below['pct_of_taken']*100:.2f}%)."
+                f"{last_50['threshold_R']:.2f}R (pct={last_50['pct_of_taken'] * 100:.2f}%) "
+                f"and {first_below['threshold_R']:.2f}R (pct={first_below['pct_of_taken'] * 100:.2f}%)."
             )
         else:
             lines.append(
                 f"All thresholds in scope have ≥ 50% survivors; max threshold is "
-                f"{last_50['threshold_R']:.2f}R (pct={last_50['pct_of_taken']*100:.2f}%)."
+                f"{last_50['threshold_R']:.2f}R (pct={last_50['pct_of_taken'] * 100:.2f}%)."
             )
     else:
         lines.append("No threshold reaches 50% coverage in the scanned range.")
@@ -459,24 +494,26 @@ def _build_report(
     lines.append("")
     bm_rows = []
     for feat, q in block_m_summary.items():
-        bm_rows.append({
-            "feature": feat,
-            "min": q["min"],
-            "q05": q["q05"],
-            "q25": q["q25"],
-            "median": q["q50"],
-            "q75": q["q75"],
-            "q95": q["q95"],
-            "max": q["max"],
-            "mean": q["mean"],
-        })
+        bm_rows.append(
+            {
+                "feature": feat,
+                "min": q["min"],
+                "q05": q["q05"],
+                "q25": q["q25"],
+                "median": q["q50"],
+                "q75": q["q75"],
+                "q95": q["q95"],
+                "max": q["max"],
+                "mean": q["mean"],
+            }
+        )
     bm_df = pd.DataFrame(bm_rows)
     lines.append(_df_to_md(bm_df, "{:.4f}"))
     lines.append("")
     lines.append("Quintile boundaries (min, max) for continuous features:")
     lines.append("")
     for feat, bs in block_m_quintile_bounds.items():
-        cells = ", ".join(f"Q{i+1}=[{lo:.4f},{hi:.4f}]" for i, (lo, hi) in enumerate(bs))
+        cells = ", ".join(f"Q{i + 1}=[{lo:.4f},{hi:.4f}]" for i, (lo, hi) in enumerate(bs))
         lines.append(f"- `{feat}`: {cells}")
     lines.append("")
 
@@ -486,9 +523,16 @@ def _build_report(
     for feat in pooled_tables.keys():
         pt = pooled_tables[feat].copy()
         pt = pt.drop(columns=["feature"])
-        cols_round = ["sl_rate", "te_rate", "de_rate", "pct_reached_1R_mfe",
-                      "mean_R", "median_R", "sl_rate_lift_vs_baseline",
-                      "mean_R_lift_vs_baseline"]
+        cols_round = [
+            "sl_rate",
+            "te_rate",
+            "de_rate",
+            "pct_reached_1R_mfe",
+            "mean_R",
+            "median_R",
+            "sl_rate_lift_vs_baseline",
+            "mean_R_lift_vs_baseline",
+        ]
         lines.append(f"### `{feat}`")
         lines.append("")
         lines.append(_df_to_md(pt[["cell", "n"] + cols_round], "{:.4f}"))
@@ -513,19 +557,29 @@ def _build_report(
 
         lines.append("Cells with SL-rate furthest above population baseline (n ≥ 20):")
         lines.append("")
-        lines.append(_df_to_md(top_sl_high[["cell", "n", "sl_rate", "sl_rate_lift_vs_baseline"]], "{:.4f}"))
+        lines.append(
+            _df_to_md(top_sl_high[["cell", "n", "sl_rate", "sl_rate_lift_vs_baseline"]], "{:.4f}")
+        )
         lines.append("")
         lines.append("Cells with SL-rate furthest below population baseline (n ≥ 20):")
         lines.append("")
-        lines.append(_df_to_md(top_sl_low[["cell", "n", "sl_rate", "sl_rate_lift_vs_baseline"]], "{:.4f}"))
+        lines.append(
+            _df_to_md(top_sl_low[["cell", "n", "sl_rate", "sl_rate_lift_vs_baseline"]], "{:.4f}")
+        )
         lines.append("")
         lines.append("Cells with mean-R furthest above population baseline (n ≥ 20):")
         lines.append("")
-        lines.append(_df_to_md(top_r_high[["cell", "n", "mean_R", "mean_R_lift_vs_baseline"]], "{:.4f}"))
+        lines.append(
+            _df_to_md(top_r_high[["cell", "n", "mean_R", "mean_R_lift_vs_baseline"]], "{:.4f}")
+        )
         lines.append("")
         lines.append("Cells with reached-1R-MFE rate furthest above pooled mean (n ≥ 20):")
         lines.append("")
-        lines.append(_df_to_md(top_mfe_high[["cell", "n", "pct_reached_1R_mfe", "reached_1R_mfe_lift"]], "{:.4f}"))
+        lines.append(
+            _df_to_md(
+                top_mfe_high[["cell", "n", "pct_reached_1R_mfe", "reached_1R_mfe_lift"]], "{:.4f}"
+            )
+        )
         lines.append("")
 
         # Per-fold stability commentary — count folds where SL rate is above baseline.
@@ -540,16 +594,20 @@ def _build_report(
             n_below = int((sub["sl_rate"] < POP_SL_RATE_BASELINE).sum())
             n_folds_in_view = len(sub)
             variance = float(sub["sl_rate"].var(ddof=0))
-            cell_fold_summary_rows.append({
-                "cell": cell,
-                "folds_with_n_ge_10": n_folds_in_view,
-                "folds_sl_rate_above_baseline": n_above,
-                "folds_sl_rate_below_baseline": n_below,
-                "sl_rate_variance_across_folds": variance,
-            })
+            cell_fold_summary_rows.append(
+                {
+                    "cell": cell,
+                    "folds_with_n_ge_10": n_folds_in_view,
+                    "folds_sl_rate_above_baseline": n_above,
+                    "folds_sl_rate_below_baseline": n_below,
+                    "sl_rate_variance_across_folds": variance,
+                }
+            )
         if cell_fold_summary_rows:
             stab_df = pd.DataFrame(cell_fold_summary_rows)
-            lines.append("Per-fold stability of SL rate (cells with n ≥ 20 pooled; per-fold sub-cells require n ≥ 10):")
+            lines.append(
+                "Per-fold stability of SL rate (cells with n ≥ 20 pooled; per-fold sub-cells require n ≥ 10):"
+            )
             lines.append("")
             lines.append(_df_to_md(stab_df, "{:.4f}"))
             lines.append("")
@@ -571,18 +629,22 @@ def _build_report(
         pop_mfe_rate = float((pt["pct_reached_1R_mfe"] * pt["n"]).sum() / max(pt["n"].sum(), 1))
         max_mfe_lift = float((ptf["pct_reached_1R_mfe"] - pop_mfe_rate).max())
         max_mfe_cell = str(ptf.loc[(ptf["pct_reached_1R_mfe"] - pop_mfe_rate).idxmax(), "cell"])
-        feat_rank_rows.append({
-            "feature": feat,
-            "max_cell_sl_rate_lift": max_sl_lift,
-            "max_cell_sl_rate_lift_cell": max_sl_cell,
-            "min_cell_sl_rate_lift": min_sl_lift,
-            "min_cell_sl_rate_lift_cell": min_sl_cell,
-            "max_cell_reached_1R_mfe_lift": max_mfe_lift,
-            "max_cell_reached_1R_mfe_lift_cell": max_mfe_cell,
-        })
+        feat_rank_rows.append(
+            {
+                "feature": feat,
+                "max_cell_sl_rate_lift": max_sl_lift,
+                "max_cell_sl_rate_lift_cell": max_sl_cell,
+                "min_cell_sl_rate_lift": min_sl_lift,
+                "min_cell_sl_rate_lift_cell": min_sl_cell,
+                "max_cell_reached_1R_mfe_lift": max_mfe_lift,
+                "max_cell_reached_1R_mfe_lift_cell": max_mfe_cell,
+            }
+        )
     fr_df = pd.DataFrame(feat_rank_rows)
     fr_df = fr_df.sort_values("max_cell_sl_rate_lift", ascending=False).reset_index(drop=True)
-    lines.append("Features ranked by the largest cell-level SL-rate lift above the population baseline (cells with n ≥ 20):")
+    lines.append(
+        "Features ranked by the largest cell-level SL-rate lift above the population baseline (cells with n ≥ 20):"
+    )
     lines.append("")
     lines.append(_df_to_md(fr_df, "{:.4f}"))
     lines.append("")
@@ -648,12 +710,22 @@ def main() -> Dict:
 
     # --- Schema discovery / Gate 2 ---
     required_cols = {
-        "pair", "time", "fold_id", "taken", "exit_reason", "R", "mfe_R",
-        "pre_momentum_label", "session", "atr_1h_regime_bin",
+        "pair",
+        "time",
+        "fold_id",
+        "taken",
+        "exit_reason",
+        "R",
+        "mfe_R",
+        "pre_momentum_label",
+        "session",
+        "atr_1h_regime_bin",
     }
     missing = required_cols - set(sf.columns)
     if missing:
-        raise RuntimeError(f"Gate 2 HALT: required columns missing in signals_features.csv: {sorted(missing)}")
+        raise RuntimeError(
+            f"Gate 2 HALT: required columns missing in signals_features.csv: {sorted(missing)}"
+        )
 
     cross_pair_density_cols: List[str] = []
     for c in full_column_list:
@@ -668,7 +740,9 @@ def main() -> Dict:
     ti = pd.read_csv(ti_path)
     # Merge on (pair, signal_bar_ts) — both files share the same convention.
     # trade_index gives us trade_id, atr_1h_wilder_at_signal.
-    sf_taken["signal_bar_ts"] = pd.to_datetime(sf_taken["signal_bar_ts"]).dt.strftime("%Y-%m-%dT%H:%M:%S")
+    sf_taken["signal_bar_ts"] = pd.to_datetime(sf_taken["signal_bar_ts"]).dt.strftime(
+        "%Y-%m-%dT%H:%M:%S"
+    )
     ti["signal_bar_ts"] = pd.to_datetime(ti["signal_bar_ts"]).dt.strftime("%Y-%m-%dT%H:%M:%S")
     taken = sf_taken.merge(
         ti[["trade_id", "pair", "signal_bar_ts", "atr_1h_wilder_at_signal"]],
@@ -683,7 +757,9 @@ def main() -> Dict:
         raise RuntimeError(f"Gate 3 HALT: taken rows = {len(taken)}, expected 3993")
 
     if taken["atr_1h_wilder_at_signal"].isna().any():
-        raise RuntimeError("Gate 3 HALT: merge dropped trades (atr_1h_wilder_at_signal NaN after merge)")
+        raise RuntimeError(
+            "Gate 3 HALT: merge dropped trades (atr_1h_wilder_at_signal NaN after merge)"
+        )
     if taken["trade_id"].isna().any():
         raise RuntimeError("Gate 3 HALT: merge dropped trades (trade_id NaN after merge)")
 
@@ -770,9 +846,7 @@ def main() -> Dict:
         for q in ["Q1", "Q2", "Q3", "Q4", "Q5"]:
             n = int(counts.get(q, 0))
             if not (780 <= n <= 820):
-                raise RuntimeError(
-                    f"Gate 8 HALT: {feat} {q} n={n} outside [780, 820]"
-                )
+                raise RuntimeError(f"Gate 8 HALT: {feat} {q} n={n} outside [780, 820]")
 
     # Build pooled / per-fold tables for all features.
     pooled_tables: Dict[str, pd.DataFrame] = {}
@@ -791,7 +865,9 @@ def main() -> Dict:
         cell_col = f"{feat}__quintile"
         pt = _block_l_pooled(taken_full, feat, cell_col)
         # Reorder cells Q1..Q5
-        pt["cell"] = pd.Categorical(pt["cell"], categories=["Q1", "Q2", "Q3", "Q4", "Q5"], ordered=True)
+        pt["cell"] = pd.Categorical(
+            pt["cell"], categories=["Q1", "Q2", "Q3", "Q4", "Q5"], ordered=True
+        )
         pt = pt.sort_values("cell").reset_index(drop=True)
         pt["cell"] = pt["cell"].astype(str)
         if int(pt["n"].sum()) != 3993:
@@ -800,7 +876,9 @@ def main() -> Dict:
 
         pf = _block_l_per_fold(taken_full, feat, cell_col)
         # Reorder cells Q1..Q5
-        pf["cell"] = pd.Categorical(pf["cell"], categories=["Q1", "Q2", "Q3", "Q4", "Q5"], ordered=True)
+        pf["cell"] = pd.Categorical(
+            pf["cell"], categories=["Q1", "Q2", "Q3", "Q4", "Q5"], ordered=True
+        )
         pf = pf.sort_values(["cell", "fold_id"]).reset_index(drop=True)
         pf["cell"] = pf["cell"].astype(str)
         per_fold_tables[feat] = pf
@@ -808,7 +886,6 @@ def main() -> Dict:
     # All-features summary CSV (ranked by sl_rate_lift_vs_baseline desc).
     summary_rows = []
     # Compute fold-stability flag — variance across folds.
-    median_variances: Dict[str, float] = {}
     # We need a global median of per-cell per-fold sl_rate variance to define "stable" vs "variable".
     all_variances: List[float] = []
     for feat in pooled_tables.keys():
@@ -831,18 +908,22 @@ def main() -> Dict:
                 flag = "stable" if v <= median_var else "variable"
             else:
                 flag = "thin"
-            summary_rows.append({
-                "feature": feat,
-                "cell": cell,
-                "n": int(row["n"]),
-                "sl_rate": float(row["sl_rate"]),
-                "sl_rate_lift_vs_baseline": float(row["sl_rate_lift_vs_baseline"]),
-                "mean_R": float(row["mean_R"]),
-                "mean_R_lift_vs_baseline": float(row["mean_R_lift_vs_baseline"]),
-                "fold_stability_flag": flag,
-            })
+            summary_rows.append(
+                {
+                    "feature": feat,
+                    "cell": cell,
+                    "n": int(row["n"]),
+                    "sl_rate": float(row["sl_rate"]),
+                    "sl_rate_lift_vs_baseline": float(row["sl_rate_lift_vs_baseline"]),
+                    "mean_R": float(row["mean_R"]),
+                    "mean_R_lift_vs_baseline": float(row["mean_R_lift_vs_baseline"]),
+                    "fold_stability_flag": flag,
+                }
+            )
     summary_df = pd.DataFrame(summary_rows)
-    summary_df = summary_df.sort_values(["sl_rate_lift_vs_baseline", "feature", "cell"], ascending=[False, True, True]).reset_index(drop=True)
+    summary_df = summary_df.sort_values(
+        ["sl_rate_lift_vs_baseline", "feature", "cell"], ascending=[False, True, True]
+    ).reset_index(drop=True)
 
     # --- Block O ---
     bo = _block_o_mfe_survivor(taken_full)
@@ -857,9 +938,10 @@ def main() -> Dict:
         "dist_4h_kijun_atr": _quantile_summary(bm["dist_4h_kijun_atr"]),
         "dist_d1_kijun_atr": _quantile_summary(bm["dist_d1_kijun_atr"]),
     }
-    block_m_quintile_bounds = {k: quintile_bounds[k] for k in (
-        "dist_1h_kijun_atr", "dist_4h_kijun_atr", "dist_d1_kijun_atr"
-    )}
+    block_m_quintile_bounds = {
+        k: quintile_bounds[k]
+        for k in ("dist_1h_kijun_atr", "dist_4h_kijun_atr", "dist_d1_kijun_atr")
+    }
 
     # --- Write CSVs ---
     _write_csv(bm, OUT_DIR / "block_M_kijun_distances.csv")
@@ -920,7 +1002,9 @@ def main() -> Dict:
     report_lc = report.lower()
     found = [p for p in forbidden if p in report_lc]
     if found:
-        raise RuntimeError(f"Gate 10 HALT: disposition discipline — forbidden patterns in report: {found}")
+        raise RuntimeError(
+            f"Gate 10 HALT: disposition discipline — forbidden patterns in report: {found}"
+        )
 
     (OUT_DIR / "entry_filter_univariate.md").write_text(report, encoding="utf-8")
 
@@ -952,18 +1036,10 @@ def main() -> Dict:
     manifest_lines.append(
         "  Prompt §6 specifies abs(dist) < 20 ATR. With §2.3's explicit choice of"
     )
-    manifest_lines.append(
-        "  `atr_1h_wilder_at_signal` as the normaliser for all three TFs, the D1"
-    )
-    manifest_lines.append(
-        "  distance legitimately exceeds 20 1H-ATR in tail cases (low 1H vol +"
-    )
-    manifest_lines.append(
-        "  large accumulated D1 move). Bound widened to 30 ATR to admit the"
-    )
-    manifest_lines.append(
-        "  empirical tail while still catching corruption-scale errors. Per-TF"
-    )
+    manifest_lines.append("  `atr_1h_wilder_at_signal` as the normaliser for all three TFs, the D1")
+    manifest_lines.append("  distance legitimately exceeds 20 1H-ATR in tail cases (low 1H vol +")
+    manifest_lines.append("  large accumulated D1 move). Bound widened to 30 ATR to admit the")
+    manifest_lines.append("  empirical tail while still catching corruption-scale errors. Per-TF")
     manifest_lines.append("  abs-max values:")
     for col, mx in g6_per_tf.items():
         manifest_lines.append(f"    {col}: abs_max = {mx:.4f}")
@@ -990,8 +1066,12 @@ def _bo_50pct(bo: pd.DataFrame) -> Dict:
     last_50 = bo[bo["pct_of_taken"] >= 0.5]
     first_below = bo[bo["pct_of_taken"] < 0.5]
     return {
-        "last_threshold_at_or_above_50": float(last_50.iloc[-1]["threshold_R"]) if len(last_50) > 0 else None,
-        "first_threshold_below_50": float(first_below.iloc[0]["threshold_R"]) if len(first_below) > 0 else None,
+        "last_threshold_at_or_above_50": float(last_50.iloc[-1]["threshold_R"])
+        if len(last_50) > 0
+        else None,
+        "first_threshold_below_50": float(first_below.iloc[0]["threshold_R"])
+        if len(first_below) > 0
+        else None,
     }
 
 
@@ -1003,4 +1083,6 @@ if __name__ == "__main__":
     print(f"cross_pair_density_cols: {receipt['cross_pair_density_cols']}")
     print(f"block_O 50% crossover: {receipt['block_o_50pct_crossover']}")
     for k, v in receipt["block_m_summary"].items():
-        print(f"  {k}: min={v['min']:.4f} q05={v['q05']:.4f} q25={v['q25']:.4f} q50={v['q50']:.4f} q75={v['q75']:.4f} q95={v['q95']:.4f} max={v['max']:.4f} mean={v['mean']:.4f}")
+        print(
+            f"  {k}: min={v['min']:.4f} q05={v['q05']:.4f} q25={v['q25']:.4f} q50={v['q50']:.4f} q75={v['q75']:.4f} q95={v['q95']:.4f} max={v['max']:.4f} mean={v['mean']:.4f}"
+        )

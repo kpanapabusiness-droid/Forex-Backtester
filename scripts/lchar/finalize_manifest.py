@@ -40,8 +40,10 @@ def main() -> int:
     out_dir = REPO_ROOT / "results" / "l6" / "characterisation"
     manifest_path = out_dir / "run_manifest.txt"
     if not manifest_path.exists():
-        print(f"FATAL: {manifest_path} not found; run scripts/lchar/run_l4_characterisation.py first.",
-              file=sys.stderr)
+        print(
+            f"FATAL: {manifest_path} not found; run scripts/lchar/run_l4_characterisation.py first.",
+            file=sys.stderr,
+        )
         return 2
 
     existing = manifest_path.read_text(encoding="utf-8")
@@ -67,8 +69,12 @@ def main() -> int:
         artefacts[p.name] = _sha256(p)
 
     # Per-pair signal counts: parse from existing manifest
-    per_pair_match = re.search(r"Per-pair signal counts.*?\n((?:  [A-Z]{3}_[A-Z]{3}: \d+\n)+)", existing)
-    per_pair_block = per_pair_match.group(0) if per_pair_match else "Per-pair signal counts: (unavailable)"
+    per_pair_match = re.search(
+        r"Per-pair signal counts.*?\n((?:  [A-Z]{3}_[A-Z]{3}: \d+\n)+)", existing
+    )
+    per_pair_block = (
+        per_pair_match.group(0) if per_pair_match else "Per-pair signal counts: (unavailable)"
+    )
     total_match = re.search(r"Total signals in window: (\d+)", existing)
     total_n = total_match.group(1) if total_match else "(unavailable)"
     look_match = re.search(r"Lookahead assertion failures: (\d+)", existing)
@@ -98,15 +104,15 @@ def main() -> int:
     lines.append(f"Git commit:          {git_commit}")
     lines.append("")
     lines.append("Inputs:")
-    lines.append(f"  configs/l4_characterisation.yaml")
+    lines.append("  configs/l4_characterisation.yaml")
     lines.append(f"    sha256: {cfg_sha}")
-    lines.append(f"  configs/spread_floors_5ers.yaml (body sha256, post-provenance):")
+    lines.append("  configs/spread_floors_5ers.yaml (body sha256, post-provenance):")
     lines.append(f"    sha256: {sf_sha}")
-    lines.append(f"  core/signals/l4_univariate_extreme.py:")
+    lines.append("  core/signals/l4_univariate_extreme.py:")
     lines.append(f"    sha256: {l4_module_sha}")
-    lines.append(f"  results/l6/arc1/trades_all.csv:")
+    lines.append("  results/l6/arc1/trades_all.csv:")
     lines.append(f"    sha256: {arc1_trades_sha}")
-    lines.append(f"  results/l6/arc1/signals_log.csv:")
+    lines.append("  results/l6/arc1/signals_log.csv:")
     lines.append(f"    sha256: {arc1_log_sha}")
     lines.append("")
     lines.append("Run #1 (pipeline):")
@@ -133,7 +139,9 @@ def main() -> int:
     lines.append("Determinism: pipeline produces byte-identical signals_features.csv across runs.")
     lines.append("All lag-1 runtime assertions (4H close_time ≤ T_N; D1.date < T_N.date strict;")
     lines.append("W1 < weekstart(T_N) strict) passed at every signal.")
-    lines.append("Disposition: descriptive only — no gate, no filter derivation, no system construction.")
+    lines.append(
+        "Disposition: descriptive only — no gate, no filter derivation, no system construction."
+    )
 
     manifest_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(f"Wrote {manifest_path}")

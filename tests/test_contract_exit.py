@@ -58,9 +58,7 @@ def test_exit_returns_dataframe_aligned(name, func, test_df):
     """Exit must return a DataFrame with same index and length as input."""
     out = _call_exit_with_signal_col(func, test_df, name)
     if not isinstance(out, pd.DataFrame):
-        raise AssertionError(
-            f"Exit '{name}' must return a DataFrame; got {type(out).__name__}"
-        )
+        raise AssertionError(f"Exit '{name}' must return a DataFrame; got {type(out).__name__}")
     if len(out) != len(test_df):
         raise AssertionError(
             f"Exit '{name}': output length {len(out)} != input length {len(test_df)}"
@@ -105,9 +103,7 @@ def test_exit_nan_policy_after_warmup(name, func, test_df):
             f"nan_rate={nan_rate}, nan_count={nan_count}, total_after_warmup={len(series) - WARMUP_BARS}."
         )
     if streak != 0:
-        raise AssertionError(
-            f"Exit '{name}': max_nan_streak after warmup must be 0; got {streak}."
-        )
+        raise AssertionError(f"Exit '{name}': max_nan_streak after warmup must be 0; got {streak}.")
 
 
 @pytest.mark.parametrize("name,func", _EXIT_LIST, ids=_EXIT_IDS)
@@ -120,7 +116,10 @@ def test_exit_determinism(name, func, test_df):
     s1 = out1[SIGNAL_COL]
     s2 = out2[SIGNAL_COL]
     pd.testing.assert_series_equal(
-        s1, s2, check_names=True, check_exact=False,
+        s1,
+        s2,
+        check_names=True,
+        check_exact=False,
         obj=f"Exit '{name}' determinism",
     )
 

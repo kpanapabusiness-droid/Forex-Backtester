@@ -44,17 +44,13 @@ def _require_phaseD2_1_config(raw: dict) -> dict:
 
     timeframe = str(cfg.get("timeframe") or "").upper()
     if timeframe not in {"D1", "D"}:
-        raise ValueError(
-            f"Phase D2.1 timeframe must be 'D1' or 'D'; got {timeframe!r}"
-        )
+        raise ValueError(f"Phase D2.1 timeframe must be 'D1' or 'D'; got {timeframe!r}")
 
     date_range = cfg.get("date_range") or {}
     start = date_range.get("start")
     end = date_range.get("end")
     if not start or not end:
-        raise ValueError(
-            "Phase D2.1 config must set date_range.start and date_range.end."
-        )
+        raise ValueError("Phase D2.1 config must set date_range.start and date_range.end.")
     if str(start) != "2019-01-01" or str(end) != "2026-01-01":
         raise ValueError(
             "Phase D2.1 date window is locked to 2019-01-01 → 2026-01-01; "
@@ -119,28 +115,28 @@ def _momentum_3bar_signals(df: pd.DataFrame, pair: str, signal_name: str) -> pd.
                 elif c2 < c1 < c0:
                     short_sig = 1
 
-        rows.append({
-            "pair": pair,
-            "date": date_t,
-            "direction": "long",
-            "signal": long_sig,
-            "signal_name": signal_name,
-        })
-        rows.append({
-            "pair": pair,
-            "date": date_t,
-            "direction": "short",
-            "signal": short_sig,
-            "signal_name": signal_name,
-        })
+        rows.append(
+            {
+                "pair": pair,
+                "date": date_t,
+                "direction": "long",
+                "signal": long_sig,
+                "signal_name": signal_name,
+            }
+        )
+        rows.append(
+            {
+                "pair": pair,
+                "date": date_t,
+                "direction": "short",
+                "signal": short_sig,
+                "signal_name": signal_name,
+            }
+        )
 
     out = pd.DataFrame(rows)
-    out["direction"] = pd.Categorical(
-        out["direction"], categories=["long", "short"], ordered=True
-    )
-    out = out[list(SIGNAL_SCHEMA)].sort_values(
-        ["pair", "date", "direction"]
-    ).reset_index(drop=True)
+    out["direction"] = pd.Categorical(out["direction"], categories=["long", "short"], ordered=True)
+    out = out[list(SIGNAL_SCHEMA)].sort_values(["pair", "date", "direction"]).reset_index(drop=True)
     return out
 
 
@@ -159,19 +155,13 @@ def _run_from_config(config_path: Path) -> None:
         df = load_pair_csv(pair, data_dir=data_dir)
         df_slice, _ = slice_df_by_dates(df, date_start, date_end, inclusive="both")
         if df_slice.empty:
-            raise ValueError(
-                f"Pair {pair} has no data in date range {date_start} → {date_end}."
-            )
+            raise ValueError(f"Pair {pair} has no data in date range {date_start} → {date_end}.")
         signals = _momentum_3bar_signals(df_slice, pair=pair, signal_name=signal_name)
         all_signals.append(signals)
 
     out = pd.concat(all_signals, ignore_index=True)
-    out["direction"] = pd.Categorical(
-        out["direction"], categories=["long", "short"], ordered=True
-    )
-    out = out[list(SIGNAL_SCHEMA)].sort_values(
-        ["pair", "date", "direction"]
-    ).reset_index(drop=True)
+    out["direction"] = pd.Categorical(out["direction"], categories=["long", "short"], ordered=True)
+    out = out[list(SIGNAL_SCHEMA)].sort_values(["pair", "date", "direction"]).reset_index(drop=True)
 
     outputs_dir.mkdir(parents=True, exist_ok=True)
     parquet_path = outputs_dir / f"{signal_name}_signals.parquet"

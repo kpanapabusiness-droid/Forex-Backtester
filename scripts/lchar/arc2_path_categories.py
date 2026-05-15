@@ -23,7 +23,7 @@ import math
 import sys
 import time as _time
 from pathlib import Path
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -37,23 +37,18 @@ if str(REPO_ROOT) not in sys.path:
 # ---------------------------------------------------------------------------
 
 LOCKED_SHA256: Dict[str, str] = {
-    "results/l6/arc2/characterisation/v1_1_full/signals_features.csv":
-        "71b39383632bd695b878add8b331b76bcd231ab5b9adba9eea03d69f8762483e",
-    "results/l6/arc2/characterisation/v1_2_1_full/trade_index.csv":
-        "9f841c5b29e87ed90d34c9617431978baf3041459797cedef02fa16c27e3abb5",
-    "results/l6/arc2/characterisation/v1_2_1_full/per_bar_paths.csv":
-        "7b2acd6ccb98f1fd145a631b318fc95d10f5cf4f42633be9c0b59738fa1696ee",
-    "results/l6/arc2/characterisation/extended/entry_filter_univariate/block_M_kijun_distances.csv":
-        "4a61407f0f1fc1b74486f0614928e776201dc6469d874db8393e689d20cdb2ff",
-    "core/signals/l4_mtf_alignment_2_down_mixed_kijun.py":
-        "3c8d0f5d4b446f84359ab0663df36869f15b47cf1bf18fbc6caff807dc5134e3",
-    "configs/wfo_l6_arc2.yaml":
-        "25917151bc84a73885eeea9ca9c4cc15b1c277ba793706b158abd3aee0ab6328",
-    "L6_0_METHODOLOGY_LOCK.md":
-        "4fd870b1d17380e4fc4fbfda5a43f7775d313c7a5f50dbfd1f06a3e49c519c26",
+    "results/l6/arc2/characterisation/v1_1_full/signals_features.csv": "71b39383632bd695b878add8b331b76bcd231ab5b9adba9eea03d69f8762483e",
+    "results/l6/arc2/characterisation/v1_2_1_full/trade_index.csv": "9f841c5b29e87ed90d34c9617431978baf3041459797cedef02fa16c27e3abb5",
+    "results/l6/arc2/characterisation/v1_2_1_full/per_bar_paths.csv": "7b2acd6ccb98f1fd145a631b318fc95d10f5cf4f42633be9c0b59738fa1696ee",
+    "results/l6/arc2/characterisation/extended/entry_filter_univariate/block_M_kijun_distances.csv": "4a61407f0f1fc1b74486f0614928e776201dc6469d874db8393e689d20cdb2ff",
+    "core/signals/l4_mtf_alignment_2_down_mixed_kijun.py": "3c8d0f5d4b446f84359ab0663df36869f15b47cf1bf18fbc6caff807dc5134e3",
+    "configs/wfo_l6_arc2.yaml": "25917151bc84a73885eeea9ca9c4cc15b1c277ba793706b158abd3aee0ab6328",
+    "L6_0_METHODOLOGY_LOCK.md": "4fd870b1d17380e4fc4fbfda5a43f7775d313c7a5f50dbfd1f06a3e49c519c26",
 }
 
-OUT_DIR = REPO_ROOT / "results" / "l6" / "arc2" / "characterisation" / "extended" / "path_categories"
+OUT_DIR = (
+    REPO_ROOT / "results" / "l6" / "arc2" / "characterisation" / "extended" / "path_categories"
+)
 
 KIJUN_PERIOD: int = 26
 EMA50_PERIOD: int = 50
@@ -67,50 +62,94 @@ THRESHOLDS_R: Tuple[float, float, float] = (0.5, 1.0, 1.5)
 # Currency baskets (R.7).
 USD_BASKET = {
     # pair, sign for USD strength (USD as base → +1, USD as quote → -1)
-    "USD_JPY": +1, "USD_CAD": +1, "USD_CHF": +1,
-    "EUR_USD": -1, "GBP_USD": -1, "AUD_USD": -1, "NZD_USD": -1,
+    "USD_JPY": +1,
+    "USD_CAD": +1,
+    "USD_CHF": +1,
+    "EUR_USD": -1,
+    "GBP_USD": -1,
+    "AUD_USD": -1,
+    "NZD_USD": -1,
 }
 EUR_BASKET = {
-    "EUR_USD": +1, "EUR_JPY": +1, "EUR_GBP": +1, "EUR_CHF": +1,
-    "EUR_AUD": +1, "EUR_CAD": +1, "EUR_NZD": +1,
+    "EUR_USD": +1,
+    "EUR_JPY": +1,
+    "EUR_GBP": +1,
+    "EUR_CHF": +1,
+    "EUR_AUD": +1,
+    "EUR_CAD": +1,
+    "EUR_NZD": +1,
 }
 JPY_BASKET = {
     # pair, sign for JPY strength
-    "USD_JPY": -1, "EUR_JPY": -1, "GBP_JPY": -1, "AUD_JPY": -1,
-    "NZD_JPY": -1, "CAD_JPY": -1, "CHF_JPY": -1,
+    "USD_JPY": -1,
+    "EUR_JPY": -1,
+    "GBP_JPY": -1,
+    "AUD_JPY": -1,
+    "NZD_JPY": -1,
+    "CAD_JPY": -1,
+    "CHF_JPY": -1,
 }
 GBP_BASKET = {
-    "GBP_USD": +1, "GBP_JPY": +1, "GBP_CHF": +1, "GBP_AUD": +1,
-    "GBP_CAD": +1, "GBP_NZD": +1,
+    "GBP_USD": +1,
+    "GBP_JPY": +1,
+    "GBP_CHF": +1,
+    "GBP_AUD": +1,
+    "GBP_CAD": +1,
+    "GBP_NZD": +1,
     "EUR_GBP": -1,
 }
 AUD_BASKET = {
-    "AUD_USD": +1, "AUD_JPY": +1, "AUD_CHF": +1, "AUD_CAD": +1, "AUD_NZD": +1,
-    "EUR_AUD": -1, "GBP_AUD": -1,
+    "AUD_USD": +1,
+    "AUD_JPY": +1,
+    "AUD_CHF": +1,
+    "AUD_CAD": +1,
+    "AUD_NZD": +1,
+    "EUR_AUD": -1,
+    "GBP_AUD": -1,
 }
 NZD_BASKET = {
-    "NZD_USD": +1, "NZD_JPY": +1, "NZD_CHF": +1, "NZD_CAD": +1,
-    "AUD_NZD": -1, "EUR_NZD": -1, "GBP_NZD": -1,
+    "NZD_USD": +1,
+    "NZD_JPY": +1,
+    "NZD_CHF": +1,
+    "NZD_CAD": +1,
+    "AUD_NZD": -1,
+    "EUR_NZD": -1,
+    "GBP_NZD": -1,
 }
 CAD_BASKET = {
     "USD_CAD": -1,
-    "CAD_JPY": +1, "CAD_CHF": +1,
-    "AUD_CAD": -1, "EUR_CAD": -1, "GBP_CAD": -1, "NZD_CAD": -1,
+    "CAD_JPY": +1,
+    "CAD_CHF": +1,
+    "AUD_CAD": -1,
+    "EUR_CAD": -1,
+    "GBP_CAD": -1,
+    "NZD_CAD": -1,
 }
 CHF_BASKET = {
     "USD_CHF": -1,
     "CHF_JPY": +1,
-    "AUD_CHF": -1, "CAD_CHF": -1, "EUR_CHF": -1, "GBP_CHF": -1, "NZD_CHF": -1,
+    "AUD_CHF": -1,
+    "CAD_CHF": -1,
+    "EUR_CHF": -1,
+    "GBP_CHF": -1,
+    "NZD_CHF": -1,
 }
 BASKETS_BY_CCY: Dict[str, Dict[str, int]] = {
-    "USD": USD_BASKET, "EUR": EUR_BASKET, "JPY": JPY_BASKET, "GBP": GBP_BASKET,
-    "AUD": AUD_BASKET, "NZD": NZD_BASKET, "CAD": CAD_BASKET, "CHF": CHF_BASKET,
+    "USD": USD_BASKET,
+    "EUR": EUR_BASKET,
+    "JPY": JPY_BASKET,
+    "GBP": GBP_BASKET,
+    "AUD": AUD_BASKET,
+    "NZD": NZD_BASKET,
+    "CAD": CAD_BASKET,
+    "CHF": CHF_BASKET,
 }
 
 
 # ---------------------------------------------------------------------------
 # sha256 helpers
 # ---------------------------------------------------------------------------
+
 
 def _sha256_file(path: Path) -> str:
     h = hashlib.sha256()
@@ -139,6 +178,7 @@ def _verify_locked_inputs(label: str = "start") -> None:
 # CSV write
 # ---------------------------------------------------------------------------
 
+
 def _write_csv(df: pd.DataFrame, path: Path, float_fmt: str = "%.10g") -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(path, index=False, lineterminator="\n", float_format=float_fmt)
@@ -147,6 +187,7 @@ def _write_csv(df: pd.DataFrame, path: Path, float_fmt: str = "%.10g") -> None:
 # ---------------------------------------------------------------------------
 # Block Q — path-category assignment
 # ---------------------------------------------------------------------------
+
 
 def compute_block_Q(taken: pd.DataFrame, pbp: pd.DataFrame) -> pd.DataFrame:
     """For each trade × threshold, determine path category.
@@ -196,20 +237,22 @@ def compute_block_Q(taken: pd.DataFrame, pbp: pd.DataFrame) -> pd.DataFrame:
                 cat = "down_then_up"
             else:
                 cat = "tied"
-            rows.append({
-                "trade_id": tid,
-                "pair": tr["pair"],
-                "fold_id": int(tr["fold_id"]),
-                "entry_time": tr["signal_bar_ts"],
-                "threshold_R": X,
-                "category": cat,
-                "t_up_bar": t_up,
-                "t_down_bar": t_dn,
-                "final_R": float(tr["R"]),
-                "final_mfe_R": float(tr["mfe_R"]),
-                "final_mae_R": float(tr["mae_R"]),
-                "exit_reason": tr["exit_reason"],
-            })
+            rows.append(
+                {
+                    "trade_id": tid,
+                    "pair": tr["pair"],
+                    "fold_id": int(tr["fold_id"]),
+                    "entry_time": tr["signal_bar_ts"],
+                    "threshold_R": X,
+                    "category": cat,
+                    "t_up_bar": t_up,
+                    "t_down_bar": t_dn,
+                    "final_R": float(tr["R"]),
+                    "final_mfe_R": float(tr["mfe_R"]),
+                    "final_mae_R": float(tr["mae_R"]),
+                    "exit_reason": tr["exit_reason"],
+                }
+            )
     out = pd.DataFrame(rows)
     out = out.sort_values(["threshold_R", "trade_id"], kind="stable").reset_index(drop=True)
     return out
@@ -218,6 +261,7 @@ def compute_block_Q(taken: pd.DataFrame, pbp: pd.DataFrame) -> pd.DataFrame:
 # ---------------------------------------------------------------------------
 # Raw-data helpers (Block R)
 # ---------------------------------------------------------------------------
+
 
 def _load_pair_tf(pair: str, tf_dir: str) -> Optional[pd.DataFrame]:
     """Load `data/<tf_dir>/<pair>.csv`. Returns None if absent."""
@@ -243,35 +287,37 @@ def _ema_array(series: pd.Series, span: int) -> np.ndarray:
 def _wilder_atr(df_tf: pd.DataFrame, period: int = WILDER_ATR_PERIOD) -> np.ndarray:
     """Wilder ATR — RMA of true range."""
     h = df_tf["high"].astype(float).to_numpy()
-    l = df_tf["low"].astype(float).to_numpy()
+    lo = df_tf["low"].astype(float).to_numpy()
     c = df_tf["close"].astype(float).to_numpy()
     pc = np.r_[np.nan, c[:-1]]
-    tr = np.maximum.reduce([h - l, np.abs(h - pc), np.abs(l - pc)])
+    tr = np.maximum.reduce([h - lo, np.abs(h - pc), np.abs(lo - pc)])
     # Wilder's smoothing (RMA): atr[i] = (atr[i-1] * (n-1) + tr[i]) / n,
     # initialised with simple mean of first n TRs at index n-1.
     n = period
     out = np.full_like(tr, np.nan)
     if len(tr) < n:
         return out
-    first = np.nanmean(tr[1:n + 1]) if n < len(tr) else np.nan  # tr[0] is NaN; use tr[1..n]
+    np.nanmean(tr[1 : n + 1]) if n < len(tr) else np.nan  # tr[0] is NaN; use tr[1..n]
     # Actually canonical: first ATR at index n is the mean of TR[1..n].
     if len(tr) > n:
-        out[n] = np.nanmean(tr[1:n + 1])
+        out[n] = np.nanmean(tr[1 : n + 1])
         for i in range(n + 1, len(tr)):
             out[i] = (out[i - 1] * (n - 1) + tr[i]) / n
     return out
 
 
-def _wilder_dmi_adx(df_tf: pd.DataFrame, period: int = ADX_PERIOD) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+def _wilder_dmi_adx(
+    df_tf: pd.DataFrame, period: int = ADX_PERIOD
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Wilder DMI: returns DI+, DI-, ADX arrays."""
     h = df_tf["high"].astype(float).to_numpy()
-    l = df_tf["low"].astype(float).to_numpy()
+    lo = df_tf["low"].astype(float).to_numpy()
     c = df_tf["close"].astype(float).to_numpy()
     n_bars = len(h)
     pc = np.r_[np.nan, c[:-1]]
-    tr = np.maximum.reduce([h - l, np.abs(h - pc), np.abs(l - pc)])
+    tr = np.maximum.reduce([h - lo, np.abs(h - pc), np.abs(lo - pc)])
     up_move = np.r_[np.nan, h[1:] - h[:-1]]
-    dn_move = np.r_[np.nan, l[:-1] - l[1:]]
+    dn_move = np.r_[np.nan, lo[:-1] - lo[1:]]
     plus_dm = np.where((up_move > dn_move) & (up_move > 0), up_move, 0.0)
     minus_dm = np.where((dn_move > up_move) & (dn_move > 0), dn_move, 0.0)
     plus_dm[0] = np.nan
@@ -283,9 +329,9 @@ def _wilder_dmi_adx(df_tf: pd.DataFrame, period: int = ADX_PERIOD) -> Tuple[np.n
     s_tr = np.full(n_bars, np.nan)
     s_pd = np.full(n_bars, np.nan)
     s_md = np.full(n_bars, np.nan)
-    s_tr[n] = np.nansum(tr[1:n + 1])
-    s_pd[n] = np.nansum(plus_dm[1:n + 1])
-    s_md[n] = np.nansum(minus_dm[1:n + 1])
+    s_tr[n] = np.nansum(tr[1 : n + 1])
+    s_pd[n] = np.nansum(plus_dm[1 : n + 1])
+    s_md[n] = np.nansum(minus_dm[1 : n + 1])
     for i in range(n + 1, n_bars):
         s_tr[i] = s_tr[i - 1] - s_tr[i - 1] / n + tr[i]
         s_pd[i] = s_pd[i - 1] - s_pd[i - 1] / n + plus_dm[i]
@@ -293,11 +339,13 @@ def _wilder_dmi_adx(df_tf: pd.DataFrame, period: int = ADX_PERIOD) -> Tuple[np.n
     di_plus = 100.0 * np.divide(s_pd, s_tr, out=np.full(n_bars, np.nan), where=(s_tr > 0))
     di_minus = 100.0 * np.divide(s_md, s_tr, out=np.full(n_bars, np.nan), where=(s_tr > 0))
     sum_di = di_plus + di_minus
-    dx = 100.0 * np.divide(np.abs(di_plus - di_minus), sum_di, out=np.full(n_bars, np.nan), where=(sum_di > 0))
+    dx = 100.0 * np.divide(
+        np.abs(di_plus - di_minus), sum_di, out=np.full(n_bars, np.nan), where=(sum_di > 0)
+    )
     adx = np.full(n_bars, np.nan)
     # ADX = Wilder average of DX over n periods, starting at index 2n
     if n_bars > 2 * n:
-        adx[2 * n] = np.nanmean(dx[n + 1:2 * n + 1])
+        adx[2 * n] = np.nanmean(dx[n + 1 : 2 * n + 1])
         for i in range(2 * n + 1, n_bars):
             adx[i] = (adx[i - 1] * (n - 1) + dx[i]) / n
     return di_plus, di_minus, adx
@@ -360,6 +408,7 @@ def _current_sign_streak(sign_arr: np.ndarray, cap: int) -> np.ndarray:
 # ---------------------------------------------------------------------------
 # Block R — at-entry feature computation
 # ---------------------------------------------------------------------------
+
 
 class PairCache:
     """Per-pair precomputed series, with timestamp → index lookups."""
@@ -465,19 +514,19 @@ def _safe_idx(idx_series: pd.Series, ts: pd.Timestamp) -> Optional[int]:
 
 def _rolling_max_back(arr: np.ndarray, i: int, window: int) -> float:
     lo = max(0, i - window + 1)
-    seg = arr[lo:i + 1]
+    seg = arr[lo : i + 1]
     return float(np.max(seg)) if seg.size > 0 else float("nan")
 
 
 def _rolling_min_back(arr: np.ndarray, i: int, window: int) -> float:
     lo = max(0, i - window + 1)
-    seg = arr[lo:i + 1]
+    seg = arr[lo : i + 1]
     return float(np.min(seg)) if seg.size > 0 else float("nan")
 
 
 def _rolling_sum_back(arr: np.ndarray, i: int, window: int) -> float:
     lo = max(0, i - window + 1)
-    seg = arr[lo:i + 1]
+    seg = arr[lo : i + 1]
     return float(np.nansum(seg)) if seg.size > 0 else float("nan")
 
 
@@ -588,14 +637,14 @@ def _compute_trade_features(
     # ----------- R.2 Returns (new) -----------
     # cum_logret_1h_240
     if i1 >= 240:
-        out["cum_logret_1h_240"] = float(np.nansum(pc.logret1[i1 - 239:i1 + 1]))
+        out["cum_logret_1h_240"] = float(np.nansum(pc.logret1[i1 - 239 : i1 + 1]))
     else:
         out["cum_logret_1h_240"] = NAN
 
     def _cum_logret_lag1(arr: np.ndarray, idx: Optional[int], n: int) -> float:
         if idx is None or idx < n:
             return NAN
-        return float(np.nansum(arr[idx - n + 1:idx + 1]))
+        return float(np.nansum(arr[idx - n + 1 : idx + 1]))
 
     out["cum_logret_4h_5_lag1"] = _cum_logret_lag1(pc.logret4, mr4, 5)
     out["cum_logret_4h_10_lag1"] = _cum_logret_lag1(pc.logret4, mr4, 10)
@@ -632,7 +681,7 @@ def _compute_trade_features(
     out["ema20_slope_d1_20_lag1"] = _slope_tf(pc.ema20_d, mrd, 20)
 
     # ----------- R.4 Volatility (new) -----------
-    atr_1h_val = float(pc.atr1_wilder[i1]) if not np.isnan(pc.atr1_wilder[i1]) else NAN
+    float(pc.atr1_wilder[i1]) if not np.isnan(pc.atr1_wilder[i1]) else NAN
     # NB: atr_div is also atr_1h_wilder_at_signal, equivalent.
     # 4H and D1 ATR at MR — read from signals_features (already present), not computed here.
     # The ratios use external atr_4h_at_mr / atr_d1_at_mr (passed in via merge).
@@ -640,19 +689,27 @@ def _compute_trade_features(
 
     # Realised vol
     if i1 >= 24:
-        seg24 = pc.logret1[i1 - 23:i1 + 1]
-        out["realised_vol_1h_24"] = float(np.nanstd(seg24, ddof=1)) if np.count_nonzero(~np.isnan(seg24)) >= 2 else NAN
+        seg24 = pc.logret1[i1 - 23 : i1 + 1]
+        out["realised_vol_1h_24"] = (
+            float(np.nanstd(seg24, ddof=1)) if np.count_nonzero(~np.isnan(seg24)) >= 2 else NAN
+        )
     else:
         out["realised_vol_1h_24"] = NAN
     if i1 >= 120:
-        seg120 = pc.logret1[i1 - 119:i1 + 1]
-        out["realised_vol_1h_120"] = float(np.nanstd(seg120, ddof=1)) if np.count_nonzero(~np.isnan(seg120)) >= 2 else NAN
+        seg120 = pc.logret1[i1 - 119 : i1 + 1]
+        out["realised_vol_1h_120"] = (
+            float(np.nanstd(seg120, ddof=1)) if np.count_nonzero(~np.isnan(seg120)) >= 2 else NAN
+        )
     else:
         out["realised_vol_1h_120"] = NAN
     atr_1h_pct = atr_div / close_1h_N if close_1h_N != 0 else NAN
     out["rv_to_atr_ratio_1h"] = (
         out["realised_vol_1h_24"] / atr_1h_pct
-        if (not math.isnan(out["realised_vol_1h_24"]) and not math.isnan(atr_1h_pct) and atr_1h_pct != 0)
+        if (
+            not math.isnan(out["realised_vol_1h_24"])
+            and not math.isnan(atr_1h_pct)
+            and atr_1h_pct != 0
+        )
         else NAN
     )
     if rng_24 == rng_24 and rng_24 > 0:
@@ -665,15 +722,21 @@ def _compute_trade_features(
         out["range_120_to_atr_1h"] = NAN
 
     # ----------- R.5 Bar morphology (new) -----------
-    o = float(pc.o1[i1]); h = float(pc.h1[i1]); l = float(pc.l1[i1]); c = float(pc.c1[i1])
+    o = float(pc.o1[i1])
+    h = float(pc.h1[i1])
+    lo = float(pc.l1[i1])
+    c = float(pc.c1[i1])
     upper = h - max(o, c)
-    lower = min(o, c) - l
+    lower = min(o, c) - lo
     out["upper_wick_atr_1h"] = upper / atr_div
     out["lower_wick_atr_1h"] = lower / atr_div
     out["upper_to_lower_wick_ratio"] = upper / (lower + 1e-12) if atr_div > 0 else NAN
     out["bar_direction_1h"] = float(np.sign(c - o))
     if i1 >= 1:
-        o_p = float(pc.o1[i1 - 1]); h_p = float(pc.h1[i1 - 1]); l_p = float(pc.l1[i1 - 1]); c_p = float(pc.c1[i1 - 1])
+        o_p = float(pc.o1[i1 - 1])
+        h_p = float(pc.h1[i1 - 1])
+        l_p = float(pc.l1[i1 - 1])
+        c_p = float(pc.c1[i1 - 1])
         out["prev_bar_size_atr_1h"] = (h_p - l_p) / atr_div
         out["prev_bar_body_atr_1h"] = abs(c_p - o_p) / atr_div
         rng = h_p - l_p
@@ -684,7 +747,10 @@ def _compute_trade_features(
         out["prev_bar_close_position"] = NAN
     # 4H bar morphology (lag-1)
     if mr4 is not None:
-        o4 = float(pc.o4[mr4]); h4 = float(pc.h4[mr4]); l4 = float(pc.l4[mr4]); c4 = float(pc.c4[mr4])
+        o4 = float(pc.o4[mr4])
+        h4 = float(pc.h4[mr4])
+        l4 = float(pc.l4[mr4])
+        c4 = float(pc.c4[mr4])
         out["bar_size_atr_4h_lag1"] = (h4 - l4) / atr_div
         out["bar_body_atr_4h_lag1"] = abs(c4 - o4) / atr_div
         out["upper_wick_atr_4h_lag1"] = (h4 - max(o4, c4)) / atr_div
@@ -692,19 +758,38 @@ def _compute_trade_features(
         rng4 = h4 - l4
         out["close_position_in_bar_4h_lag1"] = (c4 - l4) / rng4 if rng4 > 0 else NAN
     else:
-        for k in ("bar_size_atr_4h_lag1", "bar_body_atr_4h_lag1", "upper_wick_atr_4h_lag1",
-                  "lower_wick_atr_4h_lag1", "close_position_in_bar_4h_lag1"):
+        for k in (
+            "bar_size_atr_4h_lag1",
+            "bar_body_atr_4h_lag1",
+            "upper_wick_atr_4h_lag1",
+            "lower_wick_atr_4h_lag1",
+            "close_position_in_bar_4h_lag1",
+        ):
             out[k] = NAN
 
     # ----------- R.6 Streak/duration (new) -----------
     out["bars_since_1h_kijun_cross"] = float(pc.bs_kj1[i1]) if not np.isnan(pc.bs_kj1[i1]) else NAN
-    out["bars_since_4h_kijun_cross_lag1"] = float(pc.bs_kj4[mr4]) if (mr4 is not None and not np.isnan(pc.bs_kj4[mr4])) else NAN
-    out["bars_since_d1_kijun_cross_lag1"] = float(pc.bs_kjd[mrd]) if (mrd is not None and not np.isnan(pc.bs_kjd[mrd])) else NAN
-    out["bars_since_1h_ema20_cross"] = float(pc.bs_e20_1[i1]) if not np.isnan(pc.bs_e20_1[i1]) else NAN
-    out["bars_since_4h_ema20_cross_lag1"] = float(pc.bs_e20_4[mr4]) if (mr4 is not None and not np.isnan(pc.bs_e20_4[mr4])) else NAN
-    out["bars_since_d1_ema20_cross_lag1"] = float(pc.bs_e20_d[mrd]) if (mrd is not None and not np.isnan(pc.bs_e20_d[mrd])) else NAN
-    out["current_4h_kijun_sign_streak_lag1"] = float(pc.streak_kj4[mr4]) if (mr4 is not None and not np.isnan(pc.streak_kj4[mr4])) else NAN
-    out["current_d1_kijun_sign_streak_lag1"] = float(pc.streak_kjd[mrd]) if (mrd is not None and not np.isnan(pc.streak_kjd[mrd])) else NAN
+    out["bars_since_4h_kijun_cross_lag1"] = (
+        float(pc.bs_kj4[mr4]) if (mr4 is not None and not np.isnan(pc.bs_kj4[mr4])) else NAN
+    )
+    out["bars_since_d1_kijun_cross_lag1"] = (
+        float(pc.bs_kjd[mrd]) if (mrd is not None and not np.isnan(pc.bs_kjd[mrd])) else NAN
+    )
+    out["bars_since_1h_ema20_cross"] = (
+        float(pc.bs_e20_1[i1]) if not np.isnan(pc.bs_e20_1[i1]) else NAN
+    )
+    out["bars_since_4h_ema20_cross_lag1"] = (
+        float(pc.bs_e20_4[mr4]) if (mr4 is not None and not np.isnan(pc.bs_e20_4[mr4])) else NAN
+    )
+    out["bars_since_d1_ema20_cross_lag1"] = (
+        float(pc.bs_e20_d[mrd]) if (mrd is not None and not np.isnan(pc.bs_e20_d[mrd])) else NAN
+    )
+    out["current_4h_kijun_sign_streak_lag1"] = (
+        float(pc.streak_kj4[mr4]) if (mr4 is not None and not np.isnan(pc.streak_kj4[mr4])) else NAN
+    )
+    out["current_d1_kijun_sign_streak_lag1"] = (
+        float(pc.streak_kjd[mrd]) if (mrd is not None and not np.isnan(pc.streak_kjd[mrd])) else NAN
+    )
 
     # ----------- R.8 Time / session calendar -----------
     h_utc = sig_ts.hour
@@ -721,14 +806,18 @@ def _compute_trade_features(
     dow0 = sig_ts.dayofweek
     # We define "Friday 21:00 UTC" as 5pm... actually Friday is dayofweek=4.
     days_to_fri = (4 - dow0) % 7
-    fri_target = (sig_ts + pd.Timedelta(days=days_to_fri)).replace(hour=21, minute=0, second=0, microsecond=0)
+    fri_target = (sig_ts + pd.Timedelta(days=days_to_fri)).replace(
+        hour=21, minute=0, second=0, microsecond=0
+    )
     if fri_target <= sig_ts:
         fri_target = fri_target + pd.Timedelta(days=7)
     delta_to_fri = (fri_target - sig_ts).total_seconds() / 3600.0
     out["bars_to_weekend_close"] = min(float(delta_to_fri), 168.0)
     # Most recent Sunday 22:00 UTC: Sunday is dayofweek=6
     days_back_to_sun = (dow0 - 6) % 7
-    sun_target = (sig_ts - pd.Timedelta(days=days_back_to_sun)).replace(hour=22, minute=0, second=0, microsecond=0)
+    sun_target = (sig_ts - pd.Timedelta(days=days_back_to_sun)).replace(
+        hour=22, minute=0, second=0, microsecond=0
+    )
     if sun_target > sig_ts:
         sun_target = sun_target - pd.Timedelta(days=7)
     delta_since_sun = (sig_ts - sun_target).total_seconds() / 3600.0
@@ -753,7 +842,8 @@ def _compute_trade_features(
         a = a[~np.isnan(a)]
         if a.size < 3:
             return NAN
-        m = np.mean(a); s = np.std(a, ddof=0)
+        m = np.mean(a)
+        s = np.std(a, ddof=0)
         if s == 0:
             return NAN
         return float(np.mean(((a - m) / s) ** 3))
@@ -763,7 +853,8 @@ def _compute_trade_features(
         a = a[~np.isnan(a)]
         if a.size < 4:
             return NAN
-        m = np.mean(a); s = np.std(a, ddof=0)
+        m = np.mean(a)
+        s = np.std(a, ddof=0)
         if s == 0:
             return NAN
         return float(np.mean(((a - m) / s) ** 4)) - 3.0
@@ -804,12 +895,16 @@ def _compute_trade_features(
             runs.append(cur)
         return float(np.mean(runs)) if runs else 0.0
 
-    out["recent_runlen_up_mean_120"] = _runlen(seg120_ret, positive=True) if seg120_ret.size > 0 else NAN
-    out["recent_runlen_down_mean_120"] = _runlen(seg120_ret, positive=False) if seg120_ret.size > 0 else NAN
+    out["recent_runlen_up_mean_120"] = (
+        _runlen(seg120_ret, positive=True) if seg120_ret.size > 0 else NAN
+    )
+    out["recent_runlen_down_mean_120"] = (
+        _runlen(seg120_ret, positive=False) if seg120_ret.size > 0 else NAN
+    )
 
     # Max drawup / drawdown over 120 1H bars (strictly prior, so closes [i1-120, i1-1]).
     if i1 >= 120:
-        closes120 = pc.c1[i1 - 120:i1]  # 120 closes strictly before N
+        closes120 = pc.c1[i1 - 120 : i1]  # 120 closes strictly before N
         # Max drawup: max(close[j] - min(close[:j+1])) over j
         run_min = np.minimum.accumulate(closes120)
         run_max = np.maximum.accumulate(closes120)
@@ -828,8 +923,8 @@ def _compute_trade_features(
         lo_i = i1 - n + 1
         # ATR-sum (or true range sum) approximated via TR sum.
         # Use bar ranges high-low as a proxy (simple CI). For canonical CI, use sum(TR).
-        h_seg = pc.h1[lo_i:i1 + 1]
-        l_seg = pc.l1[lo_i:i1 + 1]
+        h_seg = pc.h1[lo_i : i1 + 1]
+        l_seg = pc.l1[lo_i : i1 + 1]
         pc_seg = np.r_[np.nan, pc.c1[lo_i:i1]]
         tr_seg = np.maximum.reduce([h_seg - l_seg, np.abs(h_seg - pc_seg), np.abs(l_seg - pc_seg)])
         sum_tr = float(np.nansum(tr_seg))
@@ -869,7 +964,8 @@ def _compute_trade_features(
         valid = seg[~np.isnan(seg)]
         if valid.size < 2:
             return v_n, NAN
-        m = float(np.mean(valid)); s = float(np.std(valid, ddof=1))
+        m = float(np.mean(valid))
+        s = float(np.std(valid, ddof=1))
         if s == 0 or np.isnan(v_n):
             return v_n, NAN
         return v_n, (v_n - m) / s
@@ -898,6 +994,7 @@ def _compute_trade_features(
 # ---------------------------------------------------------------------------
 # Cross-pair features (R.7)
 # ---------------------------------------------------------------------------
+
 
 def _build_pair_rolling24_logret(pc_map):
     """Wide DF indexed by 1H time, columns = pairs, values = sum of last 24 1H log-returns."""
@@ -931,31 +1028,67 @@ def _basket_value(wide_rolling, basket, ts, exclude):
 # Block R orchestration
 # ---------------------------------------------------------------------------
 
+
 def compute_block_R(taken, sf_taken, bm, all_signals):
     sf_cols_keep = [
-        "pair", "signal_bar_ts",
-        "atr_1h_wilder_at_n", "atr_1h_regime", "atr_1h_regime_bin",
-        "atr_4h_at_mr", "atr_4h_regime_at_mr", "atr_4h_regime_bin",
-        "atr_d1_at_mr", "atr_d1_regime_at_mr", "atr_d1_regime_bin",
-        "log_ret_1h_at_n", "cum_logret_1h_6", "cum_logret_1h_24", "cum_logret_1h_120",
-        "bar_size_atr", "bar_body_atr", "close_position_in_bar",
-        "dist_to_kijun_1h_atr", "dist_to_ema20_1h_atr", "dist_to_ema50_1h_atr",
-        "dist_to_kijun_4h_at_mr_atr", "dist_to_ema20_4h_at_mr_atr",
-        "dist_to_kijun_d1_at_mr_atr", "dist_to_ema20_d1_at_mr_atr",
+        "pair",
+        "signal_bar_ts",
+        "atr_1h_wilder_at_n",
+        "atr_1h_regime",
+        "atr_1h_regime_bin",
+        "atr_4h_at_mr",
+        "atr_4h_regime_at_mr",
+        "atr_4h_regime_bin",
+        "atr_d1_at_mr",
+        "atr_d1_regime_at_mr",
+        "atr_d1_regime_bin",
+        "log_ret_1h_at_n",
+        "cum_logret_1h_6",
+        "cum_logret_1h_24",
+        "cum_logret_1h_120",
+        "bar_size_atr",
+        "bar_body_atr",
+        "close_position_in_bar",
+        "dist_to_kijun_1h_atr",
+        "dist_to_ema20_1h_atr",
+        "dist_to_ema50_1h_atr",
+        "dist_to_kijun_4h_at_mr_atr",
+        "dist_to_ema20_4h_at_mr_atr",
+        "dist_to_kijun_d1_at_mr_atr",
+        "dist_to_ema20_d1_at_mr_atr",
         "concurrent_signals_same_bar",
-        "hour_utc", "dow", "session",
-        "spread_pips_entry", "spread_pips_exit", "spread_floored",
+        "hour_utc",
+        "dow",
+        "session",
+        "spread_pips_entry",
+        "spread_pips_exit",
+        "spread_floored",
         "pre_momentum_label",
     ]
     sf_keep = sf_taken[sf_cols_keep].copy()
 
-    base = taken[["trade_id", "pair", "fold_id", "signal_bar_ts",
-                  "atr_1h_wilder_at_signal", "exit_reason", "R", "mfe_R", "mae_R",
-                  "held_bars", "gross_r", "spread_cost_r"]].copy()
+    base = taken[
+        [
+            "trade_id",
+            "pair",
+            "fold_id",
+            "signal_bar_ts",
+            "atr_1h_wilder_at_signal",
+            "exit_reason",
+            "R",
+            "mfe_R",
+            "mae_R",
+            "held_bars",
+            "gross_r",
+            "spread_cost_r",
+        ]
+    ].copy()
     base = base.merge(sf_keep, on=["pair", "signal_bar_ts"], how="left", validate="one_to_one")
     base = base.merge(
         bm[["trade_id", "dist_1h_kijun_atr", "dist_4h_kijun_atr", "dist_d1_kijun_atr"]],
-        on="trade_id", how="left", validate="one_to_one",
+        on="trade_id",
+        how="left",
+        validate="one_to_one",
     )
     base = base.sort_values("trade_id").reset_index(drop=True)
     if len(base) != 3993:
@@ -1005,11 +1138,13 @@ def compute_block_R(taken, sf_taken, bm, all_signals):
         quote_ccy = pair[4:]
         feats["base_ccy_basket_24h"] = (
             _basket_value(wide_rolling, BASKETS_BY_CCY[base_ccy], sig_ts, exclude=pair)
-            if base_ccy in BASKETS_BY_CCY else float("nan")
+            if base_ccy in BASKETS_BY_CCY
+            else float("nan")
         )
         feats["quote_ccy_basket_24h"] = (
             _basket_value(wide_rolling, BASKETS_BY_CCY[quote_ccy], sig_ts, exclude=pair)
-            if quote_ccy in BASKETS_BY_CCY else float("nan")
+            if quote_ccy in BASKETS_BY_CCY
+            else float("nan")
         )
 
         d1h_k = float(tr["dist_1h_kijun_atr"])
@@ -1018,7 +1153,9 @@ def compute_block_R(taken, sf_taken, bm, all_signals):
         feats["tf_tension_4h_1h"] = d4h_k + d1h_k
         feats["tf_tension_d1_1h"] = ddh_k - d1h_k
         feats["tf_tension_4h_d1"] = d4h_k - ddh_k
-        s1 = np.sign(d1h_k); s4 = np.sign(d4h_k); sd = np.sign(ddh_k)
+        s1 = np.sign(d1h_k)
+        s4 = np.sign(d4h_k)
+        sd = np.sign(ddh_k)
         feats["alignment_consistency"] = float(s1 * s4 * sd)
 
         feats["spread_floored_flag"] = 1.0 if bool(tr["spread_floored"]) else 0.0
@@ -1030,28 +1167,60 @@ def compute_block_R(taken, sf_taken, bm, all_signals):
     spread_df = base[["trade_id", "pair", "spread_pips_entry"]].copy()
     pair_median = spread_df.groupby("pair")["spread_pips_entry"].median()
     spread_df["spread_at_entry_pips_relative"] = spread_df.apply(
-        lambda r: float(r["spread_pips_entry"]) / float(pair_median[r["pair"]])
-        if pair_median[r["pair"]] != 0 else float("nan"),
+        lambda r: (
+            float(r["spread_pips_entry"]) / float(pair_median[r["pair"]])
+            if pair_median[r["pair"]] != 0
+            else float("nan")
+        ),
         axis=1,
     )
-    feat_df["spread_at_entry_pips_relative"] = spread_df.set_index("trade_id")["spread_at_entry_pips_relative"]
+    feat_df["spread_at_entry_pips_relative"] = spread_df.set_index("trade_id")[
+        "spread_at_entry_pips_relative"
+    ]
 
     merge_df = base.set_index("trade_id")
     front_cols = [
-        "pair", "fold_id", "signal_bar_ts",
-        "exit_reason", "R", "mfe_R", "mae_R", "held_bars",
-        "dist_1h_kijun_atr", "dist_4h_kijun_atr", "dist_d1_kijun_atr",
-        "dist_to_kijun_1h_atr", "dist_to_kijun_4h_at_mr_atr", "dist_to_kijun_d1_at_mr_atr",
-        "dist_to_ema20_1h_atr", "dist_to_ema20_4h_at_mr_atr", "dist_to_ema20_d1_at_mr_atr",
+        "pair",
+        "fold_id",
+        "signal_bar_ts",
+        "exit_reason",
+        "R",
+        "mfe_R",
+        "mae_R",
+        "held_bars",
+        "dist_1h_kijun_atr",
+        "dist_4h_kijun_atr",
+        "dist_d1_kijun_atr",
+        "dist_to_kijun_1h_atr",
+        "dist_to_kijun_4h_at_mr_atr",
+        "dist_to_kijun_d1_at_mr_atr",
+        "dist_to_ema20_1h_atr",
+        "dist_to_ema20_4h_at_mr_atr",
+        "dist_to_ema20_d1_at_mr_atr",
         "dist_to_ema50_1h_atr",
-        "atr_1h_wilder_at_n", "atr_1h_regime", "atr_1h_regime_bin",
-        "atr_4h_at_mr", "atr_4h_regime_at_mr", "atr_4h_regime_bin",
-        "atr_d1_at_mr", "atr_d1_regime_at_mr", "atr_d1_regime_bin",
-        "log_ret_1h_at_n", "cum_logret_1h_6", "cum_logret_1h_24", "cum_logret_1h_120",
-        "bar_size_atr", "bar_body_atr", "close_position_in_bar",
+        "atr_1h_wilder_at_n",
+        "atr_1h_regime",
+        "atr_1h_regime_bin",
+        "atr_4h_at_mr",
+        "atr_4h_regime_at_mr",
+        "atr_4h_regime_bin",
+        "atr_d1_at_mr",
+        "atr_d1_regime_at_mr",
+        "atr_d1_regime_bin",
+        "log_ret_1h_at_n",
+        "cum_logret_1h_6",
+        "cum_logret_1h_24",
+        "cum_logret_1h_120",
+        "bar_size_atr",
+        "bar_body_atr",
+        "close_position_in_bar",
         "concurrent_signals_same_bar",
-        "hour_utc", "dow", "session",
-        "spread_pips_entry", "spread_pips_exit", "spread_floored",
+        "hour_utc",
+        "dow",
+        "session",
+        "spread_pips_entry",
+        "spread_pips_exit",
+        "spread_floored",
         "pre_momentum_label",
     ]
     out = pd.DataFrame(index=merge_df.index)
@@ -1066,7 +1235,9 @@ def compute_block_R(taken, sf_taken, bm, all_signals):
     out["pair_is_chf_quoted"] = (out["pair_quote_ccy"] == "CHF").astype(int)
     out["pair_is_usd_quoted"] = (out["pair_quote_ccy"] == "USD").astype(int)
     out["pair_is_usd_base"] = (out["pair_base_ccy"] == "USD").astype(int)
-    out["pair_is_cross"] = ((out["pair_base_ccy"] != "USD") & (out["pair_quote_ccy"] != "USD")).astype(int)
+    out["pair_is_cross"] = (
+        (out["pair_base_ccy"] != "USD") & (out["pair_quote_ccy"] != "USD")
+    ).astype(int)
     safe_havens = {"JPY", "CHF", "USD"}
     out["pair_has_safe_haven"] = (
         out["pair_base_ccy"].isin(safe_havens) | out["pair_quote_ccy"].isin(safe_havens)
@@ -1083,18 +1254,38 @@ def compute_block_R(taken, sf_taken, bm, all_signals):
 # ---------------------------------------------------------------------------
 
 NON_FEATURE_COLS = {
-    "trade_id", "pair", "fold_id", "signal_bar_ts",
-    "exit_reason", "R", "mfe_R", "mae_R", "held_bars",
+    "trade_id",
+    "pair",
+    "fold_id",
+    "signal_bar_ts",
+    "exit_reason",
+    "R",
+    "mfe_R",
+    "mae_R",
+    "held_bars",
 }
 
 CATEGORICAL_FEATURES = [
-    "pair", "session", "pre_momentum_label",
-    "atr_1h_regime_bin", "atr_4h_regime_bin", "atr_d1_regime_bin",
-    "pair_base_ccy", "pair_quote_ccy",
-    "pair_is_jpy_quoted", "pair_is_chf_quoted", "pair_is_usd_quoted",
-    "pair_is_usd_base", "pair_is_cross", "pair_has_safe_haven",
-    "is_month_start", "is_month_end", "spread_floored", "spread_floored_flag",
-    "bar_direction_1h", "alignment_consistency",
+    "pair",
+    "session",
+    "pre_momentum_label",
+    "atr_1h_regime_bin",
+    "atr_4h_regime_bin",
+    "atr_d1_regime_bin",
+    "pair_base_ccy",
+    "pair_quote_ccy",
+    "pair_is_jpy_quoted",
+    "pair_is_chf_quoted",
+    "pair_is_usd_quoted",
+    "pair_is_usd_base",
+    "pair_is_cross",
+    "pair_has_safe_haven",
+    "is_month_start",
+    "is_month_end",
+    "spread_floored",
+    "spread_floored_flag",
+    "bar_direction_1h",
+    "alignment_consistency",
 ]
 
 
@@ -1118,6 +1309,7 @@ def _list_present_categoricals(df):
 # Block S — per-category per-feature distributions
 # ---------------------------------------------------------------------------
 
+
 def compute_block_S(Q, R):
     continuous = _list_continuous_features(R)
     categorical = _list_present_categoricals(R)
@@ -1135,39 +1327,55 @@ def compute_block_S(Q, R):
                 valid = vals[~np.isnan(vals)]
                 n_nan = int(vals.size - valid.size)
                 if valid.size == 0:
-                    rows.append({
-                        "threshold_R": thr, "category": cat, "feature": feat, "kind": "continuous",
+                    rows.append(
+                        {
+                            "threshold_R": thr,
+                            "category": cat,
+                            "feature": feat,
+                            "kind": "continuous",
+                            "value": "",
+                            "n_in_category": int(vals.size),
+                            "n_valid": 0,
+                            "n_nan": n_nan,
+                            "mean": float("nan"),
+                            "std": float("nan"),
+                            "median": float("nan"),
+                            "q05": float("nan"),
+                            "q25": float("nan"),
+                            "q75": float("nan"),
+                            "q95": float("nan"),
+                            "n_in_category_with_value": 0,
+                            "n_in_population_with_value": 0,
+                            "pct_of_category": float("nan"),
+                            "pct_of_value": float("nan"),
+                            "over_representation": float("nan"),
+                        }
+                    )
+                    continue
+                rows.append(
+                    {
+                        "threshold_R": thr,
+                        "category": cat,
+                        "feature": feat,
+                        "kind": "continuous",
                         "value": "",
                         "n_in_category": int(vals.size),
-                        "n_valid": 0, "n_nan": n_nan,
-                        "mean": float("nan"), "std": float("nan"), "median": float("nan"),
-                        "q05": float("nan"), "q25": float("nan"),
-                        "q75": float("nan"), "q95": float("nan"),
+                        "n_valid": int(valid.size),
+                        "n_nan": n_nan,
+                        "mean": float(np.mean(valid)),
+                        "std": float(np.std(valid, ddof=1)) if valid.size >= 2 else float("nan"),
+                        "median": float(np.median(valid)),
+                        "q05": float(np.quantile(valid, 0.05)),
+                        "q25": float(np.quantile(valid, 0.25)),
+                        "q75": float(np.quantile(valid, 0.75)),
+                        "q95": float(np.quantile(valid, 0.95)),
                         "n_in_category_with_value": 0,
                         "n_in_population_with_value": 0,
                         "pct_of_category": float("nan"),
                         "pct_of_value": float("nan"),
                         "over_representation": float("nan"),
-                    })
-                    continue
-                rows.append({
-                    "threshold_R": thr, "category": cat, "feature": feat, "kind": "continuous",
-                    "value": "",
-                    "n_in_category": int(vals.size),
-                    "n_valid": int(valid.size), "n_nan": n_nan,
-                    "mean": float(np.mean(valid)),
-                    "std": float(np.std(valid, ddof=1)) if valid.size >= 2 else float("nan"),
-                    "median": float(np.median(valid)),
-                    "q05": float(np.quantile(valid, 0.05)),
-                    "q25": float(np.quantile(valid, 0.25)),
-                    "q75": float(np.quantile(valid, 0.75)),
-                    "q95": float(np.quantile(valid, 0.95)),
-                    "n_in_category_with_value": 0,
-                    "n_in_population_with_value": 0,
-                    "pct_of_category": float("nan"),
-                    "pct_of_value": float("nan"),
-                    "over_representation": float("nan"),
-                })
+                    }
+                )
 
         for feat in categorical:
             full_vals = Rmap[feat].astype("string")
@@ -1179,21 +1387,32 @@ def compute_block_S(Q, R):
                 for val, n_val in cnt.items():
                     n_pop = int(pop_counts.get(val, 0))
                     pop_freq = n_pop / n_total if n_total > 0 else 0.0
-                    rows.append({
-                        "threshold_R": thr, "category": cat, "feature": feat, "kind": "categorical",
-                        "value": str(val) if val is not None else "",
-                        "n_in_category": n_cat,
-                        "n_valid": int(n_cat), "n_nan": 0,
-                        "mean": float("nan"), "std": float("nan"), "median": float("nan"),
-                        "q05": float("nan"), "q25": float("nan"),
-                        "q75": float("nan"), "q95": float("nan"),
-                        "n_in_category_with_value": int(n_val),
-                        "n_in_population_with_value": n_pop,
-                        "pct_of_category": float(n_val) / n_cat if n_cat > 0 else float("nan"),
-                        "pct_of_value": float(n_val) / n_pop if n_pop > 0 else float("nan"),
-                        "over_representation": (float(n_val) / n_cat) / pop_freq
-                            if (n_cat > 0 and pop_freq > 0) else float("nan"),
-                    })
+                    rows.append(
+                        {
+                            "threshold_R": thr,
+                            "category": cat,
+                            "feature": feat,
+                            "kind": "categorical",
+                            "value": str(val) if val is not None else "",
+                            "n_in_category": n_cat,
+                            "n_valid": int(n_cat),
+                            "n_nan": 0,
+                            "mean": float("nan"),
+                            "std": float("nan"),
+                            "median": float("nan"),
+                            "q05": float("nan"),
+                            "q25": float("nan"),
+                            "q75": float("nan"),
+                            "q95": float("nan"),
+                            "n_in_category_with_value": int(n_val),
+                            "n_in_population_with_value": n_pop,
+                            "pct_of_category": float(n_val) / n_cat if n_cat > 0 else float("nan"),
+                            "pct_of_value": float(n_val) / n_pop if n_pop > 0 else float("nan"),
+                            "over_representation": (float(n_val) / n_cat) / pop_freq
+                            if (n_cat > 0 and pop_freq > 0)
+                            else float("nan"),
+                        }
+                    )
 
     out = pd.DataFrame(rows)
     sort_cols = ["threshold_R", "feature", "kind", "category", "value"]
@@ -1205,12 +1424,16 @@ def compute_block_S(Q, R):
 # Block T — cross-category effect sizes
 # ---------------------------------------------------------------------------
 
+
 def _cohen_d(x, y):
-    x = x[~np.isnan(x)]; y = y[~np.isnan(y)]
+    x = x[~np.isnan(x)]
+    y = y[~np.isnan(y)]
     if x.size < 2 or y.size < 2:
         return float("nan")
-    m1 = float(np.mean(x)); m2 = float(np.mean(y))
-    v1 = float(np.var(x, ddof=1)); v2 = float(np.var(y, ddof=1))
+    m1 = float(np.mean(x))
+    m2 = float(np.mean(y))
+    v1 = float(np.var(x, ddof=1))
+    v2 = float(np.var(y, ddof=1))
     pooled_var = ((x.size - 1) * v1 + (y.size - 1) * v2) / (x.size + y.size - 2)
     if pooled_var <= 0:
         return 0.0
@@ -1241,7 +1464,7 @@ def _kruskal_wallis_H(groups):
     sum_ranks = []
     cursor = 0
     for sz in sizes:
-        sum_ranks.append(float(np.sum(ranks[cursor:cursor + sz])))
+        sum_ranks.append(float(np.sum(ranks[cursor : cursor + sz])))
         cursor += sz
     H = 12.0 / (n * (n + 1)) * sum(r * r / s for r, s in zip(sum_ranks, sizes)) - 3.0 * (n + 1)
     return float(H)
@@ -1325,22 +1548,36 @@ def compute_block_T(Q, R):
                 for ci, v in enumerate(feat_values):
                     cont[ri, ci] = float(vc.get(v, 0))
             chi2, cv = _chi2_and_cramers_v(cont)
-            row = {"threshold_R": thr, "feature": feat, "kind": "categorical",
-                   "max_abs_cohen_d_across_pairs": float("nan"),
-                   "max_abs_pair": "",
-                   "kruskal_wallis_H": float("nan"),
-                   "chi_squared_value": chi2,
-                   "cramers_v": cv,
-                   "n_rows": cont.shape[0], "n_cols": cont.shape[1]}
+            row = {
+                "threshold_R": thr,
+                "feature": feat,
+                "kind": "categorical",
+                "max_abs_cohen_d_across_pairs": float("nan"),
+                "max_abs_pair": "",
+                "kruskal_wallis_H": float("nan"),
+                "chi_squared_value": chi2,
+                "cramers_v": cv,
+                "n_rows": cont.shape[0],
+                "n_cols": cont.shape[1],
+            }
             for a, b in PAIRWISE_LABELS:
                 row["cohen_d_" + a + "_vs_" + b] = float("nan")
             rows.append(row)
     out = pd.DataFrame(rows)
     cohen_cols = ["cohen_d_" + a + "_vs_" + b for a, b in PAIRWISE_LABELS]
-    col_order = ["threshold_R", "feature", "kind"] + cohen_cols + [
-        "max_abs_cohen_d_across_pairs", "max_abs_pair", "kruskal_wallis_H",
-        "chi_squared_value", "cramers_v", "n_rows", "n_cols"
-    ]
+    col_order = (
+        ["threshold_R", "feature", "kind"]
+        + cohen_cols
+        + [
+            "max_abs_cohen_d_across_pairs",
+            "max_abs_pair",
+            "kruskal_wallis_H",
+            "chi_squared_value",
+            "cramers_v",
+            "n_rows",
+            "n_cols",
+        ]
+    )
     out = out[col_order]
     out = out.sort_values(["threshold_R", "kind", "feature"], kind="stable").reset_index(drop=True)
     return out
@@ -1349,6 +1586,7 @@ def compute_block_T(Q, R):
 # ---------------------------------------------------------------------------
 # Block U — top features cross-tabs at threshold = 1.0R
 # ---------------------------------------------------------------------------
+
 
 def compute_block_U(Q, R, T):
     Rmap = R.set_index("trade_id")
@@ -1366,7 +1604,7 @@ def compute_block_U(Q, R, T):
     )
 
     top_continuous = cont_ranked["feature"].tolist()[:15]
-    top_categorical = cat_ranked["feature"].tolist()[:max(0, 15 - len(top_continuous))]
+    top_categorical = cat_ranked["feature"].tolist()[: max(0, 15 - len(top_continuous))]
 
     rows = []
     n_total = len(Rmap)
@@ -1384,7 +1622,7 @@ def compute_block_U(Q, R, T):
         cursor = 0
         bucket_ranges = []
         for qi, sz in enumerate(sizes):
-            seg = sorted_v.iloc[cursor:cursor + sz]
+            seg = sorted_v.iloc[cursor : cursor + sz]
             q_assign.loc[seg.index] = "Q" + str(qi + 1)
             bucket_ranges.append((float(seg.min()), float(seg.max())))
             cursor += sz
@@ -1398,19 +1636,24 @@ def compute_block_U(Q, R, T):
                 n_pop = int((q_assign == q).sum())
                 pop_freq = n_pop / n_total
                 bk_min, bk_max = bucket_ranges[qi - 1]
-                rows.append({
-                    "feature": feat, "feature_kind": "continuous",
-                    "bucket_or_value": q,
-                    "bucket_min": bk_min, "bucket_max": bk_max,
-                    "category": cat,
-                    "n_in_category": n_cat,
-                    "n_in_category_with_value": n_with_val,
-                    "n_in_population_with_value": n_pop,
-                    "pct_of_category": n_with_val / n_cat if n_cat > 0 else float("nan"),
-                    "pct_of_value": n_with_val / n_pop if n_pop > 0 else float("nan"),
-                    "over_representation": (n_with_val / n_cat) / pop_freq
-                        if (n_cat > 0 and pop_freq > 0) else float("nan"),
-                })
+                rows.append(
+                    {
+                        "feature": feat,
+                        "feature_kind": "continuous",
+                        "bucket_or_value": q,
+                        "bucket_min": bk_min,
+                        "bucket_max": bk_max,
+                        "category": cat,
+                        "n_in_category": n_cat,
+                        "n_in_category_with_value": n_with_val,
+                        "n_in_population_with_value": n_pop,
+                        "pct_of_category": n_with_val / n_cat if n_cat > 0 else float("nan"),
+                        "pct_of_value": n_with_val / n_pop if n_pop > 0 else float("nan"),
+                        "over_representation": (n_with_val / n_cat) / pop_freq
+                        if (n_cat > 0 and pop_freq > 0)
+                        else float("nan"),
+                    }
+                )
 
     for feat in top_categorical:
         full = Rmap[feat].astype("string")
@@ -1422,29 +1665,39 @@ def compute_block_U(Q, R, T):
             for val, n_pop in pop_counts.items():
                 n_with_val = int(cnt.get(val, 0))
                 pop_freq = int(n_pop) / n_total
-                rows.append({
-                    "feature": feat, "feature_kind": "categorical",
-                    "bucket_or_value": str(val) if val is not None else "",
-                    "bucket_min": float("nan"), "bucket_max": float("nan"),
-                    "category": cat,
-                    "n_in_category": n_cat,
-                    "n_in_category_with_value": n_with_val,
-                    "n_in_population_with_value": int(n_pop),
-                    "pct_of_category": n_with_val / n_cat if n_cat > 0 else float("nan"),
-                    "pct_of_value": n_with_val / int(n_pop) if int(n_pop) > 0 else float("nan"),
-                    "over_representation": (n_with_val / n_cat) / pop_freq
-                        if (n_cat > 0 and pop_freq > 0) else float("nan"),
-                })
+                rows.append(
+                    {
+                        "feature": feat,
+                        "feature_kind": "categorical",
+                        "bucket_or_value": str(val) if val is not None else "",
+                        "bucket_min": float("nan"),
+                        "bucket_max": float("nan"),
+                        "category": cat,
+                        "n_in_category": n_cat,
+                        "n_in_category_with_value": n_with_val,
+                        "n_in_population_with_value": int(n_pop),
+                        "pct_of_category": n_with_val / n_cat if n_cat > 0 else float("nan"),
+                        "pct_of_value": n_with_val / int(n_pop) if int(n_pop) > 0 else float("nan"),
+                        "over_representation": (n_with_val / n_cat) / pop_freq
+                        if (n_cat > 0 and pop_freq > 0)
+                        else float("nan"),
+                    }
+                )
 
     out = pd.DataFrame(rows)
-    out = out.sort_values(["feature", "category", "bucket_or_value"], kind="stable").reset_index(drop=True)
+    out = out.sort_values(["feature", "category", "bucket_or_value"], kind="stable").reset_index(
+        drop=True
+    )
     return out
+
+
 # --- Part 3 — orchestration, audit, report builder, main. ---
 
 
 # ---------------------------------------------------------------------------
 # Lookahead audit (R.2) — recompute selected features independently
 # ---------------------------------------------------------------------------
+
 
 def audit_lookahead(R, taken, pc_map, seed=12345, n_trades=100, n_features=10):
     """Recompute 10 random features for 100 random trades from raw data and
@@ -1456,16 +1709,24 @@ def audit_lookahead(R, taken, pc_map, seed=12345, n_trades=100, n_features=10):
 
     # Pick recomputable features (those we ourselves computed).
     candidate_features = [
-        "dist_to_high_1h_24_atr", "dist_to_low_1h_24_atr",
-        "position_in_range_1h_24", "cum_logret_1h_240",
-        "cum_logret_4h_5_lag1", "cum_logret_d1_5_lag1",
-        "kijun_slope_1h_5", "kijun_slope_4h_20_lag1",
-        "realised_vol_1h_24", "upper_wick_atr_1h",
+        "dist_to_high_1h_24_atr",
+        "dist_to_low_1h_24_atr",
+        "position_in_range_1h_24",
+        "cum_logret_1h_240",
+        "cum_logret_4h_5_lag1",
+        "cum_logret_d1_5_lag1",
+        "kijun_slope_1h_5",
+        "kijun_slope_4h_20_lag1",
+        "realised_vol_1h_24",
+        "upper_wick_atr_1h",
         "bars_since_1h_kijun_cross",
-        "atr_ratio_1h_4h", "tf_tension_4h_1h",
+        "atr_ratio_1h_4h",
+        "tf_tension_4h_1h",
         "concurrent_signals_within_3h",
-        "USD_basket_logret_24h", "bar_size_atr_4h_lag1",
-        "di_plus_1h_14", "adx_1h_14",
+        "USD_basket_logret_24h",
+        "bar_size_atr_4h_lag1",
+        "di_plus_1h_14",
+        "adx_1h_14",
         "spread_at_entry_pips_relative",
         "recent_skew_120",
     ]
@@ -1493,20 +1754,35 @@ def audit_lookahead(R, taken, pc_map, seed=12345, n_trades=100, n_features=10):
             if feat in recomputed:
                 got = float(Rmap.loc[tid, feat])
                 rec = float(recomputed[feat])
-                if (np.isnan(got) and np.isnan(rec)):
+                if np.isnan(got) and np.isnan(rec):
                     continue
                 if np.isnan(got) != np.isnan(rec):
-                    mismatches.append({"trade_id": tid, "feature": feat,
-                                       "got": got, "recomputed": rec, "reason": "nan_mismatch"})
+                    mismatches.append(
+                        {
+                            "trade_id": tid,
+                            "feature": feat,
+                            "got": got,
+                            "recomputed": rec,
+                            "reason": "nan_mismatch",
+                        }
+                    )
                 elif abs(got - rec) > TOL:
-                    mismatches.append({"trade_id": tid, "feature": feat,
-                                       "got": got, "recomputed": rec, "diff": abs(got - rec)})
+                    mismatches.append(
+                        {
+                            "trade_id": tid,
+                            "feature": feat,
+                            "got": got,
+                            "recomputed": rec,
+                            "diff": abs(got - rec),
+                        }
+                    )
     return audit_trade_ids, audit_features, mismatches
 
 
 # ---------------------------------------------------------------------------
 # Markdown report
 # ---------------------------------------------------------------------------
+
 
 def _df_to_md(df, float_fmt="{:.6f}"):
     cols = list(df.columns)
@@ -1527,7 +1803,9 @@ def _df_to_md(df, float_fmt="{:.6f}"):
     return "\n".join(lines)
 
 
-def build_report(Q, R, S, T, U, audit_meta, nan_audit_df, summary_block_Q, summary_block_R_nan, top_feature_stats):
+def build_report(
+    Q, R, S, T, U, audit_meta, nan_audit_df, summary_block_Q, summary_block_R_nan, top_feature_stats
+):
     audit_ids, audit_feats, audit_mismatches = audit_meta
     lines = []
     lines.append("# Arc 2 — Path-Category Characterisation (Block Q–U)")
@@ -1545,7 +1823,9 @@ def build_report(Q, R, S, T, U, audit_meta, nan_audit_df, summary_block_Q, summa
     lines.append("")
     lines.append("## Determinism receipt")
     lines.append("")
-    lines.append("Determinism: this build is byte-identical to a consecutive re-run of the same script on the same locked inputs (see run_manifest.txt and gate 8).")
+    lines.append(
+        "Determinism: this build is byte-identical to a consecutive re-run of the same script on the same locked inputs (see run_manifest.txt and gate 8)."
+    )
     lines.append("")
 
     # Block Q
@@ -1554,15 +1834,25 @@ def build_report(Q, R, S, T, U, audit_meta, nan_audit_df, summary_block_Q, summa
     for thr in THRESHOLDS_R:
         lines.append("### Threshold = " + ("%.1f" % thr) + "R")
         lines.append("")
-        sub = summary_block_Q[summary_block_Q["threshold_R"] == thr][[
-            "category", "n", "pct_of_total", "pct_reaching_SL_at_exit",
-            "mean_final_R", "median_final_R",
-        ]].reset_index(drop=True)
+        sub = summary_block_Q[summary_block_Q["threshold_R"] == thr][
+            [
+                "category",
+                "n",
+                "pct_of_total",
+                "pct_reaching_SL_at_exit",
+                "mean_final_R",
+                "median_final_R",
+            ]
+        ].reset_index(drop=True)
         lines.append(_df_to_md(sub, "{:.4f}"))
         lines.append("")
-    lines.append("Q.2 sanity check (threshold = 1.0R): fraction of trades with t_up < +inf compared to Block O reference 51.19% — see stdout / gate dispositions.")
+    lines.append(
+        "Q.2 sanity check (threshold = 1.0R): fraction of trades with t_up < +inf compared to Block O reference 51.19% — see stdout / gate dispositions."
+    )
     lines.append("")
-    lines.append("Q.3 sanity check: counts of `tied` category per threshold — see Block Q table above.")
+    lines.append(
+        "Q.3 sanity check: counts of `tied` category per threshold — see Block Q table above."
+    )
     lines.append("")
 
     # Block R summary
@@ -1570,11 +1860,21 @@ def build_report(Q, R, S, T, U, audit_meta, nan_audit_df, summary_block_Q, summa
     lines.append("")
     n_continuous = len(_list_continuous_features(R))
     n_categorical = len(_list_present_categoricals(R))
-    lines.append("Block R produces " + str(n_continuous) + " continuous features and "
-                 + str(n_categorical) + " categorical features per trade (3,993 rows).")
+    lines.append(
+        "Block R produces "
+        + str(n_continuous)
+        + " continuous features and "
+        + str(n_categorical)
+        + " categorical features per trade (3,993 rows)."
+    )
     lines.append("")
-    lines.append("Lookahead audit: " + str(len(audit_ids)) + " random trades × "
-                 + str(len(audit_feats)) + " random features; recomputed independently from raw data with tolerance 1e-9. Audit features:")
+    lines.append(
+        "Lookahead audit: "
+        + str(len(audit_ids))
+        + " random trades × "
+        + str(len(audit_feats))
+        + " random features; recomputed independently from raw data with tolerance 1e-9. Audit features:"
+    )
     lines.append("")
     for f in audit_feats:
         lines.append("- `" + f + "`")
@@ -1585,7 +1885,9 @@ def build_report(Q, R, S, T, U, audit_meta, nan_audit_df, summary_block_Q, summa
     # NaN-rate audit
     lines.append("## NaN-rate audit (Block R features)")
     lines.append("")
-    elevated = nan_audit_df[nan_audit_df["nan_rate_pct"] > 5.0].sort_values("nan_rate_pct", ascending=False)
+    elevated = nan_audit_df[nan_audit_df["nan_rate_pct"] > 5.0].sort_values(
+        "nan_rate_pct", ascending=False
+    )
     lines.append("Features with NaN rate > 5% (flagged):")
     lines.append("")
     if len(elevated) == 0:
@@ -1593,11 +1895,15 @@ def build_report(Q, R, S, T, U, audit_meta, nan_audit_df, summary_block_Q, summa
     else:
         lines.append(_df_to_md(elevated, "{:.2f}"))
     lines.append("")
-    lines.append("Full per-feature NaN rates are in `block_R_at_entry_features.csv` and the per-feature audit table:")
+    lines.append(
+        "Full per-feature NaN rates are in `block_R_at_entry_features.csv` and the per-feature audit table:"
+    )
     lines.append("")
     lines.append("```")
     for _, row in nan_audit_df.sort_values("feature").iterrows():
-        lines.append("  " + str(row["feature"]) + ": " + ("%6.2f" % float(row["nan_rate_pct"])) + "%")
+        lines.append(
+            "  " + str(row["feature"]) + ": " + ("%6.2f" % float(row["nan_rate_pct"])) + "%"
+        )
     lines.append("```")
     lines.append("")
 
@@ -1616,8 +1922,18 @@ def build_report(Q, R, S, T, U, audit_meta, nan_audit_df, summary_block_Q, summa
         sub["pop_mean"] = sub["feature"].map(pop_mean)
         sub["abs_deviation_from_pop_mean"] = (sub["mean"] - sub["pop_mean"]).abs()
         sub = sub.sort_values("abs_deviation_from_pop_mean", ascending=False).head(10)
-        sub_disp = sub[["feature", "n_in_category", "mean", "pop_mean",
-                        "abs_deviation_from_pop_mean", "median", "q25", "q75"]]
+        sub_disp = sub[
+            [
+                "feature",
+                "n_in_category",
+                "mean",
+                "pop_mean",
+                "abs_deviation_from_pop_mean",
+                "median",
+                "q25",
+                "q75",
+            ]
+        ]
         lines.append("### Category: `" + cat + "` (top 10 features by |mean − population mean|)")
         lines.append("")
         lines.append(_df_to_md(sub_disp, "{:.4f}"))
@@ -1640,8 +1956,16 @@ def build_report(Q, R, S, T, U, audit_meta, nan_audit_df, summary_block_Q, summa
                 rows.append(r)
         df = pd.DataFrame(rows)
         if len(df) > 0:
-            df_disp = df[["category", "value", "n_in_category_with_value", "pct_of_category",
-                          "pct_of_value", "over_representation"]]
+            df_disp = df[
+                [
+                    "category",
+                    "value",
+                    "n_in_category_with_value",
+                    "pct_of_category",
+                    "pct_of_value",
+                    "over_representation",
+                ]
+            ]
             lines.append("#### `" + feat + "` — top 5 values by over-representation per category")
             lines.append("")
             lines.append(_df_to_md(df_disp, "{:.4f}"))
@@ -1653,51 +1977,76 @@ def build_report(Q, R, S, T, U, audit_meta, nan_audit_df, summary_block_Q, summa
     Tcont = T[(T["threshold_R"] == 1.0) & (T["kind"] == "continuous")].copy()
     Tcat_1 = T[(T["threshold_R"] == 1.0) & (T["kind"] == "categorical")].copy()
 
-    top20 = Tcont.dropna(subset=["max_abs_cohen_d_across_pairs"]).sort_values(
-        "max_abs_cohen_d_across_pairs", ascending=False
-    ).head(20)
-    lines.append("Top 20 continuous features by max|Cohen's d| across the 6 category pairs (threshold = 1.0R):")
+    top20 = (
+        Tcont.dropna(subset=["max_abs_cohen_d_across_pairs"])
+        .sort_values("max_abs_cohen_d_across_pairs", ascending=False)
+        .head(20)
+    )
+    lines.append(
+        "Top 20 continuous features by max|Cohen's d| across the 6 category pairs (threshold = 1.0R):"
+    )
     lines.append("")
     if len(top20) > 0:
-        lines.append(_df_to_md(
-            top20[["feature", "max_abs_cohen_d_across_pairs", "max_abs_pair", "kruskal_wallis_H"]],
-            "{:.4f}",
-        ))
+        lines.append(
+            _df_to_md(
+                top20[
+                    ["feature", "max_abs_cohen_d_across_pairs", "max_abs_pair", "kruskal_wallis_H"]
+                ],
+                "{:.4f}",
+            )
+        )
     lines.append("")
 
-    top10_cat = Tcat_1.dropna(subset=["cramers_v"]).sort_values("cramers_v", ascending=False).head(10)
+    top10_cat = (
+        Tcat_1.dropna(subset=["cramers_v"]).sort_values("cramers_v", ascending=False).head(10)
+    )
     lines.append("Top 10 categorical features by Cramer's V (threshold = 1.0R):")
     lines.append("")
     if len(top10_cat) > 0:
-        lines.append(_df_to_md(
-            top10_cat[["feature", "cramers_v", "chi_squared_value", "n_rows", "n_cols"]],
-            "{:.4f}",
-        ))
+        lines.append(
+            _df_to_md(
+                top10_cat[["feature", "cramers_v", "chi_squared_value", "n_rows", "n_cols"]],
+                "{:.4f}",
+            )
+        )
     lines.append("")
 
     # Cross-threshold stability
     lines.append("### Cross-threshold stability of top-20 continuous features")
     lines.append("")
+
     def _top20_at(thr):
-        sub = T[(T["threshold_R"] == thr) & (T["kind"] == "continuous")].dropna(
-            subset=["max_abs_cohen_d_across_pairs"]
-        ).sort_values("max_abs_cohen_d_across_pairs", ascending=False).head(20)
+        sub = (
+            T[(T["threshold_R"] == thr) & (T["kind"] == "continuous")]
+            .dropna(subset=["max_abs_cohen_d_across_pairs"])
+            .sort_values("max_abs_cohen_d_across_pairs", ascending=False)
+            .head(20)
+        )
         return set(sub["feature"].tolist())
+
     top_05 = _top20_at(0.5)
     top_10 = _top20_at(1.0)
     top_15 = _top20_at(1.5)
     n_share_05 = len(top_10 & top_05)
     n_share_15 = len(top_10 & top_15)
-    lines.append("Of the top 20 features at 1.0R: " + str(n_share_05)
-                 + " are also in the top 20 at 0.5R; "
-                 + str(n_share_15) + " are also in the top 20 at 1.5R.")
+    lines.append(
+        "Of the top 20 features at 1.0R: "
+        + str(n_share_05)
+        + " are also in the top 20 at 0.5R; "
+        + str(n_share_15)
+        + " are also in the top 20 at 1.5R."
+    )
     lines.append("")
 
     # Most-different category pair per top feature
-    lines.append("Most-different category pair per top feature (continuous, threshold = 1.0R, top 20):")
+    lines.append(
+        "Most-different category pair per top feature (continuous, threshold = 1.0R, top 20):"
+    )
     lines.append("")
     if len(top20) > 0:
-        lines.append(_df_to_md(top20[["feature", "max_abs_pair", "max_abs_cohen_d_across_pairs"]], "{:.4f}"))
+        lines.append(
+            _df_to_md(top20[["feature", "max_abs_pair", "max_abs_cohen_d_across_pairs"]], "{:.4f}")
+        )
     lines.append("")
 
     # Block U highlights
@@ -1708,10 +2057,12 @@ def build_report(Q, R, S, T, U, audit_meta, nan_audit_df, summary_block_Q, summa
     for f in top_feats:
         lines.append("- `" + f + "`")
     lines.append("")
-    lines.append("Full cross-tabs are in `block_U_top_features_crosstabs.csv`. The table below shows the over-representation matrix for the top continuous features (rows = quintile, cols = category).")
+    lines.append(
+        "Full cross-tabs are in `block_U_top_features_crosstabs.csv`. The table below shows the over-representation matrix for the top continuous features (rows = quintile, cols = category)."
+    )
     lines.append("")
     Ucont = U[U["feature_kind"] == "continuous"]
-    Ucat = U[U["feature_kind"] == "categorical"]
+    U[U["feature_kind"] == "categorical"]
     cats_order = ["neither", "up_only", "down_only", "up_then_down", "down_then_up", "tied"]
     cats_present = [c for c in cats_order if c in U["category"].unique().tolist()]
     for feat in Ucont["feature"].unique().tolist():
@@ -1731,34 +2082,56 @@ def build_report(Q, R, S, T, U, audit_meta, nan_audit_df, summary_block_Q, summa
     # Out-of-scope items observed
     lines.append("## Out-of-scope items observed")
     lines.append("")
-    lines.append("- Predictive modelling (logistic regression, decision trees, etc.) is excluded by scope; all reported effect sizes are descriptive only.")
-    lines.append("- Multivariate / joint-feature interactions are not analysed here; only marginal per-feature distributions and pairwise category differentials.")
-    lines.append("- The Cramer's V values reported are uncorrected for sample size; no Bonferroni / FDR adjustments are applied since no inferential claim is being made.")
-    lines.append("- The `tied` category is reported per-threshold but is too thin to support category-level inference; effect-size calculations involving `tied` are not the focus of the differentiation analysis (Block T explicitly excludes `tied` from the 6 pairwise contrasts).")
-    lines.append("- Volume features (R.13) and W1 features (R.2 / R.4 W1 cum-logret) carry elevated NaN rates by construction (5ers tick-volume reliability and W1 history availability respectively); these features are not excluded from descriptive analysis but should be interpreted with the NaN-rate audit table above.")
+    lines.append(
+        "- Predictive modelling (logistic regression, decision trees, etc.) is excluded by scope; all reported effect sizes are descriptive only."
+    )
+    lines.append(
+        "- Multivariate / joint-feature interactions are not analysed here; only marginal per-feature distributions and pairwise category differentials."
+    )
+    lines.append(
+        "- The Cramer's V values reported are uncorrected for sample size; no Bonferroni / FDR adjustments are applied since no inferential claim is being made."
+    )
+    lines.append(
+        "- The `tied` category is reported per-threshold but is too thin to support category-level inference; effect-size calculations involving `tied` are not the focus of the differentiation analysis (Block T explicitly excludes `tied` from the 6 pairwise contrasts)."
+    )
+    lines.append(
+        "- Volume features (R.13) and W1 features (R.2 / R.4 W1 cum-logret) carry elevated NaN rates by construction (5ers tick-volume reliability and W1 history availability respectively); these features are not excluded from descriptive analysis but should be interpreted with the NaN-rate audit table above."
+    )
     lines.append("")
 
     # Planning input
     lines.append("## Planning input")
     lines.append("")
-    lines.append("This subsection records features with the largest cross-category effect sizes observed at threshold = 1.0R, ranked descriptively. Cross-threshold stability is reported but not interpreted as a recommendation. No imperatives; no filter selection.")
+    lines.append(
+        "This subsection records features with the largest cross-category effect sizes observed at threshold = 1.0R, ranked descriptively. Cross-threshold stability is reported but not interpreted as a recommendation. No imperatives; no filter selection."
+    )
     lines.append("")
-    lines.append("### Top 10 continuous features by max|Cohen's d| across the 6 category pairs (threshold = 1.0R)")
+    lines.append(
+        "### Top 10 continuous features by max|Cohen's d| across the 6 category pairs (threshold = 1.0R)"
+    )
     lines.append("")
-    top10 = Tcont.dropna(subset=["max_abs_cohen_d_across_pairs"]).sort_values(
-        "max_abs_cohen_d_across_pairs", ascending=False
-    ).head(10)
+    top10 = (
+        Tcont.dropna(subset=["max_abs_cohen_d_across_pairs"])
+        .sort_values("max_abs_cohen_d_across_pairs", ascending=False)
+        .head(10)
+    )
     if len(top10) > 0:
         # Add per-category means for context.
         per_cat_means_rows = []
         for _, t_row in top10.iterrows():
             feat = t_row["feature"]
-            entry = {"feature": feat,
-                     "max_abs_cohen_d": float(t_row["max_abs_cohen_d_across_pairs"]),
-                     "max_abs_pair": t_row["max_abs_pair"]}
+            entry = {
+                "feature": feat,
+                "max_abs_cohen_d": float(t_row["max_abs_cohen_d_across_pairs"]),
+                "max_abs_pair": t_row["max_abs_pair"],
+            }
             for cat in cats_present:
-                s_row = S[(S["threshold_R"] == 1.0) & (S["category"] == cat)
-                          & (S["feature"] == feat) & (S["kind"] == "continuous")]
+                s_row = S[
+                    (S["threshold_R"] == 1.0)
+                    & (S["category"] == cat)
+                    & (S["feature"] == feat)
+                    & (S["kind"] == "continuous")
+                ]
                 if len(s_row) > 0:
                     entry["mean_" + cat] = float(s_row.iloc[0]["mean"])
                 else:
@@ -1772,24 +2145,30 @@ def build_report(Q, R, S, T, U, audit_meta, nan_audit_df, summary_block_Q, summa
     lines.append("")
     top5_cat = Tcat_1.dropna(subset=["cramers_v"]).sort_values("cramers_v", ascending=False).head(5)
     if len(top5_cat) > 0:
-        lines.append(_df_to_md(
-            top5_cat[["feature", "cramers_v", "chi_squared_value", "n_rows", "n_cols"]],
-            "{:.4f}",
-        ))
+        lines.append(
+            _df_to_md(
+                top5_cat[["feature", "cramers_v", "chi_squared_value", "n_rows", "n_cols"]],
+                "{:.4f}",
+            )
+        )
     lines.append("")
 
-    lines.append("### Cross-threshold stability among top 10 continuous features (threshold = 1.0R)")
+    lines.append(
+        "### Cross-threshold stability among top 10 continuous features (threshold = 1.0R)"
+    )
     lines.append("")
-    top10_set = set(top10["feature"].tolist())
+    set(top10["feature"].tolist())
     top10_05 = _top20_at(0.5)
     top10_15 = _top20_at(1.5)
     rows_stab = []
     for f in top10["feature"].tolist():
-        rows_stab.append({
-            "feature": f,
-            "also_in_top20_at_0.5R": "yes" if f in top10_05 else "no",
-            "also_in_top20_at_1.5R": "yes" if f in top10_15 else "no",
-        })
+        rows_stab.append(
+            {
+                "feature": f,
+                "also_in_top20_at_0.5R": "yes" if f in top10_05 else "no",
+                "also_in_top20_at_1.5R": "yes" if f in top10_15 else "no",
+            }
+        )
     if rows_stab:
         lines.append(_df_to_md(pd.DataFrame(rows_stab)))
     lines.append("")
@@ -1800,6 +2179,7 @@ def build_report(Q, R, S, T, U, audit_meta, nan_audit_df, summary_block_Q, summa
 # ---------------------------------------------------------------------------
 # Main orchestration
 # ---------------------------------------------------------------------------
+
 
 def main():
     t0 = _time.time()
@@ -1812,15 +2192,20 @@ def main():
     # --- Load inputs ---
     sf = pd.read_csv(REPO_ROOT / "results/l6/arc2/characterisation/v1_1_full/signals_features.csv")
     ti = pd.read_csv(REPO_ROOT / "results/l6/arc2/characterisation/v1_2_1_full/trade_index.csv")
-    pbp = pd.read_csv(REPO_ROOT / "results/l6/arc2/characterisation/v1_2_1_full/per_bar_paths.csv",
-                      usecols=["trade_id", "k", "running_mfe_atr", "running_mae_atr"])
-    bm = pd.read_csv(REPO_ROOT / "results/l6/arc2/characterisation/extended/entry_filter_univariate/block_M_kijun_distances.csv")
+    pbp = pd.read_csv(
+        REPO_ROOT / "results/l6/arc2/characterisation/v1_2_1_full/per_bar_paths.csv",
+        usecols=["trade_id", "k", "running_mfe_atr", "running_mae_atr"],
+    )
+    bm = pd.read_csv(
+        REPO_ROOT
+        / "results/l6/arc2/characterisation/extended/entry_filter_univariate/block_M_kijun_distances.csv"
+    )
 
     # Normalise timestamp strings to ISO for merge
     sf["time"] = pd.to_datetime(sf["time"]).dt.strftime("%Y-%m-%dT%H:%M:%S")
     ti["signal_bar_ts"] = pd.to_datetime(ti["signal_bar_ts"]).dt.strftime("%Y-%m-%dT%H:%M:%S")
 
-    sf_taken = sf[sf["taken"] == True].copy()
+    sf_taken = sf[sf["taken"]].copy()
     sf_taken = sf_taken.rename(columns={"time": "signal_bar_ts"})
 
     # taken (3993)
@@ -1842,22 +2227,29 @@ def main():
     for thr in THRESHOLDS_R:
         sub = Q[Q["threshold_R"] == thr]
         if len(sub) != 3993:
-            raise RuntimeError("Gate Q.1 HALT: threshold " + str(thr) + " has "
-                               + str(len(sub)) + " rows, expected 3993")
+            raise RuntimeError(
+                "Gate Q.1 HALT: threshold "
+                + str(thr)
+                + " has "
+                + str(len(sub))
+                + " rows, expected 3993"
+            )
         # Each trade_id appears exactly once
         if sub["trade_id"].nunique() != 3993:
             raise RuntimeError("Gate Q.1 HALT: duplicate trade_id at threshold " + str(thr))
 
     # Gate Q.2: 51.19% recovery at threshold 1.0R
     sub_1 = Q[Q["threshold_R"] == 1.0]
-    n_up_reached = int(sub_1["category"].isin(
-        ["up_only", "up_then_down", "down_then_up", "tied"]
-    ).sum())
+    n_up_reached = int(
+        sub_1["category"].isin(["up_only", "up_then_down", "down_then_up", "tied"]).sum()
+    )
     pct_up = n_up_reached / 3993
     if not (0.5114 <= pct_up <= 0.5124):
         raise RuntimeError(
-            "Gate Q.2 HALT: pct trades with t_up<+inf at 1.0R = " + ("%.6f" % pct_up)
-            + " (expected 0.5119 ± 0.0005). Mismatch with Block O.")
+            "Gate Q.2 HALT: pct trades with t_up<+inf at 1.0R = "
+            + ("%.6f" % pct_up)
+            + " (expected 0.5119 ± 0.0005). Mismatch with Block O."
+        )
     print("[Gate Q.2] pct_up_reached_1R = " + ("%.6f" % pct_up) + " (Block O ref = 0.5119)")
 
     # Gate Q.3: tied < 0.5% per threshold
@@ -1866,8 +2258,9 @@ def main():
         n_tied = int((Q[(Q["threshold_R"] == thr) & (Q["category"] == "tied")]).shape[0])
         tied_counts[thr] = n_tied
         if n_tied > 0.005 * 3993:
-            raise RuntimeError("Gate Q.3 HALT: tied count " + str(n_tied)
-                               + " >= 0.5% at threshold " + str(thr))
+            raise RuntimeError(
+                "Gate Q.3 HALT: tied count " + str(n_tied) + " >= 0.5% at threshold " + str(thr)
+            )
     print("[Gate Q.3] tied counts per threshold: " + str(tied_counts))
 
     # Per-threshold summary table for the report
@@ -1878,20 +2271,24 @@ def main():
             csub = sub[sub["category"] == cat]
             n = int(len(csub))
             n_sl = int((csub["exit_reason"] == "stop_loss").sum())
-            summary_rows.append({
-                "threshold_R": thr,
-                "category": cat,
-                "n": n,
-                "pct_of_total": n / 3993,
-                "pct_reaching_SL_at_exit": n_sl / n if n > 0 else float("nan"),
-                "mean_final_R": float(csub["final_R"].mean()),
-                "median_final_R": float(csub["final_R"].median()),
-            })
+            summary_rows.append(
+                {
+                    "threshold_R": thr,
+                    "category": cat,
+                    "n": n,
+                    "pct_of_total": n / 3993,
+                    "pct_reaching_SL_at_exit": n_sl / n if n > 0 else float("nan"),
+                    "mean_final_R": float(csub["final_R"].mean()),
+                    "median_final_R": float(csub["final_R"].median()),
+                }
+            )
     summary_Q = pd.DataFrame(summary_rows)
 
     # ----- Block R -----
     print("[Block R] computing at-entry feature set (per-pair caches × 28 pairs)...")
-    R, pc_map, _wide_rolling = compute_block_R(taken, sf_taken, bm, sf[["pair", "time"]].rename(columns={"time": "time"}))
+    R, pc_map, _wide_rolling = compute_block_R(
+        taken, sf_taken, bm, sf[["pair", "time"]].rename(columns={"time": "time"})
+    )
 
     # Gate R.1
     if len(R) != 3993:
@@ -1909,12 +2306,20 @@ def main():
     print("[Gate R.2] lookahead audit...")
     audit_meta = audit_lookahead(R, taken, pc_map, seed=12345, n_trades=100, n_features=10)
     audit_ids, audit_feats, audit_mismatches = audit_meta
-    print("[Gate R.2] audit ids n=" + str(len(audit_ids))
-          + " features=" + str(audit_feats) + " mismatches=" + str(len(audit_mismatches)))
+    print(
+        "[Gate R.2] audit ids n="
+        + str(len(audit_ids))
+        + " features="
+        + str(audit_feats)
+        + " mismatches="
+        + str(len(audit_mismatches))
+    )
     if audit_mismatches:
         for m in audit_mismatches[:5]:
             print("  MISMATCH:", m)
-        raise RuntimeError("Gate R.2 HALT: " + str(len(audit_mismatches)) + " mismatches in lookahead audit")
+        raise RuntimeError(
+            "Gate R.2 HALT: " + str(len(audit_mismatches)) + " mismatches in lookahead audit"
+        )
 
     # ----- Block S -----
     print("[Block S] per-category per-feature distributions...")
@@ -1925,7 +2330,9 @@ def main():
     T = compute_block_T(Q, R)
 
     # Gate T.1
-    bad = T["max_abs_cohen_d_across_pairs"].apply(lambda v: (not np.isnan(v)) and (not np.isfinite(v)))
+    bad = T["max_abs_cohen_d_across_pairs"].apply(
+        lambda v: (not np.isnan(v)) and (not np.isfinite(v))
+    )
     if bad.any():
         raise RuntimeError("Gate T.1 HALT: non-finite Cohen's d values present")
     bad_cv = T["cramers_v"].apply(lambda v: (not np.isnan(v)) and (v < 0 or v > 1))
@@ -1952,7 +2359,11 @@ def main():
 
     # ----- Build report -----
     report = build_report(
-        Q=Q, R=R, S=S, T=T, U=U,
+        Q=Q,
+        R=R,
+        S=S,
+        T=T,
+        U=U,
         audit_meta=audit_meta,
         nan_audit_df=nan_audit_df,
         summary_block_Q=summary_Q,
@@ -1961,8 +2372,14 @@ def main():
     )
 
     # Gate 10: disposition discipline grep — forbidden patterns outside Planning input
-    forbidden = ["should filter", "best filter is", "we should exclude",
-                 "this would pass", "recommend", "predicts"]
+    forbidden = [
+        "should filter",
+        "best filter is",
+        "we should exclude",
+        "this would pass",
+        "recommend",
+        "predicts",
+    ]
     # Locate the "Planning input" section split.
     planning_marker = "## Planning input"
     pre_planning = report.split(planning_marker, 1)[0]
@@ -1999,7 +2416,9 @@ def main():
     manifest_lines.append("Arc 2 path-category characterisation — run_manifest.txt")
     manifest_lines.append("=" * 72)
     manifest_lines.append("")
-    manifest_lines.append("Wall-clock and generation timestamp are omitted from this file to preserve byte-identicality across consecutive runs (gate 8). They are printed to stdout for the operator's records.")
+    manifest_lines.append(
+        "Wall-clock and generation timestamp are omitted from this file to preserve byte-identicality across consecutive runs (gate 8). They are printed to stdout for the operator's records."
+    )
     manifest_lines.append("")
     manifest_lines.append("Locked input artefacts:")
     for rel, h in LOCKED_SHA256.items():
@@ -2013,15 +2432,27 @@ def main():
     for thr in THRESHOLDS_R:
         sub = summary_Q[summary_Q["threshold_R"] == thr]
         for _, r in sub.iterrows():
-            manifest_lines.append("  thr=" + ("%.1f" % thr) + " " + str(r["category"]) + " n=" + str(int(r["n"])))
+            manifest_lines.append(
+                "  thr=" + ("%.1f" % thr) + " " + str(r["category"]) + " n=" + str(int(r["n"]))
+            )
     manifest_lines.append("")
-    manifest_lines.append("Lookahead audit (seed=12345): " + str(len(audit_ids))
-                         + " trades × " + str(len(audit_feats)) + " features; mismatches=" + str(len(audit_mismatches)))
+    manifest_lines.append(
+        "Lookahead audit (seed=12345): "
+        + str(len(audit_ids))
+        + " trades × "
+        + str(len(audit_feats))
+        + " features; mismatches="
+        + str(len(audit_mismatches))
+    )
     (out_dir / "run_manifest.txt").write_text("\n".join(manifest_lines) + "\n", encoding="utf-8")
 
     wallclock_s = _time.time() - t0
     return {
-        "Q": Q, "R": R, "S": S, "T": T, "U": U,
+        "Q": Q,
+        "R": R,
+        "S": S,
+        "T": T,
+        "U": U,
         "summary_Q": summary_Q,
         "audit_meta": audit_meta,
         "nan_audit_df": nan_audit_df,
@@ -2042,11 +2473,13 @@ if __name__ == "__main__":
     print("Wallclock: " + ("%.2f" % receipt["wallclock_s"]) + "s")
     try:
         import resource
+
         peak_rss_kb = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
         print("Peak RSS (kB): " + str(peak_rss_kb))
     except Exception:
         try:
             import psutil
+
             p = psutil.Process()
             print("Peak RSS (MB): " + ("%.1f" % (p.memory_info().rss / 1024 / 1024)))
         except Exception:
@@ -2059,23 +2492,43 @@ if __name__ == "__main__":
     print("Block Q populations (threshold = 1.0R):")
     sub_1 = receipt["summary_Q"][receipt["summary_Q"]["threshold_R"] == 1.0]
     for _, r in sub_1.iterrows():
-        print("  " + str(r["category"]) + ": n=" + str(int(r["n"]))
-              + " (" + ("%.2f%%" % (r["pct_of_total"] * 100)) + "), mean_R="
-              + ("%.4f" % r["mean_final_R"]))
-    print("  pct_up_reached_1R = " + ("%.4f" % receipt["pct_up_reached_1R"])
-          + " (Block O ref 0.5119)")
+        print(
+            "  "
+            + str(r["category"])
+            + ": n="
+            + str(int(r["n"]))
+            + " ("
+            + ("%.2f%%" % (r["pct_of_total"] * 100))
+            + "), mean_R="
+            + ("%.4f" % r["mean_final_R"])
+        )
+    print(
+        "  pct_up_reached_1R = " + ("%.4f" % receipt["pct_up_reached_1R"]) + " (Block O ref 0.5119)"
+    )
     print()
     T = receipt["T"]
-    Tcont1 = T[(T["threshold_R"] == 1.0) & (T["kind"] == "continuous")].dropna(
-        subset=["max_abs_cohen_d_across_pairs"]
-    ).sort_values("max_abs_cohen_d_across_pairs", ascending=False).head(5)
+    Tcont1 = (
+        T[(T["threshold_R"] == 1.0) & (T["kind"] == "continuous")]
+        .dropna(subset=["max_abs_cohen_d_across_pairs"])
+        .sort_values("max_abs_cohen_d_across_pairs", ascending=False)
+        .head(5)
+    )
     print("Top 5 continuous features by max|Cohen's d| (threshold = 1.0R):")
     for _, r in Tcont1.iterrows():
-        print("  " + str(r["feature"]) + ": d=" + ("%.4f" % r["max_abs_cohen_d_across_pairs"])
-              + ", pair=" + str(r["max_abs_pair"]))
-    Tcat1 = T[(T["threshold_R"] == 1.0) & (T["kind"] == "categorical")].dropna(
-        subset=["cramers_v"]
-    ).sort_values("cramers_v", ascending=False).head(3)
+        print(
+            "  "
+            + str(r["feature"])
+            + ": d="
+            + ("%.4f" % r["max_abs_cohen_d_across_pairs"])
+            + ", pair="
+            + str(r["max_abs_pair"])
+        )
+    Tcat1 = (
+        T[(T["threshold_R"] == 1.0) & (T["kind"] == "categorical")]
+        .dropna(subset=["cramers_v"])
+        .sort_values("cramers_v", ascending=False)
+        .head(3)
+    )
     print()
     print("Top 3 categorical features by Cramer's V (threshold = 1.0R):")
     for _, r in Tcat1.iterrows():
@@ -2083,11 +2536,17 @@ if __name__ == "__main__":
     print()
 
     def _top20(thr):
-        s = T[(T["threshold_R"] == thr) & (T["kind"] == "continuous")].dropna(
-            subset=["max_abs_cohen_d_across_pairs"]
-        ).sort_values("max_abs_cohen_d_across_pairs", ascending=False).head(20)
+        s = (
+            T[(T["threshold_R"] == thr) & (T["kind"] == "continuous")]
+            .dropna(subset=["max_abs_cohen_d_across_pairs"])
+            .sort_values("max_abs_cohen_d_across_pairs", ascending=False)
+            .head(20)
+        )
         return set(s["feature"].tolist())
-    a05 = _top20(0.5); a10 = _top20(1.0); a15 = _top20(1.5)
+
+    a05 = _top20(0.5)
+    a10 = _top20(1.0)
+    a15 = _top20(1.5)
     print("Cross-threshold stability of top 20 (1.0R):")
     print("  ∩ 0.5R: " + str(len(a10 & a05)) + " features")
     print("  ∩ 1.5R: " + str(len(a10 & a15)) + " features")
@@ -2099,8 +2558,11 @@ if __name__ == "__main__":
     print("  3. Q.2 51.19% recovery at 1.0R        OK")
     print("  4. Q.3 tied < 0.5% per threshold      OK")
     print("  5. R.1 row count = 3,993              OK")
-    print("  6. R.2 lookahead audit 1e-9 tol       OK ("
-          + str(len(receipt["audit_meta"][2])) + " mismatches)")
+    print(
+        "  6. R.2 lookahead audit 1e-9 tol       OK ("
+        + str(len(receipt["audit_meta"][2]))
+        + " mismatches)"
+    )
     print("  7. T.1 effect-size values finite      OK")
     print("  8. Determinism (build × 2)            (validated externally — see _det_check)")
     print("  9. Locked-input sha256 (end)          OK")

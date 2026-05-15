@@ -22,9 +22,7 @@ DECISIONS_MD = PHASE6_ROOT / "exit_final_decisions.md"
 
 def _latest_run_dir_by_mtime(variant_dir: Path) -> Path | None:
     run_dirs = [
-        p
-        for p in variant_dir.iterdir()
-        if p.is_dir() and (p / "wfo_run_meta.json").exists()
+        p for p in variant_dir.iterdir() if p.is_dir() and (p / "wfo_run_meta.json").exists()
     ]
     if not run_dirs:
         return None
@@ -167,12 +165,25 @@ def build_final_decisions(
 
     rows: list[dict] = []
     if not c1_as_exit_final_root.exists():
-        df = pd.DataFrame(columns=[
-            "exit_c1_name", "decision", "decision_reason",
-            "baseline_dd", "baseline_expectancy", "baseline_trades", "baseline_hold",
-            "mode_Y_dd", "mode_Y_expectancy", "mode_Y_trades", "mode_Y_hold",
-            "mode_X_dd", "mode_X_expectancy", "mode_X_trades", "mode_X_hold",
-        ])
+        df = pd.DataFrame(
+            columns=[
+                "exit_c1_name",
+                "decision",
+                "decision_reason",
+                "baseline_dd",
+                "baseline_expectancy",
+                "baseline_trades",
+                "baseline_hold",
+                "mode_Y_dd",
+                "mode_Y_expectancy",
+                "mode_Y_trades",
+                "mode_Y_hold",
+                "mode_X_dd",
+                "mode_X_expectancy",
+                "mode_X_trades",
+                "mode_X_hold",
+            ]
+        )
         return df, f"Baseline A run_id: {baseline_run_id or 'not found'}."
 
     for exit_dir in sorted(c1_as_exit_final_root.iterdir()):
@@ -200,8 +211,12 @@ def build_final_decisions(
         trade_ratio_x = (trades_x / ref_trades) if ref_trades else float("nan")
         hold_ratio_x = (hold_x / ref_hold) if ref_hold and pd.notna(ref_hold) else float("nan")
 
-        qualifies_y, qualifies_by_y, dd_impr_y, exp_delta_y = _mode_qualifies(dd_y, exp_y, ref_dd, ref_exp)
-        qualifies_x, qualifies_by_x, dd_impr_x, exp_delta_x = _mode_qualifies(dd_x, exp_x, ref_dd, ref_exp)
+        qualifies_y, qualifies_by_y, dd_impr_y, exp_delta_y = _mode_qualifies(
+            dd_y, exp_y, ref_dd, ref_exp
+        )
+        qualifies_x, qualifies_by_x, dd_impr_x, exp_delta_x = _mode_qualifies(
+            dd_x, exp_x, ref_dd, ref_exp
+        )
         churn_y = _churn_breach(trade_ratio_y, hold_ratio_y)
         churn_x = _churn_breach(trade_ratio_x, hold_ratio_x)
         ok_y = qualifies_y and not churn_y
@@ -264,29 +279,31 @@ def build_final_decisions(
             else:
                 decision_reason = "no_improvement"
 
-        rows.append({
-            "exit_c1_name": exit_c1_name,
-            "decision": decision,
-            "decision_reason": decision_reason,
-            "baseline_dd": ref_dd,
-            "baseline_expectancy": ref_exp,
-            "baseline_trades": ref_trades,
-            "baseline_hold": ref_hold,
-            "mode_Y_dd": dd_y,
-            "mode_Y_expectancy": exp_y,
-            "mode_Y_trades": trades_y,
-            "mode_Y_hold": hold_y,
-            "mode_X_dd": dd_x,
-            "mode_X_expectancy": exp_x,
-            "mode_X_trades": trades_x,
-            "mode_X_hold": hold_x,
-            "chosen_mode": chosen_mode,
-            "qualifies_by": chosen_by,
-            "dd_improvement_rel": chosen_dd_impr,
-            "expectancy_delta": chosen_exp_delta,
-            "churn_trade_ratio": chosen_trade_ratio,
-            "churn_hold_ratio": chosen_hold_ratio,
-        })
+        rows.append(
+            {
+                "exit_c1_name": exit_c1_name,
+                "decision": decision,
+                "decision_reason": decision_reason,
+                "baseline_dd": ref_dd,
+                "baseline_expectancy": ref_exp,
+                "baseline_trades": ref_trades,
+                "baseline_hold": ref_hold,
+                "mode_Y_dd": dd_y,
+                "mode_Y_expectancy": exp_y,
+                "mode_Y_trades": trades_y,
+                "mode_Y_hold": hold_y,
+                "mode_X_dd": dd_x,
+                "mode_X_expectancy": exp_x,
+                "mode_X_trades": trades_x,
+                "mode_X_hold": hold_x,
+                "chosen_mode": chosen_mode,
+                "qualifies_by": chosen_by,
+                "dd_improvement_rel": chosen_dd_impr,
+                "expectancy_delta": chosen_exp_delta,
+                "churn_trade_ratio": chosen_trade_ratio,
+                "churn_hold_ratio": chosen_hold_ratio,
+            }
+        )
 
     df = pd.DataFrame(rows)
     note = f"Baseline A run_id: {baseline_run_id or 'none'} (latest by mtime)."
@@ -298,7 +315,9 @@ def main() -> None:
         description="Phase 6.3: Final report Mode Y vs Mode X vs Baseline A; KEEP/DISCARD."
     )
     parser.add_argument("--phase6-root", default=str(PHASE6_ROOT), help="Phase 6 results root.")
-    parser.add_argument("--c1-as-exit-final-root", default=str(C1_AS_EXIT_FINAL_ROOT), help="c1_as_exit_final root.")
+    parser.add_argument(
+        "--c1-as-exit-final-root", default=str(C1_AS_EXIT_FINAL_ROOT), help="c1_as_exit_final root."
+    )
     parser.add_argument("--output-csv", default=str(DECISIONS_CSV), help="Output CSV path.")
     parser.add_argument("--output-md", default=str(DECISIONS_MD), help="Output MD path.")
     args = parser.parse_args()

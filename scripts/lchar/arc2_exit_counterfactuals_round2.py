@@ -42,6 +42,7 @@ import pandas as pd
 
 os.environ["MPLBACKEND"] = "Agg"
 import matplotlib  # noqa: E402
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 from PIL import Image  # noqa: E402
@@ -62,28 +63,17 @@ import arc2_exit_sweep_filtered as r2  # noqa: E402
 # Locked input sha256s (11 inputs; gate 1, re-verified as gate 13)
 # ---------------------------------------------------------------------------
 LOCKED_SHAS: Dict[str, str] = {
-    "results/l6/arc2/characterisation/v1_1_full/signals_features.csv":
-        "71b39383632bd695b878add8b331b76bcd231ab5b9adba9eea03d69f8762483e",
-    "results/l6/arc2/characterisation/v1_2_1_full/trade_index.csv":
-        "9f841c5b29e87ed90d34c9617431978baf3041459797cedef02fa16c27e3abb5",
-    "results/l6/arc2/characterisation/v1_2_1_full/per_bar_paths.csv":
-        "7b2acd6ccb98f1fd145a631b318fc95d10f5cf4f42633be9c0b59738fa1696ee",
-    "results/l6/arc2/characterisation/extended/entry_filter_univariate/block_M_kijun_distances.csv":
-        "4a61407f0f1fc1b74486f0614928e776201dc6469d874db8393e689d20cdb2ff",
-    "results/l6/arc2/characterisation/extended/entry_filter_bivariate/block_P_bivariate_cells.csv":
-        "a5e3f8e68aa64d8fd53f752705a33613d9877dbde1f8265cb4a38d753c5e088e",
-    "results/l6/arc2/characterisation/extended/path_by_subset/block_V_subset_category_breakdown.csv":
-        "78633e9904baf2a672d2c8692f4b3557fec0aa3af8044ef3296dde08bad71c02",
-    "results/l6/arc2/characterisation/extended/counterfactuals/round_1/counterfactual_sweep_round_1.md":
-        "635ad1fdaf26525cd5e27c1d8b4c4d807da44d9d9d7c83afed9c8754dbc6e0b2",
-    "results/l6/arc2/characterisation/extended/exit_sweep_filtered/block_Z_per_subset_per_variant.csv":
-        "d4d13f1793bce3292b984aac80e983c9b08d1ec383ce2bca3f3092515798bc21",
-    "core/signals/l4_mtf_alignment_2_down_mixed_kijun.py":
-        "3c8d0f5d4b446f84359ab0663df36869f15b47cf1bf18fbc6caff807dc5134e3",
-    "configs/wfo_l6_arc2.yaml":
-        "25917151bc84a73885eeea9ca9c4cc15b1c277ba793706b158abd3aee0ab6328",
-    "L6_0_METHODOLOGY_LOCK.md":
-        "4fd870b1d17380e4fc4fbfda5a43f7775d313c7a5f50dbfd1f06a3e49c519c26",
+    "results/l6/arc2/characterisation/v1_1_full/signals_features.csv": "71b39383632bd695b878add8b331b76bcd231ab5b9adba9eea03d69f8762483e",
+    "results/l6/arc2/characterisation/v1_2_1_full/trade_index.csv": "9f841c5b29e87ed90d34c9617431978baf3041459797cedef02fa16c27e3abb5",
+    "results/l6/arc2/characterisation/v1_2_1_full/per_bar_paths.csv": "7b2acd6ccb98f1fd145a631b318fc95d10f5cf4f42633be9c0b59738fa1696ee",
+    "results/l6/arc2/characterisation/extended/entry_filter_univariate/block_M_kijun_distances.csv": "4a61407f0f1fc1b74486f0614928e776201dc6469d874db8393e689d20cdb2ff",
+    "results/l6/arc2/characterisation/extended/entry_filter_bivariate/block_P_bivariate_cells.csv": "a5e3f8e68aa64d8fd53f752705a33613d9877dbde1f8265cb4a38d753c5e088e",
+    "results/l6/arc2/characterisation/extended/path_by_subset/block_V_subset_category_breakdown.csv": "78633e9904baf2a672d2c8692f4b3557fec0aa3af8044ef3296dde08bad71c02",
+    "results/l6/arc2/characterisation/extended/counterfactuals/round_1/counterfactual_sweep_round_1.md": "635ad1fdaf26525cd5e27c1d8b4c4d807da44d9d9d7c83afed9c8754dbc6e0b2",
+    "results/l6/arc2/characterisation/extended/exit_sweep_filtered/block_Z_per_subset_per_variant.csv": "d4d13f1793bce3292b984aac80e983c9b08d1ec383ce2bca3f3092515798bc21",
+    "core/signals/l4_mtf_alignment_2_down_mixed_kijun.py": "3c8d0f5d4b446f84359ab0663df36869f15b47cf1bf18fbc6caff807dc5134e3",
+    "configs/wfo_l6_arc2.yaml": "25917151bc84a73885eeea9ca9c4cc15b1c277ba793706b158abd3aee0ab6328",
+    "L6_0_METHODOLOGY_LOCK.md": "4fd870b1d17380e4fc4fbfda5a43f7775d313c7a5f50dbfd1f06a3e49c519c26",
 }
 
 # trades_all.csv is required for spread lookup (not formally locked here,
@@ -180,21 +170,33 @@ def _write_csv(df: pd.DataFrame, path: Path, float_fmt: str = "%.10g") -> None:
 # ===========================================================================
 
 
-def variant_BL(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
-                *, time_horizon: int = TIME_HORIZON_DEFAULT) -> Dict[str, Any]:
+def variant_BL(
+    rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T, *, time_horizon: int = TIME_HORIZON_DEFAULT
+) -> Dict[str, Any]:
     """V00_BL / V09_H240. Byte-identical to Round 2's variant_BL.
 
     Returns Round 2 dict shape + trail_activated_at_k = -1.
     """
-    out = r2.variant_BL(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
-                         time_horizon=time_horizon)
+    out = r2.variant_BL(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T, time_horizon=time_horizon)
     out["trail_activated_at_k"] = -1
     return out
 
 
-def variant_PP(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
-                *, tau_atr_fill: float, cut_bar: int = 20,
-                time_horizon: int = TIME_HORIZON_DEFAULT) -> Dict[str, Any]:
+def variant_PP(
+    rmae,
+    rmfe,
+    bl_,
+    bh_,
+    bc_,
+    nbo,
+    hnb,
+    bavail,
+    T,
+    *,
+    tau_atr_fill: float,
+    cut_bar: int = 20,
+    time_horizon: int = TIME_HORIZON_DEFAULT,
+) -> Dict[str, Any]:
     """SL throughout. At k=cut_bar, if running_close <= tau, exit at that close.
 
     Exit price for cut uses _exit_te_de spread accounting (same one-sided
@@ -207,36 +209,47 @@ def variant_PP(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
             out["trail_activated_at_k"] = -1
             return out
         if k == cut_bar and bc_[k_idx] <= tau_atr_fill:
-            out = r2._exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                  exit_atr_fill=bc_[k_idx],
-                                  exit_reason="early_cut")
+            out = r2._exit_te_de(
+                k_idx=k_idx, T=T, M=2.0, exit_atr_fill=bc_[k_idx], exit_reason="early_cut"
+            )
             out["trail_activated_at_k"] = -1
             return out
         if k == time_horizon:
             if hnb[k_idx]:
-                out = r2._exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                      exit_atr_fill=nbo[k_idx],
-                                      exit_reason="time_exit")
+                out = r2._exit_te_de(
+                    k_idx=k_idx, T=T, M=2.0, exit_atr_fill=nbo[k_idx], exit_reason="time_exit"
+                )
             else:
-                out = r2._exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                      exit_atr_fill=bc_[k_idx],
-                                      exit_reason="data_end")
+                out = r2._exit_te_de(
+                    k_idx=k_idx, T=T, M=2.0, exit_atr_fill=bc_[k_idx], exit_reason="data_end"
+                )
             out["trail_activated_at_k"] = -1
             return out
         if k == bavail:
-            out = r2._exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                  exit_atr_fill=bc_[k_idx],
-                                  exit_reason="data_end")
+            out = r2._exit_te_de(
+                k_idx=k_idx, T=T, M=2.0, exit_atr_fill=bc_[k_idx], exit_reason="data_end"
+            )
             out["trail_activated_at_k"] = -1
             return out
     raise RuntimeError("variant_PP did not terminate")
 
 
-def variant_QQ(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
-                *, decision_bar: int = 120,
-                confirm_kind: str, confirm_threshold: float,
-                extended_horizon: int = TIME_HORIZON_EXTENDED
-                ) -> Dict[str, Any]:
+def variant_QQ(
+    rmae,
+    rmfe,
+    bl_,
+    bh_,
+    bc_,
+    nbo,
+    hnb,
+    bavail,
+    T,
+    *,
+    decision_bar: int = 120,
+    confirm_kind: str,
+    confirm_threshold: float,
+    extended_horizon: int = TIME_HORIZON_EXTENDED,
+) -> Dict[str, Any]:
     """SL throughout. At k=decision_bar, evaluate confirmation; if confirmed,
     extend horizon to extended_horizon; else exit at decision_bar's
     next-bar-open (or close if clamped). Falls back to data_end at bavail.
@@ -256,41 +269,53 @@ def variant_QQ(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
                 horizon = extended_horizon
             else:
                 if hnb[k_idx]:
-                    out = r2._exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                          exit_atr_fill=nbo[k_idx],
-                                          exit_reason="time_exit")
+                    out = r2._exit_te_de(
+                        k_idx=k_idx, T=T, M=2.0, exit_atr_fill=nbo[k_idx], exit_reason="time_exit"
+                    )
                 else:
-                    out = r2._exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                          exit_atr_fill=bc_[k_idx],
-                                          exit_reason="data_end")
+                    out = r2._exit_te_de(
+                        k_idx=k_idx, T=T, M=2.0, exit_atr_fill=bc_[k_idx], exit_reason="data_end"
+                    )
                 out["trail_activated_at_k"] = -1
                 return out
         if k == horizon:
             if hnb[k_idx]:
-                out = r2._exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                      exit_atr_fill=nbo[k_idx],
-                                      exit_reason="time_exit")
+                out = r2._exit_te_de(
+                    k_idx=k_idx, T=T, M=2.0, exit_atr_fill=nbo[k_idx], exit_reason="time_exit"
+                )
             else:
-                out = r2._exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                      exit_atr_fill=bc_[k_idx],
-                                      exit_reason="data_end")
+                out = r2._exit_te_de(
+                    k_idx=k_idx, T=T, M=2.0, exit_atr_fill=bc_[k_idx], exit_reason="data_end"
+                )
             out["trail_activated_at_k"] = -1
             return out
         if k == bavail:
-            out = r2._exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                  exit_atr_fill=bc_[k_idx],
-                                  exit_reason="data_end")
+            out = r2._exit_te_de(
+                k_idx=k_idx, T=T, M=2.0, exit_atr_fill=bc_[k_idx], exit_reason="data_end"
+            )
             out["trail_activated_at_k"] = -1
             return out
     raise RuntimeError("variant_QQ did not terminate")
 
 
-def variant_RR(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
-                *, tau_atr_fill: float, cut_bar: int = 20,
-                decision_bar: int = 120,
-                confirm_kind: str, confirm_threshold: float,
-                extended_horizon: int = TIME_HORIZON_EXTENDED
-                ) -> Dict[str, Any]:
+def variant_RR(
+    rmae,
+    rmfe,
+    bl_,
+    bh_,
+    bc_,
+    nbo,
+    hnb,
+    bavail,
+    T,
+    *,
+    tau_atr_fill: float,
+    cut_bar: int = 20,
+    decision_bar: int = 120,
+    confirm_kind: str,
+    confirm_threshold: float,
+    extended_horizon: int = TIME_HORIZON_EXTENDED,
+) -> Dict[str, Any]:
     """PP cut + QQ conditional hold. No trail."""
     horizon = decision_bar
     for k_idx in range(bavail):
@@ -300,9 +325,9 @@ def variant_RR(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
             out["trail_activated_at_k"] = -1
             return out
         if k == cut_bar and bc_[k_idx] <= tau_atr_fill:
-            out = r2._exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                  exit_atr_fill=bc_[k_idx],
-                                  exit_reason="early_cut")
+            out = r2._exit_te_de(
+                k_idx=k_idx, T=T, M=2.0, exit_atr_fill=bc_[k_idx], exit_reason="early_cut"
+            )
             out["trail_activated_at_k"] = -1
             return out
         if k == decision_bar:
@@ -311,38 +336,50 @@ def variant_RR(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
                 horizon = extended_horizon
             else:
                 if hnb[k_idx]:
-                    out = r2._exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                          exit_atr_fill=nbo[k_idx],
-                                          exit_reason="time_exit")
+                    out = r2._exit_te_de(
+                        k_idx=k_idx, T=T, M=2.0, exit_atr_fill=nbo[k_idx], exit_reason="time_exit"
+                    )
                 else:
-                    out = r2._exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                          exit_atr_fill=bc_[k_idx],
-                                          exit_reason="data_end")
+                    out = r2._exit_te_de(
+                        k_idx=k_idx, T=T, M=2.0, exit_atr_fill=bc_[k_idx], exit_reason="data_end"
+                    )
                 out["trail_activated_at_k"] = -1
                 return out
         if k == horizon:
             if hnb[k_idx]:
-                out = r2._exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                      exit_atr_fill=nbo[k_idx],
-                                      exit_reason="time_exit")
+                out = r2._exit_te_de(
+                    k_idx=k_idx, T=T, M=2.0, exit_atr_fill=nbo[k_idx], exit_reason="time_exit"
+                )
             else:
-                out = r2._exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                      exit_atr_fill=bc_[k_idx],
-                                      exit_reason="data_end")
+                out = r2._exit_te_de(
+                    k_idx=k_idx, T=T, M=2.0, exit_atr_fill=bc_[k_idx], exit_reason="data_end"
+                )
             out["trail_activated_at_k"] = -1
             return out
         if k == bavail:
-            out = r2._exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                  exit_atr_fill=bc_[k_idx],
-                                  exit_reason="data_end")
+            out = r2._exit_te_de(
+                k_idx=k_idx, T=T, M=2.0, exit_atr_fill=bc_[k_idx], exit_reason="data_end"
+            )
             out["trail_activated_at_k"] = -1
             return out
     raise RuntimeError("variant_RR did not terminate")
 
 
-def variant_SS(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
-                *, X_act_atr: float, D_atr: float,
-                time_horizon: int) -> Dict[str, Any]:
+def variant_SS(
+    rmae,
+    rmfe,
+    bl_,
+    bh_,
+    bc_,
+    nbo,
+    hnb,
+    bavail,
+    T,
+    *,
+    X_act_atr: float,
+    D_atr: float,
+    time_horizon: int,
+) -> Dict[str, Any]:
     """Close-based trail.
 
     Activation: running_mfe_atr first reaches X_act_atr (uses intrabar
@@ -371,8 +408,7 @@ def variant_SS(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
             if new_tl > trail_level:
                 trail_level = new_tl
             if bc_[k_idx] <= trail_level:
-                out = r2._exit_trail(k_idx=k_idx, T=T,
-                                      trail_level_atr_fill=trail_level)
+                out = r2._exit_trail(k_idx=k_idx, T=T, trail_level_atr_fill=trail_level)
                 out["trail_activated_at_k"] = activated_at_k
                 return out
         if not trail_active and rmfe[k_idx] >= X_act_atr:
@@ -382,31 +418,44 @@ def variant_SS(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
             trail_level = peak_close - D_atr
         if k == time_horizon:
             if hnb[k_idx]:
-                out = r2._exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                      exit_atr_fill=nbo[k_idx],
-                                      exit_reason="time_exit")
+                out = r2._exit_te_de(
+                    k_idx=k_idx, T=T, M=2.0, exit_atr_fill=nbo[k_idx], exit_reason="time_exit"
+                )
             else:
-                out = r2._exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                      exit_atr_fill=bc_[k_idx],
-                                      exit_reason="data_end")
+                out = r2._exit_te_de(
+                    k_idx=k_idx, T=T, M=2.0, exit_atr_fill=bc_[k_idx], exit_reason="data_end"
+                )
             out["trail_activated_at_k"] = activated_at_k
             return out
         if k == bavail:
-            out = r2._exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                  exit_atr_fill=bc_[k_idx],
-                                  exit_reason="data_end")
+            out = r2._exit_te_de(
+                k_idx=k_idx, T=T, M=2.0, exit_atr_fill=bc_[k_idx], exit_reason="data_end"
+            )
             out["trail_activated_at_k"] = activated_at_k
             return out
     raise RuntimeError("variant_SS did not terminate")
 
 
-def variant_TT(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
-                *, tau_atr_fill: float, cut_bar: int = 20,
-                X_act_atr: float, D_atr: float,
-                decision_bar: int = 120,
-                confirm_kind: str, confirm_threshold: float,
-                extended_horizon: int = TIME_HORIZON_EXTENDED
-                ) -> Dict[str, Any]:
+def variant_TT(
+    rmae,
+    rmfe,
+    bl_,
+    bh_,
+    bc_,
+    nbo,
+    hnb,
+    bavail,
+    T,
+    *,
+    tau_atr_fill: float,
+    cut_bar: int = 20,
+    X_act_atr: float,
+    D_atr: float,
+    decision_bar: int = 120,
+    confirm_kind: str,
+    confirm_threshold: float,
+    extended_horizon: int = TIME_HORIZON_EXTENDED,
+) -> Dict[str, Any]:
     """PP cut + QQ conditional hold + SS close-based trail."""
     trail_active = False
     activated_at_k = -1
@@ -422,9 +471,9 @@ def variant_TT(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
             return out
         # 2. PP cut.
         if k == cut_bar and bc_[k_idx] <= tau_atr_fill:
-            out = r2._exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                  exit_atr_fill=bc_[k_idx],
-                                  exit_reason="early_cut")
+            out = r2._exit_te_de(
+                k_idx=k_idx, T=T, M=2.0, exit_atr_fill=bc_[k_idx], exit_reason="early_cut"
+            )
             out["trail_activated_at_k"] = activated_at_k
             return out
         # 3. Trail exit (if active).
@@ -435,8 +484,7 @@ def variant_TT(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
             if new_tl > trail_level:
                 trail_level = new_tl
             if bc_[k_idx] <= trail_level:
-                out = r2._exit_trail(k_idx=k_idx, T=T,
-                                      trail_level_atr_fill=trail_level)
+                out = r2._exit_trail(k_idx=k_idx, T=T, trail_level_atr_fill=trail_level)
                 out["trail_activated_at_k"] = activated_at_k
                 return out
         # 4. QQ confirmation at decision_bar.
@@ -446,13 +494,13 @@ def variant_TT(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
                 horizon = extended_horizon
             else:
                 if hnb[k_idx]:
-                    out = r2._exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                          exit_atr_fill=nbo[k_idx],
-                                          exit_reason="time_exit")
+                    out = r2._exit_te_de(
+                        k_idx=k_idx, T=T, M=2.0, exit_atr_fill=nbo[k_idx], exit_reason="time_exit"
+                    )
                 else:
-                    out = r2._exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                          exit_atr_fill=bc_[k_idx],
-                                          exit_reason="data_end")
+                    out = r2._exit_te_de(
+                        k_idx=k_idx, T=T, M=2.0, exit_atr_fill=bc_[k_idx], exit_reason="data_end"
+                    )
                 out["trail_activated_at_k"] = activated_at_k
                 return out
         # 5. Trail activation (delayed: applies from k+1).
@@ -464,19 +512,19 @@ def variant_TT(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
         # 6. Horizon.
         if k == horizon:
             if hnb[k_idx]:
-                out = r2._exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                      exit_atr_fill=nbo[k_idx],
-                                      exit_reason="time_exit")
+                out = r2._exit_te_de(
+                    k_idx=k_idx, T=T, M=2.0, exit_atr_fill=nbo[k_idx], exit_reason="time_exit"
+                )
             else:
-                out = r2._exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                      exit_atr_fill=bc_[k_idx],
-                                      exit_reason="data_end")
+                out = r2._exit_te_de(
+                    k_idx=k_idx, T=T, M=2.0, exit_atr_fill=bc_[k_idx], exit_reason="data_end"
+                )
             out["trail_activated_at_k"] = activated_at_k
             return out
         if k == bavail:
-            out = r2._exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                  exit_atr_fill=bc_[k_idx],
-                                  exit_reason="data_end")
+            out = r2._exit_te_de(
+                k_idx=k_idx, T=T, M=2.0, exit_atr_fill=bc_[k_idx], exit_reason="data_end"
+            )
             out["trail_activated_at_k"] = activated_at_k
             return out
     raise RuntimeError("variant_TT did not terminate")
@@ -534,33 +582,85 @@ TT_VARIANTS: Tuple[Tuple[str, float, float, float, str, float], ...] = (
 
 def _make_variant_list() -> List[Tuple[str, str, Callable[..., Dict[str, Any]]]]:
     items: List[Tuple[str, str, Callable[..., Dict[str, Any]]]] = []
-    items.append(("V00_BL", "Baseline (SL=-2R, TE=120)",
-                  lambda *a: variant_BL(*a, time_horizon=TIME_HORIZON_DEFAULT)))
-    items.append(("V09_H240", "BL with TE=240",
-                  lambda *a: variant_BL(*a, time_horizon=TIME_HORIZON_EXTENDED)))
+    items.append(
+        (
+            "V00_BL",
+            "Baseline (SL=-2R, TE=120)",
+            lambda *a: variant_BL(*a, time_horizon=TIME_HORIZON_DEFAULT),
+        )
+    )
+    items.append(
+        (
+            "V09_H240",
+            "BL with TE=240",
+            lambda *a: variant_BL(*a, time_horizon=TIME_HORIZON_EXTENDED),
+        )
+    )
     for vid, tau in PP_VARIANTS:
-        items.append((vid, f"Early-cut at k=20, tau={tau}",
-                      (lambda tau_=tau: lambda *a: variant_PP(
-                          *a, tau_atr_fill=tau_))()))
+        items.append(
+            (
+                vid,
+                f"Early-cut at k=20, tau={tau}",
+                (lambda tau_=tau: lambda *a: variant_PP(*a, tau_atr_fill=tau_))(),
+            )
+        )
     for vid, kind, thr in QQ_VARIANTS:
-        items.append((vid, f"H240 conditional on {kind}>={thr}",
-                      (lambda k_=kind, t_=thr: lambda *a: variant_QQ(
-                          *a, confirm_kind=k_, confirm_threshold=t_))()))
+        items.append(
+            (
+                vid,
+                f"H240 conditional on {kind}>={thr}",
+                (
+                    lambda k_=kind, t_=thr: (
+                        lambda *a: variant_QQ(*a, confirm_kind=k_, confirm_threshold=t_)
+                    )
+                )(),
+            )
+        )
     for vid, tau, kind, thr in RR_VARIANTS:
-        items.append((vid, f"PP tau={tau} + QQ {kind}>={thr}",
-                      (lambda tau_=tau, k_=kind, t_=thr: lambda *a: variant_RR(
-                          *a, tau_atr_fill=tau_,
-                          confirm_kind=k_, confirm_threshold=t_))()))
+        items.append(
+            (
+                vid,
+                f"PP tau={tau} + QQ {kind}>={thr}",
+                (
+                    lambda tau_=tau, k_=kind, t_=thr: (
+                        lambda *a: variant_RR(
+                            *a, tau_atr_fill=tau_, confirm_kind=k_, confirm_threshold=t_
+                        )
+                    )
+                )(),
+            )
+        )
     for vid, xact, d, te in SS_VARIANTS:
-        items.append((vid, f"Trail X_act={xact} D={d} TE={te}",
-                      (lambda x_=xact, d_=d, t_=te: lambda *a: variant_SS(
-                          *a, X_act_atr=x_, D_atr=d_, time_horizon=t_))()))
+        items.append(
+            (
+                vid,
+                f"Trail X_act={xact} D={d} TE={te}",
+                (
+                    lambda x_=xact, d_=d, t_=te: (
+                        lambda *a: variant_SS(*a, X_act_atr=x_, D_atr=d_, time_horizon=t_)
+                    )
+                )(),
+            )
+        )
     for vid, tau, xact, d, kind, thr in TT_VARIANTS:
-        items.append((vid, f"TT tau={tau} X_act={xact} D={d} {kind}>={thr}",
-                      (lambda tau_=tau, x_=xact, d_=d, k_=kind, t_=thr:
-                       lambda *a: variant_TT(
-                          *a, tau_atr_fill=tau_, X_act_atr=x_, D_atr=d_,
-                          confirm_kind=k_, confirm_threshold=t_))()))
+        items.append(
+            (
+                vid,
+                f"TT tau={tau} X_act={xact} D={d} {kind}>={thr}",
+                (
+                    lambda tau_=tau, x_=xact, d_=d, k_=kind, t_=thr: (
+                        lambda *a: variant_TT(
+                            *a,
+                            tau_atr_fill=tau_,
+                            X_act_atr=x_,
+                            D_atr=d_,
+                            confirm_kind=k_,
+                            confirm_threshold=t_,
+                        )
+                    )
+                )(),
+            )
+        )
     return items
 
 
@@ -573,8 +673,7 @@ VARIANT_IDS: Tuple[str, ...] = tuple(v[0] for v in VARIANTS)
 # ===========================================================================
 
 
-def run_sweep() -> Tuple[pd.DataFrame, pd.DataFrame, np.ndarray, np.ndarray,
-                           Dict[str, np.ndarray]]:
+def run_sweep() -> Tuple[pd.DataFrame, pd.DataFrame, np.ndarray, np.ndarray, Dict[str, np.ndarray]]:
     """Returns (variant_trades, ti_full, cats, peak_mfe, subsets)."""
     print("  Loading trade_index.csv + trades_all.csv...", flush=True)
     ti = pd.read_csv(REPO_ROOT / "results/l6/arc2/characterisation/v1_2_1_full/trade_index.csv")
@@ -583,7 +682,9 @@ def run_sweep() -> Tuple[pd.DataFrame, pd.DataFrame, np.ndarray, np.ndarray,
     ta["signal_bar_ts"] = pd.to_datetime(ta["signal_bar_ts"])
     ti_full = ti.merge(
         ta[["pair", "signal_bar_ts", "spread_pips_entry", "spread_pips_exit"]],
-        on=["pair", "signal_bar_ts"], how="left", validate="one_to_one",
+        on=["pair", "signal_bar_ts"],
+        how="left",
+        validate="one_to_one",
     )
     if ti_full[["spread_pips_entry", "spread_pips_exit"]].isna().any().any():
         raise RuntimeError("HALT (sp-lookup): null sp_entry/sp_exit after merge")
@@ -600,8 +701,12 @@ def run_sweep() -> Tuple[pd.DataFrame, pd.DataFrame, np.ndarray, np.ndarray,
         atr = float(row["atr_1h_wilder_at_signal"])
         entry_fill = float(row["entry_price"])
         per_trade[tid] = {
-            "pair": pair, "atr": atr, "entry_fill": entry_fill,
-            "sp_entry_pips": sp_entry, "sp_exit_pips": sp_exit, "pip": pip,
+            "pair": pair,
+            "atr": atr,
+            "entry_fill": entry_fill,
+            "sp_entry_pips": sp_entry,
+            "sp_exit_pips": sp_exit,
+            "pip": pip,
             "entry_fill_offset_atr": sp_entry * pip / (2 * atr),
             "baseline_spread_cost_r": (sp_entry + sp_exit) * pip / (4 * atr),
             "fold_id": int(row["fold_id"]),
@@ -628,8 +733,7 @@ def run_sweep() -> Tuple[pd.DataFrame, pd.DataFrame, np.ndarray, np.ndarray,
 
     # Block B categories (gate 2.3).
     cats = r2.compute_categories(pb, n_trades)
-    print("  Block B categories:",
-          {c: int((cats == c).sum()) for c in ALL_CATS}, flush=True)
+    print("  Block B categories:", {c: int((cats == c).sum()) for c in ALL_CATS}, flush=True)
 
     # Per-trade peak_mfe for tier classification (reporting only).
     peak_mfe = np.full(n_trades, np.nan, dtype=np.float64)
@@ -641,8 +745,7 @@ def run_sweep() -> Tuple[pd.DataFrame, pd.DataFrame, np.ndarray, np.ndarray,
     # Build subsets (gate 2.1, 2.2 inside).
     _, subsets_full = r2.build_subsets()
     subsets = {sid: subsets_full[sid] for sid in SUBSET_IDS}
-    print(f"  Subsets: {{sid: n}} =",
-          {sid: len(t) for sid, t in subsets.items()}, flush=True)
+    print("  Subsets: {sid: n} =", {sid: len(t) for sid, t in subsets.items()}, flush=True)
 
     # Run 27 variants per trade.
     n_vars = len(VARIANTS)
@@ -667,9 +770,13 @@ def run_sweep() -> Tuple[pd.DataFrame, pd.DataFrame, np.ndarray, np.ndarray,
     for tid in range(n_trades):
         s, e = int(starts[tid]), int(ends[tid])
         bavail = e - s
-        rmae = rmae_all[s:e]; rmfe = rmfe_all[s:e]
-        bl_ = bl_all[s:e]; bh_ = bh_all[s:e]; bc_ = bc_all[s:e]
-        nbo = nbo_all[s:e]; hnb = hnb_all[s:e]
+        rmae = rmae_all[s:e]
+        rmfe = rmfe_all[s:e]
+        bl_ = bl_all[s:e]
+        bh_ = bh_all[s:e]
+        bc_ = bc_all[s:e]
+        nbo = nbo_all[s:e]
+        hnb = hnb_all[s:e]
         T = per_trade[tid]
         for vid, _, vfn in VARIANTS:
             r = vfn(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T)
@@ -688,17 +795,27 @@ def run_sweep() -> Tuple[pd.DataFrame, pd.DataFrame, np.ndarray, np.ndarray,
             write_idx += 1
         if (tid + 1) % 1000 == 0:
             el = time.time() - t0
-            print(f"    progress: {tid+1}/{n_trades} "
-                  f"({el:.1f}s, {(tid+1)/el:.0f} trades/s)", flush=True)
+            print(
+                f"    progress: {tid + 1}/{n_trades} ({el:.1f}s, {(tid + 1) / el:.0f} trades/s)",
+                flush=True,
+            )
 
-    vt = pd.DataFrame({
-        "variant_id": out_variant, "trade_id": out_tid, "pair": out_pair,
-        "signal_bar_ts": out_sigts, "fold_id": out_fold,
-        "exit_reason_internal": out_reason, "exit_bar": out_exitbar,
-        "exit_level_atr_fill": out_exitlvl, "gross_R": out_gross,
-        "spread_cost_R": out_spread, "net_R": out_net,
-        "trail_activated_at_k": out_act_k,
-    })
+    vt = pd.DataFrame(
+        {
+            "variant_id": out_variant,
+            "trade_id": out_tid,
+            "pair": out_pair,
+            "signal_bar_ts": out_sigts,
+            "fold_id": out_fold,
+            "exit_reason_internal": out_reason,
+            "exit_bar": out_exitbar,
+            "exit_level_atr_fill": out_exitlvl,
+            "gross_R": out_gross,
+            "spread_cost_R": out_spread,
+            "net_R": out_net,
+            "trail_activated_at_k": out_act_k,
+        }
+    )
     vt["exit_reason"] = vt["exit_reason_internal"].map(REASON_MAP_3E)
     if vt["exit_reason"].isna().any():
         raise RuntimeError("HALT: unmapped exit_reason_internal present")
@@ -712,12 +829,17 @@ def run_sweep() -> Tuple[pd.DataFrame, pd.DataFrame, np.ndarray, np.ndarray,
 
 
 def _gate_3_1_bl_repro(vt: pd.DataFrame, subsets: Dict[str, np.ndarray]) -> None:
-    bz_path = REPO_ROOT / "results/l6/arc2/characterisation/extended/exit_sweep_filtered/block_Z_per_subset_per_variant.csv"
+    bz_path = (
+        REPO_ROOT
+        / "results/l6/arc2/characterisation/extended/exit_sweep_filtered/block_Z_per_subset_per_variant.csv"
+    )
     bz = pd.read_csv(bz_path)
-    ref = float(bz[(bz["subset_id"] == "S0_pop")
-                    & (bz["variant_id"] == "V00_BL")]["mean_R"].iloc[0])
-    bl_s0 = vt[(vt["variant_id"] == "V00_BL")
-                & (vt["trade_id"].isin(set(subsets["S0_pop"].tolist())))]
+    ref = float(
+        bz[(bz["subset_id"] == "S0_pop") & (bz["variant_id"] == "V00_BL")]["mean_R"].iloc[0]
+    )
+    bl_s0 = vt[
+        (vt["variant_id"] == "V00_BL") & (vt["trade_id"].isin(set(subsets["S0_pop"].tolist())))
+    ]
     got = float(bl_s0["net_R"].mean())
     diff = abs(got - ref)
     if diff > GATE_3_1_TOL:
@@ -741,43 +863,39 @@ def _gate_3_2_clamped(vt: pd.DataFrame, ti_full: pd.DataFrame) -> None:
     if n_de < 0:  # noop sentinel; just ensure column exists.
         raise RuntimeError("HALT (gate 3.2): missing data_end column")
     # Soft sanity check vs Round 2's published count (8 on S0_pop pooled).
-    bz_path = REPO_ROOT / "results/l6/arc2/characterisation/extended/exit_sweep_filtered/block_Z_per_subset_per_variant.csv"
+    bz_path = (
+        REPO_ROOT
+        / "results/l6/arc2/characterisation/extended/exit_sweep_filtered/block_Z_per_subset_per_variant.csv"
+    )
     bz = pd.read_csv(bz_path)
-    ref_de = int(bz[(bz["subset_id"] == "S0_pop")
-                     & (bz["variant_id"] == "V00_BL")]["n_exit_reason_de"].iloc[0])
+    ref_de = int(
+        bz[(bz["subset_id"] == "S0_pop") & (bz["variant_id"] == "V00_BL")]["n_exit_reason_de"].iloc[
+            0
+        ]
+    )
     got_de = int((bl["exit_reason"] == "de").sum())
     if got_de != ref_de:
         raise RuntimeError(
-            f"HALT (gate 3.2): V00_BL S0_pop n_data_end {got_de} != "
-            f"Round 2 ref {ref_de}"
+            f"HALT (gate 3.2): V00_BL S0_pop n_data_end {got_de} != Round 2 ref {ref_de}"
         )
 
 
-def _gate_7_exit_exhaustive(vt: pd.DataFrame,
-                              subsets: Dict[str, np.ndarray]) -> None:
+def _gate_7_exit_exhaustive(vt: pd.DataFrame, subsets: Dict[str, np.ndarray]) -> None:
     """Gate 7: per (subset, variant), exit reasons sum to n."""
     for sid in SUBSET_IDS:
         tids = set(subsets[sid].tolist())
         for vid in VARIANT_IDS:
-            sub = vt[(vt["variant_id"] == vid)
-                      & (vt["trade_id"].isin(tids))]
+            sub = vt[(vt["variant_id"] == vid) & (vt["trade_id"].isin(tids))]
             n = len(sub)
             if n == 0:
-                raise RuntimeError(
-                    f"HALT (gate 7): empty {sid}/{vid}"
-                )
+                raise RuntimeError(f"HALT (gate 7): empty {sid}/{vid}")
             counts = sub["exit_reason"].value_counts().to_dict()
             total = int(sum(counts.values()))
             if total != n:
-                raise RuntimeError(
-                    f"HALT (gate 7): {sid}/{vid} reasons sum {total} != n {n}"
-                )
+                raise RuntimeError(f"HALT (gate 7): {sid}/{vid} reasons sum {total} != n {n}")
             for r in counts.keys():
                 if r not in ALL_EXIT_SHORT:
-                    raise RuntimeError(
-                        f"HALT (gate 7): unexpected reason '{r}' "
-                        f"in {sid}/{vid}"
-                    )
+                    raise RuntimeError(f"HALT (gate 7): unexpected reason '{r}' in {sid}/{vid}")
 
 
 def _gate_11_tt_pp_additivity(vt: pd.DataFrame) -> None:
@@ -799,10 +917,7 @@ def _gate_11_tt_pp_additivity(vt: pd.DataFrame) -> None:
                 )
             diff = abs(float(row["net_R"]) - float(pp_row["net_R"]))
             if diff > 1e-12:
-                raise RuntimeError(
-                    f"HALT (gate 11): {vid} tid={tid} net_R diff {diff:.3e} "
-                    f"vs PP01"
-                )
+                raise RuntimeError(f"HALT (gate 11): {vid} tid={tid} net_R diff {diff:.3e} vs PP01")
 
 
 # ===========================================================================
@@ -810,8 +925,9 @@ def _gate_11_tt_pp_additivity(vt: pd.DataFrame) -> None:
 # ===========================================================================
 
 
-def _bar_of_sl_under_BL(rmae: np.ndarray, n_trades: int,
-                        starts: np.ndarray, ends: np.ndarray) -> np.ndarray:
+def _bar_of_sl_under_BL(
+    rmae: np.ndarray, n_trades: int, starts: np.ndarray, ends: np.ndarray
+) -> np.ndarray:
     """First k where running_mae_atr <= -2 within k<=120; SENTINEL (=121)
     if never within window.
     """
@@ -833,11 +949,13 @@ def _close_at_k(starts, ends, bc, tid, k):
     return float("nan")
 
 
-def aggregate_block_PP(vt: pd.DataFrame, subsets: Dict[str, np.ndarray],
-                        cats: np.ndarray,
-                        bar_of_sl_BL: np.ndarray,
-                        close_at_k20: np.ndarray
-                        ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+def aggregate_block_PP(
+    vt: pd.DataFrame,
+    subsets: Dict[str, np.ndarray],
+    cats: np.ndarray,
+    bar_of_sl_BL: np.ndarray,
+    close_at_k20: np.ndarray,
+) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """Returns (per_subset_per_category_per_variant_df, cut_group_detail_df,
     summary_df).
     """
@@ -859,15 +977,21 @@ def aggregate_block_PP(vt: pd.DataFrame, subsets: Dict[str, np.ndarray],
             n_sl_total = int((v_sub["exit_reason"] == "sl").sum())
             n_te_total = int((v_sub["exit_reason"] == "te").sum())
             n_de_total = int((v_sub["exit_reason"] == "de").sum())
-            rows_summary.append({
-                "subset_id": sid, "variant_id": vid, "tau_atr_fill": tau,
-                "n_total": n_total_subset,
-                "n_cut_at_k20": n_cut_total,
-                "n_sl": n_sl_total, "n_te": n_te_total, "n_de": n_de_total,
-                "pooled_mean_R": pooled_mean,
-                "pooled_mean_R_BL": bl_pooled_mean,
-                "lift_vs_BL": lift,
-            })
+            rows_summary.append(
+                {
+                    "subset_id": sid,
+                    "variant_id": vid,
+                    "tau_atr_fill": tau,
+                    "n_total": n_total_subset,
+                    "n_cut_at_k20": n_cut_total,
+                    "n_sl": n_sl_total,
+                    "n_te": n_te_total,
+                    "n_de": n_de_total,
+                    "pooled_mean_R": pooled_mean,
+                    "pooled_mean_R_BL": bl_pooled_mean,
+                    "lift_vs_BL": lift,
+                }
+            )
             # Per-category breakdown.
             for cat_label in ALL_CATS:
                 tids_cat = np.array(
@@ -876,25 +1000,29 @@ def aggregate_block_PP(vt: pd.DataFrame, subsets: Dict[str, np.ndarray],
                 )
                 n_total_cat = int(len(tids_cat))
                 if n_total_cat == 0:
-                    rows_cat.append({
-                        "subset_id": sid, "variant_id": vid,
-                        "category": cat_label, "n_total_in_category": 0,
-                        "n_sl_before_k20": 0,
-                        "n_open_at_k20": 0,
-                        "n_open_at_k20_below_tau": 0,
-                        "n_open_at_k20_above_tau": 0,
-                        "n_subsequent_sl": 0,
-                        "n_subsequent_te_negative": 0,
-                        "n_subsequent_te_positive": 0,
-                        "n_subsequent_de": 0,
-                        "mean_cut_price_R": float("nan"),
-                        "median_cut_price_R": float("nan"),
-                        "mean_bl_R_for_cut_group": float("nan"),
-                        "savings_per_cut_trade": float("nan"),
-                        "pre_cut_category_mean_R": float("nan"),
-                        "post_cut_category_mean_R": float("nan"),
-                        "lift_per_category": float("nan"),
-                    })
+                    rows_cat.append(
+                        {
+                            "subset_id": sid,
+                            "variant_id": vid,
+                            "category": cat_label,
+                            "n_total_in_category": 0,
+                            "n_sl_before_k20": 0,
+                            "n_open_at_k20": 0,
+                            "n_open_at_k20_below_tau": 0,
+                            "n_open_at_k20_above_tau": 0,
+                            "n_subsequent_sl": 0,
+                            "n_subsequent_te_negative": 0,
+                            "n_subsequent_te_positive": 0,
+                            "n_subsequent_de": 0,
+                            "mean_cut_price_R": float("nan"),
+                            "median_cut_price_R": float("nan"),
+                            "mean_bl_R_for_cut_group": float("nan"),
+                            "savings_per_cut_trade": float("nan"),
+                            "pre_cut_category_mean_R": float("nan"),
+                            "post_cut_category_mean_R": float("nan"),
+                            "lift_per_category": float("nan"),
+                        }
+                    )
                     continue
                 bl_cat = bl_by_tid.loc[bl_by_tid.index.isin(tids_cat)]
                 v_cat = v_by_tid.loc[v_by_tid.index.isin(tids_cat)]
@@ -913,7 +1041,8 @@ def aggregate_block_PP(vt: pd.DataFrame, subsets: Dict[str, np.ndarray],
                     n_above = n_open - n_below
                     cut_tids = tids_open[below_mask]
                 else:
-                    n_below = 0; n_above = 0
+                    n_below = 0
+                    n_above = 0
                     cut_tids = np.array([], dtype=np.int64)
 
                 # For cut group, look up BL outcomes.
@@ -924,7 +1053,7 @@ def aggregate_block_PP(vt: pd.DataFrame, subsets: Dict[str, np.ndarray],
                     bl_R_for_cut = bl_for_cut["net_R"].to_numpy(dtype=np.float64)
                     bl_reason = bl_for_cut["exit_reason"].to_numpy()
                     n_sub_sl = int((bl_reason == "sl").sum())
-                    n_sub_te = (bl_reason == "te")
+                    n_sub_te = bl_reason == "te"
                     n_sub_te_neg = int(((bl_R_for_cut < 0) & n_sub_te).sum())
                     n_sub_te_pos = int(((bl_R_for_cut >= 0) & n_sub_te).sum())
                     n_sub_de = int((bl_reason == "de").sum())
@@ -934,45 +1063,58 @@ def aggregate_block_PP(vt: pd.DataFrame, subsets: Dict[str, np.ndarray],
                     savings = mean_cut_R - mean_bl_R_for_cut
                     # Per-cut trade detail rows.
                     for tid_, cp, bp, br in zip(
-                            cut_tids.tolist(),
-                            cut_prices.tolist(),
-                            bl_R_for_cut.tolist(),
-                            bl_reason.tolist()):
-                        rows_cut.append({
-                            "subset_id": sid, "variant_id": vid,
-                            "category": cat_label, "trade_id": int(tid_),
-                            "cut_price_R": cp,
-                            "bl_R_counterfactual": bp,
-                            "bl_exit_reason": br,
-                            "savings_R": cp - bp,
-                        })
+                        cut_tids.tolist(),
+                        cut_prices.tolist(),
+                        bl_R_for_cut.tolist(),
+                        bl_reason.tolist(),
+                    ):
+                        rows_cut.append(
+                            {
+                                "subset_id": sid,
+                                "variant_id": vid,
+                                "category": cat_label,
+                                "trade_id": int(tid_),
+                                "cut_price_R": cp,
+                                "bl_R_counterfactual": bp,
+                                "bl_exit_reason": br,
+                                "savings_R": cp - bp,
+                            }
+                        )
                 else:
-                    n_sub_sl = 0; n_sub_te_neg = 0; n_sub_te_pos = 0
+                    n_sub_sl = 0
+                    n_sub_te_neg = 0
+                    n_sub_te_pos = 0
                     n_sub_de = 0
-                    mean_cut_R = float("nan"); median_cut_R = float("nan")
-                    mean_bl_R_for_cut = float("nan"); savings = float("nan")
+                    mean_cut_R = float("nan")
+                    median_cut_R = float("nan")
+                    mean_bl_R_for_cut = float("nan")
+                    savings = float("nan")
 
                 pre = float(bl_cat["net_R"].mean())
                 post = float(v_cat["net_R"].mean())
-                rows_cat.append({
-                    "subset_id": sid, "variant_id": vid,
-                    "category": cat_label, "n_total_in_category": n_total_cat,
-                    "n_sl_before_k20": n_sl_before_k20,
-                    "n_open_at_k20": n_open,
-                    "n_open_at_k20_below_tau": n_below,
-                    "n_open_at_k20_above_tau": n_above,
-                    "n_subsequent_sl": n_sub_sl,
-                    "n_subsequent_te_negative": n_sub_te_neg,
-                    "n_subsequent_te_positive": n_sub_te_pos,
-                    "n_subsequent_de": n_sub_de,
-                    "mean_cut_price_R": mean_cut_R,
-                    "median_cut_price_R": median_cut_R,
-                    "mean_bl_R_for_cut_group": mean_bl_R_for_cut,
-                    "savings_per_cut_trade": savings,
-                    "pre_cut_category_mean_R": pre,
-                    "post_cut_category_mean_R": post,
-                    "lift_per_category": post - pre,
-                })
+                rows_cat.append(
+                    {
+                        "subset_id": sid,
+                        "variant_id": vid,
+                        "category": cat_label,
+                        "n_total_in_category": n_total_cat,
+                        "n_sl_before_k20": n_sl_before_k20,
+                        "n_open_at_k20": n_open,
+                        "n_open_at_k20_below_tau": n_below,
+                        "n_open_at_k20_above_tau": n_above,
+                        "n_subsequent_sl": n_sub_sl,
+                        "n_subsequent_te_negative": n_sub_te_neg,
+                        "n_subsequent_te_positive": n_sub_te_pos,
+                        "n_subsequent_de": n_sub_de,
+                        "mean_cut_price_R": mean_cut_R,
+                        "median_cut_price_R": median_cut_R,
+                        "mean_bl_R_for_cut_group": mean_bl_R_for_cut,
+                        "savings_per_cut_trade": savings,
+                        "pre_cut_category_mean_R": pre,
+                        "post_cut_category_mean_R": post,
+                        "lift_per_category": post - pre,
+                    }
+                )
 
     df_cat = pd.DataFrame(rows_cat)
     df_cut = pd.DataFrame(rows_cut)
@@ -986,8 +1128,12 @@ def _gate_8_pp_cut_detail(df_cat: pd.DataFrame) -> None:
     """
     for _, row in df_cat.iterrows():
         n_below = int(row["n_open_at_k20_below_tau"])
-        s = int(row["n_subsequent_sl"] + row["n_subsequent_te_negative"]
-                + row["n_subsequent_te_positive"] + row["n_subsequent_de"])
+        s = int(
+            row["n_subsequent_sl"]
+            + row["n_subsequent_te_negative"]
+            + row["n_subsequent_te_positive"]
+            + row["n_subsequent_de"]
+        )
         if s != n_below:
             raise RuntimeError(
                 f"HALT (gate 8): {row['subset_id']}/{row['variant_id']}/"
@@ -1000,8 +1146,9 @@ def _gate_8_pp_cut_detail(df_cat: pd.DataFrame) -> None:
 # ===========================================================================
 
 
-def _confirm_flag(rmfe_at_120: float, bc_at_120: float,
-                   confirm_kind: str, threshold: float) -> Optional[bool]:
+def _confirm_flag(
+    rmfe_at_120: float, bc_at_120: float, confirm_kind: str, threshold: float
+) -> Optional[bool]:
     """None if either input is NaN (trade clamped before k=120)."""
     if np.isnan(rmfe_at_120) or np.isnan(bc_at_120):
         return None
@@ -1009,10 +1156,14 @@ def _confirm_flag(rmfe_at_120: float, bc_at_120: float,
     return bool(val >= threshold)
 
 
-def aggregate_block_QQ(vt: pd.DataFrame, subsets: Dict[str, np.ndarray],
-                        cats: np.ndarray, peak_mfe: np.ndarray,
-                        rmfe_at_120: np.ndarray, bc_at_120: np.ndarray
-                        ) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def aggregate_block_QQ(
+    vt: pd.DataFrame,
+    subsets: Dict[str, np.ndarray],
+    cats: np.ndarray,
+    peak_mfe: np.ndarray,
+    rmfe_at_120: np.ndarray,
+    bc_at_120: np.ndarray,
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Returns (per_subset_per_tier_per_variant_df, summary_df)."""
     rows_tier: List[Dict[str, Any]] = []
     rows_summary: List[Dict[str, Any]] = []
@@ -1036,10 +1187,8 @@ def aggregate_block_QQ(vt: pd.DataFrame, subsets: Dict[str, np.ndarray],
                     break
             tier_for_tid[t] = label
 
-        bl_pooled_mean = float(
-            bl_by_tid.loc[bl_by_tid.index.isin(tids)]["net_R"].mean())
-        h240_pooled_mean = float(
-            h240_by_tid.loc[h240_by_tid.index.isin(tids)]["net_R"].mean())
+        bl_pooled_mean = float(bl_by_tid.loc[bl_by_tid.index.isin(tids)]["net_R"].mean())
+        h240_pooled_mean = float(h240_by_tid.loc[h240_by_tid.index.isin(tids)]["net_R"].mean())
 
         for vid, kind, thr in QQ_VARIANTS:
             v_by_tid = vt[vt["variant_id"] == vid].set_index("trade_id")
@@ -1054,20 +1203,23 @@ def aggregate_block_QQ(vt: pd.DataFrame, subsets: Dict[str, np.ndarray],
                     n_conf += 1
             n_not_conf = n_only_up - n_conf
 
-            rows_summary.append({
-                "subset_id": sid, "variant_id": vid,
-                "confirm_kind": kind, "confirm_threshold": thr,
-                "n_only_up_total": n_only_up,
-                "n_only_up_confirmed": n_conf,
-                "n_only_up_not_confirmed": n_not_conf,
-                "pct_confirmed": (n_conf / n_only_up
-                                   if n_only_up > 0 else float("nan")),
-                "pooled_mean_R": pooled_mean,
-                "pooled_mean_R_BL": bl_pooled_mean,
-                "pooled_mean_R_H240": h240_pooled_mean,
-                "lift_vs_BL": pooled_mean - bl_pooled_mean,
-                "lift_vs_H240": pooled_mean - h240_pooled_mean,
-            })
+            rows_summary.append(
+                {
+                    "subset_id": sid,
+                    "variant_id": vid,
+                    "confirm_kind": kind,
+                    "confirm_threshold": thr,
+                    "n_only_up_total": n_only_up,
+                    "n_only_up_confirmed": n_conf,
+                    "n_only_up_not_confirmed": n_not_conf,
+                    "pct_confirmed": (n_conf / n_only_up if n_only_up > 0 else float("nan")),
+                    "pooled_mean_R": pooled_mean,
+                    "pooled_mean_R_BL": bl_pooled_mean,
+                    "pooled_mean_R_H240": h240_pooled_mean,
+                    "lift_vs_BL": pooled_mean - bl_pooled_mean,
+                    "lift_vs_H240": pooled_mean - h240_pooled_mean,
+                }
+            )
 
             # Per-tier (only_up).
             for tier_label in TIER_LABELS:
@@ -1077,38 +1229,45 @@ def aggregate_block_QQ(vt: pd.DataFrame, subsets: Dict[str, np.ndarray],
                 )
                 n_in_tier = int(len(tids_tier))
                 if n_in_tier == 0:
-                    rows_tier.append({
-                        "subset_id": sid, "variant_id": vid,
-                        "tier": tier_label, "n_in_tier": 0,
-                        "n_tier_confirmed": 0,
-                        "pct_of_tier_confirmed": float("nan"),
-                        "mean_R_BL_for_tier": float("nan"),
-                        "mean_R_QQ_for_tier": float("nan"),
-                        "mean_R_H240_for_tier": float("nan"),
-                        "lift_QQ_vs_BL_for_tier": float("nan"),
-                    })
+                    rows_tier.append(
+                        {
+                            "subset_id": sid,
+                            "variant_id": vid,
+                            "tier": tier_label,
+                            "n_in_tier": 0,
+                            "n_tier_confirmed": 0,
+                            "pct_of_tier_confirmed": float("nan"),
+                            "mean_R_BL_for_tier": float("nan"),
+                            "mean_R_QQ_for_tier": float("nan"),
+                            "mean_R_H240_for_tier": float("nan"),
+                            "lift_QQ_vs_BL_for_tier": float("nan"),
+                        }
+                    )
                     continue
                 conf_in_tier = 0
                 for t in tids_tier.tolist():
                     f = _confirm_flag(rmfe_at_120[t], bc_at_120[t], kind, thr)
                     if f is True:
                         conf_in_tier += 1
-                mean_bl = float(
-                    bl_by_tid.loc[bl_by_tid.index.isin(tids_tier)]["net_R"].mean())
-                mean_qq = float(
-                    v_by_tid.loc[v_by_tid.index.isin(tids_tier)]["net_R"].mean())
+                mean_bl = float(bl_by_tid.loc[bl_by_tid.index.isin(tids_tier)]["net_R"].mean())
+                mean_qq = float(v_by_tid.loc[v_by_tid.index.isin(tids_tier)]["net_R"].mean())
                 mean_h240 = float(
-                    h240_by_tid.loc[h240_by_tid.index.isin(tids_tier)]["net_R"].mean())
-                rows_tier.append({
-                    "subset_id": sid, "variant_id": vid,
-                    "tier": tier_label, "n_in_tier": n_in_tier,
-                    "n_tier_confirmed": conf_in_tier,
-                    "pct_of_tier_confirmed": conf_in_tier / n_in_tier,
-                    "mean_R_BL_for_tier": mean_bl,
-                    "mean_R_QQ_for_tier": mean_qq,
-                    "mean_R_H240_for_tier": mean_h240,
-                    "lift_QQ_vs_BL_for_tier": mean_qq - mean_bl,
-                })
+                    h240_by_tid.loc[h240_by_tid.index.isin(tids_tier)]["net_R"].mean()
+                )
+                rows_tier.append(
+                    {
+                        "subset_id": sid,
+                        "variant_id": vid,
+                        "tier": tier_label,
+                        "n_in_tier": n_in_tier,
+                        "n_tier_confirmed": conf_in_tier,
+                        "pct_of_tier_confirmed": conf_in_tier / n_in_tier,
+                        "mean_R_BL_for_tier": mean_bl,
+                        "mean_R_QQ_for_tier": mean_qq,
+                        "mean_R_H240_for_tier": mean_h240,
+                        "lift_QQ_vs_BL_for_tier": mean_qq - mean_bl,
+                    }
+                )
     return pd.DataFrame(rows_tier), pd.DataFrame(rows_summary)
 
 
@@ -1128,8 +1287,9 @@ def _gate_9_qq_confirmation(qq_summary: pd.DataFrame) -> None:
 # ===========================================================================
 
 
-def aggregate_block_RR(vt: pd.DataFrame, subsets: Dict[str, np.ndarray],
-                        cats: np.ndarray) -> pd.DataFrame:
+def aggregate_block_RR(
+    vt: pd.DataFrame, subsets: Dict[str, np.ndarray], cats: np.ndarray
+) -> pd.DataFrame:
     rows: List[Dict[str, Any]] = []
     bl_by_tid = vt[vt["variant_id"] == "V00_BL"].set_index("trade_id")
     for sid in SUBSET_IDS:
@@ -1141,8 +1301,10 @@ def aggregate_block_RR(vt: pd.DataFrame, subsets: Dict[str, np.ndarray],
             pooled_mean = float(v_sub["net_R"].mean())
             counts = v_sub["exit_reason"].value_counts().to_dict()
             row: Dict[str, Any] = {
-                "subset_id": sid, "variant_id": vid,
-                "tau_atr_fill": tau, "confirm_kind": kind,
+                "subset_id": sid,
+                "variant_id": vid,
+                "tau_atr_fill": tau,
+                "confirm_kind": kind,
                 "confirm_threshold": thr,
                 "n_total": len(v_sub),
                 "n_cut": int(counts.get("cut", 0)),
@@ -1155,9 +1317,8 @@ def aggregate_block_RR(vt: pd.DataFrame, subsets: Dict[str, np.ndarray],
             }
             # Per-category exit-reason breakdown.
             v_sub_with_cat = v_sub.assign(
-                category=v_sub.index.to_series().map(
-                    lambda tid: cats[int(tid)]
-                ))
+                category=v_sub.index.to_series().map(lambda tid: cats[int(tid)])
+            )
             for cat in ALL_CATS:
                 cat_sub = v_sub_with_cat[v_sub_with_cat["category"] == cat]
                 row[f"n_{cat}_cut"] = int((cat_sub["exit_reason"] == "cut").sum())
@@ -1173,9 +1334,9 @@ def aggregate_block_RR(vt: pd.DataFrame, subsets: Dict[str, np.ndarray],
 # ===========================================================================
 
 
-def aggregate_block_SS(vt: pd.DataFrame, subsets: Dict[str, np.ndarray],
-                        cats: np.ndarray, peak_mfe: np.ndarray
-                        ) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def aggregate_block_SS(
+    vt: pd.DataFrame, subsets: Dict[str, np.ndarray], cats: np.ndarray, peak_mfe: np.ndarray
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Returns (per_tier_per_variant_df, summary_df)."""
     rows_tier: List[Dict[str, Any]] = []
     rows_summary: List[Dict[str, Any]] = []
@@ -1209,25 +1370,32 @@ def aggregate_block_SS(vt: pd.DataFrame, subsets: Dict[str, np.ndarray],
             # Activation counts subset-wide.
             n_activated_total = int((v_sub["trail_activated_at_k"] > 0).sum())
             n_sl_after_act = int(
-                ((v_sub["trail_activated_at_k"] > 0)
-                  & (v_sub["exit_reason"] == "sl")).sum())
+                ((v_sub["trail_activated_at_k"] > 0) & (v_sub["exit_reason"] == "sl")).sum()
+            )
             n_te_after_act = int(
-                ((v_sub["trail_activated_at_k"] > 0)
-                  & (v_sub["exit_reason"].isin(["te", "de"]))).sum())
-            rows_summary.append({
-                "subset_id": sid, "variant_id": vid,
-                "X_act_atr": xact, "D_atr": d, "time_horizon": te,
-                "n_total": len(v_sub),
-                "n_trail_activated": n_activated_total,
-                "n_trail_exited": n_trail_total,
-                "n_sl_after_activation": n_sl_after_act,
-                "n_te_after_activation": n_te_after_act,
-                "pooled_mean_R": pooled_mean,
-                "pooled_mean_R_BL": bl_pooled,
-                "pooled_mean_R_H240": h240_pooled,
-                "lift_vs_BL": pooled_mean - bl_pooled,
-                "lift_vs_H240": pooled_mean - h240_pooled,
-            })
+                (
+                    (v_sub["trail_activated_at_k"] > 0) & (v_sub["exit_reason"].isin(["te", "de"]))
+                ).sum()
+            )
+            rows_summary.append(
+                {
+                    "subset_id": sid,
+                    "variant_id": vid,
+                    "X_act_atr": xact,
+                    "D_atr": d,
+                    "time_horizon": te,
+                    "n_total": len(v_sub),
+                    "n_trail_activated": n_activated_total,
+                    "n_trail_exited": n_trail_total,
+                    "n_sl_after_activation": n_sl_after_act,
+                    "n_te_after_activation": n_te_after_act,
+                    "pooled_mean_R": pooled_mean,
+                    "pooled_mean_R_BL": bl_pooled,
+                    "pooled_mean_R_H240": h240_pooled,
+                    "lift_vs_BL": pooled_mean - bl_pooled,
+                    "lift_vs_H240": pooled_mean - h240_pooled,
+                }
+            )
 
             # Per-tier (only_up).
             for tier_label in TIER_LABELS:
@@ -1236,19 +1404,24 @@ def aggregate_block_SS(vt: pd.DataFrame, subsets: Dict[str, np.ndarray],
                     dtype=np.int64,
                 )
                 if len(tids_tier) == 0:
-                    rows_tier.append({
-                        "subset_id": sid, "variant_id": vid,
-                        "tier": tier_label, "n_in_tier": 0,
-                        "n_trail_activated": 0, "n_trail_exited": 0,
-                        "n_sl_after_activation": 0,
-                        "n_te_after_activation": 0,
-                        "mean_trail_exit_R": float("nan"),
-                        "median_trail_exit_R": float("nan"),
-                        "mean_R_BL_for_tier": float("nan"),
-                        "mean_R_H240_for_tier": float("nan"),
-                        "mean_R_SS_for_tier": float("nan"),
-                        "lift_SS_vs_BL_for_tier": float("nan"),
-                    })
+                    rows_tier.append(
+                        {
+                            "subset_id": sid,
+                            "variant_id": vid,
+                            "tier": tier_label,
+                            "n_in_tier": 0,
+                            "n_trail_activated": 0,
+                            "n_trail_exited": 0,
+                            "n_sl_after_activation": 0,
+                            "n_te_after_activation": 0,
+                            "mean_trail_exit_R": float("nan"),
+                            "median_trail_exit_R": float("nan"),
+                            "mean_R_BL_for_tier": float("nan"),
+                            "mean_R_H240_for_tier": float("nan"),
+                            "mean_R_SS_for_tier": float("nan"),
+                            "lift_SS_vs_BL_for_tier": float("nan"),
+                        }
+                    )
                     continue
                 v_tier = v_by_tid.loc[v_by_tid.index.isin(tids_tier)]
                 act_mask = v_tier["trail_activated_at_k"] > 0
@@ -1256,31 +1429,33 @@ def aggregate_block_SS(vt: pd.DataFrame, subsets: Dict[str, np.ndarray],
                 n_act = int(act_mask.sum())
                 n_exit = int(trail_exit_mask.sum())
                 n_sl_after = int((act_mask & (v_tier["exit_reason"] == "sl")).sum())
-                n_te_after = int((act_mask
-                                    & (v_tier["exit_reason"].isin(["te", "de"]))).sum())
-                trail_R = v_tier[trail_exit_mask]["net_R"].to_numpy(
-                    dtype=np.float64)
+                n_te_after = int((act_mask & (v_tier["exit_reason"].isin(["te", "de"]))).sum())
+                trail_R = v_tier[trail_exit_mask]["net_R"].to_numpy(dtype=np.float64)
                 mean_trail_R = float(np.mean(trail_R)) if len(trail_R) > 0 else float("nan")
                 median_trail_R = float(np.median(trail_R)) if len(trail_R) > 0 else float("nan")
-                mean_bl = float(
-                    bl_by_tid.loc[bl_by_tid.index.isin(tids_tier)]["net_R"].mean())
+                mean_bl = float(bl_by_tid.loc[bl_by_tid.index.isin(tids_tier)]["net_R"].mean())
                 mean_h240 = float(
-                    h240_by_tid.loc[h240_by_tid.index.isin(tids_tier)]["net_R"].mean())
+                    h240_by_tid.loc[h240_by_tid.index.isin(tids_tier)]["net_R"].mean()
+                )
                 mean_ss = float(v_tier["net_R"].mean())
-                rows_tier.append({
-                    "subset_id": sid, "variant_id": vid,
-                    "tier": tier_label, "n_in_tier": int(len(tids_tier)),
-                    "n_trail_activated": n_act,
-                    "n_trail_exited": n_exit,
-                    "n_sl_after_activation": n_sl_after,
-                    "n_te_after_activation": n_te_after,
-                    "mean_trail_exit_R": mean_trail_R,
-                    "median_trail_exit_R": median_trail_R,
-                    "mean_R_BL_for_tier": mean_bl,
-                    "mean_R_H240_for_tier": mean_h240,
-                    "mean_R_SS_for_tier": mean_ss,
-                    "lift_SS_vs_BL_for_tier": mean_ss - mean_bl,
-                })
+                rows_tier.append(
+                    {
+                        "subset_id": sid,
+                        "variant_id": vid,
+                        "tier": tier_label,
+                        "n_in_tier": int(len(tids_tier)),
+                        "n_trail_activated": n_act,
+                        "n_trail_exited": n_exit,
+                        "n_sl_after_activation": n_sl_after,
+                        "n_te_after_activation": n_te_after,
+                        "mean_trail_exit_R": mean_trail_R,
+                        "median_trail_exit_R": median_trail_R,
+                        "mean_R_BL_for_tier": mean_bl,
+                        "mean_R_H240_for_tier": mean_h240,
+                        "mean_R_SS_for_tier": mean_ss,
+                        "lift_SS_vs_BL_for_tier": mean_ss - mean_bl,
+                    }
+                )
     return pd.DataFrame(rows_tier), pd.DataFrame(rows_summary)
 
 
@@ -1309,10 +1484,13 @@ def _gate_10_ss_trail(ss_summary: pd.DataFrame) -> None:
 # ===========================================================================
 
 
-def aggregate_block_TT(vt: pd.DataFrame, subsets: Dict[str, np.ndarray],
-                        cats: np.ndarray, peak_mfe: np.ndarray,
-                        ss_summary: pd.DataFrame
-                        ) -> pd.DataFrame:
+def aggregate_block_TT(
+    vt: pd.DataFrame,
+    subsets: Dict[str, np.ndarray],
+    cats: np.ndarray,
+    peak_mfe: np.ndarray,
+    ss_summary: pd.DataFrame,
+) -> pd.DataFrame:
     """Returns one row per (subset, TT_variant) with lift comparisons."""
     rows: List[Dict[str, Any]] = []
     bl_by_tid = vt[vt["variant_id"] == "V00_BL"].set_index("trade_id")
@@ -1322,8 +1500,7 @@ def aggregate_block_TT(vt: pd.DataFrame, subsets: Dict[str, np.ndarray],
     for sid in SUBSET_IDS:
         sub = ss_summary[ss_summary["subset_id"] == sid]
         best = sub.sort_values("pooled_mean_R", ascending=False).iloc[0]
-        best_ss_per_sid[sid] = (str(best["variant_id"]),
-                                float(best["pooled_mean_R"]))
+        best_ss_per_sid[sid] = (str(best["variant_id"]), float(best["pooled_mean_R"]))
 
     for sid in SUBSET_IDS:
         tids = subsets[sid]
@@ -1350,9 +1527,13 @@ def aggregate_block_TT(vt: pd.DataFrame, subsets: Dict[str, np.ndarray],
             pooled_mean = float(v_sub["net_R"].mean())
             counts = v_sub["exit_reason"].value_counts().to_dict()
             row: Dict[str, Any] = {
-                "subset_id": sid, "variant_id": vid,
-                "tau_atr_fill": tau, "X_act_atr": xact, "D_atr": d,
-                "confirm_kind": kind, "confirm_threshold": thr,
+                "subset_id": sid,
+                "variant_id": vid,
+                "tau_atr_fill": tau,
+                "X_act_atr": xact,
+                "D_atr": d,
+                "confirm_kind": kind,
+                "confirm_threshold": thr,
                 "n_total": len(v_sub),
                 "n_cut": int(counts.get("cut", 0)),
                 "n_trail": int(counts.get("trail", 0)),
@@ -1379,10 +1560,8 @@ def aggregate_block_TT(vt: pd.DataFrame, subsets: Dict[str, np.ndarray],
                     row[f"mean_R_TT_{tier_label}"] = float("nan")
                     row[f"mean_R_BL_{tier_label}"] = float("nan")
                     continue
-                mean_tt = float(
-                    v_by_tid.loc[v_by_tid.index.isin(tids_tier)]["net_R"].mean())
-                mean_bl_t = float(
-                    bl_by_tid.loc[bl_by_tid.index.isin(tids_tier)]["net_R"].mean())
+                mean_tt = float(v_by_tid.loc[v_by_tid.index.isin(tids_tier)]["net_R"].mean())
+                mean_bl_t = float(bl_by_tid.loc[bl_by_tid.index.isin(tids_tier)]["net_R"].mean())
                 row[f"n_only_up_{tier_label}"] = int(len(tids_tier))
                 row[f"mean_R_TT_{tier_label}"] = mean_tt
                 row[f"mean_R_BL_{tier_label}"] = mean_bl_t
@@ -1395,9 +1574,15 @@ def aggregate_block_TT(vt: pd.DataFrame, subsets: Dict[str, np.ndarray],
 # ===========================================================================
 
 
-def render_plots(*, pp_summary: pd.DataFrame, qq_summary: pd.DataFrame,
-                 rr: pd.DataFrame, ss_summary: pd.DataFrame,
-                 tt: pd.DataFrame, plots_dir: Path) -> List[Path]:
+def render_plots(
+    *,
+    pp_summary: pd.DataFrame,
+    qq_summary: pd.DataFrame,
+    rr: pd.DataFrame,
+    ss_summary: pd.DataFrame,
+    tt: pd.DataFrame,
+    plots_dir: Path,
+) -> List[Path]:
     plots_dir.mkdir(parents=True, exist_ok=True)
     paths: List[Path] = []
 
@@ -1419,7 +1604,9 @@ def render_plots(*, pp_summary: pd.DataFrame, qq_summary: pd.DataFrame,
     ax.grid(True, alpha=0.3)
     fig.tight_layout()
     p = plots_dir / "block_PP_lift_vs_BL.png"
-    fig.savefig(p, dpi=100); plt.close(fig); paths.append(p)
+    fig.savefig(p, dpi=100)
+    plt.close(fig)
+    paths.append(p)
 
     # QQ.
     fig, ax = plt.subplots(figsize=(9, 4.5))
@@ -1438,7 +1625,9 @@ def render_plots(*, pp_summary: pd.DataFrame, qq_summary: pd.DataFrame,
     ax.grid(True, alpha=0.3)
     fig.tight_layout()
     p = plots_dir / "block_QQ_lift_vs_BL.png"
-    fig.savefig(p, dpi=100); plt.close(fig); paths.append(p)
+    fig.savefig(p, dpi=100)
+    plt.close(fig)
+    paths.append(p)
 
     # RR.
     fig, ax = plt.subplots(figsize=(9, 4.5))
@@ -1457,7 +1646,9 @@ def render_plots(*, pp_summary: pd.DataFrame, qq_summary: pd.DataFrame,
     ax.grid(True, alpha=0.3)
     fig.tight_layout()
     p = plots_dir / "block_RR_lift_vs_BL.png"
-    fig.savefig(p, dpi=100); plt.close(fig); paths.append(p)
+    fig.savefig(p, dpi=100)
+    plt.close(fig)
+    paths.append(p)
 
     # SS.
     fig, ax = plt.subplots(figsize=(11, 4.5))
@@ -1477,7 +1668,9 @@ def render_plots(*, pp_summary: pd.DataFrame, qq_summary: pd.DataFrame,
     ax.grid(True, alpha=0.3)
     fig.tight_layout()
     p = plots_dir / "block_SS_lift_vs_BL.png"
-    fig.savefig(p, dpi=100); plt.close(fig); paths.append(p)
+    fig.savefig(p, dpi=100)
+    plt.close(fig)
+    paths.append(p)
 
     # TT.
     fig, ax = plt.subplots(figsize=(9, 4.5))
@@ -1496,7 +1689,9 @@ def render_plots(*, pp_summary: pd.DataFrame, qq_summary: pd.DataFrame,
     ax.grid(True, alpha=0.3)
     fig.tight_layout()
     p = plots_dir / "block_TT_lift_vs_BL.png"
-    fig.savefig(p, dpi=100); plt.close(fig); paths.append(p)
+    fig.savefig(p, dpi=100)
+    plt.close(fig)
+    paths.append(p)
 
     return paths
 
@@ -1506,14 +1701,14 @@ def render_plots(*, pp_summary: pd.DataFrame, qq_summary: pd.DataFrame,
 # ===========================================================================
 
 
-def _df_to_md(df: pd.DataFrame, float_cols: Optional[Dict[str, str]] = None,
-              default_float: str = "{:+.4f}") -> str:
+def _df_to_md(
+    df: pd.DataFrame, float_cols: Optional[Dict[str, str]] = None, default_float: str = "{:+.4f}"
+) -> str:
     cols = list(df.columns)
     float_cols = float_cols or {}
     int_cols = {c for c in cols if pd.api.types.is_integer_dtype(df[c].dtype)}
     bool_cols = {c for c in cols if pd.api.types.is_bool_dtype(df[c].dtype)}
-    out = ["| " + " | ".join(cols) + " |",
-           "| " + " | ".join(["---"] * len(cols)) + " |"]
+    out = ["| " + " | ".join(cols) + " |", "| " + " | ".join(["---"] * len(cols)) + " |"]
     for i in range(len(df)):
         cells = []
         for c in cols:
@@ -1536,14 +1731,20 @@ def _df_to_md(df: pd.DataFrame, float_cols: Optional[Dict[str, str]] = None,
     return "\n".join(out)
 
 
-def render_report(*, observed_shas: Dict[str, str],
-                  pp_summary: pd.DataFrame, pp_cat: pd.DataFrame,
-                  pp_cut: pd.DataFrame,
-                  qq_summary: pd.DataFrame, qq_tier: pd.DataFrame,
-                  rr: pd.DataFrame,
-                  ss_summary: pd.DataFrame, ss_tier: pd.DataFrame,
-                  tt: pd.DataFrame,
-                  per_subset_only_up_n: Dict[str, int]) -> str:
+def render_report(
+    *,
+    observed_shas: Dict[str, str],
+    pp_summary: pd.DataFrame,
+    pp_cat: pd.DataFrame,
+    pp_cut: pd.DataFrame,
+    qq_summary: pd.DataFrame,
+    qq_tier: pd.DataFrame,
+    rr: pd.DataFrame,
+    ss_summary: pd.DataFrame,
+    ss_tier: pd.DataFrame,
+    tt: pd.DataFrame,
+    per_subset_only_up_n: Dict[str, int],
+) -> str:
     lines: List[str] = []
     a = lines.append
     a("# Arc 2 — Exit-Rule Counterfactuals Round 2 (Round 3E)")
@@ -1587,8 +1788,7 @@ def render_report(*, observed_shas: Dict[str, str],
     }
     for sid in SUBSET_IDS:
         n_exp = dict(SUBSET_DEFS)[sid]["expected_n"]
-        a(f"| {sid} | {sub_human[sid]} | {n_exp} | "
-          f"{per_subset_only_up_n[sid]} |")
+        a(f"| {sid} | {sub_human[sid]} | {n_exp} | {per_subset_only_up_n[sid]} |")
     a("")
 
     # PP
@@ -1603,12 +1803,26 @@ def render_report(*, observed_shas: Dict[str, str],
         "pooled_mean_R_BL": "{:+.5f}",
         "lift_vs_BL": "{:+.5f}",
     }
-    a(_df_to_md(
-        pp_summary[["subset_id", "variant_id", "tau_atr_fill",
-                     "n_total", "n_cut_at_k20", "n_sl", "n_te", "n_de",
-                     "pooled_mean_R", "pooled_mean_R_BL", "lift_vs_BL"]],
-        fmt_pp_s,
-    ))
+    a(
+        _df_to_md(
+            pp_summary[
+                [
+                    "subset_id",
+                    "variant_id",
+                    "tau_atr_fill",
+                    "n_total",
+                    "n_cut_at_k20",
+                    "n_sl",
+                    "n_te",
+                    "n_de",
+                    "pooled_mean_R",
+                    "pooled_mean_R_BL",
+                    "lift_vs_BL",
+                ]
+            ],
+            fmt_pp_s,
+        )
+    )
     a("")
     a("### Per-category (only_up + losers) cut-group decomposition")
     a("")
@@ -1620,8 +1834,7 @@ def render_report(*, observed_shas: Dict[str, str],
         for vid, tau in PP_VARIANTS:
             a(f"##### {vid} (tau = {tau})")
             a("")
-            sub = pp_cat[(pp_cat["subset_id"] == sid)
-                          & (pp_cat["variant_id"] == vid)].copy()
+            sub = pp_cat[(pp_cat["subset_id"] == sid) & (pp_cat["variant_id"] == vid)].copy()
             fmt = {
                 "mean_cut_price_R": "{:+.4f}",
                 "median_cut_price_R": "{:+.4f}",
@@ -1631,16 +1844,29 @@ def render_report(*, observed_shas: Dict[str, str],
                 "post_cut_category_mean_R": "{:+.4f}",
                 "lift_per_category": "{:+.4f}",
             }
-            a(_df_to_md(
-                sub[["category", "n_total_in_category",
-                      "n_sl_before_k20", "n_open_at_k20",
-                      "n_open_at_k20_below_tau", "n_open_at_k20_above_tau",
-                      "n_subsequent_sl", "n_subsequent_te_negative",
-                      "n_subsequent_te_positive", "n_subsequent_de",
-                      "mean_cut_price_R", "mean_bl_R_for_cut_group",
-                      "savings_per_cut_trade", "lift_per_category"]],
-                fmt,
-            ))
+            a(
+                _df_to_md(
+                    sub[
+                        [
+                            "category",
+                            "n_total_in_category",
+                            "n_sl_before_k20",
+                            "n_open_at_k20",
+                            "n_open_at_k20_below_tau",
+                            "n_open_at_k20_above_tau",
+                            "n_subsequent_sl",
+                            "n_subsequent_te_negative",
+                            "n_subsequent_te_positive",
+                            "n_subsequent_de",
+                            "mean_cut_price_R",
+                            "mean_bl_R_for_cut_group",
+                            "savings_per_cut_trade",
+                            "lift_per_category",
+                        ]
+                    ],
+                    fmt,
+                )
+            )
             a("")
 
     # QQ
@@ -1658,15 +1884,27 @@ def render_report(*, observed_shas: Dict[str, str],
         "lift_vs_BL": "{:+.5f}",
         "lift_vs_H240": "{:+.5f}",
     }
-    a(_df_to_md(
-        qq_summary[["subset_id", "variant_id", "confirm_kind",
-                     "confirm_threshold", "n_only_up_total",
-                     "n_only_up_confirmed", "pct_confirmed",
-                     "pooled_mean_R", "pooled_mean_R_BL",
-                     "pooled_mean_R_H240",
-                     "lift_vs_BL", "lift_vs_H240"]],
-        fmt_qq_s,
-    ))
+    a(
+        _df_to_md(
+            qq_summary[
+                [
+                    "subset_id",
+                    "variant_id",
+                    "confirm_kind",
+                    "confirm_threshold",
+                    "n_only_up_total",
+                    "n_only_up_confirmed",
+                    "pct_confirmed",
+                    "pooled_mean_R",
+                    "pooled_mean_R_BL",
+                    "pooled_mean_R_H240",
+                    "lift_vs_BL",
+                    "lift_vs_H240",
+                ]
+            ],
+            fmt_qq_s,
+        )
+    )
     a("")
     a("### Per-tier (only_up) breakdown per QQ variant")
     a("")
@@ -1681,29 +1919,58 @@ def render_report(*, observed_shas: Dict[str, str],
             "mean_R_H240_for_tier": "{:+.4f}",
             "lift_QQ_vs_BL_for_tier": "{:+.4f}",
         }
-        a(_df_to_md(
-            sub[["variant_id", "tier", "n_in_tier",
-                  "n_tier_confirmed", "pct_of_tier_confirmed",
-                  "mean_R_BL_for_tier", "mean_R_QQ_for_tier",
-                  "mean_R_H240_for_tier", "lift_QQ_vs_BL_for_tier"]],
-            fmt,
-        ))
+        a(
+            _df_to_md(
+                sub[
+                    [
+                        "variant_id",
+                        "tier",
+                        "n_in_tier",
+                        "n_tier_confirmed",
+                        "pct_of_tier_confirmed",
+                        "mean_R_BL_for_tier",
+                        "mean_R_QQ_for_tier",
+                        "mean_R_H240_for_tier",
+                        "lift_QQ_vs_BL_for_tier",
+                    ]
+                ],
+                fmt,
+            )
+        )
         a("")
 
     # RR
     a("## Block RR — PP + QQ combined")
     a("")
     fmt_rr = {
-        "tau_atr_fill": "{:+.2f}", "confirm_threshold": "{:.1f}",
-        "pooled_mean_R": "{:+.5f}", "pooled_mean_R_BL": "{:+.5f}",
+        "tau_atr_fill": "{:+.2f}",
+        "confirm_threshold": "{:.1f}",
+        "pooled_mean_R": "{:+.5f}",
+        "pooled_mean_R_BL": "{:+.5f}",
         "lift_vs_BL": "{:+.5f}",
     }
-    a(_df_to_md(
-        rr[["subset_id", "variant_id", "tau_atr_fill", "confirm_kind",
-             "confirm_threshold", "n_total", "n_cut", "n_sl", "n_te", "n_de",
-             "pooled_mean_R", "pooled_mean_R_BL", "lift_vs_BL"]],
-        fmt_rr,
-    ))
+    a(
+        _df_to_md(
+            rr[
+                [
+                    "subset_id",
+                    "variant_id",
+                    "tau_atr_fill",
+                    "confirm_kind",
+                    "confirm_threshold",
+                    "n_total",
+                    "n_cut",
+                    "n_sl",
+                    "n_te",
+                    "n_de",
+                    "pooled_mean_R",
+                    "pooled_mean_R_BL",
+                    "lift_vs_BL",
+                ]
+            ],
+            fmt_rr,
+        )
+    )
     a("")
 
     # SS
@@ -1713,21 +1980,38 @@ def render_report(*, observed_shas: Dict[str, str],
     a("references:")
     a("")
     fmt_ss_s = {
-        "X_act_atr": "{:.1f}", "D_atr": "{:.1f}",
-        "pooled_mean_R": "{:+.5f}", "pooled_mean_R_BL": "{:+.5f}",
+        "X_act_atr": "{:.1f}",
+        "D_atr": "{:.1f}",
+        "pooled_mean_R": "{:+.5f}",
+        "pooled_mean_R_BL": "{:+.5f}",
         "pooled_mean_R_H240": "{:+.5f}",
-        "lift_vs_BL": "{:+.5f}", "lift_vs_H240": "{:+.5f}",
+        "lift_vs_BL": "{:+.5f}",
+        "lift_vs_H240": "{:+.5f}",
     }
-    a(_df_to_md(
-        ss_summary[["subset_id", "variant_id", "X_act_atr", "D_atr",
-                     "time_horizon", "n_total",
-                     "n_trail_activated", "n_trail_exited",
-                     "n_sl_after_activation", "n_te_after_activation",
-                     "pooled_mean_R", "pooled_mean_R_BL",
-                     "pooled_mean_R_H240",
-                     "lift_vs_BL", "lift_vs_H240"]],
-        fmt_ss_s,
-    ))
+    a(
+        _df_to_md(
+            ss_summary[
+                [
+                    "subset_id",
+                    "variant_id",
+                    "X_act_atr",
+                    "D_atr",
+                    "time_horizon",
+                    "n_total",
+                    "n_trail_activated",
+                    "n_trail_exited",
+                    "n_sl_after_activation",
+                    "n_te_after_activation",
+                    "pooled_mean_R",
+                    "pooled_mean_R_BL",
+                    "pooled_mean_R_H240",
+                    "lift_vs_BL",
+                    "lift_vs_H240",
+                ]
+            ],
+            fmt_ss_s,
+        )
+    )
     a("")
     a("### Per-tier (only_up) mean R per SS variant")
     a("")
@@ -1743,37 +2027,74 @@ def render_report(*, observed_shas: Dict[str, str],
             "mean_R_SS_for_tier": "{:+.4f}",
             "lift_SS_vs_BL_for_tier": "{:+.4f}",
         }
-        a(_df_to_md(
-            sub[["variant_id", "tier", "n_in_tier",
-                  "n_trail_activated", "n_trail_exited",
-                  "n_sl_after_activation", "n_te_after_activation",
-                  "mean_trail_exit_R",
-                  "mean_R_BL_for_tier", "mean_R_H240_for_tier",
-                  "mean_R_SS_for_tier", "lift_SS_vs_BL_for_tier"]],
-            fmt,
-        ))
+        a(
+            _df_to_md(
+                sub[
+                    [
+                        "variant_id",
+                        "tier",
+                        "n_in_tier",
+                        "n_trail_activated",
+                        "n_trail_exited",
+                        "n_sl_after_activation",
+                        "n_te_after_activation",
+                        "mean_trail_exit_R",
+                        "mean_R_BL_for_tier",
+                        "mean_R_H240_for_tier",
+                        "mean_R_SS_for_tier",
+                        "lift_SS_vs_BL_for_tier",
+                    ]
+                ],
+                fmt,
+            )
+        )
         a("")
 
     # TT
     a("## Block TT — Full combined: PP + QQ + SS")
     a("")
     fmt_tt = {
-        "tau_atr_fill": "{:+.2f}", "X_act_atr": "{:.1f}", "D_atr": "{:.1f}",
+        "tau_atr_fill": "{:+.2f}",
+        "X_act_atr": "{:.1f}",
+        "D_atr": "{:.1f}",
         "confirm_threshold": "{:.1f}",
-        "pooled_mean_R": "{:+.5f}", "pooled_mean_R_BL": "{:+.5f}",
-        "pooled_mean_R_PP01": "{:+.5f}", "pooled_mean_R_best_SS": "{:+.5f}",
-        "lift_vs_BL": "{:+.5f}", "lift_vs_PP01_only": "{:+.5f}",
+        "pooled_mean_R": "{:+.5f}",
+        "pooled_mean_R_BL": "{:+.5f}",
+        "pooled_mean_R_PP01": "{:+.5f}",
+        "pooled_mean_R_best_SS": "{:+.5f}",
+        "lift_vs_BL": "{:+.5f}",
+        "lift_vs_PP01_only": "{:+.5f}",
         "lift_vs_best_SS": "{:+.5f}",
     }
-    a(_df_to_md(
-        tt[["subset_id", "variant_id", "tau_atr_fill", "X_act_atr",
-             "D_atr", "confirm_kind", "confirm_threshold",
-             "n_total", "n_cut", "n_trail", "n_sl", "n_te", "n_de",
-             "pooled_mean_R", "pooled_mean_R_BL", "pooled_mean_R_PP01",
-             "pooled_mean_R_best_SS",
-             "lift_vs_BL", "lift_vs_PP01_only", "lift_vs_best_SS"]],
-        fmt_tt,
-    ))
+    a(
+        _df_to_md(
+            tt[
+                [
+                    "subset_id",
+                    "variant_id",
+                    "tau_atr_fill",
+                    "X_act_atr",
+                    "D_atr",
+                    "confirm_kind",
+                    "confirm_threshold",
+                    "n_total",
+                    "n_cut",
+                    "n_trail",
+                    "n_sl",
+                    "n_te",
+                    "n_de",
+                    "pooled_mean_R",
+                    "pooled_mean_R_BL",
+                    "pooled_mean_R_PP01",
+                    "pooled_mean_R_best_SS",
+                    "lift_vs_BL",
+                    "lift_vs_PP01_only",
+                    "lift_vs_best_SS",
+                ]
+            ],
+            fmt_tt,
+        )
+    )
     a("")
     a("### Per-tier (only_up) mean R per TT variant")
     a("")
@@ -1784,9 +2105,9 @@ def render_report(*, observed_shas: Dict[str, str],
         tier_cols = []
         fmt_tier: Dict[str, str] = {}
         for tier_label in TIER_LABELS:
-            tier_cols.extend([f"n_only_up_{tier_label}",
-                              f"mean_R_BL_{tier_label}",
-                              f"mean_R_TT_{tier_label}"])
+            tier_cols.extend(
+                [f"n_only_up_{tier_label}", f"mean_R_BL_{tier_label}", f"mean_R_TT_{tier_label}"]
+            )
             fmt_tier[f"mean_R_BL_{tier_label}"] = "{:+.4f}"
             fmt_tier[f"mean_R_TT_{tier_label}"] = "{:+.4f}"
         a(_df_to_md(sub[["variant_id"] + tier_cols], fmt_tier))
@@ -1800,58 +2121,85 @@ def render_report(*, observed_shas: Dict[str, str],
     a("")
     cross_rows: List[Dict[str, Any]] = []
     for sid in SUBSET_IDS:
-        bl_ref = float(pp_summary[(pp_summary["subset_id"] == sid)
-                                    & (pp_summary["variant_id"] == "PP01")]["pooled_mean_R_BL"].iloc[0])
+        bl_ref = float(
+            pp_summary[(pp_summary["subset_id"] == sid) & (pp_summary["variant_id"] == "PP01")][
+                "pooled_mean_R_BL"
+            ].iloc[0]
+        )
         # Best lift per block (informational; no recommendation).
-        pp_best = pp_summary[pp_summary["subset_id"] == sid].sort_values(
-            "lift_vs_BL", ascending=False).iloc[0]
-        qq_best = qq_summary[qq_summary["subset_id"] == sid].sort_values(
-            "lift_vs_BL", ascending=False).iloc[0]
-        rr_best = rr[rr["subset_id"] == sid].sort_values(
-            "lift_vs_BL", ascending=False).iloc[0]
-        ss_best = ss_summary[ss_summary["subset_id"] == sid].sort_values(
-            "lift_vs_BL", ascending=False).iloc[0]
-        tt_best = tt[tt["subset_id"] == sid].sort_values(
-            "lift_vs_BL", ascending=False).iloc[0]
-        cross_rows.append({
-            "subset_id": sid,
-            "V00_BL_mean_R": bl_ref,
-            "PP_max_lift_variant": str(pp_best["variant_id"]),
-            "PP_max_lift": float(pp_best["lift_vs_BL"]),
-            "QQ_max_lift_variant": str(qq_best["variant_id"]),
-            "QQ_max_lift": float(qq_best["lift_vs_BL"]),
-            "RR_max_lift_variant": str(rr_best["variant_id"]),
-            "RR_max_lift": float(rr_best["lift_vs_BL"]),
-            "SS_max_lift_variant": str(ss_best["variant_id"]),
-            "SS_max_lift": float(ss_best["lift_vs_BL"]),
-            "TT_max_lift_variant": str(tt_best["variant_id"]),
-            "TT_max_lift": float(tt_best["lift_vs_BL"]),
-        })
-    a(_df_to_md(pd.DataFrame(cross_rows), {
-        "V00_BL_mean_R": "{:+.5f}",
-        "PP_max_lift": "{:+.5f}", "QQ_max_lift": "{:+.5f}",
-        "RR_max_lift": "{:+.5f}", "SS_max_lift": "{:+.5f}",
-        "TT_max_lift": "{:+.5f}",
-    }))
+        pp_best = (
+            pp_summary[pp_summary["subset_id"] == sid]
+            .sort_values("lift_vs_BL", ascending=False)
+            .iloc[0]
+        )
+        qq_best = (
+            qq_summary[qq_summary["subset_id"] == sid]
+            .sort_values("lift_vs_BL", ascending=False)
+            .iloc[0]
+        )
+        rr_best = rr[rr["subset_id"] == sid].sort_values("lift_vs_BL", ascending=False).iloc[0]
+        ss_best = (
+            ss_summary[ss_summary["subset_id"] == sid]
+            .sort_values("lift_vs_BL", ascending=False)
+            .iloc[0]
+        )
+        tt_best = tt[tt["subset_id"] == sid].sort_values("lift_vs_BL", ascending=False).iloc[0]
+        cross_rows.append(
+            {
+                "subset_id": sid,
+                "V00_BL_mean_R": bl_ref,
+                "PP_max_lift_variant": str(pp_best["variant_id"]),
+                "PP_max_lift": float(pp_best["lift_vs_BL"]),
+                "QQ_max_lift_variant": str(qq_best["variant_id"]),
+                "QQ_max_lift": float(qq_best["lift_vs_BL"]),
+                "RR_max_lift_variant": str(rr_best["variant_id"]),
+                "RR_max_lift": float(rr_best["lift_vs_BL"]),
+                "SS_max_lift_variant": str(ss_best["variant_id"]),
+                "SS_max_lift": float(ss_best["lift_vs_BL"]),
+                "TT_max_lift_variant": str(tt_best["variant_id"]),
+                "TT_max_lift": float(tt_best["lift_vs_BL"]),
+            }
+        )
+    a(
+        _df_to_md(
+            pd.DataFrame(cross_rows),
+            {
+                "V00_BL_mean_R": "{:+.5f}",
+                "PP_max_lift": "{:+.5f}",
+                "QQ_max_lift": "{:+.5f}",
+                "RR_max_lift": "{:+.5f}",
+                "SS_max_lift": "{:+.5f}",
+                "TT_max_lift": "{:+.5f}",
+            },
+        )
+    )
     a("")
     a("Diminishing-returns view: TT lift over (max of PP, QQ, SS) per subset.")
     a("")
     dr_rows = []
     for sid in SUBSET_IDS:
         row_cross = cross_rows[SUBSET_IDS.index(sid)]
-        max_single = max(row_cross["PP_max_lift"], row_cross["QQ_max_lift"],
-                         row_cross["SS_max_lift"])
-        dr_rows.append({
-            "subset_id": sid,
-            "max_lift_single_block": max_single,
-            "TT_best_lift": row_cross["TT_max_lift"],
-            "TT_minus_max_single": row_cross["TT_max_lift"] - max_single,
-        })
-    a(_df_to_md(pd.DataFrame(dr_rows), {
-        "max_lift_single_block": "{:+.5f}",
-        "TT_best_lift": "{:+.5f}",
-        "TT_minus_max_single": "{:+.5f}",
-    }))
+        max_single = max(
+            row_cross["PP_max_lift"], row_cross["QQ_max_lift"], row_cross["SS_max_lift"]
+        )
+        dr_rows.append(
+            {
+                "subset_id": sid,
+                "max_lift_single_block": max_single,
+                "TT_best_lift": row_cross["TT_max_lift"],
+                "TT_minus_max_single": row_cross["TT_max_lift"] - max_single,
+            }
+        )
+    a(
+        _df_to_md(
+            pd.DataFrame(dr_rows),
+            {
+                "max_lift_single_block": "{:+.5f}",
+                "TT_best_lift": "{:+.5f}",
+                "TT_minus_max_single": "{:+.5f}",
+            },
+        )
+    )
     a("")
 
     # Out-of-scope items
@@ -1893,28 +2241,42 @@ def render_report(*, observed_shas: Dict[str, str],
         # Aggregate single-rule variants: PP, QQ, SS.
         all_single: List[Dict[str, Any]] = []
         for _, r in pp_summary[pp_summary["subset_id"] == sid].iterrows():
-            all_single.append({
-                "block": "PP", "variant_id": r["variant_id"],
-                "lift_vs_BL": float(r["lift_vs_BL"]),
-                "pooled_mean_R": float(r["pooled_mean_R"]),
-            })
+            all_single.append(
+                {
+                    "block": "PP",
+                    "variant_id": r["variant_id"],
+                    "lift_vs_BL": float(r["lift_vs_BL"]),
+                    "pooled_mean_R": float(r["pooled_mean_R"]),
+                }
+            )
         for _, r in qq_summary[qq_summary["subset_id"] == sid].iterrows():
-            all_single.append({
-                "block": "QQ", "variant_id": r["variant_id"],
-                "lift_vs_BL": float(r["lift_vs_BL"]),
-                "pooled_mean_R": float(r["pooled_mean_R"]),
-            })
+            all_single.append(
+                {
+                    "block": "QQ",
+                    "variant_id": r["variant_id"],
+                    "lift_vs_BL": float(r["lift_vs_BL"]),
+                    "pooled_mean_R": float(r["pooled_mean_R"]),
+                }
+            )
         for _, r in ss_summary[ss_summary["subset_id"] == sid].iterrows():
-            all_single.append({
-                "block": "SS", "variant_id": r["variant_id"],
-                "lift_vs_BL": float(r["lift_vs_BL"]),
-                "pooled_mean_R": float(r["pooled_mean_R"]),
-            })
-        df_single = pd.DataFrame(all_single).sort_values(
-            "lift_vs_BL", ascending=False).head(3)
-        a(_df_to_md(df_single, {
-            "lift_vs_BL": "{:+.5f}", "pooled_mean_R": "{:+.5f}",
-        }))
+            all_single.append(
+                {
+                    "block": "SS",
+                    "variant_id": r["variant_id"],
+                    "lift_vs_BL": float(r["lift_vs_BL"]),
+                    "pooled_mean_R": float(r["pooled_mean_R"]),
+                }
+            )
+        df_single = pd.DataFrame(all_single).sort_values("lift_vs_BL", ascending=False).head(3)
+        a(
+            _df_to_md(
+                df_single,
+                {
+                    "lift_vs_BL": "{:+.5f}",
+                    "pooled_mean_R": "{:+.5f}",
+                },
+            )
+        )
         a("")
 
     a("### Top-3 combined-rule variants by lift vs V00_BL per subset")
@@ -1924,30 +2286,46 @@ def render_report(*, observed_shas: Dict[str, str],
         a("")
         all_comb: List[Dict[str, Any]] = []
         for _, r in rr[rr["subset_id"] == sid].iterrows():
-            all_comb.append({
-                "block": "RR", "variant_id": r["variant_id"],
-                "lift_vs_BL": float(r["lift_vs_BL"]),
-                "pooled_mean_R": float(r["pooled_mean_R"]),
-            })
+            all_comb.append(
+                {
+                    "block": "RR",
+                    "variant_id": r["variant_id"],
+                    "lift_vs_BL": float(r["lift_vs_BL"]),
+                    "pooled_mean_R": float(r["pooled_mean_R"]),
+                }
+            )
         for _, r in tt[tt["subset_id"] == sid].iterrows():
-            all_comb.append({
-                "block": "TT", "variant_id": r["variant_id"],
-                "lift_vs_BL": float(r["lift_vs_BL"]),
-                "pooled_mean_R": float(r["pooled_mean_R"]),
-            })
-        df_comb = pd.DataFrame(all_comb).sort_values(
-            "lift_vs_BL", ascending=False).head(3)
-        a(_df_to_md(df_comb, {
-            "lift_vs_BL": "{:+.5f}", "pooled_mean_R": "{:+.5f}",
-        }))
+            all_comb.append(
+                {
+                    "block": "TT",
+                    "variant_id": r["variant_id"],
+                    "lift_vs_BL": float(r["lift_vs_BL"]),
+                    "pooled_mean_R": float(r["pooled_mean_R"]),
+                }
+            )
+        df_comb = pd.DataFrame(all_comb).sort_values("lift_vs_BL", ascending=False).head(3)
+        a(
+            _df_to_md(
+                df_comb,
+                {
+                    "lift_vs_BL": "{:+.5f}",
+                    "pooled_mean_R": "{:+.5f}",
+                },
+            )
+        )
         a("")
 
     a("### Cross-subset robustness: variants with positive lift on all three subsets")
     a("")
     # Build pivot of lift_vs_BL by variant_id across SUBSET_IDS.
     all_lifts: Dict[str, Dict[str, float]] = {}
-    for df, blk in [(pp_summary, "PP"), (qq_summary, "QQ"),
-                     (rr, "RR"), (ss_summary, "SS"), (tt, "TT")]:
+    for df, blk in [
+        (pp_summary, "PP"),
+        (qq_summary, "QQ"),
+        (rr, "RR"),
+        (ss_summary, "SS"),
+        (tt, "TT"),
+    ]:
         for _, r in df.iterrows():
             vid = str(r["variant_id"])
             sid = str(r["subset_id"])
@@ -1956,47 +2334,57 @@ def render_report(*, observed_shas: Dict[str, str],
             all_lifts.setdefault(vid, {})[sid] = float(r["lift_vs_BL"])
     robust_rows = []
     for vid, lifts in sorted(all_lifts.items()):
-        if all(s in lifts for s in SUBSET_IDS) and all(lifts[s] > 0
-                                                        for s in SUBSET_IDS):
-            robust_rows.append({
-                "variant_id": vid,
-                **{f"lift_{s}": lifts[s] for s in SUBSET_IDS},
-                "min_lift_across_subsets": min(lifts[s] for s in SUBSET_IDS),
-            })
+        if all(s in lifts for s in SUBSET_IDS) and all(lifts[s] > 0 for s in SUBSET_IDS):
+            robust_rows.append(
+                {
+                    "variant_id": vid,
+                    **{f"lift_{s}": lifts[s] for s in SUBSET_IDS},
+                    "min_lift_across_subsets": min(lifts[s] for s in SUBSET_IDS),
+                }
+            )
     if robust_rows:
         df_robust = pd.DataFrame(robust_rows).sort_values(
-            "min_lift_across_subsets", ascending=False)
-        a(_df_to_md(df_robust, {f"lift_{s}": "{:+.5f}" for s in SUBSET_IDS}
-                     | {"min_lift_across_subsets": "{:+.5f}"}))
+            "min_lift_across_subsets", ascending=False
+        )
+        a(
+            _df_to_md(
+                df_robust,
+                {f"lift_{s}": "{:+.5f}" for s in SUBSET_IDS}
+                | {"min_lift_across_subsets": "{:+.5f}"},
+            )
+        )
     else:
         a("(none)")
     a("")
 
     a("### Variant-with-biggest-lift on S1_q5q2 and on S4_q5xq2q3 specifically")
     a("")
-    s1_rows = []; s4_rows = []
+    s1_rows = []
+    s4_rows = []
     for vid, lifts in all_lifts.items():
         if "S1_q5q2" in lifts:
-            s1_rows.append({"variant_id": vid,
-                            "lift_vs_BL_S1": lifts["S1_q5q2"]})
+            s1_rows.append({"variant_id": vid, "lift_vs_BL_S1": lifts["S1_q5q2"]})
         if "S4_q5xq2q3" in lifts:
-            s4_rows.append({"variant_id": vid,
-                            "lift_vs_BL_S4": lifts["S4_q5xq2q3"]})
+            s4_rows.append({"variant_id": vid, "lift_vs_BL_S4": lifts["S4_q5xq2q3"]})
     if s1_rows:
         a("S1_q5q2 top 5:")
         a("")
-        a(_df_to_md(
-            pd.DataFrame(s1_rows).sort_values("lift_vs_BL_S1",
-                                                ascending=False).head(5),
-            {"lift_vs_BL_S1": "{:+.5f}"}))
+        a(
+            _df_to_md(
+                pd.DataFrame(s1_rows).sort_values("lift_vs_BL_S1", ascending=False).head(5),
+                {"lift_vs_BL_S1": "{:+.5f}"},
+            )
+        )
         a("")
     if s4_rows:
         a("S4_q5xq2q3 top 5:")
         a("")
-        a(_df_to_md(
-            pd.DataFrame(s4_rows).sort_values("lift_vs_BL_S4",
-                                                ascending=False).head(5),
-            {"lift_vs_BL_S4": "{:+.5f}"}))
+        a(
+            _df_to_md(
+                pd.DataFrame(s4_rows).sort_values("lift_vs_BL_S4", ascending=False).head(5),
+                {"lift_vs_BL_S4": "{:+.5f}"},
+            )
+        )
         a("")
 
     return "\n".join(lines) + "\n"
@@ -2060,8 +2448,7 @@ def build_pass(*, out_dir: Path, write_manifest: bool) -> Dict[str, Any]:
     # only_up counts per subset.
     per_subset_only_up_n: Dict[str, int] = {}
     for sid in SUBSET_IDS:
-        n_ou = int(sum(1 for t in subsets[sid].tolist()
-                        if cats[int(t)] == "only_up"))
+        n_ou = int(sum(1 for t in subsets[sid].tolist() if cats[int(t)] == "only_up"))
         per_subset_only_up_n[sid] = n_ou
     print(f"  only_up per subset: {per_subset_only_up_n}", flush=True)
 
@@ -2075,14 +2462,12 @@ def build_pass(*, out_dir: Path, write_manifest: bool) -> Dict[str, Any]:
 
     # Block PP
     print("  Aggregating Block PP...", flush=True)
-    pp_cat, pp_cut, pp_summary = aggregate_block_PP(
-        vt, subsets, cats, bar_of_sl_BL, close_at_k20)
+    pp_cat, pp_cut, pp_summary = aggregate_block_PP(vt, subsets, cats, bar_of_sl_BL, close_at_k20)
     _gate_8_pp_cut_detail(pp_cat)
 
     # Block QQ
     print("  Aggregating Block QQ...", flush=True)
-    qq_tier, qq_summary = aggregate_block_QQ(
-        vt, subsets, cats, peak_mfe, rmfe_at_120, bc_at_120)
+    qq_tier, qq_summary = aggregate_block_QQ(vt, subsets, cats, peak_mfe, rmfe_at_120, bc_at_120)
     _gate_9_qq_confirmation(qq_summary)
 
     # Block RR
@@ -2116,8 +2501,11 @@ def build_pass(*, out_dir: Path, write_manifest: bool) -> Dict[str, Any]:
     # Plots
     print("  Rendering plots...", flush=True)
     plot_paths = render_plots(
-        pp_summary=pp_summary, qq_summary=qq_summary, rr=rr,
-        ss_summary=ss_summary, tt=tt,
+        pp_summary=pp_summary,
+        qq_summary=qq_summary,
+        rr=rr,
+        ss_summary=ss_summary,
+        tt=tt,
         plots_dir=out_dir / "plots",
     )
 
@@ -2125,10 +2513,14 @@ def build_pass(*, out_dir: Path, write_manifest: bool) -> Dict[str, Any]:
     print("  Rendering markdown...", flush=True)
     md = render_report(
         observed_shas=observed_shas,
-        pp_summary=pp_summary, pp_cat=pp_cat, pp_cut=pp_cut,
-        qq_summary=qq_summary, qq_tier=qq_tier,
+        pp_summary=pp_summary,
+        pp_cat=pp_cat,
+        pp_cut=pp_cut,
+        qq_summary=qq_summary,
+        qq_tier=qq_tier,
         rr=rr,
-        ss_summary=ss_summary, ss_tier=ss_tier,
+        ss_summary=ss_summary,
+        ss_tier=ss_tier,
         tt=tt,
         per_subset_only_up_n=per_subset_only_up_n,
     )
@@ -2139,9 +2531,7 @@ def build_pass(*, out_dir: Path, write_manifest: bool) -> Dict[str, Any]:
     viols = check_disposition_discipline(md)
     if viols:
         msg = "\n  ".join([f"line {ln}: pat='{p}': {tx}" for ln, p, tx in viols])
-        raise RuntimeError(
-            f"HALT (gate 14): disposition discipline violations:\n  {msg}"
-        )
+        raise RuntimeError(f"HALT (gate 14): disposition discipline violations:\n  {msg}")
 
     # Gate 13 (locked artefacts unchanged)
     _verify_locked("gate 13 (end)")
@@ -2149,8 +2539,7 @@ def build_pass(*, out_dir: Path, write_manifest: bool) -> Dict[str, Any]:
     # Output sha manifest
     out_files = list(paths.keys()) + ["exit_counterfactuals_round2.md"]
     out_paths_full = [out_dir / n for n in out_files] + plot_paths
-    out_shas = {p.relative_to(REPO_ROOT).as_posix(): _sha256_file(p)
-                for p in out_paths_full}
+    out_shas = {p.relative_to(REPO_ROOT).as_posix(): _sha256_file(p) for p in out_paths_full}
 
     gates = {
         "gate_1_inputs": "ok (11 sha256s match)",
@@ -2227,6 +2616,7 @@ def _compare_files(a: Path, b: Path) -> bool:
 
 def main(argv: Optional[List[str]] = None) -> int:
     import argparse
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--single-pass", action="store_true")
     args = parser.parse_args(argv)
@@ -2260,10 +2650,7 @@ def main(argv: Optional[List[str]] = None) -> int:
                 det_diffs.append(str(src.name))
         shutil.rmtree(snapshot_dir, ignore_errors=True)
         if det_diffs:
-            raise RuntimeError(
-                f"HALT (gate 12): determinism failed; differing files: "
-                f"{det_diffs}"
-            )
+            raise RuntimeError(f"HALT (gate 12): determinism failed; differing files: {det_diffs}")
         det_ok = True
         r1 = r2
 
@@ -2274,8 +2661,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     print("\n=== Validation gates disposition ===", flush=True)
     for k, v in r1["gates"].items():
         print(f"  {k}: {v}", flush=True)
-    print(f"  gate_12_determinism: {'ok' if det_ok else 'single-pass-skipped'}",
-          flush=True)
+    print(f"  gate_12_determinism: {'ok' if det_ok else 'single-pass-skipped'}", flush=True)
 
     # Headline numbers per subset.
     pp_summary = r1["pp_summary"]
@@ -2284,16 +2670,25 @@ def main(argv: Optional[List[str]] = None) -> int:
     tt = r1["tt"]
     print("\n=== Headline numbers per subset ===", flush=True)
     for sid in SUBSET_IDS:
-        bl_ref = float(pp_summary[(pp_summary["subset_id"] == sid)
-                                    & (pp_summary["variant_id"] == "PP01")]["pooled_mean_R_BL"].iloc[0])
-        pp01 = pp_summary[(pp_summary["subset_id"] == sid)
-                           & (pp_summary["variant_id"] == "PP01")].iloc[0]
-        qq_best = qq_summary[qq_summary["subset_id"] == sid].sort_values(
-            "lift_vs_BL", ascending=False).iloc[0]
-        ss_best = ss_summary[ss_summary["subset_id"] == sid].sort_values(
-            "lift_vs_BL", ascending=False).iloc[0]
-        tt_best = tt[tt["subset_id"] == sid].sort_values(
-            "lift_vs_BL", ascending=False).iloc[0]
+        bl_ref = float(
+            pp_summary[(pp_summary["subset_id"] == sid) & (pp_summary["variant_id"] == "PP01")][
+                "pooled_mean_R_BL"
+            ].iloc[0]
+        )
+        pp01 = pp_summary[
+            (pp_summary["subset_id"] == sid) & (pp_summary["variant_id"] == "PP01")
+        ].iloc[0]
+        qq_best = (
+            qq_summary[qq_summary["subset_id"] == sid]
+            .sort_values("lift_vs_BL", ascending=False)
+            .iloc[0]
+        )
+        ss_best = (
+            ss_summary[ss_summary["subset_id"] == sid]
+            .sort_values("lift_vs_BL", ascending=False)
+            .iloc[0]
+        )
+        tt_best = tt[tt["subset_id"] == sid].sort_values("lift_vs_BL", ascending=False).iloc[0]
         print(
             f"  {sid}: V00_BL = {bl_ref:+.5f}R. "
             f"PP01 (tau=-0.5): pooled {float(pp01['pooled_mean_R']):+.5f}R "
@@ -2319,16 +2714,20 @@ def main(argv: Optional[List[str]] = None) -> int:
             if sid not in SUBSET_IDS:
                 continue
             all_lifts.setdefault(vid, {})[sid] = float(r["lift_vs_BL"])
-    robust = {vid: min(l[s] for s in SUBSET_IDS)
-              for vid, l in all_lifts.items()
-              if all(s in l and l[s] > 0 for s in SUBSET_IDS)}
+    robust = {
+        vid: min(lifts[s] for s in SUBSET_IDS)
+        for vid, lifts in all_lifts.items()
+        if all(s in lifts and lifts[s] > 0 for s in SUBSET_IDS)
+    }
     if robust:
         top_robust = max(robust.items(), key=lambda kv: kv[1])
-        print(f"\n  Cross-subset most-consistent positive lift: "
-              f"{top_robust[0]} (min lift = {top_robust[1]:+.5f}R)", flush=True)
+        print(
+            f"\n  Cross-subset most-consistent positive lift: "
+            f"{top_robust[0]} (min lift = {top_robust[1]:+.5f}R)",
+            flush=True,
+        )
     else:
-        print("\n  No variant has positive lift on all three subsets.",
-              flush=True)
+        print("\n  No variant has positive lift on all three subsets.", flush=True)
 
     # Output sha manifest.
     print("\n=== Output artefact sha256 manifest ===", flush=True)
@@ -2342,16 +2741,13 @@ def main(argv: Optional[List[str]] = None) -> int:
             ["git", "rev-parse", "HEAD"], cwd=REPO_ROOT, text=True
         ).strip()
         print(f"  HEAD: {head}", flush=True)
-        st = subprocess.check_output(
-            ["git", "status", "--porcelain"], cwd=REPO_ROOT, text=True
-        )
+        st = subprocess.check_output(["git", "status", "--porcelain"], cwd=REPO_ROOT, text=True)
         for ln in st.splitlines()[:50]:
             print(f"  {ln}", flush=True)
     except Exception as e:
         print(f"  (git unavailable: {e})", flush=True)
 
-    print(f"\n  wallclock {wallclock:.2f}s  peak_RSS_traced_kb {peak_kb:.0f}",
-          flush=True)
+    print(f"\n  wallclock {wallclock:.2f}s  peak_RSS_traced_kb {peak_kb:.0f}", flush=True)
     return 0
 
 

@@ -107,7 +107,9 @@ def _decision_and_reason(
     row: dict, ref_trades: int, ref_hold: float, variant_slug: str
 ) -> tuple[str, str]:
     trade_ratio = (row["trade_count_total"] / ref_trades) if ref_trades else float("nan")
-    hold_ratio = (row["median_bars_held"] / ref_hold) if ref_hold and pd.notna(ref_hold) else float("nan")
+    hold_ratio = (
+        (row["median_bars_held"] / ref_hold) if ref_hold and pd.notna(ref_hold) else float("nan")
+    )
 
     reasons = []
     if not row.get("fold_level_available"):
@@ -119,7 +121,10 @@ def _decision_and_reason(
 
     if reasons:
         return "DIAGNOSTIC", "; ".join(reasons)
-    if row.get("worst_fold_expectancy_r", 0) >= 0 and row.get("worst_fold_max_drawdown_pct", 0) >= -20:
+    if (
+        row.get("worst_fold_expectancy_r", 0) >= 0
+        and row.get("worst_fold_max_drawdown_pct", 0) >= -20
+    ):
         return "KEEP", "within churn limits"
     return "DISCARD", "DD or expectancy fail"
 
@@ -163,12 +168,11 @@ def build_report(phase6_root: Path) -> pd.DataFrame:
                 }
             )
             continue
-        trade_ratio = (
-            (agg["trade_count_total"] / ref_trades) if ref_trades else float("nan")
-        )
+        trade_ratio = (agg["trade_count_total"] / ref_trades) if ref_trades else float("nan")
         hold_ratio = (
             (agg["median_bars_held"] / ref_hold)
-            if ref_hold and pd.notna(ref_hold) else float("nan")
+            if ref_hold and pd.notna(ref_hold)
+            else float("nan")
         )
         decision, reason = _decision_and_reason(agg, ref_trades, ref_hold, slug)
         records.append(
@@ -204,7 +208,9 @@ def write_notes(phase6_root: Path, out_path: Path, df: pd.DataFrame) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Phase 6: Build exit comparison report from WFO outputs.")
+    parser = argparse.ArgumentParser(
+        description="Phase 6: Build exit comparison report from WFO outputs."
+    )
     parser.add_argument(
         "--results-root",
         default=str(RESULTS_ROOT),

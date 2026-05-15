@@ -1,9 +1,11 @@
+# ruff: noqa: E402  (sys.path.insert needed before project imports)
 """Phase F — cost stress (op spec §5.12).
 
 Sweep spread-floor multipliers ∈ {0.5×, 1.0×, 1.5×, 2.0×} applied to the
 verbatim execution (bo=1, sl=2.0 ATR, h=120). Report full distribution and
 fraction floored per multiplier; identify multiplier at which mean R crosses zero.
 """
+
 from __future__ import annotations
 
 import sys
@@ -19,9 +21,16 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from scripts.l_arc_2.step2._io import (
-    PAIRS, SL_DISTANCES, SPREAD_FLOOR_PATH, SPREAD_MULT, STEP2_DIR,
-    VERBATIM_SL_ATR_MULT, VERBATIM_TIME_EXIT_H,
-    load_all_floors, load_pair_1h, load_trades_verbatim, pip_size,
+    PAIRS,
+    SPREAD_FLOOR_PATH,
+    SPREAD_MULT,
+    STEP2_DIR,
+    VERBATIM_SL_ATR_MULT,
+    VERBATIM_TIME_EXIT_H,
+    load_all_floors,
+    load_pair_1h,
+    load_trades_verbatim,
+    pip_size,
 )
 from scripts.l_arc_2.step2.phase_e_shadows import _simulate_trade
 
@@ -44,7 +53,9 @@ def run_phase_f() -> None:
             "high": df["high"].astype(float).values,
             "low": df["low"].astype(float).values,
             "close": df["close"].astype(float).values,
-            "spread": df["spread"].astype(float).values if "spread" in df.columns else np.zeros(len(df)),
+            "spread": df["spread"].astype(float).values
+            if "spread" in df.columns
+            else np.zeros(len(df)),
         }
         ts_int = df["time"].astype("int64").to_numpy()
         pair_ts_idx[pair] = {int(t): i for i, t in enumerate(ts_int)}
@@ -71,22 +82,39 @@ def run_phase_f() -> None:
             atr_at_sig = float(atrs[k])
             if not np.isfinite(atr_at_sig) or atr_at_sig <= 0:
                 continue
-            out = _simulate_trade(d["open"], d["high"], d["low"], d["spread"],
-                                  sig_idx, atr_at_sig,
-                                  bar_offset=1, sl_atr_mult=VERBATIM_SL_ATR_MULT,
-                                  h_exit=VERBATIM_TIME_EXIT_H,
-                                  pair_pip=pip_size(pair), floor_pips=floors.get(pair, None))
+            out = _simulate_trade(
+                d["open"],
+                d["high"],
+                d["low"],
+                d["spread"],
+                sig_idx,
+                atr_at_sig,
+                bar_offset=1,
+                sl_atr_mult=VERBATIM_SL_ATR_MULT,
+                h_exit=VERBATIM_TIME_EXIT_H,
+                pair_pip=pip_size(pair),
+                floor_pips=floors.get(pair, None),
+            )
             if not out["valid"]:
                 continue
             if out["spread_floored"]:
                 floored_count += 1
-            rows.append({"trade_id": int(tr_ids[k]), "fold_id": int(tr_folds[k]),
-                         "pair": pair, "net_r": out["net_r"], "spread_cost_R": out["spread_cost_R"],
-                         "exit_reason": out["exit_reason"], "spread_floored": out["spread_floored"]})
+            rows.append(
+                {
+                    "trade_id": int(tr_ids[k]),
+                    "fold_id": int(tr_folds[k]),
+                    "pair": pair,
+                    "net_r": out["net_r"],
+                    "spread_cost_R": out["spread_cost_R"],
+                    "exit_reason": out["exit_reason"],
+                    "spread_floored": out["spread_floored"],
+                }
+            )
         df_r = pd.DataFrame(rows)
         n = len(df_r)
         s = {
-            "spread_multiplier": mult, "n": int(n),
+            "spread_multiplier": mult,
+            "n": int(n),
             "mean_net_r": float(df_r["net_r"].mean()) if n else np.nan,
             "median_net_r": float(df_r["net_r"].median()) if n else np.nan,
             "p5_net_r": float(df_r["net_r"].quantile(0.05)) if n else np.nan,
@@ -96,8 +124,10 @@ def run_phase_f() -> None:
             "mean_spread_cost_R": float(df_r["spread_cost_R"].mean()) if n else np.nan,
         }
         summary_rows.append(s)
-        print(f"  mult={mult}: n={n} mean_R={s['mean_net_r']:.5f} "
-              f"floored={s['frac_floored']*100:.2f}% ({time.time()-t_s:.1f}s)")
+        print(
+            f"  mult={mult}: n={n} mean_R={s['mean_net_r']:.5f} "
+            f"floored={s['frac_floored'] * 100:.2f}% ({time.time() - t_s:.1f}s)"
+        )
 
     df_sum = pd.DataFrame(summary_rows)
     df_sum.to_csv(COST_DIR / "spread_multiplier_sweep.csv", index=False, lineterminator="\n")
@@ -105,13 +135,15 @@ def run_phase_f() -> None:
     sgn = np.sign(df_sum["mean_net_r"].to_numpy())
     for i in range(1, len(df_sum)):
         if sgn[i - 1] != sgn[i] and sgn[i - 1] != 0 and sgn[i] != 0:
-            crossing_msg = (f"Mean R sign change between multiplier "
-                            f"{df_sum['spread_multiplier'].iat[i-1]} "
-                            f"and {df_sum['spread_multiplier'].iat[i]}.")
+            crossing_msg = (
+                f"Mean R sign change between multiplier "
+                f"{df_sum['spread_multiplier'].iat[i - 1]} "
+                f"and {df_sum['spread_multiplier'].iat[i]}."
+            )
             break
     (COST_DIR / "_crossing_zero_note.txt").write_text(crossing_msg + "\n", encoding="utf-8")
     print(f"[Phase F] {crossing_msg}")
-    print(f"[Phase F] done in {time.time()-t0:.1f}s")
+    print(f"[Phase F] done in {time.time() - t0:.1f}s")
 
 
 if __name__ == "__main__":

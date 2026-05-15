@@ -42,7 +42,6 @@ from __future__ import annotations
 
 import argparse
 import sys
-from itertools import combinations
 from pathlib import Path
 from typing import Iterable, Sequence
 
@@ -86,8 +85,9 @@ def slice_window(df: pd.DataFrame, date_start: str, date_end) -> pd.DataFrame:
     return df.reset_index(drop=True)
 
 
-def load_aligned_returns(pairs: Sequence[str], data_dir: str,
-                         date_start: str, date_end) -> pd.DataFrame:
+def load_aligned_returns(
+    pairs: Sequence[str], data_dir: str, date_start: str, date_end
+) -> pd.DataFrame:
     """Return wide DataFrame indexed by date, columns = pair, values = log return.
 
     Inner-join across all pairs so every retained timestamp has data for every
@@ -133,8 +133,9 @@ def _vec_pearson(a: np.ndarray, b: np.ndarray) -> np.ndarray:
     return np.where(den > 0, num / safe, np.nan)
 
 
-def boot_corr(x: np.ndarray, y: np.ndarray, rng: np.random.Generator,
-              n_boot: int, alpha: float) -> tuple[float, float, float, int]:
+def boot_corr(
+    x: np.ndarray, y: np.ndarray, rng: np.random.Generator, n_boot: int, alpha: float
+) -> tuple[float, float, float, int]:
     x = np.asarray(x, dtype=float)
     y = np.asarray(y, dtype=float)
     n = x.size
@@ -152,8 +153,9 @@ def boot_corr(x: np.ndarray, y: np.ndarray, rng: np.random.Generator,
     return pt, lo, hi, n
 
 
-def boot_percentile(arr: np.ndarray, p: float, rng: np.random.Generator,
-                    n_boot: int, alpha: float) -> tuple[float, float, float, int]:
+def boot_percentile(
+    arr: np.ndarray, p: float, rng: np.random.Generator, n_boot: int, alpha: float
+) -> tuple[float, float, float, int]:
     arr = np.asarray(arr, dtype=float)
     arr = arr[~np.isnan(arr)]
     n = arr.size
@@ -166,8 +168,9 @@ def boot_percentile(arr: np.ndarray, p: float, rng: np.random.Generator,
     return pt, lo, hi, n
 
 
-def boot_mean(arr: np.ndarray, rng: np.random.Generator,
-              n_boot: int, alpha: float) -> tuple[float, float, float, int]:
+def boot_mean(
+    arr: np.ndarray, rng: np.random.Generator, n_boot: int, alpha: float
+) -> tuple[float, float, float, int]:
     arr = np.asarray(arr, dtype=float)
     arr = arr[~np.isnan(arr)]
     n = arr.size
@@ -180,8 +183,9 @@ def boot_mean(arr: np.ndarray, rng: np.random.Generator,
     return pt, lo, hi, n
 
 
-def boot_std(arr: np.ndarray, rng: np.random.Generator,
-             n_boot: int, alpha: float) -> tuple[float, float, float, int]:
+def boot_std(
+    arr: np.ndarray, rng: np.random.Generator, n_boot: int, alpha: float
+) -> tuple[float, float, float, int]:
     arr = np.asarray(arr, dtype=float)
     arr = arr[~np.isnan(arr)]
     n = arr.size
@@ -194,9 +198,9 @@ def boot_std(arr: np.ndarray, rng: np.random.Generator,
     return pt, lo, hi, n
 
 
-def boot_proportion_from_indicator(ind: np.ndarray, rng: np.random.Generator,
-                                   n_boot: int, alpha: float
-                                   ) -> tuple[float, float, float, int]:
+def boot_proportion_from_indicator(
+    ind: np.ndarray, rng: np.random.Generator, n_boot: int, alpha: float
+) -> tuple[float, float, float, int]:
     """Bootstrap CI for the mean of a 0/1 indicator vector."""
     ind = np.asarray(ind, dtype=np.float64)
     n = ind.size
@@ -209,9 +213,14 @@ def boot_proportion_from_indicator(ind: np.ndarray, rng: np.random.Generator,
     return pt, lo, hi, n
 
 
-def boot_asymmetry(x_t: np.ndarray, y_plus: np.ndarray, y_minus: np.ndarray,
-                   rng: np.random.Generator, n_boot: int, alpha: float
-                   ) -> tuple[float, float, float, int]:
+def boot_asymmetry(
+    x_t: np.ndarray,
+    y_plus: np.ndarray,
+    y_minus: np.ndarray,
+    rng: np.random.Generator,
+    n_boot: int,
+    alpha: float,
+) -> tuple[float, float, float, int]:
     """corr(x_t, y_{t+1}) − corr(x_t, y_{t-1}) with joint iid bootstrap."""
     x_t = np.asarray(x_t, dtype=float)
     y_plus = np.asarray(y_plus, dtype=float)
@@ -245,8 +254,13 @@ def static_corr_matrix(returns: np.ndarray) -> np.ndarray:
 
 
 def append_static_corr_rows(
-    pair_names: Sequence[str], returns: np.ndarray, tf: str,
-    rng: np.random.Generator, n_boot: int, alpha: float, rows: list[tuple],
+    pair_names: Sequence[str],
+    returns: np.ndarray,
+    tf: str,
+    rng: np.random.Generator,
+    n_boot: int,
+    alpha: float,
+    rows: list[tuple],
 ) -> np.ndarray:
     P = len(pair_names)
     C = static_corr_matrix(returns)  # (P, P)
@@ -254,19 +268,17 @@ def append_static_corr_rows(
         for j in range(i + 1, P):
             p_low, p_high = sorted([pair_names[i], pair_names[j]])
             combo = f"{p_low}__{p_high}"
-            v, lo, hi, n = boot_corr(
-                returns[:, i], returns[:, j], rng, n_boot, alpha
+            v, lo, hi, n = boot_corr(returns[:, i], returns[:, j], rng, n_boot, alpha)
+            rows.append(
+                (combo, tf, "xpair_static_corr", "static_corr_log_returns", v, lo, hi, n, "")
             )
-            rows.append((combo, tf, "xpair_static_corr",
-                         "static_corr_log_returns", v, lo, hi, n, ""))
     return C
 
 
 # ===========================================================================
 # Family 2 + 3 — rolling correlation distribution and matrix stability
 # ===========================================================================
-def rolling_corr_streams(returns: np.ndarray, window: int
-                         ) -> tuple[np.ndarray, np.ndarray]:
+def rolling_corr_streams(returns: np.ndarray, window: int) -> tuple[np.ndarray, np.ndarray]:
     """Compute streams of (off_diag_mean(C_t), ||C_t − C_{t−1}||_F).
 
     Returns:
@@ -281,7 +293,7 @@ def rolling_corr_streams(returns: np.ndarray, window: int
     iu = np.triu_indices(P, k=1)
     prev_C: np.ndarray | None = None
     for t in range(window - 1, T):
-        win = returns[t - window + 1: t + 1]  # shape (window, P)
+        win = returns[t - window + 1 : t + 1]  # shape (window, P)
         means = win.mean(axis=0, keepdims=True)
         wc = win - means
         cov = wc.T @ wc / (window - 1)
@@ -299,8 +311,12 @@ def rolling_corr_streams(returns: np.ndarray, window: int
 
 
 def append_rolling_corr_and_stab_rows(
-    off_diag: np.ndarray, frob: np.ndarray, tf: str, cfg: dict,
-    rng: np.random.Generator, rows: list[tuple],
+    off_diag: np.ndarray,
+    frob: np.ndarray,
+    tf: str,
+    cfg: dict,
+    rng: np.random.Generator,
+    rows: list[tuple],
 ) -> None:
     n_boot = int(cfg["bootstrap"]["n_resamples"])
     alpha = 1.0 - float(cfg["bootstrap"]["ci_level"])
@@ -309,20 +325,21 @@ def append_rolling_corr_and_stab_rows(
 
     for p in rc_pcts:
         v, lo, hi, n = boot_percentile(off_diag, p, rng, n_boot, alpha)
-        rows.append((UNIVERSE_TAG, tf, "xpair_rolling_corr",
-                     f"off_diag_mean_p{p:02d}", v, lo, hi, n, ""))
+        rows.append(
+            (UNIVERSE_TAG, tf, "xpair_rolling_corr", f"off_diag_mean_p{p:02d}", v, lo, hi, n, "")
+        )
 
     for p in ms_pcts:
         v, lo, hi, n = boot_percentile(frob, p, rng, n_boot, alpha)
-        rows.append((UNIVERSE_TAG, tf, "xpair_matrix_stab",
-                     f"frobenius_diff_p{p:02d}", v, lo, hi, n, ""))
+        rows.append(
+            (UNIVERSE_TAG, tf, "xpair_matrix_stab", f"frobenius_diff_p{p:02d}", v, lo, hi, n, "")
+        )
 
 
 # ===========================================================================
 # Family 4 — currency strength (D1 only)
 # ===========================================================================
-def build_currency_sign_matrix(pair_names: Sequence[str],
-                               currencies: Sequence[str]) -> np.ndarray:
+def build_currency_sign_matrix(pair_names: Sequence[str], currencies: Sequence[str]) -> np.ndarray:
     """Sign matrix S of shape (n_currencies, n_pairs).
 
     S[c, j] = +1 if currencies[c] is the BASE of pair j,
@@ -355,13 +372,15 @@ def daily_ranks_from_strength(strength: np.ndarray) -> np.ndarray:
     continuous data). With 8 currencies, exact ties are unlikely.
     """
     # Negate so largest strength → rank 0 → +1 = rank 1.
-    return np.argsort(np.argsort(-strength, axis=1, kind="stable"),
-                      axis=1, kind="stable") + 1
+    return np.argsort(np.argsort(-strength, axis=1, kind="stable"), axis=1, kind="stable") + 1
 
 
 def append_currency_strength_rows(
-    wide_d1: pd.DataFrame, currencies: Sequence[str], cfg: dict,
-    rng: np.random.Generator, rows: list[tuple],
+    wide_d1: pd.DataFrame,
+    currencies: Sequence[str],
+    cfg: dict,
+    rng: np.random.Generator,
+    rows: list[tuple],
 ) -> tuple[float, np.ndarray]:
     """Compute and append ccy_strength rows; return (max_abs_daily_sum, strength)."""
     n_boot = int(cfg["bootstrap"]["n_resamples"])
@@ -380,44 +399,61 @@ def append_currency_strength_rows(
 
     ranks = daily_ranks_from_strength(strength)
     T = strength.shape[0]
-    C = len(currencies)
+    len(currencies)
 
     for c, ccy in enumerate(currencies):
         # Persistence at each lag (P(rank_t == rank_{t+lag}))
         for lag in lags:
             if lag >= T:
-                rows.append((ccy, "D1", "ccy_strength",
-                             f"rank_persistence_lag_{lag:02d}",
-                             float("nan"), float("nan"), float("nan"), 0,
-                             "lag_exceeds_series"))
+                rows.append(
+                    (
+                        ccy,
+                        "D1",
+                        "ccy_strength",
+                        f"rank_persistence_lag_{lag:02d}",
+                        float("nan"),
+                        float("nan"),
+                        float("nan"),
+                        0,
+                        "lag_exceeds_series",
+                    )
+                )
                 continue
-            ind = (ranks[:T - lag, c] == ranks[lag:, c]).astype(np.float64)
+            ind = (ranks[: T - lag, c] == ranks[lag:, c]).astype(np.float64)
             v, lo, hi, n = boot_proportion_from_indicator(ind, rng, n_boot, alpha)
-            rows.append((ccy, "D1", "ccy_strength",
-                         f"rank_persistence_lag_{lag:02d}",
-                         v, lo, hi, n, ""))
+            rows.append(
+                (ccy, "D1", "ccy_strength", f"rank_persistence_lag_{lag:02d}", v, lo, hi, n, "")
+            )
 
         # Top→bottom reversal: top-day list, indicator of "any bottom within next K"
         top_days = np.where(ranks[:, c] <= top_th)[0]
         if top_days.size == 0:
-            rows.append((ccy, "D1", "ccy_strength", "topbottom_reversal_freq",
-                         float("nan"), float("nan"), float("nan"), 0,
-                         "no_top_days"))
+            rows.append(
+                (
+                    ccy,
+                    "D1",
+                    "ccy_strength",
+                    "topbottom_reversal_freq",
+                    float("nan"),
+                    float("nan"),
+                    float("nan"),
+                    0,
+                    "no_top_days",
+                )
+            )
         else:
             ind = np.zeros(top_days.size, dtype=np.float64)
             for k, t0 in enumerate(top_days):
                 end = min(t0 + 1 + rev_window, T)
-                window_ranks = ranks[t0 + 1:end, c]
+                window_ranks = ranks[t0 + 1 : end, c]
                 if window_ranks.size > 0 and (window_ranks >= bot_th).any():
                     ind[k] = 1.0
             v, lo, hi, n = boot_proportion_from_indicator(ind, rng, n_boot, alpha)
-            rows.append((ccy, "D1", "ccy_strength", "topbottom_reversal_freq",
-                         v, lo, hi, n, ""))
+            rows.append((ccy, "D1", "ccy_strength", "topbottom_reversal_freq", v, lo, hi, n, ""))
 
         # Strength std over the time series
         v, lo, hi, n = boot_std(strength[:, c], rng, n_boot, alpha)
-        rows.append((ccy, "D1", "ccy_strength", "strength_std",
-                     v, lo, hi, n, ""))
+        rows.append((ccy, "D1", "ccy_strength", "strength_std", v, lo, hi, n, ""))
 
     return max_abs_daily_sum, strength
 
@@ -426,8 +462,13 @@ def append_currency_strength_rows(
 # Family 5 — pair-pair lead-lag (filtered by |full-sample corr| > threshold)
 # ===========================================================================
 def append_pairpair_lead_lag_rows(
-    pair_names: Sequence[str], returns: np.ndarray, static_C: np.ndarray,
-    tf: str, cfg: dict, rng: np.random.Generator, rows: list[tuple],
+    pair_names: Sequence[str],
+    returns: np.ndarray,
+    static_C: np.ndarray,
+    tf: str,
+    cfg: dict,
+    rng: np.random.Generator,
+    rows: list[tuple],
 ) -> int:
     n_boot = int(cfg["bootstrap"]["n_resamples"])
     alpha = 1.0 - float(cfg["bootstrap"]["ci_level"])
@@ -455,20 +496,19 @@ def append_pairpair_lead_lag_rows(
 
         for lag in lags:
             if lag > 0:
-                xa = x[:T - lag]
+                xa = x[: T - lag]
                 ya = y[lag:]
             elif lag < 0:
                 k = -lag
                 xa = x[k:]
-                ya = y[:T - k]
+                ya = y[: T - k]
             else:
                 continue  # lag 0 is the static corr already in another family
             mask = ~np.isnan(xa) & ~np.isnan(ya)
             v, lo, hi, n = boot_corr(xa[mask], ya[mask], rng, n_boot, alpha)
             sign = "pos" if lag > 0 else "neg"
             stat_name = f"corr_lag_{sign}_{abs(lag):d}"
-            rows.append((combo, tf, "pairpair_lead_lag", stat_name,
-                         v, lo, hi, n, ""))
+            rows.append((combo, tf, "pairpair_lead_lag", stat_name, v, lo, hi, n, ""))
 
         # Asymmetry at lag 1
         if T >= 4:
@@ -479,12 +519,21 @@ def append_pairpair_lead_lag_rows(
             v, lo, hi, n = boot_asymmetry(
                 x_t[mask], y_plus[mask], y_minus[mask], rng, n_boot, alpha
             )
-            rows.append((combo, tf, "pairpair_lead_lag", "asymmetry_lag_1",
-                         v, lo, hi, n, ""))
+            rows.append((combo, tf, "pairpair_lead_lag", "asymmetry_lag_1", v, lo, hi, n, ""))
         else:
-            rows.append((combo, tf, "pairpair_lead_lag", "asymmetry_lag_1",
-                         float("nan"), float("nan"), float("nan"), 0,
-                         "series_too_short"))
+            rows.append(
+                (
+                    combo,
+                    tf,
+                    "pairpair_lead_lag",
+                    "asymmetry_lag_1",
+                    float("nan"),
+                    float("nan"),
+                    float("nan"),
+                    0,
+                    "series_too_short",
+                )
+            )
 
     return len(survivors)
 
@@ -493,8 +542,13 @@ def append_pairpair_lead_lag_rows(
 # Family 6 — risk basket
 # ===========================================================================
 def append_risk_basket_rows(
-    wide: pd.DataFrame, risk_on: Sequence[str], risk_off: Sequence[str],
-    tf: str, cfg: dict, rng: np.random.Generator, rows: list[tuple],
+    wide: pd.DataFrame,
+    risk_on: Sequence[str],
+    risk_off: Sequence[str],
+    tf: str,
+    cfg: dict,
+    rng: np.random.Generator,
+    rows: list[tuple],
 ) -> None:
     window = int(cfg["stats"]["rolling_window"])
     rb_pcts = list(cfg["stats"]["risk_basket_percentiles"])
@@ -506,47 +560,43 @@ def append_risk_basket_rows(
 
     # Static correlation
     v, lo, hi, n = boot_corr(on, off, rng, n_boot, alpha)
-    rows.append((RISK_BASKET_TAG, tf, "risk_basket", "static_corr",
-                 v, lo, hi, n, ""))
+    rows.append((RISK_BASKET_TAG, tf, "risk_basket", "static_corr", v, lo, hi, n, ""))
 
     # Rolling 60-bar correlation distribution
     T = on.size
     if T >= window:
         rolling_vals = np.empty(T - window + 1, dtype=np.float64)
         for t in range(window - 1, T):
-            xs = on[t - window + 1: t + 1]
-            ys = off[t - window + 1: t + 1]
+            xs = on[t - window + 1 : t + 1]
+            ys = off[t - window + 1 : t + 1]
             xc = xs - xs.mean()
             yc = ys - ys.mean()
             d = float(np.sqrt((xc * xc).sum() * (yc * yc).sum()))
-            rolling_vals[t - window + 1] = (
-                float((xc * yc).sum() / d) if d > 0 else float("nan")
-            )
+            rolling_vals[t - window + 1] = float((xc * yc).sum() / d) if d > 0 else float("nan")
     else:
         rolling_vals = np.array([])
 
     for p in rb_pcts:
         v, lo, hi, n = boot_percentile(rolling_vals, p, rng, n_boot, alpha)
-        rows.append((RISK_BASKET_TAG, tf, "risk_basket", f"rolling_corr_p{p:02d}",
-                     v, lo, hi, n, ""))
+        rows.append(
+            (RISK_BASKET_TAG, tf, "risk_basket", f"rolling_corr_p{p:02d}", v, lo, hi, n, "")
+        )
 
 
 # ===========================================================================
 # Driver
 # ===========================================================================
-def process_timeframe(tf: str, wide: pd.DataFrame, cfg: dict,
-                      rng: np.random.Generator, rows: list[tuple]
-                      ) -> dict[str, float | int]:
+def process_timeframe(
+    tf: str, wide: pd.DataFrame, cfg: dict, rng: np.random.Generator, rows: list[tuple]
+) -> dict[str, float | int]:
     pair_names = list(wide.columns)
     returns = wide.to_numpy()
     n_boot = int(cfg["bootstrap"]["n_resamples"])
     alpha = 1.0 - float(cfg["bootstrap"]["ci_level"])
     window = int(cfg["stats"]["rolling_window"])
 
-    print(f"[L3] {tf}: aligned shape {returns.shape}; static corr",
-          file=sys.stderr)
-    static_C = append_static_corr_rows(pair_names, returns, tf,
-                                        rng, n_boot, alpha, rows)
+    print(f"[L3] {tf}: aligned shape {returns.shape}; static corr", file=sys.stderr)
+    static_C = append_static_corr_rows(pair_names, returns, tf, rng, n_boot, alpha, rows)
 
     # Sanity values for the result doc
     diag = np.diag(static_C)
@@ -555,21 +605,21 @@ def process_timeframe(tf: str, wide: pd.DataFrame, cfg: dict,
     iu = np.triu_indices(len(pair_names), k=1)
     off_diag_mean = float(static_C[iu].mean())
 
-    print(f"[L3] {tf}: rolling correlation streaming (window {window})",
-          file=sys.stderr)
+    print(f"[L3] {tf}: rolling correlation streaming (window {window})", file=sys.stderr)
     off_diag_series, frob_series = rolling_corr_streams(returns, window)
-    append_rolling_corr_and_stab_rows(off_diag_series, frob_series, tf,
-                                      cfg, rng, rows)
+    append_rolling_corr_and_stab_rows(off_diag_series, frob_series, tf, cfg, rng, rows)
 
-    print(f"[L3] {tf}: pair-pair lead-lag (filter |corr|>{cfg['stats']['pairpair_corr_filter_abs']})",
-          file=sys.stderr)
-    n_survivors = append_pairpair_lead_lag_rows(pair_names, returns, static_C,
-                                                 tf, cfg, rng, rows)
+    print(
+        f"[L3] {tf}: pair-pair lead-lag (filter |corr|>{cfg['stats']['pairpair_corr_filter_abs']})",
+        file=sys.stderr,
+    )
+    n_survivors = append_pairpair_lead_lag_rows(pair_names, returns, static_C, tf, cfg, rng, rows)
     print(f"[L3] {tf}: pair-pair survivors = {n_survivors}", file=sys.stderr)
 
     print(f"[L3] {tf}: risk basket", file=sys.stderr)
-    append_risk_basket_rows(wide, cfg["risk_baskets"]["risk_on"],
-                            cfg["risk_baskets"]["risk_off"], tf, cfg, rng, rows)
+    append_risk_basket_rows(
+        wide, cfg["risk_baskets"]["risk_on"], cfg["risk_baskets"]["risk_off"], tf, cfg, rng, rows
+    )
 
     return {
         "tf": tf,
@@ -596,9 +646,9 @@ def run(cfg: dict) -> tuple[Path, dict]:
     # Load wide returns per TF.
     wide_per_tf: dict[str, pd.DataFrame] = {}
     for tf in timeframes:
-        wide = load_aligned_returns(pairs, data_dirs[tf],
-                                    cfg["data"].get("date_start"),
-                                    cfg["data"].get("date_end"))
+        wide = load_aligned_returns(
+            pairs, data_dirs[tf], cfg["data"].get("date_start"), cfg["data"].get("date_end")
+        )
         # Order columns deterministically by pair name.
         wide = wide[pairs]
         wide_per_tf[tf] = wide
@@ -610,8 +660,7 @@ def run(cfg: dict) -> tuple[Path, dict]:
 
     # Currency strength is D1 only per spec.
     print("[L3] D1: currency strength", file=sys.stderr)
-    max_abs_sum, _ = append_currency_strength_rows(wide_per_tf["D1"],
-                                                    currencies, cfg, rng, rows)
+    max_abs_sum, _ = append_currency_strength_rows(wide_per_tf["D1"], currencies, cfg, rng, rows)
     diagnostics["ccy_max_abs_daily_sum"] = max_abs_sum
 
     out_df = pd.DataFrame(rows, columns=CSV_COLUMNS)
@@ -621,8 +670,7 @@ def run(cfg: dict) -> tuple[Path, dict]:
     csv_path = Path(cfg["output"]["csv_path"])
     csv_path.parent.mkdir(parents=True, exist_ok=True)
     float_format = cfg["output"]["float_format"]
-    out_df.to_csv(csv_path, index=False, float_format=float_format,
-                  na_rep="", lineterminator="\n")
+    out_df.to_csv(csv_path, index=False, float_format=float_format, na_rep="", lineterminator="\n")
     return csv_path, diagnostics
 
 

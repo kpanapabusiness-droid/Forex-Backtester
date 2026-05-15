@@ -6,6 +6,7 @@ p30, p40, p50, p60, p70, p80, p90, p95, p99, max, plus n and n_nan.
 The CSV format is two rows: header + values. Histogram CSV is optional via
 `include_hist`; bins are 50 equal-width by default.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -16,9 +17,7 @@ import pandas as pd
 
 PERCENTILES: List[int] = [1, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 99]
 DIST_COLUMNS: List[str] = (
-    ["n", "n_nan", "mean", "std", "skew", "kurt", "min"]
-    + [f"p{p}" for p in PERCENTILES]
-    + ["max"]
+    ["n", "n_nan", "mean", "std", "skew", "kurt", "min"] + [f"p{p}" for p in PERCENTILES] + ["max"]
 )
 
 
@@ -32,11 +31,11 @@ def _skew_kurt(x: np.ndarray) -> tuple[float, float]:
     var = float(x.var(ddof=0))
     if var <= 0:
         return (0.0, -3.0)
-    sd = var ** 0.5
+    sd = var**0.5
     m3 = float(((x - mu) ** 3).mean())
     m4 = float(((x - mu) ** 4).mean())
-    skew = m3 / (sd ** 3)
-    ex_kurt = m4 / (var ** 2) - 3.0
+    skew = m3 / (sd**3)
+    ex_kurt = m4 / (var**2) - 3.0
     return (skew, ex_kurt)
 
 
@@ -73,8 +72,9 @@ def describe_distribution(values: Iterable[float], *, name: str) -> pd.DataFrame
     return pd.DataFrame([row], index=[name])[DIST_COLUMNS]
 
 
-def histogram_csv(values: Iterable[float], *, bins: int = 50,
-                  bin_range: Optional[tuple[float, float]] = None) -> pd.DataFrame:
+def histogram_csv(
+    values: Iterable[float], *, bins: int = 50, bin_range: Optional[tuple[float, float]] = None
+) -> pd.DataFrame:
     arr = np.asarray(list(values), dtype=float)
     finite = arr[np.isfinite(arr)]
     if finite.size == 0:
@@ -84,18 +84,25 @@ def histogram_csv(values: Iterable[float], *, bins: int = 50,
     if bin_range[1] <= bin_range[0]:
         bin_range = (bin_range[0], bin_range[0] + 1e-9)
     counts, edges = np.histogram(finite, bins=bins, range=bin_range)
-    return pd.DataFrame({
-        "bin_left": edges[:-1],
-        "bin_right": edges[1:],
-        "count": counts.astype(np.int64),
-    })
+    return pd.DataFrame(
+        {
+            "bin_left": edges[:-1],
+            "bin_right": edges[1:],
+            "count": counts.astype(np.int64),
+        }
+    )
 
 
-def write_distribution(values: Iterable[float], out_path: Path, *,
-                       metric_name: str, degenerate: bool = False,
-                       degenerate_reason: str = "",
-                       bins: int = 50,
-                       hist_path: Optional[Path] = None) -> None:
+def write_distribution(
+    values: Iterable[float],
+    out_path: Path,
+    *,
+    metric_name: str,
+    degenerate: bool = False,
+    degenerate_reason: str = "",
+    bins: int = 50,
+    hist_path: Optional[Path] = None,
+) -> None:
     """Write a metric's full distribution to CSV. Optionally write a histogram CSV.
 
     For degenerate metrics, the distribution CSV is still emitted with a header
@@ -117,8 +124,9 @@ def write_distribution(values: Iterable[float], out_path: Path, *,
         hist.to_csv(hist_path, index=False, lineterminator="\n")
 
 
-def write_per_fold_distribution(df: pd.DataFrame, value_col: str, fold_col: str,
-                                out_path: Path, metric_name: str) -> None:
+def write_per_fold_distribution(
+    df: pd.DataFrame, value_col: str, fold_col: str, out_path: Path, metric_name: str
+) -> None:
     """Write per-fold distributions (op spec §11.3)."""
     out_path.parent.mkdir(parents=True, exist_ok=True)
     rows: List[pd.DataFrame] = []

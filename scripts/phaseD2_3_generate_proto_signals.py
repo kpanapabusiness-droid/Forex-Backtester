@@ -95,11 +95,13 @@ def _build_spine(df: pd.DataFrame) -> pd.DataFrame:
     rows = []
     for _, row in df.iterrows():
         for direction in DIRECTIONS:
-            rows.append({
-                "pair": row["pair"],
-                "date": row["date"],
-                "direction": direction,
-            })
+            rows.append(
+                {
+                    "pair": row["pair"],
+                    "date": row["date"],
+                    "direction": direction,
+                }
+            )
     return pd.DataFrame(rows)
 
 
@@ -149,9 +151,7 @@ def _generate_proto_comp_low_atrp_breakout_up(
     breakout = (out["breakout_up_20"].fillna(0) == 1).to_numpy()
     atrp_ok = out["atrp_low"].fillna(False).to_numpy()
     long_mask = (out["direction"] == "long").to_numpy()
-    out["signal"] = np.where(
-        long_mask & atrp_ok & breakout, 1, 0
-    ).astype(int)
+    out["signal"] = np.where(long_mask & atrp_ok & breakout, 1, 0).astype(int)
     out["signal_name"] = "proto_comp_low_atrp_breakout_up"
     return out[["pair", "date", "direction", "signal", "signal_name"]]
 
@@ -170,9 +170,7 @@ def _generate_proto_comp_low_atrp_breakout_dn(
     breakout = (out["breakout_dn_20"].fillna(0) == 1).to_numpy()
     atrp_ok = out["atrp_low"].fillna(False).to_numpy()
     short_mask = (out["direction"] == "short").to_numpy()
-    out["signal"] = np.where(
-        short_mask & atrp_ok & breakout, 1, 0
-    ).astype(int)
+    out["signal"] = np.where(short_mask & atrp_ok & breakout, 1, 0).astype(int)
     out["signal_name"] = "proto_comp_low_atrp_breakout_dn"
     return out[["pair", "date", "direction", "signal", "signal_name"]]
 
@@ -185,22 +183,16 @@ def _generate_proto_comp_low_atrp_ignite_high_tr(
 ) -> pd.DataFrame:
     """Both directions fire when atrp low AND true_range high."""
     out = spine.merge(
-        features[["pair", "date"]].assign(
-            atrp_low=atrp_low, tr_high=tr_high
-        ),
+        features[["pair", "date"]].assign(atrp_low=atrp_low, tr_high=tr_high),
         on=["pair", "date"],
         how="left",
     )
-    out["signal"] = (
-        out["atrp_low"].fillna(False) & out["tr_high"].fillna(False)
-    ).astype(int)
+    out["signal"] = (out["atrp_low"].fillna(False) & out["tr_high"].fillna(False)).astype(int)
     out["signal_name"] = "proto_comp_low_atrp_ignite_high_tr"
     return out[["pair", "date", "direction", "signal", "signal_name"]]
 
 
-def _discovery_percentile_threshold(
-    df: pd.DataFrame, feature: str, q: float = 0.70
-) -> float:
+def _discovery_percentile_threshold(df: pd.DataFrame, feature: str, q: float = 0.70) -> float:
     """Compute percentile threshold from discovery split only. Freeze for validation."""
     disc = df[df["dataset_split"] == "discovery"]
     vals = disc[feature].dropna()
@@ -347,20 +339,20 @@ def _run_from_config(config_path: Path) -> None:
         "compression_atrp_low_breakout_dn": lambda: _generate_proto_comp_low_atrp_breakout_dn(
             spine, df, atrp_low
         ),
-        "compression_atrp_low_ignition_tr_high": lambda: _generate_proto_comp_low_atrp_ignite_high_tr(
-            spine, df, atrp_low, tr_high
+        "compression_atrp_low_ignition_tr_high": lambda: (
+            _generate_proto_comp_low_atrp_ignite_high_tr(spine, df, atrp_low, tr_high)
         ),
-        "compression_atrp_low_pos_pressure_up": lambda: _generate_proto_comp_atrp_low_pos_pressure_up(
-            spine, df, atrp_low
+        "compression_atrp_low_pos_pressure_up": lambda: (
+            _generate_proto_comp_atrp_low_pos_pressure_up(spine, df, atrp_low)
         ),
         "compression_atrp_low_tr_mid_high": lambda: _generate_proto_comp_atrp_low_tr_mid_high(
             spine, df, atrp_low, tr_70th
         ),
-        "compression_atrp_low_tr_atr_ratio_high": lambda: _generate_proto_comp_atrp_low_tr_atr_ratio_high(
-            spine, df, atrp_low, tr_atr_70th
+        "compression_atrp_low_tr_atr_ratio_high": lambda: (
+            _generate_proto_comp_atrp_low_tr_atr_ratio_high(spine, df, atrp_low, tr_atr_70th)
         ),
-        "compression_atrp_low_slope_alignment": lambda: _generate_proto_comp_atrp_low_slope_alignment(
-            spine, df, atrp_low
+        "compression_atrp_low_slope_alignment": lambda: (
+            _generate_proto_comp_atrp_low_slope_alignment(spine, df, atrp_low)
         ),
     }
 
@@ -385,9 +377,9 @@ def _run_from_config(config_path: Path) -> None:
     combined["direction"] = pd.Categorical(
         combined["direction"], categories=list(DIRECTIONS), ordered=True
     )
-    combined = combined.sort_values(
-        ["pair", "date", "direction", "signal_name"]
-    ).reset_index(drop=True)
+    combined = combined.sort_values(["pair", "date", "direction", "signal_name"]).reset_index(
+        drop=True
+    )
     combined = combined[["pair", "date", "direction", "signal", "signal_name"]]
 
     out_dir = Path(cfg["outputs_dir"])

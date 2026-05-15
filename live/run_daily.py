@@ -89,7 +89,9 @@ def _last_bar_signal(
     if engine_df.empty or len(engine_df) < 2:
         return {}
     engine_df = normalize_ohlcv_schema(engine_df.copy())
-    engine_df = engine_df.dropna(subset=["date", "open", "high", "low", "close"]).sort_values("date")
+    engine_df = engine_df.dropna(subset=["date", "open", "high", "low", "close"]).sort_values(
+        "date"
+    )
     engine_df["pair"] = pair
     base = apply_indicators_with_cache(engine_df.copy(), pair, cfg)
     signals_df = apply_signal_logic(base, cfg)
@@ -150,9 +152,7 @@ def run_daily(
     run_id = (cfg.get("output") or {}).get("slug", "live-daily")
     ts_utc = pd.Timestamp.now("UTC")
     timestamp_utc = f"{ts_utc.strftime('%Y-%m-%d %H:%M:%S')} UTC"
-    timestamp_melbourne = (
-        f"{ts_utc.tz_convert('Australia/Melbourne').strftime('%Y-%m-%d %H:%M:%S')} Australia/Melbourne"
-    )
+    timestamp_melbourne = f"{ts_utc.tz_convert('Australia/Melbourne').strftime('%Y-%m-%d %H:%M:%S')} Australia/Melbourne"
     timestamp = ts_utc.strftime("%Y-%m-%d %H:%M:%S")
 
     market_dfs = load_market_tsvs(market_dir)
@@ -168,8 +168,13 @@ def run_daily(
             sym = pair.replace("_", "")[:6]
             per_symbol[sym] = {"action": "HOLD", "reason": "no_market_data"}
         write_daily_summary(
-            out_dir, timestamp_utc, timestamp_melbourne, run_id, per_symbol,
-            closed_d1_date=None, forming_ignored=False,
+            out_dir,
+            timestamp_utc,
+            timestamp_melbourne,
+            run_id,
+            per_symbol,
+            closed_d1_date=None,
+            forming_ignored=False,
         )
         write_orders_csv(out_dir, [], run_id)
         write_actions_csv(out_dir, [], run_id)
@@ -182,9 +187,7 @@ def run_daily(
         pair = symbol_to_config_pair(symbol)
         if pair not in pairs_cfg:
             continue
-        last_signals[symbol] = _last_bar_signal(
-            df, pair, cfg, export_day=export_dates.get(symbol)
-        )
+        last_signals[symbol] = _last_bar_signal(df, pair, cfg, export_day=export_dates.get(symbol))
 
     closed_d1_dates = [
         pd.Timestamp(s["date"]).strftime("%Y-%m-%d")
@@ -278,10 +281,15 @@ def run_daily(
             direction = "long" if direction_int > 0 else "short"
             if not math.isfinite(atr) or atr <= 0:
                 per_symbol[symbol] = {"action": "HOLD", "reason": "invalid_atr"}
-                actions.append({
-                    "date_time": timestamp, "action": "HOLD", "symbol": symbol,
-                    "reason": "invalid_atr", "run_id": run_id,
-                })
+                actions.append(
+                    {
+                        "date_time": timestamp,
+                        "action": "HOLD",
+                        "symbol": symbol,
+                        "reason": "invalid_atr",
+                        "run_id": run_id,
+                    }
+                )
                 continue
             tp1_price = close + direction_int * (tp1_atr * atr)
             sl_price = close - direction_int * (sl_atr * atr)
@@ -292,28 +300,56 @@ def run_daily(
                 "sl_price": sl_price,
                 "tp1_price": tp1_price,
             }
-            date_str = pd.to_datetime(date_val).strftime("%Y-%m-%d %H:%M:%S") if date_val else timestamp
-            orders.append({
-                "date_time": date_str, "symbol": symbol, "direction": direction,
-                "risk_pct": RISK_PCT_PER_ORDER, "sl_price": sl_price, "tp_price": tp1_price,
-                "tag": "TP1", "run_id": run_id,
-            })
-            orders.append({
-                "date_time": date_str, "symbol": symbol, "direction": direction,
-                "risk_pct": RISK_PCT_PER_ORDER, "sl_price": sl_price, "tp_price": "",
-                "tag": "RUNNER", "run_id": run_id,
-            })
+            date_str = (
+                pd.to_datetime(date_val).strftime("%Y-%m-%d %H:%M:%S") if date_val else timestamp
+            )
+            orders.append(
+                {
+                    "date_time": date_str,
+                    "symbol": symbol,
+                    "direction": direction,
+                    "risk_pct": RISK_PCT_PER_ORDER,
+                    "sl_price": sl_price,
+                    "tp_price": tp1_price,
+                    "tag": "TP1",
+                    "run_id": run_id,
+                }
+            )
+            orders.append(
+                {
+                    "date_time": date_str,
+                    "symbol": symbol,
+                    "direction": direction,
+                    "risk_pct": RISK_PCT_PER_ORDER,
+                    "sl_price": sl_price,
+                    "tp_price": "",
+                    "tag": "RUNNER",
+                    "run_id": run_id,
+                }
+            )
             signal_id = f"{symbol}_{direction}_{pd.to_datetime(date_val).strftime('%Y%m%d')}"
-            ledger_rows.append({
-                "signal_id": signal_id, "run_id": run_id, "date_time_decision": date_str,
-                "symbol": symbol, "direction": direction,
-                "sl_price": sl_price, "tp1_price": tp1_price,
-                "tp1_ticket": "", "runner_ticket": "",
-                "entry_price_tp1": "", "entry_price_runner": "",
-                "entry_time": "", "exit_time_tp1": "", "exit_time_runner": "",
-                "exit_price_tp1": "", "exit_price_runner": "",
-                "status": "open", "reason": "approved",
-            })
+            ledger_rows.append(
+                {
+                    "signal_id": signal_id,
+                    "run_id": run_id,
+                    "date_time_decision": date_str,
+                    "symbol": symbol,
+                    "direction": direction,
+                    "sl_price": sl_price,
+                    "tp1_price": tp1_price,
+                    "tp1_ticket": "",
+                    "runner_ticket": "",
+                    "entry_price_tp1": "",
+                    "entry_price_runner": "",
+                    "entry_time": "",
+                    "exit_time_tp1": "",
+                    "exit_time_runner": "",
+                    "exit_price_tp1": "",
+                    "exit_price_runner": "",
+                    "status": "open",
+                    "reason": "approved",
+                }
+            )
             daily_positions.append(
                 {
                     "symbol": symbol,
@@ -328,10 +364,15 @@ def run_daily(
             )
         elif symbol in skipped:
             per_symbol[symbol] = {"action": "SKIP", "reason": skipped[symbol]}
-            actions.append({
-                "date_time": timestamp, "action": "SKIP", "symbol": symbol,
-                "reason": skipped[symbol], "run_id": run_id,
-            })
+            actions.append(
+                {
+                    "date_time": timestamp,
+                    "action": "SKIP",
+                    "symbol": symbol,
+                    "reason": skipped[symbol],
+                    "run_id": run_id,
+                }
+            )
             daily_positions.append(
                 {
                     "symbol": symbol,
@@ -345,10 +386,15 @@ def run_daily(
             )
         else:
             per_symbol[symbol] = {"action": "HOLD", "reason": "no_signal"}
-            actions.append({
-                "date_time": timestamp, "action": "HOLD", "symbol": symbol,
-                "reason": "no_signal", "run_id": run_id,
-            })
+            actions.append(
+                {
+                    "date_time": timestamp,
+                    "action": "HOLD",
+                    "symbol": symbol,
+                    "reason": "no_signal",
+                    "run_id": run_id,
+                }
+            )
             daily_positions.append(
                 {
                     "symbol": symbol,
@@ -377,8 +423,13 @@ def run_daily(
             )
 
     write_daily_summary(
-        out_dir, timestamp_utc, timestamp_melbourne, run_id, per_symbol,
-        closed_d1_date=closed_d1_date, forming_ignored=forming_ignored,
+        out_dir,
+        timestamp_utc,
+        timestamp_melbourne,
+        run_id,
+        per_symbol,
+        closed_d1_date=closed_d1_date,
+        forming_ignored=forming_ignored,
     )
     write_orders_csv(out_dir, orders, run_id)
     write_actions_csv(out_dir, actions, run_id)

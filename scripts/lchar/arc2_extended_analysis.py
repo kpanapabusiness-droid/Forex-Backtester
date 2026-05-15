@@ -50,7 +50,14 @@ MAE_THRESHOLDS_R: Tuple[float, ...] = (-0.1, -0.25, -0.5, -0.75, -0.9)
 
 # Block E bar bins.
 BAR_BINS: Tuple[Tuple[int, int], ...] = (
-    (1, 5), (6, 10), (11, 20), (21, 40), (41, 60), (61, 80), (81, 100), (101, 120),
+    (1, 5),
+    (6, 10),
+    (11, 20),
+    (21, 40),
+    (41, 60),
+    (61, 80),
+    (81, 100),
+    (101, 120),
 )
 
 # Forbidden patterns per §6 (case-insensitive grep on combined report body).
@@ -84,8 +91,8 @@ def _sha256(path: Path) -> str:
 def _quantiles(arr: np.ndarray, qs: Tuple[float, ...]) -> Dict[str, float]:
     arr = arr[np.isfinite(arr)]
     if arr.size == 0:
-        return {f"q{int(q*100):02d}": float("nan") for q in qs}
-    return {f"q{int(q*100):02d}": float(np.quantile(arr, q)) for q in qs}
+        return {f"q{int(q * 100):02d}": float("nan") for q in qs}
+    return {f"q{int(q * 100):02d}": float(np.quantile(arr, q)) for q in qs}
 
 
 def _stats_row(arr: np.ndarray, return_max: bool = True) -> Dict[str, float]:
@@ -128,21 +135,38 @@ def _load_input(input_csv: Path) -> pd.DataFrame:
     df = pd.read_csv(input_csv)
     # Verify columns + counts.
     required = (
-        ["pair", "time", "fold_id", "taken", "exit_reason", "R", "held_bars",
-         "mfe_R", "mae_R", "gross_r", "spread_cost_r"]
+        [
+            "pair",
+            "time",
+            "fold_id",
+            "taken",
+            "exit_reason",
+            "R",
+            "held_bars",
+            "mfe_R",
+            "mae_R",
+            "gross_r",
+            "spread_cost_r",
+        ]
         + [f"fwd_mfe_h{h}_atr" for h in HORIZON_SNAPSHOTS]
         + [f"fwd_mae_h{h}_atr" for h in HORIZON_SNAPSHOTS]
-        + ["bars_to_plus_1atr_capped_240h", "bars_to_plus_2atr_capped_240h",
-           "bars_to_minus_1atr_capped_240h", "bars_to_minus_2atr_capped_240h",
-           "forward_horizon_clamped_at_bar",
-           "session", "pre_momentum_label", "atr_1h_regime_bin"]
+        + [
+            "bars_to_plus_1atr_capped_240h",
+            "bars_to_plus_2atr_capped_240h",
+            "bars_to_minus_1atr_capped_240h",
+            "bars_to_minus_2atr_capped_240h",
+            "forward_horizon_clamped_at_bar",
+            "session",
+            "pre_momentum_label",
+            "atr_1h_regime_bin",
+        ]
     )
     missing = [c for c in required if c not in df.columns]
     if missing:
         raise RuntimeError(f"[Gate 3] HALT — required columns missing: {missing}")
     if len(df) != EXPECTED_TOTAL:
         raise RuntimeError(f"[Gate 2] HALT — total rows={len(df)} (expected {EXPECTED_TOTAL})")
-    taken_n = int((df["taken"] == True).sum())
+    taken_n = int((df["taken"]).sum())
     if taken_n != EXPECTED_TAKEN:
         raise RuntimeError(f"[Gate 2] HALT — taken rows={taken_n} (expected {EXPECTED_TAKEN})")
     return df
@@ -168,7 +192,22 @@ def _block_a(taken: pd.DataFrame, out_dir: Path) -> Dict[str, Any]:
         is_mfe = col == "mfe_R"
         st = _stats_row(arr, return_max=is_mfe)
         rows.append({"cell": label, **st})
-    cols = ["cell", "n", "mean", "std", "q01", "q05", "q10", "q25", "q50", "q75", "q90", "q95", "q99", "min_or_max"]
+    cols = [
+        "cell",
+        "n",
+        "mean",
+        "std",
+        "q01",
+        "q05",
+        "q10",
+        "q25",
+        "q50",
+        "q75",
+        "q90",
+        "q95",
+        "q99",
+        "min_or_max",
+    ]
     _write_csv(out_dir / "block_A_excursion_marginals.csv", rows, cols)
 
     # Gate 4: conditional rows should sum to 3985 (excluding 8 data_end).
@@ -187,7 +226,9 @@ def _block_a(taken: pd.DataFrame, out_dir: Path) -> Dict[str, Any]:
         "sl_mfe": rows[2],
         "te_mae": rows[5],
         "all_n": rows[0]["n"],
-        "sl_n": sl_n, "te_n": te_n, "de_n": de_n,
+        "sl_n": sl_n,
+        "te_n": te_n,
+        "de_n": de_n,
     }
 
 
@@ -219,34 +260,51 @@ def _block_b_level(
     taken: pd.DataFrame, level_name: str, col_plus: str, col_minus: str
 ) -> List[Dict[str, Any]]:
     pat = np.array(
-        [_classify_path(int(t_up), int(t_dn))
-         for t_up, t_dn in zip(taken[col_plus], taken[col_minus])]
+        [
+            _classify_path(int(t_up), int(t_dn))
+            for t_up, t_dn in zip(taken[col_plus], taken[col_minus])
+        ]
     )
     rows: List[Dict[str, Any]] = []
-    for cell in ("reached_up_only", "reached_down_only", "up_then_down",
-                 "down_then_up", "simultaneous", "neither"):
+    for cell in (
+        "reached_up_only",
+        "reached_down_only",
+        "up_then_down",
+        "down_then_up",
+        "simultaneous",
+        "neither",
+    ):
         mask = pat == cell
         sub = taken[mask]
         n = int(mask.sum())
         if n == 0:
-            rows.append({
-                "path_pattern": cell, "n": 0, "pct_of_taken": 0.0,
-                "mean_R": float("nan"), "median_R": float("nan"),
-                "sl_hit_rate": float("nan"), "time_exit_rate": float("nan"),
-                "mean_mfe_R": float("nan"), "mean_mae_R": float("nan"),
-            })
+            rows.append(
+                {
+                    "path_pattern": cell,
+                    "n": 0,
+                    "pct_of_taken": 0.0,
+                    "mean_R": float("nan"),
+                    "median_R": float("nan"),
+                    "sl_hit_rate": float("nan"),
+                    "time_exit_rate": float("nan"),
+                    "mean_mfe_R": float("nan"),
+                    "mean_mae_R": float("nan"),
+                }
+            )
             continue
-        rows.append({
-            "path_pattern": cell,
-            "n": n,
-            "pct_of_taken": round(100.0 * n / EXPECTED_TAKEN, 6),
-            "mean_R": round(float(sub["R"].mean()), 6),
-            "median_R": round(float(sub["R"].median()), 6),
-            "sl_hit_rate": round(float((sub["exit_reason"] == "stop_loss").mean()), 6),
-            "time_exit_rate": round(float((sub["exit_reason"] == "time_exit").mean()), 6),
-            "mean_mfe_R": round(float(sub["mfe_R"].mean()), 6),
-            "mean_mae_R": round(float(sub["mae_R"].mean()), 6),
-        })
+        rows.append(
+            {
+                "path_pattern": cell,
+                "n": n,
+                "pct_of_taken": round(100.0 * n / EXPECTED_TAKEN, 6),
+                "mean_R": round(float(sub["R"].mean()), 6),
+                "median_R": round(float(sub["R"].median()), 6),
+                "sl_hit_rate": round(float((sub["exit_reason"] == "stop_loss").mean()), 6),
+                "time_exit_rate": round(float((sub["exit_reason"] == "time_exit").mean()), 6),
+                "mean_mfe_R": round(float(sub["mfe_R"].mean()), 6),
+                "mean_mae_R": round(float(sub["mae_R"].mean()), 6),
+            }
+        )
     return rows
 
 
@@ -257,8 +315,17 @@ def _block_b(taken: pd.DataFrame, out_dir: Path) -> Dict[str, Any]:
     rows_1r = _block_b_level(
         taken, "1R", "bars_to_plus_2atr_capped_240h", "bars_to_minus_2atr_capped_240h"
     )
-    cols = ["path_pattern", "n", "pct_of_taken", "mean_R", "median_R",
-            "sl_hit_rate", "time_exit_rate", "mean_mfe_R", "mean_mae_R"]
+    cols = [
+        "path_pattern",
+        "n",
+        "pct_of_taken",
+        "mean_R",
+        "median_R",
+        "sl_hit_rate",
+        "time_exit_rate",
+        "mean_mfe_R",
+        "mean_mae_R",
+    ]
     _write_csv(out_dir / "block_B_path_patterns_0p5R.csv", rows_0p5, cols)
     _write_csv(out_dir / "block_B_path_patterns_1R.csv", rows_1r, cols)
 
@@ -273,9 +340,12 @@ def _block_b(taken: pd.DataFrame, out_dir: Path) -> Dict[str, Any]:
     # Gate 6: SL-hit trades at 1R level fall only into down-class or simultaneous.
     sl = taken[taken["exit_reason"] == "stop_loss"]
     sl_pats = np.array(
-        [_classify_path(int(t_up), int(t_dn))
-         for t_up, t_dn in zip(sl["bars_to_plus_2atr_capped_240h"],
-                                sl["bars_to_minus_2atr_capped_240h"])]
+        [
+            _classify_path(int(t_up), int(t_dn))
+            for t_up, t_dn in zip(
+                sl["bars_to_plus_2atr_capped_240h"], sl["bars_to_minus_2atr_capped_240h"]
+            )
+        ]
     )
     forbidden_for_sl = {"reached_up_only", "neither"}
     bad = int(np.isin(sl_pats, list(forbidden_for_sl)).sum())
@@ -296,47 +366,71 @@ def _block_b(taken: pd.DataFrame, out_dir: Path) -> Dict[str, Any]:
 # --------------------------------------------------------------------------- #
 
 
-def _block_c(taken: pd.DataFrame, out_dir: Path,
-             thresholds: Tuple[float, ...] = MFE_THRESHOLDS_R) -> Dict[str, Any]:
+def _block_c(
+    taken: pd.DataFrame, out_dir: Path, thresholds: Tuple[float, ...] = MFE_THRESHOLDS_R
+) -> Dict[str, Any]:
     rows: List[Dict[str, Any]] = []
     prev_n: int = EXPECTED_TAKEN + 1
     for thr in thresholds:
         sub = taken[taken["mfe_R"] >= thr]
         n = len(sub)
         if n == 0:
-            rows.append({
-                "mfe_threshold_R": thr, "n_survivors": 0, "pct_of_taken": 0.0,
-                "mean_R": float("nan"), "std_R": float("nan"),
-                "q05_R": float("nan"), "q25_R": float("nan"), "q50_R": float("nan"),
-                "q75_R": float("nan"), "q95_R": float("nan"),
-                "sl_hit_rate": float("nan"), "time_exit_rate": float("nan"),
-                "mean_gross_r": float("nan"),
-            })
+            rows.append(
+                {
+                    "mfe_threshold_R": thr,
+                    "n_survivors": 0,
+                    "pct_of_taken": 0.0,
+                    "mean_R": float("nan"),
+                    "std_R": float("nan"),
+                    "q05_R": float("nan"),
+                    "q25_R": float("nan"),
+                    "q50_R": float("nan"),
+                    "q75_R": float("nan"),
+                    "q95_R": float("nan"),
+                    "sl_hit_rate": float("nan"),
+                    "time_exit_rate": float("nan"),
+                    "mean_gross_r": float("nan"),
+                }
+            )
         else:
             r_arr = sub["R"].to_numpy(dtype=float)
-            rows.append({
-                "mfe_threshold_R": thr,
-                "n_survivors": n,
-                "pct_of_taken": round(100.0 * n / EXPECTED_TAKEN, 6),
-                "mean_R": round(float(np.mean(r_arr)), 6),
-                "std_R": round(float(np.std(r_arr, ddof=1)) if n > 1 else 0.0, 6),
-                "q05_R": round(float(np.quantile(r_arr, 0.05)), 6),
-                "q25_R": round(float(np.quantile(r_arr, 0.25)), 6),
-                "q50_R": round(float(np.quantile(r_arr, 0.50)), 6),
-                "q75_R": round(float(np.quantile(r_arr, 0.75)), 6),
-                "q95_R": round(float(np.quantile(r_arr, 0.95)), 6),
-                "sl_hit_rate": round(float((sub["exit_reason"] == "stop_loss").mean()), 6),
-                "time_exit_rate": round(float((sub["exit_reason"] == "time_exit").mean()), 6),
-                "mean_gross_r": round(float(sub["gross_r"].mean()), 6),
-            })
+            rows.append(
+                {
+                    "mfe_threshold_R": thr,
+                    "n_survivors": n,
+                    "pct_of_taken": round(100.0 * n / EXPECTED_TAKEN, 6),
+                    "mean_R": round(float(np.mean(r_arr)), 6),
+                    "std_R": round(float(np.std(r_arr, ddof=1)) if n > 1 else 0.0, 6),
+                    "q05_R": round(float(np.quantile(r_arr, 0.05)), 6),
+                    "q25_R": round(float(np.quantile(r_arr, 0.25)), 6),
+                    "q50_R": round(float(np.quantile(r_arr, 0.50)), 6),
+                    "q75_R": round(float(np.quantile(r_arr, 0.75)), 6),
+                    "q95_R": round(float(np.quantile(r_arr, 0.95)), 6),
+                    "sl_hit_rate": round(float((sub["exit_reason"] == "stop_loss").mean()), 6),
+                    "time_exit_rate": round(float((sub["exit_reason"] == "time_exit").mean()), 6),
+                    "mean_gross_r": round(float(sub["gross_r"].mean()), 6),
+                }
+            )
         if n > prev_n:
             raise RuntimeError(
                 f"[Gate 7] HALT — Block C n_survivors non-monotone: thr={thr} n={n} > prev_n={prev_n}"
             )
         prev_n = n
-    cols = ["mfe_threshold_R", "n_survivors", "pct_of_taken", "mean_R", "std_R",
-            "q05_R", "q25_R", "q50_R", "q75_R", "q95_R",
-            "sl_hit_rate", "time_exit_rate", "mean_gross_r"]
+    cols = [
+        "mfe_threshold_R",
+        "n_survivors",
+        "pct_of_taken",
+        "mean_R",
+        "std_R",
+        "q05_R",
+        "q25_R",
+        "q50_R",
+        "q75_R",
+        "q95_R",
+        "sl_hit_rate",
+        "time_exit_rate",
+        "mean_gross_r",
+    ]
     _write_csv(out_dir / "block_C_mfe_thresholded_survivors.csv", rows, cols)
     return {"rows": rows}
 
@@ -353,61 +447,106 @@ def _block_d(taken: pd.DataFrame, out_dir: Path) -> Dict[str, Any]:
     arr = non_sl["mae_R"].to_numpy(dtype=float)
     arr = arr[np.isfinite(arr)]
     if arr.size > 0:
-        rows.append({
-            "section": "full_distribution",
-            "threshold_R": "",
-            "n": int(arr.size),
-            "mean_R": round(float(np.mean(arr)), 6),
-            "std_R": round(float(np.std(arr, ddof=1)), 6),
-            "q01_R": round(float(np.quantile(arr, 0.01)), 6),
-            "q05_R": round(float(np.quantile(arr, 0.05)), 6),
-            "q10_R": round(float(np.quantile(arr, 0.10)), 6),
-            "q25_R": round(float(np.quantile(arr, 0.25)), 6),
-            "q50_R": round(float(np.quantile(arr, 0.50)), 6),
-            "q75_R": round(float(np.quantile(arr, 0.75)), 6),
-            "q90_R": round(float(np.quantile(arr, 0.90)), 6),
-            "q95_R": round(float(np.quantile(arr, 0.95)), 6),
-            "q99_R": round(float(np.quantile(arr, 0.99)), 6),
-            "min_R": round(float(np.min(arr)), 6),
-            "mean_R_in_subset": "",
-            "q25_R_in_subset": "",
-            "q50_R_in_subset": "",
-            "q75_R_in_subset": "",
-            "mean_mfe_R_in_subset": "",
-        })
+        rows.append(
+            {
+                "section": "full_distribution",
+                "threshold_R": "",
+                "n": int(arr.size),
+                "mean_R": round(float(np.mean(arr)), 6),
+                "std_R": round(float(np.std(arr, ddof=1)), 6),
+                "q01_R": round(float(np.quantile(arr, 0.01)), 6),
+                "q05_R": round(float(np.quantile(arr, 0.05)), 6),
+                "q10_R": round(float(np.quantile(arr, 0.10)), 6),
+                "q25_R": round(float(np.quantile(arr, 0.25)), 6),
+                "q50_R": round(float(np.quantile(arr, 0.50)), 6),
+                "q75_R": round(float(np.quantile(arr, 0.75)), 6),
+                "q90_R": round(float(np.quantile(arr, 0.90)), 6),
+                "q95_R": round(float(np.quantile(arr, 0.95)), 6),
+                "q99_R": round(float(np.quantile(arr, 0.99)), 6),
+                "min_R": round(float(np.min(arr)), 6),
+                "mean_R_in_subset": "",
+                "q25_R_in_subset": "",
+                "q50_R_in_subset": "",
+                "q75_R_in_subset": "",
+                "mean_mfe_R_in_subset": "",
+            }
+        )
     # Per-threshold rows.
     for thr in MAE_THRESHOLDS_R:
         sub = non_sl[non_sl["mae_R"] <= thr]
         n = len(sub)
         if n == 0:
-            rows.append({
-                "section": "thresholded", "threshold_R": thr, "n": 0,
-                "mean_R": "", "std_R": "", "q01_R": "", "q05_R": "", "q10_R": "",
-                "q25_R": "", "q50_R": "", "q75_R": "", "q90_R": "", "q95_R": "", "q99_R": "", "min_R": "",
-                "mean_R_in_subset": float("nan"),
-                "q25_R_in_subset": float("nan"),
-                "q50_R_in_subset": float("nan"),
-                "q75_R_in_subset": float("nan"),
-                "mean_mfe_R_in_subset": float("nan"),
-            })
+            rows.append(
+                {
+                    "section": "thresholded",
+                    "threshold_R": thr,
+                    "n": 0,
+                    "mean_R": "",
+                    "std_R": "",
+                    "q01_R": "",
+                    "q05_R": "",
+                    "q10_R": "",
+                    "q25_R": "",
+                    "q50_R": "",
+                    "q75_R": "",
+                    "q90_R": "",
+                    "q95_R": "",
+                    "q99_R": "",
+                    "min_R": "",
+                    "mean_R_in_subset": float("nan"),
+                    "q25_R_in_subset": float("nan"),
+                    "q50_R_in_subset": float("nan"),
+                    "q75_R_in_subset": float("nan"),
+                    "mean_mfe_R_in_subset": float("nan"),
+                }
+            )
         else:
-            rows.append({
-                "section": "thresholded",
-                "threshold_R": thr,
-                "n": n,
-                "mean_R": "", "std_R": "", "q01_R": "", "q05_R": "", "q10_R": "",
-                "q25_R": "", "q50_R": "", "q75_R": "", "q90_R": "", "q95_R": "", "q99_R": "", "min_R": "",
-                "mean_R_in_subset": round(float(sub["R"].mean()), 6),
-                "q25_R_in_subset": round(float(sub["R"].quantile(0.25)), 6),
-                "q50_R_in_subset": round(float(sub["R"].quantile(0.50)), 6),
-                "q75_R_in_subset": round(float(sub["R"].quantile(0.75)), 6),
-                "mean_mfe_R_in_subset": round(float(sub["mfe_R"].mean()), 6),
-            })
-    cols = ["section", "threshold_R", "n",
-            "mean_R", "std_R", "q01_R", "q05_R", "q10_R", "q25_R", "q50_R", "q75_R",
-            "q90_R", "q95_R", "q99_R", "min_R",
-            "mean_R_in_subset", "q25_R_in_subset", "q50_R_in_subset",
-            "q75_R_in_subset", "mean_mfe_R_in_subset"]
+            rows.append(
+                {
+                    "section": "thresholded",
+                    "threshold_R": thr,
+                    "n": n,
+                    "mean_R": "",
+                    "std_R": "",
+                    "q01_R": "",
+                    "q05_R": "",
+                    "q10_R": "",
+                    "q25_R": "",
+                    "q50_R": "",
+                    "q75_R": "",
+                    "q90_R": "",
+                    "q95_R": "",
+                    "q99_R": "",
+                    "min_R": "",
+                    "mean_R_in_subset": round(float(sub["R"].mean()), 6),
+                    "q25_R_in_subset": round(float(sub["R"].quantile(0.25)), 6),
+                    "q50_R_in_subset": round(float(sub["R"].quantile(0.50)), 6),
+                    "q75_R_in_subset": round(float(sub["R"].quantile(0.75)), 6),
+                    "mean_mfe_R_in_subset": round(float(sub["mfe_R"].mean()), 6),
+                }
+            )
+    cols = [
+        "section",
+        "threshold_R",
+        "n",
+        "mean_R",
+        "std_R",
+        "q01_R",
+        "q05_R",
+        "q10_R",
+        "q25_R",
+        "q50_R",
+        "q75_R",
+        "q90_R",
+        "q95_R",
+        "q99_R",
+        "min_R",
+        "mean_R_in_subset",
+        "q25_R_in_subset",
+        "q50_R_in_subset",
+        "q75_R_in_subset",
+        "mean_mfe_R_in_subset",
+    ]
     _write_csv(out_dir / "block_D_mae_nonSL.csv", rows, cols)
     return {"rows": rows, "non_sl_n": int(len(non_sl))}
 
@@ -433,21 +572,25 @@ def _block_e(taken: pd.DataFrame, out_dir: Path) -> Dict[str, Any]:
         for lo, hi in BAR_BINS:
             mask = (within >= lo) & (within <= hi)
             n = int(mask.sum())
-            rows.append({
-                "event_type": event_type,
-                "bar_bin_lo": lo,
-                "bar_bin_hi": hi,
-                "n": n,
-                "pct_of_taken": round(100.0 * n / EXPECTED_TAKEN, 6),
-            })
+            rows.append(
+                {
+                    "event_type": event_type,
+                    "bar_bin_lo": lo,
+                    "bar_bin_hi": hi,
+                    "n": n,
+                    "pct_of_taken": round(100.0 * n / EXPECTED_TAKEN, 6),
+                }
+            )
         # Summary row appended at end of each event's bins.
-        rows.append({
-            "event_type": event_type,
-            "bar_bin_lo": "not_within_120",
-            "bar_bin_hi": "not_within_120",
-            "n": not_within,
-            "pct_of_taken": round(100.0 * not_within / EXPECTED_TAKEN, 6),
-        })
+        rows.append(
+            {
+                "event_type": event_type,
+                "bar_bin_lo": "not_within_120",
+                "bar_bin_hi": "not_within_120",
+                "n": not_within,
+                "pct_of_taken": round(100.0 * not_within / EXPECTED_TAKEN, 6),
+            }
+        )
         # Stats on within-120 set.
         if within.size > 0:
             summary[event_type] = {
@@ -460,9 +603,12 @@ def _block_e(taken: pd.DataFrame, out_dir: Path) -> Dict[str, Any]:
             }
         else:
             summary[event_type] = {
-                "n_within": 0, "n_not_within": not_within,
-                "mean": float("nan"), "median": float("nan"),
-                "q25": float("nan"), "q75": float("nan"),
+                "n_within": 0,
+                "n_not_within": not_within,
+                "mean": float("nan"),
+                "median": float("nan"),
+                "q25": float("nan"),
+                "q75": float("nan"),
             }
         # Gate 8: filtered+not_within must sum to taken total.
         if int(within.size) + not_within != total:
@@ -499,50 +645,104 @@ def _block_f(taken: pd.DataFrame, out_dir: Path) -> Dict[str, Any]:
             is_mfe = col == "mfe_R"
             st = _stats_row(arr, return_max=is_mfe)
             rows_a.append({"fold_id": fid, "cell": cell, **st})
-    cols_a = ["fold_id", "cell", "n", "mean", "std",
-              "q01", "q05", "q10", "q25", "q50", "q75", "q90", "q95", "q99", "min_or_max"]
+    cols_a = [
+        "fold_id",
+        "cell",
+        "n",
+        "mean",
+        "std",
+        "q01",
+        "q05",
+        "q10",
+        "q25",
+        "q50",
+        "q75",
+        "q90",
+        "q95",
+        "q99",
+        "min_or_max",
+    ]
     _write_csv(out_dir / "block_F_per_fold_A.csv", rows_a, cols_a)
 
     # F-B: path patterns per fold at both levels
-    cols_b = ["fold_id", "path_pattern", "n", "pct_of_fold", "mean_R", "median_R",
-              "sl_hit_rate", "time_exit_rate", "mean_mfe_R", "mean_mae_R"]
+    cols_b = [
+        "fold_id",
+        "path_pattern",
+        "n",
+        "pct_of_fold",
+        "mean_R",
+        "median_R",
+        "sl_hit_rate",
+        "time_exit_rate",
+        "mean_mfe_R",
+        "mean_mae_R",
+    ]
     for level_name, col_p, col_m, fname in [
-        ("0p5R", "bars_to_plus_1atr_capped_240h", "bars_to_minus_1atr_capped_240h",
-         "block_F_per_fold_B_0p5R.csv"),
-        ("1R", "bars_to_plus_2atr_capped_240h", "bars_to_minus_2atr_capped_240h",
-         "block_F_per_fold_B_1R.csv"),
+        (
+            "0p5R",
+            "bars_to_plus_1atr_capped_240h",
+            "bars_to_minus_1atr_capped_240h",
+            "block_F_per_fold_B_0p5R.csv",
+        ),
+        (
+            "1R",
+            "bars_to_plus_2atr_capped_240h",
+            "bars_to_minus_2atr_capped_240h",
+            "block_F_per_fold_B_1R.csv",
+        ),
     ]:
         rows_b: List[Dict[str, Any]] = []
         for fid in folds:
             sub = taken[taken["fold_id"] == fid]
             fold_n = len(sub)
-            pat = np.array([
-                _classify_path(int(t_up), int(t_dn))
-                for t_up, t_dn in zip(sub[col_p], sub[col_m])
-            ])
-            for cell in ("reached_up_only", "reached_down_only", "up_then_down",
-                         "down_then_up", "simultaneous", "neither"):
+            pat = np.array(
+                [_classify_path(int(t_up), int(t_dn)) for t_up, t_dn in zip(sub[col_p], sub[col_m])]
+            )
+            for cell in (
+                "reached_up_only",
+                "reached_down_only",
+                "up_then_down",
+                "down_then_up",
+                "simultaneous",
+                "neither",
+            ):
                 mask = pat == cell
                 cell_sub = sub[mask]
                 n = int(mask.sum())
                 if n == 0:
-                    rows_b.append({
-                        "fold_id": fid, "path_pattern": cell, "n": 0,
-                        "pct_of_fold": 0.0, "mean_R": float("nan"), "median_R": float("nan"),
-                        "sl_hit_rate": float("nan"), "time_exit_rate": float("nan"),
-                        "mean_mfe_R": float("nan"), "mean_mae_R": float("nan"),
-                    })
+                    rows_b.append(
+                        {
+                            "fold_id": fid,
+                            "path_pattern": cell,
+                            "n": 0,
+                            "pct_of_fold": 0.0,
+                            "mean_R": float("nan"),
+                            "median_R": float("nan"),
+                            "sl_hit_rate": float("nan"),
+                            "time_exit_rate": float("nan"),
+                            "mean_mfe_R": float("nan"),
+                            "mean_mae_R": float("nan"),
+                        }
+                    )
                 else:
-                    rows_b.append({
-                        "fold_id": fid, "path_pattern": cell, "n": n,
-                        "pct_of_fold": round(100.0 * n / fold_n, 6) if fold_n > 0 else 0.0,
-                        "mean_R": round(float(cell_sub["R"].mean()), 6),
-                        "median_R": round(float(cell_sub["R"].median()), 6),
-                        "sl_hit_rate": round(float((cell_sub["exit_reason"] == "stop_loss").mean()), 6),
-                        "time_exit_rate": round(float((cell_sub["exit_reason"] == "time_exit").mean()), 6),
-                        "mean_mfe_R": round(float(cell_sub["mfe_R"].mean()), 6),
-                        "mean_mae_R": round(float(cell_sub["mae_R"].mean()), 6),
-                    })
+                    rows_b.append(
+                        {
+                            "fold_id": fid,
+                            "path_pattern": cell,
+                            "n": n,
+                            "pct_of_fold": round(100.0 * n / fold_n, 6) if fold_n > 0 else 0.0,
+                            "mean_R": round(float(cell_sub["R"].mean()), 6),
+                            "median_R": round(float(cell_sub["R"].median()), 6),
+                            "sl_hit_rate": round(
+                                float((cell_sub["exit_reason"] == "stop_loss").mean()), 6
+                            ),
+                            "time_exit_rate": round(
+                                float((cell_sub["exit_reason"] == "time_exit").mean()), 6
+                            ),
+                            "mean_mfe_R": round(float(cell_sub["mfe_R"].mean()), 6),
+                            "mean_mae_R": round(float(cell_sub["mae_R"].mean()), 6),
+                        }
+                    )
         _write_csv(out_dir / fname, rows_b, cols_b)
 
     # F-C: MFE-thresholded survivors per fold
@@ -553,21 +753,40 @@ def _block_f(taken: pd.DataFrame, out_dir: Path) -> Dict[str, Any]:
             survivors = sub[sub["mfe_R"] >= thr]
             n = len(survivors)
             if n == 0:
-                rows_c.append({
-                    "fold_id": fid, "mfe_threshold_R": thr, "n_survivors": 0,
-                    "pct_of_fold": 0.0, "mean_R": float("nan"),
-                    "q50_R": float("nan"), "sl_hit_rate": float("nan"),
-                })
+                rows_c.append(
+                    {
+                        "fold_id": fid,
+                        "mfe_threshold_R": thr,
+                        "n_survivors": 0,
+                        "pct_of_fold": 0.0,
+                        "mean_R": float("nan"),
+                        "q50_R": float("nan"),
+                        "sl_hit_rate": float("nan"),
+                    }
+                )
             else:
-                rows_c.append({
-                    "fold_id": fid, "mfe_threshold_R": thr, "n_survivors": n,
-                    "pct_of_fold": round(100.0 * n / len(sub), 6),
-                    "mean_R": round(float(survivors["R"].mean()), 6),
-                    "q50_R": round(float(survivors["R"].median()), 6),
-                    "sl_hit_rate": round(float((survivors["exit_reason"] == "stop_loss").mean()), 6),
-                })
-    cols_c = ["fold_id", "mfe_threshold_R", "n_survivors", "pct_of_fold",
-              "mean_R", "q50_R", "sl_hit_rate"]
+                rows_c.append(
+                    {
+                        "fold_id": fid,
+                        "mfe_threshold_R": thr,
+                        "n_survivors": n,
+                        "pct_of_fold": round(100.0 * n / len(sub), 6),
+                        "mean_R": round(float(survivors["R"].mean()), 6),
+                        "q50_R": round(float(survivors["R"].median()), 6),
+                        "sl_hit_rate": round(
+                            float((survivors["exit_reason"] == "stop_loss").mean()), 6
+                        ),
+                    }
+                )
+    cols_c = [
+        "fold_id",
+        "mfe_threshold_R",
+        "n_survivors",
+        "pct_of_fold",
+        "mean_R",
+        "q50_R",
+        "sl_hit_rate",
+    ]
     _write_csv(out_dir / "block_F_per_fold_C.csv", rows_c, cols_c)
 
     # F-E: first-passage histograms per fold
@@ -587,17 +806,26 @@ def _block_f(taken: pd.DataFrame, out_dir: Path) -> Dict[str, Any]:
             for lo, hi in BAR_BINS:
                 mask = (within >= lo) & (within <= hi)
                 n = int(mask.sum())
-                rows_e.append({
-                    "fold_id": fid, "event_type": event_type,
-                    "bar_bin_lo": lo, "bar_bin_hi": hi, "n": n,
-                    "pct_of_fold": round(100.0 * n / fold_n, 6) if fold_n > 0 else 0.0,
-                })
-            rows_e.append({
-                "fold_id": fid, "event_type": event_type,
-                "bar_bin_lo": "not_within_120", "bar_bin_hi": "not_within_120",
-                "n": not_within,
-                "pct_of_fold": round(100.0 * not_within / fold_n, 6) if fold_n > 0 else 0.0,
-            })
+                rows_e.append(
+                    {
+                        "fold_id": fid,
+                        "event_type": event_type,
+                        "bar_bin_lo": lo,
+                        "bar_bin_hi": hi,
+                        "n": n,
+                        "pct_of_fold": round(100.0 * n / fold_n, 6) if fold_n > 0 else 0.0,
+                    }
+                )
+            rows_e.append(
+                {
+                    "fold_id": fid,
+                    "event_type": event_type,
+                    "bar_bin_lo": "not_within_120",
+                    "bar_bin_hi": "not_within_120",
+                    "n": not_within,
+                    "pct_of_fold": round(100.0 * not_within / fold_n, 6) if fold_n > 0 else 0.0,
+                }
+            )
     cols_e = ["fold_id", "event_type", "bar_bin_lo", "bar_bin_hi", "n", "pct_of_fold"]
     _write_csv(out_dir / "block_F_per_fold_E.csv", rows_e, cols_e)
 
@@ -627,41 +855,79 @@ def _block_g(taken: pd.DataFrame, out_dir: Path) -> Dict[str, Any]:
                 # Two rows: with clamped + unclamped only.
                 for tag, sub in [
                     ("h=240_all", sub_full),
-                    ("h=240_unclamped",
-                     sub_full[sub_full["forward_horizon_clamped_at_bar"].astype(int) >= 240]),
+                    (
+                        "h=240_unclamped",
+                        sub_full[sub_full["forward_horizon_clamped_at_bar"].astype(int) >= 240],
+                    ),
                 ]:
                     mfe_r = sub[mfe_col].to_numpy(dtype=float) / 2.0
                     mae_r = sub[mae_col].to_numpy(dtype=float) / 2.0
-                    rows.append({
-                        "horizon_h": tag,
-                        "exit_reason": er_label,
-                        "n": int(sub.shape[0]),
-                        "median_mfe_R": round(float(np.median(mfe_r)), 6) if mfe_r.size else float("nan"),
-                        "q25_mfe_R": round(float(np.quantile(mfe_r, 0.25)), 6) if mfe_r.size else float("nan"),
-                        "q75_mfe_R": round(float(np.quantile(mfe_r, 0.75)), 6) if mfe_r.size else float("nan"),
-                        "median_mae_R": round(float(np.median(mae_r)), 6) if mae_r.size else float("nan"),
-                        "q25_mae_R": round(float(np.quantile(mae_r, 0.25)), 6) if mae_r.size else float("nan"),
-                        "q75_mae_R": round(float(np.quantile(mae_r, 0.75)), 6) if mae_r.size else float("nan"),
-                    })
+                    rows.append(
+                        {
+                            "horizon_h": tag,
+                            "exit_reason": er_label,
+                            "n": int(sub.shape[0]),
+                            "median_mfe_R": round(float(np.median(mfe_r)), 6)
+                            if mfe_r.size
+                            else float("nan"),
+                            "q25_mfe_R": round(float(np.quantile(mfe_r, 0.25)), 6)
+                            if mfe_r.size
+                            else float("nan"),
+                            "q75_mfe_R": round(float(np.quantile(mfe_r, 0.75)), 6)
+                            if mfe_r.size
+                            else float("nan"),
+                            "median_mae_R": round(float(np.median(mae_r)), 6)
+                            if mae_r.size
+                            else float("nan"),
+                            "q25_mae_R": round(float(np.quantile(mae_r, 0.25)), 6)
+                            if mae_r.size
+                            else float("nan"),
+                            "q75_mae_R": round(float(np.quantile(mae_r, 0.75)), 6)
+                            if mae_r.size
+                            else float("nan"),
+                        }
+                    )
             else:
                 # For h < 240: exclude trades where clamped_at < h (rare, but document).
                 eligible = sub_full[sub_full["forward_horizon_clamped_at_bar"].astype(int) >= h]
                 mfe_r = eligible[mfe_col].to_numpy(dtype=float) / 2.0
                 mae_r = eligible[mae_col].to_numpy(dtype=float) / 2.0
-                rows.append({
-                    "horizon_h": str(h),
-                    "exit_reason": er_label,
-                    "n": int(eligible.shape[0]),
-                    "median_mfe_R": round(float(np.median(mfe_r)), 6) if mfe_r.size else float("nan"),
-                    "q25_mfe_R": round(float(np.quantile(mfe_r, 0.25)), 6) if mfe_r.size else float("nan"),
-                    "q75_mfe_R": round(float(np.quantile(mfe_r, 0.75)), 6) if mfe_r.size else float("nan"),
-                    "median_mae_R": round(float(np.median(mae_r)), 6) if mae_r.size else float("nan"),
-                    "q25_mae_R": round(float(np.quantile(mae_r, 0.25)), 6) if mae_r.size else float("nan"),
-                    "q75_mae_R": round(float(np.quantile(mae_r, 0.75)), 6) if mae_r.size else float("nan"),
-                })
-    cols = ["horizon_h", "exit_reason", "n",
-            "median_mfe_R", "q25_mfe_R", "q75_mfe_R",
-            "median_mae_R", "q25_mae_R", "q75_mae_R"]
+                rows.append(
+                    {
+                        "horizon_h": str(h),
+                        "exit_reason": er_label,
+                        "n": int(eligible.shape[0]),
+                        "median_mfe_R": round(float(np.median(mfe_r)), 6)
+                        if mfe_r.size
+                        else float("nan"),
+                        "q25_mfe_R": round(float(np.quantile(mfe_r, 0.25)), 6)
+                        if mfe_r.size
+                        else float("nan"),
+                        "q75_mfe_R": round(float(np.quantile(mfe_r, 0.75)), 6)
+                        if mfe_r.size
+                        else float("nan"),
+                        "median_mae_R": round(float(np.median(mae_r)), 6)
+                        if mae_r.size
+                        else float("nan"),
+                        "q25_mae_R": round(float(np.quantile(mae_r, 0.25)), 6)
+                        if mae_r.size
+                        else float("nan"),
+                        "q75_mae_R": round(float(np.quantile(mae_r, 0.75)), 6)
+                        if mae_r.size
+                        else float("nan"),
+                    }
+                )
+    cols = [
+        "horizon_h",
+        "exit_reason",
+        "n",
+        "median_mfe_R",
+        "q25_mfe_R",
+        "q75_mfe_R",
+        "median_mae_R",
+        "q25_mae_R",
+        "q75_mae_R",
+    ]
     _write_csv(out_dir / "block_G_median_path.csv", rows, cols)
     return {"rows": rows, "n_clamped_at_lt_240": n_clamped}
 
@@ -673,7 +939,8 @@ def _block_g(taken: pd.DataFrame, out_dir: Path) -> Dict[str, Any]:
 
 def _fmt_row(stat: Dict[str, Any], cols: Tuple[str, ...]) -> str:
     return " | ".join(
-        f"{stat[c]:.4g}" if isinstance(stat[c], (float, int)) and not isinstance(stat[c], bool)
+        f"{stat[c]:.4g}"
+        if isinstance(stat[c], (float, int)) and not isinstance(stat[c], bool)
         else str(stat[c])
         for c in cols
     )
@@ -707,15 +974,17 @@ def _build_combined_report(
     lines.append("change to Arc 2.")
     lines.append("")
     lines.append(f"- Input CSV sha256: `{input_sha}`")
-    lines.append("- Output files (sha256s in `run_manifest.txt`): "
-                 "`block_A_excursion_marginals.csv`, "
-                 "`block_B_path_patterns_0p5R.csv`, `block_B_path_patterns_1R.csv`, "
-                 "`block_C_mfe_thresholded_survivors.csv`, `block_D_mae_nonSL.csv`, "
-                 "`block_E_first_passage_histograms.csv`, "
-                 "`block_F_per_fold_A.csv`, `block_F_per_fold_B_0p5R.csv`, "
-                 "`block_F_per_fold_B_1R.csv`, `block_F_per_fold_C.csv`, "
-                 "`block_F_per_fold_E.csv`, `block_G_median_path.csv`, "
-                 "`extended_excursion_analysis.md`, `run_manifest.txt`.")
+    lines.append(
+        "- Output files (sha256s in `run_manifest.txt`): "
+        "`block_A_excursion_marginals.csv`, "
+        "`block_B_path_patterns_0p5R.csv`, `block_B_path_patterns_1R.csv`, "
+        "`block_C_mfe_thresholded_survivors.csv`, `block_D_mae_nonSL.csv`, "
+        "`block_E_first_passage_histograms.csv`, "
+        "`block_F_per_fold_A.csv`, `block_F_per_fold_B_0p5R.csv`, "
+        "`block_F_per_fold_B_1R.csv`, `block_F_per_fold_C.csv`, "
+        "`block_F_per_fold_E.csv`, `block_G_median_path.csv`, "
+        "`extended_excursion_analysis.md`, `run_manifest.txt`."
+    )
     lines.append("- Determinism receipt: two consecutive runs produced byte-identical")
     lines.append("  outputs across all 14 files (see `run_manifest.txt`).")
     lines.append("")
@@ -724,7 +993,7 @@ def _build_combined_report(
     lines.append("first-passage column `bars_to_minus_2atr_capped_240h` is therefore the")
     lines.append("bar at which the trade reaches the SL level (−1R). The MFE/MAE envelope")
     lines.append("columns in the CSV are in ATR-distance units; R-units below = ATR/2.")
-    lines.append("Sentinel `241` in first-passage columns = \"not breached within 240 bars\".")
+    lines.append('Sentinel `241` in first-passage columns = "not breached within 240 bars".')
     lines.append("")
 
     # 2. Population summary
@@ -737,19 +1006,23 @@ def _build_combined_report(
     spread_q = taken["spread_cost_r"].quantile([0.05, 0.25, 0.5, 0.75, 0.95])
     lines.append(f"- Total taken trades: **{EXPECTED_TAKEN}**")
     lines.append(
-        f"- Exit-reason breakdown: stop_loss = **{res_a['sl_n']}** ({100*res_a['sl_n']/EXPECTED_TAKEN:.2f}%), "
-        f"time_exit = **{res_a['te_n']}** ({100*res_a['te_n']/EXPECTED_TAKEN:.2f}%), "
-        f"data_end = **{res_a['de_n']}** ({100*res_a['de_n']/EXPECTED_TAKEN:.2f}%)")
+        f"- Exit-reason breakdown: stop_loss = **{res_a['sl_n']}** ({100 * res_a['sl_n'] / EXPECTED_TAKEN:.2f}%), "
+        f"time_exit = **{res_a['te_n']}** ({100 * res_a['te_n'] / EXPECTED_TAKEN:.2f}%), "
+        f"data_end = **{res_a['de_n']}** ({100 * res_a['de_n'] / EXPECTED_TAKEN:.2f}%)"
+    )
     lines.append(f"- Mean net R = **{pooled_mean_R:.4f}** (median **{pooled_median_R:.4f}**)")
-    lines.append(f"- Mean gross R = **{pooled_mean_gross:.4f}**; mean spread cost = **{pooled_mean_spread:.4f}** R")
-    lines.append(f"- Spread cost R quantiles: q05 = {spread_q.iloc[0]:.5f}, "
-                 f"q25 = {spread_q.iloc[1]:.5f}, q50 = {spread_q.iloc[2]:.5f}, "
-                 f"q75 = {spread_q.iloc[3]:.5f}, q95 = {spread_q.iloc[4]:.5f}")
-    lines.append(f"- Data-end clamped trades (Phase 1 manifest): **28**, all in fold 7.")
+    lines.append(
+        f"- Mean gross R = **{pooled_mean_gross:.4f}**; mean spread cost = **{pooled_mean_spread:.4f}** R"
+    )
+    lines.append(
+        f"- Spread cost R quantiles: q05 = {spread_q.iloc[0]:.5f}, "
+        f"q25 = {spread_q.iloc[1]:.5f}, q50 = {spread_q.iloc[2]:.5f}, "
+        f"q75 = {spread_q.iloc[3]:.5f}, q95 = {spread_q.iloc[4]:.5f}"
+    )
+    lines.append("- Data-end clamped trades (Phase 1 manifest): **28**, all in fold 7.")
     lines.append("")
 
     # 3. Per-block findings
-    qcols = ("n", "mean", "q05", "q25", "q50", "q75", "q95", "min_or_max")
 
     # Block A
     lines.append("## 3. Block A — Marginal excursion distributions")
@@ -767,14 +1040,18 @@ def _build_combined_report(
         )
     lines.append("")
     lines.append("**Salient cells:**")
-    lines.append(f"- `sl/MFE`: SL-hit trades' favourable excursion before reversal. "
-                 f"mean = {res_a['sl_mfe']['mean']:.4f} R, median = {res_a['sl_mfe']['q50']:.4f} R, "
-                 f"q75 = {res_a['sl_mfe']['q75']:.4f} R, q95 = {res_a['sl_mfe']['q95']:.4f} R "
-                 f"on n={res_a['sl_mfe']['n']}.")
-    lines.append(f"- `te/MAE`: time-exit trades' adverse excursion. "
-                 f"mean = {res_a['te_mae']['mean']:.4f} R, median = {res_a['te_mae']['q50']:.4f} R, "
-                 f"q25 = {res_a['te_mae']['q25']:.4f} R, q05 = {res_a['te_mae']['q05']:.4f} R "
-                 f"on n={res_a['te_mae']['n']}.")
+    lines.append(
+        f"- `sl/MFE`: SL-hit trades' favourable excursion before reversal. "
+        f"mean = {res_a['sl_mfe']['mean']:.4f} R, median = {res_a['sl_mfe']['q50']:.4f} R, "
+        f"q75 = {res_a['sl_mfe']['q75']:.4f} R, q95 = {res_a['sl_mfe']['q95']:.4f} R "
+        f"on n={res_a['sl_mfe']['n']}."
+    )
+    lines.append(
+        f"- `te/MAE`: time-exit trades' adverse excursion. "
+        f"mean = {res_a['te_mae']['mean']:.4f} R, median = {res_a['te_mae']['q50']:.4f} R, "
+        f"q25 = {res_a['te_mae']['q25']:.4f} R, q05 = {res_a['te_mae']['q05']:.4f} R "
+        f"on n={res_a['te_mae']['n']}."
+    )
     lines.append("")
 
     # Block B
@@ -785,7 +1062,9 @@ def _build_combined_report(
     lines.append("")
     lines.append("### 4.1 — 0.5R level")
     lines.append("")
-    lines.append("| path_pattern | n | pct | mean_R | median_R | sl_rate | te_rate | mean_mfe_R | mean_mae_R |")
+    lines.append(
+        "| path_pattern | n | pct | mean_R | median_R | sl_rate | te_rate | mean_mfe_R | mean_mae_R |"
+    )
     lines.append("|---|---|---|---|---|---|---|---|---|")
     for row in res_b["rows_0p5"]:
         lines.append(
@@ -797,7 +1076,9 @@ def _build_combined_report(
     lines.append("")
     lines.append("### 4.2 — 1R level (Arc 2 SL/TP boundary)")
     lines.append("")
-    lines.append("| path_pattern | n | pct | mean_R | median_R | sl_rate | te_rate | mean_mfe_R | mean_mae_R |")
+    lines.append(
+        "| path_pattern | n | pct | mean_R | median_R | sl_rate | te_rate | mean_mfe_R | mean_mae_R |"
+    )
     lines.append("|---|---|---|---|---|---|---|---|---|")
     for row in res_b["rows_1r"]:
         lines.append(
@@ -808,22 +1089,32 @@ def _build_combined_report(
         )
     lines.append("")
     utd = res_b["utd_1r"]
-    lines.append("**Salient cell — `up_then_down` at 1R level** (the empirical \"wasted MFE\" population):")
+    lines.append(
+        '**Salient cell — `up_then_down` at 1R level** (the empirical "wasted MFE" population):'
+    )
     lines.append(f"- n = **{utd['n']}** ({utd['pct_of_taken']:.2f}% of taken trades)")
     lines.append(f"- mean realised R = **{utd['mean_R']:.4f}**, median = {utd['median_R']:.4f}")
-    lines.append(f"- mean held-window MFE = {utd['mean_mfe_R']:.4f} R, mean MAE = {utd['mean_mae_R']:.4f} R")
-    lines.append(f"- SL-hit rate within this cell = {utd['sl_hit_rate']:.4f}, "
-                 f"time-exit rate = {utd['time_exit_rate']:.4f}")
+    lines.append(
+        f"- mean held-window MFE = {utd['mean_mfe_R']:.4f} R, mean MAE = {utd['mean_mae_R']:.4f} R"
+    )
+    lines.append(
+        f"- SL-hit rate within this cell = {utd['sl_hit_rate']:.4f}, "
+        f"time-exit rate = {utd['time_exit_rate']:.4f}"
+    )
     lines.append("")
 
     # Block C
     lines.append("## 5. Block C — MFE-thresholded survivor distributions")
     lines.append("")
-    lines.append("\"Survivors at threshold X\" = trades where the held-window MFE reached at least X R.")
+    lines.append(
+        '"Survivors at threshold X" = trades where the held-window MFE reached at least X R.'
+    )
     lines.append("No counterfactual P&L is implied; the table characterises what the realised R")
     lines.append("looks like among the population that actually observed each MFE level.")
     lines.append("")
-    lines.append("| mfe_threshold_R | n | pct | mean_R | q05_R | q25_R | q50_R | q75_R | q95_R | sl_rate | te_rate | mean_gross_R |")
+    lines.append(
+        "| mfe_threshold_R | n | pct | mean_R | q05_R | q25_R | q50_R | q75_R | q95_R | sl_rate | te_rate | mean_gross_R |"
+    )
     lines.append("|---|---|---|---|---|---|---|---|---|---|---|---|")
     for row in res_c["rows"]:
         lines.append(
@@ -873,16 +1164,27 @@ def _build_combined_report(
     lines.append("")
     lines.append("For each of the four first-passage columns, the distribution of bar-counts to")
     lines.append("first breach, conditional on breaching within 120 bars. Trades that did not")
-    lines.append("breach within 120 bars (sentinel 241 or any value > 120) are tabulated separately.")
+    lines.append(
+        "breach within 120 bars (sentinel 241 or any value > 120) are tabulated separately."
+    )
     lines.append("")
-    for et in ("bars_to_minus_2atr", "bars_to_minus_1atr", "bars_to_plus_2atr", "bars_to_plus_1atr"):
+    for et in (
+        "bars_to_minus_2atr",
+        "bars_to_minus_1atr",
+        "bars_to_plus_2atr",
+        "bars_to_plus_1atr",
+    ):
         sm = res_e["summary"][et]
         lines.append(f"### {et}")
         lines.append("")
-        lines.append(f"- Within 120 bars: n = **{sm['n_within']}**; mean = {sm['mean']:.2f}, "
-                     f"median = {sm['median']:.2f}, q25 = {sm['q25']:.2f}, q75 = {sm['q75']:.2f}.")
-        lines.append(f"- Not within 120 bars: n = **{sm['n_not_within']}** "
-                     f"({100*sm['n_not_within']/EXPECTED_TAKEN:.2f}% of taken).")
+        lines.append(
+            f"- Within 120 bars: n = **{sm['n_within']}**; mean = {sm['mean']:.2f}, "
+            f"median = {sm['median']:.2f}, q25 = {sm['q25']:.2f}, q75 = {sm['q75']:.2f}."
+        )
+        lines.append(
+            f"- Not within 120 bars: n = **{sm['n_not_within']}** "
+            f"({100 * sm['n_not_within'] / EXPECTED_TAKEN:.2f}% of taken)."
+        )
         lines.append("")
         lines.append("| bin | n | pct_of_taken |")
         lines.append("|---|---|---|")
@@ -904,17 +1206,20 @@ def _build_combined_report(
     lines.append("")
     # F-A: SL/MFE and TE/MAE per fold
     rows_a = res_f["rows_a"]
+
     def _find_fa(fid: int, cell: str) -> Optional[Dict[str, Any]]:
         for r in rows_a:
             if r["fold_id"] == fid and r["cell"] == cell:
                 return r
         return None
+
     lines.append("**Block A excursions per fold (fold 5 / fold 4):**")
     lines.append("")
     lines.append("| cell | metric | fold 5 | fold 4 |")
     lines.append("|---|---|---|---|")
     for cell in ("sl/MFE", "sl/MAE", "te/MFE", "te/MAE"):
-        f5 = _find_fa(5, cell); f4 = _find_fa(4, cell)
+        f5 = _find_fa(5, cell)
+        f4 = _find_fa(4, cell)
         if f5 and f4:
             lines.append(
                 f"| {cell} | n / mean / median | {f5['n']} / {f5['mean']:.4f} / {f5['q50']:.4f} | "
@@ -927,8 +1232,14 @@ def _build_combined_report(
     lines.append("")
     lines.append("| path_pattern | fold 5 n / mean_R | fold 4 n / mean_R |")
     lines.append("|---|---|---|")
-    for cell in ("reached_up_only", "reached_down_only", "up_then_down",
-                 "down_then_up", "simultaneous", "neither"):
+    for cell in (
+        "reached_up_only",
+        "reached_down_only",
+        "up_then_down",
+        "down_then_up",
+        "simultaneous",
+        "neither",
+    ):
         r5 = fb1r[(fb1r["fold_id"] == 5) & (fb1r["path_pattern"] == cell)]
         r4 = fb1r[(fb1r["fold_id"] == 4) & (fb1r["path_pattern"] == cell)]
         v5 = f"{int(r5['n'].iloc[0])} / {float(r5['mean_R'].iloc[0]):.4f}" if len(r5) else "—"
@@ -957,18 +1268,30 @@ def _build_combined_report(
     lines.append("| bin | fold 5 n / pct | fold 4 n / pct |")
     lines.append("|---|---|---|")
     for lo, hi in BAR_BINS:
-        r5 = fe[(fe["fold_id"] == 5) & (fe["event_type"] == "bars_to_minus_2atr")
-                & (fe["bar_bin_lo"].astype(str) == str(lo))]
-        r4 = fe[(fe["fold_id"] == 4) & (fe["event_type"] == "bars_to_minus_2atr")
-                & (fe["bar_bin_lo"].astype(str) == str(lo))]
+        r5 = fe[
+            (fe["fold_id"] == 5)
+            & (fe["event_type"] == "bars_to_minus_2atr")
+            & (fe["bar_bin_lo"].astype(str) == str(lo))
+        ]
+        r4 = fe[
+            (fe["fold_id"] == 4)
+            & (fe["event_type"] == "bars_to_minus_2atr")
+            & (fe["bar_bin_lo"].astype(str) == str(lo))
+        ]
         v5 = f"{int(r5['n'].iloc[0])} / {float(r5['pct_of_fold'].iloc[0]):.2f}" if len(r5) else "—"
         v4 = f"{int(r4['n'].iloc[0])} / {float(r4['pct_of_fold'].iloc[0]):.2f}" if len(r4) else "—"
         lines.append(f"| [{lo}, {hi}] | {v5} | {v4} |")
     # not_within row
-    r5nw = fe[(fe["fold_id"] == 5) & (fe["event_type"] == "bars_to_minus_2atr")
-              & (fe["bar_bin_lo"].astype(str) == "not_within_120")]
-    r4nw = fe[(fe["fold_id"] == 4) & (fe["event_type"] == "bars_to_minus_2atr")
-              & (fe["bar_bin_lo"].astype(str) == "not_within_120")]
+    r5nw = fe[
+        (fe["fold_id"] == 5)
+        & (fe["event_type"] == "bars_to_minus_2atr")
+        & (fe["bar_bin_lo"].astype(str) == "not_within_120")
+    ]
+    r4nw = fe[
+        (fe["fold_id"] == 4)
+        & (fe["event_type"] == "bars_to_minus_2atr")
+        & (fe["bar_bin_lo"].astype(str) == "not_within_120")
+    ]
     if len(r5nw) and len(r4nw):
         lines.append(
             f"| not_within_120 | {int(r5nw['n'].iloc[0])} / {float(r5nw['pct_of_fold'].iloc[0]):.2f} | "
@@ -983,15 +1306,21 @@ def _build_combined_report(
     lines.append("`fwd_mfe` columns are running max from entry through bar h (≥ 0);")
     lines.append("`fwd_mae` columns are running min through bar h (≤ 0).")
     lines.append("")
-    lines.append(f"Data-end clamping: {res_g['n_clamped_at_lt_240']} trades clamped (per Phase 1 manifest, fold 7).")
-    lines.append("For h ∈ {1, 6, 24, 72, 120}: trades with `forward_horizon_clamped_at_bar < h` excluded")
+    lines.append(
+        f"Data-end clamping: {res_g['n_clamped_at_lt_240']} trades clamped (per Phase 1 manifest, fold 7)."
+    )
+    lines.append(
+        "For h ∈ {1, 6, 24, 72, 120}: trades with `forward_horizon_clamped_at_bar < h` excluded"
+    )
     lines.append("from that h's row to preserve full-resolution observation; for h=240 we report")
     lines.append("two rows (all vs unclamped-only) so divergence can be inspected.")
     lines.append("")
     for er in ("all", "stop_loss", "time_exit"):
         lines.append(f"### exit_reason = {er}")
         lines.append("")
-        lines.append("| h | n | median_mfe_R | q25_mfe_R | q75_mfe_R | median_mae_R | q25_mae_R | q75_mae_R |")
+        lines.append(
+            "| h | n | median_mfe_R | q25_mfe_R | q75_mfe_R | median_mae_R | q25_mae_R | q75_mae_R |"
+        )
         lines.append("|---|---|---|---|---|---|---|---|")
         for row in res_g["rows"]:
             if row["exit_reason"] != er:
@@ -1030,13 +1359,19 @@ def _build_combined_report(
     lines.append("## 11. Candidate observations queued for `CANDIDATE_HYPOTHESES.md`")
     lines.append("")
     if not candidate_entries:
-        lines.append("None — see appendix for observations deferred for lack of clean mechanical definition.")
+        lines.append(
+            "None — see appendix for observations deferred for lack of clean mechanical definition."
+        )
     else:
         for entry in candidate_entries:
             lines.append(f"- **{entry['id']}** — {entry['title']}")
         lines.append("")
-        lines.append("Each entry is pre-formatted per L6.0 v1.1 §14.7 schema in the `docs/CANDIDATE_HYPOTHESES.md`")
-        lines.append("append section. Selection of which to advance to a fresh arc is a planner decision per §14.2,")
+        lines.append(
+            "Each entry is pre-formatted per L6.0 v1.1 §14.7 schema in the `docs/CANDIDATE_HYPOTHESES.md`"
+        )
+        lines.append(
+            "append section. Selection of which to advance to a fresh arc is a planner decision per §14.2,"
+        )
         lines.append("separate from this report.")
     lines.append("")
 
@@ -1070,8 +1405,12 @@ def _build_combined_report(
 
 
 def _build_candidate_entries(
-    *, res_a: Dict[str, Any], res_b: Dict[str, Any], res_c: Dict[str, Any],
-    res_e: Dict[str, Any], taken: pd.DataFrame,
+    *,
+    res_a: Dict[str, Any],
+    res_b: Dict[str, Any],
+    res_c: Dict[str, Any],
+    res_e: Dict[str, Any],
+    taken: pd.DataFrame,
 ) -> List[Dict[str, Any]]:
     """Build candidate observations that meet the §7 criterion (mechanically
     definable as a feature at the moment of evaluation, with no lookahead).
@@ -1085,196 +1424,217 @@ def _build_candidate_entries(
     # CH-001 — MFE-threshold-1.5R survivor effect
     surv_15 = next(r for r in res_c["rows"] if r["mfe_threshold_R"] == 1.5)
     lift_15 = surv_15["mean_R"] - pooled_mean
-    entries.append({
-        "id": "CH-001",
-        "title": "Trades observing held-window MFE ≥ 1.5R have descriptive mean R distinct from pool",
-        "obs_summary": (
-            f"Among Arc 2 taken trades (n={pooled_n}, mean R {pooled_mean:.4f}), the subset with "
-            f"held-window MFE ≥ 1.5R (n={surv_15['n_survivors']}, {surv_15['pct_of_taken']:.2f}% of "
-            f"taken trades) has descriptive mean realised R = {surv_15['mean_R']:.4f}, with the "
-            f"q05/q25/q50/q75/q95 of realised R at {surv_15['q05_R']:.4f}/{surv_15['q25_R']:.4f}/"
-            f"{surv_15['q50_R']:.4f}/{surv_15['q75_R']:.4f}/{surv_15['q95_R']:.4f}. SL-hit rate "
-            f"within this survivor set is {surv_15['sl_hit_rate']:.4f}, time-exit rate "
-            f"{surv_15['time_exit_rate']:.4f}."
-        ),
-        "effect_size": (
-            f"Survivor mean R = {surv_15['mean_R']:.4f} vs pooled mean R = {pooled_mean:.4f} "
-            f"(descriptive lift {lift_15:+.4f} R on the survivor subset). No counterfactual "
-            f"P&L is asserted."
-        ),
-        "n": f"pooled (across all 7 folds); n_survivors = {surv_15['n_survivors']}, "
-             f"out of taken pool n = {pooled_n}",
-        "feature_def": (
-            "Exit-class feature. At each held bar k ∈ [1, 120] from entry, compute the running "
-            "favourable excursion in R-units: `running_mfe_R_at_k = max over i ∈ [1, k] of "
-            "(high[entry_idx + i - 1] - entry_price) / (2.0 × ATR_at_signal_bar)`. This is "
-            "lookahead-clean because at held bar k the algorithm only uses data through bar k. "
-            "The Arc 2 SL-distance ATR is the same value used in the entry SL calculation."
-        ),
-        "threshold": "running_mfe_R_at_k ≥ 1.5",
-        "gated_set": (
-            "A fresh arc would compare the verbatim Arc 2 exit (SL at -1R, time exit at 120 bars) "
-            "against an exit-rule variant that fires a within-trade decision at the bar where "
-            "running_mfe_R_at_k first crosses 1.5R. Specific decision (close, trail, etc.) is the "
-            "fresh arc's locked spec, not derivable here."
-        ),
-        "enforcement": (
-            "Inside the per-trade execution loop (analogous to "
-            "`_execute_arc2` in `core/signals/l4_mtf_alignment_2_down_mixed_kijun.py`), track "
-            "running_mfe_price; at each bar check `running_mfe_R = running_mfe_price / "
-            "(2 × atr_at_signal) >= 1.5`. The decision rule the fresh arc gates is its locked "
-            "choice."
-        ),
-        "priority": ("HIGH" if (abs(lift_15) > 0.15 and surv_15['n_survivors'] >= 500) else "MED"),
-        "selection_bias": (
-            "Observation came from a 7-block path-shape scan on a single arc's trade set with "
-            "9 MFE thresholds tested. The 1.5R threshold was selected as one of nine prior-"
-            "specified levels in the prompt's §4 (block C). A fresh-arc planner should apply "
-            "an appropriate Bonferroni-style haircut for the multi-threshold scan."
-        ),
-        "related": (
-            "Arc 1 has no analogous entry yet (Arc 1 was h=1 with much smaller held-window MFE "
-            "headroom; the relationship between observed MFE and realised R is structurally "
-            "different at h=1)."
-        ),
-        "references": (
-            "`results/l6/arc2/characterisation/extended/block_C_mfe_thresholded_survivors.csv` "
-            "row mfe_threshold_R=1.5; "
-            "`results/l6/arc2/characterisation/extended/extended_excursion_analysis.md` §5."
-        ),
-    })
+    entries.append(
+        {
+            "id": "CH-001",
+            "title": "Trades observing held-window MFE ≥ 1.5R have descriptive mean R distinct from pool",
+            "obs_summary": (
+                f"Among Arc 2 taken trades (n={pooled_n}, mean R {pooled_mean:.4f}), the subset with "
+                f"held-window MFE ≥ 1.5R (n={surv_15['n_survivors']}, {surv_15['pct_of_taken']:.2f}% of "
+                f"taken trades) has descriptive mean realised R = {surv_15['mean_R']:.4f}, with the "
+                f"q05/q25/q50/q75/q95 of realised R at {surv_15['q05_R']:.4f}/{surv_15['q25_R']:.4f}/"
+                f"{surv_15['q50_R']:.4f}/{surv_15['q75_R']:.4f}/{surv_15['q95_R']:.4f}. SL-hit rate "
+                f"within this survivor set is {surv_15['sl_hit_rate']:.4f}, time-exit rate "
+                f"{surv_15['time_exit_rate']:.4f}."
+            ),
+            "effect_size": (
+                f"Survivor mean R = {surv_15['mean_R']:.4f} vs pooled mean R = {pooled_mean:.4f} "
+                f"(descriptive lift {lift_15:+.4f} R on the survivor subset). No counterfactual "
+                f"P&L is asserted."
+            ),
+            "n": f"pooled (across all 7 folds); n_survivors = {surv_15['n_survivors']}, "
+            f"out of taken pool n = {pooled_n}",
+            "feature_def": (
+                "Exit-class feature. At each held bar k ∈ [1, 120] from entry, compute the running "
+                "favourable excursion in R-units: `running_mfe_R_at_k = max over i ∈ [1, k] of "
+                "(high[entry_idx + i - 1] - entry_price) / (2.0 × ATR_at_signal_bar)`. This is "
+                "lookahead-clean because at held bar k the algorithm only uses data through bar k. "
+                "The Arc 2 SL-distance ATR is the same value used in the entry SL calculation."
+            ),
+            "threshold": "running_mfe_R_at_k ≥ 1.5",
+            "gated_set": (
+                "A fresh arc would compare the verbatim Arc 2 exit (SL at -1R, time exit at 120 bars) "
+                "against an exit-rule variant that fires a within-trade decision at the bar where "
+                "running_mfe_R_at_k first crosses 1.5R. Specific decision (close, trail, etc.) is the "
+                "fresh arc's locked spec, not derivable here."
+            ),
+            "enforcement": (
+                "Inside the per-trade execution loop (analogous to "
+                "`_execute_arc2` in `core/signals/l4_mtf_alignment_2_down_mixed_kijun.py`), track "
+                "running_mfe_price; at each bar check `running_mfe_R = running_mfe_price / "
+                "(2 × atr_at_signal) >= 1.5`. The decision rule the fresh arc gates is its locked "
+                "choice."
+            ),
+            "priority": (
+                "HIGH" if (abs(lift_15) > 0.15 and surv_15["n_survivors"] >= 500) else "MED"
+            ),
+            "selection_bias": (
+                "Observation came from a 7-block path-shape scan on a single arc's trade set with "
+                "9 MFE thresholds tested. The 1.5R threshold was selected as one of nine prior-"
+                "specified levels in the prompt's §4 (block C). A fresh-arc planner should apply "
+                "an appropriate Bonferroni-style haircut for the multi-threshold scan."
+            ),
+            "related": (
+                "Arc 1 has no analogous entry yet (Arc 1 was h=1 with much smaller held-window MFE "
+                "headroom; the relationship between observed MFE and realised R is structurally "
+                "different at h=1)."
+            ),
+            "references": (
+                "`results/l6/arc2/characterisation/extended/block_C_mfe_thresholded_survivors.csv` "
+                "row mfe_threshold_R=1.5; "
+                "`results/l6/arc2/characterisation/extended/extended_excursion_analysis.md` §5."
+            ),
+        }
+    )
 
     # CH-002 — up_then_down at 1R level (wasted-MFE)
     utd = res_b["utd_1r"]
-    entries.append({
-        "id": "CH-002",
-        "title": "Trades reaching +1R favourable before traversing to −1R SL show distinct path-shape",
-        "obs_summary": (
-            f"At the 1R first-passage level (±2×ATR thresholds, equivalent to ±1R for Arc 2), "
-            f"n={utd['n']} trades ({utd['pct_of_taken']:.2f}% of taken trades) reached +1R "
-            f"favourable before traversing to the −1R SL boundary (path pattern `up_then_down`). "
-            f"Mean realised R in this cell = {utd['mean_R']:.4f}, mean held-window MFE = "
-            f"{utd['mean_mfe_R']:.4f} R, SL-hit rate = {utd['sl_hit_rate']:.4f}. This is the "
-            f"empirical 'wasted MFE' population identified at Arc 2 close in §11 of "
-            f"PHASE_L6_ARC2_RESULT.md (pooled mean wasted-MFE statistic was +1.12R)."
-        ),
-        "effect_size": (
-            f"Cell mean realised R = {utd['mean_R']:.4f} vs Arc 2 pooled mean R = "
-            f"{pooled_mean:.4f} (descriptive {utd['mean_R'] - pooled_mean:+.4f} R lift). "
-            f"Mean held-window MFE in cell = {utd['mean_mfe_R']:.4f} R, characterising how far "
-            f"these trades travelled favourable before reversing."
-        ),
-        "n": f"pooled; n = {utd['n']} ({utd['pct_of_taken']:.2f}% of {pooled_n})",
-        "feature_def": (
-            "Exit-class feature. At each held bar k, compute first_plus_2atr_bar = the first k' ≤ k "
-            "where the running MFE crossed +2×ATR (= +1R); if not yet crossed, first_plus_2atr_bar "
-            "is undefined. After first_plus_2atr_bar is defined, the trade is in the post-+1R-"
-            "observation regime. Lookahead-clean because only data ≤ k is used at bar k."
-        ),
-        "threshold": (
-            "first_plus_2atr_bar is defined AND the trade has not yet exited. (At the bar where "
-            "running_mfe first reaches 2×ATR, the trade enters the candidate-regime; a fresh-arc "
-            "exit rule can fire any locked decision from that bar onwards.)"
-        ),
-        "gated_set": (
-            "The fresh-arc-locked exit-rule applies once first_plus_2atr_bar is defined. The "
-            "specific decision (close at +1R, trail at +0.5R, partial TP, etc.) is the fresh "
-            "arc's locked spec; this candidacy only registers that the regime is characterisable "
-            "in a no-lookahead manner."
-        ),
-        "enforcement": (
-            "Per-trade state machine in execution loop: maintain running_mfe; at each bar check "
-            "if running_mfe ≥ 2 × atr_at_signal_bar; once crossed, set first_plus_2atr_bar = "
-            "current_k and apply the fresh-arc locked exit rule for all subsequent bars in the "
-            "hold window."
-        ),
-        "priority": ("HIGH" if (abs(utd['mean_R'] - pooled_mean) > 0.15 and utd['n'] >= 500) else "MED"),
-        "selection_bias": (
-            "Observation comes from a 6-cell path-pattern classification at the 1R level "
-            "(one of two prior-specified levels). Cells were predetermined by the prompt; no "
-            "post-hoc threshold selection. Standard caveat applies for the multi-arc multi-"
-            "threshold registry pattern; planner haircut at fresh-arc gate-design time."
-        ),
-        "related": "Cross-references CH-001 (MFE-threshold survivor observation).",
-        "references": (
-            "`results/l6/arc2/characterisation/extended/block_B_path_patterns_1R.csv` row "
-            "`path_pattern=up_then_down`; "
-            "`results/l6/arc2/characterisation/extended/extended_excursion_analysis.md` §4.2."
-        ),
-    })
+    entries.append(
+        {
+            "id": "CH-002",
+            "title": "Trades reaching +1R favourable before traversing to −1R SL show distinct path-shape",
+            "obs_summary": (
+                f"At the 1R first-passage level (±2×ATR thresholds, equivalent to ±1R for Arc 2), "
+                f"n={utd['n']} trades ({utd['pct_of_taken']:.2f}% of taken trades) reached +1R "
+                f"favourable before traversing to the −1R SL boundary (path pattern `up_then_down`). "
+                f"Mean realised R in this cell = {utd['mean_R']:.4f}, mean held-window MFE = "
+                f"{utd['mean_mfe_R']:.4f} R, SL-hit rate = {utd['sl_hit_rate']:.4f}. This is the "
+                f"empirical 'wasted MFE' population identified at Arc 2 close in §11 of "
+                f"PHASE_L6_ARC2_RESULT.md (pooled mean wasted-MFE statistic was +1.12R)."
+            ),
+            "effect_size": (
+                f"Cell mean realised R = {utd['mean_R']:.4f} vs Arc 2 pooled mean R = "
+                f"{pooled_mean:.4f} (descriptive {utd['mean_R'] - pooled_mean:+.4f} R lift). "
+                f"Mean held-window MFE in cell = {utd['mean_mfe_R']:.4f} R, characterising how far "
+                f"these trades travelled favourable before reversing."
+            ),
+            "n": f"pooled; n = {utd['n']} ({utd['pct_of_taken']:.2f}% of {pooled_n})",
+            "feature_def": (
+                "Exit-class feature. At each held bar k, compute first_plus_2atr_bar = the first k' ≤ k "
+                "where the running MFE crossed +2×ATR (= +1R); if not yet crossed, first_plus_2atr_bar "
+                "is undefined. After first_plus_2atr_bar is defined, the trade is in the post-+1R-"
+                "observation regime. Lookahead-clean because only data ≤ k is used at bar k."
+            ),
+            "threshold": (
+                "first_plus_2atr_bar is defined AND the trade has not yet exited. (At the bar where "
+                "running_mfe first reaches 2×ATR, the trade enters the candidate-regime; a fresh-arc "
+                "exit rule can fire any locked decision from that bar onwards.)"
+            ),
+            "gated_set": (
+                "The fresh-arc-locked exit-rule applies once first_plus_2atr_bar is defined. The "
+                "specific decision (close at +1R, trail at +0.5R, partial TP, etc.) is the fresh "
+                "arc's locked spec; this candidacy only registers that the regime is characterisable "
+                "in a no-lookahead manner."
+            ),
+            "enforcement": (
+                "Per-trade state machine in execution loop: maintain running_mfe; at each bar check "
+                "if running_mfe ≥ 2 × atr_at_signal_bar; once crossed, set first_plus_2atr_bar = "
+                "current_k and apply the fresh-arc locked exit rule for all subsequent bars in the "
+                "hold window."
+            ),
+            "priority": (
+                "HIGH" if (abs(utd["mean_R"] - pooled_mean) > 0.15 and utd["n"] >= 500) else "MED"
+            ),
+            "selection_bias": (
+                "Observation comes from a 6-cell path-pattern classification at the 1R level "
+                "(one of two prior-specified levels). Cells were predetermined by the prompt; no "
+                "post-hoc threshold selection. Standard caveat applies for the multi-arc multi-"
+                "threshold registry pattern; planner haircut at fresh-arc gate-design time."
+            ),
+            "related": "Cross-references CH-001 (MFE-threshold survivor observation).",
+            "references": (
+                "`results/l6/arc2/characterisation/extended/block_B_path_patterns_1R.csv` row "
+                "`path_pattern=up_then_down`; "
+                "`results/l6/arc2/characterisation/extended/extended_excursion_analysis.md` §4.2."
+            ),
+        }
+    )
 
     # CH-003 — SL timing distribution clustering
     sl_summary = res_e["summary"]["bars_to_minus_2atr"]
     # Count of SL hits in bins [1,5] vs the tail
     rows_e = res_e["rows"]
-    bin_1_5 = next((r for r in rows_e
-                    if r["event_type"] == "bars_to_minus_2atr"
-                    and r["bar_bin_lo"] == 1 and r["bar_bin_hi"] == 5), None)
-    bin_61_120 = sum(
-        r["n"] for r in rows_e
-        if r["event_type"] == "bars_to_minus_2atr"
-        and isinstance(r["bar_bin_lo"], int) and r["bar_bin_lo"] >= 61
+    bin_1_5 = next(
+        (
+            r
+            for r in rows_e
+            if r["event_type"] == "bars_to_minus_2atr"
+            and r["bar_bin_lo"] == 1
+            and r["bar_bin_hi"] == 5
+        ),
+        None,
     )
-    entries.append({
-        "id": "CH-003",
-        "title": "SL hits cluster in the early bars; non-trivial late-rollover tail exists",
-        "obs_summary": (
-            f"Among SL hits (n={res_a['sl_n']}), the first-passage bar count to the −1R level "
-            f"(`bars_to_minus_2atr`) has descriptive distribution: within-120-bar mean = "
-            f"{sl_summary['mean']:.2f} bars, median = {sl_summary['median']:.2f} bars, "
-            f"q25 = {sl_summary['q25']:.2f}, q75 = {sl_summary['q75']:.2f}. In bin [1, 5]: "
-            f"n = {bin_1_5['n'] if bin_1_5 else 0} ({100*(bin_1_5['n'] if bin_1_5 else 0)/EXPECTED_TAKEN:.2f}% of "
-            f"taken pool, {100*(bin_1_5['n'] if bin_1_5 else 0)/max(1,res_a['sl_n']):.2f}% of SL hits). "
-            f"In bins ≥ 61: n = {bin_61_120} ({100*bin_61_120/max(1,res_a['sl_n']):.2f}% of SL hits)."
-        ),
-        "effect_size": (
-            f"Bimodal-ish timing: ~{int(100*(bin_1_5['n'] if bin_1_5 else 0)/max(1,res_a['sl_n']))}% of SL "
-            f"hits within the first 5 bars after entry; {int(100*bin_61_120/max(1,res_a['sl_n']))}% in bars "
-            f"61-120. Compared against a uniform-over-[1,120] null (8.33% per 10-bar window), "
-            f"the early concentration is descriptively elevated."
-        ),
-        "n": f"pooled; SL-hits n = {res_a['sl_n']}, taken n = {pooled_n}",
-        "feature_def": (
-            "Exit-class feature. At each held bar k, the elapsed bar count since entry is "
-            "literally `k`. Lookahead-clean by construction (k is the current bar)."
-        ),
-        "threshold": (
-            "A fresh-arc-locked exit-rule variant could differentiate behaviour based on "
-            "elapsed-bars buckets {[1,5], [6,20], [21,60], [61,120]} or similar. Specific "
-            "thresholds locked at fresh-arc spec time."
-        ),
-        "gated_set": (
-            "Different decision rules per elapsed-bars bucket. The fresh-arc gate evaluates "
-            "whether bucket-conditional treatment improves the gate disposition relative to "
-            "Arc 2's uniform-treatment baseline."
-        ),
-        "enforcement": (
-            "Trivial — k is already the loop variable in the per-trade execution. Per-bucket "
-            "rule application via if/elif on k ranges."
-        ),
-        "priority": "LOW",
-        "selection_bias": (
-            "Observation comes from one of four prior-specified first-passage histograms in "
-            "block E. The bar-bin boundaries [1,5], [6,10], [11,20], [21,40], [41,60], [61,80], "
-            "[81,100], [101,120] are prior-specified; no post-hoc bin tuning. Standard scan "
-            "haircut applies."
-        ),
-        "related": (
-            "Cross-references CH-002 (path pattern up_then_down — late-rollover SL hits are "
-            "the up_then_down subpopulation by construction)."
-        ),
-        "references": (
-            "`results/l6/arc2/characterisation/extended/block_E_first_passage_histograms.csv` "
-            "rows event_type=bars_to_minus_2atr; "
-            "`results/l6/arc2/characterisation/extended/extended_excursion_analysis.md` §7."
-        ),
-    })
+    bin_61_120 = sum(
+        r["n"]
+        for r in rows_e
+        if r["event_type"] == "bars_to_minus_2atr"
+        and isinstance(r["bar_bin_lo"], int)
+        and r["bar_bin_lo"] >= 61
+    )
+    entries.append(
+        {
+            "id": "CH-003",
+            "title": "SL hits cluster in the early bars; non-trivial late-rollover tail exists",
+            "obs_summary": (
+                f"Among SL hits (n={res_a['sl_n']}), the first-passage bar count to the −1R level "
+                f"(`bars_to_minus_2atr`) has descriptive distribution: within-120-bar mean = "
+                f"{sl_summary['mean']:.2f} bars, median = {sl_summary['median']:.2f} bars, "
+                f"q25 = {sl_summary['q25']:.2f}, q75 = {sl_summary['q75']:.2f}. In bin [1, 5]: "
+                f"n = {bin_1_5['n'] if bin_1_5 else 0} ({100 * (bin_1_5['n'] if bin_1_5 else 0) / EXPECTED_TAKEN:.2f}% of "
+                f"taken pool, {100 * (bin_1_5['n'] if bin_1_5 else 0) / max(1, res_a['sl_n']):.2f}% of SL hits). "
+                f"In bins ≥ 61: n = {bin_61_120} ({100 * bin_61_120 / max(1, res_a['sl_n']):.2f}% of SL hits)."
+            ),
+            "effect_size": (
+                f"Bimodal-ish timing: ~{int(100 * (bin_1_5['n'] if bin_1_5 else 0) / max(1, res_a['sl_n']))}% of SL "
+                f"hits within the first 5 bars after entry; {int(100 * bin_61_120 / max(1, res_a['sl_n']))}% in bars "
+                f"61-120. Compared against a uniform-over-[1,120] null (8.33% per 10-bar window), "
+                f"the early concentration is descriptively elevated."
+            ),
+            "n": f"pooled; SL-hits n = {res_a['sl_n']}, taken n = {pooled_n}",
+            "feature_def": (
+                "Exit-class feature. At each held bar k, the elapsed bar count since entry is "
+                "literally `k`. Lookahead-clean by construction (k is the current bar)."
+            ),
+            "threshold": (
+                "A fresh-arc-locked exit-rule variant could differentiate behaviour based on "
+                "elapsed-bars buckets {[1,5], [6,20], [21,60], [61,120]} or similar. Specific "
+                "thresholds locked at fresh-arc spec time."
+            ),
+            "gated_set": (
+                "Different decision rules per elapsed-bars bucket. The fresh-arc gate evaluates "
+                "whether bucket-conditional treatment improves the gate disposition relative to "
+                "Arc 2's uniform-treatment baseline."
+            ),
+            "enforcement": (
+                "Trivial — k is already the loop variable in the per-trade execution. Per-bucket "
+                "rule application via if/elif on k ranges."
+            ),
+            "priority": "LOW",
+            "selection_bias": (
+                "Observation comes from one of four prior-specified first-passage histograms in "
+                "block E. The bar-bin boundaries [1,5], [6,10], [11,20], [21,40], [41,60], [61,80], "
+                "[81,100], [101,120] are prior-specified; no post-hoc bin tuning. Standard scan "
+                "haircut applies."
+            ),
+            "related": (
+                "Cross-references CH-002 (path pattern up_then_down — late-rollover SL hits are "
+                "the up_then_down subpopulation by construction)."
+            ),
+            "references": (
+                "`results/l6/arc2/characterisation/extended/block_E_first_passage_histograms.csv` "
+                "rows event_type=bars_to_minus_2atr; "
+                "`results/l6/arc2/characterisation/extended/extended_excursion_analysis.md` §7."
+            ),
+        }
+    )
 
     return entries
 
 
 def _append_candidate_entries(
-    chyp_path: Path, entries: List[Dict[str, Any]], date_iso: str,
+    chyp_path: Path,
+    entries: List[Dict[str, Any]],
+    date_iso: str,
 ) -> None:
     """Append candidate entries to the registry, after the `<!-- Template ... -->`
     block but before the `---` / `## Change log` section. Existing entries
@@ -1291,13 +1651,15 @@ def _append_candidate_entries(
     blocks: List[str] = []
     for e in entries:
         blocks.append(f"\n### {e['id']} — {e['title']}\n")
-        blocks.append(f"\n- **Status:** OPEN")
+        blocks.append("\n- **Status:** OPEN")
         blocks.append(f"- **Date logged:** {date_iso}")
-        blocks.append(f"- **Source arc:** Arc 2 — registry rank 2, mtf_alignment 2_down_mixed kijun h=120")
+        blocks.append(
+            "- **Source arc:** Arc 2 — registry rank 2, mtf_alignment 2_down_mixed kijun h=120"
+        )
         blocks.append(f"- **Observation summary:**\n  {e['obs_summary']}")
         blocks.append(f"- **Effect size:**\n  - {e['effect_size']}")
         blocks.append(f"- **n:** {e['n']}")
-        blocks.append(f"- **Fresh-arc gate (definition + threshold):**")
+        blocks.append("- **Fresh-arc gate (definition + threshold):**")
         blocks.append(f"  - (a) Feature definition (no-lookahead): {e['feature_def']}")
         blocks.append(f"  - (b) Threshold/rule: {e['threshold']}")
         blocks.append(f"  - (c) Gated set: {e['gated_set']}")
@@ -1351,7 +1713,9 @@ def _check_disposition_discipline(report_path: Path) -> List[str]:
             ctx_start = max(0, m.start() - 40)
             ctx_end = min(len(body), m.end() + 40)
             context = body[ctx_start:ctx_end].replace("\n", " ")
-            violations.append(f"  pattern='{pattern}' match='{m.group()}' context='...{context}...'")
+            violations.append(
+                f"  pattern='{pattern}' match='{m.group()}' context='...{context}...'"
+            )
     return violations
 
 
@@ -1361,7 +1725,9 @@ def _check_disposition_discipline(report_path: Path) -> List[str]:
 
 
 def run(
-    *, input_csv: Path, out_dir: Path,
+    *,
+    input_csv: Path,
+    out_dir: Path,
     chyp_path: Optional[Path] = None,
     skip_chyp: bool = False,
 ) -> Dict[str, str]:
@@ -1369,7 +1735,7 @@ def run(
     out_dir.mkdir(parents=True, exist_ok=True)
 
     df = _load_input(input_csv)
-    taken = df[df["taken"] == True].copy().reset_index(drop=True)
+    taken = df[df["taken"]].copy().reset_index(drop=True)
 
     # Blocks
     res_a = _block_a(taken, out_dir)
@@ -1390,9 +1756,16 @@ def run(
     run_iso = _dt.datetime.now().isoformat(timespec="seconds")
     report_path = _build_combined_report(
         taken=taken,
-        res_a=res_a, res_b=res_b, res_c=res_c, res_d=res_d,
-        res_e=res_e, res_f=res_f, res_g=res_g,
-        out_dir=out_dir, input_sha=input_sha, run_iso=run_iso,
+        res_a=res_a,
+        res_b=res_b,
+        res_c=res_c,
+        res_d=res_d,
+        res_e=res_e,
+        res_f=res_f,
+        res_g=res_g,
+        out_dir=out_dir,
+        input_sha=input_sha,
+        run_iso=run_iso,
         candidate_entries=candidate_entries,
     )
 
@@ -1440,7 +1813,15 @@ def main() -> int:
     )
     parser.add_argument(
         "--input-csv",
-        default=str(REPO_ROOT / "results" / "l6" / "arc2" / "characterisation" / "v1_1_full" / "signals_features.csv"),
+        default=str(
+            REPO_ROOT
+            / "results"
+            / "l6"
+            / "arc2"
+            / "characterisation"
+            / "v1_1_full"
+            / "signals_features.csv"
+        ),
     )
     parser.add_argument(
         "--candidate-hypotheses",
@@ -1469,7 +1850,9 @@ def main() -> int:
     chyp_sha_after = _sha256(chyp)
     for k, v in sha1.items():
         print(f"    {k}: {v}")
-    print(f"  CANDIDATE_HYPOTHESES.md sha (before/after): {chyp_sha_before[:12]}... / {chyp_sha_after[:12]}...")
+    print(
+        f"  CANDIDATE_HYPOTHESES.md sha (before/after): {chyp_sha_before[:12]}... / {chyp_sha_after[:12]}..."
+    )
 
     determinism: Dict[str, str] = {}
     if not args.single_run:

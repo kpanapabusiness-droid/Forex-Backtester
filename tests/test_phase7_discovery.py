@@ -23,4 +23,3 @@ def test_phase7_stub_indicator_detected() -> None:
     """
     ok, _reason = probe_volume_indicator("william_vix_fix")
     assert ok is False
-

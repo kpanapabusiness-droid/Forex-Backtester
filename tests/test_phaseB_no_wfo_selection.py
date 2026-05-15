@@ -49,28 +49,36 @@ def test_phaseB_scripts_do_not_import_wfo_or_leaderboard():
             continue
         imports, _ = _collect_imports_and_calls(path)
         for bad in forbidden:
-            if bad in imports or any(bad.split(".")[-1] == imp.split(".")[-1] for imp in imports if bad in imp):
+            if bad in imports or any(
+                bad.split(".")[-1] == imp.split(".")[-1] for imp in imports if bad in imp
+            ):
                 # Only fail on direct module imports that would pull in WFO/leaderboard
                 if "walk_forward" in str(imports) or "run_wfo_v2" in str(imports):
                     raise AssertionError(f"{path.name} must not import WFO: found among {imports}")
-                if "leaderboard_c1_identity" in str(imports) or "phase5_leaderboard" in str(imports):
-                    raise AssertionError(f"{path.name} must not import leaderboard: found among {imports}")
+                if "leaderboard_c1_identity" in str(imports) or "phase5_leaderboard" in str(
+                    imports
+                ):
+                    raise AssertionError(
+                        f"{path.name} must not import leaderboard: found among {imports}"
+                    )
 
 
 def test_phaseB_diagnostics_has_no_walk_forward_import():
-    content = (Path(__file__).resolve().parents[1] / "scripts" / "phaseB_run_diagnostics.py").read_text(
-        encoding="utf-8"
-    )
+    content = (
+        Path(__file__).resolve().parents[1] / "scripts" / "phaseB_run_diagnostics.py"
+    ).read_text(encoding="utf-8")
     assert "walk_forward" not in content, "phaseB_run_diagnostics must not reference walk_forward"
     assert "run_wfo_v2" not in content, "phaseB_run_diagnostics must not reference run_wfo_v2"
-    assert "build_leaderboard" not in content, "phaseB_run_diagnostics must not reference build_leaderboard"
+    assert "build_leaderboard" not in content, (
+        "phaseB_run_diagnostics must not reference build_leaderboard"
+    )
     assert "worst_fold" not in content, "phaseB_run_diagnostics must not reference worst_fold"
 
 
 def test_phaseB_controlled_overfit_has_no_wfo_import():
-    content = (Path(__file__).resolve().parents[1] / "scripts" / "phaseB_run_controlled_overfit.py").read_text(
-        encoding="utf-8"
-    )
+    content = (
+        Path(__file__).resolve().parents[1] / "scripts" / "phaseB_run_controlled_overfit.py"
+    ).read_text(encoding="utf-8")
     assert "walk_forward" not in content
     assert "run_wfo_v2" not in content
     assert "build_leaderboard" not in content

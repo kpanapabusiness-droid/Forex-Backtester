@@ -50,9 +50,8 @@ os.environ.setdefault("SOURCE_DATE_EPOCH", "1577836800")
 import matplotlib  # noqa: E402
 
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt  # noqa: E402
 import matplotlib.colors as mcolors  # noqa: E402
-
+import matplotlib.pyplot as plt  # noqa: E402
 from scipy import stats as sps  # noqa: E402
 
 REPO_ROOT: Path = Path(__file__).resolve().parents[2]
@@ -75,10 +74,8 @@ CHARTS_DIR: Path = OUTPUT_DIR / "charts"
 
 # Expected hashes from the parent appendix manifest.
 EXPECTED_INPUT_HASHES: Dict[str, str] = {
-    "cluster_assignments.csv":
-        "c82f7208ece085e804bc7c66c741d91e5004c604463f8dbeff03381aacf7ecbe",
-    "shape_features.csv":
-        "6920c990628dd2d769cfbc56bd006391f6b9a24beea64f52f5bda9da02d44aaa",
+    "cluster_assignments.csv": "c82f7208ece085e804bc7c66c741d91e5004c604463f8dbeff03381aacf7ecbe",
+    "shape_features.csv": "6920c990628dd2d769cfbc56bd006391f6b9a24beea64f52f5bda9da02d44aaa",
 }
 
 # Fold OOS boundaries (LOCKED from PHASE_L6_ARC2_RESULT.md §5 / lines 148-154).
@@ -127,16 +124,18 @@ def _png_pixel_hash(path: Path) -> str:
     while pos < len(data):
         if pos + 8 > len(data):
             break
-        length = int.from_bytes(data[pos:pos + 4], "big")
-        chunk_type = data[pos + 4:pos + 8]
-        chunk_data = data[pos + 8:pos + 8 + length]
+        length = int.from_bytes(data[pos : pos + 4], "big")
+        chunk_type = data[pos + 4 : pos + 8]
+        chunk_data = data[pos + 8 : pos + 8 + length]
         if chunk_type == b"IDAT":
             out.update(chunk_data)
         pos = pos + 8 + length + 4
     return out.hexdigest()
 
 
-def _write_csv(df: pd.DataFrame, path: Path, *, float_format: str = "%.10g", index: bool = False) -> None:
+def _write_csv(
+    df: pd.DataFrame, path: Path, *, float_format: str = "%.10g", index: bool = False
+) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     buf = io.StringIO()
     df.to_csv(buf, index=index, lineterminator="\n", float_format=float_format)
@@ -185,8 +184,13 @@ def load_inputs() -> Tuple[pd.DataFrame, Dict[str, str]]:
     # Keep only the columns we need. (Artifact column name is `actual_taken`,
     # which the prompt's input spec calls `taken` — artifact wins.)
     keep_shape_cols = [
-        "signal_idx", "signal_time", "pair", "actual_taken",
-        "peak_mfe_r", "peak_mae_r", "r_at_t240",
+        "signal_idx",
+        "signal_time",
+        "pair",
+        "actual_taken",
+        "peak_mfe_r",
+        "peak_mae_r",
+        "r_at_t240",
     ]
     shape = shape[keep_shape_cols].copy()
     shape = shape.rename(columns={"actual_taken": "taken"})
@@ -252,7 +256,7 @@ def crosstabs_at_k(df: pd.DataFrame, k: int) -> Tuple[pd.DataFrame, pd.DataFrame
     raw = counts.drop(index="Total", columns="Total")
     col_totals = raw.sum(axis=0)
     row_totals = raw.sum(axis=1)
-    n_total = int(raw.sum().sum())
+    int(raw.sum().sum())
 
     pct_of_fold = raw.divide(col_totals.replace(0, np.nan), axis=1)
     pct_of_fold["Total_check"] = pct_of_fold.sum(axis=1).fillna(0)
@@ -287,20 +291,39 @@ def analysis_2(df: pd.DataFrame, k: int = K_PRIMARY) -> pd.DataFrame:
             n = len(cell)
             base = {"cluster_id": cluster, "fold_id": fold, "n": n}
             if n == 0:
-                rows.extend([
-                    {**base, "metric": "r_at_t240", "stat": s, "value": float("nan")}
-                    for s in ("mean", "std", "p25", "p50", "p75")
-                ])
+                rows.extend(
+                    [
+                        {**base, "metric": "r_at_t240", "stat": s, "value": float("nan")}
+                        for s in ("mean", "std", "p25", "p50", "p75")
+                    ]
+                )
                 rows.append({**base, "metric": "peak_mfe_r", "stat": "mean", "value": float("nan")})
                 rows.append({**base, "metric": "peak_mae_r", "stat": "mean", "value": float("nan")})
-                rows.append({**base, "metric": "pct_taken", "stat": "fraction", "value": float("nan")})
+                rows.append(
+                    {**base, "metric": "pct_taken", "stat": "fraction", "value": float("nan")}
+                )
                 continue
             r240 = cell["r_at_t240"].to_numpy(dtype=np.float64)
             r240_finite = r240[np.isfinite(r240)]
             if r240_finite.size:
-                rows.append({**base, "metric": "r_at_t240", "stat": "mean", "value": float(np.mean(r240_finite))})
-                rows.append({**base, "metric": "r_at_t240", "stat": "std",
-                             "value": float(np.std(r240_finite, ddof=1)) if r240_finite.size > 1 else float("nan")})
+                rows.append(
+                    {
+                        **base,
+                        "metric": "r_at_t240",
+                        "stat": "mean",
+                        "value": float(np.mean(r240_finite)),
+                    }
+                )
+                rows.append(
+                    {
+                        **base,
+                        "metric": "r_at_t240",
+                        "stat": "std",
+                        "value": float(np.std(r240_finite, ddof=1))
+                        if r240_finite.size > 1
+                        else float("nan"),
+                    }
+                )
                 p25, p50, p75 = np.percentile(r240_finite, [25, 50, 75], method="linear")
                 rows.append({**base, "metric": "r_at_t240", "stat": "p25", "value": float(p25)})
                 rows.append({**base, "metric": "r_at_t240", "stat": "p50", "value": float(p50)})
@@ -310,13 +333,21 @@ def analysis_2(df: pd.DataFrame, k: int = K_PRIMARY) -> pd.DataFrame:
                     rows.append({**base, "metric": "r_at_t240", "stat": s, "value": float("nan")})
             pmfe = cell["peak_mfe_r"].to_numpy(dtype=np.float64)
             pmae = cell["peak_mae_r"].to_numpy(dtype=np.float64)
-            rows.append({**base, "metric": "peak_mfe_r", "stat": "mean", "value": float(np.nanmean(pmfe))})
-            rows.append({**base, "metric": "peak_mae_r", "stat": "mean", "value": float(np.nanmean(pmae))})
+            rows.append(
+                {**base, "metric": "peak_mfe_r", "stat": "mean", "value": float(np.nanmean(pmfe))}
+            )
+            rows.append(
+                {**base, "metric": "peak_mae_r", "stat": "mean", "value": float(np.nanmean(pmae))}
+            )
             taken = cell["taken"].astype(bool).to_numpy()
-            rows.append({**base, "metric": "pct_taken", "stat": "fraction", "value": float(np.mean(taken))})
-    out = pd.DataFrame(rows).sort_values(
-        by=["cluster_id", "fold_id", "metric", "stat"], kind="mergesort"
-    ).reset_index(drop=True)
+            rows.append(
+                {**base, "metric": "pct_taken", "stat": "fraction", "value": float(np.mean(taken))}
+            )
+    out = (
+        pd.DataFrame(rows)
+        .sort_values(by=["cluster_id", "fold_id", "metric", "stat"], kind="mergesort")
+        .reset_index(drop=True)
+    )
     return out
 
 
@@ -359,12 +390,30 @@ def analysis_3(df: pd.DataFrame) -> Dict[str, Any]:
     chi2_cm, p_cm, dof_cm, v_cm = _cramers_v_and_chi2(cm)
 
     return {
-        "cluster_fold": {"chi2": chi2_cf, "p": p_cf, "dof": dof_cf, "cramers_v": v_cf,
-                          "n_rows": int(cf.shape[0]), "n_cols": int(cf.shape[1])},
-        "cluster_pair": {"chi2": chi2_cp, "p": p_cp, "dof": dof_cp, "cramers_v": v_cp,
-                          "n_rows": int(cp.shape[0]), "n_cols": int(cp.shape[1])},
-        "cluster_month": {"chi2": chi2_cm, "p": p_cm, "dof": dof_cm, "cramers_v": v_cm,
-                           "n_rows": int(cm.shape[0]), "n_cols": int(cm.shape[1])},
+        "cluster_fold": {
+            "chi2": chi2_cf,
+            "p": p_cf,
+            "dof": dof_cf,
+            "cramers_v": v_cf,
+            "n_rows": int(cf.shape[0]),
+            "n_cols": int(cf.shape[1]),
+        },
+        "cluster_pair": {
+            "chi2": chi2_cp,
+            "p": p_cp,
+            "dof": dof_cp,
+            "cramers_v": v_cp,
+            "n_rows": int(cp.shape[0]),
+            "n_cols": int(cp.shape[1]),
+        },
+        "cluster_month": {
+            "chi2": chi2_cm,
+            "p": p_cm,
+            "dof": dof_cm,
+            "cramers_v": v_cm,
+            "n_rows": int(cm.shape[0]),
+            "n_cols": int(cm.shape[1]),
+        },
     }
 
 
@@ -417,14 +466,16 @@ def analysis_4(df: pd.DataFrame, k: int = K_PRIMARY) -> Tuple[pd.DataFrame, Dict
             mean_r = float(np.mean(r240)) if r240.size else 0.0
             weight = (n_cell / n_fold) if n_fold > 0 else 0.0
             contrib = mean_r * weight
-            cluster_contribs.append({
-                "fold_id": fold,
-                "cluster_id": cluster,
-                "n_cell": n_cell,
-                "weight_n_over_fold": weight,
-                "mean_r_cell": mean_r,
-                "contribution_to_mean_r": contrib,
-            })
+            cluster_contribs.append(
+                {
+                    "fold_id": fold,
+                    "cluster_id": cluster,
+                    "n_cell": n_cell,
+                    "weight_n_over_fold": weight,
+                    "mean_r_cell": mean_r,
+                    "contribution_to_mean_r": contrib,
+                }
+            )
 
         # Sort by |contribution| desc to compute cumulative share.
         cluster_contribs.sort(key=lambda r: abs(r["contribution_to_mean_r"]), reverse=True)
@@ -436,9 +487,11 @@ def analysis_4(df: pd.DataFrame, k: int = K_PRIMARY) -> Tuple[pd.DataFrame, Dict
             r["cumulative_share"] = cum / total_abs
             rows.append(r)
 
-    out = pd.DataFrame(rows).sort_values(
-        by=["fold_id", "abs_rank"], kind="mergesort"
-    ).reset_index(drop=True)
+    out = (
+        pd.DataFrame(rows)
+        .sort_values(by=["fold_id", "abs_rank"], kind="mergesort")
+        .reset_index(drop=True)
+    )
     return out, fold_pooled_mean
 
 
@@ -466,8 +519,15 @@ def chart_cluster_composition_per_fold(df: pd.DataFrame, k: int, path: Path) -> 
     folds = pct.index.tolist()
     for i, cluster in enumerate(pct.columns):
         vals = pct[cluster].to_numpy(dtype=np.float64)
-        ax.bar(folds, vals, bottom=bottom, color=palette[i], label=f"cluster {cluster}",
-               edgecolor="white", linewidth=0.5)
+        ax.bar(
+            folds,
+            vals,
+            bottom=bottom,
+            color=palette[i],
+            label=f"cluster {cluster}",
+            edgecolor="white",
+            linewidth=0.5,
+        )
         bottom += vals
     ax.set_xlabel("fold_id")
     ax.set_ylabel("proportion of fold")
@@ -491,8 +551,15 @@ def chart_fold_composition_per_cluster(df: pd.DataFrame, k: int, path: Path) -> 
     clusters = pct.index.tolist()
     for i, fold in enumerate(pct.columns):
         vals = pct[fold].to_numpy(dtype=np.float64)
-        ax.bar(clusters, vals, bottom=bottom, color=fold_palette[i],
-               label=f"fold {fold}", edgecolor="white", linewidth=0.5)
+        ax.bar(
+            clusters,
+            vals,
+            bottom=bottom,
+            color=fold_palette[i],
+            label=f"fold {fold}",
+            edgecolor="white",
+            linewidth=0.5,
+        )
         bottom += vals
     ax.set_xlabel("cluster_id")
     ax.set_ylabel("proportion of cluster")
@@ -504,13 +571,17 @@ def chart_fold_composition_per_cluster(df: pd.DataFrame, k: int, path: Path) -> 
 
 def chart_mean_r_heatmap(outcomes: pd.DataFrame, k: int, path: Path) -> None:
     """Heatmap of mean_r_at_t240 per (cluster, fold), annotated with value and N."""
-    pivot_mean = outcomes[(outcomes["metric"] == "r_at_t240") & (outcomes["stat"] == "mean")].pivot(
-        index="cluster_id", columns="fold_id", values="value"
-    ).reindex(index=range(1, k + 1), columns=range(1, 8))
-    pivot_n = outcomes[outcomes["metric"] == "r_at_t240"].groupby(
-        ["cluster_id", "fold_id"], as_index=False
-    )["n"].max().pivot(index="cluster_id", columns="fold_id", values="n").reindex(
-        index=range(1, k + 1), columns=range(1, 8), fill_value=0
+    pivot_mean = (
+        outcomes[(outcomes["metric"] == "r_at_t240") & (outcomes["stat"] == "mean")]
+        .pivot(index="cluster_id", columns="fold_id", values="value")
+        .reindex(index=range(1, k + 1), columns=range(1, 8))
+    )
+    pivot_n = (
+        outcomes[outcomes["metric"] == "r_at_t240"]
+        .groupby(["cluster_id", "fold_id"], as_index=False)["n"]
+        .max()
+        .pivot(index="cluster_id", columns="fold_id", values="n")
+        .reindex(index=range(1, k + 1), columns=range(1, 8), fill_value=0)
     )
 
     fig, ax = plt.subplots(figsize=(11, 6))
@@ -548,18 +619,33 @@ def chart_cluster_contribution_to_fold_mean(contrib_df: pd.DataFrame, k: int, pa
     for cluster in range(1, k + 1):
         vals = []
         for fold in folds:
-            cell = contrib_df[(contrib_df["fold_id"] == fold) & (contrib_df["cluster_id"] == cluster)]
+            cell = contrib_df[
+                (contrib_df["fold_id"] == fold) & (contrib_df["cluster_id"] == cluster)
+            ]
             vals.append(float(cell["contribution_to_mean_r"].iloc[0]) if len(cell) else 0.0)
         vals = np.asarray(vals)
         pos_heights = np.where(vals > 0, vals, 0.0)
         neg_heights = np.where(vals < 0, vals, 0.0)
         if (pos_heights != 0).any():
-            ax.bar(bar_positions, pos_heights, bottom=pos_bottom, color=palette[cluster - 1],
-                   label=f"cluster {cluster}", edgecolor="white", linewidth=0.5)
+            ax.bar(
+                bar_positions,
+                pos_heights,
+                bottom=pos_bottom,
+                color=palette[cluster - 1],
+                label=f"cluster {cluster}",
+                edgecolor="white",
+                linewidth=0.5,
+            )
             pos_bottom = pos_bottom + pos_heights
         if (neg_heights != 0).any():
-            ax.bar(bar_positions, neg_heights, bottom=neg_bottom, color=palette[cluster - 1],
-                   edgecolor="white", linewidth=0.5)
+            ax.bar(
+                bar_positions,
+                neg_heights,
+                bottom=neg_bottom,
+                color=palette[cluster - 1],
+                edgecolor="white",
+                linewidth=0.5,
+            )
             neg_bottom = neg_bottom + neg_heights
     ax.axhline(0.0, color="black", lw=0.6)
     # Plot pooled mean as a marker.
@@ -576,11 +662,17 @@ def chart_cluster_contribution_to_fold_mean(contrib_df: pd.DataFrame, k: int, pa
     # Dedupe legend labels.
     handles, labels = ax.get_legend_handles_labels()
     by_label = OrderedDict()
-    for h, l in zip(handles, labels):
-        if l not in by_label:
-            by_label[l] = h
-    ax.legend(by_label.values(), by_label.keys(), loc="upper right",
-              fontsize=8, ncol=2, bbox_to_anchor=(1.18, 1.0))
+    for h, lbl in zip(handles, labels):
+        if lbl not in by_label:
+            by_label[lbl] = h
+    ax.legend(
+        by_label.values(),
+        by_label.keys(),
+        loc="upper right",
+        fontsize=8,
+        ncol=2,
+        bbox_to_anchor=(1.18, 1.0),
+    )
     _save_figure(fig, path)
 
 
@@ -623,7 +715,9 @@ def write_independence_md(diag: Dict[str, Any], path: Path) -> None:
             f"{d['chi2']:.2f} | {d['p']:.4g} | {_fmt_float(d['cramers_v'])} | {cramers_v_label(d['cramers_v'])} |"
         )
     lines.append("")
-    lines.append("**Reading guide.** The (cluster × fold) Cramer's V is the open-question quantity.")
+    lines.append(
+        "**Reading guide.** The (cluster × fold) Cramer's V is the open-question quantity."
+    )
     lines.append(
         "If it materially exceeds the (cluster × pair) and (cluster × month) comparators, the "
         "cluster structure is more strongly associated with fold (i.e., time regime) than with "
@@ -684,7 +778,9 @@ def write_report(
 
     lines.append("## 3. Cross-tab tables at k=6 (km full)")
     lines.append("")
-    lines.append("All cross-tabs at k=4, k=6, k=8, k=10 are persisted as CSV files in this directory.")
+    lines.append(
+        "All cross-tabs at k=4, k=6, k=8, k=10 are persisted as CSV files in this directory."
+    )
     lines.append("The primary table (k=6) is shown below.")
     lines.append("")
     lines.append("### 3.1 Counts (cluster × fold)")
@@ -738,7 +834,9 @@ def write_report(
             row_means.append(_fmt_float(float(cell["value"].iloc[0])) if len(cell) else "NaN")
         lines.append(f"| {cluster} | " + " | ".join(row_means) + " |")
     lines.append("")
-    lines.append("Full long-format table (mean, std, p25, p50, p75 of r_at_t240, plus mean of peak_mfe_r / peak_mae_r and pct_taken) in `cluster_fold_outcomes_k6.csv`.")
+    lines.append(
+        "Full long-format table (mean, std, p25, p50, p75 of r_at_t240, plus mean of peak_mfe_r / peak_mae_r and pct_taken) in `cluster_fold_outcomes_k6.csv`."
+    )
     lines.append("")
 
     lines.append("## 5. Independence diagnostics")
@@ -773,23 +871,31 @@ def write_report(
     lines.append("")
     lines.append("Per-fold pooled mean r_at_t240 (ex-ante population):")
     lines.append("")
-    lines.append("| fold | n_ex_ante (in cluster set) | pooled_mean_r_at_t240 | wfo_mean_R_taken (reference) |")
-    lines.append("|------|------------------------------|-------------------------|--------------------------------|")
+    lines.append(
+        "| fold | n_ex_ante (in cluster set) | pooled_mean_r_at_t240 | wfo_mean_R_taken (reference) |"
+    )
+    lines.append(
+        "|------|------------------------------|-------------------------|--------------------------------|"
+    )
     for fid in range(1, 8):
         contrib_fold = contrib_df[contrib_df["fold_id"] == fid]
         n_fold = int(contrib_fold["n_cell"].sum())
         pooled = pooled_mean_per_fold.get(fid, float("nan"))
         wfo_mean = next((m for f, _, m, _, _, _ in WFO_REFERENCE if f == fid), float("nan"))
-        lines.append(
-            f"| {fid} | {n_fold} | {_fmt_float(pooled)} | {_fmt_float(wfo_mean)} |"
-        )
+        lines.append(f"| {fid} | {n_fold} | {_fmt_float(pooled)} | {_fmt_float(wfo_mean)} |")
     lines.append("")
     lines.append("Per-fold dominant contributors (top-3 by |contribution|):")
     lines.append("")
-    lines.append("| fold | rank | cluster | n_cell | weight | mean_r_cell | contribution | cumulative_share |")
-    lines.append("|------|------|---------|--------|--------|-------------|--------------|-------------------|")
+    lines.append(
+        "| fold | rank | cluster | n_cell | weight | mean_r_cell | contribution | cumulative_share |"
+    )
+    lines.append(
+        "|------|------|---------|--------|--------|-------------|--------------|-------------------|"
+    )
     for fid in range(1, 8):
-        contrib_fold = contrib_df[contrib_df["fold_id"] == fid].sort_values("abs_rank", kind="mergesort")
+        contrib_fold = contrib_df[contrib_df["fold_id"] == fid].sort_values(
+            "abs_rank", kind="mergesort"
+        )
         for _, r in contrib_fold.head(3).iterrows():
             lines.append(
                 f"| {int(r['fold_id'])} | {int(r['abs_rank'])} | {int(r['cluster_id'])} | "
@@ -819,7 +925,11 @@ def write_report(
     )
     # Compute concentration extreme observations from pct_of_cluster table.
     poc = crosstabs[K_PRIMARY]["pct_of_cluster"].copy()
-    poc_clean = poc[poc["cluster_id"].apply(lambda v: isinstance(v, (int, np.integer)) or (isinstance(v, str) and v != "sum_check"))]
+    poc_clean = poc[
+        poc["cluster_id"].apply(
+            lambda v: isinstance(v, (int, np.integer)) or (isinstance(v, str) and v != "sum_check")
+        )
+    ]
     poc_clean = poc_clean[poc_clean["cluster_id"] != "sum_check"]
     # Find each cluster's most-concentrated fold.
     for _, row in poc_clean.iterrows():
@@ -832,9 +942,11 @@ def write_report(
             continue
         top_fold, top_pct = max(fold_pcts, key=lambda x: x[1])
         bot_fold, bot_pct = min(fold_pcts, key=lambda x: x[1])
-        cluster_total = int(crosstabs[K_PRIMARY]["counts"][
-            crosstabs[K_PRIMARY]["counts"]["cluster_id"] == cid
-        ]["Total"].iloc[0])
+        cluster_total = int(
+            crosstabs[K_PRIMARY]["counts"][crosstabs[K_PRIMARY]["counts"]["cluster_id"] == cid][
+                "Total"
+            ].iloc[0]
+        )
         top_n = int(round(top_pct * cluster_total))
         bot_n = int(round(bot_pct * cluster_total))
         lines.append(
@@ -852,7 +964,9 @@ def write_report(
         )
     # Top contributor per fold.
     for fid in range(1, 8):
-        contrib_fold = contrib_df[contrib_df["fold_id"] == fid].sort_values("abs_rank", kind="mergesort")
+        contrib_fold = contrib_df[contrib_df["fold_id"] == fid].sort_values(
+            "abs_rank", kind="mergesort"
+        )
         if len(contrib_fold) == 0:
             continue
         top = contrib_fold.iloc[0]
@@ -867,10 +981,16 @@ def write_report(
 
     lines.append("## 8. Out of scope items observed")
     lines.append("")
-    lines.append("- Per-pair × fold cluster breakdown: not produced (would multiply table count by 28).")
-    lines.append("- IS-period cluster assignments: not produced; trajectory appendix's clustering is")
+    lines.append(
+        "- Per-pair × fold cluster breakdown: not produced (would multiply table count by 28)."
+    )
+    lines.append(
+        "- IS-period cluster assignments: not produced; trajectory appendix's clustering is"
+    )
     lines.append("  on the full ex-ante population, which has both IS and OOS rows by construction")
-    lines.append("  (signals_features.csv labels by fold_disposition). This analysis uses signal_time")
+    lines.append(
+        "  (signals_features.csv labels by fold_disposition). This analysis uses signal_time"
+    )
     lines.append("  alone for fold assignment.")
     lines.append("- Hierarchical (subsample) cluster labels: only the km full assignments are used")
     lines.append("  here. The hier_k* columns in cluster_assignments.csv have most entries marked")
@@ -961,7 +1081,9 @@ def write_manifest(
     lines.append(f"- NUMPY_SEED = {NUMPY_SEED}")
     lines.append("- Sort order: rows sorted by signal_idx ascending after the merge.")
     lines.append("- CSV: utf-8, LF line endings, float_format='%.10g'.")
-    lines.append("- Matplotlib: Agg backend, metadata pinned (Software='matplotlib', Creation Time='2020-01-01').")
+    lines.append(
+        "- Matplotlib: Agg backend, metadata pinned (Software='matplotlib', Creation Time='2020-01-01')."
+    )
     lines.append("")
     lines.append(f"## Output file sha256 (run #{run_ordinal})")
     lines.append("")
@@ -987,11 +1109,13 @@ def write_manifest(
         all_match = True
         for rel, h in hashes.items():
             prior = prior_hashes.get(rel)
-            ok = (prior == h)
+            ok = prior == h
             all_match = all_match and ok
             lines.append(f"- {rel}: {'IDENTICAL' if ok else 'DIVERGED'}")
         lines.append("")
-        lines.append(f"Overall: {'PASS - byte-identical across runs' if all_match else 'FAIL - some files diverged'}")
+        lines.append(
+            f"Overall: {'PASS - byte-identical across runs' if all_match else 'FAIL - some files diverged'}"
+        )
         lines.append("")
 
     _write_text("\n".join(lines) + "\n", OUTPUT_DIR / "run_manifest.txt")
@@ -1003,7 +1127,9 @@ def write_manifest(
 # ---------------------------------------------------------------------------
 
 
-def run_pipeline(*, run_ordinal: int, prior_hashes: Optional[Dict[str, str]] = None) -> Dict[str, str]:
+def run_pipeline(
+    *, run_ordinal: int, prior_hashes: Optional[Dict[str, str]] = None
+) -> Dict[str, str]:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     CHARTS_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -1028,7 +1154,10 @@ def run_pipeline(*, run_ordinal: int, prior_hashes: Optional[Dict[str, str]] = N
     print(f"[run #{run_ordinal}] Analysis 3 — independence diagnostics ...", flush=True)
     diag = analysis_3(df)
 
-    print(f"[run #{run_ordinal}] Analysis 4 — cluster contributions to fold pooled mean R ...", flush=True)
+    print(
+        f"[run #{run_ordinal}] Analysis 4 — cluster contributions to fold pooled mean R ...",
+        flush=True,
+    )
     contrib_df, pooled_mean = analysis_4(df, k=K_PRIMARY)
 
     print(f"[run #{run_ordinal}] Writing outputs ...", flush=True)
@@ -1050,13 +1179,19 @@ def run_pipeline(*, run_ordinal: int, prior_hashes: Optional[Dict[str, str]] = N
     write_independence_md(diag, OUTPUT_DIR / "independence_diagnostics.md")
     out_paths.append(OUTPUT_DIR / "independence_diagnostics.md")
 
-    chart_cluster_composition_per_fold(df, K_PRIMARY, CHARTS_DIR / "cluster_composition_per_fold.png")
+    chart_cluster_composition_per_fold(
+        df, K_PRIMARY, CHARTS_DIR / "cluster_composition_per_fold.png"
+    )
     out_paths.append(CHARTS_DIR / "cluster_composition_per_fold.png")
-    chart_fold_composition_per_cluster(df, K_PRIMARY, CHARTS_DIR / "fold_composition_per_cluster.png")
+    chart_fold_composition_per_cluster(
+        df, K_PRIMARY, CHARTS_DIR / "fold_composition_per_cluster.png"
+    )
     out_paths.append(CHARTS_DIR / "fold_composition_per_cluster.png")
     chart_mean_r_heatmap(outcomes_df, K_PRIMARY, CHARTS_DIR / "mean_r_heatmap_cluster_fold.png")
     out_paths.append(CHARTS_DIR / "mean_r_heatmap_cluster_fold.png")
-    chart_cluster_contribution_to_fold_mean(contrib_df, K_PRIMARY, CHARTS_DIR / "cluster_contribution_to_fold_mean.png")
+    chart_cluster_contribution_to_fold_mean(
+        contrib_df, K_PRIMARY, CHARTS_DIR / "cluster_contribution_to_fold_mean.png"
+    )
     out_paths.append(CHARTS_DIR / "cluster_contribution_to_fold_mean.png")
 
     print(f"[run #{run_ordinal}] Writing report ...", flush=True)

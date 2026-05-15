@@ -68,7 +68,9 @@ def _parse_summary(results_dir: Path) -> dict:
     return out
 
 
-def _scratch_cluster_penalty(trades_path: Path, window: int = 30, min_scratch_in_window: int = 3) -> int:
+def _scratch_cluster_penalty(
+    trades_path: Path, window: int = 30, min_scratch_in_window: int = 3
+) -> int:
     if not trades_path.exists():
         return 0
     df = pd.read_csv(trades_path)
@@ -146,18 +148,20 @@ def _run_controlled_overfit(cfg: dict, base_out: Path) -> None:
             _run_backtest(c_check, check_dir)
             fit_s = _parse_summary(best_run_dir) if best_run_dir and best_run_dir.exists() else {}
             check_s = _parse_summary(check_dir)
-            pair_rows.append({
-                "fold_idx": fp_idx,
-                "fit_start": fit_start,
-                "fit_end": fit_end,
-                "check_start": check_start,
-                "check_end": check_end,
-                "best_params": json.dumps(best_params),
-                "fit_trades": fit_s.get("total_trades", 0),
-                "check_trades": check_s.get("total_trades", 0),
-                "check_roi_pct": check_s.get("roi_pct", 0),
-                "check_max_dd_pct": check_s.get("max_dd_pct", 0),
-            })
+            pair_rows.append(
+                {
+                    "fold_idx": fp_idx,
+                    "fit_start": fit_start,
+                    "fit_end": fit_end,
+                    "check_start": check_start,
+                    "check_end": check_end,
+                    "best_params": json.dumps(best_params),
+                    "fit_trades": fit_s.get("total_trades", 0),
+                    "check_trades": check_s.get("total_trades", 0),
+                    "check_roi_pct": check_s.get("roi_pct", 0),
+                    "check_max_dd_pct": check_s.get("max_dd_pct", 0),
+                }
+            )
         if pair_rows:
             pd.DataFrame(pair_rows).to_csv(ind_out / "overfit_pairs.csv", index=False)
             summary = pd.DataFrame(pair_rows)
@@ -165,7 +169,9 @@ def _run_controlled_overfit(cfg: dict, base_out: Path) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Phase B — Controlled overfit diagnostic (no WFO).")
+    parser = argparse.ArgumentParser(
+        description="Phase B — Controlled overfit diagnostic (no WFO)."
+    )
     parser.add_argument("--config", required=True, help="Path to phaseB_controlled_overfit config.")
     args = parser.parse_args()
     config_path = Path(args.config)

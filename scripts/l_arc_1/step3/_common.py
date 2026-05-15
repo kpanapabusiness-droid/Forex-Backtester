@@ -1,15 +1,16 @@
+# ruff: noqa: E402  (sys.path.insert needed before project imports)
 """Shared utilities for L Arc 1 Step 3 extractability scripts.
 
 Determinism: all random seeds derive from BASE_SEED. All sorts are explicit.
 All file writes go through write_csv() and write_text() which use a fixed
 formatting/float precision so re-runs are byte-identical.
 """
+
 from __future__ import annotations
 
 import hashlib
 import json
 from pathlib import Path
-from typing import Any, Iterable
 
 import numpy as np
 import pandas as pd
@@ -27,7 +28,7 @@ STRAT_DIR = OUT_DIR / "stratifications"
 # --- seeds --------------------------------------------------------------
 
 BASE_SEED = 1234
-N_PERMUTATIONS = 1000   # v1.1 target; floor 500 per Amendment 11 / op spec §6.7
+N_PERMUTATIONS = 1000  # v1.1 target; floor 500 per Amendment 11 / op spec §6.7
 WARD_SUBSAMPLE = 10_000  # subsample size for hierarchical ward (memory)
 N_FOLDS = 7
 
@@ -35,21 +36,36 @@ N_FOLDS = 7
 
 # Identity columns (never used as predictors)
 IDENTITY_COLS = (
-    "trade_id", "pair", "fold_id",
-    "signal_bar_ts", "entry_bar_ts", "exit_bar_ts",
+    "trade_id",
+    "pair",
+    "fold_id",
+    "signal_bar_ts",
+    "entry_bar_ts",
+    "exit_bar_ts",
     "direction",
 )
 
 # Trade outcome columns — excluded from predictor sets
 OUTCOME_COLS = (
-    "net_r", "gross_r", "spread_cost_R",
-    "mfe_R", "mae_R", "bars_held", "exit_reason",
-    "spread_pips_entry", "spread_pips_exit", "spread_floored",
-    "sl_distance_atr", "sl_distance_price",
-    "mfe_held_atr", "mae_held_atr",
-    "peak_to_final_r_ratio", "mfe_to_mae_ratio_held",
+    "net_r",
+    "gross_r",
+    "spread_cost_R",
+    "mfe_R",
+    "mae_R",
+    "bars_held",
+    "exit_reason",
+    "spread_pips_entry",
+    "spread_pips_exit",
+    "spread_floored",
+    "sl_distance_atr",
+    "sl_distance_price",
+    "mfe_held_atr",
+    "mae_held_atr",
+    "peak_to_final_r_ratio",
+    "mfe_to_mae_ratio_held",
     "mfe_sequence_class_held",
-    "time_to_peak_mfe_held", "time_to_trough_mae_held",
+    "time_to_peak_mfe_held",
+    "time_to_trough_mae_held",
 )
 
 # Bars observed only after entry / first-bar columns — NOT signal-time
@@ -58,20 +74,38 @@ FIRST_BAR_COLS = ("first_bar_direction", "first_bar_range_atr", "first_bar_range
 
 # Numeric signal-time predictors (computable at bar N close)
 SIGNAL_TIME_NUMERIC = (
-    "signal_bar_open", "signal_bar_close", "signal_bar_high", "signal_bar_low",
-    "signal_bar_log_return", "signal_bar_abs_log_return",
-    "signal_threshold_q90", "trigger_excess", "trigger_ratio",
-    "signal_bar_volume", "signal_bar_volume_nan",
-    "atr_at_signal_1h", "atr_baseline_1h_200", "atr_ratio_to_baseline",
-    "cum_logret_1h_6", "cum_logret_1h_3",
-    "dist_close_to_high30_atr", "dist_close_to_low30_atr",
-    "hour_utc", "day_of_week",
-    "hour_in_4h_bar", "bars_to_next_4h_close",
-    "hour_in_d1_bar", "bars_to_next_d1_close",
-    "concurrent_signals_same_bar", "concurrent_signals_within_3h",
-    "currency_basket_3h_USD", "currency_basket_3h_EUR",
-    "currency_basket_3h_JPY", "currency_basket_3h_GBP",
-    "trade_overlap_at_execution_time", "sequential_same_pair_density_24h",
+    "signal_bar_open",
+    "signal_bar_close",
+    "signal_bar_high",
+    "signal_bar_low",
+    "signal_bar_log_return",
+    "signal_bar_abs_log_return",
+    "signal_threshold_q90",
+    "trigger_excess",
+    "trigger_ratio",
+    "signal_bar_volume",
+    "signal_bar_volume_nan",
+    "atr_at_signal_1h",
+    "atr_baseline_1h_200",
+    "atr_ratio_to_baseline",
+    "cum_logret_1h_6",
+    "cum_logret_1h_3",
+    "dist_close_to_high30_atr",
+    "dist_close_to_low30_atr",
+    "hour_utc",
+    "day_of_week",
+    "hour_in_4h_bar",
+    "bars_to_next_4h_close",
+    "hour_in_d1_bar",
+    "bars_to_next_d1_close",
+    "concurrent_signals_same_bar",
+    "concurrent_signals_within_3h",
+    "currency_basket_3h_USD",
+    "currency_basket_3h_EUR",
+    "currency_basket_3h_JPY",
+    "currency_basket_3h_GBP",
+    "trade_overlap_at_execution_time",
+    "sequential_same_pair_density_24h",
     "trigger_magnitude_decile",
 )
 
@@ -81,10 +115,13 @@ SIGNAL_TIME_CATEGORICAL = ("pair", "session", "vol_regime", "pre_momentum_bin")
 # Forward-context observation features (per t-slice, in forward_context_evolution/t{t}.csv)
 FWD_CTX_NUMERIC = (
     "atr_regime_ratio",
-    "broker_spread_pips_raw", "broker_spread_pips_floored",
+    "broker_spread_pips_raw",
+    "broker_spread_pips_floored",
     "cross_pair_dispersion_proxy",
-    "basket_cum_logret_USD", "basket_cum_logret_EUR",
-    "basket_cum_logret_JPY", "basket_cum_logret_GBP",
+    "basket_cum_logret_USD",
+    "basket_cum_logret_EUR",
+    "basket_cum_logret_JPY",
+    "basket_cum_logret_GBP",
 )
 
 HELD_BAR_TS = (1, 3, 5, 10, 20)
@@ -99,12 +136,15 @@ HELD_BAR_TS = (1, 3, 5, 10, 20)
 # peak_to_final_r_ratio_fwd_h240 derived in load_signals (small-return
 # approximation; documented in §schema_notes).
 CLUSTER_FEATURES_NUMERIC = (
-    "mfe_held_atr",                  # = fwd_mfe_h1_atr
+    "mfe_held_atr",  # = fwd_mfe_h1_atr
     "mae_held_atr",
-    "fwd_mfe_h24_atr", "fwd_mae_h24_atr",
-    "fwd_mfe_h120_atr", "fwd_mae_h120_atr",
+    "fwd_mfe_h24_atr",
+    "fwd_mae_h24_atr",
+    "fwd_mfe_h120_atr",
+    "fwd_mae_h120_atr",
     "race_bars_plus1_minus_minus1",
-    "fwd_time_to_peak_mfe", "fwd_time_to_trough_mae",
+    "fwd_time_to_peak_mfe",
+    "fwd_time_to_trough_mae",
     "peak_to_final_r_ratio_fwd_h240",  # derived in load
     "fwd_oscillation_count",
     "fwd_monotonicity_ratio",
@@ -143,10 +183,12 @@ SIZE_FLOOR_EXIT_OR_DELAYED_ENTRY = 0.05
 # v1.1 Amendment 5: PCA pre-check
 PCA_REDUNDANCY_THRESHOLD = 0.85  # |Pearson| > 0.85 flagged candidate-redundant
 
+
 # v1.1 Amendment 2: phase G/H eligibility — top-K-by-raw-AUC per target,
 # K = max(20, 0.5 * n_features_scanned)
 def phase_gh_top_k(n_features_scanned: int) -> int:
     return max(20, n_features_scanned // 2)
+
 
 # v1.1 Amendment 1: family-level calibration check
 # Family = §5.15 cross-pair / portfolio features (8 members)
@@ -167,9 +209,12 @@ PARTIAL_AUC_DECILE_CUTOFF = 0.10
 
 # v1.1 Amendment 11: permutation seeds use hashlib.sha256, not Python hash()
 import hashlib as _hashlib
+
+
 def perm_seed_for_feature(fname: str, base_offset: int = 0) -> int:
     h = _hashlib.sha256(fname.encode("utf-8")).hexdigest()[:8]
     return (int(h, 16) + base_offset) & 0xFFFFFFFF
+
 
 # v1.1: permutation count floor 500, target 1000 per amendment doc
 N_PERMUTATIONS_TARGET = 1000
@@ -177,10 +222,10 @@ N_PERMUTATIONS_FLOOR = 500
 
 # Effect size thresholds (operational spec §8)
 ES_THRESHOLDS = {
-    "delta_median_fwd_mfe_h24": 0.10,           # ATR-norm, or >= 0.4 * pool_std
+    "delta_median_fwd_mfe_h24": 0.10,  # ATR-norm, or >= 0.4 * pool_std
     "delta_median_fwd_mfe_h24_stdfrac": 0.40,
     "delta_median_fwd_mfe_to_mae_ratio_h24": 0.25,
-    "delta_race_condition_median": 5.0,         # bars
+    "delta_race_condition_median": 5.0,  # bars
     "delta_p_reach_plus1atr_240": 0.10,
 }
 
@@ -193,6 +238,7 @@ FILTER_DRY_RUN_TOP_K = 10
 
 
 # --- IO helpers ---------------------------------------------------------
+
 
 def sha256_file(path: Path) -> str:
     h = hashlib.sha256()
@@ -226,11 +272,33 @@ def fmt_dist_stats(values: np.ndarray, label_prefix: str = "") -> dict[str, floa
     v = np.asarray(values, dtype=float)
     v = v[~np.isnan(v)]
     if v.size == 0:
-        return {f"{label_prefix}{k}": float("nan") for k in
-                ("n", "mean", "std", "skew", "kurt", "min",
-                 "p1", "p5", "p10", "p20", "p30", "p40", "p50", "p60",
-                 "p70", "p80", "p90", "p95", "p99", "max")}
+        return {
+            f"{label_prefix}{k}": float("nan")
+            for k in (
+                "n",
+                "mean",
+                "std",
+                "skew",
+                "kurt",
+                "min",
+                "p1",
+                "p5",
+                "p10",
+                "p20",
+                "p30",
+                "p40",
+                "p50",
+                "p60",
+                "p70",
+                "p80",
+                "p90",
+                "p95",
+                "p99",
+                "max",
+            )
+        }
     from scipy import stats as ss
+
     pcts = (1, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 99)
     quants = np.percentile(v, pcts)
     out = {

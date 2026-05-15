@@ -13,6 +13,7 @@ Phases:
 
 Run with: py -m scripts.l_arc_3.step2.run_step2
 """
+
 # ruff: noqa: E402, E701, E702, F841, I001
 from __future__ import annotations
 
@@ -71,7 +72,7 @@ def main() -> None:
     phase_j_arc3_addenda.main()
 
     print("=" * 70)
-    print(f"Pipeline complete in {time.time()-t0:.0f}s")
+    print(f"Pipeline complete in {time.time() - t0:.0f}s")
     print("Outputs under results/l_arc_3/step2_descriptive/")
     print("=" * 70)
 

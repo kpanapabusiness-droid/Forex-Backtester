@@ -15,7 +15,6 @@ Public entrypoint: `run_characterisation(config_path)`.
 from __future__ import annotations
 
 import csv
-import hashlib
 import math
 import sys
 from dataclasses import dataclass
@@ -30,30 +29,51 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from core.signals.l4_univariate_extreme import (  # noqa: E402
-    _compute_signals,
-    _wilder_atr,
-    _build_quote_to_usd_table,
-    _quote_to_usd_at,
-    _CCY_TO_USD_HELPER,
-    _USD_QUOTE_PAIRS,
-    _USD_BASE_PAIRS,
-    _pip_size,
     TIME_COL,
+    _build_quote_to_usd_table,
+    _compute_signals,
+    _pip_size,
+    _quote_to_usd_at,
+    _wilder_atr,
 )
 from core.spread_floor import (  # noqa: E402
+    STATE_CFG_KEY,
     SpreadFloorState,
     apply_spread_floor_to_pips,
     format_startup_log,
     load_spread_floor,
-    STATE_CFG_KEY,
 )
 from validators_config import load_and_validate_config  # noqa: E402
 
 PAIRS_DEFAULT: Tuple[str, ...] = (
-    "AUD_CAD", "AUD_CHF", "AUD_JPY", "AUD_NZD", "AUD_USD", "CAD_CHF", "CAD_JPY", "CHF_JPY",
-    "EUR_AUD", "EUR_CAD", "EUR_CHF", "EUR_GBP", "EUR_JPY", "EUR_NZD", "EUR_USD", "GBP_AUD",
-    "GBP_CAD", "GBP_CHF", "GBP_JPY", "GBP_NZD", "GBP_USD", "NZD_CAD", "NZD_CHF", "NZD_JPY",
-    "NZD_USD", "USD_CAD", "USD_CHF", "USD_JPY",
+    "AUD_CAD",
+    "AUD_CHF",
+    "AUD_JPY",
+    "AUD_NZD",
+    "AUD_USD",
+    "CAD_CHF",
+    "CAD_JPY",
+    "CHF_JPY",
+    "EUR_AUD",
+    "EUR_CAD",
+    "EUR_CHF",
+    "EUR_GBP",
+    "EUR_JPY",
+    "EUR_NZD",
+    "EUR_USD",
+    "GBP_AUD",
+    "GBP_CAD",
+    "GBP_CHF",
+    "GBP_JPY",
+    "GBP_NZD",
+    "GBP_USD",
+    "NZD_CAD",
+    "NZD_CHF",
+    "NZD_JPY",
+    "NZD_USD",
+    "USD_CAD",
+    "USD_CHF",
+    "USD_JPY",
 )
 
 
@@ -99,8 +119,10 @@ def _ema(series: pd.Series, span: int) -> pd.Series:
 
 def _kijun(df: pd.DataFrame, period: int = 26) -> pd.Series:
     """Kijun = (rolling-N high + rolling-N low) / 2 over last N bars including current."""
-    return (df["high"].rolling(period, min_periods=period).max()
-            + df["low"].rolling(period, min_periods=period).min()) / 2.0
+    return (
+        df["high"].rolling(period, min_periods=period).max()
+        + df["low"].rolling(period, min_periods=period).min()
+    ) / 2.0
 
 
 def _slope_5(arr: np.ndarray, window: int = 5) -> np.ndarray:
@@ -118,7 +140,7 @@ def _slope_5(arr: np.ndarray, window: int = 5) -> np.ndarray:
     x_dev_sq_sum = float(np.sum(x_dev * x_dev))
     # Use a strided window via stride tricks for speed.
     for i in range(window - 1, n):
-        y = arr[i - window + 1: i + 1]
+        y = arr[i - window + 1 : i + 1]
         if not np.all(np.isfinite(y)):
             continue
         y_mean = y.mean()
@@ -132,7 +154,7 @@ def _rolling_apply_acf1(arr: np.ndarray, window: int) -> np.ndarray:
     n = len(arr)
     out = np.full(n, np.nan, dtype=float)
     for i in range(window - 1, n):
-        y = arr[i - window + 1: i + 1]
+        y = arr[i - window + 1 : i + 1]
         if not np.all(np.isfinite(y)):
             continue
         m = y.mean()
@@ -225,7 +247,9 @@ def _compute_h1_features(
 
     # ATR regime: atr_at_n / median(atr, last 50 bars including N).
     atr_s = pd.Series(atr_a)
-    atr_med50 = atr_s.rolling(int(feat_cfg["atr_regime_window"]), min_periods=int(feat_cfg["atr_regime_window"])).median()
+    atr_med50 = atr_s.rolling(
+        int(feat_cfg["atr_regime_window"]), min_periods=int(feat_cfg["atr_regime_window"])
+    ).median()
     with np.errstate(invalid="ignore", divide="ignore"):
         df["atr_1h_regime"] = atr_a / atr_med50.to_numpy()
     # ATR slope over last 5 bars: linear regression slope on last 5 ATR values ending at N.
@@ -249,13 +273,19 @@ def _compute_h1_features(
     # Range expansion: mean(range, last 5) / mean(range, last 20). Using bars [N-4..N] / [N-19..N].
     bar_range = (high_s - low_s).to_numpy()
     bar_range_s = pd.Series(bar_range)
-    rng_short = bar_range_s.rolling(int(feat_cfg["range_expansion_short_window"]), min_periods=int(feat_cfg["range_expansion_short_window"])).mean()
-    rng_long = bar_range_s.rolling(int(feat_cfg["range_expansion_long_window"]), min_periods=int(feat_cfg["range_expansion_long_window"])).mean()
+    rng_short = bar_range_s.rolling(
+        int(feat_cfg["range_expansion_short_window"]),
+        min_periods=int(feat_cfg["range_expansion_short_window"]),
+    ).mean()
+    rng_long = bar_range_s.rolling(
+        int(feat_cfg["range_expansion_long_window"]),
+        min_periods=int(feat_cfg["range_expansion_long_window"]),
+    ).mean()
     with np.errstate(invalid="ignore", divide="ignore"):
         df["range_expansion_5"] = rng_short.to_numpy() / rng_long.to_numpy()
 
     # Realized vol 24h, 120h: sqrt(sum_sq_logret over last K bars including N) / median over last 500 such windows.
-    log_ret_sq_s = pd.Series(np.where(np.isfinite(log_ret), log_ret ** 2, np.nan))
+    log_ret_sq_s = pd.Series(np.where(np.isfinite(log_ret), log_ret**2, np.nan))
     rv_short_window = int(feat_cfg["realized_vol_short_bars"])
     rv_long_window = int(feat_cfg["realized_vol_long_bars"])
     rv_norm_window = int(feat_cfg["realized_vol_norm_window"])
@@ -272,14 +302,18 @@ def _compute_h1_features(
         df["bar_size_atr"] = (high_a - low_a) / atr_a
         df["bar_body_atr"] = np.abs(close_a - open_a) / atr_a
         bar_height = high_a - low_a
-        df["close_position_in_bar"] = np.where(bar_height > 0, (close_a - low_a) / bar_height, np.nan)
+        df["close_position_in_bar"] = np.where(
+            bar_height > 0, (close_a - low_a) / bar_height, np.nan
+        )
     # signal_zscore_100: |log_return[N]| z-score against trailing-100 std of |log_return| (strict — exclude N).
     abs_lr_s = pd.Series(abs_log_ret)
     abs_lr_shifted = abs_lr_s.shift(1)
     abs_lr_mean100 = abs_lr_shifted.rolling(100, min_periods=100).mean()
     abs_lr_std100 = abs_lr_shifted.rolling(100, min_periods=100).std(ddof=0)
     with np.errstate(invalid="ignore", divide="ignore"):
-        df["signal_zscore_100"] = (abs_log_ret - abs_lr_mean100.to_numpy()) / abs_lr_std100.to_numpy()
+        df["signal_zscore_100"] = (
+            abs_log_ret - abs_lr_mean100.to_numpy()
+        ) / abs_lr_std100.to_numpy()
 
     # Spread at signal: from data 'spread' column (MT5 points, divide by points_per_pip = 10).
     points_per_pip = 10.0
@@ -307,12 +341,16 @@ def _compute_h1_features(
     vol_z_w = int(feat_cfg["volume_zscore_window_1h"])
     df["volume_1h_median_50"] = vol_s.rolling(vol_med_w, min_periods=1).median().to_numpy()
     with np.errstate(invalid="ignore", divide="ignore"):
-        df["volume_1h_ratio"] = df["volume_1h_at_n"].to_numpy() / df["volume_1h_median_50"].to_numpy()
+        df["volume_1h_ratio"] = (
+            df["volume_1h_at_n"].to_numpy() / df["volume_1h_median_50"].to_numpy()
+        )
     vol_shifted = vol_s.shift(1)
     vol_mean100 = vol_shifted.rolling(vol_z_w, min_periods=vol_z_w).mean()
     vol_std100 = vol_shifted.rolling(vol_z_w, min_periods=vol_z_w).std(ddof=0)
     with np.errstate(invalid="ignore", divide="ignore"):
-        df["volume_1h_zscore_100"] = (df["volume_1h_at_n"].to_numpy() - vol_mean100.to_numpy()) / vol_std100.to_numpy()
+        df["volume_1h_zscore_100"] = (
+            df["volume_1h_at_n"].to_numpy() - vol_mean100.to_numpy()
+        ) / vol_std100.to_numpy()
 
     # 1H baseline distances (signed, in ATR units).
     kijun_h1 = _kijun(df, period=26)
@@ -329,11 +367,13 @@ def _compute_h1_features(
 
     # Spread-floor liquidity proxy: pct of last 100 1H bars where the floor was applied.
     floored_int = floored_mask.astype(float)
-    df["pair_floor_rate_100h"] = pd.Series(floored_int).rolling(100, min_periods=100).mean().to_numpy()
+    df["pair_floor_rate_100h"] = (
+        pd.Series(floored_int).rolling(100, min_periods=100).mean().to_numpy()
+    )
 
     # Weekend-gap context: bars_to_weekend_close, bars_since_weekend_open.
     # Define a gap as a bar-time delta > 2 hours (typical 1H gap is 1h).
-    ts = df[TIME_COL].to_numpy()
+    df[TIME_COL].to_numpy()
     ts_pd = pd.Series(df[TIME_COL])
     diff_hr = ts_pd.diff().dt.total_seconds() / 3600.0
     is_first_after_gap = np.asarray((diff_hr > 2.0).to_numpy()).copy()  # NaN at idx 0 → False
@@ -371,7 +411,7 @@ def _compute_h1_features(
 def _compute_h4_features(df_h4: pd.DataFrame, feat_cfg: Dict[str, Any]) -> pd.DataFrame:
     """4H feature frame. Adds `close_time_4h = time + 4h` for asof joins."""
     df = df_h4.sort_values(TIME_COL).reset_index(drop=True).copy()
-    open_a = df["open"].to_numpy(float)
+    df["open"].to_numpy(float)
     high_a = df["high"].to_numpy(float)
     low_a = df["low"].to_numpy(float)
     close_a = df["close"].to_numpy(float)
@@ -389,7 +429,12 @@ def _compute_h4_features(df_h4: pd.DataFrame, feat_cfg: Dict[str, Any]) -> pd.Da
 
     atr_4h = _wilder_atr(df, period=14).to_numpy()
     df["atr_4h"] = atr_4h
-    atr_med = pd.Series(atr_4h).rolling(int(feat_cfg["atr_regime_window"]), min_periods=int(feat_cfg["atr_regime_window"])).median().to_numpy()
+    atr_med = (
+        pd.Series(atr_4h)
+        .rolling(int(feat_cfg["atr_regime_window"]), min_periods=int(feat_cfg["atr_regime_window"]))
+        .median()
+        .to_numpy()
+    )
     with np.errstate(invalid="ignore", divide="ignore"):
         df["atr_4h_regime"] = atr_4h / atr_med
 
@@ -422,7 +467,9 @@ def _compute_h4_features(df_h4: pd.DataFrame, feat_cfg: Dict[str, Any]) -> pd.Da
     vol_z_w = int(feat_cfg["volume_zscore_window_4h"])
     df["volume_4h_median_50"] = vol_s.rolling(vol_med_w, min_periods=1).median().to_numpy()
     with np.errstate(invalid="ignore", divide="ignore"):
-        df["volume_4h_ratio"] = df["volume_4h_at_lag1"].to_numpy() / df["volume_4h_median_50"].to_numpy()
+        df["volume_4h_ratio"] = (
+            df["volume_4h_at_lag1"].to_numpy() / df["volume_4h_median_50"].to_numpy()
+        )
     vol_shifted = vol_s.shift(1)
     vol_mean = vol_shifted.rolling(vol_z_w, min_periods=vol_z_w).mean().to_numpy()
     vol_std = vol_shifted.rolling(vol_z_w, min_periods=vol_z_w).std(ddof=0).to_numpy()
@@ -435,7 +482,7 @@ def _compute_h4_features(df_h4: pd.DataFrame, feat_cfg: Dict[str, Any]) -> pd.Da
 
 def _compute_d1_features(df_d1: pd.DataFrame, feat_cfg: Dict[str, Any]) -> pd.DataFrame:
     df = df_d1.sort_values(TIME_COL).reset_index(drop=True).copy()
-    open_a = df["open"].to_numpy(float)
+    df["open"].to_numpy(float)
     high_a = df["high"].to_numpy(float)
     low_a = df["low"].to_numpy(float)
     close_a = df["close"].to_numpy(float)
@@ -453,7 +500,12 @@ def _compute_d1_features(df_d1: pd.DataFrame, feat_cfg: Dict[str, Any]) -> pd.Da
 
     atr_d1 = _wilder_atr(df, period=14).to_numpy()
     df["atr_d1"] = atr_d1
-    atr_med = pd.Series(atr_d1).rolling(int(feat_cfg["atr_regime_window"]), min_periods=int(feat_cfg["atr_regime_window"])).median().to_numpy()
+    atr_med = (
+        pd.Series(atr_d1)
+        .rolling(int(feat_cfg["atr_regime_window"]), min_periods=int(feat_cfg["atr_regime_window"]))
+        .median()
+        .to_numpy()
+    )
     with np.errstate(invalid="ignore", divide="ignore"):
         df["atr_d1_regime"] = atr_d1 / atr_med
 
@@ -485,7 +537,9 @@ def _compute_d1_features(df_d1: pd.DataFrame, feat_cfg: Dict[str, Any]) -> pd.Da
     vol_z_w = int(feat_cfg["volume_zscore_window_d1"])
     df["volume_d1_median_50"] = vol_s.rolling(vol_med_w, min_periods=1).median().to_numpy()
     with np.errstate(invalid="ignore", divide="ignore"):
-        df["volume_d1_ratio"] = df["volume_d1_at_lag1"].to_numpy() / df["volume_d1_median_50"].to_numpy()
+        df["volume_d1_ratio"] = (
+            df["volume_d1_at_lag1"].to_numpy() / df["volume_d1_median_50"].to_numpy()
+        )
     vol_shifted = vol_s.shift(1)
     vol_mean = vol_shifted.rolling(vol_z_w, min_periods=vol_z_w).mean().to_numpy()
     vol_std = vol_shifted.rolling(vol_z_w, min_periods=vol_z_w).std(ddof=0).to_numpy()
@@ -497,8 +551,8 @@ def _compute_d1_features(df_d1: pd.DataFrame, feat_cfg: Dict[str, Any]) -> pd.Da
 
 def _compute_w1_features(df_w1: pd.DataFrame, feat_cfg: Dict[str, Any]) -> pd.DataFrame:
     df = df_w1.sort_values(TIME_COL).reset_index(drop=True).copy()
-    high_a = df["high"].to_numpy(float)
-    low_a = df["low"].to_numpy(float)
+    df["high"].to_numpy(float)
+    df["low"].to_numpy(float)
     close_a = df["close"].to_numpy(float)
 
     prev_close = np.empty(len(df), dtype=float)
@@ -535,7 +589,9 @@ def _compute_w1_features(df_w1: pd.DataFrame, feat_cfg: Dict[str, Any]) -> pd.Da
     vol_med_w = int(feat_cfg["volume_median_window_w1"])
     df["volume_w1_median_20"] = vol_s.rolling(vol_med_w, min_periods=1).median().to_numpy()
     with np.errstate(invalid="ignore", divide="ignore"):
-        df["volume_w1_ratio"] = df["volume_w1_at_lag1"].to_numpy() / df["volume_w1_median_20"].to_numpy()
+        df["volume_w1_ratio"] = (
+            df["volume_w1_at_lag1"].to_numpy() / df["volume_w1_median_20"].to_numpy()
+        )
 
     return df
 
@@ -548,7 +604,7 @@ def _compute_w1_features(df_w1: pd.DataFrame, feat_cfg: Dict[str, Any]) -> pd.Da
 def _weekstart(ts: pd.Timestamp) -> pd.Timestamp:
     """Sunday of the week containing ts (00:00:00, normalised)."""
     days_since_sunday = (ts.dayofweek + 1) % 7  # Sun=6 → 0; Mon=0 → 1; ... Sat=5 → 6
-    return (ts.normalize() - pd.Timedelta(days=int(days_since_sunday)))
+    return ts.normalize() - pd.Timedelta(days=int(days_since_sunday))
 
 
 def _h4_lag1_idx(close_time_arr: np.ndarray, t_n: pd.Timestamp) -> int:
@@ -628,7 +684,9 @@ def _trade_outcome(
     direction_int = 1  # all L4 trades are long per L6.0 §6 sign rule
 
     # Resolve spread at entry.
-    sp_entry_raw_pips = float(entry_row.get("spread", 0.0)) / 10.0 if entry_row.get("spread") is not None else 0.0
+    sp_entry_raw_pips = (
+        float(entry_row.get("spread", 0.0)) / 10.0 if entry_row.get("spread") is not None else 0.0
+    )
     if pd.isna(sp_entry_raw_pips):
         sp_entry_raw_pips = 0.0
     pre_apps = spread_state.n_applications
@@ -656,7 +714,11 @@ def _trade_outcome(
     if sl_hit:
         # Intrabar exit at sl_price; spread from entry-bar.
         pre_apps = spread_state.n_applications
-        sp_exit_raw = float(entry_row.get("spread", 0.0)) / 10.0 if entry_row.get("spread") is not None else 0.0
+        sp_exit_raw = (
+            float(entry_row.get("spread", 0.0)) / 10.0
+            if entry_row.get("spread") is not None
+            else 0.0
+        )
         if pd.isna(sp_exit_raw):
             sp_exit_raw = 0.0
         sp_exit_eff_pips = apply_spread_floor_to_pips(cfg, pair, sp_exit_raw)
@@ -666,7 +728,11 @@ def _trade_outcome(
         exit_ts = pd.Timestamp(entry_row[TIME_COL])
     else:
         pre_apps = spread_state.n_applications
-        sp_exit_raw = float(time_exit_row.get("spread", 0.0)) / 10.0 if time_exit_row.get("spread") is not None else 0.0
+        sp_exit_raw = (
+            float(time_exit_row.get("spread", 0.0)) / 10.0
+            if time_exit_row.get("spread") is not None
+            else 0.0
+        )
         if pd.isna(sp_exit_raw):
             sp_exit_raw = 0.0
         sp_exit_eff_pips = apply_spread_floor_to_pips(cfg, pair, sp_exit_raw)
@@ -767,8 +833,8 @@ def _forward_outcomes(
         else:
             fwd_lr = math.nan
         # MFE/MAE over [entry_idx, end_idx]
-        slc_high = high_a[entry_idx: end_idx + 1]
-        slc_low = low_a[entry_idx: end_idx + 1]
+        slc_high = high_a[entry_idx : end_idx + 1]
+        slc_low = low_a[entry_idx : end_idx + 1]
         mfe_price = float(np.max(slc_high)) - entry_price
         mae_price = entry_price - float(np.min(slc_low))
         if atr_at_n > 0 and math.isfinite(atr_at_n):
@@ -785,7 +851,12 @@ def _forward_outcomes(
     plus_2 = entry_price + 2.0 * atr_at_n
     minus_1 = entry_price - 1.0 * atr_at_n
     minus_2 = entry_price - 2.0 * atr_at_n
-    bars_to: Dict[float, float] = {plus_1: math.nan, plus_2: math.nan, minus_1: math.nan, minus_2: math.nan}
+    bars_to: Dict[float, float] = {
+        plus_1: math.nan,
+        plus_2: math.nan,
+        minus_1: math.nan,
+        minus_2: math.nan,
+    }
     if math.isfinite(atr_at_n) and atr_at_n > 0:
         for j in range(entry_idx, cap_end + 1):
             bars_off = j - entry_idx
@@ -797,10 +868,12 @@ def _forward_outcomes(
                 bars_to[minus_1] = float(bars_off)
             if math.isnan(bars_to[minus_2]) and low_a[j] <= minus_2:
                 bars_to[minus_2] = float(bars_off)
-            if (not math.isnan(bars_to[plus_1])
+            if (
+                not math.isnan(bars_to[plus_1])
                 and not math.isnan(bars_to[plus_2])
                 and not math.isnan(bars_to[minus_1])
-                and not math.isnan(bars_to[minus_2])):
+                and not math.isnan(bars_to[minus_2])
+            ):
                 break
 
     return FwdOutcome(
@@ -825,7 +898,16 @@ def _build_currency_basket_returns(
     The result is a Series indexed by bar timestamp giving the AVERAGE per-bar
     signed return across all pairs involving that currency.
     """
-    ccy_pairs: Dict[str, List[Tuple[str, int]]] = {"USD": [], "EUR": [], "GBP": [], "JPY": [], "AUD": [], "NZD": [], "CAD": [], "CHF": []}
+    ccy_pairs: Dict[str, List[Tuple[str, int]]] = {
+        "USD": [],
+        "EUR": [],
+        "GBP": [],
+        "JPY": [],
+        "AUD": [],
+        "NZD": [],
+        "CAD": [],
+        "CHF": [],
+    }
     for pair in pair_h1:
         base, quote = pair.split("_")
         for ccy in (base, quote):
@@ -844,7 +926,7 @@ def _build_currency_basket_returns(
         if not plist:
             continue
         contribs: List[pd.Series] = []
-        for (pair, sign) in plist:
+        for pair, sign in plist:
             contribs.append(sign * log_ret_by_pair[pair])
         # Outer-align across pairs by timestamp; take row-wise mean (NaN-aware).
         df_ccy = pd.concat(contribs, axis=1, keys=[p for p, _ in plist])
@@ -858,7 +940,7 @@ def _basket_3h_at(ts: pd.Timestamp, basket_series: pd.Series) -> float:
     if idx < 2:
         return math.nan
     # bars [idx-2, idx-1, idx]
-    s = basket_series.iloc[idx - 2: idx + 1]
+    s = basket_series.iloc[idx - 2 : idx + 1]
     if s.isna().all():
         return math.nan
     return float(s.sum(skipna=True))
@@ -967,64 +1049,145 @@ def _arc1_fold(ts: pd.Timestamp) -> Tuple[int, str]:
 
 
 FEATURE_COLUMNS: List[str] = [
-    "pair", "signal_bar_ts", "fold_id", "arc1_fold_disposition",
+    "pair",
+    "signal_bar_ts",
+    "fold_id",
+    "arc1_fold_disposition",
     # Pre-signal 1H context
-    "cum_logret_1h_3", "cum_logret_1h_6", "cum_logret_1h_10", "cum_logret_1h_12", "cum_logret_1h_24",
+    "cum_logret_1h_3",
+    "cum_logret_1h_6",
+    "cum_logret_1h_10",
+    "cum_logret_1h_12",
+    "cum_logret_1h_24",
     "run_length_into_signal",
-    "atr_1h_at_n", "atr_1h_regime", "atr_1h_slope_5",
-    "range_position_20", "acf1_returns_20", "range_expansion_5",
-    "realized_vol_24h", "realized_vol_120h",
+    "atr_1h_at_n",
+    "atr_1h_regime",
+    "atr_1h_slope_5",
+    "range_position_20",
+    "acf1_returns_20",
+    "range_expansion_5",
+    "realized_vol_24h",
+    "realized_vol_120h",
     # Signal-bar properties
-    "bar_size_atr", "bar_body_atr", "close_position_in_bar",
-    "signal_zscore_100", "spread_at_signal_pips", "spread_floored_at_signal",
+    "bar_size_atr",
+    "bar_body_atr",
+    "close_position_in_bar",
+    "signal_zscore_100",
+    "spread_at_signal_pips",
+    "spread_floored_at_signal",
     # 1H volume
-    "volume_1h_at_n", "volume_1h_median_50", "volume_1h_ratio", "volume_1h_zscore_100",
+    "volume_1h_at_n",
+    "volume_1h_median_50",
+    "volume_1h_ratio",
+    "volume_1h_zscore_100",
     # 1H baseline distances
-    "dist_to_kijun_1h_atr", "dist_to_ema20_1h_atr", "dist_to_ema50_1h_atr",
+    "dist_to_kijun_1h_atr",
+    "dist_to_ema20_1h_atr",
+    "dist_to_ema50_1h_atr",
     "ema50_1h_slope_atr",
     # 4H lag-1 features
     "ts_4h_used",
-    "cum_logret_4h_3", "cum_logret_4h_6", "cum_logret_4h_12",
-    "atr_4h", "atr_4h_regime", "range_position_4h_20",
-    "dist_to_kijun_4h_atr", "dist_to_ema20_4h_atr", "dist_to_ema50_4h_atr",
+    "cum_logret_4h_3",
+    "cum_logret_4h_6",
+    "cum_logret_4h_12",
+    "atr_4h",
+    "atr_4h_regime",
+    "range_position_4h_20",
+    "dist_to_kijun_4h_atr",
+    "dist_to_ema20_4h_atr",
+    "dist_to_ema50_4h_atr",
     "ema50_4h_slope_atr",
-    "volume_4h_at_lag1", "volume_4h_median_50", "volume_4h_ratio", "volume_4h_zscore_100",
+    "volume_4h_at_lag1",
+    "volume_4h_median_50",
+    "volume_4h_ratio",
+    "volume_4h_zscore_100",
     # D1 lag-1 features
     "ts_d1_used",
-    "cum_logret_d1_3", "cum_logret_d1_5", "cum_logret_d1_10",
-    "atr_d1", "atr_d1_regime",
-    "dist_to_kijun_d1_atr", "dist_to_ema20_d1_atr", "dist_to_ema50_d1_atr",
-    "ema20_d1_slope_atr", "ema50_d1_slope_atr",
-    "dist_to_prior_day_high_atr", "dist_to_prior_day_low_atr",
-    "volume_d1_at_lag1", "volume_d1_median_50", "volume_d1_ratio", "volume_d1_zscore_100",
+    "cum_logret_d1_3",
+    "cum_logret_d1_5",
+    "cum_logret_d1_10",
+    "atr_d1",
+    "atr_d1_regime",
+    "dist_to_kijun_d1_atr",
+    "dist_to_ema20_d1_atr",
+    "dist_to_ema50_d1_atr",
+    "ema20_d1_slope_atr",
+    "ema50_d1_slope_atr",
+    "dist_to_prior_day_high_atr",
+    "dist_to_prior_day_low_atr",
+    "volume_d1_at_lag1",
+    "volume_d1_median_50",
+    "volume_d1_ratio",
+    "volume_d1_zscore_100",
     # W1 lag-1 features
     "ts_w1_used",
-    "cum_logret_w1_3", "cum_logret_w1_5",
-    "dist_to_ema8_w1_atr", "dist_to_ema20_w1_atr",
-    "ema8_w1_slope_atr", "ema20_w1_slope_atr",
-    "volume_w1_at_lag1", "volume_w1_median_20", "volume_w1_ratio",
+    "cum_logret_w1_3",
+    "cum_logret_w1_5",
+    "dist_to_ema8_w1_atr",
+    "dist_to_ema20_w1_atr",
+    "ema8_w1_slope_atr",
+    "ema20_w1_slope_atr",
+    "volume_w1_at_lag1",
+    "volume_w1_median_20",
+    "volume_w1_ratio",
     # Time / session / liquidity
-    "hour_utc", "dow", "session",
-    "bars_to_weekend_close", "bars_since_weekend_open",
+    "hour_utc",
+    "dow",
+    "session",
+    "bars_to_weekend_close",
+    "bars_since_weekend_open",
     "pair_floor_rate_100h",
     # Cross-pair / portfolio context
-    "concurrent_signals_same_bar", "concurrent_signals_within_3h",
-    "usd_basket_3h", "eur_basket_3h", "jpy_basket_3h", "gbp_basket_3h",
-    "time_since_last_signal_same_pair_bars", "cluster_label",
+    "concurrent_signals_same_bar",
+    "concurrent_signals_within_3h",
+    "usd_basket_3h",
+    "eur_basket_3h",
+    "jpy_basket_3h",
+    "gbp_basket_3h",
+    "time_since_last_signal_same_pair_bars",
+    "cluster_label",
     # Classification labels
-    "d1_trend_label", "h4_trend_label", "h1_trend_label",
-    "mtf_alignment", "pre_momentum_label", "structural_pattern",
+    "d1_trend_label",
+    "h4_trend_label",
+    "h1_trend_label",
+    "mtf_alignment",
+    "pre_momentum_label",
+    "structural_pattern",
     # Trade-level outcome
-    "entry_price", "exit_price", "sl_price",
-    "entry_ts", "exit_ts", "exit_reason",
-    "gross_r", "net_r", "spread_cost_r",
-    "mfe_held_atr", "mae_held_atr",
+    "entry_price",
+    "exit_price",
+    "sl_price",
+    "entry_ts",
+    "exit_ts",
+    "exit_reason",
+    "gross_r",
+    "net_r",
+    "spread_cost_r",
+    "mfe_held_atr",
+    "mae_held_atr",
     # Forward-horizon outcomes
-    "fwd_logret_h1", "fwd_logret_h6", "fwd_logret_h24", "fwd_logret_h72", "fwd_logret_h120", "fwd_logret_h240",
-    "fwd_mfe_h1_atr", "fwd_mfe_h6_atr", "fwd_mfe_h24_atr", "fwd_mfe_h72_atr", "fwd_mfe_h120_atr", "fwd_mfe_h240_atr",
-    "fwd_mae_h1_atr", "fwd_mae_h6_atr", "fwd_mae_h24_atr", "fwd_mae_h72_atr", "fwd_mae_h120_atr", "fwd_mae_h240_atr",
-    "bars_to_plus_1atr_capped_240h", "bars_to_plus_2atr_capped_240h",
-    "bars_to_minus_1atr_capped_240h", "bars_to_minus_2atr_capped_240h",
+    "fwd_logret_h1",
+    "fwd_logret_h6",
+    "fwd_logret_h24",
+    "fwd_logret_h72",
+    "fwd_logret_h120",
+    "fwd_logret_h240",
+    "fwd_mfe_h1_atr",
+    "fwd_mfe_h6_atr",
+    "fwd_mfe_h24_atr",
+    "fwd_mfe_h72_atr",
+    "fwd_mfe_h120_atr",
+    "fwd_mfe_h240_atr",
+    "fwd_mae_h1_atr",
+    "fwd_mae_h6_atr",
+    "fwd_mae_h24_atr",
+    "fwd_mae_h72_atr",
+    "fwd_mae_h120_atr",
+    "fwd_mae_h240_atr",
+    "bars_to_plus_1atr_capped_240h",
+    "bars_to_plus_2atr_capped_240h",
+    "bars_to_minus_1atr_capped_240h",
+    "bars_to_minus_2atr_capped_240h",
 ]
 
 
@@ -1123,9 +1286,13 @@ def run_characterisation(config_path: str | Path) -> Dict[str, Any]:
     print(f"Computing 1H features for {len(pairs)} pairs ...")
     h1_features: Dict[str, pd.DataFrame] = {}
     for i, pair in enumerate(pairs, 1):
-        h1_features[pair] = _compute_h1_features(pair_h1[pair], pair, feat_cfg, sig_cfg, spread_state, cfg)
-        print(f"  [{i}/{len(pairs)}] {pair}: {len(h1_features[pair])} 1H bars, "
-              f"{int(h1_features[pair]['signal_fired'].sum())} signals (full data)")
+        h1_features[pair] = _compute_h1_features(
+            pair_h1[pair], pair, feat_cfg, sig_cfg, spread_state, cfg
+        )
+        print(
+            f"  [{i}/{len(pairs)}] {pair}: {len(h1_features[pair])} 1H bars, "
+            f"{int(h1_features[pair]['signal_fired'].sum())} signals (full data)"
+        )
 
     # Compute 4H/D1/W1 feature frames
     print(f"Computing 4H/D1/W1 features for {len(pairs)} pairs ...")
@@ -1189,8 +1356,11 @@ def run_characterisation(config_path: str | Path) -> Dict[str, Any]:
 
         signal_indices = np.where(sig_mask)[0]
         # Filter to signal window
-        signal_indices = [int(i) for i in signal_indices
-                          if sig_window_start <= pd.Timestamp(ts_h1[i]) <= sig_window_end]
+        signal_indices = [
+            int(i)
+            for i in signal_indices
+            if sig_window_start <= pd.Timestamp(ts_h1[i]) <= sig_window_end
+        ]
         pair_signal_counts[pair] = len(signal_indices)
 
         for sig_idx in signal_indices:
@@ -1207,18 +1377,37 @@ def run_characterisation(config_path: str | Path) -> Dict[str, Any]:
 
             # 1H context features (already computed columns)
             for col in (
-                "cum_logret_1h_3", "cum_logret_1h_6", "cum_logret_1h_10",
-                "cum_logret_1h_12", "cum_logret_1h_24",
-                "run_length_into_signal", "atr_1h_at_n", "atr_1h_regime", "atr_1h_slope_5",
-                "range_position_20", "acf1_returns_20", "range_expansion_5",
-                "realized_vol_24h", "realized_vol_120h",
-                "bar_size_atr", "bar_body_atr", "close_position_in_bar",
-                "signal_zscore_100", "spread_at_signal_pips", "spread_floored_at_signal",
-                "volume_1h_at_n", "volume_1h_median_50", "volume_1h_ratio", "volume_1h_zscore_100",
-                "dist_to_kijun_1h_atr", "dist_to_ema20_1h_atr", "dist_to_ema50_1h_atr",
+                "cum_logret_1h_3",
+                "cum_logret_1h_6",
+                "cum_logret_1h_10",
+                "cum_logret_1h_12",
+                "cum_logret_1h_24",
+                "run_length_into_signal",
+                "atr_1h_at_n",
+                "atr_1h_regime",
+                "atr_1h_slope_5",
+                "range_position_20",
+                "acf1_returns_20",
+                "range_expansion_5",
+                "realized_vol_24h",
+                "realized_vol_120h",
+                "bar_size_atr",
+                "bar_body_atr",
+                "close_position_in_bar",
+                "signal_zscore_100",
+                "spread_at_signal_pips",
+                "spread_floored_at_signal",
+                "volume_1h_at_n",
+                "volume_1h_median_50",
+                "volume_1h_ratio",
+                "volume_1h_zscore_100",
+                "dist_to_kijun_1h_atr",
+                "dist_to_ema20_1h_atr",
+                "dist_to_ema50_1h_atr",
                 "ema50_1h_slope_atr",
                 "pair_floor_rate_100h",
-                "bars_to_weekend_close", "bars_since_weekend_open",
+                "bars_to_weekend_close",
+                "bars_since_weekend_open",
             ):
                 row[col] = sig_row[col]
 
@@ -1235,17 +1424,22 @@ def run_characterisation(config_path: str | Path) -> Dict[str, Any]:
             try:
                 if pd.notna(ts_4h_used):
                     # ts_4h_used is the 4H bar OPEN time; close = open + 4h must be ≤ t_n
-                    assert (ts_4h_used + pd.Timedelta(hours=4)) <= t_n, \
+                    assert (ts_4h_used + pd.Timedelta(hours=4)) <= t_n, (
                         f"4H lookahead at {pair} {t_n}: ts_4h_used={ts_4h_used}"
+                    )
                     assert ts_4h_used <= t_n, f"4H bar-time lookahead at {pair} {t_n}"
                 if pd.notna(ts_d1_used):
-                    assert ts_d1_used < t_n, f"D1 lookahead at {pair} {t_n}: ts_d1_used={ts_d1_used}"
-                    assert ts_d1_used.date() < t_n.date(), \
+                    assert ts_d1_used < t_n, (
+                        f"D1 lookahead at {pair} {t_n}: ts_d1_used={ts_d1_used}"
+                    )
+                    assert ts_d1_used.date() < t_n.date(), (
                         f"D1 same-day at {pair} {t_n}: ts_d1_used.date={ts_d1_used.date()}"
+                    )
                 if pd.notna(ts_w1_used):
                     assert ts_w1_used < t_n, f"W1 lookahead at {pair} {t_n}"
-                    assert ts_w1_used < _weekstart(t_n), \
+                    assert ts_w1_used < _weekstart(t_n), (
                         f"W1 same-week at {pair} {t_n}: weekstart={_weekstart(t_n)}, ts_w1_used={ts_w1_used}"
+                    )
             except AssertionError as e:
                 n_lookahead_failures += 1
                 raise RuntimeError(f"Lag-1 assertion failed: {e}")
@@ -1258,20 +1452,38 @@ def run_characterisation(config_path: str | Path) -> Dict[str, Any]:
             if h4_idx >= 0:
                 h4_row = df_h4.iloc[h4_idx]
                 for col in (
-                    "cum_logret_4h_3", "cum_logret_4h_6", "cum_logret_4h_12",
-                    "atr_4h", "atr_4h_regime", "range_position_4h_20",
-                    "dist_to_kijun_4h_atr", "dist_to_ema20_4h_atr", "dist_to_ema50_4h_atr",
+                    "cum_logret_4h_3",
+                    "cum_logret_4h_6",
+                    "cum_logret_4h_12",
+                    "atr_4h",
+                    "atr_4h_regime",
+                    "range_position_4h_20",
+                    "dist_to_kijun_4h_atr",
+                    "dist_to_ema20_4h_atr",
+                    "dist_to_ema50_4h_atr",
                     "ema50_4h_slope_atr",
-                    "volume_4h_at_lag1", "volume_4h_median_50", "volume_4h_ratio", "volume_4h_zscore_100",
+                    "volume_4h_at_lag1",
+                    "volume_4h_median_50",
+                    "volume_4h_ratio",
+                    "volume_4h_zscore_100",
                 ):
                     row[col] = h4_row[col]
             else:
                 for col in (
-                    "cum_logret_4h_3", "cum_logret_4h_6", "cum_logret_4h_12",
-                    "atr_4h", "atr_4h_regime", "range_position_4h_20",
-                    "dist_to_kijun_4h_atr", "dist_to_ema20_4h_atr", "dist_to_ema50_4h_atr",
+                    "cum_logret_4h_3",
+                    "cum_logret_4h_6",
+                    "cum_logret_4h_12",
+                    "atr_4h",
+                    "atr_4h_regime",
+                    "range_position_4h_20",
+                    "dist_to_kijun_4h_atr",
+                    "dist_to_ema20_4h_atr",
+                    "dist_to_ema50_4h_atr",
                     "ema50_4h_slope_atr",
-                    "volume_4h_at_lag1", "volume_4h_median_50", "volume_4h_ratio", "volume_4h_zscore_100",
+                    "volume_4h_at_lag1",
+                    "volume_4h_median_50",
+                    "volume_4h_ratio",
+                    "volume_4h_zscore_100",
                 ):
                     row[col] = math.nan
 
@@ -1279,22 +1491,42 @@ def run_characterisation(config_path: str | Path) -> Dict[str, Any]:
             if d1_idx >= 0:
                 d1_row = df_d1.iloc[d1_idx]
                 for col in (
-                    "cum_logret_d1_3", "cum_logret_d1_5", "cum_logret_d1_10",
-                    "atr_d1", "atr_d1_regime",
-                    "dist_to_kijun_d1_atr", "dist_to_ema20_d1_atr", "dist_to_ema50_d1_atr",
-                    "ema20_d1_slope_atr", "ema50_d1_slope_atr",
-                    "dist_to_prior_day_high_atr", "dist_to_prior_day_low_atr",
-                    "volume_d1_at_lag1", "volume_d1_median_50", "volume_d1_ratio", "volume_d1_zscore_100",
+                    "cum_logret_d1_3",
+                    "cum_logret_d1_5",
+                    "cum_logret_d1_10",
+                    "atr_d1",
+                    "atr_d1_regime",
+                    "dist_to_kijun_d1_atr",
+                    "dist_to_ema20_d1_atr",
+                    "dist_to_ema50_d1_atr",
+                    "ema20_d1_slope_atr",
+                    "ema50_d1_slope_atr",
+                    "dist_to_prior_day_high_atr",
+                    "dist_to_prior_day_low_atr",
+                    "volume_d1_at_lag1",
+                    "volume_d1_median_50",
+                    "volume_d1_ratio",
+                    "volume_d1_zscore_100",
                 ):
                     row[col] = d1_row[col]
             else:
                 for col in (
-                    "cum_logret_d1_3", "cum_logret_d1_5", "cum_logret_d1_10",
-                    "atr_d1", "atr_d1_regime",
-                    "dist_to_kijun_d1_atr", "dist_to_ema20_d1_atr", "dist_to_ema50_d1_atr",
-                    "ema20_d1_slope_atr", "ema50_d1_slope_atr",
-                    "dist_to_prior_day_high_atr", "dist_to_prior_day_low_atr",
-                    "volume_d1_at_lag1", "volume_d1_median_50", "volume_d1_ratio", "volume_d1_zscore_100",
+                    "cum_logret_d1_3",
+                    "cum_logret_d1_5",
+                    "cum_logret_d1_10",
+                    "atr_d1",
+                    "atr_d1_regime",
+                    "dist_to_kijun_d1_atr",
+                    "dist_to_ema20_d1_atr",
+                    "dist_to_ema50_d1_atr",
+                    "ema20_d1_slope_atr",
+                    "ema50_d1_slope_atr",
+                    "dist_to_prior_day_high_atr",
+                    "dist_to_prior_day_low_atr",
+                    "volume_d1_at_lag1",
+                    "volume_d1_median_50",
+                    "volume_d1_ratio",
+                    "volume_d1_zscore_100",
                 ):
                     row[col] = math.nan
 
@@ -1302,18 +1534,28 @@ def run_characterisation(config_path: str | Path) -> Dict[str, Any]:
             if w1_idx >= 0:
                 w1_row = df_w1.iloc[w1_idx]
                 for col in (
-                    "cum_logret_w1_3", "cum_logret_w1_5",
-                    "dist_to_ema8_w1_atr", "dist_to_ema20_w1_atr",
-                    "ema8_w1_slope_atr", "ema20_w1_slope_atr",
-                    "volume_w1_at_lag1", "volume_w1_median_20", "volume_w1_ratio",
+                    "cum_logret_w1_3",
+                    "cum_logret_w1_5",
+                    "dist_to_ema8_w1_atr",
+                    "dist_to_ema20_w1_atr",
+                    "ema8_w1_slope_atr",
+                    "ema20_w1_slope_atr",
+                    "volume_w1_at_lag1",
+                    "volume_w1_median_20",
+                    "volume_w1_ratio",
                 ):
                     row[col] = w1_row[col]
             else:
                 for col in (
-                    "cum_logret_w1_3", "cum_logret_w1_5",
-                    "dist_to_ema8_w1_atr", "dist_to_ema20_w1_atr",
-                    "ema8_w1_slope_atr", "ema20_w1_slope_atr",
-                    "volume_w1_at_lag1", "volume_w1_median_20", "volume_w1_ratio",
+                    "cum_logret_w1_3",
+                    "cum_logret_w1_5",
+                    "dist_to_ema8_w1_atr",
+                    "dist_to_ema20_w1_atr",
+                    "ema8_w1_slope_atr",
+                    "ema20_w1_slope_atr",
+                    "volume_w1_at_lag1",
+                    "volume_w1_median_20",
+                    "volume_w1_ratio",
                 ):
                     row[col] = math.nan
 
@@ -1324,27 +1566,42 @@ def run_characterisation(config_path: str | Path) -> Dict[str, Any]:
 
             # Cross-pair / portfolio
             # concurrent_signals_same_bar: count other pairs with signal at exact T_N
-            mask_same_bar = (sig_ts_sorted == np.datetime64(t_n.to_datetime64()))
+            mask_same_bar = sig_ts_sorted == np.datetime64(t_n.to_datetime64())
             same_bar_pairs = sig_pair_sorted[mask_same_bar]
             row["concurrent_signals_same_bar"] = int(len(same_bar_pairs)) - 1  # exclude self
             # concurrent_signals_within_3h: signals on any pair within [T_N-3h, T_N+3h], excluding self
-            t_lo = np.datetime64((t_n - pd.Timedelta(hours=concurrent_window_hours)).to_datetime64())
-            t_hi = np.datetime64((t_n + pd.Timedelta(hours=concurrent_window_hours)).to_datetime64())
+            t_lo = np.datetime64(
+                (t_n - pd.Timedelta(hours=concurrent_window_hours)).to_datetime64()
+            )
+            t_hi = np.datetime64(
+                (t_n + pd.Timedelta(hours=concurrent_window_hours)).to_datetime64()
+            )
             lo_idx = np.searchsorted(sig_ts_sorted, t_lo, side="left")
             hi_idx = np.searchsorted(sig_ts_sorted, t_hi, side="right")
             window_count = int(hi_idx - lo_idx)
             # Exclude self (count of same pair at same bar):
-            self_in_window = int(np.sum(
-                (sig_pair_sorted[lo_idx:hi_idx] == pair)
-                & (sig_ts_sorted[lo_idx:hi_idx] == np.datetime64(t_n.to_datetime64()))
-            ))
+            self_in_window = int(
+                np.sum(
+                    (sig_pair_sorted[lo_idx:hi_idx] == pair)
+                    & (sig_ts_sorted[lo_idx:hi_idx] == np.datetime64(t_n.to_datetime64()))
+                )
+            )
             row["concurrent_signals_within_3h"] = window_count - self_in_window
 
-            for ccy_label, ccy_key in (("usd", "USD"), ("eur", "EUR"), ("jpy", "JPY"), ("gbp", "GBP")):
-                row[f"{ccy_label}_basket_3h"] = _basket_3h_at(t_n, ccy_baskets[ccy_key]) if ccy_key in ccy_baskets else math.nan
+            for ccy_label, ccy_key in (
+                ("usd", "USD"),
+                ("eur", "EUR"),
+                ("jpy", "JPY"),
+                ("gbp", "GBP"),
+            ):
+                row[f"{ccy_label}_basket_3h"] = (
+                    _basket_3h_at(t_n, ccy_baskets[ccy_key]) if ccy_key in ccy_baskets else math.nan
+                )
 
             if pair in last_signal_idx_per_pair:
-                row["time_since_last_signal_same_pair_bars"] = float(sig_idx - last_signal_idx_per_pair[pair])
+                row["time_since_last_signal_same_pair_bars"] = float(
+                    sig_idx - last_signal_idx_per_pair[pair]
+                )
             else:
                 row["time_since_last_signal_same_pair_bars"] = math.nan
             last_signal_idx_per_pair[pair] = sig_idx
@@ -1357,9 +1614,15 @@ def run_characterisation(config_path: str | Path) -> Dict[str, Any]:
             d1_slope = row["ema20_d1_slope_atr"]
             h4_slope = row["ema50_4h_slope_atr"]
             h1_slope = row["ema50_1h_slope_atr"]
-            d1_lab = _trend_label(float(d1_slope) if pd.notna(d1_slope) else math.nan, up_min, down_max)
-            h4_lab = _trend_label(float(h4_slope) if pd.notna(h4_slope) else math.nan, up_min, down_max)
-            h1_lab = _trend_label(float(h1_slope) if pd.notna(h1_slope) else math.nan, up_min, down_max)
+            d1_lab = _trend_label(
+                float(d1_slope) if pd.notna(d1_slope) else math.nan, up_min, down_max
+            )
+            h4_lab = _trend_label(
+                float(h4_slope) if pd.notna(h4_slope) else math.nan, up_min, down_max
+            )
+            h1_lab = _trend_label(
+                float(h1_slope) if pd.notna(h1_slope) else math.nan, up_min, down_max
+            )
             row["d1_trend_label"] = d1_lab
             row["h4_trend_label"] = h4_lab
             row["h1_trend_label"] = h1_lab
@@ -1384,15 +1647,30 @@ def run_characterisation(config_path: str | Path) -> Dict[str, Any]:
             # Trade outcome (Arc 1 semantics, on a per-trade basis — no cross-trade equity tracking;
             # this is descriptive, not a backtest. risk_usd is constant 1% of starting_balance.)
             outcome = _trade_outcome(
-                pair, sig_idx, df, atr_at_n, risk_usd, cfg,
-                spread_state, quote_to_usd, bar_offset, sl_atr_mult,
+                pair,
+                sig_idx,
+                df,
+                atr_at_n,
+                risk_usd,
+                cfg,
+                spread_state,
+                quote_to_usd,
+                bar_offset,
+                sl_atr_mult,
             )
             if outcome is None:
                 for col in (
-                    "entry_price", "exit_price", "sl_price",
-                    "entry_ts", "exit_ts", "exit_reason",
-                    "gross_r", "net_r", "spread_cost_r",
-                    "mfe_held_atr", "mae_held_atr",
+                    "entry_price",
+                    "exit_price",
+                    "sl_price",
+                    "entry_ts",
+                    "exit_ts",
+                    "exit_reason",
+                    "gross_r",
+                    "net_r",
+                    "spread_cost_r",
+                    "mfe_held_atr",
+                    "mae_held_atr",
                 ):
                     row[col] = math.nan if col != "exit_reason" else ""
             else:

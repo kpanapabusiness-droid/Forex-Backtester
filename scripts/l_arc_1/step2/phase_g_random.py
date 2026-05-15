@@ -1,3 +1,4 @@
+# ruff: noqa: E402  (sys.path.insert needed before project imports)
 """Phase G — random-entry baseline (op spec §5.13).
 
 Random entries on the same 28 pairs, same OOS windows, matched per-(pair, fold)
@@ -8,6 +9,7 @@ Outputs:
   random_baseline/random_entry_distribution.csv
   random_baseline/comparison.csv
 """
+
 from __future__ import annotations
 
 import sys
@@ -23,10 +25,16 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from scripts.l_arc_1.step2._io import (
-    PAIRS, RANDOM_SEED, STEP2_DIR, compute_signal_mask, load_all_floors,
-    load_pair_1h, load_trades_verbatim, pip_size, wilder_atr,
+    PAIRS,
+    RANDOM_SEED,
+    STEP2_DIR,
+    load_all_floors,
+    load_pair_1h,
+    load_trades_verbatim,
+    pip_size,
+    wilder_atr,
 )
-from scripts.l_arc_1.step2.phase_e_shadows import _simulate_trade, SPREAD_FLOOR_PATH
+from scripts.l_arc_1.step2.phase_e_shadows import SPREAD_FLOOR_PATH, _simulate_trade
 
 RAND_DIR = STEP2_DIR / "random_baseline"
 
@@ -58,7 +66,9 @@ def run_phase_g() -> None:
             "high": df["high"].astype(float).values,
             "low": df["low"].astype(float).values,
             "close": df["close"].astype(float).values,
-            "spread": df["spread"].astype(float).values if "spread" in df.columns else np.zeros(len(df)),
+            "spread": df["spread"].astype(float).values
+            if "spread" in df.columns
+            else np.zeros(len(df)),
         }
         pair_time_int[pair] = df["time"].astype("datetime64[ns]").astype("int64").to_numpy()
         # Compute ATR using engine convention
@@ -78,7 +88,7 @@ def run_phase_g() -> None:
     for pair in PAIRS:
         df_time = pair_time_int[pair]
         atr = pair_atr[pair]
-        n_bars = len(df_time)
+        len(df_time)
         for fold_id, oos_start, oos_end in FOLD_BOUNDARIES:
             k = counts.get((pair, fold_id), 0)
             if k == 0:
@@ -98,45 +108,71 @@ def run_phase_g() -> None:
                 atr_at_sig = float(atr[sig_idx])
                 d = pair_arrs[pair]
                 out = _simulate_trade(
-                    d["open"], d["high"], d["low"], d["spread"],
-                    int(sig_idx), atr_at_sig, bar_offset=1, sl_atr_mult=2.0, h_exit=1,
-                    pair_pip=pip_size(pair), floor_pips=floors.get(pair, None),
+                    d["open"],
+                    d["high"],
+                    d["low"],
+                    d["spread"],
+                    int(sig_idx),
+                    atr_at_sig,
+                    bar_offset=1,
+                    sl_atr_mult=2.0,
+                    h_exit=1,
+                    pair_pip=pip_size(pair),
+                    floor_pips=floors.get(pair, None),
                 )
                 if not out["valid"]:
                     continue
-                rand_rows.append({
-                    "pair": pair, "fold_id": fold_id,
-                    "signal_bar_ts": pd.Timestamp(df_time[sig_idx]).isoformat(),
-                    "atr_at_signal": atr_at_sig,
-                    "net_r": out["net_r"],
-                    "exit_reason": out["exit_reason"],
-                    "spread_floored": out["spread_floored"],
-                })
+                rand_rows.append(
+                    {
+                        "pair": pair,
+                        "fold_id": fold_id,
+                        "signal_bar_ts": pd.Timestamp(df_time[sig_idx]).isoformat(),
+                        "atr_at_signal": atr_at_sig,
+                        "net_r": out["net_r"],
+                        "exit_reason": out["exit_reason"],
+                        "spread_floored": out["spread_floored"],
+                    }
+                )
 
     df_r = pd.DataFrame(rand_rows)
-    df_r.to_csv(RAND_DIR / "random_entry_distribution.csv",
-                index=False, lineterminator="\n", float_format="%.6g")
+    df_r.to_csv(
+        RAND_DIR / "random_entry_distribution.csv",
+        index=False,
+        lineterminator="\n",
+        float_format="%.6g",
+    )
     print(f"  random trades: {len(df_r):,}")
 
     # Comparison vs verbatim
     print("[Phase G] writing comparison...")
     PCTS = [1, 5, 10, 25, 50, 75, 90, 95, 99]
+
     def summarise(s: pd.Series, label: str) -> dict:
         n = len(s)
-        out = {"set": label, "n": int(n),
-               "mean": float(s.mean()), "std": float(s.std(ddof=1)),
-               "skew": float(s.skew()), "kurt": float(s.kurt()),
-               "min": float(s.min()), "max": float(s.max())}
+        out = {
+            "set": label,
+            "n": int(n),
+            "mean": float(s.mean()),
+            "std": float(s.std(ddof=1)),
+            "skew": float(s.skew()),
+            "kurt": float(s.kurt()),
+            "min": float(s.min()),
+            "max": float(s.max()),
+        }
         for p in PCTS:
             out[f"p{p}"] = float(s.quantile(p / 100.0))
         return out
 
-    verbatim_r = trades["net_r"].astype(float) if "net_r" in trades.columns else trades["R"].astype(float)
+    verbatim_r = (
+        trades["net_r"].astype(float) if "net_r" in trades.columns else trades["R"].astype(float)
+    )
     rand_r = df_r["net_r"].astype(float)
-    summary = pd.DataFrame([
-        summarise(verbatim_r, "verbatim"),
-        summarise(rand_r, "random_baseline"),
-    ])
+    summary = pd.DataFrame(
+        [
+            summarise(verbatim_r, "verbatim"),
+            summarise(rand_r, "random_baseline"),
+        ]
+    )
     summary.to_csv(RAND_DIR / "comparison.csv", index=False, lineterminator="\n")
 
     # Descriptive yes/no on whether the distribution differs visibly
@@ -144,8 +180,12 @@ def run_phase_g() -> None:
     diff_p50 = abs(rand_r.median() - verbatim_r.median())
     diff_p95 = abs(rand_r.quantile(0.95) - verbatim_r.quantile(0.95))
     # threshold: median differs by more than 1% of either's std OR 5% of either's p95
-    pooled_std = max(verbatim_r.std(), rand_r.std())
-    differs = (diff_mean > 0.005) or (diff_p50 > 0.005) or (diff_p95 > 0.05 * abs(verbatim_r.quantile(0.95)))
+    max(verbatim_r.std(), rand_r.std())
+    differs = (
+        (diff_mean > 0.005)
+        or (diff_p50 > 0.005)
+        or (diff_p95 > 0.05 * abs(verbatim_r.quantile(0.95)))
+    )
     differs_path = RAND_DIR / "differs_from_verbatim.txt"
     differs_path.write_text(
         f"differs (descriptive heuristic): {differs}\n"
@@ -156,7 +196,7 @@ def run_phase_g() -> None:
         f"random   std: {rand_r.std():.6f}\n",
         encoding="utf-8",
     )
-    print(f"[Phase G] differs: {differs}; done in {time.time()-t0:.1f}s")
+    print(f"[Phase G] differs: {differs}; done in {time.time() - t0:.1f}s")
 
 
 if __name__ == "__main__":

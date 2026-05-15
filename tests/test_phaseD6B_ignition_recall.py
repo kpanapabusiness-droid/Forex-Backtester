@@ -21,14 +21,16 @@ def _make_synthetic_ohlcv(n: int, pair: str = "EUR_USD") -> pd.DataFrame:
     open_ = np.roll(close, 1)
     open_[0] = close[0]
     vol = 1000 + rng.integers(0, 500, n)
-    return pd.DataFrame({
-        "date": dates,
-        "open": open_,
-        "high": high,
-        "low": low,
-        "close": close,
-        "volume": vol,
-    })
+    return pd.DataFrame(
+        {
+            "date": dates,
+            "open": open_,
+            "high": high,
+            "low": low,
+            "close": close,
+            "volume": vol,
+        }
+    )
 
 
 def _make_labels_with_zone_starts(ohlcv: pd.DataFrame, pair: str) -> pd.DataFrame:
@@ -38,19 +40,21 @@ def _make_labels_with_zone_starts(ohlcv: pd.DataFrame, pair: str) -> pd.DataFram
         for direction in ["long", "short"]:
             zone_c = 1 if (i >= 30 and i < 33 and direction == "long") else 0
             zone_b = 1 if (i >= 35 and i < 38 and direction == "long") else 0
-            rows.append({
-                "pair": pair,
-                "date": d,
-                "direction": direction,
-                "dataset_split": "discovery" if i < len(dates) // 2 else "validation",
-                "zone_a_1r_10": True,
-                "zone_b_3r_20": bool(zone_b),
-                "zone_c_6r_40": bool(zone_c),
-                "t1": 1.0,
-                "t3": 3.0,
-                "t6": 5.0,
-                "mfe_40_r": 2.0,
-            })
+            rows.append(
+                {
+                    "pair": pair,
+                    "date": d,
+                    "direction": direction,
+                    "dataset_split": "discovery" if i < len(dates) // 2 else "validation",
+                    "zone_a_1r_10": True,
+                    "zone_b_3r_20": bool(zone_b),
+                    "zone_c_6r_40": bool(zone_c),
+                    "t1": 1.0,
+                    "t3": 3.0,
+                    "t6": 5.0,
+                    "mfe_40_r": 2.0,
+                }
+            )
     return pd.DataFrame(rows)
 
 

@@ -91,10 +91,10 @@ ALIGN_STATES_FULL: tuple[str, ...] = (
 # ===========================================================================
 def compute_atr(df: pd.DataFrame, period: int) -> pd.Series:
     h = df["high"].astype(float).to_numpy()
-    l = df["low"].astype(float).to_numpy()
+    lo = df["low"].astype(float).to_numpy()
     c = df["close"].astype(float).to_numpy()
     pc = np.concatenate(([np.nan], c[:-1]))
-    tr = np.nanmax(np.column_stack([h - l, np.abs(h - pc), np.abs(l - pc)]), axis=1)
+    tr = np.nanmax(np.column_stack([h - lo, np.abs(h - pc), np.abs(lo - pc)]), axis=1)
     return pd.Series(tr, index=df.index).rolling(period, min_periods=period).mean()
 
 
@@ -119,8 +119,9 @@ def slice_window(df: pd.DataFrame, date_start: str, date_end) -> pd.DataFrame:
     return df.reset_index(drop=True)
 
 
-def prep_pair_tf(raw_df: pd.DataFrame, atr_p: int, kijun_p: int, sma_p: int,
-                 date_start: str, date_end) -> pd.DataFrame:
+def prep_pair_tf(
+    raw_df: pd.DataFrame, atr_p: int, kijun_p: int, sma_p: int, date_start: str, date_end
+) -> pd.DataFrame:
     """Slice + add log_ret, atr, kijun/sma + their signs + bar-derived features.
 
     Adds columns used by L4 condition families:
@@ -168,19 +169,20 @@ def trailing_top_decile(series: pd.Series, window: int, q: float) -> np.ndarray:
     is incomplete (early bars), the mask is False.
     """
     threshold = series.shift(1).rolling(window, min_periods=window).quantile(q)
-    return (series.to_numpy() > threshold.to_numpy())
+    return series.to_numpy() > threshold.to_numpy()
 
 
 def trailing_bottom_decile(series: pd.Series, window: int, q: float) -> np.ndarray:
     threshold = series.shift(1).rolling(window, min_periods=window).quantile(q)
-    return (series.to_numpy() < threshold.to_numpy())
+    return series.to_numpy() < threshold.to_numpy()
 
 
 # ===========================================================================
 # Universe-level series (per timeframe)
 # ===========================================================================
-def load_aligned_returns(pairs: Sequence[str], data_dir: str,
-                         date_start: str, date_end) -> pd.DataFrame:
+def load_aligned_returns(
+    pairs: Sequence[str], data_dir: str, date_start: str, date_end
+) -> pd.DataFrame:
     series_list: dict[str, pd.Series] = {}
     for p in pairs:
         raw = load_pair_csv(p, data_dir)
@@ -192,8 +194,7 @@ def load_aligned_returns(pairs: Sequence[str], data_dir: str,
     return wide[list(pairs)]
 
 
-def universe_frobenius_shift(wide_returns: pd.DataFrame, window: int
-                             ) -> pd.Series:
+def universe_frobenius_shift(wide_returns: pd.DataFrame, window: int) -> pd.Series:
     """Return Series indexed by date: ||C_t - C_{t-1}||_F at each step.
 
     Aligned to wide_returns.index. The first (window-1) and the immediately
@@ -208,7 +209,7 @@ def universe_frobenius_shift(wide_returns: pd.DataFrame, window: int
         return pd.Series(out, index=wide_returns.index)
     prev_C: np.ndarray | None = None
     for t in range(window - 1, T):
-        win = R[t - window + 1: t + 1]
+        win = R[t - window + 1 : t + 1]
         means = win.mean(axis=0, keepdims=True)
         wc = win - means
         cov = wc.T @ wc / (window - 1)
@@ -223,15 +224,16 @@ def universe_frobenius_shift(wide_returns: pd.DataFrame, window: int
     return pd.Series(out, index=wide_returns.index)
 
 
-def risk_basket_rolling_corr(wide_returns: pd.DataFrame, risk_on: Sequence[str],
-                             risk_off: Sequence[str], window: int) -> pd.Series:
+def risk_basket_rolling_corr(
+    wide_returns: pd.DataFrame, risk_on: Sequence[str], risk_off: Sequence[str], window: int
+) -> pd.Series:
     on = wide_returns[list(risk_on)].mean(axis=1).to_numpy()
     off = wide_returns[list(risk_off)].mean(axis=1).to_numpy()
     T = len(on)
     out = np.full(T, np.nan)
     for t in range(window - 1, T):
-        xs = on[t - window + 1: t + 1]
-        ys = off[t - window + 1: t + 1]
+        xs = on[t - window + 1 : t + 1]
+        ys = off[t - window + 1 : t + 1]
         xc = xs - xs.mean()
         yc = ys - ys.mean()
         d = float(np.sqrt((xc * xc).sum() * (yc * yc).sum()))
@@ -242,8 +244,7 @@ def risk_basket_rolling_corr(wide_returns: pd.DataFrame, risk_on: Sequence[str],
 # ===========================================================================
 # Currency strength (D1 only) — matches L3
 # ===========================================================================
-def build_currency_sign_matrix(pair_names: Sequence[str],
-                               currencies: Sequence[str]) -> np.ndarray:
+def build_currency_sign_matrix(pair_names: Sequence[str], currencies: Sequence[str]) -> np.ndarray:
     C = len(currencies)
     P = len(pair_names)
     S = np.zeros((C, P), dtype=np.float64)
@@ -255,16 +256,16 @@ def build_currency_sign_matrix(pair_names: Sequence[str],
     return S
 
 
-def daily_strength_and_ranks(wide_d1: pd.DataFrame, currencies: Sequence[str]
-                             ) -> tuple[pd.DataFrame, pd.DataFrame]:
+def daily_strength_and_ranks(
+    wide_d1: pd.DataFrame, currencies: Sequence[str]
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     pair_names = list(wide_d1.columns)
     R = wide_d1.to_numpy()
     S = build_currency_sign_matrix(pair_names, currencies)
     pairs_per_ccy = np.abs(S).sum(axis=1, keepdims=True)
     strength = (R @ S.T) / pairs_per_ccy.T
     strength_df = pd.DataFrame(strength, index=wide_d1.index, columns=list(currencies))
-    ranks = np.argsort(np.argsort(-strength, axis=1, kind="stable"),
-                       axis=1, kind="stable") + 1
+    ranks = np.argsort(np.argsort(-strength, axis=1, kind="stable"), axis=1, kind="stable") + 1
     ranks_df = pd.DataFrame(ranks, index=wide_d1.index, columns=list(currencies))
     return strength_df, ranks_df
 
@@ -272,8 +273,9 @@ def daily_strength_and_ranks(wide_d1: pd.DataFrame, currencies: Sequence[str]
 # ===========================================================================
 # Lookback (D1 → lower TF) and MTF alignment (1H signal_TF)
 # ===========================================================================
-def lookback_d1_to_lower(df_lower: pd.DataFrame, df_d1: pd.DataFrame,
-                         d1_values: pd.Series) -> np.ndarray:
+def lookback_d1_to_lower(
+    df_lower: pd.DataFrame, df_d1: pd.DataFrame, d1_values: pd.Series
+) -> np.ndarray:
     """For each lower-TF bar at start time t, return d1_values at the
     most-recently-completed D1 (= the D1 strictly before the one containing t).
 
@@ -301,8 +303,9 @@ def lookback_d1_to_d1(df_d1: pd.DataFrame, d1_values: pd.Series) -> np.ndarray:
     return d1_values.to_numpy(dtype=float)
 
 
-def mtf_alignment_states(df_1h: pd.DataFrame, df_4h: pd.DataFrame,
-                         df_d1: pd.DataFrame, trend: str) -> np.ndarray:
+def mtf_alignment_states(
+    df_1h: pd.DataFrame, df_4h: pd.DataFrame, df_d1: pd.DataFrame, trend: str
+) -> np.ndarray:
     """Per-1H-bar MTF alignment state under a given trend ('kijun' or 'sma').
 
     Convention matches L2 §3.2: 1H signal at this bar's close (no lag); 4H and
@@ -402,8 +405,7 @@ def sr_expected(n_trials: int, T: int) -> float:
     return z_max / math.sqrt(T)
 
 
-def dsr_value(sr: float, gamma3: float, gamma4_raw: float, sr_exp: float,
-              T: int) -> float:
+def dsr_value(sr: float, gamma3: float, gamma4_raw: float, sr_exp: float, T: int) -> float:
     """Bailey & López de Prado DSR. γ_4 is RAW Pearson kurtosis (= excess + 3)."""
     if T < 2 or not np.isfinite(sr) or not np.isfinite(gamma3) or not np.isfinite(gamma4_raw):
         return float("nan")
@@ -414,16 +416,21 @@ def dsr_value(sr: float, gamma3: float, gamma4_raw: float, sr_exp: float,
     return float(sps.norm.cdf(z))
 
 
-def dsr_value_vec(sr: np.ndarray, gamma3: np.ndarray, gamma4_raw: np.ndarray,
-                  sr_exp: float, T: int) -> np.ndarray:
+def dsr_value_vec(
+    sr: np.ndarray, gamma3: np.ndarray, gamma4_raw: np.ndarray, sr_exp: float, T: int
+) -> np.ndarray:
     """Vectorised DSR for bootstrap resamples (T constant, sr_exp constant)."""
     if T < 2:
         return np.full(sr.shape, np.nan)
     denom_inner = 1.0 - gamma3 * sr + (gamma4_raw - 1.0) / 4.0 * sr * sr
     valid = (denom_inner > 0) & np.isfinite(sr) & np.isfinite(gamma3) & np.isfinite(gamma4_raw)
     z = np.full(sr.shape, np.nan)
-    np.divide((sr - sr_exp) * math.sqrt(T - 1), np.sqrt(np.where(valid, denom_inner, 1.0)),
-              where=valid, out=z)
+    np.divide(
+        (sr - sr_exp) * math.sqrt(T - 1),
+        np.sqrt(np.where(valid, denom_inner, 1.0)),
+        where=valid,
+        out=z,
+    )
     return np.where(valid, sps.norm.cdf(z), np.nan)
 
 
@@ -436,13 +443,15 @@ def _percentile_ci(boot_vals: np.ndarray, alpha: float) -> tuple[float, float]:
     bv = boot_vals[np.isfinite(boot_vals)]
     if bv.size < 2:
         return float("nan"), float("nan")
-    return (float(np.percentile(bv, 100.0 * alpha / 2.0)),
-            float(np.percentile(bv, 100.0 * (1.0 - alpha / 2.0))))
+    return (
+        float(np.percentile(bv, 100.0 * alpha / 2.0)),
+        float(np.percentile(bv, 100.0 * (1.0 - alpha / 2.0))),
+    )
 
 
-def trial_metrics_with_ci(returns: np.ndarray, n_trials_family: int,
-                          rng: np.random.Generator, n_boot: int, alpha: float
-                          ) -> dict[str, tuple[float, float, float]]:
+def trial_metrics_with_ci(
+    returns: np.ndarray, n_trials_family: int, rng: np.random.Generator, n_boot: int, alpha: float
+) -> dict[str, tuple[float, float, float]]:
     """Compute SR, mean, std, skew, kurt (excess), DSR with iid bootstrap CI."""
     arr = np.asarray(returns, dtype=float)
     arr = arr[np.isfinite(arr)]
@@ -485,8 +494,9 @@ def trial_metrics_with_ci(returns: np.ndarray, n_trials_family: int,
 # ===========================================================================
 # Conditional return computation
 # ===========================================================================
-def conditional_returns_at_horizon(df: pd.DataFrame, mask: np.ndarray, horizon: int
-                                   ) -> tuple[np.ndarray, np.ndarray]:
+def conditional_returns_at_horizon(
+    df: pd.DataFrame, mask: np.ndarray, horizon: int
+) -> tuple[np.ndarray, np.ndarray]:
     """Return (atr_normalised_returns, signal_indices) at horizon h from signal bars.
 
     For each t where mask[t] is True and t+h < len(df) and atr[t] is positive:
@@ -533,38 +543,43 @@ def per_pair_sharpe(returns: np.ndarray) -> tuple[float, int]:
 # ===========================================================================
 # Mask builders per condition family
 # ===========================================================================
-def mask_univariate_extreme(df: pd.DataFrame, base_condition: str, direction: str,
-                            window: int, q_top: float) -> np.ndarray:
+def mask_univariate_extreme(
+    df: pd.DataFrame, base_condition: str, direction: str, window: int, q_top: float
+) -> np.ndarray:
     """Univariate extreme (Family A) mask at signal bar."""
     if base_condition == "bar_range_top_decile":
-        cond = trailing_top_decile(pd.Series(df["bar_range"].to_numpy(),
-                                             index=df.index), window, q_top)
+        cond = trailing_top_decile(
+            pd.Series(df["bar_range"].to_numpy(), index=df.index), window, q_top
+        )
     elif base_condition == "dist_kijun_top_decile_mag":
-        cond = trailing_top_decile(pd.Series(df["dist_kijun_mag"].to_numpy(),
-                                             index=df.index), window, q_top)
+        cond = trailing_top_decile(
+            pd.Series(df["dist_kijun_mag"].to_numpy(), index=df.index), window, q_top
+        )
     elif base_condition == "dist_sma_top_decile_mag":
-        cond = trailing_top_decile(pd.Series(df["dist_sma_mag"].to_numpy(),
-                                             index=df.index), window, q_top)
+        cond = trailing_top_decile(
+            pd.Series(df["dist_sma_mag"].to_numpy(), index=df.index), window, q_top
+        )
     elif base_condition == "abs_return_top_decile":
-        cond = trailing_top_decile(pd.Series(df["abs_log_ret"].to_numpy(),
-                                             index=df.index), window, q_top)
+        cond = trailing_top_decile(
+            pd.Series(df["abs_log_ret"].to_numpy(), index=df.index), window, q_top
+        )
     else:
         raise ValueError(f"unknown univariate_extreme base condition: {base_condition}")
 
     bar_sign = df["bar_sign"].to_numpy(dtype=float)
     if direction == "pos":
-        sign_match = (bar_sign == 1)
+        sign_match = bar_sign == 1
     elif direction == "neg":
-        sign_match = (bar_sign == -1)
+        sign_match = bar_sign == -1
     else:
         raise ValueError(f"unknown direction: {direction}")
     cond = np.where(np.isnan(cond), False, cond).astype(bool)
     return cond & sign_match
 
 
-def mask_volatility_regime(df: pd.DataFrame, base_condition: str,
-                           d1_top_mask: np.ndarray, d1_bot_mask: np.ndarray
-                           ) -> np.ndarray:
+def mask_volatility_regime(
+    df: pd.DataFrame, base_condition: str, d1_top_mask: np.ndarray, d1_bot_mask: np.ndarray
+) -> np.ndarray:
     """Volatility regime (Family B) — D1 ATR top/bottom decile applied via L2 lookback.
 
     `d1_top_mask` / `d1_bot_mask` are precomputed boolean arrays already aligned
@@ -577,8 +592,7 @@ def mask_volatility_regime(df: pd.DataFrame, base_condition: str,
     raise ValueError(f"unknown volatility_regime base: {base_condition}")
 
 
-def mask_dow(df: pd.DataFrame, base_condition: str, top_dow: int, bot_dow: int
-             ) -> np.ndarray:
+def mask_dow(df: pd.DataFrame, base_condition: str, top_dow: int, bot_dow: int) -> np.ndarray:
     weekday = df["date"].dt.weekday.to_numpy()
     if base_condition == "dow_top_mean_abs_return_day":
         return weekday == top_dow
@@ -616,26 +630,30 @@ def enumerate_trials(cfg: dict) -> list[dict]:
         for h in horizons[tf]:
             for base in fa["base_conditions"]:
                 for direction in fa["directions"]:
-                    trials.append({
-                        "family": "univariate_extreme",
-                        "base": base,
-                        "sub": direction,
-                        "signal_tf": tf,
-                        "horizon": int(h),
-                    })
+                    trials.append(
+                        {
+                            "family": "univariate_extreme",
+                            "base": base,
+                            "sub": direction,
+                            "signal_tf": tf,
+                            "horizon": int(h),
+                        }
+                    )
 
     # B. volatility_regime
     fb = tcfg["volatility_regime"]
     for tf in fb["timeframes"]:
         for h in horizons[tf]:
             for base in fb["base_conditions"]:
-                trials.append({
-                    "family": "volatility_regime",
-                    "base": base,
-                    "sub": "any",
-                    "signal_tf": tf,
-                    "horizon": int(h),
-                })
+                trials.append(
+                    {
+                        "family": "volatility_regime",
+                        "base": base,
+                        "sub": "any",
+                        "signal_tf": tf,
+                        "horizon": int(h),
+                    }
+                )
 
     # C. mtf_alignment (1H only)
     fc = tcfg["mtf_alignment"]
@@ -643,52 +661,60 @@ def enumerate_trials(cfg: dict) -> list[dict]:
         for h in horizons[tf]:
             for state in fc["states"]:
                 for trend in fc["trends"]:
-                    trials.append({
-                        "family": "mtf_alignment",
-                        "base": state,
-                        "sub": trend,
-                        "signal_tf": tf,
-                        "horizon": int(h),
-                    })
+                    trials.append(
+                        {
+                            "family": "mtf_alignment",
+                            "base": state,
+                            "sub": trend,
+                            "signal_tf": tf,
+                            "horizon": int(h),
+                        }
+                    )
 
     # D. cross_pair
     fd = tcfg["cross_pair"]
     for tf in fd["timeframes"]:
         for h in horizons[tf]:
             for base in fd["base_conditions"]:
-                trials.append({
-                    "family": "cross_pair",
-                    "base": base,
-                    "sub": "any",
-                    "signal_tf": tf,
-                    "horizon": int(h),
-                })
+                trials.append(
+                    {
+                        "family": "cross_pair",
+                        "base": base,
+                        "sub": "any",
+                        "signal_tf": tf,
+                        "horizon": int(h),
+                    }
+                )
 
     # E. dow
     fe = tcfg["dow"]
     for tf in fe["timeframes"]:
         for h in horizons[tf]:
             for base in fe["base_conditions"]:
-                trials.append({
-                    "family": "dow",
-                    "base": base,
-                    "sub": "any",
-                    "signal_tf": tf,
-                    "horizon": int(h),
-                })
+                trials.append(
+                    {
+                        "family": "dow",
+                        "base": base,
+                        "sub": "any",
+                        "signal_tf": tf,
+                        "horizon": int(h),
+                    }
+                )
 
     # F. run_length
     ff = tcfg["run_length"]
     for tf in ff["timeframes"]:
         for h in horizons[tf]:
             for base in ff["base_conditions"]:
-                trials.append({
-                    "family": "run_length",
-                    "base": base,
-                    "sub": "any",
-                    "signal_tf": tf,
-                    "horizon": int(h),
-                })
+                trials.append(
+                    {
+                        "family": "run_length",
+                        "base": base,
+                        "sub": "any",
+                        "signal_tf": tf,
+                        "horizon": int(h),
+                    }
+                )
 
     return trials
 
@@ -817,9 +843,9 @@ def run(cfg: dict) -> Path:
     print("[L4] aligning wide returns per TF", file=sys.stderr)
     wide_per_tf: dict[str, pd.DataFrame] = {}
     for tf in timeframes:
-        wide_per_tf[tf] = load_aligned_returns(pairs, data_dirs[tf],
-                                               cfg["data"]["date_start"],
-                                               cfg["data"].get("date_end"))[pairs]
+        wide_per_tf[tf] = load_aligned_returns(
+            pairs, data_dirs[tf], cfg["data"]["date_start"], cfg["data"].get("date_end")
+        )[pairs]
 
     # --- Universe series per TF ---
     print("[L4] universe Frobenius diff and risk-basket rolling corr", file=sys.stderr)
@@ -832,18 +858,24 @@ def run(cfg: dict) -> Path:
         wide = wide_per_tf[tf]
         f = universe_frobenius_shift(wide, universe_window)
         univ_frob[tf] = f
-        univ_frob_top_mask[tf] = pd.Series(
-            trailing_top_decile(f, win_thresh, q_top), index=f.index
-        ).fillna(False).astype(bool)
+        univ_frob_top_mask[tf] = (
+            pd.Series(trailing_top_decile(f, win_thresh, q_top), index=f.index)
+            .fillna(False)
+            .astype(bool)
+        )
         c = risk_basket_rolling_corr(wide, risk_on, risk_off, universe_window)
         rb_corr[tf] = c
         c_mag = c.abs()
-        rb_corr_top_mask[tf] = pd.Series(
-            trailing_top_decile(c_mag, win_thresh, q_top), index=c.index
-        ).fillna(False).astype(bool)
-        rb_corr_bot_mask[tf] = pd.Series(
-            trailing_bottom_decile(c_mag, win_thresh, q_bot), index=c.index
-        ).fillna(False).astype(bool)
+        rb_corr_top_mask[tf] = (
+            pd.Series(trailing_top_decile(c_mag, win_thresh, q_top), index=c.index)
+            .fillna(False)
+            .astype(bool)
+        )
+        rb_corr_bot_mask[tf] = (
+            pd.Series(trailing_bottom_decile(c_mag, win_thresh, q_bot), index=c.index)
+            .fillna(False)
+            .astype(bool)
+        )
 
     # --- D1 ATR top/bottom decile mask (D1) ---
     print("[L4] D1 ATR decile mask", file=sys.stderr)
@@ -854,11 +886,13 @@ def run(cfg: dict) -> Path:
         atr_series = pd.Series(df_d1["atr"].to_numpy(), index=df_d1.index)
         d1_atr_top_per_pair[p] = np.where(
             np.isnan(trailing_top_decile(atr_series, win_thresh, q_top)),
-            False, trailing_top_decile(atr_series, win_thresh, q_top),
+            False,
+            trailing_top_decile(atr_series, win_thresh, q_top),
         ).astype(bool)
         d1_atr_bot_per_pair[p] = np.where(
             np.isnan(trailing_bottom_decile(atr_series, win_thresh, q_bot)),
-            False, trailing_bottom_decile(atr_series, win_thresh, q_bot),
+            False,
+            trailing_bottom_decile(atr_series, win_thresh, q_bot),
         ).astype(bool)
 
     # --- D1 USD extreme mask ---
@@ -890,23 +924,20 @@ def run(cfg: dict) -> Path:
     # For each (pair, signal_tf), produce arrays of length len(df_pair_signal_tf)
     # that map each bar to the relevant universe / D1 mask value (or NaN).
 
-    def align_series_to_pair_tf(series: pd.Series, df: pd.DataFrame
-                                ) -> np.ndarray:
+    def align_series_to_pair_tf(series: pd.Series, df: pd.DataFrame) -> np.ndarray:
         # Series is indexed by date (universe-wide); map to df's date index by
         # exact lookup. Universe series and pair df share TF, so dates may differ
         # only in completeness. Reindex on df['date'].
         s = series.reindex(df["date"].to_numpy())
         return s.to_numpy(dtype=float)
 
-    def align_bool_series_to_pair_tf(series: pd.Series, df: pd.DataFrame
-                                     ) -> np.ndarray:
+    def align_bool_series_to_pair_tf(series: pd.Series, df: pd.DataFrame) -> np.ndarray:
         s = series.reindex(df["date"].to_numpy())
         return s.fillna(False).to_numpy(dtype=bool)
 
     print("[L4] enumerating trials", file=sys.stderr)
     trials = enumerate_trials(cfg)
-    print(f"[L4] total trials: {len(trials)} (cap: {n_trials_family})",
-          file=sys.stderr)
+    print(f"[L4] total trials: {len(trials)} (cap: {n_trials_family})", file=sys.stderr)
 
     rows: list[tuple] = []
 
@@ -946,20 +977,30 @@ def run(cfg: dict) -> Path:
                 )
                 if signal_tf == "D1":
                     # Same TF — direct lookup (signal at D1 bar's own decile).
-                    d1_top_aligned = d1_top_mask_p.reindex(df["date"]).fillna(False).to_numpy(dtype=bool)
-                    d1_bot_aligned = d1_bot_mask_p.reindex(df["date"]).fillna(False).to_numpy(dtype=bool)
+                    d1_top_aligned = (
+                        d1_top_mask_p.reindex(df["date"]).fillna(False).to_numpy(dtype=bool)
+                    )
+                    d1_bot_aligned = (
+                        d1_bot_mask_p.reindex(df["date"]).fillna(False).to_numpy(dtype=bool)
+                    )
                 else:
                     # Lower TF — L2 lookback to most-recently-completed D1.
                     d1_top_aligned = lookback_d1_to_lower(
-                        df, pair_dfs[p]["D1"], pd.Series(d1_atr_top_per_pair[p].astype(float),
-                                                          index=pair_dfs[p]["D1"].index)
+                        df,
+                        pair_dfs[p]["D1"],
+                        pd.Series(
+                            d1_atr_top_per_pair[p].astype(float), index=pair_dfs[p]["D1"].index
+                        ),
                     )
                     d1_bot_aligned = lookback_d1_to_lower(
-                        df, pair_dfs[p]["D1"], pd.Series(d1_atr_bot_per_pair[p].astype(float),
-                                                          index=pair_dfs[p]["D1"].index)
+                        df,
+                        pair_dfs[p]["D1"],
+                        pd.Series(
+                            d1_atr_bot_per_pair[p].astype(float), index=pair_dfs[p]["D1"].index
+                        ),
                     )
-                    d1_top_aligned = (np.where(np.isnan(d1_top_aligned), 0.0, d1_top_aligned) > 0.5)
-                    d1_bot_aligned = (np.where(np.isnan(d1_bot_aligned), 0.0, d1_bot_aligned) > 0.5)
+                    d1_top_aligned = np.where(np.isnan(d1_top_aligned), 0.0, d1_top_aligned) > 0.5
+                    d1_bot_aligned = np.where(np.isnan(d1_bot_aligned), 0.0, d1_bot_aligned) > 0.5
 
             univ_frob_top_aligned = None
             rb_corr_top_aligned = None
@@ -968,26 +1009,37 @@ def run(cfg: dict) -> Path:
             if family == "cross_pair":
                 if base == "matrix_frobenius_shift_top_decile":
                     univ_frob_top_aligned = align_bool_series_to_pair_tf(
-                        univ_frob_top_mask[signal_tf], df,
+                        univ_frob_top_mask[signal_tf],
+                        df,
                     )
                 if base == "risk_basket_corr_top_decile_mag":
                     rb_corr_top_aligned = align_bool_series_to_pair_tf(
-                        rb_corr_top_mask[signal_tf], df,
+                        rb_corr_top_mask[signal_tf],
+                        df,
                     )
                 if base == "risk_basket_corr_bottom_decile_mag":
                     rb_corr_bot_aligned = align_bool_series_to_pair_tf(
-                        rb_corr_bot_mask[signal_tf], df,
+                        rb_corr_bot_mask[signal_tf],
+                        df,
                     )
                 if base == "usd_strength_extreme":
                     if signal_tf == "D1":
                         usd_extreme_aligned = (
-                            usd_extreme_d1_series.reindex(df["date"]).fillna(False).to_numpy(dtype=bool)
+                            usd_extreme_d1_series.reindex(df["date"])
+                            .fillna(False)
+                            .to_numpy(dtype=bool)
                         )
                     else:
                         usd_extreme_aligned = lookback_d1_to_lower(
-                            df, pair_dfs[p]["D1"],
-                            pd.Series(usd_extreme_d1_series.reindex(pair_dfs[p]["D1"]["date"]).fillna(False).astype(float).to_numpy(),
-                                      index=pair_dfs[p]["D1"].index),
+                            df,
+                            pair_dfs[p]["D1"],
+                            pd.Series(
+                                usd_extreme_d1_series.reindex(pair_dfs[p]["D1"]["date"])
+                                .fillna(False)
+                                .astype(float)
+                                .to_numpy(),
+                                index=pair_dfs[p]["D1"].index,
+                            ),
                         )
                         usd_extreme_aligned = (
                             np.where(np.isnan(usd_extreme_aligned), 0.0, usd_extreme_aligned) > 0.5
@@ -1000,7 +1052,10 @@ def run(cfg: dict) -> Path:
             top_dow, bot_dow = dow_per_pair_tf[p][signal_tf]
 
             mask = build_pair_signal_mask(
-                p, df, trial, cfg,
+                p,
+                df,
+                trial,
+                cfg,
                 d1_atr_top_aligned=d1_top_aligned,
                 d1_atr_bot_aligned=d1_bot_aligned,
                 universe_frob_top_aligned=univ_frob_top_aligned,
@@ -1027,16 +1082,28 @@ def run(cfg: dict) -> Path:
         if T >= 2:
             metrics = trial_metrics_with_ci(pooled, n_trials_family, rng, n_boot, alpha)
         else:
-            metrics = {nm: (float("nan"), float("nan"), float("nan"))
-                       for nm in ("sharpe", "mean_r", "std_r", "skew_r", "kurt_r", "dsr")}
+            metrics = {
+                nm: (float("nan"), float("nan"), float("nan"))
+                for nm in ("sharpe", "mean_r", "std_r", "skew_r", "kurt_r", "dsr")
+            }
 
         for stat_name, (v, lo, hi) in metrics.items():
-            rows.append((trial_id, signal_tf, "l4_trial_metric", stat_name,
-                         v, lo, hi, T, notes))
+            rows.append((trial_id, signal_tf, "l4_trial_metric", stat_name, v, lo, hi, T, notes))
 
         # n_obs_pooled stat row (no CI)
-        rows.append((trial_id, signal_tf, "l4_trial_metric", "n_obs_pooled",
-                     float(T), float("nan"), float("nan"), T, notes))
+        rows.append(
+            (
+                trial_id,
+                signal_tf,
+                "l4_trial_metric",
+                "n_obs_pooled",
+                float(T),
+                float("nan"),
+                float("nan"),
+                T,
+                notes,
+            )
+        )
 
         # Per-pair diagnostic Sharpe
         for p in eligible_pairs:
@@ -1046,9 +1113,19 @@ def run(cfg: dict) -> Path:
             sharpe_p, n_p = per_pair_sharpe(r_p)
             if n_p < diag_min_n:
                 continue
-            rows.append((diag_pair_id(trial, p), signal_tf, "l4_trial_diag",
-                         "sharpe", sharpe_p, float("nan"), float("nan"),
-                         n_p, ""))
+            rows.append(
+                (
+                    diag_pair_id(trial, p),
+                    signal_tf,
+                    "l4_trial_diag",
+                    "sharpe",
+                    sharpe_p,
+                    float("nan"),
+                    float("nan"),
+                    n_p,
+                    "",
+                )
+            )
 
         if (ti + 1) % 24 == 0 or ti == len(trials) - 1:
             print(f"[L4] {ti + 1}/{len(trials)} trials processed", file=sys.stderr)
@@ -1059,8 +1136,13 @@ def run(cfg: dict) -> Path:
     out_df = out_df.sort_values(sort_cols, kind="mergesort").reset_index(drop=True)
     csv_path = Path(cfg["output"]["csv_path"])
     csv_path.parent.mkdir(parents=True, exist_ok=True)
-    out_df.to_csv(csv_path, index=False, float_format=cfg["output"]["float_format"],
-                  na_rep="", lineterminator="\n")
+    out_df.to_csv(
+        csv_path,
+        index=False,
+        float_format=cfg["output"]["float_format"],
+        na_rep="",
+        lineterminator="\n",
+    )
     print(f"[L4] wrote {csv_path}", file=sys.stderr)
     return csv_path
 

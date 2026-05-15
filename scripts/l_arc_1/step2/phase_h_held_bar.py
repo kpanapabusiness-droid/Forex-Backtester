@@ -1,3 +1,4 @@
+# ruff: noqa: E402  (sys.path.insert needed before project imports)
 """Phase H — held-bar context evolution (op spec §5.14) and forward context
 evolution (prompt extension — analogue on the unconditional forward path).
 
@@ -13,6 +14,7 @@ Each per-t CSV contains, per trade:
     across the 28 pairs, computed on the unified timeline)
   - ATR regime ratio: atr[bar] / atr[sig_idx]
 """
+
 from __future__ import annotations
 
 import sys
@@ -28,8 +30,11 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from scripts.l_arc_1.step2._io import (
-    PAIRS, STEP2_DIR, compute_signal_mask, load_all_floors, load_pair_1h,
-    pip_size, wilder_atr,
+    PAIRS,
+    STEP2_DIR,
+    load_all_floors,
+    load_pair_1h,
+    wilder_atr,
 )
 from scripts.l_arc_1.step2.phase_e_shadows import SPREAD_FLOOR_PATH
 
@@ -57,16 +62,24 @@ def run_phase_h() -> None:
         df = load_pair_1h(pair)
         pair_data[pair] = df
         pair_close[pair] = df["close"].astype(float).values
-        pair_spread[pair] = df["spread"].astype(float).values if "spread" in df.columns else np.zeros(len(df))
-        pair_atr[pair] = wilder_atr(df["high"].astype(float).values,
-                                    df["low"].astype(float).values,
-                                    df["close"].astype(float).values, period=14)
+        pair_spread[pair] = (
+            df["spread"].astype(float).values if "spread" in df.columns else np.zeros(len(df))
+        )
+        pair_atr[pair] = wilder_atr(
+            df["high"].astype(float).values,
+            df["low"].astype(float).values,
+            df["close"].astype(float).values,
+            period=14,
+        )
         pair_ts[pair] = df["time"].astype("datetime64[ns]").astype("int64").to_numpy()
         pair_idx[pair] = {int(t): i for i, t in enumerate(pair_ts[pair])}
 
     print("[Phase H] computing cross-pair dispersion on unified timeline...")
-    all_ts = (pd.DatetimeIndex(np.concatenate([df["time"].values for df in pair_data.values()]))
-              .unique().sort_values())
+    all_ts = (
+        pd.DatetimeIndex(np.concatenate([df["time"].values for df in pair_data.values()]))
+        .unique()
+        .sort_values()
+    )
     lr_frame = pd.DataFrame(index=all_ts, dtype=np.float64)
     for pair in PAIRS:
         close = pair_close[pair]
@@ -79,14 +92,21 @@ def run_phase_h() -> None:
         s = pd.Series(lr, index=pd.DatetimeIndex(pair_data[pair]["time"].values))
         lr_frame[pair] = s.reindex(all_ts).values
     dispersion = lr_frame.std(axis=1, skipna=True)
-    dispersion_ts_int = pd.DatetimeIndex(dispersion.index).astype("datetime64[ns]").astype("int64").to_numpy()
+    dispersion_ts_int = (
+        pd.DatetimeIndex(dispersion.index).astype("datetime64[ns]").astype("int64").to_numpy()
+    )
     dispersion_vals = dispersion.to_numpy()
     # Index for fast lookup
     disp_idx = {int(t): i for i, t in enumerate(dispersion_ts_int)}
 
     # Per-trade per-t computations
     tr_pair = features["pair"].to_numpy()
-    tr_sig_ts = pd.to_datetime(features["signal_bar_ts"]).astype("datetime64[ns]").astype("int64").to_numpy()
+    tr_sig_ts = (
+        pd.to_datetime(features["signal_bar_ts"])
+        .astype("datetime64[ns]")
+        .astype("int64")
+        .to_numpy()
+    )
 
     results_per_t: Dict[int, List[dict]] = {t: [] for t in SAMPLE_TS}
 
@@ -100,7 +120,7 @@ def run_phase_h() -> None:
         atr_at_sig = float(pair_atr[pair][sig_idx])
         if not (np.isfinite(atr_at_sig) and atr_at_sig > 0):
             continue
-        close_sig = float(pair_close[pair][sig_idx])
+        float(pair_close[pair][sig_idx])
         for t in SAMPLE_TS:
             bi = entry_idx + t - 1
             if bi >= len(pair_close[pair]):
@@ -109,7 +129,9 @@ def run_phase_h() -> None:
             atr_bi = float(pair_atr[pair][bi])
             atr_regime = atr_bi / atr_at_sig if np.isfinite(atr_bi) and atr_at_sig > 0 else np.nan
             # Broker spread (raw pips + floored)
-            raw_pips = float(pair_spread[pair][bi]) / 10.0 if np.isfinite(pair_spread[pair][bi]) else 0.0
+            raw_pips = (
+                float(pair_spread[pair][bi]) / 10.0 if np.isfinite(pair_spread[pair][bi]) else 0.0
+            )
             floor_pips = floors.get(pair, 0.0)
             eff_pips = max(raw_pips, floor_pips) if floor_pips else raw_pips
             # Currency basket cum move from sig_ts to bar bi
@@ -135,20 +157,22 @@ def run_phase_h() -> None:
             # Cross-pair dispersion at bar bi
             disp_v = float(dispersion_vals[disp_idx[bi_ts]]) if bi_ts in disp_idx else np.nan
 
-            results_per_t[t].append({
-                "trade_id": int(features["trade_id"].iat[k]),
-                "pair": pair,
-                "fold_id": int(features["fold_id"].iat[k]),
-                "t": t,
-                "atr_regime_ratio": atr_regime,
-                "broker_spread_pips_raw": raw_pips,
-                "broker_spread_pips_floored": eff_pips,
-                "cross_pair_dispersion_proxy": disp_v,
-                "basket_cum_logret_USD": basket["USD"],
-                "basket_cum_logret_EUR": basket["EUR"],
-                "basket_cum_logret_JPY": basket["JPY"],
-                "basket_cum_logret_GBP": basket["GBP"],
-            })
+            results_per_t[t].append(
+                {
+                    "trade_id": int(features["trade_id"].iat[k]),
+                    "pair": pair,
+                    "fold_id": int(features["fold_id"].iat[k]),
+                    "t": t,
+                    "atr_regime_ratio": atr_regime,
+                    "broker_spread_pips_raw": raw_pips,
+                    "broker_spread_pips_floored": eff_pips,
+                    "cross_pair_dispersion_proxy": disp_v,
+                    "basket_cum_logret_USD": basket["USD"],
+                    "basket_cum_logret_EUR": basket["EUR"],
+                    "basket_cum_logret_JPY": basket["JPY"],
+                    "basket_cum_logret_GBP": basket["GBP"],
+                }
+            )
 
     # Held-bar evolution: only t=1 is non-vacuous
     df_t1 = pd.DataFrame(results_per_t[1])
@@ -160,14 +184,15 @@ def run_phase_h() -> None:
     for t in SAMPLE_TS[1:]:
         path = HELD_DIR / f"t{t}.csv"
         with path.open("w", encoding="utf-8", newline="") as fh:
-            fh.write(f"# degenerate_by_construction: true | reason: h=1 trades exit at t=2; bars at t={t} in the held window do not exist\n")
+            fh.write(
+                f"# degenerate_by_construction: true | reason: h=1 trades exit at t=2; bars at t={t} in the held window do not exist\n"
+            )
             fh.write("trade_id,pair,fold_id,t\n")
 
     # Forward context evolution: all t values non-vacuous (unconditional on exit)
     for t in SAMPLE_TS:
         df_t = pd.DataFrame(results_per_t[t])
-        df_t.to_csv(FWD_DIR / f"t{t}.csv", index=False,
-                    lineterminator="\n", float_format="%.6g")
+        df_t.to_csv(FWD_DIR / f"t{t}.csv", index=False, lineterminator="\n", float_format="%.6g")
         print(f"  forward_context_evolution/t{t}.csv: {len(df_t):,} rows")
 
     # Also write the cross-pair dispersion explanatory note
@@ -181,7 +206,7 @@ def run_phase_h() -> None:
         "approximate.\n",
         encoding="utf-8",
     )
-    print(f"[Phase H] done in {time.time()-t0:.1f}s")
+    print(f"[Phase H] done in {time.time() - t0:.1f}s")
 
 
 if __name__ == "__main__":

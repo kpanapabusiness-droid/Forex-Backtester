@@ -4,12 +4,13 @@ k-means: scikit-learn KMeans with explicit seed + n_init=10.
 Hierarchical Ward: scipy linkage on a 10k subsample, then propagate
 to all rows via nearest centroid of the subsample's cluster means.
 """
+
 from __future__ import annotations
 
 import numpy as np
 from scipy.cluster.hierarchy import fcluster, linkage
-from sklearn.cluster import KMeans, HDBSCAN
-from sklearn.metrics import silhouette_score, adjusted_rand_score
+from sklearn.cluster import HDBSCAN, KMeans
+from sklearn.metrics import adjusted_rand_score, silhouette_score
 
 from . import _common as C
 
@@ -52,10 +53,7 @@ def fit_hierarchical_ward(X: np.ndarray, k: int, seed: int) -> np.ndarray:
     sub_labels = sub_labels - 1  # 0-indexed
 
     # Compute cluster centroids on the subsample
-    centroids = np.array([
-        X[idx][sub_labels == j].mean(axis=0)
-        for j in range(k)
-    ])
+    centroids = np.array([X[idx][sub_labels == j].mean(axis=0) for j in range(k)])
 
     # Assign every row to its nearest centroid (Euclidean, on standardised X)
     # Vectorised distance
@@ -65,8 +63,9 @@ def fit_hierarchical_ward(X: np.ndarray, k: int, seed: int) -> np.ndarray:
     return labels
 
 
-def silhouette_sample(X: np.ndarray, labels: np.ndarray, seed: int,
-                      sample_size: int = 5000) -> float:
+def silhouette_sample(
+    X: np.ndarray, labels: np.ndarray, seed: int, sample_size: int = 5000
+) -> float:
     n = X.shape[0]
     if sample_size >= n:
         return float(silhouette_score(X, labels))

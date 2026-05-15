@@ -120,7 +120,12 @@ def load_market_tsvs(market_dir: str | Path) -> dict[str, pd.DataFrame]:
 
         out = pd.DataFrame()
         out["time"] = parse_mt5_date(df[date_col].astype(str))
-        for k, col in [("open", open_col), ("high", high_col), ("low", low_col), ("close", close_col)]:
+        for k, col in [
+            ("open", open_col),
+            ("high", high_col),
+            ("low", low_col),
+            ("close", close_col),
+        ]:
             out[k] = pd.to_numeric(df[col], errors="coerce")
         out["spread_points"] = (
             pd.to_numeric(df[spread_col], errors="coerce").fillna(0).astype(int)
@@ -172,15 +177,27 @@ def load_history_csv(path: str | Path) -> pd.DataFrame:
     if not p.exists():
         return pd.DataFrame(
             columns=[
-                "ticket", "symbol", "type", "open_time", "close_time",
-                "open_price", "close_price", "profit",
+                "ticket",
+                "symbol",
+                "type",
+                "open_time",
+                "close_time",
+                "open_price",
+                "close_price",
+                "profit",
             ]
         )
     try:
         df = pd.read_csv(p)
         expected = [
-            "ticket", "symbol", "type", "open_time", "close_time",
-            "open_price", "close_price", "profit",
+            "ticket",
+            "symbol",
+            "type",
+            "open_time",
+            "close_time",
+            "open_price",
+            "close_price",
+            "profit",
         ]
         for c in expected:
             if c not in df.columns:
@@ -189,8 +206,14 @@ def load_history_csv(path: str | Path) -> pd.DataFrame:
     except Exception:
         return pd.DataFrame(
             columns=[
-                "ticket", "symbol", "type", "open_time", "close_time",
-                "open_price", "close_price", "profit",
+                "ticket",
+                "symbol",
+                "type",
+                "open_time",
+                "close_time",
+                "open_price",
+                "close_price",
+                "profit",
             ]
         )
 

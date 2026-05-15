@@ -97,13 +97,10 @@ def normalize_daily_file(path: Path) -> Tuple[bool, str]:
                 raise ValueError(f"Required column '{col}' missing in {path}")
 
     # Normalise date format: YYYY.MM.DD -> YYYY-MM-DD, output column name 'time'
-    df["time"] = (
-        pd.to_datetime(
-            df["time"].astype(str).str.replace(".", "-", regex=False),
-            errors="coerce",
-        )
-        .dt.strftime("%Y-%m-%d")
-    )
+    df["time"] = pd.to_datetime(
+        df["time"].astype(str).str.replace(".", "-", regex=False),
+        errors="coerce",
+    ).dt.strftime("%Y-%m-%d")
 
     # Sort and drop duplicate times
     df = df.sort_values("time").drop_duplicates(subset=["time"], keep="first")
@@ -186,4 +183,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

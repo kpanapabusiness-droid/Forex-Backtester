@@ -125,9 +125,8 @@ def augment_trades_csv(
 
     pip = df["pair"].map(_pip_size).astype(float)
     spread_cost_price = (
-        df["spread_pips_entry"].astype(float)
-        + df["spread_pips_exit"].astype(float)
-    ) * pip / 2.0
+        (df["spread_pips_entry"].astype(float) + df["spread_pips_exit"].astype(float)) * pip / 2.0
+    )
     df["spread_cost_r"] = spread_cost_price / df["sl_distance_price"]
     df["net_r"] = df["R"].astype(float)
     df["gross_r"] = df["net_r"] + df["spread_cost_r"]
@@ -147,7 +146,9 @@ def augment_trades_csv(
 
     sl_violations = int(((df["sl_distance_atr_units"] - 2.0).abs() > 1e-9).sum())
     # Hard gate (viii): SL-side sanity — long: sl_price < entry_price.
-    sl_side_violations = int((df["sl_price"].astype(float) >= df["entry_price"].astype(float)).sum())
+    sl_side_violations = int(
+        (df["sl_price"].astype(float) >= df["entry_price"].astype(float)).sum()
+    )
 
     df.to_csv(trades_path, index=False, lineterminator="\n")
     return n, sl_violations, sl_side_violations
@@ -221,9 +222,7 @@ def run_lookahead_invariant_test_signal(
     raw_1h = _load_pair_tf(pair, "1hr")
     raw_d1 = _load_pair_tf(pair, "daily")
 
-    ref_mask, _, _ = _volatility_regime_d1_atr_top_decile_mask(
-        raw_1h, raw_d1, pair=pair
-    )
+    ref_mask, _, _ = _volatility_regime_d1_atr_top_decile_mask(raw_1h, raw_d1, pair=pair)
     valid_signal_idx = np.where(ref_mask)[0]
     # Keep samples that have at least 10 bars of headroom after them for the
     # perturbation slice to be non-trivially long.
@@ -249,9 +248,7 @@ def run_lookahead_invariant_test_signal(
             perturbed.loc[forward_slice, col] = (
                 perturbed.loc[forward_slice, col].astype(float) + noise[:, ci]
             )
-        pert_mask, _, _ = _volatility_regime_d1_atr_top_decile_mask(
-            perturbed, raw_d1, pair=pair
-        )
+        pert_mask, _, _ = _volatility_regime_d1_atr_top_decile_mask(perturbed, raw_d1, pair=pair)
         if bool(pert_mask[int(nbar)]) != bool(ref_mask[int(nbar)]):
             n_disagree += 1
             disagreements.append(int(nbar))
@@ -442,11 +439,13 @@ def run_lookahead_audit_execution(n_samples: int = 50) -> Tuple[bool, dict]:
         sig_idx_arr = np.where(df_1h_ref["time"].values == sig_ts.to_datetime64())[0]
         if sig_idx_arr.size == 0:
             n_disagree += 1
-            disagreement_rows.append({
-                "pair": pair,
-                "sig_ts": str(sig_ts),
-                "reason": "signal_bar_ts not found in 1H frame",
-            })
+            disagreement_rows.append(
+                {
+                    "pair": pair,
+                    "sig_ts": str(sig_ts),
+                    "reason": "signal_bar_ts not found in 1H frame",
+                }
+            )
             continue
         sig_idx = int(sig_idx_arr[0])
 
@@ -486,13 +485,15 @@ def run_lookahead_audit_execution(n_samples: int = 50) -> Tuple[bool, dict]:
         }
         if diffs or not ref["mask_at_sig"] or not pert["mask_at_sig"]:
             n_disagree += 1
-            disagreement_rows.append({
-                "pair": pair,
-                "sig_ts": str(sig_ts),
-                "diffs": {k: (str(v[0]), str(v[1])) for k, v in diffs.items()},
-                "ref_mask": ref["mask_at_sig"],
-                "pert_mask": pert["mask_at_sig"],
-            })
+            disagreement_rows.append(
+                {
+                    "pair": pair,
+                    "sig_ts": str(sig_ts),
+                    "diffs": {k: (str(v[0]), str(v[1])) for k, v in diffs.items()},
+                    "ref_mask": ref["mask_at_sig"],
+                    "pert_mask": pert["mask_at_sig"],
+                }
+            )
 
     pass_ = n_disagree == 0
     details = {
@@ -559,7 +560,7 @@ def write_feature_lag_audit() -> Path:
 
     idx_d1 = pd.Series(np.arange(len(raw_d1), dtype=np.int64), index=raw_d1["time"])
     contain_d1 = floor_d1.map(idx_d1).to_numpy(dtype=float)
-    mrd_idx = (np.where(np.isnan(contain_d1), 0, contain_d1).astype(np.int64) - 1)
+    mrd_idx = np.where(np.isnan(contain_d1), 0, contain_d1).astype(np.int64) - 1
 
     rows = []
     n_strict_d1 = 0
@@ -621,16 +622,12 @@ def reconcile_fires_and_takes(sig_log_path: Path) -> Dict[str, object]:
     n_fires = int(len(sdf))
     n_taken = int((sdf["taken"]).astype(bool).sum())
     n_dropped = n_fires - n_taken
-    drop_hist = (
-        sdf.loc[~sdf["taken"].astype(bool), "drop_reason"].value_counts().to_dict()
-    )
+    drop_hist = sdf.loc[~sdf["taken"].astype(bool), "drop_reason"].value_counts().to_dict()
     n_expo = sum(int(c) for r, c in drop_hist.items() if r in EXPOSURE_CAP_REASONS)
     n_other = n_dropped - n_expo
     pct_other = (n_other / n_dropped) if n_dropped > 0 else 0.0
 
-    per_fold = (
-        sdf.loc[sdf["taken"].astype(bool), "fold_id"].value_counts().sort_index().to_dict()
-    )
+    per_fold = sdf.loc[sdf["taken"].astype(bool), "fold_id"].value_counts().sort_index().to_dict()
     return {
         "n_fires_total": n_fires,
         "n_taken": n_taken,
@@ -919,9 +916,10 @@ def main() -> int:
     revalidation_pass = "BIT-IDENTICAL CHECK: PASS" in reval_text
 
     from scripts.lchar.compute_spread_floors import compute_body_sha256
+
     floor_observed = compute_body_sha256(REPO_ROOT / "configs" / "spread_floors_5ers.yaml")
     floor_expected = cfg["spread_floor"]["expected_body_sha256"]
-    floor_hash_pass = (floor_observed == floor_expected)
+    floor_hash_pass = floor_observed == floor_expected
 
     tdf = pd.read_csv(trades_path)
     same_bar = int((tdf["signal_bar_ts"] == tdf["entry_bar_ts"]).sum())

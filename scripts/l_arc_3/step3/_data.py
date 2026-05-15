@@ -7,6 +7,7 @@ Arc 3-specific notes:
 - Phase D held-bar features include trade_paths bar-by-bar observations
   PLUS held_bar_evolution/t{t}.csv context.
 """
+
 # ruff: noqa: E402, E701, E702, F841, I001, F401
 from __future__ import annotations
 
@@ -61,12 +62,11 @@ def load_paths_to_t(t: int, all_trade_ids: np.ndarray) -> pd.DataFrame:
 
 # ---- predictor feature set ---------------------------------------------
 
+
 def _onehot(series: pd.Series, prefix: str) -> pd.DataFrame:
     s = series.fillna("__nan__").astype(str)
     levels = sorted(s.unique().tolist())
-    return pd.DataFrame(
-        {f"{prefix}__{lev}": (s == lev).astype(np.int8) for lev in levels}
-    )
+    return pd.DataFrame({f"{prefix}__{lev}": (s == lev).astype(np.int8) for lev in levels})
 
 
 def build_signal_time_matrix(df: pd.DataFrame, *, return_meta: bool = False):
@@ -98,11 +98,15 @@ def build_signal_time_matrix(df: pd.DataFrame, *, return_meta: bool = False):
     if return_meta:
         source_for = {n: n for n in cols_num}
         source_for.update(cat_meta)
-        meta = pd.DataFrame({
-            "feature": feature_names,
-            "source": [source_for.get(n, n) for n in feature_names],
-            "kind": ["numeric" if n in cols_num else "categorical_dummy" for n in feature_names],
-        })
+        meta = pd.DataFrame(
+            {
+                "feature": feature_names,
+                "source": [source_for.get(n, n) for n in feature_names],
+                "kind": [
+                    "numeric" if n in cols_num else "categorical_dummy" for n in feature_names
+                ],
+            }
+        )
         return X.values.astype(np.float64), feature_names, meta
     return X.values.astype(np.float64), feature_names
 
@@ -114,7 +118,8 @@ def build_t_matrix(df_signals: pd.DataFrame, t: int):
     # First-bar features
     fb_num = df_signals[["first_bar_range_atr"]].astype(float)
     fb_num = fb_num.fillna(fb_num.median(numeric_only=True))
-    fb_mu = fb_num.mean(); fb_sd = fb_num.std(ddof=0).replace(0, 1.0)
+    fb_mu = fb_num.mean()
+    fb_sd = fb_num.std(ddof=0).replace(0, 1.0)
     fb_num_z = (fb_num - fb_mu) / fb_sd
     fb_dir = _onehot(df_signals["first_bar_direction"], "first_bar_direction")
     fb_bin = _onehot(df_signals["first_bar_range_bin"], "first_bar_range_bin")
@@ -123,7 +128,8 @@ def build_t_matrix(df_signals: pd.DataFrame, t: int):
     paths_wide = load_paths_to_t(t, df_signals["trade_id"].values)
     paths_num = paths_wide.drop(columns=["trade_id"]).astype(float)
     paths_num = paths_num.fillna(paths_num.median(numeric_only=True))
-    pmu = paths_num.mean(); psd = paths_num.std(ddof=0).replace(0, 1.0)
+    pmu = paths_num.mean()
+    psd = paths_num.std(ddof=0).replace(0, 1.0)
     paths_z = (paths_num - pmu) / psd.replace(0, 1.0)
     paths_z = paths_z.fillna(0.0)  # any leftover
 
@@ -132,17 +138,21 @@ def build_t_matrix(df_signals: pd.DataFrame, t: int):
     hnum = hdf[list(C.HELD_CTX_NUMERIC)].astype(float).reset_index(drop=True)
     hnum = hnum.fillna(hnum.median(numeric_only=True))
     hnum = hnum.fillna(0.0)  # in case the entire column is NaN at this t
-    hmu = hnum.mean(); hsd = hnum.std(ddof=0).replace(0, 1.0)
+    hmu = hnum.mean()
+    hsd = hnum.std(ddof=0).replace(0, 1.0)
     hnum_z = (hnum - hmu) / hsd
     hnum_z.columns = [f"{c}_held_t{t}" for c in hnum_z.columns]
 
-    extra = pd.concat([
-        fb_num_z.reset_index(drop=True),
-        fb_dir.reset_index(drop=True),
-        fb_bin.reset_index(drop=True),
-        paths_z.reset_index(drop=True),
-        hnum_z.reset_index(drop=True),
-    ], axis=1)
+    extra = pd.concat(
+        [
+            fb_num_z.reset_index(drop=True),
+            fb_dir.reset_index(drop=True),
+            fb_bin.reset_index(drop=True),
+            paths_z.reset_index(drop=True),
+            hnum_z.reset_index(drop=True),
+        ],
+        axis=1,
+    )
     extra_names = extra.columns.tolist()
 
     X_full = np.concatenate([X_st, extra.values.astype(np.float64)], axis=1)
@@ -162,9 +172,13 @@ def build_t_matrix(df_signals: pd.DataFrame, t: int):
         + ["numeric"] * paths_z.shape[1]
         + ["numeric"] * len(C.HELD_CTX_NUMERIC)
     )
-    extra_meta = pd.DataFrame({
-        "feature": extra_names, "source": extra_sources, "kind": extra_kinds,
-    })
+    extra_meta = pd.DataFrame(
+        {
+            "feature": extra_names,
+            "source": extra_sources,
+            "kind": extra_kinds,
+        }
+    )
     meta = pd.concat([meta_st, extra_meta], ignore_index=True)
     return X_full, names_full, meta
 
@@ -192,7 +206,8 @@ def build_cluster_features(df: pd.DataFrame, return_drop_mask: bool = False):
 
     # Standardise on the kept rows only
     sub = num[keep_mask]
-    mu = sub.mean(); sd = sub.std(ddof=0).replace(0, 1.0)
+    mu = sub.mean()
+    sd = sub.std(ddof=0).replace(0, 1.0)
     num_z_full = ((num - mu) / sd).fillna(0.0)
 
     feature_names = num.columns.tolist()

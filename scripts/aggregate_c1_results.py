@@ -124,7 +124,9 @@ def compute_metrics_from_trades(trades_path: Path) -> Dict[str, Any]:
             return metrics
 
         metrics["total_trades"] = len(df)
-        metrics["wins"] = int(df.get("win", pd.Series(dtype=bool)).sum() if "win" in df.columns else 0)
+        metrics["wins"] = int(
+            df.get("win", pd.Series(dtype=bool)).sum() if "win" in df.columns else 0
+        )
         metrics["losses"] = int(
             df.get("loss", pd.Series(dtype=bool)).sum() if "loss" in df.columns else 0
         )
@@ -257,7 +259,9 @@ def scan_results_directory(results_root: Path) -> List[Dict[str, Any]]:
                 "wins": metrics_dict.get("wins", 0),
                 "losses": metrics_dict.get("losses", 0),
                 "scratches": metrics_dict.get("scratches", 0),
-                "win_rate_pct": metrics_dict.get("win_rate_ns", 0.0),  # Map win_rate_ns to win_rate_pct
+                "win_rate_pct": metrics_dict.get(
+                    "win_rate_ns", 0.0
+                ),  # Map win_rate_ns to win_rate_pct
                 "roi_pct": metrics_dict.get("roi_pct", 0.0),
                 "max_dd_pct": metrics_dict.get("max_dd_pct", 0.0),
                 "sharpe": metrics_dict.get("sharpe", 0.0),
@@ -390,4 +394,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

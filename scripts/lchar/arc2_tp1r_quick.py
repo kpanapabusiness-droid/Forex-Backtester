@@ -42,12 +42,9 @@ from scripts.lchar.arc2_counterfactual_sweep_round_1_v2 import (  # noqa: E402
 )
 
 LOCKED_INPUT_SHAS: Dict[str, str] = {
-    "results/l6/arc2/characterisation/v1_2_1_full/per_bar_paths.csv":
-        "7b2acd6ccb98f1fd145a631b318fc95d10f5cf4f42633be9c0b59738fa1696ee",
-    "results/l6/arc2/characterisation/v1_2_full/trade_index.csv":
-        "9f841c5b29e87ed90d34c9617431978baf3041459797cedef02fa16c27e3abb5",
-    "results/l6/arc2/trades_all.csv":
-        "47fccbfe4dffa6577a6000b0c16c2ebb9597dcf76523ff2b8084631b19836b3c",
+    "results/l6/arc2/characterisation/v1_2_1_full/per_bar_paths.csv": "7b2acd6ccb98f1fd145a631b318fc95d10f5cf4f42633be9c0b59738fa1696ee",
+    "results/l6/arc2/characterisation/v1_2_full/trade_index.csv": "9f841c5b29e87ed90d34c9617431978baf3041459797cedef02fa16c27e3abb5",
+    "results/l6/arc2/trades_all.csv": "47fccbfe4dffa6577a6000b0c16c2ebb9597dcf76523ff2b8084631b19836b3c",
 }
 
 ROUND_1_DIR = REPO_ROOT / "results/l6/arc2/characterisation/extended/counterfactuals/round_1"
@@ -68,15 +65,15 @@ def _verify_inputs() -> Dict[str, str]:
         actual = _sha256_file(p)
         if actual != expected:
             raise RuntimeError(
-                f"Input sha256 mismatch on {rel}:\n"
-                f"  expected: {expected}\n  observed: {actual}"
+                f"Input sha256 mismatch on {rel}:\n  expected: {expected}\n  observed: {actual}"
             )
         out[rel] = actual
     return out
 
 
-def _run_tp1r(*, per_bar_csv: Path, trade_index_csv: Path,
-              trades_all_csv: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
+def _run_tp1r(
+    *, per_bar_csv: Path, trade_index_csv: Path, trades_all_csv: Path
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     print("  Loading trade_index.csv + trades_all.csv...", flush=True)
     ti = pd.read_csv(trade_index_csv)
     ti["signal_bar_ts"] = pd.to_datetime(ti["signal_bar_ts"])
@@ -85,7 +82,9 @@ def _run_tp1r(*, per_bar_csv: Path, trade_index_csv: Path,
 
     ti_full = ti.merge(
         ta[["pair", "signal_bar_ts", "spread_pips_entry", "spread_pips_exit"]],
-        on=["pair", "signal_bar_ts"], how="left", validate="one_to_one",
+        on=["pair", "signal_bar_ts"],
+        how="left",
+        validate="one_to_one",
     )
     if ti_full[["spread_pips_entry", "spread_pips_exit"]].isna().any().any():
         raise RuntimeError("null sp_entry/sp_exit after merge")
@@ -102,8 +101,12 @@ def _run_tp1r(*, per_bar_csv: Path, trade_index_csv: Path,
         atr = float(row["atr_1h_wilder_at_signal"])
         entry_fill = float(row["entry_price"])
         per_trade[tid] = {
-            "pair": pair, "atr": atr, "entry_fill": entry_fill,
-            "sp_entry_pips": sp_entry, "sp_exit_pips": sp_exit, "pip": pip,
+            "pair": pair,
+            "atr": atr,
+            "entry_fill": entry_fill,
+            "sp_entry_pips": sp_entry,
+            "sp_exit_pips": sp_exit,
+            "pip": pip,
             "entry_fill_offset_atr": sp_entry * pip / (2 * atr),
             "baseline_spread_cost_r": (sp_entry + sp_exit) * pip / (4 * atr),
             "exit_half_spread_r_base": sp_exit * pip / (4 * atr),
@@ -144,12 +147,27 @@ def _run_tp1r(*, per_bar_csv: Path, trade_index_csv: Path,
     for tid in range(n_trades):
         s, e = int(starts[tid]), int(ends[tid])
         bavail = e - s
-        rmae = rmae_all[s:e]; rmfe = rmfe_all[s:e]
-        bl_ = bl_all[s:e]; bh_ = bh_all[s:e]; bc_ = bc_all[s:e]
-        nbo = nbo_all[s:e]; hnb = hnb_all[s:e]
+        rmae = rmae_all[s:e]
+        rmfe = rmfe_all[s:e]
+        bl_ = bl_all[s:e]
+        bh_ = bh_all[s:e]
+        bc_ = bc_all[s:e]
+        nbo = nbo_all[s:e]
+        hnb = hnb_all[s:e]
         T = per_trade[tid]
-        r = variant_TP(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
-                       T_TP_R=1.0, time_horizon=TIME_HORIZON_DEFAULT)
+        r = variant_TP(
+            rmae,
+            rmfe,
+            bl_,
+            bh_,
+            bc_,
+            nbo,
+            hnb,
+            bavail,
+            T,
+            T_TP_R=1.0,
+            time_horizon=TIME_HORIZON_DEFAULT,
+        )
         out_tid[tid] = tid
         out_pair[tid] = T["pair"]
         out_sigts[tid] = T["signal_bar_ts"]
@@ -162,14 +180,21 @@ def _run_tp1r(*, per_bar_csv: Path, trade_index_csv: Path,
         out_net[tid] = r["net_R"]
     print(f"    done in {time.time() - t0:.1f}s", flush=True)
 
-    vt = pd.DataFrame({
-        "variant_id": "TP1R",
-        "trade_id": out_tid, "pair": out_pair,
-        "signal_bar_ts": out_sigts, "fold_id": out_fold,
-        "exit_reason_variant": out_reason, "exit_bar": out_exitbar,
-        "exit_level_atr_fill": out_exitlvl, "gross_R": out_gross,
-        "spread_cost_R": out_spread, "net_R": out_net,
-    })
+    vt = pd.DataFrame(
+        {
+            "variant_id": "TP1R",
+            "trade_id": out_tid,
+            "pair": out_pair,
+            "signal_bar_ts": out_sigts,
+            "fold_id": out_fold,
+            "exit_reason_variant": out_reason,
+            "exit_bar": out_exitbar,
+            "exit_level_atr_fill": out_exitlvl,
+            "gross_R": out_gross,
+            "spread_cost_R": out_spread,
+            "net_R": out_net,
+        }
+    )
     vt = vt.sort_values("trade_id").reset_index(drop=True)
     return vt, ti_full
 
@@ -204,17 +229,19 @@ def _aggregate_per_fold_tp1r(vt: pd.DataFrame) -> pd.DataFrame:
         dd = run_max - cum
         mdd = float(np.max(dd))
         rc = sub["exit_reason_variant"].value_counts().to_dict()
-        rows.append({
-            "variant_id": "TP1R",
-            "fold_id": int(fid),
-            "n": n,
-            "mean_R": float(np.mean(net)),
-            "total_R": float(np.sum(net)),
-            "max_DD_R": mdd,
-            "sl_rate": rc.get("stop_loss", 0) / n,
-            "tp_rate": rc.get("fixed_tp", 0) / n,
-            "te_rate": rc.get("time_exit", 0) / n,
-        })
+        rows.append(
+            {
+                "variant_id": "TP1R",
+                "fold_id": int(fid),
+                "n": n,
+                "mean_R": float(np.mean(net)),
+                "total_R": float(np.sum(net)),
+                "max_DD_R": mdd,
+                "sl_rate": rc.get("stop_loss", 0) / n,
+                "tp_rate": rc.get("fixed_tp", 0) / n,
+                "te_rate": rc.get("time_exit", 0) / n,
+            }
+        )
     return pd.DataFrame(rows)
 
 
@@ -249,17 +276,19 @@ def _pull_bl_from_round1() -> tuple[Dict[str, float], pd.DataFrame]:
     }
 
     bl_pf = per_fold_r1[per_fold_r1["variant_id"] == "BL"].copy()
-    bl_pf_out = pd.DataFrame({
-        "variant_id": "BL",
-        "fold_id": bl_pf["fold_id"].astype(int).values,
-        "n": bl_pf["n"].astype(int).values,
-        "mean_R": bl_pf["mean_R"].astype(float).values,
-        "total_R": bl_pf["total_R"].astype(float).values,
-        "max_DD_R": bl_pf["max_DD_R"].astype(float).values,
-        "sl_rate": bl_pf["sl_rate"].astype(float).values,
-        "tp_rate": bl_pf["tp_exit_rate"].astype(float).values,
-        "te_rate": bl_pf["time_exit_rate"].astype(float).values,
-    })
+    bl_pf_out = pd.DataFrame(
+        {
+            "variant_id": "BL",
+            "fold_id": bl_pf["fold_id"].astype(int).values,
+            "n": bl_pf["n"].astype(int).values,
+            "mean_R": bl_pf["mean_R"].astype(float).values,
+            "total_R": bl_pf["total_R"].astype(float).values,
+            "max_DD_R": bl_pf["max_DD_R"].astype(float).values,
+            "sl_rate": bl_pf["sl_rate"].astype(float).values,
+            "tp_rate": bl_pf["tp_exit_rate"].astype(float).values,
+            "te_rate": bl_pf["time_exit_rate"].astype(float).values,
+        }
+    )
     return bl_pooled, bl_pf_out
 
 
@@ -286,8 +315,9 @@ def main() -> int:
     per_bar_csv = REPO_ROOT / "results/l6/arc2/characterisation/v1_2_1_full/per_bar_paths.csv"
     trade_index_csv = REPO_ROOT / "results/l6/arc2/characterisation/v1_2_full/trade_index.csv"
     trades_all_csv = REPO_ROOT / "results/l6/arc2/trades_all.csv"
-    vt, ti_full = _run_tp1r(per_bar_csv=per_bar_csv, trade_index_csv=trade_index_csv,
-                             trades_all_csv=trades_all_csv)
+    vt, ti_full = _run_tp1r(
+        per_bar_csv=per_bar_csv, trade_index_csv=trade_index_csv, trades_all_csv=trades_all_csv
+    )
 
     # Validation: no NaN/inf in net_R
     nan_inf = int((~np.isfinite(vt["net_R"].to_numpy(dtype=np.float64))).sum())
@@ -351,8 +381,7 @@ def main() -> int:
     vt_p = OUT_DIR / "variant_trades.csv"
 
     summary_df.to_csv(summary_p, index=False, lineterminator="\n", float_format="%.10g")
-    per_fold_combined.to_csv(per_fold_p, index=False, lineterminator="\n",
-                              float_format="%.10g")
+    per_fold_combined.to_csv(per_fold_p, index=False, lineterminator="\n", float_format="%.10g")
     vt.to_csv(vt_p, index=False, lineterminator="\n", float_format="%.10g")
 
     # Output sha256s
@@ -372,19 +401,25 @@ def main() -> int:
 
     # Print headline table
     print("\n[Headline] Pooled comparison:")
-    print(f"  variant  pooled_R   median_R   sl_rate  tp_rate  te_rate  lift_vs_BL")
-    print(f"  BL       {bl_pooled['mean_R']:+.4f}    {bl_pooled['median_R']:+.4f}    "
-          f"{bl_pooled['sl_rate']:.4f}   -        {bl_pooled['te_rate']:.4f}   +0.0000")
-    print(f"  TP1R     {tp1r_pooled['mean_R']:+.4f}    {tp1r_pooled['median_R']:+.4f}    "
-          f"{tp1r_pooled['sl_rate']:.4f}   {tp1r_pooled['tp_rate']:.4f}   "
-          f"{tp1r_pooled['te_rate']:.4f}   {tp1r_lift:+.4f}")
+    print("  variant  pooled_R   median_R   sl_rate  tp_rate  te_rate  lift_vs_BL")
+    print(
+        f"  BL       {bl_pooled['mean_R']:+.4f}    {bl_pooled['median_R']:+.4f}    "
+        f"{bl_pooled['sl_rate']:.4f}   -        {bl_pooled['te_rate']:.4f}   +0.0000"
+    )
+    print(
+        f"  TP1R     {tp1r_pooled['mean_R']:+.4f}    {tp1r_pooled['median_R']:+.4f}    "
+        f"{tp1r_pooled['sl_rate']:.4f}   {tp1r_pooled['tp_rate']:.4f}   "
+        f"{tp1r_pooled['te_rate']:.4f}   {tp1r_lift:+.4f}"
+    )
 
     print("\n[Headline] TP1R per-fold:")
-    print(f"  fold  n    mean_R    max_DD_R   sl_rate  tp_rate  te_rate")
+    print("  fold  n    mean_R    max_DD_R   sl_rate  tp_rate  te_rate")
     for _, row in tp1r_pf.iterrows():
-        print(f"  {int(row['fold_id'])}     {int(row['n']):<4d} "
-              f"{row['mean_R']:+.4f}   {row['max_DD_R']:7.4f}   "
-              f"{row['sl_rate']:.4f}   {row['tp_rate']:.4f}   {row['te_rate']:.4f}")
+        print(
+            f"  {int(row['fold_id'])}     {int(row['n']):<4d} "
+            f"{row['mean_R']:+.4f}   {row['max_DD_R']:7.4f}   "
+            f"{row['sl_rate']:.4f}   {row['tp_rate']:.4f}   {row['te_rate']:.4f}"
+        )
     worst_fold = tp1r_pf.sort_values("mean_R").iloc[0]
     worst_dd = tp1r_pf.sort_values("max_DD_R", ascending=False).iloc[0]
     print(f"  worst-fold mean_R: fold {int(worst_fold['fold_id'])} = {worst_fold['mean_R']:+.4f}")

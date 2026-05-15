@@ -19,13 +19,15 @@ def _make_ohlcv(n: int, base: float = 1.0) -> pd.DataFrame:
     low = pd.Series([base - 0.005] * n, index=dates)
     close = pd.Series([base] * n, index=dates)
     volume = pd.Series([100] * n, index=dates)
-    return pd.DataFrame({
-        "open": open_,
-        "high": high,
-        "low": low,
-        "close": close,
-        "volume": volume,
-    })
+    return pd.DataFrame(
+        {
+            "open": open_,
+            "high": high,
+            "low": low,
+            "close": close,
+            "volume": volume,
+        }
+    )
 
 
 def test_contract():
@@ -97,13 +99,16 @@ def test_variant_a_pin_bullish_trigger():
     high[trig] = sweep_low + rng
     close[trig] = prior_swing_low + 0.065
 
-    df = pd.DataFrame({
-        "open": open_,
-        "high": high,
-        "low": low,
-        "close": close,
-        "volume": 100,
-    }, index=dates)
+    df = pd.DataFrame(
+        {
+            "open": open_,
+            "high": high,
+            "low": low,
+            "close": close,
+            "volume": 100,
+        },
+        index=dates,
+    )
     params = dict(
         signal_col=SIGNAL_COL,
         variant="A_pin",
@@ -151,13 +156,16 @@ def test_variant_a_pin_bearish_trigger():
     low[trig] = sweep_high - rng
     close[trig] = prior_swing_high - 0.065
 
-    df = pd.DataFrame({
-        "open": open_,
-        "high": high,
-        "low": low,
-        "close": close,
-        "volume": 100,
-    }, index=dates)
+    df = pd.DataFrame(
+        {
+            "open": open_,
+            "high": high,
+            "low": low,
+            "close": close,
+            "volume": 100,
+        },
+        index=dates,
+    )
     params = dict(
         signal_col=SIGNAL_COL,
         variant="A_pin",
@@ -209,13 +217,16 @@ def test_variant_b_confirm_trigger():
     low[conf_bar] = rej_high - 0.008
     close[conf_bar] = rej_high + 0.003
 
-    df = pd.DataFrame({
-        "open": open_,
-        "high": high,
-        "low": low,
-        "close": close,
-        "volume": 100,
-    }, index=dates)
+    df = pd.DataFrame(
+        {
+            "open": open_,
+            "high": high,
+            "low": low,
+            "close": close,
+            "volume": 100,
+        },
+        index=dates,
+    )
     params = dict(
         signal_col=SIGNAL_COL,
         variant="B_confirm",
@@ -234,7 +245,9 @@ def test_variant_b_confirm_trigger():
     out = c1_lsr_v2(df.copy(), **params)
     sig = out[SIGNAL_COL]
     assert sig.iloc[rej_bar] == 0, f"Expected 0 at rejection bar {rej_bar}; got {sig.iloc[rej_bar]}"
-    assert sig.iloc[conf_bar] == 1, f"Expected +1 at confirm bar {conf_bar}; got {sig.iloc[conf_bar]}"
+    assert sig.iloc[conf_bar] == 1, (
+        f"Expected +1 at confirm bar {conf_bar}; got {sig.iloc[conf_bar]}"
+    )
 
 
 def test_cooldown_suppresses_second_signal():
@@ -267,13 +280,16 @@ def test_cooldown_suppresses_second_signal():
         high[j] = base + 0.005
     _set_bullish_bar(trig2, base - 0.005)
 
-    df = pd.DataFrame({
-        "open": open_,
-        "high": high,
-        "low": low,
-        "close": close,
-        "volume": 100,
-    }, index=dates)
+    df = pd.DataFrame(
+        {
+            "open": open_,
+            "high": high,
+            "low": low,
+            "close": close,
+            "volume": 100,
+        },
+        index=dates,
+    )
     params = dict(
         signal_col=SIGNAL_COL,
         variant="A_pin",

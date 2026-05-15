@@ -93,7 +93,7 @@ def main() -> int:
     canon_4h = _to_canonical(df_4h_raw)
     canon_d1 = _to_canonical(df_d1_raw)
     canon_states = mtf_alignment_states(canon_1h, canon_4h, canon_d1, "kijun")
-    canon_mask = (canon_states == "2_down_mixed")
+    canon_mask = canon_states == "2_down_mixed"
 
     if len(eng_mask) != len(canon_mask):
         raise RuntimeError(
@@ -118,9 +118,7 @@ def main() -> int:
     disagree_details = []
     for i in disagree_idx:
         gi = SAMPLE_START + int(i)
-        disagree_details.append(
-            (gi, int(eng_fired[i]), int(canon_fired[i]), str(canon_states[gi]))
-        )
+        disagree_details.append((gi, int(eng_fired[i]), int(canon_fired[i]), str(canon_states[gi])))
 
     lines = []
     lines.append("L Arc 2 Step 1 — Signal re-validation")
@@ -139,21 +137,12 @@ def main() -> int:
         "  Engine: core.signals.l4_mtf_alignment_2_down_mixed_kijun"
         "._mtf_alignment_2_down_mixed_kijun"
     )
-    lines.append(
-        "  Canonical: scripts.lchar.run_layer4.mtf_alignment_states(trend='kijun')"
-    )
-    lines.append("             filtered to state == '2_down_mixed'."
-                 )
+    lines.append("  Canonical: scripts.lchar.run_layer4.mtf_alignment_states(trend='kijun')")
+    lines.append("             filtered to state == '2_down_mixed'.")
     lines.append("")
-    lines.append(
-        "Both implement the same priority decision tree (neutral_present →"
-    )
-    lines.append(
-        "  3_up → 3_down → opposed → 2_up_mixed → 2_down_mixed) with the same"
-    )
-    lines.append(
-        "  most-recently-completed lookups (4H_mr = floor('4h', T_N)−1; D1_mr ="
-    )
+    lines.append("Both implement the same priority decision tree (neutral_present →")
+    lines.append("  3_up → 3_down → opposed → 2_up_mixed → 2_down_mixed) with the same")
+    lines.append("  most-recently-completed lookups (4H_mr = floor('4h', T_N)−1; D1_mr =")
     lines.append("  floor('D', T_N)−1).")
     lines.append("")
     lines.append("Sample-fire counts (state == '2_down_mixed'):")
@@ -168,7 +157,9 @@ def main() -> int:
     lines.append(f"BIT-IDENTICAL CHECK: {'PASS' if bit_identical else 'FAIL'}")
     if not bit_identical:
         lines.append("")
-        lines.append("Disagreement details (global_row_idx, engine_fired, canon_fired, canonical_state):")
+        lines.append(
+            "Disagreement details (global_row_idx, engine_fired, canon_fired, canonical_state):"
+        )
         for d in disagree_details:
             lines.append(f"  {d}")
 

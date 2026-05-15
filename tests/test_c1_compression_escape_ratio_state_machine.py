@@ -95,14 +95,16 @@ def test_cooldown_behavior():
     high = close + 0.01
     low = close - 0.01
     open_ = close.shift(1).fillna(close.iloc[0])
-    df = pd.DataFrame({
-        "date": dates,
-        "open": open_,
-        "high": high,
-        "low": low,
-        "close": close,
-        "volume": 100,
-    })
+    df = pd.DataFrame(
+        {
+            "date": dates,
+            "open": open_,
+            "high": high,
+            "low": low,
+            "close": close,
+            "volume": 100,
+        }
+    )
 
     cooldown = 8
     out = c1_compression_escape_ratio_state_machine(
@@ -146,14 +148,16 @@ def test_state_box_stability_synthetic():
     close.iloc[56] = base + 0.0018
     open_ = close.shift(1).fillna(base)
 
-    df = pd.DataFrame({
-        "date": dates,
-        "open": open_,
-        "high": high,
-        "low": low,
-        "close": close,
-        "volume": 100,
-    })
+    df = pd.DataFrame(
+        {
+            "date": dates,
+            "open": open_,
+            "high": high,
+            "low": low,
+            "close": close,
+            "volume": 100,
+        }
+    )
 
     out = c1_compression_escape_ratio_state_machine(
         df.copy(),
@@ -187,14 +191,16 @@ def test_escape_long_triggers_when_close_above_box():
     low.iloc[100] = base + 0.001
     open_ = close.shift(1).fillna(base)
 
-    df = pd.DataFrame({
-        "date": dates,
-        "open": open_,
-        "high": high,
-        "low": low,
-        "close": close,
-        "volume": 100,
-    })
+    df = pd.DataFrame(
+        {
+            "date": dates,
+            "open": open_,
+            "high": high,
+            "low": low,
+            "close": close,
+            "volume": 100,
+        }
+    )
 
     out = c1_compression_escape_ratio_state_machine(
         df.copy(),

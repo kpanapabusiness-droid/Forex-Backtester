@@ -17,14 +17,13 @@ import subprocess
 import sys
 import time
 from pathlib import Path
-from typing import Dict
 
 REPO_ROOT: Path = Path(__file__).resolve().parents[2]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from scripts.lchar.l4_characterisation import run_characterisation  # noqa: E402
 from scripts.lchar.compute_spread_floors import compute_body_sha256  # noqa: E402
+from scripts.lchar.l4_characterisation import run_characterisation  # noqa: E402
 
 
 def _sha256(p: Path) -> str:
@@ -44,8 +43,9 @@ def _git_commit() -> str:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", default="configs/l4_characterisation.yaml")
-    parser.add_argument("--single-run", action="store_true",
-                        help="Skip the second run (use only for development).")
+    parser.add_argument(
+        "--single-run", action="store_true", help="Skip the second run (use only for development)."
+    )
     args = parser.parse_args()
 
     config_path = (REPO_ROOT / args.config).resolve()
@@ -67,6 +67,7 @@ def main() -> int:
 
     # Locate output dir from config
     import yaml as _yaml
+
     raw = _yaml.safe_load(config_path.read_text(encoding="utf-8"))
     out_dir = (REPO_ROOT / raw["characterisation"]["output_dir"]).resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -94,7 +95,7 @@ def main() -> int:
     t2_start = time.time()
     t2_iso = _dt.datetime.now().isoformat(timespec="seconds")
     print(f"\n=== Run #2 starting at {t2_iso} ===")
-    manifest_2 = run_characterisation(str(config_path))
+    run_characterisation(str(config_path))
     t2_wall = time.time() - t2_start
     print(f"Run #2 wall-clock: {t2_wall:.1f}s")
     sha_2 = _sha256(features_csv)
@@ -114,29 +115,29 @@ def main() -> int:
     manifest_path = out_dir / "run_manifest.txt"
     git_sha = _git_commit()
     with manifest_path.open("w", encoding="utf-8") as f:
-        f.write(f"L4 characterisation run manifest\n")
-        f.write(f"================================\n\n")
+        f.write("L4 characterisation run manifest\n")
+        f.write("================================\n\n")
         f.write(f"Generated: {_dt.datetime.now().isoformat(timespec='seconds')}\n")
         f.write(f"Git commit: {git_sha}\n\n")
-        f.write(f"Inputs:\n")
+        f.write("Inputs:\n")
         f.write(f"  config:                       {config_path.relative_to(REPO_ROOT)}\n")
         f.write(f"    sha256:                     {cfg_sha}\n")
-        f.write(f"  configs/spread_floors_5ers.yaml body sha256:\n")
+        f.write("  configs/spread_floors_5ers.yaml body sha256:\n")
         f.write(f"                                {spread_floor_body_sha}\n")
-        f.write(f"  core/signals/l4_univariate_extreme.py sha256:\n")
+        f.write("  core/signals/l4_univariate_extreme.py sha256:\n")
         f.write(f"                                {l4_module_sha}\n")
-        f.write(f"  results/l6/arc1/trades_all.csv sha256:\n")
+        f.write("  results/l6/arc1/trades_all.csv sha256:\n")
         f.write(f"                                {arc1_trades_sha}\n\n")
-        f.write(f"Run #1:\n")
+        f.write("Run #1:\n")
         f.write(f"  start: {t1_iso}\n")
         f.write(f"  wall-clock: {t1_wall:.2f}s\n")
         f.write(f"  features_csv sha256: {sha_1}\n\n")
-        f.write(f"Run #2:\n")
+        f.write("Run #2:\n")
         f.write(f"  start: {t2_iso}\n")
         f.write(f"  wall-clock: {t2_wall:.2f}s\n")
         f.write(f"  features_csv sha256: {sha_2}\n\n")
         f.write(f"Byte-identical: {byte_identical}\n\n")
-        f.write(f"Output artefacts (written by pipeline + reports):\n")
+        f.write("Output artefacts (written by pipeline + reports):\n")
         # We list what's there now (reports may be added later)
         for p in sorted(out_dir.iterdir()):
             if p.is_file() and not p.name.startswith("_"):
@@ -145,7 +146,7 @@ def main() -> int:
                 except Exception:
                     f.write(f"  {p.name}: (error)\n")
 
-        f.write(f"\nPer-pair signal counts (run #1):\n")
+        f.write("\nPer-pair signal counts (run #1):\n")
         for k, v in sorted(manifest_1["pair_signal_counts"].items()):
             f.write(f"  {k}: {v}\n")
         f.write(f"\nTotal signals in window: {manifest_1['n_signals_in_window']}\n")

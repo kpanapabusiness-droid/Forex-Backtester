@@ -60,7 +60,6 @@ import matplotlib  # noqa: E402
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
-
 import pyarrow.parquet as pq  # noqa: E402
 from scipy import stats as sps  # noqa: E402
 
@@ -83,10 +82,8 @@ CHARTS_DIR: Path = OUTPUT_DIR / "charts"
 
 # Expected input hashes (from the parent appendix's run_manifest.txt).
 EXPECTED_INPUT_HASHES: Dict[str, str] = {
-    "trajectory_panel.parquet":
-        "c8f1ec4825ada7b3a9efaf72101e79b067f7056117bf70aaae2f5766261398ed",
-    "shape_features.csv":
-        "6920c990628dd2d769cfbc56bd006391f6b9a24beea64f52f5bda9da02d44aaa",
+    "trajectory_panel.parquet": "c8f1ec4825ada7b3a9efaf72101e79b067f7056117bf70aaae2f5766261398ed",
+    "shape_features.csv": "6920c990628dd2d769cfbc56bd006391f6b9a24beea64f52f5bda9da02d44aaa",
 }
 
 TRAJ_HORIZON: int = 240
@@ -98,16 +95,20 @@ PULLBACK_THRESHOLDS: Tuple[float, ...] = (0.5, 1.0, 1.5, 2.0)
 
 # Distributional spec (same as parent appendix; histograms widened for giveback).
 DIST_PERCENTILES: Tuple[float, ...] = (1, 5, 10, 25, 50, 75, 90, 95, 99)
-HIST_BIN_EDGES_DEFAULT: np.ndarray = np.concatenate([
-    [-np.inf],
-    np.round(np.arange(-3.0, 12.0 + 0.25 / 2, 0.25), 4),
-    [np.inf],
-])
+HIST_BIN_EDGES_DEFAULT: np.ndarray = np.concatenate(
+    [
+        [-np.inf],
+        np.round(np.arange(-3.0, 12.0 + 0.25 / 2, 0.25), 4),
+        [np.inf],
+    ]
+)
 # Giveback is non-negative; widen to 0..15R.
-HIST_BIN_EDGES_GIVEBACK: np.ndarray = np.concatenate([
-    np.round(np.arange(0.0, 15.0 + 0.25 / 2, 0.25), 4),
-    [np.inf],
-])
+HIST_BIN_EDGES_GIVEBACK: np.ndarray = np.concatenate(
+    [
+        np.round(np.arange(0.0, 15.0 + 0.25 / 2, 0.25), 4),
+        [np.inf],
+    ]
+)
 
 
 # ---------------------------------------------------------------------------
@@ -128,9 +129,9 @@ def _png_pixel_hash(path: Path) -> str:
     while pos < len(data):
         if pos + 8 > len(data):
             break
-        length = int.from_bytes(data[pos:pos + 4], "big")
-        chunk_type = data[pos + 4:pos + 8]
-        chunk_data = data[pos + 8:pos + 8 + length]
+        length = int.from_bytes(data[pos : pos + 4], "big")
+        chunk_type = data[pos + 4 : pos + 8]
+        chunk_data = data[pos + 8 : pos + 8 + length]
         if chunk_type == b"IDAT":
             out.update(chunk_data)
         pos = pos + 8 + length + 4
@@ -182,7 +183,9 @@ def describe_distribution(
     out["mean"] = float(np.mean(arr))
     out["std"] = float(np.std(arr, ddof=1)) if n > 1 else float("nan")
     out["skew"] = float(sps.skew(arr, bias=False)) if n > 2 else float("nan")
-    out["excess_kurt"] = float(sps.kurtosis(arr, fisher=True, bias=False)) if n > 3 else float("nan")
+    out["excess_kurt"] = (
+        float(sps.kurtosis(arr, fisher=True, bias=False)) if n > 3 else float("nan")
+    )
     out["min"] = float(np.min(arr))
     out["max"] = float(np.max(arr))
     pcts = np.percentile(arr, list(DIST_PERCENTILES), method="linear")
@@ -238,9 +241,7 @@ def render_distribution_md(desc: Dict[str, Any], *, header_level: int = 3) -> st
     return "\n".join(lines)
 
 
-def desc_to_long_rows(
-    desc: Dict[str, Any], extra_cols: Dict[str, Any]
-) -> List[Dict[str, Any]]:
+def desc_to_long_rows(desc: Dict[str, Any], extra_cols: Dict[str, Any]) -> List[Dict[str, Any]]:
     """Render a distribution descriptor as long-format rows (one per stat)."""
     rows: List[Dict[str, Any]] = []
     base = {**extra_cols, "metric_label": desc["label"], "n": desc["n"]}
@@ -357,7 +358,9 @@ def analysis_a(
             peak_mfe_r = peak_mfe_lookup.get(sig_idx, np.nan)
             if not np.isfinite(peak_mfe_r) or peak_mfe_r < X:
                 continue
-            t_x_idx = _first_idx_ge(run_mfe, X)  # 0-based position in arrs (corresponds to t=t_x_idx+1)
+            t_x_idx = _first_idx_ge(
+                run_mfe, X
+            )  # 0-based position in arrs (corresponds to t=t_x_idx+1)
             if t_x_idx is None:
                 continue
             t_x_bar = int(t_x_idx + 1)  # 1-based bar
@@ -408,18 +411,24 @@ def analysis_a(
             for row in desc_to_long_rows(desc, {"band_R": X, "metric": metric_name}):
                 long_rows.append(row)
 
-        chain_probs.append({
-            "band_R": X,
-            "n_reached": n_sub,
-            "p_reach_X_plus_1_given_X": (n_reached_next1 / n_sub) if n_sub else float("nan"),
-            "p_reach_X_plus_2_given_X": (n_reached_next2 / n_sub) if n_sub else float("nan"),
-            "n_reached_X_plus_1": n_reached_next1,
-            "n_reached_X_plus_2": n_reached_next2,
-        })
+        chain_probs.append(
+            {
+                "band_R": X,
+                "n_reached": n_sub,
+                "p_reach_X_plus_1_given_X": (n_reached_next1 / n_sub) if n_sub else float("nan"),
+                "p_reach_X_plus_2_given_X": (n_reached_next2 / n_sub) if n_sub else float("nan"),
+                "n_reached_X_plus_1": n_reached_next1,
+                "n_reached_X_plus_2": n_reached_next2,
+            }
+        )
 
     long_df = pd.DataFrame(long_rows)
-    long_df = long_df.sort_values(by=["band_R", "metric", "stat"], kind="mergesort").reset_index(drop=True)
-    chain_df = pd.DataFrame(chain_probs).sort_values("band_R", kind="mergesort").reset_index(drop=True)
+    long_df = long_df.sort_values(by=["band_R", "metric", "stat"], kind="mergesort").reset_index(
+        drop=True
+    )
+    chain_df = (
+        pd.DataFrame(chain_probs).sort_values("band_R", kind="mergesort").reset_index(drop=True)
+    )
     return long_df, descriptors, chain_df
 
 
@@ -480,11 +489,13 @@ def analysis_b_givebacks(
         after_arr = np.asarray(after_vals, dtype=np.float64)
         before_arr = np.asarray(before_vals, dtype=np.float64)
         a_desc = describe_distribution(
-            after_arr, f"X={X:g}R | max_dd_from_peak_after_X",
+            after_arr,
+            f"X={X:g}R | max_dd_from_peak_after_X",
             hist_edges=HIST_BIN_EDGES_GIVEBACK,
         )
         b_desc = describe_distribution(
-            before_arr, f"X={X:g}R | max_dd_from_peak_before_X",
+            before_arr,
+            f"X={X:g}R | max_dd_from_peak_before_X",
             hist_edges=HIST_BIN_EDGES_GIVEBACK,
         )
         after_descs.append(a_desc)
@@ -494,18 +505,20 @@ def analysis_b_givebacks(
         for row in desc_to_long_rows(b_desc, {"band_R": X}):
             long_before_rows.append(row)
 
-    after_df = pd.DataFrame(long_after_rows).sort_values(
-        by=["band_R", "stat"], kind="mergesort"
-    ).reset_index(drop=True)
-    before_df = pd.DataFrame(long_before_rows).sort_values(
-        by=["band_R", "stat"], kind="mergesort"
-    ).reset_index(drop=True)
+    after_df = (
+        pd.DataFrame(long_after_rows)
+        .sort_values(by=["band_R", "stat"], kind="mergesort")
+        .reset_index(drop=True)
+    )
+    before_df = (
+        pd.DataFrame(long_before_rows)
+        .sort_values(by=["band_R", "stat"], kind="mergesort")
+        .reset_index(drop=True)
+    )
     return after_df, before_df, after_descs, before_descs
 
 
-def _count_pullback_events(
-    r_high: np.ndarray, r_low: np.ndarray, threshold: float
-) -> int:
+def _count_pullback_events(r_high: np.ndarray, r_low: np.ndarray, threshold: float) -> int:
     """Zigzag pullback counter.
 
     Walks the bars maintaining a running extreme. In 'up' state, the extreme
@@ -556,9 +569,11 @@ def analysis_b_pullbacks(
             row[f"n_pullbacks_ge_{thr:g}R"] = int(c)
             by_threshold[thr].append(c)
         per_trade_rows.append(row)
-    per_trade_df = pd.DataFrame(per_trade_rows).sort_values(
-        "signal_idx", kind="mergesort"
-    ).reset_index(drop=True)
+    per_trade_df = (
+        pd.DataFrame(per_trade_rows)
+        .sort_values("signal_idx", kind="mergesort")
+        .reset_index(drop=True)
+    )
 
     descriptors: List[Dict[str, Any]] = []
     for thr, vals in by_threshold.items():
@@ -649,46 +664,71 @@ def analysis_c(
             realized_r_by_cell[(X, G)] = realized
 
             n_total = int(realized.size)
-            counts = {k: int(np.sum(reasons == k)) for k in ("sl", "trail", "time_240", "never_reached_X")}
+            counts = {
+                k: int(np.sum(reasons == k)) for k in ("sl", "trail", "time_240", "never_reached_X")
+            }
 
             base = {"X": X, "G": G}
             grid_rows.append({**base, "stat": "N", "value": n_total})
             for reason, c in counts.items():
                 grid_rows.append({**base, "stat": f"n_{reason}", "value": c})
-                grid_rows.append({
-                    **base, "stat": f"p_{reason}",
-                    "value": (c / n_total) if n_total else float("nan"),
-                })
+                grid_rows.append(
+                    {
+                        **base,
+                        "stat": f"p_{reason}",
+                        "value": (c / n_total) if n_total else float("nan"),
+                    }
+                )
             grid_rows.append({**base, "stat": "mean_realized_r", "value": float(np.mean(realized))})
-            grid_rows.append({
-                **base, "stat": "std_realized_r",
-                "value": float(np.std(realized, ddof=1)) if n_total > 1 else float("nan"),
-            })
-            grid_rows.append({
-                **base, "stat": "skew_realized_r",
-                "value": float(sps.skew(realized, bias=False)) if n_total > 2 else float("nan"),
-            })
-            grid_rows.append({
-                **base, "stat": "excess_kurt_realized_r",
-                "value": float(sps.kurtosis(realized, fisher=True, bias=False)) if n_total > 3 else float("nan"),
-            })
+            grid_rows.append(
+                {
+                    **base,
+                    "stat": "std_realized_r",
+                    "value": float(np.std(realized, ddof=1)) if n_total > 1 else float("nan"),
+                }
+            )
+            grid_rows.append(
+                {
+                    **base,
+                    "stat": "skew_realized_r",
+                    "value": float(sps.skew(realized, bias=False)) if n_total > 2 else float("nan"),
+                }
+            )
+            grid_rows.append(
+                {
+                    **base,
+                    "stat": "excess_kurt_realized_r",
+                    "value": float(sps.kurtosis(realized, fisher=True, bias=False))
+                    if n_total > 3
+                    else float("nan"),
+                }
+            )
             grid_rows.append({**base, "stat": "min_realized_r", "value": float(np.min(realized))})
             grid_rows.append({**base, "stat": "max_realized_r", "value": float(np.max(realized))})
             pcts = np.percentile(realized, list(DIST_PERCENTILES), method="linear")
             for p, v in zip(DIST_PERCENTILES, pcts):
                 grid_rows.append({**base, "stat": f"p{int(p)}_realized_r", "value": float(v)})
-            grid_rows.append({
-                **base, "stat": "p_realized_r_gt_0",
-                "value": float(np.mean(realized > 0.0)),
-            })
-            grid_rows.append({
-                **base, "stat": "p_realized_r_gt_1",
-                "value": float(np.mean(realized > 1.0)),
-            })
-            grid_rows.append({
-                **base, "stat": "p_realized_r_gt_2",
-                "value": float(np.mean(realized > 2.0)),
-            })
+            grid_rows.append(
+                {
+                    **base,
+                    "stat": "p_realized_r_gt_0",
+                    "value": float(np.mean(realized > 0.0)),
+                }
+            )
+            grid_rows.append(
+                {
+                    **base,
+                    "stat": "p_realized_r_gt_1",
+                    "value": float(np.mean(realized > 1.0)),
+                }
+            )
+            grid_rows.append(
+                {
+                    **base,
+                    "stat": "p_realized_r_gt_2",
+                    "value": float(np.mean(realized > 2.0)),
+                }
+            )
             grid_rows.append({**base, "stat": "mean_exit_bar", "value": float(np.mean(ts))})
             # Histogram counts (long-format with bin labels embedded in stat name).
             hist_counts, _ = np.histogram(realized, bins=HIST_BIN_EDGES_DEFAULT)
@@ -699,7 +739,11 @@ def analysis_c(
                 hi_s = "inf" if not np.isfinite(hi) else f"{hi:.4f}"
                 grid_rows.append({**base, "stat": f"hist[{lo_s},{hi_s})", "value": int(c)})
 
-    grid_df = pd.DataFrame(grid_rows).sort_values(by=["X", "G", "stat"], kind="mergesort").reset_index(drop=True)
+    grid_df = (
+        pd.DataFrame(grid_rows)
+        .sort_values(by=["X", "G", "stat"], kind="mergesort")
+        .reset_index(drop=True)
+    )
 
     # Reference cells.
     ref_rows: List[Dict[str, Any]] = []
@@ -718,31 +762,51 @@ def analysis_c(
         for reason in unique_reasons:
             c = int(np.sum(reasons == reason))
             ref_rows.append({**base, "stat": f"n_{reason}", "value": c})
-            ref_rows.append({
-                **base, "stat": f"p_{reason}",
-                "value": (c / n_total) if n_total else float("nan"),
-            })
+            ref_rows.append(
+                {
+                    **base,
+                    "stat": f"p_{reason}",
+                    "value": (c / n_total) if n_total else float("nan"),
+                }
+            )
         ref_rows.append({**base, "stat": "mean_realized_r", "value": float(np.mean(realized))})
-        ref_rows.append({
-            **base, "stat": "std_realized_r",
-            "value": float(np.std(realized, ddof=1)) if n_total > 1 else float("nan"),
-        })
-        ref_rows.append({
-            **base, "stat": "skew_realized_r",
-            "value": float(sps.skew(realized, bias=False)) if n_total > 2 else float("nan"),
-        })
-        ref_rows.append({
-            **base, "stat": "excess_kurt_realized_r",
-            "value": float(sps.kurtosis(realized, fisher=True, bias=False)) if n_total > 3 else float("nan"),
-        })
+        ref_rows.append(
+            {
+                **base,
+                "stat": "std_realized_r",
+                "value": float(np.std(realized, ddof=1)) if n_total > 1 else float("nan"),
+            }
+        )
+        ref_rows.append(
+            {
+                **base,
+                "stat": "skew_realized_r",
+                "value": float(sps.skew(realized, bias=False)) if n_total > 2 else float("nan"),
+            }
+        )
+        ref_rows.append(
+            {
+                **base,
+                "stat": "excess_kurt_realized_r",
+                "value": float(sps.kurtosis(realized, fisher=True, bias=False))
+                if n_total > 3
+                else float("nan"),
+            }
+        )
         ref_rows.append({**base, "stat": "min_realized_r", "value": float(np.min(realized))})
         ref_rows.append({**base, "stat": "max_realized_r", "value": float(np.max(realized))})
         pcts = np.percentile(realized, list(DIST_PERCENTILES), method="linear")
         for p, v in zip(DIST_PERCENTILES, pcts):
             ref_rows.append({**base, "stat": f"p{int(p)}_realized_r", "value": float(v)})
-        ref_rows.append({**base, "stat": "p_realized_r_gt_0", "value": float(np.mean(realized > 0.0))})
-        ref_rows.append({**base, "stat": "p_realized_r_gt_1", "value": float(np.mean(realized > 1.0))})
-        ref_rows.append({**base, "stat": "p_realized_r_gt_2", "value": float(np.mean(realized > 2.0))})
+        ref_rows.append(
+            {**base, "stat": "p_realized_r_gt_0", "value": float(np.mean(realized > 0.0))}
+        )
+        ref_rows.append(
+            {**base, "stat": "p_realized_r_gt_1", "value": float(np.mean(realized > 1.0))}
+        )
+        ref_rows.append(
+            {**base, "stat": "p_realized_r_gt_2", "value": float(np.mean(realized > 2.0))}
+        )
         ref_rows.append({**base, "stat": "mean_exit_bar", "value": float(np.mean(ts))})
         hist_counts, _ = np.histogram(realized, bins=HIST_BIN_EDGES_DEFAULT)
         for i, c in enumerate(hist_counts):
@@ -752,7 +816,11 @@ def analysis_c(
             hi_s = "inf" if not np.isfinite(hi) else f"{hi:.4f}"
             ref_rows.append({**base, "stat": f"hist[{lo_s},{hi_s})", "value": int(c)})
 
-    ref_df = pd.DataFrame(ref_rows).sort_values(by=["reference", "stat"], kind="mergesort").reset_index(drop=True)
+    ref_df = (
+        pd.DataFrame(ref_rows)
+        .sort_values(by=["reference", "stat"], kind="mergesort")
+        .reset_index(drop=True)
+    )
 
     return grid_df, ref_df, realized_r_by_cell
 
@@ -806,26 +874,32 @@ def analysis_d(
     t_to_peak_from_2r = sub["peak_mfe_bar"].to_numpy(np.float64) - t_to_2r
     d_tp = describe_distribution(t_to_peak_from_2r, "all_2r_up | bars_from_first_2r_touch_to_peak")
     overall_descs.append(d_tp)
-    for row in desc_to_long_rows(d_tp, {"cell": "ALL", "metric": "bars_from_first_2r_touch_to_peak"}):
+    for row in desc_to_long_rows(
+        d_tp, {"cell": "ALL", "metric": "bars_from_first_2r_touch_to_peak"}
+    ):
         rows.append(row)
 
     # Conditional chain P(reach Y | reached 2R first up) for Y in {3..7}.
     chain_rows: List[Dict[str, Any]] = []
     for Y in (3.0, 4.0, 5.0, 6.0, 7.0):
         n_Y = int(np.sum(sub["peak_mfe_r"] >= Y))
-        chain_rows.append({
-            "cell": "ALL",
-            "target_R": Y,
-            "n_reached": n_Y,
-            "p_reached_given_2r_up": (n_Y / n_sub) if n_sub else float("nan"),
-        })
+        chain_rows.append(
+            {
+                "cell": "ALL",
+                "target_R": Y,
+                "n_reached": n_Y,
+                "p_reached_given_2r_up": (n_Y / n_sub) if n_sub else float("nan"),
+            }
+        )
         # Conditional r_at_t240 given reached Y.
         sub_Y = sub.loc[sub["peak_mfe_r"] >= Y]
         d_cond = describe_distribution(
             sub_Y["r_at_t240"].to_numpy(np.float64),
             f"all_2r_up & reached_{Y:g}R | r_at_t240",
         )
-        for row in desc_to_long_rows(d_cond, {"cell": "ALL", "metric": f"r_at_t240 | reached_{Y:g}R"}):
+        for row in desc_to_long_rows(
+            d_cond, {"cell": "ALL", "metric": f"r_at_t240 | reached_{Y:g}R"}
+        ):
             rows.append(row)
         overall_descs.append(d_cond)
 
@@ -854,18 +928,24 @@ def analysis_d(
             rows.append(row)
         for row in desc_to_long_rows(d2, {"cell": cell_label, "metric": "peak_mfe_r"}):
             rows.append(row)
-        cell_summary_rows.append({
-            "cell": cell_label,
-            "c05": c05,
-            "c1": c1,
-            "c2": c2,
-            "n": n_cell,
-            "mean_peak_mfe_r": mean_peak_mfe,
-            "mean_r_at_t240": float(np.nanmean(grp["r_at_t240"].to_numpy(np.float64))),
-            "p_final_r_gt_0": float(np.mean(grp["r_at_t240"].to_numpy(np.float64) > 0.0)),
-        })
+        cell_summary_rows.append(
+            {
+                "cell": cell_label,
+                "c05": c05,
+                "c1": c1,
+                "c2": c2,
+                "n": n_cell,
+                "mean_peak_mfe_r": mean_peak_mfe,
+                "mean_r_at_t240": float(np.nanmean(grp["r_at_t240"].to_numpy(np.float64))),
+                "p_final_r_gt_0": float(np.mean(grp["r_at_t240"].to_numpy(np.float64) > 0.0)),
+            }
+        )
 
-    df = pd.DataFrame(rows).sort_values(by=["cell", "metric", "stat"], kind="mergesort").reset_index(drop=True)
+    df = (
+        pd.DataFrame(rows)
+        .sort_values(by=["cell", "metric", "stat"], kind="mergesort")
+        .reset_index(drop=True)
+    )
     meta: Dict[str, Any] = {
         "n_sub": n_sub,
         "expected_n_from_crosstab_sum": 21851,
@@ -882,16 +962,16 @@ def analysis_d(
 # ---------------------------------------------------------------------------
 
 
-def chart_trail_heatmap(
-    grid_df: pd.DataFrame, stat_name: str, title: str, path: Path
-) -> None:
+def chart_trail_heatmap(grid_df: pd.DataFrame, stat_name: str, title: str, path: Path) -> None:
     Xs = list(TRAIL_X_GRID)
     Gs = list(TRAIL_G_GRID)
     z = np.full((len(Xs), len(Gs)), np.nan)
     nz = np.full((len(Xs), len(Gs)), 0, dtype=int)
     for i, X in enumerate(Xs):
         for j, G in enumerate(Gs):
-            cell = grid_df[(grid_df["X"] == X) & (grid_df["G"] == G) & (grid_df["stat"] == stat_name)]
+            cell = grid_df[
+                (grid_df["X"] == X) & (grid_df["G"] == G) & (grid_df["stat"] == stat_name)
+            ]
             n_cell = grid_df[(grid_df["X"] == X) & (grid_df["G"] == G) & (grid_df["stat"] == "N")]
             if len(cell):
                 z[i, j] = float(cell["value"].iloc[0])
@@ -910,12 +990,13 @@ def chart_trail_heatmap(
     for i in range(len(Xs)):
         for j in range(len(Gs)):
             txt = f"{z[i, j]:.3f}\n(N={nz[i, j]})"
-            ax.text(j, i, txt, ha="center", va="center", fontsize=8,
-                    color="black")
+            ax.text(j, i, txt, ha="center", va="center", fontsize=8, color="black")
     _save_figure(fig, path)
 
 
-def chart_per_band_giveback(per_band_descriptors_by_X: Dict[float, Dict[str, Any]], path: Path) -> None:
+def chart_per_band_giveback(
+    per_band_descriptors_by_X: Dict[float, Dict[str, Any]], path: Path
+) -> None:
     """7-panel grid of giveback_from_peak distributions, one per X band."""
     Xs = list(ANALYSIS_A_BANDS)
     n_rows = int(np.ceil(len(Xs) / 2))
@@ -1074,14 +1155,22 @@ def write_report(
                 f"{_fmt_float(d['p50'])} | {_fmt_float(d['p90'])} | {d['n']} |"
             )
     lines.append("")
-    lines.append("Full per-metric histograms in `per_band_outcomes.csv`. See `charts/per_band_giveback_distributions.png` for giveback shapes.")
+    lines.append(
+        "Full per-metric histograms in `per_band_outcomes.csv`. See `charts/per_band_giveback_distributions.png` for giveback shapes."
+    )
     lines.append("")
 
     lines.append("## Analysis B — Intra-trade pullback / giveback distributions")
     lines.append("")
-    lines.append("`intra_trade_givebacks_after_X.csv` records the max drawdown from running peak measured AFTER the first touch of X.")
-    lines.append("`intra_trade_givebacks_before_X.csv` records the same measured on the run up to first touch (max drawdown from running peak in bars [1, t_X-1]).")
-    lines.append("Histogram range for both: 0R..15R (giveback is non-negative), 0.25R bins, with overflow.")
+    lines.append(
+        "`intra_trade_givebacks_after_X.csv` records the max drawdown from running peak measured AFTER the first touch of X."
+    )
+    lines.append(
+        "`intra_trade_givebacks_before_X.csv` records the same measured on the run up to first touch (max drawdown from running peak in bars [1, t_X-1])."
+    )
+    lines.append(
+        "Histogram range for both: 0R..15R (giveback is non-negative), 0.25R bins, with overflow."
+    )
     lines.append("")
     lines.append("| band_R | metric | mean | p50 | p90 | p99 | max | N |")
     lines.append("|--------|--------|------|-----|-----|-----|-----|---|")
@@ -1100,7 +1189,9 @@ def write_report(
             f"{_fmt_float(d['max'])} | {d['n']} |"
         )
     lines.append("")
-    lines.append("Per-trade pullback event count distributions at thresholds {0.5, 1.0, 1.5, 2.0}R (zigzag detector: registers a pullback when running_peak - r_low >= threshold; recovers when next r_high - trough >= threshold/2). Per-trade counts in `pullback_counts.csv`.")
+    lines.append(
+        "Per-trade pullback event count distributions at thresholds {0.5, 1.0, 1.5, 2.0}R (zigzag detector: registers a pullback when running_peak - r_low >= threshold; recovers when next r_high - trough >= threshold/2). Per-trade counts in `pullback_counts.csv`."
+    )
     lines.append("")
     lines.append("| threshold | mean | p50 | p90 | p99 | max | N |")
     lines.append("|-----------|------|-----|-----|-----|-----|---|")
@@ -1114,9 +1205,13 @@ def write_report(
 
     lines.append("## Analysis C — Trail simulation grid")
     lines.append("")
-    lines.append("Rule: SL at -1R intrabar throughout; trail activates the first bar running_mfe >= X; trail_level = peak - G; tighten-then-check on each subsequent bar.")
+    lines.append(
+        "Rule: SL at -1R intrabar throughout; trail activates the first bar running_mfe >= X; trail_level = peak - G; tighten-then-check on each subsequent bar."
+    )
     lines.append("Grid: X in {1..5}R x G in {0.5, 1.0, 1.5, 2.0, 2.5, 3.0}R = 30 cells.")
-    lines.append("Full per-cell distribution (moments + percentiles + histogram) in `trail_simulation_grid.csv` (long format).")
+    lines.append(
+        "Full per-cell distribution (moments + percentiles + histogram) in `trail_simulation_grid.csv` (long format)."
+    )
     lines.append("")
     lines.append("Mean realized R per cell:")
     lines.append("")
@@ -1126,7 +1221,9 @@ def write_report(
     for X in TRAIL_X_GRID:
         row = [f"X={X:g}"]
         for G in TRAIL_G_GRID:
-            cell = grid_df[(grid_df["X"] == X) & (grid_df["G"] == G) & (grid_df["stat"] == "mean_realized_r")]
+            cell = grid_df[
+                (grid_df["X"] == X) & (grid_df["G"] == G) & (grid_df["stat"] == "mean_realized_r")
+            ]
             row.append(_fmt_float(float(cell["value"].iloc[0])) if len(cell) else "NaN")
         lines.append("| " + " | ".join(row) + " |")
     lines.append("")
@@ -1137,15 +1234,20 @@ def write_report(
     for X in TRAIL_X_GRID:
         row = [f"X={X:g}"]
         for G in TRAIL_G_GRID:
-            cell = grid_df[(grid_df["X"] == X) & (grid_df["G"] == G) & (grid_df["stat"] == "p_realized_r_gt_0")]
+            cell = grid_df[
+                (grid_df["X"] == X) & (grid_df["G"] == G) & (grid_df["stat"] == "p_realized_r_gt_0")
+            ]
             row.append(_fmt_float(float(cell["value"].iloc[0])) if len(cell) else "NaN")
         lines.append("| " + " | ".join(row) + " |")
     lines.append("")
-    lines.append("Reference cells (verbatim Arc 2, no-time-exit, hard-TP-2R) in `trail_simulation_reference.csv`.")
+    lines.append(
+        "Reference cells (verbatim Arc 2, no-time-exit, hard-TP-2R) in `trail_simulation_reference.csv`."
+    )
     lines.append("")
     lines.append("| reference | N | mean_R | std_R | p50_R | P(R>0) | mean_exit_bar |")
     lines.append("|-----------|---|--------|-------|-------|--------|---------------|")
     for ref_mode in ("verbatim_arc2", "no_time_exit", "hard_tp_2R"):
+
         def gv(stat: str) -> str:
             r = ref_df[(ref_df["reference"] == ref_mode) & (ref_df["stat"] == stat)]
             if not len(r):
@@ -1154,6 +1256,7 @@ def write_report(
                 return _fmt_float(float(r["value"].iloc[0]))
             except (TypeError, ValueError):
                 return str(r["value"].iloc[0])
+
         n_str = "NaN"
         n_row = ref_df[(ref_df["reference"] == ref_mode) & (ref_df["stat"] == "N")]
         if len(n_row):
@@ -1163,9 +1266,13 @@ def write_report(
             f"{gv('p50_realized_r')} | {gv('p_realized_r_gt_0')} | {gv('mean_exit_bar')} |"
         )
     lines.append("")
-    lines.append("Charts: `charts/trail_simulation_heatmap_meanR.png` and `charts/trail_simulation_heatmap_winrate.png`.")
+    lines.append(
+        "Charts: `charts/trail_simulation_heatmap_meanR.png` and `charts/trail_simulation_heatmap_winrate.png`."
+    )
     lines.append("")
-    lines.append("Cost caveat: realized R above is gross of execution cost. Real-execution spread + slippage at trail trigger is typically -0.05 to -0.15R per trade and would shift every cell downward by approximately that amount.")
+    lines.append(
+        "Cost caveat: realized R above is gross of execution cost. Real-execution spread + slippage at trail trigger is typically -0.05 to -0.15R per trade and would shift every cell downward by approximately that amount."
+    )
     lines.append("")
 
     lines.append("## Analysis D — First-touch 2R-up subpopulation")
@@ -1241,7 +1348,9 @@ def write_trail_summary_md(grid_df: pd.DataFrame, ref_df: pd.DataFrame, path: Pa
     for X in TRAIL_X_GRID:
         row = [f"X={X:g}"]
         for G in TRAIL_G_GRID:
-            cell = grid_df[(grid_df["X"] == X) & (grid_df["G"] == G) & (grid_df["stat"] == "mean_realized_r")]
+            cell = grid_df[
+                (grid_df["X"] == X) & (grid_df["G"] == G) & (grid_df["stat"] == "mean_realized_r")
+            ]
             row.append(_fmt_float(float(cell["value"].iloc[0])) if len(cell) else "NaN")
         lines.append("| " + " | ".join(row) + " |")
     lines.append("")
@@ -1252,7 +1361,9 @@ def write_trail_summary_md(grid_df: pd.DataFrame, ref_df: pd.DataFrame, path: Pa
     for X in TRAIL_X_GRID:
         row = [f"X={X:g}"]
         for G in TRAIL_G_GRID:
-            cell = grid_df[(grid_df["X"] == X) & (grid_df["G"] == G) & (grid_df["stat"] == "p_realized_r_gt_0")]
+            cell = grid_df[
+                (grid_df["X"] == X) & (grid_df["G"] == G) & (grid_df["stat"] == "p_realized_r_gt_0")
+            ]
             row.append(_fmt_float(float(cell["value"].iloc[0])) if len(cell) else "NaN")
         lines.append("| " + " | ".join(row) + " |")
     lines.append("")
@@ -1263,7 +1374,9 @@ def write_trail_summary_md(grid_df: pd.DataFrame, ref_df: pd.DataFrame, path: Pa
     for X in TRAIL_X_GRID:
         row = [f"X={X:g}"]
         for G in TRAIL_G_GRID:
-            cell = grid_df[(grid_df["X"] == X) & (grid_df["G"] == G) & (grid_df["stat"] == "p_realized_r_gt_1")]
+            cell = grid_df[
+                (grid_df["X"] == X) & (grid_df["G"] == G) & (grid_df["stat"] == "p_realized_r_gt_1")
+            ]
             row.append(_fmt_float(float(cell["value"].iloc[0])) if len(cell) else "NaN")
         lines.append("| " + " | ".join(row) + " |")
     lines.append("")
@@ -1273,6 +1386,7 @@ def write_trail_summary_md(grid_df: pd.DataFrame, ref_df: pd.DataFrame, path: Pa
     lines.append("|---|---|---|------|---------|------------|--------------------|")
     for X in TRAIL_X_GRID:
         for G in TRAIL_G_GRID:
+
             def gv(stat: str) -> str:
                 r = grid_df[(grid_df["X"] == X) & (grid_df["G"] == G) & (grid_df["stat"] == stat)]
                 if not len(r):
@@ -1281,6 +1395,7 @@ def write_trail_summary_md(grid_df: pd.DataFrame, ref_df: pd.DataFrame, path: Pa
                     return str(int(float(r["value"].iloc[0])))
                 except (TypeError, ValueError):
                     return str(r["value"].iloc[0])
+
             lines.append(
                 f"| {X:g} | {G:g} | {gv('N')} | {gv('n_sl')} | {gv('n_trail')} | "
                 f"{gv('n_time_240')} | {gv('n_never_reached_X')} |"
@@ -1291,6 +1406,7 @@ def write_trail_summary_md(grid_df: pd.DataFrame, ref_df: pd.DataFrame, path: Pa
     lines.append("| reference | N | mean_R | std_R | p50_R | P(R>0) | P(R>1) | mean_exit_bar |")
     lines.append("|-----------|---|--------|-------|-------|--------|--------|---------------|")
     for ref_mode in ("verbatim_arc2", "no_time_exit", "hard_tp_2R"):
+
         def gv(stat: str) -> str:
             r = ref_df[(ref_df["reference"] == ref_mode) & (ref_df["stat"] == stat)]
             if not len(r):
@@ -1299,6 +1415,7 @@ def write_trail_summary_md(grid_df: pd.DataFrame, ref_df: pd.DataFrame, path: Pa
                 return _fmt_float(float(r["value"].iloc[0]))
             except (TypeError, ValueError):
                 return str(r["value"].iloc[0])
+
         n_row = ref_df[(ref_df["reference"] == ref_mode) & (ref_df["stat"] == "N")]
         n_str = str(int(float(n_row["value"].iloc[0]))) if len(n_row) else "NaN"
         lines.append(
@@ -1307,8 +1424,10 @@ def write_trail_summary_md(grid_df: pd.DataFrame, ref_df: pd.DataFrame, path: Pa
             f"{gv('mean_exit_bar')} |"
         )
     lines.append("")
-    lines.append("Cost caveat: gross R only. Real execution would include spread at trail trigger; "
-                 "the parent appendix's spread modeling produces approximately -0.05 to -0.15 R per trade.")
+    lines.append(
+        "Cost caveat: gross R only. Real execution would include spread at trail trigger; "
+        "the parent appendix's spread modeling produces approximately -0.05 to -0.15 R per trade."
+    )
     lines.append("")
     _write_text("\n".join(lines) + "\n", path)
 
@@ -1399,11 +1518,13 @@ def write_manifest(
         all_match = True
         for rel, h in hashes.items():
             prior = prior_hashes.get(rel)
-            ok = (prior == h)
+            ok = prior == h
             all_match = all_match and ok
             lines.append(f"- {rel}: {'IDENTICAL' if ok else 'DIVERGED'}")
         lines.append("")
-        lines.append(f"Overall: {'PASS - byte-identical across runs' if all_match else 'FAIL - some files diverged (PNG pixel-only fallbacks above)'}")
+        lines.append(
+            f"Overall: {'PASS - byte-identical across runs' if all_match else 'FAIL - some files diverged (PNG pixel-only fallbacks above)'}"
+        )
         lines.append("")
 
     _write_text("\n".join(lines) + "\n", OUTPUT_DIR / "run_manifest.txt")
@@ -1415,7 +1536,9 @@ def write_manifest(
 # ---------------------------------------------------------------------------
 
 
-def run_pipeline(*, run_ordinal: int, prior_hashes: Optional[Dict[str, str]] = None) -> Dict[str, str]:
+def run_pipeline(
+    *, run_ordinal: int, prior_hashes: Optional[Dict[str, str]] = None
+) -> Dict[str, str]:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     CHARTS_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -1426,7 +1549,9 @@ def run_pipeline(*, run_ordinal: int, prior_hashes: Optional[Dict[str, str]] = N
 
     print(f"[run #{run_ordinal}] Analysis A — per-band outcomes ...", flush=True)
     a_long, a_descs, chain_df = analysis_a(sig_to_arr, shape)
-    print(f"[run #{run_ordinal}] Analysis B — intra-trade givebacks + pullback counts ...", flush=True)
+    print(
+        f"[run #{run_ordinal}] Analysis B — intra-trade givebacks + pullback counts ...", flush=True
+    )
     b_after_df, b_before_df, b_after_descs, b_before_descs = analysis_b_givebacks(sig_to_arr, shape)
     b_pullback_df, b_pullback_descs = analysis_b_pullbacks(sig_to_arr)
 
@@ -1472,18 +1597,24 @@ def run_pipeline(*, run_ordinal: int, prior_hashes: Optional[Dict[str, str]] = N
 
     # Charts.
     chart_trail_heatmap(
-        grid_df, "mean_realized_r", "Trail grid mean realized R",
+        grid_df,
+        "mean_realized_r",
+        "Trail grid mean realized R",
         CHARTS_DIR / "trail_simulation_heatmap_meanR.png",
     )
     out_paths.append(CHARTS_DIR / "trail_simulation_heatmap_meanR.png")
     chart_trail_heatmap(
-        grid_df, "p_realized_r_gt_0", "Trail grid P(realized R > 0)",
+        grid_df,
+        "p_realized_r_gt_0",
+        "Trail grid P(realized R > 0)",
         CHARTS_DIR / "trail_simulation_heatmap_winrate.png",
     )
     out_paths.append(CHARTS_DIR / "trail_simulation_heatmap_winrate.png")
     chart_per_band_giveback(giveback_by_X, CHARTS_DIR / "per_band_giveback_distributions.png")
     out_paths.append(CHARTS_DIR / "per_band_giveback_distributions.png")
-    chart_intra_trade_giveback_overlay(b_after_descs, CHARTS_DIR / "intra_trade_giveback_after_X.png")
+    chart_intra_trade_giveback_overlay(
+        b_after_descs, CHARTS_DIR / "intra_trade_giveback_after_X.png"
+    )
     out_paths.append(CHARTS_DIR / "intra_trade_giveback_after_X.png")
     chart_pullback_counts(b_pullback_descs, CHARTS_DIR / "pullback_count_distributions.png")
     out_paths.append(CHARTS_DIR / "pullback_count_distributions.png")
@@ -1538,7 +1669,10 @@ def main() -> int:
     if all_match:
         print("[verify] All outputs are byte-identical across the two runs.", flush=True)
     else:
-        print("[verify] Some outputs diverged; check run_manifest.txt for PNG pixel-only fallback hashes.", flush=True)
+        print(
+            "[verify] Some outputs diverged; check run_manifest.txt for PNG pixel-only fallback hashes.",
+            flush=True,
+        )
     return 0
 
 

@@ -31,6 +31,7 @@ def _filename_variants_for_pair(pair: str) -> list[str]:
         *([f"{pair.replace('_', '')}.csv", f"{pair.replace('_', '/')}.csv"] if "_" in pair else []),
     ]
 
+
 RANDOM_SEED = 42
 ATR_PERIOD = 14
 ROLLING_PERCENTILE_WINDOW = 252
@@ -125,10 +126,12 @@ def _compute_precursor_metrics(df: pd.DataFrame, bar_idx: int) -> dict:
 
     vol_avg_5 = vol.iloc[max(0, bar_idx - 4) : bar_idx + 1].mean() if bar_idx >= 0 else 0.0
     if bar_idx >= ROLLING_PERCENTILE_WINDOW - 1:
-        vol_avgs = np.array([
-            vol.iloc[max(0, i - 4) : i + 1].mean()
-            for i in range(bar_idx - ROLLING_PERCENTILE_WINDOW + 1, bar_idx + 1)
-        ])
+        vol_avgs = np.array(
+            [
+                vol.iloc[max(0, i - 4) : i + 1].mean()
+                for i in range(bar_idx - ROLLING_PERCENTILE_WINDOW + 1, bar_idx + 1)
+            ]
+        )
         vol_avg_5_pct = (
             (vol_avgs < vol_avg_5).sum() / len(vol_avgs) * 100.0 if len(vol_avgs) else np.nan
         )
@@ -175,7 +178,9 @@ def _get_bar_idx_for_date(df: pd.DataFrame, target_date: pd.Timestamp) -> int | 
     return int(pos[0]) if len(pos) > 0 else None
 
 
-def _list_ohlcv_files_and_pairs(data_dir: Path, pairs: list[str]) -> tuple[list[Path], dict[str, list[str]]]:
+def _list_ohlcv_files_and_pairs(
+    data_dir: Path, pairs: list[str]
+) -> tuple[list[Path], dict[str, list[str]]]:
     """Return (found_csv_paths, {pair: [tried_patterns]}) for diagnostics."""
     data_dir = Path(data_dir).resolve()
     found: list[Path] = []
@@ -237,7 +242,13 @@ def _build_zone_c_metrics(
             f"example expected: {data_dir / f'{example}.csv'}"
         )
 
-    stats = {"n_starts": len(starts), "n_file_not_found": 0, "n_no_date_match": 0, "n_insufficient_history": 0, "n_produced": 0}
+    stats = {
+        "n_starts": len(starts),
+        "n_file_not_found": 0,
+        "n_no_date_match": 0,
+        "n_insufficient_history": 0,
+        "n_produced": 0,
+    }
     rows = []
     for _, row in starts.iterrows():
         pair = row["pair"]
@@ -283,7 +294,9 @@ def _get_eligible_control_bars(
 ) -> pd.DataFrame:
     """Get (pair, date) that are NOT Zone C starts, with at least min_bars prior for metrics."""
     starts = _identify_zone_c_starts(labels)
-    start_keys = set(zip(starts["pair"], starts["date"].dt.strftime("%Y-%m-%d"), starts["direction"]))
+    start_keys = set(
+        zip(starts["pair"], starts["date"].dt.strftime("%Y-%m-%d"), starts["direction"])
+    )
 
     pairs = labels["pair"].unique().tolist()
     data_dir = Path(data_dir).resolve()
@@ -301,7 +314,9 @@ def _get_eligible_control_bars(
                 date_str = df.iloc[i]["date_str"]
                 if (pair, date_str, direction) in start_keys:
                     continue
-                eligible.append({"pair": pair, "bar_idx": i, "date": df.iloc[i]["date"], "direction": direction})
+                eligible.append(
+                    {"pair": pair, "bar_idx": i, "date": df.iloc[i]["date"], "direction": direction}
+                )
     return pd.DataFrame(eligible)
 
 
@@ -392,7 +407,9 @@ def _build_comparison_summary(zone_df: pd.DataFrame, ctrl_df: pd.DataFrame) -> p
                 continue
             threshold_high = c.quantile(0.9) if len(c) > 0 else np.nan
             threshold_low = c.quantile(0.1) if len(c) > 0 else np.nan
-            pct_above_90 = (z >= threshold_high).mean() * 100 if pd.notna(threshold_high) else np.nan
+            pct_above_90 = (
+                (z >= threshold_high).mean() * 100 if pd.notna(threshold_high) else np.nan
+            )
             pct_below_10 = (z <= threshold_low).mean() * 100 if pd.notna(threshold_low) else np.nan
             extreme_rows.append(
                 {
@@ -412,19 +429,23 @@ def _build_comparison_summary(zone_df: pd.DataFrame, ctrl_df: pd.DataFrame) -> p
 
 def _diagnostic_summary_row() -> pd.DataFrame:
     """Return non-empty summary with one diagnostic row (when no metric comparison possible)."""
-    return pd.DataFrame([{
-        "metric": "diagnostic",
-        "mean_diff_zoneC_minus_control": np.nan,
-        "median_diff_zoneC_minus_control": np.nan,
-        "zoneC_p25": np.nan,
-        "zoneC_p50": np.nan,
-        "zoneC_p75": np.nan,
-        "control_p25": np.nan,
-        "control_p50": np.nan,
-        "control_p75": np.nan,
-        "pct_zoneC_above_control_90pct": np.nan,
-        "pct_zoneC_below_control_10pct": np.nan,
-    }])
+    return pd.DataFrame(
+        [
+            {
+                "metric": "diagnostic",
+                "mean_diff_zoneC_minus_control": np.nan,
+                "median_diff_zoneC_minus_control": np.nan,
+                "zoneC_p25": np.nan,
+                "zoneC_p50": np.nan,
+                "zoneC_p75": np.nan,
+                "control_p25": np.nan,
+                "control_p50": np.nan,
+                "control_p75": np.nan,
+                "pct_zoneC_above_control_90pct": np.nan,
+                "pct_zoneC_below_control_10pct": np.nan,
+            }
+        ]
+    )
 
 
 def run_phaseD6A(
@@ -466,7 +487,9 @@ def main() -> int:
     parser = argparse.ArgumentParser(
         description="Phase D-6A Ignition Precursor Analysis (analytics only)"
     )
-    parser.add_argument("--labels", required=True, help="Path to opportunity_labels.csv or .parquet")
+    parser.add_argument(
+        "--labels", required=True, help="Path to opportunity_labels.csv or .parquet"
+    )
     parser.add_argument(
         "--data-dir",
         required=True,

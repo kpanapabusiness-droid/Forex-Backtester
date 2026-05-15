@@ -32,9 +32,7 @@ untracked files for user review.
 
 from __future__ import annotations
 
-import filecmp
 import hashlib
-import os
 import shutil
 import subprocess
 import sys
@@ -53,29 +51,21 @@ SCRIPTS_LCHAR = REPO_ROOT / "scripts" / "lchar"
 if str(SCRIPTS_LCHAR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_LCHAR))
 
-import arc2_exit_sweep_filtered as r2  # noqa: E402
 import arc2_exit_counterfactuals_round2 as r3e  # noqa: E402
+import arc2_exit_sweep_filtered as r2  # noqa: E402
 
 # ---------------------------------------------------------------------------
 # Locked Phase 3 inputs (gate 6.1 / 6.6) — 8 inputs per OPEN doc §1
 # ---------------------------------------------------------------------------
 LOCKED_SHAS: Dict[str, str] = {
-    "docs/PHASE_L6_ARC2_P3_OPEN.md":
-        "c3d09dce02235975e9724db0661e2d16651221bc51d96b5c652f8e506376d560",
-    "core/signals/l4_mtf_alignment_2_down_mixed_kijun.py":
-        "3c8d0f5d4b446f84359ab0663df36869f15b47cf1bf18fbc6caff807dc5134e3",
-    "configs/wfo_l6_arc2.yaml":
-        "25917151bc84a73885eeea9ca9c4cc15b1c277ba793706b158abd3aee0ab6328",
-    "L6_0_METHODOLOGY_LOCK.md":
-        "4a63827b0e8187882762090f5916aaf3f3137247aa77382806c3d57cfc8ac5e4",
-    "results/l6/arc2/trades_all.csv":
-        "47fccbfe4dffa6577a6000b0c16c2ebb9597dcf76523ff2b8084631b19836b3c",
-    "results/l6/arc2/characterisation/v1_1_full/signals_features.csv":
-        "71b39383632bd695b878add8b331b76bcd231ab5b9adba9eea03d69f8762483e",
-    "results/l6/arc2/characterisation/v1_2_1_full/per_bar_paths.csv":
-        "7b2acd6ccb98f1fd145a631b318fc95d10f5cf4f42633be9c0b59738fa1696ee",
-    "results/l6/arc2/characterisation/extended/exit_counterfactuals_round2/block_RR_combined_per_subset_per_variant.csv":
-        "047b17f684266a86db32794652ddcf1a2ad787cf707153a0c306d4c2f0600599",
+    "docs/PHASE_L6_ARC2_P3_OPEN.md": "c3d09dce02235975e9724db0661e2d16651221bc51d96b5c652f8e506376d560",
+    "core/signals/l4_mtf_alignment_2_down_mixed_kijun.py": "3c8d0f5d4b446f84359ab0663df36869f15b47cf1bf18fbc6caff807dc5134e3",
+    "configs/wfo_l6_arc2.yaml": "25917151bc84a73885eeea9ca9c4cc15b1c277ba793706b158abd3aee0ab6328",
+    "L6_0_METHODOLOGY_LOCK.md": "4a63827b0e8187882762090f5916aaf3f3137247aa77382806c3d57cfc8ac5e4",
+    "results/l6/arc2/trades_all.csv": "47fccbfe4dffa6577a6000b0c16c2ebb9597dcf76523ff2b8084631b19836b3c",
+    "results/l6/arc2/characterisation/v1_1_full/signals_features.csv": "71b39383632bd695b878add8b331b76bcd231ab5b9adba9eea03d69f8762483e",
+    "results/l6/arc2/characterisation/v1_2_1_full/per_bar_paths.csv": "7b2acd6ccb98f1fd145a631b318fc95d10f5cf4f42633be9c0b59738fa1696ee",
+    "results/l6/arc2/characterisation/extended/exit_counterfactuals_round2/block_RR_combined_per_subset_per_variant.csv": "047b17f684266a86db32794652ddcf1a2ad787cf707153a0c306d4c2f0600599",
 }
 
 # Derived inputs (verified transitively via r2.build_subsets gate 2.1 and
@@ -119,11 +109,11 @@ SPECS: Tuple[Dict[str, Any], ...] = (SPEC_B, SPEC_A, SPEC_C)
 # Gate thresholds (OPEN doc §1.3, §1.4)
 # ---------------------------------------------------------------------------
 N_FOLDS: int = 7
-GATE_ROI_FLOOR: float = 0.0       # worst-fold ROI > 0.0 (%)
-GATE_DD_CEIL: float = 8.0          # worst-fold DD < 8.0 (%)
-GATE_N_HELD_FLOOR: int = 15        # smallest fold n_held >= 15
+GATE_ROI_FLOOR: float = 0.0  # worst-fold ROI > 0.0 (%)
+GATE_DD_CEIL: float = 8.0  # worst-fold DD < 8.0 (%)
+GATE_N_HELD_FLOOR: int = 15  # smallest fold n_held >= 15
 CONSISTENCY_RANGE: Tuple[float, float] = (0.190, 0.569)  # pooled mean R
-TRADE_COUNT_LB: int = 25           # Spec B per-fold n_taken sanity
+TRADE_COUNT_LB: int = 25  # Spec B per-fold n_taken sanity
 TRADE_COUNT_UB: int = 100
 CLEAN_NULL_FOLD_SHARE: float = 0.70  # single fold > 70% of pooled R
 
@@ -172,18 +162,29 @@ def _git_head() -> str:
 # ---------------------------------------------------------------------------
 def _make_rr04() -> Callable[..., Dict[str, Any]]:
     def _v(*a):
-        return r3e.variant_RR(*a, tau_atr_fill=-0.5, cut_bar=20,
-                              decision_bar=120, confirm_kind="close",
-                              confirm_threshold=4.0,
-                              extended_horizon=r3e.TIME_HORIZON_EXTENDED)
+        return r3e.variant_RR(
+            *a,
+            tau_atr_fill=-0.5,
+            cut_bar=20,
+            decision_bar=120,
+            confirm_kind="close",
+            confirm_threshold=4.0,
+            extended_horizon=r3e.TIME_HORIZON_EXTENDED,
+        )
+
     return _v
 
 
 def _make_qq01() -> Callable[..., Dict[str, Any]]:
     def _v(*a):
-        return r3e.variant_QQ(*a, decision_bar=120,
-                              confirm_kind="mfe", confirm_threshold=4.0,
-                              extended_horizon=r3e.TIME_HORIZON_EXTENDED)
+        return r3e.variant_QQ(
+            *a,
+            decision_bar=120,
+            confirm_kind="mfe",
+            confirm_threshold=4.0,
+            extended_horizon=r3e.TIME_HORIZON_EXTENDED,
+        )
+
     return _v
 
 
@@ -225,12 +226,12 @@ def audit_lookahead() -> Dict[str, Any]:
     """
     return {
         "gate_6_2_filter_lookahead": "PASS (structural, by reuse of "
-                                      "r2.build_subsets and OPEN-doc §1.1 "
-                                      "locked numeric thresholds)",
+        "r2.build_subsets and OPEN-doc §1.1 "
+        "locked numeric thresholds)",
         "gate_6_3_exit_lookahead": "PASS (structural, by reuse of "
-                                    "r3e.variant_RR / variant_QQ which "
-                                    "iterate bar k using only running "
-                                    "and k-local observables)",
+        "r3e.variant_RR / variant_QQ which "
+        "iterate bar k using only running "
+        "and k-local observables)",
     }
 
 
@@ -241,14 +242,15 @@ def build_trade_context() -> Tuple[pd.DataFrame, Dict[int, Dict[str, Any]]]:
     """Returns (ti_full, T_by_tid). T_by_tid is keyed by trade_id and contains
     everything r3e variant functions need.
     """
-    ti = pd.read_csv(REPO_ROOT
-                     / "results/l6/arc2/characterisation/v1_2_1_full/trade_index.csv")
+    ti = pd.read_csv(REPO_ROOT / "results/l6/arc2/characterisation/v1_2_1_full/trade_index.csv")
     ti["signal_bar_ts"] = pd.to_datetime(ti["signal_bar_ts"])
     ta = pd.read_csv(REPO_ROOT / "results/l6/arc2/trades_all.csv")
     ta["signal_bar_ts"] = pd.to_datetime(ta["signal_bar_ts"])
     ti_full = ti.merge(
         ta[["pair", "signal_bar_ts", "spread_pips_entry", "spread_pips_exit"]],
-        on=["pair", "signal_bar_ts"], how="left", validate="one_to_one",
+        on=["pair", "signal_bar_ts"],
+        how="left",
+        validate="one_to_one",
     )
     if ti_full[["spread_pips_entry", "spread_pips_exit"]].isna().any().any():
         raise RuntimeError("HALT (sp-lookup): null sp_entry/sp_exit after merge")
@@ -280,15 +282,24 @@ def build_trade_context() -> Tuple[pd.DataFrame, Dict[int, Dict[str, Any]]]:
 
 def load_per_bar_arrays(
     n_trades: int,
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray,
-           np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+) -> Tuple[
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
+]:
     """Returns the flat per_bar_paths arrays and the start/end indices per trade.
 
     All arrays sorted by (trade_id, k). starts[t]:ends[t] slice gives the
     bars for trade t in k order.
     """
-    pb = pd.read_csv(REPO_ROOT
-                     / "results/l6/arc2/characterisation/v1_2_1_full/per_bar_paths.csv")
+    pb = pd.read_csv(REPO_ROOT / "results/l6/arc2/characterisation/v1_2_1_full/per_bar_paths.csv")
     pb = pb.sort_values(["trade_id", "k"]).reset_index(drop=True)
     tids_arr = pb["trade_id"].to_numpy(dtype=np.int64)
     starts = np.searchsorted(tids_arr, np.arange(n_trades), side="left")
@@ -311,9 +322,15 @@ def run_spec(
     spec: Dict[str, Any],
     trade_ids: np.ndarray,
     T_by_tid: Dict[int, Dict[str, Any]],
-    rmae: np.ndarray, rmfe: np.ndarray, bl: np.ndarray, bh: np.ndarray,
-    bc: np.ndarray, nbo: np.ndarray, hnb: np.ndarray,
-    starts: np.ndarray, ends: np.ndarray,
+    rmae: np.ndarray,
+    rmfe: np.ndarray,
+    bl: np.ndarray,
+    bh: np.ndarray,
+    bc: np.ndarray,
+    nbo: np.ndarray,
+    hnb: np.ndarray,
+    starts: np.ndarray,
+    ends: np.ndarray,
 ) -> pd.DataFrame:
     """Run the spec's exit variant on each trade in trade_ids. Returns the
     per-trade outcomes DataFrame.
@@ -325,23 +342,25 @@ def run_spec(
         s = int(starts[tid])
         e = int(ends[tid])
         if e <= s:
-            raise RuntimeError(
-                f"HALT (per-bar): empty path for trade_id={tid}")
+            raise RuntimeError(f"HALT (per-bar): empty path for trade_id={tid}")
         bavail = e - s
-        out = variant_fn(rmae[s:e], rmfe[s:e], bl[s:e], bh[s:e],
-                          bc[s:e], nbo[s:e], hnb[s:e], bavail, T)
-        rows.append({
-            "trade_id": tid,
-            "fold_id": T["fold_id"],
-            "pair": T["pair"],
-            "signal_bar_ts": T["signal_bar_ts"],
-            "exit_bar_k": out["exit_bar"],
-            "exit_reason": out["exit_reason"],
-            "exit_level_atr_fill": out["exit_level_atr_fill"],
-            "gross_R": out["gross_R"],
-            "spread_cost_R": out["spread_cost_R"],
-            "net_R": out["net_R"],
-        })
+        out = variant_fn(
+            rmae[s:e], rmfe[s:e], bl[s:e], bh[s:e], bc[s:e], nbo[s:e], hnb[s:e], bavail, T
+        )
+        rows.append(
+            {
+                "trade_id": tid,
+                "fold_id": T["fold_id"],
+                "pair": T["pair"],
+                "signal_bar_ts": T["signal_bar_ts"],
+                "exit_bar_k": out["exit_bar"],
+                "exit_reason": out["exit_reason"],
+                "exit_level_atr_fill": out["exit_level_atr_fill"],
+                "gross_R": out["gross_R"],
+                "spread_cost_R": out["spread_cost_R"],
+                "net_R": out["net_R"],
+            }
+        )
     df = pd.DataFrame(rows)
     df = df.sort_values(["trade_id"]).reset_index(drop=True)
     return df
@@ -385,20 +404,22 @@ def aggregate_per_fold(per_trade: pd.DataFrame) -> pd.DataFrame:
             peak_dd_R = float(dd.max())
         roi_pct = sum_R  # 1R = 1% at 1% risk per trade
         peak_dd_pct = peak_dd_R
-        rows.append({
-            "fold_id": fid,
-            "n_taken": n_taken,
-            "n_cut": n_cut,
-            "n_sl": n_sl,
-            "n_te": n_te,
-            "n_de": n_de,
-            "n_held": int(n_held),
-            "mean_R": mean_R,
-            "sum_R": sum_R,
-            "roi_pct": roi_pct,
-            "peak_dd_R": peak_dd_R,
-            "peak_dd_pct": peak_dd_pct,
-        })
+        rows.append(
+            {
+                "fold_id": fid,
+                "n_taken": n_taken,
+                "n_cut": n_cut,
+                "n_sl": n_sl,
+                "n_te": n_te,
+                "n_de": n_de,
+                "n_held": int(n_held),
+                "mean_R": mean_R,
+                "sum_R": sum_R,
+                "roi_pct": roi_pct,
+                "peak_dd_R": peak_dd_R,
+                "peak_dd_pct": peak_dd_pct,
+            }
+        )
     df = pd.DataFrame(rows)
     return df
 
@@ -436,8 +457,7 @@ def aggregate_global(per_trade: pd.DataFrame, per_fold: pd.DataFrame) -> Dict[st
 # ---------------------------------------------------------------------------
 # Gate evaluation (Spec B only)
 # ---------------------------------------------------------------------------
-def evaluate_gate_b(per_fold: pd.DataFrame, agg: Dict[str, Any]
-                     ) -> Dict[str, Any]:
+def evaluate_gate_b(per_fold: pd.DataFrame, agg: Dict[str, Any]) -> Dict[str, Any]:
     pass_roi = agg["worst_fold_roi_pct"] > GATE_ROI_FLOOR
     pass_dd = agg["worst_fold_dd_pct"] < GATE_DD_CEIL
     pass_n = agg["smallest_fold_n_held"] >= GATE_N_HELD_FLOOR
@@ -462,12 +482,14 @@ def evaluate_gate_b(per_fold: pd.DataFrame, agg: Dict[str, Any]
 
     # Consistency check (§1.4 / gate 6.5).
     pmR = agg["pooled_mean_R"]
-    in_range = (CONSISTENCY_RANGE[0] <= pmR <= CONSISTENCY_RANGE[1])
+    in_range = CONSISTENCY_RANGE[0] <= pmR <= CONSISTENCY_RANGE[1]
     consistency = "PASS" if in_range else "HALT"
 
     # Trade-count sanity (gate 6.9).
-    tc_ok = (TRADE_COUNT_LB <= agg["smallest_fold_n_taken"] and
-             agg["largest_fold_n_taken"] <= TRADE_COUNT_UB)
+    tc_ok = (
+        TRADE_COUNT_LB <= agg["smallest_fold_n_taken"]
+        and agg["largest_fold_n_taken"] <= TRADE_COUNT_UB
+    )
 
     return {
         "pass_roi": bool(pass_roi),
@@ -478,10 +500,11 @@ def evaluate_gate_b(per_fold: pd.DataFrame, agg: Dict[str, Any]
         "consistency_check": consistency,
         "consistency_pooled_mean_R": pmR,
         "consistency_range": list(CONSISTENCY_RANGE),
-        "trade_count_sanity": "PASS" if tc_ok else
-                              f"FAIL ({agg['smallest_fold_n_taken']} - "
-                              f"{agg['largest_fold_n_taken']} outside "
-                              f"[{TRADE_COUNT_LB}, {TRADE_COUNT_UB}])",
+        "trade_count_sanity": "PASS"
+        if tc_ok
+        else f"FAIL ({agg['smallest_fold_n_taken']} - "
+        f"{agg['largest_fold_n_taken']} outside "
+        f"[{TRADE_COUNT_LB}, {TRADE_COUNT_UB}])",
     }
 
 
@@ -490,11 +513,13 @@ def evaluate_gate_b(per_fold: pd.DataFrame, agg: Dict[str, Any]
 # ---------------------------------------------------------------------------
 def assert_per_fold_finite(per_fold: pd.DataFrame, spec_id: str) -> None:
     for col in ("n_taken", "n_held", "mean_R", "roi_pct", "peak_dd_pct"):
-        vals = per_fold[col].to_numpy(dtype=np.float64) if col in (
-            "mean_R", "roi_pct", "peak_dd_pct") else per_fold[col].to_numpy()
+        vals = (
+            per_fold[col].to_numpy(dtype=np.float64)
+            if col in ("mean_R", "roi_pct", "peak_dd_pct")
+            else per_fold[col].to_numpy()
+        )
         if not np.all(np.isfinite(vals.astype(np.float64))):
-            raise RuntimeError(
-                f"HALT (gate 6.8) {spec_id}: non-finite {col} in per_fold")
+            raise RuntimeError(f"HALT (gate 6.8) {spec_id}: non-finite {col} in per_fold")
 
 
 # ---------------------------------------------------------------------------
@@ -511,26 +536,24 @@ def run_pipeline(output_dir: Path) -> Dict[str, Any]:
 
     # Build subsets via the locked Round 3E primitive (includes gate 2.1 cell
     # count reproduction internally).
-    print("[setup] building locked subsets via r2.build_subsets()...",
-          flush=True)
+    print("[setup] building locked subsets via r2.build_subsets()...", flush=True)
     labels_df, subsets = r2.build_subsets()
-    fold_by_tid = dict(zip(labels_df["trade_id"].astype(int),
-                            labels_df["fold_id"].astype(int)))
-    print(f"  S1_q5q2 n={len(subsets['S1_q5q2'])}; "
-          f"S4_q5xq2q3 n={len(subsets['S4_q5xq2q3'])}; "
-          f"S5_q4q5xq2q3 n={len(subsets['S5_q4q5xq2q3'])}",
-          flush=True)
+    dict(zip(labels_df["trade_id"].astype(int), labels_df["fold_id"].astype(int)))
+    print(
+        f"  S1_q5q2 n={len(subsets['S1_q5q2'])}; "
+        f"S4_q5xq2q3 n={len(subsets['S4_q5xq2q3'])}; "
+        f"S5_q4q5xq2q3 n={len(subsets['S5_q4q5xq2q3'])}",
+        flush=True,
+    )
 
     print("[setup] building trade context...", flush=True)
     ti_full, T_by_tid = build_trade_context()
     n_trades = int(ti_full["trade_id"].max()) + 1
     if n_trades != 3993:
-        raise RuntimeError(
-            f"HALT (setup): expected 3993 trades, got {n_trades}")
+        raise RuntimeError(f"HALT (setup): expected 3993 trades, got {n_trades}")
 
     print("[setup] loading per_bar_paths.csv arrays...", flush=True)
-    rmae, rmfe, bl, bh, bc, nbo, hnb, starts, ends, _ = \
-        load_per_bar_arrays(n_trades)
+    rmae, rmfe, bl, bh, bc, nbo, hnb, starts, ends, _ = load_per_bar_arrays(n_trades)
 
     # Static lookahead audit (gates 6.2, 6.3).
     audit = audit_lookahead()
@@ -541,13 +564,21 @@ def run_pipeline(output_dir: Path) -> Dict[str, Any]:
     results: Dict[str, Any] = {}
     for spec in SPECS:
         sid = spec["id"]
-        print(f"[spec] running {sid} ({spec['exit_desc']})...",
-              flush=True)
+        print(f"[spec] running {sid} ({spec['exit_desc']})...", flush=True)
         trade_ids = subsets[spec["subset_id"]]
         per_trade = run_spec(
-            spec=spec, trade_ids=trade_ids, T_by_tid=T_by_tid,
-            rmae=rmae, rmfe=rmfe, bl=bl, bh=bh, bc=bc,
-            nbo=nbo, hnb=hnb, starts=starts, ends=ends,
+            spec=spec,
+            trade_ids=trade_ids,
+            T_by_tid=T_by_tid,
+            rmae=rmae,
+            rmfe=rmfe,
+            bl=bl,
+            bh=bh,
+            bc=bc,
+            nbo=nbo,
+            hnb=hnb,
+            starts=starts,
+            ends=ends,
         )
         per_fold = aggregate_per_fold(per_trade)
         assert_per_fold_finite(per_fold, sid)
@@ -564,44 +595,53 @@ def run_pipeline(output_dir: Path) -> Dict[str, Any]:
         # Gate disposition (Spec B only).
         if spec.get("gate"):
             gate = evaluate_gate_b(per_fold, agg)
-            gate_df = pd.DataFrame([{
-                "fold_id": "aggregate",
-                "disposition": gate["disposition"],
-                "pass_roi": gate["pass_roi"],
-                "pass_dd": gate["pass_dd"],
-                "pass_n": gate["pass_n"],
-                "clean_null_flag": gate["clean_null_flag"],
-                "consistency_check": gate["consistency_check"],
-                "trade_count_sanity": gate["trade_count_sanity"],
-                "worst_fold_roi_pct": agg["worst_fold_roi_pct"],
-                "worst_fold_dd_pct": agg["worst_fold_dd_pct"],
-                "smallest_fold_n_held": agg["smallest_fold_n_held"],
-                "pooled_mean_R": agg["pooled_mean_R"],
-            }])
+            gate_df = pd.DataFrame(
+                [
+                    {
+                        "fold_id": "aggregate",
+                        "disposition": gate["disposition"],
+                        "pass_roi": gate["pass_roi"],
+                        "pass_dd": gate["pass_dd"],
+                        "pass_n": gate["pass_n"],
+                        "clean_null_flag": gate["clean_null_flag"],
+                        "consistency_check": gate["consistency_check"],
+                        "trade_count_sanity": gate["trade_count_sanity"],
+                        "worst_fold_roi_pct": agg["worst_fold_roi_pct"],
+                        "worst_fold_dd_pct": agg["worst_fold_dd_pct"],
+                        "smallest_fold_n_held": agg["smallest_fold_n_held"],
+                        "pooled_mean_R": agg["pooled_mean_R"],
+                    }
+                ]
+            )
             _write_csv(gate_df, spec_dir / "fold_disposition.csv")
             results[sid] = {
-                "per_trade": per_trade, "per_fold": per_fold,
-                "agg": agg, "gate": gate,
+                "per_trade": per_trade,
+                "per_fold": per_fold,
+                "agg": agg,
+                "gate": gate,
             }
         else:
             results[sid] = {
-                "per_trade": per_trade, "per_fold": per_fold,
-                "agg": agg, "gate": None,
+                "per_trade": per_trade,
+                "per_fold": per_fold,
+                "agg": agg,
+                "gate": None,
             }
-        print(f"  {sid}: n_taken_all={agg['n_taken_all']}; "
-              f"pooled_mean_R={agg['pooled_mean_R']:+.6f}; "
-              f"worst_roi={agg['worst_fold_roi_pct']:+.4f}%; "
-              f"worst_dd={agg['worst_fold_dd_pct']:.4f}%; "
-              f"smallest_n_held={agg['smallest_fold_n_held']}",
-              flush=True)
+        print(
+            f"  {sid}: n_taken_all={agg['n_taken_all']}; "
+            f"pooled_mean_R={agg['pooled_mean_R']:+.6f}; "
+            f"worst_roi={agg['worst_fold_roi_pct']:+.4f}%; "
+            f"worst_dd={agg['worst_fold_dd_pct']:.4f}%; "
+            f"smallest_n_held={agg['smallest_fold_n_held']}",
+            flush=True,
+        )
 
     # Gate 6.6 — locked-input re-check.
     print("[gate 6.6] re-verifying locked inputs post-run...", flush=True)
     post_shas = _verify_locked("gate 6.6 post-run")
     for rel, h in pre_shas.items():
         if post_shas[rel] != h:
-            raise RuntimeError(
-                f"HALT (gate 6.6) input drift on {rel}")
+            raise RuntimeError(f"HALT (gate 6.6) input drift on {rel}")
 
     return {
         "pre_shas": pre_shas,
@@ -621,11 +661,9 @@ OUTPUT_FILES_PER_SPEC: Tuple[str, ...] = (
 )
 
 
-def determinism_audit(primary_dir: Path, secondary_dir: Path
-                       ) -> Dict[str, Any]:
+def determinism_audit(primary_dir: Path, secondary_dir: Path) -> Dict[str, Any]:
     """Compare every output file between two runs. HALT on any diff."""
-    print(f"[gate 6.4] determinism audit: {primary_dir} vs {secondary_dir}",
-          flush=True)
+    print(f"[gate 6.4] determinism audit: {primary_dir} vs {secondary_dir}", flush=True)
     diffs: List[str] = []
     file_pairs: List[Tuple[Path, Path]] = []
     for spec in SPECS:
@@ -647,18 +685,17 @@ def determinism_audit(primary_dir: Path, secondary_dir: Path
         s1 = _sha256_file(p1)
         s2 = _sha256_file(p2)
         if s1 != s2:
-            diffs.append(
-                f"  {p1.name} ({p1.parent.name}): "
-                f"pass1={s1[:12]}.. pass2={s2[:12]}..")
+            diffs.append(f"  {p1.name} ({p1.parent.name}): pass1={s1[:12]}.. pass2={s2[:12]}..")
 
     if diffs:
         raise RuntimeError(
             "HALT (gate 6.4) determinism violation — pass-1 and pass-2 "
-            "outputs differ:\n" + "\n".join(diffs))
+            "outputs differ:\n" + "\n".join(diffs)
+        )
 
     return {
         "gate_6_4_determinism": "PASS (all output files byte-identical "
-                                  "across two consecutive runs)",
+        "across two consecutive runs)",
         "n_files_compared": len(file_pairs),
     }
 
@@ -666,14 +703,19 @@ def determinism_audit(primary_dir: Path, secondary_dir: Path
 # ---------------------------------------------------------------------------
 # Run manifest
 # ---------------------------------------------------------------------------
-def write_run_manifest(*, output_dir: Path,
-                        pre_shas: Dict[str, str],
-                        post_shas: Dict[str, str],
-                        derived_shas: Dict[str, str],
-                        output_shas: Dict[str, str],
-                        wallclock_s: float, peak_rss_bytes: int,
-                        git_head: str, audit: Dict[str, Any],
-                        determinism: Dict[str, Any]) -> Path:
+def write_run_manifest(
+    *,
+    output_dir: Path,
+    pre_shas: Dict[str, str],
+    post_shas: Dict[str, str],
+    derived_shas: Dict[str, str],
+    output_shas: Dict[str, str],
+    wallclock_s: float,
+    peak_rss_bytes: int,
+    git_head: str,
+    audit: Dict[str, Any],
+    determinism: Dict[str, Any],
+) -> Path:
     path = output_dir / "run_manifest.txt"
     with path.open("w", encoding="utf-8") as fp:
         fp.write("# Phase L6 Arc 2 Phase 3 — WFO run manifest\n")
@@ -686,8 +728,7 @@ def write_run_manifest(*, output_dir: Path,
         fp.write("\n## Locked inputs (gate 6.1 / 6.6)\n")
         for rel, h in pre_shas.items():
             fp.write(f"  {h}  {rel}\n")
-        post_drift = [rel for rel, h in pre_shas.items()
-                       if post_shas[rel] != h]
+        post_drift = [rel for rel, h in pre_shas.items() if post_shas[rel] != h]
         fp.write(f"post-run drift: {'none' if not post_drift else post_drift}\n")
         fp.write("\n## Derived inputs (verified via r2.build_subsets gate 2.1)\n")
         for rel, h in derived_shas.items():
@@ -736,9 +777,19 @@ def _df_to_md(df: pd.DataFrame) -> str:
 
 
 def _fmt_per_fold_table(per_fold: pd.DataFrame) -> str:
-    cols = ["fold_id", "n_taken", "n_cut", "n_held",
-            "mean_R", "sum_R", "roi_pct", "peak_dd_pct",
-            "n_sl", "n_te", "n_de"]
+    cols = [
+        "fold_id",
+        "n_taken",
+        "n_cut",
+        "n_held",
+        "mean_R",
+        "sum_R",
+        "roi_pct",
+        "peak_dd_pct",
+        "n_sl",
+        "n_te",
+        "n_de",
+    ]
     df = per_fold[cols].copy()
     df["mean_R"] = df["mean_R"].map(lambda v: f"{v:+.5f}")
     df["sum_R"] = df["sum_R"].map(lambda v: f"{v:+.4f}")
@@ -748,11 +799,18 @@ def _fmt_per_fold_table(per_fold: pd.DataFrame) -> str:
 
 
 def write_result_doc(
-    *, output_dir: Path, results: Dict[str, Any],
-    pre_shas: Dict[str, str], post_shas: Dict[str, str],
-    derived_shas: Dict[str, str], output_shas: Dict[str, str],
-    audit: Dict[str, Any], determinism: Dict[str, Any],
-    wallclock_s: float, peak_rss_bytes: int, git_head: str,
+    *,
+    output_dir: Path,
+    results: Dict[str, Any],
+    pre_shas: Dict[str, str],
+    post_shas: Dict[str, str],
+    derived_shas: Dict[str, str],
+    output_shas: Dict[str, str],
+    audit: Dict[str, Any],
+    determinism: Dict[str, Any],
+    wallclock_s: float,
+    peak_rss_bytes: int,
+    git_head: str,
 ) -> Path:
     out_path = REPO_ROOT / "docs" / "PHASE_L6_ARC2_P3_RESULT.md"
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -765,33 +823,39 @@ def write_result_doc(
     lines.append("# Phase L6 Arc 2 Phase 3 — WFO Result")
     lines.append("")
     lines.append("**Status:** CLOSED")
-    lines.append("**Methodology:** L6.0 v1.1 §14.2 derivative arc, §3 "
-                  "pre-committed gate")
+    lines.append("**Methodology:** L6.0 v1.1 §14.2 derivative arc, §3 pre-committed gate")
     lines.append(f"**Result generated:** {time.strftime('%Y-%m-%d %H:%M:%S')}")
-    lines.append("**Disposition (Spec B):** "
-                  f"`{b['gate']['disposition']}`"
-                  + (" + CLEAN NULL" if b['gate']['clean_null_flag'] else ""))
-    lines.append(f"**Consistency check:** `{b['gate']['consistency_check']}` "
-                  f"(pooled mean R = "
-                  f"{b['gate']['consistency_pooled_mean_R']:+.6f}; "
-                  f"locked range "
-                  f"[{CONSISTENCY_RANGE[0]:+.3f}, "
-                  f"{CONSISTENCY_RANGE[1]:+.3f}])")
+    lines.append(
+        "**Disposition (Spec B):** "
+        f"`{b['gate']['disposition']}`" + (" + CLEAN NULL" if b["gate"]["clean_null_flag"] else "")
+    )
+    lines.append(
+        f"**Consistency check:** `{b['gate']['consistency_check']}` "
+        f"(pooled mean R = "
+        f"{b['gate']['consistency_pooled_mean_R']:+.6f}; "
+        f"locked range "
+        f"[{CONSISTENCY_RANGE[0]:+.3f}, "
+        f"{CONSISTENCY_RANGE[1]:+.3f}])"
+    )
     lines.append("")
 
     lines.append("## Locked input sha256 manifest")
     lines.append("")
-    lines.append("All 8 Phase 3 locked inputs verified at run start "
-                  "(gate 6.1) and re-verified at run end (gate 6.6). No "
-                  "drift.")
+    lines.append(
+        "All 8 Phase 3 locked inputs verified at run start "
+        "(gate 6.1) and re-verified at run end (gate 6.6). No "
+        "drift."
+    )
     lines.append("")
     lines.append("| sha256 | path |")
     lines.append("|---|---|")
     for rel, h in pre_shas.items():
         lines.append(f"| `{h}` | `{rel}` |")
     lines.append("")
-    lines.append("Derived inputs (transitively verified via "
-                  "`r2.build_subsets()` gate 2.1 cell-count reproduction):")
+    lines.append(
+        "Derived inputs (transitively verified via "
+        "`r2.build_subsets()` gate 2.1 cell-count reproduction):"
+    )
     lines.append("")
     lines.append("| sha256 | path |")
     lines.append("|---|---|")
@@ -810,25 +874,27 @@ def write_result_doc(
     for k, v in audit.items():
         lines.append(f"- **{k}:** {v}")
     lines.append("")
-    lines.append("Detail: the filter uses `r2.build_subsets()` which "
-                  "evaluates only bar-N-close observables and the locked "
-                  "numeric quintile thresholds from OPEN doc §1.1. The "
-                  "exit simulator (`r3e.variant_RR` / `r3e.variant_QQ`) "
-                  "iterates `k` using only `running_mae_atr`, "
-                  "`running_mfe_atr`, `bar_close_atr`, "
-                  "`next_bar_open_atr` and `has_next_bar` at bar k. No "
-                  "future-bar references in either path.")
+    lines.append(
+        "Detail: the filter uses `r2.build_subsets()` which "
+        "evaluates only bar-N-close observables and the locked "
+        "numeric quintile thresholds from OPEN doc §1.1. The "
+        "exit simulator (`r3e.variant_RR` / `r3e.variant_QQ`) "
+        "iterates `k` using only `running_mae_atr`, "
+        "`running_mfe_atr`, `bar_close_atr`, "
+        "`next_bar_open_atr` and `has_next_bar` at bar k. No "
+        "future-bar references in either path."
+    )
     lines.append("")
 
     # Spec B disposition.
-    lines.append("## Spec B (LOCKED) — S4 + RR04 — disposition: "
-                  f"**{b['gate']['disposition']}**")
+    lines.append(f"## Spec B (LOCKED) — S4 + RR04 — disposition: **{b['gate']['disposition']}**")
     lines.append("")
-    lines.append("Filter: `concurrent_signals_same_bar` Q5 AND "
-                  "`dist_d1_kijun_atr` Q2 ∪ Q3.")
-    lines.append("Exit: SL at -2 ATR throughout; early-cut at k=20 if "
-                  "`bar_close_atr` <= -0.5; conditional H240 at k=120 if "
-                  "`bar_close_atr` >= +4.0; else time-exit at k=120.")
+    lines.append("Filter: `concurrent_signals_same_bar` Q5 AND `dist_d1_kijun_atr` Q2 ∪ Q3.")
+    lines.append(
+        "Exit: SL at -2 ATR throughout; early-cut at k=20 if "
+        "`bar_close_atr` <= -0.5; conditional H240 at k=120 if "
+        "`bar_close_atr` >= +4.0; else time-exit at k=120."
+    )
     lines.append("")
     lines.append("### Per-fold metrics")
     lines.append("")
@@ -836,79 +902,100 @@ def write_result_doc(
     lines.append("")
     lines.append("### Aggregate")
     lines.append("")
-    lines.append(f"- n_taken (pool): **{b['agg']['n_taken_all']}** "
-                  f"(of which {b['agg']['n_cut_all']} early-cut)")
+    lines.append(
+        f"- n_taken (pool): **{b['agg']['n_taken_all']}** "
+        f"(of which {b['agg']['n_cut_all']} early-cut)"
+    )
     lines.append(f"- pooled mean R: **{b['agg']['pooled_mean_R']:+.6f}**")
     lines.append(f"- pooled sum R: **{b['agg']['pooled_sum_R']:+.4f}**")
-    lines.append(f"- worst-fold ROI: **{b['agg']['worst_fold_roi_pct']:+.4f}%** "
-                  f"(gate floor: > {GATE_ROI_FLOOR:.1f}%)")
-    lines.append(f"- worst-fold DD: **{b['agg']['worst_fold_dd_pct']:.4f}%** "
-                  f"(gate ceil: < {GATE_DD_CEIL:.1f}%)")
-    lines.append(f"- smallest-fold n_held: **{b['agg']['smallest_fold_n_held']}** "
-                  f"(gate floor: ≥ {GATE_N_HELD_FLOOR})")
-    lines.append(f"- smallest-fold n_taken: "
-                  f"{b['agg']['smallest_fold_n_taken']}; "
-                  f"largest-fold n_taken: "
-                  f"{b['agg']['largest_fold_n_taken']} "
-                  f"(sanity range [{TRADE_COUNT_LB}, {TRADE_COUNT_UB}])")
-    lines.append(f"- max single-fold share of pooled sum R: "
-                  f"{b['agg']['max_single_fold_sum_R_share']:.3f} "
-                  f"(CLEAN NULL trigger: > {CLEAN_NULL_FOLD_SHARE:.2f})")
+    lines.append(
+        f"- worst-fold ROI: **{b['agg']['worst_fold_roi_pct']:+.4f}%** "
+        f"(gate floor: > {GATE_ROI_FLOOR:.1f}%)"
+    )
+    lines.append(
+        f"- worst-fold DD: **{b['agg']['worst_fold_dd_pct']:.4f}%** "
+        f"(gate ceil: < {GATE_DD_CEIL:.1f}%)"
+    )
+    lines.append(
+        f"- smallest-fold n_held: **{b['agg']['smallest_fold_n_held']}** "
+        f"(gate floor: ≥ {GATE_N_HELD_FLOOR})"
+    )
+    lines.append(
+        f"- smallest-fold n_taken: "
+        f"{b['agg']['smallest_fold_n_taken']}; "
+        f"largest-fold n_taken: "
+        f"{b['agg']['largest_fold_n_taken']} "
+        f"(sanity range [{TRADE_COUNT_LB}, {TRADE_COUNT_UB}])"
+    )
+    lines.append(
+        f"- max single-fold share of pooled sum R: "
+        f"{b['agg']['max_single_fold_sum_R_share']:.3f} "
+        f"(CLEAN NULL trigger: > {CLEAN_NULL_FOLD_SHARE:.2f})"
+    )
     lines.append("")
     lines.append("### Gate conditions (§1.3 / gate 6.5 / 6.9)")
     lines.append("")
     lines.append(f"- `pass_roi`: **{b['gate']['pass_roi']}**")
     lines.append(f"- `pass_dd`:  **{b['gate']['pass_dd']}**")
     lines.append(f"- `pass_n`:   **{b['gate']['pass_n']}**")
-    lines.append(f"- consistency check (gate 6.5): "
-                  f"**{b['gate']['consistency_check']}**")
-    lines.append(f"- trade-count sanity (gate 6.9): "
-                  f"**{b['gate']['trade_count_sanity']}**")
+    lines.append(f"- consistency check (gate 6.5): **{b['gate']['consistency_check']}**")
+    lines.append(f"- trade-count sanity (gate 6.9): **{b['gate']['trade_count_sanity']}**")
     lines.append(f"- CLEAN NULL flag: **{b['gate']['clean_null_flag']}**")
     lines.append("")
-    lines.append(f"**Overall disposition: `{b['gate']['disposition']}`"
-                  + (" + CLEAN NULL" if b['gate']['clean_null_flag'] else "")
-                  + "**")
+    lines.append(
+        f"**Overall disposition: `{b['gate']['disposition']}`"
+        + (" + CLEAN NULL" if b["gate"]["clean_null_flag"] else "")
+        + "**"
+    )
     lines.append("")
 
     # Spec A.
     lines.append("## Spec A (sensitivity) — S1 + QQ01 — no disposition")
     lines.append("")
-    lines.append("Filter: `concurrent_signals_same_bar` Q5 AND "
-                  "`dist_d1_kijun_atr` Q2 (narrower D1 range).")
-    lines.append("Exit: SL at -2 ATR; at k=120 if running_mfe ever "
-                  "reached +4.0 ATR in [1,120] extend to H240, else "
-                  "time-exit at k=120. No early-cut.")
+    lines.append(
+        "Filter: `concurrent_signals_same_bar` Q5 AND `dist_d1_kijun_atr` Q2 (narrower D1 range)."
+    )
+    lines.append(
+        "Exit: SL at -2 ATR; at k=120 if running_mfe ever "
+        "reached +4.0 ATR in [1,120] extend to H240, else "
+        "time-exit at k=120. No early-cut."
+    )
     lines.append("")
     lines.append("### Per-fold metrics")
     lines.append("")
     lines.append(_fmt_per_fold_table(a["per_fold"]))
     lines.append("")
-    lines.append(f"- n_taken (pool): **{a['agg']['n_taken_all']}**; "
-                  f"pooled mean R: **{a['agg']['pooled_mean_R']:+.6f}**; "
-                  f"worst-fold ROI: **{a['agg']['worst_fold_roi_pct']:+.4f}%**; "
-                  f"worst-fold DD: **{a['agg']['worst_fold_dd_pct']:.4f}%**; "
-                  f"smallest-fold n_held: "
-                  f"**{a['agg']['smallest_fold_n_held']}**")
+    lines.append(
+        f"- n_taken (pool): **{a['agg']['n_taken_all']}**; "
+        f"pooled mean R: **{a['agg']['pooled_mean_R']:+.6f}**; "
+        f"worst-fold ROI: **{a['agg']['worst_fold_roi_pct']:+.4f}%**; "
+        f"worst-fold DD: **{a['agg']['worst_fold_dd_pct']:.4f}%**; "
+        f"smallest-fold n_held: "
+        f"**{a['agg']['smallest_fold_n_held']}**"
+    )
     lines.append("")
 
     # Spec C.
     lines.append("## Spec C (sensitivity) — S5 + RR04 exit — no disposition")
     lines.append("")
-    lines.append("Filter: `concurrent_signals_same_bar` ∈ {Q4, Q5} AND "
-                  "`dist_d1_kijun_atr` ∈ {Q2, Q3} (wider concurrent).")
+    lines.append(
+        "Filter: `concurrent_signals_same_bar` ∈ {Q4, Q5} AND "
+        "`dist_d1_kijun_atr` ∈ {Q2, Q3} (wider concurrent)."
+    )
     lines.append("Exit: same as Spec B.")
     lines.append("")
     lines.append("### Per-fold metrics")
     lines.append("")
     lines.append(_fmt_per_fold_table(c["per_fold"]))
     lines.append("")
-    lines.append(f"- n_taken (pool): **{c['agg']['n_taken_all']}**; "
-                  f"pooled mean R: **{c['agg']['pooled_mean_R']:+.6f}**; "
-                  f"worst-fold ROI: **{c['agg']['worst_fold_roi_pct']:+.4f}%**; "
-                  f"worst-fold DD: **{c['agg']['worst_fold_dd_pct']:.4f}%**; "
-                  f"smallest-fold n_held: "
-                  f"**{c['agg']['smallest_fold_n_held']}**")
+    lines.append(
+        f"- n_taken (pool): **{c['agg']['n_taken_all']}**; "
+        f"pooled mean R: **{c['agg']['pooled_mean_R']:+.6f}**; "
+        f"worst-fold ROI: **{c['agg']['worst_fold_roi_pct']:+.4f}%**; "
+        f"worst-fold DD: **{c['agg']['worst_fold_dd_pct']:.4f}%**; "
+        f"smallest-fold n_held: "
+        f"**{c['agg']['smallest_fold_n_held']}**"
+    )
     lines.append("")
 
     # Cross-spec.
@@ -916,44 +1003,53 @@ def write_result_doc(
     lines.append("")
     rank_rows: List[Dict[str, Any]] = []
     for fid in range(1, N_FOLDS + 1):
-        bv = float(b["per_fold"].loc[b["per_fold"]["fold_id"] == fid,
-                                      "roi_pct"].iloc[0])
-        av = float(a["per_fold"].loc[a["per_fold"]["fold_id"] == fid,
-                                      "roi_pct"].iloc[0])
-        cv = float(c["per_fold"].loc[c["per_fold"]["fold_id"] == fid,
-                                      "roi_pct"].iloc[0])
-        rank_rows.append({"fold_id": fid,
-                          "B_roi_pct": f"{bv:+.3f}%",
-                          "A_roi_pct": f"{av:+.3f}%",
-                          "C_roi_pct": f"{cv:+.3f}%"})
+        bv = float(b["per_fold"].loc[b["per_fold"]["fold_id"] == fid, "roi_pct"].iloc[0])
+        av = float(a["per_fold"].loc[a["per_fold"]["fold_id"] == fid, "roi_pct"].iloc[0])
+        cv = float(c["per_fold"].loc[c["per_fold"]["fold_id"] == fid, "roi_pct"].iloc[0])
+        rank_rows.append(
+            {
+                "fold_id": fid,
+                "B_roi_pct": f"{bv:+.3f}%",
+                "A_roi_pct": f"{av:+.3f}%",
+                "C_roi_pct": f"{cv:+.3f}%",
+            }
+        )
     lines.append("### Per-fold ROI comparison")
     lines.append("")
     lines.append(_df_to_md(pd.DataFrame(rank_rows)))
     lines.append("")
     lines.append("### Subset filter sensitivity")
     lines.append("")
-    lines.append("Spec A narrows the dist filter from Q2 ∪ Q3 (Spec B) to "
-                  "Q2 only and changes the exit confirmation to MFE-based; "
-                  "Spec C widens concurrent from Q5 to Q4 ∪ Q5 but keeps "
-                  "Spec B's exit. Comparing per-fold ROI signs across "
-                  "specs indicates whether Spec B's per-fold sign is "
-                  "stable to subset choice or fragile to it.")
+    lines.append(
+        "Spec A narrows the dist filter from Q2 ∪ Q3 (Spec B) to "
+        "Q2 only and changes the exit confirmation to MFE-based; "
+        "Spec C widens concurrent from Q5 to Q4 ∪ Q5 but keeps "
+        "Spec B's exit. Comparing per-fold ROI signs across "
+        "specs indicates whether Spec B's per-fold sign is "
+        "stable to subset choice or fragile to it."
+    )
     lines.append("")
     bs = b["per_fold"]["roi_pct"].to_numpy()
     aps = a["per_fold"]["roi_pct"].to_numpy()
     cps = c["per_fold"]["roi_pct"].to_numpy()
-    lines.append(f"- B per-fold ROI signs: "
-                  f"{(bs > 0).sum()} positive / "
-                  f"{(bs < 0).sum()} negative / "
-                  f"{(bs == 0).sum()} zero")
-    lines.append(f"- A per-fold ROI signs: "
-                  f"{(aps > 0).sum()} positive / "
-                  f"{(aps < 0).sum()} negative / "
-                  f"{(aps == 0).sum()} zero")
-    lines.append(f"- C per-fold ROI signs: "
-                  f"{(cps > 0).sum()} positive / "
-                  f"{(cps < 0).sum()} negative / "
-                  f"{(cps == 0).sum()} zero")
+    lines.append(
+        f"- B per-fold ROI signs: "
+        f"{(bs > 0).sum()} positive / "
+        f"{(bs < 0).sum()} negative / "
+        f"{(bs == 0).sum()} zero"
+    )
+    lines.append(
+        f"- A per-fold ROI signs: "
+        f"{(aps > 0).sum()} positive / "
+        f"{(aps < 0).sum()} negative / "
+        f"{(aps == 0).sum()} zero"
+    )
+    lines.append(
+        f"- C per-fold ROI signs: "
+        f"{(cps > 0).sum()} positive / "
+        f"{(cps < 0).sum()} negative / "
+        f"{(cps == 0).sum()} zero"
+    )
     lines.append("")
 
     # Output artefacts.
@@ -964,9 +1060,11 @@ def write_result_doc(
     for rel, h in output_shas.items():
         lines.append(f"| `{h}` | `{rel}` |")
     lines.append("")
-    lines.append(f"Wallclock: {wallclock_s:.2f}s; peak RSS: "
-                  f"{peak_rss_bytes / (1024 * 1024):.1f} MiB; "
-                  f"git HEAD: `{git_head}`")
+    lines.append(
+        f"Wallclock: {wallclock_s:.2f}s; peak RSS: "
+        f"{peak_rss_bytes / (1024 * 1024):.1f} MiB; "
+        f"git HEAD: `{git_head}`"
+    )
     lines.append("")
 
     out_path.write_text("\n".join(lines), encoding="utf-8")
@@ -1002,7 +1100,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     print("PASS 2 — determinism replay", flush=True)
     print("=" * 70, flush=True)
     secondary_dir.mkdir(parents=True, exist_ok=True)
-    pass2 = run_pipeline(secondary_dir)
+    run_pipeline(secondary_dir)
 
     # Gate 6.4 — determinism diff.
     determinism = determinism_audit(primary_dir, secondary_dir)
@@ -1025,18 +1123,27 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     manifest_path = write_run_manifest(
         output_dir=primary_dir,
-        pre_shas=pass1["pre_shas"], post_shas=pass1["post_shas"],
-        derived_shas=derived_shas, output_shas=output_shas,
-        wallclock_s=elapsed, peak_rss_bytes=peak_bytes,
-        git_head=git_head, audit=pass1["audit"],
+        pre_shas=pass1["pre_shas"],
+        post_shas=pass1["post_shas"],
+        derived_shas=derived_shas,
+        output_shas=output_shas,
+        wallclock_s=elapsed,
+        peak_rss_bytes=peak_bytes,
+        git_head=git_head,
+        audit=pass1["audit"],
         determinism=determinism,
     )
     result_path = write_result_doc(
-        output_dir=primary_dir, results=pass1["results"],
-        pre_shas=pass1["pre_shas"], post_shas=pass1["post_shas"],
-        derived_shas=derived_shas, output_shas=output_shas,
-        audit=pass1["audit"], determinism=determinism,
-        wallclock_s=elapsed, peak_rss_bytes=peak_bytes,
+        output_dir=primary_dir,
+        results=pass1["results"],
+        pre_shas=pass1["pre_shas"],
+        post_shas=pass1["post_shas"],
+        derived_shas=derived_shas,
+        output_shas=output_shas,
+        audit=pass1["audit"],
+        determinism=determinism,
+        wallclock_s=elapsed,
+        peak_rss_bytes=peak_bytes,
         git_head=git_head,
     )
 
@@ -1049,47 +1156,52 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     print()
     print("Gate dispositions:")
-    print(f"  6.1 locked-input verification (pre-run):  PASS (8 inputs)")
-    print(f"  6.2 filter lookahead audit:                "
-          f"{pass1['audit']['gate_6_2_filter_lookahead']}")
-    print(f"  6.3 exit lookahead audit:                  "
-          f"{pass1['audit']['gate_6_3_exit_lookahead']}")
-    print(f"  6.4 determinism:                           "
-          f"{determinism['gate_6_4_determinism']}")
-    print(f"  6.5 consistency (Spec B pooled mean R):    "
-          f"{b['gate']['consistency_check']}")
-    print(f"  6.6 locked-input re-verification:          PASS (no drift)")
-    print(f"  6.8 per-fold sanity:                       "
-          f"PASS (all per-fold metrics finite)")
-    print(f"  6.9 trade-count sanity (Spec B):           "
-          f"{b['gate']['trade_count_sanity']}")
+    print("  6.1 locked-input verification (pre-run):  PASS (8 inputs)")
+    print(
+        f"  6.2 filter lookahead audit:                "
+        f"{pass1['audit']['gate_6_2_filter_lookahead']}"
+    )
+    print(
+        f"  6.3 exit lookahead audit:                  {pass1['audit']['gate_6_3_exit_lookahead']}"
+    )
+    print(f"  6.4 determinism:                           {determinism['gate_6_4_determinism']}")
+    print(f"  6.5 consistency (Spec B pooled mean R):    {b['gate']['consistency_check']}")
+    print("  6.6 locked-input re-verification:          PASS (no drift)")
+    print("  6.8 per-fold sanity:                       PASS (all per-fold metrics finite)")
+    print(f"  6.9 trade-count sanity (Spec B):           {b['gate']['trade_count_sanity']}")
     print()
 
-    for sid, r in (("Spec B (LOCKED) S4+RR04", b),
-                    ("Spec A (sens) S1+QQ01", a),
-                    ("Spec C (sens) S5+RR04", c)):
+    for sid, r in (
+        ("Spec B (LOCKED) S4+RR04", b),
+        ("Spec A (sens) S1+QQ01", a),
+        ("Spec C (sens) S5+RR04", c),
+    ):
         print(f"--- {sid} ---")
-        pf = r["per_fold"][["fold_id", "n_taken", "n_held",
-                              "mean_R", "roi_pct", "peak_dd_pct"]]
+        pf = r["per_fold"][["fold_id", "n_taken", "n_held", "mean_R", "roi_pct", "peak_dd_pct"]]
         print(pf.to_string(index=False))
         ag = r["agg"]
-        print(f"  worst-fold ROI: {ag['worst_fold_roi_pct']:+.4f}%; "
-              f"worst-fold DD: {ag['worst_fold_dd_pct']:.4f}%; "
-              f"smallest-fold n_held: {ag['smallest_fold_n_held']}")
+        print(
+            f"  worst-fold ROI: {ag['worst_fold_roi_pct']:+.4f}%; "
+            f"worst-fold DD: {ag['worst_fold_dd_pct']:.4f}%; "
+            f"smallest-fold n_held: {ag['smallest_fold_n_held']}"
+        )
         print()
 
-    print(f"Spec B disposition: {b['gate']['disposition']}"
-          + (" + CLEAN NULL" if b['gate']['clean_null_flag'] else ""))
-    print(f"Spec B consistency check: {b['gate']['consistency_check']} "
-          f"(pooled mean R = "
-          f"{b['gate']['consistency_pooled_mean_R']:+.6f})")
+    print(
+        f"Spec B disposition: {b['gate']['disposition']}"
+        + (" + CLEAN NULL" if b["gate"]["clean_null_flag"] else "")
+    )
+    print(
+        f"Spec B consistency check: {b['gate']['consistency_check']} "
+        f"(pooled mean R = "
+        f"{b['gate']['consistency_pooled_mean_R']:+.6f})"
+    )
     print()
 
     print(f"Output manifest: {manifest_path.relative_to(REPO_ROOT)}")
     print(f"Result doc:      {result_path.relative_to(REPO_ROOT)}")
     print()
-    print(f"Wallclock: {elapsed:.2f}s; peak RSS: "
-          f"{peak_bytes / (1024 * 1024):.1f} MiB")
+    print(f"Wallclock: {elapsed:.2f}s; peak RSS: {peak_bytes / (1024 * 1024):.1f} MiB")
     print(f"Git HEAD: {git_head}")
     print()
 

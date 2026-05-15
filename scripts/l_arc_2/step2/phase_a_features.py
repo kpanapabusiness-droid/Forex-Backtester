@@ -1,3 +1,4 @@
+# ruff: noqa: E402  (sys.path.insert needed before project imports)
 """Phase A — feature augmentation for L Arc 2 step 2.
 
 Emits:
@@ -24,6 +25,7 @@ Lookahead invariants (per op spec §10.1, §10.4):
 
 Descriptive only — emits artefacts, no recommendations.
 """
+
 from __future__ import annotations
 
 import csv
@@ -40,8 +42,14 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from scripts.l_arc_2.step2._io import (
-    FORWARD_HORIZON_BARS_DEFAULT, H_GRID, PAIRS, STEP2_DIR, VERBATIM_TIME_EXIT_H,
-    load_pair_1h, load_signals_log, load_trades_verbatim, wilder_atr,
+    FORWARD_HORIZON_BARS_DEFAULT,
+    H_GRID,
+    PAIRS,
+    STEP2_DIR,
+    load_pair_1h,
+    load_signals_log,
+    load_trades_verbatim,
+    wilder_atr,
 )
 
 ATR_RATIO_THRESHOLDS = [0.5, 1.0, 1.5, 2.0, 3.0]
@@ -49,6 +57,7 @@ BASKET_CCYS = ["USD", "EUR", "JPY", "GBP"]
 
 
 # ----- Small helpers -----
+
 
 def _session_of_hour(h: int) -> str:
     if 22 <= h or h <= 7:
@@ -132,15 +141,18 @@ def _vol_decile(s: pd.Series) -> pd.Series:
 
 # ----- Cross-pair feature attachment -----
 
-def attach_concurrent_density(pair_data: Dict[str, pd.DataFrame],
-                              fires_by_pair: Dict[str, pd.DatetimeIndex]) -> None:
+
+def attach_concurrent_density(
+    pair_data: Dict[str, pd.DataFrame], fires_by_pair: Dict[str, pd.DatetimeIndex]
+) -> None:
     """Attach concurrent_signals_same_bar + concurrent_signals_within_3h to each pair df.
 
     Uses the union of fires across all 28 pairs on the 1H unified timeline.
     """
     all_ts = (
         pd.DatetimeIndex(np.concatenate([df["time"].values for df in pair_data.values()]))
-        .unique().sort_values()
+        .unique()
+        .sort_values()
     )
     fires = pd.Series(0, index=all_ts, dtype=np.int64)
     for fired_ts in fires_by_pair.values():
@@ -160,7 +172,8 @@ def attach_currency_basket(pair_data: Dict[str, pd.DataFrame], pairs: List[str])
     """Attach currency_basket_3h_{USD,EUR,JPY,GBP} computed from rolling 3-bar log returns."""
     all_ts = (
         pd.DatetimeIndex(np.concatenate([df["time"].values for df in pair_data.values()]))
-        .unique().sort_values()
+        .unique()
+        .sort_values()
     )
     lr_frame = pd.DataFrame(index=all_ts, dtype=np.float64)
     for pair in pairs:
@@ -196,9 +209,16 @@ def compute_atr_baseline(atr: np.ndarray, window: int = 200) -> np.ndarray:
 
 # ----- Per-trade forward + held path -----
 
-def per_trade_full_path(open_arr: np.ndarray, high_arr: np.ndarray,
-                        low_arr: np.ndarray, close_arr: np.ndarray,
-                        entry_idx: int, entry_price: float, H: int) -> Tuple[np.ndarray, ...]:
+
+def per_trade_full_path(
+    open_arr: np.ndarray,
+    high_arr: np.ndarray,
+    low_arr: np.ndarray,
+    close_arr: np.ndarray,
+    entry_idx: int,
+    entry_price: float,
+    H: int,
+) -> Tuple[np.ndarray, ...]:
     """Return (fwd_high_minus_entry, fwd_entry_minus_low, fwd_logret_cum, fwd_logret_step,
                 close_arr_slice, high_slice, low_slice, open_slice, avail).
 
@@ -252,11 +272,19 @@ def _first_hit(arr: np.ndarray, threshold: float, H: int) -> int:
     return int(where[0]) + 1
 
 
-def compute_path_aggregates(fhigh: np.ndarray, flow: np.ndarray,
-                            fcum: np.ndarray, fstep: np.ndarray,
-                            fclose: np.ndarray, fhigh_raw: np.ndarray,
-                            flow_raw: np.ndarray, entry_price: float,
-                            atr: float, H: int, held_bars: int) -> Dict[str, float]:
+def compute_path_aggregates(
+    fhigh: np.ndarray,
+    flow: np.ndarray,
+    fcum: np.ndarray,
+    fstep: np.ndarray,
+    fclose: np.ndarray,
+    fhigh_raw: np.ndarray,
+    flow_raw: np.ndarray,
+    entry_price: float,
+    atr: float,
+    H: int,
+    held_bars: int,
+) -> Dict[str, float]:
     """Compute full set of forward-horizon and HELD-window aggregates.
 
     `held_bars` is the verbatim trade's bars_held (1..120 for arc 2). Held aggregates
@@ -293,7 +321,9 @@ def compute_path_aggregates(fhigh: np.ndarray, flow: np.ndarray,
             out[f"bars_to_plus_{x}_atr_capped_{H}"] = np.nan
             out[f"bars_to_minus_{x}_atr_capped_{H}"] = np.nan
     for x in (0.5, 1.0, 2.0):
-        out[f"reached_plus_{x}_atr_within_{H}"] = int(np.any(fhigh >= x * atr)) if atr > 0 else np.nan
+        out[f"reached_plus_{x}_atr_within_{H}"] = (
+            int(np.any(fhigh >= x * atr)) if atr > 0 else np.nan
+        )
     b_pos1 = out.get(f"bars_to_plus_1.0_atr_capped_{H}", np.nan)
     b_neg1 = out.get(f"bars_to_minus_1.0_atr_capped_{H}", np.nan)
     out["race_bars_plus1_minus_minus1"] = (
@@ -305,17 +335,22 @@ def compute_path_aggregates(fhigh: np.ndarray, flow: np.ndarray,
         held_steps = fstep[:held_bars]
         steps_finite = held_steps[np.isfinite(held_steps)]
         if steps_finite.size >= 2:
-            signs = np.sign(steps_finite); signs[signs == 0] = 1
+            signs = np.sign(steps_finite)
+            signs[signs == 0] = 1
             oscillation = int(np.sum(np.abs(np.diff(signs)) > 0))
             monotonicity = float(np.sum(signs > 0) / signs.size)
             max_with = max_against = run_with = run_against = 0
             for s in signs:
                 if s > 0:
-                    run_with += 1; run_against = 0
+                    run_with += 1
+                    run_against = 0
                 else:
-                    run_against += 1; run_with = 0
-                if run_with > max_with: max_with = run_with
-                if run_against > max_against: max_against = run_against
+                    run_against += 1
+                    run_with = 0
+                if run_with > max_with:
+                    max_with = run_with
+                if run_against > max_against:
+                    max_against = run_against
             x = steps_finite - steps_finite.mean()
             denom = float(np.sum(x * x))
             acf1 = float(np.sum(x[:-1] * x[1:]) / denom) if denom > 0 else np.nan
@@ -323,11 +358,16 @@ def compute_path_aggregates(fhigh: np.ndarray, flow: np.ndarray,
             oscillation, monotonicity, max_with, max_against, acf1 = 0, np.nan, 0, 0, np.nan
         held_mfe = fhigh[:held_bars]
         held_mae = flow[:held_bars]
-        time_to_peak_mfe = int(np.nanargmax(held_mfe)) + 1 if np.any(np.isfinite(held_mfe)) else np.nan
-        time_to_trough_mae = int(np.nanargmax(held_mae)) + 1 if np.any(np.isfinite(held_mae)) else np.nan
+        time_to_peak_mfe = (
+            int(np.nanargmax(held_mfe)) + 1 if np.any(np.isfinite(held_mfe)) else np.nan
+        )
+        time_to_trough_mae = (
+            int(np.nanargmax(held_mae)) + 1 if np.any(np.isfinite(held_mae)) else np.nan
+        )
     else:
         oscillation, monotonicity, max_with, max_against, acf1 = 0, np.nan, 0, 0, np.nan
-        time_to_peak_mfe = 1; time_to_trough_mae = 1
+        time_to_peak_mfe = 1
+        time_to_trough_mae = 1
 
     out["oscillation_count"] = float(oscillation)
     out["monotonicity_ratio"] = float(monotonicity)
@@ -335,7 +375,9 @@ def compute_path_aggregates(fhigh: np.ndarray, flow: np.ndarray,
     out["max_consecutive_against"] = float(max_against)
     out["acf1_returns_during_hold"] = float(acf1)
     out["time_to_peak_mfe"] = float(time_to_peak_mfe) if np.isfinite(time_to_peak_mfe) else np.nan
-    out["time_to_trough_mae"] = float(time_to_trough_mae) if np.isfinite(time_to_trough_mae) else np.nan
+    out["time_to_trough_mae"] = (
+        float(time_to_trough_mae) if np.isfinite(time_to_trough_mae) else np.nan
+    )
     out["time_from_peak_to_exit"] = (
         float(held_bars - time_to_peak_mfe) if np.isfinite(time_to_peak_mfe) else np.nan
     )
@@ -357,7 +399,8 @@ def compute_path_aggregates(fhigh: np.ndarray, flow: np.ndarray,
         if h > H:
             out[f"mfe_sequence_class_fwd_h{h}"] = "unknown"
             continue
-        sub_h = fhigh[:h]; sub_l = flow[:h]
+        sub_h = fhigh[:h]
+        sub_l = flow[:h]
         if not np.any(np.isfinite(sub_h)) or not np.any(np.isfinite(sub_l)):
             out[f"mfe_sequence_class_fwd_h{h}"] = "unknown"
             continue
@@ -391,7 +434,8 @@ def compute_path_aggregates(fhigh: np.ndarray, flow: np.ndarray,
     # Longest consecutive run of same-sign step returns on the forward window
     fwd_steps_finite = fstep[np.isfinite(fstep)]
     if fwd_steps_finite.size >= 1:
-        signs2 = np.sign(fwd_steps_finite); signs2[signs2 == 0] = 1
+        signs2 = np.sign(fwd_steps_finite)
+        signs2[signs2 == 0] = 1
         max_run = run_curr = 1
         for i in range(1, len(signs2)):
             if signs2[i] == signs2[i - 1]:
@@ -409,6 +453,7 @@ def compute_path_aggregates(fhigh: np.ndarray, flow: np.ndarray,
 
 # ----- Sweep: trade overlap + sequential same-pair density -----
 
+
 def compute_overlap_and_density(trades: pd.DataFrame) -> Tuple[np.ndarray, np.ndarray]:
     n = len(trades)
     ent = pd.to_datetime(trades["entry_bar_ts"]).astype("int64").to_numpy()
@@ -418,13 +463,14 @@ def compute_overlap_and_density(trades: pd.DataFrame) -> Tuple[np.ndarray, np.nd
     ev_ts = np.concatenate([ent, ext])
     ev_d = np.concatenate([np.ones(n, dtype=np.int64), -np.ones(n, dtype=np.int64)])
     order = np.argsort(ev_ts, kind="stable")
-    ev_ts_s = ev_ts[order]; ev_d_s = ev_d[order]
+    ev_ts_s = ev_ts[order]
+    ev_d_s = ev_d[order]
     cum = np.cumsum(ev_d_s)
     pos = np.searchsorted(ev_ts_s, sig, side="right") - 1
     overlap = np.where(pos >= 0, cum[np.clip(pos, 0, len(cum) - 1)], 0).astype(np.int64)
 
     seq = np.zeros(n, dtype=np.int64)
-    one_day = 24 * 3600 * 10 ** 9
+    one_day = 24 * 3600 * 10**9
     pairs_arr = trades["pair"].to_numpy()
     for pair in np.unique(pairs_arr):
         mask = pairs_arr == pair
@@ -440,12 +486,13 @@ def compute_overlap_and_density(trades: pd.DataFrame) -> Tuple[np.ndarray, np.nd
 
 # ----- Pre-signal context features (v1.1 amendment — 4 new) -----
 
+
 def _pre_signal_context(close_arr: np.ndarray, sig_idx: int) -> dict:
     """Compute the 4 arc-2 pre-signal context features (cum_logret_1h_24/72/168, vol_realized_1h_24h).
 
     LOOKAHEAD ASSERT: every reference must be strictly prior to T_N (i.e. bar index < sig_idx).
     """
-    n = len(close_arr)
+    len(close_arr)
     out = {
         "cum_logret_1h_24": np.nan,
         "cum_logret_1h_72": np.nan,
@@ -465,7 +512,8 @@ def _pre_signal_context(close_arr: np.ndarray, sig_idx: int) -> dict:
         assert last_idx < sig_idx, "lookahead: last_idx must be < sig_idx"
         if anchor_idx < 0:
             continue
-        a = float(close_arr[anchor_idx]); b = float(close_arr[last_idx])
+        a = float(close_arr[anchor_idx])
+        b = float(close_arr[last_idx])
         if a > 0 and b > 0:
             out[name] = float(np.log(b / a))
     # vol_realized_1h_24h: std of 1H log returns over bars T_N-24 .. T_N-1.
@@ -473,7 +521,7 @@ def _pre_signal_context(close_arr: np.ndarray, sig_idx: int) -> dict:
     lo = sig_idx - 24
     hi = sig_idx  # exclusive
     if lo >= 1:
-        c = close_arr[lo - 1:hi]
+        c = close_arr[lo - 1 : hi]
         with np.errstate(divide="ignore", invalid="ignore"):
             lr = np.log(c[1:] / c[:-1])
         lr_finite = lr[np.isfinite(lr)]
@@ -484,6 +532,7 @@ def _pre_signal_context(close_arr: np.ndarray, sig_idx: int) -> dict:
 
 
 # ----- Main runner -----
+
 
 def run_phase_a(H: int = FORWARD_HORIZON_BARS_DEFAULT) -> dict:
     t0 = time.time()
@@ -509,15 +558,20 @@ def run_phase_a(H: int = FORWARD_HORIZON_BARS_DEFAULT) -> dict:
     pair_logret: Dict[str, np.ndarray] = {}
     for pair in PAIRS:
         df = load_pair_1h(pair)
-        atr = wilder_atr(df["high"].astype(float).values, df["low"].astype(float).values,
-                         df["close"].astype(float).values, period=14)
+        atr = wilder_atr(
+            df["high"].astype(float).values,
+            df["low"].astype(float).values,
+            df["close"].astype(float).values,
+            period=14,
+        )
         pair_data[pair] = df
         pair_atr[pair] = atr
         pair_atr_base[pair] = compute_atr_baseline(atr)
         close = df["close"].astype(float).values
         n = len(close)
         prev = np.empty(n, dtype=float)
-        prev[0] = np.nan; prev[1:] = close[:-1]
+        prev[0] = np.nan
+        prev[1:] = close[:-1]
         with np.errstate(divide="ignore", invalid="ignore"):
             pair_logret[pair] = np.log(close / prev)
 
@@ -535,7 +589,9 @@ def run_phase_a(H: int = FORWARD_HORIZON_BARS_DEFAULT) -> dict:
             "high": df["high"].astype(float).values,
             "low": df["low"].astype(float).values,
             "close": df["close"].astype(float).values,
-            "volume": df["tick_volume"].astype(float).values if "tick_volume" in df.columns else np.full(len(df), np.nan),
+            "volume": df["tick_volume"].astype(float).values
+            if "tick_volume" in df.columns
+            else np.full(len(df), np.nan),
             "concurrent_same_bar": df["concurrent_signals_same_bar"].astype(np.int64).values,
             "concurrent_3h": df["concurrent_signals_within_3h"].astype(np.int64).values,
             "basket_USD": df["currency_basket_3h_USD"].astype(float).values,
@@ -553,9 +609,15 @@ def run_phase_a(H: int = FORWARD_HORIZON_BARS_DEFAULT) -> dict:
     tr_id = trades["trade_id"].to_numpy()
     tr_pair = trades["pair"].to_numpy()
     tr_fold = trades["fold_id"].to_numpy()
-    tr_sig_ts = pd.to_datetime(trades["signal_bar_ts"]).astype("datetime64[ns]").astype("int64").to_numpy()
-    tr_entry_ts = pd.to_datetime(trades["entry_bar_ts"]).astype("datetime64[ns]").astype("int64").to_numpy()
-    tr_exit_ts = pd.to_datetime(trades["exit_bar_ts"]).astype("datetime64[ns]").astype("int64").to_numpy()
+    tr_sig_ts = (
+        pd.to_datetime(trades["signal_bar_ts"]).astype("datetime64[ns]").astype("int64").to_numpy()
+    )
+    tr_entry_ts = (
+        pd.to_datetime(trades["entry_bar_ts"]).astype("datetime64[ns]").astype("int64").to_numpy()
+    )
+    tr_exit_ts = (
+        pd.to_datetime(trades["exit_bar_ts"]).astype("datetime64[ns]").astype("int64").to_numpy()
+    )
     tr_entry_price = trades["entry_price"].astype(float).to_numpy()
     tr_atr = trades["atr_1h_wilder_at_signal"].astype(float).to_numpy()
     tr_mfe_R = trades["mfe_R"].astype(float).to_numpy()
@@ -576,11 +638,23 @@ def run_phase_a(H: int = FORWARD_HORIZON_BARS_DEFAULT) -> dict:
     paths_out = STEP2_DIR / "trade_paths.csv"
     pf = paths_out.open("w", encoding="utf-8", newline="")
     pw = csv.writer(pf, lineterminator="\n")
-    pw.writerow([
-        "trade_id", "bar_offset", "bar_ts", "open", "high", "low", "close",
-        "cum_logret_from_entry", "mfe_to_date_atr", "mae_to_date_atr",
-        "is_held_bar", "is_forward_bar", "data_end_flag",
-    ])
+    pw.writerow(
+        [
+            "trade_id",
+            "bar_offset",
+            "bar_ts",
+            "open",
+            "high",
+            "low",
+            "close",
+            "cum_logret_from_entry",
+            "mfe_to_date_atr",
+            "mae_to_date_atr",
+            "is_held_bar",
+            "is_forward_bar",
+            "data_end_flag",
+        ]
+    )
 
     feature_rows: List[dict] = []
     abs_lr_arr = np.full(n_trades, np.nan, dtype=np.float64)
@@ -615,21 +689,29 @@ def run_phase_a(H: int = FORWARD_HORIZON_BARS_DEFAULT) -> dict:
 
         # Pre-signal 1H context — short windows (legacy 3 + 6)
         lo6 = max(0, sig_idx - 6 + 1)
-        last6 = df_arrs["close"][lo6: sig_idx + 1]
-        cum_logret_6 = float(np.log(last6[-1] / last6[0])) if (last6.size >= 2 and last6[0] > 0) else np.nan
+        last6 = df_arrs["close"][lo6 : sig_idx + 1]
+        cum_logret_6 = (
+            float(np.log(last6[-1] / last6[0])) if (last6.size >= 2 and last6[0] > 0) else np.nan
+        )
         lo3 = max(0, sig_idx - 3 + 1)
-        last3 = df_arrs["close"][lo3: sig_idx + 1]
-        cum_logret_3 = float(np.log(last3[-1] / last3[0])) if (last3.size >= 2 and last3[0] > 0) else np.nan
+        last3 = df_arrs["close"][lo3 : sig_idx + 1]
+        cum_logret_3 = (
+            float(np.log(last3[-1] / last3[0])) if (last3.size >= 2 and last3[0] > 0) else np.nan
+        )
 
         # NEW pre-signal context features (4)
         psc = _pre_signal_context(df_arrs["close"], sig_idx)
 
         # ATR-normed distance to recent (last 30 bar) high/low
         lo30 = max(0, sig_idx - 30 + 1)
-        high30 = float(df_arrs["high"][lo30: sig_idx + 1].max()) if sig_idx >= lo30 else np.nan
-        low30 = float(df_arrs["low"][lo30: sig_idx + 1].min()) if sig_idx >= lo30 else np.nan
-        dist_high30_atr = (sig_close - high30) / atr_at_sig if np.isfinite(high30) and atr_at_sig > 0 else np.nan
-        dist_low30_atr = (sig_close - low30) / atr_at_sig if np.isfinite(low30) and atr_at_sig > 0 else np.nan
+        high30 = float(df_arrs["high"][lo30 : sig_idx + 1].max()) if sig_idx >= lo30 else np.nan
+        low30 = float(df_arrs["low"][lo30 : sig_idx + 1].min()) if sig_idx >= lo30 else np.nan
+        dist_high30_atr = (
+            (sig_close - high30) / atr_at_sig if np.isfinite(high30) and atr_at_sig > 0 else np.nan
+        )
+        dist_low30_atr = (
+            (sig_close - low30) / atr_at_sig if np.isfinite(low30) and atr_at_sig > 0 else np.nan
+        )
 
         # Time/session/liquidity
         sig_ts = pd.Timestamp(tr_sig_ts[k])
@@ -664,18 +746,26 @@ def run_phase_a(H: int = FORWARD_HORIZON_BARS_DEFAULT) -> dict:
         # Forward path
         entry_price = float(tr_entry_price[k])
         fhigh, flow, fcum, fstep, fopen, fhigh_raw, flow_raw, fclose, avail = per_trade_full_path(
-            df_arrs["open"], df_arrs["high"], df_arrs["low"], df_arrs["close"],
-            entry_idx, entry_price, H,
+            df_arrs["open"],
+            df_arrs["high"],
+            df_arrs["low"],
+            df_arrs["close"],
+            entry_idx,
+            entry_price,
+            H,
         )
 
         held_bars = int(tr_bars_held[k])
         # Sanity clamp to bounds (1..H)
-        if held_bars < 1: held_bars = 1
-        if held_bars > H: held_bars = H
+        if held_bars < 1:
+            held_bars = 1
+        if held_bars > H:
+            held_bars = H
 
         # data_end flag: true if engine label is data_end (we truncate at min(avail, ...))
-        is_data_end = (str(tr_exit_reason_engine[k]) == "data_end") or \
-                      (str(tr_exit_reason_canonical[k]) == "data_end")
+        is_data_end = (str(tr_exit_reason_engine[k]) == "data_end") or (
+            str(tr_exit_reason_canonical[k]) == "data_end"
+        )
         # For data_end trades, the engine closed at the last available bar's close.
         # Our forward window also truncates at `avail` bars (the data ends).
 
@@ -684,9 +774,7 @@ def run_phase_a(H: int = FORWARD_HORIZON_BARS_DEFAULT) -> dict:
         for off in range(H):
             if off >= avail:
                 # past end of data; only emit row with NaN values + data_end_flag if applicable
-                bar_ts = ""
                 op = hi = lo = cl = ""
-                cum = mfe_d = mae_d = ""
                 is_held = "False"
                 is_fwd = "False"
                 de = "True" if is_data_end else "False"
@@ -705,53 +793,89 @@ def run_phase_a(H: int = FORWARD_HORIZON_BARS_DEFAULT) -> dict:
             is_held = "True" if off < held_bars else "False"
             is_fwd = "True"
             de = "True" if (is_data_end and off == avail - 1) else "False"
-            pw.writerow([
-                tid, off,
-                pd.Timestamp(bar_ts_ns).isoformat(),
-                f"{op:.6g}", f"{hi:.6g}", f"{lo:.6g}", f"{cl:.6g}",
-                f"{cum_v:.6g}" if np.isfinite(cum_v) else "",
-                f"{mfe_v:.6g}" if np.isfinite(mfe_v) else "",
-                f"{mae_v:.6g}" if np.isfinite(mae_v) else "",
-                is_held, is_fwd, de,
-            ])
+            pw.writerow(
+                [
+                    tid,
+                    off,
+                    pd.Timestamp(bar_ts_ns).isoformat(),
+                    f"{op:.6g}",
+                    f"{hi:.6g}",
+                    f"{lo:.6g}",
+                    f"{cl:.6g}",
+                    f"{cum_v:.6g}" if np.isfinite(cum_v) else "",
+                    f"{mfe_v:.6g}" if np.isfinite(mfe_v) else "",
+                    f"{mae_v:.6g}" if np.isfinite(mae_v) else "",
+                    is_held,
+                    is_fwd,
+                    de,
+                ]
+            )
 
         # Compute aggregates (uses held_bars for HELD-window window)
         aggs = compute_path_aggregates(
-            fhigh, flow, fcum, fstep, fclose, fhigh_raw, flow_raw,
-            entry_price, atr_at_sig, H, held_bars,
+            fhigh,
+            flow,
+            fcum,
+            fstep,
+            fclose,
+            fhigh_raw,
+            flow_raw,
+            entry_price,
+            atr_at_sig,
+            H,
+            held_bars,
         )
 
         # Per-trade outcomes
-        net_r = float(tr_net_r[k]); gross_r = float(tr_gross_r[k])
+        net_r = float(tr_net_r[k])
+        gross_r = float(tr_gross_r[k])
         spread_cost_R = float(tr_spread_R[k])
-        mfe_R = float(tr_mfe_R[k]); mae_R = float(tr_mae_R[k])
+        mfe_R = float(tr_mfe_R[k])
+        mae_R = float(tr_mae_R[k])
         sl_atr_mult = float(tr_sl_atr[k])
         # Recompute mfe_held_atr / mae_held_atr from the held window for consistency
-        mfe_held_atr = float(np.nanmax(fhigh[:held_bars])) / atr_at_sig if atr_at_sig > 0 and np.any(np.isfinite(fhigh[:held_bars])) else np.nan
-        mae_held_atr = float(np.nanmax(flow[:held_bars])) / atr_at_sig if atr_at_sig > 0 and np.any(np.isfinite(flow[:held_bars])) else np.nan
-        peak_to_final = mfe_R / abs(net_r) if (np.isfinite(net_r) and abs(net_r) > 0) else np.nan
+        mfe_held_atr = (
+            float(np.nanmax(fhigh[:held_bars])) / atr_at_sig
+            if atr_at_sig > 0 and np.any(np.isfinite(fhigh[:held_bars]))
+            else np.nan
+        )
+        mae_held_atr = (
+            float(np.nanmax(flow[:held_bars])) / atr_at_sig
+            if atr_at_sig > 0 and np.any(np.isfinite(flow[:held_bars]))
+            else np.nan
+        )
+        mfe_R / abs(net_r) if (np.isfinite(net_r) and abs(net_r) > 0) else np.nan
         if np.isfinite(mae_R) and mae_R != 0:
             mfe_to_mae_held = mfe_R / abs(mae_R)
         else:
             mfe_to_mae_held = np.nan
-        r_given_back_from_peak = (mfe_R - net_r) if (np.isfinite(mfe_R) and np.isfinite(net_r)) else np.nan
+        r_given_back_from_peak = (
+            (mfe_R - net_r) if (np.isfinite(mfe_R) and np.isfinite(net_r)) else np.nan
+        )
         peak_to_final_r_ratio = mfe_R / net_r if (np.isfinite(net_r) and net_r != 0) else np.nan
 
         row = {
-            "trade_id": tid, "pair": pair, "fold_id": int(tr_fold[k]),
+            "trade_id": tid,
+            "pair": pair,
+            "fold_id": int(tr_fold[k]),
             "signal_bar_ts": sig_ts.isoformat(),
             "entry_bar_ts": pd.Timestamp(tr_entry_ts[k]).isoformat(),
             "exit_bar_ts": pd.Timestamp(tr_exit_ts[k]).isoformat(),
             "direction": "long",
             # signal-bar 1H properties
-            "signal_bar_open": sig_open, "signal_bar_close": sig_close,
-            "signal_bar_high": sig_high, "signal_bar_low": sig_low,
-            "signal_bar_log_return": sig_lr, "signal_bar_abs_log_return": sig_abs_lr,
+            "signal_bar_open": sig_open,
+            "signal_bar_close": sig_close,
+            "signal_bar_high": sig_high,
+            "signal_bar_low": sig_low,
+            "signal_bar_log_return": sig_lr,
+            "signal_bar_abs_log_return": sig_abs_lr,
             "signal_bar_volume": sig_volume,
             "signal_bar_volume_nan": int(not np.isfinite(sig_volume)),
             "atr_at_signal_1h": atr_at_sig,
             "atr_baseline_1h_200": baseline_atr,
-            "atr_ratio_to_baseline": (atr_at_sig / baseline_atr) if (np.isfinite(baseline_atr) and baseline_atr > 0) else np.nan,
+            "atr_ratio_to_baseline": (atr_at_sig / baseline_atr)
+            if (np.isfinite(baseline_atr) and baseline_atr > 0)
+            else np.nan,
             # pre-signal context (legacy)
             "cum_logret_1h_6": cum_logret_6,
             "cum_logret_1h_3": cum_logret_3,
@@ -763,36 +887,49 @@ def run_phase_a(H: int = FORWARD_HORIZON_BARS_DEFAULT) -> dict:
             "dist_close_to_high30_atr": dist_high30_atr,
             "dist_close_to_low30_atr": dist_low30_atr,
             # time/session
-            "hour_utc": hour, "day_of_week": dow, "session": session,
-            "hour_in_4h_bar": hour_in_4h, "bars_to_next_4h_close": bars_to_next_4h_close,
-            "hour_in_d1_bar": hour_in_d1, "bars_to_next_d1_close": bars_to_next_d1_close,
+            "hour_utc": hour,
+            "day_of_week": dow,
+            "session": session,
+            "hour_in_4h_bar": hour_in_4h,
+            "bars_to_next_4h_close": bars_to_next_4h_close,
+            "hour_in_d1_bar": hour_in_d1,
+            "bars_to_next_d1_close": bars_to_next_d1_close,
             # first-bar properties
-            "first_bar_direction": fb_dir, "first_bar_range_atr": first_bar_range_atr,
+            "first_bar_direction": fb_dir,
+            "first_bar_range_atr": first_bar_range_atr,
             "first_bar_range_bin": first_bar_range_bin,
             # regime / momentum
-            "vol_regime": vol_regime, "pre_momentum_bin": pre_mom_bin,
+            "vol_regime": vol_regime,
+            "pre_momentum_bin": pre_mom_bin,
             "cum_logret_1h_6_bin": _cum_logret_sign_mag_bin(cum_logret_6),
             "cum_logret_1h_24_bin": _cum_logret_sign_mag_bin(psc["cum_logret_1h_24"]),
             "cum_logret_1h_168_bin": _cum_logret_sign_mag_bin(psc["cum_logret_1h_168"]),
             # cross-pair
             "concurrent_signals_same_bar": c_same,
             "concurrent_signals_within_3h": c_3h,
-            "currency_basket_3h_USD": b_usd, "currency_basket_3h_EUR": b_eur,
-            "currency_basket_3h_JPY": b_jpy, "currency_basket_3h_GBP": b_gbp,
+            "currency_basket_3h_USD": b_usd,
+            "currency_basket_3h_EUR": b_eur,
+            "currency_basket_3h_JPY": b_jpy,
+            "currency_basket_3h_GBP": b_gbp,
             "trade_overlap_at_execution_time": int(overlap[k]),
             "sequential_same_pair_density_24h": int(seq_density[k]),
             # trade outcome
-            "net_r": net_r, "gross_r": gross_r, "spread_cost_R": spread_cost_R,
-            "mfe_R": mfe_R, "mae_R": mae_R,
+            "net_r": net_r,
+            "gross_r": gross_r,
+            "spread_cost_R": spread_cost_R,
+            "mfe_R": mfe_R,
+            "mae_R": mae_R,
             "bars_held": held_bars,
             "exit_reason": str(tr_exit_reason_canonical[k]),
             "exit_reason_engine": str(tr_exit_reason_engine[k]),
-            "spread_pips_entry": float(tr_sp_e[k]), "spread_pips_exit": float(tr_sp_x[k]),
+            "spread_pips_entry": float(tr_sp_e[k]),
+            "spread_pips_exit": float(tr_sp_x[k]),
             "spread_floored": bool(tr_spread_floored[k]),
             "sl_distance_atr": sl_atr_mult,
             "sl_distance_price": float(tr_sl_pri[k]),
             # HELD-window path aggregates
-            "mfe_held_atr": mfe_held_atr, "mae_held_atr": mae_held_atr,
+            "mfe_held_atr": mfe_held_atr,
+            "mae_held_atr": mae_held_atr,
             "peak_to_final_r_ratio": peak_to_final_r_ratio,
             "mfe_to_mae_ratio_held": mfe_to_mae_held,
             "r_given_back_from_peak": r_given_back_from_peak,
@@ -807,7 +944,7 @@ def run_phase_a(H: int = FORWARD_HORIZON_BARS_DEFAULT) -> dict:
 
         if (k + 1) % 500 == 0:
             dt = time.time() - t_loop
-            print(f"  ...processed {k+1:,}/{n_trades:,} trades ({(k+1)/dt:.0f} trades/s)")
+            print(f"  ...processed {k + 1:,}/{n_trades:,} trades ({(k + 1) / dt:.0f} trades/s)")
 
     pf.close()
 
@@ -833,9 +970,11 @@ def run_phase_a(H: int = FORWARD_HORIZON_BARS_DEFAULT) -> dict:
     features_df.to_csv(feat_out, index=False, lineterminator="\n", float_format="%.10g")
 
     elapsed = time.time() - t0
-    print(f"[Phase A] done in {elapsed:.1f}s; "
-          f"features rows={len(feature_rows):,}, columns={len(features_df.columns)}, "
-          f"paths file={paths_out}")
+    print(
+        f"[Phase A] done in {elapsed:.1f}s; "
+        f"features rows={len(feature_rows):,}, columns={len(features_df.columns)}, "
+        f"paths file={paths_out}"
+    )
     return {
         "n_trades": len(feature_rows),
         "n_columns": len(features_df.columns),

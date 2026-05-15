@@ -1,6 +1,5 @@
 """Tests for live.mt5_import: MT5 space-delimited CSV format, symbol extraction from filenames."""
 
-
 import pandas as pd
 import pytest
 
@@ -64,15 +63,17 @@ def test_load_market_tsvs_parses_space_delimited(tmp_path):
 
 
 def test_canonical_df_for_engine():
-    df = pd.DataFrame({
-        "time": pd.to_datetime(["2024-01-02", "2024-01-03"]),
-        "open": [1.0, 1.1],
-        "high": [1.2, 1.3],
-        "low": [0.9, 1.0],
-        "close": [1.05, 1.15],
-        "spread_points": [10, 11],
-        "volume": [100, 200],
-    })
+    df = pd.DataFrame(
+        {
+            "time": pd.to_datetime(["2024-01-02", "2024-01-03"]),
+            "open": [1.0, 1.1],
+            "high": [1.2, 1.3],
+            "low": [0.9, 1.0],
+            "close": [1.05, 1.15],
+            "spread_points": [10, 11],
+            "volume": [100, 200],
+        }
+    )
     out = canonical_df_for_engine(df)
     assert "date" in out.columns
     assert "open" in out.columns

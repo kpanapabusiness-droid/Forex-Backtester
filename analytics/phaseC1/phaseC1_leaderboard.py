@@ -30,11 +30,7 @@ def _latest_run_dir(c1_dir: Path) -> Optional[Path]:
     if not c1_dir.exists():
         return None
     run_dirs = sorted(
-        (
-            p
-            for p in c1_dir.iterdir()
-            if p.is_dir() and (p / "wfo_run_meta.json").exists()
-        ),
+        (p for p in c1_dir.iterdir() if p.is_dir() and (p / "wfo_run_meta.json").exists()),
         key=lambda p: p.name,
         reverse=True,
     )
@@ -408,4 +404,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

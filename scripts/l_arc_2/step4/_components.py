@@ -15,6 +15,7 @@ Schema (per dispatch §"Component table schema"):
     viable_component_table, viable_held_out_check,
     near_chance_flag, notes
 """
+
 from __future__ import annotations
 
 import numpy as np
@@ -31,39 +32,48 @@ def _capture_ratio(net_r: np.ndarray, mfe_atr_h: np.ndarray) -> float:
     return float(np.nanmean(net_r) / denom)
 
 
-def _per_fold_breakdown(post: pd.DataFrame,
-                        signals_with_clu: pd.DataFrame,
-                        fwd_mfe_col: str) -> pd.DataFrame:
+def _per_fold_breakdown(
+    post: pd.DataFrame, signals_with_clu: pd.DataFrame, fwd_mfe_col: str
+) -> pd.DataFrame:
     """Per-fold F1..F7 rows: fold_id, n_trades, mean_net_r, mean_gross_r, win_pct, mean_capture_ratio."""
     rows = []
     merged = post.merge(
-        signals_with_clu[["trade_id", fwd_mfe_col]], on="trade_id", how="left",
+        signals_with_clu[["trade_id", fwd_mfe_col]],
+        on="trade_id",
+        how="left",
     )
     for f in C.ALL_FOLDS:
         sub = merged[merged["fold"] == f]
         if len(sub) == 0:
-            rows.append({
-                "fold_id": f, "n_trades": 0,
-                "mean_net_r": float("nan"), "mean_gross_r": float("nan"),
-                "win_pct": float("nan"), "mean_capture_ratio": float("nan"),
-            })
+            rows.append(
+                {
+                    "fold_id": f,
+                    "n_trades": 0,
+                    "mean_net_r": float("nan"),
+                    "mean_gross_r": float("nan"),
+                    "win_pct": float("nan"),
+                    "mean_capture_ratio": float("nan"),
+                }
+            )
             continue
         net_r = sub["net_r"].values
         gross_r = sub["gross_r"].values if "gross_r" in sub.columns else net_r
-        rows.append({
-            "fold_id": f,
-            "n_trades": int(len(sub)),
-            "mean_net_r": float(np.nanmean(net_r)),
-            "mean_gross_r": float(np.nanmean(gross_r)),
-            "win_pct": float(np.mean(net_r > 0)) if len(net_r) > 0 else float("nan"),
-            "mean_capture_ratio": _capture_ratio(net_r, sub[fwd_mfe_col].values),
-        })
+        rows.append(
+            {
+                "fold_id": f,
+                "n_trades": int(len(sub)),
+                "mean_net_r": float(np.nanmean(net_r)),
+                "mean_gross_r": float(np.nanmean(gross_r)),
+                "win_pct": float(np.mean(net_r > 0)) if len(net_r) > 0 else float("nan"),
+                "mean_capture_ratio": _capture_ratio(net_r, sub[fwd_mfe_col].values),
+            }
+        )
     return pd.DataFrame(rows)
 
 
-def _filter_auc_per_fold(slug: str,
-                         signals_with_clu: pd.DataFrame,
-                         filter_inclusion_mask: np.ndarray) -> tuple[float, float, list[float]]:
+def _filter_auc_per_fold(
+    slug: str, signals_with_clu: pd.DataFrame, filter_inclusion_mask: np.ndarray
+) -> tuple[float, float, list[float]]:
     """For a filter candidate, compute pool-level and per-fold AUC of
     (filter_inclusion -> P(C0=is_extractable)).
 
@@ -116,8 +126,16 @@ def build_component_row_filter(
 
     # delta_p extractable / non-extractable: P(C0|retained, excl -2) - P(C0|pool, excl -2)
     valid_pool = signals_with_clu[signals_with_clu[C.CLUSTER_COL_INTERNAL] != C.CLUSTER_SENTINEL]
-    p_c0_pool = float((valid_pool[C.CLUSTER_COL_INTERNAL] == 0).mean()) if len(valid_pool) > 0 else float("nan")
-    p_c1_pool = float((valid_pool[C.CLUSTER_COL_INTERNAL] == 1).mean()) if len(valid_pool) > 0 else float("nan")
+    p_c0_pool = (
+        float((valid_pool[C.CLUSTER_COL_INTERNAL] == 0).mean())
+        if len(valid_pool) > 0
+        else float("nan")
+    )
+    p_c1_pool = (
+        float((valid_pool[C.CLUSTER_COL_INTERNAL] == 1).mean())
+        if len(valid_pool) > 0
+        else float("nan")
+    )
 
     retained = signals_with_clu[signals_with_clu["trade_id"].isin(post["trade_id"])]
     retained_valid = retained[retained[C.CLUSTER_COL_INTERNAL] != C.CLUSTER_SENTINEL]
@@ -179,7 +197,11 @@ def build_component_row_filter(
     merged_67 = post[post["fold"].isin(list(C.VALIDATE_FOLDS))].merge(
         signals_with_clu[["trade_id", fwd_mfe_col]], on="trade_id", how="left"
     )
-    cap_67 = _capture_ratio(merged_67["net_r"].values, merged_67[fwd_mfe_col].values) if len(merged_67) > 0 else float("nan")
+    cap_67 = (
+        _capture_ratio(merged_67["net_r"].values, merged_67[fwd_mfe_col].values)
+        if len(merged_67) > 0
+        else float("nan")
+    )
     # verbatim reference: same trades but with signals.net_r and signals.fwd_mfe_h120
     verbatim_ref = float("nan")
     if len(merged_67) > 0:
@@ -189,15 +211,21 @@ def build_component_row_filter(
     win_pct_pool = float(np.mean(post["net_r"].values > 0)) if len(post) > 0 else float("nan")
     expectancy_pool = mean_r_pool
 
-    near_chance = bool(C.AUC_NEAR_CHANCE_BAND[0] <= pool_auc <= C.AUC_NEAR_CHANCE_BAND[1]) if not np.isnan(pool_auc) else False
+    near_chance = (
+        bool(C.AUC_NEAR_CHANCE_BAND[0] <= pool_auc <= C.AUC_NEAR_CHANCE_BAND[1])
+        if not np.isnan(pool_auc)
+        else False
+    )
 
     # Viability (filter): per dispatch §6
     viable_ct = bool(
         dp_ext > 0
         and dp_non_ext < 0
-        and (not np.isnan(mfe_geom)) and (C.MFE_GEOMETRY_BAND[0] <= mfe_geom <= C.MFE_GEOMETRY_BAND[1])
+        and (not np.isnan(mfe_geom))
+        and (C.MFE_GEOMETRY_BAND[0] <= mfe_geom <= C.MFE_GEOMETRY_BAND[1])
         and ret_min >= C.RETAINED_PER_FOLD_FLOOR
-        and (not np.isnan(mean_r_verbatim)) and mean_r_verbatim > 0
+        and (not np.isnan(mean_r_verbatim))
+        and mean_r_verbatim > 0
         # target_cluster_documented = True (we route to C0)
     )
 
@@ -205,7 +233,9 @@ def build_component_row_filter(
     if near_chance:
         notes.append("near-chance cluster discrimination — interpret per Amendment 8 framing (a)")
     if ret_min < C.RETAINED_PER_FOLD_AUTO_DISQ:
-        notes.append(f"AUTO-DISQ: retained_per_fold_min={ret_min} < {C.RETAINED_PER_FOLD_AUTO_DISQ}")
+        notes.append(
+            f"AUTO-DISQ: retained_per_fold_min={ret_min} < {C.RETAINED_PER_FOLD_AUTO_DISQ}"
+        )
 
     return {
         "candidate_slug": slug,
@@ -294,6 +324,7 @@ def build_component_row_exit_or_delayed(
     per_fold = _per_fold_breakdown(post, signals_with_clu, fwd_mfe_col)
     f1_5 = per_fold[per_fold["fold_id"].isin(list(C.FIT_FOLDS))]
     f6_7 = per_fold[per_fold["fold_id"].isin(list(C.VALIDATE_FOLDS))]
+
     def _weighted_mean(sub: pd.DataFrame) -> float:
         n = float(sub["n_trades"].sum())
         if n <= 0:
@@ -321,7 +352,11 @@ def build_component_row_exit_or_delayed(
     merged_67 = post[post["fold"].isin(list(C.VALIDATE_FOLDS))].merge(
         signals_with_clu[["trade_id", fwd_mfe_col]], on="trade_id", how="left"
     )
-    cap_67 = _capture_ratio(merged_67["net_r"].values, merged_67[fwd_mfe_col].values) if len(merged_67) > 0 else float("nan")
+    cap_67 = (
+        _capture_ratio(merged_67["net_r"].values, merged_67[fwd_mfe_col].values)
+        if len(merged_67) > 0
+        else float("nan")
+    )
     verbatim_ref = float("nan")
     if len(merged_67) > 0:
         v = signals_with_clu[signals_with_clu["trade_id"].isin(merged_67["trade_id"])]
@@ -331,14 +366,19 @@ def build_component_row_exit_or_delayed(
     expectancy_pool = mean_r_pool
 
     viable_ho = bool(
-        (not np.isnan(mean_r_f6_7)) and mean_r_f6_7 > 0
-        and (not np.isnan(cap_67)) and (not np.isnan(verbatim_ref)) and cap_67 > verbatim_ref
+        (not np.isnan(mean_r_f6_7))
+        and mean_r_f6_7 > 0
+        and (not np.isnan(cap_67))
+        and (not np.isnan(verbatim_ref))
+        and cap_67 > verbatim_ref
         and sign_67 == "both_positive"
     )
 
     notes = []
     if ret_min < C.RETAINED_PER_FOLD_AUTO_DISQ:
-        notes.append(f"AUTO-DISQ: retained_per_fold_min={ret_min} < {C.RETAINED_PER_FOLD_AUTO_DISQ}")
+        notes.append(
+            f"AUTO-DISQ: retained_per_fold_min={ret_min} < {C.RETAINED_PER_FOLD_AUTO_DISQ}"
+        )
 
     return {
         "candidate_slug": slug,
@@ -374,8 +414,7 @@ def build_component_row_exit_or_delayed(
 def component_table_markdown(df: pd.DataFrame) -> str:
     """Render a markdown table from the component DataFrame."""
     cols = list(df.columns)
-    lines = ["| " + " | ".join(cols) + " |",
-             "|" + "|".join(["---"] * len(cols)) + "|"]
+    lines = ["| " + " | ".join(cols) + " |", "|" + "|".join(["---"] * len(cols)) + "|"]
     for _, row in df.iterrows():
         vals = []
         for c in cols:
@@ -393,8 +432,8 @@ def component_table_markdown(df: pd.DataFrame) -> str:
     return "\n".join(lines) + "\n"
 
 
-def per_fold_breakdown_csv(post: pd.DataFrame,
-                            signals_with_clu: pd.DataFrame,
-                            fwd_mfe_col: str) -> pd.DataFrame:
+def per_fold_breakdown_csv(
+    post: pd.DataFrame, signals_with_clu: pd.DataFrame, fwd_mfe_col: str
+) -> pd.DataFrame:
     """Public wrapper for evaluation_metrics.csv per-fold breakdown."""
     return _per_fold_breakdown(post, signals_with_clu, fwd_mfe_col)

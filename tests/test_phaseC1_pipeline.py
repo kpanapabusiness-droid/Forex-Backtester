@@ -175,4 +175,3 @@ def test_phaseC1_leaderboard_worst_fold_and_gates(tmp_path: Path):
     assert df.iloc[0]["pass_reject"] == "PASS"
     assert df.iloc[0]["worst_fold_id"] == 2
     assert df.iloc[0]["worst_fold_roi"] == 1.0
-

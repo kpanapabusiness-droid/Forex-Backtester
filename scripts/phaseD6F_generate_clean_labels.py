@@ -1,6 +1,7 @@
 """
 Phase D-6F: Generate clean opportunity labels (drawdown-constrained).
 """
+
 from __future__ import annotations
 
 import argparse

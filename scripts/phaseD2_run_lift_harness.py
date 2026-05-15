@@ -132,11 +132,10 @@ def generate_random_fire(
     h = hashlib.sha256()
     h.update(f"{seed}".encode("utf-8"))
     u = keys.apply(
-        lambda s: int(hashlib.sha256((s + str(seed)).encode("utf-8")).hexdigest(), 16)
-        / (2**256)
+        lambda s: int(hashlib.sha256((s + str(seed)).encode("utf-8")).hexdigest(), 16) / (2**256)
     )
     out["signal"] = (u < p).astype(int)
-    out["signal_name"] = f"random_fire_{int(p*100)}pct"
+    out["signal_name"] = f"random_fire_{int(p * 100)}pct"
     return out
 
 
@@ -184,9 +183,7 @@ def _load_external_signal(path: str | Path, name_override: str | None = None) ->
     df["signal"] = df["signal"].fillna(0).astype(int)
     if name_override is not None:
         df["signal_name"] = str(name_override)
-    df["direction"] = pd.Categorical(
-        df["direction"], categories=["long", "short"], ordered=True
-    )
+    df["direction"] = pd.Categorical(df["direction"], categories=["long", "short"], ordered=True)
     return df.sort_values(["pair", "date", "direction"]).reset_index(drop=True)
 
 
@@ -252,9 +249,7 @@ def join_signals_to_labels(
         on=join_keys,
         how="inner",
     )
-    merged = merged.sort_values(["signal_name", "pair", "date", "direction"]).reset_index(
-        drop=True
-    )
+    merged = merged.sort_values(["signal_name", "pair", "date", "direction"]).reset_index(drop=True)
     return merged
 
 
@@ -278,9 +273,7 @@ def _run_from_config(config_path: Path) -> None:
     labels = labels.sort_values(["pair", "date", "direction"]).reset_index(drop=True)
 
     signals = build_control_signals(labels, cfg)
-    df_joined = join_signals_to_labels(
-        labels, signals, discovery_end=cfg["discovery_end"]
-    )
+    df_joined = join_signals_to_labels(labels, signals, discovery_end=cfg["discovery_end"])
 
     out_dir = Path(cfg["outputs_dir"])
     joined_dir = out_dir / "joined"
@@ -296,17 +289,11 @@ def _run_from_config(config_path: Path) -> None:
     metrics = compute_metrics(df_joined)
     cov = compute_coverage(df_joined)
 
-    metrics["metrics_global"].to_csv(
-        metrics_dir / "metrics_by_signal_global.csv", index=False
-    )
+    metrics["metrics_global"].to_csv(metrics_dir / "metrics_by_signal_global.csv", index=False)
     if not metrics["metrics_split"].empty:
-        metrics["metrics_split"].to_csv(
-            metrics_dir / "metrics_by_signal_split.csv", index=False
-        )
+        metrics["metrics_split"].to_csv(metrics_dir / "metrics_by_signal_split.csv", index=False)
     if not metrics["metrics_pair"].empty:
-        metrics["metrics_pair"].to_csv(
-            metrics_dir / "metrics_by_signal_pair.csv", index=False
-        )
+        metrics["metrics_pair"].to_csv(metrics_dir / "metrics_by_signal_pair.csv", index=False)
     cov.to_csv(metrics_dir / "coverage_by_signal.csv", index=False)
 
     manifest = {

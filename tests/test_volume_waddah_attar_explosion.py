@@ -52,4 +52,3 @@ def test_wae_no_nans_after_warmup():
     s = out["volume_signal"]
     warmup = 250
     assert not s.iloc[warmup:].isna().any()
-

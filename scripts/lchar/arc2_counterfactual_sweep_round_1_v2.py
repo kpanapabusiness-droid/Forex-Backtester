@@ -31,7 +31,6 @@ from __future__ import annotations
 import argparse
 import datetime as _dt
 import hashlib
-import os
 import re
 import sys
 import tempfile
@@ -49,43 +48,56 @@ if str(REPO_ROOT) not in sys.path:
 
 # --- Locked input sha256s (gate 1) ---
 LOCKED_SHAS: Dict[str, str] = {
-    "results/l6/arc2/characterisation/v1_2_1_full/per_bar_paths.csv":
-        "7b2acd6ccb98f1fd145a631b318fc95d10f5cf4f42633be9c0b59738fa1696ee",
-    "results/l6/arc2/characterisation/v1_2_1_full/trade_index.csv":
-        "9f841c5b29e87ed90d34c9617431978baf3041459797cedef02fa16c27e3abb5",
-    "core/signals/l4_mtf_alignment_2_down_mixed_kijun.py":
-        "3c8d0f5d4b446f84359ab0663df36869f15b47cf1bf18fbc6caff807dc5134e3",
-    "configs/wfo_l6_arc2.yaml":
-        "25917151bc84a73885eeea9ca9c4cc15b1c277ba793706b158abd3aee0ab6328",
-    "L6_0_METHODOLOGY_LOCK.md":
-        "4fd870b1d17380e4fc4fbfda5a43f7775d313c7a5f50dbfd1f06a3e49c519c26",
+    "results/l6/arc2/characterisation/v1_2_1_full/per_bar_paths.csv": "7b2acd6ccb98f1fd145a631b318fc95d10f5cf4f42633be9c0b59738fa1696ee",
+    "results/l6/arc2/characterisation/v1_2_1_full/trade_index.csv": "9f841c5b29e87ed90d34c9617431978baf3041459797cedef02fa16c27e3abb5",
+    "core/signals/l4_mtf_alignment_2_down_mixed_kijun.py": "3c8d0f5d4b446f84359ab0663df36869f15b47cf1bf18fbc6caff807dc5134e3",
+    "configs/wfo_l6_arc2.yaml": "25917151bc84a73885eeea9ca9c4cc15b1c277ba793706b158abd3aee0ab6328",
+    "L6_0_METHODOLOGY_LOCK.md": "4fd870b1d17380e4fc4fbfda5a43f7775d313c7a5f50dbfd1f06a3e49c519c26",
 }
 TRADES_ALL_SHA = "47fccbfe4dffa6577a6000b0c16c2ebb9597dcf76523ff2b8084631b19836b3c"
 
 # --- Adjacent locks for gate 15 ---
 ADJ_LOCKED_SHAS: Dict[str, str] = {
-    "results/l6/arc2/characterisation/v1_2_full/per_bar_paths.csv":
-        "e1195f0dedb317f6d921d4fa9526c8aa546457f8038f28f37cd656605e6b1960",
-    "results/l6/arc2/characterisation/v1_2_full/trade_index.csv":
-        "9f841c5b29e87ed90d34c9617431978baf3041459797cedef02fa16c27e3abb5",
-    "results/l6/arc2/characterisation/v1_2_full/pipeline_diff_v1_2_manifest.md":
-        "f3094ffd59121bcb0864f72d8f851f99cc44b4e4354d374d5159e671b4f0d530",
-    "results/l6/arc2/characterisation/v1_1_full/signals_features.csv":
-        "71b39383632bd695b878add8b331b76bcd231ab5b9adba9eea03d69f8762483e",
-    "scripts/lchar/arc2_characterisation_v1_1.py":
-        "5d32627a1c4691ef654315dd5f35401d3a4e811bc20c0d48cd64a33debcb5105",
-    "scripts/lchar/arc2_per_bar_paths.py":
-        "36bb6f9b0413386bd5d25960f4525084fa93408ecb491232e17396872f1ff821",
+    "results/l6/arc2/characterisation/v1_2_full/per_bar_paths.csv": "e1195f0dedb317f6d921d4fa9526c8aa546457f8038f28f37cd656605e6b1960",
+    "results/l6/arc2/characterisation/v1_2_full/trade_index.csv": "9f841c5b29e87ed90d34c9617431978baf3041459797cedef02fa16c27e3abb5",
+    "results/l6/arc2/characterisation/v1_2_full/pipeline_diff_v1_2_manifest.md": "f3094ffd59121bcb0864f72d8f851f99cc44b4e4354d374d5159e671b4f0d530",
+    "results/l6/arc2/characterisation/v1_1_full/signals_features.csv": "71b39383632bd695b878add8b331b76bcd231ab5b9adba9eea03d69f8762483e",
+    "scripts/lchar/arc2_characterisation_v1_1.py": "5d32627a1c4691ef654315dd5f35401d3a4e811bc20c0d48cd64a33debcb5105",
+    "scripts/lchar/arc2_per_bar_paths.py": "36bb6f9b0413386bd5d25960f4525084fa93408ecb491232e17396872f1ff821",
 }
 CANDIDATE_HYPOTHESES_BASELINE_SHA = (
     "8ed487620a7f9ab2c443e6520a4afa820c353480d8329d4fe91703b7d083dfbf"
 )
 
 PAIRS: Tuple[str, ...] = (
-    "AUD_CAD", "AUD_CHF", "AUD_JPY", "AUD_NZD", "AUD_USD", "CAD_CHF", "CAD_JPY", "CHF_JPY",
-    "EUR_AUD", "EUR_CAD", "EUR_CHF", "EUR_GBP", "EUR_JPY", "EUR_NZD", "EUR_USD", "GBP_AUD",
-    "GBP_CAD", "GBP_CHF", "GBP_JPY", "GBP_NZD", "GBP_USD", "NZD_CAD", "NZD_CHF", "NZD_JPY",
-    "NZD_USD", "USD_CAD", "USD_CHF", "USD_JPY",
+    "AUD_CAD",
+    "AUD_CHF",
+    "AUD_JPY",
+    "AUD_NZD",
+    "AUD_USD",
+    "CAD_CHF",
+    "CAD_JPY",
+    "CHF_JPY",
+    "EUR_AUD",
+    "EUR_CAD",
+    "EUR_CHF",
+    "EUR_GBP",
+    "EUR_JPY",
+    "EUR_NZD",
+    "EUR_USD",
+    "GBP_AUD",
+    "GBP_CAD",
+    "GBP_CHF",
+    "GBP_JPY",
+    "GBP_NZD",
+    "GBP_USD",
+    "NZD_CAD",
+    "NZD_CHF",
+    "NZD_JPY",
+    "NZD_USD",
+    "USD_CAD",
+    "USD_CHF",
+    "USD_JPY",
 )
 
 TIME_HORIZON_DEFAULT = 120
@@ -114,7 +126,9 @@ def _verify_input_integrity() -> Dict[str, str]:
             )
         out[rel] = actual
     # trades_all.csv: capture but don't verify (no formal lock in spec)
-    out["results/l6/arc2/trades_all.csv"] = _sha256_file(REPO_ROOT / "results/l6/arc2/trades_all.csv")
+    out["results/l6/arc2/trades_all.csv"] = _sha256_file(
+        REPO_ROOT / "results/l6/arc2/trades_all.csv"
+    )
     return out
 
 
@@ -129,8 +143,9 @@ def _verify_input_integrity() -> Dict[str, str]:
 # ============================================================================
 
 
-def _exit_te_de(*, k_idx: int, T: Dict[str, Any], M: float,
-                exit_atr_fill: float, exit_reason: str) -> Dict[str, Any]:
+def _exit_te_de(
+    *, k_idx: int, T: Dict[str, Any], M: float, exit_atr_fill: float, exit_reason: str
+) -> Dict[str, Any]:
     """Time-exit or data-end exit at given fill-rel ATR offset.
 
     For TE: exit_atr_fill = next_bar_open_atr at k.
@@ -244,8 +259,9 @@ def _exit_tp(*, k_idx: int, T: Dict[str, Any], T_TP_R: float) -> Dict[str, Any]:
     }
 
 
-def variant_BL(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
-               *, time_horizon=TIME_HORIZON_DEFAULT) -> Dict[str, Any]:
+def variant_BL(
+    rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T, *, time_horizon=TIME_HORIZON_DEFAULT
+) -> Dict[str, Any]:
     """Baseline: SL at -2 ATR, time exit at k=120, data_end at bavail."""
     for k_idx in range(bavail):
         k = k_idx + 1
@@ -253,20 +269,24 @@ def variant_BL(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
             return _exit_sl(k_idx=k_idx, T=T, M=2.0)
         if k == time_horizon:
             if hnb[k_idx]:
-                return _exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                    exit_atr_fill=nbo[k_idx], exit_reason="time_exit")
+                return _exit_te_de(
+                    k_idx=k_idx, T=T, M=2.0, exit_atr_fill=nbo[k_idx], exit_reason="time_exit"
+                )
             else:
                 # Edge case: no next bar at horizon → fall through to data_end at this k
-                return _exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                    exit_atr_fill=bc_[k_idx], exit_reason="data_end")
+                return _exit_te_de(
+                    k_idx=k_idx, T=T, M=2.0, exit_atr_fill=bc_[k_idx], exit_reason="data_end"
+                )
         if k == bavail:
-            return _exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                exit_atr_fill=bc_[k_idx], exit_reason="data_end")
+            return _exit_te_de(
+                k_idx=k_idx, T=T, M=2.0, exit_atr_fill=bc_[k_idx], exit_reason="data_end"
+            )
     raise RuntimeError("BL did not terminate")
 
 
-def variant_A(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
-              *, M, time_horizon=TIME_HORIZON_DEFAULT) -> Dict[str, Any]:
+def variant_A(
+    rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T, *, M, time_horizon=TIME_HORIZON_DEFAULT
+) -> Dict[str, Any]:
     """Class A: SL at -M ATR. Variant R-unit = M × atr."""
     for k_idx in range(bavail):
         k = k_idx + 1
@@ -274,19 +294,23 @@ def variant_A(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
             return _exit_sl(k_idx=k_idx, T=T, M=M)
         if k == time_horizon:
             if hnb[k_idx]:
-                return _exit_te_de(k_idx=k_idx, T=T, M=M,
-                                    exit_atr_fill=nbo[k_idx], exit_reason="time_exit")
+                return _exit_te_de(
+                    k_idx=k_idx, T=T, M=M, exit_atr_fill=nbo[k_idx], exit_reason="time_exit"
+                )
             else:
-                return _exit_te_de(k_idx=k_idx, T=T, M=M,
-                                    exit_atr_fill=bc_[k_idx], exit_reason="data_end")
+                return _exit_te_de(
+                    k_idx=k_idx, T=T, M=M, exit_atr_fill=bc_[k_idx], exit_reason="data_end"
+                )
         if k == bavail:
-            return _exit_te_de(k_idx=k_idx, T=T, M=M,
-                                exit_atr_fill=bc_[k_idx], exit_reason="data_end")
+            return _exit_te_de(
+                k_idx=k_idx, T=T, M=M, exit_atr_fill=bc_[k_idx], exit_reason="data_end"
+            )
     raise RuntimeError("A did not terminate")
 
 
-def variant_BE(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
-               *, T_R, time_horizon=TIME_HORIZON_DEFAULT) -> Dict[str, Any]:
+def variant_BE(
+    rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T, *, T_R, time_horizon=TIME_HORIZON_DEFAULT
+) -> Dict[str, Any]:
     """Class B / G2: BE-SL at +T_R mid-rel."""
     threshold_atr_fill = 2.0 * T_R - T["entry_fill_offset_atr"]
     entry_mid_atr_fill = -T["entry_fill_offset_atr"]
@@ -303,20 +327,36 @@ def variant_BE(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
                 return _exit_be(k_idx=k_idx, T=T)
         if k == time_horizon:
             if hnb[k_idx]:
-                return _exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                    exit_atr_fill=nbo[k_idx], exit_reason="time_exit")
+                return _exit_te_de(
+                    k_idx=k_idx, T=T, M=2.0, exit_atr_fill=nbo[k_idx], exit_reason="time_exit"
+                )
             else:
-                return _exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                    exit_atr_fill=bc_[k_idx], exit_reason="data_end")
+                return _exit_te_de(
+                    k_idx=k_idx, T=T, M=2.0, exit_atr_fill=bc_[k_idx], exit_reason="data_end"
+                )
         if k == bavail:
-            return _exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                exit_atr_fill=bc_[k_idx], exit_reason="data_end")
+            return _exit_te_de(
+                k_idx=k_idx, T=T, M=2.0, exit_atr_fill=bc_[k_idx], exit_reason="data_end"
+            )
     raise RuntimeError("BE did not terminate")
 
 
-def variant_TRAIL(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
-                  *, T_engage_R, D_R, kinked=False,
-                  time_horizon=TIME_HORIZON_DEFAULT) -> Dict[str, Any]:
+def variant_TRAIL(
+    rmae,
+    rmfe,
+    bl_,
+    bh_,
+    bc_,
+    nbo,
+    hnb,
+    bavail,
+    T,
+    *,
+    T_engage_R,
+    D_R,
+    kinked=False,
+    time_horizon=TIME_HORIZON_DEFAULT,
+) -> Dict[str, Any]:
     """Class C / G1: trail engages at +T_engage_R mid-rel, D_R below peak."""
     engage_threshold_atr_fill = 2.0 * T_engage_R - T["entry_fill_offset_atr"]
     trail_active = False
@@ -338,20 +378,34 @@ def variant_TRAIL(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
                 return _exit_trail(k_idx=k_idx, T=T, trail_level_atr_fill=trail_level_atr_fill)
         if k == time_horizon:
             if hnb[k_idx]:
-                return _exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                    exit_atr_fill=nbo[k_idx], exit_reason="time_exit")
+                return _exit_te_de(
+                    k_idx=k_idx, T=T, M=2.0, exit_atr_fill=nbo[k_idx], exit_reason="time_exit"
+                )
             else:
-                return _exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                    exit_atr_fill=bc_[k_idx], exit_reason="data_end")
+                return _exit_te_de(
+                    k_idx=k_idx, T=T, M=2.0, exit_atr_fill=bc_[k_idx], exit_reason="data_end"
+                )
         if k == bavail:
-            return _exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                exit_atr_fill=bc_[k_idx], exit_reason="data_end")
+            return _exit_te_de(
+                k_idx=k_idx, T=T, M=2.0, exit_atr_fill=bc_[k_idx], exit_reason="data_end"
+            )
     raise RuntimeError("TRAIL did not terminate")
 
 
-def variant_PARTIAL_BE(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
-                       *, T_partial_R=1.0,
-                       time_horizon=TIME_HORIZON_DEFAULT) -> Dict[str, Any]:
+def variant_PARTIAL_BE(
+    rmae,
+    rmfe,
+    bl_,
+    bh_,
+    bc_,
+    nbo,
+    hnb,
+    bavail,
+    T,
+    *,
+    T_partial_R=1.0,
+    time_horizon=TIME_HORIZON_DEFAULT,
+) -> Dict[str, Any]:
     """Class D: partial 50% at +1R mid-rel + BE-SL on remainder."""
     atr = T["atr"]
     sp_exit = T["sp_exit_pips"]
@@ -360,7 +414,6 @@ def variant_PARTIAL_BE(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
     partial_threshold_atr_fill = 2.0 * T_partial_R - T["entry_fill_offset_atr"]
     entry_mid_atr_fill = -T["entry_fill_offset_atr"]
     partial_closed = False
-    be_active = False
     for k_idx in range(bavail):
         k = k_idx + 1
         if not partial_closed:
@@ -370,19 +423,23 @@ def variant_PARTIAL_BE(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
             if bh_[k_idx] >= partial_threshold_atr_fill:
                 # Partial fires this bar; BE-SL active from k+1
                 partial_closed = True
-                be_active = True
         else:  # partial_closed and be_active
             if bl_[k_idx] <= entry_mid_atr_fill:
                 # Remainder hits BE
                 # Total R = 0.5 × T_partial - baseline_spread_cost_r
                 net_R = 0.5 * T_partial_R - bsc
-                exit_level_atr_fill = entry_mid_atr_fill - sp_exit * pip / (2 * atr)  # final remainder exit
+                exit_level_atr_fill = entry_mid_atr_fill - sp_exit * pip / (
+                    2 * atr
+                )  # final remainder exit
                 gross_R = 0.5 * T_partial_R  # mid-to-mid: half closed at +T, half at 0
                 spread_cost_R = gross_R - net_R  # = bsc
                 return {
-                    "exit_bar": k, "exit_reason": "partial_then_be",
+                    "exit_bar": k,
+                    "exit_reason": "partial_then_be",
                     "exit_level_atr_fill": exit_level_atr_fill,
-                    "gross_R": gross_R, "spread_cost_R": spread_cost_R, "net_R": net_R,
+                    "gross_R": gross_R,
+                    "spread_cost_R": spread_cost_R,
+                    "net_R": net_R,
                 }
         if k == time_horizon:
             if partial_closed:
@@ -399,18 +456,23 @@ def variant_PARTIAL_BE(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
                 net_R = gross_R - bsc
                 exit_level_atr_fill = exit_atr_fill - sp_exit * pip / (2 * atr)
                 return {
-                    "exit_bar": k, "exit_reason": exit_reason,
+                    "exit_bar": k,
+                    "exit_reason": exit_reason,
                     "exit_level_atr_fill": exit_level_atr_fill,
-                    "gross_R": gross_R, "spread_cost_R": bsc, "net_R": net_R,
+                    "gross_R": gross_R,
+                    "spread_cost_R": bsc,
+                    "net_R": net_R,
                 }
             else:
                 # Full-position time exit (no partial)
                 if hnb[k_idx]:
-                    return _exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                        exit_atr_fill=nbo[k_idx], exit_reason="time_exit")
+                    return _exit_te_de(
+                        k_idx=k_idx, T=T, M=2.0, exit_atr_fill=nbo[k_idx], exit_reason="time_exit"
+                    )
                 else:
-                    return _exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                        exit_atr_fill=bc_[k_idx], exit_reason="data_end")
+                    return _exit_te_de(
+                        k_idx=k_idx, T=T, M=2.0, exit_atr_fill=bc_[k_idx], exit_reason="data_end"
+                    )
         if k == bavail:
             if partial_closed:
                 exit_atr_fill = bc_[k_idx]
@@ -418,18 +480,23 @@ def variant_PARTIAL_BE(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
                 net_R = gross_R - bsc
                 exit_level_atr_fill = exit_atr_fill - sp_exit * pip / (2 * atr)
                 return {
-                    "exit_bar": k, "exit_reason": "partial_then_data_end",
+                    "exit_bar": k,
+                    "exit_reason": "partial_then_data_end",
                     "exit_level_atr_fill": exit_level_atr_fill,
-                    "gross_R": gross_R, "spread_cost_R": bsc, "net_R": net_R,
+                    "gross_R": gross_R,
+                    "spread_cost_R": bsc,
+                    "net_R": net_R,
                 }
             else:
-                return _exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                    exit_atr_fill=bc_[k_idx], exit_reason="data_end")
+                return _exit_te_de(
+                    k_idx=k_idx, T=T, M=2.0, exit_atr_fill=bc_[k_idx], exit_reason="data_end"
+                )
     raise RuntimeError("PARTIAL_BE did not terminate")
 
 
-def variant_TP(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
-               *, T_TP_R, time_horizon=TIME_HORIZON_DEFAULT) -> Dict[str, Any]:
+def variant_TP(
+    rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T, *, T_TP_R, time_horizon=TIME_HORIZON_DEFAULT
+) -> Dict[str, Any]:
     """Class E: fixed TP at +T_TP_R mid-rel. SL has precedence at same bar."""
     tp_threshold_atr_fill = 2.0 * T_TP_R - T["entry_fill_offset_atr"]
     for k_idx in range(bavail):
@@ -442,21 +509,25 @@ def variant_TP(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
             return _exit_tp(k_idx=k_idx, T=T, T_TP_R=T_TP_R)
         if k == time_horizon:
             if hnb[k_idx]:
-                return _exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                    exit_atr_fill=nbo[k_idx], exit_reason="time_exit")
+                return _exit_te_de(
+                    k_idx=k_idx, T=T, M=2.0, exit_atr_fill=nbo[k_idx], exit_reason="time_exit"
+                )
             else:
-                return _exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                    exit_atr_fill=bc_[k_idx], exit_reason="data_end")
+                return _exit_te_de(
+                    k_idx=k_idx, T=T, M=2.0, exit_atr_fill=bc_[k_idx], exit_reason="data_end"
+                )
         if k == bavail:
-            return _exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                exit_atr_fill=bc_[k_idx], exit_reason="data_end")
+            return _exit_te_de(
+                k_idx=k_idx, T=T, M=2.0, exit_atr_fill=bc_[k_idx], exit_reason="data_end"
+            )
     raise RuntimeError("TP did not terminate")
 
 
 def variant_F1(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T) -> Dict[str, Any]:
     """F1: BL with extended time horizon 240."""
-    return variant_BL(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
-                       time_horizon=TIME_HORIZON_EXTENDED)
+    return variant_BL(
+        rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T, time_horizon=TIME_HORIZON_EXTENDED
+    )
 
 
 def variant_F2(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T) -> Dict[str, Any]:
@@ -466,41 +537,48 @@ def variant_F2(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T) -> Dict[str, Any]
         if rmae[k_idx] <= -2.0:
             return _exit_sl(k_idx=k_idx, T=T, M=2.0)
         if k == bavail:
-            return _exit_te_de(k_idx=k_idx, T=T, M=2.0,
-                                exit_atr_fill=bc_[k_idx], exit_reason="data_end")
+            return _exit_te_de(
+                k_idx=k_idx, T=T, M=2.0, exit_atr_fill=bc_[k_idx], exit_reason="data_end"
+            )
     raise RuntimeError("F2 did not terminate")
 
 
 def variant_G1(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T) -> Dict[str, Any]:
     """G1: kinked trail. T_engage = +1R; D = 0.5R while rmfe<6, D = 1R once rmfe>=6."""
-    return variant_TRAIL(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
-                          T_engage_R=1.0, D_R=0.5, kinked=True)
+    return variant_TRAIL(
+        rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T, T_engage_R=1.0, D_R=0.5, kinked=True
+    )
 
 
 def variant_G2(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T) -> Dict[str, Any]:
     """G2: B2 (BE-SL at +1R) + F1 (k=240). Tests B2+F1 additivity."""
-    return variant_BE(rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T,
-                       T_R=1.0, time_horizon=TIME_HORIZON_EXTENDED)
+    return variant_BE(
+        rmae, rmfe, bl_, bh_, bc_, nbo, hnb, bavail, T, T_R=1.0, time_horizon=TIME_HORIZON_EXTENDED
+    )
 
 
 # Variant registry: (id, spec_short, fn).
 VARIANTS: List[Tuple[str, str, Callable[..., Dict[str, Any]]]] = [
-    ("BL", "Baseline: SL=-2ATR, k=120 TE",                  variant_BL),
-    ("A1", "SL=-1.5ATR, k=120 TE",                          lambda *a: variant_A(*a, M=1.5)),
-    ("A2", "SL=-2.5ATR, k=120 TE",                          lambda *a: variant_A(*a, M=2.5)),
-    ("B1", "BE-SL @ +0.5R, k=120",                          lambda *a: variant_BE(*a, T_R=0.5)),
-    ("B2", "BE-SL @ +1.0R, k=120",                          lambda *a: variant_BE(*a, T_R=1.0)),
-    ("B3", "BE-SL @ +1.5R, k=120",                          lambda *a: variant_BE(*a, T_R=1.5)),
-    ("C1", "Trail engage +1R, D=0.5R, k=120",               lambda *a: variant_TRAIL(*a, T_engage_R=1.0, D_R=0.5)),
-    ("C2", "Trail engage +1R, D=1R, k=120",                 lambda *a: variant_TRAIL(*a, T_engage_R=1.0, D_R=1.0)),
-    ("C3", "Trail engage +2R, D=1R, k=120",                 lambda *a: variant_TRAIL(*a, T_engage_R=2.0, D_R=1.0)),
-    ("D1", "Partial 50%@+1R + BE-SL, k=120",                variant_PARTIAL_BE),
-    ("E1", "Fixed TP @ +1.5R, k=120",                       lambda *a: variant_TP(*a, T_TP_R=1.5)),
-    ("E2", "Fixed TP @ +3R, k=120",                         lambda *a: variant_TP(*a, T_TP_R=3.0)),
-    ("F1", "BL k=240",                                       variant_F1),
-    ("F2", "BL no time exit (SL or DE)",                    variant_F2),
-    ("G1", "Kinked trail (D=0.5R/1R)",                      variant_G1),
-    ("G2", "B2 + F1: BE-SL @ +1R, k=240",                   variant_G2),
+    ("BL", "Baseline: SL=-2ATR, k=120 TE", variant_BL),
+    ("A1", "SL=-1.5ATR, k=120 TE", lambda *a: variant_A(*a, M=1.5)),
+    ("A2", "SL=-2.5ATR, k=120 TE", lambda *a: variant_A(*a, M=2.5)),
+    ("B1", "BE-SL @ +0.5R, k=120", lambda *a: variant_BE(*a, T_R=0.5)),
+    ("B2", "BE-SL @ +1.0R, k=120", lambda *a: variant_BE(*a, T_R=1.0)),
+    ("B3", "BE-SL @ +1.5R, k=120", lambda *a: variant_BE(*a, T_R=1.5)),
+    (
+        "C1",
+        "Trail engage +1R, D=0.5R, k=120",
+        lambda *a: variant_TRAIL(*a, T_engage_R=1.0, D_R=0.5),
+    ),
+    ("C2", "Trail engage +1R, D=1R, k=120", lambda *a: variant_TRAIL(*a, T_engage_R=1.0, D_R=1.0)),
+    ("C3", "Trail engage +2R, D=1R, k=120", lambda *a: variant_TRAIL(*a, T_engage_R=2.0, D_R=1.0)),
+    ("D1", "Partial 50%@+1R + BE-SL, k=120", variant_PARTIAL_BE),
+    ("E1", "Fixed TP @ +1.5R, k=120", lambda *a: variant_TP(*a, T_TP_R=1.5)),
+    ("E2", "Fixed TP @ +3R, k=120", lambda *a: variant_TP(*a, T_TP_R=3.0)),
+    ("F1", "BL k=240", variant_F1),
+    ("F2", "BL no time exit (SL or DE)", variant_F2),
+    ("G1", "Kinked trail (D=0.5R/1R)", variant_G1),
+    ("G2", "B2 + F1: BE-SL @ +1R, k=240", variant_G2),
 ]
 
 
@@ -510,7 +588,10 @@ VARIANTS: List[Tuple[str, str, Callable[..., Dict[str, Any]]]] = [
 
 
 def _run_sweep(
-    *, per_bar_csv: Path, trade_index_csv: Path, trades_all_csv: Path,
+    *,
+    per_bar_csv: Path,
+    trade_index_csv: Path,
+    trades_all_csv: Path,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Returns (variant_trades, trade_index_full)."""
     print("  Loading trade_index.csv + trades_all.csv...", flush=True)
@@ -522,7 +603,9 @@ def _run_sweep(
     # Join for sp_entry/exit
     ti_full = ti.merge(
         ta[["pair", "signal_bar_ts", "spread_pips_entry", "spread_pips_exit"]],
-        on=["pair", "signal_bar_ts"], how="left", validate="one_to_one",
+        on=["pair", "signal_bar_ts"],
+        how="left",
+        validate="one_to_one",
     )
     if ti_full[["spread_pips_entry", "spread_pips_exit"]].isna().any().any():
         raise RuntimeError("Gate 3 HALT — null sp_entry/sp_exit after merge")
@@ -540,8 +623,12 @@ def _run_sweep(
         atr = float(row["atr_1h_wilder_at_signal"])
         entry_fill = float(row["entry_price"])
         per_trade[tid] = {
-            "pair": pair, "atr": atr, "entry_fill": entry_fill,
-            "sp_entry_pips": sp_entry, "sp_exit_pips": sp_exit, "pip": pip,
+            "pair": pair,
+            "atr": atr,
+            "entry_fill": entry_fill,
+            "sp_entry_pips": sp_entry,
+            "sp_exit_pips": sp_exit,
+            "pip": pip,
             "entry_fill_offset_atr": sp_entry * pip / (2 * atr),
             "baseline_spread_cost_r": (sp_entry + sp_exit) * pip / (4 * atr),
             "exit_half_spread_r_base": sp_exit * pip / (4 * atr),
@@ -588,9 +675,13 @@ def _run_sweep(
     for tid in range(n_trades):
         s, e = int(starts[tid]), int(ends[tid])
         bavail = e - s
-        rmae = rmae_all[s:e]; rmfe = rmfe_all[s:e]
-        bl_ = bl_all[s:e]; bh_ = bh_all[s:e]; bc_ = bc_all[s:e]
-        nbo = nbo_all[s:e]; hnb = hnb_all[s:e]
+        rmae = rmae_all[s:e]
+        rmfe = rmfe_all[s:e]
+        bl_ = bl_all[s:e]
+        bh_ = bh_all[s:e]
+        bc_ = bc_all[s:e]
+        nbo = nbo_all[s:e]
+        hnb = hnb_all[s:e]
         T = per_trade[tid]
 
         for vid, _, vfn in VARIANTS:
@@ -609,16 +700,26 @@ def _run_sweep(
             write_idx += 1
         if (tid + 1) % 1000 == 0:
             el = time.time() - t0
-            print(f"    progress: {tid+1}/{n_trades} ({el:.1f}s, "
-                  f"{(tid+1)/el:.0f} trades/s)", flush=True)
+            print(
+                f"    progress: {tid + 1}/{n_trades} ({el:.1f}s, {(tid + 1) / el:.0f} trades/s)",
+                flush=True,
+            )
 
-    variant_trades = pd.DataFrame({
-        "variant_id": out_variant, "trade_id": out_tid, "pair": out_pair,
-        "signal_bar_ts": out_sigts, "fold_id": out_fold,
-        "exit_reason_variant": out_reason, "exit_bar": out_exitbar,
-        "exit_level_atr_fill": out_exitlvl, "gross_R": out_gross,
-        "spread_cost_R": out_spread, "net_R": out_net,
-    })
+    variant_trades = pd.DataFrame(
+        {
+            "variant_id": out_variant,
+            "trade_id": out_tid,
+            "pair": out_pair,
+            "signal_bar_ts": out_sigts,
+            "fold_id": out_fold,
+            "exit_reason_variant": out_reason,
+            "exit_bar": out_exitbar,
+            "exit_level_atr_fill": out_exitlvl,
+            "gross_R": out_gross,
+            "spread_cost_R": out_spread,
+            "net_R": out_net,
+        }
+    )
     variant_trades = variant_trades.sort_values(["variant_id", "trade_id"]).reset_index(drop=True)
 
     return variant_trades, ti_full
@@ -630,9 +731,15 @@ def _run_sweep(
 
 
 EXIT_REASONS_ALL = [
-    "stop_loss", "time_exit", "be_exit", "trail_exit",
-    "partial_then_be", "partial_then_time", "partial_then_data_end",
-    "fixed_tp", "data_end",
+    "stop_loss",
+    "time_exit",
+    "be_exit",
+    "trail_exit",
+    "partial_then_be",
+    "partial_then_time",
+    "partial_then_data_end",
+    "fixed_tp",
+    "data_end",
 ]
 
 
@@ -645,28 +752,33 @@ def _aggregate_pooled(vt: pd.DataFrame) -> pd.DataFrame:
         net = sub["net_R"].to_numpy(dtype=np.float64)
         rc = sub["exit_reason_variant"].value_counts().to_dict()
         rates = {f"{r}_rate": rc.get(r, 0) / n for r in EXIT_REASONS_ALL}
-        rows.append({
-            "variant_id": vid, "variant_spec_short": specs[vid],
-            "n_trades": n,
-            "mean_R": float(np.mean(net)),
-            "median_R": float(np.median(net)),
-            "std_R": float(np.std(net, ddof=1)) if n > 1 else 0.0,
-            "q05_R": float(np.quantile(net, 0.05)),
-            "q25_R": float(np.quantile(net, 0.25)),
-            "q75_R": float(np.quantile(net, 0.75)),
-            "q95_R": float(np.quantile(net, 0.95)),
-            "sl_rate": rates["stop_loss_rate"],
-            "time_exit_rate": rates["time_exit_rate"],
-            "be_exit_rate": rates["be_exit_rate"] + rates["partial_then_be_rate"],
-            "trail_exit_rate": rates["trail_exit_rate"],
-            "partial_exit_rate": (rates["partial_then_be_rate"]
-                                  + rates["partial_then_time_rate"]
-                                  + rates["partial_then_data_end_rate"]),
-            "tp_exit_rate": rates["fixed_tp_rate"],
-            "data_end_rate": rates["data_end_rate"] + rates["partial_then_data_end_rate"],
-            "mean_spread_cost_R": float(sub["spread_cost_R"].mean()),
-            "total_R": float(np.sum(net)),
-        })
+        rows.append(
+            {
+                "variant_id": vid,
+                "variant_spec_short": specs[vid],
+                "n_trades": n,
+                "mean_R": float(np.mean(net)),
+                "median_R": float(np.median(net)),
+                "std_R": float(np.std(net, ddof=1)) if n > 1 else 0.0,
+                "q05_R": float(np.quantile(net, 0.05)),
+                "q25_R": float(np.quantile(net, 0.25)),
+                "q75_R": float(np.quantile(net, 0.75)),
+                "q95_R": float(np.quantile(net, 0.95)),
+                "sl_rate": rates["stop_loss_rate"],
+                "time_exit_rate": rates["time_exit_rate"],
+                "be_exit_rate": rates["be_exit_rate"] + rates["partial_then_be_rate"],
+                "trail_exit_rate": rates["trail_exit_rate"],
+                "partial_exit_rate": (
+                    rates["partial_then_be_rate"]
+                    + rates["partial_then_time_rate"]
+                    + rates["partial_then_data_end_rate"]
+                ),
+                "tp_exit_rate": rates["fixed_tp_rate"],
+                "data_end_rate": rates["data_end_rate"] + rates["partial_then_data_end_rate"],
+                "mean_spread_cost_R": float(sub["spread_cost_R"].mean()),
+                "total_R": float(np.sum(net)),
+            }
+        )
     return pd.DataFrame(rows)
 
 
@@ -687,21 +799,28 @@ def _aggregate_per_fold(vt: pd.DataFrame) -> pd.DataFrame:
             mdd = float(np.max(dd))
             rc = sub["exit_reason_variant"].value_counts().to_dict()
             rates = {f"{r}_rate": rc.get(r, 0) / n for r in EXIT_REASONS_ALL}
-            rows.append({
-                "variant_id": vid, "fold_id": int(fid), "n": n,
-                "mean_R": float(np.mean(net)),
-                "median_R": float(np.median(net)),
-                "total_R": float(np.sum(net)),
-                "max_DD_R": mdd, "max_DD_pct_of_n": mdd / n,
-                "sl_rate": rates["stop_loss_rate"],
-                "time_exit_rate": rates["time_exit_rate"],
-                "be_exit_rate": rates["be_exit_rate"] + rates["partial_then_be_rate"],
-                "trail_exit_rate": rates["trail_exit_rate"],
-                "partial_exit_rate": (rates["partial_then_be_rate"]
-                                      + rates["partial_then_time_rate"]
-                                      + rates["partial_then_data_end_rate"]),
-                "tp_exit_rate": rates["fixed_tp_rate"],
-            })
+            rows.append(
+                {
+                    "variant_id": vid,
+                    "fold_id": int(fid),
+                    "n": n,
+                    "mean_R": float(np.mean(net)),
+                    "median_R": float(np.median(net)),
+                    "total_R": float(np.sum(net)),
+                    "max_DD_R": mdd,
+                    "max_DD_pct_of_n": mdd / n,
+                    "sl_rate": rates["stop_loss_rate"],
+                    "time_exit_rate": rates["time_exit_rate"],
+                    "be_exit_rate": rates["be_exit_rate"] + rates["partial_then_be_rate"],
+                    "trail_exit_rate": rates["trail_exit_rate"],
+                    "partial_exit_rate": (
+                        rates["partial_then_be_rate"]
+                        + rates["partial_then_time_rate"]
+                        + rates["partial_then_data_end_rate"]
+                    ),
+                    "tp_exit_rate": rates["fixed_tp_rate"],
+                }
+            )
     return pd.DataFrame(rows)
 
 
@@ -713,15 +832,26 @@ def _additivity_calibration(pooled: pd.DataFrame) -> pd.DataFrame:
     lone_sum = (b2_mean - bl_mean) + (f1_mean - bl_mean)
     combo = g2_mean - bl_mean
     diverg = combo - lone_sum
-    note = ("abs(divergence) < 0.05R — additive forecastable from lone effects."
-            if abs(diverg) < 0.05 else
-            "abs(divergence) >= 0.05R — combinations must be tested directly.")
-    return pd.DataFrame([{
-        "combination": "G2 = B2 + F1",
-        "BL_mean_R": bl_mean, "B2_mean_R": b2_mean, "F1_mean_R": f1_mean, "G2_mean_R": g2_mean,
-        "lone_lift_sum": lone_sum, "combination_lift": combo, "divergence": diverg,
-        "interpretation_note": note,
-    }])
+    note = (
+        "abs(divergence) < 0.05R — additive forecastable from lone effects."
+        if abs(diverg) < 0.05
+        else "abs(divergence) >= 0.05R — combinations must be tested directly."
+    )
+    return pd.DataFrame(
+        [
+            {
+                "combination": "G2 = B2 + F1",
+                "BL_mean_R": bl_mean,
+                "B2_mean_R": b2_mean,
+                "F1_mean_R": f1_mean,
+                "G2_mean_R": g2_mean,
+                "lone_lift_sum": lone_sum,
+                "combination_lift": combo,
+                "divergence": diverg,
+                "interpretation_note": note,
+            }
+        ]
+    )
 
 
 # ============================================================================
@@ -729,9 +859,14 @@ def _additivity_calibration(pooled: pd.DataFrame) -> pd.DataFrame:
 # ============================================================================
 
 
-def _validate_gates(*, vt: pd.DataFrame, ti_full: pd.DataFrame,
-                    pooled: pd.DataFrame, per_fold: pd.DataFrame,
-                    out_dir: Path) -> Dict[str, Any]:
+def _validate_gates(
+    *,
+    vt: pd.DataFrame,
+    ti_full: pd.DataFrame,
+    pooled: pd.DataFrame,
+    per_fold: pd.DataFrame,
+    out_dir: Path,
+) -> Dict[str, Any]:
     disp: Dict[str, Any] = {}
 
     # Gate 2: trade count parity
@@ -760,16 +895,15 @@ def _validate_gates(*, vt: pd.DataFrame, ti_full: pd.DataFrame,
     GATE_4_TOL = 1e-7
     bl = vt[vt["variant_id"] == "BL"].sort_values("trade_id").reset_index(drop=True)
     ti_sorted = ti_full.sort_values("trade_id").reset_index(drop=True)
-    diff = (bl["net_R"].to_numpy(dtype=np.float64)
-            - ti_sorted["R"].to_numpy(dtype=np.float64))
+    diff = bl["net_R"].to_numpy(dtype=np.float64) - ti_sorted["R"].to_numpy(dtype=np.float64)
     abs_diff = np.abs(diff)
     max_abs = float(abs_diff.max())
     n_mismatch = int((abs_diff >= GATE_4_TOL).sum())
     # Per exit_reason breakdown for diagnostic
     er = ti_sorted["exit_reason"].to_numpy()
-    sl_mask = (er == "stop_loss")
-    te_mask = (er == "time_exit")
-    de_mask = (er == "data_end")
+    sl_mask = er == "stop_loss"
+    te_mask = er == "time_exit"
+    de_mask = er == "data_end"
     disp["gate_4"] = {
         "max_abs_diff": f"{max_abs:.3e}",
         "tolerance": f"{GATE_4_TOL:.0e}",
@@ -784,16 +918,19 @@ def _validate_gates(*, vt: pd.DataFrame, ti_full: pd.DataFrame,
     if max_abs >= GATE_4_TOL or n_mismatch > 0:
         # Halt with full diagnostic
         bad_idx = np.argsort(-abs_diff)[:20]
-        sample = pd.DataFrame({
-            "trade_id": bl["trade_id"].iloc[bad_idx].values,
-            "pair": ti_sorted["pair"].iloc[bad_idx].values,
-            "exit_reason": er[bad_idx],
-            "BL_net_R": bl["net_R"].iloc[bad_idx].values,
-            "v1.1_R": ti_sorted["R"].iloc[bad_idx].values,
-            "abs_diff": abs_diff[bad_idx],
-        })
-        _write_gate4_halt_diagnostic(out_dir=out_dir, disp_gate4=disp["gate_4"],
-                                       sample=sample, max_abs=max_abs)
+        sample = pd.DataFrame(
+            {
+                "trade_id": bl["trade_id"].iloc[bad_idx].values,
+                "pair": ti_sorted["pair"].iloc[bad_idx].values,
+                "exit_reason": er[bad_idx],
+                "BL_net_R": bl["net_R"].iloc[bad_idx].values,
+                "v1.1_R": ti_sorted["R"].iloc[bad_idx].values,
+                "abs_diff": abs_diff[bad_idx],
+            }
+        )
+        _write_gate4_halt_diagnostic(
+            out_dir=out_dir, disp_gate4=disp["gate_4"], sample=sample, max_abs=max_abs
+        )
         raise RuntimeError(
             f"Gate 4 HALT — BL R diff exceeds {GATE_4_TOL:.0e}: max={max_abs:.3e}, "
             f"mismatches_at_tol={n_mismatch}. See GATE_4_HALT_DIAGNOSTIC.md."
@@ -810,9 +947,16 @@ def _validate_gates(*, vt: pd.DataFrame, ti_full: pd.DataFrame,
     ti_sl = ti_sorted[er == "stop_loss"]
     ti_te = ti_sorted[er == "time_exit"]
     ti_sl_pip = ti_sl["pair"].apply(_pip_size).to_numpy()
-    sl_expected = ti_sl["spread_pips_exit"].to_numpy() * ti_sl_pip / (4 * ti_sl["atr_1h_wilder_at_signal"].to_numpy())
-    te_expected = ((ti_te["spread_pips_entry"].to_numpy() + ti_te["spread_pips_exit"].to_numpy())
-                   * ti_te["pair"].apply(_pip_size).to_numpy() / (4 * ti_te["atr_1h_wilder_at_signal"].to_numpy()))
+    sl_expected = (
+        ti_sl["spread_pips_exit"].to_numpy()
+        * ti_sl_pip
+        / (4 * ti_sl["atr_1h_wilder_at_signal"].to_numpy())
+    )
+    te_expected = (
+        (ti_te["spread_pips_entry"].to_numpy() + ti_te["spread_pips_exit"].to_numpy())
+        * ti_te["pair"].apply(_pip_size).to_numpy()
+        / (4 * ti_te["atr_1h_wilder_at_signal"].to_numpy())
+    )
     sl_max = float(np.max(np.abs(sa_diff_sl - sl_expected)))
     te_max = float(np.max(np.abs(sa_diff_te - te_expected)))
     disp["gate_5"] = f"sl_diff_max={sl_max:.3e}, te_diff_max={te_max:.3e}"
@@ -871,50 +1015,66 @@ def _validate_gates(*, vt: pd.DataFrame, ti_full: pd.DataFrame,
             ]
             for v_check in sl_only:
                 mr = float(vt[vt["variant_id"] == v_check]["net_R"].max())
-                diag_lines.append(f"- {v_check}: max_R = {mr:+.4f} {'← OVER CAP' if mr > 20 else ''}")
-            diag_lines.extend([
-                "",
-                f"## Top 5 {vid} trades by net_R",
-                "",
-                "```",
-                top[["trade_id", "pair", "signal_bar_ts", "exit_reason_variant",
-                     "exit_bar", "net_R"]].to_string(index=False),
-                "```",
-                "",
-                f"## Worked example: trade_id={top_tid} ({ti_top['pair']})",
-                "",
-                f"- atr_1h_wilder_at_signal: {ti_top['atr_1h_wilder_at_signal']:.6e}",
-                f"- entry_price: {ti_top['entry_price']:.6f}",
-                f"- v1.1 R (Arc 2 baseline @ k=120): {ti_top['R']:.4f}",
-                f"- v1.1 mfe_R (held-window peak): {ti_top['mfe_R']:.4f}",
-                f"- bars_available: {ti_top['bars_available']}",
-                f"- {vid} net_R (no time exit, full hold): {top.iloc[0]['net_R']:.4f}",
-                "",
-                "## Diagnosis",
-                "",
-                f"This is a **legitimate long-running winner** captured by `{vid}` (no time exit). "
-                "The trade exited at +{:.2f}R Arc 2 baseline (time exit at k=120) but ran further "
-                "favourably; F2's no-time-exit semantics let it accumulate to +{:.2f}R by bars_available=240.".format(
-                    ti_top['R'], top.iloc[0]['net_R']),
-                "",
-                f"The trade's ATR is moderate (~{ti_top['atr_1h_wilder_at_signal']:.4f}); the +{top.iloc[0]['net_R']:.0f}R extreme reflects a sustained favourable trend over multiple days, not a logic bug. "
-                "Same pattern as v1.2.1 gate 9 (cap of |x|<50 was too tight for legitimate small-ATR extremes; relaxed to <200 by planner).",
-                "",
-                "## Resolutions for the planner",
-                "",
-                f"1. **Relax cap to +50 or +100** — would accept this trade and similar legitimate long-runners; still catches genuine logic bugs (which would show R > 100s).",
-                "2. **Remove the cap entirely** — gate 7 already guarantees no NaN/inf; the +20 cap was a sanity check, not a correctness check.",
-                "3. **Restrict gate 7 cap to BL/A1/A2 only**, exempting F2 (since F2's no-time-exit semantics specifically allow long runs).",
-                "",
-                "## Outputs preserved",
-                "",
-                "- `variant_trades.csv` — full sweep computation; data correct, gate 7 cap inconsistent with population scale",
-                "- `variant_summary_pooled.csv`, `variant_summary_per_fold.csv`, `additivity_calibration.csv`",
-            ])
-            (out_dir / "GATE_7_HALT_DIAGNOSTIC.md").write_text("\n".join(diag_lines) + "\n",
-                                                                  encoding="utf-8")
-            print(f"\n=== GATE 7 HALT DIAGNOSTIC written to: {out_dir / 'GATE_7_HALT_DIAGNOSTIC.md'} ===\n",
-                  flush=True)
+                diag_lines.append(
+                    f"- {v_check}: max_R = {mr:+.4f} {'← OVER CAP' if mr > 20 else ''}"
+                )
+            diag_lines.extend(
+                [
+                    "",
+                    f"## Top 5 {vid} trades by net_R",
+                    "",
+                    "```",
+                    top[
+                        [
+                            "trade_id",
+                            "pair",
+                            "signal_bar_ts",
+                            "exit_reason_variant",
+                            "exit_bar",
+                            "net_R",
+                        ]
+                    ].to_string(index=False),
+                    "```",
+                    "",
+                    f"## Worked example: trade_id={top_tid} ({ti_top['pair']})",
+                    "",
+                    f"- atr_1h_wilder_at_signal: {ti_top['atr_1h_wilder_at_signal']:.6e}",
+                    f"- entry_price: {ti_top['entry_price']:.6f}",
+                    f"- v1.1 R (Arc 2 baseline @ k=120): {ti_top['R']:.4f}",
+                    f"- v1.1 mfe_R (held-window peak): {ti_top['mfe_R']:.4f}",
+                    f"- bars_available: {ti_top['bars_available']}",
+                    f"- {vid} net_R (no time exit, full hold): {top.iloc[0]['net_R']:.4f}",
+                    "",
+                    "## Diagnosis",
+                    "",
+                    f"This is a **legitimate long-running winner** captured by `{vid}` (no time exit). "
+                    "The trade exited at +{:.2f}R Arc 2 baseline (time exit at k=120) but ran further "
+                    "favourably; F2's no-time-exit semantics let it accumulate to +{:.2f}R by bars_available=240.".format(
+                        ti_top["R"], top.iloc[0]["net_R"]
+                    ),
+                    "",
+                    f"The trade's ATR is moderate (~{ti_top['atr_1h_wilder_at_signal']:.4f}); the +{top.iloc[0]['net_R']:.0f}R extreme reflects a sustained favourable trend over multiple days, not a logic bug. "
+                    "Same pattern as v1.2.1 gate 9 (cap of |x|<50 was too tight for legitimate small-ATR extremes; relaxed to <200 by planner).",
+                    "",
+                    "## Resolutions for the planner",
+                    "",
+                    "1. **Relax cap to +50 or +100** — would accept this trade and similar legitimate long-runners; still catches genuine logic bugs (which would show R > 100s).",
+                    "2. **Remove the cap entirely** — gate 7 already guarantees no NaN/inf; the +20 cap was a sanity check, not a correctness check.",
+                    "3. **Restrict gate 7 cap to BL/A1/A2 only**, exempting F2 (since F2's no-time-exit semantics specifically allow long runs).",
+                    "",
+                    "## Outputs preserved",
+                    "",
+                    "- `variant_trades.csv` — full sweep computation; data correct, gate 7 cap inconsistent with population scale",
+                    "- `variant_summary_pooled.csv`, `variant_summary_per_fold.csv`, `additivity_calibration.csv`",
+                ]
+            )
+            (out_dir / "GATE_7_HALT_DIAGNOSTIC.md").write_text(
+                "\n".join(diag_lines) + "\n", encoding="utf-8"
+            )
+            print(
+                f"\n=== GATE 7 HALT DIAGNOSTIC written to: {out_dir / 'GATE_7_HALT_DIAGNOSTIC.md'} ===\n",
+                flush=True,
+            )
             raise RuntimeError(f"Gate 7 HALT — {vid} max_R={max_r:.2f} > 20")
 
     # Gate 8: B2 BE FIRE rate plausibility (relaxed from [0.45, 0.55] to
@@ -950,57 +1110,66 @@ def _validate_gates(*, vt: pd.DataFrame, ti_full: pd.DataFrame,
             "",
             "## Disposition",
             "",
-            "**Gate 8 FAILED.** Spec range [0.45, 0.55]. Observed B2 be_exit_rate = **{:.4f}** ({:.2f}%).".format(b2_be, b2_be*100),
+            "**Gate 8 FAILED.** Spec range [0.45, 0.55]. Observed B2 be_exit_rate = **{:.4f}** ({:.2f}%).".format(
+                b2_be, b2_be * 100
+            ),
             "",
             "## Diagnosis: spec confused **BE activation rate** with **BE fire rate**",
             "",
             "Spec rationale: 'should approximate the share of trades with mfe_R >= 1 in v1.1 (51.19%)'.",
             "",
             f"v1.1 population reference (taken trades, n={len(taken)}):",
-            f"- Trades reaching mfe_R >= 1R: **{(taken['mfe_R']>=1.0).sum()} = {mfe_ge_1_rate*100:.2f}%** (= BE activation rate)",
+            f"- Trades reaching mfe_R >= 1R: **{(taken['mfe_R'] >= 1.0).sum()} = {mfe_ge_1_rate * 100:.2f}%** (= BE activation rate)",
             "",
             f"B2 actual exit reasons (n={n}):",
         ]
         for rsn in ["stop_loss", "be_exit", "time_exit", "data_end"]:
             cnt = rc.get(rsn, 0)
-            diag.append(f"- `{rsn}`: {cnt} = {cnt/n*100:.2f}%")
-        diag.extend([
-            "",
-            "## Two distinct rates, two physical meanings",
-            "",
-            "1. **BE activation rate** = % of trades reaching mfe_R >= 1R (so BE-SL becomes active starting at the NEXT bar). For B2: **51.19%** (matches v1.1 reference exactly — every trade reaching +1R MFE activates).",
-            "",
-            "2. **BE fire rate** = % of trades where BE-SL fires (bar_low retraces to entry_mid AFTER activation, before time exit). For B2: **" + "{:.2f}".format(b2_be*100) + "%**.",
-            "",
-            "The diff (51.19% - 38.59% = ~12.6%) = trades that reached +1R MFE but kept running favourably and never retraced to entry_mid before time exit. These show up in B2's `time_exit` (12.32%).",
-            "",
-            "Verification: 38.59% (BE fire) + 12.32% (TE without BE fire) + 0.18% (DE) ≈ 51.10% ≈ activation rate.",
-            "",
-            "## Other plausibility gates (all pass at observed data)",
-            "",
-            "Verified externally before halting:",
-            "- Gate 7 (max R, cap +50): all SL-only variants PASS (BL 14.7, A1 19.6, A2 11.8, F2 25.8)",
-            "- Gate 9 (C1/C3 trail engage): C1 51.1%, C3 34.2% — both in spec range",
-            "- Gate 10 (E1/E2 TP rates): E1 40.8%, E2 23.3% — both in spec range",
-            "- Gate 11 (A1 > BL > A2 SL ordering): 82.4% > 76.0% > 70.8% — PASS",
-            "",
-            "Only gate 8 is mis-specified. The data is correct.",
-            "",
-            "## Resolutions for the planner",
-            "",
-            "1. **Relax gate 8 range to [30%, 55%]** — accepts the BE fire rate while still bounding logic bugs (e.g., a sign-flip on the entry_mid threshold would make BE fire on near-100% of trades).",
-            "2. **Re-interpret gate 8 to check BE activation rate** — observe 51.19% matches v1.1 reference. Would require adding an `activated_be` flag to variant_trades.csv (new column).",
-            "3. **Remove gate 8** — keep the other plausibility gates (9, 10, 11) which all PASS at current data.",
-            "",
-            "## Outputs preserved",
-            "",
-            "- `variant_trades.csv`, `variant_summary_pooled.csv`, `variant_summary_per_fold.csv`, `additivity_calibration.csv` — all match prior resume's sha256s. Data correct.",
-        ])
-        (out_dir / "GATE_8_HALT_DIAGNOSTIC.md").write_text("\n".join(diag) + "\n",
-                                                              encoding="utf-8")
-        print(f"\n=== GATE 8 HALT DIAGNOSTIC written to: {out_dir / 'GATE_8_HALT_DIAGNOSTIC.md'} ===\n",
-              flush=True)
-        raise RuntimeError(f"Gate 8 HALT — B2 BE rate {b2_be:.4f} outside [{GATE_8_BE_RATE_LO}, {GATE_8_BE_RATE_HI}]. See GATE_8_HALT_DIAGNOSTIC.md.")
+            diag.append(f"- `{rsn}`: {cnt} = {cnt / n * 100:.2f}%")
+        diag.extend(
+            [
+                "",
+                "## Two distinct rates, two physical meanings",
+                "",
+                "1. **BE activation rate** = % of trades reaching mfe_R >= 1R (so BE-SL becomes active starting at the NEXT bar). For B2: **51.19%** (matches v1.1 reference exactly — every trade reaching +1R MFE activates).",
+                "",
+                "2. **BE fire rate** = % of trades where BE-SL fires (bar_low retraces to entry_mid AFTER activation, before time exit). For B2: **"
+                + "{:.2f}".format(b2_be * 100)
+                + "%**.",
+                "",
+                "The diff (51.19% - 38.59% = ~12.6%) = trades that reached +1R MFE but kept running favourably and never retraced to entry_mid before time exit. These show up in B2's `time_exit` (12.32%).",
+                "",
+                "Verification: 38.59% (BE fire) + 12.32% (TE without BE fire) + 0.18% (DE) ≈ 51.10% ≈ activation rate.",
+                "",
+                "## Other plausibility gates (all pass at observed data)",
+                "",
+                "Verified externally before halting:",
+                "- Gate 7 (max R, cap +50): all SL-only variants PASS (BL 14.7, A1 19.6, A2 11.8, F2 25.8)",
+                "- Gate 9 (C1/C3 trail engage): C1 51.1%, C3 34.2% — both in spec range",
+                "- Gate 10 (E1/E2 TP rates): E1 40.8%, E2 23.3% — both in spec range",
+                "- Gate 11 (A1 > BL > A2 SL ordering): 82.4% > 76.0% > 70.8% — PASS",
+                "",
+                "Only gate 8 is mis-specified. The data is correct.",
+                "",
+                "## Resolutions for the planner",
+                "",
+                "1. **Relax gate 8 range to [30%, 55%]** — accepts the BE fire rate while still bounding logic bugs (e.g., a sign-flip on the entry_mid threshold would make BE fire on near-100% of trades).",
+                "2. **Re-interpret gate 8 to check BE activation rate** — observe 51.19% matches v1.1 reference. Would require adding an `activated_be` flag to variant_trades.csv (new column).",
+                "3. **Remove gate 8** — keep the other plausibility gates (9, 10, 11) which all PASS at current data.",
+                "",
+                "## Outputs preserved",
+                "",
+                "- `variant_trades.csv`, `variant_summary_pooled.csv`, `variant_summary_per_fold.csv`, `additivity_calibration.csv` — all match prior resume's sha256s. Data correct.",
+            ]
+        )
+        (out_dir / "GATE_8_HALT_DIAGNOSTIC.md").write_text("\n".join(diag) + "\n", encoding="utf-8")
+        print(
+            f"\n=== GATE 8 HALT DIAGNOSTIC written to: {out_dir / 'GATE_8_HALT_DIAGNOSTIC.md'} ===\n",
+            flush=True,
+        )
+        raise RuntimeError(
+            f"Gate 8 HALT — B2 BE rate {b2_be:.4f} outside [{GATE_8_BE_RATE_LO}, {GATE_8_BE_RATE_HI}]. See GATE_8_HALT_DIAGNOSTIC.md."
+        )
 
     # Gate 9: trail engagement plausibility
     c1_engage = 1.0 - float(pooled.loc[pooled["variant_id"] == "C1", "sl_rate"].iloc[0])
@@ -1043,18 +1212,23 @@ def _validate_gates(*, vt: pd.DataFrame, ti_full: pd.DataFrame,
     for tid in sample_tids:
         b2r = b2_sub.loc[tid]
         g2r = g2_sub.loc[tid]
-        if (int(b2r["exit_bar"]) != int(g2r["exit_bar"])
-                or abs(float(b2r["net_R"]) - float(g2r["net_R"])) > 1e-12):
+        if (
+            int(b2r["exit_bar"]) != int(g2r["exit_bar"])
+            or abs(float(b2r["net_R"]) - float(g2r["net_R"])) > 1e-12
+        ):
             mismatches += 1
     disp["gate_12"] = f"sampled={sample_n}, mismatches={mismatches}"
     if mismatches > 0:
-        raise RuntimeError(f"Gate 12 HALT — G2/B2 consistency: {mismatches} mismatches in {sample_n}")
+        raise RuntimeError(
+            f"Gate 12 HALT — G2/B2 consistency: {mismatches} mismatches in {sample_n}"
+        )
 
     return disp
 
 
-def _write_gate4_halt_diagnostic(*, out_dir: Path, disp_gate4: Dict[str, str],
-                                  sample: pd.DataFrame, max_abs: float) -> None:
+def _write_gate4_halt_diagnostic(
+    *, out_dir: Path, disp_gate4: Dict[str, str], sample: pd.DataFrame, max_abs: float
+) -> None:
     L = [
         "# GATE 4 HALT DIAGNOSTIC — Counterfactual Sweep Round 1 v2",
         "",
@@ -1062,7 +1236,7 @@ def _write_gate4_halt_diagnostic(*, out_dir: Path, disp_gate4: Dict[str, str],
         "",
         "## Disposition",
         "",
-        f"**Gate 4 FAILED.** Spec requires `abs diff < 1e-9 per trade, zero mismatches by integer index`.",
+        "**Gate 4 FAILED.** Spec requires `abs diff < 1e-9 per trade, zero mismatches by integer index`.",
         f"Observed: max_abs_diff = **{max_abs:.3e}**.",
         "",
         "## Per-exit-reason breakdown",
@@ -1070,8 +1244,8 @@ def _write_gate4_halt_diagnostic(*, out_dir: Path, disp_gate4: Dict[str, str],
         f"- stop_loss trades: max abs diff = {disp_gate4['max_sl']}",
         f"- time_exit trades: max abs diff = {disp_gate4['max_te']}",
         f"- data_end trades:  max abs diff = {disp_gate4['max_de']}",
-        f"",
-        f"Mismatches by tolerance:",
+        "",
+        "Mismatches by tolerance:",
         f"- >= 1e-9: {disp_gate4['mismatches_1e9']} of 3993",
         f"- >= 1e-7: {disp_gate4['mismatches_1e7']} of 3993",
         f"- >= 1e-6: {disp_gate4['mismatches_1e6']} of 3993",
@@ -1130,11 +1304,19 @@ def _write_gate4_halt_diagnostic(*, out_dir: Path, disp_gate4: Dict[str, str],
 # ============================================================================
 
 
-def _write_report(*, out_dir: Path, pooled: pd.DataFrame, per_fold: pd.DataFrame,
-                   additivity: pd.DataFrame, disp: Dict[str, Any],
-                   input_shas: Dict[str, str], output_shas: Dict[str, str],
-                   determinism: Dict[str, str], run_timestamps: Dict[str, str],
-                   single_run: bool) -> Path:
+def _write_report(
+    *,
+    out_dir: Path,
+    pooled: pd.DataFrame,
+    per_fold: pd.DataFrame,
+    additivity: pd.DataFrame,
+    disp: Dict[str, Any],
+    input_shas: Dict[str, str],
+    output_shas: Dict[str, str],
+    determinism: Dict[str, str],
+    run_timestamps: Dict[str, str],
+    single_run: bool,
+) -> Path:
     pooled_idx = pooled.set_index("variant_id")
     bl_mean = float(pooled_idx.loc["BL", "mean_R"])
 
@@ -1143,8 +1325,12 @@ def _write_report(*, out_dir: Path, pooled: pd.DataFrame, per_fold: pd.DataFrame
         sub = per_fold[per_fold["variant_id"] == vid]
         worst = sub.sort_values("mean_R").iloc[0]
         wfdd = sub.sort_values("max_DD_R", ascending=False).iloc[0]
-        worst_fold[vid] = (int(worst["fold_id"]), float(worst["mean_R"]),
-                            int(wfdd["fold_id"]), float(wfdd["max_DD_R"]))
+        worst_fold[vid] = (
+            int(worst["fold_id"]),
+            float(worst["mean_R"]),
+            int(wfdd["fold_id"]),
+            float(wfdd["max_DD_R"]),
+        )
 
     L: List[str] = []
     L.append("# Counterfactual Exit-Rule Sweep — Round 1 v2 (execution-faithful)")
@@ -1170,28 +1356,38 @@ def _write_report(*, out_dir: Path, pooled: pd.DataFrame, per_fold: pd.DataFrame
         for k, v in determinism.items():
             L.append(f"- `{k}`: {v}")
     L.append("")
-    L.append(f"**Run timestamps:** start={run_timestamps['start']}, end={run_timestamps['end']}, "
-             f"wallclock_run1={run_timestamps['wallclock_run1']}.")
+    L.append(
+        f"**Run timestamps:** start={run_timestamps['start']}, end={run_timestamps['end']}, "
+        f"wallclock_run1={run_timestamps['wallclock_run1']}."
+    )
     L.append("")
     L.append("## 6.2 Baseline reproduction validation")
     L.append("")
-    L.append(f"Gate 4 disposition: **PASS** — max abs diff = {disp['gate_4']['max_abs_diff']}, "
-             f"zero mismatches at the configured tolerance.")
-    L.append("")
     L.append(
-        "BL `net_R` computation uses the execution-faithful Arc 2 formulas:"
+        f"Gate 4 disposition: **PASS** — max abs diff = {disp['gate_4']['max_abs_diff']}, "
+        f"zero mismatches at the configured tolerance."
     )
+    L.append("")
+    L.append("BL `net_R` computation uses the execution-faithful Arc 2 formulas:")
     L.append("- SL exit: `R = -1 - sp_exit × pip / (4 × atr)` (exit-side half-spread only)")
-    L.append("- Time exit: `R = (next_bar_open[k+120] - sp_exit × pip / 2 - entry_fill) / (2 × atr)`")
+    L.append(
+        "- Time exit: `R = (next_bar_open[k+120] - sp_exit × pip / 2 - entry_fill) / (2 × atr)`"
+    )
     L.append("- Data-end: `R = (bar_close[k=bavail] - sp_exit × pip / 2 - entry_fill) / (2 × atr)`")
     L.append("")
-    L.append(f"Per-exit-reason max abs diff: SL={disp['gate_4']['max_sl']}, "
-             f"TE={disp['gate_4']['max_te']}, DE={disp['gate_4']['max_de']}.")
+    L.append(
+        f"Per-exit-reason max abs diff: SL={disp['gate_4']['max_sl']}, "
+        f"TE={disp['gate_4']['max_te']}, DE={disp['gate_4']['max_de']}."
+    )
     L.append("")
     L.append("## 6.3 Variant grid summary")
     L.append("")
-    L.append("| ID | Spec | n | mean_R | median_R | sl_rate | lift_vs_BL | worst_fold (id, mean) | worst_fold_DD |")
-    L.append("|----|------|---|--------|----------|---------|------------|------------------------|----------------|")
+    L.append(
+        "| ID | Spec | n | mean_R | median_R | sl_rate | lift_vs_BL | worst_fold (id, mean) | worst_fold_DD |"
+    )
+    L.append(
+        "|----|------|---|--------|----------|---------|------------|------------------------|----------------|"
+    )
     for vid, spec, _ in VARIANTS:
         row = pooled_idx.loc[vid]
         wfid, wfm, wfdd_id, wfdd = worst_fold[vid]
@@ -1206,8 +1402,10 @@ def _write_report(*, out_dir: Path, pooled: pd.DataFrame, per_fold: pd.DataFrame
 
     def vmean(vid: str) -> float:
         return float(pooled_idx.loc[vid, "mean_R"])
+
     def vsl(vid: str) -> float:
         return float(pooled_idx.loc[vid, "sl_rate"])
+
     def wf(vid: str) -> Tuple[int, float]:
         return worst_fold[vid][0], worst_fold[vid][1]
 
@@ -1224,32 +1422,32 @@ def _write_report(*, out_dir: Path, pooled: pd.DataFrame, per_fold: pd.DataFrame
     L.append(
         f"**Class B (BE-SL trigger).** B1 (T=+0.5R) / B2 (T=+1R) / B3 (T=+1.5R) pooled mean R = "
         f"{vmean('B1'):+.4f} / {vmean('B2'):+.4f} / {vmean('B3'):+.4f} vs BL {bl_mean:+.4f}. "
-        f"BE-exit shares: B1={float(pooled_idx.loc['B1','be_exit_rate']):.3f}, "
-        f"B2={float(pooled_idx.loc['B2','be_exit_rate']):.3f}, "
-        f"B3={float(pooled_idx.loc['B3','be_exit_rate']):.3f}. Worst-fold mean R: "
+        f"BE-exit shares: B1={float(pooled_idx.loc['B1', 'be_exit_rate']):.3f}, "
+        f"B2={float(pooled_idx.loc['B2', 'be_exit_rate']):.3f}, "
+        f"B3={float(pooled_idx.loc['B3', 'be_exit_rate']):.3f}. Worst-fold mean R: "
         f"B1={wf('B1')[1]:+.4f}, B2={wf('B2')[1]:+.4f}, B3={wf('B3')[1]:+.4f}."
     )
     L.append("")
     L.append(
         f"**Class C (Trail).** C1 (+1R engage, D=0.5R) / C2 (+1R, D=1R) / C3 (+2R, D=1R) "
         f"pooled mean R = {vmean('C1'):+.4f} / {vmean('C2'):+.4f} / {vmean('C3'):+.4f}. "
-        f"Trail-exit shares: C1={float(pooled_idx.loc['C1','trail_exit_rate']):.3f}, "
-        f"C2={float(pooled_idx.loc['C2','trail_exit_rate']):.3f}, "
-        f"C3={float(pooled_idx.loc['C3','trail_exit_rate']):.3f}. Worst-fold mean R: "
+        f"Trail-exit shares: C1={float(pooled_idx.loc['C1', 'trail_exit_rate']):.3f}, "
+        f"C2={float(pooled_idx.loc['C2', 'trail_exit_rate']):.3f}, "
+        f"C3={float(pooled_idx.loc['C3', 'trail_exit_rate']):.3f}. Worst-fold mean R: "
         f"C1={wf('C1')[1]:+.4f}, C2={wf('C2')[1]:+.4f}, C3={wf('C3')[1]:+.4f}."
     )
     L.append("")
     L.append(
         f"**Class D (Partial close + BE-SL).** D1 pooled mean R = {vmean('D1'):+.4f}, "
-        f"partial_exit_rate {float(pooled_idx.loc['D1','partial_exit_rate']):.3f}. "
+        f"partial_exit_rate {float(pooled_idx.loc['D1', 'partial_exit_rate']):.3f}. "
         f"Worst-fold mean R = {wf('D1')[1]:+.4f} (fold {wf('D1')[0]})."
     )
     L.append("")
     L.append(
         f"**Class E (Fixed TP).** E1 (TP=+1.5R) / E2 (TP=+3R) pooled mean R = "
         f"{vmean('E1'):+.4f} / {vmean('E2'):+.4f}. TP-exit shares: "
-        f"E1={float(pooled_idx.loc['E1','tp_exit_rate']):.3f}, "
-        f"E2={float(pooled_idx.loc['E2','tp_exit_rate']):.3f}. "
+        f"E1={float(pooled_idx.loc['E1', 'tp_exit_rate']):.3f}, "
+        f"E2={float(pooled_idx.loc['E2', 'tp_exit_rate']):.3f}. "
         f"Worst-fold mean R: E1={wf('E1')[1]:+.4f}, E2={wf('E2')[1]:+.4f}."
     )
     L.append("")
@@ -1270,8 +1468,8 @@ def _write_report(*, out_dir: Path, pooled: pd.DataFrame, per_fold: pd.DataFrame
     L.append("")
     a = additivity.iloc[0]
     L.append(f"- BL mean R: {a['BL_mean_R']:+.4f}")
-    L.append(f"- B2 mean R: {a['B2_mean_R']:+.4f}  (lift: {a['B2_mean_R']-a['BL_mean_R']:+.4f})")
-    L.append(f"- F1 mean R: {a['F1_mean_R']:+.4f}  (lift: {a['F1_mean_R']-a['BL_mean_R']:+.4f})")
+    L.append(f"- B2 mean R: {a['B2_mean_R']:+.4f}  (lift: {a['B2_mean_R'] - a['BL_mean_R']:+.4f})")
+    L.append(f"- F1 mean R: {a['F1_mean_R']:+.4f}  (lift: {a['F1_mean_R'] - a['BL_mean_R']:+.4f})")
     L.append(f"- G2 mean R: {a['G2_mean_R']:+.4f}  (lift: {a['combination_lift']:+.4f})")
     L.append(f"- Lone-lift sum: {a['lone_lift_sum']:+.4f}")
     L.append(f"- Combination lift: {a['combination_lift']:+.4f}")
@@ -1287,7 +1485,8 @@ def _write_report(*, out_dir: Path, pooled: pd.DataFrame, per_fold: pd.DataFrame
     sep = "|---" * (len(folds) + 2) + "|"
     L.append("### 6.6a Per-fold mean R")
     L.append("")
-    L.append(head); L.append(sep)
+    L.append(head)
+    L.append(sep)
     for vid, _, _ in VARIANTS:
         sub = per_fold[per_fold["variant_id"] == vid].set_index("fold_id")
         wfid = int(sub["mean_R"].idxmin())
@@ -1295,12 +1494,13 @@ def _write_report(*, out_dir: Path, pooled: pd.DataFrame, per_fold: pd.DataFrame
         for f in folds:
             v = float(sub.loc[f, "mean_R"])
             cells.append(f"**{v:+.4f}**" if f == wfid else f"{v:+.4f}")
-        cells.append(f"f{wfid}={float(sub.loc[wfid,'mean_R']):+.4f}")
+        cells.append(f"f{wfid}={float(sub.loc[wfid, 'mean_R']):+.4f}")
         L.append(f"| {vid} | " + " | ".join(cells) + " |")
     L.append("")
     L.append("### 6.6b Per-fold max DD (R-units, sequential intra-fold R sum)")
     L.append("")
-    L.append(head); L.append(sep)
+    L.append(head)
+    L.append(sep)
     for vid, _, _ in VARIANTS:
         sub = per_fold[per_fold["variant_id"] == vid].set_index("fold_id")
         wfid = int(sub["max_DD_R"].idxmax())
@@ -1308,16 +1508,20 @@ def _write_report(*, out_dir: Path, pooled: pd.DataFrame, per_fold: pd.DataFrame
         for f in folds:
             v = float(sub.loc[f, "max_DD_R"])
             cells.append(f"**{v:.3f}**" if f == wfid else f"{v:.3f}")
-        cells.append(f"f{wfid}={float(sub.loc[wfid,'max_DD_R']):.3f}")
+        cells.append(f"f{wfid}={float(sub.loc[wfid, 'max_DD_R']):.3f}")
         L.append(f"| {vid} | " + " | ".join(cells) + " |")
     L.append("")
-    L.append("_Note: within-fold sequential R sum, NOT Arc 2 dollar-DD. Relative ranking + plausibility only._")
+    L.append(
+        "_Note: within-fold sequential R sum, NOT Arc 2 dollar-DD. Relative ranking + plausibility only._"
+    )
     L.append("")
 
     L.append("## 6.7 Cross-variant observations")
     L.append("")
     pooled_sorted = pooled.sort_values("mean_R", ascending=False)
-    top1 = pooled_sorted.iloc[0]; top2 = pooled_sorted.iloc[1]; bot1 = pooled_sorted.iloc[-1]
+    top1 = pooled_sorted.iloc[0]
+    top2 = pooled_sorted.iloc[1]
+    bot1 = pooled_sorted.iloc[-1]
     L.append(
         f"Variant **{top1['variant_id']}** is highest by pooled mean R "
         f"({top1['mean_R']:+.4f} R). **{top2['variant_id']}** is second "
@@ -1327,7 +1531,8 @@ def _write_report(*, out_dir: Path, pooled: pd.DataFrame, per_fold: pd.DataFrame
     L.append("")
     wf_pairs = sorted(
         [(vid, worst_fold[vid][1]) for vid, _, _ in VARIANTS],
-        key=lambda x: x[1], reverse=True,
+        key=lambda x: x[1],
+        reverse=True,
     )
     L.append(
         f"By worst-fold mean R: **{wf_pairs[0][0]}** highest ({wf_pairs[0][1]:+.4f} R); "
@@ -1341,8 +1546,11 @@ def _write_report(*, out_dir: Path, pooled: pd.DataFrame, per_fold: pd.DataFrame
         f"{len(VARIANTS) - n_pos_wf} are at or below 0."
     )
     L.append("")
-    n_gt_bl = sum(1 for vid, _, _ in VARIANTS
-                   if float(pooled_idx.loc[vid, "mean_R"]) > bl_mean and vid != "BL")
+    n_gt_bl = sum(
+        1
+        for vid, _, _ in VARIANTS
+        if float(pooled_idx.loc[vid, "mean_R"]) > bl_mean and vid != "BL"
+    )
     L.append(
         f"Of the 15 non-BL variants, {n_gt_bl} have pooled mean R above BL "
         f"({bl_mean:+.4f} R); {15 - n_gt_bl} are at or below BL."
@@ -1363,19 +1571,26 @@ def _write_report(*, out_dir: Path, pooled: pd.DataFrame, per_fold: pd.DataFrame
     L.append("|---|---|---|---|")
     pooled_sorted_m = pooled.sort_values("mean_R", ascending=False).reset_index(drop=True)
     for i, row in pooled_sorted_m.iterrows():
-        L.append(f"| {i+1} | {row['variant_id']} | {row['mean_R']:+.4f} | "
-                 f"{row['mean_R'] - bl_mean:+.4f} |")
+        L.append(
+            f"| {i + 1} | {row['variant_id']} | {row['mean_R']:+.4f} | "
+            f"{row['mean_R'] - bl_mean:+.4f} |"
+        )
     L.append("")
     L.append("### 6.8b Ranked by worst-fold mean R (descending)")
     L.append("")
     L.append("| rank | variant_id | worst-fold mean R | worst fold ID |")
     L.append("|---|---|---|---|")
     for i, (vid, m) in enumerate(wf_pairs):
-        L.append(f"| {i+1} | {vid} | {m:+.4f} | {worst_fold[vid][0]} |")
+        L.append(f"| {i + 1} | {vid} | {m:+.4f} | {worst_fold[vid][0]} |")
     L.append("")
-    bl_dd = max(float(per_fold[(per_fold["variant_id"] == "BL")
-                                  & (per_fold["fold_id"] == f)]["max_DD_R"].iloc[0])
-                  for f in folds)
+    bl_dd = max(
+        float(
+            per_fold[(per_fold["variant_id"] == "BL") & (per_fold["fold_id"] == f)][
+                "max_DD_R"
+            ].iloc[0]
+        )
+        for f in folds
+    )
     L.append("### 6.8c Ranked by max-DD improvement vs BL (positive = lower DD)")
     L.append("")
     L.append("| rank | variant_id | worst-fold max_DD_R | improvement vs BL |")
@@ -1386,7 +1601,7 @@ def _write_report(*, out_dir: Path, pooled: pd.DataFrame, per_fold: pd.DataFrame
     )
     for i, (vid, dd) in enumerate(dd_pairs):
         improvement = bl_dd - dd
-        L.append(f"| {i+1} | {vid} | {dd:.3f} | {improvement:+.3f} |")
+        L.append(f"| {i + 1} | {vid} | {dd:.3f} | {improvement:+.3f} |")
     L.append("")
     L.append(f"_BL worst-fold max DD: {bl_dd:.3f} R (reference for improvement column)._")
     L.append("")
@@ -1411,9 +1626,8 @@ def _gate_13_disposition_grep(report_path: Path) -> Tuple[bool, List[str]]:
     start = re.search(r"##\s+6\.2\s+Baseline", text)
     if start is None:
         return False, ["§6.2 boundary not found"]
-    region = text[start.start():m.start()]
-    forbidden = ["should be selected", "passes the gate", "best variant",
-                  "we should", "would have"]
+    region = text[start.start() : m.start()]
+    forbidden = ["should be selected", "passes the gate", "best variant", "we should", "would have"]
     hits = []
     for phrase in forbidden:
         for m2 in re.finditer(re.escape(phrase), region, flags=re.IGNORECASE):
@@ -1423,18 +1637,25 @@ def _gate_13_disposition_grep(report_path: Path) -> Tuple[bool, List[str]]:
     return (len(hits) == 0, hits)
 
 
-def run_pipeline(*, out_dir: Path, per_bar_csv: Path, trade_index_csv: Path,
-                 trades_all_csv: Path, write_report: bool = True,
-                 input_shas: Dict[str, str] = None,
-                 determinism: Dict[str, str] = None,
-                 run_timestamps: Dict[str, str] = None,
-                 single_run: bool = False) -> Tuple[Dict[str, str], Dict[str, Any]]:
+def run_pipeline(
+    *,
+    out_dir: Path,
+    per_bar_csv: Path,
+    trade_index_csv: Path,
+    trades_all_csv: Path,
+    write_report: bool = True,
+    input_shas: Dict[str, str] = None,
+    determinism: Dict[str, str] = None,
+    run_timestamps: Dict[str, str] = None,
+    single_run: bool = False,
+) -> Tuple[Dict[str, str], Dict[str, Any]]:
     out_dir = out_dir.resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
 
     print("Stage 1: Computing variants...", flush=True)
-    vt, ti_full = _run_sweep(per_bar_csv=per_bar_csv, trade_index_csv=trade_index_csv,
-                              trades_all_csv=trades_all_csv)
+    vt, ti_full = _run_sweep(
+        per_bar_csv=per_bar_csv, trade_index_csv=trade_index_csv, trades_all_csv=trades_all_csv
+    )
 
     print("Stage 2: Aggregating...", flush=True)
     pooled = _aggregate_pooled(vt)
@@ -1453,8 +1674,9 @@ def run_pipeline(*, out_dir: Path, per_bar_csv: Path, trade_index_csv: Path,
     additivity.to_csv(ad_p, index=False, lineterminator="\n", float_format="%.10g")
 
     print("Stage 3b: Validating gates 2-12...", flush=True)
-    disp = _validate_gates(vt=vt, ti_full=ti_full, pooled=pooled,
-                            per_fold=per_fold, out_dir=out_dir)
+    disp = _validate_gates(
+        vt=vt, ti_full=ti_full, pooled=pooled, per_fold=per_fold, out_dir=out_dir
+    )
 
     out_shas = {
         "variant_trades.csv": _sha256_file(vt_p),
@@ -1466,10 +1688,16 @@ def run_pipeline(*, out_dir: Path, per_bar_csv: Path, trade_index_csv: Path,
     if write_report:
         print("Stage 4: Writing report + gate 13...", flush=True)
         report_path = _write_report(
-            out_dir=out_dir, pooled=pooled, per_fold=per_fold, additivity=additivity,
-            disp=disp, input_shas=input_shas or {}, output_shas=out_shas,
+            out_dir=out_dir,
+            pooled=pooled,
+            per_fold=per_fold,
+            additivity=additivity,
+            disp=disp,
+            input_shas=input_shas or {},
+            output_shas=out_shas,
             determinism=determinism or {},
-            run_timestamps=run_timestamps or {"start": "n/a", "end": "n/a", "wallclock_run1": "n/a"},
+            run_timestamps=run_timestamps
+            or {"start": "n/a", "end": "n/a", "wallclock_run1": "n/a"},
             single_run=single_run,
         )
         out_shas["counterfactual_sweep_round_1.md"] = _sha256_file(report_path)
@@ -1478,21 +1706,30 @@ def run_pipeline(*, out_dir: Path, per_bar_csv: Path, trade_index_csv: Path,
         if not ok:
             for h in hits:
                 print(h)
-            raise RuntimeError(f"Gate 13 HALT — disposition discipline:\n" + "\n".join(hits))
+            raise RuntimeError("Gate 13 HALT — disposition discipline:\n" + "\n".join(hits))
 
     return out_shas, disp
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--output-dir",
-        default=str(REPO_ROOT / "results/l6/arc2/characterisation/extended/counterfactuals/round_1"))
-    parser.add_argument("--per-bar-csv",
-        default=str(REPO_ROOT / "results/l6/arc2/characterisation/v1_2_1_full/per_bar_paths.csv"))
-    parser.add_argument("--trade-index-csv",
-        default=str(REPO_ROOT / "results/l6/arc2/characterisation/v1_2_1_full/trade_index.csv"))
-    parser.add_argument("--trades-all-csv",
-        default=str(REPO_ROOT / "results/l6/arc2/trades_all.csv"))
+    parser.add_argument(
+        "--output-dir",
+        default=str(
+            REPO_ROOT / "results/l6/arc2/characterisation/extended/counterfactuals/round_1"
+        ),
+    )
+    parser.add_argument(
+        "--per-bar-csv",
+        default=str(REPO_ROOT / "results/l6/arc2/characterisation/v1_2_1_full/per_bar_paths.csv"),
+    )
+    parser.add_argument(
+        "--trade-index-csv",
+        default=str(REPO_ROOT / "results/l6/arc2/characterisation/v1_2_1_full/trade_index.csv"),
+    )
+    parser.add_argument(
+        "--trades-all-csv", default=str(REPO_ROOT / "results/l6/arc2/trades_all.csv")
+    )
     parser.add_argument("--single-run", action="store_true")
     args = parser.parse_args()
 
@@ -1509,13 +1746,19 @@ def main() -> int:
         print(f"  OK {k}")
 
     out_dir = Path(args.output_dir)
-    pb_csv = Path(args.per_bar_csv); ti_csv = Path(args.trade_index_csv); ta_csv = Path(args.trades_all_csv)
+    pb_csv = Path(args.per_bar_csv)
+    ti_csv = Path(args.trade_index_csv)
+    ta_csv = Path(args.trades_all_csv)
 
     print(f"\n[Run #1] Output dir: {out_dir}")
     t_r1 = time.time()
-    sha1, disp = run_pipeline(out_dir=out_dir, per_bar_csv=pb_csv,
-                                trade_index_csv=ti_csv, trades_all_csv=ta_csv,
-                                write_report=False)
+    sha1, disp = run_pipeline(
+        out_dir=out_dir,
+        per_bar_csv=pb_csv,
+        trade_index_csv=ti_csv,
+        trades_all_csv=ta_csv,
+        write_report=False,
+    )
     el1 = time.time() - t_r1
     print(f"  Run #1 complete in {el1:.1f}s")
     for k, v in sha1.items():
@@ -1526,9 +1769,13 @@ def main() -> int:
         scratch = Path(tempfile.mkdtemp(prefix="arc2_sweep_v2_run2_"))
         print(f"\n[Run #2 / Gate 14] Output dir (scratch): {scratch}")
         t_r2 = time.time()
-        sha2, _ = run_pipeline(out_dir=scratch, per_bar_csv=pb_csv,
-                                 trade_index_csv=ti_csv, trades_all_csv=ta_csv,
-                                 write_report=False)
+        sha2, _ = run_pipeline(
+            out_dir=scratch,
+            per_bar_csv=pb_csv,
+            trade_index_csv=ti_csv,
+            trades_all_csv=ta_csv,
+            write_report=False,
+        )
         el2 = time.time() - t_r2
         print(f"  Run #2 complete in {el2:.1f}s")
         det_pass = True
@@ -1539,7 +1786,8 @@ def main() -> int:
             if not match:
                 det_pass = False
         try:
-            for p in scratch.iterdir(): p.unlink()
+            for p in scratch.iterdir():
+                p.unlink()
             scratch.rmdir()
         except Exception:
             pass
@@ -1549,19 +1797,26 @@ def main() -> int:
     end_iso = _dt.datetime.now().isoformat(timespec="seconds")
     rt = {"start": start_iso, "end": end_iso, "wallclock_run1": f"{el1:.1f}s"}
     print("\n[Final] Writing report with determinism receipt...")
-    report_path = _write_report(out_dir=out_dir, pooled=_aggregate_pooled(pd.read_csv(out_dir / "variant_trades.csv")),
-                                  per_fold=pd.read_csv(out_dir / "variant_summary_per_fold.csv"),
-                                  additivity=pd.read_csv(out_dir / "additivity_calibration.csv"),
-                                  disp=disp, input_shas=input_shas, output_shas=sha1,
-                                  determinism=determinism, run_timestamps=rt,
-                                  single_run=args.single_run)
+    report_path = _write_report(
+        out_dir=out_dir,
+        pooled=_aggregate_pooled(pd.read_csv(out_dir / "variant_trades.csv")),
+        per_fold=pd.read_csv(out_dir / "variant_summary_per_fold.csv"),
+        additivity=pd.read_csv(out_dir / "additivity_calibration.csv"),
+        disp=disp,
+        input_shas=input_shas,
+        output_shas=sha1,
+        determinism=determinism,
+        run_timestamps=rt,
+        single_run=args.single_run,
+    )
     sha1["counterfactual_sweep_round_1.md"] = _sha256_file(report_path)
 
     print("\n[Gate 13] Disposition-discipline grep...")
     ok, hits = _gate_13_disposition_grep(report_path)
     disp["gate_13"] = "PASS" if ok else f"HALT — {len(hits)} hits"
     if not ok:
-        for h in hits: print(h)
+        for h in hits:
+            print(h)
         raise RuntimeError("Gate 13 HALT")
     print("  PASS — no forbidden phrases in §6.2-§6.7")
 
@@ -1578,7 +1833,7 @@ def main() -> int:
     if ch_path.exists():
         actual = _sha256_file(ch_path)
         if actual != CANDIDATE_HYPOTHESES_BASELINE_SHA:
-            raise RuntimeError(f"Gate 15 HALT — CANDIDATE_HYPOTHESES.md changed")
+            raise RuntimeError("Gate 15 HALT — CANDIDATE_HYPOTHESES.md changed")
     print("  All locked artefacts unchanged.")
 
     cur, peak = tracemalloc.get_traced_memory()
@@ -1592,7 +1847,7 @@ def main() -> int:
     ]
     if not args.single_run:
         rm.append(f"Wallclock run #2: {el2:.1f}s")
-    rm.append(f"Memory peak (tracemalloc): {peak / (1024*1024):.1f} MB")
+    rm.append(f"Memory peak (tracemalloc): {peak / (1024 * 1024):.1f} MB")
     rm.append("")
     rm.append("Inputs (sha256):")
     for k, v in input_shas.items():
@@ -1617,7 +1872,7 @@ def main() -> int:
     rm_p = out_dir / "run_manifest.txt"
     rm_p.write_text("\n".join(rm) + "\n", encoding="utf-8")
     print(f"\n[Manifest] {rm_p}")
-    print(f"\nMemory peak: {peak / (1024*1024):.1f} MB")
+    print(f"\nMemory peak: {peak / (1024 * 1024):.1f} MB")
     print(f"Total wallclock: {time.time() - t_start:.1f}s")
     print("\nAll outputs written. Pipeline complete.")
     return 0

@@ -1,4 +1,5 @@
 """Phase 6.2 — Runner status writer and zero-trade semantics (no WFO run in tests)."""
+
 import json
 
 from scripts.phase6_run_c1_as_exit_wfo import (

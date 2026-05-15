@@ -57,9 +57,8 @@ os.environ.setdefault("SOURCE_DATE_EPOCH", "1577836800")
 import matplotlib  # noqa: E402
 
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt  # noqa: E402
 import matplotlib.colors as mcolors  # noqa: E402
-
+import matplotlib.pyplot as plt  # noqa: E402
 import pyarrow.parquet as pq  # noqa: E402
 from scipy import stats as sps  # noqa: E402
 from scipy.optimize import minimize  # noqa: E402
@@ -86,12 +85,9 @@ OUTPUT_DIR: Path = APPENDIX_DIR / "gate_exit_analysis"
 CHARTS_DIR: Path = OUTPUT_DIR / "charts"
 
 EXPECTED_INPUT_HASHES: Dict[str, str] = {
-    "trajectory_panel.parquet":
-        "c8f1ec4825ada7b3a9efaf72101e79b067f7056117bf70aaae2f5766261398ed",
-    "shape_features.csv":
-        "6920c990628dd2d769cfbc56bd006391f6b9a24beea64f52f5bda9da02d44aaa",
-    "cluster_assignments.csv":
-        "c82f7208ece085e804bc7c66c741d91e5004c604463f8dbeff03381aacf7ecbe",
+    "trajectory_panel.parquet": "c8f1ec4825ada7b3a9efaf72101e79b067f7056117bf70aaae2f5766261398ed",
+    "shape_features.csv": "6920c990628dd2d769cfbc56bd006391f6b9a24beea64f52f5bda9da02d44aaa",
+    "cluster_assignments.csv": "c82f7208ece085e804bc7c66c741d91e5004c604463f8dbeff03381aacf7ecbe",
 }
 
 # Reference parity targets from band_behavior (allow tolerance 0.005R).
@@ -124,11 +120,13 @@ V4_THRESHOLDS: Tuple[float, ...] = (-0.5, -0.25, 0.0, 0.25, 0.5)
 V4_MFE_SKIP_LEVEL: float = 1.0
 
 DIST_PERCENTILES: Tuple[float, ...] = (1, 5, 10, 25, 50, 75, 90, 95, 99)
-HIST_BIN_EDGES_DEFAULT: np.ndarray = np.concatenate([
-    [-np.inf],
-    np.round(np.arange(-3.0, 12.0 + 0.25 / 2, 0.25), 4),
-    [np.inf],
-])
+HIST_BIN_EDGES_DEFAULT: np.ndarray = np.concatenate(
+    [
+        [-np.inf],
+        np.round(np.arange(-3.0, 12.0 + 0.25 / 2, 0.25), 4),
+        [np.inf],
+    ]
+)
 
 EXIT_REASONS = ("sl", "gate", "time_240")
 
@@ -151,16 +149,18 @@ def _png_pixel_hash(path: Path) -> str:
     while pos < len(data):
         if pos + 8 > len(data):
             break
-        length = int.from_bytes(data[pos:pos + 4], "big")
-        chunk_type = data[pos + 4:pos + 8]
-        chunk_data = data[pos + 8:pos + 8 + length]
+        length = int.from_bytes(data[pos : pos + 4], "big")
+        chunk_type = data[pos + 4 : pos + 8]
+        chunk_data = data[pos + 8 : pos + 8 + length]
         if chunk_type == b"IDAT":
             out.update(chunk_data)
         pos = pos + 8 + length + 4
     return out.hexdigest()
 
 
-def _write_csv(df: pd.DataFrame, path: Path, *, float_format: str = "%.10g", index: bool = False) -> None:
+def _write_csv(
+    df: pd.DataFrame, path: Path, *, float_format: str = "%.10g", index: bool = False
+) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     buf = io.StringIO()
     df.to_csv(buf, index=index, lineterminator="\n", float_format=float_format)
@@ -206,7 +206,9 @@ def describe_distribution(values: np.ndarray) -> Dict[str, Any]:
     out["mean"] = float(np.mean(arr))
     out["std"] = float(np.std(arr, ddof=1)) if n > 1 else float("nan")
     out["skew"] = float(sps.skew(arr, bias=False)) if n > 2 else float("nan")
-    out["excess_kurt"] = float(sps.kurtosis(arr, fisher=True, bias=False)) if n > 3 else float("nan")
+    out["excess_kurt"] = (
+        float(sps.kurtosis(arr, fisher=True, bias=False)) if n > 3 else float("nan")
+    )
     out["min"] = float(np.min(arr))
     out["max"] = float(np.max(arr))
     pcts = np.percentile(arr, list(DIST_PERCENTILES), method="linear")
@@ -223,7 +225,9 @@ def describe_distribution(values: np.ndarray) -> Dict[str, Any]:
 # ---------------------------------------------------------------------------
 
 
-def _logistic_loss_and_grad(theta: np.ndarray, X: np.ndarray, y: np.ndarray) -> Tuple[float, np.ndarray]:
+def _logistic_loss_and_grad(
+    theta: np.ndarray, X: np.ndarray, y: np.ndarray
+) -> Tuple[float, np.ndarray]:
     w = theta[:-1]
     b = theta[-1]
     z = X @ w + b
@@ -244,8 +248,11 @@ def fit_logistic_lbfgs(
     """Fit a logistic regression via L-BFGS-B; returns (w, b, converged)."""
     theta0 = np.zeros(X.shape[1] + 1, dtype=np.float64)
     res = minimize(
-        _logistic_loss_and_grad, theta0,
-        args=(X, y), jac=True, method="L-BFGS-B",
+        _logistic_loss_and_grad,
+        theta0,
+        args=(X, y),
+        jac=True,
+        method="L-BFGS-B",
         options={"maxiter": max_iter, "gtol": tol, "ftol": tol},
     )
     w = res.x[:-1]
@@ -278,14 +285,14 @@ def compute_auc(scores: np.ndarray, y: np.ndarray) -> float:
 
 def load_inputs() -> Tuple[
     Dict[int, Dict[str, np.ndarray]],
-    Dict[int, int],   # first_sl_bar per signal_idx (0 if never)
-    Dict[int, float], # r_at_t240 per signal_idx
-    Dict[int, int],   # n_post_bars per signal_idx (panel length excluding t=0)
-    Dict[int, int],   # cluster_id per signal_idx (km_k6; -1 for NaN-cluster)
-    Dict[int, int],   # fold_id per signal_idx
-    Dict[int, str],   # pair per signal_idx
-    Dict[str, str],   # actual hashes
-    int,              # N total
+    Dict[int, int],  # first_sl_bar per signal_idx (0 if never)
+    Dict[int, float],  # r_at_t240 per signal_idx
+    Dict[int, int],  # n_post_bars per signal_idx (panel length excluding t=0)
+    Dict[int, int],  # cluster_id per signal_idx (km_k6; -1 for NaN-cluster)
+    Dict[int, int],  # fold_id per signal_idx
+    Dict[int, str],  # pair per signal_idx
+    Dict[str, str],  # actual hashes
+    int,  # N total
 ]:
     actual_hashes: Dict[str, str] = {
         "trajectory_panel.parquet": _sha256_file(INPUT_PANEL),
@@ -358,22 +365,30 @@ def load_inputs() -> Tuple[
         n_post_bars[int(s_idx)] = int(t_arr[-1])
         # r_at_t240: r_close at t=240 if available.
         if t_arr[-1] >= 240:
-            r_at_t240[int(s_idx)] = float(rc[239])  # t=240 is at index 239 (since t_arr starts at 1)
+            r_at_t240[int(s_idx)] = float(
+                rc[239]
+            )  # t=240 is at index 239 (since t_arr starts at 1)
         else:
             r_at_t240[int(s_idx)] = float("nan")
 
-    cluster_id_map: Dict[int, int] = dict(zip(
-        shape["signal_idx"].astype(int).tolist(),
-        shape["km_k6"].fillna(-1).astype(int).tolist(),
-    ))
-    fold_id_map: Dict[int, int] = dict(zip(
-        shape["signal_idx"].astype(int).tolist(),
-        shape["fold_id"].astype(int).tolist(),
-    ))
-    pair_map: Dict[int, str] = dict(zip(
-        shape["signal_idx"].astype(int).tolist(),
-        shape["pair"].astype(str).tolist(),
-    ))
+    cluster_id_map: Dict[int, int] = dict(
+        zip(
+            shape["signal_idx"].astype(int).tolist(),
+            shape["km_k6"].fillna(-1).astype(int).tolist(),
+        )
+    )
+    fold_id_map: Dict[int, int] = dict(
+        zip(
+            shape["signal_idx"].astype(int).tolist(),
+            shape["fold_id"].astype(int).tolist(),
+        )
+    )
+    pair_map: Dict[int, str] = dict(
+        zip(
+            shape["signal_idx"].astype(int).tolist(),
+            shape["pair"].astype(str).tolist(),
+        )
+    )
 
     n_total = len(sig_to_arr)
     return (
@@ -586,7 +601,9 @@ def cell_stats_rows(
     for k, reason in enumerate(EXIT_REASONS):
         c = int(np.sum(reason_idx == k))
         rows.append({**base, "stat": f"n_{reason}", "value": c})
-        rows.append({**base, "stat": f"p_{reason}", "value": (c / n_total) if n_total else float("nan")})
+        rows.append(
+            {**base, "stat": f"p_{reason}", "value": (c / n_total) if n_total else float("nan")}
+        )
     desc = describe_distribution(realized)
     for s in ("mean", "std", "skew", "excess_kurt", "min", "max"):
         rows.append({**base, "stat": f"{s}_realized_r", "value": desc[s]})
@@ -620,7 +637,9 @@ def per_cluster_rows(
     cluster_arr = np.array([cluster_id_map.get(s, -1) for s in sigs_sorted], dtype=np.int32)
     n_total = int(realized.size)
     pooled_mean = float(np.mean(realized))
-    rows: List[Dict[str, Any]] = [{**base, "cluster": "POOLED", "stat": "pooled_mean_r", "value": pooled_mean}]
+    rows: List[Dict[str, Any]] = [
+        {**base, "cluster": "POOLED", "stat": "pooled_mean_r", "value": pooled_mean}
+    ]
     for cluster_id in sorted(set(cluster_arr.tolist())):
         mask = cluster_arr == cluster_id
         n_cluster = int(mask.sum())
@@ -630,7 +649,14 @@ def per_cluster_rows(
         contrib = (n_cluster / n_total) * cluster_mean
         rows.append({**base, "cluster": int(cluster_id), "stat": "n", "value": n_cluster})
         rows.append({**base, "cluster": int(cluster_id), "stat": "mean_r", "value": cluster_mean})
-        rows.append({**base, "cluster": int(cluster_id), "stat": "contribution_to_pooled_mean", "value": contrib})
+        rows.append(
+            {
+                **base,
+                "cluster": int(cluster_id),
+                "stat": "contribution_to_pooled_mean",
+                "value": contrib,
+            }
+        )
     return rows
 
 
@@ -677,7 +703,9 @@ def variant_2_pipeline(
     r_at_t240: Dict[int, float],
     cluster_id_map: Dict[int, int],
     fold_id_map: Dict[int, int],
-) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]], List[Dict[str, Any]], Dict[int, Dict[str, float]]]:
+) -> Tuple[
+    List[Dict[str, Any]], List[Dict[str, Any]], List[Dict[str, Any]], Dict[int, Dict[str, float]]
+]:
     """For each t*, train logistic regression on (rc, mfe, mae)[t*] -> r_at_t240>0,
     apply gate p_winner<0.5, and emit cell stats + per-cluster + per-fold rows."""
     rng = np.random.default_rng(SKLEARN_SEED)
@@ -697,17 +725,19 @@ def variant_2_pipeline(
             target = r_at_t240.get(s, float("nan"))
             if not np.isfinite(target):
                 continue
-            feat_rows.append((
-                s,
-                float(arrs["r_close"][t_idx]),
-                float(arrs["running_mfe"][t_idx]),
-                float(arrs["running_mae"][t_idx]),
-                float(target),
-            ))
+            feat_rows.append(
+                (
+                    s,
+                    float(arrs["r_close"][t_idx]),
+                    float(arrs["running_mfe"][t_idx]),
+                    float(arrs["running_mae"][t_idx]),
+                    float(target),
+                )
+            )
         if not feat_rows:
             continue
         feat_arr = np.array(feat_rows, dtype=np.float64)
-        sig_ids = feat_arr[:, 0].astype(np.int64)
+        feat_arr[:, 0].astype(np.int64)
         X_raw = feat_arr[:, 1:4]
         y = (feat_arr[:, 4] > 0.0).astype(np.float64)
 
@@ -856,8 +886,8 @@ def sl_wick_analysis(
             wick_total += 1
             per_cluster_counts[cluster]["wick"] += 1
             # Subsequent trajectory: bars > t_sl.
-            tail_rc = rc[idx_sl + 1:]
-            tail_mfe = rmfe[idx_sl + 1:]
+            tail_rc = rc[idx_sl + 1 :]
+            tail_mfe = rmfe[idx_sl + 1 :]
             if tail_mfe.size:
                 subsequent_peak_mfe_wicks.append(float(np.max(tail_mfe)))
             if tail_rc.size:
@@ -873,33 +903,57 @@ def sl_wick_analysis(
 
     p_wick = (wick_total / sl_hit_total) if sl_hit_total else float("nan")
     p_recover = (recover_count_wicks / wick_total) if wick_total else float("nan")
-    p_reach_neg1_close_after = (reach_neg1_close_after_wick / wick_total) if wick_total else float("nan")
+    p_reach_neg1_close_after = (
+        (reach_neg1_close_after_wick / wick_total) if wick_total else float("nan")
+    )
 
     analysis_rows.append({"scope": "POOLED", "stat": "n_sl_hit", "value": sl_hit_total})
     analysis_rows.append({"scope": "POOLED", "stat": "n_wick", "value": wick_total})
-    analysis_rows.append({"scope": "POOLED", "stat": "n_close_below_sl", "value": close_below_total})
+    analysis_rows.append(
+        {"scope": "POOLED", "stat": "n_close_below_sl", "value": close_below_total}
+    )
     analysis_rows.append({"scope": "POOLED", "stat": "p_wick_given_sl_hit", "value": p_wick})
-    analysis_rows.append({"scope": "POOLED", "stat": "p_recover_r_close_gt_0_after_wick", "value": p_recover})
-    analysis_rows.append({"scope": "POOLED", "stat": "p_close_below_neg1_after_wick", "value": p_reach_neg1_close_after})
+    analysis_rows.append(
+        {"scope": "POOLED", "stat": "p_recover_r_close_gt_0_after_wick", "value": p_recover}
+    )
+    analysis_rows.append(
+        {
+            "scope": "POOLED",
+            "stat": "p_close_below_neg1_after_wick",
+            "value": p_reach_neg1_close_after,
+        }
+    )
 
     desc_peak = describe_distribution(np.asarray(subsequent_peak_mfe_wicks, dtype=np.float64))
     desc_final = describe_distribution(np.asarray(final_r_wicks, dtype=np.float64))
-    for label, d in (("subsequent_peak_mfe_among_wicks", desc_peak), ("final_r_among_wicks", desc_final)):
+    for label, d in (
+        ("subsequent_peak_mfe_among_wicks", desc_peak),
+        ("final_r_among_wicks", desc_final),
+    ):
         analysis_rows.append({"scope": "POOLED", "stat": f"{label}_n", "value": d["n"]})
         for s in ("mean", "std", "min", "max"):
             analysis_rows.append({"scope": "POOLED", "stat": f"{label}_{s}", "value": d[s]})
         for p in DIST_PERCENTILES:
-            analysis_rows.append({"scope": "POOLED", "stat": f"{label}_p{int(p)}", "value": d[f"p{int(p)}"]})
+            analysis_rows.append(
+                {"scope": "POOLED", "stat": f"{label}_p{int(p)}", "value": d[f"p{int(p)}"]}
+            )
 
     for cid, counts in sorted(per_cluster_counts.items()):
-        analysis_rows.append({"scope": f"cluster_{cid}", "stat": "n_sl_hit", "value": counts["sl_hit"]})
+        analysis_rows.append(
+            {"scope": f"cluster_{cid}", "stat": "n_sl_hit", "value": counts["sl_hit"]}
+        )
         analysis_rows.append({"scope": f"cluster_{cid}", "stat": "n_wick", "value": counts["wick"]})
-        analysis_rows.append({"scope": f"cluster_{cid}", "stat": "n_close_below_sl", "value": counts["close_below"]})
+        analysis_rows.append(
+            {"scope": f"cluster_{cid}", "stat": "n_close_below_sl", "value": counts["close_below"]}
+        )
         if counts["sl_hit"]:
-            analysis_rows.append({
-                "scope": f"cluster_{cid}", "stat": "p_wick_given_sl_hit",
-                "value": counts["wick"] / counts["sl_hit"],
-            })
+            analysis_rows.append(
+                {
+                    "scope": f"cluster_{cid}",
+                    "stat": "p_wick_given_sl_hit",
+                    "value": counts["wick"] / counts["sl_hit"],
+                }
+            )
 
     analysis_df = pd.DataFrame(analysis_rows)
 
@@ -925,10 +979,20 @@ def sl_wick_analysis(
         realized[i] = rcv
 
     # Simulation summary rows.
-    sim_rows = cell_stats_rows(exit_t, reason_idx, realized,
-                                {"variant": "ref_close_confirmed_sl", "cell_id": "close_confirmed_sl"})
-    sim_rows.extend(per_fold_rows({"variant": "ref_close_confirmed_sl", "cell_id": "close_confirmed_sl"},
-                                   sigs_sorted, fold_id_map, realized))
+    sim_rows = cell_stats_rows(
+        exit_t,
+        reason_idx,
+        realized,
+        {"variant": "ref_close_confirmed_sl", "cell_id": "close_confirmed_sl"},
+    )
+    sim_rows.extend(
+        per_fold_rows(
+            {"variant": "ref_close_confirmed_sl", "cell_id": "close_confirmed_sl"},
+            sigs_sorted,
+            fold_id_map,
+            realized,
+        )
+    )
     sim_df = pd.DataFrame(sim_rows)
 
     return analysis_df, sim_df, realized
@@ -977,9 +1041,7 @@ def chart_heatmap(
     _save_figure(fig, path)
 
 
-def chart_per_fold_heatmap(
-    per_fold_df: pd.DataFrame, top_cells: List[str], path: Path
-) -> None:
+def chart_per_fold_heatmap(per_fold_df: pd.DataFrame, top_cells: List[str], path: Path) -> None:
     """For top cells, show (cell × fold) mean R."""
     folds = list(range(1, 8))
     z = np.full((len(top_cells), len(folds)), np.nan)
@@ -1037,10 +1099,16 @@ def chart_two_bar_comparison(grid_v1: pd.DataFrame, grid_v3: pd.DataFrame, path:
     means_v3 = []
     means_v1_t1 = []
     means_v1_t2 = []
-    for (t1, t2) in V3_PAIRS:
-        v3 = grid_v3[(grid_v3["cell_id"] == f"V3_t{t1}_t{t2}") & (grid_v3["stat"] == "mean_realized_r")]
-        v1_t1 = grid_v1[(grid_v1["cell_id"] == f"V1_t{t1}_T0") & (grid_v1["stat"] == "mean_realized_r")]
-        v1_t2 = grid_v1[(grid_v1["cell_id"] == f"V1_t{t2}_T0") & (grid_v1["stat"] == "mean_realized_r")]
+    for t1, t2 in V3_PAIRS:
+        v3 = grid_v3[
+            (grid_v3["cell_id"] == f"V3_t{t1}_t{t2}") & (grid_v3["stat"] == "mean_realized_r")
+        ]
+        v1_t1 = grid_v1[
+            (grid_v1["cell_id"] == f"V1_t{t1}_T0") & (grid_v1["stat"] == "mean_realized_r")
+        ]
+        v1_t2 = grid_v1[
+            (grid_v1["cell_id"] == f"V1_t{t2}_T0") & (grid_v1["stat"] == "mean_realized_r")
+        ]
         labels.append(f"({t1},{t2})")
         means_v3.append(float(v3["value"].iloc[0]) if len(v3) else float("nan"))
         means_v1_t1.append(float(v1_t1["value"].iloc[0]) if len(v1_t1) else float("nan"))
@@ -1060,7 +1128,9 @@ def chart_two_bar_comparison(grid_v1: pd.DataFrame, grid_v3: pd.DataFrame, path:
     _save_figure(fig, path)
 
 
-def chart_sl_wick_recovery(realized_cc: np.ndarray, realized_intrabar: np.ndarray, path: Path) -> None:
+def chart_sl_wick_recovery(
+    realized_cc: np.ndarray, realized_intrabar: np.ndarray, path: Path
+) -> None:
     fig, ax = plt.subplots(figsize=(10, 5))
     bins = np.arange(-3.0, 12.0 + 0.25, 0.25)
     ax.hist(realized_cc, bins=bins, alpha=0.5, color="C1", label="close-confirmed SL variant")
@@ -1127,10 +1197,16 @@ def write_report(
 
     lines.append("## 3. Reference cells — band_behavior parity check")
     lines.append("")
-    lines.append("| reference | observed_mean_r | band_behavior_target | delta | within_tolerance |")
-    lines.append("|-----------|-----------------|----------------------|-------|-------------------|")
+    lines.append(
+        "| reference | observed_mean_r | band_behavior_target | delta | within_tolerance |"
+    )
+    lines.append(
+        "|-----------|-----------------|----------------------|-------|-------------------|"
+    )
     for ref_mode in ("verbatim_arc2", "no_time_exit"):
-        obs = grid_refs[(grid_refs["cell_id"] == ref_mode) & (grid_refs["stat"] == "mean_realized_r")]
+        obs = grid_refs[
+            (grid_refs["cell_id"] == ref_mode) & (grid_refs["stat"] == "mean_realized_r")
+        ]
         obs_v = float(obs["value"].iloc[0]) if len(obs) else float("nan")
         target = BAND_BEHAVIOR_REF_MEAN_R[ref_mode]
         delta = obs_v - target
@@ -1140,8 +1216,10 @@ def write_report(
             f"{_fmt_float(delta)} | {'PASS' if ok else 'FAIL'} |"
         )
     lines.append("")
-    lines.append(f"Reference parity tolerance: |delta| <= {REF_TOLERANCE}R. Both PASS implies "
-                 "methodology consistency with band_behavior.")
+    lines.append(
+        f"Reference parity tolerance: |delta| <= {REF_TOLERANCE}R. Both PASS implies "
+        "methodology consistency with band_behavior."
+    )
     lines.append("")
 
     lines.append("## 4. Variant 1 — single-bar gate grid (5 t* x 5 T = 25 cells)")
@@ -1178,9 +1256,11 @@ def write_report(
     for t in V1_T_STARS:
         for T in V1_THRESHOLDS:
             cell_id = f"V1_t{t}_T{T:g}"
+
             def gv(stat: str) -> str:
                 r = grid_v1[(grid_v1["cell_id"] == cell_id) & (grid_v1["stat"] == stat)]
                 return str(int(float(r["value"].iloc[0]))) if len(r) else "NaN"
+
             lines.append(f"| {cell_id} | {gv('n_sl')} | {gv('n_gate')} | {gv('n_time_240')} |")
     lines.append("")
     lines.append("Charts: `charts/gate_meanR_heatmap.png`, `charts/gate_winrate_heatmap.png`.")
@@ -1188,12 +1268,22 @@ def write_report(
 
     lines.append("## 5. Variant 2 — composite classifier")
     lines.append("")
-    lines.append("Logistic regression on standardised (r_close[t*], running_mfe[t*], running_mae[t*]),")
-    lines.append("target = r_at_t240 > 0, 70/30 train/test split (seeded), L-BFGS-B solver, intercept fitted.")
-    lines.append("Gate rule: at bar t*, exit at r_close[t*] if predict_proba < 0.5; otherwise hold.")
+    lines.append(
+        "Logistic regression on standardised (r_close[t*], running_mfe[t*], running_mae[t*]),"
+    )
+    lines.append(
+        "target = r_at_t240 > 0, 70/30 train/test split (seeded), L-BFGS-B solver, intercept fitted."
+    )
+    lines.append(
+        "Gate rule: at bar t*, exit at r_close[t*] if predict_proba < 0.5; otherwise hold."
+    )
     lines.append("")
-    lines.append("| t* | n_train | n_test | AUC_train | AUC_test | gap | coef_r_close | coef_running_mfe | coef_running_mae | intercept | mean_R | P(R>0) |")
-    lines.append("|----|---------|--------|-----------|----------|-----|---------------|--------------------|--------------------|-----------|--------|--------|")
+    lines.append(
+        "| t* | n_train | n_test | AUC_train | AUC_test | gap | coef_r_close | coef_running_mfe | coef_running_mae | intercept | mean_R | P(R>0) |"
+    )
+    lines.append(
+        "|----|---------|--------|-----------|----------|-----|---------------|--------------------|--------------------|-----------|--------|--------|"
+    )
     for t in V2_T_STARS:
         cm = classifier_meta.get(t, {})
         cell_id = f"V2_t{t}"
@@ -1213,15 +1303,22 @@ def write_report(
             f"{mean_v} | {win_v} |"
         )
     lines.append("")
-    lines.append("Train/test AUC gap should be < 0.05 for overfit warning to clear; values above that threshold are flagged in run_manifest.txt diagnostics.")
+    lines.append(
+        "Train/test AUC gap should be < 0.05 for overfit warning to clear; values above that threshold are flagged in run_manifest.txt diagnostics."
+    )
     lines.append("")
 
     lines.append("## 6. Variant 3 — two-bar consistency (T1 = T2 = 0)")
     lines.append("")
-    lines.append("| (t1, t2) | mean_R (V3) | mean_R (V1@t1, T=0) | mean_R (V1@t2, T=0) | n_gate (V3) | n_sl (V3) |")
-    lines.append("|----------|-------------|----------------------|----------------------|--------------|------------|")
+    lines.append(
+        "| (t1, t2) | mean_R (V3) | mean_R (V1@t1, T=0) | mean_R (V1@t2, T=0) | n_gate (V3) | n_sl (V3) |"
+    )
+    lines.append(
+        "|----------|-------------|----------------------|----------------------|--------------|------------|"
+    )
     for t1, t2 in V3_PAIRS:
         cell_id = f"V3_t{t1}_t{t2}"
+
         def grab(df: pd.DataFrame, cid: str, stat: str) -> str:
             r = df[(df["cell_id"] == cid) & (df["stat"] == stat)]
             if not len(r):
@@ -1230,9 +1327,11 @@ def write_report(
                 return _fmt_float(float(r["value"].iloc[0]))
             except (TypeError, ValueError):
                 return str(r["value"].iloc[0])
+
         def grab_n(df: pd.DataFrame, cid: str, stat: str) -> str:
             r = df[(df["cell_id"] == cid) & (df["stat"] == stat)]
             return str(int(float(r["value"].iloc[0]))) if len(r) else "NaN"
+
         lines.append(
             f"| ({t1},{t2}) | {grab(grid_v3, cell_id, 'mean_realized_r')} | "
             f"{grab(grid_v1, f'V1_t{t1}_T0', 'mean_realized_r')} | "
@@ -1246,7 +1345,9 @@ def write_report(
 
     lines.append("## 7. Variant 4 — MFE-conditional skip")
     lines.append("")
-    lines.append("Rule: at bar t*, if running_mfe[t*] >= 1R skip the gate (continue); otherwise apply V1 gate.")
+    lines.append(
+        "Rule: at bar t*, if running_mfe[t*] >= 1R skip the gate (continue); otherwise apply V1 gate."
+    )
     lines.append("")
     lines.append("Mean realized R per cell (delta vs V1 same cell shown in parentheses):")
     lines.append("")
@@ -1269,30 +1370,42 @@ def write_report(
     lines.append("Chart: `charts/gate_meanR_with_mfe_skip.png`.")
     lines.append("")
 
-    lines.append("## 8. Per-cluster contribution table (top-5 cells per variant + 2 reference cells)")
+    lines.append(
+        "## 8. Per-cluster contribution table (top-5 cells per variant + 2 reference cells)"
+    )
     lines.append("")
-    lines.append("Full table in `gate_cell_per_cluster.csv`. Headline: per-cell pooled mean R decomposed by cluster.")
+    lines.append(
+        "Full table in `gate_cell_per_cluster.csv`. Headline: per-cell pooled mean R decomposed by cluster."
+    )
     lines.append("")
-    lines.append("Top contributors are shown per variant in the CSV; mean R per cluster differs only weakly across cells of the same variant (the rule sees the same population modulo gate timing).")
+    lines.append(
+        "Top contributors are shown per variant in the CSV; mean R per cluster differs only weakly across cells of the same variant (the rule sees the same population modulo gate timing)."
+    )
     lines.append("")
 
     lines.append("## 9. Per-fold breakdown — the headline gate criterion")
     lines.append("")
-    lines.append("Worst-fold mean R per cell. The L6.0 §4 condition 1 requires worst-fold ROI > 0% across all 7 folds. Worst-fold mean R > 0 is a (much looser) proxy.")
+    lines.append(
+        "Worst-fold mean R per cell. The L6.0 §4 condition 1 requires worst-fold ROI > 0% across all 7 folds. Worst-fold mean R > 0 is a (much looser) proxy."
+    )
     lines.append("")
     # Find cells where worst_fold_mean_r > 0.
     worst = per_fold_df[per_fold_df["fold"] == "WORST"].copy()
     worst["worst_mean_r"] = worst["value"].astype(float)
     surviving = worst[worst["worst_mean_r"] > 0.0].sort_values("worst_mean_r", ascending=False)
     if len(surviving) == 0:
-        lines.append("**No cell has worst-fold mean R > 0.** All cells fail the proxy criterion on at least one fold.")
+        lines.append(
+            "**No cell has worst-fold mean R > 0.** All cells fail the proxy criterion on at least one fold."
+        )
     else:
         lines.append("Cells with worst-fold mean R > 0:")
         lines.append("")
         lines.append("| variant | cell_id | worst_fold_mean_r |")
         lines.append("|---------|---------|---------------------|")
         for _, r in surviving.iterrows():
-            lines.append(f"| {r['variant']} | {r['cell_id']} | {_fmt_float(float(r['worst_mean_r']))} |")
+            lines.append(
+                f"| {r['variant']} | {r['cell_id']} | {_fmt_float(float(r['worst_mean_r']))} |"
+            )
     lines.append("")
     lines.append("Top 10 cells by worst-fold mean R (regardless of sign):")
     lines.append("")
@@ -1300,7 +1413,9 @@ def write_report(
     lines.append("| variant | cell_id | worst_fold_mean_r |")
     lines.append("|---------|---------|---------------------|")
     for _, r in top10.iterrows():
-        lines.append(f"| {r['variant']} | {r['cell_id']} | {_fmt_float(float(r['worst_mean_r']))} |")
+        lines.append(
+            f"| {r['variant']} | {r['cell_id']} | {_fmt_float(float(r['worst_mean_r']))} |"
+        )
     lines.append("")
     lines.append("Chart: `charts/gate_per_fold_heatmap.png` — top-10 cells × 7 folds.")
     lines.append("")
@@ -1308,6 +1423,7 @@ def write_report(
     lines.append("## 10. SL wick analysis (Candidate 3b probe)")
     lines.append("")
     pooled = sl_wick_df[sl_wick_df["scope"] == "POOLED"]
+
     def grab_pooled(stat: str) -> str:
         r = pooled[pooled["stat"] == stat]
         if not len(r):
@@ -1316,12 +1432,21 @@ def write_report(
             return _fmt_float(float(r["value"].iloc[0]))
         except (TypeError, ValueError):
             return str(r["value"].iloc[0])
-    lines.append(f"- N(SL hit) = {int(float(pooled[pooled['stat'] == 'n_sl_hit']['value'].iloc[0]))}")
+
+    lines.append(
+        f"- N(SL hit) = {int(float(pooled[pooled['stat'] == 'n_sl_hit']['value'].iloc[0]))}"
+    )
     lines.append(f"- N(wick) = {int(float(pooled[pooled['stat'] == 'n_wick']['value'].iloc[0]))}")
-    lines.append(f"- N(close-below SL) = {int(float(pooled[pooled['stat'] == 'n_close_below_sl']['value'].iloc[0]))}")
+    lines.append(
+        f"- N(close-below SL) = {int(float(pooled[pooled['stat'] == 'n_close_below_sl']['value'].iloc[0]))}"
+    )
     lines.append(f"- P(wick | SL hit) = {grab_pooled('p_wick_given_sl_hit')}")
-    lines.append(f"- Among wicks: P(recover r_close > 0R within bars (t_sl, 240]) = {grab_pooled('p_recover_r_close_gt_0_after_wick')}")
-    lines.append(f"- Among wicks: P(close-below -1R confirmed after wick) = {grab_pooled('p_close_below_neg1_after_wick')}")
+    lines.append(
+        f"- Among wicks: P(recover r_close > 0R within bars (t_sl, 240]) = {grab_pooled('p_recover_r_close_gt_0_after_wick')}"
+    )
+    lines.append(
+        f"- Among wicks: P(close-below -1R confirmed after wick) = {grab_pooled('p_close_below_neg1_after_wick')}"
+    )
     lines.append("")
     lines.append("Per-cluster wick rate:")
     lines.append("")
@@ -1331,6 +1456,7 @@ def write_report(
         if not cid.startswith("cluster_"):
             continue
         sub = sl_wick_df[sl_wick_df["scope"] == cid]
+
         def gv(s: str) -> str:
             r = sub[sub["stat"] == s]
             if not len(r):
@@ -1339,11 +1465,13 @@ def write_report(
                 return _fmt_float(float(r["value"].iloc[0]))
             except (TypeError, ValueError):
                 return str(r["value"].iloc[0])
+
         lines.append(f"| {cid} | {gv('n_sl_hit')} | {gv('n_wick')} | {gv('p_wick_given_sl_hit')} |")
     lines.append("")
     lines.append("Close-confirmed SL variant (SL only if r_close <= -1R, no intrabar trigger):")
     lines.append("")
     cc = sl_wick_sim_df[sl_wick_sim_df["cell_id"] == "close_confirmed_sl"]
+
     def grab_cc(stat: str) -> str:
         r = cc[cc["stat"] == stat]
         if not len(r):
@@ -1352,6 +1480,7 @@ def write_report(
             return _fmt_float(float(r["value"].iloc[0]))
         except (TypeError, ValueError):
             return str(r["value"].iloc[0])
+
     lines.append(f"- N = {int(float(cc[cc['stat'] == 'N']['value'].iloc[0]))}")
     lines.append(f"- mean_realized_r = {grab_cc('mean_realized_r')}")
     lines.append(f"- std_realized_r = {grab_cc('std_realized_r')}")
@@ -1364,7 +1493,10 @@ def write_report(
     lines.append("| fold | n | mean_R | dd_proxy |")
     lines.append("|------|---|--------|----------|")
     for fold in range(1, 8):
-        for_fold = sl_wick_sim_df[(sl_wick_sim_df["cell_id"] == "close_confirmed_sl") & (sl_wick_sim_df["fold"] == fold)]
+        for_fold = sl_wick_sim_df[
+            (sl_wick_sim_df["cell_id"] == "close_confirmed_sl") & (sl_wick_sim_df["fold"] == fold)
+        ]
+
         def fold_gv(s: str) -> str:
             r = for_fold[for_fold["stat"] == s]
             if not len(r):
@@ -1373,13 +1505,16 @@ def write_report(
                 return _fmt_float(float(r["value"].iloc[0]))
             except (TypeError, ValueError):
                 return str(r["value"].iloc[0])
+
         n_str = "NaN"
         n_row = for_fold[for_fold["stat"] == "n"]
         if len(n_row):
             n_str = str(int(float(n_row["value"].iloc[0])))
         lines.append(f"| {fold} | {n_str} | {fold_gv('mean_r')} | {fold_gv('dd_proxy')} |")
     lines.append("")
-    lines.append("Chart: `charts/sl_wick_recovery.png` (realized R histograms: close-confirmed vs intrabar).")
+    lines.append(
+        "Chart: `charts/sl_wick_recovery.png` (realized R histograms: close-confirmed vs intrabar)."
+    )
     lines.append("")
 
     lines.append("## 11. Empirical observations")
@@ -1416,8 +1551,13 @@ def write_report(
                 f"pooled mean realized R = {_fmt_float(float(r_mean['value'].iloc[0]))}."
             )
     # Close-confirmed SL net effect.
-    cc_mean = sl_wick_sim_df[(sl_wick_sim_df["cell_id"] == "close_confirmed_sl") & (sl_wick_sim_df["stat"] == "mean_realized_r")]
-    ref_no_time = grid_refs[(grid_refs["cell_id"] == "no_time_exit") & (grid_refs["stat"] == "mean_realized_r")]
+    cc_mean = sl_wick_sim_df[
+        (sl_wick_sim_df["cell_id"] == "close_confirmed_sl")
+        & (sl_wick_sim_df["stat"] == "mean_realized_r")
+    ]
+    ref_no_time = grid_refs[
+        (grid_refs["cell_id"] == "no_time_exit") & (grid_refs["stat"] == "mean_realized_r")
+    ]
     if len(cc_mean) and len(ref_no_time):
         cc_v = float(cc_mean["value"].iloc[0])
         nt_v = float(ref_no_time["value"].iloc[0])
@@ -1436,11 +1576,13 @@ def write_report(
             f"- {len(surviving)} cell(s) achieve worst-fold mean R > 0: see Section 9 'Cells with worst-fold mean R > 0'."
         )
     lines.append("")
-    lines.append("Reading guide. The gate is a mid-trade exit conditional on r_close[t*] < threshold. "
-                 "Variants V1/V3/V4 use fixed thresholds; V2 uses a learned threshold via logistic regression. "
-                 "The headline graduation criterion for Candidate 8 (per the open task prompt) is: pooled "
-                 "mean R > +0.10R, worst-fold mean R > +0.05R, and P(R>0) > 0.45 net of est. cost. The "
-                 "cells in this run that meet that bar (if any) are flagged in Section 9.")
+    lines.append(
+        "Reading guide. The gate is a mid-trade exit conditional on r_close[t*] < threshold. "
+        "Variants V1/V3/V4 use fixed thresholds; V2 uses a learned threshold via logistic regression. "
+        "The headline graduation criterion for Candidate 8 (per the open task prompt) is: pooled "
+        "mean R > +0.10R, worst-fold mean R > +0.05R, and P(R>0) > 0.45 net of est. cost. The "
+        "cells in this run that meet that bar (if any) are flagged in Section 9."
+    )
     lines.append("")
 
     lines.append("## §14.5 discipline")
@@ -1540,7 +1682,9 @@ def write_manifest(
     lines.append("")
     lines.append(f"- NUMPY_SEED = {NUMPY_SEED}")
     lines.append(f"- SKLEARN_SEED = {SKLEARN_SEED}")
-    lines.append("- Sort: sigs_sorted = sorted(signal_idx). Per-cluster / per-fold iteration sorted.")
+    lines.append(
+        "- Sort: sigs_sorted = sorted(signal_idx). Per-cluster / per-fold iteration sorted."
+    )
     lines.append("- CSV: utf-8, LF, float_format='%.10g'.")
     lines.append("- Matplotlib: Agg backend, pinned metadata.")
     lines.append("")
@@ -1568,11 +1712,13 @@ def write_manifest(
         all_match = True
         for rel, h in hashes.items():
             prior = prior_hashes.get(rel)
-            ok = (prior == h)
+            ok = prior == h
             all_match = all_match and ok
             lines.append(f"- {rel}: {'IDENTICAL' if ok else 'DIVERGED'}")
         lines.append("")
-        lines.append(f"Overall: {'PASS - byte-identical across runs' if all_match else 'FAIL - some files diverged'}")
+        lines.append(
+            f"Overall: {'PASS - byte-identical across runs' if all_match else 'FAIL - some files diverged'}"
+        )
         lines.append("")
 
     _write_text("\n".join(lines) + "\n", OUTPUT_DIR / "run_manifest.txt")
@@ -1584,13 +1730,24 @@ def write_manifest(
 # ---------------------------------------------------------------------------
 
 
-def run_pipeline(*, run_ordinal: int, prior_hashes: Optional[Dict[str, str]] = None) -> Dict[str, str]:
+def run_pipeline(
+    *, run_ordinal: int, prior_hashes: Optional[Dict[str, str]] = None
+) -> Dict[str, str]:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     CHARTS_DIR.mkdir(parents=True, exist_ok=True)
 
     print(f"[run #{run_ordinal}] Loading + hash-verifying inputs ...", flush=True)
-    (sig_to_arr, first_sl_bar, r_at_t240, n_post_bars, cluster_id_map, fold_id_map,
-     pair_map, actual_hashes, n_total) = load_inputs()
+    (
+        sig_to_arr,
+        first_sl_bar,
+        r_at_t240,
+        n_post_bars,
+        cluster_id_map,
+        fold_id_map,
+        pair_map,
+        actual_hashes,
+        n_total,
+    ) = load_inputs()
     sigs_sorted: List[int] = sorted(sig_to_arr.keys())
     fold_counts: Dict[int, int] = {f: 0 for f in range(1, 8)}
     for s in sigs_sorted:
@@ -1606,7 +1763,9 @@ def run_pipeline(*, run_ordinal: int, prior_hashes: Optional[Dict[str, str]] = N
     ref_parity_ok: Dict[str, bool] = {}
     ref_realized: Dict[str, np.ndarray] = {}
     for ref_mode in ("verbatim_arc2", "no_time_exit"):
-        _, reason_idx, realized = simulate_reference(sigs_sorted, sig_to_arr, first_sl_bar, ref_mode)
+        _, reason_idx, realized = simulate_reference(
+            sigs_sorted, sig_to_arr, first_sl_bar, ref_mode
+        )
         ref_realized[ref_mode] = realized
         obs = float(np.mean(realized))
         target = BAND_BEHAVIOR_REF_MEAN_R[ref_mode]
@@ -1619,10 +1778,22 @@ def run_pipeline(*, run_ordinal: int, prior_hashes: Optional[Dict[str, str]] = N
                 f"target {target:.4f} by {abs(obs - target):.6f} (tolerance {REF_TOLERANCE})."
             )
         base = {"variant": "reference", "cell_id": ref_mode}
-        ref_rows.extend(cell_stats_rows(np.zeros(n_total, dtype=np.int32),  # exit_t placeholder unused in reason-counts
-                                         reason_idx, realized, base))
+        ref_rows.extend(
+            cell_stats_rows(
+                np.zeros(n_total, dtype=np.int32),  # exit_t placeholder unused in reason-counts
+                reason_idx,
+                realized,
+                base,
+            )
+        )
         # Re-add exit_t properly:
-        ref_rows = [r for r in ref_rows if r.get("stat") != "mean_exit_bar" or r.get("cell_id") != ref_mode or r.get("value") is None]
+        ref_rows = [
+            r
+            for r in ref_rows
+            if r.get("stat") != "mean_exit_bar"
+            or r.get("cell_id") != ref_mode
+            or r.get("value") is None
+        ]
         # Recompute mean_exit_bar with actual exit_t:
         et_array, _, _ = simulate_reference(sigs_sorted, sig_to_arr, first_sl_bar, ref_mode)
         # Replace mean_exit_bar row(s) for this ref_mode:
@@ -1630,7 +1801,9 @@ def run_pipeline(*, run_ordinal: int, prior_hashes: Optional[Dict[str, str]] = N
     # Re-do cleanly:
     ref_rows = []
     for ref_mode in ("verbatim_arc2", "no_time_exit"):
-        et_array, reason_idx, realized = simulate_reference(sigs_sorted, sig_to_arr, first_sl_bar, ref_mode)
+        et_array, reason_idx, realized = simulate_reference(
+            sigs_sorted, sig_to_arr, first_sl_bar, ref_mode
+        )
         base = {"variant": "reference", "cell_id": ref_mode}
         ref_rows.extend(cell_stats_rows(et_array, reason_idx, realized, base))
         ref_per_cluster_rows.extend(per_cluster_rows(base, sigs_sorted, cluster_id_map, realized))
@@ -1655,7 +1828,12 @@ def run_pipeline(*, run_ordinal: int, prior_hashes: Optional[Dict[str, str]] = N
     # ----- Variant 2 -----
     print(f"[run #{run_ordinal}] Variant 2 — composite classifier, 5 cells ...", flush=True)
     v2_rows, v2_cluster_rows, v2_fold_rows, classifier_meta = variant_2_pipeline(
-        sigs_sorted, sig_to_arr, first_sl_bar, r_at_t240, cluster_id_map, fold_id_map,
+        sigs_sorted,
+        sig_to_arr,
+        first_sl_bar,
+        r_at_t240,
+        cluster_id_map,
+        fold_id_map,
     )
 
     # ----- Variant 3 -----
@@ -1666,7 +1844,14 @@ def run_pipeline(*, run_ordinal: int, prior_hashes: Optional[Dict[str, str]] = N
     for t1, t2 in V3_PAIRS:
         cell_id = f"V3_t{t1}_t{t2}"
         et, ri, rr = simulate_v3(sigs_sorted, sig_to_arr, first_sl_bar, t1, t2, V3_T1, V3_T2)
-        base = {"variant": "V3_two_bar", "cell_id": cell_id, "t1": t1, "t2": t2, "T1": V3_T1, "T2": V3_T2}
+        base = {
+            "variant": "V3_two_bar",
+            "cell_id": cell_id,
+            "t1": t1,
+            "t2": t2,
+            "T1": V3_T1,
+            "T2": V3_T2,
+        }
         v3_rows.extend(cell_stats_rows(et, ri, rr, base))
         v3_cluster_rows.extend(per_cluster_rows(base, sigs_sorted, cluster_id_map, rr))
         v3_fold_rows.extend(per_fold_rows(base, sigs_sorted, fold_id_map, rr))
@@ -1679,7 +1864,9 @@ def run_pipeline(*, run_ordinal: int, prior_hashes: Optional[Dict[str, str]] = N
     for t_star in V4_T_STARS:
         for T in V4_THRESHOLDS:
             cell_id = f"V4_t{t_star}_T{T:g}"
-            et, ri, rr, skipped = simulate_v4(sigs_sorted, sig_to_arr, first_sl_bar, t_star, T, V4_MFE_SKIP_LEVEL)
+            et, ri, rr, skipped = simulate_v4(
+                sigs_sorted, sig_to_arr, first_sl_bar, t_star, T, V4_MFE_SKIP_LEVEL
+            )
             base = {"variant": "V4_mfe_skip", "cell_id": cell_id, "t_star": t_star, "T": T}
             cell_rows = cell_stats_rows(et, ri, rr, base)
             cell_rows.append({**base, "stat": "n_skipped_by_mfe", "value": int(skipped.sum())})
@@ -1690,15 +1877,39 @@ def run_pipeline(*, run_ordinal: int, prior_hashes: Optional[Dict[str, str]] = N
     # ----- SL wick analysis -----
     print(f"[run #{run_ordinal}] SL wick analysis + close-confirmed simulation ...", flush=True)
     sl_wick_df, sl_wick_sim_df, realized_cc = sl_wick_analysis(
-        sigs_sorted, sig_to_arr, first_sl_bar, cluster_id_map, fold_id_map,
+        sigs_sorted,
+        sig_to_arr,
+        first_sl_bar,
+        cluster_id_map,
+        fold_id_map,
     )
 
     # ----- Pack DataFrames -----
-    grid_v1 = pd.DataFrame(v1_rows).sort_values(by=["cell_id", "stat"], kind="mergesort").reset_index(drop=True)
-    grid_v2 = pd.DataFrame(v2_rows).sort_values(by=["cell_id", "stat"], kind="mergesort").reset_index(drop=True)
-    grid_v3 = pd.DataFrame(v3_rows).sort_values(by=["cell_id", "stat"], kind="mergesort").reset_index(drop=True)
-    grid_v4 = pd.DataFrame(v4_rows).sort_values(by=["cell_id", "stat"], kind="mergesort").reset_index(drop=True)
-    grid_refs = pd.DataFrame(ref_rows).sort_values(by=["cell_id", "stat"], kind="mergesort").reset_index(drop=True)
+    grid_v1 = (
+        pd.DataFrame(v1_rows)
+        .sort_values(by=["cell_id", "stat"], kind="mergesort")
+        .reset_index(drop=True)
+    )
+    grid_v2 = (
+        pd.DataFrame(v2_rows)
+        .sort_values(by=["cell_id", "stat"], kind="mergesort")
+        .reset_index(drop=True)
+    )
+    grid_v3 = (
+        pd.DataFrame(v3_rows)
+        .sort_values(by=["cell_id", "stat"], kind="mergesort")
+        .reset_index(drop=True)
+    )
+    grid_v4 = (
+        pd.DataFrame(v4_rows)
+        .sort_values(by=["cell_id", "stat"], kind="mergesort")
+        .reset_index(drop=True)
+    )
+    grid_refs = (
+        pd.DataFrame(ref_rows)
+        .sort_values(by=["cell_id", "stat"], kind="mergesort")
+        .reset_index(drop=True)
+    )
 
     # Combined per-cluster table: top-5 by mean realized R per variant + 2 refs.
     def top5_cells(grid: pd.DataFrame) -> List[str]:
@@ -1721,31 +1932,49 @@ def run_pipeline(*, run_ordinal: int, prior_hashes: Optional[Dict[str, str]] = N
     ref_df = pd.DataFrame(ref_per_cluster_rows)
     if len(ref_df):
         cluster_combined.append(ref_df)
-    per_cluster_df = pd.concat(cluster_combined, ignore_index=True).sort_values(
-        by=["variant", "cell_id", "cluster", "stat"], kind="mergesort"
-    ).reset_index(drop=True)
+    per_cluster_df = (
+        pd.concat(cluster_combined, ignore_index=True)
+        .sort_values(by=["variant", "cell_id", "cluster", "stat"], kind="mergesort")
+        .reset_index(drop=True)
+    )
 
     # Combined per-fold table: ALL cells across V1..V4 + refs.
-    per_fold_df = pd.concat([
-        pd.DataFrame(v1_fold_rows),
-        pd.DataFrame(v2_fold_rows),
-        pd.DataFrame(v3_fold_rows),
-        pd.DataFrame(v4_fold_rows),
-        pd.DataFrame(ref_per_fold_rows),
-    ], ignore_index=True).sort_values(by=["variant", "cell_id", "fold", "stat"], kind="mergesort").reset_index(drop=True)
+    per_fold_df = (
+        pd.concat(
+            [
+                pd.DataFrame(v1_fold_rows),
+                pd.DataFrame(v2_fold_rows),
+                pd.DataFrame(v3_fold_rows),
+                pd.DataFrame(v4_fold_rows),
+                pd.DataFrame(ref_per_fold_rows),
+            ],
+            ignore_index=True,
+        )
+        .sort_values(by=["variant", "cell_id", "fold", "stat"], kind="mergesort")
+        .reset_index(drop=True)
+    )
 
     # ----- Write outputs -----
     print(f"[run #{run_ordinal}] Writing CSV outputs ...", flush=True)
     out_paths: List[Path] = []
-    _write_csv(grid_v1, OUTPUT_DIR / "gate_grid_single_bar.csv"); out_paths.append(OUTPUT_DIR / "gate_grid_single_bar.csv")
-    _write_csv(grid_v2, OUTPUT_DIR / "gate_grid_composite.csv"); out_paths.append(OUTPUT_DIR / "gate_grid_composite.csv")
-    _write_csv(grid_v3, OUTPUT_DIR / "gate_grid_two_bar.csv"); out_paths.append(OUTPUT_DIR / "gate_grid_two_bar.csv")
-    _write_csv(grid_v4, OUTPUT_DIR / "gate_grid_mfe_skip.csv"); out_paths.append(OUTPUT_DIR / "gate_grid_mfe_skip.csv")
-    _write_csv(grid_refs, OUTPUT_DIR / "gate_reference_cells.csv"); out_paths.append(OUTPUT_DIR / "gate_reference_cells.csv")
-    _write_csv(per_cluster_df, OUTPUT_DIR / "gate_cell_per_cluster.csv"); out_paths.append(OUTPUT_DIR / "gate_cell_per_cluster.csv")
-    _write_csv(per_fold_df, OUTPUT_DIR / "gate_cell_per_fold.csv"); out_paths.append(OUTPUT_DIR / "gate_cell_per_fold.csv")
-    _write_csv(sl_wick_df, OUTPUT_DIR / "sl_wick_analysis.csv"); out_paths.append(OUTPUT_DIR / "sl_wick_analysis.csv")
-    _write_csv(sl_wick_sim_df, OUTPUT_DIR / "sl_wick_simulation.csv"); out_paths.append(OUTPUT_DIR / "sl_wick_simulation.csv")
+    _write_csv(grid_v1, OUTPUT_DIR / "gate_grid_single_bar.csv")
+    out_paths.append(OUTPUT_DIR / "gate_grid_single_bar.csv")
+    _write_csv(grid_v2, OUTPUT_DIR / "gate_grid_composite.csv")
+    out_paths.append(OUTPUT_DIR / "gate_grid_composite.csv")
+    _write_csv(grid_v3, OUTPUT_DIR / "gate_grid_two_bar.csv")
+    out_paths.append(OUTPUT_DIR / "gate_grid_two_bar.csv")
+    _write_csv(grid_v4, OUTPUT_DIR / "gate_grid_mfe_skip.csv")
+    out_paths.append(OUTPUT_DIR / "gate_grid_mfe_skip.csv")
+    _write_csv(grid_refs, OUTPUT_DIR / "gate_reference_cells.csv")
+    out_paths.append(OUTPUT_DIR / "gate_reference_cells.csv")
+    _write_csv(per_cluster_df, OUTPUT_DIR / "gate_cell_per_cluster.csv")
+    out_paths.append(OUTPUT_DIR / "gate_cell_per_cluster.csv")
+    _write_csv(per_fold_df, OUTPUT_DIR / "gate_cell_per_fold.csv")
+    out_paths.append(OUTPUT_DIR / "gate_cell_per_fold.csv")
+    _write_csv(sl_wick_df, OUTPUT_DIR / "sl_wick_analysis.csv")
+    out_paths.append(OUTPUT_DIR / "sl_wick_analysis.csv")
+    _write_csv(sl_wick_sim_df, OUTPUT_DIR / "sl_wick_simulation.csv")
+    out_paths.append(OUTPUT_DIR / "sl_wick_simulation.csv")
 
     # ----- Charts -----
     print(f"[run #{run_ordinal}] Writing charts ...", flush=True)
@@ -1762,11 +1991,16 @@ def run_pipeline(*, run_ordinal: int, prior_hashes: Optional[Dict[str, str]] = N
             if len(n):
                 n_grid_v1[i, j] = float(n["value"].iloc[0])
     chart_heatmap(
-        mean_grid_v1, n_grid_v1,
+        mean_grid_v1,
+        n_grid_v1,
         [f"t*={t}" for t in V1_T_STARS],
         [f"T={T:g}" for T in V1_THRESHOLDS],
-        "V1 single-bar gate — mean realized R", "threshold T", "anchor bar t*",
-        "mean realized R", CHARTS_DIR / "gate_meanR_heatmap.png", diverging=True,
+        "V1 single-bar gate — mean realized R",
+        "threshold T",
+        "anchor bar t*",
+        "mean realized R",
+        CHARTS_DIR / "gate_meanR_heatmap.png",
+        diverging=True,
     )
     out_paths.append(CHARTS_DIR / "gate_meanR_heatmap.png")
     # V1 win-rate heatmap.
@@ -1778,11 +2012,16 @@ def run_pipeline(*, run_ordinal: int, prior_hashes: Optional[Dict[str, str]] = N
             if len(m):
                 win_grid[i, j] = float(m["value"].iloc[0])
     chart_heatmap(
-        win_grid, n_grid_v1,
+        win_grid,
+        n_grid_v1,
         [f"t*={t}" for t in V1_T_STARS],
         [f"T={T:g}" for T in V1_THRESHOLDS],
-        "V1 single-bar gate — P(realized R > 0)", "threshold T", "anchor bar t*",
-        "P(R > 0)", CHARTS_DIR / "gate_winrate_heatmap.png", diverging=False,
+        "V1 single-bar gate — P(realized R > 0)",
+        "threshold T",
+        "anchor bar t*",
+        "P(R > 0)",
+        CHARTS_DIR / "gate_winrate_heatmap.png",
+        diverging=False,
     )
     out_paths.append(CHARTS_DIR / "gate_winrate_heatmap.png")
     # V4 mean R heatmap.
@@ -1798,11 +2037,16 @@ def run_pipeline(*, run_ordinal: int, prior_hashes: Optional[Dict[str, str]] = N
             if len(n):
                 n_grid_v4[i, j] = float(n["value"].iloc[0])
     chart_heatmap(
-        mean_grid_v4, n_grid_v4,
+        mean_grid_v4,
+        n_grid_v4,
         [f"t*={t}" for t in V4_T_STARS],
         [f"T={T:g}" for T in V4_THRESHOLDS],
-        "V4 MFE-skip gate — mean realized R", "threshold T", "anchor bar t*",
-        "mean realized R", CHARTS_DIR / "gate_meanR_with_mfe_skip.png", diverging=True,
+        "V4 MFE-skip gate — mean realized R",
+        "threshold T",
+        "anchor bar t*",
+        "mean realized R",
+        CHARTS_DIR / "gate_meanR_with_mfe_skip.png",
+        diverging=True,
     )
     out_paths.append(CHARTS_DIR / "gate_meanR_with_mfe_skip.png")
     # Top-10 cells per-fold heatmap.
@@ -1815,7 +2059,9 @@ def run_pipeline(*, run_ordinal: int, prior_hashes: Optional[Dict[str, str]] = N
     chart_two_bar_comparison(grid_v1, grid_v3, CHARTS_DIR / "two_bar_comparison.png")
     out_paths.append(CHARTS_DIR / "two_bar_comparison.png")
     # SL wick recovery.
-    chart_sl_wick_recovery(realized_cc, ref_realized["no_time_exit"], CHARTS_DIR / "sl_wick_recovery.png")
+    chart_sl_wick_recovery(
+        realized_cc, ref_realized["no_time_exit"], CHARTS_DIR / "sl_wick_recovery.png"
+    )
     out_paths.append(CHARTS_DIR / "sl_wick_recovery.png")
 
     # ----- Report -----
@@ -1824,7 +2070,10 @@ def run_pipeline(*, run_ordinal: int, prior_hashes: Optional[Dict[str, str]] = N
         actual_hashes=actual_hashes,
         n_total=n_total,
         fold_counts=fold_counts,
-        grid_v1=grid_v1, grid_v2=grid_v2, grid_v3=grid_v3, grid_v4=grid_v4,
+        grid_v1=grid_v1,
+        grid_v2=grid_v2,
+        grid_v3=grid_v3,
+        grid_v4=grid_v4,
         grid_refs=grid_refs,
         per_cluster_df=per_cluster_df,
         per_fold_df=per_fold_df,

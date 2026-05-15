@@ -102,9 +102,7 @@ def test_phase4_driver_invokes_wfo_per_c1(monkeypatch, tmp_path):
         assert wfo_cfg.get("output_root") == str(c1_root)
 
         # Verify a subprocess call was made using this WFO config
-        matching = [
-            cmd for cmd in calls if str(wfo_cfg_path) in [str(part) for part in cmd]
-        ]
+        matching = [cmd for cmd in calls if str(wfo_cfg_path) in [str(part) for part in cmd]]
         assert matching, f"No WFO call found for {c1_name}"
 
 
@@ -139,7 +137,9 @@ def test_phase4_driver_allowlist_filters_c1s(monkeypatch, tmp_path):
     results_root = tmp_path / "results" / "wfo"
     allowlist_path = tmp_path / "c1_allowlist.yaml"
 
-    sweep_cfg_path.write_text(yaml.safe_dump({"pairs": ["EUR_USD"]}, sort_keys=False), encoding="utf-8")
+    sweep_cfg_path.write_text(
+        yaml.safe_dump({"pairs": ["EUR_USD"]}, sort_keys=False), encoding="utf-8"
+    )
     wfo_template_path.write_text(
         yaml.safe_dump({"output_root": "results/phase4/wfo"}, sort_keys=False),
         encoding="utf-8",
@@ -202,4 +202,3 @@ def test_phase4_driver_allowlist_unknown_entry_raises(monkeypatch, tmp_path):
             wfo_template_path, sweep_cfg_path, results_root, c1_allowlist_path=allowlist_path
         )
     assert "c1_nonexistent" in str(exc_info.value) or "not in discovered" in str(exc_info.value)
-

@@ -60,7 +60,14 @@ from scripts.audit_data_integrity import (  # noqa: E402
 DEFAULT_CFG = {
     "schema": {
         "required_columns": [
-            "time", "open", "high", "low", "close", "tick_volume", "spread", "real_volume",
+            "time",
+            "open",
+            "high",
+            "low",
+            "close",
+            "tick_volume",
+            "spread",
+            "real_volume",
         ],
     },
     "anomaly": {
@@ -225,7 +232,10 @@ def test_detect_gaps_classifies_weekend_vs_suspicious():
     df = pd.DataFrame(
         {
             "date": dates,
-            "open": 1.0, "high": 1.1, "low": 0.9, "close": 1.0,
+            "open": 1.0,
+            "high": 1.1,
+            "low": 0.9,
+            "close": 1.0,
             "volume": 1.0,
         }
     )
@@ -248,7 +258,10 @@ def test_detect_gaps_pure_weekend_is_not_suspicious():
     df = pd.DataFrame(
         {
             "date": dates,
-            "open": 1.0, "high": 1.1, "low": 0.9, "close": 1.0,
+            "open": 1.0,
+            "high": 1.1,
+            "low": 0.9,
+            "close": 1.0,
             "volume": 1.0,
         }
     )
@@ -309,9 +322,7 @@ def test_spread_p4_flags_high_spread_bars():
             "spread": [10] * 9 + [600],  # 60 pips on the last bar (>50 threshold)
         }
     )
-    findings, rows, summary = check_spread(
-        raw, threshold_pips=50.0, tf="daily", pair="EUR_USD"
-    )
+    findings, rows, summary = check_spread(raw, threshold_pips=50.0, tf="daily", pair="EUR_USD")
     assert any(f.check_id == CHK_P4_SPREAD_HIGH for f in findings)
     assert any(r["spread_pips"] == 60.0 for r in rows)
     assert summary["spread_max_pips"] == 60.0
@@ -320,9 +331,7 @@ def test_spread_p4_flags_high_spread_bars():
 def test_spread_missing_column_is_critical():
     raw = pd.DataFrame({"time": [pd.Timestamp("2020-01-01")], "open": [1.0]})
     findings, _, _ = check_spread(raw, threshold_pips=50.0, tf="daily", pair="EUR_USD")
-    assert any(
-        f.check_id == CHK_P1_SPREAD_MISSING and f.severity == SEV_CRITICAL for f in findings
-    )
+    assert any(f.check_id == CHK_P1_SPREAD_MISSING and f.severity == SEV_CRITICAL for f in findings)
 
 
 # --------------------------------------------------------------------------
@@ -382,15 +391,23 @@ def test_cross_tf_compare_zero_diff_when_high_is_aggregate_of_low():
     h1 = pd.DataFrame(
         {
             "date": rng,
-            "open": opens, "high": highs, "low": lows, "close": closes,
+            "open": opens,
+            "high": highs,
+            "low": lows,
+            "close": closes,
             "volume": np.ones(len(rng)),
         }
     )
     h4 = aggregate_to_target(h1, target_grid="H4")
     findings, rows = cross_tf_compare(
-        h1, h4, "H4",
-        sample_size=5, seed=42,
-        pair="EUR_USD", low_tf="1hr", high_tf="4hr",
+        h1,
+        h4,
+        "H4",
+        sample_size=5,
+        seed=42,
+        pair="EUR_USD",
+        low_tf="1hr",
+        high_tf="4hr",
         tolerance=0.0,
     )
     assert findings == []
@@ -403,19 +420,29 @@ def test_cross_tf_compare_flags_aggregation_diff_when_high_diverges():
     h1 = pd.DataFrame(
         {
             "date": rng,
-            "open": 1.0, "high": 1.1, "low": 0.9, "close": 1.05,
+            "open": 1.0,
+            "high": 1.1,
+            "low": 0.9,
+            "close": 1.05,
             "volume": 1.0,
         }
     )
     h4 = aggregate_to_target(h1, target_grid="H4").copy()
     h4["close"] = h4["close"] + 0.1  # tamper
     findings, _ = cross_tf_compare(
-        h1, h4, "H4",
-        sample_size=5, seed=42,
-        pair="EUR_USD", low_tf="1hr", high_tf="4hr",
+        h1,
+        h4,
+        "H4",
+        sample_size=5,
+        seed=42,
+        pair="EUR_USD",
+        low_tf="1hr",
+        high_tf="4hr",
         tolerance=0.0,
     )
-    assert any(f.check_id == CHK_X2_AGGREGATION_DIFF and f.severity == SEV_CRITICAL for f in findings)
+    assert any(
+        f.check_id == CHK_X2_AGGREGATION_DIFF and f.severity == SEV_CRITICAL for f in findings
+    )
 
 
 # --------------------------------------------------------------------------
@@ -510,7 +537,10 @@ def _build_mini_data_tree(root: Path) -> dict:
     h1 = pd.DataFrame(
         {
             "date": rng,
-            "open": opens, "high": highs, "low": lows, "close": closes,
+            "open": opens,
+            "high": highs,
+            "low": lows,
+            "close": closes,
             "volume": np.ones(len(rng)),
         }
     )
@@ -523,8 +553,7 @@ def _build_mini_data_tree(root: Path) -> dict:
     cfg = {
         "data_root": str(root / "data"),
         "timeframes": {
-            tf: {"dir": str(root / d.split("/")[1]), "grid": g}
-            for tf, (d, g) in timeframes.items()
+            tf: {"dir": str(root / d.split("/")[1]), "grid": g} for tf, (d, g) in timeframes.items()
         },
         # The discovery dir should be relative to root → write under <root>/<tf>.
     }

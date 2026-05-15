@@ -8,6 +8,7 @@ pair's 1H data. Recompute all forward-horizon path aggregates. Assert byte-ident
 Also performs a separate test for the 4 new pre-signal context features: perturb
 bars at indices >= sig_idx and re-compute; assert byte-identical.
 """
+
 # ruff: noqa: E402, E701, E702, F841, I001
 from __future__ import annotations
 
@@ -36,8 +37,9 @@ from scripts.l_arc_3.step2.phase_a_features import (
 )
 
 
-def run_lookahead_test(H: int = FORWARD_HORIZON_BARS_DEFAULT,
-                      n_samples: int = 100) -> Tuple[bool, dict]:
+def run_lookahead_test(
+    H: int = FORWARD_HORIZON_BARS_DEFAULT, n_samples: int = 100
+) -> Tuple[bool, dict]:
     """Run perturbation test. Returns (pass, details)."""
     seed = hash_seed("l_arc_3_step2_lookahead")
     rng = np.random.default_rng(seed)
@@ -79,11 +81,17 @@ def run_lookahead_test(H: int = FORWARD_HORIZON_BARS_DEFAULT,
         # ----- forward-horizon test (perturb bars >= entry_idx + H) -----
         ref = pair_cache[pair]
         rfh, rfl, rfc, rfs, rfo, rfhr, rflr, rfcl, _ = per_trade_full_path(
-            ref["open"], ref["high"], ref["low"], ref["close"],
-            entry_idx, entry_price, H,
+            ref["open"],
+            ref["high"],
+            ref["low"],
+            ref["close"],
+            entry_idx,
+            entry_price,
+            H,
         )
-        ref_aggs = compute_path_aggregates(rfh, rfl, rfc, rfs, rfcl, rfhr, rflr,
-                                           entry_price, atr_at_sig, H, held_bars)
+        ref_aggs = compute_path_aggregates(
+            rfh, rfl, rfc, rfs, rfcl, rfhr, rflr, entry_price, atr_at_sig, H, held_bars
+        )
         pert = {k: v.copy() for k, v in ref.items()}
         future_slice = slice(entry_idx + H, len(pert["open"]))
         n_future = pert["open"][future_slice].shape[0]
@@ -94,51 +102,71 @@ def run_lookahead_test(H: int = FORWARD_HORIZON_BARS_DEFAULT,
         for ci, col in enumerate(("open", "high", "low", "close")):
             pert[col][future_slice] = pert[col][future_slice] + noise[:, ci]
         pfh, pfl, pfc, pfs, pfo, pfhr, pflr, pfcl, _ = per_trade_full_path(
-            pert["open"], pert["high"], pert["low"], pert["close"],
-            entry_idx, entry_price, H,
+            pert["open"],
+            pert["high"],
+            pert["low"],
+            pert["close"],
+            entry_idx,
+            entry_price,
+            H,
         )
-        pert_aggs = compute_path_aggregates(pfh, pfl, pfc, pfs, pfcl, pfhr, pflr,
-                                            entry_price, atr_at_sig, H, held_bars)
+        pert_aggs = compute_path_aggregates(
+            pfh, pfl, pfc, pfs, pfcl, pfhr, pflr, entry_price, atr_at_sig, H, held_bars
+        )
         diffs = []
         for k in ref_aggs:
-            r = ref_aggs[k]; p = pert_aggs[k]
+            r = ref_aggs[k]
+            p = pert_aggs[k]
             if isinstance(r, str) or isinstance(p, str):
-                if r != p: diffs.append(k)
+                if r != p:
+                    diffs.append(k)
             else:
                 if not np.isnan(r) and not np.isnan(p):
-                    if abs(r - p) > 1e-12: diffs.append(k)
+                    if abs(r - p) > 1e-12:
+                        diffs.append(k)
                 elif np.isnan(r) != np.isnan(p):
                     diffs.append(k)
         if diffs:
             n_disagree_fwd += 1
-            disagreements.append({"trade_id": int(row["trade_id"]), "axis": "fwd",
-                                  "pair": pair, "diffs": diffs[:5]})
+            disagreements.append(
+                {"trade_id": int(row["trade_id"]), "axis": "fwd", "pair": pair, "diffs": diffs[:5]}
+            )
 
         # ----- pre-signal context test (perturb bars >= sig_idx) -----
         ref_psc = _pre_signal_context(ref["close"], sig_idx)
         # Restore ref close before perturbing again
         pert_psc_src = ref["close"].copy()
         if sig_idx < len(pert_psc_src):
-            pert_psc_src[sig_idx:] = pert_psc_src[sig_idx:] + rng_loc.normal(0.0, 0.05, size=len(pert_psc_src) - sig_idx)
+            pert_psc_src[sig_idx:] = pert_psc_src[sig_idx:] + rng_loc.normal(
+                0.0, 0.05, size=len(pert_psc_src) - sig_idx
+            )
         pert_psc = _pre_signal_context(pert_psc_src, sig_idx)
         diffs_psc = []
         for k in ref_psc:
-            r = ref_psc[k]; p = pert_psc[k]
+            r = ref_psc[k]
+            p = pert_psc[k]
             if np.isfinite(r) != np.isfinite(p):
                 diffs_psc.append(k)
             elif np.isfinite(r) and abs(r - p) > 1e-12:
                 diffs_psc.append(k)
         if diffs_psc:
             n_disagree_pre += 1
-            disagreements.append({"trade_id": int(row["trade_id"]), "axis": "pre_signal",
-                                  "pair": pair, "diffs": diffs_psc[:5]})
+            disagreements.append(
+                {
+                    "trade_id": int(row["trade_id"]),
+                    "axis": "pre_signal",
+                    "pair": pair,
+                    "diffs": diffs_psc[:5],
+                }
+            )
 
     passed = (n_disagree_fwd == 0) and (n_disagree_pre == 0)
     out_path = STEP2_DIR / "lookahead_invariant_features_test.txt"
     out_path.parent.mkdir(parents=True, exist_ok=True)
     lines = [
         "L Arc 3 Step 2 — Lookahead-invariant feature test (op spec §10.1)",
-        "=" * 70, "",
+        "=" * 70,
+        "",
         f"Forward H: {H}; Samples: {len(samples)}",
         f"Forward-window perturbation:    bars >= entry_idx + H  → {'PASS' if n_disagree_fwd == 0 else f'FAIL ({n_disagree_fwd} disagreements)'}",
         f"Pre-signal context perturbation: bars >= sig_idx        → {'PASS' if n_disagree_pre == 0 else f'FAIL ({n_disagree_pre} disagreements)'}",
@@ -149,10 +177,16 @@ def run_lookahead_test(H: int = FORWARD_HORIZON_BARS_DEFAULT,
     if not passed:
         lines += ["", "First disagreement details:"]
         for d in disagreements[:5]:
-            lines.append(f"  trade_id={d['trade_id']} axis={d['axis']} pair={d['pair']} diffs={d['diffs']}")
+            lines.append(
+                f"  trade_id={d['trade_id']} axis={d['axis']} pair={d['pair']} diffs={d['diffs']}"
+            )
     out_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
-    return passed, {"n_samples": len(samples), "n_disagree_fwd": n_disagree_fwd,
-                    "n_disagree_pre": n_disagree_pre, "out_path": str(out_path)}
+    return passed, {
+        "n_samples": len(samples),
+        "n_disagree_fwd": n_disagree_fwd,
+        "n_disagree_pre": n_disagree_pre,
+        "out_path": str(out_path),
+    }
 
 
 def write_feature_lag_audit(H: int = FORWARD_HORIZON_BARS_DEFAULT) -> Path:
@@ -178,7 +212,8 @@ def write_feature_lag_audit(H: int = FORWARD_HORIZON_BARS_DEFAULT) -> Path:
 
     lines = [
         "L Arc 3 Step 2 — Feature lag audit (op spec §10.4)",
-        "=" * 70, "",
+        "=" * 70,
+        "",
         "Deterministic 100-row sample: drawn via rng seed = hash_seed('l_arc_3_step2_lag_audit').",
         "",
         "Signal-time features (in signals_features.csv): computed at bar N close.",
@@ -211,7 +246,7 @@ def write_feature_lag_audit(H: int = FORWARD_HORIZON_BARS_DEFAULT) -> Path:
         f"Forward-horizon features: H = {H} bars from entry_idx = sig_idx + 1.",
         "  - For each trade, fwd_* aggregates use ONLY bars [entry_idx, entry_idx+H-1].",
         "  - mfe_sequence_class_fwd_h{24,120}: argmax over fwd_mfe[:h], fwd_mae[:h].",
-        f"  - bars_to_+x_atr / bars_to_-x_atr capped at H+1 = {H+1}.",
+        f"  - bars_to_+x_atr / bars_to_-x_atr capped at H+1 = {H + 1}.",
         "  - Lookahead-invariant: perturbation test in lookahead_invariant_features_test.txt",
         "    confirms bars >= entry_idx + H do not affect any forward-horizon feature.",
         "",

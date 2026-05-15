@@ -145,7 +145,9 @@ def test_nearest_signal_distance(tmp_path: Path) -> None:
     labels = pd.DataFrame(
         {
             "pair": ["EUR_USD"] * 5,
-            "date": pd.to_datetime(["2020-01-06", "2020-01-07", "2020-01-08", "2020-01-09", "2020-01-10"]),
+            "date": pd.to_datetime(
+                ["2020-01-06", "2020-01-07", "2020-01-08", "2020-01-09", "2020-01-10"]
+            ),
             "direction": ["long"] * 5,
             "dataset_split": ["discovery"] * 5,
             "zone_a_1r_10": [True] * 5,
@@ -182,7 +184,10 @@ def test_nearest_signal_distance(tmp_path: Path) -> None:
     if len(uncaptured) > 0:
         row = uncaptured.iloc[0]
         assert "nearest_signal_distance_bars" in missed.columns
-        assert pd.notna(row["nearest_signal_distance_bars"]) or row["nearest_signal_distance_bars"] >= 0
+        assert (
+            pd.notna(row["nearest_signal_distance_bars"])
+            or row["nearest_signal_distance_bars"] >= 0
+        )
 
 
 def test_trades_direction_aliases(tmp_path: Path) -> None:

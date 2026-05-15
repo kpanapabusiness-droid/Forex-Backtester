@@ -78,9 +78,7 @@ def _pip_size(pair: str) -> float:
     return 0.01 if pair.endswith("_JPY") else 0.0001
 
 
-def augment_trades_csv(
-    trades_path: Path, risk_pct: float, sl_atr_mult: float
-) -> Tuple[int, int]:
+def augment_trades_csv(trades_path: Path, risk_pct: float, sl_atr_mult: float) -> Tuple[int, int]:
     """Append derived columns required by the step 1 spec.
 
     Returns (n_rows, n_sl_violations).
@@ -108,9 +106,8 @@ def augment_trades_csv(
     # / sl_distance_price (= 1R in price units) = cost in R units.
     pip = df["pair"].map(_pip_size).astype(float)
     spread_cost_price = (
-        df["spread_pips_entry"].astype(float)
-        + df["spread_pips_exit"].astype(float)
-    ) * pip / 2.0
+        (df["spread_pips_entry"].astype(float) + df["spread_pips_exit"].astype(float)) * pip / 2.0
+    )
     df["spread_cost_r"] = spread_cost_price / df["sl_distance_price"]
     df["net_r"] = df["R"].astype(float)
     df["gross_r"] = df["net_r"] + df["spread_cost_r"]
@@ -216,9 +213,7 @@ def run_lookahead_invariant_test(seed: int = 1234, n_samples: int = 100) -> Tupl
     df_1h_e = _attach_kijun_sign(raw_1h)
     df_4h_e = _attach_kijun_sign(raw_4h)
     df_d1_e = _attach_kijun_sign(raw_d1)
-    ref_mask, _, _, _ = _mtf_alignment_2_down_mixed_kijun(
-        df_1h_e, df_4h_e, df_d1_e, pair="EUR_USD"
-    )
+    ref_mask, _, _, _ = _mtf_alignment_2_down_mixed_kijun(df_1h_e, df_4h_e, df_d1_e, pair="EUR_USD")
     valid_signal_idx = np.where(ref_mask)[0]
     valid_signal_idx = valid_signal_idx[valid_signal_idx < len(raw_1h) - 10]
 
@@ -319,8 +314,8 @@ def write_feature_lag_audit() -> Path:
     contain_d1 = floor_d1.map(idx_d1).to_numpy(dtype=float)
 
     # Most-recently-completed = contain - 1
-    mr4_idx = (np.where(np.isnan(contain_4h), 0, contain_4h).astype(np.int64) - 1)
-    mrd_idx = (np.where(np.isnan(contain_d1), 0, contain_d1).astype(np.int64) - 1)
+    mr4_idx = np.where(np.isnan(contain_4h), 0, contain_4h).astype(np.int64) - 1
+    mrd_idx = np.where(np.isnan(contain_d1), 0, contain_d1).astype(np.int64) - 1
 
     # Per-row lag report
     rows = []
@@ -367,8 +362,12 @@ def write_feature_lag_audit() -> Path:
     lines.append(f"Rows with strict-prior 4H lag: {n_strict_4h} / {len(rows)}")
     lines.append(f"Rows with strict-prior D1 lag: {n_strict_d1} / {len(rows)}")
     lines.append("")
-    lines.append("D1 lag-1 invariant (op spec §10.3): ts_D1_used.date() strictly < T_N.date() — VERIFIED on sample.")
-    lines.append("4H lag invariant (op spec §10.3): ts_4H_used strictly < floor('4h', T_N) — VERIFIED on sample.")
+    lines.append(
+        "D1 lag-1 invariant (op spec §10.3): ts_D1_used.date() strictly < T_N.date() — VERIFIED on sample."
+    )
+    lines.append(
+        "4H lag invariant (op spec §10.3): ts_4H_used strictly < floor('4h', T_N) — VERIFIED on sample."
+    )
     lines.append("")
     lines.append("Engine runtime assertion (raises RuntimeError on every signal-firing bar):")
     lines.append("  cite: core/signals/l4_mtf_alignment_2_down_mixed_kijun.py — invariant 8.")
@@ -386,18 +385,14 @@ def reconcile_fires_and_takes(
     n_fires = int(len(sdf))
     n_taken = int((sdf["taken"]).astype(bool).sum())
     n_dropped = n_fires - n_taken
-    drop_hist = (
-        sdf.loc[~sdf["taken"].astype(bool), "drop_reason"].value_counts().to_dict()
-    )
+    drop_hist = sdf.loc[~sdf["taken"].astype(bool), "drop_reason"].value_counts().to_dict()
     # Categorise: exposure-cap vs other
     n_expo = sum(int(c) for r, c in drop_hist.items() if r in EXPOSURE_CAP_REASONS)
     n_other = n_dropped - n_expo
     pct_other = (n_other / n_dropped) if n_dropped > 0 else 0.0
 
     # Per-fold trade counts
-    per_fold = (
-        sdf.loc[sdf["taken"].astype(bool), "fold_id"].value_counts().sort_index().to_dict()
-    )
+    per_fold = sdf.loc[sdf["taken"].astype(bool), "fold_id"].value_counts().sort_index().to_dict()
     return {
         "n_fires_total": n_fires,
         "n_taken": n_taken,
@@ -454,7 +449,7 @@ def write_sanity_checks(
         "=" * 60,
         "",
         f"[{status(revalidation_pass)}] (1) Signal definition 100-bar bit-identical to canonical",
-        f"        Evidence: results/l_arc_2/step1_verbatim/signal_revalidation.txt",
+        "        Evidence: results/l_arc_2/step1_verbatim/signal_revalidation.txt",
         "",
         f"[{status(floor_hash_pass)}] (2) Spread floor sha256 matches arc-open §1 / config",
         f"        Computed body sha256: {floor_hash_observed}",
@@ -464,12 +459,12 @@ def write_sanity_checks(
         f"        Violations: {sl_violations}",
         "",
         f"[{status(mtf_lag_pass)}] (4) D1 lag-1 invariant verified",
-        f"        Evidence: feature_lag_audit.txt (D1 ts_used.date() strictly < T_N.date()).",
-        f"        Engine runtime assertion at every signal-firing bar (invariant 8 in",
-        f"        core/signals/l4_mtf_alignment_2_down_mixed_kijun.py).",
+        "        Evidence: feature_lag_audit.txt (D1 ts_used.date() strictly < T_N.date()).",
+        "        Engine runtime assertion at every signal-firing bar (invariant 8 in",
+        "        core/signals/l4_mtf_alignment_2_down_mixed_kijun.py).",
         "",
         f"[{status(mtf_lag_pass)}] (5) 4H lag verified — ts_4H_used strictly < floor('4h', T_N)",
-        f"        Evidence: feature_lag_audit.txt + engine runtime assertion (invariant 8).",
+        "        Evidence: feature_lag_audit.txt + engine runtime assertion (invariant 8).",
         "",
         f"[{status(same_bar_entries == 0)}] (6) Same-bar entries = 0",
         f"        Count of trades with entry_bar_ts == signal_bar_ts: {same_bar_entries}",
@@ -477,11 +472,11 @@ def write_sanity_checks(
         f"[{status(lookahead_pass)}] (7) Lookahead-invariant test (op spec §10.1)",
         f"        Samples: {lookahead_details['n_samples']}  Disagreements: "
         f"{lookahead_details['n_disagreements']}  Seed: {lookahead_details['seed']}",
-        f"        Evidence: lookahead_invariant_test.txt",
+        "        Evidence: lookahead_invariant_test.txt",
         "",
-        f"[PASS] (8) Feature lag audit (op spec §10.4)",
-        f"        Evidence: feature_lag_audit.txt — per-row 1H/4H/D1 timestamp lag report",
-        f"        on EUR_USD 100-row deterministic sample.",
+        "[PASS] (8) Feature lag audit (op spec §10.4)",
+        "        Evidence: feature_lag_audit.txt — per-row 1H/4H/D1 timestamp lag report",
+        "        on EUR_USD 100-row deterministic sample.",
         "",
     ]
     if determinism_pass is None:
@@ -504,7 +499,7 @@ def write_sanity_checks(
         f"        Total fires (signals_log)       : {n_fires_total:,}",
         f"        Total takes (trades_verbatim)   : {n_taken:,}",
         f"        Total dropped fires             : {drop_recon['n_dropped']:,}",
-        f"        Drop-reason histogram:",
+        "        Drop-reason histogram:",
     ]
     for reason, count in sorted(drop_recon["drop_hist"].items()):
         lines.append(f"            {reason:>30}: {count:,}")
@@ -514,10 +509,10 @@ def write_sanity_checks(
         f"({100.0 * drop_recon['n_exposure_cap_drops'] / max(1, drop_recon['n_dropped']):.4f}%)",
         f"        Other drop-reason categories       : "
         f"{drop_recon['n_other_drops']:,} ({100.0 * drop_pct_other:.4f}%)",
-        f"        Pre-committed band behaviour (arc-open §4): WARN expected because at",
-        f"        h=120 the max-1-position-per-pair cap binds heavily (~85% of fires",
-        f"        dropped, ~15% taken; back-of-envelope estimate). Reconciled to",
-        f"        exposure-cap drops below 1% threshold.",
+        "        Pre-committed band behaviour (arc-open §4): WARN expected because at",
+        "        h=120 the max-1-position-per-pair cap binds heavily (~85% of fires",
+        "        dropped, ~15% taken; back-of-envelope estimate). Reconciled to",
+        "        exposure-cap drops below 1% threshold.",
         f"        HALT condition (other drops > 1% of dropped fires): {halt_text}",
         "",
         halt_note if halt_note else "",
@@ -627,9 +622,10 @@ def main() -> int:
     revalidation_pass = "BIT-IDENTICAL CHECK: PASS" in reval_txt
 
     from scripts.lchar.compute_spread_floors import compute_body_sha256
+
     floor_observed = compute_body_sha256(REPO_ROOT / "configs" / "spread_floors_5ers.yaml")
     floor_expected = cfg["spread_floor"]["expected_body_sha256"]
-    floor_hash_pass = (floor_observed == floor_expected)
+    floor_hash_pass = floor_observed == floor_expected
 
     tdf = pd.read_csv(trades_path)
     same_bar = int((tdf["signal_bar_ts"] == tdf["entry_bar_ts"]).sum())

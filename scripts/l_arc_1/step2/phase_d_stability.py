@@ -1,3 +1,4 @@
+# ruff: noqa: E402  (sys.path.insert needed before project imports)
 """Phase D — forward-horizon stability check (op spec §5.3).
 
 Compare distributions of fwd_mfe / fwd_mae at h=120 vs h=240. If any
@@ -6,13 +7,13 @@ evolving — extend Phase A to h=480 and document the outcome.
 
 Writes `forward_horizon_stability.txt` and returns the triggered status.
 """
+
 from __future__ import annotations
 
 import sys
 from pathlib import Path
 from typing import Tuple
 
-import numpy as np
 import pandas as pd
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
@@ -37,20 +38,28 @@ def run_stability_check(threshold_pct: float = 0.10) -> Tuple[bool, dict]:
             v120 = features[col120].dropna()
             v240 = features[col240].dropna()
             if ag == "median":
-                a = float(v120.median()); b = float(v240.median())
+                a = float(v120.median())
+                b = float(v240.median())
             else:
-                a = float(v120.quantile(0.95)); b = float(v240.quantile(0.95))
+                a = float(v120.quantile(0.95))
+                b = float(v240.quantile(0.95))
             if a == 0:
                 pct = float("inf") if b != 0 else 0.0
             else:
                 pct = abs(b - a) / abs(a)
             this_triggered = pct > threshold_pct
             triggered = triggered or this_triggered
-            rows.append({
-                "metric": metric, "agg": ag, "h120": a, "h240": b,
-                "abs_diff": b - a, "rel_diff_pct": pct * 100.0,
-                "exceeds_10pct": this_triggered,
-            })
+            rows.append(
+                {
+                    "metric": metric,
+                    "agg": ag,
+                    "h120": a,
+                    "h240": b,
+                    "abs_diff": b - a,
+                    "rel_diff_pct": pct * 100.0,
+                    "exceeds_10pct": this_triggered,
+                }
+            )
 
     # Also document h=240 vs h=480 if h=480 exists (extended run outcome)
     if has_h480:
@@ -61,18 +70,26 @@ def run_stability_check(threshold_pct: float = 0.10) -> Tuple[bool, dict]:
                 v240 = features[col240].dropna()
                 v480 = features[col480].dropna()
                 if ag == "median":
-                    a = float(v240.median()); b = float(v480.median())
+                    a = float(v240.median())
+                    b = float(v480.median())
                 else:
-                    a = float(v240.quantile(0.95)); b = float(v480.quantile(0.95))
+                    a = float(v240.quantile(0.95))
+                    b = float(v480.quantile(0.95))
                 if a == 0:
                     pct = float("inf") if b != 0 else 0.0
                 else:
                     pct = abs(b - a) / abs(a)
-                extended_rows.append({
-                    "metric": metric, "agg": ag, "h240": a, "h480": b,
-                    "abs_diff": b - a, "rel_diff_pct": pct * 100.0,
-                    "exceeds_10pct": pct > threshold_pct,
-                })
+                extended_rows.append(
+                    {
+                        "metric": metric,
+                        "agg": ag,
+                        "h240": a,
+                        "h480": b,
+                        "abs_diff": b - a,
+                        "rel_diff_pct": pct * 100.0,
+                        "exceeds_10pct": pct > threshold_pct,
+                    }
+                )
 
     df = pd.DataFrame(rows)
     out = STEP2_DIR / "forward_horizon_stability.txt"

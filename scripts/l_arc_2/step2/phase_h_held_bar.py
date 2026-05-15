@@ -1,3 +1,4 @@
+# ruff: noqa: E402  (sys.path.insert needed before project imports)
 """Phase H — held-bar context evolution (op spec §5.14).
 
 Arc 2 has a real held window (mean ~47 bars, max 120), so for each open trade
@@ -7,6 +8,7 @@ to t iff bars_held > t (i.e. still in the held window at bar_offset t).
 Forward context evolution (unconditional on exit) is also emitted at the same t
 sample points — analogous to the verbatim forward window.
 """
+
 from __future__ import annotations
 
 import sys
@@ -22,8 +24,13 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from scripts.l_arc_2.step2._io import (
-    HEALD_T, PAIRS, SPREAD_FLOOR_PATH, STEP2_DIR,
-    load_all_floors, load_pair_1h, load_trades_verbatim, wilder_atr,
+    HEALD_T,
+    PAIRS,
+    SPREAD_FLOOR_PATH,
+    STEP2_DIR,
+    load_all_floors,
+    load_pair_1h,
+    wilder_atr,
 )
 
 HELD_DIR = STEP2_DIR / "held_bar_evolution"
@@ -49,33 +56,49 @@ def run_phase_h() -> None:
         df = load_pair_1h(pair)
         pair_data[pair] = df
         pair_close[pair] = df["close"].astype(float).values
-        pair_spread[pair] = df["spread"].astype(float).values if "spread" in df.columns else np.zeros(len(df))
-        pair_atr[pair] = wilder_atr(df["high"].astype(float).values,
-                                    df["low"].astype(float).values,
-                                    df["close"].astype(float).values, period=14)
+        pair_spread[pair] = (
+            df["spread"].astype(float).values if "spread" in df.columns else np.zeros(len(df))
+        )
+        pair_atr[pair] = wilder_atr(
+            df["high"].astype(float).values,
+            df["low"].astype(float).values,
+            df["close"].astype(float).values,
+            period=14,
+        )
         pair_ts[pair] = df["time"].astype("datetime64[ns]").astype("int64").to_numpy()
         pair_idx[pair] = {int(t): i for i, t in enumerate(pair_ts[pair])}
 
     print("[Phase H] computing cross-pair dispersion on unified timeline...")
-    all_ts = (pd.DatetimeIndex(np.concatenate([df["time"].values for df in pair_data.values()]))
-              .unique().sort_values())
+    all_ts = (
+        pd.DatetimeIndex(np.concatenate([df["time"].values for df in pair_data.values()]))
+        .unique()
+        .sort_values()
+    )
     lr_frame = pd.DataFrame(index=all_ts, dtype=np.float64)
     for pair in PAIRS:
         close = pair_close[pair]
         n = len(close)
         prev = np.empty(n, dtype=float)
-        prev[0] = np.nan; prev[1:] = close[:-1]
+        prev[0] = np.nan
+        prev[1:] = close[:-1]
         with np.errstate(divide="ignore", invalid="ignore"):
             lr = np.log(close / prev)
         s = pd.Series(lr, index=pd.DatetimeIndex(pair_data[pair]["time"].values))
         lr_frame[pair] = s.reindex(all_ts).values
     dispersion = lr_frame.std(axis=1, skipna=True)
-    dispersion_ts_int = pd.DatetimeIndex(dispersion.index).astype("datetime64[ns]").astype("int64").to_numpy()
+    dispersion_ts_int = (
+        pd.DatetimeIndex(dispersion.index).astype("datetime64[ns]").astype("int64").to_numpy()
+    )
     dispersion_vals = dispersion.to_numpy()
     disp_idx = {int(t): i for i, t in enumerate(dispersion_ts_int)}
 
     tr_pair = features["pair"].to_numpy()
-    tr_sig_ts = pd.to_datetime(features["signal_bar_ts"]).astype("datetime64[ns]").astype("int64").to_numpy()
+    tr_sig_ts = (
+        pd.to_datetime(features["signal_bar_ts"])
+        .astype("datetime64[ns]")
+        .astype("int64")
+        .to_numpy()
+    )
     tr_bars_held = features["bars_held"].astype(int).to_numpy()
     tr_tid = features["trade_id"].astype(int).to_numpy()
     tr_fold = features["fold_id"].astype(int).to_numpy()
@@ -100,7 +123,9 @@ def run_phase_h() -> None:
                 continue
             atr_bi = float(pair_atr[pair][bi])
             atr_regime = atr_bi / atr_at_sig if np.isfinite(atr_bi) and atr_at_sig > 0 else np.nan
-            raw_pips = float(pair_spread[pair][bi]) / 10.0 if np.isfinite(pair_spread[pair][bi]) else 0.0
+            raw_pips = (
+                float(pair_spread[pair][bi]) / 10.0 if np.isfinite(pair_spread[pair][bi]) else 0.0
+            )
             floor_pips = floors.get(pair, 0.0)
             eff_pips = max(raw_pips, floor_pips) if floor_pips else raw_pips
             bi_ts = int(pair_ts[pair][bi])
@@ -115,14 +140,17 @@ def run_phase_h() -> None:
                     bi_idx_p = pair_idx[p].get(bi_ts)
                     if sig_idx_p is None or bi_idx_p is None:
                         continue
-                    cs = pair_close[p][sig_idx_p]; cb = pair_close[p][bi_idx_p]
+                    cs = pair_close[p][sig_idx_p]
+                    cb = pair_close[p][bi_idx_p]
                     if cs > 0 and cb > 0:
                         lr = float(np.log(cb / cs))
                         contribs.append(lr if quote == ccy else -lr)
                 basket[ccy] = float(np.mean(contribs)) if contribs else np.nan
             disp_v = float(dispersion_vals[disp_idx[bi_ts]]) if bi_ts in disp_idx else np.nan
             row = {
-                "trade_id": int(tr_tid[k]), "pair": pair, "fold_id": int(tr_fold[k]),
+                "trade_id": int(tr_tid[k]),
+                "pair": pair,
+                "fold_id": int(tr_fold[k]),
                 "t": t,
                 "atr_regime_ratio": atr_regime,
                 "broker_spread_pips_raw": raw_pips,
@@ -141,7 +169,9 @@ def run_phase_h() -> None:
 
     for t in HEALD_T:
         df_held = pd.DataFrame(held_rows_per_t[t])
-        df_held.to_csv(HELD_DIR / f"t{t}.csv", index=False, lineterminator="\n", float_format="%.6g")
+        df_held.to_csv(
+            HELD_DIR / f"t{t}.csv", index=False, lineterminator="\n", float_format="%.6g"
+        )
         df_fwd = pd.DataFrame(fwd_rows_per_t[t])
         df_fwd.to_csv(FWD_DIR / f"t{t}.csv", index=False, lineterminator="\n", float_format="%.6g")
         print(f"  t={t}: held n={len(df_held)}; forward n={len(df_fwd)}")
@@ -154,7 +184,7 @@ def run_phase_h() -> None:
         "Descriptive proxy — not the max-eigenvalue of a rolling correlation matrix.\n",
         encoding="utf-8",
     )
-    print(f"[Phase H] done in {time.time()-t0:.1f}s")
+    print(f"[Phase H] done in {time.time() - t0:.1f}s")
 
 
 if __name__ == "__main__":

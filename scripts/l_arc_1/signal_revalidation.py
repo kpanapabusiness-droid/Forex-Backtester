@@ -39,7 +39,6 @@ from scripts.lchar.run_layer4 import (  # noqa: E402
     prep_pair_tf,
 )
 
-
 SAMPLE_PAIR = "EUR_USD"
 SAMPLE_TF_DIR = "1hr"
 # Deterministic 100-bar window: starting at row index 5000 in the (sorted) 1H
@@ -104,9 +103,7 @@ def main() -> int:
 
     # Both frames now have one row per source bar in the same order.
     if len(engine_df) != len(canon_df):
-        raise RuntimeError(
-            f"Row-count mismatch: engine={len(engine_df)} canonical={len(canon_df)}"
-        )
+        raise RuntimeError(f"Row-count mismatch: engine={len(engine_df)} canonical={len(canon_df)}")
 
     # Restrict to the deterministic 100-bar sample.
     win = slice(SAMPLE_START, SAMPLE_START + SAMPLE_LEN)
@@ -158,7 +155,7 @@ def main() -> int:
     lines.append("=" * 60)
     lines.append("")
     lines.append(f"Sample pair          : {SAMPLE_PAIR}")
-    lines.append(f"Sample TF            : 1H")
+    lines.append("Sample TF            : 1H")
     lines.append(f"Sample row range     : [{SAMPLE_START}, {SAMPLE_START + SAMPLE_LEN})")
     lines.append(f"Sample window n      : {n}")
     lines.append(f"Lookback bars        : {LOOKBACK}")
@@ -166,9 +163,7 @@ def main() -> int:
     lines.append(f"Direction filter     : {DIRECTION}")
     lines.append(f"ATR period           : {ATR_PERIOD}")
     lines.append("")
-    lines.append(
-        "Implementations compared (signal decision, boolean mask):"
-    )
+    lines.append("Implementations compared (signal decision, boolean mask):")
     lines.append(
         "  Engine: core.signals.l4_univariate_extreme._compute_signals "
         "[log_return = np.log(close/prev_close)]"
@@ -194,9 +189,7 @@ def main() -> int:
     lines.append(f"  Engine    : {engine_hash}")
     lines.append(f"  Canonical : {canon_hash}")
     lines.append("")
-    lines.append(
-        f"BIT-IDENTICAL CHECK: {'PASS' if bit_identical else 'FAIL'}"
-    )
+    lines.append(f"BIT-IDENTICAL CHECK: {'PASS' if bit_identical else 'FAIL'}")
     if not bit_identical:
         lines.append("")
         lines.append(

@@ -1,3 +1,4 @@
+# ruff: noqa: E402  (sys.path.insert needed before project imports)
 """One-shot fix: patches signals_features.csv to repair time-derived columns.
 
 The Phase A bug interpreted us-encoded int64 timestamps as ns when calling
@@ -9,6 +10,7 @@ bars_to_next_d1_close).
 This script re-derives those columns from trades_verbatim.csv (which has the
 correct timestamps) and rewrites signals_features.csv in place.
 """
+
 from __future__ import annotations
 
 import sys
@@ -38,9 +40,15 @@ def main() -> None:
     ent_map = dict(zip(trades["trade_id"].astype(int), pd.to_datetime(trades["entry_bar_ts"])))
     ext_map = dict(zip(trades["trade_id"].astype(int), pd.to_datetime(trades["exit_bar_ts"])))
 
-    f["signal_bar_ts"] = f["trade_id"].astype(int).map(sig_map).apply(lambda x: x.isoformat() if pd.notna(x) else "")
-    f["entry_bar_ts"] = f["trade_id"].astype(int).map(ent_map).apply(lambda x: x.isoformat() if pd.notna(x) else "")
-    f["exit_bar_ts"] = f["trade_id"].astype(int).map(ext_map).apply(lambda x: x.isoformat() if pd.notna(x) else "")
+    f["signal_bar_ts"] = (
+        f["trade_id"].astype(int).map(sig_map).apply(lambda x: x.isoformat() if pd.notna(x) else "")
+    )
+    f["entry_bar_ts"] = (
+        f["trade_id"].astype(int).map(ent_map).apply(lambda x: x.isoformat() if pd.notna(x) else "")
+    )
+    f["exit_bar_ts"] = (
+        f["trade_id"].astype(int).map(ext_map).apply(lambda x: x.isoformat() if pd.notna(x) else "")
+    )
 
     sig_dt = f["trade_id"].astype(int).map(sig_map)
     f["hour_utc"] = sig_dt.dt.hour.astype(int)
@@ -53,8 +61,20 @@ def main() -> None:
 
     f.to_csv(feat_path, index=False, lineterminator="\n", float_format="%.10g")
     print("Patched. Sample fixed rows:")
-    print(f[["trade_id", "signal_bar_ts", "hour_utc", "day_of_week", "session",
-            "hour_in_4h_bar", "bars_to_next_4h_close", "hour_in_d1_bar"]].head())
+    print(
+        f[
+            [
+                "trade_id",
+                "signal_bar_ts",
+                "hour_utc",
+                "day_of_week",
+                "session",
+                "hour_in_4h_bar",
+                "bars_to_next_4h_close",
+                "hour_in_d1_bar",
+            ]
+        ].head()
+    )
 
 
 if __name__ == "__main__":

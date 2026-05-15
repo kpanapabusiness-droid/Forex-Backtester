@@ -4,6 +4,7 @@ Phase D-6G: Signal conditioning of clean opportunity geometry.
 Measures how entry signals condition the probability of reaching Y before MAE X.
 Phase E-1.2: Primary objective 3R_before_2R, frequency guards, pass criteria.
 """
+
 from __future__ import annotations
 
 import numpy as np
@@ -26,9 +27,15 @@ def _to_bool(s: pd.Series) -> pd.Series:
 
 
 def _valid_mask(df: pd.DataFrame) -> pd.Series:
-    valid_atr = _to_bool(df["valid_atr"]) if "valid_atr" in df.columns else pd.Series(True, index=df.index)
-    valid_ref = _to_bool(df["valid_ref"]) if "valid_ref" in df.columns else pd.Series(True, index=df.index)
-    valid_h40 = _to_bool(df["valid_h40"]) if "valid_h40" in df.columns else pd.Series(True, index=df.index)
+    valid_atr = (
+        _to_bool(df["valid_atr"]) if "valid_atr" in df.columns else pd.Series(True, index=df.index)
+    )
+    valid_ref = (
+        _to_bool(df["valid_ref"]) if "valid_ref" in df.columns else pd.Series(True, index=df.index)
+    )
+    valid_h40 = (
+        _to_bool(df["valid_h40"]) if "valid_h40" in df.columns else pd.Series(True, index=df.index)
+    )
     return valid_atr & valid_ref & valid_h40
 
 
@@ -75,18 +82,20 @@ def compute_pooled_signal_lift(
                 lift = round(signal_rate_y - baseline_rate_y, 6)
                 denom = max(baseline_rate_y, 1e-12)
                 ratio = round(signal_rate_y / denom, 6)
-                rows.append({
-                    "signal_name": signal_col,
-                    "direction": direction,
-                    "x": x,
-                    "y": float(y),
-                    "n_total": n_total,
-                    "n_signal": n_signal,
-                    "baseline_rate": round(baseline_rate_y, 6),
-                    "signal_rate": round(signal_rate_y, 6),
-                    "lift": lift,
-                    "ratio": ratio,
-                })
+                rows.append(
+                    {
+                        "signal_name": signal_col,
+                        "direction": direction,
+                        "x": x,
+                        "y": float(y),
+                        "n_total": n_total,
+                        "n_signal": n_signal,
+                        "baseline_rate": round(baseline_rate_y, 6),
+                        "signal_rate": round(signal_rate_y, 6),
+                        "lift": lift,
+                        "ratio": ratio,
+                    }
+                )
     out = pd.DataFrame(rows)
     if not out.empty:
         out = out.sort_values(["signal_name", "direction", "x", "y"]).reset_index(drop=True)
@@ -139,23 +148,25 @@ def compute_pooled_signal_lift_stability(
                 lift_disc = sig_disc - base_disc
                 lift_val = sig_val - base_val
                 delta_lift = round(lift_val - lift_disc, 6)
-                rows.append({
-                    "signal_name": signal_col,
-                    "direction": direction,
-                    "x": x,
-                    "y": float(y),
-                    "n_total_discovery": n_disc,
-                    "n_signal_discovery": n_disc_sig,
-                    "baseline_rate_discovery": round(float(base_disc), 6),
-                    "signal_rate_discovery": round(float(sig_disc), 6),
-                    "lift_discovery": round(float(lift_disc), 6),
-                    "n_total_validation": n_val,
-                    "n_signal_validation": n_val_sig,
-                    "baseline_rate_validation": round(float(base_val), 6),
-                    "signal_rate_validation": round(float(sig_val), 6),
-                    "lift_validation": round(float(lift_val), 6),
-                    "delta_lift": delta_lift,
-                })
+                rows.append(
+                    {
+                        "signal_name": signal_col,
+                        "direction": direction,
+                        "x": x,
+                        "y": float(y),
+                        "n_total_discovery": n_disc,
+                        "n_signal_discovery": n_disc_sig,
+                        "baseline_rate_discovery": round(float(base_disc), 6),
+                        "signal_rate_discovery": round(float(sig_disc), 6),
+                        "lift_discovery": round(float(lift_disc), 6),
+                        "n_total_validation": n_val,
+                        "n_signal_validation": n_val_sig,
+                        "baseline_rate_validation": round(float(base_val), 6),
+                        "signal_rate_validation": round(float(sig_val), 6),
+                        "lift_validation": round(float(lift_val), 6),
+                        "delta_lift": delta_lift,
+                    }
+                )
     out = pd.DataFrame(rows)
     if not out.empty:
         out = out.sort_values(["signal_name", "direction", "x", "y"]).reset_index(drop=True)
@@ -173,31 +184,47 @@ def compute_leaderboard_signal_lift(
     rank_by = (x, y); ties broken by validation lift.
     """
     if lift_df.empty or stability_df.empty:
-        return pd.DataFrame(columns=["rank", "signal_name", "lift_combined", "lift_validation", "n_signal", "notes"])
+        return pd.DataFrame(
+            columns=["rank", "signal_name", "lift_combined", "lift_validation", "n_signal", "notes"]
+        )
 
     x0, y0 = rank_by
     sub = lift_df[(lift_df["x"] == x0) & (lift_df["y"] == y0)]
     if sub.empty:
-        return pd.DataFrame(columns=["rank", "signal_name", "lift_combined", "lift_validation", "n_signal", "notes"])
+        return pd.DataFrame(
+            columns=["rank", "signal_name", "lift_combined", "lift_validation", "n_signal", "notes"]
+        )
 
     combined = []
     for sig in sub["signal_name"].unique():
         s = sub[sub["signal_name"] == sig]
         n_signal = int(s["n_signal"].sum())
-        lift_long = s[s["direction"] == "long"]["lift"].mean() if len(s[s["direction"] == "long"]) else 0
-        lift_short = s[s["direction"] == "short"]["lift"].mean() if len(s[s["direction"] == "short"]) else 0
+        lift_long = (
+            s[s["direction"] == "long"]["lift"].mean() if len(s[s["direction"] == "long"]) else 0
+        )
+        lift_short = (
+            s[s["direction"] == "short"]["lift"].mean() if len(s[s["direction"] == "short"]) else 0
+        )
         lift_combined = (lift_long + lift_short) / 2.0
-        stab = stability_df[(stability_df["signal_name"] == sig) & (stability_df["x"] == x0) & (stability_df["y"] == y0)]
+        stab = stability_df[
+            (stability_df["signal_name"] == sig)
+            & (stability_df["x"] == x0)
+            & (stability_df["y"] == y0)
+        ]
         lift_val = stab["lift_validation"].mean() if not stab.empty else 0
-        combined.append({
-            "signal_name": sig,
-            "lift_combined": round(float(lift_combined), 6),
-            "lift_validation": round(float(lift_val), 6),
-            "n_signal": int(n_signal),
-            "notes": "insufficient_sample" if n_signal < min_n_signal else "",
-        })
+        combined.append(
+            {
+                "signal_name": sig,
+                "lift_combined": round(float(lift_combined), 6),
+                "lift_validation": round(float(lift_val), 6),
+                "n_signal": int(n_signal),
+                "notes": "insufficient_sample" if n_signal < min_n_signal else "",
+            }
+        )
     agg = pd.DataFrame(combined)
-    agg = agg.sort_values(["lift_combined", "lift_validation"], ascending=[False, False]).reset_index(drop=True)
+    agg = agg.sort_values(
+        ["lift_combined", "lift_validation"], ascending=[False, False]
+    ).reset_index(drop=True)
     agg["rank"] = range(1, len(agg) + 1)
     return agg[["rank", "signal_name", "lift_combined", "lift_validation", "n_signal", "notes"]]
 
@@ -235,7 +262,9 @@ def _derive_metrics_from_stability(
         insufficient_disc = True
     else:
         weighted_sig = (disc_rows["signal_rate_discovery"] * disc_rows["n_signal_discovery"]).sum()
-        weighted_base = (disc_rows["baseline_rate_discovery"] * disc_rows["n_signal_discovery"]).sum()
+        weighted_base = (
+            disc_rows["baseline_rate_discovery"] * disc_rows["n_signal_discovery"]
+        ).sum()
         sig_disc = weighted_sig / n_disc
         base_disc = weighted_base / n_disc
         insufficient_disc = False
@@ -246,7 +275,9 @@ def _derive_metrics_from_stability(
         insufficient_val = True
     else:
         weighted_sig = (val_rows["signal_rate_validation"] * val_rows["n_signal_validation"]).sum()
-        weighted_base = (val_rows["baseline_rate_validation"] * val_rows["n_signal_validation"]).sum()
+        weighted_base = (
+            val_rows["baseline_rate_validation"] * val_rows["n_signal_validation"]
+        ).sum()
         sig_val = weighted_sig / n_val
         base_val = weighted_base / n_val
         insufficient_val = False
@@ -278,7 +309,9 @@ def compute_annual_signals_per_pair(
     return float(sig_count) / years / n_pairs
 
 
-def compute_clustering_ratio_simple(merged: pd.DataFrame, signal_col: str, window_bars: int = 3) -> float:
+def compute_clustering_ratio_simple(
+    merged: pd.DataFrame, signal_col: str, window_bars: int = 3
+) -> float:
     """Clustering: fraction of non-zero signals within window_bars of prior same-direction."""
     sub = merged[merged[signal_col].notna()].copy()
     sub["date"] = pd.to_datetime(sub["date"])
@@ -355,24 +388,28 @@ def compute_leaderboard_geometry_lock(
         denom_4r = max(p_4r_disc, 1e-12)
         p4r_drop = (p_4r_disc - p_4r_val) / denom_4r if denom_4r > 0 else 0.0
         if p4r_drop > P4R_DROP_MAX_PCT:
-            reject_reasons.append(f"P_4R_before_2R_drop_{p4r_drop:.2%}_above_{P4R_DROP_MAX_PCT:.0%}")
+            reject_reasons.append(
+                f"P_4R_before_2R_drop_{p4r_drop:.2%}_above_{P4R_DROP_MAX_PCT:.0%}"
+            )
 
         passed = len(reject_reasons) == 0
-        rows.append({
-            "signal_name": signal_name,
-            "P_3R_before_2R_disc": round(p_disc, 6),
-            "P_3R_before_2R_val": round(p_val, 6),
-            "P_2R_before_1R_disc": round(m2["signal_rate_disc"], 6),
-            "P_2R_before_1R_val": round(m2["signal_rate_val"], 6),
-            "P_4R_before_2R_disc": round(p_4r_disc, 6),
-            "P_4R_before_2R_val": round(p_4r_val, 6),
-            "discovery_lift": round(lift_disc, 6),
-            "validation_lift": round(lift_val, 6),
-            "annual_signals_per_pair": round(ann_sig, 2),
-            "clustering_ratio": round(clust, 4),
-            "PASS": passed,
-            "reject_reason": "; ".join(reject_reasons) if reject_reasons else "",
-        })
+        rows.append(
+            {
+                "signal_name": signal_name,
+                "P_3R_before_2R_disc": round(p_disc, 6),
+                "P_3R_before_2R_val": round(p_val, 6),
+                "P_2R_before_1R_disc": round(m2["signal_rate_disc"], 6),
+                "P_2R_before_1R_val": round(m2["signal_rate_val"], 6),
+                "P_4R_before_2R_disc": round(p_4r_disc, 6),
+                "P_4R_before_2R_val": round(p_4r_val, 6),
+                "discovery_lift": round(lift_disc, 6),
+                "validation_lift": round(lift_val, 6),
+                "annual_signals_per_pair": round(ann_sig, 2),
+                "clustering_ratio": round(clust, 4),
+                "PASS": passed,
+                "reject_reason": "; ".join(reject_reasons) if reject_reasons else "",
+            }
+        )
     if not rows:
         return pd.DataFrame()
     df = pd.DataFrame(rows)

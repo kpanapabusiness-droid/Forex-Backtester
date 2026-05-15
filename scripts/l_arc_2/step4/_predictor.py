@@ -284,3 +284,122 @@ def fit_predict_cluster_all_folds(signals_df: pd.DataFrame, t: int) -> pd.DataFr
             "predicted_cluster", "bars_already_held_at_t", "already_exited_before_t",
         ])
     return pd.concat(rows, axis=0, ignore_index=True).sort_values("trade_id").reset_index(drop=True)
+
+
+def fit_predict_cluster_anchored_expanding(signals_df: pd.DataFrame, t: int) -> pd.DataFrame:
+    """Anchored expanding gb cluster predictor for step 5 F2..F5 materialisation.
+
+    Per-fold training scheme:
+        F1: skipped (no rows emitted) — pre-F1 history is empty in L Arc 2
+            (signals_features.csv fold_id range is exactly 1..7), so the
+            anchored-expanding training set for F1 has no examples.
+        F2: train on F1                  -> predict F2
+        F3: train on F1+F2               -> predict F3
+        F4: train on F1+F2+F3            -> predict F4
+        F5: train on F1+F2+F3+F4         -> predict F5
+        F6,F7: single pooled F1..F5 fit  -> predict F6+F7 from one model
+               (byte-identical to fit_predict_cluster's F6/F7 branch).
+
+    The F2..F5 branch is the new piece; F6/F7 mirrors fit_predict_cluster
+    exactly so that step 4's published trades_post_mechanism.csv F6+F7 rows
+    re-emerge byte-identical when the F6/F7 predictions are passed through
+    run_delayed_entry.
+
+    Determinism requirements (preserved from fit_predict_cluster):
+    - X_full built ONCE via build_t_matrix on the full sorted pool before
+      any per-fold masking. Z-score normalisation, median fill, and one-hot
+      level enumeration must see the full pool. Splitting X_full construction
+      per-fold would change normalisation and break byte identity.
+    - F6/F7 predictions come from a single predict_proba call covering both
+      folds combined (not two separate calls).
+    - Hyperparameters and random_state pinned from C.HGB_RANDOM_STATE.
+    - Output sorted by trade_id ascending.
+    """
+    df = signals_df.reset_index(drop=True).copy()
+    if C.CLUSTER_COL_INTERNAL not in df.columns:
+        raise ValueError(f"signals_df missing {C.CLUSTER_COL_INTERNAL} — merge clusters first")
+
+    df = df.sort_values("trade_id").reset_index(drop=True)
+    X_full, _ = build_t_matrix(df, t)
+
+    bars_held = df["bars_held"].values
+    cluster = df[C.CLUSTER_COL_INTERNAL].values
+    fold = df["fold_id"].values
+
+    active_mask = bars_held >= t
+    valid_cluster_mask = cluster != C.CLUSTER_SENTINEL
+    use_mask = active_mask & valid_cluster_mask
+
+    rows = []
+
+    # ---- F2..F5 anchored expanding ----
+    # F1 deliberately skipped (pre-F1 history empty in L Arc 2).
+    for f_target in (2, 3, 4, 5):
+        train_folds = list(range(1, f_target))  # F2 trains on [1]; F5 trains on [1,2,3,4]
+        train_mask = use_mask & np.isin(fold, train_folds)
+        test_mask = use_mask & (fold == f_target)
+        if not train_mask.any() or not test_mask.any():
+            continue
+        y_train = cluster[train_mask].astype(int)
+        if len(np.unique(y_train)) < 2:
+            continue
+        clf = HistGradientBoostingClassifier(
+            max_iter=200, max_depth=3, learning_rate=0.05,
+            random_state=C.HGB_RANDOM_STATE,
+        )
+        clf.fit(X_full[train_mask], y_train)
+        proba = clf.predict_proba(X_full[test_mask])
+        classes = clf.classes_
+        if 1 in classes:
+            c1_idx = int(np.where(classes == 1)[0][0])
+            p1 = proba[:, c1_idx]
+        else:
+            p1 = np.zeros(int(test_mask.sum()))
+        pred = (p1 >= 0.5).astype(int)
+        sub = pd.DataFrame({
+            "trade_id": df.loc[test_mask, "trade_id"].values,
+            "fold": fold[test_mask],
+            "true_cluster": cluster[test_mask].astype(int),
+            "p_cluster_1": p1,
+            "predicted_cluster": pred,
+            "bars_already_held_at_t": np.full(int(test_mask.sum()), t, dtype=int),
+            "already_exited_before_t": (bars_held[test_mask] < t).astype(int),
+        })
+        rows.append(sub)
+
+    # ---- F6/F7 from pooled F1..F5 fit (mirrors fit_predict_cluster) ----
+    fit_mask = use_mask & np.isin(fold, list(C.FIT_FOLDS))
+    pred_mask = use_mask & np.isin(fold, list(C.VALIDATE_FOLDS))
+    if fit_mask.any() and pred_mask.any():
+        y_fit = cluster[fit_mask].astype(int)
+        if len(np.unique(y_fit)) >= 2:
+            clf = HistGradientBoostingClassifier(
+                max_iter=200, max_depth=3, learning_rate=0.05,
+                random_state=C.HGB_RANDOM_STATE,
+            )
+            clf.fit(X_full[fit_mask], y_fit)
+            proba = clf.predict_proba(X_full[pred_mask])
+            classes = clf.classes_
+            if 1 in classes:
+                c1_idx = int(np.where(classes == 1)[0][0])
+                p1 = proba[:, c1_idx]
+            else:
+                p1 = np.zeros(int(pred_mask.sum()))
+            pred = (p1 >= 0.5).astype(int)
+            sub = pd.DataFrame({
+                "trade_id": df.loc[pred_mask, "trade_id"].values,
+                "fold": fold[pred_mask],
+                "true_cluster": cluster[pred_mask].astype(int),
+                "p_cluster_1": p1,
+                "predicted_cluster": pred,
+                "bars_already_held_at_t": np.full(int(pred_mask.sum()), t, dtype=int),
+                "already_exited_before_t": (bars_held[pred_mask] < t).astype(int),
+            })
+            rows.append(sub)
+
+    if not rows:
+        return pd.DataFrame(columns=[
+            "trade_id", "fold", "true_cluster", "p_cluster_1",
+            "predicted_cluster", "bars_already_held_at_t", "already_exited_before_t",
+        ])
+    return pd.concat(rows, axis=0, ignore_index=True).sort_values("trade_id").reset_index(drop=True)

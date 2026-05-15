@@ -29,7 +29,6 @@ import hashlib
 import sys
 import time
 from pathlib import Path
-from typing import Iterable
 
 import numpy as np
 import pandas as pd
@@ -896,9 +895,9 @@ def main() -> int:
         sub_k2 = None
         sub_k3 = None
         if n_actual >= SUBCLUSTER_THRESHOLD:
-            print(f"  sub-clustering K=2 ...", flush=True)
+            print("  sub-clustering K=2 ...", flush=True)
             sub_k2 = subcluster(slug, per_trade, signals, k=2)
-            print(f"  sub-clustering K=3 ...", flush=True)
+            print("  sub-clustering K=3 ...", flush=True)
             sub_k3 = subcluster(slug, per_trade, signals, k=3)
             receipts.append(
                 f"{slug}: subcluster seed={sub_k2['seed']} "
@@ -974,20 +973,20 @@ def main() -> int:
             out_doc_lines.append("")
         # Winner/loser read
         w = per_trade[per_trade["net_r"] > 0]
-        l = per_trade[per_trade["net_r"] < 0]
-        if len(w) and len(l):
+        losers = per_trade[per_trade["net_r"] < 0]
+        if len(w) and len(losers):
             wp = float(w["time_to_peak_mfe"].median())
-            lp = float(l["time_to_peak_mfe"].median())
+            lp = float(losers["time_to_peak_mfe"].median())
             wb = float(w["bars_held"].median())
-            lb = float(l["bars_held"].median())
+            lb = float(losers["bars_held"].median())
             out_doc_lines.append(
                 f"Winners ({len(w)}) reach peak MFE at median bar {wp:.3g} "
-                f"and hold {wb:.3g} bars total; losers ({len(l)}) reach peak "
+                f"and hold {wb:.3g} bars total; losers ({len(losers)}) reach peak "
                 f"MFE at median bar {lp:.3g} and hold {lb:.3g} bars. "
                 f"Winner median MFE = {float(w['mfe_held_atr'].median()):.3g} ATR vs "
-                f"loser median MFE = {float(l['mfe_held_atr'].median()):.3g} ATR; "
+                f"loser median MFE = {float(losers['mfe_held_atr'].median()):.3g} ATR; "
                 f"winner median MAE = {float(w['mae_held_atr'].median()):.3g} ATR vs "
-                f"loser median MAE = {float(l['mae_held_atr'].median()):.3g} ATR."
+                f"loser median MAE = {float(losers['mae_held_atr'].median()):.3g} ATR."
             )
         out_doc_lines.append("")
 
@@ -1078,7 +1077,6 @@ def main() -> int:
                 out_doc_lines.append("")
             # Read
             if sub_k2 and sub_k2["clusters"]:
-                means = [c["mean_r"] for c in sub_k2["clusters"]]
                 ns = [c["n"] for c in sub_k2["clusters"]]
                 dominant = max(sub_k2["clusters"], key=lambda c: c["n"])
                 modal = "dominant" if dominant["n"] / sum(ns) > 0.65 else "multimodal"

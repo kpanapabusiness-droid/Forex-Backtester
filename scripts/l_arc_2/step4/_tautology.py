@@ -13,7 +13,6 @@ import pandas as pd
 
 from . import _common as C
 
-
 CLUSTER_COND_SLUGS = ("exit_cluster_cond_gb", "exit_cluster_cond_gb_h240", "delayed_entry_t_gb")
 
 

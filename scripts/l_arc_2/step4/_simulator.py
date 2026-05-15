@@ -15,9 +15,6 @@ from dataclasses import dataclass
 import numpy as np
 import pandas as pd
 
-from . import _common as C
-from . import _data as D
-
 
 @dataclass(frozen=True)
 class TradeStaticContext:

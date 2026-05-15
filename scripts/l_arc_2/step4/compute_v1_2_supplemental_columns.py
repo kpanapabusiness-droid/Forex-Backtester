@@ -391,10 +391,10 @@ def main() -> int:
 
     out_sha = sha256_file(OUT_CSV)
     wall = time.time() - t0
-    receipts.append(f"## Output")
+    receipts.append("## Output")
     receipts.append(f"path: {OUT_CSV.relative_to(REPO).as_posix()}")
     receipts.append(f"sha256: {out_sha}")
-    receipts.append(f"rows: 11 + header")
+    receipts.append("rows: 11 + header")
     receipts.append(f"wall_time_seconds: {wall:.3f}")
     receipts.append("")
     if notes_acc:

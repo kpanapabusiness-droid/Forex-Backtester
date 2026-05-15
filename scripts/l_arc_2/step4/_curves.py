@@ -17,7 +17,6 @@ import pandas as pd
 from . import _common as C
 from . import _simulator as S
 
-
 CURVE_HORIZONS = (120, 144, 168, 192, 216, 240)
 
 FWD_MFE_AVAILABLE = (24, 48, 72, 120, 240, 360, 480)

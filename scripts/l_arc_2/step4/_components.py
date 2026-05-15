@@ -19,12 +19,9 @@ from __future__ import annotations
 
 import numpy as np
 import pandas as pd
-from sklearn.ensemble import HistGradientBoostingClassifier
 from sklearn.metrics import roc_auc_score
 
 from . import _common as C
-from . import _actions as A
-from . import _predictor as P
 
 
 def _capture_ratio(net_r: np.ndarray, mfe_atr_h: np.ndarray) -> float:

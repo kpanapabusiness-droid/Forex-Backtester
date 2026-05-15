@@ -17,10 +17,10 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
-from . import _common as C
 from . import _actions as A
-from . import _predictor as P
+from . import _common as C
 from . import _data as D
+from . import _predictor as P
 
 
 def _capture_ratio(net_r: np.ndarray, mfe_atr_h: np.ndarray) -> float:

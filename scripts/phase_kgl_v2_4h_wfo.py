@@ -3184,7 +3184,7 @@ def run_kgl_v2() -> None:
         print(f"  signals filtered (OOS): {_kh20_oos_filtered}  "
               f"taken: {_kh20_oos_taken}  total: {_kh20_total}  "
               f"pct filtered: {_kh20_pct:.1f}%")
-        print(f"  per-fold filtered: "
+        print("  per-fold filtered: "
               + "  ".join(f"F{k}={v}" for k, v in sorted(stats["kh20_per_fold"].items())))
         # Sanity check: d1_close_in_range distribution for taken trades (OOS only)
         _oos_cir = [t.get("d1_close_in_range", float("nan"))
@@ -3219,7 +3219,7 @@ def run_kgl_v2() -> None:
         print(f"  signals filtered (OOS): {_kh22_oos_filtered}  "
               f"taken: {_kh22_oos_taken}  total: {_kh22_total}  "
               f"pct filtered: {_kh22_pct:.1f}%")
-        print(f"  per-fold filtered: "
+        print("  per-fold filtered: "
               + "  ".join(f"F{k}={v}" for k, v in sorted(stats["kh22_per_fold"].items())))
         _oos_h1_cir = [t.get("h1_last_bar_close_in_range", float("nan"))
                        for t in all_trades

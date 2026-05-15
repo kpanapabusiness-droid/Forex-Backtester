@@ -49,7 +49,6 @@ import pandas as pd
 from . import _common as C
 from . import _data as D
 
-
 REPO = C.REPO
 STEP4_OUT = REPO / "results" / "l_arc_2" / "step4" / "delayed_entry_t_gb"
 STEP5_OUT = REPO / "results" / "l_arc_2" / "step5_recharacterisation" / "delayed_entry_t_gb"
@@ -290,7 +289,7 @@ def _summary_table(first_cross: pd.DataFrame, source_label: str,
     rows = []
     for X in THRESHOLDS:
         s = sub[sub["threshold"] == X]
-        crossed = s[s["excluded_no_cross"] == False]
+        crossed = s[~s["excluded_no_cross"]]
         n_crossed = len(crossed)
         n_fb = int(crossed["fell_back_to_BE"].sum()) if n_crossed > 0 else 0
         if n_crossed > 0:
@@ -536,8 +535,7 @@ def main() -> dict:
         "outputs_sha256": output_shas,
         # No timestamp — deterministic across runs.
     }
-    manifest_path = STEP5_OUT / "run_manifest.json"
-    # NOTE: this manifest path is shared with CC-0's run_manifest.json.
+    # NOTE: CC-0 owns STEP5_OUT / "run_manifest.json".
     # CC-1 writes to a CC-1-specific file to avoid clobber.
     cc1_manifest_path = STEP5_OUT / "cc1_run_manifest.json"
     with open(cc1_manifest_path, "w", encoding="utf-8", newline="\n") as fh:

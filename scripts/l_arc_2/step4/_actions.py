@@ -21,10 +21,7 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
-from . import _common as C
-from . import _data as D
 from . import _simulator as S
-
 
 JPY_PAIRS = {
     "AUD_JPY", "CAD_JPY", "CHF_JPY", "EUR_JPY",
@@ -131,7 +128,6 @@ def run_exit_cluster_cond(
     For predicted C1 -> close at bar t. For predicted C0 -> verbatim h=120 (from signals).
     """
     pred = predictions.set_index("trade_id")
-    pred_tids = pred.index.values
     sig_idx = signals_with_clu.set_index("trade_id")
 
     # Predicted C1 trades -> simulate close at bar t

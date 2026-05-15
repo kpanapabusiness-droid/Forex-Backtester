@@ -10,8 +10,8 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from core.backtester import load_config, run_backtest
-from core.utils import summarize_results
+from core.backtester import load_config, run_backtest  # noqa: E402
+from core.utils import summarize_results  # noqa: E402
 
 
 def _compute_extra_metrics(results_dir: Path, cfg: dict) -> dict:

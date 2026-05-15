@@ -10,24 +10,21 @@ Order of execution:
 """
 from __future__ import annotations
 
-import json
 import subprocess
 import sys
-from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
-from . import _common as C
-from . import _data as D
-from . import _simulator as S
-from . import _curves as CV
-from . import _tautology as TT
-from . import _t_selection as TS
-from . import _predictor as P
 from . import _actions as A
+from . import _common as C
 from . import _components as CMP
+from . import _curves as CV
+from . import _data as D
 from . import _lookahead as LA
+from . import _predictor as P
+from . import _t_selection as TS
+from . import _tautology as TT
 
 
 def _filter_slugs() -> list[str]:
@@ -131,7 +128,7 @@ def main() -> dict:
         selected_rows = ts_df[ts_df["selected"]]
         if len(selected_rows) == 0:
             selected_t_by_slug[slug] = None
-            print(f"         no valid t — skipping")
+            print("         no valid t — skipping")
         else:
             t_star = int(selected_rows["t"].iloc[0])
             selected_t_by_slug[slug] = t_star

@@ -20,7 +20,6 @@ from sklearn.ensemble import HistGradientBoostingClassifier
 from . import _common as C
 from . import _data as D
 
-
 SIGNAL_TIME_NUMERIC = (
     "signal_bar_open", "signal_bar_close", "signal_bar_high", "signal_bar_low",
     "signal_bar_log_return", "signal_bar_abs_log_return",

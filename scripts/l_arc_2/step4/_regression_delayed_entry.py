@@ -20,12 +20,10 @@ from __future__ import annotations
 import hashlib
 from pathlib import Path
 
-import pandas as pd
-
+from . import _actions as A
 from . import _common as C
 from . import _data as D
 from . import _predictor as P
-from . import _actions as A
 
 
 def _sha256(path: Path) -> str:
@@ -102,7 +100,7 @@ def main_anchored_expanding_f6_f7() -> None:
     # Also report F2..F5 row count from the new function (for visibility,
     # not part of the byte-identity check).
     f2_f5 = preds_all[preds_all["fold"].isin([2, 3, 4, 5])]
-    print(f"F2..F5 predictions (informational, not in this check):")
+    print("F2..F5 predictions (informational, not in this check):")
     print(f"  total active+valid rows scored: {len(f2_f5)}")
     print(f"  per-fold counts: {f2_f5['fold'].value_counts().sort_index().to_dict()}")
     print(f"  predicted cluster 0 (mirror) per fold: "

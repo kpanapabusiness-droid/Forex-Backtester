@@ -24,18 +24,15 @@ import hashlib
 import json
 import subprocess
 import sys
-from datetime import datetime, timezone
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from sklearn.ensemble import HistGradientBoostingClassifier
 
+from . import _actions as A
 from . import _common as C
 from . import _data as D
 from . import _predictor as P
-from . import _actions as A
-
 
 REPO = C.REPO
 OUT_DIR = REPO / "results" / "l_arc_2" / "step5_recharacterisation" / "delayed_entry_t_gb"
@@ -395,7 +392,6 @@ def lookahead_invariant_test(n_sample: int = 100, seed: int = 17) -> dict:
     # Compare predictions for sampled trades only (the others are unperturbed
     # but might shift due to z-score normalisation contamination — that's a
     # different invariant; this test scopes to the sampled trades)
-    sample_set = set(sample_ids_int)
     diffs = []
     byte_identical = 0
     for tid in sample_ids_int:

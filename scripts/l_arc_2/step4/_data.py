@@ -15,7 +15,6 @@ import pandas as pd
 
 from . import _common as C
 
-
 PATH_NUMERIC_PER_BAR = (
     "open", "high", "low", "close",
     "cum_logret_from_entry",

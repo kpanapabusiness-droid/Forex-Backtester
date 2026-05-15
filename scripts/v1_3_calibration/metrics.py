@@ -15,8 +15,6 @@ R-unit convention: all values in SL-distance R-units, R = 2 × ATR.
 """
 from __future__ import annotations
 
-from collections.abc import Iterable
-
 import numpy as np
 import pandas as pd
 
@@ -209,7 +207,6 @@ def axis2b_trail_exit(paths: pd.DataFrame, per_trade: pd.DataFrame) -> tuple[dic
         cap_arr         = df["cap_bar"].to_numpy()
 
         # Pick whichever happens first.
-        chosen_bar = np.minimum.reduce([trail_first_arr, sl_first_arr, cap_arr])
         realised = np.full(len(df), np.nan, dtype=np.float64)
         is_sl    = (sl_first_arr <= trail_first_arr) & (sl_first_arr <= cap_arr) & np.isfinite(sl_first_arr)
         is_trail = ~is_sl & (trail_first_arr <= cap_arr) & np.isfinite(trail_first_arr)
@@ -382,7 +379,6 @@ def axis2g_in_trade_smoothness(paths: pd.DataFrame, meta: pd.DataFrame) -> pd.Da
     p["close_prev"] = p.groupby("trade_id", sort=False)["close_r"].shift(1)
     in_profit       = p["close_r"] > 0
     advanced        = (p["close_r"] > p["close_prev"]).fillna(False) & in_profit
-    retreat_or_eq   = in_profit & ~advanced
     mono_per_trade  = (
         advanced.groupby(p["trade_id"]).sum()
         / (in_profit.groupby(p["trade_id"]).sum().replace(0, np.nan))

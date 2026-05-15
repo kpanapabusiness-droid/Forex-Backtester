@@ -11,7 +11,6 @@ floors after.
 from __future__ import annotations
 
 import hashlib
-import json
 import sys
 import time
 from pathlib import Path
@@ -21,10 +20,8 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
-from scripts.v1_3_calibration import metrics as M
-from scripts.v1_3_calibration.load_paths import (
-    DATASETS, load_clusters, load_paths,
-)
+from scripts.v1_3_calibration import metrics as M  # noqa: E402
+from scripts.v1_3_calibration.load_paths import load_clusters, load_paths  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 OUT_ROOT  = REPO_ROOT / "results" / "v1_3_calibration"

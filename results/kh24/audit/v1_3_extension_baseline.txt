@@ -49,11 +49,20 @@ scripts/_v1_3_record_legacy_sha.py which performs exactly the same
 slice-and-hash the regression test does.
 
 BASELINE_FULL_FILE_SHA:      d5f99d5692ca57fbbbab004fbf95f51206e0d8b3266f699f737158d9bf72fd9e
-BASELINE_LEGACY_SUBSET_SHA:  55d617da6009dfb2548feabc6bc9573e749a83c564a9463c78f50ab05c1e101e
+BASELINE_LEGACY_SUBSET_SHA:  29a056b7932a4019627edd23b08913c9f2459a8160618e869e7471526be230d2
+  (slice-and-reserialise with explicit lineterminator='\n' for cross-
+   platform stability — pandas defaults to os.linesep which yields CRLF
+   on Windows and LF on Linux, producing different hashes for the same
+   underlying values. On Windows dev with default settings the same
+   slice produces sha 55d617da6009dfb2548feabc6bc9573e749a83c564a9463c78f50ab05c1e101e;
+   both encode the same logical data, but only the LF-normalised one
+   is platform-stable. CI runs on Linux so the LF sha is the canonical
+   regression baseline.)
 
 Verification: after the v1.3 extension landed and the backtester was
 re-run on configs/wfo_kh24.yaml, the post-extension trades_all.csv was
-sliced to the legacy 39 columns, re-serialised, and hashed. The
-resulting sha256 matches BASELINE_LEGACY_SUBSET_SHA above. See test
+sliced to the legacy 39 columns, re-serialised with
+lineterminator='\n', and hashed. The resulting sha256 matches
+BASELINE_LEGACY_SUBSET_SHA above. See test
 tests/test_kh24_trades_all_regression.py::test_legacy_columns_byte_identical
 for the enforced regression.

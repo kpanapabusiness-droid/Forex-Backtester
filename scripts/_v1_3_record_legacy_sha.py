@@ -50,8 +50,13 @@ def main() -> int:
     print(f"Missing legacy columns: {missing}")
     print(f"Extra columns (not legacy): {extra}")
     slc = df[LEGACY_COLUMNS]
-    sha = hashlib.sha256(slc.to_csv(index=False).encode()).hexdigest()
-    print(f"\nLegacy-subset sha256 (slice-and-reserialise): {sha}")
+    # lineterminator='\n' makes the sha platform-independent (pandas defaults
+    # to os.linesep — CRLF on Windows, LF on Linux — which otherwise yields
+    # different shas across CI/dev for the same input file).
+    sha = hashlib.sha256(
+        slc.to_csv(index=False, lineterminator="\n").encode()
+    ).hexdigest()
+    print(f"\nLegacy-subset sha256 (slice-and-reserialise, LF lineterm): {sha}")
     return 0
 
 

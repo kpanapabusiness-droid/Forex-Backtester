@@ -25,11 +25,19 @@ TRADES_PATH = os.path.join(REPO_ROOT, "results", "kh24", "trades_all.csv")
 
 # sha256 of the legacy column subset, computed via:
 #   df = pd.read_csv(TRADES_PATH); slc = df[LEGACY_COLUMNS]
-#   sha256(slc.to_csv(index=False).encode())
+#   sha256(slc.to_csv(index=False, lineterminator='\n').encode())
 # on the pre-extension main HEAD trades_all.csv (full-file sha
 # d5f99d5692ca57fbbbab004fbf95f51206e0d8b3266f699f737158d9bf72fd9e).
+#
+# lineterminator='\n' is REQUIRED: pandas defaults to os.linesep, so the
+# slice-and-reserialise sha differs between Windows (CRLF) and Linux (LF)
+# even though the underlying values are byte-identical. Pinning '\n' makes
+# the baseline stable across platforms — CI Linux runs and dev Windows
+# runs both produce the same sha against the same input file. The legacy
+# columns themselves remain unchanged; this only normalises how we hash
+# the slice for the regression check.
 BASELINE_LEGACY_SUBSET_SHA = (
-    "55d617da6009dfb2548feabc6bc9573e749a83c564a9463c78f50ab05c1e101e"
+    "29a056b7932a4019627edd23b08913c9f2459a8160618e869e7471526be230d2"
 )
 
 LEGACY_COLUMNS = [
@@ -68,7 +76,7 @@ def test_legacy_columns_byte_identical():
         "Existing trade outcomes must not be altered."
     )
     legacy_subset = df[LEGACY_COLUMNS]
-    legacy_csv = legacy_subset.to_csv(index=False).encode()
+    legacy_csv = legacy_subset.to_csv(index=False, lineterminator="\n").encode()
     actual_sha = hashlib.sha256(legacy_csv).hexdigest()
     assert actual_sha == BASELINE_LEGACY_SUBSET_SHA, (
         f"Legacy columns changed after v1.3 extension.\n"

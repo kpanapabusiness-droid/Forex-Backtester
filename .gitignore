@@ -51,7 +51,12 @@ tmp_find_exit_baselines.py
 Mt4 Volume Indis/
 
 # Local outputs
-results/
+# Use `results/*` (not `results/`) so per-directory exceptions can negate it;
+# git refuses to re-include children if the parent dir itself is excluded.
+results/*
+# KH-24 artefacts are tracked (production system results — see results/kh24/audit/PHASE_KH24_PROMOTION.md)
+!results/kh24/
+!results/kh24/**
 results_phase*/
 __pycache__/
 .ipynb_checkpoints/

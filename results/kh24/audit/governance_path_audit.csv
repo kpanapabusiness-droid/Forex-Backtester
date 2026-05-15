@@ -1,0 +1,16 @@
+doc,line_number,path_referenced,reference_form,resolves_on_promotion_branch,action_taken,notes
+CLAUDE.md,15,docs/KH24_SYSTEM_LOCK.md,explicit path,true,none,resolves after promotion
+CLAUDE.md,107,scripts/phase_kgl_v2_4h_wfo.py,explicit path,true,none,resolves after promotion
+CLAUDE.md,109,configs/wfo_kh24.yaml,explicit path,true,none,resolves after promotion
+CLAUDE.md,159,docs/KH24_SYSTEM_LOCK.md,explicit path,true,none,resolves after promotion
+STATUS.md,33,docs/KH24_SYSTEM_LOCK.md,explicit path,true,none,resolves after promotion
+STATUS.md,34,configs/wfo_kh24.yaml,explicit path,true,none,resolves after promotion
+STATUS.md,35,KH24_EA.mq5,bare filename in table cell,true,none,bare filename; file resolves at EA/KH24_EA.mq5; not strictly stale — informal label
+STATUS.md,120,results/kh24/,explicit path,true,none,resolves after promotion (directory now contains 6 files)
+SESSION_ZERO.md,19,docs/KH24_SYSTEM_LOCK.md,explicit path,true,none,resolves after promotion
+SESSION_ZERO.md,20,configs/wfo_kh24.yaml,explicit path,true,none,resolves after promotion
+SESSION_ZERO.md,21,results/kh24/,explicit path,true,none,resolves after promotion
+SESSION_ZERO.md,22,KH24_EA.mq5,bare filename in table cell,true,none,bare filename; file resolves at EA/KH24_EA.mq5; not strictly stale — informal label
+SESSION_ZERO.md,61,wfo_kh24.yaml,bare filename in prose,true,none,bare filename; resolves at configs/wfo_kh24.yaml
+SESSION_ZERO.md,61,wfo_baseline_clean.yaml,bare filename in prose,true,none,bare filename; resolves at configs/wfo_baseline_clean.yaml after promotion (this prompted adding it to the manifest)
+SESSION_ZERO.md,72,docs/KH24_SYSTEM_LOCK.md,explicit path,true,none,resolves after promotion

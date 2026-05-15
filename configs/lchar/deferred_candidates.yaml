@@ -1,0 +1,57 @@
+# Deferred Candidates — L-arc trials cleared by DSR > 0.95 but capped out of N=5
+#
+# This config drives `scripts/lchar/extract_deferred_candidates.py`. It is a
+# planning input for the L6+ chat. It does NOT modify the L arc — L5 closed
+# CANDIDATE_PRODUCING and `LCHAR_TOPN_REGISTRY.md` is the locked top-N artefact.
+#
+# Per L0 §4 (ranking + tie-break) and §5 (N=5 threshold semantics):
+#   - The L0-locked threshold is DSR > 0.95 (strict greater-than).
+#   - The L0-locked N is 5. The registry is capped at the top 5 by sort key.
+#   - Trials that clear DSR > 0.95 but were not in the top 5 are not "failed";
+#     they are deferred — they cleared the same locked threshold by the same
+#     locked metric, and were truncated only by the operational N=5 cap.
+#
+# This artefact surfaces those deferred trials with full metadata in the same
+# format as the L5 registry. It does NOT promote them to candidate status. Any
+# use of these as L6+ inputs requires explicit re-planning per L0 §1.
+
+arc: L
+phase: L-deferred-enumeration
+description: "Enumerate L4 trials with DSR > 0.95 that are not in the L5 registry. Mechanical, descriptive, no new statistical computation."
+
+# ----------------------------------------------------------------------
+# Inputs (read-only)
+# ----------------------------------------------------------------------
+input:
+  # L4 conditional atlas — the only data source for trial metrics and diagnostics.
+  l4_csv: "results/lchar/atlas/layer4_conditional.csv"
+  # L5 registry data — canonical source of trial_ids to exclude.
+  l5_registry_json: "results/lchar/_l5_registry_data.json"
+  # L5 selection config — re-used for condition_descriptions, direction_descriptions,
+  # horizon_labels, so the deferred artefact uses identical human-readable text.
+  l5_config: "configs/lchar/layer5.yaml"
+
+# ----------------------------------------------------------------------
+# Selection (locked — identical to L5)
+# ----------------------------------------------------------------------
+selection:
+  # Sort key matches L5: descending DSR, then descending Sharpe, then descending
+  # n_obs_pooled. Stable sort (mergesort).
+  sort_columns: ["dsr", "sharpe", "n_obs_pooled"]
+  sort_ascending: [false, false, false]
+  sort_kind: "mergesort"
+
+  # Threshold matches L0 §5 (DSR strictly greater than 0.95).
+  threshold: 0.95
+  threshold_strict_gt: true
+
+  # Starting rank for emitted entries. The L5 registry occupies ranks 1..5;
+  # deferred candidates begin at rank 6.
+  start_rank: 6
+
+# ----------------------------------------------------------------------
+# Output
+# ----------------------------------------------------------------------
+output:
+  deferred_md: "docs/L_ARC_DEFERRED_CANDIDATES.md"
+  deferred_data_json: "results/lchar/_l_arc_deferred_candidates.json"

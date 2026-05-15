@@ -1,0 +1,110 @@
+phase: l4_characterisation
+description: |
+  L4 univariate-extreme descriptive characterisation
+  Per task brief; research-mode only — produces a per-signal feature matrix
+  and aggregated reports. Disposition is descriptive only (no gate, no filter
+  derivation, no system construction). L6.0 §9 no-filter-rescue applies.
+
+# Signal contract — verbatim L4 (byte-identical bar set to Arc 1 over overlap window).
+signal:
+  type: l4_univariate_extreme
+  signal_tf: 1H
+  base: abs_log_return
+  lookback_bars: 100
+  threshold_quantile: 0.90
+  threshold_comparison: strict_greater
+  direction_filter: neg
+  trade_direction: long
+
+# Research window (the SIGNAL-firing range). Distinct from Arc 1 WFO fold layout.
+# Data load extends earlier for warm-up coverage on D1 ATR(14), W1 EMAs, etc.
+window:
+  signal_start: '2021-01-01 00:00:00'
+  signal_end: '2025-12-31 23:00:00'
+  data_load_start: '2019-12-01'
+
+pairs:
+  - AUD_CAD
+  - AUD_CHF
+  - AUD_JPY
+  - AUD_NZD
+  - AUD_USD
+  - CAD_CHF
+  - CAD_JPY
+  - CHF_JPY
+  - EUR_AUD
+  - EUR_CAD
+  - EUR_CHF
+  - EUR_GBP
+  - EUR_JPY
+  - EUR_NZD
+  - EUR_USD
+  - GBP_AUD
+  - GBP_CAD
+  - GBP_CHF
+  - GBP_JPY
+  - GBP_NZD
+  - GBP_USD
+  - NZD_CAD
+  - NZD_CHF
+  - NZD_JPY
+  - NZD_USD
+  - USD_CAD
+  - USD_CHF
+  - USD_JPY
+
+# Trade-outcome execution semantics — match Arc 1 verbatim.
+execution:
+  bar_offset: 1                 # entry at signal bar + 1 open
+  time_exit_bars: 1             # exit at signal bar + 2 open (or SL hit intrabar)
+  sl_atr_mult: 2.0
+  atr_period: 14
+  starting_balance: 10000.0
+  pct_per_trade: 0.01
+
+spread_floor:
+  enabled: true
+  source: configs/spread_floors_5ers.yaml
+  expected_body_sha256: a613b4ce641c8d5218490531770a4924204029dedaa80fb24111beb61bd15547
+
+characterisation:
+  output_dir: results/l6/characterisation/
+  data_paths:
+    h1: data/1hr
+    h4: data/4hr
+    d1: data/daily
+    w1: data/w1
+  features:
+    pre_signal_1h_lookback: 100
+    range_position_window_1h: 20
+    range_expansion_short_window: 5
+    range_expansion_long_window: 20
+    realized_vol_short_bars: 24
+    realized_vol_long_bars: 120
+    realized_vol_norm_window: 500
+    acf_window: 20
+    atr_regime_window: 50
+    volume_median_window_1h: 50
+    volume_zscore_window_1h: 100
+    volume_median_window_4h: 50
+    volume_zscore_window_4h: 100
+    volume_median_window_d1: 50
+    volume_zscore_window_d1: 100
+    volume_median_window_w1: 20
+  forward_horizons: [1, 6, 24, 72, 120, 240]
+  sessions:
+    sydney: [22, 0]
+    asia: [1, 7]
+    london: [8, 12]
+    london_ny_overlap: [13, 16]
+    ny: [17, 21]
+  trend_label_thresholds:
+    up_min: 0.05
+    down_max: -0.05
+  pre_momentum_label:
+    field: cum_logret_1h_10
+    up_min: 0.001
+    down_max: -0.001
+  lag_audit_sample_seed: 20260510
+  lag_audit_sample_n: 100
+  concurrent_window_hours: 3

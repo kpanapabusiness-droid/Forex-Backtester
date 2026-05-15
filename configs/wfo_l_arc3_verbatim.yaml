@@ -1,0 +1,107 @@
+phase: l_arc_3_step1_verbatim
+description: |
+  L Arc 3 — step 1 verbatim run (plumbing test, NOT a gate).
+  Protocol: L_ARC_PROTOCOL.md v1.0 + L_ARC_PROTOCOL_v1.1_AMENDMENT.md (12 amendments;
+                                    A12 superseded by v1.2 A2)
+                                    + L_ARC_PROTOCOL_v1.2_AMENDMENT.md (A1/A2/A3 active from step 3+)
+  Operational spec: L_ARC_OPERATIONAL_SPEC.md v1.0
+  Arc-open doc: results/l_arc_3/PHASE_L_ARC_3_OPEN.md
+  Signal: TRIAL__volatility_regime__d1_atr_top_decile__any__h_120
+          (L registry rank 3, docs/LCHAR_TOPN_REGISTRY.md Entry 3)
+  Canonical signal source: scripts/lchar/run_layer4.py
+                           (volatility_regime family, d1_atr_top_decile base,
+                            any sub-spec, signal_TF=1H, h=120)
+  Engine path: signal.type='l4_volatility_regime_d1_atr_top_decile_any' routes to
+               core/signals/l4_volatility_regime_d1_atr_top_decile_any.py:run_arc3_wfo
+  Risk: L arc convention 0.5% (protocol §4 rule 7). Output dir
+        results/l_arc_3/step1_verbatim/.
+
+signal:
+  type: l4_volatility_regime_d1_atr_top_decile_any
+  signal_tf: 1H
+  family: volatility_regime
+  base: d1_atr_top_decile
+  sub_spec: any
+  trailing_window: 100
+  decile_quantile: 0.90
+  higher_tf: D1
+  higher_tf_lag: most_recently_completed
+  trade_direction: long
+
+entry:
+  bar_offset: 1                    # bar N+1 open
+  execution: open
+
+exit:
+  hard_stop:
+    type: absolute_atr
+    atr_period: 14
+    atr_smoothing: wilder            # decision 1: inherit arc 1 / arc 2 Wilder for execution SL
+    atr_tf: 1H
+    multiplier: 2.0
+    anchor: entry
+  time_exit:
+    bars_after_entry: 120            # exit at bar N+121 open (h=120)
+  trail: null
+  structural_exits: []
+
+filters: []                          # verbatim — no filters at step 1
+
+exposure:
+  max_concurrent_per_pair: 1
+  currency_cap: null
+  daily_dd_guard: null
+
+risk:
+  basis: reset_floor
+  pct_per_trade: 0.005               # L arc convention (protocol §4 rule 7)
+  starting_balance: 10000.0
+
+spread_floor:
+  enabled: true
+  source: configs/spread_floors_5ers.yaml
+  expected_body_sha256: a613b4ce641c8d5218490531770a4924204029dedaa80fb24111beb61bd15547
+
+pairs:
+  - AUD_CAD
+  - AUD_CHF
+  - AUD_JPY
+  - AUD_NZD
+  - AUD_USD
+  - CAD_CHF
+  - CAD_JPY
+  - CHF_JPY
+  - EUR_AUD
+  - EUR_CAD
+  - EUR_CHF
+  - EUR_GBP
+  - EUR_JPY
+  - EUR_NZD
+  - EUR_USD
+  - GBP_AUD
+  - GBP_CAD
+  - GBP_CHF
+  - GBP_JPY
+  - GBP_NZD
+  - GBP_USD
+  - NZD_CAD
+  - NZD_CHF
+  - NZD_JPY
+  - NZD_USD
+  - USD_CAD
+  - USD_CHF
+  - USD_JPY
+
+walk_forward:                        # BYTE-IDENTICAL to configs/wfo_l_arc2_verbatim.yaml
+  method: anchored_expanding
+  n_folds: 7
+  is_period_years: 4
+  oos_period_months: 9
+  oos_start: '2020-10-01'
+  oos_end: '2026-01-01'
+
+output:
+  results_dir: results/l_arc_3/step1_verbatim/
+  trades_csv: trades_verbatim.csv
+  fold_results_csv: wfo_fold_results.csv
+  summary_txt: wfo_summary.txt

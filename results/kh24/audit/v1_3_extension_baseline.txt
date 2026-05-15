@@ -1,0 +1,68 @@
+v1.3 KH-24 capturability extension — pre-change baseline
+========================================================
+
+Purpose: pin the sha256 of results/kh24/trades_all.csv as it sits on main
+HEAD before the v1.3 extension lands. The regression test
+tests/test_kh24_trades_all_regression.py asserts that the legacy column
+subset of the post-extension trades_all.csv reproduces the locked sha256
+byte-for-byte.
+
+Working tree state at recording time:
+  Branch:   main
+  HEAD:     0d4f85b — "Track L-arc work unpacked from stash …" (#125)
+  Date:     2026-05-15
+
+File: results/kh24/trades_all.csv
+Full-file sha256: d5f99d5692ca57fbbbab004fbf95f51206e0d8b3266f699f737158d9bf72fd9e
+
+Legacy columns (in file order — used to slice the post-extension file
+before re-hashing):
+
+  pair, entry_date, exit_date, entry_price, exit_price, sl_price,
+  trail_active, exit_reason, classification, bars_held, net_pnl,
+  r_multiple, spread_pips_used, sl_distance_atr, d1_dist_ratio,
+  d1_close_in_range, h1_last_bar_close_in_range, mae_final, mfe_final,
+  mae_at_bar_3, mfe_at_bar_3, mae_at_bar_6, mfe_at_bar_6, first_bar_dir,
+  kh13_mae_at_check, kh13_mfe_at_check, kh13_triggered, kh14_triggered,
+  kh14_state2, atr_sized_down, trade_type, original_entry_price_ref,
+  signal_spread_pips, spread_ratio, atr_abs, atr_ratio, d1_kijun_slope,
+  session, concurrent_signals
+
+Total legacy columns: 39
+Total trades: 553 (1 header + 553 data rows)
+
+The regression test must:
+  1) Read the post-extension trades_all.csv
+  2) Slice to the 39 legacy columns above (preserving order)
+  3) Serialise via pandas to_csv(index=False)
+  4) Compute sha256 of the serialised bytes
+  5) Assert equality with the BASELINE_LEGACY_SUBSET_SHA recorded below
+
+Note on serialisation parity: the legacy-subset sha256 is NOT identical
+to the full-file sha256 above, because slicing-then-reserialising goes
+through pandas' to_csv (vs the original generator's to_csv on the full
+DataFrame). What matters is that the slice-then-reserialise pipeline
+is deterministic: running it on the pre-change file gives one sha; the
+post-change file must produce the same sha. The baseline_legacy_sha
+below was populated by the helper script
+scripts/_v1_3_record_legacy_sha.py which performs exactly the same
+slice-and-hash the regression test does.
+
+BASELINE_FULL_FILE_SHA:      d5f99d5692ca57fbbbab004fbf95f51206e0d8b3266f699f737158d9bf72fd9e
+BASELINE_LEGACY_SUBSET_SHA:  29a056b7932a4019627edd23b08913c9f2459a8160618e869e7471526be230d2
+  (slice-and-reserialise with explicit lineterminator='\n' for cross-
+   platform stability — pandas defaults to os.linesep which yields CRLF
+   on Windows and LF on Linux, producing different hashes for the same
+   underlying values. On Windows dev with default settings the same
+   slice produces sha 55d617da6009dfb2548feabc6bc9573e749a83c564a9463c78f50ab05c1e101e;
+   both encode the same logical data, but only the LF-normalised one
+   is platform-stable. CI runs on Linux so the LF sha is the canonical
+   regression baseline.)
+
+Verification: after the v1.3 extension landed and the backtester was
+re-run on configs/wfo_kh24.yaml, the post-extension trades_all.csv was
+sliced to the legacy 39 columns, re-serialised with
+lineterminator='\n', and hashed. The resulting sha256 matches
+BASELINE_LEGACY_SUBSET_SHA above. See test
+tests/test_kh24_trades_all_regression.py::test_legacy_columns_byte_identical
+for the enforced regression.

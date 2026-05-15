@@ -55,9 +55,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score
-from sklearn.preprocessing import StandardScaler
 
 from scripts.l_arc_2.step3 import _clustering as CL
 from scripts.l_arc_2.step3 import _common as C3

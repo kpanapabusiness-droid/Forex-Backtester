@@ -60,6 +60,10 @@ results/*
 # KH-24 artefacts are tracked (production system results — see results/kh24/audit/PHASE_KH24_PROMOTION.md)
 !results/kh24/
 !results/kh24/**
+# v1.3 capturability calibration — read-only analysis output, tracked so
+# the chat can read CALIBRATION_REPORT.md when locking v1.3 floors
+!results/v1_3_calibration/
+!results/v1_3_calibration/**
 results_phase*/
 __pycache__/
 .ipynb_checkpoints/

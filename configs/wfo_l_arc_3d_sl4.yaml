@@ -1,0 +1,118 @@
+# wfo_l_arc_3d_sl4.yaml — Arc 3D diagnostic tail, SL=4.0 × ATR(14)_1H.
+#
+# Mirrors configs/wfo_l_arc_3.yaml except for exit.hard_stop.multiplier
+# and output.results_dir. R-unit metrics rescale: 1R is now 4 × ATR_1H
+# from entry (2x Arc 3 baseline). Per Open-15 evidence; close to the
+# √(h/24) Brownian-consistent reference (~4.5x).
+
+phase: L_ARC_3D_SL_4_STEP_1
+description: |
+  Arc 3D diagnostic tail — SL=4.0 × ATR(14)_1H. Cell C1 evaluates §2
+  floors aggregated; Cell C2 un-aggregated. Same signal, pairs, window,
+  spread treatment, and gate constants as Arc 3.
+
+signal:
+  module: signals.lchar_d1atr_top_decile
+  trial_id: TRIAL__volatility_regime__d1_atr_top_decile__any__h_120
+  family: volatility_regime
+  base: d1_atr_top_decile
+  sub_spec: any
+  signal_tf: "1H"
+  higher_tf: "D1"
+  higher_tf_lag: most_recently_completed
+  atr_period_d1: 14
+  atr_smoothing_d1: sma
+  trailing_window: 100
+  decile_quantile: 0.90
+  trade_direction: long
+
+data:
+  data_dirs:
+    "1H": "data/1hr"
+    "D1": "data/daily"
+  date_start: "2020-10-01"
+  date_end: "2026-01-31"
+
+pairs:
+  - AUD_CAD
+  - AUD_CHF
+  - AUD_JPY
+  - AUD_NZD
+  - AUD_USD
+  - CAD_CHF
+  - CAD_JPY
+  - CHF_JPY
+  - EUR_AUD
+  - EUR_CAD
+  - EUR_CHF
+  - EUR_GBP
+  - EUR_JPY
+  - EUR_NZD
+  - EUR_USD
+  - GBP_AUD
+  - GBP_CAD
+  - GBP_CHF
+  - GBP_JPY
+  - GBP_NZD
+  - GBP_USD
+  - NZD_CAD
+  - NZD_CHF
+  - NZD_JPY
+  - NZD_USD
+  - USD_CAD
+  - USD_CHF
+  - USD_JPY
+
+entry:
+  bar_offset: 1
+  execution: open
+
+exit:
+  hard_stop:
+    type: absolute_atr
+    atr_period: 14
+    atr_smoothing: wilder
+    atr_tf: "1H"
+    multiplier: 4.0
+    anchor: entry_price
+  time_exit:
+    bars_after_entry: 120
+  trail: null
+  structural_exits: []
+
+exposure:
+  max_concurrent_per_pair: 1
+  currency_cap: null
+  concurrent_trade_cap: null
+
+risk:
+  pct_per_trade: 0.005
+  starting_balance: 10000.0
+  basis: reset_floor
+
+spreads:
+  enabled: true
+  source: per_bar
+  points_per_pip: 10.0
+  default_pips: 0.0
+
+spread_floor:
+  enabled: true
+  source: configs/spread_floors_5ers.yaml
+  expected_body_sha256: a613b4ce641c8d5218490531770a4924204029dedaa80fb24111beb61bd15547
+
+trade_paths:
+  enabled: true
+  forward_window_bars: 240
+
+output:
+  results_dir: results/arc_3d/sl_4.0/step1
+  trades_csv: trades_all.csv
+  paths_csv: trades_paths.csv
+  manifest_json: manifest.json
+  float_format: "%.10g"
+
+gate:
+  pool_size_min: 500
+  determinism: byte_identical_two_run
+  bars_held_p95_max: 240

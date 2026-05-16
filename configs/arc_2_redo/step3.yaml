@@ -1,0 +1,112 @@
+# Arc 2 redo — Step 3 capturability characterisation config
+#
+# Protocol: L_ARC_PROTOCOL.md v2.0 §§2, 7, 11
+# Input:   Step 1 (trades_all, trades_paths) + Step 2 (clusters_K4, centroids_K4,
+#          archetype_assignments).
+# Outputs: results/l_arc_2_redo/step3/...
+
+phase: arc_2_redo_step3
+description: >-
+  Per-archetype capturability characterisation against v2.0 §2 hard floors,
+  on the K=4 path-shape clustering from Step 2.
+
+input:
+  step1_dir: results/l_arc_2_redo/step1
+  step2_dir: results/l_arc_2_redo/step2
+  trades_csv: trades_all.csv
+  paths_csv: trades_paths.csv
+  clusters_csv: clusters_K4.csv
+  centroids_csv: centroids_K4.csv
+  archetypes_csv: archetype_assignments.csv
+
+output:
+  results_dir: results/l_arc_2_redo/step3
+  per_archetype_dist_prefix: archetype_           # archetype_{cid}_distribution.csv
+  per_archetype_fwd_hist_suffix: _fwd_mfe_histogram.png
+  per_archetype_finalr_hist_suffix: _final_r_histogram.png
+  forward_geometry_csv: forward_geometry.csv     # per-trade aggregates
+  capturability_csv: capturability_pass_list.csv
+  archetype_summaries_csv: archetype_summaries.csv
+  spot_check_txt: forward_geometry_spot_check.txt
+  summary_md: STEP3_SUMMARY.md
+  determinism_check: true
+
+# ----------------------------------------------------------------------
+# Forward-window definition (v2.0 §2 + §7)
+# ----------------------------------------------------------------------
+forward_window:
+  bar_offset_min: 0
+  bar_offset_max: 240            # h240, inclusive
+
+# ----------------------------------------------------------------------
+# Threshold crossings + peak-and-collapse (Task 2)
+# ----------------------------------------------------------------------
+crossings:
+  reach_thresholds_r: [1.0, 2.0]
+  wrong_way_r: -1.0
+peak_and_collapse:
+  peak_floor_r: 1.0              # "meaningful peak" floor
+  collapse_ratio: 0.30           # close_r_at_240 <= 0.30 * fwd_mfe_h240
+
+# ----------------------------------------------------------------------
+# Shape-tag detection (v2.0 §7) — operational definitions
+# ----------------------------------------------------------------------
+shape_tag:
+  histogram_bins: 50
+  histogram_range_quantile: 0.99 # upper bound = p99 of fwd_mfe in archetype
+  no_magnitude_p75_max: 0.5
+  tight_unimodal_iqr_over_range_max: 0.5
+  heavy_right_tail_skew_min: 1.5
+  heavy_right_tail_p95_over_p50_min: 3.0
+  bimodal_separation_r_min: 1.0
+  bimodal_valley_ratio_max: 0.5  # valley height <= ratio * min(peak heights)
+  scattered_max_bin_mass_max: 0.05
+
+# ----------------------------------------------------------------------
+# Mass-in-band edges (v2.0 §7)
+# ----------------------------------------------------------------------
+mass_bands:
+  edges_r: [0.0, 0.5, 1.0, 2.0, 5.0]   # >5R = open-ended last band
+
+# ----------------------------------------------------------------------
+# §2 capturability thresholds (v2.0 §2)
+# ----------------------------------------------------------------------
+capturability:
+  monotonicity_min: 0.55
+  fwd_mfe_p50_min_r: 1.5
+  frac_reach_1r_min: 0.70
+  frac_wrong_way_max: 0.30
+  shape_tag_pass: [tight_unimodal, heavy_right_tail]
+  size_fraction_min: 0.10
+  # §11 local_peaks ceilings per archetype label.
+  local_peaks_ceiling_by_archetype:
+    Monotone ascent: 4
+    Stepwise climber: 30
+    Random walk: null           # no upper ceiling (lower-bound only)
+    Early-peak hold: null
+    Peak-and-collapse: null
+    V-shape recovery: null
+    boundary: null              # be permissive when boundary
+    unclassified: null
+
+# ----------------------------------------------------------------------
+# §11 disambiguation for boundary (Early-peak hold vs Peak-and-collapse)
+# ----------------------------------------------------------------------
+disambiguation:
+  early_peak_hold_max: 0.30     # pct_peak_and_collapse < this → Early-peak hold
+  peak_and_collapse_min: 0.50   # >= this → Peak-and-collapse
+                                # [0.30, 0.50) → empirical (Step 3+ test)
+
+# ----------------------------------------------------------------------
+# PR #129 cross-check reference (for cluster 2 / Stepwise climber)
+# ----------------------------------------------------------------------
+pr129_reference:
+  cluster_id: 2                 # redo cluster id expected to be Stepwise climber
+  fwd_mfe_p50_r: 6.86
+  frac_reach_1r: 0.998
+  final_r_mean_r: 4.45
+  final_r_t_stat: 38.7
+  tolerance_fwd_mfe_p50_r: 1.5
+  tolerance_frac_reach_1r: 0.02
+  tolerance_final_r_mean_r: 1.0
+  tolerance_final_r_t_stat_pct: 0.20  # 20% relative

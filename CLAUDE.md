@@ -1,12 +1,20 @@
 # CLAUDE.md — Forex Ignition Rebuild
-> Last updated: 2026-05-13 | Phase: L arc signal testing, Arc 1 redo opens under L_ARC_PROTOCOL v1.0
+> Last updated: 2026-05-16 | Phase: L_ARC_PROTOCOL v2.0 locked, Arc 3 opens under v2.0
 > First file any AI assistant reads. Reflects where the project ACTUALLY is.
+
+---
+
+## Active protocol
+
+L_ARC_PROTOCOL v2.0 (`L_ARC_PROTOCOL.md`) governs Arcs 3+. Path-shape clustering + two-pipeline (E entry-filter / D1 deferred-identification) extractability gate. Calibration anchor: KH-24 K=4 archetype 3 (passes via Pipeline D1 at t=3). Next engine PR: Pipeline D1 backtester extension (conditional exits at bar N).
+
+Historical: Arcs 1, 2 ran under v1.0 protocol (`archive/L_ARC_PROTOCOL_v1_0.md` + v1.1/v1.2 amendments).
 
 ---
 
 ## Read These First, In Order
 
-1. **`L_ARC_PROTOCOL.md`** — methodology of record for all L arc signal-testing work. Locked v1.0.
+1. **`L_ARC_PROTOCOL.md`** — methodology of record for all L arc signal-testing work. Locked v2.0.
 2. **`L_ARC_OPERATIONAL_SPEC.md`** — deliverables, folder layout, angle catalogues, scoring tables. Locked v1.0.
 3. **`SESSION_ZERO.md`** — 5-minute primer on current state.
 4. **`STATUS.md`** — tight current-state snapshot.
@@ -22,7 +30,7 @@ Then, depending on scope:
 
 **Live system KH-24 is locked, passing, deployed.** Out of scope for L arc work; do not modify without an explicit modification phase.
 
-**Active research: L arc signal testing under `L_ARC_PROTOCOL.md` v1.0.** Arc 1 redo is the current/next phase. Arc 1 redo doubles as the protocol calibration check (`concurrent_signals_within_3h` must surface as ≥ Tier 2 predictor in step 3, or halt and investigate).
+**Active research: L arc signal testing under `L_ARC_PROTOCOL.md` v2.0.** Arc 3 opens under v2.0 (path-shape clustering, two-pipeline E/D1 extractability). Arcs 1 and 2 are historical (ran under v1.x).
 
 ---
 
@@ -30,7 +38,7 @@ Then, depending on scope:
 
 A long-only 4H trend-pullback system (KH-24) is in production. Parallel research arcs (the L arc series) are testing the top-N signals from the L characterization atlas (`docs/LCHAR_TOPN_REGISTRY.md`) through a six-step pipeline that ends with a WFO gate. The goal of L arc work is one or more PASS-DEPLOYABLE survivor systems that complement or supersede KH-24.
 
-The signal under test in any given L arc is from the registry. The test follows `L_ARC_PROTOCOL.md` v1.0 exactly. Per-arc deliverables are specified in `L_ARC_OPERATIONAL_SPEC.md` v1.0.
+The signal under test in any given L arc is from the registry. From Arc 3 onward the test follows `L_ARC_PROTOCOL.md` v2.0 exactly. Per-arc deliverables are specified in `L_ARC_OPERATIONAL_SPEC.md` v1.0.
 
 ---
 
@@ -48,7 +56,7 @@ The signal under test in any given L arc is from the registry. The test follows 
 | Clean labels = evaluation only | Never in population selection |
 | Full distributions, never medians-only | No metric summarised as a single number |
 | Effect size before significance | AUC + forward-geometry effect size both required in step 3 |
-| Within-arc thresholds do not move | Calibration adjustments are cross-arc only, via v1.1 patch |
+| Within-arc thresholds do not move | Calibration adjustments are cross-arc only (v2.0 §12) |
 
 ---
 
@@ -77,7 +85,7 @@ KH-24 WFO gate: PASS. Worst-fold ROI +1.92% (F7); worst-fold DD 6.37% (F1); 214 
 
 ---
 
-## L Arc Configuration (Per L_ARC_PROTOCOL v1.0)
+## L Arc Configuration (Per L_ARC_PROTOCOL v2.0)
 
 ```
 Signal:        Per docs/LCHAR_TOPN_REGISTRY.md entry (currently 5 signals, arcs 1–5)
@@ -134,7 +142,7 @@ Key scripts:
 - Same-day D1 alignment (lookahead; permanently replaced by one-day lag)
 - KH-25 re-entry exposure cap (KH-27 KILL — re-entries fire post-original-exit)
 - 1H timeframe port of KH-24 (KI arc: mean R 0.004, t=0.095)
-- L6.0 verbatim-as-gate framing (replaced by `L_ARC_PROTOCOL.md` v1.0)
+- L6.0 verbatim-as-gate framing (replaced by `L_ARC_PROTOCOL.md` v1.0; v1.x in turn superseded by v2.0 for Arcs 3+)
 
 ---
 

@@ -1,15 +1,22 @@
 # SESSION ZERO — Forex Ignition Rebuild
 > 5-minute primer. Read this first, then read `L_ARC_PROTOCOL.md` and `L_ARC_OPERATIONAL_SPEC.md` for the active research methodology.
-> Last updated: 2026-05-13 — L_ARC_PROTOCOL v1.0 locked, Arc 1 redo is the current/next phase.
+> Last updated: 2026-05-16 — L_ARC_PROTOCOL v2.0 locked, Arc 3 opens under v2.0.
+
+---
+
+## Pointers
+
+- Active protocol: `L_ARC_PROTOCOL.md` (v2.0)
+- v1.x archive: `archive/`
 
 ---
 
 ## Current State
 
-**ACTIVE WORK: L ARC SIGNAL TESTING UNDER L_ARC_PROTOCOL v1.0**
+**ACTIVE WORK: L ARC SIGNAL TESTING UNDER L_ARC_PROTOCOL v2.0 (ARC 3+)**
 **LIVE SYSTEM: KH-24 (locked, unchanged, running on VPS)**
 
-As of 2026-05-13, the L characterization arc is complete (atlas built, top-N registry produced) and the L arc signal-testing protocol is locked at v1.0. Arc 1 and Arc 2 were previously run under L6.0 verbatim-as-gate framing and closed FAIL on the verbatim WFO. Both are being redone under `L_ARC_PROTOCOL.md` v1.0, which replaces verbatim-as-gate with a six-step extractability protocol. Arc 1 redo doubles as the protocol calibration check.
+As of 2026-05-16, `L_ARC_PROTOCOL.md` v2.0 is locked and supersedes v1.0 + amendments. v2.0 restructures the pipeline around path-shape (outcome-blind) clustering and a two-pipeline extractability gate: Pipeline E (entry filter) and Pipeline D1 (deferred identification at bar N). KH-24 K=4 archetype 3 is the calibration anchor (passes via Pipeline D1 at t=3). Arcs 1 and 2 ran under v1.x and are historical; v2.0 governs Arc 3 onward.
 
 ### Live system
 
@@ -28,17 +35,17 @@ KH-24 is locked and out of scope for L arc work. No modifications without an exp
 
 ### Active research direction
 
-**L arc signal testing, Arc 1 redo first.** Source of truth: `L_ARC_PROTOCOL.md` (methodology) and `L_ARC_OPERATIONAL_SPEC.md` (deliverables, scoring, angles).
+**L arc signal testing, Arc 3 first under v2.0.** Source of truth: `L_ARC_PROTOCOL.md` v2.0 (methodology) and `L_ARC_OPERATIONAL_SPEC.md` v1.0 (deliverables, scoring, angles).
 
-The L arc tests each of the top-N L registry signals through a six-step pipeline:
-1. Verbatim run (plumbing test, not a gate)
-2. Descriptive trade-path analysis (full distributions, every angle in the operational spec catalogue)
-3. Extractability assessment with dual-gate verdict (AUC + effect size + cluster size + stability)
-4. Filter / exit candidate derivation (component-ranked, not single-composite)
-5. Re-characterisation of the filtered population
-6. Joint WFO with dual-tier disposition (PASS-DEPLOYABLE / PASS-VIABLE / clean-null)
+The v2.0 L arc tests each registry signal through a six-step pipeline:
+1. Plumbing (deterministic full-pool generation; pool ≥ 500)
+2. Path-shape clustering (outcome-blind features: monotonicity, local_peaks, pullback, time_to_peak_rel)
+3. Capturability characterisation (per §2 hard floors: clean shape + meaningful magnitude)
+4. Extractability + artefact production (Pipeline E entry-filter AUC ≥ 0.65 OR Pipeline D1 deferred-policy AUC ≥ 0.60)
+5. Cross-fold stability (sign consistency, size variance, DD ceiling)
+6. WFO truth + pass-deployable / pass-viable gate
 
-Arcs 1–5 run as full separate arcs per the L registry (no conditional duplicates). Arc 1 redo doubles as a protocol calibration check — `concurrent_signals_within_3h` (known real edge from L6 Arc 1 P2 work) must surface as ≥ Tier 2 predictor in step 3, or halt and investigate before Arc 2.
+Arcs 1 and 2 are historical (ran under v1.x). v2.0 governs Arc 3 onward. Calibration anchor: KH-24 K=4 archetype 3, which passes v2.0 extractability via Pipeline D1 at t=3 (RF AUC 0.638, exclusion 15.4%).
 
 ### Tool assignments (unchanged)
 
@@ -94,6 +101,10 @@ The L arc is methodologically distinct from KH-24 development. It does not assum
 ## Phase History
 
 *Note: when applying SESSION_ZERO updates, preserve any pre-existing Phase History entries below this line. New entries are appended at the top. The full list is what remains in the file.*
+
+### 2026-05-16 — L_ARC_PROTOCOL v2.0 locked; Arc 3 opens under v2.0
+
+`L_ARC_PROTOCOL.md` v2.0 locked. Replaces v1.0 + amendments as active protocol for Arcs 3+. Structural rewrite: clustering basis shifts from forward-geometry magnitude to outcome-blind path-shape; single entry-filter pipeline replaced by two-pipeline structure (E entry-filter + D1 deferred-identification); two-gate sequencing (capturability §2 → extractability §2); calibration anchor KH-24 K=4 archetype 3 (passes via Pipeline D1 at t=3); documentation shifts from per-step result docs to one live arc doc per protocol §13; workflow shifts to direct-to-main for analysis with PRs for engine changes per §13. v1.0 + amendments archived at `archive/L_ARC_PROTOCOL_v1_0.md` etc. for Arcs 1, 2 historical reference. Evidence base: PR #129 (archetype diagnostic), PR #130 (predictability investigation). Governance docs (CLAUDE.md, STATUS.md, SESSION_ZERO.md) updated.
 
 ### 2026-05-13 — L_ARC_PROTOCOL v1.0 locked; Arc 1 redo opens
 

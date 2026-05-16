@@ -2,15 +2,23 @@
 
 > Tight current-state snapshot. For full context, read `SESSION_ZERO.md` first.
 > For methodology, read `L_ARC_PROTOCOL.md` and `L_ARC_OPERATIONAL_SPEC.md`.
-> Last updated: 2026-05-13 — L_ARC_PROTOCOL v1.0 locked; Arc 1 redo is the current/next phase.
+> Last updated: 2026-05-16 — L_ARC_PROTOCOL v2.0 locked; Arc 3 opens under v2.0.
+
+---
+
+## Active protocol
+
+- Active protocol: L_ARC_PROTOCOL v2.0
+- Calibration anchor: KH-24 K=4 archetype 3 (passes via Pipeline D1 at t=3)
+- Next engine PR: Pipeline D1 backtester extension (conditional exits at bar N)
 
 ---
 
 ## Current Phase
 
-**Arc 1 redo opens under `L_ARC_PROTOCOL.md` v1.0.** Arc 1 redo doubles as the protocol calibration check — verify `concurrent_signals_within_3h` surfaces as ≥ Tier 2 predictor of the non-extractable cluster in step 3, or halt and investigate.
+**Arc 3 opens under `L_ARC_PROTOCOL.md` v2.0.** v2.0 restructures the pipeline around path-shape (outcome-blind) clustering and two-pipeline extractability (E entry-filter / D1 deferred-identification). Arcs 1 and 2 ran under v1.x and are historical.
 
-Order: Arc 1 redo → Arc 2 redo → Arc 3 → Arc 4 → Arc 5.
+Order under v2.0: Arc 3 → Arc 4 → Arc 5.
 
 ---
 
@@ -38,14 +46,15 @@ KH-24 is locked and unchanged. No modifications without an explicit modification
 
 ## Active Research
 
-L arc signal testing under `L_ARC_PROTOCOL.md` v1.0.
+L arc signal testing under `L_ARC_PROTOCOL.md` v2.0 (Arcs 3+). v1.x archive at `archive/` for historical Arc 1, Arc 2 reference.
 
 | Item | Detail |
 | --- | --- |
-| Protocol | `L_ARC_PROTOCOL.md` v1.0 (methodology), `L_ARC_OPERATIONAL_SPEC.md` v1.0 (deliverables) |
+| Protocol | `L_ARC_PROTOCOL.md` v2.0 (methodology), `L_ARC_OPERATIONAL_SPEC.md` v1.0 (deliverables) |
 | Signals | Top-N from `docs/LCHAR_TOPN_REGISTRY.md` — 5 arcs scheduled |
-| Approach | Six-step extractability pipeline per arc, dual-tier WFO disposition |
-| Current arc | Arc 1 (redo); doubles as protocol calibration check |
+| Approach | Six-step pipeline: plumbing → path-shape clustering → capturability → extractability (E or D1) → cross-fold stability → WFO |
+| Current arc | Arc 3 opens under v2.0 |
+| Calibration anchor | KH-24 K=4 archetype 3 (passes via Pipeline D1 at t=3) |
 | Risk per trade | 0.5% × reset floor balance |
 | Pair set | All 28 FX, same as KH-24 |
 | WFO | 7 anchored expanding folds, OOS Oct 2020 – Jan 2026 |
@@ -72,11 +81,14 @@ Annualisation: `fold_raw_ROI × (365 / fold_OOS_days)`. Folds < 90 OOS days excl
 
 ---
 
-## Recent Closures (2026-05-13)
+## Recent Closures
 
 | Phase | Verdict | Finding |
 | --- | --- | --- |
-| L_ARC_PROTOCOL design | LOCKED v1.0 | Six-step extractability protocol replaces L6.0 verbatim-as-gate framing |
+| L_ARC_PROTOCOL v2.0 | LOCKED 2026-05-16 | Path-shape clustering + two-pipeline E/D1 extractability; KH-24 K=4 archetype 3 = calibration anchor; v1.x archived for Arcs 1, 2 historical reference |
+| v2.0 predictability investigation | DELIVERED (PR #130) | Evidence base for v2.0 extractability gate |
+| v2.0 archetype diagnostic | DELIVERED (PR #129) | Evidence base for path-shape clustering on KH-24 + Arc 1 + Arc 2 |
+| L_ARC_PROTOCOL design | LOCKED v1.0 (2026-05-13, superseded by v2.0) | Six-step extractability protocol replaces L6.0 verbatim-as-gate framing |
 | L_ARC_OPERATIONAL_SPEC design | LOCKED v1.0 | Deliverables, angle catalogues, scoring tables, effect size definitions |
 | L6_0_METHODOLOGY_LOCK | SUPERSEDED | §9, §14 disposition rules superseded; feature schema (§14.3) and pair-set/WFO structure (§5, §4) carry forward |
 | PHASE_L6_ARC1_OPEN, _P2_OPEN, _ARC2_OPEN | SUPERSEDED | Replaced by Arc 1/2 redo arc-open docs under new protocol |
@@ -88,11 +100,9 @@ Annualisation: `fold_raw_ROI × (365 / fold_OOS_days)`. Folds < 90 OOS days excl
 
 | Item | Priority | Notes |
 | --- | --- | --- |
-| Arc 1 redo step 1 (verbatim run + signal re-validation) | HIGH | Next chat session |
-| Arc 1 redo step 2 (full descriptive) | HIGH | Same chat as step 1+3 per protocol §13 |
-| Arc 1 redo step 3 (extractability verdict + calibration check) | HIGH | Verify CH-001 surfaces as ≥ Tier 2 predictor |
-| Sign off `L_ARC_PROTOCOL.md` v1.0 and `L_ARC_OPERATIONAL_SPEC.md` v1.0 | HIGH | Fill sign-off blocks at bottom of each doc |
-| Arc 1 redo arc-open doc | HIGH | Per `L_ARC_OPERATIONAL_SPEC.md` §12 template |
+| Arc 3 opens under v2.0 | HIGH | Step 1 plumbing → Step 2 path-shape clustering → Step 3 capturability per v2.0 §5–§7 |
+| Pipeline D1 backtester extension | HIGH | Conditional exits keyed on mid-trade classifier output at bar N; next engine PR per v2.0 §13 |
+| Arc 3 live doc | HIGH | One `ARC_3_LIVE.md` per v2.0 §13; finalised as `ARC_3_RESULT.md` at arc end |
 
 No outstanding bugs or issues against KH-24. No pending fixes against the backtester.
 

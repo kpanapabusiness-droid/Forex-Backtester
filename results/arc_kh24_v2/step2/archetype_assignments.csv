@@ -1,0 +1,6 @@
+cluster_id,cluster_size,archetype_label,labelling_method,notes
+0,193,early_peak_family,provisional_step3,matched: time_to_peak_rel<=0.30; split (Early-peak hold vs Peak-and-collapse) requires pct_peak_and_collapse at Step 3
+1,365,unresolved_f22d041e,unresolved,"no archetype rule matched; resolve at Step 3 per §11 boundary rule (centroid: mono=0.501, peaks=8.40, pullback=0.222, ttp=0.459)"
+2,112,early_peak_family,provisional_step3,matched: time_to_peak_rel<=0.30; split (Early-peak hold vs Peak-and-collapse) requires pct_peak_and_collapse at Step 3
+3,50,unresolved_dd77bf0f,unresolved,"no archetype rule matched; resolve at Step 3 per §11 boundary rule (centroid: mono=0.532, peaks=3.64, pullback=0.698, ttp=0.612)"
+4,122,unresolved_11fee4a0,unresolved,"no archetype rule matched; resolve at Step 3 per §11 boundary rule (centroid: mono=0.530, peaks=30.94, pullback=0.233, ttp=0.760)"

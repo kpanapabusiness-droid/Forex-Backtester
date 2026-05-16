@@ -1,0 +1,85 @@
+# arc_kh24_v2_step1.yaml
+# KH-24 v2.0 self-test — Step 1 plumbing (bare kb_exhaustion_bar)
+#
+# Generates the full trade pool and per-bar trade-paths for the bare
+# kb_exhaustion_bar signal under L_ARC_PROTOCOL v2.0 Step 1.
+#
+# - Conditions C1-C6, C8, C9 (C7 disabled, permanently removed).
+# - Long only, 4H primary, D1 regime filter via one-day lag.
+# - NO filters (no currency cap, no 1H CIR, no trail, no kijun_d1).
+# - Hard SL = entry - 2.0 * ATR(14) at signal bar N.
+# - Time exit at bar offset 240 open (no SL hit in 240 held bars).
+# - Spread per SPREAD_SEMANTICS_LOCK.md (entry/exit-bar sourcing).
+
+arc: arc_kh24_v2
+step: 1
+description: "Bare kb_exhaustion_bar pool under L_ARC_PROTOCOL v2.0 Step 1"
+
+signal: kb_exhaustion_bar
+direction: long
+timeframe: H4
+
+data:
+  h4_dir: data/4hr
+  d1_dir: data/daily
+
+pairs:
+  - AUD_CAD
+  - AUD_CHF
+  - AUD_JPY
+  - AUD_NZD
+  - AUD_USD
+  - CAD_CHF
+  - CAD_JPY
+  - CHF_JPY
+  - EUR_AUD
+  - EUR_CAD
+  - EUR_CHF
+  - EUR_GBP
+  - EUR_JPY
+  - EUR_NZD
+  - EUR_USD
+  - GBP_AUD
+  - GBP_CAD
+  - GBP_CHF
+  - GBP_JPY
+  - GBP_NZD
+  - GBP_USD
+  - NZD_CAD
+  - NZD_CHF
+  - NZD_JPY
+  - NZD_USD
+  - USD_CAD
+  - USD_CHF
+  - USD_JPY
+
+signal_params:
+  atr_period: 14
+  kijun_period: 26
+  d1_atr_period: 14
+  d1_kijun_period: 26
+  long_body_threshold: 0.5         # C2
+  long_close_position_max: 0.24    # C3
+  c5_distance_cap_atr: 1.0         # C5: close <= Kijun + 1.0 * ATR
+  c6_depth_bars: 10                # C6: counter-move lookback
+  c6_depth_threshold: 0.5          # C6: (close - close[N-10]) / ATR <= -0.5
+  c9_d1_distance_cap_atr: 1.0      # C9: D1 close <= D1 Kijun + 1.0 * D1 ATR
+
+execution:
+  hard_sl_atr_mult: 2.0            # SL = entry - 2.0 * ATR(14) at N
+  hold_bars: 240                   # 40 days at 4H
+  pip_points_per_pip: 10.0         # MT5 5-digit broker: 1 pip = 10 points
+
+spreads:
+  source: per_bar_csv              # `spread` column in OHLC CSVs (MT5 points)
+
+outputs:
+  dir: results/arc_kh24_v2/step1
+  trades_csv: trades_all.csv
+  paths_csv: trades_paths.csv
+  report: plumbing_report.md
+
+gates:
+  min_pool_size: 500
+  min_pair_trades_warn: 30
+  bars_held_p95_max_for_cap_check: 240

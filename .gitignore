@@ -72,6 +72,10 @@ results/*
 # target archetypes from PR #129 (diagnostic only; no protocol revision)
 !results/v2_0_predictability/
 !results/v2_0_predictability/**
+# KH-24 v2.0 self-test arc — Step 1+ outputs (L_ARC_PROTOCOL v2.0 §13: arc
+# results data is direct-to-main).
+!results/arc_kh24_v2/
+!results/arc_kh24_v2/**
 results_phase*/
 __pycache__/
 .ipynb_checkpoints/

@@ -14,10 +14,11 @@ Historical: Arcs 1, 2 ran under v1.0 protocol (`archive/L_ARC_PROTOCOL_v1_0.md` 
 
 ## Read These First, In Order
 
-1. **`L_ARC_PROTOCOL.md`** — methodology of record for all L arc signal-testing work. Locked v2.0.
-2. **`L_ARC_OPERATIONAL_SPEC.md`** — deliverables, folder layout, angle catalogues, scoring tables. Locked v1.0.
-3. **`SESSION_ZERO.md`** — 5-minute primer on current state.
-4. **`STATUS.md`** — tight current-state snapshot.
+1. **`L_ARC_PROTOCOL.md`** — methodology of record for all L arc signal-testing work. Locked v2.0. Self-contained: deliverables, gates, exit-family map, and workflow all live in the v2.0 doc.
+2. **`SESSION_ZERO.md`** — 5-minute primer on current state.
+3. **`STATUS.md`** — tight current-state snapshot.
+
+For v1.x historical reference (Arcs 1, 2): `archive/L_ARC_PROTOCOL_v1_0.md`, `archive/L_ARC_OPERATIONAL_SPEC_v1_0.md`, plus v1.1/v1.2 amendments in the same folder.
 
 Then, depending on scope:
 - Touching the live system → `docs/KH24_SYSTEM_LOCK.md`
@@ -38,7 +39,7 @@ Then, depending on scope:
 
 A long-only 4H trend-pullback system (KH-24) is in production. Parallel research arcs (the L arc series) are testing the top-N signals from the L characterization atlas (`docs/LCHAR_TOPN_REGISTRY.md`) through a six-step pipeline that ends with a WFO gate. The goal of L arc work is one or more PASS-DEPLOYABLE survivor systems that complement or supersede KH-24.
 
-The signal under test in any given L arc is from the registry. From Arc 3 onward the test follows `L_ARC_PROTOCOL.md` v2.0 exactly. Per-arc deliverables are specified in `L_ARC_OPERATIONAL_SPEC.md` v1.0.
+The signal under test in any given L arc is from the registry. From Arc 3 onward the test follows `L_ARC_PROTOCOL.md` v2.0 exactly — v2.0 is self-contained for deliverables, gates, and workflow.
 
 ---
 
@@ -162,7 +163,7 @@ GPT-4 and Aider are permanently excluded from all implementation work.
 ## Folder Convention (v2, Locked 2026-05-13)
 
 All result documents are co-located with their artefacts under the arc folder.
-- L arc work: `results/l_arc_N/<step_subfolder>/...` per `L_ARC_OPERATIONAL_SPEC.md` §2.
+- L arc work: `results/l_arc_N/<step_subfolder>/...` (folder convention inherited from v1.x ops spec §2; v2.0 keeps the same layout).
 - Future non-L-arc work: same pattern under `results/<arc_name>/`.
 - `docs/` retained for non-arc-specific system specs (e.g. `docs/KH24_SYSTEM_LOCK.md`).
 

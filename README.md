@@ -7,8 +7,8 @@ A research-first FX trading system targeting prop firm requirements (5ers) with 
 ## Current State
 
 - **Live system:** KH-24 — running on Contabo VPS, gate-passing, +1.92% worst-fold ROI / 6.37% worst-fold DD across 7 OOS folds.
-- **Active research:** L arc signal testing under `L_ARC_PROTOCOL.md` v1.0. Arc 1 redo is the current/next phase. Five L registry signals scheduled (Arcs 1–5).
-- **Status as of 2026-05-13:** `L_ARC_PROTOCOL.md` v1.0 and `L_ARC_OPERATIONAL_SPEC.md` v1.0 locked. Arc 1 redo doubles as protocol calibration check.
+- **Active research:** L arc signal testing under `L_ARC_PROTOCOL.md` v2.0. Arc 3 opens under v2.0; Arcs 1, 2 are historical (ran under v1.x). Five L registry signals scheduled (Arcs 1–5).
+- **Status as of 2026-05-16:** `L_ARC_PROTOCOL.md` v2.0 locked. Path-shape clustering + two-pipeline (E entry-filter / D1 deferred-identification) extractability gate. Calibration anchor: KH-24 K=4 archetype 3 (passes via D1 at t=3). v1.x protocol + ops spec archived under `archive/`.
 
 ---
 
@@ -16,18 +16,19 @@ A research-first FX trading system targeting prop firm requirements (5ers) with 
 
 For new sessions, read in this order:
 
-1. **`L_ARC_PROTOCOL.md`** — methodology of record for all L arc signal-testing work. Read first.
-2. **`L_ARC_OPERATIONAL_SPEC.md`** — deliverables, folder layout, angle catalogues, scoring. Read second.
-3. `SESSION_ZERO.md` — 5-minute primer on current state.
-4. `STATUS.md` — tight current-state snapshot.
-5. `CLAUDE.md` — first-read context for AI assistants.
-6. `WORKFLOW.md` v2 — phase management and folder convention.
-7. `PROJECT_RULES.md` — tool roles and guardrails.
-8. `docs/GOLDEN_STANDARD_LOGIC.md` — execution truth invariants.
+1. **`L_ARC_PROTOCOL.md`** — methodology of record for all L arc signal-testing work. Locked v2.0; self-contained for methodology, deliverables, gates, and workflow. Read first.
+2. `SESSION_ZERO.md` — 5-minute primer on current state.
+3. `STATUS.md` — tight current-state snapshot.
+4. `CLAUDE.md` — first-read context for AI assistants.
+5. `WORKFLOW.md` v2 — phase management and folder convention.
+6. `PROJECT_RULES.md` — tool roles and guardrails.
+7. `docs/GOLDEN_STANDARD_LOGIC.md` — execution truth invariants.
+
+For v1.x historical reference (Arcs 1, 2): `archive/L_ARC_PROTOCOL_v1_0.md`, `archive/L_ARC_OPERATIONAL_SPEC_v1_0.md`, plus v1.1/v1.2 amendments.
 
 Specific scenarios:
 - Touching the live system → `docs/KH24_SYSTEM_LOCK.md`
-- Opening a new arc → `L_ARC_OPERATIONAL_SPEC.md` §12 arc-open template
+- Opening a new arc → `L_ARC_PROTOCOL.md` §13 (live arc doc convention)
 - Closing a phase → `WORKFLOW.md` v2 checklist
 
 ---
@@ -67,8 +68,8 @@ Top-level files in this repository serve specific roles. Read them in the right 
 
 | File | When to read |
 | --- | --- |
-| `L_ARC_PROTOCOL.md` | First read for any L arc work — methodology, verdict logic, discipline rules |
-| `L_ARC_OPERATIONAL_SPEC.md` | Second read for any L arc work — deliverables, scoring, angle catalogues |
+| `L_ARC_PROTOCOL.md` | First read for any L arc work — methodology, gates, deliverables, exit-family map, workflow (v2.0, self-contained) |
+| `archive/L_ARC_PROTOCOL_v1_0.md`, `archive/L_ARC_OPERATIONAL_SPEC_v1_0.md` | Historical v1.x protocol + ops spec (Arcs 1, 2 reference only) |
 | `SESSION_ZERO.md` | Top of every session — current state primer |
 | `STATUS.md` | Tight current-state snapshot |
 | `CLAUDE.md` | First-read context for AI assistants |
@@ -138,4 +139,4 @@ Every phase produces a result document regardless of pass or fail.
 
 ---
 
-*Last updated: 2026-05-13 — L_ARC_PROTOCOL v1.0 locked; Arc 1 redo opens; WORKFLOW.md v2 folder convention permanent.*
+*Last updated: 2026-05-16 — L_ARC_PROTOCOL v2.0 locked; Arc 3 opens under v2.0; v1.x archived under `archive/`.*

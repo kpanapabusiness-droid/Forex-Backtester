@@ -1,5 +1,5 @@
 # SESSION ZERO — Forex Ignition Rebuild
-> 5-minute primer. Read this first, then read `L_ARC_PROTOCOL.md` and `L_ARC_OPERATIONAL_SPEC.md` for the active research methodology.
+> 5-minute primer. Read this first, then read `L_ARC_PROTOCOL.md` (v2.0, self-contained) for the active research methodology.
 > Last updated: 2026-05-16 — L_ARC_PROTOCOL v2.0 locked, Arc 3 opens under v2.0.
 
 ---
@@ -35,7 +35,7 @@ KH-24 is locked and out of scope for L arc work. No modifications without an exp
 
 ### Active research direction
 
-**L arc signal testing, Arc 3 first under v2.0.** Source of truth: `L_ARC_PROTOCOL.md` v2.0 (methodology) and `L_ARC_OPERATIONAL_SPEC.md` v1.0 (deliverables, scoring, angles).
+**L arc signal testing, Arc 3 first under v2.0.** Source of truth: `L_ARC_PROTOCOL.md` v2.0 — self-contained for methodology, deliverables, gates, and workflow. v1.x ops spec is archived for historical reference.
 
 The v2.0 L arc tests each registry signal through a six-step pipeline:
 1. Plumbing (deterministic full-pool generation; pool ≥ 500)
@@ -94,7 +94,7 @@ The L arc is methodologically distinct from KH-24 development. It does not assum
 
 **L6 signal-testing arc (May 2026).** Initial L6.0 methodology lock used verbatim-as-gate framing. Arcs 1 and 2 ran and FAILED verbatim WFO (DD 39%–91%) — expected outcome of the framing, but the disposition rule closed those arcs prematurely. Arc 1 P2 (with concurrent_signals_within_3h filter, CH-001) passed under that framing; the work proved real edge existed but the protocol needed redesign.
 
-**L arc protocol redesign (2026-05-13).** `L_ARC_PROTOCOL.md` v1.0 locked. Replaces verbatim-as-gate with six-step extractability protocol. Includes PASS-DEPLOYABLE vs PASS-VIABLE tiers, effect-size + AUC dual-gate verdict, post-arc routing, Arc 1 redo as calibration check. `L_ARC_OPERATIONAL_SPEC.md` v1.0 specifies deliverables, angle catalogues, scoring tables.
+**L arc protocol redesign (2026-05-13).** `L_ARC_PROTOCOL.md` v1.0 locked. Replaces verbatim-as-gate with six-step extractability protocol. Includes PASS-DEPLOYABLE vs PASS-VIABLE tiers, effect-size + AUC dual-gate verdict, post-arc routing, Arc 1 redo as calibration check. `archive/L_ARC_OPERATIONAL_SPEC_v1_0.md` specifies deliverables, angle catalogues, scoring tables. (v1.x superseded by v2.0 on 2026-05-16; both archived.)
 
 ---
 
@@ -108,7 +108,7 @@ The L arc is methodologically distinct from KH-24 development. It does not assum
 
 ### 2026-05-13 — L_ARC_PROTOCOL v1.0 locked; Arc 1 redo opens
 
-`L_ARC_PROTOCOL.md` v1.0 and `L_ARC_OPERATIONAL_SPEC.md` v1.0 locked. Supersedes L6.0 §9 (no filter rescue, verbatim-as-gate) and §14 disposition rules; L6.0 feature schema (§14.3) and pair-set / WFO structure carry forward. Arc 1 and Arc 2 reopened for redo under the new protocol. Arc 1 redo doubles as the protocol calibration check — `concurrent_signals_within_3h` must surface as ≥ Tier 2 predictor in step 3, or the protocol is miscalibrated. WORKFLOW.md v2: phase docs now co-located in `results/<arc>/` permanently. CLAUDE.md, README.md, STATUS.md updated to point at new protocol.
+`archive/L_ARC_PROTOCOL_v1_0.md` (v1.0) and `archive/L_ARC_OPERATIONAL_SPEC_v1_0.md` (v1.0) locked. Supersedes L6.0 §9 (no filter rescue, verbatim-as-gate) and §14 disposition rules; L6.0 feature schema (§14.3) and pair-set / WFO structure carry forward. Arc 1 and Arc 2 reopened for redo under the new protocol. Arc 1 redo doubles as the protocol calibration check — `concurrent_signals_within_3h` must surface as ≥ Tier 2 predictor in step 3, or the protocol is miscalibrated. WORKFLOW.md v2: phase docs now co-located in `results/<arc>/` permanently. CLAUDE.md, README.md, STATUS.md updated to point at new protocol. (v1.x in turn superseded by v2.0 on 2026-05-16; both archived.)
 
 ### 2026-05-09 — L characterization arc closed; L6 signal-testing opened (then redesigned)
 

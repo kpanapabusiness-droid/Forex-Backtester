@@ -9,7 +9,7 @@
 > - Closure record: `L_ARC_CLOSURE.md`
 > - Deferred candidates: `L_ARC_DEFERRED_CANDIDATES.md`
 >
-> **What happens next:** signal testing of the 5 registry candidates under `L_ARC_PROTOCOL.md` v1.0. Arcs 1–5 run as full separate arcs per the six-step extractability protocol. See `L_ARC_PROTOCOL.md` and `L_ARC_OPERATIONAL_SPEC.md`.
+> **What happens next:** signal testing of the 5 registry candidates under `L_ARC_PROTOCOL.md` (v1.0 for Arcs 1, 2 — historical; v2.0 for Arc 3+). See `L_ARC_PROTOCOL.md` (current v2.0) and `archive/L_ARC_PROTOCOL_v1_0.md` + `archive/L_ARC_OPERATIONAL_SPEC_v1_0.md` for v1.x reference.
 >
 > **Status of this doc:** historical reference for how the registry was produced. Not authoritative for current or future signal-testing work.
 >

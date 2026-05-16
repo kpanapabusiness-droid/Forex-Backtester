@@ -1,11 +1,11 @@
 > # ⚠️ SUPERSEDED 2026-05-13
 >
-> This document is SUPERSEDED by `L_ARC_PROTOCOL.md` v1.0 and `L_ARC_OPERATIONAL_SPEC.md` v1.0.
+> This document is SUPERSEDED by `L_ARC_PROTOCOL.md` v1.0 (now archived at `archive/L_ARC_PROTOCOL_v1_0.md`) and `archive/L_ARC_OPERATIONAL_SPEC_v1_0.md`. As of 2026-05-16 the active protocol is `L_ARC_PROTOCOL.md` v2.0.
 >
 > **What is superseded:** §9 (no filter rescue, verbatim-as-gate) and §14 disposition rules — replaced by the six-step extractability protocol with dual-tier WFO disposition.
 >
 > **What carries forward unchanged:**
-> - §14.3 feature schema (referenced by `L_ARC_OPERATIONAL_SPEC.md` §5.16)
+> - §14.3 feature schema (referenced by `archive/L_ARC_OPERATIONAL_SPEC_v1_0.md` §5.16; v2.0 has its own feature set per `L_ARC_PROTOCOL.md` §8)
 > - §5 pair set (28 FX pairs)
 > - §4 WFO structure (7 anchored expanding folds, OOS Oct 2020 – Jan 2026)
 >

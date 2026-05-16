@@ -1,7 +1,7 @@
 # STATUS
 
 > Tight current-state snapshot. For full context, read `SESSION_ZERO.md` first.
-> For methodology, read `L_ARC_PROTOCOL.md` and `L_ARC_OPERATIONAL_SPEC.md`.
+> For methodology, read `L_ARC_PROTOCOL.md` (v2.0, self-contained).
 > Last updated: 2026-05-16 — L_ARC_PROTOCOL v2.0 locked; Arc 3 opens under v2.0.
 
 ---
@@ -50,7 +50,7 @@ L arc signal testing under `L_ARC_PROTOCOL.md` v2.0 (Arcs 3+). v1.x archive at `
 
 | Item | Detail |
 | --- | --- |
-| Protocol | `L_ARC_PROTOCOL.md` v2.0 (methodology), `L_ARC_OPERATIONAL_SPEC.md` v1.0 (deliverables) |
+| Protocol | `L_ARC_PROTOCOL.md` v2.0 (self-contained; v1.x ops spec archived) |
 | Signals | Top-N from `docs/LCHAR_TOPN_REGISTRY.md` — 5 arcs scheduled |
 | Approach | Six-step pipeline: plumbing → path-shape clustering → capturability → extractability (E or D1) → cross-fold stability → WFO |
 | Current arc | Arc 3 opens under v2.0 |
@@ -129,7 +129,7 @@ Earlier eliminations (KGL_V2 era, JL forward bias, NNFX, exit indicator sweeps, 
 | KH-28 regime analysis | `results/kh28/` |
 | KH-29 excursion analysis | `results/kh29/` |
 | L characterisation atlas | `results/lchar/` |
-| L arc signal testing (current) | `results/l_arc_N/` per `L_ARC_OPERATIONAL_SPEC.md` §2 |
+| L arc signal testing (current) | `results/l_arc_N/` (folder convention inherited from v1.x ops spec §2) |
 
 ---
 
@@ -137,7 +137,7 @@ Earlier eliminations (KGL_V2 era, JL forward bias, NNFX, exit indicator sweeps, 
 
 - `SESSION_ZERO.md` — full current state primer
 - `L_ARC_PROTOCOL.md` — active research methodology (read first)
-- `L_ARC_OPERATIONAL_SPEC.md` — per-step deliverables and scoring
+- `archive/L_ARC_OPERATIONAL_SPEC_v1_0.md` — v1.x per-step deliverables (historical; v2.0 protocol is self-contained)
 - `docs/LCHAR_TOPN_REGISTRY.md` — the 5 candidate signals being tested
 - `WORKFLOW.md` v2 — phase management and folder convention
 - `docs/KH_Research_Roadmap.md` — closed and deferred KH-arc items

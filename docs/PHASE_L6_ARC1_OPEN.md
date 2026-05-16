@@ -2,7 +2,7 @@
 >
 > This arc-open doc was written under L6.0 verbatim-as-gate framing, now SUPERSEDED by `L_ARC_PROTOCOL.md` v1.0.
 >
-> **Arc 1 is being redone** under the new protocol. The new arc-open doc will live at `results/l_arc_1/PHASE_L_ARC_1_OPEN.md` per `L_ARC_OPERATIONAL_SPEC.md` §2 folder structure.
+> **Arc 1 was redone** under v1.0 protocol (now archived; v2.0 is current as of 2026-05-16). v1.x folder convention at `archive/L_ARC_OPERATIONAL_SPEC_v1_0.md` §2 — same layout retained under v2.0.
 >
 > **What's retained from this original arc:** the step 1 trade-set (signal computation is unchanged; re-validation per `L_ARC_PROTOCOL.md` §5 confirms bit-identical match against canonical source).
 >

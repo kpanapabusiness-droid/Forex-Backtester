@@ -6,7 +6,8 @@
 **Methodology lock sha256:** 4a63827b0e8187882762090f5916aaf3f3137247aa77382806c3d57cfc8ac5e4
 
 **Methodology status note:** L6.0 was superseded on 2026-05-13 by
-`L_ARC_PROTOCOL.md` v1.0 and `L_ARC_OPERATIONAL_SPEC.md` v1.0. Phase 3 was
+`L_ARC_PROTOCOL.md` v1.0 (now archived; v2.0 active as of 2026-05-16) and
+`archive/L_ARC_OPERATIONAL_SPEC_v1_0.md`. Phase 3 was
 already in flight at supersession and is grandfathered under its own
 self-contained gate (§1.3 pre-committed pass conditions, §1.4 consistency
 check, §4 disposition rule). The methodology lock sha above is the

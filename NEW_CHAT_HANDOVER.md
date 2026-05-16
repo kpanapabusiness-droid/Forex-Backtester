@@ -1,8 +1,16 @@
 # L Arc — New Chat Handover Prompt
 
-This file contains the handover prompt to paste as the first message in a new Claude chat when opening or continuing L arc work under `L_ARC_PROTOCOL.md` v1.0.
+> **SUPERSEDED (2026-05-16):** This handover prompt was written for Arc 1 redo
+> under `L_ARC_PROTOCOL.md` v1.0. v2.0 (Arcs 3+) restructures the pipeline
+> (path-shape clustering + two-pipeline E/D1 extractability) and introduces a
+> one-live-arc-doc workflow per §13 that does not match the Chat A/B/C/D /
+> arc-open / per-step phase-doc structure described below. **Candidate for
+> removal or rewrite when Arc 3 opens.** v1.x references below are preserved
+> for historical context only.
 
-For Arc 1 redo (the current phase), use the prompt below. For subsequent arcs or continuations, adapt the bracketed sections.
+This file contains the handover prompt to paste as the first message in a new Claude chat when opening or continuing L arc work under `archive/L_ARC_PROTOCOL_v1_0.md` (v1.0, archived).
+
+For Arc 1 redo (historical), use the prompt below. For Arc 3+ under v2.0, write a new handover prompt aligned to v2.0 §13.
 
 ---
 

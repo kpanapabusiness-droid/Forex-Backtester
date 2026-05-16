@@ -1,7 +1,23 @@
 # Changelog
 
-## L_ARC_PROTOCOL v1.0 LOCKED | 2026-05-13 | METHODOLOGY REDESIGN
-`L_ARC_PROTOCOL.md` v1.0 and `L_ARC_OPERATIONAL_SPEC.md` v1.0 locked. Six-step extractability protocol replaces L6.0 verbatim-as-gate framing.
+## L_ARC_PROTOCOL v2.0 LOCKED | 2026-05-16 | STRUCTURAL REWRITE
+`L_ARC_PROTOCOL.md` v2.0 locked. Supersedes v1.0 + amendments (v1.1, v1.2, v1.3) for Arcs 3+. v1.x archived under `archive/`.
+- Clustering basis shifts from forward-geometry magnitude to outcome-blind path-shape (monotonicity, local_peaks, pullback, time_to_peak_rel)
+- Two-pipeline extractability: Pipeline E (entry-filter, RF AUC ≥ 0.65) and Pipeline D1 (deferred identification at bar N, RF AUC ≥ 0.60, ≤ 30% trades-exited-before-t)
+- Two gates sequenced: capturability (§2 floors) → extractability (§2 disjunctive)
+- Calibration anchor: KH-24 K=4 archetype 3 (passes via Pipeline D1 at t=3, RF AUC 0.638, exclusion 15.4%)
+- Documentation: one live arc doc per arc (`ARC_<N>_LIVE.md`), finalised at end as `ARC_<N>_RESULT.md` — replaces per-step phase-doc workflow
+- Workflow: direct-to-main for analysis scripts/results/calibration; PR required for backtester core, signal definitions, locked configs, CI, protocol doc
+- Filter stacking: two-tier rule — Tier 1 (single classifier / feature subset / stack of 2) to clear gate, Tier 2 lift candidates after
+- Exit-family map (§11): centroid pattern → archetype label → exit policy, per pipeline
+- Evidence base: PR #129 (archetype diagnostic), PR #130 (predictability investigation)
+- v1.0 + v1.1/v1.2 amendments + ops spec v1.0 moved to `archive/`
+- Governance docs (CLAUDE.md, STATUS.md, SESSION_ZERO.md, README.md, WORKFLOW.md, NEW_CHAT_HANDOVER.md) updated to reference v2.0 as active protocol
+- WORKFLOW.md / NEW_CHAT_HANDOVER.md flagged as v1.x-shaped — candidates for rewrite when Arc 3 opens
+- Pipeline D1 backtester extension is the next planned engine PR (conditional exits keyed on mid-trade classifier output at bar N)
+
+## L_ARC_PROTOCOL v1.0 LOCKED | 2026-05-13 | METHODOLOGY REDESIGN | SUPERSEDED 2026-05-16
+`archive/L_ARC_PROTOCOL_v1_0.md` (v1.0) and `archive/L_ARC_OPERATIONAL_SPEC_v1_0.md` (v1.0) locked. Six-step extractability protocol replaces L6.0 verbatim-as-gate framing.
 - Six steps: verbatim run (plumbing), descriptive trade-path analysis, extractability verdict, filter/exit derivation, re-characterisation, joint WFO
 - Dual-tier WFO disposition: PASS-DEPLOYABLE (worst-fold annualised ROI >5%, mean >8%, DD <8%) / PASS-VIABLE (worst-fold ROI >0%, DD <8%) / clean-null
 - Dual-gate step 3 verdict: AUC AND forward-geometry effect size AND cluster size ≥15% AND fold stability

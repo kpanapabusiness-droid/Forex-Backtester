@@ -1,5 +1,13 @@
 # WORKFLOW — Phase Management and Documentation
 
+> **v2.0 protocol note (2026-05-16):** `L_ARC_PROTOCOL.md` v2.0 §13 introduces the
+> one-live-arc-doc model (`ARC_<N>_LIVE.md`, finalised at arc end as
+> `ARC_<N>_RESULT.md`) and direct-to-main workflow for analysis. This supersedes
+> the per-step phase-doc / phase-close-prompt workflow described below for Arcs
+> 3+. The folder-convention sections below remain valid. The Phase Close Checklist
+> and templates are kept for v1.x historical reference and should not be applied
+> to v2.0 arcs — candidates for rewrite when WORKFLOW reaches v3.
+
 ## The Problem This Solves
 Previously, closing a phase required manual copy-paste across multiple documents,
 separate prompts, and manual uploads to the Claude project folder. This document
@@ -12,10 +20,11 @@ artefacts, configs — all co-located under the arc folder.
 
 The previous `docs/` convention is retired. Co-location of phase docs with their
 result artefacts is the new permanent standard, derived from the L arc protocol
-(`L_ARC_PROTOCOL.md` / `L_ARC_OPERATIONAL_SPEC.md`) and applied to all future work.
+(`L_ARC_PROTOCOL.md` v2.0; v1.x folder convention inherited from
+`archive/L_ARC_OPERATIONAL_SPEC_v1_0.md` §2) and applied to all future work.
 
 ### For L arc research (current and future arcs)
-Per `L_ARC_OPERATIONAL_SPEC.md` §2 folder structure:
+Per v1.x ops spec §2 folder structure (still in force):
 - Phase docs: `results/l_arc_N/PHASE_L_ARC_N_STEPK[_<candidate>].md`
 - Arc open/closure: `results/l_arc_N/PHASE_L_ARC_N_OPEN.md`, `PHASE_L_ARC_N_CLOSURE.md`
 - Per-step subfolders: `step1_verbatim/`, `step2_descriptive/`, etc.
@@ -34,7 +43,7 @@ The Claude project folder contains only files that change frequently:
 - `SESSION_ZERO.md`
 - `STATUS.md`
 - `CHANGELOG.md`
-- `L_ARC_PROTOCOL.md` and `L_ARC_OPERATIONAL_SPEC.md` (read at start of every arc chat)
+- `L_ARC_PROTOCOL.md` (v2.0, self-contained — read at start of every arc chat)
 - The current phase's open and result docs
 
 Static reference docs (GOLDEN_STANDARD_LOGIC, BACKTESTER_TEMPLATE, KH24_SYSTEM_LOCK
@@ -52,7 +61,7 @@ Run this at the end of every phase/step, in order:
 2. Update SESSION_ZERO.md "Current State" section only
 3. Append entry to CHANGELOG.md (most recent first)
 4. Update STATUS.md to reflect new current step
-5. Write handover note for next chat (per `L_ARC_OPERATIONAL_SPEC.md` §13 for L arc work)
+5. Write handover note for next chat (v1.x convention; v2.0 supersedes with one-live-arc-doc per `L_ARC_PROTOCOL.md` §13)
 6. Report which files changed — human uploads only those to Claude project folder
 
 ## Phase Close Prompt Template
@@ -61,8 +70,10 @@ Use this template when closing a phase. Fill in the bracketed sections.
 ---
 PHASE CLOSE — [ARC NAME / STEP NUMBER]
 
-Read `L_ARC_PROTOCOL.md` and `L_ARC_OPERATIONAL_SPEC.md` before starting. Follow
-the phase close checklist exactly.
+Read `L_ARC_PROTOCOL.md` before starting (v2.0 is self-contained; v1.x ops spec
+in `archive/` if working on a historical Arc 1/2 doc). Follow the phase close
+checklist exactly. **For v2.0 arcs use the one-live-arc-doc model instead — see
+`L_ARC_PROTOCOL.md` §13.**
 
 Phase document to write (`results/<arc>/<path>.md`):
 [Full phase document content]
@@ -94,9 +105,9 @@ Report all files changed when complete. Do not touch any other files.
 - Handover note for next chat at the bottom
 
 ## What Goes In An Arc-Open Document
-Per `L_ARC_OPERATIONAL_SPEC.md` §12 for L arcs. For non-L-arc work, the same
-template applies with the protocol version field replaced by the relevant
-governing methodology lock.
+**v1.x convention** (per `archive/L_ARC_OPERATIONAL_SPEC_v1_0.md` §12). For
+v2.0 arcs there is no separate arc-open doc — see `L_ARC_PROTOCOL.md` §13 for
+the one-live-arc-doc structure (`ARC_<N>_LIVE.md`).
 
 ## Modification Policy
 This workflow document is locked v2. Modifications require an explicit

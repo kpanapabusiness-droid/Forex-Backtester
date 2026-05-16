@@ -1,0 +1,6 @@
+dataset,K,exit_family_tag,archetype_ids_in_group,n_archetypes_in_group,total_size_fraction
+kh24,3,stepwise_lock,1,1,0.5027124773960217
+kh24,4,stepwise_lock,3,1,0.1338155515370705
+kh24,5,stepwise_lock,3,1,0.1229656419529837
+kh24,6,stepwise_lock,"2,4",2,0.37070524412296546
+kh24,7,stepwise_lock,1,1,0.2459312839059674

@@ -1,0 +1,15 @@
+dataset,K,archetype_id,centroid_summary,exit_family_tag,size_count,size_fraction_of_pool
+arc2,3,0,mono=0.54 peaks=24.2 pull=0.03 ttp=0.79,mixed,772,0.1933383420986726
+arc2,4,2,mono=0.54 peaks=24.1 pull=0.03 ttp=0.80,mixed,765,0.1915852742299023
+arc2,5,1,mono=0.54 peaks=26.5 pull=0.03 ttp=0.79,mixed,621,0.1555221637866266
+arc2,6,2,mono=0.54 peaks=26.8 pull=0.03 ttp=0.80,mixed,604,0.1512647132481843
+arc2,7,2,mono=0.54 peaks=27.1 pull=0.03 ttp=0.80,mixed,585,0.1465063861758076
+kh24,3,1,mono=0.60 peaks=6.7 pull=0.02 ttp=0.70,stepwise_lock,278,0.5027124773960217
+kh24,4,1,mono=0.60 peaks=3.9 pull=0.02 ttp=0.62,untradeable,219,0.3960216998191682
+kh24,4,3,mono=0.58 peaks=14.2 pull=0.02 ttp=0.85,stepwise_lock,74,0.1338155515370705
+kh24,5,3,mono=0.58 peaks=14.6 pull=0.02 ttp=0.85,stepwise_lock,68,0.1229656419529837
+kh24,5,4,mono=0.53 peaks=4.6 pull=0.02 ttp=0.78,mixed,153,0.2766726943942134
+kh24,6,2,mono=0.58 peaks=14.7 pull=0.02 ttp=0.85,stepwise_lock,67,0.1211573236889692
+kh24,6,4,mono=0.61 peaks=5.0 pull=0.02 ttp=0.76,stepwise_lock,138,0.2495479204339963
+kh24,7,1,mono=0.61 peaks=5.2 pull=0.02 ttp=0.76,stepwise_lock,136,0.2459312839059674
+kh24,7,3,mono=0.58 peaks=15.1 pull=0.02 ttp=0.86,mixed,61,0.1103074141048824

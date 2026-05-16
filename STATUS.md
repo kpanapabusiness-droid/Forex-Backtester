@@ -2,7 +2,7 @@
 
 > Tight current-state snapshot. For full context, read `SESSION_ZERO.md` first.
 > For methodology, read `L_ARC_PROTOCOL.md` (v2.0, self-contained).
-> Last updated: 2026-05-16 — Arc 3 CLOSED (CLEAN-NULL at Step 3); Arc 2 redo also CLOSED (KILL at Step 3) earlier same day.
+> Last updated: 2026-05-16 — three arcs CLOSED at Step 3 §2 floors (Arc 2 redo KILL, KH-24 v2.0 self-test HALT, Arc 3 CLEAN-NULL); Arc 4 next.
 
 ---
 
@@ -92,6 +92,7 @@ Annualisation: `fold_raw_ROI × (365 / fold_OOS_days)`. Folds < 90 OOS days excl
 | Phase | Verdict | Finding |
 | --- | --- | --- |
 | Arc 3 (l_arc_3) | CLEAN-NULL at Step 3 (2026-05-16) | TRIAL__volatility_regime__d1_atr_top_decile__any__h_120 — zero archetypes pass §2 as drawn; Stepwise climber profile shows real edge (mfe_p50 3.34R, reach_1R 83.6%, median final_r +1.85R) but killed by §2/§11-row-7 bimodal incompatibility; three reviewer flags + five cross-arc items |
+| KH-24 v2.0 self-test (arc_kh24_v2) | HALT at Step 3 (2026-05-16) | Bare `kb_exhaustion_bar` under v2.0 — protocol self-test. 0/5 clusters cleared §2 conjunctively → arc dies per §7. Best contender c4 (trend-rider, n=122, fwd_mfe_p50 6.65R, frac_reach_1R 1.000, frac_wrong_way 0.000) missed monotonicity floor by 0.020 AND shape_tag=scattered from 87.7% forward-window cap-binding. §14 anchor non-reproducible on bare signal (anchor measured on filtered deployed population). 8 cross-arc items added. Open-08 closed as resolved. |
 | Arc 2 redo | KILL at Step 3 (2026-05-16) | All 4 archetypes failed §2 capturability under hard floors; cluster 2 (Stepwise climber) carried strong magnitude but unextractable paths. Cross-arc carryover for v2.x calibration: Open-09 evidence, shape_tag definition pressure. |
 | L_ARC_PROTOCOL v2.0 | LOCKED 2026-05-16 | Path-shape clustering + two-pipeline E/D1 extractability; KH-24 K=4 archetype 3 = calibration anchor; v1.x archived for Arcs 1, 2 historical reference |
 | v2.0 predictability investigation | DELIVERED (PR #130) | Evidence base for v2.0 extractability gate |
@@ -110,10 +111,39 @@ Annualisation: `fold_raw_ROI × (365 / fold_OOS_days)`. Folds < 90 OOS days excl
 | --- | --- | --- |
 | Arc 3D diagnostic tail decision | HIGH | Reviewer to decide on running 2D SL × aggregation sweep before Arc 4 |
 | Arc 4 opens under v2.0 | HIGH | Step 1 plumbing on registry Entry 4 (1-bar horizon, univariate-extreme `neg`) |
-| Pipeline D1 backtester extension | HIGH | Conditional exits at bar N; next engine PR per v2.0 §13 |
-| v2.1 calibration tracking | MEDIUM | Five cross-arc items from Arc 3 (Open-12 through Open-15 plus Open-07 evidence) |
+| Pipeline D1 backtester extension | HIGH | Conditional exits at bar N; next engine PR per v2.0 §13. Work continues in separate chat. |
+| v2.1 calibration tracking | MEDIUM | Cross-arc items accumulating from Arcs 2 redo, KH-24 v2.0, Arc 3 — see Cross-arc calibration backlog below |
 
 No outstanding bugs or issues against KH-24. No pending fixes against the backtester.
+
+---
+
+## Watch Items
+
+| Item | Status | Notes |
+| --- | --- | --- |
+| §2 calibration pattern | 2/3 arcs hit it | 2026-05-16 closures: Arc 2 redo and KH-24 v2.0 self-test both failed §2 on monotonicity / shape_tag with strong-edge cohorts (KH-24 c4: fwd_mfe_p50 6.65R, reach_1R 1.000, missed mono by 0.020; Arc 2 redo c2: t-stat +52.17, missed mono by 0.009). Arc 3 closed CLEAN-NULL on related §2 floors. If Arc 4 closes the same way, §2 calibration moves from watch item to blocking the protocol from producing systems. Post-Arc-5 calibration review now has concrete inputs. |
+
+---
+
+## Cross-Arc Calibration Backlog (post-Arc-5 review)
+
+Items accumulating from arc closures under v2.0. Per §1.8 within-arc thresholds do not move; per §12 cross-arc calibration is governed and requires a calibration document + chat-level approval. The list below is record-only — no protocol or threshold edits yet.
+
+| Item | Source arc(s) | Priority | Notes |
+| --- | --- | --- | --- |
+| §2 monotonicity floor (0.55) calibration | KH-24 v2.0, Arc 2 redo | HIGH | KH-24 v2.0 c4 missed by 0.020 with structurally perfect profile; c1 by 0.049 with heavy_right_tail. Arc 2 redo c2 by 0.009 with t-stat +52.17 (n=2,278). Calibration review should consider whether 0.55 is too high, whether conjunctive AND should soften to "k of 6," or whether monotonicity should be median-across-cluster-trades rather than centroid. |
+| shape_tag definitions vs forward-window censoring | KH-24 v2.0 | HIGH | When N% of a cohort hits the window cap, their final_r is censored. KH-24 v2.0 c4: 87.7% cap-binders → shape_tag=scattered despite underlying MFE distribution being clean and right-tailed. Candidates: censor-aware shape_tag, shape_tag derived from MFE not final_r, or skip shape_tag for cohorts with > 50% cap-binders. |
+| 240-bar forward window for 4H signals | KH-24 v2.0 | HIGH | 16.7% pool-level cap-binding on bare KH-24; 87.7% on c4. Too tight for slow trend-following signals. Candidates: per-arc-configurable window, window scaled to expected hold time, or window extension when cap-binding exceeds a threshold. |
+| §14 anchor population vs §15 pool floor mismatch | KH-24 v2.0 | HIGH | §14 numbers measured on KH-24's filtered 214-trade deployed population; §15 pool floor (≥ 500) excludes that population. Anchor and protocol describe non-overlapping populations. Calibration review should either re-derive §14 on a v2.0-compatible population or document the mismatch explicitly. |
+| §17 `frac_wrong_way` definition | KH-24 v2.0 | MEDIUM | Ratify Def B (wrong-from-outset: MAE ≤ -1R before MFE > 0.5R, or MFE > 0.5R never reached) as protocol's intent. Add explicit definition to §17 glossary. Def A (final_r ≤ -0.5) gives nonsense on hard-SL designs. |
+| §16 Open-08 closure | KH-24 v2.0 | LOW | `pullback_magnitude_median` operational definition (close_r dip between peaks) is empirically non-degenerate on bare KH-24 (mode fraction 0.31). Open-08 can be closed as resolved. |
+| §11 archetype priors empirical refinement (Open-07) | KH-24 v2.0, Arc 2 redo, Arc 3 | MEDIUM | None of §11 patterns matched cleanly across the three arcs. Most clusters labelled `unresolved_*`. Cross-arc evidence accumulating that §11 centroid ranges are first-pass priors needing empirical refinement. |
+| Per-pair n distribution stability concern | KH-24 v2.0 | LOW | 15/28 pairs flagged < 30 trades in bare KH-24 pool. §5 keeps them; structural concern remains if downstream archetypes concentrate in low-n pairs. Candidates: per-archetype per-pair stability check at Step 5, or pool-level rule excluding low-n pairs from clusters they don't reach a minimum count in. |
+| Open-12 silhouette tie tolerance | Arc 3 | MEDIUM | (from Arc 3 closure doc) |
+| Open-13 §2/§11 row-7 bimodal incompatibility | Arc 3 | HIGH | (from Arc 3 closure doc; highest priority) |
+| Open-14 same-archetype aggregation rule | Arc 3 | MEDIUM | (from Arc 3 closure doc) |
+| Open-15 SL/horizon asymmetry inflating wrong_way | Arc 3 | MEDIUM | (from Arc 3 closure doc) |
 
 ---
 
@@ -142,6 +172,7 @@ Note: Arc 2 signal (mtf_alignment.2_down_mixed.kijun, h=120) shelved 2026-05-16 
 | L characterisation atlas | `results/lchar/` |
 | L arc signal testing (current) | `results/l_arc_N/` (folder convention inherited from v1.x ops spec §2) |
 | Arc 2 redo (closed KILL) | `results/l_arc_2_redo/` |
+| KH-24 v2.0 self-test (closed HALT) | `results/arc_kh24_v2/` + `results/arc_kh24_v2/ARC_KH24_V2_RESULT.md` |
 | Arc 3 (closed CLEAN-NULL) | `results/l_arc_3/` + `docs/arc_results/ARC_3_RESULT.md` |
 
 ---

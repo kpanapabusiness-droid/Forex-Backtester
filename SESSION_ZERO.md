@@ -1,6 +1,6 @@
 # SESSION ZERO — Forex Ignition Rebuild
 > 5-minute primer. Read this first, then read `L_ARC_PROTOCOL.md` (v2.0, self-contained) for the active research methodology.
-> Last updated: 2026-05-16 — Arc 3 CLOSED (CLEAN-NULL at Step 3); Arc 4 next under v2.0.
+> Last updated: 2026-05-16 — Three arcs CLOSED at Step 3 §2 floors (Arc 2 redo KILL, KH-24 v2.0 self-test HALT, Arc 3 CLEAN-NULL); Arc 4 next under v2.0.
 
 ---
 
@@ -16,7 +16,11 @@
 **ACTIVE WORK: L ARC SIGNAL TESTING UNDER L_ARC_PROTOCOL v2.0 — ARC 3 CLOSED, ARC 4 NEXT**
 **LIVE SYSTEM: KH-24 (locked, unchanged, running on VPS)**
 
-Arc 3 closed CLEAN-NULL at Step 3 on 2026-05-16. Closure doc flags three reviewer items — Stepwise climber opportunity (passes 4/6 §2 floors cleanly), aggregation rule destroying capturable sub-clusters, SL/horizon asymmetry inflating wrong_way. Five cross-arc items logged for v2.1. Diagnostic tail (Arc 3D) recommended before Arc 4 — reviewer decision pending. Result: `docs/arc_results/ARC_3_RESULT.md`.
+Three arcs closed on 2026-05-16, all at Step 3 §2 floors: Arc 2 redo (KILL), KH-24 v2.0 self-test (HALT), Arc 3 (CLEAN-NULL). KH-24 v2.0 self-test was a protocol self-test on the bare KH-24 signal — its closure surfaces the same §2 monotonicity / shape_tag failure mode seen on Arc 2 redo on a different signal with a different mechanism (forward-window censoring of the trend-rider cohort). The §14 calibration anchor was measured on KH-24's filtered deployed population (not bare signal), so v2.0 cannot self-validate on its own anchor as drawn. Cross-arc calibration backlog grew by 8 items, with §2 monotonicity floor and shape_tag-vs-censoring as the top priorities. Open-08 is closed as resolved (pullback_magnitude_median operational definition empirically non-degenerate on KH-24 paths). Arc 3 closure doc flags three reviewer items — Stepwise climber opportunity (passes 4/6 §2 floors cleanly), aggregation rule destroying capturable sub-clusters, SL/horizon asymmetry inflating wrong_way. Five cross-arc items logged for v2.1 from Arc 3. Diagnostic tail (Arc 3D) recommended before Arc 4 — reviewer decision pending. Results: `docs/arc_results/ARC_3_RESULT.md`, `results/arc_kh24_v2/ARC_KH24_V2_RESULT.md`, `results/l_arc_2_redo/ARC_2_REDO_RESULT.md`.
+
+Pipeline D1 backtester extension is in progress in a separate chat — value independent of these closures, carries forward to all future D1-routed archetypes.
+
+Pattern flag: two-of-three closures hit the same §2 monotonicity / shape_tag wall with structurally credible cohorts (KH-24 v2.0 c4: fwd_mfe_p50 6.65R, frac_reach_1R 1.000, frac_wrong_way 0.000, missed mono by 0.020; Arc 2 redo c2: t-stat +52.17, missed mono by 0.009). If Arc 4 closes the same way, §2 calibration moves from "watch item" to blocking the protocol — post-Arc-5 calibration review has concrete inputs.
 
 Next: Arc 4 — registry Entry 4 (1-bar horizon, univariate-extreme family, structurally different from Arc 3).
 
@@ -105,6 +109,10 @@ The L arc is methodologically distinct from KH-24 development. It does not assum
 ## Phase History
 
 *Note: when applying SESSION_ZERO updates, preserve any pre-existing Phase History entries below this line. New entries are appended at the top. The full list is what remains in the file.*
+
+### 2026-05-16 — KH-24 v2.0 self-test arc closed (HALT at Step 3)
+
+`results/arc_kh24_v2/ARC_KH24_V2_RESULT.md` written. Protocol self-test on the bare `kb_exhaustion_bar` signal (C1-C6, C8, C9; long-only; 4H; 1R = 2 × ATR(14); 240-bar forward window) — opened and closed same day. Step 1 PASS (pool 842, deterministic, no lookahead). Step 2 PASS (K=5, silhouette 0.4327, five clusters). Step 3 FAIL — zero of 5 clusters cleared §2 conjunctively → arc halts per §7 (STEP3_FAIL_NO_CAPTURABLE_ARCHETYPE). Best contender c4 (trend-rider cohort, n=122, 14.5% of pool): fwd_mfe_p50 6.65R, frac_reach_1R 1.000, frac_wrong_way 0.000 — missed monotonicity floor by 0.020 (mono=0.530 vs 0.55) and shape_tag was `scattered` because 87.7% of c4 trades hit the 240-bar forward-window cap, censoring final_r distribution. Two technical failures on a structurally-edge-carrying cohort. The §14 calibration anchor (mono 0.576) was measured on KH-24's deployed 214-trade population — already filtered through 1H CIR + currency cap — so v2.0 cannot mechanically rediscover, on bare signal, what v1.0's hand-crafted filters extracted. KH-24 v1.0 deployment unaffected. 8 cross-arc calibration items logged for post-Arc-5 review (top: §2 monotonicity floor, shape_tag censoring, 240-bar window, §14-vs-§15 population mismatch, §17 frac_wrong_way disambiguation). Open-08 closed as resolved (pullback_magnitude_median operational definition empirically non-degenerate). Pipeline D1 backtester extension work in separate chat continues. 77/77 CI tests passing.
 
 ### 2026-05-16 — Arc 3 closed CLEAN-NULL at Step 3 (with reviewer flags)
 

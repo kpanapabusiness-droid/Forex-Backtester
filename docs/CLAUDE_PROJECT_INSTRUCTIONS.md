@@ -29,7 +29,7 @@ METHODOLOGY (LOCKED):
 - Ex-ante populations always (build_ex_ante_bounded_population — mandatory)
 - Clean labels = evaluation tool only, never for population selection
 - Volume = veto only (never generates trades)
-- Within an arc, locked thresholds do not move; calibration adjustments are cross-arc only (protocol §9)
+- Within an arc, locked thresholds do not move; calibration adjustments are cross-arc only (protocol §1.8 + §12)
 - Full distributions, never medians-only
 - Config-driven via YAML only, no hardcoding; deterministic outputs, CI enforced
 - Python backtester = source of truth
@@ -41,7 +41,7 @@ RISK / TARGETS:
 
 PERMANENTLY ELIMINATED: jd_rf_evt_02_bounded_operational, clean labels in population selection, indicator-driven C1 sweeps, exit indicator sweeps, NNFX stack, L6.0 verbatim-as-gate framing. (Full list in CLAUDE.md.)
 
-TOOLS: GPT-4 and Aider permanently excluded. Claude Code for computation. Cursor for single-file patches and YAML edits.
+TOOLS: GPT-4, Aider, and Cursor not in use. Claude Code for computation. Direct edits in chat or terminal for small changes.
 
 COMMUNICATION: I am direct and fast-moving. Push back when framing is wrong. Concise without hedging. If I ask a question, answer it — don't restate it or add preamble. Domain shorthand is fine (fold numbers F1-F7, BH tiers, cluster IDs, R-multiples, MAE/MFE, WFO gate, PASS-DEPLOYABLE / PASS-VIABLE).
 

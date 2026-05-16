@@ -1,5 +1,21 @@
 # Changelog
 
+## KH-24 V2.0 SELF-TEST ARC CLOSED | 2026-05-16 | HALT AT STEP 3
+Protocol self-test arc on the bare `kb_exhaustion_bar` signal opened and closed same day under `L_ARC_PROTOCOL.md` v2.0.
+- Signal: bare KH-24 (C1-C6, C8, C9; C7 disabled); long-only, 4H, 28 FX, 1R = 2.0 × ATR(14), 240-bar forward window
+- Step 1 plumbing PASS: pool 842 trades, deterministic, no lookahead, spread per `SPREAD_SEMANTICS_LOCK.md`
+- Step 2 clustering PASS: K=5 chosen (silhouette 0.4327)
+- Step 3 capturability FAIL: 0/5 clusters passed §2 conjunctively → arc dies per §7 (STEP3_FAIL_NO_CAPTURABLE_ARCHETYPE)
+- Best contender c4 (trend-rider, n=122, 14.5% of pool): fwd_mfe_p50 6.65R, frac_reach_1R 1.000, frac_wrong_way 0.000 — missed monotonicity floor by 0.020 (mono=0.530 vs ≥0.55) AND shape_tag=scattered due to 87.7% forward-window cap-binding (censored final_r distribution)
+- §14 calibration anchor non-reproducible on bare signal — anchor was measured on KH-24's filtered deployed 214-trade population, not bare 842-trade signal; structural mismatch with §15 pool floor
+- Open-08 closed as resolved: `pullback_magnitude_median` operational definition empirically non-degenerate (mode fraction 0.31 on KH-24 paths, well under 0.80)
+- Pattern flag: two-of-two arcs closed at Step 3 §2 floors on 2026-05-16 (KH-24 v2.0 + Arc 2 redo) — different signals, same gate failure mode (monotonicity / shape_tag)
+- 8 cross-arc calibration candidates added to post-Arc-5 backlog: §2 monotonicity floor (0.55), shape_tag vs censoring, 240-bar forward window for 4H signals, §14-anchor / §15-pool mismatch, §17 `frac_wrong_way` disambiguation (Def B ratified), §11 archetype priors empirical refinement, per-pair n distribution stability, §16 Open-08 closure
+- Pipeline D1 backtester extension work continues in separate chat — independent of this arc's closure
+- KH-24 v1.0 deployment unaffected and unchanged
+- Outputs: `results/arc_kh24_v2/ARC_KH24_V2_RESULT.md` + step1/, step2/, step3/ subfolders
+- 77/77 CI tests passing under `tests/arc_kh24_v2/`
+
 ## ARC 3 CLOSED | 2026-05-16 | CLEAN-NULL at Step 3 (with reviewer flags)
 Arc 3 (`TRIAL__volatility_regime__d1_atr_top_decile__any__h_120`) closes CLEAN-NULL with three reviewer-flagged opportunities for v2.1 calibration.
 - Step 1 PASS: 2568 trades over 2020-10-01 → 2026-01-31, determinism byte-identical

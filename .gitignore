@@ -76,6 +76,10 @@ results/*
 # results data is direct-to-main).
 !results/arc_kh24_v2/
 !results/arc_kh24_v2/**
+# Arc 3 (L registry Entry 3: d1_atr_top_decile, h_120) — Step 1+ outputs
+# (L_ARC_PROTOCOL v2.0 §13: arc results data is direct-to-main).
+!results/l_arc_3/
+!results/l_arc_3/**
 results_phase*/
 __pycache__/
 .ipynb_checkpoints/

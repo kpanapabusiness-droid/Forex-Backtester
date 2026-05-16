@@ -149,7 +149,7 @@ These tests verify the invariants above. Any backtester change must keep them pa
 
 - **KH24_SYSTEM_LOCK.md** — describes the specific entry/exit architecture, parameters, and acceptance tests for the KH-24 live system. KH-24 inherits all invariants in this document and adds system-specific rules.
 - **L_ARC_PLAN.md** — describes the L characterization arc methodology. L inherits all invariants in this document; the descriptive-not-predictive rule and pre-registered bridge are L-arc-specific additions.
-- **PROJECT_RULES.md** — tool roles and decision trees that apply across all arcs.
+- **L_ARC_PROTOCOL.md §1 + §12** — methodology principles and operational rules that apply across all arcs.
 - **WORKFLOW.md** — phase management conventions.
 - **BACKTESTER_AUDIT.md** — implementation-level audit of the backtester engine.
 

@@ -21,8 +21,7 @@ For new sessions, read in this order:
 3. `STATUS.md` — tight current-state snapshot.
 4. `CLAUDE.md` — first-read context for AI assistants.
 5. `WORKFLOW.md` v2 — phase management and folder convention.
-6. `PROJECT_RULES.md` — tool roles and guardrails.
-7. `docs/GOLDEN_STANDARD_LOGIC.md` — execution truth invariants.
+6. `docs/GOLDEN_STANDARD_LOGIC.md` — execution truth invariants.
 
 For v1.x historical reference (Arcs 1, 2): `archive/L_ARC_PROTOCOL_v1_0.md`, `archive/L_ARC_OPERATIONAL_SPEC_v1_0.md`, plus v1.1/v1.2 amendments.
 
@@ -76,7 +75,6 @@ Top-level files in this repository serve specific roles. Read them in the right 
 | `docs/LCHAR_TOPN_REGISTRY.md` | When working on any L arc — the 5 candidate signals being tested |
 | `docs/KH_Research_Roadmap.md` | When questioning what's been tried in KH (closed and deferred items) |
 | `WORKFLOW.md` | When closing a phase or writing phase documentation |
-| `PROJECT_RULES.md` | When deciding which tool to use or how to scope a change |
 | `docs/GOLDEN_STANDARD_LOGIC.md` | When writing or reviewing backtester code; the formal invariants |
 | `docs/BACKTESTER_AUDIT.md` | When debugging backtester behavior or extending the engine |
 | `docs/BACKTESTER_SCHEMA.json` | When writing or modifying YAML configs |

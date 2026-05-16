@@ -1,5 +1,38 @@
 # Changelog
 
+## L_ARC_PROTOCOL v2.1 AMENDMENT | 2026-05-17 | doc-only
+Protocol amendment closing Open-08, Open-12, Open-13, Open-14, Open-15; partial close on Open-01 (forward-geometry only). Doc-only — engine work (SL-free path recording) deferred to separate engine PR; closed-arc re-runs under v2.1 deferred to post-engine-PR task.
+Resolutions:
+- Open-08 (`pullback_magnitude_median` degeneracy): empirically refuted by KH-24 v2.0 self-test (modal mass 0.31); closed as resolved
+- Open-12 (silhouette tie tolerance): defined as 0.01 absolute in §6
+- Open-13 (§2 / §11 row 7 bimodal incompatibility): §2 admits `bimodal_separated` shape_tag under Hartigan dip + mass + separation test in §7; routes to §11 row 7
+- Open-14 (same-archetype aggregation kills capturable sub-clusters): §7 evaluates per-cluster AND per-aggregate; cluster proceeds if either passes
+- Open-15 (SL/horizon asymmetry inflates frac_wrong_way): addressed via SL-free measurement (engine PR pending) + per-archetype SL sweep at Step 3
+Substantive changes:
+- §2 forward-geometry metrics split pre-peak (capturability gate) vs post-peak (exit-policy info)
+- §7 SL sweep replaces single-SL evaluation; smallest-SL-that-passes selected per archetype
+- §11 SL column demoted to prior; actual SL = Step 3 sweep result
+- §6 K-selection tie tolerance 0.01 absolute
+- §5 forward window auto-extend at >20% pool-level cap-binding
+- §17 frac_wrong_way Def C ratified (pre-peak)
+- §16 Open-16 added: 1R consistency across arcs (accepted as v2.1 design choice)
+Calibration anchor refresh pending engine PR + KH-24 v2.0 re-run.
+Files:
+- L_ARC_PROTOCOL.md → v2.1
+- STATUS.md updated for v2.1 active protocol
+- SESSION_ZERO.md version reference bump
+- PROTOCOL_IMPROVEMENT_BACKLOG.md marked resolved items
+
+## PIPELINE D1 BACKTESTER EXTENSION | 2026-05-17 | PR #131 MERGED
+Pipeline D1 plumbing landed per L_ARC_PROTOCOL v2.0 §3. Conditional exits keyed on mid-trade classifier output at bar N now supported. No D1 archetypes exist yet — extension is unexercised pending an arc producing a Step 4 candidate.
+- New: core/features_path_so_far.py — path-so-far feature builder, single source of truth for offline training + runtime engine
+- New: core/d1_pipeline.py — D1Hook class, Close / ApplyPolicy / Hold decision dataclasses, YAML config loader
+- Patched: scripts/phase_kgl_v2_4h_wfo.py — hook fires at line ~1352 (pre-Priority-1 SL check, post-bar_path append); entry features stored at trade open; D1_HOOK global with YAML loader in main(); byte-identical when D1_HOOK is None
+- Patched: L_ARC_PROTOCOL.md §3 — Pipeline D1 wording fixed: pre-t SL = 2.0 × ATR(14), "close at N+1 open" replaces "break-even close" framing; PR 1 / PR 2 scope split documented
+- Tests: 41 new tests in tests/test_d1_pipeline.py, all passing; CI green (push + pull_request)
+- Scope: PR 1 of 2. PR 2 (per-archetype §11 exit policies — MFE-lock, custom trail distances, TP1 half-off + trail, archetype-specific SL on classifier accept) deferred until an arc surfaces archetypes that need them. Trigger: Arc 4 or Arc 5 (or post-3D Stepwise climber if Open-13 amendment lands) produces an archetype reaching Step 4 with a §11 row the current engine cannot express.
+- Live system KH-24 unaffected; D1_HOOK = None for all current configs
+
 ## KH-24 V2.0 SELF-TEST ARC CLOSED | 2026-05-16 | HALT AT STEP 3
 Protocol self-test arc on the bare `kb_exhaustion_bar` signal opened and closed same day under `L_ARC_PROTOCOL.md` v2.0.
 - Signal: bare KH-24 (C1-C6, C8, C9; C7 disabled); long-only, 4H, 28 FX, 1R = 2.0 × ATR(14), 240-bar forward window

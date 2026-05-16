@@ -2,29 +2,36 @@
 
 > Tight current-state snapshot. For full context, read `SESSION_ZERO.md` first.
 > For methodology, read `L_ARC_PROTOCOL.md` (v2.0, self-contained).
-> Last updated: 2026-05-16 — three arcs CLOSED at Step 3 §2 floors (Arc 2 redo KILL, KH-24 v2.0 self-test HALT, Arc 3 CLEAN-NULL); Arc 4 next.
+> Last updated: 2026-05-17 — L_ARC_PROTOCOL v2.1 amendment landed (Open-08/12/13/14/15 closed; partial Open-01). PR #131 D1 backtester plumbing merged. Engine PR for SL-free path recording is next; closed-arc re-runs under v2.1 follow.
 
 ---
 
 ## Active protocol
 
-- Active protocol: L_ARC_PROTOCOL v2.0
-- Calibration anchor: KH-24 K=4 archetype 3 (passes via Pipeline D1 at t=3)
-- Next engine PR: Pipeline D1 backtester extension (conditional exits at bar N)
+- Active protocol: L_ARC_PROTOCOL v2.1 (amendment landed 2026-05-17)
+- Calibration anchor: KH-24 K=4 archetype 3 — v2.0 values; refresh under v2.1 pending engine PR + re-run
+- Next engine PR: SL-free path recording (extends `trades_paths.csv` past hypothetical SL exit; required for §7 SL sweep)
+- Next chat task: draft engine PR prompt for SL-free path recording
 
 ---
 
 ## Current Phase
 
-**Arc 3 closed CLEAN-NULL at Step 3 under `L_ARC_PROTOCOL.md` v2.0.** Zero archetypes pass §2 capturability floors as drawn. Stepwise climber (27.5% pool, n=707) is the closest call — passes mono / mfe_p50 3.34R / reach_1R 83.6% / size cleanly but killed by §2 shape_tag floor excluding bimodal, despite §11 row 7 defining bimodal as a valid archetype.
+**L_ARC_PROTOCOL v2.1 amendment landed 2026-05-17.** Doc-only protocol changes resolving Open-08/12/13/14/15 (partial Open-01). Substantive changes:
+- §2 forward-geometry metrics split pre-peak (gates capturability) and post-peak (informs exit-policy routing)
+- §7 SL sweep at Step 3 — per-cluster smallest-SL-that-passes selection from {0.5, 1.0, 1.5, 2.0, 3.0, 4.0} × ATR
+- §7 per-cluster AND per-aggregate §2 evaluation
+- §2/§7/§11 admit `bimodal_separated` shape_tag (Hartigan dip + mass + separation test)
+- §11 SL column demoted to prior; actual SL from Step 3 sweep
+- §5 forward window auto-extend (>20% cap-bind → 2×)
+- §6 K-tie tolerance 0.01 absolute
+- §17 frac_wrong_way Def C ratified (pre-peak)
 
-Five cross-arc items logged for v2.1: Open-12 (silhouette tie tolerance), Open-13 (§2/§11 row-7 incompatibility — highest priority), Open-14 (same-archetype aggregation rule), Open-15 (SL/horizon asymmetry), plus Open-07 evidence.
+Engine work for SL-free path recording is the next chat task. Closed-arc re-runs under v2.1 (KH-24 v2.0 self-test mandatory for anchor refresh; Arc 3 recommended as v2.1 validation; Arc 2 redo optional) follow engine PR landing.
 
-**Diagnostic tail (Arc 3D) recommended in closure doc** — reviewer decision pending whether to run before Arc 4 opens.
+PR #131 (Pipeline D1 backtester extension, plumbing only) merged 2026-05-17. PR 2 (per-archetype §11 exit policies) deferred until an arc surfaces a Step-4 consumer needing them.
 
-**Next:** Arc 4 (registry Entry 4: `TRIAL__univariate_extreme__bar_range_top_decile__neg__h_001`).
-
-Order under v2.0: Arc 4 → Arc 5.
+**Arc 4** opens after engine PR + re-runs land.
 
 ---
 
@@ -91,6 +98,8 @@ Annualisation: `fold_raw_ROI × (365 / fold_OOS_days)`. Folds < 90 OOS days excl
 
 | Phase | Verdict | Finding |
 | --- | --- | --- |
+| L_ARC_PROTOCOL v2.1 amendment | LANDED (2026-05-17) | Doc-only protocol amendment closing Open-08/12/13/14/15 (partial Open-01). Pre-peak §2 metrics, SL sweep at Step 3, per-cluster + per-aggregate evaluation, bimodal_separated admission, SL column demotion in §11, K-tie tolerance, forward window auto-extend. Engine PR + closed-arc re-runs follow. |
+| Pipeline D1 backtester extension | DELIVERED (PR #131, 2026-05-17) | D1 plumbing + close-at-market policy; 41 tests; byte-identical when D1_HOOK=None. PR 2 (per-archetype §11 exit policies) deferred — awaiting a Step-4 archetype consumer. |
 | Arc 3 (l_arc_3) | CLEAN-NULL at Step 3 (2026-05-16) | TRIAL__volatility_regime__d1_atr_top_decile__any__h_120 — zero archetypes pass §2 as drawn; Stepwise climber profile shows real edge (mfe_p50 3.34R, reach_1R 83.6%, median final_r +1.85R) but killed by §2/§11-row-7 bimodal incompatibility; three reviewer flags + five cross-arc items |
 | KH-24 v2.0 self-test (arc_kh24_v2) | HALT at Step 3 (2026-05-16) | Bare `kb_exhaustion_bar` under v2.0 — protocol self-test. 0/5 clusters cleared §2 conjunctively → arc dies per §7. Best contender c4 (trend-rider, n=122, fwd_mfe_p50 6.65R, frac_reach_1R 1.000, frac_wrong_way 0.000) missed monotonicity floor by 0.020 AND shape_tag=scattered from 87.7% forward-window cap-binding. §14 anchor non-reproducible on bare signal (anchor measured on filtered deployed population). 8 cross-arc items added. Open-08 closed as resolved. |
 | Arc 2 redo | KILL at Step 3 (2026-05-16) | All 4 archetypes failed §2 capturability under hard floors; cluster 2 (Stepwise climber) carried strong magnitude but unextractable paths. Cross-arc carryover for v2.x calibration: Open-09 evidence, shape_tag definition pressure. |
@@ -109,10 +118,11 @@ Annualisation: `fold_raw_ROI × (365 / fold_OOS_days)`. Folds < 90 OOS days excl
 
 | Item | Priority | Notes |
 | --- | --- | --- |
-| Arc 3D diagnostic tail decision | HIGH | Reviewer to decide on running 2D SL × aggregation sweep before Arc 4 |
-| Arc 4 opens under v2.0 | HIGH | Step 1 plumbing on registry Entry 4 (1-bar horizon, univariate-extreme `neg`) |
-| Pipeline D1 backtester extension | HIGH | Conditional exits at bar N; next engine PR per v2.0 §13. Work continues in separate chat. |
-| v2.1 calibration tracking | MEDIUM | Cross-arc items accumulating from Arcs 2 redo, KH-24 v2.0, Arc 3 — see Cross-arc calibration backlog below |
+| Engine PR: SL-free path recording | HIGH | Required for v2.1 Step 3 SL sweep. Extends `trades_paths.csv` past hypothetical SL exit to bar 240. Smaller scope than D1 PR 2. |
+| Closed-arc re-runs under v2.1 | HIGH | KH-24 v2.0 (anchor refresh, mandatory), Arc 3 (v2.1 validation, recommended), Arc 2 redo (cross-arc evidence, optional). Blocked on engine PR. |
+| Arc 3D diagnostic tail decision | SUPERSEDED | v2.1 amendment resolves Open-13/14/15 directly; closed-arc re-runs serve the same diagnostic purpose more completely. Decision moot. |
+| Arc 4 opens under v2.1 | HIGH | Opens after engine PR + KH-24 v2.0 re-run land. Registry Entry 4 (1-bar horizon, univariate-extreme `neg`). |
+| Pipeline D1 PR 2 (per-archetype §11 exit policies) | DEFERRED | Awaiting Arc 4 / Arc 5 (or post-Arc-3 re-run Stepwise climber under v2.1) to surface a §11 row the current engine cannot express. No build until concrete consumer surfaces. |
 
 No outstanding bugs or issues against KH-24. No pending fixes against the backtester.
 
@@ -128,22 +138,29 @@ No outstanding bugs or issues against KH-24. No pending fixes against the backte
 
 ## Cross-Arc Calibration Backlog (post-Arc-5 review)
 
-Items accumulating from arc closures under v2.0. Per §1.8 within-arc thresholds do not move; per §12 cross-arc calibration is governed and requires a calibration document + chat-level approval. The list below is record-only — no protocol or threshold edits yet.
+Items accumulating from arc closures under v2.0. Per §1.8 within-arc thresholds do not move; per §12 cross-arc calibration is governed and requires a calibration document + chat-level approval. The 2026-05-17 v2.1 amendment resolved or partially resolved most of the items below; items still requiring evidence / execution are kept under "Active backlog".
+
+### Resolved in v2.1 (2026-05-17 amendment)
+
+| Item | Source arc(s) | Resolution |
+| --- | --- | --- |
+| §17 `frac_wrong_way` definition | KH-24 v2.0 | CLOSED in v2.1 — §17 Def C ratified (MAE ≤ −1R on or before peak_mfe_bar) |
+| §16 Open-08 closure | KH-24 v2.0 | CLOSED 2026-05-17 — `pullback_magnitude_median` empirically non-degenerate; §16 marked resolved |
+| Open-12 silhouette tie tolerance | Arc 3 | CLOSED in v2.1 — §6 tolerance 0.01 absolute silhouette |
+| Open-13 §2/§11 row-7 bimodal incompatibility | Arc 3 | CLOSED in v2.1 — `bimodal_separated` admitted at §2 under Hartigan dip + mass + separation test; routes to §11 row 7 |
+| Open-14 same-archetype aggregation rule | Arc 3 | CLOSED in v2.1 — §7 evaluates per-cluster AND per-aggregate; cluster proceeds if either passes |
+| Open-15 SL/horizon asymmetry inflating wrong_way | Arc 3 | CLOSED in v2.1 — addressed via SL-free measurement (engine PR pending) + per-archetype SL sweep at §7 |
+| 240-bar forward window for 4H signals | KH-24 v2.0 | CLOSED in v2.1 — §5 forward window auto-extend at >20% pool-level cap-binding (2× extension default) |
+| Per-pair n distribution stability concern | KH-24 v2.0 | CLOSED in v2.1 — §9 per-pair stability reporting added at Step 5 (informational; flags > 50% concentration in < 5 pairs) |
+
+### Active backlog (still open or partial)
 
 | Item | Source arc(s) | Priority | Notes |
 | --- | --- | --- | --- |
-| §2 monotonicity floor (0.55) calibration | KH-24 v2.0, Arc 2 redo | HIGH | KH-24 v2.0 c4 missed by 0.020 with structurally perfect profile; c1 by 0.049 with heavy_right_tail. Arc 2 redo c2 by 0.009 with t-stat +52.17 (n=2,278). Calibration review should consider whether 0.55 is too high, whether conjunctive AND should soften to "k of 6," or whether monotonicity should be median-across-cluster-trades rather than centroid. |
-| shape_tag definitions vs forward-window censoring | KH-24 v2.0 | HIGH | When N% of a cohort hits the window cap, their final_r is censored. KH-24 v2.0 c4: 87.7% cap-binders → shape_tag=scattered despite underlying MFE distribution being clean and right-tailed. Candidates: censor-aware shape_tag, shape_tag derived from MFE not final_r, or skip shape_tag for cohorts with > 50% cap-binders. |
-| 240-bar forward window for 4H signals | KH-24 v2.0 | HIGH | 16.7% pool-level cap-binding on bare KH-24; 87.7% on c4. Too tight for slow trend-following signals. Candidates: per-arc-configurable window, window scaled to expected hold time, or window extension when cap-binding exceeds a threshold. |
-| §14 anchor population vs §15 pool floor mismatch | KH-24 v2.0 | HIGH | §14 numbers measured on KH-24's filtered 214-trade deployed population; §15 pool floor (≥ 500) excludes that population. Anchor and protocol describe non-overlapping populations. Calibration review should either re-derive §14 on a v2.0-compatible population or document the mismatch explicitly. |
-| §17 `frac_wrong_way` definition | KH-24 v2.0 | MEDIUM | Ratify Def B (wrong-from-outset: MAE ≤ -1R before MFE > 0.5R, or MFE > 0.5R never reached) as protocol's intent. Add explicit definition to §17 glossary. Def A (final_r ≤ -0.5) gives nonsense on hard-SL designs. |
-| §16 Open-08 closure | KH-24 v2.0 | LOW | `pullback_magnitude_median` operational definition (close_r dip between peaks) is empirically non-degenerate on bare KH-24 (mode fraction 0.31). Open-08 can be closed as resolved. |
-| §11 archetype priors empirical refinement (Open-07) | KH-24 v2.0, Arc 2 redo, Arc 3 | MEDIUM | None of §11 patterns matched cleanly across the three arcs. Most clusters labelled `unresolved_*`. Cross-arc evidence accumulating that §11 centroid ranges are first-pass priors needing empirical refinement. |
-| Per-pair n distribution stability concern | KH-24 v2.0 | LOW | 15/28 pairs flagged < 30 trades in bare KH-24 pool. §5 keeps them; structural concern remains if downstream archetypes concentrate in low-n pairs. Candidates: per-archetype per-pair stability check at Step 5, or pool-level rule excluding low-n pairs from clusters they don't reach a minimum count in. |
-| Open-12 silhouette tie tolerance | Arc 3 | MEDIUM | (from Arc 3 closure doc) |
-| Open-13 §2/§11 row-7 bimodal incompatibility | Arc 3 | HIGH | (from Arc 3 closure doc; highest priority) |
-| Open-14 same-archetype aggregation rule | Arc 3 | MEDIUM | (from Arc 3 closure doc) |
-| Open-15 SL/horizon asymmetry inflating wrong_way | Arc 3 | MEDIUM | (from Arc 3 closure doc) |
+| §2 monotonicity floor (0.55) calibration | KH-24 v2.0, Arc 2 redo | HIGH | v2.1 §7 likely subsumes via pre-peak measurement (monotonicity now restricted to bars 0..peak_mfe_bar). Confirm via closed-arc re-runs under v2.1; floor stays 0.55 pending evidence. |
+| shape_tag definitions vs forward-window censoring | KH-24 v2.0 | HIGH | v2.1 `bimodal_separated` admission covers part of the tightness. Censoring-vs-shape_tag tension (e.g. KH-24 v2.0 c4 87.7% cap-binders → shape_tag=scattered) remains until re-run evidence. Forward window auto-extend reduces but doesn't eliminate. |
+| §14 anchor population vs §15 pool floor mismatch | KH-24 v2.0 | HIGH | v2.1 §14 documents refresh path. Execution pending engine PR + KH-24 v2.0 re-run under v2.1. |
+| §11 archetype priors empirical refinement (Open-07) | KH-24 v2.0, Arc 2 redo, Arc 3 | MEDIUM | v2.1 demotes §11 SL column to prior (actual SL = Step 3 sweep). Centroid-pattern refresh remains open; deferred until Arc 4 + Arc 5 produce additional evidence. |
 
 ---
 

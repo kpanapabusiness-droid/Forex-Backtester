@@ -126,11 +126,11 @@ Disjunctive across pipelines: archetype passes extractability if it clears E OR 
 ### Pipeline D1 — Deferred-identification
 
 1. Train t=N RF classifier on features at bar offset N.
-2. Signal fires → enter with archetype-appropriate initial SL → hold to bar N.
+2. Signal fires → enter with uniform pre-t SL (entry − 2.0 × ATR(14), matching KH-24 baseline) → hold to bar N. Archetype-specific SL replaces the pre-t SL at bar N once classifier verdict lands (PR 2 — not in PR 1).
 3. At bar N: classifier evaluates → apply archetype exit policy from §11.
-4. Trades classifier deems untradeable at bar N: close at break-even or small loss.
+4. Trades classifier deems untradeable at bar N: close at market on bar N+1 open. Expected outcome is near-break-even small loss after spread, given the short hold and pre-t SL — engine books the realised PnL.
 
-**Backtester:** REQUIRES EXTENSION. Conditional exits keyed on mid-trade classifier output. Estimate 3-5 days. Pipeline D1 archetypes cannot reach Step 6 WFO until extension lands (next engine PR per §13).
+**Backtester:** PR 1 lands plumbing + close-at-market (uniform pre-t SL, classifier evaluation at bar N, untradeable trades close at N+1 open). PR 2 ships per-archetype exit policies (archetype-specific SL replacement at bar N, custom trail distances, TP targets). Pipeline D1 archetypes can reach Step 6 WFO under PR 1 for the close-at-market path; the full archetype-policy WFO awaits PR 2.
 
 **Early-exit attrition:** smaller N preserves addressable pool but weakens signal; larger N improves signal but loses trades. 30% exclusion floor balances this.
 

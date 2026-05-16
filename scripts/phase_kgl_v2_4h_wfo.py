@@ -46,6 +46,8 @@ sys.path.insert(0, str(PROJECT_ROOT))
 os.chdir(PROJECT_ROOT)
 warnings.filterwarnings("ignore")
 
+from core.d1_pipeline import D1Hook, apply_d1_hook_per_bar  # noqa: E402
+from core.features_path_so_far import build_entry_features_at_signal_bar  # noqa: E402
 from core.utils import get_pip_size, load_pair_csv  # noqa: E402
 from signals.kb_exhaustion_bar import _wilder_atr  # noqa: E402
 
@@ -423,6 +425,11 @@ RISK_PCT       = 0.02
 INITIAL_BAL    = 10_000.0
 EXPOSURE_CAP   = 1
 SIGNAL_DIRECTION = "long"  # "long" or "short" — set via config direction: short
+
+# ── Pipeline D1 hook (L_ARC_PROTOCOL v2.0 §3) ────────────────────────────────
+# None preserves baseline byte-for-byte. Configured at run-start from the
+# top-level ``d1_archetypes`` YAML block. See core/d1_pipeline.py.
+D1_HOOK: "D1Hook | None" = None
 
 # ── WFO configuration ─────────────────────────────────────────────────────────
 WFO_START       = datetime(2019, 1, 1)
@@ -1350,6 +1357,20 @@ def _simulate_kgl_v2(
             exit_bar    = j
             exit_reason = None
 
+            # Pipeline D1 hook (L_ARC_PROTOCOL v2.0 §3). When configured,
+            # fires exactly once per trade at bar offset t == D1_HOOK.bar_offset_t.
+            # Close decision: exit at next bar's open with reason "d1_untradeable"
+            # (last-bar fallback collapses to bar j close). ApplyPolicy / Hold
+            # are no-ops in PR 1 — the legacy cascade below handles the trade.
+            if D1_HOOK is not None:
+                _d1_px, _d1_bar, _d1_reason = apply_d1_hook_per_bar(
+                    D1_HOOK, trade, j, entry_idx, cached, c_j,
+                )
+                if _d1_reason is not None:
+                    exit_px     = _d1_px
+                    exit_bar    = _d1_bar
+                    exit_reason = _d1_reason
+
             # Priority 1: Intrabar hard SL
             if exit_reason is None:
                 if SIGNAL_DIRECTION == "short":
@@ -2269,6 +2290,21 @@ def _simulate_kgl_v2(
                 currency_exposure[base]  += 1
                 currency_exposure[quote] -= 1
 
+            # Pipeline D1: compute the 8 base entry features at signal bar N
+            # for downstream classifier evaluation at bar offset t. Storage is
+            # gated on D1_HOOK so the baseline path remains byte-identical when
+            # no D1 archetypes are configured.
+            entry_features_dict: dict[str, float] | None = None
+            if D1_HOOK is not None:
+                entry_features_dict = build_entry_features_at_signal_bar(
+                    open_arr=cached["o"],
+                    high_arr=cached["h"],
+                    low_arr=cached["lo"],
+                    close_arr=cached["c"],
+                    atr_at_signal_bar=float(a),
+                    signal_bar_idx=int(i),
+                )
+
             open_trades.append({
                 "pair":           pair,
                 "base_ccy":       base,
@@ -2312,6 +2348,7 @@ def _simulate_kgl_v2(
                 ),
                 "time_to_peak_mfe":    0,
                 "time_to_trough_mae":  0,
+                "entry_features":      entry_features_dict,
             })
 
     # Close any remaining open trades at last available close
@@ -3588,6 +3625,7 @@ def main() -> None:
     global KH17_WATCH_WINDOW_BARS, KH17_WATCH_SL_ATR_MULT
     global KH17_STATE1_SL_ATR_MULT
     global KH17_BAR6_MFE_THRESHOLD, KH17_BAR6_MAE_THRESHOLD
+    global D1_HOOK
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", "--config", default=None)
@@ -3999,6 +4037,18 @@ def main() -> None:
             raise ValueError(
                 "kh25_reentry_enabled is mutually exclusive with kh17_enabled "
                 "and kh18_enabled. Enable at most one per run."
+            )
+
+        # Pipeline D1 hook (L_ARC_PROTOCOL v2.0 §3). Absent or empty block
+        # leaves D1_HOOK = None and the engine behaves byte-identically to
+        # the baseline. See core/d1_pipeline.py for schema details.
+        if cfg.get("d1_archetypes"):
+            D1_HOOK = D1Hook.from_yaml_dict(
+                cfg["d1_archetypes"], project_root=PROJECT_ROOT,
+            )
+            print(
+                f"  Pipeline D1: ENABLED — {len(D1_HOOK.archetypes)} archetype(s), "
+                f"bar_offset_t={D1_HOOK.bar_offset_t}"
             )
 
     D1_ATR_DIST_CAP = args.threshold

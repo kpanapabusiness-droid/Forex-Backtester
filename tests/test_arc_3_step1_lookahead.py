@@ -23,13 +23,13 @@ import numpy as np
 import pandas as pd
 import pytest
 
+from scripts.arc_3.step1_backtest import _wilder_atr_1h
 from signals.lchar_d1atr_top_decile import (
     _compute_d1_atr_sma,
     _lookback_d1_to_1h,
     _trailing_top_decile,
     compute_signal,
 )
-from scripts.arc_3.step1_backtest import _wilder_atr_1h
 
 
 def _make_d1(n: int = 200, seed: int = 7) -> pd.DataFrame:

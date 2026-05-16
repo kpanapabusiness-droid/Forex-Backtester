@@ -25,7 +25,7 @@ import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -41,7 +41,6 @@ from scripts.arc_2_redo.arc2_signal import (  # noqa: E402
     wilder_atr,
 )
 from scripts.lchar.compute_spread_floors import compute_body_sha256  # noqa: E402
-
 
 # ============================================================
 # Constants
@@ -753,7 +752,7 @@ def write_summary(
     lines.append("")
     lines.append("Two-run byte-identical hashes (sha256):")
     lines.append("")
-    lines.append(f"- `trades_all.csv`")
+    lines.append("- `trades_all.csv`")
     lines.append(f"  - run 1: `{trades_csv_sha_run1}`")
     if trades_csv_sha_run2 is not None:
         lines.append(f"  - run 2: `{trades_csv_sha_run2}`")
@@ -762,7 +761,7 @@ def write_summary(
         )
     else:
         lines.append("  - run 2: skipped (cfg.output.determinism_check=false)")
-    lines.append(f"- `trades_paths.csv`")
+    lines.append("- `trades_paths.csv`")
     lines.append(f"  - run 1: `{paths_csv_sha_run1}`")
     if paths_csv_sha_run2 is not None:
         lines.append(f"  - run 2: `{paths_csv_sha_run2}`")

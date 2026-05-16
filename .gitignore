@@ -68,6 +68,10 @@ results/*
 # on KH-24 + Arc 1 + Arc 2 (diagnostic only; no protocol revision)
 !results/v2_0_diagnostic/
 !results/v2_0_diagnostic/**
+# v2.0 predictability investigation — entry-time + t>0 angles on
+# target archetypes from PR #129 (diagnostic only; no protocol revision)
+!results/v2_0_predictability/
+!results/v2_0_predictability/**
 results_phase*/
 __pycache__/
 .ipynb_checkpoints/

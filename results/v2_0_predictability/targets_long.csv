@@ -1,0 +1,16 @@
+dataset,K,target_id,target_kind,archetype_ids,exit_family_tag
+arc2,3,arch_0,archetype,0,mixed
+arc2,4,arch_2,archetype,2,mixed
+arc2,5,arch_1,archetype,1,mixed
+arc2,6,arch_2,archetype,2,mixed
+arc2,7,arch_2,archetype,2,mixed
+kh24,3,arch_1,archetype,1,stepwise_lock
+kh24,4,arch_1,archetype,1,untradeable
+kh24,4,arch_3,archetype,3,stepwise_lock
+kh24,5,arch_3,archetype,3,stepwise_lock
+kh24,5,arch_4,archetype,4,mixed
+kh24,6,arch_2,archetype,2,stepwise_lock
+kh24,6,arch_4,archetype,4,stepwise_lock
+kh24,7,arch_1,archetype,1,stepwise_lock
+kh24,7,arch_3,archetype,3,mixed
+kh24,6,group_stepwise_lock,group,"2,4",stepwise_lock

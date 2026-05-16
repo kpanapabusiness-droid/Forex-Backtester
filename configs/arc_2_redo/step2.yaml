@@ -1,0 +1,58 @@
+# Arc 2 redo — Step 2 path-shape clustering config
+#
+# Protocol: L_ARC_PROTOCOL.md v2.0 §§1, 6, 11
+# Input:   results/l_arc_2_redo/step1/trades_paths.csv + trades_all.csv
+# Outputs: results/l_arc_2_redo/step2/...
+
+phase: arc_2_redo_step2
+description: >-
+  Path-shape clustering on Arc 2 redo Step 1 pool (12,262 trades).
+  Outcome-blind features per v2.0 §6, K-means sweep K in {3..7},
+  cluster-to-archetype labelling per §11.
+
+input:
+  step1_dir: results/l_arc_2_redo/step1
+  paths_csv: trades_paths.csv
+  trades_csv: trades_all.csv
+
+output:
+  results_dir: results/l_arc_2_redo/step2
+  features_csv: path_features.csv
+  diagnostics_csv: feature_diagnostics.csv
+  histograms_png: feature_histograms.png
+  sweep_csv: silhouette_sweep.csv
+  archetypes_csv: archetype_assignments.csv
+  summary_md: STEP2_SUMMARY.md
+  determinism_check: true
+
+# ----------------------------------------------------------------------
+# Clustering parameters (v2.0 §6 locked)
+# ----------------------------------------------------------------------
+clustering:
+  k_sweep: [3, 4, 5, 6, 7]
+  random_state: 42
+  n_init: 10
+  max_iter: 300
+  silhouette_sample_size: 5000
+
+# ----------------------------------------------------------------------
+# Feature degeneracy thresholds (v2.0 §6)
+# ----------------------------------------------------------------------
+degeneracy:
+  modal_bin_mass_threshold: 0.80   # >80% mass in single hist bin = flag
+  histogram_bins: 50
+
+# ----------------------------------------------------------------------
+# Gate thresholds (v2.0 §6)
+# ----------------------------------------------------------------------
+gates:
+  silhouette_min: 0.30
+  max_cluster_fraction: 0.90       # no cluster > 90% of trades
+  min_cluster_count: 30            # all clusters >= 30 trades
+
+# ----------------------------------------------------------------------
+# Archetype boundary (v2.0 §11)
+# ----------------------------------------------------------------------
+archetype:
+  # A cluster centroid is "near" a threshold if within this fraction of it.
+  boundary_relative_distance: 0.10

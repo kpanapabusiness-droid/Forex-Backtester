@@ -35,7 +35,7 @@ _REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-from scripts.arc_2_redo.signal import (  # noqa: E402
+from scripts.arc_2_redo.arc2_signal import (  # noqa: E402
     attach_kijun_sign,
     compute_signal_mask,
     wilder_atr,

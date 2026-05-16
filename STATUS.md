@@ -2,7 +2,7 @@
 
 > Tight current-state snapshot. For full context, read `SESSION_ZERO.md` first.
 > For methodology, read `L_ARC_PROTOCOL.md` (v2.0, self-contained).
-> Last updated: 2026-05-16 — Arc 2 redo CLOSED (KILL at Step 3); Arc 3 continues unaffected.
+> Last updated: 2026-05-16 — Arc 3 CLOSED (CLEAN-NULL at Step 3); Arc 2 redo also CLOSED (KILL at Step 3) earlier same day.
 
 ---
 
@@ -16,9 +16,15 @@
 
 ## Current Phase
 
-**Arc 3 opens under `L_ARC_PROTOCOL.md` v2.0.** v2.0 restructures the pipeline around path-shape (outcome-blind) clustering and two-pipeline extractability (E entry-filter / D1 deferred-identification). Arcs 1 and 2 ran under v1.x and are historical.
+**Arc 3 closed CLEAN-NULL at Step 3 under `L_ARC_PROTOCOL.md` v2.0.** Zero archetypes pass §2 capturability floors as drawn. Stepwise climber (27.5% pool, n=707) is the closest call — passes mono / mfe_p50 3.34R / reach_1R 83.6% / size cleanly but killed by §2 shape_tag floor excluding bimodal, despite §11 row 7 defining bimodal as a valid archetype.
 
-Order under v2.0: Arc 3 → Arc 4 → Arc 5.
+Five cross-arc items logged for v2.1: Open-12 (silhouette tie tolerance), Open-13 (§2/§11 row-7 incompatibility — highest priority), Open-14 (same-archetype aggregation rule), Open-15 (SL/horizon asymmetry), plus Open-07 evidence.
+
+**Diagnostic tail (Arc 3D) recommended in closure doc** — reviewer decision pending whether to run before Arc 4 opens.
+
+**Next:** Arc 4 (registry Entry 4: `TRIAL__univariate_extreme__bar_range_top_decile__neg__h_001`).
+
+Order under v2.0: Arc 4 → Arc 5.
 
 ---
 
@@ -53,7 +59,7 @@ L arc signal testing under `L_ARC_PROTOCOL.md` v2.0 (Arcs 3+). v1.x archive at `
 | Protocol | `L_ARC_PROTOCOL.md` v2.0 (self-contained; v1.x ops spec archived) |
 | Signals | Top-N from `docs/LCHAR_TOPN_REGISTRY.md` — 5 arcs scheduled |
 | Approach | Six-step pipeline: plumbing → path-shape clustering → capturability → extractability (E or D1) → cross-fold stability → WFO |
-| Current arc | Arc 3 opens under v2.0 |
+| Current arc | Arc 4 — opens after Arc 3 closure (CLEAN-NULL) and any authorised Arc 3D diagnostic |
 | Calibration anchor | KH-24 K=4 archetype 3 (passes via Pipeline D1 at t=3) |
 | Risk per trade | 0.5% × reset floor balance |
 | Pair set | All 28 FX, same as KH-24 |
@@ -85,6 +91,7 @@ Annualisation: `fold_raw_ROI × (365 / fold_OOS_days)`. Folds < 90 OOS days excl
 
 | Phase | Verdict | Finding |
 | --- | --- | --- |
+| Arc 3 (l_arc_3) | CLEAN-NULL at Step 3 (2026-05-16) | TRIAL__volatility_regime__d1_atr_top_decile__any__h_120 — zero archetypes pass §2 as drawn; Stepwise climber profile shows real edge (mfe_p50 3.34R, reach_1R 83.6%, median final_r +1.85R) but killed by §2/§11-row-7 bimodal incompatibility; three reviewer flags + five cross-arc items |
 | Arc 2 redo | KILL at Step 3 (2026-05-16) | All 4 archetypes failed §2 capturability under hard floors; cluster 2 (Stepwise climber) carried strong magnitude but unextractable paths. Cross-arc carryover for v2.x calibration: Open-09 evidence, shape_tag definition pressure. |
 | L_ARC_PROTOCOL v2.0 | LOCKED 2026-05-16 | Path-shape clustering + two-pipeline E/D1 extractability; KH-24 K=4 archetype 3 = calibration anchor; v1.x archived for Arcs 1, 2 historical reference |
 | v2.0 predictability investigation | DELIVERED (PR #130) | Evidence base for v2.0 extractability gate |
@@ -101,9 +108,10 @@ Annualisation: `fold_raw_ROI × (365 / fold_OOS_days)`. Folds < 90 OOS days excl
 
 | Item | Priority | Notes |
 | --- | --- | --- |
-| Arc 3 opens under v2.0 | HIGH | Step 1 plumbing → Step 2 path-shape clustering → Step 3 capturability per v2.0 §5–§7 |
-| Pipeline D1 backtester extension | HIGH | Conditional exits keyed on mid-trade classifier output at bar N; next engine PR per v2.0 §13 |
-| Arc 3 live doc | HIGH | One `ARC_3_LIVE.md` per v2.0 §13; finalised as `ARC_3_RESULT.md` at arc end |
+| Arc 3D diagnostic tail decision | HIGH | Reviewer to decide on running 2D SL × aggregation sweep before Arc 4 |
+| Arc 4 opens under v2.0 | HIGH | Step 1 plumbing on registry Entry 4 (1-bar horizon, univariate-extreme `neg`) |
+| Pipeline D1 backtester extension | HIGH | Conditional exits at bar N; next engine PR per v2.0 §13 |
+| v2.1 calibration tracking | MEDIUM | Five cross-arc items from Arc 3 (Open-12 through Open-15 plus Open-07 evidence) |
 
 No outstanding bugs or issues against KH-24. No pending fixes against the backtester.
 
@@ -134,6 +142,7 @@ Note: Arc 2 signal (mtf_alignment.2_down_mixed.kijun, h=120) shelved 2026-05-16 
 | L characterisation atlas | `results/lchar/` |
 | L arc signal testing (current) | `results/l_arc_N/` (folder convention inherited from v1.x ops spec §2) |
 | Arc 2 redo (closed KILL) | `results/l_arc_2_redo/` |
+| Arc 3 (closed CLEAN-NULL) | `results/l_arc_3/` + `docs/arc_results/ARC_3_RESULT.md` |
 
 ---
 

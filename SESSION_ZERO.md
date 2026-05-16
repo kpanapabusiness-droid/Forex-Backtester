@@ -1,6 +1,6 @@
 # SESSION ZERO — Forex Ignition Rebuild
 > 5-minute primer. Read this first, then read `L_ARC_PROTOCOL.md` (v2.0, self-contained) for the active research methodology.
-> Last updated: 2026-05-16 — L_ARC_PROTOCOL v2.0 locked, Arc 3 opens under v2.0.
+> Last updated: 2026-05-16 — Arc 3 CLOSED (CLEAN-NULL at Step 3); Arc 4 next under v2.0.
 
 ---
 
@@ -13,8 +13,12 @@
 
 ## Current State
 
-**ACTIVE WORK: L ARC SIGNAL TESTING UNDER L_ARC_PROTOCOL v2.0 (ARC 3+)**
+**ACTIVE WORK: L ARC SIGNAL TESTING UNDER L_ARC_PROTOCOL v2.0 — ARC 3 CLOSED, ARC 4 NEXT**
 **LIVE SYSTEM: KH-24 (locked, unchanged, running on VPS)**
+
+Arc 3 closed CLEAN-NULL at Step 3 on 2026-05-16. Closure doc flags three reviewer items — Stepwise climber opportunity (passes 4/6 §2 floors cleanly), aggregation rule destroying capturable sub-clusters, SL/horizon asymmetry inflating wrong_way. Five cross-arc items logged for v2.1. Diagnostic tail (Arc 3D) recommended before Arc 4 — reviewer decision pending. Result: `docs/arc_results/ARC_3_RESULT.md`.
+
+Next: Arc 4 — registry Entry 4 (1-bar horizon, univariate-extreme family, structurally different from Arc 3).
 
 As of 2026-05-16, `L_ARC_PROTOCOL.md` v2.0 is locked and supersedes v1.0 + amendments. v2.0 restructures the pipeline around path-shape (outcome-blind) clustering and a two-pipeline extractability gate: Pipeline E (entry filter) and Pipeline D1 (deferred identification at bar N). KH-24 K=4 archetype 3 is the calibration anchor (passes via Pipeline D1 at t=3). Arcs 1 and 2 ran under v1.x and are historical; v2.0 governs Arc 3 onward.
 
@@ -101,6 +105,10 @@ The L arc is methodologically distinct from KH-24 development. It does not assum
 ## Phase History
 
 *Note: when applying SESSION_ZERO updates, preserve any pre-existing Phase History entries below this line. New entries are appended at the top. The full list is what remains in the file.*
+
+### 2026-05-16 — Arc 3 closed CLEAN-NULL at Step 3 (with reviewer flags)
+
+`TRIAL__volatility_regime__d1_atr_top_decile__any__h_120` taken through v2.0 Steps 1-3. Step 1 PASS (2568 trades). Step 2 PASS (K=7). Step 3 FAIL — zero archetypes pass §2. Stepwise climber (27.5%, n=707) is the closest call: passes mono 0.559, mfe_p50 3.34R (2.2× floor), reach_1R 83.6%, size; killed only by shape_tag=bimodal (excluded by §2 despite §11 row 7 defining the exit policy) and wrong_way 38.3%. Median final_r +1.85R. Three reviewer flags in closure doc. Five v2.1 cross-arc items: Open-12, Open-13 (highest priority), Open-14, Open-15, Open-07 evidence. Arc 3D diagnostic tail recommended. Result: `docs/arc_results/ARC_3_RESULT.md`.
 
 ### 2026-05-16 — Arc 2 redo CLOSED: KILL at Step 3
 

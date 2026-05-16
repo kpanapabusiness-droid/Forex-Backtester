@@ -682,6 +682,41 @@ joblib used for v2.0. ONNX/PMML for cross-version portability is a future concer
 
 **Status:** not blocking. Address when reproducibility issues surface.
 
+### Open-12: Silhouette tie tolerance for K selection
+
+§6 K selection rule "ties: smaller K preferred" lacks tolerance definition. Arc 3 chose K=7 over K=4 on a 0.0021 silhouette margin (range across five Ks: 0.0165 — effectively noise).
+
+**Status:** v2.1 calibration. Proposed: relative threshold (e.g., 0.01 absolute or 5% relative) below which smaller K is preferred for parsimony.
+
+### Open-13: §2 shape_tag floor / §11 row-7 bimodal incompatibility
+
+§11 row 7 ("Split exit variant — bimodal fwd_mfe distribution, two distinct modes ≥ 1R apart") defines bimodal as a valid archetype shape with its own exit policy (half-off at TP1 lower mode, trail remainder). §2's shape_tag floor `∈ {tight_unimodal, heavy_right_tail}` makes that archetype structurally unreachable. The protocol is internally inconsistent.
+
+Evidence: Arc 3 Stepwise climber (clusters 2+4, 27.5% pool, n=707) — fails §2 only on shape_tag=bimodal and frac_wrong_way 0.383; passes monotonicity 0.559 / mfe_p50 3.34R / reach_1R 83.6% / size cleanly. Final_r distribution textbook split: p25 −1.00, p50 +1.85R, p75 +3.80R.
+
+**Status:** v2.1 amendment. Highest priority among Arc 3 cross-arc candidates. Proposed: §2 shape_tag admits `bimodal` when accompanied by §11 row-7 routing AND modes meet ≥ 1R separation criterion (operationalised via Hartigan dip + mode-separation check).
+
+### Open-14: Same-archetype aggregation can destroy capturable sub-clusters
+
+§6 same-archetype aggregation rule states "same-archetype clusters... are aggregated for downstream Step 3-6 evaluation — they share an exit policy." The rule assumes shared §11 label implies shared forward geometry; the data refutes that.
+
+Evidence: Arc 3 Early-peak hold (clusters 0+3 aggregated). Cluster 0 mono 0.008. Cluster 3 mono 0.579 (passes §2 floor alone). Aggregated mono 0.251 — aggregation killed cluster 3's individual capturability. Within Stepwise climber (clusters 2+4): cluster 2 local_peaks 24.42 vs cluster 4 7.79 (3× difference); cluster 2 pc 0.126 vs cluster 4 0.474 (3.7× difference). Aggregating these as "Stepwise climber" mixes structurally different sub-archetypes.
+
+**Status:** v2.1 amendment. Proposed: same-archetype aggregation conditional on cluster-pair disparity ≤ X across each §2 floor; otherwise treat as separate sub-archetypes carrying the same §11 exit policy.
+
+### Open-15: SL-distance / hold-horizon asymmetry inflates frac_wrong_way
+
+When horizon ≫ SL-distance-in-volatility-units, false stop-outs structurally inflate the §2 `frac_wrong_way ≤ 0.30` floor. 2× ATR_1H on 120-bar horizon = ~0.18 σ of expected horizon price movement — even a directionally neutral random walk should stop out frequently.
+
+Evidence: Arc 3 — all three full-evaluation archetypes failed on frac_wrong_way. Stepwise climber 38.3% (margin 8.3pp over floor). Cluster 1 73.2%. Early-peak hold 98.8%.
+
+**Status:** v2.1 consideration. Proposed options:
+- (a) Archetype-specific initial SLs (set at Step 4 with the rest of the artefact) derived from cluster MAE characteristics
+- (b) Step 1's initial SL scaled to horizon: SL = 2.0 × ATR × √(h/24) — Brownian-motion-consistent default
+- (c) Horizon-aware frac_wrong_way floor scaled to horizon/SL ratio
+
+Path (b) cleanest at arc level. Path (a) is what §11 was meant to do at Step 4 but requires the protocol to reach Step 4.
+
 ---
 
 ## §17. Glossary

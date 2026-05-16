@@ -1,5 +1,5 @@
 # CLAUDE.md — Forex Ignition Rebuild
-> Last updated: 2026-05-16 | Phase: Arc 2 redo CLOSED (KILL at Step 3); Arc 3 continues under v2.0
+> Last updated: 2026-05-16 | Phase: Arc 3 CLOSED (CLEAN-NULL at Step 3); Arc 4 next under v2.0
 > First file any AI assistant reads. Reflects where the project ACTUALLY is.
 
 ---
@@ -31,7 +31,7 @@ Then, depending on scope:
 
 **Live system KH-24 is locked, passing, deployed.** Out of scope for L arc work; do not modify without an explicit modification phase.
 
-**Active research: L arc signal testing under `L_ARC_PROTOCOL.md` v2.0.** Arc 3 opens under v2.0 (path-shape clustering, two-pipeline E/D1 extractability). Arcs 1 and 2 are historical (ran under v1.x).
+**Active research: L arc signal testing under `L_ARC_PROTOCOL.md` v2.0.** Arc 3 closed CLEAN-NULL at Step 3 (2026-05-16) — five v2.1 cross-arc items logged; see `docs/arc_results/ARC_3_RESULT.md`. Arc 4 (registry Entry 4, `bar_range_top_decile__neg__h_001`) is next. Arcs 1 and 2 are historical (ran under v1.x).
 
 ---
 

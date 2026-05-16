@@ -7,8 +7,8 @@ A research-first FX trading system targeting prop firm requirements (5ers) with 
 ## Current State
 
 - **Live system:** KH-24 — running on Contabo VPS, gate-passing, +1.92% worst-fold ROI / 6.37% worst-fold DD across 7 OOS folds.
-- **Active research:** L arc signal testing under `L_ARC_PROTOCOL.md` v2.0. Arc 3 opens under v2.0; Arcs 1, 2 are historical (ran under v1.x). Five L registry signals scheduled (Arcs 1–5).
-- **Status as of 2026-05-16:** `L_ARC_PROTOCOL.md` v2.0 locked. Path-shape clustering + two-pipeline (E entry-filter / D1 deferred-identification) extractability gate. Calibration anchor: KH-24 K=4 archetype 3 (passes via D1 at t=3). v1.x protocol + ops spec archived under `archive/`.
+- **Active research:** L arc signal testing under `L_ARC_PROTOCOL.md` v2.0. Arc 3 closed CLEAN-NULL (2026-05-16). Arc 4 next.
+- **Status as of 2026-05-16:** `L_ARC_PROTOCOL.md` v2.0 locked. Path-shape clustering + two-pipeline (E entry-filter / D1 deferred-identification) extractability gate. Calibration anchor: KH-24 K=4 archetype 3 (passes via D1 at t=3). v1.x protocol + ops spec archived under `archive/`. Arc 3 closure flagged five v2.1 cross-arc items (Open-12 through Open-15 plus Open-07 evidence) — see `docs/arc_results/ARC_3_RESULT.md`.
 
 ---
 

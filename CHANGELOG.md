@@ -1,5 +1,22 @@
 # Changelog
 
+## ARC 3 CLOSED | 2026-05-16 | CLEAN-NULL at Step 3 (with reviewer flags)
+Arc 3 (`TRIAL__volatility_regime__d1_atr_top_decile__any__h_120`) closes CLEAN-NULL with three reviewer-flagged opportunities for v2.1 calibration.
+- Step 1 PASS: 2568 trades over 2020-10-01 → 2026-01-31, determinism byte-identical
+- Step 2 PASS: K=7 chosen (silhouette 0.4177); 7 clusters → 2 named archetypes + 3 unassigned
+- Step 3 FAIL: zero archetypes pass §2 conjunctive floors
+  - Stepwise climber (27.5%, n=707): fails 2/6 — passes mono 0.559 / mfe_p50 3.34R / reach_1R 83.6% / size; killed by shape_tag=bimodal and wrong_way 38.3%. Median final_r +1.85R. Textbook §11 row-7 split-exit. Highest-priority v2.1 evidence.
+  - Early-peak hold (40.0%): fails 5/6; aggregation of cluster 0 with cluster 3 destroyed clean sub-cluster (Open-14 evidence)
+  - Cluster 1 (19.2%): fails 3/6; peak-and-collapse signature drives wrong_way
+- Three reviewer flags in closure doc:
+  - Stepwise climber opportunity → Open-13 (§2/§11 row-7 bimodal incompatibility, HIGH)
+  - Aggregation hiding real archetypes → Open-14
+  - SL/horizon asymmetry inflating wrong_way → Open-15
+- Diagnostic tail (Arc 3D) recommended — 2D sweep (3 SL distances × 2 aggregation modes), ~30-60 min compute, generates direct evidence for Open-13/14/15. Reviewer decision pending.
+- Result doc: `docs/arc_results/ARC_3_RESULT.md`
+- Arc data: `results/l_arc_3/`
+- Live system KH-24 unaffected and unchanged
+
 ## ARC 2 REDO CLOSED | 2026-05-16 | KILL AT STEP 3
 Arc 2 redo opened and closed same day under L_ARC_PROTOCOL v2.0.
 - Signal: TRIAL__mtf_alignment__2_down_mixed__kijun__h_120 (LCHAR_TOPN_REGISTRY.md Entry 2)

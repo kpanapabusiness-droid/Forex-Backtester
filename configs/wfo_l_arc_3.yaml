@@ -1,0 +1,152 @@
+# wfo_l_arc_3.yaml — Arc 3 Step 1 plumbing config (L_ARC_PROTOCOL v2.0)
+#
+# Signal under test: TRIAL__volatility_regime__d1_atr_top_decile__any__h_120
+# (LCHAR_TOPN_REGISTRY.md Entry 3). Mirrors L4 (scripts/lchar/run_layer4.py)
+# via signals/lchar_d1atr_top_decile.py.
+#
+# Protocol: L_ARC_PROTOCOL.md v2.0 §5 (Step 1). Single pass over the full
+# data window — no WFO folds at Step 1; fold structure enters at Steps 5/6.
+#
+# Engine path: scripts/arc_3/step1_backtest.py reads this file directly. The
+# existing core/signals/l4_volatility_regime_d1_atr_top_decile_any.py (v1.x)
+# is intentionally NOT used — its output shape (per-fold WFO, no trade-paths)
+# does not match v2.0 Step 1 deliverables.
+
+phase: L_ARC_3_STEP_1_PLUMBING
+description: |
+  Arc 3 Step 1 plumbing — full-window trade pool for L registry Entry 3
+  (d1_atr_top_decile, any sub-spec, h=120 horizon). Long-only, 1H signal TF,
+  single pass over the window. Deterministic. v2.0 gates: pool >= 500,
+  byte-identical re-run, lookahead-invariant, 95th pct bars_held <= 240.
+
+# ----------------------------------------------------------------------
+# Signal — registry Entry 3
+# ----------------------------------------------------------------------
+signal:
+  module: signals.lchar_d1atr_top_decile
+  trial_id: TRIAL__volatility_regime__d1_atr_top_decile__any__h_120
+  family: volatility_regime
+  base: d1_atr_top_decile
+  sub_spec: any
+  signal_tf: "1H"
+  higher_tf: "D1"
+  higher_tf_lag: most_recently_completed   # L2 contain - 1 (one-day lag)
+  atr_period_d1: 14
+  atr_smoothing_d1: sma                     # SMA-based (mirrors L4 compute_atr)
+  trailing_window: 100
+  decile_quantile: 0.90
+  trade_direction: long                     # arc-level (L4 sub-spec is `any`)
+
+# ----------------------------------------------------------------------
+# Data window — v2.0 protocol does not constrain Step 1's window choice;
+# anchored to KH-24 era inception (2020-10-01) through Jan 2026.
+# ----------------------------------------------------------------------
+data:
+  data_dirs:
+    "1H": "data/1hr"
+    "D1": "data/daily"
+  date_start: "2020-10-01"
+  date_end: "2026-01-31"
+
+# All 28 FX pairs (identical set to configs/wfo_kh24.yaml).
+pairs:
+  - AUD_CAD
+  - AUD_CHF
+  - AUD_JPY
+  - AUD_NZD
+  - AUD_USD
+  - CAD_CHF
+  - CAD_JPY
+  - CHF_JPY
+  - EUR_AUD
+  - EUR_CAD
+  - EUR_CHF
+  - EUR_GBP
+  - EUR_JPY
+  - EUR_NZD
+  - EUR_USD
+  - GBP_AUD
+  - GBP_CAD
+  - GBP_CHF
+  - GBP_JPY
+  - GBP_NZD
+  - GBP_USD
+  - NZD_CAD
+  - NZD_CHF
+  - NZD_JPY
+  - NZD_USD
+  - USD_CAD
+  - USD_CHF
+  - USD_JPY
+
+# ----------------------------------------------------------------------
+# Entry / exit (v2.0 §5; values from Arc 3 dispatch)
+# ----------------------------------------------------------------------
+entry:
+  bar_offset: 1                  # bar N+1 open
+  execution: open
+
+exit:
+  hard_stop:
+    type: absolute_atr
+    atr_period: 14
+    atr_smoothing: wilder         # Wilder-smoothed on 1H bars (per arc 3 dispatch)
+    atr_tf: "1H"
+    multiplier: 2.0
+    anchor: entry_price
+  time_exit:
+    bars_after_entry: 120         # exit at bar N+1+120 open
+  trail: null
+  structural_exits: []
+
+# ----------------------------------------------------------------------
+# Exposure / risk
+# ----------------------------------------------------------------------
+exposure:
+  max_concurrent_per_pair: 1
+  currency_cap: null
+  concurrent_trade_cap: null
+
+risk:
+  pct_per_trade: 0.005             # 0.5% per protocol v2.0 §1 (L arc convention)
+  starting_balance: 10000.0
+  basis: reset_floor
+
+# ----------------------------------------------------------------------
+# Spread (locked floor + per-bar MT5 native points)
+# ----------------------------------------------------------------------
+spreads:
+  enabled: true
+  source: per_bar                  # MT5 'spread' column from data CSV
+  points_per_pip: 10.0
+  default_pips: 0.0
+
+spread_floor:
+  enabled: true
+  source: configs/spread_floors_5ers.yaml
+  expected_body_sha256: a613b4ce641c8d5218490531770a4924204029dedaa80fb24111beb61bd15547
+
+# ----------------------------------------------------------------------
+# Path output (v2.0 §5)
+# ----------------------------------------------------------------------
+trade_paths:
+  enabled: true
+  forward_window_bars: 240        # truncate at min(bar_offset = 240, exit_bar)
+
+# ----------------------------------------------------------------------
+# Output
+# ----------------------------------------------------------------------
+output:
+  results_dir: results/l_arc_3/step1_plumbing
+  trades_csv: trades_all.csv
+  paths_csv: trades_paths.csv
+  manifest_json: manifest.json
+  float_format: "%.10g"            # mirrors L4 output format
+
+# ----------------------------------------------------------------------
+# Gate (Step 1 — v2.0 §5)
+# ----------------------------------------------------------------------
+gate:
+  pool_size_min: 500
+  determinism: byte_identical_two_run
+  bars_held_p95_max: 240

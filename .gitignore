@@ -80,6 +80,11 @@ results/*
 # (L_ARC_PROTOCOL v2.0 §13: arc results data is direct-to-main).
 !results/l_arc_3/
 !results/l_arc_3/**
+# Arc 2 redo (CLOSED 2026-05-16 KILL at Step 3) — track the result doc;
+# step1/2/3 CSVs/PNGs stay local per minimal-track convention.
+!results/l_arc_2_redo/
+results/l_arc_2_redo/*
+!results/l_arc_2_redo/ARC_2_REDO_RESULT.md
 results_phase*/
 __pycache__/
 .ipynb_checkpoints/

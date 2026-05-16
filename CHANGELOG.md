@@ -1,5 +1,16 @@
 # Changelog
 
+## ARC 2 REDO CLOSED | 2026-05-16 | KILL AT STEP 3
+Arc 2 redo opened and closed same day under L_ARC_PROTOCOL v2.0.
+- Signal: TRIAL__mtf_alignment__2_down_mixed__kijun__h_120 (LCHAR_TOPN_REGISTRY.md Entry 2)
+- Step 1 plumbing PASS: pool 12,262 trades, 28 pairs, deterministic, no lookahead
+- Step 2 clustering PASS: K=4 chosen via silhouette 0.4778
+- Step 3 capturability FAIL: 0/4 archetypes passed §2 hard floors; arc dies per §7
+- Headline: cluster 2 (Stepwise climber, 18.6%) had fwd_mfe_p50 5.83R, frac_reach_1R 99.65%, final_r_mean +3.18R, t-stat +52.17 — failed on monotonicity 0.5414 (vs ≥0.55), frac_wrong_way 0.3051 (vs ≤0.30), shape_tag unclassified
+- Cross-arc carryover: Open-09 evidence (hard floors false-killing high-magnitude cohorts), shape_tag definition pressure for high-body distributions
+- Methodology cross-validation: v1.x verbatim WFO and v2.0 path-shape both FAIL on this signal — strong evidence signal is intractable not artefact
+- Outputs: `results/l_arc_2_redo/ARC_2_REDO_RESULT.md` + step1/, step2/, step3/ subfolders
+
 ## L_ARC_PROTOCOL v2.0 LOCKED | 2026-05-16 | STRUCTURAL REWRITE
 `L_ARC_PROTOCOL.md` v2.0 locked. Supersedes v1.0 + amendments (v1.1, v1.2, v1.3) for Arcs 3+. v1.x archived under `archive/`.
 - Clustering basis shifts from forward-geometry magnitude to outcome-blind path-shape (monotonicity, local_peaks, pullback, time_to_peak_rel)

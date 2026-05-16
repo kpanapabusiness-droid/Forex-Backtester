@@ -2,7 +2,7 @@
 
 > Tight current-state snapshot. For full context, read `SESSION_ZERO.md` first.
 > For methodology, read `L_ARC_PROTOCOL.md` (v2.0, self-contained).
-> Last updated: 2026-05-16 — L_ARC_PROTOCOL v2.0 locked; Arc 3 opens under v2.0.
+> Last updated: 2026-05-16 — Arc 2 redo CLOSED (KILL at Step 3); Arc 3 continues unaffected.
 
 ---
 
@@ -85,6 +85,7 @@ Annualisation: `fold_raw_ROI × (365 / fold_OOS_days)`. Folds < 90 OOS days excl
 
 | Phase | Verdict | Finding |
 | --- | --- | --- |
+| Arc 2 redo | KILL at Step 3 (2026-05-16) | All 4 archetypes failed §2 capturability under hard floors; cluster 2 (Stepwise climber) carried strong magnitude but unextractable paths. Cross-arc carryover for v2.x calibration: Open-09 evidence, shape_tag definition pressure. |
 | L_ARC_PROTOCOL v2.0 | LOCKED 2026-05-16 | Path-shape clustering + two-pipeline E/D1 extractability; KH-24 K=4 archetype 3 = calibration anchor; v1.x archived for Arcs 1, 2 historical reference |
 | v2.0 predictability investigation | DELIVERED (PR #130) | Evidence base for v2.0 extractability gate |
 | v2.0 archetype diagnostic | DELIVERED (PR #129) | Evidence base for path-shape clustering on KH-24 + Arc 1 + Arc 2 |
@@ -118,6 +119,8 @@ No outstanding bugs or issues against KH-24. No pending fixes against the backte
 
 Earlier eliminations (KGL_V2 era, JL forward bias, NNFX, exit indicator sweeps, etc.) recorded in `CLAUDE.md`, `docs/KH_Research_Roadmap.md`, and `project_brief.md`.
 
+Note: Arc 2 signal (mtf_alignment.2_down_mixed.kijun, h=120) shelved 2026-05-16 as "real edge, not extractable under v2.0 as drawn" — see `results/l_arc_2_redo/ARC_2_REDO_RESULT.md`. Not permanently eliminated; reopenable contingent on v2.x calibration amendment.
+
 ---
 
 ## Results Locations
@@ -130,6 +133,7 @@ Earlier eliminations (KGL_V2 era, JL forward bias, NNFX, exit indicator sweeps, 
 | KH-29 excursion analysis | `results/kh29/` |
 | L characterisation atlas | `results/lchar/` |
 | L arc signal testing (current) | `results/l_arc_N/` (folder convention inherited from v1.x ops spec §2) |
+| Arc 2 redo (closed KILL) | `results/l_arc_2_redo/` |
 
 ---
 

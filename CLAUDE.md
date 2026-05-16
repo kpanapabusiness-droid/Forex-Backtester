@@ -1,5 +1,5 @@
 # CLAUDE.md — Forex Ignition Rebuild
-> Last updated: 2026-05-16 | Phase: L_ARC_PROTOCOL v2.0 locked, Arc 3 opens under v2.0
+> Last updated: 2026-05-16 | Phase: Arc 2 redo CLOSED (KILL at Step 3); Arc 3 continues under v2.0
 > First file any AI assistant reads. Reflects where the project ACTUALLY is.
 
 ---
@@ -144,6 +144,7 @@ Key scripts:
 - KH-25 re-entry exposure cap (KH-27 KILL — re-entries fire post-original-exit)
 - 1H timeframe port of KH-24 (KI arc: mean R 0.004, t=0.095)
 - L6.0 verbatim-as-gate framing (replaced by `L_ARC_PROTOCOL.md` v1.0; v1.x in turn superseded by v2.0 for Arcs 3+)
+- Arc 2 signal (mtf_alignment.2_down_mixed.kijun, h=120) — SHELVED 2026-05-16, not permanently eliminated; cluster 2 has strong magnitude (fwd_mfe_p50 5.83R, t-stat +52) on unextractable paths, reopenable via v2.x calibration; see `results/l_arc_2_redo/ARC_2_REDO_RESULT.md`
 
 ---
 

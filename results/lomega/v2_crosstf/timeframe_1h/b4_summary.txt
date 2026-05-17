@@ -1,0 +1,10 @@
+n_splits: 7
+n_after_dropna: 1032603
+clean_rate: 0.1582234411482438
+mean_fold_auc: 0.5351912116987692
+worst_fold_auc: 0.49870312057699423
+fold_auc_stdev: 0.017360168527379996
+full_data_auc: 0.681616821316511
+n_features: 51
+feature_set_size: 51
+feature_cols: ['atr_14', 'atr_50', 'atr_200', 'atr_ratio_14_50', 'atr_ratio_14_200', 'atr_percentile_20', 'atr_percentile_60', 'atr_percentile_200', 'realised_vol_20', 'range_compression_20', 'range_compression_60', 'ema_20_slope', 'ema_50_slope', 'ema_200_slope', 'ema_20_above_50', 'ema_50_above_200', 'ema_spread_20_50_atr', 'adx_14', 'di_plus_14', 'di_minus_14', 'position_in_range_20', 'position_in_range_60', 'body_ratio', 'close_in_bar', 'body_size_atr', 'prev_3_body_ratio_mean', 'prev_3_body_size_atr_mean', 'recent_5_bar_size_pct_atr', 'day_of_week', 'session_marker', 'hour_of_week', 'd1_ema_50_slope_at_entry', 'd1_close_above_ema_50', 'h4_ema_50_slope_at_entry', 'd1_atr_percentile_20', 'd1_atr_percentile_60', 'd1_range_compression_20', 'd1_realised_vol_20', 'd1_atr_14_normalised', 'd1_higher_highs_5', 'd1_higher_lows_5', 'd1_swing_state', 'd1_ema_stack_up', 'd1_momentum_5_atr', 'd1_momentum_20_atr', 'h4_ema_stack_up', 'w_ema_20_slope', 'cross_tf_trend_alignment', 'cross_tf_trend_strong_up', 'd1_h4_slope_agreement', 'dxy_proxy_ema_20_slope']

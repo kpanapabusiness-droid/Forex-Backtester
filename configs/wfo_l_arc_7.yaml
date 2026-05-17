@@ -1,0 +1,149 @@
+# wfo_l_arc_7.yaml — Arc 7 Step 1 plumbing config (L_ARC_PROTOCOL v2.1.2)
+#
+# Signal under test: liquidity_sweep + reclaim, long (per ARC_7_LIVE Step 1
+# dispatch). 7-condition signal on 4H bars; see signals/lchar_liquidity_sweep_reclaim.py
+# for the verbatim definition (do not reinterpret).
+#
+# Protocol: L_ARC_PROTOCOL.md v2.1.2 §5 (Step 1) + §15a (trades_paths.csv
+# schema). Single pass over the full data window — no WFO folds at Step 1.
+#
+# Engine path: scripts/arc_7/step1_backtest.py reads this file directly.
+
+phase: L_ARC_7_STEP_1_PLUMBING
+description: |
+  Arc 7 Step 1 plumbing — full-window trade pool for the liquidity-sweep +
+  reclaim long signal. 4H signal TF, long-only, single pass over the window.
+  Deterministic, §15a-compliant trades_paths.csv (is_held column, forward
+  observation bars to entry+240 regardless of exit reason). v2.1.2 Step 1
+  gates: pool >= 500, byte-identical re-run, lookahead-invariant, schema-valid,
+  Phase A spread semantics tests green.
+
+# ----------------------------------------------------------------------
+# Signal (verbatim from signals/lchar_liquidity_sweep_reclaim.py)
+# ----------------------------------------------------------------------
+signal:
+  module: signals.lchar_liquidity_sweep_reclaim
+  trial_id: ARC_7__liquidity_sweep_reclaim__long__4h__h_240
+  family: liquidity_geometry
+  base: liquidity_sweep_reclaim
+  signal_tf: "4H"
+  trade_direction: long
+  swing_lookback_n: 20
+  atr_period: 14
+  atr_smoothing: wilder
+  sweep_magnitude_atr_min: 0.25
+  reclaim_ratio_min: 0.5
+  refractory_bars: 20
+
+# ----------------------------------------------------------------------
+# Data window — locked per ARC_7_LIVE.
+# ----------------------------------------------------------------------
+data:
+  data_dirs:
+    "4H": "data/4hr"
+  date_start: "2020-10-01"
+  date_end: "2026-01-31"
+
+# All 28 FX pairs (identical set to configs/wfo_kh24.yaml).
+pairs:
+  - AUD_CAD
+  - AUD_CHF
+  - AUD_JPY
+  - AUD_NZD
+  - AUD_USD
+  - CAD_CHF
+  - CAD_JPY
+  - CHF_JPY
+  - EUR_AUD
+  - EUR_CAD
+  - EUR_CHF
+  - EUR_GBP
+  - EUR_JPY
+  - EUR_NZD
+  - EUR_USD
+  - GBP_AUD
+  - GBP_CAD
+  - GBP_CHF
+  - GBP_JPY
+  - GBP_NZD
+  - GBP_USD
+  - NZD_CAD
+  - NZD_CHF
+  - NZD_JPY
+  - NZD_USD
+  - USD_CAD
+  - USD_CHF
+  - USD_JPY
+
+# ----------------------------------------------------------------------
+# Entry / exit (per ARC_7_LIVE Step 1 dispatch)
+# ----------------------------------------------------------------------
+entry:
+  bar_offset: 1                  # bar N+1 open
+  execution: open                # spread fill via core/SPREAD_SEMANTICS_LOCK
+
+exit:
+  hard_stop:
+    type: absolute_atr
+    atr_period: 14
+    atr_smoothing: wilder         # Wilder 4H ATR(14) at signal bar (same as
+    atr_tf: "4H"                  # signal cond 4); anchored to entry_price.
+    multiplier: 2.0
+    anchor: entry_price
+  time_exit:
+    bars_after_entry: 240         # 240 4H bars = 40 calendar days
+  trail: null
+  structural_exits: []
+
+# ----------------------------------------------------------------------
+# Exposure / risk
+# ----------------------------------------------------------------------
+exposure:
+  max_concurrent_per_pair: 1
+  currency_cap: null
+  concurrent_trade_cap: null
+
+risk:
+  pct_per_trade: 0.005             # 0.5% per L_ARC_PROTOCOL v2.1.2 §1 (L arc)
+  starting_balance: 10000.0
+  basis: reset_floor
+
+# ----------------------------------------------------------------------
+# Spread (locked floor + per-bar MT5 native points)
+# ----------------------------------------------------------------------
+spreads:
+  enabled: true
+  source: per_bar                  # MT5 `spread` column from data CSV
+  points_per_pip: 10.0
+  default_pips: 0.0
+
+spread_floor:
+  enabled: true
+  source: configs/spread_floors_5ers.yaml
+  expected_body_sha256: a613b4ce641c8d5218490531770a4924204029dedaa80fb24111beb61bd15547
+
+# ----------------------------------------------------------------------
+# Path output (v2.1.2 §15a)
+# ----------------------------------------------------------------------
+trade_paths:
+  enabled: true
+  forward_window_bars: 240        # emit bar_offset 0..240; is_held=0 after exit
+
+# ----------------------------------------------------------------------
+# Output
+# ----------------------------------------------------------------------
+output:
+  results_dir: results/l_arc_7/step1
+  trades_csv: trades_all.csv
+  paths_csv: trades_paths.csv
+  prefilter_csv: prefilter_events.csv
+  manifest_json: manifest.json
+  float_format: "%.10g"            # mirrors L4 / Arc 3 output format
+
+# ----------------------------------------------------------------------
+# Gate (Step 1 — v2.1.2 §5)
+# ----------------------------------------------------------------------
+gate:
+  pool_size_min: 500
+  determinism: byte_identical_two_run
+  schema_check: v2_1_1_strict      # §15a required columns

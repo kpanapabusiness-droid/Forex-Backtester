@@ -1,0 +1,213 @@
+{
+  "diag_1_pool": {
+    "pairs_lt_30": [],
+    "per_pair": {
+      "AUD_CAD": 47,
+      "AUD_CHF": 54,
+      "AUD_JPY": 39,
+      "AUD_NZD": 49,
+      "AUD_USD": 44,
+      "CAD_CHF": 55,
+      "CAD_JPY": 41,
+      "CHF_JPY": 42,
+      "EUR_AUD": 39,
+      "EUR_CAD": 45,
+      "EUR_CHF": 55,
+      "EUR_GBP": 48,
+      "EUR_JPY": 37,
+      "EUR_NZD": 53,
+      "EUR_USD": 46,
+      "GBP_AUD": 41,
+      "GBP_CAD": 54,
+      "GBP_CHF": 54,
+      "GBP_JPY": 32,
+      "GBP_NZD": 36,
+      "GBP_USD": 48,
+      "NZD_CAD": 57,
+      "NZD_CHF": 62,
+      "NZD_JPY": 38,
+      "NZD_USD": 43,
+      "USD_CAD": 46,
+      "USD_CHF": 44,
+      "USD_JPY": 39
+    },
+    "total_trades": 1288
+  },
+  "diag_2_bars_held": {
+    "auto_extend_flag": false,
+    "exit_reason_counts": {
+      "end_of_data": 11,
+      "stoploss": 1058,
+      "time_exit": 219
+    },
+    "p25": 9.0,
+    "p5": 2.0,
+    "p50": 24.0,
+    "p75": 107.25,
+    "p95": 240.0,
+    "p95_value": 240.0,
+    "pct_at_cap_240": 17.003105590062113
+  },
+  "diag_3_reclaim_strength": {
+    "hartigan_dip": {
+      "p_value": 0.9904750491291888,
+      "statistic": 0.004993554446981232
+    },
+    "histogram_path": "results\\l_arc_7\\step1\\reclaim_strength_hist.png",
+    "mass_below_0p5": 0.17393199651264168,
+    "percentiles": {
+      "max": 11.17557252,
+      "min": 0.003205128205,
+      "n": 2294,
+      "p25": 0.6571898684,
+      "p5": 0.21507979936500002,
+      "p50": 1.2488532110000001,
+      "p75": 2.094339623,
+      "p95": 4.035384841749999
+    }
+  },
+  "diag_4_kh24_cofire": {
+    "flag_gt_10pct": false,
+    "pct_of_arc7_pool_pm_one": 0.0,
+    "pm_one_bar": 0,
+    "present": true,
+    "same_bar": 0
+  },
+  "diag_5_arc6_overlap": {
+    "arc6_pool_size": 1564,
+    "arc6_signal_col": "signal_bar_ts",
+    "arc6_source": "C:\\Users\\panap\\Documents\\Forex-Backtester\\results\\arc_6\\step1\\trades_all.csv",
+    "examples": [
+      {
+        "bar": "2020-10-09 00:00:00",
+        "pair": "NZD_CAD"
+      },
+      {
+        "bar": "2020-10-13 12:00:00",
+        "pair": "EUR_NZD"
+      },
+      {
+        "bar": "2020-10-20 20:00:00",
+        "pair": "USD_CAD"
+      },
+      {
+        "bar": "2020-11-09 00:00:00",
+        "pair": "CAD_CHF"
+      },
+      {
+        "bar": "2021-01-06 12:00:00",
+        "pair": "EUR_AUD"
+      },
+      {
+        "bar": "2021-01-06 12:00:00",
+        "pair": "USD_CAD"
+      },
+      {
+        "bar": "2021-02-22 00:00:00",
+        "pair": "CHF_JPY"
+      },
+      {
+        "bar": "2021-04-23 16:00:00",
+        "pair": "GBP_JPY"
+      },
+      {
+        "bar": "2021-05-07 00:00:00",
+        "pair": "GBP_AUD"
+      },
+      {
+        "bar": "2021-05-07 08:00:00",
+        "pair": "EUR_CHF"
+      }
+    ],
+    "file_present": true,
+    "overlap_count": 69
+  },
+  "diag_6_spread_reality": {
+    "spread_pips_exit": {
+      "p25": 0.2,
+      "p5": 0.1,
+      "p50": 0.6,
+      "p75": 1.1,
+      "p95": 2.4
+    },
+    "spread_pips_used": {
+      "p25": 0.2,
+      "p5": 0.1,
+      "p50": 0.6,
+      "p75": 1.1,
+      "p95": 2.4
+    },
+    "weekend_tail_count_exit_gt_50": 0,
+    "worst_examples": []
+  },
+  "input_sha256": {
+    "prefilter_events_csv": "a4e1832ddc50bd0a8a93529398ee28b422a0273db1ea26a8d5d4953d35b0eb20",
+    "trades_all_csv": "d00eb9fec7643c0e0ed2534400e30a0d72a6f7f9cf0a6dbda5af97c86a77b33a",
+    "trades_paths_csv": "478ff1372539fb2d99347ca69aa782b2661c087b3eedbbce2c048deaac83483b"
+  },
+  "lookahead_spotcheck": {
+    "all_pass": true,
+    "n_checked": 5,
+    "results": [
+      {
+        "fired_at_sig_under_truncation": true,
+        "ok": true,
+        "pair": "USD_CAD",
+        "reclaim_ratio_recomputed": 1.688172043010414,
+        "reclaim_ratio_reported": 1.688172043,
+        "signal_bar_time": "2022-03-18 08:00:00",
+        "swing_low_recomputed": 1.26045,
+        "swing_low_reported": 1.26045
+      },
+      {
+        "fired_at_sig_under_truncation": true,
+        "ok": true,
+        "pair": "EUR_USD",
+        "reclaim_ratio_recomputed": 0.6315789473683472,
+        "reclaim_ratio_reported": 0.6315789474,
+        "signal_bar_time": "2025-02-19 12:00:00",
+        "swing_low_recomputed": 1.04282,
+        "swing_low_reported": 1.04282
+      },
+      {
+        "fired_at_sig_under_truncation": true,
+        "ok": true,
+        "pair": "CAD_CHF",
+        "reclaim_ratio_recomputed": 2.3636363636364277,
+        "reclaim_ratio_reported": 2.363636364,
+        "signal_bar_time": "2022-07-29 12:00:00",
+        "swing_low_recomputed": 0.74254,
+        "swing_low_reported": 0.74254
+      },
+      {
+        "fired_at_sig_under_truncation": true,
+        "ok": true,
+        "pair": "GBP_AUD",
+        "reclaim_ratio_recomputed": 0.7004405286343544,
+        "reclaim_ratio_reported": 0.7004405286,
+        "signal_bar_time": "2025-02-11 00:00:00",
+        "swing_low_recomputed": 1.96879,
+        "swing_low_reported": 1.96879
+      },
+      {
+        "fired_at_sig_under_truncation": true,
+        "ok": true,
+        "pair": "GBP_CAD",
+        "reclaim_ratio_recomputed": 1.570680628272429,
+        "reclaim_ratio_reported": 1.570680628,
+        "signal_bar_time": "2025-02-04 16:00:00",
+        "swing_low_recomputed": 1.78704,
+        "swing_low_reported": 1.78704
+      }
+    ]
+  },
+  "schema_check": {
+    "missing_columns": [],
+    "pass": true,
+    "required_columns_present": true,
+    "trades_checked": 1288,
+    "trades_with_forward_obs_rows": 1058,
+    "violation_count": 0,
+    "violations": []
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "missing_columns": [],
+  "pass": true,
+  "required_columns_present": true,
+  "trades_checked": 1288,
+  "trades_with_forward_obs_rows": 1058,
+  "violation_count": 0,
+  "violations": []
+}

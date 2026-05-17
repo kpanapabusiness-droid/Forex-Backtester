@@ -1,5 +1,82 @@
 # Changelog
 
+## L_ARC_PROTOCOL v2.1.2 AMENDMENT | 2026-05-17 | doc-only
+
+Open-18 cross-replay synthesis amendment. §2 internal-consistency floor relaxed from categorical admit list to single exclusion (`≠ scattered`); §11 Stepwise climber local_peaks ceiling extended 5-30 → 5-50; §15a arc Step 1 schema requirement added (Open-19 closure mechanism). Open-15 and Open-18 closed as empirically validated.
+
+### Substantive changes
+
+- §2 floor: `shape_tag ∈ {tight_unimodal, heavy_right_tail, bimodal_separated}` → `shape_tag ≠ scattered`. Mechanically: detection of "no structure" (scattered) replaces taxonomic admission. Cohorts with detectable structure but no clean label (unclassified, moderate-tail unimodal, multi-modal without clean separation) now pass §2's internal-consistency floor and route to §11 by centroid pattern.
+- §11 Stepwise climber row: local_peaks 5-30 → 5-50. Empirical centroids from KH-24 c4 (30.94), Arc 3 c2 (24.42), Arc 2 redo2 cid 1 (20.07) cluster near or above the previous ceiling with same exit-policy profile.
+- §7 fallback text rewritten to reference relaxed §2 floor.
+- §15a added (arc Step 1 schema requirement): real-market R-fields out to entry+240, `is_held` column distinguishing held vs forward-observation bars. Reference implementation: `_flatten_bar_path_for_trade`. Engine refactor to signal-agnostic utility deferred.
+- §17 glossary: `scattered` and `unclassified` operational definitions added.
+- §16 Open-15 status augmented with cross-replay empirical confirmation.
+- §16 Open-18 status → CLOSED (synthesis complete, three replays passed).
+- §16 Open-19 added + closed (via §15a).
+
+### Open items resolved
+
+- Open-15: CLOSED — empirically confirmed across three replays
+- Open-18: CLOSED — synthesis complete (Arc 3 Stepwise, KH-24 v2.0 c4, Arc 2 redo2 cid 1 all PASS)
+- Open-19: CLOSED — §15a schema requirement landed
+
+### Items deliberately NOT added
+
+- Open-20 (raised in Arc 2 redo2 closure re: cohorts with negative final_r under fixed-SL re-imposition): not added to protocol. Reframed as Step 4+ measurement question — cohorts with high pct_peak_and_collapse should have realised R measured under the trailing-stop exit policy from §11, not under fixed-SL re-imposition at Step 3. The trailing stop *is* the realised-R protection; §2 is correctly a capturability gate, not a realised-R gate.
+
+### Anchor preservation
+
+KH-24 K=4 archetype 3 centroid (mono 0.576, local_peaks 14.19, pullback 0.020, ttp_rel 0.847) routes to Stepwise climber under both old [5,30] and new [5,50] local_peaks ranges. bimodal shape_tag passes under both old admit list and new `≠ scattered` floor. No routing change. §14 anchor explicitly not refreshed (user decision — deployed-pop reference holds).
+
+### Files
+
+- L_ARC_PROTOCOL.md → v2.1.2
+- STATUS.md updated
+- SESSION_ZERO.md version bump
+
+## OPEN-18 CROSS-REPLAY SYNTHESIS | 2026-05-17 | empirical validation
+
+Three parallel Open-18 replays completed under v2.1.1 — all PASS. Synthesis closed v2.1.2 amendment same day.
+
+### Replay results
+
+**Replay #1 — Arc 3 Stepwise climber (PASS):**
+- c2 individual: PASS at SL=1.5×ATR, composite 0.473, shape_tag `bimodal_separated` (Hartigan dip + min-mode-mass + ≥1R separation all fired)
+- Aggregate (c2+c4): PASS at SL=2.0×ATR, composite 0.467
+- c4 individual: FAIL on magnitude/reach (small-magnitude archetype distinct from c2)
+- Pre-peak Def C: 38.3% → 1.7% wrong_way on aggregate (~20× reduction, much larger than analyst predicted)
+- Forks fired: C (genuine cluster-level bimodal_separated, not aggregation artifact) + F (44-58% of trades peak after Arc 3's 120-bar time exit; rescue is partly horizon-extension)
+- Results: `results/replays_v2_1_1/arc_3_stepwise/REPLAY_RESULT.md`
+
+**Replay #2 — KH-24 v2.0 c4 (PASS):**
+- c1 (unresolved, near-stepwise): PASS at SL=2.0×ATR, composite 0.387
+- c4 (unresolved, near-stepwise): PASS at SL=1.0×ATR, composite 0.304
+- c0, c2, c3, c0+c2 aggregate: FAIL (peak-and-collapse cohorts, no magnitude edge)
+- Findings: shape_tag dead-zone correlates with cap-binding (informs §5 + Amendment A architecture); pre-peak mono lift varies (c1 +0.108, c4 +0.036)
+- Results: `results/replays_v2_1_1/kh24_v2_c4/REPLAY_RESULT.md`
+
+**Replay #3 — Arc 2 redo2 cid 1 (PASS, Step 4+ deferred):**
+- cid 1 (Stepwise climber): PASS at SL=3.0×ATR, composite 0.593, n=2285 (18.6% of pool), final_r_mean +3.148 (t=35.06)
+- cid 3 (unclassified): clears §2 path-shape floors but negative final_r_mean under SL re-imposition; shelved as evidence for Open-20 (not added to protocol — see v2.1.2 entry above)
+- Pre-peak Def C: 34.0% → 0.0% wrong_way on cid 1 (total rescue)
+- bimodal_separated REJECTED on mode separation (0.48R < 1.0R required)
+- New ops surfaced: Open-19 (Step 1 schema portability) closed in v2.1.2 §15a
+- Results: `results/l_arc_2_redo2/step3/STEP3_SUMMARY.md` (full Arc 2 redo2 artefacts under `results/l_arc_2_redo2/`)
+
+### Synthesis verdict
+
+Pre-peak Def C is the dominant rescue mechanism — three independent cohorts, three signal classes, three near-total wrong_way reductions. The Open-15/Open-18 hypothesis is the load-bearing v2.1.1 mechanism.
+
+bimodal_separated (Open-13) validated narrowly — one positive (Arc 3 c2). Useful admit for a specific archetype, not workhorse infrastructure.
+
+§2 categorical floor + §11 Stepwise ceiling were the architectural gaps surfaced by the replays; v2.1.2 amendment addresses them.
+
+### Closes
+
+- Open-15: validated (cross-replay empirical confirmation)
+- Open-18: complete (3/3 replays passed, synthesis written into v2.1.2)
+
 ## L_ARC_PROTOCOL v2.1.1 AMENDMENT | 2026-05-17 | doc-only
 
 Combined patch: v2.1 refinements + v2.1 engine-reality corrections.

@@ -1,39 +1,40 @@
 # STATUS
 
 > Tight current-state snapshot. For full context, read `SESSION_ZERO.md` first.
-> For methodology, read `L_ARC_PROTOCOL.md` (v2.1.1, self-contained).
-> Last updated: 2026-05-17 — L_ARC_PROTOCOL v2.1.1 amendment landed (v2.1 refinements + engine-reality corrections). Engine PR for SL-free path recording superseded — v1.3 forward extension already provides the required SL-free observation. Open-18 empirical replays of v2.0-killed cohorts runnable now.
+> For methodology, read `L_ARC_PROTOCOL.md` (v2.1.2, self-contained).
+> Last updated: 2026-05-17 — L_ARC_PROTOCOL v2.1.2 amendment landed. Open-18 cross-replay synthesis complete (3/3 replays passed). §2 categorical shape_tag floor relaxed to `≠ scattered`; §11 Stepwise local_peaks ceiling extended 5-30 → 5-50; Open-15/18 closed (validated); Open-19 added + closed (§15a schema requirement). Arc 4 active on LCHAR Entry 4.
 
 ---
 
 ## Active protocol
 
-- Active protocol: L_ARC_PROTOCOL v2.1.1 (amendment landed 2026-05-17)
-- Calibration anchor: KH-24 K=4 archetype 3 — v2.0 values; refresh under v2.1.1 pending KH-24 v2.0 re-run only (no engine work needed; v1.3 forward extension already provides SL-free observation)
+- Active protocol: L_ARC_PROTOCOL v2.1.2 (amendment landed 2026-05-17)
+- Calibration anchor: KH-24 K=4 archetype 3 — v2.0 values; deployed-pop reference held (no refresh from Open-18 replays per user decision; v2.1.2 anchor preservation verified — centroid still routes to Stepwise under 5-50 local_peaks range)
 - Next engine PR: none currently planned. PR #131 (D1 plumbing) is merged; D1 PR 2 (per-archetype §11 exit policies) deferred until an arc surfaces a Step-4 consumer
-- Next chat task: Open-18 empirical replays — Arc 3 Stepwise climber under v2.1.1 first (highest priority, designed-for cohort), then KH-24 v2.0 c4 (anchor refresh), then Arc 2 redo c2 (cross-arc validation)
+- Next chat task: Arc 4 — LCHAR Entry 4 (`TRIAL__univariate_extreme__bar_range_top_decile__neg__h_001`), 1-bar horizon, univariate-extreme family
 
 ---
 
 ## Current Phase
 
-**L_ARC_PROTOCOL v2.1.1 amendment landed 2026-05-17.** Combined patch with two parts:
+**L_ARC_PROTOCOL v2.1.2 amendment landed 2026-05-17.** Synthesis of Open-18's three parallel replays:
 
-**v2.1.1 substantive refinements:**
-- §7 SL selection: capturability composite maximiser (replaces smallest-SL-passes)
-- §5 forward window auto-extend: Step 2 re-runs on extended-window paths
-- §11 row 7 bimodal_separated: routing precedence resolved — both base archetype and split-exit policies advance through Step 4-6, Step 6 ships best
-- §10 multi-cluster ship decision: one cluster per arc, highest worst-fold ROI subject to DD ≤ 8%
+- **Replay #1 Arc 3 Stepwise (PASS):** c2 individual fires bimodal_separated genuinely (composite 0.473 at SL=1.5×ATR). Aggregate PASS at SL=2.0, composite 0.467. Pre-peak Def C: 38.3% → 1.7% wrong_way.
+- **Replay #2 KH-24 v2.0 c4 (PASS):** c1 (n=365, SL=2.0, composite 0.387) and c4 (n=122, SL=1.0, composite 0.304) both rescue. Surfaced shape_tag dead-zone correlation with cap-binding.
+- **Replay #3 Arc 2 redo2 cid 1 (PASS):** SL=3.0×ATR, composite 0.593, n=2285 (18.6% of pool). Pre-peak Def C: 34% → 0% wrong_way.
 
-**v2.1 engine-reality corrections:**
-- v2.1 introduced language about an "engine PR pending" for SL-free path recording
-- CC's halt while attempting that PR established that the engine already has a v1.3 forward-window extension (`_flatten_bar_path_for_trade`) that emits forward bars (`is_held=0`) regardless of exit reason
-- v2.1.1 corrects the wording across §1, §5, §7, §14, §16, §17 — no engine change implied or needed
-- `feat/sl-free-path-recording` branch superseded and deleted
+**Synthesis verdict:** Pre-peak Def C is the dominant rescue mechanism across all three. bimodal_separated validated narrowly (one positive: Arc 3 c2). §2 categorical floor was mixing capability gating with classification gating; v2.1.2 relaxes it. §11 Stepwise local_peaks ceiling was a first-pass prior; empirical evidence justifies 5-50.
 
-**Next: Open-18 empirical replays.** Three v2.0-killed cohorts (Arc 2 redo c2, KH-24 v2.0 c4, Arc 3 Stepwise climber) become testable under v2.1.1 rules immediately — no Step 1 re-run, no engine work, just re-running Step 3 analysis on existing `trades_paths.csv`. Recommended order: Arc 3 Stepwise climber → KH-24 v2.0 c4 (refreshes §14 anchor) → Arc 2 redo c2.
+**v2.1.2 substantive changes:**
+- §2 internal-consistency floor: `∈ {tight_unimodal, heavy_right_tail, bimodal_separated}` → `≠ scattered`
+- §11 Stepwise local_peaks ceiling: 5-30 → 5-50
+- §15a added: arc Step 1 schema requirement (Open-19 closure mechanism)
+- Open-15, Open-18 closed (validated); Open-19 closed
+- Open-20 deliberately NOT added: reframed as Step 4 measurement question (high-pct_peak_and_collapse cohorts measured under trailing-stop exit, not fixed-SL re-imposition; the trailing stop *is* the realised-R protection)
 
-**Arc 4** opens after Open-18 replays validate v2.1.1 mechanics.
+**Anchor preservation:** KH-24 K=4 archetype 3 centroid (mono 0.576, local_peaks 14.19, pullback 0.020, ttp_rel 0.847) routes to Stepwise climber under both old [5,30] and new [5,50] ranges; bimodal shape_tag passes `≠ scattered`. No routing change.
+
+**Arc 4 active:** LCHAR Entry 4 (`TRIAL__univariate_extreme__bar_range_top_decile__neg__h_001`), 1-bar horizon, univariate-extreme family.
 
 ---
 
@@ -61,14 +62,14 @@ KH-24 is locked and unchanged. No modifications without an explicit modification
 
 ## Active Research
 
-L arc signal testing under `L_ARC_PROTOCOL.md` v2.0 (Arcs 3+). v1.x archive at `archive/` for historical Arc 1, Arc 2 reference.
+L arc signal testing under `L_ARC_PROTOCOL.md` v2.1.2 (Arcs 4+). v2.0 governed Arc 3 (closed); v1.x archive at `archive/` for historical Arc 1, Arc 2 reference.
 
 | Item | Detail |
 | --- | --- |
-| Protocol | `L_ARC_PROTOCOL.md` v2.0 (self-contained; v1.x ops spec archived) |
+| Protocol | `L_ARC_PROTOCOL.md` v2.1.2 (self-contained; v1.x ops spec archived) |
 | Signals | Top-N from `docs/LCHAR_TOPN_REGISTRY.md` — 5 arcs scheduled |
 | Approach | Six-step pipeline: plumbing → path-shape clustering → capturability → extractability (E or D1) → cross-fold stability → WFO |
-| Current arc | Arc 4 — opens after Arc 3 closure (CLEAN-NULL) and any authorised Arc 3D diagnostic |
+| Current arc | Arc 4 — active, LCHAR Entry 4 (`TRIAL__univariate_extreme__bar_range_top_decile__neg__h_001`) |
 | Calibration anchor | KH-24 K=4 archetype 3 (passes via Pipeline D1 at t=3) |
 | Risk per trade | 0.5% × reset floor balance |
 | Pair set | All 28 FX, same as KH-24 |
@@ -100,6 +101,8 @@ Annualisation: `fold_raw_ROI × (365 / fold_OOS_days)`. Folds < 90 OOS days excl
 
 | Phase | Verdict | Finding |
 | --- | --- | --- |
+| L_ARC_PROTOCOL v2.1.2 amendment | LANDED (2026-05-17) | §2 categorical shape_tag floor relaxed to `≠ scattered`; §11 Stepwise local_peaks ceiling 5-30 → 5-50; §15a arc Step 1 schema requirement (Open-19 closure). Open-15, Open-18, Open-19 closed. Open-20 reframed as Step 4 measurement (not a §2 gate). Anchor preservation verified. |
+| Open-18 cross-replay synthesis | COMPLETE (2026-05-17) | 3/3 replays passed: Arc 3 Stepwise (c2 + aggregate), KH-24 v2.0 c4 (c1 + c4), Arc 2 redo2 cid 1. Pre-peak Def C validated as dominant rescue mechanism (38% → 0-2% wrong_way across cohorts). bimodal_separated validated narrowly. See `results/replays_v2_1_1/` for full evidence. |
 | L_ARC_PROTOCOL v2.1.1 amendment | LANDED (2026-05-17) | Combined patch: v2.1.1 refinements (§7 capturability composite, §5 re-cluster on extend, §11 row 7 routing precedence, §10 ship rule) + v2.1 engine-reality corrections (§1, §5, §7, §14, §16, §17 wording fixes — v1.3 forward extension already provides SL-free observation; engine PR was unneeded). `feat/sl-free-path-recording` branch superseded. Open-18 replays of v2.0-killed cohorts now runnable. |
 | L_ARC_PROTOCOL v2.1 amendment | LANDED (2026-05-17) | Doc-only protocol amendment closing Open-08/12/13/14/15 (partial Open-01). Pre-peak §2 metrics, SL sweep at Step 3, per-cluster + per-aggregate evaluation, bimodal_separated admission, SL column demotion in §11, K-tie tolerance, forward window auto-extend. Engine PR + closed-arc re-runs follow. |
 | Pipeline D1 backtester extension | DELIVERED (PR #131, 2026-05-17) | D1 plumbing + close-at-market policy; 41 tests; byte-identical when D1_HOOK=None. PR 2 (per-archetype §11 exit policies) deferred — awaiting a Step-4 archetype consumer. |
@@ -121,13 +124,10 @@ Annualisation: `fold_raw_ROI × (365 / fold_OOS_days)`. Folds < 90 OOS days excl
 
 | Item | Priority | Notes |
 | --- | --- | --- |
-| Open-18 empirical replays | HIGH | Run v2.1.1 Step 3 analysis on existing `trades_paths.csv` for: Arc 3 Stepwise climber (first), KH-24 v2.0 c4 (anchor refresh), Arc 2 redo c2 (cross-arc). No engine work — v1.3 forward bars (`is_held=0`) already in schema. |
-| §14 anchor refresh | HIGH | Pick refreshed anchor from KH-24 v2.0 c4 replay result. Only blocker is the replay above. |
-| Arc 3D diagnostic tail | SUPERSEDED | v2.1 resolved Open-13/14/15; Open-18 replays serve the same purpose. Decision moot. |
-| Arc 4 opens under v2.1.1 | HIGH | Opens after Open-18 replays validate v2.1.1 mechanics + anchor refresh lands. Registry Entry 4 (1-bar horizon, univariate-extreme `neg`). |
+| Arc 4 | ACTIVE | LCHAR Entry 4 (`TRIAL__univariate_extreme__bar_range_top_decile__neg__h_001`), 1-bar horizon, univariate-extreme family. Under L_ARC_PROTOCOL v2.1.2. |
 | Pipeline D1 PR 2 (per-archetype §11 exit policies) | DEFERRED | Awaiting an arc to surface an archetype reaching Step 4 with a §11 row the current engine cannot express. No build until concrete consumer surfaces. |
 
-No outstanding bugs or issues against KH-24. No pending fixes against the backtester.
+No outstanding bugs or issues against KH-24. No pending fixes against the backtester. §14 anchor refresh explicitly held (deployed-pop reference, no change).
 
 ---
 
@@ -135,7 +135,7 @@ No outstanding bugs or issues against KH-24. No pending fixes against the backte
 
 | Item | Status | Notes |
 | --- | --- | --- |
-| §2 calibration pattern | 2/3 arcs hit it | 2026-05-16 closures: Arc 2 redo and KH-24 v2.0 self-test both failed §2 on monotonicity / shape_tag with strong-edge cohorts (KH-24 c4: fwd_mfe_p50 6.65R, reach_1R 1.000, missed mono by 0.020; Arc 2 redo c2: t-stat +52.17, missed mono by 0.009). Arc 3 closed CLEAN-NULL on related §2 floors. If Arc 4 closes the same way, §2 calibration moves from watch item to blocking the protocol from producing systems. Post-Arc-5 calibration review now has concrete inputs. |
+| §2 calibration pattern | ADDRESSED in v2.1.2 | The §2 monotonicity / shape_tag wall seen at 2026-05-16 closures (KH-24 c4, Arc 2 redo c2, Arc 3 Stepwise) was empirically resolved by Open-18 replays under v2.1.1 (pre-peak Def C + capturability composite) and architecturally addressed by v2.1.2 (`≠ scattered` floor + Stepwise ceiling extension). Watch list retained — re-open if Arc 4 surfaces a similar failure mode that v2.1.2 doesn't resolve. |
 
 ---
 
@@ -143,7 +143,7 @@ No outstanding bugs or issues against KH-24. No pending fixes against the backte
 
 Items accumulating from arc closures under v2.0. Per §1.8 within-arc thresholds do not move; per §12 cross-arc calibration is governed and requires a calibration document + chat-level approval. The 2026-05-17 v2.1 amendment resolved or partially resolved most of the items below; items still requiring evidence / execution are kept under "Active backlog".
 
-### Resolved in v2.1 (2026-05-17 amendment)
+### Resolved in v2.1 / v2.1.1 / v2.1.2 amendments
 
 | Item | Source arc(s) | Resolution |
 | --- | --- | --- |
@@ -152,18 +152,19 @@ Items accumulating from arc closures under v2.0. Per §1.8 within-arc thresholds
 | Open-12 silhouette tie tolerance | Arc 3 | CLOSED in v2.1 — §6 tolerance 0.01 absolute silhouette |
 | Open-13 §2/§11 row-7 bimodal incompatibility | Arc 3 | CLOSED in v2.1 — `bimodal_separated` admitted at §2 under Hartigan dip + mass + separation test; routes to §11 row 7 |
 | Open-14 same-archetype aggregation rule | Arc 3 | CLOSED in v2.1 — §7 evaluates per-cluster AND per-aggregate; cluster proceeds if either passes |
-| Open-15 SL/horizon asymmetry inflating wrong_way | Arc 3 | CLOSED in v2.1 / v2.1.1 — addressed via SL-free measurement (uses v1.3 forward-window extension already in engine; no PR needed) + per-archetype SL sweep at §7 (capturability composite selection under v2.1.1) |
+| Open-15 SL/horizon asymmetry inflating wrong_way | Arc 3 | CLOSED in v2.1 / v2.1.1 — addressed via SL-free measurement (uses v1.3 forward-window extension already in engine; no PR needed) + per-archetype SL sweep at §7 (capturability composite selection under v2.1.1); empirically confirmed across three Open-18 replays in v2.1.2 |
 | 240-bar forward window for 4H signals | KH-24 v2.0 | CLOSED in v2.1 — §5 forward window auto-extend at >20% pool-level cap-binding (2× extension default) |
 | Per-pair n distribution stability concern | KH-24 v2.0 | CLOSED in v2.1 — §9 per-pair stability reporting added at Step 5 (informational; flags > 50% concentration in < 5 pairs) |
+| §2 monotonicity floor (0.55) calibration | KH-24 v2.0, Arc 2 redo | RESOLVED in v2.1.2 — pre-peak measurement subsumes the full-window bias; three Open-18 replays confirm empirically. Floor unchanged; near-miss failure mode no longer reproduces. |
+| shape_tag definitions vs forward-window censoring | KH-24 v2.0 | PARTIALLY RESOLVED in v2.1.2 — §2 categorical floor relaxed to `≠ scattered`; cap-binding correlation diagnostic carried forward as Watch / Active backlog item below. |
+| §14 anchor population vs §15 pool floor mismatch | KH-24 v2.0 | HELD — user decision: deployed-pop reference unchanged. KH-24 v2.0 c4 replay produced c1/c4 candidates but no refresh applied. v2.1.2 anchor preservation verified under the existing v2.0 reference. |
 
 ### Active backlog (still open or partial)
 
 | Item | Source arc(s) | Priority | Notes |
 | --- | --- | --- | --- |
-| §2 monotonicity floor (0.55) calibration | KH-24 v2.0, Arc 2 redo | ADDRESSED in v2.1.1 | Pre-peak measurement subsumes the full-window biasing; Open-18 replays validate empirically. Floor stays 0.55 pending replay outcomes — re-open if replays surface residual near-misses. |
-| shape_tag definitions vs forward-window censoring | KH-24 v2.0 | HIGH | v2.1 `bimodal_separated` admission covers part of the tightness. Censoring-vs-shape_tag tension (e.g. KH-24 v2.0 c4 87.7% cap-binders → shape_tag=scattered) remains until re-run evidence. Forward window auto-extend reduces but doesn't eliminate. |
-| §14 anchor population vs §15 pool floor mismatch | KH-24 v2.0 | HIGH | v2.1.1 §14 documents refresh path. Execution pending KH-24 v2.0 re-run only (no engine work needed — v1.3 forward extension already provides SL-free observation; Open-18 replay #2 produces the refreshed anchor). |
-| §11 archetype priors empirical refinement (Open-07) | KH-24 v2.0, Arc 2 redo, Arc 3 | MEDIUM | v2.1 demotes §11 SL column to prior (actual SL = Step 3 sweep). Centroid-pattern refresh remains open; deferred until Arc 4 + Arc 5 produce additional evidence. |
+| §11 archetype priors empirical refinement (Open-07) | KH-24 v2.0, Arc 2 redo, Arc 3 | MEDIUM | v2.1 demoted §11 SL column to prior; v2.1.2 extends Stepwise local_peaks ceiling 5-30 → 5-50 based on Open-18 empirical centroids. Other §11 rows still first-pass priors; centroid-pattern refresh remains open. Deferred until Arc 4 + Arc 5 produce additional evidence. |
+| Cap-binding / shape_tag dead-zone diagnostic | KH-24 v2.0 c4 replay | LOW | Replay #2 surfaced correlation between p95/p50 dead-zone (2.0, 3.0] and forward-window cap-binding. v2.1.2's `≠ scattered` floor avoids over-rejecting on this; §5 auto-extend addresses upstream. Track whether the correlation resurfaces under Arc 4+. |
 
 ---
 

@@ -1,0 +1,83 @@
+# Arc 7 — Step 4 extractability config (L_ARC_PROTOCOL v2.1.2 §§8, 10, 17).
+#
+# Per-unit (cluster or aggregate): Pipeline E (4H entry-time) and Pipeline D1
+# (daily regime) classifiers. Success label = final_r ≥ 1R at the unit's
+# selected SL. TimeSeriesSplit CV ordered by entry_time. RF (n_estimators=200,
+# max_depth=8, random_state=42, n_jobs=1 for determinism). Threshold t sweep
+# ∈ {0.30, 0.32, …, 0.80}; select largest t with exclusion ≤ 0.30.
+
+phase: L_ARC_7_STEP_4_EXTRACTABILITY
+
+input:
+  step1_dir: results/l_arc_7/step1
+  trades_csv: trades_all.csv
+  paths_csv: trades_paths.csv
+  step2_dir: results/l_arc_7/step2
+  clusters_csv: clusters_K4.csv
+  step3_dir: results/l_arc_7/step3
+  pass_list_csv: capturability_pass_list.csv
+
+output:
+  results_dir: results/l_arc_7/step4
+  summary_md: STEP4_SUMMARY.md
+  determinism_check: true
+
+# Surviving units from Step 3 (mirror; do not regenerate).
+units:
+  - unit_id: c1
+    type: cluster
+    cluster_ids: [1]
+    selected_sl_atr_mult: 4
+  - unit_id: c3
+    type: cluster
+    cluster_ids: [3]
+    selected_sl_atr_mult: 2
+  - unit_id: agg_c1_c3
+    type: aggregate
+    cluster_ids: [1, 3]
+    selected_sl_atr_mult: 4
+
+# SL re-imposition (matches Step 3).
+original_sl_atr_mult: 2.0
+
+# §8 gate thresholds.
+gates:
+  pipeline_e_auc_min: 0.65
+  pipeline_d1_auc_min: 0.60
+
+# Threshold-t sweep + exclusion cap.
+threshold_sweep:
+  t_min: 0.30
+  t_max: 0.80
+  t_step: 0.02
+  exclusion_max: 0.30
+
+# Classifier (deterministic).
+model:
+  type: random_forest
+  n_estimators: 200
+  max_depth: 8
+  random_state: 42
+  n_jobs: 1                       # n_jobs=-1 risks non-determinism on Windows
+  class_weight_balanced_threshold: 0.30  # use balanced if minority < 30%
+
+# Cross-validation.
+cv:
+  type: time_series_split
+  n_splits: 5
+  order_by: entry_time
+
+# Permutation importance.
+permutation_importance:
+  n_repeats: 5
+  random_state: 42
+
+# Data paths for D1 + 4H raw bars (for D1 lag audit + feature recomputation).
+data:
+  dir_4h: data/4hr
+  dir_d1: data/daily
+
+# D1 lag audit.
+d1_lag_audit:
+  n_random_trades_per_unit: 5
+  random_seed: 42

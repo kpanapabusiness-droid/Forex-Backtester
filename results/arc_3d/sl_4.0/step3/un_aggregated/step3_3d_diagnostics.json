@@ -1,0 +1,322 @@
+{
+  "env": {
+    "numpy": "2.4.4",
+    "pandas": "3.0.2",
+    "python": "3.14.0",
+    "scipy": "1.17.1"
+  },
+  "groups": [
+    {
+      "archetype_label": "Stepwise climber",
+      "centroid": {
+        "local_peaks": 21.04237288135593,
+        "monotonicity": 0.5424137056819915,
+        "pullback": 0.261684768232839,
+        "time_to_peak_rel": 0.8257537051324152
+      },
+      "cluster_ids": [
+        0
+      ],
+      "final_r": {
+        "mean": 1.5245751572526696,
+        "p25": 0.8447656165749999,
+        "p5": -0.5548524671849999,
+        "p50": 1.4539247815,
+        "p75": 2.187648186,
+        "p95": 3.281353488549998,
+        "t_stat": 27.600856106815556
+      },
+      "frequencies": {
+        "frac_reach_1R": 0.9364406779661016,
+        "frac_reach_2R": 0.5466101694915254,
+        "frac_wrong_way": 0.05084745762711865,
+        "pct_peak_and_collapse": 0.1673728813559322
+      },
+      "gates": {
+        "failure_reasons": [
+          "monotonicity_centroid 0.542 < 0.55"
+        ],
+        "gates_passed_count": 5,
+        "local_peaks": "PASS",
+        "mfe_p50": "PASS",
+        "monotonicity": "FAIL",
+        "reach_1R": "PASS",
+        "shape_tag": "PASS",
+        "size": "PASS",
+        "verdict": "FAIL",
+        "wrong_way": "PASS"
+      },
+      "label": "cluster_0 (Stepwise climber)",
+      "mass_in_band": {
+        "-0.5R_to_0R": 0.02754237288135593,
+        "-1R_to_-0.5R": 0.00423728813559322,
+        "0.5R_to_1R": 0.1716101694915254,
+        "0R_to_0.5R": 0.06991525423728813,
+        "1R_to_2R": 0.3580508474576271,
+        "2R_to_5R": 0.3050847457627119,
+        "gt_5R": 0.01694915254237288,
+        "le_-1R": 0.046610169491525424
+      },
+      "mfe_h240": {
+        "p25": 1.60229541825,
+        "p5": 0.9395370553200001,
+        "p50": 2.1007007575000003,
+        "p75": 2.8018229515,
+        "p95": 3.9686040325999987
+      },
+      "shape_tag": "tight_unimodal",
+      "shape_tag_log": {
+        "iqr": 1.3428825694250002,
+        "p25": 0.8447656165749999,
+        "p50": 1.4539247815,
+        "p75": 2.187648186,
+        "p95": 3.281353488549998,
+        "skew": 0.6475262095788654,
+        "std": 1.2000443182980338,
+        "tight_unimodal_iqr_le_1.5_skew_abs_le_1.0": true
+      },
+      "size_count": 472,
+      "size_fraction": 0.2872793670115642
+    },
+    {
+      "archetype_label": "Early-peak hold",
+      "centroid": {
+        "local_peaks": 0.5439330543933054,
+        "monotonicity": 0.013538553496234309,
+        "pullback": 0.010103631389456066,
+        "time_to_peak_rel": 0.1094634907427364
+      },
+      "cluster_ids": [
+        1
+      ],
+      "final_r": {
+        "mean": -1.0012490540150627,
+        "p25": -1.001782394,
+        "p5": -1.0100317236999998,
+        "p50": -1.000807721,
+        "p75": -1.0005172354999998,
+        "p95": -1.0002691316,
+        "t_stat": -338.71106986982784
+      },
+      "frequencies": {
+        "frac_reach_1R": 0.0,
+        "frac_reach_2R": 0.0,
+        "frac_wrong_way": 0.99581589958159,
+        "pct_peak_and_collapse": 0.0
+      },
+      "gates": {
+        "failure_reasons": [
+          "monotonicity_centroid 0.014 < 0.55",
+          "mfe_h240_p50 0.100R < 1.5R",
+          "frac_reach_1R 0.000 < 0.7",
+          "frac_wrong_way 0.996 > 0.3",
+          "shape_tag=no_magnitude not in {tight_unimodal, heavy_right_tail}"
+        ],
+        "gates_passed_count": 2,
+        "local_peaks": "PASS",
+        "mfe_p50": "FAIL",
+        "monotonicity": "FAIL",
+        "reach_1R": "FAIL",
+        "shape_tag": "FAIL",
+        "size": "PASS",
+        "verdict": "FAIL",
+        "wrong_way": "FAIL"
+      },
+      "label": "cluster_1 (Early-peak hold)",
+      "mass_in_band": {
+        "-0.5R_to_0R": 0.0041841004184100415,
+        "-1R_to_-0.5R": 0.0,
+        "0.5R_to_1R": 0.0,
+        "0R_to_0.5R": 0.0,
+        "1R_to_2R": 0.0,
+        "2R_to_5R": 0.0,
+        "gt_5R": 0.0,
+        "le_-1R": 0.99581589958159
+      },
+      "mfe_h240": {
+        "p25": 0.042242085375,
+        "p5": 0.0020080227998,
+        "p50": 0.1000285405,
+        "p75": 0.17047129575,
+        "p95": 0.3281471770499999
+      },
+      "shape_tag": "no_magnitude",
+      "shape_tag_log": {
+        "iqr": 0.0012651585000000853,
+        "no_magnitude_p75_le_0.5R": true,
+        "p25": -1.001782394,
+        "p50": -1.000807721,
+        "p75": -1.0005172354999998,
+        "p95": -1.0002691316,
+        "skew": 13.24663556620751,
+        "std": 0.045699524217378135
+      },
+      "size_count": 239,
+      "size_fraction": 0.14546561168594035
+    },
+    {
+      "archetype_label": "unassigned",
+      "centroid": {
+        "local_peaks": 6.5575364667747165,
+        "monotonicity": 0.5324608614583469,
+        "pullback": 0.1604603886795624,
+        "time_to_peak_rel": 0.30253159109671474
+      },
+      "cluster_ids": [
+        2
+      ],
+      "final_r": {
+        "mean": -0.6131870970104861,
+        "p25": -1.001597218,
+        "p5": -1.0106981421999999,
+        "p50": -1.00062301,
+        "p75": -0.3102106524,
+        "p95": 0.825670097739999,
+        "t_stat": -22.61052721479501
+      },
+      "frequencies": {
+        "frac_reach_1R": 0.31118314424635335,
+        "frac_reach_2R": 0.050243111831442464,
+        "frac_wrong_way": 0.7179902755267423,
+        "pct_peak_and_collapse": 0.22852512155591573
+      },
+      "gates": {
+        "failure_reasons": [
+          "monotonicity_centroid 0.532 < 0.55",
+          "mfe_h240_p50 0.705R < 1.5R",
+          "frac_reach_1R 0.311 < 0.7",
+          "frac_wrong_way 0.718 > 0.3",
+          "shape_tag=no_magnitude not in {tight_unimodal, heavy_right_tail}"
+        ],
+        "gates_passed_count": 2,
+        "local_peaks": "PASS",
+        "mfe_p50": "FAIL",
+        "monotonicity": "FAIL",
+        "reach_1R": "FAIL",
+        "shape_tag": "FAIL",
+        "size": "PASS",
+        "verdict": "FAIL",
+        "wrong_way": "FAIL"
+      },
+      "label": "cluster_2 (unassigned)",
+      "mass_in_band": {
+        "-0.5R_to_0R": 0.09076175040518639,
+        "-1R_to_-0.5R": 0.03889789303079417,
+        "0.5R_to_1R": 0.06482982171799027,
+        "0R_to_0.5R": 0.09076175040518639,
+        "1R_to_2R": 0.03565640194489465,
+        "2R_to_5R": 0.0,
+        "gt_5R": 0.0,
+        "le_-1R": 0.6790923824959482
+      },
+      "mfe_h240": {
+        "p25": 0.3624425078,
+        "p5": 0.17686507724,
+        "p50": 0.7049684247,
+        "p75": 1.128995548,
+        "p95": 1.9995845395999996
+      },
+      "shape_tag": "no_magnitude",
+      "shape_tag_log": {
+        "iqr": 0.6913865655999999,
+        "no_magnitude_p75_le_0.5R": true,
+        "p25": -1.001597218,
+        "p50": -1.00062301,
+        "p75": -0.3102106524,
+        "p95": 0.825670097739999,
+        "skew": 1.6561323872229579,
+        "std": 0.6736353985796992
+      },
+      "size_count": 617,
+      "size_fraction": 0.3755325623858795
+    },
+    {
+      "archetype_label": "unassigned",
+      "centroid": {
+        "local_peaks": 8.19047619047619,
+        "monotonicity": 0.5031343853580952,
+        "pullback": 0.5753246451520635,
+        "time_to_peak_rel": 0.6308163716104762
+      },
+      "cluster_ids": [
+        3
+      ],
+      "final_r": {
+        "mean": -0.10632509218109214,
+        "p25": -1.0009113594999999,
+        "p5": -1.0138246262,
+        "p50": -0.4378496495,
+        "p75": 0.6177036043999999,
+        "p95": 1.7020634803000003,
+        "t_stat": -1.8239343773101258
+      },
+      "frequencies": {
+        "frac_reach_1R": 0.5238095238095238,
+        "frac_reach_2R": 0.14603174603174604,
+        "frac_wrong_way": 0.49206349206349204,
+        "pct_peak_and_collapse": 0.3047619047619048
+      },
+      "gates": {
+        "failure_reasons": [
+          "monotonicity_centroid 0.503 < 0.55",
+          "mfe_h240_p50 1.048R < 1.5R",
+          "frac_reach_1R 0.524 < 0.7",
+          "frac_wrong_way 0.492 > 0.3"
+        ],
+        "gates_passed_count": 3,
+        "local_peaks": "PASS",
+        "mfe_p50": "FAIL",
+        "monotonicity": "FAIL",
+        "reach_1R": "FAIL",
+        "shape_tag": "PASS",
+        "size": "PASS",
+        "verdict": "FAIL",
+        "wrong_way": "FAIL"
+      },
+      "label": "cluster_3 (unassigned)",
+      "mass_in_band": {
+        "-0.5R_to_0R": 0.08571428571428572,
+        "-1R_to_-0.5R": 0.047619047619047616,
+        "0.5R_to_1R": 0.1365079365079365,
+        "0R_to_0.5R": 0.14285714285714285,
+        "1R_to_2R": 0.11428571428571428,
+        "2R_to_5R": 0.02857142857142857,
+        "gt_5R": 0.0,
+        "le_-1R": 0.4444444444444444
+      },
+      "mfe_h240": {
+        "p25": 0.6892119881500001,
+        "p5": 0.28486301260999997,
+        "p50": 1.047744095,
+        "p75": 1.6010433535000002,
+        "p95": 2.7753003014000015
+      },
+      "shape_tag": "heavy_right_tail",
+      "shape_tag_log": {
+        "heavy_right_tail_ratio_ge_2.5_skew_ge_1.0": true,
+        "iqr": 1.6186149638999998,
+        "p25": -1.0009113594999999,
+        "p50": -0.4378496495,
+        "p75": 0.6177036043999999,
+        "p95": 1.7020634803000003,
+        "p95_over_p75": 2.7554695620616982,
+        "skew": 1.0983632380164439,
+        "std": 1.0346223023929682
+      },
+      "size_count": 315,
+      "size_fraction": 0.19172245891661593
+    }
+  ],
+  "input_assignments_csv": "C:\\Users\\panap\\Documents\\Forex-Backtester\\results\\arc_3d\\sl_4.0\\step2\\archetype_assignments.csv",
+  "input_clusters_csv": "C:\\Users\\panap\\Documents\\Forex-Backtester\\results\\arc_3d\\sl_4.0\\step2\\clusters_K4.csv",
+  "input_features_csv": "C:\\Users\\panap\\Documents\\Forex-Backtester\\results\\arc_3d\\sl_4.0\\step2\\path_features.csv",
+  "input_paths_csv": "C:\\Users\\panap\\Documents\\Forex-Backtester\\results\\arc_3d\\sl_4.0\\step1\\trades_paths.csv",
+  "input_trades_csv": "C:\\Users\\panap\\Documents\\Forex-Backtester\\results\\arc_3d\\sl_4.0\\step1\\trades_all.csv",
+  "mode": "un_aggregated",
+  "n_groups": 4,
+  "pool_size": 1643,
+  "run_timestamp_utc": "2026-05-16 13:31:12",
+  "sha256": {
+    "archetype_summaries_csv": "a1270141e3c9c0be344fdf4a01fba843293fb187c9f6cf773c56ccde54ffcbb1"
+  }
+}

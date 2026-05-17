@@ -14,8 +14,10 @@ is computed in signals/lchar_d1atr_top_decile.py — verbatim mirror of L4
 
 Trade mechanics:
   - Entry: bar N+1 open (long fill = mid + spread/2).
-  - SL: entry_price − 2.0 × Wilder ATR(14)_1H at signal bar N (anchored to
-        entry_price per arc dispatch). 1R = SL distance from entry.
+  - SL: entry_price − sl_multiplier × Wilder ATR(14)_1H at signal bar N
+        (anchored to entry_price per arc dispatch; sl_multiplier read from
+        cfg["exit"]["hard_stop"]["multiplier"], default 2.0 for Arc 3 baseline).
+        1R = SL distance from entry.
   - Time exit: bar N+1+120 open.
   - Exposure: max 1 open position per pair. Signals while a position is open
         are logged in the manifest's skipped count and dropped.
@@ -193,6 +195,7 @@ def _simulate_pair(
     next_trade_id: int,
     hold_bars: int,
     path_forward_bars: int,
+    sl_multiplier: float,
 ) -> Tuple[List[_TradeRow], List[_PathRow], int, int, int]:
     """Simulate trades for a single pair in chronological order.
 
@@ -244,8 +247,8 @@ def _simulate_pair(
         sp_entry_pips = _spread_pips_at_row(pair, entry_row, cfg, spread_state)
         entry_fill = entry_mid + DIRECTION_INT * (sp_entry_pips * pip_size) / 2.0
 
-        # SL: entry_price − 2.0 × ATR_1H Wilder at signal bar (long).
-        sl_distance_price = 2.0 * atr_at_sig
+        # SL: entry_price − sl_multiplier × ATR_1H Wilder at signal bar (long).
+        sl_distance_price = sl_multiplier * atr_at_sig
         sl_price = entry_fill - DIRECTION_INT * sl_distance_price
 
         # Walk hold window [entry_idx, entry_idx + hold_bars) for SL hit.
@@ -449,6 +452,7 @@ def run(cfg: dict, config_path: Path, *, write_manifest: bool = True) -> Dict[st
 
     hold_bars = int(cfg["exit"]["time_exit"]["bars_after_entry"])
     path_forward_bars = int(cfg["trade_paths"].get("forward_window_bars", PATH_FORWARD_BARS_DEFAULT))
+    sl_multiplier = float(cfg["exit"]["hard_stop"]["multiplier"])
 
     # Signal module — verified shape.
     sig_mod_name = str(cfg["signal"]["module"])
@@ -502,6 +506,7 @@ def run(cfg: dict, config_path: Path, *, write_manifest: bool = True) -> Dict[st
             next_trade_id=next_trade_id,
             hold_bars=hold_bars,
             path_forward_bars=path_forward_bars,
+            sl_multiplier=sl_multiplier,
         )
         all_trades.extend(trades)
         all_paths.extend(paths)
@@ -549,6 +554,7 @@ def run(cfg: dict, config_path: Path, *, write_manifest: bool = True) -> Dict[st
         "phase": cfg.get("phase"),
         "protocol_version": "v2.0",
         "signal_trial_id": cfg["signal"]["trial_id"],
+        "sl_multiplier": sl_multiplier,
         "data_window": {"start": date_start, "end": date_end},
         "totals": {
             "total_signals_fired": total_signals_fired,

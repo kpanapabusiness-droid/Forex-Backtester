@@ -1,0 +1,4 @@
+cluster_label,size,size_fraction,centroid_monotonicity_ratio_in_profit,centroid_local_peaks_count,centroid_pullback_magnitude_median,centroid_time_to_peak_mfe_relative
+0,717,0.4363968351,0.5257944961,6.479776848,0.2146588842,0.316735152
+1,681,0.4144856969,0.5360356803,17.47136564,0.3645601976,0.8020422999
+2,245,0.149117468,0.01728862974,0.587755102,0.01626688552,0.1142724966

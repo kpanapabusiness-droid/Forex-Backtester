@@ -1,0 +1,524 @@
+{
+  "arc_status": "PASS",
+  "chosen_k": 4,
+  "chosen_k_archetype_assignments": [
+    {
+      "archetype_label": "Stepwise climber",
+      "boundary_reason": "",
+      "centroid_local_peaks": 21.521560574948666,
+      "centroid_monotonicity": 0.5429485619137728,
+      "centroid_pullback": 0.3303374581952062,
+      "centroid_time_to_peak_rel": 0.8070525790105466,
+      "cluster_label": 0,
+      "pct_peak_and_collapse": 0.188911704312115,
+      "size": 487,
+      "size_fraction": 0.25377800937988537
+    },
+    {
+      "archetype_label": "Early-peak hold",
+      "boundary_reason": "",
+      "centroid_local_peaks": 0.4777777777777778,
+      "centroid_monotonicity": 0.006435185185185184,
+      "centroid_pullback": 0.006850856069055555,
+      "centroid_time_to_peak_rel": 0.10656690885257873,
+      "cluster_label": 1,
+      "pct_peak_and_collapse": 0.0,
+      "size": 360,
+      "size_fraction": 0.18759770713913496
+    },
+    {
+      "archetype_label": "unassigned",
+      "boundary_reason": "no \u00a711 pattern matched",
+      "centroid_local_peaks": 8.114634146341464,
+      "centroid_monotonicity": 0.5026773472316508,
+      "centroid_pullback": 0.6662842072484098,
+      "centroid_time_to_peak_rel": 0.6214087190392388,
+      "cluster_label": 2,
+      "pct_peak_and_collapse": 0.43658536585365854,
+      "size": 410,
+      "size_fraction": 0.2136529442417926
+    },
+    {
+      "archetype_label": "unassigned",
+      "boundary_reason": "no \u00a711 pattern matched",
+      "centroid_local_peaks": 5.777945619335347,
+      "centroid_monotonicity": 0.5348024324803347,
+      "centroid_pullback": 0.17981261446049157,
+      "centroid_time_to_peak_rel": 0.31143532509749045,
+      "cluster_label": 3,
+      "pct_peak_and_collapse": 0.2930513595166163,
+      "size": 662,
+      "size_fraction": 0.3449713392391871
+    }
+  ],
+  "degeneracy_audit": {
+    "_summary": {
+      "arc_kill": false,
+      "count": 0,
+      "degenerate_features": []
+    },
+    "local_peaks_count": {
+      "is_degenerate_gt_80pct": false,
+      "modal_count": 250,
+      "modal_fraction": 0.13027618551328818,
+      "modal_value": 0.0
+    },
+    "monotonicity_ratio_in_profit": {
+      "is_degenerate_gt_80pct": false,
+      "modal_count": 354,
+      "modal_fraction": 0.18447107868681606,
+      "modal_value": 0.0
+    },
+    "pullback_magnitude_median": {
+      "is_degenerate_gt_80pct": false,
+      "modal_count": 551,
+      "modal_fraction": 0.2871287128712871,
+      "modal_value": 0.0
+    },
+    "time_to_peak_mfe_relative": {
+      "is_degenerate_gt_80pct": false,
+      "modal_count": 250,
+      "modal_fraction": 0.13027618551328818,
+      "modal_value": 0.0
+    }
+  },
+  "determinism": {
+    "byte_identical": true,
+    "chosen_k": 4,
+    "run_1_clusters_chosen_sha256": "f8e3b51f74747e48f0f0de2915ca80bffd5d378fc1fb71db0c604c8a8594fdc2",
+    "run_2_clusters_chosen_sha256": "f8e3b51f74747e48f0f0de2915ca80bffd5d378fc1fb71db0c604c8a8594fdc2"
+  },
+  "env": {
+    "numpy": "2.4.4",
+    "pandas": "3.0.2",
+    "python": "3.14.0",
+    "sklearn": "1.8.0"
+  },
+  "input_paths_csv": "results\\arc_3d\\sl_3.0\\step1\\trades_paths.csv",
+  "input_trades_csv": "results\\arc_3d\\sl_3.0\\step1\\trades_all.csv",
+  "k_sweep": {
+    "3": {
+      "cluster_sizes": [
+        741,
+        369,
+        809
+      ],
+      "max_cluster_fraction": 0.42157373632100054,
+      "min_cluster_size": 369,
+      "passes_all_gates": true,
+      "passes_max_fraction_gate": true,
+      "passes_min_size_gate": true,
+      "passes_silhouette_gate": true,
+      "silhouette": 0.3957045531243795,
+      "size_fractions": [
+        0.38613861386138615,
+        0.19228764981761334,
+        0.42157373632100054
+      ]
+    },
+    "4": {
+      "cluster_sizes": [
+        487,
+        360,
+        410,
+        662
+      ],
+      "max_cluster_fraction": 0.3449713392391871,
+      "min_cluster_size": 360,
+      "passes_all_gates": true,
+      "passes_max_fraction_gate": true,
+      "passes_min_size_gate": true,
+      "passes_silhouette_gate": true,
+      "silhouette": 0.4135037002388932,
+      "size_fractions": [
+        0.25377800937988537,
+        0.18759770713913496,
+        0.2136529442417926,
+        0.3449713392391871
+      ]
+    },
+    "5": {
+      "cluster_sizes": [
+        349,
+        237,
+        359,
+        555,
+        419
+      ],
+      "max_cluster_fraction": 0.28921313183949976,
+      "min_cluster_size": 237,
+      "passes_all_gates": true,
+      "passes_max_fraction_gate": true,
+      "passes_min_size_gate": true,
+      "passes_silhouette_gate": true,
+      "silhouette": 0.38385986182054094,
+      "size_fractions": [
+        0.1818655549765503,
+        0.12350182386659718,
+        0.18707660239708182,
+        0.28921313183949976,
+        0.21834288692027098
+      ]
+    },
+    "6": {
+      "cluster_sizes": [
+        340,
+        357,
+        196,
+        385,
+        213,
+        428
+      ],
+      "max_cluster_fraction": 0.22303282959874934,
+      "min_cluster_size": 196,
+      "passes_all_gates": true,
+      "passes_max_fraction_gate": true,
+      "passes_min_size_gate": true,
+      "passes_silhouette_gate": true,
+      "silhouette": 0.3588164875723628,
+      "size_fractions": [
+        0.1771756122980719,
+        0.18603439291297552,
+        0.10213652944241793,
+        0.2006253256904638,
+        0.11099531005732152,
+        0.22303282959874934
+      ]
+    },
+    "7": {
+      "cluster_sizes": [
+        209,
+        189,
+        356,
+        79,
+        371,
+        440,
+        275
+      ],
+      "max_cluster_fraction": 0.2292860865033872,
+      "min_cluster_size": 79,
+      "passes_all_gates": true,
+      "passes_max_fraction_gate": true,
+      "passes_min_size_gate": true,
+      "passes_silhouette_gate": true,
+      "silhouette": 0.36383780495259405,
+      "size_fractions": [
+        0.10891089108910891,
+        0.09848879624804585,
+        0.18551328817092236,
+        0.04116727462219906,
+        0.19332985930171964,
+        0.2292860865033872,
+        0.14330380406461699
+      ]
+    }
+  },
+  "n_trades": 1919,
+  "open_07_match_audit": [
+    {
+      "assignment": "Stepwise climber",
+      "boundary_reason": "",
+      "centroid": {
+        "local_peaks_count": 21.521560574948666,
+        "monotonicity_ratio_in_profit": 0.5429485619137728,
+        "pullback_magnitude_median": 0.3303374581952062,
+        "time_to_peak_mfe_relative": 0.8070525790105466
+      },
+      "cluster_label": 0,
+      "matches": [
+        {
+          "archetype_label": "Monotone ascent",
+          "matched": false,
+          "rule_text": "monotonicity >= 0.55 AND local_peaks <= 4 AND time_to_peak_rel >= 0.50",
+          "unmet": [
+            "monotonicity 0.543 < 0.55",
+            "local_peaks 21.52 > 4"
+          ]
+        },
+        {
+          "archetype_label": "Stepwise climber",
+          "matched": true,
+          "rule_text": "monotonicity >= 0.50 AND local_peaks in [5,30] AND pullback <= 0.5R AND time_to_peak_rel >= 0.50",
+          "unmet": []
+        },
+        {
+          "archetype_label": "Early-peak hold",
+          "matched": false,
+          "rule_text": "time_to_peak_rel <= 0.30 AND pct_peak_and_collapse < 0.30 (fwd_mfe_p50 >= 1.5R deferred to Step 3)",
+          "unmet": [
+            "time_to_peak_rel 0.807 > 0.30"
+          ]
+        },
+        {
+          "archetype_label": "Peak-and-collapse",
+          "matched": false,
+          "rule_text": "time_to_peak_rel <= 0.30 AND pct_peak_and_collapse >= 0.50",
+          "unmet": [
+            "time_to_peak_rel 0.807 > 0.30",
+            "pct_peak_and_collapse 0.189 < 0.50"
+          ]
+        },
+        {
+          "archetype_label": "V-shape recovery",
+          "matched": false,
+          "rule_text": "MAE-before-peak >= 5 bars AND peak position in [0.4, 0.8] (not centroid-matchable from 4 features alone)",
+          "unmet": [
+            "pattern not expressible from 4 centroid features"
+          ]
+        },
+        {
+          "archetype_label": "Random walk",
+          "matched": false,
+          "rule_text": "local_peaks >= 8 AND monotonicity <= 0.30 AND pullback >= 1R",
+          "unmet": [
+            "monotonicity 0.543 > 0.30",
+            "pullback 0.330 < 1.0R"
+          ]
+        },
+        {
+          "archetype_label": "Split exit variant (bimodal)",
+          "matched": false,
+          "rule_text": "bimodal fwd_mfe distribution with two modes >= 1R apart (cluster-level, not centroid-matchable)",
+          "unmet": [
+            "distributional pattern; defer to Step 3"
+          ]
+        }
+      ],
+      "pct_peak_and_collapse": 0.188911704312115
+    },
+    {
+      "assignment": "Early-peak hold",
+      "boundary_reason": "",
+      "centroid": {
+        "local_peaks_count": 0.4777777777777778,
+        "monotonicity_ratio_in_profit": 0.006435185185185184,
+        "pullback_magnitude_median": 0.006850856069055555,
+        "time_to_peak_mfe_relative": 0.10656690885257873
+      },
+      "cluster_label": 1,
+      "matches": [
+        {
+          "archetype_label": "Monotone ascent",
+          "matched": false,
+          "rule_text": "monotonicity >= 0.55 AND local_peaks <= 4 AND time_to_peak_rel >= 0.50",
+          "unmet": [
+            "monotonicity 0.006 < 0.55",
+            "time_to_peak_rel 0.107 < 0.50"
+          ]
+        },
+        {
+          "archetype_label": "Stepwise climber",
+          "matched": false,
+          "rule_text": "monotonicity >= 0.50 AND local_peaks in [5,30] AND pullback <= 0.5R AND time_to_peak_rel >= 0.50",
+          "unmet": [
+            "monotonicity 0.006 < 0.50",
+            "local_peaks 0.48 not in [5, 30]",
+            "time_to_peak_rel 0.107 < 0.50"
+          ]
+        },
+        {
+          "archetype_label": "Early-peak hold",
+          "matched": true,
+          "rule_text": "time_to_peak_rel <= 0.30 AND pct_peak_and_collapse < 0.30 (fwd_mfe_p50 >= 1.5R deferred to Step 3)",
+          "unmet": []
+        },
+        {
+          "archetype_label": "Peak-and-collapse",
+          "matched": false,
+          "rule_text": "time_to_peak_rel <= 0.30 AND pct_peak_and_collapse >= 0.50",
+          "unmet": [
+            "pct_peak_and_collapse 0.000 < 0.50"
+          ]
+        },
+        {
+          "archetype_label": "V-shape recovery",
+          "matched": false,
+          "rule_text": "MAE-before-peak >= 5 bars AND peak position in [0.4, 0.8] (not centroid-matchable from 4 features alone)",
+          "unmet": [
+            "pattern not expressible from 4 centroid features"
+          ]
+        },
+        {
+          "archetype_label": "Random walk",
+          "matched": false,
+          "rule_text": "local_peaks >= 8 AND monotonicity <= 0.30 AND pullback >= 1R",
+          "unmet": [
+            "local_peaks 0.48 < 8",
+            "pullback 0.007 < 1.0R"
+          ]
+        },
+        {
+          "archetype_label": "Split exit variant (bimodal)",
+          "matched": false,
+          "rule_text": "bimodal fwd_mfe distribution with two modes >= 1R apart (cluster-level, not centroid-matchable)",
+          "unmet": [
+            "distributional pattern; defer to Step 3"
+          ]
+        }
+      ],
+      "pct_peak_and_collapse": 0.0
+    },
+    {
+      "assignment": "unassigned",
+      "boundary_reason": "no \u00a711 pattern matched",
+      "centroid": {
+        "local_peaks_count": 8.114634146341464,
+        "monotonicity_ratio_in_profit": 0.5026773472316508,
+        "pullback_magnitude_median": 0.6662842072484098,
+        "time_to_peak_mfe_relative": 0.6214087190392388
+      },
+      "cluster_label": 2,
+      "matches": [
+        {
+          "archetype_label": "Monotone ascent",
+          "matched": false,
+          "rule_text": "monotonicity >= 0.55 AND local_peaks <= 4 AND time_to_peak_rel >= 0.50",
+          "unmet": [
+            "monotonicity 0.503 < 0.55",
+            "local_peaks 8.11 > 4"
+          ]
+        },
+        {
+          "archetype_label": "Stepwise climber",
+          "matched": false,
+          "rule_text": "monotonicity >= 0.50 AND local_peaks in [5,30] AND pullback <= 0.5R AND time_to_peak_rel >= 0.50",
+          "unmet": [
+            "pullback 0.666 > 0.5R"
+          ]
+        },
+        {
+          "archetype_label": "Early-peak hold",
+          "matched": false,
+          "rule_text": "time_to_peak_rel <= 0.30 AND pct_peak_and_collapse < 0.30 (fwd_mfe_p50 >= 1.5R deferred to Step 3)",
+          "unmet": [
+            "time_to_peak_rel 0.621 > 0.30",
+            "pct_peak_and_collapse 0.437 >= 0.30"
+          ]
+        },
+        {
+          "archetype_label": "Peak-and-collapse",
+          "matched": false,
+          "rule_text": "time_to_peak_rel <= 0.30 AND pct_peak_and_collapse >= 0.50",
+          "unmet": [
+            "time_to_peak_rel 0.621 > 0.30",
+            "pct_peak_and_collapse 0.437 < 0.50"
+          ]
+        },
+        {
+          "archetype_label": "V-shape recovery",
+          "matched": false,
+          "rule_text": "MAE-before-peak >= 5 bars AND peak position in [0.4, 0.8] (not centroid-matchable from 4 features alone)",
+          "unmet": [
+            "pattern not expressible from 4 centroid features"
+          ]
+        },
+        {
+          "archetype_label": "Random walk",
+          "matched": false,
+          "rule_text": "local_peaks >= 8 AND monotonicity <= 0.30 AND pullback >= 1R",
+          "unmet": [
+            "monotonicity 0.503 > 0.30",
+            "pullback 0.666 < 1.0R"
+          ]
+        },
+        {
+          "archetype_label": "Split exit variant (bimodal)",
+          "matched": false,
+          "rule_text": "bimodal fwd_mfe distribution with two modes >= 1R apart (cluster-level, not centroid-matchable)",
+          "unmet": [
+            "distributional pattern; defer to Step 3"
+          ]
+        }
+      ],
+      "pct_peak_and_collapse": 0.43658536585365854
+    },
+    {
+      "assignment": "unassigned",
+      "boundary_reason": "no \u00a711 pattern matched",
+      "centroid": {
+        "local_peaks_count": 5.777945619335347,
+        "monotonicity_ratio_in_profit": 0.5348024324803347,
+        "pullback_magnitude_median": 0.17981261446049157,
+        "time_to_peak_mfe_relative": 0.31143532509749045
+      },
+      "cluster_label": 3,
+      "matches": [
+        {
+          "archetype_label": "Monotone ascent",
+          "matched": false,
+          "rule_text": "monotonicity >= 0.55 AND local_peaks <= 4 AND time_to_peak_rel >= 0.50",
+          "unmet": [
+            "monotonicity 0.535 < 0.55",
+            "local_peaks 5.78 > 4",
+            "time_to_peak_rel 0.311 < 0.50"
+          ]
+        },
+        {
+          "archetype_label": "Stepwise climber",
+          "matched": false,
+          "rule_text": "monotonicity >= 0.50 AND local_peaks in [5,30] AND pullback <= 0.5R AND time_to_peak_rel >= 0.50",
+          "unmet": [
+            "time_to_peak_rel 0.311 < 0.50"
+          ]
+        },
+        {
+          "archetype_label": "Early-peak hold",
+          "matched": false,
+          "rule_text": "time_to_peak_rel <= 0.30 AND pct_peak_and_collapse < 0.30 (fwd_mfe_p50 >= 1.5R deferred to Step 3)",
+          "unmet": [
+            "time_to_peak_rel 0.311 > 0.30"
+          ]
+        },
+        {
+          "archetype_label": "Peak-and-collapse",
+          "matched": false,
+          "rule_text": "time_to_peak_rel <= 0.30 AND pct_peak_and_collapse >= 0.50",
+          "unmet": [
+            "time_to_peak_rel 0.311 > 0.30",
+            "pct_peak_and_collapse 0.293 < 0.50"
+          ]
+        },
+        {
+          "archetype_label": "V-shape recovery",
+          "matched": false,
+          "rule_text": "MAE-before-peak >= 5 bars AND peak position in [0.4, 0.8] (not centroid-matchable from 4 features alone)",
+          "unmet": [
+            "pattern not expressible from 4 centroid features"
+          ]
+        },
+        {
+          "archetype_label": "Random walk",
+          "matched": false,
+          "rule_text": "local_peaks >= 8 AND monotonicity <= 0.30 AND pullback >= 1R",
+          "unmet": [
+            "local_peaks 5.78 < 8",
+            "monotonicity 0.535 > 0.30",
+            "pullback 0.180 < 1.0R"
+          ]
+        },
+        {
+          "archetype_label": "Split exit variant (bimodal)",
+          "matched": false,
+          "rule_text": "bimodal fwd_mfe distribution with two modes >= 1R apart (cluster-level, not centroid-matchable)",
+          "unmet": [
+            "distributional pattern; defer to Step 3"
+          ]
+        }
+      ],
+      "pct_peak_and_collapse": 0.2930513595166163
+    }
+  ],
+  "passing_ks": [
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "sha256": {
+    "archetype_assignments_csv": "4e438a874f79cb1cecdb10c948ecbc014c185ea053991a7b6fbc07a1b6ddf74c",
+    "centroids_chosen_csv": "b69f7a115b0d47cab2da3b80c550f3c31191c28a2b82c33fc99c00dde080ad34",
+    "clusters_chosen_csv": "f8e3b51f74747e48f0f0de2915ca80bffd5d378fc1fb71db0c604c8a8594fdc2",
+    "path_features_csv": "1e6c6806bf68da3eaaf4805cfae9d26708cf4fcca4dae21134de4c089f6164de"
+  }
+}

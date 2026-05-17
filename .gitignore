@@ -85,6 +85,10 @@ results/*
 # (L_ARC_PROTOCOL v2.0 §13: arc results data is direct-to-main).
 !results/l_arc_3/
 !results/l_arc_3/**
+# Arc 3D diagnostic tail — SL × aggregation sweep on the Arc 3 pool. Authorised
+# in docs/arc_results/ARC_3_RESULT.md "Diagnostic tail (Arc 3D) — recommended".
+!results/arc_3d/
+!results/arc_3d/**
 # Arc 2 redo (CLOSED 2026-05-16 KILL at Step 3) — track the result doc;
 # step1/2/3 CSVs/PNGs stay local per minimal-track convention.
 !results/l_arc_2_redo/

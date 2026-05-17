@@ -1,0 +1,327 @@
+{
+  "env": {
+    "numpy": "2.4.4",
+    "pandas": "3.0.2",
+    "python": "3.14.0",
+    "scipy": "1.17.1"
+  },
+  "groups": [
+    {
+      "archetype_label": "Stepwise climber",
+      "centroid": {
+        "local_peaks": 21.521560574948666,
+        "monotonicity": 0.5429485619147844,
+        "pullback": 0.3303374581943532,
+        "time_to_peak_rel": 0.8070525790127311
+      },
+      "cluster_ids": [
+        0
+      ],
+      "final_r": {
+        "mean": 2.029737290872259,
+        "p25": 1.1521893815,
+        "p5": -1.0008647347,
+        "p50": 1.971697575,
+        "p75": 2.968047172,
+        "p95": 4.4757825006999985,
+        "t_stat": 28.028776201872837
+      },
+      "frequencies": {
+        "frac_reach_1R": 0.9794661190965093,
+        "frac_reach_2R": 0.7946611909650924,
+        "frac_wrong_way": 0.08418891170431211,
+        "pct_peak_and_collapse": 0.188911704312115
+      },
+      "gates": {
+        "failure_reasons": [
+          "monotonicity_centroid 0.543 < 0.55",
+          "shape_tag=bimodal not in {tight_unimodal, heavy_right_tail}"
+        ],
+        "gates_passed_count": 4,
+        "local_peaks": "PASS",
+        "mfe_p50": "PASS",
+        "monotonicity": "FAIL",
+        "reach_1R": "PASS",
+        "shape_tag": "FAIL",
+        "size": "PASS",
+        "verdict": "FAIL",
+        "wrong_way": "PASS"
+      },
+      "label": "Stepwise climber",
+      "mass_in_band": {
+        "-0.5R_to_0R": 0.01026694045174538,
+        "-1R_to_-0.5R": 0.008213552361396304,
+        "0.5R_to_1R": 0.08213552361396304,
+        "0R_to_0.5R": 0.04722792607802875,
+        "1R_to_2R": 0.2813141683778234,
+        "2R_to_5R": 0.459958932238193,
+        "gt_5R": 0.03490759753593429,
+        "le_-1R": 0.07597535934291581
+      },
+      "mfe_h240": {
+        "p25": 2.179836845,
+        "p5": 1.2595845712,
+        "p50": 2.86863901,
+        "p75": 3.769051762,
+        "p95": 5.490700274099999
+      },
+      "shape_tag": "bimodal",
+      "shape_tag_log": {
+        "bimodal_decision": "fire",
+        "iqr": 1.8158577905,
+        "kde_peak_count": 2,
+        "mode_separation_R": 2.6342712856046964,
+        "p25": 1.1521893815,
+        "p50": 1.971697575,
+        "p75": 2.968047172,
+        "p95": 4.4757825006999985,
+        "p95_over_p75": 1.5079890046639726,
+        "skew": 0.416969573988577,
+        "std": 1.5980861050947521,
+        "valley_depth_pct": 0.22511144931760174
+      },
+      "size_count": 487,
+      "size_fraction": 0.25377800937988537
+    },
+    {
+      "archetype_label": "Early-peak hold",
+      "centroid": {
+        "local_peaks": 0.4777777777777778,
+        "monotonicity": 0.006435185184999999,
+        "pullback": 0.006850856068888888,
+        "time_to_peak_rel": 0.10656690885222224
+      },
+      "cluster_ids": [
+        1
+      ],
+      "final_r": {
+        "mean": -1.00443914875,
+        "p25": -1.00233133825,
+        "p5": -1.0154324057,
+        "p50": -1.001120832,
+        "p75": -1.0006821805000001,
+        "p95": -1.00035743705,
+        "t_stat": -1473.0516197168163
+      },
+      "frequencies": {
+        "frac_reach_1R": 0.0,
+        "frac_reach_2R": 0.0,
+        "frac_wrong_way": 1.0,
+        "pct_peak_and_collapse": 0.0
+      },
+      "gates": {
+        "failure_reasons": [
+          "monotonicity_centroid 0.006 < 0.55",
+          "mfe_h240_p50 0.133R < 1.5R",
+          "frac_reach_1R 0.000 < 0.7",
+          "frac_wrong_way 1.000 > 0.3",
+          "shape_tag=no_magnitude not in {tight_unimodal, heavy_right_tail}"
+        ],
+        "gates_passed_count": 2,
+        "local_peaks": "PASS",
+        "mfe_p50": "FAIL",
+        "monotonicity": "FAIL",
+        "reach_1R": "FAIL",
+        "shape_tag": "FAIL",
+        "size": "PASS",
+        "verdict": "FAIL",
+        "wrong_way": "FAIL"
+      },
+      "label": "Early-peak hold",
+      "mass_in_band": {
+        "-0.5R_to_0R": 0.0,
+        "-1R_to_-0.5R": 0.0,
+        "0.5R_to_1R": 0.0,
+        "0R_to_0.5R": 0.0,
+        "1R_to_2R": 0.0,
+        "2R_to_5R": 0.0,
+        "gt_5R": 0.0,
+        "le_-1R": 1.0
+      },
+      "mfe_h240": {
+        "p25": 0.059204491095,
+        "p5": 0.00247810670985,
+        "p50": 0.1329615154,
+        "p75": 0.22338933915,
+        "p95": 0.47325615760000017
+      },
+      "shape_tag": "no_magnitude",
+      "shape_tag_log": {
+        "iqr": 0.0016491577499999632,
+        "no_magnitude_p75_le_0.5R": true,
+        "p25": -1.00233133825,
+        "p50": -1.001120832,
+        "p75": -1.0006821805000001,
+        "p95": -1.00035743705,
+        "skew": -6.143037660300266,
+        "std": 0.012937695211392358
+      },
+      "size_count": 360,
+      "size_fraction": 0.18759770713913496
+    },
+    {
+      "archetype_label": "unassigned",
+      "centroid": {
+        "local_peaks": 8.114634146341464,
+        "monotonicity": 0.5026773472309757,
+        "pullback": 0.6662842072451219,
+        "time_to_peak_rel": 0.6214087190409755
+      },
+      "cluster_ids": [
+        2
+      ],
+      "final_r": {
+        "mean": -0.11446065739490245,
+        "p25": -1.0013575405,
+        "p5": -1.0188852156,
+        "p50": -1.000541267,
+        "p75": 0.683726569375,
+        "p95": 2.1012000949999976,
+        "t_stat": -1.8607895310592384
+      },
+      "frequencies": {
+        "frac_reach_1R": 0.6634146341463415,
+        "frac_reach_2R": 0.28780487804878047,
+        "frac_wrong_way": 0.5707317073170731,
+        "pct_peak_and_collapse": 0.43658536585365854
+      },
+      "gates": {
+        "failure_reasons": [
+          "monotonicity_centroid 0.503 < 0.55",
+          "mfe_h240_p50 1.325R < 1.5R",
+          "frac_reach_1R 0.663 < 0.7",
+          "frac_wrong_way 0.571 > 0.3"
+        ],
+        "gates_passed_count": 3,
+        "local_peaks": "PASS",
+        "mfe_p50": "FAIL",
+        "monotonicity": "FAIL",
+        "reach_1R": "FAIL",
+        "shape_tag": "PASS",
+        "size": "PASS",
+        "verdict": "FAIL",
+        "wrong_way": "FAIL"
+      },
+      "label": "unassigned (cluster 2)",
+      "mass_in_band": {
+        "-0.5R_to_0R": 0.046341463414634146,
+        "-1R_to_-0.5R": 0.014634146341463415,
+        "0.5R_to_1R": 0.0975609756097561,
+        "0R_to_0.5R": 0.0975609756097561,
+        "1R_to_2R": 0.12195121951219512,
+        "2R_to_5R": 0.06097560975609756,
+        "gt_5R": 0.004878048780487805,
+        "le_-1R": 0.5560975609756098
+      },
+      "mfe_h240": {
+        "p25": 0.7980770479499999,
+        "p5": 0.37939275855000004,
+        "p50": 1.3247304295,
+        "p75": 2.073252445,
+        "p95": 3.4835715118999993
+      },
+      "shape_tag": "heavy_right_tail",
+      "shape_tag_log": {
+        "heavy_right_tail_ratio_ge_2.5_skew_ge_1.0": true,
+        "iqr": 1.685084109875,
+        "p25": -1.0013575405,
+        "p50": -1.000541267,
+        "p75": 0.683726569375,
+        "p95": 2.1012000949999976,
+        "p95_over_p75": 3.0731584658480093,
+        "skew": 1.639272213713463,
+        "std": 1.2455205868336066
+      },
+      "size_count": 410,
+      "size_fraction": 0.2136529442417926
+    },
+    {
+      "archetype_label": "unassigned",
+      "centroid": {
+        "local_peaks": 5.777945619335347,
+        "monotonicity": 0.5348024324800604,
+        "pullback": 0.1798126144618429,
+        "time_to_peak_rel": 0.31143532509859967
+      },
+      "cluster_ids": [
+        3
+      ],
+      "final_r": {
+        "mean": -0.7138195605753171,
+        "p25": -1.0029088,
+        "p5": -1.0229259194,
+        "p50": -1.0010588610000002,
+        "p75": -1.000443534,
+        "p95": 0.9623552763799994,
+        "t_stat": -27.31039517005471
+      },
+      "frequencies": {
+        "frac_reach_1R": 0.3610271903323263,
+        "frac_reach_2R": 0.1027190332326284,
+        "frac_wrong_way": 0.8141993957703928,
+        "pct_peak_and_collapse": 0.2930513595166163
+      },
+      "gates": {
+        "failure_reasons": [
+          "monotonicity_centroid 0.535 < 0.55",
+          "mfe_h240_p50 0.726R < 1.5R",
+          "frac_reach_1R 0.361 < 0.7",
+          "frac_wrong_way 0.814 > 0.3",
+          "shape_tag=no_magnitude not in {tight_unimodal, heavy_right_tail}"
+        ],
+        "gates_passed_count": 2,
+        "local_peaks": "PASS",
+        "mfe_p50": "FAIL",
+        "monotonicity": "FAIL",
+        "reach_1R": "FAIL",
+        "shape_tag": "FAIL",
+        "size": "PASS",
+        "verdict": "FAIL",
+        "wrong_way": "FAIL"
+      },
+      "label": "unassigned (cluster 3)",
+      "mass_in_band": {
+        "-0.5R_to_0R": 0.04229607250755287,
+        "-1R_to_-0.5R": 0.01661631419939577,
+        "0.5R_to_1R": 0.04380664652567976,
+        "0R_to_0.5R": 0.055891238670694864,
+        "1R_to_2R": 0.03625377643504532,
+        "2R_to_5R": 0.0075528700906344415,
+        "gt_5R": 0.0,
+        "le_-1R": 0.797583081570997
+      },
+      "mfe_h240": {
+        "p25": 0.43416250829999997,
+        "p5": 0.21302666550500002,
+        "p50": 0.72575550535,
+        "p75": 1.30057475825,
+        "p95": 2.40105350365
+      },
+      "shape_tag": "no_magnitude",
+      "shape_tag_log": {
+        "iqr": 0.002465265999999966,
+        "no_magnitude_p75_le_0.5R": true,
+        "p25": -1.0029088,
+        "p50": -1.0010588610000002,
+        "p75": -1.000443534,
+        "p95": 0.9623552763799994,
+        "skew": 2.3767941580320646,
+        "std": 0.6724956122468195
+      },
+      "size_count": 662,
+      "size_fraction": 0.3449713392391871
+    }
+  ],
+  "input_assignments_csv": "C:\\Users\\panap\\Documents\\Forex-Backtester\\results\\arc_3d\\sl_3.0\\step2\\archetype_assignments.csv",
+  "input_clusters_csv": "C:\\Users\\panap\\Documents\\Forex-Backtester\\results\\arc_3d\\sl_3.0\\step2\\clusters_K4.csv",
+  "input_features_csv": "C:\\Users\\panap\\Documents\\Forex-Backtester\\results\\arc_3d\\sl_3.0\\step2\\path_features.csv",
+  "input_paths_csv": "C:\\Users\\panap\\Documents\\Forex-Backtester\\results\\arc_3d\\sl_3.0\\step1\\trades_paths.csv",
+  "input_trades_csv": "C:\\Users\\panap\\Documents\\Forex-Backtester\\results\\arc_3d\\sl_3.0\\step1\\trades_all.csv",
+  "mode": "aggregated",
+  "n_groups": 4,
+  "pool_size": 1919,
+  "run_timestamp_utc": "2026-05-16 13:30:13",
+  "sha256": {
+    "archetype_summaries_csv": "d43f1774b176768d45f046eb7e21f82425dff367de4d565d311802c76e86a185"
+  }
+}

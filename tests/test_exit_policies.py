@@ -179,15 +179,20 @@ class TestUpdatePerBar:
         assert trade["mfe_lock_fired_bar"] is None
 
     def test_lock_fires_at_one_r(self):
-        """First bar with MFE ≥ 1R: SL jumps to entry (BE); trail does
-        not apply on the lock-fire bar itself.
+        """First bar with MFE ≥ 1R: lock fires AND trail arms same-bar.
+
+        Effective SL = max(post-t SL, BE, trail_stop). With MFE = 1R:
+        trail = entry + (1.0 − 0.75) × R = entry + 0.25R. max(entry-3R,
+        entry, entry+0.25R) = entry + 0.25R. Matches Step 5 simulator
+        (`scripts/l_arc_4/step5_stability.py:294-298`).
         """
         policy, trade = self._bootstrap([1.0])
         policy.update_per_bar(
             trade, trade["bar_path"][0], entry_px=1.0, atr_at_entry=0.01
         )
         assert trade["mfe_lock_fired_bar"] == 1
-        assert trade["sl_px"] == pytest.approx(1.0)  # BE
+        # Trail at MFE=1R = entry + 0.25R = 1.0 + 0.0075.
+        assert trade["sl_px"] == pytest.approx(1.0 + 0.25 * 3.0 * 0.01)
 
     def test_lock_doesnt_reverse_on_subsequent_drawdown(self):
         """Once lock fires, dropping back below 1R doesn't reset SL.
@@ -232,16 +237,16 @@ class TestUpdatePerBar:
         assert trade["sl_px"] == pytest.approx(1.0375)
 
     def test_worked_example_arc4_c1_trajectory(self):
-        """Spec worked example, verbatim: pre-t → accept → lock → 2R → 3R.
+        """Spec worked example: pre-t → accept → lock → 2R → 3R.
 
         Arc 4 cluster 1 long with entry = 1.0, ATR = 0.01 (R = 0.03).
-        Expected SL at each stage:
+        Matches Step 5 simulator's same-bar trail-arm semantics:
 
         * pre-t:  entry − 2 × ATR = 0.98
         * accept: entry − 3 × ATR = 0.97
-        * lock @ MFE=1R: entry (BE) = 1.00
-        * MFE=2R (post-lock): entry + (2 − 0.75) × R = entry + 1.25R = 1.0375
-        * MFE=3R (post-lock): entry + (3 − 0.75) × R = entry + 2.25R = 1.0675
+        * lock @ MFE=1R (same-bar trail): entry + 0.25R = 1.0075
+        * MFE=2R: entry + (2 − 0.75) × R = entry + 1.25R = 1.0375
+        * MFE=3R: entry + (3 − 0.75) × R = entry + 2.25R = 1.0675
         """
         policy = StepwiseClimberPolicy(**ARC4_C1_KW)
         trade = _new_trade(entry_px=1.0, atr=0.01, direction="long")
@@ -259,10 +264,10 @@ class TestUpdatePerBar:
             for k, v in enumerate([1.0, 2.0, 3.0])
         ]
         trade["bar_path"] = rows
-        # 3) lock
+        # 3) lock fires + trail arms same-bar
         policy.update_per_bar(trade, rows[0], entry_px=1.0, atr_at_entry=0.01)
-        assert trade["sl_px"] == pytest.approx(1.00)
-        # 4) MFE = 2R (post-lock — trail active)
+        assert trade["sl_px"] == pytest.approx(1.0075)
+        # 4) MFE = 2R
         policy.update_per_bar(trade, rows[1], entry_px=1.0, atr_at_entry=0.01)
         assert trade["sl_px"] == pytest.approx(1.0375)
         # 5) MFE = 3R
@@ -270,8 +275,8 @@ class TestUpdatePerBar:
         assert trade["sl_px"] == pytest.approx(1.0675)
 
     def test_short_direction_mirrors_long(self):
-        """Short trades: BE-lock pulls SL DOWN to entry; trail pulls SL
-        DOWN as MFE grows.
+        """Short trades: BE ceiling at entry, trail pulls SL DOWN as MFE
+        grows. Same-bar trail-arm semantics mirrored from long.
         """
         policy = StepwiseClimberPolicy(**ARC4_C1_KW)
         trade = _new_trade(entry_px=1.0, atr=0.01, direction="short")
@@ -287,8 +292,10 @@ class TestUpdatePerBar:
         ]
         trade["bar_path"] = rows
         policy.update_per_bar(trade, rows[0], entry_px=1.0, atr_at_entry=0.01)
-        # Short lock: SL = min(1.03, 1.0) = 1.0.
-        assert trade["sl_px"] == pytest.approx(1.0)
+        # Short lock fires + trail same-bar at MFE=1R:
+        # trail = entry − (1 − 0.75) × R = 1 − 0.0075 = 0.9925.
+        # SL = min(1.03, 1.0, 0.9925) = 0.9925.
+        assert trade["sl_px"] == pytest.approx(0.9925)
         policy.update_per_bar(trade, rows[1], entry_px=1.0, atr_at_entry=0.01)
         # Short trail at MFE=2R: SL = entry − (2 − 0.75) × R = 1 − 0.0375 = 0.9625.
         assert trade["sl_px"] == pytest.approx(0.9625)

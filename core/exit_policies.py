@@ -64,18 +64,22 @@ class StepwiseClimberPolicy(ExitPolicy):
       entry − ``archetype_sl_r`` × ``r_in_atr`` × ATR. For Arc 4 cluster 1
       this is a *loosening* (entry − 3.0 × ATR).
     * **MFE-lock** (one-shot, fires the first bar at which
-      ``mfe_so_far_r >= mfe_lock_r``): SL = max(current_sl, entry_px) for
-      longs (min for shorts). Records the fire bar in
-      ``trade["mfe_lock_fired_bar"]``.
-    * **Trail** (every bar after the lock fires; not on the lock bar
-      itself): trail_stop = entry + (mfe_so_far_r − trail_from_high_r) ×
-      ``r_in_atr`` × ATR. SL = max(current_sl, trail_stop) for longs (min
-      for shorts). Ratchets only.
+      ``mfe_so_far_r >= mfe_lock_r``): records the fire bar in
+      ``trade["mfe_lock_fired_bar"]``. Once fired, trail is armed AND
+      used in the same-bar SL check (matches the Step 5 simulator's
+      Step 4 ``effective_sl = max(current_sl, trail_stop)`` semantics —
+      see ``scripts/l_arc_4/step5_stability.py:269-318``).
+    * **Effective SL post-lock**: max(current_sl, entry_px, trail_stop)
+      for longs (min for shorts), where
+      ``trail_stop = entry + (mfe_so_far_r − trail_from_high_r) ×
+      r_in_atr × ATR``. At the lock-fire bar with MFE = 1R this yields
+      entry + 0.25R; subsequent new MFE highs ratchet upward only.
 
-    The lock and trail interact additively: the lock seeds SL at break-even
-    on the trigger bar, then the trail starts ratcheting from there as
-    MFE keeps climbing. Subsequent drawdown in close_r does not reverse
-    the lock (because mfe_so_far_r is a running max).
+    Subsequent drawdown in close_r does not reverse the lock (because
+    mfe_so_far_r is a running max). Engine ordering is MFE-first: the
+    bar_path append updates mfe_so_far_r from bar high before the hook
+    fires, so the lock can detect the same bar's high and the trail
+    same-bar SL is checked against bar low in the Priority-1 SL test.
 
     Fields
     ------
@@ -127,27 +131,22 @@ class StepwiseClimberPolicy(ExitPolicy):
         long = _is_long(trade)
         current_sl = float(trade["sl_px"])
 
-        lock_just_fired = False
+        # Lock check: fires the first bar at which MFE reaches mfe_lock_r.
         if trade.get("mfe_lock_fired_bar") is None and mfe_r >= float(self.mfe_lock_r):
-            if long:
-                current_sl = max(current_sl, float(entry_px))
-            else:
-                current_sl = min(current_sl, float(entry_px))
             trade["mfe_lock_fired_bar"] = bar_offset
-            lock_just_fired = True
 
-        # Trail operates only on bars *after* the lock bar — on the lock
-        # bar itself, BE is the SL. This keeps the worked-example boundary
-        # SL = entry at MFE = 1R, then trail takes over as MFE keeps
-        # climbing.
-        if trade.get("mfe_lock_fired_bar") is not None and not lock_just_fired:
+        # Effective SL post-lock = max(static SL, BE floor, trail_stop)
+        # for longs (min for shorts). Trail fires on the lock-fire bar
+        # itself — same-bar arm + use, matching Step 5's effective_sl
+        # semantics (scripts/l_arc_4/step5_stability.py:294-298).
+        if trade.get("mfe_lock_fired_bar") is not None:
             trail_offset_px = (mfe_r - float(self.trail_from_high_r)) * r_size_px
             if long:
                 trail_stop = float(entry_px) + trail_offset_px
-                current_sl = max(current_sl, trail_stop)
+                current_sl = max(current_sl, float(entry_px), trail_stop)
             else:
                 trail_stop = float(entry_px) - trail_offset_px
-                current_sl = min(current_sl, trail_stop)
+                current_sl = min(current_sl, float(entry_px), trail_stop)
 
         trade["sl_px"] = float(current_sl)
 

@@ -472,6 +472,22 @@ def _wfo_folds() -> list[dict]:
 FOLDS = _wfo_folds()
 
 
+def _fold_id_for_entry(entry_ts) -> str | None:
+    """Return the WFO fold id (``"F1"``..``"F7"``) whose OOS window
+    contains ``entry_ts``, or ``None`` for IS-only trades.
+
+    Used by the Pipeline D1 hook to dispatch the trade to the correct
+    per-fold classifier — see ``D1_HOOK.evaluate(..., fold_id=...)``.
+    Trades with ``entry_ts`` before the first fold's OOS start return
+    ``None`` and are not gated by D1.
+    """
+    ts = pd.Timestamp(entry_ts)
+    for f in FOLDS:
+        if pd.Timestamp(f["oos_start"]) <= ts < pd.Timestamp(f["oos_end"]):
+            return f"F{int(f['fold'])}"
+    return None
+
+
 # ── Kijun helpers ─────────────────────────────────────────────────────────────
 
 def _compute_kijun(df: pd.DataFrame, period: int) -> np.ndarray:
@@ -1357,19 +1373,44 @@ def _simulate_kgl_v2(
             exit_bar    = j
             exit_reason = None
 
-            # Pipeline D1 hook (L_ARC_PROTOCOL v2.0 §3). When configured,
-            # fires exactly once per trade at bar offset t == D1_HOOK.bar_offset_t.
-            # Close decision: exit at next bar's open with reason "d1_untradeable"
-            # (last-bar fallback collapses to bar j close). ApplyPolicy / Hold
-            # are no-ops in PR 1 — the legacy cascade below handles the trade.
+            # Pipeline D1 hook (L_ARC_PROTOCOL v2.0 §3 + §11). Fires exactly
+            # once per trade at bar offset t == D1_HOOK.bar_offset_t.
+            #   Close       → exit at next bar's open with reason
+            #                  "d1_untradeable" (last-bar fallback → bar j
+            #                  close). PR 1 behaviour.
+            #   ApplyPolicy → install the archetype's ExitPolicy on the
+            #                  trade. The policy's apply_at_accept runs
+            #                  inside the helper (replaces pre-t SL), and
+            #                  the per-bar block below ratchets SL on
+            #                  every subsequent bar. PR 2.
+            #   Hold        → no classifier for this trade's fold (e.g.
+            #                  Arc 4 F1). Legacy cascade handles the trade.
             if D1_HOOK is not None:
                 _d1_px, _d1_bar, _d1_reason = apply_d1_hook_per_bar(
                     D1_HOOK, trade, j, entry_idx, cached, c_j,
+                    fold_id=trade.get("fold_id"),
                 )
                 if _d1_reason is not None:
                     exit_px     = _d1_px
                     exit_bar    = _d1_bar
                     exit_reason = _d1_reason
+                # apply_at_accept (when ApplyPolicy) mutated trade["sl_px"];
+                # refresh the local so subsequent SL/trail logic uses the
+                # archetype's post-t stop, not the stale pre-t value.
+                sl_px = trade["sl_px"]
+
+            # Per-bar policy update (PR 2). Fires every bar from accept
+            # onward; mutates trade["sl_px"] in place via the installed
+            # ExitPolicy. Runs before the Priority-1 SL check so the
+            # ratchet is in effect for the same bar's intrabar SL test.
+            if trade.get("exit_policy") is not None and exit_reason is None:
+                trade["exit_policy"].update_per_bar(
+                    trade=trade,
+                    bar_path_row=trade["bar_path"][-1],
+                    entry_px=entry_px,
+                    atr_at_entry=a,
+                )
+                sl_px = trade["sl_px"]
 
             # Priority 1: Intrabar hard SL
             if exit_reason is None:
@@ -1564,6 +1605,20 @@ def _simulate_kgl_v2(
                 )
                 _kh14_state2  = bool(trade["first_bar_dir"] == -1)
 
+                # Pipeline D1 (PR 2) audit columns. Gated on D1_HOOK so
+                # KH-24 baseline runs (D1_HOOK = None) write a
+                # byte-identical trades_all.csv.
+                _d1_audit_extras: dict = {}
+                if D1_HOOK is not None:
+                    _d1_audit_extras = {
+                        "fold_id":               trade.get("fold_id"),
+                        "d1_decision":           trade.get("d1_decision", "no_d1"),
+                        "classifier_fold_id":    trade.get("classifier_fold_id"),
+                        "d1_archetype_label":    trade.get("d1_archetype_label"),
+                        "d1_probability":        trade.get("d1_probability", float("nan")),
+                        "mfe_lock_fired_bar":    trade.get("mfe_lock_fired_bar"),
+                        "trail_active_from_bar": trade.get("trail_active_from_bar"),
+                    }
                 completed_trades.append({
                     "pair":              pair,
                     "entry_date":        trade["entry_date"],
@@ -1607,6 +1662,7 @@ def _simulate_kgl_v2(
                     # set (preserves byte-identity of the legacy subset).
                     "_v13_time_to_peak_mfe":   int(trade["time_to_peak_mfe"]),
                     "_v13_time_to_trough_mae": int(trade["time_to_trough_mae"]),
+                    **_d1_audit_extras,
                 })
                 _flatten_bar_path_for_trade(
                     trade, exit_bar, pair_cache,
@@ -1635,6 +1691,12 @@ def _simulate_kgl_v2(
                 trade["trail_active"] = trail_active
                 trade["best_cl"]      = best_cl
                 trade["ts_level"]     = ts_level
+                # Pipeline D1 (PR 2): the per-bar policy mutated sl_px in
+                # place — persist the latest value so the next bar's local
+                # binding sees the policy-driven stop. mfe_lock_fired_bar
+                # and trail_active_from_bar are already on the trade dict
+                # (mutated by update_per_bar / apply_at_accept).
+                trade["sl_px"]        = sl_px
                 still_open.append(trade)
 
         open_trades = still_open
@@ -2349,6 +2411,17 @@ def _simulate_kgl_v2(
                 "time_to_peak_mfe":    0,
                 "time_to_trough_mae":  0,
                 "entry_features":      entry_features_dict,
+                # Pipeline D1 (PR 2) audit fields. Stamped at trade open
+                # so they are always present in the completed-trade
+                # record, even when the hook doesn't fire (e.g. trade
+                # exited before bar t, or D1_HOOK is None).
+                "fold_id":             _fold_id_for_entry(bar_date),
+                "signal_direction":    SIGNAL_DIRECTION,
+                "exit_policy":         None,
+                "mfe_lock_fired_bar":  None,
+                "trail_active_from_bar": None,
+                "classifier_fold_id":  None,
+                "d1_decision":         "no_d1",
             })
 
     # Close any remaining open trades at last available close

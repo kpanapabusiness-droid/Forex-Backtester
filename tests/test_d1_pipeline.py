@@ -29,8 +29,10 @@ from core.d1_pipeline import (
     Close,
     D1ArchetypeConfig,
     D1Hook,
+    Hold,
     apply_d1_hook_per_bar,
 )
+from core.exit_policies import StepwiseClimberPolicy
 from core.features_path_so_far import (
     ALL_FEATURE_KEYS,
     ENTRY_FEATURE_KEYS,
@@ -290,29 +292,40 @@ class TestD1HookInit:
             D1Hook([])
 
     def test_mixed_bar_offset_t_raises(self):
+        order = list(ALL_FEATURE_KEYS)
+        policy = StepwiseClimberPolicy(
+            archetype_sl_r=1.0, r_in_atr=3.0, mfe_lock_r=1.0, trail_from_high_r=0.75
+        )
         a = D1ArchetypeConfig(
             label="x",
-            feature_order=tuple(ALL_FEATURE_KEYS),
+            feature_order=tuple(order),
             decision_threshold=0.5,
             bar_offset_t=3,
-            classifier=StubClassifier(list(ALL_FEATURE_KEYS)),
+            per_fold_classifiers={"F1": StubClassifier(order)},
+            exit_policy=policy,
         )
         b = D1ArchetypeConfig(
             label="y",
-            feature_order=tuple(ALL_FEATURE_KEYS),
+            feature_order=tuple(order),
             decision_threshold=0.5,
             bar_offset_t=5,
-            classifier=StubClassifier(list(ALL_FEATURE_KEYS)),
+            per_fold_classifiers={"F1": StubClassifier(order)},
+            exit_policy=policy,
         )
         with pytest.raises(ValueError, match="must share bar_offset_t"):
             D1Hook([a, b])
 
     def test_bad_feature_order_raises(self):
+        policy = StepwiseClimberPolicy(
+            archetype_sl_r=1.0, r_in_atr=3.0, mfe_lock_r=1.0, trail_from_high_r=0.75
+        )
         a = D1ArchetypeConfig(
             label="x",
             feature_order=tuple(list(ALL_FEATURE_KEYS) + ["bogus"]),
             decision_threshold=0.5,
             bar_offset_t=3,
+            per_fold_classifiers={"F1": StubClassifier(list(ALL_FEATURE_KEYS))},
+            exit_policy=policy,
         )
         with pytest.raises(ValueError, match="bogus"):
             D1Hook([a])
@@ -328,31 +341,61 @@ class TestD1HookInit:
             feature_order=tuple(order),
             decision_threshold=0.5,
             bar_offset_t=3,
-            classifier=stub,
+            per_fold_classifiers={"F1": stub},
+            exit_policy=StepwiseClimberPolicy(
+                archetype_sl_r=1.0, r_in_atr=3.0,
+                mfe_lock_r=1.0, trail_from_high_r=0.75,
+            ),
         )
         with pytest.raises(ValueError, match="expects 99 features"):
             D1Hook([a])
 
     def test_threshold_out_of_range_raises(self):
+        order = list(ALL_FEATURE_KEYS)
         a = D1ArchetypeConfig(
             label="x",
-            feature_order=tuple(ALL_FEATURE_KEYS),
+            feature_order=tuple(order),
             decision_threshold=1.5,
             bar_offset_t=3,
-            classifier=StubClassifier(list(ALL_FEATURE_KEYS)),
+            per_fold_classifiers={"F1": StubClassifier(order)},
+            exit_policy=StepwiseClimberPolicy(
+                archetype_sl_r=1.0, r_in_atr=3.0,
+                mfe_lock_r=1.0, trail_from_high_r=0.75,
+            ),
         )
         with pytest.raises(ValueError, match="decision_threshold"):
             D1Hook([a])
 
     def test_bar_offset_t_must_be_positive(self):
+        order = list(ALL_FEATURE_KEYS)
         a = D1ArchetypeConfig(
             label="x",
-            feature_order=tuple(ALL_FEATURE_KEYS),
+            feature_order=tuple(order),
             decision_threshold=0.5,
             bar_offset_t=0,
-            classifier=StubClassifier(list(ALL_FEATURE_KEYS)),
+            per_fold_classifiers={"F1": StubClassifier(order)},
+            exit_policy=StepwiseClimberPolicy(
+                archetype_sl_r=1.0, r_in_atr=3.0,
+                mfe_lock_r=1.0, trail_from_high_r=0.75,
+            ),
         )
         with pytest.raises(ValueError, match="bar_offset_t"):
+            D1Hook([a])
+
+    def test_empty_per_fold_classifiers_raises(self):
+        order = list(ALL_FEATURE_KEYS)
+        a = D1ArchetypeConfig(
+            label="x",
+            feature_order=tuple(order),
+            decision_threshold=0.5,
+            bar_offset_t=3,
+            per_fold_classifiers={},
+            exit_policy=StepwiseClimberPolicy(
+                archetype_sl_r=1.0, r_in_atr=3.0,
+                mfe_lock_r=1.0, trail_from_high_r=0.75,
+            ),
+        )
+        with pytest.raises(ValueError, match="per_fold_classifiers is empty"):
             D1Hook([a])
 
 
@@ -361,14 +404,27 @@ class TestD1HookInit:
 # ---------------------------------------------------------------------------
 
 
-def _make_single_hook(threshold: float = 0.5, t: int = 3) -> D1Hook:
+def _default_policy() -> StepwiseClimberPolicy:
+    return StepwiseClimberPolicy(
+        archetype_sl_r=1.0, r_in_atr=3.0, mfe_lock_r=1.0, trail_from_high_r=0.75
+    )
+
+
+def _make_single_hook(
+    threshold: float = 0.5, t: int = 3, fold_id: str = "F1"
+) -> D1Hook:
     order = list(ALL_FEATURE_KEYS)
     arch = D1ArchetypeConfig(
         label="stepwise_climber",
         feature_order=tuple(order),
         decision_threshold=threshold,
         bar_offset_t=t,
-        classifier=StubClassifier(order, gate_feature="mfe_so_far_r_at_t", threshold=1.0),
+        per_fold_classifiers={
+            fold_id: StubClassifier(
+                order, gate_feature="mfe_so_far_r_at_t", threshold=1.0,
+            ),
+        },
+        exit_policy=_default_policy(),
     )
     return D1Hook([arch])
 
@@ -380,18 +436,19 @@ class TestD1HookEvaluate:
         path = _bar_path([0.0, 0.5, 1.0, 1.5])
         decision = hook.evaluate(
             trade={}, bar_path_so_far=path, entry_features=entry_features_finite,
-            t=3, cached={},
+            t=3, cached={}, fold_id="F1",
         )
         assert isinstance(decision, ApplyPolicy)
         assert decision.label == "stepwise_climber"
         assert decision.probability == pytest.approx(0.9)
+        assert isinstance(decision.policy, StepwiseClimberPolicy)
 
     def test_returns_close_when_mfe_low(self, entry_features_finite):
         hook = _make_single_hook(threshold=0.5, t=3)
         path = _bar_path([0.0, 0.1, 0.2, 0.3])  # max high_r = 0.4 < 1.0 → P=0.1
         decision = hook.evaluate(
             trade={}, bar_path_so_far=path, entry_features=entry_features_finite,
-            t=3, cached={},
+            t=3, cached={}, fold_id="F1",
         )
         assert isinstance(decision, Close)
         assert decision.reason == "d1_untradeable"
@@ -402,19 +459,35 @@ class TestD1HookEvaluate:
         with pytest.raises(ValueError, match="configured t=3"):
             hook.evaluate(
                 trade={}, bar_path_so_far=path,
-                entry_features=entry_features_finite, t=2, cached={},
+                entry_features=entry_features_finite, t=2, cached={}, fold_id="F1",
             )
 
     def test_nan_entry_features_abstain(self):
         hook = _make_single_hook(threshold=0.5, t=3)
-        # All entry features NaN → archetype abstains → Close.
+        # All entry features NaN → archetype abstains. With only one
+        # archetype, no archetype has valid features → Close (not Hold,
+        # because the classifier IS available for this fold).
         nan_entry = {k: float("nan") for k in ENTRY_FEATURE_KEYS}
         path = _bar_path([0.0, 0.5, 1.0, 1.5])
         decision = hook.evaluate(
             trade={}, bar_path_so_far=path, entry_features=nan_entry,
-            t=3, cached={},
+            t=3, cached={}, fold_id="F1",
         )
         assert isinstance(decision, Close)
+
+    def test_returns_hold_when_fold_has_no_classifier(self, entry_features_finite):
+        """Trades in a fold absent from per_fold_classifiers fall through.
+
+        Use-case: Arc 4 F1 has no training data; the YAML registers
+        F2..F7 only. F1 trades return Hold and run the legacy cascade.
+        """
+        hook = _make_single_hook(threshold=0.5, t=3, fold_id="F2")
+        path = _bar_path([0.0, 0.5, 1.0, 1.5])
+        decision = hook.evaluate(
+            trade={}, bar_path_so_far=path, entry_features=entry_features_finite,
+            t=3, cached={}, fold_id="F1",
+        )
+        assert isinstance(decision, Hold)
 
 
 # ---------------------------------------------------------------------------
@@ -425,19 +498,22 @@ class TestD1HookEvaluate:
 class TestMultiArchetype:
     def _two_arch_hook(self, p_a: float, p_b: float) -> D1Hook:
         order = list(ALL_FEATURE_KEYS)
+        policy = _default_policy()
         arch_a = D1ArchetypeConfig(
             label="a",
             feature_order=tuple(order),
             decision_threshold=0.5,
             bar_offset_t=3,
-            classifier=StubClassifier(order, fixed_p=p_a),
+            per_fold_classifiers={"F1": StubClassifier(order, fixed_p=p_a)},
+            exit_policy=policy,
         )
         arch_b = D1ArchetypeConfig(
             label="b",
             feature_order=tuple(order),
             decision_threshold=0.5,
             bar_offset_t=3,
-            classifier=StubClassifier(order, fixed_p=p_b),
+            per_fold_classifiers={"F1": StubClassifier(order, fixed_p=p_b)},
+            exit_policy=policy,
         )
         return D1Hook([arch_a, arch_b])
 
@@ -445,7 +521,7 @@ class TestMultiArchetype:
         hook = self._two_arch_hook(p_a=0.6, p_b=0.9)
         decision = hook.evaluate(
             trade={}, bar_path_so_far=_bar_path([0.0, 0.5, 1.0, 1.5]),
-            entry_features=entry_features_finite, t=3, cached={},
+            entry_features=entry_features_finite, t=3, cached={}, fold_id="F1",
         )
         assert isinstance(decision, ApplyPolicy)
         assert decision.label == "b"
@@ -455,7 +531,7 @@ class TestMultiArchetype:
         hook = self._two_arch_hook(p_a=0.8, p_b=0.8)
         decision = hook.evaluate(
             trade={}, bar_path_so_far=_bar_path([0.0, 0.5, 1.0, 1.5]),
-            entry_features=entry_features_finite, t=3, cached={},
+            entry_features=entry_features_finite, t=3, cached={}, fold_id="F1",
         )
         assert isinstance(decision, ApplyPolicy)
         assert decision.label == "a"
@@ -464,7 +540,7 @@ class TestMultiArchetype:
         hook = self._two_arch_hook(p_a=0.4, p_b=0.45)
         decision = hook.evaluate(
             trade={}, bar_path_so_far=_bar_path([0.0, 0.5, 1.0, 1.5]),
-            entry_features=entry_features_finite, t=3, cached={},
+            entry_features=entry_features_finite, t=3, cached={}, fold_id="F1",
         )
         assert isinstance(decision, Close)
 
@@ -479,6 +555,10 @@ def _trade_with(t: int, close_rs: list[float], entry_features: dict[str, float])
         "entry_idx": 0,
         "bar_path": _bar_path(close_rs),
         "entry_features": entry_features,
+        "entry_px": 1.0,
+        "atr": 0.01,
+        "sl_px": 1.0 - 2.0 * 0.01,  # pre-t SL (entry − 2 × ATR)
+        "signal_direction": "long",
     }
 
 
@@ -488,6 +568,7 @@ class TestApplyD1HookPerBar:
         trade = _trade_with(3, [0.0, 0.5, 1.0, 1.5], entry_features_finite)
         out = apply_d1_hook_per_bar(
             hook=None, trade=trade, j=3, entry_idx=0, cached=cached, c_j=1.03,
+            fold_id="F1",
         )
         assert out == (None, None, None)
 
@@ -498,6 +579,7 @@ class TestApplyD1HookPerBar:
         # j - entry_idx = 1 != bar_offset_t = 3.
         out = apply_d1_hook_per_bar(
             hook=hook, trade=trade, j=1, entry_idx=0, cached=cached, c_j=1.01,
+            fold_id="F1",
         )
         assert out == (None, None, None)
 
@@ -508,11 +590,15 @@ class TestApplyD1HookPerBar:
         trade = _trade_with(3, [0.0, 0.1, 0.2, 0.3], entry_features_finite)  # low mfe → Close
         out = apply_d1_hook_per_bar(
             hook=hook, trade=trade, j=3, entry_idx=0, cached=cached, c_j=1.03,
+            fold_id="F1",
         )
         exit_px, exit_bar, exit_reason = out
         assert exit_reason == "d1_untradeable"
         assert exit_bar == 4
         assert exit_px == pytest.approx(1.0399)
+        # Audit fields stamped on trade dict (used by trades_all.csv).
+        assert trade["d1_decision"] == "close"
+        assert trade["classifier_fold_id"] == "F1"
 
     def test_close_last_bar_fallback_uses_c_j(self, entry_features_finite):
         hook = _make_single_hook(threshold=0.5, t=3)
@@ -522,21 +608,51 @@ class TestApplyD1HookPerBar:
         trade = _trade_with(3, [0.0, 0.1, 0.2, 0.3], entry_features_finite)
         out = apply_d1_hook_per_bar(
             hook=hook, trade=trade, j=3, entry_idx=0, cached=cached, c_j=1.0301,
+            fold_id="F1",
         )
         exit_px, exit_bar, exit_reason = out
         assert exit_reason == "d1_untradeable"
         assert exit_bar == 3
         assert exit_px == pytest.approx(1.0301)
 
-    def test_apply_policy_returns_noop_tuple(self, entry_features_finite):
+    def test_apply_policy_installs_policy_on_trade(self, entry_features_finite):
+        """ApplyPolicy: helper installs the policy on the trade dict,
+        mutates SL via apply_at_accept, and returns no-exit tuple so the
+        engine cascade continues.
+        """
         hook = _make_single_hook(threshold=0.5, t=3)
         cached = {"o": np.array([1.0, 1.01, 1.02, 1.03, 1.04])}
         # High mfe path → P=0.9 ≥ 0.5 → ApplyPolicy.
         trade = _trade_with(3, [0.0, 0.5, 1.0, 1.5], entry_features_finite)
+        pre_sl = trade["sl_px"]
         out = apply_d1_hook_per_bar(
             hook=hook, trade=trade, j=3, entry_idx=0, cached=cached, c_j=1.03,
+            fold_id="F1",
         )
         assert out == (None, None, None)
+        # apply_at_accept replaced the pre-t SL with entry − 3 × ATR.
+        assert trade["sl_px"] == pytest.approx(1.0 - 3.0 * 0.01)
+        assert trade["sl_px"] != pre_sl
+        assert isinstance(trade["exit_policy"], StepwiseClimberPolicy)
+        assert trade["d1_decision"] == "apply_policy"
+        assert trade["classifier_fold_id"] == "F1"
+        assert trade["d1_archetype_label"] == "stepwise_climber"
+
+    def test_missing_fold_classifier_returns_hold(self, entry_features_finite):
+        """Trade with fold_id absent from per_fold_classifiers → Hold →
+        helper returns no-exit; trade falls through to legacy cascade.
+        """
+        hook = _make_single_hook(threshold=0.5, t=3, fold_id="F2")
+        cached = {"o": np.array([1.0, 1.01, 1.02, 1.03, 1.04])}
+        trade = _trade_with(3, [0.0, 0.5, 1.0, 1.5], entry_features_finite)
+        out = apply_d1_hook_per_bar(
+            hook=hook, trade=trade, j=3, entry_idx=0, cached=cached, c_j=1.03,
+            fold_id="F1",
+        )
+        assert out == (None, None, None)
+        assert trade["d1_decision"] == "no_d1"
+        # No policy installed.
+        assert "exit_policy" not in trade or trade.get("exit_policy") is None
 
     def test_missing_entry_features_fall_through(self):
         """Re-entry trades (no entry_features) must fall through without erroring."""
@@ -549,6 +665,7 @@ class TestApplyD1HookPerBar:
         }
         out = apply_d1_hook_per_bar(
             hook=hook, trade=trade, j=3, entry_idx=0, cached=cached, c_j=1.03,
+            fold_id="F1",
         )
         assert out == (None, None, None)
 
@@ -601,26 +718,103 @@ class TestEntryFeatureBuilder:
 
 
 class TestFromYamlDict:
-    def test_inline_classifier_is_used(self):
+    def test_inline_per_fold_classifiers_are_used(self):
+        """PR 2 schema: per_fold_classifiers dict + exit_policy block."""
         order = list(ALL_FEATURE_KEYS)
-        stub = StubClassifier(order, fixed_p=0.99)
+        stubs = {f: StubClassifier(order, fixed_p=0.99) for f in ("F2", "F3")}
         yaml_block = [
             {
-                "label": "stepwise_climber",
+                "label": "stepwise_climber_arc4_cluster1",
                 "feature_order": order,
-                "decision_threshold": 0.5,
-                "bar_offset_t": 3,
-                "classifier": stub,  # bypass joblib loading
+                "decision_threshold": 0.1647,
+                "bar_offset_t": 1,
+                "per_fold_classifiers": stubs,
+                "exit_policy": {
+                    "type": "stepwise_climber",
+                    "archetype_sl_r": 1.0,
+                    "r_in_atr": 3.0,
+                    "mfe_lock_r": 1.0,
+                    "trail_from_high_r": 0.75,
+                },
             }
         ]
         hook = D1Hook.from_yaml_dict(yaml_block)
-        assert hook.bar_offset_t == 3
-        assert hook.archetypes[0].label == "stepwise_climber"
-        assert hook.archetypes[0].classifier is stub
+        assert hook.bar_offset_t == 1
+        assert hook.archetypes[0].label == "stepwise_climber_arc4_cluster1"
+        assert hook.archetypes[0].per_fold_classifiers["F2"] is stubs["F2"]
+        assert isinstance(hook.archetypes[0].exit_policy, StepwiseClimberPolicy)
+        assert hook.archetypes[0].exit_policy.archetype_sl_r == 1.0
 
     def test_empty_block_raises(self):
         with pytest.raises(ValueError, match="empty"):
             D1Hook.from_yaml_dict([])
+
+    def test_pr1_schema_fails_loud(self):
+        """PR 1 ``classifier_path`` schema is no longer accepted."""
+        order = list(ALL_FEATURE_KEYS)
+        yaml_block = [
+            {
+                "label": "old_schema",
+                "feature_order": order,
+                "decision_threshold": 0.5,
+                "bar_offset_t": 3,
+                "classifier_path": "some/path.joblib",
+            }
+        ]
+        with pytest.raises(ValueError, match="PR 1 schema"):
+            D1Hook.from_yaml_dict(yaml_block)
+
+    def test_missing_exit_policy_raises(self):
+        order = list(ALL_FEATURE_KEYS)
+        stub = StubClassifier(order)
+        yaml_block = [
+            {
+                "label": "no_policy",
+                "feature_order": order,
+                "decision_threshold": 0.5,
+                "bar_offset_t": 3,
+                "per_fold_classifiers": {"F1": stub},
+                # no exit_policy
+            }
+        ]
+        with pytest.raises(ValueError, match="exit_policy.*required"):
+            D1Hook.from_yaml_dict(yaml_block)
+
+    def test_missing_per_fold_classifiers_raises(self):
+        order = list(ALL_FEATURE_KEYS)
+        yaml_block = [
+            {
+                "label": "no_classifiers",
+                "feature_order": order,
+                "decision_threshold": 0.5,
+                "bar_offset_t": 3,
+                "exit_policy": {
+                    "type": "stepwise_climber",
+                    "archetype_sl_r": 1.0,
+                    "r_in_atr": 3.0,
+                    "mfe_lock_r": 1.0,
+                    "trail_from_high_r": 0.75,
+                },
+                # no per_fold_classifiers
+            }
+        ]
+        with pytest.raises(ValueError, match="per_fold_classifiers.*required"):
+            D1Hook.from_yaml_dict(yaml_block)
+
+    def test_unknown_exit_policy_type_raises(self):
+        order = list(ALL_FEATURE_KEYS)
+        yaml_block = [
+            {
+                "label": "bogus_policy",
+                "feature_order": order,
+                "decision_threshold": 0.5,
+                "bar_offset_t": 3,
+                "per_fold_classifiers": {"F1": StubClassifier(order)},
+                "exit_policy": {"type": "not_a_real_policy"},
+            }
+        ]
+        with pytest.raises(ValueError, match="unknown exit_policy type"):
+            D1Hook.from_yaml_dict(yaml_block)
 
 
 # ---------------------------------------------------------------------------
@@ -689,6 +883,58 @@ class TestEnginePatch:
             src,
         )
         assert m, "hook block must be guarded by `if D1_HOOK is not None:`"
+
+    def test_engine_passes_fold_id_to_hook(self):
+        """PR 2: helper receives fold_id from trade dict so the per-fold
+        classifier dispatch works.
+        """
+        src = ENGINE_PATH.read_text(encoding="utf-8")
+        m = re.search(
+            r"apply_d1_hook_per_bar\([^)]*fold_id\s*=\s*trade\.get\(\"fold_id\"\)",
+            src,
+            re.S,
+        )
+        assert m, "engine call to apply_d1_hook_per_bar must thread fold_id"
+
+    def test_engine_invokes_per_bar_policy_update(self):
+        """PR 2: per-bar update fires every bar from accept onward,
+        before Priority-1 SL.
+        """
+        src = ENGINE_PATH.read_text(encoding="utf-8")
+        update_idx = src.find('trade["exit_policy"].update_per_bar')
+        sl_priority_idx = src.index("# Priority 1: Intrabar hard SL")
+        assert update_idx != -1, (
+            "engine must call trade['exit_policy'].update_per_bar(...)"
+        )
+        assert update_idx < sl_priority_idx, (
+            "per-bar policy update must run before the Priority-1 SL check"
+        )
+
+    def test_engine_stamps_fold_id_at_trade_open(self):
+        """PR 2: trade dict gains fold_id at entry — used to select the
+        per-fold classifier.
+        """
+        src = ENGINE_PATH.read_text(encoding="utf-8")
+        assert "_fold_id_for_entry(bar_date)" in src
+        m = re.search(
+            r"\"fold_id\":\s+_fold_id_for_entry\(bar_date\)",
+            src,
+        )
+        assert m, "trade dict must carry fold_id at open"
+
+    def test_engine_audit_columns_gated_on_hook(self):
+        """PR 2: trades_all.csv gains new D1 audit columns only when
+        D1_HOOK is configured — KH-24 baseline runs stay byte-identical.
+        """
+        src = ENGINE_PATH.read_text(encoding="utf-8")
+        m = re.search(
+            r"_d1_audit_extras:\s*dict\s*=\s*\{\}\s*\n\s+if\s+D1_HOOK\s+is\s+not\s+None:",
+            src,
+        )
+        assert m, (
+            "audit columns must be gated on `if D1_HOOK is not None:` so "
+            "the baseline trades_all.csv stays byte-identical"
+        )
 
 
 if __name__ == "__main__":

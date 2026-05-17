@@ -1,0 +1,121 @@
+# Arc 2 redo2 — Step 1 plumbing config
+#
+# Protocol: L_ARC_PROTOCOL.md v2.1.1 §5
+# Signal:   TRIAL__mtf_alignment__2_down_mixed__kijun__h_120
+#           (LCHAR_TOPN_REGISTRY.md Entry 2)
+# Canonical signal source: scripts/lchar/run_layer4.py (mtf_alignment_states,
+#           trend='kijun', state='2_down_mixed') — re-used via
+#           scripts/arc_2_redo/arc2_signal.py (port; canonical script not modified).
+#
+# Fork of configs/arc_2_redo/step1.yaml — identical content except output paths
+# and protocol reference (v2.0 -> v2.1.1). Used with the v2.1.1-schema-compliant
+# fork scripts/arc_2_redo2/step1_build_pool.py.
+#
+# Pure trade-pool generation: no filters, no analysis, single pass across data.
+
+phase: arc_2_redo2_step1
+description: >-
+  L Arc 2 redo2 Step 1 — generate trade pool for signal
+  TRIAL__mtf_alignment__2_down_mixed__kijun__h_120 under v2.1.1 protocol.
+  Direct-to-main per v2.1.1 §13; no PR (arc analysis script + arc results dir).
+
+# ----------------------------------------------------------------------
+# Signal parameters (locked to LCHAR_TOPN_REGISTRY.md Entry 2 + v2.1.1)
+# ----------------------------------------------------------------------
+signal:
+  family: mtf_alignment
+  state: 2_down_mixed
+  trend: kijun                       # kijun-sign trend definition
+  signal_tf: 1H
+  middle_tf: 4H
+  higher_tf: D1
+  middle_tf_lag: most_recently_completed
+  higher_tf_lag: most_recently_completed
+  kijun_period: 26
+  trade_direction: long              # v2.1.1 §1.16 long-only baseline
+
+# ----------------------------------------------------------------------
+# Execution parameters (CLAUDE.md L arc config + v2.1.1 §1)
+# ----------------------------------------------------------------------
+execution:
+  entry_bar_offset: 1                # bar N+1 open after signal at bar N close
+  atr_period: 14
+  atr_smoothing: wilder              # Wilder ATR(14) on 1H frame
+  atr_tf: 1H
+  sl_atr_multiplier: 2.0             # SL = entry - 2.0 * ATR(14) for long
+  horizon_bars: 120                  # time exit at bar N+1+120
+  path_window_bars: 240              # per v2.1.1 §5 / prompt §5
+  max_concurrent_per_pair: 1
+  risk_pct_per_trade: 0.005          # L6 convention (v2.1.1)
+  starting_balance: 10000.0
+  trade_direction: long
+
+# ----------------------------------------------------------------------
+# Data inputs (matches scripts/lchar/run_layer4.py canonical paths)
+# ----------------------------------------------------------------------
+data:
+  data_dirs:
+    "1H": data/1hr
+    "4H": data/4hr
+    "D1": data/daily
+  timeframes: [1H, 4H, D1]
+  # Period: full available range — script reports actual coverage and uses
+  # the intersection across pairs. No date_start/date_end overrides.
+  date_start: null
+  date_end: null
+  pairs:
+    - AUD_CAD
+    - AUD_CHF
+    - AUD_JPY
+    - AUD_NZD
+    - AUD_USD
+    - CAD_CHF
+    - CAD_JPY
+    - CHF_JPY
+    - EUR_AUD
+    - EUR_CAD
+    - EUR_CHF
+    - EUR_GBP
+    - EUR_JPY
+    - EUR_NZD
+    - EUR_USD
+    - GBP_AUD
+    - GBP_CAD
+    - GBP_CHF
+    - GBP_JPY
+    - GBP_NZD
+    - GBP_USD
+    - NZD_CAD
+    - NZD_CHF
+    - NZD_JPY
+    - NZD_USD
+    - USD_CAD
+    - USD_CHF
+    - USD_JPY
+
+# ----------------------------------------------------------------------
+# Spread floor (locked; matches arc 2 original)
+# ----------------------------------------------------------------------
+spread_floor:
+  enabled: true
+  source: configs/spread_floors_5ers.yaml
+  expected_body_sha256: a613b4ce641c8d5218490531770a4924204029dedaa80fb24111beb61bd15547
+  points_per_pip: 10.0
+
+# ----------------------------------------------------------------------
+# Gates (v2.1.1 §5)
+# ----------------------------------------------------------------------
+gates:
+  pool_size_min: 500
+  small_pair_flag_threshold: 30      # pairs with n < 30 flagged but not removed
+
+# ----------------------------------------------------------------------
+# Output
+# ----------------------------------------------------------------------
+output:
+  results_dir: results/l_arc_2_redo2/step1
+  trades_csv: trades_all.csv
+  paths_csv: trades_paths.csv
+  summary_md: STEP1_SUMMARY.md
+  float_format: "%.10g"
+  determinism_check: true            # if true, run twice and verify byte-identical

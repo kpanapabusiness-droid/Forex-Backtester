@@ -1,0 +1,46 @@
+# Arc 7 — Step 2 path-shape clustering config (L_ARC_PROTOCOL v2.1.2 §§6, 11).
+#
+# Operates on results/l_arc_7/step1/{trades_paths.csv, trades_all.csv}; sweep
+# K ∈ {3..7}, KMeans + StandardScaler, archetype matching against v2.1.2 §11
+# centroid patterns (Stepwise climber local_peaks ceiling 50, not 30).
+
+phase: L_ARC_7_STEP_2_PATH_SHAPE_CLUSTERING
+
+input:
+  step1_dir: results/l_arc_7/step1
+  paths_csv: trades_paths.csv
+  trades_csv: trades_all.csv
+
+output:
+  results_dir: results/l_arc_7/step2
+  features_csv: path_features.csv
+  sweep_csv: silhouette_sweep.csv
+  archetypes_csv: archetype_assignments.csv
+  histograms_png: feature_histograms.png
+  summary_md: STEP2_SUMMARY.md
+  determinism_check: true
+
+clustering:
+  k_sweep: [3, 4, 5, 6, 7]
+  random_state: 42
+  n_init: 10
+  max_iter: 300
+  silhouette_sample_size: null     # full pool (1,288 is small)
+
+gates:
+  silhouette_min: 0.30
+  max_cluster_fraction: 0.90
+  min_cluster_count: 30
+
+k_selection:
+  tie_tolerance_absolute: 0.01     # v2.1.1 Open-12 closure: smaller K within ±0.01
+
+degeneracy:
+  modal_bin_mass_threshold: 0.80   # > 80% in single bin → degenerate
+  histogram_bins: 50
+
+archetype:
+  # v2.1.2 §11 centroid patterns (Stepwise climber local_peaks ceiling 50).
+  # Rows referencing fwd_mfe_p50 / pct_peak_and_collapse / MAE-timing return
+  # `tentative_<archetype>` when path-shape conditions match (Step 3 confirms).
+  boundary_relative_distance: 0.10

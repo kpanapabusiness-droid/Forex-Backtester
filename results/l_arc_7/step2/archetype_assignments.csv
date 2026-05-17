@@ -1,0 +1,5 @@
+cluster_id,n,size_fraction,centroid_monotonicity,centroid_local_peaks,centroid_pullback,centroid_ttp_rel,archetype_label,label_status,matching_rule,notes
+0,385,0.2989130435,0.55467387,4.436363636,0.1577725074,0.2977223632,tentative_Early-peak hold OR Peak-and-collapse,tentative,ttp_rel<=0.30,Step 3 pct_peak_and_collapse: <0.30 → Early-peak hold; >=0.50 → Peak-and-collapse
+1,185,0.1436335404,0.5363095437,33.51351351,0.567230615,0.7301833595,tentative_V-shape recovery,tentative,"ttp_rel in [0.4, 0.8]",Step 3 MAE-before-peak >= 5 bars confirmation
+2,353,0.274068323,0.01362266943,0.5920679887,0.008891715759,0.0816727712,tentative_Early-peak hold OR Peak-and-collapse,tentative,ttp_rel<=0.30,Step 3 pct_peak_and_collapse: <0.30 → Early-peak hold; >=0.50 → Peak-and-collapse
+3,365,0.2833850932,0.49754463,9.843835616,0.7622319837,0.5673325333,tentative_V-shape recovery,tentative,"ttp_rel in [0.4, 0.8]",Step 3 MAE-before-peak >= 5 bars confirmation

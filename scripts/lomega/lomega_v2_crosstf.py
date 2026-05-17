@@ -33,36 +33,33 @@ _REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-import numpy as np
-import pandas as pd
-from scipy import stats as sps
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import roc_auc_score
-from sklearn.model_selection import TimeSeriesSplit
+import numpy as np  # noqa: E402
+import pandas as pd  # noqa: E402
+from scipy import stats as sps  # noqa: E402
+from sklearn.ensemble import RandomForestClassifier  # noqa: E402
+from sklearn.linear_model import LogisticRegression  # noqa: E402
+from sklearn.metrics import roc_auc_score  # noqa: E402
+from sklearn.model_selection import TimeSeriesSplit  # noqa: E402
 
 # Reuse byte-identical helpers from B1-B4 — feature definitions for the
 # 30 reused features and the existing cross-TF anchors must match exactly.
 from scripts.lomega.lomega_b1_b4 import (  # noqa: E402
-    PAIRS,
-    USD_BASE,
-    USD_QUOTE,
-    START_DATE,
     END_DATE,
+    PAIRS,
     RNG_SEED,
-    load_pair,
+    START_DATE,
+    attach_d1_anchor,
+    attach_dxy_proxy,
+    attach_h4_anchor,
+    cohen_d,
     compute_atr,
+    compute_pair_features,
     ema_adjust_false,
+    load_pair,
     rolling_rank_pct,
     rolling_std,
     sma,
-    compute_pair_features,
-    attach_d1_anchor,
-    attach_h4_anchor,
-    attach_dxy_proxy,
-    cohen_d,
 )
-
 
 _REPO = Path(__file__).resolve().parent.parent.parent
 _DATA = _REPO / "data"
@@ -653,11 +650,11 @@ def spot_check_no_lookahead(rows_df: pd.DataFrame, pair_dfs: dict,
         df = pair_dfs[pair]
         loc = int(df.index[df["time"] == t][0])
         h = df["high"].values[: loc + 1]
-        l = df["low"].values[: loc + 1]
+        lo = df["low"].values[: loc + 1]
         c = df["close"].values[: loc + 1]
         if loc + 1 < 14:
             continue
-        atr_recomp = float(compute_atr(h, l, c, 14)[0][-1])
+        atr_recomp = float(compute_atr(h, lo, c, 14)[0][-1])
 
         # D1 anchor — strict prior calendar day
         d1_df = d1_data[pair]

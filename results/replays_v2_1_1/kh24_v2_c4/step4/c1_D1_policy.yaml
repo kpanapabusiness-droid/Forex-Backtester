@@ -1,7 +1,6 @@
 cluster_id: c1
 archetype: Stepwise climber
-amendment_dependency: AMENDMENT_PROPOSAL_S2_SHAPE_TAG_S11_EXPANSION.md (chat-side,
-  pending synthesis)
+protocol_reference: L_ARC_PROTOCOL.md v2.1.2 §11 row Stepwise climber
 pipeline: D1
 target: cluster_membership_binary
 positives_count: 365
@@ -35,11 +34,11 @@ rf_roc_auc_cv_mean: 0.617764030048608
 rf_pr_auc_cv_mean: 0.5338982728241023
 exclusion_rate: 0.0
 exit_policy_ref:
-  source: L_ARC_PROTOCOL.md Â§11 row Stepwise climber
-  initial_sl: 2.0xATR (entry-to-bar-N pre-classification)
+  source: L_ARC_PROTOCOL.md v2.1.2 §11 row Stepwise climber
+  initial_sl: 2.0×ATR (entry-to-bar-N pre-classification)
   on_bar_N_if_admitted:
     mfe_lock_at_R: 1.0
     trail_from_new_high_R: 0.75
   on_bar_N_if_rejected:
     close_at_market: bar N+1 open
-  executor: 'D1 PR 2 backtester (deferred; PR #131 close-at-market path operational)'
+  executor: D1 PR 2 backtester (deferred; PR #131 close-at-market path operational)

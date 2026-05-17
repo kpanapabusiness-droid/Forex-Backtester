@@ -1,8 +1,23 @@
-# KH-24 v2.0 self-test Step 4 — Extractability (Amendment-Conditional) — RESULT
+# KH-24 v2.0 self-test Step 4 — Extractability — RESULT
 
-## Conditional disclaimer
+## v2.1.2 alignment note
 
-This Step 4 work runs under proposed but not yet ratified amendments to v2.1.1 §2 + §11 (see chat-side `AMENDMENT_PROPOSAL_S2_SHAPE_TAG_S11_EXPANSION.md`). Cohort set (c1 Stepwise climber, c4 Slow Trend Trail) depends on amendment ratification. **Classifier target is cluster membership (not profitability)** — policy-independent. Output is diagnostic-grade until Open-18 cross-replay synthesis confirms or modifies the amendments. STATUS / CHANGELOG / §14 governance updates do not follow from this dispatch.
+This Step 4 work was originally dispatched against a chat-side amendment proposal
+(`AMENDMENT_PROPOSAL_S2_SHAPE_TAG_S11_EXPANSION.md`). The v2.1.2 protocol amendment
+(commit e063c18) subsequently ratified the proposal via ceiling extension (Stepwise
+climber local_peaks 5-30 → 5-50) rather than a new §11 row. c4 is therefore Stepwise
+climber under v2.1.2.
+
+c4's R-frame re-locked from Step 3's 1.0×ATR to 2.0×ATR per v2.1.2 composite-max
+(§2 categorical floor relaxation to `≠ scattered` admits the wider SLs producing
+composite 0.607 vs 0.304 at 1.0×). Classifier predictions are R-frame-independent
+(cluster-membership target); only Step 5/6 downstream framing changes.
+
+Policy YAMLs corrected in this patch to reference v2.1.2 §11 Stepwise climber row
+with 0.75R trail (not the 0.5R from the original chat-side proposal). c4 admit_threshold
+remains null — operational selection caveat documented in `c4_D1_policy.yaml`.
+
+**Classifier target is cluster membership (not profitability)** — policy-independent.
 
 Inputs:
 - `trades_all.csv` (Step 1)
@@ -12,12 +27,12 @@ Inputs:
 
 All three joined on `trade_id`; row count 842 preserved across the inner join. Zero NaN across the 8 base features post-join.
 
-## Cohort set under test (amendment-state)
+## Cohort set under test (v2.1.2-ratified)
 
-| cluster | n (positives) | non-cluster pool (negatives) | size | positive_rate | selected SL | composite | §11 row (proposed) | exit policy (deferred D1 PR 2) |
+| cluster | n (positives) | non-cluster pool (negatives) | size | positive_rate | selected SL | composite | §11 row (v2.1.2) | exit policy (deferred D1 PR 2) |
 |---|---|---|---|---|---|---|---|---|
 | c1 | 365 | 477 | 43.4% | 0.434 | 2.0×ATR | 0.387 | Stepwise climber | MFE-lock at 1R, trail 0.75R from new high |
-| c4 | 122 | 720 | 14.5% | 0.145 | 2.0×ATR | 0.607 | Slow Trend Trail (new row) | Lock at 1R, trail 0.5R from new high |
+| c4 | 122 | 720 | 14.5% | 0.145 | 2.0×ATR | 0.607 | Stepwise climber (5-50 ceiling) | MFE-lock at 1R, trail 0.75R from new high |
 
 c1 is roughly balanced; c4 is imbalanced. PR-AUC is the load-bearing metric for c4 — its class baseline of 0.145 means ROC-AUC alone can mislead.
 

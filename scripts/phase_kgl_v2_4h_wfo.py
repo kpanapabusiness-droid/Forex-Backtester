@@ -46,16 +46,75 @@ sys.path.insert(0, str(PROJECT_ROOT))
 os.chdir(PROJECT_ROOT)
 warnings.filterwarnings("ignore")
 
+# When this file is launched directly (``py scripts/phase_kgl_v2_4h_wfo.py``)
+# Python registers it as ``__main__``. Helpers in the signals package that
+# later do ``from scripts.phase_kgl_v2_4h_wfo import X`` would otherwise
+# import a second module copy with default globals — bypassing the cfg
+# overrides applied by main(). Aliasing __main__ to the package path keeps
+# globals (USE_C8, NO_VOLUME_FILTER, …) consistent across both lookups.
+if __name__ == "__main__":
+    sys.modules.setdefault("scripts.phase_kgl_v2_4h_wfo", sys.modules[__name__])
+
 from core.d1_pipeline import D1Hook, apply_d1_hook_per_bar  # noqa: E402
-from core.features_path_so_far import build_entry_features_at_signal_bar  # noqa: E402
+from core.signal_adapter import SignalAdapter, import_class, validate_aux_declaration  # noqa: E402
+from core.spread_floor import (  # noqa: E402
+    STATE_CFG_KEY,
+    apply_spread_floor_to_pips,
+    format_startup_log,
+    format_summary_log,
+    load_spread_floor,
+)
 from core.utils import get_pip_size, load_pair_csv  # noqa: E402
 from signals.kb_exhaustion_bar import _wilder_atr  # noqa: E402
 
+# Bag dict used to ferry the SpreadFloorState into apply_spread_floor_to_pips.
+# core/spread_floor.py expects a cfg-shaped dict with the state under
+# STATE_CFG_KEY. Engine populates this in main() from cfg.
+_SPREAD_FLOOR_BAG: dict = {}
+
+
+def _apply_spread_floor(pair: str, raw_pips: float) -> float:
+    return float(apply_spread_floor_to_pips(_SPREAD_FLOOR_BAG, pair, float(raw_pips)))
+
+# ── Signal adapter (set in main() from cfg) ──────────────────────────────────
+# None → caller must call _ensure_signal_adapter() before the pair cache build.
+# main() always sets this; tests that import the engine directly should too.
+SIGNAL_ADAPTER: "SignalAdapter | None" = None
+
+_DEFAULT_SIGNAL_ADAPTER_SPEC = "signals.kb_exhaustion_bar_adapter:KbExhaustionBarAdapter"
+
+
+def _ensure_signal_adapter() -> "SignalAdapter":
+    """Fallback to the KH-24 adapter when main() hasn't set one.
+
+    Keeps legacy direct imports (no config) byte-identical: KH-24 was the
+    only signal before this PR, so defaulting to its adapter matches the
+    pre-PR behaviour.
+    """
+    global SIGNAL_ADAPTER
+    if SIGNAL_ADAPTER is None:
+        adapter_cls = import_class(_DEFAULT_SIGNAL_ADAPTER_SPEC)
+        SIGNAL_ADAPTER = adapter_cls()
+        validate_aux_declaration(
+            SIGNAL_ADAPTER.required_aux_data(),
+            _DEFAULT_SIGNAL_ADAPTER_SPEC,
+        )
+    return SIGNAL_ADAPTER
+
 # ── Directories ───────────────────────────────────────────────────────────────
+# DATA_DIR_4H is retained by name for backward compatibility — it now stores
+# the signal-timeframe data directory regardless of timeframe. SIGNAL_TF holds
+# the textual label (e.g. "H4", "H1"). Both are cfg-overridable in main().
+SIGNAL_TF   = "H4"
 DATA_DIR_4H = PROJECT_ROOT / "data" / "4hr"
 D1_DATA_DIR = PROJECT_ROOT / "data" / "daily"
 H1_DATA_DIR = PROJECT_ROOT / "data" / "1hr"
 OUT_ROOT    = PROJECT_ROOT / "results" / "phase_kg" / "kg_l_v2"
+
+# PATH_FORWARD_BARS semantics: bars in the SIGNAL timeframe. At signal_tf=H4
+# this is 240 × 4h = 40 calendar days; at H1 it's 240 × 1h = 10 calendar days.
+# Documented here because the constant is defined below without timeframe
+# context.
 
 # ── D1 filter parameters ──────────────────────────────────────────────────────
 D1_REGIME_FILTER  = True
@@ -430,6 +489,12 @@ SIGNAL_DIRECTION = "long"  # "long" or "short" — set via config direction: sho
 # None preserves baseline byte-for-byte. Configured at run-start from the
 # top-level ``d1_archetypes`` YAML block. See core/d1_pipeline.py.
 D1_HOOK: "D1Hook | None" = None
+
+# ── Time-exit cap (engine-generalisation PR) ─────────────────────────────────
+# None disables; positive int = max bars from entry_idx before forcing an
+# exit at the NEXT bar's open (last-bar fallback: c_j on bar j). Fires at
+# the END of the exit cascade so any other exit wins on tie.
+TIME_EXIT_BARS: "int | None" = None
 
 # ── WFO configuration ─────────────────────────────────────────────────────────
 WFO_START       = datetime(2019, 1, 1)
@@ -1021,6 +1086,10 @@ def _build_pair_cache(pairs: list[str] | None = None) -> dict:
     target_pairs = pairs if pairs is not None else ALL_PAIRS
     pair_cache: dict[str, dict] = {}
 
+    adapter_aux = set(_ensure_signal_adapter().required_aux_data())
+    load_d1 = "d1" in adapter_aux
+    load_h1 = "h1" in adapter_aux
+
     for pair in target_pairs:
         try:
             df = load_pair_csv(pair, DATA_DIR_4H)
@@ -1028,8 +1097,8 @@ def _build_pair_cache(pairs: list[str] | None = None) -> dict:
             df = df.sort_values("date").reset_index(drop=True)
             if "volume" not in df.columns:
                 df["volume"] = 0.0
-            d1_filt = _load_d1_filter(pair) if D1_REGIME_FILTER else None
-            h1_df   = _load_h1_data(pair)
+            d1_filt = _load_d1_filter(pair) if (load_d1 and D1_REGIME_FILTER) else None
+            h1_df   = _load_h1_data(pair) if load_h1 else None
             (d1_close_arr, d1_kijun_arr,
              d1_close_lag2_arr, d1_kijun_lag2_arr,
              d1_atr_lag1_arr,
@@ -1074,11 +1143,19 @@ def _build_pair_cache(pairs: list[str] | None = None) -> dict:
                 baseline_vals = None
 
             min_warm = WARMUP_BARS.get(BASELINE_TYPE, 0)
-            sig, n_blocked, n_passed, n_cond9, cond9_dates, d1_dist_ratios = _build_signal_series(
-                df, d1_filt,
-                baseline_override=baseline_vals,
-                min_warmup=min_warm if baseline_vals is not None else None,
-            )
+            adapter = _ensure_signal_adapter()
+            _signal_aux = {
+                "d1_filter":         d1_filt,
+                "h1_df":             h1_df,
+                "baseline_override": baseline_vals,
+                "min_warmup":        min_warm if baseline_vals is not None else None,
+            }
+            sig, _signal_extras = adapter.compute_signal_mask(df, _signal_aux)
+            n_blocked      = int(_signal_extras.get("n_d1_blocked", 0))
+            n_passed       = int(_signal_extras.get("n_d1_passed", 0))
+            n_cond9        = int(_signal_extras.get("n_cond9_blocked", 0))
+            cond9_dates    = list(_signal_extras.get("cond9_block_dates", []))
+            d1_dist_ratios = dict(_signal_extras.get("d1_dist_ratio_by_bar", {}))
 
             ema50_arr = _compute_ema(closes_arr, REGIME_EMA_PERIOD)
             ema50_series = pd.Series(ema50_arr, index=pd.DatetimeIndex(df["date"].values))
@@ -1523,6 +1600,20 @@ def _simulate_kgl_v2(
                         exit_px     = c_j
                     exit_reason = "kijun_d1"
 
+            # Priority 6: time-exit cap (TIME_EXIT_BARS=None disables).
+            # Fires LAST so SL / trail / kijun_d1 / KH-13 / KH-14 / D1 hook
+            # all win if they would trigger on this bar first.
+            if exit_reason is None and TIME_EXIT_BARS is not None:
+                if (j - entry_idx) >= TIME_EXIT_BARS:
+                    n = len(cached["o"])
+                    if j + 1 < n:
+                        exit_bar    = j + 1
+                        exit_px     = cached["o"][j + 1]
+                    else:
+                        exit_bar    = j
+                        exit_px     = c_j
+                    exit_reason = "time_exit"
+
             if exit_reason is not None:
                 # v1.3: when the exit fills at the next bar's open
                 # (exit_bar > j), the regular per-bar emission stopped at
@@ -1738,7 +1829,9 @@ def _simulate_kgl_v2(
                     risk_pp_re  = REENTRY_SL_ATR_MULT * a_re
                     sl_px_re    = re_px - risk_pp_re
                     ta_px_re    = re_px + TRAIL_ACT_MULT * a_re
-                    sp_pips_re  = re_cac["sp"][re_idx] / POINTS_PER_PIP
+                    sp_pips_re  = _apply_spread_floor(
+                        re_pair, re_cac["sp"][re_idx] / POINTS_PER_PIP
+                    )
                     pos_size_re = (INITIAL_BAL * RISK_PCT) / risk_pp_re
                     sc_re       = (sp_pips_re * re_cac["pip"]) * pos_size_re
                     best_cl_re  = re_cac["c"][re_idx]
@@ -1871,7 +1964,9 @@ def _simulate_kgl_v2(
                         continue
                     sl_px_s1 = e_px - risk_pp_s1
                     ta_px_s1 = e_px + TRAIL_ACT_MULT * a_f
-                    sp_pips_s1  = cac17["sp"][e_idx] / POINTS_PER_PIP
+                    sp_pips_s1  = _apply_spread_floor(
+                        p17, cac17["sp"][e_idx] / POINTS_PER_PIP
+                    )
                     pos_size_s1 = (INITIAL_BAL * RISK_PCT) / risk_pp_s1
                     sc_s1       = (sp_pips_s1 * cac17["pip"]) * pos_size_s1
                     best_cl_s1  = cac17["c"][e_idx]
@@ -2044,7 +2139,9 @@ def _simulate_kgl_v2(
                         continue
                     sl_px_r = r_px - risk_pp_r
                     ta_px_r = r_px + TRAIL_ACT_MULT * a_r
-                    sp_pips_r  = cac17["sp"][re_idx] / POINTS_PER_PIP
+                    sp_pips_r  = _apply_spread_floor(
+                        p17, cac17["sp"][re_idx] / POINTS_PER_PIP
+                    )
                     pos_size_r = (INITIAL_BAL * RISK_PCT) / risk_pp_r
                     sc_r       = (sp_pips_r * cac17["pip"]) * pos_size_r
                     best_cl_r  = cac17["c"][re_idx]
@@ -2252,7 +2349,7 @@ def _simulate_kgl_v2(
                 ATR_SIZING_REDUCED_PCT if atr_sized_down_flag else RISK_PCT
             )
 
-            spread_pips  = cached["sp"][entry_idx] / POINTS_PER_PIP
+            spread_pips  = _apply_spread_floor(pair, cached["sp"][entry_idx] / POINTS_PER_PIP)
             spread_price = spread_pips * cached["pip"]
             pos_size     = (INITIAL_BAL * effective_risk_pct) / risk_pp
             spread_cost  = spread_price * pos_size
@@ -2355,16 +2452,12 @@ def _simulate_kgl_v2(
             # Pipeline D1: compute the 8 base entry features at signal bar N
             # for downstream classifier evaluation at bar offset t. Storage is
             # gated on D1_HOOK so the baseline path remains byte-identical when
-            # no D1 archetypes are configured.
+            # no D1 archetypes are configured. Routed through the signal
+            # adapter so non-KH-24 signals can supply their own feature set.
             entry_features_dict: dict[str, float] | None = None
             if D1_HOOK is not None:
-                entry_features_dict = build_entry_features_at_signal_bar(
-                    open_arr=cached["o"],
-                    high_arr=cached["h"],
-                    low_arr=cached["lo"],
-                    close_arr=cached["c"],
-                    atr_at_signal_bar=float(a),
-                    signal_bar_idx=int(i),
+                entry_features_dict = _ensure_signal_adapter().compute_entry_features(
+                    cached["df"], int(i), aux={},
                 )
 
             open_trades.append({
@@ -3669,6 +3762,9 @@ def run_kgl_v2() -> None:
     print("    trades_all.csv")
     print("    trades_paths.csv  (v1.3 per-bar capturability extension)")
     print("    kgl_v2_report.md")
+    _spread_floor_state = _SPREAD_FLOOR_BAG.get(STATE_CFG_KEY)
+    if _spread_floor_state is not None:
+        print(format_summary_log(_spread_floor_state))
     print("\n=== KG-L-V2 complete ===")
 
 
@@ -3699,6 +3795,9 @@ def main() -> None:
     global KH17_STATE1_SL_ATR_MULT
     global KH17_BAR6_MFE_THRESHOLD, KH17_BAR6_MAE_THRESHOLD
     global D1_HOOK
+    global SIGNAL_ADAPTER
+    global SIGNAL_TF, H1_DATA_DIR
+    global TIME_EXIT_BARS
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", "--config", default=None)
@@ -3732,13 +3831,34 @@ def main() -> None:
             OUT_ROOT = PROJECT_ROOT / out_dir
             OUT_ROOT.mkdir(parents=True, exist_ok=True)
 
-        # Override data directories
-        data_4h = cfg.get("data_dir")
-        if data_4h:
-            DATA_DIR_4H = PROJECT_ROOT / data_4h
-        d1_dir = cfg.get("indicator_params", {}).get("kb_exhaustion_bar", {}).get("d1_data_dir")
-        if d1_dir:
-            D1_DATA_DIR = PROJECT_ROOT / d1_dir
+        # Signal timeframe label (informational + for reports / logs)
+        if "signal_tf" in cfg:
+            SIGNAL_TF = str(cfg["signal_tf"])
+
+        # Data directories — modern `data:` block takes precedence; falls
+        # back to legacy `data_dir` / `indicator_params.*.d1_data_dir`.
+        data_block = cfg.get("data") or {}
+        data_signal_dir = data_block.get("signal_tf_dir") or cfg.get("data_dir")
+        if data_signal_dir:
+            DATA_DIR_4H = PROJECT_ROOT / data_signal_dir
+        aux_block = data_block.get("aux") or {}
+        aux_h1 = aux_block.get("h1")
+        if aux_h1:
+            H1_DATA_DIR = PROJECT_ROOT / aux_h1
+        aux_d1 = (
+            aux_block.get("d1")
+            or cfg.get("indicator_params", {}).get("kb_exhaustion_bar", {}).get("d1_data_dir")
+        )
+        if aux_d1:
+            D1_DATA_DIR = PROJECT_ROOT / aux_d1
+
+        # Track which aux keys are actually configured so the adapter
+        # declaration can be validated below.
+        _configured_aux = set()
+        if aux_h1:
+            _configured_aux.add("h1")
+        if aux_d1:
+            _configured_aux.add("d1")
 
         # Override WFO fold definitions if folds are explicitly listed in config
         wfo_cfg = cfg.get("wfo", {})
@@ -4111,6 +4231,44 @@ def main() -> None:
                 "kh25_reentry_enabled is mutually exclusive with kh17_enabled "
                 "and kh18_enabled. Enable at most one per run."
             )
+
+        # Signal adapter (per-arc plug-in). Defaults to KbExhaustionBarAdapter
+        # when absent so pre-PR configs (and KH-24 itself, until its YAML adds
+        # the keys) remain byte-identical.
+        _adapter_spec = cfg.get("signal_adapter", _DEFAULT_SIGNAL_ADAPTER_SPEC)
+        _adapter_kwargs = cfg.get("signal_adapter_kwargs") or {}
+        adapter_cls = import_class(_adapter_spec)
+        SIGNAL_ADAPTER = adapter_cls(**_adapter_kwargs)
+        _adapter_aux = SIGNAL_ADAPTER.required_aux_data()
+        validate_aux_declaration(_adapter_aux, _adapter_spec)
+        # When the cfg uses the explicit `data.aux` block, every adapter-
+        # declared aux key must have a configured path; otherwise it's a
+        # silent data-missing bug at load time.
+        if data_block:
+            _missing_aux = sorted(set(_adapter_aux) - _configured_aux)
+            if _missing_aux:
+                raise ValueError(
+                    f"signal_adapter '{_adapter_spec}' declared aux "
+                    f"{_adapter_aux} but cfg.data.aux is missing: {_missing_aux}"
+                )
+
+        # Spread-floor application (engine-generalisation PR). Field names
+        # (`enabled`, `source`, `expected_body_sha256`) follow the existing
+        # core/spread_floor.py contract — see ``load_spread_floor``. Absent
+        # block or enabled=False is a no-op.
+        _spread_floor_state = load_spread_floor(cfg)
+        _SPREAD_FLOOR_BAG[STATE_CFG_KEY] = _spread_floor_state
+        print(format_startup_log(_spread_floor_state))
+
+        # Time-exit cap: max bars from entry before forcing an exit at the
+        # next bar's open. Absent / null = no enforcement (baseline).
+        if cfg.get("time_exit_bars") is not None:
+            t = cfg["time_exit_bars"]
+            if not isinstance(t, int) or t < 1:
+                raise ValueError(
+                    f"Invalid time_exit_bars '{t}'. Must be a positive int."
+                )
+            TIME_EXIT_BARS = t
 
         # Pipeline D1 hook (L_ARC_PROTOCOL v2.0 §3). Absent or empty block
         # leaves D1_HOOK = None and the engine behaves byte-identically to

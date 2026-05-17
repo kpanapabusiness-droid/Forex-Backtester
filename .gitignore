@@ -68,6 +68,11 @@ results/*
 # on KH-24 + Arc 1 + Arc 2 (diagnostic only; no protocol revision)
 !results/v2_0_diagnostic/
 !results/v2_0_diagnostic/**
+# Lω discovery track (B1-B4 and later) — multi-timeframe extractability
+# ceiling analysis; small analysis outputs are tracked, heavy per-bar CSVs
+# are gitignored in-folder (regen via scripts/lomega/lomega_b1_b4.py).
+!results/lomega/
+!results/lomega/**
 # v2.0 predictability investigation — entry-time + t>0 angles on
 # target archetypes from PR #129 (diagnostic only; no protocol revision)
 !results/v2_0_predictability/

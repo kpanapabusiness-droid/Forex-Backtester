@@ -1,0 +1,9 @@
+# Heavy artefacts excluded from git (> GitHub 100MB / GH suggested 50MB).
+# Reproducible from scripts/lomega/lomega_b1_b4.py.
+# All analysis outputs (b3_univariate, b4_multivariate, summaries) ARE committed.
+labels.csv
+features.csv
+labels.csv.gz
+features.csv.gz
+labels.parquet
+features.parquet

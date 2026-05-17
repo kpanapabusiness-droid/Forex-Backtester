@@ -1,0 +1,8 @@
+n_splits: 7
+n_after_dropna: 42022
+clean_rate: 0.3151444481462091
+mean_fold_auc: 0.4998364770943117
+worst_fold_auc: 0.4496391569013677
+fold_auc_stdev: 0.03990881993482085
+full_data_auc: 0.7817312075614804
+top_15_features: ['atr_200', 'atr_50', 'atr_14', 'adx_14', 'di_minus_14', 'ema_50_above_200', 'atr_ratio_14_50', 'atr_percentile_200', 'di_plus_14', 'dxy_proxy_ema_20_slope', 'range_compression_60', 'atr_ratio_14_200', 'position_in_range_20', 'body_size_atr', 'ema_20_slope']

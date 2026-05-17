@@ -1,0 +1,8 @@
+n_splits: 7
+n_after_dropna: 255174
+clean_rate: 0.19565472971384232
+mean_fold_auc: 0.5039718859603749
+worst_fold_auc: 0.47329303953520135
+fold_auc_stdev: 0.027449689016102067
+full_data_auc: 0.6852035646077834
+top_15_features: ['atr_14', 'atr_50', 'atr_200', 'ema_200_slope', 'atr_ratio_14_200', 'atr_percentile_200', 'd1_close_above_ema_50', 'd1_ema_50_slope_at_entry', 'ema_50_above_200', 'ema_spread_20_50_atr', 'ema_50_slope', 'atr_ratio_14_50', 'ema_20_slope', 'position_in_range_60', 'atr_percentile_60']

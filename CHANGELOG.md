@@ -1,5 +1,51 @@
 # Changelog
 
+## L_ARC_PROTOCOL v2.1.1 AMENDMENT | 2026-05-17 | doc-only
+
+Combined patch: v2.1 refinements + v2.1 engine-reality corrections.
+
+### v2.1.1 refinements (substantive)
+
+- §7 SL selection rule: smallest-SL-passes → **capturability composite maximiser** among SLs passing all §2 floors. Composite = (mono_pre_peak − 0.55) + (frac_reach_1R − 0.70) + (0.30 − frac_wrong_way_pre_peak). Tiebreaker 1: physical-MFE in ATR units. Tiebreaker 2: smaller SL. Closes selection bias toward marginal-pass tight SLs.
+- §5 forward window auto-extend: Step 2 clustering **re-runs on extended-window paths**. K may differ; extended-window K is the documented value. Previously unspecified.
+- §11 row 7 routing precedence: when cluster matches base archetype AND passes bimodal_separated test, **both exit policies advance** through Step 4-6; Step 6 ships higher worst-fold ROI. Previously ambiguous.
+- §10 multi-cluster ship decision: **one cluster per arc** — highest worst-fold ROI subject to DD ≤ 8%. Other survivors archived as portfolio candidates (Open-05). Previously unspecified.
+
+### v2.1 engine-reality corrections (wording)
+
+v2.1's §1 item 25, §5 "SL-free path recording" subsection, §7 SL sweep mechanics, §14 anchor refresh list, §16 Open-15, §17 SL-free path glossary all referenced an "engine PR pending" for SL-free path recording. CC's halt while attempting that PR established that the engine already has a v1.3 forward-window extension (`scripts/phase_kgl_v2_4h_wfo.py::_flatten_bar_path_for_trade`, lines 104-213) that emits forward observation bars (`is_held=0`) regardless of exit reason. No new column or schema change is needed — the existing forward bars provide what §7 SL sweep requires.
+
+v2.1.1 corrects the wording across all eight locations:
+- §0 v2.1 changes table: "Path recording" row removed (v1.3 extension predates v2.1, not a v2.0→v2.1 engine change)
+- §1 item 25: rewritten to confirm SL sweep operates on existing `is_held=0` forward bars
+- §5: "SL-free path recording" subsection replaced with clarification citing v1.3 extension
+- §7: SL sweep mechanics step 2 references actual schema (`is_held=1` + `is_held=0`)
+- §14: anchor refresh dependency #1 (engine PR) removed; only KH-24 v2.0 re-run blocking
+- §16 Open-15: status rewritten to cite v1.3 extension as existing mechanism
+- §16 Open-18 (new): empirical replays runnable immediately on existing trades_paths.csv
+- §17: SL-free path glossary entry rewritten without `post_sl_hypothetical` reference
+
+### Open items added
+
+- Open-17: capturability composite weighting calibration (v2.2 item, weights currently equal as first-pass prior)
+- Open-18: empirical replay of three v2.0-killed cohorts (Arc 2 redo c2, KH-24 v2.0 c4, Arc 3 Stepwise climber) under v2.1.1 rules to validate the pre-peak + composite + bimodal_separated mechanisms
+
+### Branch / PR impact
+
+- `feat/sl-free-path-recording` branch superseded and deleted (no PR opened)
+- Anchor refresh blocked only on KH-24 v2.0 re-run analysis (no engine wait)
+- Open-18 replays runnable immediately on existing `trades_paths.csv` from closed arcs
+
+### Anchor preservation
+
+All v2.1.1 changes either strictly more permissive than v2.1 (composite selects among passing SLs; row 7 adds candidate exit policy; window auto-extend doesn't fire for anchor population which is below 20% trigger) or constrain only ship-decision logic (post-§2). No §2 floor numbers change. KH-24 K=4 archetype 3 cannot fail under v2.1.1 if it passed under v2.1.
+
+### Files
+- L_ARC_PROTOCOL.md → v2.1.1
+- STATUS.md updated
+- SESSION_ZERO.md version bump
+- PROTOCOL_IMPROVEMENT_BACKLOG.md P0.1 and P1.7 status text corrected
+
 ## L_ARC_PROTOCOL v2.1 AMENDMENT | 2026-05-17 | doc-only
 Protocol amendment closing Open-08, Open-12, Open-13, Open-14, Open-15; partial close on Open-01 (forward-geometry only). Doc-only — engine work (SL-free path recording) deferred to separate engine PR; closed-arc re-runs under v2.1 deferred to post-engine-PR task.
 Resolutions:

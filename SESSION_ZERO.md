@@ -1,19 +1,19 @@
 # SESSION ZERO — Forex Ignition Rebuild
-> 5-minute primer. Read this first, then read `L_ARC_PROTOCOL.md` (v2.1, self-contained) for the active research methodology.
-> Last updated: 2026-05-17 — L_ARC_PROTOCOL v2.1 amendment landed (Open-08/12/13/14/15 closed; partial Open-01). PR #131 D1 backtester plumbing merged. Next engine PR: SL-free path recording (required for §7 SL sweep), then closed-arc re-runs under v2.1, then Arc 4.
+> 5-minute primer. Read this first, then read `L_ARC_PROTOCOL.md` (v2.1.1, self-contained) for the active research methodology.
+> Last updated: 2026-05-17 — L_ARC_PROTOCOL v2.1.1 amendment landed (v2.1 refinements + engine-reality corrections). PR #131 D1 backtester plumbing merged. Previously planned engine PR for SL-free path recording superseded — v1.3 forward extension already provides the required SL-free observation. Next: Open-18 empirical replays of v2.0-killed cohorts (runnable on existing `trades_paths.csv`), then Arc 4 under v2.1.1.
 
 ---
 
 ## Pointers
 
-- Active protocol: `L_ARC_PROTOCOL.md` (v2.1)
+- Active protocol: `L_ARC_PROTOCOL.md` (v2.1.1)
 - v1.x archive: `archive/`
 
 ---
 
 ## Current State
 
-**ACTIVE WORK: L ARC SIGNAL TESTING UNDER L_ARC_PROTOCOL v2.1 — v2.1 AMENDMENT LANDED 2026-05-17, ENGINE PR + RE-RUNS NEXT, THEN ARC 4**
+**ACTIVE WORK: L ARC SIGNAL TESTING UNDER L_ARC_PROTOCOL v2.1.1 — v2.1.1 AMENDMENT LANDED 2026-05-17, OPEN-18 REPLAYS NEXT, THEN ARC 4**
 **LIVE SYSTEM: KH-24 (locked, unchanged, running on VPS)**
 
 Three arcs closed on 2026-05-16, all at Step 3 §2 floors: Arc 2 redo (KILL), KH-24 v2.0 self-test (HALT), Arc 3 (CLEAN-NULL). KH-24 v2.0 self-test was a protocol self-test on the bare KH-24 signal — its closure surfaces the same §2 monotonicity / shape_tag failure mode seen on Arc 2 redo on a different signal with a different mechanism (forward-window censoring of the trend-rider cohort). The §14 calibration anchor was measured on KH-24's filtered deployed population (not bare signal), so v2.0 cannot self-validate on its own anchor as drawn. Cross-arc calibration backlog grew by 8 items, with §2 monotonicity floor and shape_tag-vs-censoring as the top priorities. Open-08 is closed as resolved (pullback_magnitude_median operational definition empirically non-degenerate on KH-24 paths). Arc 3 closure doc flags three reviewer items — Stepwise climber opportunity (passes 4/6 §2 floors cleanly), aggregation rule destroying capturable sub-clusters, SL/horizon asymmetry inflating wrong_way. Five cross-arc items logged for v2.1 from Arc 3. Diagnostic tail (Arc 3D) recommended before Arc 4 — reviewer decision pending. Results: `docs/arc_results/ARC_3_RESULT.md`, `results/arc_kh24_v2/ARC_KH24_V2_RESULT.md`, `results/l_arc_2_redo/ARC_2_REDO_RESULT.md`.
@@ -24,7 +24,7 @@ Pattern flag: two-of-three closures hit the same §2 monotonicity / shape_tag wa
 
 Next: Arc 4 — registry Entry 4 (1-bar horizon, univariate-extreme family, structurally different from Arc 3).
 
-As of 2026-05-17, `L_ARC_PROTOCOL.md` v2.1 is the active protocol. v2.1 is a doc-only amendment on top of v2.0 (locked 2026-05-16) closing Open-08/12/13/14/15 (partial Open-01): §2 forward-geometry split pre-peak/post-peak, §7 SL sweep at Step 3 (smallest-SL-that-passes per archetype), per-cluster + per-aggregate evaluation, `bimodal_separated` shape_tag admission, §11 SL column demoted to prior, §5 forward window auto-extend, §6 K-tie tolerance 0.01, §17 frac_wrong_way Def C. Engine PR for SL-free path recording is the next chat task; closed-arc re-runs (KH-24 v2.0 mandatory for anchor refresh; Arc 3 recommended) follow. KH-24 K=4 archetype 3 remains the calibration anchor with refresh pending. Arcs 1 and 2 ran under v1.x and are historical; v2.0 governed Arc 3; v2.1 governs Arc 4 onward.
+As of 2026-05-17, `L_ARC_PROTOCOL.md` v2.1.1 is the active protocol. v2.1.1 combines v2.1's refinements (substantive: §7 capturability composite SL selection, §5 Step 2 re-clustering on window-extend, §11 row 7 routing precedence, §10 multi-cluster ship decision) with engine-reality corrections that supersede v2.1's references to a pending SL-free path-recording engine PR. CC's halt while attempting that PR established that `scripts/phase_kgl_v2_4h_wfo.py::_flatten_bar_path_for_trade` (v1.3) already emits `is_held=0` forward observation bars from entry to entry+240 regardless of exit reason — providing the SL-free continuation §7 SL sweep needs. v2.1.1 corrects §1/§5/§7/§14/§16/§17 wording accordingly; no engine change implied or needed. The `feat/sl-free-path-recording` branch is superseded and deleted. Open-18 empirical replays (Arc 3 Stepwise climber first, then KH-24 v2.0 c4 for anchor refresh, then Arc 2 redo c2) are runnable now on existing `trades_paths.csv`. KH-24 K=4 archetype 3 remains the calibration anchor with refresh pending re-run only. Arcs 1 and 2 ran under v1.x and are historical; v2.0 governed Arc 3; v2.1.1 governs Arc 4 onward.
 
 ### Live system
 
@@ -43,9 +43,9 @@ KH-24 is locked and out of scope for L arc work. No modifications without an exp
 
 ### Active research direction
 
-**L arc signal testing, Arc 4 next under v2.1.** Source of truth: `L_ARC_PROTOCOL.md` v2.1 — self-contained for methodology, deliverables, gates, and workflow. v1.x ops spec is archived for historical reference.
+**L arc signal testing, Arc 4 next under v2.1.1.** Source of truth: `L_ARC_PROTOCOL.md` v2.1.1 — self-contained for methodology, deliverables, gates, and workflow. v1.x ops spec is archived for historical reference.
 
-The v2.1 L arc tests each registry signal through a six-step pipeline:
+The v2.1.1 L arc tests each registry signal through a six-step pipeline:
 1. Plumbing (deterministic full-pool generation; pool ≥ 500)
 2. Path-shape clustering (outcome-blind features: monotonicity, local_peaks, pullback, time_to_peak_rel)
 3. Capturability characterisation (per §2 hard floors: clean shape + meaningful magnitude)
@@ -53,7 +53,7 @@ The v2.1 L arc tests each registry signal through a six-step pipeline:
 5. Cross-fold stability (sign consistency, size variance, DD ceiling)
 6. WFO truth + pass-deployable / pass-viable gate
 
-Arcs 1 and 2 are historical (ran under v1.x). v2.0 governed Arc 3; v2.1 governs Arc 4 onward. Calibration anchor: KH-24 K=4 archetype 3, which passes v2.0 extractability via Pipeline D1 at t=3 (RF AUC 0.638, exclusion 15.4%). Anchor refresh under v2.1 metrics pending engine PR + KH-24 v2.0 self-test re-run.
+Arcs 1 and 2 are historical (ran under v1.x). v2.0 governed Arc 3; v2.1.1 governs Arc 4 onward. Calibration anchor: KH-24 K=4 archetype 3, which passes v2.0 extractability via Pipeline D1 at t=3 (RF AUC 0.638, exclusion 15.4%). Anchor refresh under v2.1.1 metrics pending KH-24 v2.0 self-test re-run only (no engine work needed — v1.3 forward extension already provides SL-free observation).
 
 ### Tool assignments (unchanged)
 

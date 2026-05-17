@@ -10,11 +10,11 @@
 
 | Resolution | Count | Items |
 |---|---|---|
-| Resolved in v2.1 | 11 | P0.1, P0.2, P0.3, P0.4, P0.5, P1.6, P1.9, P1.11 (via PR #131), P2.13, P2.15, P3.16 |
+| Resolved in v2.1 / v2.1.1 | 11 | P0.1 (v2.1 + v2.1.1 composite refinement), P0.2, P0.3, P0.4, P0.5, P1.6, P1.9, P1.11 (via PR #131), P2.13, P2.15, P3.16 |
 | Partial in v2.1 | 1 | P1.8 |
-| Still open | 4 | P1.7 (refresh execution), P1.10, P1.12, P2.14 |
+| Still open | 4 | P1.7 (refresh execution — pending KH-24 v2.0 re-run only under v2.1.1), P1.10, P1.12, P2.14 |
 
-Last updated: 2026-05-17 alongside L_ARC_PROTOCOL v2.1 amendment.
+Last updated: 2026-05-17 alongside L_ARC_PROTOCOL v2.1.1 amendment (combined refinements + engine-reality corrections).
 
 ---
 
@@ -24,7 +24,7 @@ Three arcs have closed at Step 3 §2 floors with archetypes carrying strong forw
 
 ### P0.1 — Path-quality metrics measure full held-window, not path-to-peak
 
-**Status:** RESOLVED in v2.1 protocol amendment 2026-05-17 (§2/§7 pre-peak metrics). Engine PR for SL-free path recording pending; closed-arc re-runs under v2.1 follow.
+**Status:** RESOLVED in v2.1 protocol amendment 2026-05-17 (§2/§7 pre-peak metrics); refined in v2.1.1 (§7 capturability composite for SL selection among passing SLs). v1.3 forward-window extension already provides the SL-free continuation required — no engine PR needed (corrected in v2.1.1). Closed-arc re-runs under v2.1.1 (Open-18) runnable on existing `trades_paths.csv`.
 
 **Original status (2026-05-16):** new, user-raised 2026-05-16. Subsumes part of Open-01 (which currently scopes only path-shape clustering features, not §2 forward-geometry).
 
@@ -211,7 +211,7 @@ Arc 3 used... unclear; closure doc doesn't specify. Arc 2 redo doesn't specify. 
 
 ### P1.7 — §14 anchor population vs §15 pool floor structural mismatch
 
-**Status:** OPEN — v2.1 §14 defines refresh path; refresh execution pending engine PR + KH-24 v2.0 re-run.
+**Status:** OPEN — v2.1.1 §14 defines refresh path; refresh execution pending KH-24 v2.0 re-run only. No engine PR needed — v1.3 forward extension predates the requirement and already provides the SL-free observation (engine-reality correction in v2.1.1).
 
 **Original status (2026-05-16):** Cross-arc calibration backlog, HIGH priority. Surfaced by KH-24 v2.0 self-test.
 
@@ -459,3 +459,4 @@ P0.4 is the exception: Path 2 (SL scaled to horizon) cannot retrofit to KH-24 wi
 | Review trigger | post-Arc-5 cross-arc calibration review (or earlier if Arc 4 closes on §2 floors) |
 | Anchor rule | §14 KH-24 K=4 archetype 3 preservation checked per item |
 | v2.1 amendment date | 2026-05-17 — summary status block above tracks per-item resolution |
+| v2.1.1 amendment date | 2026-05-17 — combined refinements + engine-reality corrections; P0.1 refined to composite selection, P1.7 unblocked from engine PR (re-run only) |

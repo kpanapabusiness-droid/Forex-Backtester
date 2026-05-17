@@ -1,0 +1,5 @@
+# Heavy artefacts excluded from git (1H bin_membership.csv ≈ 37 MB per variant;
+# 4H ≈ 9 MB). Reproducible from scripts/lomega/lomega_regime_conditional.py.
+# All analysis outputs (per_bin_per_fold_auc.csv, variant_summary.csv,
+# timeframe_summary.csv, cross_variant_overlap.txt) ARE committed.
+**/bin_membership.csv

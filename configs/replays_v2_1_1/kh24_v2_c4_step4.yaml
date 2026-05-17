@@ -1,0 +1,78 @@
+# KH-24 v2.0 Step 4 extractability config (amendment-conditional).
+#
+# Runs Pipeline E + Pipeline D1 classifier production for c1 and c4 — the two
+# clusters surviving Step 3 §2 under proposed AMENDMENT_PROPOSAL_S2_SHAPE_TAG_S11_EXPANSION.md.
+# Classifier target: binary cluster membership (policy-independent).
+
+step_id: kh24_v2_step4
+source_arc: arc_kh24_v2
+amendment_dependency: AMENDMENT_PROPOSAL_S2_SHAPE_TAG_S11_EXPANSION.md (chat-side, pending synthesis)
+
+inputs:
+  trades_all: results/arc_kh24_v2/step1/trades_all.csv
+  trades_paths: results/arc_kh24_v2/step1/trades_paths.csv
+  trades_features_base8: results/arc_kh24_v2/step1/trades_features_base8.csv
+  clusters: results/arc_kh24_v2/step2/clusters_K5.csv
+  feature_catalogue: configs/replays_v2_1_1/kh24_v2_c4_step4_feature_catalogue.yaml
+
+# Cohort set under test — both at engine-default SL = 2.0×ATR
+target_clusters:
+  - id: 1
+    label: c1
+    archetype: Stepwise climber
+    selected_sl_atr: 2.0
+    capturability_composite: 0.387
+    exit_policy:
+      source_ref: L_ARC_PROTOCOL.md §11 row Stepwise climber
+      mfe_lock_at_R: 1.0
+      trail_from_new_high_R: 0.75
+  - id: 4
+    label: c4
+    archetype: Slow Trend Trail
+    selected_sl_atr: 2.0
+    capturability_composite: 0.607
+    exit_policy:
+      source_ref: AMENDMENT_PROPOSAL_S2_SHAPE_TAG_S11_EXPANSION.md proposed §11 Slow Trend Trail row
+      lock_at_R: 1.0
+      trail_from_new_high_R: 0.5
+
+# §8 model settings (locked)
+random_forest:
+  n_estimators: 200
+  max_depth: 8
+  min_samples_leaf: 20
+  random_state: 42
+  n_jobs: 1   # deterministic across re-runs
+
+logistic_regression:
+  max_iter: 2000
+  random_state: 42
+
+# §8 validation
+cv:
+  n_splits: 5
+  stratified: true
+  shuffle: true
+  random_state: 42
+
+# §8 gates
+gates:
+  pipeline_e_rf_auc_min: 0.65
+  pipeline_d1_rf_auc_min: 0.60
+  pipeline_d1_exclusion_max: 0.30
+  rf_logistic_gap_flag: 0.10
+  pr_auc_meaningful_min: 0.25   # c4 imbalance check; class baseline = 0.145
+
+# Angle D1 t-sweep
+d1_t_values: [1, 2, 3, 4, 5, 10]
+
+# Pipeline E threshold sweep
+threshold_sweep: [0.40, 0.50, 0.60, 0.70]
+threshold_recall_min: 0.60
+
+# Filter selection (Steps A/B/C per §8)
+filter_selection:
+  step_b_subset_sizes: [5]    # 9 total features; top-5 is the only meaningful subset
+  step_c_max_combinations: 30 # tier-1 budget across both clusters
+
+output_dir: results/replays_v2_1_1/kh24_v2_c4/step4

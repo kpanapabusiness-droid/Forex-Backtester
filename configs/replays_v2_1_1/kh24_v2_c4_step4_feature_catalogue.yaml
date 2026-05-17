@@ -1,0 +1,48 @@
+# Feature catalogue for KH-24 v2.0 Step 4 (amendment-conditional).
+#
+# Catalogues the entry-time features available to Pipeline E and Pipeline D1
+# classifiers. Total feature count must be <= 38 per §8 (8 base + up to 30
+# arc-specific).
+#
+# base8: cross-dataset features per §8, sourced from
+#   results/arc_kh24_v2/step1/trades_features_base8.csv (sidecar, commit 1a7c9f8).
+#
+# candidate_arc_specific: features present in trades_all.csv that could serve as
+# entry-time inputs. Only signal_bar_atr_14 qualifies — other trades_all columns
+# are either outcome data (final_r, mfe_r, mae_r, bars_held, exit_*) or
+# identifier/trade-construction fields (trade_id, pair, entry_*, sl_at_entry_price).
+# spread_pips_used is known at entry time but is a market-condition variable, not
+# a structural feature — excluded to keep the feature set strictly
+# path-shape/price-action.
+#
+# selected_arc_specific: catalogued subset actually fed to classifiers.
+
+base8:
+  - body_to_range_ratio
+  - upper_wick_ratio
+  - lower_wick_ratio
+  - range_to_atr_14
+  - ret_5bar_atr
+  - ret_20bar_atr
+  - pos_in_20bar_range
+  - rsi_14
+
+candidate_arc_specific:
+  - signal_bar_atr_14   # raw ATR(14) scalar at signal bar; magnitude complement to range_to_atr_14
+
+selected_arc_specific:
+  - signal_bar_atr_14
+
+d1_path_so_far:
+  # Path-so-far features computed at bar t from trades_paths.csv
+  - close_r_at_t
+  - mfe_so_far_r_at_t
+  - mae_so_far_r_at_t
+  - bars_in_profit_at_t
+  - local_peaks_so_far_at_t
+  - monotonicity_so_far_at_t
+  - velocity_first_t
+
+total_angle_e_features: 9       # 8 base + 1 arc-specific
+total_angle_d1_features: 16     # 9 entry + 7 path-so-far
+feature_cap_per_protocol: 38    # §8 ceiling

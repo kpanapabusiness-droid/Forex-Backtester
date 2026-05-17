@@ -1,0 +1,45 @@
+cluster_id: c1
+archetype: Stepwise climber
+amendment_dependency: AMENDMENT_PROPOSAL_S2_SHAPE_TAG_S11_EXPANSION.md (chat-side,
+  pending synthesis)
+pipeline: D1
+target: cluster_membership_binary
+positives_count: 365
+negatives_count: 465
+chosen_t: 1
+classifier_path: c1_D1_classifier.joblib
+admit_threshold: 0.5
+admit_logic: P(c1 | features_at_t=1) >= admit_threshold
+feature_set:
+- body_to_range_ratio
+- upper_wick_ratio
+- lower_wick_ratio
+- range_to_atr_14
+- ret_5bar_atr
+- ret_20bar_atr
+- pos_in_20bar_range
+- rsi_14
+- signal_bar_atr_14
+- close_r_at_t
+- mfe_so_far_r_at_t
+- mae_so_far_r_at_t
+- bars_in_profit_at_t
+- local_peaks_so_far_at_t
+- monotonicity_so_far_at_t
+- velocity_first_t
+feature_sources:
+  base8: results/arc_kh24_v2/step1/trades_features_base8.csv
+  arc_specific: results/arc_kh24_v2/step1/trades_all.csv
+  path_so_far: results/arc_kh24_v2/step1/trades_paths.csv
+rf_roc_auc_cv_mean: 0.617764030048608
+rf_pr_auc_cv_mean: 0.5338982728241023
+exclusion_rate: 0.0
+exit_policy_ref:
+  source: L_ARC_PROTOCOL.md Â§11 row Stepwise climber
+  initial_sl: 2.0xATR (entry-to-bar-N pre-classification)
+  on_bar_N_if_admitted:
+    mfe_lock_at_R: 1.0
+    trail_from_new_high_R: 0.75
+  on_bar_N_if_rejected:
+    close_at_market: bar N+1 open
+  executor: 'D1 PR 2 backtester (deferred; PR #131 close-at-market path operational)'

@@ -1,7 +1,7 @@
-# L_ARC_PROTOCOL v2.1.1
+# L_ARC_PROTOCOL v2.1.2
 
-> Status: Active protocol for Arcs 4+. v2.1.1 amendment landed 2026-05-17 on top of v2.1 (landed 2026-05-17) and v2.0 (locked 2026-05-16). Supersedes v1.0 + amendments (v1.1, v1.2, v1.3).
-> v1.x is the historical protocol for prior arcs (Arcs 1, 2). v2.0 governed Arc 3; v2.1.1 governs Arc 4 onward.
+> Status: Active protocol for Arcs 4+. v2.1.2 amendment landed 2026-05-17 on top of v2.1.1 (2026-05-17), v2.1 (2026-05-17), and v2.0 (locked 2026-05-16). Supersedes v1.0 + amendments (v1.1, v1.2, v1.3).
+> v1.x is the historical protocol for prior arcs (Arcs 1, 2). v2.0 governed Arc 3; v2.1.2 governs Arc 4 onward.
 > Calibration anchor: KH-24 verbatim trade-paths (`results/kh24/trades_paths.csv`).
 > Evidence base: v2.0 archetype diagnostic (PR #129), v2.0 predictability investigation (PR #130).
 
@@ -61,6 +61,21 @@ Calibration anchor (KH-24 K=4 archetype 3) preservation pending re-run under v2.
 | §10 multi-cluster ship decision | Unspecified | One cluster per arc; highest worst-fold ROI |
 
 Plus engine-reality wording corrections to v2.1 §1, §5, §7, §14, §16, §17 — no engine change implied or needed; v1.3 forward-window extension already provides the SL-free continuation required by §7 SL sweep.
+
+### What v2.1.2 changes from v2.1.1
+
+| Dimension | v2.1.1 | v2.1.2 |
+|---|---|---|
+| §2 shape_tag floor | ∈ {tight_unimodal, heavy_right_tail, bimodal_separated} | ≠ scattered |
+| §11 Stepwise climber local_peaks ceiling | 5-30 | 5-50 |
+| Open-19 (arc Step 1 schema portability) | Implicit; surfaced as halt at Arc 2 redo2 Step 1 | Erratum landed — §15a schema requirement (this protocol) |
+| Open-15 / Open-18 | Open empirical questions | CLOSED — validated across three Open-18 replays |
+
+Rationale: §2's categorical shape_tag floor was mixing capability gating (does this cohort have exploitable structure?) with classification gating (does the distribution fit a named bucket?). Three arcs of evidence (KH-24 v2.0 c4 + Arc 3 c2/c4 individuals + Arc 2 redo2 cid 1) show numerically-clean cohorts being killed by the categorical floor for not matching a taxonomy entry. The fix relaxes the floor to `≠ scattered` — distributions with detectable structure (unimodal-with-irregular-tail, multi-modal-without-clean-separation, etc.) pass §2 and route to §11 by centroid pattern match.
+
+The §11 Stepwise climber local_peaks range 5-30 was a first-pass prior. Empirical centroids from KH-24 c4 (30.94), Arc 3 c2 (24.42), Arc 2 redo2 cid 1 (20.07) cluster near or above the 30 ceiling. Exit-policy profile (MFE-lock at 1R, trail 0.75R from new high) is the same across these — the ceiling extension is mechanical recalibration, no policy change.
+
+Anchor preservation (§14): KH-24 K=4 archetype 3 centroid (mono 0.576, local_peaks 14.19, pullback 0.020, ttp_rel 0.847) routes to Stepwise climber under both old and new local_peaks ranges (14.19 ∈ both [5,30] and [5,50]). Bimodal shape_tag passes under both old admit list and new `≠ scattered` floor. No change to anchor routing.
 
 ### Core thesis
 
@@ -134,7 +149,7 @@ Hard floors, conjunctive at the selected SL — all criteria must pass.
 | Limited oscillation | local_peaks_centroid within shape-appropriate ceiling (see §11) | Path-shape centroid |
 | Magnitude | fwd_mfe_h240_p50 ≥ 1.5R | Forward geometry under selected SL |
 | Direction (pre-peak) | frac_reach_1R ≥ 0.70 AND frac_wrong_way_pre_peak ≤ 0.30 | Forward geometry; wrong_way restricted to bars 0..peak_mfe_bar |
-| Internal consistency | shape_tag ∈ {tight_unimodal, heavy_right_tail, bimodal_separated} | Distribution shape (see §7 for `bimodal_separated` test) |
+| Internal consistency | shape_tag ≠ scattered | Distribution shape — see §7 for shape_tag categories and `bimodal_separated` test; see §17 for `scattered` operational definition |
 | Size viability | size_fraction_of_pool ≥ 0.10 | Cluster size |
 
 §2 evaluated per-cluster AND per-aggregate (when ≥ 2 clusters share archetype label). Cluster proceeds to Step 4 if it passes individually OR as part of an aggregate; see §7 for routing.
@@ -369,7 +384,7 @@ shape_tag is `bimodal_separated` iff all three:
 3. Mode separation ≥ 1R (peaks of two modes ≥ 1R apart in fwd_mfe space)
 
 All three pass → `bimodal_separated`, admitted under §2 shape_tag floor, routed to §11 row 7.
-Any one fails → falls back to `scattered` or `unclassified` per current rules. Closes Open-13.
+Any one fails → shape_tag remains the v2.0 classifier output (typically `scattered`, `unclassified`, `tight_unimodal`, or `heavy_right_tail`). Under v2.1.2 §2's `≠ scattered` floor, only `scattered` fails the internal-consistency gate — other classifications including `unclassified` pass and route to §11 by centroid pattern. Closes Open-13.
 
 Implementation: `diptest` Python library for Hartigan dip statistic.
 
@@ -582,7 +597,7 @@ When a cluster's centroid matches a base archetype pattern (rows 1-6) AND the cl
 | Centroid pattern | Archetype label | SL prior (Step 3 sweep selects actual) | Exit (Pipeline E) | Exit (Pipeline D1, at bar N) |
 |---|---|---|---|---|
 | monotonicity ≥ 0.55, local_peaks ≤ 4, time_to_peak_rel ≥ 0.50 | Monotone ascent | 1R | Wide trail (0.75-1.0R from peak) | SL to break-even, trail 1.0R |
-| monotonicity ≥ 0.50, local_peaks 5-30, pullback ≤ 0.5R, time_to_peak_rel ≥ 0.50 | Stepwise climber | 1.3R | MFE-lock at 1R, trail 0.75R from new high | MFE-lock at 1R, trail 0.75R |
+| monotonicity ≥ 0.50, local_peaks 5-50, pullback ≤ 0.5R, time_to_peak_rel ≥ 0.50 | Stepwise climber | 1.3R | MFE-lock at 1R, trail 0.75R from new high | MFE-lock at 1R, trail 0.75R |
 | time_to_peak_rel ≤ 0.30, fwd_mfe_p50 ≥ 1.5R, pct_peak_and_collapse < 0.30 | Early-peak hold | 0.8R | Wide trail (1.0R from peak) | Trail from peak observed at bar N |
 | time_to_peak_rel ≤ 0.30, pct_peak_and_collapse ≥ 0.50 | Peak-and-collapse | 0.5R | Fixed TP at archetype p75 MFE | Tight TP at 0.8x peak observed |
 | MAE early (mae before peak ≥ 5 bars), peak in [0.4, 0.8] of trade | V-shape recovery | 1.5R | Standard trail after recovery confirmed | After bar N confirms reversal, standard trail |
@@ -810,6 +825,22 @@ If a future arc surfaces a stronger reference archetype, promotion requires a ca
 
 Arcs with insufficient pool size cannot reach pass-deployable but may pass-viable as portfolio candidates. The trade-count floor is enforced at Step 6 only.
 
+### §15a. Arc Step 1 schema requirement (v2.1.1+)
+
+Arc Step 1 scripts emit `trades_paths.csv` with a schema sufficient for §7 SL sweep on the SL-free path. Required columns and semantics:
+
+- `trade_id`, `pair`, `bar_offset` (0 = entry bar)
+- `close_r` — close price in R units (R = simulation SL distance from entry)
+- `mfe_so_far_r` — running max of close_r from entry to current bar
+- `mae_so_far_r` — running min of close_r from entry to current bar
+- `is_held` — 1 if bar is in held window (entry..actual_exit), 0 if forward observation (actual_exit+1..entry+240)
+
+Forward-observation bars (`is_held=0`) are required regardless of exit reason. They have no PnL impact (recorded outcomes live in `trades_all.csv`) but enable §7 SL sweep to re-impose hypothetical SLs at any candidate distance.
+
+`_flatten_bar_path_for_trade` in `scripts/phase_kgl_v2_4h_wfo.py` is the reference implementation. Arc-specific Step 1 scripts either import from there or replicate the per-bar excursion math byte-equivalently. Determinism check on Step 1 output is required before Step 2 commits.
+
+Evidence: Open-18 Replays #1 (Arc 3 reconstruction) and #3 (Arc 2 redo2 halt). Engine refactor to a signal-agnostic utility is deferred — manual replication has been sustainable across three arcs.
+
 ---
 
 ## §16. Open questions and deferred decisions
@@ -900,7 +931,7 @@ When horizon ≫ SL-distance-in-volatility-units, false stop-outs structurally i
 
 Evidence: Arc 3 — all three full-evaluation archetypes failed on frac_wrong_way. Stepwise climber 38.3% (margin 8.3pp over floor). Cluster 1 73.2%. Early-peak hold 98.8%.
 
-**Status:** CLOSED 2026-05-17 in v2.1; phrasing corrected in v2.1.1. Addressed via two combined mechanisms:
+**Status:** CLOSED 2026-05-17 in v2.1; phrasing corrected in v2.1.1; empirically confirmed across three Open-18 replays in v2.1.2 (Arc 3 aggregate 38.3%→1.7%; Arc 2 redo2 cid 1 34%→0%; KH-24 c1+c4 pre-peak mono lift). Addressed via two combined mechanisms:
 1. SL-free measurement uses the v1.3 forward-window extension already produced by the engine (`is_held=0` forward bars in `trades_paths.csv`) — no engine PR needed; works on existing schema
 2. §7 SL sweep selects each archetype's R-frame empirically from the data, not from a fixed prior. v2.1.1 refines selection from smallest-SL-passes to capturability composite (see Open-17)
 
@@ -934,7 +965,21 @@ Empirical question: under v2.1.1 (pre-peak + SL sweep + capturability composite 
 
 **Hypothesis:** KH-24 c4 most likely rescued (primary failure was post-peak censoring). Arc 3 Stepwise climber likely rescued (bimodal_separated test admits it directly). Arc 2 redo cluster 2 uncertain — depends on whether the wrong_way 0.3051 is early-touch or post-peak; if path is genuinely messy from the start, pre-peak doesn't help.
 
-**Status:** test empirically via parallel replays on existing `trades_paths.csv` from each closed arc. Forward observation bars (`is_held=0`) already in schema from v1.3 forward extension — no engine work or Step 1 re-run required, only re-running Step 3 analysis under v2.1.1 rules. Outcomes inform whether further §2 calibration is needed or whether v2.1.1 is structurally sufficient.
+**Status:** CLOSED 2026-05-17 — three parallel replays completed under v2.1.1, synthesised into v2.1.2. Results:
+
+- **Replay #1 Arc 3 Stepwise:** PASS. c2 individual fires bimodal_separated genuinely (Fork C, not aggregation artifact), composite 0.473 at SL=1.5×ATR. Aggregate PASS at SL=2.0×ATR, composite 0.467. Pre-peak Def C: 38.3% → 1.7% wrong_way on aggregate.
+- **Replay #2 KH-24 v2.0 c4:** PASS. c1 (n=365, SL=2.0×ATR, composite 0.387) and c4 (n=122, SL=1.0×ATR, composite 0.304) both rescue. Surfaced shape_tag dead zone / cap-binding correlation — informs v2.1.2 Amendment A.
+- **Replay #3 Arc 2 redo2 cid 1:** PASS. SL=3.0×ATR, composite 0.593. Pre-peak Def C: 34.0% → 0.0% wrong_way. bimodal_separated REJECTED on mode separation (0.48R < 1.0R required).
+
+**Synthesis verdict:** Pre-peak Def C is the dominant rescue mechanism — three independent cohorts, three signal classes, near-total wrong_way reduction. bimodal_separated validated narrowly (one positive across three replays — Arc 3 c2). v2.1.2 amends §2 categorical floor and §11 Stepwise ceiling based on these results; full synthesis evidence in the three Open-18 replay result docs under `results/replays_v2_1_1/`.
+
+### Open-19: Arc Step 1 script schema portability
+
+v2.1.1 §17 / §5 SL-free observation claim is narrowly correct only for KH-24's pipeline (`_flatten_bar_path_for_trade` in `scripts/phase_kgl_v2_4h_wfo.py`). Other arcs' bespoke Step 1 scripts each reimplement path emission and must independently get the v2.1.1 schema right — real-market R-fields out to entry+240, `is_held` column distinguishing held bars (`is_held=1`, entry..actual_exit) from forward-observation bars (`is_held=0`, actual_exit+1..entry+240).
+
+Evidence: Open-18 Replay #1 Arc 3 (extend_paths.py reconstruction needed for v2.1.1 schema on frozen Arc 3 step1 output). Open-18 Replay #3 Arc 2 redo2 (Step 1 halt; two surgical fixes required to emit v2.1.1 schema correctly).
+
+**Status:** CLOSED 2026-05-17 via §15a schema requirement (this protocol). Engine refactor of `_flatten_bar_path_for_trade` to signal-agnostic form deferred until cumulative pain across arcs justifies the engine PR + parity-test risk.
 
 ---
 
@@ -969,6 +1014,8 @@ Empirical question: under v2.1.1 (pre-peak + SL sweep + capturability composite 
 - **SL sweep** — Step 3 procedure: evaluate §2 floors at each candidate SL in `{0.5, 1.0, 1.5, 2.0, 3.0, 4.0} × ATR_signal_TF` (arc-overridable). Select smallest passing SL as archetype's R-frame.
 - **Selected SL / archetype R-frame** — Output of Step 3 SL sweep per archetype. Defines R for the archetype throughout Steps 4-6. Different archetypes in the same arc may have different selected SLs.
 - **bimodal_separated** — shape_tag value indicating fwd_mfe distribution has two structurally distinct modes. Test: Hartigan dip p<0.05 + min-mode-mass ≥ 0.20 + mode separation ≥ 1R. Admitted at §2; routes to §11 row 7 split-exit policy.
+- **scattered** — shape_tag value indicating fwd_mfe distribution has no detectable structure. Operational definition: high coefficient of variation AND no detectable mode by Gaussian KDE (or equivalent test). Specific CV threshold and KDE bandwidth inherited from the active Step 3 shape_tag classifier (see arc step3 scripts); revisit thresholds at cross-arc calibration if mis-classification surfaces. Under v2.1.2, `scattered` is the only shape_tag value that fails §2's internal-consistency floor.
+- **unclassified** — shape_tag value indicating fwd_mfe distribution has detectable structure but doesn't fit `tight_unimodal`, `heavy_right_tail`, or `bimodal_separated` cleanly (e.g. moderate-tail unimodal with middling skew, multi-modal without sufficient separation). Under v2.1.2 passes §2 (`≠ scattered`) and routes to §11 by centroid pattern match.
 - **Hartigan dip statistic** — Statistical test for unimodality. p < 0.05 indicates distribution is significantly not unimodal (real dip between modes). Implemented via `diptest` Python library.
 - **R-unit (v2.1.1 update)** — 1R = entry-to-SL distance. Under v2.0 this was a fixed value per arc (e.g. 2.0 × ATR(14)). Under v2.1, each archetype has its own selected SL from Step 3 sweep, so 1R is archetype-specific. Cross-archetype and cross-arc R comparisons are approximate; physical-distance comparison requires ATR-units conversion. Under v2.1.1, the ship decision selects one cluster per arc (§10), so the deployed system has a single R-frame; the cross-archetype-R issue is a per-arc reporting concern only.
 - **Capturability composite** — Sum of margins above §2 path-quality floors: `(mono_pre_peak − 0.55) + (frac_reach_1R − 0.70) + (0.30 − frac_wrong_way_pre_peak)`. Used at §7 SL selection to choose among candidate SLs passing all §2 floors. Higher composite = more headroom above the gate across path-quality criteria. Magnitude and categorical floors remain hard gates; composite ranks within the passing set only.
@@ -979,9 +1026,9 @@ Empirical question: under v2.1.1 (pre-peak + SL sweep + capturability composite 
 
 | Field | Value |
 |---|---|
-| Version | v2.1.1 |
-| Supersedes | v2.1 (2026-05-17) + v2.0 (locked 2026-05-16) + amendments (v1.1, v1.2, v1.3) |
-| Evidence base | PR #129 (archetype diagnostic), PR #130 (predictability investigation), PR #131 (D1 plumbing), Arc 2 redo + KH-24 v2.0 + Arc 3 closure docs, engine-reality halt finding (`_flatten_bar_path_for_trade` v1.3 extension predates v2.1) |
-| Calibration anchor | KH-24 K=4 archetype 3 — values measured under v2.0, refresh under v2.1.1 pending re-run only (no engine work needed) |
+| Version | v2.1.2 |
+| Supersedes | v2.1.1 (2026-05-17) + v2.1 (2026-05-17) + v2.0 (locked 2026-05-16) + amendments (v1.1, v1.2, v1.3) |
+| Evidence base | PR #129 (archetype diagnostic), PR #130 (predictability investigation), PR #131 (D1 plumbing), Arc 2 redo + KH-24 v2.0 + Arc 3 closure docs, Open-18 cross-replay synthesis (Replay #1 Arc 3 Stepwise, Replay #2 KH-24 v2.0 c4, Replay #3 Arc 2 redo2 — all 2026-05-17) |
+| Calibration anchor | KH-24 K=4 archetype 3 — values measured under v2.0; v2.1.2 amendments verified anchor-preserving (centroid pattern matches Stepwise climber under both old 5-30 and new 5-50 local_peaks ranges; bimodal shape_tag passes both old admit list and new `≠ scattered` floor) |
 | Active for arcs | Arc 4+ |
-| v2.1.1 amendment date | 2026-05-17 |
+| v2.1.2 amendment date | 2026-05-17 |

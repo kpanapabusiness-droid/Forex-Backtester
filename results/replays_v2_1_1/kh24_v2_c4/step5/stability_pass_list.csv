@@ -1,0 +1,3 @@
+cluster_label,blocked,block_reason,sign_consistency_pass,size_variance_ratio,size_variance_pass,dd_ceiling_ratio,dd_ceiling_pass,overall
+c1,False,,False,4.2,False,4.697391812727796,False,FAIL
+c4,True,admit_threshold is null in policy YAML — Step 4 §8 threshold sweep produced no candidate satisfying recall ≥ 0.60. §9 admission cannot fire.,,,,,,blocked

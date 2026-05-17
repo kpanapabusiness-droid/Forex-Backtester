@@ -1,0 +1,57 @@
+# KH-24 v2.0 Step 5 cross-fold stability config.
+#
+# Per §9: apply Step 4 classifier per fold (retrained on IS only — no lookahead).
+# Engine-default exit as proxy for §11 Stepwise climber exit policy (true §11 evaluation
+# blocked on D1 PR 2; deferred per §12).
+#
+# Both surviving clusters (c1, c4) are Stepwise climber under v2.1.2 — same exit policy
+# referenced in their Step 4 policy YAMLs.
+
+step_id: kh24_v2_step5
+source_arc: arc_kh24_v2
+protocol_reference: L_ARC_PROTOCOL.md v2.1.2 §9
+
+inputs:
+  trades_all: results/arc_kh24_v2/step1/trades_all.csv
+  trades_paths: results/arc_kh24_v2/step1/trades_paths.csv
+  trades_features_base8: results/arc_kh24_v2/step1/trades_features_base8.csv
+  clusters: results/arc_kh24_v2/step2/clusters_K5.csv
+  feature_catalogue: configs/replays_v2_1_1/kh24_v2_c4_step4_feature_catalogue.yaml
+  wfo_config: configs/wfo_kh24.yaml         # locked; folds read from .wfo.folds
+  step4_policy_dir: results/replays_v2_1_1/kh24_v2_c4/step4
+
+# Cohort set — same as Step 4 survivors
+target_clusters:
+  - id: 1
+    label: c1
+    archetype: Stepwise climber
+    policy_yaml: c1_D1_policy.yaml
+  - id: 4
+    label: c4
+    archetype: Stepwise climber
+    policy_yaml: c4_D1_policy.yaml
+
+# §8 RF settings (locked — same as Step 4)
+random_forest:
+  n_estimators: 200
+  max_depth: 8
+  min_samples_leaf: 20
+  random_state: 42
+  n_jobs: 1
+
+# Risk / ROI per L arc convention (CLAUDE.md)
+risk:
+  pct_per_trade: 0.005    # 0.5% of reset floor balance per trade
+  days_per_year: 365.25   # for annualisation
+
+# §9 gates
+gates:
+  size_variance_max: 3.0
+  dd_ceiling_multiple_of_median: 2.0    # worst-fold DD ≤ 2× median-fold DD
+
+# Per-pair stability flag thresholds (§9 informational)
+pair_stability:
+  concentration_pct_min: 0.50           # > 50% in
+  concentration_n_pairs_max: 5          # < 5 pairs → flag
+
+output_dir: results/replays_v2_1_1/kh24_v2_c4/step5

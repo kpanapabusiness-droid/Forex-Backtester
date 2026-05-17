@@ -1,0 +1,3 @@
+cluster_label,flag,top_n_pairs_share,n_pairs_with_trades,top_pair,top_pair_share,reason
+c1,False,0.44827586206896547,27.0,CAD_CHF,0.10344827586206896,
+c4,False,,,,,blocked

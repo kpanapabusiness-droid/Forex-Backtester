@@ -19,7 +19,10 @@ Contract:
   by the Pipeline D1 hook (see core/d1_pipeline.py).
 - ``per_trade_init(trade, df, idx, aux)``: stamp signal-specific fields
   onto the trade dict (e.g. KH-24's kh13_triggered/kh14_triggered/
-  first_bar_dir initial values).
+  first_bar_dir initial values). Called only from the primary entry
+  path. Adapters whose features must populate on re-entry paths need
+  to extend those paths separately — KH-24 re-entry / KH-17 paths
+  preserve inline init for byte-identity.
 """
 
 from __future__ import annotations

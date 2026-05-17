@@ -111,8 +111,6 @@ def main() -> int:
     flagged_list = list(flagged_small.index) if len(flagged_small) > 0 else []
 
     # ---- Write artefacts ----
-    summary_md_text = (RESULTS / "STEP1_SUMMARY.md").read_text(encoding="utf-8")
-
     # Extract sha256 hashes from STEP1_SUMMARY for determinism_check.txt
     trades_all_sha = _sha(RESULTS / "trades_all.csv")
     trades_paths_sha = _sha(RESULTS / "trades_paths.csv")

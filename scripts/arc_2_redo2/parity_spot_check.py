@@ -103,7 +103,6 @@ def _compare_one(
 
     pair = prior_trade["pair"]
     sig_t = prior_trade["signal_time"]
-    exit_off_prior = int(prior_trade["bars_held"] if pd.notna(prior_trade["bars_held"]) else 0)
     # bars_held = sl_hit_idx - entry_idx + 1 (SL) or horizon (time_exit, 120).
     # In paths, exit_offset = exit_idx - entry_idx, which is (bars_held - 1) for SL
     # and 120 for time_exit per build logic.

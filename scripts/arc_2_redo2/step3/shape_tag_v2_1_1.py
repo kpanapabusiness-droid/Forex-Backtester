@@ -120,11 +120,8 @@ def detect_shape_tag_v2_1_1(
     pos = np.clip(fwd_mfe, 0.0, upper)
     try:
         dip_stat, dip_p = diptest(pos)
-    except Exception as e:
+    except Exception:
         dip_stat, dip_p = float("nan"), float("nan")
-        bimodal_err = f"diptest failed: {e}"
-    else:
-        bimodal_err = ""
 
     mode_locs, mode_masses, _ = _detect_modes_from_histogram(fwd_mfe, n_bins, upper_q)
     sep = (

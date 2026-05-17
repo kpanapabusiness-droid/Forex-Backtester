@@ -248,7 +248,6 @@ class TestMT5ParitySmoke:
         """
         try:
             import pandas as pd
-
             from scripts.mt5_compare import compare_totals, match_trades
 
             # Create synthetic trade data for testing comparison logic

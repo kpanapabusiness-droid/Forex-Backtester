@@ -1,7 +1,6 @@
 from pathlib import Path
 
 import yaml
-
 from scripts.run_c1_only_exits import build_run_config
 
 

@@ -146,6 +146,10 @@ Key scripts:
 - L6.0 verbatim-as-gate framing (replaced by `L_ARC_PROTOCOL.md` v1.0; v1.x in turn superseded by v2.0 for Arcs 3+)
 - Arc 2 signal (mtf_alignment.2_down_mixed.kijun, h=120) — SHELVED 2026-05-16, not permanently eliminated; cluster 2 has strong magnitude (fwd_mfe_p50 5.83R, t-stat +52) on unextractable paths, reopenable via v2.x calibration; see `results/l_arc_2_redo/ARC_2_REDO_RESULT.md`
 
+### Not eliminated, but flagged
+
+- Failed-breakout reversal long (Arc 6, 2026-05-17): path quality clean at v2.1.2 Step 3 (c2 Stepwise, mfe_p50=4.47R, ww_pp=0.000) but entry-time predictability below 0.65 deployability bar (best Pipeline E AUC 0.600 / 0.590); D1 admission collapses on threshold sweep. Not permanently eliminated; may return under richer feature regime, multi-TF entry context, or ensemble approach. See `docs/arc_results/ARC_6_RESULT.md`.
+
 ---
 
 ## Tool Assignments

@@ -2,7 +2,7 @@
 
 > Tight current-state snapshot. For full context, read `SESSION_ZERO.md` first.
 > For methodology, read `L_ARC_PROTOCOL.md` (v2.1.2, self-contained).
-> Last updated: 2026-05-17 — L_ARC_PROTOCOL v2.1.2 amendment landed. Open-18 cross-replay synthesis complete (3/3 replays passed). §2 categorical shape_tag floor relaxed to `≠ scattered`; §11 Stepwise local_peaks ceiling extended 5-30 → 5-50; Open-15/18 closed (validated); Open-19 added + closed (§15a schema requirement). Arc 4 active on LCHAR Entry 4.
+> Last updated: 2026-05-17 — Arc 6 (failed-breakout reversal long, out-of-registry) closed DIES at Step 4 deployability. Two calibration items queued: Open-21 (Step 4 deployability gate, new) + Open-17 expansion (Tiebreak 1 noise floor). Arc 7 active.
 
 ---
 
@@ -11,7 +11,7 @@
 - Active protocol: L_ARC_PROTOCOL v2.1.2 (amendment landed 2026-05-17)
 - Calibration anchor: KH-24 K=4 archetype 3 — v2.0 values; deployed-pop reference held (no refresh from Open-18 replays per user decision; v2.1.2 anchor preservation verified — centroid still routes to Stepwise under 5-50 local_peaks range)
 - Next engine PR: none currently planned. PR #131 (D1 plumbing) is merged; D1 PR 2 (per-archetype §11 exit policies) deferred until an arc surfaces a Step-4 consumer
-- Next chat task: Arc 4 — LCHAR Entry 4 (`TRIAL__univariate_extreme__bar_range_top_decile__neg__h_001`), 1-bar horizon, univariate-extreme family
+- Next chat task: Arc 7 (in progress; Step 3 completed PASS, Step 4 pending). Cross-arc calibration session for Open-21 (Step 4 deployability gate) + Open-17 expansion (Tiebreak 1 noise floor) queued before next out-of-registry arc opens.
 
 ---
 
@@ -35,6 +35,27 @@
 **Anchor preservation:** KH-24 K=4 archetype 3 centroid (mono 0.576, local_peaks 14.19, pullback 0.020, ttp_rel 0.847) routes to Stepwise climber under both old [5,30] and new [5,50] ranges; bimodal shape_tag passes `≠ scattered`. No routing change.
 
 **Arc 4 active:** LCHAR Entry 4 (`TRIAL__univariate_extreme__bar_range_top_decile__neg__h_001`), 1-bar horizon, univariate-extreme family.
+
+---
+
+## Arc 6 closure (2026-05-17)
+
+Arc 6 (`signal_spec_failed_breakout_long_v0.2`, out-of-registry insertion on `discovery/lomega_regime_conditional`) opened and closed same day. Steps 1–4 ran consecutively; all four mechanical PASSes.
+
+**Disposition:** **DIES at Step 4 — deployability-level failure on Pipeline D1 recall collapse.**
+
+Pipeline E fails both Step 3 survivors (c0 best AUC 0.600, c2 best AUC 0.590; 0.65 floor). Pipeline D1 mechanically clears AUC ≥ 0.60 (c0 0.602 at t=4; c2 0.630 at t=1), but neither cluster achieves recall ≥ 0.60 at any threshold, so the §8 threshold sweep falls back to max-F1. Resulting admission: ~3 trades (c0) / ~1 trade (c2) across the 5-year, 28-pair, 1,564-trade pool. WFO at Step 6 would see ≤ 1 trade/fold; Steps 5–6 not executed.
+
+c2's D1 AUC growth with t (0.630 at t=1 → 0.711 at t=10) is the strongest single signal-quality finding — path-so-far information has real discriminative power, but the smallest-t rule + threshold-sweep design point combined to bury the deployable hook.
+
+**Calibration items queued (cross-arc session before next out-of-registry arc):**
+- **Open-21 (new) — Step 4 deployability gate:** §8 currently passes mechanically when D1 AUC ≥ 0.60 even when the threshold sweep falls back to max-F1 at sub-1% recall. Recommended fix (a): strict-mode threshold sweep — max-F1 fallback triggers cluster-dies, not graceful pass. Alts: (b) recall floor at admit ≥ 0.30; (c) raise D1 AUC floor 0.60 → 0.70.
+- **Open-17 expansion — Tiebreak 1 noise floor:** §7 Tiebreak 1 fired at 0.02 ATR / 0.15% relative margin in Arc 6 c2 SL selection (X=3.0 over X=2.0 at identical composite 0.6162). Proposal: require `peak_mfe_atr_margin ≥ 0.10 ATR OR ≥ 1% relative` before Tiebreak 1 applies.
+- **(unnumbered note) reach_1R floor noise tolerance:** c3 died at 0.697 vs 0.70 floor (0.003 margin within sampling noise at n=511). Cross-arc question whether floor needs a binomial-noise tolerance; both-sides argument required, not blocking next arc.
+
+Arc 6 also produced a spec v0.2 erratum (`docs/signal_spec_failed_breakout_long_v0.2.md`): the literal v0.1 `swing_low_N = min(low[t-N..t-1])` is mathematically unsatisfiable; corrected to `min(low[t-N-M..t-M-1])`.
+
+Full closure: `docs/arc_results/ARC_6_RESULT.md`. Arc 6 signal is NOT permanently eliminated — path quality is clean at v2.1.2 §2 (c2 Stepwise, mfe_p50 4.47R, ww_pp 0.000) and may return under a richer feature regime, multi-TF entry context, or ensemble approach.
 
 ---
 
@@ -101,6 +122,7 @@ Annualisation: `fold_raw_ROI × (365 / fold_OOS_days)`. Folds < 90 OOS days excl
 
 | Phase | Verdict | Finding |
 | --- | --- | --- |
+| Arc 6 (out-of-registry; failed-breakout reversal long) | DIES at Step 4 deployability (2026-05-17) | Steps 1–4 all mechanical PASS. Pipeline E best AUC 0.600 / 0.590 vs 0.65 floor; Pipeline D1 mechanically clears AUC ≥ 0.60 but threshold sweep collapses to max-F1 at sub-1% recall (~3-4 admitted trades / 5-year pool). Two calibration items raised: Open-21 (Step 4 deployability gate, new) + Open-17 expansion (Tiebreak 1 noise floor); plus unnumbered cross-arc note on reach_1R floor noise tolerance. Spec v0.2 erratum: `swing_low_N = min(low[t-N-M..t-M-1])`. See `docs/arc_results/ARC_6_RESULT.md`. |
 | L_ARC_PROTOCOL v2.1.2 amendment | LANDED (2026-05-17) | §2 categorical shape_tag floor relaxed to `≠ scattered`; §11 Stepwise local_peaks ceiling 5-30 → 5-50; §15a arc Step 1 schema requirement (Open-19 closure). Open-15, Open-18, Open-19 closed. Open-20 reframed as Step 4 measurement (not a §2 gate). Anchor preservation verified. |
 | Open-18 cross-replay synthesis | COMPLETE (2026-05-17) | 3/3 replays passed: Arc 3 Stepwise (c2 + aggregate), KH-24 v2.0 c4 (c1 + c4), Arc 2 redo2 cid 1. Pre-peak Def C validated as dominant rescue mechanism (38% → 0-2% wrong_way across cohorts). bimodal_separated validated narrowly. See `results/replays_v2_1_1/` for full evidence. |
 | L_ARC_PROTOCOL v2.1.1 amendment | LANDED (2026-05-17) | Combined patch: v2.1.1 refinements (§7 capturability composite, §5 re-cluster on extend, §11 row 7 routing precedence, §10 ship rule) + v2.1 engine-reality corrections (§1, §5, §7, §14, §16, §17 wording fixes — v1.3 forward extension already provides SL-free observation; engine PR was unneeded). `feat/sl-free-path-recording` branch superseded. Open-18 replays of v2.0-killed cohorts now runnable. |
@@ -195,6 +217,7 @@ Note: Arc 2 signal (mtf_alignment.2_down_mixed.kijun, h=120) shelved 2026-05-16 
 | Arc 2 redo (closed KILL) | `results/l_arc_2_redo/` |
 | KH-24 v2.0 self-test (closed HALT) | `results/arc_kh24_v2/` + `results/arc_kh24_v2/ARC_KH24_V2_RESULT.md` |
 | Arc 3 (closed CLEAN-NULL) | `results/l_arc_3/` + `docs/arc_results/ARC_3_RESULT.md` |
+| Arc 6 (closed DIES at Step 4) | `results/arc_6/` (on `discovery/lomega_regime_conditional`) + `docs/arc_results/ARC_6_RESULT.md` |
 
 ---
 

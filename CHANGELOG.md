@@ -1,5 +1,21 @@
 # Changelog
 
+## ARC 6 CLOSED | 2026-05-17 | DIES AT STEP 4 DEPLOYABILITY
+Arc 6 (failed-breakout reversal long, out-of-registry insertion on `discovery/lomega_regime_conditional`) opened and closed same day. Steps 1–4 ran consecutively; all four mechanical PASSes.
+- Step 1 PASS: pool 1,564 trades over 2020-10-01 → 2026-01-31, determinism `e57528...`, KH-24 co-fire 0.0000 by structural exclusion (bullish reclaim vs bearish exhaustion), cap-binding 17.65%
+- Step 2 PASS: K=4 chosen, silhouette 0.4795; 4 clusters labelled (1 Stepwise, 1 early_peak, 2 unassigned — 54% pool)
+- Step 3 PASS 2/4: c2 (Stepwise climber, n=242) SL=3.0×ATR composite 0.616; c0 (Stepwise-boundary, n=334) SL=2.0×ATR composite 0.384. c1 dies on early_peak structural mfe_p50 ceiling; c3 dies on reach_1R 0.697 vs 0.70 (0.003 absolute margin, within sampling noise)
+- Step 4 PASS mechanically / FAIL substantively: Pipeline E fails both clusters (best AUC 0.600 c0 / 0.590 c2 vs 0.65 floor); Pipeline D1 clears AUC ≥ 0.60 (c0 t=4 RF AUC 0.602; c2 t=1 RF AUC 0.630) but threshold sweep collapses to max-F1 fallback at sub-1% recall — c0 precision 0.333 recall 0.009 (~3 admitted), c2 precision 0.250 recall 0.004 (~1 admitted) across the 5-year pool
+- Steps 5 and 6 NOT EXECUTED: ≤ 1 trade/fold makes Step 5 stability noise-dominated and Step 6 WFO uninformative; arc dies at Step 4 deployability
+- c2 D1 AUC monotone in t (0.630 t=1 → 0.711 t=10) — path-so-far information has real discriminative power; smallest-t rule + threshold-sweep design point combined to bury the deployable hook
+- Calibration items raised: **Open-21 (new)** — §8 Step 4 deployability gate (strict-mode threshold sweep recommended; max-F1 fallback = cluster-dies, not graceful pass); **Open-17 expansion** — Tiebreak 1 noise floor (Arc 6 c2 selection flipped X=2.0→3.0 on 0.02 ATR / 0.15% relative at identical composite 0.6162); plus unnumbered cross-arc note on reach_1R floor noise tolerance
+- Spec v0.2 erratum: literal v0.1 `swing_low_N = min(low[t-N..t-1])` is mathematically unsatisfiable; corrected to `min(low[t-N-M..t-M-1])` (verified Arc 6 Step 1 no-lookahead spot check 5/5). New file: `docs/signal_spec_failed_breakout_long_v0.2.md`
+- Signal NOT permanently eliminated — path quality clean (c2 mfe_p50 4.47R, ww_pp 0.000); may return under richer feature regime, multi-TF entry context, or ensemble approach. Logged under CLAUDE.md "Not eliminated, but flagged"
+- Commits: `b178ea4` (Step 1), `fd660ab` (Step 2), `f56b945` (Step 3), `8648c1b` (Step 4) on `discovery/lomega_regime_conditional`
+- Closure: `docs/arc_results/ARC_6_RESULT.md`
+- Arc 7 unaffected and continues on `phase/l_arc_7`
+- Live system KH-24 unaffected and unchanged
+
 ## L_ARC_PROTOCOL v2.1.2 AMENDMENT | 2026-05-17 | doc-only
 
 Open-18 cross-replay synthesis amendment. §2 internal-consistency floor relaxed from categorical admit list to single exclusion (`≠ scattered`); §11 Stepwise climber local_peaks ceiling extended 5-30 → 5-50; §15a arc Step 1 schema requirement added (Open-19 closure mechanism). Open-15 and Open-18 closed as empirically validated.

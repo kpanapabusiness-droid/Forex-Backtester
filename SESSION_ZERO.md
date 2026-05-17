@@ -1,6 +1,6 @@
 # SESSION ZERO — Forex Ignition Rebuild
 > 5-minute primer. Read this first, then read `L_ARC_PROTOCOL.md` (v2.1.2, self-contained) for the active research methodology.
-> Last updated: 2026-05-17 — L_ARC_PROTOCOL v2.1.2 amendment landed. Open-18 cross-replay synthesis complete (3/3 replays passed). §2 categorical floor relaxed (`≠ scattered`); §11 Stepwise local_peaks ceiling 5-30 → 5-50; §15a schema requirement added. Open-15, Open-18, Open-19 closed. Arc 4 active on LCHAR Entry 4.
+> Last updated: 2026-05-17 — Arc 6 (failed-breakout reversal long, out-of-registry) closed DIES at Step 4 deployability. Open-21 (new) + Open-17 expansion queued for cross-arc calibration before next out-of-registry arc. Arc 7 active.
 
 ---
 
@@ -13,7 +13,7 @@
 
 ## Current State
 
-**ACTIVE WORK: L ARC SIGNAL TESTING UNDER L_ARC_PROTOCOL v2.1.2 — v2.1.2 AMENDMENT LANDED 2026-05-17, OPEN-18 SYNTHESIS CLOSED, ARC 4 ACTIVE ON LCHAR ENTRY 4**
+**ACTIVE WORK: L ARC SIGNAL TESTING UNDER L_ARC_PROTOCOL v2.1.2 — ARC 6 (OUT-OF-REGISTRY) CLOSED 2026-05-17 DIES AT STEP 4 DEPLOYABILITY; ARC 7 ACTIVE**
 **LIVE SYSTEM: KH-24 (locked, unchanged, running on VPS)**
 
 Three arcs closed on 2026-05-16 (Arc 2 redo KILL, KH-24 v2.0 self-test HALT, Arc 3 CLEAN-NULL) all hit the same §2 monotonicity / shape_tag wall with structurally credible cohorts. v2.1 (2026-05-17) introduced pre-peak measurement + SL sweep + capturability composite + bimodal_separated admit. v2.1.1 (2026-05-17) refined SL selection to capturability composite maximiser.
@@ -32,6 +32,10 @@ Synthesis verdict: pre-peak Def C is the dominant rescue mechanism across all th
 §14 anchor not refreshed (user decision — deployed-pop reference holds; v2.1.2 anchor preservation verified). Open-20 (raised in Arc 2 redo2 closure) not added to protocol — reframed as Step 4+ measurement question (high-pct_peak_and_collapse cohorts measured under trailing-stop exit, not fixed-SL re-imposition).
 
 Arc 4 active under v2.1.2 on LCHAR Entry 4 (`TRIAL__univariate_extreme__bar_range_top_decile__neg__h_001`) — 1-bar horizon, univariate-extreme family, structurally different from Arc 3.
+
+**Arc 6 (out-of-registry; failed-breakout reversal long) closed 2026-05-17 DIES at Step 4 deployability.** Steps 1–4 ran consecutively on `discovery/lomega_regime_conditional`; all four mechanical PASSes. Pipeline E failed both Step 3 survivors (best AUC 0.600 / 0.590 vs 0.65 floor). Pipeline D1 mechanically cleared AUC ≥ 0.60 (c0 0.602 at t=4; c2 0.630 at t=1) but neither cluster achieves recall ≥ 0.60 at any threshold, so §8 threshold sweep collapses to max-F1 — ~3 admitted trades (c0) / ~1 trade (c2) across the 5-year, 1,564-trade pool. Steps 5–6 not executed. Two calibration items raised: Open-21 (Step 4 deployability gate, new) + Open-17 expansion (Tiebreak 1 noise floor); plus an unnumbered cross-arc note on reach_1R floor noise tolerance. Spec v0.2 erratum (`docs/signal_spec_failed_breakout_long_v0.2.md`): `swing_low_N = min(low[t-N-M..t-M-1])`. Signal NOT permanently eliminated — path quality clean, may return under richer feature regime / multi-TF / ensemble. Full closure: `docs/arc_results/ARC_6_RESULT.md`.
+
+**Arc 7 active** on `phase/l_arc_7`. Step 1 PASS (1288 trades), Step 2 PASS (K=4, sil=0.4263), Step 3 PASS (3 units survive §2: c1, c3, agg_c1_c3 all V-shape recovery family).
 
 Results: `results/replays_v2_1_1/arc_3_stepwise/REPLAY_RESULT.md`, `results/replays_v2_1_1/kh24_v2_c4/REPLAY_RESULT.md`, `results/l_arc_2_redo2/`, `docs/arc_results/ARC_3_RESULT.md`, `results/arc_kh24_v2/ARC_KH24_V2_RESULT.md`, `results/l_arc_2_redo/ARC_2_REDO_RESULT.md`.
 
@@ -118,6 +122,10 @@ The L arc is methodologically distinct from KH-24 development. It does not assum
 ## Phase History
 
 *Note: when applying SESSION_ZERO updates, preserve any pre-existing Phase History entries below this line. New entries are appended at the top. The full list is what remains in the file.*
+
+### 2026-05-17 — Arc 6 (out-of-registry; failed-breakout reversal long) closed DIES at Step 4 deployability
+
+`docs/arc_results/ARC_6_RESULT.md` written. Arc 6 dispatched out-of-registry on `discovery/lomega_regime_conditional`; opened and closed same day. Signal under test: failed-breakout reversal at swing low (long-only, 4H, 28 FX pairs). Steps 1–4 ran consecutively; all four mechanical PASSes. Step 1 PASS (pool 1,564; det e57528...; KH-24 co-fire 0.0000 by structural exclusion; cap-bind 17.65%; spec erratum locked — `swing_low_N = min(low[t-N-M..t-M-1])`). Step 2 PASS (K=4, silhouette 0.4795; 4 clusters labelled across early_peak / Stepwise / two unassigned). Step 3 PASS 2/4 (c2 Stepwise SL=3.0×ATR composite 0.616; c0 Stepwise-boundary SL=2.0×ATR composite 0.384). Step 4 PASS mechanically / FAIL substantively: Pipeline E fails both clusters (best AUC 0.600 c0, 0.590 c2; floor 0.65); Pipeline D1 clears AUC ≥ 0.60 floor (c0 t=4 RF AUC 0.602; c2 t=1 RF AUC 0.630) but neither achieves recall ≥ 0.60 at any threshold, so §8 sweep falls back to max-F1 — c0 precision 0.333 recall 0.009 (~3 trades), c2 precision 0.250 recall 0.004 (~1 trade). WFO would see ≤ 1 trade/fold; Steps 5–6 not executed. c2 D1 AUC grows monotonically with t (0.630 t=1 → 0.711 t=10) — path-so-far information has real discriminative power, the strongest single signal-quality finding in Arc 6. Calibration items queued: **Open-21 (new)** — §8 Step 4 deployability gate: strict-mode threshold sweep recommended (max-F1 fallback = cluster-dies, not graceful pass); **Open-17 expansion** — Tiebreak 1 noise floor (Arc 6 c2 selection flipped X=2.0→3.0 on a 0.02 ATR / 0.15% relative margin at identical composite 0.6162); plus unnumbered cross-arc note on reach_1R floor noise tolerance (c3 died 0.697 vs 0.70 by 0.003, within sampling noise at n=511). Signal NOT permanently eliminated — path quality clean (c2 mfe_p50 4.47R, ww_pp 0.000); may return under richer feature regime, multi-TF entry context, or ensemble approach. Commits: b178ea4 (Step 1), fd660ab (Step 2), f56b945 (Step 3), 8648c1b (Step 4) on `discovery/lomega_regime_conditional`. Arc 7 unaffected and continues on `phase/l_arc_7`.
 
 ### 2026-05-16 — KH-24 v2.0 self-test arc closed (HALT at Step 3)
 

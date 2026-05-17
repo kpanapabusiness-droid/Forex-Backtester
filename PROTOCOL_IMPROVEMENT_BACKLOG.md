@@ -422,6 +422,39 @@ Option 1 lighter-touch (reporting, not exclusion). Fold into Step 5 spec.
 
 ---
 
+## Arc 6 cross-arc items (2026-05-17)
+
+Three items raised by Arc 6 closure (failed-breakout reversal long, out-of-registry; DIES at Step 4 deployability). Queued for the cross-arc calibration session before the next out-of-registry arc opens. Numbering follows protocol §16 Open-NN convention (Open-20 reserved/rejected for the realised-R-under-fixed-SL framing per v2.1.2 CHANGELOG; next available is Open-21).
+
+### Open-21 (new): Step 4 deployability gate
+
+- **Source:** Arc 6 closure 2026-05-17, Step 4 disposition.
+- **Problem.** §8 arc-level gate at D1 RF AUC ≥ 0.60 passes mechanically even when the threshold sweep falls back to max-F1 at sub-1% recall. Resulting admission rate is non-deployable. Arc 6 demonstration: both Step 3 survivors cleared D1 AUC ≥ 0.60 (c0 0.602 at t=4; c2 0.630 at t=1, growing to 0.711 at t=10) but neither cluster admitted recall ≥ 0.60 at any threshold ∈ {0.40, 0.50, 0.60, 0.70}; both fell back to max-F1 — c0 precision 0.333 recall 0.009 (~3 trades), c2 precision 0.250 recall 0.004 (~1 trade) across the 5-year, 1,564-trade pool. Arithmetic: AUC 0.60 at 15–21% positive class admits a max precision at recall 0.60 of ~0.20–0.25 — barely better than base rate. The §8 design point (recall ≥ 0.60 AND meaningful precision) effectively requires AUC ≈ 0.75+ at this class balance.
+- **Proposal (recommended): (a) Strict mode.** Threshold sweep must select on max-precision subject to recall ≥ 0.60. Max-F1 fallback triggers cluster-dies, not graceful pass. The §8 rule's stated intent already encodes recall ≥ 0.60 as the deployability line; make it the gate. Minimal protocol change.
+- **Alt proposals.**
+  - (b) **Recall floor at admission threshold ≥ 0.30** (or 0.40) regardless of selection rule. Below that, cluster dies.
+  - (c) **Higher AUC floor.** Raise §8 D1 AUC threshold 0.60 → 0.70. At 0.70, recall-0.60 thresholds become achievable for class balances in the 15–25% range.
+- **Anchor preservation.** KH-24 K=4 archetype 3 passes Pipeline D1 at t=3 with RF AUC 0.638 and exclusion 15.4%. Under (a) the anchor's recall ≥ 0.60 sweep needs verification — anchor numbers were measured under v2.0 mechanics that did not separate the sweep selection from the AUC pass. Verification required before commit.
+- **Status.** Queued for cross-arc calibration session before next out-of-registry arc opens. Likely v2.1.3 amendment.
+
+### Open-17 expansion: Tiebreak 1 noise floor
+
+- **Source:** Arc 6 Step 3 c2 SL selection 2026-05-17.
+- **Problem.** §7 Tiebreak 1 (larger peak_mfe in ATR units) fires on sub-noise margins. Arc 6 c2 selection: peak_mfe_atr 13.40 (X=3.0) vs 13.38 (X=2.0) — 0.02 ATR absolute, 0.15% relative — flipped SL from X=2.0 to X=3.0 at identical composite (0.6162). Economic consequence: ~50% capital efficiency loss at identical path quality (same dollar risk per trade, ~1.5× dollar MFE under X=2.0). Tiebreak 1's stated purpose ("reward larger physical capture") is not satisfied at noise-level differences.
+- **Proposal.** Require `peak_mfe_atr_margin ≥ 0.10 ATR` OR `≥ 1% relative` before Tiebreak 1 applies; otherwise fall through to Tiebreak 2 (parsimony / smaller SL). Preserves the rule's intent while eliminating the noise-driven flip.
+- **Anchor preservation.** Anchor (KH-24 K=4 archetype 3) is a single SL selection upstream of Tiebreak 1; rule change does not touch it.
+- **Status.** Queued for cross-arc calibration session. Pairs naturally with Open-21 review.
+
+### (unnumbered note) reach_1R floor noise tolerance
+
+- **Source:** Arc 6 Step 3 c3 disposition 2026-05-17.
+- **Problem.** c3 dies at `reach_1R = 0.697` vs 0.70 floor — a 0.003 absolute margin, within sampling noise for n=511 (binomial se at p=0.70, n=511 → 1.96·se ≈ 0.040). Within-arc thresholds don't move per §1.8.
+- **Question.** Does the floor need a binomial-noise tolerance — e.g., `reach_1R ≥ 0.70 − 1.96 × se`?
+- **Trade-off.** Tolerance restores marginal clusters (would meaningfully widen the gate at typical n) but weakens the gate's discriminative power. Same tension exists in principle for every §2 hard floor.
+- **Status.** Cross-arc note — both-sides argument required, not a clear-cut calibration. Not blocking next arc.
+
+---
+
 ## Cross-cutting observations
 
 ### Two arcs (KH-24 v2.0, Arc 2 redo, Arc 3) all close FAIL at Step 3 §2 floors
@@ -460,3 +493,4 @@ P0.4 is the exception: Path 2 (SL scaled to horizon) cannot retrofit to KH-24 wi
 | Anchor rule | §14 KH-24 K=4 archetype 3 preservation checked per item |
 | v2.1 amendment date | 2026-05-17 — summary status block above tracks per-item resolution |
 | v2.1.1 amendment date | 2026-05-17 — combined refinements + engine-reality corrections; P0.1 refined to composite selection, P1.7 unblocked from engine PR (re-run only) |
+| Arc 6 cross-arc items added | 2026-05-17 — Open-21 (Step 4 deployability gate, new), Open-17 expansion (Tiebreak 1 noise floor), unnumbered reach_1R noise tolerance note |

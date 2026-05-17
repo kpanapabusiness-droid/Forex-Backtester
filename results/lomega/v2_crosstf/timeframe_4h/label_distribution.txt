@@ -1,0 +1,41 @@
+timeframe: 4h
+forward_window_bars: 240
+n_rows: 255174
+clean_move_relaxed_count: 61315
+clean_move_relaxed_rate: 0.240287
+clean_score_relaxed_distribution: {0: 3331, 1: 17608, 2: 68083, 3: 110589, 4: 55563}
+per_pair_clean_counts:
+   pair  sum  count  clean_rate  share_of_clean
+USD_JPY 2611   9114    0.286482        0.042583
+CHF_JPY 2599   9113    0.285197        0.042388
+USD_CHF 2577   9114    0.282752        0.042029
+EUR_JPY 2555   9114    0.280338        0.041670
+AUD_JPY 2541   9113    0.278832        0.041442
+GBP_CHF 2492   9114    0.273425        0.040643
+EUR_CHF 2444   9114    0.268159        0.039860
+NZD_CHF 2389   9111    0.262211        0.038963
+CAD_CHF 2344   9114    0.257187        0.038229
+GBP_USD 2235   9114    0.245227        0.036451
+NZD_JPY 2219   9115    0.243445        0.036190
+USD_CAD 2193   9114    0.240619        0.035766
+AUD_CHF 2163   9114    0.237327        0.035277
+GBP_NZD 2149   9106    0.235998        0.035049
+EUR_CAD 2132   9114    0.233926        0.034771
+CAD_JPY 2128   9114    0.233487        0.034706
+AUD_NZD 2104   9115    0.230828        0.034315
+AUD_USD 2071   9114    0.227233        0.033776
+EUR_NZD 2051   9110    0.225137        0.033450
+NZD_CAD 2042   9112    0.224100        0.033303
+GBP_CAD 1971   9113    0.216284        0.032145
+GBP_JPY 1962   9114    0.215273        0.031999
+AUD_CAD 1958   9113    0.214858        0.031933
+EUR_USD 1936   9114    0.212420        0.031575
+GBP_AUD 1918   9111    0.210515        0.031281
+NZD_USD 1875   9116    0.205682        0.030580
+EUR_AUD 1839   9114    0.201777        0.029993
+EUR_GBP 1817   9116    0.199320        0.029634
+
+OK: no single pair contributes > 40% of relaxed clean labels.
+
+OK: relaxed clean base rate 0.2403 within 15-70% range.
+NOTE: relaxed clean base rate 0.2403 outside dispatch's 30-50% expected band; not a blocker.

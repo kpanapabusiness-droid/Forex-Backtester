@@ -1,0 +1,4 @@
+unit_id,type,final_archetype_label,selected_SL_atr_mult,selected_R_atr,n,candidate_pipelines
+c1,cluster,V-shape recovery (forward-geometry weak),4,4,185,E_and_D1
+c3,cluster,V-shape recovery,2,2,365,E_and_D1
+agg_c1_c3,aggregate,V-shape recovery,4,4,550,E_and_D1

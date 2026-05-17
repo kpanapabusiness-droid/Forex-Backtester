@@ -14,6 +14,8 @@ from pathlib import Path
 
 import pytest
 
+pytest.importorskip("sklearn")  # optional dep — run_step2 imports sklearn.cluster
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 STEP1_DIR = REPO_ROOT / "results" / "arc_kh24_v2" / "step1"
 

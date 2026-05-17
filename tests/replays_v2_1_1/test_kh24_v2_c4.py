@@ -24,7 +24,6 @@ from scripts.replays_v2_1_1.kh24_v2_c4.step3 import (  # noqa: E402
     wrong_way_pre_peak_hit,
 )
 
-
 FLOORS = {
     "monotonicity_pre_peak_min": 0.55,
     "fwd_mfe_h240_p50_min": 1.5,

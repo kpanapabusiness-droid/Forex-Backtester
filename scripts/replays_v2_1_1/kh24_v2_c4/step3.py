@@ -12,14 +12,12 @@ import math
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Iterable
 
 import numpy as np
 import pandas as pd
 import yaml
-from scipy.stats import gaussian_kde, mode
 from diptest import diptest
-
+from scipy.stats import gaussian_kde
 
 # --- Path truncation under candidate SL -------------------------------------------------
 
@@ -457,7 +455,7 @@ def render_dryrun_stdout(
     relaxed_max: float,
 ) -> None:
     v20_local_peaks = float(centroid_row["centroid_local_peaks"])
-    print(f"=== Replay #2 — KH-24 v2.0 c4 under v2.1.1 (DRY-RUN) ===\n")
+    print("=== Replay #2 — KH-24 v2.0 c4 under v2.1.1 (DRY-RUN) ===\n")
     print(f"Cluster: {cluster_label}")
     print(f"Pool: n={cluster_size}, size_fraction={cluster_size / pool_size:.3f}")
     print(
@@ -466,7 +464,7 @@ def render_dryrun_stdout(
         f"pullback={centroid_row['centroid_pullback']:.3f}, "
         f"ttp_rel={centroid_row['centroid_time_to_peak_rel']:.3f}"
     )
-    print(f"v2.0 label: unresolved_11fee4a0 (near stepwise)\n")
+    print("v2.0 label: unresolved_11fee4a0 (near stepwise)\n")
 
     print("--- SL sweep ---\n")
     for r in sweep:

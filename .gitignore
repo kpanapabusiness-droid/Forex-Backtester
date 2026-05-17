@@ -85,6 +85,13 @@ results/*
 !results/l_arc_2_redo/
 results/l_arc_2_redo/*
 !results/l_arc_2_redo/ARC_2_REDO_RESULT.md
+# Arc 2 redo2 (OPEN; v2.1.1) — Step 1+ outputs (L_ARC_PROTOCOL v2.1.1 §13: arc
+# results data is direct-to-main). Track summaries / audits / small CSVs;
+# trades_paths.csv excluded (>100MB GitHub limit; regenerable from script + config).
+!results/l_arc_2_redo2/
+!results/l_arc_2_redo2/**
+results/l_arc_2_redo2/**/trades_paths.csv
+results/l_arc_2_redo2/**/_run_log.txt
 results_phase*/
 __pycache__/
 .ipynb_checkpoints/

@@ -1,0 +1,22 @@
+Arc 2 redo2 — Step 1 lookahead audit
+====================================
+
+Source: extracted from results/l_arc_2_redo2/step1/STEP1_SUMMARY.md Gate 2.
+
+Audit invariants (v2.1.1 §1.2, §1.4):
+  1. Signal at bar N close uses only bars ≤ N (kijun_sign computed per-TF
+     from rolling windows ending at N).
+  2. Entry uses bar N+1 open (entry_idx = sig_idx + 1).
+  3. SL distance uses ATR(14) at bar N (atr[sig_idx]), not bar N+1.
+  4. D1 alignment uses one-day lag (mr_d1 = floor('D', T_N) − 1).
+  5. 4H alignment uses prior-completed 4H (mr_4h = floor('4h', T_N) − 1).
+
+Runtime assertion mechanism:
+  scripts/arc_2_redo/arc2_signal.py::compute_signal_mask raises
+  RuntimeError if any firing bar references a future 4H or D1 bar.
+  The pool build completed without raising → all 12,262 firing bars
+  satisfy the invariant by construction.
+
+Spot-check (first 10 trades by trade_id): PASS — no mismatches.
+
+Overall: PASS (0 violations).

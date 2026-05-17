@@ -1,0 +1,11 @@
+Arc 2 redo2 — Step 1 determinism check
+======================================
+
+Pipeline ran twice (cfg.output.determinism_check=true). Hashes computed
+after each run and compared.
+
+sha256:
+  trades_all.csv   = 4f89efd42cf5a0d0b96c43f00f738d9615f1d73ce9f827def2792f9141039888
+  trades_paths.csv = ddb709befb98ace8804003ac45679bcde173108398516477684f260c0b62cf2f
+
+Run-1 vs Run-2 byte-identical (verified by script): PASS (per STEP1_SUMMARY.md Gate 1).

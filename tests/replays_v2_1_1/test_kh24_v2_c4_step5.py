@@ -16,6 +16,9 @@ import pytest
 REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT))
 
+pytest.importorskip("sklearn")  # optional deps (sklearn + joblib via step4 chain)
+pytest.importorskip("joblib")
+
 from scripts.replays_v2_1_1.kh24_v2_c4_step5.step5 import (  # noqa: E402
     AssembledData,  # noqa: E402
     ClusterResults,

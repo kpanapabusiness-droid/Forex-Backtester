@@ -920,7 +920,7 @@ def write_summary(
             )
         lines.append("")
         if r.overall_pass:
-            lines.append(f"→ **Capturability: PASS**")
+            lines.append("→ **Capturability: PASS**")
         else:
             lines.append(f"→ **Capturability: FAIL** (kill criterion: `{r.kill_criterion}`)")
         lines.append("")
@@ -977,7 +977,7 @@ def write_summary(
         for r in survivors:
             lines.append(f"- Cluster {r.cluster_id}: {r.archetype_label}")
     else:
-        lines.append(f"**0 archetypes PASS** — Arc-level **KILL ARC**.")
+        lines.append("**0 archetypes PASS** — Arc-level **KILL ARC**.")
         lines.append("")
         lines.append("All failing criteria per cluster (not just the first):")
         lines.append("")

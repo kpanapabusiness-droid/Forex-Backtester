@@ -1,10 +1,8 @@
 from __future__ import annotations
 
-import os
 from pathlib import Path
 
 import pandas as pd
-import pytest
 
 
 def _results_root() -> Path:
@@ -26,7 +24,8 @@ def test_aggregate_outputs_shape(tmp_path: Path):
         outdir = tmp_path
 
     # Run aggregator
-    import subprocess, sys
+    import subprocess
+    import sys
     subprocess.check_call([sys.executable, 'tools/aggregate_c1_only.py', '--root', str(root), '--outdir', str(outdir)])
 
     all_csv = Path(outdir) / 'c1_only_exits_all_runs.csv'
@@ -60,7 +59,8 @@ def test_stability_outputs_shape(tmp_path: Path):
         root = synth
         out_csv = tmp_path / 'stability' / 'c1_only_exits_stability.csv'
 
-    import subprocess, sys
+    import subprocess
+    import sys
     subprocess.check_call([sys.executable, 'analytics/stability_scan.py', '--root', str(root), '--out', str(out_csv), '--min-trades', '1'])
 
     if out_csv.exists():

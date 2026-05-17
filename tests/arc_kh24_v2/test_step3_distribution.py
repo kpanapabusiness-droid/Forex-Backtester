@@ -3,8 +3,11 @@
 from __future__ import annotations
 
 import numpy as np
+import pytest
 
-from scripts.arc_kh24_v2.step3._distribution import classify_shape
+pytest.importorskip("scipy")  # optional dep — skip if absent in CI clean env
+
+from scripts.arc_kh24_v2.step3._distribution import classify_shape  # noqa: E402
 
 
 def test_no_magnitude_when_p95_below_half_r():

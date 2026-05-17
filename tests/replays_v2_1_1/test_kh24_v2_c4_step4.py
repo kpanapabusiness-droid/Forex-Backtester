@@ -16,6 +16,8 @@ import pytest
 REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT))
 
+pytest.importorskip("sklearn")  # optional dep — skip if absent in CI clean env
+
 from sklearn.metrics import average_precision_score  # noqa: E402
 
 from scripts.replays_v2_1_1.kh24_v2_c4_step4.step4 import (  # noqa: E402

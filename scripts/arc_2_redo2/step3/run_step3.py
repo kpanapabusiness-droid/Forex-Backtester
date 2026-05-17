@@ -22,7 +22,6 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
-import numpy as np
 import pandas as pd
 import yaml
 
@@ -30,15 +29,13 @@ _REPO_ROOT = Path(__file__).resolve().parents[3]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
+from scripts.arc_2_redo2.step3.shape_tag_v2_1_1 import (  # noqa: E402
+    detect_shape_tag_v2_1_1,
+)
 from scripts.arc_2_redo2.step3.sl_sweep import (  # noqa: E402
     aggregate_per_cluster,
     sweep_all_trades,
 )
-from scripts.arc_2_redo2.step3.shape_tag_v2_1_1 import (  # noqa: E402
-    ShapeTagDecision,
-    detect_shape_tag_v2_1_1,
-)
-
 
 # ============================================================
 # §2 floor evaluation per (cluster, SL)

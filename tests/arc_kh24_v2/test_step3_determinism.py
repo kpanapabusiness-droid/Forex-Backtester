@@ -7,6 +7,8 @@ from pathlib import Path
 
 import pytest
 
+pytest.importorskip("scipy")  # optional dep — run_step3 imports scipy.signal
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 STEP1_DIR = REPO_ROOT / "results" / "arc_kh24_v2" / "step1"
 STEP2_DIR = REPO_ROOT / "results" / "arc_kh24_v2" / "step2"

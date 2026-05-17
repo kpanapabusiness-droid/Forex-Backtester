@@ -6,10 +6,13 @@ import sys
 from pathlib import Path
 
 import numpy as np
+import pytest
 
 _REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
+
+pytest.importorskip("scipy")  # optional dep — skip if absent in CI clean env
 
 from scripts.replays_v2_1_1.arc_3_stepwise.shape_classifier import classify_shape_tag  # noqa: E402
 from scripts.replays_v2_1_1.arc_3_stepwise.step3 import (  # noqa: E402

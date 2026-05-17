@@ -19,7 +19,6 @@ import hashlib
 import sys
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -29,7 +28,6 @@ sys.path.insert(0, str(REPO_ROOT))
 from scripts.v2_0_diagnostic.entry_features import (  # noqa: E402
     _features_at_bar,
 )
-
 
 FEATURE_COLUMNS = [
     "body_to_range_ratio",
@@ -149,17 +147,10 @@ def main() -> int:
         ),
     )
 
-    # Cross-check against trades_all.signal_bar_atr_14 if present.
+    # Cross-check against trades_all.signal_bar_atr_14 if present. Compare NaN
+    # distributions — drift in either direction surfaces a Step 1 vs sidecar mismatch.
     trades_full = pd.read_csv(args.trades_all)
     if "signal_bar_atr_14" in trades_full.columns:
-        merged = pd.merge(
-            trades_full[["trade_id", "signal_bar_atr_14"]],
-            out[["trade_id", "range_to_atr_14"]],
-            on="trade_id",
-            how="left",
-        )
-        # range_to_atr_14 = (high - low) / ATR — can't directly compare ATR values
-        # but if either column has NaN/inf where the other doesn't we have drift.
         nan_us = out["range_to_atr_14"].isna().sum()
         nan_engine = trades_full["signal_bar_atr_14"].isna().sum()
         print(f"Cross-check: range_to_atr_14 NaN={nan_us}, "

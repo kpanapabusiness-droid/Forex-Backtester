@@ -23,11 +23,9 @@ Outputs:
 from __future__ import annotations
 
 import argparse
-import json
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Iterable
 
 import joblib
 import numpy as np
@@ -37,14 +35,11 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import (
     average_precision_score,
-    confusion_matrix,
-    precision_recall_curve,
     roc_auc_score,
 )
 from sklearn.model_selection import StratifiedKFold
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
-
 
 # ============================================================================
 # Path-so-far feature computation (per bar t)

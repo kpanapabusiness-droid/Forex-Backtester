@@ -16,19 +16,15 @@ import pytest
 REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT))
 
+from sklearn.metrics import average_precision_score  # noqa: E402
+
 from scripts.replays_v2_1_1.kh24_v2_c4_step4.step4 import (  # noqa: E402
-    PATH_SO_FAR_COLS,
-    AssembledData,
     build_logistic,
     build_rf,
     compute_path_so_far_features,
-    run_angle_d1,
-    run_angle_e,
     select_threshold,
     stratified_cv_metrics,
 )
-from sklearn.metrics import average_precision_score, roc_auc_score  # noqa: E402
-
 
 CFG_MIN = {
     "random_forest": {

@@ -1,5 +1,11 @@
 # Changelog
 
+## ARC 7 CLOSED | 2026-05-17 | CLEAN-NULL AT STEP 4
+- Arc 7 (Liquidity sweep + reclaim, long): CLEAN-NULL at Step 4. PASS §5, §6, §7; FAIL §8 (best AUC 0.536 vs 0.65 gate).
+- Headline: first capturable-not-extractable closure of record. v2.1.2 `≠ scattered` floor validated as load-bearing.
+- Result doc: `docs/arc_results/ARC_7_RESULT.md`
+- Backlog: 3 NEW + 1 VALIDATED + 1 UNRESOLVED + 2 CLEANUP items (see `PROTOCOL_IMPROVEMENT_BACKLOG.md`, Arc 7 section).
+
 ## ARC 4 CLOSED | 2026-05-17 | CLEAN-NULL ON TRANSACTION-COST TRUTH
 
 ### Added

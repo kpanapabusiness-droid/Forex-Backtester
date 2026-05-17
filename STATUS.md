@@ -2,7 +2,7 @@
 
 > Tight current-state snapshot. For full context, read `SESSION_ZERO.md` first.
 > For methodology, read `L_ARC_PROTOCOL.md` (v2.1.2, self-contained).
-> Last updated: 2026-05-17 — Arc 4 closed CLEAN-NULL on transaction-cost truth; `configs/spread_floors_5ers.yaml` flagged for per-pair empirical replacement (HistData audit shows uniform 0.1 pip floor under-models real spreads 3-48x per pair). KH-24 live deployment unchanged; WFO claim downgraded to pass-viable retroactively. Backtester extension closed (PR #131 + #135 + #138 merged). Arc 6 closed DIES at Step 4 deployability.
+> Last updated: 2026-05-17 — Arc 7 closed CLEAN-NULL at Step 4 (first capturable-not-extractable closure of record; v2.1.2 `≠ scattered` floor validated as load-bearing; capturable-extractable gap forwarded as v2.2 commissioning candidate). Arc 4 closed CLEAN-NULL on transaction-cost truth; spread floor replacement remains the blocking item. Backtester extension closed (PR #131 + #135 + #138). Arc 6 closed DIES at Step 4 deployability.
 
 ---
 
@@ -12,7 +12,7 @@
 - Calibration anchor: KH-24 K=4 archetype 3 — v2.0 values; deployed-pop reference held (no refresh from Open-18 replays per user decision; v2.1.2 anchor preservation verified — centroid still routes to Stepwise under 5-50 local_peaks range)
 - Next engine PR: none currently planned. Backtester extension complete: PR #131 (D1 plumbing), PR #135 (D1 PR 2 Stepwise climber policy + per-fold classifiers), PR #138 (engine generalisation: signal adapter + TF pluggability + time-exit + spread floor). §11 rows 1, 3, 4, 5, 6, 7 exit policies deferred until an arc surfaces a Step-4 consumer needing them.
 - **BLOCKER:** `configs/spread_floors_5ers.yaml` flagged for per-pair empirical floor replacement before Arc 5+ proceeds. See `docs/SPREAD_FLOOR_AUDIT_FINDING.md`.
-- Next chat task: spread floor file replacement under SPREAD_SEMANTICS_LOCK governance; then Open-18 replays; then Arc 5. Cross-arc calibration session for Open-21 (Step 4 deployability gate) + Open-17 expansion (Tiebreak 1 noise floor) queued.
+- Next chat task: spread floor file replacement under SPREAD_SEMANTICS_LOCK governance; then Open-18 replays; then Arc 5. Active arc: none — awaiting next signal spec (Arc 7 closed 2026-05-17). Cross-arc calibration session for Open-21 (Step 4 deployability gate) + Open-17 expansion (Tiebreak 1 noise floor) + Arc 7 items (A7-N1/N2/N3) queued.
 
 ---
 
@@ -124,6 +124,7 @@ Annualisation: `fold_raw_ROI × (365 / fold_OOS_days)`. Folds < 90 OOS days excl
 
 | Phase | Verdict | Finding |
 | --- | --- | --- |
+| Arc 7 (l_arc_7; Liquidity sweep + reclaim, long) | CLEAN-NULL at Step 4 (2026-05-17) | First capturable-not-extractable closure of record. PASS Steps 1-3 (3 V-shape units survive §2 conjunctively); FAIL §8 (zero unit × pipeline pairs clear AUC gate; best agg/E 0.536 vs 0.65). v2.1.2 `≠ scattered` floor validated as load-bearing (all 3 survivors `shape_tag=unclassified`). 3 NEW + 1 VALIDATED + 1 UNRESOLVED + 2 CLEANUP cross-arc items. See `docs/arc_results/ARC_7_RESULT.md`. |
 | Arc 4 (l_arc_4) | CLEAN-NULL at Step 5 retroactive (2026-05-17) | bar_range_top_decile__neg__h_001 — first L arc to reach Step 5 PASS; cluster 1 D1 AUC 0.667 pass-deployable at 0.20% risk under modeled spreads; killed by HistData spread audit showing floor file under-models real spreads 3-48x per pair; F6 ann ROI flips from +10.08% to ~−5.6% under real spreads; §9.A retroactive fail; 8 cross-arc calibration items |
 | Engine generalisation | DELIVERED (PR #138, 2026-05-17) | Engine config-driven for signal, timeframe, time-exit, spread floor. KH-24 byte-identical (sha256 verified). Arc 4 engine prerequisites complete. |
 | Pipeline D1 PR 2 — Stepwise climber policy | DELIVERED (PR #135, 2026-05-17) | §11 row 2 exit policy + per-fold classifier dispatch land. ApplyPolicy made concrete. Trail-suppression resolved against Step 5 simulator. Other §11 rows deferred. |
@@ -235,6 +236,7 @@ Note: `bar_range_top_decile__neg__h_001` (Arc 4 signal) is SHELVED pending sprea
 | Arc 3 (closed CLEAN-NULL) | `results/l_arc_3/` + `docs/arc_results/ARC_3_RESULT.md` |
 | Arc 4 (closed CLEAN-NULL on transaction-cost truth) | `results/l_arc_4/` + `docs/arc_results/ARC_4_RESULT.md` + `docs/SPREAD_FLOOR_AUDIT_FINDING.md` |
 | Arc 6 (closed DIES at Step 4) | `results/arc_6/` (on `discovery/lomega_regime_conditional`) + `docs/arc_results/ARC_6_RESULT.md` |
+| Arc 7 (closed CLEAN-NULL at Step 4) | `results/l_arc_7/` + `docs/arc_results/ARC_7_RESULT.md` |
 
 ---
 

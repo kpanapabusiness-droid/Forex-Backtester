@@ -532,3 +532,29 @@ P0.4 is the exception: Path 2 (SL scaled to horizon) cannot retrofit to KH-24 wi
 | v2.1 amendment date | 2026-05-17 — summary status block above tracks per-item resolution |
 | v2.1.1 amendment date | 2026-05-17 — combined refinements + engine-reality corrections; P0.1 refined to composite selection, P1.7 unblocked from engine PR (re-run only) |
 | Arc 6 cross-arc items added | 2026-05-17 — Open-21 (Step 4 deployability gate, new), Open-17 expansion (Tiebreak 1 noise floor), unnumbered reach_1R noise tolerance note |
+| Arc 7 cross-arc items added | 2026-05-17 — A7-N1/N2/N3 NEW (capturable-extractable gap, SL-vs-class-imbalance, Open-04 escalation), A7-V1 VALIDATED (v2.1.2 `≠ scattered`), A7-U1 UNRESOLVED (§11 Stepwise pullback ceiling), A7-C1/C2 CLEANUP |
+
+---
+
+## Arc 7 (Liquidity sweep + reclaim, long) — closure 2026-05-17
+
+CLEAN-NULL at Step 4. Capturable (§7 PASS, 3 V-shape units) but not extractable (§8 FAIL, best AUC 0.536 vs 0.65). Full details at `docs/arc_results/ARC_7_RESULT.md`.
+
+### NEW items
+
+- **A7-N1 — Capturable-extractable gap as a recognised closure category.** v2.2 should consider an explicit closure pathway for arcs that PASS §7 but FAIL §8. Distinct failure mode from §2-fail at Step 3. Arc 7 is the case study.
+- **A7-N2 — SL-selection vs class-imbalance tension.** Composite-maximising SL at §7 can compress success distribution into §8-hostile territory (Arc 7 c1: SL=4×ATR → base success 0.778 → 41 negatives in n=185 → AUC 0.484). Candidate v2.2 directions: §8 re-sweeps SLs and joint-reports AUC × class-balance; §7 composite gets a class-balance regulariser; or §17 surfaces the tension without protocol change.
+- **A7-N3 — Open-04 external features escalation.** Arc 7 supplies concrete evidence that Pipeline E + D1 can be insufficient even for capturable cohorts. Macro / session / cross-asset feature pipelines now have empirical backing for v2.2 commission.
+
+### VALIDATED items
+
+- **A7-V1 — v2.1.2 `≠ scattered` floor.** First arc-of-record where relaxed floor was load-bearing. All three Arc 7 §7-survivors carried `shape_tag = unclassified`; would have died at Step 3 under the prior floor. Floor stays.
+
+### UNRESOLVED items (forward to future arcs)
+
+- **A7-U1 — §11 Stepwise pullback ≤ 0.5R ceiling.** Arc 7 c1 was the test case (mono 0.536, peaks 33.5, ttp_rel 0.73, pullback 0.567 — over by 13.4%). Did not deploy (§8 fail). Question persists.
+
+### CLEANUP items
+
+- **A7-C1 — §15a text vs `_flatten_bar_path_for_trade` impl gap.** Text says `mfe_so_far_r` = running max of `close_r`; impl uses running max of `high_r` (intrabar). Arc 7 followed impl. Reconcile protocol text at next calibration review.
+- **A7-C2 — Dispatch halt-criterion phrasing.** "Cross-arc bar-overlap" is a finding, not a halt (Arc 7 surfaced 69 legitimate Arc 6 ↔ Arc 7 co-fires via different reference windows). Future dispatches use KH-24 co-fire as live-system independence check; cross-arc overlap is Open-05 portfolio-composition note.

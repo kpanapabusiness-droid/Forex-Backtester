@@ -1,6 +1,6 @@
 # SESSION ZERO — Forex Ignition Rebuild
 > 5-minute primer. Read this first, then read `L_ARC_PROTOCOL.md` (v2.1.2, self-contained) for the active research methodology.
-> Last updated: 2026-05-17 — Arc 6 (failed-breakout reversal long, out-of-registry) closed DIES at Step 4 deployability. Open-21 (new) + Open-17 expansion queued for cross-arc calibration before next out-of-registry arc. Arc 7 active.
+> Last updated: 2026-05-17 — Arc 4 closed CLEAN-NULL on transaction-cost truth. Spread audit revealed `spread_floors_5ers.yaml` under-models real spreads 3-48x per pair; file flagged for replacement. Open-18 replays blocked; Arc 5 blocked. KH-24 live deployment unchanged.
 
 ---
 
@@ -13,8 +13,8 @@
 
 ## Current State
 
-**ACTIVE WORK: L ARC SIGNAL TESTING UNDER L_ARC_PROTOCOL v2.1.2 — ARC 6 (OUT-OF-REGISTRY) CLOSED 2026-05-17 DIES AT STEP 4 DEPLOYABILITY; ARC 7 ACTIVE**
-**LIVE SYSTEM: KH-24 (locked, unchanged, running on VPS)**
+**ACTIVE WORK: SPREAD FLOOR REPLACEMENT (HIGHEST PRIORITY) — blocks all future arc work. See `docs/SPREAD_FLOOR_AUDIT_FINDING.md`. LIVE SYSTEM: KH-24 unchanged on VPS.**
+**Next:** spread floor file replacement under SPREAD_SEMANTICS_LOCK governance; then Open-18 replays; then Arc 5.
 
 Three arcs closed on 2026-05-16 (Arc 2 redo KILL, KH-24 v2.0 self-test HALT, Arc 3 CLEAN-NULL) all hit the same §2 monotonicity / shape_tag wall with structurally credible cohorts. v2.1 (2026-05-17) introduced pre-peak measurement + SL sweep + capturability composite + bimodal_separated admit. v2.1.1 (2026-05-17) refined SL selection to capturability composite maximiser.
 
@@ -122,6 +122,18 @@ The L arc is methodologically distinct from KH-24 development. It does not assum
 ## Phase History
 
 *Note: when applying SESSION_ZERO updates, preserve any pre-existing Phase History entries below this line. New entries are appended at the top. The full list is what remains in the file.*
+
+### 2026-05-17 — Arc 4 closed CLEAN-NULL on transaction-cost truth
+
+`docs/arc_results/ARC_4_RESULT.md` written. Arc 4 (signal: `bar_range_top_decile__neg__h_001`, 1H, 10,764 trades) became the first L arc to pass Steps 1-5 under modeled spreads. Cluster 1 D1 pipeline cleared §8 (RF AUC 0.667), survived per-fold refit (leakage haircut 14%), passed §9 stability F2-F7, and reached pass-deployable at 0.20% risk under convention (b) MTM DD with daily DD constraint and modeled exit spread.
+
+Parallel spread audit against HistData ASCII tick data (2024-01 → 2025-12, 28 pairs) showed `configs/spread_floors_5ers.yaml`'s uniform 0.1 pip floor under-models real first-5-minute execution-bar spreads by 3x (EUR/USD) to 48x (GBP/NZD). 44.59% of Arc 4 entries hit the floor.
+
+Real-spread reconciliation: 0.06574 R additional drag per trade (6.5x the ~0.01R modeled), ~15.7% annualised drag per fold. F6 worst-fold ann ROI flips from +10.08% to ~−5.6%. §9.A sign consistency retroactively fails. Arc 4 closes CLEAN-NULL.
+
+Cross-arc structural finding documented in `docs/SPREAD_FLOOR_AUDIT_FINDING.md`. Spread floor replacement is now the blocking item for all future arc work. KH-24 live system unchanged (raw MT5 spread already used in deployment); WFO claim downgraded to pass-viable retroactively. 8 cross-arc calibration items added.
+
+Open-18 replays blocked until floor updated. Arc 5 blocked until floor updated.
 
 ### 2026-05-17 — Arc 6 (out-of-registry; failed-breakout reversal long) closed DIES at Step 4 deployability
 

@@ -422,6 +422,44 @@ Option 1 lighter-touch (reporting, not exclusion). Fold into Step 5 spec.
 
 ---
 
+## Arc 4 cross-arc items (2026-05-17)
+
+Items raised by Arc 4 closure (`bar_range_top_decile__neg__h_001`; CLEAN-NULL on transaction-cost truth). Spread floor file replacement is the highest-priority blocker for all future arc work.
+
+### HIGHEST priority — added 2026-05-17 from Arc 4 closure
+
+- **Spread floor file replacement** — `configs/spread_floors_5ers.yaml`'s uniform 0.1 pip floor under-models real spreads by 3-48x per pair. Per-pair empirical floors from HistData audit (or MT5 broker snapshot) required. Locked-file change. Blocks all future arc work.
+  Source: Arc 4 closure 2026-05-17.
+
+### HIGH priority — added 2026-05-17
+
+- **Phase Zero spread validation** — Add spread floor validation step before Step 1 plumbing for all future L arcs. Refresh tick-based audit every 6 months. Affects `L_ARC_PROTOCOL.md` §5 and `WORKFLOW.md`.
+  Source: Arc 4 closure 2026-05-17.
+
+- **F1 structural leakage** — L arc pool starts 2020-10-01 = F1 OOS start. No honest WFO training data exists for F1. Affects every L arc retroactively (magnitude not direction). Options: pool back-extend to pre-2020, drop F1 from L arc evaluation, or alternate fold structure for L arcs.
+  Source: Arc 4 Step 5C 2026-05-17.
+
+### MEDIUM priority — added 2026-05-17
+
+- **Session-aware spread modeling** — Per-pair × per-session floors may be required for accurate cost modeling on signals that fire outside London/NY overlap. Defer until per-pair floor in place and next arc's behaviour observed.
+  Source: Arc 4 closure 2026-05-17.
+
+- **Convention (b) MTM DD as §10 default** — 5ers measures account equity in real-time; convention (a) closed-trade ordering understates DD by 14-63%. Convention (b) should become §10's default gate metric. Affects protocol §9 and §10 wording.
+  Source: Arc 4 Step 5B-refit 2026-05-17.
+
+- **Step 5 simulator default — apply exit spread** — Post-hoc simulator templates should enforce S/2 exit spread by default per SPREAD_SEMANTICS_LOCK.md. Arc 4's omission was prompt-author error; the simulator template should make it impossible to skip.
+  Source: Arc 4 Step 5B-spread 2026-05-17.
+
+- **D1 threshold grid specification** — §3 locks Pipeline E grid {0.40, 0.50, 0.60, 0.70} but never explicitly locks D1's grid. Both Arc 4 and Arc 5 hit this. Lock D1 grid as {base_rate, 0.20, 0.25, 0.30, 0.35, 0.40, 0.50} in protocol amendment.
+  Source: Arc 4 Step 5A + Arc 5 Step 4b 2026-05-17.
+
+### LOW priority — added 2026-05-17
+
+- **§11 row 2 deep-pullback tolerance** — Arc 4 cluster 1 carried pullback 0.676R against row 2's ≤0.5R rule. Closed arc, so doesn't matter for Arc 4, but centroid pattern boundaries in §11 deserve empirical refinement once more arcs land.
+  Source: Arc 4 Step 4→5 boundary decision 2026-05-17.
+
+---
+
 ## Arc 6 cross-arc items (2026-05-17)
 
 Three items raised by Arc 6 closure (failed-breakout reversal long, out-of-registry; DIES at Step 4 deployability). Queued for the cross-arc calibration session before the next out-of-registry arc opens. Numbering follows protocol §16 Open-NN convention (Open-20 reserved/rejected for the realised-R-under-fixed-SL framing per v2.1.2 CHANGELOG; next available is Open-21).

@@ -2,7 +2,7 @@
 
 > Tight current-state snapshot. For full context, read `SESSION_ZERO.md` first.
 > For methodology, read `L_ARC_PROTOCOL.md` (v2.1.2, self-contained).
-> Last updated: 2026-05-17 — Backtester extension closure: PR #135 (D1 PR 2 Stepwise climber) + PR #138 (engine generalisation) merged. Engine is ready for any signal/TF/time-exit/spread-floor config. Arc 4 engine prerequisites complete. Arc 6 (failed-breakout reversal long, out-of-registry) closed DIES at Step 4 deployability; Open-21 (new) + Open-17 expansion queued.
+> Last updated: 2026-05-17 — Arc 4 closed CLEAN-NULL on transaction-cost truth; `configs/spread_floors_5ers.yaml` flagged for per-pair empirical replacement (HistData audit shows uniform 0.1 pip floor under-models real spreads 3-48x per pair). KH-24 live deployment unchanged; WFO claim downgraded to pass-viable retroactively. Backtester extension closed (PR #131 + #135 + #138 merged). Arc 6 closed DIES at Step 4 deployability.
 
 ---
 
@@ -11,7 +11,8 @@
 - Active protocol: L_ARC_PROTOCOL v2.1.2 (amendment landed 2026-05-17)
 - Calibration anchor: KH-24 K=4 archetype 3 — v2.0 values; deployed-pop reference held (no refresh from Open-18 replays per user decision; v2.1.2 anchor preservation verified — centroid still routes to Stepwise under 5-50 local_peaks range)
 - Next engine PR: none currently planned. Backtester extension complete: PR #131 (D1 plumbing), PR #135 (D1 PR 2 Stepwise climber policy + per-fold classifiers), PR #138 (engine generalisation: signal adapter + TF pluggability + time-exit + spread floor). §11 rows 1, 3, 4, 5, 6, 7 exit policies deferred until an arc surfaces a Step-4 consumer needing them.
-- Next chat task: Arc 7 (in progress; Step 3 completed PASS, Step 4 pending). Cross-arc calibration session for Open-21 (Step 4 deployability gate) + Open-17 expansion (Tiebreak 1 noise floor) queued before next out-of-registry arc opens.
+- **BLOCKER:** `configs/spread_floors_5ers.yaml` flagged for per-pair empirical floor replacement before Arc 5+ proceeds. See `docs/SPREAD_FLOOR_AUDIT_FINDING.md`.
+- Next chat task: spread floor file replacement under SPREAD_SEMANTICS_LOCK governance; then Open-18 replays; then Arc 5. Cross-arc calibration session for Open-21 (Step 4 deployability gate) + Open-17 expansion (Tiebreak 1 noise floor) queued.
 
 ---
 
@@ -34,7 +35,7 @@
 
 **Anchor preservation:** KH-24 K=4 archetype 3 centroid (mono 0.576, local_peaks 14.19, pullback 0.020, ttp_rel 0.847) routes to Stepwise climber under both old [5,30] and new [5,50] ranges; bimodal shape_tag passes `≠ scattered`. No routing change.
 
-**Arc 4 active:** LCHAR Entry 4 (`TRIAL__univariate_extreme__bar_range_top_decile__neg__h_001`), 1-bar horizon, univariate-extreme family.
+**Arc 4 closed CLEAN-NULL 2026-05-17.** Signal had real edge through Step 5 under modeled spreads; real-spread reconciliation (HistData audit) showed cost model under-modeled spreads by 3-48x per pair, killing F6 worst-fold sign consistency on Arc 4 cluster 1. Spread floor replacement is now the priority blocker for Arc 5+ work. Open-18 replays also blocked. KH-24 live deployment unchanged; WFO claim downgraded to pass-viable retroactively. See `docs/arc_results/ARC_4_RESULT.md` and `docs/SPREAD_FLOOR_AUDIT_FINDING.md`.
 
 ---
 
@@ -76,6 +77,7 @@ Full closure: `docs/arc_results/ARC_6_RESULT.md`. Arc 6 signal is NOT permanentl
 | Spec | `docs/KH24_SYSTEM_LOCK.md` |
 | Config | `configs/wfo_kh24.yaml` (locked, do not modify) |
 | EA | `KH24_EA.mq5` v2.01 |
+| WFO claim retrospective | Pass-viable on real-spread reconciliation (not pass-deployable as originally claimed); live unchanged |
 
 KH-24 is locked and unchanged. No modifications without an explicit modification phase.
 
@@ -122,6 +124,7 @@ Annualisation: `fold_raw_ROI × (365 / fold_OOS_days)`. Folds < 90 OOS days excl
 
 | Phase | Verdict | Finding |
 | --- | --- | --- |
+| Arc 4 (l_arc_4) | CLEAN-NULL at Step 5 retroactive (2026-05-17) | bar_range_top_decile__neg__h_001 — first L arc to reach Step 5 PASS; cluster 1 D1 AUC 0.667 pass-deployable at 0.20% risk under modeled spreads; killed by HistData spread audit showing floor file under-models real spreads 3-48x per pair; F6 ann ROI flips from +10.08% to ~−5.6% under real spreads; §9.A retroactive fail; 8 cross-arc calibration items |
 | Engine generalisation | DELIVERED (PR #138, 2026-05-17) | Engine config-driven for signal, timeframe, time-exit, spread floor. KH-24 byte-identical (sha256 verified). Arc 4 engine prerequisites complete. |
 | Pipeline D1 PR 2 — Stepwise climber policy | DELIVERED (PR #135, 2026-05-17) | §11 row 2 exit policy + per-fold classifier dispatch land. ApplyPolicy made concrete. Trail-suppression resolved against Step 5 simulator. Other §11 rows deferred. |
 | Arc 6 (out-of-registry; failed-breakout reversal long) | DIES at Step 4 deployability (2026-05-17) | Steps 1–4 all mechanical PASS. Pipeline E best AUC 0.600 / 0.590 vs 0.65 floor; Pipeline D1 mechanically clears AUC ≥ 0.60 but threshold sweep collapses to max-F1 at sub-1% recall (~3-4 admitted trades / 5-year pool). Two calibration items raised: Open-21 (Step 4 deployability gate, new) + Open-17 expansion (Tiebreak 1 noise floor); plus unnumbered cross-arc note on reach_1R floor noise tolerance. Spec v0.2 erratum: `swing_low_N = min(low[t-N-M..t-M-1])`. See `docs/arc_results/ARC_6_RESULT.md`. |
@@ -148,7 +151,9 @@ Annualisation: `fold_raw_ROI × (365 / fold_OOS_days)`. Folds < 90 OOS days excl
 
 | Item | Priority | Notes |
 | --- | --- | --- |
-| Arc 4 | ACTIVE | LCHAR Entry 4 (`TRIAL__univariate_extreme__bar_range_top_decile__neg__h_001`), 1-bar horizon, univariate-extreme family. Under L_ARC_PROTOCOL v2.1.2. |
+| `configs/spread_floors_5ers.yaml` replacement | HIGHEST | Per-pair empirical floors from HistData audit at p10. Locked-file change. SPREAD_SEMANTICS_LOCK governance required. Blocks all future arcs. |
+| Phase Zero spread validation | HIGH | Add to L arc workflow before Step 1 plumbing; refresh tick audit every 6 months. |
+| MT5 vs HistData spread cross-check | MEDIUM | Dump 5 days of 5ers MT5 spread snapshots from Contabo VPS, validate audit assumptions. |
 | §11 row policies for rows 1, 3, 4, 5, 6, 7 | DEFERRED | Row 2 (Stepwise climber) shipped in PR #135. Other rows added when an arc surfaces a Step-4 archetype consumer needing them. No build until concrete consumer surfaces. |
 
 No outstanding bugs or issues against KH-24. No pending fixes against the backtester. §14 anchor refresh explicitly held (deployed-pop reference, no change).
@@ -159,7 +164,7 @@ No outstanding bugs or issues against KH-24. No pending fixes against the backte
 
 | Item | Status | Notes |
 | --- | --- | --- |
-| §2 calibration pattern | ADDRESSED in v2.1.2 | The §2 monotonicity / shape_tag wall seen at 2026-05-16 closures (KH-24 c4, Arc 2 redo c2, Arc 3 Stepwise) was empirically resolved by Open-18 replays under v2.1.1 (pre-peak Def C + capturability composite) and architecturally addressed by v2.1.2 (`≠ scattered` floor + Stepwise ceiling extension). Watch list retained — re-open if Arc 4 surfaces a similar failure mode that v2.1.2 doesn't resolve. |
+| §2 calibration pattern | ADDRESSED in v2.1.2 | The §2 monotonicity / shape_tag wall seen at 2026-05-16 closures (KH-24 c4, Arc 2 redo c2, Arc 3 Stepwise) was empirically resolved by Open-18 replays under v2.1.1 (pre-peak Def C + capturability composite) and architecturally addressed by v2.1.2 (`≠ scattered` floor + Stepwise ceiling extension). 3/3 arcs hit §2-related issues now; Arc 4 escalates to a different failure mode (cost-model invalidity surfaces real edge as undeployable). Spread floor finding is bigger than §2 calibration — affects every prior closure's magnitude (not direction). |
 
 ---
 
@@ -189,6 +194,13 @@ Items accumulating from arc closures under v2.0. Per §1.8 within-arc thresholds
 | --- | --- | --- | --- |
 | §11 archetype priors empirical refinement (Open-07) | KH-24 v2.0, Arc 2 redo, Arc 3 | MEDIUM | v2.1 demoted §11 SL column to prior; v2.1.2 extends Stepwise local_peaks ceiling 5-30 → 5-50 based on Open-18 empirical centroids. Other §11 rows still first-pass priors; centroid-pattern refresh remains open. Deferred until Arc 4 + Arc 5 produce additional evidence. |
 | Cap-binding / shape_tag dead-zone diagnostic | KH-24 v2.0 c4 replay | LOW | Replay #2 surfaced correlation between p95/p50 dead-zone (2.0, 3.0] and forward-window cap-binding. v2.1.2's `≠ scattered` floor avoids over-rejecting on this; §5 auto-extend addresses upstream. Track whether the correlation resurfaces under Arc 4+. |
+| Real-spread floor file replacement | Arc 4 | HIGHEST | Per-pair empirical floors from HistData audit (or MT5 broker snapshot) required to replace uniform 0.1 pip floor that under-models real spreads 3-48x. Locked-file change under SPREAD_SEMANTICS_LOCK.md governance. Blocks all future arc work. |
+| Spread audit as Phase Zero | Arc 4 | HIGH | All future L arcs must validate spread floor file against current broker quote before Step 1 plumbing runs; refresh tick audit every 6 months. Affects WORKFLOW.md v2 and `L_ARC_PROTOCOL.md` §5. |
+| Session-aware spread modeling | Arc 4 | MEDIUM | Per-pair × per-session floors may be required for accurate cost modeling on cross-pair signals. Defer until per-pair floor in place and next arc's behaviour observed. |
+| Step 5 simulator default — apply exit spread | Arc 4 | MEDIUM | Post-hoc simulator templates should enforce S/2 exit spread by default per SPREAD_SEMANTICS_LOCK.md. Arc 4's omission was prompt-author error; the simulator template should make it impossible to skip. |
+| Convention (b) MTM DD as §10 default | Arc 4 | MEDIUM | 5ers measures account equity in real-time; convention (a) closed-trade ordering understates DD by 14-63%. Convention (b) should become §10's default gate metric. Affects protocol §9 and §10 wording. |
+| F1 structural leakage | Arc 4 | HIGH | L arc pool starts 2020-10-01 = F1 OOS start. No honest WFO training data exists for F1. Affects every L arc retroactively (magnitude not direction). Options: pool back-extend to pre-2020, drop F1 from L arc evaluation, or alternate fold structure for L arcs. |
+| D1 threshold grid specification | Arc 4 | MEDIUM | §3 locks Pipeline E grid {0.40, 0.50, 0.60, 0.70} but never explicitly locks D1's grid. Both Arc 4 and Arc 5 hit this. Lock D1 grid as {base_rate, 0.20, 0.25, 0.30, 0.35, 0.40, 0.50} in protocol amendment. |
 
 ---
 
@@ -203,6 +215,8 @@ Items accumulating from arc closures under v2.0. Per §1.8 within-arc thresholds
 Earlier eliminations (KGL_V2 era, JL forward bias, NNFX, exit indicator sweeps, etc.) recorded in `CLAUDE.md`, `docs/KH_Research_Roadmap.md`, and `project_brief.md`.
 
 Note: Arc 2 signal (mtf_alignment.2_down_mixed.kijun, h=120) shelved 2026-05-16 as "real edge, not extractable under v2.0 as drawn" — see `results/l_arc_2_redo/ARC_2_REDO_RESULT.md`. Not permanently eliminated; reopenable contingent on v2.x calibration amendment.
+
+Note: `bar_range_top_decile__neg__h_001` (Arc 4 signal) is SHELVED pending spread floor calibration. Not permanently eliminated — re-evaluatable under corrected spread file. See `docs/arc_results/ARC_4_RESULT.md`.
 
 ---
 
@@ -219,6 +233,7 @@ Note: Arc 2 signal (mtf_alignment.2_down_mixed.kijun, h=120) shelved 2026-05-16 
 | Arc 2 redo (closed KILL) | `results/l_arc_2_redo/` |
 | KH-24 v2.0 self-test (closed HALT) | `results/arc_kh24_v2/` + `results/arc_kh24_v2/ARC_KH24_V2_RESULT.md` |
 | Arc 3 (closed CLEAN-NULL) | `results/l_arc_3/` + `docs/arc_results/ARC_3_RESULT.md` |
+| Arc 4 (closed CLEAN-NULL on transaction-cost truth) | `results/l_arc_4/` + `docs/arc_results/ARC_4_RESULT.md` + `docs/SPREAD_FLOOR_AUDIT_FINDING.md` |
 | Arc 6 (closed DIES at Step 4) | `results/arc_6/` (on `discovery/lomega_regime_conditional`) + `docs/arc_results/ARC_6_RESULT.md` |
 
 ---

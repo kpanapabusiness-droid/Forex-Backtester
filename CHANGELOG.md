@@ -1,5 +1,26 @@
 # Changelog
 
+## ARC 4 CLOSED | 2026-05-17 | CLEAN-NULL ON TRANSACTION-COST TRUTH
+
+### Added
+- `docs/arc_results/ARC_4_RESULT.md` — Arc 4 full closure doc
+- `docs/SPREAD_FLOOR_AUDIT_FINDING.md` — cross-arc finding on spread floor file
+- Spread validation report artefacts (separate chat): `results/spread_audit/`
+
+### Changed
+- `STATUS.md` — Arc 4 closure logged; spread floor replacement set as highest-priority blocker; Open-18 replays and Arc 5 marked blocked
+- `SESSION_ZERO.md` — Phase History entry added; current-state updated
+- `CLAUDE.md` — current state updated; Arc 4 signal noted as shelved-not-eliminated
+- `PROTOCOL_IMPROVEMENT_BACKLOG.md` — 7 new cross-arc calibration items
+- Live system posture: KH-24 WFO claim retroactively downgraded to pass-viable on real-spread reconciliation. Live deployment unchanged.
+
+### Flagged for replacement
+- `configs/spread_floors_5ers.yaml` — uniform 0.1 pip floor wrong on all 28 pairs by 3-48x; requires per-pair empirical replacement under SPREAD_SEMANTICS_LOCK governance
+
+### Closed
+- Arc 4 (l_arc_4) — CLEAN-NULL at Step 5 retroactive fail on real-spread reconciliation
+- Open-18 replays — superseded; blocked behind spread floor replacement
+
 ## ENGINE GENERALISATION | 2026-05-17 | PR #138 MERGED
 Engine becomes config-driven for signal, timeframe, time-exit, and spread floor. KH-24 remains byte-identical (sha256 verified pre/post). Engine is now ready to run signals beyond KH-24 across any timeframe with configurable max-life caps and spread-floor application.
 - New: `core/signal_adapter.py` — SignalAdapter Protocol, import_class helper, validate_aux_declaration

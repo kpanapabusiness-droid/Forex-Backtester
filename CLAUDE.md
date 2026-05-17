@@ -1,5 +1,5 @@
 # CLAUDE.md — Forex Ignition Rebuild
-> Last updated: 2026-05-16 | Phase: Arc 3 CLOSED (CLEAN-NULL at Step 3); Arc 4 next under v2.0
+> Last updated: 2026-05-17 | Phase: Arc 4 CLOSED (CLEAN-NULL on transaction-cost truth); spread floor file flagged for replacement
 > First file any AI assistant reads. Reflects where the project ACTUALLY is.
 
 ---
@@ -31,7 +31,7 @@ Then, depending on scope:
 
 **Live system KH-24 is locked, passing, deployed.** Out of scope for L arc work; do not modify without an explicit modification phase.
 
-**Active research: L arc signal testing under `L_ARC_PROTOCOL.md` v2.0.** Arc 3 closed CLEAN-NULL at Step 3 (2026-05-16) — five v2.1 cross-arc items logged; see `docs/arc_results/ARC_3_RESULT.md`. Arc 4 (registry Entry 4, `bar_range_top_decile__neg__h_001`) is next. Arcs 1 and 2 are historical (ran under v1.x).
+**Active research: L arc signal testing under `L_ARC_PROTOCOL.md` v2.1.1.** Arc 4 closed CLEAN-NULL on transaction-cost truth 2026-05-17 — signal reached pass-deployable through Step 5 under modeled spreads; HistData spread audit revealed `configs/spread_floors_5ers.yaml` under-models real spreads by 3-48x per pair, killing F6 worst-fold sign consistency under real-spread reconciliation. **Spread floor file replacement is now the blocker for all future arc work.** See `docs/arc_results/ARC_4_RESULT.md` and `docs/SPREAD_FLOOR_AUDIT_FINDING.md`. Arc 3 closed CLEAN-NULL at Step 3 (2026-05-16). Arcs 1 and 2 are historical (ran under v1.x).
 
 ---
 
@@ -145,6 +145,7 @@ Key scripts:
 - 1H timeframe port of KH-24 (KI arc: mean R 0.004, t=0.095)
 - L6.0 verbatim-as-gate framing (replaced by `L_ARC_PROTOCOL.md` v1.0; v1.x in turn superseded by v2.0 for Arcs 3+)
 - Arc 2 signal (mtf_alignment.2_down_mixed.kijun, h=120) — SHELVED 2026-05-16, not permanently eliminated; cluster 2 has strong magnitude (fwd_mfe_p50 5.83R, t-stat +52) on unextractable paths, reopenable via v2.x calibration; see `results/l_arc_2_redo/ARC_2_REDO_RESULT.md`
+- Arc 4 signal (`bar_range_top_decile__neg__h_001`, 1H) — SHELVED 2026-05-17, not permanently eliminated; real edge through Step 5, killed by transaction-cost truth under HistData spread audit (cluster 1 D1 AUC 0.667, pass-deployable at 0.20% risk under modeled spreads; F6 ann ROI flips +10.08% → ~−5.6% under real-spread reconciliation). Re-evaluatable under corrected spread file. See `docs/arc_results/ARC_4_RESULT.md`.
 
 ### Not eliminated, but flagged
 

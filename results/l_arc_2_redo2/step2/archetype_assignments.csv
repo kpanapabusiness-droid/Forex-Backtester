@@ -1,0 +1,5 @@
+cluster_id,centroid_monotonicity_ratio_in_profit,centroid_local_peaks_count,centroid_pullback_magnitude_median,centroid_time_to_peak_mfe_relative,cluster_size,cluster_fraction,archetype_label,matching_rule,boundary_flag
+0,0.5482173913,4.72836031,0.1299534301,0.3408264293,4270,0.348230305,unclassified,no §11 pattern matched,False
+1,0.5382006365,20.06836109,0.3397724563,0.7744169256,2285,0.1863480672,Stepwise climber,monotonicity>=0.50 AND local_peaks in [5;30] AND pullback<=0.5 AND time_to_peak_rel>=0.50,False
+2,0.01470748642,0.5341164709,0.01123628255,0.04320972967,4001,0.3262926113,Early-peak hold OR Peak-and-collapse,time_to_peak_rel<=0.30 (disambiguation needs Step-3 pct_peak_and_collapse),True
+3,0.5121499857,7.458624709,0.7002101866,0.5905478278,1706,0.1391290165,unclassified,no §11 pattern matched,False

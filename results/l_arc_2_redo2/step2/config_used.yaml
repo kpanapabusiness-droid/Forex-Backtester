@@ -1,0 +1,91 @@
+# Arc 2 redo2 — Step 2 config snapshot (v2.1.1)
+#
+# Source: configs/arc_2_redo2/step2.yaml (verbatim, plus runtime metadata).
+#
+# CSV output hashes (this run, sha256):
+#   archetype_assignments.csv: f385f610384351ddf079b6be652fd02fdc1ddcfb29fa8cc1ee6b12f001c9738a
+#   centroids_K3.csv: c8b3f3c754cfac4cd9ca217fdfbe946f4608da595445adec6a57b977af95c966
+#   centroids_K4.csv: a06393be96a59d0381a5a7a70d5c1ed8520bf36a6565604c4e5718128fa785b2
+#   centroids_K5.csv: c351e3015b7333ae9494f9e435723fdde18fe0ce1a7a405cdfbd1723686a960c
+#   centroids_K6.csv: 1df07ecc77216c2b9e3ed4f9359d761e7150234b637d71d0ee48addf5e71015e
+#   centroids_K7.csv: 3151deafe2b47a91d5e9302fea56c8b060bbd5e4fd3e9fe46ec27b1911658bc0
+#   clusters_K3.csv: e5ad098f29491226f5ce4328b43f4bfcde3dde64ae8cfdd165a0ed83c6251fa0
+#   clusters_K4.csv: 07c6b506e6111a5c97d5d80011c78b37e6f668d650f2b7903ade6f469e94c471
+#   clusters_K5.csv: 0accf498aba3bc9cc281f521b9b057bfd95b0ac12497664d08b36168d276632f
+#   clusters_K6.csv: 0b7ade7eec8ce7f0786e9105e4c10d291f3e495c5c00620b28b68c7377cfe7fa
+#   clusters_K7.csv: e124da9f353f6598bb0ffa54b83220d9e25587d70238811cfeead6b1dbb67e53
+#   feature_diagnostics.csv: 6d7d450954d992f5ca891cc52c6c3ef4138d345a9b6377e3095179f5645ef103
+#   jaccard_vs_prior_K4.csv: 38af054cc32b159aa99f59b985080e2042a56a9b970c3986a98e1655d411bdd5
+#   path_features.csv: 95636c84de1d63bcdf57866574b14bbcfcb2ee5c04fa32081083efa927a5a618
+#   silhouette_sweep.csv: 82c18d817ecb052897b8a743214fc6cfb557d69307b5ae44f8a9091d43688002
+
+# --- verbatim configs/arc_2_redo2/step2.yaml ---
+# Arc 2 redo2 — Step 2 path-shape clustering config
+#
+# Protocol: L_ARC_PROTOCOL.md v2.1.1 §§1, 6, 11
+# Input:   results/l_arc_2_redo2/step1/trades_paths.csv + trades_all.csv
+# Outputs: results/l_arc_2_redo2/step2/...
+
+phase: arc_2_redo2_step2
+description: >-
+  Path-shape clustering on Arc 2 redo2 Step 1 pool (12,262 trades).
+  Outcome-blind features per v2.1.1 §6, K-means sweep K in {3..7},
+  cluster-to-archetype labelling per §11. Features computed on
+  is_held=1 rows only (held window per v2.1.1 §17 — exit bar inclusive).
+
+input:
+  step1_dir: results/l_arc_2_redo2/step1
+  paths_csv: trades_paths.csv
+  trades_csv: trades_all.csv
+  # Prior arc_2_redo K=4 cluster assignments for Jaccard overlap comparison.
+  # Optional; if missing, jaccard reported as "n/a".
+  prior_clusters_csv: results/l_arc_2_redo/step2/clusters_K4.csv
+
+output:
+  results_dir: results/l_arc_2_redo2/step2
+  features_csv: path_features.csv
+  diagnostics_csv: feature_diagnostics.csv
+  histograms_png: feature_histograms.png
+  sweep_csv: silhouette_sweep.csv
+  archetypes_csv: archetype_assignments.csv
+  jaccard_csv: jaccard_vs_prior_K4.csv
+  summary_md: STEP2_SUMMARY.md
+  determinism_check: true
+
+# ----------------------------------------------------------------------
+# Clustering parameters (v2.1.1 §6 locked)
+# ----------------------------------------------------------------------
+clustering:
+  k_sweep: [3, 4, 5, 6, 7]
+  random_state: 42
+  n_init: 10
+  max_iter: 300
+  silhouette_sample_size: 5000
+
+# ----------------------------------------------------------------------
+# K-selection tolerance (v2.1.1 §6 / §1.21 / Open-12 closure)
+# ----------------------------------------------------------------------
+k_selection:
+  tie_tolerance_absolute: 0.01     # smaller K preferred within ±0.01 silhouette
+
+# ----------------------------------------------------------------------
+# Feature degeneracy thresholds (v2.1.1 §6)
+# ----------------------------------------------------------------------
+degeneracy:
+  modal_bin_mass_threshold: 0.80   # >80% mass in single hist bin = flag
+  histogram_bins: 50
+
+# ----------------------------------------------------------------------
+# Gate thresholds (v2.1.1 §6)
+# ----------------------------------------------------------------------
+gates:
+  silhouette_min: 0.30
+  max_cluster_fraction: 0.90       # no cluster > 90% of trades
+  min_cluster_count: 30            # all clusters >= 30 trades
+
+# ----------------------------------------------------------------------
+# Archetype boundary (v2.1.1 §11)
+# ----------------------------------------------------------------------
+archetype:
+  # A cluster centroid is "near" a threshold if within this fraction of it.
+  boundary_relative_distance: 0.10

@@ -1,0 +1,52 @@
+replay_id: arc_3_stepwise
+source_arc: l_arc_3
+cluster_k: 7
+
+inputs:
+  trades_all: results/l_arc_3/step1_plumbing/trades_all.csv
+  trades_paths_original: results/l_arc_3/step1_plumbing/trades_paths.csv
+  trades_paths_extended: results/replays_v2_1_1/arc_3_stepwise/trades_paths_extended.csv
+  clusters: results/l_arc_3/step2_clustering/clusters_K7.csv
+  centroids: results/l_arc_3/step2_clustering/centroids_K7.csv
+  path_features: results/l_arc_3/step2_clustering/path_features.csv
+  data_1h_dir: data/1hr
+
+# Cohort under Open-18 Replay #1
+cohort:
+  name: stepwise_climber
+  cluster_ids_individual: [2, 4]
+  cluster_ids_aggregate: [2, 4]
+
+# Arc 3 simulation R-frame
+atr_units_per_R_at_simulation: 2.0
+forward_window_bars: 240
+original_held_window_bars: 120
+pool_size: 2568
+
+sl_sweep_candidates_atr: [0.5, 1.0, 1.5, 2.0, 3.0, 4.0]
+
+floors:
+  monotonicity_pre_peak_min: 0.55
+  local_peaks_min: 5
+  local_peaks_max: 30
+  fwd_mfe_h240_p50_min: 1.5
+  frac_reach_1R_min: 0.70
+  frac_wrong_way_pre_peak_max: 0.30
+  size_fraction_min: 0.10
+  shape_tag_admitted: [tight_unimodal, heavy_right_tail, bimodal_separated]
+
+bimodal_separated_test:
+  hartigan_dip_p_max: 0.05
+  min_mode_mass: 0.20
+  min_mode_separation_r: 1.0
+
+composite_tiebreaker_tolerance: 0.02
+
+output_dir: results/replays_v2_1_1/arc_3_stepwise
+
+dependencies:
+  # NOTE: the spec asked for diptest>=0.5.2,<0.6 but only diptest==0.11.0 has a
+  # prebuilt wheel for Python 3.14 (the env Arc 3 ran on per its manifest).
+  # The API `diptest.diptest(values) -> (D, p)` is unchanged across versions.
+  # Installed: 0.11.0.
+  diptest: "==0.11.0"

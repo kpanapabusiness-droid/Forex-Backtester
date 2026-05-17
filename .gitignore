@@ -92,6 +92,13 @@ results/l_arc_2_redo/*
 !results/l_arc_2_redo2/**
 results/l_arc_2_redo2/**/trades_paths.csv
 results/l_arc_2_redo2/**/_run_log.txt
+# v2.1.1 Open-18 empirical replays (per-cohort: arc_3_stepwise, kh24_v2_c4,
+# arc_2_redo_c2). Track all small CSVs + REPLAY_RESULT.md; exclude the large
+# regenerable forward-extended paths CSV (~40-50MB per cohort; rebuildable
+# from extend_paths.py + the source arc's step1 data).
+!results/replays_v2_1_1/
+!results/replays_v2_1_1/**
+results/replays_v2_1_1/**/trades_paths_extended.csv
 results_phase*/
 __pycache__/
 .ipynb_checkpoints/

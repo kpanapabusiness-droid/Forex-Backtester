@@ -1,0 +1,3 @@
+cluster_id,individual_verdict,aggregate_verdict,routing
+2,PASS,PASS,both
+4,FAIL,PASS,aggregate

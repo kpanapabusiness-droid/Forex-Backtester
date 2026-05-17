@@ -1,0 +1,2 @@
+cluster_or_archetype,selected_sl_atr,n_trades,fwd_mfe_p25_R_candidate,fwd_mfe_p50_R_candidate,fwd_mfe_p75_R_candidate,fwd_mfe_p95_R_candidate,frac_reach_1R,frac_reach_2R,final_r_mean,final_r_t_stat,final_r_p25,final_r_p50,final_r_p75,cap_binding_rate,shape_tag,shape_dip_p,shape_p95_over_p50,shape_mode_locations,shape_mode_masses,shape_mode_separation
+c2,0.5,112,0.6612257670658619,1.1584649166184264,2.064575019954586,4.240231463685519,0.5714285714285714,0.2767857142857143,-1.0,0.0,-1.0,-1.0,-1.0,0.0,heavy_right_tail,0.9905299146554307,3.6602156896238234,,,

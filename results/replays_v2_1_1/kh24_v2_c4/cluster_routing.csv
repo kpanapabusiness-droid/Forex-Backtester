@@ -1,0 +1,6 @@
+cluster_id,archetype_label,individual_passes,aggregate_archetype,aggregate_passes,disposition
+c0,peak_and_collapse,False,peak_and_collapse,False,dies
+c1,unresolved_f22d041e,True,,,individual_passes_only
+c2,peak_and_collapse,False,peak_and_collapse,False,dies
+c3,unresolved_dd77bf0f,False,,,dies
+c4,unresolved_11fee4a0,True,,,individual_passes_only

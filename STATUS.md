@@ -2,7 +2,7 @@
 
 > Tight current-state snapshot. For full context, read `SESSION_ZERO.md` first.
 > For methodology, read `L_ARC_PROTOCOL.md` (v2.1.2, self-contained).
-> Last updated: 2026-05-17 — Arc 6 (failed-breakout reversal long, out-of-registry) closed DIES at Step 4 deployability. Two calibration items queued: Open-21 (Step 4 deployability gate, new) + Open-17 expansion (Tiebreak 1 noise floor). Arc 7 active.
+> Last updated: 2026-05-17 — Backtester extension closure: PR #135 (D1 PR 2 Stepwise climber) + PR #138 (engine generalisation) merged. Engine is ready for any signal/TF/time-exit/spread-floor config. Arc 4 engine prerequisites complete. Arc 6 (failed-breakout reversal long, out-of-registry) closed DIES at Step 4 deployability; Open-21 (new) + Open-17 expansion queued.
 
 ---
 
@@ -10,7 +10,7 @@
 
 - Active protocol: L_ARC_PROTOCOL v2.1.2 (amendment landed 2026-05-17)
 - Calibration anchor: KH-24 K=4 archetype 3 — v2.0 values; deployed-pop reference held (no refresh from Open-18 replays per user decision; v2.1.2 anchor preservation verified — centroid still routes to Stepwise under 5-50 local_peaks range)
-- Next engine PR: none currently planned. PR #131 (D1 plumbing) is merged; D1 PR 2 (per-archetype §11 exit policies) deferred until an arc surfaces a Step-4 consumer
+- Next engine PR: none currently planned. Backtester extension complete: PR #131 (D1 plumbing), PR #135 (D1 PR 2 Stepwise climber policy + per-fold classifiers), PR #138 (engine generalisation: signal adapter + TF pluggability + time-exit + spread floor). §11 rows 1, 3, 4, 5, 6, 7 exit policies deferred until an arc surfaces a Step-4 consumer needing them.
 - Next chat task: Arc 7 (in progress; Step 3 completed PASS, Step 4 pending). Cross-arc calibration session for Open-21 (Step 4 deployability gate) + Open-17 expansion (Tiebreak 1 noise floor) queued before next out-of-registry arc opens.
 
 ---
@@ -122,6 +122,8 @@ Annualisation: `fold_raw_ROI × (365 / fold_OOS_days)`. Folds < 90 OOS days excl
 
 | Phase | Verdict | Finding |
 | --- | --- | --- |
+| Engine generalisation | DELIVERED (PR #138, 2026-05-17) | Engine config-driven for signal, timeframe, time-exit, spread floor. KH-24 byte-identical (sha256 verified). Arc 4 engine prerequisites complete. |
+| Pipeline D1 PR 2 — Stepwise climber policy | DELIVERED (PR #135, 2026-05-17) | §11 row 2 exit policy + per-fold classifier dispatch land. ApplyPolicy made concrete. Trail-suppression resolved against Step 5 simulator. Other §11 rows deferred. |
 | Arc 6 (out-of-registry; failed-breakout reversal long) | DIES at Step 4 deployability (2026-05-17) | Steps 1–4 all mechanical PASS. Pipeline E best AUC 0.600 / 0.590 vs 0.65 floor; Pipeline D1 mechanically clears AUC ≥ 0.60 but threshold sweep collapses to max-F1 at sub-1% recall (~3-4 admitted trades / 5-year pool). Two calibration items raised: Open-21 (Step 4 deployability gate, new) + Open-17 expansion (Tiebreak 1 noise floor); plus unnumbered cross-arc note on reach_1R floor noise tolerance. Spec v0.2 erratum: `swing_low_N = min(low[t-N-M..t-M-1])`. See `docs/arc_results/ARC_6_RESULT.md`. |
 | L_ARC_PROTOCOL v2.1.2 amendment | LANDED (2026-05-17) | §2 categorical shape_tag floor relaxed to `≠ scattered`; §11 Stepwise local_peaks ceiling 5-30 → 5-50; §15a arc Step 1 schema requirement (Open-19 closure). Open-15, Open-18, Open-19 closed. Open-20 reframed as Step 4 measurement (not a §2 gate). Anchor preservation verified. |
 | Open-18 cross-replay synthesis | COMPLETE (2026-05-17) | 3/3 replays passed: Arc 3 Stepwise (c2 + aggregate), KH-24 v2.0 c4 (c1 + c4), Arc 2 redo2 cid 1. Pre-peak Def C validated as dominant rescue mechanism (38% → 0-2% wrong_way across cohorts). bimodal_separated validated narrowly. See `results/replays_v2_1_1/` for full evidence. |
@@ -147,7 +149,7 @@ Annualisation: `fold_raw_ROI × (365 / fold_OOS_days)`. Folds < 90 OOS days excl
 | Item | Priority | Notes |
 | --- | --- | --- |
 | Arc 4 | ACTIVE | LCHAR Entry 4 (`TRIAL__univariate_extreme__bar_range_top_decile__neg__h_001`), 1-bar horizon, univariate-extreme family. Under L_ARC_PROTOCOL v2.1.2. |
-| Pipeline D1 PR 2 (per-archetype §11 exit policies) | DEFERRED | Awaiting an arc to surface an archetype reaching Step 4 with a §11 row the current engine cannot express. No build until concrete consumer surfaces. |
+| §11 row policies for rows 1, 3, 4, 5, 6, 7 | DEFERRED | Row 2 (Stepwise climber) shipped in PR #135. Other rows added when an arc surfaces a Step-4 archetype consumer needing them. No build until concrete consumer surfaces. |
 
 No outstanding bugs or issues against KH-24. No pending fixes against the backtester. §14 anchor refresh explicitly held (deployed-pop reference, no change).
 

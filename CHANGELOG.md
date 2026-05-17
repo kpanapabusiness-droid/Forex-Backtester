@@ -1,5 +1,25 @@
 # Changelog
 
+## ENGINE GENERALISATION | 2026-05-17 | PR #138 MERGED
+Engine becomes config-driven for signal, timeframe, time-exit, and spread floor. KH-24 remains byte-identical (sha256 verified pre/post). Engine is now ready to run signals beyond KH-24 across any timeframe with configurable max-life caps and spread-floor application.
+- New: `core/signal_adapter.py` — SignalAdapter Protocol, import_class helper, validate_aux_declaration
+- New: `signals/kb_exhaustion_bar_adapter.py` — wraps KH-24 signal logic; deferred import avoids module-load cycle
+- Patched: `scripts/phase_kgl_v2_4h_wfo.py` — adapter wiring, signal_tf + data config block, aux loading gated by adapter declaration, time_exit_bars cascade tail, _apply_spread_floor at four entry sites, sys.modules alias preventing __main__-vs-package double-load byte-identity break
+- Patched: `configs/wfo_kh24.yaml` — adds signal_adapter / signal_adapter_kwargs / signal_tf / data block with KH-24 defaults
+- Tests: 22 new tests in tests/test_engine_generalisation.py; full suite 1075 passed, 62 skipped
+- KH-24 byte-identical: sha256 08118567a6ef…58e80ab0 verified pre- and post-PR
+- Recovery: parallel CC-session worktree collision mid-build lost two adapter files; recovered via isolated git worktree pattern (now standard going forward)
+
+## PIPELINE D1 PR 2 — STEPWISE CLIMBER POLICY | 2026-05-17 | PR #135 MERGED
+§11 row 2 (Stepwise climber) exit policy + per-fold classifier dispatch land. ApplyPolicy decision pathway from PR #131 made concrete for the first §11 archetype. Other §11 rows deferred until an arc surfaces a Step-4 consumer.
+- New: `core/exit_policies.py` — StepwiseClimberPolicy with MFE-lock at 1R + 0.75R trail-from-high; SL at lock-fire = max(BE_floor, trail_stop)
+- Extended: `core/d1_pipeline.py` — D1Hook loads one joblib per fold per archetype; evaluate() takes fold_id; per-fold classifier dispatch with fail-loud on missing fold path
+- Patched: `scripts/phase_kgl_v2_4h_wfo.py` — per-bar policy update_per_bar between bar_path append and SL check; fold_id threaded from WFO loop; audit fields (mfe_lock_fired_bar, trail_active_from_bar, classifier_fold_id) persisted to trades_all.csv
+- Tests: 72 tests (20 exit-policy + 52 D1-pipeline), all passing
+- Trail-suppression resolved against Step 5 simulator (scripts/arc_4/step5_stability.py:269-318): lock-fire bar arms AND uses trail in same-bar SL check
+- KH-24 unaffected; D1_HOOK = None for all KH-24 configs
+- Deferred: §11 rows 1, 3, 4, 5, 6, 7 exit policies — built per concrete consumer when an arc surfaces a Step-4 archetype needing them
+
 ## ARC 6 CLOSED | 2026-05-17 | DIES AT STEP 4 DEPLOYABILITY
 Arc 6 (failed-breakout reversal long, out-of-registry insertion on `discovery/lomega_regime_conditional`) opened and closed same day. Steps 1–4 ran consecutively; all four mechanical PASSes.
 - Step 1 PASS: pool 1,564 trades over 2020-10-01 → 2026-01-31, determinism `e57528...`, KH-24 co-fire 0.0000 by structural exclusion (bullish reclaim vs bearish exhaustion), cap-binding 17.65%

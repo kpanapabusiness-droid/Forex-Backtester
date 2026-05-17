@@ -27,6 +27,12 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
+# Repo root onto sys.path so the script invocation `py scripts/lomega/lomega_v2_crosstf.py`
+# can resolve `scripts.lomega.lomega_b1_b4` without requiring `-m`.
+_REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
+
 import numpy as np
 import pandas as pd
 from scipy import stats as sps

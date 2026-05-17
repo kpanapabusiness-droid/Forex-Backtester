@@ -5,9 +5,7 @@ RSI vs reference, determinism, byte-identical input preservation, row count.
 """
 from __future__ import annotations
 
-import hashlib
 import shutil
-import subprocess
 import sys
 from pathlib import Path
 
@@ -25,10 +23,8 @@ from scripts.arc_kh24_v2_patch.emit_step1_base8_features import (  # noqa: E402
 )
 from scripts.v2_0_diagnostic.entry_features import (  # noqa: E402
     _features_at_bar,
-    _wilder_atr,
     _wilder_rsi,
 )
-
 
 TRADES_ALL = REPO_ROOT / "results" / "arc_kh24_v2" / "step1" / "trades_all.csv"
 OHLCV_DIR = REPO_ROOT / "data" / "4hr"

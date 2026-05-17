@@ -1,0 +1,7 @@
+variant: d1_trend
+feature: d1_ema_50_slope_at_entry
+threshold: 0.002
+widened_from_0.001_to_0.002: True
+d1_flat_share: 0.0702696983234969
+n_finite: 255174
+n_missing: 0

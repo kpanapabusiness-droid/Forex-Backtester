@@ -1,0 +1,4 @@
+variant,best_bin,best_bin_worst_auc,n_bins_total,n_bins_trained,gate_pass,b1_b4_baseline_worst_auc
+variant_a_vol_percentile,vol_q4,0.4786102129478427,5,5,False,0.4733
+variant_b_d1_trend,d1_flat,0.48820457603027234,3,3,False,0.4733
+variant_c_year_quarter,2020-Q2,0.5527892767403605,23,23,True,0.4733

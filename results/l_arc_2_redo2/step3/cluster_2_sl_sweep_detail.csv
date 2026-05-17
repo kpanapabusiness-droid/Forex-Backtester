@@ -1,0 +1,7 @@
+X,n,mono_pp_centroid,frac_reach_1R,frac_wrong_way_pp,fwd_mfe_p50_R,fwd_mfe_p50_atr,shape_tag,bimodal_sep_admits,dip_stat,dip_p,mode_loc_1,mode_loc_2,mode_mass_1,mode_mass_2,mode_separation,composite,floors_failed,overall_pass
+0.5,4001,0.01577581795,0.09347663084,0.7223194201,-0.8830453132,-0.4415226566,no_magnitude,0,,,,,,,,-1.563066971,mono_pre_peak;frac_reach_1R;frac_wrong_way_pp;fwd_mfe_p50;shape_tag,0
+1,4001,0.02128277454,0.04048987753,0.4091477131,-0.3538379882,-0.3538379882,no_magnitude,0,,,,,,,,-1.297375061,mono_pre_peak;frac_reach_1R;frac_wrong_way_pp;fwd_mfe_p50;shape_tag,0
+1.5,4001,0.02153271206,0.01349662584,0.2099475131,-0.1658508245,-0.2487762368,no_magnitude,0,,,,,,,,-1.124918175,mono_pre_peak;frac_reach_1R;fwd_mfe_p50;shape_tag,0
+2,4001,0.02153271206,0.006498375406,0.103724069,-0.1017151597,-0.2034303194,no_magnitude,0,,,,,,,,-1.025692982,mono_pre_peak;frac_reach_1R;fwd_mfe_p50;shape_tag,0
+3,4001,0.1779695028,0.1562109473,0.03349162709,0.03072616275,0.09217848824,no_magnitude,0,,,,,,,,-0.649311177,mono_pre_peak;frac_reach_1R;fwd_mfe_p50;shape_tag,0
+4,4001,0.2637406278,0.2296925769,0.01449637591,0.1025251085,0.410100434,heavy_right_tail,0,0.00521189274,0.732728115,0.1821152679,,0.2185287012,,,-0.4710631712,mono_pre_peak;frac_reach_1R;fwd_mfe_p50,0

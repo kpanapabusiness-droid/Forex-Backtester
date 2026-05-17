@@ -1,0 +1,117 @@
+# Arc 2 redo2 — Step 3 capturability characterisation config (v2.1.1)
+#
+# Protocol: L_ARC_PROTOCOL.md v2.1.1 §§2, 7, 11
+# Input:   Step 1 (trades_all + trades_paths, v2.1.1 fork) + Step 2 (clusters_K4, centroids_K4)
+# Outputs: results/l_arc_2_redo2/step3/...
+
+phase: arc_2_redo2_step3
+description: >-
+  Per-cluster SL sweep + §2 capturability gate + bimodal_separated admission
+  + §11 routing on the K=4 Step 2 clusters. v2.1.1 mechanics: pre-peak metrics
+  (Def C), capturability composite selection, candidate SLs {0.5..4.0}×ATR.
+
+input:
+  step1_dir: results/l_arc_2_redo2/step1
+  step2_dir: results/l_arc_2_redo2/step2
+  trades_csv: trades_all.csv
+  paths_csv: trades_paths.csv
+  clusters_csv: clusters_K4.csv
+  centroids_csv: centroids_K4.csv
+  archetypes_csv: archetype_assignments.csv
+
+output:
+  results_dir: results/l_arc_2_redo2/step3
+  per_trade_sl_csv: per_trade_sl_results.csv
+  cluster_sl_sweep_csv: cluster_sl_sweep.csv
+  archetype_summaries_csv: archetype_summaries.csv
+  per_cluster_dist_prefix: cluster_              # cluster_{cid}_distribution.csv
+  per_cluster_sl_detail_prefix: cluster_         # cluster_{cid}_sl_sweep_detail.csv
+  capturability_pass_list_csv: capturability_pass_list.csv
+  cluster_routing_csv: cluster_routing.csv
+  shape_tag_diagnostics_csv: shape_tag_diagnostics.csv
+  pct_peak_and_collapse_def_txt: pct_peak_and_collapse_definition.txt
+  summary_md: STEP3_SUMMARY.md
+  determinism_check: true
+
+# ----------------------------------------------------------------------
+# SL sweep candidates (v2.1.1 §7)
+# ----------------------------------------------------------------------
+sl_sweep:
+  candidates_atr: [0.5, 1.0, 1.5, 2.0, 3.0, 4.0]
+  baseline_sl_atr: 2.0           # CSV's close_r/mfe/mae are R-normalised at this baseline
+
+# ----------------------------------------------------------------------
+# §2 hard floors (v2.1.1)
+# ----------------------------------------------------------------------
+capturability:
+  mono_pre_peak_min: 0.55
+  fwd_mfe_p50_min_r: 1.5         # in candidate-SL R units
+  frac_reach_1r_min: 0.70
+  frac_wrong_way_pre_peak_max: 0.30  # Def C: low_r ≤ -X/2 at or before peak_mfe_bar
+  shape_tag_admit: [tight_unimodal, heavy_right_tail, bimodal_separated]
+  size_fraction_min: 0.10
+  # §11 local_peaks centroid ceilings per archetype (centroid value from Step 2 unaffected by SL).
+  local_peaks_ceiling_by_archetype:
+    Monotone ascent: 4
+    Stepwise climber: 30
+    Random walk: null            # lower-bound only
+    Early-peak hold: null
+    Peak-and-collapse: null
+    V-shape recovery: null
+    unclassified: null           # no ceiling enforced
+
+# ----------------------------------------------------------------------
+# Composite selection (v2.1.1 §7)
+# ----------------------------------------------------------------------
+composite:
+  tiebreaker_tolerance: 0.02     # within this, prefer larger peak_mfe in ATR units
+
+# ----------------------------------------------------------------------
+# Shape-tag detection (v2.1.1 §7)
+# Operational thresholds for tight_unimodal / heavy_right_tail inherited verbatim
+# from prior arc_2_redo step3 (configs/arc_2_redo/step3.yaml) for comparability.
+# bimodal_separated is the v2.1.1 strict test (diptest + min-mode-mass + separation).
+# ----------------------------------------------------------------------
+shape_tag:
+  # Tight-unimodal / heavy-right-tail (prior arc_2_redo defs):
+  histogram_bins: 50
+  histogram_range_quantile: 0.99
+  no_magnitude_p75_max: 0.5
+  tight_unimodal_iqr_over_range_max: 0.5
+  heavy_right_tail_skew_min: 1.5
+  heavy_right_tail_p95_over_p50_min: 3.0
+  scattered_max_bin_mass_max: 0.05
+  # bimodal_separated (v2.1.1 strict — three-part conjunctive):
+  bimodal_dip_p_max: 0.05
+  bimodal_min_mode_mass: 0.20
+  bimodal_mode_separation_min_r: 1.0   # in candidate-SL R units
+
+# ----------------------------------------------------------------------
+# Mass-in-band edges (for distribution reporting; in candidate-SL R units)
+# ----------------------------------------------------------------------
+mass_bands:
+  edges_r: [0.0, 0.5, 1.0, 2.0, 5.0]   # >5R = open-ended last band
+
+# ----------------------------------------------------------------------
+# pct_peak_and_collapse — inherited from prior arc_2_redo step3
+# Definition (per scripts/arc_2_redo/step3_capturability.py:1140-1144):
+#   peaked   = (fwd_mfe_h240 >= peak_floor_r)                       # peak_floor_r = 1.0R
+#   collapsed = peaked AND (close_r_at_bar_240 <= collapse_ratio*fwd_mfe_h240)  # ratio = 0.30
+#   pct_peak_and_collapse = mean(collapsed) per cluster
+# Note: full-window definition; uses fwd_mfe_h240 (max close_r over full 0..240
+# observation window using REAL-MARKET data — the fork's is_held=0 R-fields are
+# now real-market, matching v2.1.1 §5/§7 schema requirement). Same conceptual
+# definition as prior; computed on real-market continuation now rather than
+# frozen post-exit values.
+# ----------------------------------------------------------------------
+peak_and_collapse:
+  peak_floor_r: 1.0              # in BASELINE-R units (close_r in CSV)
+  collapse_ratio: 0.30           # close_r_at_240 <= ratio × fwd_mfe_h240
+
+# ----------------------------------------------------------------------
+# §11 disambiguation (Early-peak hold vs Peak-and-collapse for cid 2)
+# ----------------------------------------------------------------------
+disambiguation:
+  early_peak_hold_max: 0.30      # pct_pc < this → Early-peak hold
+  peak_and_collapse_min: 0.50    # pct_pc >= this → Peak-and-collapse
+                                  # [0.30, 0.50) → empirical-defer (flag, do NOT auto-resolve)

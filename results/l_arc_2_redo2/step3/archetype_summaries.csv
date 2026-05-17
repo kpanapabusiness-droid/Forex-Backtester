@@ -1,0 +1,5 @@
+cluster_id,archetype_label_step2,archetype_label_final,selected_SL,n,size_fraction,mono_pre_peak_centroid,local_peaks_centroid,frac_reach_1R,frac_reach_2R,frac_wrong_way_pp,fwd_mfe_p50_R,fwd_mfe_p50_atr,mass_gt_5R,final_r_mean,final_r_t_stat,shape_tag,bimodal_sep_admits,composite,pct_peak_and_collapse_full_window,capturability_pass
+0,unclassified,unclassified,,,0.348230305,0.5482173913,4.72836031,,,,,,,,,,,,0.4173302108,FAIL
+1,Stepwise climber,Stepwise climber,3,2285,0.1863480672,0.5649044457,20.06836109,0.9776805252,0.858643326,0,3.809383109,11.42814933,0.2962800875,2.1019101,35.06346505,tight_unimodal,0,0.5925849709,0.3277899344,PASS
+2,Early-peak hold OR Peak-and-collapse,Early-peak hold,,,0.3262926113,0.01470748642,0.5341164709,,,,,,,,,,,,0.2959260185,FAIL
+3,unclassified,unclassified,2,1706,0.1391290165,0.5910357309,7.458624709,0.7286049238,0.4413833529,0,1.722030195,3.444060391,0.1277842907,-0.06225987757,-1.023578022,heavy_right_tail,0,0.3696406547,0.4718640094,PASS

@@ -1,0 +1,24 @@
+pct_peak_and_collapse — Arc 2 redo2 Step 3 (v2.1.1) definition
+================================================================
+
+Source: inherited verbatim from prior arc_2_redo step3 config.
+Reference: scripts/arc_2_redo/step3_capturability.py:1140-1144.
+
+Per-trade boolean:
+  fwd_mfe_h240 = max(close_r) over full path (baseline R units)
+  close_r_at_240 = close_r at bar_offset = 240 (baseline R units)
+  peaked     = (fwd_mfe_h240 >= 1.00 R)
+  collapsed  = peaked AND (close_r_at_240 <= 0.30 * fwd_mfe_h240)
+
+Cluster aggregate: mean(collapsed) across trades.
+
+v2.1.1 note: the fork's is_held=0 forward bars now carry REAL-MARKET
+R-fields (not frozen at final_r as in the prior arc_2_redo). The
+conceptual definition is unchanged; the values are now genuine
+post-exit price observation over the full 240-bar window rather
+than the frozen-at-final-R substitute.
+
+§11 disambiguation thresholds (cfg disambiguation block):
+  pct_pc <  0.3 → Early-peak hold
+  pct_pc >= 0.5 → Peak-and-collapse
+  in between → empirical-defer (flag for chat, do NOT auto-resolve)

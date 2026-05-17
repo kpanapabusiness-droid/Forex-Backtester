@@ -1,0 +1,5 @@
+cluster_id,archetype_label_final,base_archetype_match,bimodal_sep_admits,routing
+0,unclassified,0,0,DIES (no SL passed §2)
+1,Stepwise climber,1,0,base archetype (Stepwise climber) only
+2,Early-peak hold,1,0,DIES (no SL passed §2)
+3,unclassified,0,0,PASS §2 but no §11 base; defer to chat

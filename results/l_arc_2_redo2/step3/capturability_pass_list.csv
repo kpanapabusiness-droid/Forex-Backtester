@@ -1,0 +1,5 @@
+cluster_id,archetype_label_final,selected_SL_X_atr,composite,verdict
+0,unclassified,,,FAIL
+1,Stepwise climber,3,0.5925849709,PASS
+2,Early-peak hold,,,FAIL
+3,unclassified,2,0.3696406547,PASS

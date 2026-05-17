@@ -17,6 +17,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT))
 
 from scripts.replays_v2_1_1.kh24_v2_c4_step5.step5 import (  # noqa: E402
+    AssembledData,  # noqa: E402
     ClusterResults,
     FoldResult,
     FoldSpec,
@@ -24,8 +25,6 @@ from scripts.replays_v2_1_1.kh24_v2_c4_step5.step5 import (  # noqa: E402
     compute_fold_roi_annualised,
     evaluate_cluster,
 )
-from scripts.replays_v2_1_1.kh24_v2_c4_step5.step5 import AssembledData  # noqa: E402
-
 
 # ---------------------------------------------------------------------------------------
 # 1. Fold boundary assignment
@@ -125,7 +124,8 @@ def test_per_fold_classifier_only_sees_is_data(monkeypatch):
     )]
     cohort = {"id": 1, "label": "c1"}
     policy = {"chosen_t": 1, "admit_threshold": 0.5}
-    results = evaluate_cluster(
+    # We assert via the SpyRF side-effect, so we don't bind the return value.
+    evaluate_cluster(
         cohort, data, pd.DataFrame(), folds,
         {"n_estimators": 10, "max_depth": 3, "min_samples_leaf": 5, "random_state": 42},
         {"pct_per_trade": 0.005, "days_per_year": 365.25},

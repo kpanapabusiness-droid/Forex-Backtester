@@ -15,6 +15,8 @@ import pytest
 REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT))
 
+pytest.importorskip("diptest")  # optional dep — skip if absent in CI clean env
+
 from scripts.replays_v2_1_1.kh24_v2_c4.step3 import (  # noqa: E402
     classify_shape_tag,
     evaluate_sl_for_cluster,

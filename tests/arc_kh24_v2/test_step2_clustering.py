@@ -4,16 +4,19 @@ from __future__ import annotations
 
 import numpy as np
 import pandas as pd
+import pytest
 
-from scripts.arc_kh24_v2.step2._archetype import match_archetype
-from scripts.arc_kh24_v2.step2._cluster import (
+pytest.importorskip("sklearn")  # optional dep — skip if absent in CI clean env
+
+from scripts.arc_kh24_v2.step2._archetype import match_archetype  # noqa: E402
+from scripts.arc_kh24_v2.step2._cluster import (  # noqa: E402
     GATE_MIN_CLUSTER_SIZE,
     GATE_MIN_SILHOUETTE,
     evaluate_gate,
     run_kmeans_sweep,
     select_k,
 )
-from scripts.arc_kh24_v2.step2._features import FEATURE_COLUMNS
+from scripts.arc_kh24_v2.step2._features import FEATURE_COLUMNS  # noqa: E402
 
 
 def _synthetic_features(seed: int = 42) -> pd.DataFrame:

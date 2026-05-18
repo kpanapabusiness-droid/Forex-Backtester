@@ -1,0 +1,9 @@
+regime,mean_auc,n_clears_gate_0.65,n_folds_valid,clears_gate_5_of_7,above_strong_candidate_0.70_in_folds,feature_count
+A_baseline_c1_PE,0.5238,0,6,0,0,23
+B_delayed_t1_c1,0.6194,2,6,0,0,15
+B_delayed_t3_c1,0.6404,4,6,0,1,15
+B_delayed_t5_c1,0.6323,1,6,0,0,15
+B_delayed_t8_c1,0.6409,1,6,0,0,15
+C_multiTF_c1_PE+D1+1H,0.5481,0,6,0,0,30
+D_target_reach1R_atSL3,0.4846,0,6,0,0,23
+D_target_mfe2R_atSL3,0.5102,0,6,0,0,23

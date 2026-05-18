@@ -1,6 +1,6 @@
 # SESSION ZERO — Forex Ignition Rebuild
 > 5-minute primer. Read this first, then read `L_ARC_PROTOCOL.md` (v2.1.2 base) + `L_ARC_PROTOCOL_v2_2_AMENDMENT.md` (v2.2) + `L_ARC_PROTOCOL_v2_3_AMENDMENT.md` (v2.3 active for Arc 8+).
-> Last updated: 2026-05-18 — L_ARC_PROTOCOL v2.3 amendment landed (Step 5 cross-fold stability removed; Step 6 WFO renumbered as Step 5; Open-22/23/24 closed in protocol with engine PR pending for Open-24). v2.2 amendment landed earlier same day. Arcs 4-7 all closed. Arc queue empty pending analyst signal selection for Arc 8+. KH-24 live deployment unchanged.
+> Last updated: 2026-05-19 — Arc 8 (PR-HHHL long) CLOSED 2026-05-18 HALT_DEPLOYMENT — Steps 1-4 PASS, Step 5 WFO FAIL §10 (admit-only PASS, full-pool FAIL); c1 V-shape recovery FG-weak logged for Open-05; 3rd consecutive Open-22/23/24 admit-only-vs-deployment failure (Arcs 4 RERUN, 5, 8); v2.4 §1.5 entry-separability gate proposed (see `PROTOCOL_IMPROVEMENT_BACKLOG.md`). L_ARC_PROTOCOL v2.3 amendment landed 2026-05-18 (Step 5 cross-fold stability removed; Step 6 WFO renumbered as Step 5; Open-22/23/24 closed in protocol with engine PR pending for Open-24). v2.2 amendment landed earlier same day. KH-24 live deployment unchanged.
 
 ---
 
@@ -20,15 +20,55 @@
 
 **v2.2 amendment landed earlier same day (2026-05-18).** Mechanises remaining chat-judgement carve-outs in steps 1-5, closes Step 4 max-F1 fallback gap surfaced by Arc 7, asserts live-execution equivalence for steps 1 and 6 (now Step 1 + Step 5 under v2.3 §7). Methodology unchanged. CC can now run arcs unattended through Steps 1-4 without analyst sign-off mid-arc. Companion files (`prompts/cc_arc_orchestrator_template.md`, `results/ARC_QUEUE.md`) landed same day; orchestrator template updated to v1.1 for v2.3.
 
-**Arc queue currently empty.** Arcs 4-7 all closed in the 2026-05-17/2026-05-18 batch. Analyst populates `results/ARC_QUEUE.md` Unrun section with Arc 8+ signal specs (registry exhausted after Arc 5; Arc 6+ use standalone `signal_spec_<name>_v<version>.md` docs per v2.2 §15b).
+**Arc 8 closed HALT_DEPLOYMENT 2026-05-18.** Queue empty pending Arc 9+ signal selection. Arcs 4-7 closed in the 2026-05-17/2026-05-18 batch; Arc 8 closed 2026-05-18. Analyst populates `results/ARC_QUEUE.md` Unrun section with Arc 9+ signal specs (registry exhausted after Arc 5; Arc 6+ use standalone `signal_spec_<name>_v<version>.md` docs per v2.2 §15b).
 
 **LIVE SYSTEM: KH-24 unchanged on VPS.** None of the seven v2.2 §0 items were invoked on the KH-24 anchor under v2.0 or v2.1.x — anchor preservation verified. v2.3 §0 changes are anchor-preserving by construction (anchor passes Step 5 WFO by deployment; Open-24 default 2.0 matches anchor's Step 3 selected SL).
 
 **Next chat tasks:**
-1. Analyst signal selection for Arc 8+ (populate `results/ARC_QUEUE.md` Unrun)
-2. Engine PR for Open-24 honour (per-archetype D1 `pre_t_sl_atr_multiplier`; default 2.0 preserves anchor) — can land independently of protocol-doc PR
-3. Engineering pass to apply v2.2 + v2.3 amendment text into `L_ARC_PROTOCOL.md` itself (PR-required; option to bundle both amendments into a single consolidation PR)
-4. Analyst decision on whether Arc 5 archetypes should be pre-populated in `SHELVED_ARCS.md` Active table (analyst signal call)
+1. Analyst signal selection for Arc 9+ (populate `results/ARC_QUEUE.md` Unrun); Arc 8 closed HALT_DEPLOYMENT 2026-05-18
+2. **Push engine PR `feat/open-24-pre-t-sl-per-archetype` to origin/main** — merged locally during Arc 8 Step 5 (commit `716ce84`); 69/69 D1 pipeline tests pass. Not yet on remote.
+3. **Draft v2.4 protocol amendment — §1.5 entry-separability gate** — pre-Step-1 multiclass RF check; halt if winning-cluster precision@recall=0.60 < 0.30 on entry features. Evidence base: Arcs 4 RERUN, 5, 8 (3rd consecutive admit-only-vs-deployment failure). See `PROTOCOL_IMPROVEMENT_BACKLOG.md` for full proposal + acceptance criteria.
+4. **Open-05 portfolio composition log** — add Arc 8 c1 V-shape recovery FG-weak archetype with admit-only economics (Pipeline E Sharpe 1.44 / DD 1.00% / ROI 18.66%; Pipeline D1 Sharpe 1.14 / DD 0.54% / ROI 25.73%) and key features (`ret_5bar_atr`, `pos_in_20bar_range`, `pullback_depth_atr`, `range_to_atr_14`, `hl_range_atr`).
+5. **Resolve stale `phase/l_arc_8` branch** — pre-Arc-3 commits from `phase/v2_2_housekeeping`; rename to `phase/l_arc_8_pre_arc8_archive` or delete; fast-forward to Arc 8 worktree `claude/magical-zhukovsky-bd69d9`.
+6. Engineering pass to apply v2.2 + v2.3 amendment text into `L_ARC_PROTOCOL.md` itself (PR-required; option to bundle both amendments into a single consolidation PR)
+7. Analyst decision on whether Arc 5 archetypes should be pre-populated in `SHELVED_ARCS.md` Active table (analyst signal call)
+
+### Arc 8 closure (2026-05-18) — 3rd Open-22/23/24 confirmation
+
+Arc 8 (PR-HHHL long, `signal_pullback_resume_hhhl_long_v0.1`) closed HALT_DEPLOYMENT. Steps 1–4 PASS, Step 5 WFO FAIL §10 ship gates. One archetype survived Step 4 (c1 V-shape recovery FG-weak, +2.59R admit-only) but the c1 classifier admits 70–89% of full Step 1 pool, drowning the edge in non-c1 trades averaging ≈ −0.3R.
+
+Three post-Step-5 diagnostics confirmed the failure is structural:
+
+1. **Entry-feature overlap** — c1 vs rest 1-vs-rest AUC 0.547, precision@recall=0.60 = 0.149 (zero lift over base rate 0.133). c1 vs c2 pairwise overlap coefficient 0.83 — they share entry-bar geometry.
+2. **Path 1 (post-entry confirmation, t ∈ {3, 5, 8, 12})** — c1 separability improves monotonically with t (AUC 0.547 → 0.755 from entry → t=12); c1 precision@recall=0.60 plateaus at 0.274, below the 0.40 viable threshold. Slippage is not the constraint (only 17% c1 MFE consumed by t=12).
+3. **Path 2 (mechanical signal-tightening)** — c1 and c2 retention drop in lockstep across all 6 single-rule sweeps and pairwise combinations. Best filter (`pullback_depth_atr ≥ 1.0`) keeps c1_ret 0.83 / c2_ret 0.80 — diagonal pattern. No configuration satisfies c1_ret ≥ 0.80 ∧ c2_ret ≤ 0.30 ∧ pool ≥ 500.
+
+The core finding: c1 (V-shape recovery winner) and c2 (Early-peak hold loser) cannot be told apart at the entry bar. The difference is whether MFE develops mid-trade (c1) or stalls early (c2) — a forward-path property, not an observable at entry.
+
+**Cross-arc pattern (3rd confirmation):**
+
+| Arc | Admit-only | Full-pool | Failure mode |
+|---|:---:|:---:|---|
+| 4 RERUN | PASS | FAIL | Reject pool 32% × −0.232R + early-exit 11% × −0.685R |
+| 5 | PASS | FAIL | Rejected pool 78% × −0.46R |
+| **8** | PASS | FAIL | Admit 70–89% × non-c1 mean ≈ −0.3R |
+
+Three arcs failing the same way is framework-level, not arc-level. The current protocol optimises admit-only economics and only checks full-pool deployment at Step 5 — by then features, thresholds, SL, exit policy are all locked on the wrong objective. **v2.4 amendment proposed** (see `PROTOCOL_IMPROVEMENT_BACKLOG.md` for the §1.5 entry-separability gate spec — pre-Step-1 multiclass RF check, halt if winning-cluster precision@recall=0.60 < 0.30 on entry features).
+
+**Items logged for downstream work:**
+
+- **Open-05 portfolio composition** — c1 archetype with admit-only economics (Pipeline E Sharpe 1.44 / DD 1.00% / ROI 18.66%; Pipeline D1 Sharpe 1.14 / DD 0.54% / ROI 25.73%). Tradeable in isolation but not routable from PR-HHHL alone; possible combination candidate with confirming archetypes from other signals.
+- **Signal-design observation** — `pullback_depth_atr ≥ 1.0` improves aggregate mean_r +68% on Step 1 pool. Not a system on its own; useful as cross-arc filter input for trend-continuation signals.
+- **Speculative follow-up** — Path 1 AUC trend suggests t=20–30 might reach viable; not tested in this arc. Open question, not committed work.
+
+**Repo state at closure:**
+
+- Branch: `claude/magical-zhukovsky-bd69d9` (worktree); stale local `phase/l_arc_8` to be renamed/archived
+- Engine PR `feat/open-24-pre-t-sl-per-archetype` merged locally to main (commit `716ce84`), NOT pushed to origin
+- All Step 1–5 outputs locked under `results/l_arc_8/step*`
+- All diagnostics locked under `results/l_arc_8/diagnostics/`
+- Closure doc: `results/l_arc_8/ARC_8_CLOSURE.md`
+- Live arc doc: `results/l_arc_8/ARC_8_LIVE.md` (status CLOSED)
 
 ### Arcs 4-7 closure batch summary
 

@@ -14,10 +14,10 @@
 | Partial in v2.1 | 1 | P1.8 |
 | Closed in v2.2 | 4 | §8 max-F1 fallback (v2.2 §3); mid-arc analyst sign-off carve-outs spanning §9/§12/§16a (v2.2 §1/§2/§5/§6); FIFO arc selection state file (v2.2 §4 new §15b); live-execution equivalence (v2.2 §7 new §1a, asserted not closed). Note: v2.2 §1 sign-flip mechanisation obsoleted by v2.3 §9 removal — the gate it mechanised no longer exists. |
 | Closed in v2.3 | 3 | Open-22 (full-pool gate at §9, structural removal in v2.3 §1); Open-23 (Pipeline D1 cost-language, documentation correction in v2.3 §4); Open-24 (Pipeline D1 pre-t SL per archetype, protocol spec in v2.3 §5 — engine PR pending) |
-| Still open | 4 | P1.7 (refresh execution — pending KH-24 v2.0 re-run only under v2.1.1), P1.10, P1.12, P2.14 |
+| Still open | 5 | P1.7 (refresh execution — pending KH-24 v2.0 re-run only under v2.1.1), P1.10, P1.12, P2.14, **Open-25 (v2.4 §1.5 entry-separability gate — Arc 8 closure 2026-05-18; evidence Arcs 4 RERUN / 5 / 8; HIGH PRIORITY)** |
 | Partial in v2.2 | 1 | Open-21 (Step 4 deployability gate) — proposal (a) strict-mode max-F1 fallback closed by v2.2 §3; alternates (b) recall floor 0.30 + (c) AUC floor 0.70 remain on calibration backlog |
 
-Last updated: 2026-05-18 alongside L_ARC_PROTOCOL v2.3 amendment (Step 5 cross-fold stability removed; Step 6 WFO renumbered as Step 5; Open-22/23/24 closed in protocol with engine PR pending for Open-24). v2.2 amendment landed earlier same day.
+Last updated: 2026-05-19 alongside Arc 8 closure housekeeping (Arc 8 PR-HHHL long CLOSED 2026-05-18 HALT_DEPLOYMENT; v2.4 §1.5 entry-separability gate proposed as Open-25). L_ARC_PROTOCOL v2.3 amendment landed 2026-05-18 (Step 5 cross-fold stability removed; Step 6 WFO renumbered as Step 5; Open-22/23/24 closed in protocol with engine PR pending for Open-24). v2.2 amendment landed earlier same day.
 
 ---
 
@@ -693,6 +693,80 @@ Items 1-3 (NEW) are candidates for the v2.3 / v2.1.3 calibration cycle. Items 5 
 
 ---
 
+## Open-25 — v2.4 §1.5 entry-separability gate (proposed; Arc 8 closure)
+
+**Status:** Proposed
+**Priority:** High — third consecutive arc failure of the same structural pattern
+**First proposed:** 2026-05-18 (Arc 8 closure)
+**Evidence base:** Arcs 4 RERUN, 5, 8 — all PASS admit-only, FAIL full-pool ship gates
+**Closure docs:** `docs/arc_results/ARC_4_RERUN_RESULT.md`, `docs/arc_results/ARC_5_RESULT.md`, `results/l_arc_8/ARC_8_CLOSURE.md`
+
+### Problem
+
+The v2.3 protocol stack optimises admit-only economics through Step 4 (extractability) and only evaluates full-pool deployment ROI at Step 5 (WFO). When path-shape clustering identifies a winning archetype but that archetype is not predictable from entry-time observables, the Step 4 classifier admits a large fraction of non-winning trades because they share entry-bar geometry with the winners. Full-pool deployment economics then dilute the archetype's edge to negative aggregate ROI.
+
+Three consecutive arcs have failed this way:
+
+| Arc | Admit-only Sharpe | Full-pool worst DD | Failure mechanism |
+|---|---:|---:|---|
+| 4 RERUN | (PASS) | (FAIL) | Reject pool 32% × −0.232R + early-exit pool 11% × −0.685R |
+| 5 | (PASS) | (FAIL) | Rejected pool 78% × −0.46R |
+| 8 | 1.14–1.44 | 15.6%–19.0% | Admit rate 70–89% × non-c1 mean ≈ −0.3R |
+
+This is structural, not arc-specific. Per-arc patches (better classifiers, different SLs, alternative exit policies) cannot fix it — the discriminating information genuinely isn't available at entry. Confirmed empirically by Arc 8's post-Step-5 entry-feature-overlap diagnostic (commit `7d9109e`): all 18 entry features have mean overlap coefficient > 0.78 between c1 and non-c1; multiclass RF on cluster IDs at entry achieves c1 1-vs-rest AUC 0.547 (≈ coin-flip) and precision@recall=0.60 = 0.149 (zero lift over base rate 0.133).
+
+### Proposal
+
+Add a §1.5 gate to the protocol, executed **before** Step 1 simulation compute is committed.
+
+**Gate procedure:**
+1. Run a Step-1-spec smoke pool (n ≥ 200 trades; subset of pairs OK)
+2. Apply Step 2 clustering (same K-selection logic as full Step 2)
+3. Train a multiclass RandomForestClassifier on entry-time features (Step 4 Angle E feature set) with target = cluster ID
+4. 5-fold TimeSeriesSplit; report one-vs-rest AUC and precision@recall=0.60 per cluster
+5. Identify the winning-archetype candidate cluster(s) by mean final_r within cluster
+
+**Gate threshold:**
+- Winning-cluster one-vs-rest precision@recall=0.60 ≥ 0.30 (entry features only) → PASS, proceed to full Step 1
+- < 0.30 → HALT, arc closed pre-Step-1 with structural-separability finding logged
+
+**Rationale for 0.30 threshold:**
+- Arc 8 c1 entry-time precision@recall=0.60 = 0.149 → would have caught Arc 8 at §1.5 (saved Steps 1–5 + diagnostics compute)
+- 0.30 is below the §10 deployment-viable threshold of 0.40 — preserves arcs that are marginal at entry but might be rescuable by post-entry confirmation (rare path, but kept open)
+- Threshold should be validated against Arcs 4 and 5 historical data as a regression test before v2.4 release
+
+### Cost-benefit
+
+**Compute savings per blocked arc:** ~10–30 hours of CC time across Step 1 sim + clustering + capturability + extractability + WFO + diagnostics. Three arcs over the last cycle would have been blocked here.
+
+**Implementation cost:** ~1 dispatch's worth of CC time for the §1.5 script + ~30 min smoke-pool compute per arc.
+
+**Risk of over-blocking:** Low. The 0.30 threshold is below deployment-viable, so arcs that could rescue with post-entry confirmation aren't auto-killed. Need regression test against Arcs 4 / 5 to verify they would have failed §1.5 (likely yes based on their failure patterns).
+
+### Open design questions
+
+1. **Smoke-pool sample size and pair selection** — does 200 trades from 5 pairs reliably predict full-pool separability? Probably, but worth a quick sensitivity analysis.
+2. **Cluster K selection at §1.5** — full Step 2 uses silhouette-driven K selection. §1.5 needs to mirror this; risk of K=2 vs K=4 changing the gate's verdict.
+3. **What about post-entry-viable archetypes** that fail §1.5 by entry-feature stats but pass at t=5–10? Current proposal would block these. Could add a second-pass at t=5 multiclass — but doubles compute and we don't yet know if any signal in the framework benefits.
+4. **Regression test corpus** — Arcs 4 RERUN, 5, 8 should fail §1.5. What about Arc 2 (passed full pipeline)? It should pass §1.5 — verify before v2.4 release.
+
+### Acceptance criteria for v2.4 release
+
+- §1.5 script implemented and tested deterministically
+- Regression test against Arcs 4 RERUN, 5, 8 confirms all three fail the gate
+- Regression test against Arc 2 (or other historically successful arc) confirms it passes the gate
+- Protocol doc updated with §1.5 spec, threshold, halt-on-fail logic
+- Existing arc workflow updated to call §1.5 before Step 1
+
+### Related items
+
+- See `results/l_arc_8/ARC_8_CLOSURE.md` for full Arc 8 context
+- See `results/l_arc_8/diagnostics/entry_feature_overlap/DIAGNOSTIC_SUMMARY.md` for the multiclass-at-entry analysis that informs the threshold choice
+- See `results/l_arc_8/diagnostics/COMBINED_DIAGNOSTIC_SUMMARY.md` for the Path 1 / Path 2 follow-up diagnostics confirming the failure is structural (Path 1 marginal at t=12 with AUC 0.755 but precision@recall=0.60 = 0.274; Path 2 dead — no mechanical filter satisfies c1_ret ≥ 0.80 ∧ c2_ret ≤ 0.30 ∧ pool ≥ 500)
+- Builds on Open-22 / Open-23 / Open-24 (closed in v2.3 protocol-level; Open-25 is the cross-arc systemic-pattern response that those individual closures did not address)
+
+---
+
 ## Document control
 
 | Field | Value |
@@ -709,3 +783,4 @@ Items 1-3 (NEW) are candidates for the v2.3 / v2.1.3 calibration cycle. Items 5 
 | Arc 7 cross-arc items added | 2026-05-18 (housekeeping pass) — 7 items (3 NEW, 1 VALIDATED, 1 UNRESOLVED, 2 CLEANUP) from `phase/l_arc_7` closure doc |
 | v2.2 amendment date | 2026-05-18 — `L_ARC_PROTOCOL_v2_2_AMENDMENT.md`. Closed in v2.2: §8 max-F1 fallback (v2.2 §3, closing Arc 6/7 case), mid-arc analyst sign-off carve-outs (v2.2 §1/§2/§5/§6), FIFO arc selection (v2.2 §4 new §15b), live-execution equivalence asserted (v2.2 §7 new §1a). Open-21 partial: proposal (a) strict-mode closed; (b)/(c) on backlog. Open-22/23/24 (Pipeline D1 full-pool gating) NOT closed by v2.2 — addressed in v2.3 (row below). |
 | v2.3 amendment date | 2026-05-18 — `L_ARC_PROTOCOL_v2_3_AMENDMENT.md`. Closed in v2.3: Open-22 (v2.3 §1 structural removal of §9); Open-23 (v2.3 §4 §3/§8 cost-language correction); Open-24 (v2.3 §5 per-archetype pre-t SL spec; engine PR pending for `pre_t_sl_atr_multiplier`). Step 5 cross-fold stability removed; Step 6 WFO renumbered as Step 5; orchestrator halt point shifted end of Step 5 → end of Step 4; v2.2 §1 sign-flip mechanisation OBSOLETED (gate no longer exists); §16a position-5 semantic shifted to WFO; §1a Step 1 + Step 5 (was Step 6). New informal register at `SHELVED_ARCS.md`. Anchor preservation verified (KH-24 K=4 archetype 3 passes Step 5 WFO by deployment; Step 3 selected SL = 2.0×ATR matches v2.2 uniform pre-t SL — Open-24 no-op for anchor). Companion file: `prompts/cc_arc_orchestrator_template.md` updated to v1.1. |
+| Arc 8 cross-arc items added | 2026-05-19 (housekeeping pass) — Open-25 (v2.4 §1.5 entry-separability gate, HIGH PRIORITY) from Arc 8 closure 2026-05-18. Arc 8 (PR-HHHL long) HALT_DEPLOYMENT — Steps 1-4 PASS, Step 5 WFO FAIL §10 ship gates; 3rd consecutive Open-22/23/24 admit-only-vs-deployment failure (Arcs 4 RERUN, 5, 8). Open-25 is the cross-arc systemic-pattern response that Open-22/23/24's individual v2.3 closures did not address. Closure doc: `results/l_arc_8/ARC_8_CLOSURE.md`. |

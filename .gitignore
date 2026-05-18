@@ -101,6 +101,10 @@ results/l_arc_2_redo/*
 !results/l_arc_2_redo2/**
 results/l_arc_2_redo2/**/trades_paths.csv
 results/l_arc_2_redo2/**/_run_log.txt
+# Arc 7 (liquidity sweep + reclaim, long, 4H) — Step 1+ outputs
+# (L_ARC_PROTOCOL v2.1.2 §13: arc results data is direct-to-main).
+!results/l_arc_7/
+!results/l_arc_7/**
 # v2.1.1 Open-18 empirical replays (per-cohort: arc_3_stepwise, kh24_v2_c4,
 # arc_2_redo_c2). Track all small CSVs + REPLAY_RESULT.md; exclude the large
 # regenerable forward-extended paths CSV (~40-50MB per cohort; rebuildable

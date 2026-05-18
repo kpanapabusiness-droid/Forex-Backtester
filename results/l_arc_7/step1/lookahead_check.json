@@ -1,0 +1,56 @@
+{
+  "all_pass": true,
+  "n_checked": 5,
+  "results": [
+    {
+      "fired_at_sig_under_truncation": true,
+      "ok": true,
+      "pair": "USD_CAD",
+      "reclaim_ratio_recomputed": 1.688172043010414,
+      "reclaim_ratio_reported": 1.688172043,
+      "signal_bar_time": "2022-03-18 08:00:00",
+      "swing_low_recomputed": 1.26045,
+      "swing_low_reported": 1.26045
+    },
+    {
+      "fired_at_sig_under_truncation": true,
+      "ok": true,
+      "pair": "EUR_USD",
+      "reclaim_ratio_recomputed": 0.6315789473683472,
+      "reclaim_ratio_reported": 0.6315789474,
+      "signal_bar_time": "2025-02-19 12:00:00",
+      "swing_low_recomputed": 1.04282,
+      "swing_low_reported": 1.04282
+    },
+    {
+      "fired_at_sig_under_truncation": true,
+      "ok": true,
+      "pair": "CAD_CHF",
+      "reclaim_ratio_recomputed": 2.3636363636364277,
+      "reclaim_ratio_reported": 2.363636364,
+      "signal_bar_time": "2022-07-29 12:00:00",
+      "swing_low_recomputed": 0.74254,
+      "swing_low_reported": 0.74254
+    },
+    {
+      "fired_at_sig_under_truncation": true,
+      "ok": true,
+      "pair": "GBP_AUD",
+      "reclaim_ratio_recomputed": 0.7004405286343544,
+      "reclaim_ratio_reported": 0.7004405286,
+      "signal_bar_time": "2025-02-11 00:00:00",
+      "swing_low_recomputed": 1.96879,
+      "swing_low_reported": 1.96879
+    },
+    {
+      "fired_at_sig_under_truncation": true,
+      "ok": true,
+      "pair": "GBP_CAD",
+      "reclaim_ratio_recomputed": 1.570680628272429,
+      "reclaim_ratio_reported": 1.570680628,
+      "signal_bar_time": "2025-02-04 16:00:00",
+      "swing_low_recomputed": 1.78704,
+      "swing_low_reported": 1.78704
+    }
+  ]
+}

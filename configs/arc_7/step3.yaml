@@ -1,0 +1,63 @@
+# Arc 7 — Step 3 capturability characterisation config (L_ARC_PROTOCOL v2.1.2 §§2, 7, 11, 17).
+#
+# Operates on Arc 7 Step 1 + Step 2 outputs. Sweeps candidate SLs, evaluates
+# §2 floors at each, selects the SL maximising the capturability composite
+# per §7. Per-cluster AND per-aggregate evaluation under v2.1 routing.
+
+phase: L_ARC_7_STEP_3_CAPTURABILITY
+
+input:
+  step1_dir: results/l_arc_7/step1
+  trades_csv: trades_all.csv
+  paths_csv: trades_paths.csv
+  step2_dir: results/l_arc_7/step2
+  clusters_csv: clusters_K4.csv
+  features_csv: path_features.csv
+  archetypes_csv: archetype_assignments.csv
+
+output:
+  results_dir: results/l_arc_7/step3
+  summary_md: STEP3_SUMMARY.md
+  determinism_check: true
+
+# Original SL applied at Step 1 (used to scale R-denomination across candidate SLs).
+original_sl_atr_mult: 2.0
+
+# §7 default sweep; arc-specific override would go here.
+sl_sweep:
+  candidates_atr_mult: [0.5, 1.0, 1.5, 2.0, 3.0, 4.0]
+
+# §2 floors (v2.1.2, conjunctive at selected SL).
+floors:
+  mono_pre_peak_min: 0.55
+  fwd_mfe_p50_min_r: 1.5
+  frac_reach_1R_min: 0.70
+  frac_wrong_way_pre_peak_max: 0.30
+  size_fraction_min: 0.10
+  # shape_tag must not equal "scattered" — only scattered fails internal-consistency.
+
+# §7 capturability composite tiebreakers.
+composite:
+  tie_tolerance_absolute: 0.02
+
+# bimodal_separated test (§7).
+bimodal_test:
+  hartigan_dip_p_max: 0.05
+  min_mode_mass: 0.20
+  mode_separation_r_min: 1.0
+  kde_grid_points: 512
+
+# pct_peak_and_collapse operational definition (v2.0 reference impl).
+peak_and_collapse:
+  mfe_threshold_r: 1.0          # trade must have reached >= 1R MFE
+  final_r_ratio_threshold: 0.4  # final_r <= 0.4 * mfe_r → collapse
+
+# Archetype groups (from Step 2 K=4 tentative assignments).
+# Each tentative label evaluates per-cluster and per-aggregate (≥2 members).
+archetype_groups:
+  - tentative_label: "tentative_Early-peak hold OR Peak-and-collapse"
+    cluster_ids: [0, 2]
+    local_peaks_rule: any
+  - tentative_label: "tentative_V-shape recovery"
+    cluster_ids: [1, 3]
+    local_peaks_rule: any

@@ -1,0 +1,10 @@
+# Heavy artefacts excluded from git (> GitHub 100MB / GH suggested 50MB).
+# Reproducible from scripts/lomega/lomega_v2_crosstf.py.
+# All analysis outputs (b3_univariate_expanded, b4_multivariate_expanded,
+# summaries, importance drift, spot-check) ARE committed.
+labels_relaxed.csv
+features_expanded.csv
+labels_relaxed.csv.gz
+features_expanded.csv.gz
+labels_relaxed.parquet
+features_expanded.parquet

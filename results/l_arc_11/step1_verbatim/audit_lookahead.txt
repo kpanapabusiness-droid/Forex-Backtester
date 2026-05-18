@@ -1,0 +1,15 @@
+# Arc 11 — Step 1 right-edge swing audit
+
+L_ARC_PROTOCOL v2.3 §5 + signal spec §'Step 1 right-edge swing audit'.
+Both swing-high (H_ref) and swing-low (trend filter) must be at most
+bar t-4 in any selected signal — k+1..k+3 lookahead used within the
+detection window only.
+
+trades emitted:                       2299
+min h_ref_bar_offset (must be >= 4):  4
+trades with h_ref_bar_offset < 4:     0
+
+trend filter swing-lows: enforced structurally in the signal module
+(see signals/lchar_swing_high_breakout_trend.py RIGHT_EDGE_OFFSET=4).
+
+audit verdict: PASS

@@ -1,0 +1,158 @@
+# wfo_l_arc_11.yaml — Arc 11 Step 1 plumbing config (L_ARC_PROTOCOL v2.3)
+#
+# Signal under test: swing-high breakout in trend, long (signal spec
+# docs/signal_spec_swing_high_breakout_trend_long_v0.1.md / Downloads). 4H
+# signal TF, long-only, 28 FX. Single pass over the full data window — no
+# WFO folds at Step 1.
+#
+# Engine path: scripts/l_arc_11/step1_backtest.py reads this file directly.
+# Protocol stack: v2.1.2 base + v2.2 amendment (FIFO queue, §16a, live-exec)
+# + v2.3 amendment (Step 5 stability removed; halt at end of Step 4).
+#
+# Note on data_dir: this worktree's local data/ only contains a test/ subset.
+# data_dirs.4H is set to an absolute path to the parent repo's data/4hr/
+# (sibling CC chats running arcs 8-10 use the same dataset).
+
+phase: L_ARC_11_STEP_1_PLUMBING
+description: |
+  Arc 11 Step 1 plumbing — full-window trade pool for the swing-high
+  breakout (SHB) long signal. 4H signal TF, long-only, single pass over the
+  data window 2020-10-01..2026-01-31. Deterministic, §15a-compliant
+  trades_paths.csv (is_held column, forward observation bars to entry+240
+  regardless of exit reason). v2.3 Step 1 gates: pool >= 500, byte-identical
+  re-run, right-edge swing audit clean (H_ref + trend-filter swing-lows at
+  most bar t-4), schema-valid.
+
+# ----------------------------------------------------------------------
+# Signal (verbatim from signals/lchar_swing_high_breakout_trend.py)
+# ----------------------------------------------------------------------
+signal:
+  module: signals.lchar_swing_high_breakout_trend
+  trial_id: ARC_11__swing_high_breakout_trend__long__4h__h_240
+  family: trend_continuation_structural_breakout
+  base: swing_high_breakout
+  signal_tf: "4H"
+  trade_direction: long
+  swing_k: 3
+  trend_filter_lookback: 30
+  h_ref_lookback: 20
+  right_edge_offset: 4
+  atr_period: 14
+  atr_smoothing: wilder
+  break_buffer_atr: 0.10
+  close_upper_half_min: 0.5
+  refractory_bars: 20
+
+# ----------------------------------------------------------------------
+# Data window — locked per signal spec
+# ----------------------------------------------------------------------
+data:
+  data_dirs:
+    "4H": "C:/Users/panap/Documents/Forex-Backtester/data/4hr"
+  date_start: "2020-10-01"
+  date_end: "2026-01-31"
+
+# All 28 FX pairs (identical set to configs/wfo_kh24.yaml).
+pairs:
+  - AUD_CAD
+  - AUD_CHF
+  - AUD_JPY
+  - AUD_NZD
+  - AUD_USD
+  - CAD_CHF
+  - CAD_JPY
+  - CHF_JPY
+  - EUR_AUD
+  - EUR_CAD
+  - EUR_CHF
+  - EUR_GBP
+  - EUR_JPY
+  - EUR_NZD
+  - EUR_USD
+  - GBP_AUD
+  - GBP_CAD
+  - GBP_CHF
+  - GBP_JPY
+  - GBP_NZD
+  - GBP_USD
+  - NZD_CAD
+  - NZD_CHF
+  - NZD_JPY
+  - NZD_USD
+  - USD_CAD
+  - USD_CHF
+  - USD_JPY
+
+# ----------------------------------------------------------------------
+# Entry / exit (signal-spec defaults; SL sweep happens at Step 3)
+# ----------------------------------------------------------------------
+entry:
+  bar_offset: 1                  # bar N+1 open
+  execution: open                # spread fill via core/SPREAD_SEMANTICS_LOCK
+
+exit:
+  hard_stop:
+    type: absolute_atr
+    atr_period: 14
+    atr_smoothing: wilder
+    atr_tf: "4H"
+    multiplier: 2.0                # Step 1 sim SL = 2.0 x ATR per spec
+    anchor: entry_price
+  time_exit:
+    bars_after_entry: 240          # 240 4H bars = 40 calendar days
+  trail: null
+  structural_exits: []
+
+# ----------------------------------------------------------------------
+# Exposure / risk
+# ----------------------------------------------------------------------
+exposure:
+  max_concurrent_per_pair: 1
+  currency_cap: null
+  concurrent_trade_cap: null
+
+risk:
+  pct_per_trade: 0.005             # 0.5% per L_ARC_PROTOCOL v2.x L arc
+  starting_balance: 10000.0
+  basis: reset_floor
+
+# ----------------------------------------------------------------------
+# Spread (locked floor + per-bar MT5 native points)
+# ----------------------------------------------------------------------
+spreads:
+  enabled: true
+  source: per_bar                  # MT5 `spread` column from data CSV
+  points_per_pip: 10.0
+  default_pips: 0.0
+
+spread_floor:
+  enabled: true
+  source: configs/spread_floors_5ers.yaml
+  expected_body_sha256: 8da7644b252ae163d963fbd46807572906fa3e5a44fb3e02d771e181b3ecdc05
+
+# ----------------------------------------------------------------------
+# Path output (v2.1.2 §15a)
+# ----------------------------------------------------------------------
+trade_paths:
+  enabled: true
+  forward_window_bars: 240         # emit bar_offset 0..240; is_held=0 after exit
+
+# ----------------------------------------------------------------------
+# Output
+# ----------------------------------------------------------------------
+output:
+  results_dir: results/l_arc_11/step1_verbatim
+  trades_csv: trades_all.csv
+  paths_csv: trades_paths.csv
+  prefilter_csv: prefilter_events.csv
+  manifest_json: manifest.json
+  float_format: "%.10g"
+
+# ----------------------------------------------------------------------
+# Gate (Step 1 — v2.3 §5)
+# ----------------------------------------------------------------------
+gate:
+  pool_size_min: 500
+  determinism: byte_identical_two_run
+  schema_check: v2_1_2_strict      # §15a required columns + is_held
+  right_edge_audit_max_bar_offset: 4   # H_ref / sl at most t-4

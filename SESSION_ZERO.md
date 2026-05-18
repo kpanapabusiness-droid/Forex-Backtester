@@ -1,6 +1,6 @@
 # SESSION ZERO — Forex Ignition Rebuild
 > 5-minute primer. Read this first, then read `L_ARC_PROTOCOL.md` (v2.1.2, self-contained) for the active research methodology.
-> Last updated: 2026-05-17 — Arc 4 closed CLEAN-NULL on transaction-cost truth. Spread audit revealed `spread_floors_5ers.yaml` under-models real spreads 3-48x per pair; file flagged for replacement. Open-18 replays blocked; Arc 5 blocked. KH-24 live deployment unchanged.
+> Last updated: 2026-05-17 — **Arc 5 closed SHELVED at Step 6 FAIL** under PR 2 + new spreads + full-pool WFO accounting. Registry exhausted at h≥120 (Entries 2 KILL, 3 CLEAN-NULL, 5 SHELVED; Entries 1, 4 h=1 skipped per chat). Three P0 backlog items (P-§9-FRAMING, P-D1-VIABILITY, P-D1-REJECT-BIAS) take priority over further arc dispatches — Pipeline D1 framework requires correction. `configs/spread_floors_5ers.yaml` replaced 2026-05-17 with per-pair p50 values from HistData 2024-2025 audit. KH-24 live deployment unchanged.
 
 ---
 
@@ -13,8 +13,15 @@
 
 ## Current State
 
-**ACTIVE WORK: SPREAD FLOOR REPLACEMENT (HIGHEST PRIORITY) — blocks all future arc work. See `docs/SPREAD_FLOOR_AUDIT_FINDING.md`. LIVE SYSTEM: KH-24 unchanged on VPS.**
-**Next:** spread floor file replacement under SPREAD_SEMANTICS_LOCK governance; then Open-18 replays; then Arc 5.
+**ACTIVE WORK: ARC 5 CLOSED SHELVED. PIPELINE D1 FRAMEWORK NEEDS REVISION. LIVE SYSTEM: KH-24 unchanged on VPS.**
+
+Arc 5 (`mtf_alignment.2_down_mixed.kijun` at h=120, registry Entry 5) closed SHELVED 2026-05-17 at Step 6 FAIL under PR 2 mechanics + new per-pair p50 spread floors + full-pool WFO accounting. All three candidate strategies (cluster 1 alone, cluster 3 alone, tiered ensemble) failed §10 at every risk level. Headline finding: Pipeline D1's rejected pool (~78% of trades) has mean R **−0.46** per trade vs +0.025 unconditional bar-2 R — classifier rejection is itself a prediction of adverse drift. Admit-set edge confirmed (admit mean R +0.14-0.21 per fold, 7/7 positive) but the pipeline cannot extract it.
+
+The §9 admit-only framing missed this failure mode — Step 6's full-pool reckoning caught it. Same bug applies to every Pipeline D1 arc with competent classifier (adverse-selected rejection is structural). Three P0 backlog items now hold priority over further arc dispatches: P-§9-FRAMING (full-pool §9 measurement), P-D1-VIABILITY (5% bar-0/1 SL-hit-rate gate at Step 4), P-D1-REJECT-BIAS (document rejected-pool selection bias in §3).
+
+Registry exhausted at h≥120: Entry 2 (KILL, Arc 2 redo), Entry 3 (CLEAN-NULL, Arc 3), Entry 5 (SHELVED, Arc 5). Entries 1 + 4 are h=1 and outside the active scope per chat decision.
+
+**Next:** address P0 backlog items (P-§9-FRAMING and P-D1-VIABILITY are highest-leverage mechanical protocol clarifications); then KH-24 anchor refresh under new spreads, Pipeline E retrofit on Arc 5 signal, or out-of-registry signal exploration.
 
 Three arcs closed on 2026-05-16 (Arc 2 redo KILL, KH-24 v2.0 self-test HALT, Arc 3 CLEAN-NULL) all hit the same §2 monotonicity / shape_tag wall with structurally credible cohorts. v2.1 (2026-05-17) introduced pre-peak measurement + SL sweep + capturability composite + bimodal_separated admit. v2.1.1 (2026-05-17) refined SL selection to capturability composite maximiser.
 
@@ -122,6 +129,24 @@ The L arc is methodologically distinct from KH-24 development. It does not assum
 ## Phase History
 
 *Note: when applying SESSION_ZERO updates, preserve any pre-existing Phase History entries below this line. New entries are appended at the top. The full list is what remains in the file.*
+
+### 2026-05-17 — Arc 5 closed SHELVED at Step 6 FAIL
+
+`docs/arc_results/ARC_5_RESULT.md` written. Arc 5 (signal: `mtf_alignment.2_down_mixed.kijun` at h=120 chat override; byte-identical Step 1 pool to Arc 2 redo2; registry Entry 5) opened and closed 2026-05-17. Steps 1-5 PASS under old spreads + PR 1 (admit-set §9 clean, c1 worst-fold +36.5%, c3 worst-fold +8.8%, v2.1.1 anchor-rescue mechanism validated empirically for the first time on a non-self-test arc).
+
+Two corrections changed the verdict: (a) re-run under new per-pair p50 spread floors broke c1's §9 DD ratio (2.34 > 2.0) under PR 1 mechanics; (b) Step 6 under PR 2 (§11 row 2 MFE-lock + trail) with full-pool WFO accounting confirmed PR 2 fully rescues c1 DD ratio (2.34 → 1.17) but reveals rejected pool (~78% of trades) mean R = **−0.46** (vs +0.025 unconditional bar-2 R). Classifier rejection is itself a prediction of adverse drift — structural for any competent classifier.
+
+All three candidate strategies (cluster 1 alone, cluster 3 alone, tiered ensemble with c1 ≥ 0.20 → A / c1 < 0.20 ∧ c3 ≥ 0.15 → B / else C) FAIL §10 at every risk level (best is 0.10%, all with negative worst-fold ROI). Signal has admit-set edge; pipeline cannot extract it.
+
+**Methodology lesson (P0 backlog):** Step 5 §9 admit-only framing missed the failure. Under corrected full-pool §9 framing, Arc 5 would have failed at fold 4 — Step 6 would have been redundant. Bug applies to every competent-classifier Pipeline D1 arc, not just Arc 5.
+
+**8 new backlog items** logged in `PROTOCOL_IMPROVEMENT_BACKLOG.md` (3 P0, 1 P1, 4 P2). P0 items: P-§9-FRAMING, P-D1-VIABILITY (5% bar-0/1 SL-hit-rate gate), P-D1-REJECT-BIAS (document rejected-pool selection bias in §3 with Arc 5 calibration data).
+
+**Positive evidence preserved:** v2.1.1 anchor-rescue validated; PR 2 row-2 exit policy validated; D1 path-so-far features at t=1 carry real predictive signal (AUC 0.636-0.640, anchor-parity to KH-24); Open-10 leakage test for c3 confirmed clean (Jaccard 0.93).
+
+**Registry exhausted at h≥120:** Entry 2 (KILL, Arc 2 redo), Entry 3 (CLEAN-NULL, Arc 3), Entry 5 (SHELVED, Arc 5). Entries 1 + 4 (h=1) skipped per chat decision. Further signal exploration moves out-of-registry pending P0 backlog work.
+
+Signal NOT permanently eliminated — reopenable on Pipeline E re-evaluation with richer feature set, or on alternative pipeline shape that doesn't bear the rejected-pool cost. KH-24 live deployment unaffected (KH-24 doesn't use Pipeline D1); spread re-calibration applies, KH-24 anchor-refresh task with new floors queued for next refresh cycle.
 
 ### 2026-05-17 — Arc 4 closed CLEAN-NULL on transaction-cost truth
 

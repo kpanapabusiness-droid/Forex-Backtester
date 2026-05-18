@@ -2,17 +2,18 @@
 
 > Tight current-state snapshot. For full context, read `SESSION_ZERO.md` first.
 > For methodology, read `L_ARC_PROTOCOL.md` (v2.1.2, self-contained).
-> Last updated: 2026-05-17 — Arc 4 closed CLEAN-NULL on transaction-cost truth; `configs/spread_floors_5ers.yaml` flagged for per-pair empirical replacement (HistData audit shows uniform 0.1 pip floor under-models real spreads 3-48x per pair). KH-24 live deployment unchanged; WFO claim downgraded to pass-viable retroactively. Backtester extension closed (PR #131 + #135 + #138 merged). Arc 6 closed DIES at Step 4 deployability.
+> Last updated: 2026-05-17 — **Arc 5 closed SHELVED at Step 6 FAIL** under PR 2 + new spreads + full-pool WFO accounting (Pipeline D1 rejected-pool adverse selection at −0.46R/trade kills full-strategy expectancy; admit-set edge confirmed but pipeline cannot extract it). **Registry exhausted at h≥120** — Entries 1 + 4 (h=1) skipped per chat decision. Next priority: address P0 backlog items (P-§9-FRAMING, P-D1-VIABILITY, P-D1-REJECT-BIAS) before further arc dispatches. `configs/spread_floors_5ers.yaml` replaced 2026-05-17 with per-pair p50 values from HistData 2024-2025 audit. KH-24 live deployment unchanged.
 
 ---
 
 ## Active protocol
 
 - Active protocol: L_ARC_PROTOCOL v2.1.2 (amendment landed 2026-05-17)
-- Calibration anchor: KH-24 K=4 archetype 3 — v2.0 values; deployed-pop reference held (no refresh from Open-18 replays per user decision; v2.1.2 anchor preservation verified — centroid still routes to Stepwise under 5-50 local_peaks range)
+- Calibration anchor: KH-24 K=4 archetype 3 — v2.0 values; deployed-pop reference held (no refresh from Open-18 replays per user decision; v2.1.2 anchor preservation verified — centroid still routes to Stepwise under 5-50 local_peaks range). KH-24 anchor-refresh task with new spread floors logged for next anchor-refresh cycle.
 - Next engine PR: none currently planned. Backtester extension complete: PR #131 (D1 plumbing), PR #135 (D1 PR 2 Stepwise climber policy + per-fold classifiers), PR #138 (engine generalisation: signal adapter + TF pluggability + time-exit + spread floor). §11 rows 1, 3, 4, 5, 6, 7 exit policies deferred until an arc surfaces a Step-4 consumer needing them.
-- **BLOCKER:** `configs/spread_floors_5ers.yaml` flagged for per-pair empirical floor replacement before Arc 5+ proceeds. See `docs/SPREAD_FLOOR_AUDIT_FINDING.md`.
-- Next chat task: spread floor file replacement under SPREAD_SEMANTICS_LOCK governance; then Open-18 replays; then Arc 5. Cross-arc calibration session for Open-21 (Step 4 deployability gate) + Open-17 expansion (Tiebreak 1 noise floor) queued.
+- **L-arc state:** Pipeline D1 framework needs revision before further D1-based arcs run. Three P0 items (P-§9-FRAMING, P-D1-VIABILITY, P-D1-REJECT-BIAS) hold priority over new arc dispatches — Arc 5 demonstrated that §9 admit-only framing missed the full-strategy failure that Step 6 caught. Same bug applies to any competent-classifier Pipeline D1 arc.
+- **Registry state:** Entry 5 SHELVED (Arc 5 closure 2026-05-17). Entry 4 (h=1) and Entry 1 (h=1) skipped per chat decision. Entries 2 (KILL), 3 (CLEAN-NULL), 5 (SHELVED) all closed. **Registry exhausted at h≥120; remaining h=1 entries are outside the active scope.** Signal exploration beyond registry queued behind P0 backlog work.
+- Next chat task: address P-§9-FRAMING and P-D1-VIABILITY (highest leverage; mechanical protocol clarifications). After P0 items land, options are KH-24 anchor refresh under new spreads, Pipeline E retrofit on Arc 5 signal, or out-of-registry signal exploration.
 
 ---
 
@@ -124,6 +125,7 @@ Annualisation: `fold_raw_ROI × (365 / fold_OOS_days)`. Folds < 90 OOS days excl
 
 | Phase | Verdict | Finding |
 | --- | --- | --- |
+| Arc 5 (l_arc_5) | SHELVED at Step 6 FAIL (2026-05-17) | mtf_alignment.2_down_mixed.kijun (registry Entry 5, h=120 chat override). Steps 1-5 PASS under old spreads + PR 1; §9 admit-only metrics looked clean. Two corrections changed the verdict: (a) new per-pair p50 spread floors broke c1's §9 DD ratio (2.34 > 2.0) under PR 1; (b) Step 6 under PR 2 with full-pool WFO accounting confirmed PR 2 rescues c1 DD ratio (1.17) but reveals rejected pool (~78% of trades) mean R = −0.46 (vs +0.025 unconditional) from classifier adverse selection. All three strategies (c1, c3, ensemble) FAIL §10 at every risk level. Admit-set edge is real; pipeline cannot extract it. 8 new backlog items (3 P0). Signal not eliminated — reopenable on Pipeline E or alternative pipeline. See `docs/arc_results/ARC_5_RESULT.md`. |
 | Arc 4 (l_arc_4) | CLEAN-NULL at Step 5 retroactive (2026-05-17) | bar_range_top_decile__neg__h_001 — first L arc to reach Step 5 PASS; cluster 1 D1 AUC 0.667 pass-deployable at 0.20% risk under modeled spreads; killed by HistData spread audit showing floor file under-models real spreads 3-48x per pair; F6 ann ROI flips from +10.08% to ~−5.6% under real spreads; §9.A retroactive fail; 8 cross-arc calibration items |
 | Engine generalisation | DELIVERED (PR #138, 2026-05-17) | Engine config-driven for signal, timeframe, time-exit, spread floor. KH-24 byte-identical (sha256 verified). Arc 4 engine prerequisites complete. |
 | Pipeline D1 PR 2 — Stepwise climber policy | DELIVERED (PR #135, 2026-05-17) | §11 row 2 exit policy + per-fold classifier dispatch land. ApplyPolicy made concrete. Trail-suppression resolved against Step 5 simulator. Other §11 rows deferred. |
@@ -165,6 +167,31 @@ No outstanding bugs or issues against KH-24. No pending fixes against the backte
 | Item | Status | Notes |
 | --- | --- | --- |
 | §2 calibration pattern | ADDRESSED in v2.1.2 | The §2 monotonicity / shape_tag wall seen at 2026-05-16 closures (KH-24 c4, Arc 2 redo c2, Arc 3 Stepwise) was empirically resolved by Open-18 replays under v2.1.1 (pre-peak Def C + capturability composite) and architecturally addressed by v2.1.2 (`≠ scattered` floor + Stepwise ceiling extension). 3/3 arcs hit §2-related issues now; Arc 4 escalates to a different failure mode (cost-model invalidity surfaces real edge as undeployable). Spread floor finding is bigger than §2 calibration — affects every prior closure's magnitude (not direction). |
+
+---
+
+## Arc 5 closure (2026-05-17)
+
+Arc 5 (`mtf_alignment.2_down_mixed.kijun` at h=120, registry Entry 5) closed SHELVED at Step 6 FAIL.
+
+**Disposition:** SHELVED — Step 6 FAIL under PR 2 + new spreads + full-pool WFO accounting. No ship candidate across cluster 1, cluster 3, or tiered ensemble strategies.
+
+The arc proceeded cleanly through Steps 1-5 under PR 1 + old spreads (apparent strong results: c1 worst-fold +36.5%, c3 worst-fold +8.8%, §9 clean). Two corrections changed the picture:
+
+1. **New per-pair p50 spread floors:** Step 5 re-run under new spreads breaks c1's §9 DD ratio (2.34 > 2.0); c3 survives §9 at thin margin (1.91).
+2. **PR 2 + Step 6 full-pool reckoning:** PR 2's row-2 exit policy (MFE-lock + trail) fully rescues c1's §9 DD ratio (2.34 → 1.17) — confirming the row 2 mechanism works as designed. But full-strategy equity curve dominated by rejected pool: ~78% of trades close at market on bar 2 with mean R **−0.46** (vs +0.025 unconditional bar-2 R). Classifier rejection is itself an adverse-drift prediction. Admit-set R stays positive (+0.14 c1 / +0.21 c3 per fold) but cannot overcome rejection drag.
+
+All three strategies FAIL §10 at every risk level (smallest at 0.10%, all with negative worst-fold ROI). Signal has admit-set edge; Pipeline D1 cannot extract it.
+
+**Methodology finding (most important cross-arc lesson):** §9 admit-only framing missed the failure mode. Step 5 §9 metrics were computed on admit-set R only — rejected pool's R contribution implicitly assumed ≈0. Step 6's full-pool reckoning revealed −0.46R/trade rejection cost. Under corrected full-pool §9 framing, Arc 5 would have failed at Step 5 fold 4. Same bug applies to every competent-classifier Pipeline D1 arc. Logged P0: P-§9-FRAMING.
+
+**Other P0 items raised:** P-D1-VIABILITY (signals with > 5% bar-0/1 SL-hit rate flagged as D1-unsuitable at Step 4 — Arc 5 had 7.9%); P-D1-REJECT-BIAS (document rejected-pool adverse selection in §3 with Arc 5 calibration data).
+
+**Positive evidence preserved:** v2.1.1 anchor-rescue (pre-peak + SL sweep + composite) empirically validated; PR 2 row-2 exit policy validated as deployment-relevant capability; D1 path-so-far features carry real predictive signal; Open-10 leakage test for c3 confirmed clean (Jaccard 0.93).
+
+Signal not eliminated — reopenable on Pipeline E re-evaluation with richer features, or alternative pipeline shape that doesn't bear the rejected-pool cost. Full closure: `docs/arc_results/ARC_5_RESULT.md`.
+
+KH-24 live deployment unaffected (KH-24 doesn't use Pipeline D1). Spread re-calibration applies — KH-24 anchor-refresh task queued for next refresh cycle.
 
 ---
 
@@ -218,6 +245,8 @@ Note: Arc 2 signal (mtf_alignment.2_down_mixed.kijun, h=120) shelved 2026-05-16 
 
 Note: `bar_range_top_decile__neg__h_001` (Arc 4 signal) is SHELVED pending spread floor calibration. Not permanently eliminated — re-evaluatable under corrected spread file. See `docs/arc_results/ARC_4_RESULT.md`.
 
+Note: `mtf_alignment.2_down_mixed.kijun` (Arc 5 signal at h=120; byte-identical entry trigger to Arc 2 registry Entry 2) is SHELVED 2026-05-17 at Step 6 FAIL under PR 2 + new spreads + full-pool WFO accounting. Admit-set edge confirmed (admit-set mean R +0.14 c1 / +0.21 c3 across all 7 folds) but Pipeline D1 rejected-pool adverse selection (~78% of pool at −0.46R/trade) kills full-strategy expectancy. Not permanently eliminated — reopenable on Pipeline E re-evaluation with richer feature set, or on alternative pipeline shape that doesn't bear the rejected-pool cost. See `docs/arc_results/ARC_5_RESULT.md`.
+
 ---
 
 ## Results Locations
@@ -234,6 +263,7 @@ Note: `bar_range_top_decile__neg__h_001` (Arc 4 signal) is SHELVED pending sprea
 | KH-24 v2.0 self-test (closed HALT) | `results/arc_kh24_v2/` + `results/arc_kh24_v2/ARC_KH24_V2_RESULT.md` |
 | Arc 3 (closed CLEAN-NULL) | `results/l_arc_3/` + `docs/arc_results/ARC_3_RESULT.md` |
 | Arc 4 (closed CLEAN-NULL on transaction-cost truth) | `results/l_arc_4/` + `docs/arc_results/ARC_4_RESULT.md` + `docs/SPREAD_FLOOR_AUDIT_FINDING.md` |
+| Arc 5 (closed SHELVED at Step 6 FAIL) | `results/l_arc_5/` (Steps 1-5 baseline, step5_5 audit, step1_spread_v2 + step5_spread_v2 re-runs, step6_pr2 final) + `docs/arc_results/ARC_5_RESULT.md` |
 | Arc 6 (closed DIES at Step 4) | `results/arc_6/` (on `discovery/lomega_regime_conditional`) + `docs/arc_results/ARC_6_RESULT.md` |
 
 ---

@@ -1,5 +1,38 @@
 # Changelog
 
+## ARC 5 CLOSED | 2026-05-17 | SHELVED AT STEP 6 FAIL
+
+Arc 5 (`mtf_alignment.2_down_mixed.kijun` at h=120 chat override, registry Entry 5) closed SHELVED at Step 6 FAIL under PR 2 mechanics + new per-pair p50 spread floors + full-pool WFO accounting. Signal has admit-set edge (admit mean R +0.14 c1 / +0.21 c3 across all 7 folds, 7/7 positive); Pipeline D1 cannot extract it because the rejected pool (~78% of trades) closes at market on bar 2 with mean R **−0.46** (vs +0.025 unconditional). Classifier rejection at t=1 is itself a prediction of further adverse drift — the natural state of a competent classifier. All three candidate strategies (cluster 1 alone, cluster 3 alone, tiered ensemble) FAIL §10 at every risk level (best is 0.10% with negative worst-fold ROI). Methodology finding: Step 5 §9 admit-only framing missed the failure (admit-set looks clean in isolation); Step 6's full-pool reckoning caught it. The §9 framing bug applies to every competent-classifier Pipeline D1 arc, not just Arc 5. Cross-arc validation also landed: HistData active-session p50 spread floors validated, applied, and inherited by future arcs.
+
+### Added
+- `docs/arc_results/ARC_5_RESULT.md` — Arc 5 full closure doc
+
+### Changed
+- `STATUS.md` — Arc 5 closure logged; registry exhausted at h≥120 (remaining h=1 entries skipped); next priority = P0 backlog items before further arc dispatches; KH-24 anchor-refresh task with new spread floors queued; Recent Closures + Results Locations + Permanently Eliminated note updated
+- `SESSION_ZERO.md` — Current State updated to reflect Arc 5 closure + registry exhaustion + P0 backlog priority; new Phase History entry
+- `LCHAR_TOPN_REGISTRY.md` — Entry 5 marked SHELVED (Arc 5 — 2026-05-17); Entry 2 annotated with byte-identical entry trigger shared with Entry 5; registry summary updated to note h≥120 exhaustion
+- `PROTOCOL_IMPROVEMENT_BACKLOG.md` — 8 new items (3 P0, 1 P1, 4 P2 — see below)
+
+### New backlog items (priority-ordered)
+- **P-§9-FRAMING (P0)** — §9 sign-consistency + DD-ratio must be measured on full-pool strategy R, not admit-only. Same bug applies to every Pipeline D1 arc with competent classifier (adverse-selected rejection by construction).
+- **P-D1-VIABILITY (P0)** — Step 4 gate addition: signals with > 5% bar-0/1 SL-hit rate flagged for D1 unsuitability. Arc 5 had 7.9% (some from spread-blowout fills on news days).
+- **P-D1-REJECT-BIAS (P0)** — Document rejected-pool selection bias in §3 Pipeline D1 description with Arc 5 calibration data (−0.46R rejected vs +0.025R unconditional).
+- **P-F9-RESELECT (P1)** — F9 threshold selection should use ship-decision metric (worst-fold compounded ROI subject to DD ceiling), not admit-only precision/recall proxies.
+- **P-CLUSTERING-LEAKAGE (P1)** — Per-fold clustering should be default (full-pool retained as comparison); Open-10 reconciliation note (c3 confirmed clean Jaccard 0.93; c1 audit invalid due to match formula saturation).
+- **P-§11-MATCH-FORMULA (P2)** — §11 row 2 `min(1, (30-peaks)/25)` saturates at peaks ≤ 5, conflating Monotone-ascent (row 1) and Stepwise (row 2) regions. Add peaks lower-bound or preferred-range spec.
+- **P-SPREAD-FLOOR-DOC (P2)** — Spread floor file docstring outdated ("applies only when raw spread is zero" — true for old uniform 0.1-pip floor; new p50 calibration applies to 58.6% of execution-bar entries).
+- **P-OPEN-18-RECONCILE (P2)** — STATUS / Open-18 priority queue had multiple inaccuracies surfaced during Arc 5; reconcile STATUS with actual repo state.
+
+### Closed
+- Arc 5 (l_arc_5) — SHELVED at Step 6 FAIL on PR 2 + new spreads + full-pool WFO accounting. Signal NOT permanently eliminated; reopen conditions in result doc §"Conditions for reopening".
+- Registry h≥120 entries — exhausted (Entries 2 KILL, 3 CLEAN-NULL, 5 SHELVED). Entries 1, 4 (h=1) skipped per chat decision.
+
+### Live system
+- KH-24 unaffected (does not use Pipeline D1). Spread re-calibration applies — KH-24 anchor-refresh task with new spread floors queued for next refresh cycle.
+
+### Cross-arc validation landed
+- HistData active-session per-pair p50 spread floors validated against 2024-01 → 2025-12 tick data, applied to `configs/spread_floors_5ers.yaml`, documented under `SPREAD_SEMANTICS_LOCK` governance. Inherited by all future arcs.
+
 ## ARC 4 CLOSED | 2026-05-17 | CLEAN-NULL ON TRANSACTION-COST TRUTH
 
 ### Added

@@ -493,6 +493,78 @@ Three items raised by Arc 6 closure (failed-breakout reversal long, out-of-regis
 
 ---
 
+## Arc 5 cross-arc items (2026-05-17)
+
+Eight items raised by Arc 5 closure (`mtf_alignment.2_down_mixed.kijun` at h=120, registry Entry 5; SHELVED at Step 6 FAIL under PR 2 + new spreads + full-pool WFO accounting). The three P0 items below take priority over further arc dispatches — they're protocol-level corrections, not arc-specific.
+
+### P-§9-FRAMING — P0
+
+- **Source:** Arc 5 Step 5 vs Step 6 reconciliation 2026-05-17.
+- **Problem.** §9 sign-consistency and DD-ratio gates must be measured on full-pool strategy R (admits with their pipeline outcomes + rejects with their pipeline outcomes), not admit-only R. Protocol §9 wording is currently ambiguous and reads as admit-only in practice. Under admit-only Arc 5 passed §9 cleanly (7/7 positive admit mean R, both clusters). Under full-pool framing Arc 5 would have failed at fold 4 (admit mean barely positive, full-pool mean negative). Same bug applies to every Pipeline D1 arc with high rejection rate and adverse-selected rejection (i.e., every competent classifier — by construction, competent rejection correlates with bad outcomes).
+- **Empirical evidence (Arc 5).** Cluster 1 admit-set §9 PASS (sign 7/7, DD ratio 1.17 under PR 2). Full-pool §9 evaluated retroactively would have flagged fold 4 (mean R −0.094, ROI −34.49% compounded). Step 6 caught the negative expectancy that admit-only §9 missed.
+- **Action.** Explicit protocol clarification in §9 — sign-consistency, size variance (already full-pool), and DD-ratio all measured on the full-pool equity curve including rejected-trade pipeline outcomes. Update Step 5 result-doc template to require full-pool metrics. Re-evaluate any in-flight or recently-closed D1 arcs under corrected framing.
+- **Anchor preservation.** KH-24 K=4 archetype 3 passes Pipeline D1 at t=3 with exclusion 15.4% (vs Arc 5's ~80% rejection rate). Lower rejection rate means smaller rejected-pool contribution to full-pool R; anchor preservation depends on actual KH-24 rejected-pool mean R, not currently measured. Verification required before commit.
+- **Status.** Highest-priority cross-arc item. Likely v2.1.3 amendment.
+
+### P-D1-VIABILITY — P0
+
+- **Source:** Arc 5 Step 6 economic decomposition 2026-05-17.
+- **Problem.** Pipeline D1 enters every signal and pays the SL cost on any trade that hits SL before bar t=1 (where the classifier evaluates). Signals with high bar-0/1 SL-hit rate at the deployed baseline SL accumulate unavoidable per-trade losses that the classifier cannot mitigate. Arc 5 had 7.9% bar-0/1 hits (976/12,348), some from spread-blowout fills on news days (Jan 2015 SNB unpeg drove individual losses to −6.87R from 440-pip spreads). Mean early-exit R ≈ −1.1 in 2×ATR R-frame.
+- **Proposal.** Add a Step 4 gate that measures bar-0/1 SL-hit rate on the OOS pool under the candidate's deployed-baseline SL. If > 5%, flag D1 as unsuitable (cluster routes to E only, or arc dies if E also fails). Threshold (5%) is a starting calibration point informed by Arc 5; cross-arc calibration may refine.
+- **Anchor preservation.** KH-24 K=4 archetype 3 bar-0/1 SL-hit rate not currently measured; needs measurement before commit. Verification required.
+- **Status.** P0. Pairs with P-§9-FRAMING (both are D1-framework corrections). Likely v2.1.3 amendment.
+
+### P-D1-REJECT-BIAS — P0
+
+- **Source:** Arc 5 Step 6 tier decomposition 2026-05-17.
+- **Problem.** Pipeline D1 description (§3) does not document that classifier rejection at bar t is itself a prediction signal correlated with continued adverse drift. A competent classifier rejects when path-so-far at t=1 looks adverse (negative MAE, low MFE, monotone-down close_r); that adversity correlates strongly with bar-2 drift. Rejected-pool close-at-market cost is therefore materially worse than unconditional bar-2 R baseline.
+- **Empirical calibration (Arc 5).** Rejected pool (~78% of trades): mean R **−0.46** (denominated in c3 R-frame). Unconditional bar-2 R baseline (all trades, conditional only on bars_held ≥ 3): mean R **+0.025**. Order-of-magnitude difference. Tier C in Arc 5 ensemble (both classifiers reject): mean R −0.46 (1,789 trades). Selection bias is structural, not an Arc 5 idiosyncrasy.
+- **Action.** Add explicit framing in §3 Pipeline D1 description: "Classifier rejection at bar t is itself a prediction signal; rejected pool's pipeline-outcome R is expected to be materially negative under a competent classifier. Strategy ROI accounting must include rejected-pool pipeline outcomes." Include Arc 5 calibration data (−0.46 vs +0.025) as reference.
+- **Anchor preservation.** Doc-only change. Anchor unaffected.
+- **Status.** P0. Pairs with P-§9-FRAMING. Likely v2.1.3 amendment.
+
+### P-F9-RESELECT — P1
+
+- **Source:** Arc 5 Step 4b threshold selection 2026-05-17.
+- **Problem.** F9 threshold selection at Step 4b currently uses admit-set precision/recall proxies (max-precision subject to recall ≥ 0.60). These don't capture full-strategy cost (rejected-pool drag + early-exit losses). A threshold that maximises admit precision may not minimise the full-strategy negative R from rejection drag. Under-spec'd in §8 for D1 specifically (E grid is explicit; D1 grid was extended in Arc 5 within-arc as F9 decision).
+- **Proposal.** Revise §8 threshold-selection rule to operate on full-strategy WFO R (worst-fold compounded ROI subject to DD ceiling), not admit-only precision/recall. Requires Step 4b to know about Step 6 mechanics — explicit dependency to document.
+- **Anchor preservation.** KH-24's D1 threshold at t=3 was selected under v2.0 mechanics; verification under new rule required before commit.
+- **Status.** P1. Lower priority than the three P0s because it's a downstream refinement once full-pool framing lands.
+
+### P-CLUSTERING-LEAKAGE — P1
+
+- **Source:** Arc 5 Step 5.5 audit 2026-05-17, plus Open-10 carryover.
+- **Problem.** Open-10 leakage status: Arc 5 Step 5.5 confirmed c3 leak-free (Jaccard 0.93 — full-pool clustering identity reproduces under per-fold clustering); c1 audit invalid due to §11 row 2 match formula saturation (see P-§11-MATCH-FORMULA below). Per-fold clustering should become default rather than full-pool, with full-pool retained as comparison only.
+- **Proposal.** Revise §6 Step 2 spec to make per-fold clustering canonical for WFO-bound arcs. Full-pool clustering retained as a parallel diagnostic. Step 5.5 audit framework (Jaccard vs full-pool) becomes a standard Step 2 deliverable.
+- **Anchor preservation.** KH-24 K=4 anchor clustering under per-fold methodology requires re-measurement. Verification required.
+- **Status.** P1. Closes Open-10 with empirical methodology rather than just resolving a single instance.
+
+### P-§11-MATCH-FORMULA — P2
+
+- **Source:** Arc 5 Step 5.5 c1 audit invalidation 2026-05-17.
+- **Problem.** §11 row 2 (Stepwise climber) pattern matching formula `min(1, (30 − peaks) / 25)` saturates at peaks ≤ 5, returning the same match score (1.0) for any centroid with peaks 0-5. This conflates row 1 (Monotone-ascent, peaks ≤ 4) and row 2 (Stepwise-climber, peaks 5-30) match regions. Arc 5 Step 5.5 audit-c1 was systematically misrouted to baseline c0 (peaks 4.73, near-Monotone-ascent) instead of baseline c1 (peaks 20.07, true Stepwise) specifically because of this saturation. Jaccard 0.0 across all folds — different cluster, not different version of same cluster.
+- **Proposal.** Add a peaks lower-bound to row 2's match criteria (e.g., peaks ≥ 5 required, not just peaks ≤ 30/50), or specify a preferred-peaks-range that informs match-score weighting. Same review may apply to other §11 rows with one-sided ceiling/floor.
+- **Anchor preservation.** KH-24 K=4 archetype 3 has peaks 14.19 — well within preferred Stepwise range — anchor preservation holds under any reasonable peaks lower-bound.
+- **Status.** P2. Cleanup item; doesn't change protocol behaviour for typical centroids, only resolves the saturation edge case.
+
+### P-SPREAD-FLOOR-DOC — P2
+
+- **Source:** Arc 5 Phase 1 (Step 1 re-run under new spreads) 2026-05-17.
+- **Problem.** `configs/spread_floors_5ers.yaml` docstring claims "applies only when raw spread is zero" — accurate for the old uniform 0.1-pip floor (mechanically equivalent to raw native > 0). False for the new per-pair active-session p50 calibration: the loader (`core/spread_floor.py`, `_spread_pips_at_bar`) applies `max(raw_pips, floor)` — so under the new floors, much larger fractions of execution bars are floored upward. Arc 5 measurement: 58.6% of matched-trade entry-bar spreads strictly raised by the new floor.
+- **Proposal.** Revise spread file docstring to reflect post-calibration semantics: "Loader applies max(raw_pips, floor). Under per-pair active-session p50 calibration, floor activates on a material fraction of execution bars (~50-60% in Arc 5 measurement)."
+- **Anchor preservation.** Doc-only change. KH-24 doesn't load this file (raw MT5 per-bar spread used directly).
+- **Status.** P2. Cleanup item; doesn't change behaviour, only documentation accuracy.
+
+### P-OPEN-18-RECONCILE — P2
+
+- **Source:** Arc 5 multi-step provenance discovery 2026-05-17.
+- **Problem.** STATUS.md / Open-18 priority queue had multiple inaccuracies discovered during Arc 5 work: `l_arc_4` Step 4/5/6 scaffolding existed undocumented; Arc 2 redo2 (v2.1.1 schema fork with `is_held` column + real-market forward R-fields) existed undocumented; Open-18 KH-24 anchor replay scaffolding existed undocumented. Arc 5 had to rediscover these via repo archaeology.
+- **Proposal.** Walk through repo and reconcile STATUS.md (Recent Closures, Active Research, Open Items) with actual state. Add a STATUS section for "in-flight scaffolding" that captures work-in-progress trees not yet promoted to a named arc.
+- **Anchor preservation.** Doc-only.
+- **Status.** P2. Process-improvement item; reduces friction for future arcs.
+
+---
+
 ## Cross-cutting observations
 
 ### Two arcs (KH-24 v2.0, Arc 2 redo, Arc 3) all close FAIL at Step 3 §2 floors
@@ -532,3 +604,4 @@ P0.4 is the exception: Path 2 (SL scaled to horizon) cannot retrofit to KH-24 wi
 | v2.1 amendment date | 2026-05-17 — summary status block above tracks per-item resolution |
 | v2.1.1 amendment date | 2026-05-17 — combined refinements + engine-reality corrections; P0.1 refined to composite selection, P1.7 unblocked from engine PR (re-run only) |
 | Arc 6 cross-arc items added | 2026-05-17 — Open-21 (Step 4 deployability gate, new), Open-17 expansion (Tiebreak 1 noise floor), unnumbered reach_1R noise tolerance note |
+| Arc 5 cross-arc items added | 2026-05-17 — 8 items: P-§9-FRAMING (P0), P-D1-VIABILITY (P0), P-D1-REJECT-BIAS (P0), P-F9-RESELECT (P1), P-CLUSTERING-LEAKAGE (P1), P-§11-MATCH-FORMULA (P2), P-SPREAD-FLOOR-DOC (P2), P-OPEN-18-RECONCILE (P2). Three P0s take priority over further arc dispatches — Pipeline D1 framework requires correction before next D1-based arc runs. |

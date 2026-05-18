@@ -1,5 +1,42 @@
 # Changelog
 
+## L_ARC_PROTOCOL v2.3 AMENDMENT | 2026-05-18 | doc-only
+
+Step 5 cross-fold stability (§9) removed; Step 6 WFO (§10) renumbered as Step 5. Open-22 closed by structural removal; Open-23 closed by D1 cost-language documentation; Open-24 closed in protocol with engine PR pending. SHELVED informal register at SHELVED_ARCS.md.
+
+### Substantive changes
+- §9 deprecated — Step 5 cross-fold stability removed. Admit-only fold gating for Pipeline D1 was structurally misaligned with deployed-system economics; Step 5 WFO (renumbered) measures full-pool by construction. v2.2 §1 sign-flip mechanisation obsoleted.
+- §10 retitled — formerly "Step 6 — WFO"; now "Step 5 — WFO". Pipeline is five-step: 1 plumbing, 2 clustering, 3 capturability, 4 extractability, 5 WFO.
+- §3 / §8 — Pipeline D1 cost-language correction (Open-23): rejected-pool cost empirically −0.15 to −0.46R; pre-t losses −0.45 to −0.69R on ~10-15% of signals.
+- §3 — Pipeline D1 pre-t SL spec (Open-24): pre-t SL = cluster's Step 3 selected SL multiplier (was uniform 2.0×ATR). Engine PR pending; default 2.0 preserves anchor.
+- §16a — failing-step list position 5 semantic now = WFO (not stability). Path A/B logic unchanged.
+- Orchestrator halt point — end of Step 5 → end of Step 4.
+- §1a live-execution equivalence — Step 1 + Step 5 (was Step 6). Wording unchanged otherwise.
+
+### Open items resolved
+- Open-22 (full-pool gate at §9): CLOSED — by structural removal of §9
+- Open-23 (D1 cost-language): CLOSED — documentation correction in §3 / §8
+- Open-24 (pre-t SL per archetype): CLOSED in protocol; engine PR pending
+
+### v2.2 amendment items obsoleted or updated
+- v2.2 §1 (sign-flip mechanisation): OBSOLETED — Step 5 stability gate no longer exists
+- v2.2 §2 (Tier 2 lift cap): UNCHANGED
+- v2.2 §3 (max-F1 fallback removal): UNCHANGED
+- v2.2 §4 (FIFO queue): UNCHANGED
+- v2.2 §5 (§16a HALT/KILL): UPDATED — Step 5 semantic shift to WFO; Path A/B unchanged
+- v2.2 §6 (no mid-arc sign-off): UPDATED — halt at end of Step 4 (not Step 5)
+- v2.2 §7 (§1a live-execution equivalence): UPDATED — Step 1 + Step 5 (was Step 6)
+
+### Anchor preservation
+KH-24 K=4 archetype 3 passes Step 5 WFO by deployment. Step 3 selected SL = 2.0×ATR, identical to v2.2 uniform pre-t SL — Open-24 spec change is a no-op for the anchor. v2.2 §1 sign-flip mechanisation was anchor-preserving (anchor passed all 7 folds positive); its obsoletion does not affect anchor evaluation.
+
+### Files
+- L_ARC_PROTOCOL_v2_3_AMENDMENT.md added to repo
+- L_ARC_PROTOCOL.md unchanged (separate engineering PR pending to apply v2.2 + v2.3 amendments into protocol doc proper)
+- prompts/cc_arc_orchestrator_template.md updated (renumbering + halt point shift + Step 5 section removal)
+- SHELVED_ARCS.md added (empty initial register)
+- STATUS.md, SESSION_ZERO.md, PROTOCOL_IMPROVEMENT_BACKLOG.md updated
+
 ## L_ARC_PROTOCOL v2.2 AMENDMENT | 2026-05-18 | doc-only
 
 L_ARC_PROTOCOL v2.2 amendment landed. Mechanises remaining chat-judgement carve-outs in steps 1-5, closes Step 4 max-F1 fallback gap surfaced by Arc 7, asserts live-execution equivalence for steps 1 and 6. Methodology unchanged. CC can now run arcs 1→5 unattended in parallel without analyst sign-off mid-arc.

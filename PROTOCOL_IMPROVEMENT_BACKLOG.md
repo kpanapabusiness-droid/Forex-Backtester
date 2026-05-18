@@ -12,11 +12,12 @@
 |---|---|---|
 | Resolved in v2.1 / v2.1.1 | 11 | P0.1 (v2.1 + v2.1.1 composite refinement), P0.2, P0.3, P0.4, P0.5, P1.6, P1.9, P1.11 (via PR #131), P2.13, P2.15, P3.16 |
 | Partial in v2.1 | 1 | P1.8 |
-| Closed in v2.2 | 4 | §8 max-F1 fallback (v2.2 §3); mid-arc analyst sign-off carve-outs spanning §9/§12/§16a (v2.2 §1/§2/§5/§6); FIFO arc selection state file (v2.2 §4 new §15b); live-execution equivalence (v2.2 §7 new §1a, asserted not closed) |
-| Still open | 7 | P1.7 (refresh execution — pending KH-24 v2.0 re-run only under v2.1.1), P1.10, P1.12, P2.14; Open-22 (HIGH), Open-23 (MEDIUM), Open-24 (MEDIUM) — Pipeline D1 full-pool gating (Arc 4 RERUN + Arc 5) |
+| Closed in v2.2 | 4 | §8 max-F1 fallback (v2.2 §3); mid-arc analyst sign-off carve-outs spanning §9/§12/§16a (v2.2 §1/§2/§5/§6); FIFO arc selection state file (v2.2 §4 new §15b); live-execution equivalence (v2.2 §7 new §1a, asserted not closed). Note: v2.2 §1 sign-flip mechanisation obsoleted by v2.3 §9 removal — the gate it mechanised no longer exists. |
+| Closed in v2.3 | 3 | Open-22 (full-pool gate at §9, structural removal in v2.3 §1); Open-23 (Pipeline D1 cost-language, documentation correction in v2.3 §4); Open-24 (Pipeline D1 pre-t SL per archetype, protocol spec in v2.3 §5 — engine PR pending) |
+| Still open | 4 | P1.7 (refresh execution — pending KH-24 v2.0 re-run only under v2.1.1), P1.10, P1.12, P2.14 |
 | Partial in v2.2 | 1 | Open-21 (Step 4 deployability gate) — proposal (a) strict-mode max-F1 fallback closed by v2.2 §3; alternates (b) recall floor 0.30 + (c) AUC floor 0.70 remain on calibration backlog |
 
-Last updated: 2026-05-18 alongside L_ARC_PROTOCOL v2.2 amendment (governance + carve-out mechanisation + Step 4 max-F1 closure + live-execution equivalence assertion).
+Last updated: 2026-05-18 alongside L_ARC_PROTOCOL v2.3 amendment (Step 5 cross-fold stability removed; Step 6 WFO renumbered as Step 5; Open-22/23/24 closed in protocol with engine PR pending for Open-24). v2.2 amendment landed earlier same day.
 
 ---
 
@@ -499,23 +500,21 @@ Three items raised by Arc 6 closure (failed-breakout reversal long, out-of-regis
 
 Three items raised by the Arc 4 re-run closure (FAIL Step 6 under p50 floors) plus the Arc 5 closure (SHELVED Step 6 FAIL). Both arcs PASSED §9 admit-only stability and FAILED §10 full-pool deployment. Cross-arc structural finding: Pipeline D1 carries mandatory reject-pool + early-exit-pool cost that §9's admit-only framing cannot see. Numbering continues the Open-NN sequence (Open-21 was the last assigned).
 
-### Open-22 — Full-pool gate at §9 or earlier (HIGH)
+### Open-22 — Full-pool gate at §9 or earlier (HIGH) — CLOSED in v2.3
 
 - **Description.** §9 currently evaluates admit-only stability. Arc 4 and Arc 5 both PASS §9 and FAIL §10 full-pool deployment. The protocol burns Steps 1-5 of compute and analyst time on arcs whose architectural failure mode is invisible until Step 6.
 
-    Candidate amendments:
+    Candidate amendments (historical, pre-v2.3):
     - Add a full-pool variant to §9 (require both admit-only AND full-pool sign-consistency to advance)
     - Add a Step 4 full-pool preview (admit/reject/early-exit decomposition with expectancy estimate at the classifier-locking gate)
     - Restructure §9 + §10 sequencing so the deployment-blocking metric is the primary stability gate
     - Pre-Step 6 admit/reject/early-exit expectancy summary as standardised Step 4 output
 
-    Decision belongs in cross-arc calibration session. Quantitative inputs available from Arc 4 + Arc 5 step6 artefacts.
-
 - **Surface arc.** Arc 4 rerun (2026-05-18) + Arc 5 closure (recent).
-- **Owner.** Cross-arc calibration session.
-- **Status.** OPEN.
+- **Resolution (v2.3, 2026-05-18).** Closed by structural removal of §9 in v2.3 §1. Step 5 (WFO, was Step 6) measures full-pool by construction. No replacement gate needed. See "Resolved in v2.3 amendment" section below.
+- **Status.** CLOSED in v2.3.
 
-### Open-23 — §8 Pipeline D1 cost-language correction (MEDIUM)
+### Open-23 — §8 Pipeline D1 cost-language correction (MEDIUM) — CLOSED in v2.3
 
 - **Description.** §8 describes Pipeline D1 reject pool as "near-break-even small loss after spread, given the short hold and pre-t SL." Empirical evidence from Arc 4 + Arc 5:
 
@@ -524,28 +523,24 @@ Three items raised by the Arc 4 re-run closure (FAIL Step 6 under p50 floors) pl
     | Arc 4 cluster 1 | −0.232 | 32.2% | −0.685 | 10.6% |
     | Arc 5 (per closure) | ~−0.46 | ~78% (Arc 5 specific) | — | — |
 
-    §8 wording understates reject-pool cost. Empirically the reject pool costs ~−0.15 to −0.46R per trade depending on classifier discrimination strength, and the early-exit pool (pre-t SL hits before t=1) is a separate architectural cost at ~−0.45 to −0.69R on ~10-15% of signals.
-
-    Proposed amendment: update §8 description to specify empirical cost ranges and mandate full-pool reporting at Step 4-6 evaluation.
+    §8 wording understated reject-pool cost. Empirically the reject pool costs ~−0.15 to −0.46R per trade depending on classifier discrimination strength, and the early-exit pool (pre-t SL hits before t=1) is a separate architectural cost at ~−0.45 to −0.69R on ~10-15% of signals.
 
 - **Surface arc.** Arc 4 rerun + Arc 5 closure.
-- **Owner.** Cross-arc calibration session.
-- **Status.** OPEN.
+- **Resolution (v2.3, 2026-05-18).** Closed by documentation correction in v2.3 §4. §3 and §8 Pipeline D1 wording updated with empirical cost ranges; full-pool R = admit + reject + pre-t-loss contributions; evaluated at Step 5 WFO. See "Resolved in v2.3 amendment" section below.
+- **Status.** CLOSED in v2.3.
 
-### Open-24 — Early-exit pool architectural cost (MEDIUM)
+### Open-24 — Pipeline D1 pre-t SL per archetype (MEDIUM) — CLOSED in protocol in v2.3; engine PR pending
 
 - **Description.** Pre-t SL of 2×ATR (§8 Pipeline D1 default) fires on 10-15% of signals before the classifier evaluates at bar t. This is pure architectural cost — not classifier-induced, not exit-policy-induced. The classifier cannot filter these trades and the bail-out doesn't apply. Arc 4 cluster 1 saw 1,005 / 9,474 signals (10.6%) hit pre-t SL at −0.685R mean.
 
-    Candidate structural responses:
+    Candidate structural responses (historical, pre-v2.3):
     - Widen uniform pre-t SL (reduces early-exit rate; increases per-event loss)
     - Shorten t (less time for SL to fire; smaller classifier feature set)
     - Hybrid: per-archetype pre-t SL calibrated to early-exit rate observed at Step 1
 
-    Currently §8 uses uniform 2×ATR as a pre-amendment default matching KH-24 baseline. Per-archetype calibration may be justified by empirical data from Arc 4 + Arc 5.
-
 - **Surface arc.** Arc 4 rerun.
-- **Owner.** Cross-arc calibration session.
-- **Status.** OPEN.
+- **Resolution (v2.3, 2026-05-18).** Closed in protocol via v2.3 §5: pre-t SL = cluster's Step 3 selected SL multiplier (was uniform 2.0×ATR). Engine PR pending to expose per-archetype `pre_t_sl_atr_multiplier` field (default 2.0 for backward compatibility / anchor preservation). Per-archetype YAML schema extension; Step 3 archetype YAML emission writes `pre_t_sl_atr_multiplier = selected_sl_multiplier`. See "Resolved in v2.3 amendment" section below.
+- **Status.** CLOSED in protocol; engine PR pending.
 
 ---
 
@@ -573,6 +568,37 @@ Recommend executing P0.1 first (mechanical, cheap, almost certainly resolves muc
 P0.1, P0.2, P0.3, P0.5 are anchor-safe by construction (anchor values are at least as favourable under new metric definitions, anchor already passes the looser shape_tag taxonomy via D1, anchor is a single cluster not aggregated, anchor monotonicity comfortably clears any plausible loosened floor).
 
 P0.4 is the exception: Path 2 (SL scaled to horizon) cannot retrofit to KH-24 without rebuilding the live system. Anchor preservation requires Path 2 to apply forward only, with KH-24 documented as a per-system exception.
+
+---
+
+## Resolved in v2.3 amendment (2026-05-18)
+
+L_ARC_PROTOCOL v2.3 amendment landed 2026-05-18 (`L_ARC_PROTOCOL_v2_3_AMENDMENT.md`). Seven §0 changes; three items from this backlog close:
+
+### CLOSED in v2.3 §1 — Open-22 full-pool gate at §9 (structural removal)
+
+- **Surface:** Arc 4 RERUN (2026-05-18) + Arc 5 closure. Both arcs PASSED §9 admit-only stability and FAILED §10 full-pool deployment. §9 evaluated admit-set fold metrics; deployed-system economics for Pipeline D1 depend on full-pool (admit + reject + early-exit). The gate measured the wrong population.
+- **Resolution.** v2.3 §1 removes §9 entirely. Pipeline is now 1-2-3-4-5 with Step 5 = WFO (renumbered from Step 6). Step 5 WFO runs the full backtester across all 7 OOS folds with real execution — every signal in the population goes through the engine, including reject-set early closures with their actual costs. Step 5 inherently measures full-pool. No separate Step 5 question that Step 6 doesn't answer more accurately.
+- **Compute trade-off acknowledged.** Step 5 was cheap (uses already-trained classifier + admit set); Step 5 WFO is expensive (full WFO). "Filter bad archetypes before spending Step 6 compute" rationale doesn't justify the misleading-data problem documented in Arc 4 RERUN's deployment-fatal failure mode.
+- **Anchor preservation.** KH-24 K=4 archetype 3 passes Step 5 WFO by deployment (worst-fold ROI +1.92%, worst-fold DD 6.37%, all 7 OOS folds positive). v2.2 Step 5 cross-fold stability (now removed) had been satisfied trivially by the same fold data. No interaction.
+
+### CLOSED in v2.3 §4 — Open-23 Pipeline D1 cost-language correction (documentation)
+
+- **Surface:** Arc 5 closure surfaced the gap; Arc 4 RERUN reinforced.
+- **Resolution.** v2.3 §4 updates §3 and §8 Pipeline D1 wording. §3 Pipeline D1 description now reads: "Predict at bar t which trades to close vs continue. Rejected trades close at bar t with cost ~−0.15 to −0.46R; this is empirical, not a parameter." §8 Pipeline D1 row now references full-pool R = admit-weighted + reject-weighted + pre-t-loss contributions, evaluated at Step 5 WFO. Three-population structure documented (admit / rejected / pre-t losers) with empirical cost bounds from closed-arc evidence.
+- **No threshold change.** Documentation correction only. Arc 5's KILL disposition was correct under v2.2; the gap was that an analyst reading §3 / §8 in v2.2 might infer rejected trades were cost-free.
+- **Anchor preservation.** Anchor uses Pipeline D1 at t=3. Documentation correction does not change anchor evaluation.
+
+### CLOSED in v2.3 §5 — Open-24 Pipeline D1 pre-t SL per archetype (protocol; engine PR pending)
+
+- **Surface:** Arc 4 RERUN — uniform 2.0×ATR pre-t SL fired on 10.6% of signals at −0.685R mean, structurally separate cost from classifier-induced reject pool.
+- **Resolution.** v2.3 §5 specifies pre-t SL = cluster's Step 3 selected SL multiplier (was uniform 2.0×ATR for all D1 archetypes). The SL distance selected at §7 SL sweep (per cluster, by capturability composite) is the SL used pre-t for that cluster's Pipeline D1 deployment.
+- **Engine impact.** Pipeline D1 engine (post-PR2) supports per-archetype config for §11 exit policies. v2.3 spec requires the per-archetype D1 config to additionally express `pre_t_sl_atr_multiplier` (default 2.0 for backward compatibility with v2.2 behaviour and anchor preservation). Engine PR scope: add field to per-archetype D1 YAML schema; default 2.0; read at trade entry; apply to pre-t SL distance calculation; Step 3 archetype YAML emission writes `pre_t_sl_atr_multiplier = selected_sl_multiplier`. Can land independently of v2.3 protocol amendment doc.
+- **Anchor preservation.** KH-24 K=4 archetype 3 Step 3 selected SL = 2.0×ATR (matches v2.0 anchor metrics fwd_mfe_p50 measured at 2.0×ATR frame). Pre-t SL under v2.3 = 2.0×ATR (cluster's Step 3 selected) = identical to v2.2's uniform 2.0×ATR. Open-24 spec change is a no-op for the anchor.
+
+### Cross-cutting note on v2.2 §1 obsoletion
+
+v2.2 §1 (sign-flip mechanisation) is OBSOLETED by v2.3 §1 — it mechanised the Step 5 gate 1 override; the gate no longer exists. v2.2 §2/§3/§4/§7 stand unchanged; v2.2 §5 (§16a) and §6 (halt point) updated for renumbering. Recorded for change-tracking, not a calibration loss.
 
 ---
 
@@ -681,4 +707,5 @@ Items 1-3 (NEW) are candidates for the v2.3 / v2.1.3 calibration cycle. Items 5 
 | Arc 6 cross-arc items added | 2026-05-17 — Open-21 (Step 4 deployability gate, new), Open-17 expansion (Tiebreak 1 noise floor), unnumbered reach_1R noise tolerance note |
 | Arc 4 RERUN + Arc 5 items added | 2026-05-18 — Open-22/23/24 (Pipeline D1 full-pool gating); Arc 5 P-series (P0: §9-FRAMING, D1-VIABILITY, D1-REJECT-BIAS; P1: F9-RESELECT; P2: CLUSTERING-LEAKAGE, SPREAD-FLOOR-DOC, §11-MATCH-FORMULA, OPEN-18-RECONCILE) |
 | Arc 7 cross-arc items added | 2026-05-18 (housekeeping pass) — 7 items (3 NEW, 1 VALIDATED, 1 UNRESOLVED, 2 CLEANUP) from `phase/l_arc_7` closure doc |
-| v2.2 amendment date | 2026-05-18 — `L_ARC_PROTOCOL_v2_2_AMENDMENT.md`. Closed in v2.2: §8 max-F1 fallback (v2.2 §3, closing Arc 6/7 case), mid-arc analyst sign-off carve-outs (v2.2 §1/§2/§5/§6), FIFO arc selection (v2.2 §4 new §15b), live-execution equivalence asserted (v2.2 §7 new §1a). Open-21 partial: proposal (a) strict-mode closed; (b)/(c) on backlog. Open-22/23/24 (Pipeline D1 full-pool gating) NOT closed by v2.2 — remain top P0 for next cross-arc calibration cycle. |
+| v2.2 amendment date | 2026-05-18 — `L_ARC_PROTOCOL_v2_2_AMENDMENT.md`. Closed in v2.2: §8 max-F1 fallback (v2.2 §3, closing Arc 6/7 case), mid-arc analyst sign-off carve-outs (v2.2 §1/§2/§5/§6), FIFO arc selection (v2.2 §4 new §15b), live-execution equivalence asserted (v2.2 §7 new §1a). Open-21 partial: proposal (a) strict-mode closed; (b)/(c) on backlog. Open-22/23/24 (Pipeline D1 full-pool gating) NOT closed by v2.2 — addressed in v2.3 (row below). |
+| v2.3 amendment date | 2026-05-18 — `L_ARC_PROTOCOL_v2_3_AMENDMENT.md`. Closed in v2.3: Open-22 (v2.3 §1 structural removal of §9); Open-23 (v2.3 §4 §3/§8 cost-language correction); Open-24 (v2.3 §5 per-archetype pre-t SL spec; engine PR pending for `pre_t_sl_atr_multiplier`). Step 5 cross-fold stability removed; Step 6 WFO renumbered as Step 5; orchestrator halt point shifted end of Step 5 → end of Step 4; v2.2 §1 sign-flip mechanisation OBSOLETED (gate no longer exists); §16a position-5 semantic shifted to WFO; §1a Step 1 + Step 5 (was Step 6). New informal register at `SHELVED_ARCS.md`. Anchor preservation verified (KH-24 K=4 archetype 3 passes Step 5 WFO by deployment; Step 3 selected SL = 2.0×ATR matches v2.2 uniform pre-t SL — Open-24 no-op for anchor). Companion file: `prompts/cc_arc_orchestrator_template.md` updated to v1.1. |

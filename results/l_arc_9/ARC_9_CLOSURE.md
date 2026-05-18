@@ -1,89 +1,150 @@
-# Arc 9 - Closure Doc
+# Arc 9 — IB-trend (compression geometry → directional break)
 
-## Disposition
-
-**STEP_4_KILL** under L_ARC_PROTOCOL v2.3 (base v2.1.2 + v2.2 + v2.3 amendments) §16a.
-
-## Signal
+## Closure
 
 | Field | Value |
 |---|---|
-| Name | `signal_inside_bar_break_trend_long_v0.1` |
-| Source spec | `docs/signal_spec_inside_bar_break_trend_long_v0.1.md` (provided by dispatcher) |
-| Family | Trend continuation (compression-and-break) |
-| Direction | Long only |
-| Signal TF | 4H |
-| Pair set | 28 FX (KH-24 set) |
-| Data window | 2020-10-01 → 2026-01-31 |
-| Pool size | 2,153 trades |
+| Disposition | **STEP_4_KILL_REAFFIRMED** |
+| First closed | 2026-05-18 (STEP_4_KILL on extractability FAIL) |
+| Held-open opened | 2026-05-18 (analyst-directed diagnostic experiments) |
+| Held-open closed | 2026-05-19 (STEP_4_KILL reaffirmed after causal patch) |
+| Active protocol | L_ARC_PROTOCOL v2.1.2 + v2.2 + v2.3 amendments |
+| Branch | `claude/bold-brattain-d79817` + `claude/arc-9-causal-patch` |
+| Anchor preservation | KH-24 K=4 archetype 3 — preserved, no interaction |
 
-## Step results
+## Verdict
 
-| Step | Result | Killer |
-|---|---|---|
-| 1 — Plumbing | PASS | - |
-| 2 — Clustering (K=3, sil 0.4247) | PASS | - |
-| 3 — Capturability (cluster_0_individual survives, SL=2.0×ATR) | PASS (1 archetype) | - |
-| 4 — Extractability | **FAIL** | Pipeline E RF AUC 0.511 << 0.65; Pipeline D1 reaches AUC 0.626 at t=1 but threshold sweep recall maxes at 0.003 (gate 0.60), per v2.2 §3 no max-F1 fallback |
+Arc 9 closes as STEP_4_KILL with cohort verified deployable in oracle but unreachable through causally-clean in-protocol features. The held-open cycle produced one valuable forward-looking artefact (producer-level causal audit dimension) and one important framework-level correction (a feature-expansion finding that appeared load-bearing was an artefact of two leaked features).
 
-## §16a HALT vs KILL evaluation
+Two months of cycle time, eight experiments, one consequential audit miss, one corrective patch. Honest disposition.
 
-| Criterion | Status |
+## Step pass/fail table
+
+| Step | Gate | Result | Commit |
+|---|---|---|---|
+| 1 | Plumbing | PASS — 2153 trades; all 7 sub-gates green | (Step 1 commit) |
+| 2 | Clustering | PASS — K=3, silhouette 0.4247 | (Step 2 commit) |
+| 3 | Capturability | PASS — 1 archetype (cluster_0_individual @ SL=2.0×ATR) | (Step 3 commit) |
+| 4 | Extractability (original) | **FAIL** — E AUC 0.511; D1 AUC 0.626 with threshold sweep recall 0.003 | (Step 4 commit) |
+
+### Held-open experiments (2026-05-18 → 2026-05-19)
+
+| # | Experiment | Outcome | Commit |
+|---|---|---|---|
+| 1 | Step 5 oracle validation | PASS-DEPLOYABLE @ +39.45% worst-fold ROI / 0.01% DD (cluster 0 only, oracle filter) | d32b506 |
+| 2 | Calibration recovery (Platt / isotonic) | OUTCOME_B — rank-bound, not calibration-bound | 2882270 |
+| 3 | Step 5 raw baseline | FAIL all gates (−29.64% worst-fold, 62.99% DD; the floor) | 496d772 |
+| 4 | Pipeline E retry (LGBM + expanded features) | **AUC 0.7508 (FAKE — see Phase 7)** | 0193334 |
+| 5 | Step 5 LGBM Pipeline E WFO | **PASS-DEPLOYABLE F2-F7 (INVALIDATED — see Phase 7)** | 44de1ca |
+| 6 | Lookahead audit (8 dimensions) | GREEN on join-level dimensions; **INCOMPLETE — missed producer-level causal scope** | 9dc4f8a |
+| 7 | Scaled-risk WFO | **1.0% recommended (INVALIDATED — admit set was on fake classifier)** | 5ce39d6 |
+| 8 | Causal patch + forced WFO | **STEP_4_KILL_AFTER_PATCH** — patched AUC 0.5190; forced WFO confirms economic collapse | 5b6c547 |
+
+## What happened
+
+Steps 1-4 ran cleanly. Step 4 KILL was correct: Pipeline E AUC 0.511 (chance) on the in-protocol 16-feature set, D1 AUC 0.626 with probability mass below the threshold grid. The cohort exists in forward-geometry but doesn't separate from the pool on entry-time features.
+
+Held-open experiments confirmed the cohort's reality:
+- Step 5 oracle (cluster 0 only): +60% ann ROI / 0% DD across 7/7 folds. The signal class produces clean economics when correctly identified.
+- Step 5 raw baseline (no filter): −29% worst-fold ROI, 63% DD. The complement is portfolio-killing; the cluster work is the entire system.
+- Calibration recovery: rank-bound failure. Probability mass concentration below 0.40 wasn't a calibration artifact; the classifier genuinely couldn't separate the populations crisply.
+
+**The Pipeline E retry (Experiment 4) appeared to break this.** Adding 8 D1-lagged features + 4 session/time features lifted classifier AUC from 0.511 to 0.7508. Step 5 LGBM Pipeline E WFO (Experiment 5) produced two pass-deployable candidates. Lookahead audit (Experiment 6) passed 8/8 dimensions. Scaled-risk measurement (Experiment 7) identified worst-day DD as the binding constraint and recommended 1.0% per-trade deployment risk producing +41.45% annualised ROI at 2.52% DD.
+
+**Then an external audit detected lookahead in two of the added features.** `d1_bars_since_swing_low` and `d1_bars_since_swing_high` were computed using a ±10-bar centred swing detector at the D1 frame level. The producer suppressed the last 10 bars of the frame, but did not suppress the 10 bars after each individual signal's join point. The `merge_asof` join itself was clean (verified to 560 samples in the prior audit). The values inside the joined rows were not — they had been computed using up to 10 future D1 bars relative to each signal's entry time. The original audit checked join-level causality and end-to-end probability reproduction; it did not check producer-level causal scope.
+
+Causal patch dispatch (Experiment 8) replaced both swing features with a confirmed-swing detector requiring 10 days of lag before a swing is markable. Re-ran Pipeline E retry on the patched feature set. AUC collapsed from 0.7508 to 0.5190. RF on the same patched features dropped from 0.7759 to 0.5551. The baseline 16-feature cells were byte-identical between original and patched runs, confirming the 12 added features (and specifically the 2 swing features) were the load-bearing change.
+
+Forced WFO at the patched classifier confirmed the economic verdict. Candidate A: full-data ROI −0.13%, DD 13.38%, 3 of 6 folds negative. Candidate B: full-data ROI +0.08%, DD 22.65%, well past 5ers' 10% hard limit. The §8 AUC gate correctly identifies these classifiers as non-deployable; forced WFO confirms the gate's verdict.
+
+## The bracket — three Step 5 reference points (final)
+
+| Run | Filter | Worst-fold ROI | Worst-fold DD | Verdict |
+|---|---|---|---|---|
+| Floor (raw baseline) | none | −29.64% | 43.61% | FAIL all gates (expected) |
+| Ceiling (oracle) | post-hoc cluster identity | +39.45% | 0.01% | PASS-DEPLOYABLE (oracle, not deployable as system) |
+| Patched LGBM Pipeline E Cand A | classifier @ threshold 0.40 | −6.61% (F6) | 6.83% | FAIL — close to floor |
+| Patched LGBM Pipeline E Cand B | classifier @ threshold 0.05 | −19.37% (F6) | 20.90% | FAIL — at floor |
+
+The gap between oracle ceiling (+39%) and patched real-classifier (−6%) is the gap between "we know the future" and "we use causally-clean entry-time features." It is unbridgeable on the current in-protocol feature catalogue.
+
+## What survives
+
+- **Step 1 plumbing** (2153 trades, deterministic, audit-clean on join-level dimensions)
+- **Step 2 clustering** (K=3, cluster_0 n=365) — path-shape features only, no entry-time leak risk
+- **Step 3 capturability** — cluster_0 fwd_mfe_p50 6.18R, final_r_mean +4.42R, t-stat +21.81 at SL=2.0×ATR. The cohort is real.
+- **Step 5 oracle ceiling** — confirms the cohort produces deployable economics if perfectly identified at entry
+- **Step 5 raw baseline** — confirms the complement carries portfolio-killing loss-side asymmetry
+- **Original lookahead audit on its checked dimensions** — join-level, label, fold disjointness, execution semantics, e2e reproduction all valid; the dimensions checked were correct, the audit scope was incomplete
+
+## What collapses
+
+- **Pipeline E retry AUC 0.7508** — the appearance of extractability was a leak artefact
+- **Step 5 LGBM Pipeline E both candidates** — admit sets were on a fake classifier
+- **Scaled-risk 1.0% deployment recommendation** — measured on the fake classifier; meaningless
+- **"Features over classifiers" methodology lesson** — the empirical lift attributed to feature expansion was the leaked features; lesson has no Arc 9 empirical case
+- **v2.x §8 D1 feature-budget expansion proposal** — Arc 9 contributes no evidence; proposal needs different empirical support or different scope
+
+## What is newly valuable
+
+The **producer-level causal scope audit dimension** is the single most valuable forward-looking artefact from the entire held-open cycle. The original audit checked:
+
+- Join-level causality (`merge_asof` direction, days_lag distribution)
+- End-to-end probability reproduction
+- Label leakage (forward-geometry features in entry-time feature set)
+- Fold disjointness (training/inference separation)
+- Execution semantics
+- Cluster label flow
+- 4H feature timestamps
+- Session/hour feature determinism
+
+It did not check, for each D1 feature, whether the value at the join row depended only on data with timestamp ≤ that row's date. This is a distinct audit dimension from the eight listed above. It is now standard for every future classifier audit. The audit-dimension specification is captured in the corresponding incident note.
+
+## v2.x amendment evidence — Arc 9's surviving contribution
+
+| Amendment | Arc 9 contribution |
 |---|---|
-| Single criterion fail (exactly one gate fails at the killing step) | **FAIL** — Pipeline E AUC AND Pipeline D1 threshold-sweep recall both fail (two failure modes within the cohort) |
-| Cohort viability (size_fraction ≥ 0.10) | PASS (0.170) |
-| Path A (numeric near-miss, margin < 0.03) | **FAIL** — E AUC margin 0.139; D1 recall margin 0.597. Both far above 0.03. |
-| Path B (categorical with strong magnitude, fwd_mfe_h240_p50 ≥ 3.0R) | N/A — failing criteria are numeric, not categorical |
+| §3 threshold-grid replacement | WEAKENED — Arc 9's AUC-clears-grid-fails pattern was on a fake classifier. Arc 7 calibration recovery remains the load-bearing evidence. Cross-test on Arc 7 D1 units still recommended. |
+| §8 D1 feature-budget expansion | COLLAPSED — Arc 9 contributes no evidence. Causally-clean D1 expansion delivers ≈ 0 AUC lift. Proposal requires re-scoping or different empirical support. |
+| Step 5 fold-1 warmup convention | Still applies for future arcs whose data window starts at F1 OOS_start. Survives independent of Arc 9 economics. |
+| **Producer-level causal audit dimension (NEW)** | REINFORCED. Promotes from "lesson" to "standard audit requirement" for every future classifier evaluation. |
+| Step 4 artefact-on-FAIL persistence | Still valid (process improvement, independent of leak). |
 
-**Disposition: KILL.** No `## Cross-arc calibration candidate` section per §16a KILL convention.
+## Cross-arc work corrected
 
-## Closure summary
+- **Arc 7 D1 feature-expansion test:** REFUTED as a recommendation. Do not run the +12-feature expansion test on Arc 7's three surviving D1 units. The proposed expansion includes the now-known-leaked swing features. Reproducing the leak in Arc 7 contributes nothing.
+- **Arc 7 calibration recovery test (Platt + isotonic on existing classifier):** remains valid and recommended. Separate dispatch from feature expansion. Tests whether Arc 7's threshold-sweep failure is a calibration artefact, parallel to the Arc 9 calibration recovery (which returned OUTCOME_B, rank-bound).
 
-The signal generates a pool comfortably within the spec's prior (2,153 / target 1,500-2,500) and Step 1 passes all sub-gates with margin. Path-shape clustering at K=3 produces one capturable cluster (cluster_0, n=365, 17% of pool, mono 0.534, ttp_rel 0.771, lp 31.44): forward MFE p50 6.18R, frac_reach_1R 1.000, frac_wrong_way_pre_peak 0.000, final_r_mean +4.423R t=+21.81 at SL=2.0×ATR. Capturability is clean and strong.
+## Methodology lessons (revised after patch)
 
-Extractability fails. Pipeline E entry-time RF AUC is 0.511 — at chance — across the 16-feature set (8 protocol-base + 8 arc-specific compression/break geometry). The signal-spec's hypothesis that compression geometry features carry entry-time edge is empirically refuted. Pipeline D1 with path-so-far features at bar offset t reaches the AUC floor at every t∈{1..5} (best t=10 at AUC 0.692 but exclusion 32.7% violates ≤30%); the smallest-t selection yields t=1, AUC 0.626. The classifier discriminates, but its probability outputs cluster below 0.40 — the {0.40, 0.50, 0.60, 0.70} threshold sweep produces no threshold with recall ≥ 0.60 (best 0.003 at threshold 0.40). Per v2.2 §3 the archetype fails Step 4 with no max-F1 fallback.
+The original held-open finding "features over classifiers" was the Arc 9 empirical case for prioritising feature engineering over classifier-family experimentation when Step 4 fails. **That case collapses with the leak removal.** The lift attributed to feature expansion was almost entirely the two leaked features. Causally-clean expansion produces near-zero lift on this cohort.
 
-The clean cohort exists but is not surface-able with the features available to the protocol at decision time. The IB-trend signal class is not extractable on Pipeline E or D1 as drawn.
+The lesson in principle may still be valid — feature engineering is often higher-leverage than classifier tuning — but Arc 9 does not provide empirical support. Future arcs would need to establish this independently.
 
-## What is permanently eliminated by this closure
+The replacement lesson, taken directly from this cycle's mistake: **dispatch instructions must specify causality at the producer level, not just at the join level.** When a feature catalogue says "use D1-lagged features via `merge_asof` backward," the analyst must also specify that the values within D1 rows must be causally constructed — meaning each row's value depends only on data with timestamp ≤ that row's date. Standard mathematical definitions of trading concepts (swing detection, pivots, ZigZag, fractal points) frequently use centred windows and are non-causal by default. The dispatch must call this out; the audit must verify it.
 
-Nothing structural to the signal. The cohort is genuinely clean (cluster_0 capturability is strong); the failure is specifically about feature-based extractability at entry / very-early-bar windows.
+## Disposition
 
-Signal NOT permanently eliminated. Could potentially be revisited under:
-- Richer feature regime (multi-TF context, session/regime conditioning, cross-asset)
-- Probability-calibrated classifiers (Platt scaling, isotonic) that allow the existing AUC 0.626+ discrimination to reach the threshold sweep
-- A protocol amendment that relaxes the strict {0.40, 0.50, 0.60, 0.70} grid or removes the recall floor for low-prevalence positive classes
+**STEP_4_KILL_REAFFIRMED.** The cohort is real but unreachable on causally-clean in-protocol features. The held-open lifecycle terminates here.
 
-The compression-geometry-features hypothesis (specifically: ib_range_ratio, inside_bar_range_atr, break_bar_body_atr, break_close_above_high_atr) IS empirically refuted as an entry-time predictor for this archetype.
-
-## Cross-arc observation (informational, not a §16a candidate)
-
-This is the second arc (after Arc 7, CLEAN-NULL 2026-05-17) where Pipeline D1 clears AUC ≥ 0.60 mechanically but the strict threshold sweep produces no threshold satisfying recall ≥ 0.60. The failure mode is classifier probability mis-calibration relative to the fixed sweep grid, not classifier non-discrimination. Two occurrences is not a calibration trigger; recording here for future cross-arc review. Not eligible for §16a Path A — margins (0.597 here, similar in Arc 7) are far above the 0.03 near-miss threshold.
+Resurrecting this signal requires a fresh research effort proposing a different feature class — cross-pair regime context, intra-bar microstructure, longer-TF context (W1, M1), ensemble methods, or non-standard data sources. A fresh dispatch, not a continuation of Arc 9.
 
 ## Files
 
-| Artefact | Path |
-|---|---|
-| Live arc doc | results/l_arc_9/ARC_9_LIVE.md |
-| Signal module | signals/lchar_inside_bar_break_trend_long.py |
-| Config | configs/wfo_l_arc_9.yaml (sha256 in step1 manifest.json) |
-| Step 1 trades | results/l_arc_9/step1_verbatim/trades_all.csv |
-| Step 1 paths | results/l_arc_9/step1_verbatim/trades_paths.csv |
-| Step 1 prefilter events | results/l_arc_9/step1_verbatim/prefilter_events.csv |
-| Step 1 manifest | results/l_arc_9/step1_verbatim/manifest.json |
-| Step 1 diagnostics | results/l_arc_9/step1_verbatim/{audit_lookahead.txt, audit_right_edge_swing.txt, schema_check.json, cofire_matrix.{md,json}, pool_summary.md, diagnostics.json} |
-| Step 2 path features | results/l_arc_9/step2_clustering/path_features.csv |
-| Step 2 silhouette + clusters | results/l_arc_9/step2_clustering/{silhouette_summary.csv, silhouette_K{k}.txt, clusters_K{k}.csv, centroids_K{k}.csv} |
-| Step 2 archetype assignments | results/l_arc_9/step2_clustering/archetype_assignments.csv |
-| Step 2 summary | results/l_arc_9/step2_clustering/STEP2_SUMMARY.md |
-| Step 3 SL sweep (per-trade) | results/l_arc_9/step3_capturability/per_trade_sl_sweep.csv |
-| Step 3 cluster + archetype aggregates | results/l_arc_9/step3_capturability/{cluster_sl_sweep.csv, archetype_sl_sweep.csv} |
-| Step 3 archetype summaries + pass list + routing | results/l_arc_9/step3_capturability/{archetype_summaries.csv, capturability_pass_list.csv, cluster_routing.csv, cluster_0_distribution.csv} |
-| Step 3 summary | results/l_arc_9/step3_capturability/STEP3_SUMMARY.md |
-| Step 4 entry features | results/l_arc_9/step4_extractability/entry_features.csv |
-| Step 4 predictability (E + D1) | results/l_arc_9/step4_extractability/{predictability_angle_E.csv, predictability_angle_D1.csv} |
-| Step 4 threshold sweep (D1 only since E never cleared gate) | results/l_arc_9/step4_extractability/threshold_sweep_D1_cluster_0_individual.csv |
-| Step 4 extractability pass list (empty / no survivors) | results/l_arc_9/step4_extractability/extractability_pass_list.csv |
-| Step 4 summary | results/l_arc_9/step4_extractability/STEP4_SUMMARY.md |
+All under `results/l_arc_9/` on `claude/bold-brattain-d79817` + `claude/arc-9-causal-patch`:
+- `step1_plumbing/`, `step2_clustering/`, `step3_capturability/`, `step4_extractability/` — original arc artefacts
+- `experiments/step5_validation/` — oracle ceiling (valid)
+- `experiments/calibration_recovery/` — OUTCOME_B (valid)
+- `experiments/step5_raw_baseline/` — floor (valid)
+- `experiments/pipeline_e_retry/` — leaked classifier (invalidated by Phase 8)
+- `experiments/step5_lgbm_pipeline_e/` — leaked-classifier WFO (invalidated)
+- `experiments/lookahead_audit/` — original audit (valid on its dimensions; scope incomplete)
+- `experiments/scaled_risk/` — leaked-classifier scaled risk (invalidated)
+- `experiments/causal_patch/` — patched re-run + forced WFO + new audit dimension (load-bearing)
+- `ARC_9_LIVE.md` — held-open record, status STEP_4_KILL_REAFFIRMED 2026-05-19
+- `ARC_9_CLOSURE.md` — this doc
 
-No classifier artefacts (`*_E_classifier.joblib`, `*_D1_classifier.joblib`, `*_E_filter.yaml`, `*_D1_policy.yaml`) emitted — no pipeline cleared its gates.
+## Companion documents
+
+- `INCIDENT_2026_05_19_ARC_9_PRODUCER_LEAK.md` — incident note: what was missed, why, what audit dimension is now standard
+- `L_ARC_PROTOCOL_v2_x_AMENDMENT_PROPOSAL.md` — revised amendment proposal reflecting Arc 9's actual evidence contribution

@@ -1,0 +1,2 @@
+label_archetype_or_cluster,cluster_id,archetype_label,evaluation_mode,selected_SL_atr_mult,n,size_fraction,mono_pre_peak_centroid,frac_reach_1R,frac_wrong_way_pre_peak,fwd_mfe_p50,fwd_mfe_p50_atr,final_r_mean,final_r_t_stat,composite,shape_tag,shape_tag_pass,bimodal_separated_pass,pre_t_sl_atr_multiplier
+cluster_0_individual,0,Unclassified,individual,2,365,0.1695308871,0.5622971688,1,0,6.175595278,12.35119056,4.42293133,21.81184012,0.6122971688,tight_unimodal,1,0,2

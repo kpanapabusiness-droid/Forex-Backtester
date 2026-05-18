@@ -12,9 +12,11 @@
 |---|---|---|
 | Resolved in v2.1 / v2.1.1 | 11 | P0.1 (v2.1 + v2.1.1 composite refinement), P0.2, P0.3, P0.4, P0.5, P1.6, P1.9, P1.11 (via PR #131), P2.13, P2.15, P3.16 |
 | Partial in v2.1 | 1 | P1.8 |
-| Still open | 4 | P1.7 (refresh execution — pending KH-24 v2.0 re-run only under v2.1.1), P1.10, P1.12, P2.14 |
+| Closed in v2.2 | 4 | §8 max-F1 fallback (v2.2 §3); mid-arc analyst sign-off carve-outs spanning §9/§12/§16a (v2.2 §1/§2/§5/§6); FIFO arc selection state file (v2.2 §4 new §15b); live-execution equivalence (v2.2 §7 new §1a, asserted not closed) |
+| Still open | 7 | P1.7 (refresh execution — pending KH-24 v2.0 re-run only under v2.1.1), P1.10, P1.12, P2.14; Open-22 (HIGH), Open-23 (MEDIUM), Open-24 (MEDIUM) — Pipeline D1 full-pool gating (Arc 4 RERUN + Arc 5) |
+| Partial in v2.2 | 1 | Open-21 (Step 4 deployability gate) — proposal (a) strict-mode max-F1 fallback closed by v2.2 §3; alternates (b) recall floor 0.30 + (c) AUC floor 0.70 remain on calibration backlog |
 
-Last updated: 2026-05-17 alongside L_ARC_PROTOCOL v2.1.1 amendment (combined refinements + engine-reality corrections).
+Last updated: 2026-05-18 alongside L_ARC_PROTOCOL v2.2 amendment (governance + carve-out mechanisation + Step 4 max-F1 closure + live-execution equivalence assertion).
 
 ---
 
@@ -574,6 +576,97 @@ P0.4 is the exception: Path 2 (SL scaled to horizon) cannot retrofit to KH-24 wi
 
 ---
 
+## Resolved in v2.2 amendment (2026-05-18)
+
+L_ARC_PROTOCOL v2.2 amendment landed 2026-05-18 (`L_ARC_PROTOCOL_v2_2_AMENDMENT.md`). Seven §0 changes; four items from this backlog (and cross-arc surface) close or partially close:
+
+### CLOSED in v2.2 §3 — Step 4 max-F1 fallback
+
+- **Surface:** Arc 6 closure (Open-21 original surface), Arc 7 closure (case study).
+- **Resolution.** §8 threshold sweep must satisfy recall ≥ 0.60. No max-F1 fallback. If no threshold in {0.40, 0.50, 0.60, 0.70} satisfies recall ≥ 0.60, archetype dies at Step 4. Applies to Pipeline E, Pipeline D1, and Tier 2 lift candidate threshold sweeps.
+- **Open-21 partial closure.** Proposal (a) "strict mode" is now mechanical. Alternates (b) recall floor 0.30 and (c) AUC floor 0.70 remain on the calibration backlog as potential further tightening; v2.2 §3 implements the minimum-mechanical fix.
+- **Anchor preservation.** KH-24 K=4 archetype 3, Pipeline D1 at t=3, RF AUC 0.638 — cohort large enough that 60% admit is mechanical. No interaction.
+
+### CLOSED in v2.2 §1 / §2 / §5 / §6 — Mid-arc analyst sign-off carve-outs
+
+- **Surface:** every closed arc (KH-24 v2.0, Arc 2 redo, Arc 3, Arc 4, Arc 5, Arc 6, Arc 7) — chat-judgement carve-outs at §9 single-fold flip, §12 stack-freely, and ambiguous KILL/HALT disposition rules. Under serial execution these were cheap; under parallel CC execution they became serialisation bottlenecks.
+- **Resolution.** v2.2 §1 mechanises §9 single-fold sign-flip (no chat override; mandatory diagnostic logging). v2.2 §2 caps §12 Tier 2 lift at ≤ 5 candidates intersection-only. v2.2 §5 adds new §16a KILL vs HALT mechanical disposition rule (single-criterion + cohort viability + near-miss/strong-magnitude). v2.2 §6 explicitly removes mid-arc analyst sign-off between arc-open and end of step 5 (§13 update).
+- **Empirical basis.** Historical pattern: every carve-out was resolved the way the new rule resolves it. No archetype has tested more than 3 lift candidates historically (cap at 5 is bounded permission without practical constraint). Every archetype that died on §9 sign consistency also failed another gate.
+- **Anchor preservation.** KH-24 K=4 archetype 3 — all 7 folds positive under v2.0 evaluation (§9 untriggered); no Tier 2 lift evaluated (§12 untriggered); passes all gates (§16a untriggered). No interaction.
+
+### CLOSED in v2.2 §4 — Arc selection FIFO via state file
+
+- **Surface:** Arc 6 (out-of-registry insertion via `discovery/lomega_regime_conditional`) demonstrated that implicit arc selection ("analyst picks") doesn't scale.
+- **Resolution.** New §15b. CC consults `results/ARC_QUEUE.md` at arc start; picks topmost Unrun entry; transitions to Active with timestamp + branch name. Supports registry entries (`LCHAR_TOPN_REGISTRY.md` Entry K) AND standalone signal specs (`signal_spec_<name>_v<version>.md`). Git-level concurrency. Analyst override via direct edit.
+- **Companion file landed.** `results/ARC_QUEUE.md` initialised 2026-05-18; empty Active and Unrun at landing; Closed section populated by housekeeping pass.
+
+### ASSERTED in v2.2 §7 — Live-execution equivalence
+
+- **Surface:** Arc 4 spread fix landing (2026-05-17) + PR2 landing (2026-05-17 PR #135). The engine now complies post-PR2 + spread fix; v2.2 makes the contract explicit.
+- **Resolution.** New §1a. Steps 1 and 6 must execute under SPREAD_SEMANTICS_LOCK-equivalent semantics: entry timing (signal at bar t close → entry at bar t+1 open), spread costs (real per-bar MT5 bid/ask from execution bar; floor file is fallback only), intrabar SL/TS (triggers on mid, fills on bid/ask), D1 features (one-day lag), volume veto (no entry / no trade row / no spread). Step 6 additionally must apply §11 archetype-specific exit policy.
+- **No behaviour change.** The assertion prevents silent re-introduction of pre-PR2 / pre-spread-fix divergence in future arc scripts.
+
+---
+
+## Arc 5 cross-arc items (2026-05-17, from `arc-5-closure` branch)
+
+Eight items raised by Arc 5 closure (`mtf_alignment.2_down_mixed.kijun` h=120; SHELVED at Step 6 FAIL). Pipeline D1 + new spreads + full-pool WFO accounting surfaced rejected-pool adverse selection as the dominant cost — the protocol §9 admit-only framing missed the failure Step 6's full-pool reckoning caught. Numbering uses the `P-<id>` convention from the closure doc (distinct from Open-NN sequence).
+
+### P0 — Protocol must surface full-pool economics before Step 6
+
+- **P-§9-FRAMING (P0).** §9 sign-consistency and DD-ratio must be measured on full-pool strategy R (admits with their pipeline outcomes + rejects with their pipeline outcomes), not admit-only R. Protocol wording is currently ambiguous and reads as admit-only in practice. Under corrected framing, Arc 5 would have failed §9 at fold 4 (admit mean barely positive, full-pool mean negative). Step 6 would have been redundant.
+- **P-D1-VIABILITY (P0).** Pipeline D1 viability check: signals with > X% bar-0/1 SL-hit rate at deployed baseline SL should be flagged for D1 unsuitability at Step 4. Arc 5 had 7.9%. Suggested threshold: 5%.
+- **P-D1-REJECT-BIAS (P0).** Document rejected-pool selection bias: classifier rejection at bar t is itself a prediction signal correlated with continued adverse drift. Mean R of rejected pool ≠ unconditional bar-t baseline. Add to §3 Pipeline D1 description with calibration data from Arc 5 (−0.46R rejected vs +0.025R unconditional).
+
+### P1 — Threshold selection
+
+- **P-F9-RESELECT (P1).** F9 threshold selection should use the metric that gates ship decision (worst-fold compounded ROI subject to DD ceiling), not an intermediate measurement (admit-set precision/recall). Currently Step 4b selects on admit-only proxies that don't capture full-strategy cost.
+
+### P2 — Housekeeping
+
+- **P-CLUSTERING-LEAKAGE (P2).** Open-10 leakage status: c3 confirmed clean (Arc 5 Step 5.5 audit); c1 unresolved (audit invalid due to match formula saturation). Per-fold clustering should become default rather than full-pool, with full-pool retained as comparison only.
+- **P-SPREAD-FLOOR-DOC (P2).** Spread floor file docstring drift — claims "applies only when raw spread is zero" but new p50 calibration applies to 58.6% of execution-bar entries. Update docstring + governance.
+- **P-§11-MATCH-FORMULA (P2).** §11 row 2 pattern matching formula `min(1, (30-peaks)/25)` saturates at peaks ≤ 5, conflating Monotone-ascent (row 1, peaks ≤ 4) and Stepwise-climber (row 2, peaks 5-30) regions. Add a peaks lower-bound or a "preferred peaks range" specification for cleaner archetype matching.
+- **P-OPEN-18-RECONCILE (P2).** STATUS.md / Open-18 priority queue had multiple inaccuracies discovered during Arc 5: `l_arc_4` Step 4/5 scaffolding existed undocumented; Arc 2 redo2 (v2.1.1 schema fork) existed undocumented; Open-18 KH-24 anchor replay scaffolding existed undocumented. Reconcile STATUS with actual repo state.
+
+### Status
+
+P0 items combine with Arc 4 RERUN's Open-22/23/24 (below) to form the cross-arc Pipeline D1 full-pool gating question. Owner: cross-arc calibration session. Queued for next protocol amendment cycle (likely v2.3 or v2.1.3 — pre-v2.2 numbering rules).
+
+---
+
+## Arc 7 cross-arc items (2026-05-17, from `phase/l_arc_7` branch)
+
+Seven items raised by Arc 7 closure (liquidity sweep + reclaim long; CLEAN-NULL at Step 4). First capturable-not-extractable closure of record. Cross-arc items are documented in the closure doc and forwarded here for batch review.
+
+### NEW
+
+1. **Capturable-extractable gap as recognised closure category.** Arc 7 is the case study: PASS §7 with 3 V-shape units passing §2 conjunctively at composite > 0.37; FAIL §8 with 0/6 unit × pipeline AUCs clearing gate. This is not the same failure mode as a §2-fail at Step 3. v2.2 should consider an explicit closure pathway and commentary for arcs that PASS §7 but FAIL §8.
+
+2. **SL-selection vs class-imbalance tension.** Composite-maximising SLs at §7 can compress the success distribution past extractability viability. Arc 7 c1: SL=4×ATR maximised §7 composite (0.617) but drove base success to 0.778, leaving only 41 negatives in n=185 for the classifier to learn from. Candidate v2.2 amendments: (a) §8 re-sweeps SLs and reports AUC × class-balance jointly; (b) §7 composite includes a class-balance regulariser; (c) leave §7 alone but flag the tension in §17.
+
+3. **Open-04 external features escalation.** Arc 7 supplies concrete evidence that in-protocol features (Pipeline E + D1) can be insufficient even for capturable cohorts. Macro / session / cross-asset feature pipelines are now backed by empirical case for v2.2 commission.
+
+### VALIDATED
+
+4. **v2.1.2 `≠ scattered` floor.** First arc-of-record where the relaxed floor was load-bearing. All three Step 3 survivors carried `shape_tag = unclassified`. Under the prior floor (`∈ {tight_unimodal, heavy_right_tail, bimodal_separated}`), Arc 7 would have died at Step 3 with the wrong diagnosis. Closure proves the relaxation admits cohorts that subsequently get killed by other gates for the right reasons. Floor stays.
+
+### UNRESOLVED
+
+5. **§11 Stepwise pullback ≤ 0.5R ceiling.** Arc 7 c1 was the test case (mono 0.536, peaks 33.5, ttp_rel 0.73, pullback 0.567). Did not deploy. We don't know whether the §11 pullback ≤ 0.5R ceiling is over-strict in practice because no Arc 7 unit cleared §8. Question persists for future arcs.
+
+### CLEANUP
+
+6. **§15a text vs `_flatten_bar_path_for_trade` impl gap.** On `mfe_so_far_r` semantics: text says `close_r` running max; impl uses `high_r` intrabar. Arc 7 followed impl. Reconcile protocol text at next calibration review.
+
+7. **Dispatch halt-criterion phrasing.** "Cross-arc bar-overlap" is a finding, not a halt. Future dispatches use overlap-vs-KH-24 as the live-system check; cross-arc overlap is a portfolio-composition note (Open-05).
+
+### Status
+
+Items 1-3 (NEW) are candidates for the v2.3 / v2.1.3 calibration cycle. Items 5 (UNRESOLVED) and 6, 7 (CLEANUP) carry to backlog. Item 4 (VALIDATED) is informational.
+
+---
+
 ## Document control
 
 | Field | Value |
@@ -586,3 +679,6 @@ P0.4 is the exception: Path 2 (SL scaled to horizon) cannot retrofit to KH-24 wi
 | v2.1 amendment date | 2026-05-17 — summary status block above tracks per-item resolution |
 | v2.1.1 amendment date | 2026-05-17 — combined refinements + engine-reality corrections; P0.1 refined to composite selection, P1.7 unblocked from engine PR (re-run only) |
 | Arc 6 cross-arc items added | 2026-05-17 — Open-21 (Step 4 deployability gate, new), Open-17 expansion (Tiebreak 1 noise floor), unnumbered reach_1R noise tolerance note |
+| Arc 4 RERUN + Arc 5 items added | 2026-05-18 — Open-22/23/24 (Pipeline D1 full-pool gating); Arc 5 P-series (P0: §9-FRAMING, D1-VIABILITY, D1-REJECT-BIAS; P1: F9-RESELECT; P2: CLUSTERING-LEAKAGE, SPREAD-FLOOR-DOC, §11-MATCH-FORMULA, OPEN-18-RECONCILE) |
+| Arc 7 cross-arc items added | 2026-05-18 (housekeeping pass) — 7 items (3 NEW, 1 VALIDATED, 1 UNRESOLVED, 2 CLEANUP) from `phase/l_arc_7` closure doc |
+| v2.2 amendment date | 2026-05-18 — `L_ARC_PROTOCOL_v2_2_AMENDMENT.md`. Closed in v2.2: §8 max-F1 fallback (v2.2 §3, closing Arc 6/7 case), mid-arc analyst sign-off carve-outs (v2.2 §1/§2/§5/§6), FIFO arc selection (v2.2 §4 new §15b), live-execution equivalence asserted (v2.2 §7 new §1a). Open-21 partial: proposal (a) strict-mode closed; (b)/(c) on backlog. Open-22/23/24 (Pipeline D1 full-pool gating) NOT closed by v2.2 — remain top P0 for next cross-arc calibration cycle. |

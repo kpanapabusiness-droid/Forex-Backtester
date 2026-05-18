@@ -55,7 +55,7 @@ import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -329,7 +329,6 @@ def fill_rejected_records(records: List[TradeRecord], paths_df: pd.DataFrame,
     Use bar 2 spread (timestamp = entry_time + 2 hours) with floor applied.
     """
     paths_b2 = paths_df[paths_df["bar_offset"] == 2][["trade_id", "open", "timestamp"]].set_index("trade_id")
-    trades_by_id = trades_all.set_index("trade_id")
     for r in records:
         if r.is_admit or r.is_early_exit:
             continue
@@ -624,7 +623,6 @@ def main() -> int:
         # 5ers reality check
         max_daily_dd = float(daily["daily_dd_pct"].max())
         days_over_5pct = int(daily["exceeds_5pct"].sum())
-        max_alltime_dd = full_m["max_dd_pct"]
 
         sweep_rows.append({
             "risk_pct": risk_pct,

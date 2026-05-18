@@ -13,6 +13,7 @@
   - Opened: 2026-05-18 (under v2.3 dispatch `cc_dispatch_arc_8.md`)
   - Branch: `phase/l_arc_8` (dispatcher target; this session works on worktree branch `claude/magical-zhukovsky-bd69d9` — to be merged to `phase/l_arc_8` at session end)
   - Live doc: `results/l_arc_8/ARC_8_LIVE.md`
+  - **Step 4 complete 2026-05-18 — STEP_4_COMPLETE_READY_FOR_WFO** (1 surviving archetype: c1 V-shape recovery FG-weak, Pipeline E+D1, pre_t_sl_atr_multiplier=4.0). Awaiting Step 5 WFO dispatch.
 
 ---
 

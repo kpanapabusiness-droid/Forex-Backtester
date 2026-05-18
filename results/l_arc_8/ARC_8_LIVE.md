@@ -393,6 +393,73 @@ Single run for this dispatch (n_jobs=1 + random_state=42 throughout; RF + Logist
 - **D1 t=1 was strongest for c1** (AUC 0.637 vs t=2..5 in 0.534-0.605 range). For a V-shape archetype where the entry bar IS the resume trigger, t=1 (one bar after entry) catches the immediate follow-through. This is consistent with the V-shape "MAE-before-peak ≥ 5 bars" expectation — the *path-so-far* features at t=1 likely don't include the eventual deep pullback, so what t=1 actually captures is "did the next bar confirm bullish momentum?".
 - **Single-archetype survivor in a 4-cluster arc**: 1 / 4 = 25% archetype survival from K=4 → Step 4. Compare to KH-24 calibration anchor where 1 / 4 archetypes survives at Pipeline D1 — Arc 8 mirrors that ratio. Reasonable.
 
+---
+
+## Halt Summary — Arc 8
+
+### Status
+
+- **Disposition:** STEP_4_COMPLETE_READY_FOR_WFO
+- **Closure doc:** n/a — proceeded to Step 4 complete
+- **Live arc doc:** `results/l_arc_8/ARC_8_LIVE.md`
+- **Branch:** worktree `claude/magical-zhukovsky-bd69d9` (dispatcher to merge into `phase/l_arc_8`; stale local `phase/l_arc_8` requires renaming/archival first)
+- **Queue state:** Arc 8 remains **Active** pending Step 5 WFO (per v2.3 §9 — Step 5 is a chat-dispatched analyst-review checkpoint)
+
+### Step pass/fail table
+
+| Step | Gate | Result |
+|---|---|---|
+| 1 | Plumbing — pool ≥ 500, determinism, schema, right-edge, lookahead-invariance | **PASS** (1327 trades, all 5 gates clear) |
+| 2 | Path-shape clustering — silhouette gate, ≤ 1 degenerate feature, K-selection rule | **PASS** (K=4, silhouette 0.4762, 0/4 degenerate) |
+| 3 | Capturability — §2 floors + composite + bimodal/scattered tests | **PASS** (3 units survive: c1, c3, agg_c1_c3) |
+| 4 | Extractability — RF AUC ≥ 0.65 (E) or ≥ 0.60 (D1) + recall ≥ 0.60 threshold sweep | **PASS** (1 archetype: c1 E+D1) |
+
+### Surviving archetypes (Step 4 complete)
+
+| Label | Cluster IDs | Selected SL (= D1 pre_t_sl_atr) | Pipeline | RF AUC | Threshold | Recall | Notes |
+|---|---|---:|---|---:|---:|---:|---|
+| V-shape recovery (forward-geometry weak) | c1 | 4.0×ATR | **E** (5 features, B-top5) | 0.697 | 0.70 | 0.867 | Precision 0.897 at chosen threshold |
+| V-shape recovery (forward-geometry weak) | c1 | 4.0×ATR | **D1** (t=1) | 0.637 | 0.60 | 1.000 | Precision 0.909; pre_t_sl_atr_multiplier=4.0 recorded for v2.3 §4 |
+
+Step 6 ship decision (E vs D1 vs unison) deferred to Step 5 WFO per §10 multi-pipeline ship rule.
+
+### Cross-arc calibration candidates (HALT only)
+
+n/a — Arc 8 is not a HALT closure. (Cross-arc candidates noted in the Cross-arc candidates section above are forward-looking suggestions, not §16a calibration-pending items.)
+
+### Recommended next dispatch
+
+**Chat reviews the surviving c1 archetype + per-fold AUC variance (fold 2 weak at 0.45) → dispatches Step 5 WFO on (c1, E) and (c1, D1) configurations.** Per §10 ship rule, both configurations evaluate; ship whichever achieves pass-deployable thresholds with higher worst-fold ROI subject to DD ≤ 8%.
+
+Step 5 WFO inputs:
+- Engine: Pipeline D1 backtester extension (currently feat/open-24-pre-t-sl-per-archetype; PR pending merge)
+- Locked configs: `configs/wfo_kh24.yaml`, `configs/spreads_5ers.yaml`, `configs/spread_floors_5ers.yaml` (body sha `8da7644b...`)
+- Per-archetype `pre_t_sl_atr_multiplier`: 4.0 (recorded in `archetype_v-shape_recovery_forward-geometry_weak_c1_D1_policy.yaml`)
+- Step 4 classifier joblibs: 2 files in `results/l_arc_8/step4/`
+- Exit policy row reference: §11 row 5 (V-shape recovery — after bar N confirms reversal, standard trail)
+
+### Deferred (not blocking; recommended addenda)
+
+1. **Tier 2 lift candidates** (v2.2 §2, ≤ 5 per archetype): not produced this dispatch. Optional. Could be added in a Step-4-extension dispatch for the surviving c1 archetype if time permits before Step 5 WFO.
+2. **Co-fire vs Arc 9/10/11**: deferred — their signal modules not on `main`. Whichever arc lands Step 1 next within the parallel batch will compute its co-fire to Arc 8.
+3. **Stale `phase/l_arc_8` branch handling:** the existing local `phase/l_arc_8` branch is unrelated to this work (descends from `phase/v2_2_housekeeping`, last unique commit pre-Arc 3). Dispatcher should rename (`git branch -m phase/l_arc_8 phase/l_arc_8_pre_arc8_archive`) or delete it before fast-forwarding to this worktree branch.
+
+### Variance from dispatch (recorded in arc-open + this halt summary)
+
+- Branch name: worktree `claude/magical-zhukovsky-bd69d9` instead of `phase/l_arc_8` (existing stale branch conflict).
+- Signal spec: written from analyst-supplied content (was unmerged on `tmp/post-v2_3`).
+- Data: `data/4hr` is a directory junction to parent repo `..\..\..\..\data\4hr` (worktree had `data/` gitignored).
+- Step 4 implementation: written fresh per protocol §8 Angle D1 (bar-offset-t features), NOT adapted from `scripts/arc_7/step4_extractability.py` (which used daily-features-with-lag — a non-protocol interpretation).
+- Threshold sweep for D1: 80/20 time-prefix holdout used (Arc 7 used 5-fold CV for AUC, train-only for the final threshold). Holdout is conservative and consistent with v2.2 §3 intent ("max precision with recall ≥ 0.60").
+
+### Commit history (this worktree branch, since arc-open)
+
+- `a80972b arc-8 open`
+- `3c5f943 arc-8 step 1 PASS: 1327 trades, determinism + right-edge + lookahead OK`
+- `9583947 arc-8 step 2 PASS: K=4 chosen, 0/4 degenerate, 3 tentative + 1 unassigned`
+- `c34cc6b arc-8 step 3 PASS: 3 V-shape units survive; pre_t_sl_atr_multiplier recorded`
+- `a5eb6e6 arc-8 step 4 PASS: c1 V-shape recovery survives E+D1 with full threshold sweep`
+
 ## Detailed analysis
 
 _(none yet)_

@@ -130,6 +130,11 @@ class D1ArchetypeConfig:
       :func:`D1Hook.from_yaml_dict`. After loading the cache holds the
       live classifier; the path itself is kept on
       ``per_fold_classifier_paths`` for audit.
+
+    Open-24 (v2.3 §5): ``pre_t_sl_atr_multiplier`` is the ATR multiplier
+    for the pre-classification SL (bars 0..t). Default 2.0 preserves
+    v2.2 uniform behaviour and the KH-24 anchor (Step 3 selected SL =
+    2.0×ATR for archetype 3).
     """
 
     label: str
@@ -139,6 +144,7 @@ class D1ArchetypeConfig:
     per_fold_classifiers: Mapping[str, Any] = field(default_factory=dict)
     per_fold_classifier_paths: Mapping[str, str] = field(default_factory=dict)
     exit_policy: ExitPolicy | None = None
+    pre_t_sl_atr_multiplier: float = 2.0
     extras: Mapping[str, Any] = field(default_factory=dict)
 
 
@@ -169,6 +175,24 @@ class D1Hook:
                 f"got {sorted(ts)}"
             )
         self._bar_offset_t = int(next(iter(ts)))
+
+        # Open-24 (v2.3 §5): pre-t SL must be shared across archetypes in
+        # the same hook because the SL is set at trade entry, before the
+        # classifier decides which archetype wins at bar t. Multi-archetype
+        # hooks whose clusters select different SLs must run as separate
+        # WFO evaluations.
+        mults = {round(float(a.pre_t_sl_atr_multiplier), 12) for a in archetypes}
+        if len(mults) > 1:
+            raise ValueError(
+                "Open-24 constraint: all archetypes must share "
+                f"pre_t_sl_atr_multiplier; got {sorted(mults)}"
+            )
+        pre_t_mult = float(next(iter(mults)))
+        if not (pre_t_mult > 0.0):
+            raise ValueError(
+                f"pre_t_sl_atr_multiplier must be > 0; got {pre_t_mult}"
+            )
+        self._pre_t_sl_atr_multiplier = pre_t_mult
 
         known = set(ALL_FEATURE_KEYS)
         for a in archetypes:
@@ -227,6 +251,17 @@ class D1Hook:
     def bar_offset_t(self) -> int:
         """The single ``t`` shared across all archetypes."""
         return self._bar_offset_t
+
+    @property
+    def pre_t_sl_atr_multiplier(self) -> float:
+        """ATR multiplier for the pre-classification SL (bars 0..t).
+
+        Open-24 (v2.3 §5): shared across all archetypes in this hook —
+        the engine sets the SL at trade entry, before the classifier
+        decides which archetype wins. Default 2.0 when the field is
+        absent from YAML preserves v2.2 uniform behaviour.
+        """
+        return self._pre_t_sl_atr_multiplier
 
     @property
     def archetypes(self) -> tuple[D1ArchetypeConfig, ...]:
@@ -398,6 +433,13 @@ class D1Hook:
                 )
             policy = build_exit_policy(raw_policy)
 
+            # Open-24 (v2.3 §5): optional per-archetype pre-t SL ATR
+            # multiplier. Absent field → 2.0 (anchor / v2.2 behaviour).
+            if "pre_t_sl_atr_multiplier" in raw:
+                pre_t_sl_atr_multiplier = float(raw["pre_t_sl_atr_multiplier"])
+            else:
+                pre_t_sl_atr_multiplier = 2.0
+
             archetypes.append(
                 D1ArchetypeConfig(
                     label=label,
@@ -407,6 +449,7 @@ class D1Hook:
                     per_fold_classifiers=per_fold_classifiers,
                     per_fold_classifier_paths=per_fold_classifier_paths,
                     exit_policy=policy,
+                    pre_t_sl_atr_multiplier=pre_t_sl_atr_multiplier,
                     extras={
                         k: v
                         for k, v in raw.items()
@@ -418,6 +461,7 @@ class D1Hook:
                             "bar_offset_t",
                             "per_fold_classifiers",
                             "exit_policy",
+                            "pre_t_sl_atr_multiplier",
                         }
                     },
                 )

@@ -33,8 +33,6 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import TimeSeriesSplit
-from sklearn.preprocessing import StandardScaler
-
 
 # ---------------------------------------------------------------- paths / config
 
@@ -668,11 +666,11 @@ def spot_check_no_lookahead(rows_df: pd.DataFrame, pair_dfs: dict, tf: str,
         loc = int(df.index[df["time"] == t][0])
         # Recompute atr_14 from scratch using only bars <= loc
         h = df["high"].values[: loc + 1]
-        l = df["low"].values[: loc + 1]
+        low_arr = df["low"].values[: loc + 1]
         c = df["close"].values[: loc + 1]
         if loc + 1 < 14:
             continue
-        atr_recomp = compute_atr(h, l, c, 14)[0][-1]
+        atr_recomp = compute_atr(h, low_arr, c, 14)[0][-1]
         # body_ratio
         o_t = df["open"].values[loc]
         c_t = df["close"].values[loc]
@@ -773,7 +771,6 @@ def run_timeframe(tf: str) -> dict:
 
     # DXY proxy at signal TF (after per-pair features ready)
     close_dict = {}
-    common_times = None
     for pair in PAIRS:
         s = pair_dfs[pair].set_index("time")["close"]
         close_dict[pair] = s

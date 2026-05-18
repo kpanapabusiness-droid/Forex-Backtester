@@ -1,5 +1,5 @@
 # CLAUDE.md — Forex Ignition Rebuild
-> Last updated: 2026-05-17 | Phase: Arc 4 CLOSED (CLEAN-NULL on transaction-cost truth); spread floor file flagged for replacement
+> Last updated: 2026-05-17 | Phase: Arc 4 CLOSED (CLEAN-NULL on transaction-cost truth); spread floor file replaced 2026-05-17 with per-pair p50 values, arc work unblocked
 > First file any AI assistant reads. Reflects where the project ACTUALLY is.
 
 ---
@@ -31,7 +31,7 @@ Then, depending on scope:
 
 **Live system KH-24 is locked, passing, deployed.** Out of scope for L arc work; do not modify without an explicit modification phase.
 
-**Active research: L arc signal testing under `L_ARC_PROTOCOL.md` v2.1.1.** Arc 4 closed CLEAN-NULL on transaction-cost truth 2026-05-17 — signal reached pass-deployable through Step 5 under modeled spreads; HistData spread audit revealed `configs/spread_floors_5ers.yaml` under-models real spreads by 3-48x per pair, killing F6 worst-fold sign consistency under real-spread reconciliation. **Spread floor file replacement is now the blocker for all future arc work.** See `docs/arc_results/ARC_4_RESULT.md` and `docs/SPREAD_FLOOR_AUDIT_FINDING.md`. Arc 3 closed CLEAN-NULL at Step 3 (2026-05-16). Arcs 1 and 2 are historical (ran under v1.x).
+**Active research: L arc signal testing under `L_ARC_PROTOCOL.md` v2.1.2.** Arc 4 closed CLEAN-NULL on transaction-cost truth 2026-05-17 — signal reached pass-deployable through Step 5 under modeled spreads; HistData spread audit revealed `configs/spread_floors_5ers.yaml` under-models real spreads by 3-48x per pair, killing F6 worst-fold sign consistency under real-spread reconciliation. **Spread floor file replaced 2026-05-17 with per-pair p50 values from HistData 2024-2025 audit. `configs/spread_floors_5ers.yaml` is now calibration-curated (no longer generated; source script `scripts/lchar/compute_spread_floors.py` retired). Arc work unblocked.** See `docs/calibration_decisions/SPREAD_FLOOR_CALIBRATION_DECISION_2026-05-17.md` for calibration rationale, `docs/SPREAD_FLOOR_AUDIT_FINDING.md` (RESOLVED section) for original finding, and `docs/arc_results/ARC_4_RESULT.md` for the arc context that surfaced the issue. Arc 3 closed CLEAN-NULL at Step 3 (2026-05-16). Arcs 1 and 2 are historical (ran under v1.x).
 
 ---
 

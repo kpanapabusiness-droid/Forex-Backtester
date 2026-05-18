@@ -95,7 +95,7 @@ data:
 spread_floor:
   enabled: true
   source: configs/spread_floors_5ers.yaml
-  expected_body_sha256: a613b4ce641c8d5218490531770a4924204029dedaa80fb24111beb61bd15547
+  expected_body_sha256: 8da7644b252ae163d963fbd46807572906fa3e5a44fb3e02d771e181b3ecdc05
   points_per_pip: 10.0
 
 # ----------------------------------------------------------------------

@@ -2,7 +2,7 @@
 
 > Tight current-state snapshot. For full context, read `SESSION_ZERO.md` first.
 > For methodology, read `L_ARC_PROTOCOL.md` (v2.1.2, self-contained).
-> Last updated: 2026-05-17 — Arc 4 closed CLEAN-NULL on transaction-cost truth; `configs/spread_floors_5ers.yaml` flagged for per-pair empirical replacement (HistData audit shows uniform 0.1 pip floor under-models real spreads 3-48x per pair). KH-24 live deployment unchanged; WFO claim downgraded to pass-viable retroactively. Backtester extension closed (PR #131 + #135 + #138 merged). Arc 6 closed DIES at Step 4 deployability.
+> Last updated: 2026-05-17 — Arc 4 closed CLEAN-NULL on transaction-cost truth; `configs/spread_floors_5ers.yaml` replaced 2026-05-17 with per-pair p50 values from HistData 2024-2025 audit (calibration-curated; generator script retired). Arc work unblocked. KH-24 live deployment unchanged; WFO claim downgraded to pass-viable retroactively. Backtester extension closed (PR #131 + #135 + #138 merged). Arc 6 closed DIES at Step 4 deployability.
 
 ---
 
@@ -11,8 +11,8 @@
 - Active protocol: L_ARC_PROTOCOL v2.1.2 (amendment landed 2026-05-17)
 - Calibration anchor: KH-24 K=4 archetype 3 — v2.0 values; deployed-pop reference held (no refresh from Open-18 replays per user decision; v2.1.2 anchor preservation verified — centroid still routes to Stepwise under 5-50 local_peaks range)
 - Next engine PR: none currently planned. Backtester extension complete: PR #131 (D1 plumbing), PR #135 (D1 PR 2 Stepwise climber policy + per-fold classifiers), PR #138 (engine generalisation: signal adapter + TF pluggability + time-exit + spread floor). §11 rows 1, 3, 4, 5, 6, 7 exit policies deferred until an arc surfaces a Step-4 consumer needing them.
-- **BLOCKER:** `configs/spread_floors_5ers.yaml` flagged for per-pair empirical floor replacement before Arc 5+ proceeds. See `docs/SPREAD_FLOOR_AUDIT_FINDING.md`.
-- Next chat task: spread floor file replacement under SPREAD_SEMANTICS_LOCK governance; then Open-18 replays; then Arc 5. Cross-arc calibration session for Open-21 (Step 4 deployability gate) + Open-17 expansion (Tiebreak 1 noise floor) queued.
+- **UNBLOCKED 2026-05-17:** `configs/spread_floors_5ers.yaml` replaced with per-pair p50 values from HistData 2024-2025 audit. See `docs/calibration_decisions/SPREAD_FLOOR_CALIBRATION_DECISION_2026-05-17.md` (decision rationale, §3–§4 for the p50-over-p10 override) and `docs/SPREAD_FLOOR_AUDIT_FINDING.md` RESOLVED section.
+- Next chat task: Open-18 replays under new floor; then Arc 5. Cross-arc calibration session for Open-21 (Step 4 deployability gate) + Open-17 expansion (Tiebreak 1 noise floor) queued.
 
 ---
 
@@ -147,13 +147,22 @@ Annualisation: `fold_raw_ROI × (365 / fold_OOS_days)`. Folds < 90 OOS days excl
 
 ---
 
+## Resolved (2026-05-17 calibration update)
+
+| Item | Source arc | Resolution |
+| --- | --- | --- |
+| `configs/spread_floors_5ers.yaml` replacement (was HIGHEST) | Arc 4 | Per-pair p50 floor landed 2026-05-17 — see [docs/calibration_decisions/SPREAD_FLOOR_CALIBRATION_DECISION_2026-05-17.md](docs/calibration_decisions/SPREAD_FLOOR_CALIBRATION_DECISION_2026-05-17.md). p50 chosen over p10 (bias-stacking argument; see decision doc §3–§4). File now calibration-curated; generator script `scripts/lchar/compute_spread_floors.py` retired. |
+
+---
+
 ## Open Items
 
 | Item | Priority | Notes |
 | --- | --- | --- |
-| `configs/spread_floors_5ers.yaml` replacement | HIGHEST | Per-pair empirical floors from HistData audit at p10. Locked-file change. SPREAD_SEMANTICS_LOCK governance required. Blocks all future arcs. |
 | Phase Zero spread validation | HIGH | Add to L arc workflow before Step 1 plumbing; refresh tick audit every 6 months. |
+| LP-to-retail multiplier calibration | MEDIUM | One-week MT5 bid/ask snapshot from live VPS to derive HistData-LP to 5ers-retail multiplier; refines floor values upward by estimated 10-30%. Tracked separately from session-aware floor item. (Arc 4 follow-up) |
 | MT5 vs HistData spread cross-check | MEDIUM | Dump 5 days of 5ers MT5 spread snapshots from Contabo VPS, validate audit assumptions. |
+| Governance doc consolidation | LOW | `docs/SPREAD_SEMANTICS_LOCK.md` and `docs/L6_0_METHODOLOGY_LOCK.md` overlap on spread floor governance. Resolve before next calibration cycle. (Arc 4 closure follow-up) |
 | §11 row policies for rows 1, 3, 4, 5, 6, 7 | DEFERRED | Row 2 (Stepwise climber) shipped in PR #135. Other rows added when an arc surfaces a Step-4 archetype consumer needing them. No build until concrete consumer surfaces. |
 
 No outstanding bugs or issues against KH-24. No pending fixes against the backtester. §14 anchor refresh explicitly held (deployed-pop reference, no change).
@@ -171,6 +180,12 @@ No outstanding bugs or issues against KH-24. No pending fixes against the backte
 ## Cross-Arc Calibration Backlog (post-Arc-5 review)
 
 Items accumulating from arc closures under v2.0. Per §1.8 within-arc thresholds do not move; per §12 cross-arc calibration is governed and requires a calibration document + chat-level approval. The 2026-05-17 v2.1 amendment resolved or partially resolved most of the items below; items still requiring evidence / execution are kept under "Active backlog".
+
+### Resolved in 2026-05-17 calibration update
+
+| Item | Source arc(s) | Resolution |
+| --- | --- | --- |
+| Real-spread floor file replacement (was HIGHEST) | Arc 4 | Per-pair p50 floor landed 2026-05-17. File now calibration-curated; generator script `scripts/lchar/compute_spread_floors.py` retired. Decision doc: [docs/calibration_decisions/SPREAD_FLOOR_CALIBRATION_DECISION_2026-05-17.md](docs/calibration_decisions/SPREAD_FLOOR_CALIBRATION_DECISION_2026-05-17.md). p50 chosen over p10 (audit doc's original recommendation) on bias-stacking grounds — see decision doc §3–§4. Encoding lock (÷10 uniform incl. JPY) documented in `SPREAD_SEMANTICS_LOCK.md` "Floor file encoding" subsection. |
 
 ### Resolved in v2.1 / v2.1.1 / v2.1.2 amendments
 
@@ -194,8 +209,9 @@ Items accumulating from arc closures under v2.0. Per §1.8 within-arc thresholds
 | --- | --- | --- | --- |
 | §11 archetype priors empirical refinement (Open-07) | KH-24 v2.0, Arc 2 redo, Arc 3 | MEDIUM | v2.1 demoted §11 SL column to prior; v2.1.2 extends Stepwise local_peaks ceiling 5-30 → 5-50 based on Open-18 empirical centroids. Other §11 rows still first-pass priors; centroid-pattern refresh remains open. Deferred until Arc 4 + Arc 5 produce additional evidence. |
 | Cap-binding / shape_tag dead-zone diagnostic | KH-24 v2.0 c4 replay | LOW | Replay #2 surfaced correlation between p95/p50 dead-zone (2.0, 3.0] and forward-window cap-binding. v2.1.2's `≠ scattered` floor avoids over-rejecting on this; §5 auto-extend addresses upstream. Track whether the correlation resurfaces under Arc 4+. |
-| Real-spread floor file replacement | Arc 4 | HIGHEST | Per-pair empirical floors from HistData audit (or MT5 broker snapshot) required to replace uniform 0.1 pip floor that under-models real spreads 3-48x. Locked-file change under SPREAD_SEMANTICS_LOCK.md governance. Blocks all future arc work. |
 | Spread audit as Phase Zero | Arc 4 | HIGH | All future L arcs must validate spread floor file against current broker quote before Step 1 plumbing runs; refresh tick audit every 6 months. Affects WORKFLOW.md v2 and `L_ARC_PROTOCOL.md` §5. |
+| LP-to-retail multiplier calibration | Arc 4 | MEDIUM | One-week MT5 bid/ask snapshot from live VPS to derive HistData-LP to 5ers-retail multiplier; refines floor values upward by estimated 10-30%. Tracked separately from session-aware floor item. |
+| Governance doc consolidation | Arc 4 closure | LOW | `docs/SPREAD_SEMANTICS_LOCK.md` and `docs/L6_0_METHODOLOGY_LOCK.md` overlap on spread floor governance. Resolve before next calibration cycle. |
 | Session-aware spread modeling | Arc 4 | MEDIUM | Per-pair × per-session floors may be required for accurate cost modeling on cross-pair signals. Defer until per-pair floor in place and next arc's behaviour observed. |
 | Step 5 simulator default — apply exit spread | Arc 4 | MEDIUM | Post-hoc simulator templates should enforce S/2 exit spread by default per SPREAD_SEMANTICS_LOCK.md. Arc 4's omission was prompt-author error; the simulator template should make it impossible to skip. |
 | Convention (b) MTM DD as §10 default | Arc 4 | MEDIUM | 5ers measures account equity in real-time; convention (a) closed-trade ordering understates DD by 14-63%. Convention (b) should become §10's default gate metric. Affects protocol §9 and §10 wording. |

@@ -1,0 +1,4 @@
+unit_id,pipeline_E_AUC_pass,pipeline_E_threshold_pass,pipeline_D1_smallest_t,pipeline_D1_AUC_pass,pipeline_D1_threshold_pass,final_pipeline_assignment,selected_E_threshold,selected_D1_threshold,pre_t_sl_atr_multiplier
+c1,0,0,,0,0,none,,,3
+c3,0,0,,0,0,none,,,2
+agg_c1_c3,0,0,,0,0,none,,,3

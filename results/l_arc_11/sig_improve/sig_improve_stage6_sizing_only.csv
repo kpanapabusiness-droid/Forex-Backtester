@@ -1,0 +1,4 @@
+size_pct,n_trades_total,sign_consistency,worst_fold_roi_ann_pct,mean_fold_roi_ann_pct,worst_fold_dd_pct,min_trade_count,full_data_roi_pct,full_data_dd_pct
+0.25,2299,0,-17.4376,-0.9482,25.2191,281,-10.5543,42.5021
+0.50,2299,0,-32.4171,-0.2645,44.2805,281,-24.3894,67.8289
+1.00,2299,0,-55.8462,7.3301,69.3952,281,-54.1816,90.6986

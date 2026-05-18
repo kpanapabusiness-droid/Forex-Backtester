@@ -1,0 +1,4 @@
+rule_a,th_a,rule_b,th_b,n_remaining,c1_retention,c2_retention,pool_remaining,aggregate_mean_r,passes_gate
+F1_trigger_close_pos,0.60,F2_pullback_depth_atr,1.25,1955,0.8580,0.8273,1955,-0.0230,0
+F1_trigger_close_pos,0.60,F3_trigger_body_atr,0.30,2024,0.8981,0.8694,2024,-0.0157,0
+F2_pullback_depth_atr,1.25,F3_trigger_body_atr,0.30,1908,0.8333,0.8123,1908,-0.0266,0

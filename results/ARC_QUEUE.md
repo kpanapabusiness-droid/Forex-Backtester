@@ -8,12 +8,7 @@
 
 ## Active (in-flight)
 
-- [ ] **Arc 8** — Pullback-and-resume in HH/HL uptrend (PR-HHHL, long)
-  - Spec: `docs/signal_spec_pullback_resume_hhhl_long_v0.1.md`
-  - Opened: 2026-05-18 (under v2.3 dispatch `cc_dispatch_arc_8.md`)
-  - Branch: `phase/l_arc_8` (dispatcher target; this session works on worktree branch `claude/magical-zhukovsky-bd69d9` — to be merged to `phase/l_arc_8` at session end)
-  - Live doc: `results/l_arc_8/ARC_8_LIVE.md`
-  - **Step 4 complete 2026-05-18 — STEP_4_COMPLETE_READY_FOR_WFO** (1 surviving archetype: c1 V-shape recovery FG-weak, Pipeline E+D1, pre_t_sl_atr_multiplier=4.0). Awaiting Step 5 WFO dispatch.
+_None._
 
 ---
 
@@ -30,11 +25,6 @@ In FIFO order. Topmost is next. Analyst adds entries here as signals become read
   - Spec: `signal_spec_d1_swing_low_rejection_long_v0.1.md`
   - Handover: `arc_10_handover_DLR.md`
   - Family: Multi-TF trend continuation (HTF-anchored level rejection). Signal TF 4H, anchor TF D1 (one-day lag), long-only, 28 FX. Pool prior 1,000–2,000.
-
-- [ ] **Arc 11** — Swing-high breakout in trend (SHB, long)
-  - Spec: `signal_spec_swing_high_breakout_trend_long_v0.1.md`
-  - Handover: `arc_11_handover_SHB.md`
-  - Family: Trend continuation (structural breakout at historical reference). Signal TF 4H, long-only, 28 FX. Pool prior 1,500–3,000.
 
 ### Batch note
 
@@ -61,6 +51,16 @@ Each Unrun entry references either a registry entry or a standalone signal spec:
 ## Closed
 
 Most recent first. Populated from actual closure docs in `results/arc_<N>/` and `docs/arc_results/`.
+
+- [x] **Arc 8** — Pullback-and-resume in HH/HL uptrend (PR-HHHL, long) — HALT_DEPLOYMENT (Step 5 WFO §10 FAIL) 2026-05-18; `results/l_arc_8/ARC_8_CLOSURE.md`
+  - Spec: `docs/signal_spec_pullback_resume_hhhl_long_v0.1.md`
+  - Closure branch: `claude/magical-zhukovsky-bd69d9` (worktree branch — see closure doc's "Recommended next dispatch" for analyst-side merge to main + stale `phase/l_arc_8` branch handling)
+  - Note: Steps 1-4 PASS; 1 archetype survived (c1 V-shape recovery FG-weak, +2.59R admit-only). Step 5 WFO FAIL §10 ship gates — admit-only PASS (Pipeline E Sharpe 1.44, Pipeline D1 Sharpe 1.14) but full-pool FAIL (worst DD 15.6%-19.0%, worst ROI −13% to −15%). c1 and c2 share entry-bar geometry; classifier admits 70-89% of full pool. **3rd consecutive Open-22/23/24 admit-only-vs-deployment failure** (Arcs 4 RERUN, 5, 8). v2.4 §1.5 entry-separability gate proposed as Open-25 (`PROTOCOL_IMPROVEMENT_BACKLOG.md`). c1 logged for Open-05 portfolio composition. Engine PR `feat/open-24-pre-t-sl-per-archetype` (Open-24) merged 2026-05-19 (PR #146).
+
+- [x] **Arc 11** — Swing-high breakout in trend (SHB, long) — HALT (Step 4) 2026-05-18; `results/l_arc_11/ARC_11_CLOSURE.md`
+  - Spec: `signal_spec_swing_high_breakout_trend_long_v0.1.md`
+  - Closure branch: `claude/condescending-hoover-72a181` (worktree branch — analyst-side merge to main TBD)
+  - Note: second confirmed capturable-not-extractable closure (pairs with Arc 6). 3 Step 3 V-shape units survived; 0/3 cleared Step 4 disjunctive AUC gate (best agg_c1_c3 D1 t=5 AUC 0.5728 vs 0.60, margin 0.027). §16a Path A near-miss. 4 post-closure experimental sessions (~125s compute) retired 8 directions and proposed Pipeline DE + `min_observation_bars` as v2.4 amendment candidates.
 
 - [x] **Arc 7** — Liquidity sweep + reclaim (long) — CLEAN-NULL 2026-05-17 (Step 4); `docs/arc_results/ARC_7_RESULT.md`
   - Spec: `signal_spec_liquidity_sweep_reclaim_long_v0.1.md`

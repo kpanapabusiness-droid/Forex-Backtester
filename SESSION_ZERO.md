@@ -1,6 +1,6 @@
 # SESSION ZERO — Forex Ignition Rebuild
 > 5-minute primer. Read this first, then read `L_ARC_PROTOCOL.md` (v2.1.2 base) + `L_ARC_PROTOCOL_v2_2_AMENDMENT.md` (v2.2) + `L_ARC_PROTOCOL_v2_3_AMENDMENT.md` (v2.3 active for Arc 8+).
-> Last updated: 2026-05-19 — Arc 8 (PR-HHHL long) CLOSED 2026-05-18 HALT_DEPLOYMENT — Steps 1-4 PASS, Step 5 WFO FAIL §10 (admit-only PASS, full-pool FAIL); c1 V-shape recovery FG-weak logged for Open-05; 3rd consecutive Open-22/23/24 admit-only-vs-deployment failure (Arcs 4 RERUN, 5, 8); v2.4 §1.5 entry-separability gate proposed (see `PROTOCOL_IMPROVEMENT_BACKLOG.md`). L_ARC_PROTOCOL v2.3 amendment landed 2026-05-18 (Step 5 cross-fold stability removed; Step 6 WFO renumbered as Step 5; Open-22/23/24 closed in protocol with engine PR pending for Open-24). v2.2 amendment landed earlier same day. KH-24 live deployment unchanged.
+> Last updated: 2026-05-19 — **Arc 8** (PR-HHHL long) CLOSED 2026-05-18 HALT_DEPLOYMENT — Steps 1-4 PASS, Step 5 WFO FAIL §10 (admit-only PASS, full-pool FAIL); c1 V-shape recovery FG-weak logged for Open-05; **3rd consecutive Open-22/23/24 admit-only-vs-deployment failure** (Arcs 4 RERUN, 5, 8); v2.4 §1.5 entry-separability gate proposed as Open-25 (see `PROTOCOL_IMPROVEMENT_BACKLOG.md`). **Arc 9** closed STEP_4_KILL_REAFFIRMED after producer-leak patch invalidated held-open Pipeline E retry's AUC 0.7508. v2.x amendment proposal revised: §8 D1 feature-budget expansion WITHDRAWN; §3 threshold-grid replacement WEAKENED; NEW Amendment 1 — producer-level causal audit dimension as highest priority. **Arc 11** (SHB long 4H) CLOSED-HALT 2026-05-18. Engine PR `feat/open-24-pre-t-sl-per-archetype` (Open-24) merged 2026-05-19 (PR #146). Arc 10 still in flight in parallel CC chat. KH-24 live deployment unchanged. Prior context: 2026-05-18 L_ARC_PROTOCOL v2.3 amendment landed (Step 5 cross-fold stability removed; Step 6 WFO renumbered as Step 5; Open-22/23/24 closed in protocol); v2.2 amendment landed earlier same day; Arcs 4-7 all closed.
 
 ---
 
@@ -15,6 +15,45 @@
 ---
 
 ## Current State
+
+## 2026-05-19 — Arc 9 STEP_4_KILL_REAFFIRMED after producer-leak patch
+
+Arc 9 was originally closed STEP_4_KILL on 2026-05-18 (extractability FAIL, Pipeline E AUC 0.511, D1 AUC 0.626 with threshold sweep failure). The arc opened a held-open lifecycle for diagnostic experiments. Experiments 1-3 characterised the deployment surface: Step 5 oracle ceiling (+60% ann ROI / 0% DD with perfect cluster identification), calibration recovery OUTCOME_B (rank-bound), Step 5 raw baseline floor (−29% / 63% DD).
+
+Experiment 4 (Pipeline E retry) added 8 D1-lagged context features + 4 session/time features and reported classifier AUC 0.7508 — a +0.23 lift over the 16-feature baseline. Experiments 5-7 built on this: Step 5 LGBM E produced two pass-deployable candidates, lookahead audit returned 8/8 GREEN, scaled-risk measurement identified worst-day DD as binding constraint and recommended 1.0% per-trade deployment risk producing +41.45% ann ROI / 2.52% DD.
+
+An analyst-initiated parallel-chat audit detected producer-level lookahead in two of the added features: `d1_bars_since_swing_low` and `d1_bars_since_swing_high` used a ±10-bar centred swing detector at the D1 frame level. The merge_asof join was correct (verified to 560 samples); the values within joined rows were not (constructed using up to 10 future D1 bars relative to each signal's entry time). The original audit checked join-level causality and end-to-end probability reproduction; it did not check whether values within each joined row were causally constructed.
+
+The causal patch dispatch (Experiment 8, commit 5b6c547) replaced the swing detectors with confirmed-swing variants requiring 10 days of forward confirmation. Re-ran the classifier. Patched AUC: 0.5190 (LGBM) and 0.5551 (RF) — both below §8 gate 0.65. The +0.23 lift was entirely the two leaked features. Forced WFO at the patched classifier produced full-data ROI ≈ 0% with materially negative folds for both candidates.
+
+Arc 9 reverts to STEP_4_KILL_REAFFIRMED. The cohort is real (Step 3 capturability and Step 5 oracle ceiling both unaffected) but unreachable on causally-clean in-protocol features. The held-open lifecycle terminates here.
+
+### Forward-looking changes from this incident
+
+1. **Producer-level causal audit dimension** is now standard for every future classifier audit. Distinct from join-level causality (`merge_asof` direction, days_lag distribution) and from end-to-end probability reproduction. Logged as Amendment 1 in `L_ARC_PROTOCOL_v2_x_AMENDMENT_PROPOSAL.md` (revised 2026-05-19).
+
+2. **Dispatch instructions** that specify feature catalogues must include the producer-level causal-scope rule explicitly. Standard mathematical definitions of trading concepts (swing detection, pivots, ZigZag, centred smoothers, bilateral change-point detection) are non-causal by default and must be replaced with one-sided or confirmation-lag variants.
+
+3. **Causal-only feature library** to be created for common trading concepts that have textbook non-causal forms. Future dispatches reference the library rather than asking CC to implement from definition.
+
+4. **Pre-PR audit of KH-24 under producer-level dimension** required before v2.x lands. Anchor preservation requires verifying KH-24's deployed features don't contain the same failure pattern.
+
+5. **§8 D1 feature-budget expansion** is WITHDRAWN as v2.x amendment. Arc 9's evidence collapsed; proposal requires different empirical support.
+
+6. **Methodology lesson "features over classifiers"** is withdrawn. The Arc 9 empirical case was the leaked features; lesson has no remaining empirical base.
+
+### Repo state at closure
+
+- Branches: `claude/bold-brattain-d79817` (worktree, 8 experiments past original closure) + `claude/arc-9-causal-patch` (Phase 8 only)
+- All Step 1-3 outputs locked under `results/l_arc_9/step*` — valid
+- Experiments 1-3, 6 valid on their checked dimensions
+- Experiments 4, 5, 7 INVALIDATED (leaked classifier downstream)
+- Experiment 8 (causal patch + forced WFO) load-bearing for final disposition
+- Closure: `results/l_arc_9/ARC_9_CLOSURE.md` (rewritten 2026-05-19)
+- Incident: `results/l_arc_9/INCIDENT_2026_05_19_ARC_9_PRODUCER_LEAK.md` (new)
+- Live arc doc: `results/l_arc_9/ARC_9_LIVE.md` (status STEP_4_KILL_REAFFIRMED)
+
+---
 
 **L_ARC_PROTOCOL v2.3 AMENDMENT LANDED 2026-05-18.** Step 5 cross-fold stability (§9) removed — pipeline is now five steps (1 plumbing, 2 clustering, 3 capturability, 4 extractability, 5 WFO). Step 6 WFO renumbered as Step 5. Closes Open-22 (full-pool gate at §9) by structural removal; closes Open-23 (Pipeline D1 cost-language) by documentation correction in §3/§8; closes Open-24 (pre-t SL per archetype) in protocol with engine PR pending. v2.2 §1 sign-flip mechanisation OBSOLETED (Step 5 stability gate no longer exists). Orchestrator halt point: end of Step 5 → end of Step 4. §1a live-execution equivalence: Step 1 + Step 5 (was Step 6). SHELVED informal register at new `SHELVED_ARCS.md`. Anchor preservation verified — KH-24 K=4 archetype 3 passes Step 5 WFO by deployment; Step 3 selected SL = 2.0×ATR matches v2.2 uniform pre-t SL (Open-24 no-op for anchor).
 
@@ -114,6 +153,18 @@ L arc tests each candidate signal through a five-step pipeline (v2.3):
 Step 5 cross-fold stability (v2.2 §9) removed under v2.3 §1 — Step 5 (WFO, was Step 6) measures full-pool by construction. Arcs 1 and 2 are historical (ran under v1.x). v2.0 governed Arc 3; v2.1.2 governed Arcs 4-7; v2.2 + v2.3 govern Arc 8+. Calibration anchor: KH-24 K=4 archetype 3, which passes Step 5 WFO via Pipeline D1 at t=3 (RF AUC 0.638, exclusion 15.4%). Anchor not refreshed from Open-18 replays per user decision — deployed-pop reference holds. v2.3 anchor preservation verified (anchor passes Step 5 WFO by deployment; Step 3 selected SL = 2.0×ATR matches v2.2 uniform pre-t SL — Open-24 spec change is a no-op).
 
 **Arc dispatch model under v2.3:** one arc per CC chat session, dispatched via `prompts/cc_arc_orchestrator_template.md` v1.1. CC reads `results/ARC_QUEUE.md`, picks topmost Unrun entry, runs Steps 1-4 unattended, halts at end of Step 4 for analyst-led Step 5 WFO dispatch. Multiple arcs in parallel = multiple CC chat sessions, each on its own `phase/arc-<N>` branch. See v2.2 §15b (FIFO arc selection) and §13 (no mid-arc analyst sign-off; halt point shifted to end of Step 4 under v2.3 §9).
+
+### Active concepts (proposed v2.4 additions)
+
+> Surfaced 2026-05-19 from Arc 11 closure synthesis. Not enacted in protocol — filed in `PROTOCOL_IMPROVEMENT_BACKLOG.md` for next amendment cycle.
+
+**Pipeline DE (Deferred-Entry)** — proposed v2.4. Architecture: enter at bar `t` post-signal or not at all; no second-stage classifier. Features = path-so-far at bar `t`. Distinct from D1 (post-entry in-trade decision) and E (entry-bar decision). Default `t` per-archetype, sweep range [1, 16]. Gate: AUC ≥ 0.60 + sign-consistency + pre-t SL filter rate < 40%. Empirical support: Arc 11 Stage 2 (only AUC-moving direction across four feature regimes).
+
+**`min_observation_bars`** — proposed archetype-registry parameter. Specifies minimum post-signal bars required before entry decision. Protocol would test Pipeline DE variants at this `t` before declaring §16a HALT. Implication: capturable-not-extractable arcs get a cleaner failure attribution (DD/trade-count grounds) rather than AUC-margin near-miss grounds.
+
+### Cross-arc patterns (confirmed)
+
+**Capturable-not-extractable (CONFIRMED 2026-05-19)** — upgraded from speculative. Arc 6 + Arc 11 are two clean instances: cohort carries real structural edge (mfe_p50 3R+, reach_1R high), entry-time features cannot resolve which trades realise it. Pipeline E AUC ceiling ~0.55 on 4H entry-bar features across three independent feature regimes (baseline, multi-TF, reframed target). Discriminating information lives in post-signal price action (timing > features as extractability lever), not pre-signal context. Cross-reference target: any future arc with `mfe_p50 ≥ 3R` + `reach_1R ≥ 80%` + Pipeline E AUC < 0.55 should auto-flag this pattern and route to Pipeline DE evaluation.
 
 ### Tool assignments (unchanged)
 

@@ -1,0 +1,5 @@
+t,n_surviving,n_excluded_pre_t_sl,mean_mfe_so_far_r_at_t,median_mfe_so_far_r_at_t
+1,2264,35,0.3503,0.2626
+3,2111,188,0.5011,0.3969
+5,1950,349,0.6649,0.5551
+8,1659,640,0.8870,0.7674

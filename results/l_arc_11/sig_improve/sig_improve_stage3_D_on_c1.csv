@@ -1,0 +1,5 @@
+t,n_eligible_c1,mean_auc,mean_recall_at_0.50,hold_mean_r_admit_pool,exit_mean_r_reject_pool,gate_pass_auc_and_recall
+3,324,0.4452,0.9905,3.0102,-0.1573,0
+5,324,0.3966,0.9811,3.0015,0.0585,0
+8,324,0.4100,0.9915,3.0061,0.4282,0
+12,324,0.4376,0.9961,3.0039,0.2143,0

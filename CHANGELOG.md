@@ -1,8 +1,43 @@
 # Changelog
 
+## 2026-05-19 — Arc 9 closure REAFFIRMED (STEP_4_KILL after producer-leak patch)
+
+### Closed
+- Arc 9 IB-trend compression-break long — **STEP_4_KILL_REAFFIRMED**
+  - Original Step 4 KILL 2026-05-18 (Pipeline E AUC 0.511, D1 threshold-sweep recall 0.003); held-open cycle ran 7 diagnostic experiments through 2026-05-19
+  - Held-open Pipeline E retry's AUC 0.7508 was a leak artefact (two D1 swing features used a ±10-bar centred window at the D1 frame level; values within joined rows depended on up to 10 future bars relative to each signal's entry time)
+  - Causal patch (commit `5b6c547`, confirmed-swing detector with 10-day lag): patched AUC **0.5190** (LGBM) / **0.5551** (RF), both below §8 gate 0.65
+  - Forced WFO at patched classifier (commit `51457e6`): Candidate A full-data ROI **−0.13% / DD 13.38%**; Candidate B **+0.08% / DD 22.65%**
+  - Cohort verified deployable in Step 5 oracle (+39.45% worst-fold ROI / 0.01% DD with post-hoc cluster identity) but unreachable on causally-clean in-protocol features
+  - Closure: `results/l_arc_9/ARC_9_CLOSURE.md`
+  - Incident: `results/l_arc_9/INCIDENT_2026_05_19_ARC_9_PRODUCER_LEAK.md`
+
+### Invalidated
+- Pipeline E retry AUC 0.7508 → fake (leaked features)
+- Step 5 LGBM E Candidate A (+9.63% worst-fold / 1.32% DD / 236 admits) → invalidated
+- Step 5 LGBM E Candidate B (+20.68% worst-fold / 6.80% DD / 599 admits) → invalidated
+- Scaled-risk 1.0% deployment recommendation → invalidated
+- "Features over classifiers" methodology lesson → withdrawn
+
+### Forward-looking changes
+- **Producer-level causal audit dimension** added as standard for all future classifier audits (v2.x Amendment 1, highest priority; distinct from join-level causality + end-to-end probability reproduction)
+- v2.x §8 D1 feature-budget expansion proposal **WITHDRAWN** (Arc 9 evidence collapsed; causally-clean expansion delivers ≈ 0 AUC lift)
+- v2.x §3 threshold-grid replacement **WEAKENED** (Arc 7 calibration recovery becomes load-bearing evidence)
+- Arc 7 D1 feature-expansion test **REFUTED** as recommendation (would reproduce the same leak)
+- Arc 7 calibration recovery test remains valid; separate dispatch
+- Causal-only feature library implementation queued (pairs with Amendment 1)
+- KH-24 producer-level audit required pre-PR for v2.x landing (anchor preservation verification)
+
+### Diagnostics
+- `9541237` — Merge `claude/arc-9-causal-patch` (Phase 8 + forced WFO)
+- `5b6c547` — Causal patch (patched LGBM AUC 0.5190)
+- `51457e6` — Forced WFO addendum (analyst override; both candidates FAIL restricted §10)
+- `b3b43b9` — Closure doc rewritten with STEP_4_KILL_REAFFIRMED
+- `29b39f9` — Incident note added
+
 ## ARC 8 CLOSURE | 2026-05-18 | HALT_DEPLOYMENT
 
-Arc 8 (PR-HHHL long, `signal_pullback_resume_hhhl_long_v0.1`) closed HALT_DEPLOYMENT. Steps 1-4 PASS; one archetype survived (c1 V-shape recovery FG-weak). Step 5 WFO FAIL §10 ship gates under full-pool deployment economics. 3rd consecutive Open-22/23/24 admit-only-vs-deployment failure (Arcs 4 RERUN, 5, 8). v2.4 §1.5 entry-separability gate proposed in `PROTOCOL_IMPROVEMENT_BACKLOG.md`.
+Arc 8 (PR-HHHL long, `signal_pullback_resume_hhhl_long_v0.1`) closed HALT_DEPLOYMENT. Steps 1-4 PASS; one archetype survived (c1 V-shape recovery FG-weak). Step 5 WFO FAIL §10 ship gates under full-pool deployment economics. 3rd consecutive Open-22/23/24 admit-only-vs-deployment failure (Arcs 4 RERUN, 5, 8). v2.4 §1.5 entry-separability gate proposed in `PROTOCOL_IMPROVEMENT_BACKLOG.md` as Open-25.
 
 ### Closed
 - **Arc 8 PR-HHHL long** — no §10 ship-gate-passing configuration
@@ -17,13 +52,13 @@ Arc 8 (PR-HHHL long, `signal_pullback_resume_hhhl_long_v0.1`) closed HALT_DEPLOY
 - `4756c66` — Path 1 (post-entry confirmation, t ∈ {3, 5, 8, 12}): `PATH_1_MARGINAL` (best t=12, AUC 0.755, precision@recall=0.60 = 0.274 — below 0.40 viable; slippage not the constraint, 17% c1 MFE consumed by t=12); Path 2 (signal-tightening, 6 single-rule sweeps + 3 pairwise combos): `PATH_2_DEAD` (no filter satisfies c1_ret ≥ 0.80 ∧ c2_ret ≤ 0.30 ∧ pool ≥ 500)
 
 ### Findings logged
-- **v2.4 §1.5 entry-separability gate proposed** — pre-Step-1 multiclass RF check on smoke pool, halt if winning-cluster precision@recall=0.60 < 0.30 on entry features alone. Evidence base: Arcs 4 RERUN, 5, 8. See `PROTOCOL_IMPROVEMENT_BACKLOG.md` for full proposal + acceptance criteria.
+- **v2.4 §1.5 entry-separability gate proposed** as Open-25 — pre-Step-1 multiclass RF check on smoke pool, halt if winning-cluster precision@recall=0.60 < 0.30 on entry features alone. Evidence base: Arcs 4 RERUN, 5, 8. See `PROTOCOL_IMPROVEMENT_BACKLOG.md` for full proposal + acceptance criteria.
 - **c1 V-shape recovery FG-weak archetype** logged for Open-05 portfolio composition (admit-only Pipeline E Sharpe 1.44 / DD 1.00% / ROI 18.66%; Pipeline D1 Sharpe 1.14 / DD 0.54% / ROI 25.73% — tradeable in isolation but not routable from PR-HHHL signal alone). Key features: `ret_5bar_atr`, `pos_in_20bar_range`, `pullback_depth_atr`, `range_to_atr_14`, `hl_range_atr`.
 - **Signal-design observation:** `pullback_depth_atr ≥ 1.0` filter improves aggregate Step 1 mean_r +68% (+0.054 → +0.091). Informational; not deployable as system.
 - **3rd Open-22/23/24 confirmation** (Arcs 4, 5, 8): framework-level pattern, not arc-level failures. Three consecutive arcs PASS admit-only / FAIL full-pool ship gates with the same structural failure mode.
 
 ### Engine state
-- `feat/open-24-pre-t-sl-per-archetype` merged locally to main mid-arc (consumed by Arc 8 D1 policy YAML's `pre_t_sl_atr_multiplier: 4.0`). NOT pushed to origin/main — analyst-side decision pending.
+- `feat/open-24-pre-t-sl-per-archetype` (Open-24) merged 2026-05-19 (PR #146). Consumed by Arc 8 D1 policy YAML's `pre_t_sl_atr_multiplier: 4.0`.
 
 ### Variance from dispatch (recorded)
 - Branch: worktree `claude/magical-zhukovsky-bd69d9` instead of `phase/l_arc_8` (stale local branch conflict)
@@ -37,6 +72,18 @@ Arc 8 (PR-HHHL long, `signal_pullback_resume_hhhl_long_v0.1`) closed HALT_DEPLOY
 - `results/l_arc_8/step1_verbatim/`, `step2/`, `step3/`, `step4/`, `step5_wfo/` (locked at closure)
 - `results/l_arc_8/diagnostics/entry_feature_overlap/`, `post_entry_confirmation/`, `signal_tightening/`, `COMBINED_DIAGNOSTIC_SUMMARY.md` (locked at closure)
 - `STATUS.md`, `SESSION_ZERO.md`, `CHANGELOG.md`, `PROTOCOL_IMPROVEMENT_BACKLOG.md` updated (this housekeeping pass)
+
+## Arc 11 — Closed-HALT (SHB long 4H) | 2026-05-18 | arc closure
+
+- Original closure: Step 4 extractability fail, §16a Path A near-miss (best AUC 0.5728, margin 0.027)
+- Post-closure experimental documentation pass (4 sessions, ~125s total compute):
+  - Exp 1: S5 oracle runs — established cohort magnitude ceiling
+  - Exp 2: S5 no-oracle — vindicated S4 AUC gate (Pipeline E at base rate)
+  - Exp 3: Filter diagnosis — only delayed entry moves AUC; multi-TF and reframed target empirically retired
+  - Exp 4: Signal improvement sweep — best candidate (DE t=7 + dynamic SL 4a) fails on DD/ROI ratio (1.04) and trade count (16/fold)
+- Outcome: no deployable system
+- Closure doc: `results/l_arc_11/ARC_11_CLOSURE.md`
+- No queue / registry / protocol mutation during experimental work
 
 ## L_ARC_PROTOCOL v2.3 AMENDMENT | 2026-05-18 | doc-only
 

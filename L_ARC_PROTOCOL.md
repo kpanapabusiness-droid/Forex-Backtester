@@ -663,6 +663,23 @@ Calibration changes (thresholds, feature sets, floors) require:
 
 Within-arc thresholds locked at arc start.
 
+### Spread floor calibration (effective 2026-05-17)
+
+`configs/spread_floors_5ers.yaml` is calibration-curated, encoding per-pair p50 values from the HistData 2024-2025 audit at 1H execution bars. Floor file mechanism: raw 5ers per-bar spread is used when non-zero; p50 floor applies only when raw=0. Encoding convention is documented in `docs/SPREAD_SEMANTICS_LOCK.md` "Floor file encoding".
+
+p50 is the floor of the floor; lower percentiles are not admissible because HistData LP is systematically tighter than 5ers retail by 10-30%, and any below-median percentile choice stacks two layers of system-favouring bias. See [docs/calibration_decisions/SPREAD_FLOOR_CALIBRATION_DECISION_2026-05-17.md](docs/calibration_decisions/SPREAD_FLOOR_CALIBRATION_DECISION_2026-05-17.md) §3–§4 for full rationale.
+
+Update governance for this file requires:
+- (a) recalibration run on refreshed HistData window or alternative tick source
+- (b) dated calibration decision doc in `docs/calibration_decisions/` with explicit override notice if changing previously chosen percentile
+- (c) KH-24 byte-identity verification on `configs/wfo_kh24.yaml` run (trivial — KH-24 does not load this file)
+- (d) chat-level approval recorded in decision doc §9
+- (e) updates propagated to: floor yaml body, `tests/test_spread_floors_lock.py` `LOCKED_BODY_SHA256`, all consuming configs' `expected_body_sha256`, `docs/SPREAD_SEMANTICS_LOCK.md` change-log entry
+
+Recalibration cadence: every 6 months minimum, upon broker change, or upon evidence affecting the LP-to-retail multiplier.
+
+**Convention precedent:** dated decision docs under `docs/calibration_decisions/<TOPIC>_<YYYY-MM-DD>.md` preserve the historical record of each calibration change for audit reconstruction.
+
 ---
 
 ## §13. Documentation and operational workflow

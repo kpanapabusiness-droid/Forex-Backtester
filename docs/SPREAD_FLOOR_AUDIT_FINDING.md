@@ -6,6 +6,29 @@
 
 ---
 
+## RESOLVED — 2026-05-17
+
+**Resolution:** `configs/spread_floors_5ers.yaml` replaced with per-pair p50 values from HistData 2024-2025 audit (28 pairs, active-session pooled p50 at 1H execution bars). The file is now calibration-curated; `scripts/lchar/compute_spread_floors.py` is retired.
+
+**IMPORTANT — METHODOLOGY OVERRIDE:**
+The "Required resolution §1" section of this document specified **p10** as the floor value. That recommendation has been **OVERRIDDEN**. After revisiting the bias-stacking argument (HistData LP + low-percentile choice combine to two layers of system-favouring bias), **p50** was chosen instead.
+
+Authoritative source of calibration choice and rationale: [docs/calibration_decisions/SPREAD_FLOOR_CALIBRATION_DECISION_2026-05-17.md](calibration_decisions/SPREAD_FLOOR_CALIBRATION_DECISION_2026-05-17.md) §3–§4.
+
+Floor file mechanism is unchanged: raw 5ers per-bar spread used when non-zero, p50 floor applied when raw=0.
+
+KH-24 unaffected (does not load this file). WFO claim downgrade to pass-viable stands on independent audit reconciliation, not on this resolution.
+
+**Open follow-ups carried forward to STATUS.md backlog:**
+- LP-to-retail multiplier calibration (one-week MT5 snapshot, MEDIUM)
+- Phase Zero audit step in L arc workflow (HIGH)
+- Session-aware floors per-pair × per-session (MEDIUM)
+- Governance doc consolidation (SPREAD_SEMANTICS_LOCK + docs/L6_0_METHODOLOGY_LOCK)
+
+The "Required resolution §1" wording below is preserved in place as a historical record of the original recommendation. The override is recorded only at the top of this document, via the forward-pointer above.
+
+---
+
 ## Finding
 
 The locked `configs/spread_floors_5ers.yaml` applies a uniform 0.1 pip floor across all 28 FX pairs. Validation against HistData ASCII tick data (2024-01 → 2025-12, 28 pairs) shows this floor is **systematically wrong on every pair, by factors ranging from 3x (EUR/USD) to 48x (GBP/NZD)**.

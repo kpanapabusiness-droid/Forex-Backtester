@@ -63,6 +63,20 @@
 
 Spread must appear **only** in fill prices **or** only as an explicit cost — never both. This project uses **fill prices only**.
 
+### Floor file encoding (locked 2026-05-17)
+
+`configs/spread_floors_5ers.yaml` encodes per-pair floors as `min_nonzero_spread_native: <integer>` in raw MT5 points. The conversion to pips is **uniform across all 28 pairs**:
+
+```
+pips = native_points / 10
+```
+
+This applies to JPY pairs identically to non-JPY pairs. JPY-specific pip-size handling (where 0.01 = 1 pip in JPY quote terms) occurs later in the pipeline during PnL computation, not at floor application. Reference: [scripts/lchar/compute_spread_floors.py](../scripts/lchar/compute_spread_floors.py) (now retired) and [core/spread_floor.py](../core/spread_floor.py) loader logic (`floors_pips[pair] = native / points_per_pip` with `points_per_pip = 10` by default).
+
+**Foot-gun precedent:** in 2026-05-17 calibration update v1, a draft dispatch specified ×100 for JPY pair conversions based on FX market pip-quote convention. This was incorrect and was caught before yaml write. The mistake is recorded here to prevent recurrence.
+
+**Round-up rule:** non-integer pip values (e.g. 1.85 pips, 2.05 pips) round UP to the next integer when encoded as native points (e.g. 1.85 pips → 19 native, 2.05 pips → 21 native). Round-up is the conservative choice consistent with "p50 is the floor of the floor" calibration logic — see [docs/calibration_decisions/SPREAD_FLOOR_CALIBRATION_DECISION_2026-05-17.md](calibration_decisions/SPREAD_FLOOR_CALIBRATION_DECISION_2026-05-17.md) §3 for rationale.
+
 ---
 
 ## Why we use execution-bar spread (t+1) with daily spread data
@@ -107,3 +121,9 @@ Run only Phase A spread tests:
 ```bash
 python -m pytest tests/test_spread_semantics_lock_phase_a.py -v
 ```
+
+---
+
+## Change log
+
+- **2026-05-17:** `configs/spread_floors_5ers.yaml` replaced with per-pair p50 values from HistData 2024-2025 audit. Calibration-curated, no longer generated. Source script `scripts/lchar/compute_spread_floors.py` retired. New body sha256 propagated to `tests/test_spread_floors_lock.py` `LOCKED_BODY_SHA256` and all 13 consuming configs' `expected_body_sha256`. Governing decision: [docs/calibration_decisions/SPREAD_FLOOR_CALIBRATION_DECISION_2026-05-17.md](calibration_decisions/SPREAD_FLOOR_CALIBRATION_DECISION_2026-05-17.md). Overrides p10 recommendation in `docs/SPREAD_FLOOR_AUDIT_FINDING.md` ("Required resolution §1") — see decision doc §3–§4 for rationale. Encoding-lock convention documented in "Floor file encoding" subsection above.

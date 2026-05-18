@@ -1,0 +1,35 @@
+Determinism verification for 1H — Lω-v2 cross-TF pipeline.
+
+Procedure:
+  1. Run 1: py scripts/lomega/lomega_v2_crosstf.py --tf 1h
+     SHA256 of every deterministic output captured in
+     _determinism_run1_hashes.txt.
+  2. Run 2: py scripts/lomega/lomega_v2_crosstf.py --tf all
+     (1H first, 4H second). Outputs overwritten in place.
+  3. Compared SHA256 of the rewritten files against the run-1 hashes.
+
+Result: 10/10 outputs byte-identical to run 1.
+
+Outputs verified:
+  labels_relaxed.csv
+  b3_univariate_expanded.csv
+  b4_multivariate_expanded.csv
+  b4_summary.txt
+  b4_feature_importances_full.csv
+  feature_importance_drift.csv
+  feature_importance_spearman.csv
+  b4_per_pair_per_fold.csv
+  label_distribution.txt
+  lookahead_spot_check.txt
+
+Status: PASS.
+
+Determinism sources confirmed:
+  - Labels: pure numpy/pandas, no randomness.
+  - Features: pure numpy/pandas/sklearn helpers, no randomness.
+  - RF: random_state=42 fixed; sklearn 1.8.0 RandomForestClassifier is
+    deterministic under fixed seed with n_jobs=-1 on this platform.
+  - Univariate: LogisticRegression with default lbfgs is deterministic
+    for these inputs.
+  - Spot-check: rng seeded with RNG_SEED=42 inside
+    spot_check_no_lookahead.

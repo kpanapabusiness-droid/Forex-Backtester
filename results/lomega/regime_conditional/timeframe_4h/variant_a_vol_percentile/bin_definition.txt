@@ -1,0 +1,5 @@
+variant: vol_percentile
+feature: atr_percentile_60
+edges_q20_q40_q60_q80: [0.1, 0.3166666666666666, 0.5833333333333334, 0.85]
+n_finite: 255174
+n_missing: 0

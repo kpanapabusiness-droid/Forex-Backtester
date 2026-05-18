@@ -1,0 +1,552 @@
+{
+  "env": {
+    "numpy": "2.4.4",
+    "pandas": "3.0.2",
+    "python": "3.14.0",
+    "scipy": "1.17.1"
+  },
+  "groups": [
+    {
+      "archetype_label": "Early-peak hold",
+      "centroid": {
+        "local_peaks": 0.24534686971235195,
+        "monotonicity": 0.008403835307275804,
+        "pullback": 0.0,
+        "time_to_peak_rel": 0.04058286594382403
+      },
+      "cluster_ids": [
+        0
+      ],
+      "final_r": {
+        "mean": -1.0081453369509306,
+        "p25": -1.0048465085,
+        "p5": -1.0352256615,
+        "p50": -1.001734868,
+        "p75": -1.001113358,
+        "p95": -1.0005738845,
+        "t_stat": -1064.9886258358154
+      },
+      "frequencies": {
+        "frac_reach_1R": 0.00676818950930626,
+        "frac_reach_2R": 0.0,
+        "frac_wrong_way": 1.0,
+        "pct_peak_and_collapse": 0.00676818950930626
+      },
+      "gates": {
+        "failure_reasons": [
+          "monotonicity_centroid 0.008 < 0.55",
+          "mfe_h240_p50 0.159R < 1.5R",
+          "frac_reach_1R 0.007 < 0.7",
+          "frac_wrong_way 1.000 > 0.3",
+          "shape_tag=no_magnitude not in {tight_unimodal, heavy_right_tail}"
+        ],
+        "gates_passed_count": 2,
+        "local_peaks": "PASS",
+        "mfe_p50": "FAIL",
+        "monotonicity": "FAIL",
+        "reach_1R": "FAIL",
+        "shape_tag": "FAIL",
+        "size": "PASS",
+        "verdict": "FAIL",
+        "wrong_way": "FAIL"
+      },
+      "label": "cluster_0 (Early-peak hold)",
+      "mass_in_band": {
+        "-0.5R_to_0R": 0.0,
+        "-1R_to_-0.5R": 0.0,
+        "0.5R_to_1R": 0.0,
+        "0R_to_0.5R": 0.0,
+        "1R_to_2R": 0.0,
+        "2R_to_5R": 0.0,
+        "gt_5R": 0.0,
+        "le_-1R": 1.0
+      },
+      "mfe_h240": {
+        "p25": 0.064183609965,
+        "p5": 0.001729093164,
+        "p50": 0.1594950412,
+        "p75": 0.31295356705,
+        "p95": 0.6457619922
+      },
+      "shape_tag": "no_magnitude",
+      "shape_tag_log": {
+        "iqr": 0.0037331505000000043,
+        "no_magnitude_p75_le_0.5R": true,
+        "p25": -1.0048465085,
+        "p50": -1.001734868,
+        "p75": -1.001113358,
+        "p95": -1.0005738845,
+        "skew": -6.352186339288887,
+        "std": 0.023012930009716725
+      },
+      "size_count": 591,
+      "size_fraction": 0.23014018691588786
+    },
+    {
+      "archetype_label": "unassigned",
+      "centroid": {
+        "local_peaks": 8.697768762677486,
+        "monotonicity": 0.49891837516044624,
+        "pullback": 0.4729253980425963,
+        "time_to_peak_rel": 0.3845657514000609
+      },
+      "cluster_ids": [
+        1
+      ],
+      "final_r": {
+        "mean": -0.3519421477024341,
+        "p25": -1.00468122,
+        "p5": -1.0504882908,
+        "p50": -1.001462579,
+        "p75": -0.06692024069,
+        "p95": 2.5318646041999995,
+        "t_stat": -6.43489297683299
+      },
+      "frequencies": {
+        "frac_reach_1R": 0.8093306288032455,
+        "frac_reach_2R": 0.4847870182555781,
+        "frac_wrong_way": 0.7322515212981744,
+        "pct_peak_and_collapse": 0.6632860040567952
+      },
+      "gates": {
+        "failure_reasons": [
+          "monotonicity_centroid 0.499 < 0.55",
+          "frac_wrong_way 0.732 > 0.3",
+          "shape_tag=no_magnitude not in {tight_unimodal, heavy_right_tail}"
+        ],
+        "gates_passed_count": 3,
+        "local_peaks": "PASS",
+        "mfe_p50": "PASS",
+        "monotonicity": "FAIL",
+        "reach_1R": "PASS",
+        "shape_tag": "FAIL",
+        "size": "PASS",
+        "verdict": "FAIL",
+        "wrong_way": "FAIL"
+      },
+      "label": "cluster_1 (unassigned)",
+      "mass_in_band": {
+        "-0.5R_to_0R": 0.018255578093306288,
+        "-1R_to_-0.5R": 0.010141987829614604,
+        "0.5R_to_1R": 0.05070993914807302,
+        "0R_to_0.5R": 0.032454361054766734,
+        "1R_to_2R": 0.09939148073022312,
+        "2R_to_5R": 0.06693711967545639,
+        "gt_5R": 0.0,
+        "le_-1R": 0.7221095334685599
+      },
+      "mfe_h240": {
+        "p25": 1.165968895,
+        "p5": 0.5964553392999999,
+        "p50": 1.948247266,
+        "p75": 2.914544167,
+        "p95": 4.870004916799999
+      },
+      "shape_tag": "no_magnitude",
+      "shape_tag_log": {
+        "iqr": 0.9377609793099999,
+        "no_magnitude_p75_le_0.5R": true,
+        "p25": -1.00468122,
+        "p50": -1.001462579,
+        "p75": -0.06692024069,
+        "p95": 2.5318646041999995,
+        "skew": 1.7318371496768676,
+        "std": 1.2143766592857275
+      },
+      "size_count": 493,
+      "size_fraction": 0.19197819314641745
+    },
+    {
+      "archetype_label": "Stepwise climber",
+      "centroid": {
+        "local_peaks": 24.41842105263158,
+        "monotonicity": 0.5489078066744737,
+        "pullback": 0.49847169160947363,
+        "time_to_peak_rel": 0.8159857363252633
+      },
+      "cluster_ids": [
+        2
+      ],
+      "final_r": {
+        "mean": 3.6762165976013157,
+        "p25": 2.314271121,
+        "p5": -0.11954735011500012,
+        "p50": 3.591531086,
+        "p75": 4.95946061475,
+        "p95": 7.13148947675,
+        "t_stat": 31.90203512047485
+      },
+      "frequencies": {
+        "frac_reach_1R": 1.0,
+        "frac_reach_2R": 0.9947368421052631,
+        "frac_wrong_way": 0.04736842105263158,
+        "pct_peak_and_collapse": 0.12631578947368421
+      },
+      "gates": {
+        "failure_reasons": [
+          "monotonicity_centroid 0.549 < 0.55",
+          "shape_tag=unclassified not in {tight_unimodal, heavy_right_tail}"
+        ],
+        "gates_passed_count": 4,
+        "local_peaks": "PASS",
+        "mfe_p50": "PASS",
+        "monotonicity": "FAIL",
+        "reach_1R": "PASS",
+        "shape_tag": "FAIL",
+        "size": "PASS",
+        "verdict": "FAIL",
+        "wrong_way": "PASS"
+      },
+      "label": "cluster_2 (Stepwise climber)",
+      "mass_in_band": {
+        "-0.5R_to_0R": 0.005263157894736842,
+        "-1R_to_-0.5R": 0.0,
+        "0.5R_to_1R": 0.013157894736842105,
+        "0R_to_0.5R": 0.018421052631578946,
+        "1R_to_2R": 0.10263157894736842,
+        "2R_to_5R": 0.5763157894736842,
+        "gt_5R": 0.23684210526315788,
+        "le_-1R": 0.04736842105263158
+      },
+      "mfe_h240": {
+        "p25": 3.70309201125,
+        "p5": 2.7142003481,
+        "p50": 4.8234520755,
+        "p75": 6.16250882825,
+        "p95": 8.851936571300001
+      },
+      "shape_tag": "unclassified",
+      "shape_tag_log": {
+        "bimodal_decision": "separation_or_valley_insufficient",
+        "fall_through": true,
+        "iqr": 2.6451894937500002,
+        "kde_peak_count": 4,
+        "mode_separation_R": 4.111689335178082,
+        "p25": 2.314271121,
+        "p50": 3.591531086,
+        "p75": 4.95946061475,
+        "p95": 7.13148947675,
+        "p95_over_p75": 1.4379566712436709,
+        "skew": 0.5845470291502782,
+        "std": 2.2463348816763524,
+        "valley_depth_pct": 0.042469503544417024
+      },
+      "size_count": 380,
+      "size_fraction": 0.14797507788161993
+    },
+    {
+      "archetype_label": "Early-peak hold",
+      "centroid": {
+        "local_peaks": 2.528604118993135,
+        "monotonicity": 0.5785008308453089,
+        "pullback": 0.044151464084462244,
+        "time_to_peak_rel": 0.2526499840759794
+      },
+      "cluster_ids": [
+        3
+      ],
+      "final_r": {
+        "mean": -0.9597452971145767,
+        "p25": -1.005293361,
+        "p5": -1.0272730662,
+        "p50": -1.001810408,
+        "p75": -1.001089944,
+        "p95": -1.00049019,
+        "t_stat": -62.93032859549571
+      },
+      "frequencies": {
+        "frac_reach_1R": 0.2723112128146453,
+        "frac_reach_2R": 0.038901601830663615,
+        "frac_wrong_way": 0.9725400457665904,
+        "pct_peak_and_collapse": 0.2654462242562929
+      },
+      "gates": {
+        "failure_reasons": [
+          "mfe_h240_p50 0.685R < 1.5R",
+          "frac_reach_1R 0.272 < 0.7",
+          "frac_wrong_way 0.973 > 0.3",
+          "shape_tag=no_magnitude not in {tight_unimodal, heavy_right_tail}"
+        ],
+        "gates_passed_count": 3,
+        "local_peaks": "PASS",
+        "mfe_p50": "FAIL",
+        "monotonicity": "PASS",
+        "reach_1R": "FAIL",
+        "shape_tag": "FAIL",
+        "size": "PASS",
+        "verdict": "FAIL",
+        "wrong_way": "FAIL"
+      },
+      "label": "cluster_3 (Early-peak hold)",
+      "mass_in_band": {
+        "-0.5R_to_0R": 0.002288329519450801,
+        "-1R_to_-0.5R": 0.0,
+        "0.5R_to_1R": 0.004576659038901602,
+        "0R_to_0.5R": 0.011441647597254004,
+        "1R_to_2R": 0.006864988558352402,
+        "2R_to_5R": 0.002288329519450801,
+        "gt_5R": 0.0,
+        "le_-1R": 0.9725400457665904
+      },
+      "mfe_h240": {
+        "p25": 0.471360834,
+        "p5": 0.2615230142,
+        "p50": 0.6846759242,
+        "p75": 1.016563764,
+        "p95": 1.8717947691999999
+      },
+      "shape_tag": "no_magnitude",
+      "shape_tag_log": {
+        "iqr": 0.004203417000000043,
+        "no_magnitude_p75_le_0.5R": true,
+        "p25": -1.005293361,
+        "p50": -1.001810408,
+        "p75": -1.001089944,
+        "p95": -1.00049019,
+        "skew": 7.79685520751385,
+        "std": 0.3188135063300521
+      },
+      "size_count": 437,
+      "size_fraction": 0.17017133956386293
+    },
+    {
+      "archetype_label": "Stepwise climber",
+      "centroid": {
+        "local_peaks": 7.7859327217125385,
+        "monotonicity": 0.5716157223810397,
+        "pullback": 0.4259963525646789,
+        "time_to_peak_rel": 0.7872228675724771
+      },
+      "cluster_ids": [
+        4
+      ],
+      "final_r": {
+        "mean": -0.34258319545902144,
+        "p25": -1.003884171,
+        "p5": -1.0190154263,
+        "p50": -1.001390667,
+        "p75": -1.0005611665,
+        "p95": 2.8098817605999993,
+        "t_stat": -4.525808515692629
+      },
+      "frequencies": {
+        "frac_reach_1R": 0.6452599388379205,
+        "frac_reach_2R": 0.3211009174311927,
+        "frac_wrong_way": 0.7737003058103975,
+        "pct_peak_and_collapse": 0.4740061162079511
+      },
+      "gates": {
+        "failure_reasons": [
+          "mfe_h240_p50 1.329R < 1.5R",
+          "frac_reach_1R 0.645 < 0.7",
+          "frac_wrong_way 0.774 > 0.3",
+          "shape_tag=no_magnitude not in {tight_unimodal, heavy_right_tail}"
+        ],
+        "gates_passed_count": 3,
+        "local_peaks": "PASS",
+        "mfe_p50": "FAIL",
+        "monotonicity": "PASS",
+        "reach_1R": "FAIL",
+        "shape_tag": "FAIL",
+        "size": "PASS",
+        "verdict": "FAIL",
+        "wrong_way": "FAIL"
+      },
+      "label": "cluster_4 (Stepwise climber)",
+      "mass_in_band": {
+        "-0.5R_to_0R": 0.01529051987767584,
+        "-1R_to_-0.5R": 0.0061162079510703364,
+        "0.5R_to_1R": 0.03058103975535168,
+        "0R_to_0.5R": 0.0,
+        "1R_to_2R": 0.08868501529051988,
+        "2R_to_5R": 0.08256880733944955,
+        "gt_5R": 0.009174311926605505,
+        "le_-1R": 0.7675840978593272
+      },
+      "mfe_h240": {
+        "p25": 0.7796484659,
+        "p5": 0.38481845544,
+        "p50": 1.328737698,
+        "p75": 2.274823494,
+        "p95": 3.9982261001
+      },
+      "shape_tag": "no_magnitude",
+      "shape_tag_log": {
+        "iqr": 0.003323004499999893,
+        "no_magnitude_p75_le_0.5R": true,
+        "p25": -1.003884171,
+        "p50": -1.001390667,
+        "p75": -1.0005611665,
+        "p95": 2.8098817605999993,
+        "skew": 2.0186591840053425,
+        "std": 1.3688118522626438
+      },
+      "size_count": 327,
+      "size_fraction": 0.12733644859813084
+    },
+    {
+      "archetype_label": "unassigned",
+      "centroid": {
+        "local_peaks": 1.5454545454545454,
+        "monotonicity": 0.01807359307272727,
+        "pullback": 0.09684946486090908,
+        "time_to_peak_rel": 0.6446862572518182
+      },
+      "cluster_ids": [
+        5
+      ],
+      "final_r": {
+        "mean": -1.0041516691636363,
+        "p25": -1.0036657197499999,
+        "p5": -1.0123439224,
+        "p50": -1.0020662445,
+        "p75": -1.00123273375,
+        "p95": -1.00060521535,
+        "t_stat": -1477.2229031402733
+      },
+      "frequencies": {
+        "frac_reach_1R": 0.01818181818181818,
+        "frac_reach_2R": 0.0,
+        "frac_wrong_way": 1.0,
+        "pct_peak_and_collapse": 0.01818181818181818
+      },
+      "gates": {
+        "failure_reasons": [
+          "monotonicity_centroid 0.018 < 0.55",
+          "mfe_h240_p50 0.273R < 1.5R",
+          "frac_reach_1R 0.018 < 0.7",
+          "frac_wrong_way 1.000 > 0.3",
+          "shape_tag=no_magnitude not in {tight_unimodal, heavy_right_tail}",
+          "size_fraction 0.043 < 0.1"
+        ],
+        "gates_passed_count": 1,
+        "local_peaks": "PASS",
+        "mfe_p50": "FAIL",
+        "monotonicity": "FAIL",
+        "reach_1R": "FAIL",
+        "shape_tag": "FAIL",
+        "size": "FAIL",
+        "verdict": "FAIL",
+        "wrong_way": "FAIL"
+      },
+      "label": "cluster_5 (unassigned)",
+      "mass_in_band": {
+        "-0.5R_to_0R": 0.0,
+        "-1R_to_-0.5R": 0.0,
+        "0.5R_to_1R": 0.0,
+        "0R_to_0.5R": 0.0,
+        "1R_to_2R": 0.0,
+        "2R_to_5R": 0.0,
+        "gt_5R": 0.0,
+        "le_-1R": 1.0
+      },
+      "mfe_h240": {
+        "p25": 0.1670347623,
+        "p5": 0.0722215594745,
+        "p50": 0.2727527192,
+        "p75": 0.397569955925,
+        "p95": 0.7325821245149999
+      },
+      "shape_tag": "no_magnitude",
+      "shape_tag_log": {
+        "iqr": 0.0024329859999998593,
+        "no_magnitude_p75_le_0.5R": true,
+        "p25": -1.0036657197499999,
+        "p50": -1.0020662445,
+        "p75": -1.00123273375,
+        "p95": -1.00060521535,
+        "skew": -5.069917439056152,
+        "std": 0.007129344889554849
+      },
+      "size_count": 110,
+      "size_fraction": 0.042834890965732085
+    },
+    {
+      "archetype_label": "unassigned",
+      "centroid": {
+        "local_peaks": 8.373913043478261,
+        "monotonicity": 0.5037068052447826,
+        "pullback": 1.0833922788126087,
+        "time_to_peak_rel": 0.6413957960017391
+      },
+      "cluster_ids": [
+        6
+      ],
+      "final_r": {
+        "mean": 0.2579671668487392,
+        "p25": -1.0021161475,
+        "p5": -1.0240939543999998,
+        "p50": -1.0011595034999998,
+        "p75": 1.47387569,
+        "p95": 3.9078167585999983,
+        "t_stat": 2.0555152257314515
+      },
+      "frequencies": {
+        "frac_reach_1R": 0.8347826086956521,
+        "frac_reach_2R": 0.5521739130434783,
+        "frac_wrong_way": 0.6173913043478261,
+        "pct_peak_and_collapse": 0.5565217391304348
+      },
+      "gates": {
+        "failure_reasons": [
+          "monotonicity_centroid 0.504 < 0.55",
+          "frac_wrong_way 0.617 > 0.3",
+          "size_fraction 0.090 < 0.1"
+        ],
+        "gates_passed_count": 3,
+        "local_peaks": "PASS",
+        "mfe_p50": "PASS",
+        "monotonicity": "FAIL",
+        "reach_1R": "PASS",
+        "shape_tag": "PASS",
+        "size": "FAIL",
+        "verdict": "FAIL",
+        "wrong_way": "FAIL"
+      },
+      "label": "cluster_6 (unassigned)",
+      "mass_in_band": {
+        "-0.5R_to_0R": 0.021739130434782608,
+        "-1R_to_-0.5R": 0.004347826086956522,
+        "0.5R_to_1R": 0.02608695652173913,
+        "0R_to_0.5R": 0.02608695652173913,
+        "1R_to_2R": 0.10434782608695652,
+        "2R_to_5R": 0.1826086956521739,
+        "gt_5R": 0.021739130434782608,
+        "le_-1R": 0.6130434782608696
+      },
+      "mfe_h240": {
+        "p25": 1.24914956225,
+        "p5": 0.513731796825,
+        "p50": 2.181339949,
+        "p75": 3.3365208615,
+        "p95": 5.662799932499998
+      },
+      "shape_tag": "heavy_right_tail",
+      "shape_tag_log": {
+        "heavy_right_tail_ratio_ge_2.5_skew_ge_1.0": true,
+        "iqr": 2.4759918375,
+        "p25": -1.0021161475,
+        "p50": -1.0011595034999998,
+        "p75": 1.47387569,
+        "p95": 3.9078167585999983,
+        "p95_over_p75": 2.6513882989684143,
+        "skew": 1.4569112428842548,
+        "std": 1.90330178086885
+      },
+      "size_count": 230,
+      "size_fraction": 0.0895638629283489
+    }
+  ],
+  "input_assignments_csv": "C:\\Users\\panap\\Documents\\Forex-Backtester\\results\\arc_3d\\sl_2.0\\step2\\archetype_assignments.csv",
+  "input_clusters_csv": "C:\\Users\\panap\\Documents\\Forex-Backtester\\results\\arc_3d\\sl_2.0\\step2\\clusters_K7.csv",
+  "input_features_csv": "C:\\Users\\panap\\Documents\\Forex-Backtester\\results\\arc_3d\\sl_2.0\\step2\\path_features.csv",
+  "input_paths_csv": "C:\\Users\\panap\\Documents\\Forex-Backtester\\results\\arc_3d\\sl_2.0\\step1\\trades_paths.csv",
+  "input_trades_csv": "C:\\Users\\panap\\Documents\\Forex-Backtester\\results\\arc_3d\\sl_2.0\\step1\\trades_all.csv",
+  "mode": "un_aggregated",
+  "n_groups": 7,
+  "pool_size": 2568,
+  "run_timestamp_utc": "2026-05-16 13:28:18",
+  "sha256": {
+    "archetype_summaries_csv": "50cbb4f45464a31af4f46d451a2c788ddea8b741f4211c0c4c184ba1bd89b9d0"
+  }
+}

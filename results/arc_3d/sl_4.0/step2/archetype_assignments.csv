@@ -1,0 +1,5 @@
+cluster_label,archetype_label,centroid_monotonicity,centroid_local_peaks,centroid_pullback,centroid_time_to_peak_rel,pct_peak_and_collapse,size,size_fraction,boundary_reason
+0,Stepwise climber,0.5424137057,21.04237288,0.2616847682,0.8257537051,0.1673728814,472,0.287279367,
+1,Early-peak hold,0.0135385535,0.5439330544,0.01010363139,0.1094634907,0,239,0.1454656117,
+2,unassigned,0.5324608615,6.557536467,0.1604603887,0.3025315911,0.2285251216,617,0.3755325624,no §11 pattern matched
+3,unassigned,0.5031343854,8.19047619,0.5753246452,0.6308163716,0.3047619048,315,0.1917224589,no §11 pattern matched

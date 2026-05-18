@@ -42,6 +42,8 @@ Per L0 §3 the registry is descriptive. Trials flagged `PROCEEDS_TO_L6` are **ca
 - **n_obs_pooled:** 40,572
 - **Per-pair Sharpe diagnostic** (across 28 pairs): median 0.056475, p25 -0.017012, p75 0.22231, range [-0.17325, 0.40173]
 - **Threshold disposition:** `PROCEEDS_TO_L6`
+- **Arc disposition:** **KILL at Step 3** (Arc 2 redo — 2026-05-16) under v2.0. Cluster 2 (Stepwise climber) carried strong magnitude (fwd_mfe_p50 5.83R, t-stat +52.17, n=2,278) but failed §2 monotonicity floor by 0.0086 + frac_wrong_way by 0.0051 + shape_tag. See `results/l_arc_2_redo/ARC_2_REDO_RESULT.md`.
+- **Trigger overlap note (2026-05-17):** **Shares byte-identical entry trigger with Entry 5** (`TRIAL__mtf_alignment__2_down_mixed__kijun__h_024`); only horizon differs. Arc 5 at h=120 (chat override of registry h=24) produced an Arc 2 redo2-byte-identical Step 1 trade pool. Arc 2 redo's KILL disposition (v2.0) and Arc 5's SHELVED disposition (v2.1.1 + PR 2) together establish the signal trigger's full picture: the signal carries genuine admit-set edge under v2.1.1's anchor-rescue, but Pipeline D1 cannot extract it due to rejected-pool adverse selection (mean R −0.46). No further work on this entry trigger without a pipeline architecture change (Pipeline E retrofit with richer features, or new pipeline shape that avoids the rejected-pool cost).
 
 ## Entry 3: `TRIAL__volatility_regime__d1_atr_top_decile__any__h_120`
 
@@ -81,7 +83,7 @@ Per L0 §3 the registry is descriptive. Trials flagged `PROCEEDS_TO_L6` are **ca
 - **Base condition:** Extremes both down, 4H_mr up — mixed-down state
 - **Direction / sub-spec:** `kijun` — Kijun-sign trend definition
 - **Signal TF:** `1H`
-- **Horizon:** 24 bars (24 bars = 1 day)
+- **Horizon:** 24 bars (24 bars = 1 day) — *Arc 5 chat override set time_exit_bars=120; with that override Arc 5's Step 1 pool became byte-identical to Arc 2 redo2 (Entry 2 trigger).*
 - **DSR:** 0.999769  (95% CI [0.931629, 1])
 - **Raw Sharpe:** 0.0320725  (95% CI [0.0220306, 0.0415913])
 - **Pooled return mean (ATR-normalised):** 0.105752
@@ -90,6 +92,9 @@ Per L0 §3 the registry is descriptive. Trials flagged `PROCEEDS_TO_L6` are **ca
 - **n_obs_pooled:** 40,619
 - **Per-pair Sharpe diagnostic** (across 28 pairs): median 0.051242, p25 -0.01527, p75 0.12302, range [-0.1385, 0.20096]
 - **Threshold disposition:** `PROCEEDS_TO_L6`
+- **Arc disposition:** **SHELVED (Arc 5 — 2026-05-17)** at Step 6 FAIL under PR 2 + per-pair p50 spread floors + full-pool WFO accounting.
+- **Reason:** Admit-set edge confirmed — v2.1.1 anchor-rescue cleared c1 §2 (composite 0.593); D1 RF AUC 0.636/0.640 at t=1 anchor-parity to KH-24; admit-set mean R +0.14 (c1) / +0.21 (c3) positive across all 7 folds under PR 2's §11 row 2 exit (MFE-lock + trail). PR 2 also rescues c1's §9 DD ratio (2.34 → 1.17). **But Pipeline D1's rejected pool (~78% of trades, classifier P < threshold → close at bar 2) has mean R −0.46 (vs +0.025 unconditional bar-2 R) — adverse-selected by construction (a competent classifier rejects trades whose path-so-far looks bad, which correlates with continued drift).** All three candidate strategies (c1 alone, c3 alone, tiered ensemble) FAIL §10 at every risk level. The signal-pipeline mismatch is the failure mode, not the signal itself.
+- **Reopen condition:** Pipeline E re-evaluation with richer feature set (current E AUC 0.566 is feature-set bound, RF−LR gap ≤ 0.014 — E filters at entry, avoids rejected-pool cost entirely if it clears 0.65); OR alternative pipeline shape (e.g. E pre-filter + D1-on-survivors hybrid) that doesn't bear the rejected-pool cost; OR full Steps 2-4 retrain under new spreads with re-trained classifiers + re-selected thresholds. See `docs/arc_results/ARC_5_RESULT.md` §"Conditions for reopening".
 
 ---
 
@@ -99,6 +104,20 @@ Per L0 §3 the registry is descriptive. Trials flagged `PROCEEDS_TO_L6` are **ca
 - Repeated bases (parameter variations): `2_down_mixed` × 2.
 - Signal-TF distribution in top 5: `1H` (5).
 - Horizons present: 1, 24, 120.
+
+## Registry exhaustion note (2026-05-17, post-Arc-5)
+
+With Arc 5 SHELVED, the registry's h≥120 entries are now exhausted across the L arc programme:
+
+- Entry 1 (h=1) — SKIPPED per chat decision (h=1 trade horizons outside active scope).
+- Entry 2 (h=120) — **KILL** at Step 3 (Arc 2 redo, 2026-05-16) under v2.0.
+- Entry 3 (h=120) — **CLEAN-NULL** at Step 3 (Arc 3, 2026-05-16) under v2.0.
+- Entry 4 (h=1) — SKIPPED per chat decision (h=1 outside active scope); separately Arc 4 took the same trigger and CLOSED CLEAN-NULL on transaction-cost truth (2026-05-17).
+- Entry 5 (h=24, run at h=120 chat override) — **SHELVED** at Step 6 FAIL (Arc 5, 2026-05-17).
+
+Remaining h=1 registry entries are outside the L arc programme's active scope (chat-level decision: h=1 horizons not pursued under current registry framing). Further signal exploration moves out-of-registry pending P0 backlog work (`PROTOCOL_IMPROVEMENT_BACKLOG.md`, items P-§9-FRAMING / P-D1-VIABILITY / P-D1-REJECT-BIAS).
+
+---
 
 ## Cross-entry observations
 

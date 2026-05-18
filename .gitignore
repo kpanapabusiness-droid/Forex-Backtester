@@ -68,6 +68,11 @@ results/*
 # on KH-24 + Arc 1 + Arc 2 (diagnostic only; no protocol revision)
 !results/v2_0_diagnostic/
 !results/v2_0_diagnostic/**
+# Lω discovery track (B1-B4 and later) — multi-timeframe extractability
+# ceiling analysis; small analysis outputs are tracked, heavy per-bar CSVs
+# are gitignored in-folder (regen via scripts/lomega/lomega_b1_b4.py).
+!results/lomega/
+!results/lomega/**
 # v2.0 predictability investigation — entry-time + t>0 angles on
 # target archetypes from PR #129 (diagnostic only; no protocol revision)
 !results/v2_0_predictability/
@@ -80,6 +85,10 @@ results/*
 # (L_ARC_PROTOCOL v2.0 §13: arc results data is direct-to-main).
 !results/l_arc_3/
 !results/l_arc_3/**
+# Arc 3D diagnostic tail — SL × aggregation sweep on the Arc 3 pool. Authorised
+# in docs/arc_results/ARC_3_RESULT.md "Diagnostic tail (Arc 3D) — recommended".
+!results/arc_3d/
+!results/arc_3d/**
 # Arc 2 redo (CLOSED 2026-05-16 KILL at Step 3) — track the result doc;
 # step1/2/3 CSVs/PNGs stay local per minimal-track convention.
 !results/l_arc_2_redo/
@@ -103,6 +112,9 @@ results/l_arc_2_redo2/**/_run_log.txt
 !results/replays_v2_1_1/
 !results/replays_v2_1_1/**
 results/replays_v2_1_1/**/trades_paths_extended.csv
+# L_ARC_PROTOCOL v2.2 governance: arc queue state file (FIFO selection
+# coordination between parallel CC sessions). Tracked by design.
+!results/ARC_QUEUE.md
 results_phase*/
 __pycache__/
 .ipynb_checkpoints/

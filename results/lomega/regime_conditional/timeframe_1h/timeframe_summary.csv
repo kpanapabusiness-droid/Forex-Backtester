@@ -1,0 +1,4 @@
+variant,best_bin,best_bin_worst_auc,n_bins_total,n_bins_trained,gate_pass,b1_b4_baseline_worst_auc
+variant_a_vol_percentile,vol_q1,0.491276075692303,5,5,False,0.4841
+variant_b_d1_trend,d1_down,0.49539798950629155,3,3,False,0.4841
+variant_c_year_quarter,2022-Q4,0.5294921318477306,24,24,False,0.4841

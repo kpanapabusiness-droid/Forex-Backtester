@@ -26,7 +26,7 @@ from scripts.lchar.compute_spread_floors import compute_body_sha256  # noqa: E40
 
 # Single source of truth for the L6.0 §7 lock. Any change requires
 # explicit re-planning per L6.0 §17.
-LOCKED_BODY_SHA256: str = "a613b4ce641c8d5218490531770a4924204029dedaa80fb24111beb61bd15547"
+LOCKED_BODY_SHA256: str = "8da7644b252ae163d963fbd46807572906fa3e5a44fb3e02d771e181b3ecdc05"
 SPREAD_FLOORS_PATH: Path = REPO_ROOT / "configs" / "spread_floors_5ers.yaml"
 
 

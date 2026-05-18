@@ -940,5 +940,204 @@ class TestEnginePatch:
         )
 
 
+# ---------------------------------------------------------------------------
+# 11. Open-24 — per-archetype pre-t SL ATR multiplier (L_ARC_PROTOCOL v2.3 §5).
+# ---------------------------------------------------------------------------
+
+
+def _open24_yaml_block(
+    *,
+    pre_t_sl_atr_multiplier: float | None,
+    fixed_p: float = 0.99,
+    bar_offset_t: int = 1,
+    label: str = "open24_archetype",
+) -> list[dict]:
+    """Build a minimal one-archetype YAML block with the new field.
+
+    ``pre_t_sl_atr_multiplier=None`` omits the field entirely (tests the
+    default-2.0 backward-compat path).
+    """
+    order = list(ALL_FEATURE_KEYS)
+    entry: dict = {
+        "label": label,
+        "feature_order": order,
+        "decision_threshold": 0.1,
+        "bar_offset_t": bar_offset_t,
+        "per_fold_classifiers": {"F1": StubClassifier(order, fixed_p=fixed_p)},
+        "exit_policy": {
+            "type": "stepwise_climber",
+            "archetype_sl_r": 1.0,
+            "r_in_atr": 3.0,
+            "mfe_lock_r": 1.0,
+            "trail_from_high_r": 0.75,
+        },
+    }
+    if pre_t_sl_atr_multiplier is not None:
+        entry["pre_t_sl_atr_multiplier"] = pre_t_sl_atr_multiplier
+    return [entry]
+
+
+class TestPreTSLAtrMultiplier:
+    """Open-24 (v2.3 §5) — per-archetype pre-classification SL multiplier.
+
+    The field controls the SL distance for bars 0..t (before the
+    classifier fires at bar t). Default 2.0 preserves the v2.2 uniform
+    behaviour and the KH-24 anchor (Step 3 selected SL = 2.0 × ATR).
+    """
+
+    @pytest.mark.parametrize(
+        "mult", [0.5, 1.0, 1.5, 2.0, 3.0, 4.0]
+    )
+    def test_yaml_field_round_trips(self, mult: float):
+        """``D1Hook.from_yaml_dict`` reads the field at any positive value."""
+        hook = D1Hook.from_yaml_dict(
+            _open24_yaml_block(pre_t_sl_atr_multiplier=mult)
+        )
+        assert hook.pre_t_sl_atr_multiplier == pytest.approx(mult)
+        assert hook.archetypes[0].pre_t_sl_atr_multiplier == pytest.approx(mult)
+
+    def test_default_is_2_0_when_field_absent(self):
+        """Backward compat: existing per-archetype YAMLs without the new
+        field continue to behave as v2.2 uniform 2.0×ATR.
+        """
+        hook = D1Hook.from_yaml_dict(
+            _open24_yaml_block(pre_t_sl_atr_multiplier=None)
+        )
+        assert hook.pre_t_sl_atr_multiplier == 2.0
+        assert hook.archetypes[0].pre_t_sl_atr_multiplier == 2.0
+
+    @pytest.mark.parametrize("bad", [0.0, -0.1, -2.5])
+    def test_non_positive_multiplier_raises(self, bad: float):
+        with pytest.raises(ValueError, match=r"pre_t_sl_atr_multiplier must be > 0"):
+            D1Hook.from_yaml_dict(
+                _open24_yaml_block(pre_t_sl_atr_multiplier=bad)
+            )
+
+    def test_mixed_multipliers_across_archetypes_raise(self):
+        """Multi-archetype hooks must share the same multiplier — the SL
+        is set at trade entry, before the classifier picks an archetype.
+        Mirrors the existing ``bar_offset_t`` shared-across-archetypes
+        constraint (PR 1).
+        """
+        order = list(ALL_FEATURE_KEYS)
+        policy = _default_policy()
+        a = D1ArchetypeConfig(
+            label="a",
+            feature_order=tuple(order),
+            decision_threshold=0.5,
+            bar_offset_t=3,
+            per_fold_classifiers={"F1": StubClassifier(order)},
+            exit_policy=policy,
+            pre_t_sl_atr_multiplier=1.5,
+        )
+        b = D1ArchetypeConfig(
+            label="b",
+            feature_order=tuple(order),
+            decision_threshold=0.5,
+            bar_offset_t=3,
+            per_fold_classifiers={"F1": StubClassifier(order)},
+            exit_policy=policy,
+            pre_t_sl_atr_multiplier=2.5,
+        )
+        with pytest.raises(
+            ValueError,
+            match=r"Open-24.*must share pre_t_sl_atr_multiplier",
+        ):
+            D1Hook([a, b])
+
+    def test_field_is_not_collected_into_extras(self):
+        """``pre_t_sl_atr_multiplier`` is a known schema field — it must
+        not leak into the ``extras`` mapping reserved for forward-compat
+        unknown keys.
+        """
+        hook = D1Hook.from_yaml_dict(
+            _open24_yaml_block(pre_t_sl_atr_multiplier=1.25)
+        )
+        assert "pre_t_sl_atr_multiplier" not in hook.archetypes[0].extras
+
+
+class TestEnginePreTSLHookIntegration:
+    """Open-24 engine integration — source-level contract.
+
+    The runtime path is exercised end-to-end by the WFO pytest suite;
+    here we verify the static contract: ``main()`` declares ``SL_MULT``
+    global and reassigns it from ``D1_HOOK.pre_t_sl_atr_multiplier`` when
+    the hook is configured. The entry-SL formula and the position-size
+    formula are unchanged at the source level (both still read
+    ``SL_MULT``), so position size scales linearly with the new field.
+    """
+
+    def test_main_declares_sl_mult_global(self):
+        src = ENGINE_PATH.read_text(encoding="utf-8")
+        assert re.search(r"^\s+global\s+SL_MULT\b", src, re.M), (
+            "main() must declare `global SL_MULT` so the D1 hook block "
+            "can reassign it from D1_HOOK.pre_t_sl_atr_multiplier"
+        )
+
+    def test_engine_reassigns_sl_mult_from_hook(self):
+        """When ``D1_HOOK`` is configured the engine sets
+        ``SL_MULT = D1_HOOK.pre_t_sl_atr_multiplier`` so the entry-SL
+        and position-size formulas pick up the per-archetype value.
+        """
+        src = ENGINE_PATH.read_text(encoding="utf-8")
+        m = re.search(
+            r"D1_HOOK\s*=\s*D1Hook\.from_yaml_dict\([^)]*\)\s*"
+            r"(?:[^\n]*\n)*?"
+            r"\s+SL_MULT\s*=\s*D1_HOOK\.pre_t_sl_atr_multiplier",
+            src,
+            re.S,
+        )
+        assert m, (
+            "engine must set `SL_MULT = D1_HOOK.pre_t_sl_atr_multiplier` "
+            "in the same block that constructs D1_HOOK"
+        )
+
+    def test_position_size_formula_reads_sl_mult_via_risk_pp(self):
+        """Position size scales linearly with ``pre_t_sl_atr_multiplier``.
+
+        Source-level proof: ``risk_pp = SL_MULT * a`` and
+        ``pos_size = (INITIAL_BAL * effective_risk_pct) / risk_pp``.
+        Reassigning ``SL_MULT`` to the per-archetype multiplier therefore
+        scales ``pos_size`` by ``1 / multiplier`` at fixed R risk.
+        """
+        src = ENGINE_PATH.read_text(encoding="utf-8")
+        assert "risk_pp   = SL_MULT * a" in src, (
+            "risk_pp must be `SL_MULT * a` so Open-24 reassignment flows "
+            "to position sizing"
+        )
+        assert "pos_size     = (INITIAL_BAL * effective_risk_pct) / risk_pp" in src, (
+            "position-size formula must divide by risk_pp"
+        )
+
+    def test_anchor_default_keeps_sl_mult_2_0(self):
+        """KH-24 anchor preservation: with no explicit field (or
+        explicit 2.0) the hook exposes ``pre_t_sl_atr_multiplier = 2.0``
+        and the engine's reassignment is a no-op against the module-
+        scope default ``SL_MULT = 2.0``.
+        """
+        # Source-level: module-scope default remains 2.0.
+        src = ENGINE_PATH.read_text(encoding="utf-8")
+        assert re.search(r"^SL_MULT\s*=\s*2\.0", src, re.M), (
+            "module-scope SL_MULT default must remain 2.0 for the KH-24 "
+            "baseline / Pipeline-E byte-identity"
+        )
+        # Runtime: anchor's YAML (omitted or explicit 2.0) → hook 2.0.
+        for absent_or_two in (None, 2.0):
+            hook = D1Hook.from_yaml_dict(
+                _open24_yaml_block(pre_t_sl_atr_multiplier=absent_or_two)
+            )
+            assert hook.pre_t_sl_atr_multiplier == 2.0
+
+    def test_sl_audit_uses_runtime_sl_mult(self):
+        """The Section 6 SL-distance sanity check compares against the
+        active ``SL_MULT`` rather than a hardcoded 2.0 so Open-24 runs
+        with a non-default multiplier do not falsely report FAIL.
+        """
+        src = ENGINE_PATH.read_text(encoding="utf-8")
+        assert "abs(d - SL_MULT) < 1e-6 for d in orig_sl" in src, (
+            "original-trade SL audit must compare against runtime SL_MULT"
+        )
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

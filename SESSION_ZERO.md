@@ -114,6 +114,18 @@ Step 5 cross-fold stability (v2.2 §9) removed under v2.3 §1 — Step 5 (WFO, w
 
 **Arc dispatch model under v2.3:** one arc per CC chat session, dispatched via `prompts/cc_arc_orchestrator_template.md` v1.1. CC reads `results/ARC_QUEUE.md`, picks topmost Unrun entry, runs Steps 1-4 unattended, halts at end of Step 4 for analyst-led Step 5 WFO dispatch. Multiple arcs in parallel = multiple CC chat sessions, each on its own `phase/arc-<N>` branch. See v2.2 §15b (FIFO arc selection) and §13 (no mid-arc analyst sign-off; halt point shifted to end of Step 4 under v2.3 §9).
 
+### Active concepts (proposed v2.4 additions)
+
+> Surfaced 2026-05-19 from Arc 11 closure synthesis. Not enacted in protocol — filed in `PROTOCOL_IMPROVEMENT_BACKLOG.md` for next amendment cycle.
+
+**Pipeline DE (Deferred-Entry)** — proposed v2.4. Architecture: enter at bar `t` post-signal or not at all; no second-stage classifier. Features = path-so-far at bar `t`. Distinct from D1 (post-entry in-trade decision) and E (entry-bar decision). Default `t` per-archetype, sweep range [1, 16]. Gate: AUC ≥ 0.60 + sign-consistency + pre-t SL filter rate < 40%. Empirical support: Arc 11 Stage 2 (only AUC-moving direction across four feature regimes).
+
+**`min_observation_bars`** — proposed archetype-registry parameter. Specifies minimum post-signal bars required before entry decision. Protocol would test Pipeline DE variants at this `t` before declaring §16a HALT. Implication: capturable-not-extractable arcs get a cleaner failure attribution (DD/trade-count grounds) rather than AUC-margin near-miss grounds.
+
+### Cross-arc patterns (confirmed)
+
+**Capturable-not-extractable (CONFIRMED 2026-05-19)** — upgraded from speculative. Arc 6 + Arc 11 are two clean instances: cohort carries real structural edge (mfe_p50 3R+, reach_1R high), entry-time features cannot resolve which trades realise it. Pipeline E AUC ceiling ~0.55 on 4H entry-bar features across three independent feature regimes (baseline, multi-TF, reframed target). Discriminating information lives in post-signal price action (timing > features as extractability lever), not pre-signal context. Cross-reference target: any future arc with `mfe_p50 ≥ 3R` + `reach_1R ≥ 80%` + Pipeline E AUC < 0.55 should auto-flag this pattern and route to Pipeline DE evaluation.
+
 ### Tool assignments (unchanged)
 
 - This chat: strategy, research interpretation, decisions, step 3 verdicts, step 4 candidate selection

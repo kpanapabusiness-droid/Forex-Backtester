@@ -1,0 +1,12 @@
+# Arc 11 — Step 1 determinism audit
+
+L_ARC_PROTOCOL v2.3 §5: two-run byte-identical CSV outputs required.
+
+run 1 trades_all sha256:    6fcc2f526bf5d81143385c9413eec01aa2fa63350525d02ab4cde0665910df32
+run 2 trades_all sha256:    6fcc2f526bf5d81143385c9413eec01aa2fa63350525d02ab4cde0665910df32
+run 1 trades_paths sha256:  1d943ee2e22e23a4ec91b7cf45ce7958b6212b0fcb5c724655d9d488cfa1401b
+run 2 trades_paths sha256:  1d943ee2e22e23a4ec91b7cf45ce7958b6212b0fcb5c724655d9d488cfa1401b
+run 1 prefilter sha256:     d90cb38eed4da51fc0e3cda03e34b54ba414cbab0bde56da23301c6061618118
+run 2 prefilter sha256:     d90cb38eed4da51fc0e3cda03e34b54ba414cbab0bde56da23301c6061618118
+
+verdict: PASS

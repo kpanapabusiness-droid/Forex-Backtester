@@ -1,0 +1,2 @@
+regime,threshold,sign_consistency,worst_fold_roi_ann_pct,mean_fold_roi_ann_pct,worst_fold_dd_pct,min_trade_count,full_data_roi_pct,full_data_dd_pct,pass_deployable,pass_viable
+B_delayed_t8_c1,0.50,1,4.1638,20.2504,18.9522,12,162.1948,19.9107,0,0

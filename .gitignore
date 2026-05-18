@@ -105,6 +105,12 @@ results/l_arc_2_redo2/**/_run_log.txt
 # (L_ARC_PROTOCOL v2.1.2 §13: arc results data is direct-to-main).
 !results/l_arc_7/
 !results/l_arc_7/**
+# Arc 11 (swing-high breakout in trend, long, 4H) — Step 1+ outputs
+# (L_ARC_PROTOCOL v2.3 §13: arc results data is direct-to-main). trades_paths.csv
+# excluded (43MB; regenerable from script + config).
+!results/l_arc_11/
+!results/l_arc_11/**
+results/l_arc_11/**/trades_paths.csv
 # v2.1.1 Open-18 empirical replays (per-cohort: arc_3_stepwise, kh24_v2_c4,
 # arc_2_redo_c2). Track all small CSVs + REPLAY_RESULT.md; exclude the large
 # regenerable forward-extended paths CSV (~40-50MB per cohort; rebuildable

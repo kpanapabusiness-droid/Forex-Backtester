@@ -31,11 +31,6 @@ In FIFO order. Topmost is next. Analyst adds entries here as signals become read
   - Handover: `arc_10_handover_DLR.md`
   - Family: Multi-TF trend continuation (HTF-anchored level rejection). Signal TF 4H, anchor TF D1 (one-day lag), long-only, 28 FX. Pool prior 1,000–2,000.
 
-- [ ] **Arc 11** — Swing-high breakout in trend (SHB, long)
-  - Spec: `signal_spec_swing_high_breakout_trend_long_v0.1.md`
-  - Handover: `arc_11_handover_SHB.md`
-  - Family: Trend continuation (structural breakout at historical reference). Signal TF 4H, long-only, 28 FX. Pool prior 1,500–3,000.
-
 ### Batch note
 
 Arcs 8-11 are a coordinated parallel batch testing the entry-time-features hypothesis across four distinct trend-continuation feature classes:
@@ -61,6 +56,11 @@ Each Unrun entry references either a registry entry or a standalone signal spec:
 ## Closed
 
 Most recent first. Populated from actual closure docs in `results/arc_<N>/` and `docs/arc_results/`.
+
+- [x] **Arc 11** — Swing-high breakout in trend (SHB, long) — HALT (Step 4) 2026-05-18; `results/l_arc_11/ARC_11_CLOSURE.md`
+  - Spec: `signal_spec_swing_high_breakout_trend_long_v0.1.md`
+  - Closure branch: `claude/condescending-hoover-72a181` (worktree branch — analyst-side merge to main TBD)
+  - Note: second confirmed capturable-not-extractable closure (pairs with Arc 6). 3 Step 3 V-shape units survived; 0/3 cleared Step 4 disjunctive AUC gate (best agg_c1_c3 D1 t=5 AUC 0.5728 vs 0.60, margin 0.027). §16a Path A near-miss. 4 post-closure experimental sessions (~125s compute) retired 8 directions and proposed Pipeline DE + `min_observation_bars` as v2.4 amendment candidates.
 
 - [x] **Arc 7** — Liquidity sweep + reclaim (long) — CLEAN-NULL 2026-05-17 (Step 4); `docs/arc_results/ARC_7_RESULT.md`
   - Spec: `signal_spec_liquidity_sweep_reclaim_long_v0.1.md`

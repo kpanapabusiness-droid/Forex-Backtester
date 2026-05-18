@@ -2,8 +2,8 @@
 
 ## Status
 
-- **Current step:** Step 3 PASS — proceeding to Step 4.
-- **Verdict:** _(pending end-of-Step-4 halt summary)_
+- **Current step:** Step 4 KILL → HALT — arc closed.
+- **Verdict:** **STEP_4_HALT** per §16a Path A (numeric near-miss; agg_c1_c3 best AUC 0.5728 vs gate 0.60, margin 0.027 < 0.03 absolute).
 - **Last updated:** 2026-05-18
 - **Branch:** `claude/condescending-hoover-72a181` (worktree branch in use for Arc 11; mapping to `phase/l_arc_11` for the dispatch's commit-message convention).
 
@@ -61,7 +61,7 @@ Implemented verbatim in [signals/lchar_swing_high_breakout_trend.py](signals/lch
 | 1 — Plumbing | Pool ≥ 500; byte-identical determinism; right-edge audit clean | **PASS** | 2,299 trades; det PASS; min `h_ref_bar_offset` = 4. |
 | 2 — Clustering | silhouette ≥ 0.30, no cluster > 90%, all clusters ≥ 30 | **PASS** | K=4, silhouette 0.4692, 0/4 degenerate, det PASS. |
 | 3 — Capturability | ≥1 archetype passes §2 floors at any swept SL | **PASS** | 3 surviving units (c1, c3, agg_c1_c3 — all V-shape recovery); c0/c2/agg_c0_c2 die. |
-| 4 — Extractability | ≥1 capturable archetype clears RF AUC ≥ 0.65 (E) or ≥ 0.60 (D1) with valid threshold (recall ≥ 0.60) | _pending_ | |
+| 4 — Extractability | ≥1 capturable archetype clears RF AUC ≥ 0.65 (E) or ≥ 0.60 (D1) with valid threshold (recall ≥ 0.60) | **FAIL — HALT** | 0/3 units clear gate. Best AUC 0.5728 (agg_c1_c3 D1 t=5), margin 0.027 < 0.03 → §16a Path A HALT. |
 
 ## Step 1 — Plumbing
 
@@ -226,10 +226,127 @@ No archetype triggers the §11 row 7 split-exit parallel routing at the selected
 
 **PASS** — 3 V-shape recovery units survive into Step 4 (1 cluster c1, 1 cluster c3, 1 aggregate agg_c1_c3). Early-peak family fully eliminated at §2.
 
+## Step 4 — Extractability investigation
+
+### Headline
+
+| Metric | Value |
+|---|---|
+| Units evaluated | 3 (c1, c3, agg_c1_c3) — Step 3 survivors |
+| Pipeline E feature count | 23 (8 cross-dataset base + 15 arc-11-specific) |
+| Pipeline D1 features (per t) | 15 (8 base entry + 7 path-so-far at bar t) |
+| t candidates swept (D1) | {1, 2, 3, 4, 5, 10} per protocol §8 |
+| Units passing §8 (AUC + v2.2 §3 threshold) | **0 / 3** |
+| Determinism | **PASS** (two-run byte-identical CSVs across summary, fold AUCs, threshold sweeps, feature importance) |
+
+### Per-(unit, pipeline) mean AUCs
+
+| unit | base_succ | E mean AUC (gate 0.65) | D1 best AUC (gate 0.60) | best D1 t |
+|---|---:|---:|---:|---:|
+| c1 | 0.784 | 0.4194 | 0.4810 | 3 |
+| c3 | 0.099 | 0.3911 | 0.5707 | 4 |
+| agg_c1_c3 | 0.387 | 0.5140 | **0.5728** | 5 |
+
+### Threshold sweep
+
+Not reached for any unit — all (unit, pipeline) pairs fail the AUC gate before threshold sweep. Empty `threshold_sweep_*.csv` artefacts.
+
+### Class-imbalance observation
+
+- c1 base_success_rate 0.784 (78% reach 1R at SL=3 — minority is the 22% that fail).
+- c3 base_success_rate 0.099 (10% reach 1R at SL=2 — severe class imbalance; success is the minority).
+- agg_c1_c3 base_success_rate 0.387 (balanced enough that class_weight="none" was used).
+
+c3's per-fold AUCs swing widely (0.222 to 0.512 for Pipeline E; 0.474–0.688 for D1 t=4) — small minority class makes per-fold predictions unstable. agg_c1_c3 is the most stable cohort with std_auc < 0.07 across all configurations.
+
+### Arc-level near-miss analysis
+
+Best AUC across all 21 (unit × pipeline × t) configurations: **0.5728** at agg_c1_c3 Pipeline D1 t=5. Gate is 0.60. Margin = 0.60 − 0.5728 = **0.0272 < 0.03 absolute**.
+
+§16a Path A criteria check:
+1. **Single criterion fail**: arc-level extractability is the §8 disjunctive (E∨D1) over the best unit. One criterion. ✓
+2. **Cohort viability**: agg_c1_c3 size_fraction = 0.387 ≥ 0.10. ✓
+3. **Path A near-miss** (numeric, margin < 0.03 absolute): 0.0272 < 0.03. ✓
+
+All three Path A conditions met → **HALT** with cross-arc calibration candidate, not KILL.
+
+### Artefacts
+
+- `results/l_arc_11/step4/extractability_summary.csv`
+- `results/l_arc_11/step4/extractability_pass_list.csv` (includes `pre_t_sl_atr_multiplier` per Open-24)
+- `results/l_arc_11/step4/fold_aucs.csv`
+- `results/l_arc_11/step4/STEP4_SUMMARY.md`
+- (No feature-importance or threshold-sweep CSVs — AUC gate didn't clear for any pipeline.)
+
+### Verdict
+
+**FAIL → STEP_4_HALT** — capturable Step 3 cohorts (V-shape recovery family, mfe_p50 2.06–4.48 R) cannot be distinguished from non-success trades by entry-time features (Pipeline E AUC peak 0.514 on the aggregate) nor by short-horizon path-so-far features (Pipeline D1 best AUC 0.573 on the aggregate at t=5). The cohorts carry structural edge (Step 3 PASS); they lack entry-time / early-path extractability under the §8 feature set.
+
 ## Cross-arc candidates
 
-_(populated at end of arc)_
+### HALT candidate — SHB extractability under richer feature regime
+
+**Failing criterion:** Pipeline D1 RF AUC (numeric).
+**Margin:** 0.60 − 0.5728 = **0.0272 absolute** (Path A near-miss qualifying).
+**Magnitude evidence:** agg_c1_c3 fwd_mfe_h240_p50 = 2.502 R; final_r p75 = 1.45 R (Step 3 distribution). c1 alone has fwd_mfe_p50 = 4.48 R with reach_1R = 100% — real structural edge, the extractability problem is identification, not capturability.
+
+**Calibration item type:** entry-time / early-path feature-set extension for trend-continuation breakout signals. Candidates:
+- Multi-timeframe context (D1 trend strength + 1H sub-bar context — Arc 11 was single-TF 4H by spec)
+- Cross-pair regime / volatility cluster features
+- Order-flow proxies (sweep depth pre-break, post-break retest absence)
+- Composite ensemble (Pipeline E + Pipeline D1 intersection — not run here under §3 single-classifier-clears-gate rule but mathematically feasible since the unit class balances are not adversarial)
+
+**Reference to open items:** related to **Open-23 / Arc 5 / Arc 4 RERUN cross-arc lesson** that Pipeline D1 admit-only is not the deployment economics — Arc 11 doesn't reach that question because Pipeline D1 doesn't clear AUC. Also related to **Arc 6 closure** (`signal_failed_breakout_long_v0.2`): capturable-not-extractable closure of the same shape (Step 3 PASS path quality clean; Step 4 Pipeline E best AUC 0.60 below 0.65). Arc 11 + Arc 6 are now two arcs in a row where the failure mode is "trend signal with valid forward-geometry edge that the entry-time feature regime can't extract."
+
+### Sibling-arc comparison candidates
+
+Arcs 8, 9, 10 are in-flight parallel CC chats testing other entry-time-feature classes for trend continuation (PR-HHHL, IB-trend, DLR). If any of those reach Step 4 with Pipeline E AUC ≥ 0.65, the cross-arc synthesis (per Arc 11 spec "Arc 8 differential note") can pinpoint which feature class carries the signal — Arc 11's HALT closure is the "structural reference break magnitude" data point.
 
 ## Interesting observations
 
-_(populated as work proceeds)_
+- **Class-imbalance asymmetry between V-shape sub-clusters.** c1 (n=324, SL=3.0): 78% success — the few losers are very hard to identify in advance. c3 (n=565, SL=2.0): 10% success — winners are the minority and hard to predict. The aggregate at SL=3.0 is the most balanced (39% success) yet still doesn't yield ≥ 0.65 AUC.
+- **Pipeline E AUC for c3 (0.39) is below 0.50 random baseline** in 4/5 folds. This suggests entry-time features capture a regime-dependent pattern that the time-series CV's expanding window actively trains *against* — the early folds learn one direction; the later folds invert it. Pipeline D1 path-so-far features are more stable across folds (std_auc 0.05–0.10 for c3 D1 vs 0.11 for E).
+- **D1 best t is unit-dependent**: c1 best at t=3, c3 best at t=4, agg_c1_c3 best at t=5. The smallest-t rule per §8 (smaller t = larger addressable pool, shorter wait) would favour smaller-t — but no t passes the gate so the rule never fires.
+- **Right-edge audit at Step 1 was the only spec-mandated audit gate.** The fact that the signal passed all five preceding gates (Step 1 plumbing, Step 2 clustering, Step 3 capturability per-cluster + per-aggregate) before failing at Step 4 strongly suggests the failure is real (not a plumbing/feature error). The cohort exists and the cohort has structural edge — but the cohort can't be distinguished from non-cohort at decision time using the feature regimes available.
+- **Co-fire matrix vs sibling arcs deferred** — Arcs 8/9/10 in flight; cross-arc co-fire is analyst-level synthesis input, not a Step 1 gate. If Arc 11 SHB and Arc 8 PR-HHHL show 20%+ co-fire (per spec expectation), then Arc 8's Pipeline E result (if it clears 0.65) shows what features SHB also has access to. If Arc 8 also lands at HALT, the cross-arc finding is "trend-continuation breakout signals at this protocol's feature regime hit an extractability ceiling around 0.55–0.60 RF AUC."
+
+## Halt Summary — Arc 11
+
+### Status
+
+- **Disposition:** STEP_4_HALT (per §16a Path A numeric near-miss)
+- **Closure doc:** _(this live arc doc is the closure record; will be renamed `ARC_11_RESULT.md` at queue closure)_
+- **Live arc doc:** `results/l_arc_11/ARC_11_LIVE.md`
+- **Branch:** `claude/condescending-hoover-72a181` (worktree branch — Arc 11's commits use the dispatch's `arc-11 step <K>` prefix convention)
+- **Queue state:** Per user instruction "Ignore the arc queue, another cc chat is running the previous arcs", no queue mutation performed by this session. Analyst should mark Arc 11 Closed-HALT at queue update time.
+
+### Step pass/fail table
+
+| Step | Gate | Result |
+|---|---|---|
+| 1 — Plumbing | Pool ≥ 500, det, right-edge audit | **PASS** (2299 trades, det PASS, min h_ref_bar_offset = 4) |
+| 2 — Path-shape clustering | sil ≥ 0.30, no cluster > 90%, all clusters ≥ 30, ≤ 1 degenerate feature | **PASS** (K=4, silhouette 0.469, 0/4 degenerate, det PASS) |
+| 3 — Capturability | ≥ 1 archetype passes §2 conjunctively at some swept SL | **PASS** (3 V-shape recovery units; Early-peak family fully eliminated) |
+| 4 — Extractability | ≥ 1 capturable archetype clears RF AUC + v2.2 §3 threshold | **FAIL → HALT** (best AUC 0.5728, margin 0.027 < 0.03 → Path A near-miss) |
+
+### Surviving archetypes (Step 3 capturable)
+
+None advance to Step 5 (WFO) — Step 4 HALT closes the arc. For analyst reference (would have been the Step 5 dispatch input had Step 4 passed):
+
+| Label | Cluster IDs | Selected SL (= D1 pre_t_sl_atr) | Pipeline | RF AUC (best) | Threshold | Notes |
+|---|---|---:|---|---:|---:|---|
+| V-shape recovery (path-shape weak) | c1 | 3.0 | (would be both, neither cleared AUC) | E 0.42 / D1 0.48 @ t=3 | n/a | Smallest cohort (n=324), highest base success (78%) — extractability hard at this imbalance |
+| V-shape recovery | c3 | 2.0 | (neither cleared) | E 0.39 / D1 0.57 @ t=4 | n/a | n=565, base success 10% — severe class imbalance |
+| V-shape recovery | agg_c1_c3 | 3.0 | (neither cleared; closest miss) | E 0.51 / D1 **0.5728** @ t=5 | n/a | n=889, base success 39% — most balanced; near-miss source |
+
+### Cross-arc calibration candidates (HALT-specific)
+
+See **Cross-arc candidates** section above. Single calibration candidate:
+- **SHB extractability under richer feature regime.** Failing criterion numeric (AUC), margin 0.027 absolute. Magnitude evidence: agg_c1_c3 fwd_mfe_p50 2.50 R, c1 fwd_mfe_p50 4.48 R with reach_1R 100%. Calibration suggestion: feature-set extension (multi-TF, regime, cross-pair, ensemble) for trend-continuation breakouts. Pairs with Arc 6 (failed-breakout) as a second capturable-not-extractable closure of the same shape.
+
+### Recommended next dispatch
+
+Per v2.3 §9 + §16a:
+- Closure recorded as KILL/HALT — no further chat dispatch for this arc.
+- HALT closure doc batched with other HALT items for next protocol amendment cycle (per v2.2 §6 / §13 "Chat reviews HALT closure docs in batch for cross-arc calibration cycles").
+- Sibling arcs (8, 9, 10) still in flight; cross-arc synthesis happens when all four complete.

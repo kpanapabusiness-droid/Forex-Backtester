@@ -1,6 +1,6 @@
 # Arc Queue
 
-> State file for L arc parallel execution under L_ARC_PROTOCOL v2.2.
+> State file for L arc parallel execution under L_ARC_PROTOCOL v2.3 (base v2.1.2 + v2.2 amendment + v2.3 amendment).
 > Read by CC at arc-open. Updated by CC at queue transitions. Analyst owns Unrun ordering and signal source selection.
 > Coordination: git-level. Queue file is the only shared state between concurrent CC sessions. Each session pulls before edit; on push conflict, pulls and retries.
 
@@ -16,7 +16,31 @@ _None._
 
 In FIFO order. Topmost is next. Analyst adds entries here as signals become ready.
 
-_Empty._
+- [ ] **Arc 8** — Pullback-and-resume in HH/HL uptrend (PR-HHHL, long)
+  - Spec: `docs/signal_spec_pullback_resume_hhhl_long_v0.1.md`
+  - Family: Trend continuation (structural). Signal TF 4H, long-only, 28 FX. Pool prior 2,500–4,000.
+
+- [ ] **Arc 9** — Inside-bar break in trend (IB-trend, long)
+  - Spec: `docs/signal_spec_inside_bar_break_trend_long_v0.1.md`
+  - Family: Trend continuation (compression-and-break). Signal TF 4H, long-only, 28 FX. Pool prior 1,500–2,500.
+
+- [ ] **Arc 10** — D1 swing-low rejection in D1 uptrend (DLR, long)
+  - Spec: `docs/signal_spec_d1_swing_low_rejection_long_v0.1.md`
+  - Family: Multi-TF trend continuation (HTF-anchored level rejection). Signal TF 4H, anchor TF D1 (one-day lag), long-only, 28 FX. Pool prior 1,000–2,000.
+
+- [ ] **Arc 11** — Swing-high breakout in trend (SHB, long)
+  - Spec: `docs/signal_spec_swing_high_breakout_trend_long_v0.1.md`
+  - Family: Trend continuation (structural breakout at historical reference). Signal TF 4H, long-only, 28 FX. Pool prior 1,500–3,000.
+
+### Batch note
+
+Arcs 8-11 are a coordinated parallel batch testing the entry-time-features hypothesis across four distinct trend-continuation feature classes:
+- Arc 8: rich entry-time features (trend strength + pullback geometry + trigger geometry)
+- Arc 9: narrow entry-time features (compression geometry + break geometry)
+- Arc 10: HTF entry-time features (D1 anchor identity + LTF rejection geometry)
+- Arc 11: structural reference break magnitude (swing-high freshness + break magnitude)
+
+Co-fire matrix between the four is measured at each arc's Step 1 closure (specs). Cross-arc synthesis is analyst work at Step 4 halt-summary review (v2.3: Step 4 is now the unattended halt point; Step 5 = WFO is the analyst-dispatched checkpoint).
 
 ### Entry format
 
@@ -25,32 +49,32 @@ Each Unrun entry references either a registry entry or a standalone signal spec:
 ```markdown
 - [ ] **Arc <N>** — <signal name>
   - Spec: `LCHAR_TOPN_REGISTRY.md` Entry <K>     # for registry-derived signals
-  - Spec: `signal_spec_<name>_v<version>.md`     # for analyst-designed signals
+  - Spec: `docs/signal_spec_<name>_v<version>.md`  # for analyst-designed signals
 ```
 
 ---
 
 ## Closed
 
-Most recent first. Populated from actual closure docs in `results/arc_<N>/` and `docs/arc_results/`.
+Most recent first. Populated from actual closure docs in `results/l_arc_<N>/` and `docs/arc_results/`.
 
 - [x] **Arc 7** — Liquidity sweep + reclaim (long) — CLEAN-NULL 2026-05-17 (Step 4); `docs/arc_results/ARC_7_RESULT.md`
-  - Spec: `signal_spec_liquidity_sweep_reclaim_long_v0.1.md`
-  - Closure branch: `phase/l_arc_7` (closure doc pending merge to main)
+  - Spec: `docs/signal_spec_liquidity_sweep_reclaim_long_v0.1.md`
+  - Closure branch: `phase/l_arc_7`
   - Note: first capturable-not-extractable closure of record. PASS §7 with 3 V-shape units; FAIL §8 with 0/6 unit × pipeline AUCs clearing gate (best 0.536 vs 0.65). Max-F1 fallback case that v2.2 §3 closes mechanically going forward.
 
 - [x] **Arc 4 RERUN** — `bar_range_top_decile__neg__h_001` — KILL (Step 6 FAIL) 2026-05-18; `docs/arc_results/ARC_4_RERUN_RESULT.md`
   - Spec: `LCHAR_TOPN_REGISTRY.md` Entry 4 (re-run from Step 1 under corrected per-pair p50 spread floors)
   - Closure branch: `calibration/spread-floor-p50-2026-05-17`
-  - Note: §10 full-pool deployment FAIL on every gate. Admit-pool edge +0.125R per trade swamped by reject pool (32%, −0.232R) + early-exit pool (11%, −0.685R). Open-22/23/24 spawned. Supersedes prior CLEAN-NULL closure (disposition unchanged, reason updated).
+  - Note: §10 full-pool deployment FAIL on every gate. Admit-pool edge +0.125R per trade swamped by reject pool (32%, −0.232R) + early-exit pool (11%, −0.685R). Open-22/23/24 spawned; v2.3 closes Open-22 by structural removal of Step 5 (was cross-fold stability), closes Open-23 by documentation correction. Supersedes prior CLEAN-NULL closure (disposition unchanged, reason updated). Closed under v2.2 numbering ("Step 6 = WFO"); under v2.3 the equivalent step is renumbered to Step 5.
 
 - [x] **Arc 5** — `mtf_alignment.2_down_mixed.kijun` (h=120) — KILL (SHELVED Step 6 FAIL) 2026-05-17; `docs/arc_results/ARC_5_RESULT.md`
   - Spec: `LCHAR_TOPN_REGISTRY.md` Entry 5
-  - Closure branch: `arc-5-closure` (closure doc pending merge to main)
-  - Note: all three strategy candidates FAIL at every risk level. Pipeline D1 rejected-pool adverse selection (~78%, −0.46R mean) kills full-strategy expectancy despite admit-set edge. Signal NOT permanently eliminated — Pipeline E re-evaluation reopenable.
+  - Closure branch: `arc-5-closure`
+  - Note: all three strategy candidates FAIL at every risk level. Pipeline D1 rejected-pool adverse selection (~78%, −0.46R mean) kills full-strategy expectancy despite admit-set edge. Signal NOT permanently eliminated — Pipeline E re-evaluation reopenable. Closed under v2.2 numbering; under v2.3 the equivalent step is Step 5 (was Step 6).
 
 - [x] **Arc 6** — Failed-breakout reversal (long) — KILL (DIES Step 4) 2026-05-17; `docs/arc_results/ARC_6_RESULT.md`
-  - Spec: `signal_spec_failed_breakout_long_v0.2.md` (out-of-registry insertion on `discovery/lomega_regime_conditional`)
+  - Spec: `docs/signal_spec_failed_breakout_long_v0.2.md` (out-of-registry insertion on `discovery/lomega_regime_conditional`)
   - Note: Pipeline E both clusters fail (best AUC 0.600 / 0.590 vs 0.65); Pipeline D1 clears AUC ≥ 0.60 mechanically but threshold sweep collapses to max-F1 fallback at sub-1% recall. Signal NOT permanently eliminated — path quality clean (c2 mfe_p50 4.47R, ww_pp 0.000); may return under richer feature regime / multi-TF / ensemble. v2.2 §3 closes the max-F1 fallback path mechanically.
 
 - [x] **Arc 4** (original closure) — `bar_range_top_decile__neg__h_001` — KILL (CLEAN-NULL on transaction-cost truth) 2026-05-17; `docs/arc_results/ARC_4_RESULT.md`
@@ -70,7 +94,7 @@ The following closed pre-v2.2 (when arc selection was implicit and queue did not
 - **Arc 1** — original under v1.x protocol — FAIL verbatim WFO; Arc 1 P2 (CH-001 concurrent_signals filter) PASS under L6.0 framing. See archive.
 - **KH-24 v2.0 self-test (arc_kh24_v2)** — HALT at Step 3 2026-05-16. Protocol self-test on bare `kb_exhaustion_bar`. See `results/arc_kh24_v2/ARC_KH24_V2_RESULT.md`.
 
-Note on disposition naming under v2.2: KILL and HALT are the mechanical dispositions per §16a; SHIPPED is reserved for step 6 WFO pass-deployable + analyst ship decision. Pre-v2.2 closures used SHELVED for some KILL-equivalent outcomes; preserved verbatim from closure docs for traceability.
+Note on disposition naming under v2.3: KILL and HALT are the mechanical dispositions per §16a; SHIPPED is reserved for Step 5 (WFO, was Step 6 pre-v2.3) pass-deployable + analyst ship decision. Pre-v2.3 closures used "Step 6" for WFO; under v2.3 that's "Step 5" — see v2.3 §2 (Step renumbering). Closure docs are not retroactively renumbered.
 
 ---
 
@@ -91,7 +115,7 @@ Each Unrun entry must reference either a registry entry or a standalone signal s
 
 ### Parallel arcs
 
-Multiple Active entries permitted. Each on its own `phase/arc-<N>` branch, own `results/arc_<N>/` folder. One Active entry per CC chat session.
+Multiple Active entries permitted. Each on its own `phase/l_arc_<N>` branch, own `results/l_arc_<N>/` folder per `WORKFLOW.md`. One Active entry per CC chat session.
 
 To run N arcs in parallel: open N CC chats. Each session reads this queue file, picks the topmost Unrun, and proceeds.
 
@@ -105,4 +129,4 @@ A closed arc re-evaluated under a new protocol version gets a new Unrun entry (`
 
 ### SHIPPED disposition
 
-Only assigned after step 6 WFO pass-deployable + analyst ship decision (per §10). Steps 1-5 dispatches never produce SHIPPED — only KILL, HALT, or step-5-complete-pending-WFO (Active remains).
+Only assigned after Step 5 (WFO, was Step 6 pre-v2.3) pass-deployable + analyst ship decision (per §10). Steps 1-4 dispatches never produce SHIPPED — only KILL, HALT, or step-4-complete-pending-Step-5 (Active remains).

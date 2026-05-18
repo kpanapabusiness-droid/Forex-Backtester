@@ -1,0 +1,6 @@
+K=7
+silhouette: 0.4055
+sizes: {0: 206, 1: 560, 2: 433, 3: 232, 4: 120, 5: 219, 6: 383}
+max_cluster_frac: 0.2601
+min_cluster_n: 120
+gate_pass: True

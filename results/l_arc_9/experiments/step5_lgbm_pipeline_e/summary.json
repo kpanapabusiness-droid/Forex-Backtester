@@ -1,0 +1,67 @@
+{
+  "candidates": {
+    "A_thr0.40": {
+      "fold_n_admitted": [
+        0,
+        50,
+        24,
+        32,
+        39,
+        44,
+        47
+      ],
+      "gates_summary": {
+        "all_folds_positive": false,
+        "full_data_ann_roi_pct": 19.064516197971336,
+        "full_data_max_dd_pct": 1.3161495857344208,
+        "mean_fold_ann_roi_pct": 19.64921397399059,
+        "min_trades_per_fold": 0,
+        "worst_fold_ann_roi_pct": 0.0,
+        "worst_fold_max_dd_pct": 1.316149585734438
+      },
+      "note": "locked v2.2 \u00a73 grid best (Pipeline E retry extended sweep)",
+      "pass_deployable": false,
+      "pass_viable": false,
+      "threshold": 0.4,
+      "total_trades_admitted": 236
+    },
+    "B_thr0.05": {
+      "fold_n_admitted": [
+        0,
+        111,
+        81,
+        74,
+        96,
+        103,
+        134
+      ],
+      "gates_summary": {
+        "all_folds_positive": false,
+        "full_data_ann_roi_pct": 29.89049410183451,
+        "full_data_max_dd_pct": 6.8017951266300685,
+        "mean_fold_ann_roi_pct": 30.963238659769843,
+        "min_trades_per_fold": 0,
+        "worst_fold_ann_roi_pct": 0.0,
+        "worst_fold_max_dd_pct": 6.801795126630095
+      },
+      "note": "recall-floor operating point (extended sweep recall ~0.60)",
+      "pass_deployable": false,
+      "pass_viable": false,
+      "threshold": 0.05,
+      "total_trades_admitted": 599
+    }
+  },
+  "parity": {
+    "expected_mean_auc": 0.7508,
+    "parity": true,
+    "per_fold_aucs": [
+      0.84838,
+      0.735746,
+      0.717263,
+      0.714402,
+      0.738041
+    ],
+    "reproduced_mean_auc": 0.750766276954388,
+    "tolerance": 0.0001
+  }
+}

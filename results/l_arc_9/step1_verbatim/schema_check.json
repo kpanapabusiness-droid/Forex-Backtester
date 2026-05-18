@@ -1,0 +1,23 @@
+{
+  "bad_is_held": 0,
+  "bad_offset": 0,
+  "extras_present": [
+    "high_r",
+    "low_r"
+  ],
+  "missing_required_cols": [],
+  "n_trades_no_forward_obs": 399,
+  "n_trades_total": 2153,
+  "n_trades_with_forward_obs": 1754,
+  "required_cols_present": [
+    "bar_offset",
+    "close_r",
+    "is_held",
+    "mae_so_far_r",
+    "mfe_so_far_r",
+    "pair",
+    "trade_id"
+  ],
+  "verdict": "PASS",
+  "violations": []
+}

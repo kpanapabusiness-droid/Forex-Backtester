@@ -1,0 +1,11 @@
+Arc 9 Step 1 - right-edge swing-low audit
+============================================================
+Spec: most recent qualifying swing-low at bar k with k <= t-4
+Equivalent column: trades.most_recent_sl_lag >= 4 for every fire
+
+Trades scanned: 2153
+Min lag: 4  Max lag: 30
+Lag p5/p25/p50/p75/p95: 4/5/8/11/17
+Violations (lag<4): 0
+
+Right-edge swing audit: PASS

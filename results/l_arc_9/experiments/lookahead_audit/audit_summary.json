@@ -1,0 +1,85 @@
+{
+  "audits": {
+    "1": {
+      "audit": "1_4h_feature_timestamps",
+      "n_feature_checks": 3920,
+      "n_mismatches": 0,
+      "n_samples": 280,
+      "note": "Truncated-series recompute matched recorded feature values for 3920/3920 (feature, sample) pairs. Mismatches imply forward bars contributed.",
+      "verdict": "GREEN"
+    },
+    "2": {
+      "audit": "2_d1_lag",
+      "early_hours_min_days_lag": 1,
+      "hard_stop_triggered": false,
+      "max_days_lag_overall": 4,
+      "min_days_lag_overall": 1,
+      "missing_pieces_arc9": [],
+      "missing_pieces_reference": [],
+      "monday_min_days_lag": 3,
+      "n_early_hours_boundary": 194,
+      "n_leak": 0,
+      "n_monday_boundary": 129,
+      "n_no_d1_avail": 0,
+      "n_samples": 560,
+      "pattern_arc9_ok": true,
+      "pattern_ref_engine_ok": true,
+      "verdict": "GREEN"
+    },
+    "3": {
+      "audit": "3_session_features",
+      "n_feature_checks": 80,
+      "n_mismatches": 0,
+      "n_samples": 20,
+      "verdict": "GREEN"
+    },
+    "4": {
+      "audit": "4_label_leak",
+      "column_overlap_with_path_shape": [],
+      "max_abs_correlation": 0.3284538294200442,
+      "max_corr_feature_pair": [
+        "d1_bars_since_swing_low",
+        "local_peaks_count"
+      ],
+      "n_features": 28,
+      "n_forward_geometry_in_entry": 0,
+      "n_pairs_with_abs_corr_above_0_85": 0,
+      "verdict": "GREEN"
+    },
+    "5": {
+      "audit": "5_fold_disjointness",
+      "note": "Pipeline E retry uses TimeSeriesSplit(5) which is walk-forward by construction (train indices < test indices always). Step 5 LGBM Pipeline E retrains per KH-24 fold using anchored expanding training (train_mask = entry_time < fold.oos_start). Neither scheme has training overlap with its own test fold.",
+      "parity_pass": true,
+      "parity_reproduced_auc": 0.750766276954388,
+      "step5_walkforward_in_code": true,
+      "tss_folds_overlap_count": 0,
+      "verdict": "GREEN",
+      "wfo_folds_train_into_oos_count": 0
+    },
+    "6": {
+      "audit": "6_cluster_label_flow",
+      "inference_uses_features_only": true,
+      "no_kmeans_in_step5_inference": true,
+      "verdict": "GREEN",
+      "y_is_target_only": true
+    },
+    "7": {
+      "audit": "7_execution_semantics",
+      "n_fail": 0,
+      "n_pass": 20,
+      "n_samples": 20,
+      "verdict": "GREEN",
+      "volume_veto_note": "Arc 9 signal (lchar_inside_bar_break_trend_long.py) has no volume veto condition; check N/A."
+    },
+    "8": {
+      "audit": "8_e2e_reproduction",
+      "max_abs_diff": 4.822819921201926e-11,
+      "n_match_within_1e-6": 100,
+      "n_mismatch": 0,
+      "n_samples": 100,
+      "verdict": "GREEN"
+    }
+  },
+  "overall_verdict": "GREEN",
+  "rng_seed": 4242
+}

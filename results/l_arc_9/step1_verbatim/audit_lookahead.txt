@@ -1,0 +1,11 @@
+Arc 9 Step 1 - lookahead spot-check
+============================================================
+seed=20260518, n_samples=5
+
+  EUR_GBP 2024-07-16 08:00:00: swing_low 0.83852/0.83852  n_sl 1/1  fired=True  PASS
+  EUR_NZD 2024-03-04 00:00:00: swing_low 1.75463/1.75463  n_sl 2/2  fired=True  PASS
+  EUR_CHF 2025-02-26 08:00:00: swing_low 0.93659/0.93659  n_sl 4/4  fired=True  PASS
+  GBP_JPY 2023-09-29 00:00:00: swing_low 180.88600/180.88600  n_sl 2/2  fired=True  PASS
+  CHF_JPY 2020-10-09 08:00:00: swing_low 114.04100/114.04100  n_sl 2/2  fired=True  PASS
+
+Lookahead spot-check: 5/5 - PASS

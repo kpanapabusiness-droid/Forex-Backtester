@@ -1,0 +1,13 @@
+calibrator,threshold,precision,recall,n_admitted,passes_recall_floor
+approach_A_uncal,0.4,0,0,0,0
+approach_A_uncal,0.5,0,0,0,0
+approach_A_uncal,0.6,0,0,0,0
+approach_A_uncal,0.7,0,0,0,0
+approach_A_platt,0.4,0,0,1,0
+approach_A_platt,0.5,0,0,0,0
+approach_A_platt,0.6,0,0,0,0
+approach_A_platt,0.7,0,0,0,0
+approach_A_isotonic,0.4,0.3333333333,0.02739726027,6,0
+approach_A_isotonic,0.5,0.3333333333,0.02739726027,6,0
+approach_A_isotonic,0.6,0.3333333333,0.02739726027,6,0
+approach_A_isotonic,0.7,0.3333333333,0.02739726027,6,0

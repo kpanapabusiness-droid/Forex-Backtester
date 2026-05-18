@@ -1,0 +1,13 @@
+{
+  "expected_mean_auc": 0.7508,
+  "parity": true,
+  "per_fold_aucs": [
+    0.84838,
+    0.735746,
+    0.717263,
+    0.714402,
+    0.738041
+  ],
+  "reproduced_mean_auc": 0.750766276954388,
+  "tolerance": 0.0001
+}

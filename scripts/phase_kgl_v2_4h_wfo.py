@@ -3150,10 +3150,13 @@ def _write_report(
     orig_sl = [t["sl_distance_atr"] for t in orig_t]
     re_sl   = [t["sl_distance_atr"] for t in re_t]
     if orig_sl:
-        orig_exact = all(abs(d - 2.0) < 1e-6 for d in orig_sl)
+        # Open-24 (v2.3 §5): the entry-SL multiplier follows the active
+        # Pipeline D1 archetype when D1_HOOK is configured; with no D1
+        # hook ``SL_MULT`` stays at the module-scope default of 2.0.
+        orig_exact = all(abs(d - SL_MULT) < 1e-6 for d in orig_sl)
         a(f"Original trades ({len(orig_t)}):  "
           f"min sl_distance_atr={min(orig_sl):.6f}  max={max(orig_sl):.6f}  "
-          f"all exactly 2.0: **{'YES — OK' if orig_exact else 'NO — FAIL'}**")
+          f"all exactly {SL_MULT:.1f}: **{'YES — OK' if orig_exact else 'NO — FAIL'}**")
     if re_sl:
         re_exp   = REENTRY_SL_ATR_MULT
         re_exact = all(abs(d - re_exp) < 1e-6 for d in re_sl)
@@ -3795,6 +3798,7 @@ def main() -> None:
     global KH17_STATE1_SL_ATR_MULT
     global KH17_BAR6_MFE_THRESHOLD, KH17_BAR6_MAE_THRESHOLD
     global D1_HOOK
+    global SL_MULT
     global SIGNAL_ADAPTER
     global SIGNAL_TF, H1_DATA_DIR
     global TIME_EXIT_BARS
@@ -4277,9 +4281,20 @@ def main() -> None:
             D1_HOOK = D1Hook.from_yaml_dict(
                 cfg["d1_archetypes"], project_root=PROJECT_ROOT,
             )
+            # Open-24 (L_ARC_PROTOCOL v2.3 §5): pre-classification SL
+            # (bars 0..t) follows the cluster's Step 3 selected SL via
+            # the archetype's `pre_t_sl_atr_multiplier` (default 2.0
+            # preserves v2.2 uniform behaviour and the KH-24 anchor).
+            # Reassigning the module-scope ``SL_MULT`` keeps the entry
+            # SL formula (``entry_px ± SL_MULT * a``) and the position
+            # sizing formula (``risk_pp = SL_MULT * a``) byte-identical
+            # at the source level while making the multiplier runtime-
+            # configurable per archetype.
+            SL_MULT = D1_HOOK.pre_t_sl_atr_multiplier
             print(
                 f"  Pipeline D1: ENABLED — {len(D1_HOOK.archetypes)} archetype(s), "
-                f"bar_offset_t={D1_HOOK.bar_offset_t}"
+                f"bar_offset_t={D1_HOOK.bar_offset_t}, "
+                f"pre_t_sl_atr_multiplier={SL_MULT}"
             )
 
     D1_ATR_DIST_CAP = args.threshold

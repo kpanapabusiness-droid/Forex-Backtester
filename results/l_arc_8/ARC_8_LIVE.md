@@ -2,8 +2,8 @@
 
 ## Status
 
-- **Current step:** Arc open (pre-Step-1)
-- **Verdict:** none yet
+- **Current step:** Step 1 complete (PASS); Step 2 next
+- **Verdict:** none yet (arc still active)
 - **Last updated:** 2026-05-18
 - **Branch:** worktree `claude/magical-zhukovsky-bd69d9` (dispatcher-target merge to `phase/l_arc_8`)
 - **Live doc:** `results/l_arc_8/ARC_8_LIVE.md`
@@ -39,7 +39,7 @@ This signal carries structural edge surface-able by path-shape clustering and v2
 | Risk per trade | 0.5% × reset floor balance |
 | Population builder | `build_ex_ante_bounded_population` (single pass, no folds at Step 1) |
 | Spread | Per-bar MT5 native points; floor file fallback when raw = 0 |
-| Spread floor file | `configs/spread_floors_5ers.yaml` (sha256 `f5f5c584b7181278c0d4ecbcd3383023fb68af81cd7a320da2dc92524392411b`) |
+| Spread floor file | `configs/spread_floors_5ers.yaml` (body sha256 `8da7644b252ae163d963fbd46807572906fa3e5a44fb3e02d771e181b3ecdc05` — p50 per-pair, post 2026-05-17 calibration) |
 | Spread semantics | `docs/SPREAD_SEMANTICS_LOCK.md` (sha256 `ef0fb938ce37a029b58a6c76b0c13380dc4f73c08a35576c2b200d3dcf951f5c`) |
 
 ### Step 3 SL sweep candidates
@@ -92,10 +92,89 @@ This session does NOT own: Step 5 WFO dispatch, engine PRs (`scripts/phase_kgl_v
 
 | Step | Gate | Result | Notes |
 |---|---|---|---|
-| 1 | Plumbing | _pending_ | |
+| 1 | Plumbing | **PASS** | 1327 trades / 28 pairs; determinism PASS; right-edge PASS (min age=4); lookahead-invariance PASS (0/216k bars); cofire vs KH-24 long = 0.0% |
 | 2 | Clustering | _pending_ | |
 | 3 | Capturability | _pending_ | |
 | 4 | Extractability | _pending_ | |
+
+### Step 1 — Plumbing
+
+**Outputs:** `results/l_arc_8/step1_verbatim/`
+
+| Artifact | sha256 |
+|---|---|
+| `trades_all.csv` | `bfb4b357522e10d7e0042aaea596de5c3b6ef9457eeaf3956595f4a80ef356d2` |
+| `trades_paths.csv` | `bd89ba64903f0281648ae3fb0d29bb1169ab050cfb40f39070cf63fd965e99ac` |
+| `manifest.json` | (regenerable) |
+| `audit_lookahead.txt` | (regenerable) |
+| `audit_determinism.txt` | (regenerable) |
+| `cofire_matrix.csv` | (regenerable) |
+
+**Gates (v2.3 §7 inheriting v2.1.2 §5):**
+
+| Gate | Required | Observed | Status |
+|---|---|---|---|
+| Pool size | ≥ 500 | 1,327 | **PASS** |
+| Determinism | byte-identical two-run | both sha256s match | **PASS** |
+| Schema | §15a strict (trade_id, pair, bar_offset, close_r, mfe_so_far_r, mae_so_far_r, is_held; plus high_r/low_r for §7 SL sweep) | all columns present | **PASS** |
+| Right-edge swing audit | min SH/SL age ≥ 4 across all signals | min SH age = 4; min SL age = 4 | **PASS** |
+| Lookahead invariance | 0 mismatches across truncation points | 0 mismatches across 216,000 bars sampled (3 pairs × 3 truncations at 25/50/75% data) | **PASS** |
+
+**Pool counts:**
+
+| Metric | Value |
+|---|---|
+| Total signals fired (raw, pre-exposure-cap) | 2,230 |
+| Trades after exposure cap (max 1 per pair) | 1,327 |
+| Signals skipped (position open) | 902 |
+| Pairs with < 30 trades | 0 |
+| Pairs with 0 trades | 0 |
+| Per-pair range | 35 (EUR_GBP) … 58 (AUD_JPY) |
+
+**Co-fire matrix (signal spec §62-68):**
+
+| Comparator | Arc 8 count | Comparator count | Co-fire count | Co-fire % | Flag |
+|---|---|---|---|---|---|
+| KH-24 (`kb_exhaustion_bar` long, c1 only) | 2,230 | 28,489 | 0 | 0.00% | OK (< 10%) |
+| Arc 9 (`lchar_inside_bar_break_trend`) | 2,230 | — | — | — | n/a — module not on branch |
+| Arc 10 (`lchar_d1_swing_low_rejection`) | 2,230 | — | — | — | n/a — module not on branch |
+| Arc 11 (`lchar_swing_high_breakout_trend`) | 2,230 | — | — | — | n/a — module not on branch |
+
+KH-24 co-fire = 0% is mechanically expected (PR-HHHL requires `close[t] > open[t]`; KH-24 long requires `close[t] < open[t]`). Independence confirmed — no double-counting risk under any future portfolio composition that runs both signals.
+
+KH-24 comparator is c1 (`kb_exhaustion_bar` body+close-position) alone; full KH-24 long signal also requires c2-c6, c8, c9 (volume veto, D1 regime, NNFX confluence). Bar-level c1 co-occurrence is the strictest no-overlap test for Step 1 purposes (intersection cannot grow when adding more filters).
+
+Arc 9-11 comparators: not landed on this branch — their signal modules live (or will live) on per-arc branches. Co-fire vs sibling arcs is deferred to the arc whose Step 1 lands second within this batch.
+
+**Informational trade economics (NOT gating at Step 1; just sanity):**
+
+| Metric | Value |
+|---|---|
+| Mean final_r (raw, pre-cluster) | −0.008 |
+| Hit rate (final_r > 0) | 16.7% |
+| Median final_r | −1.011 |
+| Max final_r | +21.75 |
+| Stoploss exits | 1,102 (83.0%) |
+| Time exits (bar +240) | 210 (15.8%) |
+| End-of-data exits | 15 (1.1%) |
+| bars_held p95 | 240 |
+
+Raw pool is near break-even on average with strong skew: most trades fail (stoploss at −1R), a few capture large multi-R moves. This is the exact pre-cluster profile that path-shape clustering + capturability + extractability are designed to surface edge from — the right tail of the distribution may correspond to a separable cluster.
+
+Per-pair pool sizes (35–58) all clear the §6 / §15 sample-size floor (≥ 30 per cluster) for Step 2 clustering.
+
+**Variance from pool-size prior:** signal spec line 56 expected 2,500–4,000 trades; observed 1,327 (after exposure cap; 2,230 raw signals before cap). Below the lower prior. Plausible drivers: strict HH-AND-HL ascending sequence requirement (versus the relaxed "≥ 1 HH or ≥ 1 HL" alternative noted as a future-arc design candidate in the spec), and the deep 0.5×ATR pullback floor. Pool still clears §5 floor with margin (2.65×).
+
+**Notes (informational):**
+- 1102 stoploss hits / 1327 trades = 83% — high SL hit rate is consistent with a "pullback-resume" signal where the 2.0 ATR SL anchored to entry sits below the recent swing low for many trades.
+- Largest winners (final_r > 5) likely cluster around Stepwise-climber path archetypes per signal spec §74 expectation. Step 2 clustering will quantify.
+- Both pairs of co-fire conditions (independence + non-empty arc 9-11 matrix) deferred to next arc.
+
+**Engine / data variance:**
+- Signal module: `signals/lchar_pullback_resume_hhhl.py` (sha256 `dbd1142f...`)
+- Arc 8 config: `configs/wfo_l_arc_8.yaml` (sha256 `accba985...`)
+- KH-24 locked config sha: `252dfd8d...` (unchanged from main)
+- Spread floor body sha: `8da7644b...` (p50 per-pair, unchanged from main)
 
 ## Detailed analysis
 

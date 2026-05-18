@@ -1,0 +1,14 @@
+# Arc 8 Step 1 — Right-edge swing audit + lookahead invariance
+
+## Right-edge swing audit (signal spec §58-60)
+- Trades audited: 1327
+- Minimum SH/SL age required: 4 (swing bar k satisfies k <= t - 4 so confirmation bars k+1..k+3 < t)
+- Minimum SH age observed: 4
+- Minimum SL age observed: 4
+- SH violations: 0
+- SL violations: 0
+
+**Right-edge audit verdict: PASS**
+
+## General lookahead invariance check
+- skipped: True

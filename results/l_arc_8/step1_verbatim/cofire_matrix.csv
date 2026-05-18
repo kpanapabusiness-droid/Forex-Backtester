@@ -1,0 +1,5 @@
+comparator,arc8_signal_count,comparator_signal_count,cofire_count,cofire_pct_of_arc8,flag_threshold_pct,flag,note
+kh24_kb_exhaustion_long,2230,28489.0,0.0,0.0,10.0,OK,raw bar-level co-occurrence; KH-24 c1 alone (c4-c9 + D1 regime not applied)
+lchar_inside_bar_break_trend,2230,,,,,n/a,n/a — signal module not present on this branch
+lchar_d1_swing_low_rejection,2230,,,,,n/a,n/a — signal module not present on this branch
+lchar_swing_high_breakout_trend,2230,,,,,n/a,n/a — signal module not present on this branch

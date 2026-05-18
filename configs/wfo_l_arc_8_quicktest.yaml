@@ -1,0 +1,91 @@
+# wfo_l_arc_8_quicktest.yaml — 3-pair smoke run, not the real Step 1 config.
+
+phase: L_ARC_8_STEP_1_QUICKTEST
+description: |
+  3-pair smoke run for Arc 8 Step 1 plumbing.
+
+signal:
+  module: signals.lchar_pullback_resume_hhhl
+  trial_id: ARC_8__pullback_resume_hhhl__long__4h__h_240__quicktest
+  family: trend_continuation_structural
+  base: pullback_resume_hhhl
+  signal_tf: "4H"
+  trade_direction: long
+  swing_lookback_bars: 3
+  trend_window_bars: 30
+  right_edge_gap: 4
+  min_swing_highs: 2
+  min_swing_lows: 2
+  pullback_depth_atr_min: 0.5
+  trigger_close_pos_min: 0.5
+  atr_period: 14
+  atr_smoothing: wilder
+  refractory_bars: 20
+
+data:
+  data_dirs:
+    "4H": "data/4hr"
+  date_start: "2020-10-01"
+  date_end: "2026-01-31"
+
+pairs:
+  - EUR_USD
+  - GBP_USD
+  - USD_JPY
+
+entry:
+  bar_offset: 1
+  execution: open
+
+exit:
+  hard_stop:
+    type: absolute_atr
+    atr_period: 14
+    atr_smoothing: wilder
+    atr_tf: "4H"
+    multiplier: 2.0
+    anchor: entry_price
+  time_exit:
+    bars_after_entry: 240
+  trail: null
+  structural_exits: []
+
+exposure:
+  max_concurrent_per_pair: 1
+  currency_cap: null
+  concurrent_trade_cap: null
+
+risk:
+  pct_per_trade: 0.005
+  starting_balance: 10000.0
+  basis: reset_floor
+
+spreads:
+  enabled: true
+  source: per_bar
+  points_per_pip: 10.0
+  default_pips: 0.0
+
+spread_floor:
+  enabled: true
+  source: configs/spread_floors_5ers.yaml
+  expected_body_sha256: 8da7644b252ae163d963fbd46807572906fa3e5a44fb3e02d771e181b3ecdc05
+
+trade_paths:
+  enabled: true
+  forward_window_bars: 240
+
+output:
+  results_dir: results/l_arc_8/step1_quicktest
+  trades_csv: trades_all.csv
+  paths_csv: trades_paths.csv
+  manifest_json: manifest.json
+  audit_lookahead_txt: audit_lookahead.txt
+  audit_determinism_txt: audit_determinism.txt
+  cofire_csv: cofire_matrix.csv
+  float_format: "%.10g"
+
+gate:
+  pool_size_min: 50
+  determinism: byte_identical_two_run
+  schema_check: v2_1_1_strict

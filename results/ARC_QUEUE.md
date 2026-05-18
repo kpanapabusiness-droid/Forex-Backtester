@@ -8,18 +8,17 @@
 
 ## Active (in-flight)
 
-_None._
+- [ ] **Arc 8** — Pullback-and-resume in HH/HL uptrend (PR-HHHL, long)
+  - Spec: `docs/signal_spec_pullback_resume_hhhl_long_v0.1.md`
+  - Opened: 2026-05-18 (under v2.3 dispatch `cc_dispatch_arc_8.md`)
+  - Branch: `phase/l_arc_8` (dispatcher target; this session works on worktree branch `claude/magical-zhukovsky-bd69d9` — to be merged to `phase/l_arc_8` at session end)
+  - Live doc: `results/l_arc_8/ARC_8_LIVE.md`
 
 ---
 
 ## Unrun
 
 In FIFO order. Topmost is next. Analyst adds entries here as signals become ready.
-
-- [ ] **Arc 8** — Pullback-and-resume in HH/HL uptrend (PR-HHHL, long)
-  - Spec: `signal_spec_pullback_resume_hhhl_long_v0.1.md`
-  - Handover: `arc_8_handover_PR_HHHL.md`
-  - Family: Trend continuation (structural). Signal TF 4H, long-only, 28 FX. Pool prior 2,500–4,000.
 
 - [ ] **Arc 9** — Inside-bar break in trend (IB-trend, long)
   - Spec: `signal_spec_inside_bar_break_trend_long_v0.1.md`

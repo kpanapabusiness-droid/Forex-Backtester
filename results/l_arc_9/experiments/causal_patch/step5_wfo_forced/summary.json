@@ -1,0 +1,63 @@
+{
+  "auc_gate": 0.65,
+  "candidate_A_restricted_pass_F2_F7": false,
+  "candidate_B_restricted_pass_F2_F7": false,
+  "comparison_rows": [
+    {
+      "all_folds_positive": 0,
+      "candidate": "A_thr0.40_ORIGINAL_LEAKED",
+      "full_data_ann_roi_pct": 19.064516197971336,
+      "full_data_max_dd_pct": 1.3161495857344208,
+      "mean_fold_ann_roi_pct": 19.649213973000002,
+      "min_trades_per_fold": 0,
+      "n_admitted": 236,
+      "pass_deployable": 0,
+      "pass_viable": 0,
+      "worst_fold_ann_roi_pct": 0.0,
+      "worst_fold_max_dd_pct": 1.316149586
+    },
+    {
+      "all_folds_positive": 0,
+      "candidate": "A_thr0.40_PATCHED_FORCED",
+      "full_data_ann_roi_pct": -0.1307533159546126,
+      "full_data_max_dd_pct": 13.378577850660012,
+      "mean_fold_ann_roi_pct": -0.08197131988960026,
+      "min_trades_per_fold": 0,
+      "n_admitted": 169,
+      "pass_deployable": 0,
+      "pass_viable": 0,
+      "worst_fold_ann_roi_pct": -6.608733079139961,
+      "worst_fold_max_dd_pct": 6.825440997833654
+    },
+    {
+      "all_folds_positive": 0,
+      "candidate": "B_thr0.05_ORIGINAL_LEAKED",
+      "full_data_ann_roi_pct": 29.89049410183451,
+      "full_data_max_dd_pct": 6.8017951266300685,
+      "mean_fold_ann_roi_pct": 30.96323865857143,
+      "min_trades_per_fold": 0,
+      "n_admitted": 599,
+      "pass_deployable": 0,
+      "pass_viable": 0,
+      "worst_fold_ann_roi_pct": 0.0,
+      "worst_fold_max_dd_pct": 6.801795127
+    },
+    {
+      "all_folds_positive": 0,
+      "candidate": "B_thr0.05_PATCHED_FORCED",
+      "full_data_ann_roi_pct": 0.08200158957012427,
+      "full_data_max_dd_pct": 22.654406807723568,
+      "mean_fold_ann_roi_pct": 0.6366534585141265,
+      "min_trades_per_fold": 0,
+      "n_admitted": 817,
+      "pass_deployable": 0,
+      "pass_viable": 0,
+      "worst_fold_ann_roi_pct": -19.36951300766234,
+      "worst_fold_max_dd_pct": 20.903674858421894
+    }
+  ],
+  "headline": "STEP_4_KILL_AFTER_PATCH (UNCHANGED) \u2014 diagnostic forced-WFO numbers attached",
+  "note": "Run executed at analyst override; the dispatch hard rule was to halt at Phase 3 because the patched AUC dropped below \u00a78 gate. This run provides diagnostic numbers only; Arc 9 disposition (STEP_4_KILL) is unchanged.",
+  "patched_classifier_auc": 0.519,
+  "scaled_risk_runs": {}
+}

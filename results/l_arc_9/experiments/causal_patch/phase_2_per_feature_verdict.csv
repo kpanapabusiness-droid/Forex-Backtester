@@ -1,0 +1,8 @@
+feature,n,n_match,match_pct,verdict
+d1_bars_since_swing_high,100,100,100,PASS
+d1_bars_since_swing_low,100,100,100,PASS
+d1_close_above_kijun,100,100,100,PASS
+d1_pos_in_20d_range,100,100,100,PASS
+d1_ret_5d_atr,100,100,100,PASS
+d1_rsi_14,100,100,100,PASS
+d1_trend_state,100,100,100,PASS

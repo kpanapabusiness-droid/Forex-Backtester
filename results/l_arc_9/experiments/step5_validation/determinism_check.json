@@ -1,0 +1,7 @@
+{
+  "byte_identical": true,
+  "folds_run1_sha256": "461f924fb926e6b95aa0bb12d993807a0e53dcfc8677106e59fda2f336ee5bcd",
+  "folds_run2_sha256": "461f924fb926e6b95aa0bb12d993807a0e53dcfc8677106e59fda2f336ee5bcd",
+  "trades_run1_sha256": "f2a1cf54ce3d4a40c5d2b6c20a45ee995d173f61c082b0101a6e3e3c6ec74b5c",
+  "trades_run2_sha256": "f2a1cf54ce3d4a40c5d2b6c20a45ee995d173f61c082b0101a6e3e3c6ec74b5c"
+}

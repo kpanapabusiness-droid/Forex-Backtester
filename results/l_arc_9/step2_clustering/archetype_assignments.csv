@@ -1,0 +1,4 @@
+cluster_id,n,frac_of_pool,monotonicity_ratio_in_profit,local_peaks_count,pullback_magnitude_median,time_to_peak_mfe_relative,archetype_label
+0,365,0.1695,0.5336564807,31.44383562,0.5795313886,0.7712722931,Unclassified
+1,781,0.3627,0.07353684423,0.7554417414,0.02849996953,0.1294292085,Early-peak hold
+2,1007,0.4677,0.5282490903,7.276067527,0.510214527,0.4765361621,Unclassified

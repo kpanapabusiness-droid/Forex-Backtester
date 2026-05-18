@@ -1,0 +1,6 @@
+fold,n_train,n_cal,n_test,n_pos_test,uncal_auc,platt_auc,iso_auc,uncal_precision_at_40,uncal_recall_at_40,uncal_precision_at_50,uncal_recall_at_50,uncal_precision_at_60,uncal_recall_at_60,uncal_precision_at_70,uncal_recall_at_70,platt_precision_at_40,platt_recall_at_40,platt_precision_at_50,platt_recall_at_50,platt_precision_at_60,platt_recall_at_60,platt_precision_at_70,platt_recall_at_70,iso_precision_at_40,iso_recall_at_40,iso_precision_at_50,iso_recall_at_50,iso_precision_at_60,iso_recall_at_60,iso_precision_at_70,iso_recall_at_70
+1,1274,425,425,73,0.6297089041,0.6297089041,0.6300202366,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+2,1274,425,425,73,0.5396948941,0.5396948941,0.5371458593,0,0,0,0,0,0,0,0,0.1363636364,0.04109589041,0.25,0.01369863014,0,0,0,0,0.2115384615,0.1506849315,0.3333333333,0.01369863014,0.3333333333,0.01369863014,0.3333333333,0.01369863014
+3,1274,425,425,73,0.6526307597,0.6526307597,0.6534480075,0,0,0,0,0,0,0,0,1,0.01369863014,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+4,1274,425,425,73,0.6727506227,0.6727506227,0.6746575342,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.2857142857,0.08219178082,0,0,0,0,0,0
+5,1275,425,424,73,0.6372399797,0.6372399797,0.6283222105,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0

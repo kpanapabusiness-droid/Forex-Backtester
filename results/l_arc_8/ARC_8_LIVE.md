@@ -2,9 +2,9 @@
 
 ## Status
 
-- **Current step:** Step 5 WFO dispatched; halted at pre-check exit gate (engine PR not merged). Pre-checks 1 + 2 PASS.
+- **Current step:** Step 5 WFO unblocked — engine PR merged into main (`716ce84`), brought into worktree (`3025b35`). 69/69 D1 tests pass post-merge. Ready to resume WFO procedure.
 - **Verdict (Step 4 endpoint):** STEP_4_COMPLETE_READY_FOR_WFO
-- **Verdict (Step 5 entry):** HALT_PENDING_ENGINE_PR_MERGE
+- **Verdict (Step 5 entry):** ENGINE_PR_MERGED_LOCALLY — awaiting analyst go-ahead to run WFO (push of merged main to origin/main is separate analyst-side action)
 - **Verdict:** none yet (arc still active)
 - **Last updated:** 2026-05-18
 - **Branch:** worktree `claude/magical-zhukovsky-bd69d9` (dispatcher-target merge to `phase/l_arc_8`)
@@ -98,7 +98,7 @@ This session does NOT own: Step 5 WFO dispatch, engine PRs (`scripts/phase_kgl_v
 | 2 | Clustering | **PASS** | K=4 chosen (silhouette 0.4762); 4 clusters {316, 177, 429, 405}; 0/4 degenerate features; 2 V-shape clusters → per-cluster AND per-aggregate at Step 3 |
 | 3 | Capturability | **PASS** | 3 units survive: c1 (n=177, SL=4.0×ATR), c3 (n=405, SL=2.0×ATR), agg_c1_c3 (n=582, SL=3.0×ATR); all V-shape recovery; c2 (Early-peak hold) dies on §2 floors |
 | 4 | Extractability | **PASS** | 1 archetype survives: c1 (V-shape recovery, FG-weak) at E+D1; c3 + agg_c1_c3 die per v2.2 §3 (no max-F1 fallback). pre_t_sl_atr_multiplier=4.0 recorded in D1 policy YAML |
-| 5 | WFO | **HALT** | Pre-checks PASS (fold 2 regime characterised — regime-shift artefact not leak; D1 t=1 leak audit clean). Halt: engine PR `feat/open-24-pre-t-sl-per-archetype` NOT merged into main; required per dispatch §35 to consume `pre_t_sl_atr_multiplier: 4.0`. |
+| 5 | WFO | **UNBLOCKED** | Pre-checks PASS (fold 2 regime characterised; D1 t=1 leak audit clean). Engine PR merged into local main (`716ce84`) via `--no-ff` from `feat/open-24-pre-t-sl-per-archetype`; brought into worktree (`3025b35`); 69/69 D1 tests pass post-merge. Ready to run WFO procedure on re-dispatch / continuation. |
 
 ### Step 1 — Plumbing
 
@@ -560,6 +560,29 @@ This matches the on-disk file AND the git-blob committed at `3c5f943`. Confirmed
 4. CC resumes from the WFO procedure section directly (pre-checks already passed and committed).
 
 No re-work of Step 4 needed; pre-check artefacts persist under `results/l_arc_8/step5_prechecks/`.
+
+---
+
+## Engine PR merge completed (local, not pushed)
+
+User requested "merge into main"; executed at this session 2026-05-18.
+
+**Local state:**
+- `main` ref now points to `716ce84` (merge commit) — was `fb2e7ab`
+- This worktree branch `claude/magical-zhukovsky-bd69d9` now at `3025b35` (merge main into worktree) — was `3db7da0`
+- `feat/open-24-pre-t-sl-per-archetype` left intact on the main repo working dir (untouched)
+- `lomega-v2` worktree advanced from `fb2e7ab` to `716ce84` (it was the path used to do the merge; was clean and on main)
+
+**Verification post-merge:**
+- 69/69 D1 pipeline tests PASS in this worktree
+- `core/d1_pipeline.py` (+44 lines) present with `pre_t_sl_atr_multiplier` schema field
+- `scripts/phase_kgl_v2_4h_wfo.py` (+21/-3 lines) present with `SL_MULT` runtime reassignment hook at lines 480, 2320-2325, 3155-3159, 3423, 3540-3546
+- `tests/test_d1_pipeline.py` (+199 lines) with Open-24 coverage
+- Arc 8 Step 1-4 artefacts intact under `results/l_arc_8/step1_verbatim`, `step2`, `step3`, `step4`
+
+**NOT done (deferred to analyst):**
+- `git push origin main` — local merge only; remote `origin/main` still at `fb2e7ab`. Push when ready.
+- Re-dispatch of Step 5 WFO from chat (or simply tell CC to continue from the WFO procedure step — pre-checks are committed).
 
 ## Detailed analysis
 

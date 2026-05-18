@@ -886,7 +886,6 @@ def _run_once(cfg: dict) -> Tuple[Dict[str, str], Dict[str, Any]]:
     results: List[PipelineResult] = []
     unit_routing: Dict[str, Dict[str, Any]] = {}
 
-    pool_size = int(len(trades_df))
     for u in cfg["units"]:
         unit_id = str(u["unit_id"])
         cid_set = set(int(c) for c in u["cluster_ids"])

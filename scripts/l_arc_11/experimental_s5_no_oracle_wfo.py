@@ -54,9 +54,9 @@ from __future__ import annotations
 import csv
 import math
 import sys
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -66,15 +66,27 @@ if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
 from scripts.l_arc_11.experimental_s5_wfo import (  # noqa: E402
-    FOLDS, RISK_PER_TRADE, ORIGINAL_SL, T_FOR_B, EXP_S5_DIR,
-    PASS_DEPLOYABLE_TRADE_FLOOR, PASS_VIABLE_TRADE_FLOOR,
-    FoldMetrics, RunAggregates,
-    build_paths_index, compute_final_r_at_sl, compute_close_r_at_bar,
-    aggregate_run, _compounded_equity, _max_dd_from_curve, _annualise,
+    EXP_S5_DIR,
+    FOLDS,
+    ORIGINAL_SL,
+    T_FOR_B,
+    FoldMetrics,
+    RunAggregates,
+    _annualise,
+    _compounded_equity,
+    _max_dd_from_curve,
+    aggregate_run,
+    build_paths_index,
+    compute_close_r_at_bar,
+    compute_final_r_at_sl,
 )
 from scripts.l_arc_11.step4_extractability import (  # noqa: E402
-    PIPELINE_E_FEATURES, PIPELINE_E_BASE, PIPELINE_D1_PATH_FEATURES,
-    _build_pair_cache, compute_pipeline_e_features, _path_features_at_t,
+    PIPELINE_D1_PATH_FEATURES,
+    PIPELINE_E_BASE,
+    PIPELINE_E_FEATURES,
+    _build_pair_cache,
+    _path_features_at_t,
+    compute_pipeline_e_features,
 )
 
 SL_DEPLOY = 3.0
@@ -415,7 +427,6 @@ def _run_d_full(
                 outcomes.append((tid, float(row["final_r_sl3"]), "d1_admit_no_classifier"))
 
         n_admit_d1 = sum(1 for o in outcomes if "d1_admit" in o[2])
-        n_reject_d1 = sum(1 for o in outcomes if o[2] == "d1_reject")
         n_pre_t = sum(1 for o in outcomes if o[2].startswith("pre_t_sl"))
         d1_admit_rate_within_e = float(n_admit_d1 / max(n_admit_e, 1))
 
@@ -661,7 +672,6 @@ def main() -> int:
     print(f"[exp_s5_noOracle] Run C best operating point: threshold={best_t}", file=sys.stderr)
 
     # Write per-fold for both 0.50 baseline AND best threshold.
-    runc_perfold_rows: List[RunCFold] = []
     baseline_folds = runc_folds_by_threshold[0.50]
     for f in baseline_folds:
         # Tag run label inline by changing the writer slightly — easier to just write twice.
@@ -727,7 +737,7 @@ def main() -> int:
     comparison_rows = [
         ("A_c1_raw_sl3", "c1 raw at SL=3 (NO admission)", "cluster-ID-at-entry oracle", a_agg),
         ("B_agg_c1c3_d1_t5_sl3", "agg_c1_c3 + D1 t=5 classifier at SL=3", "cluster-ID-at-entry oracle", b_agg),
-        ("C_E_only_c1_t0.50_baseline", f"Live E classifier predicting c1, t=0.50 baseline",
+        ("C_E_only_c1_t0.50_baseline", "Live E classifier predicting c1, t=0.50 baseline",
          "NO oracle — live E classifier", baseline_agg),
     ]
     if abs(best_t - 0.50) > 1e-9:

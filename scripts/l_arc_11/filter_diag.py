@@ -45,7 +45,7 @@ import hashlib
 import math
 import sys
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -56,12 +56,17 @@ _REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
+from scripts.l_arc_11.experimental_s5_wfo import FOLDS, build_paths_index  # noqa: E402
 from scripts.l_arc_11.step3_capturability import _eval_trade_at_sl  # noqa: E402
 from scripts.l_arc_11.step4_extractability import (  # noqa: E402
-    PIPELINE_E_FEATURES, PIPELINE_E_BASE,
-    _build_pair_cache, compute_pipeline_e_features, _wilder_atr, _wilder_rsi, _ema,
+    PIPELINE_E_BASE,
+    PIPELINE_E_FEATURES,
+    _build_pair_cache,
+    _ema,
+    _wilder_atr,
+    _wilder_rsi,
+    compute_pipeline_e_features,
 )
-from scripts.l_arc_11.experimental_s5_wfo import FOLDS, build_paths_index  # noqa: E402
 
 OUT_DIR = _REPO_ROOT / "results" / "l_arc_11" / "filter_diag"
 SL_DEPLOY = 3.0

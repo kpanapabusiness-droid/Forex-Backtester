@@ -72,11 +72,11 @@ if str(_REPO_ROOT) not in sys.path:
 
 from scripts.l_arc_11.step3_capturability import _eval_trade_at_sl  # noqa: E402
 from scripts.l_arc_11.step4_extractability import (  # noqa: E402
-    PIPELINE_E_BASE,
     PIPELINE_D1_PATH_FEATURES,
+    PIPELINE_E_BASE,
     _build_pair_cache,
-    compute_pipeline_e_features,
     _path_features_at_t,
+    compute_pipeline_e_features,
 )
 
 RISK_PER_TRADE = 0.005       # 0.5% per L arc convention
@@ -332,7 +332,6 @@ def run_b_agg_d1_t5(
     # Map trade_id → entry_time, bars_held for fold partitioning.
     tr_lite = trades_df[["trade_id", "entry_time", "bars_held"]].copy()
     tr_lite["entry_time"] = pd.to_datetime(tr_lite["entry_time"])
-    tr_idx = tr_lite.set_index("trade_id")
 
     feature_cols = list(PIPELINE_E_BASE) + list(PIPELINE_D1_PATH_FEATURES)
     model_kw = dict(n_estimators=200, max_depth=8, random_state=42, n_jobs=1)

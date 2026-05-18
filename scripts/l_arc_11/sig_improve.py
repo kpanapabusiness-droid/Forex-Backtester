@@ -25,7 +25,7 @@ import csv
 import math
 import sys
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -36,20 +36,29 @@ _REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-from scripts.l_arc_11.step3_capturability import _eval_trade_at_sl  # noqa: E402
-from scripts.l_arc_11.step4_extractability import (  # noqa: E402
-    PIPELINE_E_FEATURES, PIPELINE_E_BASE,
-    _build_pair_cache, compute_pipeline_e_features,
-)
 from scripts.l_arc_11.experimental_s5_wfo import (  # noqa: E402
-    FOLDS, build_paths_index,
+    FOLDS,
+    build_paths_index,
 )
 from scripts.l_arc_11.filter_diag import (  # noqa: E402
-    PATH_SO_FAR_FEATURES_AT_T, _path_features_at_t_orig_frame,
-    _train_predict_one_fold, _decide_class_weight, _wfo_run,
-    _summarise_aucs, _live_deployable_for_regime, RegimeResult,
-    EXPECTED_CLUSTERS_K4_SHA256, _file_sha256, DATA_DIR_4H,
-    SL_DEPLOY, ORIGINAL_SL,
+    DATA_DIR_4H,
+    EXPECTED_CLUSTERS_K4_SHA256,
+    ORIGINAL_SL,
+    PATH_SO_FAR_FEATURES_AT_T,
+    SL_DEPLOY,
+    RegimeResult,
+    _decide_class_weight,
+    _file_sha256,
+    _live_deployable_for_regime,
+    _path_features_at_t_orig_frame,
+    _summarise_aucs,
+    _wfo_run,
+)
+from scripts.l_arc_11.step3_capturability import _eval_trade_at_sl  # noqa: E402
+from scripts.l_arc_11.step4_extractability import (  # noqa: E402
+    PIPELINE_E_BASE,
+    _build_pair_cache,
+    compute_pipeline_e_features,
 )
 
 OUT_DIR = _REPO_ROOT / "results" / "l_arc_11" / "sig_improve"
@@ -197,10 +206,8 @@ def stage_1_signal_tighten(
     trigger_features: pd.DataFrame, clusters_df: pd.DataFrame, final_r_sl3: Dict[int, float]
 ) -> Tuple[List[S1Result], List[Dict[str, Any]]]:
     """Run Stage 1: single-filter pareto + pairwise AND combinations."""
-    cluster_map: Dict[int, int] = {int(r["trade_id"]): int(r["cluster_id"]) for _, r in clusters_df.iterrows()}
     full = trigger_features.merge(clusters_df, on="trade_id", how="left").copy()
     full["final_r_sl3"] = full["trade_id"].map(final_r_sl3)
-    n_total = len(full)
     n_c1_total = int((full["cluster_id"] == 1).sum())
     n_c2_total = int((full["cluster_id"] == 2).sum())
 
@@ -377,7 +384,7 @@ def stage_3_pipeline_d_on_c1(
         # Per-fold: train D, test on OOS, compute economics (hold vs exit).
         feat_df = feat_df.sort_values("entry_time").reset_index(drop=True)
         from sklearn.ensemble import RandomForestClassifier
-        from sklearn.metrics import roc_auc_score, recall_score
+        from sklearn.metrics import recall_score, roc_auc_score
 
         fold_aucs = []
         fold_recalls = []
@@ -619,7 +626,6 @@ def stage_5_pair_pareto(
     pair_rows.sort(key=lambda r: -r["mean_r"])
     top10 = pair_rows[:10]
     top10_pairs = {r["pair"] for r in top10}
-    top10_tids = [tid for tid in c1_tids if pair_map[tid] in top10_pairs]
 
     # Top-10 pair-subset WFO on Stage 2's t=8 DE config (use full universe but restrict to top-10 pair subset).
     # Filter the universe to top-10 pairs first.
@@ -862,7 +868,7 @@ def stage_7_combinations(
         feat_iv, _, _ = _build_de_feature_df(sub_i, paths_index, e_features, s2_best_t)
         sim_fn = _simulate_dynamic_sl_4a if s4_winner == "4a" else _simulate_dynamic_sl_4b
         custom_r_iv = {int(tid): sim_fn(paths_index[int(tid)]) for tid in sub_i["trade_id"].astype(int)}
-        rr_iv = RegimeResult(name=f"S7_S1+S2+S4", fold_aucs=[],
+        rr_iv = RegimeResult(name="S7_S1+S2+S4", fold_aucs=[],
                              mean_auc=0.0, n_clears_gate=0, n_folds=0, fold_details=[],
                              feature_cols=cols)
         live_iv = _live_deployable_for_regime(rr_iv, feat_iv, c1_label_by_tid, custom_r_iv, model_kw)
@@ -962,8 +968,7 @@ def main() -> int:
         best = max(pair_passing, key=lambda p: p["aggregate_mean_r"])
         # Use the higher-impact single rule from the pair as a primary; pairs may be too restrictive here.
         col_a = S1_FILTERS[best["rule_a"]][0]
-        col_b = S1_FILTERS[best["rule_b"]][0]
-        # For combinator, we pick the rule with stricter c2-cut.
+        # For combinator, we pick rule_a as primary; rule_b kept in the label for traceability.
         s1_winner = (col_a, float(best["th_a"]))  # Use rule_a as primary; documented as winner.
         s1_winner_label = f"pair: {best['rule_a']}>={best['th_a']} AND {best['rule_b']}>={best['th_b']}"
     elif single_passing:
@@ -1346,8 +1351,8 @@ def main() -> int:
         bullets.append(f"Stage 4 (dynamic SL) — {winner} improves mean R by {delta_4:+.4f} over baseline SL=3 fixed on c1. "
                         f"Exit-policy redesign helps the magnitude.")
     else:
-        bullets.append(f"Stage 4 (dynamic SL) — neither config beats baseline SL=3 fixed on c1 mean R. "
-                        f"V-shape recovery doesn't benefit from wider-early/tighter-late or breakeven adjustments at these thresholds.")
+        bullets.append("Stage 4 (dynamic SL) — neither config beats baseline SL=3 fixed on c1 mean R. "
+                        "V-shape recovery doesn't benefit from wider-early/tighter-late or breakeven adjustments at these thresholds.")
 
     # Stage 5 summary.
     if s5_top10["live_pass_deployable"]:

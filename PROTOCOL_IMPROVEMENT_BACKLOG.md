@@ -709,3 +709,59 @@ Items 1-3 (NEW) are candidates for the v2.3 / v2.1.3 calibration cycle. Items 5 
 | Arc 7 cross-arc items added | 2026-05-18 (housekeeping pass) — 7 items (3 NEW, 1 VALIDATED, 1 UNRESOLVED, 2 CLEANUP) from `phase/l_arc_7` closure doc |
 | v2.2 amendment date | 2026-05-18 — `L_ARC_PROTOCOL_v2_2_AMENDMENT.md`. Closed in v2.2: §8 max-F1 fallback (v2.2 §3, closing Arc 6/7 case), mid-arc analyst sign-off carve-outs (v2.2 §1/§2/§5/§6), FIFO arc selection (v2.2 §4 new §15b), live-execution equivalence asserted (v2.2 §7 new §1a). Open-21 partial: proposal (a) strict-mode closed; (b)/(c) on backlog. Open-22/23/24 (Pipeline D1 full-pool gating) NOT closed by v2.2 — addressed in v2.3 (row below). |
 | v2.3 amendment date | 2026-05-18 — `L_ARC_PROTOCOL_v2_3_AMENDMENT.md`. Closed in v2.3: Open-22 (v2.3 §1 structural removal of §9); Open-23 (v2.3 §4 §3/§8 cost-language correction); Open-24 (v2.3 §5 per-archetype pre-t SL spec; engine PR pending for `pre_t_sl_atr_multiplier`). Step 5 cross-fold stability removed; Step 6 WFO renumbered as Step 5; orchestrator halt point shifted end of Step 5 → end of Step 4; v2.2 §1 sign-flip mechanisation OBSOLETED (gate no longer exists); §16a position-5 semantic shifted to WFO; §1a Step 1 + Step 5 (was Step 6). New informal register at `SHELVED_ARCS.md`. Anchor preservation verified (KH-24 K=4 archetype 3 passes Step 5 WFO by deployment; Step 3 selected SL = 2.0×ATR matches v2.2 uniform pre-t SL — Open-24 no-op for anchor). Companion file: `prompts/cc_arc_orchestrator_template.md` updated to v1.1. |
+
+---
+
+## Arc 11 cross-arc items (2026-05-18; housekeeping landed 2026-05-19)
+
+Source: `results/l_arc_11/ARC_11_CLOSURE.md`. Arc 11 closed CLOSED-HALT at Step 4 (§16a Path A near-miss, best AUC 0.5728, margin 0.027). 4 post-closure experimental sessions surfaced amendment candidates, pattern documentation, and strike list below. All entries doc-only — no protocol mutation by Arc 11 housekeeping.
+
+### Amendment candidates (priority: live for v2.4)
+
+**[Arc 11] Pipeline DE (Deferred-Entry)** — NEW amendment proposal
+
+- Architecture: enter at bar `t` or not at all, no in-trade classifier
+- Gate: `AUC ≥ 0.60` + sign-consistency + pre-t SL filter rate `< 40%`
+- Default `t`: per-archetype, sweep `[1, 16]`
+- Pairs with: `min_observation_bars` registry parameter (below)
+- Distinct from Pipeline D1 (post-entry in-trade decision) and Pipeline E (entry-bar decision)
+- Source: Arc 11 filter_diag (Exp 3) Regime B + sig_improve (Exp 4) Stage 2. Only direction across four feature regimes that moves Pipeline E AUC above the §8 0.60 line on this signal class.
+
+**[Arc 11] `min_observation_bars` archetype-registry parameter** — NEW amendment proposal
+
+- Required per-archetype parameter, gates §16a HALT decision
+- Protocol: test Pipeline DE variants at `min_observation_bars` before declaring near-miss HALT on Step 4 disjunctive AUC gate
+- Implication: cleaner failure attribution for capturable-not-extractable cohorts (DD/trade-count grounds, not AUC margin grounds)
+- Source: Arc 11 closure synthesis. Implication for Arc 11 specifically: would have continued to DE evaluation, produced the same +3.11%/+17.23%/18% DD result, then HALT'd on DD/trade-count grounds instead of AUC-margin near-miss
+
+### Pattern documentation (priority: cross-arc synthesis)
+
+**[Arc 11] Capturable-not-extractable pattern (Arc 6 + Arc 11 confirmation)** — UPGRADE from speculative to confirmed
+
+- Two clean instances of same shape: cohort carries real structural edge (Arc 11 c1: `fwd_mfe_p50 = 4.48R`, `reach_1R = 100%`; Arc 6 c2: `mfe_p50 = 4.47R`, `ww_pp = 0.000`); entry-time features cannot resolve which trades realise it
+- Calibration: Pipeline E AUC ceiling ~0.55 on 4H entry-bar features across three independent feature regimes (baseline, multi-TF including D1+1H, reframed target reach_1R / mfe≥2R). Likely structural to the feature/timeframe combination, not the classifier choice.
+- Discriminating information lives in post-signal price action (timing > features as extractability lever) — multi-TF and feature redesign do not help
+- Cross-reference target: any future arc with `mfe_p50 ≥ 3R` + `reach_1R ≥ 80%` + Pipeline E AUC < 0.55 should auto-flag this pattern and route to Pipeline DE evaluation before §16a HALT consideration
+
+### Strike list (priority: prevent re-proposal)
+
+**[Arc 11] Empirically retired directions for SHB long 4H**
+
+The following directions have been tested and disconfirmed for this signal/timeframe combination. Do not re-propose without new evidence:
+
+1. Pipeline E on entry-bar features (AUC ceiling 0.52)
+2. Pipeline D post-entry on c1 cohort (AUC 0.40–0.45 — worse than random)
+3. Multi-TF feature extension D1+1H (+0.024 AUC, dead)
+4. Reframed supervision target reach_1R or mfe ≥ 2R (worse than cluster ID)
+5. Trigger-bar mechanical filters (0/27 single rules, 0/3 pairs pass c1_ret ≥ 0.80 AND c2_ret ≤ 0.30)
+6. Sizing without filtering (full pool negative EV at every tier: 0.25% / 0.50% / 1.00% → worst-fold −17% / −32% / −56%)
+7. "Relax AUC gate when mfe_p50 ≥ 3R" (disconfirmed by no-oracle test; even with c1 mfe_p50 4.48R the no-oracle live system fails on every gate)
+8. DD-relaxation amendment for capturable-not-extractable cohorts (best combo DD/ROI ratio 1.04 too poor to justify; risk-scaling does not rescue)
+
+Note: directions 1, 3, 4 may still apply to other signals/timeframes; this strike list is signal-specific to SHB long 4H.
+
+### Files
+
+- Closure doc: `results/l_arc_11/ARC_11_CLOSURE.md`
+- Live doc: `results/l_arc_11/ARC_11_LIVE.md`
+- Experimental outputs: `results/l_arc_11/experimental_s5/`, `results/l_arc_11/filter_diag/`, `results/l_arc_11/sig_improve/`

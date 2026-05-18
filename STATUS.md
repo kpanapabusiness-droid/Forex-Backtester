@@ -2,7 +2,7 @@
 
 > Tight current-state snapshot. For full context, read `SESSION_ZERO.md` first.
 > For methodology, read `L_ARC_PROTOCOL.md` (v2.1.2 base) + `L_ARC_PROTOCOL_v2_2_AMENDMENT.md` (v2.2) + `L_ARC_PROTOCOL_v2_3_AMENDMENT.md` (v2.3, landed 2026-05-18); protocol-doc PR pending engineering pass to consolidate v2.2 + v2.3 amendments into the protocol doc itself.
-> Last updated: 2026-05-18 — L_ARC_PROTOCOL v2.3 amendment landed (Step 5 cross-fold stability removed; Step 6 WFO renumbered as Step 5; Open-22/23/24 closed in protocol with engine PR pending for Open-24). v2.2 amendment landed earlier same day. Arcs 4, 5, 6, 7 all closed. Arc queue currently empty pending analyst signal selection for Arc 8+. KH-24 live deployment unchanged.
+> Last updated: 2026-05-19 — Arc 11 (SHB long 4H) housekeeping landed: CLOSED-HALT per §16a Path A (best AUC 0.5728, margin 0.027). Second confirmed capturable-not-extractable closure (pairs with Arc 6); 4 post-closure experimental sessions retired 8 directions and filed Pipeline DE + `min_observation_bars` as v2.4 amendment candidates. Sibling arcs 8/9/10 still in flight in parallel CC chats (housekeeping landed ahead of merge per analyst override). Prior: 2026-05-18 — L_ARC_PROTOCOL v2.3 amendment landed (Step 5 cross-fold stability removed; Step 6 WFO renumbered as Step 5; Open-22/23/24 closed in protocol with engine PR pending for Open-24). v2.2 amendment landed earlier same day. Arcs 4, 5, 6, 7 all closed. KH-24 live deployment unchanged.
 
 ---
 
@@ -95,6 +95,32 @@ c2's D1 AUC growth with t (0.630 at t=1 → 0.711 at t=10) is the strongest sing
 Arc 6 also produced a spec v0.2 erratum (`docs/signal_spec_failed_breakout_long_v0.2.md`): the literal v0.1 `swing_low_N = min(low[t-N..t-1])` is mathematically unsatisfiable; corrected to `min(low[t-N-M..t-M-1])`.
 
 Full closure: `docs/arc_results/ARC_6_RESULT.md`. Arc 6 signal is NOT permanently eliminated — path quality is clean at v2.1.2 §2 (c2 Stepwise, mfe_p50 4.47R, ww_pp 0.000) and may return under a richer feature regime, multi-TF entry context, or ensemble approach.
+
+---
+
+## Arc 11 closure (2026-05-18)
+
+| Field | Value |
+| --- | --- |
+| Arc | 11 |
+| Signal | SHB long 4H (`signal_swing_high_breakout_trend_long_v0.1`) |
+| Status | **CLOSED-HALT** |
+| Disposition | §16a Path A — Step 4 disjunctive AUC near-miss (best 0.5728, gate 0.60, margin 0.027 < 0.03 absolute) |
+| Closure doc | `results/l_arc_11/ARC_11_CLOSURE.md` |
+| Live doc | `results/l_arc_11/ARC_11_LIVE.md` |
+| Notable | 4 post-closure experimental sessions (~125s compute); 8 directions empirically retired; 2 amendment candidates filed (Pipeline DE + `min_observation_bars`) |
+
+**Disposition mechanics:** Steps 1–3 PASS mechanically (pool 2,299; K=4 silhouette 0.469; 3 V-shape recovery units survive §2 — c1, c3, agg_c1_c3). Step 4 disjunctive E∨D1 AUC gate failed on all three surviving units (best agg_c1_c3 D1 t=5 AUC 0.5728). §16a Path A satisfied: single criterion fail; cohort viable (`size_fraction = 0.387 ≥ 0.10`); numeric margin 0.027 < 0.03 absolute → HALT not KILL.
+
+**Post-closure experimental work (off-protocol, documentation only, no queue/registry/protocol mutation):**
+- **Exp 1 (S5 oracle):** c1 raw at SL=3 worst-fold ROI ann +101%, mean +152%, DD 2.48% (oracle assumes cluster-ID-at-entry — not deployable; established cohort magnitude ceiling).
+- **Exp 2 (S5 no-oracle):** Live Pipeline E → c1 at t=0.50: worst −20%, sign-fail, DD 33%. Oracle premium 154pp on c1 leg, 56pp on agg leg. **S4 AUC gate vindicated.**
+- **Exp 3 (filter-diagnosis):** Delayed entry the only direction that moves AUC; multi-TF (+0.024) and reframed-target (−0.014 to −0.039) empirically retired.
+- **Exp 4 (signal improvement sweep, 7 stages):** Best candidate `DE t=7 + dynamic SL 4a`: sign-consistent, worst-fold +3.11%, mean +17.23%, DD 18.03%, min 16 trades. DD/ROI ratio 1.04 — risk-scaling does not rescue. Not deployable.
+
+**Outcome:** No deployable system. Arc 11's value: (i) second clean capturable-not-extractable instance (pairs with Arc 6), (ii) 8 directions retired for SHB long 4H, (iii) Pipeline DE + `min_observation_bars` filed as v2.4 amendment candidates. See `PROTOCOL_IMPROVEMENT_BACKLOG.md` Arc 11 section + `ARC_11_CLOSURE.md` for full record.
+
+**Cross-arc note:** Sibling arcs 8/9/10 still in flight in parallel CC chats (per session-start dispatch). Their closures will need to merge-resolve their tracking-file entries against this Arc 11 landing.
 
 ---
 

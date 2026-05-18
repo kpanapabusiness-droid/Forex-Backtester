@@ -1,5 +1,17 @@
 # Changelog
 
+## Arc 11 — Closed-HALT (SHB long 4H) | 2026-05-18 | arc closure
+
+- Original closure: Step 4 extractability fail, §16a Path A near-miss (best AUC 0.5728, margin 0.027)
+- Post-closure experimental documentation pass (4 sessions, ~125s total compute):
+  - Exp 1: S5 oracle runs — established cohort magnitude ceiling
+  - Exp 2: S5 no-oracle — vindicated S4 AUC gate (Pipeline E at base rate)
+  - Exp 3: Filter diagnosis — only delayed entry moves AUC; multi-TF and reframed target empirically retired
+  - Exp 4: Signal improvement sweep — best candidate (DE t=7 + dynamic SL 4a) fails on DD/ROI ratio (1.04) and trade count (16/fold)
+- Outcome: no deployable system
+- Closure doc: `results/l_arc_11/ARC_11_CLOSURE.md`
+- No queue / registry / protocol mutation during experimental work
+
 ## L_ARC_PROTOCOL v2.3 AMENDMENT | 2026-05-18 | doc-only
 
 Step 5 cross-fold stability (§9) removed; Step 6 WFO (§10) renumbered as Step 5. Open-22 closed by structural removal; Open-23 closed by D1 cost-language documentation; Open-24 closed in protocol with engine PR pending. SHELVED informal register at SHELVED_ARCS.md.

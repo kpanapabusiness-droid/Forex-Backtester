@@ -54,8 +54,8 @@ if str(_REPO_ROOT) not in sys.path:
 # Reuse the locked feature builder from Step 4 (function-level inspection only
 # per dispatch — not retraining or modifying Step 4 outputs).
 from scripts.l_arc_8.step4_extractability import (  # noqa: E402
-    PIPELINE_E_BASE_FEATURES,
     PIPELINE_E_ARC8_FEATURES,
+    PIPELINE_E_BASE_FEATURES,
     _build_pair_cache,
     _impute_nans,
     compute_base_e_features,
@@ -215,8 +215,11 @@ def part_b_multiclass(
     """
     from sklearn.ensemble import RandomForestClassifier
     from sklearn.metrics import (
-        precision_recall_fscore_support, roc_auc_score, confusion_matrix,
-        precision_recall_curve, accuracy_score,
+        accuracy_score,
+        confusion_matrix,
+        precision_recall_curve,
+        precision_recall_fscore_support,
+        roc_auc_score,
     )
     from sklearn.model_selection import TimeSeriesSplit
 
@@ -547,7 +550,7 @@ def write_diagnostic_summary(
     lines.append("## Key numbers")
     lines.append("")
     c1 = multiclass["per_class"].get(1, {})
-    lines.append(f"- Multiclass RF on full 1,327 pool with 4 cluster labels")
+    lines.append("- Multiclass RF on full 1,327 pool with 4 cluster labels")
     lines.append(f"- 5-fold TimeSeriesSplit out-of-fold ({multiclass['n_samples_oof']} test predictions)")
     lines.append(f"- OOF accuracy (4-class): **{multiclass['oof_accuracy']:.4f}**")
     lines.append(f"- c1 one-vs-rest AUC: **{c1.get('auc_one_vs_rest', float('nan')):.4f}** "
@@ -668,7 +671,7 @@ def main() -> int:
     print(f"[diagnostic] PR-HHHL features present: {len(arc8_required)}", file=sys.stderr)
 
     # Compute 8 base entry features via pair caches.
-    print(f"[diagnostic] Computing 8 base entry features from 4H bars...", file=sys.stderr)
+    print("[diagnostic] Computing 8 base entry features from 4H bars...", file=sys.stderr)
     pairs = sorted(trades_with["pair"].unique())
     pair_caches = {p: _build_pair_cache(p, "data/4hr") for p in pairs}
     base_e_df = compute_base_e_features(trades_with, pair_caches)

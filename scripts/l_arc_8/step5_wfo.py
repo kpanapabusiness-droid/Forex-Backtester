@@ -53,7 +53,6 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-import joblib
 import numpy as np
 import pandas as pd
 import yaml
@@ -667,7 +666,6 @@ def aggregate_folds(
         oos_days += (oe_ - os_).days
     time_cov = (oos_days / total_data_days * 100.0) if total_data_days > 0 else 0.0
 
-    pairs_active: set = set()
     for fr in run_folds:
         # We rebuild pairs from per_trade_pair if stored... we didn't keep it
         # in _FoldResult outside loops, so use n_pairs_active aggregated.
@@ -864,7 +862,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     # Inputs.
     step1_dir = _REPO_ROOT / cfg["input"]["step1_dir"]
     step2_dir = _REPO_ROOT / cfg["input"]["step2_dir"]
-    step4_dir = _REPO_ROOT / cfg["input"]["step4_dir"]
+    _REPO_ROOT / cfg["input"]["step4_dir"]
     trades_df = pd.read_csv(step1_dir / cfg["input"]["trades_csv"])
     paths_df = pd.read_csv(step1_dir / cfg["input"]["paths_csv"])
     clusters_df = pd.read_csv(step2_dir / cfg["input"]["clusters_csv"])

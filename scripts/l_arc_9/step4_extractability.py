@@ -32,10 +32,7 @@ Per §8 + v2.2 §3:
 from __future__ import annotations
 
 import argparse
-import importlib
-import json
 import sys
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -46,7 +43,10 @@ import yaml
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import (
-    confusion_matrix, precision_score, recall_score, roc_auc_score,
+    confusion_matrix,
+    precision_score,
+    recall_score,
+    roc_auc_score,
 )
 from sklearn.model_selection import StratifiedKFold
 from sklearn.preprocessing import StandardScaler
@@ -354,7 +354,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     trades_paths = pd.read_csv(args.step1_dir / "trades_paths.csv")
     clusters = pd.read_csv(args.step2_dir / "clusters_K3.csv")
     pass_list = pd.read_csv(args.step3_dir / "capturability_pass_list.csv")
-    arch_summaries = pd.read_csv(args.step3_dir / "archetype_summaries.csv")
+    pd.read_csv(args.step3_dir / "archetype_summaries.csv")
 
     # Build entry features once.
     features_path = args.out_dir / "entry_features.csv"
@@ -371,7 +371,6 @@ def main(argv: Optional[List[str]] = None) -> int:
     angle_E_rows: List[Dict[str, Any]] = []
     angle_D1_rows: List[Dict[str, Any]] = []
     extract_pass: List[Dict[str, Any]] = []
-    summary_md_rows: List[str] = []
 
     for _, surv in pass_list.iterrows():
         label = str(surv["label_archetype_or_cluster"])

@@ -56,7 +56,7 @@ import hashlib
 import json
 import math
 import sys
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -337,8 +337,8 @@ def compute_d1_features_at_t(
         # in original frame (monotone in scale > 0).
         mfe_new = mfe_orig * scale
         mae_new = mae_orig * scale
-        high_new = high_orig * scale
-        low_new = low_orig * scale
+        high_orig * scale
+        low_orig * scale
 
         # Features at bar t (last bar of slice).
         idx_t = len(seg) - 1
@@ -417,8 +417,8 @@ def _make_rf():
 
 def _make_logistic():
     from sklearn.linear_model import LogisticRegression
-    from sklearn.preprocessing import StandardScaler
     from sklearn.pipeline import Pipeline
+    from sklearn.preprocessing import StandardScaler
     return Pipeline(
         [
             ("scaler", StandardScaler()),
@@ -429,8 +429,8 @@ def _make_logistic():
 
 def _cv_auc_rf(X: np.ndarray, y: np.ndarray, n_splits: int = 5) -> Tuple[float, List[float]]:
     """5-fold TimeSeriesSplit CV ROC-AUC for an RF classifier."""
-    from sklearn.model_selection import TimeSeriesSplit
     from sklearn.metrics import roc_auc_score
+    from sklearn.model_selection import TimeSeriesSplit
     tss = TimeSeriesSplit(n_splits=n_splits)
     aucs: List[float] = []
     for fold, (tr_idx, te_idx) in enumerate(tss.split(X)):
@@ -448,8 +448,8 @@ def _cv_auc_rf(X: np.ndarray, y: np.ndarray, n_splits: int = 5) -> Tuple[float, 
 
 
 def _cv_auc_logistic(X: np.ndarray, y: np.ndarray, n_splits: int = 5) -> Tuple[float, List[float]]:
-    from sklearn.model_selection import TimeSeriesSplit
     from sklearn.metrics import roc_auc_score
+    from sklearn.model_selection import TimeSeriesSplit
     tss = TimeSeriesSplit(n_splits=n_splits)
     aucs: List[float] = []
     for fold, (tr_idx, te_idx) in enumerate(tss.split(X)):
@@ -646,8 +646,8 @@ def run_angle_e(
         X1 = _impute_nans(feat_df[feats1])
         X2 = _impute_nans(feat_df[feats2])
         # Compute per-fold intersection AUC via CV.
-        from sklearn.model_selection import TimeSeriesSplit
         from sklearn.metrics import roc_auc_score
+        from sklearn.model_selection import TimeSeriesSplit
         tss = TimeSeriesSplit(n_splits=5)
         stack_aucs: List[float] = []
         for tr_idx, te_idx in tss.split(X1):
@@ -986,7 +986,7 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     trades_df["entry_time"] = pd.to_datetime(trades_df["entry_time"])
     trades_df["signal_bar_time"] = pd.to_datetime(trades_df["signal_bar_time"])
-    pool_size = len(trades_df)
+    len(trades_df)
 
     paths_index = _build_paths_index(paths_df)
 

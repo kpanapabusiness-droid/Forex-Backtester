@@ -37,9 +37,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import math
 import sys
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -567,7 +565,7 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     summary = run(args.out_dir)
     print(f"[pe-retry] VERDICT: {summary['verdict']}")
-    print(f"  cells (mean CV AUC):")
+    print("  cells (mean CV AUC):")
     for cn, info in summary["cells"].items():
         print(f"    {cn:24s}  AUC mean {info['mean_auc']:.4f}  folds {[round(a, 4) for a in info['fold_aucs']]}")
     if summary["threshold_sweep_chosen"]:

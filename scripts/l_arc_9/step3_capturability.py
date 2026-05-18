@@ -379,7 +379,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     pool_n = int(trades["trade_id"].nunique())
 
     # Determine chosen K and load clusters + archetype assignment.
-    sil = pd.read_csv(args.step2_dir / "silhouette_summary.csv")
+    pd.read_csv(args.step2_dir / "silhouette_summary.csv")
     arch = pd.read_csv(args.step2_dir / "archetype_assignments.csv")
     # Use the K that matches the archetype_assignments.csv row count (number of clusters).
     chosen_k = int(arch["cluster_id"].nunique())

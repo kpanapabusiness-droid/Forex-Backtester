@@ -59,12 +59,9 @@ Hard rules per dispatch:
 from __future__ import annotations
 
 import argparse
-import datetime as dt
 import hashlib
-import importlib
 import json
 import math
-import platform
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -433,7 +430,7 @@ def _sha256_file(path: Path) -> str:
 def run(
     cfg_arc: dict, cfg_kh24: dict, out_dir: Path,
 ) -> Tuple[pd.DataFrame, pd.DataFrame, Dict[str, Any], List[Tuple[pd.Timestamp, pd.Timestamp]]]:
-    pairs_set = set(cfg_arc["pairs"])
+    set(cfg_arc["pairs"])
     data_4h = cfg_arc["data"]["data_dirs"]["4H"]
     data_dir = Path(data_4h) if Path(data_4h).is_absolute() else _REPO_ROOT / data_4h
     date_start = str(cfg_arc["data"]["date_start"])

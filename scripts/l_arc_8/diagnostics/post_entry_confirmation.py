@@ -41,8 +41,8 @@ if str(_REPO_ROOT) not in sys.path:
 
 from scripts.l_arc_8.step3_capturability import _eval_trade_at_sl  # noqa: E402
 from scripts.l_arc_8.step4_extractability import (  # noqa: E402
-    PIPELINE_E_BASE_FEATURES,
     PIPELINE_E_ARC8_FEATURES,
+    PIPELINE_E_BASE_FEATURES,
     _build_pair_cache,
     _impute_nans,
     compute_base_e_features,
@@ -81,8 +81,11 @@ def run_multiclass_at_t(
     """Multiclass RF at bar t. Returns (metrics_dict, eligibility_mask)."""
     from sklearn.ensemble import RandomForestClassifier
     from sklearn.metrics import (
-        accuracy_score, confusion_matrix, precision_recall_curve,
-        precision_recall_fscore_support, roc_auc_score,
+        accuracy_score,
+        confusion_matrix,
+        precision_recall_curve,
+        precision_recall_fscore_support,
+        roc_auc_score,
     )
     from sklearn.model_selection import TimeSeriesSplit
 
@@ -522,7 +525,7 @@ def main() -> int:
     print(f"\n[path1] Verdict: {verdict}", file=sys.stderr)
     print(f"  best_t = {best_t}, c1 precision@recall=0.60 at best_t = {best_p:.4f}", file=sys.stderr)
     if economic_downgrade:
-        print(f"  (downgraded from PATH_1_VIABLE → PATH_1_MARGINAL due to >50% MFE consumed by t)",
+        print("  (downgraded from PATH_1_VIABLE → PATH_1_MARGINAL due to >50% MFE consumed by t)",
               file=sys.stderr)
     return 0
 

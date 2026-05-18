@@ -2,8 +2,9 @@
 
 ## Status
 
-- **Current step:** Step 4 complete (PASS — 1 surviving archetype); halt per v2.3 §9, awaiting Step 5 WFO dispatch
+- **Current step:** Step 5 WFO dispatched; halted at pre-check exit gate (engine PR not merged). Pre-checks 1 + 2 PASS.
 - **Verdict (Step 4 endpoint):** STEP_4_COMPLETE_READY_FOR_WFO
+- **Verdict (Step 5 entry):** HALT_PENDING_ENGINE_PR_MERGE
 - **Verdict:** none yet (arc still active)
 - **Last updated:** 2026-05-18
 - **Branch:** worktree `claude/magical-zhukovsky-bd69d9` (dispatcher-target merge to `phase/l_arc_8`)
@@ -97,6 +98,7 @@ This session does NOT own: Step 5 WFO dispatch, engine PRs (`scripts/phase_kgl_v
 | 2 | Clustering | **PASS** | K=4 chosen (silhouette 0.4762); 4 clusters {316, 177, 429, 405}; 0/4 degenerate features; 2 V-shape clusters → per-cluster AND per-aggregate at Step 3 |
 | 3 | Capturability | **PASS** | 3 units survive: c1 (n=177, SL=4.0×ATR), c3 (n=405, SL=2.0×ATR), agg_c1_c3 (n=582, SL=3.0×ATR); all V-shape recovery; c2 (Early-peak hold) dies on §2 floors |
 | 4 | Extractability | **PASS** | 1 archetype survives: c1 (V-shape recovery, FG-weak) at E+D1; c3 + agg_c1_c3 die per v2.2 §3 (no max-F1 fallback). pre_t_sl_atr_multiplier=4.0 recorded in D1 policy YAML |
+| 5 | WFO | **HALT** | Pre-checks PASS (fold 2 regime characterised — regime-shift artefact not leak; D1 t=1 leak audit clean). Halt: engine PR `feat/open-24-pre-t-sl-per-archetype` NOT merged into main; required per dispatch §35 to consume `pre_t_sl_atr_multiplier: 4.0`. |
 
 ### Step 1 — Plumbing
 
@@ -459,6 +461,105 @@ Step 5 WFO inputs:
 - `9583947 arc-8 step 2 PASS: K=4 chosen, 0/4 degenerate, 3 tentative + 1 unassigned`
 - `c34cc6b arc-8 step 3 PASS: 3 V-shape units survive; pre_t_sl_atr_multiplier recorded`
 - `a5eb6e6 arc-8 step 4 PASS: c1 V-shape recovery survives E+D1 with full threshold sweep`
+- `7537cb2 arc-8 step 4 complete — halt summary appended; queue annotated`
+
+---
+
+## Step 5 Pre-flight Halt — Engine PR not merged
+
+### Status
+
+- **Disposition:** HALT_PENDING_ENGINE_PR_MERGE (not a §16a closure — arc remains Active)
+- **Pre-checks:** both PASS (see `results/l_arc_8/step5_prechecks/`)
+- **Engine PR `feat/open-24-pre-t-sl-per-archetype`:** EXISTS on origin, **NOT MERGED INTO main**
+- **Queue state:** Arc 8 remains **Active** (no transition)
+
+### Halt condition triggered
+
+Per dispatch §35: "Engine: `scripts/phase_kgl_v2_4h_wfo.py` with `feat/open-24-pre-t-sl-per-archetype` branch merged (confirm before run — halt if PR not merged)."
+
+Per dispatch §62-63: "Engine PR not merged → halt."
+
+`git merge-base --is-ancestor origin/feat/open-24-pre-t-sl-per-archetype origin/main` returns false. The branch contains 3 commits adding the v2.3 §4 (Open-24) plumbing that consumes the `pre_t_sl_atr_multiplier: 4.0` field from Arc 8's D1 policy YAML.
+
+| Commit | Title |
+|---|---|
+| `2440e30` | `feat(d1): add pre_t_sl_atr_multiplier to per-archetype YAML schema` |
+| `720eb7e` | `feat(d1): apply pre_t_sl_atr_multiplier at entry via SL_MULT reassignment` |
+| `541390a` | `test(d1): add pre_t_sl_atr_multiplier unit + integration + anchor tests` |
+
+Files changed (vs origin/main):
+
+```
+ core/d1_pipeline.py            |  44 ++++++  (new hook to read per-archetype field)
+ scripts/phase_kgl_v2_4h_wfo.py |  21 +++-   (engine integration at startup)
+ tests/test_d1_pipeline.py      | 199 +++++  (52 existing D1 tests + Open-24 coverage)
+ 3 files changed, 261 insertions(+), 3 deletions(-)
+```
+
+Tests cited as passing in the branch's commit messages (1135 passed / 20 skipped in the full suite). Branch appears merge-ready pending analyst review.
+
+**Why this is hard-halting (not just degrading) Pipeline D1 WFO:**
+
+Without the engine PR merged, the WFO engine (`scripts/phase_kgl_v2_4h_wfo.py`) treats `SL_MULT` as the module-scope default 2.0×ATR. Arc 8's c1 archetype was Step-3-characterised, Step-4-classifier-trained, and Step-4-threshold-swept under SL=4.0×ATR. Running WFO at SL=2.0×ATR would:
+
+- Use the wrong R-frame (Step 4 labels assumed 4.0×ATR; positive class would invert at 2.0×ATR since `final_r ≥ 1.0` in 2×ATR units = `final_r ≥ 2.0` in 4×ATR units — far rarer)
+- Cause many trades to hit the (now-tighter) SL early, eliminating much of the c1 archetype population
+- Produce per-archetype attribution that doesn't correspond to the trained classifier
+
+**Why this is also blocking Pipeline E WFO** (although less directly):
+
+Pipeline E is an entry filter — admits/rejects at signal time, then the trade runs to its natural exit under the unit's selected SL. The engine still needs SL_MULT=4.0×ATR for c1's E-admitted trades. The `feat/open-24-pre-t-sl-per-archetype` plumbing is the canonical way to set this per-archetype; without it, an out-of-band hardcoded SL_MULT=4.0 in the WFO config would be required (a less clean workaround that diverges from v2.3 §4).
+
+### Pre-check results (both clean)
+
+#### Pre-check 1: Fold 2 regime investigation
+
+**File:** [results/l_arc_8/step5_prechecks/fold2_regime.md](step5_prechecks/fold2_regime.md)
+
+- TimeSeriesSplit fold idx 1 (the AUC 0.4500 fold) → OOS window **2022-10-19 to 2023-08-01**
+- Macro context: USD reversal (late 2022) + SVB/Credit-Suisse banking crisis (March 2023) + BoJ Ueda transition (April 2023) + US debt ceiling (May-June 2023)
+- Verdict: **regime-shift artefact, NOT a Step 4 leak or modelling bug**. Fold 0 (AUC 0.85) trained pre-regime-shift on the clean 2020-2022 USD bull-trend regime; fold 1 OOS hit three back-to-back regime-shift events.
+- Recommendation for WFO interpretation: KH-24 WFO's 3mo OOS windows will split the 2022-10 → 2023-08 disaster zone into ~3 separate windows; the per-window stratification will surface whether c1 ships pass-deployable (best ROI > 5% worst-window) vs pass-viable (best ROI > 0% worst-window).
+
+#### Pre-check 2: D1 t=1 leak audit
+
+**File:** [results/l_arc_8/step5_prechecks/d1_t1_leak_audit.md](step5_prechecks/d1_t1_leak_audit.md)
+
+- Code path inspected: `scripts/l_arc_8/step4_extractability.py::compute_d1_features_at_t` lines 257-373
+- Verified empirically: at t=1, slice contains bars `[0, 1]` only. `Any bar_offset > t in slice? False`.
+- All 7 path-so-far features read from this slice; the underlying `mfe_so_far_r` / `mae_so_far_r` from Step 1 path emission are running max/min over bars `[0..i]` (strictly causal per Step 1 reference impl).
+- Eligibility check uses `_eval_trade_at_sl` for full-path future info, but only to compute `actual_exit_bar` — an observable quantity at bar 1 close in OOS (we know whether the trade has been SL-hit by bar 1 in real time).
+- Verdict: **CLEAN — no future-bar leak**. The "suspiciously clean" recall 1.000 / precision 0.909 deflates under inspection: c1's high base rate (0.81 positive class) makes recall ≥ 0.60 trivial; the classifier's actual lift is specificity 50% on 6 holdout negatives (CV AUC 0.637 is the more reliable metric).
+- Caveat flagged: c1's base-rate-driven cheap-recall property means v2.2 §3 gating is mechanically permissive for high-base-rate archetypes. WFO worst-window economics will be the binding test.
+
+### sha-mismatch clarification (dispatch §39 claim resolved as analyst error)
+
+The dispatch §39 said: "`configs/wfo_l_arc_8.yaml` (signal config; verify sha `accba985...`)".
+
+This sha is from `results/l_arc_8/step1_quicktest/manifest.json` — the SMOKE-TEST run on 3 pairs, not the verbatim Step 1 run.
+
+The verbatim Step 1 manifest `results/l_arc_8/step1_verbatim/manifest.json` records:
+
+```
+"config_arc8": "9785a5ba0e8619352ec656290305959df6bdb51af72b8c27655254f81dbbba73"
+```
+
+This matches the on-disk file AND the git-blob committed at `3c5f943`. Confirmed via:
+- `sha256sum configs/wfo_l_arc_8.yaml` → `9785a5b...`
+- `py -c "hashlib.sha256(...read_bytes()).hexdigest()"` → `9785a5b...`
+- `git cat-file -p 3c5f943:configs/wfo_l_arc_8.yaml | sha256sum` → `9785a5b...`
+
+**No config drift.** The Step 4 outputs are valid against the committed `wfo_l_arc_8.yaml`. The dispatch's quoted sha needs amendment in the analyst-side Step 5 dispatch text.
+
+### Recommended next action (analyst-side)
+
+1. **Review + merge `feat/open-24-pre-t-sl-per-archetype` into main** (or have the analyst confirm a fast-forward via the relevant PR review process).
+2. Re-dispatch Step 5 WFO with the corrected `wfo_l_arc_8.yaml` sha (`9785a5b...`) in the dispatch text.
+3. Re-pull `main` into the worktree (or merge `main` into this worktree branch).
+4. CC resumes from the WFO procedure section directly (pre-checks already passed and committed).
+
+No re-work of Step 4 needed; pre-check artefacts persist under `results/l_arc_8/step5_prechecks/`.
 
 ## Detailed analysis
 

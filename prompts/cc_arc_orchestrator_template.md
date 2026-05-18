@@ -1,8 +1,8 @@
-# CC Arc Orchestrator — Unattended Steps 1-5 Dispatch Template
+# CC Arc Orchestrator — Unattended Steps 1-4 Dispatch Template
 
-> Version: v1.0 (drafted 2026-05-18 for L_ARC_PROTOCOL v2.2)
-> Scope: single CC dispatch in a single CC chat session runs one L arc from arc-open through end of step 5. Halts at end of step 5, returns halt summary. Step 6 (WFO) is a separate dispatch from chat after analyst review.
-> Companion files: `L_ARC_PROTOCOL.md` (v2.2), `results/ARC_QUEUE.md`, `LCHAR_TOPN_REGISTRY.md`, `SPREAD_SEMANTICS_LOCK.md`.
+> Version: v1.1 (updated 2026-05-18 for L_ARC_PROTOCOL v2.3)
+> Scope: single CC dispatch in a single CC chat session runs one L arc from arc-open through end of step 4. Halts at end of step 4, returns halt summary. Step 5 (WFO) is a separate dispatch from chat after analyst review.
+> Companion files: `L_ARC_PROTOCOL.md` (v2.1.2 base) + `L_ARC_PROTOCOL_v2_2_AMENDMENT.md` (v2.2 governance) + `L_ARC_PROTOCOL_v2_3_AMENDMENT.md` (v2.3 Step 5 removal + renumbering), `results/ARC_QUEUE.md`, `LCHAR_TOPN_REGISTRY.md`, `SPREAD_SEMANTICS_LOCK.md`, `SHELVED_ARCS.md`.
 
 ---
 
@@ -23,7 +23,7 @@ To run N arcs in parallel: open N CC chats, paste the template into each with th
 
 ## Read these first, in order
 
-1. `L_ARC_PROTOCOL.md` (v2.2) — methodology of record, self-contained
+1. `L_ARC_PROTOCOL.md` (v2.1.2 base) + `L_ARC_PROTOCOL_v2_2_AMENDMENT.md` (v2.2 governance) + `L_ARC_PROTOCOL_v2_3_AMENDMENT.md` (v2.3 Step 5 removal + renumbering) — methodology of record. All three documents are binding for Arc 8+.
 2. `results/ARC_QUEUE.md` — queue state; confirm Arc <N> is the topmost Unrun entry, then transition it to Active
 3. The signal source for Arc <N>:
    - Registry-based arcs: `LCHAR_TOPN_REGISTRY.md` Entry <K>
@@ -35,19 +35,19 @@ To run N arcs in parallel: open N CC chats, paste the template into each with th
 
 ## What this dispatch does
 
-Run Arc <N> through steps 1-5 of L_ARC_PROTOCOL v2.2. Halt at end of step 5. Do NOT run step 6 WFO — that is a separate dispatch from chat.
+Run Arc <N> through steps 1-4 of L_ARC_PROTOCOL v2.3. Halt at end of step 4. Do NOT run Step 5 WFO — that is a separate dispatch from chat (Step 5 is the WFO truth gate, renumbered from v2.2's Step 6 under the v2.3 amendment's §9 removal + step renumbering).
 
-No mid-arc analyst sign-off is required or expected. Per v2.2 §6: between arc-open and end of step 5, chat does not review mid-arc state. Apply mechanical rules per the protocol. Where ambiguity exists, halt and document — do not guess.
+No mid-arc analyst sign-off is required or expected. Per v2.2 §6 (updated by v2.3 §9): between arc-open and end of step 4, chat does not review mid-arc state. Apply mechanical rules per the protocol. Where ambiguity exists, halt and document — do not guess.
 
 ## Boundaries
 
-- **You own:** arc-open doc, all step 1-5 scripts, live arc doc, closure doc on early arc death, queue state transitions, branch creation, all commits on `phase/arc-<N>`.
-- **You do NOT own:** step 6 WFO dispatch, engine PRs (`scripts/phase_kgl_v2_4h_wfo.py`, `signals/`, locked configs `configs/wfo_kh24.yaml` / `configs/spreads_5ers.yaml` / `configs/spread_floors_5ers.yaml`), `L_ARC_PROTOCOL.md` edits, ship/archive decisions on step 6 output.
+- **You own:** arc-open doc, all step 1-4 scripts, live arc doc, closure doc on early arc death, queue state transitions, branch creation, all commits on `phase/arc-<N>`.
+- **You do NOT own:** Step 5 WFO dispatch, engine PRs (`scripts/phase_kgl_v2_4h_wfo.py`, `signals/`, locked configs `configs/wfo_kh24.yaml` / `configs/spreads_5ers.yaml` / `configs/spread_floors_5ers.yaml`), `L_ARC_PROTOCOL.md` edits, ship/archive decisions on Step 5 output.
 - **One arc per session.** This session runs Arc <N> and only Arc <N>. If you finish early, end the session — do not pick up the next queue entry.
 - **If you find an engine change is needed:** halt, write the halt summary explaining what engine change is needed and why, do NOT make the change. Engine PRs are PR-required scope.
 - **If protocol applicability is ambiguous:** halt, write the halt summary citing the clause and the ambiguity. Do not interpret loosely.
 
-## Live-execution equivalence (v2.2 §7 / §1a)
+## Live-execution equivalence (v2.2 §7 / §1a — Step 1 + Step 5 per v2.3 §7)
 
 All step 1 trade construction MUST use live-equivalent execution:
 
@@ -58,7 +58,7 @@ All step 1 trade construction MUST use live-equivalent execution:
 - D1 features use one-day lag (`merge_asof` backward, pre-shifted date)
 - Volume veto: no entry, no trade row, no spread
 
-The Python backtester implements this already. The assertion here is that arc Step 1 scripts MUST use the same execution path. No synthetic mid-fills. No hardcoded spread defaults. No same-day D1 close.
+The Python backtester implements this already. The assertion here is that arc Step 1 scripts MUST use the same execution path, and Step 5 WFO inherits the same semantics. No synthetic mid-fills. No hardcoded spread defaults. No same-day D1 close.
 
 ## Pre-flight
 
@@ -73,8 +73,8 @@ The Python backtester implements this already. The assertion here is that arc St
 Write `results/arc_<N>/ARC_<N>_LIVE.md` using the template in `L_ARC_PROTOCOL.md` §13. Fill arc-open section:
 
 - Signal under test: <signal_name>, source = <registry Entry K | signal_spec_<name>.md>
-- Hypothesis: this signal carries structural edge surface-able by path-shape clustering and v2.2 capturability + extractability gates
-- Protocol version: v2.2
+- Hypothesis: this signal carries structural edge surface-able by path-shape clustering and v2.1.2 capturability + extractability gates
+- Protocol version: v2.1.2 base + v2.2 amendment + v2.3 amendment (active for Arc 8+)
 - SL sweep candidates: default `{0.5, 1.0, 1.5, 2.0, 3.0, 4.0} × ATR_signal_TF` unless signal spec overrides
 - Simulation SL (step 1 pool): default 2.0×ATR_signal_TF unless signal spec overrides
 - Forward window: default 240 bars on signal TF
@@ -82,7 +82,7 @@ Write `results/arc_<N>/ARC_<N>_LIVE.md` using the template in `L_ARC_PROTOCOL.md
 - Pair set: 28 FX (KH-24 set) unless signal spec overrides
 - Population builder: `build_ex_ante_bounded_population`
 - Risk: 0.5% per trade
-- Pre-committed step gates: per v2.2 (no overrides, no mid-arc sign-off)
+- Pre-committed step gates: per v2.2 + v2.3 (no overrides, no mid-arc sign-off; halt at end of Step 4)
 
 Commit arc-open doc.
 
@@ -140,7 +140,7 @@ Update live arc doc step 3 row. Commit.
 
 ## Step 4 — Extractability
 
-Per protocol §8, with v2.2 §3 amendment (no max-F1 fallback) and v2.2 §2 amendment (Tier 2 lift cap ≤ 5).
+Per protocol §8, with v2.2 §3 amendment (no max-F1 fallback) and v2.2 §2 amendment (Tier 2 lift cap ≤ 5). Pipeline D1 cost-language and pre-t SL per v2.3 §4/§5 (Open-23/24): D1 pre-t SL = cluster's Step 3 selected SL multiplier (engine PR pending; default 2.0×ATR is anchor-preserving). Rejected-pool / pre-t-loser empirical cost ranges per v2.3 §4 — full-pool R = admit + reject + pre-t-loss contributions, evaluated at Step 5 WFO.
 
 For each surviving archetype, in order:
 1. Angle E step A: full feature set RF + logistic at entry. If RF AUC ≥ 0.65 → lock Pipeline E, proceed to threshold sweep.
@@ -151,7 +151,7 @@ For each surviving archetype, in order:
 
 For each locked classifier (E and/or D1):
 6. **Threshold sweep:** sweep {0.40, 0.50, 0.60, 0.70}, select max precision with recall ≥ 0.60. **If no threshold satisfies recall ≥ 0.60 → archetype fails Step 4 (no max-F1 fallback, v2.2 §3). Apply §16a HALT/KILL.**
-7. Tier 2 lift: ≤ 5 candidates per archetype (v2.2 §2 cap), intersection-only, evaluated at step 6. Each lift candidate must independently pass threshold sweep per rule 6.
+7. Tier 2 lift: ≤ 5 candidates per archetype (v2.2 §2 cap), intersection-only, evaluated at Step 5 WFO. Each lift candidate must independently pass threshold sweep per rule 6.
 8. Train final classifier(s), save `archetype_<label>_E_classifier.joblib` + `archetype_<label>_E_filter.yaml` (and/or D1 equivalents).
 
 Outputs: `predictability_angle_E.csv`, `predictability_angle_D1.csv`, `extractability_pass_list.csv`, per-archetype classifier files + policy YAMLs.
@@ -159,28 +159,6 @@ Outputs: `predictability_angle_E.csv`, `predictability_angle_D1.csv`, `extractab
 Gate fail (zero archetypes clear E or D1 with valid threshold) → closure doc, apply §16a.
 
 Update live arc doc step 4 row. Commit.
-
-## Step 5 — Cross-fold stability
-
-Per protocol §9.
-
-For each surviving archetype: apply filter / D1 policy across all 7 WFO folds, compute per-fold metrics.
-
-Conjunctive gate (v2.2 §1 — no overrides):
-1. Sign consistency: `final_r_mean` positive across ALL 7 folds (gate)
-2. Size variance: max-fold / min-fold ≤ 3.0 (gate)
-3. DD ceiling: worst-fold archetype-attributable DD ≤ 2× median-fold DD (gate)
-
-Diagnostic logging (v2.2 §1 mandatory):
-- Per-fold final_r_mean, n_archetype_in_fold, t_stat, fold ROI, fold max DD
-- Flag any fold with n_archetype_in_fold < 10 as "thin-fold flip" if final_r_mean ≤ 0 (informational only, does not change disposition)
-- Per-pair concentration report (informational per §9; flag if >50% in <5 pairs)
-
-Outputs: `fold_stability_<label>.csv`, `pair_stability_<label>.csv`, `stability_pass_list.csv`.
-
-Gate fail → closure doc, apply §16a.
-
-Update live arc doc step 5 row. Commit.
 
 ## Halt summary (always produced at dispatch end)
 
@@ -190,24 +168,24 @@ Append to live arc doc + write to dispatch return:
 ## Halt Summary — Arc <N>
 
 ### Status
-- Disposition: <STEP_<N>_KILL | STEP_<N>_HALT | STEP_5_COMPLETE_READY_FOR_WFO>
-- Closure doc: <path or "n/a — proceeded to step 5">
+- Disposition: <STEP_<N>_KILL | STEP_<N>_HALT | STEP_4_COMPLETE_READY_FOR_WFO>
+- Closure doc: <path or "n/a — proceeded to end of step 4">
 - Live arc doc: results/arc_<N>/ARC_<N>_LIVE.md
 - Branch: phase/arc-<N>
-- Queue state: <transitioned Active → Closed-{KILL|HALT} | remains Active pending step 6>
+- Queue state: <transitioned Active → Closed-{KILL|HALT} | remains Active pending Step 5 WFO>
 
 ### Step pass/fail table
-[as per live arc doc]
+[as per live arc doc — rows for Steps 1, 2, 3, 4]
 
-### Surviving archetypes (if step 5 complete)
-| Label | Cluster IDs | Selected SL | Pipeline | RF AUC | Threshold | Recall | Fold pass | Notes |
-|---|---|---|---|---|---|---|---|---|
+### Surviving archetypes (primary end-of-Step-4 output)
+| Label | Cluster IDs | Selected SL | Pipeline | RF AUC | Threshold | Recall | Notes |
+|---|---|---|---|---|---|---|---|
 
 ### Cross-arc calibration candidates (HALT only)
-[per §16a]
+[per §16a; failing-step list semantic position 5 now means WFO, per v2.3 §8]
 
 ### Recommended next dispatch
-- If STEP_5_COMPLETE: chat reviews surviving archetypes, dispatches step 6 WFO on selected subset
+- If STEP_4_COMPLETE_READY_FOR_WFO: chat reviews surviving archetypes, dispatches Step 5 WFO on selected subset
 - If STEP_<N>_KILL: nothing — arc archived
 - If STEP_<N>_HALT: chat reviews calibration candidate, batches with other HALT items for next protocol amendment cycle
 ```
@@ -228,6 +206,8 @@ Append to live arc doc + write to dispatch return:
 - **Unexpected data shape (NaNs, negative spreads, missing bars):** halt with halt summary documenting the data issue.
 - **Queue write conflict:** if push of queue update fails, pull, confirm Arc <N> still topmost Unrun. If yes, retry. If another session took it, halt — dispatch was for the wrong arc number.
 
+Failure modes cover Steps 1-4 only. Step 5 WFO failures are handled by the analyst-led Step 5 dispatch, not by this orchestrator.
+
 All halts are recoverable — the live arc doc + commits on branch preserve state.
 
 ## Resume semantics
@@ -244,7 +224,7 @@ No state lives in CC memory across sessions — all state is on disk + in git.
 ## End-of-dispatch
 
 Final actions:
-1. Update `results/ARC_QUEUE.md` (Active → Closed-{KILL|HALT} OR remains Active pending step 6)
+1. Update `results/ARC_QUEUE.md` (Active → Closed-{KILL|HALT} OR remains Active pending Step 5 WFO)
 2. Commit queue update
 3. Return halt summary to dispatcher
 ```
@@ -262,8 +242,9 @@ Final actions:
 
 ## What this template does NOT cover
 
-- Step 6 WFO dispatch (separate template, future work — now that PR2 lands, §11 archetype-specific exit policies are executable in step 6)
+- Step 5 WFO dispatch (separate template, future work — now the analyst-review checkpoint at end of Step 4 under v2.3; PR2 lands §11 archetype-specific exit policies, executable in Step 5 WFO)
 - Cross-arc calibration synthesis (analyst work, per §12)
 - Engine PRs (PR-required, separate workflow)
 - Protocol amendments (PR-required, separate workflow)
 - The Open-19 engine refactor that would replace manual schema replication in step 1 (deferred; absorbed risk under §16a)
+- Engine PR for Open-24 honour (per-archetype D1 `pre_t_sl_atr_multiplier`; default 2.0 preserves anchor) — separate engineering PR, can land independently of v2.3 protocol

@@ -1,0 +1,7 @@
+# Spread-floor lock file — pin LF to keep body sha256 stable across platforms.
+# Without this, autocrlf=true (Windows default) converts LF→CRLF on checkout
+# and breaks tests/test_spread_floors_lock.py LOCKED_BODY_SHA256 verification
+# (the test hashes raw on-disk bytes via scripts/lchar/compute_spread_floors.py
+# compute_body_sha256, which does not normalize line endings).
+# See docs/calibration_decisions/SPREAD_FLOOR_CALIBRATION_DECISION_2026-05-17.md
+configs/spread_floors_5ers.yaml text eol=lf

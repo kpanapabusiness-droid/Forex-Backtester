@@ -1,48 +1,43 @@
 # SESSION ZERO — Forex Ignition Rebuild
-> 5-minute primer. Read this first, then read `L_ARC_PROTOCOL.md` (v2.1.2, self-contained) for the active research methodology.
-> Last updated: 2026-05-17 — **Arc 5 closed SHELVED at Step 6 FAIL** under PR 2 + new spreads + full-pool WFO accounting. Registry exhausted at h≥120 (Entries 2 KILL, 3 CLEAN-NULL, 5 SHELVED; Entries 1, 4 h=1 skipped per chat). Three P0 backlog items (P-§9-FRAMING, P-D1-VIABILITY, P-D1-REJECT-BIAS) take priority over further arc dispatches — Pipeline D1 framework requires correction. `configs/spread_floors_5ers.yaml` replaced 2026-05-17 with per-pair p50 values from HistData 2024-2025 audit. KH-24 live deployment unchanged.
+> 5-minute primer. Read this first, then read `L_ARC_PROTOCOL.md` (v2.1.2 base) + `L_ARC_PROTOCOL_v2_2_AMENDMENT.md` (v2.2 active for Arc 8+).
+> Last updated: 2026-05-18 — L_ARC_PROTOCOL v2.2 amendment landed (mechanises remaining chat-judgement carve-outs, closes Step 4 max-F1 fallback, asserts live-execution equivalence). Arcs 4-7 all closed (Arc 4 RERUN FAIL Step 6; Arc 5 SHELVED Step 6 FAIL; Arc 6 DIES Step 4; Arc 7 CLEAN-NULL Step 4). Arc queue empty pending analyst signal selection for Arc 8+. KH-24 live deployment unchanged.
 
 ---
 
 ## Pointers
 
-- Active protocol: `L_ARC_PROTOCOL.md` (v2.1.2)
+- Active protocol: `L_ARC_PROTOCOL.md` v2.1.2 base + `L_ARC_PROTOCOL_v2_2_AMENDMENT.md` v2.2 amendment (active for Arc 8+)
+- Arc queue: `results/ARC_QUEUE.md` (Active: none; Unrun: none; Closed: see file)
+- Orchestrator: `prompts/cc_arc_orchestrator_template.md` — one arc per CC chat session (unattended Steps 1-5)
 - v1.x archive: `archive/`
 
 ---
 
 ## Current State
 
-**ACTIVE WORK: ARC 5 CLOSED SHELVED. PIPELINE D1 FRAMEWORK NEEDS REVISION. LIVE SYSTEM: KH-24 unchanged on VPS.**
+**L_ARC_PROTOCOL v2.2 AMENDMENT LANDED 2026-05-18.** Mechanises remaining chat-judgement carve-outs in steps 1-5, closes Step 4 max-F1 fallback gap surfaced by Arc 7, asserts live-execution equivalence for steps 1 and 6. Methodology unchanged. CC can now run arcs 1→5 unattended in parallel without analyst sign-off mid-arc. Companion files (`prompts/cc_arc_orchestrator_template.md`, `results/ARC_QUEUE.md`) landed same day.
 
-Arc 5 (`mtf_alignment.2_down_mixed.kijun` at h=120, registry Entry 5) closed SHELVED 2026-05-17 at Step 6 FAIL under PR 2 mechanics + new per-pair p50 spread floors + full-pool WFO accounting. All three candidate strategies (cluster 1 alone, cluster 3 alone, tiered ensemble) failed §10 at every risk level. Headline finding: Pipeline D1's rejected pool (~78% of trades) has mean R **−0.46** per trade vs +0.025 unconditional bar-2 R — classifier rejection is itself a prediction of adverse drift. Admit-set edge confirmed (admit mean R +0.14-0.21 per fold, 7/7 positive) but the pipeline cannot extract it.
+**Arc queue currently empty.** Arcs 4-7 all closed in the 2026-05-17/2026-05-18 batch. Analyst populates `results/ARC_QUEUE.md` Unrun section with Arc 8+ signal specs (registry exhausted after Arc 5; Arc 6+ use standalone `signal_spec_<name>_v<version>.md` docs per v2.2 §15b).
 
-The §9 admit-only framing missed this failure mode — Step 6's full-pool reckoning caught it. Same bug applies to every Pipeline D1 arc with competent classifier (adverse-selected rejection is structural). Three P0 backlog items now hold priority over further arc dispatches: P-§9-FRAMING (full-pool §9 measurement), P-D1-VIABILITY (5% bar-0/1 SL-hit-rate gate at Step 4), P-D1-REJECT-BIAS (document rejected-pool selection bias in §3).
+**LIVE SYSTEM: KH-24 unchanged on VPS.** None of the seven v2.2 §0 items were invoked on the KH-24 anchor under v2.0 or v2.1.x — anchor preservation verified.
 
-Registry exhausted at h≥120: Entry 2 (KILL, Arc 2 redo), Entry 3 (CLEAN-NULL, Arc 3), Entry 5 (SHELVED, Arc 5). Entries 1 + 4 are h=1 and outside the active scope per chat decision.
+**Next chat tasks:**
+1. Analyst signal selection for Arc 8+ (populate `results/ARC_QUEUE.md` Unrun)
+2. Cross-arc calibration session for Open-22/23/24 (Pipeline D1 full-pool gating — surfaced by Arc 4 + Arc 5 closures, NOT closed by v2.2)
+3. Engineering pass to apply the v2.2 amendment text into `L_ARC_PROTOCOL.md` itself (PR-required per amendment §9)
 
-**Next:** address P0 backlog items (P-§9-FRAMING and P-D1-VIABILITY are highest-leverage mechanical protocol clarifications); then KH-24 anchor refresh under new spreads, Pipeline E retrofit on Arc 5 signal, or out-of-registry signal exploration.
+### Arcs 4-7 closure batch summary
 
-Three arcs closed on 2026-05-16 (Arc 2 redo KILL, KH-24 v2.0 self-test HALT, Arc 3 CLEAN-NULL) all hit the same §2 monotonicity / shape_tag wall with structurally credible cohorts. v2.1 (2026-05-17) introduced pre-peak measurement + SL sweep + capturability composite + bimodal_separated admit. v2.1.1 (2026-05-17) refined SL selection to capturability composite maximiser.
+- **Arc 4** (`bar_range_top_decile__neg__h_001`): original closure 2026-05-17 CLEAN-NULL on transaction-cost truth; rerun closure 2026-05-18 FAIL Step 6 under §10 full-pool deployment reckoning. Pipeline D1 admit-only edge swamped by reject + early-exit pool drag. Three protocol items spawned (Open-22/23/24). `docs/arc_results/ARC_4_RERUN_RESULT.md`.
+- **Arc 5** (`mtf_alignment.2_down_mixed.kijun` h=120, registry Entry 5): closed 2026-05-17 SHELVED Step 6 FAIL. Pipeline D1 rejected-pool adverse selection (~78%, −0.46R) kills full-strategy expectancy despite admit-set edge. Same Pipeline D1 architectural failure pattern as Arc 4. Eight cross-arc backlog items added (3 P0). Closure doc on `arc-5-closure` branch: `docs/arc_results/ARC_5_RESULT.md`.
+- **Arc 6** (failed-breakout reversal long, out-of-registry): closed 2026-05-17 DIES at Step 4 deployability. Pipeline E both clusters fail; Pipeline D1 clears AUC mechanically but threshold sweep collapses to max-F1 fallback at sub-1% recall. Two calibration items (Open-21 new + Open-17 expansion). `docs/arc_results/ARC_6_RESULT.md`. (v2.2 §3 now closes the max-F1 fallback path mechanically.)
+- **Arc 7** (liquidity sweep + reclaim long, out-of-registry): closed 2026-05-17 CLEAN-NULL at Step 4. First capturable-not-extractable closure of record (PASS §7 with 3 V-shape units; FAIL §8 with 0/6 unit × pipeline AUCs clearing gate). v2.1.2 `≠ scattered` floor validated as load-bearing. Closure doc on `phase/l_arc_7` branch: `docs/arc_results/ARC_7_RESULT.md`.
 
-Open-18 cross-replay synthesis closed 2026-05-17. Three parallel replays under v2.1.1 all PASS:
-- Replay #1 Arc 3 Stepwise: c2 individual + aggregate PASS; pre-peak Def C 38.3% → 1.7% wrong_way
-- Replay #2 KH-24 v2.0 c4: c1 + c4 both PASS as unresolved near-stepwise
-- Replay #3 Arc 2 redo2 cid 1: PASS at SL=3.0, composite 0.593; pre-peak Def C 34% → 0%
+### Prior context (v2.1.2 — preserved)
 
-Synthesis verdict: pre-peak Def C is the dominant rescue mechanism across all three. bimodal_separated validated narrowly (one positive: Arc 3 c2). v2.1.2 amendment (landed 2026-05-17) addresses the §2 categorical floor + §11 Stepwise ceiling gaps the replays surfaced:
-- §2 internal-consistency floor: `∈ {tight_unimodal, heavy_right_tail, bimodal_separated}` → `≠ scattered`
-- §11 Stepwise local_peaks ceiling: 5-30 → 5-50
-- §15a added: arc Step 1 schema requirement (Open-19 closure)
-- Open-15, Open-18, Open-19 closed
+Three arcs closed 2026-05-16 (Arc 2 redo KILL, KH-24 v2.0 self-test HALT, Arc 3 CLEAN-NULL) all hit the same §2 monotonicity / shape_tag wall with structurally credible cohorts. v2.1 (2026-05-17) introduced pre-peak measurement + SL sweep + capturability composite + bimodal_separated admit. v2.1.1 (2026-05-17) refined SL selection to capturability composite maximiser. v2.1.2 (2026-05-17) relaxed §2 categorical floor to `≠ scattered` and extended §11 Stepwise local_peaks ceiling 5-30 → 5-50, on the basis of three parallel Open-18 replays (Arc 3 Stepwise PASS, KH-24 v2.0 c4 PASS, Arc 2 redo2 cid 1 PASS).
 
-§14 anchor not refreshed (user decision — deployed-pop reference holds; v2.1.2 anchor preservation verified). Open-20 (raised in Arc 2 redo2 closure) not added to protocol — reframed as Step 4+ measurement question (high-pct_peak_and_collapse cohorts measured under trailing-stop exit, not fixed-SL re-imposition).
-
-Arc 4 active under v2.1.2 on LCHAR Entry 4 (`TRIAL__univariate_extreme__bar_range_top_decile__neg__h_001`) — 1-bar horizon, univariate-extreme family, structurally different from Arc 3.
-
-**Arc 6 (out-of-registry; failed-breakout reversal long) closed 2026-05-17 DIES at Step 4 deployability.** Steps 1–4 ran consecutively on `discovery/lomega_regime_conditional`; all four mechanical PASSes. Pipeline E failed both Step 3 survivors (best AUC 0.600 / 0.590 vs 0.65 floor). Pipeline D1 mechanically cleared AUC ≥ 0.60 (c0 0.602 at t=4; c2 0.630 at t=1) but neither cluster achieves recall ≥ 0.60 at any threshold, so §8 threshold sweep collapses to max-F1 — ~3 admitted trades (c0) / ~1 trade (c2) across the 5-year, 1,564-trade pool. Steps 5–6 not executed. Two calibration items raised: Open-21 (Step 4 deployability gate, new) + Open-17 expansion (Tiebreak 1 noise floor); plus an unnumbered cross-arc note on reach_1R floor noise tolerance. Spec v0.2 erratum (`docs/signal_spec_failed_breakout_long_v0.2.md`): `swing_low_N = min(low[t-N-M..t-M-1])`. Signal NOT permanently eliminated — path quality clean, may return under richer feature regime / multi-TF / ensemble. Full closure: `docs/arc_results/ARC_6_RESULT.md`.
-
-**Arc 7 active** on `phase/l_arc_7`. Step 1 PASS (1288 trades), Step 2 PASS (K=4, sil=0.4263), Step 3 PASS (3 units survive §2: c1, c3, agg_c1_c3 all V-shape recovery family).
+§14 anchor not refreshed (user decision — deployed-pop reference holds; v2.1.2/v2.2 anchor preservation verified). Open-20 (raised in Arc 2 redo2 closure) reframed as Step 4+ measurement question rather than a §2 amendment.
 
 Results: `results/replays_v2_1_1/arc_3_stepwise/REPLAY_RESULT.md`, `results/replays_v2_1_1/kh24_v2_c4/REPLAY_RESULT.md`, `results/l_arc_2_redo2/`, `docs/arc_results/ARC_3_RESULT.md`, `results/arc_kh24_v2/ARC_KH24_V2_RESULT.md`, `results/l_arc_2_redo/ARC_2_REDO_RESULT.md`.
 
@@ -63,17 +58,19 @@ KH-24 is locked and out of scope for L arc work. No modifications without an exp
 
 ### Active research direction
 
-**L arc signal testing, Arc 4 active under v2.1.2.** Source of truth: `L_ARC_PROTOCOL.md` v2.1.2 — self-contained for methodology, deliverables, gates, and workflow. v1.x ops spec is archived for historical reference.
+**L arc signal testing under v2.2 amendment (Arc 8+); v2.1.2 base.** Source of truth: `L_ARC_PROTOCOL.md` v2.1.2 + `L_ARC_PROTOCOL_v2_2_AMENDMENT.md` v2.2 amendment (methodology unchanged from v2.1.2; v2.2 is governance + carve-out mechanisation). v1.x ops spec is archived for historical reference.
 
-The v2.1.2 L arc tests each registry signal through a six-step pipeline:
+L arc tests each candidate signal through a six-step pipeline:
 1. Plumbing (deterministic full-pool generation; pool ≥ 500)
 2. Path-shape clustering (outcome-blind features: monotonicity, local_peaks, pullback, time_to_peak_rel)
 3. Capturability characterisation (per §2 hard floors: clean shape + meaningful magnitude)
-4. Extractability + artefact production (Pipeline E entry-filter AUC ≥ 0.65 OR Pipeline D1 deferred-policy AUC ≥ 0.60)
-5. Cross-fold stability (sign consistency, size variance, DD ceiling)
-6. WFO truth + pass-deployable / pass-viable gate
+4. Extractability + artefact production (Pipeline E entry-filter AUC ≥ 0.65 OR Pipeline D1 deferred-policy AUC ≥ 0.60; v2.2 §3 — no max-F1 fallback if recall ≥ 0.60 unachievable)
+5. Cross-fold stability (sign consistency, size variance, DD ceiling; v2.2 §1 — conjunctive without override)
+6. WFO truth + pass-deployable / pass-viable gate (v2.2 §7 — live-execution equivalence required)
 
-Arcs 1 and 2 are historical (ran under v1.x). v2.0 governed Arc 3; v2.1.2 governs Arc 4 onward. Calibration anchor: KH-24 K=4 archetype 3, which passes v2.0 extractability via Pipeline D1 at t=3 (RF AUC 0.638, exclusion 15.4%). Anchor not refreshed from Open-18 replays per user decision — deployed-pop reference holds. v2.1.2 anchor preservation verified (centroid still routes to Stepwise under 5-50 local_peaks range; bimodal shape_tag passes `≠ scattered`).
+Arcs 1 and 2 are historical (ran under v1.x). v2.0 governed Arc 3; v2.1.2 governed Arcs 4-7; v2.2 governs Arc 8+. Calibration anchor: KH-24 K=4 archetype 3, which passes v2.0 extractability via Pipeline D1 at t=3 (RF AUC 0.638, exclusion 15.4%). Anchor not refreshed from Open-18 replays per user decision — deployed-pop reference holds. v2.1.2/v2.2 anchor preservation verified (centroid still routes to Stepwise under 5-50 local_peaks range; bimodal shape_tag passes `≠ scattered`; none of the seven v2.2 §0 items were invoked on the anchor).
+
+**Arc dispatch model under v2.2 (new):** one arc per CC chat session, dispatched via `prompts/cc_arc_orchestrator_template.md`. CC reads `results/ARC_QUEUE.md`, picks topmost Unrun entry, runs Steps 1-5 unattended, halts at end of Step 5 for analyst-led Step 6 WFO dispatch. Multiple arcs in parallel = multiple CC chat sessions, each on its own `phase/arc-<N>` branch. See v2.2 §15b (FIFO arc selection) and §13 (no mid-arc analyst sign-off).
 
 ### Tool assignments (unchanged)
 
@@ -130,23 +127,31 @@ The L arc is methodologically distinct from KH-24 development. It does not assum
 
 *Note: when applying SESSION_ZERO updates, preserve any pre-existing Phase History entries below this line. New entries are appended at the top. The full list is what remains in the file.*
 
-### 2026-05-17 — Arc 5 closed SHELVED at Step 6 FAIL
+### 2026-05-18 — L_ARC_PROTOCOL v2.2 amendment landed
 
-`docs/arc_results/ARC_5_RESULT.md` written. Arc 5 (signal: `mtf_alignment.2_down_mixed.kijun` at h=120 chat override; byte-identical Step 1 pool to Arc 2 redo2; registry Entry 5) opened and closed 2026-05-17. Steps 1-5 PASS under old spreads + PR 1 (admit-set §9 clean, c1 worst-fold +36.5%, c3 worst-fold +8.8%, v2.1.1 anchor-rescue mechanism validated empirically for the first time on a non-self-test arc).
+`L_ARC_PROTOCOL_v2_2_AMENDMENT.md` (repo root), `prompts/cc_arc_orchestrator_template.md`, `results/ARC_QUEUE.md` all landed 2026-05-18. v2.2 is the active protocol for Arc 8+ (methodology unchanged from v2.1.2; v2.2 is governance + carve-out mechanisation). Seven §0 changes:
 
-Two corrections changed the verdict: (a) re-run under new per-pair p50 spread floors broke c1's §9 DD ratio (2.34 > 2.0) under PR 1 mechanics; (b) Step 6 under PR 2 (§11 row 2 MFE-lock + trail) with full-pool WFO accounting confirmed PR 2 fully rescues c1 DD ratio (2.34 → 1.17) but reveals rejected pool (~78% of trades) mean R = **−0.46** (vs +0.025 unconditional bar-2 R). Classifier rejection is itself a prediction of adverse drift — structural for any competent classifier.
+1. **§9 single-fold sign-flip mechanisation.** The v2.1.2 "chat-level judgement" override is removed. §9 gate 1 is conjunctive without exception. Mandatory diagnostic logging (per-fold final_r_mean, n_archetype_in_fold, t_stat; thin-fold flag if n < 10).
+2. **§12 Tier 2 lift cap.** ≤ 5 lift candidates per archetype per arc, intersection-only.
+3. **§8 Step 4 threshold sweep failure.** If no threshold in {0.40, 0.50, 0.60, 0.70} satisfies recall ≥ 0.60, archetype dies. No max-F1 fallback. Arc 7 surfaced this gap.
+4. **New §15b — FIFO arc selection.** CC consults `results/ARC_QUEUE.md` at arc start; picks topmost Unrun entry. Supports registry entries (`LCHAR_TOPN_REGISTRY.md` Entry K) AND standalone signal specs (`signal_spec_<name>_v<version>.md`).
+5. **New §16a — KILL vs HALT mechanical rule.** HALT iff (single-criterion fail) AND (size_fraction_of_pool ≥ 0.10) AND (Path A numeric near-miss margin < 0.03 OR Path B categorical fail with fwd_mfe_p50 ≥ 3.0R). KILL otherwise. No analyst sign-off required for disposition assignment.
+6. **§13 — no mid-arc analyst sign-off.** Between arc-open and end of step 5, CC requires no analyst review. Chat reviews step 5 halt summaries (for step 6 dispatch decisions), HALT closure docs in batch, KILL closures by skim.
+7. **New §1a — live-execution equivalence.** Explicit assertion that steps 1 and 6 execute under SPREAD_SEMANTICS_LOCK-equivalent semantics (entry timing, spread costs, intrabar SL/TS, D1 one-day lag, volume veto). No behaviour change — engine already complies post-PR2 + spread fix. Assertion prevents silent re-introduction.
 
-All three candidate strategies (cluster 1 alone, cluster 3 alone, tiered ensemble with c1 ≥ 0.20 → A / c1 < 0.20 ∧ c3 ≥ 0.15 → B / else C) FAIL §10 at every risk level (best is 0.10%, all with negative worst-fold ROI). Signal has admit-set edge; pipeline cannot extract it.
+Anchor preservation: KH-24 K=4 archetype 3 unaffected — none of the seven items were invoked on the anchor under v2.0 or v2.1.x. Per amendment §9 migration: protocol-doc PR to apply amendment text into `L_ARC_PROTOCOL.md` itself is engineering scope (PR-required), separate from this doc landing. v2.2 applies to Arc 8 onward; closed arcs not re-evaluated.
 
-**Methodology lesson (P0 backlog):** Step 5 §9 admit-only framing missed the failure. Under corrected full-pool §9 framing, Arc 5 would have failed at fold 4 — Step 6 would have been redundant. Bug applies to every competent-classifier Pipeline D1 arc, not just Arc 5.
+### 2026-05-18 — Arc 4 RERUN closed FAIL Step 6 under p50 floors
 
-**8 new backlog items** logged in `PROTOCOL_IMPROVEMENT_BACKLOG.md` (3 P0, 1 P1, 4 P2). P0 items: P-§9-FRAMING, P-D1-VIABILITY (5% bar-0/1 SL-hit-rate gate), P-D1-REJECT-BIAS (document rejected-pool selection bias in §3 with Arc 5 calibration data).
+`docs/arc_results/ARC_4_RERUN_RESULT.md` written. Re-ran Arc 4 from Step 1 under corrected per-pair p50 spread floors (calibration applied 2026-05-17). Phase 5 §9 admit-only PASS (+0.125R per trade). Phase 6 §10 full-pool deployment FAIL on every gate — reject pool (32% of signals, −0.232R mean) + early-exit pool (11%, −0.685R mean) drag the strategy to −0.076R per signal, full-data ROI −76.98% over F2-F7, max DD 76.98%, 5ers daily DD breach (5.12%) = account-closure event on one day. Three open protocol items spawned: Open-22 (full-pool gate at §9 or earlier, HIGH), Open-23 (§8 D1 cost-language correction, MEDIUM), Open-24 (early-exit pool architectural cost, MEDIUM). Cross-arc structural finding: second consecutive arc (Arc 4 + Arc 5) to PASS §9 admit-only and FAIL §10 full-pool — Pipeline D1 with honest classifier (AUC ~0.65-0.70) bears reject-pool + early-exit-pool cost that swamps admit-pool edge. Prior CLEAN-NULL closure (2026-05-17, cost-model framing) superseded — disposition unchanged (Arc 4 closed), reason updated. KH-24 live deployment unaffected. New step6 wrapper `scripts/l_arc_4/step6_wfo.py` adapted from Arc 5's pattern. Commits: f1a819d (docs), 885f97a (wrapper), 5a38cd8 (spread floor calibration upstream).
 
-**Positive evidence preserved:** v2.1.1 anchor-rescue validated; PR 2 row-2 exit policy validated; D1 path-so-far features at t=1 carry real predictive signal (AUC 0.636-0.640, anchor-parity to KH-24); Open-10 leakage test for c3 confirmed clean (Jaccard 0.93).
+### 2026-05-17 — Arc 7 closed CLEAN-NULL at Step 4
 
-**Registry exhausted at h≥120:** Entry 2 (KILL, Arc 2 redo), Entry 3 (CLEAN-NULL, Arc 3), Entry 5 (SHELVED, Arc 5). Entries 1 + 4 (h=1) skipped per chat decision. Further signal exploration moves out-of-registry pending P0 backlog work.
+`docs/arc_results/ARC_7_RESULT.md` written (on `phase/l_arc_7` branch). Liquidity sweep + reclaim long (out-of-registry, `signal_spec_liquidity_sweep_reclaim_long_v0.1.md`). First capturable-not-extractable closure of record: PASS §5 (pool 1,288 / 28 pairs, det byte-identical, lookahead 5/5 clean, KH-24 cofire 0), PASS §6 (K=4, silhouette 0.4263), PASS §7 (3 V-shape units survive §2 conjunctively: c1 SL=4×ATR composite 0.617; c3 SL=2×ATR composite 0.413; agg_c1_c3 SL=4×ATR composite 0.378 — all `shape_tag = unclassified`); FAIL §8 (zero unit × pipeline pairs clear AUC gate: c1/E 0.484, c1/D1 0.420, c3/E 0.512, c3/D1 0.518, agg/E 0.536, agg/D1 0.496; best 0.536 vs 0.65 required). v2.1.2 `≠ scattered` floor validated as load-bearing — under prior floor all three §7 survivors would have died at Step 3 with the wrong diagnosis; v2.1.2 correctly admitted them and §8 correctly killed for "no predictability" not "overly strict shape_tag." Arc 6 overlap finding: 69 overlaps are legitimate co-occurrence (different reference windows) → halt criterion retired. Cross-arc items (forwarded to backlog): capturable-extractable gap as recognised closure category; SL-selection vs class-imbalance tension; Open-04 external features escalation; §15a text vs `_flatten_bar_path_for_trade` impl gap. Commits: 59de33a (step1), 28111e4 (step2), fa07c4a (step3), 4e6f1a6 (step4), 451652c (closure). Arc 7 max-F1 fallback case is what v2.2 §3 closes mechanically going forward.
 
-Signal NOT permanently eliminated — reopenable on Pipeline E re-evaluation with richer feature set, or on alternative pipeline shape that doesn't bear the rejected-pool cost. KH-24 live deployment unaffected (KH-24 doesn't use Pipeline D1); spread re-calibration applies, KH-24 anchor-refresh task with new floors queued for next refresh cycle.
+### 2026-05-17 — Arc 5 closed SHELVED Step 6 FAIL
+
+`docs/arc_results/ARC_5_RESULT.md` written (on `arc-5-closure` branch). `mtf_alignment.2_down_mixed.kijun` at h=120 (registry Entry 5) under L_ARC_PROTOCOL v2.1.1 with Pipeline D1 mechanics. Steps 1-5 PASS under PR 1 + uniform 0.1-pip spread floor; Step 6 under PR 2 + new spreads + full-pool WFO FAIL on all three candidate strategies (c1 alone, c3 alone, tiered ensemble). All three close with negative worst-fold ROI at every risk level: c1 worst-fold −5.74% at 0.10% risk; c3 worst-fold −7.95%; ensemble worst-fold −10.60%. Admit-set edge confirmed across folds (+0.14-0.21R per fold, 7/7 positive); Pipeline D1 rejected-pool adverse selection (~78% of trades at −0.46R/trade vs +0.025R unconditional bar-2 R) kills full-strategy expectancy. PR 2 (§11 row 2 MFE-lock + trail) fully recovers c1 §9 DD ratio 2.34 → 1.17 — mechanism works as designed, but cannot overcome rejected-pool drag. Methodology finding: §9 admit-only framing missed the failure that Step 6's full-pool reckoning caught. Eight cross-arc backlog items added (3 P0: P-§9-FRAMING, P-D1-VIABILITY, P-D1-REJECT-BIAS; 1 P1: P-F9-RESELECT; 4 P2: P-CLUSTERING-LEAKAGE, P-§11-MATCH-FORMULA, P-SPREAD-FLOOR-DOC, P-OPEN-18-RECONCILE). Signal NOT permanently eliminated — Pipeline E re-evaluation with richer features reopenable. Commit: 5fd98a5.
 
 ### 2026-05-17 — Arc 4 closed CLEAN-NULL on transaction-cost truth
 

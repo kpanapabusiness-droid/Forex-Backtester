@@ -1,4 +1,35 @@
-"""compute_spread_floors.py — Compute per-pair non-zero spread floors per L6.0 §7.
+"""compute_spread_floors.py — RETIRED 2026-05-17.
+
+================================================================================
+RETIRED — 2026-05-17
+================================================================================
+
+This script previously generated configs/spread_floors_5ers.yaml from broker
+MT5 historical data, producing minimum-observed-nonzero spread per pair (uniform
+1 native point / 0.1 pip across all 28 pairs).
+
+As of 2026-05-17, configs/spread_floors_5ers.yaml is calibration-curated, not
+generated. The methodology shifted from "minimum-observed-nonzero spread per
+pair" to "p50 of HistData first-5-minute spread at 1H execution bars,
+active-session pooled".
+
+See:
+  docs/calibration_decisions/SPREAD_FLOOR_CALIBRATION_DECISION_2026-05-17.md
+  docs/SPREAD_FLOOR_AUDIT_FINDING.md (RESOLVED section)
+  docs/SPREAD_SEMANTICS_LOCK.md (Floor file encoding subsection)
+
+This script is preserved for historical reference and is no longer run in any
+workflow. Running it will OVERWRITE the curated yaml with stale empirical
+values — DO NOT EXECUTE. A `sys.exit` guard at the top of `main()` enforces
+this.
+
+The historical helpers `compute_body_sha256` and `extract_body_bytes` are still
+used by `core/spread_floor.py` and `tests/test_spread_floors_lock.py` to verify
+the curated yaml's body hash — those imports remain valid.
+
+================================================================================
+Original docstring follows:
+================================================================================
 
 Reads the `spread` column from data/{1hr,4hr,daily,w1}/<pair>.csv, pools spread
 observations across all four timeframes for each pair, and writes a deterministic
@@ -394,6 +425,16 @@ def _print_sanity_flags(stats: dict[str, dict]) -> None:
 
 
 def main() -> None:
+    sys.exit(
+        "scripts/lchar/compute_spread_floors.py is RETIRED as of 2026-05-17.\n"
+        "configs/spread_floors_5ers.yaml is now calibration-curated, not generated.\n"
+        "Running this script would overwrite the curated yaml with stale empirical\n"
+        "values. See docs/calibration_decisions/"
+        "SPREAD_FLOOR_CALIBRATION_DECISION_2026-05-17.md and the module docstring.\n"
+        "If you genuinely need to regenerate the legacy file (do not commit it),\n"
+        "remove this sys.exit() guard locally — do NOT remove it in a commit."
+    )
+
     if OUTPUT_PATH.exists():
         _blocker(
             f"{OUTPUT_PATH.relative_to(REPO_ROOT)} already exists — delete it "

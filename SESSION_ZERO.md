@@ -1,30 +1,34 @@
 # SESSION ZERO — Forex Ignition Rebuild
-> 5-minute primer. Read this first, then read `L_ARC_PROTOCOL.md` (v2.1.2 base) + `L_ARC_PROTOCOL_v2_2_AMENDMENT.md` (v2.2 active for Arc 8+).
-> Last updated: 2026-05-18 — L_ARC_PROTOCOL v2.2 amendment landed (mechanises remaining chat-judgement carve-outs, closes Step 4 max-F1 fallback, asserts live-execution equivalence). Arcs 4-7 all closed (Arc 4 RERUN FAIL Step 6; Arc 5 SHELVED Step 6 FAIL; Arc 6 DIES Step 4; Arc 7 CLEAN-NULL Step 4). Arc queue empty pending analyst signal selection for Arc 8+. KH-24 live deployment unchanged.
+> 5-minute primer. Read this first, then read `L_ARC_PROTOCOL.md` (v2.1.2 base) + `L_ARC_PROTOCOL_v2_2_AMENDMENT.md` (v2.2) + `L_ARC_PROTOCOL_v2_3_AMENDMENT.md` (v2.3 active for Arc 8+).
+> Last updated: 2026-05-18 — L_ARC_PROTOCOL v2.3 amendment landed (Step 5 cross-fold stability removed; Step 6 WFO renumbered as Step 5; Open-22/23/24 closed in protocol with engine PR pending for Open-24). v2.2 amendment landed earlier same day. Arcs 4-7 all closed. Arc queue empty pending analyst signal selection for Arc 8+. KH-24 live deployment unchanged.
 
 ---
 
 ## Pointers
 
-- Active protocol: `L_ARC_PROTOCOL.md` v2.1.2 base + `L_ARC_PROTOCOL_v2_2_AMENDMENT.md` v2.2 amendment (active for Arc 8+)
+- Active protocol: `L_ARC_PROTOCOL.md` v2.1.2 base + `L_ARC_PROTOCOL_v2_2_AMENDMENT.md` v2.2 + `L_ARC_PROTOCOL_v2_3_AMENDMENT.md` v2.3 (all three binding for Arc 8+)
 - Arc queue: `results/ARC_QUEUE.md` (Active: none; Unrun: none; Closed: see file)
-- Orchestrator: `prompts/cc_arc_orchestrator_template.md` — one arc per CC chat session (unattended Steps 1-5)
+- Orchestrator: `prompts/cc_arc_orchestrator_template.md` v1.1 — one arc per CC chat session (unattended Steps 1-4 under v2.3)
+- Shelved register: `SHELVED_ARCS.md` — informal register for KILL closures with portfolio-candidate annotation (per v2.3 §6)
 - v1.x archive: `archive/`
 
 ---
 
 ## Current State
 
-**L_ARC_PROTOCOL v2.2 AMENDMENT LANDED 2026-05-18.** Mechanises remaining chat-judgement carve-outs in steps 1-5, closes Step 4 max-F1 fallback gap surfaced by Arc 7, asserts live-execution equivalence for steps 1 and 6. Methodology unchanged. CC can now run arcs 1→5 unattended in parallel without analyst sign-off mid-arc. Companion files (`prompts/cc_arc_orchestrator_template.md`, `results/ARC_QUEUE.md`) landed same day.
+**L_ARC_PROTOCOL v2.3 AMENDMENT LANDED 2026-05-18.** Step 5 cross-fold stability (§9) removed — pipeline is now five steps (1 plumbing, 2 clustering, 3 capturability, 4 extractability, 5 WFO). Step 6 WFO renumbered as Step 5. Closes Open-22 (full-pool gate at §9) by structural removal; closes Open-23 (Pipeline D1 cost-language) by documentation correction in §3/§8; closes Open-24 (pre-t SL per archetype) in protocol with engine PR pending. v2.2 §1 sign-flip mechanisation OBSOLETED (Step 5 stability gate no longer exists). Orchestrator halt point: end of Step 5 → end of Step 4. §1a live-execution equivalence: Step 1 + Step 5 (was Step 6). SHELVED informal register at new `SHELVED_ARCS.md`. Anchor preservation verified — KH-24 K=4 archetype 3 passes Step 5 WFO by deployment; Step 3 selected SL = 2.0×ATR matches v2.2 uniform pre-t SL (Open-24 no-op for anchor).
+
+**v2.2 amendment landed earlier same day (2026-05-18).** Mechanises remaining chat-judgement carve-outs in steps 1-5, closes Step 4 max-F1 fallback gap surfaced by Arc 7, asserts live-execution equivalence for steps 1 and 6 (now Step 1 + Step 5 under v2.3 §7). Methodology unchanged. CC can now run arcs unattended through Steps 1-4 without analyst sign-off mid-arc. Companion files (`prompts/cc_arc_orchestrator_template.md`, `results/ARC_QUEUE.md`) landed same day; orchestrator template updated to v1.1 for v2.3.
 
 **Arc queue currently empty.** Arcs 4-7 all closed in the 2026-05-17/2026-05-18 batch. Analyst populates `results/ARC_QUEUE.md` Unrun section with Arc 8+ signal specs (registry exhausted after Arc 5; Arc 6+ use standalone `signal_spec_<name>_v<version>.md` docs per v2.2 §15b).
 
-**LIVE SYSTEM: KH-24 unchanged on VPS.** None of the seven v2.2 §0 items were invoked on the KH-24 anchor under v2.0 or v2.1.x — anchor preservation verified.
+**LIVE SYSTEM: KH-24 unchanged on VPS.** None of the seven v2.2 §0 items were invoked on the KH-24 anchor under v2.0 or v2.1.x — anchor preservation verified. v2.3 §0 changes are anchor-preserving by construction (anchor passes Step 5 WFO by deployment; Open-24 default 2.0 matches anchor's Step 3 selected SL).
 
 **Next chat tasks:**
 1. Analyst signal selection for Arc 8+ (populate `results/ARC_QUEUE.md` Unrun)
-2. Cross-arc calibration session for Open-22/23/24 (Pipeline D1 full-pool gating — surfaced by Arc 4 + Arc 5 closures, NOT closed by v2.2)
-3. Engineering pass to apply the v2.2 amendment text into `L_ARC_PROTOCOL.md` itself (PR-required per amendment §9)
+2. Engine PR for Open-24 honour (per-archetype D1 `pre_t_sl_atr_multiplier`; default 2.0 preserves anchor) — can land independently of protocol-doc PR
+3. Engineering pass to apply v2.2 + v2.3 amendment text into `L_ARC_PROTOCOL.md` itself (PR-required; option to bundle both amendments into a single consolidation PR)
+4. Analyst decision on whether Arc 5 archetypes should be pre-populated in `SHELVED_ARCS.md` Active table (analyst signal call)
 
 ### Arcs 4-7 closure batch summary
 
@@ -58,19 +62,18 @@ KH-24 is locked and out of scope for L arc work. No modifications without an exp
 
 ### Active research direction
 
-**L arc signal testing under v2.2 amendment (Arc 8+); v2.1.2 base.** Source of truth: `L_ARC_PROTOCOL.md` v2.1.2 + `L_ARC_PROTOCOL_v2_2_AMENDMENT.md` v2.2 amendment (methodology unchanged from v2.1.2; v2.2 is governance + carve-out mechanisation). v1.x ops spec is archived for historical reference.
+**L arc signal testing under v2.3 amendment (Arc 8+); v2.1.2 base + v2.2 governance.** Source of truth: `L_ARC_PROTOCOL.md` v2.1.2 + `L_ARC_PROTOCOL_v2_2_AMENDMENT.md` v2.2 amendment + `L_ARC_PROTOCOL_v2_3_AMENDMENT.md` v2.3 amendment (methodology unchanged from v2.1.2; v2.2 is governance + carve-out mechanisation; v2.3 removes Step 5 cross-fold stability and renumbers Step 6 → Step 5). v1.x ops spec is archived for historical reference.
 
-L arc tests each candidate signal through a six-step pipeline:
+L arc tests each candidate signal through a five-step pipeline (v2.3):
 1. Plumbing (deterministic full-pool generation; pool ≥ 500)
 2. Path-shape clustering (outcome-blind features: monotonicity, local_peaks, pullback, time_to_peak_rel)
 3. Capturability characterisation (per §2 hard floors: clean shape + meaningful magnitude)
 4. Extractability + artefact production (Pipeline E entry-filter AUC ≥ 0.65 OR Pipeline D1 deferred-policy AUC ≥ 0.60; v2.2 §3 — no max-F1 fallback if recall ≥ 0.60 unachievable)
-5. Cross-fold stability (sign consistency, size variance, DD ceiling; v2.2 §1 — conjunctive without override)
-6. WFO truth + pass-deployable / pass-viable gate (v2.2 §7 — live-execution equivalence required)
+5. WFO truth + pass-deployable / pass-viable gate (renumbered from v2.2's Step 6 under v2.3 §2; v2.2 §7 §1a live-execution equivalence applies; full-pool measurement by construction)
 
-Arcs 1 and 2 are historical (ran under v1.x). v2.0 governed Arc 3; v2.1.2 governed Arcs 4-7; v2.2 governs Arc 8+. Calibration anchor: KH-24 K=4 archetype 3, which passes v2.0 extractability via Pipeline D1 at t=3 (RF AUC 0.638, exclusion 15.4%). Anchor not refreshed from Open-18 replays per user decision — deployed-pop reference holds. v2.1.2/v2.2 anchor preservation verified (centroid still routes to Stepwise under 5-50 local_peaks range; bimodal shape_tag passes `≠ scattered`; none of the seven v2.2 §0 items were invoked on the anchor).
+Step 5 cross-fold stability (v2.2 §9) removed under v2.3 §1 — Step 5 (WFO, was Step 6) measures full-pool by construction. Arcs 1 and 2 are historical (ran under v1.x). v2.0 governed Arc 3; v2.1.2 governed Arcs 4-7; v2.2 + v2.3 govern Arc 8+. Calibration anchor: KH-24 K=4 archetype 3, which passes Step 5 WFO via Pipeline D1 at t=3 (RF AUC 0.638, exclusion 15.4%). Anchor not refreshed from Open-18 replays per user decision — deployed-pop reference holds. v2.3 anchor preservation verified (anchor passes Step 5 WFO by deployment; Step 3 selected SL = 2.0×ATR matches v2.2 uniform pre-t SL — Open-24 spec change is a no-op).
 
-**Arc dispatch model under v2.2 (new):** one arc per CC chat session, dispatched via `prompts/cc_arc_orchestrator_template.md`. CC reads `results/ARC_QUEUE.md`, picks topmost Unrun entry, runs Steps 1-5 unattended, halts at end of Step 5 for analyst-led Step 6 WFO dispatch. Multiple arcs in parallel = multiple CC chat sessions, each on its own `phase/arc-<N>` branch. See v2.2 §15b (FIFO arc selection) and §13 (no mid-arc analyst sign-off).
+**Arc dispatch model under v2.3:** one arc per CC chat session, dispatched via `prompts/cc_arc_orchestrator_template.md` v1.1. CC reads `results/ARC_QUEUE.md`, picks topmost Unrun entry, runs Steps 1-4 unattended, halts at end of Step 4 for analyst-led Step 5 WFO dispatch. Multiple arcs in parallel = multiple CC chat sessions, each on its own `phase/arc-<N>` branch. See v2.2 §15b (FIFO arc selection) and §13 (no mid-arc analyst sign-off; halt point shifted to end of Step 4 under v2.3 §9).
 
 ### Tool assignments (unchanged)
 
@@ -126,6 +129,22 @@ The L arc is methodologically distinct from KH-24 development. It does not assum
 ## Phase History
 
 *Note: when applying SESSION_ZERO updates, preserve any pre-existing Phase History entries below this line. New entries are appended at the top. The full list is what remains in the file.*
+
+### 2026-05-18 — L_ARC_PROTOCOL v2.3 amendment landed
+
+`L_ARC_PROTOCOL_v2_3_AMENDMENT.md` (repo root), `prompts/cc_arc_orchestrator_template.md` (updated to v1.1), and new `SHELVED_ARCS.md` all landed 2026-05-18 alongside the v2.2 amendment. v2.3 is the active protocol for Arc 8+ in conjunction with v2.1.2 base + v2.2 governance. Seven §0 changes:
+
+1. **§9 (Step 5 cross-fold stability) removed.** Pipeline is now five steps: 1 plumbing, 2 clustering, 3 capturability, 4 extractability, 5 WFO. Step 5 was an admit-only proxy for Pipeline D1 that diverged from deployed-system economics (Arc 4 RERUN evidence: admit-set +1.5R vs full-pool −76.98% ROI). Step 5 WFO (renumbered) measures full-pool by construction. Closes Open-22 (full-pool gate at §9) by structural removal.
+2. **§10 retitled "Step 5 — WFO".** All internal cross-references renumbered: Step 6 → Step 5 across §1, §2, §3, §11, §12, §13, §14, §15, §16, §17, §16a, v2.2 §1a, v2.2 §3 downstream. Closure docs and CHANGELOG entries written under v2.2 or earlier keep "Step 6" verbatim — protocol-version anchoring rather than retroactive renumbering.
+3. **Orchestrator halt point: end of Step 5 → end of Step 4.** Mechanical consequence of §9 removal. Orchestrator template updated to v1.1.
+4. **v2.2 §1 sign-flip mechanisation OBSOLETED.** It mechanised the Step 5 gate 1 override; the gate no longer exists. v2.2 §2/§3/§4/§7 unchanged; v2.2 §5 (§16a) and §6 (halt point) updated for renumbering.
+5. **§16a failing-step list semantic.** Position 5 now means "Step 5 WFO" (not "Step 5 cross-fold stability"). Numeric identifier unchanged; Path A near-miss and Path B categorical-with-strong-magnitude logic unchanged.
+6. **Pipeline D1 pre-t SL per archetype (Open-24).** v2.3 §5 specifies pre-t SL = cluster's Step 3 selected SL multiplier (was uniform 2.0×ATR). Engine PR pending to expose per-archetype `pre_t_sl_atr_multiplier`; default 2.0 preserves anchor (KH-24's Step 3 selected SL = 2.0×ATR, identical to v2.2 default).
+7. **Pipeline D1 cost-language documented (Open-23).** v2.3 §4 updates §3 / §8 Pipeline D1 wording with empirical cost bounds: rejected pool ~−0.15 to −0.46R, pre-t losers ~−0.45 to −0.69R on ~10-15% of signals. Full-pool R = admit + reject + pre-t-loss contributions; evaluated at Step 5 WFO.
+
+Plus new informal SHELVED register (`SHELVED_ARCS.md`, v2.3 §6) — KILL closures with portfolio-candidate annotation, feeding §16 Open-05 (multi-signal portfolio composition). Not a formal §16a disposition. Active table starts empty; analyst decides whether Arc 5's archetypes pre-populate.
+
+Anchor preservation: KH-24 K=4 archetype 3 passes Step 5 WFO by deployment (worst-fold ROI +1.92%, worst-fold DD 6.37%, all 7 OOS folds positive). Open-24's spec change is a no-op for the anchor (Step 3 selected SL = 2.0×ATR matches v2.2 uniform pre-t SL). Per v2.3 §11 Migration: protocol-doc PR to consolidate v2.2 + v2.3 amendment text into `L_ARC_PROTOCOL.md` itself is engineering scope (PR-required); option to bundle both amendments. Engine PR for Open-24 honour can land independently. v2.3 applies to Arc 8 onward; closed arcs not re-evaluated.
 
 ### 2026-05-18 — L_ARC_PROTOCOL v2.2 amendment landed
 

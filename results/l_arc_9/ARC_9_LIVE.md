@@ -2,10 +2,16 @@
 
 ## Status
 
-- Disposition: **STEP_4_KILL**
+- Disposition: **STEP_4_KILL** (held-open lifecycle — experimental validation in progress; closure pending second experiment per dispatcher)
 - Protocol: L_ARC_PROTOCOL v2.3 (base v2.1.2 + v2.2 + v2.3 amendments)
 - Branch: `claude/bold-brattain-d79817` (CC worktree; queue transition skipped per dispatcher instruction - another CC session running prior arcs)
 - Last updated: 2026-05-18
+
+## Experiments (held-open lifecycle)
+
+| Experiment | Question | Outcome |
+|---|---|---|
+| Step 5 validation — no-filter WFO on cluster 0 (`results/l_arc_9/experiments/step5_validation/`) | Does §8 extractability correctly identify non-deployable cohorts, or did it over-reject a cohort with real edge? | **§8 over-rejected.** 7/7 folds pass-deployable (worst-fold ann ROI +39.45%, mean +61.40%, worst-fold DD 0.01%, full-data ann ROI +60.50%). Conditional on oracle filter (post-hoc cluster membership): the cohort has real, durable structural edge; the binding constraint at Step 4 was the feature set / classifier probability calibration, not cohort quality. No deployment implication — closure stands. |
 
 ## Arc-open
 

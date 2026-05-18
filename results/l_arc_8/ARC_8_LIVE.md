@@ -2,7 +2,7 @@
 
 ## Status
 
-- **Current step:** Step 1 complete (PASS); Step 2 next
+- **Current step:** Step 2 complete (PASS — K=4); Step 3 next
 - **Verdict:** none yet (arc still active)
 - **Last updated:** 2026-05-18
 - **Branch:** worktree `claude/magical-zhukovsky-bd69d9` (dispatcher-target merge to `phase/l_arc_8`)
@@ -93,7 +93,7 @@ This session does NOT own: Step 5 WFO dispatch, engine PRs (`scripts/phase_kgl_v
 | Step | Gate | Result | Notes |
 |---|---|---|---|
 | 1 | Plumbing | **PASS** | 1327 trades / 28 pairs; determinism PASS; right-edge PASS (min age=4); lookahead-invariance PASS (0/216k bars); cofire vs KH-24 long = 0.0% |
-| 2 | Clustering | _pending_ | |
+| 2 | Clustering | **PASS** | K=4 chosen (silhouette 0.4762); 4 clusters {316, 177, 429, 405}; 0/4 degenerate features; 2 V-shape clusters → per-cluster AND per-aggregate at Step 3 |
 | 3 | Capturability | _pending_ | |
 | 4 | Extractability | _pending_ | |
 
@@ -175,6 +175,70 @@ Per-pair pool sizes (35–58) all clear the §6 / §15 sample-size floor (≥ 30
 - Arc 8 config: `configs/wfo_l_arc_8.yaml` (sha256 `accba985...`)
 - KH-24 locked config sha: `252dfd8d...` (unchanged from main)
 - Spread floor body sha: `8da7644b...` (p50 per-pair, unchanged from main)
+
+### Step 2 — Path-shape clustering
+
+**Outputs:** `results/l_arc_8/step2/`
+
+**Silhouette sweep (K ∈ {3..7}, KMeans + StandardScaler, random_state=42):**
+
+| K | silhouette | min cluster n | max cluster % | gate pass |
+|---:|---:|---:|---:|:---:|
+| 3 | 0.4622 | 221 | 46.27% | PASS |
+| 4 | 0.4762 | 177 | 32.33% | PASS |
+| 5 | 0.4578 | 149 | 32.03% | PASS |
+| 6 | 0.4630 | 54 | 31.35% | PASS |
+| 7 | 0.4570 | 50 | 31.27% | PASS |
+
+**K selection (§6 v2.1.1 Open-12 closure):**
+- K_best by raw silhouette: K=4 (0.4762)
+- Tied set within ±0.01: only K=4
+- **K chosen: 4** (no parsimony divergence)
+
+**Degenerate features (§6 gate, > 80% in single bin):**
+
+| Feature | modal-bin mass | degenerate? |
+|---|---:|:---:|
+| monotonicity_ratio_in_profit | 31.42% | no |
+| local_peaks_count | 34.36% | no |
+| pullback_magnitude_median | 44.76% | no |
+| time_to_peak_mfe_relative | 26.30% | no |
+
+0 / 4 degenerate — clean.
+
+**Archetype assignments (K=4) — §11 v2.1.2 centroid patterns:**
+
+| Cluster | n | size | centroid (mono / peaks / pullback / ttp_rel) | Archetype | Status |
+|---:|---:|---:|---|---|:---:|
+| 0 | 316 | 23.8% | 0.565 / 4.26 / 0.124 / 0.314 | unassigned (near Early-peak hold OR Peak-and-collapse) | unassigned |
+| 1 | 177 | 13.3% | 0.540 / 33.82 / 0.548 / 0.778 | tentative_V-shape recovery | tentative |
+| 2 | 429 | 32.3% | 0.010 / 0.48 / 0.008 / 0.059 | tentative_Early-peak hold OR Peak-and-collapse | tentative |
+| 3 | 405 | 30.5% | 0.507 / 10.42 / 0.714 / 0.545 | tentative_V-shape recovery | tentative |
+
+- 0 assigned (no §11 row fully satisfied — all conditions are partial matches)
+- 3 tentative (clusters 1, 2, 3 — Step 3 forward-geometry confirmation required)
+- 0 boundary
+- 1 unassigned (cluster 0 — ttp 0.31 just over Early-peak threshold of 0.30; closest miss)
+
+**Same-archetype clusters (§7 per-cluster AND per-aggregate evaluation required at Step 3):**
+- `tentative_V-shape recovery` → clusters [1, 3]
+
+**Determinism:** PASS — byte-identical across both runs (all 17 output files).
+
+**Feature distributions (full pool, n=1327):**
+
+| feature | p5 | p25 | p50 | p75 | p95 |
+|---|---:|---:|---:|---:|---:|
+| monotonicity_ratio_in_profit | 0 | 0 | 0.491 | 0.5375 | 0.6667 |
+| local_peaks_count | 0 | 1 | 4 | 12 | 35 |
+| pullback_magnitude_median | 0 | 0 | 0.2572 | 0.5697 | 0.9823 |
+| time_to_peak_mfe_relative | 0 | 0 | 0.3415 | 0.6057 | 0.9212 |
+
+**Notes (informational):**
+- High mass at zero for monotonicity / pullback / ttp_rel reflects the high SL hit rate at Step 1 — trades that hit SL early have no in-profit bars, no peaks, no ttp. Cluster 2 (n=429, 32%) captures these "didn't get going" trades.
+- Cluster 1 (n=177) is the high-peak / late-ttp profile expected from Stepwise climber-like paths; it misses formal Stepwise assignment only because pullback 0.548 just exceeds the 0.5 ceiling.
+- Cluster 3 (n=405) has even larger pullback (0.71) → tentative_V-shape rather than Stepwise.
+- All clusters above the §15 size-50 floor for Step 3.
 
 ## Detailed analysis
 

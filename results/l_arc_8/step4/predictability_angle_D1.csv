@@ -1,0 +1,19 @@
+unit_id,type,final_archetype_label,selected_SL_atr_mult,t,n_eligible,exclusion_pct,rf_auc,is_chosen_t,per_fold_aucs
+c1,cluster,V-shape recovery (forward-geometry weak),4,1,177,0,0.6365791855,1,0.5650;0.5050;0.6167;0.6373;0.8590
+c1,cluster,V-shape recovery (forward-geometry weak),4,2,177,0,0.6046093514,0,0.2900;0.5950;0.6750;0.5784;0.8846
+c1,cluster,V-shape recovery (forward-geometry weak),4,3,177,0,0.5547828054,0,0.2600;0.5500;0.6083;0.5735;0.7821
+c1,cluster,V-shape recovery (forward-geometry weak),4,4,177,0,0.5338974359,0,0.2850;0.5300;0.6750;0.5000;0.6795
+c1,cluster,V-shape recovery (forward-geometry weak),4,5,177,0,0.5796485671,0,0.3050;0.5400;0.6000;0.5686;0.8846
+c1,cluster,V-shape recovery (forward-geometry weak),4,10,177,0,0.5485791855,0,0.2700;0.5100;0.6333;0.4706;0.8590
+c3,cluster,V-shape recovery,2,1,405,0,0.5116722507,0,0.7008;0.5310;0.2881;0.5807;0.4578
+c3,cluster,V-shape recovery,2,2,405,0,0.5143121403,0,0.6817;0.6143;0.3595;0.5281;0.3880
+c3,cluster,V-shape recovery,2,3,405,0,0.5759009483,0,0.7596;0.6167;0.2929;0.6439;0.5666
+c3,cluster,V-shape recovery,2,4,405,0,0.6124516022,1,0.8415;0.5786;0.3952;0.6544;0.5925
+c3,cluster,V-shape recovery,2,5,405,0,0.5919974302,0,0.8388;0.5762;0.4119;0.5649;0.5682
+c3,cluster,V-shape recovery,2,10,403,0.004938271605,0.5864850278,0,0.6954;0.5857;0.6262;0.5544;0.4708
+agg_c1_c3,aggregate,V-shape recovery,3,1,582,0,0.5365873281,0,0.4933;0.5435;0.6207;0.5255;0.5000
+agg_c1_c3,aggregate,V-shape recovery,3,2,582,0,0.5469046449,0,0.5572;0.5995;0.5880;0.5043;0.4855
+agg_c1_c3,aggregate,V-shape recovery,3,3,582,0,0.5366616358,0,0.4841;0.5973;0.6021;0.4668;0.5329
+agg_c1_c3,aggregate,V-shape recovery,3,4,582,0,0.5432540128,0,0.5106;0.5913;0.5955;0.4755;0.5434
+agg_c1_c3,aggregate,V-shape recovery,3,5,582,0,0.5812501729,0,0.5510;0.6387;0.5566;0.5293;0.6307
+agg_c1_c3,aggregate,V-shape recovery,3,10,581,0.001718213058,0.5609185576,0,0.5354;0.6267;0.5502;0.5156;0.5767

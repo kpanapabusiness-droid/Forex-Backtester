@@ -1,0 +1,4 @@
+unit_id,type,final_archetype_label,selected_SL_atr_mult,n,positive_rate,rf_auc,logistic_auc,chosen_step,feature_count,pass_065_gate,per_fold_rf_aucs,threshold_sweep_pass,chosen_threshold,threshold_sweep_notes,notes
+c1,cluster,V-shape recovery (forward-geometry weak),4,177,0.813559322,0.697372549,0.6559381599,B-top5,5,1,0.8550;0.4500;0.7750;0.7402;0.6667,1,0.7,"Chosen threshold 0.70 (precision 0.8966, recall 0.8667)",Step B top-5 pass: RF AUC 0.6974 >= 0.65
+c3,cluster,V-shape recovery,2,405,0.1308641975,0.6147839793,0.5198343101,B-fwd,2,0,0.6885;0.6750;0.5619;0.5754;0.5731,0,,skipped — gate fail,"Step B fwd-sel: 2 features, RF AUC 0.6148 — angle_E DIES (no step clears 0.65)"
+agg_c1_c3,aggregate,V-shape recovery,3,582,0.3865979381,0.6082627179,0.580489105,B-fwd,6,0,0.6630;0.6417;0.5508;0.5582;0.6276,0,,skipped — gate fail,"Step B fwd-sel: 6 features, RF AUC 0.6083 — angle_E DIES (no step clears 0.65)"

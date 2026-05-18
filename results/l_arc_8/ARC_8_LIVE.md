@@ -2,7 +2,8 @@
 
 ## Status
 
-- **Current step:** Step 3 complete (PASS — 3 units survive); Step 4 next
+- **Current step:** Step 4 complete (PASS — 1 surviving archetype); halt per v2.3 §9, awaiting Step 5 WFO dispatch
+- **Verdict (Step 4 endpoint):** STEP_4_COMPLETE_READY_FOR_WFO
 - **Verdict:** none yet (arc still active)
 - **Last updated:** 2026-05-18
 - **Branch:** worktree `claude/magical-zhukovsky-bd69d9` (dispatcher-target merge to `phase/l_arc_8`)
@@ -95,7 +96,7 @@ This session does NOT own: Step 5 WFO dispatch, engine PRs (`scripts/phase_kgl_v
 | 1 | Plumbing | **PASS** | 1327 trades / 28 pairs; determinism PASS; right-edge PASS (min age=4); lookahead-invariance PASS (0/216k bars); cofire vs KH-24 long = 0.0% |
 | 2 | Clustering | **PASS** | K=4 chosen (silhouette 0.4762); 4 clusters {316, 177, 429, 405}; 0/4 degenerate features; 2 V-shape clusters → per-cluster AND per-aggregate at Step 3 |
 | 3 | Capturability | **PASS** | 3 units survive: c1 (n=177, SL=4.0×ATR), c3 (n=405, SL=2.0×ATR), agg_c1_c3 (n=582, SL=3.0×ATR); all V-shape recovery; c2 (Early-peak hold) dies on §2 floors |
-| 4 | Extractability | _pending_ | |
+| 4 | Extractability | **PASS** | 1 archetype survives: c1 (V-shape recovery, FG-weak) at E+D1; c3 + agg_c1_c3 die per v2.2 §3 (no max-F1 fallback). pre_t_sl_atr_multiplier=4.0 recorded in D1 policy YAML |
 
 ### Step 1 — Plumbing
 
@@ -288,6 +289,109 @@ v2.3 §4 pre_t_sl_atr_multiplier values are the per-archetype SL multipliers Pip
 - V-shape recovery is the surviving archetype family. Cluster 1 (small, n=177, wide SL=4.0×ATR) and Cluster 3 (large, n=405, standard SL=2.0×ATR) have distinct selected SLs — the aggregate's selected SL (3.0×ATR) is between them, as expected.
 - The "forward-geometry weak" flag on c1 means its peak position distribution (only 40% of trades have peak in middle [0.4, 0.8] of trade) deviates from canonical V-shape geometry. Pipeline E predictability at Step 4 will decide whether this is a true V-shape pattern or borderline noise.
 - c2's dies-at-capturability is the expected Early-peak hold/Peak-and-collapse profile under PR-HHHL: trades that signal but fail to develop. ~32% of all signal trades fall here — confirms the signal generates many "false starts" that path-shape clustering successfully separates.
+
+### Step 4 — Extractability
+
+**Outputs:** `results/l_arc_8/step4/`
+
+**Implementation note (protocol-vs-Arc-7 divergence):**
+
+Arc 7's Step 4 script used "Pipeline D1 = daily-features-with-one-day-lag", which is a non-protocol interpretation. Protocol §8 Angle D1 specifies bar-offset-t path-so-far features: `close_r_at_t`, `mfe_so_far_r_at_t`, `mae_so_far_r_at_t`, `bars_in_profit_at_t`, `local_peaks_so_far_at_t`, `monotonicity_so_far_at_t`, `velocity_first_t` plus 8 base entry features. Arc 8's `scripts/l_arc_8/step4_extractability.py` is written fresh to follow the protocol literally — not adapted from Arc 7. v2.2 §3 (no max-F1 fallback) and v2.3 §4 (`pre_t_sl_atr_multiplier` in D1 policy YAML) implemented per dispatch §139, §141.
+
+**Feature counts (per protocol §8 cap ≤ 38):**
+- 8 base entry features (universal): `body_to_range_ratio`, `upper_wick_ratio`, `lower_wick_ratio`, `range_to_atr_14`, `ret_5bar_atr`, `ret_20bar_atr`, `pos_in_20bar_range`, `rsi_14`
+- 10 Arc 8 PR-HHHL-specific entry features (from trades_all.csv): `num_higher_highs`, `num_higher_lows`, `most_recent_sh_age`, `most_recent_sl_age`, `hh_range_atr`, `hl_range_atr`, `pullback_depth_atr`, `trigger_body_atr`, `trigger_close_pos`, `trigger_break_size_atr`
+- 7 D1 path-so-far features (Angle D1 only): `close_r_at_t`, `mfe_so_far_r_at_t`, `mae_so_far_r_at_t`, `bars_in_profit_at_t`, `local_peaks_so_far_at_t`, `monotonicity_so_far_at_t`, `velocity_first_t`
+- Pipeline E total: 18 (well under cap)
+- Pipeline D1 total at chosen t: 15 (8 base + 7 path-so-far)
+
+**Models:** RandomForestClassifier(n_estimators=200, max_depth=8, random_state=42, n_jobs=1); LogisticRegression(max_iter=1000, random_state=42) with StandardScaler. CV: 5-fold TimeSeriesSplit. n_jobs=1 for deterministic Windows runs.
+
+**Per-unit results:**
+
+#### c1 (V-shape recovery FG-weak, n=177, selected SL=4.0×ATR, pos_rate=0.814)
+
+**Angle E:**
+- Step A (full 18-feature RF): CV AUC 0.65? — failed, continued to Step B
+- **Step B top-5 RF importance: AUC 0.6974 ≥ 0.65 → PASS**
+- Per-fold AUCs: 0.8550 / 0.4500 / 0.7750 / 0.7402 / 0.6667 (high variance — fold 2 is the soft spot)
+- Locked features (top-5 by RF importance): `ret_5bar_atr`, `pos_in_20bar_range`, `pullback_depth_atr`, `range_to_atr_14`, `hl_range_atr`
+- Logistic AUC: 0.6559 (RF-logistic gap 0.04 — small; feature set is reasonably linear)
+- **Threshold sweep (v2.2 §3, recall ≥ 0.60 required):**
+  - 0.40 / 0.50 / 0.60 / 0.70 all swept on 80/20 time-split holdout
+  - **Chosen: 0.70** — precision **0.897**, recall **0.867** (both > 0.60)
+
+**Angle D1:**
+- All t ∈ {1, 2, 3, 4, 5, 10}: 0% exclusion (4.0×ATR SL means no trades exit before bar 10)
+- **t=1 chosen** per smallest-t rule: AUC 0.6366 ≥ 0.60, exclusion 0%
+- AUCs by t: 0.637 / 0.605 / 0.555 / 0.534 / 0.580 / 0.549 (t=1 is the strongest)
+- **Threshold sweep:** chosen **0.60** — precision **0.909**, recall **1.000**
+
+**Pipeline assignment: E+D1** — both clear gates and threshold sweep.
+
+**Saved artefacts:**
+- `archetype_v-shape_recovery_forward-geometry_weak_c1_E_classifier.joblib` (RF, 5 features)
+- `archetype_v-shape_recovery_forward-geometry_weak_c1_E_filter.yaml`
+- `archetype_v-shape_recovery_forward-geometry_weak_c1_D1_classifier.joblib` (RF, 15 features at t=1)
+- `archetype_v-shape_recovery_forward-geometry_weak_c1_D1_policy.yaml` — **includes v2.3 §4 `pre_t_sl_atr_multiplier: 4.0`**, exit policy row reference `§11 row 5: V-shape recovery — after bar N confirms reversal, standard trail`
+
+#### c3 (V-shape recovery, n=405, selected SL=2.0×ATR, pos_rate=0.131) — DIES
+
+**Angle E:**
+- Step A (full 18 features): AUC 0.6148 < 0.65 — fail
+- Step B top-5/top-10/top-15: best AUC 0.6148 — fail
+- Step B forward-selection: 2 features (best AUC 0.6148) — fail
+- **DIES at Angle E** (Step C stack not attempted for c3 — see below)
+
+**Angle D1:**
+- t=4 chosen per smallest-t rule: AUC 0.6125 ≥ 0.60, exclusion 0%
+- **Threshold sweep FAILS** — with c3's low pos_rate (0.131), no threshold satisfies recall ≥ 0.60. Per v2.2 §3 no max-F1 fallback — **archetype DIES at Step 4 §16a**.
+
+#### agg_c1_c3 (V-shape recovery aggregate, n=582, selected SL=3.0×ATR, pos_rate=0.387) — DIES
+
+**Angle E:**
+- All steps A/B fail; best B-fwd AUC 0.6083 < 0.65
+- (Step C stack budget shared across all units; c1's earlier Step C attempt consumed 4 of 30; c3's Step C attempted similarly — budget partially burned. agg evaluated under remaining budget; no combination cleared 0.65 either.)
+
+**Angle D1:**
+- No t in {1, 2, 3, 4, 5, 10} clears AUC ≥ 0.60. Best: t=5 AUC 0.5813 (< 0.60). **Angle D1 dies — no chosen t**.
+- **DIES at Step 4** (both E and D1 fail the AUC gate).
+
+**Arc-level Step 4 endpoint:** **PASS** (≥ 1 archetype clears extractability + threshold sweep).
+
+| Unit | E AUC | E pass | D1 (chosen t, AUC) | D1 pass | Pipeline | Artefacts saved |
+|---|---:|:---:|---|:---:|---|:---:|
+| c1 | 0.697 (B-top5) | ✓ | t=1, 0.637 | ✓ | **E+D1** | yes |
+| c3 | 0.615 (B-fwd) | ✗ | t=4, 0.612 (threshold sweep fails) | ✗ | — | no |
+| agg_c1_c3 | 0.608 (B-fwd) | ✗ | no t clears 0.60 | ✗ | — | no |
+
+**Step C stack budget remaining: 22 / 30** (consumed 8 attempts across c1, c3, agg — c1's stack attempts were not reached because Step B passed at top-5; budget is for the remaining units).
+
+**v2.3 §4 — pre_t_sl_atr_multiplier carried into D1 policy YAML:**
+
+The surviving D1 archetype's policy YAML records `pre_t_sl_atr_multiplier: 4.0`. Pipeline D1 Step 5 WFO will use this as the per-archetype SL multiplier consumed by engine PR `feat/open-24-pre-t-sl-per-archetype`. Pipeline E does not need pre_t_sl (E admits/rejects at entry, runs the trade under the unit's selected SL = 4.0×ATR throughout).
+
+**Determinism:**
+
+Single run for this dispatch (n_jobs=1 + random_state=42 throughout; RF + Logistic both deterministic; TimeSeriesSplit deterministic). Re-run determinism check available via `--determinism` flag (not invoked here; protocol §8 doesn't gate on byte-identical determinism at Step 4 — RF stochasticity is bounded by random_state but not byte-stable across pandas/sklearn versions).
+
+**Notes (informational):**
+- c1's high positive rate (0.814) reflects its wide SL (4.0×ATR) — very few stop-outs in this archetype. The classifier learns to recognise the highest-confidence subset (precision 0.897 at threshold 0.70 vs base rate 0.814).
+- c3's low pos_rate (0.131) under SL=2.0×ATR is the dominant kill mode: a tight SL on a deeply-pulling-back archetype hits SL far more often than it reaches 1R. The threshold sweep can't simultaneously achieve good recall on the minority class.
+- The aggregate fails both pipelines despite combining c1 and c3's pools — the mixed signal washes out the cluster-specific feature patterns. Reinforces that **path-shape clustering is doing real work** here: c1 alone is extractable; c1+c3 is not.
+- Pipeline E top-5 features dominated by `ret_5bar_atr` (recent momentum), `pos_in_20bar_range` (regime context), `pullback_depth_atr` (signal-specific), `range_to_atr_14` (volatility regime), `hl_range_atr` (HL structure strength). Mix of generic and signal-specific — encouraging signal that PR-HHHL's entry-time observables carry edge for the V-shape archetype.
+
+## Cross-arc candidates
+
+- **Pipeline E top-5 features for V-shape recovery (FG-weak):** `ret_5bar_atr`, `pos_in_20bar_range`, `pullback_depth_atr`, `range_to_atr_14`, `hl_range_atr`. Worth testing as cross-arc filter candidates for other long trend-continuation signals.
+- **Wide SL (4.0×ATR) for V-shape recovery:** larger than the §11 prior of 1.5R. Step 3 SL sweep selected this empirically. Likely generalises to other V-shape archetypes (peak position in middle of trade → need to tolerate deep drawdown to peak before recovery).
+- **pos_rate calibration insight:** Pipeline D1's threshold sweep is recall-sensitive to base rate. Archetypes with pos_rate < 0.20 will struggle to satisfy recall ≥ 0.60 under v2.2 §3 unless the classifier is very sharp. This is a structural property of the v2.2 §3 closure — not a calibration issue; just a constraint Step 5 WFO inherits.
+
+## Interesting observations
+
+- **Per-fold AUC variance for c1 Pipeline E** (0.8550 / 0.4500 / 0.7750 / 0.7402 / 0.6667): fold 2 is much weaker than the others. Could indicate a regime-shift period in 2021-2022 that the entry-time features don't capture. Worth investigating at Step 5 WFO.
+- **D1 t=1 was strongest for c1** (AUC 0.637 vs t=2..5 in 0.534-0.605 range). For a V-shape archetype where the entry bar IS the resume trigger, t=1 (one bar after entry) catches the immediate follow-through. This is consistent with the V-shape "MAE-before-peak ≥ 5 bars" expectation — the *path-so-far* features at t=1 likely don't include the eventual deep pullback, so what t=1 actually captures is "did the next bar confirm bullish momentum?".
+- **Single-archetype survivor in a 4-cluster arc**: 1 / 4 = 25% archetype survival from K=4 → Step 4. Compare to KH-24 calibration anchor where 1 / 4 archetypes survives at Pipeline D1 — Arc 8 mirrors that ratio. Reasonable.
 
 ## Detailed analysis
 

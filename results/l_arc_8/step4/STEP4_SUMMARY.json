@@ -1,0 +1,12 @@
+{
+  "n_units_evaluated": 3,
+  "n_units_pass_step4": 1,
+  "phase": "L_ARC_8_STEP_4_EXTRACTABILITY",
+  "protocol_version": "v2.3 stack (base v2.1.2 + v2.2 + v2.3)",
+  "sha256": {
+    "extractability_pass_list.csv": "47481eedbff2e84693bff05f89162c31ad40ddd50dc90fd8d93b9e917ceaf192",
+    "predictability_angle_D1.csv": "9c45955c1743a6e774a97835c23ac218ecb37ba2d66e64b4eb371691fe8e77a9",
+    "predictability_angle_E.csv": "8a3755443b04f89651ac08f7e238d1f4c68583b764ff9197dcaaef8e6b874c2b"
+  },
+  "stack_budget_remaining": 22
+}

@@ -849,10 +849,13 @@ class TestEnginePatch:
 
     def test_entry_features_stored_only_when_hook_active(self):
         src = ENGINE_PATH.read_text(encoding="utf-8")
-        # The build_entry_features call must be guarded by an `if D1_HOOK is not None:`.
+        # Engine-generalisation PR routes feature building through the
+        # signal adapter; the guard requirement is unchanged but the call
+        # target moved from the bare helper to the adapter method.
         m = re.search(
             r"if\s+D1_HOOK\s+is\s+not\s+None:\s*\n\s+entry_features_dict\s*=\s*"
-            r"build_entry_features_at_signal_bar",
+            r"(build_entry_features_at_signal_bar"
+            r"|_ensure_signal_adapter\(\)\.compute_entry_features)",
             src,
         )
         assert m, (

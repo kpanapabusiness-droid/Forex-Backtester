@@ -13,6 +13,16 @@ description: "4H WFO — exposure cap=2 + 1H close-in-range filter T=0.28, 1% ri
 timeframe: "H4"
 data_dir: "data/4hr"
 
+# Signal timeframe + data block (engine-generalisation PR). For KH-24 these
+# resolve to the same paths the engine used pre-PR; for new arcs the signal
+# timeframe is configurable here.
+signal_tf: "H4"
+data:
+  signal_tf_dir: "data/4hr"
+  aux:
+    h1: "data/1hr"
+    d1: "data/daily"
+
 pairs:
   - "AUD_CAD"
   - "AUD_CHF"
@@ -45,6 +55,14 @@ pairs:
 
 signal: kb_exhaustion_bar
 direction: long
+
+# Pluggable signal adapter (engine-generalisation PR). For KH-24 the adapter
+# delegates to the in-engine _build_signal_series helper so behaviour is
+# byte-identical to the pre-PR baseline. All KH-24 parameters continue to
+# come from indicator_params.kb_exhaustion_bar / top-level keys below — the
+# adapter itself takes no kwargs.
+signal_adapter: signals.kb_exhaustion_bar_adapter:KbExhaustionBarAdapter
+signal_adapter_kwargs: {}
 
 indicator_params:
   kb_exhaustion_bar:

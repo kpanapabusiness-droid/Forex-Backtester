@@ -16,7 +16,35 @@ _None._
 
 In FIFO order. Topmost is next. Analyst adds entries here as signals become ready.
 
-_Empty._
+- [ ] **Arc 8** — Pullback-and-resume in HH/HL uptrend (PR-HHHL, long)
+  - Spec: `signal_spec_pullback_resume_hhhl_long_v0.1.md`
+  - Handover: `arc_8_handover_PR_HHHL.md`
+  - Family: Trend continuation (structural). Signal TF 4H, long-only, 28 FX. Pool prior 2,500–4,000.
+
+- [ ] **Arc 9** — Inside-bar break in trend (IB-trend, long)
+  - Spec: `signal_spec_inside_bar_break_trend_long_v0.1.md`
+  - Handover: `arc_9_handover_IB_trend.md`
+  - Family: Trend continuation (compression-and-break). Signal TF 4H, long-only, 28 FX. Pool prior 1,500–2,500.
+
+- [ ] **Arc 10** — D1 swing-low rejection in D1 uptrend (DLR, long)
+  - Spec: `signal_spec_d1_swing_low_rejection_long_v0.1.md`
+  - Handover: `arc_10_handover_DLR.md`
+  - Family: Multi-TF trend continuation (HTF-anchored level rejection). Signal TF 4H, anchor TF D1 (one-day lag), long-only, 28 FX. Pool prior 1,000–2,000.
+
+- [ ] **Arc 11** — Swing-high breakout in trend (SHB, long)
+  - Spec: `signal_spec_swing_high_breakout_trend_long_v0.1.md`
+  - Handover: `arc_11_handover_SHB.md`
+  - Family: Trend continuation (structural breakout at historical reference). Signal TF 4H, long-only, 28 FX. Pool prior 1,500–3,000.
+
+### Batch note
+
+Arcs 8-11 are a coordinated parallel batch testing the entry-time-features hypothesis across four distinct trend-continuation feature classes:
+- Arc 8: rich entry-time features (trend strength + pullback geometry + trigger geometry)
+- Arc 9: narrow entry-time features (compression geometry + break geometry)
+- Arc 10: HTF entry-time features (D1 anchor identity + LTF rejection geometry)
+- Arc 11: structural reference break magnitude (swing-high freshness + break magnitude)
+
+Co-fire matrix between the four is measured at each arc's Step 1 closure (handover specs). Cross-arc synthesis is analyst work at Step 5 halt-summary review.
 
 ### Entry format
 

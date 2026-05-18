@@ -108,6 +108,9 @@ results/l_arc_2_redo2/**/_run_log.txt
 !results/replays_v2_1_1/
 !results/replays_v2_1_1/**
 results/replays_v2_1_1/**/trades_paths_extended.csv
+# L_ARC_PROTOCOL v2.2 governance: arc queue state file (FIFO selection
+# coordination between parallel CC sessions). Tracked by design.
+!results/ARC_QUEUE.md
 results_phase*/
 __pycache__/
 .ipynb_checkpoints/

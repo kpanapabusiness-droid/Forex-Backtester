@@ -50,16 +50,15 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+import matplotlib
 import numpy as np
 import pandas as pd
-import yaml
 from sklearn.calibration import CalibratedClassifierCV, calibration_curve
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.frozen import FrozenEstimator  # sklearn >= 1.6 replacement for cv='prefit'
 from sklearn.metrics import precision_score, recall_score, roc_auc_score
 from sklearn.model_selection import StratifiedKFold, train_test_split
 
-import matplotlib
 matplotlib.use("Agg")  # non-interactive backend
 import matplotlib.pyplot as plt  # noqa: E402
 
@@ -357,7 +356,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         abs(a["auc_drift_platt"]) <= 0.01 and abs(a["auc_drift_iso"]) <= 0.01
     )
     if not auc_preserved:
-        print(f"[cal-recov] WARNING - calibrated AUC drift > 0.01")
+        print("[cal-recov] WARNING - calibrated AUC drift > 0.01")
 
     # ---- Approach B --------------------------------------------------------
     b = _approach_b(X, y)
@@ -435,7 +434,7 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     outcome_a_passes = passes_v2_2_s3(platt_best) or passes_v2_2_s3(iso_best)
     outcome = "OUTCOME_A" if outcome_a_passes else "OUTCOME_B"
-    print(f"[cal-recov] best recall on Approach A test set:")
+    print("[cal-recov] best recall on Approach A test set:")
     print(f"  uncal: recall {uncal_best[0]:.4f} @ thr {uncal_best[1]:.2f} (precision {uncal_best[2]:.4f})")
     print(f"  platt: recall {platt_best[0]:.4f} @ thr {platt_best[1]:.2f} (precision {platt_best[2]:.4f})")
     print(f"  iso  : recall {iso_best[0]:.4f} @ thr {iso_best[1]:.2f} (precision {iso_best[2]:.4f})")

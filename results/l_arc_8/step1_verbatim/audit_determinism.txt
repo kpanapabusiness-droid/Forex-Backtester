@@ -1,0 +1,8 @@
+# Arc 8 Step 1 — Determinism audit
+
+Run 1 trades_all.csv sha256:   bfb4b357522e10d7e0042aaea596de5c3b6ef9457eeaf3956595f4a80ef356d2
+Run 2 trades_all.csv sha256:   bfb4b357522e10d7e0042aaea596de5c3b6ef9457eeaf3956595f4a80ef356d2
+Run 1 trades_paths.csv sha256: bd89ba64903f0281648ae3fb0d29bb1169ab050cfb40f39070cf63fd965e99ac
+Run 2 trades_paths.csv sha256: bd89ba64903f0281648ae3fb0d29bb1169ab050cfb40f39070cf63fd965e99ac
+
+Byte-identical: PASS

@@ -76,7 +76,7 @@ def _audit_lookahead(
     date_start = str(cfg["data"]["date_start"])
     date_end = str(cfg["data"]["date_end"])
 
-    rng = random.Random(LOOKAHEAD_SEED)
+    random.Random(LOOKAHEAD_SEED)
     sample = trades.sample(
         n=min(N_LOOKAHEAD_SPOT_CHECKS, len(trades)),
         random_state=LOOKAHEAD_SEED,

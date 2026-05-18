@@ -35,6 +35,44 @@
 - `b3b43b9` — Closure doc rewritten with STEP_4_KILL_REAFFIRMED
 - `29b39f9` — Incident note added
 
+## ARC 8 CLOSURE | 2026-05-18 | HALT_DEPLOYMENT
+
+Arc 8 (PR-HHHL long, `signal_pullback_resume_hhhl_long_v0.1`) closed HALT_DEPLOYMENT. Steps 1-4 PASS; one archetype survived (c1 V-shape recovery FG-weak). Step 5 WFO FAIL §10 ship gates under full-pool deployment economics. 3rd consecutive Open-22/23/24 admit-only-vs-deployment failure (Arcs 4 RERUN, 5, 8). v2.4 §1.5 entry-separability gate proposed in `PROTOCOL_IMPROVEMENT_BACKLOG.md` as Open-25.
+
+### Closed
+- **Arc 8 PR-HHHL long** — no §10 ship-gate-passing configuration
+  - Steps 1–4 PASS; 1 archetype survived (c1 V-shape recovery FG-weak; pre_t_sl_atr_multiplier=4.0×ATR; E AUC 0.697, D1 AUC 0.637 at t=1)
+  - Step 5 WFO FAIL: admit-only PASS (Pipeline E Sharpe 1.44, Pipeline D1 Sharpe 1.14) but full-pool FAIL (worst DD 15.6%–19.0%, worst-window ROI −13% to −15%, aggregate Sharpe ≈ 0)
+  - Failure mechanism: c1 (+2.59R) and c2 (−0.47R) share entry-bar geometry; classifier admits 70–89% of full Step 1 OOS pool; non-c1 admits with mean_r ≈ −0.3R drown c1's edge
+  - Closure doc: `results/l_arc_8/ARC_8_CLOSURE.md`
+  - Live arc doc: `results/l_arc_8/ARC_8_LIVE.md` (flipped to CLOSED)
+
+### Diagnostics
+- `7d9109e` — entry-feature overlap: `c1_NOT_SEPARABLE_AT_ENTRY` (multiclass at entry: AUC 0.547, precision@recall=0.60 = 0.149 vs base rate 0.133, zero lift; all 18 entry features mean overlap > 0.78; c1-vs-c2 pairwise overlap 0.83)
+- `4756c66` — Path 1 (post-entry confirmation, t ∈ {3, 5, 8, 12}): `PATH_1_MARGINAL` (best t=12, AUC 0.755, precision@recall=0.60 = 0.274 — below 0.40 viable; slippage not the constraint, 17% c1 MFE consumed by t=12); Path 2 (signal-tightening, 6 single-rule sweeps + 3 pairwise combos): `PATH_2_DEAD` (no filter satisfies c1_ret ≥ 0.80 ∧ c2_ret ≤ 0.30 ∧ pool ≥ 500)
+
+### Findings logged
+- **v2.4 §1.5 entry-separability gate proposed** as Open-25 — pre-Step-1 multiclass RF check on smoke pool, halt if winning-cluster precision@recall=0.60 < 0.30 on entry features alone. Evidence base: Arcs 4 RERUN, 5, 8. See `PROTOCOL_IMPROVEMENT_BACKLOG.md` for full proposal + acceptance criteria.
+- **c1 V-shape recovery FG-weak archetype** logged for Open-05 portfolio composition (admit-only Pipeline E Sharpe 1.44 / DD 1.00% / ROI 18.66%; Pipeline D1 Sharpe 1.14 / DD 0.54% / ROI 25.73% — tradeable in isolation but not routable from PR-HHHL signal alone). Key features: `ret_5bar_atr`, `pos_in_20bar_range`, `pullback_depth_atr`, `range_to_atr_14`, `hl_range_atr`.
+- **Signal-design observation:** `pullback_depth_atr ≥ 1.0` filter improves aggregate Step 1 mean_r +68% (+0.054 → +0.091). Informational; not deployable as system.
+- **3rd Open-22/23/24 confirmation** (Arcs 4, 5, 8): framework-level pattern, not arc-level failures. Three consecutive arcs PASS admit-only / FAIL full-pool ship gates with the same structural failure mode.
+
+### Engine state
+- `feat/open-24-pre-t-sl-per-archetype` (Open-24) merged 2026-05-19 (PR #146). Consumed by Arc 8 D1 policy YAML's `pre_t_sl_atr_multiplier: 4.0`.
+
+### Variance from dispatch (recorded)
+- Branch: worktree `claude/magical-zhukovsky-bd69d9` instead of `phase/l_arc_8` (stale local branch conflict)
+- Signal spec: written from analyst-supplied content (byte-equivalent to `tmp/post-v2_3` commit `9e9bf0a`)
+- Data: `data/4hr` directory junction to parent repo
+- Step 1 wfo_l_arc_8.yaml sha: `9785a5b…` (dispatch text said `accba985…` — was smoke-test manifest sha; verbatim sha matches on-disk + git blob)
+
+### Files
+- `results/l_arc_8/ARC_8_CLOSURE.md` (new — authoritative closure record)
+- `results/l_arc_8/ARC_8_LIVE.md` (flipped to CLOSED)
+- `results/l_arc_8/step1_verbatim/`, `step2/`, `step3/`, `step4/`, `step5_wfo/` (locked at closure)
+- `results/l_arc_8/diagnostics/entry_feature_overlap/`, `post_entry_confirmation/`, `signal_tightening/`, `COMBINED_DIAGNOSTIC_SUMMARY.md` (locked at closure)
+- `STATUS.md`, `SESSION_ZERO.md`, `CHANGELOG.md`, `PROTOCOL_IMPROVEMENT_BACKLOG.md` updated (this housekeeping pass)
+
 ## Arc 11 — Closed-HALT (SHB long 4H) | 2026-05-18 | arc closure
 
 - Original closure: Step 4 extractability fail, §16a Path A near-miss (best AUC 0.5728, margin 0.027)

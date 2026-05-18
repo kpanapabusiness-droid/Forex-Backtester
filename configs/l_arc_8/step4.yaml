@@ -1,0 +1,27 @@
+# Arc 8 — Step 4 extractability config.
+# L_ARC_PROTOCOL v2.3 stack: §8 + v2.2 §2 (Tier 2 lift cap ≤ 5) +
+# v2.2 §3 (no max-F1 fallback) + v2.3 §4 (pre_t_sl_atr_multiplier in
+# D1 policy YAML).
+
+phase: L_ARC_8_STEP_4_EXTRACTABILITY
+
+data:
+  dir_4h: "data/4hr"
+
+input:
+  step1_dir: results/l_arc_8/step1_verbatim
+  step2_dir: results/l_arc_8/step2
+  step3_dir: results/l_arc_8/step3
+  trades_csv: trades_all.csv
+  paths_csv: trades_paths.csv
+  clusters_csv: clusters_K4.csv
+  capturability_pass_list_csv: capturability_pass_list.csv
+
+output:
+  results_dir: results/l_arc_8/step4
+
+# §8 Angle E original SL (for scale conversion in path re-evaluation).
+original_sl_atr_mult: 2.0
+
+# §8 Step C stack budget per arc.
+stack_budget: 30

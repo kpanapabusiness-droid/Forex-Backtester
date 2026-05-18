@@ -1,0 +1,27 @@
+{
+  "best_config": {
+    "aggregate_hit_rate": 0.32019704433497537,
+    "aggregate_mean_r_unit": 0.08653897592223751,
+    "c1_fraction_post": 0.14901477832512317,
+    "c1_fraction_pre": 0.1333835719668425,
+    "c1_lift": 1.1171898917369403,
+    "c2_kill_rate": 0.4125874125874126,
+    "feature": "pullback_depth_atr",
+    "floor_500_pass": 1,
+    "pool_kept_pct": 0.611906556141673,
+    "pool_size_post": 812,
+    "pool_size_pre": 1327,
+    "retention_c0": 0.5822784810126582,
+    "retention_c1": 0.6836158192090396,
+    "retention_c2": 0.5874125874125874,
+    "retention_c3": 0.6296296296296297,
+    "rule_id": "F2",
+    "rule_str": "pullback_depth_atr >= 1.5",
+    "threshold": 1.5
+  },
+  "n_marginal_configs": 0,
+  "n_pareto_points": 11,
+  "n_total_configs": 30,
+  "n_viable_configs": 0,
+  "verdict": "PATH_2_DEAD"
+}

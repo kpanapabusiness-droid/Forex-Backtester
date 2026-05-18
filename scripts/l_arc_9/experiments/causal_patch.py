@@ -54,12 +54,12 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+import lightgbm as lgb
 import numpy as np
 import pandas as pd
 import yaml
-import lightgbm as lgb
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import precision_score, recall_score, roc_auc_score
+from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import TimeSeriesSplit
 
 _REPO_ROOT = Path(__file__).resolve().parent.parent.parent.parent
@@ -68,14 +68,24 @@ if str(_REPO_ROOT) not in sys.path:
 
 # Reuse exact hyperparams + feature catalogue from the original pipeline_e_retry.
 from scripts.l_arc_9.experiments.pipeline_e_retry import (  # noqa: E402
-    EXPANDED_28, BASELINE_16, D1_8, SESSION_4, BASE_8, ARC_SPECIFIC_8,
-    LGBM_KW, RF_KW, SEED, N_SPLITS,
-    THRESHOLDS_LOCKED, RECALL_FLOOR, PIPELINE_E_AUC_FLOOR,
+    BASE_8,
+    BASELINE_16,
+    D1_8,
+    EXPANDED_28,
     FORBIDDEN_LEAK_FEATURES,
-    _wilder_atr_d1, _rsi, _kijun, _d1_swing_high_low,
-    _attach_session_features, _load_d1,
+    LGBM_KW,
+    N_SPLITS,
+    PIPELINE_E_AUC_FLOOR,
+    RECALL_FLOOR,
+    RF_KW,
+    SESSION_4,
+    _attach_session_features,
+    _d1_swing_high_low,
+    _kijun,
+    _load_d1,
+    _rsi,
+    _wilder_atr_d1,
 )
-
 
 SWING_HALF = 10
 SWING_CONFIRM_LAG = 10
@@ -270,7 +280,6 @@ def phase_2_producer_audit(out_dir: Path) -> Dict[str, Any]:
 
     data_d1_dir = Path("C:/Users/panap/Documents/Forex-Backtester/data/daily")
     # Cache: per pair, build the full PATCHED D1 frame ONCE for lookup.
-    pair_full_d1: Dict[str, pd.DataFrame] = {}
     pair_full_feats: Dict[str, pd.DataFrame] = {}
     pair_raw_d1: Dict[str, pd.DataFrame] = {}
 
@@ -302,7 +311,8 @@ def phase_2_producer_audit(out_dir: Path) -> Dict[str, Any]:
             full_val = full_row[fname] if fname in full_row.index else float("nan")
             trunc_val = trunc_row[fname] if fname in trunc_row.index else float("nan")
             try:
-                fv = float(full_val); tv = float(trunc_val)
+                fv = float(full_val)
+                tv = float(trunc_val)
                 if np.isnan(fv) and np.isnan(tv):
                     match = True
                 elif np.isnan(fv) or np.isnan(tv):
@@ -438,12 +448,16 @@ def phase_4_step5_wfo_patched(
     feature matrix. Same KH-24 anchored expanding training, same threshold
     candidates A (0.40) and B (0.05), same §11 Stepwise exit re-sim.
     """
+    from core.spread_floor import STATE_CFG_KEY, load_spread_floor
     from scripts.l_arc_9.experiments.step5_validation import (
-        STARTING_BALANCE as SV_STARTING_BALANCE, RISK_PCT as SV_RISK_PCT,
-        _resimulate_trade, _compute_fold_metrics, _full_data_equity,
+        STARTING_BALANCE as SV_STARTING_BALANCE,
+    )
+    from scripts.l_arc_9.experiments.step5_validation import (
+        _compute_fold_metrics,
+        _full_data_equity,
+        _resimulate_trade,
         evaluate_gates,
     )
-    from core.spread_floor import STATE_CFG_KEY, load_spread_floor
 
     cfg_kh24 = yaml.safe_load((_REPO_ROOT / "configs" / "wfo_kh24.yaml").read_text(encoding="utf-8"))
     kh24_folds: List[Tuple[int, pd.Timestamp, pd.Timestamp]] = [
@@ -600,11 +614,18 @@ def phase_4_step5_wfo_patched(
 def phase_5_scaled_risk(candidate_a_resim: pd.DataFrame, out_dir: Path) -> Dict[str, Any]:
     """Mirror scaled_risk methodology on the patched Candidate A admit set."""
     from scripts.l_arc_9.experiments.scaled_risk import (
-        STARTING_BALANCE as SR_STARTING_BALANCE, RISK_LEVELS as SR_RISK_LEVELS,
-        IN_SYSTEM_MAX_DD_PCT, IN_SYSTEM_DAILY_DD_PCT,
-        HARD_MAX_DD_PCT, HARD_DAILY_DD_PCT,
-        RECOMMEND_MAX_FOLD_DD_PCT, RECOMMEND_WORST_DAY_DD_PCT,
-        _account_fold, _full_data_account, _annualise_roi,
+        HARD_DAILY_DD_PCT,
+        HARD_MAX_DD_PCT,
+        IN_SYSTEM_DAILY_DD_PCT,
+        IN_SYSTEM_MAX_DD_PCT,
+        RECOMMEND_MAX_FOLD_DD_PCT,
+        RECOMMEND_WORST_DAY_DD_PCT,
+        _account_fold,
+        _annualise_roi,
+        _full_data_account,
+    )
+    from scripts.l_arc_9.experiments.scaled_risk import (
+        RISK_LEVELS as SR_RISK_LEVELS,
     )
     cfg_kh24 = yaml.safe_load((_REPO_ROOT / "configs" / "wfo_kh24.yaml").read_text(encoding="utf-8"))
     kh24_folds: List[Tuple[int, pd.Timestamp, pd.Timestamp]] = [
@@ -618,8 +639,6 @@ def phase_5_scaled_risk(candidate_a_resim: pd.DataFrame, out_dir: Path) -> Dict[
     summary_rows: List[Dict[str, Any]] = []
     per_risk_summary: Dict[float, Dict[str, Any]] = {}
     worst_day_rows: List[Dict[str, Any]] = []
-    baseline_full_roi = None
-    baseline_worst_dd = None
     for r in SR_RISK_LEVELS:
         out_subdir = out_dir / f"per_risk_{int(r * 10000):04d}"
         out_subdir.mkdir(parents=True, exist_ok=True)
@@ -661,8 +680,11 @@ def phase_5_scaled_risk(candidate_a_resim: pd.DataFrame, out_dir: Path) -> Dict[
             worst_fold_day_dd = float(real["worst_day_dd_pct"].max())
             all_pos = bool((real["fold_roi_pct"] > 0).all())
         else:
-            worst_fold_ann_roi = float("nan"); mean_fold_ann_roi = float("nan")
-            worst_fold_max_dd = float("nan"); worst_fold_day_dd = float("nan"); all_pos = False
+            worst_fold_ann_roi = float("nan")
+            mean_fold_ann_roi = float("nan")
+            worst_fold_max_dd = float("nan")
+            worst_fold_day_dd = float("nan")
+            all_pos = False
         per_risk_summary[r] = {
             "worst_fold_ann_roi_pct": worst_fold_ann_roi,
             "mean_fold_ann_roi_pct": mean_fold_ann_roi,
@@ -672,8 +694,7 @@ def phase_5_scaled_risk(candidate_a_resim: pd.DataFrame, out_dir: Path) -> Dict[
             "full_m": full_m, "per_day_all": per_day_all,
         }
         if abs(r - 0.005) < 1e-9:
-            baseline_full_roi = full_m["full_data_annualised_roi_pct"]
-            baseline_worst_dd = worst_fold_max_dd
+            full_m["full_data_annualised_roi_pct"]
         summary_rows.append({
             "risk_pct": r * 100,
             "worst_fold_ann_roi_pct": worst_fold_ann_roi,
@@ -832,7 +853,7 @@ def main(argv: Optional[List[str]] = None) -> int:
                 if cand_a_pass else "FAIL_STEP_5_AFTER_PATCH"
             )
         else:
-            print(f"\n[phase 5] SKIPPED — patched Candidate A fails restricted §10 pass-deployable")
+            print("\n[phase 5] SKIPPED — patched Candidate A fails restricted §10 pass-deployable")
             summary["phase_5"] = {"skipped": True, "reason": "Candidate A fails restricted §10"}
             summary["headline"] = "FAIL_STEP_5_AFTER_PATCH"
 

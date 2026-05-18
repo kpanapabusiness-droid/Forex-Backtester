@@ -31,13 +31,11 @@ from __future__ import annotations
 
 import argparse
 import hashlib
-import importlib
 import json
 import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-import numpy as np
 import pandas as pd
 import yaml
 
@@ -46,8 +44,6 @@ if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
 from scripts.l_arc_9.experiments.step5_validation import (  # noqa: E402
-    STARTING_BALANCE,
-    RISK_PCT,
     PASS_DEPLOYABLE,
     PASS_VIABLE,
     _compute_fold_metrics,

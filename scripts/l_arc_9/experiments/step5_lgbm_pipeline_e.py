@@ -67,7 +67,6 @@ from __future__ import annotations
 
 import argparse
 import hashlib
-import importlib
 import json
 import sys
 from pathlib import Path
@@ -85,19 +84,24 @@ if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
 # Reuse training-time feature pipeline + WFO/exit machinery.
-from scripts.l_arc_9.experiments.pipeline_e_retry import (  # noqa: E402
-    EXPANDED_28, BASELINE_16, D1_8, SESSION_4, LGBM_KW, SEED,
-    _attach_d1_features, _attach_session_features,
-    FORBIDDEN_LEAK_FEATURES,
-)
-from scripts.l_arc_9.experiments.step5_validation import (  # noqa: E402
-    STARTING_BALANCE, RISK_PCT, PASS_DEPLOYABLE, PASS_VIABLE,
-    _resimulate_trade, _compute_fold_metrics, _full_data_equity,
-    evaluate_gates,
-)
 from core.spread_floor import (  # noqa: E402
     STATE_CFG_KEY,
     load_spread_floor,
+)
+from scripts.l_arc_9.experiments.pipeline_e_retry import (  # noqa: E402
+    BASELINE_16,
+    EXPANDED_28,
+    FORBIDDEN_LEAK_FEATURES,
+    LGBM_KW,
+    _attach_d1_features,
+    _attach_session_features,
+)
+from scripts.l_arc_9.experiments.step5_validation import (  # noqa: E402
+    STARTING_BALANCE,
+    _compute_fold_metrics,
+    _full_data_equity,
+    _resimulate_trade,
+    evaluate_gates,
 )
 
 # Candidate thresholds per dispatch.
@@ -482,7 +486,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     args.out_dir.mkdir(parents=True, exist_ok=True)
 
     summary = run(args.out_dir, args.kh24_cfg, args.arc_cfg)
-    print(f"[lgbm-e] DONE.")
+    print("[lgbm-e] DONE.")
     for cn, info in summary["candidates"].items():
         head = "PASS-DEPLOYABLE" if info["pass_deployable"] else "PASS-VIABLE" if info["pass_viable"] else "FAIL"
         s = info["gates_summary"]

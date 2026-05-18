@@ -1,0 +1,2 @@
+unit_id,type,final_archetype_label,selected_SL_atr_mult,pre_t_sl_atr_multiplier,pipeline_assignment,e_rf_auc,e_chosen_step,e_threshold,d1_chosen_t,d1_rf_auc,d1_threshold
+c1,cluster,V-shape recovery (forward-geometry weak),4,4,E+D1,0.697372549,B-top5,0.7,1,0.6365791855,0.6

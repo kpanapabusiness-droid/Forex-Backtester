@@ -1,0 +1,4 @@
+cluster_id,tentative_label,individual_pass,aggregate_pass,disposition,final_archetype_label,pre_t_sl_atr_multiplier,notes
+2,tentative_Early-peak hold OR Peak-and-collapse,0,0,dies,Early-peak hold,,pct_peak_and_collapse 0.0233 < 0.30
+1,tentative_V-shape recovery,1,1,proceeds_both,V-shape recovery (forward-geometry weak),4,"V-shape conditions: peak_bars>=5 frac=1.000 (need >=0.5); peak_pos in [0.4,0.8] frac=0.401 (need >=0.5)"
+3,tentative_V-shape recovery,1,1,proceeds_both,V-shape recovery,2,"peak_bars>=5 frac=0.998; peak_pos in [0.4,0.8] frac=0.664"

@@ -27,7 +27,7 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict
 
 import pandas as pd
 
@@ -142,7 +142,7 @@ def main(argv=None) -> int:
     )
 
     print("\n" + "=" * 70)
-    print(f"HEADLINE: STEP_4_KILL_AFTER_PATCH (UNCHANGED)")
+    print("HEADLINE: STEP_4_KILL_AFTER_PATCH (UNCHANGED)")
     print(f"Diagnostic: Candidate A restricted §10 (F2-F7): {'PASS' if cand_a_pass else 'FAIL'}")
     print(f"            Candidate B restricted §10 (F2-F7): {'PASS' if cand_b_pass else 'FAIL'}")
     print("=" * 70)

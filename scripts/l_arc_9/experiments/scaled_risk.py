@@ -297,9 +297,12 @@ def run_one_risk(
         min_trades_per_fold = int(fold_df_real["n_trades"].min())
         all_pos = bool((fold_df_real["fold_roi_pct"] > 0).all())
     else:
-        worst_fold_ann_roi = float("nan"); mean_fold_ann_roi = float("nan")
-        worst_fold_max_dd = float("nan"); worst_fold_day_dd = float("nan")
-        min_trades_per_fold = 0; all_pos = False
+        worst_fold_ann_roi = float("nan")
+        mean_fold_ann_roi = float("nan")
+        worst_fold_max_dd = float("nan")
+        worst_fold_day_dd = float("nan")
+        min_trades_per_fold = 0
+        all_pos = False
 
     return {
         "risk_pct": risk_pct,

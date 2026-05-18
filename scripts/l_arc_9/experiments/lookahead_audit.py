@@ -29,9 +29,9 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+import lightgbm as lgb
 import numpy as np
 import pandas as pd
-import lightgbm as lgb
 import yaml
 
 _REPO_ROOT = Path(__file__).resolve().parent.parent.parent.parent
@@ -41,13 +41,9 @@ if str(_REPO_ROOT) not in sys.path:
 # Reuse exact feature engineering (read-only): same code that produced the
 # audited matrix.
 from scripts.l_arc_9.experiments.pipeline_e_retry import (  # noqa: E402
-    EXPANDED_28, BASELINE_16, D1_8, SESSION_4, BASE_8, ARC_SPECIFIC_8,
-    LGBM_KW, SEED, FORBIDDEN_LEAK_FEATURES,
-    _attach_d1_features, _attach_session_features,
-    _build_d1_feature_frame, _load_d1,
-)
-from scripts.l_arc_9.step4_extractability import (  # noqa: E402
-    compute_entry_features,
+    EXPANDED_28,
+    LGBM_KW,
+    _load_d1,
 )
 
 AUDIT_SEED = 4242
@@ -136,7 +132,7 @@ def audit_1_4h_timestamps(out_dir: Path, rng: random.Random) -> Dict[str, Any]:
             atr = float(single["atr14_at_signal"].iloc[0])
             # Find index of signal bar in truncated series.
             idx = int(np.where(df_pair["date"].to_numpy() == np.datetime64(sig_t))[0][0])
-            n = len(df_pair)
+            len(df_pair)
             if idx < 21:
                 continue
             op_t = float(df_pair["open"].iloc[idx])
@@ -258,7 +254,7 @@ def audit_2_d1_lag(out_dir: Path, rng: random.Random) -> Dict[str, Any]:
     code_review_md_lines.append("")
     code_review_md_lines.append("## Arc 9 D1 lag implementation")
     code_review_md_lines.append("")
-    code_review_md_lines.append(f"Source: `scripts/l_arc_9/experiments/pipeline_e_retry.py:_attach_d1_features`")
+    code_review_md_lines.append("Source: `scripts/l_arc_9/experiments/pipeline_e_retry.py:_attach_d1_features`")
     code_review_md_lines.append("")
     code_review_md_lines.append("```python")
     # Extract the function body.
@@ -282,7 +278,7 @@ def audit_2_d1_lag(out_dir: Path, rng: random.Random) -> Dict[str, Any]:
     ref_pattern_ok = len(ref_missing) == 0
     code_review_md_lines.append("## Reference engine pattern (KH-24 backtester)")
     code_review_md_lines.append("")
-    code_review_md_lines.append(f"Source: `scripts/phase_kgl_v2_4h_wfo.py:_precompute_d1_exit_arrays` (line ~900)")
+    code_review_md_lines.append("Source: `scripts/phase_kgl_v2_4h_wfo.py:_precompute_d1_exit_arrays` (line ~900)")
     code_review_md_lines.append("")
     code_review_md_lines.append("```python")
     code_review_md_lines.append('dates_4h_norm = pd.to_datetime(df_4h["date"]).dt.normalize() - pd.Timedelta(days=1)')
@@ -653,7 +649,6 @@ def audit_5_fold_disjointness(out_dir: Path) -> Dict[str, Any]:
 # =========================================================================
 
 def audit_6_cluster_label_flow(out_dir: Path) -> Dict[str, Any]:
-    findings: List[str] = []
     md = ["# Audit 6 — Cluster label flow", "",
           "## Question",
           "",
@@ -686,21 +681,21 @@ def audit_6_cluster_label_flow(out_dir: Path) -> Dict[str, Any]:
 
     # 3) Cluster fitting: clusters_K3.csv was produced ONCE at Step 2 from path-shape features.
     # No re-fit at inference time (Step 5 does not re-run k-means).
-    cluster_src = (_REPO_ROOT / "scripts" / "l_arc_9" / "step2_clustering.py").read_text(encoding="utf-8")
+    (_REPO_ROOT / "scripts" / "l_arc_9" / "step2_clustering.py").read_text(encoding="utf-8")
     kmeans_in_step5 = "KMeans" in step5_src
     md.append("## Step 3 — No k-means at inference time")
     md.append("")
     md.append(f"- KMeans imported in Step 5 LGBM Pipeline E script: {kmeans_in_step5}")
-    md.append(f"- k-means is computed once at Step 2 (`scripts/l_arc_9/step2_clustering.py`) using only path-shape features;")
-    md.append(f"  the resulting `clusters_K3.csv` provides the binary `is_cluster_0` labels used as classification target.")
+    md.append("- k-means is computed once at Step 2 (`scripts/l_arc_9/step2_clustering.py`) using only path-shape features;")
+    md.append("  the resulting `clusters_K3.csv` provides the binary `is_cluster_0` labels used as classification target.")
     md.append("")
 
     md.append("## Conclusion")
     md.append("")
     flow_clean = (has_y and len(forbidden_in_features) == 0
                   and inference_uses_features_only and not kmeans_in_step5)
-    md.append(f"- Label flows: Step 2 (k-means on path-shape) → `is_cluster_0` target → Step 4/E-retry training → trained model → Step 5 inference on entry-time features only.")
-    md.append(f"- No leakage path: cluster labels never enter inference X. Classifier predicts is_cluster_0 from entry-time features only.")
+    md.append("- Label flows: Step 2 (k-means on path-shape) → `is_cluster_0` target → Step 4/E-retry training → trained model → Step 5 inference on entry-time features only.")
+    md.append("- No leakage path: cluster labels never enter inference X. Classifier predicts is_cluster_0 from entry-time features only.")
     md.append(f"- **Verdict: {'GREEN' if flow_clean else 'RED'}**")
     (out_dir / "audit_6_label_flow.md").write_text("\n".join(md) + "\n", encoding="utf-8")
 

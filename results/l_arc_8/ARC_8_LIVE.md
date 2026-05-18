@@ -2,9 +2,9 @@
 
 ## Status
 
-- **Current step:** Step 5 WFO unblocked — engine PR merged into main (`716ce84`), brought into worktree (`3025b35`). 69/69 D1 tests pass post-merge. Ready to resume WFO procedure.
+- **Current step:** Step 5 WFO complete. Disposition: **ARCHETYPE_DIES_STEP_5**
 - **Verdict (Step 4 endpoint):** STEP_4_COMPLETE_READY_FOR_WFO
-- **Verdict (Step 5 entry):** ENGINE_PR_MERGED_LOCALLY — awaiting analyst go-ahead to run WFO (push of merged main to origin/main is separate analyst-side action)
+- **Verdict (Step 5 endpoint):** ARCHETYPE_DIES_STEP_5 — both Pipeline E and Pipeline D1 fail §10 ship gates under full-pool deployment economics; admit-only economics pass but full-pool admit rate 70-89% dilutes c1's structural edge with non-c1 trades' negative mean_r. Third arc to confirm Open-22/23/24 cross-arc pattern (Arc 4 RERUN, Arc 5, Arc 8).
 - **Verdict:** none yet (arc still active)
 - **Last updated:** 2026-05-18
 - **Branch:** worktree `claude/magical-zhukovsky-bd69d9` (dispatcher-target merge to `phase/l_arc_8`)
@@ -98,7 +98,7 @@ This session does NOT own: Step 5 WFO dispatch, engine PRs (`scripts/phase_kgl_v
 | 2 | Clustering | **PASS** | K=4 chosen (silhouette 0.4762); 4 clusters {316, 177, 429, 405}; 0/4 degenerate features; 2 V-shape clusters → per-cluster AND per-aggregate at Step 3 |
 | 3 | Capturability | **PASS** | 3 units survive: c1 (n=177, SL=4.0×ATR), c3 (n=405, SL=2.0×ATR), agg_c1_c3 (n=582, SL=3.0×ATR); all V-shape recovery; c2 (Early-peak hold) dies on §2 floors |
 | 4 | Extractability | **PASS** | 1 archetype survives: c1 (V-shape recovery, FG-weak) at E+D1; c3 + agg_c1_c3 die per v2.2 §3 (no max-F1 fallback). pre_t_sl_atr_multiplier=4.0 recorded in D1 policy YAML |
-| 5 | WFO | **UNBLOCKED** | Pre-checks PASS (fold 2 regime characterised; D1 t=1 leak audit clean). Engine PR merged into local main (`716ce84`) via `--no-ff` from `feat/open-24-pre-t-sl-per-archetype`; brought into worktree (`3025b35`); 69/69 D1 tests pass post-merge. Ready to run WFO procedure on re-dispatch / continuation. |
+| 5 | WFO | **FAIL** | Pre-checks PASS. Admit-only economics PASS all gates (c1-only OOS: E worst-window ROI +18.66% / DD 1.00%; D1 worst-window ROI +25.73% / DD 0.54%). Full-pool deployment economics FAIL — classifier admits 70-89% of all Step 1 OOS trades (low specificity on non-c1); non-c1 admits with mean_r −0.10 to −0.47 dilute c1's +2.59. Pipeline E full-pool: worst ROI −13.21%, max DD 15.58%, sharpe 0.012 (3/4 gates fail). Pipeline D1 full-pool: worst ROI −14.69%, max DD 19.02%, sharpe 0.001 (3/4 gates fail). **Archetype dies.** |
 
 ### Step 1 — Plumbing
 
@@ -583,6 +583,68 @@ User requested "merge into main"; executed at this session 2026-05-18.
 **NOT done (deferred to analyst):**
 - `git push origin main` — local merge only; remote `origin/main` still at `fb2e7ab`. Push when ready.
 - Re-dispatch of Step 5 WFO from chat (or simply tell CC to continue from the WFO procedure step — pre-checks are committed).
+
+---
+
+## Step 5 WFO complete — ARCHETYPE_DIES_STEP_5
+
+### Disposition
+
+| Pipeline | Admit-only ship gates | Full-pool ship gates | Decision |
+|---|:---:|:---:|---|
+| Pipeline E (c1) | **PASS** all 4 | **FAIL** 3/4 (worst ROI −13.21%, DD 15.58%, sharpe 0.012) | Does not ship |
+| Pipeline D1 (c1) | **PASS** all 4 | **FAIL** 3/4 (worst ROI −14.69%, DD 19.02%, sharpe 0.001) | Does not ship |
+
+Both pass-deployable AND pass-viable gates fail. Per §10: "If no cluster's best configuration achieves pass-viable: arc dies at Step 6, no shipment, no portfolio candidates." (Step 5 is now Step 6 equivalent under v2.3 §9.)
+
+**ARCHETYPE_DIES_STEP_5.**
+
+### Cross-arc finding — 3rd confirmation of Open-22/23/24
+
+Arc 8 is the **third arc in sequence** to PASS admit-only economics and FAIL full-pool deployment economics:
+
+| Arc | Admit-only verdict | Full-pool verdict | Failure mode |
+|---|---|---|---|
+| Arc 4 RERUN | PASS (Pipeline D1 +0.125R/trade admit) | FAIL §10 (reject + early-exit drag) | Reject pool 32% × −0.232R + early-exit 11% × −0.685R |
+| Arc 5 | PASS (Pipeline D1) | FAIL §10 (rejected-pool adverse selection) | Rejected 78% × −0.46R mean |
+| **Arc 8** | **PASS (E AUC 0.697 + D1 AUC 0.637)** | **FAIL §10 (classifier specificity gap)** | **Admit 70-89% of full pool; non-c1 admits with mean_r −0.10 to −0.47 dilute c1's +2.59** |
+
+Pattern confirmed: Pipeline E and D1 classifiers trained on a single cluster cannot achieve sufficient specificity on the broader Step 1 pool at deployment. Cross-arc systemic finding for analyst-side protocol amendment cycle.
+
+### Files
+
+- [results/l_arc_8/step5_wfo/STEP5_SUMMARY.md](step5_wfo/STEP5_SUMMARY.md) — comprehensive ship-gate evaluation, two views (admit-only + full-pool), §16a cross-arc analysis, recommendations
+- [results/l_arc_8/step5_wfo/pipeline_e/](step5_wfo/pipeline_e/) — Pipeline E WFO outputs (full-pool ship-gate basis + admit-only validation)
+- [results/l_arc_8/step5_wfo/pipeline_d1/](step5_wfo/pipeline_d1/) — Pipeline D1 WFO outputs
+- [results/l_arc_8/step5_prechecks/](step5_prechecks/) — pre-flight pre-checks (committed at `3db7da0`)
+
+### Cross-arc candidates surfaced
+
+- **c1 V-shape recovery (FG-weak) cluster geometry** (path-shape features `monotonicity_ratio_in_profit`, `local_peaks_count`, `pullback_magnitude_median`, `time_to_peak_mfe_relative`) — Path-shape clustering successfully isolates a +2.59R/trade structural edge. **Genuinely tradeable in isolation; NOT deployable as a stand-alone classifier**. Portfolio composition candidate for Open-05.
+- **Pipeline E top-5 entry features** that admitted c1 with AUC 0.697: `ret_5bar_atr`, `pos_in_20bar_range`, `pullback_depth_atr`, `range_to_atr_14`, `hl_range_atr`. Worth adding to `feature_catalogue.yaml` as candidates for future arcs.
+
+### Engine work used
+
+- `feat/open-24-pre-t-sl-per-archetype` (merged into local main `716ce84` — NOT pushed to origin). The `pre_t_sl_atr_multiplier: 4.0` from c1 D1 policy YAML was the field this PR enabled engine consumption of; the WFO ran without using the engine directly (Step 5 used Step 1 path data + the trained classifiers + path-data SL re-imposition logic from `step3_capturability._eval_trade_at_sl`).
+
+### Recommended next action (analyst-side)
+
+1. Archive Arc 8 c1 archetype as portfolio candidate (Open-05) and close arc with disposition KILL or HALT per analyst judgement.
+2. Open protocol amendment item: full-pool deployment economics evaluation should run **at Step 4**, not Step 5, so failing arcs are killed before WFO compute spend. See `STEP5_SUMMARY.md §16a` for specific amendment recommendations.
+3. Update `CHANGELOG.md`, `SESSION_ZERO.md`, `STATUS.md`, `PROTOCOL_IMPROVEMENT_BACKLOG.md` with Arc 8 closure — out of executor scope per dispatch §83.
+
+### Commit history (worktree branch, since arc-open)
+
+- `a80972b arc-8 open`
+- `3c5f943 arc-8 step 1 PASS: 1327 trades, determinism + right-edge + lookahead OK`
+- `9583947 arc-8 step 2 PASS: K=4 chosen`
+- `c34cc6b arc-8 step 3 PASS: 3 V-shape units survive`
+- `a5eb6e6 arc-8 step 4 PASS: c1 V-shape recovery survives E+D1`
+- `7537cb2 arc-8 step 4 complete — halt summary appended`
+- `3db7da0 arc-8 step 5 pre-flight: pre-checks PASS; HALT on engine PR not merged`
+- `3025b35 Merge main into Arc 8 worktree (brings v2.3 §4 engine PR)`
+- `fc674e4 arc-8 live doc: engine PR merged into main locally; Step 5 unblocked`
+- `<this commit> arc-8 step 5 WFO complete — ARCHETYPE_DIES_STEP_5`
 
 ## Detailed analysis
 

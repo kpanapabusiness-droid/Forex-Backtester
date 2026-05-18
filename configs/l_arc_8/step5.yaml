@@ -1,0 +1,29 @@
+# Arc 8 — Step 5 WFO config.
+# L_ARC_PROTOCOL v2.3 §10 multi-pipeline ship rule.
+#
+# Runs WFO on (c1, Pipeline E) and (c1, Pipeline D1) independently.
+# c1 archetype: V-shape recovery (forward-geometry weak).
+# Unit selected SL: 4.0×ATR_4H (entry-anchored).
+# pre_t_sl_atr_multiplier (D1 only): 4.0 — consumed by feat/open-24-pre-t-sl-
+# per-archetype merged into main at 716ce84.
+#
+# WFO windows: configs/wfo_kh24.yaml verbatim (7 anchored folds, IS expanding,
+# OOS 9mo each). Fold 1 IS window precedes Arc 8 data start; will be skipped.
+
+phase: L_ARC_8_STEP_5_WFO
+
+data:
+  dir_4h: "data/4hr"
+
+input:
+  step1_dir: results/l_arc_8/step1_verbatim
+  step2_dir: results/l_arc_8/step2
+  step4_dir: results/l_arc_8/step4
+  trades_csv: trades_all.csv
+  paths_csv: trades_paths.csv
+  clusters_csv: clusters_K4.csv
+  cluster_id: 1                    # c1
+  wfo_kh24_yaml: configs/wfo_kh24.yaml
+
+output:
+  results_dir: results/l_arc_8/step5_wfo

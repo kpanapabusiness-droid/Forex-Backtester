@@ -1,5 +1,40 @@
 # Changelog
 
+## 2026-05-19 — Arc 9 closure REAFFIRMED (STEP_4_KILL after producer-leak patch)
+
+### Closed
+- Arc 9 IB-trend compression-break long — **STEP_4_KILL_REAFFIRMED**
+  - Original Step 4 KILL 2026-05-18 (Pipeline E AUC 0.511, D1 threshold-sweep recall 0.003); held-open cycle ran 7 diagnostic experiments through 2026-05-19
+  - Held-open Pipeline E retry's AUC 0.7508 was a leak artefact (two D1 swing features used a ±10-bar centred window at the D1 frame level; values within joined rows depended on up to 10 future bars relative to each signal's entry time)
+  - Causal patch (commit `5b6c547`, confirmed-swing detector with 10-day lag): patched AUC **0.5190** (LGBM) / **0.5551** (RF), both below §8 gate 0.65
+  - Forced WFO at patched classifier (commit `51457e6`): Candidate A full-data ROI **−0.13% / DD 13.38%**; Candidate B **+0.08% / DD 22.65%**
+  - Cohort verified deployable in Step 5 oracle (+39.45% worst-fold ROI / 0.01% DD with post-hoc cluster identity) but unreachable on causally-clean in-protocol features
+  - Closure: `results/l_arc_9/ARC_9_CLOSURE.md`
+  - Incident: `results/l_arc_9/INCIDENT_2026_05_19_ARC_9_PRODUCER_LEAK.md`
+
+### Invalidated
+- Pipeline E retry AUC 0.7508 → fake (leaked features)
+- Step 5 LGBM E Candidate A (+9.63% worst-fold / 1.32% DD / 236 admits) → invalidated
+- Step 5 LGBM E Candidate B (+20.68% worst-fold / 6.80% DD / 599 admits) → invalidated
+- Scaled-risk 1.0% deployment recommendation → invalidated
+- "Features over classifiers" methodology lesson → withdrawn
+
+### Forward-looking changes
+- **Producer-level causal audit dimension** added as standard for all future classifier audits (v2.x Amendment 1, highest priority; distinct from join-level causality + end-to-end probability reproduction)
+- v2.x §8 D1 feature-budget expansion proposal **WITHDRAWN** (Arc 9 evidence collapsed; causally-clean expansion delivers ≈ 0 AUC lift)
+- v2.x §3 threshold-grid replacement **WEAKENED** (Arc 7 calibration recovery becomes load-bearing evidence)
+- Arc 7 D1 feature-expansion test **REFUTED** as recommendation (would reproduce the same leak)
+- Arc 7 calibration recovery test remains valid; separate dispatch
+- Causal-only feature library implementation queued (pairs with Amendment 1)
+- KH-24 producer-level audit required pre-PR for v2.x landing (anchor preservation verification)
+
+### Diagnostics
+- `9541237` — Merge `claude/arc-9-causal-patch` (Phase 8 + forced WFO)
+- `5b6c547` — Causal patch (patched LGBM AUC 0.5190)
+- `51457e6` — Forced WFO addendum (analyst override; both candidates FAIL restricted §10)
+- `b3b43b9` — Closure doc rewritten with STEP_4_KILL_REAFFIRMED
+- `29b39f9` — Incident note added
+
 ## Arc 11 — Closed-HALT (SHB long 4H) | 2026-05-18 | arc closure
 
 - Original closure: Step 4 extractability fail, §16a Path A near-miss (best AUC 0.5728, margin 0.027)

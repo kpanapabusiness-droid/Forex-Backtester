@@ -1,0 +1,134 @@
+{
+  "cofire_matrix": {
+    "Arc 10 (DLR)": {
+      "checked_paths": [
+        "results/l_arc_10/step1_verbatim/trades_all.csv",
+        "results/l_arc_10/step1/trades_all.csv",
+        "results/arc_10/step1/trades_all.csv"
+      ],
+      "status": "not landed"
+    },
+    "Arc 11 (SHB)": {
+      "checked_paths": [
+        "results/l_arc_11/step1_verbatim/trades_all.csv",
+        "results/l_arc_11/step1/trades_all.csv",
+        "results/arc_11/step1/trades_all.csv"
+      ],
+      "status": "not landed"
+    },
+    "Arc 8 (PR-HHHL)": {
+      "checked_paths": [
+        "results/l_arc_8/step1_verbatim/trades_all.csv",
+        "results/l_arc_8/step1/trades_all.csv",
+        "results/arc_8/step1/trades_all.csv"
+      ],
+      "status": "not landed"
+    },
+    "KH-24 (kb_exhaustion_bar)": {
+      "arc9_pool": 2153,
+      "exact": 6,
+      "exact_pct_of_arc9": 0.279,
+      "other_pool": 553,
+      "pm1bar": 10
+    }
+  },
+  "lookahead": {
+    "detail": [
+      {
+        "fired_on_truncated": true,
+        "n_sl_recomputed": 1,
+        "n_sl_reported": 1,
+        "pair": "EUR_GBP",
+        "pass": true,
+        "signal_bar_time": "2024-07-16 08:00:00",
+        "swing_low_recomputed": 0.83852,
+        "swing_low_reported": 0.83852
+      },
+      {
+        "fired_on_truncated": true,
+        "n_sl_recomputed": 2,
+        "n_sl_reported": 2,
+        "pair": "EUR_NZD",
+        "pass": true,
+        "signal_bar_time": "2024-03-04 00:00:00",
+        "swing_low_recomputed": 1.75463,
+        "swing_low_reported": 1.75463
+      },
+      {
+        "fired_on_truncated": true,
+        "n_sl_recomputed": 4,
+        "n_sl_reported": 4,
+        "pair": "EUR_CHF",
+        "pass": true,
+        "signal_bar_time": "2025-02-26 08:00:00",
+        "swing_low_recomputed": 0.93659,
+        "swing_low_reported": 0.93659
+      },
+      {
+        "fired_on_truncated": true,
+        "n_sl_recomputed": 2,
+        "n_sl_reported": 2,
+        "pair": "GBP_JPY",
+        "pass": true,
+        "signal_bar_time": "2023-09-29 00:00:00",
+        "swing_low_recomputed": 180.886,
+        "swing_low_reported": 180.886
+      },
+      {
+        "fired_on_truncated": true,
+        "n_sl_recomputed": 2,
+        "n_sl_reported": 2,
+        "pair": "CHF_JPY",
+        "pass": true,
+        "signal_bar_time": "2020-10-09 08:00:00",
+        "swing_low_recomputed": 114.041,
+        "swing_low_reported": 114.041
+      }
+    ],
+    "n_pass": 5,
+    "n_total": 5,
+    "verdict": "PASS"
+  },
+  "pool_summary": {
+    "bars_held_p50": 22.0,
+    "bars_held_p95": 240.0,
+    "exit_reason_counts": {
+      "end_of_data": 23,
+      "stoploss": 1754,
+      "time_exit": 376
+    },
+    "pairs_lt_30": [],
+    "pct_at_cap_bar_240": 17.46400371574547
+  },
+  "right_edge_swing": {
+    "lag_p50": 8.0,
+    "max_lag": 30,
+    "min_lag": 4,
+    "trades_scanned": 2153,
+    "verdict": "PASS",
+    "violations": 0
+  },
+  "schema_15a": {
+    "bad_is_held": 0,
+    "bad_offset": 0,
+    "extras_present": [
+      "high_r",
+      "low_r"
+    ],
+    "missing_required_cols": [],
+    "n_trades_no_forward_obs": 399,
+    "n_trades_total": 2153,
+    "n_trades_with_forward_obs": 1754,
+    "required_cols_present": [
+      "bar_offset",
+      "close_r",
+      "is_held",
+      "mae_so_far_r",
+      "mfe_so_far_r",
+      "pair",
+      "trade_id"
+    ],
+    "verdict": "PASS",
+    "violations": []
+  }
+}

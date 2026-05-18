@@ -1,0 +1,5 @@
+reference_point,worst_fold_ann_roi_pct,mean_fold_ann_roi_pct,worst_fold_max_dd_pct,full_data_ann_roi_pct,full_data_max_dd_pct,total_trades_admitted,pass_deployable,pass_viable
+raw_baseline,-29.63728258,6.095390519,43.61424253,0.802270691,62.98560728,2153,0,0
+oracle_cluster0,39.45332919,61.40018646,0.01498670059,60.49601312,0.01498670059,365,1,1
+lgbm_e_A_thr0.40,0,19.64921397,1.316149586,19.0645162,1.316149586,236,0,0
+lgbm_e_B_thr0.05,0,30.96323866,6.801795127,29.8904941,6.801795127,599,0,0

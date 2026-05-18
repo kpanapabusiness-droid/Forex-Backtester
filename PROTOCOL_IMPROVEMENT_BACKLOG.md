@@ -17,7 +17,66 @@
 | Still open | 4 | P1.7 (refresh execution — pending KH-24 v2.0 re-run only under v2.1.1), P1.10, P1.12, P2.14 |
 | Partial in v2.2 | 1 | Open-21 (Step 4 deployability gate) — proposal (a) strict-mode max-F1 fallback closed by v2.2 §3; alternates (b) recall floor 0.30 + (c) AUC floor 0.70 remain on calibration backlog |
 
-Last updated: 2026-05-18 alongside L_ARC_PROTOCOL v2.3 amendment (Step 5 cross-fold stability removed; Step 6 WFO renumbered as Step 5; Open-22/23/24 closed in protocol with engine PR pending for Open-24). v2.2 amendment landed earlier same day.
+Last updated: 2026-05-19 alongside Arc 9 closure (STEP_4_KILL_REAFFIRMED after producer-leak patch). v2.x Amendment 1 added (producer-level causal audit dimension, highest priority); v2.x §8 D1 feature-budget expansion WITHDRAWN; v2.x §3 threshold-grid replacement WEAKENED. Prior: 2026-05-18 L_ARC_PROTOCOL v2.3 amendment landed (Step 5 cross-fold stability removed; Step 6 WFO renumbered as Step 5; Open-22/23/24 closed in protocol with engine PR pending for Open-24); v2.2 amendment landed earlier same day.
+
+---
+
+## v2.x Amendment Proposals (revised 2026-05-19 after Arc 9 producer-leak incident)
+
+Full text in `L_ARC_PROTOCOL_v2_x_AMENDMENT_PROPOSAL.md` (revised). Pre-PR requirements at the proposal doc's Migration table.
+
+### v2.x Amendment 1 — Producer-level causal audit dimension (NEW, highest priority)
+
+**Status:** Proposed (drafted 2026-05-19)
+**Priority:** Highest — failure mode demonstrated, costs were severe, fix is mechanical and cheap
+**Evidence base:** Arc 9 producer-leak incident (single arc, direct empirical)
+**Source:** `L_ARC_PROTOCOL_v2_x_AMENDMENT_PROPOSAL.md` Amendment 1
+
+#### Problem
+
+The existing audit framework checks join-level causality and end-to-end probability reproduction. It does not check whether values within joined rows are causally constructed. Arc 9 incident: ±10-bar centred swing detector at D1 frame level produced features whose values at each row depended on up to 10 future bars relative to the row's date. `merge_asof` join was correct; values inside the joined rows were not. Original audit returned 8/8 GREEN. Classifier AUC inflated by +0.23 on the leaked features. Deployment chain initiated on fake economics. External audit detected the miss.
+
+#### Proposal
+
+For every feature in a classifier's feature matrix, the value at any given row must depend only on data with timestamp ≤ that row's nominal date (after any specified lag). Standard mathematical definitions that use centred or bilateral windows are non-causal by default and must be replaced with one-sided or confirmation-lag variants.
+
+Audit requirement: every classifier audit must include per-feature producer-level causal verification, distinct from join-level causality and end-to-end probability reproduction.
+
+#### Pre-PR requirements
+
+- KH-24 producer-level audit (anchor preservation verification)
+- Causal-only feature library implementation
+- Updated CC lookahead audit dispatch template (dimension 9 = producer-level causal verification)
+
+#### Related items
+
+- `results/l_arc_9/INCIDENT_2026_05_19_ARC_9_PRODUCER_LEAK.md`
+- `results/l_arc_9/ARC_9_CLOSURE.md`
+- `L_ARC_PROTOCOL_v2_x_AMENDMENT_PROPOSAL.md`
+
+---
+
+### v2.x §8 D1 feature-budget expansion — WITHDRAWN 2026-05-19
+
+Status changed from "proposed" to "withdrawn." Arc 9 evidence (originally cited as direct empirical support) was on a classifier with leaked features. With causally-clean features, the AUC lift from D1 + session feature expansion collapses to ≈ 0. Proposal requires different empirical support before re-listing.
+
+---
+
+### v2.x §3 threshold-grid replacement — WEAKENED 2026-05-19
+
+Arc 9's empirical contribution (Candidate B at threshold 0.05 producing +11pp ROI over Candidate A) is invalidated by leaked classifier. Arc 7 calibration recovery experiment becomes the load-bearing evidence. Arc 7 calibration recovery test recommended as separate dispatch.
+
+---
+
+### v2.x Step 5 fold-1 warmup convention — LIVE
+
+Survives independent of the Arc 9 leak (data-window mismatch with KH-24 anchor; applies to any future arc whose data window starts at F1 OOS_start).
+
+---
+
+### v2.x Worst-day DD as standard Step 5 output — LIVE
+
+Methodology engineering-level, signal-agnostic. Arc 9 numerical results invalidated; methodology itself survives and applies to every future Step 5 evaluation. KH-24 worst-day DD characterisation recommended pre-PR (independent of v2.x landing).
 
 ---
 

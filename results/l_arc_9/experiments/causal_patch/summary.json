@@ -1,0 +1,109 @@
+{
+  "headline": "STEP_4_KILL_AFTER_PATCH",
+  "phase_1": {
+    "n_features": 28,
+    "n_pos": 365,
+    "n_total": 2153
+  },
+  "phase_2": {
+    "n_samples_evaluated": 100,
+    "overall_verdict": "PASS",
+    "per_feature": [
+      {
+        "feature": "d1_bars_since_swing_high",
+        "match_pct": 100.0,
+        "n": 100,
+        "n_match": 100,
+        "verdict": "PASS"
+      },
+      {
+        "feature": "d1_bars_since_swing_low",
+        "match_pct": 100.0,
+        "n": 100,
+        "n_match": 100,
+        "verdict": "PASS"
+      },
+      {
+        "feature": "d1_close_above_kijun",
+        "match_pct": 100.0,
+        "n": 100,
+        "n_match": 100,
+        "verdict": "PASS"
+      },
+      {
+        "feature": "d1_pos_in_20d_range",
+        "match_pct": 100.0,
+        "n": 100,
+        "n_match": 100,
+        "verdict": "PASS"
+      },
+      {
+        "feature": "d1_ret_5d_atr",
+        "match_pct": 100.0,
+        "n": 100,
+        "n_match": 100,
+        "verdict": "PASS"
+      },
+      {
+        "feature": "d1_rsi_14",
+        "match_pct": 100.0,
+        "n": 100,
+        "n_match": 100,
+        "verdict": "PASS"
+      },
+      {
+        "feature": "d1_trend_state",
+        "match_pct": 100.0,
+        "n": 100,
+        "n_match": 100,
+        "verdict": "PASS"
+      }
+    ]
+  },
+  "phase_3": {
+    "lgbm_baseline_16": {
+      "fold_aucs": [
+        0.5944809941520468,
+        0.5140107212475634,
+        0.50057099352874,
+        0.4640973630831643,
+        0.5500131268049357
+      ],
+      "mean_auc": 0.52463463976329
+    },
+    "lgbm_expanded_28": {
+      "fold_aucs": [
+        0.6154970760233918,
+        0.4937865497076024,
+        0.5585268366958509,
+        0.43488843813387423,
+        0.49241270674717774
+      ],
+      "mean_auc": 0.5190223214615795
+    },
+    "rf_baseline_16": {
+      "fold_aucs": [
+        0.6219541910331384,
+        0.49537037037037035,
+        0.5566235249333842,
+        0.44731237322515216,
+        0.4579154633762142
+      ],
+      "mean_auc": 0.5158351845876519
+    },
+    "rf_expanded_28": {
+      "fold_aucs": [
+        0.6558845029239767,
+        0.5021320662768032,
+        0.6017320137038447,
+        0.47013184584178497,
+        0.5458125492255185
+      ],
+      "mean_auc": 0.5551385955943856
+    }
+  },
+  "phase_4": {
+    "reason": "AUC 0.5190 < gate 0.65",
+    "skipped": true
+  }
+}

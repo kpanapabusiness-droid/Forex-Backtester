@@ -1,0 +1,5 @@
+candidate,n_admitted,worst_fold_ann_roi_pct,mean_fold_ann_roi_pct,worst_fold_max_dd_pct,full_data_ann_roi_pct,full_data_max_dd_pct,all_folds_positive,min_trades_per_fold,pass_deployable,pass_viable
+A_thr0.40_ORIGINAL_LEAKED,236,0,19.64921397,1.316149586,19.0645162,1.316149586,0,0,0,0
+A_thr0.40_PATCHED_FORCED,169,-6.608733079,-0.08197131989,6.825440998,-0.130753316,13.37857785,0,0,0,0
+B_thr0.05_ORIGINAL_LEAKED,599,0,30.96323866,6.801795127,29.8904941,6.801795127,0,0,0,0
+B_thr0.05_PATCHED_FORCED,817,-19.36951301,0.6366534585,20.90367486,0.08200158957,22.65440681,0,0,0,0

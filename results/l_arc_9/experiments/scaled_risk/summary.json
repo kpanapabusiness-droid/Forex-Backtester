@@ -1,0 +1,116 @@
+{
+  "five_ers_hard_limits": {
+    "daily_dd_pct": 5.0,
+    "max_dd_pct": 10.0
+  },
+  "in_system_targets": {
+    "daily_dd_pct": 4.0,
+    "max_fold_dd_pct": 8.0
+  },
+  "per_risk_aggregates": {
+    "0.50pct": {
+      "all_folds_positive": true,
+      "mean_fold_ann_roi_pct": 22.924082969414936,
+      "min_trades_per_fold": 24,
+      "worst_fold_ann_roi_pct": 9.629513201909457,
+      "worst_fold_day_dd_pct": 1.0056839701268578,
+      "worst_fold_max_dd_pct": 1.2627584204397742
+    },
+    "1.00pct": {
+      "all_folds_positive": true,
+      "mean_fold_ann_roi_pct": 51.57170789077879,
+      "min_trades_per_fold": 24,
+      "worst_fold_ann_roi_pct": 20.074693592686522,
+      "worst_fold_day_dd_pct": 2.0062853595074386,
+      "worst_fold_max_dd_pct": 2.5173793111276637
+    },
+    "1.50pct": {
+      "all_folds_positive": true,
+      "mean_fold_ann_roi_pct": 87.42707600298775,
+      "min_trades_per_fold": 24,
+      "worst_fold_ann_roi_pct": 31.394519737564885,
+      "worst_fold_day_dd_pct": 3.0018041681417054,
+      "worst_fold_max_dd_pct": 3.7638412923889515
+    },
+    "2.00pct": {
+      "all_folds_positive": true,
+      "mean_fold_ann_roi_pct": 132.3577422346996,
+      "min_trades_per_fold": 24,
+      "worst_fold_ann_roi_pct": 43.651395865765764,
+      "worst_fold_day_dd_pct": 3.9922403960296933,
+      "worst_fold_max_dd_pct": 5.002123475382401
+    },
+    "2.50pct": {
+      "all_folds_positive": true,
+      "mean_fold_ann_roi_pct": 188.71020158709328,
+      "min_trades_per_fold": 24,
+      "worst_fold_ann_roi_pct": 56.9112862845611,
+      "worst_fold_day_dd_pct": 4.977594043171386,
+      "worst_fold_max_dd_pct": 6.232205464354071
+    }
+  },
+  "per_risk_full_data": {
+    "0.50pct": {
+      "ending_equity": 25000.46686093538,
+      "full_data_annualised_roi_pct": 19.06451619779832,
+      "full_data_max_dd_pct": 1.2627584204397586,
+      "full_data_roi_pct": 150.00466860935379,
+      "full_data_worst_day_dd_pct": 1.00568397012686,
+      "n_trades": 236
+    },
+    "1.00pct": {
+      "ending_equity": 61779.918130459046,
+      "full_data_annualised_roi_pct": 41.45008918161797,
+      "full_data_max_dd_pct": 2.51737931112764,
+      "full_data_roi_pct": 517.7991813045904,
+      "full_data_worst_day_dd_pct": 2.0062853595074253,
+      "n_trades": 236
+    },
+    "1.50pct": {
+      "ending_equity": 150947.26495481213,
+      "full_data_annualised_roi_pct": 67.68218517094893,
+      "full_data_max_dd_pct": 3.7638412923889772,
+      "full_data_roi_pct": 1409.4726495481214,
+      "full_data_worst_day_dd_pct": 3.0018041681417063,
+      "n_trades": 236
+    },
+    "2.00pct": {
+      "ending_equity": 364755.79486074805,
+      "full_data_annualised_roi_pct": 98.3610336389994,
+      "full_data_max_dd_pct": 5.002123475382403,
+      "full_data_roi_pct": 3547.5579486074807,
+      "full_data_worst_day_dd_pct": 3.9922403960296995,
+      "n_trades": 236
+    },
+    "2.50pct": {
+      "ending_equity": 871950.4592611634,
+      "full_data_annualised_roi_pct": 134.17103594065372,
+      "full_data_max_dd_pct": 6.232205464354084,
+      "full_data_roi_pct": 8619.504592611633,
+      "full_data_worst_day_dd_pct": 4.9775940431713925,
+      "n_trades": 236
+    }
+  },
+  "recommendation": {
+    "full_data_ann_roi_pct": 41.45008918161797,
+    "full_data_max_dd_pct": 2.51737931112764,
+    "full_data_worst_day_dd_pct": 2.0062853595074253,
+    "recommended_risk_pct": 1.0,
+    "worst_fold_ann_roi_pct": 20.074693592686522,
+    "worst_fold_day_dd_pct": 2.0062853595074386,
+    "worst_fold_max_dd_pct": 2.5173793111276637
+  },
+  "recommendation_rules": {
+    "max_fold_dd_pct": 6.0,
+    "worst_day_dd_pct": 3.0
+  },
+  "risk_levels": [
+    0.005,
+    0.01,
+    0.015,
+    0.02,
+    0.025
+  ],
+  "rng_seed": "n/a (no randomness in re-accounting; fully deterministic)",
+  "starting_balance": 10000.0
+}

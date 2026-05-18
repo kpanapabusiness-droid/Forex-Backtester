@@ -2,14 +2,13 @@
 
 ## Status
 
-- **Current step:** Step 5 WFO complete. Disposition: **ARCHETYPE_DIES_STEP_5**
-- **Verdict (Step 4 endpoint):** STEP_4_COMPLETE_READY_FOR_WFO
-- **Verdict (Step 5 endpoint):** ARCHETYPE_DIES_STEP_5 — both Pipeline E and Pipeline D1 fail §10 ship gates under full-pool deployment economics; admit-only economics pass but full-pool admit rate 70-89% dilutes c1's structural edge with non-c1 trades' negative mean_r. Third arc to confirm Open-22/23/24 cross-arc pattern (Arc 4 RERUN, Arc 5, Arc 8).
-- **Verdict:** none yet (arc still active)
-- **Last updated:** 2026-05-18
-- **Branch:** worktree `claude/magical-zhukovsky-bd69d9` (dispatcher-target merge to `phase/l_arc_8`)
+- **Current step:** CLOSED
+- **Verdict:** HALT_DEPLOYMENT — no §10 ship-gate-passing configuration; c1 archetype logged as cross-arc structural finding for Open-05
+- **Closure date:** 2026-05-18
+- **Closure doc:** `results/l_arc_8/ARC_8_CLOSURE.md`
+- **Branch:** worktree `claude/magical-zhukovsky-bd69d9` (dispatcher to merge into `phase/l_arc_8` per closure §"Recommended next dispatch")
 - **Live doc:** `results/l_arc_8/ARC_8_LIVE.md`
-- **Dispatch:** `cc_dispatch_arc_8.md` (under L_ARC_PROTOCOL v2.3 stack)
+- **Queue state:** removed from Active
 
 ## Arc-open
 
@@ -99,6 +98,9 @@ This session does NOT own: Step 5 WFO dispatch, engine PRs (`scripts/phase_kgl_v
 | 3 | Capturability | **PASS** | 3 units survive: c1 (n=177, SL=4.0×ATR), c3 (n=405, SL=2.0×ATR), agg_c1_c3 (n=582, SL=3.0×ATR); all V-shape recovery; c2 (Early-peak hold) dies on §2 floors |
 | 4 | Extractability | **PASS** | 1 archetype survives: c1 (V-shape recovery, FG-weak) at E+D1; c3 + agg_c1_c3 die per v2.2 §3 (no max-F1 fallback). pre_t_sl_atr_multiplier=4.0 recorded in D1 policy YAML |
 | 5 | WFO | **FAIL** | Pre-checks PASS. Admit-only economics PASS all gates (c1-only OOS: E worst-window ROI +18.66% / DD 1.00%; D1 worst-window ROI +25.73% / DD 0.54%). Full-pool deployment economics FAIL — classifier admits 70-89% of all Step 1 OOS trades (low specificity on non-c1); non-c1 admits with mean_r −0.10 to −0.47 dilute c1's +2.59. Pipeline E full-pool: worst ROI −13.21%, max DD 15.58%, sharpe 0.012 (3/4 gates fail). Pipeline D1 full-pool: worst ROI −14.69%, max DD 19.02%, sharpe 0.001 (3/4 gates fail). **Archetype dies.** |
+| Diag 1 | Entry-feature overlap | `c1_NOT_SEPARABLE_AT_ENTRY` | Multiclass at entry: AUC 0.547, precision@recall=0.60 = 0.149 (vs base rate 0.133, zero lift) |
+| Diag 2 | Path 1 (post-entry t-sweep) | `PATH_1_MARGINAL` | Best t=12: AUC 0.755, precision@recall=0.60 = 0.274 (below 0.40 viable) |
+| Diag 2 | Path 2 (signal-tightening) | `PATH_2_DEAD` | No filter satisfies c1≥0.80 + c2≤0.30 + pool≥500 |
 
 ### Step 1 — Plumbing
 
@@ -633,6 +635,21 @@ Pattern confirmed: Pipeline E and D1 classifiers trained on a single cluster can
 2. Open protocol amendment item: full-pool deployment economics evaluation should run **at Step 4**, not Step 5, so failing arcs are killed before WFO compute spend. See `STEP5_SUMMARY.md §16a` for specific amendment recommendations.
 3. Update `CHANGELOG.md`, `SESSION_ZERO.md`, `STATUS.md`, `PROTOCOL_IMPROVEMENT_BACKLOG.md` with Arc 8 closure — out of executor scope per dispatch §83.
 
+## Closure
+
+**Disposition:** HALT_DEPLOYMENT
+
+Arc 8 found one structurally-viable archetype (c1 V-shape recovery FG-weak, +2.59R/trade admit-only) but failed §10 full-pool ship gates because c1 and c2 share entry-bar geometry. Three post-WFO diagnostics confirmed the failure is structural, not classifier-tunable.
+
+**Cross-arc structural findings logged for v2.4 protocol design:**
+1. **§1.5 entry-separability gate** (proposed) — pre-Step-1 multiclass RF check, halt if winning-cluster precision@recall=0.60 < 0.30 on entry features
+2. **c1 archetype** logged for Open-05 portfolio composition (admit-only Sharpe 1.14–1.44, DD < 1%)
+3. **pullback_depth_atr ≥ 1.0** filter improves aggregate mean_r +68% — signal-design observation
+
+This is the 3rd consecutive arc (4, 5, 8) failing the Open-22/23/24 admit-only-vs-deployment divergence pattern. Framework needs structural amendment, not per-arc patches.
+
+See `ARC_8_CLOSURE.md` for full detail and recommended next dispatch.
+
 ### Commit history (worktree branch, since arc-open)
 
 - `a80972b arc-8 open`
@@ -644,7 +661,10 @@ Pattern confirmed: Pipeline E and D1 classifiers trained on a single cluster can
 - `3db7da0 arc-8 step 5 pre-flight: pre-checks PASS; HALT on engine PR not merged`
 - `3025b35 Merge main into Arc 8 worktree (brings v2.3 §4 engine PR)`
 - `fc674e4 arc-8 live doc: engine PR merged into main locally; Step 5 unblocked`
-- `<this commit> arc-8 step 5 WFO complete — ARCHETYPE_DIES_STEP_5`
+- `07f7019 arc-8 step 5 WFO complete — ARCHETYPE_DIES_STEP_5`
+- `7d9109e arc-8 diagnostic: entry-feature overlap (c1_NOT_SEPARABLE_AT_ENTRY)`
+- `4756c66 arc-8 diagnostic: post-entry confirmation + signal-tightening (path1+path2)`
+- `<this commit> arc-8 closure: HALT_DEPLOYMENT, closure doc landed, live doc flipped to CLOSED`
 
 ## Detailed analysis
 

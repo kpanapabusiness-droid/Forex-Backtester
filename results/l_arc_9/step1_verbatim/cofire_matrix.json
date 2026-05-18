@@ -1,0 +1,33 @@
+{
+  "Arc 10 (DLR)": {
+    "checked_paths": [
+      "results/l_arc_10/step1_verbatim/trades_all.csv",
+      "results/l_arc_10/step1/trades_all.csv",
+      "results/arc_10/step1/trades_all.csv"
+    ],
+    "status": "not landed"
+  },
+  "Arc 11 (SHB)": {
+    "checked_paths": [
+      "results/l_arc_11/step1_verbatim/trades_all.csv",
+      "results/l_arc_11/step1/trades_all.csv",
+      "results/arc_11/step1/trades_all.csv"
+    ],
+    "status": "not landed"
+  },
+  "Arc 8 (PR-HHHL)": {
+    "checked_paths": [
+      "results/l_arc_8/step1_verbatim/trades_all.csv",
+      "results/l_arc_8/step1/trades_all.csv",
+      "results/arc_8/step1/trades_all.csv"
+    ],
+    "status": "not landed"
+  },
+  "KH-24 (kb_exhaustion_bar)": {
+    "arc9_pool": 2153,
+    "exact": 6,
+    "exact_pct_of_arc9": 0.279,
+    "other_pool": 553,
+    "pm1bar": 10
+  }
+}

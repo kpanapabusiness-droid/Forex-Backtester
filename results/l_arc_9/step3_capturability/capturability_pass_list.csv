@@ -1,0 +1,2 @@
+label_archetype_or_cluster,cluster_id,archetype_label,evaluation_mode,selected_SL_atr_mult,pre_t_sl_atr_multiplier,size_fraction,final_r_mean,shape_tag
+cluster_0_individual,0,Unclassified,individual,2,2,0.1695308871,4.42293133,tight_unimodal

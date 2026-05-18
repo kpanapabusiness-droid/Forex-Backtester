@@ -1,0 +1,6 @@
+risk_pct,worst_day_date,worst_day_dd_pct,fold,n_contributing_trades,n_contributing_pairs,contributing_pairs,trade_ids,net_day_pnl_dollars
+0.5,2024-08-06,1.00568397,6,2,2,"GBP_CHF, NZD_USD","1623,1618",-101.6811063
+1,2024-08-06,2.00628536,6,2,2,"GBP_CHF, NZD_USD","1623,1618",-205.0790536
+1.5,2024-08-06,3.001804168,6,2,2,"GBP_CHF, NZD_USD","1623,1618",-310.1932384
+2,2024-08-06,3.992240396,6,2,2,"GBP_CHF, NZD_USD","1623,1618",-417.022891
+2.5,2024-08-06,4.977594043,6,2,2,"GBP_CHF, NZD_USD","1623,1618",-525.5670755

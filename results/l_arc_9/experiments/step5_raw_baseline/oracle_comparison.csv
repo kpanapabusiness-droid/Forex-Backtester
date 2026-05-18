@@ -1,0 +1,8 @@
+metric,raw_baseline,oracle,gap
+worst_fold_annualised_roi_pct,-29.63728258,39.45332919,69.09061177178171
+mean_fold_annualised_roi_pct,6.095390518,61.40018646,55.304795941650816
+worst_fold_max_dd_pct,43.61424253,0.01498670059,-43.599255824494016
+min_trades_per_fold,277,45,-232
+all_folds_positive,0,1,-
+full_data_annualised_roi_pct,0.802270691,60.49601312,59.69374242440924
+full_data_max_dd_pct,62.98560728,0.01498670059,-62.97062058025136

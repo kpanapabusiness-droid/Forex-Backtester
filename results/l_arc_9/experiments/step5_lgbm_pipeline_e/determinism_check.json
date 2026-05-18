@@ -1,0 +1,11 @@
+{
+  "byte_identical": true,
+  "run1": {
+    "candidate_A_thr0.40_per_fold": "73af3a5dee134c07b594f3c5cf556b439a1c868b5bd13aed35745039263d3c9d",
+    "candidate_B_thr0.05_per_fold": "2e90d042e46b230d9adbe2b0231e4178a03e87e39c2107fc707c1f9f6645cac8"
+  },
+  "run2": {
+    "candidate_A_thr0.40_per_fold": "73af3a5dee134c07b594f3c5cf556b439a1c868b5bd13aed35745039263d3c9d",
+    "candidate_B_thr0.05_per_fold": "2e90d042e46b230d9adbe2b0231e4178a03e87e39c2107fc707c1f9f6645cac8"
+  }
+}

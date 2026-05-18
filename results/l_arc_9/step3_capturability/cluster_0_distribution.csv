@@ -1,0 +1,16 @@
+metric,value
+cluster_id,0
+archetype_label,Unclassified
+selected_SL_atr_mult,2.0
+n,365.0
+shape_tag,tight_unimodal
+dip_stat,0.011309827816117021
+dip_p,0.992743659128698
+used_diptest,True
+bimodal_separated_pass,False
+bimodal_detail,{"n": 365, "mean_atr": 13.950313615643836, "std_atr": 6.918386860865883, "cv": 0.49593056123896934, "dip_stat": 0.011309827816117021, "dip_p": 0.992743659128698, "used_diptest": true, "mode_a_atr": 11.151382982532663, "mode_b_atr": 35.04705115155779, "mode_sep_atr": 23.895668169025125, "mass_below_mid": 0.9068493150684932, "mass_above_mid": 0.09315068493150686, "min_mode_mass": 0.09315068493150686, "bimodal_reason": "min_mode_mass<0.20"}
+mass_in_band_0-0.5R,0.0
+mass_in_band_0.5-1R,0.0
+mass_in_band_1-2R,0.0027397260273972603
+mass_in_band_2-5R,0.29041095890410956
+mass_in_band_>5R,0.7068493150684931

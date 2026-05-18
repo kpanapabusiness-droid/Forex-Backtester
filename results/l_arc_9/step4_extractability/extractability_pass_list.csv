@@ -1,0 +1,2 @@
+label,cluster_id,evaluation_mode,n_total,n_pos,sample_ok,e_rf_auc,e_lr_auc,e_status,e_threshold,e_precision,e_recall,d1_chosen_t,d1_rf_auc,d1_exclusion,d1_status,d1_threshold,d1_precision,d1_recall,selected_SL_atr_multiplier,pre_t_sl_atr_multiplier,pipeline_assignment
+cluster_0_individual,0,individual,2153,365,1,0.5114313453,0.5267164982,fail,,,,1,0.6257867133,0.01346957733,fail_threshold_sweep,,,,2,2,dies

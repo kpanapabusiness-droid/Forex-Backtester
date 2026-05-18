@@ -1,0 +1,4 @@
+cluster_id,archetype_label,individual_passes,individual_selected_SL_atr_mult,individual_composite,aggregate_passes,aggregate_selected_SL_atr_mult,aggregate_composite,disposition
+0,Unclassified,1,2,0.6122971688,0,,,individual_only
+1,Early-peak hold,0,,,0,,,dies
+2,Unclassified,0,,,0,,,dies

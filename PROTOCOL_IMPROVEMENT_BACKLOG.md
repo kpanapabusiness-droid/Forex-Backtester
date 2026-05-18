@@ -493,6 +493,60 @@ Three items raised by Arc 6 closure (failed-breakout reversal long, out-of-regis
 
 ---
 
+## Arc 4 rerun + Arc 5 closure items (2026-05-18)
+
+Three items raised by the Arc 4 re-run closure (FAIL Step 6 under p50 floors) plus the Arc 5 closure (SHELVED Step 6 FAIL). Both arcs PASSED §9 admit-only stability and FAILED §10 full-pool deployment. Cross-arc structural finding: Pipeline D1 carries mandatory reject-pool + early-exit-pool cost that §9's admit-only framing cannot see. Numbering continues the Open-NN sequence (Open-21 was the last assigned).
+
+### Open-22 — Full-pool gate at §9 or earlier (HIGH)
+
+- **Description.** §9 currently evaluates admit-only stability. Arc 4 and Arc 5 both PASS §9 and FAIL §10 full-pool deployment. The protocol burns Steps 1-5 of compute and analyst time on arcs whose architectural failure mode is invisible until Step 6.
+
+    Candidate amendments:
+    - Add a full-pool variant to §9 (require both admit-only AND full-pool sign-consistency to advance)
+    - Add a Step 4 full-pool preview (admit/reject/early-exit decomposition with expectancy estimate at the classifier-locking gate)
+    - Restructure §9 + §10 sequencing so the deployment-blocking metric is the primary stability gate
+    - Pre-Step 6 admit/reject/early-exit expectancy summary as standardised Step 4 output
+
+    Decision belongs in cross-arc calibration session. Quantitative inputs available from Arc 4 + Arc 5 step6 artefacts.
+
+- **Surface arc.** Arc 4 rerun (2026-05-18) + Arc 5 closure (recent).
+- **Owner.** Cross-arc calibration session.
+- **Status.** OPEN.
+
+### Open-23 — §8 Pipeline D1 cost-language correction (MEDIUM)
+
+- **Description.** §8 describes Pipeline D1 reject pool as "near-break-even small loss after spread, given the short hold and pre-t SL." Empirical evidence from Arc 4 + Arc 5:
+
+    | Arc | Reject mean R | Reject % of signals | Early-exit mean R | Early-exit % |
+    |---|---:|---:|---:|---:|
+    | Arc 4 cluster 1 | −0.232 | 32.2% | −0.685 | 10.6% |
+    | Arc 5 (per closure) | ~−0.46 | ~78% (Arc 5 specific) | — | — |
+
+    §8 wording understates reject-pool cost. Empirically the reject pool costs ~−0.15 to −0.46R per trade depending on classifier discrimination strength, and the early-exit pool (pre-t SL hits before t=1) is a separate architectural cost at ~−0.45 to −0.69R on ~10-15% of signals.
+
+    Proposed amendment: update §8 description to specify empirical cost ranges and mandate full-pool reporting at Step 4-6 evaluation.
+
+- **Surface arc.** Arc 4 rerun + Arc 5 closure.
+- **Owner.** Cross-arc calibration session.
+- **Status.** OPEN.
+
+### Open-24 — Early-exit pool architectural cost (MEDIUM)
+
+- **Description.** Pre-t SL of 2×ATR (§8 Pipeline D1 default) fires on 10-15% of signals before the classifier evaluates at bar t. This is pure architectural cost — not classifier-induced, not exit-policy-induced. The classifier cannot filter these trades and the bail-out doesn't apply. Arc 4 cluster 1 saw 1,005 / 9,474 signals (10.6%) hit pre-t SL at −0.685R mean.
+
+    Candidate structural responses:
+    - Widen uniform pre-t SL (reduces early-exit rate; increases per-event loss)
+    - Shorten t (less time for SL to fire; smaller classifier feature set)
+    - Hybrid: per-archetype pre-t SL calibrated to early-exit rate observed at Step 1
+
+    Currently §8 uses uniform 2×ATR as a pre-amendment default matching KH-24 baseline. Per-archetype calibration may be justified by empirical data from Arc 4 + Arc 5.
+
+- **Surface arc.** Arc 4 rerun.
+- **Owner.** Cross-arc calibration session.
+- **Status.** OPEN.
+
+---
+
 ## Cross-cutting observations
 
 ### Two arcs (KH-24 v2.0, Arc 2 redo, Arc 3) all close FAIL at Step 3 §2 floors

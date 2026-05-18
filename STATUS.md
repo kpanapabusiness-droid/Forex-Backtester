@@ -2,7 +2,7 @@
 
 > Tight current-state snapshot. For full context, read `SESSION_ZERO.md` first.
 > For methodology, read `L_ARC_PROTOCOL.md` (v2.1.2, self-contained).
-> Last updated: 2026-05-17 — Arc 4 closed CLEAN-NULL on transaction-cost truth; `configs/spread_floors_5ers.yaml` replaced 2026-05-17 with per-pair p50 values from HistData 2024-2025 audit (calibration-curated; generator script retired). Arc work unblocked. KH-24 live deployment unchanged; WFO claim downgraded to pass-viable retroactively. Backtester extension closed (PR #131 + #135 + #138 merged). Arc 6 closed DIES at Step 4 deployability.
+> Last updated: 2026-05-18 — Arc 4 RE-RUN under p50 spread floors closed FAIL Step 6 (§10 full-pool deployment fails on every gate; admit-only edge swamped by reject + early-exit pool drag, same structural pattern as Arc 5). Prior CLEAN-NULL closure (cost-model) superseded by full architectural finding. KH-24 live deployment unchanged. See `docs/arc_results/ARC_4_RERUN_RESULT.md`.
 
 ---
 
@@ -12,7 +12,7 @@
 - Calibration anchor: KH-24 K=4 archetype 3 — v2.0 values; deployed-pop reference held (no refresh from Open-18 replays per user decision; v2.1.2 anchor preservation verified — centroid still routes to Stepwise under 5-50 local_peaks range)
 - Next engine PR: none currently planned. Backtester extension complete: PR #131 (D1 plumbing), PR #135 (D1 PR 2 Stepwise climber policy + per-fold classifiers), PR #138 (engine generalisation: signal adapter + TF pluggability + time-exit + spread floor). §11 rows 1, 3, 4, 5, 6, 7 exit policies deferred until an arc surfaces a Step-4 consumer needing them.
 - **UNBLOCKED 2026-05-17:** `configs/spread_floors_5ers.yaml` replaced with per-pair p50 values from HistData 2024-2025 audit. See `docs/calibration_decisions/SPREAD_FLOOR_CALIBRATION_DECISION_2026-05-17.md` (decision rationale, §3–§4 for the p50-over-p10 override) and `docs/SPREAD_FLOOR_AUDIT_FINDING.md` RESOLVED section.
-- Next chat task: Open-18 replays under new floor; then Arc 5. Cross-arc calibration session for Open-21 (Step 4 deployability gate) + Open-17 expansion (Tiebreak 1 noise floor) queued.
+- Next chat task: cross-arc calibration session for Open-22/23/24 (Pipeline D1 full-pool gating); then Arc 6+ under updated framework.
 
 ---
 
@@ -35,7 +35,7 @@
 
 **Anchor preservation:** KH-24 K=4 archetype 3 centroid (mono 0.576, local_peaks 14.19, pullback 0.020, ttp_rel 0.847) routes to Stepwise climber under both old [5,30] and new [5,50] ranges; bimodal shape_tag passes `≠ scattered`. No routing change.
 
-**Arc 4 closed CLEAN-NULL 2026-05-17.** Signal had real edge through Step 5 under modeled spreads; real-spread reconciliation (HistData audit) showed cost model under-modeled spreads by 3-48x per pair, killing F6 worst-fold sign consistency on Arc 4 cluster 1. Spread floor replacement is now the priority blocker for Arc 5+ work. Open-18 replays also blocked. KH-24 live deployment unchanged; WFO claim downgraded to pass-viable retroactively. See `docs/arc_results/ARC_4_RESULT.md` and `docs/SPREAD_FLOOR_AUDIT_FINDING.md`.
+**Arc 4 closed FAIL Step 6 2026-05-18 (rerun under p50 floors).** Re-run regenerated trade pool with corrected per-pair p50 spread floors; admit-pool edge survives (+0.125R per trade, §9 admit-only PASS), but full-pool deployment reckoning (§10) FAILS on every gate. Reject pool (32% of signals, −0.232R mean) plus early-exit pool (11% of signals, −0.685R mean) drag the strategy to −0.076R per signal, producing 76.98% full-data DD over F2-F7 and a 5ers account-closure event on one day. Second Pipeline D1 arc after Arc 5 to PASS §9 admit-only and FAIL §10 full-pool — cross-arc structural finding. Three open protocol items spawned: Open-22 (full-pool gate at §9 or earlier), Open-23 (§8 D1 cost-language correction), Open-24 (early-exit pool architectural cost). See `docs/arc_results/ARC_4_RERUN_RESULT.md` and `PROTOCOL_IMPROVEMENT_BACKLOG.md`.
 
 ---
 

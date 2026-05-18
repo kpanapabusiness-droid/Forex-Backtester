@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-05-18 — Arc 4 RE-RUN closed FAIL Step 6 under p50 floors
+
+- Re-ran Arc 4 from Step 1 under corrected per-pair p50 spread floors (calibration applied 2026-05-17)
+- Phase 5 §9 admit-only stability: PASS
+- Phase 6 §10 full-pool deployment: FAIL (worst-fold ann ROI −55%, full-data ROI −77%, full-data DD 77%, 5ers daily DD breach)
+- Prior CLEAN-NULL closure (cost-model framing) superseded by Step 6 FAIL (architectural framing)
+- Cross-arc structural finding: Pipeline D1 with honest classifier (AUC ~0.65-0.70) incurs reject-pool + early-exit-pool drag that swamps admit-pool edge. Second consecutive arc (Arc 4 + Arc 5) demonstrates pattern.
+- New step6 wrapper `scripts/l_arc_4/step6_wfo.py` adapted from Arc 5's `step6_wfo_truth.py`
+- New result doc `docs/arc_results/ARC_4_RERUN_RESULT.md`
+- Three open protocol items spawned (Open-22/23/24) — see PROTOCOL_IMPROVEMENT_BACKLOG.md
+- KH-24 live deployment unaffected; floor file confirmed not loaded by KH-24 (static analysis)
+
 ## ARC 4 CLOSED | 2026-05-17 | CLEAN-NULL ON TRANSACTION-COST TRUTH
 
 ### Added

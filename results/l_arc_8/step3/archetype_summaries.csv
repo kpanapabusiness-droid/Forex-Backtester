@@ -1,0 +1,5 @@
+unit_id,type,constituent_clusters,n,size_fraction,tentative_label,final_archetype_label,selected_SL_atr_mult,selected_R_atr,composite_at_selected_sl,mono_pre_peak,frac_reach_1R,frac_reach_2R,frac_wrong_way_pre_peak,fwd_mfe_h240_p50,shape_tag,bimodal_separated_pass,pct_peak_and_collapse,gate_status,kill_criteria
+c2,cluster,c2,429,0.3232856066,tentative_Early-peak hold OR Peak-and-collapse,Early-peak hold,,,,0.01534576535,0.02331002331,0,0.09324009324,0.1707754489,unclassified,0,0.02331002331,FAIL,mono_pre_peak 0.0153 < 0.55;fwd_mfe_p50 0.1708R < 1.5R;frac_reach_1R 0.0233 < 0.7
+c1,cluster,c1,177,0.133383572,tentative_V-shape recovery,V-shape recovery (forward-geometry weak),4,4,0.6146305951,0.5646305951,1,0.9265536723,0,3.499915434,unclassified,0,0.1920903955,PASS,
+c3,cluster,c3,405,0.3051996986,tentative_V-shape recovery,V-shape recovery,2,2,0.4606404752,0.5736034382,0.8419753086,0.5530864198,0.004938271605,2.249153486,unclassified,0,0.7283950617,PASS,
+agg_c1_c3,aggregate,c1+c3,582,0.4385832705,tentative_V-shape recovery,V-shape recovery,3,3,0.4313807597,0.56694777,0.8161512027,0.5756013746,0.001718213058,2.473902262,unclassified,0,0.4364261168,PASS,

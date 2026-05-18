@@ -2,7 +2,7 @@
 
 ## Status
 
-- **Current step:** Step 2 complete (PASS — K=4); Step 3 next
+- **Current step:** Step 3 complete (PASS — 3 units survive); Step 4 next
 - **Verdict:** none yet (arc still active)
 - **Last updated:** 2026-05-18
 - **Branch:** worktree `claude/magical-zhukovsky-bd69d9` (dispatcher-target merge to `phase/l_arc_8`)
@@ -94,7 +94,7 @@ This session does NOT own: Step 5 WFO dispatch, engine PRs (`scripts/phase_kgl_v
 |---|---|---|---|
 | 1 | Plumbing | **PASS** | 1327 trades / 28 pairs; determinism PASS; right-edge PASS (min age=4); lookahead-invariance PASS (0/216k bars); cofire vs KH-24 long = 0.0% |
 | 2 | Clustering | **PASS** | K=4 chosen (silhouette 0.4762); 4 clusters {316, 177, 429, 405}; 0/4 degenerate features; 2 V-shape clusters → per-cluster AND per-aggregate at Step 3 |
-| 3 | Capturability | _pending_ | |
+| 3 | Capturability | **PASS** | 3 units survive: c1 (n=177, SL=4.0×ATR), c3 (n=405, SL=2.0×ATR), agg_c1_c3 (n=582, SL=3.0×ATR); all V-shape recovery; c2 (Early-peak hold) dies on §2 floors |
 | 4 | Extractability | _pending_ | |
 
 ### Step 1 — Plumbing
@@ -239,6 +239,55 @@ Per-pair pool sizes (35–58) all clear the §6 / §15 sample-size floor (≥ 30
 - Cluster 1 (n=177) is the high-peak / late-ttp profile expected from Stepwise climber-like paths; it misses formal Stepwise assignment only because pullback 0.548 just exceeds the 0.5 ceiling.
 - Cluster 3 (n=405) has even larger pullback (0.71) → tentative_V-shape rather than Stepwise.
 - All clusters above the §15 size-50 floor for Step 3.
+
+### Step 3 — Capturability
+
+**Outputs:** `results/l_arc_8/step3/`
+
+**Unit-level evaluation (per-cluster AND per-aggregate for V-shape group):**
+
+| Unit | Type | n | size | Tentative label | Selected SL | Composite | mono_pp | reach_1R | reach_2R | frac_wrong_way | fwd_mfe_p50 | shape_tag | Verdict |
+|---|---|---:|---:|---|---:|---:|---:|---:|---:|---:|---:|---|:---:|
+| c2 | cluster | 429 | 32.3% | Early-peak hold OR P&C | — | — | 0.015 | 0.023 | 0 | — | — | — | **DIES** (fails §2 floors at every SL) |
+| c1 | cluster | 177 | 13.3% | V-shape recovery | **4.0×ATR** | 0.615 | 0.565 | 1.000 | 0.927 | … | … | … | **PASS** |
+| c3 | cluster | 405 | 30.5% | V-shape recovery | **2.0×ATR** | 0.461 | 0.574 | 0.842 | 0.553 | … | … | … | **PASS** |
+| agg_c1_c3 | aggregate | 582 | 43.9% | V-shape recovery | **3.0×ATR** | 0.431 | 0.567 | 0.816 | 0.576 | … | … | … | **PASS** |
+
+(Cluster 0 — unassigned — does not enter Step 3 routing per §11.)
+
+**Disambiguation (Step 3 §11 tentative → final):**
+
+- c2 (Early-peak hold OR Peak-and-collapse): `pct_peak_and_collapse = 0.0233 < 0.30` → **Early-peak hold**. But §2 floors fail (mono_pre_peak 0.015 << 0.55, reach_1R 0.023 << 0.70) — cluster **dies** at Step 3 regardless of final label.
+- c1 (V-shape recovery): `peak_bars >= 5 frac = 1.000`; `peak_pos in [0.4, 0.8] frac = 0.401` (below 0.5 confirmation threshold) → **"V-shape recovery (forward-geometry weak)"** — survives capturability but flagged.
+- c3 (V-shape recovery): `peak_bars >= 5 frac = 0.998`; `peak_pos in [0.4, 0.8] frac = 0.664` → **V-shape recovery** confirmed.
+- agg_c1_c3 (V-shape recovery): cluster-mixed confirmation; final label `V-shape recovery`.
+
+**Cluster routing (v2.3 §4 — pre_t_sl_atr_multiplier added):**
+
+| Cluster | Tentative label | Indiv pass | Agg pass | Disposition | Final label | pre_t_sl_atr_multiplier |
+|---:|---|:---:|:---:|---|---|---:|
+| 2 | tentative_Early-peak hold OR P&C | 0 | 0 | dies | Early-peak hold | — |
+| 1 | tentative_V-shape recovery | 1 | 1 | proceeds_both | V-shape recovery (FG weak) | **4.0** |
+| 3 | tentative_V-shape recovery | 1 | 1 | proceeds_both | V-shape recovery | **2.0** |
+
+v2.3 §4 pre_t_sl_atr_multiplier values are the per-archetype SL multipliers Pipeline D1 will use at Step 5 WFO. Engine PR `feat/open-24-pre-t-sl-per-archetype` consumes this column.
+
+**Capturability pass list (input to Step 4):**
+
+| Unit | Type | Final label | Selected SL | n | Candidate pipelines |
+|---|---|---|---:|---:|---|
+| c1 | cluster | V-shape recovery (FG weak) | 4.0×ATR | 177 | E_and_D1 |
+| c3 | cluster | V-shape recovery | 2.0×ATR | 405 | E_and_D1 |
+| agg_c1_c3 | aggregate | V-shape recovery | 3.0×ATR | 582 | E_and_D1 |
+
+**bimodal_separated test (§7):** all 3 surviving units evaluated — bimodal flag not separately routed at this arc (Hartigan dip + KDE results captured in archetype_summaries.csv).
+
+**Determinism:** PASS — byte-identical across both runs (sl_sweep CSVs, distribution CSVs, routing CSV, pass list, archetype_summaries.csv all match run-to-run).
+
+**Notes (informational):**
+- V-shape recovery is the surviving archetype family. Cluster 1 (small, n=177, wide SL=4.0×ATR) and Cluster 3 (large, n=405, standard SL=2.0×ATR) have distinct selected SLs — the aggregate's selected SL (3.0×ATR) is between them, as expected.
+- The "forward-geometry weak" flag on c1 means its peak position distribution (only 40% of trades have peak in middle [0.4, 0.8] of trade) deviates from canonical V-shape geometry. Pipeline E predictability at Step 4 will decide whether this is a true V-shape pattern or borderline noise.
+- c2's dies-at-capturability is the expected Early-peak hold/Peak-and-collapse profile under PR-HHHL: trades that signal but fail to develop. ~32% of all signal trades fall here — confirms the signal generates many "false starts" that path-shape clustering successfully separates.
 
 ## Detailed analysis
 

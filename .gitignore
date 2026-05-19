@@ -14,8 +14,13 @@ __pycache__/
 .envrc
 
 # Data & caches
-data/
+# Use data/* (not data/) so per-directory re-includes below can negate it;
+# git refuses to recurse into a wholly-excluded directory, so `data/` would
+# block re-includes for subdirectories like data/histdata/ that contain
+# text artefacts we want to track.
+data/*
 !data/test/
+!data/histdata/
 data_raw/
 cache/
 Cache/
@@ -142,3 +147,15 @@ __pycache__/
 # Live bridge (Phase 7)
 live_feed/
 live_out/
+
+# HistData foundation — track text artefacts (manifests, gap reports, logs,
+# download_intent.md); the raw tick zips and derived M1 CSVs stay local only.
+# See docs/DATA_FOUNDATION.md for the source-of-truth contract.
+# `data/*` + `!data/histdata/` above re-include the directory; the rules below
+# selectively re-exclude binary artefacts and re-include text artefacts.
+!data/histdata/**
+data/histdata/**/*.zip
+data/histdata/**/*.csv
+data/histdata/**/*.reason.txt
+data/histdata/manifest.json.tmp
+data/histdata/manifest.json.corrupt

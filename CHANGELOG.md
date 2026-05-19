@@ -85,6 +85,80 @@ Arc 8 (PR-HHHL long, `signal_pullback_resume_hhhl_long_v0.1`) closed HALT_DEPLOY
 - Closure doc: `results/l_arc_11/ARC_11_CLOSURE.md`
 - No queue / registry / protocol mutation during experimental work
 
+## ARC 10 CLOSED | 2026-05-18 | STEP_4_HALT (with post-closure research) | meta-docs aligned 2026-05-19
+
+Arc 10 (D1 swing-low rejection long — DLR, `signal_spec_d1_swing_low_rejection_long_v0.1.md`) opened and closed under the active v2.3 protocol on `claude/charming-mcnulty-8160e0` (worktree). First arc to run end-to-end under v2.2 + v2.3 amendments. Disposition `STEP_4_HALT` per §16a Path A; post-closure experimentation + WFO pair conducted as research probes over §16a at chat-side direction. Disposition unchanged.
+
+### Pipeline trail
+
+- **Step 1 PASS** (`362a085`) — 802 trades, 28 pairs, 2020-10-01 → 2026-01-31; deterministic byte-identical; 5/5 lookahead audit; 3/3 D1-lag NaN-perturbation; right-edge swing audit + L_1 freshness PASS; KH-24 co-fire 0%.
+- **Steps 2-3 PASS** (`f39dcd9`) — K=3 silhouette 0.4525 (tied set [3,4,5,7] within 0.01; smaller K preferred per Open-12); 0/4 degenerate; c1 V-shape recovery survives §2 at SL=3.0×ATR, composite 0.4934, mono_pp 0.557, reach_1R 0.886, wrong_way_pp 0.000, fwd_mfe_p50 3.08R, shape_tag `unclassified`.
+- **Step 4 HALT** (`994f642`) — c1 E mean AUC 0.6296 (margin −0.0204); D1 mean AUC 0.5897 (margin −0.0103). Disjunctive §8 fails on near-miss; §16a Path A compound reading applied (single compound §8 gate fails, both numeric margins < 0.03, cohort size_fraction 0.284 ≥ 0.10). Compound-vs-strict ambiguity documented in closure; v2.4 cycle is the natural place to formalise.
+
+### Post-closure research (over §16a, chat-direction)
+
+- **Experimentation pass EXP-01..06 complete** (`73ba1f0`).
+  - EXP-01: bootstrap (n=2000) on OOF (p, y) — E 95% CI [0.523, 0.684]; D1 95% CI [0.503, 0.663]; joint P(either clears) = 40.5%. Both pipelines straddle thresholds.
+  - EXP-02: HTF feature ablation — total HTF lift +0.024 over generic baseline; `L1_minus_L0_atr` (D1 HL slope) carries 116% of LOO drop on Arc 10.
+  - EXP-03: threshold scan — triple-pass for Arc 6/7/10 requires E ≥ 0.536 (binding: Arc 7 agg); 0 documented FP across arc history at any relaxed threshold.
+  - EXP-04: Q2 2022 fold regime characterisation — no entry-time descriptor places fold 2 ≥ 1.5σ from cohort mean. Drop unexplained.
+  - EXP-05: cross-arc V-shape pool (Arc 7 c3 + Arc 10 c1) — pool n=593, AUC 0.6348 (gap −0.015 to 0.65); +0.029 over Arc 10 alone, +0.140 over Arc 7. Closest to gate in any experiment.
+  - EXP-06: Open-04 probes (D1 Kijun distance, session dummies) — both negative on Arc 10 alone. Informational only.
+- **WFO pair complete** (`07e41c1`) — experimental Step 5 base + oracle c1 over §16a HALT.
+  - Base (n=802, no cluster knowledge): Sharpe annualised −1.29; expectancy 0.40R; n_admit 1.4/fold (4/8 folds admit zero).
+  - Oracle c1 (n=228, cluster-ID lookahead permitted at entry): Sharpe annualised 4.61 (95% CI [3.13, 6.09]); expectancy 1.55R; n_admit 3.9/fold; max DD 0.50% (lower than base).
+  - Gap: +5.90 Sharpe (vs material threshold +0.30 — PASS); +602% Calmar relative (vs +50% — PASS). Synthesis recommendation: BUILD clusterifier with explicit DO NOT DEPLOY notice. Caveat: oracle is upper bound; EXP-01 says P(realisable AUC ≥ 0.65) = 12.5% — realised lift will be fraction of oracle gap.
+
+### Closure relocation
+
+- **Closure doc finalised at `docs/arc_results/ARC_10_RESULT.md`** (`0f89986`, 2026-05-19) per L_ARC_PROTOCOL §13 / Arc 5+ convention. LIVE doc retired. Original closure at `994f642` superseded by updated version reflecting post-closure research.
+- **Meta-doc alignment pass** (this commit, 2026-05-19) — CHANGELOG, CLAUDE.md, SESSION_ZERO, STATUS, PROTOCOL_IMPROVEMENT_BACKLOG brought into alignment with closure.
+
+### Material corrections
+
+1. **Arc 6 archetype.** Previously classified as the third V-shape near-miss (Arc 6 / Arc 7 / Arc 10). Per EXP-05 reclassification, Arc 6 is **Stepwise climber, not V-shape** (its own closure doc was Stepwise; the V-shape mislabel propagated through Arc 10 closure narrative). Two genuine V-shape near-misses on record: Arc 7 and Arc 10. Open-06 threshold-relaxation case weakened — clean V-shape pair (Arc 7 + Arc 10) requires deeper relaxation (binding at ~0.536 via Arc 7) than the Arc 6+10 pair that mixes archetypes.
+2. **Arc 10 fold-2 date.** Original closure stated Q2 2022; EXP-04 confirmed actual window is **2023-07-13 → 2024-06-05**. Closure narrative corrected. No protocol implication (v2.3 §1 removed Step 5 cross-fold stability — fold-level regime gating not in scope).
+
+### Cross-arc structural finding
+
+V-shape recovery is the second cohort to demonstrate "structurally capturable, marginally extractable on entry-time-only features" pattern (Arc 7 c1/c3, Arc 10 c1). Pooled across arcs the gap closes (EXP-05 0.6348 vs 0.65); oracle WFO shows real OOS edge exists if cluster ID is known at entry. Cross-arc V-shape archetype now the leading candidate for v2.4 cycle (rank #2 next dispatch: cross-arc clusterifier build).
+
+### Open-question status changes
+
+- **Open-06 (AUC threshold recalibration):** WEAKENED. Original three V-shape data points (Arc 6, 7, 10) now two (Arc 7, 10). Reassess in v2.4.
+- **Open-04 (external-feature commission):** DEFERRED. EXP-06 single-arc probe inconclusive; needs Arc 8/9/11 reproduction.
+
+### New backlog items
+
+- §16a Path A disjunctive-gate ambiguity (compound vs strict reading) — formalise in v2.4.
+- Reverse FE methodology framework formalisation.
+- Within-cluster heterogeneity probing (V-shape sub-clustering) as Step 2 extension candidate.
+- Q2-2022 misattribution audit across all closure docs.
+- Filter-path validation regime — define acceptance criteria (post-filter P&L, not AUC) before any filter-path probe.
+
+### Recommended next dispatches (in rank order)
+
+1. Reverse-FE diagnostic (c1-vs-rest distributional comparison + SHAP/permutation importance) — routes everything downstream.
+2. Cross-arc clusterifier build (Arc 7 c3 + Arc 10 c1; `L1_minus_L0_atr` mandatory in catalog).
+3. Filter-path probe (hand-engineered conditions, post-filter trade-set P&L validation).
+4. v2.4 calibration packet bundling EXP-01..06 + WFO pair + corrections.
+
+### Files
+
+- `results/l_arc_10/` — step1_verbatim, step2, step3, step4 + experiments + wfo_base + wfo_oracle_c1 + wfo_pair_synthesis.md
+- `docs/arc_results/ARC_10_RESULT.md` — closure (final location per Arc 5+ convention)
+- `scripts/l_arc_10/` — step1-4 + experiments + wfo subfolders
+- `signals/lchar_dlr_long.py` — DLR signal module
+- `configs/wfo_l_arc_10.yaml`, `configs/l_arc_10/{step2,step3,step4}.yaml`
+
+### Anchor preservation
+
+KH-24 K=4 archetype 3 untouched. Live deployment unaffected. `results/ARC_QUEUE.md` not modified at any Arc 10 commit (parallel CC session running Arcs 8/9/11 retains queue ownership).
+
+### Commits
+
+`362a085` (step 1) → `f39dcd9` (steps 2-3) → `994f642` (step 4 HALT) → `73ba1f0` (experiments) → `07e41c1` (WFO pair) → `0f89986` (closure relocation) → (this commit, meta-docs alignment).
+
 ## L_ARC_PROTOCOL v2.3 AMENDMENT | 2026-05-18 | doc-only
 
 Step 5 cross-fold stability (§9) removed; Step 6 WFO (§10) renumbered as Step 5. Open-22 closed by structural removal; Open-23 closed by D1 cost-language documentation; Open-24 closed in protocol with engine PR pending. SHELVED informal register at SHELVED_ARCS.md.

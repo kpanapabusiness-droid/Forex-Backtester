@@ -1,0 +1,9 @@
+# Arc 10 Step 1 — lookahead spot-check (5/5 audit)
+
+PASS: NZD_CHF @ 2020-10-07 04:00:00 full=True truncated=True
+PASS: GBP_JPY @ 2022-01-14 04:00:00 full=True truncated=True
+PASS: USD_CHF @ 2023-06-15 04:00:00 full=True truncated=True
+PASS: GBP_CHF @ 2024-11-01 08:00:00 full=True truncated=True
+PASS: EUR_CHF @ 2025-12-31 16:00:00 full=True truncated=True
+
+Overall: PASS (5/5)

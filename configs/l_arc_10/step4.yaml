@@ -1,0 +1,78 @@
+# Arc 10 — Step 4 extractability config
+# (L_ARC_PROTOCOL v2.3, §§8, 10, 17 inherited from v2.1.2 base;
+# v2.2 §3 no max-F1 fallback applies).
+#
+# Per-unit (cluster): Pipeline E (4H entry-time) and Pipeline D1 (deferred-id)
+# classifiers. Success label = final_r >= 1R at the unit's selected SL.
+# TimeSeriesSplit CV ordered by entry_time. RF (n_estimators=200,
+# max_depth=8, random_state=42, n_jobs=1 for determinism). Threshold t sweep
+# {0.40, 0.50, 0.60, 0.70} (§8); select max precision with recall >= 0.60.
+# v2.2 §3: NO max-F1 fallback — archetype dies if no threshold meets recall.
+
+phase: L_ARC_10_STEP_4_EXTRACTABILITY
+
+input:
+  step1_dir: results/l_arc_10/step1_verbatim
+  trades_csv: trades_all.csv
+  paths_csv: trades_paths.csv
+  step2_dir: results/l_arc_10/step2
+  clusters_csv: clusters_K3.csv
+  step3_dir: results/l_arc_10/step3
+  pass_list_csv: capturability_pass_list.csv
+
+output:
+  results_dir: results/l_arc_10/step4
+  summary_md: STEP4_SUMMARY.md
+  determinism_check: true
+
+# Surviving units from Step 3 (mirror; do not regenerate).
+units:
+  - unit_id: c1
+    type: cluster
+    cluster_ids: [1]
+    selected_sl_atr_mult: 3
+
+# SL re-imposition (matches Step 3).
+original_sl_atr_mult: 2.0
+
+# §8 gate thresholds.
+gates:
+  pipeline_e_auc_min: 0.65
+  pipeline_d1_auc_min: 0.60
+
+# Threshold sweep — protocol §8 sweep is {0.40, 0.50, 0.60, 0.70}.
+threshold_sweep:
+  t_min: 0.40
+  t_max: 0.70
+  t_step: 0.10
+  exclusion_max: 0.30
+
+# Classifier (deterministic).
+model:
+  type: random_forest
+  n_estimators: 200
+  max_depth: 8
+  random_state: 42
+  n_jobs: 1
+  class_weight_balanced_threshold: 0.30
+
+# Cross-validation.
+cv:
+  type: time_series_split
+  n_splits: 5
+  order_by: entry_time
+
+# Permutation importance.
+permutation_importance:
+  n_repeats: 5
+  random_state: 42
+
+# Data paths for D1 + 4H raw bars (absolute paths for worktree).
+data:
+  dir_4h: "C:/Users/panap/Documents/Forex-Backtester/data/4hr"
+  dir_d1: "C:/Users/panap/Documents/Forex-Backtester/data/daily"
+
+# D1 lag audit.
+d1_lag_audit:
+  n_random_trades_per_unit: 5
+  random_seed: 42

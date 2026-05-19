@@ -1,0 +1,2 @@
+reference,n_arc10,n_reference,overlap_count,overlap_pct,expected_overlap_max_pct,flag,note
+KH-24,802,553,0,0.0,10.0,OK,"bearish single-bar exhaustion + D1 regime filter vs DLR bullish rejection at D1 swing-low (direction-opposite, low overlap expected)"

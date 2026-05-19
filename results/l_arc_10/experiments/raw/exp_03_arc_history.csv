@@ -1,0 +1,10 @@
+arc,cohort,archetype,n,e_auc,d1_auc,downstream_outcome,notes
+KH-24,K=4 arch 3,Stepwise climber,n/a,0.642,0.638,DEPLOYED,calibration anchor; passes D1 by 0.038 margin
+Arc 6,c0,Stepwise climber,334,0.6,0.62,DEPLOYABILITY_FAIL_recall_collapse,best E AUC across A/B/C steps; D1 passes mechanically but recall < 0.60 at all thresholds
+Arc 6,c2,Stepwise climber,242,0.59,0.711,DEPLOYABILITY_FAIL_recall_collapse,D1 AUC 0.711 at t=10 — strongest D1 signal in arc history; admission 0.4% though
+Arc 7,c1,V-shape recovery (weak),185,0.484,0.42,CLEAN_NULL_step4,both pipelines well below threshold
+Arc 7,c3,V-shape recovery,365,0.512,0.518,CLEAN_NULL_step4,largest single V-shape cohort in arc history
+Arc 7,agg_c1_c3,V-shape recovery (aggregate),550,0.536,0.496,CLEAN_NULL_step4,aggregation stabilises std (0.029) but no AUC lift over c3
+Arc 10,c1,V-shape recovery,228,0.6296,0.5897,HALT_step4_near_miss,this arc; both pipelines near-miss <0.03
+Arc 4 RERUN,(per closure),Pipeline D1 archetype,n/a,0.55,0.65,STEP6_FAIL_full_pool_DD_76.98pct,"passed admit-only stability, failed full-pool deployment economics"
+Arc 5,(per closure),Pipeline D1 archetype,n/a,n/a,0.62,STEP6_KILL_Pipeline_D1_negative_expectancy,same admit-only-pass / full-pool-fail pattern as Arc 4 RERUN

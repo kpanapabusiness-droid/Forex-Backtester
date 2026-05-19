@@ -1,0 +1,4 @@
+cluster_id,tentative_label,individual_pass,aggregate_pass,disposition,final_archetype_label,notes
+0,tentative_Early-peak hold OR Peak-and-collapse,0,0,dies,Early-peak hold,pct_peak_and_collapse 0.0188 < 0.30
+1,tentative_V-shape recovery,1,0,proceeds_as_individual,V-shape recovery,"peak_bars>=5 frac=1.000; peak_pos in [0.4,0.8] frac=0.535"
+2,unassigned,0,0,dies,unassigned,no disambiguation rule for label

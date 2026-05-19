@@ -1,0 +1,150 @@
+# Arc 9 Candidate A — Canonical exit policy + risk parameters
+# ============================================================================
+# Single source of truth for the §11 archetype exit policy applied to admitted
+# Candidate A trades, plus per-trade risk sizing.
+#
+# Python (Phase 1 + Dispatch 3 admit-set parity) reads this; MQL5 (future
+# Dispatch 2/3 EA) reads this.
+#
+# Archetype routing source: this cohort's centroid was flagged "Unclassified" by
+# automatic §11 pattern matching at Step 3 (boundary case — 3 of 4 §11 Stepwise
+# climber criteria match; pullback 0.580 fails the 0.5 ceiling by 0.08). The
+# Step 5 oracle dispatch routed it to the §11 Stepwise climber Pipeline E exit
+# and the dispatcher accepted that routing (PASS-DEPLOYABLE oracle result).
+# Step 5 LGBM Pipeline E and Candidate A re-use the same routing via direct
+# re-use of step5_validation._resimulate_trade.
+#
+# §11 verbatim row this policy implements (L_ARC_PROTOCOL.md:600):
+#   | Centroid pattern                                       | Archetype label | SL prior | Exit (Pipeline E)                            | Exit (Pipeline D1, at bar N) |
+#   | monotonicity >= 0.50, local_peaks 5-50, pullback <= 0.5R, time_to_peak_rel >= 0.50 | Stepwise climber | 1.3R | MFE-lock at 1R, trail 0.75R from new high | MFE-lock at 1R, trail 0.75R |
+#
+# This policy uses the Pipeline E column (entry-time admission).
+#
+# Reference implementation:
+#   scripts/l_arc_9/experiments/step5_validation.py:88-97  (constants)
+#   scripts/l_arc_9/experiments/step5_validation.py:191-345 (_resimulate_trade)
+# ============================================================================
+schema_version: 1
+
+archetype:
+  label: cluster_0_individual
+  automatic_match: Unclassified         # §11 pattern-matcher result at Step 3
+  routed_to: Stepwise climber           # via Step 5 oracle dispatcher decision
+  routing_basis: |
+    Boundary cluster: 3 of 4 §11 Stepwise climber criteria match
+    (monotonicity 0.534 >= 0.50; local_peaks 31.44 in [5, 50] post-v2.x
+    ceiling extension; time_to_peak_mfe_relative 0.771 >= 0.50). Pullback
+    median 0.580 fails the 0.5 ceiling by 0.08 — boundary fail. Oracle
+    Step 5 dispatcher accepted Stepwise-climber routing on capturability
+    economics (PASS-DEPLOYABLE oracle: +39.45% worst-fold ROI, 0.01% DD).
+  shape_tag: tight_unimodal
+  cluster_size_pool_frac: 0.1695        # 365 / 2153
+  capturability_composite: 0.6122971688
+
+stop_loss:
+  type: atr_based
+  multiplier: 2.0
+  atr_period: 14
+  atr_timeframe: 4H
+  anchor_price: entry_fill              # initial SL = entry_fill - 2.0 * ATR_at_signal
+  rationale: |
+    2.0 x ATR(14) on 4H, locked from Step 3 SL sweep
+    (results/l_arc_9/step3_capturability/per_trade_sl_sweep.csv selected the
+    2.0 multiplier as cluster_0_individual's optimum on the §2 floors).
+    1R for the purposes of this exit policy equals this SL distance.
+
+exit_policy:
+  pipeline: E                            # entry-time admission, then archetype-managed exit
+  mfe_lock:
+    trigger_R: 1.0                       # intrabar MFE >= 1R favorable
+    action: move_sl_to_entry             # SL moves to entry_fill (breakeven, no further loss)
+    measurement: intrabar_high           # uses bar high vs entry+1R*sl_distance threshold
+    update_timing: bar_close             # SL update applied at bar close (next-bar enforcement)
+  trail:
+    active_after: mfe_lock_trigger       # trail engages only after MFE-lock fires
+    distance_R: 0.75                     # trail SL = peak_close - 0.75R*sl_distance
+    anchor: peak_close                   # ratchets up on each new bar-close peak (long)
+    update_timing: bar_close             # peak_close + trail SL update at bar close
+  time_exit:
+    bars: 240                            # 4H * 240 = 40 calendar days
+    timing: bar_open                     # exit at the open of the time_exit bar
+  partial_take:
+    enabled: false                       # no TP1 / partial-take for Stepwise climber Pipeline E
+  breakeven_shift:
+    independent_of_mfe_lock: false       # only breakeven shift is the MFE-lock action above
+
+execution:
+  direction: long                        # long-only signal
+  entry:
+    bar_offset_from_signal: 1            # signal at bar t close -> entry at bar t+1 open
+    fill_convention: long_ask            # entry_fill = mid + spread_at_entry_bar / 2 (in price)
+  exit:
+    sl_trigger: intrabar_mid_low_leq_sl  # SL fires when bar low <= current SL
+    fill_convention: long_bid_at_sl      # exit_fill = sl_price - spread_at_exit_bar / 2 (in price)
+    time_exit_fill: open_minus_half_spread # exit_fill = open[time_exit_bar] - spread/2
+  exit_reasons:
+    - stoploss                           # SL hit before MFE-lock fired
+    - trail_stop                         # SL hit after MFE-lock + trail engaged
+    - mfe_lock_breakeven                 # SL hit at entry after MFE-lock (subset of trail_stop semantically)
+    - time_exit                          # held to bar t+241 open
+    - end_of_data                        # ran out of bars before SL or time_exit
+
+risk:
+  research_baseline_pct: 0.5             # used for Step 5 WFO + admit-set parity reproduction only
+  deployment_target_pct: 1.0             # LOCKED per SCALED_RISK measurement at commit 5ce39d6
+  active_for_phase_1: research_baseline  # Phase 1 parity verification uses 0.5% to match reference
+  active_for_live: deployment_target     # live EA configures 1.0%
+  starting_balance: 10000.0              # research convention; live EA uses 5ers account balance
+  rationale: |
+    SCALED_RISK experiment
+    (results/l_arc_9/experiments/scaled_risk/SCALED_RISK_RESULT.md) measured
+    Candidate A's fixed admit set (236 trades, F2-F7) at five per-trade risk
+    levels {0.5%, 1.0%, 1.5%, 2.0%, 2.5%} with intraday-resolution worst-day DD.
+
+    Key finding: BINDING CONSTRAINT IS WORST-DAY DD, NOT WORST-FOLD MAX DD.
+    Worst-fold max DD has 5+pp headroom under in-system 8% target at all
+    candidate risk levels. Worst-day DD reaches 4% in-system target at exactly
+    2.0% risk with no margin (3.99% measured, 0.01pp from breach).
+
+    Per-risk-level worst-day DD (measured):
+      0.5% -> 1.01% worst-day  (1.26% worst-fold)
+      1.0% -> 2.01% worst-day  (2.52% worst-fold)   << RECOMMENDED
+      1.5% -> 3.00% worst-day  (3.76% worst-fold)
+      2.0% -> 3.99% worst-day  (5.00% worst-fold)
+      2.5% -> 4.98% worst-day  (6.23% worst-fold)
+
+    Recommendation rule (in-system target + 1pp safety margin):
+      worst-fold DD <= 6%, worst-day DD <= 3% -> 1.0% is the highest risk
+      level satisfying both.
+
+    The 2.0% projection in earlier spec drafts was based on linear scaling of
+    worst-fold DD only; SCALED_RISK supersedes that projection with measurement.
+
+  binding_constraint: worst_day_dd
+  in_system_targets:
+    worst_fold_max_dd_pct: 8.0           # protocol §10 PASS-DEPLOYABLE ceiling
+    worst_day_dd_pct: 4.0                # in-system daily target
+  prop_firm_hard_limits:                 # 5ers
+    max_dd_pct: 10.0
+    daily_dd_pct: 5.0
+  measured_margins_at_recommended:
+    worst_fold_max_dd_pct: 2.52          # 5.48pp under 8% target
+    worst_day_dd_pct: 2.01               # 1.99pp under 4% in-system / 2.99pp under 5ers 5%
+
+admission:
+  pipeline: E
+  classifier: lightgbm
+  feature_catalogue: configs/arc9_canda_features.yaml
+  threshold: 0.40                        # locked v2.2 §3 grid operating point
+  threshold_grid: [0.40, 0.50, 0.60, 0.70]
+
+provenance:
+  source_arc: l_arc_9
+  branch: claude/bold-brattain-d79817
+  training_commit: 0193334
+  audit_commit: 9dc4f8a
+  scaled_risk_commit: 5ce39d6
+  step3_artefact: results/l_arc_9/step3_capturability/capturability_pass_list.csv
+  step5_artefact: results/l_arc_9/experiments/step5_lgbm_pipeline_e/STEP5_LGBM_E_RESULT.md
+  scaled_risk_artefact: results/l_arc_9/experiments/scaled_risk/SCALED_RISK_RESULT.md
+  protocol_row: L_ARC_PROTOCOL.md:600

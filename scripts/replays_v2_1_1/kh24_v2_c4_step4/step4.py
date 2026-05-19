@@ -705,6 +705,11 @@ def write_classifier_artefacts(
             "rf_roc_auc_cv_mean": t_res.rf_metrics.roc_auc_mean,
             "rf_pr_auc_cv_mean": t_res.rf_metrics.pr_auc_mean,
             "exclusion_rate": t_res.exclusion_rate,
+            # Open-24 (L_ARC_PROTOCOL v2.3 §5): the cluster's Step 3
+            # selected SL multiplier carried into the engine's D1
+            # archetype config (engine PR #146). Default 2.0 preserves
+            # the KH-24 anchor (c1, c4 both at 2.0×ATR).
+            "pre_t_sl_atr_multiplier": float(cohort["selected_sl_atr"]),
             "exit_policy_ref": {
                 **{
                     "source": cohort["exit_policy"].get("source_ref", "TBD"),

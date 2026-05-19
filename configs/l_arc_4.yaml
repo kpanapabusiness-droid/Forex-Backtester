@@ -1,0 +1,123 @@
+# configs/l_arc_4.yaml — Arc 4 Step 1 plumbing config (L_ARC_PROTOCOL v2.1.1 §5)
+#
+# Signal under test: TRIAL__univariate_extreme__bar_range_top_decile__neg__h_001
+# (LCHAR_TOPN_REGISTRY.md Entry 4). Canonical L4 source:
+# scripts/lchar/run_layer4.py::mask_univariate_extreme.
+# Engine-side signal module: signals/lchar_bar_range_top_decile.py.
+#
+# Pure trade-pool generation — no filters, no analysis, single pass.
+#
+# Baseline policy (v2.1.1 §5): SL-only. No time exit. Trade closes when SL
+# hits OR when 240-bar `max_trade_life` cap is reached (force-close at
+# bar N+1+240 open if no SL hit). bars_held distributes 1..240.
+#
+# Note on registry h_001 vs. Arc 4 baseline_horizon: the underlying L4 atlas
+# entry uses h=1 for its 1-bar-horizon return statistic. Under v2.1.1 §5 the
+# arc's baseline policy is path-shape-driven over 240 bars (no time exit) so
+# Step 4+ archetype exits can be assigned. The h=1 registry horizon does NOT
+# carry over to the arc's exit policy.
+
+phase: l_arc_4_step1
+description: >-
+  L Arc 4 Step 1 — generate trade pool for signal
+  TRIAL__univariate_extreme__bar_range_top_decile__neg__h_001 under v2.1.1
+  protocol. Direct-to-main per v2.1.1 §13 (arc analysis script + results dir).
+
+# ----------------------------------------------------------------------
+# Signal — registry Entry 4 (LCHAR_TOPN_REGISTRY.md)
+# ----------------------------------------------------------------------
+signal:
+  module: signals.lchar_bar_range_top_decile
+  trial_id: TRIAL__univariate_extreme__bar_range_top_decile__neg__h_001
+  family: univariate_extreme
+  base: bar_range_top_decile
+  sub_spec: neg                       # close_N < open_N
+  signal_tf: "1H"
+  trailing_window_bars: 100
+  decile_pctile: 0.90                 # top decile per pair, strict `>` (mirrors L4)
+  trade_direction: long               # v2.1.1 §1.16 long-only baseline
+
+# ----------------------------------------------------------------------
+# Execution parameters (v2.1.1 §5 + CLAUDE.md L arc config)
+# ----------------------------------------------------------------------
+execution:
+  entry_bar_offset: 1                 # bar N+1 open
+  atr_period: 14
+  atr_smoothing: wilder               # Wilder ATR(14) on 1H frame
+  atr_tf: "1H"
+  base_sl_atr_mult: 2.0               # SL = entry - 2.0 * ATR(14) for long
+  baseline_horizon_bars: null         # SL-only baseline; no time exit
+  max_trade_life_bars: 240            # force-close at N+1+240 if no SL hit
+  forward_window_bars: 240            # path bars 0..240 inclusive
+  max_concurrent_per_pair: 1
+  risk_pct_per_trade: 0.005           # 0.5% (L arc convention)
+  starting_balance: 10000.0
+  trade_direction: long
+
+# ----------------------------------------------------------------------
+# Data window (KH-24 OOS window — match exactly per spec)
+# ----------------------------------------------------------------------
+data:
+  data_dirs:
+    "1H": data/1hr
+  timeframes: [1H]                    # univariate signal — 1H only
+  date_start: "2020-10-01"
+  date_end: "2026-01-31"
+  pairs:
+    - AUD_CAD
+    - AUD_CHF
+    - AUD_JPY
+    - AUD_NZD
+    - AUD_USD
+    - CAD_CHF
+    - CAD_JPY
+    - CHF_JPY
+    - EUR_AUD
+    - EUR_CAD
+    - EUR_CHF
+    - EUR_GBP
+    - EUR_JPY
+    - EUR_NZD
+    - EUR_USD
+    - GBP_AUD
+    - GBP_CAD
+    - GBP_CHF
+    - GBP_JPY
+    - GBP_NZD
+    - GBP_USD
+    - NZD_CAD
+    - NZD_CHF
+    - NZD_JPY
+    - NZD_USD
+    - USD_CAD
+    - USD_CHF
+    - USD_JPY
+
+# ----------------------------------------------------------------------
+# Spread floor (locked; matches arc 2 redo2 / arc 3)
+# ----------------------------------------------------------------------
+spread_floor:
+  enabled: true
+  source: configs/spread_floors_5ers.yaml
+  expected_body_sha256: a613b4ce641c8d5218490531770a4924204029dedaa80fb24111beb61bd15547
+  points_per_pip: 10.0
+
+# ----------------------------------------------------------------------
+# Gates (v2.1.1 §5 + prompt §5)
+# ----------------------------------------------------------------------
+gates:
+  pool_size_min: 500
+  small_pair_flag_threshold: 30       # pairs with n < 30 flagged but not removed
+  bars_held_p95_max: 240              # sanity: 95th pct must be UNDER cap
+  cap_bind_warn_pct: 0.20             # >20% cap-binding → flag for §5 auto-extend
+
+# ----------------------------------------------------------------------
+# Output
+# ----------------------------------------------------------------------
+output:
+  results_dir: results/l_arc_4/step1
+  trades_csv: trades_all.csv
+  paths_csv: trades_paths.csv
+  summary_md: step1_diagnostics.md
+  float_format: "%.10g"
+  determinism_check: true             # if true, run twice and verify byte-identical

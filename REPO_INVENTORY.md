@@ -234,6 +234,8 @@ Note: "ARTEFACT_SUBFOLDER" is not in the dispatch's official scheme — it's use
 
 7. **scripts/v1_3_calibration/loader_decisions.md**. Companion to a v1.3 calibration loader script. The v1.3 calibration outputs are under `results/v1_3_calibration/`. Chat to confirm: is the v1.3 calibration current, or superseded by later calibration work? If superseded, move both the script-companion doc and the results to an archive folder.
 
+8. **L_ARC_PROTOCOL.md §13 "End of arc" line (line 717).** Per the dispatch's "cross-referenced files where the reference type is ambiguous" flag class: the protocol instructs `commit to docs/arc_results/`. The arc-result archive has now moved to `docs/archive/arc_results/`. This is a prescriptive workflow instruction (where future closures should land), not a broken link to an existing file. Two readings: (a) leave it — when future closures land they should still go to `docs/arc_results/`, and the current archive is just where the historical record sits; (b) update it — the canonical future destination is now `docs/archive/arc_results/`. Chat to pick during protocol redesign — this is a small but real workflow-doc decision and not a unilateral edit.
+
 ---
 
 ## Move execution log

@@ -4,7 +4,7 @@
 **Period covered:** 2020-10-01 → 2025-12-31.
 **Phases completed:** L0 (methodology lock), L1 (univariate), L2 (multi-timeframe), L3 (cross-pair), L4 (conditional), L5 (synthesis & registry).
 **Methodology lock:** `docs/L0_METHODOLOGY_LOCK.md` (descriptive-not-predictive rule, DSR ranking, N=5 top-N registry).
-**Plan source-of-truth:** `docs/L_ARC_PLAN.md`.
+**Plan source-of-truth:** `docs/archive/nnfx_era/L_ARC_PLAN.md` (archived after completion).
 **Companion documents:** `LCHAR_TOPN_REGISTRY.md` (top-5 entries), `results/lchar/L_ARC_CLOSURE.md` (arc closure + L6+ pointer), `results/lchar/PHASE_L1_RESULT.md` … `PHASE_L5_RESULT.md` (per-phase result documents).
 
 This atlas is **descriptive**. Per L0 §3 nothing in this document recommends a signal, identifies a "tradeable" pattern, or interprets a high-DSR finding as an opportunity. The mechanical bridge from atlas to candidate signals lives in `LCHAR_TOPN_REGISTRY.md`; what subsequent direction the project takes is summarised in `results/lchar/L_ARC_CLOSURE.md`.

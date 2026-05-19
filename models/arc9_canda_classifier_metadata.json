@@ -1,0 +1,107 @@
+{
+  "admission_threshold": 0.4,
+  "audit_commit": "9dc4f8a",
+  "candidate": "A",
+  "classifier_hyperparameters": {
+    "class_weight": "balanced",
+    "deterministic": true,
+    "force_row_wise": true,
+    "learning_rate": 0.05,
+    "max_depth": 6,
+    "min_child_samples": 20,
+    "n_estimators": 500,
+    "n_jobs": -1,
+    "num_leaves": 31,
+    "random_state": 42,
+    "reg_alpha": 0.1,
+    "reg_lambda": 0.1,
+    "verbose": -1
+  },
+  "classifier_kind": "LightGBM",
+  "determinism_check": {
+    "byte_identical": true,
+    "run1_sha256": "9fe718686c27960104ebf87358439542c25e8e1652b59ae9f0fdf82eaac22120",
+    "run2_sha256": "9fe718686c27960104ebf87358439542c25e8e1652b59ae9f0fdf82eaac22120"
+  },
+  "dispatch_branch": "feature/arc9-canda-spec-onnx",
+  "exit_policy_yaml": "configs/arc9_canda_exit_policy.yaml",
+  "export_config": {
+    "opset_import_actual": {
+      "": 13,
+      "ai.onnx.ml": 2
+    },
+    "target_opset_ai_onnx_ml_required": 2,
+    "target_opset_main": 13,
+    "zipmap": false
+  },
+  "feature_catalogue_yaml": "configs/arc9_canda_features.yaml",
+  "feature_count": 28,
+  "feature_order": [
+    "body_to_range_ratio",
+    "upper_wick_ratio",
+    "lower_wick_ratio",
+    "range_to_atr_14",
+    "ret_5bar_atr",
+    "ret_20bar_atr",
+    "pos_in_20bar_range",
+    "rsi_14",
+    "n_swing_lows",
+    "most_recent_sl_lag",
+    "swing_low_dist_atr",
+    "mother_bar_range_atr",
+    "inside_bar_range_atr",
+    "ib_range_ratio",
+    "break_bar_body_atr",
+    "break_close_above_high_atr",
+    "d1_trend_state",
+    "d1_atr_ratio_to_4h",
+    "d1_pos_in_20d_range",
+    "d1_ret_5d_atr",
+    "d1_rsi_14",
+    "d1_close_above_kijun",
+    "d1_bars_since_swing_high",
+    "d1_bars_since_swing_low",
+    "session_london",
+    "session_ny_overlap",
+    "hour_sin",
+    "hour_cos"
+  ],
+  "input_spec": {
+    "dtype": "float32",
+    "name": "input",
+    "shape": [
+      "batch",
+      28
+    ]
+  },
+  "model_name": "arc9_canda_classifier",
+  "onnx_byte_count": 839343,
+  "onnx_sha256": "9fe718686c27960104ebf87358439542c25e8e1652b59ae9f0fdf82eaac22120",
+  "output_spec": {
+    "label_output_index": 0,
+    "label_output_name": "label",
+    "outputs": [
+      {
+        "dtype": "tensor(int64)",
+        "name": "label",
+        "shape": [
+          1
+        ]
+      },
+      {
+        "dtype": "tensor(float)",
+        "name": "probabilities",
+        "shape": [
+          null,
+          2
+        ]
+      }
+    ],
+    "positive_class_column": 1,
+    "probability_output_index": 1,
+    "probability_output_name": "probabilities"
+  },
+  "scaled_risk_commit": "5ce39d6",
+  "source_branch": "claude/bold-brattain-d79817",
+  "training_commit": "0193334"
+}

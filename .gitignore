@@ -111,6 +111,10 @@ results/l_arc_2_redo2/**/_run_log.txt
 !results/l_arc_8/**
 # Don't track the quicktest subfolder — smoke-test artefact only.
 results/l_arc_8/step1_quicktest/
+# Arc 9 (IB-trend long, 4H) — Step 1+ outputs and post-kill deployment
+# artefacts (L_ARC_PROTOCOL v2.3 §13: arc results data is direct-to-main).
+!results/l_arc_9/
+!results/l_arc_9/**
 # Arc 10 (D1 swing-low rejection, long, 4H) — Step 1+ outputs
 # (L_ARC_PROTOCOL v2.3 §13: arc results data is direct-to-main).
 !results/l_arc_10/

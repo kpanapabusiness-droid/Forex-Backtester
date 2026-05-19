@@ -1,0 +1,402 @@
+# Arc 9 Candidate A — Canonical 28-feature catalogue
+# ============================================================================
+# Single source of truth for the LightGBM Pipeline E classifier input vector.
+# Python (Phase 1.1+) reads this; MQL5 (future dispatch) reads this.
+#
+# Feature ORDER is load-bearing. The `index` field is the position in the
+# 28-element float32 input tensor passed to the LightGBM model. The classifier
+# was trained in this exact order via:
+#   EXPANDED_28 = BASELINE_16 + D1_8 + SESSION_4
+# defined in scripts/l_arc_9/experiments/pipeline_e_retry.py:84-103.
+#
+# Sources of truth (formulas; verbatim):
+#   - BASE_8 + ARC_SPECIFIC_8: scripts/l_arc_9/step4_extractability.py:128-232
+#   - D1_8: scripts/l_arc_9/experiments/pipeline_e_retry.py:215-311
+#   - SESSION_4: scripts/l_arc_9/experiments/pipeline_e_retry.py:317-325
+#
+# Training cohort: 2153 trades from results/l_arc_9/step1_verbatim/trades_all.csv
+# (post-feature-NaN-drop yields ~2100 usable trades per pipeline_e_retry filter).
+#
+# Joblib classifier path (reference only — Audit 8 pattern uses deterministic
+# in-memory rebuild from feature matrix, NOT joblib reload):
+#   No persisted full-data joblib exists. The classifier is rebuilt via
+#   `lgb.LGBMClassifier(**LGBM_KW).fit(X_expanded, y)` per pipeline_e_retry.py:514.
+#
+# Audit 8 e2e reproduction: max_abs_diff 4.82e-11 over 100 samples — reproduction
+# pattern verified clean.
+# ============================================================================
+schema_version: 1
+total_features: 28
+classifier_source: scripts/l_arc_9/experiments/pipeline_e_retry.py
+training_commit: 0193334
+audit_commit: 9dc4f8a
+features:
+  # ---------- BASE_8 (cross-dataset base 4H features at signal bar t) ----------
+  - name: body_to_range_ratio
+    index: 0
+    source_tf: 4H
+    lag_bars: 0
+    dtype: float
+    formula: |
+      body = abs(close[t] - open[t])
+      range = max(high[t] - low[t], 1e-12)
+      body_to_range_ratio = body / range
+    dependencies: [4H_open, 4H_high, 4H_low, 4H_close]
+    notes: |
+      Signal bar candle-body fraction. Defined in step4_extractability.py:174,177.
+
+  - name: upper_wick_ratio
+    index: 1
+    source_tf: 4H
+    lag_bars: 0
+    dtype: float
+    formula: |
+      upper_wick = high[t] - max(close[t], open[t])
+      range = max(high[t] - low[t], 1e-12)
+      upper_wick_ratio = upper_wick / range
+    dependencies: [4H_open, 4H_high, 4H_low, 4H_close]
+    notes: Defined in step4_extractability.py:175,178.
+
+  - name: lower_wick_ratio
+    index: 2
+    source_tf: 4H
+    lag_bars: 0
+    dtype: float
+    formula: |
+      lower_wick = min(close[t], open[t]) - low[t]
+      range = max(high[t] - low[t], 1e-12)
+      lower_wick_ratio = lower_wick / range
+    dependencies: [4H_open, 4H_high, 4H_low, 4H_close]
+    notes: Defined in step4_extractability.py:176,179.
+
+  - name: range_to_atr_14
+    index: 3
+    source_tf: 4H
+    lag_bars: 0
+    dtype: float
+    formula: |
+      atr14 = Wilder ATR(14) on 4H at bar t (period 14)
+      range = max(high[t] - low[t], 1e-12)
+      range_to_atr_14 = range / atr14 if atr14 > 0 else NaN
+    dependencies: [4H_high, 4H_low, 4H_close (for ATR)]
+    notes: Defined in step4_extractability.py:180.
+
+  - name: ret_5bar_atr
+    index: 4
+    source_tf: 4H
+    lag_bars: 0
+    dtype: float
+    formula: |
+      ret_5bar_atr = (close[t] - close[t-5]) / atr14[t] if atr14[t] > 0 else NaN
+    dependencies: [4H_close, 4H ATR(14)]
+    notes: 5-bar return in 4H ATR units. step4_extractability.py:181,183.
+
+  - name: ret_20bar_atr
+    index: 5
+    source_tf: 4H
+    lag_bars: 0
+    dtype: float
+    formula: |
+      ret_20bar_atr = (close[t] - close[t-20]) / atr14[t] if atr14[t] > 0 else NaN
+    dependencies: [4H_close, 4H ATR(14)]
+    notes: 20-bar return in 4H ATR units. step4_extractability.py:182,184.
+
+  - name: pos_in_20bar_range
+    index: 6
+    source_tf: 4H
+    lag_bars: 0
+    dtype: float
+    formula: |
+      win_lo = min(low[t-20:t])
+      win_hi = max(high[t-20:t])
+      pos_in_20bar_range = (close[t] - win_lo) / max(win_hi - win_lo, 1e-12)
+    dependencies: [4H_high, 4H_low, 4H_close]
+    notes: |
+      Position of signal close within the 20-bar high/low range (exclusive of
+      bar t — window slice [t-20:t]). step4_extractability.py:185-187.
+
+  - name: rsi_14
+    index: 7
+    source_tf: 4H
+    lag_bars: 0
+    dtype: float
+    formula: |
+      Wilder RSI on 4H close, period 14. NaN until bar 14.
+      delta = diff(close); gain = max(delta, 0); loss = max(-delta, 0)
+      avg_gain[14] = mean(gain[0:14]); avg_loss[14] = mean(loss[0:14])
+      avg_gain[i] = (avg_gain[i-1]*13 + gain[i-1])/14   (i > 14)
+      avg_loss[i] = (avg_loss[i-1]*13 + loss[i-1])/14
+      rs = avg_gain / avg_loss; rsi = 100 - 100/(1+rs)
+    dependencies: [4H_close]
+    notes: |
+      step4_extractability.py:108-126 (definition); :151 + :188 (use). Note: at
+      the warmup edge (i.e. bar < 14), value is NaN and the feature row is
+      dropped by the training pipeline.
+
+  # ---------- ARC_SPECIFIC_8 (IB-trend structural features at signal bar t) ----------
+  - name: n_swing_lows
+    index: 8
+    source_tf: 4H
+    lag_bars: 0
+    dtype: int
+    formula: |
+      Count of 3-bar swing-lows in window [t-30, t-4] (per signal trigger:
+      TREND_WINDOW=30, SWING_RIGHT_EDGE_LAG=4). A 3-bar swing-low at bar k
+      requires low[k] < min(low[k-3..k-1]) AND low[k] < min(low[k+1..k+3]).
+      Source: signals/lchar_inside_bar_break_trend_long.py:53-69 (swing detection)
+      and :137-147 (window slice / count). Value is carried into trades_all.csv
+      column 'n_swing_lows' and read at step4_extractability.py:206.
+    dependencies: [4H_low (from t-33 to t-4)]
+    notes: |
+      Carried from the signal computation; not recomputed at feature time.
+
+  - name: most_recent_sl_lag
+    index: 9
+    source_tf: 4H
+    lag_bars: 0
+    dtype: int
+    formula: |
+      most_recent_sl_lag = t - most_recent_sl_idx
+      where most_recent_sl_idx = max index of swing-low in window [t-30, t-4]
+      (or -1 if none). Source: lchar_inside_bar_break_trend_long.py:151
+      (most_recent_sl[t] = qualifying_sl[-1]); step1_plumbing.py stores this
+      as `most_recent_sl_lag` column; step4_extractability.py:207 reads it.
+    dependencies: [4H_low (from t-33 to t-4)]
+    notes: |
+      Bars between t and the most recent qualifying swing-low. Minimum value 4
+      (SWING_RIGHT_EDGE_LAG); maximum value 30 (TREND_WINDOW).
+
+  - name: swing_low_dist_atr
+    index: 10
+    source_tf: 4H
+    lag_bars: 0
+    dtype: float
+    formula: |
+      swing_low_used = min(low[k]) over qualifying swing-lows in [t-30, t-4]
+      swing_low_dist_atr = (close[t] - swing_low_used) / atr14[t]   (if atr14 > 0)
+    dependencies: [4H_close, 4H ATR(14), swing_low_used (from signal compute)]
+    notes: |
+      Distance from signal close to reference swing-low, in 4H ATR units.
+      swing_low_used carried from signals/lchar_inside_bar_break_trend_long.py:152-153
+      (sl_min = float(low[qualifying_sl].min())). Computed at
+      step4_extractability.py:202-205.
+
+  - name: mother_bar_range_atr
+    index: 11
+    source_tf: 4H
+    lag_bars: 0
+    dtype: float
+    formula: |
+      mother_range = max(high[t-2] - low[t-2], 1e-12)
+      mother_bar_range_atr = mother_range / atr14[t]   (if atr14 > 0)
+    dependencies: [4H_high (t-2), 4H_low (t-2), 4H ATR(14) at t]
+    notes: |
+      Mother bar = the bar before the inside bar. Size in 4H ATR units at
+      signal-bar ATR. step4_extractability.py:195,197.
+
+  - name: inside_bar_range_atr
+    index: 12
+    source_tf: 4H
+    lag_bars: 0
+    dtype: float
+    formula: |
+      inside_range = max(high[t-1] - low[t-1], 1e-12)
+      inside_bar_range_atr = inside_range / atr14[t]   (if atr14 > 0)
+    dependencies: [4H_high (t-1), 4H_low (t-1), 4H ATR(14) at t]
+    notes: step4_extractability.py:196,198.
+
+  - name: ib_range_ratio
+    index: 13
+    source_tf: 4H
+    lag_bars: 0
+    dtype: float
+    formula: |
+      ib_range_ratio = inside_range / mother_range
+        = (high[t-1] - low[t-1]) / (high[t-2] - low[t-2])
+        (each clamped to >= 1e-12 to avoid div-by-zero)
+    dependencies: [4H_high (t-1, t-2), 4H_low (t-1, t-2)]
+    notes: |
+      Compression ratio: inside-bar range as fraction of mother-bar range.
+      step4_extractability.py:199.
+
+  - name: break_bar_body_atr
+    index: 14
+    source_tf: 4H
+    lag_bars: 0
+    dtype: float
+    formula: |
+      body = abs(close[t] - open[t])
+      break_bar_body_atr = body / atr14[t]   (if atr14 > 0)
+    dependencies: [4H_open (t), 4H_close (t), 4H ATR(14) at t]
+    notes: Body of the break bar (signal bar) in ATR units. step4_extractability.py:200.
+
+  - name: break_close_above_high_atr
+    index: 15
+    source_tf: 4H
+    lag_bars: 0
+    dtype: float
+    formula: |
+      break_close_above_high_atr = (close[t] - high[t-1]) / atr14[t]   (if atr14 > 0)
+    dependencies: [4H_close (t), 4H_high (t-1), 4H ATR(14) at t]
+    notes: |
+      How far the break-bar close exceeded the inside bar's high, in ATR units.
+      Always positive at signal time (Cond 3 requires close[t] > high[t-1]).
+      step4_extractability.py:201.
+
+  # ---------- D1_8 (D1-lagged context features, lag = 1 calendar day) ----------
+  - name: d1_trend_state
+    index: 16
+    source_tf: D1
+    lag_bars: 1
+    dtype: int
+    formula: |
+      bool: D1 close > D1 open AND D1 close > D1 close[prev]   (cast to int)
+      Read at the D1 bar dated 4H_signal_bar_date.normalize() - 1 day, joined
+      via merge_asof(direction='backward').
+    dependencies: [D1_open, D1_close, D1_close[-1]]
+    notes: pipeline_e_retry.py:239-240.
+
+  - name: d1_atr_ratio_to_4h
+    index: 17
+    source_tf: D1
+    lag_bars: 1
+    dtype: float
+    formula: |
+      d1_atr14_lag1 = Wilder ATR(14) on D1, at the lagged D1 bar (date - 1)
+      atr14_at_signal = trades_all.atr14_at_signal (4H ATR at signal bar)
+      d1_atr_ratio_to_4h = d1_atr14_lag1 / atr14_at_signal
+        (NaN if either is missing or atr14_at_signal <= 0)
+    dependencies: [D1 ATR(14) lag1, 4H ATR(14) at signal bar]
+    notes: |
+      Post-merge computation in pipeline_e_retry.py:307-310. atr14_at_signal
+      comes from results/l_arc_9/step1_verbatim/trades_all.csv.
+
+  - name: d1_pos_in_20d_range
+    index: 18
+    source_tf: D1
+    lag_bars: 1
+    dtype: float
+    formula: |
+      d1_20d_high = rolling max of D1 high over 20 D1 bars
+      d1_20d_low  = rolling min of D1 low  over 20 D1 bars
+      rng = d1_20d_high - d1_20d_low
+      d1_pos_in_20d_range = (d1_close - d1_20d_low) / rng   (0.5 if rng <= 0)
+    dependencies: [D1_high (20-bar window), D1_low (20-bar window), D1_close]
+    notes: pipeline_e_retry.py:242-245.
+
+  - name: d1_ret_5d_atr
+    index: 19
+    source_tf: D1
+    lag_bars: 1
+    dtype: float
+    formula: |
+      d1_close_5d_ago = D1 close shifted 5 bars
+      d1_ret_5d_atr = (d1_close - d1_close_5d_ago) / d1_atr14
+        (NaN if d1_atr14 <= 0 or NaN)
+    dependencies: [D1_close, D1 ATR(14)]
+    notes: pipeline_e_retry.py:247-252.
+
+  - name: d1_rsi_14
+    index: 20
+    source_tf: D1
+    lag_bars: 1
+    dtype: float
+    formula: |
+      Wilder RSI(14) on D1 close, same algorithm as 4H rsi_14 feature but on
+      D1 frequency. NaN until D1 bar 14.
+    dependencies: [D1_close]
+    notes: pipeline_e_retry.py:236 (uses shared _rsi helper at :144-161).
+
+  - name: d1_close_above_kijun
+    index: 21
+    source_tf: D1
+    lag_bars: 1
+    dtype: int
+    formula: |
+      d1_kijun = (rolling_max(D1_high, 26) + rolling_min(D1_low, 26)) / 2
+      d1_close_above_kijun = int(d1_close > d1_kijun)
+    dependencies: [D1_high (26-bar window), D1_low (26-bar window), D1_close]
+    notes: pipeline_e_retry.py:164-168 (kijun helper); :253 (use).
+
+  - name: d1_bars_since_swing_high
+    index: 22
+    source_tf: D1
+    lag_bars: 1
+    dtype: int
+    formula: |
+      D1 swing-high: bar k iff high[k] > max(high[k-10..k-1])
+        AND high[k] >= max(high[k+1..k+10])
+      Only swings confirmed at k <= n_d1 - 11 are usable (forward-confirmation
+      window cleared); flags for the last 10 D1 bars are zeroed.
+      d1_bars_since_swing_high = (current D1 idx) - (last confirmed swing-high idx)
+        (-1 if no confirmed swing-high yet)
+    dependencies: [D1_high (k-10..k+10 windows)]
+    notes: |
+      pipeline_e_retry.py:185-212 (swing detection); :254-264 (use). The
+      backward swing-detection window strictly precedes the lagged D1 bar
+      (one-day-back via merge_asof); no lookahead from the 4H signal bar
+      because all D1 bars are at least one calendar day before the 4H bar.
+
+  - name: d1_bars_since_swing_low
+    index: 23
+    source_tf: D1
+    lag_bars: 1
+    dtype: int
+    formula: |
+      Mirror of d1_bars_since_swing_high but for swing-lows:
+        is_swing_low at k iff low[k] < min(low[k-10..k-1])
+          AND low[k] <= min(low[k+1..k+10])
+      Last 10 D1 bars zeroed (no forward confirmation); bars_since computed on
+      confirmed flags.
+    dependencies: [D1_low (k-10..k+10 windows)]
+    notes: |
+      pipeline_e_retry.py:185-212 (swing detection); :254-264 (use).
+      TOP FEATURE by importance gain (dominates by 3x margin per
+      results/l_arc_9/experiments/pipeline_e_retry/feature_importances.csv).
+      Structural reading: cluster-0 trades concentrate at the early phase of
+      D1 uptrends, identifiable at entry by recency-to-confirmed-D1-swing-low.
+
+  # ---------- SESSION_4 (time-of-day features, 4H signal bar timestamp) ----------
+  - name: session_london
+    index: 24
+    source_tf: 4H
+    lag_bars: 0
+    dtype: int
+    formula: |
+      hour = signal_bar_time.hour (UTC)
+      session_london = int((hour >= 8) and (hour < 16))
+    dependencies: [4H_signal_bar_time (hour-of-day)]
+    notes: pipeline_e_retry.py:320-321.
+
+  - name: session_ny_overlap
+    index: 25
+    source_tf: 4H
+    lag_bars: 0
+    dtype: int
+    formula: |
+      hour = signal_bar_time.hour (UTC)
+      session_ny_overlap = int((hour >= 12) and (hour < 16))
+    dependencies: [4H_signal_bar_time (hour-of-day)]
+    notes: pipeline_e_retry.py:322.
+
+  - name: hour_sin
+    index: 26
+    source_tf: 4H
+    lag_bars: 0
+    dtype: float
+    formula: |
+      hour = signal_bar_time.hour (UTC)
+      hour_sin = sin(2 * pi * hour / 24.0)
+    dependencies: [4H_signal_bar_time (hour-of-day)]
+    notes: pipeline_e_retry.py:323. Not in top-15 importance.
+
+  - name: hour_cos
+    index: 27
+    source_tf: 4H
+    lag_bars: 0
+    dtype: float
+    formula: |
+      hour = signal_bar_time.hour (UTC)
+      hour_cos = cos(2 * pi * hour / 24.0)
+    dependencies: [4H_signal_bar_time (hour-of-day)]
+    notes: pipeline_e_retry.py:324. Not in top-15 importance.

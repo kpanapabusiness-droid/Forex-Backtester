@@ -1,0 +1,28 @@
+{
+  "abs_diff_distribution": {
+    "max": 0.13462507561684456,
+    "min": 7.7676181459152e-12,
+    "p25": 2.3311951931337394e-08,
+    "p50": 5.119305592979351e-08,
+    "p75": 0.00014988169816491015,
+    "p95": 0.009784896984002225,
+    "p99": 0.03929539178256386
+  },
+  "admit_threshold": 0.4,
+  "flip_count": 0,
+  "gates": {
+    "disposition": "PASS_WITH_NOTE_aspirational_exceeded",
+    "flip_count": 0,
+    "flip_count_binding_threshold": 0,
+    "flip_count_pass": true,
+    "max_abs_diff": 0.13462507561684456,
+    "max_abs_diff_aspirational_threshold": 1e-05,
+    "max_abs_diff_pass": false
+  },
+  "n_pos": 365,
+  "n_total": 2153,
+  "native_admit_count": 365,
+  "onnx_admit_count": 365,
+  "onnx_sha256": "9fe718686c27960104ebf87358439542c25e8e1652b59ae9f0fdf82eaac22120",
+  "operating_point_margin_band_count": 0
+}

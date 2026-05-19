@@ -1,0 +1,5 @@
+# SUMMARY
+# Leaked: 18/50 trades (36%)
+# Among leaked trades: min delta 11, median 26, max 88
+# Mean (live - prod) across all 50: 11.5
+# Median (live - prod): 0

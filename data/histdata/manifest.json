@@ -1,0 +1,2042 @@
+{
+  "downloaded_at": "2026-05-19T23:54:14+00:00",
+  "pairs": {
+    "AUDCAD": {
+      "earliest_month": "201001",
+      "files": {
+        "AUDCAD/tick/2010/DAT_ASCII_AUDCAD_T_201001.zip": {
+          "rows": 548601,
+          "sha256": "b653690f50cce0f3bbc3ec71d39b0df8b21795377b9871c51327020becd93a35",
+          "size_bytes": 2095335
+        },
+        "AUDCAD/tick/2010/DAT_ASCII_AUDCAD_T_201002.zip": {
+          "rows": 581605,
+          "sha256": "28ea02b7c16bb7797960bdb8cd25e5306cb3f6e5ff8c7e6f85921a54f7e4b3b8",
+          "size_bytes": 2181848
+        },
+        "AUDCAD/tick/2010/DAT_ASCII_AUDCAD_T_201003.zip": {
+          "rows": 611539,
+          "sha256": "5cd23c27d1a18e333257898c18c1ddd48a8636efccf8e6319bc0789b11daff29",
+          "size_bytes": 2212680
+        },
+        "AUDCAD/tick/2010/DAT_ASCII_AUDCAD_T_201004.zip": {
+          "rows": 560462,
+          "sha256": "2b100cb05845e23189db1c646fba81d28029ed1dbc8b39e912d5d432339f4a81",
+          "size_bytes": 1976482
+        },
+        "AUDCAD/tick/2010/DAT_ASCII_AUDCAD_T_201005.zip": {
+          "rows": 876625,
+          "sha256": "647e9c8b5f30ba8e6fca7a18b9db8370c850d9593b998591622bec8d2e2104db",
+          "size_bytes": 3201646
+        },
+        "AUDCAD/tick/2010/DAT_ASCII_AUDCAD_T_201006.zip": {
+          "rows": 810613,
+          "sha256": "4b60fd3f5e4f1dc772c383c0514a45e73db1333453945ebdf6f8f534bd764fff",
+          "size_bytes": 2940551
+        },
+        "AUDCAD/tick/2010/DAT_ASCII_AUDCAD_T_201007.zip": {
+          "rows": 636228,
+          "sha256": "680047bb29918dd43a496c621661db27b20ec32ef2650bff2318e8c60763d2d7",
+          "size_bytes": 2346836
+        },
+        "AUDCAD/tick/2010/DAT_ASCII_AUDCAD_T_201008.zip": {
+          "rows": 601128,
+          "sha256": "abc949def5da9f2b6b00dbb4630474b4cfb25ecb63bd05983dece3280465d7dc",
+          "size_bytes": 2218498
+        },
+        "AUDCAD/tick/2010/DAT_ASCII_AUDCAD_T_201009.zip": {
+          "rows": 604740,
+          "sha256": "c2d231ad217cad1e992bc53a3122477daac88da1c0b07c8bedeafb5936ec60a9",
+          "size_bytes": 2226576
+        },
+        "AUDCAD/tick/2010/DAT_ASCII_AUDCAD_T_201010.zip": {
+          "rows": 545857,
+          "sha256": "ee4e5ebac6df28705d23dab53634b007edc5a2dd2a85666aa6a99da183525b36",
+          "size_bytes": 1991693
+        },
+        "AUDCAD/tick/2010/DAT_ASCII_AUDCAD_T_201011.zip": {
+          "rows": 621581,
+          "sha256": "3139eee6030f254a4abfa53ec17ff6d620998700b5bd8f0245752d5ca8c8e6ff",
+          "size_bytes": 2249381
+        },
+        "AUDCAD/tick/2010/DAT_ASCII_AUDCAD_T_201012.zip": {
+          "rows": 438081,
+          "sha256": "bb2ba1cb107a8b123651a06bf333cb49a725ab66476983b062ab2d4292241592",
+          "size_bytes": 1632597
+        },
+        "AUDCAD/tick/2011/DAT_ASCII_AUDCAD_T_201101.zip": {
+          "rows": 523575,
+          "sha256": "fc36c7753c57b2a0b8bfb36821cc44dd527feb88966be403d8538159f2f54476",
+          "size_bytes": 1913614
+        },
+        "AUDCAD/tick/2011/DAT_ASCII_AUDCAD_T_201102.zip": {
+          "rows": 480484,
+          "sha256": "f37c6366c96b9cda1721d3badedf7d903c803dbedc53f28e222516aee77132c5",
+          "size_bytes": 1733660
+        },
+        "AUDCAD/tick/2011/DAT_ASCII_AUDCAD_T_201103.zip": {
+          "rows": 529713,
+          "sha256": "bb023ea3dab7a530ff84ecd3cbb5a084ec6eaadef0ce8b2d56679a73827d91c4",
+          "size_bytes": 1958229
+        },
+        "AUDCAD/tick/2011/DAT_ASCII_AUDCAD_T_201104.zip": {
+          "rows": 424621,
+          "sha256": "1bb576211e27b89854661bcbd1996a4294da7769e11aacfaca633e6caece7378",
+          "size_bytes": 1744078
+        },
+        "AUDCAD/tick/2011/DAT_ASCII_AUDCAD_T_201105.zip": {
+          "rows": 556814,
+          "sha256": "f5839c073a6a1cc8a007b9015c5a0f7b3b2dbd1ba90605e4e65100b99de6babb",
+          "size_bytes": 2911045
+        },
+        "AUDCAD/tick/2011/DAT_ASCII_AUDCAD_T_201106.zip": {
+          "rows": 617954,
+          "sha256": "fe7facb8e0e26b6e802485715f3760c427e38e6309e9caa71d17c5d01b29c16c",
+          "size_bytes": 3138663
+        },
+        "AUDCAD/tick/2011/DAT_ASCII_AUDCAD_T_201107.zip": {
+          "rows": 584989,
+          "sha256": "e89a4b908fdd8889f93a1e5b6f77a25fbdf4ac1c4be0d77c9c2bcf2cbe93fc73",
+          "size_bytes": 3004641
+        },
+        "AUDCAD/tick/2011/DAT_ASCII_AUDCAD_T_201108.zip": {
+          "rows": 803480,
+          "sha256": "bc54ae5402c579ddbe86a7b3b771c104af1f4413a849fa95ce6a95ff16c0c6d4",
+          "size_bytes": 4083414
+        },
+        "AUDCAD/tick/2011/DAT_ASCII_AUDCAD_T_201109.zip": {
+          "rows": 751115,
+          "sha256": "d62c8f37be5326f840adaf16bc1470b8bba176298a8024f4b10dea8127b61b54",
+          "size_bytes": 3885960
+        },
+        "AUDCAD/tick/2011/DAT_ASCII_AUDCAD_T_201110.zip": {
+          "rows": 744786,
+          "sha256": "8464b3217b3792219bed74d1032a78bef88c306204a585a312e29a6919b64b8a",
+          "size_bytes": 3830516
+        },
+        "AUDCAD/tick/2011/DAT_ASCII_AUDCAD_T_201111.zip": {
+          "rows": 768064,
+          "sha256": "877a938da0765d4ad0a57f82d1cbec355989ca5a685e8ed3e3b0e7417e70f2f1",
+          "size_bytes": 3942785
+        },
+        "AUDCAD/tick/2011/DAT_ASCII_AUDCAD_T_201112.zip": {
+          "rows": 1173667,
+          "sha256": "629139121e839a2882cf0b8d1fab0062f0fec6812f521cb9d907965e53e9cf30",
+          "size_bytes": 6566477
+        },
+        "AUDCAD/tick/2012/DAT_ASCII_AUDCAD_T_201201.zip": {
+          "rows": 1240715,
+          "sha256": "ec2ff00bd94859862c4acea2d64e9d91f21a0da33944cc63d0ef265bfba9e66e",
+          "size_bytes": 6890032
+        },
+        "AUDCAD/tick/2012/DAT_ASCII_AUDCAD_T_201202.zip": {
+          "rows": 1665367,
+          "sha256": "1a2b5c2892fd491eaf438ef5e9166ba960e2f34a83425f34912b52fb1cb74f34",
+          "size_bytes": 8880388
+        },
+        "AUDCAD/tick/2012/DAT_ASCII_AUDCAD_T_201203.zip": {
+          "rows": 1537407,
+          "sha256": "ec59400ac194ae09cf1527b1c121b3b1608f7f9740bf0f93a047142d823f5c42",
+          "size_bytes": 8274104
+        },
+        "AUDCAD/tick/2012/DAT_ASCII_AUDCAD_T_201204.zip": {
+          "rows": 1359630,
+          "sha256": "c34d23d338c88a54cb3eaeccc747365624940dda60242638924e1731262a5efc",
+          "size_bytes": 7269507
+        },
+        "AUDCAD/tick/2012/DAT_ASCII_AUDCAD_T_201205.zip": {
+          "rows": 1648963,
+          "sha256": "b643e46b5c0ceb53600b07d67d7968d6f06c5e68c4532d000d77e7508c82b7ff",
+          "size_bytes": 8820043
+        },
+        "AUDCAD/tick/2012/DAT_ASCII_AUDCAD_T_201206.zip": {
+          "rows": 1654488,
+          "sha256": "d40ea1f6e72b82e50cd15d225de7f33fd8a528252b31060eb742d0d5f00b3dc2",
+          "size_bytes": 8732189
+        },
+        "AUDCAD/tick/2012/DAT_ASCII_AUDCAD_T_201207.zip": {
+          "rows": 1530231,
+          "sha256": "3ff652485fbe5b5683621e6018d3ee05da880f0ce86a60d28611b26200bdc6d5",
+          "size_bytes": 8063661
+        },
+        "AUDCAD/tick/2012/DAT_ASCII_AUDCAD_T_201208.zip": {
+          "rows": 951477,
+          "sha256": "916bba99cc1835e168aa8d7dfbc2af0352ef999001f63e990c0e13a57eb22697",
+          "size_bytes": 5224238
+        },
+        "AUDCAD/tick/2012/DAT_ASCII_AUDCAD_T_201209.zip": {
+          "rows": 799949,
+          "sha256": "2149f5a7ceeee512f02847ec7a8e03f5b6315258c894059a9e46ed2be1a009a0",
+          "size_bytes": 4539644
+        },
+        "AUDCAD/tick/2012/DAT_ASCII_AUDCAD_T_201210.zip": {
+          "rows": 814822,
+          "sha256": "41382303fc83a2bc8c8036be23141f1a24e21b9561dd6f4a4f87e6e992e91ac8",
+          "size_bytes": 4615944
+        },
+        "AUDCAD/tick/2012/DAT_ASCII_AUDCAD_T_201211.zip": {
+          "rows": 696236,
+          "sha256": "89a9f9d55956e1aebce8905b043a6bcb140960d77b67e235287feaf9fa459b34",
+          "size_bytes": 3946450
+        },
+        "AUDCAD/tick/2012/DAT_ASCII_AUDCAD_T_201212.zip": {
+          "rows": 520682,
+          "sha256": "92a88c509ba4c48ee044129a801ce0ff52da1a9f562d5291a0f023e087720a72",
+          "size_bytes": 2989302
+        },
+        "AUDCAD/tick/2013/DAT_ASCII_AUDCAD_T_201301.zip": {
+          "rows": 701072,
+          "sha256": "2aac40ebd695b301a92a81c5733e576bb4974890d6965b0354eba21192038a70",
+          "size_bytes": 4020103
+        },
+        "AUDCAD/tick/2013/DAT_ASCII_AUDCAD_T_201302.zip": {
+          "rows": 588180,
+          "sha256": "df6d1dc2dc3ca4b213353309f8e30c5b714e699ae2fd9852e72f3774dbe897c5",
+          "size_bytes": 3460758
+        },
+        "AUDCAD/tick/2013/DAT_ASCII_AUDCAD_T_201303.zip": {
+          "rows": 587085,
+          "sha256": "5eb314e4acc30ae9740f2e01812ef23435e159675b447a3576bb40d928d3a761",
+          "size_bytes": 3417003
+        },
+        "AUDCAD/tick/2013/DAT_ASCII_AUDCAD_T_201304.zip": {
+          "rows": 679488,
+          "sha256": "6d42e0fc9b84eef6873813ac86bbe2788b97083aae29a1b88721f504e993b69c",
+          "size_bytes": 3954255
+        },
+        "AUDCAD/tick/2013/DAT_ASCII_AUDCAD_T_201305.zip": {
+          "rows": 852955,
+          "sha256": "c55a7d565aff4329b7b9d363b3a5013898964d5c742992c5368990ed62d306fb",
+          "size_bytes": 5027642
+        },
+        "AUDCAD/tick/2013/DAT_ASCII_AUDCAD_T_201306.zip": {
+          "rows": 1143600,
+          "sha256": "f6cd3e95bb5b70c9cc7b979bbc103449f333d040a49c8e52511d57f7acdde520",
+          "size_bytes": 6747219
+        },
+        "AUDCAD/tick/2013/DAT_ASCII_AUDCAD_T_201307.zip": {
+          "rows": 1235580,
+          "sha256": "775d9e31f9e2c4ec30bbe0ef2357a08f1bf1dbc7c21e15f1a85e7f66e79a5455",
+          "size_bytes": 7217114
+        },
+        "AUDCAD/tick/2013/DAT_ASCII_AUDCAD_T_201308.zip": {
+          "rows": 906609,
+          "sha256": "be4cb3f561c04b0bbf8f2dbd6b3d6b0f95f15edec502ff6afe45eead6c04604b",
+          "size_bytes": 5348423
+        },
+        "AUDCAD/tick/2013/DAT_ASCII_AUDCAD_T_201309.zip": {
+          "rows": 721817,
+          "sha256": "1bc15907dd3e8299f89d4ad60af267b9adacf716e4cbc71ade159aa45439496c",
+          "size_bytes": 4259353
+        },
+        "AUDCAD/tick/2013/DAT_ASCII_AUDCAD_T_201310.zip": {
+          "rows": 649405,
+          "sha256": "0745a6b31f82e19c611399360b433a58883672fae11e705e138e3d6d10e01930",
+          "size_bytes": 3879374
+        },
+        "AUDCAD/tick/2013/DAT_ASCII_AUDCAD_T_201311.zip": {
+          "rows": 597219,
+          "sha256": "684e1cc186d3407444885708d0f092a7eb8f921c18021c95cc34278e9d71d4f3",
+          "size_bytes": 3589703
+        },
+        "AUDCAD/tick/2013/DAT_ASCII_AUDCAD_T_201312.zip": {
+          "rows": 614866,
+          "sha256": "66e74ff0cfe40e60b62231a60d87481fb211c62f3bb813f15fea6796a788870d",
+          "size_bytes": 3670953
+        },
+        "AUDCAD/tick/2014/DAT_ASCII_AUDCAD_T_201401.zip": {
+          "rows": 871434,
+          "sha256": "f93fa883850ac5ea5cca6868eb8ce69b27d1641c8a27143a74325c26201add9f",
+          "size_bytes": 5143894
+        },
+        "AUDCAD/tick/2014/DAT_ASCII_AUDCAD_T_201402.zip": {
+          "rows": 748680,
+          "sha256": "74d4516a9868f6906f3962de2f5b62288873962a389123fad5b5eed59cb7485c",
+          "size_bytes": 4443965
+        },
+        "AUDCAD/tick/2014/DAT_ASCII_AUDCAD_T_201403.zip": {
+          "rows": 767583,
+          "sha256": "3e3006df61fa4ed2ed422b2ffbf6bf4b27cf26e0a23c4681c27445b7a1387bdd",
+          "size_bytes": 4498542
+        },
+        "AUDCAD/tick/2014/DAT_ASCII_AUDCAD_T_201404.zip": {
+          "rows": 659259,
+          "sha256": "67d175db33c8a9291a53945e9f47c173b4173d15913e3981ad12d6d0fcfea975",
+          "size_bytes": 3835838
+        },
+        "AUDCAD/tick/2014/DAT_ASCII_AUDCAD_T_201405.zip": {
+          "rows": 607517,
+          "sha256": "613749a6d293431f852e3dc00f0bb281670bfdc62c0ab8ba954e185df4975f3f",
+          "size_bytes": 3513733
+        },
+        "AUDCAD/tick/2014/DAT_ASCII_AUDCAD_T_201406.zip": {
+          "rows": 524732,
+          "sha256": "2c5d4bfe4c3a67e140012534d15c3784a567ed982ffc454a1319cf58a1ab3771",
+          "size_bytes": 3039079
+        },
+        "AUDCAD/tick/2014/DAT_ASCII_AUDCAD_T_201407.zip": {
+          "rows": 628700,
+          "sha256": "5c72efb0ec8787513c397723de78344ed2eb458eeb4ad96ac554c0579b6d8c1c",
+          "size_bytes": 3519168
+        },
+        "AUDCAD/tick/2014/DAT_ASCII_AUDCAD_T_201408.zip": {
+          "rows": 702122,
+          "sha256": "ea06bdcb43893a8111b4ddaccdfa983404eeffeca266ea87dfc3efc0b0610d75",
+          "size_bytes": 3449701
+        },
+        "AUDCAD/tick/2014/DAT_ASCII_AUDCAD_T_201409.zip": {
+          "rows": 1087712,
+          "sha256": "6816f0327136c8c624139d3bac587658a41a5aada94762d49f5bc640755ac633",
+          "size_bytes": 5318641
+        },
+        "AUDCAD/tick/2014/DAT_ASCII_AUDCAD_T_201410.zip": {
+          "rows": 1260802,
+          "sha256": "f72c0b62739dd4eedef64bc0553ae0ae778f178f5ed543b390bd286b821a57e2",
+          "size_bytes": 7225075
+        },
+        "AUDCAD/tick/2014/DAT_ASCII_AUDCAD_T_201411.zip": {
+          "rows": 1387273,
+          "sha256": "f9716b2c47c45f4a4d80e9e524a164249c140d82e4cd90aaf7056bc722b0a027",
+          "size_bytes": 7611897
+        },
+        "AUDCAD/tick/2014/DAT_ASCII_AUDCAD_T_201412.zip": {
+          "rows": 1265611,
+          "sha256": "ef614380e60fa065c2eca454e8b4d1e5662a106dd6a06d310c734561efb0eab8",
+          "size_bytes": 6954736
+        },
+        "AUDCAD/tick/2015/DAT_ASCII_AUDCAD_T_201501.zip": {
+          "rows": 1501974,
+          "sha256": "3c6ee863715bd07b511c757191bce4f2bea7af0a8eba8409a78f0421dab9fdf0",
+          "size_bytes": 8399212
+        },
+        "AUDCAD/tick/2015/DAT_ASCII_AUDCAD_T_201502.zip": {
+          "rows": 1384895,
+          "sha256": "3c58c75e505fb808c54a2aa56e2859881d3d4f578b2adf44de90a90dc8371dc9",
+          "size_bytes": 7687204
+        },
+        "AUDCAD/tick/2015/DAT_ASCII_AUDCAD_T_201503.zip": {
+          "rows": 1567711,
+          "sha256": "2e7b495cf319cd2bf6bb4b860ca48f64516a5c4370d568277485f1f5679bb8e8",
+          "size_bytes": 8618647
+        },
+        "AUDCAD/tick/2015/DAT_ASCII_AUDCAD_T_201504.zip": {
+          "rows": 1528524,
+          "sha256": "f6dc3e86de381e8ce8632baeef6d19c09c13c0227382344747a028da950eb130",
+          "size_bytes": 8308176
+        },
+        "AUDCAD/tick/2015/DAT_ASCII_AUDCAD_T_201505.zip": {
+          "rows": 1371505,
+          "sha256": "e6f3595f95982e64c21986642c7e45cf9025cce2ee30cf29258ba10209eab3e9",
+          "size_bytes": 7394123
+        },
+        "AUDCAD/tick/2015/DAT_ASCII_AUDCAD_T_201506.zip": {
+          "rows": 1359153,
+          "sha256": "afd62fad1912a00b4ad4ebe389b3a9e2c090d9a05b5f6f905d2c3d82f79c0332",
+          "size_bytes": 7393821
+        },
+        "AUDCAD/tick/2015/DAT_ASCII_AUDCAD_T_201507.zip": {
+          "rows": 1400748,
+          "sha256": "ea3de07d1c1726a13c86d040e387c3a72b99d44b922a845ab5ceeaa1504f3afa",
+          "size_bytes": 7512733
+        },
+        "AUDCAD/tick/2015/DAT_ASCII_AUDCAD_T_201508.zip": {
+          "rows": 1450757,
+          "sha256": "a60675246f82d8e8092f1393d95fad2e6f058e9b6867d17b0f6a7c669be7a72d",
+          "size_bytes": 7806900
+        },
+        "AUDCAD/tick/2015/DAT_ASCII_AUDCAD_T_201509.zip": {
+          "rows": 1022048,
+          "sha256": "7ee9d97705e8498aad999ba2ca9e419c85b122c0107e83aa0853fb8a7835aa7c",
+          "size_bytes": 5887571
+        },
+        "AUDCAD/tick/2015/DAT_ASCII_AUDCAD_T_201510.zip": {
+          "rows": 908125,
+          "sha256": "6c77ccb26d4f3279ef766d410158aca0e1556b2bbf2b8c059f9e289137729467",
+          "size_bytes": 5227252
+        },
+        "AUDCAD/tick/2015/DAT_ASCII_AUDCAD_T_201511.zip": {
+          "rows": 1018918,
+          "sha256": "d2d2126e5c86b9d2dc4b3546647fd91ecb4d0ce40486d356189c164141897201",
+          "size_bytes": 5503193
+        },
+        "AUDCAD/tick/2015/DAT_ASCII_AUDCAD_T_201512.zip": {
+          "rows": 1218313,
+          "sha256": "76a915f93fb2e741a1389c5e8463fc9059fd7f788d3f8c778d84252509bf13ea",
+          "size_bytes": 6541362
+        },
+        "AUDCAD/tick/2016/DAT_ASCII_AUDCAD_T_201601.zip": {
+          "rows": 1719458,
+          "sha256": "cca5b351fada40a077c8b5775b44e70061ce02c2f3e3836d0b306833ddf04501",
+          "size_bytes": 9363842
+        },
+        "AUDCAD/tick/2016/DAT_ASCII_AUDCAD_T_201602.zip": {
+          "rows": 1463896,
+          "sha256": "25aefcead2245c119df0f6f69c9aaf685bb35bbc455af89fe66970e278da7b1e",
+          "size_bytes": 8024372
+        },
+        "AUDCAD/tick/2016/DAT_ASCII_AUDCAD_T_201603.zip": {
+          "rows": 1324979,
+          "sha256": "ca34dcbf9f8094e6242c43e17e65c305403ac1be64a05aebe075790c44f4b19f",
+          "size_bytes": 7310292
+        },
+        "AUDCAD/tick/2016/DAT_ASCII_AUDCAD_T_201604.zip": {
+          "rows": 1084935,
+          "sha256": "0366078c31d66a665fea6604a5765e0d60dbce909ce68d1629d6720d77eb08ee",
+          "size_bytes": 6108487
+        },
+        "AUDCAD/tick/2016/DAT_ASCII_AUDCAD_T_201605.zip": {
+          "rows": 867977,
+          "sha256": "c08fe8ca43a480d9e11c4cab6072c2478cae634074f15b51c6c61e50e0679db9",
+          "size_bytes": 4954065
+        },
+        "AUDCAD/tick/2016/DAT_ASCII_AUDCAD_T_201606.zip": {
+          "rows": 941090,
+          "sha256": "2234f5df2deb266a54803ffd3507ab2ba35ce66da8a1a90208baf0f5a87e174b",
+          "size_bytes": 5436108
+        },
+        "AUDCAD/tick/2016/DAT_ASCII_AUDCAD_T_201607.zip": {
+          "rows": 1032222,
+          "sha256": "d5cd8f53e70186a87b4667fce68d18a4d2d364d4d65424165553ffcf9679c8c9",
+          "size_bytes": 5741322
+        },
+        "AUDCAD/tick/2016/DAT_ASCII_AUDCAD_T_201608.zip": {
+          "rows": 790241,
+          "sha256": "7fe5607bacac94c91f3d8242cb8e3dd6a7f1f470a69f7cdc583e6fc5472975c4",
+          "size_bytes": 4442889
+        },
+        "AUDCAD/tick/2016/DAT_ASCII_AUDCAD_T_201609.zip": {
+          "rows": 887304,
+          "sha256": "82e21c4678c1d3709ceaf9a893fd370e22d69677ffd7c8f63ad3b53715182750",
+          "size_bytes": 4971771
+        },
+        "AUDCAD/tick/2016/DAT_ASCII_AUDCAD_T_201610.zip": {
+          "rows": 891955,
+          "sha256": "60f22ef2ba79ebf942e79dfc34f554a5450376ad80e45b2aedcee9c7648b7298",
+          "size_bytes": 4975221
+        },
+        "AUDCAD/tick/2016/DAT_ASCII_AUDCAD_T_201611.zip": {
+          "rows": 1472607,
+          "sha256": "db170712ae18679c71ae37389ff4df8c4074d783b865061860e4213814b6bd7c",
+          "size_bytes": 8128636
+        },
+        "AUDCAD/tick/2016/DAT_ASCII_AUDCAD_T_201612.zip": {
+          "rows": 1049377,
+          "sha256": "bd3d5b68c40aeb282debebdf8f979c8c1720af855d3107d1abc603582d879cdb",
+          "size_bytes": 5702977
+        },
+        "AUDCAD/tick/2017/DAT_ASCII_AUDCAD_T_201701.zip": {
+          "rows": 1407023,
+          "sha256": "77113715c8c5fd2305609dcad702c79f53665f544be3a85a37b6bbe11f9bde75",
+          "size_bytes": 7538129
+        },
+        "AUDCAD/tick/2017/DAT_ASCII_AUDCAD_T_201702.zip": {
+          "rows": 948657,
+          "sha256": "936c18b8c75e79f2029e01e1ad17f9a2daf0d9c54dac4f484f7a01b7b9eea48b",
+          "size_bytes": 5158564
+        },
+        "AUDCAD/tick/2017/DAT_ASCII_AUDCAD_T_201703.zip": {
+          "rows": 1239932,
+          "sha256": "5957f6d924abf1836b504cb6cbdffbde86ee628b4eb34744a1e588dffc0a9a45",
+          "size_bytes": 6611336
+        },
+        "AUDCAD/tick/2017/DAT_ASCII_AUDCAD_T_201704.zip": {
+          "rows": 753867,
+          "sha256": "b9ce3bf60a4f123ac5fa48942e3aac927a91a3b451525cdd9b371f15e29b9584",
+          "size_bytes": 4179964
+        },
+        "AUDCAD/tick/2017/DAT_ASCII_AUDCAD_T_201705.zip": {
+          "rows": 786613,
+          "sha256": "6cabebb31b55c349b1c1fc78cca64df6511ec080575011053115ada9ccdfee07",
+          "size_bytes": 4421757
+        },
+        "AUDCAD/tick/2017/DAT_ASCII_AUDCAD_T_201706.zip": {
+          "rows": 695612,
+          "sha256": "0d95b54d1ced7ee91e81bbf45c0c3c2a267ca3a454f40d52010cf8b244a6734a",
+          "size_bytes": 3920476
+        },
+        "AUDCAD/tick/2017/DAT_ASCII_AUDCAD_T_201707.zip": {
+          "rows": 928976,
+          "sha256": "e15ad60ecef36bdb089f3eefccbf9d3c427c0d921850cca36d22449a64ef2bc3",
+          "size_bytes": 5144235
+        },
+        "AUDCAD/tick/2017/DAT_ASCII_AUDCAD_T_201708.zip": {
+          "rows": 723091,
+          "sha256": "9acfbe47a0274c7753804fae35a952fa08198ffc9e870c25307d9394fb594bb4",
+          "size_bytes": 4150513
+        },
+        "AUDCAD/tick/2017/DAT_ASCII_AUDCAD_T_201709.zip": {
+          "rows": 912355,
+          "sha256": "96e65241a3bb407bb9109f7f1d6ecb6fa47602bf07932150ca5184196e986e49",
+          "size_bytes": 5063384
+        },
+        "AUDCAD/tick/2017/DAT_ASCII_AUDCAD_T_201710.zip": {
+          "rows": 908128,
+          "sha256": "a5655d4155f6cff391002480d4b1eb88604cba1219c6e532452fc965bb51ed4e",
+          "size_bytes": 4910231
+        },
+        "AUDCAD/tick/2017/DAT_ASCII_AUDCAD_T_201711.zip": {
+          "rows": 791400,
+          "sha256": "a311cb4bba4310198992ddb5e78d7ec062a82cd2303c22feb8913a8c987b0450",
+          "size_bytes": 4249454
+        },
+        "AUDCAD/tick/2017/DAT_ASCII_AUDCAD_T_201712.zip": {
+          "rows": 653739,
+          "sha256": "aec94fafd9e3bad548a5cf10e1f8e7473846e58223993d69aa7d2b071ee8bc22",
+          "size_bytes": 3585525
+        },
+        "AUDCAD/tick/2018/DAT_ASCII_AUDCAD_T_201801.zip": {
+          "rows": 1054677,
+          "sha256": "add7853dd9799155b2fd46b2592a2dbeec5e6a8520b5cf6bc5eedab602f19932",
+          "size_bytes": 5704341
+        },
+        "AUDCAD/tick/2018/DAT_ASCII_AUDCAD_T_201802.zip": {
+          "rows": 1284326,
+          "sha256": "dd42fe935fb2e853fc07bc09f38b95ca0f3c1ff337f7197e1b77ca2ae201ff95",
+          "size_bytes": 6791509
+        },
+        "AUDCAD/tick/2018/DAT_ASCII_AUDCAD_T_201803.zip": {
+          "rows": 1252322,
+          "sha256": "124ecefd9d4bc0bc28f119d6737ae8943d90acb33813b2f069401fd891e680cf",
+          "size_bytes": 6622490
+        },
+        "AUDCAD/tick/2018/DAT_ASCII_AUDCAD_T_201804.zip": {
+          "rows": 1014587,
+          "sha256": "224cb6925388d5f3d260532eaeb403306737b14376e972d07a373c6ca4ac74d3",
+          "size_bytes": 5318623
+        },
+        "AUDCAD/tick/2018/DAT_ASCII_AUDCAD_T_201805.zip": {
+          "rows": 1401052,
+          "sha256": "2540550852def7fdaf7a3e3e8e751a13567dd1347ccc13d60d0e699907251c98",
+          "size_bytes": 7479623
+        },
+        "AUDCAD/tick/2018/DAT_ASCII_AUDCAD_T_201806.zip": {
+          "rows": 1153523,
+          "sha256": "228e387a158b73cb5b310287083d08013b3d8f774a2bd7171d3cb17136db4e42",
+          "size_bytes": 6079096
+        },
+        "AUDCAD/tick/2018/DAT_ASCII_AUDCAD_T_201807.zip": {
+          "rows": 1062061,
+          "sha256": "85d6fe118ad6a37dbca23d1504275f75604ec6f91c38d2bfea6373bf2263a5e9",
+          "size_bytes": 5639939
+        },
+        "AUDCAD/tick/2018/DAT_ASCII_AUDCAD_T_201808.zip": {
+          "rows": 1104424,
+          "sha256": "97e6f4d9e8b40d8c14ea399416dee56bfb62ae023098e2a277964838065d5674",
+          "size_bytes": 5893525
+        },
+        "AUDCAD/tick/2018/DAT_ASCII_AUDCAD_T_201809.zip": {
+          "rows": 987674,
+          "sha256": "edaf4f4b3cf6bfbc8fe73fe6b8dfda2fe7a6a80ade9166bb8d8ddbe275290351",
+          "size_bytes": 5350277
+        },
+        "AUDCAD/tick/2018/DAT_ASCII_AUDCAD_T_201810.zip": {
+          "rows": 1704468,
+          "sha256": "b4b91f5549de86a935c800bac98e9dd62edd0931a2b5f5efc59517d8ffbbf951",
+          "size_bytes": 8594532
+        },
+        "AUDCAD/tick/2018/DAT_ASCII_AUDCAD_T_201811.zip": {
+          "rows": 1413499,
+          "sha256": "10d99d59a57256823ea33115f405d79cd99e4c2f4404330583a220be89069b02",
+          "size_bytes": 7461571
+        },
+        "AUDCAD/tick/2018/DAT_ASCII_AUDCAD_T_201812.zip": {
+          "rows": 1995562,
+          "sha256": "856372472fef6e20194c2f7b6b8570863d2fdad24c6a8ce6d0c97bf123ea3a60",
+          "size_bytes": 11613853
+        },
+        "AUDCAD/tick/2019/DAT_ASCII_AUDCAD_T_201901.zip": {
+          "rows": 2905287,
+          "sha256": "3597bf91c6ac7973b766610c9197ef2345e2fda93b0d9496af833ad4589d30ac",
+          "size_bytes": 17492569
+        },
+        "AUDCAD/tick/2019/DAT_ASCII_AUDCAD_T_201902.zip": {
+          "rows": 2341256,
+          "sha256": "ed8d4fbc7c64e2035f82e25b1dc3799e18b14ecbb0c5936c1d5aab24df4e5175",
+          "size_bytes": 14027597
+        },
+        "AUDCAD/tick/2019/DAT_ASCII_AUDCAD_T_201903.zip": {
+          "rows": 2321999,
+          "sha256": "5f0b1063971fccbe3507e505b1ba821d5fb3db1c8f95944cf2b78f703c28960c",
+          "size_bytes": 13931222
+        },
+        "AUDCAD/tick/2019/DAT_ASCII_AUDCAD_T_201904.zip": {
+          "rows": 1956386,
+          "sha256": "23934f8707c8d0f43307b5aa481be99dd104a85dec3deddcd4e2e10ccb54e4ad",
+          "size_bytes": 11818393
+        },
+        "AUDCAD/tick/2019/DAT_ASCII_AUDCAD_T_201905.zip": {
+          "rows": 2134402,
+          "sha256": "4d07cd294100f9e1a8a6de37267852857d06552520bdf372dc72fce422f62188",
+          "size_bytes": 12811343
+        },
+        "AUDCAD/tick/2019/DAT_ASCII_AUDCAD_T_201906.zip": {
+          "rows": 2084838,
+          "sha256": "1c161b1bad4a5e0cdeb309ccbac9a3cd5c536ebffd5aa8de424fb28717ca94c9",
+          "size_bytes": 12338453
+        },
+        "AUDCAD/tick/2019/DAT_ASCII_AUDCAD_T_201907.zip": {
+          "rows": 1891190,
+          "sha256": "ff41fd8279ebe64aec898555cfb37d36f41f9e43408811b0d4488c6e7ba11e7c",
+          "size_bytes": 11164366
+        },
+        "AUDCAD/tick/2019/DAT_ASCII_AUDCAD_T_201908.zip": {
+          "rows": 2497642,
+          "sha256": "abe35a235e6d584f4a1413e55ef949cca82abca11432657030616ec1d2013045",
+          "size_bytes": 14732886
+        },
+        "AUDCAD/tick/2019/DAT_ASCII_AUDCAD_T_201909.zip": {
+          "rows": 1515069,
+          "sha256": "b7ba6635f325cec80878d8f92b7ba4ce53798f6810cabdac6682f95b340cd36f",
+          "size_bytes": 9121846
+        },
+        "AUDCAD/tick/2019/DAT_ASCII_AUDCAD_T_201910.zip": {
+          "rows": 2054578,
+          "sha256": "416a00bbf7e05854dbeca4c4598165746e5079dc715a0ba1e35623a2cce7cc91",
+          "size_bytes": 12177636
+        },
+        "AUDCAD/tick/2019/DAT_ASCII_AUDCAD_T_201911.zip": {
+          "rows": 1434975,
+          "sha256": "c79d4ff1a1e45293e3bc9dedc57bd2d9737351c7e46225b996dd48d52838d261",
+          "size_bytes": 8545537
+        },
+        "AUDCAD/tick/2019/DAT_ASCII_AUDCAD_T_201912.zip": {
+          "rows": 1404869,
+          "sha256": "cf003f8559abcb5885b038606b45f881cecd8069c9a8500d4914d36b4f959b6c",
+          "size_bytes": 8392991
+        },
+        "AUDCAD/tick/2020/DAT_ASCII_AUDCAD_T_202001.zip": {
+          "rows": 1908720,
+          "sha256": "5265694353a728c9c21d203698bafd37b9d2174f6ddb4983cdba62697213294c",
+          "size_bytes": 11471400
+        },
+        "AUDCAD/tick/2020/DAT_ASCII_AUDCAD_T_202002.zip": {
+          "rows": 2227038,
+          "sha256": "c3c507fee52a71073f5f8b605a5628ce95cd33330e35608d997907b4cfc97edd",
+          "size_bytes": 13183183
+        },
+        "AUDCAD/tick/2020/DAT_ASCII_AUDCAD_T_202003.zip": {
+          "rows": 6061580,
+          "sha256": "3604c7c6d07a247f12c8b111b15bf6870c8142d79b8e43c4876f1cb267ef7b67",
+          "size_bytes": 37621644
+        },
+        "AUDCAD/tick/2020/DAT_ASCII_AUDCAD_T_202004.zip": {
+          "rows": 4339004,
+          "sha256": "60ac76bf46f6c5fde950f13586f77a6e1d85786a5aee3340764debe2f5a975cd",
+          "size_bytes": 26343923
+        },
+        "AUDCAD/tick/2020/DAT_ASCII_AUDCAD_T_202005.zip": {
+          "rows": 3688375,
+          "sha256": "b4bc9a41174d963c2764fd737f9314118b4681f547a5775df2a06cd4018dc71d",
+          "size_bytes": 22061326
+        },
+        "AUDCAD/tick/2020/DAT_ASCII_AUDCAD_T_202006.zip": {
+          "rows": 4544191,
+          "sha256": "e11d27ad2a23ae815d474462bf0f19a32c1209fbcec90d8311cf39209fed0aca",
+          "size_bytes": 27214664
+        },
+        "AUDCAD/tick/2020/DAT_ASCII_AUDCAD_T_202007.zip": {
+          "rows": 3371568,
+          "sha256": "254e9c58de5d71338d7b018ca807eff617c8f318031453a931c630e78f3cacc9",
+          "size_bytes": 20014342
+        },
+        "AUDCAD/tick/2020/DAT_ASCII_AUDCAD_T_202008.zip": {
+          "rows": 2879495,
+          "sha256": "4056a3c85b1f9bcf38488149880a8b4269907d18feb1634869337ceaeae9d7f7",
+          "size_bytes": 17273188
+        },
+        "AUDCAD/tick/2020/DAT_ASCII_AUDCAD_T_202009.zip": {
+          "rows": 2972857,
+          "sha256": "f57ac10d0e9740911bcfc29187f824889688610b7002eddc36782b52af4841e8",
+          "size_bytes": 18143730
+        },
+        "AUDCAD/tick/2020/DAT_ASCII_AUDCAD_T_202010.zip": {
+          "rows": 2571309,
+          "sha256": "86aea2a27f503d9d63121aed4be9adfde107ccd54424ad9a4951021842a61e6e",
+          "size_bytes": 15692617
+        },
+        "AUDCAD/tick/2020/DAT_ASCII_AUDCAD_T_202011.zip": {
+          "rows": 2532119,
+          "sha256": "18967227766953fe1358dbd8ab76e94a75ce50482735e57c80a3c8e5ce6242ec",
+          "size_bytes": 15627641
+        },
+        "AUDCAD/tick/2020/DAT_ASCII_AUDCAD_T_202012.zip": {
+          "rows": 2258519,
+          "sha256": "c1e723aa2c189ec645e384bce45fd57be73485189fa4d3e228fe0e0987088bb2",
+          "size_bytes": 14004075
+        },
+        "AUDCAD/tick/2021/DAT_ASCII_AUDCAD_T_202101.zip": {
+          "rows": 2778382,
+          "sha256": "af43e70e014579995385c57ac5a9e35ff8f75c9264d6b0bf2956c1b644ee6419",
+          "size_bytes": 17077482
+        },
+        "AUDCAD/tick/2021/DAT_ASCII_AUDCAD_T_202102.zip": {
+          "rows": 2277127,
+          "sha256": "8d93a499ef40ea948173ad13e3a8639c871f66d083e5a5d6fa5c55629f54cd4d",
+          "size_bytes": 14071107
+        },
+        "AUDCAD/tick/2021/DAT_ASCII_AUDCAD_T_202103.zip": {
+          "rows": 3248511,
+          "sha256": "7d8fcc9430eb3c8f71c5b6cf90d84238aca88ccec7b0102f453174c55aeed589",
+          "size_bytes": 19716012
+        },
+        "AUDCAD/tick/2021/DAT_ASCII_AUDCAD_T_202104.zip": {
+          "rows": 1981705,
+          "sha256": "d64b5dd91824e3b1d054bcb8febdecc469d9eee5a79991ea2c1811623d03e5e4",
+          "size_bytes": 12226205
+        },
+        "AUDCAD/tick/2021/DAT_ASCII_AUDCAD_T_202105.zip": {
+          "rows": 1948291,
+          "sha256": "6d93fac503b716f050f9aaa71a6bfff1dd703e126f594e4e23dd4282a3a04b26",
+          "size_bytes": 12052858
+        },
+        "AUDCAD/tick/2021/DAT_ASCII_AUDCAD_T_202106.zip": {
+          "rows": 1795020,
+          "sha256": "6aa917cc5d55e95437e8e911200ae6a89b147d9809fda638cf3e390091484885",
+          "size_bytes": 11165816
+        },
+        "AUDCAD/tick/2021/DAT_ASCII_AUDCAD_T_202107.zip": {
+          "rows": 2062792,
+          "sha256": "a011d2b1c2e770ccad5a09307a3315a36b657f7ba47bb57aa2a766ce81663e98",
+          "size_bytes": 12790341
+        },
+        "AUDCAD/tick/2021/DAT_ASCII_AUDCAD_T_202108.zip": {
+          "rows": 1543399,
+          "sha256": "3e75a937776a0ddee65c16972a3ae3bf07b1b52852218ed256c16d74a38a8f6e",
+          "size_bytes": 9719768
+        },
+        "AUDCAD/tick/2021/DAT_ASCII_AUDCAD_T_202109.zip": {
+          "rows": 2061676,
+          "sha256": "da51852e62960a5b3c695cb6abc4a80edb39d6787400823f18d7bd96c3cb9568",
+          "size_bytes": 12776676
+        },
+        "AUDCAD/tick/2021/DAT_ASCII_AUDCAD_T_202110.zip": {
+          "rows": 2032247,
+          "sha256": "89eb5406c32f4fe19959bb43c8d130f2a36c9e3ebaeeb129101115c3ccd9d687",
+          "size_bytes": 12576328
+        },
+        "AUDCAD/tick/2021/DAT_ASCII_AUDCAD_T_202111.zip": {
+          "rows": 2103269,
+          "sha256": "654fa2d22ec2359243a992d8ca614cd9b3f34f50c82a0107d48cf28eb386d564",
+          "size_bytes": 13053210
+        },
+        "AUDCAD/tick/2021/DAT_ASCII_AUDCAD_T_202112.zip": {
+          "rows": 2221215,
+          "sha256": "ec218687b9c512ef5602ca81c6e04004146191e8da08b380a6fb4c0196d5003c",
+          "size_bytes": 13669321
+        },
+        "AUDCAD/tick/2022/DAT_ASCII_AUDCAD_T_202201.zip": {
+          "rows": 2657589,
+          "sha256": "dd9242fd3b143731b2b68df677ff158f2c1030a4c2548fda8f378b2d9281c192",
+          "size_bytes": 16024883
+        },
+        "AUDCAD/tick/2022/DAT_ASCII_AUDCAD_T_202202.zip": {
+          "rows": 2752991,
+          "sha256": "77e81628e10d931e673daffc1b9bae91e26ccdbc2b64eaff560d1d74508fe86f",
+          "size_bytes": 16786790
+        },
+        "AUDCAD/tick/2022/DAT_ASCII_AUDCAD_T_202203.zip": {
+          "rows": 3101176,
+          "sha256": "f998395b4b09e8d3f68aa89c8c186ab9a4b074daf5126230280eed611eca10ca",
+          "size_bytes": 19116961
+        },
+        "AUDCAD/tick/2022/DAT_ASCII_AUDCAD_T_202204.zip": {
+          "rows": 2348332,
+          "sha256": "1e8b44ca0138caf1061dab38c671a5f8bda4aa34100d76ea66aff68a7a11bcb7",
+          "size_bytes": 14611513
+        },
+        "AUDCAD/tick/2022/DAT_ASCII_AUDCAD_T_202205.zip": {
+          "rows": 3411010,
+          "sha256": "987bdfa21ca766f358079b1f3fc41c034d2e38074eab73ed9128fafe7b148f78",
+          "size_bytes": 21008987
+        },
+        "AUDCAD/tick/2022/DAT_ASCII_AUDCAD_T_202206.zip": {
+          "rows": 3395407,
+          "sha256": "5339209e6b183f57d465b23ee13f6a53e5e2d10ef818995c3a094d9dc9ff72a6",
+          "size_bytes": 20603254
+        },
+        "AUDCAD/tick/2022/DAT_ASCII_AUDCAD_T_202207.zip": {
+          "rows": 3351465,
+          "sha256": "0ac892f9559cf8d225c88d826f43359301f8fff884bd1a726b0913b181ef9bd8",
+          "size_bytes": 20380603
+        },
+        "AUDCAD/tick/2022/DAT_ASCII_AUDCAD_T_202208.zip": {
+          "rows": 3170752,
+          "sha256": "199e692d6660c9e7bfa0ac5156a25d7cfc98ea887384fd20752c17067a83790b",
+          "size_bytes": 19306473
+        },
+        "AUDCAD/tick/2022/DAT_ASCII_AUDCAD_T_202209.zip": {
+          "rows": 3830002,
+          "sha256": "67db1acb5192d3609ce017c0678d668d91aa2f8a231822042f94f94591726b48",
+          "size_bytes": 23238125
+        },
+        "AUDCAD/tick/2022/DAT_ASCII_AUDCAD_T_202210.zip": {
+          "rows": 3968215,
+          "sha256": "dc02ba4208446c46c093f333664be0fb3971971422f2436f02c2966c67ce48d4",
+          "size_bytes": 24227590
+        },
+        "AUDCAD/tick/2022/DAT_ASCII_AUDCAD_T_202211.zip": {
+          "rows": 4800753,
+          "sha256": "12e3a785753f83ada193bc28b9abe2b96070d2c89141f052740d98da523e011b",
+          "size_bytes": 28781753
+        },
+        "AUDCAD/tick/2022/DAT_ASCII_AUDCAD_T_202212.zip": {
+          "rows": 3794483,
+          "sha256": "2803677edc09a857836879a53cb6814b71f03bba46b138a33da10b919abf4d31",
+          "size_bytes": 23123054
+        },
+        "AUDCAD/tick/2023/DAT_ASCII_AUDCAD_T_202301.zip": {
+          "rows": 3187338,
+          "sha256": "d615132410de2d65010377a08c7d4050624451d15237d8328bae189c50d0fbfe",
+          "size_bytes": 20123350
+        },
+        "AUDCAD/tick/2023/DAT_ASCII_AUDCAD_T_202302.zip": {
+          "rows": 2933614,
+          "sha256": "9ed52dabfc1ecc09e72f61bc71d63819d109b8bcd1c8702874439fc293c670ab",
+          "size_bytes": 18122202
+        },
+        "AUDCAD/tick/2023/DAT_ASCII_AUDCAD_T_202303.zip": {
+          "rows": 2517461,
+          "sha256": "ffd4b7b099e5fb93507cacae91e7d8fd0947d4891489a530501a5f176bce2509",
+          "size_bytes": 15562776
+        },
+        "AUDCAD/tick/2023/DAT_ASCII_AUDCAD_T_202304.zip": {
+          "rows": 1506636,
+          "sha256": "8e7fc195904e6594fb31565b67fc2a9c203d12883582a9e671ed85f207777b13",
+          "size_bytes": 9361818
+        },
+        "AUDCAD/tick/2023/DAT_ASCII_AUDCAD_T_202305.zip": {
+          "rows": 1908203,
+          "sha256": "beef40ae4ef02a0863280d572986de25a053946d4ca8f61ae4d41146e08451b9",
+          "size_bytes": 11679348
+        },
+        "AUDCAD/tick/2023/DAT_ASCII_AUDCAD_T_202306.zip": {
+          "rows": 1509599,
+          "sha256": "10f86867d4f81e6663a851264d2899cc951d3c5e6c9c5336f5f68bb4ca5d6706",
+          "size_bytes": 9489496
+        },
+        "AUDCAD/tick/2023/DAT_ASCII_AUDCAD_T_202307.zip": {
+          "rows": 1505196,
+          "sha256": "d6483b3eaba96aa1a6d8a90b00421812cb0c263b60aed6cf617aefab7a64a45c",
+          "size_bytes": 9558477
+        },
+        "AUDCAD/tick/2023/DAT_ASCII_AUDCAD_T_202308.zip": {
+          "rows": 2452833,
+          "sha256": "353f7a856c3d663265529f1127fc708e59cb85298af56aac71efd10d77ea8659",
+          "size_bytes": 15366285
+        },
+        "AUDCAD/tick/2023/DAT_ASCII_AUDCAD_T_202309.zip": {
+          "rows": 2002763,
+          "sha256": "973c54edc9e02dfbc83eb7d4e36615a469f0688e496fb0d8b0ca1fdd8fb2d2d0",
+          "size_bytes": 12494573
+        },
+        "AUDCAD/tick/2023/DAT_ASCII_AUDCAD_T_202310.zip": {
+          "rows": 2394605,
+          "sha256": "f7b8bc8a28d2e92e104095e4f48de71e73a3a298edcc46c3aebb88892733126f",
+          "size_bytes": 14890044
+        },
+        "AUDCAD/tick/2023/DAT_ASCII_AUDCAD_T_202311.zip": {
+          "rows": 2030621,
+          "sha256": "0fe35108d13e48a1bf0cdb07892c4f2ca01f3ccd43a0d907c7c3dfb679327895",
+          "size_bytes": 12780560
+        },
+        "AUDCAD/tick/2023/DAT_ASCII_AUDCAD_T_202312.zip": {
+          "rows": 2092298,
+          "sha256": "21631a3e3171ea23aca53d0365be946083f84fbd39a3379dfede5bb65e1433c0",
+          "size_bytes": 13065553
+        },
+        "AUDCAD/tick/2024/DAT_ASCII_AUDCAD_T_202401.zip": {
+          "rows": 2201787,
+          "sha256": "16a9caeea8e09415cc4608182d8e565617a66586520d509e6b3a10a01a73c414",
+          "size_bytes": 13840487
+        },
+        "AUDCAD/tick/2024/DAT_ASCII_AUDCAD_T_202402.zip": {
+          "rows": 1745957,
+          "sha256": "ea27b5802053b125f705af8418036accfe2954bbef90c6831b14478a79436aa3",
+          "size_bytes": 10849175
+        },
+        "AUDCAD/tick/2024/DAT_ASCII_AUDCAD_T_202403.zip": {
+          "rows": 1565050,
+          "sha256": "357aff046c4a20418634b5e875326cf31b8956141987d01445996f07910829d3",
+          "size_bytes": 9766245
+        },
+        "AUDCAD/tick/2024/DAT_ASCII_AUDCAD_T_202404.zip": {
+          "rows": 1908028,
+          "sha256": "8471cdcd0a193b7ee499d6c706cd77d80e8b4892d5fe92fb29cc3a3288740359",
+          "size_bytes": 11820948
+        },
+        "AUDCAD/tick/2024/DAT_ASCII_AUDCAD_T_202405.zip": {
+          "rows": 1707887,
+          "sha256": "ba05088a4064b98fa7695560d1013da64b9f4d054e55e2dae849dab305e99aec",
+          "size_bytes": 10597973
+        },
+        "AUDCAD/tick/2024/DAT_ASCII_AUDCAD_T_202406.zip": {
+          "rows": 1690695,
+          "sha256": "db1e48398119ace10206c6ef6a7424a4d1d02b5ab4abc0fa8cd4ab0c31a7dbb9",
+          "size_bytes": 10418943
+        },
+        "AUDCAD/tick/2024/DAT_ASCII_AUDCAD_T_202407.zip": {
+          "rows": 1860814,
+          "sha256": "fde66b9f51c374de40486e8bf73f2d81e40e1d8fec21e74e1bc80140c8e99259",
+          "size_bytes": 11445892
+        },
+        "AUDCAD/tick/2024/DAT_ASCII_AUDCAD_T_202408.zip": {
+          "rows": 2454235,
+          "sha256": "031004db2090481d485299bb060f3673324d36b7978e66b7b935fe3a155f7c00",
+          "size_bytes": 15043290
+        },
+        "AUDCAD/tick/2024/DAT_ASCII_AUDCAD_T_202409.zip": {
+          "rows": 2229217,
+          "sha256": "8a0baf941ca481ab24749a513399d43c36b2e3718dca3312f71af54a9aed9c7c",
+          "size_bytes": 13510488
+        },
+        "AUDCAD/tick/2024/DAT_ASCII_AUDCAD_T_202410.zip": {
+          "rows": 2234658,
+          "sha256": "e46bff20948acb08f64828e55da1709329c4b7a437ef1c672cd4228a6b6fbbb7",
+          "size_bytes": 13723144
+        },
+        "AUDCAD/tick/2024/DAT_ASCII_AUDCAD_T_202411.zip": {
+          "rows": 2686782,
+          "sha256": "5ae0f75c97e56e6cbf375ceeccf382450da9246cea749a61e599d3588ee06895",
+          "size_bytes": 16435826
+        },
+        "AUDCAD/tick/2024/DAT_ASCII_AUDCAD_T_202412.zip": {
+          "rows": 2454144,
+          "sha256": "9650e10873d320a92358866cb4666976002fe926a9d1997502f63059e6f36b35",
+          "size_bytes": 15071287
+        },
+        "AUDCAD/tick/2025/DAT_ASCII_AUDCAD_T_202501.zip": {
+          "rows": 2599572,
+          "sha256": "0f233cb870b7befe6b2366954b821f5f166ac60284fbd782b4dabe2555eda6ec",
+          "size_bytes": 16035142
+        },
+        "AUDCAD/tick/2025/DAT_ASCII_AUDCAD_T_202502.zip": {
+          "rows": 2508230,
+          "sha256": "5ef2f7cf877676ffcf46e2740a6a5a688929670207e37989695ae9379eae5c0c",
+          "size_bytes": 15283939
+        },
+        "AUDCAD/tick/2025/DAT_ASCII_AUDCAD_T_202503.zip": {
+          "rows": 2981270,
+          "sha256": "642260433cd7bb6442cdec9502f4de128ca82aabacf5c8b41ad2e1866990df95",
+          "size_bytes": 18062944
+        },
+        "AUDCAD/tick/2025/DAT_ASCII_AUDCAD_T_202504.zip": {
+          "rows": 4593577,
+          "sha256": "33e11cac273f6c39f5137817e668cf53f1342e6ad3f8f000de46d1f3a7ad81ac",
+          "size_bytes": 28574034
+        },
+        "AUDCAD/tick/2025/DAT_ASCII_AUDCAD_T_202505.zip": {
+          "rows": 1785095,
+          "sha256": "785ab195fe804a158bef674d11bafe12a32b70cdcea93244a594dde929475515",
+          "size_bytes": 11292786
+        },
+        "AUDCAD/tick/2025/DAT_ASCII_AUDCAD_T_202506.zip": {
+          "rows": 1802910,
+          "sha256": "f60dc00187511209b91bbbbaaaeeaa478b948e2192a5ca1194440631924a02a8",
+          "size_bytes": 11240593
+        },
+        "AUDCAD/tick/2025/DAT_ASCII_AUDCAD_T_202507.zip": {
+          "rows": 1757141,
+          "sha256": "e1d313c74f819f7a92c796c21f8b98853c9b3947fc7295d32887cfea30a8622a",
+          "size_bytes": 10771659
+        },
+        "AUDCAD/tick/2025/DAT_ASCII_AUDCAD_T_202508.zip": {
+          "rows": 1324860,
+          "sha256": "c65e57c2d5fc910d44e8eace3ce187a7f112bc3667a86fb57b8acbe8b3127cf8",
+          "size_bytes": 8170677
+        },
+        "AUDCAD/tick/2025/DAT_ASCII_AUDCAD_T_202509.zip": {
+          "rows": 1497188,
+          "sha256": "0f377afc2f9512fe72d9af415209c9d51d9934f076524f6f72b2e165f5878677",
+          "size_bytes": 9198406
+        },
+        "AUDCAD/tick/2025/DAT_ASCII_AUDCAD_T_202510.zip": {
+          "rows": 1744500,
+          "sha256": "3fe2c64ce0fe1dec648bc0f22fdd33f0a5a1ceff0f216a71d5daa5f520ded01e",
+          "size_bytes": 10688382
+        },
+        "AUDCAD/tick/2025/DAT_ASCII_AUDCAD_T_202511.zip": {
+          "rows": 1970855,
+          "sha256": "f8972da289cd151b50d2983770fba3502a772ed0cc2d14ba95f7ebc44d782267",
+          "size_bytes": 11887029
+        },
+        "AUDCAD/tick/2025/DAT_ASCII_AUDCAD_T_202512.zip": {
+          "rows": 2042782,
+          "sha256": "cc520dd2e4c05515611577a9d527f82a6e9dda35fe512981378b60484dbc552d",
+          "size_bytes": 12141906
+        },
+        "AUDCAD/tick/2026/DAT_ASCII_AUDCAD_T_202601.zip": {
+          "rows": 1726719,
+          "sha256": "d5eb90aff10a40085046fbcb7b7e0e2edabbb3dc23ef273942862edac516b116",
+          "size_bytes": 10578126
+        },
+        "AUDCAD/tick/2026/DAT_ASCII_AUDCAD_T_202602.zip": {
+          "rows": 1417280,
+          "sha256": "e09c2cedfea2e566a3cea85b9633b314704257d5363d9f24012ef8f390657bc8",
+          "size_bytes": 9072880
+        },
+        "AUDCAD/tick/2026/DAT_ASCII_AUDCAD_T_202603.zip": {
+          "rows": 2837610,
+          "sha256": "e93ce0145117e9fe2b614bf2fa2c56edc5f272cf533431c7c8bca5e05f1387af",
+          "size_bytes": 18183427
+        },
+        "AUDCAD/tick/2026/DAT_ASCII_AUDCAD_T_202604.zip": {
+          "rows": 637232,
+          "sha256": "df8cdbe945fdcce36dacec073095721b05cf95147c0ce36917c3c254e0d7a929",
+          "size_bytes": 4133363
+        }
+      },
+      "latest_month": "202604",
+      "total_files": 196,
+      "total_size_bytes": 1873947154
+    },
+    "AUDCHF": {
+      "earliest_month": "201001",
+      "files": {
+        "AUDCHF/tick/2010/DAT_ASCII_AUDCHF_T_201001.zip": {
+          "rows": 580469,
+          "sha256": "afab08ecc89dff6f7ef441d677700d14cb9bed16fd62706359ffd087429c6ff2",
+          "size_bytes": 2162073
+        },
+        "AUDCHF/tick/2010/DAT_ASCII_AUDCHF_T_201002.zip": {
+          "rows": 609714,
+          "sha256": "b56a6a20169de4cd22d5f8eb37b70463808fb2f7c4624f449e09124388148736",
+          "size_bytes": 2250332
+        },
+        "AUDCHF/tick/2010/DAT_ASCII_AUDCHF_T_201003.zip": {
+          "rows": 690598,
+          "sha256": "f4e52dc27ad9aba7779cc731a07aadf224c43850a3a88051c9a6a7cd5b8df451",
+          "size_bytes": 2427493
+        },
+        "AUDCHF/tick/2010/DAT_ASCII_AUDCHF_T_201004.zip": {
+          "rows": 715317,
+          "sha256": "829383af28e12262f615aadfe0bf6befb2dbff2ba8c7ee1b188a6f74a12418f1",
+          "size_bytes": 2398811
+        },
+        "AUDCHF/tick/2010/DAT_ASCII_AUDCHF_T_201005.zip": {
+          "rows": 1073266,
+          "sha256": "413428e6a089c31e9f4a9db503f74f1b2ae374103be9f65f42ab9eed246c26c9",
+          "size_bytes": 3907276
+        },
+        "AUDCHF/tick/2010/DAT_ASCII_AUDCHF_T_201006.zip": {
+          "rows": 856421,
+          "sha256": "1072f87117e2c83a87548b1a1d414e3772364156098bcd405dbc302eb9daa81b",
+          "size_bytes": 3183144
+        },
+        "AUDCHF/tick/2010/DAT_ASCII_AUDCHF_T_201007.zip": {
+          "rows": 690247,
+          "sha256": "ced703b6a0eeeb20255256140f86109d7d76e161a593456e6c70cb9aa4362aeb",
+          "size_bytes": 2601426
+        },
+        "AUDCHF/tick/2010/DAT_ASCII_AUDCHF_T_201008.zip": {
+          "rows": 646582,
+          "sha256": "029876b0bc95626f657bde7ab73aa8dd281b1a71578effac753772f63f554b7a",
+          "size_bytes": 2443964
+        },
+        "AUDCHF/tick/2010/DAT_ASCII_AUDCHF_T_201009.zip": {
+          "rows": 644462,
+          "sha256": "bae3de2c0b697550105a4be3d9b3b1b3ac9a4e2335dfa16d604d8f435299907c",
+          "size_bytes": 2416908
+        },
+        "AUDCHF/tick/2010/DAT_ASCII_AUDCHF_T_201010.zip": {
+          "rows": 576928,
+          "sha256": "73b87f724d3b8d6c3bfbc793b77557508b215e485ad82217d0ce4ee8581628b4",
+          "size_bytes": 2117608
+        },
+        "AUDCHF/tick/2010/DAT_ASCII_AUDCHF_T_201011.zip": {
+          "rows": 635992,
+          "sha256": "7e05726083495f1db556f52cd904c6fd4f2854ff68a4c5125e36fc0013d43b0b",
+          "size_bytes": 2310703
+        },
+        "AUDCHF/tick/2010/DAT_ASCII_AUDCHF_T_201012.zip": {
+          "rows": 516633,
+          "sha256": "1807524ed4f4e1de1c7c9b254ea6a6c5eece6798477fff89e79e70a14f96f01b",
+          "size_bytes": 1896801
+        },
+        "AUDCHF/tick/2011/DAT_ASCII_AUDCHF_T_201101.zip": {
+          "rows": 570313,
+          "sha256": "66940457f04bb3967398974342e93cb998716df2e1bede4bc8bf47a365ec4ec7",
+          "size_bytes": 2078823
+        },
+        "AUDCHF/tick/2011/DAT_ASCII_AUDCHF_T_201102.zip": {
+          "rows": 544360,
+          "sha256": "dc3ebe7783ed28464bea23f190792ae0c4051514ab646469368690fb64d0a098",
+          "size_bytes": 1940165
+        },
+        "AUDCHF/tick/2011/DAT_ASCII_AUDCHF_T_201103.zip": {
+          "rows": 575248,
+          "sha256": "1c9e3959bb8039add9081c3eae6c21a9510ad7542660108021f082191f6c783c",
+          "size_bytes": 2129667
+        },
+        "AUDCHF/tick/2011/DAT_ASCII_AUDCHF_T_201104.zip": {
+          "rows": 451964,
+          "sha256": "64d1ee9162158e28fce2b698d02d5fd665e2f81a27db368f2d4ffb09dafa2671",
+          "size_bytes": 1843176
+        },
+        "AUDCHF/tick/2011/DAT_ASCII_AUDCHF_T_201105.zip": {
+          "rows": 562922,
+          "sha256": "3a554787502d2258b5bb799b4e434579dbc2514b77f4d1e086607e50c1250adc",
+          "size_bytes": 2941389
+        },
+        "AUDCHF/tick/2011/DAT_ASCII_AUDCHF_T_201106.zip": {
+          "rows": 590787,
+          "sha256": "8411ce6d28ce84e27c4c70cfd4e6a7b7553b23ab2580a89914220b7aa8c84457",
+          "size_bytes": 3018960
+        },
+        "AUDCHF/tick/2011/DAT_ASCII_AUDCHF_T_201107.zip": {
+          "rows": 606688,
+          "sha256": "7aab42afaccfe2c77a682adf5867615716e0390a57085ee78998ec95acbc8504",
+          "size_bytes": 3139980
+        },
+        "AUDCHF/tick/2011/DAT_ASCII_AUDCHF_T_201108.zip": {
+          "rows": 798323,
+          "sha256": "3f362f52db90a3f9673a41a635a41ea032343040a4163cefdd5f76d7738eb7e7",
+          "size_bytes": 4140485
+        },
+        "AUDCHF/tick/2011/DAT_ASCII_AUDCHF_T_201109.zip": {
+          "rows": 662574,
+          "sha256": "9fcf871bc2aaf1e6d8ed9c38614edc1d8c2631b0826be0a55a5c15fb58c800c6",
+          "size_bytes": 3456980
+        },
+        "AUDCHF/tick/2011/DAT_ASCII_AUDCHF_T_201110.zip": {
+          "rows": 653544,
+          "sha256": "06031a4b7907990396b9abcbf0ad553dd9e5e3585643284509f04743b13aeb5a",
+          "size_bytes": 3400165
+        },
+        "AUDCHF/tick/2011/DAT_ASCII_AUDCHF_T_201111.zip": {
+          "rows": 730794,
+          "sha256": "b561206ab33a286ca4ed4a349b8d227f3ab61397eec2fc90134acc73f59c20e5",
+          "size_bytes": 3768888
+        },
+        "AUDCHF/tick/2011/DAT_ASCII_AUDCHF_T_201112.zip": {
+          "rows": 1041607,
+          "sha256": "947ec2c837ee8eca63fb949c36a4daefd7a07d02d65a53d2db550e673c4846f5",
+          "size_bytes": 5973663
+        },
+        "AUDCHF/tick/2012/DAT_ASCII_AUDCHF_T_201201.zip": {
+          "rows": 1066665,
+          "sha256": "56ab2eaf44a30f40e54042b500d1eb9557d65ad03695fcb10e782f0f74488479",
+          "size_bytes": 6044708
+        },
+        "AUDCHF/tick/2012/DAT_ASCII_AUDCHF_T_201202.zip": {
+          "rows": 1645800,
+          "sha256": "3439623df270fe67311bc06e52ba9b0c7b88531324c7d12f31e56a2e9a243b13",
+          "size_bytes": 8795218
+        },
+        "AUDCHF/tick/2012/DAT_ASCII_AUDCHF_T_201203.zip": {
+          "rows": 1538432,
+          "sha256": "e4dc12f64e3f306bba8d95618e5e4d546091bbc1334fcfc927366294358add40",
+          "size_bytes": 8242358
+        },
+        "AUDCHF/tick/2012/DAT_ASCII_AUDCHF_T_201204.zip": {
+          "rows": 1374619,
+          "sha256": "55a8d7fca8cf60e2ca3fe164739432dd00302ea29fa8bae2c3f114f83d316889",
+          "size_bytes": 7334647
+        },
+        "AUDCHF/tick/2012/DAT_ASCII_AUDCHF_T_201205.zip": {
+          "rows": 1704139,
+          "sha256": "3a71ce9a9a359d16c2784aa54ee849b5d8e421c2c902889be95349161454b87b",
+          "size_bytes": 9074720
+        },
+        "AUDCHF/tick/2012/DAT_ASCII_AUDCHF_T_201206.zip": {
+          "rows": 1630199,
+          "sha256": "82cdfbebc0c30b445235897243122f0648072f9601fa5b57c401edef5297b3ff",
+          "size_bytes": 8642569
+        },
+        "AUDCHF/tick/2012/DAT_ASCII_AUDCHF_T_201207.zip": {
+          "rows": 1391755,
+          "sha256": "d4c3db2123669b65f34c22a6b449d949787fd349ef8eb80e7d89fb318470064d",
+          "size_bytes": 7497125
+        },
+        "AUDCHF/tick/2012/DAT_ASCII_AUDCHF_T_201208.zip": {
+          "rows": 1007085,
+          "sha256": "c0ab3d347af5bdce997f3ee1066c1267fba503c8151c7db7b8dde499b7e0d0a6",
+          "size_bytes": 5557949
+        },
+        "AUDCHF/tick/2012/DAT_ASCII_AUDCHF_T_201209.zip": {
+          "rows": 971425,
+          "sha256": "d4cd55530361d33e6754ae001368bb384ae80e210e22ee01806f5f0a5e16d013",
+          "size_bytes": 5512317
+        },
+        "AUDCHF/tick/2012/DAT_ASCII_AUDCHF_T_201210.zip": {
+          "rows": 908695,
+          "sha256": "4fbc4e5a791cf9b3f4c97dc9b051371815baa3e25014a6ea10c5bd8d970725f6",
+          "size_bytes": 5071241
+        },
+        "AUDCHF/tick/2012/DAT_ASCII_AUDCHF_T_201211.zip": {
+          "rows": 732748,
+          "sha256": "fd6b1807ce38d79525691d7f61e0d7254fc504f43a8385a8ab415928212ba2e7",
+          "size_bytes": 4117489
+        },
+        "AUDCHF/tick/2012/DAT_ASCII_AUDCHF_T_201212.zip": {
+          "rows": 549128,
+          "sha256": "2586516a3f2890a9b2209e902d068f600689fd185adedee9f01fc8be79fe8a47",
+          "size_bytes": 3169630
+        },
+        "AUDCHF/tick/2013/DAT_ASCII_AUDCHF_T_201301.zip": {
+          "rows": 794977,
+          "sha256": "8727c8075d16134c7fbd0cd015f1435e5da9e23046bccbac208a1c4c5bc5b388",
+          "size_bytes": 4648089
+        },
+        "AUDCHF/tick/2013/DAT_ASCII_AUDCHF_T_201302.zip": {
+          "rows": 727978,
+          "sha256": "6dec63dbbc6cf89c4c056a89e7f390b3e1dc72b0c5ade9d56e0feb18f363ca68",
+          "size_bytes": 4287742
+        },
+        "AUDCHF/tick/2013/DAT_ASCII_AUDCHF_T_201303.zip": {
+          "rows": 701438,
+          "sha256": "9d90f404d247693025202be7ef7a58334bc22134ab69782b3ea25a8133ce9e22",
+          "size_bytes": 4085030
+        },
+        "AUDCHF/tick/2013/DAT_ASCII_AUDCHF_T_201304.zip": {
+          "rows": 690709,
+          "sha256": "ce84f6556942f3154065bc23ce72680b40ac4a17a1c39c73804904ebc1c8b67f",
+          "size_bytes": 4048076
+        },
+        "AUDCHF/tick/2013/DAT_ASCII_AUDCHF_T_201305.zip": {
+          "rows": 943057,
+          "sha256": "d93dfdb38aa16be9c758be075fb330b54b33a5b9789d5e93e0984fb30087aec8",
+          "size_bytes": 5607679
+        },
+        "AUDCHF/tick/2013/DAT_ASCII_AUDCHF_T_201306.zip": {
+          "rows": 1123190,
+          "sha256": "93459f1458a4dab5e64db0f3614bf824ef6b61b1d0e9933b6762111cf748db5f",
+          "size_bytes": 6739473
+        },
+        "AUDCHF/tick/2013/DAT_ASCII_AUDCHF_T_201307.zip": {
+          "rows": 1144583,
+          "sha256": "e790bd6f826a7679afaf7785c3c0179335a5aac58f3cfba86060b151ed3470b2",
+          "size_bytes": 6756931
+        },
+        "AUDCHF/tick/2013/DAT_ASCII_AUDCHF_T_201308.zip": {
+          "rows": 947862,
+          "sha256": "48ecd3d722d485c693b1ab7d3bb71f135db238420f6213843b2fca88eb9abfe5",
+          "size_bytes": 5553213
+        },
+        "AUDCHF/tick/2013/DAT_ASCII_AUDCHF_T_201309.zip": {
+          "rows": 781612,
+          "sha256": "cd9f464f790eb53d34e5775d8b45059b0abc4a1e7d6be708a9c278cb2dd6d332",
+          "size_bytes": 4575176
+        },
+        "AUDCHF/tick/2013/DAT_ASCII_AUDCHF_T_201310.zip": {
+          "rows": 768581,
+          "sha256": "7b4dd7d91ee14c702cfba8f592c427296ad31a503dfc8659e8f88826a53c06dd",
+          "size_bytes": 4530192
+        },
+        "AUDCHF/tick/2013/DAT_ASCII_AUDCHF_T_201311.zip": {
+          "rows": 708191,
+          "sha256": "514b52a0168dde71d8e6e51172bb8b632c81c99476089f94ad106e72182751c6",
+          "size_bytes": 4168787
+        },
+        "AUDCHF/tick/2013/DAT_ASCII_AUDCHF_T_201312.zip": {
+          "rows": 680239,
+          "sha256": "4e0955beed30711e2712e64982403fec327320ac8884645740de5a2293eef6d2",
+          "size_bytes": 3988744
+        },
+        "AUDCHF/tick/2014/DAT_ASCII_AUDCHF_T_201401.zip": {
+          "rows": 884990,
+          "sha256": "ec9a968f54a29a8867ebd4c7135c48be87e7a275f57da9aee2dc25fc8c68fe98",
+          "size_bytes": 5169571
+        },
+        "AUDCHF/tick/2014/DAT_ASCII_AUDCHF_T_201402.zip": {
+          "rows": 718584,
+          "sha256": "37d96f5bac15c29970c05e817678e423e55a0b0ad4bffc0c87171af0481abd89",
+          "size_bytes": 4237335
+        },
+        "AUDCHF/tick/2014/DAT_ASCII_AUDCHF_T_201403.zip": {
+          "rows": 710487,
+          "sha256": "5ccca2b4a0fc559eefcc455ce7195318b1c3dc7ed3099b62f3315a61a6eb2e62",
+          "size_bytes": 4136026
+        },
+        "AUDCHF/tick/2014/DAT_ASCII_AUDCHF_T_201404.zip": {
+          "rows": 616347,
+          "sha256": "e9ac289aaba6ea6e99535c1750b80c411adafb9a5eba6b2067b24cb09a8532b8",
+          "size_bytes": 3559773
+        },
+        "AUDCHF/tick/2014/DAT_ASCII_AUDCHF_T_201405.zip": {
+          "rows": 603628,
+          "sha256": "97f1a4b8107ca0e96d0e0df9b6fc152fbc4afaac91854a116ae3c14f033692a4",
+          "size_bytes": 3459292
+        },
+        "AUDCHF/tick/2014/DAT_ASCII_AUDCHF_T_201406.zip": {
+          "rows": 592702,
+          "sha256": "f487692fafed6b6f1fe4210b00d3dfecaa115482f44b03bc6abbeaf8bd6ca08a",
+          "size_bytes": 3356912
+        },
+        "AUDCHF/tick/2014/DAT_ASCII_AUDCHF_T_201407.zip": {
+          "rows": 628880,
+          "sha256": "b4922514c24f31f8ff6f2b1deeaf09c6d6a3dc808b259f113e6f558ac6d23186",
+          "size_bytes": 3449609
+        },
+        "AUDCHF/tick/2014/DAT_ASCII_AUDCHF_T_201408.zip": {
+          "rows": 692472,
+          "sha256": "b8951ce340347c4c54abd143211819fc51505261de2e92b4830363e143f4e16f",
+          "size_bytes": 3358801
+        },
+        "AUDCHF/tick/2014/DAT_ASCII_AUDCHF_T_201409.zip": {
+          "rows": 1027624,
+          "sha256": "493f5fe0a92f621f038435bbc97fe6a96113482b563135d248f73b156dd5587d",
+          "size_bytes": 5028306
+        },
+        "AUDCHF/tick/2014/DAT_ASCII_AUDCHF_T_201410.zip": {
+          "rows": 1283065,
+          "sha256": "a2c2a62edd9b028409dd37658e7f8a7f54f29a3c350b51878efa85d1eb47d5f7",
+          "size_bytes": 7283053
+        },
+        "AUDCHF/tick/2014/DAT_ASCII_AUDCHF_T_201411.zip": {
+          "rows": 1410189,
+          "sha256": "bf6aacf83ab073944fa7e23b5b6f32a3ddda763a4a8dde415d44ea5f727ec492",
+          "size_bytes": 7621866
+        },
+        "AUDCHF/tick/2014/DAT_ASCII_AUDCHF_T_201412.zip": {
+          "rows": 1294564,
+          "sha256": "4c5e64851008f6fc3be0f17e3dc3db2375dc2c1584781a6f9bcab255232952fc",
+          "size_bytes": 7071274
+        },
+        "AUDCHF/tick/2015/DAT_ASCII_AUDCHF_T_201501.zip": {
+          "rows": 1396608,
+          "sha256": "3a53c73b8f30c91aa231ee3fa32d34d725656f005edaa659ec7ce301e5c09bb2",
+          "size_bytes": 8012996
+        },
+        "AUDCHF/tick/2015/DAT_ASCII_AUDCHF_T_201502.zip": {
+          "rows": 961932,
+          "sha256": "510ee80eef13c7d91a5f43a97a3b892e8263a98e2f382dc82098d1306b8a659a",
+          "size_bytes": 5441364
+        },
+        "AUDCHF/tick/2015/DAT_ASCII_AUDCHF_T_201503.zip": {
+          "rows": 1236053,
+          "sha256": "fd318103c30baa8b2a7d29672e7aef442060b33e313db7ea52c6de3b30df8939",
+          "size_bytes": 7098860
+        },
+        "AUDCHF/tick/2015/DAT_ASCII_AUDCHF_T_201504.zip": {
+          "rows": 1347843,
+          "sha256": "2fa89d3d1a2e408593bae005928f5bc31b1aded213db159cb22354f2f2151dcb",
+          "size_bytes": 7534349
+        },
+        "AUDCHF/tick/2015/DAT_ASCII_AUDCHF_T_201505.zip": {
+          "rows": 1392764,
+          "sha256": "6e57ddde404e88621dd69529cabafc02b122b1a6ae0f2545c5a43a48b5980706",
+          "size_bytes": 7682865
+        },
+        "AUDCHF/tick/2015/DAT_ASCII_AUDCHF_T_201506.zip": {
+          "rows": 1493254,
+          "sha256": "1e5e483a1686f372b7e7a89f271502160537486e55bf5e070c6534bf3cfb037b",
+          "size_bytes": 8150820
+        },
+        "AUDCHF/tick/2015/DAT_ASCII_AUDCHF_T_201507.zip": {
+          "rows": 1547354,
+          "sha256": "bf778f87a222c11cf47e9c6a41b38d02cd5d7c376cf98c9cf46a418b66f7f1ea",
+          "size_bytes": 8334019
+        },
+        "AUDCHF/tick/2015/DAT_ASCII_AUDCHF_T_201508.zip": {
+          "rows": 1445619,
+          "sha256": "fc03d7d45bab85d33fc10cb3733a8fee570dee561342588b4d992d3a84c43d5c",
+          "size_bytes": 8018299
+        },
+        "AUDCHF/tick/2015/DAT_ASCII_AUDCHF_T_201509.zip": {
+          "rows": 1378654,
+          "sha256": "ed05d2e9b38806760791ae680e6387d7986b1c0aa6a0348aa9db4a047f781aef",
+          "size_bytes": 7783925
+        },
+        "AUDCHF/tick/2015/DAT_ASCII_AUDCHF_T_201510.zip": {
+          "rows": 1241720,
+          "sha256": "48509e9d76ee7ed21f7ed67ced4e2f85895a3e73549f6d972c7177785e9a76aa",
+          "size_bytes": 6919298
+        },
+        "AUDCHF/tick/2015/DAT_ASCII_AUDCHF_T_201511.zip": {
+          "rows": 1296168,
+          "sha256": "00ca42c9e6dbd2551a8af8d297968feee035c263390e3a715cc8fe089369f49c",
+          "size_bytes": 6934918
+        },
+        "AUDCHF/tick/2015/DAT_ASCII_AUDCHF_T_201512.zip": {
+          "rows": 1383921,
+          "sha256": "67fe9c940c8d2f2c49baecc30018b3d4b57be8f4c0ed831fb26a808ba5d2a139",
+          "size_bytes": 7493468
+        },
+        "AUDCHF/tick/2016/DAT_ASCII_AUDCHF_T_201601.zip": {
+          "rows": 1857565,
+          "sha256": "87baeffb0af8c54ba6f6c41e487c7d875c8e15ac9359e156f6ff1cb89e848daf",
+          "size_bytes": 10314535
+        },
+        "AUDCHF/tick/2016/DAT_ASCII_AUDCHF_T_201602.zip": {
+          "rows": 1875333,
+          "sha256": "aa6ec9bb82307dfa1149347ff731c90471c3b665eeb7d1877d39cd3ab49a509f",
+          "size_bytes": 10193123
+        },
+        "AUDCHF/tick/2016/DAT_ASCII_AUDCHF_T_201603.zip": {
+          "rows": 1631312,
+          "sha256": "17745d0c62c5f422ed1b234692f42987ac81df37f7e343262e9a6d0be1e9a8a1",
+          "size_bytes": 8899505
+        },
+        "AUDCHF/tick/2016/DAT_ASCII_AUDCHF_T_201604.zip": {
+          "rows": 1364074,
+          "sha256": "04fdd3a0ca70807d75d339faa0e506635573391c77d395b24563f1a0ea989ed3",
+          "size_bytes": 7573903
+        },
+        "AUDCHF/tick/2016/DAT_ASCII_AUDCHF_T_201605.zip": {
+          "rows": 1310710,
+          "sha256": "c1e5f56de5b0dac4269b6faf0e6fc1d100dfcd645d94cdde5df7a65fe17ce887",
+          "size_bytes": 7192226
+        },
+        "AUDCHF/tick/2016/DAT_ASCII_AUDCHF_T_201606.zip": {
+          "rows": 1358522,
+          "sha256": "205643675fd20dcb9745d82d65f8cfccd04522383e571ec231ada90cf223c871",
+          "size_bytes": 7532805
+        },
+        "AUDCHF/tick/2016/DAT_ASCII_AUDCHF_T_201607.zip": {
+          "rows": 899462,
+          "sha256": "5b41cd7ff68997991f802d9d01665fdf017c25bacf9f4bd7575573c2adcb507a",
+          "size_bytes": 5017439
+        },
+        "AUDCHF/tick/2016/DAT_ASCII_AUDCHF_T_201608.zip": {
+          "rows": 861955,
+          "sha256": "81ae8f85a6b0e2eed8ddf6f379957435be097fa81d1189b7a1d323faa8232247",
+          "size_bytes": 4702667
+        },
+        "AUDCHF/tick/2016/DAT_ASCII_AUDCHF_T_201609.zip": {
+          "rows": 884349,
+          "sha256": "e08e2e01f9d1f4b8e11a1d8ae8be2e0dc114fde760b7756dad638c4494803fff",
+          "size_bytes": 4815468
+        },
+        "AUDCHF/tick/2016/DAT_ASCII_AUDCHF_T_201610.zip": {
+          "rows": 723559,
+          "sha256": "83c0b21bd9124c3a36b6cade2c1fc2f273ae8578d752b95040ac4a7c1dbef405",
+          "size_bytes": 3911436
+        },
+        "AUDCHF/tick/2016/DAT_ASCII_AUDCHF_T_201611.zip": {
+          "rows": 1163189,
+          "sha256": "f21fc13381986c34552a10a710cd6543165eb2af3a0c5b4b554df765f2697d2f",
+          "size_bytes": 6242767
+        },
+        "AUDCHF/tick/2016/DAT_ASCII_AUDCHF_T_201612.zip": {
+          "rows": 844971,
+          "sha256": "9faa7c85ae77d76b6bb2fef51568c0754722e80214c7ecee188913809236ccc6",
+          "size_bytes": 4530780
+        },
+        "AUDCHF/tick/2017/DAT_ASCII_AUDCHF_T_201701.zip": {
+          "rows": 1166836,
+          "sha256": "ae1185fe656ae5b877d27c1b5d8bece729f980e1b67449fc3d78cb9f9bcfc2c6",
+          "size_bytes": 6082342
+        },
+        "AUDCHF/tick/2017/DAT_ASCII_AUDCHF_T_201702.zip": {
+          "rows": 956466,
+          "sha256": "5b30f53c87b8a697d1b473610807909e73c7cd3c6e640a588ecce97e32e64bb8",
+          "size_bytes": 4997840
+        },
+        "AUDCHF/tick/2017/DAT_ASCII_AUDCHF_T_201703.zip": {
+          "rows": 1161051,
+          "sha256": "ad52841e70ab5a95b97091af8545b3becbdd7f3eb1047c98ec5663283bbe3a7f",
+          "size_bytes": 6213760
+        },
+        "AUDCHF/tick/2017/DAT_ASCII_AUDCHF_T_201704.zip": {
+          "rows": 840474,
+          "sha256": "6b3695fd1af9a028deb040ea6a93ccc352ad05e6f7f5970f09c1711aaa8f8267",
+          "size_bytes": 4550713
+        },
+        "AUDCHF/tick/2017/DAT_ASCII_AUDCHF_T_201705.zip": {
+          "rows": 1067826,
+          "sha256": "e8a0debe0ad994afbb6e5c6e6a1c88babb9985c347c7df25559a91214edc289e",
+          "size_bytes": 5698258
+        },
+        "AUDCHF/tick/2017/DAT_ASCII_AUDCHF_T_201706.zip": {
+          "rows": 942121,
+          "sha256": "234cdd6144389c7e8cfb3896e0b78677f532e7d43567ed874de57e19b1b4562f",
+          "size_bytes": 4991713
+        },
+        "AUDCHF/tick/2017/DAT_ASCII_AUDCHF_T_201707.zip": {
+          "rows": 1079458,
+          "sha256": "56dc461781b12334b0684e8b9143193170083860d3248910f9d0ae5a422d4a01",
+          "size_bytes": 5718103
+        },
+        "AUDCHF/tick/2017/DAT_ASCII_AUDCHF_T_201708.zip": {
+          "rows": 805637,
+          "sha256": "0467f7ced3d44e038cdeb43cef031d6f680527438f0bcd1154d7bfaa33a51369",
+          "size_bytes": 4436053
+        },
+        "AUDCHF/tick/2017/DAT_ASCII_AUDCHF_T_201709.zip": {
+          "rows": 813929,
+          "sha256": "fe5335533b188c44c2a62acb92de7aade6c4e8d0a57f8771ffc925278b9ccd07",
+          "size_bytes": 4462278
+        },
+        "AUDCHF/tick/2017/DAT_ASCII_AUDCHF_T_201710.zip": {
+          "rows": 820037,
+          "sha256": "d580b2fb388c35de6a80f618b461ceae2ef05a3efea85a00725ae998ac4a88b1",
+          "size_bytes": 4391944
+        },
+        "AUDCHF/tick/2017/DAT_ASCII_AUDCHF_T_201711.zip": {
+          "rows": 767808,
+          "sha256": "c1b1034d24d72623e375b57ee3354afd8f8d8e4d7b9c9866809211babd5c5efa",
+          "size_bytes": 4082684
+        },
+        "AUDCHF/tick/2017/DAT_ASCII_AUDCHF_T_201712.zip": {
+          "rows": 615530,
+          "sha256": "b5e9c3db17b38776ff3fc3534e2e1fab8d69653c65488174bf1e0abdd165c447",
+          "size_bytes": 3309081
+        },
+        "AUDCHF/tick/2018/DAT_ASCII_AUDCHF_T_201801.zip": {
+          "rows": 1060088,
+          "sha256": "90d2e041dd60cfb503f6a59f184a9a7a80a05de4e61b42b76aaf1bba883fe392",
+          "size_bytes": 5625428
+        },
+        "AUDCHF/tick/2018/DAT_ASCII_AUDCHF_T_201802.zip": {
+          "rows": 1015757,
+          "sha256": "3b4e6930926f05190dd0554006f3d26f35cd5ee88e624706b0e201e570f77f6d",
+          "size_bytes": 5446090
+        },
+        "AUDCHF/tick/2018/DAT_ASCII_AUDCHF_T_201803.zip": {
+          "rows": 840531,
+          "sha256": "e489f9bc44bcf1c047a7748e0f2cb683b3280692fd79b20e1a76046faf428087",
+          "size_bytes": 4499289
+        },
+        "AUDCHF/tick/2018/DAT_ASCII_AUDCHF_T_201804.zip": {
+          "rows": 723466,
+          "sha256": "a9b3496068d00f8cf0c97d94d47a545210f600be111ce5d3d93506e8cd2473fa",
+          "size_bytes": 3825361
+        },
+        "AUDCHF/tick/2018/DAT_ASCII_AUDCHF_T_201805.zip": {
+          "rows": 1154348,
+          "sha256": "0305f7e756f7b381f94290d3163be63f53f0d484505c20adee2390e296c06109",
+          "size_bytes": 6157162
+        },
+        "AUDCHF/tick/2018/DAT_ASCII_AUDCHF_T_201806.zip": {
+          "rows": 830754,
+          "sha256": "3f36a5eb345054393727b57f6398d105735d26b368435c660d52ac18d9b58732",
+          "size_bytes": 4454497
+        },
+        "AUDCHF/tick/2018/DAT_ASCII_AUDCHF_T_201807.zip": {
+          "rows": 903547,
+          "sha256": "3a164ca0c008355cb665093a5308987b1acc8738c64530963bdcac0424dba587",
+          "size_bytes": 4773358
+        },
+        "AUDCHF/tick/2018/DAT_ASCII_AUDCHF_T_201808.zip": {
+          "rows": 1111621,
+          "sha256": "d5797395dfcd455becd8a04fe346df6ad85484ba30b1022b2e8c58dc5021a00e",
+          "size_bytes": 5738828
+        },
+        "AUDCHF/tick/2018/DAT_ASCII_AUDCHF_T_201809.zip": {
+          "rows": 1259823,
+          "sha256": "635f6cd1865a3486c6e77cbf81bde6a9c6553127c6d6182d22455bdd04a8539f",
+          "size_bytes": 6422163
+        },
+        "AUDCHF/tick/2018/DAT_ASCII_AUDCHF_T_201810.zip": {
+          "rows": 1857433,
+          "sha256": "17ab0c558baf4fd48cbc09350b09294363e1b89f5afa29f80ebd52b0ce676217",
+          "size_bytes": 9225355
+        },
+        "AUDCHF/tick/2018/DAT_ASCII_AUDCHF_T_201811.zip": {
+          "rows": 1506810,
+          "sha256": "a81e6b579f06fdd8853c488b5bcb87b6f7f32507906fbc2f9141fc1651c031da",
+          "size_bytes": 7678565
+        },
+        "AUDCHF/tick/2018/DAT_ASCII_AUDCHF_T_201812.zip": {
+          "rows": 1663609,
+          "sha256": "19ff9657ee2ff5d036c3ba6f2f78323c824458fc81277a230a5717af229f1de4",
+          "size_bytes": 9473770
+        },
+        "AUDCHF/tick/2019/DAT_ASCII_AUDCHF_T_201901.zip": {
+          "rows": 2375866,
+          "sha256": "88b50809b652c6531558f762f72143985a6f787983a43269b9236d59ae22c300",
+          "size_bytes": 14265412
+        },
+        "AUDCHF/tick/2019/DAT_ASCII_AUDCHF_T_201902.zip": {
+          "rows": 2375532,
+          "sha256": "e9a0415e644fbb29d67cb406b717818b72afaa36cee94d1b71464f8a065f5e80",
+          "size_bytes": 13736493
+        },
+        "AUDCHF/tick/2019/DAT_ASCII_AUDCHF_T_201903.zip": {
+          "rows": 2458600,
+          "sha256": "ffaf377d68d90c2de93ce608a5f3d3411e5c4f6590948f1ea3cc78dea8cd345d",
+          "size_bytes": 14011336
+        },
+        "AUDCHF/tick/2019/DAT_ASCII_AUDCHF_T_201904.zip": {
+          "rows": 1866591,
+          "sha256": "18dc6ca8fcd8c8164b2b71ea03d90ef736f89a35213517f3805b60b470236729",
+          "size_bytes": 10811507
+        },
+        "AUDCHF/tick/2019/DAT_ASCII_AUDCHF_T_201905.zip": {
+          "rows": 1494873,
+          "sha256": "b1661eaf375fdf867ca2b85987019270791305223158a458a97c5a30989dbfeb",
+          "size_bytes": 8892289
+        },
+        "AUDCHF/tick/2019/DAT_ASCII_AUDCHF_T_201906.zip": {
+          "rows": 1406925,
+          "sha256": "efe228f4444568e965ba463780ec5da1bbcfe08805c02f67b5e3f10b653f843e",
+          "size_bytes": 8389630
+        },
+        "AUDCHF/tick/2019/DAT_ASCII_AUDCHF_T_201907.zip": {
+          "rows": 1212016,
+          "sha256": "5cbf344425bd9fdefe04ebb75e747ce44f4898ca27d7e9e90c8f30972e34f843",
+          "size_bytes": 7268561
+        },
+        "AUDCHF/tick/2019/DAT_ASCII_AUDCHF_T_201908.zip": {
+          "rows": 1866738,
+          "sha256": "8f14d17f288d8a343ca9a97683c332a65dd84b5831cf4e5df3ceb3b3a1f996f3",
+          "size_bytes": 11150627
+        },
+        "AUDCHF/tick/2019/DAT_ASCII_AUDCHF_T_201909.zip": {
+          "rows": 1435372,
+          "sha256": "f459a7cedbb2b548d1dc44ae1d9a31e762058a6bae75929bc2ec942820fc192a",
+          "size_bytes": 8509800
+        },
+        "AUDCHF/tick/2019/DAT_ASCII_AUDCHF_T_201910.zip": {
+          "rows": 1632411,
+          "sha256": "cedcd2844ceb4b41c0517b776f19de22deb1b93801806e77b84b8d4d8ccb0b87",
+          "size_bytes": 9748602
+        },
+        "AUDCHF/tick/2019/DAT_ASCII_AUDCHF_T_201911.zip": {
+          "rows": 1220182,
+          "sha256": "659baf32f379ed79903b89d2d5d433dc513e7b4782759ef6c0ed919512872bee",
+          "size_bytes": 7295453
+        },
+        "AUDCHF/tick/2019/DAT_ASCII_AUDCHF_T_201912.zip": {
+          "rows": 1021863,
+          "sha256": "1a77439aaf79677d424f7459854da4b6fdea40238f69a9321912a91701777028",
+          "size_bytes": 6234791
+        },
+        "AUDCHF/tick/2020/DAT_ASCII_AUDCHF_T_202001.zip": {
+          "rows": 1437035,
+          "sha256": "de4a2a3ebeaeb4389465c83041b4cd6da0076b25966235c1a56bd4b57d97102c",
+          "size_bytes": 8715933
+        },
+        "AUDCHF/tick/2020/DAT_ASCII_AUDCHF_T_202002.zip": {
+          "rows": 1468965,
+          "sha256": "06fd485e3cbe4acc3b85779bacb62d74a7e12625d24f775c840498446f799351",
+          "size_bytes": 8957987
+        },
+        "AUDCHF/tick/2020/DAT_ASCII_AUDCHF_T_202003.zip": {
+          "rows": 3932685,
+          "sha256": "29f3c867af58fbb08ec71a73de40644cf63c6d7117ad66fd0f9e400c67f85df3",
+          "size_bytes": 25123343
+        },
+        "AUDCHF/tick/2020/DAT_ASCII_AUDCHF_T_202004.zip": {
+          "rows": 2198905,
+          "sha256": "6672f298bdf34a56d040b501cbcc5ea47688e2ff2c857f48decd5669fbff9e58",
+          "size_bytes": 13753983
+        },
+        "AUDCHF/tick/2020/DAT_ASCII_AUDCHF_T_202005.zip": {
+          "rows": 1911680,
+          "sha256": "cb9e5f1b3e96357e2e6e8baa55236ca71db30a7a42ffc8422c1ee40fbbcf1b87",
+          "size_bytes": 11813887
+        },
+        "AUDCHF/tick/2020/DAT_ASCII_AUDCHF_T_202006.zip": {
+          "rows": 2581708,
+          "sha256": "c2f3e4a78f55c377580bc8f827a233574184c4cd85bc907e76d2fc62e2b2b7f7",
+          "size_bytes": 15968534
+        },
+        "AUDCHF/tick/2020/DAT_ASCII_AUDCHF_T_202007.zip": {
+          "rows": 1860632,
+          "sha256": "c56841008602b90fcea9042c497a19f778affe5c8a9ee5969953df5b6dde754d",
+          "size_bytes": 11374224
+        },
+        "AUDCHF/tick/2020/DAT_ASCII_AUDCHF_T_202008.zip": {
+          "rows": 1644917,
+          "sha256": "f7e223a9ed2d2ef73720cc1f62ada8273dd9a533f9243756a32abec8e8da864b",
+          "size_bytes": 10084433
+        },
+        "AUDCHF/tick/2020/DAT_ASCII_AUDCHF_T_202009.zip": {
+          "rows": 1687456,
+          "sha256": "613795282ed81d82a05672bf8ad53c84699131127a5101115b1e4ae5150cad4d",
+          "size_bytes": 10508481
+        },
+        "AUDCHF/tick/2020/DAT_ASCII_AUDCHF_T_202010.zip": {
+          "rows": 1466844,
+          "sha256": "c5a7c1c03303fa637cd5b3adb0c741c6c7a941b2665c7ebf16fd50c6db02cc44",
+          "size_bytes": 9130460
+        },
+        "AUDCHF/tick/2020/DAT_ASCII_AUDCHF_T_202011.zip": {
+          "rows": 1665559,
+          "sha256": "308228226076718cd492a64e303ea0cbd6efbde7c9eb0fe8fa466059dcbf167a",
+          "size_bytes": 10442792
+        },
+        "AUDCHF/tick/2020/DAT_ASCII_AUDCHF_T_202012.zip": {
+          "rows": 1460673,
+          "sha256": "d0aef385694ae8decaab4824a96cf084d305ab4f2ddb8fbe39f67e0de1aca63b",
+          "size_bytes": 9131987
+        },
+        "AUDCHF/tick/2021/DAT_ASCII_AUDCHF_T_202101.zip": {
+          "rows": 1859781,
+          "sha256": "ca9a2e3741e90a1faa805d00564878d416d0ee421fc197ba6c29bb2de9750cdc",
+          "size_bytes": 11508796
+        },
+        "AUDCHF/tick/2021/DAT_ASCII_AUDCHF_T_202102.zip": {
+          "rows": 1626357,
+          "sha256": "45b867df9480ee1c60c5a4dafbcb3d4d001fc091bcddbfd373e264d413d56617",
+          "size_bytes": 10070230
+        },
+        "AUDCHF/tick/2021/DAT_ASCII_AUDCHF_T_202103.zip": {
+          "rows": 2246037,
+          "sha256": "469630db45bd56e21ffef3597f8b7161770db9dbd1af5e8158ece8e23760b2d5",
+          "size_bytes": 13852225
+        },
+        "AUDCHF/tick/2021/DAT_ASCII_AUDCHF_T_202104.zip": {
+          "rows": 1424804,
+          "sha256": "4e3b1bd4c776f926d334e1d0f285a49f78f9c4ebfd8ab50886edee713103cd73",
+          "size_bytes": 8924894
+        },
+        "AUDCHF/tick/2021/DAT_ASCII_AUDCHF_T_202105.zip": {
+          "rows": 1506021,
+          "sha256": "8bcb5338ed000f7681d2878d6b6c2a677bcbffffafecd74aab8cc195368f7393",
+          "size_bytes": 9349639
+        },
+        "AUDCHF/tick/2021/DAT_ASCII_AUDCHF_T_202106.zip": {
+          "rows": 1462316,
+          "sha256": "1cad36e9424815192e01037269117838bf26e015456ae936e0c74c7c34c5cb4d",
+          "size_bytes": 9041553
+        },
+        "AUDCHF/tick/2021/DAT_ASCII_AUDCHF_T_202107.zip": {
+          "rows": 1686179,
+          "sha256": "e7cca0d12932f958a85287227e0dcf4d58bd61faaba89c4c514ca8b7da8e19a5",
+          "size_bytes": 10396767
+        },
+        "AUDCHF/tick/2021/DAT_ASCII_AUDCHF_T_202108.zip": {
+          "rows": 1241522,
+          "sha256": "158a2223bd5fcc24d03586fca85a3a6a4ecbeb809787301aab5ef0b5b15c1c75",
+          "size_bytes": 7798804
+        },
+        "AUDCHF/tick/2021/DAT_ASCII_AUDCHF_T_202109.zip": {
+          "rows": 1590039,
+          "sha256": "cabd8bf1e371db54c4070ab7345314c1c7bbeb1208a8464ee3ce7af44d75d2d5",
+          "size_bytes": 9885268
+        },
+        "AUDCHF/tick/2021/DAT_ASCII_AUDCHF_T_202110.zip": {
+          "rows": 1660673,
+          "sha256": "7a62995730ede889ca4d514f403cc42cf633ba4893d7cc3c85f46aefaf898a95",
+          "size_bytes": 10207997
+        },
+        "AUDCHF/tick/2021/DAT_ASCII_AUDCHF_T_202111.zip": {
+          "rows": 1847058,
+          "sha256": "ddd3bc96e69f0e7a33b477f4c31e8540915150b64d982c0d62b66cc9135b0559",
+          "size_bytes": 11315283
+        },
+        "AUDCHF/tick/2021/DAT_ASCII_AUDCHF_T_202112.zip": {
+          "rows": 1686999,
+          "sha256": "743e977a3ff0a51f290e5978038e043606a62d8c0f77cba15353663b81aa261a",
+          "size_bytes": 10340524
+        },
+        "AUDCHF/tick/2022/DAT_ASCII_AUDCHF_T_202201.zip": {
+          "rows": 1842484,
+          "sha256": "4fa33dec0bfac996598a3441cfe19f075b885dadc8d9fed087dfe1449aeb82c0",
+          "size_bytes": 11328618
+        },
+        "AUDCHF/tick/2022/DAT_ASCII_AUDCHF_T_202202.zip": {
+          "rows": 2325458,
+          "sha256": "c6a47ac09ef96afff732c144a8ff9ab38202f380774ac7b1daa24149c5e6d0e2",
+          "size_bytes": 14142926
+        },
+        "AUDCHF/tick/2022/DAT_ASCII_AUDCHF_T_202203.zip": {
+          "rows": 2720849,
+          "sha256": "e45636f43b187451a6cca85682efe3a2c668de5e396086ce3bcf440a0ed4cac5",
+          "size_bytes": 16640391
+        },
+        "AUDCHF/tick/2022/DAT_ASCII_AUDCHF_T_202204.zip": {
+          "rows": 2154638,
+          "sha256": "86f68c4bfdae2c0b4d32690ce2e476d5369043a8e66a3bf2d6252b03588328a2",
+          "size_bytes": 13215872
+        },
+        "AUDCHF/tick/2022/DAT_ASCII_AUDCHF_T_202205.zip": {
+          "rows": 2937838,
+          "sha256": "dd4293526ecd37e4c4f89d2b29878778c345518be4037821ed8e1e3159c2364c",
+          "size_bytes": 18070764
+        },
+        "AUDCHF/tick/2022/DAT_ASCII_AUDCHF_T_202206.zip": {
+          "rows": 3379356,
+          "sha256": "adf4bd2fcf36a0f6e46c9871b5bbed988be75d5eae9b9652079fbcd738838cd0",
+          "size_bytes": 20147481
+        },
+        "AUDCHF/tick/2022/DAT_ASCII_AUDCHF_T_202207.zip": {
+          "rows": 3267706,
+          "sha256": "1eb0527640d399595b5d5d71fe16e1f51808aa705e1a0f481382a7385f18014f",
+          "size_bytes": 19431344
+        },
+        "AUDCHF/tick/2022/DAT_ASCII_AUDCHF_T_202208.zip": {
+          "rows": 2669179,
+          "sha256": "40026a95446e756155611221268f54eb9edf89eb0753ef84a2dbf751eae4c80e",
+          "size_bytes": 16343413
+        },
+        "AUDCHF/tick/2022/DAT_ASCII_AUDCHF_T_202209.zip": {
+          "rows": 4032144,
+          "sha256": "ef2ec74e3b9fa1f1bb01dc8b86eef08cd208800bc7ff6122b12acc0d61011c5d",
+          "size_bytes": 24049867
+        },
+        "AUDCHF/tick/2022/DAT_ASCII_AUDCHF_T_202210.zip": {
+          "rows": 3726783,
+          "sha256": "18c14904c1aa97876ad3b9eae14bebf1eb0d38d5e7ca259f1fa29e23ac38b39d",
+          "size_bytes": 22278261
+        },
+        "AUDCHF/tick/2022/DAT_ASCII_AUDCHF_T_202211.zip": {
+          "rows": 2660510,
+          "sha256": "4eba66e059179e4f50ace0653f8033c2f04e06bd85815e289314e2b5376dc013",
+          "size_bytes": 16299437
+        },
+        "AUDCHF/tick/2022/DAT_ASCII_AUDCHF_T_202212.zip": {
+          "rows": 2539376,
+          "sha256": "674541fc5ec0bd0be0f54ba49f8a514afd028ac904a5fe58f82d5d8919c3040c",
+          "size_bytes": 15432258
+        },
+        "AUDCHF/tick/2023/DAT_ASCII_AUDCHF_T_202301.zip": {
+          "rows": 2675610,
+          "sha256": "934644b45a678bebd814e108a93d5b9138c10308697f58bad9aadf75979d9575",
+          "size_bytes": 16496856
+        },
+        "AUDCHF/tick/2023/DAT_ASCII_AUDCHF_T_202302.zip": {
+          "rows": 2075542,
+          "sha256": "cbe4cc1342b871c88a94d9575a45b7a8bafe50b75d50c8405b8f939cdf391268",
+          "size_bytes": 12726641
+        },
+        "AUDCHF/tick/2023/DAT_ASCII_AUDCHF_T_202303.zip": {
+          "rows": 2005967,
+          "sha256": "9dcb6cd6ba735d61433c2b827a4fbc9c5c23b3eb5acf4c35b1b6ee2f646470db",
+          "size_bytes": 12282984
+        },
+        "AUDCHF/tick/2023/DAT_ASCII_AUDCHF_T_202304.zip": {
+          "rows": 1050144,
+          "sha256": "25243f61db5c3cba00b7be8fe5b3872a3347c8cbd764e3d6b861645798146ed8",
+          "size_bytes": 6538541
+        },
+        "AUDCHF/tick/2023/DAT_ASCII_AUDCHF_T_202305.zip": {
+          "rows": 1035718,
+          "sha256": "fa8d6c66b868a8e5a73f6e97cb72ff808a8ed6ff21f058e503fd71159a82d170",
+          "size_bytes": 6535855
+        },
+        "AUDCHF/tick/2023/DAT_ASCII_AUDCHF_T_202306.zip": {
+          "rows": 1018752,
+          "sha256": "150c974b526855f8865a2221033e411b0b8871eaa27c759476318376011b4b06",
+          "size_bytes": 6465419
+        },
+        "AUDCHF/tick/2023/DAT_ASCII_AUDCHF_T_202307.zip": {
+          "rows": 1150109,
+          "sha256": "cfe37b868621044f73d1e8c99fcd82b15fe2011504bc68c4af6341840ba342f7",
+          "size_bytes": 7240504
+        },
+        "AUDCHF/tick/2023/DAT_ASCII_AUDCHF_T_202308.zip": {
+          "rows": 1694683,
+          "sha256": "0e4d89cbe76341d72e3be9b3fd66c1449a566d7c7ee7883878ec6c71eca5a3e1",
+          "size_bytes": 10640109
+        },
+        "AUDCHF/tick/2023/DAT_ASCII_AUDCHF_T_202309.zip": {
+          "rows": 1331029,
+          "sha256": "e16d8f372518b85203906e36dc69a10f2a9db0e114a29269627c7030193c3e02",
+          "size_bytes": 8350123
+        },
+        "AUDCHF/tick/2023/DAT_ASCII_AUDCHF_T_202310.zip": {
+          "rows": 1610265,
+          "sha256": "d2a9b71ddc66710eebd425aedb1c606913a95f7a54d6f154bab866b3ddc009c4",
+          "size_bytes": 10047397
+        },
+        "AUDCHF/tick/2023/DAT_ASCII_AUDCHF_T_202311.zip": {
+          "rows": 1296036,
+          "sha256": "eb57fa8d0a86304677e3ddc661a089b6e3c359d020ae0372b11d170340ee75bf",
+          "size_bytes": 8184480
+        },
+        "AUDCHF/tick/2023/DAT_ASCII_AUDCHF_T_202312.zip": {
+          "rows": 1285860,
+          "sha256": "3ca107ad184ed5bbf86f40e246eeab14922b1ebb7f0accf4d229985850785aeb",
+          "size_bytes": 8103716
+        },
+        "AUDCHF/tick/2024/DAT_ASCII_AUDCHF_T_202401.zip": {
+          "rows": 1533725,
+          "sha256": "b8a67c106d6f51691dc68f59b9019bf85cc1a6fda40cf4a18dd1766d72c5ae09",
+          "size_bytes": 9634677
+        },
+        "AUDCHF/tick/2024/DAT_ASCII_AUDCHF_T_202402.zip": {
+          "rows": 1123311,
+          "sha256": "aaeeafbe658c6168be4c53fa44c8a051ee14b074273502e3c9ca2321db8a4390",
+          "size_bytes": 7042735
+        },
+        "AUDCHF/tick/2024/DAT_ASCII_AUDCHF_T_202403.zip": {
+          "rows": 1154881,
+          "sha256": "0010d727c42f1da2e90b21382309bac6020aa7cbf2db799e0ccc9c58335d6a8d",
+          "size_bytes": 7207374
+        },
+        "AUDCHF/tick/2024/DAT_ASCII_AUDCHF_T_202404.zip": {
+          "rows": 1327331,
+          "sha256": "fda35bd38f05a20532852e37250645869920cd8eb667715abd411050233e4e54",
+          "size_bytes": 8344138
+        },
+        "AUDCHF/tick/2024/DAT_ASCII_AUDCHF_T_202405.zip": {
+          "rows": 1156642,
+          "sha256": "a1d5698e448fb9cff0b94f4b72423d69e46c0382c8c0391b8fbbbd1a106be4f4",
+          "size_bytes": 7279208
+        },
+        "AUDCHF/tick/2024/DAT_ASCII_AUDCHF_T_202406.zip": {
+          "rows": 975073,
+          "sha256": "66d4554b767d7c1930e88cb08062bbad0b54ccc865d7bc15b494852f7b182241",
+          "size_bytes": 6198330
+        },
+        "AUDCHF/tick/2024/DAT_ASCII_AUDCHF_T_202407.zip": {
+          "rows": 1123702,
+          "sha256": "8315d89fed21e3c5dabb2714d625cc106a14998772e75c792970592cd0d0e951",
+          "size_bytes": 7112082
+        },
+        "AUDCHF/tick/2024/DAT_ASCII_AUDCHF_T_202408.zip": {
+          "rows": 1587053,
+          "sha256": "57e57e82ca9fca10a823202f7fb999178a47a00285c2b1ebf6971fc0b79aeefe",
+          "size_bytes": 10191351
+        },
+        "AUDCHF/tick/2024/DAT_ASCII_AUDCHF_T_202409.zip": {
+          "rows": 1414234,
+          "sha256": "466da854b6b987073f3fe8ef3a7b11a3857a9ec01937bbbbf10e6710d57791e9",
+          "size_bytes": 8874624
+        },
+        "AUDCHF/tick/2024/DAT_ASCII_AUDCHF_T_202410.zip": {
+          "rows": 1220126,
+          "sha256": "f2dea0479c4f1860cf7dab3329f969614d98336ef9e9d14b5f2f66926f00081b",
+          "size_bytes": 7800883
+        },
+        "AUDCHF/tick/2024/DAT_ASCII_AUDCHF_T_202411.zip": {
+          "rows": 1435170,
+          "sha256": "49cbc79e48f0a09a4a3c7ea0a93bad9ab611161d8cc60600c3cb013562628a4b",
+          "size_bytes": 8934648
+        },
+        "AUDCHF/tick/2024/DAT_ASCII_AUDCHF_T_202412.zip": {
+          "rows": 1209801,
+          "sha256": "f569124cffee052874203f833dd45b30fb5bede63b92a9375c639813919e1584",
+          "size_bytes": 7555598
+        },
+        "AUDCHF/tick/2025/DAT_ASCII_AUDCHF_T_202501.zip": {
+          "rows": 1190535,
+          "sha256": "b5f577d37858f659859fdf8bb8caa3f7769562037f899761b05b7353467723ae",
+          "size_bytes": 7499414
+        },
+        "AUDCHF/tick/2025/DAT_ASCII_AUDCHF_T_202502.zip": {
+          "rows": 973617,
+          "sha256": "eb7be53f0dc84fc3cb2a61c80b49286275d524df3097795761fab8cc00e85a8b",
+          "size_bytes": 6207186
+        },
+        "AUDCHF/tick/2025/DAT_ASCII_AUDCHF_T_202503.zip": {
+          "rows": 1041855,
+          "sha256": "b0050119bdcb87e87b54f5e4fa23152316f309b44509406f964cf875884a2512",
+          "size_bytes": 6758830
+        },
+        "AUDCHF/tick/2025/DAT_ASCII_AUDCHF_T_202504.zip": {
+          "rows": 3041108,
+          "sha256": "094c91a385b6cd9e1af13ca15ff6c5e633c18fe47405e62d450978f18c20a8e5",
+          "size_bytes": 19185428
+        },
+        "AUDCHF/tick/2025/DAT_ASCII_AUDCHF_T_202505.zip": {
+          "rows": 1215008,
+          "sha256": "9f999710535b4153faa4e742a5056dbcc3bcb6a844efa63143bc9e9f1a19b82a",
+          "size_bytes": 7883210
+        },
+        "AUDCHF/tick/2025/DAT_ASCII_AUDCHF_T_202506.zip": {
+          "rows": 1070091,
+          "sha256": "3ab4add93eabf41981edcbdf34a1dc4b79f6b69f10488f5356d4e43862dfce4a",
+          "size_bytes": 6878788
+        },
+        "AUDCHF/tick/2025/DAT_ASCII_AUDCHF_T_202507.zip": {
+          "rows": 859568,
+          "sha256": "2b71ce3752991bd6b7ec77000d5bd1e103c8d76120132572b5564b4f10c0b6a7",
+          "size_bytes": 5508343
+        },
+        "AUDCHF/tick/2025/DAT_ASCII_AUDCHF_T_202508.zip": {
+          "rows": 737593,
+          "sha256": "52aec8b72d420140d7995eaed54068472872f2bb280c05007656ba4a4fe38e0a",
+          "size_bytes": 4718144
+        },
+        "AUDCHF/tick/2025/DAT_ASCII_AUDCHF_T_202509.zip": {
+          "rows": 799960,
+          "sha256": "2f0dc46cc4ea1c8691a26ddb7d520463671d9e957df46c5c8e2cf7e11e5c463f",
+          "size_bytes": 5056871
+        },
+        "AUDCHF/tick/2025/DAT_ASCII_AUDCHF_T_202510.zip": {
+          "rows": 821506,
+          "sha256": "7ef934364d9ac9ea214c2fc6f9cd00f56d7f537d9d0bd7c2d999193cfb7b590a",
+          "size_bytes": 5297041
+        },
+        "AUDCHF/tick/2025/DAT_ASCII_AUDCHF_T_202511.zip": {
+          "rows": 976679,
+          "sha256": "0ab2974b02277cf8c0e28e34072920e98c2c82028230af43d73339319e864ac8",
+          "size_bytes": 6168232
+        },
+        "AUDCHF/tick/2025/DAT_ASCII_AUDCHF_T_202512.zip": {
+          "rows": 1019395,
+          "sha256": "3c8419787b2117169ffb90281d45dbfa0631ad6fea9874804c2cac581d141903",
+          "size_bytes": 6322680
+        },
+        "AUDCHF/tick/2026/DAT_ASCII_AUDCHF_T_202601.zip": {
+          "rows": 1093420,
+          "sha256": "e38d864ae59f04e6a9a38b8f9fcf743284904acc03c2d118cb2ac828228ccb17",
+          "size_bytes": 6868702
+        },
+        "AUDCHF/tick/2026/DAT_ASCII_AUDCHF_T_202602.zip": {
+          "rows": 985605,
+          "sha256": "7b77058b7e4e110d24e64042cc5a3ff6e45186e6feec8379f621a6af14e6f529",
+          "size_bytes": 6332395
+        },
+        "AUDCHF/tick/2026/DAT_ASCII_AUDCHF_T_202603.zip": {
+          "rows": 1671344,
+          "sha256": "8436ee9f4e08b32659e0a6aa36e00b894c107bf9c0e14835c41325dbccfc647b",
+          "size_bytes": 10528971
+        },
+        "AUDCHF/tick/2026/DAT_ASCII_AUDCHF_T_202604.zip": {
+          "rows": 390728,
+          "sha256": "d1d0b84c249796bd7113fd9587a3bea3a029d0f7d94e9c0228e236764c1df8fc",
+          "size_bytes": 2464822
+        }
+      },
+      "latest_month": "202604",
+      "total_files": 196,
+      "total_size_bytes": 1485176758
+    },
+    "AUDJPY": {
+      "earliest_month": "201001",
+      "files": {
+        "AUDJPY/tick/2010/DAT_ASCII_AUDJPY_T_201001.zip": {
+          "rows": 396622,
+          "sha256": "2c1e3ef95dcbf18a730ff6fe6bef4d731660980038591d6539150281e16395d0",
+          "size_bytes": 1501966
+        },
+        "AUDJPY/tick/2010/DAT_ASCII_AUDJPY_T_201002.zip": {
+          "rows": 397384,
+          "sha256": "d1dc096e214067b0e87ee907eecac5ef4fa576b2d5e8008c2711a61e6d918d12",
+          "size_bytes": 1505793
+        },
+        "AUDJPY/tick/2010/DAT_ASCII_AUDJPY_T_201003.zip": {
+          "rows": 408622,
+          "sha256": "fb49410e3d6f86268f173dc0c08f941a8d070773d6dba5ac7bb505439d136c66",
+          "size_bytes": 1488550
+        },
+        "AUDJPY/tick/2010/DAT_ASCII_AUDJPY_T_201004.zip": {
+          "rows": 441018,
+          "sha256": "2d95df6c984e6b8fdbfa9cc6dc2ce3ef325654f8f238a1c7883775f5b30d3e96",
+          "size_bytes": 1532876
+        },
+        "AUDJPY/tick/2010/DAT_ASCII_AUDJPY_T_201005.zip": {
+          "rows": 662745,
+          "sha256": "27ec8960c6fae2015669b32e961b656357d4770c8eba7b2d1f97a13a55e90da1",
+          "size_bytes": 2487430
+        },
+        "AUDJPY/tick/2010/DAT_ASCII_AUDJPY_T_201006.zip": {
+          "rows": 499105,
+          "sha256": "7eea6cfac3a4edb0554b07990cfd13a4de5355a0f7a00050ed4d1c59dc31650b",
+          "size_bytes": 1857827
+        },
+        "AUDJPY/tick/2010/DAT_ASCII_AUDJPY_T_201007.zip": {
+          "rows": 403828,
+          "sha256": "bcc65d06991eff9c237bef79f0798dbd3275e8af6a921d76f005d85597717a46",
+          "size_bytes": 1521630
+        },
+        "AUDJPY/tick/2010/DAT_ASCII_AUDJPY_T_201008.zip": {
+          "rows": 358835,
+          "sha256": "185139b3a5ed1786c870038ff558b1dc58a905d8e64a6cf8de097104c74b2053",
+          "size_bytes": 1349817
+        }
+      },
+      "latest_month": "201008",
+      "total_files": 8,
+      "total_size_bytes": 13245889
+    },
+    "EURUSD": {
+      "earliest_month": "201501",
+      "files": {
+        "EURUSD/tick/2015/DAT_ASCII_EURUSD_T_201501.zip": {
+          "rows": 1691494,
+          "sha256": "01bda26f5a7a54ee621791e6ee279d3e334afecd36ac8261a961cd50233c6a7f",
+          "size_bytes": 9299925
+        }
+      },
+      "latest_month": "201501",
+      "total_files": 1,
+      "total_size_bytes": 9299925
+    }
+  }
+}

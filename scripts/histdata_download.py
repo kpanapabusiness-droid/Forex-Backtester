@@ -79,6 +79,11 @@ DEFAULT_MAX_RETRIES: int = 3
 RETRY_BACKOFF_BASE_S: float = 5.0
 USER_AGENT: str = "Mozilla/5.0 (Forex-Backtester/data-foundation)"
 
+# HistData has a progressive throttle that doubles per-file response time after
+# ~100 requests in a Session (observed pair 1: 13s mean over files 1-50, then
+# 41s mean over files 100-196). Rotating the Session resets the throttle.
+SESSION_FILES_BEFORE_ROTATE: int = 50
+
 # Sample-validation bounds (gross-corruption sanity, not a tight quality gate).
 MEDIAN_SPREAD_PIPS_LO: float = 0.05
 MEDIAN_SPREAD_PIPS_HI: float = 50.0
@@ -491,7 +496,6 @@ def run_download(
     months = iter_yearmonths(start[0], start[1], end[0], end[1])
     total_specs = len(pairs) * len(months)
 
-    session = make_session()
     counts: dict[str, int] = {}
     t0 = time.time()
     n_done = 0
@@ -500,6 +504,9 @@ def run_download(
     log_event(log_fh, event="start", n_specs=total_specs, pairs=len(pairs),
               months=len(months), rate_s=rate_s, dry_run=dry_run)
 
+    files_since_rotate = 0
+    session = make_session()
+    log_event(log_fh, event="session_rotate", reason="initial")
     try:
         for pair in pairs:
             for year, month in months:
@@ -528,7 +535,17 @@ def run_download(
                     n_done += 1
                     continue
 
+                # Rotate Session before it accumulates throttle (HistData throttles
+                # progressively within a Session; rotating resets server-side state).
+                if files_since_rotate >= SESSION_FILES_BEFORE_ROTATE:
+                    session.close()
+                    session = make_session()
+                    log_event(log_fh, event="session_rotate", reason="throttle_guard",
+                              files_since_rotate=files_since_rotate)
+                    files_since_rotate = 0
+
                 status, body, derr = http_get_zip(session, pair, year, month, max_retries)
+                files_since_rotate += 1
                 if status == "OK":
                     # validate before writing to disk (so quarantine doesn't pollute the tree)
                     ok, vreason, n_rows, _ = validate_zip(pair, body)

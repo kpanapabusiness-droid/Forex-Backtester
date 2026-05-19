@@ -1,5 +1,25 @@
 # Changelog
 
+## L_ARC_PROTOCOL v2.5 AMENDMENT LANDED | 2026-05-19 | INFRASTRUCTURE
+
+v2.5 amendment adds a parallel system-level evaluation track to the L_ARC protocol. The existing trade-classifier track (v2.0–v2.3 mechanics) is preserved unchanged for arcs using it. New arcs declare track at arc open; track is locked once Step 1 commits.
+
+The amendment is numbered v2.5 (not v2.4) to avoid collision with the existing v2.4 entry-separability proposal (Open-25). Both can coexist; the entry-separability v2.4 proposal remains in flight and is not affected by this landing.
+
+Motivation: cross-arc evidence over 11 arcs shows the trade-classifier track's Step 4 AUC gate filters against a question (predict individual trade success from entry features) that may not correspond to deployability. KH-24 base would die at Step 4 under that track. The system-level track asks the deployment question directly: does signal + filter + exposure produce worst-fold WFO pass on held-out data.
+
+System-level track step structure: Step 1 plumbing (identical to v2.3), Step 2 pool characterisation (no clustering required), Step 3 filter+exposure search on IS (2010-2019 HistData), Step 4 one-shot OOS validation per top-K config (2020-current). Pre-declared canonical filter menu (≤ 3 filters per config). Selection-bias accounting mandatory. Anchor preservation (KH-24) binding.
+
+Migration: closed Arcs 1–11 eligible for re-evaluation under system-level track. Original closure status preserved unchanged; system-level verdict added as parallel record.
+
+v2.5 does NOT close any open backlog items. v2.3 closures of Open-22/23/24 remain attributed to v2.3.
+
+- Branch: `claude/vigilant-bhabha-f5e0a8`
+- Final commit: <to be filled at PR open>
+- Amendment doc: `L_ARC_PROTOCOL_v2_5_AMENDMENT.md`
+- Conventions doc: `PARALLEL_DISPATCH_CONVENTIONS.md`
+- Parallel dispatches cleared: system-level re-eval, currency strength descriptive, t=x contamination test, free-reign discovery
+
 ## 2026-05-19 — Arc 9 closure REAFFIRMED (STEP_4_KILL after producer-leak patch)
 
 ### Closed

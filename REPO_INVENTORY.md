@@ -255,4 +255,98 @@ Total: 40 files moved via `git mv`. All UNCERTAIN files (7) and OPEN_PROPOSAL (1
 
 ## Post-move state
 
-(Filled in Task 4 — Final verification.)
+### Counts
+
+- Total tracked `.md` files: **181** (was 178; +3 for ARC_HISTORY.md, REPO_INVENTORY.md, inventory_intent.md)
+- Repo root: **17** .md files
+- `docs/archive/`: **40** .md files across 6 subdirs
+
+### Repo root final contents
+
+```
+AGENTS.md
+ARC_HISTORY.md                              (NEW)
+CHANGELOG.md
+CLAUDE.md
+L_ARC_PROTOCOL.md
+L_ARC_PROTOCOL_v2_2_AMENDMENT.md
+L_ARC_PROTOCOL_v2_3_AMENDMENT.md
+L_ARC_PROTOCOL_v2_x_AMENDMENT_PROPOSAL.md   (OPEN_PROPOSAL)
+PROTOCOL_IMPROVEMENT_BACKLOG.md
+README.md
+REPO_INVENTORY.md                           (NEW)
+SESSION_ZERO.md
+SHELVED_ARCS.md
+STATUS.md
+WORKFLOW.md
+inventory_intent.md                         (NEW; plan doc, retained as record)
+project_brief.md                            (UNCERTAIN — flagged)
+```
+
+17 root-level .md files match the dispatch target plus one UNCERTAIN flagged for chat.
+
+### docs/archive/ final tree
+
+```
+docs/archive/
+├── arc_results/        (8 files)
+│   ├── ARC_3_RESULT.md
+│   ├── ARC_4_RESULT.md
+│   ├── ARC_4_RERUN_RESULT.md
+│   ├── ARC_5_RESULT.md
+│   ├── ARC_6_RESULT.md
+│   ├── ARC_7_RESULT.md
+│   ├── ARC_10_RESULT.md
+│   └── PHASE_L6_ARC2_P3_RESULT.md
+├── calibration/        (1 file)
+│   └── SPREAD_FLOOR_AUDIT_FINDING.md
+├── dispatches/         (5 files)
+│   ├── BACKTESTER_EXTENSION_CLOSURE.md
+│   ├── NEW_CHAT_HANDOVER.md
+│   ├── cleanup_intent.md
+│   ├── cleanup_log.md
+│   └── cleanup_plan_2025-11-08.md
+├── nnfx_era/           (21 files)
+│   ├── ARCHETYPE_REGISTRY.md
+│   ├── C1_SWEEP_GUIDE.md
+│   ├── CANDIDATES.md
+│   ├── EXIT_INDICATOR_SETUP.md
+│   ├── KH_Research_Roadmap.md
+│   ├── L_ARC_PLAN.md
+│   ├── PHASE6_PLAN.md
+│   ├── PHASE_B1_C1_ARCHETYPES.md
+│   ├── PHASE_B_INDICATOR_QUALITY.md
+│   ├── PHASE_C1_PARAMETER_SENSITIVITY.md
+│   ├── PHASE_C_C1_IDENTITY_WFO.md
+│   ├── PHASE_D2_2_FEATURE_DIAGNOSTICS.md
+│   ├── PHASE_D2_LIFT_HARNESS.md
+│   ├── PHASE_D6F_CLEAN_LABELS.md
+│   ├── PHASE_L6_ARC1_OPEN.md
+│   ├── PHASE_L6_ARC1_P2_OPEN.md
+│   ├── PHASE_L6_ARC2_OPEN.md
+│   ├── PHASE_L6_ARC2_P3_OPEN.md
+│   ├── RESULTS_SCHEMA_AUDIT.md
+│   ├── VOLUME_INDICATOR_SETUP.md
+│   └── phase8_execution_truth.md
+├── protocol/           (1 file)
+│   └── L6_0_METHODOLOGY_LOCK.md
+└── signal_specs/       (4 files)
+    ├── ARC_9_CANDIDATE_A_SPEC.md
+    ├── signal_spec_failed_breakout_long_v0.2.md
+    ├── signal_spec_inside_bar_break_trend_long_v0.1.md
+    └── signal_spec_pullback_resume_hhhl_long_v0.1.md
+```
+
+### Pre-existing archives (unchanged)
+
+- `archive/` (4 files) — v1.x protocol + ops spec + v1.1/v1.2 amendments
+- `attic/2025-11-08/` (7 files) — quarantined NNFX-era files
+
+### Active doc internal-link state
+
+Broken-link sweep ran across all ACTIVE docs (excluding STATUS.md and CHANGELOG.md per dispatch). All references to moved files updated in: README.md, CLAUDE.md, SESSION_ZERO.md, PROTOCOL_IMPROVEMENT_BACKLOG.md, ARC_HISTORY.md, docs/LCHAR_ATLAS.md, docs/LCHAR_TOPN_REGISTRY.md, docs/SPREAD_SEMANTICS_LOCK.md, docs/BACKTESTER_ARCHITECTURE.md.
+
+One reference deliberately NOT updated:
+- `L_ARC_PROTOCOL.md:717` — "commit to `docs/arc_results/`" is a prescriptive future-arc workflow instruction, not a link to an existing file. Flagged in the UNCERTAIN section above for chat resolution during protocol redesign.
+
+STATUS.md and CHANGELOG.md retain pre-move references intact per dispatch §5 of "What to flag for chat" — chat decides separately whether to reset their content.

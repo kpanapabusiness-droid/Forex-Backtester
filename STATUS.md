@@ -6,6 +6,23 @@
 
 ---
 
+### 2026-05-19 — Parallel dispatch wave launched — v2.5 amendment in effect
+
+L_ARC_PROTOCOL v2.5 amendment landed on main. Adds parallel system-level evaluation track alongside the existing trade-classifier track. Each new arc declares which track at arc open; track locked once Step 1 commits. Existing closed arcs eligible for re-evaluation under system-level track per §F.
+
+v2.5 numbering note: the existing v2.4 entry-separability proposal (Open-25) is unaffected and remains in flight. v2.5 lands as an additive parallel amendment. v2.3 closures of Open-22/23/24 stand unchanged; v2.5 does NOT close any existing backlog items.
+
+Four parallel CC dispatches cleared to launch:
+
+1. **System-level re-eval** (`system-level/closed-arc-reeval`): re-evaluate closed Arcs 6, 7, 8, 10, 11 under system-level track. Depends on HistData 2010-2019 pipeline (separate work). Optional Phase 0 sanity on 2020-2025 runs immediately under interim partition.
+2. **Currency strength descriptive** (`analysis/currency-strength-descriptive`): Phase 0 descriptive analysis of cross-sectional currency strength on 2020-2025 data. Gates whether to open a formal arc.
+3. **t=x contamination test** (`probe/tx-contamination-test`): diagnostic probe testing whether post-entry AUC lift in prior arcs is genuine forward signal or contamination from observing the move. Informs Pipeline D feature design.
+4. **Free-reign strategy discovery** (`discovery/free-reign-v1`): open-ended discovery dispatch. No fixed signal, no prescribed methodology beyond core non-negotiables. Continuously updated live discovery doc.
+
+Parallel conventions doc landed at `PARALLEL_DISPATCH_CONVENTIONS.md`. KH-24 anchor preservation rule binding across all four. All four read v2.5 amendment as canonical. Landed via worktree branch `claude/vigilant-bhabha-f5e0a8` (HEAD == origin/main at cut time).
+
+---
+
 ## Active protocol
 
 - Active protocol: L_ARC_PROTOCOL v2.1.2 base + v2.2 amendment + v2.3 amendment (v2.3 landed 2026-05-18 at `L_ARC_PROTOCOL_v2_3_AMENDMENT.md`; v2.2 amendment landed earlier same day at `L_ARC_PROTOCOL_v2_2_AMENDMENT.md`; v2.1.2 base, 2026-05-17). Companion files: `prompts/cc_arc_orchestrator_template.md` (updated to v1.1 for v2.3), `results/ARC_QUEUE.md`, `SHELVED_ARCS.md` (new under v2.3). Protocol-doc PR pending engineering pass to consolidate v2.2 + v2.3 amendment text into `L_ARC_PROTOCOL.md` itself.

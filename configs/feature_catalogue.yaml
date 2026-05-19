@@ -1,0 +1,182 @@
+# Feature catalogue for L arc Step 4 (extractability) classifiers.
+#
+# Per L_ARC_PROTOCOL.md v2.1.1 §8 / §12:
+#   - 8 mandatory base entry features (cross-dataset, locked).
+#   - ≤ 30 arc-specific entry features per arc section.
+#   - Total entry features ≤ 38.
+#
+# Each arc section names the feature subset for Pipeline E classifiers.
+# Pipeline D1 path-so-far features are NOT listed here — they are computed
+# at runtime from trades_paths.csv at observation point t (see §8 Angle D1).
+#
+# All features computed STRICTLY from bars ≤ signal bar N (no lookahead).
+# Lookahead-safety enforced by:
+#   - Per-pair feature computation operates on the pair's 1H bar history
+#     ending at the signal bar's timestamp.
+#   - Rolling windows use the trailing N bars (excluding the signal bar
+#     itself only when the spec explicitly requires it).
+#   - Day-of-week and hour-of-day are derived from the signal bar's own
+#     timestamp (no future info).
+
+# ============================================================================
+# Base features (mandatory across all arcs)
+# ============================================================================
+
+base_features:
+  - body_to_range_ratio
+  - upper_wick_ratio
+  - lower_wick_ratio
+  - range_to_atr_14
+  - ret_5bar_atr
+  - ret_20bar_atr
+  - pos_in_20bar_range
+  - rsi_14
+
+# ============================================================================
+# Arc 4 — TRIAL__univariate_extreme__bar_range_top_decile__neg__h_001
+# Signal TF: 1H. Long-only. Surviving clusters from Step 3: 1, 3.
+# ============================================================================
+
+l_arc_4:
+  # 22 arc-specific features (under the 30-feature cap; total 30 ≤ 38).
+  # Selected to span: short/long volatility regimes, momentum context,
+  # ranging-vs-trending position, microstructure (wick/body), session, and
+  # signal-class-specific bar_range pctile rank.
+  arc_specific_features:
+    # --- Volatility regime (5) ---
+    - atr_7_to_atr_14_ratio
+    - atr_28_to_atr_14_ratio
+    - realized_vol_20
+    - realized_vol_60
+    - bb_pos_20
+
+    # --- Momentum / direction (4) ---
+    - rsi_7
+    - rsi_28
+    - ret_50bar_atr
+    - ret_100bar_atr
+
+    # --- Range / position (4) ---
+    - bars_since_high_20
+    - bars_since_low_20
+    - dist_to_swing_high_20_atr
+    - dist_to_swing_low_20_atr
+
+    # --- Microstructure / 5-bar smoothing (3) ---
+    - body_to_range_mean_5
+    - upper_wick_mean_5
+    - lower_wick_mean_5
+
+    # --- Signal-class-specific (2) ---
+    - close_below_open_run_length
+    - bar_range_pctile_100
+
+    # --- Session / calendar (3 session + hour + day-of-week = 5 features) ---
+    - session_asia
+    - session_london
+    - session_ny
+    - hour_of_day
+    - day_of_week
+  total_arc_specific: 24
+  total_features: 32   # 8 base + 24 arc-specific (under 38 cap)
+
+  # Pipeline D1 path-so-far features (NOT in catalogue — listed here for
+  # documentation only; computed from trades_paths.csv at runtime).
+  d1_path_so_far_features_documentation:
+    - close_r_at_t
+    - mfe_so_far_r_at_t
+    - mae_so_far_r_at_t
+    - bars_in_profit_at_t
+    - local_peaks_so_far_at_t
+    - monotonicity_so_far_at_t
+    - velocity_first_t
+
+  # Feature definitions: brief notes on computation method + lookahead spec.
+  feature_definitions:
+    body_to_range_ratio:
+      formula: "|close - open| / (high - low)"
+      window: "signal bar N only"
+      notes: "0 if bar_range = 0 (degenerate); finite otherwise."
+    upper_wick_ratio:
+      formula: "(high - max(open, close)) / (high - low)"
+      window: "signal bar N only"
+    lower_wick_ratio:
+      formula: "(min(open, close) - low) / (high - low)"
+      window: "signal bar N only"
+    range_to_atr_14:
+      formula: "(high - low) / ATR(14)"
+      window: "signal bar N; ATR uses bars ≤ N (Wilder smoothing)"
+    ret_5bar_atr:
+      formula: "(close_N - close_{N-5}) / ATR_14"
+      window: "bars N-5..N"
+    ret_20bar_atr:
+      formula: "(close_N - close_{N-20}) / ATR_14"
+      window: "bars N-20..N"
+    pos_in_20bar_range:
+      formula: "(close - min_20) / (max_20 - min_20)"
+      window: "bars N-19..N (20 bars including signal bar)"
+    rsi_14:
+      formula: "Wilder RSI on 14-bar period"
+      window: "bars ≤ N"
+    atr_7_to_atr_14_ratio:
+      formula: "ATR(7) / ATR(14)"
+      window: "bars ≤ N (Wilder)"
+    atr_28_to_atr_14_ratio:
+      formula: "ATR(28) / ATR(14)"
+      window: "bars ≤ N (Wilder)"
+    realized_vol_20:
+      formula: "std(log_ret over 20 bars)"
+      window: "bars N-19..N"
+    realized_vol_60:
+      formula: "std(log_ret over 60 bars)"
+      window: "bars N-59..N"
+    bb_pos_20:
+      formula: "(close - SMA_20) / std_20"
+      window: "20-bar rolling"
+    rsi_7:
+      formula: "Wilder RSI on 7-bar period"
+      window: "bars ≤ N"
+    rsi_28:
+      formula: "Wilder RSI on 28-bar period"
+      window: "bars ≤ N"
+    ret_50bar_atr:
+      formula: "(close_N - close_{N-50}) / ATR_14"
+      window: "bars N-50..N"
+    ret_100bar_atr:
+      formula: "(close_N - close_{N-100}) / ATR_14"
+      window: "bars N-100..N"
+    bars_since_high_20:
+      formula: "20 - 1 - argmax(high over last 20 bars including N)"
+      window: "bars N-19..N"
+    bars_since_low_20:
+      formula: "20 - 1 - argmin(low over last 20 bars including N)"
+      window: "bars N-19..N"
+    dist_to_swing_high_20_atr:
+      formula: "(max_high_20 - close_N) / ATR_14"
+      window: "20-bar rolling max"
+    dist_to_swing_low_20_atr:
+      formula: "(close_N - min_low_20) / ATR_14"
+      window: "20-bar rolling min"
+    body_to_range_mean_5:
+      formula: "mean of body_to_range_ratio over bars N-4..N"
+    upper_wick_mean_5:
+      formula: "mean of upper_wick_ratio over bars N-4..N"
+    lower_wick_mean_5:
+      formula: "mean of lower_wick_ratio over bars N-4..N"
+    close_below_open_run_length:
+      formula: "current streak of consecutive bars where close < open ending at N"
+      notes: "0 if bar N has close ≥ open."
+    bar_range_pctile_100:
+      formula: "pctile rank of (high_N - low_N) in trailing 100 bars (N-100..N-1) EXCLUDING bar N"
+      notes: "signal-class-specific: matches the trailing-100 p90 threshold mechanism."
+    session_asia:
+      formula: "1 if 0 ≤ hour_UTC < 7"
+    session_london:
+      formula: "1 if 7 ≤ hour_UTC < 16"
+    session_ny:
+      formula: "1 if 13 ≤ hour_UTC < 22"
+      notes: "Sessions may overlap (London/NY share 13:00-16:00)."
+    hour_of_day:
+      formula: "0..23 hour from signal bar timestamp"
+    day_of_week:
+      formula: "0..6 weekday (Mon=0); typically 0..4 for FX"

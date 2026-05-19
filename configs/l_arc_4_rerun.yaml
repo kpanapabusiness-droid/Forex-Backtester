@@ -1,0 +1,122 @@
+# configs/l_arc_4_rerun.yaml — Arc 4 RE-RUN config (new per-pair p50 spread floor)
+#
+# Identical to configs/l_arc_4.yaml except for TWO fields:
+#   1. spread_floor.expected_body_sha256 — bound to the NEW locked body sha
+#      `8da7644b252ae163d963fbd46807572906fa3e5a44fb3e02d771e181b3ecdc05`
+#      (per `tests/test_spread_floors_lock.py::LOCKED_BODY_SHA256`; new
+#      per-pair p50 values from HistData 2024-2025, replacing uniform 0.1).
+#   2. output.results_dir — redirected to `results/l_arc_4_rerun/step1`
+#      to keep the original Arc 4 outputs intact for comparison.
+#
+# All other fields (signal, execution, data, gates, output filenames) are
+# identical to configs/l_arc_4.yaml — verified by diff at write time.
+# Original l_arc_4.yaml is preserved untouched.
+#
+# Body sha of original l_arc_4.yaml: b3909f17b93d29ef... (matches lock
+# reference in docs/arc_results/ARC_4_RESULT.md line 203).
+
+phase: l_arc_4_rerun_step1
+description: >-
+  L Arc 4 RE-RUN Step 1 — generate trade pool for signal
+  TRIAL__univariate_extreme__bar_range_top_decile__neg__h_001 under v2.1.1
+  protocol, with NEW per-pair p50 spread floor (HistData 2024-2025).
+  Companion to results/l_arc_4/step1 (under old uniform 0.1 pip floor).
+
+# ----------------------------------------------------------------------
+# Signal — registry Entry 4 (LCHAR_TOPN_REGISTRY.md) — UNCHANGED
+# ----------------------------------------------------------------------
+signal:
+  module: signals.lchar_bar_range_top_decile
+  trial_id: TRIAL__univariate_extreme__bar_range_top_decile__neg__h_001
+  family: univariate_extreme
+  base: bar_range_top_decile
+  sub_spec: neg                       # close_N < open_N
+  signal_tf: "1H"
+  trailing_window_bars: 100
+  decile_pctile: 0.90                 # top decile per pair, strict `>` (mirrors L4)
+  trade_direction: long               # v2.1.1 §1.16 long-only baseline
+
+# ----------------------------------------------------------------------
+# Execution parameters (v2.1.1 §5 + CLAUDE.md L arc config) — UNCHANGED
+# ----------------------------------------------------------------------
+execution:
+  entry_bar_offset: 1                 # bar N+1 open
+  atr_period: 14
+  atr_smoothing: wilder               # Wilder ATR(14) on 1H frame
+  atr_tf: "1H"
+  base_sl_atr_mult: 2.0               # SL = entry - 2.0 * ATR(14) for long
+  baseline_horizon_bars: null         # SL-only baseline; no time exit
+  max_trade_life_bars: 240            # force-close at N+1+240 if no SL hit
+  forward_window_bars: 240            # path bars 0..240 inclusive
+  max_concurrent_per_pair: 1
+  risk_pct_per_trade: 0.005           # 0.5% (L arc convention)
+  starting_balance: 10000.0
+  trade_direction: long
+
+# ----------------------------------------------------------------------
+# Data window (KH-24 OOS window — match exactly per spec) — UNCHANGED
+# ----------------------------------------------------------------------
+data:
+  data_dirs:
+    "1H": data/1hr
+  timeframes: [1H]                    # univariate signal — 1H only
+  date_start: "2020-10-01"
+  date_end: "2026-01-31"
+  pairs:
+    - AUD_CAD
+    - AUD_CHF
+    - AUD_JPY
+    - AUD_NZD
+    - AUD_USD
+    - CAD_CHF
+    - CAD_JPY
+    - CHF_JPY
+    - EUR_AUD
+    - EUR_CAD
+    - EUR_CHF
+    - EUR_GBP
+    - EUR_JPY
+    - EUR_NZD
+    - EUR_USD
+    - GBP_AUD
+    - GBP_CAD
+    - GBP_CHF
+    - GBP_JPY
+    - GBP_NZD
+    - GBP_USD
+    - NZD_CAD
+    - NZD_CHF
+    - NZD_JPY
+    - NZD_USD
+    - USD_CAD
+    - USD_CHF
+    - USD_JPY
+
+# ----------------------------------------------------------------------
+# Spread floor — CHANGED: expected_body_sha256 bound to NEW p50 floor file
+# ----------------------------------------------------------------------
+spread_floor:
+  enabled: true
+  source: configs/spread_floors_5ers.yaml
+  expected_body_sha256: 8da7644b252ae163d963fbd46807572906fa3e5a44fb3e02d771e181b3ecdc05
+  points_per_pip: 10.0
+
+# ----------------------------------------------------------------------
+# Gates (v2.1.1 §5 + prompt §5) — UNCHANGED
+# ----------------------------------------------------------------------
+gates:
+  pool_size_min: 500
+  small_pair_flag_threshold: 30       # pairs with n < 30 flagged but not removed
+  bars_held_p95_max: 240              # sanity: 95th pct must be UNDER cap
+  cap_bind_warn_pct: 0.20             # >20% cap-binding → flag for §5 auto-extend
+
+# ----------------------------------------------------------------------
+# Output — CHANGED: results_dir redirected to l_arc_4_rerun
+# ----------------------------------------------------------------------
+output:
+  results_dir: results/l_arc_4_rerun/step1
+  trades_csv: trades_all.csv
+  paths_csv: trades_paths.csv
+  summary_md: step1_diagnostics.md
+  float_format: "%.10g"
+  determinism_check: true             # if true, run twice and verify byte-identical

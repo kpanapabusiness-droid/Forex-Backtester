@@ -1,0 +1,123 @@
+# configs/wfo_l_arc_5.yaml — L Arc 5 Step 1 plumbing config (baseline)
+#
+# Protocol: L_ARC_PROTOCOL.md v2.1.1 §5
+# Signal:   TRIAL__mtf_alignment__2_down_mixed__kijun__h_120
+#           (LCHAR_TOPN_REGISTRY.md Entry 5; equivalent trigger to Arc 2 redo2
+#            Entry 2 with explicit time_exit_bars=120 override).
+#
+# This config reproduces the Arc 5 baseline trade pool documented in
+# results/l_arc_5/step1/PHASE_L_ARC_5_STEP1.md (PASS, 12262 trades,
+# determinism + lookahead + spread gates all PASS, trades_all.csv sha256
+# 4f89efd42cf5a0d0… , trades_paths.csv sha256 ddb709befb98ace8…).
+#
+# Spread floor reference: the baseline used the PRIOR spread file (body sha256
+# a613b4ce641c8d52… — uniform 0.1 pip floor). That body has been superseded
+# by the 2026-05-17 per-pair p50 calibration (current body sha256
+# 8da7644b252ae163…). To reproduce baseline byte-for-byte, point spread_floor
+# at the recovered prior file under tmp/arc5_validation/. To re-run under the
+# 2026-05-17 calibrated floors, see configs/wfo_l_arc_5_spread_v2.yaml.
+
+phase: l_arc_5_step1
+description: >-
+  L Arc 5 Step 1 — generate trade pool for signal
+  TRIAL__mtf_alignment__2_down_mixed__kijun__h_120 under v2.1.1 protocol.
+  Direct-to-main per v2.1.1 §13.
+
+# ----------------------------------------------------------------------
+# Signal parameters (LCHAR_TOPN_REGISTRY.md Entry 5 + v2.1.1)
+# ----------------------------------------------------------------------
+signal:
+  family: mtf_alignment
+  state: 2_down_mixed
+  trend: kijun
+  signal_tf: 1H
+  middle_tf: 4H
+  higher_tf: D1
+  middle_tf_lag: most_recently_completed
+  higher_tf_lag: most_recently_completed
+  kijun_period: 26
+  trade_direction: long
+
+# ----------------------------------------------------------------------
+# Execution parameters (CLAUDE.md L arc config + v2.1.1 §1)
+# ----------------------------------------------------------------------
+execution:
+  entry_bar_offset: 1
+  atr_period: 14
+  atr_smoothing: wilder
+  atr_tf: 1H
+  sl_atr_multiplier: 2.0
+  horizon_bars: 120
+  path_window_bars: 240
+  max_concurrent_per_pair: 1
+  risk_pct_per_trade: 0.005
+  starting_balance: 10000.0
+  trade_direction: long
+
+# ----------------------------------------------------------------------
+# Data inputs
+# ----------------------------------------------------------------------
+data:
+  data_dirs:
+    "1H": data/1hr
+    "4H": data/4hr
+    "D1": data/daily
+  timeframes: [1H, 4H, D1]
+  date_start: null
+  date_end: null
+  pairs:
+    - AUD_CAD
+    - AUD_CHF
+    - AUD_JPY
+    - AUD_NZD
+    - AUD_USD
+    - CAD_CHF
+    - CAD_JPY
+    - CHF_JPY
+    - EUR_AUD
+    - EUR_CAD
+    - EUR_CHF
+    - EUR_GBP
+    - EUR_JPY
+    - EUR_NZD
+    - EUR_USD
+    - GBP_AUD
+    - GBP_CAD
+    - GBP_CHF
+    - GBP_JPY
+    - GBP_NZD
+    - GBP_USD
+    - NZD_CAD
+    - NZD_CHF
+    - NZD_JPY
+    - NZD_USD
+    - USD_CAD
+    - USD_CHF
+    - USD_JPY
+
+# ----------------------------------------------------------------------
+# Spread floor (PRIOR — pre-2026-05-17 calibration; produces baseline pool)
+# ----------------------------------------------------------------------
+spread_floor:
+  enabled: true
+  source: tmp/arc5_validation/spread_floors_5ers_PRIOR_2026-05-17.yaml
+  expected_body_sha256: a613b4ce641c8d5218490531770a4924204029dedaa80fb24111beb61bd15547
+  points_per_pip: 10.0
+
+# ----------------------------------------------------------------------
+# Gates (v2.1.1 §5)
+# ----------------------------------------------------------------------
+gates:
+  pool_size_min: 500
+  small_pair_flag_threshold: 30
+
+# ----------------------------------------------------------------------
+# Output
+# ----------------------------------------------------------------------
+output:
+  results_dir: results/l_arc_5/step1_validate_old_spread
+  trades_csv: trades_all.csv
+  paths_csv: trades_paths.csv
+  summary_md: STEP1_SUMMARY.md
+  float_format: "%.10g"
+  determinism_check: true

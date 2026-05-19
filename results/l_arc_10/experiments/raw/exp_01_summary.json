@@ -1,0 +1,55 @@
+{
+  "joint": {
+    "n_paired_resamples": 2000,
+    "p_both_clear": 0.058,
+    "p_either_clears": 0.405
+  },
+  "n_oof_pairs": 190,
+  "n_resamples": 2000,
+  "n_trades": 228,
+  "pipeline_D1": {
+    "bootstrap_ci_95": [
+      0.5029256851209863,
+      0.6627643938806383
+    ],
+    "bootstrap_mean": 0.5822700546011162,
+    "bootstrap_median": 0.5828716225057688,
+    "mass_above_threshold": 0.338,
+    "mean_per_fold_auc": 0.5896962237425819,
+    "oof_pooled_auc": 0.5831380426291708,
+    "per_fold_auc": [
+      0.6689750692520776,
+      0.6246498599439776,
+      0.5180055401662049,
+      0.4607142857142857,
+      0.6761363636363636
+    ],
+    "std_per_fold_auc": 0.09585755612242837,
+    "step4_margin": -0.010303776257418074,
+    "step4_reported_auc": 0.5897,
+    "threshold": 0.6
+  },
+  "pipeline_E": {
+    "bootstrap_ci_95": [
+      0.5226637743794326,
+      0.6838645077772405
+    ],
+    "bootstrap_mean": 0.6013707141772201,
+    "bootstrap_median": 0.5995543799693013,
+    "mass_above_threshold": 0.125,
+    "mean_per_fold_auc": 0.6296093271103456,
+    "oof_pooled_auc": 0.6025555183573261,
+    "per_fold_auc": [
+      0.6246537396121884,
+      0.669467787114846,
+      0.551246537396122,
+      0.6464285714285714,
+      0.65625
+    ],
+    "std_per_fold_auc": 0.04676161332927795,
+    "step4_margin": -0.02039067288965446,
+    "step4_reported_auc": 0.6296,
+    "threshold": 0.65
+  },
+  "random_state": 42
+}

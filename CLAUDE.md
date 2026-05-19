@@ -1,5 +1,5 @@
 # CLAUDE.md — Forex Ignition Rebuild
-> Last updated: 2026-05-17 | Phase: Arc 4 CLOSED (CLEAN-NULL on transaction-cost truth); spread floor file replaced 2026-05-17 with per-pair p50 values, arc work unblocked
+> Last updated: 2026-05-19 | Phase: Arc 10 closed STEP_4_HALT on `claude/charming-mcnulty-8160e0`; post-closure research (experimentation + WFO pair) complete and committed. Arcs 8/9/11 run in parallel CC sessions (queue ownership delegated to those sessions). KH-24 live deployment unchanged.
 > First file any AI assistant reads. Reflects where the project ACTUALLY is.
 
 ---
@@ -31,7 +31,7 @@ Then, depending on scope:
 
 **Live system KH-24 is locked, passing, deployed.** Out of scope for L arc work; do not modify without an explicit modification phase.
 
-**Active research: L arc signal testing under `L_ARC_PROTOCOL.md` v2.1.2.** Arc 4 RE-RUN closed FAIL Step 6 2026-05-18 under corrected per-pair p50 spread floors. Admit-pool edge survived the cost-model correction (+0.125R per trade, §9 admit-only PASS), but §10 full-pool deployment reckoning FAILS on every gate — reject pool (32% of signals, −0.232R mean) + early-exit pool (11% of signals, −0.685R mean) crush net expectancy to −0.076R per signal, full-data DD 76.98% over 4.5 years at 0.20% risk, 5ers account-closure event on one day. **Second Pipeline D1 arc after Arc 5 to PASS §9 admit-only and FAIL §10 full-pool — cross-arc structural finding.** Three open protocol items spawned (Open-22/23/24, see `PROTOCOL_IMPROVEMENT_BACKLOG.md`). The prior CLEAN-NULL closure (2026-05-17, cost-model framing) is superseded by the rerun's architectural finding; disposition unchanged (Arc 4 closed), reason updated. KH-24 live deployment unaffected. See `docs/arc_results/ARC_4_RERUN_RESULT.md` (primary) and `docs/arc_results/ARC_4_RESULT.md` (prior closure, preserved as historical record). Arc 3 closed CLEAN-NULL at Step 3 (2026-05-16). Arcs 1 and 2 are historical (ran under v1.x).
+**Active research: L arc signal testing under `L_ARC_PROTOCOL.md` v2.1.2 base + v2.2 + v2.3 amendments.** Arc 10 (DLR — D1 swing-low rejection long) closed `STEP_4_HALT` 2026-05-18 per §16a Path A. First arc to run end-to-end under v2.3 (5-step pipeline, halt at end of Step 4). Step 4 near-miss: c1 V-shape recovery E AUC 0.6296 (margin −0.0204), D1 AUC 0.5897 (margin −0.0103); disjunctive §8 fails on both. Post-closure experimentation pass (EXP-01–06) and WFO pair (base + oracle c1) conducted as research probes over §16a at chat-side direction. Oracle WFO Sharpe 4.61 vs base −1.29 (gap +5.90) — synthesis recommends BUILD clusterifier; explicit DO NOT DEPLOY. EXP-01 bootstrap shows realisable classifier P(AUC ≥ 0.65) = 12.5%. Closure: `docs/arc_results/ARC_10_RESULT.md`. Two material corrections to prior framing: Arc 6 reclassified Stepwise (not V-shape, per EXP-05); fold-2 date 2023-07 → 2024-06 (not Q2 2022, per EXP-04). Open-06 (AUC threshold) weakened; Open-04 (external features) deferred pending Arc 8/9/11. Arc 4 RE-RUN closed FAIL Step 6 2026-05-18 — Pipeline D1 reject + early-exit pool drag swamps admit-pool edge (Open-22/23/24 spawned, closed in v2.3 with engine PR pending for Open-24). Arc 3 closed CLEAN-NULL at Step 3 (2026-05-16). Arcs 5/6/7 closed under v2.1.2 (see STATUS.md "Recent Closures"). Arcs 1, 2 historical (ran under v1.x). KH-24 live deployment unaffected.
 
 ---
 
@@ -153,9 +153,37 @@ Key scripts:
 
 - **Spread-floor changes are not population-invariant under exposure caps.** Changing the spread floor file shifts entry/exit fill prices, which shifts when stops fire, which shifts when the `max_concurrent_per_pair` cap releases, which shifts admission for subsequent signals. Trade pool can drift ±1-2% from a pure cost-model change. Path features (mid-based) remain spread-independent; PnL and exposure-derived metrics do not. Future arcs swapping spread files should expect Step 1 pool drift and propagate through Step 2 cluster sizes + Step 4 per-fold classifier retraining.
 
+- **V-shape recovery: capturable, near-miss extractable, cross-arc deployable (Arc 7 + Arc 10).** Two V-shape near-misses on record (Arc 7 c1/c3/agg, Arc 10 c1) — capturable at Step 3 but missing Step 4 disjunctive E/D1 AUC gate. Cross-arc pool (EXP-05) closes the gap: pooled AUC 0.6348 with generic 17-feature subset vs 0.6057 (Arc 10 alone) / 0.4954 (Arc 7 c3 alone at common SL). WFO oracle on Arc 10 c1 confirms real OOS edge if cluster ID known at entry (Sharpe 4.61, expectancy 1.55R/trade). Single load-bearing feature: `L1_minus_L0_atr` (D1 HL slope magnitude) carries 116% of HTF LOO drop on Arc 10. Reading: V-shape archetype is a cross-arc deployable abstraction once a classifier with extended feature envelope is built; Arc 10 alone is in the noise zone (EXP-01 P(AUC ≥ 0.65) under bootstrap = 12.5%). Cross-arc clusterifier build is the leading v2.4 candidate. See `docs/arc_results/ARC_10_RESULT.md` and `results/l_arc_10/experiments/ARC_10_EXPERIMENT_SYNTHESIS.md`.
+
 ### Not eliminated, but flagged
 
-- Failed-breakout reversal long (Arc 6, 2026-05-17): path quality clean at v2.1.2 Step 3 (c2 Stepwise, mfe_p50=4.47R, ww_pp=0.000) but entry-time predictability below 0.65 deployability bar (best Pipeline E AUC 0.600 / 0.590); D1 admission collapses on threshold sweep. Not permanently eliminated; may return under richer feature regime, multi-TF entry context, or ensemble approach. See `docs/arc_results/ARC_6_RESULT.md`.
+- Failed-breakout reversal long (Arc 6, 2026-05-17): path quality clean at v2.1.2 Step 3 (c2 **Stepwise climber**, mfe_p50=4.47R, ww_pp=0.000) but entry-time predictability below 0.65 deployability bar (best Pipeline E AUC 0.600 / 0.590); D1 admission collapses on threshold sweep. Not permanently eliminated; may return under richer feature regime, multi-TF entry context, or ensemble approach. See `docs/arc_results/ARC_6_RESULT.md`. *(Note: Arc 6 was previously narrated as V-shape in some Arc 10 docs; per EXP-05 it is Stepwise.)*
+- D1 swing-low rejection long (Arc 10 DLR, 2026-05-18): path quality clean at v2.3 Step 3 (c1 V-shape recovery, composite 0.4934 at SL=3.0×ATR, fwd_mfe_p50 3.08R, wrong_way_pp 0.000) but entry-time predictability near-miss on disjunctive §8 — c1 E AUC 0.6296 (margin −0.0204), D1 AUC 0.5897 (margin −0.0103). Both Path A near-miss < 0.03. Post-closure WFO oracle Sharpe 4.61 vs base −1.29 (gap +5.90) confirms structural OOS edge if cluster ID known at entry; realisable classifier ceiling pending feature-envelope expansion (per closure §"Why we can't filter to c1"). Not permanently eliminated; cross-arc clusterifier build with Arc 7 c3 is the leading v2.4 candidate (EXP-05 pool AUC 0.6348). See `docs/arc_results/ARC_10_RESULT.md`.
+
+---
+
+## Vocabulary (post-Arc-10)
+
+Terms used across post-Arc-10 dispatches and downstream docs. Defined here; referenced elsewhere — do not redefine.
+
+- **Reverse FE.** Envelope-expansion activity that runs outside the gated pipeline. Method: qualitative characterisation of the target cluster's entries → encoded hypothesis catalog (pre-registered, hashed before validation) → cheap separation tests → routing to classifier or filter path. Distinct from Step 4, which evaluates a fixed envelope and does not iterate on failure. Anti-snooping protocol mandatory.
+- **Classifier path.** Extend the entry-time feature envelope via new feature families (multi-TF trend alignment, pre-entry pattern context, volatility-regime descriptors, within-cluster sub-clustering), re-test through Step 4 on the extended envelope. Validation: AUC against existing gate (E ≥ 0.65 / D1 ≥ 0.60).
+- **Filter path.** Hand-engineer deterministic entry-time conditions (e.g. `D1 slope > X AND compression ratio < Y AND realised-vol-percentile > Z`) that select cluster-like setups by construction. Validate on post-filter trade-set P&L (Sharpe, expectancy, max DD), not classifier AUC. Sidesteps the AUC gate entirely. More robust at small N; interpretable. Acceptance criteria pending (backlog item).
+- **§16a Path A — disjunctive-gate ambiguity.** "Single criterion fail with margin < 0.03 → HALT" is ambiguous when a disjunctive Step 4 gate (E OR D1) fails on both criteria. Default reading: compound (Step 4 as one §8 gate → HALT). Strict reading (two numeric criteria → KILL) is available and should be documented in the closure when invoked. Arc 10 invoked compound. v2.4 cycle is the natural place to formalise.
+
+## Conventions
+
+- **Queue ownership.** `results/ARC_QUEUE.md` is owned by exactly one CC session at any time. Sessions that are not the queue owner must not modify it. Parallel sessions on the same project must coordinate via the queue owner. Arc 10 ran on `claude/charming-mcnulty-8160e0` while Arcs 8/9/11 ran in a parallel session that held queue ownership.
+- **Determinism baseline.** `random_state=42`, `n_jobs=1`, `lineterminator="\n"` throughout for any work that must be byte-identical-reproducible. Audited via two-run sha256 comparison.
+- **Closure docs land at `docs/arc_results/ARC_<N>_RESULT.md`** per L_ARC_PROTOCOL §13. LIVE docs are retired at closure. (Arc 7 onward.)
+
+## Activity catalog (downstream-route names)
+
+- **Pipeline E / Pipeline D1** — classifier-gated extractability per protocol §3 / §8.
+- **Reverse FE diagnostic** — envelope expansion outside the gated pipeline (pre-registered).
+- **Cross-arc clusterifier build** — multi-arc pool + extended feature catalog (e.g. V-shape pool with `L1_minus_L0_atr` mandatory).
+- **Filter-path probe** — deterministic conditions, P&L validation, post-filter trade-set metrics.
+- **v2.X calibration packet** — cross-arc cycle bundling closures + experimentation + WFO evidence for protocol amendments.
 
 ---
 

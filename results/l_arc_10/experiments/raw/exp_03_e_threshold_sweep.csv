@@ -1,0 +1,22 @@
+e_threshold,n_pass,passing_units
+0.55,5,KH-24/K=4 arch 3; Arc 6/c0; Arc 6/c2; Arc 10/c1; Arc 4 RERUN/(per closure)
+0.555,4,KH-24/K=4 arch 3; Arc 6/c0; Arc 6/c2; Arc 10/c1
+0.56,4,KH-24/K=4 arch 3; Arc 6/c0; Arc 6/c2; Arc 10/c1
+0.565,4,KH-24/K=4 arch 3; Arc 6/c0; Arc 6/c2; Arc 10/c1
+0.57,4,KH-24/K=4 arch 3; Arc 6/c0; Arc 6/c2; Arc 10/c1
+0.575,4,KH-24/K=4 arch 3; Arc 6/c0; Arc 6/c2; Arc 10/c1
+0.58,4,KH-24/K=4 arch 3; Arc 6/c0; Arc 6/c2; Arc 10/c1
+0.585,4,KH-24/K=4 arch 3; Arc 6/c0; Arc 6/c2; Arc 10/c1
+0.59,4,KH-24/K=4 arch 3; Arc 6/c0; Arc 6/c2; Arc 10/c1
+0.595,3,KH-24/K=4 arch 3; Arc 6/c0; Arc 10/c1
+0.6,3,KH-24/K=4 arch 3; Arc 6/c0; Arc 10/c1
+0.605,2,KH-24/K=4 arch 3; Arc 10/c1
+0.61,2,KH-24/K=4 arch 3; Arc 10/c1
+0.615,2,KH-24/K=4 arch 3; Arc 10/c1
+0.62,2,KH-24/K=4 arch 3; Arc 10/c1
+0.625,2,KH-24/K=4 arch 3; Arc 10/c1
+0.63,1,KH-24/K=4 arch 3
+0.635,1,KH-24/K=4 arch 3
+0.64,1,KH-24/K=4 arch 3
+0.645,0,
+0.65,0,

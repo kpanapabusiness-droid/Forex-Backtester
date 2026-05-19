@@ -1,0 +1,3 @@
+unit_id,pipeline,n,n_features,base_success_rate,mean_auc,std_auc,fold_aucs,gate_threshold,gate_pass,selected_t,exclusion_at_t,admission_at_t,realised_success_at_t,lift_at_t,class_weight_used
+c1,E,228,25,0.4824561404,0.6296093271,0.04676161333,0.6246537396;0.6694677871;0.5512465374;0.6464285714;0.65625,0.65,0,,,,,,none
+c1,D1,228,11,0.4824561404,0.5896962237,0.09585755612,0.6689750693;0.6246498599;0.5180055402;0.4607142857;0.6761363636,0.6,0,,,,,,none

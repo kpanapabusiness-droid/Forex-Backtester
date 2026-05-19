@@ -1,0 +1,4 @@
+arc,cohort,e_auc,downstream_outcome,reason_for_FP
+Arc 6,c0,0.6,DEPLOYABILITY_FAIL_recall_collapse,passes E AUC at relaxed threshold but downstream failure on record
+Arc 6,c2,0.59,DEPLOYABILITY_FAIL_recall_collapse,passes E AUC at relaxed threshold but downstream failure on record
+Arc 4 RERUN,(per closure),0.55,STEP6_FAIL_full_pool_DD_76.98pct,passes E AUC at relaxed threshold but downstream failure on record

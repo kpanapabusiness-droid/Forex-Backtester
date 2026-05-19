@@ -1,0 +1,176 @@
+# wfo_l_arc_10.yaml — Arc 10 Step 1 plumbing config
+#
+# Active protocol stack: L_ARC_PROTOCOL.md v2.1.2 + L_ARC_PROTOCOL_v2_2_AMENDMENT.md
+# + L_ARC_PROTOCOL_v2_3_AMENDMENT.md.
+#
+# Signal under test: signal_d1_swing_low_rejection_long_v0.1 (DLR).
+# 4H signal TF, D1 anchor TF (one-day lag MANDATORY, KH-24 convention).
+# Long only. 28 FX pair set.
+#
+# Engine path: scripts/l_arc_10/step1_plumbing.py reads this file directly.
+
+phase: L_ARC_10_STEP_1_PLUMBING
+description: |
+  Arc 10 Step 1 plumbing — full-window trade pool for the DLR
+  (D1 swing-low rejection) long signal. 4H signal TF + D1 anchor (one-day
+  lag), long-only, single pass over the window. Deterministic, §15a-compliant
+  trades_paths.csv with is_held column. v2.3 Step 1 gates:
+  pool >= 500, byte-identical re-run, lookahead-invariant, schema-valid,
+  Arc 10 D1-lag NaN-perturbation + right-edge swing audits.
+
+# ----------------------------------------------------------------------
+# Signal (verbatim from signals/lchar_dlr_long.py — locked at arc open)
+# ----------------------------------------------------------------------
+signal:
+  module: signals.lchar_dlr_long
+  trial_id: ARC_10__d1_swing_low_rejection__long__4h__h_240
+  family: multi_tf_trend_continuation_htf_anchored
+  base: d1_swing_low_rejection
+  signal_tf: "4H"
+  anchor_tf: "D1"
+  trade_direction: long
+  d1_swing_window_k: 3
+  d1_right_edge_offset: 4
+  d1_structure_lookback_bars: 30
+  d1_l1_freshness_max_bars: 20
+  atr_period_4h: 14
+  proximity_atr_mult: 0.25
+  reject_buffer_atr_mult: 0.10
+  upper_fraction_min: 0.6
+  refractory_bars_4h: 20
+
+# ----------------------------------------------------------------------
+# Data window — 2020-10-01 -> 2026-01-31 per signal spec.
+# Absolute paths used so the script runs from a worktree without symlinking
+# the gitignored data/ tree.
+# ----------------------------------------------------------------------
+data:
+  data_dirs:
+    "4H": "C:/Users/panap/Documents/Forex-Backtester/data/4hr"
+    "D1": "C:/Users/panap/Documents/Forex-Backtester/data/daily"
+  date_start: "2020-10-01"
+  date_end: "2026-01-31"
+
+# All 28 FX pairs (identical set to KH-24).
+pairs:
+  - AUD_CAD
+  - AUD_CHF
+  - AUD_JPY
+  - AUD_NZD
+  - AUD_USD
+  - CAD_CHF
+  - CAD_JPY
+  - CHF_JPY
+  - EUR_AUD
+  - EUR_CAD
+  - EUR_CHF
+  - EUR_GBP
+  - EUR_JPY
+  - EUR_NZD
+  - EUR_USD
+  - GBP_AUD
+  - GBP_CAD
+  - GBP_CHF
+  - GBP_JPY
+  - GBP_NZD
+  - GBP_USD
+  - NZD_CAD
+  - NZD_CHF
+  - NZD_JPY
+  - NZD_USD
+  - USD_CAD
+  - USD_CHF
+  - USD_JPY
+
+# ----------------------------------------------------------------------
+# Entry / exit
+# ----------------------------------------------------------------------
+entry:
+  bar_offset: 1                  # bar N+1 open
+  execution: open
+
+exit:
+  hard_stop:
+    type: absolute_atr
+    atr_period: 14
+    atr_smoothing: wilder
+    atr_tf: "4H"
+    multiplier: 2.0              # Step 1 simulation SL = 2.0 x ATR (default)
+    anchor: entry_price
+  time_exit:
+    bars_after_entry: 240        # 240 4H bars = 40 calendar days
+  trail: null
+  structural_exits: []
+
+# ----------------------------------------------------------------------
+# Exposure / risk
+# ----------------------------------------------------------------------
+exposure:
+  max_concurrent_per_pair: 1
+  currency_cap: null
+  concurrent_trade_cap: null
+
+risk:
+  pct_per_trade: 0.005           # 0.5% per L arc convention
+  starting_balance: 10000.0
+  basis: reset_floor
+
+# ----------------------------------------------------------------------
+# Spread (locked floor + per-bar MT5 native points)
+# ----------------------------------------------------------------------
+spreads:
+  enabled: true
+  source: per_bar
+  points_per_pip: 10.0
+  default_pips: 0.0
+
+spread_floor:
+  enabled: true
+  source: configs/spread_floors_5ers.yaml
+  expected_body_sha256: 8da7644b252ae163d963fbd46807572906fa3e5a44fb3e02d771e181b3ecdc05
+
+# ----------------------------------------------------------------------
+# Path output (v2.1.2 §15a — same schema as Arc 7)
+# ----------------------------------------------------------------------
+trade_paths:
+  enabled: true
+  forward_window_bars: 240
+
+# ----------------------------------------------------------------------
+# Output
+# ----------------------------------------------------------------------
+output:
+  results_dir: results/l_arc_10/step1_verbatim
+  trades_csv: trades_all.csv
+  paths_csv: trades_paths.csv
+  prefilter_csv: prefilter_events.csv
+  manifest_json: manifest.json
+  float_format: "%.10g"
+
+# ----------------------------------------------------------------------
+# Gate (Step 1 — v2.3 §5 / §15a)
+# ----------------------------------------------------------------------
+gate:
+  pool_size_min: 500
+  determinism: byte_identical_two_run
+  schema_check: v2_1_1_strict
+
+# ----------------------------------------------------------------------
+# Arc 10 specific Step 1 audits (D1-lag-critical per signal spec)
+# ----------------------------------------------------------------------
+d1_lag_audits:
+  nan_perturbation_test_cases: 3       # NaN out D1[d_t] on 3 signal-fire events
+  right_edge_offset_required: 4        # L_1 must be at most D1[d_t - 4]
+  lookahead_spot_check_count: 5        # standard 5/5 lookahead audit
+
+# ----------------------------------------------------------------------
+# Co-fire matrix (Step 1 §1 of signal spec)
+# Cross-reference KH-24 (kb_exhaustion_bar) only — arcs 8/9/11 step1 not landed.
+# ----------------------------------------------------------------------
+cofire:
+  references:
+    - name: KH-24
+      kind: trades_all_csv
+      path: results/kh24/trades_all.csv
+      expected_overlap_max_pct: 10
+      note: bearish single-bar exhaustion + D1 regime filter vs DLR bullish rejection at D1 swing-low (direction-opposite, low overlap expected)

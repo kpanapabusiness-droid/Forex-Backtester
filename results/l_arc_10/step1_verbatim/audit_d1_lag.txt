@@ -1,0 +1,23 @@
+# Arc 10 Step 1 — D1 lag audit
+
+## (a) Right-edge swing audit
+L_1_age_d1_bars min/max across 802 signals: 4 / 20
+Required: L_1_age >= 4 (right_edge_offset)
+Result: PASS
+
+## (b) L_1 freshness sanity
+L_1_age_d1_bars max: 20 | freshness_max: 20
+Result: PASS
+
+## (c) NaN-perturbation test (3 synthetic cases)
+Procedure: for each signal-fire event, NaN out the D1 row at d_t
+(the D1 bar containing 4H bar t). If the signal still fires identically,
+the lag is structurally correct (D1[d_t] is unread).
+
+  PASS: NZD_CHF @ 2020-10-07 04:00:00 baseline=True perturbed_with_d_t_NaN=True d_t_idx_in_df_d1=12 d_t_date=2020-10-07
+  PASS: USD_CHF @ 2023-06-15 04:00:00 baseline=True perturbed_with_d_t_NaN=True d_t_idx_in_df_d1=711 d_t_date=2023-06-15
+  PASS: EUR_CHF @ 2025-12-31 16:00:00 baseline=True perturbed_with_d_t_NaN=True d_t_idx_in_df_d1=1373 d_t_date=2025-12-31
+
+NaN-perturbation overall: PASS
+
+=== Overall D1 lag audit: PASS ===

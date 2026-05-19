@@ -1,0 +1,4 @@
+cluster_id,n,size_fraction,centroid_monotonicity,centroid_local_peaks,centroid_pullback,centroid_ttp_rel,archetype_label,label_status,matching_rule,notes
+0,266,0.3316708229,0.01595059076,0.5338345865,0.006780123228,0.06558760906,tentative_Early-peak hold OR Peak-and-collapse,tentative,ttp_rel<=0.30,Step 3 pct_peak_and_collapse: <0.30 → Early-peak hold; >=0.50 → Peak-and-collapse
+1,228,0.2842892768,0.5210903998,21.91666667,0.7337702853,0.6866942238,tentative_V-shape recovery,tentative,"ttp_rel in [0.4, 0.8]",Step 3 MAE-before-peak >= 5 bars confirmation
+2,308,0.3840399002,0.5469628878,5.558441558,0.2642829869,0.3621089585,unassigned,unassigned,no §11 pattern satisfied,

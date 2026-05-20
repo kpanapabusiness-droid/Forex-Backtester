@@ -1,5 +1,5 @@
 {
-  "downloaded_at": "2026-05-20T03:16:41+00:00",
+  "downloaded_at": "2026-05-20T05:52:46+00:00",
   "pairs": {
     "AUDCAD": {
       "earliest_month": "201001",
@@ -3952,6 +3952,1982 @@
       "latest_month": "202604",
       "total_files": 196,
       "total_size_bytes": 1608134138
+    },
+    "AUDUSD": {
+      "earliest_month": "201001",
+      "files": {
+        "AUDUSD/tick/2010/DAT_ASCII_AUDUSD_T_201001.zip": {
+          "rows": 344821,
+          "sha256": "99b8f6809d253a820838c5c017ad5c9ee830c1241c4608a58a35c892e31d042d",
+          "size_bytes": 1383046
+        },
+        "AUDUSD/tick/2010/DAT_ASCII_AUDUSD_T_201002.zip": {
+          "rows": 408404,
+          "sha256": "79d1ffd0751b72cca829ccb7aab84a08951dd74834fb73e0f91af022794cbda3",
+          "size_bytes": 1611174
+        },
+        "AUDUSD/tick/2010/DAT_ASCII_AUDUSD_T_201003.zip": {
+          "rows": 410931,
+          "sha256": "ff266df1a99b7521cc561a5d2b45c674b5f42b3bad7dcc6ba50a1d4248d8f951",
+          "size_bytes": 1572523
+        },
+        "AUDUSD/tick/2010/DAT_ASCII_AUDUSD_T_201004.zip": {
+          "rows": 378804,
+          "sha256": "3d54883b6ed2af84f8fbb8f5c8ab3e736230d904145ff22d7eb30de1111c5f20",
+          "size_bytes": 1404929
+        },
+        "AUDUSD/tick/2010/DAT_ASCII_AUDUSD_T_201005.zip": {
+          "rows": 655988,
+          "sha256": "4ba23c7103e28d5c3e812e8708f4fea1b45a4eeccfc8220c2df70ae987dc84d2",
+          "size_bytes": 2507796
+        },
+        "AUDUSD/tick/2010/DAT_ASCII_AUDUSD_T_201006.zip": {
+          "rows": 585167,
+          "sha256": "3346759e5c4c161ca45329b4c86a92e3d9527fa40c43bc6b4689228ddfe4fa4c",
+          "size_bytes": 2254976
+        },
+        "AUDUSD/tick/2010/DAT_ASCII_AUDUSD_T_201007.zip": {
+          "rows": 313149,
+          "sha256": "f223b0815e90cbf95bf9f37c3b7e21f427cca6b4504c22e99335147c5472dac6",
+          "size_bytes": 1203663
+        },
+        "AUDUSD/tick/2010/DAT_ASCII_AUDUSD_T_201008.zip": {
+          "rows": 266028,
+          "sha256": "beee636ad36afccfb9357fb04099e08d9d4a816b4be785fbe456cf44e3bb09e2",
+          "size_bytes": 1026958
+        },
+        "AUDUSD/tick/2010/DAT_ASCII_AUDUSD_T_201009.zip": {
+          "rows": 234321,
+          "sha256": "f817958a2e54fb60ba2c5ec4cb8c25c3fde236175adac3b82a9cc93389f1be44",
+          "size_bytes": 910095
+        },
+        "AUDUSD/tick/2010/DAT_ASCII_AUDUSD_T_201010.zip": {
+          "rows": 294300,
+          "sha256": "b584a17ea9cdfa73d072631eca556fc207589806abf10a2985cbff59a2dd38aa",
+          "size_bytes": 1111742
+        },
+        "AUDUSD/tick/2010/DAT_ASCII_AUDUSD_T_201011.zip": {
+          "rows": 339713,
+          "sha256": "89bd821bf5896b432e64cc6ce8e25ad54642573a5540bf82e3e0ea4ae872beb8",
+          "size_bytes": 1267356
+        },
+        "AUDUSD/tick/2010/DAT_ASCII_AUDUSD_T_201012.zip": {
+          "rows": 252373,
+          "sha256": "d6a78583ef838b0bbe87c768c8b63b605a4d44085caf31b18fe9f0effde337b8",
+          "size_bytes": 967962
+        },
+        "AUDUSD/tick/2011/DAT_ASCII_AUDUSD_T_201101.zip": {
+          "rows": 266003,
+          "sha256": "7c3ea21ea04baf948acb33b70f03c28026cc559ec3372f172c08c8796e0e78a6",
+          "size_bytes": 999721
+        },
+        "AUDUSD/tick/2011/DAT_ASCII_AUDUSD_T_201102.zip": {
+          "rows": 228037,
+          "sha256": "622036ecc1f1289818e6b5627acfcf9c50f46cedd3f88a12cfc4b673578b78e0",
+          "size_bytes": 853440
+        },
+        "AUDUSD/tick/2011/DAT_ASCII_AUDUSD_T_201103.zip": {
+          "rows": 264854,
+          "sha256": "d3ba214d03cfd0b4b231f28a56d9dd32191357f210def691e0ff70e09f573271",
+          "size_bytes": 1013627
+        },
+        "AUDUSD/tick/2011/DAT_ASCII_AUDUSD_T_201104.zip": {
+          "rows": 210896,
+          "sha256": "1d219545f932496d0f49456804bdbf0da33ac0f3722b5586b325fbd770840de8",
+          "size_bytes": 898632
+        },
+        "AUDUSD/tick/2011/DAT_ASCII_AUDUSD_T_201105.zip": {
+          "rows": 325303,
+          "sha256": "edf2635fd0594d46a28845be0d2a0a85100a3f72612773e30fee7f44ccddb116",
+          "size_bytes": 1709667
+        },
+        "AUDUSD/tick/2011/DAT_ASCII_AUDUSD_T_201106.zip": {
+          "rows": 329394,
+          "sha256": "185d73b66156925f774eb481348fa24e17fc97466b92634e5737df58def3948c",
+          "size_bytes": 1698432
+        },
+        "AUDUSD/tick/2011/DAT_ASCII_AUDUSD_T_201107.zip": {
+          "rows": 284826,
+          "sha256": "af7e6109187a7158d39680fe1134a13c1fae2c3a2193e7b0f0e2f5419343443e",
+          "size_bytes": 1491156
+        },
+        "AUDUSD/tick/2011/DAT_ASCII_AUDUSD_T_201108.zip": {
+          "rows": 436641,
+          "sha256": "fcebd26a1137e8728c3fb86e383219ca5189bd0971b7c508db2d0d4d64f9ab43",
+          "size_bytes": 2261812
+        },
+        "AUDUSD/tick/2011/DAT_ASCII_AUDUSD_T_201109.zip": {
+          "rows": 413176,
+          "sha256": "05c1374bb95710e510af6224893760ce6f75b57f1c10acba1efd8d08dea87055",
+          "size_bytes": 2150139
+        },
+        "AUDUSD/tick/2011/DAT_ASCII_AUDUSD_T_201110.zip": {
+          "rows": 479963,
+          "sha256": "3c22301e7e04b711b004c4bcae3e61806a134bf89cdb1f05d9008d66b02feef7",
+          "size_bytes": 2464256
+        },
+        "AUDUSD/tick/2011/DAT_ASCII_AUDUSD_T_201111.zip": {
+          "rows": 500808,
+          "sha256": "8b7ab94245f3d320fd6ed2a74e5c71ceaaaf1d4f196e80f17aa67f26759b6705",
+          "size_bytes": 2545032
+        },
+        "AUDUSD/tick/2011/DAT_ASCII_AUDUSD_T_201112.zip": {
+          "rows": 1276437,
+          "sha256": "0f9c1771419351b1d849e91cc663850ca0f49b58be723698b6bd0ab7ebacc553",
+          "size_bytes": 7285427
+        },
+        "AUDUSD/tick/2012/DAT_ASCII_AUDUSD_T_201201.zip": {
+          "rows": 1327518,
+          "sha256": "58eab2560ec3f17c5d192e3464a8e74bedb396c6ba68d97c0ad7645e5cb7ae29",
+          "size_bytes": 7549953
+        },
+        "AUDUSD/tick/2012/DAT_ASCII_AUDUSD_T_201202.zip": {
+          "rows": 1352978,
+          "sha256": "74a2ed5a974422a869b75b8804af416538dab7359149357641c76723555566bf",
+          "size_bytes": 7650031
+        },
+        "AUDUSD/tick/2012/DAT_ASCII_AUDUSD_T_201203.zip": {
+          "rows": 1258466,
+          "sha256": "d85b417fe75850f1140ffb53178d2477e651e0824568a63e78eb0c53b321f355",
+          "size_bytes": 7139982
+        },
+        "AUDUSD/tick/2012/DAT_ASCII_AUDUSD_T_201204.zip": {
+          "rows": 1059374,
+          "sha256": "1617c76c9a8d7a6550f0e99cd82203ec9be86267d2009d3c196358f06fd60879",
+          "size_bytes": 5970501
+        },
+        "AUDUSD/tick/2012/DAT_ASCII_AUDUSD_T_201205.zip": {
+          "rows": 1420630,
+          "sha256": "b6a6c4fa2d54d4d2a329b2f6475d214d8d7d70a1e053be29b2b3d58343f8fdcd",
+          "size_bytes": 7962440
+        },
+        "AUDUSD/tick/2012/DAT_ASCII_AUDUSD_T_201206.zip": {
+          "rows": 1478026,
+          "sha256": "e9be0f88a7cf85b406b26c4baa16627cb2a392176bc50828b17657adbb10ed6a",
+          "size_bytes": 8211446
+        },
+        "AUDUSD/tick/2012/DAT_ASCII_AUDUSD_T_201207.zip": {
+          "rows": 1307917,
+          "sha256": "1d07d3184acc16e5545422365334a32638382cf349eec1abba26abf303596887",
+          "size_bytes": 7238740
+        },
+        "AUDUSD/tick/2012/DAT_ASCII_AUDUSD_T_201208.zip": {
+          "rows": 1142001,
+          "sha256": "6bc126106a47308aab38b6def75a0ca3b18b718ab1b370c3b775bec13b49be52",
+          "size_bytes": 6258273
+        },
+        "AUDUSD/tick/2012/DAT_ASCII_AUDUSD_T_201209.zip": {
+          "rows": 1077850,
+          "sha256": "31c551098ede4acf44804074bb9fd7162d93559c6d7abc432e51e87ce2c910a8",
+          "size_bytes": 5998235
+        },
+        "AUDUSD/tick/2012/DAT_ASCII_AUDUSD_T_201210.zip": {
+          "rows": 1058429,
+          "sha256": "a6b49d9b647b710f9630e50c8cec0c36d370bda9caee00a66a6eb104ecff9fb2",
+          "size_bytes": 5865911
+        },
+        "AUDUSD/tick/2012/DAT_ASCII_AUDUSD_T_201211.zip": {
+          "rows": 798097,
+          "sha256": "eb61bd934268a9144fc6159336fd843f34fca11ac2e918dfd4338287ec71f4d4",
+          "size_bytes": 4452647
+        },
+        "AUDUSD/tick/2012/DAT_ASCII_AUDUSD_T_201212.zip": {
+          "rows": 586075,
+          "sha256": "71d2627fe135dd50bab8295f17720fe483306201a402d886a66b890a3a828b99",
+          "size_bytes": 3252781
+        },
+        "AUDUSD/tick/2013/DAT_ASCII_AUDUSD_T_201301.zip": {
+          "rows": 781225,
+          "sha256": "36d2308e24ea03f0566184c2f61393ccd4b1d11e82b3dee4c9434f3abf8625cb",
+          "size_bytes": 4341202
+        },
+        "AUDUSD/tick/2013/DAT_ASCII_AUDUSD_T_201302.zip": {
+          "rows": 724586,
+          "sha256": "da41b3cf6ccd6d44b85b277c1feb5cf7e81c46de0d12ebd5775efdb8eee4963c",
+          "size_bytes": 4085192
+        },
+        "AUDUSD/tick/2013/DAT_ASCII_AUDUSD_T_201303.zip": {
+          "rows": 793506,
+          "sha256": "3a6cd681e56577938dba7b6a2766144c5ed633732950f0cde2bbca290f8930e2",
+          "size_bytes": 4379125
+        },
+        "AUDUSD/tick/2013/DAT_ASCII_AUDUSD_T_201304.zip": {
+          "rows": 913371,
+          "sha256": "6c015fdcab21c2ceb77e5c631d51d948719b1e92d25be72421b3a6763267db68",
+          "size_bytes": 5092216
+        },
+        "AUDUSD/tick/2013/DAT_ASCII_AUDUSD_T_201305.zip": {
+          "rows": 1092530,
+          "sha256": "4214a22ee81f50d64be23bf934ff73c01a8d67b2dfa2415ea8b6241ff6e8c500",
+          "size_bytes": 6239780
+        },
+        "AUDUSD/tick/2013/DAT_ASCII_AUDUSD_T_201306.zip": {
+          "rows": 1420282,
+          "sha256": "16ad010ce3f1b8cf4158f6b6c6d70786b3d7a2101bb1db323f8c4decc48a104b",
+          "size_bytes": 8119840
+        },
+        "AUDUSD/tick/2013/DAT_ASCII_AUDUSD_T_201307.zip": {
+          "rows": 1571282,
+          "sha256": "d98313e190b6e515d4317f519240adbc2476470e18654b5fea69faa9430a95ec",
+          "size_bytes": 8800096
+        },
+        "AUDUSD/tick/2013/DAT_ASCII_AUDUSD_T_201308.zip": {
+          "rows": 1284129,
+          "sha256": "8cf82f56af9133e0cfce19537f49de0382caa92360c1632c48c37f989e1fc1b1",
+          "size_bytes": 7140010
+        },
+        "AUDUSD/tick/2013/DAT_ASCII_AUDUSD_T_201309.zip": {
+          "rows": 1100844,
+          "sha256": "8152127074169f6524ea8f5c29cfae44a01aeec8acc08003065ca9df49263d93",
+          "size_bytes": 6024449
+        },
+        "AUDUSD/tick/2013/DAT_ASCII_AUDUSD_T_201310.zip": {
+          "rows": 1131520,
+          "sha256": "a9d87b5cf2f416e39943d443528e626ed85efb8625ea6c2c20b065dba1363516",
+          "size_bytes": 6155251
+        },
+        "AUDUSD/tick/2013/DAT_ASCII_AUDUSD_T_201311.zip": {
+          "rows": 1067978,
+          "sha256": "988ba2490c471b818c529de66d840d8bcea7c3b64ceead5fee74ae931c27c683",
+          "size_bytes": 5825645
+        },
+        "AUDUSD/tick/2013/DAT_ASCII_AUDUSD_T_201312.zip": {
+          "rows": 1049955,
+          "sha256": "2058303df1581f0e4b3c574c5581a6bfa4d78d523a2e1577f86c826a3cc8b31d",
+          "size_bytes": 5687817
+        },
+        "AUDUSD/tick/2014/DAT_ASCII_AUDUSD_T_201401.zip": {
+          "rows": 1151618,
+          "sha256": "3277a5b6f1f0bcd1038c3d8f3112f96ad082539853514cdecd8b77910a79b3ca",
+          "size_bytes": 6325124
+        },
+        "AUDUSD/tick/2014/DAT_ASCII_AUDUSD_T_201402.zip": {
+          "rows": 925059,
+          "sha256": "239cb64b48db2b96a9d764803372f359ef096337086f45d1c4a64a5588272885",
+          "size_bytes": 5104717
+        },
+        "AUDUSD/tick/2014/DAT_ASCII_AUDUSD_T_201403.zip": {
+          "rows": 595829,
+          "sha256": "f89e21e94e91ef0cb09d545a11fc7887743fe5cee1879521db7d9902ff37e971",
+          "size_bytes": 3475502
+        },
+        "AUDUSD/tick/2014/DAT_ASCII_AUDUSD_T_201404.zip": {
+          "rows": 493801,
+          "sha256": "7a02e59e0844dd31919adf45a99a90944521e8c89a4b27b86d233d380b32318c",
+          "size_bytes": 2866040
+        },
+        "AUDUSD/tick/2014/DAT_ASCII_AUDUSD_T_201405.zip": {
+          "rows": 473484,
+          "sha256": "07945dc9f947d3325233aa60c467cd189ccacb67cb33e2fea6fbe07864f74293",
+          "size_bytes": 2736409
+        },
+        "AUDUSD/tick/2014/DAT_ASCII_AUDUSD_T_201406.zip": {
+          "rows": 451559,
+          "sha256": "d701e24eb366cda968474374e77e8227024ab83f22183c0d27f35ee582a1900a",
+          "size_bytes": 2585574
+        },
+        "AUDUSD/tick/2014/DAT_ASCII_AUDUSD_T_201407.zip": {
+          "rows": 531327,
+          "sha256": "42b4af59fccc65fdb289bd853da8ba56b5f78b8f466785df5a723f31857b92f7",
+          "size_bytes": 2931470
+        },
+        "AUDUSD/tick/2014/DAT_ASCII_AUDUSD_T_201408.zip": {
+          "rows": 571529,
+          "sha256": "028fcd18e56a3234dab0f85220c2762da2319117850d45052c6eec9694e34dee",
+          "size_bytes": 2764199
+        },
+        "AUDUSD/tick/2014/DAT_ASCII_AUDUSD_T_201409.zip": {
+          "rows": 913176,
+          "sha256": "a34a1d3cdd29397c283e3270a83c62f93496f88a0db53a0d7a690f4e9953eeb7",
+          "size_bytes": 4492156
+        },
+        "AUDUSD/tick/2014/DAT_ASCII_AUDUSD_T_201410.zip": {
+          "rows": 1195993,
+          "sha256": "31e14cd906b014c27ef11eab1a8663dfee6741f0995245741bd0c47852f9c299",
+          "size_bytes": 6842020
+        },
+        "AUDUSD/tick/2014/DAT_ASCII_AUDUSD_T_201411.zip": {
+          "rows": 1459404,
+          "sha256": "20f6f47112ff5656ecd89ae4e524c52d811e55454ffecc3e82b3ba084711d6c0",
+          "size_bytes": 7789212
+        },
+        "AUDUSD/tick/2014/DAT_ASCII_AUDUSD_T_201412.zip": {
+          "rows": 1165513,
+          "sha256": "e65261246989b463083c85e831eb874f9c986c85b3b928f08a8daa18b2bc89ff",
+          "size_bytes": 6290775
+        },
+        "AUDUSD/tick/2015/DAT_ASCII_AUDUSD_T_201501.zip": {
+          "rows": 1422013,
+          "sha256": "1adceb22e99d8e0b4f996397d77cf98e0a9a260a72458c774b5f64e834ebeae6",
+          "size_bytes": 7707167
+        },
+        "AUDUSD/tick/2015/DAT_ASCII_AUDUSD_T_201502.zip": {
+          "rows": 1106177,
+          "sha256": "4d49ed304e6cc7bca9936a8d953fc7bbb15a97e9b11f120bc3bc174e432196e5",
+          "size_bytes": 6111225
+        },
+        "AUDUSD/tick/2015/DAT_ASCII_AUDUSD_T_201503.zip": {
+          "rows": 1520478,
+          "sha256": "c40eeb9e8d2948a3272b35c02bfa45708e64c158356529f6bfaee90e469fd417",
+          "size_bytes": 8328561
+        },
+        "AUDUSD/tick/2015/DAT_ASCII_AUDUSD_T_201504.zip": {
+          "rows": 1641687,
+          "sha256": "13bf4f37ea11eb05f39c58ac8f3dd22564f92560a6b5044e8bde13df6cc01af4",
+          "size_bytes": 8784296
+        },
+        "AUDUSD/tick/2015/DAT_ASCII_AUDUSD_T_201505.zip": {
+          "rows": 1588003,
+          "sha256": "42a5c0681b5d271fa884f1b4bced5f0b5ecce4f8214a22a7281e65f9f9f6a1ba",
+          "size_bytes": 8264991
+        },
+        "AUDUSD/tick/2015/DAT_ASCII_AUDUSD_T_201506.zip": {
+          "rows": 1535224,
+          "sha256": "9f1f09efed29e8aa90b772abb2af1cc1b2d8eacad70b7431df2ad7d230c90e1a",
+          "size_bytes": 7971492
+        },
+        "AUDUSD/tick/2015/DAT_ASCII_AUDUSD_T_201507.zip": {
+          "rows": 1532527,
+          "sha256": "6c0ebdf92d23fe67bd0df6b5bbcab7f15899b76c9857e9c66bd55aecb0651356",
+          "size_bytes": 7840104
+        },
+        "AUDUSD/tick/2015/DAT_ASCII_AUDUSD_T_201508.zip": {
+          "rows": 1367781,
+          "sha256": "a9a2eea75ea71961ec3c3851a938f0536895c329a24a3c4d9cfff8a82a3f4916",
+          "size_bytes": 7174185
+        },
+        "AUDUSD/tick/2015/DAT_ASCII_AUDUSD_T_201509.zip": {
+          "rows": 1069238,
+          "sha256": "408750734d08695a8499c32101dbe031b3b7835d870742c354357082d038b17c",
+          "size_bytes": 5776209
+        },
+        "AUDUSD/tick/2015/DAT_ASCII_AUDUSD_T_201510.zip": {
+          "rows": 976707,
+          "sha256": "b4a56da372eaeede79e0aed8a06447748c0b10d9be39ce1d04391e8138d94e98",
+          "size_bytes": 5283420
+        },
+        "AUDUSD/tick/2015/DAT_ASCII_AUDUSD_T_201511.zip": {
+          "rows": 1067817,
+          "sha256": "7355402234dd6a5819c97a2d75572752c6a2b94a2feccb5829c1cc7da0062291",
+          "size_bytes": 5536650
+        },
+        "AUDUSD/tick/2015/DAT_ASCII_AUDUSD_T_201512.zip": {
+          "rows": 1090877,
+          "sha256": "7fb678c57835a879f8b0d5ef612c002064ea24a4397a251cf645b4665bf7d75e",
+          "size_bytes": 5687613
+        },
+        "AUDUSD/tick/2016/DAT_ASCII_AUDUSD_T_201601.zip": {
+          "rows": 1532596,
+          "sha256": "3abea8da2f0e44bf1832d7e031a8a687f8475438cee014183db324edec56519d",
+          "size_bytes": 8180375
+        },
+        "AUDUSD/tick/2016/DAT_ASCII_AUDUSD_T_201602.zip": {
+          "rows": 1562026,
+          "sha256": "5cabbe53a69f50c4089b05481c292eb7f893bd62f57e79cd4d58bff6e58a2238",
+          "size_bytes": 8107611
+        },
+        "AUDUSD/tick/2016/DAT_ASCII_AUDUSD_T_201603.zip": {
+          "rows": 1610467,
+          "sha256": "acc870c2d028eb59c87979ec28d4f73163030f94385b5ce42cebea058ddb3a1b",
+          "size_bytes": 8333716
+        },
+        "AUDUSD/tick/2016/DAT_ASCII_AUDUSD_T_201604.zip": {
+          "rows": 1539143,
+          "sha256": "ab0204922881507f501d729c4db7830788840256f85d15cfcb260cfdc3bd9d73",
+          "size_bytes": 7966620
+        },
+        "AUDUSD/tick/2016/DAT_ASCII_AUDUSD_T_201605.zip": {
+          "rows": 1685039,
+          "sha256": "b64c3d5c95b0c2e5c2300239355f38e06bcf93e9ba1fcac0a91319e67c5525e4",
+          "size_bytes": 8426177
+        },
+        "AUDUSD/tick/2016/DAT_ASCII_AUDUSD_T_201606.zip": {
+          "rows": 1758346,
+          "sha256": "939aa7bc0ba45e20fbd4a6ae6804e912ccaa73a251f7893df04f08f198970eb1",
+          "size_bytes": 9013503
+        },
+        "AUDUSD/tick/2016/DAT_ASCII_AUDUSD_T_201607.zip": {
+          "rows": 1048572,
+          "sha256": "dc24c09445721cb6c73ae63934e67089649cfb7260944804e5540caddf6f808d",
+          "size_bytes": 5633344
+        },
+        "AUDUSD/tick/2016/DAT_ASCII_AUDUSD_T_201608.zip": {
+          "rows": 912936,
+          "sha256": "7d3b245848cd242d229897cab622db8d7608f02d79298af0cbb13da4edaba276",
+          "size_bytes": 4945515
+        },
+        "AUDUSD/tick/2016/DAT_ASCII_AUDUSD_T_201609.zip": {
+          "rows": 1031590,
+          "sha256": "f1a2edc5442206fb048616956e9e1ff354d0ef6ad8882642ee3570ac587d487f",
+          "size_bytes": 5570423
+        },
+        "AUDUSD/tick/2016/DAT_ASCII_AUDUSD_T_201610.zip": {
+          "rows": 946528,
+          "sha256": "8c20c74516ebddcb08c139f81ec0289fc0a26afe4d26d7c27651936b4a19af93",
+          "size_bytes": 5084481
+        },
+        "AUDUSD/tick/2016/DAT_ASCII_AUDUSD_T_201611.zip": {
+          "rows": 1569210,
+          "sha256": "20416e56a6a50805cbf84829c18ec0c40105aae2e1e4f7b5c66e54146ed22db0",
+          "size_bytes": 8248510
+        },
+        "AUDUSD/tick/2016/DAT_ASCII_AUDUSD_T_201612.zip": {
+          "rows": 1012880,
+          "sha256": "ad41a50b09912ca00043a3e9d7bf9fedcbad2cf0aea800626ca99335051900f2",
+          "size_bytes": 5353586
+        },
+        "AUDUSD/tick/2017/DAT_ASCII_AUDUSD_T_201701.zip": {
+          "rows": 1429217,
+          "sha256": "e0ab106f143c285f88f64f992a62d42169ef28b854005b5ba2262e6aad446a6e",
+          "size_bytes": 7428570
+        },
+        "AUDUSD/tick/2017/DAT_ASCII_AUDUSD_T_201702.zip": {
+          "rows": 1036289,
+          "sha256": "ee167128e9f07f79bfd2dbc5db60a28ff7ec84bbf68f83b472d4be880a2ab9c0",
+          "size_bytes": 5397787
+        },
+        "AUDUSD/tick/2017/DAT_ASCII_AUDUSD_T_201703.zip": {
+          "rows": 946485,
+          "sha256": "a94597e9ed974b65501fb03533b9a577a5ce364c322074408f576f02cf915647",
+          "size_bytes": 5094783
+        },
+        "AUDUSD/tick/2017/DAT_ASCII_AUDUSD_T_201704.zip": {
+          "rows": 729137,
+          "sha256": "af0df115027454ae005e6675c36e15f0bf7d6d3e4bc787ff6d0ccb7d71038a67",
+          "size_bytes": 3871448
+        },
+        "AUDUSD/tick/2017/DAT_ASCII_AUDUSD_T_201705.zip": {
+          "rows": 1008769,
+          "sha256": "cfeebc41db534530b59d5484b2e595702d8405872f4fcd24583da00def7dc06a",
+          "size_bytes": 5153391
+        },
+        "AUDUSD/tick/2017/DAT_ASCII_AUDUSD_T_201706.zip": {
+          "rows": 734589,
+          "sha256": "37783308a4cd84020686861775d433c3c90f425f2469b595c4713185e864eea9",
+          "size_bytes": 3860167
+        },
+        "AUDUSD/tick/2017/DAT_ASCII_AUDUSD_T_201707.zip": {
+          "rows": 808346,
+          "sha256": "0cab920766b96c8f4204d73626c7c2aeafc7ae6cb5d73e0cf15423387e829ebb",
+          "size_bytes": 4321069
+        },
+        "AUDUSD/tick/2017/DAT_ASCII_AUDUSD_T_201708.zip": {
+          "rows": 807367,
+          "sha256": "2591fe902958a4e78ccf2e3c3d21092291674dd17342d569e4376558587585d3",
+          "size_bytes": 4394630
+        },
+        "AUDUSD/tick/2017/DAT_ASCII_AUDUSD_T_201709.zip": {
+          "rows": 853156,
+          "sha256": "8f9d75ee091568f3c7746a22e48fb8f26f86ce29dfeaf3a6d2a61bb330ac3e52",
+          "size_bytes": 4648042
+        },
+        "AUDUSD/tick/2017/DAT_ASCII_AUDUSD_T_201710.zip": {
+          "rows": 824331,
+          "sha256": "44d33f72094b4b06f37dd81601b1b634ddca0c737698ef8dcc762d483ca7ad89",
+          "size_bytes": 4404157
+        },
+        "AUDUSD/tick/2017/DAT_ASCII_AUDUSD_T_201711.zip": {
+          "rows": 751378,
+          "sha256": "90124ad93992c338d5eba070d5612a1af6fa3ea83a5a7b96c5650a7862e68354",
+          "size_bytes": 3952236
+        },
+        "AUDUSD/tick/2017/DAT_ASCII_AUDUSD_T_201712.zip": {
+          "rows": 617799,
+          "sha256": "174bc2e84f0451c1a08e1c58dfa7e2c69cd092afe01ffa5b05bc9518e17e38b3",
+          "size_bytes": 3269817
+        },
+        "AUDUSD/tick/2018/DAT_ASCII_AUDUSD_T_201801.zip": {
+          "rows": 1047385,
+          "sha256": "823f5ef41569c5cb1afa5f1a12abb814e5f6a851ad34b42b287c805b99a5ad9c",
+          "size_bytes": 5577059
+        },
+        "AUDUSD/tick/2018/DAT_ASCII_AUDUSD_T_201802.zip": {
+          "rows": 1148004,
+          "sha256": "b6708ab06bd0486becf6111328fc88cd54b102a663da229ddb691ff4b18e33cd",
+          "size_bytes": 6091960
+        },
+        "AUDUSD/tick/2018/DAT_ASCII_AUDUSD_T_201803.zip": {
+          "rows": 1077791,
+          "sha256": "2605aa08daf15f06082dd816d12cd263533dbdd55115c8d32af5138d50cc6264",
+          "size_bytes": 5657378
+        },
+        "AUDUSD/tick/2018/DAT_ASCII_AUDUSD_T_201804.zip": {
+          "rows": 806291,
+          "sha256": "4ec6698c0be640db30f6276869069f2c4e60b2759442ed606e35d87a2e61b574",
+          "size_bytes": 4268501
+        },
+        "AUDUSD/tick/2018/DAT_ASCII_AUDUSD_T_201805.zip": {
+          "rows": 1234939,
+          "sha256": "cc30319b97326e9e087f5c3319e454b1cb0b26d7c2a14f3f9c5061022bdcde2e",
+          "size_bytes": 6620159
+        },
+        "AUDUSD/tick/2018/DAT_ASCII_AUDUSD_T_201806.zip": {
+          "rows": 884935,
+          "sha256": "2deca85e633c01a240df9f2cc79bc03787d56804e814f2e4343bf4f0ce9c6aec",
+          "size_bytes": 4692181
+        },
+        "AUDUSD/tick/2018/DAT_ASCII_AUDUSD_T_201807.zip": {
+          "rows": 910182,
+          "sha256": "dc05b7902c3b3776f8b5b54d2684d17af3160fe40d46aa3ed921bf06e126598f",
+          "size_bytes": 4841510
+        },
+        "AUDUSD/tick/2018/DAT_ASCII_AUDUSD_T_201808.zip": {
+          "rows": 987856,
+          "sha256": "cef87b3af34383b42fe171dd5119050011912aff450d336d7f56d4f4ff3436a5",
+          "size_bytes": 5205450
+        },
+        "AUDUSD/tick/2018/DAT_ASCII_AUDUSD_T_201809.zip": {
+          "rows": 836780,
+          "sha256": "704a6493398bf0ccaab3ba320522f95acd7fadecaca3f58b949a2adea2c28bfa",
+          "size_bytes": 4417398
+        },
+        "AUDUSD/tick/2018/DAT_ASCII_AUDUSD_T_201810.zip": {
+          "rows": 1143184,
+          "sha256": "4e3509dfa2f83ae245e6e82220b10397b35a2598276b4fc749bc5d02643e0610",
+          "size_bytes": 5821133
+        },
+        "AUDUSD/tick/2018/DAT_ASCII_AUDUSD_T_201811.zip": {
+          "rows": 1042070,
+          "sha256": "ebef830b045a28acff6adb460162ea6918fa8635c5f611b1b07fed821d48bd9f",
+          "size_bytes": 5428223
+        },
+        "AUDUSD/tick/2018/DAT_ASCII_AUDUSD_T_201812.zip": {
+          "rows": 1248883,
+          "sha256": "80bc1e069e6fc1e978429c3af3ec04de5b2c918e17773993113734ca51580fff",
+          "size_bytes": 7061274
+        },
+        "AUDUSD/tick/2019/DAT_ASCII_AUDUSD_T_201901.zip": {
+          "rows": 1634205,
+          "sha256": "5f23a88a8a1d1ea18fcb03ce634619ad4b9557615d80106999112922894ccd5a",
+          "size_bytes": 9737267
+        },
+        "AUDUSD/tick/2019/DAT_ASCII_AUDUSD_T_201902.zip": {
+          "rows": 1405922,
+          "sha256": "9a3d007df31a667c74885e87bae8328a1a5e168c65f1b4a4dead39affa0347e9",
+          "size_bytes": 8321517
+        },
+        "AUDUSD/tick/2019/DAT_ASCII_AUDUSD_T_201903.zip": {
+          "rows": 1364317,
+          "sha256": "c3010d8d701b149aa3c5fd285137d77262e4fc038552042485d07e969707e97d",
+          "size_bytes": 8040071
+        },
+        "AUDUSD/tick/2019/DAT_ASCII_AUDUSD_T_201904.zip": {
+          "rows": 1178426,
+          "sha256": "95a03ce9e9696d1bdb717950fd52b3846a9958844ffcf35b8b0038a837895309",
+          "size_bytes": 7013265
+        },
+        "AUDUSD/tick/2019/DAT_ASCII_AUDUSD_T_201905.zip": {
+          "rows": 1362603,
+          "sha256": "f5ddb52459e9efd9c674527d74b7ac012b24c7d1a8b0d382f7ac07ea9a70db33",
+          "size_bytes": 8086790
+        },
+        "AUDUSD/tick/2019/DAT_ASCII_AUDUSD_T_201906.zip": {
+          "rows": 1400157,
+          "sha256": "6f761ee1f07bf30534a4dbd0ba3231674149e739ba749ecafece7b3bdeee0c64",
+          "size_bytes": 8131854
+        },
+        "AUDUSD/tick/2019/DAT_ASCII_AUDUSD_T_201907.zip": {
+          "rows": 1101103,
+          "sha256": "bd8b0e5868ac88a27783d2d03c0c6c16cc4d52767508a689788e2438f6dc1216",
+          "size_bytes": 6515372
+        },
+        "AUDUSD/tick/2019/DAT_ASCII_AUDUSD_T_201908.zip": {
+          "rows": 1884606,
+          "sha256": "5405d1787df4d2aaa128fc1cce186fb01e59582d0d5fe3a98aee51f21e9c9ff4",
+          "size_bytes": 10748692
+        },
+        "AUDUSD/tick/2019/DAT_ASCII_AUDUSD_T_201909.zip": {
+          "rows": 1256110,
+          "sha256": "720b8f4e4527f6d9d535c2e51edd063df270677974483a83b9169ad8e0fe39dd",
+          "size_bytes": 7203721
+        },
+        "AUDUSD/tick/2019/DAT_ASCII_AUDUSD_T_201910.zip": {
+          "rows": 1376408,
+          "sha256": "1c9553a2853f271422b406e47301510954b48c55aaefeabca4a811783732e5e1",
+          "size_bytes": 8033038
+        },
+        "AUDUSD/tick/2019/DAT_ASCII_AUDUSD_T_201911.zip": {
+          "rows": 954886,
+          "sha256": "9c7c0cb1925ee8f2e3995f181532da88e5f098229cf9445e9ea3171bb5108be5",
+          "size_bytes": 5652652
+        },
+        "AUDUSD/tick/2019/DAT_ASCII_AUDUSD_T_201912.zip": {
+          "rows": 878271,
+          "sha256": "29a65f1ad375dbdfe9cbfcf8da0fc22bcb72b0839d7a0b3caa403e32d7576d73",
+          "size_bytes": 5199796
+        },
+        "AUDUSD/tick/2020/DAT_ASCII_AUDUSD_T_202001.zip": {
+          "rows": 1106896,
+          "sha256": "4aa55b069eacb9a5b411e79dd17d738367890b0c6eb1fd79ff94feae948d5edd",
+          "size_bytes": 6674523
+        },
+        "AUDUSD/tick/2020/DAT_ASCII_AUDUSD_T_202002.zip": {
+          "rows": 1174230,
+          "sha256": "75a6df93b4659fea39c3ce961813be954b80cee79d98d3d73044fa0b2de63929",
+          "size_bytes": 7057937
+        },
+        "AUDUSD/tick/2020/DAT_ASCII_AUDUSD_T_202003.zip": {
+          "rows": 3616650,
+          "sha256": "cf048600f52681218c5ec9a22b46253817e6c634a8dd85b40fbb89d27823620d",
+          "size_bytes": 22662485
+        },
+        "AUDUSD/tick/2020/DAT_ASCII_AUDUSD_T_202004.zip": {
+          "rows": 2206843,
+          "sha256": "daba6b809d5abd70ee63d7599505ad7eb972a7636e57ea549da17db708232e81",
+          "size_bytes": 13510278
+        },
+        "AUDUSD/tick/2020/DAT_ASCII_AUDUSD_T_202005.zip": {
+          "rows": 1636055,
+          "sha256": "d7f192f188cf518c0f97e14a1518f91802aa48e6cb4ab140c04d52017ba1a615",
+          "size_bytes": 10107042
+        },
+        "AUDUSD/tick/2020/DAT_ASCII_AUDUSD_T_202006.zip": {
+          "rows": 2422938,
+          "sha256": "7ca31c89696bafa7c5f81088304f9ebccd467ce0ff315a2a37d13336756403e0",
+          "size_bytes": 15047748
+        },
+        "AUDUSD/tick/2020/DAT_ASCII_AUDUSD_T_202007.zip": {
+          "rows": 1760822,
+          "sha256": "0feaca2b791eb426078ef888f5e7e41641a1983b77a9d71f14a19a331b170b9c",
+          "size_bytes": 10864748
+        },
+        "AUDUSD/tick/2020/DAT_ASCII_AUDUSD_T_202008.zip": {
+          "rows": 1406840,
+          "sha256": "714c46cd4b044012cab75a92b011f07e244d188363b4b485e93ba2a293e72d0e",
+          "size_bytes": 8777133
+        },
+        "AUDUSD/tick/2020/DAT_ASCII_AUDUSD_T_202009.zip": {
+          "rows": 1687938,
+          "sha256": "e9fa889be0e039d7c7477ba5cc34d7b7f4ed759f5a309cf79a93c09155240247",
+          "size_bytes": 10618013
+        },
+        "AUDUSD/tick/2020/DAT_ASCII_AUDUSD_T_202010.zip": {
+          "rows": 1487562,
+          "sha256": "86ca6e6583d0453b5b94196a1c3409a7a6350189b66c74bb29b1c647fb66d371",
+          "size_bytes": 9317146
+        },
+        "AUDUSD/tick/2020/DAT_ASCII_AUDUSD_T_202011.zip": {
+          "rows": 1545358,
+          "sha256": "b481cee0ef2e4faf33607d647d03b4c0838b09c0a97bf20a6f72b106dea01042",
+          "size_bytes": 9876361
+        },
+        "AUDUSD/tick/2020/DAT_ASCII_AUDUSD_T_202012.zip": {
+          "rows": 1246146,
+          "sha256": "9a0dc6f9088016c0ca43d5a2652752910dc2cfca820efa306f18b29b2e44ecb3",
+          "size_bytes": 8005124
+        },
+        "AUDUSD/tick/2021/DAT_ASCII_AUDUSD_T_202101.zip": {
+          "rows": 1831199,
+          "sha256": "ae91c5e77fe42a7b124d13a948bf8e7d33affa27fbe3c7e29b6c8d7b267e3b21",
+          "size_bytes": 11542854
+        },
+        "AUDUSD/tick/2021/DAT_ASCII_AUDUSD_T_202102.zip": {
+          "rows": 1472740,
+          "sha256": "300d9087eff93feb59acde8596cb67c80bc931f467cc5202da703ddcca1042c0",
+          "size_bytes": 9358585
+        },
+        "AUDUSD/tick/2021/DAT_ASCII_AUDUSD_T_202103.zip": {
+          "rows": 1872458,
+          "sha256": "0c72f7e635361e078a9492856f8e0b9f9f78dbb000abb5fd1aa405afea711269",
+          "size_bytes": 11971858
+        },
+        "AUDUSD/tick/2021/DAT_ASCII_AUDUSD_T_202104.zip": {
+          "rows": 1148497,
+          "sha256": "eff0f4fe6424a33f42d388e13869a475122c7d7c970c23faf43ab22f3ec4ddac",
+          "size_bytes": 7403925
+        },
+        "AUDUSD/tick/2021/DAT_ASCII_AUDUSD_T_202105.zip": {
+          "rows": 1227109,
+          "sha256": "cdab0fe364e8f5cffa73fe4db3b16c8b385c6d772a8b3c07d2f36a274bfcf6ac",
+          "size_bytes": 7855340
+        },
+        "AUDUSD/tick/2021/DAT_ASCII_AUDUSD_T_202106.zip": {
+          "rows": 1193326,
+          "sha256": "1e37c9a81c2b2b42b5c636bab511a9a5d5fd0636b5920c5a39b098a7552e5e74",
+          "size_bytes": 7603368
+        },
+        "AUDUSD/tick/2021/DAT_ASCII_AUDUSD_T_202107.zip": {
+          "rows": 1440816,
+          "sha256": "2835a0de7ffc94a4bf9f70f9b751ab4edd9c839e6473a12c4caf2e97a425bf30",
+          "size_bytes": 9089578
+        },
+        "AUDUSD/tick/2021/DAT_ASCII_AUDUSD_T_202108.zip": {
+          "rows": 1020021,
+          "sha256": "377eec925741bbe41118346914b9c9d094f0894f8ddcda40e43ef7b9905cd6e6",
+          "size_bytes": 6551531
+        },
+        "AUDUSD/tick/2021/DAT_ASCII_AUDUSD_T_202109.zip": {
+          "rows": 1414314,
+          "sha256": "9659bb06b7a9431c918624101c1f28ed733ac0d5930d0fbc06625ce48e15cbdf",
+          "size_bytes": 8914856
+        },
+        "AUDUSD/tick/2021/DAT_ASCII_AUDUSD_T_202110.zip": {
+          "rows": 1441071,
+          "sha256": "2efe199938f7fcb398f33d042b7ef59ff806122ab5a7a6473ed296ccaf15ea46",
+          "size_bytes": 9012285
+        },
+        "AUDUSD/tick/2021/DAT_ASCII_AUDUSD_T_202111.zip": {
+          "rows": 1461424,
+          "sha256": "f8af2c2e5c3b7cdf81b8eff83b78868567f4b5660d1af2e6116a7822d1f5bfa6",
+          "size_bytes": 9145177
+        },
+        "AUDUSD/tick/2021/DAT_ASCII_AUDUSD_T_202112.zip": {
+          "rows": 1301973,
+          "sha256": "89b5a94c1c656407647e1f76e0a2c219ddff8c6649fb39c3bc562f1cbae96465",
+          "size_bytes": 8138557
+        },
+        "AUDUSD/tick/2022/DAT_ASCII_AUDUSD_T_202201.zip": {
+          "rows": 1473171,
+          "sha256": "ca40b4230850d2f020b73b0c22cd253c72b9e79bd2290f6487c2f568b936de95",
+          "size_bytes": 9248503
+        },
+        "AUDUSD/tick/2022/DAT_ASCII_AUDUSD_T_202202.zip": {
+          "rows": 1881899,
+          "sha256": "390924d53cfd3673b3193381fd228c302f7c2871cfce04d677b4b8a1eedea744",
+          "size_bytes": 11727956
+        },
+        "AUDUSD/tick/2022/DAT_ASCII_AUDUSD_T_202203.zip": {
+          "rows": 2119829,
+          "sha256": "8dd09294d5549ec43a4c1276236ce3bd849a92709a530a8c59598e488bbee6f6",
+          "size_bytes": 13251954
+        },
+        "AUDUSD/tick/2022/DAT_ASCII_AUDUSD_T_202204.zip": {
+          "rows": 1554334,
+          "sha256": "f3a65828365360c7f933ee6da5bbb4f3531d43cf32e18a5a1893df50830ba918",
+          "size_bytes": 9860027
+        },
+        "AUDUSD/tick/2022/DAT_ASCII_AUDUSD_T_202205.zip": {
+          "rows": 2528457,
+          "sha256": "4e82d60515bbc3e656407fbedeb8e7d8846bbd6f3d7d65bbcedaee23946eab77",
+          "size_bytes": 15881777
+        },
+        "AUDUSD/tick/2022/DAT_ASCII_AUDUSD_T_202206.zip": {
+          "rows": 2493429,
+          "sha256": "8a2286582560b3eb3b9e2f12c3897d394151a1580caf73fbfd68625874343d48",
+          "size_bytes": 15414930
+        },
+        "AUDUSD/tick/2022/DAT_ASCII_AUDUSD_T_202207.zip": {
+          "rows": 2659902,
+          "sha256": "c4bce901b7c22afbc3b2b7fb98e17f86637fb6fe4376494262eaac30d7694172",
+          "size_bytes": 16227626
+        },
+        "AUDUSD/tick/2022/DAT_ASCII_AUDUSD_T_202208.zip": {
+          "rows": 2445725,
+          "sha256": "7d59a424db8860faa2197815869c182b5fd53f1887bdfced39799de86605a09d",
+          "size_bytes": 14851457
+        },
+        "AUDUSD/tick/2022/DAT_ASCII_AUDUSD_T_202209.zip": {
+          "rows": 3305824,
+          "sha256": "0fd89eda5a770cea99fc51a1758d8cd14078bbc4acb70a967fb378085091ab2b",
+          "size_bytes": 19923543
+        },
+        "AUDUSD/tick/2022/DAT_ASCII_AUDUSD_T_202210.zip": {
+          "rows": 3724331,
+          "sha256": "c4d26e0ed8e04b710989999b38ae4f4c00bc3e5f5d0ec97a4e8e4078cf3c7c59",
+          "size_bytes": 22417006
+        },
+        "AUDUSD/tick/2022/DAT_ASCII_AUDUSD_T_202211.zip": {
+          "rows": 3427736,
+          "sha256": "3f10b143f5e38dba92bd3ecdde8886b8c2ce4c56b86718b0b2397a3b3000d6ac",
+          "size_bytes": 20632062
+        },
+        "AUDUSD/tick/2022/DAT_ASCII_AUDUSD_T_202212.zip": {
+          "rows": 2713295,
+          "sha256": "ed0623f7fa8bb2142449e041b8723507fc33e67ddda430c94f9a34cc578d8e20",
+          "size_bytes": 16448636
+        },
+        "AUDUSD/tick/2023/DAT_ASCII_AUDUSD_T_202301.zip": {
+          "rows": 2696862,
+          "sha256": "3d2ee00b9eaa95a7a73333cff0d0d9488b0cd18115baae15a84a9142619e4696",
+          "size_bytes": 16615625
+        },
+        "AUDUSD/tick/2023/DAT_ASCII_AUDUSD_T_202302.zip": {
+          "rows": 2065628,
+          "sha256": "3dd31b88e3fffa691ab5994a636224ad692ea6025bc5fe8e9fdedfe29c63ae5c",
+          "size_bytes": 12830117
+        },
+        "AUDUSD/tick/2023/DAT_ASCII_AUDUSD_T_202303.zip": {
+          "rows": 1772249,
+          "sha256": "3a240ce3c1062ab09afc74c53dc1d123912f83011059d60ba08300e72063c9fb",
+          "size_bytes": 11023270
+        },
+        "AUDUSD/tick/2023/DAT_ASCII_AUDUSD_T_202304.zip": {
+          "rows": 880239,
+          "sha256": "838b93217faa39683df2e0f9872d212686340e1b108982c5e6e6035a89703234",
+          "size_bytes": 5633651
+        },
+        "AUDUSD/tick/2023/DAT_ASCII_AUDUSD_T_202305.zip": {
+          "rows": 894822,
+          "sha256": "83cff00ca2171daad2034e296ff7eed4fa78b2aa231adefab97a65db552bacc0",
+          "size_bytes": 5803174
+        },
+        "AUDUSD/tick/2023/DAT_ASCII_AUDUSD_T_202306.zip": {
+          "rows": 894753,
+          "sha256": "102a2e5ef3048d9b838c21b5b13d5d1bf482f143b874b1e6a83bff2035ddc43f",
+          "size_bytes": 5802339
+        },
+        "AUDUSD/tick/2023/DAT_ASCII_AUDUSD_T_202307.zip": {
+          "rows": 1068544,
+          "sha256": "adbc16f09312973ee2ec96518d53edb8ca8137c7260ca381294e39ff8906a61c",
+          "size_bytes": 6859484
+        },
+        "AUDUSD/tick/2023/DAT_ASCII_AUDUSD_T_202308.zip": {
+          "rows": 1665639,
+          "sha256": "52c58167a8104bf7a64fd364560ab4380b002680ec3449ac0699a7a18ced9cce",
+          "size_bytes": 10626939
+        },
+        "AUDUSD/tick/2023/DAT_ASCII_AUDUSD_T_202309.zip": {
+          "rows": 1326025,
+          "sha256": "9ed56caf5a425ed4bc19099be9956b9ce3fa77e89962210bcc1c7a28330e2261",
+          "size_bytes": 8436159
+        },
+        "AUDUSD/tick/2023/DAT_ASCII_AUDUSD_T_202310.zip": {
+          "rows": 1574846,
+          "sha256": "aa59ea85e934804316be5419ac412e6ec63bd466033c3505eb50a43219b8a981",
+          "size_bytes": 9991189
+        },
+        "AUDUSD/tick/2023/DAT_ASCII_AUDUSD_T_202311.zip": {
+          "rows": 1332213,
+          "sha256": "c7deb05f2ce7e23b023141eea2d21eb40b8d391f77ea08c8e3d3a17da26e8b3e",
+          "size_bytes": 8529668
+        },
+        "AUDUSD/tick/2023/DAT_ASCII_AUDUSD_T_202312.zip": {
+          "rows": 1395460,
+          "sha256": "04b2c52c66e4ef68c58a841ed26fc06383d8c88b56a937e31ac18219f1702ac6",
+          "size_bytes": 8814907
+        },
+        "AUDUSD/tick/2024/DAT_ASCII_AUDUSD_T_202401.zip": {
+          "rows": 1477644,
+          "sha256": "ca6aefdea014475db9407fe88d8421e0c91d5500685d71b96973aef86ccd0812",
+          "size_bytes": 9443873
+        },
+        "AUDUSD/tick/2024/DAT_ASCII_AUDUSD_T_202402.zip": {
+          "rows": 1069845,
+          "sha256": "359b9718fccbeafb884a9d1f472e3e9865937086ac696c15a4d2e3c6819e93f3",
+          "size_bytes": 6789083
+        },
+        "AUDUSD/tick/2024/DAT_ASCII_AUDUSD_T_202403.zip": {
+          "rows": 986375,
+          "sha256": "44998299508a7333fecefc79c1bd7d1ae615a899d940ae4607a84c6cab211651",
+          "size_bytes": 6273440
+        },
+        "AUDUSD/tick/2024/DAT_ASCII_AUDUSD_T_202404.zip": {
+          "rows": 1278486,
+          "sha256": "296e91ea3c476b4306b1471a8a313bc103cac416acc6efe1ba16ec90a261f3b1",
+          "size_bytes": 8110871
+        },
+        "AUDUSD/tick/2024/DAT_ASCII_AUDUSD_T_202405.zip": {
+          "rows": 1061918,
+          "sha256": "dada38b98f998ddf564c54f8588669e3dd9b06977e8c32ce0e942dc4e4e86075",
+          "size_bytes": 6797231
+        },
+        "AUDUSD/tick/2024/DAT_ASCII_AUDUSD_T_202406.zip": {
+          "rows": 1009048,
+          "sha256": "e9e62c5cbe31b648cf2b6be294b5ce584f226bba3fe73c4c202de0b94cde5c47",
+          "size_bytes": 6405503
+        },
+        "AUDUSD/tick/2024/DAT_ASCII_AUDUSD_T_202407.zip": {
+          "rows": 1162723,
+          "sha256": "3edfa435eebba04418e9010577e75864ced28a22622f83211c5368cad868df3f",
+          "size_bytes": 7322123
+        },
+        "AUDUSD/tick/2024/DAT_ASCII_AUDUSD_T_202408.zip": {
+          "rows": 1398292,
+          "sha256": "cd3a63c645c69ed73aaa9d61334aa9a0937c15d7ef2a0add97c55887a8bcc43a",
+          "size_bytes": 8867151
+        },
+        "AUDUSD/tick/2024/DAT_ASCII_AUDUSD_T_202409.zip": {
+          "rows": 1106414,
+          "sha256": "9404c6354ae9864b4040c54f9ef770f73068e374d60f11aab9c8d570b1fbe4d1",
+          "size_bytes": 7109938
+        },
+        "AUDUSD/tick/2024/DAT_ASCII_AUDUSD_T_202410.zip": {
+          "rows": 1194796,
+          "sha256": "717c891b5cbd525bcc484efa160aae28b20f61dcbe85ef943537c0d8a5b0a182",
+          "size_bytes": 7649491
+        },
+        "AUDUSD/tick/2024/DAT_ASCII_AUDUSD_T_202411.zip": {
+          "rows": 1906022,
+          "sha256": "e411dcb2c50877d129c7e248812395a43c09b4c6be9a719cfebba5df8e53072b",
+          "size_bytes": 11770083
+        },
+        "AUDUSD/tick/2024/DAT_ASCII_AUDUSD_T_202412.zip": {
+          "rows": 1495312,
+          "sha256": "a325845b44051702bc49d7cbd724aad77fe1df0f4dfddf4bb9a82885ad7cab68",
+          "size_bytes": 9313843
+        },
+        "AUDUSD/tick/2025/DAT_ASCII_AUDUSD_T_202501.zip": {
+          "rows": 1668426,
+          "sha256": "bcb94bfa9d2da041e2a4ba28f2c18efcf32cfad1e92a37dfe3c3abeac633b8d9",
+          "size_bytes": 10398109
+        },
+        "AUDUSD/tick/2025/DAT_ASCII_AUDUSD_T_202502.zip": {
+          "rows": 1277691,
+          "sha256": "797d08c07a9f3335ae442cc47fd94f8253a8fcbd7a5f7c47701344ea1b46f0ca",
+          "size_bytes": 8016668
+        },
+        "AUDUSD/tick/2025/DAT_ASCII_AUDUSD_T_202503.zip": {
+          "rows": 1450674,
+          "sha256": "9158ab589944b26c1ce361a89227e6315439bc62107b6be3243653b27c2e6d4e",
+          "size_bytes": 9079407
+        },
+        "AUDUSD/tick/2025/DAT_ASCII_AUDUSD_T_202504.zip": {
+          "rows": 3059690,
+          "sha256": "327cc1c601ae15e432b1e575a7b79f870b24952548aa2af366c3d9abfcccd137",
+          "size_bytes": 19033965
+        },
+        "AUDUSD/tick/2025/DAT_ASCII_AUDUSD_T_202505.zip": {
+          "rows": 1322803,
+          "sha256": "e8df16a7b09b34fddde59a31c5ccb3228048145fc2e37ebdef7a1c8ef95ea314",
+          "size_bytes": 8511561
+        },
+        "AUDUSD/tick/2025/DAT_ASCII_AUDUSD_T_202506.zip": {
+          "rows": 1248131,
+          "sha256": "7ba4c813967c9ef937af93a7569e4f8514aa32497f52e0411a904fad879da5f3",
+          "size_bytes": 8016783
+        },
+        "AUDUSD/tick/2025/DAT_ASCII_AUDUSD_T_202507.zip": {
+          "rows": 1253279,
+          "sha256": "50b9534e72c6e04da5cf73882d6b1e405788de46b42f38089e6fdc81da2552a1",
+          "size_bytes": 8005495
+        },
+        "AUDUSD/tick/2025/DAT_ASCII_AUDUSD_T_202508.zip": {
+          "rows": 986439,
+          "sha256": "786b5353233292a1325e23db1551d1a1798111952c035b38f286dd7fd2465e0a",
+          "size_bytes": 6288741
+        },
+        "AUDUSD/tick/2025/DAT_ASCII_AUDUSD_T_202509.zip": {
+          "rows": 1072396,
+          "sha256": "cebafd7040178986ef98fc9c1d2d9af1fd057a4646687a545253f26a3e40b412",
+          "size_bytes": 6803117
+        },
+        "AUDUSD/tick/2025/DAT_ASCII_AUDUSD_T_202510.zip": {
+          "rows": 1266736,
+          "sha256": "170de86ab1b461fb16e3bf9b8dcdbc8939b8a942ad60c987d39dc0c465d93ee8",
+          "size_bytes": 7996168
+        },
+        "AUDUSD/tick/2025/DAT_ASCII_AUDUSD_T_202511.zip": {
+          "rows": 1156395,
+          "sha256": "9606f0d92433680b93ed71e41359c42a04d7eea5f5669babfd92b85255f46fa4",
+          "size_bytes": 7276316
+        },
+        "AUDUSD/tick/2025/DAT_ASCII_AUDUSD_T_202512.zip": {
+          "rows": 1085337,
+          "sha256": "a7e4564a99e2c45effda0c0536831b1aed4cc5eedbf0b45b87c29f4c6ef1f531",
+          "size_bytes": 6851649
+        },
+        "AUDUSD/tick/2026/DAT_ASCII_AUDUSD_T_202601.zip": {
+          "rows": 1343132,
+          "sha256": "817b1441ef5a34394ee5be60a535b48a43662705f3a5eec77886ee890d7f2935",
+          "size_bytes": 8501371
+        },
+        "AUDUSD/tick/2026/DAT_ASCII_AUDUSD_T_202602.zip": {
+          "rows": 1647663,
+          "sha256": "8eafed1d899fb7df2d692f6bf60bb0f991aac4ca7c5e1069f8229c8746675312",
+          "size_bytes": 10509032
+        },
+        "AUDUSD/tick/2026/DAT_ASCII_AUDUSD_T_202603.zip": {
+          "rows": 3308308,
+          "sha256": "3e00ecef7739818537405c9640237caf043e102f0cb624f1525b94af319dbab9",
+          "size_bytes": 20630604
+        },
+        "AUDUSD/tick/2026/DAT_ASCII_AUDUSD_T_202604.zip": {
+          "rows": 746594,
+          "sha256": "d3ebe17b1f2d1e088c010e81b1c929b0621481c17061b78bce400be2647c2bbf",
+          "size_bytes": 4648192
+        }
+      },
+      "latest_month": "202604",
+      "total_files": 196,
+      "total_size_bytes": 1412108713
+    },
+    "CADCHF": {
+      "earliest_month": "201001",
+      "files": {
+        "CADCHF/tick/2010/DAT_ASCII_CADCHF_T_201001.zip": {
+          "rows": 521513,
+          "sha256": "31b2fc01cd046b38097f7d30b0a21d80c80db3d0f80afa3901ecb6a31fe14380",
+          "size_bytes": 1961597
+        },
+        "CADCHF/tick/2010/DAT_ASCII_CADCHF_T_201002.zip": {
+          "rows": 529446,
+          "sha256": "f25aade174ff9cc9b1caa330f5cf110043a79a78e8d3a3d35c14fd67bca34570",
+          "size_bytes": 1979509
+        },
+        "CADCHF/tick/2010/DAT_ASCII_CADCHF_T_201003.zip": {
+          "rows": 655019,
+          "sha256": "91b7114cd1fd8a9ad0517b5c935815e035882b613aed8db9427a03adcd2c76d2",
+          "size_bytes": 2345383
+        },
+        "CADCHF/tick/2010/DAT_ASCII_CADCHF_T_201004.zip": {
+          "rows": 734597,
+          "sha256": "ab633e2cb53e64d435e44942b865eab9beeb945a38825638a377ff8f5a4bc7b8",
+          "size_bytes": 2495116
+        },
+        "CADCHF/tick/2010/DAT_ASCII_CADCHF_T_201005.zip": {
+          "rows": 1013340,
+          "sha256": "25360fa0d1154086068807404870e76bf8a364100aadbc35a7efb8ed8b159eaf",
+          "size_bytes": 3723755
+        },
+        "CADCHF/tick/2010/DAT_ASCII_CADCHF_T_201006.zip": {
+          "rows": 806342,
+          "sha256": "12cfc99cedfc510f6ee6183796166d009bfb44b28a2618c2164bee0f02584198",
+          "size_bytes": 2987560
+        },
+        "CADCHF/tick/2010/DAT_ASCII_CADCHF_T_201007.zip": {
+          "rows": 623828,
+          "sha256": "423e170b3011a499c2638c12679b0e5f51a01386c71707fbb34321ea7d2a3663",
+          "size_bytes": 2356739
+        },
+        "CADCHF/tick/2010/DAT_ASCII_CADCHF_T_201008.zip": {
+          "rows": 584139,
+          "sha256": "ab5c1d402143418d834eb9114cfc879ca944211cf119b41eff9af993b9184eb6",
+          "size_bytes": 2220033
+        },
+        "CADCHF/tick/2010/DAT_ASCII_CADCHF_T_201009.zip": {
+          "rows": 584966,
+          "sha256": "bf7326bd925ab78b510e6ce4ec82c3f65963fe7da95d56d5ef13be26eab740ad",
+          "size_bytes": 2221176
+        },
+        "CADCHF/tick/2010/DAT_ASCII_CADCHF_T_201010.zip": {
+          "rows": 401459,
+          "sha256": "7af74e8af44231e59d7a301c27b589347dcaf7e4f3b6f0b96be53761d1c73d84",
+          "size_bytes": 1461800
+        },
+        "CADCHF/tick/2010/DAT_ASCII_CADCHF_T_201011.zip": {
+          "rows": 434195,
+          "sha256": "752d8ddb5700a42a271deefc43303d6c16c7c2947e541cc442b59e16fe300628",
+          "size_bytes": 1559998
+        },
+        "CADCHF/tick/2010/DAT_ASCII_CADCHF_T_201012.zip": {
+          "rows": 364623,
+          "sha256": "3fc7ef26f33b3da9f6bff6c9f8389775f5f1a7ec6221eb29f6f0efa7f2acc1cf",
+          "size_bytes": 1342351
+        },
+        "CADCHF/tick/2011/DAT_ASCII_CADCHF_T_201101.zip": {
+          "rows": 367843,
+          "sha256": "4179c9b42c85191d69968ebdb5264ec8b0a49c6bb411a28b784116e3ffd44324",
+          "size_bytes": 1343412
+        },
+        "CADCHF/tick/2011/DAT_ASCII_CADCHF_T_201102.zip": {
+          "rows": 315982,
+          "sha256": "1c4c9419a43fff8186de815bcb862fa70836c0704a4426b4058b65b1fb3a6372",
+          "size_bytes": 1148734
+        },
+        "CADCHF/tick/2011/DAT_ASCII_CADCHF_T_201103.zip": {
+          "rows": 328372,
+          "sha256": "1538a64adbbbc1f508c9eb3802369655623cf47b0a8058db3140b76846f32698",
+          "size_bytes": 1228292
+        },
+        "CADCHF/tick/2011/DAT_ASCII_CADCHF_T_201104.zip": {
+          "rows": 280171,
+          "sha256": "bd82f9d802f07271c67ab930b8bed9efd1704d9b7e6c8124b9a308e71fd791e7",
+          "size_bytes": 1153121
+        },
+        "CADCHF/tick/2011/DAT_ASCII_CADCHF_T_201105.zip": {
+          "rows": 333195,
+          "sha256": "ac280ceb32e2f12c9e6347dcea703a4607ed7a41e71089ab7a591ee82d23285a",
+          "size_bytes": 1730263
+        },
+        "CADCHF/tick/2011/DAT_ASCII_CADCHF_T_201106.zip": {
+          "rows": 316726,
+          "sha256": "222be81fae1f753dd578946a3d6d86d564e61254bdb10fbb49a5e2345f9f1a83",
+          "size_bytes": 1629271
+        },
+        "CADCHF/tick/2011/DAT_ASCII_CADCHF_T_201107.zip": {
+          "rows": 308081,
+          "sha256": "3618a65730323b77a94acd659b99dbf79e55a9f94b324ebd7ba6cc3b3ef0bac7",
+          "size_bytes": 1610047
+        },
+        "CADCHF/tick/2011/DAT_ASCII_CADCHF_T_201108.zip": {
+          "rows": 546742,
+          "sha256": "6d5766946975e79dd77e10b3ce77f9b52fdb3c29b7d5a2adfa7b966a8189878f",
+          "size_bytes": 2798713
+        },
+        "CADCHF/tick/2011/DAT_ASCII_CADCHF_T_201109.zip": {
+          "rows": 391231,
+          "sha256": "ee916e6cea1e5c2e848aa1fcc0241f3fd0d46834936eeb8ea89f368df823658a",
+          "size_bytes": 2022251
+        },
+        "CADCHF/tick/2011/DAT_ASCII_CADCHF_T_201110.zip": {
+          "rows": 344843,
+          "sha256": "fd3e5e756dbf87a70961985c9356edbc34e72b0777559e20d70117cf40f5915f",
+          "size_bytes": 1791211
+        },
+        "CADCHF/tick/2011/DAT_ASCII_CADCHF_T_201111.zip": {
+          "rows": 331545,
+          "sha256": "1379ef19e35c47c7cacab578220a3efdd78485ae254b677024f7095caa526d33",
+          "size_bytes": 1718873
+        },
+        "CADCHF/tick/2011/DAT_ASCII_CADCHF_T_201112.zip": {
+          "rows": 722006,
+          "sha256": "86988e471c00b840cc0147cc2dd47e6b852702e4e513bddc7fa972ac0ba5c268",
+          "size_bytes": 4196546
+        },
+        "CADCHF/tick/2012/DAT_ASCII_CADCHF_T_201201.zip": {
+          "rows": 863242,
+          "sha256": "7b102e6588c1a4bb77e2e529fbff3622de0c0477849c18d205b0d2a5d0897634",
+          "size_bytes": 4953678
+        },
+        "CADCHF/tick/2012/DAT_ASCII_CADCHF_T_201202.zip": {
+          "rows": 1234917,
+          "sha256": "4e3ce4d4525738fe4551697dbb17f304fd8663f86e25d6293998bccd1c068aab",
+          "size_bytes": 6668014
+        },
+        "CADCHF/tick/2012/DAT_ASCII_CADCHF_T_201203.zip": {
+          "rows": 1159163,
+          "sha256": "108e6d1d291ad55496f5f6b22bc8c9758e9fe425d008aef5b99c61528b121c45",
+          "size_bytes": 6268525
+        },
+        "CADCHF/tick/2012/DAT_ASCII_CADCHF_T_201204.zip": {
+          "rows": 1115455,
+          "sha256": "11ba4be24628736e0d37b5301b9a4fb05f83954f73eac50d8c26a426639e8d3b",
+          "size_bytes": 5984274
+        },
+        "CADCHF/tick/2012/DAT_ASCII_CADCHF_T_201205.zip": {
+          "rows": 1357973,
+          "sha256": "8bd3ea9cd46ddb445f3381abde941366da8aef41b90b5693fe63eec853550eaa",
+          "size_bytes": 7302674
+        },
+        "CADCHF/tick/2012/DAT_ASCII_CADCHF_T_201206.zip": {
+          "rows": 1324129,
+          "sha256": "f51113348e8bbd7ac8292a53b6c8f96b9206497082cfbe285a0326c9f987bc0d",
+          "size_bytes": 7078574
+        },
+        "CADCHF/tick/2012/DAT_ASCII_CADCHF_T_201207.zip": {
+          "rows": 1135082,
+          "sha256": "67257259868b08f70c89790266cad00cf6f7a4acacdf2e8cd386f451ad32d402",
+          "size_bytes": 6173689
+        },
+        "CADCHF/tick/2012/DAT_ASCII_CADCHF_T_201208.zip": {
+          "rows": 744493,
+          "sha256": "7d760892892374cdeebce0e06696b11edb21857920d2f4731f7229d40a115ad1",
+          "size_bytes": 4220268
+        },
+        "CADCHF/tick/2012/DAT_ASCII_CADCHF_T_201209.zip": {
+          "rows": 758877,
+          "sha256": "78985f9e1d3dbeaf0617b65c02dc1ba0bd913c80375fe982697e5b8a29df70f7",
+          "size_bytes": 4362521
+        },
+        "CADCHF/tick/2012/DAT_ASCII_CADCHF_T_201210.zip": {
+          "rows": 711913,
+          "sha256": "65c2a1252d1446a84b2f241237ac3b9ab2d2c9c6a3e13bc62413a357fbf12f99",
+          "size_bytes": 4028879
+        },
+        "CADCHF/tick/2012/DAT_ASCII_CADCHF_T_201211.zip": {
+          "rows": 624598,
+          "sha256": "2c6e6b29644db499d113f387b7a9098889acb63d4081a843556457dcbb4c10aa",
+          "size_bytes": 3539748
+        },
+        "CADCHF/tick/2012/DAT_ASCII_CADCHF_T_201212.zip": {
+          "rows": 488552,
+          "sha256": "5f94b96c566fa0ed469073336b18be0e815ecce2086d7d6558c927538fed3b4e",
+          "size_bytes": 2834329
+        },
+        "CADCHF/tick/2013/DAT_ASCII_CADCHF_T_201301.zip": {
+          "rows": 719327,
+          "sha256": "c83763328e307ad196bfdc055d951718f2af72f4967678440896f0d2a09332cc",
+          "size_bytes": 4189061
+        },
+        "CADCHF/tick/2013/DAT_ASCII_CADCHF_T_201302.zip": {
+          "rows": 623506,
+          "sha256": "741030eb2370ec906f3f84c766c5f2fdc36a4de0f1e4d9e51281ad46c264ac33",
+          "size_bytes": 3647410
+        },
+        "CADCHF/tick/2013/DAT_ASCII_CADCHF_T_201303.zip": {
+          "rows": 593245,
+          "sha256": "3ddb12db91d58f61d526af4e58415549e425c03fb0fddd4a2a9db658b445e5a4",
+          "size_bytes": 3463699
+        },
+        "CADCHF/tick/2013/DAT_ASCII_CADCHF_T_201304.zip": {
+          "rows": 564660,
+          "sha256": "f400c315a6403c82a9bd0800acf2262c05b73aa7df6f4f1e6dd9c9a320ad3cdf",
+          "size_bytes": 3317419
+        },
+        "CADCHF/tick/2013/DAT_ASCII_CADCHF_T_201305.zip": {
+          "rows": 781837,
+          "sha256": "ad1f7c41910189583b981ac4cc665d4c3b37c9cb2fca4aff13911ec7e354e936",
+          "size_bytes": 4675093
+        },
+        "CADCHF/tick/2013/DAT_ASCII_CADCHF_T_201306.zip": {
+          "rows": 919406,
+          "sha256": "cc26abe7085b1ecf34e87008db2e6dac97e893c6a17f14fab22719cb7d6ee40e",
+          "size_bytes": 5453616
+        },
+        "CADCHF/tick/2013/DAT_ASCII_CADCHF_T_201307.zip": {
+          "rows": 949527,
+          "sha256": "b59e7a958c868b87ba67a66981644fbcdd674f5509227c0b0105f43daafeb885",
+          "size_bytes": 5533222
+        },
+        "CADCHF/tick/2013/DAT_ASCII_CADCHF_T_201308.zip": {
+          "rows": 787051,
+          "sha256": "266388400b1119cf74f224a0fe9dc4de48f27e0bd43b3e89221f57c80f5d2dd5",
+          "size_bytes": 4553531
+        },
+        "CADCHF/tick/2013/DAT_ASCII_CADCHF_T_201309.zip": {
+          "rows": 643266,
+          "sha256": "39290f5f26173cb1782409f676f7826068b6fd784ef72813126e569468a59875",
+          "size_bytes": 3727536
+        },
+        "CADCHF/tick/2013/DAT_ASCII_CADCHF_T_201310.zip": {
+          "rows": 641040,
+          "sha256": "6518cf6a0f1079dbc15bb4374bb46c1f2e8bbf99883fc1bee404ecdce8763c06",
+          "size_bytes": 3746962
+        },
+        "CADCHF/tick/2013/DAT_ASCII_CADCHF_T_201311.zip": {
+          "rows": 604235,
+          "sha256": "f56878c6cbcc441112622ef3cedd75aef141ecfbba628bfd934592ecb8f95e8c",
+          "size_bytes": 3533019
+        },
+        "CADCHF/tick/2013/DAT_ASCII_CADCHF_T_201312.zip": {
+          "rows": 604905,
+          "sha256": "fa41903a90c5be226afe7245424762471b08b947465b9ca053ded8e1df68879c",
+          "size_bytes": 3527648
+        },
+        "CADCHF/tick/2014/DAT_ASCII_CADCHF_T_201401.zip": {
+          "rows": 754738,
+          "sha256": "c4ea63a8e033b011db7b96af8cacfef035b2827a0d692d8300cc7d904a869f7f",
+          "size_bytes": 4434226
+        },
+        "CADCHF/tick/2014/DAT_ASCII_CADCHF_T_201402.zip": {
+          "rows": 584343,
+          "sha256": "a8d906490febf2f86d39d7050ced63b98698feaa3332298f9cbf4cdeba95470e",
+          "size_bytes": 3456777
+        },
+        "CADCHF/tick/2014/DAT_ASCII_CADCHF_T_201403.zip": {
+          "rows": 616984,
+          "sha256": "cb6bedded52c0d2d55073a56daab454ffc6113e8a2bdcae95baf11c79c87f173",
+          "size_bytes": 3596634
+        },
+        "CADCHF/tick/2014/DAT_ASCII_CADCHF_T_201404.zip": {
+          "rows": 539076,
+          "sha256": "54ad886b4864602d5689d0d1f7376f56bf15df72ec9d1479cb70ec7281286a66",
+          "size_bytes": 3116278
+        },
+        "CADCHF/tick/2014/DAT_ASCII_CADCHF_T_201405.zip": {
+          "rows": 507528,
+          "sha256": "f8e535a29555ec255190087cabfd5d14bd35a573f547f1a1a2dbd9319def8d42",
+          "size_bytes": 2924855
+        },
+        "CADCHF/tick/2014/DAT_ASCII_CADCHF_T_201406.zip": {
+          "rows": 467946,
+          "sha256": "74a775eb9b794390d378bc6e21e0c5f173c7be0fff3d97b22b979ac325f6c3db",
+          "size_bytes": 2687919
+        },
+        "CADCHF/tick/2014/DAT_ASCII_CADCHF_T_201407.zip": {
+          "rows": 455782,
+          "sha256": "b9943a25d25d78f233f35c2cd10f80d5e2cfc89f36dee696c5a871c5d4cb43a4",
+          "size_bytes": 2563757
+        },
+        "CADCHF/tick/2014/DAT_ASCII_CADCHF_T_201408.zip": {
+          "rows": 518630,
+          "sha256": "035e8f9de3902475b527651ee701fc92c8e15acf8a1e34d13b403f8e735134b8",
+          "size_bytes": 2607135
+        },
+        "CADCHF/tick/2014/DAT_ASCII_CADCHF_T_201409.zip": {
+          "rows": 808815,
+          "sha256": "90ac15618549070d734a9d75a7388db32296170294dda72b5ef0b003922bf840",
+          "size_bytes": 4018469
+        },
+        "CADCHF/tick/2014/DAT_ASCII_CADCHF_T_201410.zip": {
+          "rows": 1013829,
+          "sha256": "d7377d68064120771785ebde5c9b50faa5e46ee7e4be2784087247096202cbdf",
+          "size_bytes": 5820621
+        },
+        "CADCHF/tick/2014/DAT_ASCII_CADCHF_T_201411.zip": {
+          "rows": 1061087,
+          "sha256": "fa80db5fb12f912c1eff52d7909597c52a58b7cfaced8fa167261e9b49891254",
+          "size_bytes": 5845144
+        },
+        "CADCHF/tick/2014/DAT_ASCII_CADCHF_T_201412.zip": {
+          "rows": 1055437,
+          "sha256": "b2de05f7097a30bb9d8b7a0fbc6c525149870a8e8919ce31f26a5b04f2be1470",
+          "size_bytes": 5897971
+        },
+        "CADCHF/tick/2015/DAT_ASCII_CADCHF_T_201501.zip": {
+          "rows": 1209875,
+          "sha256": "3f0978aba0a946eb638369632e0cc3658ebe2b1669d427de8360528e50922329",
+          "size_bytes": 6923113
+        },
+        "CADCHF/tick/2015/DAT_ASCII_CADCHF_T_201502.zip": {
+          "rows": 1016649,
+          "sha256": "e3f8a4e95d1a3c102897d15bc165dde19bf81639431ffdd74f64a6a752ce3f37",
+          "size_bytes": 5527892
+        },
+        "CADCHF/tick/2015/DAT_ASCII_CADCHF_T_201503.zip": {
+          "rows": 1269275,
+          "sha256": "97d21f210a85f3f37a9a144d064f83148af65921d1b75f29f81881321f19aad6",
+          "size_bytes": 7097988
+        },
+        "CADCHF/tick/2015/DAT_ASCII_CADCHF_T_201504.zip": {
+          "rows": 1226324,
+          "sha256": "844c887d71cc99f973c051c0078d9b1875b8d3f71e21881ec1c91f8959451dc2",
+          "size_bytes": 6802924
+        },
+        "CADCHF/tick/2015/DAT_ASCII_CADCHF_T_201505.zip": {
+          "rows": 1183470,
+          "sha256": "076fe1a013aa4ddcde3f354c2ba44229ce0e595402cb57dfd95ee1003c1096be",
+          "size_bytes": 6449295
+        },
+        "CADCHF/tick/2015/DAT_ASCII_CADCHF_T_201506.zip": {
+          "rows": 1161110,
+          "sha256": "ecda02af38e61bd9f2570247531d6443d7afd30b1c75468ad791ee17ca3c99ae",
+          "size_bytes": 6399272
+        },
+        "CADCHF/tick/2015/DAT_ASCII_CADCHF_T_201507.zip": {
+          "rows": 1249786,
+          "sha256": "4e96453f853ebb193b738d01a179a99b111ce59ac52929ffe6b55fc4467dee51",
+          "size_bytes": 6657038
+        },
+        "CADCHF/tick/2015/DAT_ASCII_CADCHF_T_201508.zip": {
+          "rows": 1155210,
+          "sha256": "1dd9caf76e6cf609faeb2ecfdcf2ddd35d8d74bf24172714c1fc653c49bdba9c",
+          "size_bytes": 6298494
+        },
+        "CADCHF/tick/2015/DAT_ASCII_CADCHF_T_201509.zip": {
+          "rows": 1053515,
+          "sha256": "b98a0868938187cc1edb55732d4dc72b973539680e3868a184a46d81c6b9018c",
+          "size_bytes": 5925838
+        },
+        "CADCHF/tick/2015/DAT_ASCII_CADCHF_T_201510.zip": {
+          "rows": 1037819,
+          "sha256": "d4afca0e74a695f3607fcfa4db6be3752be4053ccb8a6b0d88a4c8d720878374",
+          "size_bytes": 5744755
+        },
+        "CADCHF/tick/2015/DAT_ASCII_CADCHF_T_201511.zip": {
+          "rows": 1052817,
+          "sha256": "ca48faafa6d77877f303478728d28acbbdd6940a08eb7d71eea11b227fdf9438",
+          "size_bytes": 5635206
+        },
+        "CADCHF/tick/2015/DAT_ASCII_CADCHF_T_201512.zip": {
+          "rows": 1213129,
+          "sha256": "80869693c6a68f399cc6876a5ae871e13daae9f8df26d32381abfed7e6a89fa8",
+          "size_bytes": 6476780
+        },
+        "CADCHF/tick/2016/DAT_ASCII_CADCHF_T_201601.zip": {
+          "rows": 1747070,
+          "sha256": "dbce4c81d731d1526fe37d28c047336f36fe434a840c19e0639bb399ae9596bb",
+          "size_bytes": 9416963
+        },
+        "CADCHF/tick/2016/DAT_ASCII_CADCHF_T_201602.zip": {
+          "rows": 1921886,
+          "sha256": "de7ab655ac0e447ff7a177af87da37525aecd47637cd398b2f594a7f73df0119",
+          "size_bytes": 10278229
+        },
+        "CADCHF/tick/2016/DAT_ASCII_CADCHF_T_201603.zip": {
+          "rows": 1470781,
+          "sha256": "08b58374674c27e617929f7c7296b4ca5dd019f350dbbe8cc9624408f886ea2b",
+          "size_bytes": 7883500
+        },
+        "CADCHF/tick/2016/DAT_ASCII_CADCHF_T_201604.zip": {
+          "rows": 1359467,
+          "sha256": "192cac89d873d28701ae2daa2747f887a16d1ea1bfe50c94c23d37f0648c2789",
+          "size_bytes": 7307469
+        },
+        "CADCHF/tick/2016/DAT_ASCII_CADCHF_T_201605.zip": {
+          "rows": 1122864,
+          "sha256": "10210d4539a8a4bcb027ca23ec6270de4ba02c80f8761e9874bc5f5b2cecfafb",
+          "size_bytes": 6117080
+        },
+        "CADCHF/tick/2016/DAT_ASCII_CADCHF_T_201606.zip": {
+          "rows": 1274432,
+          "sha256": "d78c49a695876980ea63584809585fd3f1e208df09d5b05f1baa221f756aa2ad",
+          "size_bytes": 6927237
+        },
+        "CADCHF/tick/2016/DAT_ASCII_CADCHF_T_201607.zip": {
+          "rows": 943256,
+          "sha256": "4c3a34040f38006d5432c15de82cf35459bc761fe3a6f1a03486be88335acc5c",
+          "size_bytes": 5094096
+        },
+        "CADCHF/tick/2016/DAT_ASCII_CADCHF_T_201608.zip": {
+          "rows": 871479,
+          "sha256": "8b694c3d98df759ec256593135d9384274068a720bea162c8a868d3ad1de26db",
+          "size_bytes": 4643517
+        },
+        "CADCHF/tick/2016/DAT_ASCII_CADCHF_T_201609.zip": {
+          "rows": 950041,
+          "sha256": "527656c8d64124e091d449b2fc38a585684d228052e62cb2bcf492e398cbbf80",
+          "size_bytes": 5046803
+        },
+        "CADCHF/tick/2016/DAT_ASCII_CADCHF_T_201610.zip": {
+          "rows": 838038,
+          "sha256": "d12adea7d735a742681d7b4dbb8631662a63191b21740504761cca8074545b0f",
+          "size_bytes": 4429239
+        },
+        "CADCHF/tick/2016/DAT_ASCII_CADCHF_T_201611.zip": {
+          "rows": 1224503,
+          "sha256": "0dcd5b48563917ea96c725e3af9913b5b8bfe0e8f35891fcaff99df15cbad234",
+          "size_bytes": 6473909
+        },
+        "CADCHF/tick/2016/DAT_ASCII_CADCHF_T_201612.zip": {
+          "rows": 883085,
+          "sha256": "dcc43ed4cb36e3ed8b455052fb2c690a8841e29a010e48906e87ef505b98b64b",
+          "size_bytes": 4651795
+        },
+        "CADCHF/tick/2017/DAT_ASCII_CADCHF_T_201701.zip": {
+          "rows": 1212369,
+          "sha256": "2d558bcb79cecef26e89086ec1fa19523d46190d9321d938011b0a79a1cad0b9",
+          "size_bytes": 6261946
+        },
+        "CADCHF/tick/2017/DAT_ASCII_CADCHF_T_201702.zip": {
+          "rows": 1000441,
+          "sha256": "8f921188d92e232a4928ff4dc4e3ed80794e849bfeed1375a7a6fe8ded51ee26",
+          "size_bytes": 5134506
+        },
+        "CADCHF/tick/2017/DAT_ASCII_CADCHF_T_201703.zip": {
+          "rows": 1186218,
+          "sha256": "e0f6e4120173fedc375c701e3495151546be9ccfa717a35d2f921e95202a418a",
+          "size_bytes": 6173953
+        },
+        "CADCHF/tick/2017/DAT_ASCII_CADCHF_T_201704.zip": {
+          "rows": 851657,
+          "sha256": "d26a74c465ba5899cad9e5f531b27e96a13bea002522de25372cc1454ff6f0e7",
+          "size_bytes": 4504585
+        },
+        "CADCHF/tick/2017/DAT_ASCII_CADCHF_T_201705.zip": {
+          "rows": 1081877,
+          "sha256": "4f6fbe0b49d672a1ded1507671597212f5ed7e7f95f683b18d7133ea6caf3812",
+          "size_bytes": 5646387
+        },
+        "CADCHF/tick/2017/DAT_ASCII_CADCHF_T_201706.zip": {
+          "rows": 893973,
+          "sha256": "5ae4861ec26ced6ef850d329f92de9b1d1d5a899ffb9673ec0deb0e4af54efed",
+          "size_bytes": 4728288
+        },
+        "CADCHF/tick/2017/DAT_ASCII_CADCHF_T_201707.zip": {
+          "rows": 1117534,
+          "sha256": "86f7c739105b66be3ff6117b98af06a7616ceb8fc57125e0fde3cd1e983ecd72",
+          "size_bytes": 5916417
+        },
+        "CADCHF/tick/2017/DAT_ASCII_CADCHF_T_201708.zip": {
+          "rows": 845150,
+          "sha256": "fac9373aaf12f8a5a9ad58b1bd95e7e8ab668cfeda2d93c496bb295d2ff25335",
+          "size_bytes": 4655730
+        },
+        "CADCHF/tick/2017/DAT_ASCII_CADCHF_T_201709.zip": {
+          "rows": 913504,
+          "sha256": "c95969f557e88b8e10b5ecbcd5049b07c199e861eb7be7c30f4d6b1a83ad75df",
+          "size_bytes": 5077780
+        },
+        "CADCHF/tick/2017/DAT_ASCII_CADCHF_T_201710.zip": {
+          "rows": 955087,
+          "sha256": "6948150789baa367f43428559bacf0a23861cb515a753e74ad843a47bc7ef11f",
+          "size_bytes": 5101999
+        },
+        "CADCHF/tick/2017/DAT_ASCII_CADCHF_T_201711.zip": {
+          "rows": 911005,
+          "sha256": "5ea08776a5e4383f96426e43d49e42351340162367c3705191fb55cf5fe8052d",
+          "size_bytes": 4800301
+        },
+        "CADCHF/tick/2017/DAT_ASCII_CADCHF_T_201712.zip": {
+          "rows": 755867,
+          "sha256": "62092fb25427b0b2982769a6d0a408b6dc910897369f4e7202f07931bc209063",
+          "size_bytes": 4068211
+        },
+        "CADCHF/tick/2018/DAT_ASCII_CADCHF_T_201801.zip": {
+          "rows": 1193986,
+          "sha256": "7772e018dca0f2658b1c179267914a076e8858d60969574de291eb885dea12fe",
+          "size_bytes": 6347692
+        },
+        "CADCHF/tick/2018/DAT_ASCII_CADCHF_T_201802.zip": {
+          "rows": 1045768,
+          "sha256": "22e2576340f8ef39017675ee2ccc9aff997e9e1775f0a71803138bc779d9746a",
+          "size_bytes": 5530766
+        },
+        "CADCHF/tick/2018/DAT_ASCII_CADCHF_T_201803.zip": {
+          "rows": 764549,
+          "sha256": "35b89f137b971e1632cc3730cb56a2fad13db2a5a53de6065b5a26db9100a844",
+          "size_bytes": 4078695
+        },
+        "CADCHF/tick/2018/DAT_ASCII_CADCHF_T_201804.zip": {
+          "rows": 691394,
+          "sha256": "851c1e41dab2dc3328d39aff1fe7dcde93c1382d4641f8d4742cbcd165a753cb",
+          "size_bytes": 3680269
+        },
+        "CADCHF/tick/2018/DAT_ASCII_CADCHF_T_201805.zip": {
+          "rows": 971088,
+          "sha256": "0d632ca65a94670f90f5664ceae1485a60748c830e08ae03a0b64e66a2d296b1",
+          "size_bytes": 5247489
+        },
+        "CADCHF/tick/2018/DAT_ASCII_CADCHF_T_201806.zip": {
+          "rows": 711629,
+          "sha256": "598aec9fd4a6787a2d46301d0760a04fcef75cc80c67a737649b1f430ee8e64b",
+          "size_bytes": 3830011
+        },
+        "CADCHF/tick/2018/DAT_ASCII_CADCHF_T_201807.zip": {
+          "rows": 703078,
+          "sha256": "bbb9d60a442be08ff6818d4f5395335a36310c9019f8e2759050a852cf700f4f",
+          "size_bytes": 3713326
+        },
+        "CADCHF/tick/2018/DAT_ASCII_CADCHF_T_201808.zip": {
+          "rows": 795884,
+          "sha256": "9b9b0ca91a5a7dc8d2cb7a64295d741a62cdc2247d2411fcddb4c8d0e2581280",
+          "size_bytes": 4185937
+        },
+        "CADCHF/tick/2018/DAT_ASCII_CADCHF_T_201809.zip": {
+          "rows": 1006313,
+          "sha256": "d21e882d3b06925fc6e91c264f04c06651813d4853b4cca4aa776a7fcc527116",
+          "size_bytes": 5157167
+        },
+        "CADCHF/tick/2018/DAT_ASCII_CADCHF_T_201810.zip": {
+          "rows": 1486173,
+          "sha256": "72de9927766db14573f922b8c82a5f1779800aa27fbecd896a521e659fc487b7",
+          "size_bytes": 7446872
+        },
+        "CADCHF/tick/2018/DAT_ASCII_CADCHF_T_201811.zip": {
+          "rows": 1096397,
+          "sha256": "2837813a665d128fed6984503e134d7bd68ca389b164c80ebdff7505c2bf7d68",
+          "size_bytes": 5723615
+        },
+        "CADCHF/tick/2018/DAT_ASCII_CADCHF_T_201812.zip": {
+          "rows": 1368445,
+          "sha256": "70e0dfe436f20051560cc8d96533b2662a88763c00809fefb4cf7d5463e17ac0",
+          "size_bytes": 7910796
+        },
+        "CADCHF/tick/2019/DAT_ASCII_CADCHF_T_201901.zip": {
+          "rows": 1955321,
+          "sha256": "6191af965d6e8df1ec17a81bf298898475de98f3328ebc8fa5420fb332154854",
+          "size_bytes": 11717998
+        },
+        "CADCHF/tick/2019/DAT_ASCII_CADCHF_T_201902.zip": {
+          "rows": 1676833,
+          "sha256": "92719fe7d99cac358d246e7d838572571255114525e67b8cf0222ec956464322",
+          "size_bytes": 9866042
+        },
+        "CADCHF/tick/2019/DAT_ASCII_CADCHF_T_201903.zip": {
+          "rows": 2000376,
+          "sha256": "4e83233771973fc53e6c83b5527634d410bc70095666681c15bf6e9bef93f944",
+          "size_bytes": 11575591
+        },
+        "CADCHF/tick/2019/DAT_ASCII_CADCHF_T_201904.zip": {
+          "rows": 1616875,
+          "sha256": "59b42ceffa58af4c4bd9b1e434cdb53a3d06c1033ea456f19a26b65486535fcb",
+          "size_bytes": 9480836
+        },
+        "CADCHF/tick/2019/DAT_ASCII_CADCHF_T_201905.zip": {
+          "rows": 1761149,
+          "sha256": "fd024986fdfb4e68b47c925bde44423c5f2a9775f3f5ef10ff7136c768693d3b",
+          "size_bytes": 10460019
+        },
+        "CADCHF/tick/2019/DAT_ASCII_CADCHF_T_201906.zip": {
+          "rows": 1819752,
+          "sha256": "6b74e9c643e93b56ada23714009091cc6e90b6babac9d0b547caba0052c463f7",
+          "size_bytes": 10831164
+        },
+        "CADCHF/tick/2019/DAT_ASCII_CADCHF_T_201907.zip": {
+          "rows": 1768789,
+          "sha256": "3441bcfcb0afd770d6eb4a9bdf75ce4d623568571a6476f48ac71e3f21390c8b",
+          "size_bytes": 10359003
+        },
+        "CADCHF/tick/2019/DAT_ASCII_CADCHF_T_201908.zip": {
+          "rows": 2607949,
+          "sha256": "92ed03628ab26de374c76d0f8d7643954908c6f44226725cdc3a9589f832026a",
+          "size_bytes": 15321612
+        },
+        "CADCHF/tick/2019/DAT_ASCII_CADCHF_T_201909.zip": {
+          "rows": 1806522,
+          "sha256": "3d25d8e4a1f17aae63408885c7966a310d1cb3dd49353272796f3cf850afbaed",
+          "size_bytes": 10696416
+        },
+        "CADCHF/tick/2019/DAT_ASCII_CADCHF_T_201910.zip": {
+          "rows": 1859830,
+          "sha256": "541495503867132c57cab78cb305507b1675e3778b0f1c57c0600f8861173f6f",
+          "size_bytes": 10949240
+        },
+        "CADCHF/tick/2019/DAT_ASCII_CADCHF_T_201911.zip": {
+          "rows": 1384077,
+          "sha256": "546903534a57317baf120d4f700e7c20da395e80c49053a2e681f7daaa2c5614",
+          "size_bytes": 8077749
+        },
+        "CADCHF/tick/2019/DAT_ASCII_CADCHF_T_201912.zip": {
+          "rows": 1279124,
+          "sha256": "cbf6fa1fc6a0d248e10b66c1a08156e222bc5690856c51ab017bf1f835b151fc",
+          "size_bytes": 7555512
+        },
+        "CADCHF/tick/2020/DAT_ASCII_CADCHF_T_202001.zip": {
+          "rows": 1530264,
+          "sha256": "5ce0e15396d17a2f41a54f8473db693add2526dd517018a1eb27ad433d0f4501",
+          "size_bytes": 9044227
+        },
+        "CADCHF/tick/2020/DAT_ASCII_CADCHF_T_202002.zip": {
+          "rows": 1696903,
+          "sha256": "be5eb2834a360ae93b9d0c51131f24fa353e0c4669d14d49f02389d8569a361b",
+          "size_bytes": 10090273
+        },
+        "CADCHF/tick/2020/DAT_ASCII_CADCHF_T_202003.zip": {
+          "rows": 5462443,
+          "sha256": "1573afff07d798a72975e2fe708865accca8ae032ec5fe97340d28c1d2905236",
+          "size_bytes": 32975877
+        },
+        "CADCHF/tick/2020/DAT_ASCII_CADCHF_T_202004.zip": {
+          "rows": 2955002,
+          "sha256": "d77e57d8ff9fe3af0d370fac93515970749e0a61573e3b8fe63144a63bae9a4a",
+          "size_bytes": 17700928
+        },
+        "CADCHF/tick/2020/DAT_ASCII_CADCHF_T_202005.zip": {
+          "rows": 2135533,
+          "sha256": "1e65388eb00ccb428e2c433cf3a63173937100bbf9abb4cbee15ace6d7da6153",
+          "size_bytes": 12672172
+        },
+        "CADCHF/tick/2020/DAT_ASCII_CADCHF_T_202006.zip": {
+          "rows": 2745698,
+          "sha256": "0339f66a2d05644f18895949b7af18aee5cda69b1afa41aa622f9b10d2e64846",
+          "size_bytes": 16171474
+        },
+        "CADCHF/tick/2020/DAT_ASCII_CADCHF_T_202007.zip": {
+          "rows": 2163410,
+          "sha256": "1d21043366d191a3eb5e8616eeecffd74283d5a5611910f03aa1da390897a57b",
+          "size_bytes": 12632113
+        },
+        "CADCHF/tick/2020/DAT_ASCII_CADCHF_T_202008.zip": {
+          "rows": 1950173,
+          "sha256": "e5de878a1cad8895770845b541e68a9c1a562c46ac19f88d40f0630c512b763d",
+          "size_bytes": 11633407
+        },
+        "CADCHF/tick/2020/DAT_ASCII_CADCHF_T_202009.zip": {
+          "rows": 1979558,
+          "sha256": "169a172e4c23258916258c246940b0973e7797eaad2a0ec8a800e3c6d8cc40bd",
+          "size_bytes": 11950690
+        },
+        "CADCHF/tick/2020/DAT_ASCII_CADCHF_T_202010.zip": {
+          "rows": 1579244,
+          "sha256": "5b564d2c46db4e0dbcfb0ecd239980eae385cdb0d4eef6fe36f61fcf5931128a",
+          "size_bytes": 9576991
+        },
+        "CADCHF/tick/2020/DAT_ASCII_CADCHF_T_202011.zip": {
+          "rows": 1667465,
+          "sha256": "3630233976363408dea9b290d00a28a2060cc51224ff927807e6b346511317e6",
+          "size_bytes": 10214384
+        },
+        "CADCHF/tick/2020/DAT_ASCII_CADCHF_T_202012.zip": {
+          "rows": 1536817,
+          "sha256": "19ec9ad28624f6ffe0ef04a0fa13ffe0b08e5b758d6e09cece682272599bc814",
+          "size_bytes": 9439244
+        },
+        "CADCHF/tick/2021/DAT_ASCII_CADCHF_T_202101.zip": {
+          "rows": 1795302,
+          "sha256": "0f5afba807ace70f2dc25dc1aa83297c4e35587ecdac55536ce13f849e22e70d",
+          "size_bytes": 10950446
+        },
+        "CADCHF/tick/2021/DAT_ASCII_CADCHF_T_202102.zip": {
+          "rows": 1704850,
+          "sha256": "3a1f40bd84769253f77c6a21157c8bea474190d6b64f03b7ac355089255ade48",
+          "size_bytes": 10324886
+        },
+        "CADCHF/tick/2021/DAT_ASCII_CADCHF_T_202103.zip": {
+          "rows": 2153508,
+          "sha256": "d52d80cc19a15e959b42b21dd4c96078e2f0e846ae277376dbc9ebb5e0757b29",
+          "size_bytes": 13052734
+        },
+        "CADCHF/tick/2021/DAT_ASCII_CADCHF_T_202104.zip": {
+          "rows": 1354043,
+          "sha256": "84b71400f6c1fd7569d393103664b4532227f44955807255715c73eb2871e19e",
+          "size_bytes": 8306827
+        },
+        "CADCHF/tick/2021/DAT_ASCII_CADCHF_T_202105.zip": {
+          "rows": 1440516,
+          "sha256": "6988b5bad6c70b8bbbd62b0bf3a40438e395c9442a979b8f6b6cd08470dddb4a",
+          "size_bytes": 8744042
+        },
+        "CADCHF/tick/2021/DAT_ASCII_CADCHF_T_202106.zip": {
+          "rows": 1356414,
+          "sha256": "6b529a171cd87507875c63a356e53c2a0541ec61993352f24fd4d26e9650aef9",
+          "size_bytes": 8231119
+        },
+        "CADCHF/tick/2021/DAT_ASCII_CADCHF_T_202107.zip": {
+          "rows": 1614410,
+          "sha256": "6e8894fc169af6cbdd630634a544bfef334e70a4b38856977276f5ff1ab02ccc",
+          "size_bytes": 9735760
+        },
+        "CADCHF/tick/2021/DAT_ASCII_CADCHF_T_202108.zip": {
+          "rows": 1293066,
+          "sha256": "7ee48639ea33c6b2203377a75e86f3f0a362735acbf370711d13ef644c03778f",
+          "size_bytes": 7895039
+        },
+        "CADCHF/tick/2021/DAT_ASCII_CADCHF_T_202109.zip": {
+          "rows": 1515510,
+          "sha256": "f70c2a5d38623bcca527b0cd6410f7a76f947362d59397fe7b1e7f642eb56d39",
+          "size_bytes": 9338052
+        },
+        "CADCHF/tick/2021/DAT_ASCII_CADCHF_T_202110.zip": {
+          "rows": 1413685,
+          "sha256": "5e3c19d84ef2a3c9eb306790f20eb51148b3b5c0bffe3691d38423bdbfd4a6c8",
+          "size_bytes": 8709827
+        },
+        "CADCHF/tick/2021/DAT_ASCII_CADCHF_T_202111.zip": {
+          "rows": 1627803,
+          "sha256": "273873e6015676e228613bc251dab508caacb056d3b065b85872239db80edd03",
+          "size_bytes": 9925959
+        },
+        "CADCHF/tick/2021/DAT_ASCII_CADCHF_T_202112.zip": {
+          "rows": 1609681,
+          "sha256": "708f79d4c05a463329569f9a6614d0eb8a4b390e0901d00dde0dc4a758409859",
+          "size_bytes": 9784250
+        },
+        "CADCHF/tick/2022/DAT_ASCII_CADCHF_T_202201.zip": {
+          "rows": 1743373,
+          "sha256": "5e755a8047a20ad041990cd70998b37f168daa62134bdd4cce16f18f491d7221",
+          "size_bytes": 10624363
+        },
+        "CADCHF/tick/2022/DAT_ASCII_CADCHF_T_202202.zip": {
+          "rows": 1926649,
+          "sha256": "e80b570c94f18b04cf4f6a5d4ea940b1cc85187c821bba83a6ecd9185db0da5c",
+          "size_bytes": 11544923
+        },
+        "CADCHF/tick/2022/DAT_ASCII_CADCHF_T_202203.zip": {
+          "rows": 2291487,
+          "sha256": "0d610c4b958c647b2402bceccb98f30f67bc3f35c812f7abae1db6b07643b34a",
+          "size_bytes": 13797955
+        },
+        "CADCHF/tick/2022/DAT_ASCII_CADCHF_T_202204.zip": {
+          "rows": 1819041,
+          "sha256": "98c1dba4b1dbd2c1c1d8458c4d438aca837ece2adebd8e9f8352412093ff8cc5",
+          "size_bytes": 11049425
+        },
+        "CADCHF/tick/2022/DAT_ASCII_CADCHF_T_202205.zip": {
+          "rows": 2182059,
+          "sha256": "a38127f87fdeb9014408855ea75d53885dc54075311ed95f297666f97841136f",
+          "size_bytes": 13344824
+        },
+        "CADCHF/tick/2022/DAT_ASCII_CADCHF_T_202206.zip": {
+          "rows": 2656037,
+          "sha256": "19f4ccff6f6089829317ae77681cfe85261c3e35ef310a59dcd3be4ea827a243",
+          "size_bytes": 15878178
+        },
+        "CADCHF/tick/2022/DAT_ASCII_CADCHF_T_202207.zip": {
+          "rows": 2550860,
+          "sha256": "53cc2d56a1c62ff5edea83bcd09b6cc43e17a170a3e8f5ffe3f8a98d9d66affd",
+          "size_bytes": 15203058
+        },
+        "CADCHF/tick/2022/DAT_ASCII_CADCHF_T_202208.zip": {
+          "rows": 2323007,
+          "sha256": "e4d7ebebc0ea2eb2fa53ef2017b74f4d27ba62777f1b2b5905a53c63a0d56330",
+          "size_bytes": 13735972
+        },
+        "CADCHF/tick/2022/DAT_ASCII_CADCHF_T_202209.zip": {
+          "rows": 3049866,
+          "sha256": "e0d4e4c2feaab298c46f5f4b4b7f4d21885dcd99562ea2c05dc4ab775adbedca",
+          "size_bytes": 17906838
+        },
+        "CADCHF/tick/2022/DAT_ASCII_CADCHF_T_202210.zip": {
+          "rows": 3361840,
+          "sha256": "4de93c7029e9fd6818516ae7f4e823785240812189c6a7692f56a40e60e61817",
+          "size_bytes": 19411597
+        },
+        "CADCHF/tick/2022/DAT_ASCII_CADCHF_T_202211.zip": {
+          "rows": 2736712,
+          "sha256": "c162ea4b72a9d2aa7c1c12890de19b45f44bdb6858e80f67f4b89d71fe589bf8",
+          "size_bytes": 16029223
+        },
+        "CADCHF/tick/2022/DAT_ASCII_CADCHF_T_202212.zip": {
+          "rows": 2425443,
+          "sha256": "da91a2ff1ee8f0d192709a73334fc3eba9d6195630ba18b6e816b2c41f249c0f",
+          "size_bytes": 14475254
+        },
+        "CADCHF/tick/2023/DAT_ASCII_CADCHF_T_202301.zip": {
+          "rows": 2453423,
+          "sha256": "65290ce5afc7baa035b416a63c0d46e585c155b6934d11ea68e2e776438dd6b7",
+          "size_bytes": 14948621
+        },
+        "CADCHF/tick/2023/DAT_ASCII_CADCHF_T_202302.zip": {
+          "rows": 1923275,
+          "sha256": "740289497fcde7fa613a5a78ed1234d52a570431cf130e6f1828687625ed6148",
+          "size_bytes": 11553004
+        },
+        "CADCHF/tick/2023/DAT_ASCII_CADCHF_T_202303.zip": {
+          "rows": 1792045,
+          "sha256": "0ce0e9d464d4f8158c36dfcce8e95ac85e56af70329e861364df857b37d46b7a",
+          "size_bytes": 10916486
+        },
+        "CADCHF/tick/2023/DAT_ASCII_CADCHF_T_202304.zip": {
+          "rows": 876240,
+          "sha256": "43a8fc918e0591b3e8feb408ff71ec37ce04e5bd82e7ed96f297c8642a265914",
+          "size_bytes": 5472509
+        },
+        "CADCHF/tick/2023/DAT_ASCII_CADCHF_T_202305.zip": {
+          "rows": 914285,
+          "sha256": "e63ff3a59e8ac53222f7a552988e6b73a95d4227c285e8cd3e93caadea85ff7a",
+          "size_bytes": 5760184
+        },
+        "CADCHF/tick/2023/DAT_ASCII_CADCHF_T_202306.zip": {
+          "rows": 883522,
+          "sha256": "d87802181f2184fcf3a63b19a6b8f7151d706fabd562213741aa17130f0bad13",
+          "size_bytes": 5582272
+        },
+        "CADCHF/tick/2023/DAT_ASCII_CADCHF_T_202307.zip": {
+          "rows": 935640,
+          "sha256": "3c899bc8db7d96b861cdc70c9ead0a2a7feac80a9871210236d968c0f749bf5d",
+          "size_bytes": 5857757
+        },
+        "CADCHF/tick/2023/DAT_ASCII_CADCHF_T_202308.zip": {
+          "rows": 1467154,
+          "sha256": "3033fe1527d43db7475eee9a66258b00b6d451f3d3155f480b997319de320c57",
+          "size_bytes": 9160093
+        },
+        "CADCHF/tick/2023/DAT_ASCII_CADCHF_T_202309.zip": {
+          "rows": 1179759,
+          "sha256": "cfdfb9c3806f0a350011c2434510acb266accff4b63362a28fb91152acf54a2a",
+          "size_bytes": 7400472
+        },
+        "CADCHF/tick/2023/DAT_ASCII_CADCHF_T_202310.zip": {
+          "rows": 1578726,
+          "sha256": "517794eddadf2d62a741c0ebc81365e033b0197fe13d47bd3cc6a666924bd42c",
+          "size_bytes": 9817021
+        },
+        "CADCHF/tick/2023/DAT_ASCII_CADCHF_T_202311.zip": {
+          "rows": 1203647,
+          "sha256": "cddc9fb047389519ba634d54df620b91e3ce667a25f2f9dd53438cd9085822df",
+          "size_bytes": 7558961
+        },
+        "CADCHF/tick/2023/DAT_ASCII_CADCHF_T_202312.zip": {
+          "rows": 1155288,
+          "sha256": "a1ac013f10541f9ee4b720e1a9925db075db794bb0b6582cd7ac93adb71b3273",
+          "size_bytes": 7328533
+        },
+        "CADCHF/tick/2024/DAT_ASCII_CADCHF_T_202401.zip": {
+          "rows": 1369728,
+          "sha256": "4b998d086b27623f565db5bc268c52567035a261c487ce2137c6b5d3aa6285dc",
+          "size_bytes": 8660364
+        },
+        "CADCHF/tick/2024/DAT_ASCII_CADCHF_T_202402.zip": {
+          "rows": 1076986,
+          "sha256": "aa8c5ac4086b75c1aaef9b3126acb5b934fe457c1037899e76ebd7137f7e1f60",
+          "size_bytes": 6797133
+        },
+        "CADCHF/tick/2024/DAT_ASCII_CADCHF_T_202403.zip": {
+          "rows": 1079765,
+          "sha256": "2b2bb9ae8f6ae69ef5e9b542a2336db87df02ac3785dd6fc8f1c5f8d32790668",
+          "size_bytes": 6800380
+        },
+        "CADCHF/tick/2024/DAT_ASCII_CADCHF_T_202404.zip": {
+          "rows": 1128813,
+          "sha256": "ade4d694c8f157e3e979b3bbb3aaa6f92ecb881e4897958ca8006d05beff9b73",
+          "size_bytes": 7151330
+        },
+        "CADCHF/tick/2024/DAT_ASCII_CADCHF_T_202405.zip": {
+          "rows": 962533,
+          "sha256": "b8624894f83122e19aa8a377c36c3372f951158110ceb0e16e5d5c147a173449",
+          "size_bytes": 6057314
+        },
+        "CADCHF/tick/2024/DAT_ASCII_CADCHF_T_202406.zip": {
+          "rows": 970043,
+          "sha256": "6019b42d7ce517b5a1f38af28966ee20e1bf5eec78f325df001b281e123d25b0",
+          "size_bytes": 6053822
+        },
+        "CADCHF/tick/2024/DAT_ASCII_CADCHF_T_202407.zip": {
+          "rows": 1104025,
+          "sha256": "01560fccf7ff4705b76bffebe1ffe6f5cdf960b5dd0be5384361c84e00e3d05b",
+          "size_bytes": 6865644
+        },
+        "CADCHF/tick/2024/DAT_ASCII_CADCHF_T_202408.zip": {
+          "rows": 1582231,
+          "sha256": "a84cc2f798815060d47e6ecf485311adcb3022401496019d7001b0a952460162",
+          "size_bytes": 9939179
+        },
+        "CADCHF/tick/2024/DAT_ASCII_CADCHF_T_202409.zip": {
+          "rows": 1398200,
+          "sha256": "158c0660366c0857925fe54b05d7617708ddb014638d7c0bd3a0758c2c45e63d",
+          "size_bytes": 8714565
+        },
+        "CADCHF/tick/2024/DAT_ASCII_CADCHF_T_202410.zip": {
+          "rows": 1353562,
+          "sha256": "bce32bf9d6112406e21a182babeecdd7cbf89bd7c3b942707235982a4b0bdd83",
+          "size_bytes": 8258487
+        },
+        "CADCHF/tick/2024/DAT_ASCII_CADCHF_T_202411.zip": {
+          "rows": 1496704,
+          "sha256": "0f90f2ea5e385af945bb29731538b72c723f9dd111c17caad26cd38f58987bd4",
+          "size_bytes": 9040941
+        },
+        "CADCHF/tick/2024/DAT_ASCII_CADCHF_T_202412.zip": {
+          "rows": 1506721,
+          "sha256": "a413d255639760d5a6cb1b7852b918f4945b32bb017619cbb9b6ddca2ce44eba",
+          "size_bytes": 9042806
+        },
+        "CADCHF/tick/2025/DAT_ASCII_CADCHF_T_202501.zip": {
+          "rows": 1858606,
+          "sha256": "18d70127e2357917fa3ea39a08529e27d409fe3eee2c5785b1ab4e68f3e0e38d",
+          "size_bytes": 11167875
+        },
+        "CADCHF/tick/2025/DAT_ASCII_CADCHF_T_202502.zip": {
+          "rows": 1923730,
+          "sha256": "2763f3e8d74ba0c9df13f13e6b1f1b85afd6457a4cf9bd8417996fa3e4f7cdde",
+          "size_bytes": 11495557
+        },
+        "CADCHF/tick/2025/DAT_ASCII_CADCHF_T_202503.zip": {
+          "rows": 1852999,
+          "sha256": "b8acde727b5ea886d289fe1bfea35900fa90fa47b8880239e4238f99d55b1b3f",
+          "size_bytes": 11447571
+        },
+        "CADCHF/tick/2025/DAT_ASCII_CADCHF_T_202504.zip": {
+          "rows": 3214506,
+          "sha256": "6fd98d4dc1fff89ea713a9dacee5a14d1ba53bd2cb1ca282c33c5b84ba090c39",
+          "size_bytes": 20101963
+        },
+        "CADCHF/tick/2025/DAT_ASCII_CADCHF_T_202505.zip": {
+          "rows": 1532788,
+          "sha256": "de04dbc2761edcbb41334850d600ca9c4bf5006aa49c194d342b2bbc3c8e111b",
+          "size_bytes": 9611414
+        },
+        "CADCHF/tick/2025/DAT_ASCII_CADCHF_T_202506.zip": {
+          "rows": 1289790,
+          "sha256": "08b30bcfe3e9977b24a343235c3d1a4aa90db9735d1166404118201d94c03ca8",
+          "size_bytes": 8031906
+        },
+        "CADCHF/tick/2025/DAT_ASCII_CADCHF_T_202507.zip": {
+          "rows": 1094506,
+          "sha256": "821c415212c7c9a0e1fc5bfc73632fb38f41f522ff939a0a7f41886e5b972042",
+          "size_bytes": 6767201
+        },
+        "CADCHF/tick/2025/DAT_ASCII_CADCHF_T_202508.zip": {
+          "rows": 900531,
+          "sha256": "af55d7b87aae49e0e86088502af43fe77b93d4545e561df3ca0002a95b8444a5",
+          "size_bytes": 5568747
+        },
+        "CADCHF/tick/2025/DAT_ASCII_CADCHF_T_202509.zip": {
+          "rows": 938457,
+          "sha256": "3fc1e2a7a7867d718614accec08577aeebf8a5d0e5d5286a007da60614362299",
+          "size_bytes": 5727202
+        },
+        "CADCHF/tick/2025/DAT_ASCII_CADCHF_T_202510.zip": {
+          "rows": 1048371,
+          "sha256": "624fc30881c8f7ef3d622980501bb719977b0c0dc5ffed139944bb0632e1837d",
+          "size_bytes": 6382734
+        },
+        "CADCHF/tick/2025/DAT_ASCII_CADCHF_T_202511.zip": {
+          "rows": 922741,
+          "sha256": "4e3f953fefe2cbe99d848895f3a8c774aec00b3fcb797079367e34c2f623ec95",
+          "size_bytes": 5640164
+        },
+        "CADCHF/tick/2025/DAT_ASCII_CADCHF_T_202512.zip": {
+          "rows": 770144,
+          "sha256": "a0ef2eb806482098df4467d365dc557af68521b2d714343b1c51aeb6791e5930",
+          "size_bytes": 4756976
+        },
+        "CADCHF/tick/2026/DAT_ASCII_CADCHF_T_202601.zip": {
+          "rows": 790347,
+          "sha256": "17651f59119c95bcf891492bd4a0f41c5e74d84978069ccf682af6d61df3d54b",
+          "size_bytes": 5018465
+        },
+        "CADCHF/tick/2026/DAT_ASCII_CADCHF_T_202602.zip": {
+          "rows": 635825,
+          "sha256": "187c6cf6caa573279ca8e6fffe4165a3c9faa97ff9041152de4e807cda2fb7b5",
+          "size_bytes": 4098359
+        },
+        "CADCHF/tick/2026/DAT_ASCII_CADCHF_T_202603.zip": {
+          "rows": 1004155,
+          "sha256": "ec1009b74427f0945dd36eade14f5c016750875159dc39b7a7453c87a3f82369",
+          "size_bytes": 6376672
+        },
+        "CADCHF/tick/2026/DAT_ASCII_CADCHF_T_202604.zip": {
+          "rows": 247257,
+          "sha256": "98482113ab1a695cdb549cb4a9e1744f82c1fa1194baecc538363ad37ecb8a23",
+          "size_bytes": 1595812
+        }
+      },
+      "latest_month": "202604",
+      "total_files": 196,
+      "total_size_bytes": 1385430105
     },
     "EURUSD": {
       "earliest_month": "201501",

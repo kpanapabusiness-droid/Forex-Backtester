@@ -1,5 +1,5 @@
 {
-  "downloaded_at": "2026-05-20T05:52:46+00:00",
+  "downloaded_at": "2026-05-20T09:18:23+00:00",
   "pairs": {
     "AUDCAD": {
       "earliest_month": "201001",
@@ -5928,6 +5928,1982 @@
       "latest_month": "202604",
       "total_files": 196,
       "total_size_bytes": 1385430105
+    },
+    "CADJPY": {
+      "earliest_month": "201001",
+      "files": {
+        "CADJPY/tick/2010/DAT_ASCII_CADJPY_T_201001.zip": {
+          "rows": 404894,
+          "sha256": "21c0f2547db4f012141d0a169ece2765a16c6afb28fea29b861b9508d47f8fa8",
+          "size_bytes": 1568723
+        },
+        "CADJPY/tick/2010/DAT_ASCII_CADJPY_T_201002.zip": {
+          "rows": 357004,
+          "sha256": "4636d5922d9fb57ea0968abf4899acd01b313b70f78fe2e7290e67fd292c3063",
+          "size_bytes": 1385685
+        },
+        "CADJPY/tick/2010/DAT_ASCII_CADJPY_T_201003.zip": {
+          "rows": 395188,
+          "sha256": "2584b45ad3d5251d939567aa286ca8bd214b106d337fa2ad786bcfceaf2a328c",
+          "size_bytes": 1482036
+        },
+        "CADJPY/tick/2010/DAT_ASCII_CADJPY_T_201004.zip": {
+          "rows": 439561,
+          "sha256": "8fae1116c7af2153f4413635b82643c82aec0467ebe38e7010948540f3de57f8",
+          "size_bytes": 1566834
+        },
+        "CADJPY/tick/2010/DAT_ASCII_CADJPY_T_201005.zip": {
+          "rows": 711806,
+          "sha256": "53f4348c984bc04f46abbe5f441ee738400b82c3d61029445562a16af6fc4d74",
+          "size_bytes": 2729847
+        },
+        "CADJPY/tick/2010/DAT_ASCII_CADJPY_T_201006.zip": {
+          "rows": 575973,
+          "sha256": "2abf7f14461376e866c51fce4df3930dcda9a4c5583eea879e092df8eb13ee92",
+          "size_bytes": 2194644
+        },
+        "CADJPY/tick/2010/DAT_ASCII_CADJPY_T_201007.zip": {
+          "rows": 438252,
+          "sha256": "f244202bcaa974fd0a7c81f7a48c344686de80d57c492c642623a2d352925aa7",
+          "size_bytes": 1673953
+        },
+        "CADJPY/tick/2010/DAT_ASCII_CADJPY_T_201008.zip": {
+          "rows": 398360,
+          "sha256": "4e59d6538d432577b23a775cf4c4f7686844166dd72fd02761444dc67f1130ee",
+          "size_bytes": 1517392
+        },
+        "CADJPY/tick/2010/DAT_ASCII_CADJPY_T_201009.zip": {
+          "rows": 365418,
+          "sha256": "766641caedd568919babb3da9c0271f1e69916a6e4ec44fe8645dc8c563aba72",
+          "size_bytes": 1385280
+        },
+        "CADJPY/tick/2010/DAT_ASCII_CADJPY_T_201010.zip": {
+          "rows": 465187,
+          "sha256": "b70c48d55a077a88b00fb7375c9632da3e80fcee8a9570539fa6ea1cdd9c9a4c",
+          "size_bytes": 1740381
+        },
+        "CADJPY/tick/2010/DAT_ASCII_CADJPY_T_201011.zip": {
+          "rows": 550017,
+          "sha256": "ec9ae7dab06e3f80bc79e7bfc1ec60a13b8c64e4bde125bd6d1672a71a9e6d77",
+          "size_bytes": 2029088
+        },
+        "CADJPY/tick/2010/DAT_ASCII_CADJPY_T_201012.zip": {
+          "rows": 426209,
+          "sha256": "2e5a1cc5c7eed9bd4a5157d1014a4b97f33f793f8c0583c4d674ed4990c7ad68",
+          "size_bytes": 1618056
+        },
+        "CADJPY/tick/2011/DAT_ASCII_CADJPY_T_201101.zip": {
+          "rows": 449246,
+          "sha256": "7c860b64553d508b4f17e8c3aa474d30172599ef61a0ade62a47f0220e2bca90",
+          "size_bytes": 1685791
+        },
+        "CADJPY/tick/2011/DAT_ASCII_CADJPY_T_201102.zip": {
+          "rows": 415218,
+          "sha256": "5143c2871a81eb034abb75b627661ac019ccea403c526b2adaf48b8f8176bbb2",
+          "size_bytes": 1527091
+        },
+        "CADJPY/tick/2011/DAT_ASCII_CADJPY_T_201103.zip": {
+          "rows": 501803,
+          "sha256": "a3cd2272441540ce8d380281288026060bdfe7d9921032bb7f763c910944ed8f",
+          "size_bytes": 1893490
+        },
+        "CADJPY/tick/2011/DAT_ASCII_CADJPY_T_201104.zip": {
+          "rows": 427476,
+          "sha256": "b779fcb300762e73a6fb88d18b1394a69618ef5f2337d69a55c55f41a9605451",
+          "size_bytes": 1790336
+        },
+        "CADJPY/tick/2011/DAT_ASCII_CADJPY_T_201105.zip": {
+          "rows": 484153,
+          "sha256": "282c2aa01cb9d6c09c946a13e5bf9627725fa41f463b675af8c47cdaa65ec4cb",
+          "size_bytes": 2598028
+        },
+        "CADJPY/tick/2011/DAT_ASCII_CADJPY_T_201106.zip": {
+          "rows": 478790,
+          "sha256": "1d441e81c59bc154ea788e70daafa190f6953acb8b630fcf2f351767be65d5ce",
+          "size_bytes": 2495711
+        },
+        "CADJPY/tick/2011/DAT_ASCII_CADJPY_T_201107.zip": {
+          "rows": 428462,
+          "sha256": "644e324e9aab5b6a67fc720e92b0299a639b4555ebe011e76aee837d9c55114a",
+          "size_bytes": 2288228
+        },
+        "CADJPY/tick/2011/DAT_ASCII_CADJPY_T_201108.zip": {
+          "rows": 555737,
+          "sha256": "6edfb37e6f7502bb41d2f3a85782f55f4dfdd7ed61a44edac9d50542a8ba99f4",
+          "size_bytes": 2944924
+        },
+        "CADJPY/tick/2011/DAT_ASCII_CADJPY_T_201109.zip": {
+          "rows": 374613,
+          "sha256": "4e1a3c0be7b889c142b39f0ad5d6176f77659a984e46f4bf1c1fbc64479cbd47",
+          "size_bytes": 2027569
+        },
+        "CADJPY/tick/2011/DAT_ASCII_CADJPY_T_201110.zip": {
+          "rows": 369424,
+          "sha256": "81730beff68eb17e438a8a66cef27698f68d6e5d2b3855a28845febd12dc2826",
+          "size_bytes": 2018697
+        },
+        "CADJPY/tick/2011/DAT_ASCII_CADJPY_T_201111.zip": {
+          "rows": 372183,
+          "sha256": "72b4090f83dd70524f1d22ab8552b53f5a2d098bd61f507f5c81f8a6dae4e3f2",
+          "size_bytes": 2004517
+        },
+        "CADJPY/tick/2011/DAT_ASCII_CADJPY_T_201112.zip": {
+          "rows": 741787,
+          "sha256": "e42bb4608c969ee1220507efeb206192ae4289df5f9404e7b3587d530d3f981b",
+          "size_bytes": 4206940
+        },
+        "CADJPY/tick/2012/DAT_ASCII_CADJPY_T_201201.zip": {
+          "rows": 850353,
+          "sha256": "643676a8d388216a1d54d898caaaca4c80d457b4cdde8b8bba12014f43bda7ae",
+          "size_bytes": 4781642
+        },
+        "CADJPY/tick/2012/DAT_ASCII_CADJPY_T_201202.zip": {
+          "rows": 1161373,
+          "sha256": "77f5952413a455b911a4a01cbe8e6b25844a0b19654fe106e0cdb362d220a68d",
+          "size_bytes": 6363281
+        },
+        "CADJPY/tick/2012/DAT_ASCII_CADJPY_T_201203.zip": {
+          "rows": 1249966,
+          "sha256": "8eaa9b046ee19b1f89cc719f9b7dc37c237a677ed5ed97cbbe6a944be4179b86",
+          "size_bytes": 7056920
+        },
+        "CADJPY/tick/2012/DAT_ASCII_CADJPY_T_201204.zip": {
+          "rows": 1176497,
+          "sha256": "30ee0e90225573097600f00fbf2048b0021c892928039df3200cd9947175f032",
+          "size_bytes": 6586530
+        },
+        "CADJPY/tick/2012/DAT_ASCII_CADJPY_T_201205.zip": {
+          "rows": 1349386,
+          "sha256": "f4220c5ea3fdcd30da53d36f8ac35d85509949be4da200be5c2d1a79327fcc32",
+          "size_bytes": 7437480
+        },
+        "CADJPY/tick/2012/DAT_ASCII_CADJPY_T_201206.zip": {
+          "rows": 1306827,
+          "sha256": "6419e90733f5b6e78fd15369708bfa81ebf3ca896a0c0d2d65892cc1bfb35b70",
+          "size_bytes": 7219040
+        },
+        "CADJPY/tick/2012/DAT_ASCII_CADJPY_T_201207.zip": {
+          "rows": 995799,
+          "sha256": "32d64512f41836da46b8b7f2c716f9bf6a24be1cecee4420ddae15d62f69ca33",
+          "size_bytes": 5509839
+        },
+        "CADJPY/tick/2012/DAT_ASCII_CADJPY_T_201208.zip": {
+          "rows": 641359,
+          "sha256": "81a163c9931a7c128529152b09660bf9b4932af84bc3ed909bad4f030721a419",
+          "size_bytes": 3686463
+        },
+        "CADJPY/tick/2012/DAT_ASCII_CADJPY_T_201209.zip": {
+          "rows": 590416,
+          "sha256": "1feea50fe51123f65e1ca8eb8a0c20f15e130e3ee3c8e2d534be76e923cb9839",
+          "size_bytes": 3463075
+        },
+        "CADJPY/tick/2012/DAT_ASCII_CADJPY_T_201210.zip": {
+          "rows": 676170,
+          "sha256": "a758d813bbd69a96644d9e5ad64f08b1380e91ae3cb6bb395b113d806c684305",
+          "size_bytes": 3952974
+        },
+        "CADJPY/tick/2012/DAT_ASCII_CADJPY_T_201211.zip": {
+          "rows": 748447,
+          "sha256": "7621fd284a1ffc0dd1b540038d98a912872d92c0302b4b6b2eb3491a65973dbf",
+          "size_bytes": 4352309
+        },
+        "CADJPY/tick/2012/DAT_ASCII_CADJPY_T_201212.zip": {
+          "rows": 629945,
+          "sha256": "e85ccb077f5a8d093a6db68a96d88118f161231aab32b225205c8f95d1427edf",
+          "size_bytes": 3683390
+        },
+        "CADJPY/tick/2013/DAT_ASCII_CADJPY_T_201301.zip": {
+          "rows": 1112476,
+          "sha256": "ec2a08605c0403bbcf0c78637463efdcdff5a6af5ef0b72b94b8c957b549d73a",
+          "size_bytes": 6564293
+        },
+        "CADJPY/tick/2013/DAT_ASCII_CADJPY_T_201302.zip": {
+          "rows": 1021759,
+          "sha256": "7434920c04bb7b05d0c5f740edda84d74e24ac4fa434cb04c6d15da831810a81",
+          "size_bytes": 6153292
+        },
+        "CADJPY/tick/2013/DAT_ASCII_CADJPY_T_201303.zip": {
+          "rows": 983906,
+          "sha256": "042dc707f22c3ea24098171df2d2bb57e44aae8774c480996b933bfbd19ca7b7",
+          "size_bytes": 5812421
+        },
+        "CADJPY/tick/2013/DAT_ASCII_CADJPY_T_201304.zip": {
+          "rows": 1182919,
+          "sha256": "723d012d242acdef56a06044e7ee5286181f36a71cdef85f38868f6fabb14392",
+          "size_bytes": 7171227
+        },
+        "CADJPY/tick/2013/DAT_ASCII_CADJPY_T_201305.zip": {
+          "rows": 1257354,
+          "sha256": "64b3a1f85408c603c10e176284e366fe280b6a6869cb38508488573b7862fae7",
+          "size_bytes": 7510856
+        },
+        "CADJPY/tick/2013/DAT_ASCII_CADJPY_T_201306.zip": {
+          "rows": 1482114,
+          "sha256": "c08ebf9b7070ece943177e0d96e09998d22d3c5fefdf506e5ef7e2a3fea823ef",
+          "size_bytes": 9014026
+        },
+        "CADJPY/tick/2013/DAT_ASCII_CADJPY_T_201307.zip": {
+          "rows": 1185434,
+          "sha256": "c87e5bd6bf5729d35df3ee61687c4bd753e85c749bb300671f942a9dfd509031",
+          "size_bytes": 7044709
+        },
+        "CADJPY/tick/2013/DAT_ASCII_CADJPY_T_201308.zip": {
+          "rows": 1058706,
+          "sha256": "0612d31e0f202f878a68407fab19ce0c371384a62dda8097b1e0589504af7451",
+          "size_bytes": 6264334
+        },
+        "CADJPY/tick/2013/DAT_ASCII_CADJPY_T_201309.zip": {
+          "rows": 874911,
+          "sha256": "94b9343872900a81ae382f7f93458fe4cadfc3bced1c5ad7d619a297c378a9db",
+          "size_bytes": 5170353
+        },
+        "CADJPY/tick/2013/DAT_ASCII_CADJPY_T_201310.zip": {
+          "rows": 819727,
+          "sha256": "874e8610369842e3834e3976639c42eb62fa984d8fbc997f9680855cb9fd46ff",
+          "size_bytes": 4832943
+        },
+        "CADJPY/tick/2013/DAT_ASCII_CADJPY_T_201311.zip": {
+          "rows": 752381,
+          "sha256": "36d1c903a263f75c9ee99d3af9ecf0efdc70a774e191ecb7488d171c196c0ee8",
+          "size_bytes": 4402811
+        },
+        "CADJPY/tick/2013/DAT_ASCII_CADJPY_T_201312.zip": {
+          "rows": 788912,
+          "sha256": "6d2d8242e33a97ab0a5b1f62c6913a6710bf14307c8d7c9d82356935d1ccddeb",
+          "size_bytes": 4612485
+        },
+        "CADJPY/tick/2014/DAT_ASCII_CADJPY_T_201401.zip": {
+          "rows": 1034484,
+          "sha256": "85daefb76a79729aac200698f48695783b1b54dda9ea5f2342f8aa79a1e683d9",
+          "size_bytes": 6085749
+        },
+        "CADJPY/tick/2014/DAT_ASCII_CADJPY_T_201402.zip": {
+          "rows": 863726,
+          "sha256": "94e09aad42e924a0772f2eec69214faba51e84edb52082d48c2c5a0f9233f00f",
+          "size_bytes": 5087554
+        },
+        "CADJPY/tick/2014/DAT_ASCII_CADJPY_T_201403.zip": {
+          "rows": 889136,
+          "sha256": "9fd7282c4967846aadbae69b88abd984905210182a0d38945bea231d9fba30d4",
+          "size_bytes": 5129296
+        },
+        "CADJPY/tick/2014/DAT_ASCII_CADJPY_T_201404.zip": {
+          "rows": 809051,
+          "sha256": "cbfc57c9b57a8c34d7919d63054afb32022fc671d7098b50d44e7db69396ac96",
+          "size_bytes": 4602614
+        },
+        "CADJPY/tick/2014/DAT_ASCII_CADJPY_T_201405.zip": {
+          "rows": 761438,
+          "sha256": "922ffe023ee7f5f6beeb26bbf365deeefadecbdcf0876c8321efe824fe3977a7",
+          "size_bytes": 4249240
+        },
+        "CADJPY/tick/2014/DAT_ASCII_CADJPY_T_201406.zip": {
+          "rows": 638904,
+          "sha256": "ebe627bbc10570e2d055c44f5403b324db405dd8af3a8b8bbd04774fe7ffdd38",
+          "size_bytes": 3534821
+        },
+        "CADJPY/tick/2014/DAT_ASCII_CADJPY_T_201407.zip": {
+          "rows": 637845,
+          "sha256": "06c4b40089053dfc26ed85cbe66a1cf4b8f1b63d3f586f4e3fcdef95076f99c1",
+          "size_bytes": 3464474
+        },
+        "CADJPY/tick/2014/DAT_ASCII_CADJPY_T_201408.zip": {
+          "rows": 736408,
+          "sha256": "8bbab22cf89fb57efa81a25c967829fb6d8d5db4d95a0d588d72a32a70d32a58",
+          "size_bytes": 3556037
+        },
+        "CADJPY/tick/2014/DAT_ASCII_CADJPY_T_201409.zip": {
+          "rows": 1153666,
+          "sha256": "f2beb7e2fa5b090480c683fd026c3771bdae136de51ac3d83b04c0b1190660e5",
+          "size_bytes": 5520484
+        },
+        "CADJPY/tick/2014/DAT_ASCII_CADJPY_T_201410.zip": {
+          "rows": 1554016,
+          "sha256": "729dcedd5930065a97e820b5f34d60669349d6bc055e1f38b5b40618c8a362f8",
+          "size_bytes": 8798571
+        },
+        "CADJPY/tick/2014/DAT_ASCII_CADJPY_T_201411.zip": {
+          "rows": 1899468,
+          "sha256": "e371c288a6f569f989ed448e9f905c3a357e9ba59e10d6f436cb6e0bf6906eac",
+          "size_bytes": 10108802
+        },
+        "CADJPY/tick/2014/DAT_ASCII_CADJPY_T_201412.zip": {
+          "rows": 1940088,
+          "sha256": "33c997d4fe63cd40b6f3ce8e264dfa69683c13f3399a9260602b57b86b062e04",
+          "size_bytes": 10403399
+        },
+        "CADJPY/tick/2015/DAT_ASCII_CADJPY_T_201501.zip": {
+          "rows": 2084454,
+          "sha256": "bba7771f7d8d1fe20751748ff7f77f7fc70d49539e8607e74973a40b265e4523",
+          "size_bytes": 11450497
+        },
+        "CADJPY/tick/2015/DAT_ASCII_CADJPY_T_201502.zip": {
+          "rows": 1380676,
+          "sha256": "7e257619e7d6c64aee7208c8e7164b7d737320e5e9fe6fc5c468fd3498e19dfb",
+          "size_bytes": 7793947
+        },
+        "CADJPY/tick/2015/DAT_ASCII_CADJPY_T_201503.zip": {
+          "rows": 1432477,
+          "sha256": "8e8ae2da77a3e39dffd8907f9fb88256717b03405748cab1c4b1334a69afbbc1",
+          "size_bytes": 8042409
+        },
+        "CADJPY/tick/2015/DAT_ASCII_CADJPY_T_201504.zip": {
+          "rows": 1578086,
+          "sha256": "4d5963fc41f5f1f5679ae4903cf95e1feb68f64c8e5f7d53fd00fa1199ce3b40",
+          "size_bytes": 8563834
+        },
+        "CADJPY/tick/2015/DAT_ASCII_CADJPY_T_201505.zip": {
+          "rows": 1632212,
+          "sha256": "f544c51427182f3050d627a6f98cc3ee2acf993d3609e1856a09d69eefd2907d",
+          "size_bytes": 8593254
+        },
+        "CADJPY/tick/2015/DAT_ASCII_CADJPY_T_201506.zip": {
+          "rows": 2005608,
+          "sha256": "8242838684368de02e4b57bd46a295d3a21e87a35291eea3b1c27a22ba200034",
+          "size_bytes": 10268949
+        },
+        "CADJPY/tick/2015/DAT_ASCII_CADJPY_T_201507.zip": {
+          "rows": 2111025,
+          "sha256": "678370d1365f946fc17313eee6074d628280ff3fcca57d452c2163c8f7a6b847",
+          "size_bytes": 10693191
+        },
+        "CADJPY/tick/2015/DAT_ASCII_CADJPY_T_201508.zip": {
+          "rows": 2009212,
+          "sha256": "fc5bbb987cd2d61957c6f7de9596e39b11233a214242c35106793ce79d8a1535",
+          "size_bytes": 10555195
+        },
+        "CADJPY/tick/2015/DAT_ASCII_CADJPY_T_201509.zip": {
+          "rows": 2362830,
+          "sha256": "9c33e1cb89a8fae6eecd44cb22eedb3064f6b0cc701b89d5071c817aebef3a45",
+          "size_bytes": 12481414
+        },
+        "CADJPY/tick/2015/DAT_ASCII_CADJPY_T_201510.zip": {
+          "rows": 1999721,
+          "sha256": "dc31f2a1e4e913ffa61615c6a713242cda6635e23b6df2f480437c547f8f7236",
+          "size_bytes": 10237530
+        },
+        "CADJPY/tick/2015/DAT_ASCII_CADJPY_T_201511.zip": {
+          "rows": 1857771,
+          "sha256": "709ed5a9b41142a7e3700be050d57097fdf504e400f5fb0950d3879d5deca0c2",
+          "size_bytes": 9198085
+        },
+        "CADJPY/tick/2015/DAT_ASCII_CADJPY_T_201512.zip": {
+          "rows": 1985262,
+          "sha256": "3501797bdd5f77e8b82ec8400c655dd1d473f9e12510ff926dd86d9c6a317cdb",
+          "size_bytes": 10041449
+        },
+        "CADJPY/tick/2016/DAT_ASCII_CADJPY_T_201601.zip": {
+          "rows": 2462516,
+          "sha256": "62ac62e7dcab65933ea922ffd8f5e12e26501689110ec9f65e9baf12be61781c",
+          "size_bytes": 13391372
+        },
+        "CADJPY/tick/2016/DAT_ASCII_CADJPY_T_201602.zip": {
+          "rows": 2329147,
+          "sha256": "9dc6f1788ae5efb89d9f9e57291d18cce68d4b83406181d06a78a645ab65b714",
+          "size_bytes": 12893720
+        },
+        "CADJPY/tick/2016/DAT_ASCII_CADJPY_T_201603.zip": {
+          "rows": 1743895,
+          "sha256": "fe329de5af0567f0737593264f73903372c8666921aca57010e6cfde66746450",
+          "size_bytes": 9545318
+        },
+        "CADJPY/tick/2016/DAT_ASCII_CADJPY_T_201604.zip": {
+          "rows": 1662530,
+          "sha256": "1ee084390a5c6635170945886f65673dfd2f75fe09f9b13ff4b40dfaa31fab27",
+          "size_bytes": 9258866
+        },
+        "CADJPY/tick/2016/DAT_ASCII_CADJPY_T_201605.zip": {
+          "rows": 1485591,
+          "sha256": "ce5b05164388d02bd6edbabcef4f7abf05dd67d363931aeab68112dc13ba62ed",
+          "size_bytes": 8248858
+        },
+        "CADJPY/tick/2016/DAT_ASCII_CADJPY_T_201606.zip": {
+          "rows": 1722233,
+          "sha256": "d2469ed4bd8c1853a493c3cec43db2de99016bb393785c722ea0257e3b469902",
+          "size_bytes": 9750296
+        },
+        "CADJPY/tick/2016/DAT_ASCII_CADJPY_T_201607.zip": {
+          "rows": 1353425,
+          "sha256": "f02d4f84a8223e3980c8e93ed41d19080f695724f4806488e3ff888e8fb00500",
+          "size_bytes": 7695949
+        },
+        "CADJPY/tick/2016/DAT_ASCII_CADJPY_T_201608.zip": {
+          "rows": 1097940,
+          "sha256": "c20fa59b260b447e5d61771fe532ce82271d3cd82df39428daadd68b895033e7",
+          "size_bytes": 5961881
+        },
+        "CADJPY/tick/2016/DAT_ASCII_CADJPY_T_201609.zip": {
+          "rows": 1316930,
+          "sha256": "71a2f0179e3d85bc36774750706cdf99f651e4a452eaa707a77c0d9fe7e171bb",
+          "size_bytes": 7153452
+        },
+        "CADJPY/tick/2016/DAT_ASCII_CADJPY_T_201610.zip": {
+          "rows": 1065777,
+          "sha256": "24f9a304eefd66d94b433452f7e8a0c0c2ee4e67ccb776112b1314d6fe41c1be",
+          "size_bytes": 5774684
+        },
+        "CADJPY/tick/2016/DAT_ASCII_CADJPY_T_201611.zip": {
+          "rows": 1670584,
+          "sha256": "3a5931153ed3c48b8078db324f5221c13feeff64d2f2f371d01321a5767d35f3",
+          "size_bytes": 9214409
+        },
+        "CADJPY/tick/2016/DAT_ASCII_CADJPY_T_201612.zip": {
+          "rows": 1348350,
+          "sha256": "8a5ac7da430fcbea1b3e3f895e07e8e2bdb0612c51239d1fd67d298e6c397701",
+          "size_bytes": 7304751
+        },
+        "CADJPY/tick/2017/DAT_ASCII_CADJPY_T_201701.zip": {
+          "rows": 1904724,
+          "sha256": "2bb61480071d487143e26d8a90a11f0835c3e2f2c4c2a6f3229b4de062b864c2",
+          "size_bytes": 10111794
+        },
+        "CADJPY/tick/2017/DAT_ASCII_CADJPY_T_201702.zip": {
+          "rows": 1386367,
+          "sha256": "0cc2f118823cb5a63dfe222585b56c41d7517c39a0b47aebad5618bf96b28159",
+          "size_bytes": 7313935
+        },
+        "CADJPY/tick/2017/DAT_ASCII_CADJPY_T_201703.zip": {
+          "rows": 1624197,
+          "sha256": "55ca64147cb0c03e69c6d0315786ffbc28617a9e6a63e9de533fac209813ba99",
+          "size_bytes": 8479320
+        },
+        "CADJPY/tick/2017/DAT_ASCII_CADJPY_T_201704.zip": {
+          "rows": 1228414,
+          "sha256": "64a5c37d6f668d7298d4e0f47835d913961734ccb2a1feba7f84296ce7f460d1",
+          "size_bytes": 6508903
+        },
+        "CADJPY/tick/2017/DAT_ASCII_CADJPY_T_201705.zip": {
+          "rows": 1403225,
+          "sha256": "1088076493fd127a412227349922d4a1bae9637dc653a089f4c7b3fbf39347fb",
+          "size_bytes": 7400643
+        },
+        "CADJPY/tick/2017/DAT_ASCII_CADJPY_T_201706.zip": {
+          "rows": 1326823,
+          "sha256": "178c517b2b0120071b7fdb3ab56db8bb83897f04bf493cf1d4ebeba651b089a5",
+          "size_bytes": 6852725
+        },
+        "CADJPY/tick/2017/DAT_ASCII_CADJPY_T_201707.zip": {
+          "rows": 1419481,
+          "sha256": "17843c581acbeac985aaa5f620b2355bbb322168f34b822c4073b912079f7881",
+          "size_bytes": 7396714
+        },
+        "CADJPY/tick/2017/DAT_ASCII_CADJPY_T_201708.zip": {
+          "rows": 1171433,
+          "sha256": "2bfd392f79fb1145def57ee103ee81242606c66db5316a4436dd7fb2ef40fd72",
+          "size_bytes": 6238407
+        },
+        "CADJPY/tick/2017/DAT_ASCII_CADJPY_T_201709.zip": {
+          "rows": 1260971,
+          "sha256": "b6cd4da1ac338acceb490ed798938a800626a5d7e336f0e38c2903e57e3ed211",
+          "size_bytes": 6865558
+        },
+        "CADJPY/tick/2017/DAT_ASCII_CADJPY_T_201710.zip": {
+          "rows": 1129904,
+          "sha256": "a4d16d4433d943b94a7adb7074956aec612ba9f535902d75b7f05de0e65e49c7",
+          "size_bytes": 6006474
+        },
+        "CADJPY/tick/2017/DAT_ASCII_CADJPY_T_201711.zip": {
+          "rows": 1124357,
+          "sha256": "a94d0486e16f409fee0921d95554393cd71d67ab690c884d70de9c76c22dd459",
+          "size_bytes": 5887113
+        },
+        "CADJPY/tick/2017/DAT_ASCII_CADJPY_T_201712.zip": {
+          "rows": 925946,
+          "sha256": "0aef44ae5474b2274f80efb18fe2ca5c69651790131f0bf1454e36f40031cf38",
+          "size_bytes": 4921304
+        },
+        "CADJPY/tick/2018/DAT_ASCII_CADJPY_T_201801.zip": {
+          "rows": 1323107,
+          "sha256": "18423621cabc9238d7b6b0a03c6d4b393392bcad64236f644c7ac0e43231d624",
+          "size_bytes": 7037759
+        },
+        "CADJPY/tick/2018/DAT_ASCII_CADJPY_T_201802.zip": {
+          "rows": 1537286,
+          "sha256": "cc793c1680d8233181fba6c9d0f01cd6aaa25e8e7de15ea2c3a80f85093e835c",
+          "size_bytes": 8232459
+        },
+        "CADJPY/tick/2018/DAT_ASCII_CADJPY_T_201803.zip": {
+          "rows": 1483539,
+          "sha256": "18b7e3e0581b259c3ea476100a26253585b0e392673e21a24160913f35a8824b",
+          "size_bytes": 7866144
+        },
+        "CADJPY/tick/2018/DAT_ASCII_CADJPY_T_201804.zip": {
+          "rows": 1213933,
+          "sha256": "a545ccb619afbb74cf8ec9ef0a8d777456d3780ff1d39b9cf4e22c482c543b1f",
+          "size_bytes": 6393523
+        },
+        "CADJPY/tick/2018/DAT_ASCII_CADJPY_T_201805.zip": {
+          "rows": 1482190,
+          "sha256": "5e39fec60e96bac0878e0cf60e3345eadbdf72eae5b25ec54367323b0cd4aa14",
+          "size_bytes": 8089584
+        },
+        "CADJPY/tick/2018/DAT_ASCII_CADJPY_T_201806.zip": {
+          "rows": 1228893,
+          "sha256": "1813979aa665fd8ebe72c68d3c51ca723cf3ddb52f3cc886644c9ac4fe9d86ff",
+          "size_bytes": 6582528
+        },
+        "CADJPY/tick/2018/DAT_ASCII_CADJPY_T_201807.zip": {
+          "rows": 1190030,
+          "sha256": "d2488016cf7470ee2c48b4db6fee283e78cd76ea9762414b05d526a1d9f2b1e2",
+          "size_bytes": 6261909
+        },
+        "CADJPY/tick/2018/DAT_ASCII_CADJPY_T_201808.zip": {
+          "rows": 1132885,
+          "sha256": "e2122e8fede550f60a30014a3bed73e238a6edc5b2ae2bb71564a14ecc811d77",
+          "size_bytes": 6062771
+        },
+        "CADJPY/tick/2018/DAT_ASCII_CADJPY_T_201809.zip": {
+          "rows": 1008203,
+          "sha256": "40a786344d0af7d123918c684bc5ce9cb3bfeb355f1f8dbf3c570698c52d9d21",
+          "size_bytes": 5371995
+        },
+        "CADJPY/tick/2018/DAT_ASCII_CADJPY_T_201810.zip": {
+          "rows": 1837817,
+          "sha256": "7054d97001c161a06288ecfd90daaf5e2dd95c30c8c2b0ddcd46afaf99e33725",
+          "size_bytes": 9381683
+        },
+        "CADJPY/tick/2018/DAT_ASCII_CADJPY_T_201811.zip": {
+          "rows": 1329747,
+          "sha256": "be8995fcd3d2b43e483f4ee62c583f2e9feeee92b6157b67b61cf6654eedd8ce",
+          "size_bytes": 6947487
+        },
+        "CADJPY/tick/2018/DAT_ASCII_CADJPY_T_201812.zip": {
+          "rows": 2077807,
+          "sha256": "fa6d7e18bf911c5571afbab0ac30ce2ebb6915741f32db6d03296e582286a957",
+          "size_bytes": 12005756
+        },
+        "CADJPY/tick/2019/DAT_ASCII_CADJPY_T_201901.zip": {
+          "rows": 2946386,
+          "sha256": "bf5b143d00a378d5ad9baa3a4340bdc1b76527050d6a2a8163bda504138a3185",
+          "size_bytes": 17877700
+        },
+        "CADJPY/tick/2019/DAT_ASCII_CADJPY_T_201902.zip": {
+          "rows": 1890199,
+          "sha256": "2efb4d6ea0437b497b6d959469f595576ae24c78db98337f29879436a8e04c0e",
+          "size_bytes": 11510201
+        },
+        "CADJPY/tick/2019/DAT_ASCII_CADJPY_T_201903.zip": {
+          "rows": 2124905,
+          "sha256": "e6a4e27de433e2cd01d03825952f6b5c7ecd51ee7c1dd94f4c7c66f1edb63080",
+          "size_bytes": 12940352
+        },
+        "CADJPY/tick/2019/DAT_ASCII_CADJPY_T_201904.zip": {
+          "rows": 1748336,
+          "sha256": "a0eb9f3b59aae02da980370571ec661fbdb04e92c383962cc0e3caab8fbbf510",
+          "size_bytes": 10624090
+        },
+        "CADJPY/tick/2019/DAT_ASCII_CADJPY_T_201905.zip": {
+          "rows": 2351613,
+          "sha256": "735ada6395b0bba38beb7f24aeaf4c95ff717eca6aeef8d0e222915dd1d73b44",
+          "size_bytes": 14318836
+        },
+        "CADJPY/tick/2019/DAT_ASCII_CADJPY_T_201906.zip": {
+          "rows": 2186644,
+          "sha256": "68605ee5020a4a6ccbf22a7d8a7186661ac3b9c8f68326a1c12c0d4d32fba2e7",
+          "size_bytes": 13229949
+        },
+        "CADJPY/tick/2019/DAT_ASCII_CADJPY_T_201907.zip": {
+          "rows": 1972506,
+          "sha256": "4095a3b1e4285e5b2f03037ca6b134c583d102e13354e58c7e1041ce5b7775ee",
+          "size_bytes": 11907500
+        },
+        "CADJPY/tick/2019/DAT_ASCII_CADJPY_T_201908.zip": {
+          "rows": 3338498,
+          "sha256": "f9ed8784c561b9a71567a0a8bab751daa1c12bb326ac8470e1c7097bfc2c8f68",
+          "size_bytes": 20099914
+        },
+        "CADJPY/tick/2019/DAT_ASCII_CADJPY_T_201909.zip": {
+          "rows": 2406248,
+          "sha256": "a4bb4272579ee03a107b712e3dfc05d2e881d9d269fd153bd81d7a4542a22946",
+          "size_bytes": 14311449
+        },
+        "CADJPY/tick/2019/DAT_ASCII_CADJPY_T_201910.zip": {
+          "rows": 2380913,
+          "sha256": "deba0667ee66b1ca778201642b91682467a5919d5493e4c304d7dae0ff945f43",
+          "size_bytes": 14186982
+        },
+        "CADJPY/tick/2019/DAT_ASCII_CADJPY_T_201911.zip": {
+          "rows": 1623588,
+          "sha256": "712b9373e841e225f4c0a5fda1cc5fcb551476c4b317ef2bc3e6165178db7ad4",
+          "size_bytes": 9714936
+        },
+        "CADJPY/tick/2019/DAT_ASCII_CADJPY_T_201912.zip": {
+          "rows": 1476085,
+          "sha256": "bb657ca8a2bd134e9b742773c3c389ae9a5c88f4b093d187e46d89ea95a239e6",
+          "size_bytes": 8892496
+        },
+        "CADJPY/tick/2020/DAT_ASCII_CADJPY_T_202001.zip": {
+          "rows": 1869267,
+          "sha256": "e00a5758f6de2abaa03a1a1b27757ee2c29c4a18e7c4fd0604026589f865bf0d",
+          "size_bytes": 11321876
+        },
+        "CADJPY/tick/2020/DAT_ASCII_CADJPY_T_202002.zip": {
+          "rows": 2282251,
+          "sha256": "53252c1b168da32932697bbc86ad1be13493fce218b3e81b693b5ae1230b6d0f",
+          "size_bytes": 13755044
+        },
+        "CADJPY/tick/2020/DAT_ASCII_CADJPY_T_202003.zip": {
+          "rows": 6998147,
+          "sha256": "24b30a492b896311412a0702be1c147d9b50a81509f1c732f032ff5e8680d788",
+          "size_bytes": 43211592
+        },
+        "CADJPY/tick/2020/DAT_ASCII_CADJPY_T_202004.zip": {
+          "rows": 4036949,
+          "sha256": "09d113e0c250eaa42e9d6d7ffbc92b52890aa4a1c1b27df9cddc3dcbf2d4836a",
+          "size_bytes": 24281442
+        },
+        "CADJPY/tick/2020/DAT_ASCII_CADJPY_T_202005.zip": {
+          "rows": 2708650,
+          "sha256": "ef9324a4e2ee2e3de3450090d37fdc4f644ada6ea5293129e38f2ff45557c1d3",
+          "size_bytes": 16112130
+        },
+        "CADJPY/tick/2020/DAT_ASCII_CADJPY_T_202006.zip": {
+          "rows": 3759466,
+          "sha256": "86004aca374714734ab53cb75fa1869f964ab573f5844364fb598d2b14807c7e",
+          "size_bytes": 22481376
+        },
+        "CADJPY/tick/2020/DAT_ASCII_CADJPY_T_202007.zip": {
+          "rows": 2674878,
+          "sha256": "535e82dab6df2d5102eeaea59a27a9c88d25e4d75675d8b26e886e7d41b22713",
+          "size_bytes": 15763641
+        },
+        "CADJPY/tick/2020/DAT_ASCII_CADJPY_T_202008.zip": {
+          "rows": 2625942,
+          "sha256": "244d7d13efcce8bd1c89089e98d8d7931eba61fd824472a9024849a6d88e212b",
+          "size_bytes": 15628850
+        },
+        "CADJPY/tick/2020/DAT_ASCII_CADJPY_T_202009.zip": {
+          "rows": 2364443,
+          "sha256": "fbc452e2facbfa609257be9688a4b19a7fe33d9c6a82c2d3a69e4126d7f044fe",
+          "size_bytes": 14366217
+        },
+        "CADJPY/tick/2020/DAT_ASCII_CADJPY_T_202010.zip": {
+          "rows": 1974488,
+          "sha256": "ba577be0764a59beab79e47e1034f17212b5842b4c14a381a21c388b8018af70",
+          "size_bytes": 11983910
+        },
+        "CADJPY/tick/2020/DAT_ASCII_CADJPY_T_202011.zip": {
+          "rows": 2155549,
+          "sha256": "cb555718ce5e546f55a60f000980fa5024449c4d6eb52fbef1585d513aa2aa21",
+          "size_bytes": 13206712
+        },
+        "CADJPY/tick/2020/DAT_ASCII_CADJPY_T_202012.zip": {
+          "rows": 2035186,
+          "sha256": "2acd77a223dcdd62ae9e87f035ac50cc0f33f0f24e09efd0b8fdb60fb8170738",
+          "size_bytes": 12385936
+        },
+        "CADJPY/tick/2021/DAT_ASCII_CADJPY_T_202101.zip": {
+          "rows": 2060011,
+          "sha256": "331a5c7618542be9e6c79bd9136787ac08d1605b22eac2a7736adb65d70db37c",
+          "size_bytes": 12559881
+        },
+        "CADJPY/tick/2021/DAT_ASCII_CADJPY_T_202102.zip": {
+          "rows": 1807615,
+          "sha256": "aa8665b11f3fbbd7d33c16029e69aadc1fcc2b0eec823d47804663ce727fc275",
+          "size_bytes": 11153975
+        },
+        "CADJPY/tick/2021/DAT_ASCII_CADJPY_T_202103.zip": {
+          "rows": 2304395,
+          "sha256": "fde52610efd508f3a81ca5bf6dbd88641c69454a3700b52f98c4da7c80f7b45b",
+          "size_bytes": 14246318
+        },
+        "CADJPY/tick/2021/DAT_ASCII_CADJPY_T_202104.zip": {
+          "rows": 1589280,
+          "sha256": "42886075e5c35543f7c57d2c8b3f0b22364d4e0421bc0406112db18eadf27005",
+          "size_bytes": 9959320
+        },
+        "CADJPY/tick/2021/DAT_ASCII_CADJPY_T_202105.zip": {
+          "rows": 1680422,
+          "sha256": "2d3630739385c83420c7081a28e6b80036b5a750007787b9776ed351323797b3",
+          "size_bytes": 10495557
+        },
+        "CADJPY/tick/2021/DAT_ASCII_CADJPY_T_202106.zip": {
+          "rows": 1572735,
+          "sha256": "e23676301157c72d342d8b72d40e03275c2df5703fed7892c8a96c024c335885",
+          "size_bytes": 9770733
+        },
+        "CADJPY/tick/2021/DAT_ASCII_CADJPY_T_202107.zip": {
+          "rows": 1878896,
+          "sha256": "91cebc89de6ad340edccecf251921406f425dce2f6f2c8617f7fac3a0b4dd9ed",
+          "size_bytes": 11788742
+        },
+        "CADJPY/tick/2021/DAT_ASCII_CADJPY_T_202108.zip": {
+          "rows": 1622245,
+          "sha256": "d189a59182e4e3fa8dab13e8dc3bd5fcdd21ed691becbb824d9d005ba779cb74",
+          "size_bytes": 10142859
+        },
+        "CADJPY/tick/2021/DAT_ASCII_CADJPY_T_202109.zip": {
+          "rows": 1885560,
+          "sha256": "5e5ba362012a82787f1e420ea240347c24002291db7611d0b3fda90ab6efe86d",
+          "size_bytes": 11814894
+        },
+        "CADJPY/tick/2021/DAT_ASCII_CADJPY_T_202110.zip": {
+          "rows": 2087935,
+          "sha256": "5325da5b5a015c409a7e392afe2c06f7976b95a0c3c5238d098434fb5f67ceea",
+          "size_bytes": 13035148
+        },
+        "CADJPY/tick/2021/DAT_ASCII_CADJPY_T_202111.zip": {
+          "rows": 2376882,
+          "sha256": "54c90fdf0d8102ce4f2d9aa2f4f1bf23e730ad892ee984eb1d1d50e191686a7f",
+          "size_bytes": 14757868
+        },
+        "CADJPY/tick/2021/DAT_ASCII_CADJPY_T_202112.zip": {
+          "rows": 2280208,
+          "sha256": "346acf6722675addfc3011a3ee86f52bad891e0b055a570a3519f6319fc5c2db",
+          "size_bytes": 14018036
+        },
+        "CADJPY/tick/2022/DAT_ASCII_CADJPY_T_202201.zip": {
+          "rows": 2371861,
+          "sha256": "c1905c0d3f322e9b332bdd66408bb2c171853c1daa7a57ae13bc645be18413f5",
+          "size_bytes": 14824842
+        },
+        "CADJPY/tick/2022/DAT_ASCII_CADJPY_T_202202.zip": {
+          "rows": 2435616,
+          "sha256": "fb967701521e405c341cad523554c2190689c268f5b6a4d31ece3e66425fab8c",
+          "size_bytes": 15152584
+        },
+        "CADJPY/tick/2022/DAT_ASCII_CADJPY_T_202203.zip": {
+          "rows": 3034650,
+          "sha256": "af7e36973923a91b28ce9e334923808e5ebca5dac00344ccbdfcbfd9956132e3",
+          "size_bytes": 19038612
+        },
+        "CADJPY/tick/2022/DAT_ASCII_CADJPY_T_202204.zip": {
+          "rows": 2986938,
+          "sha256": "52397d022d56cd72eea5ed7d4d1460952f10ce1623c955a775fcd74bad001422",
+          "size_bytes": 18645684
+        },
+        "CADJPY/tick/2022/DAT_ASCII_CADJPY_T_202205.zip": {
+          "rows": 3580295,
+          "sha256": "10b6d83fdf169830a031b47bd3c02f918a26aa8a9e683b311e35cdcac59c2374",
+          "size_bytes": 22339916
+        },
+        "CADJPY/tick/2022/DAT_ASCII_CADJPY_T_202206.zip": {
+          "rows": 3935684,
+          "sha256": "580264d5e07ba6f8de95698a2e76224d63acc2d30a06e472cc220433773d1c7b",
+          "size_bytes": 24320172
+        },
+        "CADJPY/tick/2022/DAT_ASCII_CADJPY_T_202207.zip": {
+          "rows": 3672087,
+          "sha256": "a31dd5aca9b0b40549f96a8c18face86128463d3f729f81cee54552b6ad339d7",
+          "size_bytes": 22649930
+        },
+        "CADJPY/tick/2022/DAT_ASCII_CADJPY_T_202208.zip": {
+          "rows": 3554783,
+          "sha256": "f4d7e298b36406b0537dff17b816c1965400a2d9c375ed3fbdc1059bc522e2ec",
+          "size_bytes": 21803907
+        },
+        "CADJPY/tick/2022/DAT_ASCII_CADJPY_T_202209.zip": {
+          "rows": 3978637,
+          "sha256": "b0b34fc54bcb8e71f9193d5782d9310381c1fd01a9becc29d8607730e7a4e989",
+          "size_bytes": 24207412
+        },
+        "CADJPY/tick/2022/DAT_ASCII_CADJPY_T_202210.zip": {
+          "rows": 3688491,
+          "sha256": "3be98d89b39b0ff09fcc008d3202e1fed808779f13a0355ccb89fa4889280ae8",
+          "size_bytes": 22164981
+        },
+        "CADJPY/tick/2022/DAT_ASCII_CADJPY_T_202211.zip": {
+          "rows": 3572444,
+          "sha256": "e515dafabe61110ca6ab819163feef5a3801355f7fa4aa3b8bab04e66281efd2",
+          "size_bytes": 21249688
+        },
+        "CADJPY/tick/2022/DAT_ASCII_CADJPY_T_202212.zip": {
+          "rows": 3446689,
+          "sha256": "04bb0839fd2c18fbb9aedcbf148636e9ef42ceaef6d0bab8c011107a30147384",
+          "size_bytes": 21343756
+        },
+        "CADJPY/tick/2023/DAT_ASCII_CADJPY_T_202301.zip": {
+          "rows": 3759188,
+          "sha256": "b6c1ff4125c0a269815c3d9b43f021264046e8d7417c444db481ac4fe03dc38e",
+          "size_bytes": 23754149
+        },
+        "CADJPY/tick/2023/DAT_ASCII_CADJPY_T_202302.zip": {
+          "rows": 2803749,
+          "sha256": "91bb350caa8134913d0320c2eeee645f4969e653e2a5443d22bbcdd907f0566c",
+          "size_bytes": 17531279
+        },
+        "CADJPY/tick/2023/DAT_ASCII_CADJPY_T_202303.zip": {
+          "rows": 2730891,
+          "sha256": "761ee2a20078a9638015258157c9a2f328022f098f34d144bd144c0436857b22",
+          "size_bytes": 17534985
+        },
+        "CADJPY/tick/2023/DAT_ASCII_CADJPY_T_202304.zip": {
+          "rows": 1531224,
+          "sha256": "ee7db67cff0ef0c6be5877ba416ff3eef3da67bc426b975abb175d31248e7bcf",
+          "size_bytes": 9905698
+        },
+        "CADJPY/tick/2023/DAT_ASCII_CADJPY_T_202305.zip": {
+          "rows": 1578280,
+          "sha256": "489aac4f045f7b90773833143d4d9ab68f45fbdce5f68dd43ad7032f89acabc2",
+          "size_bytes": 10338241
+        },
+        "CADJPY/tick/2023/DAT_ASCII_CADJPY_T_202306.zip": {
+          "rows": 1452538,
+          "sha256": "2d96cbdb1e73508dbf34d7524f5ae4f531916f1eb071ff5a2179c942536a5339",
+          "size_bytes": 9526443
+        },
+        "CADJPY/tick/2023/DAT_ASCII_CADJPY_T_202307.zip": {
+          "rows": 1685023,
+          "sha256": "6a120cf4057746bff3ff80a2a1651e035e5510b4e2836db957852fda2b97858c",
+          "size_bytes": 11077837
+        },
+        "CADJPY/tick/2023/DAT_ASCII_CADJPY_T_202308.zip": {
+          "rows": 2285125,
+          "sha256": "b87c41232fd0376429cfda17f17f2519642d7f8e099840a41183c8c7008b654f",
+          "size_bytes": 14804699
+        },
+        "CADJPY/tick/2023/DAT_ASCII_CADJPY_T_202309.zip": {
+          "rows": 1781986,
+          "sha256": "2a8c786a30aeef1968dc2d5b666e6df87cf9bc44911435ab51a1c669dcb8925a",
+          "size_bytes": 11541111
+        },
+        "CADJPY/tick/2023/DAT_ASCII_CADJPY_T_202310.zip": {
+          "rows": 2048881,
+          "sha256": "d4d0844f3516f5f39ae9e40b68e8d26f8179e4ab836d05845166f0422b95f253",
+          "size_bytes": 13160139
+        },
+        "CADJPY/tick/2023/DAT_ASCII_CADJPY_T_202311.zip": {
+          "rows": 1888833,
+          "sha256": "6dc27ac3d36b709ac450fe897bc8a04e36f00af41b99a2538c19fe314580ccc7",
+          "size_bytes": 12191409
+        },
+        "CADJPY/tick/2023/DAT_ASCII_CADJPY_T_202312.zip": {
+          "rows": 2353708,
+          "sha256": "6cdbd613faf7d542b2395b93440e2418a0522b0c36e0c279d91a2988296ea1dd",
+          "size_bytes": 15298086
+        },
+        "CADJPY/tick/2024/DAT_ASCII_CADJPY_T_202401.zip": {
+          "rows": 2321463,
+          "sha256": "6bcc980a6333dde8dc05a1452398a936ba265e60ad88d0d0aa4fba19f6fd4b73",
+          "size_bytes": 15071754
+        },
+        "CADJPY/tick/2024/DAT_ASCII_CADJPY_T_202402.zip": {
+          "rows": 1835906,
+          "sha256": "323c24a777d67d529943e7e6cd8ff55f21abd89ac3bf4e12ade6ebc38cb3e8d6",
+          "size_bytes": 11721953
+        },
+        "CADJPY/tick/2024/DAT_ASCII_CADJPY_T_202403.zip": {
+          "rows": 1636391,
+          "sha256": "85b8f67e92cbf3f6cba4dd51103f93bef79124d54aea162d059bbe8f4840c67e",
+          "size_bytes": 10609225
+        },
+        "CADJPY/tick/2024/DAT_ASCII_CADJPY_T_202404.zip": {
+          "rows": 1575150,
+          "sha256": "a7726cb459265c9798b470859fd5adbd09167ffc7657834bd45f49e6c326a6c4",
+          "size_bytes": 10421499
+        },
+        "CADJPY/tick/2024/DAT_ASCII_CADJPY_T_202405.zip": {
+          "rows": 1384916,
+          "sha256": "3756a14f47e2d327623bb1426f7bd07e877d79ef7e15723a653ba996559760bc",
+          "size_bytes": 9246673
+        },
+        "CADJPY/tick/2024/DAT_ASCII_CADJPY_T_202406.zip": {
+          "rows": 1304668,
+          "sha256": "5140267d9efc1465ad9d5a6f77e507de5aec3a216392414e2c3537b3eac6cea6",
+          "size_bytes": 8698948
+        },
+        "CADJPY/tick/2024/DAT_ASCII_CADJPY_T_202407.zip": {
+          "rows": 2020269,
+          "sha256": "fc08f6e6f731e0bbfc49ff2c95ddca9663e84029cc37c89484cede4b58e9d683",
+          "size_bytes": 13575772
+        },
+        "CADJPY/tick/2024/DAT_ASCII_CADJPY_T_202408.zip": {
+          "rows": 3124295,
+          "sha256": "73494b85ff86fc5a0e7f0b55346f1a070dd09492203c03a37dd218b503610300",
+          "size_bytes": 20912844
+        },
+        "CADJPY/tick/2024/DAT_ASCII_CADJPY_T_202409.zip": {
+          "rows": 2832839,
+          "sha256": "b94c7d93e4309db8cca12d84cd87c1fdd1b92cbb5bd7097b2d0e6373d8fd5072",
+          "size_bytes": 18622145
+        },
+        "CADJPY/tick/2024/DAT_ASCII_CADJPY_T_202410.zip": {
+          "rows": 2279454,
+          "sha256": "fd4a7407afd9899f66a47588b6d71559f5811d48054e5c385c3718496e417f95",
+          "size_bytes": 14871025
+        },
+        "CADJPY/tick/2024/DAT_ASCII_CADJPY_T_202411.zip": {
+          "rows": 2712606,
+          "sha256": "f2b22b9914e6df351cfd2bc4dca5e1f1ff99bd0fa71fa6391ed61ddf7eb88c48",
+          "size_bytes": 17321356
+        },
+        "CADJPY/tick/2024/DAT_ASCII_CADJPY_T_202412.zip": {
+          "rows": 2229681,
+          "sha256": "8b2de714265c50f30d1eb2bfdcec27b9b7282098b6aae0d870bc25aee5a072f5",
+          "size_bytes": 14329302
+        },
+        "CADJPY/tick/2025/DAT_ASCII_CADJPY_T_202501.zip": {
+          "rows": 2583111,
+          "sha256": "07628c2128b2f9b1dc5ff93e980daa96692ae07a6b5b2a6d3487916902f7fa87",
+          "size_bytes": 16749381
+        },
+        "CADJPY/tick/2025/DAT_ASCII_CADJPY_T_202502.zip": {
+          "rows": 2380592,
+          "sha256": "375bb0b00f3a453b3f2b9fca1dfc137037d4e8065ab7154ed5edd8e6eabbd157",
+          "size_bytes": 15495818
+        },
+        "CADJPY/tick/2025/DAT_ASCII_CADJPY_T_202503.zip": {
+          "rows": 2999477,
+          "sha256": "f38ee3636a3421d012135368d667632f56438735e1fa8251d884b9d6903a9cb9",
+          "size_bytes": 19640167
+        },
+        "CADJPY/tick/2025/DAT_ASCII_CADJPY_T_202504.zip": {
+          "rows": 4857775,
+          "sha256": "24a476daaef7c16fc97cb93cd2889a533ce8a25cd5502eb37c2de9c86ccdedbb",
+          "size_bytes": 31580571
+        },
+        "CADJPY/tick/2025/DAT_ASCII_CADJPY_T_202505.zip": {
+          "rows": 2249130,
+          "sha256": "9e921630a8a06e3b30c75d155036da93135c825e83697390e8609a504fbf5e93",
+          "size_bytes": 14771510
+        },
+        "CADJPY/tick/2025/DAT_ASCII_CADJPY_T_202506.zip": {
+          "rows": 1935445,
+          "sha256": "a4540bd89cbb534c0bc273d874d806d8c9f4ec641c045430e3a284156a759a68",
+          "size_bytes": 12745575
+        },
+        "CADJPY/tick/2025/DAT_ASCII_CADJPY_T_202507.zip": {
+          "rows": 1725310,
+          "sha256": "3e0a036933cb70415056bc94ea4be5eff2e9298e1ba0f9af849d1580c3c1c2e0",
+          "size_bytes": 11471399
+        },
+        "CADJPY/tick/2025/DAT_ASCII_CADJPY_T_202508.zip": {
+          "rows": 1423889,
+          "sha256": "f894de3bf70bb7d5cab3c0d6227255b15010ec278b83cc218070e2e302dfe42c",
+          "size_bytes": 9471581
+        },
+        "CADJPY/tick/2025/DAT_ASCII_CADJPY_T_202509.zip": {
+          "rows": 1511024,
+          "sha256": "0a9368738b20470ffcaa2ae26c0208962dedbb433c7b7451b3c00034b06c5187",
+          "size_bytes": 9947513
+        },
+        "CADJPY/tick/2025/DAT_ASCII_CADJPY_T_202510.zip": {
+          "rows": 1771827,
+          "sha256": "6e430190df437bb9db9bbc46e08b0f1fd8d58d08bfbb075fdf7f5c47cf7b8175",
+          "size_bytes": 11789792
+        },
+        "CADJPY/tick/2025/DAT_ASCII_CADJPY_T_202511.zip": {
+          "rows": 1665634,
+          "sha256": "6e2b01a3d83a2f7682e4b0e39fc4399749b82dbb1585e248b75c4f213f3e2682",
+          "size_bytes": 10921357
+        },
+        "CADJPY/tick/2025/DAT_ASCII_CADJPY_T_202512.zip": {
+          "rows": 1487285,
+          "sha256": "fe9d2c69ed22ccc375afc3cb1331e1d0e975ab7851c642fd185317fa4a1b88f5",
+          "size_bytes": 9798271
+        },
+        "CADJPY/tick/2026/DAT_ASCII_CADJPY_T_202601.zip": {
+          "rows": 1880843,
+          "sha256": "e70922ba213d38f827007199135a20aa18d06cd832b3fb8911350bf393910c1d",
+          "size_bytes": 12328512
+        },
+        "CADJPY/tick/2026/DAT_ASCII_CADJPY_T_202602.zip": {
+          "rows": 1883593,
+          "sha256": "7851d961ab5c60b9464d46879c3f284e46b4c5ed06c910270087454b54b24da5",
+          "size_bytes": 12379399
+        },
+        "CADJPY/tick/2026/DAT_ASCII_CADJPY_T_202603.zip": {
+          "rows": 2236144,
+          "sha256": "41fedd063794196c276a56514443500167873f536b1dd733c296921dc0cdbaf7",
+          "size_bytes": 14301897
+        },
+        "CADJPY/tick/2026/DAT_ASCII_CADJPY_T_202604.zip": {
+          "rows": 507510,
+          "sha256": "7f03d94961df4070c22b6695928408151ad56679a128185a6f999ecab5cb2648",
+          "size_bytes": 3258803
+        }
+      },
+      "latest_month": "202604",
+      "total_files": 196,
+      "total_size_bytes": 1970206837
+    },
+    "CHFJPY": {
+      "earliest_month": "201001",
+      "files": {
+        "CHFJPY/tick/2010/DAT_ASCII_CHFJPY_T_201001.zip": {
+          "rows": 503583,
+          "sha256": "6ec356fb61cdbc64d5b5c1d6816d4895bace709860b1802dcc9be8b06d40e222",
+          "size_bytes": 1922330
+        },
+        "CHFJPY/tick/2010/DAT_ASCII_CHFJPY_T_201002.zip": {
+          "rows": 493764,
+          "sha256": "1e8f01954aa0160ae2c3d018e03590d4a9b9925e7a6b3ccb0c59e4e42f4b9f00",
+          "size_bytes": 1881590
+        },
+        "CHFJPY/tick/2010/DAT_ASCII_CHFJPY_T_201003.zip": {
+          "rows": 592823,
+          "sha256": "a7b8c8b4d9de2ddb8f82baa5ec8e3ff6e43e449408a0aab38b448dc3d7c3df1b",
+          "size_bytes": 2153659
+        },
+        "CHFJPY/tick/2010/DAT_ASCII_CHFJPY_T_201004.zip": {
+          "rows": 647346,
+          "sha256": "e47e6cb3fbe4b558e2209bc10fe6e34508cc41872884d012c99f47f20e925701",
+          "size_bytes": 2236334
+        },
+        "CHFJPY/tick/2010/DAT_ASCII_CHFJPY_T_201005.zip": {
+          "rows": 835506,
+          "sha256": "d9e8d5407cc5044ccab6bb450b5d85307cc6fb242e9851d33558b905bdfc7b23",
+          "size_bytes": 3140187
+        },
+        "CHFJPY/tick/2010/DAT_ASCII_CHFJPY_T_201006.zip": {
+          "rows": 622165,
+          "sha256": "9eb28d5b67fbe788f1f7068aa69572d1887590fdbbe7bf2cb3209334c4afd592",
+          "size_bytes": 2352498
+        },
+        "CHFJPY/tick/2010/DAT_ASCII_CHFJPY_T_201007.zip": {
+          "rows": 525857,
+          "sha256": "c674e8ff8c4484c1074a6d4a01b02174aee0f30a45118294680e9ad41de3fd5a",
+          "size_bytes": 2009272
+        },
+        "CHFJPY/tick/2010/DAT_ASCII_CHFJPY_T_201008.zip": {
+          "rows": 495879,
+          "sha256": "0408910a415617b4e4e7e589fa05337efd47b024419f2c91fd2b0695f046f990",
+          "size_bytes": 1907801
+        },
+        "CHFJPY/tick/2010/DAT_ASCII_CHFJPY_T_201009.zip": {
+          "rows": 505600,
+          "sha256": "208be0d0e2792bdb878b5d9408a6dc96b1236ad723854c8ea628b2ed09e0783e",
+          "size_bytes": 1931468
+        },
+        "CHFJPY/tick/2010/DAT_ASCII_CHFJPY_T_201010.zip": {
+          "rows": 511053,
+          "sha256": "f720cc017b973a6149da5fbddb7ebdc1174a5ac3fed975b30942e743df110d12",
+          "size_bytes": 1896880
+        },
+        "CHFJPY/tick/2010/DAT_ASCII_CHFJPY_T_201011.zip": {
+          "rows": 630936,
+          "sha256": "c2f305f7107f7e0747a929362d5cdfc6651ef77c0efcae1126ec5d71833e9257",
+          "size_bytes": 2298328
+        },
+        "CHFJPY/tick/2010/DAT_ASCII_CHFJPY_T_201012.zip": {
+          "rows": 550453,
+          "sha256": "d9e702a5153e17ea694390e45186612f080c8a7ebdf5012259375eefdcdcc619",
+          "size_bytes": 2053660
+        },
+        "CHFJPY/tick/2011/DAT_ASCII_CHFJPY_T_201101.zip": {
+          "rows": 596922,
+          "sha256": "79993e345a7983c2d4effa1201ffca863c9ab78d4efea3b52380d6e322db6506",
+          "size_bytes": 2191723
+        },
+        "CHFJPY/tick/2011/DAT_ASCII_CHFJPY_T_201102.zip": {
+          "rows": 580818,
+          "sha256": "d77eee0da95b21adaf5dd1b0d53f7b13621d941a669d1b9b3752af752591bc3c",
+          "size_bytes": 2062828
+        },
+        "CHFJPY/tick/2011/DAT_ASCII_CHFJPY_T_201103.zip": {
+          "rows": 625183,
+          "sha256": "495150aa043496239a5196d0be921a957bda72ff9d86960b171623fc5b461e22",
+          "size_bytes": 2302803
+        },
+        "CHFJPY/tick/2011/DAT_ASCII_CHFJPY_T_201104.zip": {
+          "rows": 523518,
+          "sha256": "686c6026b3f5f5622351334f74de7ce9e87179e4a8ad5dbd4d144e78b59a7917",
+          "size_bytes": 2149803
+        },
+        "CHFJPY/tick/2011/DAT_ASCII_CHFJPY_T_201105.zip": {
+          "rows": 564226,
+          "sha256": "5993ef05f821906ac66c4d95e989155231ae8d90cefb820cf473e64a0c70759a",
+          "size_bytes": 2981278
+        },
+        "CHFJPY/tick/2011/DAT_ASCII_CHFJPY_T_201106.zip": {
+          "rows": 575820,
+          "sha256": "989cd285e11240d74b645aaf9c4df93f0851f9bbf264a25181f92de6afe432f2",
+          "size_bytes": 2961989
+        },
+        "CHFJPY/tick/2011/DAT_ASCII_CHFJPY_T_201107.zip": {
+          "rows": 532241,
+          "sha256": "dadc482fe01600d820e6cb0071826483035cd06e1864025cd5ac3e1218777ae7",
+          "size_bytes": 2797136
+        },
+        "CHFJPY/tick/2011/DAT_ASCII_CHFJPY_T_201108.zip": {
+          "rows": 719012,
+          "sha256": "376af9ad0bd22519c74ea8675a85111c368cbbb0bb24d87a94d682f1f3d6f662",
+          "size_bytes": 3762153
+        },
+        "CHFJPY/tick/2011/DAT_ASCII_CHFJPY_T_201109.zip": {
+          "rows": 513838,
+          "sha256": "f740b0951107231a3ce67440c65486f5a3231ecc82a9d73ce2db6e7bbc63da2c",
+          "size_bytes": 2731770
+        },
+        "CHFJPY/tick/2011/DAT_ASCII_CHFJPY_T_201110.zip": {
+          "rows": 425005,
+          "sha256": "faeb04a08e63e684f09255d30f0d71b5a5a8716c7bb2bbd2acfb1186b6586f90",
+          "size_bytes": 2299858
+        },
+        "CHFJPY/tick/2011/DAT_ASCII_CHFJPY_T_201111.zip": {
+          "rows": 422457,
+          "sha256": "2bc565848fb22d05a6313554cbdb453e27fc0a34eb3785c657f15a3ecae84a1a",
+          "size_bytes": 2282113
+        },
+        "CHFJPY/tick/2011/DAT_ASCII_CHFJPY_T_201112.zip": {
+          "rows": 818034,
+          "sha256": "ee10755f46c2d1fe46a9a69b4f09f3dca5910de0bb4d48208b104d98cad47db3",
+          "size_bytes": 4680057
+        },
+        "CHFJPY/tick/2012/DAT_ASCII_CHFJPY_T_201201.zip": {
+          "rows": 963885,
+          "sha256": "2fe69a9bfa19f02a8d1815bac273952cf5c56eb8e86e5c5d78c29eccade35539",
+          "size_bytes": 5489877
+        },
+        "CHFJPY/tick/2012/DAT_ASCII_CHFJPY_T_201202.zip": {
+          "rows": 1206059,
+          "sha256": "767a14afca92edab62c62668366b01c2026fd362e51353541bd454e1d43a2930",
+          "size_bytes": 6786395
+        },
+        "CHFJPY/tick/2012/DAT_ASCII_CHFJPY_T_201203.zip": {
+          "rows": 1200935,
+          "sha256": "7d88e0a07bac3e0c68d392e2b071afb5182b9cc2d52ec7e1aa7818aacf5f606e",
+          "size_bytes": 6924264
+        },
+        "CHFJPY/tick/2012/DAT_ASCII_CHFJPY_T_201204.zip": {
+          "rows": 1074231,
+          "sha256": "5b0904bb92543087b91d7703a07b05dfa35920cd2fb866f072cbe98fa429f8e0",
+          "size_bytes": 6208698
+        },
+        "CHFJPY/tick/2012/DAT_ASCII_CHFJPY_T_201205.zip": {
+          "rows": 1203016,
+          "sha256": "ff07b236bf9829696015438b773c05995417dee10c6e99d7810e542b7c6c3a7c",
+          "size_bytes": 6844052
+        },
+        "CHFJPY/tick/2012/DAT_ASCII_CHFJPY_T_201206.zip": {
+          "rows": 1128100,
+          "sha256": "bdc24def83b18a1acf076b3ec9c7cff1a89289135eab3ea6a82208b22906cfe4",
+          "size_bytes": 6520484
+        },
+        "CHFJPY/tick/2012/DAT_ASCII_CHFJPY_T_201207.zip": {
+          "rows": 855255,
+          "sha256": "8f80b0dc63a058ccc9dffcd12d6ad4cb303d691332d469f944c3ed80b51546b6",
+          "size_bytes": 4963289
+        },
+        "CHFJPY/tick/2012/DAT_ASCII_CHFJPY_T_201208.zip": {
+          "rows": 780475,
+          "sha256": "9204c17bdc9335a0b29faf07eb2bf6e10a0d7a15969b52cebb1cf4537c888e80",
+          "size_bytes": 4516709
+        },
+        "CHFJPY/tick/2012/DAT_ASCII_CHFJPY_T_201209.zip": {
+          "rows": 785869,
+          "sha256": "6045ca8651fd5f6028cd8594d28b12de54509982e9d39cc41a59d431ccbd83e6",
+          "size_bytes": 4579774
+        },
+        "CHFJPY/tick/2012/DAT_ASCII_CHFJPY_T_201210.zip": {
+          "rows": 861780,
+          "sha256": "c316e92c1406b984e2f7d602152fab451e4334247009398d1764e164c6c5085b",
+          "size_bytes": 4963377
+        },
+        "CHFJPY/tick/2012/DAT_ASCII_CHFJPY_T_201211.zip": {
+          "rows": 923167,
+          "sha256": "d49a4db27d974225ddfa8bb2e14664a19d15d105e9f0bb9198b0389bad623e5f",
+          "size_bytes": 5354588
+        },
+        "CHFJPY/tick/2012/DAT_ASCII_CHFJPY_T_201212.zip": {
+          "rows": 810365,
+          "sha256": "a48c63d4e01b1f251a0e8e7852698c5ef88b4374388d27b2458b4636397afb4a",
+          "size_bytes": 4746715
+        },
+        "CHFJPY/tick/2013/DAT_ASCII_CHFJPY_T_201301.zip": {
+          "rows": 1375229,
+          "sha256": "a238f501996c1d1fc9d27cd58bf64eb2c0e9ba0c44797abb097c232c3f29b35b",
+          "size_bytes": 8196352
+        },
+        "CHFJPY/tick/2013/DAT_ASCII_CHFJPY_T_201302.zip": {
+          "rows": 1251412,
+          "sha256": "bcbc16f6161726170196a15cd84f067daf9dc25ce3ce2c401deb908747eda7cf",
+          "size_bytes": 7605239
+        },
+        "CHFJPY/tick/2013/DAT_ASCII_CHFJPY_T_201303.zip": {
+          "rows": 1173638,
+          "sha256": "544959d6a41b33c2258bd410eea7cdd1c2e962d36e00ec33b58077e6374f6e78",
+          "size_bytes": 6987176
+        },
+        "CHFJPY/tick/2013/DAT_ASCII_CHFJPY_T_201304.zip": {
+          "rows": 1412118,
+          "sha256": "033d77fe2911fd6184855528fd4370da713cc909d60adb9878ee792b056c2f5d",
+          "size_bytes": 8574112
+        },
+        "CHFJPY/tick/2013/DAT_ASCII_CHFJPY_T_201305.zip": {
+          "rows": 1515135,
+          "sha256": "69da3b1f7c11621b8a1a19a6ea20d1170d33e343ce8d057946f253a7e52eafd5",
+          "size_bytes": 8975959
+        },
+        "CHFJPY/tick/2013/DAT_ASCII_CHFJPY_T_201306.zip": {
+          "rows": 1654512,
+          "sha256": "1b283c073a309e6c10650ce3ca067b05b3794d574e766a7b39d02079bfc0a25c",
+          "size_bytes": 9907647
+        },
+        "CHFJPY/tick/2013/DAT_ASCII_CHFJPY_T_201307.zip": {
+          "rows": 1380836,
+          "sha256": "e144144ac3b8312a7ea84dfb92075f8c482ca413ef7dc0aea237efe61a0e9eaf",
+          "size_bytes": 8130602
+        },
+        "CHFJPY/tick/2013/DAT_ASCII_CHFJPY_T_201308.zip": {
+          "rows": 1179230,
+          "sha256": "0d546f0f6082c0abf55de7b8297492fbe6951b6524f16789ca7ad5940fd4d29f",
+          "size_bytes": 6903771
+        },
+        "CHFJPY/tick/2013/DAT_ASCII_CHFJPY_T_201309.zip": {
+          "rows": 1026746,
+          "sha256": "fac6307df38c78b7c1feae99394e21db662668a305f7bccf5d88629e1799c74c",
+          "size_bytes": 5977773
+        },
+        "CHFJPY/tick/2013/DAT_ASCII_CHFJPY_T_201310.zip": {
+          "rows": 1016058,
+          "sha256": "4138eacffd7f3223082f1fa891b502a9875292dd7fd97eaef3750ade3f7f92be",
+          "size_bytes": 5904876
+        },
+        "CHFJPY/tick/2013/DAT_ASCII_CHFJPY_T_201311.zip": {
+          "rows": 910776,
+          "sha256": "495ba801262c4da17a05af9116b70d798a2651b7f87a5f862d19d32358181ac9",
+          "size_bytes": 5332150
+        },
+        "CHFJPY/tick/2013/DAT_ASCII_CHFJPY_T_201312.zip": {
+          "rows": 935707,
+          "sha256": "76e573b0727450f6b946b54ccbfb43385224acf7e9aa8677d3b9d6079cc7c23f",
+          "size_bytes": 5499070
+        },
+        "CHFJPY/tick/2014/DAT_ASCII_CHFJPY_T_201401.zip": {
+          "rows": 1157718,
+          "sha256": "2cb9c35bae18c7f9455b9755d44f959b5fec686fdcb803a0356417e0754a5cdc",
+          "size_bytes": 6848520
+        },
+        "CHFJPY/tick/2014/DAT_ASCII_CHFJPY_T_201402.zip": {
+          "rows": 887998,
+          "sha256": "e6a492449ece5f112728f4aa47c92ac44f312601d8c452c4ac4e92bca35332f6",
+          "size_bytes": 5279837
+        },
+        "CHFJPY/tick/2014/DAT_ASCII_CHFJPY_T_201403.zip": {
+          "rows": 940413,
+          "sha256": "97a484ae7c43dc4e1ccb038f45be55b82df6a104112a65cc06a9b42fc4367f3d",
+          "size_bytes": 5530918
+        },
+        "CHFJPY/tick/2014/DAT_ASCII_CHFJPY_T_201404.zip": {
+          "rows": 817895,
+          "sha256": "bdcc2a603e5ba431798cf1327e3a01c315f19bf26c697437bee06aa5e3de7233",
+          "size_bytes": 4744768
+        },
+        "CHFJPY/tick/2014/DAT_ASCII_CHFJPY_T_201405.zip": {
+          "rows": 734280,
+          "sha256": "f03a36d2fa14f69f35c44fdfbeb15c1bb2b2be016277b4bd35d4e83b24ecbdfc",
+          "size_bytes": 4218111
+        },
+        "CHFJPY/tick/2014/DAT_ASCII_CHFJPY_T_201406.zip": {
+          "rows": 609283,
+          "sha256": "fc55c60d191f84f19029b2bc66665ea63acf840410250db5eca13f32fef9b87e",
+          "size_bytes": 3488949
+        },
+        "CHFJPY/tick/2014/DAT_ASCII_CHFJPY_T_201407.zip": {
+          "rows": 503533,
+          "sha256": "e671930639082161abe569ae285baeb023f0c06489d4260043cd4e9fa7bec71b",
+          "size_bytes": 2830469
+        },
+        "CHFJPY/tick/2014/DAT_ASCII_CHFJPY_T_201408.zip": {
+          "rows": 567220,
+          "sha256": "c16bf49111c9fb4ea403129a6d8e3279799f77b66b963a254cfbcbf5d62f2167",
+          "size_bytes": 2882440
+        },
+        "CHFJPY/tick/2014/DAT_ASCII_CHFJPY_T_201409.zip": {
+          "rows": 906953,
+          "sha256": "d501aea6fdf9fd9fe85bc7b2a479490e19cd0a07d2ed888e601f73e065416be3",
+          "size_bytes": 4571167
+        },
+        "CHFJPY/tick/2014/DAT_ASCII_CHFJPY_T_201410.zip": {
+          "rows": 1388851,
+          "sha256": "a99d88d52af5abd900e099b04c83c4e43617ec6e7655cc24e1efe77858db1af9",
+          "size_bytes": 7971668
+        },
+        "CHFJPY/tick/2014/DAT_ASCII_CHFJPY_T_201411.zip": {
+          "rows": 1597565,
+          "sha256": "e8337f2194056c5fd0d5337c9ab06da8cf346b04293f8b4ec2004d264bf98dd0",
+          "size_bytes": 8736751
+        },
+        "CHFJPY/tick/2014/DAT_ASCII_CHFJPY_T_201412.zip": {
+          "rows": 1437930,
+          "sha256": "1fe57a46a9603e18a2e50f2d31640b428a6f03a08a9fdd5ae433cdcdfee20aad",
+          "size_bytes": 8096464
+        },
+        "CHFJPY/tick/2015/DAT_ASCII_CHFJPY_T_201501.zip": {
+          "rows": 1582291,
+          "sha256": "8e961b370b8bdf88dbb8b91104b171596e89c0dccdf9c1a6a0dfc8675af38c11",
+          "size_bytes": 9553926
+        },
+        "CHFJPY/tick/2015/DAT_ASCII_CHFJPY_T_201502.zip": {
+          "rows": 1129035,
+          "sha256": "726291a4a184b25b27276180e848988f58dbce3a87f5f3a82bece0d6c5f7bd55",
+          "size_bytes": 6604122
+        },
+        "CHFJPY/tick/2015/DAT_ASCII_CHFJPY_T_201503.zip": {
+          "rows": 1042853,
+          "sha256": "330b95087f3cd9bfb225e0b1edf8fde140960768de55e033260aef3a41bfaab6",
+          "size_bytes": 6379437
+        },
+        "CHFJPY/tick/2015/DAT_ASCII_CHFJPY_T_201504.zip": {
+          "rows": 1372797,
+          "sha256": "39c75e71fff5d4411e7ef5c4786fb635a279bfa8ce477e679a1939916660cd3e",
+          "size_bytes": 7773939
+        },
+        "CHFJPY/tick/2015/DAT_ASCII_CHFJPY_T_201505.zip": {
+          "rows": 1855944,
+          "sha256": "12f3fb741319718a0ca4032c8a9912f3ed1de95fbd13a0c004c308e3bd9ccb1f",
+          "size_bytes": 10025290
+        },
+        "CHFJPY/tick/2015/DAT_ASCII_CHFJPY_T_201506.zip": {
+          "rows": 1791321,
+          "sha256": "4ff9f2433895e0b5e2b84120d56e120016b4f3d79025d4e37afa469b254e606b",
+          "size_bytes": 9789770
+        },
+        "CHFJPY/tick/2015/DAT_ASCII_CHFJPY_T_201507.zip": {
+          "rows": 1503286,
+          "sha256": "118e936172cae4a41b398222185ad596944f2de82579c6641dbabdc85349dd0c",
+          "size_bytes": 8187259
+        },
+        "CHFJPY/tick/2015/DAT_ASCII_CHFJPY_T_201508.zip": {
+          "rows": 1795294,
+          "sha256": "ff405f51814485a06fd7302dc6bd0f9e6550b7d14ca3b4b45a6358276c1f9f06",
+          "size_bytes": 9797535
+        },
+        "CHFJPY/tick/2015/DAT_ASCII_CHFJPY_T_201509.zip": {
+          "rows": 2170567,
+          "sha256": "215ba837fcdcb2aec40381c17f2635b9d6e0ecd4b16fb1aa07ba8042600acc08",
+          "size_bytes": 11579772
+        },
+        "CHFJPY/tick/2015/DAT_ASCII_CHFJPY_T_201510.zip": {
+          "rows": 1505259,
+          "sha256": "5ad65843a652ccaa84cff90a72948e9e02440bfbaea1679b7cb0a35659d56b31",
+          "size_bytes": 8001365
+        },
+        "CHFJPY/tick/2015/DAT_ASCII_CHFJPY_T_201511.zip": {
+          "rows": 1439494,
+          "sha256": "cf7036e00fce630a37c8b4894dc84de8efb19a93694ce7140fcec3afc4661f76",
+          "size_bytes": 7462564
+        },
+        "CHFJPY/tick/2015/DAT_ASCII_CHFJPY_T_201512.zip": {
+          "rows": 1628324,
+          "sha256": "99e1906537a919498d163ec98046441233e7d0b19827e90c7b329165c155f120",
+          "size_bytes": 8615225
+        },
+        "CHFJPY/tick/2016/DAT_ASCII_CHFJPY_T_201601.zip": {
+          "rows": 1990881,
+          "sha256": "14ce23c113d7825bab52c22eaf0dad374db0ef14dee64c732b278ead20e12bf0",
+          "size_bytes": 10796370
+        },
+        "CHFJPY/tick/2016/DAT_ASCII_CHFJPY_T_201602.zip": {
+          "rows": 1805245,
+          "sha256": "2be9b3966418c3c34b8d1da49cf0c658a46555ca5e4d678f61a82a31e4e0eea3",
+          "size_bytes": 9945224
+        },
+        "CHFJPY/tick/2016/DAT_ASCII_CHFJPY_T_201603.zip": {
+          "rows": 1244017,
+          "sha256": "230c929167b9c834fc1c5211ddc8f8011f1057c6fb16140e658f0c18db8e3f31",
+          "size_bytes": 7034428
+        },
+        "CHFJPY/tick/2016/DAT_ASCII_CHFJPY_T_201604.zip": {
+          "rows": 1000561,
+          "sha256": "5e1dae644b4df1d51bab888a035df739304bdfda2df6c0edf1066a7b59a19223",
+          "size_bytes": 5863597
+        },
+        "CHFJPY/tick/2016/DAT_ASCII_CHFJPY_T_201605.zip": {
+          "rows": 978006,
+          "sha256": "7f6bba0f46ed2318b85daf518f8ba380b36fce7976b019a6be81bd987c789a8d",
+          "size_bytes": 5624317
+        },
+        "CHFJPY/tick/2016/DAT_ASCII_CHFJPY_T_201606.zip": {
+          "rows": 1327009,
+          "sha256": "f5a4ee19c04963c9140a4244b56b401f0d6fa5a412c4c71b42d68f84c50a452e",
+          "size_bytes": 7790820
+        },
+        "CHFJPY/tick/2016/DAT_ASCII_CHFJPY_T_201607.zip": {
+          "rows": 1174334,
+          "sha256": "2c7e3ba17ddbef3f30d2674e786fd9f2e44fff4199304c69b9e2a27670d4d8c0",
+          "size_bytes": 6870329
+        },
+        "CHFJPY/tick/2016/DAT_ASCII_CHFJPY_T_201608.zip": {
+          "rows": 877539,
+          "sha256": "3df5d718a7888db81c3d44f99e4f10e2832a3a89939bfdb9707e73f5cb6a195c",
+          "size_bytes": 5017265
+        },
+        "CHFJPY/tick/2016/DAT_ASCII_CHFJPY_T_201609.zip": {
+          "rows": 1136672,
+          "sha256": "11ce13ccc9ec48d952b9f413dd0bb88298f89ed5e5436bb06bb8156611151249",
+          "size_bytes": 6383397
+        },
+        "CHFJPY/tick/2016/DAT_ASCII_CHFJPY_T_201610.zip": {
+          "rows": 902790,
+          "sha256": "2c09e390a1b6bff5af415ff61567bf9d7279bd77a18163409a81279cd021b24e",
+          "size_bytes": 5069014
+        },
+        "CHFJPY/tick/2016/DAT_ASCII_CHFJPY_T_201611.zip": {
+          "rows": 1552233,
+          "sha256": "77634ec9ec559c05e2defb1755206fbc137fe76cdf9430c2f3ed9cf03130a767",
+          "size_bytes": 8699089
+        },
+        "CHFJPY/tick/2016/DAT_ASCII_CHFJPY_T_201612.zip": {
+          "rows": 1265518,
+          "sha256": "103fac9d977e45b8895b70dad44099e3a6b8aeefd5ac0e5196c7b763a5bc50f0",
+          "size_bytes": 6959985
+        },
+        "CHFJPY/tick/2017/DAT_ASCII_CHFJPY_T_201701.zip": {
+          "rows": 1605426,
+          "sha256": "571d84539ee31565c05f9d090c7f5bdd17a27b7c0a7ee70a41c15e2ce6e48db3",
+          "size_bytes": 8780921
+        },
+        "CHFJPY/tick/2017/DAT_ASCII_CHFJPY_T_201702.zip": {
+          "rows": 1159462,
+          "sha256": "c2b4568fe4982e00a909b3aada0d613025c5c2bf6d9f70179b6f8531ae5c046b",
+          "size_bytes": 6328163
+        },
+        "CHFJPY/tick/2017/DAT_ASCII_CHFJPY_T_201703.zip": {
+          "rows": 1373085,
+          "sha256": "dd2c41dfc483ded8dea554a30b7fb13af95cd8cd8fa36f6e54d9b9bb715bf261",
+          "size_bytes": 7462791
+        },
+        "CHFJPY/tick/2017/DAT_ASCII_CHFJPY_T_201704.zip": {
+          "rows": 1083537,
+          "sha256": "6d9d233ad22990a9e92622dbbcfe00a8fc7fc4e40f40b3c31527e903f0828af6",
+          "size_bytes": 5962530
+        },
+        "CHFJPY/tick/2017/DAT_ASCII_CHFJPY_T_201705.zip": {
+          "rows": 1178038,
+          "sha256": "399ec9e7a07a8253f6cc5de09a256b003d8a7e6e5a0fd0c89eaf4d116aa3e268",
+          "size_bytes": 6543838
+        },
+        "CHFJPY/tick/2017/DAT_ASCII_CHFJPY_T_201706.zip": {
+          "rows": 987541,
+          "sha256": "72f54b423e28830c909b74b625706410fb3b46548459137805b62e9d78c7b148",
+          "size_bytes": 5498197
+        },
+        "CHFJPY/tick/2017/DAT_ASCII_CHFJPY_T_201707.zip": {
+          "rows": 1083287,
+          "sha256": "69c559d71eb61755687741e9ac998ad4d6c641e3601016b64df7ff35c8503318",
+          "size_bytes": 6017682
+        },
+        "CHFJPY/tick/2017/DAT_ASCII_CHFJPY_T_201708.zip": {
+          "rows": 939772,
+          "sha256": "127c5d3539b67959bf68fe3db3898cbf912dc84942c6d1de4a52be9a9c24b671",
+          "size_bytes": 5267709
+        },
+        "CHFJPY/tick/2017/DAT_ASCII_CHFJPY_T_201709.zip": {
+          "rows": 1101743,
+          "sha256": "8136ec5414c7a4834475b9618bb0c687e49665a49377c7a06eb1ca4a491b53b4",
+          "size_bytes": 6055336
+        },
+        "CHFJPY/tick/2017/DAT_ASCII_CHFJPY_T_201710.zip": {
+          "rows": 1032945,
+          "sha256": "5274679657eebbdb32250e30449d7f6bab24d879a6e72b7a34dcb8cefcaef56a",
+          "size_bytes": 5614203
+        },
+        "CHFJPY/tick/2017/DAT_ASCII_CHFJPY_T_201711.zip": {
+          "rows": 982428,
+          "sha256": "3025bf2026dc8ae3f7a069c53eb4bd9a0797aef09a890cde6b3faa76325cf1a9",
+          "size_bytes": 5275057
+        },
+        "CHFJPY/tick/2017/DAT_ASCII_CHFJPY_T_201712.zip": {
+          "rows": 841483,
+          "sha256": "28adf69afe1adf3d1f9df6818b5902f685cec36d8ca4f15ca060c95134540f3b",
+          "size_bytes": 4526294
+        },
+        "CHFJPY/tick/2018/DAT_ASCII_CHFJPY_T_201801.zip": {
+          "rows": 1203998,
+          "sha256": "0cfd873eb07e394849488398cbbbe21a5f0a7134790d95cff2d71e63a0ec0796",
+          "size_bytes": 6623313
+        },
+        "CHFJPY/tick/2018/DAT_ASCII_CHFJPY_T_201802.zip": {
+          "rows": 1388820,
+          "sha256": "7de2add47fe1e04f661fe8d27fb8335284b99a9747a262d8004aef08004613fc",
+          "size_bytes": 7663252
+        },
+        "CHFJPY/tick/2018/DAT_ASCII_CHFJPY_T_201803.zip": {
+          "rows": 1303325,
+          "sha256": "d5d1dae58f1d027b85f6415d9004272be9f9c58a9664ac2b755075a0ae7895fe",
+          "size_bytes": 7126409
+        },
+        "CHFJPY/tick/2018/DAT_ASCII_CHFJPY_T_201804.zip": {
+          "rows": 1119904,
+          "sha256": "91c68552b637c818f9d083127ba40233d9a6e25f9263b2c1a63afadd0ddfc5a2",
+          "size_bytes": 5974399
+        },
+        "CHFJPY/tick/2018/DAT_ASCII_CHFJPY_T_201805.zip": {
+          "rows": 1293080,
+          "sha256": "9ef0e62d2a38af53d0972a1ff59d55b59bbbcf58ec29576cab43adc5d6df2ef1",
+          "size_bytes": 7163287
+        },
+        "CHFJPY/tick/2018/DAT_ASCII_CHFJPY_T_201806.zip": {
+          "rows": 1009392,
+          "sha256": "7a6e9831fcaaa0c924c45ec52e184de992476d1d4a9a68466a9bdfb0aebd9955",
+          "size_bytes": 5560155
+        },
+        "CHFJPY/tick/2018/DAT_ASCII_CHFJPY_T_201807.zip": {
+          "rows": 1008777,
+          "sha256": "b36764e60e4bc8c316c98b089f90505ef0694843cc81dd85e9783fc3e2716ad3",
+          "size_bytes": 5467869
+        },
+        "CHFJPY/tick/2018/DAT_ASCII_CHFJPY_T_201808.zip": {
+          "rows": 1018009,
+          "sha256": "197e69c32821f655dd2e7b4df68bebac3c7f5941abe1742f4894bdd95bb584d4",
+          "size_bytes": 5541631
+        },
+        "CHFJPY/tick/2018/DAT_ASCII_CHFJPY_T_201809.zip": {
+          "rows": 1046288,
+          "sha256": "04bc37145adfad1b9027eb7befb5ac17bcf344c2e3dd6c5770f9e4ac1031c200",
+          "size_bytes": 5670836
+        },
+        "CHFJPY/tick/2018/DAT_ASCII_CHFJPY_T_201810.zip": {
+          "rows": 1995450,
+          "sha256": "319a89967d3d4e39a72e3406297f3edd20a50a1eddc61f21edb8279c0cec5cb4",
+          "size_bytes": 10220611
+        },
+        "CHFJPY/tick/2018/DAT_ASCII_CHFJPY_T_201811.zip": {
+          "rows": 1434291,
+          "sha256": "c0b3f911caa0a8ea64a481ce11d76393b1bfe971c23f456ffb56b6dbf9f53493",
+          "size_bytes": 7547744
+        },
+        "CHFJPY/tick/2018/DAT_ASCII_CHFJPY_T_201812.zip": {
+          "rows": 1920929,
+          "sha256": "8693bd8d45b14df8c26336a7fd2563b9113dc298804c7095be7685e1dd08918d",
+          "size_bytes": 11143869
+        },
+        "CHFJPY/tick/2019/DAT_ASCII_CHFJPY_T_201901.zip": {
+          "rows": 2525564,
+          "sha256": "3a42a4edc08cef20319f057422c079b94569ca1e7642f16ff164f13ace8f5824",
+          "size_bytes": 15601733
+        },
+        "CHFJPY/tick/2019/DAT_ASCII_CHFJPY_T_201902.zip": {
+          "rows": 1780816,
+          "sha256": "7b257b59ff00c4a713bc7ba33b98f74da23e75bd3268d49b190592557278da19",
+          "size_bytes": 10727040
+        },
+        "CHFJPY/tick/2019/DAT_ASCII_CHFJPY_T_201903.zip": {
+          "rows": 2295300,
+          "sha256": "09c6077bb97a9cc56d5cf36537c388fd6a7ba375471e62f2bcf599c716f55adb",
+          "size_bytes": 13673459
+        },
+        "CHFJPY/tick/2019/DAT_ASCII_CHFJPY_T_201904.zip": {
+          "rows": 1625536,
+          "sha256": "14710bb9a62acaaca5b56460d708ce762d7383f139492a5f9ba1081682fe8a84",
+          "size_bytes": 9784114
+        },
+        "CHFJPY/tick/2019/DAT_ASCII_CHFJPY_T_201905.zip": {
+          "rows": 1649911,
+          "sha256": "07fb98726803cc310279acc8c18482411305b552c40003c442eeafed01703165",
+          "size_bytes": 10277647
+        },
+        "CHFJPY/tick/2019/DAT_ASCII_CHFJPY_T_201906.zip": {
+          "rows": 1694314,
+          "sha256": "82aed063013220ee0f8e09efa69dd4fad817a645be990176404447d2fe083048",
+          "size_bytes": 10523243
+        },
+        "CHFJPY/tick/2019/DAT_ASCII_CHFJPY_T_201907.zip": {
+          "rows": 1394094,
+          "sha256": "03e560095e16fc3bc2547b3966689b488f0370f6148492f5da78a63f10b02f09",
+          "size_bytes": 8755413
+        },
+        "CHFJPY/tick/2019/DAT_ASCII_CHFJPY_T_201908.zip": {
+          "rows": 2057587,
+          "sha256": "29605b486bec6f27e199d70c6e9d4d084b8be3355a057b58cc90020b857dba98",
+          "size_bytes": 13002638
+        },
+        "CHFJPY/tick/2019/DAT_ASCII_CHFJPY_T_201909.zip": {
+          "rows": 1532077,
+          "sha256": "4d1d6e091e9c38955136914fc7ac8de2610490e8867f5db0b0c10efdf8002e8e",
+          "size_bytes": 9603294
+        },
+        "CHFJPY/tick/2019/DAT_ASCII_CHFJPY_T_201910.zip": {
+          "rows": 1598997,
+          "sha256": "c4c7eb96ba7a89ecef9c8ae2dd4b4cacb39108f60bf589d0b72da7937211785f",
+          "size_bytes": 9980259
+        },
+        "CHFJPY/tick/2019/DAT_ASCII_CHFJPY_T_201911.zip": {
+          "rows": 1127273,
+          "sha256": "00913977055c12386a719927b3276a72ebe2303d8f611a944e83e61903ae4e04",
+          "size_bytes": 6999133
+        },
+        "CHFJPY/tick/2019/DAT_ASCII_CHFJPY_T_201912.zip": {
+          "rows": 1130167,
+          "sha256": "061c366a15e87ddd78a7dbca2a770bdaf8e52b0dbda380a310ddd8b953869ca6",
+          "size_bytes": 7040697
+        },
+        "CHFJPY/tick/2020/DAT_ASCII_CHFJPY_T_202001.zip": {
+          "rows": 1382794,
+          "sha256": "2ad1533d6699938d6bdc9ccbb3d53971013b31a5f5073e886b97b79b826ad423",
+          "size_bytes": 8689378
+        },
+        "CHFJPY/tick/2020/DAT_ASCII_CHFJPY_T_202002.zip": {
+          "rows": 2063348,
+          "sha256": "3574c08db64f8c7968b95e6bdebcf2182efbaf23d59d485136b6053a24c1a21e",
+          "size_bytes": 12527847
+        },
+        "CHFJPY/tick/2020/DAT_ASCII_CHFJPY_T_202003.zip": {
+          "rows": 6386846,
+          "sha256": "82b3bfd8f3060b7f2e0fd3ef0ff30285d5e021dc25bb994ffeff7eb0fefac3f6",
+          "size_bytes": 40774604
+        },
+        "CHFJPY/tick/2020/DAT_ASCII_CHFJPY_T_202004.zip": {
+          "rows": 2669595,
+          "sha256": "263d6a01c1bdcae4de3fa8ae46295d4e7d1948552148c43e819f8908bca9ace5",
+          "size_bytes": 16768157
+        },
+        "CHFJPY/tick/2020/DAT_ASCII_CHFJPY_T_202005.zip": {
+          "rows": 1995501,
+          "sha256": "dba7de1c99c348b7090aeb2da631632982f8b540fc62495293d4c12458848473",
+          "size_bytes": 12391096
+        },
+        "CHFJPY/tick/2020/DAT_ASCII_CHFJPY_T_202006.zip": {
+          "rows": 2573299,
+          "sha256": "1201ae6907cafb0a9b0ee79f9dae9a40c944b3ffcad920606e20a243e88492ce",
+          "size_bytes": 16085297
+        },
+        "CHFJPY/tick/2020/DAT_ASCII_CHFJPY_T_202007.zip": {
+          "rows": 1892041,
+          "sha256": "572abcf28d945ee815f2dcefd6b588833fd75a09191be9f3a8cd9e511a7966a1",
+          "size_bytes": 11802660
+        },
+        "CHFJPY/tick/2020/DAT_ASCII_CHFJPY_T_202008.zip": {
+          "rows": 2023450,
+          "sha256": "b57c31f6accc904d56ac4af82a63b29d482598b265566f7e0776ad1c1581d3f5",
+          "size_bytes": 12866397
+        },
+        "CHFJPY/tick/2020/DAT_ASCII_CHFJPY_T_202009.zip": {
+          "rows": 1691465,
+          "sha256": "598e638d5ee68a5f60ab70a631bec04b55f9576c0048bd7d4a76439a6589897b",
+          "size_bytes": 11044983
+        },
+        "CHFJPY/tick/2020/DAT_ASCII_CHFJPY_T_202010.zip": {
+          "rows": 1368948,
+          "sha256": "6f2af51ae96de97d1115561797a3b5e5d88c4f9005d1461e4d85c015c43c9794",
+          "size_bytes": 8973199
+        },
+        "CHFJPY/tick/2020/DAT_ASCII_CHFJPY_T_202011.zip": {
+          "rows": 1729825,
+          "sha256": "90a71cf341659609c6da289da9bf9ffc0ad09e99a87f5fcb8ca9d2d53d40a943",
+          "size_bytes": 11287081
+        },
+        "CHFJPY/tick/2020/DAT_ASCII_CHFJPY_T_202012.zip": {
+          "rows": 1607145,
+          "sha256": "f0e218909d810dcff1381050a49ca4164ae8d1e59879e455b90126c9f2d87e98",
+          "size_bytes": 10463549
+        },
+        "CHFJPY/tick/2021/DAT_ASCII_CHFJPY_T_202101.zip": {
+          "rows": 1641304,
+          "sha256": "1d9b0e1f5da4fa11e572c8d14f3687f9be769972156891e13aafe50f6ea5cc70",
+          "size_bytes": 10602987
+        },
+        "CHFJPY/tick/2021/DAT_ASCII_CHFJPY_T_202102.zip": {
+          "rows": 1533246,
+          "sha256": "012fcb1a60a6fb439fe8137d46cf2ee95ae4125cfc7f5d019c813857b9d82810",
+          "size_bytes": 9853230
+        },
+        "CHFJPY/tick/2021/DAT_ASCII_CHFJPY_T_202103.zip": {
+          "rows": 1947681,
+          "sha256": "9ab04b1ebbfc1272a66af0110f4392a28d9dc0eef751689c7ea34299e234c935",
+          "size_bytes": 12521031
+        },
+        "CHFJPY/tick/2021/DAT_ASCII_CHFJPY_T_202104.zip": {
+          "rows": 1501060,
+          "sha256": "f3bb8dff548c299f9131eb752d33d45b6bf97aed05d7c4b82dc54ecc64db9e49",
+          "size_bytes": 9783605
+        },
+        "CHFJPY/tick/2021/DAT_ASCII_CHFJPY_T_202105.zip": {
+          "rows": 1550921,
+          "sha256": "5b1225efdbed5f764ac1ec1a21369d23fae02d461db618ac25e6cce3d0f0cced",
+          "size_bytes": 9988853
+        },
+        "CHFJPY/tick/2021/DAT_ASCII_CHFJPY_T_202106.zip": {
+          "rows": 1571751,
+          "sha256": "f69fc71d9557432370c5fb85913dd42ceab866e2fa377e1a7c1737b731c713e7",
+          "size_bytes": 10043220
+        },
+        "CHFJPY/tick/2021/DAT_ASCII_CHFJPY_T_202107.zip": {
+          "rows": 1872000,
+          "sha256": "d5dbc91dbfeb53eaaec652c3d7810b2b94459e821326620f68f8c111efe9f9ae",
+          "size_bytes": 11855850
+        },
+        "CHFJPY/tick/2021/DAT_ASCII_CHFJPY_T_202108.zip": {
+          "rows": 1422514,
+          "sha256": "966ed2a1b60f334968584a07da9e9bc94fc7a242ae0e0a246d6cba4e45cc0384",
+          "size_bytes": 9155129
+        },
+        "CHFJPY/tick/2021/DAT_ASCII_CHFJPY_T_202109.zip": {
+          "rows": 1554546,
+          "sha256": "63956b5cd251ac6eef8de08c8cdb9d920f1da0ae7d08cb7e5be4ee980a688bcb",
+          "size_bytes": 9946648
+        },
+        "CHFJPY/tick/2021/DAT_ASCII_CHFJPY_T_202110.zip": {
+          "rows": 1795459,
+          "sha256": "ff450bffd074a6123c21ad6a28559de5275ca26a03373882ec671fa1ee977932",
+          "size_bytes": 11397761
+        },
+        "CHFJPY/tick/2021/DAT_ASCII_CHFJPY_T_202111.zip": {
+          "rows": 2280456,
+          "sha256": "780e9f5a9143312850cf014bf22796b568bf53099eaca0d516e907850ff6f52b",
+          "size_bytes": 14449474
+        },
+        "CHFJPY/tick/2021/DAT_ASCII_CHFJPY_T_202112.zip": {
+          "rows": 2004594,
+          "sha256": "9260386950d5237960c472eed0dfaac82d52dfca451ee8a13353bd073b4ec505",
+          "size_bytes": 12589412
+        },
+        "CHFJPY/tick/2022/DAT_ASCII_CHFJPY_T_202201.zip": {
+          "rows": 2037621,
+          "sha256": "7a1af85a66ea5d6e8883ec5176085900a2ffa98dfd6fa1c67d70d757f8fa1365",
+          "size_bytes": 12933839
+        },
+        "CHFJPY/tick/2022/DAT_ASCII_CHFJPY_T_202202.zip": {
+          "rows": 2403583,
+          "sha256": "c1d1a44905c96ba4f933445c7995f342586c32511345b1c27c27588a0eb8e363",
+          "size_bytes": 15138804
+        },
+        "CHFJPY/tick/2022/DAT_ASCII_CHFJPY_T_202203.zip": {
+          "rows": 2981980,
+          "sha256": "b10c8be3097fce9c5f69572beaa57f418806f7aa0a8a4b71b8a8b9c9f9c2ec8f",
+          "size_bytes": 19074468
+        },
+        "CHFJPY/tick/2022/DAT_ASCII_CHFJPY_T_202204.zip": {
+          "rows": 2837152,
+          "sha256": "562abeb410094971a6877adb0af0b8f48f258e3b734180664722e603c40aa113",
+          "size_bytes": 18156904
+        },
+        "CHFJPY/tick/2022/DAT_ASCII_CHFJPY_T_202205.zip": {
+          "rows": 2964313,
+          "sha256": "1924ab0ce09fca839e1f16836bfbbc7d8b53c3f60c649cbbbe56fc243c92914b",
+          "size_bytes": 19246268
+        },
+        "CHFJPY/tick/2022/DAT_ASCII_CHFJPY_T_202206.zip": {
+          "rows": 3730940,
+          "sha256": "94bcd2cede3cbcec0aba4dccf4e244340dcbca26969ee1c5967f5ea23daa6a07",
+          "size_bytes": 24071258
+        },
+        "CHFJPY/tick/2022/DAT_ASCII_CHFJPY_T_202207.zip": {
+          "rows": 3722679,
+          "sha256": "a4080be006435956a19a322a8fd7c65fa5fb5c27f22453580f0e37737b260204",
+          "size_bytes": 23832188
+        },
+        "CHFJPY/tick/2022/DAT_ASCII_CHFJPY_T_202208.zip": {
+          "rows": 3809648,
+          "sha256": "954e4affe7a685cf99f779697b0f51eb2ce2fe3a506de8efb3e6fdd230c25237",
+          "size_bytes": 24217582
+        },
+        "CHFJPY/tick/2022/DAT_ASCII_CHFJPY_T_202209.zip": {
+          "rows": 4796777,
+          "sha256": "1e8e371638ec200516e5f1fb607f003c285a5c6394be990ce294f9dc9f41b437",
+          "size_bytes": 30290390
+        },
+        "CHFJPY/tick/2022/DAT_ASCII_CHFJPY_T_202210.zip": {
+          "rows": 4123369,
+          "sha256": "98d21f69af209533368651c7b75b9679743bb5a2effebea02dd496f76837c7d2",
+          "size_bytes": 25702697
+        },
+        "CHFJPY/tick/2022/DAT_ASCII_CHFJPY_T_202211.zip": {
+          "rows": 3554354,
+          "sha256": "8f0801768aba38d01542b5c1c21ff852b7ce994fe75a1c86ee7c76b2afdd1340",
+          "size_bytes": 22166514
+        },
+        "CHFJPY/tick/2022/DAT_ASCII_CHFJPY_T_202212.zip": {
+          "rows": 3593159,
+          "sha256": "1cf6d0632a3365b865e63325447e8b90bba957ebaebeab04ce0d93c555b8ec0f",
+          "size_bytes": 23155635
+        },
+        "CHFJPY/tick/2023/DAT_ASCII_CHFJPY_T_202301.zip": {
+          "rows": 4018147,
+          "sha256": "fca470db66284e6a7cba158953a012e8b58328971b9e48dd595436dbeb3b9539",
+          "size_bytes": 26341465
+        },
+        "CHFJPY/tick/2023/DAT_ASCII_CHFJPY_T_202302.zip": {
+          "rows": 2867654,
+          "sha256": "892dfcc53fe588dac60f0cd97096eb71086cd12a0f21db4e484f24bcadd90b9d",
+          "size_bytes": 18683546
+        },
+        "CHFJPY/tick/2023/DAT_ASCII_CHFJPY_T_202303.zip": {
+          "rows": 3083782,
+          "sha256": "6cd1048d1c32774118c1ebe546878eac2952157d7da69effd45993b70350fd8d",
+          "size_bytes": 20421509
+        },
+        "CHFJPY/tick/2023/DAT_ASCII_CHFJPY_T_202304.zip": {
+          "rows": 1732557,
+          "sha256": "fe8f619ca3df71920b3813a595673d803238ea6d4e3b12457d0d799d608e7500",
+          "size_bytes": 11642369
+        },
+        "CHFJPY/tick/2023/DAT_ASCII_CHFJPY_T_202305.zip": {
+          "rows": 1685458,
+          "sha256": "5106f1adc5d54167eba7a35a5320fda5a74173349f86532356a341e7a1053d9b",
+          "size_bytes": 11471952
+        },
+        "CHFJPY/tick/2023/DAT_ASCII_CHFJPY_T_202306.zip": {
+          "rows": 1633615,
+          "sha256": "6329c3a85452727f8df0df200f285049731d482bcbe7a7e85c0caf897e0828ad",
+          "size_bytes": 11134275
+        },
+        "CHFJPY/tick/2023/DAT_ASCII_CHFJPY_T_202307.zip": {
+          "rows": 1884710,
+          "sha256": "ceac4ba34038618e67b9ccc79a993c6b0602a5eb9970d15080fc73c86376ae7e",
+          "size_bytes": 12982259
+        },
+        "CHFJPY/tick/2023/DAT_ASCII_CHFJPY_T_202308.zip": {
+          "rows": 2408904,
+          "sha256": "8c8e273bb8594f59a08a33b149beefc79de567d51fa3034cff36795466b33e1e",
+          "size_bytes": 16509111
+        },
+        "CHFJPY/tick/2023/DAT_ASCII_CHFJPY_T_202309.zip": {
+          "rows": 1850849,
+          "sha256": "2e47fe70fb4a48421384391f965a4dab939077583fdecde7809b80918e526a8c",
+          "size_bytes": 12671158
+        },
+        "CHFJPY/tick/2023/DAT_ASCII_CHFJPY_T_202310.zip": {
+          "rows": 2150675,
+          "sha256": "d934f21b42da3500e104c696de55c600a2ae51713a0ce560f63d19994486447b",
+          "size_bytes": 14741640
+        },
+        "CHFJPY/tick/2023/DAT_ASCII_CHFJPY_T_202311.zip": {
+          "rows": 1886185,
+          "sha256": "19fb19cfb74ac9d31487dc4d8a54fd122f974f18813d55054713e8b20d432c7f",
+          "size_bytes": 12943654
+        },
+        "CHFJPY/tick/2023/DAT_ASCII_CHFJPY_T_202312.zip": {
+          "rows": 2529031,
+          "sha256": "c5766cb05f4006bd29ded4e155291d49dc83ec90c1661dcc07a4b055e7bedd84",
+          "size_bytes": 17490883
+        },
+        "CHFJPY/tick/2024/DAT_ASCII_CHFJPY_T_202401.zip": {
+          "rows": 2621003,
+          "sha256": "bdedabb5036fa76d9c3f72f01d528fda448b0fa95124f3e9387174510ba41e95",
+          "size_bytes": 18074410
+        },
+        "CHFJPY/tick/2024/DAT_ASCII_CHFJPY_T_202402.zip": {
+          "rows": 2048154,
+          "sha256": "d8dda9357a3ca4aa946407934f6ec9506f80191b163bc1405e550c2587f3c703",
+          "size_bytes": 13816404
+        },
+        "CHFJPY/tick/2024/DAT_ASCII_CHFJPY_T_202403.zip": {
+          "rows": 2072711,
+          "sha256": "a1cda1e9be29ca89cff6ff1b2483fb83dce64b599bfedf8b0fe5de1546954e82",
+          "size_bytes": 14080313
+        },
+        "CHFJPY/tick/2024/DAT_ASCII_CHFJPY_T_202404.zip": {
+          "rows": 1953225,
+          "sha256": "5854f0e7761c6c22cf49418c82b588d2ede706b094fba6052a32f55c8c886c0f",
+          "size_bytes": 13504988
+        },
+        "CHFJPY/tick/2024/DAT_ASCII_CHFJPY_T_202405.zip": {
+          "rows": 1725359,
+          "sha256": "fb4c0b3f3a6bdd2785fc4296ca7fcc6ab20ca31033887293a808a870d511a788",
+          "size_bytes": 12006065
+        },
+        "CHFJPY/tick/2024/DAT_ASCII_CHFJPY_T_202406.zip": {
+          "rows": 1730212,
+          "sha256": "267964b3adb3e9c6f19655178b67746a8d7c86a42c5a6af56604f6a360fb3482",
+          "size_bytes": 11908895
+        },
+        "CHFJPY/tick/2024/DAT_ASCII_CHFJPY_T_202407.zip": {
+          "rows": 2497937,
+          "sha256": "d8033782da1d0da8af9f27893f4c6cf83bdb3c4e101811211b711dd6badc9ed2",
+          "size_bytes": 17290561
+        },
+        "CHFJPY/tick/2024/DAT_ASCII_CHFJPY_T_202408.zip": {
+          "rows": 4002132,
+          "sha256": "80ce12d98dede6bb78021c865d96f3dddc7c8fb562e0da66c6e7b777f98e8042",
+          "size_bytes": 27140478
+        },
+        "CHFJPY/tick/2024/DAT_ASCII_CHFJPY_T_202409.zip": {
+          "rows": 3687191,
+          "sha256": "d82bf9fb979dcf9b3d7cfbe1a0af8715ec72f75c8a7bd1273f5191e40c8e96f5",
+          "size_bytes": 24525371
+        },
+        "CHFJPY/tick/2024/DAT_ASCII_CHFJPY_T_202410.zip": {
+          "rows": 2991571,
+          "sha256": "3aa05b21d940a0176c2c149e22fa870dca41a6a51127ea0e061f18689f129a4e",
+          "size_bytes": 19806267
+        },
+        "CHFJPY/tick/2024/DAT_ASCII_CHFJPY_T_202411.zip": {
+          "rows": 3011892,
+          "sha256": "8d66b3dc972634a32426d00714caf6487ada8e01a9e0127e053bb5080366cf59",
+          "size_bytes": 19871044
+        },
+        "CHFJPY/tick/2024/DAT_ASCII_CHFJPY_T_202412.zip": {
+          "rows": 2255612,
+          "sha256": "b7835c471b1941cce124d4f9208b90a8d1a632e0306d5018648b7732b3cea42c",
+          "size_bytes": 15208066
+        },
+        "CHFJPY/tick/2025/DAT_ASCII_CHFJPY_T_202501.zip": {
+          "rows": 2612423,
+          "sha256": "9bb6d3894574ab46072e3b1d23c5156d217fdec49b9cea4919be79871e0c5f73",
+          "size_bytes": 17647191
+        },
+        "CHFJPY/tick/2025/DAT_ASCII_CHFJPY_T_202502.zip": {
+          "rows": 2291020,
+          "sha256": "0654971fb581f0150af2af3553fe7a2485d60a03b9e196e4b6569a2a32562353",
+          "size_bytes": 15487888
+        },
+        "CHFJPY/tick/2025/DAT_ASCII_CHFJPY_T_202503.zip": {
+          "rows": 2629807,
+          "sha256": "03e26969e20aab1b6211a3c32355921d11bace7b6a6baf7bae8b384361f745c7",
+          "size_bytes": 18074378
+        },
+        "CHFJPY/tick/2025/DAT_ASCII_CHFJPY_T_202504.zip": {
+          "rows": 5131565,
+          "sha256": "d8994e88cce429f3e11bb0021d0dee6ccaf15ad1b9db92b91f9c455572ebf577",
+          "size_bytes": 35096014
+        },
+        "CHFJPY/tick/2025/DAT_ASCII_CHFJPY_T_202505.zip": {
+          "rows": 2696111,
+          "sha256": "352567bc8528d73707c7c21e6f796f6111f5363d4f4733c114590c386ebb38f5",
+          "size_bytes": 18376201
+        },
+        "CHFJPY/tick/2025/DAT_ASCII_CHFJPY_T_202506.zip": {
+          "rows": 2358258,
+          "sha256": "e2bbd4327299f56d61fa76c0cd1d657a996c0adc265409b8d81cfe6623326a78",
+          "size_bytes": 16020646
+        },
+        "CHFJPY/tick/2025/DAT_ASCII_CHFJPY_T_202507.zip": {
+          "rows": 2304977,
+          "sha256": "11cbb48e6ab2973f06e186805e6c6c14102e207b800ab46e130f34d386c546da",
+          "size_bytes": 15845108
+        },
+        "CHFJPY/tick/2025/DAT_ASCII_CHFJPY_T_202508.zip": {
+          "rows": 2045271,
+          "sha256": "3a10d62919857a1c31e9b0bf33574e73c91854ec299b3ffac16ecacdb72f8229",
+          "size_bytes": 13999829
+        },
+        "CHFJPY/tick/2025/DAT_ASCII_CHFJPY_T_202509.zip": {
+          "rows": 2168827,
+          "sha256": "44557493fe67abc272aa7bc81c8b028855d777c2c91294df5ac08c569ee0b4fe",
+          "size_bytes": 14678855
+        },
+        "CHFJPY/tick/2025/DAT_ASCII_CHFJPY_T_202510.zip": {
+          "rows": 2456777,
+          "sha256": "18db9b71067eab9c6b8e6d3511352a9d62d4dfa8e6f81888bc8fed75621f293f",
+          "size_bytes": 16720048
+        },
+        "CHFJPY/tick/2025/DAT_ASCII_CHFJPY_T_202511.zip": {
+          "rows": 2067831,
+          "sha256": "4aaf7b74cefc4ed13000b10855da1e020e54f27debdf0b8de4d57d9403116080",
+          "size_bytes": 14100002
+        },
+        "CHFJPY/tick/2025/DAT_ASCII_CHFJPY_T_202512.zip": {
+          "rows": 1924100,
+          "sha256": "28f52902bd07e9b19a80225b3f8b1c053bc22296e36e1d22e03449d44f4841e7",
+          "size_bytes": 13168066
+        },
+        "CHFJPY/tick/2026/DAT_ASCII_CHFJPY_T_202601.zip": {
+          "rows": 2415685,
+          "sha256": "09f774588571b5e6f4696f1b9fe75c79e4ff1eba1f62c5f409cfce2ba35ecbea",
+          "size_bytes": 16718003
+        },
+        "CHFJPY/tick/2026/DAT_ASCII_CHFJPY_T_202602.zip": {
+          "rows": 2223013,
+          "sha256": "9c61a7170511ddab707b38edf6cf84f97314a29c88cfd06741224e0276316097",
+          "size_bytes": 15511366
+        },
+        "CHFJPY/tick/2026/DAT_ASCII_CHFJPY_T_202603.zip": {
+          "rows": 2753440,
+          "sha256": "578949f826b610843710c2fa632a358cf8665ba36ca0bbb406553c95f12b48ea",
+          "size_bytes": 18469093
+        },
+        "CHFJPY/tick/2026/DAT_ASCII_CHFJPY_T_202604.zip": {
+          "rows": 751689,
+          "sha256": "763d82e89d8dacbb5e5d613d89748c9291d2ada9bcb6c223dc373c38602e037f",
+          "size_bytes": 5011908
+        }
+      },
+      "latest_month": "202604",
+      "total_files": 196,
+      "total_size_bytes": 1977948608
     },
     "EURUSD": {
       "earliest_month": "201501",

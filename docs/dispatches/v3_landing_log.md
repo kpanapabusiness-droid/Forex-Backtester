@@ -167,3 +167,29 @@ Two minor deviations from the dispatch's literal text. Both flagged in the inten
 | 7 | PR opened | PENDING (Task 6) |
 
 End of log.
+
+---
+
+## UNCERTAIN flag resolution (chat-side, post-PR-review)
+
+Chat reviewed the 7 UNCERTAIN flags from Task 4 audit. Resolutions:
+
+**Archived (7 files moved):**
+- `docs/SPREAD_SEMANTICS_LOCK.md` → `docs/archive/calibration/` (obsolete under HistData)
+- `docs/L0_METHODOLOGY_LOCK.md` → `docs/archive/protocol/` (pre-v2.0, eliminated)
+- `docs/L_ARC_PROTOCOL.md` → `docs/archive/protocol/` (predecessor to v3.0)
+- `docs/L_ARC_PROTOCOL_v2_2_AMENDMENT.md` → `docs/archive/protocol/`
+- `docs/L_ARC_PROTOCOL_v2_3_AMENDMENT.md` → `docs/archive/protocol/`
+- `docs/L_ARC_PROTOCOL_v2_x_AMENDMENT_PROPOSAL.md` → `docs/archive/protocol/`
+- `docs/L_ARC_DEFERRED_CANDIDATES.md` → `docs/archive/legacy/` (superseded by TODO.md Phase 2)
+
+**Left at docs/:**
+- `docs/L_ARC_FEATURE_REGISTRY.md` (may inform Phase 0)
+- `docs/BACKTESTER_USER_GUIDE.md`, `docs/BACKTESTER_AUDIT.md`, `docs/CLAUDE_PROJECT_INSTRUCTIONS.md` (inventory-only reference, defaulting to keep)
+- `docs/LCHAR_ATLAS.md` (upstream of active registry)
+
+Deviation acceptances:
+- `docs/dispatches/` for intent/log artefacts — ACCEPTED
+- `results/ARC_QUEUE.md` archived with subdirs — ACCEPTED
+
+PR #159 captures full reorganisation including this resolution.

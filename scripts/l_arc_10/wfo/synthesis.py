@@ -16,9 +16,8 @@ import json
 import math
 import sys
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict
 
-import numpy as np
 import pandas as pd
 
 _REPO_ROOT = Path(__file__).resolve().parents[3]
@@ -120,7 +119,7 @@ def main() -> int:
     md.append("")
     md.append("## Material-uplift readout")
     md.append("")
-    md.append(f"**Chat-side material thresholds (defaults):**")
+    md.append("**Chat-side material thresholds (defaults):**")
     md.append(f"- Absolute Sharpe uplift ≥ {MATERIAL_SHARPE_UPLIFT}")
     md.append(f"- Relative Calmar uplift ≥ {MATERIAL_CALMAR_UPLIFT_PCT}%")
     md.append("")

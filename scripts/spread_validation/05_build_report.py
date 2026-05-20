@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import sys
-from pathlib import Path
 from datetime import datetime, timezone
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -89,7 +89,7 @@ def build_cross_pair_section(exec_df: pd.DataFrame) -> str:
     worst3 = too_low_1h.head(3)[["pair", "p50_spread_pips_first5min", "gap"]]
     lines = [
         f"- 1H execution bars: {len(too_low_1h)} of {len(rows_1h)} pairs ({pct_too_low:.0f}%) have real p50 > current floor (0.1 pip).",
-        f"- Worst 3 TOO_LOW pairs (by gap_p50_first5min_minus_floor):",
+        "- Worst 3 TOO_LOW pairs (by gap_p50_first5min_minus_floor):",
     ]
     for _, r in worst3.iterrows():
         lines.append(

@@ -11,7 +11,6 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 import yaml
 
@@ -110,7 +109,7 @@ true_c1_reject = true_c1[(true_c1["is_admit"] == 0) & (true_c1["is_early_exit"] 
 true_c1_early = true_c1[true_c1["is_early_exit"] == 1]
 true_c1_total_r = float(true_c1["final_r"].sum())
 true_c1_mean = float(true_c1["final_r"].mean())
-print(f"\n=== Framing 1 (TRUE cluster 1 only) ===")
+print("\n=== Framing 1 (TRUE cluster 1 only) ===")
 print(f"  total: n={len(true_c1)}, mean_r={true_c1_mean:+.4f}, sum_r={true_c1_total_r:+.2f}")
 print(f"  admit (true c1, classifier admitted): n={len(true_c1_admit)}, mean={float(true_c1_admit['final_r'].mean()):+.4f}")
 print(f"  reject (true c1, classifier rejected, bars_held>=3): n={len(true_c1_reject)}, mean={float(true_c1_reject['final_r'].mean()):+.4f}")
@@ -282,8 +281,8 @@ md.append("- OR a different pipeline (Pipeline E entry-only filter — but Phase
 md.append("")
 
 md.append("## 12. Data quality / engine notes\n")
-md.append(f"- Engine: `scripts/l_arc_4/step6_wfo.py` (new for this run; adapted from Arc 5's `step6_wfo_truth.py`)")
-md.append(f"- Input shas:")
+md.append("- Engine: `scripts/l_arc_4/step6_wfo.py` (new for this run; adapted from Arc 5's `step6_wfo_truth.py`)")
+md.append("- Input shas:")
 for k, v in meta["input_shas"].items():
     md.append(f"  - `{k}`: `{v[:24]}…`")
 md.append("- Two-run determinism: not explicitly tested in this run (engine is deterministic by construction — no randomness in S/2 lookup or PnL accounting); a stricter determinism check would re-run and sha-compare CSVs.")
@@ -292,7 +291,7 @@ md.append("- Position size at 0.20% risk: 0.20% × equity / (3 × ATR_price). R-
 md.append("")
 
 md.append("## Verdict statement\n")
-md.append(f"**Step 6 verdict: FAIL.**\n")
+md.append("**Step 6 verdict: FAIL.**\n")
 md.append("Under live-deployment full-pool framing with S/2 exit spread correction applied, Arc 4 cluster 1 (Stepwise climber) **FAILS** §10 pass-deployable AND pass-viable at all three tested risk levels (0.20%, 0.15%, 0.10%). The strategy's admit-only edge (Phase 5 §9 PASS at admit-only) is overwhelmed by:")
 md.append(f"1. Rejected-pool adverse selection ({n_reject:,} trades at {mean_reject:+.4f}R mean)")
 md.append(f"2. Pre-t SL hits ({n_early:,} early-exit trades at {mean_early:+.4f}R mean)")

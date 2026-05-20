@@ -20,7 +20,7 @@ import pandas as pd
 
 THIS = Path(__file__).resolve()
 sys.path.insert(0, str(THIS.parent))
-from lib_sim import load_path_arrays, simulate_policy_vectorized, EXIT_CODE_TO_LABEL
+from lib_sim import load_path_arrays, simulate_policy_vectorized  # noqa: E402
 
 REPO = THIS.parents[2]
 OUT_DIR = REPO / "results" / "arc_4_exit_entry_sweep"

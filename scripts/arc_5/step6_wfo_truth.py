@@ -43,7 +43,6 @@ Usage:
 
 from __future__ import annotations
 
-import hashlib
 import json
 import sys
 import time
@@ -61,12 +60,10 @@ if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
 from scripts.arc_5.step5_rerun_new_spreads import (  # noqa: E402
-    ALL_FEATURES,
     BASE_ENTRY_FEATURES,
     CLUSTER_F9_THRESHOLD,
     CLUSTER_LABEL,
     CLUSTER_R_FRAME_ATR_MULT,
-    DATA_DIR,
     WFO_FOLDS,
     _build_entry_features_for_pool,
     _build_path_tensor,
@@ -296,7 +293,6 @@ def main() -> int:
     entry_times = pd.to_datetime(new_trades_sorted["entry_time"])
     final_r_arr = new_trades_sorted["final_r"].to_numpy(dtype=float)
     bars_held = new_trades_sorted["bars_held"].to_numpy(dtype=int)
-    pairs_arr = new_trades_sorted["pair"].to_numpy()
     trade_ids_arr = new_trades_sorted["trade_id"].to_numpy(dtype=int)
     atr_14 = new_trades_sorted["atr_14_at_signal"].to_numpy(dtype=float)
     entry_prices = new_trades_sorted["entry_price"].to_numpy(dtype=float)

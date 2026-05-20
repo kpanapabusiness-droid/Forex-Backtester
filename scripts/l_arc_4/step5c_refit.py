@@ -246,7 +246,6 @@ def per_fold_refit(
         # Admission at locked threshold.
         admitted_in_oos = (p_oos >= ADMISSION_THRESHOLD)
         admitted_mask_refit_full[oos_idx[admitted_in_oos]] = True
-        refit_trade_ids = set(int(i) for i in oos_idx[admitted_in_oos].tolist())
 
         # Overlap with original.
         orig_ids = original_admitted_trade_ids_per_fold.get(f.fold, set())

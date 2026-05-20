@@ -26,7 +26,6 @@ import os
 import sys
 import time
 import zipfile
-from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import numpy as np

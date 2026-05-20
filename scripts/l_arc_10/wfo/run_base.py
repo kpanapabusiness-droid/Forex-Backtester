@@ -15,8 +15,12 @@ if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
 from scripts.l_arc_10.wfo._common import (  # noqa: E402
-    load_full_pool_bundle, run_wfo, THRESHOLD_GRID, SL_GRID, MODES,
     FEATURE_SET_NAMES,
+    MODES,
+    SL_GRID,
+    THRESHOLD_GRID,
+    load_full_pool_bundle,
+    run_wfo,
 )
 
 OUT_DIR = _REPO_ROOT / "results" / "l_arc_10" / "wfo_base"

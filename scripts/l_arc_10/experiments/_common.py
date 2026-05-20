@@ -17,7 +17,7 @@ import math
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -29,16 +29,11 @@ if str(_REPO_ROOT) not in sys.path:
 # Re-use Arc 10 Step 4 wiring (deterministic seeds, feature builders, D1 cache).
 from scripts.l_arc_10.step4_extractability import (  # noqa: E402
     PerPairCache,
-    PIPELINE_E_FEATURES,
-    PIPELINE_D1_FEATURES,
-    compute_pipeline_e_features,
-    compute_pipeline_d1_features,
-    compute_success_labels,
     _build_pair_cache,
     _build_paths_index,
-    _wilder_atr,
-    _ema,
-    _d1_lag1_idx,
+    compute_pipeline_d1_features,
+    compute_pipeline_e_features,
+    compute_success_labels,
 )
 
 RANDOM_STATE = 42
@@ -116,7 +111,7 @@ def load_arc10_c1_bundle(verbose: bool = False) -> C1Bundle:
     e_features_full = compute_pipeline_e_features(trades, pair_caches)
 
     if verbose:
-        print(f"  computing pipeline D1 features (full pool)", file=sys.stderr)
+        print("  computing pipeline D1 features (full pool)", file=sys.stderr)
     d1_features_full, _ = compute_pipeline_d1_features(trades, pair_caches)
 
     paths_index = _build_paths_index(paths_c1)

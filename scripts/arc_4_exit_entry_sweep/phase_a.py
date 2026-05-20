@@ -21,7 +21,7 @@ from scipy import stats as scistats
 
 THIS = Path(__file__).resolve()
 sys.path.insert(0, str(THIS.parent))
-from lib_sim import load_path_arrays, simulate_policy_vectorized, EXIT_CODE_TO_LABEL
+from lib_sim import load_path_arrays  # noqa: E402
 
 REPO = THIS.parents[2]
 OUT_DIR = REPO / "results" / "arc_4_exit_entry_sweep"
@@ -335,7 +335,7 @@ for sname, df in sviews.items():
         # use exit_reason='trail_hit' as proxy + mfe_locked_bar > -1 from path_metrics
         df_trail = df[df["exit_reason_baseline"] == "trail_hit"].copy()
         if "mfe_locked_bar" not in df_trail.columns:
-            print(f"  [warn] slice C missing mfe_locked_bar — skipping A2 for C")
+            print("  [warn] slice C missing mfe_locked_bar — skipping A2 for C")
             continue
     if len(df_trail) == 0:
         continue

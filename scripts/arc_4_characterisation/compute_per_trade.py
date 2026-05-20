@@ -13,7 +13,6 @@ for slices A, B, D consistency. Slice C uses its own refit final_r (3*ATR cluste
 """
 from __future__ import annotations
 
-import sys
 from pathlib import Path
 
 import numpy as np
@@ -141,8 +140,6 @@ def simulate_and_summarise(grp: pd.DataFrame) -> dict:
     # Path-shape metrics (computed up to exit_bar inclusive)
     mask_alive = bar_offset <= exit_bar
     close_alive = close_r[mask_alive]
-    mfe_alive = mfe[mask_alive]
-    mae_alive = mae[mask_alive]
     n_alive = len(close_alive)
 
     # monotonicity_ratio_in_profit: among bars where close_r>0, frac where close_r[i] >= close_r[i-1]

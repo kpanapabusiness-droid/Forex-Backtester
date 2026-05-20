@@ -29,10 +29,9 @@ from each arc's published Step 4 summaries.
 
 from __future__ import annotations
 
-import json
 import sys
 from pathlib import Path
-from typing import List, Dict
+from typing import Dict, List
 
 import numpy as np
 import pandas as pd

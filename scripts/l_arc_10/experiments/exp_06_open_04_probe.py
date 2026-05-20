@@ -28,7 +28,6 @@ All variants use the same 5-fold TimeSeriesSplit / RF seed=42 wiring.
 
 from __future__ import annotations
 
-import json
 import sys
 from pathlib import Path
 from typing import Dict, List
@@ -43,9 +42,9 @@ if str(_REPO_ROOT) not in sys.path:
 from scripts.l_arc_10.experiments._common import (  # noqa: E402
     PIPELINE_E_FEATURES,
     load_arc10_c1_bundle,
-    wf_oof_preds,
     mean_auc_safe,
     sha256_file,
+    wf_oof_preds,
 )
 from scripts.l_arc_10.step4_extractability import _d1_lag1_idx  # noqa: E402
 

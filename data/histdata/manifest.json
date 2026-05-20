@@ -1,5 +1,5 @@
 {
-  "downloaded_at": "2026-05-20T09:18:23+00:00",
+  "downloaded_at": "2026-05-20T13:23:06+00:00",
   "pairs": {
     "AUDCAD": {
       "earliest_month": "201001",
@@ -7904,6 +7904,1982 @@
       "latest_month": "202604",
       "total_files": 196,
       "total_size_bytes": 1977948608
+    },
+    "EURAUD": {
+      "earliest_month": "201001",
+      "files": {
+        "EURAUD/tick/2010/DAT_ASCII_EURAUD_T_201001.zip": {
+          "rows": 760545,
+          "sha256": "e46103f86e4794809335cfd5a8cc079e96499636f9c9de45d3030bb3ca6034d6",
+          "size_bytes": 2926208
+        },
+        "EURAUD/tick/2010/DAT_ASCII_EURAUD_T_201002.zip": {
+          "rows": 807585,
+          "sha256": "b5b2729045b741543e8164b8afa15e4a5c3d25e598a209888b5b094cf9e7513a",
+          "size_bytes": 3065346
+        },
+        "EURAUD/tick/2010/DAT_ASCII_EURAUD_T_201003.zip": {
+          "rows": 892428,
+          "sha256": "dfa19bc394b5bc775d4d4ea936ab6d88d4da40ba6a25c1d3698b1e93a7bbde5e",
+          "size_bytes": 3201745
+        },
+        "EURAUD/tick/2010/DAT_ASCII_EURAUD_T_201004.zip": {
+          "rows": 831893,
+          "sha256": "4c3897a9c14720f62db7176ffb1d9e218d595903ccaa09b61eeb380ec9e5f7fb",
+          "size_bytes": 2851765
+        },
+        "EURAUD/tick/2010/DAT_ASCII_EURAUD_T_201005.zip": {
+          "rows": 1211359,
+          "sha256": "d7ffdf0c9878db8a8d21d8aea27df07e5902a5b815f881fdc4321013376e332a",
+          "size_bytes": 4538518
+        },
+        "EURAUD/tick/2010/DAT_ASCII_EURAUD_T_201006.zip": {
+          "rows": 1061483,
+          "sha256": "fd6e23792c3ae3777628ab40b77b028ebd1099e7333f8418c48fc9e60199737f",
+          "size_bytes": 3975748
+        },
+        "EURAUD/tick/2010/DAT_ASCII_EURAUD_T_201007.zip": {
+          "rows": 861899,
+          "sha256": "6b48e5bb9723b2a3c3dc0a772527a6e704399338e8286b78055abe23ccf33b72",
+          "size_bytes": 3252249
+        },
+        "EURAUD/tick/2010/DAT_ASCII_EURAUD_T_201008.zip": {
+          "rows": 827436,
+          "sha256": "aee8625a20f690e0b14dbda318b96d40dd499446d675004878e395553c8e30d5",
+          "size_bytes": 3103299
+        },
+        "EURAUD/tick/2010/DAT_ASCII_EURAUD_T_201009.zip": {
+          "rows": 831683,
+          "sha256": "39853b5c76bb235c783e520a17602650d9c083a0691cabea7bc600987f9a5feb",
+          "size_bytes": 3069151
+        },
+        "EURAUD/tick/2010/DAT_ASCII_EURAUD_T_201010.zip": {
+          "rows": 600418,
+          "sha256": "ef1a19670215a9cd0f388d92205b78aeca1523e4da52ce55c08c65ace0651afd",
+          "size_bytes": 2121811
+        },
+        "EURAUD/tick/2010/DAT_ASCII_EURAUD_T_201011.zip": {
+          "rows": 659952,
+          "sha256": "846254617f5dc32b788d52890c8511cd8bd8d893076cddeb351b3f8a63b7e438",
+          "size_bytes": 2302406
+        },
+        "EURAUD/tick/2010/DAT_ASCII_EURAUD_T_201012.zip": {
+          "rows": 502502,
+          "sha256": "8ac7f0d36c932bfb71f7f123a87888950134a5c53339d822b2c4e205b91645f8",
+          "size_bytes": 1777479
+        },
+        "EURAUD/tick/2011/DAT_ASCII_EURAUD_T_201101.zip": {
+          "rows": 551657,
+          "sha256": "f8e95a5d9ebaa1ef4ada66522757055033e41147642133ea3d6a8402c670d829",
+          "size_bytes": 1928442
+        },
+        "EURAUD/tick/2011/DAT_ASCII_EURAUD_T_201102.zip": {
+          "rows": 470069,
+          "sha256": "dd222a9b7cb8b90656a587a13fa1ad3e8fb3c291e44fec7d772ebfd962d0b2d3",
+          "size_bytes": 1621755
+        },
+        "EURAUD/tick/2011/DAT_ASCII_EURAUD_T_201103.zip": {
+          "rows": 524385,
+          "sha256": "b8eb57229134498d6aa395606e9509df791d82a6ad35e17a3bad636cacaae0fe",
+          "size_bytes": 1870010
+        },
+        "EURAUD/tick/2011/DAT_ASCII_EURAUD_T_201104.zip": {
+          "rows": 404472,
+          "sha256": "007f6a3aab7b3cc7711eb38577700ee10f0b08b46cde112b7a71ff8a62bb1fba",
+          "size_bytes": 1603411
+        },
+        "EURAUD/tick/2011/DAT_ASCII_EURAUD_T_201105.zip": {
+          "rows": 527979,
+          "sha256": "d49af2326b9813cbe36e85aa8bb5267cc190fb0891fb89b90d2854f1d8a9c940",
+          "size_bytes": 2635515
+        },
+        "EURAUD/tick/2011/DAT_ASCII_EURAUD_T_201106.zip": {
+          "rows": 570574,
+          "sha256": "3e0dfd4c8357ca7ec5c5f2e9353c6ceb9b3b84b7b70ab72f604e9b663cf9523b",
+          "size_bytes": 2793015
+        },
+        "EURAUD/tick/2011/DAT_ASCII_EURAUD_T_201107.zip": {
+          "rows": 512818,
+          "sha256": "7d6864800330ab0ca95adb2868f3608ddc4f0c3dd30a6c28f7155dbf98f49183",
+          "size_bytes": 2526343
+        },
+        "EURAUD/tick/2011/DAT_ASCII_EURAUD_T_201108.zip": {
+          "rows": 752199,
+          "sha256": "1955d32054bdd438fca78022514336e4ef357064c42d6ba077dfce1d00b1ac59",
+          "size_bytes": 3699410
+        },
+        "EURAUD/tick/2011/DAT_ASCII_EURAUD_T_201109.zip": {
+          "rows": 682988,
+          "sha256": "d9db50f93b289364292b7ac80bf617064ef6b66b125fb2b6589c1d2d875273c4",
+          "size_bytes": 3392026
+        },
+        "EURAUD/tick/2011/DAT_ASCII_EURAUD_T_201110.zip": {
+          "rows": 717252,
+          "sha256": "b5b81329babe3e7c1d37eae66ec6c651e01efd4f054e4720dfa63d9a478b75f6",
+          "size_bytes": 3529479
+        },
+        "EURAUD/tick/2011/DAT_ASCII_EURAUD_T_201111.zip": {
+          "rows": 691258,
+          "sha256": "c50e05b40595bf31d101a9b8f27edb92c1560a5e5ea4da31dd8260590f094fe6",
+          "size_bytes": 3366357
+        },
+        "EURAUD/tick/2011/DAT_ASCII_EURAUD_T_201112.zip": {
+          "rows": 1666808,
+          "sha256": "fad295cc063fc61e9e5c24418147deb5596c226bf8c124d8027ce7b27ddc6c21",
+          "size_bytes": 9197814
+        },
+        "EURAUD/tick/2012/DAT_ASCII_EURAUD_T_201201.zip": {
+          "rows": 1829465,
+          "sha256": "153f9905ab35bef8a6fdf4a9cb8be06cd227754c6ffd27084cd59b0bf1a8fbdc",
+          "size_bytes": 9931823
+        },
+        "EURAUD/tick/2012/DAT_ASCII_EURAUD_T_201202.zip": {
+          "rows": 2148630,
+          "sha256": "8d521e7b90fab224be1d9449d29e05a78e6594b3e028efc2e92a697868acc6b1",
+          "size_bytes": 11380030
+        },
+        "EURAUD/tick/2012/DAT_ASCII_EURAUD_T_201203.zip": {
+          "rows": 2018987,
+          "sha256": "0c058dddc17bfff27708daadea1d577cb3594f264e424b6afcd5df3fcbb87d32",
+          "size_bytes": 10803718
+        },
+        "EURAUD/tick/2012/DAT_ASCII_EURAUD_T_201204.zip": {
+          "rows": 1784246,
+          "sha256": "e2808166b9333aaa2e48e85061ca8768a577fc9d151d85425c148cf583cd4560",
+          "size_bytes": 9548516
+        },
+        "EURAUD/tick/2012/DAT_ASCII_EURAUD_T_201205.zip": {
+          "rows": 2244271,
+          "sha256": "987e740371312d272d13ea2836b0c24468cf34102079d717de8d413cc269f614",
+          "size_bytes": 12019843
+        },
+        "EURAUD/tick/2012/DAT_ASCII_EURAUD_T_201206.zip": {
+          "rows": 1866168,
+          "sha256": "6318c725d245cb0e7ff16b16dc93495d1bcb15079547de07d82ea1bc874735c2",
+          "size_bytes": 10099299
+        },
+        "EURAUD/tick/2012/DAT_ASCII_EURAUD_T_201207.zip": {
+          "rows": 1557129,
+          "sha256": "bc2ce12f9150b85360bb52f83df77005296bb70bd67e1dd270fc491975ee0b4a",
+          "size_bytes": 8485850
+        },
+        "EURAUD/tick/2012/DAT_ASCII_EURAUD_T_201208.zip": {
+          "rows": 1316470,
+          "sha256": "0fb9eb9daea1aa4411de99f320dd21a15eee6ccc71784b6ab8efb37a4e130d34",
+          "size_bytes": 7230419
+        },
+        "EURAUD/tick/2012/DAT_ASCII_EURAUD_T_201209.zip": {
+          "rows": 1448439,
+          "sha256": "fa99f02e791e0d9dd91dad1022e1198b78f21e248dbb0c8772d4fafb717724ad",
+          "size_bytes": 7980518
+        },
+        "EURAUD/tick/2012/DAT_ASCII_EURAUD_T_201210.zip": {
+          "rows": 1395138,
+          "sha256": "d73ba6236a4ab6d4f2abb9a1aff2ff6dd79dbfe4cd896fe3c8162475f7ae940f",
+          "size_bytes": 7723521
+        },
+        "EURAUD/tick/2012/DAT_ASCII_EURAUD_T_201211.zip": {
+          "rows": 1143410,
+          "sha256": "d6800d3eb902591d378a996fad7676bb92ca51b4ec51b2d0da2ad98fb6aad0b7",
+          "size_bytes": 6391860
+        },
+        "EURAUD/tick/2012/DAT_ASCII_EURAUD_T_201212.zip": {
+          "rows": 885215,
+          "sha256": "3744d8cb669cb1fdb2fcc32148d37d31adf2264aac886bcfa04ae3415b89b918",
+          "size_bytes": 5039953
+        },
+        "EURAUD/tick/2013/DAT_ASCII_EURAUD_T_201301.zip": {
+          "rows": 1257853,
+          "sha256": "15467fd1398d616c02967b18223525bcfabc3506da4f514704825b54f010aef4",
+          "size_bytes": 7214749
+        },
+        "EURAUD/tick/2013/DAT_ASCII_EURAUD_T_201302.zip": {
+          "rows": 1189723,
+          "sha256": "79da5fa45bd4e30138310bcba251f41697df412ee722aaad9e21e168a0a16bea",
+          "size_bytes": 6978965
+        },
+        "EURAUD/tick/2013/DAT_ASCII_EURAUD_T_201303.zip": {
+          "rows": 1177281,
+          "sha256": "5264909dfaee309d832ff171486226f08c9baad0e2d93eebf7aed896e090894b",
+          "size_bytes": 6759692
+        },
+        "EURAUD/tick/2013/DAT_ASCII_EURAUD_T_201304.zip": {
+          "rows": 1280651,
+          "sha256": "1154cc169287922a4bee2b7ba02ff1f855cacf61f0ae359ab414a2529b6bca98",
+          "size_bytes": 7347389
+        },
+        "EURAUD/tick/2013/DAT_ASCII_EURAUD_T_201305.zip": {
+          "rows": 1455104,
+          "sha256": "5ddb14ba9b8d9bbcffebc527ae3c43665bcf5d707eeb83b1936ffb4688362e3e",
+          "size_bytes": 8503616
+        },
+        "EURAUD/tick/2013/DAT_ASCII_EURAUD_T_201306.zip": {
+          "rows": 1727253,
+          "sha256": "bd5451e2d0232468ca9b8915165a27af96fcabe7661fc5514bd56ef15f52ad94",
+          "size_bytes": 10291114
+        },
+        "EURAUD/tick/2013/DAT_ASCII_EURAUD_T_201307.zip": {
+          "rows": 1863366,
+          "sha256": "1aaf79cf34f44ebd0ca65e7ba62a24b3b0f2dd1839c6268195ac793b8523ae2a",
+          "size_bytes": 10948705
+        },
+        "EURAUD/tick/2013/DAT_ASCII_EURAUD_T_201308.zip": {
+          "rows": 1432880,
+          "sha256": "c19ec1fb19395a1e306f4b2f8e7e03b06f8d9a974c77d75419f4a73e4e427235",
+          "size_bytes": 8496595
+        },
+        "EURAUD/tick/2013/DAT_ASCII_EURAUD_T_201309.zip": {
+          "rows": 1210772,
+          "sha256": "4a18ce4cf1f2178aa3381d34517cfa0db7529118ab80a71fc952e04be1f50493",
+          "size_bytes": 7110169
+        },
+        "EURAUD/tick/2013/DAT_ASCII_EURAUD_T_201310.zip": {
+          "rows": 1126874,
+          "sha256": "7c3c252eba23a92b2067b054e2187463b520b75601bf2563ec1f5696d039996f",
+          "size_bytes": 6679154
+        },
+        "EURAUD/tick/2013/DAT_ASCII_EURAUD_T_201311.zip": {
+          "rows": 948635,
+          "sha256": "8c8ea3df394f215f143a51fc197df2d4f68eed88ae7037fd6b251c742e036589",
+          "size_bytes": 5710840
+        },
+        "EURAUD/tick/2013/DAT_ASCII_EURAUD_T_201312.zip": {
+          "rows": 954503,
+          "sha256": "d09c53cb921c7f0a9585a0f3fe69f6037b19837621ed0e8868bedd738409bc39",
+          "size_bytes": 5765488
+        },
+        "EURAUD/tick/2014/DAT_ASCII_EURAUD_T_201401.zip": {
+          "rows": 1356770,
+          "sha256": "ac582483839b054c8e8079902c5f2370c8b427679ac2c0c26c730844a8f05cd7",
+          "size_bytes": 8095966
+        },
+        "EURAUD/tick/2014/DAT_ASCII_EURAUD_T_201402.zip": {
+          "rows": 1084012,
+          "sha256": "295e9995c3edf3f8a10ff5b0920b4ceb38bb243a1b7fb4ae06f1eec203ddb6df",
+          "size_bytes": 6531606
+        },
+        "EURAUD/tick/2014/DAT_ASCII_EURAUD_T_201403.zip": {
+          "rows": 1061654,
+          "sha256": "9af576df1611821e56a0b943d59b5f79131bacfc16cbaea621d888bf48785319",
+          "size_bytes": 6325675
+        },
+        "EURAUD/tick/2014/DAT_ASCII_EURAUD_T_201404.zip": {
+          "rows": 877100,
+          "sha256": "ccde52d676b049d19f42f9900d112c5dc09ea5457565514b04e26aa63fd83dcf",
+          "size_bytes": 5174458
+        },
+        "EURAUD/tick/2014/DAT_ASCII_EURAUD_T_201405.zip": {
+          "rows": 881094,
+          "sha256": "610e366aa09b3cc05ecc851ca836e974566d73c25d6f3593240a524079a439bb",
+          "size_bytes": 5171379
+        },
+        "EURAUD/tick/2014/DAT_ASCII_EURAUD_T_201406.zip": {
+          "rows": 751615,
+          "sha256": "b1d339cc9a8835164d0e6c496d6d21254a22af80c46837c28e46ef4dea3c4d66",
+          "size_bytes": 4416049
+        },
+        "EURAUD/tick/2014/DAT_ASCII_EURAUD_T_201407.zip": {
+          "rows": 799040,
+          "sha256": "a08a7a2dc29cf0180d5eafabc43fbfdb750d1cb268f241de27afae583542559a",
+          "size_bytes": 4542746
+        },
+        "EURAUD/tick/2014/DAT_ASCII_EURAUD_T_201408.zip": {
+          "rows": 931134,
+          "sha256": "3185915dbd5ae6f9e0f1d007359afcb63b6b452245d80e4f03749acbe84ddc43",
+          "size_bytes": 4644313
+        },
+        "EURAUD/tick/2014/DAT_ASCII_EURAUD_T_201409.zip": {
+          "rows": 1413344,
+          "sha256": "c3676dc43e5583f185a80078f916670508149a9555c313c404d6f8a54ea3b13c",
+          "size_bytes": 7106022
+        },
+        "EURAUD/tick/2014/DAT_ASCII_EURAUD_T_201410.zip": {
+          "rows": 1696654,
+          "sha256": "b9304bd03bdb29662518876176cfaf0b013d72c02d681e77302a39fd0c9a02a5",
+          "size_bytes": 9928239
+        },
+        "EURAUD/tick/2014/DAT_ASCII_EURAUD_T_201411.zip": {
+          "rows": 1670073,
+          "sha256": "e05c20b6d0f7a4c5fc7152889a40087cee3fd30a4f16ebc189f811e9053c20de",
+          "size_bytes": 9470520
+        },
+        "EURAUD/tick/2014/DAT_ASCII_EURAUD_T_201412.zip": {
+          "rows": 1578315,
+          "sha256": "9e18abde17a0d0f2995b7d4f4b674372e7bfc2ea69b882bab86104a6955fca6b",
+          "size_bytes": 9046611
+        },
+        "EURAUD/tick/2015/DAT_ASCII_EURAUD_T_201501.zip": {
+          "rows": 1896884,
+          "sha256": "e996f93b2e2d8526ba75de53ca4143329a06f2a8b782509028b9f8076228a3f4",
+          "size_bytes": 11156656
+        },
+        "EURAUD/tick/2015/DAT_ASCII_EURAUD_T_201502.zip": {
+          "rows": 1632309,
+          "sha256": "f347da3f7c7ae7877dfec24a82d3079aefff2c9c55af48638fdd6bc0f1a9bf4e",
+          "size_bytes": 9571208
+        },
+        "EURAUD/tick/2015/DAT_ASCII_EURAUD_T_201503.zip": {
+          "rows": 2120495,
+          "sha256": "054b2b3f9a8ef400c4e0ec389771bf5b4d6e0bb44e496ca91508ea7b81a43315",
+          "size_bytes": 12274175
+        },
+        "EURAUD/tick/2015/DAT_ASCII_EURAUD_T_201504.zip": {
+          "rows": 1982043,
+          "sha256": "9ce909eed430ebf0ba86c7d1dfccd2e51215bf6d2fad5a8eeeaa70d7bce23c04",
+          "size_bytes": 11340888
+        },
+        "EURAUD/tick/2015/DAT_ASCII_EURAUD_T_201505.zip": {
+          "rows": 2072073,
+          "sha256": "fab1069ea104dc638a9e82f5c80325bff0254395ebb69b0002c247f858b32c72",
+          "size_bytes": 11675556
+        },
+        "EURAUD/tick/2015/DAT_ASCII_EURAUD_T_201506.zip": {
+          "rows": 2314114,
+          "sha256": "00add03187cbe3c59522ecade9275398a89277df5a6d5faafb8cf1182adc3760",
+          "size_bytes": 12936044
+        },
+        "EURAUD/tick/2015/DAT_ASCII_EURAUD_T_201507.zip": {
+          "rows": 2216372,
+          "sha256": "323872cdbc9259804cb201e2701dc085056960cf6c38b64f23ba466b29a07073",
+          "size_bytes": 12409258
+        },
+        "EURAUD/tick/2015/DAT_ASCII_EURAUD_T_201508.zip": {
+          "rows": 2201286,
+          "sha256": "a83ae0fbb07c152828e6e7f8f6fd002de4912c67a7be94f4e9ee75e8b21f2bd1",
+          "size_bytes": 12647414
+        },
+        "EURAUD/tick/2015/DAT_ASCII_EURAUD_T_201509.zip": {
+          "rows": 1991739,
+          "sha256": "048d579cea562803105cc9496579863559589e666ff62bf11862e498e328f020",
+          "size_bytes": 11867998
+        },
+        "EURAUD/tick/2015/DAT_ASCII_EURAUD_T_201510.zip": {
+          "rows": 1911201,
+          "sha256": "5325213d6704641b3333a9ff7f32d89929ec89a0d31fb5e76dbcb7f46bb02116",
+          "size_bytes": 11106638
+        },
+        "EURAUD/tick/2015/DAT_ASCII_EURAUD_T_201511.zip": {
+          "rows": 2022274,
+          "sha256": "99b8c4b940246c710dabe6ce288ec1622b1beee009def125673df84cb1e43ee9",
+          "size_bytes": 11246645
+        },
+        "EURAUD/tick/2015/DAT_ASCII_EURAUD_T_201512.zip": {
+          "rows": 2192493,
+          "sha256": "06b1957f4eb50c6ed060506e9c681531c951c19d150091f00e906b1a4dceb09e",
+          "size_bytes": 12277347
+        },
+        "EURAUD/tick/2016/DAT_ASCII_EURAUD_T_201601.zip": {
+          "rows": 2708583,
+          "sha256": "63a8862b85879577188311ce9b7b5fecb0f2f95567b9338cb3db31415660273b",
+          "size_bytes": 15840442
+        },
+        "EURAUD/tick/2016/DAT_ASCII_EURAUD_T_201602.zip": {
+          "rows": 2342242,
+          "sha256": "fcfa0e6485627b2d52f2a645875e5c508c971d6d7ba39f69f9a2503f25689f26",
+          "size_bytes": 13719569
+        },
+        "EURAUD/tick/2016/DAT_ASCII_EURAUD_T_201603.zip": {
+          "rows": 2095656,
+          "sha256": "e9457e9c9042eb2f514be66dec9a5e392cadf8331f6f260097360db633256b74",
+          "size_bytes": 11998589
+        },
+        "EURAUD/tick/2016/DAT_ASCII_EURAUD_T_201604.zip": {
+          "rows": 1537862,
+          "sha256": "da2ee3bfc2b899568e2958340dd47e137b8cffae82a812071f00ce348feb332e",
+          "size_bytes": 9082056
+        },
+        "EURAUD/tick/2016/DAT_ASCII_EURAUD_T_201605.zip": {
+          "rows": 1229453,
+          "sha256": "45702b226f3f612ef03ca081fdbb4e6e9c43db45a37f8fed353bdc862efefd44",
+          "size_bytes": 7337875
+        },
+        "EURAUD/tick/2016/DAT_ASCII_EURAUD_T_201606.zip": {
+          "rows": 1515203,
+          "sha256": "f1081286fff8ffa2467be4563bdbe44da622cfcd57cbf4de7c912ac64ca13c16",
+          "size_bytes": 9020941
+        },
+        "EURAUD/tick/2016/DAT_ASCII_EURAUD_T_201607.zip": {
+          "rows": 1323571,
+          "sha256": "db7f7a4a400b09ce849924b09730e8e0a1f8fdba544de11946885fc276bf5ffc",
+          "size_bytes": 7677464
+        },
+        "EURAUD/tick/2016/DAT_ASCII_EURAUD_T_201608.zip": {
+          "rows": 1202760,
+          "sha256": "76c65a85d0e2f10ec9ae017fc8e5e85f72eec9651f66bddcecfddb28bf7d7625",
+          "size_bytes": 6808768
+        },
+        "EURAUD/tick/2016/DAT_ASCII_EURAUD_T_201609.zip": {
+          "rows": 1248616,
+          "sha256": "5a28416d15cc23a43732202bc45f6ddc57af48127c04aa489b3e6df770ddfc77",
+          "size_bytes": 7117479
+        },
+        "EURAUD/tick/2016/DAT_ASCII_EURAUD_T_201610.zip": {
+          "rows": 1245855,
+          "sha256": "df9bd5db6309761c68dac9d3b24ec9c18236cb99bd5f13e24294858a64553458",
+          "size_bytes": 7053487
+        },
+        "EURAUD/tick/2016/DAT_ASCII_EURAUD_T_201611.zip": {
+          "rows": 2160920,
+          "sha256": "ad55f061f7a5f1117649a7e4db6fed7519de37884cab88ff424625db69059df1",
+          "size_bytes": 12130435
+        },
+        "EURAUD/tick/2016/DAT_ASCII_EURAUD_T_201612.zip": {
+          "rows": 1279217,
+          "sha256": "d907bcd4d9710ca56cf9e920c9089fb5db64f4afcec0b08bcfaae32b9303bfef",
+          "size_bytes": 7295867
+        },
+        "EURAUD/tick/2017/DAT_ASCII_EURAUD_T_201701.zip": {
+          "rows": 1716531,
+          "sha256": "59ad260f65c7863ea7a8454ef115071778cf6be7ce7178070771fa234cf85906",
+          "size_bytes": 9456655
+        },
+        "EURAUD/tick/2017/DAT_ASCII_EURAUD_T_201702.zip": {
+          "rows": 1579478,
+          "sha256": "535336ee54f7d1d1f2d46f9438cf6c423f976e21121010b29162262adbf30c1b",
+          "size_bytes": 8446099
+        },
+        "EURAUD/tick/2017/DAT_ASCII_EURAUD_T_201703.zip": {
+          "rows": 1797410,
+          "sha256": "66d77fbffd75ff65b97e99262b7c2fa49bc62b7ac78eef74713cfbf05f9e25c4",
+          "size_bytes": 9647091
+        },
+        "EURAUD/tick/2017/DAT_ASCII_EURAUD_T_201704.zip": {
+          "rows": 1264750,
+          "sha256": "4093731917bc57ded6ae5795f444615e0f3150846be46282a626b9ba83af2629",
+          "size_bytes": 6936778
+        },
+        "EURAUD/tick/2017/DAT_ASCII_EURAUD_T_201705.zip": {
+          "rows": 1446781,
+          "sha256": "d5e0dfe26455e12ecf825599cb5543ced274421aebd939952aea88adc3c267e9",
+          "size_bytes": 8048305
+        },
+        "EURAUD/tick/2017/DAT_ASCII_EURAUD_T_201706.zip": {
+          "rows": 1460414,
+          "sha256": "474ac48f9f86e35e9dcafbd79920103f581b4454285e464327a12c4fbcf56497",
+          "size_bytes": 7928513
+        },
+        "EURAUD/tick/2017/DAT_ASCII_EURAUD_T_201707.zip": {
+          "rows": 1515449,
+          "sha256": "5e4c7890047d65b9ebb42d41cb13309f83cd27753c2d08ce5e1c8fafbbab67d6",
+          "size_bytes": 8323200
+        },
+        "EURAUD/tick/2017/DAT_ASCII_EURAUD_T_201708.zip": {
+          "rows": 1469992,
+          "sha256": "80e0a7af81fa537e114d648accf0554299b2d1bd3d1295fa4941865e8c9a5858",
+          "size_bytes": 8144889
+        },
+        "EURAUD/tick/2017/DAT_ASCII_EURAUD_T_201709.zip": {
+          "rows": 1186171,
+          "sha256": "2e7ce01937acba0003f1e1bfdcda0e56365912e6191ee6b3cd9edca66b3cf03d",
+          "size_bytes": 6841721
+        },
+        "EURAUD/tick/2017/DAT_ASCII_EURAUD_T_201710.zip": {
+          "rows": 1118172,
+          "sha256": "c7b1003b912630429bd6341d9855cb9eb0918118177628c6aee9a738677463be",
+          "size_bytes": 6349277
+        },
+        "EURAUD/tick/2017/DAT_ASCII_EURAUD_T_201711.zip": {
+          "rows": 1032061,
+          "sha256": "50190bf147b095229caa938c8c197f7e0cf28449c5f31c7ef30b91ed19874b04",
+          "size_bytes": 5840489
+        },
+        "EURAUD/tick/2017/DAT_ASCII_EURAUD_T_201712.zip": {
+          "rows": 876487,
+          "sha256": "870e3e21dace5fef1e3453cb81dbdb8c21e7742ebc88e395dd6e8d55b326f703",
+          "size_bytes": 4998545
+        },
+        "EURAUD/tick/2018/DAT_ASCII_EURAUD_T_201801.zip": {
+          "rows": 1362488,
+          "sha256": "d0f20c840b90a74e1ac9618eacf413dd31ec4668ab697a430d8124cf144a9a8b",
+          "size_bytes": 7746535
+        },
+        "EURAUD/tick/2018/DAT_ASCII_EURAUD_T_201802.zip": {
+          "rows": 1612024,
+          "sha256": "f7f69f1af3a773471f7d5ad1b62da23b827c8c00c056fa3892f0802aa26d4b57",
+          "size_bytes": 9054176
+        },
+        "EURAUD/tick/2018/DAT_ASCII_EURAUD_T_201803.zip": {
+          "rows": 1453012,
+          "sha256": "99ad9f06d5b63642832ae72894027aad7cb92a362a9999770835f198ba156262",
+          "size_bytes": 8165896
+        },
+        "EURAUD/tick/2018/DAT_ASCII_EURAUD_T_201804.zip": {
+          "rows": 1138821,
+          "sha256": "27510fd7331354b7939f570345bd067650502364f528ec36f52fdb46d8f103e3",
+          "size_bytes": 6398898
+        },
+        "EURAUD/tick/2018/DAT_ASCII_EURAUD_T_201805.zip": {
+          "rows": 1704813,
+          "sha256": "5d80115494422713b5b868ba5cffcfcfad1639c0e3057cadd5842c11b29aeb55",
+          "size_bytes": 9538213
+        },
+        "EURAUD/tick/2018/DAT_ASCII_EURAUD_T_201806.zip": {
+          "rows": 1547417,
+          "sha256": "cea934b18769fa3d1a3f36ffb399a2ee663c8c37b3e41c110ad2267dee13c6ad",
+          "size_bytes": 8501090
+        },
+        "EURAUD/tick/2018/DAT_ASCII_EURAUD_T_201807.zip": {
+          "rows": 1589690,
+          "sha256": "d9d5997aae1780440e522f617029e5b1f34a45855642cd1a61db8bd1166e2e7a",
+          "size_bytes": 8626599
+        },
+        "EURAUD/tick/2018/DAT_ASCII_EURAUD_T_201808.zip": {
+          "rows": 1608200,
+          "sha256": "d438d733ba5d6f9acc3af15da04f23ad64ab4c856de0427280774e0a77af5cd4",
+          "size_bytes": 8671811
+        },
+        "EURAUD/tick/2018/DAT_ASCII_EURAUD_T_201809.zip": {
+          "rows": 1492950,
+          "sha256": "a56d18cd57068215fee59026fb9e91b035b9760b1328d47e1e614c399ade57b0",
+          "size_bytes": 8174671
+        },
+        "EURAUD/tick/2018/DAT_ASCII_EURAUD_T_201810.zip": {
+          "rows": 1864535,
+          "sha256": "7e7b3878f1e08743b2943e476cf9244550463a3035c175de871f1c1e1466d16d",
+          "size_bytes": 10118656
+        },
+        "EURAUD/tick/2018/DAT_ASCII_EURAUD_T_201811.zip": {
+          "rows": 1828721,
+          "sha256": "6cdcdec34fc3843077afe3e871c957645854786a9da7db80c035bb71cfe2c9e5",
+          "size_bytes": 9914458
+        },
+        "EURAUD/tick/2018/DAT_ASCII_EURAUD_T_201812.zip": {
+          "rows": 2377768,
+          "sha256": "3d05fc0a6ee3d0d1870b0e97b1a14dbf5e78869af9ad6dcaccfad0b947310d9b",
+          "size_bytes": 14138555
+        },
+        "EURAUD/tick/2019/DAT_ASCII_EURAUD_T_201901.zip": {
+          "rows": 3548886,
+          "sha256": "b2d033787effe67c6a9a5b3e000ea3fed04245744b7b91d454e81171707bfd09",
+          "size_bytes": 21952795
+        },
+        "EURAUD/tick/2019/DAT_ASCII_EURAUD_T_201902.zip": {
+          "rows": 2819099,
+          "sha256": "3600876f8e21d5574d380d57f6a7e3f15299811fe3ab6a67e381455dab3c1a12",
+          "size_bytes": 17331671
+        },
+        "EURAUD/tick/2019/DAT_ASCII_EURAUD_T_201903.zip": {
+          "rows": 2872932,
+          "sha256": "c6d6e58e613756d56e6b92920c7f34e781895ffb6b0d28c47c38fc98d598db00",
+          "size_bytes": 17626927
+        },
+        "EURAUD/tick/2019/DAT_ASCII_EURAUD_T_201904.zip": {
+          "rows": 2318202,
+          "sha256": "cac60e9b77f97041f537e24370b7d7323415a82654da0e3213bf215367cd51ab",
+          "size_bytes": 14359013
+        },
+        "EURAUD/tick/2019/DAT_ASCII_EURAUD_T_201905.zip": {
+          "rows": 2381099,
+          "sha256": "539e22c3be59fe63ad45d0713e504665b0fe133b7602858ffb7b7ca80e11bccf",
+          "size_bytes": 15003498
+        },
+        "EURAUD/tick/2019/DAT_ASCII_EURAUD_T_201906.zip": {
+          "rows": 2520975,
+          "sha256": "617467f2f9ddd448ebc75d756006b063678564dcb7a9e655d12a2e04dd422f31",
+          "size_bytes": 15519440
+        },
+        "EURAUD/tick/2019/DAT_ASCII_EURAUD_T_201907.zip": {
+          "rows": 2129374,
+          "sha256": "4c850c9d57db745249d1b5bb7a18de4eb167f7dabce2b20391b370c700fad897",
+          "size_bytes": 13228883
+        },
+        "EURAUD/tick/2019/DAT_ASCII_EURAUD_T_201908.zip": {
+          "rows": 3395316,
+          "sha256": "4c1d8a0e33b824e8479c1e655a4e84a807a77ff3d8f02afcda94848350a97d36",
+          "size_bytes": 20985044
+        },
+        "EURAUD/tick/2019/DAT_ASCII_EURAUD_T_201909.zip": {
+          "rows": 2609056,
+          "sha256": "b709e827d6fe9178b37e953239ebc0b1ecbfc5726484c31a07c8bc2a3108c7ef",
+          "size_bytes": 16138634
+        },
+        "EURAUD/tick/2019/DAT_ASCII_EURAUD_T_201910.zip": {
+          "rows": 2787859,
+          "sha256": "ec21601ccee86fa4fa7c8de5876a9f6d72a04931ab3d52a8941e4462bb20bccd",
+          "size_bytes": 17343535
+        },
+        "EURAUD/tick/2019/DAT_ASCII_EURAUD_T_201911.zip": {
+          "rows": 1931322,
+          "sha256": "e24c255a0bdae6d67878f017374ef18eed7489cf5d88610c6429fe15f53c3b27",
+          "size_bytes": 11980812
+        },
+        "EURAUD/tick/2019/DAT_ASCII_EURAUD_T_201912.zip": {
+          "rows": 2015584,
+          "sha256": "7fbdbd86e25c65a71db5b0e67448c5b1c6a78cddc23486ab26fc60f7859eb455",
+          "size_bytes": 12447072
+        },
+        "EURAUD/tick/2020/DAT_ASCII_EURAUD_T_202001.zip": {
+          "rows": 2524926,
+          "sha256": "ddf75296fdfa9197e3e37962dd079aecf756e5225025bb4d5f92fbd59de1153e",
+          "size_bytes": 15630019
+        },
+        "EURAUD/tick/2020/DAT_ASCII_EURAUD_T_202002.zip": {
+          "rows": 2454316,
+          "sha256": "4bef4f340345bacf8cb56605c70e8474e68565f5381542a0c2c8f8a89df24af0",
+          "size_bytes": 15392826
+        },
+        "EURAUD/tick/2020/DAT_ASCII_EURAUD_T_202003.zip": {
+          "rows": 7055621,
+          "sha256": "701451aa79172a9b6d49f7fd567955bc6b1a0147e0e22f675ac9347552ccc671",
+          "size_bytes": 47642306
+        },
+        "EURAUD/tick/2020/DAT_ASCII_EURAUD_T_202004.zip": {
+          "rows": 3915613,
+          "sha256": "2fcc23cd5a9b312b060c03de8a2bd166e7c65621afab306fc421f05bc0c837fc",
+          "size_bytes": 25717648
+        },
+        "EURAUD/tick/2020/DAT_ASCII_EURAUD_T_202005.zip": {
+          "rows": 3259540,
+          "sha256": "6ab88b5693fb62d6c2038875411ab219189bced986ba23a74d3362df86a50c79",
+          "size_bytes": 20922086
+        },
+        "EURAUD/tick/2020/DAT_ASCII_EURAUD_T_202006.zip": {
+          "rows": 4349338,
+          "sha256": "1dd296afee760029af82031ebe5cddaec4b71172555f867c69c43323c57c1d36",
+          "size_bytes": 27959969
+        },
+        "EURAUD/tick/2020/DAT_ASCII_EURAUD_T_202007.zip": {
+          "rows": 3453912,
+          "sha256": "d24d34e891c7228f85dcc6f2029fb9a8e48aa6f5f9bbbd8c73b2ff6b34a136ab",
+          "size_bytes": 21821724
+        },
+        "EURAUD/tick/2020/DAT_ASCII_EURAUD_T_202008.zip": {
+          "rows": 3024373,
+          "sha256": "0505031820df5ecf0c3a50f0d19caa963d9e57ff8a95beba331dc8727c896047",
+          "size_bytes": 19163057
+        },
+        "EURAUD/tick/2020/DAT_ASCII_EURAUD_T_202009.zip": {
+          "rows": 3284279,
+          "sha256": "2de9740c592eda1bd9c246aa053c6ed9dbdca9147ed55183866f096228db5deb",
+          "size_bytes": 21004859
+        },
+        "EURAUD/tick/2020/DAT_ASCII_EURAUD_T_202010.zip": {
+          "rows": 2954655,
+          "sha256": "92de8f5986a3654ec793ef1baef25d5180207465029c23b8c5783fb9904c5c13",
+          "size_bytes": 18807773
+        },
+        "EURAUD/tick/2020/DAT_ASCII_EURAUD_T_202011.zip": {
+          "rows": 2887099,
+          "sha256": "a20e41b02dafd21ccf6a5d45abf547c61da8af5fe1beaad81083df5991c3f978",
+          "size_bytes": 18759680
+        },
+        "EURAUD/tick/2020/DAT_ASCII_EURAUD_T_202012.zip": {
+          "rows": 2760191,
+          "sha256": "190d4f1810d254a4ed70d42ed08ae1fbfe553dcab27adb2298e39c94ca5d9266",
+          "size_bytes": 17786471
+        },
+        "EURAUD/tick/2021/DAT_ASCII_EURAUD_T_202101.zip": {
+          "rows": 3349160,
+          "sha256": "e9b37a8a801025464fb5d10fafcdc65fa4728f2efce47e90a6ab9ef7a6902e77",
+          "size_bytes": 21309085
+        },
+        "EURAUD/tick/2021/DAT_ASCII_EURAUD_T_202102.zip": {
+          "rows": 2789411,
+          "sha256": "dc0b3e1b6ca8f52b5eff568e519dc93f00808b1331e9a2cecd90e67a557f91e9",
+          "size_bytes": 17709546
+        },
+        "EURAUD/tick/2021/DAT_ASCII_EURAUD_T_202103.zip": {
+          "rows": 3357999,
+          "sha256": "9d967f7c3f59f6027f53d0eeb0cdcafa81a83ba699cfc5697470fa0593d06b62",
+          "size_bytes": 21476451
+        },
+        "EURAUD/tick/2021/DAT_ASCII_EURAUD_T_202104.zip": {
+          "rows": 2215382,
+          "sha256": "acc9ee426c2b370037ce9e6915dff91b4443d09f099a9769dc61ec325feaf8eb",
+          "size_bytes": 14152874
+        },
+        "EURAUD/tick/2021/DAT_ASCII_EURAUD_T_202105.zip": {
+          "rows": 2466700,
+          "sha256": "4a1d0ce0d5b6e82f3a5d2cdf86ed510832a5c195ca3aa512409748769396b1f1",
+          "size_bytes": 15599882
+        },
+        "EURAUD/tick/2021/DAT_ASCII_EURAUD_T_202106.zip": {
+          "rows": 2526229,
+          "sha256": "efa0f69698c9e36d6b6d14eb8910df6c80dede8b913ed6f4d98e82e9cf4c4450",
+          "size_bytes": 15755602
+        },
+        "EURAUD/tick/2021/DAT_ASCII_EURAUD_T_202107.zip": {
+          "rows": 2922411,
+          "sha256": "af2df7ff6d3cd8229d9ba6baa066a451f16607b05ca77e4b34c74f07792b3b10",
+          "size_bytes": 18230038
+        },
+        "EURAUD/tick/2021/DAT_ASCII_EURAUD_T_202108.zip": {
+          "rows": 2171380,
+          "sha256": "35e0c40c92408dab92bc88fbb880aae44385f2e5520df9d7030a47635e36b41d",
+          "size_bytes": 13740773
+        },
+        "EURAUD/tick/2021/DAT_ASCII_EURAUD_T_202109.zip": {
+          "rows": 2663048,
+          "sha256": "392c64b3a1c4a5c3fecd5e098a1df975dd362989665d0ca8710a2ca015444c70",
+          "size_bytes": 16751684
+        },
+        "EURAUD/tick/2021/DAT_ASCII_EURAUD_T_202110.zip": {
+          "rows": 2732104,
+          "sha256": "c6dc380f2d9a257db4aa0c71d6bd6a05ad949f113bcf9aed7bcbaef1e0c21562",
+          "size_bytes": 16990579
+        },
+        "EURAUD/tick/2021/DAT_ASCII_EURAUD_T_202111.zip": {
+          "rows": 3037124,
+          "sha256": "208bba125925ff186fb9d58f0c91ed34348db0fecb298969add68089c84924b3",
+          "size_bytes": 18892826
+        },
+        "EURAUD/tick/2021/DAT_ASCII_EURAUD_T_202112.zip": {
+          "rows": 2942139,
+          "sha256": "1a15c987c5ee2133a1f2ffffa917f3c5d01d018c155689690d89d3a8796a882b",
+          "size_bytes": 18374613
+        },
+        "EURAUD/tick/2022/DAT_ASCII_EURAUD_T_202201.zip": {
+          "rows": 3325743,
+          "sha256": "3fcc3e62d440b8e5fac9d7653ab8a54c646725c2c2ac785215aa0708649d1962",
+          "size_bytes": 20774575
+        },
+        "EURAUD/tick/2022/DAT_ASCII_EURAUD_T_202202.zip": {
+          "rows": 3946245,
+          "sha256": "3edf0bdb6ec0089247902ef2b7a1e71349c67f45f8014774015a9b589eff4dc7",
+          "size_bytes": 24602508
+        },
+        "EURAUD/tick/2022/DAT_ASCII_EURAUD_T_202203.zip": {
+          "rows": 4762934,
+          "sha256": "5a553031612472794587c298d6bebbd5273abe8078134f8567f73898b95307e5",
+          "size_bytes": 29671850
+        },
+        "EURAUD/tick/2022/DAT_ASCII_EURAUD_T_202204.zip": {
+          "rows": 3653970,
+          "sha256": "00a88151c73b4dff10ffe6b85daba909b3159121180cda389445c43eba931485",
+          "size_bytes": 22858430
+        },
+        "EURAUD/tick/2022/DAT_ASCII_EURAUD_T_202205.zip": {
+          "rows": 5097351,
+          "sha256": "337cc36a53afa3fbd3b62392862a382a217b83b9877450109a54dca81fcc6097",
+          "size_bytes": 32066182
+        },
+        "EURAUD/tick/2022/DAT_ASCII_EURAUD_T_202206.zip": {
+          "rows": 5116503,
+          "sha256": "21a39a9c416f954a61e55cbd71409cf7624846172c62c8f06d1ad2bde2f4ec6b",
+          "size_bytes": 31695221
+        },
+        "EURAUD/tick/2022/DAT_ASCII_EURAUD_T_202207.zip": {
+          "rows": 5276629,
+          "sha256": "29057dc3b002c124d9fb2a279a51a691c4c5d488b1362b595ae005e12f91ac3d",
+          "size_bytes": 32375015
+        },
+        "EURAUD/tick/2022/DAT_ASCII_EURAUD_T_202208.zip": {
+          "rows": 4262993,
+          "sha256": "1421ecd32d80c4ba7cbb282551ada2971c3782a85409f0c8b6f4bb4c4b6caf10",
+          "size_bytes": 26128441
+        },
+        "EURAUD/tick/2022/DAT_ASCII_EURAUD_T_202209.zip": {
+          "rows": 5403238,
+          "sha256": "b7f8fe390de9f9b50d04fc425b22a25850f2ee1ca9ef8809cafd6f214c09f580",
+          "size_bytes": 33176596
+        },
+        "EURAUD/tick/2022/DAT_ASCII_EURAUD_T_202210.zip": {
+          "rows": 5548731,
+          "sha256": "c8d0d0159b680aacf6d8ca0d841f797f0365e88626b1a99d24a815f7a3697bcf",
+          "size_bytes": 33975505
+        },
+        "EURAUD/tick/2022/DAT_ASCII_EURAUD_T_202211.zip": {
+          "rows": 4534828,
+          "sha256": "149c9718c512a910071bf5616b39e75ecd9618c74e5cc5183085d86936f2dccb",
+          "size_bytes": 27421218
+        },
+        "EURAUD/tick/2022/DAT_ASCII_EURAUD_T_202212.zip": {
+          "rows": 3884069,
+          "sha256": "223e71642572ce31de5d461422ce787d89363e1dabc9406836e4575928467887",
+          "size_bytes": 24122107
+        },
+        "EURAUD/tick/2023/DAT_ASCII_EURAUD_T_202301.zip": {
+          "rows": 3864688,
+          "sha256": "cb7d7097114cbb0fd3f324fbbea85836d3888f694ea69f13206c843ca4cf37dd",
+          "size_bytes": 24557601
+        },
+        "EURAUD/tick/2023/DAT_ASCII_EURAUD_T_202302.zip": {
+          "rows": 3094812,
+          "sha256": "33fa5b9f649e4e1f124f04fbdaa320c47fef345a17ed61acaa7c31ba8f25d20c",
+          "size_bytes": 19626648
+        },
+        "EURAUD/tick/2023/DAT_ASCII_EURAUD_T_202303.zip": {
+          "rows": 2818533,
+          "sha256": "f60a9bf12985ae564a0e2c5994b758d09d6556bbfc2f276d6fe65d3d59e97868",
+          "size_bytes": 18098233
+        },
+        "EURAUD/tick/2023/DAT_ASCII_EURAUD_T_202304.zip": {
+          "rows": 1807719,
+          "sha256": "1135b3c03430653463711e45c4082e0ef0a5102c91bd59b8bf8bb36d26523261",
+          "size_bytes": 11727701
+        },
+        "EURAUD/tick/2023/DAT_ASCII_EURAUD_T_202305.zip": {
+          "rows": 2038227,
+          "sha256": "2f21faa53575d2a9298eddafff618a2ce2f110586abaff5246b8b46c9e58bf60",
+          "size_bytes": 13225607
+        },
+        "EURAUD/tick/2023/DAT_ASCII_EURAUD_T_202306.zip": {
+          "rows": 1920366,
+          "sha256": "987351e47eb68aafb3d09c5d5302ff8979e585002c42eb1e16bdd899e141e7da",
+          "size_bytes": 12494178
+        },
+        "EURAUD/tick/2023/DAT_ASCII_EURAUD_T_202307.zip": {
+          "rows": 2033601,
+          "sha256": "5bd2e17c097287a80f51aa9284917653e843750e658343d71170ae3215f1c249",
+          "size_bytes": 13322866
+        },
+        "EURAUD/tick/2023/DAT_ASCII_EURAUD_T_202308.zip": {
+          "rows": 2986428,
+          "sha256": "9bd824aed012ec6ac4c5c15b377934060853bcbd602f4e0a3a97ce36d4b11834",
+          "size_bytes": 19436971
+        },
+        "EURAUD/tick/2023/DAT_ASCII_EURAUD_T_202309.zip": {
+          "rows": 2561337,
+          "sha256": "f920515efac3967437c6217403c469b8feaca6e93e8e10a583c4ec272c63a86d",
+          "size_bytes": 16568246
+        },
+        "EURAUD/tick/2023/DAT_ASCII_EURAUD_T_202310.zip": {
+          "rows": 3202288,
+          "sha256": "237a0d8e64e58802b509064cfc3c265d4d70d25d1e08a071f61c8017183ebfdb",
+          "size_bytes": 20449577
+        },
+        "EURAUD/tick/2023/DAT_ASCII_EURAUD_T_202311.zip": {
+          "rows": 2632289,
+          "sha256": "6c1ddc6f1e0d79c90e75221f6bd3a430b2f1ae12dc332314a85389f1efad1b9f",
+          "size_bytes": 16981072
+        },
+        "EURAUD/tick/2023/DAT_ASCII_EURAUD_T_202312.zip": {
+          "rows": 2557106,
+          "sha256": "ed82a8f309b38d0814ef937d7a6809b8fea4475242eeb828e0a7b234f36c27c5",
+          "size_bytes": 16560297
+        },
+        "EURAUD/tick/2024/DAT_ASCII_EURAUD_T_202401.zip": {
+          "rows": 2795373,
+          "sha256": "8f0850b4024a6b416b7b0e75d7c67b5c1711befc983417723cb884c6e93c1911",
+          "size_bytes": 18142839
+        },
+        "EURAUD/tick/2024/DAT_ASCII_EURAUD_T_202402.zip": {
+          "rows": 2314852,
+          "sha256": "35fc7e26fbddde24e08994e9f1b0e23af935ec0a2dcbbba7841b31463c413225",
+          "size_bytes": 14832661
+        },
+        "EURAUD/tick/2024/DAT_ASCII_EURAUD_T_202403.zip": {
+          "rows": 2113557,
+          "sha256": "baa02f119aac497e950c863583a65cd88978eac5ad0df29586d51be7185b05ba",
+          "size_bytes": 13487485
+        },
+        "EURAUD/tick/2024/DAT_ASCII_EURAUD_T_202404.zip": {
+          "rows": 2679702,
+          "sha256": "7b0204485975afd01d812754b8062dd6928cf417c132cb471c1ae96e56ba081b",
+          "size_bytes": 16989259
+        },
+        "EURAUD/tick/2024/DAT_ASCII_EURAUD_T_202405.zip": {
+          "rows": 2469669,
+          "sha256": "cbee5fec4894ae9a81689be463b358ebe9f0f91e607f5d5fdae0d666fd1752bc",
+          "size_bytes": 15735129
+        },
+        "EURAUD/tick/2024/DAT_ASCII_EURAUD_T_202406.zip": {
+          "rows": 2462628,
+          "sha256": "188fab8a8ebfddef335e3cf43c9d4e3e46c2775f893bc2b8c2756e5996877770",
+          "size_bytes": 15589138
+        },
+        "EURAUD/tick/2024/DAT_ASCII_EURAUD_T_202407.zip": {
+          "rows": 2755621,
+          "sha256": "c6ce664cf2a66c0f21a9c9aebd6880c277c179e5ed4e603511e6be78d3dd96a7",
+          "size_bytes": 17343057
+        },
+        "EURAUD/tick/2024/DAT_ASCII_EURAUD_T_202408.zip": {
+          "rows": 3308476,
+          "sha256": "0b4d814c1a3a4fe324f51af70f75c1485c595d2375978891602e47e7d32d7601",
+          "size_bytes": 21160351
+        },
+        "EURAUD/tick/2024/DAT_ASCII_EURAUD_T_202409.zip": {
+          "rows": 2772723,
+          "sha256": "a9d123f1761606eef95d21dd6f365fe8f5dba7d295001a4f50cd1ab1f7e4c5cb",
+          "size_bytes": 17639214
+        },
+        "EURAUD/tick/2024/DAT_ASCII_EURAUD_T_202410.zip": {
+          "rows": 2845940,
+          "sha256": "cd49a522c7fb3f24bfe4b5b555116272c26fd722d0eafb5aa13495e29bb50593",
+          "size_bytes": 18078582
+        },
+        "EURAUD/tick/2024/DAT_ASCII_EURAUD_T_202411.zip": {
+          "rows": 4339966,
+          "sha256": "099d3687ae1acb6bf49ce0668bd88b29ecf872ca10c869cb39fe851f9d2416c8",
+          "size_bytes": 26757582
+        },
+        "EURAUD/tick/2024/DAT_ASCII_EURAUD_T_202412.zip": {
+          "rows": 3685933,
+          "sha256": "4745fb7c8c002f96d1f438eea179862188e6638ed4c389f684a8b446ecca43b3",
+          "size_bytes": 22945510
+        },
+        "EURAUD/tick/2025/DAT_ASCII_EURAUD_T_202501.zip": {
+          "rows": 4152051,
+          "sha256": "cd5f404c256f710b384adf0cb43b3c2b7cab2f7d98f41a03f721448973eb785b",
+          "size_bytes": 25778352
+        },
+        "EURAUD/tick/2025/DAT_ASCII_EURAUD_T_202502.zip": {
+          "rows": 3675684,
+          "sha256": "6d22781aad4ad35c69bff0f182d626ab2f82a9de561f56aaa31a2d194f11e510",
+          "size_bytes": 22746385
+        },
+        "EURAUD/tick/2025/DAT_ASCII_EURAUD_T_202503.zip": {
+          "rows": 4363251,
+          "sha256": "5f545ac2488a922cb73d81b027dafa2b7b33e11039055ef9e21e7d8038f35cc8",
+          "size_bytes": 27166325
+        },
+        "EURAUD/tick/2025/DAT_ASCII_EURAUD_T_202504.zip": {
+          "rows": 7603942,
+          "sha256": "1cb40ab7cce173028141875ac1a6721eaf97e44e4f088c436989e175b4d453bd",
+          "size_bytes": 49366953
+        },
+        "EURAUD/tick/2025/DAT_ASCII_EURAUD_T_202505.zip": {
+          "rows": 4161168,
+          "sha256": "b23c6e68d57b251ee74060370df427ddc6c95d71ba7e5aa507216d58d5ce78fa",
+          "size_bytes": 26604225
+        },
+        "EURAUD/tick/2025/DAT_ASCII_EURAUD_T_202506.zip": {
+          "rows": 3669728,
+          "sha256": "c0edf49ce2c275975e6533813476297a7119293f8aae0c3c914a0e8f291d09b3",
+          "size_bytes": 23598996
+        },
+        "EURAUD/tick/2025/DAT_ASCII_EURAUD_T_202507.zip": {
+          "rows": 3501573,
+          "sha256": "14457309b3b85162b458e9f3301d849ca9496b44d47ea7616dea264f65262224",
+          "size_bytes": 22553041
+        },
+        "EURAUD/tick/2025/DAT_ASCII_EURAUD_T_202508.zip": {
+          "rows": 2759043,
+          "sha256": "f922e6a68dce71665d7d615991afb7eaec5ec203c3de894d1f1df9f793d39877",
+          "size_bytes": 17741516
+        },
+        "EURAUD/tick/2025/DAT_ASCII_EURAUD_T_202509.zip": {
+          "rows": 3091966,
+          "sha256": "e3d43ea31efc59ee4b1ff9957a0cd89a85f830d67b9def0c861ea163d17693e4",
+          "size_bytes": 19735840
+        },
+        "EURAUD/tick/2025/DAT_ASCII_EURAUD_T_202510.zip": {
+          "rows": 3453861,
+          "sha256": "bffefd63fc463fc21d43c22e32e475ec0b1a59797ad880cd2e11a2e907a28d3d",
+          "size_bytes": 22229951
+        },
+        "EURAUD/tick/2025/DAT_ASCII_EURAUD_T_202511.zip": {
+          "rows": 2659158,
+          "sha256": "b0811d0d27122add8112c37c2a1ac5f5d66b3ce42ffd15ab45eb8a01e2ba83ab",
+          "size_bytes": 17242556
+        },
+        "EURAUD/tick/2025/DAT_ASCII_EURAUD_T_202512.zip": {
+          "rows": 2426246,
+          "sha256": "e26f107adb6699521f72e02ab1472b7900ea78be1d71b80e0aed00b404a1d268",
+          "size_bytes": 15615090
+        },
+        "EURAUD/tick/2026/DAT_ASCII_EURAUD_T_202601.zip": {
+          "rows": 2866087,
+          "sha256": "2d4571a9814ad699faf598d210a2fb66ce6f17abcaa5515ccd648d9a4acc77a9",
+          "size_bytes": 18456430
+        },
+        "EURAUD/tick/2026/DAT_ASCII_EURAUD_T_202602.zip": {
+          "rows": 3215752,
+          "sha256": "344be0c6eccb140cdcd85a0205f4a17cbc9e6dd4f5e269007f4ad593d6b0b0ec",
+          "size_bytes": 20764455
+        },
+        "EURAUD/tick/2026/DAT_ASCII_EURAUD_T_202603.zip": {
+          "rows": 6278757,
+          "sha256": "8b166c403a040a7402299d2b157223b3c69e47224e79161f0fa55815b5775c93",
+          "size_bytes": 39009678
+        },
+        "EURAUD/tick/2026/DAT_ASCII_EURAUD_T_202604.zip": {
+          "rows": 1562795,
+          "sha256": "1d1568f9b2cfeac2a84682e222df5e2d016e82f46b615f59dda8eb1b28745205",
+          "size_bytes": 9642202
+        }
+      },
+      "latest_month": "202604",
+      "total_files": 196,
+      "total_size_bytes": 2621227773
+    },
+    "EURCAD": {
+      "earliest_month": "201001",
+      "files": {
+        "EURCAD/tick/2010/DAT_ASCII_EURCAD_T_201001.zip": {
+          "rows": 662901,
+          "sha256": "02732e2dad757de935f9a44aed6d7886adf19eccd94a76bef2aa82ec47234415",
+          "size_bytes": 2562136
+        },
+        "EURCAD/tick/2010/DAT_ASCII_EURCAD_T_201002.zip": {
+          "rows": 671452,
+          "sha256": "5878b3313e9b871b1d86a9d03f7e17f217f0af84cd416471c9e34d1e0f62c130",
+          "size_bytes": 2565125
+        },
+        "EURCAD/tick/2010/DAT_ASCII_EURCAD_T_201003.zip": {
+          "rows": 761513,
+          "sha256": "fd75e00298babb6765856aee955294c8a056b938490f7092f75b0b88972ebfd1",
+          "size_bytes": 2787017
+        },
+        "EURCAD/tick/2010/DAT_ASCII_EURCAD_T_201004.zip": {
+          "rows": 837367,
+          "sha256": "71a4622a65c1128ad35611ac54b683c98f3fb7b2edc754409526820305753447",
+          "size_bytes": 2868435
+        },
+        "EURCAD/tick/2010/DAT_ASCII_EURCAD_T_201005.zip": {
+          "rows": 1109445,
+          "sha256": "74aea7d6fbe815496ab3e0aecbc216908ddfc21470ccd015a66aa35d00275459",
+          "size_bytes": 4106793
+        },
+        "EURCAD/tick/2010/DAT_ASCII_EURCAD_T_201006.zip": {
+          "rows": 895011,
+          "sha256": "8428d997765eabe35c3095474a8bd6c196ba93df69c31d1b98a010efad28908a",
+          "size_bytes": 3283228
+        },
+        "EURCAD/tick/2010/DAT_ASCII_EURCAD_T_201007.zip": {
+          "rows": 773652,
+          "sha256": "d005580dd78bc5471e10fe44c92ddf0d0cbf9d025b9e9dd644e57cecbf1175ca",
+          "size_bytes": 2854029
+        },
+        "EURCAD/tick/2010/DAT_ASCII_EURCAD_T_201008.zip": {
+          "rows": 743232,
+          "sha256": "e6d42ba3189218ca49d4a12d51b760713a31527b158873011f4789e75b295281",
+          "size_bytes": 2758401
+        },
+        "EURCAD/tick/2010/DAT_ASCII_EURCAD_T_201009.zip": {
+          "rows": 747228,
+          "sha256": "4f53897be072c4a933f6189aabb9ea61dc91cd2f5b35e01e28443422f0407c48",
+          "size_bytes": 2780424
+        },
+        "EURCAD/tick/2010/DAT_ASCII_EURCAD_T_201010.zip": {
+          "rows": 626849,
+          "sha256": "a292d9e6cc5551cb439f646afdb658f8c1ae451df82e8f6d999e83f5db4ed438",
+          "size_bytes": 2288471
+        },
+        "EURCAD/tick/2010/DAT_ASCII_EURCAD_T_201011.zip": {
+          "rows": 701827,
+          "sha256": "8a14bbd32e1fd4be347ad1ca8c3ea147e58e06fb35d88e8b68528678f8716074",
+          "size_bytes": 2546065
+        },
+        "EURCAD/tick/2010/DAT_ASCII_EURCAD_T_201012.zip": {
+          "rows": 556948,
+          "sha256": "7ad11df021d803c43081f77c4d2f454ef246a0dc3b602860f42c23a4ca8e6a05",
+          "size_bytes": 2072524
+        },
+        "EURCAD/tick/2011/DAT_ASCII_EURCAD_T_201101.zip": {
+          "rows": 611735,
+          "sha256": "a423beae9ae333bf11db3779f643c091d23b7f3baed79c396c9ed28c7bcba55a",
+          "size_bytes": 2257292
+        },
+        "EURCAD/tick/2011/DAT_ASCII_EURCAD_T_201102.zip": {
+          "rows": 524703,
+          "sha256": "bd920f56d083de9e4855c334893ee1e84849c6de3a2f03ea41745afffee5504a",
+          "size_bytes": 1913086
+        },
+        "EURCAD/tick/2011/DAT_ASCII_EURCAD_T_201103.zip": {
+          "rows": 535996,
+          "sha256": "78862b96dc4615b1c79dcf74e19aea88231746d446bb1dffeefa79fb89ab42a8",
+          "size_bytes": 2003711
+        },
+        "EURCAD/tick/2011/DAT_ASCII_EURCAD_T_201104.zip": {
+          "rows": 456318,
+          "sha256": "7a376ce31fda13055cb3a2b2e71cd5c6f3c139ee4927851c8cec5b6d9682d32a",
+          "size_bytes": 1898147
+        },
+        "EURCAD/tick/2011/DAT_ASCII_EURCAD_T_201105.zip": {
+          "rows": 645984,
+          "sha256": "50f9213256d2ececcf6b86be416c8b85e8f8933e0cb20646af664cd1d018f8f1",
+          "size_bytes": 3380007
+        },
+        "EURCAD/tick/2011/DAT_ASCII_EURCAD_T_201106.zip": {
+          "rows": 713081,
+          "sha256": "6f55aaa5db4cad22dad7706695e2d7f6e959bc6bda5184555808d172781aba57",
+          "size_bytes": 3640748
+        },
+        "EURCAD/tick/2011/DAT_ASCII_EURCAD_T_201107.zip": {
+          "rows": 720384,
+          "sha256": "cda50840fd3819a7ef4c0610aa8d441aeccdcf02102234fcd8a0f42bfca12ecd",
+          "size_bytes": 3714381
+        },
+        "EURCAD/tick/2011/DAT_ASCII_EURCAD_T_201108.zip": {
+          "rows": 901294,
+          "sha256": "c08cf328a19f1033a41f4f52ad4dd1e15dc45d3d9d1e601cfc366e8cb1cd4085",
+          "size_bytes": 4583264
+        },
+        "EURCAD/tick/2011/DAT_ASCII_EURCAD_T_201109.zip": {
+          "rows": 814248,
+          "sha256": "16f14e54c0d032e5b1bae1fa579e05609b419dcd0bffc648b143c9ea0722ba67",
+          "size_bytes": 4175776
+        },
+        "EURCAD/tick/2011/DAT_ASCII_EURCAD_T_201110.zip": {
+          "rows": 798363,
+          "sha256": "731d2ba0f06f88ba53c00a1efe514d7db4680ec8f643e692e038aba8c1dcecb0",
+          "size_bytes": 4098343
+        },
+        "EURCAD/tick/2011/DAT_ASCII_EURCAD_T_201111.zip": {
+          "rows": 866496,
+          "sha256": "de5e100b84b5bafcfe1325fc555f4518cf16511baaa6e7dc976b6bc840b6bc36",
+          "size_bytes": 4435072
+        },
+        "EURCAD/tick/2011/DAT_ASCII_EURCAD_T_201112.zip": {
+          "rows": 1439321,
+          "sha256": "a977dbd057689023c1892c23e52b7836b2f46b4f3b84df03d1775e6a4046ac7a",
+          "size_bytes": 8002766
+        },
+        "EURCAD/tick/2012/DAT_ASCII_EURCAD_T_201201.zip": {
+          "rows": 1620890,
+          "sha256": "729c783a617c3d6337c95c836ef2028233f9726704f2068b946fbe8870399429",
+          "size_bytes": 8980307
+        },
+        "EURCAD/tick/2012/DAT_ASCII_EURCAD_T_201202.zip": {
+          "rows": 1761610,
+          "sha256": "a135720c94f0477acbdbb700bbef1d518449b84e5201b44b486745eac3c8a0bf",
+          "size_bytes": 9546223
+        },
+        "EURCAD/tick/2012/DAT_ASCII_EURCAD_T_201203.zip": {
+          "rows": 1517994,
+          "sha256": "fee76767f9b66a14a437a9d5c3157ab10b0e549777bfe1ca006d359c0fbcfa4a",
+          "size_bytes": 8327237
+        },
+        "EURCAD/tick/2012/DAT_ASCII_EURCAD_T_201204.zip": {
+          "rows": 1346907,
+          "sha256": "87f15bad3382dbe7983f347d506876e927d3078b8cf1128f96436e3626bb4ee4",
+          "size_bytes": 7422247
+        },
+        "EURCAD/tick/2012/DAT_ASCII_EURCAD_T_201205.zip": {
+          "rows": 1687055,
+          "sha256": "b98160f42d58554cbb24607ed380414444000097beb72702c80ec05e2a5f848a",
+          "size_bytes": 9264999
+        },
+        "EURCAD/tick/2012/DAT_ASCII_EURCAD_T_201206.zip": {
+          "rows": 1588761,
+          "sha256": "03e880d59ac9fa507799a4662432bef7520d4eb533bf14c8fed4a285bf0619a3",
+          "size_bytes": 8683373
+        },
+        "EURCAD/tick/2012/DAT_ASCII_EURCAD_T_201207.zip": {
+          "rows": 1236770,
+          "sha256": "c2da6df127fd0f0ecc1ed5131ae80f8074c858adc4c51cf462c92b6d337acd72",
+          "size_bytes": 6885391
+        },
+        "EURCAD/tick/2012/DAT_ASCII_EURCAD_T_201208.zip": {
+          "rows": 1091386,
+          "sha256": "cb748679267cb5838d3a1cdaaa4e0e0c862699a0bc44dc9ff57b652e206d25d4",
+          "size_bytes": 6131638
+        },
+        "EURCAD/tick/2012/DAT_ASCII_EURCAD_T_201209.zip": {
+          "rows": 1037290,
+          "sha256": "84553893e3bb4793f4263bc24aa77436c512935f02171f5948395d8a23ba5869",
+          "size_bytes": 5940744
+        },
+        "EURCAD/tick/2012/DAT_ASCII_EURCAD_T_201210.zip": {
+          "rows": 1066024,
+          "sha256": "83e8c11f82b6b5eb557ace7835e51507f10ee03d3c936b171fe37461d452b23e",
+          "size_bytes": 6088353
+        },
+        "EURCAD/tick/2012/DAT_ASCII_EURCAD_T_201211.zip": {
+          "rows": 1040119,
+          "sha256": "d8fa29bf2915d069d7080ecad05d90eb1c01043e76a2cc04cf4fbf2d4a179d0c",
+          "size_bytes": 5920930
+        },
+        "EURCAD/tick/2012/DAT_ASCII_EURCAD_T_201212.zip": {
+          "rows": 786199,
+          "sha256": "4c67c050452a16feff0e123717ee16b495b3061a4b6a3e291e8590f7cc378b75",
+          "size_bytes": 4557867
+        },
+        "EURCAD/tick/2013/DAT_ASCII_EURCAD_T_201301.zip": {
+          "rows": 1116515,
+          "sha256": "75d49db9d4db1abeb4042fe3f2f5024ed13f60369e69e8b644444d38b3cd2937",
+          "size_bytes": 6482054
+        },
+        "EURCAD/tick/2013/DAT_ASCII_EURCAD_T_201302.zip": {
+          "rows": 1002844,
+          "sha256": "7806260ecb6b6ff0f13aa7aaf025758239b11485446578a312b658da6c8d2efd",
+          "size_bytes": 5937722
+        },
+        "EURCAD/tick/2013/DAT_ASCII_EURCAD_T_201303.zip": {
+          "rows": 986992,
+          "sha256": "d084b72de31616895da380a443fb84c2906de7f560b3724ea6ccc480c3835cf8",
+          "size_bytes": 5785173
+        },
+        "EURCAD/tick/2013/DAT_ASCII_EURCAD_T_201304.zip": {
+          "rows": 970678,
+          "sha256": "31200ceb72b5b3426c46abcbbfd9dd1682594ded09329cd4c37949ab2fc29a7d",
+          "size_bytes": 5694382
+        },
+        "EURCAD/tick/2013/DAT_ASCII_EURCAD_T_201305.zip": {
+          "rows": 1120272,
+          "sha256": "6c61112706c696a726fb5af362c907a6c8106a9b2674bc6d15f2a9f73bc94a77",
+          "size_bytes": 6589010
+        },
+        "EURCAD/tick/2013/DAT_ASCII_EURCAD_T_201306.zip": {
+          "rows": 1218971,
+          "sha256": "9f6596863572a82b89514a1c9aff0e38752c12497dcb315f4167b59dfcd5f9d9",
+          "size_bytes": 7161574
+        },
+        "EURCAD/tick/2013/DAT_ASCII_EURCAD_T_201307.zip": {
+          "rows": 1174956,
+          "sha256": "f9a58e60e1b9ac775ab50fc7656a2840fb3f1ece7915fa54333ce00037170edf",
+          "size_bytes": 6885942
+        },
+        "EURCAD/tick/2013/DAT_ASCII_EURCAD_T_201308.zip": {
+          "rows": 986142,
+          "sha256": "09adcd20b7787e6b3ddb49a97a12ecd09479ae45c12ae4f3db19edeee7590484",
+          "size_bytes": 5757620
+        },
+        "EURCAD/tick/2013/DAT_ASCII_EURCAD_T_201309.zip": {
+          "rows": 825606,
+          "sha256": "2fd1961c2ca71d662f3624369d3a32f1f72d0b0988679129071985002f086aa8",
+          "size_bytes": 4827087
+        },
+        "EURCAD/tick/2013/DAT_ASCII_EURCAD_T_201310.zip": {
+          "rows": 806406,
+          "sha256": "ba37a12a38beffd14d3789cfbd5553ac1b055bb5caa4a2b8b041a84c9e9390d2",
+          "size_bytes": 4768203
+        },
+        "EURCAD/tick/2013/DAT_ASCII_EURCAD_T_201311.zip": {
+          "rows": 776732,
+          "sha256": "ab3abc8f4402aec117368435ef6f401e568a64e0b2259deab252ea82ff6e6ee1",
+          "size_bytes": 4636792
+        },
+        "EURCAD/tick/2013/DAT_ASCII_EURCAD_T_201312.zip": {
+          "rows": 805062,
+          "sha256": "6ae6a430ae9e14926351dfd3e0a929c2eb7c6804dc13e92c7d37d45d10ead9c1",
+          "size_bytes": 4796368
+        },
+        "EURCAD/tick/2014/DAT_ASCII_EURCAD_T_201401.zip": {
+          "rows": 1160931,
+          "sha256": "bd7715793a290ef4823d3fff70d547188dcb957677dbd04fe943bfb5d4087dc6",
+          "size_bytes": 6873766
+        },
+        "EURCAD/tick/2014/DAT_ASCII_EURCAD_T_201402.zip": {
+          "rows": 884055,
+          "sha256": "5d8f30e9a32715c0b5da83078774a06a30a7fac933a1fcff1bed80a75ab8efb9",
+          "size_bytes": 5298399
+        },
+        "EURCAD/tick/2014/DAT_ASCII_EURCAD_T_201403.zip": {
+          "rows": 883256,
+          "sha256": "ed32e984186f706e9b482d41b913744687688a6613a6ba4411c605ec5a3f5cd7",
+          "size_bytes": 5297941
+        },
+        "EURCAD/tick/2014/DAT_ASCII_EURCAD_T_201404.zip": {
+          "rows": 814656,
+          "sha256": "85cc0e9deda7570349697679b24fc7d268d98a2c442ac576e7b01d5029b231f7",
+          "size_bytes": 4783965
+        },
+        "EURCAD/tick/2014/DAT_ASCII_EURCAD_T_201405.zip": {
+          "rows": 815345,
+          "sha256": "99fdcc5dfd9a8606dc66e7a20a972cfa5c2f0317ae73baed2ebb22112c87005d",
+          "size_bytes": 4729161
+        },
+        "EURCAD/tick/2014/DAT_ASCII_EURCAD_T_201406.zip": {
+          "rows": 696133,
+          "sha256": "a99a2f2b6b52b831eff2901bf0962c72da3cc701eedf3d6905c568dac0daeddb",
+          "size_bytes": 4055136
+        },
+        "EURCAD/tick/2014/DAT_ASCII_EURCAD_T_201407.zip": {
+          "rows": 765896,
+          "sha256": "7f5ba82ccdaf46908d6eb7b5c62a218c92e99d7e20dc965cda54d79caa8c16e4",
+          "size_bytes": 4298911
+        },
+        "EURCAD/tick/2014/DAT_ASCII_EURCAD_T_201408.zip": {
+          "rows": 898222,
+          "sha256": "a49439b8f2131bfab10fc56462a503dfb5f836ee277c6fa3903ffb4a7dd0b4ae",
+          "size_bytes": 4480939
+        },
+        "EURCAD/tick/2014/DAT_ASCII_EURCAD_T_201409.zip": {
+          "rows": 1262539,
+          "sha256": "e4ca784da372514795d284f08c58dd992dbeea5e11c936cd1b6c99e00281e40b",
+          "size_bytes": 6271621
+        },
+        "EURCAD/tick/2014/DAT_ASCII_EURCAD_T_201410.zip": {
+          "rows": 1526177,
+          "sha256": "8a5f1a2f14e171b0a0c39638c82a85d73fe874148eaa95ec3a3b2857f9a22521",
+          "size_bytes": 8853721
+        },
+        "EURCAD/tick/2014/DAT_ASCII_EURCAD_T_201411.zip": {
+          "rows": 1415417,
+          "sha256": "17521c39d2665a23fcce5da983da9789234c8d5ba565a84b60a89859c7961a28",
+          "size_bytes": 7969726
+        },
+        "EURCAD/tick/2014/DAT_ASCII_EURCAD_T_201412.zip": {
+          "rows": 1230397,
+          "sha256": "22fc4fbdd70c8201b4b489158242058c750becef9c227c5cf2c221342ead7ce6",
+          "size_bytes": 7107939
+        },
+        "EURCAD/tick/2015/DAT_ASCII_EURCAD_T_201501.zip": {
+          "rows": 1616181,
+          "sha256": "b6072af7f567d429c687efcc17dc90740b885d9d51eda69e7db7bca83b0d8d09",
+          "size_bytes": 9542706
+        },
+        "EURCAD/tick/2015/DAT_ASCII_EURCAD_T_201502.zip": {
+          "rows": 1425214,
+          "sha256": "abaa890fd03441640aba3598970510fab1753f891d68b1829a360025d138a6af",
+          "size_bytes": 8412390
+        },
+        "EURCAD/tick/2015/DAT_ASCII_EURCAD_T_201503.zip": {
+          "rows": 1698651,
+          "sha256": "b813e7b2d63c1ab6ad5b41bc797b20bef03c74a2d1490e157d47a8e537aebd5d",
+          "size_bytes": 9990887
+        },
+        "EURCAD/tick/2015/DAT_ASCII_EURCAD_T_201504.zip": {
+          "rows": 1587954,
+          "sha256": "b9baa4ac97dddc80fa5f23c2001bc8a3405788f3e33da0532c1fd987477f6d05",
+          "size_bytes": 9225194
+        },
+        "EURCAD/tick/2015/DAT_ASCII_EURCAD_T_201505.zip": {
+          "rows": 1407509,
+          "sha256": "7b682b4052410996367eb42d09f05ad7ef82bfe60acffd31cd7df5d9afaf0380",
+          "size_bytes": 8208979
+        },
+        "EURCAD/tick/2015/DAT_ASCII_EURCAD_T_201506.zip": {
+          "rows": 1603474,
+          "sha256": "4e1915dc408178206df11a8fd76a655c23b6ec8d81839cae522e1c3c20605e86",
+          "size_bytes": 9219623
+        },
+        "EURCAD/tick/2015/DAT_ASCII_EURCAD_T_201507.zip": {
+          "rows": 1675899,
+          "sha256": "ce7a034cb0b0e478d8d3a7e4938766330ff5a287d34622247a91f1584b892ac3",
+          "size_bytes": 9523773
+        },
+        "EURCAD/tick/2015/DAT_ASCII_EURCAD_T_201508.zip": {
+          "rows": 1730103,
+          "sha256": "b97987931728f08b2a676dd842bb5b8cd43722322b040c40249204fceaa3756d",
+          "size_bytes": 10026655
+        },
+        "EURCAD/tick/2015/DAT_ASCII_EURCAD_T_201509.zip": {
+          "rows": 1650853,
+          "sha256": "a04fcd315a9b53bb49049723ef0290cd6ab373e4b8cd29be0fdc820b9af8d921",
+          "size_bytes": 9808633
+        },
+        "EURCAD/tick/2015/DAT_ASCII_EURCAD_T_201510.zip": {
+          "rows": 1568668,
+          "sha256": "d6157e85f15491ce65816c1eab438dcaaf526a4a68469c1f7146670f3914a9f7",
+          "size_bytes": 9090986
+        },
+        "EURCAD/tick/2015/DAT_ASCII_EURCAD_T_201511.zip": {
+          "rows": 1706420,
+          "sha256": "9faa6b2734784fd1b608e672a3e7c0270b3010b2ae657cd57a7429fc3902ca82",
+          "size_bytes": 9476298
+        },
+        "EURCAD/tick/2015/DAT_ASCII_EURCAD_T_201512.zip": {
+          "rows": 1877036,
+          "sha256": "1f4f41e0ca4bc7a4df23b053deda3185b7811b20a8370aa12e9f5231b8ee74f1",
+          "size_bytes": 10670287
+        },
+        "EURCAD/tick/2016/DAT_ASCII_EURCAD_T_201601.zip": {
+          "rows": 2377992,
+          "sha256": "20ff53714c3e931aef12c886bc72fdb5191a4e9cb25e05b6fdf41001b0b4efc5",
+          "size_bytes": 13669983
+        },
+        "EURCAD/tick/2016/DAT_ASCII_EURCAD_T_201602.zip": {
+          "rows": 1991643,
+          "sha256": "c5a3fe66bb22708c6ed22809eb60b3503fec6240ee203a72ba7ef7caf8e1548e",
+          "size_bytes": 11655907
+        },
+        "EURCAD/tick/2016/DAT_ASCII_EURCAD_T_201603.zip": {
+          "rows": 1682318,
+          "sha256": "039c6a7a49f645a914c3c0b64534be8a63ff4295f4f55ef00df59d43b32dc37c",
+          "size_bytes": 9663904
+        },
+        "EURCAD/tick/2016/DAT_ASCII_EURCAD_T_201604.zip": {
+          "rows": 1579212,
+          "sha256": "ebabb4938e1be88740f884579e7369ee810f6652289ef97d2ab365a7c4508688",
+          "size_bytes": 9104894
+        },
+        "EURCAD/tick/2016/DAT_ASCII_EURCAD_T_201605.zip": {
+          "rows": 1156969,
+          "sha256": "b615a5820b163467b3641f45614543098ab8becab460bf2edc5a6497ff85dd90",
+          "size_bytes": 6775399
+        },
+        "EURCAD/tick/2016/DAT_ASCII_EURCAD_T_201606.zip": {
+          "rows": 1272968,
+          "sha256": "d40296fce5f11262e3239571c467139d9e90fcf0ebd8aba7ce987aa004ee45a5",
+          "size_bytes": 7560265
+        },
+        "EURCAD/tick/2016/DAT_ASCII_EURCAD_T_201607.zip": {
+          "rows": 999427,
+          "sha256": "c0fcc49bacde4f4bb319455b8f8b8f47f925417d0e18fd0f0c48e9b29199e44d",
+          "size_bytes": 5775248
+        },
+        "EURCAD/tick/2016/DAT_ASCII_EURCAD_T_201608.zip": {
+          "rows": 852068,
+          "sha256": "89355b97b44456cc94f5e765aebcbece1832c2e18366d997f2f0c9d03b765c09",
+          "size_bytes": 4855428
+        },
+        "EURCAD/tick/2016/DAT_ASCII_EURCAD_T_201609.zip": {
+          "rows": 1195164,
+          "sha256": "24e8056590ef72c0ed88a7eddfedb75cd81498c40abeb7d7efe2e8408707b3d5",
+          "size_bytes": 6711209
+        },
+        "EURCAD/tick/2016/DAT_ASCII_EURCAD_T_201610.zip": {
+          "rows": 1334678,
+          "sha256": "bb8395fcd21c12912b389039cb0dffd8ab20219059043d63e7e1dde168248b45",
+          "size_bytes": 7424977
+        },
+        "EURCAD/tick/2016/DAT_ASCII_EURCAD_T_201611.zip": {
+          "rows": 2148612,
+          "sha256": "1a17094bd2bdd60097857676672ab1d32781e59a4c070024435cab3a4e4c0102",
+          "size_bytes": 11873113
+        },
+        "EURCAD/tick/2016/DAT_ASCII_EURCAD_T_201612.zip": {
+          "rows": 1232153,
+          "sha256": "7069de19b69e5fd650dbd7d3d6d3d91cf7dd8f4951ed2a17ea302e12d5453003",
+          "size_bytes": 6983247
+        },
+        "EURCAD/tick/2017/DAT_ASCII_EURCAD_T_201701.zip": {
+          "rows": 1706633,
+          "sha256": "4d219b9956f92497eda02864583d371aae252781c89ecd5748c10f8f45ac9e54",
+          "size_bytes": 9386742
+        },
+        "EURCAD/tick/2017/DAT_ASCII_EURCAD_T_201702.zip": {
+          "rows": 1604963,
+          "sha256": "8a041bb6767e679093eef02b991ecfe9a79df9414612cbc394bc99950a845726",
+          "size_bytes": 8517102
+        },
+        "EURCAD/tick/2017/DAT_ASCII_EURCAD_T_201703.zip": {
+          "rows": 1981272,
+          "sha256": "cc504ac3887c8ccb18110b6c12784789746113f4d8071235da5f9b69b1b0d5a8",
+          "size_bytes": 10436482
+        },
+        "EURCAD/tick/2017/DAT_ASCII_EURCAD_T_201704.zip": {
+          "rows": 1298462,
+          "sha256": "4c34c08e9f5a6ba5d0f910dd45a9f964e21608f131eea131d0b04123dceb04ed",
+          "size_bytes": 7010397
+        },
+        "EURCAD/tick/2017/DAT_ASCII_EURCAD_T_201705.zip": {
+          "rows": 1512082,
+          "sha256": "24a1db30b11438290463876fd62dd203ed1b256bb7e71f11ce6fc176a3fa772d",
+          "size_bytes": 8280691
+        },
+        "EURCAD/tick/2017/DAT_ASCII_EURCAD_T_201706.zip": {
+          "rows": 1371789,
+          "sha256": "dbe99c77806b765c60a9da520862a6c590fd118cf251f22b1decc0aa3f577e7f",
+          "size_bytes": 7513988
+        },
+        "EURCAD/tick/2017/DAT_ASCII_EURCAD_T_201707.zip": {
+          "rows": 1555545,
+          "sha256": "f91e83875d8d61d0ce8523b4b6c8849ff3ae08cc6b0bee94cdf71753792d2d5d",
+          "size_bytes": 8473275
+        },
+        "EURCAD/tick/2017/DAT_ASCII_EURCAD_T_201708.zip": {
+          "rows": 1461980,
+          "sha256": "5043f0eabd3440b90c1b73c66ed9e9c41df45bd4e164d05979eac49916e27a2f",
+          "size_bytes": 8089729
+        },
+        "EURCAD/tick/2017/DAT_ASCII_EURCAD_T_201709.zip": {
+          "rows": 1180675,
+          "sha256": "1f8cd229225c5359fd835565dbd4b1959bce01cd8e525418f8856be9b33e5c1e",
+          "size_bytes": 6764983
+        },
+        "EURCAD/tick/2017/DAT_ASCII_EURCAD_T_201710.zip": {
+          "rows": 1191012,
+          "sha256": "79db381159f6b17d8c13610f5e29dd2b6d83e7d92862da491b54e1fccbb4376e",
+          "size_bytes": 6614549
+        },
+        "EURCAD/tick/2017/DAT_ASCII_EURCAD_T_201711.zip": {
+          "rows": 1150820,
+          "sha256": "dd237c7b8217ec1b0ac4fd41dad949569bb535033ca82b25fd7a598b1fe95e7e",
+          "size_bytes": 6354479
+        },
+        "EURCAD/tick/2017/DAT_ASCII_EURCAD_T_201712.zip": {
+          "rows": 930391,
+          "sha256": "dce0d14e14139da36f9ccae8eff1ba2be537a7be966969238529edf45ecd8353",
+          "size_bytes": 5291946
+        },
+        "EURCAD/tick/2018/DAT_ASCII_EURCAD_T_201801.zip": {
+          "rows": 1389570,
+          "sha256": "139d23631348c62ab05e07d7478f6ec1aaff72dac6b53f61327c154cafc4bcaa",
+          "size_bytes": 7858936
+        },
+        "EURCAD/tick/2018/DAT_ASCII_EURCAD_T_201802.zip": {
+          "rows": 1618345,
+          "sha256": "2d4cb380596b4a0ef2ade08988373b94a0e7850578a3aebcb1858be367761f4a",
+          "size_bytes": 8820445
+        },
+        "EURCAD/tick/2018/DAT_ASCII_EURCAD_T_201803.zip": {
+          "rows": 1596444,
+          "sha256": "5501ad5765e85d199188880d203993b1a42df06cd4f9ef0f39bce5936baad20a",
+          "size_bytes": 8740331
+        },
+        "EURCAD/tick/2018/DAT_ASCII_EURCAD_T_201804.zip": {
+          "rows": 1103441,
+          "sha256": "849d9f78b4cea2ddc20e485331b5c03a41dbe74ee5a520a3322c09a1e38e4ca0",
+          "size_bytes": 6200360
+        },
+        "EURCAD/tick/2018/DAT_ASCII_EURCAD_T_201805.zip": {
+          "rows": 1810130,
+          "sha256": "80ae40df2ded52c7e883ebeecd9c2624164cba73040ab960530804eab63097d8",
+          "size_bytes": 10073021
+        },
+        "EURCAD/tick/2018/DAT_ASCII_EURCAD_T_201806.zip": {
+          "rows": 1629114,
+          "sha256": "6bdd8fd90c4afb2da45ca65c6ad41320b401997cb281e61aa993d50cedba93f0",
+          "size_bytes": 8948951
+        },
+        "EURCAD/tick/2018/DAT_ASCII_EURCAD_T_201807.zip": {
+          "rows": 1266775,
+          "sha256": "0d9e67d32b2ae6504ca73b37af87e16af1cee83fbd25d3526815f6869df4c689",
+          "size_bytes": 7034472
+        },
+        "EURCAD/tick/2018/DAT_ASCII_EURCAD_T_201808.zip": {
+          "rows": 1159868,
+          "sha256": "7158ddd5a7364f90616289f5ae052a1f93f72e88c4f95f56e35e21fb0612fea6",
+          "size_bytes": 6521189
+        },
+        "EURCAD/tick/2018/DAT_ASCII_EURCAD_T_201809.zip": {
+          "rows": 996736,
+          "sha256": "92d3a1f3a5b8c4411ae7846bbcd30f7699e595a8b28ea4eeac3b4c823a33646b",
+          "size_bytes": 5618699
+        },
+        "EURCAD/tick/2018/DAT_ASCII_EURCAD_T_201810.zip": {
+          "rows": 1397045,
+          "sha256": "e11ca0ea6ccbcf735ee4918c53a5da790de45204172a7d08f4c9b28b39bd6b7d",
+          "size_bytes": 7677147
+        },
+        "EURCAD/tick/2018/DAT_ASCII_EURCAD_T_201811.zip": {
+          "rows": 1523240,
+          "sha256": "a1de737e69c20f88af9e78a62ed5de7b6752ffb2b4d1349ea0af3f8472aceab8",
+          "size_bytes": 8396773
+        },
+        "EURCAD/tick/2018/DAT_ASCII_EURCAD_T_201812.zip": {
+          "rows": 2389262,
+          "sha256": "b697b3e92bd76376054b4d4c13fda14a20b61d51e592acf2ebceed2dbf2c7537",
+          "size_bytes": 14353284
+        },
+        "EURCAD/tick/2019/DAT_ASCII_EURCAD_T_201901.zip": {
+          "rows": 3626109,
+          "sha256": "176cdbb4fc8dc7986cb5d2d305340b74ba0802315082d41eb474ce4fd8860083",
+          "size_bytes": 22153781
+        },
+        "EURCAD/tick/2019/DAT_ASCII_EURCAD_T_201902.zip": {
+          "rows": 2515824,
+          "sha256": "baa6eb76849ee02e0c8559afb5d7b1c877f27f9f4d6dad0e9d52f2da864da3a1",
+          "size_bytes": 15357374
+        },
+        "EURCAD/tick/2019/DAT_ASCII_EURCAD_T_201903.zip": {
+          "rows": 2701123,
+          "sha256": "3999cf188455617ea587db7c3eba60cea02ff52c17879e71fd46f99e46bec8fc",
+          "size_bytes": 16587225
+        },
+        "EURCAD/tick/2019/DAT_ASCII_EURCAD_T_201904.zip": {
+          "rows": 2240646,
+          "sha256": "18860a32cd470bc385a3fb663818a702c157bbb030d546d5e29db7d700cac0d2",
+          "size_bytes": 13756039
+        },
+        "EURCAD/tick/2019/DAT_ASCII_EURCAD_T_201905.zip": {
+          "rows": 2488155,
+          "sha256": "d76c9e87c69e763716340667ca74d5b0bd475c68c067fe9316e523dd548061a7",
+          "size_bytes": 15286452
+        },
+        "EURCAD/tick/2019/DAT_ASCII_EURCAD_T_201906.zip": {
+          "rows": 2378033,
+          "sha256": "4e4e6e9f98ec4e063ec8c4c77b437d872530c45a89108b354b6f0d9a727332c9",
+          "size_bytes": 14631541
+        },
+        "EURCAD/tick/2019/DAT_ASCII_EURCAD_T_201907.zip": {
+          "rows": 2408101,
+          "sha256": "87194c9f07f3fd1c74f0a4d9591b141a176efd7094fcb0bb483275d440cb11b0",
+          "size_bytes": 14661837
+        },
+        "EURCAD/tick/2019/DAT_ASCII_EURCAD_T_201908.zip": {
+          "rows": 3303900,
+          "sha256": "dce4a3a363c98fce9f6ad513d09e273d86e6e16f41d09e56e76cced399dff191",
+          "size_bytes": 20110945
+        },
+        "EURCAD/tick/2019/DAT_ASCII_EURCAD_T_201909.zip": {
+          "rows": 2561720,
+          "sha256": "b4b33df6c41c9391df1927bb862f7ef167e6633d706bd396e43698e2b0c64719",
+          "size_bytes": 15645165
+        },
+        "EURCAD/tick/2019/DAT_ASCII_EURCAD_T_201910.zip": {
+          "rows": 2752342,
+          "sha256": "0c83beef859e44cd7c0578c3c2ec4b3071b596d23920d7382cd4986816ac25c7",
+          "size_bytes": 16592190
+        },
+        "EURCAD/tick/2019/DAT_ASCII_EURCAD_T_201911.zip": {
+          "rows": 1756994,
+          "sha256": "7e43d18ba1b9fbcbf4454f30d4d2cac372dac8563de16201ad47f6cee8b1b89d",
+          "size_bytes": 10710497
+        },
+        "EURCAD/tick/2019/DAT_ASCII_EURCAD_T_201912.zip": {
+          "rows": 1738023,
+          "sha256": "e9d2e842a888abad8d107e998ba13a181a2757f675dbd499efcd296a96c94b49",
+          "size_bytes": 10616963
+        },
+        "EURCAD/tick/2020/DAT_ASCII_EURCAD_T_202001.zip": {
+          "rows": 1923727,
+          "sha256": "c526d2b69aca4e764983a7009f28a957c10c725880a3e5491519fd5424198909",
+          "size_bytes": 11791991
+        },
+        "EURCAD/tick/2020/DAT_ASCII_EURCAD_T_202002.zip": {
+          "rows": 1908799,
+          "sha256": "034b96c170c75a1630330d29e5674bbd6b4e73759c2024d201066f4000bc0826",
+          "size_bytes": 11944730
+        },
+        "EURCAD/tick/2020/DAT_ASCII_EURCAD_T_202003.zip": {
+          "rows": 6955021,
+          "sha256": "ba0ad87cc4e7f0b03ca1b2ed1160fc4be5b30bc31c1e6b2d0faad3fe9ea51811",
+          "size_bytes": 45009710
+        },
+        "EURCAD/tick/2020/DAT_ASCII_EURCAD_T_202004.zip": {
+          "rows": 4029658,
+          "sha256": "102a7eca003d604e815b9ed7457dcbe7dc7c517e162f2d3b3f011d1934287057",
+          "size_bytes": 25830063
+        },
+        "EURCAD/tick/2020/DAT_ASCII_EURCAD_T_202005.zip": {
+          "rows": 2987340,
+          "sha256": "6ae1db8616b9106a730bf1102dad572be539aa12bd48c42ca7dc81b15e935c09",
+          "size_bytes": 18950534
+        },
+        "EURCAD/tick/2020/DAT_ASCII_EURCAD_T_202006.zip": {
+          "rows": 4079150,
+          "sha256": "7f0bf2a15d199d51b32a9a129283f49999a6cb927aa678912960dae023e66888",
+          "size_bytes": 25497704
+        },
+        "EURCAD/tick/2020/DAT_ASCII_EURCAD_T_202007.zip": {
+          "rows": 3183688,
+          "sha256": "832b987f02fa83570c2167188a6f72c7104a9c3233db725719db0e75c70c486f",
+          "size_bytes": 19887136
+        },
+        "EURCAD/tick/2020/DAT_ASCII_EURCAD_T_202008.zip": {
+          "rows": 3129253,
+          "sha256": "bbfd8f0fe176fb9f9ab65b5097882d46d4df7266a59eabde00cf948bdea86a50",
+          "size_bytes": 19615407
+        },
+        "EURCAD/tick/2020/DAT_ASCII_EURCAD_T_202009.zip": {
+          "rows": 3324056,
+          "sha256": "573da160b3b30d6e2bb1c289de10b3ef70a383b10c2428ec4ef6fd23ea66aaff",
+          "size_bytes": 20778639
+        },
+        "EURCAD/tick/2020/DAT_ASCII_EURCAD_T_202010.zip": {
+          "rows": 2804863,
+          "sha256": "1d6b456019f421463559dc6e227f14de116b9bb928531f7b945da0ccaf59db01",
+          "size_bytes": 17461455
+        },
+        "EURCAD/tick/2020/DAT_ASCII_EURCAD_T_202011.zip": {
+          "rows": 2662364,
+          "sha256": "206bb708738eaacacd66581a8c4ebc6486db2198b433d184a6b371b6d621c02d",
+          "size_bytes": 16845289
+        },
+        "EURCAD/tick/2020/DAT_ASCII_EURCAD_T_202012.zip": {
+          "rows": 2732391,
+          "sha256": "5f82daacf979ac88be287e067ac8a16d82b6cde56628a0aa83023214abf1f663",
+          "size_bytes": 17171857
+        },
+        "EURCAD/tick/2021/DAT_ASCII_EURCAD_T_202101.zip": {
+          "rows": 2889090,
+          "sha256": "2d8fe41e9ea023bf3a7469081938317df52b09a8bd8efcfa71d5c7d9ce08499e",
+          "size_bytes": 18185829
+        },
+        "EURCAD/tick/2021/DAT_ASCII_EURCAD_T_202102.zip": {
+          "rows": 2416404,
+          "sha256": "ab9df6dd2a1fb9e9ca0c99d19b5554991c1b232fb0d9c7eafc5774cb4ffa2180",
+          "size_bytes": 15122058
+        },
+        "EURCAD/tick/2021/DAT_ASCII_EURCAD_T_202103.zip": {
+          "rows": 2808380,
+          "sha256": "508392b09fc3be3e4063dfa3b038fbec22cab647c7bfb022a12bc390a854c67b",
+          "size_bytes": 17544117
+        },
+        "EURCAD/tick/2021/DAT_ASCII_EURCAD_T_202104.zip": {
+          "rows": 1879981,
+          "sha256": "d0b5c129a41469a8cc5bd4b955280bff868fa2de8f5c0fe2a6bae1e4c4828975",
+          "size_bytes": 11768793
+        },
+        "EURCAD/tick/2021/DAT_ASCII_EURCAD_T_202105.zip": {
+          "rows": 2053261,
+          "sha256": "d994e7a729598f81c449a562df7f3cb2fe091633c5779252de99853b96ec1af9",
+          "size_bytes": 12630960
+        },
+        "EURCAD/tick/2021/DAT_ASCII_EURCAD_T_202106.zip": {
+          "rows": 2180529,
+          "sha256": "36e6a325b5c17922d1e7db99dc98300432d563144ad0750d42e26f7e364e40a0",
+          "size_bytes": 13250481
+        },
+        "EURCAD/tick/2021/DAT_ASCII_EURCAD_T_202107.zip": {
+          "rows": 2438017,
+          "sha256": "4afa02705d88ed8b6a092a651c25af483a8bf58f73446c0397441494eadb999f",
+          "size_bytes": 14964511
+        },
+        "EURCAD/tick/2021/DAT_ASCII_EURCAD_T_202108.zip": {
+          "rows": 1864446,
+          "sha256": "e1cec14da2e2fbabe8817cbbe241771128471a2852debdbcb7116e674693c2f6",
+          "size_bytes": 11616472
+        },
+        "EURCAD/tick/2021/DAT_ASCII_EURCAD_T_202109.zip": {
+          "rows": 2133639,
+          "sha256": "26f2cddd0043d780e76b281beec5204bbf7d70ee760eaacdd2f6323b4c712195",
+          "size_bytes": 13296007
+        },
+        "EURCAD/tick/2021/DAT_ASCII_EURCAD_T_202110.zip": {
+          "rows": 2044979,
+          "sha256": "8ca581e6e06004d19738463a2b2c5af04f9327e09896e9535e5335a78ecde61d",
+          "size_bytes": 12462705
+        },
+        "EURCAD/tick/2021/DAT_ASCII_EURCAD_T_202111.zip": {
+          "rows": 2540682,
+          "sha256": "a7df4f8d60a0d11f7d56630b851945aa73cb39511e8228f36a82aff0e679e6b7",
+          "size_bytes": 15505781
+        },
+        "EURCAD/tick/2021/DAT_ASCII_EURCAD_T_202112.zip": {
+          "rows": 2625702,
+          "sha256": "3b7e1ef2c96ea101aa7a08f46fa814a89eb5abb1cbbc9644e97472eea510d2d6",
+          "size_bytes": 15931345
+        },
+        "EURCAD/tick/2022/DAT_ASCII_EURCAD_T_202201.zip": {
+          "rows": 2634245,
+          "sha256": "13c1da0fcfb5c6423ad5d66ff99c046f76e07792aacf002be33873d148e8badf",
+          "size_bytes": 15929415
+        },
+        "EURCAD/tick/2022/DAT_ASCII_EURCAD_T_202202.zip": {
+          "rows": 2833947,
+          "sha256": "361f60081f91d578e63f196d8fb8818e79d3ffc41cfbb649e36bfd223601f199",
+          "size_bytes": 17155784
+        },
+        "EURCAD/tick/2022/DAT_ASCII_EURCAD_T_202203.zip": {
+          "rows": 3652222,
+          "sha256": "e24b1d90c8011bb705e0732a760d7342ddc2b1052a1d5f05bffeed7a941715b2",
+          "size_bytes": 22081636
+        },
+        "EURCAD/tick/2022/DAT_ASCII_EURCAD_T_202204.zip": {
+          "rows": 2727332,
+          "sha256": "eaaa0d438f9053468fee6acc4029e1286d18bf29e78ee92443b1081cf1f0be9b",
+          "size_bytes": 16505725
+        },
+        "EURCAD/tick/2022/DAT_ASCII_EURCAD_T_202205.zip": {
+          "rows": 3422408,
+          "sha256": "2b7630a31670e3299105f599d07bf2327e33698c88555f8a0ae3213310cf000c",
+          "size_bytes": 20513316
+        },
+        "EURCAD/tick/2022/DAT_ASCII_EURCAD_T_202206.zip": {
+          "rows": 3771944,
+          "sha256": "1229ef0b6f1c8da00d9151520261cf72e3f05278696de589bf79f1f3a162ab75",
+          "size_bytes": 22631507
+        },
+        "EURCAD/tick/2022/DAT_ASCII_EURCAD_T_202207.zip": {
+          "rows": 3899665,
+          "sha256": "eeaf7bfa2df1aeb73be4d103fe9a211f6a31a727e444ed74dc9adeb2b2134cb6",
+          "size_bytes": 23467398
+        },
+        "EURCAD/tick/2022/DAT_ASCII_EURCAD_T_202208.zip": {
+          "rows": 3684821,
+          "sha256": "ed61f5f44877c2c10c73868d760127c9c32db85b3c0c79e6262029fbd7c32c9a",
+          "size_bytes": 21997933
+        },
+        "EURCAD/tick/2022/DAT_ASCII_EURCAD_T_202209.zip": {
+          "rows": 4701329,
+          "sha256": "d4450ab74aa62914933fb75b188440cf682604471ea927fc2c1875bb23b5e007",
+          "size_bytes": 28028313
+        },
+        "EURCAD/tick/2022/DAT_ASCII_EURCAD_T_202210.zip": {
+          "rows": 4864615,
+          "sha256": "4b58da1e3acbc46c7a8e1998f08e9a3cb01b3c8293ef89bbca2beb5027ed45c1",
+          "size_bytes": 28287261
+        },
+        "EURCAD/tick/2022/DAT_ASCII_EURCAD_T_202211.zip": {
+          "rows": 4020734,
+          "sha256": "13cb1cb1290c1d3e59cf947206dc2fbe80191b567ee1eddece992fddb6427a15",
+          "size_bytes": 23176957
+        },
+        "EURCAD/tick/2022/DAT_ASCII_EURCAD_T_202212.zip": {
+          "rows": 3465854,
+          "sha256": "a0fef8f430fe3971a24f35bd9eb270b7a4bb196605c489e26455f6a84ef0bb35",
+          "size_bytes": 21004212
+        },
+        "EURCAD/tick/2023/DAT_ASCII_EURCAD_T_202301.zip": {
+          "rows": 3223103,
+          "sha256": "1779c70a8d9e21d62f03ad5a3f51c157e6b6217a4b1bc5c313d314099ae9e6b1",
+          "size_bytes": 19845574
+        },
+        "EURCAD/tick/2023/DAT_ASCII_EURCAD_T_202302.zip": {
+          "rows": 2531871,
+          "sha256": "bffa4226949b60c96b1098091733cfc146e2899f14673802b1938bb4b81a7e11",
+          "size_bytes": 15408850
+        },
+        "EURCAD/tick/2023/DAT_ASCII_EURCAD_T_202303.zip": {
+          "rows": 2165826,
+          "sha256": "b8ee2b33cb9dc2d1c9fd63ba36598afed21f43426d968b676855fea007ad6a27",
+          "size_bytes": 13685324
+        },
+        "EURCAD/tick/2023/DAT_ASCII_EURCAD_T_202304.zip": {
+          "rows": 1082330,
+          "sha256": "2b3e2a1a0a80f2971a87d6bedbb87978e3c5f127ca32bd6a86a06763be7413b5",
+          "size_bytes": 7151484
+        },
+        "EURCAD/tick/2023/DAT_ASCII_EURCAD_T_202305.zip": {
+          "rows": 1112966,
+          "sha256": "e0f916f3d531faafd0db949ea5c332cb1b7a0b669809deddff0df287cdda0287",
+          "size_bytes": 7424158
+        },
+        "EURCAD/tick/2023/DAT_ASCII_EURCAD_T_202306.zip": {
+          "rows": 1053825,
+          "sha256": "fcab103843a64e859993b97d1541c50f6706ee3703a2cbf7f5beebe305972155",
+          "size_bytes": 6979303
+        },
+        "EURCAD/tick/2023/DAT_ASCII_EURCAD_T_202307.zip": {
+          "rows": 1158437,
+          "sha256": "b1a4027d6634cdfd2d932b7ef162ca131c9ad33dce3ba45d18f3c66a2cd7e50a",
+          "size_bytes": 7625562
+        },
+        "EURCAD/tick/2023/DAT_ASCII_EURCAD_T_202308.zip": {
+          "rows": 1682218,
+          "sha256": "d49445d059d318cf7deef3fde698b4be1e7def0ef547d8fe65ac2634959e9f58",
+          "size_bytes": 11104885
+        },
+        "EURCAD/tick/2023/DAT_ASCII_EURCAD_T_202309.zip": {
+          "rows": 1425384,
+          "sha256": "3b60ac52300c8f02858ce624a7c643a391e7edc2dfa085c78a47c24d79896230",
+          "size_bytes": 9446658
+        },
+        "EURCAD/tick/2023/DAT_ASCII_EURCAD_T_202310.zip": {
+          "rows": 1915247,
+          "sha256": "0c1848c6a54924d7e359b3cb01292105143be10d740a6963a0967aee5a01f62e",
+          "size_bytes": 12494649
+        },
+        "EURCAD/tick/2023/DAT_ASCII_EURCAD_T_202311.zip": {
+          "rows": 1653542,
+          "sha256": "f9a8bbd654cc29f5e06e60a6c62f7ad1e89ce7c5ff47d50895f417c00b8008d4",
+          "size_bytes": 10829014
+        },
+        "EURCAD/tick/2023/DAT_ASCII_EURCAD_T_202312.zip": {
+          "rows": 1567850,
+          "sha256": "e3c13cc09c280086e8f8a33d2991d570d5c7216251bb20997d7beeb3661f7e10",
+          "size_bytes": 10243231
+        },
+        "EURCAD/tick/2024/DAT_ASCII_EURCAD_T_202401.zip": {
+          "rows": 1657129,
+          "sha256": "59ffc207f7e6607628ae924813af4e91cdee850362c3a898cc24d3c076a784df",
+          "size_bytes": 10918445
+        },
+        "EURCAD/tick/2024/DAT_ASCII_EURCAD_T_202402.zip": {
+          "rows": 1535451,
+          "sha256": "2ca927de9f6802900ffaed1677a163a4b6e33dc022b320bd78b610ea60a6a05a",
+          "size_bytes": 9885886
+        },
+        "EURCAD/tick/2024/DAT_ASCII_EURCAD_T_202403.zip": {
+          "rows": 1402142,
+          "sha256": "9ffc062cb4acc80720748c24f5eec2c22dc7244c403feb72d2bfdc1278139467",
+          "size_bytes": 8925529
+        },
+        "EURCAD/tick/2024/DAT_ASCII_EURCAD_T_202404.zip": {
+          "rows": 1612138,
+          "sha256": "aeb49b121f5bbabbf7e5170aaec3e1bace294df49a1a9f5c8b2084d1552b49d0",
+          "size_bytes": 10276660
+        },
+        "EURCAD/tick/2024/DAT_ASCII_EURCAD_T_202405.zip": {
+          "rows": 1293474,
+          "sha256": "a4bf30d99bbc72287349ebb580b203020daebb0c701619e1425be755541d2d98",
+          "size_bytes": 8253905
+        },
+        "EURCAD/tick/2024/DAT_ASCII_EURCAD_T_202406.zip": {
+          "rows": 1274939,
+          "sha256": "7e717c314b1d9c352b26326b5890ae1754a51ed6a655ef0eeb655339a5a47a5b",
+          "size_bytes": 8077987
+        },
+        "EURCAD/tick/2024/DAT_ASCII_EURCAD_T_202407.zip": {
+          "rows": 1365677,
+          "sha256": "773f5059a2cf102d722cd4f025aff1fcde403e807bf452e114765e7f7a627bc8",
+          "size_bytes": 8638483
+        },
+        "EURCAD/tick/2024/DAT_ASCII_EURCAD_T_202408.zip": {
+          "rows": 1802590,
+          "sha256": "5848e247d71a23a09b5e6abecc51629d8328222a14e5471624d2615d752fdfae",
+          "size_bytes": 11442699
+        },
+        "EURCAD/tick/2024/DAT_ASCII_EURCAD_T_202409.zip": {
+          "rows": 1807155,
+          "sha256": "a248de1032dcb9457f546980b4d6c2d3a14ca848ea89f5d96ce284c50e1a9900",
+          "size_bytes": 11350453
+        },
+        "EURCAD/tick/2024/DAT_ASCII_EURCAD_T_202410.zip": {
+          "rows": 1769594,
+          "sha256": "8d0921fae5e3967bd6f0e5d90a6c0e6ac3b43cbbc3b82c8fde7b1fc2d7f05ab4",
+          "size_bytes": 11088801
+        },
+        "EURCAD/tick/2024/DAT_ASCII_EURCAD_T_202411.zip": {
+          "rows": 2272581,
+          "sha256": "428834d8d791bee53779f101734e017766d64597aec22e9064735fa4c085d1b4",
+          "size_bytes": 13810899
+        },
+        "EURCAD/tick/2024/DAT_ASCII_EURCAD_T_202412.zip": {
+          "rows": 1895141,
+          "sha256": "a10c3c7493d9df59908ff6363cd34e1fb4152aa60ee1c133690440879b043060",
+          "size_bytes": 11754276
+        },
+        "EURCAD/tick/2025/DAT_ASCII_EURCAD_T_202501.zip": {
+          "rows": 2402221,
+          "sha256": "4224445f9b558ad411be1e30a1635075b300bb352c02cc550521efcfc1a08de0",
+          "size_bytes": 14963545
+        },
+        "EURCAD/tick/2025/DAT_ASCII_EURCAD_T_202502.zip": {
+          "rows": 1965321,
+          "sha256": "3fa29fdbae67c0db7e95b207e268af86c591a23ea131ea4b9c2e52d4f57504a3",
+          "size_bytes": 12341610
+        },
+        "EURCAD/tick/2025/DAT_ASCII_EURCAD_T_202503.zip": {
+          "rows": 2257576,
+          "sha256": "f6c9caaaa54f9866085bed4e530325522c08aed839ab2165f4925a0ab0830981",
+          "size_bytes": 14435489
+        },
+        "EURCAD/tick/2025/DAT_ASCII_EURCAD_T_202504.zip": {
+          "rows": 4364416,
+          "sha256": "cb43fef67fca9eed98896e7226ede8a3054819c4b78a2de1f9625b61497d6cea",
+          "size_bytes": 28220391
+        },
+        "EURCAD/tick/2025/DAT_ASCII_EURCAD_T_202505.zip": {
+          "rows": 2485737,
+          "sha256": "a34a79d05da15232633df02e1f0d35a5d244ddd496b476661ec5d0716ae5392b",
+          "size_bytes": 15767870
+        },
+        "EURCAD/tick/2025/DAT_ASCII_EURCAD_T_202506.zip": {
+          "rows": 2197690,
+          "sha256": "3860f1acaec80b51f896b75543cd076be291518ee0f07c33c7b087c15805019c",
+          "size_bytes": 14244485
+        },
+        "EURCAD/tick/2025/DAT_ASCII_EURCAD_T_202507.zip": {
+          "rows": 2029450,
+          "sha256": "a8ac6b48c5b6b604c8d4fa52da545b33ea424c15d898d9ec94faa5162b4184c4",
+          "size_bytes": 13304689
+        },
+        "EURCAD/tick/2025/DAT_ASCII_EURCAD_T_202508.zip": {
+          "rows": 1624689,
+          "sha256": "6ca0286b5e1ca6a871a38dc57789bfa7d4e045f7eaa6d1cca2054c2bbcdb7918",
+          "size_bytes": 10718989
+        },
+        "EURCAD/tick/2025/DAT_ASCII_EURCAD_T_202509.zip": {
+          "rows": 1851449,
+          "sha256": "b9c50308f40fd2417ad00a55d38eb69c10b04ce05888afb05be196e9fc398aec",
+          "size_bytes": 12120589
+        },
+        "EURCAD/tick/2025/DAT_ASCII_EURCAD_T_202510.zip": {
+          "rows": 1966342,
+          "sha256": "42d94aef61fbf1d710f376fdef3033a6feb76200ab24bdfc47e0d656862fcf73",
+          "size_bytes": 12785342
+        },
+        "EURCAD/tick/2025/DAT_ASCII_EURCAD_T_202511.zip": {
+          "rows": 1776170,
+          "sha256": "14a2867b7028bede78b903b99e213ad6765dc0b0a834b7ab4345436ddd6e2eb1",
+          "size_bytes": 11410107
+        },
+        "EURCAD/tick/2025/DAT_ASCII_EURCAD_T_202512.zip": {
+          "rows": 1719792,
+          "sha256": "330955f8fb209fb3facf47556c5d45e0ed24712082e344936c344d0712390637",
+          "size_bytes": 11051122
+        },
+        "EURCAD/tick/2026/DAT_ASCII_EURCAD_T_202601.zip": {
+          "rows": 2248735,
+          "sha256": "59c03b0a5e106c9b23046ff602d4105a8c7df2ad3f8d7385e129ddeddf4bf072",
+          "size_bytes": 14375810
+        },
+        "EURCAD/tick/2026/DAT_ASCII_EURCAD_T_202602.zip": {
+          "rows": 2286674,
+          "sha256": "dd7f958bd37c9f7c041f180495b68e212e417c772a3b29c52dd1e2af5a80e1e8",
+          "size_bytes": 14483054
+        },
+        "EURCAD/tick/2026/DAT_ASCII_EURCAD_T_202603.zip": {
+          "rows": 3850508,
+          "sha256": "506091305dd5ad7c85af322e070a532ddab43168afda27f61f67702be1f2acbb",
+          "size_bytes": 23741656
+        },
+        "EURCAD/tick/2026/DAT_ASCII_EURCAD_T_202604.zip": {
+          "rows": 978851,
+          "sha256": "7bbe27d38f40e5179c0147b89eb554863cdeaf599ffe098d43b62fff2f15c1b0",
+          "size_bytes": 6103911
+        }
+      },
+      "latest_month": "202604",
+      "total_files": 196,
+      "total_size_bytes": 2069580072
     },
     "EURUSD": {
       "earliest_month": "201501",

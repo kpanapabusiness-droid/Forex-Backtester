@@ -1,6 +1,6 @@
 # HistData coverage and gap report
 
-Generated: 2026-05-20T09:18:39+00:00  
+Generated: 2026-05-20T13:23:19+00:00  
 Window: 201001 → 202604 (196 months)
 
 ## Summary
@@ -15,8 +15,8 @@ Window: 201001 → 202604 (196 months)
 | CADCHF | 196 | 196 | 100.0% | 201001 | 202604 |  1385.4 |  240471402 |
 | CADJPY | 196 | 196 | 100.0% | 201001 | 202604 |  1970.2 |  331982808 |
 | CHFJPY | 196 | 196 | 100.0% | 201001 | 202604 |  1977.9 |  321354852 |
-| EURAUD | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
-| EURCAD | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
+| EURAUD | 196 | 196 | 100.0% | 201001 | 202604 |  2621.2 |  434515050 |
+| EURCAD | 196 | 196 | 100.0% | 201001 | 202604 |  2069.6 |  348249050 |
 | EURCHF | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
 | EURGBP | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
 | EURJPY | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
@@ -35,7 +35,7 @@ Window: 201001 → 202604 (196 months)
 | USDCAD | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
 | USDCHF | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
 | USDJPY | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
-| **TOTAL** | **1569** | **5488** | ** 28.6%** | — | — | **13860.8** | **2354076942** |
+| **TOTAL** | **1961** | **5488** | ** 35.7%** | — | — | **18551.6** | **3136841042** |
 
 ## Per-pair detail
 
@@ -89,13 +89,15 @@ Window: 201001 → 202604 (196 months)
 
 ### EURAUD
 
-- **No months observed.**
-- Real coverage gap (before HistData has data): 196 months, 201001–202604
+- First observed month: **201001**  (real coverage start)
+- Last observed month:  **202604**
+- Observed months: **196 / 196**
 
 ### EURCAD
 
-- **No months observed.**
-- Real coverage gap (before HistData has data): 196 months, 201001–202604
+- First observed month: **201001**  (real coverage start)
+- Last observed month:  **202604**
+- Observed months: **196 / 196**
 
 ### EURCHF
 

@@ -1,6 +1,6 @@
 # HistData coverage and gap report
 
-Generated: 2026-05-20T13:23:19+00:00  
+Generated: 2026-05-20T18:26:42+00:00  
 Window: 201001 → 202604 (196 months)
 
 ## Summary
@@ -17,10 +17,10 @@ Window: 201001 → 202604 (196 months)
 | CHFJPY | 196 | 196 | 100.0% | 201001 | 202604 |  1977.9 |  321354852 |
 | EURAUD | 196 | 196 | 100.0% | 201001 | 202604 |  2621.2 |  434515050 |
 | EURCAD | 196 | 196 | 100.0% | 201001 | 202604 |  2069.6 |  348249050 |
-| EURCHF | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
-| EURGBP | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
-| EURJPY | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
-| EURNZD | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
+| EURCHF | 196 | 196 | 100.0% | 201001 | 202604 |  1284.6 |  228121530 |
+| EURGBP | 196 | 196 | 100.0% | 201001 | 202604 |  1516.1 |  268147835 |
+| EURJPY | 196 | 196 | 100.0% | 201001 | 202604 |  2973.9 |  509488516 |
+| EURNZD | 196 | 196 | 100.0% | 201001 | 202604 |  2116.5 |  337866107 |
 | EURUSD | 1 | 196 |   0.5% | 201501 | 201501 |     9.3 |    1691494 |
 | GBPAUD | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
 | GBPCAD | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
@@ -35,7 +35,7 @@ Window: 201001 → 202604 (196 months)
 | USDCAD | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
 | USDCHF | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
 | USDJPY | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
-| **TOTAL** | **1961** | **5488** | ** 35.7%** | — | — | **18551.6** | **3136841042** |
+| **TOTAL** | **2745** | **5488** | ** 50.0%** | — | — | **26442.6** | **4480465030** |
 
 ## Per-pair detail
 
@@ -101,23 +101,27 @@ Window: 201001 → 202604 (196 months)
 
 ### EURCHF
 
-- **No months observed.**
-- Real coverage gap (before HistData has data): 196 months, 201001–202604
+- First observed month: **201001**  (real coverage start)
+- Last observed month:  **202604**
+- Observed months: **196 / 196**
 
 ### EURGBP
 
-- **No months observed.**
-- Real coverage gap (before HistData has data): 196 months, 201001–202604
+- First observed month: **201001**  (real coverage start)
+- Last observed month:  **202604**
+- Observed months: **196 / 196**
 
 ### EURJPY
 
-- **No months observed.**
-- Real coverage gap (before HistData has data): 196 months, 201001–202604
+- First observed month: **201001**  (real coverage start)
+- Last observed month:  **202604**
+- Observed months: **196 / 196**
 
 ### EURNZD
 
-- **No months observed.**
-- Real coverage gap (before HistData has data): 196 months, 201001–202604
+- First observed month: **201001**  (real coverage start)
+- Last observed month:  **202604**
+- Observed months: **196 / 196**
 
 ### EURUSD
 

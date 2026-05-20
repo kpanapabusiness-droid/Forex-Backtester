@@ -1,5 +1,5 @@
 {
-  "downloaded_at": "2026-05-20T13:23:06+00:00",
+  "downloaded_at": "2026-05-20T18:26:25+00:00",
   "pairs": {
     "AUDCAD": {
       "earliest_month": "201001",
@@ -9880,6 +9880,3958 @@
       "latest_month": "202604",
       "total_files": 196,
       "total_size_bytes": 2069580072
+    },
+    "EURCHF": {
+      "earliest_month": "201001",
+      "files": {
+        "EURCHF/tick/2010/DAT_ASCII_EURCHF_T_201001.zip": {
+          "rows": 312265,
+          "sha256": "eb66a2f38e559f6ec7b09e749df5f5c489dd81023c663e43e3359e000fe377b4",
+          "size_bytes": 1187401
+        },
+        "EURCHF/tick/2010/DAT_ASCII_EURCHF_T_201002.zip": {
+          "rows": 327111,
+          "sha256": "aa6e53a3f47dd785b25d8f5971746e816287e53e1a0e7f61c179be2dc32fca84",
+          "size_bytes": 1221054
+        },
+        "EURCHF/tick/2010/DAT_ASCII_EURCHF_T_201003.zip": {
+          "rows": 369246,
+          "sha256": "a1e56362c65feb3d4cd5ee40832a0553336dd084c7c75162fdf46cef511265bc",
+          "size_bytes": 1317019
+        },
+        "EURCHF/tick/2010/DAT_ASCII_EURCHF_T_201004.zip": {
+          "rows": 418842,
+          "sha256": "e26d6106cd50f4a6968b79c741505efb5602a93722eb4f1d0cfbecfd99517637",
+          "size_bytes": 1401297
+        },
+        "EURCHF/tick/2010/DAT_ASCII_EURCHF_T_201005.zip": {
+          "rows": 480604,
+          "sha256": "a734153751efc153d04316c8e232a563a31bf1cc491a7ca42a821ea2c3974792",
+          "size_bytes": 1806723
+        },
+        "EURCHF/tick/2010/DAT_ASCII_EURCHF_T_201006.zip": {
+          "rows": 502118,
+          "sha256": "aa53bea7a2e8d07bff21a15a0a04c0a91212fbc5514f3a19538c3c91cb1b60ec",
+          "size_bytes": 1932385
+        },
+        "EURCHF/tick/2010/DAT_ASCII_EURCHF_T_201007.zip": {
+          "rows": 467541,
+          "sha256": "76110ef2cc0a84ce9b410f137ac8550c6e2a1071647ae22dba685faeec4a666b",
+          "size_bytes": 1832845
+        },
+        "EURCHF/tick/2010/DAT_ASCII_EURCHF_T_201008.zip": {
+          "rows": 464436,
+          "sha256": "aac2f8dfb093f49c2ca577c4c63e590d04eefb1e3445133193846cc22c88aec0",
+          "size_bytes": 1820967
+        },
+        "EURCHF/tick/2010/DAT_ASCII_EURCHF_T_201009.zip": {
+          "rows": 461696,
+          "sha256": "b18141b52fcfb444f704c39c2a4f4ecb947cf96ad4249aa0f64080a479697624",
+          "size_bytes": 1821618
+        },
+        "EURCHF/tick/2010/DAT_ASCII_EURCHF_T_201010.zip": {
+          "rows": 321142,
+          "sha256": "f4783609e5ae3c924510ff86834affc2ed92411ec6a44fa8d5ccea17c998e581",
+          "size_bytes": 1217991
+        },
+        "EURCHF/tick/2010/DAT_ASCII_EURCHF_T_201011.zip": {
+          "rows": 375467,
+          "sha256": "26f22b121a4b34aaab4f625efd87fccae4607685a9f15c331fcd193afd4ff308",
+          "size_bytes": 1387778
+        },
+        "EURCHF/tick/2010/DAT_ASCII_EURCHF_T_201012.zip": {
+          "rows": 298916,
+          "sha256": "60132f9cea2fef0b8cbe0ea0c4ce12692c3a16cb00682c2d9bc401cc2dc3bec4",
+          "size_bytes": 1146032
+        },
+        "EURCHF/tick/2011/DAT_ASCII_EURCHF_T_201101.zip": {
+          "rows": 298165,
+          "sha256": "ef28161207eeaf1c8bb6911fc34c2793b38521f2f3ab448a14f4e774a08945b9",
+          "size_bytes": 1138782
+        },
+        "EURCHF/tick/2011/DAT_ASCII_EURCHF_T_201102.zip": {
+          "rows": 276603,
+          "sha256": "55638b4ce0985b5ee2eebd93fb5b2edd44da15c581dfd6a3f6aae8b70b96e738",
+          "size_bytes": 1035960
+        },
+        "EURCHF/tick/2011/DAT_ASCII_EURCHF_T_201103.zip": {
+          "rows": 279792,
+          "sha256": "9c6415cb6d7aa7d3987743a2b4defc5bd3fbb89e59a74c0aa30b2709ce8990cb",
+          "size_bytes": 1084288
+        },
+        "EURCHF/tick/2011/DAT_ASCII_EURCHF_T_201104.zip": {
+          "rows": 219031,
+          "sha256": "44d1d0478bcadf6a140a49e54ebb8ab925b942114554a5747bb5e555ce973c85",
+          "size_bytes": 952372
+        },
+        "EURCHF/tick/2011/DAT_ASCII_EURCHF_T_201105.zip": {
+          "rows": 299776,
+          "sha256": "461df48a08282c137979537af4802939e3a15c3919d1d76abd3c533ecf5479fa",
+          "size_bytes": 1584787
+        },
+        "EURCHF/tick/2011/DAT_ASCII_EURCHF_T_201106.zip": {
+          "rows": 280083,
+          "sha256": "05dba5410356438a16a9f7d19572f6de87f8964aecc218d06cf24c5b1ac3e006",
+          "size_bytes": 1482896
+        },
+        "EURCHF/tick/2011/DAT_ASCII_EURCHF_T_201107.zip": {
+          "rows": 317562,
+          "sha256": "8f40b3ca3b4cea33add0d1fe6cf3f4e730ee3d4913363d010005df947b5703a8",
+          "size_bytes": 1685264
+        },
+        "EURCHF/tick/2011/DAT_ASCII_EURCHF_T_201108.zip": {
+          "rows": 578521,
+          "sha256": "85ccb6b634cd08b1473ea42ef6fddda8384c36884ac0b5c536bcd5e98fafe4d9",
+          "size_bytes": 3013046
+        },
+        "EURCHF/tick/2011/DAT_ASCII_EURCHF_T_201109.zip": {
+          "rows": 516818,
+          "sha256": "66f7b78d96899d0bf1507d30266343077c3e5d2f956b1765027a1b4a48b89488",
+          "size_bytes": 2563211
+        },
+        "EURCHF/tick/2011/DAT_ASCII_EURCHF_T_201110.zip": {
+          "rows": 412934,
+          "sha256": "db175efc3e235c6bb8739441f4dbc997afd12fd4ff3fa26960a6c468a86ba7e3",
+          "size_bytes": 2085404
+        },
+        "EURCHF/tick/2011/DAT_ASCII_EURCHF_T_201111.zip": {
+          "rows": 285188,
+          "sha256": "51924b9eb16f7e3daa6c5fc2487fdd69d284323e5af8748837c88af295166794",
+          "size_bytes": 1487715
+        },
+        "EURCHF/tick/2011/DAT_ASCII_EURCHF_T_201112.zip": {
+          "rows": 869666,
+          "sha256": "16fc7c0daa3ee8cc3435de8e3dd5047cd9185f40a3f1ced5d38b528e22f44378",
+          "size_bytes": 4907135
+        },
+        "EURCHF/tick/2012/DAT_ASCII_EURCHF_T_201201.zip": {
+          "rows": 845256,
+          "sha256": "80439728be011685b6784548b422cfa88280c43899825090937c396982f2d65b",
+          "size_bytes": 4543415
+        },
+        "EURCHF/tick/2012/DAT_ASCII_EURCHF_T_201202.zip": {
+          "rows": 740288,
+          "sha256": "385a0407409754c2295ce9442ef015b962a3433dec130159b3eac009609df6db",
+          "size_bytes": 3888878
+        },
+        "EURCHF/tick/2012/DAT_ASCII_EURCHF_T_201203.zip": {
+          "rows": 547329,
+          "sha256": "cc5e88914e20539680c7d6cfa0f7dc173015f3a7c080516bcce66e3e45a5a801",
+          "size_bytes": 2831716
+        },
+        "EURCHF/tick/2012/DAT_ASCII_EURCHF_T_201204.zip": {
+          "rows": 457183,
+          "sha256": "f0f4e8bb8c02a62bc04700e9c98f5678da8f2c5835c749c4de41defa9fc3e73c",
+          "size_bytes": 2372319
+        },
+        "EURCHF/tick/2012/DAT_ASCII_EURCHF_T_201205.zip": {
+          "rows": 336226,
+          "sha256": "69894d45149f6292495732b29e253404fee5122a28d9699327cc564b679b0ae3",
+          "size_bytes": 1763410
+        },
+        "EURCHF/tick/2012/DAT_ASCII_EURCHF_T_201206.zip": {
+          "rows": 267660,
+          "sha256": "d3188e6c283f2c95a74139bda3db7681be28fdd2a053d694c3849084a83f6d76",
+          "size_bytes": 1391074
+        },
+        "EURCHF/tick/2012/DAT_ASCII_EURCHF_T_201207.zip": {
+          "rows": 268354,
+          "sha256": "d7e938f3ce9299fb9f0fbad954d516f3d1e28116250abd5847a1d90cbd9b0a74",
+          "size_bytes": 1391656
+        },
+        "EURCHF/tick/2012/DAT_ASCII_EURCHF_T_201208.zip": {
+          "rows": 196488,
+          "sha256": "008c0a717ff2b428bebfd55cabcb7a2d9cf9b5522bbca4d361fb82ca759c0ed2",
+          "size_bytes": 1065417
+        },
+        "EURCHF/tick/2012/DAT_ASCII_EURCHF_T_201209.zip": {
+          "rows": 476464,
+          "sha256": "720ee265c95629bb5610d66c717eb24b16334c400381d3d7e6c09987b76c1000",
+          "size_bytes": 2716244
+        },
+        "EURCHF/tick/2012/DAT_ASCII_EURCHF_T_201210.zip": {
+          "rows": 451928,
+          "sha256": "84e5ae88ac5177cf8ac170db2a8165ab3899c78cf16e3b991c408a8b28f50844",
+          "size_bytes": 2461175
+        },
+        "EURCHF/tick/2012/DAT_ASCII_EURCHF_T_201211.zip": {
+          "rows": 311597,
+          "sha256": "82c45acb2335b2d6ef2558bb1647c353bfdf237862aadcc06bc6b8658186262d",
+          "size_bytes": 1701570
+        },
+        "EURCHF/tick/2012/DAT_ASCII_EURCHF_T_201212.zip": {
+          "rows": 313755,
+          "sha256": "21089b9e3ee08d2f66a6d5c7f4f624a0cf63266d39d185f69d566919dc75b931",
+          "size_bytes": 1812710
+        },
+        "EURCHF/tick/2013/DAT_ASCII_EURCHF_T_201301.zip": {
+          "rows": 613057,
+          "sha256": "9327dd54844d4e7bc0701439eed5484a73bda487f6156035bcae135a8e2ff391",
+          "size_bytes": 3608994
+        },
+        "EURCHF/tick/2013/DAT_ASCII_EURCHF_T_201302.zip": {
+          "rows": 715177,
+          "sha256": "76d7f671fc66cf930dfa9d4eaedfa84e0e5e6f83cb25d8b414fa620729f571b1",
+          "size_bytes": 4147976
+        },
+        "EURCHF/tick/2013/DAT_ASCII_EURCHF_T_201303.zip": {
+          "rows": 701679,
+          "sha256": "213bca5b1fa4b2842189b325613ccaef8779b527c2e51561d52684cb5601dc7c",
+          "size_bytes": 3938867
+        },
+        "EURCHF/tick/2013/DAT_ASCII_EURCHF_T_201304.zip": {
+          "rows": 647247,
+          "sha256": "b9021324708b37dc95e404cfbabf7d9efd93d3207a68645a18b045fd539cac88",
+          "size_bytes": 3564071
+        },
+        "EURCHF/tick/2013/DAT_ASCII_EURCHF_T_201305.zip": {
+          "rows": 803021,
+          "sha256": "3449be852cef81ec0dc9fa0695b169c3a1df3b9aba779d7b83475436cc1295c0",
+          "size_bytes": 4714153
+        },
+        "EURCHF/tick/2013/DAT_ASCII_EURCHF_T_201306.zip": {
+          "rows": 762733,
+          "sha256": "48dc5ccc0fd12195ad10d6ffca5aaac34f802e7fa771191a42410735a5465eae",
+          "size_bytes": 4446110
+        },
+        "EURCHF/tick/2013/DAT_ASCII_EURCHF_T_201307.zip": {
+          "rows": 625448,
+          "sha256": "1b1e1f448cf2e0c9fc2e13406afd0df5858d98e59a610fccbc2799adfbd84a8f",
+          "size_bytes": 3613395
+        },
+        "EURCHF/tick/2013/DAT_ASCII_EURCHF_T_201308.zip": {
+          "rows": 468073,
+          "sha256": "d64c8b053efbe2f78e55fca20eb9c98d20fbde75e82a0b0d7026ac940526e779",
+          "size_bytes": 2714441
+        },
+        "EURCHF/tick/2013/DAT_ASCII_EURCHF_T_201309.zip": {
+          "rows": 408008,
+          "sha256": "d8f3dd19076ffd1f127f2cd40a328d201c5ea74ecc7dd85998bb9be49198394c",
+          "size_bytes": 2345486
+        },
+        "EURCHF/tick/2013/DAT_ASCII_EURCHF_T_201310.zip": {
+          "rows": 432065,
+          "sha256": "007312acc4ca40a53e8e8af38fe6a77c88ea2c4ea6927e65edd669d18654683a",
+          "size_bytes": 2484909
+        },
+        "EURCHF/tick/2013/DAT_ASCII_EURCHF_T_201311.zip": {
+          "rows": 394019,
+          "sha256": "a6ab1f9054c1b20a5a1a25e159430fdd81b4701f9d24583bfba159d1e2583189",
+          "size_bytes": 2226921
+        },
+        "EURCHF/tick/2013/DAT_ASCII_EURCHF_T_201312.zip": {
+          "rows": 381216,
+          "sha256": "8b5908dbd365109ea0759708a806a5370b071179540149da2fe70b2529df27ee",
+          "size_bytes": 2179993
+        },
+        "EURCHF/tick/2014/DAT_ASCII_EURCHF_T_201401.zip": {
+          "rows": 467781,
+          "sha256": "a7e88ef2430319e8c69ce066dde863cc4411c8cc2e3a97a203d40e40389718ea",
+          "size_bytes": 2684002
+        },
+        "EURCHF/tick/2014/DAT_ASCII_EURCHF_T_201402.zip": {
+          "rows": 357292,
+          "sha256": "49fe91b92c869de9c1fad6f46f14468be25dd1f3fbd7a84a036eff2ee599b6a3",
+          "size_bytes": 2046786
+        },
+        "EURCHF/tick/2014/DAT_ASCII_EURCHF_T_201403.zip": {
+          "rows": 399386,
+          "sha256": "f78a3e06585335671268b1ad0d8a7d366e01c42a1e49683858142d176e86f653",
+          "size_bytes": 2250252
+        },
+        "EURCHF/tick/2014/DAT_ASCII_EURCHF_T_201404.zip": {
+          "rows": 326466,
+          "sha256": "92879d3ecbc67f6593fd929c20e601ac804f5b05c7767a69aaa59b0d7f20a5c3",
+          "size_bytes": 1828928
+        },
+        "EURCHF/tick/2014/DAT_ASCII_EURCHF_T_201405.zip": {
+          "rows": 323861,
+          "sha256": "c552d99c8a353ee25cd218f44c87e2631b6403ef85143e4af6c1f76f62e40343",
+          "size_bytes": 1786137
+        },
+        "EURCHF/tick/2014/DAT_ASCII_EURCHF_T_201406.zip": {
+          "rows": 309854,
+          "sha256": "cc117d526cb81c83d9a9124e31a0dbd28ae1fa188b748395e0a618ad11ce3308",
+          "size_bytes": 1683976
+        },
+        "EURCHF/tick/2014/DAT_ASCII_EURCHF_T_201407.zip": {
+          "rows": 367388,
+          "sha256": "593596768d0d11cdc64a980272be909f34fb9c6b870022c5cac8a1a9b5d7f11d",
+          "size_bytes": 1882126
+        },
+        "EURCHF/tick/2014/DAT_ASCII_EURCHF_T_201408.zip": {
+          "rows": 466817,
+          "sha256": "929ca155088a80dd6cda3188cb14f6dd89975e63448ffe098c26ead9481ab27f",
+          "size_bytes": 2065417
+        },
+        "EURCHF/tick/2014/DAT_ASCII_EURCHF_T_201409.zip": {
+          "rows": 688176,
+          "sha256": "b4338b4f1a32bf6e3d3dcc897019b8f6b71b7c1e3a29974fe32953e039981c4e",
+          "size_bytes": 2995010
+        },
+        "EURCHF/tick/2014/DAT_ASCII_EURCHF_T_201410.zip": {
+          "rows": 989591,
+          "sha256": "41b2523577fcee29e43fce87782ed8fa91b60cd61166974448b69a2c69b555d9",
+          "size_bytes": 4999352
+        },
+        "EURCHF/tick/2014/DAT_ASCII_EURCHF_T_201411.zip": {
+          "rows": 780837,
+          "sha256": "3d0bd31b2960988fe55ccf4ef366ea46afb50357842c6390d6f93f73daaf9474",
+          "size_bytes": 3692340
+        },
+        "EURCHF/tick/2014/DAT_ASCII_EURCHF_T_201412.zip": {
+          "rows": 373880,
+          "sha256": "7a2fbd065dc9d09c595891ee572716585805c2f159f2f6cc09f5a86274463d86",
+          "size_bytes": 1911597
+        },
+        "EURCHF/tick/2015/DAT_ASCII_EURCHF_T_201501.zip": {
+          "rows": 729317,
+          "sha256": "5e74f130dbd1b4c496610dec9c98b5e8bfdaaacb7c273c41edd1e60efa6b0c25",
+          "size_bytes": 4332238
+        },
+        "EURCHF/tick/2015/DAT_ASCII_EURCHF_T_201502.zip": {
+          "rows": 1171959,
+          "sha256": "ce8af1324a68803af53a11ace244c694d023bdf238ba4e59bb1a2207ca10645d",
+          "size_bytes": 6334119
+        },
+        "EURCHF/tick/2015/DAT_ASCII_EURCHF_T_201503.zip": {
+          "rows": 1343538,
+          "sha256": "5d7f5c7e32706340621fa03e4efa1791a70c53c1b093ba4e0dcd08ade046e2b7",
+          "size_bytes": 7504788
+        },
+        "EURCHF/tick/2015/DAT_ASCII_EURCHF_T_201504.zip": {
+          "rows": 1375463,
+          "sha256": "d07f1323ddb5e7f4c307105e58732c51b7fa7c134af3f6e9b60809747955a67a",
+          "size_bytes": 7374875
+        },
+        "EURCHF/tick/2015/DAT_ASCII_EURCHF_T_201505.zip": {
+          "rows": 1611246,
+          "sha256": "0d7b4345c0a5f61413cc12f6f2e46377580817e64528859acf09320fad104ae5",
+          "size_bytes": 8340801
+        },
+        "EURCHF/tick/2015/DAT_ASCII_EURCHF_T_201506.zip": {
+          "rows": 1631988,
+          "sha256": "8e1de7204c12301a77a9485bb8e64b96ebc1eab55bfdec2e39cafa50b7d064f0",
+          "size_bytes": 8471601
+        },
+        "EURCHF/tick/2015/DAT_ASCII_EURCHF_T_201507.zip": {
+          "rows": 1613010,
+          "sha256": "3e18b462ec4cdd6e4485c78e05f59bc25e6ff099b0a0378251d86a847cf08bc3",
+          "size_bytes": 8280820
+        },
+        "EURCHF/tick/2015/DAT_ASCII_EURCHF_T_201508.zip": {
+          "rows": 1490709,
+          "sha256": "f245d1e06c59a0a661cac20ee8f673e2170c4fd4f50c99807450b19b8c73aad2",
+          "size_bytes": 7808850
+        },
+        "EURCHF/tick/2015/DAT_ASCII_EURCHF_T_201509.zip": {
+          "rows": 1309686,
+          "sha256": "9881949d1257b0e3f92025a592747bb549f86046eb60483fdb2318fc477d8f86",
+          "size_bytes": 6925665
+        },
+        "EURCHF/tick/2015/DAT_ASCII_EURCHF_T_201510.zip": {
+          "rows": 1190164,
+          "sha256": "214629419b1b462c1df621efc7f1c383a395fe132a37693b5041710ebdac66b8",
+          "size_bytes": 6202057
+        },
+        "EURCHF/tick/2015/DAT_ASCII_EURCHF_T_201511.zip": {
+          "rows": 1234476,
+          "sha256": "c6d0a7c335650eda6c05460bd838fe10c74e6ed88864e675547420441baed873",
+          "size_bytes": 6270130
+        },
+        "EURCHF/tick/2015/DAT_ASCII_EURCHF_T_201512.zip": {
+          "rows": 1305046,
+          "sha256": "0f6892d1fd2de520d558f645fdbd1c426451880c40f9f614261c8465f988fada",
+          "size_bytes": 6668553
+        },
+        "EURCHF/tick/2016/DAT_ASCII_EURCHF_T_201601.zip": {
+          "rows": 1620421,
+          "sha256": "b3a851c8b98f597a779dafaf24bea3b3ed5b0e762129efb5453b6e199459c4f5",
+          "size_bytes": 8175202
+        },
+        "EURCHF/tick/2016/DAT_ASCII_EURCHF_T_201602.zip": {
+          "rows": 1892096,
+          "sha256": "627ab62654e872bd033d9da40069964e539cf5e2495afd3b42000bab7c081ae5",
+          "size_bytes": 9374478
+        },
+        "EURCHF/tick/2016/DAT_ASCII_EURCHF_T_201603.zip": {
+          "rows": 1455447,
+          "sha256": "c28cce81b9dec6baf9a0f903c9ba606509f035e7a667d05718ac8f016cd1162f",
+          "size_bytes": 7322617
+        },
+        "EURCHF/tick/2016/DAT_ASCII_EURCHF_T_201604.zip": {
+          "rows": 1129935,
+          "sha256": "02cb621d5d4cc93ac823bcde9f1f82ff69a340390fbfcd671b0ae95efa0a0281",
+          "size_bytes": 5698917
+        },
+        "EURCHF/tick/2016/DAT_ASCII_EURCHF_T_201605.zip": {
+          "rows": 1130914,
+          "sha256": "2eea1da2819f9e2ccf60a8106f765b8fcf6b739733cb1c85f39b839c75fe8f71",
+          "size_bytes": 5636156
+        },
+        "EURCHF/tick/2016/DAT_ASCII_EURCHF_T_201606.zip": {
+          "rows": 1315811,
+          "sha256": "c1e5ee1a0162bc6c37814b6f57697a8c76b06f87cdcb8a85927844692752af97",
+          "size_bytes": 6838982
+        },
+        "EURCHF/tick/2016/DAT_ASCII_EURCHF_T_201607.zip": {
+          "rows": 949898,
+          "sha256": "eb806c9ae9348014b453f5280d3cd0ff0cc25ebbd2598b8918ec55e992c6139e",
+          "size_bytes": 4988302
+        },
+        "EURCHF/tick/2016/DAT_ASCII_EURCHF_T_201608.zip": {
+          "rows": 745810,
+          "sha256": "bf6ef11a3c63b94f7dbbe958650603d47618f8a8a5d1298889680b0d77e82b89",
+          "size_bytes": 3892163
+        },
+        "EURCHF/tick/2016/DAT_ASCII_EURCHF_T_201609.zip": {
+          "rows": 821466,
+          "sha256": "d9eb2f20749cbea19019a7334566fb16b03d39ea46f0c9f992f6f1e68554062e",
+          "size_bytes": 4267436
+        },
+        "EURCHF/tick/2016/DAT_ASCII_EURCHF_T_201610.zip": {
+          "rows": 743656,
+          "sha256": "8dc411ad1e0bafe2c8da5e12a7451c922db22af16942eb4fb3de94dd17ddd231",
+          "size_bytes": 3859533
+        },
+        "EURCHF/tick/2016/DAT_ASCII_EURCHF_T_201611.zip": {
+          "rows": 1286962,
+          "sha256": "b20ea52e3f752fe2337f62f1cf20621a700fc19e4c7efadc9bde25894c18c80a",
+          "size_bytes": 6529416
+        },
+        "EURCHF/tick/2016/DAT_ASCII_EURCHF_T_201612.zip": {
+          "rows": 1192418,
+          "sha256": "9f41a3ce4eb1122ca628769de99a0312fbf3a2a4532581f696d7eddda4744136",
+          "size_bytes": 5919701
+        },
+        "EURCHF/tick/2017/DAT_ASCII_EURCHF_T_201701.zip": {
+          "rows": 1258717,
+          "sha256": "b8cce350fba2d2e8e3af22104bf211e9f2d6dca19aef1f1d0e99a034f2f594bf",
+          "size_bytes": 6236731
+        },
+        "EURCHF/tick/2017/DAT_ASCII_EURCHF_T_201702.zip": {
+          "rows": 948660,
+          "sha256": "1c722791ba3065d8c1ba282e3d20538e9e9b622dd28044a5bdee3bc7d9be5248",
+          "size_bytes": 4702695
+        },
+        "EURCHF/tick/2017/DAT_ASCII_EURCHF_T_201703.zip": {
+          "rows": 871162,
+          "sha256": "18948b25467607b1f87b749ec7a411c00586527524551d88d26f49c7cb6bf67c",
+          "size_bytes": 4489539
+        },
+        "EURCHF/tick/2017/DAT_ASCII_EURCHF_T_201704.zip": {
+          "rows": 716279,
+          "sha256": "6189d00a8304d0d224bbc538a317c70137279b0716b7e0fbfdd48de53e55a37b",
+          "size_bytes": 3702001
+        },
+        "EURCHF/tick/2017/DAT_ASCII_EURCHF_T_201705.zip": {
+          "rows": 905124,
+          "sha256": "475ecade9c1b99e7eb9c96f2f73c0f1913f14425fae81c887f7900020254d581",
+          "size_bytes": 4713145
+        },
+        "EURCHF/tick/2017/DAT_ASCII_EURCHF_T_201706.zip": {
+          "rows": 827695,
+          "sha256": "41bc1e00186eac46ba3feef9873172b1e4951676a848ef072f3b17a154edcd54",
+          "size_bytes": 4211017
+        },
+        "EURCHF/tick/2017/DAT_ASCII_EURCHF_T_201707.zip": {
+          "rows": 968516,
+          "sha256": "79a62fe621a5a127023f6c1e08859a245ce6514ea97980e5e1e91f6e16f8d175",
+          "size_bytes": 4951831
+        },
+        "EURCHF/tick/2017/DAT_ASCII_EURCHF_T_201708.zip": {
+          "rows": 1268489,
+          "sha256": "311d7e7999b80a3002e02fad24c8b9191d88a37165e24aad2e9aff95c4258e03",
+          "size_bytes": 6650491
+        },
+        "EURCHF/tick/2017/DAT_ASCII_EURCHF_T_201709.zip": {
+          "rows": 1087471,
+          "sha256": "871249ae7c4f378c816f0daf3cd2f78a32de4e512c301c4f5aa5b80b0d03fcfd",
+          "size_bytes": 5698161
+        },
+        "EURCHF/tick/2017/DAT_ASCII_EURCHF_T_201710.zip": {
+          "rows": 963860,
+          "sha256": "e9c3bac23230567c9a863691727b3388a454b1300b2e981b548aef9643132c60",
+          "size_bytes": 5023708
+        },
+        "EURCHF/tick/2017/DAT_ASCII_EURCHF_T_201711.zip": {
+          "rows": 964125,
+          "sha256": "9b712bff8ac1ef703e556b762b5dd6ff0e023687e74a6953ff0939d47caf51f0",
+          "size_bytes": 4981021
+        },
+        "EURCHF/tick/2017/DAT_ASCII_EURCHF_T_201712.zip": {
+          "rows": 855663,
+          "sha256": "c7943dac23870341dc3ba81c35eb7293c903968ba75ea954d11910b7925083ad",
+          "size_bytes": 4419223
+        },
+        "EURCHF/tick/2018/DAT_ASCII_EURCHF_T_201801.zip": {
+          "rows": 1172671,
+          "sha256": "49aef2570ad43f8b80d9ec9013a351074790047f9f87e785f4dfa0c3b58fda0b",
+          "size_bytes": 6113205
+        },
+        "EURCHF/tick/2018/DAT_ASCII_EURCHF_T_201802.zip": {
+          "rows": 1159057,
+          "sha256": "d70cc46e1214d20fef350c83f837a357f3c3ed3ca6e9b17d58ca81f4dfa1bdf8",
+          "size_bytes": 6028425
+        },
+        "EURCHF/tick/2018/DAT_ASCII_EURCHF_T_201803.zip": {
+          "rows": 1084505,
+          "sha256": "e8158521da705e20600d52c280d1254041238ee90fff22fddc99669f0aff1b0d",
+          "size_bytes": 5622024
+        },
+        "EURCHF/tick/2018/DAT_ASCII_EURCHF_T_201804.zip": {
+          "rows": 956712,
+          "sha256": "0fe194f6a2b94163d7007ccef47fe81c9bca71a0e2a91f551cc4d7be61a8c749",
+          "size_bytes": 4958908
+        },
+        "EURCHF/tick/2018/DAT_ASCII_EURCHF_T_201805.zip": {
+          "rows": 1496011,
+          "sha256": "109aaf091aee300a65eb87ae7dc878b18329c0f6737babf17b0a1c49e65a7a58",
+          "size_bytes": 7880651
+        },
+        "EURCHF/tick/2018/DAT_ASCII_EURCHF_T_201806.zip": {
+          "rows": 1217092,
+          "sha256": "cc304261dec8626afb35f84f2b4708d696a0d575e84b31c860890b7df05cfd17",
+          "size_bytes": 6429480
+        },
+        "EURCHF/tick/2018/DAT_ASCII_EURCHF_T_201807.zip": {
+          "rows": 1096569,
+          "sha256": "256a5c634268c8319290280f024eea0a02f1102c2389a93beac86ab327289a33",
+          "size_bytes": 5687044
+        },
+        "EURCHF/tick/2018/DAT_ASCII_EURCHF_T_201808.zip": {
+          "rows": 1082807,
+          "sha256": "ecbd7d5dfd54929125523c61c7ead657993ade5c29a9d8e916dc297b0c8939b6",
+          "size_bytes": 5687582
+        },
+        "EURCHF/tick/2018/DAT_ASCII_EURCHF_T_201809.zip": {
+          "rows": 1022641,
+          "sha256": "443a17a5b609298f94bb4ca0d01f4132cce97fe18b65d634f286a9f55a8ff6d1",
+          "size_bytes": 5333391
+        },
+        "EURCHF/tick/2018/DAT_ASCII_EURCHF_T_201810.zip": {
+          "rows": 1354258,
+          "sha256": "ebd8dce8819fa052c5136cf8ad591b61835a8f6736e70777c5288bd33d375722",
+          "size_bytes": 7009216
+        },
+        "EURCHF/tick/2018/DAT_ASCII_EURCHF_T_201811.zip": {
+          "rows": 1181084,
+          "sha256": "885fbfcf7561d90ae79b962f036c2d79f114bf81958037e1ab4ca5a832f77a3f",
+          "size_bytes": 6105281
+        },
+        "EURCHF/tick/2018/DAT_ASCII_EURCHF_T_201812.zip": {
+          "rows": 1559085,
+          "sha256": "4f82424bae683e400ffad12e9d0ee245ffdf7fd996d75bcf7a1d6595de72c5e7",
+          "size_bytes": 8833677
+        },
+        "EURCHF/tick/2019/DAT_ASCII_EURCHF_T_201901.zip": {
+          "rows": 2395294,
+          "sha256": "ee90aced6f7869b6d0b12c2d68fa0c89e241374780188a1dfd5a57e1dea26cb2",
+          "size_bytes": 13944049
+        },
+        "EURCHF/tick/2019/DAT_ASCII_EURCHF_T_201902.zip": {
+          "rows": 1746319,
+          "sha256": "5abcf331883ad91c40beb9b77b5950ecb5886abf1f390fddec4b681ebaf8c2d2",
+          "size_bytes": 10108231
+        },
+        "EURCHF/tick/2019/DAT_ASCII_EURCHF_T_201903.zip": {
+          "rows": 1872645,
+          "sha256": "3a73430e2b43484591336473b866dd38ba39a0932ae08899943ffc45744cb4c2",
+          "size_bytes": 10661417
+        },
+        "EURCHF/tick/2019/DAT_ASCII_EURCHF_T_201904.zip": {
+          "rows": 1606396,
+          "sha256": "f695053dd634eda21f8b6b99bf8615c3650e1973ee0d1a2ba57b862b0a18e348",
+          "size_bytes": 9127378
+        },
+        "EURCHF/tick/2019/DAT_ASCII_EURCHF_T_201905.zip": {
+          "rows": 1538305,
+          "sha256": "91570479b6efefedee6b7f52cc3624ebfd64b3e5f4afa456613e6645876b85ee",
+          "size_bytes": 8864244
+        },
+        "EURCHF/tick/2019/DAT_ASCII_EURCHF_T_201906.zip": {
+          "rows": 1723915,
+          "sha256": "28869e0ee6b731c7510a35613430aec800302f7f2475608e3c4dac946153e4c7",
+          "size_bytes": 9998339
+        },
+        "EURCHF/tick/2019/DAT_ASCII_EURCHF_T_201907.zip": {
+          "rows": 1510910,
+          "sha256": "8cf2a3b22102f4e1523affb6791d63130d01c6e08d9a6d54480d887bd5ef4dc3",
+          "size_bytes": 8778233
+        },
+        "EURCHF/tick/2019/DAT_ASCII_EURCHF_T_201908.zip": {
+          "rows": 2298921,
+          "sha256": "fb4188e8bcf15cb7c872119a50e0eae1f75f3169ec26cfacaa35c9c725e77466",
+          "size_bytes": 13174012
+        },
+        "EURCHF/tick/2019/DAT_ASCII_EURCHF_T_201909.zip": {
+          "rows": 1832104,
+          "sha256": "30c4e2d953c769df1533f7844e5de63c84e6a9e793b12661bb24b1a068559154",
+          "size_bytes": 10429086
+        },
+        "EURCHF/tick/2019/DAT_ASCII_EURCHF_T_201910.zip": {
+          "rows": 2083315,
+          "sha256": "9602673f8e0cdeda9faa95644a19d3b246afa08ca3742e9fceb203d4ce2c53b7",
+          "size_bytes": 11870455
+        },
+        "EURCHF/tick/2019/DAT_ASCII_EURCHF_T_201911.zip": {
+          "rows": 1483018,
+          "sha256": "4a89f12734aba46b679588c997545250e742a0e0c42ee50216a172ee0d503ec3",
+          "size_bytes": 8503384
+        },
+        "EURCHF/tick/2019/DAT_ASCII_EURCHF_T_201912.zip": {
+          "rows": 1315600,
+          "sha256": "53c7fb8f9b8f6b09576ff15b1f334a386405ef7f9e0a8ded0cd6fbfa4f8cbeef",
+          "size_bytes": 7661830
+        },
+        "EURCHF/tick/2020/DAT_ASCII_EURCHF_T_202001.zip": {
+          "rows": 1398054,
+          "sha256": "889477451736da7997dee222c607be281ef8815ca08a39d9ef26d788a65b8f40",
+          "size_bytes": 8123812
+        },
+        "EURCHF/tick/2020/DAT_ASCII_EURCHF_T_202002.zip": {
+          "rows": 1667961,
+          "sha256": "fcc53ff5e113e0b422ef62794a76aef58000b5f229bffbcbeb59326985757024",
+          "size_bytes": 9563112
+        },
+        "EURCHF/tick/2020/DAT_ASCII_EURCHF_T_202003.zip": {
+          "rows": 5088405,
+          "sha256": "73046203f29561741c4cdcecbe0021a1dda434c275761616d22ec79e55fe87d3",
+          "size_bytes": 29561248
+        },
+        "EURCHF/tick/2020/DAT_ASCII_EURCHF_T_202004.zip": {
+          "rows": 1828073,
+          "sha256": "792c10ed7c53ebf869b356058106223158c567c482736eb5928679c0079f6b60",
+          "size_bytes": 10401196
+        },
+        "EURCHF/tick/2020/DAT_ASCII_EURCHF_T_202005.zip": {
+          "rows": 1529109,
+          "sha256": "a6e57c0499928b3ff633bb7573339c58916fa18150c3737836397e70c8a3bf54",
+          "size_bytes": 8769624
+        },
+        "EURCHF/tick/2020/DAT_ASCII_EURCHF_T_202006.zip": {
+          "rows": 2305157,
+          "sha256": "efc85d2f405a910f2202a53d612ff218f4d8d6976c821e87291015cf31d07a21",
+          "size_bytes": 13324847
+        },
+        "EURCHF/tick/2020/DAT_ASCII_EURCHF_T_202007.zip": {
+          "rows": 1862668,
+          "sha256": "83469c416f84e6621fe264283d8ef09b0ae56e29da8fd10e90a76a83bc663ab3",
+          "size_bytes": 10815970
+        },
+        "EURCHF/tick/2020/DAT_ASCII_EURCHF_T_202008.zip": {
+          "rows": 1858682,
+          "sha256": "8732a668ed2af3f7e011e39915e1dd2934122dea2f8ee749e0a0186f87cb72ba",
+          "size_bytes": 10853525
+        },
+        "EURCHF/tick/2020/DAT_ASCII_EURCHF_T_202009.zip": {
+          "rows": 1768720,
+          "sha256": "1b38239149042834f598171aed83b91b8c10f980b2adbf2e8831268676d2cad5",
+          "size_bytes": 10333264
+        },
+        "EURCHF/tick/2020/DAT_ASCII_EURCHF_T_202010.zip": {
+          "rows": 1387829,
+          "sha256": "fc725fd716d4ba025ed88b5492809d17e5a0f2acc5eeff4f6deb3d4c1332473d",
+          "size_bytes": 8158565
+        },
+        "EURCHF/tick/2020/DAT_ASCII_EURCHF_T_202011.zip": {
+          "rows": 1325907,
+          "sha256": "c6846a27ee2ddb1eca17abe46e5ef33533ac7f0d27a377284ff95514d0940396",
+          "size_bytes": 7876387
+        },
+        "EURCHF/tick/2020/DAT_ASCII_EURCHF_T_202012.zip": {
+          "rows": 1236959,
+          "sha256": "450d949a2aee668a7bb70f84cbb46c141e59702ff1c12c16998203826fdcf1c2",
+          "size_bytes": 7468599
+        },
+        "EURCHF/tick/2021/DAT_ASCII_EURCHF_T_202101.zip": {
+          "rows": 1193441,
+          "sha256": "0683aa79c6c369ec80f229ebaae16dd009f22453a6fa93229e96dfd0f83636e3",
+          "size_bytes": 7190294
+        },
+        "EURCHF/tick/2021/DAT_ASCII_EURCHF_T_202102.zip": {
+          "rows": 1110385,
+          "sha256": "e0eba9d247342a37319080a104a168e8fa815ba36d5859e920baada3959ea6fa",
+          "size_bytes": 6580650
+        },
+        "EURCHF/tick/2021/DAT_ASCII_EURCHF_T_202103.zip": {
+          "rows": 1588402,
+          "sha256": "4cb7f1c447df0e3761fdf73fba6cfb04bb34d398dd583afd9314a417aeff37c9",
+          "size_bytes": 9453485
+        },
+        "EURCHF/tick/2021/DAT_ASCII_EURCHF_T_202104.zip": {
+          "rows": 989302,
+          "sha256": "30b886daea8606382b768fc8707e57ba48db3a81f8433b6cd98d2cca2a863fb4",
+          "size_bytes": 6060814
+        },
+        "EURCHF/tick/2021/DAT_ASCII_EURCHF_T_202105.zip": {
+          "rows": 1117294,
+          "sha256": "7c4d0881170c4cb1a2271bda542a6f8c40d4f9fc4e60578791cf40335ecd138e",
+          "size_bytes": 6680842
+        },
+        "EURCHF/tick/2021/DAT_ASCII_EURCHF_T_202106.zip": {
+          "rows": 1038545,
+          "sha256": "ad96e345a83e7e63643ceac1ed2c48da04a9e79979dde9d9ca7df62a25a14691",
+          "size_bytes": 6270547
+        },
+        "EURCHF/tick/2021/DAT_ASCII_EURCHF_T_202107.zip": {
+          "rows": 1098901,
+          "sha256": "a0a8cc7fcadaefdf340ed6a77c0f7194e45cdf3c3ec74a91fda6ddfd0dc86f4b",
+          "size_bytes": 6565647
+        },
+        "EURCHF/tick/2021/DAT_ASCII_EURCHF_T_202108.zip": {
+          "rows": 775297,
+          "sha256": "d8bd25980dc7b8abd2bcda9c29a679949d18f89fcfc3b476e48d3c615edda7ad",
+          "size_bytes": 4732895
+        },
+        "EURCHF/tick/2021/DAT_ASCII_EURCHF_T_202109.zip": {
+          "rows": 1086521,
+          "sha256": "94bf50f64f2478ffb7225a6e88182d6de198f114e4100df27cb51aeccc9ac950",
+          "size_bytes": 6467370
+        },
+        "EURCHF/tick/2021/DAT_ASCII_EURCHF_T_202110.zip": {
+          "rows": 1087866,
+          "sha256": "de75fd247a2070e11edc73fd9124970bff74cc24e6da7cea1de9cb110cd112c6",
+          "size_bytes": 6380144
+        },
+        "EURCHF/tick/2021/DAT_ASCII_EURCHF_T_202111.zip": {
+          "rows": 1431209,
+          "sha256": "91494d60a2f863239c945dd626ab8cd4d4b799c02a481f58f920c4ee4ca4a582",
+          "size_bytes": 8319168
+        },
+        "EURCHF/tick/2021/DAT_ASCII_EURCHF_T_202112.zip": {
+          "rows": 1278432,
+          "sha256": "df63e26dbc54b86227619fa8747b9d8ae36d36c268c4c99833385a0424853cac",
+          "size_bytes": 7492559
+        },
+        "EURCHF/tick/2022/DAT_ASCII_EURCHF_T_202201.zip": {
+          "rows": 1227893,
+          "sha256": "fccbb114a0a11f0dc7a0da5851cfcd0c9f6eb71586a78168b09fdbf034880dfd",
+          "size_bytes": 7178540
+        },
+        "EURCHF/tick/2022/DAT_ASCII_EURCHF_T_202202.zip": {
+          "rows": 1658571,
+          "sha256": "e6b54942a27d525c3351a3c4db64bd511238c08c8993caa5d621ada9166807ec",
+          "size_bytes": 9754670
+        },
+        "EURCHF/tick/2022/DAT_ASCII_EURCHF_T_202203.zip": {
+          "rows": 2628260,
+          "sha256": "db04f2c2e4cf2d33290bd7040c94d2e8025faaebd849680ee5d193041502d701",
+          "size_bytes": 15674918
+        },
+        "EURCHF/tick/2022/DAT_ASCII_EURCHF_T_202204.zip": {
+          "rows": 1964249,
+          "sha256": "6745cb7bb9624fb9199af656aa3aa9f2d88d7f7f1c65575dd6aac994f904e995",
+          "size_bytes": 11683882
+        },
+        "EURCHF/tick/2022/DAT_ASCII_EURCHF_T_202205.zip": {
+          "rows": 2065026,
+          "sha256": "459e16a7f72d04e4c1ef1598d4a3d7df63d90f9d3f0c52ed75a3c9facb1cfe27",
+          "size_bytes": 12408852
+        },
+        "EURCHF/tick/2022/DAT_ASCII_EURCHF_T_202206.zip": {
+          "rows": 2652559,
+          "sha256": "33597858290124b24a1ee83a8eb5ce77a1b128dbf47da32cda56d04775458965",
+          "size_bytes": 15369889
+        },
+        "EURCHF/tick/2022/DAT_ASCII_EURCHF_T_202207.zip": {
+          "rows": 2890904,
+          "sha256": "99d06bdda13964901d554474ca7545ce3cb91b01f32ce4e1b9a9f5bc689324dd",
+          "size_bytes": 16786789
+        },
+        "EURCHF/tick/2022/DAT_ASCII_EURCHF_T_202208.zip": {
+          "rows": 2892381,
+          "sha256": "152dfa5d650ca226b1478a00342335d92fe399953250e380eb4e0d05c0a1fb5a",
+          "size_bytes": 16320180
+        },
+        "EURCHF/tick/2022/DAT_ASCII_EURCHF_T_202209.zip": {
+          "rows": 3996963,
+          "sha256": "b9b65c64a8eabd58bb46a935071d3db252b42e98c03f7ec813f869f7e53ccbe1",
+          "size_bytes": 22658127
+        },
+        "EURCHF/tick/2022/DAT_ASCII_EURCHF_T_202210.zip": {
+          "rows": 3552267,
+          "sha256": "df335a31aac7b6421df82e5fc86cb31f8f703c9d80c078be08325ea377081621",
+          "size_bytes": 19923698
+        },
+        "EURCHF/tick/2022/DAT_ASCII_EURCHF_T_202211.zip": {
+          "rows": 2563474,
+          "sha256": "27260a872a4ef51a44fdb00b888b816642fae66b80a94773b5f037f387201ac9",
+          "size_bytes": 14361229
+        },
+        "EURCHF/tick/2022/DAT_ASCII_EURCHF_T_202212.zip": {
+          "rows": 2066514,
+          "sha256": "eea513b949b6b452b20115c144c84ee433cbd693a6958e59674235eb4c319808",
+          "size_bytes": 12113413
+        },
+        "EURCHF/tick/2023/DAT_ASCII_EURCHF_T_202301.zip": {
+          "rows": 1927652,
+          "sha256": "d1cc9d5cea5a3827fc102ab4d34913d7d728d0162c71c109b83e9e1d3580514b",
+          "size_bytes": 11664746
+        },
+        "EURCHF/tick/2023/DAT_ASCII_EURCHF_T_202302.zip": {
+          "rows": 1373458,
+          "sha256": "418ab4be7bbfbce3fce709f6ca9db676b4d5d500f3bc8707eb28a76e86f86561",
+          "size_bytes": 8302317
+        },
+        "EURCHF/tick/2023/DAT_ASCII_EURCHF_T_202303.zip": {
+          "rows": 1510838,
+          "sha256": "65e5c22f416ae219ec4501610c037378dec42d5e63f914dd07fdbf75cc24c242",
+          "size_bytes": 9129625
+        },
+        "EURCHF/tick/2023/DAT_ASCII_EURCHF_T_202304.zip": {
+          "rows": 894598,
+          "sha256": "e5133971a8c7cb2d24d21ded69e6dfd3d13b3a7b9618d1666c7b50e545f1d1ea",
+          "size_bytes": 5437088
+        },
+        "EURCHF/tick/2023/DAT_ASCII_EURCHF_T_202305.zip": {
+          "rows": 832789,
+          "sha256": "4696eb15e37b4aba2795b1ed470a0f32745e2aad8a2fbd71c1bdeaa62d9d870b",
+          "size_bytes": 5107688
+        },
+        "EURCHF/tick/2023/DAT_ASCII_EURCHF_T_202306.zip": {
+          "rows": 747993,
+          "sha256": "896aa49033a3a6d0eba1134431ff19f60df6ac2f7aa6aef25a19d9580267db8c",
+          "size_bytes": 4618131
+        },
+        "EURCHF/tick/2023/DAT_ASCII_EURCHF_T_202307.zip": {
+          "rows": 779055,
+          "sha256": "f1e139fa0af0f4a311d81e51090492bf069128e2f8d972f8a484d37dde986689",
+          "size_bytes": 4793818
+        },
+        "EURCHF/tick/2023/DAT_ASCII_EURCHF_T_202308.zip": {
+          "rows": 1215228,
+          "sha256": "d072299776bee2336f16ddbc6300eb580b1aa08a743f1ef1a9b2a468643c64f1",
+          "size_bytes": 7391318
+        },
+        "EURCHF/tick/2023/DAT_ASCII_EURCHF_T_202309.zip": {
+          "rows": 1015815,
+          "sha256": "5ac2ecc23c29684fb66e8e1c38032445bdcb4336e9109bd432197cc527d2fa8c",
+          "size_bytes": 6189784
+        },
+        "EURCHF/tick/2023/DAT_ASCII_EURCHF_T_202310.zip": {
+          "rows": 1255286,
+          "sha256": "845463974ebbbbf563d62164482955ad23f57068cd8053ad1ddc1dc4a51ff055",
+          "size_bytes": 7670995
+        },
+        "EURCHF/tick/2023/DAT_ASCII_EURCHF_T_202311.zip": {
+          "rows": 1099033,
+          "sha256": "4e353cef9c99442c38159f5a3a51ed13ddb40752199d2ed75945463b2e530942",
+          "size_bytes": 6740708
+        },
+        "EURCHF/tick/2023/DAT_ASCII_EURCHF_T_202312.zip": {
+          "rows": 1213316,
+          "sha256": "312f7c9a283bbc831d1558ae69ffda694bccebccf7e68651871777404fe7e43f",
+          "size_bytes": 7459443
+        },
+        "EURCHF/tick/2024/DAT_ASCII_EURCHF_T_202401.zip": {
+          "rows": 1247572,
+          "sha256": "dd1f02d7e1d4a7fba8bcda0fdc99dda7de6438fcc2f62820bff462d2f4314a55",
+          "size_bytes": 7684566
+        },
+        "EURCHF/tick/2024/DAT_ASCII_EURCHF_T_202402.zip": {
+          "rows": 1035990,
+          "sha256": "cc8341292ed34c45aff72ee6b80c55339940b6117b3ecb3024fd450432abb967",
+          "size_bytes": 6380025
+        },
+        "EURCHF/tick/2024/DAT_ASCII_EURCHF_T_202403.zip": {
+          "rows": 1163281,
+          "sha256": "4bf9a95e068c02f91a2a5f6dac7ce83267a39e34d00cc9078b1c8b45feff46be",
+          "size_bytes": 7106070
+        },
+        "EURCHF/tick/2024/DAT_ASCII_EURCHF_T_202404.zip": {
+          "rows": 1147270,
+          "sha256": "31e8f1d321afc8c5cb6a319c49a2c1e80abebf7288f0951159e622a1f10b5b7b",
+          "size_bytes": 7153980
+        },
+        "EURCHF/tick/2024/DAT_ASCII_EURCHF_T_202405.zip": {
+          "rows": 912589,
+          "sha256": "cc438be3152fa5c2837f9de927b8d0253fb508d0423536c4609a06e25c94ebbf",
+          "size_bytes": 5717190
+        },
+        "EURCHF/tick/2024/DAT_ASCII_EURCHF_T_202406.zip": {
+          "rows": 839564,
+          "sha256": "ec22a6e82367ce7ae7ed032bce7ec186fe07060ed30ac61241c29080215984a4",
+          "size_bytes": 5347307
+        },
+        "EURCHF/tick/2024/DAT_ASCII_EURCHF_T_202407.zip": {
+          "rows": 993902,
+          "sha256": "60068fe52ee4c69de3ed6f7b87c5a7d7f0748ab8b6dff6cdde6d6b044a0ac0dd",
+          "size_bytes": 6275583
+        },
+        "EURCHF/tick/2024/DAT_ASCII_EURCHF_T_202408.zip": {
+          "rows": 1769393,
+          "sha256": "477dfbc4d9a5cc75662cd27872381981fff3ab794c5e015e3b40591c4f6c2009",
+          "size_bytes": 11102840
+        },
+        "EURCHF/tick/2024/DAT_ASCII_EURCHF_T_202409.zip": {
+          "rows": 1466821,
+          "sha256": "594639703bec456fd1b0d7883cde4f0c544e9379d8044d06b9c3315882f8ccf2",
+          "size_bytes": 9007235
+        },
+        "EURCHF/tick/2024/DAT_ASCII_EURCHF_T_202410.zip": {
+          "rows": 1328618,
+          "sha256": "2d4c14284e36164756b0431f41face27a8ff8c3da3d0356866573556c27e17a8",
+          "size_bytes": 8140403
+        },
+        "EURCHF/tick/2024/DAT_ASCII_EURCHF_T_202411.zip": {
+          "rows": 2051168,
+          "sha256": "fe9cf9944b1ef74030806c83515c4cb2c0acd3ce33aba56d40a754f1570ab96b",
+          "size_bytes": 12260421
+        },
+        "EURCHF/tick/2024/DAT_ASCII_EURCHF_T_202412.zip": {
+          "rows": 1835119,
+          "sha256": "ebd15db0fd6d55100cec43c96ad2d19dcca74c20a4efbe80426fa5ea39298c78",
+          "size_bytes": 10899668
+        },
+        "EURCHF/tick/2025/DAT_ASCII_EURCHF_T_202501.zip": {
+          "rows": 2094920,
+          "sha256": "9394d373e130d3cfadea6cdcd03d373ef3af9ccfbf3e13461b2393e881303814",
+          "size_bytes": 12365893
+        },
+        "EURCHF/tick/2025/DAT_ASCII_EURCHF_T_202502.zip": {
+          "rows": 1912447,
+          "sha256": "d4f1abcf6902f3355afbb8d92f11f3a51274872c8b60aaadd717b0db355937d7",
+          "size_bytes": 11374876
+        },
+        "EURCHF/tick/2025/DAT_ASCII_EURCHF_T_202503.zip": {
+          "rows": 2352488,
+          "sha256": "f185a79cad006b6c60eba69d27562d4a91a02be78a1f147e54e1703fc30ff0c9",
+          "size_bytes": 14164903
+        },
+        "EURCHF/tick/2025/DAT_ASCII_EURCHF_T_202504.zip": {
+          "rows": 4097932,
+          "sha256": "16cbfc3fe5fb90061b1e79d690573602126546887831134031c19c126d65fcc7",
+          "size_bytes": 24998429
+        },
+        "EURCHF/tick/2025/DAT_ASCII_EURCHF_T_202505.zip": {
+          "rows": 1935659,
+          "sha256": "533bf70cbab3641bb593f99351bc1f4a1d33a94a2bd47f4f4a1f9c347340b6fe",
+          "size_bytes": 11691669
+        },
+        "EURCHF/tick/2025/DAT_ASCII_EURCHF_T_202506.zip": {
+          "rows": 1590285,
+          "sha256": "054ad31cdb465be91cbd4513d7645618a4431b9418845d7ba7545d7fcc0e2841",
+          "size_bytes": 9641017
+        },
+        "EURCHF/tick/2025/DAT_ASCII_EURCHF_T_202507.zip": {
+          "rows": 1406127,
+          "sha256": "8c1623aabab9bfe5acd3b2548d7960136aa6301e48b0d22054e95827fd8de29e",
+          "size_bytes": 8530439
+        },
+        "EURCHF/tick/2025/DAT_ASCII_EURCHF_T_202508.zip": {
+          "rows": 1193718,
+          "sha256": "3b2e2a374addd74267d42d0dabefde0995db4cfca43749eae94b17c27648ce9a",
+          "size_bytes": 7269856
+        },
+        "EURCHF/tick/2025/DAT_ASCII_EURCHF_T_202509.zip": {
+          "rows": 1283345,
+          "sha256": "ac0a4add5409e245ea4b9f2643a13f46d453f189a4d52e5ae194881085d8e717",
+          "size_bytes": 7674076
+        },
+        "EURCHF/tick/2025/DAT_ASCII_EURCHF_T_202510.zip": {
+          "rows": 1347430,
+          "sha256": "4a55aa35f54b4f271ac1171b6eff8b487e8f4eeab97b3a875979248698b9a467",
+          "size_bytes": 8023085
+        },
+        "EURCHF/tick/2025/DAT_ASCII_EURCHF_T_202511.zip": {
+          "rows": 1018498,
+          "sha256": "318ee878bc7d548599a0edeb22023dfd4d57771d1b5ab34170fb2f2c41eb0ba3",
+          "size_bytes": 6164748
+        },
+        "EURCHF/tick/2025/DAT_ASCII_EURCHF_T_202512.zip": {
+          "rows": 973442,
+          "sha256": "868e0a7c7d95e3cbaf5a2121c150d977d35fd1ffd24a3d29c59ffe014dcc87b6",
+          "size_bytes": 5900896
+        },
+        "EURCHF/tick/2026/DAT_ASCII_EURCHF_T_202601.zip": {
+          "rows": 1211812,
+          "sha256": "85cd186342d99a7f6488671cccdd55fca6266b6f376339eb0bc3767607d55e46",
+          "size_bytes": 7360427
+        },
+        "EURCHF/tick/2026/DAT_ASCII_EURCHF_T_202602.zip": {
+          "rows": 1046438,
+          "sha256": "a512d69beb92d8b597d2113f5acf3d9649b4d97326c5985674073359e060d872",
+          "size_bytes": 6370803
+        },
+        "EURCHF/tick/2026/DAT_ASCII_EURCHF_T_202603.zip": {
+          "rows": 2017790,
+          "sha256": "5eab5a00b76824a767344c67b618f65d33b63a71f32e75752d3a258cfad74b4b",
+          "size_bytes": 11787448
+        },
+        "EURCHF/tick/2026/DAT_ASCII_EURCHF_T_202604.zip": {
+          "rows": 605117,
+          "sha256": "4f76fa5e436d3752804f7af65f2fbea288ea9a5410a8070e0b99dc7eb38371b5",
+          "size_bytes": 3529990
+        }
+      },
+      "latest_month": "202604",
+      "total_files": 196,
+      "total_size_bytes": 1284579553
+    },
+    "EURGBP": {
+      "earliest_month": "201001",
+      "files": {
+        "EURGBP/tick/2010/DAT_ASCII_EURGBP_T_201001.zip": {
+          "rows": 346010,
+          "sha256": "8dc0da1fc4ec19371c762cb6178b944a1610fc0871f2e93b6e36f641c94400a0",
+          "size_bytes": 1306854
+        },
+        "EURGBP/tick/2010/DAT_ASCII_EURGBP_T_201002.zip": {
+          "rows": 311996,
+          "sha256": "870885a5672fac925244070017f2b8ebf097b6cb674bef05c209d1bc78d179de",
+          "size_bytes": 1187926
+        },
+        "EURGBP/tick/2010/DAT_ASCII_EURGBP_T_201003.zip": {
+          "rows": 426847,
+          "sha256": "18d50a0ebd81748ffaab22942d48426cbc1b0d4001b528027695416a7eb4cac6",
+          "size_bytes": 1548479
+        },
+        "EURGBP/tick/2010/DAT_ASCII_EURGBP_T_201004.zip": {
+          "rows": 449198,
+          "sha256": "9003424a219540d7efa4e5cd1cc93ced7046db7ad3dc34d5fcb920f61ae4750d",
+          "size_bytes": 1558450
+        },
+        "EURGBP/tick/2010/DAT_ASCII_EURGBP_T_201005.zip": {
+          "rows": 620993,
+          "sha256": "b6e4a19d73260ebca0bc6ec6589cae05ff36a70d1cbb1434ffa06de9354cd6fc",
+          "size_bytes": 2254243
+        },
+        "EURGBP/tick/2010/DAT_ASCII_EURGBP_T_201006.zip": {
+          "rows": 492317,
+          "sha256": "ed2aaa1a0b73fbfecddba05f7adef5dd1a47574749d589866c130fb2eba85682",
+          "size_bytes": 1799917
+        },
+        "EURGBP/tick/2010/DAT_ASCII_EURGBP_T_201007.zip": {
+          "rows": 404001,
+          "sha256": "6e4d47c27c0d2e2e36bccd515c22e17b067fcb129bf86cd88d647e8da8bedc27",
+          "size_bytes": 1491358
+        },
+        "EURGBP/tick/2010/DAT_ASCII_EURGBP_T_201008.zip": {
+          "rows": 375318,
+          "sha256": "dae0df3e8d5bbc62f18fb6300727a9cdea824fb3cd05e390c4f410c4de51815d",
+          "size_bytes": 1396730
+        },
+        "EURGBP/tick/2010/DAT_ASCII_EURGBP_T_201009.zip": {
+          "rows": 356286,
+          "sha256": "16efd3d69d38d3d16ba3468179c75445bc213fd651b118b48b7fa514b1c1f940",
+          "size_bytes": 1336582
+        },
+        "EURGBP/tick/2010/DAT_ASCII_EURGBP_T_201010.zip": {
+          "rows": 231654,
+          "sha256": "708db3341f57c770ad63dd62688bce3bbbec1c6fd29e81d3af3aa53167a92f39",
+          "size_bytes": 871336
+        },
+        "EURGBP/tick/2010/DAT_ASCII_EURGBP_T_201011.zip": {
+          "rows": 250987,
+          "sha256": "8d770b86f3626b60f26846294c807306a9597dfefb703288b4d804eb09541a81",
+          "size_bytes": 933187
+        },
+        "EURGBP/tick/2010/DAT_ASCII_EURGBP_T_201012.zip": {
+          "rows": 230227,
+          "sha256": "541ee6b0d94da6494b4f08f1eaefcce928b21a5b98235cbb72b7dd1c967454df",
+          "size_bytes": 878597
+        },
+        "EURGBP/tick/2011/DAT_ASCII_EURGBP_T_201101.zip": {
+          "rows": 264433,
+          "sha256": "9ccda35f7ccdeaba3feb137d95acbebe2cadd16b66a1e859e0bf02eb1c06430c",
+          "size_bytes": 984687
+        },
+        "EURGBP/tick/2011/DAT_ASCII_EURGBP_T_201102.zip": {
+          "rows": 221578,
+          "sha256": "199ddb74fb78b84b1ff239c221f86e1d517d67b17c3da7f1b3e0e128902a98b6",
+          "size_bytes": 818789
+        },
+        "EURGBP/tick/2011/DAT_ASCII_EURGBP_T_201103.zip": {
+          "rows": 212844,
+          "sha256": "586b234ef79d543fc312fa5b8305a998172f9b6a456b0bed45c3c6fa5112f2e8",
+          "size_bytes": 811928
+        },
+        "EURGBP/tick/2011/DAT_ASCII_EURGBP_T_201104.zip": {
+          "rows": 182884,
+          "sha256": "b89d58e9b5915cfae2b132aae37d1baf0ab627d3711cce7565b0dc9db57d16b8",
+          "size_bytes": 776120
+        },
+        "EURGBP/tick/2011/DAT_ASCII_EURGBP_T_201105.zip": {
+          "rows": 222976,
+          "sha256": "0f37a09b907b4eb2969ffcce9ecc2c32ea6da1c0740ba49c75540b9505935848",
+          "size_bytes": 1181979
+        },
+        "EURGBP/tick/2011/DAT_ASCII_EURGBP_T_201106.zip": {
+          "rows": 222949,
+          "sha256": "effdabb9385f0433b5d7202c6a3cb124d4779a93ecd3e2c4c4442f6e22cbccdb",
+          "size_bytes": 1166496
+        },
+        "EURGBP/tick/2011/DAT_ASCII_EURGBP_T_201107.zip": {
+          "rows": 229854,
+          "sha256": "025fba1f0e2209016ae0270d4c189a8ccdc0b6154cf4f5773ebd82f0d992d33e",
+          "size_bytes": 1199307
+        },
+        "EURGBP/tick/2011/DAT_ASCII_EURGBP_T_201108.zip": {
+          "rows": 288255,
+          "sha256": "4f1911ae8d2a85dbfb1d06bd623f8ace809d4f85ca20ad40a3fd5e9ce0d30030",
+          "size_bytes": 1481899
+        },
+        "EURGBP/tick/2011/DAT_ASCII_EURGBP_T_201109.zip": {
+          "rows": 295631,
+          "sha256": "901b7144b6165ff5b3db4dedc5d2c2e0396555c5731571c075f80e24a8a9bca5",
+          "size_bytes": 1513133
+        },
+        "EURGBP/tick/2011/DAT_ASCII_EURGBP_T_201110.zip": {
+          "rows": 283535,
+          "sha256": "623b933c8b3ebb2f3229856601d3bf5beffec2850012f47e2d5eb0c2ff093550",
+          "size_bytes": 1449482
+        },
+        "EURGBP/tick/2011/DAT_ASCII_EURGBP_T_201111.zip": {
+          "rows": 262034,
+          "sha256": "4e142bfc1cd90e78b5e66fc9158540f50f3c7a1a129b518b2889c54c9cb1df82",
+          "size_bytes": 1345315
+        },
+        "EURGBP/tick/2011/DAT_ASCII_EURGBP_T_201112.zip": {
+          "rows": 1046935,
+          "sha256": "1508f5f6c057d5304ce787dac72f16d80f82a8b5a063558d8df4445990aa46fe",
+          "size_bytes": 5567506
+        },
+        "EURGBP/tick/2012/DAT_ASCII_EURGBP_T_201201.zip": {
+          "rows": 1197028,
+          "sha256": "76e153f2d61a241572e5f1974affb8e7a1d399cc04a5d63ba498931dc916a0e2",
+          "size_bytes": 6366908
+        },
+        "EURGBP/tick/2012/DAT_ASCII_EURGBP_T_201202.zip": {
+          "rows": 1148243,
+          "sha256": "5070dcca16e1af9b2e615e7b4d4ed4f08f4876d4ce42eedceb580507e7df6c71",
+          "size_bytes": 6101504
+        },
+        "EURGBP/tick/2012/DAT_ASCII_EURGBP_T_201203.zip": {
+          "rows": 1070007,
+          "sha256": "40c527e9a5d24e2d31179e08fb73475a3996b6f8b4417f7078f4e0cf70216255",
+          "size_bytes": 5662731
+        },
+        "EURGBP/tick/2012/DAT_ASCII_EURGBP_T_201204.zip": {
+          "rows": 1024254,
+          "sha256": "72a72470abb6636fbb23067882038000d0acc99ed047e0acaaa572541cd95cb0",
+          "size_bytes": 5372749
+        },
+        "EURGBP/tick/2012/DAT_ASCII_EURGBP_T_201205.zip": {
+          "rows": 1083656,
+          "sha256": "0cf00c45c7bd2dc1b0ba2ba98d070533c8d7cc222a2691296be7cecac7c665c2",
+          "size_bytes": 5748496
+        },
+        "EURGBP/tick/2012/DAT_ASCII_EURGBP_T_201206.zip": {
+          "rows": 999372,
+          "sha256": "c478507e3158885cb7fb0cf4f33d374524fc9e48d16e2c845a809fa1a2dedad7",
+          "size_bytes": 5314088
+        },
+        "EURGBP/tick/2012/DAT_ASCII_EURGBP_T_201207.zip": {
+          "rows": 902453,
+          "sha256": "fd09f64ae3e9ce1d4944700805029875202a5cc75c4145d99591a48ddaa51ae2",
+          "size_bytes": 4819994
+        },
+        "EURGBP/tick/2012/DAT_ASCII_EURGBP_T_201208.zip": {
+          "rows": 780277,
+          "sha256": "b092b17b755f728ddd2c334ed7b9fd8a7692bf0ae622673b8846f249e3e86ef0",
+          "size_bytes": 4191928
+        },
+        "EURGBP/tick/2012/DAT_ASCII_EURGBP_T_201209.zip": {
+          "rows": 735421,
+          "sha256": "61bc5473284c39f265fb9e6c8cac7fef7574ceb2449cf3b0840cbae259c59267",
+          "size_bytes": 4010349
+        },
+        "EURGBP/tick/2012/DAT_ASCII_EURGBP_T_201210.zip": {
+          "rows": 674804,
+          "sha256": "384586fb2392ddcaf2b272cce0c6191832c35ad58d8163067dce846f956c2aa0",
+          "size_bytes": 3675029
+        },
+        "EURGBP/tick/2012/DAT_ASCII_EURGBP_T_201211.zip": {
+          "rows": 592295,
+          "sha256": "c623adb577649fdf646b0f2f14cc50dfede4139bc090531187caf179ef372bee",
+          "size_bytes": 3267461
+        },
+        "EURGBP/tick/2012/DAT_ASCII_EURGBP_T_201212.zip": {
+          "rows": 478498,
+          "sha256": "4b70c07af874139f98a3fd5be4e4592d9b0a6b68c0916ac34a01a797ded0f3f5",
+          "size_bytes": 2678266
+        },
+        "EURGBP/tick/2013/DAT_ASCII_EURGBP_T_201301.zip": {
+          "rows": 750841,
+          "sha256": "62bf5a24c7c23bb41c4c930c934c6b3afb5275904c77161bac3c096c689304f6",
+          "size_bytes": 4169261
+        },
+        "EURGBP/tick/2013/DAT_ASCII_EURGBP_T_201302.zip": {
+          "rows": 810681,
+          "sha256": "de63f274aea05907308f68a5b6af1432a4d96ded21781ef1fa63a59637f7ac63",
+          "size_bytes": 4608661
+        },
+        "EURGBP/tick/2013/DAT_ASCII_EURGBP_T_201303.zip": {
+          "rows": 939066,
+          "sha256": "18d86aa1e038a6212b0dcc7a1621f5f5ac9a6f548db42c952f7411b43afbcb95",
+          "size_bytes": 5180462
+        },
+        "EURGBP/tick/2013/DAT_ASCII_EURGBP_T_201304.zip": {
+          "rows": 982216,
+          "sha256": "0dfc737fd4dfc69ba929a9c045fe2add821f5b147b313180b58ecbd4701c9fdb",
+          "size_bytes": 5323780
+        },
+        "EURGBP/tick/2013/DAT_ASCII_EURGBP_T_201305.zip": {
+          "rows": 1005262,
+          "sha256": "ef32adde14f7d621ba1232da6a3f9299f28f7cc881177ee07c532c8526b7d550",
+          "size_bytes": 5432226
+        },
+        "EURGBP/tick/2013/DAT_ASCII_EURGBP_T_201306.zip": {
+          "rows": 1003553,
+          "sha256": "021f307dc6c4a908b0d0722aef808bffee1cf479da389e03791d0670c317f5a4",
+          "size_bytes": 5386578
+        },
+        "EURGBP/tick/2013/DAT_ASCII_EURGBP_T_201307.zip": {
+          "rows": 965550,
+          "sha256": "8bcf59d4b3c790fca90929de40d615eb0b4bcff4ff64803b31ca8be9efbc33b9",
+          "size_bytes": 5263339
+        },
+        "EURGBP/tick/2013/DAT_ASCII_EURGBP_T_201308.zip": {
+          "rows": 783196,
+          "sha256": "cd25e872d2a8655a729b28b6454a2d5d95e5bee9706182bf333d3a404a9ad937",
+          "size_bytes": 4257592
+        },
+        "EURGBP/tick/2013/DAT_ASCII_EURGBP_T_201309.zip": {
+          "rows": 682241,
+          "sha256": "28c6975ac723497a256a6502a17057b264ea52b810d691d7b352e2b39cebf606",
+          "size_bytes": 3698837
+        },
+        "EURGBP/tick/2013/DAT_ASCII_EURGBP_T_201310.zip": {
+          "rows": 679286,
+          "sha256": "0ffeb945e5b35b8808f624a7cc4ff2db4e52f3cd62446d5edeeedfea08c94e41",
+          "size_bytes": 3704346
+        },
+        "EURGBP/tick/2013/DAT_ASCII_EURGBP_T_201311.zip": {
+          "rows": 663570,
+          "sha256": "e4620b8769642decccd714b2a754205fe724b5b59eb668fdc01c0fb958c91e1c",
+          "size_bytes": 3657890
+        },
+        "EURGBP/tick/2013/DAT_ASCII_EURGBP_T_201312.zip": {
+          "rows": 602758,
+          "sha256": "5460cb1538297517d5f4d43887a1562231409951fc9ef3cba20a86cba06c7c7c",
+          "size_bytes": 3317134
+        },
+        "EURGBP/tick/2014/DAT_ASCII_EURGBP_T_201401.zip": {
+          "rows": 730202,
+          "sha256": "bccf712637a309d922c08b14e37faa96dad751c473b20de26fb0647e5273a0db",
+          "size_bytes": 4005868
+        },
+        "EURGBP/tick/2014/DAT_ASCII_EURGBP_T_201402.zip": {
+          "rows": 622750,
+          "sha256": "6b299a6e54a513cc5d9f47244c88df4896b716f738325cbadf148647c8aa3c23",
+          "size_bytes": 3450007
+        },
+        "EURGBP/tick/2014/DAT_ASCII_EURGBP_T_201403.zip": {
+          "rows": 596267,
+          "sha256": "8bcc19dd086b8a393fa8d10e4f76916071b34db1b2cc12c5de9a0c4ec825847a",
+          "size_bytes": 3277405
+        },
+        "EURGBP/tick/2014/DAT_ASCII_EURGBP_T_201404.zip": {
+          "rows": 515698,
+          "sha256": "23c031ffaf3b045caa209fdadf2b3101e3c68a0d1518f5e008836e287eee1cd8",
+          "size_bytes": 2812229
+        },
+        "EURGBP/tick/2014/DAT_ASCII_EURGBP_T_201405.zip": {
+          "rows": 486952,
+          "sha256": "cd2cb6de51e81096fd172fcafa8414718573f994aa5327f80d26d7ca18b48d91",
+          "size_bytes": 2654656
+        },
+        "EURGBP/tick/2014/DAT_ASCII_EURGBP_T_201406.zip": {
+          "rows": 459976,
+          "sha256": "86d96085a0525b1059dee843e87c335bd6d96d7c306321b6b1eb1c41b282a2f8",
+          "size_bytes": 2537954
+        },
+        "EURGBP/tick/2014/DAT_ASCII_EURGBP_T_201407.zip": {
+          "rows": 466991,
+          "sha256": "b02379d5c212d9a7ba98a4db3784e66a74689dca0f256b69f760cfc3e88603b0",
+          "size_bytes": 2494317
+        },
+        "EURGBP/tick/2014/DAT_ASCII_EURGBP_T_201408.zip": {
+          "rows": 557310,
+          "sha256": "0b1f347d629ebbb3f7fd588287bd9bd5f264af740f70f0a7611a00fd648dc0f4",
+          "size_bytes": 2591409
+        },
+        "EURGBP/tick/2014/DAT_ASCII_EURGBP_T_201409.zip": {
+          "rows": 874581,
+          "sha256": "815f5d3e83d6508ac027c693697c61fe0717cc768880db28231323ff2ba43650",
+          "size_bytes": 4083735
+        },
+        "EURGBP/tick/2014/DAT_ASCII_EURGBP_T_201410.zip": {
+          "rows": 1153439,
+          "sha256": "743aaed24f4ea766f822e9d6a09cf3452e604f1379fad08788d530cea01ed993",
+          "size_bytes": 6176084
+        },
+        "EURGBP/tick/2014/DAT_ASCII_EURGBP_T_201411.zip": {
+          "rows": 1453883,
+          "sha256": "835cd3d36bb36b1ba57abe6d313125175a308c6ec234009b7d3e24e03a44bf6f",
+          "size_bytes": 7181275
+        },
+        "EURGBP/tick/2014/DAT_ASCII_EURGBP_T_201412.zip": {
+          "rows": 1088209,
+          "sha256": "39e856e07b015153b58a720962160e1a4021985a8a7d74f0b0decaf3c99057da",
+          "size_bytes": 5631626
+        },
+        "EURGBP/tick/2015/DAT_ASCII_EURGBP_T_201501.zip": {
+          "rows": 1510704,
+          "sha256": "42b8e6b32187154685afc0a9a9b5649204e0676d9a1153203ece33e6e5f4021e",
+          "size_bytes": 7946889
+        },
+        "EURGBP/tick/2015/DAT_ASCII_EURGBP_T_201502.zip": {
+          "rows": 1337015,
+          "sha256": "4ea103a21a586dcf4fa3a3a617fed5f6bf76febcefedf5e1fe0c010b666391e4",
+          "size_bytes": 6899438
+        },
+        "EURGBP/tick/2015/DAT_ASCII_EURGBP_T_201503.zip": {
+          "rows": 1953716,
+          "sha256": "1bbc1bd129d75f1f82e402ef639556c35b3b3039596d4ee80e79d7ad889e2f4f",
+          "size_bytes": 9985140
+        },
+        "EURGBP/tick/2015/DAT_ASCII_EURGBP_T_201504.zip": {
+          "rows": 1822523,
+          "sha256": "7289453ac3d90fbb81077d6732fff2644a57328f0bb3583039cada5101cad984",
+          "size_bytes": 9219631
+        },
+        "EURGBP/tick/2015/DAT_ASCII_EURGBP_T_201505.zip": {
+          "rows": 1822280,
+          "sha256": "0b9e59a98e88edb293a204efedadc4a8d17d602779fce3ad7bc143a373653452",
+          "size_bytes": 9137380
+        },
+        "EURGBP/tick/2015/DAT_ASCII_EURGBP_T_201506.zip": {
+          "rows": 1843951,
+          "sha256": "b26960f5230e6c3a3b011ee082d3b1ecb71ff961b95923b6567d09333a0b3a02",
+          "size_bytes": 9275633
+        },
+        "EURGBP/tick/2015/DAT_ASCII_EURGBP_T_201507.zip": {
+          "rows": 1700435,
+          "sha256": "e2f1d9706267aa21b64677776c7d153f7cab279bad76636fe0dcff776b2a5f79",
+          "size_bytes": 8536045
+        },
+        "EURGBP/tick/2015/DAT_ASCII_EURGBP_T_201508.zip": {
+          "rows": 1620722,
+          "sha256": "b59a5538296fab7ee7d5c93532a9372e703163c30a41339dafeebf8a2497fb68",
+          "size_bytes": 8212032
+        },
+        "EURGBP/tick/2015/DAT_ASCII_EURGBP_T_201509.zip": {
+          "rows": 1511770,
+          "sha256": "9f31b34aaad60ff851b471928caf4448eaf34c007d3e1174e3f91aabb7353d26",
+          "size_bytes": 7782864
+        },
+        "EURGBP/tick/2015/DAT_ASCII_EURGBP_T_201510.zip": {
+          "rows": 1441336,
+          "sha256": "51fbce1e9650818b058c0314f589a33f6a6b6231e82d5a555a750679ae3d6dad",
+          "size_bytes": 7254478
+        },
+        "EURGBP/tick/2015/DAT_ASCII_EURGBP_T_201511.zip": {
+          "rows": 1341939,
+          "sha256": "7755af36cf298efb87b940ad31895329f9ffdc0dcbadc4e9f567a88d8c282dc3",
+          "size_bytes": 6698921
+        },
+        "EURGBP/tick/2015/DAT_ASCII_EURGBP_T_201512.zip": {
+          "rows": 1538254,
+          "sha256": "94acf66bc1d69335f09f588e43db848b798955eddac3e16ec3283d24d76b8ac5",
+          "size_bytes": 7738080
+        },
+        "EURGBP/tick/2016/DAT_ASCII_EURGBP_T_201601.zip": {
+          "rows": 2015213,
+          "sha256": "bbd8dcf3cf3b59a6255c0831870d1619e39e5a2dc46242b810ed2e0dd252c1f1",
+          "size_bytes": 10383520
+        },
+        "EURGBP/tick/2016/DAT_ASCII_EURGBP_T_201602.zip": {
+          "rows": 2377767,
+          "sha256": "3062736170c618195cbf33d1add57782b0b9ca7aeea8d5b0918f24d9d7e79f2f",
+          "size_bytes": 12071424
+        },
+        "EURGBP/tick/2016/DAT_ASCII_EURGBP_T_201603.zip": {
+          "rows": 1817953,
+          "sha256": "aeff23ad8bf3cfd5157996e455cff347f241c08454a0765bce06e8f1b761573a",
+          "size_bytes": 9181221
+        },
+        "EURGBP/tick/2016/DAT_ASCII_EURGBP_T_201604.zip": {
+          "rows": 1655675,
+          "sha256": "e47137919017960288026b374c7467f1750fce68107b5f48f9dc0bede9212ebe",
+          "size_bytes": 8310300
+        },
+        "EURGBP/tick/2016/DAT_ASCII_EURGBP_T_201605.zip": {
+          "rows": 1538547,
+          "sha256": "a6d54adf79b81d121c03aad9b7398c05bde0da87a52e847609c34ab1ed1ebf68",
+          "size_bytes": 7667757
+        },
+        "EURGBP/tick/2016/DAT_ASCII_EURGBP_T_201606.zip": {
+          "rows": 2175345,
+          "sha256": "7b03ef0ce7614a5e646bb7bfd93cbc20e550268f59690988c290b558f7b31d3b",
+          "size_bytes": 11421204
+        },
+        "EURGBP/tick/2016/DAT_ASCII_EURGBP_T_201607.zip": {
+          "rows": 1350136,
+          "sha256": "687a0ec4446b8c65c75aadc88e05d7088f0286c863a3836e6a57af3449673d71",
+          "size_bytes": 7253270
+        },
+        "EURGBP/tick/2016/DAT_ASCII_EURGBP_T_201608.zip": {
+          "rows": 865411,
+          "sha256": "0b1c26b6b5e16fe138aa0cedae61574a0cdec67147601994ca8fd9b3f939a3f6",
+          "size_bytes": 4674750
+        },
+        "EURGBP/tick/2016/DAT_ASCII_EURGBP_T_201609.zip": {
+          "rows": 1007867,
+          "sha256": "ae55d5e9e30117262eb6e4cc6e62dbbf7d1777048481e081832bec72395b8920",
+          "size_bytes": 5360695
+        },
+        "EURGBP/tick/2016/DAT_ASCII_EURGBP_T_201610.zip": {
+          "rows": 1158647,
+          "sha256": "10be1b2eef48f2bfacd52f7c2849034a76ad106a2c57b7f66972849853eaa3e1",
+          "size_bytes": 6302823
+        },
+        "EURGBP/tick/2016/DAT_ASCII_EURGBP_T_201611.zip": {
+          "rows": 1552585,
+          "sha256": "fa9fe2bd3aa9000a438fd20c384dc9079f358404f9de87ee39e7bb988dd7efef",
+          "size_bytes": 8275375
+        },
+        "EURGBP/tick/2016/DAT_ASCII_EURGBP_T_201612.zip": {
+          "rows": 1198227,
+          "sha256": "49ccf7f2ffc2363169927d49370f4e267a8e271fa4524ee4200114b6aef9bbc7",
+          "size_bytes": 6415468
+        },
+        "EURGBP/tick/2017/DAT_ASCII_EURGBP_T_201701.zip": {
+          "rows": 1680527,
+          "sha256": "39116f9c67495edf5c97de4bcae3030c3373df0b5fdeb45fa942628b712bb52c",
+          "size_bytes": 8607675
+        },
+        "EURGBP/tick/2017/DAT_ASCII_EURGBP_T_201702.zip": {
+          "rows": 1632155,
+          "sha256": "33e2b252f0667899d49e5dfe16b819805aa8a11f0ef5c7c675a68c94e8f77d9f",
+          "size_bytes": 8193953
+        },
+        "EURGBP/tick/2017/DAT_ASCII_EURGBP_T_201703.zip": {
+          "rows": 1655635,
+          "sha256": "3806a262a5035f9d886e513b6f9f4d472b859bd485ed077d5fabbac3a6b9e881",
+          "size_bytes": 8364435
+        },
+        "EURGBP/tick/2017/DAT_ASCII_EURGBP_T_201704.zip": {
+          "rows": 1235522,
+          "sha256": "9935de0da03aeff5dd9fb528bd296d98c1fd260722ff450be01c0ac0088d55e2",
+          "size_bytes": 6250718
+        },
+        "EURGBP/tick/2017/DAT_ASCII_EURGBP_T_201705.zip": {
+          "rows": 1286455,
+          "sha256": "3e367ca944af36404617dd1d0436cb7fa65bf05277f374ffe9950257799f178d",
+          "size_bytes": 6492370
+        },
+        "EURGBP/tick/2017/DAT_ASCII_EURGBP_T_201706.zip": {
+          "rows": 1195299,
+          "sha256": "b7fda5950d3e21b733bfd51d97ed3069714d880719eba8c4ba803b06c0657817",
+          "size_bytes": 6130329
+        },
+        "EURGBP/tick/2017/DAT_ASCII_EURGBP_T_201707.zip": {
+          "rows": 1196843,
+          "sha256": "1c9cd3200246fd1df5df07bed51d8c78c93367fbc77a2c2e8c379659062c3773",
+          "size_bytes": 6072694
+        },
+        "EURGBP/tick/2017/DAT_ASCII_EURGBP_T_201708.zip": {
+          "rows": 1325415,
+          "sha256": "457e5e899de23c0d429f6a6c849711162bb2fb8d0c571f8a331d9b973886b3d7",
+          "size_bytes": 6724144
+        },
+        "EURGBP/tick/2017/DAT_ASCII_EURGBP_T_201709.zip": {
+          "rows": 1304843,
+          "sha256": "19ba4160187fe2133ccb6eae1689e8e21575cf1617b95af7b05900a03f256c05",
+          "size_bytes": 6706695
+        },
+        "EURGBP/tick/2017/DAT_ASCII_EURGBP_T_201710.zip": {
+          "rows": 1089448,
+          "sha256": "e48d42339c084d1993b1f246175d6ebac618c232fce329bf279fd97ee90d8dab",
+          "size_bytes": 5649954
+        },
+        "EURGBP/tick/2017/DAT_ASCII_EURGBP_T_201711.zip": {
+          "rows": 1072522,
+          "sha256": "31c8f687ffced4ff93b3bdc30f4d8a9d317770add088d8735496525223627b18",
+          "size_bytes": 5569161
+        },
+        "EURGBP/tick/2017/DAT_ASCII_EURGBP_T_201712.zip": {
+          "rows": 974319,
+          "sha256": "62e12f1e692820445208b942e1ebb5d5b290b416d38351f3812cef34afc72fa8",
+          "size_bytes": 5060600
+        },
+        "EURGBP/tick/2018/DAT_ASCII_EURGBP_T_201801.zip": {
+          "rows": 1378707,
+          "sha256": "d07fb4ea27f00ce9bb89a1c27bcbaddffe55aab73f96f6d8c7159a04f67b2064",
+          "size_bytes": 6975684
+        },
+        "EURGBP/tick/2018/DAT_ASCII_EURGBP_T_201802.zip": {
+          "rows": 1240480,
+          "sha256": "ad3b3ab0e3e655efc321648335d45a110aecf4829922282734589153b2583c50",
+          "size_bytes": 6303555
+        },
+        "EURGBP/tick/2018/DAT_ASCII_EURGBP_T_201803.zip": {
+          "rows": 1100694,
+          "sha256": "58e4e38f44a12d223df5e555efbb9519e84d0237149594bb38e7fe5754ec0f4b",
+          "size_bytes": 5626913
+        },
+        "EURGBP/tick/2018/DAT_ASCII_EURGBP_T_201804.zip": {
+          "rows": 786610,
+          "sha256": "106f0eac2b74f465f43f9c2268f043b59a348537a9d5b23d23fb3ed64f719bfd",
+          "size_bytes": 4066054
+        },
+        "EURGBP/tick/2018/DAT_ASCII_EURGBP_T_201805.zip": {
+          "rows": 1160168,
+          "sha256": "6a324f125bed20b69d4b9a2b97a1bd63a96007427563dd623e713680d42d1ddb",
+          "size_bytes": 6121809
+        },
+        "EURGBP/tick/2018/DAT_ASCII_EURGBP_T_201806.zip": {
+          "rows": 1125270,
+          "sha256": "7366a751956d354bf1c42b00ec88a665142ee74412bd4693a92406e53a84ff00",
+          "size_bytes": 5689884
+        },
+        "EURGBP/tick/2018/DAT_ASCII_EURGBP_T_201807.zip": {
+          "rows": 1098817,
+          "sha256": "b74774ab7b0ac077608f7d747c67612d4ac22fc4227985a91894bae53138feff",
+          "size_bytes": 5518516
+        },
+        "EURGBP/tick/2018/DAT_ASCII_EURGBP_T_201808.zip": {
+          "rows": 1029364,
+          "sha256": "706e9062410b1979e1614f9257e8594dc442f1070483286b381fda6c0b5ff06c",
+          "size_bytes": 5187993
+        },
+        "EURGBP/tick/2018/DAT_ASCII_EURGBP_T_201809.zip": {
+          "rows": 902839,
+          "sha256": "5cd6caaae5d7d6e713ba2011efee565560ab4e060d9726a3074b61163a6a3094",
+          "size_bytes": 4660236
+        },
+        "EURGBP/tick/2018/DAT_ASCII_EURGBP_T_201810.zip": {
+          "rows": 1225533,
+          "sha256": "9aaafb1ab2fd41b76cb6e77780de05851e5651b04093f82f69d8a2110c3b459a",
+          "size_bytes": 6142813
+        },
+        "EURGBP/tick/2018/DAT_ASCII_EURGBP_T_201811.zip": {
+          "rows": 1281649,
+          "sha256": "22e517c500f7ebf1a2c8f2a0db6a41cfe896b384c2ac2913bed04b9ca75ed909",
+          "size_bytes": 6665685
+        },
+        "EURGBP/tick/2018/DAT_ASCII_EURGBP_T_201812.zip": {
+          "rows": 2000291,
+          "sha256": "93f8793bce317cae1876c4590fff48ce530c59093eb574c234792b8e9993a8f3",
+          "size_bytes": 11245630
+        },
+        "EURGBP/tick/2019/DAT_ASCII_EURGBP_T_201901.zip": {
+          "rows": 3041829,
+          "sha256": "c9b310f2a13f22688623622e8eea0589b22abf2e1e92d81c7e2bd352762ad30d",
+          "size_bytes": 17617935
+        },
+        "EURGBP/tick/2019/DAT_ASCII_EURGBP_T_201902.zip": {
+          "rows": 2331730,
+          "sha256": "b75e9723f492af7db01fb374aec9904b270f5adf6224cf38c89342b166b8e01f",
+          "size_bytes": 13445881
+        },
+        "EURGBP/tick/2019/DAT_ASCII_EURGBP_T_201903.zip": {
+          "rows": 2605573,
+          "sha256": "b51b8806f9ea74ec1716917045411dc8b4b153c724eb57f4cd3b8afedb37cde5",
+          "size_bytes": 15362459
+        },
+        "EURGBP/tick/2019/DAT_ASCII_EURGBP_T_201904.zip": {
+          "rows": 1925952,
+          "sha256": "5a358558517dcd082f63145eb305313c1924aff7efdf4f13422950bf53ba91bb",
+          "size_bytes": 11300790
+        },
+        "EURGBP/tick/2019/DAT_ASCII_EURGBP_T_201905.zip": {
+          "rows": 1645895,
+          "sha256": "57a149dc53732cc288491a6f37511f10ce047d00497455cd882c288f38de95fd",
+          "size_bytes": 9719176
+        },
+        "EURGBP/tick/2019/DAT_ASCII_EURGBP_T_201906.zip": {
+          "rows": 1745482,
+          "sha256": "2c5212740cd87fe1bc8421aabe1326780af0d17ee6d203d3cdd6a5d8880ad9f8",
+          "size_bytes": 10165062
+        },
+        "EURGBP/tick/2019/DAT_ASCII_EURGBP_T_201907.zip": {
+          "rows": 1603931,
+          "sha256": "49488dc56c2f02abf93b81e784477fede48e1e42da7a79f24376dc621235b058",
+          "size_bytes": 9434641
+        },
+        "EURGBP/tick/2019/DAT_ASCII_EURGBP_T_201908.zip": {
+          "rows": 2357160,
+          "sha256": "2b2f857273aa138fa5b77cea329c9aa89d323385e8e3c3c58fdc0b2aaca4f828",
+          "size_bytes": 13885835
+        },
+        "EURGBP/tick/2019/DAT_ASCII_EURGBP_T_201909.zip": {
+          "rows": 2172025,
+          "sha256": "629efce394e918fe08337664f66af5fb881f5fdb617066fc48018ff7aff2773a",
+          "size_bytes": 12819490
+        },
+        "EURGBP/tick/2019/DAT_ASCII_EURGBP_T_201910.zip": {
+          "rows": 2596018,
+          "sha256": "314b4548917ca861bbd8ea6353536d5590fe451b4651b466598ad1d2ef4ef411",
+          "size_bytes": 15474008
+        },
+        "EURGBP/tick/2019/DAT_ASCII_EURGBP_T_201911.zip": {
+          "rows": 1511464,
+          "sha256": "a8ca7b194e42af893b42f6cc7df1f6b645e2eb4e90f6997f5f71741adf2e1f40",
+          "size_bytes": 8851955
+        },
+        "EURGBP/tick/2019/DAT_ASCII_EURGBP_T_201912.zip": {
+          "rows": 1769731,
+          "sha256": "ea84c0a8694a77f3bbf826316248804265ea0dfda78a958f89ae67df9d20506a",
+          "size_bytes": 10521756
+        },
+        "EURGBP/tick/2020/DAT_ASCII_EURGBP_T_202001.zip": {
+          "rows": 1743022,
+          "sha256": "5787d2ad191080fd4d5f5977e41ec003c4abb63557463833e0580389d630b60a",
+          "size_bytes": 10259273
+        },
+        "EURGBP/tick/2020/DAT_ASCII_EURGBP_T_202002.zip": {
+          "rows": 1707062,
+          "sha256": "16cd4cebb69319dd86f3ac70bc77719faf2682847d43fee8aa2f8533f347cdbc",
+          "size_bytes": 10004628
+        },
+        "EURGBP/tick/2020/DAT_ASCII_EURGBP_T_202003.zip": {
+          "rows": 6122295,
+          "sha256": "e4b7d6ac6675becee3ff8da4b018c96af1bd3c51b3231139689646cee88e1fac",
+          "size_bytes": 37407928
+        },
+        "EURGBP/tick/2020/DAT_ASCII_EURGBP_T_202004.zip": {
+          "rows": 2857181,
+          "sha256": "bca584cd6e4eba7db429d4bf581ede49dbd4df8b14934e1ed333c3d91664bd8d",
+          "size_bytes": 17063150
+        },
+        "EURGBP/tick/2020/DAT_ASCII_EURGBP_T_202005.zip": {
+          "rows": 2430894,
+          "sha256": "6f6ae25c6c2b47fb96dedbb006fbf14d2282b5ef8595c475522f941f94a0414f",
+          "size_bytes": 14199088
+        },
+        "EURGBP/tick/2020/DAT_ASCII_EURGBP_T_202006.zip": {
+          "rows": 2807207,
+          "sha256": "4177e14460803328119757c6f82ddcc761ade069e27c99c89ad380db1ed5b67a",
+          "size_bytes": 16541082
+        },
+        "EURGBP/tick/2020/DAT_ASCII_EURGBP_T_202007.zip": {
+          "rows": 2200073,
+          "sha256": "0080a8ab4186939c90d6327e8f41b3b9dcc1a37a43a24c0cb4e876a4971297ff",
+          "size_bytes": 12993265
+        },
+        "EURGBP/tick/2020/DAT_ASCII_EURGBP_T_202008.zip": {
+          "rows": 2096395,
+          "sha256": "9d32d5031235d6be5c0adceda61aa76ca5582675008ad691835ff8a6d7a57555",
+          "size_bytes": 12302039
+        },
+        "EURGBP/tick/2020/DAT_ASCII_EURGBP_T_202009.zip": {
+          "rows": 2086934,
+          "sha256": "a260ae95d9f92144f9dae0abaa9a1c7829d85a1a8336094e43afe7cf3577d9f4",
+          "size_bytes": 12794843
+        },
+        "EURGBP/tick/2020/DAT_ASCII_EURGBP_T_202010.zip": {
+          "rows": 2152749,
+          "sha256": "c4035abbc899eb76f74d8119d2a3f4d453454bcfaadf92481d206dd83bbcd053",
+          "size_bytes": 13196590
+        },
+        "EURGBP/tick/2020/DAT_ASCII_EURGBP_T_202011.zip": {
+          "rows": 2112896,
+          "sha256": "520e0bffcc41ebb40848f11d6d3937f9e6958139f814ef4c2269bd1f88a8af65",
+          "size_bytes": 12905765
+        },
+        "EURGBP/tick/2020/DAT_ASCII_EURGBP_T_202012.zip": {
+          "rows": 2215661,
+          "sha256": "a75b2a094fe98b25a44d80f5c6b90736cab38589b19e38157a67ce095bd1aa13",
+          "size_bytes": 13948501
+        },
+        "EURGBP/tick/2021/DAT_ASCII_EURGBP_T_202101.zip": {
+          "rows": 1947110,
+          "sha256": "688cf56cb75f4cd3eaabbf1be934ae773edef6122d1a163cf17014b457d37854",
+          "size_bytes": 11931946
+        },
+        "EURGBP/tick/2021/DAT_ASCII_EURGBP_T_202102.zip": {
+          "rows": 1540108,
+          "sha256": "91736d9303d417592b5ad8ce96a9cad4eb708ec0338adaa2407fa9aae2c9c317",
+          "size_bytes": 9368925
+        },
+        "EURGBP/tick/2021/DAT_ASCII_EURGBP_T_202103.zip": {
+          "rows": 1852277,
+          "sha256": "afb6c7dc3bf882d34e535ab1aeb7c32a277309296d6fd80c201193cea0630d7d",
+          "size_bytes": 11295252
+        },
+        "EURGBP/tick/2021/DAT_ASCII_EURGBP_T_202104.zip": {
+          "rows": 1404877,
+          "sha256": "5d3912f130838ce17ba3ef25f6e48161880bbc9744b85a42dd9030f1171cd462",
+          "size_bytes": 8679048
+        },
+        "EURGBP/tick/2021/DAT_ASCII_EURGBP_T_202105.zip": {
+          "rows": 1366616,
+          "sha256": "8a79ed39afdad62c6c8e6e83c3fb731aea6459bed22d4ef30be6d92ebbc05df6",
+          "size_bytes": 8381496
+        },
+        "EURGBP/tick/2021/DAT_ASCII_EURGBP_T_202106.zip": {
+          "rows": 1409290,
+          "sha256": "1d8d625c6a67ed068d928c226a5318e194c8e53a5d0d932dbdcc6162fe8a0d7b",
+          "size_bytes": 8627698
+        },
+        "EURGBP/tick/2021/DAT_ASCII_EURGBP_T_202107.zip": {
+          "rows": 1476205,
+          "sha256": "9989f2efb3c836c62ca463e0304358edc46dc17463f634f9b8755ddd6c6f2d8d",
+          "size_bytes": 9024520
+        },
+        "EURGBP/tick/2021/DAT_ASCII_EURGBP_T_202108.zip": {
+          "rows": 983551,
+          "sha256": "14eba0a69a67a9935d07c8739878bf29e36e70de650626e7cad8093cb5559108",
+          "size_bytes": 6108364
+        },
+        "EURGBP/tick/2021/DAT_ASCII_EURGBP_T_202109.zip": {
+          "rows": 1106483,
+          "sha256": "795ab15d2610a0f96b2058602662ada4fad32e7bc2c4c906267ccf0fb2df8062",
+          "size_bytes": 6784308
+        },
+        "EURGBP/tick/2021/DAT_ASCII_EURGBP_T_202110.zip": {
+          "rows": 1152815,
+          "sha256": "0389eb579833944cf98fffcf8196e2fe0dba644590175deac901a2eda74d3746",
+          "size_bytes": 7083668
+        },
+        "EURGBP/tick/2021/DAT_ASCII_EURGBP_T_202111.zip": {
+          "rows": 1588586,
+          "sha256": "3443b7b35b697b19c573cd8911e8a40464e5ead3012b3975e8a7e6eafb36866d",
+          "size_bytes": 9625366
+        },
+        "EURGBP/tick/2021/DAT_ASCII_EURGBP_T_202112.zip": {
+          "rows": 1630450,
+          "sha256": "e80e5e376bacb4c254c3cc8d5200386264c9cbebbb1ce4a97b7d3a65bd286e21",
+          "size_bytes": 9811799
+        },
+        "EURGBP/tick/2022/DAT_ASCII_EURGBP_T_202201.zip": {
+          "rows": 1505390,
+          "sha256": "f2c8ac82384545d31516f7f170e2c88c759de38eb1201afaf82177864ae64941",
+          "size_bytes": 9025699
+        },
+        "EURGBP/tick/2022/DAT_ASCII_EURGBP_T_202202.zip": {
+          "rows": 1677837,
+          "sha256": "8f796892f8159b7a051a78ddba63b7570fad6fce304728d4d1262725743bf3dd",
+          "size_bytes": 10045120
+        },
+        "EURGBP/tick/2022/DAT_ASCII_EURGBP_T_202203.zip": {
+          "rows": 2330860,
+          "sha256": "0796edd62ad8d2e2c8529f126c5e467ee509f522794255aee31be5161f3730be",
+          "size_bytes": 13953481
+        },
+        "EURGBP/tick/2022/DAT_ASCII_EURGBP_T_202204.zip": {
+          "rows": 1863351,
+          "sha256": "fb8c3e401aed9bfc53d6474ab768509fafc5ecb4b925bdd95d4746e01b134c6d",
+          "size_bytes": 11101004
+        },
+        "EURGBP/tick/2022/DAT_ASCII_EURGBP_T_202205.zip": {
+          "rows": 2184940,
+          "sha256": "53def9e4ce66259d726bc9f421002331382c4c034b1552916a549a6e087cc28c",
+          "size_bytes": 13098955
+        },
+        "EURGBP/tick/2022/DAT_ASCII_EURGBP_T_202206.zip": {
+          "rows": 2614530,
+          "sha256": "0a97a6c6cbf5fc813bdfb41a198b19db1ece8e957d34a2d325f8776a7b415af7",
+          "size_bytes": 15507011
+        },
+        "EURGBP/tick/2022/DAT_ASCII_EURGBP_T_202207.zip": {
+          "rows": 2802732,
+          "sha256": "67c552666d39a5c31a345c4164d43a2c53d5e0820bf18fc19aacc40b7321f8a4",
+          "size_bytes": 16573118
+        },
+        "EURGBP/tick/2022/DAT_ASCII_EURGBP_T_202208.zip": {
+          "rows": 2789891,
+          "sha256": "187ea42c6597525c8d8ec00f7fb3d709630d2776596b7ad89e63c389b999a742",
+          "size_bytes": 15998799
+        },
+        "EURGBP/tick/2022/DAT_ASCII_EURGBP_T_202209.zip": {
+          "rows": 4182054,
+          "sha256": "7684ef88e2934f7e673b5c16466584f0e19eb5ac333b1c46a19e10a5788b2477",
+          "size_bytes": 24624198
+        },
+        "EURGBP/tick/2022/DAT_ASCII_EURGBP_T_202210.zip": {
+          "rows": 4561889,
+          "sha256": "a41c9fe9e9a24753c9c7ea0e8525878dd4e7aa0ca73bef2c264be41b814d1040",
+          "size_bytes": 26897554
+        },
+        "EURGBP/tick/2022/DAT_ASCII_EURGBP_T_202211.zip": {
+          "rows": 3430220,
+          "sha256": "98a07ec1314fa403b685f39ddd61011d9943a2e595ba4f9aea585277c5b7fd68",
+          "size_bytes": 19990607
+        },
+        "EURGBP/tick/2022/DAT_ASCII_EURGBP_T_202212.zip": {
+          "rows": 2850009,
+          "sha256": "fa4dfde8287c1e0bb2721cf59d6f00be664e4484b90dd07d7b5874f5928ad743",
+          "size_bytes": 16885934
+        },
+        "EURGBP/tick/2023/DAT_ASCII_EURGBP_T_202301.zip": {
+          "rows": 2747020,
+          "sha256": "73adf6c9b26a1831ee847232f8b298b4e7963ffbd10b30b8f84858b47d16050c",
+          "size_bytes": 16453542
+        },
+        "EURGBP/tick/2023/DAT_ASCII_EURGBP_T_202302.zip": {
+          "rows": 1970423,
+          "sha256": "98b6a9bee9c3b552907b4a3a5d8bd344effa60491b3b72503cfa43567799c7a1",
+          "size_bytes": 11830844
+        },
+        "EURGBP/tick/2023/DAT_ASCII_EURGBP_T_202303.zip": {
+          "rows": 1771784,
+          "sha256": "03f160fec3b9ca319fb54fa0b40e092ddc51df71ab8ab7462e245a9fc06193ef",
+          "size_bytes": 10665999
+        },
+        "EURGBP/tick/2023/DAT_ASCII_EURGBP_T_202304.zip": {
+          "rows": 943272,
+          "sha256": "a4ad6b583acde5bcbc812cae5932feda5745a1b5872c67b2c09fc3010a2c1515",
+          "size_bytes": 5781084
+        },
+        "EURGBP/tick/2023/DAT_ASCII_EURGBP_T_202305.zip": {
+          "rows": 944002,
+          "sha256": "fdccbd5fd93566c5dc1d164f4d17e7e68ecf49dfd9cb6855208475ca63efba98",
+          "size_bytes": 5815212
+        },
+        "EURGBP/tick/2023/DAT_ASCII_EURGBP_T_202306.zip": {
+          "rows": 831065,
+          "sha256": "26b76d35ca9df10ecd822906bf8ee743110fc661e06e1d7bd1218f8c2f86c5d4",
+          "size_bytes": 5153452
+        },
+        "EURGBP/tick/2023/DAT_ASCII_EURGBP_T_202307.zip": {
+          "rows": 857705,
+          "sha256": "1d85ff49c0626369949cfaa8e65e672d474f95d6a0a2926d182eaf71c5f72ab1",
+          "size_bytes": 5333485
+        },
+        "EURGBP/tick/2023/DAT_ASCII_EURGBP_T_202308.zip": {
+          "rows": 1329556,
+          "sha256": "a380c7f1dfb1715d725d9e8ef44e46cafee14db1d75d12ca05952c61a756a2b6",
+          "size_bytes": 8195516
+        },
+        "EURGBP/tick/2023/DAT_ASCII_EURGBP_T_202309.zip": {
+          "rows": 1032835,
+          "sha256": "e10e92b2b74f9ec00b06624c10b5accd5b9c379bdae5cabbc6a0b4cc6e6c1682",
+          "size_bytes": 6430447
+        },
+        "EURGBP/tick/2023/DAT_ASCII_EURGBP_T_202310.zip": {
+          "rows": 1199415,
+          "sha256": "76b72a032e4d0d9952fb2dfccd5ed0ed7fdfe8ee65b13589ac814cf2b150dec8",
+          "size_bytes": 7407272
+        },
+        "EURGBP/tick/2023/DAT_ASCII_EURGBP_T_202311.zip": {
+          "rows": 1113381,
+          "sha256": "7ab4021c10578d095f676bbdb51a1256472b3c9bc197c7fdd3648181eeb9e695",
+          "size_bytes": 6904099
+        },
+        "EURGBP/tick/2023/DAT_ASCII_EURGBP_T_202312.zip": {
+          "rows": 1164775,
+          "sha256": "607b8edba5e2abfcf48e036ae618ba2dc674e796cb0bf611d37ce64b08b6661d",
+          "size_bytes": 7221526
+        },
+        "EURGBP/tick/2024/DAT_ASCII_EURGBP_T_202401.zip": {
+          "rows": 1219096,
+          "sha256": "d89c8d6b1bc1909724cc3abc3c37df6430e1a96416f05826e11e539062993725",
+          "size_bytes": 7514918
+        },
+        "EURGBP/tick/2024/DAT_ASCII_EURGBP_T_202402.zip": {
+          "rows": 982785,
+          "sha256": "4394fe8b7b1c42dc0d242b6d8be828a74ec612e40dd3a81e7033a72541265e31",
+          "size_bytes": 6063084
+        },
+        "EURGBP/tick/2024/DAT_ASCII_EURGBP_T_202403.zip": {
+          "rows": 1084894,
+          "sha256": "8cdf8db310d516acfbb9c7c0bb8916b4095bc8ff925646b760941a54e801c410",
+          "size_bytes": 6501980
+        },
+        "EURGBP/tick/2024/DAT_ASCII_EURGBP_T_202404.zip": {
+          "rows": 1254142,
+          "sha256": "f49078d58e8940396fc8ed69896855db4a5947177e2151249e763cb2322773dd",
+          "size_bytes": 7479121
+        },
+        "EURGBP/tick/2024/DAT_ASCII_EURGBP_T_202405.zip": {
+          "rows": 965544,
+          "sha256": "677da0935765b32991aa371ec951995714877554130fe312db9f5de56dc94251",
+          "size_bytes": 5864731
+        },
+        "EURGBP/tick/2024/DAT_ASCII_EURGBP_T_202406.zip": {
+          "rows": 971506,
+          "sha256": "a2ce1597d57a0c01d0e8a1807bb4d83990dcd55d3f03205580a062f52235070f",
+          "size_bytes": 5846155
+        },
+        "EURGBP/tick/2024/DAT_ASCII_EURGBP_T_202407.zip": {
+          "rows": 969736,
+          "sha256": "3710a89359af865f800fd7489cd51ea3ea8729e42934a0a5f8656e3babf9294d",
+          "size_bytes": 5898466
+        },
+        "EURGBP/tick/2024/DAT_ASCII_EURGBP_T_202408.zip": {
+          "rows": 1346250,
+          "sha256": "2d4b90393c0eed8a85261d5e7e83bfaf87b6b7c4fe01b071e7feac6912fd7db9",
+          "size_bytes": 8196908
+        },
+        "EURGBP/tick/2024/DAT_ASCII_EURGBP_T_202409.zip": {
+          "rows": 1323991,
+          "sha256": "af073758cf9eeeaf1df0f4d5f6edefff9d9b1be3f6a10fa52346ce28ba52b6dc",
+          "size_bytes": 7927727
+        },
+        "EURGBP/tick/2024/DAT_ASCII_EURGBP_T_202410.zip": {
+          "rows": 1593194,
+          "sha256": "8b1b4434838f530f34387826ba6d2beb10c90c24d46701a771c0bf14c656e3c2",
+          "size_bytes": 9427490
+        },
+        "EURGBP/tick/2024/DAT_ASCII_EURGBP_T_202411.zip": {
+          "rows": 2162171,
+          "sha256": "a4bce818203d09ce9c5ecd1acd702aa47171405ac70db8b9c32c7915969f923b",
+          "size_bytes": 12739233
+        },
+        "EURGBP/tick/2024/DAT_ASCII_EURGBP_T_202412.zip": {
+          "rows": 1696447,
+          "sha256": "a0d5c0d31971db94e7e015604903098c8c2f15a03afbab340ed346a9ccd7fc8c",
+          "size_bytes": 10075233
+        },
+        "EURGBP/tick/2025/DAT_ASCII_EURGBP_T_202501.zip": {
+          "rows": 1860668,
+          "sha256": "ca9da7971755275e316be6e24e657cfd2c2c2c4d014c4677e178bfcebc82afb4",
+          "size_bytes": 11227336
+        },
+        "EURGBP/tick/2025/DAT_ASCII_EURGBP_T_202502.zip": {
+          "rows": 1687459,
+          "sha256": "3d958fcdef721795a938692c50c17348eb5e4a621aea947f88bc9dac09792620",
+          "size_bytes": 10028116
+        },
+        "EURGBP/tick/2025/DAT_ASCII_EURGBP_T_202503.zip": {
+          "rows": 1960847,
+          "sha256": "37cdfbd51551f501824fdb2a2ef38db2a46fec71dbd332cf3f2adb7c4d572cd7",
+          "size_bytes": 11680749
+        },
+        "EURGBP/tick/2025/DAT_ASCII_EURGBP_T_202504.zip": {
+          "rows": 3408049,
+          "sha256": "ae7200fb2c6ba48173c006707b1c769e168917a911be0da37ef568b0a80dc81e",
+          "size_bytes": 20622955
+        },
+        "EURGBP/tick/2025/DAT_ASCII_EURGBP_T_202505.zip": {
+          "rows": 1614500,
+          "sha256": "2667941a1246d762851729746181a1cdcc9ceb8496e68ce105f9932adfaf5f44",
+          "size_bytes": 9915126
+        },
+        "EURGBP/tick/2025/DAT_ASCII_EURGBP_T_202506.zip": {
+          "rows": 1470054,
+          "sha256": "9102a3eab58ca7481a455c1196eb54fe54110a341e32933e4b14d337279590a7",
+          "size_bytes": 8980465
+        },
+        "EURGBP/tick/2025/DAT_ASCII_EURGBP_T_202507.zip": {
+          "rows": 1471872,
+          "sha256": "9bbccfe8f520b83de4d8556bb21f3c9698bf3049d1e323e5ada4c8e688207441",
+          "size_bytes": 9009079
+        },
+        "EURGBP/tick/2025/DAT_ASCII_EURGBP_T_202508.zip": {
+          "rows": 1135648,
+          "sha256": "8e89aaf964c0fbd25ef0d787b61a78a26d1fba54c3288aaed5c4540394c78769",
+          "size_bytes": 7011515
+        },
+        "EURGBP/tick/2025/DAT_ASCII_EURGBP_T_202509.zip": {
+          "rows": 1170901,
+          "sha256": "aceae5fe38949810ed2750c1795ac3ea95fd90a5ba7acf89490006d88749dd7c",
+          "size_bytes": 7245017
+        },
+        "EURGBP/tick/2025/DAT_ASCII_EURGBP_T_202510.zip": {
+          "rows": 1266383,
+          "sha256": "9b23e68276b172108482fa20cfc5c38651f598f84d23615d6e6fa60ab29081df",
+          "size_bytes": 7847560
+        },
+        "EURGBP/tick/2025/DAT_ASCII_EURGBP_T_202511.zip": {
+          "rows": 1251644,
+          "sha256": "4b676ea4f7692af044fd3758cd94d98c5615eba824a4f1b0f9c5624edda577c6",
+          "size_bytes": 7685500
+        },
+        "EURGBP/tick/2025/DAT_ASCII_EURGBP_T_202512.zip": {
+          "rows": 1210471,
+          "sha256": "ff53ea0f6fdcfd4066fe468961fa44daf55e0cbc40ac66998306fcdaff1ee056",
+          "size_bytes": 7372641
+        },
+        "EURGBP/tick/2026/DAT_ASCII_EURGBP_T_202601.zip": {
+          "rows": 1282571,
+          "sha256": "6eca1ca412c490d4dd1fe09d32fda202c33c410f267cd9967a34415ab18b201e",
+          "size_bytes": 7858541
+        },
+        "EURGBP/tick/2026/DAT_ASCII_EURGBP_T_202602.zip": {
+          "rows": 1207089,
+          "sha256": "33a126cfd789aa21e4795a0ca1d0d91a675e6ee2ec629f6c50c127971aa592f5",
+          "size_bytes": 7411066
+        },
+        "EURGBP/tick/2026/DAT_ASCII_EURGBP_T_202603.zip": {
+          "rows": 2073256,
+          "sha256": "49b8aa0fd063536a2aa00156493b0ce45e0be8cfe36202b7a0547880c10e7743",
+          "size_bytes": 12371692
+        },
+        "EURGBP/tick/2026/DAT_ASCII_EURGBP_T_202604.zip": {
+          "rows": 582253,
+          "sha256": "5fb155e09d9a2587c88be87a2a37a90874c352e14a1631c2bf8735a6cf3e542f",
+          "size_bytes": 3453825
+        }
+      },
+      "latest_month": "202604",
+      "total_files": 196,
+      "total_size_bytes": 1516086029
+    },
+    "EURJPY": {
+      "earliest_month": "201001",
+      "files": {
+        "EURJPY/tick/2010/DAT_ASCII_EURJPY_T_201001.zip": {
+          "rows": 608201,
+          "sha256": "f30793cfaf18b95418b909b82395c3ab5e842774a5b5bc10893058303a0796d5",
+          "size_bytes": 2372947
+        },
+        "EURJPY/tick/2010/DAT_ASCII_EURJPY_T_201002.zip": {
+          "rows": 645809,
+          "sha256": "a51f0e34d680e39b9f6e24c47935b3a0184b1231f832f18c276dfddc3625376c",
+          "size_bytes": 2499345
+        },
+        "EURJPY/tick/2010/DAT_ASCII_EURJPY_T_201003.zip": {
+          "rows": 759608,
+          "sha256": "0c3048efea3d590210a4a5371e50de6474369b2ae55efd25f9a373315d00f796",
+          "size_bytes": 2807098
+        },
+        "EURJPY/tick/2010/DAT_ASCII_EURJPY_T_201004.zip": {
+          "rows": 838535,
+          "sha256": "101990939a2add0a8801c706bcd0e120a33d35d8f06481a5e832a003ea83b63a",
+          "size_bytes": 2969551
+        },
+        "EURJPY/tick/2010/DAT_ASCII_EURJPY_T_201005.zip": {
+          "rows": 919661,
+          "sha256": "2326a2c0214b0c84fd1200cb021e7af5d9b63e72b13ba73ae95250f3445a610e",
+          "size_bytes": 3574324
+        },
+        "EURJPY/tick/2010/DAT_ASCII_EURJPY_T_201006.zip": {
+          "rows": 527880,
+          "sha256": "72ce56c390274bdd18bc31a43bb95ee1ae15b31e43be4266628034414caf2f01",
+          "size_bytes": 2038282
+        },
+        "EURJPY/tick/2010/DAT_ASCII_EURJPY_T_201007.zip": {
+          "rows": 409776,
+          "sha256": "2272111c9f4d5488ddb9fd5be945f412996cefafb459bba2d83aa0b46c489930",
+          "size_bytes": 1561726
+        },
+        "EURJPY/tick/2010/DAT_ASCII_EURJPY_T_201008.zip": {
+          "rows": 369142,
+          "sha256": "1ba01842262e04bf23ecb30c609556783dc53d181f70a4898830005ce9f442ce",
+          "size_bytes": 1408697
+        },
+        "EURJPY/tick/2010/DAT_ASCII_EURJPY_T_201009.zip": {
+          "rows": 354248,
+          "sha256": "d20dcfbf9f8b3b8421a2cf3d55c62501a0a73100252992e0cd3c28f2eb943852",
+          "size_bytes": 1339968
+        },
+        "EURJPY/tick/2010/DAT_ASCII_EURJPY_T_201010.zip": {
+          "rows": 367276,
+          "sha256": "71af2f6391f4ef70f63e1b6bd47d81a0b1a71346c6a96bb1e15b87a56316876e",
+          "size_bytes": 1361923
+        },
+        "EURJPY/tick/2010/DAT_ASCII_EURJPY_T_201011.zip": {
+          "rows": 433407,
+          "sha256": "69abad2eac9173c11deb4bdd3d13302733d93ca9774da6c2d824a881b8cd95ff",
+          "size_bytes": 1582261
+        },
+        "EURJPY/tick/2010/DAT_ASCII_EURJPY_T_201012.zip": {
+          "rows": 367688,
+          "sha256": "3c38144125d547af78c67ca2d18794e2a1c07752ffed75e7a51502c4e50ccc25",
+          "size_bytes": 1355746
+        },
+        "EURJPY/tick/2011/DAT_ASCII_EURJPY_T_201101.zip": {
+          "rows": 373058,
+          "sha256": "549fe07fe8efeaa756f76ce9653e0eb4caec43a35f090545a0c26417a588a2c5",
+          "size_bytes": 1361480
+        },
+        "EURJPY/tick/2011/DAT_ASCII_EURJPY_T_201102.zip": {
+          "rows": 325611,
+          "sha256": "117e82b64996ec32417f1d6bce031ae04a37c5ed289c3717d263b28233b952a0",
+          "size_bytes": 1175228
+        },
+        "EURJPY/tick/2011/DAT_ASCII_EURJPY_T_201103.zip": {
+          "rows": 390815,
+          "sha256": "e5c93ea25c7766d577d627948cf7768b8ec6d4cc1315da141f18ba9c00949590",
+          "size_bytes": 1464308
+        },
+        "EURJPY/tick/2011/DAT_ASCII_EURJPY_T_201104.zip": {
+          "rows": 332562,
+          "sha256": "98dc39f3ebd21eeed404d52054601fc4a9f4a76c868b69a75bc5c7c3f22ec775",
+          "size_bytes": 1381052
+        },
+        "EURJPY/tick/2011/DAT_ASCII_EURJPY_T_201105.zip": {
+          "rows": 413433,
+          "sha256": "805ace0e52927e453ef0ef9c19e190f2055c0a44ca4344c64ea1f3749681df48",
+          "size_bytes": 2139356
+        },
+        "EURJPY/tick/2011/DAT_ASCII_EURJPY_T_201106.zip": {
+          "rows": 405107,
+          "sha256": "bc914cb7c9cc13e936c0158da5d18e13378462e5f2b7f251d5fd1feb00101f9b",
+          "size_bytes": 2057476
+        },
+        "EURJPY/tick/2011/DAT_ASCII_EURJPY_T_201107.zip": {
+          "rows": 384429,
+          "sha256": "7e70af3bb8aeee4e505fa06b26e046cbbd16759baeb2b4279df313f9b38f18d7",
+          "size_bytes": 1980995
+        },
+        "EURJPY/tick/2011/DAT_ASCII_EURJPY_T_201108.zip": {
+          "rows": 532187,
+          "sha256": "02e0b740a25ed609babe95eaeb2a364ec3f7658b32d4f15ad0818d0068656830",
+          "size_bytes": 2700726
+        },
+        "EURJPY/tick/2011/DAT_ASCII_EURJPY_T_201109.zip": {
+          "rows": 441347,
+          "sha256": "a79656cf33badb8c2393892d21a9dc4cccc8a0d9285e237ea03e2380337ba518",
+          "size_bytes": 2244256
+        },
+        "EURJPY/tick/2011/DAT_ASCII_EURJPY_T_201110.zip": {
+          "rows": 414885,
+          "sha256": "1b6cdfce3d5ddc65878c58f4b5e3c4eefb84ddb42495c273347b982d0d2b3d8e",
+          "size_bytes": 2129812
+        },
+        "EURJPY/tick/2011/DAT_ASCII_EURJPY_T_201111.zip": {
+          "rows": 391692,
+          "sha256": "28236956b5de3a65e27451a77bde43d1c97c7d5421b7ebb133a9f93e20d42201",
+          "size_bytes": 2002000
+        },
+        "EURJPY/tick/2011/DAT_ASCII_EURJPY_T_201112.zip": {
+          "rows": 1228690,
+          "sha256": "8f61cd4107726b62ebb7cb104a64add398563573a854643fb3e402593072618f",
+          "size_bytes": 6804130
+        },
+        "EURJPY/tick/2012/DAT_ASCII_EURJPY_T_201201.zip": {
+          "rows": 1444883,
+          "sha256": "230858ee1121747bfafcecbeaca5378323b462bf2d3f5bdedb9adf0221114f1c",
+          "size_bytes": 8017627
+        },
+        "EURJPY/tick/2012/DAT_ASCII_EURJPY_T_201202.zip": {
+          "rows": 1473470,
+          "sha256": "c8609ae2f3ac20a47aa7a640bc2f600c1d225b372a5aa10a469960650c487308",
+          "size_bytes": 8358406
+        },
+        "EURJPY/tick/2012/DAT_ASCII_EURJPY_T_201203.zip": {
+          "rows": 1592121,
+          "sha256": "8b75fd80fc285187a12a2af1b6cfb69d8429aae05211ba05a7454f524ee1a514",
+          "size_bytes": 9103939
+        },
+        "EURJPY/tick/2012/DAT_ASCII_EURJPY_T_201204.zip": {
+          "rows": 1296569,
+          "sha256": "71b45af66dc46efbce12a6c2ac2d68820537fbb08161b01f35e0685b72d6a96a",
+          "size_bytes": 7523163
+        },
+        "EURJPY/tick/2012/DAT_ASCII_EURJPY_T_201205.zip": {
+          "rows": 1580458,
+          "sha256": "725fd1ca020e8d2716cc63e2a420a14e52a4ff0cab85b4fa47a2b26e2fef6767",
+          "size_bytes": 8915839
+        },
+        "EURJPY/tick/2012/DAT_ASCII_EURJPY_T_201206.zip": {
+          "rows": 1470008,
+          "sha256": "3b7ff9b4343a3c62610c0f832911e85bcfc0ec4b118ae86be5cb78f9bcb8e3ef",
+          "size_bytes": 8398974
+        },
+        "EURJPY/tick/2012/DAT_ASCII_EURJPY_T_201207.zip": {
+          "rows": 1172169,
+          "sha256": "a92a709614b8b489063416f7a1b9a559a6aeb48b6851d6074998b3a5c8394cfc",
+          "size_bytes": 6684811
+        },
+        "EURJPY/tick/2012/DAT_ASCII_EURJPY_T_201208.zip": {
+          "rows": 1067819,
+          "sha256": "5bc66991b2be3d333bd42b631d0899f5887c26d3410977218827da42925d1bb5",
+          "size_bytes": 6088460
+        },
+        "EURJPY/tick/2012/DAT_ASCII_EURJPY_T_201209.zip": {
+          "rows": 1312705,
+          "sha256": "eca7e46577da039f04bf01d143c9ce51e869220010daf4a854361f87c348d353",
+          "size_bytes": 7283042
+        },
+        "EURJPY/tick/2012/DAT_ASCII_EURJPY_T_201210.zip": {
+          "rows": 1322104,
+          "sha256": "44ae368773bcfce8f26b8994f755ba718359ecc1fd26bc5059edb2a2c41241d0",
+          "size_bytes": 7374253
+        },
+        "EURJPY/tick/2012/DAT_ASCII_EURJPY_T_201211.zip": {
+          "rows": 1300426,
+          "sha256": "30d46db16b89e59b31c12c79ec58e0e7286608176a8c46da0bf82beaff34a7ac",
+          "size_bytes": 7371955
+        },
+        "EURJPY/tick/2012/DAT_ASCII_EURJPY_T_201212.zip": {
+          "rows": 1121307,
+          "sha256": "eb6c14ea0efd6bb2c671be0d053cc0f73ddadf091fac4f45ee5793d353dc2155",
+          "size_bytes": 6405738
+        },
+        "EURJPY/tick/2013/DAT_ASCII_EURJPY_T_201301.zip": {
+          "rows": 1799005,
+          "sha256": "85d08683d015fa2cc1587346124a150bf17dec4e1e514e7091edd1b3ce7f2370",
+          "size_bytes": 10578226
+        },
+        "EURJPY/tick/2013/DAT_ASCII_EURJPY_T_201302.zip": {
+          "rows": 1817832,
+          "sha256": "5ad1f5455a1c6fa9d3323cc4d2ca6da52a541b46745958ca972ed1dd2b211648",
+          "size_bytes": 10856460
+        },
+        "EURJPY/tick/2013/DAT_ASCII_EURJPY_T_201303.zip": {
+          "rows": 1866898,
+          "sha256": "808ab5d4937dee41d6514a278eaebe00555691c10e0087a3f6d3c0ba2ee06c71",
+          "size_bytes": 10777195
+        },
+        "EURJPY/tick/2013/DAT_ASCII_EURJPY_T_201304.zip": {
+          "rows": 2156354,
+          "sha256": "765bec5804f43c870a29c2a120ec7018ee6bd6f1ffb42e9f0f84975b07157815",
+          "size_bytes": 12715038
+        },
+        "EURJPY/tick/2013/DAT_ASCII_EURJPY_T_201305.zip": {
+          "rows": 2116083,
+          "sha256": "f72d318911c5e751daafa6a9417517818cd06a6c7353d88753bf27673a148bb5",
+          "size_bytes": 12202032
+        },
+        "EURJPY/tick/2013/DAT_ASCII_EURJPY_T_201306.zip": {
+          "rows": 2208382,
+          "sha256": "4a1f0db1c3a551e2d1730ef5922dce9d8fd2a1a897e14c75a9ac654eb1b96bf4",
+          "size_bytes": 13043810
+        },
+        "EURJPY/tick/2013/DAT_ASCII_EURJPY_T_201307.zip": {
+          "rows": 2022582,
+          "sha256": "11b68b3e76eeca3f735e02eed789d1c8403519a43a49fd988aae632a1b6948ae",
+          "size_bytes": 11514319
+        },
+        "EURJPY/tick/2013/DAT_ASCII_EURJPY_T_201308.zip": {
+          "rows": 1726833,
+          "sha256": "2557a5ceb50fe0b0cde5e2c2fe9569e3c67df7f964c56a55d64e25e7b8ce3349",
+          "size_bytes": 9808585
+        },
+        "EURJPY/tick/2013/DAT_ASCII_EURJPY_T_201309.zip": {
+          "rows": 1566232,
+          "sha256": "bf0be5763ea059025b2994ad2de1c8a3399ca4814510a721a871192e2555226a",
+          "size_bytes": 8783621
+        },
+        "EURJPY/tick/2013/DAT_ASCII_EURJPY_T_201310.zip": {
+          "rows": 1461212,
+          "sha256": "c78821cd840577ff7283749e6f4d29aab6f6ae029a88e22f0b96fb7ea5343de9",
+          "size_bytes": 8172397
+        },
+        "EURJPY/tick/2013/DAT_ASCII_EURJPY_T_201311.zip": {
+          "rows": 1398331,
+          "sha256": "e3358b648896331a232f3796d2b0bc163b5f76fda8ec3a26132cdd0539df5bfd",
+          "size_bytes": 7800976
+        },
+        "EURJPY/tick/2013/DAT_ASCII_EURJPY_T_201312.zip": {
+          "rows": 1409157,
+          "sha256": "467ead545099d894e6139e3644731069293587046bcab5a5e860f40be98e055c",
+          "size_bytes": 7859504
+        },
+        "EURJPY/tick/2014/DAT_ASCII_EURJPY_T_201401.zip": {
+          "rows": 1638761,
+          "sha256": "e9d695b89a4bd0dcaf658768babd36720c0840dc2a240998524873ed8f5453fc",
+          "size_bytes": 9324735
+        },
+        "EURJPY/tick/2014/DAT_ASCII_EURJPY_T_201402.zip": {
+          "rows": 1394696,
+          "sha256": "991b91ec939e23b32bb23c52d722bffe48101f4e56190a669ea138d3a9f01e2d",
+          "size_bytes": 7914308
+        },
+        "EURJPY/tick/2014/DAT_ASCII_EURJPY_T_201403.zip": {
+          "rows": 1057590,
+          "sha256": "9362a2d439fdd5afd0cd4e9ac2ef861ac21dad677f56b65f59f379583aea21f7",
+          "size_bytes": 6294540
+        },
+        "EURJPY/tick/2014/DAT_ASCII_EURJPY_T_201404.zip": {
+          "rows": 953467,
+          "sha256": "d4e337b999d0f993ea51b0b527296308b7be666eb1b2ac5a76b86151747078c7",
+          "size_bytes": 5530895
+        },
+        "EURJPY/tick/2014/DAT_ASCII_EURJPY_T_201405.zip": {
+          "rows": 908257,
+          "sha256": "76b9a575cc0a202ce27113ac0d98041304f7f52b7bb3358ba24678b41f75261f",
+          "size_bytes": 5188843
+        },
+        "EURJPY/tick/2014/DAT_ASCII_EURJPY_T_201406.zip": {
+          "rows": 763416,
+          "sha256": "80723e72fc2f947b99ac9da4f9b057799f46f066067c9e4f4d7b976d263d92e9",
+          "size_bytes": 4331241
+        },
+        "EURJPY/tick/2014/DAT_ASCII_EURJPY_T_201407.zip": {
+          "rows": 857738,
+          "sha256": "665f590e10d5fb297ade6fc94312bebffdb1a6997500940cc947f776b9624696",
+          "size_bytes": 4572606
+        },
+        "EURJPY/tick/2014/DAT_ASCII_EURJPY_T_201408.zip": {
+          "rows": 948427,
+          "sha256": "840152153de3891fa3376288bb785f75154781b0588a18dc853795cebd83d275",
+          "size_bytes": 4569139
+        },
+        "EURJPY/tick/2014/DAT_ASCII_EURJPY_T_201409.zip": {
+          "rows": 1391881,
+          "sha256": "b309903d5f497c7d72d013cefc38512b96f22490f55273019bc0409b3ef7dace",
+          "size_bytes": 6693047
+        },
+        "EURJPY/tick/2014/DAT_ASCII_EURJPY_T_201410.zip": {
+          "rows": 1929986,
+          "sha256": "98f0d6358820bd796c6535cfb155346da4f5d3bc6775015691403e5b85d877e4",
+          "size_bytes": 10911659
+        },
+        "EURJPY/tick/2014/DAT_ASCII_EURJPY_T_201411.zip": {
+          "rows": 2120850,
+          "sha256": "18a2b156e040a0f020d1f2bb375865c05dee85c7a3b30dbc7d15638199fa03a5",
+          "size_bytes": 11408669
+        },
+        "EURJPY/tick/2014/DAT_ASCII_EURJPY_T_201412.zip": {
+          "rows": 1918144,
+          "sha256": "0130b0745cc60197c684fa1dbb89ef80f7a9ab0035ab1766d4661c7624056f19",
+          "size_bytes": 10608703
+        },
+        "EURJPY/tick/2015/DAT_ASCII_EURJPY_T_201501.zip": {
+          "rows": 2400596,
+          "sha256": "4ddde88fa1639a885032275bff86ee23644dc2ee4e9c5b62e8260c69310ef120",
+          "size_bytes": 13458827
+        },
+        "EURJPY/tick/2015/DAT_ASCII_EURJPY_T_201502.zip": {
+          "rows": 1910532,
+          "sha256": "ee6eb0ed421633e2556c21018551de98b11e99d5bcddf94b57458b592441971c",
+          "size_bytes": 10564896
+        },
+        "EURJPY/tick/2015/DAT_ASCII_EURJPY_T_201503.zip": {
+          "rows": 2460201,
+          "sha256": "b3cfedf23e74930b2202078f89b6f759c4a6a063e4f54ec5d528075ce0cc7523",
+          "size_bytes": 13552738
+        },
+        "EURJPY/tick/2015/DAT_ASCII_EURJPY_T_201504.zip": {
+          "rows": 2200943,
+          "sha256": "05b7a241b5d174e5a10ff9cd0374df02db646924a5a1b6e88d6ef755091e7fb0",
+          "size_bytes": 12007633
+        },
+        "EURJPY/tick/2015/DAT_ASCII_EURJPY_T_201505.zip": {
+          "rows": 2222544,
+          "sha256": "6901357b3a95c80c1d5a8b0177d7c70f1a681d74c030c3a20792352fdd94c3ea",
+          "size_bytes": 11985071
+        },
+        "EURJPY/tick/2015/DAT_ASCII_EURJPY_T_201506.zip": {
+          "rows": 2564791,
+          "sha256": "ff67534f711454e305e15c239d48847d3aa2905356c7353c800ce0f4db435852",
+          "size_bytes": 13796432
+        },
+        "EURJPY/tick/2015/DAT_ASCII_EURJPY_T_201507.zip": {
+          "rows": 2497318,
+          "sha256": "df64603cf1eb79473d3aff193d0f63a78fe4bdb1fe6b789242f909f356085e20",
+          "size_bytes": 13130731
+        },
+        "EURJPY/tick/2015/DAT_ASCII_EURJPY_T_201508.zip": {
+          "rows": 2270118,
+          "sha256": "b9151aae21b0bd113a8f3c772f5547582048b695f429783a7f07e93db5642da8",
+          "size_bytes": 12059349
+        },
+        "EURJPY/tick/2015/DAT_ASCII_EURJPY_T_201509.zip": {
+          "rows": 2439166,
+          "sha256": "916a0585a583a8267e277638d39576463f34c94b8fd11b8584bb53893a8d0336",
+          "size_bytes": 12819232
+        },
+        "EURJPY/tick/2015/DAT_ASCII_EURJPY_T_201510.zip": {
+          "rows": 2212168,
+          "sha256": "95ccda6386a90427c0804fb882a70c408e43c6b442a62bbbc9c1b2e980c9fde0",
+          "size_bytes": 11405141
+        },
+        "EURJPY/tick/2015/DAT_ASCII_EURJPY_T_201511.zip": {
+          "rows": 1993957,
+          "sha256": "a23a3bf7aa4c717701e76206727a581a9cc340efccea66ec0f31211a26012b8b",
+          "size_bytes": 10198916
+        },
+        "EURJPY/tick/2015/DAT_ASCII_EURJPY_T_201512.zip": {
+          "rows": 2232057,
+          "sha256": "d607baf798cbb2a989b0709ae7d9e98028a3b8e9c0c893ee1e65428d2ebe5df0",
+          "size_bytes": 11499948
+        },
+        "EURJPY/tick/2016/DAT_ASCII_EURJPY_T_201601.zip": {
+          "rows": 2943508,
+          "sha256": "a67526ede6361626fdac64f830a318862df0ab71120b64e12a4f5f2069d46450",
+          "size_bytes": 15254931
+        },
+        "EURJPY/tick/2016/DAT_ASCII_EURJPY_T_201602.zip": {
+          "rows": 3366554,
+          "sha256": "c09e095d8a4285d4fb3aa2c57b931e71d294545a5b140214427673d8a76f182e",
+          "size_bytes": 17434445
+        },
+        "EURJPY/tick/2016/DAT_ASCII_EURJPY_T_201603.zip": {
+          "rows": 2616760,
+          "sha256": "e33d4131828f4abd88f2483bdd9c25ac839f10805b9602c2a456215114e95a8c",
+          "size_bytes": 13558454
+        },
+        "EURJPY/tick/2016/DAT_ASCII_EURJPY_T_201604.zip": {
+          "rows": 2429390,
+          "sha256": "3fa52cc9a674846fcd2b5446ef5788acb572f10998380112bc4abfa2bc421f15",
+          "size_bytes": 12720931
+        },
+        "EURJPY/tick/2016/DAT_ASCII_EURJPY_T_201605.zip": {
+          "rows": 2239397,
+          "sha256": "c86214e0598342429ed535165b65276baba7bbc90e31f2cc0c17eeed836525ae",
+          "size_bytes": 11601332
+        },
+        "EURJPY/tick/2016/DAT_ASCII_EURJPY_T_201606.zip": {
+          "rows": 2635510,
+          "sha256": "4c14686dfc22c5206c21b6fb8c5560fdd035659c6ca49967f7dfd49cd02361d7",
+          "size_bytes": 14323083
+        },
+        "EURJPY/tick/2016/DAT_ASCII_EURJPY_T_201607.zip": {
+          "rows": 1900177,
+          "sha256": "b376a9fbd1bf130a431dfbc865d1e80229b799525853e0b18ebe84206c9cd45d",
+          "size_bytes": 10645526
+        },
+        "EURJPY/tick/2016/DAT_ASCII_EURJPY_T_201608.zip": {
+          "rows": 1282990,
+          "sha256": "7d573bcf266943e65e0286c84edc34dc6f973eeb423d92884c10bba3b38ac7ca",
+          "size_bytes": 7000678
+        },
+        "EURJPY/tick/2016/DAT_ASCII_EURJPY_T_201609.zip": {
+          "rows": 1708775,
+          "sha256": "a6fe9c69d21d205ee8d0bdc48b1f823aa6d666cb0ec4a5ad22877d368996481b",
+          "size_bytes": 9184619
+        },
+        "EURJPY/tick/2016/DAT_ASCII_EURJPY_T_201610.zip": {
+          "rows": 1685236,
+          "sha256": "4f4fae8e85f04ec8a959af5a8ee5715a9df0ab8dd4af1c56221acc70b5b42b4c",
+          "size_bytes": 8924030
+        },
+        "EURJPY/tick/2016/DAT_ASCII_EURJPY_T_201611.zip": {
+          "rows": 2451630,
+          "sha256": "73d2184c936f77ea78072e6ae193b352c01e86311b6b2636454085a3d32c7ef8",
+          "size_bytes": 13200784
+        },
+        "EURJPY/tick/2016/DAT_ASCII_EURJPY_T_201612.zip": {
+          "rows": 1972665,
+          "sha256": "3d441ff4e561b1623f80978def8614e7d345afa49df283e76316cadf78f5793b",
+          "size_bytes": 10474825
+        },
+        "EURJPY/tick/2017/DAT_ASCII_EURJPY_T_201701.zip": {
+          "rows": 2545694,
+          "sha256": "ebc7e6192567e404f3cf04ab4de02579e72cfc6edc6bc5411ee7e2c5bb706915",
+          "size_bytes": 13242918
+        },
+        "EURJPY/tick/2017/DAT_ASCII_EURJPY_T_201702.zip": {
+          "rows": 2251440,
+          "sha256": "19b64f865f4bb6732c07ef33b426351ec5050f2a2d7bd7a508cb9f989fc3618f",
+          "size_bytes": 11465566
+        },
+        "EURJPY/tick/2017/DAT_ASCII_EURJPY_T_201703.zip": {
+          "rows": 2193692,
+          "sha256": "7ef5efe2b73ef9f19cd27eb45f6af24855841b0c79dd482cb4aa3f602c3842ec",
+          "size_bytes": 11318948
+        },
+        "EURJPY/tick/2017/DAT_ASCII_EURJPY_T_201704.zip": {
+          "rows": 1907241,
+          "sha256": "d9dacf727ed866f4057effb8dd1c4740b34ce2c62497f342ddab65327b9e3c9e",
+          "size_bytes": 9943021
+        },
+        "EURJPY/tick/2017/DAT_ASCII_EURJPY_T_201705.zip": {
+          "rows": 2041376,
+          "sha256": "82f3e6968ebeb474bbdfcaf9d3fcf9e083c76352e193a76d58467aee6d2285ce",
+          "size_bytes": 10771957
+        },
+        "EURJPY/tick/2017/DAT_ASCII_EURJPY_T_201706.zip": {
+          "rows": 2073768,
+          "sha256": "8596eebf5c5659d430849698d95063b86698bfcd3133141def80a9968a17614d",
+          "size_bytes": 10529905
+        },
+        "EURJPY/tick/2017/DAT_ASCII_EURJPY_T_201707.zip": {
+          "rows": 2575412,
+          "sha256": "97d7bd49c5195db736f93119ccb2bdec4a24af492077cdf68adb76cc4a7a9808",
+          "size_bytes": 12646725
+        },
+        "EURJPY/tick/2017/DAT_ASCII_EURJPY_T_201708.zip": {
+          "rows": 2844803,
+          "sha256": "3a26dfedd50a26a7043169d4e1e8ba1d4061d690d70f78be20fa7028c6db1ae5",
+          "size_bytes": 13849873
+        },
+        "EURJPY/tick/2017/DAT_ASCII_EURJPY_T_201709.zip": {
+          "rows": 2148050,
+          "sha256": "fd66eb41a9d85514f16607446a032bb55a54baff5344cd03e6ce9869df39c5df",
+          "size_bytes": 11026470
+        },
+        "EURJPY/tick/2017/DAT_ASCII_EURJPY_T_201710.zip": {
+          "rows": 1708389,
+          "sha256": "f30fe328221ae4c7887e57c503cd7f6c48891dfdbddac4747cffa8115672149a",
+          "size_bytes": 8729941
+        },
+        "EURJPY/tick/2017/DAT_ASCII_EURJPY_T_201711.zip": {
+          "rows": 1739991,
+          "sha256": "a64fd9f13c27dad079dc3898eaecbb5ef60ca127377858acfc62a5322e786ec7",
+          "size_bytes": 8856869
+        },
+        "EURJPY/tick/2017/DAT_ASCII_EURJPY_T_201712.zip": {
+          "rows": 1532268,
+          "sha256": "dba82706b0803e17c415b15d463cb1a6ce6597b9ee9246b47eb77ec2356863fd",
+          "size_bytes": 7717641
+        },
+        "EURJPY/tick/2018/DAT_ASCII_EURJPY_T_201801.zip": {
+          "rows": 2052124,
+          "sha256": "9d4d7647c49b33e1f191e86dc4940b297e5b8527f320133f1901fc7c035e96c2",
+          "size_bytes": 10683195
+        },
+        "EURJPY/tick/2018/DAT_ASCII_EURJPY_T_201802.zip": {
+          "rows": 2233329,
+          "sha256": "fb229cd5eaba278e6daf336d9d31f2563caa1cc89c70a5b22c1a05e0f9fae076",
+          "size_bytes": 11900780
+        },
+        "EURJPY/tick/2018/DAT_ASCII_EURJPY_T_201803.zip": {
+          "rows": 2291732,
+          "sha256": "e7836c108ca5354ba6cbf068215ff41617fe5d66901c655823d7910d9fbda082",
+          "size_bytes": 11892835
+        },
+        "EURJPY/tick/2018/DAT_ASCII_EURJPY_T_201804.zip": {
+          "rows": 1532033,
+          "sha256": "709fd2c50e03a96939a758fc57573af6802eb18f59b34423042a8dc5d09536ec",
+          "size_bytes": 7957284
+        },
+        "EURJPY/tick/2018/DAT_ASCII_EURJPY_T_201805.zip": {
+          "rows": 2011267,
+          "sha256": "23a0d307276fa5abe05f940a09d2f07e6ed48c05decc1ba27fa427e15859a55b",
+          "size_bytes": 10971945
+        },
+        "EURJPY/tick/2018/DAT_ASCII_EURJPY_T_201806.zip": {
+          "rows": 1834284,
+          "sha256": "bf25d79fe0c362b965b412911d87955fe6c7f2e51232af1ff073841ea75eb482",
+          "size_bytes": 9842563
+        },
+        "EURJPY/tick/2018/DAT_ASCII_EURJPY_T_201807.zip": {
+          "rows": 2113932,
+          "sha256": "df21e3a032e3f121e67793feb634812444c5c7d9a15283d646c02417fab96f28",
+          "size_bytes": 10694264
+        },
+        "EURJPY/tick/2018/DAT_ASCII_EURJPY_T_201808.zip": {
+          "rows": 1815689,
+          "sha256": "950e84f4b618df4b9e8b8ab92bd7fb302cb024d54b3b17b838cd81b4f5f5956f",
+          "size_bytes": 9521866
+        },
+        "EURJPY/tick/2018/DAT_ASCII_EURJPY_T_201809.zip": {
+          "rows": 1669409,
+          "sha256": "1200156306a8ac34ef7d511a9f7dd91792c949ef8a2c067613290573f8afdf98",
+          "size_bytes": 8687387
+        },
+        "EURJPY/tick/2018/DAT_ASCII_EURJPY_T_201810.zip": {
+          "rows": 2778567,
+          "sha256": "bd40f0424cfa26a0199dd2fd28b9473497a174e83e02e0b560fbc5cefea2b95f",
+          "size_bytes": 14178927
+        },
+        "EURJPY/tick/2018/DAT_ASCII_EURJPY_T_201811.zip": {
+          "rows": 2320944,
+          "sha256": "7132923e8f3c42bbae249992a3b5686de2ac94e7a7b1d0814b1117ba49cad852",
+          "size_bytes": 11732525
+        },
+        "EURJPY/tick/2018/DAT_ASCII_EURJPY_T_201812.zip": {
+          "rows": 3839557,
+          "sha256": "d02179884529fe12bc5de76b7879398c931125a80ee0ffea199e77005e2af0ff",
+          "size_bytes": 21067018
+        },
+        "EURJPY/tick/2019/DAT_ASCII_EURJPY_T_201901.zip": {
+          "rows": 5572733,
+          "sha256": "5d900d3cf7b6b7617b19789d74f4b58e358ca788e6c5df02adbe18156e024431",
+          "size_bytes": 31518005
+        },
+        "EURJPY/tick/2019/DAT_ASCII_EURJPY_T_201902.zip": {
+          "rows": 3799575,
+          "sha256": "b23cc68067eeeef0b81c1d67802efb9ec023b182e96f7f6028d0eb94a6782379",
+          "size_bytes": 21290208
+        },
+        "EURJPY/tick/2019/DAT_ASCII_EURJPY_T_201903.zip": {
+          "rows": 3513595,
+          "sha256": "d5684cb597b1f633646f8bfa39839ab129fa5918faf84d2a90faf6cede7ca8ae",
+          "size_bytes": 20245354
+        },
+        "EURJPY/tick/2019/DAT_ASCII_EURJPY_T_201904.zip": {
+          "rows": 2866685,
+          "sha256": "26f8fb298e45612d77565c5dae91372fb05a98ab11ffdcd20e157f2309aaec11",
+          "size_bytes": 16389682
+        },
+        "EURJPY/tick/2019/DAT_ASCII_EURJPY_T_201905.zip": {
+          "rows": 3783324,
+          "sha256": "992ec1bdbb8096f0a87d92695b142640474b6dbbc1ebfcd24054ea4fb77a2fed",
+          "size_bytes": 21507494
+        },
+        "EURJPY/tick/2019/DAT_ASCII_EURJPY_T_201906.zip": {
+          "rows": 3625772,
+          "sha256": "f3ac4f1fdecc23778f247794cfaafd039edf5113580d2ef1219f8642a3c15d45",
+          "size_bytes": 20456253
+        },
+        "EURJPY/tick/2019/DAT_ASCII_EURJPY_T_201907.zip": {
+          "rows": 3039622,
+          "sha256": "d2203d65717c4a122ec118d36720d3b961b40c0d22c46ee321036afcc71e9f1b",
+          "size_bytes": 17258627
+        },
+        "EURJPY/tick/2019/DAT_ASCII_EURJPY_T_201908.zip": {
+          "rows": 4287426,
+          "sha256": "5ca689162cf12528b155bb4a0b88c475681af45293c045f72d306c3e8ea33a56",
+          "size_bytes": 24821180
+        },
+        "EURJPY/tick/2019/DAT_ASCII_EURJPY_T_201909.zip": {
+          "rows": 3333977,
+          "sha256": "14a4ef23d12a6bd0f84302de0c85f16349e0a899feeeac0cd69147a16bf23682",
+          "size_bytes": 19104960
+        },
+        "EURJPY/tick/2019/DAT_ASCII_EURJPY_T_201910.zip": {
+          "rows": 3689700,
+          "sha256": "6391dec36e359d2f9b9bdea87ae87d0c0eb40255d057d74a9b55a36adcd1c5cc",
+          "size_bytes": 21181721
+        },
+        "EURJPY/tick/2019/DAT_ASCII_EURJPY_T_201911.zip": {
+          "rows": 2465022,
+          "sha256": "04caebf77f3dec00943b6abf803454ce5fdb91067c2360f1984d17ab9d1799a1",
+          "size_bytes": 14157720
+        },
+        "EURJPY/tick/2019/DAT_ASCII_EURJPY_T_201912.zip": {
+          "rows": 2339170,
+          "sha256": "4b7a403e18be5f15e3e1cf13ef86c86496e04ba01f36196fdac2cb0ffa30abea",
+          "size_bytes": 13618629
+        },
+        "EURJPY/tick/2020/DAT_ASCII_EURJPY_T_202001.zip": {
+          "rows": 2695320,
+          "sha256": "048a9cc0cc8fbe9d099c170cfe6c3034b3fffd231506d7b3bf0df4cdcbb22f24",
+          "size_bytes": 15798609
+        },
+        "EURJPY/tick/2020/DAT_ASCII_EURJPY_T_202002.zip": {
+          "rows": 3249833,
+          "sha256": "e77195bfaefee124ebfc12863271c92e27006c2766055d222b63ff11d26d7306",
+          "size_bytes": 18944040
+        },
+        "EURJPY/tick/2020/DAT_ASCII_EURJPY_T_202003.zip": {
+          "rows": 10473611,
+          "sha256": "d23de70f2aea8d85630fde7277d1368c2d67ea722442ee4da7169c1aa6288854",
+          "size_bytes": 64454790
+        },
+        "EURJPY/tick/2020/DAT_ASCII_EURJPY_T_202004.zip": {
+          "rows": 4278016,
+          "sha256": "380635f67ee6afdcee2d90b85e29ee119bbd6f37221997b4941c01c5a4bd65ca",
+          "size_bytes": 25533997
+        },
+        "EURJPY/tick/2020/DAT_ASCII_EURJPY_T_202005.zip": {
+          "rows": 3052831,
+          "sha256": "38793f6232d845ece4ed5d87b5721fbe354fd494e6bc03b2aac5b1123fa2bf4d",
+          "size_bytes": 18146213
+        },
+        "EURJPY/tick/2020/DAT_ASCII_EURJPY_T_202006.zip": {
+          "rows": 4195595,
+          "sha256": "d40618adf0ac09923eab326f61684a1fb476f3220ae282b510fbf402472a03fe",
+          "size_bytes": 25246305
+        },
+        "EURJPY/tick/2020/DAT_ASCII_EURJPY_T_202007.zip": {
+          "rows": 3287406,
+          "sha256": "33c3c0ce9e175372a610e37bf1226ff7f936fdfd5a96419cb6971aba20a98519",
+          "size_bytes": 19604480
+        },
+        "EURJPY/tick/2020/DAT_ASCII_EURJPY_T_202008.zip": {
+          "rows": 3140188,
+          "sha256": "cd6db3923985b3d1ac150405cb6606ef0487a5289c28fbc7162017574e80151d",
+          "size_bytes": 18813679
+        },
+        "EURJPY/tick/2020/DAT_ASCII_EURJPY_T_202009.zip": {
+          "rows": 2968467,
+          "sha256": "05f535a60a69d093da14aa636671dc0522ef771b03f0175899500246c5778f39",
+          "size_bytes": 18187706
+        },
+        "EURJPY/tick/2020/DAT_ASCII_EURJPY_T_202010.zip": {
+          "rows": 2758348,
+          "sha256": "be6ebcd44618567d7c77e99e595ebceb52588bda0cc1ad14d68ee7d9075a33ca",
+          "size_bytes": 16571483
+        },
+        "EURJPY/tick/2020/DAT_ASCII_EURJPY_T_202011.zip": {
+          "rows": 2940155,
+          "sha256": "194229a05a03a938140fb44c11f194c411e958c151e8b7e1173002aa9248f10c",
+          "size_bytes": 17878675
+        },
+        "EURJPY/tick/2020/DAT_ASCII_EURJPY_T_202012.zip": {
+          "rows": 2758638,
+          "sha256": "627157ea88f6fc34a0f8c1921b64ca160dc894107afe77b789b054a19fc2b5e6",
+          "size_bytes": 16743022
+        },
+        "EURJPY/tick/2021/DAT_ASCII_EURJPY_T_202101.zip": {
+          "rows": 2717540,
+          "sha256": "1634c082a78b040d01c11dc4f7c249cfe2bfe810a919b2f26c257f4e00ad8eb9",
+          "size_bytes": 16410161
+        },
+        "EURJPY/tick/2021/DAT_ASCII_EURJPY_T_202102.zip": {
+          "rows": 2167092,
+          "sha256": "a509ab13b5a923f4be6accad72c46adfd6c9f06f3dc2d48bb42fcf80c8c3db46",
+          "size_bytes": 13231010
+        },
+        "EURJPY/tick/2021/DAT_ASCII_EURJPY_T_202103.zip": {
+          "rows": 2786623,
+          "sha256": "e6b637d233e559b8f8cf53542d0d9dab1642352bd756a04bfb4f2f0956a872a6",
+          "size_bytes": 16866914
+        },
+        "EURJPY/tick/2021/DAT_ASCII_EURJPY_T_202104.zip": {
+          "rows": 2043379,
+          "sha256": "01c4865b6797b1aa92a15ca2517003759adc93a8896a448f068aa124782fce34",
+          "size_bytes": 12474474
+        },
+        "EURJPY/tick/2021/DAT_ASCII_EURJPY_T_202105.zip": {
+          "rows": 2113142,
+          "sha256": "530c5c8dc58ed9e628dfdd12688ab29432a277764c29ccb23d92fb6fd78e045d",
+          "size_bytes": 12751237
+        },
+        "EURJPY/tick/2021/DAT_ASCII_EURJPY_T_202106.zip": {
+          "rows": 2071803,
+          "sha256": "424b75584275a22100784cf101bcce8ce024f823f99d2fd1eaf4da6110221c29",
+          "size_bytes": 12475769
+        },
+        "EURJPY/tick/2021/DAT_ASCII_EURJPY_T_202107.zip": {
+          "rows": 2403774,
+          "sha256": "7eb4ac762d327393fc29760c23a2d52f186e0cf640944b70b0e1937de7609116",
+          "size_bytes": 14459571
+        },
+        "EURJPY/tick/2021/DAT_ASCII_EURJPY_T_202108.zip": {
+          "rows": 1630568,
+          "sha256": "9d2698640af5c18f74fd012a452b1a0902647914a85676c02fa6d1046f53805b",
+          "size_bytes": 9927063
+        },
+        "EURJPY/tick/2021/DAT_ASCII_EURJPY_T_202109.zip": {
+          "rows": 1866158,
+          "sha256": "0c5e1d39e9e57118d8137e6289983f79acab06a7715bbe416647fe0395f2e5fd",
+          "size_bytes": 11363484
+        },
+        "EURJPY/tick/2021/DAT_ASCII_EURJPY_T_202110.zip": {
+          "rows": 2198170,
+          "sha256": "19e4edc57ffc33ac5f51b9f1faae720ccd26f9d9dac20515298066a69e01b281",
+          "size_bytes": 13412685
+        },
+        "EURJPY/tick/2021/DAT_ASCII_EURJPY_T_202111.zip": {
+          "rows": 2837017,
+          "sha256": "ffabde1144a13132e33e439fb48524015750df43b0da628415504a44ed2bf740",
+          "size_bytes": 17274913
+        },
+        "EURJPY/tick/2021/DAT_ASCII_EURJPY_T_202112.zip": {
+          "rows": 2402489,
+          "sha256": "5d8a0567e2c40ec069c62b64ca4d70f6d42abbc332f46eb0b3e6de546d8acdd8",
+          "size_bytes": 14676049
+        },
+        "EURJPY/tick/2022/DAT_ASCII_EURJPY_T_202201.zip": {
+          "rows": 2477847,
+          "sha256": "505536cef23dda273f9eece029e0f67f12a46c10e1e179444eb0acdd8e52667c",
+          "size_bytes": 15256918
+        },
+        "EURJPY/tick/2022/DAT_ASCII_EURJPY_T_202202.zip": {
+          "rows": 3118950,
+          "sha256": "bc37ffdda5f2c24603945910acb0b560a872758bde9feb1df7e908feea150b6f",
+          "size_bytes": 19178705
+        },
+        "EURJPY/tick/2022/DAT_ASCII_EURJPY_T_202203.zip": {
+          "rows": 4453692,
+          "sha256": "540edb2242afa018254ba34cdf4122266bd802f52fe1d91e98a054555af3c559",
+          "size_bytes": 27833916
+        },
+        "EURJPY/tick/2022/DAT_ASCII_EURJPY_T_202204.zip": {
+          "rows": 4213989,
+          "sha256": "27cb4b5988b181d0b28c7afd5e680f41660dac84a6300b63faa0d82eae230de2",
+          "size_bytes": 26190910
+        },
+        "EURJPY/tick/2022/DAT_ASCII_EURJPY_T_202205.zip": {
+          "rows": 4581357,
+          "sha256": "cfc73dfdd92b805d6e245437757c1b61f97a9c7d80f426d1f5b715389e3a3d5f",
+          "size_bytes": 28890248
+        },
+        "EURJPY/tick/2022/DAT_ASCII_EURJPY_T_202206.zip": {
+          "rows": 5200868,
+          "sha256": "6bc917c607914d015d031fd30122c68fdc695c17f4bd59953499c3d24c2f7400",
+          "size_bytes": 32377766
+        },
+        "EURJPY/tick/2022/DAT_ASCII_EURJPY_T_202207.zip": {
+          "rows": 5480286,
+          "sha256": "70b5c671c5f60146179109513bd584fa7086672854c55f64fa8753bbb422c408",
+          "size_bytes": 34012568
+        },
+        "EURJPY/tick/2022/DAT_ASCII_EURJPY_T_202208.zip": {
+          "rows": 6269019,
+          "sha256": "1d5380dc31a3e073c6d767fa9602f14415cb29e6243f29867eb0ec14be6d2018",
+          "size_bytes": 37760080
+        },
+        "EURJPY/tick/2022/DAT_ASCII_EURJPY_T_202209.zip": {
+          "rows": 7384536,
+          "sha256": "cb0dc456172a65ef18fd1f018dc2cb9ebb2c26e3db3203f3cf5c5c53aeb6f2b9",
+          "size_bytes": 44872070
+        },
+        "EURJPY/tick/2022/DAT_ASCII_EURJPY_T_202210.zip": {
+          "rows": 6457183,
+          "sha256": "b3a235376ecf134519096a6c04a4483d5764462bf3899e18ea8435e7abcd91dc",
+          "size_bytes": 39213830
+        },
+        "EURJPY/tick/2022/DAT_ASCII_EURJPY_T_202211.zip": {
+          "rows": 5248239,
+          "sha256": "bf2a9da43f67ce4a5f81c055b69629f7fce59cf83bf108904a5e82e9ab72f20f",
+          "size_bytes": 32402610
+        },
+        "EURJPY/tick/2022/DAT_ASCII_EURJPY_T_202212.zip": {
+          "rows": 5206993,
+          "sha256": "cea10340e7870f8940c307a8f9a8da7032d7a122129930d4d6679b326e4f1bd8",
+          "size_bytes": 32406177
+        },
+        "EURJPY/tick/2023/DAT_ASCII_EURJPY_T_202301.zip": {
+          "rows": 5239475,
+          "sha256": "282b642e2822747f5ede4e1a8521ba67570b8754fbfca829ba977e181eb6de67",
+          "size_bytes": 32954379
+        },
+        "EURJPY/tick/2023/DAT_ASCII_EURJPY_T_202302.zip": {
+          "rows": 3935405,
+          "sha256": "64756fc37edcdc8a11eab72498d39b8c1efd560cad7427e5567b34ef34e17b62",
+          "size_bytes": 24364442
+        },
+        "EURJPY/tick/2023/DAT_ASCII_EURJPY_T_202303.zip": {
+          "rows": 4158322,
+          "sha256": "abe6e3331e74eddc419e4f2dc2178bb1c5e42de336fd7206ec8340d24e6c7cf7",
+          "size_bytes": 26237152
+        },
+        "EURJPY/tick/2023/DAT_ASCII_EURJPY_T_202304.zip": {
+          "rows": 2713779,
+          "sha256": "16dbcf0b583230397ff70856674a232b0a6bba2947918838c2083a71e8e48614",
+          "size_bytes": 17099468
+        },
+        "EURJPY/tick/2023/DAT_ASCII_EURJPY_T_202305.zip": {
+          "rows": 3407195,
+          "sha256": "4f9f0d9cb5177c06d52df1867450a0dae28cbb7c29a1eef6d6132a06092a43ef",
+          "size_bytes": 20991818
+        },
+        "EURJPY/tick/2023/DAT_ASCII_EURJPY_T_202306.zip": {
+          "rows": 2993793,
+          "sha256": "bc38ae2df5b265431988b40dd559100bc6268994e965cbc86aeb27e3503ad914",
+          "size_bytes": 18375277
+        },
+        "EURJPY/tick/2023/DAT_ASCII_EURJPY_T_202307.zip": {
+          "rows": 3057951,
+          "sha256": "4b06c9a0855e043112812a4788f1cdebaf029802906a879d07371e01dd0fd655",
+          "size_bytes": 19247980
+        },
+        "EURJPY/tick/2023/DAT_ASCII_EURJPY_T_202308.zip": {
+          "rows": 5131397,
+          "sha256": "82b276d15fdcff2e2cc6dd596221615914039c8cb9673e94d666ec7121dc74da",
+          "size_bytes": 30464363
+        },
+        "EURJPY/tick/2023/DAT_ASCII_EURJPY_T_202309.zip": {
+          "rows": 3287249,
+          "sha256": "dd712881ef9101cfcfe1ef3606b677164b626b79a1fc9af1ef6895fc68287030",
+          "size_bytes": 20216601
+        },
+        "EURJPY/tick/2023/DAT_ASCII_EURJPY_T_202310.zip": {
+          "rows": 3811859,
+          "sha256": "b98b93248e6d2e93003ef43281af8633641637b7e71181f7f192c03bb1b35992",
+          "size_bytes": 23594694
+        },
+        "EURJPY/tick/2023/DAT_ASCII_EURJPY_T_202311.zip": {
+          "rows": 3914044,
+          "sha256": "6c55c1af54787f63df630f34b6e333770292543bd792c90b33264d132b6dbe3c",
+          "size_bytes": 23437976
+        },
+        "EURJPY/tick/2023/DAT_ASCII_EURJPY_T_202312.zip": {
+          "rows": 5073331,
+          "sha256": "dc1e76916639da2c02394729e171b309127f6d9f8a5ad5c991d700f833ee08b2",
+          "size_bytes": 30264333
+        },
+        "EURJPY/tick/2024/DAT_ASCII_EURJPY_T_202401.zip": {
+          "rows": 4753091,
+          "sha256": "41f5c49da670d4f17df2df5977c4505566148acecddc5b706fa11fcec51ea72a",
+          "size_bytes": 29022605
+        },
+        "EURJPY/tick/2024/DAT_ASCII_EURJPY_T_202402.zip": {
+          "rows": 3787333,
+          "sha256": "b3079253c96b700d4befeb51a6d0ad29d74a86828790e226f676fe26198c51cd",
+          "size_bytes": 22856739
+        },
+        "EURJPY/tick/2024/DAT_ASCII_EURJPY_T_202403.zip": {
+          "rows": 3577520,
+          "sha256": "f1bc29840d934134799814a2d57c1a9660d579cfc579bb3f2cc0b7debcd865e0",
+          "size_bytes": 21849343
+        },
+        "EURJPY/tick/2024/DAT_ASCII_EURJPY_T_202404.zip": {
+          "rows": 3595080,
+          "sha256": "8961fdfacf907584fa5d6188cadf61853524a34581db5de1b53e3565343c9638",
+          "size_bytes": 22216018
+        },
+        "EURJPY/tick/2024/DAT_ASCII_EURJPY_T_202405.zip": {
+          "rows": 3051949,
+          "sha256": "3ac0c4692e31c325f7f5e8e74400326786c707c2583e3acadfa3d667414171e4",
+          "size_bytes": 19258362
+        },
+        "EURJPY/tick/2024/DAT_ASCII_EURJPY_T_202406.zip": {
+          "rows": 3109147,
+          "sha256": "f72ddf67d68196c7a23977d3697d3376824edd9f9968475b271cef8067679373",
+          "size_bytes": 19517039
+        },
+        "EURJPY/tick/2024/DAT_ASCII_EURJPY_T_202407.zip": {
+          "rows": 4245083,
+          "sha256": "d6b62bf2372e020365a4ce4924dcde893751291a58ce2c13d6c65ce140d86edc",
+          "size_bytes": 27127033
+        },
+        "EURJPY/tick/2024/DAT_ASCII_EURJPY_T_202408.zip": {
+          "rows": 6474248,
+          "sha256": "92fadf043d7b6056833809511f20512be36a9ed11e25a444a054a69e56f038db",
+          "size_bytes": 41276019
+        },
+        "EURJPY/tick/2024/DAT_ASCII_EURJPY_T_202409.zip": {
+          "rows": 5428782,
+          "sha256": "fdd8e7fa14d914e64565d8a289582a2e5d2ae40db32440218f9408e19308a0aa",
+          "size_bytes": 34195739
+        },
+        "EURJPY/tick/2024/DAT_ASCII_EURJPY_T_202410.zip": {
+          "rows": 4742299,
+          "sha256": "a6aa3353d1ffbe34bc937ae547f4b844e3e52dc0436e3d5a50443fd887076e96",
+          "size_bytes": 29419673
+        },
+        "EURJPY/tick/2024/DAT_ASCII_EURJPY_T_202411.zip": {
+          "rows": 6116168,
+          "sha256": "893148777ca0e0eac14b0a51db0cc42e1d33d9f9d7e96b13282e35d5c36ec82b",
+          "size_bytes": 37349966
+        },
+        "EURJPY/tick/2024/DAT_ASCII_EURJPY_T_202412.zip": {
+          "rows": 4891580,
+          "sha256": "8c960ca796297c90e5849c2af8b3b6f03298d87e58939794d681d2997d2926d0",
+          "size_bytes": 30107342
+        },
+        "EURJPY/tick/2025/DAT_ASCII_EURJPY_T_202501.zip": {
+          "rows": 5297042,
+          "sha256": "1ceaac02c349b635cf94267b3e738e95eb38d3acff5f5c2560d8f4cef429b638",
+          "size_bytes": 32895743
+        },
+        "EURJPY/tick/2025/DAT_ASCII_EURJPY_T_202502.zip": {
+          "rows": 5078809,
+          "sha256": "3f8bf2d778b9f918298cd641701c63d6ff65996d9333a537dc4935b72ab88317",
+          "size_bytes": 31486763
+        },
+        "EURJPY/tick/2025/DAT_ASCII_EURJPY_T_202503.zip": {
+          "rows": 6286330,
+          "sha256": "9f80541b2682440c1fd7b57f64c6dd0c32a2a3faec93286c788e2b831cbade2c",
+          "size_bytes": 39489291
+        },
+        "EURJPY/tick/2025/DAT_ASCII_EURJPY_T_202504.zip": {
+          "rows": 7167268,
+          "sha256": "383448d6a5a2845776b709f968a7ab4168dbb24ef2762c03bfc38453cbdd6842",
+          "size_bytes": 46101613
+        },
+        "EURJPY/tick/2025/DAT_ASCII_EURJPY_T_202505.zip": {
+          "rows": 3230664,
+          "sha256": "6ef74910821a10097861eff77f1299a9839a94e8ac785cfb12b180a6364d4765",
+          "size_bytes": 20433667
+        },
+        "EURJPY/tick/2025/DAT_ASCII_EURJPY_T_202506.zip": {
+          "rows": 2902611,
+          "sha256": "0cfd94baeb2fc4db741d938685cee8dcebc2a529567b7c1137b24369b624c9a0",
+          "size_bytes": 18289705
+        },
+        "EURJPY/tick/2025/DAT_ASCII_EURJPY_T_202507.zip": {
+          "rows": 2975117,
+          "sha256": "e254fc14cd080f560970bdc455bdb6f9e279302d4b0482cd89eb3316289a4eed",
+          "size_bytes": 18876209
+        },
+        "EURJPY/tick/2025/DAT_ASCII_EURJPY_T_202508.zip": {
+          "rows": 2723434,
+          "sha256": "737c1c7e4e218a981d5bb7ecba7c28751ae4bd4ebdb05eb03d0e325b4f41003c",
+          "size_bytes": 17364929
+        },
+        "EURJPY/tick/2025/DAT_ASCII_EURJPY_T_202509.zip": {
+          "rows": 3061482,
+          "sha256": "548bed5bda1f529d2eb253c68aef61032468efa55cab21c8871b7fa125948495",
+          "size_bytes": 19166407
+        },
+        "EURJPY/tick/2025/DAT_ASCII_EURJPY_T_202510.zip": {
+          "rows": 3588732,
+          "sha256": "bb836f70ca647ad483fec65b8afc4179e4426603e91ee9298c187f53100dbd58",
+          "size_bytes": 22493551
+        },
+        "EURJPY/tick/2025/DAT_ASCII_EURJPY_T_202511.zip": {
+          "rows": 2959404,
+          "sha256": "62de4c3f56e2f92287acafc4fa3179e4dc75342c7a4f25fe23797e9d23cd2bc5",
+          "size_bytes": 18555806
+        },
+        "EURJPY/tick/2025/DAT_ASCII_EURJPY_T_202512.zip": {
+          "rows": 2810502,
+          "sha256": "0eac097fd8f491caa7889ffcc86a22cf318d7f36954d9660f7f96424c51501d7",
+          "size_bytes": 17553146
+        },
+        "EURJPY/tick/2026/DAT_ASCII_EURJPY_T_202601.zip": {
+          "rows": 3266999,
+          "sha256": "56cd4ec99674d0fe22277d30cacb4ef728a20cc58e8f258de70754d5fca151ee",
+          "size_bytes": 20782540
+        },
+        "EURJPY/tick/2026/DAT_ASCII_EURJPY_T_202602.zip": {
+          "rows": 3391698,
+          "sha256": "09d6e881bf161b2883f6f57e2cf4657e2a34b770b1c8bc4c33a2e1b13e613a1e",
+          "size_bytes": 21691604
+        },
+        "EURJPY/tick/2026/DAT_ASCII_EURJPY_T_202603.zip": {
+          "rows": 4882226,
+          "sha256": "7c9cab69600361ec176f7aac410d3860778fe2b685cee44ab040b77a24f85e35",
+          "size_bytes": 30187823
+        },
+        "EURJPY/tick/2026/DAT_ASCII_EURJPY_T_202604.zip": {
+          "rows": 1411221,
+          "sha256": "40e72bee25d4df7761e77536e0b9a45d1b72be8602d9e506cf4f17188ec3ed07",
+          "size_bytes": 8608358
+        }
+      },
+      "latest_month": "202604",
+      "total_files": 196,
+      "total_size_bytes": 2973945893
+    },
+    "EURNZD": {
+      "earliest_month": "201001",
+      "files": {
+        "EURNZD/tick/2010/DAT_ASCII_EURNZD_T_201001.zip": {
+          "rows": 685399,
+          "sha256": "00f45ae0194e192438bcd511f5f1dc7845957b613ad7ee9a21899eefaf02f76f",
+          "size_bytes": 2868605
+        },
+        "EURNZD/tick/2010/DAT_ASCII_EURNZD_T_201002.zip": {
+          "rows": 721671,
+          "sha256": "2cdc51f4a5f693b937cabeb12b53dbdfa763c3e9fe3dc8d49ffb012b3096c7b1",
+          "size_bytes": 2995302
+        },
+        "EURNZD/tick/2010/DAT_ASCII_EURNZD_T_201003.zip": {
+          "rows": 862943,
+          "sha256": "cdb119c5f025573a83b4ed75e9073453571c517f9de5aaa8ccd879d1d524e8f7",
+          "size_bytes": 3366974
+        },
+        "EURNZD/tick/2010/DAT_ASCII_EURNZD_T_201004.zip": {
+          "rows": 880151,
+          "sha256": "f0a393205bf8d5cf3a6903549679d6e04eccc6647de19f6c169d61b97b3b5178",
+          "size_bytes": 3222962
+        },
+        "EURNZD/tick/2010/DAT_ASCII_EURNZD_T_201005.zip": {
+          "rows": 1140670,
+          "sha256": "21f770bfeb01c95aa8aeef885b42dddd48a1284d93268c48cc73dd594a100e3f",
+          "size_bytes": 4558819
+        },
+        "EURNZD/tick/2010/DAT_ASCII_EURNZD_T_201006.zip": {
+          "rows": 930186,
+          "sha256": "e099715f2dadc444ab1aa14c4c162438a0af4cff2860397b542cb01808391419",
+          "size_bytes": 3720861
+        },
+        "EURNZD/tick/2010/DAT_ASCII_EURNZD_T_201007.zip": {
+          "rows": 790177,
+          "sha256": "6473a7aa065470bc54225f1bf4a30879e28d73c0349cd0a66a3b33ecb45e1f2b",
+          "size_bytes": 3148465
+        },
+        "EURNZD/tick/2010/DAT_ASCII_EURNZD_T_201008.zip": {
+          "rows": 825732,
+          "sha256": "33a9392bb8aa5c2b63a58dfeb614d6c2e99193ffb85b20a30783a52732ac56db",
+          "size_bytes": 3285009
+        },
+        "EURNZD/tick/2010/DAT_ASCII_EURNZD_T_201009.zip": {
+          "rows": 776884,
+          "sha256": "574e7101def7c5132b7078dd891c51ffe4a68375e46f93f090b2397ef4c77513",
+          "size_bytes": 3054652
+        },
+        "EURNZD/tick/2010/DAT_ASCII_EURNZD_T_201010.zip": {
+          "rows": 667826,
+          "sha256": "8de5db346e2afc671b82c10bc5cfa8b82ac1cd94818b529b9a43be02a3084ce7",
+          "size_bytes": 2514364
+        },
+        "EURNZD/tick/2010/DAT_ASCII_EURNZD_T_201011.zip": {
+          "rows": 751626,
+          "sha256": "dd021b237038c038569346f0162c8a4c1584f36e6cc9e1ed51998a93cdeb66b3",
+          "size_bytes": 2800645
+        },
+        "EURNZD/tick/2010/DAT_ASCII_EURNZD_T_201012.zip": {
+          "rows": 607840,
+          "sha256": "5e95559578300aefc43692d96027a223f5f2272ae6eeaa2b3ecc14dc713d9ef9",
+          "size_bytes": 2286587
+        },
+        "EURNZD/tick/2011/DAT_ASCII_EURNZD_T_201101.zip": {
+          "rows": 682969,
+          "sha256": "265acf093b582156cb91d9b443986006328d0da02bcf09d4cb23b20b487af16f",
+          "size_bytes": 2558664
+        },
+        "EURNZD/tick/2011/DAT_ASCII_EURNZD_T_201102.zip": {
+          "rows": 618443,
+          "sha256": "d96b47e6b8462d11bad0c8bf62426c64206552a7a5949a2c141915c8f03e9c4f",
+          "size_bytes": 2282570
+        },
+        "EURNZD/tick/2011/DAT_ASCII_EURNZD_T_201103.zip": {
+          "rows": 656758,
+          "sha256": "476b45702c88c3c296ffa3633732af8edcb11183f6ce267fe8e12cf8bded838d",
+          "size_bytes": 2492148
+        },
+        "EURNZD/tick/2011/DAT_ASCII_EURNZD_T_201104.zip": {
+          "rows": 533556,
+          "sha256": "0d06d57cf63c7ac1447f3540521551394a50399ea9a3a2c5e7fb1af30cc25076",
+          "size_bytes": 2260031
+        },
+        "EURNZD/tick/2011/DAT_ASCII_EURNZD_T_201105.zip": {
+          "rows": 726491,
+          "sha256": "258b5cc2436418d61740bb2be77f7111f4c1f612bc32437459037b6eada402bc",
+          "size_bytes": 3908388
+        },
+        "EURNZD/tick/2011/DAT_ASCII_EURNZD_T_201106.zip": {
+          "rows": 765522,
+          "sha256": "0b79440aa17e002130bb403cd9e41fd84f1e3b7dbc49359853ff5e7cec6c8a49",
+          "size_bytes": 3969750
+        },
+        "EURNZD/tick/2011/DAT_ASCII_EURNZD_T_201107.zip": {
+          "rows": 874789,
+          "sha256": "793266164ffd2bd61944834bdab7e037da327e8483531caf1105be035a1548e0",
+          "size_bytes": 4640707
+        },
+        "EURNZD/tick/2011/DAT_ASCII_EURNZD_T_201108.zip": {
+          "rows": 1089466,
+          "sha256": "537d72e13af6c8b3a650916e6ca24c829c9df600e8e75196825a336b761aaaac",
+          "size_bytes": 5758622
+        },
+        "EURNZD/tick/2011/DAT_ASCII_EURNZD_T_201109.zip": {
+          "rows": 809441,
+          "sha256": "19117b6713f8f7d0b50a4b83b288960b86c58ac68e0cce5242c803a88511e158",
+          "size_bytes": 4401570
+        },
+        "EURNZD/tick/2011/DAT_ASCII_EURNZD_T_201110.zip": {
+          "rows": 709621,
+          "sha256": "e0d52d55ec8ad6682ed30034251de22341625227e354a1f05a59fe592d6b7594",
+          "size_bytes": 3859736
+        },
+        "EURNZD/tick/2011/DAT_ASCII_EURNZD_T_201111.zip": {
+          "rows": 899670,
+          "sha256": "7d6837b069f17578d61e5f171691fd3d7f9cd9481bac32233a63250d7beef48e",
+          "size_bytes": 4860878
+        },
+        "EURNZD/tick/2011/DAT_ASCII_EURNZD_T_201112.zip": {
+          "rows": 817240,
+          "sha256": "0a6db81d2b3a8ad9bf303f6771782cbc794b833b7e3882d3d1f793a11e62fb1c",
+          "size_bytes": 5114061
+        },
+        "EURNZD/tick/2012/DAT_ASCII_EURNZD_T_201201.zip": {
+          "rows": 953125,
+          "sha256": "654cfb1056d7f00b01a70affe902e6511ceee6a7f3e716056b7e0c3a09255147",
+          "size_bytes": 5876044
+        },
+        "EURNZD/tick/2012/DAT_ASCII_EURNZD_T_201202.zip": {
+          "rows": 1553683,
+          "sha256": "1221caefb6eca80d520e88ebefe4ed7dd81291c74060a36c5eda5f86b55549b6",
+          "size_bytes": 9016840
+        },
+        "EURNZD/tick/2012/DAT_ASCII_EURNZD_T_201203.zip": {
+          "rows": 1299297,
+          "sha256": "c16e1687b85fbeb489d7e2cc313260eadcd4d02f9dd3e59e0f3dc0957d95303b",
+          "size_bytes": 7768304
+        },
+        "EURNZD/tick/2012/DAT_ASCII_EURNZD_T_201204.zip": {
+          "rows": 1176066,
+          "sha256": "474db5858eb95fd07509b07439e123efe2b66c1d53c97730f4c88b180162b462",
+          "size_bytes": 7036595
+        },
+        "EURNZD/tick/2012/DAT_ASCII_EURNZD_T_201205.zip": {
+          "rows": 1627304,
+          "sha256": "44f218a39367081390ec7b0809eef40fa4ce6b454bc4012eeeaa5e913707526e",
+          "size_bytes": 9715519
+        },
+        "EURNZD/tick/2012/DAT_ASCII_EURNZD_T_201206.zip": {
+          "rows": 1307645,
+          "sha256": "3209cd4a98c8a37e7ab959080b916159f079345b2c573fd39571eee39f1466e0",
+          "size_bytes": 7829370
+        },
+        "EURNZD/tick/2012/DAT_ASCII_EURNZD_T_201207.zip": {
+          "rows": 962775,
+          "sha256": "0c934e25565b118298b4bd88e40a07fbc180e7eeb5e1677d5f3bf68318c1d788",
+          "size_bytes": 5843028
+        },
+        "EURNZD/tick/2012/DAT_ASCII_EURNZD_T_201208.zip": {
+          "rows": 780374,
+          "sha256": "9ebf29ea695adf719b93456e02f7e5143e2e8eea23ab7d74375ec8cd5c332d93",
+          "size_bytes": 4780050
+        },
+        "EURNZD/tick/2012/DAT_ASCII_EURNZD_T_201209.zip": {
+          "rows": 595122,
+          "sha256": "de4345c3fb9864e256f7493f7129f9ec0b520fbb11e3268a7e92421130133486",
+          "size_bytes": 3796975
+        },
+        "EURNZD/tick/2012/DAT_ASCII_EURNZD_T_201210.zip": {
+          "rows": 752344,
+          "sha256": "ce45622b308cad50b02218e959fab896337158a0c93f0925d13acf4620ee5fed",
+          "size_bytes": 4664729
+        },
+        "EURNZD/tick/2012/DAT_ASCII_EURNZD_T_201211.zip": {
+          "rows": 811440,
+          "sha256": "af74376e1ed6e93f5b36b26c6b248013dafebda3bea541df2e88a29d3b1607d7",
+          "size_bytes": 4943673
+        },
+        "EURNZD/tick/2012/DAT_ASCII_EURNZD_T_201212.zip": {
+          "rows": 616584,
+          "sha256": "ec94b7db99ab73ffd4ee7ae76bc00b074d80285e97be47f9b6bec714bae4c13d",
+          "size_bytes": 3821518
+        },
+        "EURNZD/tick/2013/DAT_ASCII_EURNZD_T_201301.zip": {
+          "rows": 912028,
+          "sha256": "b536db4e71ee34eb9102e32549f9250fffc618b20bad7e0f85e58ccd50a0dead",
+          "size_bytes": 5700194
+        },
+        "EURNZD/tick/2013/DAT_ASCII_EURNZD_T_201302.zip": {
+          "rows": 841674,
+          "sha256": "f8d726707604cfde0819b1a49e950e51282eca70a43f34bd10298aa8f7eb5e52",
+          "size_bytes": 5358087
+        },
+        "EURNZD/tick/2013/DAT_ASCII_EURNZD_T_201303.zip": {
+          "rows": 753355,
+          "sha256": "2555ceb3348d319776e13530c1ff554618b33f29f849f5ba01f1912edee2ae40",
+          "size_bytes": 4744567
+        },
+        "EURNZD/tick/2013/DAT_ASCII_EURNZD_T_201304.zip": {
+          "rows": 704342,
+          "sha256": "96e94f6304d923d609aca87883ecbf3f298cb3ee0c5264b4805d719331b23f0a",
+          "size_bytes": 4469400
+        },
+        "EURNZD/tick/2013/DAT_ASCII_EURNZD_T_201305.zip": {
+          "rows": 962952,
+          "sha256": "b6175e8cf714609b1413596eacd4874735eb13804d1f76877f76f226f5f7e6bf",
+          "size_bytes": 6128768
+        },
+        "EURNZD/tick/2013/DAT_ASCII_EURNZD_T_201306.zip": {
+          "rows": 1280255,
+          "sha256": "0f0018cc71a2c45cd41195e508017db601fd2c91fb3b166301a19467a6bfd9cf",
+          "size_bytes": 8233407
+        },
+        "EURNZD/tick/2013/DAT_ASCII_EURNZD_T_201307.zip": {
+          "rows": 1276501,
+          "sha256": "2683b41094ac74d2a1aff081ed62d96bca4fa276414850ca4f074c34ce505a1d",
+          "size_bytes": 8130721
+        },
+        "EURNZD/tick/2013/DAT_ASCII_EURNZD_T_201308.zip": {
+          "rows": 1047488,
+          "sha256": "95f79328cf17bc4d0dda0b1cfba7c63ceed89d6df93a9229c49f3d91b6917b45",
+          "size_bytes": 6735747
+        },
+        "EURNZD/tick/2013/DAT_ASCII_EURNZD_T_201309.zip": {
+          "rows": 833634,
+          "sha256": "34212aad43a70295906fded81c228834a8653fabc3b6e7f626af211adec15b1d",
+          "size_bytes": 5323237
+        },
+        "EURNZD/tick/2013/DAT_ASCII_EURNZD_T_201310.zip": {
+          "rows": 880768,
+          "sha256": "3416f202a54a5cc185f620cdde6d81fc37b6e0f31bc7fa111a2048ac0e29f078",
+          "size_bytes": 5615888
+        },
+        "EURNZD/tick/2013/DAT_ASCII_EURNZD_T_201311.zip": {
+          "rows": 823573,
+          "sha256": "9aa581fe787b24c682cb34fdc0b66e998e122d42894e5234a1c7fa9979219475",
+          "size_bytes": 5294879
+        },
+        "EURNZD/tick/2013/DAT_ASCII_EURNZD_T_201312.zip": {
+          "rows": 740579,
+          "sha256": "d40358b89808ded080de72aa863d3276d2a59dd6f7727e2de11b16b63e01210a",
+          "size_bytes": 4770162
+        },
+        "EURNZD/tick/2014/DAT_ASCII_EURNZD_T_201401.zip": {
+          "rows": 927738,
+          "sha256": "850ae2d665e06eaa1d5dd9bb15849bb627387ab264298ce3febfaec0a59311b3",
+          "size_bytes": 5920398
+        },
+        "EURNZD/tick/2014/DAT_ASCII_EURNZD_T_201402.zip": {
+          "rows": 724044,
+          "sha256": "8cc4b8dae33bf7cbd72cb8ee919bb45189828b420da2ad27623a9ff38cc407a5",
+          "size_bytes": 4642255
+        },
+        "EURNZD/tick/2014/DAT_ASCII_EURNZD_T_201403.zip": {
+          "rows": 765200,
+          "sha256": "bdc3619203191569f8a0f4a4e2439265b810a659fee0e1cf4ddc15ce8b2cea68",
+          "size_bytes": 4799198
+        },
+        "EURNZD/tick/2014/DAT_ASCII_EURNZD_T_201404.zip": {
+          "rows": 651367,
+          "sha256": "a6fc7d085dcc1d0d09ad6c456cbfa973b5848da8277d4702ebdf80324ece7a01",
+          "size_bytes": 4099725
+        },
+        "EURNZD/tick/2014/DAT_ASCII_EURNZD_T_201405.zip": {
+          "rows": 693909,
+          "sha256": "a1e42e6ccb21e1ff7a2d16d3f76eff49492c5751cb7504fc0938050f24753816",
+          "size_bytes": 4278251
+        },
+        "EURNZD/tick/2014/DAT_ASCII_EURNZD_T_201406.zip": {
+          "rows": 648526,
+          "sha256": "20f44832ebe4796798abec99492d6604deaf85fb47492edf2203b5a21255e6fc",
+          "size_bytes": 3970328
+        },
+        "EURNZD/tick/2014/DAT_ASCII_EURNZD_T_201407.zip": {
+          "rows": 675613,
+          "sha256": "cd51da41653b4b8fc54b2f35ec791986e6a84b22f16bb47be54c80ba8022e54d",
+          "size_bytes": 3985341
+        },
+        "EURNZD/tick/2014/DAT_ASCII_EURNZD_T_201408.zip": {
+          "rows": 769155,
+          "sha256": "77f20a0afa39b4081ea07993fabb74d080441452867adea4889b7b16926b20ff",
+          "size_bytes": 4074068
+        },
+        "EURNZD/tick/2014/DAT_ASCII_EURNZD_T_201409.zip": {
+          "rows": 1139910,
+          "sha256": "b0948317e63ef52d394d570d288ca9a06e9db8de77cf97af42fc63fed01def5f",
+          "size_bytes": 6050632
+        },
+        "EURNZD/tick/2014/DAT_ASCII_EURNZD_T_201410.zip": {
+          "rows": 1189759,
+          "sha256": "97c6e05d3a77c218799f03a76d5bfc073c792f89420912d6f00bfb97e9caa10c",
+          "size_bytes": 7407493
+        },
+        "EURNZD/tick/2014/DAT_ASCII_EURNZD_T_201411.zip": {
+          "rows": 1204394,
+          "sha256": "b3cbfe3c07d7493bd0802ba6eaa269ff46186f69d73e77da74027b079587fd4c",
+          "size_bytes": 7103107
+        },
+        "EURNZD/tick/2014/DAT_ASCII_EURNZD_T_201412.zip": {
+          "rows": 1170468,
+          "sha256": "5e4e3b281f1f015df9df06a5f535008d13472a050c1beb7c22d03e7b8b9c42ed",
+          "size_bytes": 6908586
+        },
+        "EURNZD/tick/2015/DAT_ASCII_EURNZD_T_201501.zip": {
+          "rows": 1499955,
+          "sha256": "d15c07caab6dd0171e2acfd687d1a882cdc9ef3700b80116f5ecf144427a9797",
+          "size_bytes": 8763072
+        },
+        "EURNZD/tick/2015/DAT_ASCII_EURNZD_T_201502.zip": {
+          "rows": 1137957,
+          "sha256": "a4f6ac3221d57015f734a5a6b6177063fa3b5c089c9deb14c0de8e00b6dd4644",
+          "size_bytes": 6708530
+        },
+        "EURNZD/tick/2015/DAT_ASCII_EURNZD_T_201503.zip": {
+          "rows": 1604768,
+          "sha256": "99b4cbeb11aafe75e1aa671349d3247d25e0e3a81c83e73fbc17c7bd0b5558dc",
+          "size_bytes": 9290971
+        },
+        "EURNZD/tick/2015/DAT_ASCII_EURNZD_T_201504.zip": {
+          "rows": 1635882,
+          "sha256": "8924c94cad93541f57c11c4b69f85c5929b23a5410fb204bae69a3a42e7bd6ea",
+          "size_bytes": 9256336
+        },
+        "EURNZD/tick/2015/DAT_ASCII_EURNZD_T_201505.zip": {
+          "rows": 1727971,
+          "sha256": "f36bdbb0c302fc7ec224c2a39b1933efeb0ac41eeb6ec521f43ef92c8cc8c284",
+          "size_bytes": 9794791
+        },
+        "EURNZD/tick/2015/DAT_ASCII_EURNZD_T_201506.zip": {
+          "rows": 2076503,
+          "sha256": "83c5b7a286d2a60c444479de3acb9f684501f4e4e768e0baf1c012d79d714533",
+          "size_bytes": 11699887
+        },
+        "EURNZD/tick/2015/DAT_ASCII_EURNZD_T_201507.zip": {
+          "rows": 1785368,
+          "sha256": "0313c77a1e21699913551c013c685090d83a6003be6c8d3eacdb276d3cd32300",
+          "size_bytes": 10063294
+        },
+        "EURNZD/tick/2015/DAT_ASCII_EURNZD_T_201508.zip": {
+          "rows": 1641223,
+          "sha256": "9dc564684eeebbdab821f9ed7630516d5092de8238f5ccf502394d6a0faad2e6",
+          "size_bytes": 9508426
+        },
+        "EURNZD/tick/2015/DAT_ASCII_EURNZD_T_201509.zip": {
+          "rows": 1307584,
+          "sha256": "a9937e68afdd4103b6f2ea4b10850055d31d1552aa3471535ae3b4ec0e2969f8",
+          "size_bytes": 8089770
+        },
+        "EURNZD/tick/2015/DAT_ASCII_EURNZD_T_201510.zip": {
+          "rows": 1150515,
+          "sha256": "cdaee99f7e4fc15e6f57c4c75fe9ca9745132eb12d82a8eaa7a21b477927ed3d",
+          "size_bytes": 6992519
+        },
+        "EURNZD/tick/2015/DAT_ASCII_EURNZD_T_201511.zip": {
+          "rows": 1667394,
+          "sha256": "9591937e00f99a999cbcdea98b4eba010a3555bd82017e157c5a7bc3ffa51146",
+          "size_bytes": 9196693
+        },
+        "EURNZD/tick/2015/DAT_ASCII_EURNZD_T_201512.zip": {
+          "rows": 1914335,
+          "sha256": "2e235463e27bc3a20d94a72d0aa05a7bd449b18a0c25a1492763c2f0004ac81b",
+          "size_bytes": 10483963
+        },
+        "EURNZD/tick/2016/DAT_ASCII_EURNZD_T_201601.zip": {
+          "rows": 2346577,
+          "sha256": "b53e734274f490f3a050a916545c6f68d06a65365719e24055ce989f621d65af",
+          "size_bytes": 13237321
+        },
+        "EURNZD/tick/2016/DAT_ASCII_EURNZD_T_201602.zip": {
+          "rows": 2260199,
+          "sha256": "2847cc545b2957b905d21b6864bb74a5292e71bf5af408940cd75fdf7803c240",
+          "size_bytes": 12553593
+        },
+        "EURNZD/tick/2016/DAT_ASCII_EURNZD_T_201603.zip": {
+          "rows": 1709504,
+          "sha256": "f9cbcf965a63661c01a2ac3a9af71c986183505156fd25dfd02be10d5040aa76",
+          "size_bytes": 9779857
+        },
+        "EURNZD/tick/2016/DAT_ASCII_EURNZD_T_201604.zip": {
+          "rows": 1116215,
+          "sha256": "22df990716305b8e202ed9d1ff35456826bcf3a307b62bc10a9ff852e26adfd9",
+          "size_bytes": 6782656
+        },
+        "EURNZD/tick/2016/DAT_ASCII_EURNZD_T_201605.zip": {
+          "rows": 1077890,
+          "sha256": "955eb992aabebcc699e40e6d50d7672341ecd36425cc5d217bb6fa8d3d7572b8",
+          "size_bytes": 6514131
+        },
+        "EURNZD/tick/2016/DAT_ASCII_EURNZD_T_201606.zip": {
+          "rows": 992578,
+          "sha256": "518f4a23bb410437beb341cb3a5446ec0f25b68285cb48b90d3c6fbb9ac3e7cb",
+          "size_bytes": 6098633
+        },
+        "EURNZD/tick/2016/DAT_ASCII_EURNZD_T_201607.zip": {
+          "rows": 785825,
+          "sha256": "a6f42599bb40a3258fefc5bedc5658018e3683b356c180afeb924989c1953f06",
+          "size_bytes": 4748673
+        },
+        "EURNZD/tick/2016/DAT_ASCII_EURNZD_T_201608.zip": {
+          "rows": 638634,
+          "sha256": "1c28ff33273384cb3fffed04c2912aa7b81b513be9315942329e6ff134be8480",
+          "size_bytes": 3849900
+        },
+        "EURNZD/tick/2016/DAT_ASCII_EURNZD_T_201609.zip": {
+          "rows": 610988,
+          "sha256": "4771eddd6377042557560074dfc38280722104d4d88049e1a08ba75383661e59",
+          "size_bytes": 3727760
+        },
+        "EURNZD/tick/2016/DAT_ASCII_EURNZD_T_201610.zip": {
+          "rows": 631491,
+          "sha256": "15093f1b165b1ae26c893b84fed4103e362595a028cee377e17602910f3f9e47",
+          "size_bytes": 3794956
+        },
+        "EURNZD/tick/2016/DAT_ASCII_EURNZD_T_201611.zip": {
+          "rows": 957167,
+          "sha256": "7d47b5de6c1661b9e1177fc40b55e7745ab45971fd39332e8d86736410894715",
+          "size_bytes": 5756422
+        },
+        "EURNZD/tick/2016/DAT_ASCII_EURNZD_T_201612.zip": {
+          "rows": 1004362,
+          "sha256": "3f5773fafb2bebb12936373e0115c6230dcf14d4a1a102940e2fe1c452da3935",
+          "size_bytes": 5774474
+        },
+        "EURNZD/tick/2017/DAT_ASCII_EURNZD_T_201701.zip": {
+          "rows": 1463908,
+          "sha256": "5bb06adffbe38f7b94870c59842a07cb3af309ff17670878468f9cb0e28a149d",
+          "size_bytes": 8143973
+        },
+        "EURNZD/tick/2017/DAT_ASCII_EURNZD_T_201702.zip": {
+          "rows": 1197533,
+          "sha256": "f0fe99f1ac9822543c41c255cc06f8b2998affe67eb113b94af2dca9f6e56708",
+          "size_bytes": 6579932
+        },
+        "EURNZD/tick/2017/DAT_ASCII_EURNZD_T_201703.zip": {
+          "rows": 1489685,
+          "sha256": "9e9108a9063a31f87b8f613a4a5caadae8fc1b065aac5123004c22b671e22783",
+          "size_bytes": 8349828
+        },
+        "EURNZD/tick/2017/DAT_ASCII_EURNZD_T_201704.zip": {
+          "rows": 1067848,
+          "sha256": "d062766c8d7d759323f17038c0f540ff65735b4ccbbdf7afbc4f7f841426a97e",
+          "size_bytes": 6037400
+        },
+        "EURNZD/tick/2017/DAT_ASCII_EURNZD_T_201705.zip": {
+          "rows": 1294026,
+          "sha256": "7f0ed8c18d782d50608a9d68822383fc682100d7e6bdb1edcb8183302fcce4f3",
+          "size_bytes": 7340320
+        },
+        "EURNZD/tick/2017/DAT_ASCII_EURNZD_T_201706.zip": {
+          "rows": 1373357,
+          "sha256": "9f78b96d6dd9e739db5bbf5a62b1cb6739deb1460ee8640bbd714ee3c9ef9748",
+          "size_bytes": 7604525
+        },
+        "EURNZD/tick/2017/DAT_ASCII_EURNZD_T_201707.zip": {
+          "rows": 1474695,
+          "sha256": "eea5efe98e19ebe9b1ff3b0570b375fa4bbbf655730e4625e43fc85f3bdd9001",
+          "size_bytes": 8231703
+        },
+        "EURNZD/tick/2017/DAT_ASCII_EURNZD_T_201708.zip": {
+          "rows": 1303171,
+          "sha256": "93682cbcab7fde2d471e87beb3549dae24921725bf74052304e4f45ce9141793",
+          "size_bytes": 7372884
+        },
+        "EURNZD/tick/2017/DAT_ASCII_EURNZD_T_201709.zip": {
+          "rows": 957733,
+          "sha256": "2ba333eba131d7227e6fc716730f3dd5c6cfe0267ca31216bfa0ff5d5d0f7e95",
+          "size_bytes": 5705979
+        },
+        "EURNZD/tick/2017/DAT_ASCII_EURNZD_T_201710.zip": {
+          "rows": 1030314,
+          "sha256": "6bb98cfa4f11d01b1d68a88cca78e8fba9bfefd893abd7b7d51afa39167383f2",
+          "size_bytes": 6037534
+        },
+        "EURNZD/tick/2017/DAT_ASCII_EURNZD_T_201711.zip": {
+          "rows": 895106,
+          "sha256": "e131c95284781ebae59b22d816477f3bb346612749c3c9a8605399a50a90d920",
+          "size_bytes": 5244408
+        },
+        "EURNZD/tick/2017/DAT_ASCII_EURNZD_T_201712.zip": {
+          "rows": 702738,
+          "sha256": "c23cda531ab65e723f34ac3472d21f8e259fca618c506f404ffa12c9a3ec70df",
+          "size_bytes": 4182806
+        },
+        "EURNZD/tick/2018/DAT_ASCII_EURNZD_T_201801.zip": {
+          "rows": 1149122,
+          "sha256": "30775d23849c0830d58520f83f98e4a4323a0e4d9778c0f77824ef24f3901ef0",
+          "size_bytes": 6789027
+        },
+        "EURNZD/tick/2018/DAT_ASCII_EURNZD_T_201802.zip": {
+          "rows": 989669,
+          "sha256": "68189130486d24a4b070393ce08e903f844978cd6b1c5aaf47e8163093c388b0",
+          "size_bytes": 6004052
+        },
+        "EURNZD/tick/2018/DAT_ASCII_EURNZD_T_201803.zip": {
+          "rows": 852239,
+          "sha256": "a9e332aaf82bd3c20ad14e831616467e1b826aaba0741988ee63c52dd9fd8a49",
+          "size_bytes": 5164471
+        },
+        "EURNZD/tick/2018/DAT_ASCII_EURNZD_T_201804.zip": {
+          "rows": 808778,
+          "sha256": "74fdcfefd416701de0a4719cedfe5a4fe4b9804b5d7e8a49ae23414e6e29e4f2",
+          "size_bytes": 4765697
+        },
+        "EURNZD/tick/2018/DAT_ASCII_EURNZD_T_201805.zip": {
+          "rows": 1534505,
+          "sha256": "1950bdbf70a4254252ce6ccdcd9554101fd3b131494f2593a40d9b91629a4481",
+          "size_bytes": 8792533
+        },
+        "EURNZD/tick/2018/DAT_ASCII_EURNZD_T_201806.zip": {
+          "rows": 1186337,
+          "sha256": "4cbf3990d4083b9a6639a7f0e531f1f2b3341ef2f36fa452e04bbfbb96e0ce83",
+          "size_bytes": 6762859
+        },
+        "EURNZD/tick/2018/DAT_ASCII_EURNZD_T_201807.zip": {
+          "rows": 1011845,
+          "sha256": "cf8151253b60fbd1543132f7ee87dcfb5798d09ce1d870dec33a44d5690fdec3",
+          "size_bytes": 5892986
+        },
+        "EURNZD/tick/2018/DAT_ASCII_EURNZD_T_201808.zip": {
+          "rows": 1196116,
+          "sha256": "4da09f8f1f55769b9829c01ee9e3e77947979777480ba581991b357795910880",
+          "size_bytes": 6858441
+        },
+        "EURNZD/tick/2018/DAT_ASCII_EURNZD_T_201809.zip": {
+          "rows": 1316562,
+          "sha256": "c4894f24a1a7be7bd4d1f7dcc5a2990086e54994f08bcdabb111c0a16cfa50d1",
+          "size_bytes": 7497103
+        },
+        "EURNZD/tick/2018/DAT_ASCII_EURNZD_T_201810.zip": {
+          "rows": 1921884,
+          "sha256": "089e117960cadbd11667c342916657f0c7c1b929ee1dac4c25f2110629eed26a",
+          "size_bytes": 10630603
+        },
+        "EURNZD/tick/2018/DAT_ASCII_EURNZD_T_201811.zip": {
+          "rows": 1725472,
+          "sha256": "d05fedf47c55c718fbdce529316b4015b82f4d0208a8672961c805d8fd7f2cce",
+          "size_bytes": 9727942
+        },
+        "EURNZD/tick/2018/DAT_ASCII_EURNZD_T_201812.zip": {
+          "rows": 2505460,
+          "sha256": "7f935f0d52a4d365529a575fffc601bb6c8d755c9aefcccf5ecd54db13bd3d62",
+          "size_bytes": 14981227
+        },
+        "EURNZD/tick/2019/DAT_ASCII_EURNZD_T_201901.zip": {
+          "rows": 3696940,
+          "sha256": "83394a8a00d29992fd04d6b34e246ecce247b915f8504d6444d978431afb0650",
+          "size_bytes": 22861559
+        },
+        "EURNZD/tick/2019/DAT_ASCII_EURNZD_T_201902.zip": {
+          "rows": 2708371,
+          "sha256": "9fae3c67bf7ccc6ab56f2343ff9ff0d8a74274b7803a0f2586ba7d821699c154",
+          "size_bytes": 16777906
+        },
+        "EURNZD/tick/2019/DAT_ASCII_EURNZD_T_201903.zip": {
+          "rows": 2772403,
+          "sha256": "7b37ee8ea7026de84eaa477d5893644589ea1bee3731934df25a264a39e0a49e",
+          "size_bytes": 17337728
+        },
+        "EURNZD/tick/2019/DAT_ASCII_EURNZD_T_201904.zip": {
+          "rows": 2210784,
+          "sha256": "48fbd9e53fe508a3662ce8893b2252824e86271629108910b2ac1fc7b9af6902",
+          "size_bytes": 13914769
+        },
+        "EURNZD/tick/2019/DAT_ASCII_EURNZD_T_201905.zip": {
+          "rows": 2044090,
+          "sha256": "ad1a17051d5e3e9d532f4c4a28bbed38c788f094966e1bc28750afbf9fa1da56",
+          "size_bytes": 12741981
+        },
+        "EURNZD/tick/2019/DAT_ASCII_EURNZD_T_201906.zip": {
+          "rows": 2206536,
+          "sha256": "1c649540c8baeea4af6c7780d15d473c1fbdd748f4fae72ce2ac3ad633fa04f6",
+          "size_bytes": 13643914
+        },
+        "EURNZD/tick/2019/DAT_ASCII_EURNZD_T_201907.zip": {
+          "rows": 1958045,
+          "sha256": "92b57dcd014bdd1bf383993748f8a21ed9ef0c25ddfd84af1ee060eb6a731d86",
+          "size_bytes": 12069474
+        },
+        "EURNZD/tick/2019/DAT_ASCII_EURNZD_T_201908.zip": {
+          "rows": 2826481,
+          "sha256": "b682f6267e65175c8593d99b5b1ec6450fb4243b18ab08ac9e0e272af991ff48",
+          "size_bytes": 17568853
+        },
+        "EURNZD/tick/2019/DAT_ASCII_EURNZD_T_201909.zip": {
+          "rows": 2109385,
+          "sha256": "8bd78a8ab2cf24ba1a333f98eccb0bfa6c22370d3b52de281c73d8ebec39e21f",
+          "size_bytes": 13207398
+        },
+        "EURNZD/tick/2019/DAT_ASCII_EURNZD_T_201910.zip": {
+          "rows": 2380477,
+          "sha256": "ed96daafbb3a96ab940338cc81e1af0c50adce961a212974c18da47ac2d66b42",
+          "size_bytes": 14900300
+        },
+        "EURNZD/tick/2019/DAT_ASCII_EURNZD_T_201911.zip": {
+          "rows": 1814219,
+          "sha256": "a663f5b7e00b77b4e137e31f2e6e868e51e0fcf054dba2d011c2717abe453ae2",
+          "size_bytes": 11288931
+        },
+        "EURNZD/tick/2019/DAT_ASCII_EURNZD_T_201912.zip": {
+          "rows": 1811768,
+          "sha256": "61c303a1421cb0d3b34a12362d54a3199301d26403269c18ef110dd3b5f76030",
+          "size_bytes": 11298962
+        },
+        "EURNZD/tick/2020/DAT_ASCII_EURNZD_T_202001.zip": {
+          "rows": 1827741,
+          "sha256": "ca2dc886f57a78249bb89d5c228a20184ccef11863985d2a6032e05dc87feb26",
+          "size_bytes": 11418481
+        },
+        "EURNZD/tick/2020/DAT_ASCII_EURNZD_T_202002.zip": {
+          "rows": 2150912,
+          "sha256": "77de1a59d57c796392d150a244716aecb5ead1bb27ee8c1c6b29d80bea88dcc6",
+          "size_bytes": 13618348
+        },
+        "EURNZD/tick/2020/DAT_ASCII_EURNZD_T_202003.zip": {
+          "rows": 6152086,
+          "sha256": "2393198481deb33ca73218b3b9ea8b74b2068fe8e7fd452605a6bc7be7716238",
+          "size_bytes": 41559138
+        },
+        "EURNZD/tick/2020/DAT_ASCII_EURNZD_T_202004.zip": {
+          "rows": 2845095,
+          "sha256": "5cb16f4a567a78f795902869537102291026c0278e114a78df424625c3462469",
+          "size_bytes": 18835874
+        },
+        "EURNZD/tick/2020/DAT_ASCII_EURNZD_T_202005.zip": {
+          "rows": 2691920,
+          "sha256": "70739cf8d0eabdd500aa6155c39e675cdc3c9a30f9c96d0dac1fa7430b235616",
+          "size_bytes": 17309578
+        },
+        "EURNZD/tick/2020/DAT_ASCII_EURNZD_T_202006.zip": {
+          "rows": 3600612,
+          "sha256": "7924a679d3ff2596bacabd0626fb0684c23939a2d77f9d1e913897253f501e67",
+          "size_bytes": 22800069
+        },
+        "EURNZD/tick/2020/DAT_ASCII_EURNZD_T_202007.zip": {
+          "rows": 3123073,
+          "sha256": "c688f6333701d3451f1ec51b2954c9764a8a5bc650d3e90b1a41365765e4d328",
+          "size_bytes": 19189167
+        },
+        "EURNZD/tick/2020/DAT_ASCII_EURNZD_T_202008.zip": {
+          "rows": 2806249,
+          "sha256": "2f29314f5e07c2b02a1b0d0cfec3cb93c5e8d66ae3c8d27fc38b478cd40a301e",
+          "size_bytes": 17569201
+        },
+        "EURNZD/tick/2020/DAT_ASCII_EURNZD_T_202009.zip": {
+          "rows": 2903688,
+          "sha256": "4b3f5f95a49ef1df71cefd53bb54db6e44cc61b080895b09cebae9136291c3f2",
+          "size_bytes": 18694342
+        },
+        "EURNZD/tick/2020/DAT_ASCII_EURNZD_T_202010.zip": {
+          "rows": 2400527,
+          "sha256": "ab8739b6b8f64c64bdf14f09fae8639fb3cafc267676642815cb0e978e193623",
+          "size_bytes": 15344287
+        },
+        "EURNZD/tick/2020/DAT_ASCII_EURNZD_T_202011.zip": {
+          "rows": 2281932,
+          "sha256": "9d3700ecdb15b25b94da7eb1494800d0119b63dcb47cdec905394b4133af7702",
+          "size_bytes": 14876105
+        },
+        "EURNZD/tick/2020/DAT_ASCII_EURNZD_T_202012.zip": {
+          "rows": 2251295,
+          "sha256": "84a764ccc0a0ce1d3cd88c8fec9c01e7c2b610a604568c83c9bee21775c465b5",
+          "size_bytes": 14514078
+        },
+        "EURNZD/tick/2021/DAT_ASCII_EURNZD_T_202101.zip": {
+          "rows": 2590651,
+          "sha256": "4d129c4e07fa0fdde01a0a20bbe11d6665cb3eb0758eccf790ab03bcdaf4a57d",
+          "size_bytes": 16669504
+        },
+        "EURNZD/tick/2021/DAT_ASCII_EURNZD_T_202102.zip": {
+          "rows": 2356140,
+          "sha256": "f6eb1478b52047b59ff779ddb147ef89279c9825c3ba901dfde3a8a361ca69dc",
+          "size_bytes": 15255204
+        },
+        "EURNZD/tick/2021/DAT_ASCII_EURNZD_T_202103.zip": {
+          "rows": 2815204,
+          "sha256": "8eb774f79a0023b2f789fd7c7645163875942fa85b07784f48b4326eff636ea2",
+          "size_bytes": 18353167
+        },
+        "EURNZD/tick/2021/DAT_ASCII_EURNZD_T_202104.zip": {
+          "rows": 1868735,
+          "sha256": "721babde4de573b0e817fa692aadde33c568b04bcfd1af6cbb72f360109eb130",
+          "size_bytes": 12191819
+        },
+        "EURNZD/tick/2021/DAT_ASCII_EURNZD_T_202105.zip": {
+          "rows": 1992061,
+          "sha256": "7cdc2d1ea9afc349981340c321883ca5bfa912f4a7e7fd16882d808ba417d22b",
+          "size_bytes": 12926147
+        },
+        "EURNZD/tick/2021/DAT_ASCII_EURNZD_T_202106.zip": {
+          "rows": 2106119,
+          "sha256": "bd478dd06152cc44598f45c8c01456940ba4bd8c8d8b981935265011bbb74855",
+          "size_bytes": 13635673
+        },
+        "EURNZD/tick/2021/DAT_ASCII_EURNZD_T_202107.zip": {
+          "rows": 2170039,
+          "sha256": "322eb544e2be290d0e5fc569ef308ebe56ebe95a02499e7aadb9a895e25d6299",
+          "size_bytes": 14279357
+        },
+        "EURNZD/tick/2021/DAT_ASCII_EURNZD_T_202108.zip": {
+          "rows": 1745498,
+          "sha256": "cec81cac1bd7c0b1fb8d34c8b6ea7bd3e29db3182822a75903df86f8c80e001f",
+          "size_bytes": 11574433
+        },
+        "EURNZD/tick/2021/DAT_ASCII_EURNZD_T_202109.zip": {
+          "rows": 2113787,
+          "sha256": "5ccdef85e0e56a2288b47141b215206e4e9fe53733cd10120d4baeece9d916d9",
+          "size_bytes": 13885202
+        },
+        "EURNZD/tick/2021/DAT_ASCII_EURNZD_T_202110.zip": {
+          "rows": 2003565,
+          "sha256": "f97b58597267cf02a02abc997aec97ca7f03409a1535e230468b2d283aeda460",
+          "size_bytes": 13123719
+        },
+        "EURNZD/tick/2021/DAT_ASCII_EURNZD_T_202111.zip": {
+          "rows": 2374335,
+          "sha256": "5dc429e7033987b5e9ec671a7010fc8b219e693d8f151eda82328ad8351a2636",
+          "size_bytes": 15454371
+        },
+        "EURNZD/tick/2021/DAT_ASCII_EURNZD_T_202112.zip": {
+          "rows": 2481781,
+          "sha256": "849c4962e0ec6b9ad11947277fb6f0ded41bb88c3d97a337244191aea1d9f66f",
+          "size_bytes": 15991523
+        },
+        "EURNZD/tick/2022/DAT_ASCII_EURNZD_T_202201.zip": {
+          "rows": 2429022,
+          "sha256": "8189d6898dc5ebf157bc08bf86467946081530628c64ab462a58b1a837cc5bed",
+          "size_bytes": 15717307
+        },
+        "EURNZD/tick/2022/DAT_ASCII_EURNZD_T_202202.zip": {
+          "rows": 2791262,
+          "sha256": "d0eb040d8bef0661b5209b0ddf89881c0838f8d8bcede7c045d214808cd23852",
+          "size_bytes": 18068487
+        },
+        "EURNZD/tick/2022/DAT_ASCII_EURNZD_T_202203.zip": {
+          "rows": 3589468,
+          "sha256": "d485210570718a60f0183996faf2ba8ea32baf412eba462ac88d7c3deb68174f",
+          "size_bytes": 23029299
+        },
+        "EURNZD/tick/2022/DAT_ASCII_EURNZD_T_202204.zip": {
+          "rows": 2725937,
+          "sha256": "4c770fab9b2a1b339b7239c1e8a64818bc6cf32dd28cd040632a005e56dc9436",
+          "size_bytes": 17648567
+        },
+        "EURNZD/tick/2022/DAT_ASCII_EURNZD_T_202205.zip": {
+          "rows": 3522775,
+          "sha256": "20c60d7c03c677db2d4c69c5d2de017633a765afab43cae2d97e3b59b95a84aa",
+          "size_bytes": 22910340
+        },
+        "EURNZD/tick/2022/DAT_ASCII_EURNZD_T_202206.zip": {
+          "rows": 3804513,
+          "sha256": "0560f10a4f146f066ade84b0f80ff7e1783371bb66b42b474df2f5ce3a3cb4fd",
+          "size_bytes": 24762468
+        },
+        "EURNZD/tick/2022/DAT_ASCII_EURNZD_T_202207.zip": {
+          "rows": 3835778,
+          "sha256": "ed478262b5deb593f310995830a487ded9d4f1bbfd6a21e8bfa0b4ac674b81ca",
+          "size_bytes": 24869027
+        },
+        "EURNZD/tick/2022/DAT_ASCII_EURNZD_T_202208.zip": {
+          "rows": 3492983,
+          "sha256": "a728b578a2d7fc2093acde1e15980ac1c2683f05ff53a175100f2d0b9896c19e",
+          "size_bytes": 22870426
+        },
+        "EURNZD/tick/2022/DAT_ASCII_EURNZD_T_202209.zip": {
+          "rows": 4232554,
+          "sha256": "fbcd83df04061b76e0d0ad0a1faa21acb92c00520a2292897d70b79ca8668c2f",
+          "size_bytes": 28019424
+        },
+        "EURNZD/tick/2022/DAT_ASCII_EURNZD_T_202210.zip": {
+          "rows": 4588009,
+          "sha256": "72e94c55405a9d25996fb632291cf1e51c4a84cd4940776ffe5fd9033f0b7e21",
+          "size_bytes": 30849751
+        },
+        "EURNZD/tick/2022/DAT_ASCII_EURNZD_T_202211.zip": {
+          "rows": 3845276,
+          "sha256": "992e8f9ca6bc235d8884d7c49e616840a0f27ff740a615acc83db8254893813e",
+          "size_bytes": 25882404
+        },
+        "EURNZD/tick/2022/DAT_ASCII_EURNZD_T_202212.zip": {
+          "rows": 3768241,
+          "sha256": "de53740bbe6a8e986743fa2f95a9e896039b996d58667c6cf7f9cd6524f5ecc6",
+          "size_bytes": 24975544
+        },
+        "EURNZD/tick/2023/DAT_ASCII_EURNZD_T_202301.zip": {
+          "rows": 3989985,
+          "sha256": "c3b388a7a36376a4895f37693cba24d154e30a2e948a22230a09b5d033322286",
+          "size_bytes": 26607388
+        },
+        "EURNZD/tick/2023/DAT_ASCII_EURNZD_T_202302.zip": {
+          "rows": 2980383,
+          "sha256": "cf86313a2ba10761640102cf76a66551036a6ba235b92e1739bea8e8b101463d",
+          "size_bytes": 19816404
+        },
+        "EURNZD/tick/2023/DAT_ASCII_EURNZD_T_202303.zip": {
+          "rows": 2741237,
+          "sha256": "82684bebd5fe94fe245ef2c585a0d59d0f1009bd3c4980991fbadedbf4a91378",
+          "size_bytes": 18310070
+        },
+        "EURNZD/tick/2023/DAT_ASCII_EURNZD_T_202304.zip": {
+          "rows": 1482391,
+          "sha256": "8896f31fa0035ad05595e19766e1c4a48acfe4ba6635fcaa32f0315bccd708f8",
+          "size_bytes": 10140313
+        },
+        "EURNZD/tick/2023/DAT_ASCII_EURNZD_T_202305.zip": {
+          "rows": 1526993,
+          "sha256": "303e21ad8af62e68076d058d2b8e5669623923cd83190e9c518a3aef85cd0e97",
+          "size_bytes": 10522404
+        },
+        "EURNZD/tick/2023/DAT_ASCII_EURNZD_T_202306.zip": {
+          "rows": 1510642,
+          "sha256": "b9b3969843715e5bffa2866a231140a0bcbf4e7a0b4cf53872dc4432b5812b87",
+          "size_bytes": 10390990
+        },
+        "EURNZD/tick/2023/DAT_ASCII_EURNZD_T_202307.zip": {
+          "rows": 1729647,
+          "sha256": "2a5d71cf29e696a9d2dad0312b690d3b97fea193d5515d8f5f97639832183ddd",
+          "size_bytes": 11875778
+        },
+        "EURNZD/tick/2023/DAT_ASCII_EURNZD_T_202308.zip": {
+          "rows": 2167602,
+          "sha256": "f730c0f7c487b480646fd953d7bdd4d5e88b7bc107cf977134caf2208b8f7890",
+          "size_bytes": 15059228
+        },
+        "EURNZD/tick/2023/DAT_ASCII_EURNZD_T_202309.zip": {
+          "rows": 1797517,
+          "sha256": "9f06c2795a899b95eae0297df5d343ff50cacf84b6099cc65f8a09c7d0fbdcb6",
+          "size_bytes": 12491015
+        },
+        "EURNZD/tick/2023/DAT_ASCII_EURNZD_T_202310.zip": {
+          "rows": 2264068,
+          "sha256": "162b835b0a1c162f8500e5b4f4434806aa46c2f461571030bdbe14b7bf6a8fc2",
+          "size_bytes": 15517731
+        },
+        "EURNZD/tick/2023/DAT_ASCII_EURNZD_T_202311.zip": {
+          "rows": 1877136,
+          "sha256": "0199bc3ac8a2842b7a855268c5ee5a50bf4dd16dd54c675249be159e54858ed3",
+          "size_bytes": 13012524
+        },
+        "EURNZD/tick/2023/DAT_ASCII_EURNZD_T_202312.zip": {
+          "rows": 1929492,
+          "sha256": "cc9a0f24abd32ae135eae4808d9ba3ea015670cf99b22ba120585d84be9748dc",
+          "size_bytes": 13327136
+        },
+        "EURNZD/tick/2024/DAT_ASCII_EURNZD_T_202401.zip": {
+          "rows": 2034920,
+          "sha256": "df49343f056f02f9f2d11eb888df872f8f15162d24b1ee6f16ca9dff8ee43a57",
+          "size_bytes": 14126411
+        },
+        "EURNZD/tick/2024/DAT_ASCII_EURNZD_T_202402.zip": {
+          "rows": 1649562,
+          "sha256": "93aebb797e31e81d9a7825a1a2ba303dcafc93fd2d81b78b2348988b70bedfbe",
+          "size_bytes": 11397439
+        },
+        "EURNZD/tick/2024/DAT_ASCII_EURNZD_T_202403.zip": {
+          "rows": 1376894,
+          "sha256": "9e1c262b1b40d344f7c5a0a5d75fb2a67099a2fcf6f795b6ed9c033c79c1c3f1",
+          "size_bytes": 9533969
+        },
+        "EURNZD/tick/2024/DAT_ASCII_EURNZD_T_202404.zip": {
+          "rows": 1533998,
+          "sha256": "0494b90da1d89ee4f9345d8f93f18436f68cd721ad17a546bd09b41949f8f262",
+          "size_bytes": 10643603
+        },
+        "EURNZD/tick/2024/DAT_ASCII_EURNZD_T_202405.zip": {
+          "rows": 1398428,
+          "sha256": "0e4b7f94c02aca33550312dba53c2b7151a7b95c2e745545bba2abe9fd48823a",
+          "size_bytes": 9722532
+        },
+        "EURNZD/tick/2024/DAT_ASCII_EURNZD_T_202406.zip": {
+          "rows": 1600099,
+          "sha256": "b51b25a7bfbc36a3091d161499455ab89a3a0ce895a492ef6379530989f33ce5",
+          "size_bytes": 10923654
+        },
+        "EURNZD/tick/2024/DAT_ASCII_EURNZD_T_202407.zip": {
+          "rows": 1798433,
+          "sha256": "024fbc26d2a689160a1d47aec3810f01f4d9fef3b514b6dac4e91afa6ea406ed",
+          "size_bytes": 12228096
+        },
+        "EURNZD/tick/2024/DAT_ASCII_EURNZD_T_202408.zip": {
+          "rows": 2408341,
+          "sha256": "e414d9b9adb3426b0032b3a7ba68f6e2d3603fb8689cff3a41c2d2989e9a831e",
+          "size_bytes": 16372904
+        },
+        "EURNZD/tick/2024/DAT_ASCII_EURNZD_T_202409.zip": {
+          "rows": 2607894,
+          "sha256": "11ae078eaa33d19343817f42789c8c456eda4b21f0f0a8858626346b8db8047c",
+          "size_bytes": 17471213
+        },
+        "EURNZD/tick/2024/DAT_ASCII_EURNZD_T_202410.zip": {
+          "rows": 2101031,
+          "sha256": "a58ff355e4a63aa1fd3a5b0a2f2554838fcff7d58a7c1d325d88a342d869fa03",
+          "size_bytes": 14421859
+        },
+        "EURNZD/tick/2024/DAT_ASCII_EURNZD_T_202411.zip": {
+          "rows": 2631611,
+          "sha256": "a2e2670c9e7d67900137cf7672117e9db9ca4b5268b04fdf253a243c96c4c4ac",
+          "size_bytes": 17750051
+        },
+        "EURNZD/tick/2024/DAT_ASCII_EURNZD_T_202412.zip": {
+          "rows": 2050636,
+          "sha256": "b67e1fe808405204dcb75a77fadc6bea2c047325e66e37d81d0a5194b524ff2c",
+          "size_bytes": 14075177
+        },
+        "EURNZD/tick/2025/DAT_ASCII_EURNZD_T_202501.zip": {
+          "rows": 2357852,
+          "sha256": "e555659ad4507340618b75ec0b7b2ea641e8ed79eea4512511db220045517acb",
+          "size_bytes": 16080969
+        },
+        "EURNZD/tick/2025/DAT_ASCII_EURNZD_T_202502.zip": {
+          "rows": 1991997,
+          "sha256": "0bbe99f0b4531e608cd517750cb2ad61c9816075169a34e337c7d8355a409e6d",
+          "size_bytes": 13610553
+        },
+        "EURNZD/tick/2025/DAT_ASCII_EURNZD_T_202503.zip": {
+          "rows": 2289385,
+          "sha256": "2bb9984a6c4e5d4a5c68bb413eff197c14fa071b6e7bb18851877fb42327d0bf",
+          "size_bytes": 15783492
+        },
+        "EURNZD/tick/2025/DAT_ASCII_EURNZD_T_202504.zip": {
+          "rows": 5111039,
+          "sha256": "d12006082a1b2b0ce3a365a2286a542ef67c8912847768c85895521d60539018",
+          "size_bytes": 34997240
+        },
+        "EURNZD/tick/2025/DAT_ASCII_EURNZD_T_202505.zip": {
+          "rows": 2782166,
+          "sha256": "eb96ddd02951f68a776afb4762fc71a902ef791d05e1a29d7365577d3d189cf7",
+          "size_bytes": 19009383
+        },
+        "EURNZD/tick/2025/DAT_ASCII_EURNZD_T_202506.zip": {
+          "rows": 3128057,
+          "sha256": "7bea1ea8704b90b72a118c5c4391360e1403e9a91a1dd65ffc8b1c4df8d7b4aa",
+          "size_bytes": 20661237
+        },
+        "EURNZD/tick/2025/DAT_ASCII_EURNZD_T_202507.zip": {
+          "rows": 3095277,
+          "sha256": "25fc46b5513be8e2b1bb0c7360dc2427bddf31403935b78e70961090a8b88233",
+          "size_bytes": 20280786
+        },
+        "EURNZD/tick/2025/DAT_ASCII_EURNZD_T_202508.zip": {
+          "rows": 2302928,
+          "sha256": "dcfa64b47052f35593e349bbcb56c5de67f7686944c82b58a2f0ec8a5980e05f",
+          "size_bytes": 15250280
+        },
+        "EURNZD/tick/2025/DAT_ASCII_EURNZD_T_202509.zip": {
+          "rows": 2317923,
+          "sha256": "00998339fbf999d07b07f70afbba0e10e4e6225888cb561e569b4a36e3a8fa71",
+          "size_bytes": 15385817
+        },
+        "EURNZD/tick/2025/DAT_ASCII_EURNZD_T_202510.zip": {
+          "rows": 2396641,
+          "sha256": "16e21c7a0889e75fb6d1de16887858874fb35a40bcfb870638fa7a7fa30741e5",
+          "size_bytes": 16098163
+        },
+        "EURNZD/tick/2025/DAT_ASCII_EURNZD_T_202511.zip": {
+          "rows": 1617630,
+          "sha256": "254735341d3a2ba6c06789f31c87614615d87ff7be99414710fefbcfa558c8e0",
+          "size_bytes": 11180971
+        },
+        "EURNZD/tick/2025/DAT_ASCII_EURNZD_T_202512.zip": {
+          "rows": 1819903,
+          "sha256": "1b907b855cb63bd5026d16db042c55cd42e27b9537f589e63f92bd68dc71fed2",
+          "size_bytes": 12343570
+        },
+        "EURNZD/tick/2026/DAT_ASCII_EURNZD_T_202601.zip": {
+          "rows": 2080480,
+          "sha256": "4f1fb425e0549f9c5e4a8ded3ad006ee2282d19b25d58bc1c1049ed73ad6648c",
+          "size_bytes": 14041312
+        },
+        "EURNZD/tick/2026/DAT_ASCII_EURNZD_T_202602.zip": {
+          "rows": 1716614,
+          "sha256": "95c5028ebd113a9f935a749a51945369e2949d637efd0c7afa893640837b66e2",
+          "size_bytes": 11737107
+        },
+        "EURNZD/tick/2026/DAT_ASCII_EURNZD_T_202603.zip": {
+          "rows": 3432779,
+          "sha256": "07da84ed4f3c49443d82542c4c03e574a2982398a2a9e2bcdc4c729932108b6c",
+          "size_bytes": 22652279
+        },
+        "EURNZD/tick/2026/DAT_ASCII_EURNZD_T_202604.zip": {
+          "rows": 811084,
+          "sha256": "24f7fcce925e9a47bc14dbd7e4248608b2c07f5adfd6540ff3c6c0ce12194b00",
+          "size_bytes": 5386547
+        }
+      },
+      "latest_month": "202604",
+      "total_files": 196,
+      "total_size_bytes": 2116453516
     },
     "EURUSD": {
       "earliest_month": "201501",

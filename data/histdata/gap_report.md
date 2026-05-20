@@ -1,6 +1,6 @@
 # HistData coverage and gap report
 
-Generated: 2026-05-19T23:54:00+00:00  
+Generated: 2026-05-20T03:16:55+00:00  
 Window: 201001 → 202604 (196 months)
 
 ## Summary
@@ -9,8 +9,8 @@ Window: 201001 → 202604 (196 months)
 |------|---------:|---------:|---------:|-------|------|--------:|-----------:|
 | AUDCAD | 196 | 196 | 100.0% | 201001 | 202604 |  1873.9 |  319582187 |
 | AUDCHF | 196 | 196 | 100.0% | 201001 | 202604 |  1485.2 |  256041154 |
-| AUDJPY | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
-| AUDNZD | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
+| AUDJPY | 196 | 196 | 100.0% | 201001 | 202604 |  2138.5 |  365519699 |
+| AUDNZD | 196 | 196 | 100.0% | 201001 | 202604 |  1608.1 |  275307102 |
 | AUDUSD | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
 | CADCHF | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
 | CADJPY | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
@@ -35,7 +35,7 @@ Window: 201001 → 202604 (196 months)
 | USDCAD | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
 | USDCHF | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
 | USDJPY | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
-| **TOTAL** | **393** | **5488** | **  7.2%** | — | — | ** 3368.4** | ** 577314835** |
+| **TOTAL** | **785** | **5488** | ** 14.3%** | — | — | ** 7115.1** | **1218141636** |
 
 ## Per-pair detail
 
@@ -53,13 +53,15 @@ Window: 201001 → 202604 (196 months)
 
 ### AUDJPY
 
-- **No months observed.**
-- Real coverage gap (before HistData has data): 196 months, 201001–202604
+- First observed month: **201001**  (real coverage start)
+- Last observed month:  **202604**
+- Observed months: **196 / 196**
 
 ### AUDNZD
 
-- **No months observed.**
-- Real coverage gap (before HistData has data): 196 months, 201001–202604
+- First observed month: **201001**  (real coverage start)
+- Last observed month:  **202604**
+- Observed months: **196 / 196**
 
 ### AUDUSD
 

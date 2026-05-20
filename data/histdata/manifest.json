@@ -1,5 +1,5 @@
 {
-  "downloaded_at": "2026-05-19T23:54:14+00:00",
+  "downloaded_at": "2026-05-20T03:16:41+00:00",
   "pairs": {
     "AUDCAD": {
       "earliest_month": "201001",
@@ -2019,11 +2019,1939 @@
           "rows": 358835,
           "sha256": "185139b3a5ed1786c870038ff558b1dc58a905d8e64a6cf8de097104c74b2053",
           "size_bytes": 1349817
+        },
+        "AUDJPY/tick/2010/DAT_ASCII_AUDJPY_T_201009.zip": {
+          "rows": 334619,
+          "sha256": "3b926effa94d5d2a8bdebcbd27332e4828b5f216c08a2673c5560acbf6967d35",
+          "size_bytes": 1250085
+        },
+        "AUDJPY/tick/2010/DAT_ASCII_AUDJPY_T_201010.zip": {
+          "rows": 342840,
+          "sha256": "2d8d2a6ba8a551e3da75543934f2411b8648e26e394ac7fa8b334e148ed5bce2",
+          "size_bytes": 1256209
+        },
+        "AUDJPY/tick/2010/DAT_ASCII_AUDJPY_T_201011.zip": {
+          "rows": 381433,
+          "sha256": "ec2c9204d167a404634597ff4c77a3f20beceff02fd776cfd95c1168535becad",
+          "size_bytes": 1388286
+        },
+        "AUDJPY/tick/2010/DAT_ASCII_AUDJPY_T_201012.zip": {
+          "rows": 300923,
+          "sha256": "db082db9326409ee4670e2ece544d5003930f044066f5123f3042fccd36eb1ee",
+          "size_bytes": 1116454
+        },
+        "AUDJPY/tick/2011/DAT_ASCII_AUDJPY_T_201101.zip": {
+          "rows": 307166,
+          "sha256": "ab2cd2d878b506ec1aafdf4ec13fdd8be423f47220c2eab8b132195079aa2052",
+          "size_bytes": 1122197
+        },
+        "AUDJPY/tick/2011/DAT_ASCII_AUDJPY_T_201102.zip": {
+          "rows": 273384,
+          "sha256": "0be48bd6fd481a66b071215f0949623a8ec9c116618e15928d6f75da46f5bdf3",
+          "size_bytes": 986064
+        },
+        "AUDJPY/tick/2011/DAT_ASCII_AUDJPY_T_201103.zip": {
+          "rows": 354958,
+          "sha256": "19021220dbc5d55bdac92fa1b1036fbcef0883784f6634c1ccb7af5a6ae53647",
+          "size_bytes": 1325709
+        },
+        "AUDJPY/tick/2011/DAT_ASCII_AUDJPY_T_201104.zip": {
+          "rows": 291826,
+          "sha256": "f54f1ac312e6c65de8678e66f2dc279fdc9e2765b730adcb57b1147e0f58e3cc",
+          "size_bytes": 1209836
+        },
+        "AUDJPY/tick/2011/DAT_ASCII_AUDJPY_T_201105.zip": {
+          "rows": 355382,
+          "sha256": "1db94f8a0d11053e5d1e5fbf651ff7b4f9130be316d460b767d1e115f3845c79",
+          "size_bytes": 1839477
+        },
+        "AUDJPY/tick/2011/DAT_ASCII_AUDJPY_T_201106.zip": {
+          "rows": 335934,
+          "sha256": "feb45f2a2a8331260a925ddefcf8ad46f3ec5cdea88d3ffbc90a5b2880ea2645",
+          "size_bytes": 1713245
+        },
+        "AUDJPY/tick/2011/DAT_ASCII_AUDJPY_T_201107.zip": {
+          "rows": 297143,
+          "sha256": "9c8864f9ca7cd932581590b21c5d2e988e27e30f06deff5a72c4cf044609c252",
+          "size_bytes": 1536002
+        },
+        "AUDJPY/tick/2011/DAT_ASCII_AUDJPY_T_201108.zip": {
+          "rows": 451154,
+          "sha256": "e1a0381b2855e26ac5a2509fefd16852ca66948cde07096ad0e1547425ae634f",
+          "size_bytes": 2314832
+        },
+        "AUDJPY/tick/2011/DAT_ASCII_AUDJPY_T_201109.zip": {
+          "rows": 343184,
+          "sha256": "dc1763fe81605f269d51c1f833d352b661db3d424030b1cd8f0897866bfb8b3b",
+          "size_bytes": 1788068
+        },
+        "AUDJPY/tick/2011/DAT_ASCII_AUDJPY_T_201110.zip": {
+          "rows": 380891,
+          "sha256": "6074b5e3061e866af26754888ef67c1d2017c9abe5173212f80184da197f62dc",
+          "size_bytes": 1968340
+        },
+        "AUDJPY/tick/2011/DAT_ASCII_AUDJPY_T_201111.zip": {
+          "rows": 377324,
+          "sha256": "573f8534ce8f3e5f4bc16ac6a76a02c4adda9f1403dd12ab6ccc8d2b27310da7",
+          "size_bytes": 1932709
+        },
+        "AUDJPY/tick/2011/DAT_ASCII_AUDJPY_T_201112.zip": {
+          "rows": 1148002,
+          "sha256": "0b53ee1024ff791d20503986626ea3985c261ecf713398871777d49881aa0ce3",
+          "size_bytes": 6476325
+        },
+        "AUDJPY/tick/2012/DAT_ASCII_AUDJPY_T_201201.zip": {
+          "rows": 1184591,
+          "sha256": "b2d224eda8cbb4620f09d27123211f4048a11c0826800fed3997370ac9532a60",
+          "size_bytes": 6662136
+        },
+        "AUDJPY/tick/2012/DAT_ASCII_AUDJPY_T_201202.zip": {
+          "rows": 1596700,
+          "sha256": "6118fcf3b81b70c1a30bf5942c79aba20df7f604f44af7525b5fe60b8d7c7bc6",
+          "size_bytes": 8802245
+        },
+        "AUDJPY/tick/2012/DAT_ASCII_AUDJPY_T_201203.zip": {
+          "rows": 1689297,
+          "sha256": "43a25bc3cb4a592843344d43e3bc818080d393f70eef6cd34b5e8e0e509f4522",
+          "size_bytes": 9493457
+        },
+        "AUDJPY/tick/2012/DAT_ASCII_AUDJPY_T_201204.zip": {
+          "rows": 1491686,
+          "sha256": "a9e055597ce5102f5bc470baf0b1174b6c303bf58a8473cf2ae6e0efcf804e7d",
+          "size_bytes": 8348531
+        },
+        "AUDJPY/tick/2012/DAT_ASCII_AUDJPY_T_201205.zip": {
+          "rows": 1727096,
+          "sha256": "9d4435b65d444944f5f4f4919a29e327103d9d3dbae798a2ad0967c12dfdbfd6",
+          "size_bytes": 9580062
+        },
+        "AUDJPY/tick/2012/DAT_ASCII_AUDJPY_T_201206.zip": {
+          "rows": 1686279,
+          "sha256": "9efbb97ff90ce2bf7ca420bc857c66eb9331aac0febfdbabce2e9955d7a5a92d",
+          "size_bytes": 9381936
+        },
+        "AUDJPY/tick/2012/DAT_ASCII_AUDJPY_T_201207.zip": {
+          "rows": 1436707,
+          "sha256": "3dabc06172aca5b9823981344e1cb3180f4b34616a5ff09108276e04808bb650",
+          "size_bytes": 7930287
+        },
+        "AUDJPY/tick/2012/DAT_ASCII_AUDJPY_T_201208.zip": {
+          "rows": 1251004,
+          "sha256": "b629e3ee2921e4e4d1acaeb94df32e44f6bbfe86c5888679d98f889434753570",
+          "size_bytes": 6872664
+        },
+        "AUDJPY/tick/2012/DAT_ASCII_AUDJPY_T_201209.zip": {
+          "rows": 1069925,
+          "sha256": "ce7959652dce090649897ffc008e85a8c1b6e08f1f7d327d38e1c57c6e860a51",
+          "size_bytes": 6035341
+        },
+        "AUDJPY/tick/2012/DAT_ASCII_AUDJPY_T_201210.zip": {
+          "rows": 1026201,
+          "sha256": "594d92c8f5923e2d8cf9a824e5dbc0898373bc3809268e5154dfd870dc856aa6",
+          "size_bytes": 5847807
+        },
+        "AUDJPY/tick/2012/DAT_ASCII_AUDJPY_T_201211.zip": {
+          "rows": 880278,
+          "sha256": "150a8a3b8a0abee6ccdd433e0e9e169d6be6ad04f659bcbab61561e20416e8ef",
+          "size_bytes": 5124943
+        },
+        "AUDJPY/tick/2012/DAT_ASCII_AUDJPY_T_201212.zip": {
+          "rows": 747337,
+          "sha256": "4efec7c4741e661eb9b492813f3970802470fbdba9b7c3e774ecf9ccbc85c025",
+          "size_bytes": 4351009
+        },
+        "AUDJPY/tick/2013/DAT_ASCII_AUDJPY_T_201301.zip": {
+          "rows": 1248193,
+          "sha256": "b3c178e31e8371b1d5cef0f292fff251a67b8d86f4c9a77b6db92f65e4196a06",
+          "size_bytes": 7373189
+        },
+        "AUDJPY/tick/2013/DAT_ASCII_AUDJPY_T_201302.zip": {
+          "rows": 1252449,
+          "sha256": "07d2803c329e2c08b54b55ea1af60f7f6abd03cba183b7a3dc1fbff293ee5a73",
+          "size_bytes": 7400076
+        },
+        "AUDJPY/tick/2013/DAT_ASCII_AUDJPY_T_201303.zip": {
+          "rows": 1247308,
+          "sha256": "f275d1016bdcd3651ded08c07aff7546d0a0fcc7cace4ca518ca4ba1fd6fb505",
+          "size_bytes": 7209592
+        },
+        "AUDJPY/tick/2013/DAT_ASCII_AUDJPY_T_201304.zip": {
+          "rows": 1522755,
+          "sha256": "8aad06d14200c7586b01a7bfc575e8a68e3902d6f6de41c1eb74c53e86c35f60",
+          "size_bytes": 9102167
+        },
+        "AUDJPY/tick/2013/DAT_ASCII_AUDJPY_T_201305.zip": {
+          "rows": 1540644,
+          "sha256": "3dc274c78e4845244cc06f23246bbcb827083985e9d5dc89cd6e92f5521acdf5",
+          "size_bytes": 9104831
+        },
+        "AUDJPY/tick/2013/DAT_ASCII_AUDJPY_T_201306.zip": {
+          "rows": 1726680,
+          "sha256": "75b7297ca2646cac0844c4d070d44f5aa30f720f9d26d44f40ddc60f803b6ea4",
+          "size_bytes": 10475085
+        },
+        "AUDJPY/tick/2013/DAT_ASCII_AUDJPY_T_201307.zip": {
+          "rows": 1560818,
+          "sha256": "32d8936cf307758dcce6f76bc483b40bf4acda82b863343f758c9a8a2179d282",
+          "size_bytes": 9178479
+        },
+        "AUDJPY/tick/2013/DAT_ASCII_AUDJPY_T_201308.zip": {
+          "rows": 1260716,
+          "sha256": "830362a0df5849b61cb5bc7dea10c5ae481016c90ec25039f18cfa31e40b15f6",
+          "size_bytes": 7445741
+        },
+        "AUDJPY/tick/2013/DAT_ASCII_AUDJPY_T_201309.zip": {
+          "rows": 1069964,
+          "sha256": "66ced34c830c170d3aa063d7ede4711900549ed8977989086eb8b377bb2d345c",
+          "size_bytes": 6307592
+        },
+        "AUDJPY/tick/2013/DAT_ASCII_AUDJPY_T_201310.zip": {
+          "rows": 1003946,
+          "sha256": "c7ad137965db91316a28f34ac9c2255ab04136b69214bb6e437016fd2dd8a917",
+          "size_bytes": 5964334
+        },
+        "AUDJPY/tick/2013/DAT_ASCII_AUDJPY_T_201311.zip": {
+          "rows": 873703,
+          "sha256": "f44d3591157996605a6404b94d768f11171cf83ceaba32dc41ae5ee4b2821529",
+          "size_bytes": 5172338
+        },
+        "AUDJPY/tick/2013/DAT_ASCII_AUDJPY_T_201312.zip": {
+          "rows": 889884,
+          "sha256": "f23be99a8eacf94bb1d345f32055e579c5371370116a77d2f645513caf56658a",
+          "size_bytes": 5212335
+        },
+        "AUDJPY/tick/2014/DAT_ASCII_AUDJPY_T_201401.zip": {
+          "rows": 1133928,
+          "sha256": "d6971847186103f0b19ed809efec1a4229817be53a8c3a67b5be8ec2e2a188d0",
+          "size_bytes": 6667585
+        },
+        "AUDJPY/tick/2014/DAT_ASCII_AUDJPY_T_201402.zip": {
+          "rows": 947405,
+          "sha256": "d6d8d01926a951a0afa1f6676c5b38812a668c217ab52a47b276b2f2709363b8",
+          "size_bytes": 5650883
+        },
+        "AUDJPY/tick/2014/DAT_ASCII_AUDJPY_T_201403.zip": {
+          "rows": 965227,
+          "sha256": "478119acfa0bdc33a4baf04de4ad028f0e5803ef732ff38c90500f0439b97217",
+          "size_bytes": 5644242
+        },
+        "AUDJPY/tick/2014/DAT_ASCII_AUDJPY_T_201404.zip": {
+          "rows": 918752,
+          "sha256": "0a41bf50035a1586f17a418959b2019ec01f1da53d1f265c2588076415ed16da",
+          "size_bytes": 5234216
+        },
+        "AUDJPY/tick/2014/DAT_ASCII_AUDJPY_T_201405.zip": {
+          "rows": 843827,
+          "sha256": "a5886be019191d6ca38eb9c758fd920f49af743d207b7c0bb87f915b1cff5b2e",
+          "size_bytes": 4761466
+        },
+        "AUDJPY/tick/2014/DAT_ASCII_AUDJPY_T_201406.zip": {
+          "rows": 721807,
+          "sha256": "22d5288ecbd7f04011545f8df417850da4665bf0df0e95f5d2a6f51c91bfebfc",
+          "size_bytes": 4025226
+        },
+        "AUDJPY/tick/2014/DAT_ASCII_AUDJPY_T_201407.zip": {
+          "rows": 765871,
+          "sha256": "1ac5fea76607472bb95ee42fa28c3c4c8c3ed494350eebdb7e583f50018386ca",
+          "size_bytes": 4142480
+        },
+        "AUDJPY/tick/2014/DAT_ASCII_AUDJPY_T_201408.zip": {
+          "rows": 849619,
+          "sha256": "fd5865e72e4b8e1a049802facd02a4ed5eddedf88b4cd6f116b60a2cb35100f9",
+          "size_bytes": 4057536
+        },
+        "AUDJPY/tick/2014/DAT_ASCII_AUDJPY_T_201409.zip": {
+          "rows": 1312826,
+          "sha256": "2a3402bf7304d44e682fe34f99b4a6cdb6d8e8d0504e0780be91b93272eec509",
+          "size_bytes": 6249803
+        },
+        "AUDJPY/tick/2014/DAT_ASCII_AUDJPY_T_201410.zip": {
+          "rows": 1690313,
+          "sha256": "d362a4fc90a0a6c3ae8e722fd033affc5e70eff746c0e5381d8b003230e4f681",
+          "size_bytes": 9638220
+        },
+        "AUDJPY/tick/2014/DAT_ASCII_AUDJPY_T_201411.zip": {
+          "rows": 1834304,
+          "sha256": "3ef25061f32352048dc0aecc8bd03c6c9ccb81806309235ceaa49fe40ef38f9a",
+          "size_bytes": 10021056
+        },
+        "AUDJPY/tick/2014/DAT_ASCII_AUDJPY_T_201412.zip": {
+          "rows": 1674076,
+          "sha256": "e2c47c5adbf888988711de3f56d370d5b97d89a7c420cf472268fda4c544fd40",
+          "size_bytes": 9343872
+        },
+        "AUDJPY/tick/2015/DAT_ASCII_AUDJPY_T_201501.zip": {
+          "rows": 2077590,
+          "sha256": "a1a06a74b61e7c8068d3f16624e8fcdf2e96253236564c8d4833262f88b97c5a",
+          "size_bytes": 11628695
+        },
+        "AUDJPY/tick/2015/DAT_ASCII_AUDJPY_T_201502.zip": {
+          "rows": 1550102,
+          "sha256": "9e16343adb9dcb10f3a548926fbc120e2c284c55c1fa0e824ae92b3aec5363e4",
+          "size_bytes": 8701844
+        },
+        "AUDJPY/tick/2015/DAT_ASCII_AUDJPY_T_201503.zip": {
+          "rows": 1672854,
+          "sha256": "5c8b587e41de594a297a06a0deac2639ede6c2ba237fc593bb6519df78b5c822",
+          "size_bytes": 9361156
+        },
+        "AUDJPY/tick/2015/DAT_ASCII_AUDJPY_T_201504.zip": {
+          "rows": 1588115,
+          "sha256": "0bc3f1c5d73876b509d9589fc6528e06365d25e06883b74c3f3355d151265b5e",
+          "size_bytes": 8797326
+        },
+        "AUDJPY/tick/2015/DAT_ASCII_AUDJPY_T_201505.zip": {
+          "rows": 1552197,
+          "sha256": "d7765b0b4e32981a22c227cb0127060aab1126708d2fabbdbd89f1bae934ae82",
+          "size_bytes": 8438101
+        },
+        "AUDJPY/tick/2015/DAT_ASCII_AUDJPY_T_201506.zip": {
+          "rows": 1651920,
+          "sha256": "9b7084729daa74e0900647fc82efbe4f484614da05fa02ee7edaf7173a2e37d6",
+          "size_bytes": 8896612
+        },
+        "AUDJPY/tick/2015/DAT_ASCII_AUDJPY_T_201507.zip": {
+          "rows": 1546763,
+          "sha256": "097751c5e8e4d4ca45ce116df85bc1a994145574eb2cee383bb57a25e110b80d",
+          "size_bytes": 8427583
+        },
+        "AUDJPY/tick/2015/DAT_ASCII_AUDJPY_T_201508.zip": {
+          "rows": 1768379,
+          "sha256": "eb43493b4a09e1d7f361f60b5b29b95268080e6799933f32e098df4db9a3e6bf",
+          "size_bytes": 9707095
+        },
+        "AUDJPY/tick/2015/DAT_ASCII_AUDJPY_T_201509.zip": {
+          "rows": 1916216,
+          "sha256": "50607f54249aa48c244fabcf7458f95ea2095294c9e6366f92e85e98d013a4dc",
+          "size_bytes": 10590961
+        },
+        "AUDJPY/tick/2015/DAT_ASCII_AUDJPY_T_201510.zip": {
+          "rows": 1559237,
+          "sha256": "8ef4196f6f43de2835bb4118888e1ad3d0cf1e35806161dffe41a0f510be008e",
+          "size_bytes": 8498299
+        },
+        "AUDJPY/tick/2015/DAT_ASCII_AUDJPY_T_201511.zip": {
+          "rows": 1462433,
+          "sha256": "6b9f2e9a340eb0aea8562f6a6a89ebd0b61358e62d615a41e87b31916d95f9c8",
+          "size_bytes": 7685892
+        },
+        "AUDJPY/tick/2015/DAT_ASCII_AUDJPY_T_201512.zip": {
+          "rows": 1583560,
+          "sha256": "a0413c7c10c67e16584afbfc0cfa39869ccb37de6a0d79f54d46b27de81c3d0a",
+          "size_bytes": 8445056
+        },
+        "AUDJPY/tick/2016/DAT_ASCII_AUDJPY_T_201601.zip": {
+          "rows": 2411853,
+          "sha256": "aab5071ec3052ca95aa9aeaf1188c68fa70f34cfabda95dcd575706fa5a0e9ed",
+          "size_bytes": 13409771
+        },
+        "AUDJPY/tick/2016/DAT_ASCII_AUDJPY_T_201602.zip": {
+          "rows": 2367498,
+          "sha256": "737d736057753624f6f1b29593caf1db7f7a3656cfe1ab6a6bbc2ef4803b8384",
+          "size_bytes": 13159076
+        },
+        "AUDJPY/tick/2016/DAT_ASCII_AUDJPY_T_201603.zip": {
+          "rows": 1910266,
+          "sha256": "69eb868cc05447dd4bba97e4f6f06f6f935e4c6c96cb11b10383ff2f8da9ab99",
+          "size_bytes": 10484061
+        },
+        "AUDJPY/tick/2016/DAT_ASCII_AUDJPY_T_201604.zip": {
+          "rows": 1656040,
+          "sha256": "23904d83eb980d82c8330e9beb3c95466084e6fcac763ffae8ec27a081f3037d",
+          "size_bytes": 9349626
+        },
+        "AUDJPY/tick/2016/DAT_ASCII_AUDJPY_T_201605.zip": {
+          "rows": 1444000,
+          "sha256": "7c343abab0788d26fd5f9b6ac98c16671a2fbb7dd3980ab9fabd512169883673",
+          "size_bytes": 8090608
+        },
+        "AUDJPY/tick/2016/DAT_ASCII_AUDJPY_T_201606.zip": {
+          "rows": 1692173,
+          "sha256": "65bd9f4b1f5c28c0d46ff63f26362458e0ab32df55069bdfa199e7b8e96b4e04",
+          "size_bytes": 9687811
+        },
+        "AUDJPY/tick/2016/DAT_ASCII_AUDJPY_T_201607.zip": {
+          "rows": 1501213,
+          "sha256": "c5b16539bf86d06621fa5e8d4eaa73917af7cc9f7b8060d221c94d0fa3261096",
+          "size_bytes": 8588644
+        },
+        "AUDJPY/tick/2016/DAT_ASCII_AUDJPY_T_201608.zip": {
+          "rows": 1244183,
+          "sha256": "e2994a4f864fdcf6978ecf44e95c4ef1d07e6beee674b3be1e2fbc540f309b58",
+          "size_bytes": 6821157
+        },
+        "AUDJPY/tick/2016/DAT_ASCII_AUDJPY_T_201609.zip": {
+          "rows": 1351681,
+          "sha256": "d99a767b3e26a3923e722e232a7fec0babd6b84587cc761c7f4d1a9292aabe8f",
+          "size_bytes": 7420429
+        },
+        "AUDJPY/tick/2016/DAT_ASCII_AUDJPY_T_201610.zip": {
+          "rows": 1183859,
+          "sha256": "fa5c45b7e786fd224b2ef9c2b97c6616a15884039a1fa1701f1ce44b2dd17b85",
+          "size_bytes": 6490444
+        },
+        "AUDJPY/tick/2016/DAT_ASCII_AUDJPY_T_201611.zip": {
+          "rows": 2091244,
+          "sha256": "fae5c875a8aa49ebb5117261687b58267c1d89a38114a9cf8cbb3365a804d655",
+          "size_bytes": 11392382
+        },
+        "AUDJPY/tick/2016/DAT_ASCII_AUDJPY_T_201612.zip": {
+          "rows": 1430023,
+          "sha256": "b912ce2534daaeffbace17ddcb3497a6faf79633c4819e595a42150a34fca271",
+          "size_bytes": 7702677
+        },
+        "AUDJPY/tick/2017/DAT_ASCII_AUDJPY_T_201701.zip": {
+          "rows": 1952632,
+          "sha256": "906f78c3f9c57d4a4061be8b47b38149a712018220ad802d4742ce26772015bb",
+          "size_bytes": 10252405
+        },
+        "AUDJPY/tick/2017/DAT_ASCII_AUDJPY_T_201702.zip": {
+          "rows": 1504753,
+          "sha256": "4d6fa1b0e4ad5272d5a26546977c12a86938a586b83e849e3269261528e703d8",
+          "size_bytes": 7857354
+        },
+        "AUDJPY/tick/2017/DAT_ASCII_AUDJPY_T_201703.zip": {
+          "rows": 1680711,
+          "sha256": "096231a93d491d45164f80b74499fe61c306605bff356ec724d98fffe36dfa74",
+          "size_bytes": 8821116
+        },
+        "AUDJPY/tick/2017/DAT_ASCII_AUDJPY_T_201704.zip": {
+          "rows": 1251728,
+          "sha256": "7a1d7e7624e857a899085e6408e1b24ca6b00c382a4a3c0dc9f056c4ab5446c6",
+          "size_bytes": 6739051
+        },
+        "AUDJPY/tick/2017/DAT_ASCII_AUDJPY_T_201705.zip": {
+          "rows": 1374185,
+          "sha256": "3a1c9e8a1453ee15dc04b7fef1cda0a3160cb5d474c8f63ab5be348211467b26",
+          "size_bytes": 7384565
+        },
+        "AUDJPY/tick/2017/DAT_ASCII_AUDJPY_T_201706.zip": {
+          "rows": 1213744,
+          "sha256": "863000d1047c10b2bc5c14c7b872f534043fd5beca9afd1c44f1c91726c7d984",
+          "size_bytes": 6440358
+        },
+        "AUDJPY/tick/2017/DAT_ASCII_AUDJPY_T_201707.zip": {
+          "rows": 1342772,
+          "sha256": "a98dccdacdfaa628f699a309f0c28e8eca699a309fede642b35d1dbf27401714",
+          "size_bytes": 7050468
+        },
+        "AUDJPY/tick/2017/DAT_ASCII_AUDJPY_T_201708.zip": {
+          "rows": 1315956,
+          "sha256": "4b14420396895f901a1440d626e2e5b744b85b7b21518e953eb99f158b053328",
+          "size_bytes": 7000852
+        },
+        "AUDJPY/tick/2017/DAT_ASCII_AUDJPY_T_201709.zip": {
+          "rows": 1516674,
+          "sha256": "15f78d378db86c7a8c0eb6a7e8fce78ef93f9ca8ea4f4798f515e0bb5bdc1006",
+          "size_bytes": 7886108
+        },
+        "AUDJPY/tick/2017/DAT_ASCII_AUDJPY_T_201710.zip": {
+          "rows": 1543907,
+          "sha256": "7d9765634806485ea8e5cc9dd72fa662776583aa87aa8c0698bdf56a7721de0f",
+          "size_bytes": 7685944
+        },
+        "AUDJPY/tick/2017/DAT_ASCII_AUDJPY_T_201711.zip": {
+          "rows": 1461863,
+          "sha256": "ab2a3a0ad33cea1fcf9a936e0b2831f83e65b7c69d4afa2cad21be3e95d8b1ba",
+          "size_bytes": 7263819
+        },
+        "AUDJPY/tick/2017/DAT_ASCII_AUDJPY_T_201712.zip": {
+          "rows": 1217954,
+          "sha256": "3e4a5020b328b11aa102fe75e2d25b9fc3a8f2565c8eb36f2d09da9150cebb5e",
+          "size_bytes": 6003048
+        },
+        "AUDJPY/tick/2018/DAT_ASCII_AUDJPY_T_201801.zip": {
+          "rows": 1758593,
+          "sha256": "a249da941696d2e888bc8cf3003af4765f02e2e7bbd8978606dab7ed823d2681",
+          "size_bytes": 8829429
+        },
+        "AUDJPY/tick/2018/DAT_ASCII_AUDJPY_T_201802.zip": {
+          "rows": 1981641,
+          "sha256": "fa4041c434faadb69e44848382c3cabb69c5af0c82e09e35eb749661725c3fb2",
+          "size_bytes": 10202355
+        },
+        "AUDJPY/tick/2018/DAT_ASCII_AUDJPY_T_201803.zip": {
+          "rows": 1850526,
+          "sha256": "a95bff90aa8b9efe990e418236c686b4d79a2905283bfad2525e8d2f04bbda28",
+          "size_bytes": 9543276
+        },
+        "AUDJPY/tick/2018/DAT_ASCII_AUDJPY_T_201804.zip": {
+          "rows": 1224433,
+          "sha256": "bbb4177935d7a7275f6786a33cf5df9fc6d6ae8cb0cf4e31edd6f22eabcdc947",
+          "size_bytes": 6446200
+        },
+        "AUDJPY/tick/2018/DAT_ASCII_AUDJPY_T_201805.zip": {
+          "rows": 1617533,
+          "sha256": "0a744fc9982791c69159ff47b84edbba9401f9ec2426fa5da2516645fec4ee37",
+          "size_bytes": 8730941
+        },
+        "AUDJPY/tick/2018/DAT_ASCII_AUDJPY_T_201806.zip": {
+          "rows": 1334830,
+          "sha256": "1fdf03cd1155069c4c41501a972757e86ffdf72aaaa24dc68a6ab309a95dc8cc",
+          "size_bytes": 7091667
+        },
+        "AUDJPY/tick/2018/DAT_ASCII_AUDJPY_T_201807.zip": {
+          "rows": 1461637,
+          "sha256": "3ebb9fa7b45a72f2947e015fde423526d7ad2b64a3a88f9d65507e271cf2f419",
+          "size_bytes": 7547911
+        },
+        "AUDJPY/tick/2018/DAT_ASCII_AUDJPY_T_201808.zip": {
+          "rows": 1388753,
+          "sha256": "fc0831705cf644fbe4bd4312dc6a588f7529f5a7888fde741f23aca296c91218",
+          "size_bytes": 7261254
+        },
+        "AUDJPY/tick/2018/DAT_ASCII_AUDJPY_T_201809.zip": {
+          "rows": 1172141,
+          "sha256": "7ba5f1d4db6aa9488e771c678065f63b6fe8e4aad9b9c09002750b37c5e912c9",
+          "size_bytes": 6188449
+        },
+        "AUDJPY/tick/2018/DAT_ASCII_AUDJPY_T_201810.zip": {
+          "rows": 1998970,
+          "sha256": "98d37f648abef6c685b84e625ce1fff330077daf02b0a78ba27774ba1d4593bd",
+          "size_bytes": 10168090
+        },
+        "AUDJPY/tick/2018/DAT_ASCII_AUDJPY_T_201811.zip": {
+          "rows": 1514654,
+          "sha256": "72078f956b532958b0a837abbf5dd97a42f61981490fc453e46a88179af17550",
+          "size_bytes": 7829718
+        },
+        "AUDJPY/tick/2018/DAT_ASCII_AUDJPY_T_201812.zip": {
+          "rows": 1982240,
+          "sha256": "526d6b1ddcdb31be7d1952d1236a659441401da0cddcf0f7d743c71a2f028cc2",
+          "size_bytes": 11197044
+        },
+        "AUDJPY/tick/2019/DAT_ASCII_AUDJPY_T_201901.zip": {
+          "rows": 2616706,
+          "sha256": "75554cd7a6a608d86b0b4010987107d09a2c6bc30f5b764b03f1acf563801553",
+          "size_bytes": 15672020
+        },
+        "AUDJPY/tick/2019/DAT_ASCII_AUDJPY_T_201902.zip": {
+          "rows": 1924022,
+          "sha256": "318017d85860a14a1b58ab49c6f484ac93211a4bf092c2220c0f963192cae6ed",
+          "size_bytes": 11424878
+        },
+        "AUDJPY/tick/2019/DAT_ASCII_AUDJPY_T_201903.zip": {
+          "rows": 2015283,
+          "sha256": "8d8876a0ba10247a88d1730f153ef1069972324c1f0278369047008e25b2ddad",
+          "size_bytes": 11907205
+        },
+        "AUDJPY/tick/2019/DAT_ASCII_AUDJPY_T_201904.zip": {
+          "rows": 1660681,
+          "sha256": "b5ea4ba257157ac0329de7faf54610205b8cc7e4a73e5a228e75d09254cf5474",
+          "size_bytes": 9819250
+        },
+        "AUDJPY/tick/2019/DAT_ASCII_AUDJPY_T_201905.zip": {
+          "rows": 1961316,
+          "sha256": "4679c2d6e61d58cf3870ea61411b86960a6129e8e083a8a7a9a19745fc6f15ac",
+          "size_bytes": 11969635
+        },
+        "AUDJPY/tick/2019/DAT_ASCII_AUDJPY_T_201906.zip": {
+          "rows": 1944445,
+          "sha256": "73a6dfa5afd8beb1d211a74079df5b9128d138eead53b11868b7778d61c65a0f",
+          "size_bytes": 11509639
+        },
+        "AUDJPY/tick/2019/DAT_ASCII_AUDJPY_T_201907.zip": {
+          "rows": 1541297,
+          "sha256": "74b0d1b9017371bd9467efa39883ee7232ed5cbfebb18d56b96af95d98a86af1",
+          "size_bytes": 9194232
+        },
+        "AUDJPY/tick/2019/DAT_ASCII_AUDJPY_T_201908.zip": {
+          "rows": 2889786,
+          "sha256": "98dda0284a12570769e1440247bf534d41da087b0fd8dc8b4f217ba6f0829a91",
+          "size_bytes": 17156251
+        },
+        "AUDJPY/tick/2019/DAT_ASCII_AUDJPY_T_201909.zip": {
+          "rows": 2064446,
+          "sha256": "84ad966d6b7896dbce5e32c4ca8a3393d7f0ce667a76dbb7a301e9230e5aeac7",
+          "size_bytes": 12166642
+        },
+        "AUDJPY/tick/2019/DAT_ASCII_AUDJPY_T_201910.zip": {
+          "rows": 2084819,
+          "sha256": "3a99c8b9040d5d3979184e34cc6b6a6d22d8183a46bbc4e27c9ee656543b6e6b",
+          "size_bytes": 12439622
+        },
+        "AUDJPY/tick/2019/DAT_ASCII_AUDJPY_T_201911.zip": {
+          "rows": 1468843,
+          "sha256": "addb3386e08d7c3493f2e75f358c7a2315ee5c7a8fd0b39f63ef225594479a06",
+          "size_bytes": 8846693
+        },
+        "AUDJPY/tick/2019/DAT_ASCII_AUDJPY_T_201912.zip": {
+          "rows": 1376092,
+          "sha256": "782795bf2029c6a4932a91298cadf7ad90db89ba56d8d5787a254c0c35fce2cb",
+          "size_bytes": 8212838
+        },
+        "AUDJPY/tick/2020/DAT_ASCII_AUDJPY_T_202001.zip": {
+          "rows": 1852923,
+          "sha256": "cd4eccd8e026cecace866ba840d72817b00a8ded3758d3b3cd8647cc88362801",
+          "size_bytes": 11121561
+        },
+        "AUDJPY/tick/2020/DAT_ASCII_AUDJPY_T_202002.zip": {
+          "rows": 2061673,
+          "sha256": "90d14092a31ff11833dee70035a833fda44bf40a6dc170f04951c005bf8ec14a",
+          "size_bytes": 12324097
+        },
+        "AUDJPY/tick/2020/DAT_ASCII_AUDJPY_T_202003.zip": {
+          "rows": 6332571,
+          "sha256": "a7938728d884226d324e2677e90c9f7ebf6cfb621614418e8cce6651d1ae7123",
+          "size_bytes": 39660580
+        },
+        "AUDJPY/tick/2020/DAT_ASCII_AUDJPY_T_202004.zip": {
+          "rows": 3164842,
+          "sha256": "e2f8e4f778cc72db08901d9f7d481730c3b0da3f655fb9352f2e22fed6d847c6",
+          "size_bytes": 19418583
+        },
+        "AUDJPY/tick/2020/DAT_ASCII_AUDJPY_T_202005.zip": {
+          "rows": 2318140,
+          "sha256": "a344b89f746dca02c40c72d34c62711e59e750528e573c1df84a37eafef718f0",
+          "size_bytes": 14193527
+        },
+        "AUDJPY/tick/2020/DAT_ASCII_AUDJPY_T_202006.zip": {
+          "rows": 3196306,
+          "sha256": "c348264f460f2a538b48e091374fe8cb541ed41bfa9a04c996d3d6eea2df3574",
+          "size_bytes": 19928347
+        },
+        "AUDJPY/tick/2020/DAT_ASCII_AUDJPY_T_202007.zip": {
+          "rows": 2343022,
+          "sha256": "0cfbb805fb4d20747bb094ca95b618f28440f490c089c840014c802dac8e2c4a",
+          "size_bytes": 14262696
+        },
+        "AUDJPY/tick/2020/DAT_ASCII_AUDJPY_T_202008.zip": {
+          "rows": 2169657,
+          "sha256": "b9aaf7093b0b863567b3c6c25e44776163804c1bbcd42cc59ab2696c4c708997",
+          "size_bytes": 13094205
+        },
+        "AUDJPY/tick/2020/DAT_ASCII_AUDJPY_T_202009.zip": {
+          "rows": 2266276,
+          "sha256": "382cf9bd23409fea6fee590e30192d8141edc604dd41008d7f691fb6f4c10012",
+          "size_bytes": 13654080
+        },
+        "AUDJPY/tick/2020/DAT_ASCII_AUDJPY_T_202010.zip": {
+          "rows": 2032222,
+          "sha256": "8ce88c1b14d9c924f933686595bdd7ca185ca387d743c74c2b1359dff004dafb",
+          "size_bytes": 12046160
+        },
+        "AUDJPY/tick/2020/DAT_ASCII_AUDJPY_T_202011.zip": {
+          "rows": 2228589,
+          "sha256": "75d6a12294995cc3059da8f3c1dab8ed11f1ff8dca070d1b75f8aff4f014fd3e",
+          "size_bytes": 13508078
+        },
+        "AUDJPY/tick/2020/DAT_ASCII_AUDJPY_T_202012.zip": {
+          "rows": 2032073,
+          "sha256": "190bd6463557dbeea8b9e33b7d6c8689aae63003503a22725e835da85b7d2fde",
+          "size_bytes": 12085922
+        },
+        "AUDJPY/tick/2021/DAT_ASCII_AUDJPY_T_202101.zip": {
+          "rows": 2460701,
+          "sha256": "7d74162c00c666905d0a231cd454924dfebf3718a13f286bf3d77c22b487cc6a",
+          "size_bytes": 14494915
+        },
+        "AUDJPY/tick/2021/DAT_ASCII_AUDJPY_T_202102.zip": {
+          "rows": 1999335,
+          "sha256": "546830e09417b18bb55166ce7af028cc83d78b1d4d14306f3237a6636d2c8a81",
+          "size_bytes": 11745807
+        },
+        "AUDJPY/tick/2021/DAT_ASCII_AUDJPY_T_202103.zip": {
+          "rows": 2617122,
+          "sha256": "1afc67fb1275797975465cd8e6745cca70a09bc6119e4eaf8be71a30c2aa5b45",
+          "size_bytes": 15521382
+        },
+        "AUDJPY/tick/2021/DAT_ASCII_AUDJPY_T_202104.zip": {
+          "rows": 1870122,
+          "sha256": "d6361cdf790683d8f4fe08612b516a2998d022e15eb229d26a796ee00c32fcb3",
+          "size_bytes": 11121237
+        },
+        "AUDJPY/tick/2021/DAT_ASCII_AUDJPY_T_202105.zip": {
+          "rows": 1874466,
+          "sha256": "044e19be15b3dba1832a4ff3a040d8e3ce05df3a27a56cb56dae218846d84927",
+          "size_bytes": 11120391
+        },
+        "AUDJPY/tick/2021/DAT_ASCII_AUDJPY_T_202106.zip": {
+          "rows": 1788000,
+          "sha256": "1721feffeac2090e623b5eb550df068a5c8daee96e45fdda636b7a88c8770184",
+          "size_bytes": 10562175
+        },
+        "AUDJPY/tick/2021/DAT_ASCII_AUDJPY_T_202107.zip": {
+          "rows": 2234267,
+          "sha256": "368f2d89e41ea6cd799eba61a1cf712c71016b8ecb20ca19e5968e8016923e38",
+          "size_bytes": 13221299
+        },
+        "AUDJPY/tick/2021/DAT_ASCII_AUDJPY_T_202108.zip": {
+          "rows": 1671889,
+          "sha256": "9e9df35474e9a3646d8c73bc0c7ce7738a914fe6166366b814f85aa5a07d0b65",
+          "size_bytes": 9991445
+        },
+        "AUDJPY/tick/2021/DAT_ASCII_AUDJPY_T_202109.zip": {
+          "rows": 2057724,
+          "sha256": "3219fd40b51feee8945d5954c963441ca89aaa479b5c5ad5eefcb0a4e3ebd60d",
+          "size_bytes": 12259047
+        },
+        "AUDJPY/tick/2021/DAT_ASCII_AUDJPY_T_202110.zip": {
+          "rows": 2328614,
+          "sha256": "be001eaf3e77cfa7ed6cfe0b18be849998954ad0895a1d893f5ceb2c4ce79a55",
+          "size_bytes": 13775381
+        },
+        "AUDJPY/tick/2021/DAT_ASCII_AUDJPY_T_202111.zip": {
+          "rows": 2542311,
+          "sha256": "e387b1692167251bf1fc68e1c269bb15f1f81bb47384cb5851c50b77ec3f1198",
+          "size_bytes": 15085494
+        },
+        "AUDJPY/tick/2021/DAT_ASCII_AUDJPY_T_202112.zip": {
+          "rows": 2253745,
+          "sha256": "0a2a9b209ce94504d3ec0103f225eec110502a0139047f2ec9689ab246a6ca96",
+          "size_bytes": 13338969
+        },
+        "AUDJPY/tick/2022/DAT_ASCII_AUDJPY_T_202201.zip": {
+          "rows": 2522322,
+          "sha256": "7bc8a306955b175a23dad94a941988224e957ff97c74c647a20e3cc64dffa797",
+          "size_bytes": 15109229
+        },
+        "AUDJPY/tick/2022/DAT_ASCII_AUDJPY_T_202202.zip": {
+          "rows": 3051569,
+          "sha256": "55d0d4675f1d2716f38b7a77b0168b4390da8654161d7e6257882da5b3f96bbe",
+          "size_bytes": 18185324
+        },
+        "AUDJPY/tick/2022/DAT_ASCII_AUDJPY_T_202203.zip": {
+          "rows": 3754916,
+          "sha256": "ec05e0e487825b180c39cb376bf14b29eab7c10f68fa9ee1c62742c1dcba2b71",
+          "size_bytes": 22554813
+        },
+        "AUDJPY/tick/2022/DAT_ASCII_AUDJPY_T_202204.zip": {
+          "rows": 3628719,
+          "sha256": "317caccf55ba39ffb9cc9a168c165219c69a62dbac72218e03ab15c2cdca79bb",
+          "size_bytes": 21754536
+        },
+        "AUDJPY/tick/2022/DAT_ASCII_AUDJPY_T_202205.zip": {
+          "rows": 4460094,
+          "sha256": "3b4934f45704debcd683cc9fa7c1a02fd26eab2b04920302622fc4f2af5cdb6f",
+          "size_bytes": 27130267
+        },
+        "AUDJPY/tick/2022/DAT_ASCII_AUDJPY_T_202206.zip": {
+          "rows": 4686377,
+          "sha256": "eeb9bf4701a317e3c49fc931d0faa1909ddf92691a1dd5cade57f8de6c925b25",
+          "size_bytes": 28138331
+        },
+        "AUDJPY/tick/2022/DAT_ASCII_AUDJPY_T_202207.zip": {
+          "rows": 4506104,
+          "sha256": "8ee373a02370aeaee509bb1b9fce0e14ac94b08ea679a2a38db279b32af9cf21",
+          "size_bytes": 26870485
+        },
+        "AUDJPY/tick/2022/DAT_ASCII_AUDJPY_T_202208.zip": {
+          "rows": 4336097,
+          "sha256": "6c20ae71fb816ed4c3855bbadced92e0daa9b259fee11f5e2b80015f9b54c9c4",
+          "size_bytes": 25545845
+        },
+        "AUDJPY/tick/2022/DAT_ASCII_AUDJPY_T_202209.zip": {
+          "rows": 5537862,
+          "sha256": "d269327051175e45003a67720fbb6f6bdb507eb2f488b0971c206ecb37c2f234",
+          "size_bytes": 32355704
+        },
+        "AUDJPY/tick/2022/DAT_ASCII_AUDJPY_T_202210.zip": {
+          "rows": 5305012,
+          "sha256": "d764814cf87641f9330a660b8c55bdc6f9580cf8777ae9db42e8f468cc078d48",
+          "size_bytes": 31099630
+        },
+        "AUDJPY/tick/2022/DAT_ASCII_AUDJPY_T_202211.zip": {
+          "rows": 4668334,
+          "sha256": "068a9354daf81d6e617529a6d84b3091eb9a03aaea6a27ea0cb77d5685f3f8f9",
+          "size_bytes": 26891367
+        },
+        "AUDJPY/tick/2022/DAT_ASCII_AUDJPY_T_202212.zip": {
+          "rows": 4145249,
+          "sha256": "225bedb4edf3c8194c2ba4e462ef219643f2ac85a31253499a0cdeb9c96f7b72",
+          "size_bytes": 24437807
+        },
+        "AUDJPY/tick/2023/DAT_ASCII_AUDJPY_T_202301.zip": {
+          "rows": 4496072,
+          "sha256": "c5006ea13c0f1952db4137c9dce2820795eed06ef781e20c2d269c8dda29155c",
+          "size_bytes": 26847990
+        },
+        "AUDJPY/tick/2023/DAT_ASCII_AUDJPY_T_202302.zip": {
+          "rows": 3299698,
+          "sha256": "b301b6081537503b7ce32009ec01c285193a5f0a18e3b05febe73fbbbdd7846d",
+          "size_bytes": 19795605
+        },
+        "AUDJPY/tick/2023/DAT_ASCII_AUDJPY_T_202303.zip": {
+          "rows": 3249558,
+          "sha256": "f6a2b131c82de3d385c1d1d707a357983181c9db4fb7078e05bf99145f8c4c9b",
+          "size_bytes": 19820769
+        },
+        "AUDJPY/tick/2023/DAT_ASCII_AUDJPY_T_202304.zip": {
+          "rows": 1808915,
+          "sha256": "57054ab858ca042df541cb88e075b4d4f8fbf35056726a985edf7ff55e136f60",
+          "size_bytes": 11185161
+        },
+        "AUDJPY/tick/2023/DAT_ASCII_AUDJPY_T_202305.zip": {
+          "rows": 1804487,
+          "sha256": "5704b4059c981612f32ee5e2c4602f3da4a1e74ee54b11667ad13c11c7784c0e",
+          "size_bytes": 11354174
+        },
+        "AUDJPY/tick/2023/DAT_ASCII_AUDJPY_T_202306.zip": {
+          "rows": 1645155,
+          "sha256": "6359b978d1e68828152300b42a5171bf68a81871772397f5a51ecc7f15c261a3",
+          "size_bytes": 10453810
+        },
+        "AUDJPY/tick/2023/DAT_ASCII_AUDJPY_T_202307.zip": {
+          "rows": 2018268,
+          "sha256": "53491ce575c061f98897565cb951ba92eaf350bf30f3bbd42c3fc7c02877bd31",
+          "size_bytes": 12762795
+        },
+        "AUDJPY/tick/2023/DAT_ASCII_AUDJPY_T_202308.zip": {
+          "rows": 2660686,
+          "sha256": "b0a5b2f46c4609376b4a79fd1438ad14d5def8e65339107e11738474a3e0f1a2",
+          "size_bytes": 16861137
+        },
+        "AUDJPY/tick/2023/DAT_ASCII_AUDJPY_T_202309.zip": {
+          "rows": 2013171,
+          "sha256": "9704f9e63fdb469fc9f215ab46548d0163c9ca2a874ced9ebfb604996b2d837e",
+          "size_bytes": 12767250
+        },
+        "AUDJPY/tick/2023/DAT_ASCII_AUDJPY_T_202310.zip": {
+          "rows": 2316649,
+          "sha256": "ef65f51648af3a9458fb83e1445fb4f6724766f24ddc2fd8c70c97047685f4ba",
+          "size_bytes": 14564567
+        },
+        "AUDJPY/tick/2023/DAT_ASCII_AUDJPY_T_202311.zip": {
+          "rows": 2139571,
+          "sha256": "f433b6dd7f9dc0e243c39b2e6c4217ec5f0c37d2e9ddc46a5ef2e7d3c3c378ad",
+          "size_bytes": 13314993
+        },
+        "AUDJPY/tick/2023/DAT_ASCII_AUDJPY_T_202312.zip": {
+          "rows": 2609508,
+          "sha256": "88f983bd61d94785113f44079ba2d5f22aa3863588cab3e68f87c30ad5f5e949",
+          "size_bytes": 16135366
+        },
+        "AUDJPY/tick/2024/DAT_ASCII_AUDJPY_T_202401.zip": {
+          "rows": 2587050,
+          "sha256": "58e356dbdb4592d18efe95614d9041ed2846fa7e4974b97a9c5814dc1846c467",
+          "size_bytes": 16085923
+        },
+        "AUDJPY/tick/2024/DAT_ASCII_AUDJPY_T_202402.zip": {
+          "rows": 1982564,
+          "sha256": "3c366ee3a1de38bd53381f04d1542f2c23907895dbdf4f39b5c3c480c651892e",
+          "size_bytes": 12145300
+        },
+        "AUDJPY/tick/2024/DAT_ASCII_AUDJPY_T_202403.zip": {
+          "rows": 1815919,
+          "sha256": "eaeb62190308435039e53404b0a1970853b86ef77d3c67e3aaffed69d449afa0",
+          "size_bytes": 11288814
+        },
+        "AUDJPY/tick/2024/DAT_ASCII_AUDJPY_T_202404.zip": {
+          "rows": 2018980,
+          "sha256": "83ebb00ef9d387cf36f76860a51ec2c8e1080e5ceeb3abdbcea0940ff7f5fdbd",
+          "size_bytes": 12927922
+        },
+        "AUDJPY/tick/2024/DAT_ASCII_AUDJPY_T_202405.zip": {
+          "rows": 1803131,
+          "sha256": "bcae0e4ca41e4725f535e88ffb0141946ce0d48db6da8b6d5718550c125eec2e",
+          "size_bytes": 11590522
+        },
+        "AUDJPY/tick/2024/DAT_ASCII_AUDJPY_T_202406.zip": {
+          "rows": 1740727,
+          "sha256": "46c311dde3b54ae59d63d048dca16034f178dd4987ea1d44d07417581e5fb946",
+          "size_bytes": 11091094
+        },
+        "AUDJPY/tick/2024/DAT_ASCII_AUDJPY_T_202407.zip": {
+          "rows": 2520365,
+          "sha256": "768c89739c92f596045ae0a4796ae3bb57a25e1032758a4acd8fa862f32676ce",
+          "size_bytes": 16134151
+        },
+        "AUDJPY/tick/2024/DAT_ASCII_AUDJPY_T_202408.zip": {
+          "rows": 3656194,
+          "sha256": "95135f96dfa17af9dd9b94a888a20ca6ee1a79b81be2eb8a01eed3fdf2f779e3",
+          "size_bytes": 23723401
+        },
+        "AUDJPY/tick/2024/DAT_ASCII_AUDJPY_T_202409.zip": {
+          "rows": 3086316,
+          "sha256": "f4459cd66ee7b4a3878a6229dcceb3818afcc0ae22cfbf388829f9351c1b68be",
+          "size_bytes": 19810210
+        },
+        "AUDJPY/tick/2024/DAT_ASCII_AUDJPY_T_202410.zip": {
+          "rows": 2765874,
+          "sha256": "dbf41f32433ea2768b2985786d649aeaf51d13064209e441825611969597b7bd",
+          "size_bytes": 17503826
+        },
+        "AUDJPY/tick/2024/DAT_ASCII_AUDJPY_T_202411.zip": {
+          "rows": 3567278,
+          "sha256": "8a38963fa778ef27e6076c8f50a95c7787f74e0d02491bbb71075283154bf035",
+          "size_bytes": 21814021
+        },
+        "AUDJPY/tick/2024/DAT_ASCII_AUDJPY_T_202412.zip": {
+          "rows": 2821251,
+          "sha256": "85e1c0984135eafdc76f72a9bf2510a556860634ada902e22ec8ae4cd0991a7a",
+          "size_bytes": 17348192
+        },
+        "AUDJPY/tick/2025/DAT_ASCII_AUDJPY_T_202501.zip": {
+          "rows": 3029488,
+          "sha256": "035709b174ebc21c73d86111a3b217c4f1d96cb8144e00de2a958126e3ae4c19",
+          "size_bytes": 18693589
+        },
+        "AUDJPY/tick/2025/DAT_ASCII_AUDJPY_T_202502.zip": {
+          "rows": 2725476,
+          "sha256": "b264d193956bc5c691a93f7659eeda4e1530b391ae8d4f1e1e7c0c2828c0de7e",
+          "size_bytes": 16834073
+        },
+        "AUDJPY/tick/2025/DAT_ASCII_AUDJPY_T_202503.zip": {
+          "rows": 3185290,
+          "sha256": "ef70331874447b019f6813ab137743bafe21c85d8644fe98e570a0554de600b4",
+          "size_bytes": 20071052
+        },
+        "AUDJPY/tick/2025/DAT_ASCII_AUDJPY_T_202504.zip": {
+          "rows": 5639763,
+          "sha256": "a479fcc23e2d2647db4afa9bbd189093cbe1a30dfe3f0f6bea98cc99e7fbfc89",
+          "size_bytes": 35948892
+        },
+        "AUDJPY/tick/2025/DAT_ASCII_AUDJPY_T_202505.zip": {
+          "rows": 2660311,
+          "sha256": "4ee3a6b4863fa8be68eda889c27a62b361793f19ac4006a2eb01c4d07ba0ef52",
+          "size_bytes": 16831249
+        },
+        "AUDJPY/tick/2025/DAT_ASCII_AUDJPY_T_202506.zip": {
+          "rows": 2285483,
+          "sha256": "4326fa14e27ff17823195ca17b587d0a73d62a9f2f160ef17da3693ed6649229",
+          "size_bytes": 14530580
+        },
+        "AUDJPY/tick/2025/DAT_ASCII_AUDJPY_T_202507.zip": {
+          "rows": 2170310,
+          "sha256": "8f713b2b203bd082e256738338e6f859a2c4a089e3e16a867c0c895d77c98705",
+          "size_bytes": 13777153
+        },
+        "AUDJPY/tick/2025/DAT_ASCII_AUDJPY_T_202508.zip": {
+          "rows": 1723110,
+          "sha256": "532e87e0d009e5af9876744a20ce791e135aea433a033df980fc00aea18cb493",
+          "size_bytes": 10910207
+        },
+        "AUDJPY/tick/2025/DAT_ASCII_AUDJPY_T_202509.zip": {
+          "rows": 1858701,
+          "sha256": "a96e9ab3f072f9bd9312d3789af99752dba66899f69c404ff5b0c4855330b7d1",
+          "size_bytes": 11608396
+        },
+        "AUDJPY/tick/2025/DAT_ASCII_AUDJPY_T_202510.zip": {
+          "rows": 2284988,
+          "sha256": "0d4aef0113f9e5a1f3249aac7081c04419d81528870ef4340290eee969b699a2",
+          "size_bytes": 14459746
+        },
+        "AUDJPY/tick/2025/DAT_ASCII_AUDJPY_T_202511.zip": {
+          "rows": 2140999,
+          "sha256": "4095d98ddb967eb626daa2a745f04a15f835f9ebec17e06a10de3f123b5a9db3",
+          "size_bytes": 13464640
+        },
+        "AUDJPY/tick/2025/DAT_ASCII_AUDJPY_T_202512.zip": {
+          "rows": 1856224,
+          "sha256": "0c2d9d0dab3508d4219c511cf27a954eaa342617c380cb85dd97cc66842dfd3b",
+          "size_bytes": 11661509
+        },
+        "AUDJPY/tick/2026/DAT_ASCII_AUDJPY_T_202601.zip": {
+          "rows": 2303103,
+          "sha256": "6b1ca11ec7ab6a23d38a6fdfcf996004a360e76d2b8bef2a8b04c82dfb458d04",
+          "size_bytes": 14532359
+        },
+        "AUDJPY/tick/2026/DAT_ASCII_AUDJPY_T_202602.zip": {
+          "rows": 2661569,
+          "sha256": "6868a253bc8bd1be6497d07092c62dc32a49fb9a3f044d7d3888ae0496befa42",
+          "size_bytes": 17062399
+        },
+        "AUDJPY/tick/2026/DAT_ASCII_AUDJPY_T_202603.zip": {
+          "rows": 4317405,
+          "sha256": "df8061f377430a7c70c6bdfd9f82822807144e381989e1964d34adb2c5cec6c0",
+          "size_bytes": 26959169
+        },
+        "AUDJPY/tick/2026/DAT_ASCII_AUDJPY_T_202604.zip": {
+          "rows": 1040444,
+          "sha256": "3def15b4d0883eea20220d4a2e64283a250d076788faf0f99414b78e5248216a",
+          "size_bytes": 6425412
         }
       },
-      "latest_month": "201008",
-      "total_files": 8,
-      "total_size_bytes": 13245889
+      "latest_month": "202604",
+      "total_files": 196,
+      "total_size_bytes": 2138504256
+    },
+    "AUDNZD": {
+      "earliest_month": "201001",
+      "files": {
+        "AUDNZD/tick/2010/DAT_ASCII_AUDNZD_T_201001.zip": {
+          "rows": 627483,
+          "sha256": "90e73a3c6b24e79cd9235283a0f1821f45171c3e7f6fc77839e4c202e68a187c",
+          "size_bytes": 2479369
+        },
+        "AUDNZD/tick/2010/DAT_ASCII_AUDNZD_T_201002.zip": {
+          "rows": 670455,
+          "sha256": "0bdf94cae446f7a8d831b64059385681f704105c56fc127390ee360cbe421cb6",
+          "size_bytes": 2629842
+        },
+        "AUDNZD/tick/2010/DAT_ASCII_AUDNZD_T_201003.zip": {
+          "rows": 695185,
+          "sha256": "cb5668f5ee60b712ac6b10b9444a22ee8f44ee15a1a4df0de578414a8aba292a",
+          "size_bytes": 2629733
+        },
+        "AUDNZD/tick/2010/DAT_ASCII_AUDNZD_T_201004.zip": {
+          "rows": 660671,
+          "sha256": "1001863055bf858922c7bbeefd9ee28daf28199058e7e84338d0b0cb728e02a2",
+          "size_bytes": 2413416
+        },
+        "AUDNZD/tick/2010/DAT_ASCII_AUDNZD_T_201005.zip": {
+          "rows": 1011851,
+          "sha256": "b22cfcda9f8a982d1e2066aea4cd0e8f67616a5c0a4ddd92c9bcf23676ad974c",
+          "size_bytes": 3895499
+        },
+        "AUDNZD/tick/2010/DAT_ASCII_AUDNZD_T_201006.zip": {
+          "rows": 887106,
+          "sha256": "3ba7b384516fb64270bb65af8c4bb78fa467172ab9bba82a33c7b3a8ae8c329f",
+          "size_bytes": 3422053
+        },
+        "AUDNZD/tick/2010/DAT_ASCII_AUDNZD_T_201007.zip": {
+          "rows": 734494,
+          "sha256": "cdf190473d7faeaf97e63a569c2d34d6668148420d68d8f6300fd6045119799a",
+          "size_bytes": 2809231
+        },
+        "AUDNZD/tick/2010/DAT_ASCII_AUDNZD_T_201008.zip": {
+          "rows": 690046,
+          "sha256": "ecea8051686ada046c3251f8375c64ac632e6a7d2679592364b9b32f40369fd0",
+          "size_bytes": 2648098
+        },
+        "AUDNZD/tick/2010/DAT_ASCII_AUDNZD_T_201009.zip": {
+          "rows": 657105,
+          "sha256": "bd357ad0578afb4d5e1e341d40b08f8096ab7cc4f216c3639a6ddb2b36e9cef9",
+          "size_bytes": 2490385
+        },
+        "AUDNZD/tick/2010/DAT_ASCII_AUDNZD_T_201010.zip": {
+          "rows": 636910,
+          "sha256": "0b9af083acd9dbb893d650789e43fe2508901d7170befe4332ae806fd2bff3d2",
+          "size_bytes": 2389330
+        },
+        "AUDNZD/tick/2010/DAT_ASCII_AUDNZD_T_201011.zip": {
+          "rows": 687927,
+          "sha256": "ca5097f0f61348f4ef103830655e035bc6c5e643a2637414f31267e130541b02",
+          "size_bytes": 2599573
+        },
+        "AUDNZD/tick/2010/DAT_ASCII_AUDNZD_T_201012.zip": {
+          "rows": 497402,
+          "sha256": "094bb891407b7076ba95457b5347273faaef78e68739e932edba94e6e8c6df9e",
+          "size_bytes": 1913528
+        },
+        "AUDNZD/tick/2011/DAT_ASCII_AUDNZD_T_201101.zip": {
+          "rows": 584705,
+          "sha256": "82aacfa86d3a691395a73d81a83a4daf9a7c07ccb3901c7f4857054bc87d1ecd",
+          "size_bytes": 2218508
+        },
+        "AUDNZD/tick/2011/DAT_ASCII_AUDNZD_T_201102.zip": {
+          "rows": 568909,
+          "sha256": "5501118068176cb3c35744814135c0c1fb7c70643f7c9aeb587bc074e16bec1e",
+          "size_bytes": 2118457
+        },
+        "AUDNZD/tick/2011/DAT_ASCII_AUDNZD_T_201103.zip": {
+          "rows": 683040,
+          "sha256": "458e0cce782b5e817f462fc941fb2025689df4af40f32f137163412daeae63f5",
+          "size_bytes": 2600538
+        },
+        "AUDNZD/tick/2011/DAT_ASCII_AUDNZD_T_201104.zip": {
+          "rows": 528496,
+          "sha256": "7838f2811b789207240d447befd75617e102d88f01ebab8bc6520be94fdb03ce",
+          "size_bytes": 2237296
+        },
+        "AUDNZD/tick/2011/DAT_ASCII_AUDNZD_T_201105.zip": {
+          "rows": 673382,
+          "sha256": "f1d6a90a59a7433d6a7538abb905f1b10abb128c68840eeab157bd04ac90db51",
+          "size_bytes": 3623325
+        },
+        "AUDNZD/tick/2011/DAT_ASCII_AUDNZD_T_201106.zip": {
+          "rows": 712565,
+          "sha256": "d666fa209a58177a3bec3f33307ac92b527d46c9d039e91a4a2b42804300a49f",
+          "size_bytes": 3747135
+        },
+        "AUDNZD/tick/2011/DAT_ASCII_AUDNZD_T_201107.zip": {
+          "rows": 667246,
+          "sha256": "fb3d2107e48e835f29075eee4d3a7462f42d575ef17711ce50c438fa1a65d357",
+          "size_bytes": 3537663
+        },
+        "AUDNZD/tick/2011/DAT_ASCII_AUDNZD_T_201108.zip": {
+          "rows": 918010,
+          "sha256": "3c5bd000ac3ac32d5b4f30d7d1f005c5e87c6cffea66669135a38ed05be3ee29",
+          "size_bytes": 4841693
+        },
+        "AUDNZD/tick/2011/DAT_ASCII_AUDNZD_T_201109.zip": {
+          "rows": 840970,
+          "sha256": "97f93b991d2f63a87f03b3e6a601e803c4deb1434650e66be28db324872348e5",
+          "size_bytes": 4474783
+        },
+        "AUDNZD/tick/2011/DAT_ASCII_AUDNZD_T_201110.zip": {
+          "rows": 792553,
+          "sha256": "bebb6469374c4d9758c0a404b9754252e8e0f1428d30566a5b4490657513d5b9",
+          "size_bytes": 4130859
+        },
+        "AUDNZD/tick/2011/DAT_ASCII_AUDNZD_T_201111.zip": {
+          "rows": 868259,
+          "sha256": "10d1be118cc47a3da171ec06b101f52155d8ecaa4c26e52919edb47354ab8e54",
+          "size_bytes": 4494227
+        },
+        "AUDNZD/tick/2011/DAT_ASCII_AUDNZD_T_201112.zip": {
+          "rows": 973421,
+          "sha256": "a0d2c1020bb87b6f217f8813d08bb2104e65d82bf219ae2973c21229d687cdbf",
+          "size_bytes": 5589383
+        },
+        "AUDNZD/tick/2012/DAT_ASCII_AUDNZD_T_201201.zip": {
+          "rows": 993753,
+          "sha256": "1843e5a4d95e2f7e978b5f9d1a99f8c51d1247a5d26e4d07a0ffb78eb4f6bf85",
+          "size_bytes": 5713397
+        },
+        "AUDNZD/tick/2012/DAT_ASCII_AUDNZD_T_201202.zip": {
+          "rows": 1548925,
+          "sha256": "cb99b5b78b7c4f8a8f2c84cfff82a2bfce21c17b91d93a7ffea9f56f9ebc754b",
+          "size_bytes": 8377536
+        },
+        "AUDNZD/tick/2012/DAT_ASCII_AUDNZD_T_201203.zip": {
+          "rows": 1182185,
+          "sha256": "cbf1df73e8aff127a0fd36f79f77ccf0067b53cb926efd37cb51ebfbc71d51cf",
+          "size_bytes": 6640050
+        },
+        "AUDNZD/tick/2012/DAT_ASCII_AUDNZD_T_201204.zip": {
+          "rows": 1090043,
+          "sha256": "9bcea19f2bc2fc5f3445ae04ab2f9485cf85f00f8cd98ab0f7cd3d206edadb53",
+          "size_bytes": 6076483
+        },
+        "AUDNZD/tick/2012/DAT_ASCII_AUDNZD_T_201205.zip": {
+          "rows": 1330086,
+          "sha256": "38b0de353823ff4e740dafb66349fad055fb627f9c37600ca4d284c8c86dbe32",
+          "size_bytes": 7461625
+        },
+        "AUDNZD/tick/2012/DAT_ASCII_AUDNZD_T_201206.zip": {
+          "rows": 1212403,
+          "sha256": "24b98a2eb8ee8af837bd960266ea65b76f01d8a4998c771e06f1480f0b031b80",
+          "size_bytes": 6689888
+        },
+        "AUDNZD/tick/2012/DAT_ASCII_AUDNZD_T_201207.zip": {
+          "rows": 1029644,
+          "sha256": "45a8ebe20490a64400ddaa55f417cf771f31e5946ddda1788e10638fccbfb66a",
+          "size_bytes": 5764217
+        },
+        "AUDNZD/tick/2012/DAT_ASCII_AUDNZD_T_201208.zip": {
+          "rows": 574725,
+          "sha256": "62c404acdb8fabd79fcdf4605b5859cf9b993a60b0b25bbe19d1d37a936e4795",
+          "size_bytes": 3365680
+        },
+        "AUDNZD/tick/2012/DAT_ASCII_AUDNZD_T_201209.zip": {
+          "rows": 705575,
+          "sha256": "ee9cb178a01b54a365c1b8a6c85d428abf75ba1427eb4e1fdda477db7e8c6f81",
+          "size_bytes": 4109780
+        },
+        "AUDNZD/tick/2012/DAT_ASCII_AUDNZD_T_201210.zip": {
+          "rows": 863852,
+          "sha256": "9662dd33904a9bf516b00952dca8fa1612d7b6297e07ac8a737f8da65b46b818",
+          "size_bytes": 4933193
+        },
+        "AUDNZD/tick/2012/DAT_ASCII_AUDNZD_T_201211.zip": {
+          "rows": 756606,
+          "sha256": "626ad9488d9d2a98c6ee2e744f0591b9adcd7e427cfe1581d216f73823d8e6e4",
+          "size_bytes": 4332598
+        },
+        "AUDNZD/tick/2012/DAT_ASCII_AUDNZD_T_201212.zip": {
+          "rows": 552860,
+          "sha256": "2c261df365e988c5ada6d53dfb0c4a1501a7a6dfef62cdd4315aa66ce09562ab",
+          "size_bytes": 3220844
+        },
+        "AUDNZD/tick/2013/DAT_ASCII_AUDNZD_T_201301.zip": {
+          "rows": 741449,
+          "sha256": "496317081f3dd24cf1822fc3c3fd6b5c5f0f8292e1eaf564b8b8f049bbb36557",
+          "size_bytes": 4351173
+        },
+        "AUDNZD/tick/2013/DAT_ASCII_AUDNZD_T_201302.zip": {
+          "rows": 640056,
+          "sha256": "6142e2d8cda7d1b71a68f377393b6a8b0be848ed0c461811810acd71e4371624",
+          "size_bytes": 3808899
+        },
+        "AUDNZD/tick/2013/DAT_ASCII_AUDNZD_T_201303.zip": {
+          "rows": 619704,
+          "sha256": "24c8137cdd2a9ba6277222b56e14130cc3058462aa964510e2ecdc174abb1901",
+          "size_bytes": 3665189
+        },
+        "AUDNZD/tick/2013/DAT_ASCII_AUDNZD_T_201304.zip": {
+          "rows": 686159,
+          "sha256": "3d31c5e8241a71d693d94469f524fc0a0893edfbbb6dd9829849335bbfa45e45",
+          "size_bytes": 4067711
+        },
+        "AUDNZD/tick/2013/DAT_ASCII_AUDNZD_T_201305.zip": {
+          "rows": 976464,
+          "sha256": "2a1c368120f9054f140f0c759b70d7bd211c86f20d56832090e97518333682f0",
+          "size_bytes": 5766684
+        },
+        "AUDNZD/tick/2013/DAT_ASCII_AUDNZD_T_201306.zip": {
+          "rows": 1192799,
+          "sha256": "2c69c03c4980b689dad7977900bbc2712557b7504a3aafeb7a29feef8b8382fd",
+          "size_bytes": 6999923
+        },
+        "AUDNZD/tick/2013/DAT_ASCII_AUDNZD_T_201307.zip": {
+          "rows": 1143278,
+          "sha256": "d16c33e1b30e9b347734cc49d713bf71adfcb669a6c745c2db5139f6dbd0c012",
+          "size_bytes": 6695100
+        },
+        "AUDNZD/tick/2013/DAT_ASCII_AUDNZD_T_201308.zip": {
+          "rows": 989772,
+          "sha256": "0059c73dd09f5d5b0eb5f467a4f47e711b2882884fac81283e77faceaa3d92a9",
+          "size_bytes": 5886135
+        },
+        "AUDNZD/tick/2013/DAT_ASCII_AUDNZD_T_201309.zip": {
+          "rows": 768313,
+          "sha256": "6f33540c4b1adf7feecb7db7bdee201c40ad55637f0335a77320af65b86e780c",
+          "size_bytes": 4514813
+        },
+        "AUDNZD/tick/2013/DAT_ASCII_AUDNZD_T_201310.zip": {
+          "rows": 732564,
+          "sha256": "f2932d0066e0a1ff692fb6b984a841e7f6b6dd0d3d09f0ab26834a571930c23a",
+          "size_bytes": 4333121
+        },
+        "AUDNZD/tick/2013/DAT_ASCII_AUDNZD_T_201311.zip": {
+          "rows": 659355,
+          "sha256": "b468ae1e3a65a4107aab512f69c00907397df9742fe9ba06ce89c0036027ca67",
+          "size_bytes": 3938615
+        },
+        "AUDNZD/tick/2013/DAT_ASCII_AUDNZD_T_201312.zip": {
+          "rows": 582295,
+          "sha256": "22f2cf4083aa9d647225b26dff288bf22557d48421a44e7f91862fac5872193e",
+          "size_bytes": 3483156
+        },
+        "AUDNZD/tick/2014/DAT_ASCII_AUDNZD_T_201401.zip": {
+          "rows": 800700,
+          "sha256": "b69bea95cf5becfa5256fdd46ba1ebf1ec2fda4588145177846da3f2ca4dfad0",
+          "size_bytes": 4723539
+        },
+        "AUDNZD/tick/2014/DAT_ASCII_AUDNZD_T_201402.zip": {
+          "rows": 616814,
+          "sha256": "2c2148ee355d9927892e317ef1fa9d2e8c0a1ad3804959c68d4bbc76d59c9a66",
+          "size_bytes": 3666364
+        },
+        "AUDNZD/tick/2014/DAT_ASCII_AUDNZD_T_201403.zip": {
+          "rows": 605586,
+          "sha256": "1d9874423d81e8a7ebac60dd7502ad181302073750556a29e462891178432d69",
+          "size_bytes": 3566158
+        },
+        "AUDNZD/tick/2014/DAT_ASCII_AUDNZD_T_201404.zip": {
+          "rows": 501122,
+          "sha256": "45e0f082c942b3cb521693670f5b87779725f1c0111d76b34a631794ece744b0",
+          "size_bytes": 2975712
+        },
+        "AUDNZD/tick/2014/DAT_ASCII_AUDNZD_T_201405.zip": {
+          "rows": 504720,
+          "sha256": "530d781b1c19f4567744905eeda11c8e78e192b15a4ab3fb01b8e3372e77b50a",
+          "size_bytes": 2974696
+        },
+        "AUDNZD/tick/2014/DAT_ASCII_AUDNZD_T_201406.zip": {
+          "rows": 416588,
+          "sha256": "459fe0ca1564b427326ca4b2e609ed92344d49530e5bef81a867def131292937",
+          "size_bytes": 2448472
+        },
+        "AUDNZD/tick/2014/DAT_ASCII_AUDNZD_T_201407.zip": {
+          "rows": 501482,
+          "sha256": "353aafa795f82df9f3d5c6630fd40648f98db3d488e395e764760cb3fe112745",
+          "size_bytes": 2850924
+        },
+        "AUDNZD/tick/2014/DAT_ASCII_AUDNZD_T_201408.zip": {
+          "rows": 572013,
+          "sha256": "593f05cf582ed7443157797969bce7e175cc2e99fc204009698dd8918fbdcace",
+          "size_bytes": 2896627
+        },
+        "AUDNZD/tick/2014/DAT_ASCII_AUDNZD_T_201409.zip": {
+          "rows": 805371,
+          "sha256": "3c377e44841c39ff4b67b1c6c7b6ce610908c6f021085d01597428ccb876d038",
+          "size_bytes": 4098008
+        },
+        "AUDNZD/tick/2014/DAT_ASCII_AUDNZD_T_201410.zip": {
+          "rows": 868624,
+          "sha256": "a1b59f3b2022addef20f2a957fc97fcbbb9523f87c867471bb762beb32b6e5f9",
+          "size_bytes": 5142198
+        },
+        "AUDNZD/tick/2014/DAT_ASCII_AUDNZD_T_201411.zip": {
+          "rows": 713728,
+          "sha256": "d1a4412b7bc7e452edd3a71f3ced95a13db895cbad810423ffe33ea36ba057ee",
+          "size_bytes": 4145391
+        },
+        "AUDNZD/tick/2014/DAT_ASCII_AUDNZD_T_201412.zip": {
+          "rows": 617799,
+          "sha256": "d87e5790d32d112e60a66349b0d1be431e8c18095f4f93c2400e15d63d4d2bec",
+          "size_bytes": 3653062
+        },
+        "AUDNZD/tick/2015/DAT_ASCII_AUDNZD_T_201501.zip": {
+          "rows": 782216,
+          "sha256": "a01565fedcf5665ffde3737431cb25c6fe36bacb2cdb49f4dfbecd2844b0884e",
+          "size_bytes": 4685903
+        },
+        "AUDNZD/tick/2015/DAT_ASCII_AUDNZD_T_201502.zip": {
+          "rows": 800277,
+          "sha256": "bd5b5101e6b62d49b38b8e8d4a0dfc9e20dda40b79c20a8419b5efa38159b0bc",
+          "size_bytes": 4616697
+        },
+        "AUDNZD/tick/2015/DAT_ASCII_AUDNZD_T_201503.zip": {
+          "rows": 949924,
+          "sha256": "42a44cb69ad6ed9cf7178cc62bf569947b09fe12db4da7e361940802f56587ed",
+          "size_bytes": 5344602
+        },
+        "AUDNZD/tick/2015/DAT_ASCII_AUDNZD_T_201504.zip": {
+          "rows": 870117,
+          "sha256": "dcde907ebea56583b4df3b8795d00a9ec53ff2744bdecd2a550be2d42375ce61",
+          "size_bytes": 4849178
+        },
+        "AUDNZD/tick/2015/DAT_ASCII_AUDNZD_T_201505.zip": {
+          "rows": 1103549,
+          "sha256": "aa3e8f1d412efbaff1286e0ce5a11c27356a5e1bdd724107c4811bcfbcca71fb",
+          "size_bytes": 6047651
+        },
+        "AUDNZD/tick/2015/DAT_ASCII_AUDNZD_T_201506.zip": {
+          "rows": 1119177,
+          "sha256": "61ceb4fb8ca9aec5d173b88607adf046b8717a0fae14e452f87aec4c0fb4bab5",
+          "size_bytes": 6138495
+        },
+        "AUDNZD/tick/2015/DAT_ASCII_AUDNZD_T_201507.zip": {
+          "rows": 1039905,
+          "sha256": "e5beca1eeb5a009a60713a09e316e339838df332a3219284cc139262958f28a1",
+          "size_bytes": 5887516
+        },
+        "AUDNZD/tick/2015/DAT_ASCII_AUDNZD_T_201508.zip": {
+          "rows": 1103689,
+          "sha256": "27d8247297c83d5fb02586318aa8bf4c78140969f748bb1f772f4de39d0eec22",
+          "size_bytes": 6315360
+        },
+        "AUDNZD/tick/2015/DAT_ASCII_AUDNZD_T_201509.zip": {
+          "rows": 1073874,
+          "sha256": "33e0bc957874a1c140c1db248a3703fd04c9bc95c23d5ea856c803aff8bc932c",
+          "size_bytes": 6145123
+        },
+        "AUDNZD/tick/2015/DAT_ASCII_AUDNZD_T_201510.zip": {
+          "rows": 858178,
+          "sha256": "78872ddf0f86a3a64226e1c4493a17c071f40e83d26125ff369bd171a082fbd9",
+          "size_bytes": 4964602
+        },
+        "AUDNZD/tick/2015/DAT_ASCII_AUDNZD_T_201511.zip": {
+          "rows": 951865,
+          "sha256": "b580b5bdc21c1369a6ab32fb20732656e0322fb08ec5ec676377642b640ebd90",
+          "size_bytes": 5230258
+        },
+        "AUDNZD/tick/2015/DAT_ASCII_AUDNZD_T_201512.zip": {
+          "rows": 988035,
+          "sha256": "f37ad5ba4807c780a8e75dfd8fdcdd7393a76bad00fbf6021f7ecf8e2a90a9bf",
+          "size_bytes": 5422055
+        },
+        "AUDNZD/tick/2016/DAT_ASCII_AUDNZD_T_201601.zip": {
+          "rows": 1144438,
+          "sha256": "e22bb7fcc94d065c824a6aefa03a682c477fc39f09454cf06e390d56afcc5994",
+          "size_bytes": 6397183
+        },
+        "AUDNZD/tick/2016/DAT_ASCII_AUDNZD_T_201602.zip": {
+          "rows": 1099399,
+          "sha256": "c00be654847345cf7e0aaab7fb7242348c39d5682516e083dced193620f7af3f",
+          "size_bytes": 6066977
+        },
+        "AUDNZD/tick/2016/DAT_ASCII_AUDNZD_T_201603.zip": {
+          "rows": 1077434,
+          "sha256": "26fc6b0525e2e9d7da60573f972c2876ccc8b6619b8ae1a8725ecd55dcc24b09",
+          "size_bytes": 6023189
+        },
+        "AUDNZD/tick/2016/DAT_ASCII_AUDNZD_T_201604.zip": {
+          "rows": 776506,
+          "sha256": "b511cbbd972c4bcf5a7a886841caf29f0fd4c6ff6d35655e796e80c2ecfba99b",
+          "size_bytes": 4521746
+        },
+        "AUDNZD/tick/2016/DAT_ASCII_AUDNZD_T_201605.zip": {
+          "rows": 698504,
+          "sha256": "cfbacf85c17dff7f8711aba9e78975f24176ad679dfcf50a1215ad78f9a666ac",
+          "size_bytes": 4078141
+        },
+        "AUDNZD/tick/2016/DAT_ASCII_AUDNZD_T_201606.zip": {
+          "rows": 787166,
+          "sha256": "f2bab5e739e9d5d02d24e7858483cdcbcf4d83267a0e10fc24139ec08deab65f",
+          "size_bytes": 4578587
+        },
+        "AUDNZD/tick/2016/DAT_ASCII_AUDNZD_T_201607.zip": {
+          "rows": 606660,
+          "sha256": "d01abf8afa989d06fc601f622ec8cc4883da8d1766c6f4a66f2305b76cdb09f6",
+          "size_bytes": 3524456
+        },
+        "AUDNZD/tick/2016/DAT_ASCII_AUDNZD_T_201608.zip": {
+          "rows": 548709,
+          "sha256": "ba2515bde732362e9a12508d270b3d50c59c8ed07d4e24360a3696d44af5884a",
+          "size_bytes": 3138509
+        },
+        "AUDNZD/tick/2016/DAT_ASCII_AUDNZD_T_201609.zip": {
+          "rows": 614092,
+          "sha256": "054a108e11c12777a1e9c6b3dc7526f57252e78190140bce166d5d71fdbd44ba",
+          "size_bytes": 3483102
+        },
+        "AUDNZD/tick/2016/DAT_ASCII_AUDNZD_T_201610.zip": {
+          "rows": 644697,
+          "sha256": "a057ce8916bf3a5a25f11de34275d13932ae1d49f7d049bbeba22c08a05d60ce",
+          "size_bytes": 3622527
+        },
+        "AUDNZD/tick/2016/DAT_ASCII_AUDNZD_T_201611.zip": {
+          "rows": 1212015,
+          "sha256": "2136a244396735cbb67d4e38920d6e1704e50db6f5e08b206e4ceea4b4a874d9",
+          "size_bytes": 6653369
+        },
+        "AUDNZD/tick/2016/DAT_ASCII_AUDNZD_T_201612.zip": {
+          "rows": 685588,
+          "sha256": "ae781c6c87baa98d65f0cb92f5ee8b8b7ccc0b11a93cf7c3f8e51aaae126dc7b",
+          "size_bytes": 3790254
+        },
+        "AUDNZD/tick/2017/DAT_ASCII_AUDNZD_T_201701.zip": {
+          "rows": 1122573,
+          "sha256": "15843bba49568a3551ce08a22429613281fdfd0a2a7166a84a247cf744da533e",
+          "size_bytes": 5913835
+        },
+        "AUDNZD/tick/2017/DAT_ASCII_AUDNZD_T_201702.zip": {
+          "rows": 1277935,
+          "sha256": "e4971e03770d1d1fc40f95ddc22c01fa384a971f392af98c59a16eb81004c52b",
+          "size_bytes": 6586849
+        },
+        "AUDNZD/tick/2017/DAT_ASCII_AUDNZD_T_201703.zip": {
+          "rows": 1369535,
+          "sha256": "5361597bfde71f3ea5a00277efde83cce2c4b807829faf0ca1d265a99579890e",
+          "size_bytes": 7165852
+        },
+        "AUDNZD/tick/2017/DAT_ASCII_AUDNZD_T_201704.zip": {
+          "rows": 1038287,
+          "sha256": "ed5516331ea5b10fa77614e19a9a11968add8a0a7aea9a78b89444a2b582811e",
+          "size_bytes": 5399291
+        },
+        "AUDNZD/tick/2017/DAT_ASCII_AUDNZD_T_201705.zip": {
+          "rows": 1198614,
+          "sha256": "e5b1f565d7935f19bfc1c31691f8816860589dfc7514581a63ab030c980dfb63",
+          "size_bytes": 6282967
+        },
+        "AUDNZD/tick/2017/DAT_ASCII_AUDNZD_T_201706.zip": {
+          "rows": 1219835,
+          "sha256": "8c585b2022fa79725c0fd19cf452a2a96d3ce7682c1a05908d34da94cd405830",
+          "size_bytes": 6232356
+        },
+        "AUDNZD/tick/2017/DAT_ASCII_AUDNZD_T_201707.zip": {
+          "rows": 1388214,
+          "sha256": "e40dc9bbca93af93b0adf36b5fffa47ea498eaa8d525c1d539f8af90a2abc5e7",
+          "size_bytes": 7092607
+        },
+        "AUDNZD/tick/2017/DAT_ASCII_AUDNZD_T_201708.zip": {
+          "rows": 1412038,
+          "sha256": "814c286779e716d754e101ce47ca4f0f08ba29b8253e76570ac93f8cd087a5db",
+          "size_bytes": 7187393
+        },
+        "AUDNZD/tick/2017/DAT_ASCII_AUDNZD_T_201709.zip": {
+          "rows": 926598,
+          "sha256": "70bf96b8e16b4233164fb0d1bcf2c37fa957cf34231f2c934250c983d31cb5e8",
+          "size_bytes": 5109083
+        },
+        "AUDNZD/tick/2017/DAT_ASCII_AUDNZD_T_201710.zip": {
+          "rows": 867246,
+          "sha256": "b46a6a718bca2127ea94d74a723e3a0daa089ff86a010275ea5a9366e32922a1",
+          "size_bytes": 4785587
+        },
+        "AUDNZD/tick/2017/DAT_ASCII_AUDNZD_T_201711.zip": {
+          "rows": 842484,
+          "sha256": "97e3de5b4e3a75b782b4e74e966f93f7906804564a87b20588adc90975a3eabe",
+          "size_bytes": 4581277
+        },
+        "AUDNZD/tick/2017/DAT_ASCII_AUDNZD_T_201712.zip": {
+          "rows": 626295,
+          "sha256": "0fde14c79890f2385d02a4bddb19f98a74d792acdc9c6d7ef6296d78e9e42e7a",
+          "size_bytes": 3427570
+        },
+        "AUDNZD/tick/2018/DAT_ASCII_AUDNZD_T_201801.zip": {
+          "rows": 978008,
+          "sha256": "f9ee15ede108acaf202ead76ed7a7fec66d880139c5713add94a665ee636ab6d",
+          "size_bytes": 5332132
+        },
+        "AUDNZD/tick/2018/DAT_ASCII_AUDNZD_T_201802.zip": {
+          "rows": 957549,
+          "sha256": "3b3044b79d65442873258b907d5ad9644b72ef667c491e853f948b4781800c6e",
+          "size_bytes": 5341517
+        },
+        "AUDNZD/tick/2018/DAT_ASCII_AUDNZD_T_201803.zip": {
+          "rows": 1011073,
+          "sha256": "e7d50dc1ce812cc507fcdc5c75848dafd7378edec3f8706e3a10a0b96c71682a",
+          "size_bytes": 5471966
+        },
+        "AUDNZD/tick/2018/DAT_ASCII_AUDNZD_T_201804.zip": {
+          "rows": 764108,
+          "sha256": "5186fcdfbd80fa0197bbb825dc05aba2e06c02c93f0ffddc4fbe611c7a4dd8c4",
+          "size_bytes": 4156347
+        },
+        "AUDNZD/tick/2018/DAT_ASCII_AUDNZD_T_201805.zip": {
+          "rows": 1103146,
+          "sha256": "a4206642120ece97e6dfcd4deded3bca58ce960bd9d1cd63365696bd378472d9",
+          "size_bytes": 6051199
+        },
+        "AUDNZD/tick/2018/DAT_ASCII_AUDNZD_T_201806.zip": {
+          "rows": 836706,
+          "sha256": "8d4f7ccbfd5eb00ee521362758113c09f4e7dd84089f7997f1d807539ceea51c",
+          "size_bytes": 4584240
+        },
+        "AUDNZD/tick/2018/DAT_ASCII_AUDNZD_T_201807.zip": {
+          "rows": 839088,
+          "sha256": "7d04b8034c221ab315d8e94710e5cea6d62397728d6d0f9daf287b326858929c",
+          "size_bytes": 4608546
+        },
+        "AUDNZD/tick/2018/DAT_ASCII_AUDNZD_T_201808.zip": {
+          "rows": 843191,
+          "sha256": "26b6eebc40c4db3829d9b6d06427ac81846dd3c7b83694f32c80d72892d363d3",
+          "size_bytes": 4665953
+        },
+        "AUDNZD/tick/2018/DAT_ASCII_AUDNZD_T_201809.zip": {
+          "rows": 869607,
+          "sha256": "4dd14a9535f0d3690246429bc1a45b9c05d76deaea8865fcbf6feada6492a5cf",
+          "size_bytes": 4709263
+        },
+        "AUDNZD/tick/2018/DAT_ASCII_AUDNZD_T_201810.zip": {
+          "rows": 1315731,
+          "sha256": "ca9b1b4d8972186beb46d231542bd9a0d4cab7b3e1af035b30d35043166e641f",
+          "size_bytes": 6859265
+        },
+        "AUDNZD/tick/2018/DAT_ASCII_AUDNZD_T_201811.zip": {
+          "rows": 1274431,
+          "sha256": "c361fa1559c1e6e8b369f109c5f0f3c0a7a47f28809648adab5de3014717dcff",
+          "size_bytes": 6692340
+        },
+        "AUDNZD/tick/2018/DAT_ASCII_AUDNZD_T_201812.zip": {
+          "rows": 2088376,
+          "sha256": "092fd3b945827d1b5335247e181a6a96f78281f924842b8b81b52027090a981d",
+          "size_bytes": 11777984
+        },
+        "AUDNZD/tick/2019/DAT_ASCII_AUDNZD_T_201901.zip": {
+          "rows": 3523327,
+          "sha256": "bf1c545ad0511a3ba4c7c9597c03fe9a8d8ab5850994581776db4f808db4b3d5",
+          "size_bytes": 20215365
+        },
+        "AUDNZD/tick/2019/DAT_ASCII_AUDNZD_T_201902.zip": {
+          "rows": 2919320,
+          "sha256": "e773d329bd94c4cb70d2f473d2b1702ef362f7dc466ae38738e6b4cfb1dd2811",
+          "size_bytes": 16788674
+        },
+        "AUDNZD/tick/2019/DAT_ASCII_AUDNZD_T_201903.zip": {
+          "rows": 2462708,
+          "sha256": "065239075c541891920576f6555caa4b447147e386500b408b9ba75e0326973e",
+          "size_bytes": 14476324
+        },
+        "AUDNZD/tick/2019/DAT_ASCII_AUDNZD_T_201904.zip": {
+          "rows": 2220831,
+          "sha256": "6fc3b9fc601ecb4aa63022e9ebd0db5d000de83686efc807c44a45fbf8f5f209",
+          "size_bytes": 13112462
+        },
+        "AUDNZD/tick/2019/DAT_ASCII_AUDNZD_T_201905.zip": {
+          "rows": 2055654,
+          "sha256": "dc8ffd4e37aa4807b2e067a7ed026e33c92e9fa512479ad7abfae2769b8da735",
+          "size_bytes": 12162774
+        },
+        "AUDNZD/tick/2019/DAT_ASCII_AUDNZD_T_201906.zip": {
+          "rows": 2099800,
+          "sha256": "621b684e0892432553b741184b2669bf699ba260019e5c4934d6aa440736c5db",
+          "size_bytes": 12209311
+        },
+        "AUDNZD/tick/2019/DAT_ASCII_AUDNZD_T_201907.zip": {
+          "rows": 1824297,
+          "sha256": "b7d660dc3b04b1df33317b0ee302fe75936043042ff41052ef4264e104ef4a24",
+          "size_bytes": 10654691
+        },
+        "AUDNZD/tick/2019/DAT_ASCII_AUDNZD_T_201908.zip": {
+          "rows": 2511863,
+          "sha256": "618ad20bd0f1db3aea49707bca0a7ebc3fe6d42b21fe473726c749a42b74c2cb",
+          "size_bytes": 14738195
+        },
+        "AUDNZD/tick/2019/DAT_ASCII_AUDNZD_T_201909.zip": {
+          "rows": 1969720,
+          "sha256": "fb721a993874ac1348d3172928962939c8e7db83ad45eeb5f08ca7fcae0fd1a6",
+          "size_bytes": 11583305
+        },
+        "AUDNZD/tick/2019/DAT_ASCII_AUDNZD_T_201910.zip": {
+          "rows": 2448871,
+          "sha256": "d40fd129f2572dae9592c944ac5122851fab8a623ca3d42f053808996682ba18",
+          "size_bytes": 14264104
+        },
+        "AUDNZD/tick/2019/DAT_ASCII_AUDNZD_T_201911.zip": {
+          "rows": 1693473,
+          "sha256": "a236251f04de7f14355c78fef7bce14e3041eccf3c8ac6cc2c724ece6b064495",
+          "size_bytes": 9961113
+        },
+        "AUDNZD/tick/2019/DAT_ASCII_AUDNZD_T_201912.zip": {
+          "rows": 1574862,
+          "sha256": "40acf7c329b37834eb6594b9ab2e7359811f4af19daba4966b419474544ab74d",
+          "size_bytes": 9164388
+        },
+        "AUDNZD/tick/2020/DAT_ASCII_AUDNZD_T_202001.zip": {
+          "rows": 1865065,
+          "sha256": "07d73836e1f5a3e3e3b7ad416dc2f5a2c19774f63814f15e596aa631d0721bf8",
+          "size_bytes": 10913672
+        },
+        "AUDNZD/tick/2020/DAT_ASCII_AUDNZD_T_202002.zip": {
+          "rows": 1890236,
+          "sha256": "97eba2913381880cada69b0aa86cea9d52b27bee7f6e5a2d78d95bbe6769a66d",
+          "size_bytes": 11217288
+        },
+        "AUDNZD/tick/2020/DAT_ASCII_AUDNZD_T_202003.zip": {
+          "rows": 5710778,
+          "sha256": "70349aea7188664424dabd3bb957bf6186dc11947ce6ad687844f6c9e93c26f8",
+          "size_bytes": 35357336
+        },
+        "AUDNZD/tick/2020/DAT_ASCII_AUDNZD_T_202004.zip": {
+          "rows": 2861511,
+          "sha256": "598a195ef353b14a0b26a1282723d25892176ab017ed5972e0a925222b1613dc",
+          "size_bytes": 17681887
+        },
+        "AUDNZD/tick/2020/DAT_ASCII_AUDNZD_T_202005.zip": {
+          "rows": 2317754,
+          "sha256": "c061fafe716ec0e62e624ec2b574cc8632d23e675a0ae9a8b889c6e879e2b15e",
+          "size_bytes": 14111147
+        },
+        "AUDNZD/tick/2020/DAT_ASCII_AUDNZD_T_202006.zip": {
+          "rows": 3666837,
+          "sha256": "e6609fa4bb2c6cabd724fc8401785fe76a67b54d2e61296eb244eba536d49995",
+          "size_bytes": 21552532
+        },
+        "AUDNZD/tick/2020/DAT_ASCII_AUDNZD_T_202007.zip": {
+          "rows": 2829323,
+          "sha256": "43a2a966b0c79b72a1e345f126c8f470cf512254c0d3c5f576fe44adca2a85e5",
+          "size_bytes": 16943465
+        },
+        "AUDNZD/tick/2020/DAT_ASCII_AUDNZD_T_202008.zip": {
+          "rows": 2197289,
+          "sha256": "0d2c32060221cf8d8b89e4c4a43d095d0f427d6f358092da595d8c5e0badb539",
+          "size_bytes": 13493973
+        },
+        "AUDNZD/tick/2020/DAT_ASCII_AUDNZD_T_202009.zip": {
+          "rows": 2195195,
+          "sha256": "fb84b49a08b250f7c637fa2046603880a1f7517fb7315c31f675bd29f7e9f9fc",
+          "size_bytes": 13798466
+        },
+        "AUDNZD/tick/2020/DAT_ASCII_AUDNZD_T_202010.zip": {
+          "rows": 2067493,
+          "sha256": "956dc435495ae41b16525c4944de04260d3782ad87d6926d56b48c56d415b2b8",
+          "size_bytes": 12889761
+        },
+        "AUDNZD/tick/2020/DAT_ASCII_AUDNZD_T_202011.zip": {
+          "rows": 2150659,
+          "sha256": "ec7af7a980e4882176f9190ebafec1b9548246d3ccea1581c666127c9a15cf17",
+          "size_bytes": 13515384
+        },
+        "AUDNZD/tick/2020/DAT_ASCII_AUDNZD_T_202012.zip": {
+          "rows": 1859906,
+          "sha256": "955a54487426c44cec66e91446063278b20512fe9194bc529c393ec1c9243615",
+          "size_bytes": 11574268
+        },
+        "AUDNZD/tick/2021/DAT_ASCII_AUDNZD_T_202101.zip": {
+          "rows": 2416324,
+          "sha256": "e3d389b9e6faba75eaa5e1872d9387fbfa09aec254fa908eee922975ab7132fd",
+          "size_bytes": 14759694
+        },
+        "AUDNZD/tick/2021/DAT_ASCII_AUDNZD_T_202102.zip": {
+          "rows": 2017573,
+          "sha256": "e9aefdda6b3d3db485e6e3abb55b35340672fc7081cdd75f48100a5c8b1d26a9",
+          "size_bytes": 12382375
+        },
+        "AUDNZD/tick/2021/DAT_ASCII_AUDNZD_T_202103.zip": {
+          "rows": 2292327,
+          "sha256": "1413dabab6e32a1f3da6707c26298c56e853826f7cc4366d80330ef90cd87d2e",
+          "size_bytes": 14132595
+        },
+        "AUDNZD/tick/2021/DAT_ASCII_AUDNZD_T_202104.zip": {
+          "rows": 1391920,
+          "sha256": "6929b1b4d1507b37f20c6590d430cd50f1315f7acf97c5c24aec7f25336752a8",
+          "size_bytes": 8712573
+        },
+        "AUDNZD/tick/2021/DAT_ASCII_AUDNZD_T_202105.zip": {
+          "rows": 1431048,
+          "sha256": "61ef653690eeb9fccc235b4300973f4f059583d1bb76ba11b2795d0d5b08f1a7",
+          "size_bytes": 8861113
+        },
+        "AUDNZD/tick/2021/DAT_ASCII_AUDNZD_T_202106.zip": {
+          "rows": 1351520,
+          "sha256": "5149debb6bc20e40708ef2e0f912a59809435c86c4225e831684d5e0351f5307",
+          "size_bytes": 8344725
+        },
+        "AUDNZD/tick/2021/DAT_ASCII_AUDNZD_T_202107.zip": {
+          "rows": 1668631,
+          "sha256": "9a5451a40d7e2b3585ee2b1659cd05558e71f47f026135d71f9968349fba682d",
+          "size_bytes": 10233456
+        },
+        "AUDNZD/tick/2021/DAT_ASCII_AUDNZD_T_202108.zip": {
+          "rows": 1322636,
+          "sha256": "7446e96660c8b73f6b404d2b7d8056eaf5d47d6ed0aa32ab2e64f9c699a90f54",
+          "size_bytes": 8290765
+        },
+        "AUDNZD/tick/2021/DAT_ASCII_AUDNZD_T_202109.zip": {
+          "rows": 1607349,
+          "sha256": "c62a85e741e6fc4d0a97432037d7ff7240b01fe0e4ccee9c094d757044efdee3",
+          "size_bytes": 9818867
+        },
+        "AUDNZD/tick/2021/DAT_ASCII_AUDNZD_T_202110.zip": {
+          "rows": 1609349,
+          "sha256": "0c12e2890a69bf176274cdee9ad4c64d2582a11c45a35d85cc249e7fa44bbaed",
+          "size_bytes": 9755870
+        },
+        "AUDNZD/tick/2021/DAT_ASCII_AUDNZD_T_202111.zip": {
+          "rows": 1716554,
+          "sha256": "219fef13b19615ca3cc72b808b7f32367ca3cde8d0442d52d46f44277b867e0e",
+          "size_bytes": 10547103
+        },
+        "AUDNZD/tick/2021/DAT_ASCII_AUDNZD_T_202112.zip": {
+          "rows": 1825906,
+          "sha256": "477ee12ca81be9248a40ccbd0f4f9ff448b35cc7487820e53356ad1eb10d7f0f",
+          "size_bytes": 11119816
+        },
+        "AUDNZD/tick/2022/DAT_ASCII_AUDNZD_T_202201.zip": {
+          "rows": 1990387,
+          "sha256": "d43210d0effd5c9ad4960089900d918254ef9c17e67c0ce96c601e2020dd689c",
+          "size_bytes": 11987157
+        },
+        "AUDNZD/tick/2022/DAT_ASCII_AUDNZD_T_202202.zip": {
+          "rows": 2649054,
+          "sha256": "60549900a73ee106749d4180fe8ba203dadd6e87616427c716fd66950e9912f5",
+          "size_bytes": 15676311
+        },
+        "AUDNZD/tick/2022/DAT_ASCII_AUDNZD_T_202203.zip": {
+          "rows": 2812988,
+          "sha256": "303277535758a8c3d894b164e05c1db082c057592a4d18546fad338ac898f89a",
+          "size_bytes": 16715301
+        },
+        "AUDNZD/tick/2022/DAT_ASCII_AUDNZD_T_202204.zip": {
+          "rows": 2526914,
+          "sha256": "0172f53cfdbb61c02c8886a4d064e8ea89588d2e730cc3902baa55e2a456c927",
+          "size_bytes": 15191366
+        },
+        "AUDNZD/tick/2022/DAT_ASCII_AUDNZD_T_202205.zip": {
+          "rows": 3767177,
+          "sha256": "065217665c63e889c7d61f3b5a407d4ab2795544289b19e22636c7068d4ca0e2",
+          "size_bytes": 22307990
+        },
+        "AUDNZD/tick/2022/DAT_ASCII_AUDNZD_T_202206.zip": {
+          "rows": 3513603,
+          "sha256": "085823b93f774822c969ed2e38d582021f99422862595b94d74f54eb8908a835",
+          "size_bytes": 20652277
+        },
+        "AUDNZD/tick/2022/DAT_ASCII_AUDNZD_T_202207.zip": {
+          "rows": 3521305,
+          "sha256": "19890645bfad32fd5f1917a40e9b55f00181e9b53dab921fca1f7153030fe40a",
+          "size_bytes": 20743865
+        },
+        "AUDNZD/tick/2022/DAT_ASCII_AUDNZD_T_202208.zip": {
+          "rows": 2726762,
+          "sha256": "3341b2f8bbb022c1adf1cc032e3e8d9707a8c531772b8b115ad29c2ce2010de3",
+          "size_bytes": 16261755
+        },
+        "AUDNZD/tick/2022/DAT_ASCII_AUDNZD_T_202209.zip": {
+          "rows": 3043575,
+          "sha256": "68431583252114578f40d992c72bbafe9ac4c0a260fbe6f347225219f74bcf7d",
+          "size_bytes": 17680166
+        },
+        "AUDNZD/tick/2022/DAT_ASCII_AUDNZD_T_202210.zip": {
+          "rows": 3255296,
+          "sha256": "8cdded12e1667acd443cf692619e42e780efac82e2f95c36eb14c9243487abd7",
+          "size_bytes": 18930755
+        },
+        "AUDNZD/tick/2022/DAT_ASCII_AUDNZD_T_202211.zip": {
+          "rows": 2600753,
+          "sha256": "bba49192c675c1bd6f0d52bdbee9e43ba9aea6d2079d143ff1e163ede2f05d81",
+          "size_bytes": 15262712
+        },
+        "AUDNZD/tick/2022/DAT_ASCII_AUDNZD_T_202212.zip": {
+          "rows": 2788160,
+          "sha256": "efbc99ff55a3de92f77d9e0bd79225e9730cfa6551c123182bbcb8acda63e45f",
+          "size_bytes": 16912074
+        },
+        "AUDNZD/tick/2023/DAT_ASCII_AUDNZD_T_202301.zip": {
+          "rows": 3208510,
+          "sha256": "5278aabc0eb95e05a8e9f77053eab78efc4b4da9cb2d4091cbb1755057c76114",
+          "size_bytes": 19910078
+        },
+        "AUDNZD/tick/2023/DAT_ASCII_AUDNZD_T_202302.zip": {
+          "rows": 2658353,
+          "sha256": "e8451bcaec314f60ede42e1fd3e008d952d5b863c07e8e876b4e5f2ba5e95e14",
+          "size_bytes": 16392492
+        },
+        "AUDNZD/tick/2023/DAT_ASCII_AUDNZD_T_202303.zip": {
+          "rows": 2471476,
+          "sha256": "142e58130f7d79aba57cd16d39fd4b413032013a52814fbecbd68ea182fa9ae0",
+          "size_bytes": 15072576
+        },
+        "AUDNZD/tick/2023/DAT_ASCII_AUDNZD_T_202304.zip": {
+          "rows": 1482342,
+          "sha256": "ebb9ddbcf4ad70e448fb728c0ad9169ea0c9ba348c573b6b63afeed3129c216d",
+          "size_bytes": 9177429
+        },
+        "AUDNZD/tick/2023/DAT_ASCII_AUDNZD_T_202305.zip": {
+          "rows": 1659002,
+          "sha256": "8b9316dba023541a70341cf6cc30cbab1518818f79450f8a62334e5d15f0131f",
+          "size_bytes": 10307470
+        },
+        "AUDNZD/tick/2023/DAT_ASCII_AUDNZD_T_202306.zip": {
+          "rows": 1560788,
+          "sha256": "104fe7bb1cc6e1d3a023087928a9eef67c5a7ee772ae7ba8d4c6825a3d184578",
+          "size_bytes": 9770562
+        },
+        "AUDNZD/tick/2023/DAT_ASCII_AUDNZD_T_202307.zip": {
+          "rows": 1733868,
+          "sha256": "ee6326c137633444d347352807cd581ceb448a276fd091ef675680f74460ed33",
+          "size_bytes": 10811232
+        },
+        "AUDNZD/tick/2023/DAT_ASCII_AUDNZD_T_202308.zip": {
+          "rows": 2379443,
+          "sha256": "152bf06c67108dee3562f774fc48fa5cc53e7213ded125eb9cde980b33ac0c17",
+          "size_bytes": 14924116
+        },
+        "AUDNZD/tick/2023/DAT_ASCII_AUDNZD_T_202309.zip": {
+          "rows": 2046690,
+          "sha256": "f8ed8164b654b5a6fbefb02eee7262c880066c76f5288876f06d03462b429a0c",
+          "size_bytes": 12646170
+        },
+        "AUDNZD/tick/2023/DAT_ASCII_AUDNZD_T_202310.zip": {
+          "rows": 2532715,
+          "sha256": "31c4b7829577af85cac6d0068b52b312c66cd3b71ff2138e84e5e792d4d5be79",
+          "size_bytes": 15473039
+        },
+        "AUDNZD/tick/2023/DAT_ASCII_AUDNZD_T_202311.zip": {
+          "rows": 2035213,
+          "sha256": "2f2571051aa3e6719acb6e5d55d3672650f6766693c861267548420dc5d1b14d",
+          "size_bytes": 12625152
+        },
+        "AUDNZD/tick/2023/DAT_ASCII_AUDNZD_T_202312.zip": {
+          "rows": 2059115,
+          "sha256": "d1d1680edef281b47d5a3279578571c31fb162c52c2fe55da782fc2da3a503f4",
+          "size_bytes": 12656676
+        },
+        "AUDNZD/tick/2024/DAT_ASCII_AUDNZD_T_202401.zip": {
+          "rows": 2265102,
+          "sha256": "f04d945a680c416a423c8177ee522e40091bda367d8853d344b63066d1cc2224",
+          "size_bytes": 13937752
+        },
+        "AUDNZD/tick/2024/DAT_ASCII_AUDNZD_T_202402.zip": {
+          "rows": 1644698,
+          "sha256": "5f6c338246d2aefd3a273365b366af93a8f7f4d69cd64933da62385641b03adc",
+          "size_bytes": 10199387
+        },
+        "AUDNZD/tick/2024/DAT_ASCII_AUDNZD_T_202403.zip": {
+          "rows": 1387408,
+          "sha256": "3b11b05b84c57ef1bbc0d81fb943c5660cf0013082bfa39ee418ef494e68e556",
+          "size_bytes": 8652587
+        },
+        "AUDNZD/tick/2024/DAT_ASCII_AUDNZD_T_202404.zip": {
+          "rows": 1660357,
+          "sha256": "3963e8b17257da50920348f829054e8ff4cc2240d9212a9d43673147c4041033",
+          "size_bytes": 10297417
+        },
+        "AUDNZD/tick/2024/DAT_ASCII_AUDNZD_T_202405.zip": {
+          "rows": 1299103,
+          "sha256": "92d8bd14fdecf04c3998b86a0f56592b9ee517d46019a7adbbc54586422fba93",
+          "size_bytes": 8165287
+        },
+        "AUDNZD/tick/2024/DAT_ASCII_AUDNZD_T_202406.zip": {
+          "rows": 960228,
+          "sha256": "25cbb95547b98791103ff1da8192e2f84f9f5a04c28b44f303f1d2de7df47aa4",
+          "size_bytes": 6159428
+        },
+        "AUDNZD/tick/2024/DAT_ASCII_AUDNZD_T_202407.zip": {
+          "rows": 1182318,
+          "sha256": "2ea37d584c80d073138c91df471139779cbdf84bec207ed7bb194bf9e2c97568",
+          "size_bytes": 7628669
+        },
+        "AUDNZD/tick/2024/DAT_ASCII_AUDNZD_T_202408.zip": {
+          "rows": 1591293,
+          "sha256": "ad83c034c1827640782e4ff28c432d01a693a3eac256ffba2be6447d72d6f4c7",
+          "size_bytes": 10276641
+        },
+        "AUDNZD/tick/2024/DAT_ASCII_AUDNZD_T_202409.zip": {
+          "rows": 1286502,
+          "sha256": "21f6ff71d6befa872d44e7c7a20062aa1a83e9ef3403bb2694bf0c31a3fae7ef",
+          "size_bytes": 8228621
+        },
+        "AUDNZD/tick/2024/DAT_ASCII_AUDNZD_T_202410.zip": {
+          "rows": 1323873,
+          "sha256": "312ea74fb5a40c15f936381f04a01b5bb9fdd6351face3e072e2d131ec3a0c3a",
+          "size_bytes": 8444184
+        },
+        "AUDNZD/tick/2024/DAT_ASCII_AUDNZD_T_202411.zip": {
+          "rows": 1711141,
+          "sha256": "c30d63933d4313b14d7eb6e6c2c031d85ebcf4b150312239d436613b8cf359b2",
+          "size_bytes": 10758633
+        },
+        "AUDNZD/tick/2024/DAT_ASCII_AUDNZD_T_202412.zip": {
+          "rows": 1350401,
+          "sha256": "35b8db5dbf075b8c5d5af43a1891415f245de62d28048ef7d82807706f0c2a3a",
+          "size_bytes": 8555832
+        },
+        "AUDNZD/tick/2025/DAT_ASCII_AUDNZD_T_202501.zip": {
+          "rows": 1230595,
+          "sha256": "436a9773926fc2f11dc4bf80408975a605c5376dcac14ab02b800cf903b1e457",
+          "size_bytes": 7832845
+        },
+        "AUDNZD/tick/2025/DAT_ASCII_AUDNZD_T_202502.zip": {
+          "rows": 974401,
+          "sha256": "297165692ad6d2cb38de045110b1580b4b2fe4c88cb0e359da29cf093bc40a2e",
+          "size_bytes": 6204378
+        },
+        "AUDNZD/tick/2025/DAT_ASCII_AUDNZD_T_202503.zip": {
+          "rows": 1104010,
+          "sha256": "55457a3f4647fdf3bf1337512ebe3e09fafd9fb6a9bcf2140cf19cd2a1a9d528",
+          "size_bytes": 6993703
+        },
+        "AUDNZD/tick/2025/DAT_ASCII_AUDNZD_T_202504.zip": {
+          "rows": 3116025,
+          "sha256": "61fd7fd0ea7ae6b57ea5323d37209221b2aa03f4e7e7c93313071ef04c1c7649",
+          "size_bytes": 19455189
+        },
+        "AUDNZD/tick/2025/DAT_ASCII_AUDNZD_T_202505.zip": {
+          "rows": 1372883,
+          "sha256": "dae63d31bda10d053701a6c1000b8677181a78b81a95a2e62ed59e22c832bd6d",
+          "size_bytes": 8761362
+        },
+        "AUDNZD/tick/2025/DAT_ASCII_AUDNZD_T_202506.zip": {
+          "rows": 1523791,
+          "sha256": "65de4558bf6947d260748d82800f9ca64b353e2d1f4d1dc548d4691e5527bf11",
+          "size_bytes": 9555331
+        },
+        "AUDNZD/tick/2025/DAT_ASCII_AUDNZD_T_202507.zip": {
+          "rows": 1421668,
+          "sha256": "293e0d57cdff2e9106efa7227a1e13238afa0de86a75d6087a3267d324da938d",
+          "size_bytes": 8923840
+        },
+        "AUDNZD/tick/2025/DAT_ASCII_AUDNZD_T_202508.zip": {
+          "rows": 1006378,
+          "sha256": "c6b96f857ad6cb1d663383a3e37024688c335d0221b74f4a8de6027bd77e8a7a",
+          "size_bytes": 6423337
+        },
+        "AUDNZD/tick/2025/DAT_ASCII_AUDNZD_T_202509.zip": {
+          "rows": 992654,
+          "sha256": "88109cd73a9e87ec1978c3d6eed9364c5f337934cfef2eb9ab38e690de5e860e",
+          "size_bytes": 6369928
+        },
+        "AUDNZD/tick/2025/DAT_ASCII_AUDNZD_T_202510.zip": {
+          "rows": 1576645,
+          "sha256": "a956efc3e11ec0f01a5fef659e79fbd007faf19888b87066865e47f3d325ff19",
+          "size_bytes": 9890694
+        },
+        "AUDNZD/tick/2025/DAT_ASCII_AUDNZD_T_202511.zip": {
+          "rows": 1414762,
+          "sha256": "a74256bba53420ecdc3eae5b49a477c5bd1d724262bbfaf1dee77e925f63cd14",
+          "size_bytes": 8910595
+        },
+        "AUDNZD/tick/2025/DAT_ASCII_AUDNZD_T_202512.zip": {
+          "rows": 1278989,
+          "sha256": "5aa136679236788e7c88b2619798cf3e13a302044a8521de20832bd976322e8d",
+          "size_bytes": 8080775
+        },
+        "AUDNZD/tick/2026/DAT_ASCII_AUDNZD_T_202601.zip": {
+          "rows": 1215546,
+          "sha256": "176166790fa2569256adfc2cdd18859050838afe4e02b3b15359137bd5f23937",
+          "size_bytes": 7829151
+        },
+        "AUDNZD/tick/2026/DAT_ASCII_AUDNZD_T_202602.zip": {
+          "rows": 1205174,
+          "sha256": "10831c7c0ace1c2f5f9dbc7eeff053fa7dec5ae119adfea657f155b4ae8e2022",
+          "size_bytes": 7873015
+        },
+        "AUDNZD/tick/2026/DAT_ASCII_AUDNZD_T_202603.zip": {
+          "rows": 2778838,
+          "sha256": "c847f6e44db9f41d15fea2525c8319119557541e60c4dafbcae67aa49395c2e9",
+          "size_bytes": 16899307
+        },
+        "AUDNZD/tick/2026/DAT_ASCII_AUDNZD_T_202604.zip": {
+          "rows": 768636,
+          "sha256": "cc2f957a9eff47e75cf257727dc58fd79d16963a490da85108e2e7e1b8e16e08",
+          "size_bytes": 4586908
+        }
+      },
+      "latest_month": "202604",
+      "total_files": 196,
+      "total_size_bytes": 1608134138
     },
     "EURUSD": {
       "earliest_month": "201501",

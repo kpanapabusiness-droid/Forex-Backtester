@@ -44,8 +44,6 @@ Usage:
 
 from __future__ import annotations
 
-import hashlib
-import json
 import math
 import sys
 import time
@@ -65,7 +63,6 @@ if str(_REPO_ROOT) not in sys.path:
 from scripts.arc_5.step5_rerun_new_spreads import (  # noqa: E402
     BASE_ENTRY_FEATURES,
     CLUSTER_F9_THRESHOLD,
-    CLUSTER_LABEL,
     CLUSTER_R_FRAME_ATR_MULT,
     WFO_FOLDS,
     _build_entry_features_for_pool,
@@ -366,8 +363,6 @@ def main() -> int:
         sl_dist_price = sl_mult * atr_14  # R-frame for this cluster
         cam_r = _compute_close_at_market_r(bar2_open, entry_prices, sl_dist_price, spread_pips, pip_sizes)
         cam_r_by_cluster[cid] = cam_r
-    # Survivor mask (bars_held >= 3 in original pool, classifier can route)
-    survived = bars_held >= 3
     # For early-exit trades (bars_held <= 2), R under cluster X = (engine final_r) / sl_mult_X / 2.0
     # The engine's final_r is denominated to 2.0×ATR. To re-express in cluster R-frame:
     # cluster_final_r = engine_final_r × (2.0 / cluster_sl_mult)
@@ -509,7 +504,6 @@ def main() -> int:
         """For the tiered ensemble strategy."""
         t1 = CLUSTER_F9_THRESHOLD[1]
         t3 = CLUSTER_F9_THRESHOLD[3]
-        cam_r_1 = cam_r_by_cluster[1]
         cam_r_3 = cam_r_by_cluster[3]
         early_r_1 = early_exit_r_by_cluster[1]
         early_r_3 = early_exit_r_by_cluster[3]
@@ -562,7 +556,6 @@ def main() -> int:
             n_admit = int(admit_mask.sum())
             admit_rate = n_admit / len(oos_idx) if len(oos_idx) > 0 else 0.0
             # Win rate = positive among admits (using their own R-frame)
-            admit_global = oos_idx[admit_mask]
             n_target_admit_pos = int((r[admit_mask] > 0).sum())
             out[fidx] = FoldStratData(
                 fold=fidx, oos_start=oos_start_ts, oos_end=oos_end_ts, oos_days=oos_days,
@@ -655,7 +648,6 @@ def main() -> int:
         best_tier = "FAIL"
         best_risk: Optional[float] = None
         best_metrics: Optional[Dict] = None
-        best_per_fold: Optional[List[Dict]] = None
         tier_rank_map = {"FAIL": 0, "VIABLE": 1, "DEPLOYABLE": 2}
         best_key: Optional[Tuple[int, float, float]] = None  # (tier_rank, worst_roi_ann, smaller_risk_better)
 
@@ -747,7 +739,6 @@ def main() -> int:
                     "n_admit_total": int(sum(n_admit_per_fold)),
                     "n_admit_min_per_fold": int(min(n_admit_per_fold)),
                 }
-                best_per_fold = per_fold
                 best_key = cand_key
 
             pd.DataFrame(per_fold).to_csv(strat_dir / f"per_fold_wfo_{sname}_risk_{r_bps}bps.csv", index=False)
@@ -820,7 +811,7 @@ def main() -> int:
     # Load prior PR 1 numbers from step5_spread_v2/
     for cid in (1, 3):
         sd = strategies[f"cluster_{cid}"]
-        pr1_path = _REPO_ROOT / "results" / "l_arc_5" / "step5_spread_v2" / f"cluster_{cid}" / f"fold_stability_new_spreads.csv"
+        pr1_path = _REPO_ROOT / "results" / "l_arc_5" / "step5_spread_v2" / f"cluster_{cid}" / "fold_stability_new_spreads.csv"
         pr1 = pd.read_csv(pr1_path)
         for fidx in range(1, 8):
             f = sd[fidx]

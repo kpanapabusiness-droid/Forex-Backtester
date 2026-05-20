@@ -43,7 +43,6 @@ if str(_REPO_ROOT) not in sys.path:
 
 from scripts.l_arc_10 import step1_plumbing as s1  # noqa: E402
 
-
 # ---------------------------------------------------------------------------
 # Determinism audit — two-run sha256 comparison.
 # ---------------------------------------------------------------------------

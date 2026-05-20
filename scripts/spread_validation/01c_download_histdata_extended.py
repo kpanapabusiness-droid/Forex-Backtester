@@ -33,13 +33,13 @@ import io
 import shutil
 import sys
 import time
-import urllib3
 import zipfile
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import requests
+import urllib3
 from bs4 import BeautifulSoup
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -408,7 +408,6 @@ def gate_phase_b(phase_a_summary: dict) -> tuple[bool, str]:
         )
     # Per-pair gap > 20%
     by_pair = phase_a_summary["by_pair"]
-    n_months = (PHASES["phaseA"][2] - PHASES["phaseA"][0]) * 12 + (PHASES["phaseA"][3] - PHASES["phaseA"][1]) + 1
     for pair, d in by_pair.items():
         n_total = sum(d.values())
         n_missing = d.get("MISSING_ON_SOURCE", 0) + d.get("FAIL_AFTER_RETRY", 0) + d.get("QUARANTINED", 0)

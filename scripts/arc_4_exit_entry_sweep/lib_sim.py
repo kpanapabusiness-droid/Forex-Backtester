@@ -56,7 +56,6 @@ def simulate_policy_vectorized(
         # over the bar range [start_bar..end]
         new_close = close_r - entry_close_r[:, None]
         # Mask invalid bars (NaN) and pre-start bars
-        n_after = n_bars_total - start_bar
         slice_close = new_close[:, start_bar:]
         eff_close = np.full_like(close_r, np.nan)
         eff_close[:, start_bar:] = slice_close

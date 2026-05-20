@@ -24,24 +24,23 @@ from __future__ import annotations
 import json
 import sys
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Tuple
 
 import numpy as np
 import pandas as pd
-import yaml
 
 _REPO_ROOT = Path(__file__).resolve().parents[3]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
 from scripts.l_arc_10.experiments._common import (  # noqa: E402
-    RANDOM_STATE,
-    PIPELINE_E_FEATURES,
     PIPELINE_D1_FEATURES,
+    PIPELINE_E_FEATURES,
+    RANDOM_STATE,
     load_arc10_c1_bundle,
-    wf_oof_preds,
     mean_auc_safe,
     sha256_file,
+    wf_oof_preds,
 )
 
 N_RESAMPLES = 2000
@@ -199,7 +198,7 @@ def main() -> int:
     md.append(f"- Walk-forward 5-fold TimeSeriesSplit (matches Step 4); RF seed={RANDOM_STATE}.")
     md.append(f"- Pool out-of-fold predictions across folds: n_oof_pairs={n_oof}.")
     md.append(f"- Bootstrap-resample (p, y) pairs WITH replacement n={N_RESAMPLES} times,")
-    md.append(f"  paired resamples (same indices for E and D1) so joint P is exact.")
+    md.append("  paired resamples (same indices for E and D1) so joint P is exact.")
     md.append("- Note: per-fold-AUC bootstrap is intentionally not done — re-fitting 2000")
     md.append("  RFs would add model-variance noise without changing the qualitative answer.")
     md.append("  AUC sampling-distribution bootstrap on OOF (p, y) is the standard estimator.")

@@ -318,7 +318,6 @@ md.append("### C3. Combined: best exit policy × best delayed entry, per fold (s
 best_trigger = None
 best_width = None
 best_threshold = None
-import re
 with open(OUT_DIR / "c3_combined_per_fold.csv") as f:
     pass
 # We'll just describe in doc

@@ -263,7 +263,8 @@ print("Cluster 1 economic numbers are NOT driven by these specific trades" if ou
 print(f"\n[done] wrote per_fold_economics.csv, pair_stability_cluster_1.csv, prior_vs_new_comparison.csv to {OUT}")
 
 # Final structured output for the verdict doc
-import json
+import json  # noqa: E402
+
 out_summary = {
     "convention": {
         "risk_pct": RISK_PCT / 100,

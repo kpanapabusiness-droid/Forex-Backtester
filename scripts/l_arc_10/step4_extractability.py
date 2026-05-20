@@ -575,7 +575,6 @@ def _full_fit_and_threshold(
 
     sweep: List[Tuple[float, float, float, float, float, float, float]] = []
     candidates: List[Tuple[float, float, float, float, float, float, float]] = []
-    n_positive = int(y.sum())
     t = t_min
     while t <= t_max + 1e-9:
         admit_mask = p >= t

@@ -203,7 +203,7 @@ python scripts/phaseB_run_controlled_overfit.py --config configs/phaseB/phaseB_c
 python -m analytics.phaseB_quality_gate --input results/phaseB --output results/phaseB
 ```
 
-**Done** when: `results/phaseB/quality_gate.csv`, `approved_pool.json`, and `approved_pool.md` exist and tests pass. See `docs/PHASE_B_INDICATOR_QUALITY.md` for metrics and interpretation.
+**Done** when: `results/phaseB/quality_gate.csv`, `approved_pool.json`, and `approved_pool.md` exist and tests pass. See `docs/archive/nnfx_era/PHASE_B_INDICATOR_QUALITY.md` for metrics and interpretation.
 
 #### Phase B.1 — Filtered run (new C1 archetypes only)
 Phase B.1 uses the **same Phase B runner and quality gate** with a filtered config: only the 6 new C1 archetypes (regime_sm, vol_dir, persist_momo × binary/neutral_gate). Legacy and fixture indicators (e.g. c1_coral, supertrend) are **excluded** from Phase B.1; they remain in the codebase and still resolve, but are not evaluated in this run. Approval for the archetype pool is determined **only** from Phase B.1 outputs.
@@ -216,7 +216,7 @@ python scripts/phaseB_run_diagnostics.py --config configs/phaseB1/phaseB1_c1_arc
 python -m analytics.phaseB_quality_gate --input results/phaseB1/c1_archetypes --output results/phaseB1
 ```
 
-**Outputs**: `results/phaseB1/quality_gate.csv`, `approved_pool.json`, `approved_pool.md` under `results/phaseB1/`. See `docs/PHASE_B1_C1_ARCHETYPES.md` for the 6 indicators and behaviour.
+**Outputs**: `results/phaseB1/quality_gate.csv`, `approved_pool.json`, `approved_pool.md` under `results/phaseB1/`. See `docs/archive/nnfx_era/PHASE_B1_C1_ARCHETYPES.md` for the 6 indicators and behaviour.
 
 ### Development & Validation
 ```bash

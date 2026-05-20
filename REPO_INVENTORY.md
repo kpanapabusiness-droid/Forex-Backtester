@@ -1,0 +1,380 @@
+# REPO_INVENTORY — Markdown File Classification
+
+> Single classification table for every tracked `.md` file in the repo. Source plan: `inventory_intent.md`. Generated 2026-05-19; UNCERTAIN flags resolved 2026-05-20.
+
+---
+
+## Counts by class (post-resolution)
+
+```
+Total .md files tracked:        181
+ACTIVE:                          55   (54 from prior pass + project_brief.md resolved ACTIVE)
+ARC_RESULT:                      18   (8 docs/results moved; 10 results/* co-located, in place)
+PROTOCOL_HISTORICAL:              5   (1 moved; 4 already in archive/)
+CALIBRATION_DECISION:             3   (2 moved to docs/archive/calibration/ — SPREAD_FLOOR_AUDIT_FINDING + loader_decisions; 1 stays at docs/calibration_decisions/)
+SPEC_HISTORICAL:                  9   (4 from prior pass + 5 Arcs 12-16 unrun specs)
+NNFX_ERA:                        27   (20 moved; 7 already in attic/)
+DISPATCH_HISTORICAL:              6   (moved)
+OPEN_PROPOSAL:                    1   (stays at root)
+UNCERTAIN:                        1   (only L_ARC_PROTOCOL.md:717 prescriptive line remains, deferred to protocol redesign)
+ARTEFACT_SUBFOLDER:               54  (results/l_arc_*/step*/ and experiments/ summaries — stay co-located)
+```
+
+Note: "ARTEFACT_SUBFOLDER" is not in the dispatch's official scheme — it's used here for the ~54 per-step / per-experiment summary docs under `results/l_arc_*/` that are not arc closures but are co-located artefact descriptions. They stay in place; their move would break artefact co-location.
+
+---
+
+## Classification table
+
+> **Status legend in Notes column:**
+> - "MOVED to <path>" — git mv executed in Task 3
+> - "(stays)" — keeps current path
+> - "(co-located)" — under `results/<arc>/`, kept with artefacts
+> - "(already archived)" — pre-existing archive
+
+| Current path | Class | Proposed destination | Notes |
+|---|---|---|---|
+| README.md | ACTIVE | (stays) | Repo entry doc |
+| CLAUDE.md | ACTIVE | (stays) | First-read context for AI assistants |
+| STATUS.md | ACTIVE | (stays) | Current-state snapshot (chat may reset content separately) |
+| CHANGELOG.md | ACTIVE | (stays) | Closures log |
+| SESSION_ZERO.md | ACTIVE | (stays) | 5-minute primer |
+| WORKFLOW.md | ACTIVE | (stays) | Phase workflow |
+| AGENTS.md | ACTIVE | (stays) | Coding-agent contract |
+| L_ARC_PROTOCOL.md | ACTIVE | (stays) | Active v2.1.2 base protocol |
+| L_ARC_PROTOCOL_v2_2_AMENDMENT.md | ACTIVE | (stays) | Landed amendment, active for Arc 8+ |
+| L_ARC_PROTOCOL_v2_3_AMENDMENT.md | ACTIVE | (stays) | Landed amendment, active for Arc 8+ |
+| L_ARC_PROTOCOL_v2_x_AMENDMENT_PROPOSAL.md | OPEN_PROPOSAL | (stays) | DRAFT awaiting decision |
+| PROTOCOL_IMPROVEMENT_BACKLOG.md | ACTIVE | (stays) | Cross-arc backlog |
+| SHELVED_ARCS.md | ACTIVE | (stays) | Shelved register (v2.3+) |
+| ARC_HISTORY.md | ACTIVE | (stays) | NEW — output of this dispatch |
+| REPO_INVENTORY.md | ACTIVE | (stays) | NEW — this file |
+| inventory_intent.md | ACTIVE | (stays) | NEW — plan doc, kept as record |
+| ARC_9_CANDIDATE_A_SPEC.md | SPEC_HISTORICAL | docs/archive/signal_specs/ARC_9_CANDIDATE_A_SPEC.md | Arc 9 STEP_4_KILL_REAFFIRMED; deployment candidate invalidated. Duplicate at results/l_arc_9/ stays. **MOVED.** |
+| NEW_CHAT_HANDOVER.md | DISPATCH_HISTORICAL | docs/archive/dispatches/NEW_CHAT_HANDOVER.md | Self-marked SUPERSEDED 2026-05-16. **MOVED.** |
+| C1_SWEEP_GUIDE.md | NNFX_ERA | docs/archive/nnfx_era/C1_SWEEP_GUIDE.md | NNFX 57-C1-indicator sweep. **MOVED.** |
+| EXIT_INDICATOR_SETUP.md | NNFX_ERA | docs/archive/nnfx_era/EXIT_INDICATOR_SETUP.md | NNFX exit-indicator infrastructure. **MOVED.** |
+| VOLUME_INDICATOR_SETUP.md | NNFX_ERA | docs/archive/nnfx_era/VOLUME_INDICATOR_SETUP.md | NNFX volume-indicator setup. **MOVED.** |
+| RESULTS_SCHEMA_AUDIT.md | NNFX_ERA | docs/archive/nnfx_era/RESULTS_SCHEMA_AUDIT.md | Jan-2025 baseline-vs-volume schema audit. **MOVED.** |
+| project_brief.md | ACTIVE | (stays) | Pre-v2.0 brief 2026-05-09; chat resolved 2026-05-20 — kept at root as historical anchor (referenced by arc closures for JL-invalidation precedent). |
+| cleanup_intent.md | DISPATCH_HISTORICAL | docs/archive/dispatches/cleanup_intent.md | One-time cleanup-dispatch record 2026-05-19. **MOVED.** |
+| cleanup_log.md | DISPATCH_HISTORICAL | docs/archive/dispatches/cleanup_log.md | One-time cleanup-dispatch record 2026-05-19. **MOVED.** |
+| .cursor/rules.md | ACTIVE | (stays) | IDE config |
+| .github/pull_request_template.md | ACTIVE | (stays) | Repo config |
+| prompts/cc_arc_orchestrator_template.md | ACTIVE | (stays) | Active v1.1 orchestrator template |
+| indicators/mq5/README.md | ACTIVE | (stays) | Component README |
+| mt5/README.md | ACTIVE | (stays) | Component README |
+| scripts/v1_3_calibration/loader_decisions.md | CALIBRATION_DECISION | docs/archive/calibration/loader_decisions.md | Chat resolved 2026-05-20 — v1.3 calibration superseded by HistData migration. **MOVED.** Script + result artefacts not touched. |
+| archive/L_ARC_OPERATIONAL_SPEC_v1_0.md | PROTOCOL_HISTORICAL | (stays) | (already archived) |
+| archive/L_ARC_PROTOCOL_v1_0.md | PROTOCOL_HISTORICAL | (stays) | (already archived) |
+| archive/L_ARC_PROTOCOL_v1_1_AMENDMENT.md | PROTOCOL_HISTORICAL | (stays) | (already archived) |
+| archive/L_ARC_PROTOCOL_v1_2_AMENDMENT.md | PROTOCOL_HISTORICAL | (stays) | (already archived) |
+| attic/2025-11-08/MT5_PARITY_RERUN.md | NNFX_ERA | (stays) | (already archived in attic/) |
+| attic/2025-11-08/docs/FOLDER_STRUCTURE.md | NNFX_ERA | (stays) | (already archived) |
+| attic/2025-11-08/docs/GOLDEN_STANDARD_LOGIC.md | NNFX_ERA | (stays) | (already archived) |
+| attic/2025-11-08/docs/INDICATORS.md | NNFX_ERA | (stays) | (already archived) |
+| attic/2025-11-08/docs/c1_only_analysis.md | NNFX_ERA | (stays) | (already archived) |
+| attic/2025-11-08/docs/c1_only_exits.md | NNFX_ERA | (stays) | (already archived) |
+| attic/2025-11-08/docs/mt5_fisher_parity.md | NNFX_ERA | (stays) | (already archived) |
+| docs/KH24_SYSTEM_LOCK.md | ACTIVE | (stays) | Live system spec |
+| docs/GOLDEN_STANDARD_LOGIC.md | ACTIVE | (stays) | Execution-truth invariants |
+| docs/BACKTESTER_ARCHITECTURE.md | ACTIVE | (stays) | Engine architecture reference |
+| docs/BACKTESTER_AUDIT.md | ACTIVE | (stays) | Engine audit reference |
+| docs/BACKTESTER_USER_GUIDE.md | ACTIVE | (stays) | Engine user guide |
+| docs/BACKTESTER_EXTENSION_CLOSURE.md | DISPATCH_HISTORICAL | docs/archive/dispatches/BACKTESTER_EXTENSION_CLOSURE.md | PR #131/135/138 closure record. **MOVED.** |
+| docs/CLAUDE_PROJECT_INSTRUCTIONS.md | ACTIVE | (stays) | Canonical Claude project settings |
+| docs/CANDIDATES.md | NNFX_ERA | docs/archive/nnfx_era/CANDIDATES.md | Arc 1 L6+ candidate hypotheses. **MOVED.** |
+| docs/L0_METHODOLOGY_LOCK.md | ACTIVE | (stays) | L atlas methodology — still referenced by LCHAR docs |
+| docs/L6_0_METHODOLOGY_LOCK.md | PROTOCOL_HISTORICAL | docs/archive/protocol/L6_0_METHODOLOGY_LOCK.md | Self-marked SUPERSEDED 2026-05-13. **MOVED.** |
+| docs/LCHAR_ATLAS.md | ACTIVE | (stays) | L atlas reference |
+| docs/LCHAR_TOPN_REGISTRY.md | ACTIVE | (stays) | Live registry |
+| docs/L_ARC_DEFERRED_CANDIDATES.md | ACTIVE | (stays) | Active deferred-candidate reference |
+| docs/L_ARC_FEATURE_REGISTRY.md | ACTIVE | (stays) | Cross-arc feature registry |
+| docs/L_ARC_PLAN.md | NNFX_ERA | docs/archive/nnfx_era/L_ARC_PLAN.md | Self-marked COMPLETED 2026-05-13. **MOVED.** |
+| docs/KH_Research_Roadmap.md | NNFX_ERA | docs/archive/nnfx_era/KH_Research_Roadmap.md | KH arc closed; superseded. **MOVED.** |
+| docs/PHASE6_PLAN.md | NNFX_ERA | docs/archive/nnfx_era/PHASE6_PLAN.md | Phase 6 NNFX-era. **MOVED.** |
+| docs/PHASE_B1_C1_ARCHETYPES.md | NNFX_ERA | docs/archive/nnfx_era/PHASE_B1_C1_ARCHETYPES.md | Phase B.1 NNFX-era. **MOVED.** |
+| docs/PHASE_B_INDICATOR_QUALITY.md | NNFX_ERA | docs/archive/nnfx_era/PHASE_B_INDICATOR_QUALITY.md | Phase B NNFX-era. **MOVED.** |
+| docs/PHASE_C1_PARAMETER_SENSITIVITY.md | NNFX_ERA | docs/archive/nnfx_era/PHASE_C1_PARAMETER_SENSITIVITY.md | Phase C.1. **MOVED.** |
+| docs/PHASE_C_C1_IDENTITY_WFO.md | NNFX_ERA | docs/archive/nnfx_era/PHASE_C_C1_IDENTITY_WFO.md | Phase C. **MOVED.** |
+| docs/PHASE_D2_2_FEATURE_DIAGNOSTICS.md | NNFX_ERA | docs/archive/nnfx_era/PHASE_D2_2_FEATURE_DIAGNOSTICS.md | Phase D-2.2. **MOVED.** |
+| docs/PHASE_D2_LIFT_HARNESS.md | NNFX_ERA | docs/archive/nnfx_era/PHASE_D2_LIFT_HARNESS.md | Phase D-2. **MOVED.** |
+| docs/PHASE_D6F_CLEAN_LABELS.md | NNFX_ERA | docs/archive/nnfx_era/PHASE_D6F_CLEAN_LABELS.md | Phase D-6F. **MOVED.** |
+| docs/PHASE_L6_ARC1_OPEN.md | NNFX_ERA | docs/archive/nnfx_era/PHASE_L6_ARC1_OPEN.md | L6.0-era SUPERSEDED. **MOVED.** |
+| docs/PHASE_L6_ARC1_P2_OPEN.md | NNFX_ERA | docs/archive/nnfx_era/PHASE_L6_ARC1_P2_OPEN.md | L6.0-era SUPERSEDED. **MOVED.** |
+| docs/PHASE_L6_ARC2_OPEN.md | NNFX_ERA | docs/archive/nnfx_era/PHASE_L6_ARC2_OPEN.md | L6.0-era SUPERSEDED. **MOVED.** |
+| docs/PHASE_L6_ARC2_P3_OPEN.md | NNFX_ERA | docs/archive/nnfx_era/PHASE_L6_ARC2_P3_OPEN.md | L6.0-era SUPERSEDED. **MOVED.** |
+| docs/PHASE_L6_ARC2_P3_RESULT.md | ARC_RESULT | docs/archive/arc_results/PHASE_L6_ARC2_P3_RESULT.md | L6.0 Arc 2 P3 result (v1.x closure). **MOVED.** |
+| docs/ARCHETYPE_REGISTRY.md | NNFX_ERA | docs/archive/nnfx_era/ARCHETYPE_REGISTRY.md | Ignition-pool archetype registry (pre-L/KH). **MOVED.** |
+| docs/SPREAD_FLOOR_AUDIT_FINDING.md | CALIBRATION_DECISION | docs/archive/calibration/SPREAD_FLOOR_AUDIT_FINDING.md | Resolved cross-arc finding (Arc 4 surface, RESOLVED). **MOVED.** |
+| docs/SPREAD_SEMANTICS_LOCK.md | ACTIVE | (stays) | Protocol-level lock |
+| docs/cleanup_plan_2025-11-08.md | DISPATCH_HISTORICAL | docs/archive/dispatches/cleanup_plan_2025-11-08.md | 2025-11-08 cleanup plan record. **MOVED.** |
+| docs/phase8_execution_truth.md | NNFX_ERA | docs/archive/nnfx_era/phase8_execution_truth.md | Phase 8 NNFX-era. **MOVED.** |
+| docs/arc_results/ARC_3_RESULT.md | ARC_RESULT | docs/archive/arc_results/ARC_3_RESULT.md | Arc 3 closure (v2.0 CLEAN-NULL Step 3). **MOVED.** |
+| docs/arc_results/ARC_4_RESULT.md | ARC_RESULT | docs/archive/arc_results/ARC_4_RESULT.md | Arc 4 initial CLEAN-NULL (transaction-cost). **MOVED.** |
+| docs/arc_results/ARC_4_RERUN_RESULT.md | ARC_RESULT | docs/archive/arc_results/ARC_4_RERUN_RESULT.md | Arc 4 rerun FAIL Step 6 (canonical Arc 4 verdict). **MOVED.** |
+| docs/arc_results/ARC_5_RESULT.md | ARC_RESULT | docs/archive/arc_results/ARC_5_RESULT.md | Arc 5 SHELVED Step 6 FAIL. **MOVED.** |
+| docs/arc_results/ARC_6_RESULT.md | ARC_RESULT | docs/archive/arc_results/ARC_6_RESULT.md | Arc 6 DIES Step 4. **MOVED.** |
+| docs/arc_results/ARC_7_RESULT.md | ARC_RESULT | docs/archive/arc_results/ARC_7_RESULT.md | Arc 7 CLEAN-NULL Step 4. **MOVED.** |
+| docs/arc_results/ARC_10_RESULT.md | ARC_RESULT | docs/archive/arc_results/ARC_10_RESULT.md | Arc 10 STEP_4_HALT. **MOVED.** |
+| docs/calibration_decisions/SPREAD_FLOOR_CALIBRATION_DECISION_2026-05-17.md | CALIBRATION_DECISION | (stays) | Current calibration decision; subdir is current per dispatch |
+| docs/signal_spec_failed_breakout_long_v0.2.md | SPEC_HISTORICAL | docs/archive/signal_specs/signal_spec_failed_breakout_long_v0.2.md | Arc 6 closed. **MOVED.** |
+| docs/signal_spec_pullback_resume_hhhl_long_v0.1.md | SPEC_HISTORICAL | docs/archive/signal_specs/signal_spec_pullback_resume_hhhl_long_v0.1.md | Arc 8 closed HALT_DEPLOYMENT. **MOVED.** |
+| docs/signal_spec_inside_bar_break_trend_long_v0.1.md | SPEC_HISTORICAL | docs/archive/signal_specs/signal_spec_inside_bar_break_trend_long_v0.1.md | Arc 9 closed KILL_REAFFIRMED. **MOVED.** |
+| docs/signal_spec_three_bar_reversal_trend_long_v0.1.md | SPEC_HISTORICAL | docs/archive/signal_specs/signal_spec_three_bar_reversal_trend_long_v0.1.md | Arc 12 unrun; chat resolved 2026-05-20 archive pending protocol redesign. **MOVED.** |
+| docs/signal_spec_asia_range_breakout_htf_trend_long_v0.1.md | SPEC_HISTORICAL | docs/archive/signal_specs/signal_spec_asia_range_breakout_htf_trend_long_v0.1.md | Arc 13 unrun; chat resolved 2026-05-20. **MOVED.** |
+| docs/signal_spec_mean_reversion_stretch_long_v0.1.md | SPEC_HISTORICAL | docs/archive/signal_specs/signal_spec_mean_reversion_stretch_long_v0.1.md | Arc 14 unrun; chat resolved 2026-05-20. **MOVED.** |
+| docs/signal_spec_failed_breakdown_reversal_uptrend_long_v0.1.md | SPEC_HISTORICAL | docs/archive/signal_specs/signal_spec_failed_breakdown_reversal_uptrend_long_v0.1.md | Arc 15 unrun; chat resolved 2026-05-20. **MOVED.** |
+| docs/signal_spec_persistent_momentum_continuation_long_v0.1.md | SPEC_HISTORICAL | docs/archive/signal_specs/signal_spec_persistent_momentum_continuation_long_v0.1.md | Arc 16 unrun; chat resolved 2026-05-20. **MOVED.** |
+| results/ARC_QUEUE.md | ACTIVE | (stays) | Live queue state file |
+| results/arc_3d/ARC_3D_SUMMARY.md | ARC_RESULT | (co-located) | Arc 3D diagnostic tail; co-located with artefacts |
+| results/arc_kh24_v2/ARC_KH24_V2_RESULT.md | ARC_RESULT | (co-located) | KH-24 v2.0 self-test closure; co-located |
+| results/arc_kh24_v2/step1/plumbing_report.md | ARTEFACT_SUBFOLDER | (co-located) | Step report |
+| results/arc_kh24_v2/step2/step2_report.md | ARTEFACT_SUBFOLDER | (co-located) | Step report |
+| results/arc_kh24_v2/step3/step3_report.md | ARTEFACT_SUBFOLDER | (co-located) | Step report |
+| results/kh24/PHASE_KH24_RESULT.md | ARC_RESULT | (co-located) | KH-24 deployment closure |
+| results/kh24/audit/PHASE_KH24_PROMOTION.md | ARTEFACT_SUBFOLDER | (co-located) | KH-24 promotion audit |
+| results/kh24/audit/capturability_artefact_audit.md | ARTEFACT_SUBFOLDER | (co-located) | Audit subfolder |
+| results/kh24/audit/v1_3_extension_final_report.md | ARTEFACT_SUBFOLDER | (co-located) | v1.3 extension audit |
+| results/kh24/kgl_v2_report.md | ARTEFACT_SUBFOLDER | (co-located) | KGL v2 report |
+| results/l_arc_10/experiments/ARC_10_EXPERIMENT_SYNTHESIS.md | ARTEFACT_SUBFOLDER | (co-located) | Arc 10 EXP synthesis |
+| results/l_arc_10/experiments/EXP_01_auc_bootstrap.md | ARTEFACT_SUBFOLDER | (co-located) | Arc 10 EXP-01 |
+| results/l_arc_10/experiments/EXP_02_htf_ablation.md | ARTEFACT_SUBFOLDER | (co-located) | EXP-02 |
+| results/l_arc_10/experiments/EXP_03_threshold_scan.md | ARTEFACT_SUBFOLDER | (co-located) | EXP-03 |
+| results/l_arc_10/experiments/EXP_04_q2_2022_regime.md | ARTEFACT_SUBFOLDER | (co-located) | EXP-04 |
+| results/l_arc_10/experiments/EXP_05_v_shape_pool.md | ARTEFACT_SUBFOLDER | (co-located) | EXP-05 |
+| results/l_arc_10/experiments/EXP_06_open_04_probe.md | ARTEFACT_SUBFOLDER | (co-located) | EXP-06 |
+| results/l_arc_10/step2/STEP2_SUMMARY.md | ARTEFACT_SUBFOLDER | (co-located) | Step 2 summary |
+| results/l_arc_10/step3/STEP3_SUMMARY.md | ARTEFACT_SUBFOLDER | (co-located) | Step 3 summary |
+| results/l_arc_10/step4/STEP4_SUMMARY.md | ARTEFACT_SUBFOLDER | (co-located) | Step 4 summary |
+| results/l_arc_10/wfo_base/WFO_BASE_RESULT.md | ARTEFACT_SUBFOLDER | (co-located) | WFO base run |
+| results/l_arc_10/wfo_oracle_c1/WFO_ORACLE_C1_RESULT.md | ARTEFACT_SUBFOLDER | (co-located) | WFO oracle run |
+| results/l_arc_10/wfo_pair_synthesis.md | ARTEFACT_SUBFOLDER | (co-located) | WFO pair synthesis |
+| results/l_arc_11/ARC_11_CLOSURE.md | ARC_RESULT | (co-located) | Arc 11 closure; co-located with artefacts |
+| results/l_arc_11/ARC_11_LIVE.md | ARC_RESULT | (co-located) | Arc 11 live tracker (now closed status) |
+| results/l_arc_11/experimental_s5/arc11_exp_s5_NOTES.md | ARTEFACT_SUBFOLDER | (co-located) | Arc 11 experiment |
+| results/l_arc_11/experimental_s5/arc11_exp_s5_noOracle_NOTES.md | ARTEFACT_SUBFOLDER | (co-located) | Arc 11 experiment |
+| results/l_arc_11/filter_diag/filter_diag_report.md | ARTEFACT_SUBFOLDER | (co-located) | Arc 11 filter diagnosis |
+| results/l_arc_11/sig_improve/sig_improve_report.md | ARTEFACT_SUBFOLDER | (co-located) | Arc 11 signal-improve sweep |
+| results/l_arc_11/step2/STEP2_SUMMARY.md | ARTEFACT_SUBFOLDER | (co-located) | Step 2 summary |
+| results/l_arc_11/step3/STEP3_SUMMARY.md | ARTEFACT_SUBFOLDER | (co-located) | Step 3 summary |
+| results/l_arc_11/step4/STEP4_SUMMARY.md | ARTEFACT_SUBFOLDER | (co-located) | Step 4 summary |
+| results/l_arc_2_redo/ARC_2_REDO_RESULT.md | ARC_RESULT | (co-located) | Arc 2 v2.0 redo closure |
+| results/l_arc_2_redo2/step1/STEP1_SUMMARY.md | ARTEFACT_SUBFOLDER | (co-located) | Step 1 summary |
+| results/l_arc_2_redo2/step1/STEP1_SUMMARY_v2_1_1_addendum.md | ARTEFACT_SUBFOLDER | (co-located) | Step 1 v2.1.1 addendum |
+| results/l_arc_2_redo2/step2/STEP2_SUMMARY.md | ARTEFACT_SUBFOLDER | (co-located) | Step 2 summary |
+| results/l_arc_2_redo2/step3/STEP3_SUMMARY.md | ARTEFACT_SUBFOLDER | (co-located) | Step 3 summary |
+| results/l_arc_7/step1/STEP1_SUMMARY.md | ARTEFACT_SUBFOLDER | (co-located) | Step 1 summary |
+| results/l_arc_7/step2/STEP2_SUMMARY.md | ARTEFACT_SUBFOLDER | (co-located) | Step 2 summary |
+| results/l_arc_7/step3/STEP3_SUMMARY.md | ARTEFACT_SUBFOLDER | (co-located) | Step 3 summary |
+| results/l_arc_7/step4/STEP4_SUMMARY.md | ARTEFACT_SUBFOLDER | (co-located) | Step 4 summary |
+| results/l_arc_8/ARC_8_CLOSURE.md | ARC_RESULT | (co-located) | Arc 8 closure |
+| results/l_arc_8/ARC_8_LIVE.md | ARC_RESULT | (co-located) | Arc 8 live tracker (closed status) |
+| results/l_arc_8/diagnostics/COMBINED_DIAGNOSTIC_SUMMARY.md | ARTEFACT_SUBFOLDER | (co-located) | Arc 8 diagnostics |
+| results/l_arc_8/diagnostics/entry_feature_overlap/DIAGNOSTIC_SUMMARY.md | ARTEFACT_SUBFOLDER | (co-located) | Arc 8 diagnostics |
+| results/l_arc_8/step2/STEP2_SUMMARY.md | ARTEFACT_SUBFOLDER | (co-located) | Step 2 summary |
+| results/l_arc_8/step3/STEP3_SUMMARY.md | ARTEFACT_SUBFOLDER | (co-located) | Step 3 summary |
+| results/l_arc_8/step5_prechecks/d1_t1_leak_audit.md | ARTEFACT_SUBFOLDER | (co-located) | Step 5 prechecks |
+| results/l_arc_8/step5_prechecks/fold2_regime.md | ARTEFACT_SUBFOLDER | (co-located) | Step 5 prechecks |
+| results/l_arc_8/step5_wfo/STEP5_SUMMARY.md | ARTEFACT_SUBFOLDER | (co-located) | Step 5 summary |
+| results/l_arc_9/ARC_9_CANDIDATE_A_SPEC.md | SPEC_HISTORICAL | (co-located) | Arc 9 candidate spec (duplicate of root copy; canonical here) |
+| results/l_arc_9/ARC_9_CLOSURE.md | ARC_RESULT | (co-located) | Arc 9 closure |
+| results/l_arc_9/ARC_9_LIVE.md | ARC_RESULT | (co-located) | Arc 9 live tracker (closed status) |
+| results/l_arc_9/INCIDENT_2026_05_19_ARC_9_PRODUCER_LEAK.md | ARTEFACT_SUBFOLDER | (co-located) | Arc 9 incident note (load-bearing for v2.x amendment) |
+| results/l_arc_9/audit/AUDIT_ARC_9_TRADEABILITY.md | ARTEFACT_SUBFOLDER | (co-located) | Arc 9 audit |
+| results/l_arc_9/audit/audit_intent.md | ARTEFACT_SUBFOLDER | (co-located) | Arc 9 audit intent |
+| results/l_arc_9/audit/verdict_evidence/phase_0/phase_0_reproducibility.md | ARTEFACT_SUBFOLDER | (co-located) | Arc 9 audit phase 0 |
+| results/l_arc_9/audit/verdict_evidence/phase_1/phase_1_lookahead.md | ARTEFACT_SUBFOLDER | (co-located) | Arc 9 audit phase 1 |
+| results/l_arc_9/deployment/audit_status_summary.md | ARTEFACT_SUBFOLDER | (co-located) | Arc 9 deployment audit |
+| results/l_arc_9/deployment/onnx_parity_report.md | ARTEFACT_SUBFOLDER | (co-located) | Arc 9 ONNX parity |
+| results/l_arc_9/experiments/calibration_recovery/CALIBRATION_RECOVERY_RESULT.md | ARTEFACT_SUBFOLDER | (co-located) | Arc 9 experiment |
+| results/l_arc_9/experiments/causal_patch/CAUSAL_PATCH_REPORT.md | ARTEFACT_SUBFOLDER | (co-located) | Arc 9 experiment (load-bearing) |
+| results/l_arc_9/experiments/lookahead_audit/AUDIT_REPORT.md | ARTEFACT_SUBFOLDER | (co-located) | Arc 9 lookahead audit |
+| results/l_arc_9/experiments/lookahead_audit/audit_2_d1_lag_code_review.md | ARTEFACT_SUBFOLDER | (co-located) | Arc 9 audit subreport |
+| results/l_arc_9/experiments/lookahead_audit/audit_4_feature_list_review.md | ARTEFACT_SUBFOLDER | (co-located) | Arc 9 audit subreport |
+| results/l_arc_9/experiments/lookahead_audit/audit_6_label_flow.md | ARTEFACT_SUBFOLDER | (co-located) | Arc 9 audit subreport |
+| results/l_arc_9/experiments/pipeline_e_retry/PIPELINE_E_RETRY_RESULT.md | ARTEFACT_SUBFOLDER | (co-located) | Arc 9 experiment (invalidated by leak) |
+| results/l_arc_9/experiments/scaled_risk/SCALED_RISK_RESULT.md | ARTEFACT_SUBFOLDER | (co-located) | Arc 9 experiment (invalidated) |
+| results/l_arc_9/experiments/step5_lgbm_pipeline_e/STEP5_LGBM_E_RESULT.md | ARTEFACT_SUBFOLDER | (co-located) | Arc 9 experiment (invalidated) |
+| results/l_arc_9/experiments/step5_raw_baseline/STEP5_RAW_BASELINE_RESULT.md | ARTEFACT_SUBFOLDER | (co-located) | Arc 9 experiment (floor — valid) |
+| results/l_arc_9/experiments/step5_validation/STEP5_VALIDATION_RESULT.md | ARTEFACT_SUBFOLDER | (co-located) | Arc 9 experiment (oracle ceiling — valid) |
+| results/l_arc_9/step1_verbatim/cofire_matrix.md | ARTEFACT_SUBFOLDER | (co-located) | Step 1 cofire |
+| results/l_arc_9/step1_verbatim/pool_summary.md | ARTEFACT_SUBFOLDER | (co-located) | Step 1 pool summary |
+| results/l_arc_9/step2_clustering/STEP2_SUMMARY.md | ARTEFACT_SUBFOLDER | (co-located) | Step 2 summary |
+| results/l_arc_9/step3_capturability/STEP3_SUMMARY.md | ARTEFACT_SUBFOLDER | (co-located) | Step 3 summary |
+| results/l_arc_9/step4_extractability/STEP4_SUMMARY.md | ARTEFACT_SUBFOLDER | (co-located) | Step 4 summary |
+| results/lomega/b1_b4_discovery/LOMEGA_B1_B4_SUMMARY.md | ARTEFACT_SUBFOLDER | (co-located) | Lω discovery track summary |
+| results/lomega/b1_b4_postmortem/LOMEGA_POSTMORTEM_SUMMARY.md | ARTEFACT_SUBFOLDER | (co-located) | Lω postmortem |
+| results/lomega/regime_conditional/LOMEGA_REGIME_CONDITIONAL_SUMMARY.md | ARTEFACT_SUBFOLDER | (co-located) | Lω regime-conditional |
+| results/lomega/v2_crosstf/LOMEGA_V2_CROSSTF_SUMMARY.md | ARTEFACT_SUBFOLDER | (co-located) | Lω v2 cross-TF |
+| results/replays_v2_1_1/arc_3_stepwise/REPLAY_RESULT.md | ARTEFACT_SUBFOLDER | (co-located) | Open-18 replay |
+| results/replays_v2_1_1/kh24_v2_c4/REPLAY_RESULT.md | ARTEFACT_SUBFOLDER | (co-located) | Open-18 replay |
+| results/replays_v2_1_1/kh24_v2_c4/step4/STEP4_RESULT.md | ARTEFACT_SUBFOLDER | (co-located) | Replay step 4 |
+| results/replays_v2_1_1/kh24_v2_c4/step5/STEP5_RESULT.md | ARTEFACT_SUBFOLDER | (co-located) | Replay step 5 |
+| results/v1_3_calibration/CALIBRATION_REPORT.md | ARTEFACT_SUBFOLDER | (co-located) | v1.3 calibration report |
+| results/v1_3_calibration/schema_audit.md | ARTEFACT_SUBFOLDER | (co-located) | v1.3 calibration schema audit |
+| results/v2_0_diagnostic/DIAGNOSTIC_REPORT.md | ARTEFACT_SUBFOLDER | (co-located) | v2.0 archetype diagnostic |
+| results/v2_0_predictability/PREDICTABILITY_INVESTIGATION.md | ARTEFACT_SUBFOLDER | (co-located) | v2.0 predictability investigation |
+
+---
+
+## UNCERTAIN — resolution status
+
+**7 of 8 UNCERTAIN flags resolved by chat on 2026-05-20.** See "Resolved UNCERTAIN flags" section at the bottom. One item remains, deferred to the protocol redesign.
+
+1. **L_ARC_PROTOCOL.md §13 "End of arc" line (line 717).** *Status: DEFERRED — chat 2026-05-20 chose option (a) "leave for now; address in protocol redesign."* The protocol instructs `commit to docs/arc_results/` as a prescriptive future-arc workflow instruction. After the inventory pass that destination is empty (the closures have moved to `docs/archive/arc_results/`). This is not a broken link to an existing file — it's a workflow-doc decision: should future closures still land at `docs/arc_results/` (creating a fresh forward-looking subdir alongside the archived history), or should the protocol be amended to point to `docs/archive/arc_results/` directly? Either has merits; chat to settle during the redesign itself rather than as a one-off line edit.
+
+---
+
+## Move execution log
+
+Moves executed in Task 3, one commit per class:
+
+- **dispatches** (6 files moved to `docs/archive/dispatches/`): NEW_CHAT_HANDOVER.md, cleanup_intent.md, cleanup_log.md, docs/cleanup_plan_2025-11-08.md, docs/BACKTESTER_EXTENSION_CLOSURE.md
+- **nnfx_era** (20 files moved to `docs/archive/nnfx_era/`): C1_SWEEP_GUIDE.md, EXIT_INDICATOR_SETUP.md, VOLUME_INDICATOR_SETUP.md, RESULTS_SCHEMA_AUDIT.md, docs/CANDIDATES.md, docs/L_ARC_PLAN.md, docs/KH_Research_Roadmap.md, docs/PHASE6_PLAN.md, docs/PHASE_B1_C1_ARCHETYPES.md, docs/PHASE_B_INDICATOR_QUALITY.md, docs/PHASE_C1_PARAMETER_SENSITIVITY.md, docs/PHASE_C_C1_IDENTITY_WFO.md, docs/PHASE_D2_2_FEATURE_DIAGNOSTICS.md, docs/PHASE_D2_LIFT_HARNESS.md, docs/PHASE_D6F_CLEAN_LABELS.md, docs/PHASE_L6_ARC1_OPEN.md, docs/PHASE_L6_ARC1_P2_OPEN.md, docs/PHASE_L6_ARC2_OPEN.md, docs/PHASE_L6_ARC2_P3_OPEN.md, docs/ARCHETYPE_REGISTRY.md, docs/phase8_execution_truth.md
+- **protocol** (1 file moved to `docs/archive/protocol/`): docs/L6_0_METHODOLOGY_LOCK.md
+- **arc_results** (8 files moved to `docs/archive/arc_results/`): docs/arc_results/ARC_3_RESULT.md, ARC_4_RESULT.md, ARC_4_RERUN_RESULT.md, ARC_5_RESULT.md, ARC_6_RESULT.md, ARC_7_RESULT.md, ARC_10_RESULT.md, docs/PHASE_L6_ARC2_P3_RESULT.md
+- **calibration** (1 file moved to `docs/archive/calibration/`): docs/SPREAD_FLOOR_AUDIT_FINDING.md
+- **signal_specs** (4 files moved to `docs/archive/signal_specs/`): ARC_9_CANDIDATE_A_SPEC.md (root), docs/signal_spec_failed_breakout_long_v0.2.md, docs/signal_spec_pullback_resume_hhhl_long_v0.1.md, docs/signal_spec_inside_bar_break_trend_long_v0.1.md
+
+Total: 40 files moved via `git mv` in the initial dispatch.
+
+### Resolution pass — 2026-05-20
+
+Chat resolved 7 of 8 UNCERTAIN flags. Additional moves executed:
+
+- **signal_specs** (5 Arc 12-16 unrun specs moved to `docs/archive/signal_specs/`):
+  - docs/signal_spec_three_bar_reversal_trend_long_v0.1.md (Arc 12)
+  - docs/signal_spec_asia_range_breakout_htf_trend_long_v0.1.md (Arc 13)
+  - docs/signal_spec_mean_reversion_stretch_long_v0.1.md (Arc 14)
+  - docs/signal_spec_failed_breakdown_reversal_uptrend_long_v0.1.md (Arc 15)
+  - docs/signal_spec_persistent_momentum_continuation_long_v0.1.md (Arc 16)
+- **calibration** (1 file moved to `docs/archive/calibration/`):
+  - scripts/v1_3_calibration/loader_decisions.md (v1.3 superseded by HistData migration)
+
+Total moves in resolution pass: 6. Grand total across both passes: **46 files moved via `git mv`**.
+
+---
+
+## Post-move state (after 2026-05-20 resolution pass)
+
+### Counts
+
+- Total tracked `.md` files: **181** (was 178; +3 for ARC_HISTORY.md, REPO_INVENTORY.md, inventory_intent.md)
+- Repo root: **17** .md files (unchanged — Arc 12-16 specs were at `docs/`, not root)
+- `docs/archive/`: **46** .md files across 6 subdirs (+6 in resolution pass)
+
+### Repo root final contents
+
+```
+AGENTS.md
+ARC_HISTORY.md                              (NEW)
+CHANGELOG.md
+CLAUDE.md
+L_ARC_PROTOCOL.md
+L_ARC_PROTOCOL_v2_2_AMENDMENT.md
+L_ARC_PROTOCOL_v2_3_AMENDMENT.md
+L_ARC_PROTOCOL_v2_x_AMENDMENT_PROPOSAL.md   (OPEN_PROPOSAL)
+PROTOCOL_IMPROVEMENT_BACKLOG.md
+README.md
+REPO_INVENTORY.md                           (NEW)
+SESSION_ZERO.md
+SHELVED_ARCS.md
+STATUS.md
+WORKFLOW.md
+inventory_intent.md                         (NEW; plan doc, retained as record)
+project_brief.md                            (ACTIVE — resolved 2026-05-20)
+```
+
+17 root-level .md files: the 16 dispatch-target files plus `project_brief.md` (chat-resolved ACTIVE as a historical anchor).
+
+### docs/archive/ final tree
+
+```
+docs/archive/
+├── arc_results/        (8 files)
+│   ├── ARC_3_RESULT.md
+│   ├── ARC_4_RESULT.md
+│   ├── ARC_4_RERUN_RESULT.md
+│   ├── ARC_5_RESULT.md
+│   ├── ARC_6_RESULT.md
+│   ├── ARC_7_RESULT.md
+│   ├── ARC_10_RESULT.md
+│   └── PHASE_L6_ARC2_P3_RESULT.md
+├── calibration/        (2 files)
+│   ├── SPREAD_FLOOR_AUDIT_FINDING.md
+│   └── loader_decisions.md
+├── dispatches/         (5 files)
+│   ├── BACKTESTER_EXTENSION_CLOSURE.md
+│   ├── NEW_CHAT_HANDOVER.md
+│   ├── cleanup_intent.md
+│   ├── cleanup_log.md
+│   └── cleanup_plan_2025-11-08.md
+├── nnfx_era/           (21 files)
+│   ├── ARCHETYPE_REGISTRY.md
+│   ├── C1_SWEEP_GUIDE.md
+│   ├── CANDIDATES.md
+│   ├── EXIT_INDICATOR_SETUP.md
+│   ├── KH_Research_Roadmap.md
+│   ├── L_ARC_PLAN.md
+│   ├── PHASE6_PLAN.md
+│   ├── PHASE_B1_C1_ARCHETYPES.md
+│   ├── PHASE_B_INDICATOR_QUALITY.md
+│   ├── PHASE_C1_PARAMETER_SENSITIVITY.md
+│   ├── PHASE_C_C1_IDENTITY_WFO.md
+│   ├── PHASE_D2_2_FEATURE_DIAGNOSTICS.md
+│   ├── PHASE_D2_LIFT_HARNESS.md
+│   ├── PHASE_D6F_CLEAN_LABELS.md
+│   ├── PHASE_L6_ARC1_OPEN.md
+│   ├── PHASE_L6_ARC1_P2_OPEN.md
+│   ├── PHASE_L6_ARC2_OPEN.md
+│   ├── PHASE_L6_ARC2_P3_OPEN.md
+│   ├── RESULTS_SCHEMA_AUDIT.md
+│   ├── VOLUME_INDICATOR_SETUP.md
+│   └── phase8_execution_truth.md
+├── protocol/           (1 file)
+│   └── L6_0_METHODOLOGY_LOCK.md
+└── signal_specs/       (9 files)
+    ├── ARC_9_CANDIDATE_A_SPEC.md
+    ├── signal_spec_asia_range_breakout_htf_trend_long_v0.1.md
+    ├── signal_spec_failed_breakdown_reversal_uptrend_long_v0.1.md
+    ├── signal_spec_failed_breakout_long_v0.2.md
+    ├── signal_spec_inside_bar_break_trend_long_v0.1.md
+    ├── signal_spec_mean_reversion_stretch_long_v0.1.md
+    ├── signal_spec_persistent_momentum_continuation_long_v0.1.md
+    ├── signal_spec_pullback_resume_hhhl_long_v0.1.md
+    └── signal_spec_three_bar_reversal_trend_long_v0.1.md
+```
+
+### Pre-existing archives (unchanged)
+
+- `archive/` (4 files) — v1.x protocol + ops spec + v1.1/v1.2 amendments
+- `attic/2025-11-08/` (7 files) — quarantined NNFX-era files
+
+### Active doc internal-link state
+
+Broken-link sweep ran across all ACTIVE docs (excluding STATUS.md and CHANGELOG.md per dispatch). All references to moved files updated in: README.md, CLAUDE.md, SESSION_ZERO.md, PROTOCOL_IMPROVEMENT_BACKLOG.md, ARC_HISTORY.md, docs/LCHAR_ATLAS.md, docs/LCHAR_TOPN_REGISTRY.md, docs/SPREAD_SEMANTICS_LOCK.md, docs/BACKTESTER_ARCHITECTURE.md.
+
+One reference deliberately NOT updated:
+- `L_ARC_PROTOCOL.md:717` — "commit to `docs/arc_results/`" is a prescriptive future-arc workflow instruction, not a link to an existing file. Flagged in the UNCERTAIN section above for chat resolution during protocol redesign.
+
+STATUS.md and CHANGELOG.md retain pre-move references intact per dispatch §5 of "What to flag for chat" — chat decides separately whether to reset their content.
+
+---
+
+## Resolved UNCERTAIN flags (2026-05-20)
+
+Decisions for each of the 8 UNCERTAIN items flagged in the initial inventory:
+
+| # | Item | Decision | Action |
+|---|---|---|---|
+| 1 | `project_brief.md` (root) | **ACTIVE** — keep at root as historical anchor | None |
+| 2 | `docs/signal_spec_three_bar_reversal_trend_long_v0.1.md` (Arc 12 unrun) | **SPEC_HISTORICAL** — archive pending protocol redesign | MOVED to `docs/archive/signal_specs/` |
+| 3 | `docs/signal_spec_asia_range_breakout_htf_trend_long_v0.1.md` (Arc 13 unrun) | **SPEC_HISTORICAL** | MOVED to `docs/archive/signal_specs/` |
+| 4 | `docs/signal_spec_mean_reversion_stretch_long_v0.1.md` (Arc 14 unrun) | **SPEC_HISTORICAL** | MOVED to `docs/archive/signal_specs/` |
+| 5 | `docs/signal_spec_failed_breakdown_reversal_uptrend_long_v0.1.md` (Arc 15 unrun) | **SPEC_HISTORICAL** | MOVED to `docs/archive/signal_specs/` |
+| 6 | `docs/signal_spec_persistent_momentum_continuation_long_v0.1.md` (Arc 16 unrun) | **SPEC_HISTORICAL** | MOVED to `docs/archive/signal_specs/` |
+| 7 | `scripts/v1_3_calibration/loader_decisions.md` | **CALIBRATION_DECISION** — v1.3 superseded by HistData migration | MOVED to `docs/archive/calibration/` |
+| 8 | `L_ARC_PROTOCOL.md:717` prescriptive path | **DEFERRED** — addressed in protocol redesign | None (line left as-is) |
+
+Six files moved; one stays at root (ACTIVE); one prescriptive line deferred to protocol redesign. The repo reorganisation phase of the inventory dispatch is now closed.

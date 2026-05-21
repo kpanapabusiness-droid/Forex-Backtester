@@ -1,6 +1,6 @@
 # HistData coverage and gap report
 
-Generated: 2026-05-20T18:26:42+00:00  
+Generated: 2026-05-21T00:00:39+00:00  
 Window: 201001 → 202604 (196 months)
 
 ## Summary
@@ -21,10 +21,10 @@ Window: 201001 → 202604 (196 months)
 | EURGBP | 196 | 196 | 100.0% | 201001 | 202604 |  1516.1 |  268147835 |
 | EURJPY | 196 | 196 | 100.0% | 201001 | 202604 |  2973.9 |  509488516 |
 | EURNZD | 196 | 196 | 100.0% | 201001 | 202604 |  2116.5 |  337866107 |
-| EURUSD | 1 | 196 |   0.5% | 201501 | 201501 |     9.3 |    1691494 |
-| GBPAUD | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
-| GBPCAD | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
-| GBPCHF | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
+| EURUSD | 196 | 196 | 100.0% | 201001 | 202604 |  1785.2 |  309896452 |
+| GBPAUD | 196 | 196 | 100.0% | 201001 | 202604 |  2464.6 |  395201851 |
+| GBPCAD | 196 | 196 | 100.0% | 201001 | 202604 |  2208.9 |  363171075 |
+| GBPCHF | 196 | 196 | 100.0% | 201001 | 202604 |  1893.2 |  316692936 |
 | GBPJPY | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
 | GBPNZD | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
 | GBPUSD | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
@@ -35,7 +35,7 @@ Window: 201001 → 202604 (196 months)
 | USDCAD | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
 | USDCHF | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
 | USDJPY | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
-| **TOTAL** | **2745** | **5488** | ** 50.0%** | — | — | **26442.6** | **4480465030** |
+| **TOTAL** | **3528** | **5488** | ** 64.3%** | — | — | **34785.2** | **5863735850** |
 
 ## Per-pair detail
 
@@ -125,27 +125,27 @@ Window: 201001 → 202604 (196 months)
 
 ### EURUSD
 
-- First observed month: **201501**  (real coverage start)
-- Last observed month:  **201501**
-- Observed months: **1 / 196**
-- Real coverage gap (before HistData has data): 60 months, 201001–201412
-- Unattempted months (no log entry — re-run downloader): 135
-    - 201502, 201503, 201504, 201505, 201506, 201507, 201508, 201509, 201510, 201511, 201512, 201601, 201602, 201603, 201604, 201605, 201606, 201607, 201608, 201609, 201610, 201611, 201612, 201701, 201702, 201703, 201704, 201705, 201706, 201707, 201708, 201709, 201710, 201711, 201712, 201801, 201802, 201803, 201804, 201805 …
+- First observed month: **201001**  (real coverage start)
+- Last observed month:  **202604**
+- Observed months: **196 / 196**
 
 ### GBPAUD
 
-- **No months observed.**
-- Real coverage gap (before HistData has data): 196 months, 201001–202604
+- First observed month: **201001**  (real coverage start)
+- Last observed month:  **202604**
+- Observed months: **196 / 196**
 
 ### GBPCAD
 
-- **No months observed.**
-- Real coverage gap (before HistData has data): 196 months, 201001–202604
+- First observed month: **201001**  (real coverage start)
+- Last observed month:  **202604**
+- Observed months: **196 / 196**
 
 ### GBPCHF
 
-- **No months observed.**
-- Real coverage gap (before HistData has data): 196 months, 201001–202604
+- First observed month: **201001**  (real coverage start)
+- Last observed month:  **202604**
+- Observed months: **196 / 196**
 
 ### GBPJPY
 

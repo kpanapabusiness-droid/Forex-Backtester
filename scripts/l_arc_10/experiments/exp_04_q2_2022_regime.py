@@ -36,7 +36,6 @@ already builds.
 
 from __future__ import annotations
 
-import json
 import sys
 from pathlib import Path
 from typing import Dict, List
@@ -49,12 +48,11 @@ if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
 from scripts.l_arc_10.experiments._common import (  # noqa: E402
-    PIPELINE_E_FEATURES,
     PIPELINE_D1_FEATURES,
+    PIPELINE_E_FEATURES,
     load_arc10_c1_bundle,
-    wf_oof_preds,
-    mean_auc_safe,
     sha256_file,
+    wf_oof_preds,
 )
 
 OUT_DIR = _REPO_ROOT / "results" / "l_arc_10" / "experiments"

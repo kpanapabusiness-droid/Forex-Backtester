@@ -55,9 +55,14 @@ if str(_REPO_ROOT) not in sys.path:
 
 # Re-use training-time feature pipeline + hyperparameters verbatim.
 from scripts.l_arc_9.experiments.pipeline_e_retry import (  # noqa: E402
-    BASELINE_16, D1_8, SESSION_4, EXPANDED_28, FORBIDDEN_LEAK_FEATURES,
-    LGBM_KW, N_SPLITS, SEED,
-    _attach_d1_features, _attach_session_features,
+    BASELINE_16,
+    EXPANDED_28,
+    FORBIDDEN_LEAK_FEATURES,
+    LGBM_KW,
+    N_SPLITS,
+    SEED,
+    _attach_d1_features,
+    _attach_session_features,
 )
 
 # Locked reference AUCs (lgbm_expanded_28 cell) from

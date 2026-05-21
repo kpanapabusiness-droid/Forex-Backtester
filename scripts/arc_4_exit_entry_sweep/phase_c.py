@@ -12,13 +12,12 @@ from pathlib import Path
 import matplotlib
 
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
 THIS = Path(__file__).resolve()
 sys.path.insert(0, str(THIS.parent))
-from lib_sim import load_path_arrays, simulate_policy_vectorized, EXIT_CODE_TO_LABEL
+from lib_sim import load_path_arrays, simulate_policy_vectorized  # noqa: E402
 
 REPO = THIS.parents[2]
 OUT_DIR = REPO / "results" / "arc_4_exit_entry_sweep"
@@ -105,7 +104,6 @@ def aggregate_admission_sim(slice_name, cluster_label, threshold_descriptor,
 
     # Winner recall: % of baseline winners (bins 1+2) that survived this filter
     # baseline_winners_mask is for the full slice
-    admitted_idx_in_slice = np.where(admitted_mask_within_slice)[0]
     recall_winners = float(admitted_mask_within_slice[baseline_winners_mask].mean()) if baseline_winners_mask.any() else np.nan
     # Specificity: % of baseline losers (bin 5) rejected
     rejected_mask = ~admitted_mask_within_slice
@@ -403,6 +401,6 @@ c3_rows.append({
 })
 
 pd.DataFrame(c3_rows).to_csv(OUT_DIR / "c3_combined_per_fold.csv", index=False)
-print(f"[done] c3_combined_per_fold.csv")
+print("[done] c3_combined_per_fold.csv")
 print(f"[info] best policy: trigger={best_trigger}, width={best_width}, threshold={best_threshold}")
 print("[done] Phase C complete")

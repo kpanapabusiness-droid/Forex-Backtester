@@ -130,7 +130,7 @@ def _build_md_report(
     lines.append(f"- ONNX sha256: `{onnx_metadata['onnx_sha256']}`")
     lines.append(f"- ONNX opset_import: `{onnx_metadata['export_config']['opset_import_actual']}`")
     lines.append(f"- ONNX positive-class column: `{onnx_metadata['output_spec']['positive_class_column']}`")
-    lines.append(f"- Native classifier: deterministic in-memory rebuild via `scripts/deployment/arc9_canda_rebuild_classifier.py`")
+    lines.append("- Native classifier: deterministic in-memory rebuild via `scripts/deployment/arc9_canda_rebuild_classifier.py`")
     lines.append(f"- Training commit: {onnx_metadata['training_commit']}")
     lines.append(f"- Audit commit: {onnx_metadata['audit_commit']}")
     lines.append(f"- Dispatch branch: {onnx_metadata['dispatch_branch']}")

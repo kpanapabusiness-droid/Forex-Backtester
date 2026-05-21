@@ -436,7 +436,7 @@ mae_traj_df = pd.DataFrame(mae_rows)
 mfe_traj_df = pd.DataFrame(mfe_rows)
 mae_traj_df.to_csv(OUT_DIR / "bar_trajectory_mae.csv", index=False)
 mfe_traj_df.to_csv(OUT_DIR / "bar_trajectory_mfe.csv", index=False)
-print(f"[done] bar trajectory CSVs")
+print("[done] bar trajectory CSVs")
 
 
 # ---------- trajectory plots ----------
@@ -728,7 +728,7 @@ for slice_name, df in slices.items():
 
 conv_df = pd.DataFrame(conv_rows)
 conv_df.to_csv(OUT_DIR / "conversion_analysis.csv", index=False)
-print(f"[done] conversion_analysis.csv")
+print("[done] conversion_analysis.csv")
 
 
 # ---------- specific anatomy plots ----------

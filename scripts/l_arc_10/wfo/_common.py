@@ -37,13 +37,11 @@ Metrics per fold + aggregate:
 
 from __future__ import annotations
 
-import hashlib
-import itertools
 import math
 import sys
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -53,21 +51,20 @@ if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
 from scripts.l_arc_10.experiments._common import (  # noqa: E402
-    PIPELINE_E_FEATURES,
-    PIPELINE_D1_FEATURES,
-    load_arc10_c1_bundle,
     DATA_DIR_4H,
     DATA_DIR_D1,
+    PIPELINE_D1_FEATURES,
+    PIPELINE_E_FEATURES,
     RANDOM_STATE,
     sha256_file,
 )
-from scripts.l_arc_10.step4_extractability import (  # noqa: E402
-    compute_pipeline_e_features,
-    compute_pipeline_d1_features,
-    _build_paths_index,
-    _build_pair_cache,
-)
 from scripts.l_arc_10.step3_capturability import _eval_trade_at_sl  # noqa: E402
+from scripts.l_arc_10.step4_extractability import (  # noqa: E402
+    _build_pair_cache,
+    _build_paths_index,
+    compute_pipeline_d1_features,
+    compute_pipeline_e_features,
+)
 
 # Default WFO grid (trimmed hard from dispatch's "suggested" range for compute
 # feasibility — empirically each fold on 36-combo grid took ~10 min, total

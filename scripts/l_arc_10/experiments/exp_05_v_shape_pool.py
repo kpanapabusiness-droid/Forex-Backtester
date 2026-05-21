@@ -35,11 +35,8 @@ Procedure:
 
 from __future__ import annotations
 
-import json
-import math
 import sys
 from pathlib import Path
-from typing import Dict, List
 
 import numpy as np
 import pandas as pd
@@ -50,20 +47,20 @@ if str(_REPO_ROOT) not in sys.path:
 
 from scripts.l_arc_10.experiments._common import (  # noqa: E402
     C1_SL_ATR_MULT,
-    ORIGINAL_SL_ATR_MULT,
-    PIPELINE_E_FEATURES,
-    load_arc10_c1_bundle,
-    wf_oof_preds,
-    mean_auc_safe,
-    sha256_file,
-    _build_pair_cache,
     DATA_DIR_4H,
     DATA_DIR_D1,
+    ORIGINAL_SL_ATR_MULT,
+    PIPELINE_E_FEATURES,
+    _build_pair_cache,
+    load_arc10_c1_bundle,
+    mean_auc_safe,
+    sha256_file,
+    wf_oof_preds,
 )
 from scripts.l_arc_10.step4_extractability import (  # noqa: E402
+    _build_paths_index,
     compute_pipeline_e_features,
     compute_success_labels,
-    _build_paths_index,
 )
 
 OUT_DIR = _REPO_ROOT / "results" / "l_arc_10" / "experiments"
@@ -185,8 +182,6 @@ def main() -> int:
     pooled["pair_id_int"] = pooled["pair"].map(pid_map).astype(int)
     pooled = pooled.sort_values("entry_time", kind="mergesort").reset_index(drop=True)
     # Stitch labels.
-    a10_pairs = list(zip(b10.e_features["trade_id"].astype(int).tolist(),
-                          ["Arc 10"] * len(b10.e_features)))
     a10_y = {int(tid): int(b10.y[i]) for i, tid in enumerate(b10.e_features["trade_id"])}
     a7_y = {int(tid): int(y_a7_c3[i]) for i, tid in enumerate(e_a7_c3["trade_id"])}
     # Compose pooled y in pooled-order.

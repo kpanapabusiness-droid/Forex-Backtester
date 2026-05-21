@@ -8,7 +8,7 @@ A research-first FX trading system targeting prop firm requirements (5ers) with 
 
 - **Live system:** KH-24 — running on Contabo VPS, gate-passing, +1.92% worst-fold ROI / 6.37% worst-fold DD across 7 OOS folds.
 - **Active research:** L arc signal testing under `L_ARC_PROTOCOL.md` v2.0. Arc 3 closed CLEAN-NULL (2026-05-16). Arc 4 next.
-- **Status as of 2026-05-16:** `L_ARC_PROTOCOL.md` v2.0 locked. Path-shape clustering + two-pipeline (E entry-filter / D1 deferred-identification) extractability gate. Calibration anchor: KH-24 K=4 archetype 3 (passes via D1 at t=3). v1.x protocol + ops spec archived under `archive/`. Arc 3 closure flagged five v2.1 cross-arc items (Open-12 through Open-15 plus Open-07 evidence) — see `docs/arc_results/ARC_3_RESULT.md`.
+- **Status as of 2026-05-16:** `L_ARC_PROTOCOL.md` v2.0 locked. Path-shape clustering + two-pipeline (E entry-filter / D1 deferred-identification) extractability gate. Calibration anchor: KH-24 K=4 archetype 3 (passes via D1 at t=3). v1.x protocol + ops spec archived under `archive/`. Arc 3 closure flagged five v2.1 cross-arc items (Open-12 through Open-15 plus Open-07 evidence) — see `docs/archive/arc_results/ARC_3_RESULT.md`.
 
 ---
 
@@ -73,7 +73,7 @@ Top-level files in this repository serve specific roles. Read them in the right 
 | `STATUS.md` | Tight current-state snapshot |
 | `CLAUDE.md` | First-read context for AI assistants |
 | `docs/LCHAR_TOPN_REGISTRY.md` | When working on any L arc — the 5 candidate signals being tested |
-| `docs/KH_Research_Roadmap.md` | When questioning what's been tried in KH (closed and deferred items) |
+| `docs/archive/nnfx_era/KH_Research_Roadmap.md` | When questioning what's been tried in KH (closed and deferred items) |
 | `WORKFLOW.md` | When closing a phase or writing phase documentation |
 | `docs/GOLDEN_STANDARD_LOGIC.md` | When writing or reviewing backtester code; the formal invariants |
 | `docs/BACKTESTER_AUDIT.md` | When debugging backtester behavior or extending the engine |

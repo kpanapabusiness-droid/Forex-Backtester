@@ -42,7 +42,6 @@ from typing import Dict, List, Tuple
 import joblib
 import numpy as np
 import pandas as pd
-import yaml
 from sklearn.preprocessing import StandardScaler
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]

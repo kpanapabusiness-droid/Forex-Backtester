@@ -758,7 +758,7 @@ Items 1-3 (NEW) are candidates for the v2.3 / v2.1.3 calibration cycle. Items 5 
 **Priority:** High — third consecutive arc failure of the same structural pattern
 **First proposed:** 2026-05-18 (Arc 8 closure)
 **Evidence base:** Arcs 4 RERUN, 5, 8 — all PASS admit-only, FAIL full-pool ship gates
-**Closure docs:** `docs/arc_results/ARC_4_RERUN_RESULT.md`, `docs/arc_results/ARC_5_RESULT.md`, `results/l_arc_8/ARC_8_CLOSURE.md`
+**Closure docs:** `docs/archive/arc_results/ARC_4_RERUN_RESULT.md`, `docs/archive/arc_results/ARC_5_RESULT.md`, `results/l_arc_8/ARC_8_CLOSURE.md`
 
 ### Problem
 
@@ -828,7 +828,7 @@ Add a §1.5 gate to the protocol, executed **before** Step 1 simulation compute 
 
 ## Arc 10 cross-arc items (2026-05-18, from `claude/charming-mcnulty-8160e0`)
 
-Arc 10 (DLR — D1 swing-low rejection long, out-of-registry `signal_spec_d1_swing_low_rejection_long_v0.1.md`) closed `STEP_4_HALT` per §16a Path A. First arc to run end-to-end under v2.3. Steps 1-3 PASS clean; Step 4 disjunctive §8 fails near-miss (c1 V-shape recovery E AUC 0.6296 margin −0.0204; D1 AUC 0.5897 margin −0.0103). Post-closure experimentation (EXP-01–06) + WFO pair conducted over §16a at chat-side direction. Items below derive from the closure + experimentation + WFO. Closure doc: `docs/arc_results/ARC_10_RESULT.md`.
+Arc 10 (DLR — D1 swing-low rejection long, out-of-registry `signal_spec_d1_swing_low_rejection_long_v0.1.md`) closed `STEP_4_HALT` per §16a Path A. First arc to run end-to-end under v2.3. Steps 1-3 PASS clean; Step 4 disjunctive §8 fails near-miss (c1 V-shape recovery E AUC 0.6296 margin −0.0204; D1 AUC 0.5897 margin −0.0103). Post-closure experimentation (EXP-01–06) + WFO pair conducted over §16a at chat-side direction. Items below derive from the closure + experimentation + WFO. Closure doc: `docs/archive/arc_results/ARC_10_RESULT.md`.
 
 ### Status changes to existing items
 

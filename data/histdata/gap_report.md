@@ -1,6 +1,6 @@
 # HistData coverage and gap report
 
-Generated: 2026-05-21T05:01:46+00:00  
+Generated: 2026-05-21T13:54:18+00:00  
 Window: 201001 → 202604 (196 months)
 
 ## Summary
@@ -28,14 +28,14 @@ Window: 201001 → 202604 (196 months)
 | GBPJPY | 196 | 196 | 100.0% | 201001 | 202604 |  2723.3 |  439207056 |
 | GBPNZD | 196 | 196 | 100.0% | 201001 | 202604 |  2236.1 |  354515902 |
 | GBPUSD | 196 | 196 | 100.0% | 201001 | 202604 |  1936.1 |  324727260 |
-| NZDCAD | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
-| NZDCHF | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
-| NZDJPY | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
-| NZDUSD | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
-| USDCAD | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
-| USDCHF | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
-| USDJPY | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
-| **TOTAL** | **4116** | **5488** | ** 75.0%** | — | — | **41680.6** | **6982186068** |
+| NZDCAD | 196 | 196 | 100.0% | 201001 | 202604 |  1472.4 |  249686977 |
+| NZDCHF | 196 | 196 | 100.0% | 201001 | 202604 |  1373.8 |  236552247 |
+| NZDJPY | 196 | 196 | 100.0% | 201001 | 202604 |  1768.7 |  298150972 |
+| NZDUSD | 196 | 196 | 100.0% | 201001 | 202604 |  1210.8 |  206663898 |
+| USDCAD | 196 | 196 | 100.0% | 201001 | 202604 |  1536.9 |  262359916 |
+| USDCHF | 196 | 196 | 100.0% | 201001 | 202604 |  1265.4 |  218788581 |
+| USDJPY | 196 | 196 | 100.0% | 201001 | 202604 |  1951.1 |  331636196 |
+| **TOTAL** | **5488** | **5488** | **100.0%** | — | — | **52259.6** | **8786024855** |
 
 ## Per-pair detail
 
@@ -167,38 +167,45 @@ Window: 201001 → 202604 (196 months)
 
 ### NZDCAD
 
-- **No months observed.**
-- Real coverage gap (before HistData has data): 196 months, 201001–202604
+- First observed month: **201001**  (real coverage start)
+- Last observed month:  **202604**
+- Observed months: **196 / 196**
 
 ### NZDCHF
 
-- **No months observed.**
-- Real coverage gap (before HistData has data): 196 months, 201001–202604
+- First observed month: **201001**  (real coverage start)
+- Last observed month:  **202604**
+- Observed months: **196 / 196**
 
 ### NZDJPY
 
-- **No months observed.**
-- Real coverage gap (before HistData has data): 196 months, 201001–202604
+- First observed month: **201001**  (real coverage start)
+- Last observed month:  **202604**
+- Observed months: **196 / 196**
 
 ### NZDUSD
 
-- **No months observed.**
-- Real coverage gap (before HistData has data): 196 months, 201001–202604
+- First observed month: **201001**  (real coverage start)
+- Last observed month:  **202604**
+- Observed months: **196 / 196**
 
 ### USDCAD
 
-- **No months observed.**
-- Real coverage gap (before HistData has data): 196 months, 201001–202604
+- First observed month: **201001**  (real coverage start)
+- Last observed month:  **202604**
+- Observed months: **196 / 196**
 
 ### USDCHF
 
-- **No months observed.**
-- Real coverage gap (before HistData has data): 196 months, 201001–202604
+- First observed month: **201001**  (real coverage start)
+- Last observed month:  **202604**
+- Observed months: **196 / 196**
 
 ### USDJPY
 
-- **No months observed.**
-- Real coverage gap (before HistData has data): 196 months, 201001–202604
+- First observed month: **201001**  (real coverage start)
+- Last observed month:  **202604**
+- Observed months: **196 / 196**
 
 ## Bid/ask pairing
 

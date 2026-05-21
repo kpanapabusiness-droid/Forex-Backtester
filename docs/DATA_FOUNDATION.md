@@ -23,15 +23,26 @@ with HistData's actual product line.
 ## Coverage
 
 - **28 FX pairs** — the KH-24 / L-arc canonical universe.
-- **2010-01 onwards** — HistData's earliest available month per pair varies
-  (some crosses start mid-decade); actual earliest-month-per-pair is recorded
-  in `data/histdata/gap_report.md`.
+- **2010-01 → 2026-04** — 196 months per pair, all pairs complete (see
+  `data/histdata/gap_report.md`). HistData had no real coverage gaps for
+  any pair in the universe across the full window.
 - **Tick granularity** — one tick = one quote update (bid, ask, volume=0).
   Volume is always 0 in HistData tick data (synthetic).
 - **EST without DST timezone** — fixed UTC−5 year-round, with one known
   exception: October files may show a single-hour backward jump at the EU DST
   "fall back". The aggregator handles this transparently (minute buckets are
   order-independent within the bucket).
+
+### Final dataset stats
+
+- **Tick layer**: 5,488 files, **52.26 GB compressed**, **8.79 billion ticks**.
+- **M1 derived layer**: 10,976 CSV files (5,488 bid + 5,488 ask),
+  **18.22 GB**, **333.5 million minute bars** (~167.8M per side).
+- **Heaviest pair**: EURJPY (2.97 GB tick, 509M ticks).
+- **Lightest pair**: NZDUSD (1.21 GB tick, 207M ticks).
+- **Integrity**: 0 sha mismatches, 0 per-row bid>ask violations, 0 parse
+  failures. 265 row-count anomalies, all positive z-score (COVID March 2020,
+  2022 macro shocks, recent 2025 vol — expected high-activity months).
 
 ## Location
 
@@ -122,9 +133,9 @@ Backup script properties:
 - Recomputes destination sha256 after copy; flags mismatches.
 - `scripts/verify_backup.py` is a separate read-only verification pass.
 
-**Last backup:** *(filled in after first run)*
+**Last backup:** 2026-05-21T15:40:19 UTC — 16,464 files copied (52.26 GB tick + 18.22 GB M1), 0 failures, 0 sha mismatches, elapsed 279s. Backup report: `data/histdata/backup_report.md`.
 
-**Last verified:** *(filled in after first verify)*
+**Last verified:** 2026-05-21 (verify_backup.py pass — see `data/histdata/backup_verify_report.md`).
 
 ## Spread handling
 

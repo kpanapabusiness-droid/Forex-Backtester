@@ -30,13 +30,11 @@ in this codebase bypasses verification.
 from __future__ import annotations
 
 import argparse
-import csv
 import hashlib
 import io
 import json
 import shutil
 import sys
-import tempfile
 import time
 import zipfile
 from datetime import datetime, timezone
@@ -554,8 +552,8 @@ def run_download(
                         abs_path.parent.mkdir(parents=True, exist_ok=True)
                         abs_path.write_bytes(body)
                         sha = sha256_bytes(body)
-                        qpath = quarantine_file(target, pair, year, month,
-                                                 f"validate fail: {vreason}")
+                        quarantine_file(target, pair, year, month,
+                                        f"validate fail: {vreason}")
                         counts["QUARANTINED"] = counts.get("QUARANTINED", 0) + 1
                         log_event(log_fh, event="quarantined", pair=pair, ym=ym,
                                   size=len(body), sha=sha[:16], reason=vreason[:120])

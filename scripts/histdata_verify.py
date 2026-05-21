@@ -21,21 +21,17 @@ and removal of sha-mismatched files (for re-download).
 from __future__ import annotations
 
 import argparse
-import csv
 import hashlib
-import io
 import json
 import multiprocessing as mp
 import os
 import sys
 import time
 import zipfile
-from datetime import datetime, timezone
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
-
 
 REPO_ROOT: Path = Path(__file__).resolve().parent.parent
 DEFAULT_TARGET: Path = REPO_ROOT / "data" / "histdata"

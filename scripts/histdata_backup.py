@@ -27,7 +27,6 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-
 REPO_ROOT: Path = Path(__file__).resolve().parent.parent
 DEFAULT_TARGET: Path = REPO_ROOT / "data" / "histdata"
 DEFAULT_DEST: Path = Path.home() / "histdata_backup"

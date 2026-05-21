@@ -22,7 +22,6 @@ from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 
-
 PAIRS: tuple[str, ...] = (
     "AUDCAD", "AUDCHF", "AUDJPY", "AUDNZD", "AUDUSD",
     "CADCHF", "CADJPY", "CHFJPY",

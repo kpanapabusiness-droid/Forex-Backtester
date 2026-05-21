@@ -23,7 +23,6 @@ Parallelism: defaults to os.cpu_count()-1 workers, per pair-month independent.
 from __future__ import annotations
 
 import argparse
-import csv
 import hashlib
 import io
 import json
@@ -37,7 +36,6 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-
 
 REPO_ROOT: Path = Path(__file__).resolve().parent.parent
 DEFAULT_TARGET: Path = REPO_ROOT / "data" / "histdata"

@@ -1,5 +1,5 @@
 {
-  "downloaded_at": "2026-05-21T00:00:23+00:00",
+  "downloaded_at": "2026-05-21T05:01:34+00:00",
   "pairs": {
     "AUDCAD": {
       "earliest_month": "201001",
@@ -17784,6 +17784,2970 @@
       "latest_month": "202604",
       "total_files": 196,
       "total_size_bytes": 1893185995
+    },
+    "GBPJPY": {
+      "earliest_month": "201001",
+      "files": {
+        "GBPJPY/tick/2010/DAT_ASCII_GBPJPY_T_201001.zip": {
+          "rows": 816134,
+          "sha256": "52a882190a611dbf009c1840fb47d3f738a8e9cb588e01940e83529cae397375",
+          "size_bytes": 3175968
+        },
+        "GBPJPY/tick/2010/DAT_ASCII_GBPJPY_T_201002.zip": {
+          "rows": 754160,
+          "sha256": "335ea16ead78e6f777d3b89b901b7dab563394dadd043f08aa34a33c9a11ac15",
+          "size_bytes": 2947528
+        },
+        "GBPJPY/tick/2010/DAT_ASCII_GBPJPY_T_201003.zip": {
+          "rows": 894511,
+          "sha256": "1722c8face8b011184ae2947b5e32ae5d04e4b7974c8efc3cdaea99da119d241",
+          "size_bytes": 3332279
+        },
+        "GBPJPY/tick/2010/DAT_ASCII_GBPJPY_T_201004.zip": {
+          "rows": 1011106,
+          "sha256": "4cd18146415073181fae6a6ca01f5719ac8d10e22705da58dc652b2a7fe53f00",
+          "size_bytes": 3589805
+        },
+        "GBPJPY/tick/2010/DAT_ASCII_GBPJPY_T_201005.zip": {
+          "rows": 1195253,
+          "sha256": "25b21f9c7e651356efd0d301a59b701d6df56a1a7787f023e2d234e855314f01",
+          "size_bytes": 4637251
+        },
+        "GBPJPY/tick/2010/DAT_ASCII_GBPJPY_T_201006.zip": {
+          "rows": 842982,
+          "sha256": "1ad6605aec8fef32be863f9eb94ef9fce3d2b27047aff52ca41daeb2ebe62593",
+          "size_bytes": 3232801
+        },
+        "GBPJPY/tick/2010/DAT_ASCII_GBPJPY_T_201007.zip": {
+          "rows": 522259,
+          "sha256": "5f57b9a3086c95ceeeb050d55aa5da0e2b050270223e6f4527b44dc3b619dfae",
+          "size_bytes": 1949974
+        },
+        "GBPJPY/tick/2010/DAT_ASCII_GBPJPY_T_201008.zip": {
+          "rows": 468760,
+          "sha256": "0a7b6397edef69db25ecfc8f872aaa178e02a03dafac7b062d9ba2dfb3323795",
+          "size_bytes": 1756183
+        },
+        "GBPJPY/tick/2010/DAT_ASCII_GBPJPY_T_201009.zip": {
+          "rows": 436937,
+          "sha256": "7215f877a71a6eefaf7d761356822d3a6d0f16560e92d49f8b98b61a837385db",
+          "size_bytes": 1638452
+        },
+        "GBPJPY/tick/2010/DAT_ASCII_GBPJPY_T_201010.zip": {
+          "rows": 444126,
+          "sha256": "1000160ceaa056809873466dd57e98bcbf0b82c7f1c3e092a1825c90ad023e4b",
+          "size_bytes": 1620187
+        },
+        "GBPJPY/tick/2010/DAT_ASCII_GBPJPY_T_201011.zip": {
+          "rows": 489097,
+          "sha256": "2f2b755319f6d1d346a2af6a3318bdc13adfb0cb89ae179127e5c9df78cc8350",
+          "size_bytes": 1767255
+        },
+        "GBPJPY/tick/2010/DAT_ASCII_GBPJPY_T_201012.zip": {
+          "rows": 401645,
+          "sha256": "4db5eab8a56e4ccb309a9192957cfe8ed42f84fcf45f6c4d9d98511c3c51383a",
+          "size_bytes": 1483895
+        },
+        "GBPJPY/tick/2011/DAT_ASCII_GBPJPY_T_201101.zip": {
+          "rows": 438528,
+          "sha256": "c238fbe3131428b89d8a3be1722253ece1d1c43a605416b07cfb172750843c5f",
+          "size_bytes": 1588247
+        },
+        "GBPJPY/tick/2011/DAT_ASCII_GBPJPY_T_201102.zip": {
+          "rows": 392649,
+          "sha256": "ed57e172e136b498636c2786887a3b4cc6c490e1e726bbc413ce41175f9624ba",
+          "size_bytes": 1402679
+        },
+        "GBPJPY/tick/2011/DAT_ASCII_GBPJPY_T_201103.zip": {
+          "rows": 476512,
+          "sha256": "c4b103f86e4a6f82d7c5d88e1b57370669f746abc4552b8d4d33edef92c8bd74",
+          "size_bytes": 1764904
+        },
+        "GBPJPY/tick/2011/DAT_ASCII_GBPJPY_T_201104.zip": {
+          "rows": 399018,
+          "sha256": "ce3787f2998732e9daae340af65186f52ce1a7955abb1330ecfed11baa19d248",
+          "size_bytes": 1628665
+        },
+        "GBPJPY/tick/2011/DAT_ASCII_GBPJPY_T_201105.zip": {
+          "rows": 469471,
+          "sha256": "163155ec5ebdb395c8c4dfc4a110daf66f1985517fbc24e6f090b9a2abd1bc03",
+          "size_bytes": 2399598
+        },
+        "GBPJPY/tick/2011/DAT_ASCII_GBPJPY_T_201106.zip": {
+          "rows": 415155,
+          "sha256": "91e88177faa3dfdf2bedbf270f29e4b1797ae6f372845e763fa8ec07ae738014",
+          "size_bytes": 2098480
+        },
+        "GBPJPY/tick/2011/DAT_ASCII_GBPJPY_T_201107.zip": {
+          "rows": 379910,
+          "sha256": "802e726284dfa378039246b8eb766bef3fd107252cba90c7262acb3fa4f57c10",
+          "size_bytes": 1946879
+        },
+        "GBPJPY/tick/2011/DAT_ASCII_GBPJPY_T_201108.zip": {
+          "rows": 489575,
+          "sha256": "f6aca4b1809243fc80561d0f40036f2c6ac761f09763874d748e46bb881ff2d2",
+          "size_bytes": 2509649
+        },
+        "GBPJPY/tick/2011/DAT_ASCII_GBPJPY_T_201109.zip": {
+          "rows": 378366,
+          "sha256": "d5fa4d2ac55e259be05b8ba42473bde6d3db459c7dc747c21300b2eef90f0cc9",
+          "size_bytes": 1952912
+        },
+        "GBPJPY/tick/2011/DAT_ASCII_GBPJPY_T_201110.zip": {
+          "rows": 359427,
+          "sha256": "deffa26545e8de3bf215f66b7b20ee7b3bfb74b0244ff8194a7298a820b18f28",
+          "size_bytes": 1874970
+        },
+        "GBPJPY/tick/2011/DAT_ASCII_GBPJPY_T_201111.zip": {
+          "rows": 336001,
+          "sha256": "fe6a2b6ea4db1efdc1be8cc7e02b43163e7e538fc0957490437713bb9e762a13",
+          "size_bytes": 1738357
+        },
+        "GBPJPY/tick/2011/DAT_ASCII_GBPJPY_T_201112.zip": {
+          "rows": 1033360,
+          "sha256": "1ba3f05ddcde55ffca6fb03e666cadb972b3ca235719ca41959598ab59464ca0",
+          "size_bytes": 5946778
+        },
+        "GBPJPY/tick/2012/DAT_ASCII_GBPJPY_T_201201.zip": {
+          "rows": 1276906,
+          "sha256": "d2dfff8d0adeaca538d49c216cc12853b1cf4eb9e4ab6734f9ff0da31f3c70f5",
+          "size_bytes": 7253276
+        },
+        "GBPJPY/tick/2012/DAT_ASCII_GBPJPY_T_201202.zip": {
+          "rows": 1448436,
+          "sha256": "dd3bf874a71b6bfb117a4f83eb761e847b143598a24c7a23ba809c3ee449518d",
+          "size_bytes": 8268765
+        },
+        "GBPJPY/tick/2012/DAT_ASCII_GBPJPY_T_201203.zip": {
+          "rows": 1536402,
+          "sha256": "27b953d0b87d1251915edcef7cf1d7b329c7d73f6ab54ff28d6c98deeb49d2db",
+          "size_bytes": 9044995
+        },
+        "GBPJPY/tick/2012/DAT_ASCII_GBPJPY_T_201204.zip": {
+          "rows": 1326335,
+          "sha256": "bf313ea9f0ed7e85b675b0498464b02e2611632a742763c40c6dcce94c1952ad",
+          "size_bytes": 7806956
+        },
+        "GBPJPY/tick/2012/DAT_ASCII_GBPJPY_T_201205.zip": {
+          "rows": 1590980,
+          "sha256": "794aa9c515178e38bc76a749a6b38d5c137e49abb97bd52c4c14c732ac482337",
+          "size_bytes": 9035570
+        },
+        "GBPJPY/tick/2012/DAT_ASCII_GBPJPY_T_201206.zip": {
+          "rows": 1523563,
+          "sha256": "833cccd4e1643fe46d4a153d77af97be7de2e369f4c46ff360d53b1de357b085",
+          "size_bytes": 8809046
+        },
+        "GBPJPY/tick/2012/DAT_ASCII_GBPJPY_T_201207.zip": {
+          "rows": 1187641,
+          "sha256": "a6649193da4167d145a8647a8ff175fb51dcaa812548bb547b5caa74748fbbce",
+          "size_bytes": 6943253
+        },
+        "GBPJPY/tick/2012/DAT_ASCII_GBPJPY_T_201208.zip": {
+          "rows": 927749,
+          "sha256": "a4c92165e56d612deb1d8da03b79272f57640430d8b1a216371f29ec919ae800",
+          "size_bytes": 5495264
+        },
+        "GBPJPY/tick/2012/DAT_ASCII_GBPJPY_T_201209.zip": {
+          "rows": 1005661,
+          "sha256": "566ff73cda634c415a19d827fb72eef28d75e15518644f8aeede7bbce8c564bf",
+          "size_bytes": 5894146
+        },
+        "GBPJPY/tick/2012/DAT_ASCII_GBPJPY_T_201210.zip": {
+          "rows": 1048666,
+          "sha256": "022b00d1400052d1f892c4794f4bc734a70f8791cf62aa41d173952aaba6abc7",
+          "size_bytes": 6139184
+        },
+        "GBPJPY/tick/2012/DAT_ASCII_GBPJPY_T_201211.zip": {
+          "rows": 1036133,
+          "sha256": "5c0f32cfc96c05e28e1ebb79bdec53adea38812871c6b492b050a85f2ca41d1d",
+          "size_bytes": 6140978
+        },
+        "GBPJPY/tick/2012/DAT_ASCII_GBPJPY_T_201212.zip": {
+          "rows": 914280,
+          "sha256": "7e967dae8c2bcac8275eaee5237ecb732bee41ca9b0eff4d9eb8008056536d22",
+          "size_bytes": 5458282
+        },
+        "GBPJPY/tick/2013/DAT_ASCII_GBPJPY_T_201301.zip": {
+          "rows": 1550820,
+          "sha256": "15ba2cb60a2186cbd091841d0b883348312b22d2f64c8465e581a95b63e15b38",
+          "size_bytes": 9475873
+        },
+        "GBPJPY/tick/2013/DAT_ASCII_GBPJPY_T_201302.zip": {
+          "rows": 1447386,
+          "sha256": "89e680a1b985300a3127ef2bd12709f029c486800429c47da032c55651b7b12e",
+          "size_bytes": 9015484
+        },
+        "GBPJPY/tick/2013/DAT_ASCII_GBPJPY_T_201303.zip": {
+          "rows": 1384933,
+          "sha256": "1993398d4faf421f9e0c4a2f100cc39526c4cbc19751a20b91c2e0d58167fcbd",
+          "size_bytes": 8467872
+        },
+        "GBPJPY/tick/2013/DAT_ASCII_GBPJPY_T_201304.zip": {
+          "rows": 1685821,
+          "sha256": "56bd355d405d7009b9461011ea912d5965dc9ccac81a7bca9a294e810bc964a8",
+          "size_bytes": 10469244
+        },
+        "GBPJPY/tick/2013/DAT_ASCII_GBPJPY_T_201305.zip": {
+          "rows": 1754037,
+          "sha256": "83ffa9543c92766f0d4c62f47c318b3ac5d3e7fbe92c15f357b9b677012888e9",
+          "size_bytes": 10624399
+        },
+        "GBPJPY/tick/2013/DAT_ASCII_GBPJPY_T_201306.zip": {
+          "rows": 1992754,
+          "sha256": "fccae5a5cedfb12b4ef6d42991ebe162517fe387574dd50fe1b6b7435d5fb90e",
+          "size_bytes": 12318688
+        },
+        "GBPJPY/tick/2013/DAT_ASCII_GBPJPY_T_201307.zip": {
+          "rows": 1772835,
+          "sha256": "93bc67a9276d6caad5adc1d67cd76e5d8dccd8e735f0d800e525014c33b4626b",
+          "size_bytes": 10655662
+        },
+        "GBPJPY/tick/2013/DAT_ASCII_GBPJPY_T_201308.zip": {
+          "rows": 1472212,
+          "sha256": "08dfae7501f59e10f78fdf511720012ac3523f793f9ee0bb5101380bdf97258f",
+          "size_bytes": 8919873
+        },
+        "GBPJPY/tick/2013/DAT_ASCII_GBPJPY_T_201309.zip": {
+          "rows": 1305878,
+          "sha256": "40883102e92c255a8c790667efb23c80101b8284202de9c3a6838765489bc2f7",
+          "size_bytes": 7855736
+        },
+        "GBPJPY/tick/2013/DAT_ASCII_GBPJPY_T_201310.zip": {
+          "rows": 1297935,
+          "sha256": "754cd9ead4927b1d1e82fc8443131282cc0d23201144ad4ae178303260b65a05",
+          "size_bytes": 7759163
+        },
+        "GBPJPY/tick/2013/DAT_ASCII_GBPJPY_T_201311.zip": {
+          "rows": 1145200,
+          "sha256": "94ee86186b668430e0ba23a60b2421d0474c976ef6cb7a8774097eecb0e1fb0a",
+          "size_bytes": 6887057
+        },
+        "GBPJPY/tick/2013/DAT_ASCII_GBPJPY_T_201312.zip": {
+          "rows": 1094760,
+          "sha256": "813a8e0c1ca3a6acf071bd8ecd1d501643f175eb778df0d126d037e35be0d46b",
+          "size_bytes": 6647954
+        },
+        "GBPJPY/tick/2014/DAT_ASCII_GBPJPY_T_201401.zip": {
+          "rows": 1355024,
+          "sha256": "e728b6cad17868ab680b762d33fc1e3873878805c421928436267b837d9ecc14",
+          "size_bytes": 8370734
+        },
+        "GBPJPY/tick/2014/DAT_ASCII_GBPJPY_T_201402.zip": {
+          "rows": 1153927,
+          "sha256": "3ba88558663f73369d1fcb6a78c114f48898e33c960d21b55a02ccf7b42d4d81",
+          "size_bytes": 7167129
+        },
+        "GBPJPY/tick/2014/DAT_ASCII_GBPJPY_T_201403.zip": {
+          "rows": 1091075,
+          "sha256": "6b3c1d3c8a8f484b9c36f081165596788ed7525629b5c39199b475216532e7ba",
+          "size_bytes": 6663218
+        },
+        "GBPJPY/tick/2014/DAT_ASCII_GBPJPY_T_201404.zip": {
+          "rows": 990841,
+          "sha256": "c40da62069950d52b42076266ae7b3fbb37f21425cd4cdc7d89e6895c4a4c8ca",
+          "size_bytes": 5920447
+        },
+        "GBPJPY/tick/2014/DAT_ASCII_GBPJPY_T_201405.zip": {
+          "rows": 1027450,
+          "sha256": "397ea52622fbe49e79416659b3ecea632f8870ecee8cf814b10d7b0648b65e6d",
+          "size_bytes": 5990844
+        },
+        "GBPJPY/tick/2014/DAT_ASCII_GBPJPY_T_201406.zip": {
+          "rows": 959681,
+          "sha256": "700d4f73027692f04d474b87af7f989a7d4c63809b50c5d832e9ff8fc028a031",
+          "size_bytes": 5490334
+        },
+        "GBPJPY/tick/2014/DAT_ASCII_GBPJPY_T_201407.zip": {
+          "rows": 941010,
+          "sha256": "5cd3b5809e35f46eefe538e4f47921e7ea7859fea0af4e8f2a8a698895c30d44",
+          "size_bytes": 5237319
+        },
+        "GBPJPY/tick/2014/DAT_ASCII_GBPJPY_T_201408.zip": {
+          "rows": 1123109,
+          "sha256": "361109667929cf949d13d50681243d5236bcc0e4a956727b3807abf6dce3a266",
+          "size_bytes": 5503717
+        },
+        "GBPJPY/tick/2014/DAT_ASCII_GBPJPY_T_201409.zip": {
+          "rows": 1734087,
+          "sha256": "ebdb07baef708306c0ec1ba56c4f795a59e30d0aeaa58440298829e295b9aea2",
+          "size_bytes": 8585664
+        },
+        "GBPJPY/tick/2014/DAT_ASCII_GBPJPY_T_201410.zip": {
+          "rows": 2031242,
+          "sha256": "e69cc2407c5458ae1192699a7c489b320040109fa5b9842d673a16ca1fb27e3c",
+          "size_bytes": 11944036
+        },
+        "GBPJPY/tick/2014/DAT_ASCII_GBPJPY_T_201411.zip": {
+          "rows": 2017570,
+          "sha256": "234b51a152a4791ae037435fe73b09720eb3b71b4f5c394f5f79ebf9f4817fcf",
+          "size_bytes": 11473639
+        },
+        "GBPJPY/tick/2014/DAT_ASCII_GBPJPY_T_201412.zip": {
+          "rows": 1696528,
+          "sha256": "88e443a1c44ba8d7e42583394172882c3ec32cde91a479a1a8b32c330ae35ab5",
+          "size_bytes": 10056720
+        },
+        "GBPJPY/tick/2015/DAT_ASCII_GBPJPY_T_201501.zip": {
+          "rows": 2156741,
+          "sha256": "b3ee94abae5f7affd19f1130f4c206484e13af11d15c3b953aa995a6455eed6a",
+          "size_bytes": 12748410
+        },
+        "GBPJPY/tick/2015/DAT_ASCII_GBPJPY_T_201502.zip": {
+          "rows": 1828508,
+          "sha256": "438c525f5b7cf01a62a1364191a5246370259d7ee87e995e1c5492c0e40fc236",
+          "size_bytes": 10504879
+        },
+        "GBPJPY/tick/2015/DAT_ASCII_GBPJPY_T_201503.zip": {
+          "rows": 1886989,
+          "sha256": "adef031368252d710dd7b6bc7a6790f656166e7a5e2b9c3df70cf454305af101",
+          "size_bytes": 11014461
+        },
+        "GBPJPY/tick/2015/DAT_ASCII_GBPJPY_T_201504.zip": {
+          "rows": 1706278,
+          "sha256": "1639964880a40a6655d50715139e57b4c7ceba4edf7131ac437c82180902215d",
+          "size_bytes": 9882445
+        },
+        "GBPJPY/tick/2015/DAT_ASCII_GBPJPY_T_201505.zip": {
+          "rows": 2100232,
+          "sha256": "21c5fcc4af2eee14de1ad8e768ace9932d50cc36952c88d4873b45f546edca63",
+          "size_bytes": 11786776
+        },
+        "GBPJPY/tick/2015/DAT_ASCII_GBPJPY_T_201506.zip": {
+          "rows": 1819002,
+          "sha256": "ca57eb9e7736cd32f2ef0bb9642bed4086bea532de1143be2ec62ef48785b2e7",
+          "size_bytes": 10343008
+        },
+        "GBPJPY/tick/2015/DAT_ASCII_GBPJPY_T_201507.zip": {
+          "rows": 1671610,
+          "sha256": "472b365f5fd4b20e5e62f9fe9d5c61bcbaf40a1fdd7d6dcb9a82aafb0f40f90c",
+          "size_bytes": 9426955
+        },
+        "GBPJPY/tick/2015/DAT_ASCII_GBPJPY_T_201508.zip": {
+          "rows": 2001239,
+          "sha256": "adc7bc47f967ec6b4c66a47fbffa362219e37737d9142909a2d5b783ae304b54",
+          "size_bytes": 11338730
+        },
+        "GBPJPY/tick/2015/DAT_ASCII_GBPJPY_T_201509.zip": {
+          "rows": 2393257,
+          "sha256": "7315c51c0dc301fe6653b88bb09aa14ee63390cba9b19ca88099e882f862872b",
+          "size_bytes": 13537721
+        },
+        "GBPJPY/tick/2015/DAT_ASCII_GBPJPY_T_201510.zip": {
+          "rows": 1849676,
+          "sha256": "9603c9ba4c6748bf12c231a4a8cf19e839a43212a6a84a75479be521b50b27bf",
+          "size_bytes": 10260423
+        },
+        "GBPJPY/tick/2015/DAT_ASCII_GBPJPY_T_201511.zip": {
+          "rows": 1516633,
+          "sha256": "6c8036232a6103b98ff4dce55447b70b176e235828eed114cf8b999a4842dfbb",
+          "size_bytes": 8350895
+        },
+        "GBPJPY/tick/2015/DAT_ASCII_GBPJPY_T_201512.zip": {
+          "rows": 1746121,
+          "sha256": "0c5b786d195c8b1bb17060b5bb1280e0519cbcbed91a040ad16b136073d796bd",
+          "size_bytes": 9740342
+        },
+        "GBPJPY/tick/2016/DAT_ASCII_GBPJPY_T_201601.zip": {
+          "rows": 2660604,
+          "sha256": "72b36497beb1f379f3cb11ce27b352de61b2e0dd32e2e6d2eb68b63724ec8f83",
+          "size_bytes": 15202396
+        },
+        "GBPJPY/tick/2016/DAT_ASCII_GBPJPY_T_201602.zip": {
+          "rows": 2785530,
+          "sha256": "4f9621bb0f4435cccef90a36483fce5e7a46c14173bf589f03c8a70252b44be5",
+          "size_bytes": 16234780
+        },
+        "GBPJPY/tick/2016/DAT_ASCII_GBPJPY_T_201603.zip": {
+          "rows": 1937594,
+          "sha256": "29965c170469889936eb8e962c542002d41afd75bf6f204deaf1f7ec43c16177",
+          "size_bytes": 11256458
+        },
+        "GBPJPY/tick/2016/DAT_ASCII_GBPJPY_T_201604.zip": {
+          "rows": 1706561,
+          "sha256": "018a6744eaaa3ac94f250dbb1fba6963a8b0737f4820bcff8352effbbd957aa3",
+          "size_bytes": 10181757
+        },
+        "GBPJPY/tick/2016/DAT_ASCII_GBPJPY_T_201605.zip": {
+          "rows": 1408164,
+          "sha256": "c95e48995c9b660e63cc6495d6126ec30959f6e4fcd6f1ff735b835c9a5d97c2",
+          "size_bytes": 8525481
+        },
+        "GBPJPY/tick/2016/DAT_ASCII_GBPJPY_T_201606.zip": {
+          "rows": 2001389,
+          "sha256": "6767ebb25666514aa22a372a80c04302255afe0f856dcba847d8446d4369597c",
+          "size_bytes": 12459892
+        },
+        "GBPJPY/tick/2016/DAT_ASCII_GBPJPY_T_201607.zip": {
+          "rows": 1583667,
+          "sha256": "18ff8f6bad2f8e93555bba89c526527cf138400a61aa4250c5f8424eb1a6dfbf",
+          "size_bytes": 9874973
+        },
+        "GBPJPY/tick/2016/DAT_ASCII_GBPJPY_T_201608.zip": {
+          "rows": 1122720,
+          "sha256": "3bf9c71bcc96349b298f05f9d0913f460008fd99c72a55cdf54c799f75b64821",
+          "size_bytes": 6731445
+        },
+        "GBPJPY/tick/2016/DAT_ASCII_GBPJPY_T_201609.zip": {
+          "rows": 1320709,
+          "sha256": "b73b2df48ea11336eca82ea99d7c33426ec05c80d10644b8194043ab08ee31a6",
+          "size_bytes": 7855827
+        },
+        "GBPJPY/tick/2016/DAT_ASCII_GBPJPY_T_201610.zip": {
+          "rows": 1363467,
+          "sha256": "d73ba1254cdf82aeabde437d6799c7ec136904f7a4e97f5ac0543c2f322e79a4",
+          "size_bytes": 8031209
+        },
+        "GBPJPY/tick/2016/DAT_ASCII_GBPJPY_T_201611.zip": {
+          "rows": 2070994,
+          "sha256": "842817f9a5889df01d0f87dbb0316be5aca8020e963672bf95182cef6b6a019a",
+          "size_bytes": 12176126
+        },
+        "GBPJPY/tick/2016/DAT_ASCII_GBPJPY_T_201612.zip": {
+          "rows": 1435654,
+          "sha256": "e8183fdc438b3d18ceebebc48827e80e450256e6ed90a461d557f7ee3c2f8192",
+          "size_bytes": 8468782
+        },
+        "GBPJPY/tick/2017/DAT_ASCII_GBPJPY_T_201701.zip": {
+          "rows": 2049810,
+          "sha256": "6f07b61b1e08ec44758f199634dc1e6bc62e15c7ef46c10c7abfc64442534ecd",
+          "size_bytes": 11811793
+        },
+        "GBPJPY/tick/2017/DAT_ASCII_GBPJPY_T_201702.zip": {
+          "rows": 1756670,
+          "sha256": "c312198defb658e53de902022432633a012ebd9d5fd170d8d4af73bdec34ef3c",
+          "size_bytes": 9885438
+        },
+        "GBPJPY/tick/2017/DAT_ASCII_GBPJPY_T_201703.zip": {
+          "rows": 1844404,
+          "sha256": "581bd307b6298ec8b4d026e0959baf5b0bfd82e66c18efb52d2f89bbae02d3ee",
+          "size_bytes": 10308126
+        },
+        "GBPJPY/tick/2017/DAT_ASCII_GBPJPY_T_201704.zip": {
+          "rows": 1360427,
+          "sha256": "3aefa835f601ae38206779d089c01e9ae3f40dc528518e8de318af12a00ede6f",
+          "size_bytes": 7784691
+        },
+        "GBPJPY/tick/2017/DAT_ASCII_GBPJPY_T_201705.zip": {
+          "rows": 1406055,
+          "sha256": "041ad0650f72dd9539c573abc8009328e9fe4cf8fce837a39e49acf15b6f9ee6",
+          "size_bytes": 8081523
+        },
+        "GBPJPY/tick/2017/DAT_ASCII_GBPJPY_T_201706.zip": {
+          "rows": 1390606,
+          "sha256": "eaf60a7bb2e6123b6a410005d48feb1a299c000816513a66e301b6c3f9916540",
+          "size_bytes": 7940989
+        },
+        "GBPJPY/tick/2017/DAT_ASCII_GBPJPY_T_201707.zip": {
+          "rows": 1932892,
+          "sha256": "1ccac7e6019ce8379866de5739a674ad733d26b9dda93faf32a41746261e5c3f",
+          "size_bytes": 10082728
+        },
+        "GBPJPY/tick/2017/DAT_ASCII_GBPJPY_T_201708.zip": {
+          "rows": 1684213,
+          "sha256": "669953dd6ec66254834027879f8a720e2e93af84c4f98b273eaa2b40365c9b71",
+          "size_bytes": 9006689
+        },
+        "GBPJPY/tick/2017/DAT_ASCII_GBPJPY_T_201709.zip": {
+          "rows": 1643385,
+          "sha256": "e898acbf9b7af691756afb41ab88bc133e1a58bfafa85394901e8b47457d2a64",
+          "size_bytes": 9204654
+        },
+        "GBPJPY/tick/2017/DAT_ASCII_GBPJPY_T_201710.zip": {
+          "rows": 1657231,
+          "sha256": "6a54454d0e64fb3f3fb512e489cd9a2b553e13614dda6955701f7d74851cb68a",
+          "size_bytes": 9017389
+        },
+        "GBPJPY/tick/2017/DAT_ASCII_GBPJPY_T_201711.zip": {
+          "rows": 1678344,
+          "sha256": "5d7208d9e3ab1b58a2236f37e8e97677d8d4863c468d3a977a1ae6da57719f0e",
+          "size_bytes": 9145484
+        },
+        "GBPJPY/tick/2017/DAT_ASCII_GBPJPY_T_201712.zip": {
+          "rows": 1480981,
+          "sha256": "28f59b584513ff71a12222083ccd6992c6733e7fb7ec014ddeca1f797d2d7df2",
+          "size_bytes": 7981332
+        },
+        "GBPJPY/tick/2018/DAT_ASCII_GBPJPY_T_201801.zip": {
+          "rows": 2015608,
+          "sha256": "cb68c812ed55863b7711f0e894aac288f00e2f6fbf6c6f1c14c7104d0ceb35da",
+          "size_bytes": 10874651
+        },
+        "GBPJPY/tick/2018/DAT_ASCII_GBPJPY_T_201802.zip": {
+          "rows": 2323551,
+          "sha256": "516c0a7d0c2abe6fd90e0313222c52afc29816a9c66748aadc9647411e997ee9",
+          "size_bytes": 12853307
+        },
+        "GBPJPY/tick/2018/DAT_ASCII_GBPJPY_T_201803.zip": {
+          "rows": 2209690,
+          "sha256": "73aff16330e943f44edd12f68c6d8aec8bfdb5a338522bd6ae362621fb718fa2",
+          "size_bytes": 12052893
+        },
+        "GBPJPY/tick/2018/DAT_ASCII_GBPJPY_T_201804.zip": {
+          "rows": 1435366,
+          "sha256": "f139db388bd750ff5a17d0421b3312b1152a86c8b17f87b69e9b834151ab17bd",
+          "size_bytes": 8008666
+        },
+        "GBPJPY/tick/2018/DAT_ASCII_GBPJPY_T_201805.zip": {
+          "rows": 2308464,
+          "sha256": "635ad4edfb0d0929f126fe8be767150f3c86443c49470ff4049c2a774e61fe7a",
+          "size_bytes": 12858840
+        },
+        "GBPJPY/tick/2018/DAT_ASCII_GBPJPY_T_201806.zip": {
+          "rows": 1871195,
+          "sha256": "23754e6d1dacafc10a76af8178193fd21ae7d6c51479d89049e1be53904778c9",
+          "size_bytes": 10274941
+        },
+        "GBPJPY/tick/2018/DAT_ASCII_GBPJPY_T_201807.zip": {
+          "rows": 1933281,
+          "sha256": "f49ec7f8067f62633f886e6845e8971c14709d79cef2cf9b1b52f6bbe8c238fd",
+          "size_bytes": 10326179
+        },
+        "GBPJPY/tick/2018/DAT_ASCII_GBPJPY_T_201808.zip": {
+          "rows": 1576826,
+          "sha256": "22fd8d8cf19e19d062f370e2892d0fbe9188d284730e80d1ebbae6d65edddba1",
+          "size_bytes": 8649782
+        },
+        "GBPJPY/tick/2018/DAT_ASCII_GBPJPY_T_201809.zip": {
+          "rows": 1428400,
+          "sha256": "f3f350608e84b36ff91660df5e70c0a819e98744b1cccdfd79e9a8b78e83129c",
+          "size_bytes": 7941743
+        },
+        "GBPJPY/tick/2018/DAT_ASCII_GBPJPY_T_201810.zip": {
+          "rows": 2405736,
+          "sha256": "83d0f53f818474f6b460c7e96fe9f59ead1d9580fbc1d01a22c1bf95c8e029f9",
+          "size_bytes": 12906833
+        },
+        "GBPJPY/tick/2018/DAT_ASCII_GBPJPY_T_201811.zip": {
+          "rows": 2137317,
+          "sha256": "4cf01e586617279734558b9b0f7b1e90dfef97cfeab1c0c548a77ae7a290ec6a",
+          "size_bytes": 11616773
+        },
+        "GBPJPY/tick/2018/DAT_ASCII_GBPJPY_T_201812.zip": {
+          "rows": 2923473,
+          "sha256": "819e8da79661b279c3d886739f4d5981cc87ed3392fefee528bd1867e7a4c06a",
+          "size_bytes": 17320862
+        },
+        "GBPJPY/tick/2019/DAT_ASCII_GBPJPY_T_201901.zip": {
+          "rows": 3740490,
+          "sha256": "8e40673f7eb2af18e72b28b7b8a66897efccc09f56e5bd4a90013c4a9da6d6f2",
+          "size_bytes": 23720769
+        },
+        "GBPJPY/tick/2019/DAT_ASCII_GBPJPY_T_201902.zip": {
+          "rows": 2571847,
+          "sha256": "5f03172e0c74280607070d4766423c5d229f14b506a47522251ade7a9149128e",
+          "size_bytes": 16200873
+        },
+        "GBPJPY/tick/2019/DAT_ASCII_GBPJPY_T_201903.zip": {
+          "rows": 3348701,
+          "sha256": "cf7a296c17390dbb00f33160aba9a109b3200a1f1f1b8d65a486525642fd2183",
+          "size_bytes": 21378191
+        },
+        "GBPJPY/tick/2019/DAT_ASCII_GBPJPY_T_201904.zip": {
+          "rows": 2799448,
+          "sha256": "3e42a67ac7781b7690cac999a7fbc2c84acb3c3dff5ca814c1e7223a884d7587",
+          "size_bytes": 17294637
+        },
+        "GBPJPY/tick/2019/DAT_ASCII_GBPJPY_T_201905.zip": {
+          "rows": 2168546,
+          "sha256": "b0b38626303f84c5057b5d938d610d235db0e56cd25eb15a194c7c652b5e2969",
+          "size_bytes": 14084132
+        },
+        "GBPJPY/tick/2019/DAT_ASCII_GBPJPY_T_201906.zip": {
+          "rows": 2081682,
+          "sha256": "65435519a4a798137a7c3fdea2e52882f0aade6f4d5b465d7513881557fea7b8",
+          "size_bytes": 13255253
+        },
+        "GBPJPY/tick/2019/DAT_ASCII_GBPJPY_T_201907.zip": {
+          "rows": 1861926,
+          "sha256": "ab3f5f4af0c2c7311cfe7926ffc7a500de202acd5d2c97f2188a3966824c9cf8",
+          "size_bytes": 11949369
+        },
+        "GBPJPY/tick/2019/DAT_ASCII_GBPJPY_T_201908.zip": {
+          "rows": 2696914,
+          "sha256": "b7f48ed740b278189ba5748cea5d8f3d5cbc94ab2f94555afde271ea681d3283",
+          "size_bytes": 17612068
+        },
+        "GBPJPY/tick/2019/DAT_ASCII_GBPJPY_T_201909.zip": {
+          "rows": 2156232,
+          "sha256": "6a175dccc26017618140ce493db4498e3c8d7f635a7e119dd4e59d5ee2998418",
+          "size_bytes": 13969505
+        },
+        "GBPJPY/tick/2019/DAT_ASCII_GBPJPY_T_201910.zip": {
+          "rows": 2727319,
+          "sha256": "f6a079d1c831ff52137f5b27d76ef2a35fe1e5bfd789c07278503b2a6402e565",
+          "size_bytes": 17911317
+        },
+        "GBPJPY/tick/2019/DAT_ASCII_GBPJPY_T_201911.zip": {
+          "rows": 2072326,
+          "sha256": "478ea8639c36c7319824dbd87674f53065b2a046567538084f8e41c8a2f5992a",
+          "size_bytes": 12998967
+        },
+        "GBPJPY/tick/2019/DAT_ASCII_GBPJPY_T_201912.zip": {
+          "rows": 2418833,
+          "sha256": "544707fb1eb717291f3a48a7c6650d6b91a0a41d77c548820a831db187afa2dc",
+          "size_bytes": 15319521
+        },
+        "GBPJPY/tick/2020/DAT_ASCII_GBPJPY_T_202001.zip": {
+          "rows": 2865487,
+          "sha256": "c7b10667ad3f46a94735a2536b0c9ac29961a41cbf3f5bdc872e6ac0da18d857",
+          "size_bytes": 17892616
+        },
+        "GBPJPY/tick/2020/DAT_ASCII_GBPJPY_T_202002.zip": {
+          "rows": 3141514,
+          "sha256": "eea4a4b366aaaddb3be55b6103d0628fd8e3a93cb69be7ca3481b23b5bf0c638",
+          "size_bytes": 19400216
+        },
+        "GBPJPY/tick/2020/DAT_ASCII_GBPJPY_T_202003.zip": {
+          "rows": 7798494,
+          "sha256": "ba7d66adb1c5ac6f28d055800952689618b3d9688ea10419bbe7057aef1b65af",
+          "size_bytes": 51025303
+        },
+        "GBPJPY/tick/2020/DAT_ASCII_GBPJPY_T_202004.zip": {
+          "rows": 3487230,
+          "sha256": "a98a8036f8d29da6a48af80d0f2d6a640243a175399bfb3f6aab43912ce52935",
+          "size_bytes": 22305439
+        },
+        "GBPJPY/tick/2020/DAT_ASCII_GBPJPY_T_202005.zip": {
+          "rows": 2969755,
+          "sha256": "7d88eeda72b0aa0126d689313257df79f0c593d2a94820d5122d4dc8840b2de1",
+          "size_bytes": 18728580
+        },
+        "GBPJPY/tick/2020/DAT_ASCII_GBPJPY_T_202006.zip": {
+          "rows": 3602383,
+          "sha256": "77bb65d0502b29b66ff6b88a8817446a322ce9fd74e6c6c8d848d6a42d89f9e5",
+          "size_bytes": 23342973
+        },
+        "GBPJPY/tick/2020/DAT_ASCII_GBPJPY_T_202007.zip": {
+          "rows": 2745907,
+          "sha256": "f9f561683f169f8ae91255bd7cc74497b743d0386baf79acb9536e1fad73277e",
+          "size_bytes": 17487097
+        },
+        "GBPJPY/tick/2020/DAT_ASCII_GBPJPY_T_202008.zip": {
+          "rows": 2691952,
+          "sha256": "58b1b4232c84850247d98f9fb3729c898651cb39782f4317f485a159b749ce3a",
+          "size_bytes": 17204698
+        },
+        "GBPJPY/tick/2020/DAT_ASCII_GBPJPY_T_202009.zip": {
+          "rows": 2690005,
+          "sha256": "000420e1f7b21464bef4f06a5a10f52492fd8bf0c842a34c34233a6c7bf98c44",
+          "size_bytes": 17761301
+        },
+        "GBPJPY/tick/2020/DAT_ASCII_GBPJPY_T_202010.zip": {
+          "rows": 2622715,
+          "sha256": "84e5e736ae13b338b85402f3b283890e7b2b64e511882057eeb6134f6631ce75",
+          "size_bytes": 17080862
+        },
+        "GBPJPY/tick/2020/DAT_ASCII_GBPJPY_T_202011.zip": {
+          "rows": 3002776,
+          "sha256": "577cc65d6c0a4c5b3f291598855e618b1daedc7a7914dcee7c34f9ababb0839b",
+          "size_bytes": 19206581
+        },
+        "GBPJPY/tick/2020/DAT_ASCII_GBPJPY_T_202012.zip": {
+          "rows": 3111012,
+          "sha256": "51472c6da9767428975d3af16a3620ddfd14b664c347e20f24528e6b7feed50f",
+          "size_bytes": 20121556
+        },
+        "GBPJPY/tick/2021/DAT_ASCII_GBPJPY_T_202101.zip": {
+          "rows": 2904009,
+          "sha256": "33bb7f003404a9740d38002395da4a0a6b01680862c9b6768530eeda4463de8c",
+          "size_bytes": 18265214
+        },
+        "GBPJPY/tick/2021/DAT_ASCII_GBPJPY_T_202102.zip": {
+          "rows": 2248170,
+          "sha256": "df44a89af8dba8dd84a0cadcb9140473077e139cfd82ee8a7501c51a12c18c9f",
+          "size_bytes": 14380682
+        },
+        "GBPJPY/tick/2021/DAT_ASCII_GBPJPY_T_202103.zip": {
+          "rows": 3039230,
+          "sha256": "e7d95528e59bcd40242620d24ee2bd77dda6cbf418e06084b8fc4dd0079b3bef",
+          "size_bytes": 19225204
+        },
+        "GBPJPY/tick/2021/DAT_ASCII_GBPJPY_T_202104.zip": {
+          "rows": 2332653,
+          "sha256": "4d0afe0a7e19380558a3b3ccbcec13c8afc23c5a853376811fb4462d84d5dfe9",
+          "size_bytes": 14891680
+        },
+        "GBPJPY/tick/2021/DAT_ASCII_GBPJPY_T_202105.zip": {
+          "rows": 2364905,
+          "sha256": "e3a3c7601974b0e5310c375084932f7413b182a047fd435e1fd0cf2d91b1d497",
+          "size_bytes": 14983294
+        },
+        "GBPJPY/tick/2021/DAT_ASCII_GBPJPY_T_202106.zip": {
+          "rows": 2284916,
+          "sha256": "ffb91eb158530319966e9b7816f8006760ba383afa772e5c6a238cd62dce0fbd",
+          "size_bytes": 14440357
+        },
+        "GBPJPY/tick/2021/DAT_ASCII_GBPJPY_T_202107.zip": {
+          "rows": 2588872,
+          "sha256": "1a9b6b1b6d9f72e7079099409d1e7d850a5dc594753a9be22e85850fa8f96f87",
+          "size_bytes": 16554718
+        },
+        "GBPJPY/tick/2021/DAT_ASCII_GBPJPY_T_202108.zip": {
+          "rows": 1807777,
+          "sha256": "122472f79fb5ffe4f35954d3c1abe3936e05b3b365401272b1a49a737a92ae90",
+          "size_bytes": 11731263
+        },
+        "GBPJPY/tick/2021/DAT_ASCII_GBPJPY_T_202109.zip": {
+          "rows": 2116888,
+          "sha256": "dbb4227f205fe96f1d02238cca9f1f2b89796cc70de7acc9c1a2a7fb3b003317",
+          "size_bytes": 13551997
+        },
+        "GBPJPY/tick/2021/DAT_ASCII_GBPJPY_T_202110.zip": {
+          "rows": 2559348,
+          "sha256": "701fef900f527755b279fbab025f3b6f78b4d57fb3396fe4bfa1f058315568b3",
+          "size_bytes": 16349769
+        },
+        "GBPJPY/tick/2021/DAT_ASCII_GBPJPY_T_202111.zip": {
+          "rows": 3138481,
+          "sha256": "deca70945c68d8934d6e84b1700307a7bd7e60a42185ddd8f9054354bf2c9129",
+          "size_bytes": 19974065
+        },
+        "GBPJPY/tick/2021/DAT_ASCII_GBPJPY_T_202112.zip": {
+          "rows": 2857876,
+          "sha256": "b599c31db6ba415cfa707eb4424d5baed209b4667535dafa7c6effd3903c1ed7",
+          "size_bytes": 17962178
+        },
+        "GBPJPY/tick/2022/DAT_ASCII_GBPJPY_T_202201.zip": {
+          "rows": 2685646,
+          "sha256": "2378f5b8fc29ebe1c391aac1757a8e7e519b67a002ab935bcba006358a06458c",
+          "size_bytes": 17180859
+        },
+        "GBPJPY/tick/2022/DAT_ASCII_GBPJPY_T_202202.zip": {
+          "rows": 3031875,
+          "sha256": "b475b9f9edb3b192b0f046812d913dedb04ae51d13c1deb9353785669253232e",
+          "size_bytes": 19275558
+        },
+        "GBPJPY/tick/2022/DAT_ASCII_GBPJPY_T_202203.zip": {
+          "rows": 3898457,
+          "sha256": "4e7b94edf1582b30cb75986116cf2dc769733d33ba244bcbe3bf983f30f5b88c",
+          "size_bytes": 25094355
+        },
+        "GBPJPY/tick/2022/DAT_ASCII_GBPJPY_T_202204.zip": {
+          "rows": 3929175,
+          "sha256": "9fba9e2ca58ed6d17a0154bd033cf4dcdff9f536bf8ecf8fe9d042d50e171cb0",
+          "size_bytes": 25073993
+        },
+        "GBPJPY/tick/2022/DAT_ASCII_GBPJPY_T_202205.zip": {
+          "rows": 4722593,
+          "sha256": "631b2b374a05e66bf4671eca0bab7d2883954f02cd24849b31f0813bddefd9a1",
+          "size_bytes": 30438445
+        },
+        "GBPJPY/tick/2022/DAT_ASCII_GBPJPY_T_202206.zip": {
+          "rows": 5504811,
+          "sha256": "5fd68f07bad38a913673d65918d83620ae041c40d3a98904973e4401748f7c11",
+          "size_bytes": 35270819
+        },
+        "GBPJPY/tick/2022/DAT_ASCII_GBPJPY_T_202207.zip": {
+          "rows": 5542644,
+          "sha256": "a97df69d3e02d31fb53a5f2793f4bafa0222dcb6ea6e9785430f2ff558423394",
+          "size_bytes": 35055970
+        },
+        "GBPJPY/tick/2022/DAT_ASCII_GBPJPY_T_202208.zip": {
+          "rows": 5001423,
+          "sha256": "9e9fb69dd000dc3984cdb192e7a2f233d9d05603ea8ae2ffe4ddae4b8245ea4d",
+          "size_bytes": 31899869
+        },
+        "GBPJPY/tick/2022/DAT_ASCII_GBPJPY_T_202209.zip": {
+          "rows": 6439062,
+          "sha256": "90de09b7d481e54b0cc24a4d1692ade872a53915911643ccc1db00d78e838f59",
+          "size_bytes": 41326668
+        },
+        "GBPJPY/tick/2022/DAT_ASCII_GBPJPY_T_202210.zip": {
+          "rows": 6631481,
+          "sha256": "c4d205e437b8f5bb95acb91e96b035e19aa8375819d325d6c66efe43be02aaf8",
+          "size_bytes": 43024490
+        },
+        "GBPJPY/tick/2022/DAT_ASCII_GBPJPY_T_202211.zip": {
+          "rows": 4951760,
+          "sha256": "e0ab49b761ea5ef852b1f31089cc696ebfb8e84a50ca95ba479b64f38706367a",
+          "size_bytes": 32323628
+        },
+        "GBPJPY/tick/2022/DAT_ASCII_GBPJPY_T_202212.zip": {
+          "rows": 4574200,
+          "sha256": "26d47a6eb9523d06bc4afa711037a03740fdd0811c9cd4f3cb4eb64fe52db96f",
+          "size_bytes": 29808817
+        },
+        "GBPJPY/tick/2023/DAT_ASCII_GBPJPY_T_202301.zip": {
+          "rows": 4636109,
+          "sha256": "c5846933125d0364f1b11c1a4db828926242451e108fdc1307455797d6b12d14",
+          "size_bytes": 30351814
+        },
+        "GBPJPY/tick/2023/DAT_ASCII_GBPJPY_T_202302.zip": {
+          "rows": 3309376,
+          "sha256": "b8626b2aac6e4f7c766b8e121501e7180691f4e41b7267d3bdb666e2e5796715",
+          "size_bytes": 21622167
+        },
+        "GBPJPY/tick/2023/DAT_ASCII_GBPJPY_T_202303.zip": {
+          "rows": 3533083,
+          "sha256": "d22aac4e8ba99bd8cd30defbbe8cfa1533863735e7e28b2922bfa856f73623c8",
+          "size_bytes": 23277992
+        },
+        "GBPJPY/tick/2023/DAT_ASCII_GBPJPY_T_202304.zip": {
+          "rows": 2234219,
+          "sha256": "3b8f52f680c4957e50dcff6e61da517423ab04e614db75f26beb3e3c99c5d9f2",
+          "size_bytes": 14684480
+        },
+        "GBPJPY/tick/2023/DAT_ASCII_GBPJPY_T_202305.zip": {
+          "rows": 2277936,
+          "sha256": "3751e581a4bc04851ff90b62f3b542782f01a17868e7aa36787733871f19b2c7",
+          "size_bytes": 15143057
+        },
+        "GBPJPY/tick/2023/DAT_ASCII_GBPJPY_T_202306.zip": {
+          "rows": 2040987,
+          "sha256": "a8507171301c90e5bbff600a49af484fb77d27cb9d78d60405a14ac86af66660",
+          "size_bytes": 13650092
+        },
+        "GBPJPY/tick/2023/DAT_ASCII_GBPJPY_T_202307.zip": {
+          "rows": 2267987,
+          "sha256": "f308a6d7aaa7f25480db55622efb3bc95427391f09ad5fc6ef2c59dba66b1ce7",
+          "size_bytes": 15292639
+        },
+        "GBPJPY/tick/2023/DAT_ASCII_GBPJPY_T_202308.zip": {
+          "rows": 2945269,
+          "sha256": "b89b532d9e3d273cc7996c1b58bc71114cc2240d46ddcc0457627b666a36506d",
+          "size_bytes": 19761582
+        },
+        "GBPJPY/tick/2023/DAT_ASCII_GBPJPY_T_202309.zip": {
+          "rows": 2414844,
+          "sha256": "829925c6d72004210cab9559034a832987aaeee83550c70a1285b143ebca212f",
+          "size_bytes": 16126932
+        },
+        "GBPJPY/tick/2023/DAT_ASCII_GBPJPY_T_202310.zip": {
+          "rows": 2667161,
+          "sha256": "125b2659e1b665158f6558f5001ca127d65c11d9a94f952610aabecaeac267fe",
+          "size_bytes": 17788370
+        },
+        "GBPJPY/tick/2023/DAT_ASCII_GBPJPY_T_202311.zip": {
+          "rows": 2581179,
+          "sha256": "9beb051f5229f5ff1782738f4de0e79c39c76a3379d51a782aa3d9f0a8ad2cfe",
+          "size_bytes": 17111630
+        },
+        "GBPJPY/tick/2023/DAT_ASCII_GBPJPY_T_202312.zip": {
+          "rows": 3143612,
+          "sha256": "0b2ce35a11c69f57884ce6bfd4a37c46f181106e5d278226064b922b15226bc0",
+          "size_bytes": 20938804
+        },
+        "GBPJPY/tick/2024/DAT_ASCII_GBPJPY_T_202401.zip": {
+          "rows": 3144515,
+          "sha256": "5e3bf10cb0b9fd14c7f5dc85542f051864f16339298d4729889af2124d40c54c",
+          "size_bytes": 21010697
+        },
+        "GBPJPY/tick/2024/DAT_ASCII_GBPJPY_T_202402.zip": {
+          "rows": 2456149,
+          "sha256": "87d1083f70b58e7da3bf6d456ce507339ebd7142238b996eb87b27344e5516c8",
+          "size_bytes": 16150668
+        },
+        "GBPJPY/tick/2024/DAT_ASCII_GBPJPY_T_202403.zip": {
+          "rows": 2216472,
+          "sha256": "6c33cebbf35dbeec3cfed1f39f8ab6a315223e7b54f3cb40aa21e6e580dfa5ff",
+          "size_bytes": 14809070
+        },
+        "GBPJPY/tick/2024/DAT_ASCII_GBPJPY_T_202404.zip": {
+          "rows": 2727140,
+          "sha256": "b6cbcbae445efab33c0e7be64ebf7982e1b537260e4fb9e1a6ca83c0c448f59a",
+          "size_bytes": 18090067
+        },
+        "GBPJPY/tick/2024/DAT_ASCII_GBPJPY_T_202405.zip": {
+          "rows": 2750980,
+          "sha256": "b23f8e9508f501cc9d73a8891218c81b17feb50776a1df5c931156a963b4d43a",
+          "size_bytes": 18177584
+        },
+        "GBPJPY/tick/2024/DAT_ASCII_GBPJPY_T_202406.zip": {
+          "rows": 2558292,
+          "sha256": "08a0e7a1a62b4fb543ce6ac2db7682768938c48f1370368a95ee42fc3d265d65",
+          "size_bytes": 16854731
+        },
+        "GBPJPY/tick/2024/DAT_ASCII_GBPJPY_T_202407.zip": {
+          "rows": 3150051,
+          "sha256": "9268bbeb78b1d51d0365ac1cada8d6fa51c244443ebf0171fd7c1add4214dfad",
+          "size_bytes": 21398117
+        },
+        "GBPJPY/tick/2024/DAT_ASCII_GBPJPY_T_202408.zip": {
+          "rows": 4485313,
+          "sha256": "557acca76de7f8e45d246cce4355a9896b9abd9234dabddacf59262487bccf24",
+          "size_bytes": 30815439
+        },
+        "GBPJPY/tick/2024/DAT_ASCII_GBPJPY_T_202409.zip": {
+          "rows": 4077326,
+          "sha256": "8ab5eca62d9cea31efdfb499e9fdb5d60ff8b1ef3f192f59d0fdea660927f78e",
+          "size_bytes": 27608297
+        },
+        "GBPJPY/tick/2024/DAT_ASCII_GBPJPY_T_202410.zip": {
+          "rows": 4049799,
+          "sha256": "90b51b9162131fd2e0654dbbe742d12530bbf9777f3ca6e84ff2eda9d277e431",
+          "size_bytes": 26849960
+        },
+        "GBPJPY/tick/2024/DAT_ASCII_GBPJPY_T_202411.zip": {
+          "rows": 4944722,
+          "sha256": "5cd9ca959baf5a77cb1a1a32ca66a82aceba37229a7ada5b317e13fae0f4fbfb",
+          "size_bytes": 31980557
+        },
+        "GBPJPY/tick/2024/DAT_ASCII_GBPJPY_T_202412.zip": {
+          "rows": 3677173,
+          "sha256": "0eb4b9977b0d32bc6c0a5429fb7265340ef8cc2f4e8329cb66fe551123747b92",
+          "size_bytes": 24091231
+        },
+        "GBPJPY/tick/2025/DAT_ASCII_GBPJPY_T_202501.zip": {
+          "rows": 4453792,
+          "sha256": "c68248b83dfbf33a210fab5a1b63603f5a2eb1f02e285cdd49912b99106b0d08",
+          "size_bytes": 29152698
+        },
+        "GBPJPY/tick/2025/DAT_ASCII_GBPJPY_T_202502.zip": {
+          "rows": 3797418,
+          "sha256": "4033f62e222c7fcd60abaf25718e1a2dbc25c4c6ecc65ae69ba0638244b3408d",
+          "size_bytes": 25031878
+        },
+        "GBPJPY/tick/2025/DAT_ASCII_GBPJPY_T_202503.zip": {
+          "rows": 4371801,
+          "sha256": "3d851e5a7887d0da60ae7bd0e9977da0bb22c845626034ebdf0d7eaa04722b61",
+          "size_bytes": 29417013
+        },
+        "GBPJPY/tick/2025/DAT_ASCII_GBPJPY_T_202504.zip": {
+          "rows": 6841419,
+          "sha256": "edcdeb5d35c54303f5de2a7432abc56ad587fef04580e8d7f116378d064dc256",
+          "size_bytes": 45596774
+        },
+        "GBPJPY/tick/2025/DAT_ASCII_GBPJPY_T_202505.zip": {
+          "rows": 3562500,
+          "sha256": "3490e350eabb4115940e346c06b5ac40336bcc031187eeab8a3568b7c4aeded0",
+          "size_bytes": 23542264
+        },
+        "GBPJPY/tick/2025/DAT_ASCII_GBPJPY_T_202506.zip": {
+          "rows": 2920482,
+          "sha256": "778cdae5979a0c080628d9c2e1d3239fcc0c2fb4b44b55abde1bd1e27a12c8e4",
+          "size_bytes": 19650884
+        },
+        "GBPJPY/tick/2025/DAT_ASCII_GBPJPY_T_202507.zip": {
+          "rows": 2934775,
+          "sha256": "0a57a13549f28e6920c7be21bebea970b970058e7e030c5804d3eef71b34fde6",
+          "size_bytes": 19802646
+        },
+        "GBPJPY/tick/2025/DAT_ASCII_GBPJPY_T_202508.zip": {
+          "rows": 2398982,
+          "sha256": "68fbd58bb357a8652d7b6845a751e0fca65c8ab6cbc08353727f2fbae63cf827",
+          "size_bytes": 16235124
+        },
+        "GBPJPY/tick/2025/DAT_ASCII_GBPJPY_T_202509.zip": {
+          "rows": 2610465,
+          "sha256": "c847660fd345cd163c9bb2f9506afd75ecaf7186a3b89d56219014f9bbd6d281",
+          "size_bytes": 17488657
+        },
+        "GBPJPY/tick/2025/DAT_ASCII_GBPJPY_T_202510.zip": {
+          "rows": 3077034,
+          "sha256": "49ec38749efd9cc2514ede1aa29d154b9c2f39d086a4f18b0bc599fc3f43cfd2",
+          "size_bytes": 20803743
+        },
+        "GBPJPY/tick/2025/DAT_ASCII_GBPJPY_T_202511.zip": {
+          "rows": 3011165,
+          "sha256": "c0f14d35018dc5835ff3facb613946d7ef6232638319dc6eaa3f1befb1f918c1",
+          "size_bytes": 20090832
+        },
+        "GBPJPY/tick/2025/DAT_ASCII_GBPJPY_T_202512.zip": {
+          "rows": 2670973,
+          "sha256": "be311e66a05c89cc171212a36dfabee1d2758712d001457f6cee7dcaa71dee02",
+          "size_bytes": 17798965
+        },
+        "GBPJPY/tick/2026/DAT_ASCII_GBPJPY_T_202601.zip": {
+          "rows": 3401562,
+          "sha256": "d42729372a6aa264d2caa99883dbadcc9960da5b8ca10fe212839e10ef639187",
+          "size_bytes": 22545983
+        },
+        "GBPJPY/tick/2026/DAT_ASCII_GBPJPY_T_202602.zip": {
+          "rows": 3127912,
+          "sha256": "9c994059343292bcb69fe5ab2dfc00d20f7af975d6e3706647f538333369d96c",
+          "size_bytes": 21019008
+        },
+        "GBPJPY/tick/2026/DAT_ASCII_GBPJPY_T_202603.zip": {
+          "rows": 4793235,
+          "sha256": "dc457485036440add80b8f4abdf96d49258c95149b9a306483490f0486c802d1",
+          "size_bytes": 30858610
+        },
+        "GBPJPY/tick/2026/DAT_ASCII_GBPJPY_T_202604.zip": {
+          "rows": 1193028,
+          "sha256": "35047b86a3156004741caa2d52fb721996fcdd13734c3e7d62a9521cd2192275",
+          "size_bytes": 7672768
+        }
+      },
+      "latest_month": "202604",
+      "total_files": 196,
+      "total_size_bytes": 2723274234
+    },
+    "GBPNZD": {
+      "earliest_month": "201001",
+      "files": {
+        "GBPNZD/tick/2010/DAT_ASCII_GBPNZD_T_201001.zip": {
+          "rows": 803849,
+          "sha256": "46d7e69746b468158e15f368e1c4104e2eb8e439530032c7c6f238953e9abc2d",
+          "size_bytes": 3389561
+        },
+        "GBPNZD/tick/2010/DAT_ASCII_GBPNZD_T_201002.zip": {
+          "rows": 846169,
+          "sha256": "29390e890ca75432f2a5da5a8e9d85eea172b1fff984f97f90798b54098a7d24",
+          "size_bytes": 3534931
+        },
+        "GBPNZD/tick/2010/DAT_ASCII_GBPNZD_T_201003.zip": {
+          "rows": 979017,
+          "sha256": "fb63eea6d7766d5b368338527b4553ec0615b1f48908dbb27a553510cc203c25",
+          "size_bytes": 3872747
+        },
+        "GBPNZD/tick/2010/DAT_ASCII_GBPNZD_T_201004.zip": {
+          "rows": 1012987,
+          "sha256": "ca8a78d419bd3e74b213085a89441257b742260f4197ca8450dedfb2decaec18",
+          "size_bytes": 3753991
+        },
+        "GBPNZD/tick/2010/DAT_ASCII_GBPNZD_T_201005.zip": {
+          "rows": 1277663,
+          "sha256": "dde6e9f20b987969ee27a40bbd7307732a0dc63471874d4b3a078e37c6c9af5b",
+          "size_bytes": 5158398
+        },
+        "GBPNZD/tick/2010/DAT_ASCII_GBPNZD_T_201006.zip": {
+          "rows": 1111276,
+          "sha256": "a18ce19ea4d41caf0bd4e97c5a5c49eedc3b1e5124b77b3f4e626abf7e63572d",
+          "size_bytes": 4482695
+        },
+        "GBPNZD/tick/2010/DAT_ASCII_GBPNZD_T_201007.zip": {
+          "rows": 904603,
+          "sha256": "b7ff385aa3b956ab1cff902c997013639be1ad56d66bcfbe76c2e6eca1e64ef3",
+          "size_bytes": 3640226
+        },
+        "GBPNZD/tick/2010/DAT_ASCII_GBPNZD_T_201008.zip": {
+          "rows": 891369,
+          "sha256": "e59f0b5b28bdf40ccaa5c06956363459dd83c3c6170a180a1d48da0066db73e4",
+          "size_bytes": 3609541
+        },
+        "GBPNZD/tick/2010/DAT_ASCII_GBPNZD_T_201009.zip": {
+          "rows": 842130,
+          "sha256": "8415f7a4a510ca694283485bc6539d8900b8fd0b190486c0c20e8951c531d356",
+          "size_bytes": 3379899
+        },
+        "GBPNZD/tick/2010/DAT_ASCII_GBPNZD_T_201010.zip": {
+          "rows": 692295,
+          "sha256": "210320d30ba62753307462f3429e5fdabc1dd7888ae69ecd6381fc18e71184c5",
+          "size_bytes": 2621121
+        },
+        "GBPNZD/tick/2010/DAT_ASCII_GBPNZD_T_201011.zip": {
+          "rows": 757887,
+          "sha256": "aee5602c3a2f586e4486bab3924b1f86a55ee46a7b12ed418eb65e7b5bd5604b",
+          "size_bytes": 2845773
+        },
+        "GBPNZD/tick/2010/DAT_ASCII_GBPNZD_T_201012.zip": {
+          "rows": 599896,
+          "sha256": "f4f75f07ba92bb3dcf84e7d4d52b4820f0f6ad6f45d7632c1a1e7c37363a7266",
+          "size_bytes": 2287094
+        },
+        "GBPNZD/tick/2011/DAT_ASCII_GBPNZD_T_201101.zip": {
+          "rows": 661859,
+          "sha256": "0241b12ad1b7c7e65a5057caf35f4cac93aea299e519e7c528e3fdd90dc20303",
+          "size_bytes": 2505707
+        },
+        "GBPNZD/tick/2011/DAT_ASCII_GBPNZD_T_201102.zip": {
+          "rows": 623966,
+          "sha256": "12bcd5d93f6fb947394b305b98affdc4c08356f531e1a5505ab5531676ba5bd1",
+          "size_bytes": 2317676
+        },
+        "GBPNZD/tick/2011/DAT_ASCII_GBPNZD_T_201103.zip": {
+          "rows": 659968,
+          "sha256": "d3754e9925267bcdf9d4cd5ad4437ca8996b4b61024717b71eabc0dc44acf3a2",
+          "size_bytes": 2542310
+        },
+        "GBPNZD/tick/2011/DAT_ASCII_GBPNZD_T_201104.zip": {
+          "rows": 503163,
+          "sha256": "f76dac61aa968593ac98b1d5ca09d50ad75150c6e90a6ec1b54e1c219ff63352",
+          "size_bytes": 2152043
+        },
+        "GBPNZD/tick/2011/DAT_ASCII_GBPNZD_T_201105.zip": {
+          "rows": 642389,
+          "sha256": "327d3df56a9a13757805f1a1307210d340ee2999228fef95b67168e2b5ba1c5c",
+          "size_bytes": 3522411
+        },
+        "GBPNZD/tick/2011/DAT_ASCII_GBPNZD_T_201106.zip": {
+          "rows": 662439,
+          "sha256": "6087e5f30c1686e6de061a8afa8c317ee155187e2730488b03d707a05241b879",
+          "size_bytes": 3479565
+        },
+        "GBPNZD/tick/2011/DAT_ASCII_GBPNZD_T_201107.zip": {
+          "rows": 753215,
+          "sha256": "c3da6aa6358d451bd21327cadab774997453e434d2f21f196fb1fc8d3371d2fd",
+          "size_bytes": 4071022
+        },
+        "GBPNZD/tick/2011/DAT_ASCII_GBPNZD_T_201108.zip": {
+          "rows": 1113947,
+          "sha256": "911294c7489d0e2f4383f55fdde9e76faa86812d71b290acf705381520819163",
+          "size_bytes": 5910130
+        },
+        "GBPNZD/tick/2011/DAT_ASCII_GBPNZD_T_201109.zip": {
+          "rows": 1174210,
+          "sha256": "a92901becec02e104769647c9ac6a692b979e3d16cd6ca589a7c6d5201c8fcc6",
+          "size_bytes": 6278116
+        },
+        "GBPNZD/tick/2011/DAT_ASCII_GBPNZD_T_201110.zip": {
+          "rows": 1118038,
+          "sha256": "b82aafad9799d89ddbc118b2af47c5ca6bdf602c20d22c94683fedd39707ede3",
+          "size_bytes": 5985680
+        },
+        "GBPNZD/tick/2011/DAT_ASCII_GBPNZD_T_201111.zip": {
+          "rows": 1336740,
+          "sha256": "04cd95bd4589e1a35c31a30d78b252265256d51c89a5fa264592fd7931996ca9",
+          "size_bytes": 7013366
+        },
+        "GBPNZD/tick/2011/DAT_ASCII_GBPNZD_T_201112.zip": {
+          "rows": 1542017,
+          "sha256": "28dbd58275a7c9dd7515ac4461a78021060b512eca1f7129969e71e6a0b53fba",
+          "size_bytes": 9296707
+        },
+        "GBPNZD/tick/2012/DAT_ASCII_GBPNZD_T_201201.zip": {
+          "rows": 1412736,
+          "sha256": "0c4c304fbfa63476c45d51e38a1792aa8f926d7143116b472043f5712ffef3b5",
+          "size_bytes": 8550443
+        },
+        "GBPNZD/tick/2012/DAT_ASCII_GBPNZD_T_201202.zip": {
+          "rows": 1503576,
+          "sha256": "e57252e5fe74130c4339b6fa0d9e402923a4b004dd35eeb70e1409df863e0a21",
+          "size_bytes": 8933848
+        },
+        "GBPNZD/tick/2012/DAT_ASCII_GBPNZD_T_201203.zip": {
+          "rows": 982280,
+          "sha256": "0b831f19323011d80e1c7df1ad61d3cdd7ccd7c6409b21ebe3e2f3f2b614f3fc",
+          "size_bytes": 6225006
+        },
+        "GBPNZD/tick/2012/DAT_ASCII_GBPNZD_T_201204.zip": {
+          "rows": 942554,
+          "sha256": "7672de80f8fdb9d9470c82c985445a851b9828d18935acbc1b201b6e145bdcd6",
+          "size_bytes": 5929520
+        },
+        "GBPNZD/tick/2012/DAT_ASCII_GBPNZD_T_201205.zip": {
+          "rows": 1323011,
+          "sha256": "0c05aee7854feab2f6e0308b290351b3cb12f44a006f55290f590180a9ffd98e",
+          "size_bytes": 8397997
+        },
+        "GBPNZD/tick/2012/DAT_ASCII_GBPNZD_T_201206.zip": {
+          "rows": 1080451,
+          "sha256": "765f3c60de22f8e00f0e24c8591ba4cff3f4ab67be0ef27d747e7c42a4409b5c",
+          "size_bytes": 6835815
+        },
+        "GBPNZD/tick/2012/DAT_ASCII_GBPNZD_T_201207.zip": {
+          "rows": 792949,
+          "sha256": "562de86aa1c06da0bafea326add443f5ba9fb6447849b0d057ab33c74a2402d7",
+          "size_bytes": 5065641
+        },
+        "GBPNZD/tick/2012/DAT_ASCII_GBPNZD_T_201208.zip": {
+          "rows": 535395,
+          "sha256": "4f7e5322820136d95d00ab8402f1f6ce9aea0c36872aa48ea2b514a42f2b4223",
+          "size_bytes": 3486028
+        },
+        "GBPNZD/tick/2012/DAT_ASCII_GBPNZD_T_201209.zip": {
+          "rows": 524101,
+          "sha256": "8b6e62f6712c2d9f58e76f2c2e67f3e1986e1475fe38039ac4d7fb2620efbda3",
+          "size_bytes": 3458670
+        },
+        "GBPNZD/tick/2012/DAT_ASCII_GBPNZD_T_201210.zip": {
+          "rows": 709358,
+          "sha256": "fde3000f0e14ee01d02d4c43434698a2b2b5918e6a844d7af773ab9534f71eff",
+          "size_bytes": 4531246
+        },
+        "GBPNZD/tick/2012/DAT_ASCII_GBPNZD_T_201211.zip": {
+          "rows": 701636,
+          "sha256": "15a9f87e827c1ec788996499285f454791baeecd7b7380660cedeea64ea3d7e5",
+          "size_bytes": 4415658
+        },
+        "GBPNZD/tick/2012/DAT_ASCII_GBPNZD_T_201212.zip": {
+          "rows": 564871,
+          "sha256": "cd3ad8e0002bc46c14392da439c41d8becd335c00bfb25c2ecd69db1095867bc",
+          "size_bytes": 3575113
+        },
+        "GBPNZD/tick/2013/DAT_ASCII_GBPNZD_T_201301.zip": {
+          "rows": 803122,
+          "sha256": "5fa5b12b2b248af55237b6cfd5ca3b8cd9d17bfd281e1c13a664af639c85725e",
+          "size_bytes": 5114973
+        },
+        "GBPNZD/tick/2013/DAT_ASCII_GBPNZD_T_201302.zip": {
+          "rows": 723407,
+          "sha256": "fd1c03f2b5d41446142636a06a93a4f45e9bdc966e1b7b6b4d468130e9222726",
+          "size_bytes": 4704973
+        },
+        "GBPNZD/tick/2013/DAT_ASCII_GBPNZD_T_201303.zip": {
+          "rows": 689283,
+          "sha256": "38ed479d51b9902f9809c43579aa81385b368f52cff49132667d84b24c30b74e",
+          "size_bytes": 4442802
+        },
+        "GBPNZD/tick/2013/DAT_ASCII_GBPNZD_T_201304.zip": {
+          "rows": 633722,
+          "sha256": "f77583bfe25ad4ecebd4dcbe4fb4c4768db561608b040c352344fb14e87500d3",
+          "size_bytes": 4122426
+        },
+        "GBPNZD/tick/2013/DAT_ASCII_GBPNZD_T_201305.zip": {
+          "rows": 865844,
+          "sha256": "40c81722e3dac69e1804ab96759e3dd0fe95daa599039dc3a804dd7f5809956e",
+          "size_bytes": 5679747
+        },
+        "GBPNZD/tick/2013/DAT_ASCII_GBPNZD_T_201306.zip": {
+          "rows": 1165950,
+          "sha256": "bd01ea925c92e479f419a026c294728d650280c2f3ef1d8b18fa445dc86d211e",
+          "size_bytes": 7767881
+        },
+        "GBPNZD/tick/2013/DAT_ASCII_GBPNZD_T_201307.zip": {
+          "rows": 1245848,
+          "sha256": "6762d1ff09c04c59b42ec7d34f22a1c82199a5607e1837923ccebe942f9711c0",
+          "size_bytes": 8154630
+        },
+        "GBPNZD/tick/2013/DAT_ASCII_GBPNZD_T_201308.zip": {
+          "rows": 1032833,
+          "sha256": "7b2c1cc981f8f74551eb208dad5cae54d0c82f1a1e31f53b1d46b18cc6dc9cb8",
+          "size_bytes": 6846968
+        },
+        "GBPNZD/tick/2013/DAT_ASCII_GBPNZD_T_201309.zip": {
+          "rows": 837152,
+          "sha256": "de443472ac59d5e3cb39aa5a1b83e9ae50d1e318ca86cf22671e47a57110c87f",
+          "size_bytes": 5495195
+        },
+        "GBPNZD/tick/2013/DAT_ASCII_GBPNZD_T_201310.zip": {
+          "rows": 882825,
+          "sha256": "c48554be38df5836285a3540198bb18e3122fcf5b3203f4b8aa94cb762146c11",
+          "size_bytes": 5797647
+        },
+        "GBPNZD/tick/2013/DAT_ASCII_GBPNZD_T_201311.zip": {
+          "rows": 818099,
+          "sha256": "15a8a0b6785511538d9ae685986f59768c323ad45fcb66510628aa329c35389a",
+          "size_bytes": 5415043
+        },
+        "GBPNZD/tick/2013/DAT_ASCII_GBPNZD_T_201312.zip": {
+          "rows": 737624,
+          "sha256": "80dd977d7e2d719a508413ec5d791d822ce2e9b091f068c7043f5a50c04e2f90",
+          "size_bytes": 4890800
+        },
+        "GBPNZD/tick/2014/DAT_ASCII_GBPNZD_T_201401.zip": {
+          "rows": 910873,
+          "sha256": "ab1d67b173c837a6e2045078d0bdb74df5ea61b804a96682819071d47eaba69e",
+          "size_bytes": 6038058
+        },
+        "GBPNZD/tick/2014/DAT_ASCII_GBPNZD_T_201402.zip": {
+          "rows": 821368,
+          "sha256": "9a85433cb7daaa066e00fb309e2889293af17fd86da25eff2b688c0a36e1a674",
+          "size_bytes": 5388403
+        },
+        "GBPNZD/tick/2014/DAT_ASCII_GBPNZD_T_201403.zip": {
+          "rows": 860334,
+          "sha256": "d57c8db8e125a8451e1348f32abc628e5430225eda2607e69c4642aa98b6c636",
+          "size_bytes": 5464484
+        },
+        "GBPNZD/tick/2014/DAT_ASCII_GBPNZD_T_201404.zip": {
+          "rows": 694422,
+          "sha256": "ef96e7001d3332ff2c7704330d38d420d3be9ac51559783afbd00b85dff9e5a4",
+          "size_bytes": 4443115
+        },
+        "GBPNZD/tick/2014/DAT_ASCII_GBPNZD_T_201405.zip": {
+          "rows": 802909,
+          "sha256": "d81af738bb87d13354f381cd5f8fc15de98d0e11a356f228e5634c6e0daa7d8d",
+          "size_bytes": 4984945
+        },
+        "GBPNZD/tick/2014/DAT_ASCII_GBPNZD_T_201406.zip": {
+          "rows": 757408,
+          "sha256": "ae4b8ffb69eec302a2b1f6a2078084c1375a0a78a57dba4308274d59656f2c82",
+          "size_bytes": 4654941
+        },
+        "GBPNZD/tick/2014/DAT_ASCII_GBPNZD_T_201407.zip": {
+          "rows": 803266,
+          "sha256": "53f7e4ebc97c95246430344bf6f104193d142c9bedea5054410324e144f8fe57",
+          "size_bytes": 4808041
+        },
+        "GBPNZD/tick/2014/DAT_ASCII_GBPNZD_T_201408.zip": {
+          "rows": 881421,
+          "sha256": "3118aa44596c75394eb3480c8729500244621624fbe5ef74447058ad716c414a",
+          "size_bytes": 4685994
+        },
+        "GBPNZD/tick/2014/DAT_ASCII_GBPNZD_T_201409.zip": {
+          "rows": 1248591,
+          "sha256": "311f67b9160033a179111b7ed59519cdbf7577a4522ef7d1f802e706621048d9",
+          "size_bytes": 6810910
+        },
+        "GBPNZD/tick/2014/DAT_ASCII_GBPNZD_T_201410.zip": {
+          "rows": 1132043,
+          "sha256": "b91cdc3c2e73302e9e1ee64236603a9e14714df6b81d23208d6a50395c70da6f",
+          "size_bytes": 7286711
+        },
+        "GBPNZD/tick/2014/DAT_ASCII_GBPNZD_T_201411.zip": {
+          "rows": 1034340,
+          "sha256": "8fd5639890acf47f921bf7d3f38c863f1a19c048624d2c51fb993789ef60c60d",
+          "size_bytes": 6342621
+        },
+        "GBPNZD/tick/2014/DAT_ASCII_GBPNZD_T_201412.zip": {
+          "rows": 1000533,
+          "sha256": "f779597fdb18b09c251402b859cf5634fbdde15cda4c6ac8d13776d699016cd3",
+          "size_bytes": 6126100
+        },
+        "GBPNZD/tick/2015/DAT_ASCII_GBPNZD_T_201501.zip": {
+          "rows": 1302453,
+          "sha256": "8baaaa969c09cda3683644ae1a5985e967a93dc78dc918cd8774924817ddd435",
+          "size_bytes": 7769030
+        },
+        "GBPNZD/tick/2015/DAT_ASCII_GBPNZD_T_201502.zip": {
+          "rows": 1169279,
+          "sha256": "576819f03b20a1139ff805790a900cfd4d28cf98c92d25ca25b5d198114a7bf2",
+          "size_bytes": 6910496
+        },
+        "GBPNZD/tick/2015/DAT_ASCII_GBPNZD_T_201503.zip": {
+          "rows": 1348746,
+          "sha256": "30cca9b8355046231b01e7190662682277bdfc8dde317f192c1826d52f330c17",
+          "size_bytes": 8097029
+        },
+        "GBPNZD/tick/2015/DAT_ASCII_GBPNZD_T_201504.zip": {
+          "rows": 1685067,
+          "sha256": "3432389491221adb174a07f822bd1dfa48630f3d7fd8e71d6b757ddb252ef26c",
+          "size_bytes": 9755511
+        },
+        "GBPNZD/tick/2015/DAT_ASCII_GBPNZD_T_201505.zip": {
+          "rows": 2081416,
+          "sha256": "80dae57a07e02dea77af467c1697cdf7f7c19b0ed5d96320ae8e5592aa3f4a1d",
+          "size_bytes": 11975285
+        },
+        "GBPNZD/tick/2015/DAT_ASCII_GBPNZD_T_201506.zip": {
+          "rows": 1959284,
+          "sha256": "4917eaac6a11275f83e4463a12dfaff087c40f5b69bb381bfc364ef2d0c4a47d",
+          "size_bytes": 11418522
+        },
+        "GBPNZD/tick/2015/DAT_ASCII_GBPNZD_T_201507.zip": {
+          "rows": 1689189,
+          "sha256": "f88148ce1da4c53ef02df0dac28f8fca47fa4fc52f454c36054bb6974dbe26e6",
+          "size_bytes": 10076960
+        },
+        "GBPNZD/tick/2015/DAT_ASCII_GBPNZD_T_201508.zip": {
+          "rows": 1638549,
+          "sha256": "c64c18cf71097d72bc5dccd5e6385810ef62040abbc226939653162b2c3d89b3",
+          "size_bytes": 9839874
+        },
+        "GBPNZD/tick/2015/DAT_ASCII_GBPNZD_T_201509.zip": {
+          "rows": 1441264,
+          "sha256": "3f1865ff176c3f25fa8823f8903c55d10d1062a2f46b4ff6d85061650b743941",
+          "size_bytes": 8969770
+        },
+        "GBPNZD/tick/2015/DAT_ASCII_GBPNZD_T_201510.zip": {
+          "rows": 1332449,
+          "sha256": "da36c2a1aa23707500f6ae4268cfc1c252502f94ce4f1209d61fa0c67057bc18",
+          "size_bytes": 8219665
+        },
+        "GBPNZD/tick/2015/DAT_ASCII_GBPNZD_T_201511.zip": {
+          "rows": 1721862,
+          "sha256": "a3c5ef7a82c9674d7bd1ffc2be62fbefb42738055fcbcaeb548d423229c38eb5",
+          "size_bytes": 9908002
+        },
+        "GBPNZD/tick/2015/DAT_ASCII_GBPNZD_T_201512.zip": {
+          "rows": 1794716,
+          "sha256": "ae07b4b42a0de7b951c3cfbe1d42a5f03b21d8cd6b85023103e702bdaca88af6",
+          "size_bytes": 10136914
+        },
+        "GBPNZD/tick/2016/DAT_ASCII_GBPNZD_T_201601.zip": {
+          "rows": 2277479,
+          "sha256": "607ca08db8db749851fdcadbac7df2d9fb8983859cab1939cb6b61b0218ca5a5",
+          "size_bytes": 12888037
+        },
+        "GBPNZD/tick/2016/DAT_ASCII_GBPNZD_T_201602.zip": {
+          "rows": 2273723,
+          "sha256": "c7f1ded6e1b6ecbf8daa59455807cb216d1b5fa49ca4da796a235a82df6b6d51",
+          "size_bytes": 13008127
+        },
+        "GBPNZD/tick/2016/DAT_ASCII_GBPNZD_T_201603.zip": {
+          "rows": 1542789,
+          "sha256": "cd415ace0a55c999b946222ec0bcc39ff4f5e32b2cc9eba067bebb6802da7733",
+          "size_bytes": 9213109
+        },
+        "GBPNZD/tick/2016/DAT_ASCII_GBPNZD_T_201604.zip": {
+          "rows": 1011870,
+          "sha256": "cfebc9fb63c02801ce6f72851a1a3693fe74762f3ae5e3f1b055b5e341607a27",
+          "size_bytes": 6420904
+        },
+        "GBPNZD/tick/2016/DAT_ASCII_GBPNZD_T_201605.zip": {
+          "rows": 1080085,
+          "sha256": "f28f6576442b582de004408c2ad3f6f8de90d49e4a2760382468db8baee321b7",
+          "size_bytes": 6791256
+        },
+        "GBPNZD/tick/2016/DAT_ASCII_GBPNZD_T_201606.zip": {
+          "rows": 962156,
+          "sha256": "b49ada14cbb1255a8e3db6ebaa3a9792b141581caa7c052380e4f6274a697d59",
+          "size_bytes": 6364359
+        },
+        "GBPNZD/tick/2016/DAT_ASCII_GBPNZD_T_201607.zip": {
+          "rows": 814732,
+          "sha256": "c09d8efe255aea4961dc04e24c94a0d420b1da824f22851cc4f1f708e0032286",
+          "size_bytes": 5289284
+        },
+        "GBPNZD/tick/2016/DAT_ASCII_GBPNZD_T_201608.zip": {
+          "rows": 868868,
+          "sha256": "39ac84c6d9bc8f4a1a44b64b0652e687197c70967dc1d31bb5fa795876003caa",
+          "size_bytes": 5358281
+        },
+        "GBPNZD/tick/2016/DAT_ASCII_GBPNZD_T_201609.zip": {
+          "rows": 804117,
+          "sha256": "00980ca1de1d4350ba389a09adac47b64d56a432c9cd38041a90446cb45ff8c6",
+          "size_bytes": 4967796
+        },
+        "GBPNZD/tick/2016/DAT_ASCII_GBPNZD_T_201610.zip": {
+          "rows": 859829,
+          "sha256": "d8a96d7423c987f60877bb165aeebf9d9ecd991a2fb8caa4bbec00ac1f55f96c",
+          "size_bytes": 5309321
+        },
+        "GBPNZD/tick/2016/DAT_ASCII_GBPNZD_T_201611.zip": {
+          "rows": 1068248,
+          "sha256": "9c483bcd35d81e68440e9b9476f32ca1978e2bcb236467e002d1ff22e028f200",
+          "size_bytes": 6633405
+        },
+        "GBPNZD/tick/2016/DAT_ASCII_GBPNZD_T_201612.zip": {
+          "rows": 896762,
+          "sha256": "e28b5f857bf83eecd911032b5d8812c9da6f881c16bf43d9cc972caddb922c89",
+          "size_bytes": 5484567
+        },
+        "GBPNZD/tick/2017/DAT_ASCII_GBPNZD_T_201701.zip": {
+          "rows": 1036460,
+          "sha256": "5106ae07f4146b66635dd8705fa4da7d2e8daabd939f50aef432dc4f3511fcbc",
+          "size_bytes": 6236001
+        },
+        "GBPNZD/tick/2017/DAT_ASCII_GBPNZD_T_201702.zip": {
+          "rows": 856955,
+          "sha256": "b27c9e46eae33037c28dc7d483c80e41a2316979edcb3e5e7d8eb98ca534d722",
+          "size_bytes": 5075979
+        },
+        "GBPNZD/tick/2017/DAT_ASCII_GBPNZD_T_201703.zip": {
+          "rows": 884430,
+          "sha256": "1dbcfe8b66fb919bd78363d26b764c0d471d8003bdc6bc690a66a0630d4288ab",
+          "size_bytes": 5475355
+        },
+        "GBPNZD/tick/2017/DAT_ASCII_GBPNZD_T_201704.zip": {
+          "rows": 686848,
+          "sha256": "6d22cb2ec4345516a71d8e0c59b70375898b0394effd071d8ba87d1e47f82443",
+          "size_bytes": 4260693
+        },
+        "GBPNZD/tick/2017/DAT_ASCII_GBPNZD_T_201705.zip": {
+          "rows": 812534,
+          "sha256": "49174f1419f3a4bcf2449122073278c520c565b82ff01681c43774e9d2dea900",
+          "size_bytes": 4961868
+        },
+        "GBPNZD/tick/2017/DAT_ASCII_GBPNZD_T_201706.zip": {
+          "rows": 893511,
+          "sha256": "9b0981fa32cee6d880fd97cc0eccef3b450fe8fae21fb18f37bd03df286ba80e",
+          "size_bytes": 5389504
+        },
+        "GBPNZD/tick/2017/DAT_ASCII_GBPNZD_T_201707.zip": {
+          "rows": 926503,
+          "sha256": "c4d0b0a3d5b0331e40a5d1623a4e104fbd3b488289b27bb33fe8cead2c46ca85",
+          "size_bytes": 5579923
+        },
+        "GBPNZD/tick/2017/DAT_ASCII_GBPNZD_T_201708.zip": {
+          "rows": 698889,
+          "sha256": "72e09045339603f46752ffd52c91db6b287e3e765b0ead1669edfeae39ee088d",
+          "size_bytes": 4359050
+        },
+        "GBPNZD/tick/2017/DAT_ASCII_GBPNZD_T_201709.zip": {
+          "rows": 662318,
+          "sha256": "359e8a5a149a4f7ea6e41044844fe537647170ea5b5371514492ee799cc9dfe8",
+          "size_bytes": 4233074
+        },
+        "GBPNZD/tick/2017/DAT_ASCII_GBPNZD_T_201710.zip": {
+          "rows": 729395,
+          "sha256": "160248435c7ab8f13af57148446df90c09770c862bf3cfb80fc45192f27ac20c",
+          "size_bytes": 4529952
+        },
+        "GBPNZD/tick/2017/DAT_ASCII_GBPNZD_T_201711.zip": {
+          "rows": 677657,
+          "sha256": "9aaed8f13b636acc075349eab4f3f45e75811906d2430b96b72611729a27b1f6",
+          "size_bytes": 4255440
+        },
+        "GBPNZD/tick/2017/DAT_ASCII_GBPNZD_T_201712.zip": {
+          "rows": 560977,
+          "sha256": "3599eb0369e32482f8196c05ef2703562c07d72a608fb24d2e6bb730f34b94f3",
+          "size_bytes": 3547589
+        },
+        "GBPNZD/tick/2018/DAT_ASCII_GBPNZD_T_201801.zip": {
+          "rows": 956975,
+          "sha256": "eaee89d4e8b798dc1fb1f98206180f401cefd2f2b6c39e1f0c4905148d483d79",
+          "size_bytes": 5905180
+        },
+        "GBPNZD/tick/2018/DAT_ASCII_GBPNZD_T_201802.zip": {
+          "rows": 950466,
+          "sha256": "d3843b692b1f27aae68c37e589312332bcb562c8efbea0eb299de9dcd1f6c313",
+          "size_bytes": 5908840
+        },
+        "GBPNZD/tick/2018/DAT_ASCII_GBPNZD_T_201803.zip": {
+          "rows": 831699,
+          "sha256": "196a282b494a9f883d9a505e949bccdd4b17b67f4310e3677ca67f821287e565",
+          "size_bytes": 5142645
+        },
+        "GBPNZD/tick/2018/DAT_ASCII_GBPNZD_T_201804.zip": {
+          "rows": 704425,
+          "sha256": "0b707d66f7da10ffee5d0347a4323339888aa4c7f71a60e7e2bd13c71e2b7650",
+          "size_bytes": 4336635
+        },
+        "GBPNZD/tick/2018/DAT_ASCII_GBPNZD_T_201805.zip": {
+          "rows": 1065220,
+          "sha256": "36f2a887c90eaadd49143b0277ea7348dbbcda5ef53382dbb58b2322074dba30",
+          "size_bytes": 6558680
+        },
+        "GBPNZD/tick/2018/DAT_ASCII_GBPNZD_T_201806.zip": {
+          "rows": 805557,
+          "sha256": "c21fb9c026bab451eadaf39680176521539c9a6f1cee770f5424b4a40f2822a9",
+          "size_bytes": 4964416
+        },
+        "GBPNZD/tick/2018/DAT_ASCII_GBPNZD_T_201807.zip": {
+          "rows": 761154,
+          "sha256": "7fb0a37c2743b96a8940415769cb75ebd59a139cac2f9daf4914b30de2c603bd",
+          "size_bytes": 4735411
+        },
+        "GBPNZD/tick/2018/DAT_ASCII_GBPNZD_T_201808.zip": {
+          "rows": 828120,
+          "sha256": "768dd5a3f892dbd4e78d0b77095f254bffe7ccebb4993c54b8870dbd3ac38557",
+          "size_bytes": 5076630
+        },
+        "GBPNZD/tick/2018/DAT_ASCII_GBPNZD_T_201809.zip": {
+          "rows": 957239,
+          "sha256": "3a25821101e35e32e82bef15017da19c1a82bbe7c1c4ac56731b00efb833a119",
+          "size_bytes": 5806007
+        },
+        "GBPNZD/tick/2018/DAT_ASCII_GBPNZD_T_201810.zip": {
+          "rows": 1345492,
+          "sha256": "b7fa392b2590f34ce1fb9af7624f3f1842dc773650bfc132e82d2a612f3222cd",
+          "size_bytes": 7830046
+        },
+        "GBPNZD/tick/2018/DAT_ASCII_GBPNZD_T_201811.zip": {
+          "rows": 1298574,
+          "sha256": "98eebeee7dad9df6debb11ee341e742931d7fa000c6576c5089d22ed06db67c9",
+          "size_bytes": 7802730
+        },
+        "GBPNZD/tick/2018/DAT_ASCII_GBPNZD_T_201812.zip": {
+          "rows": 2524254,
+          "sha256": "43776696ff12f277a01386b61bc1a2c186fcbfccb63f688354aefa6780ea11eb",
+          "size_bytes": 15772523
+        },
+        "GBPNZD/tick/2019/DAT_ASCII_GBPNZD_T_201901.zip": {
+          "rows": 4353602,
+          "sha256": "11f58e356497d44dc24de0e3ff2ee9f5964e6326460e48d1055c20cba7ecc814",
+          "size_bytes": 27109063
+        },
+        "GBPNZD/tick/2019/DAT_ASCII_GBPNZD_T_201902.zip": {
+          "rows": 3671693,
+          "sha256": "aea660a75c8474db33d4a1d3041b6b230f0db0f0c51d2dd842826d8d6515fcd9",
+          "size_bytes": 22844517
+        },
+        "GBPNZD/tick/2019/DAT_ASCII_GBPNZD_T_201903.zip": {
+          "rows": 4260844,
+          "sha256": "eb938b4cffa4847a0a22e4dd925ff91a52c380abbd7e05b3abdaeab8a9c5fd8d",
+          "size_bytes": 26745562
+        },
+        "GBPNZD/tick/2019/DAT_ASCII_GBPNZD_T_201904.zip": {
+          "rows": 3698909,
+          "sha256": "a2503ed1acc71ff5c4e5cbd8a18b2b5f7d21fa43b8c9f64b3c6ca46d24dc5b73",
+          "size_bytes": 22819530
+        },
+        "GBPNZD/tick/2019/DAT_ASCII_GBPNZD_T_201905.zip": {
+          "rows": 3619948,
+          "sha256": "028f7558f2e2510d7eee0d6a535f6fdf5835089cecee22363c2203b1b6441467",
+          "size_bytes": 22081853
+        },
+        "GBPNZD/tick/2019/DAT_ASCII_GBPNZD_T_201906.zip": {
+          "rows": 3822373,
+          "sha256": "cbe9269bf6fd6d4b7554a56fab495b1bfbab92b02f64f7011585ea857f8b7f90",
+          "size_bytes": 22959166
+        },
+        "GBPNZD/tick/2019/DAT_ASCII_GBPNZD_T_201907.zip": {
+          "rows": 3346816,
+          "sha256": "b650ab61242587932e90fec8d9c11881ec68a457b480c97124f66209e2cde73c",
+          "size_bytes": 20496961
+        },
+        "GBPNZD/tick/2019/DAT_ASCII_GBPNZD_T_201908.zip": {
+          "rows": 3380254,
+          "sha256": "6352991cc61a66ec1aabe166dcad87f0bb933cd2090dc6bdacab51d6d78e4cd3",
+          "size_bytes": 20811095
+        },
+        "GBPNZD/tick/2019/DAT_ASCII_GBPNZD_T_201909.zip": {
+          "rows": 2499302,
+          "sha256": "48208734971d541c48bdd2d74dd84253dccfa40f99c3a9928bc74861a0d1c5a9",
+          "size_bytes": 15436137
+        },
+        "GBPNZD/tick/2019/DAT_ASCII_GBPNZD_T_201910.zip": {
+          "rows": 2613325,
+          "sha256": "47c15c8417034b12b604e4b5203867488a683d22270d903fff6b4fa914a63d8c",
+          "size_bytes": 17160238
+        },
+        "GBPNZD/tick/2019/DAT_ASCII_GBPNZD_T_201911.zip": {
+          "rows": 1994095,
+          "sha256": "08bb047d872d6be86be4496c7108e7792e0a8879f980c69e6fdcb9141169e13d",
+          "size_bytes": 12570838
+        },
+        "GBPNZD/tick/2019/DAT_ASCII_GBPNZD_T_201912.zip": {
+          "rows": 2572021,
+          "sha256": "4657629295f55971a270f85908285e30a885a90897bba3681f29d075c1b25775",
+          "size_bytes": 16085316
+        },
+        "GBPNZD/tick/2020/DAT_ASCII_GBPNZD_T_202001.zip": {
+          "rows": 2451582,
+          "sha256": "f03b30b5550d72945b0dbe9f12825fb2dab83d1b5ae1eed7cbc51bf5f764217c",
+          "size_bytes": 15428944
+        },
+        "GBPNZD/tick/2020/DAT_ASCII_GBPNZD_T_202002.zip": {
+          "rows": 2649604,
+          "sha256": "373fed1547e0f34c2fe7bef37b201fd4f1a2d62e17388e198f9ab610d35751f2",
+          "size_bytes": 16982339
+        },
+        "GBPNZD/tick/2020/DAT_ASCII_GBPNZD_T_202003.zip": {
+          "rows": 5442057,
+          "sha256": "d1f885a145e92be8ec0acfc4ff59afa375073912677128f22a557977e2a749ba",
+          "size_bytes": 36516420
+        },
+        "GBPNZD/tick/2020/DAT_ASCII_GBPNZD_T_202004.zip": {
+          "rows": 3204922,
+          "sha256": "8b4d703464e6060e10cf285e1e8e560587a8bddd653225b1a7a94a63bdf20453",
+          "size_bytes": 20785981
+        },
+        "GBPNZD/tick/2020/DAT_ASCII_GBPNZD_T_202005.zip": {
+          "rows": 3308115,
+          "sha256": "74c12a19f5f785d905cc543bb818503801beaf262cee51fcdb62c1be3fe91a05",
+          "size_bytes": 21011092
+        },
+        "GBPNZD/tick/2020/DAT_ASCII_GBPNZD_T_202006.zip": {
+          "rows": 4245248,
+          "sha256": "f36fcc5be46faf679ff1b586e3085983c71e8c7311f4d0679ab3fc304dcb8406",
+          "size_bytes": 26358576
+        },
+        "GBPNZD/tick/2020/DAT_ASCII_GBPNZD_T_202007.zip": {
+          "rows": 3545430,
+          "sha256": "c66a80d0b45265de0139ef86a353ba67b0c238676ebdeac2f47ff810baccd640",
+          "size_bytes": 21310944
+        },
+        "GBPNZD/tick/2020/DAT_ASCII_GBPNZD_T_202008.zip": {
+          "rows": 3107375,
+          "sha256": "b09d8cc7bf407717431feb8a5fb60698c6f2dca298fb32d92531e84e759b90f9",
+          "size_bytes": 18875602
+        },
+        "GBPNZD/tick/2020/DAT_ASCII_GBPNZD_T_202009.zip": {
+          "rows": 3626503,
+          "sha256": "408dd2f12d5e4925394838409e55f99c73e0ca9a9a05cecfe296824b4a4650fe",
+          "size_bytes": 22963612
+        },
+        "GBPNZD/tick/2020/DAT_ASCII_GBPNZD_T_202010.zip": {
+          "rows": 3122035,
+          "sha256": "cf75cb0566e7a68cd5fed1f19226421f0d99736d726475315c319fd79bffc221",
+          "size_bytes": 20085953
+        },
+        "GBPNZD/tick/2020/DAT_ASCII_GBPNZD_T_202011.zip": {
+          "rows": 2903680,
+          "sha256": "c993aa1c63d8e335788b7ea7b4ff0441b9d3e039a533dba8fd7163b0708f2766",
+          "size_bytes": 18946128
+        },
+        "GBPNZD/tick/2020/DAT_ASCII_GBPNZD_T_202012.zip": {
+          "rows": 3128971,
+          "sha256": "c5b6076ac6413e84451694ca3bed2c6e9cf6894284ce95252abcec41663b506f",
+          "size_bytes": 20258199
+        },
+        "GBPNZD/tick/2021/DAT_ASCII_GBPNZD_T_202101.zip": {
+          "rows": 3042299,
+          "sha256": "29af89e1cc44f523ad84386b2d6a09c05101e033834edae19958179260a4c03b",
+          "size_bytes": 19462843
+        },
+        "GBPNZD/tick/2021/DAT_ASCII_GBPNZD_T_202102.zip": {
+          "rows": 2719649,
+          "sha256": "f64f4ce1bbd6211ec926ec0158ccef0c77c914e17fbd310661105729ce758009",
+          "size_bytes": 17428434
+        },
+        "GBPNZD/tick/2021/DAT_ASCII_GBPNZD_T_202103.zip": {
+          "rows": 3309678,
+          "sha256": "91ec28b6d31fb7411baf7f0fd06a858cf0cc91ef3f72d53e43c2092e59f5d190",
+          "size_bytes": 21114965
+        },
+        "GBPNZD/tick/2021/DAT_ASCII_GBPNZD_T_202104.zip": {
+          "rows": 1969724,
+          "sha256": "5e0620d55bcef8e31803b9111e40ee523a6c4ad996878beff76e527ab4729b6e",
+          "size_bytes": 13070870
+        },
+        "GBPNZD/tick/2021/DAT_ASCII_GBPNZD_T_202105.zip": {
+          "rows": 2238969,
+          "sha256": "8b38b3c8d0ea4e62267836308fa0380524b3bcee2e5e06fdf1a5ebc1386f3510",
+          "size_bytes": 14453046
+        },
+        "GBPNZD/tick/2021/DAT_ASCII_GBPNZD_T_202106.zip": {
+          "rows": 2432063,
+          "sha256": "454eaaf83cb073ecb0465e8df8f3afbee0b996951a3a3f3afcadca0ba63a7652",
+          "size_bytes": 15514464
+        },
+        "GBPNZD/tick/2021/DAT_ASCII_GBPNZD_T_202107.zip": {
+          "rows": 2158476,
+          "sha256": "6c12599dbbabb1a33992844fe67acd3914482fdab18139d8d7a4ea8a823a0c5c",
+          "size_bytes": 14430636
+        },
+        "GBPNZD/tick/2021/DAT_ASCII_GBPNZD_T_202108.zip": {
+          "rows": 1456565,
+          "sha256": "31edca4b042e86c2fdea08a3c26bf417f453ec4d83c409cc835fc31b0b297ad3",
+          "size_bytes": 10037395
+        },
+        "GBPNZD/tick/2021/DAT_ASCII_GBPNZD_T_202109.zip": {
+          "rows": 1873123,
+          "sha256": "eb5a3bb1ad60faad5c4524d3af276b778ad9c4e5df4f6d0e14797185dcfec187",
+          "size_bytes": 12697305
+        },
+        "GBPNZD/tick/2021/DAT_ASCII_GBPNZD_T_202110.zip": {
+          "rows": 1823516,
+          "sha256": "eb3f040a894969c46a706111d32bfafcd7e00d9bf3e2f96bab91220a474c217c",
+          "size_bytes": 12474487
+        },
+        "GBPNZD/tick/2021/DAT_ASCII_GBPNZD_T_202111.zip": {
+          "rows": 2135398,
+          "sha256": "568067757b6dc336c07b63b3d79e7714186ccce6cdd1f5b683ded7299c1a24e5",
+          "size_bytes": 14638896
+        },
+        "GBPNZD/tick/2021/DAT_ASCII_GBPNZD_T_202112.zip": {
+          "rows": 2316023,
+          "sha256": "30253ac4463d47ca620276089c0f7a1f9fe1dd170231c8e0ff6ef5fc60ab1d1c",
+          "size_bytes": 15603715
+        },
+        "GBPNZD/tick/2022/DAT_ASCII_GBPNZD_T_202201.zip": {
+          "rows": 1808265,
+          "sha256": "208179d0bf00b928df1a1477d7178230416633a393189e5e28121d86b02abb5a",
+          "size_bytes": 12486735
+        },
+        "GBPNZD/tick/2022/DAT_ASCII_GBPNZD_T_202202.zip": {
+          "rows": 1892850,
+          "sha256": "8df2b2de9c5fbb97004a45a16e282c988ed31d4deea5e5d5bffd49238eaaf00f",
+          "size_bytes": 12938665
+        },
+        "GBPNZD/tick/2022/DAT_ASCII_GBPNZD_T_202203.zip": {
+          "rows": 2463861,
+          "sha256": "b69b5c27979690b00cd83e1e40ce44f0a7ba284ab071debe1e144961c9f426c1",
+          "size_bytes": 16637066
+        },
+        "GBPNZD/tick/2022/DAT_ASCII_GBPNZD_T_202204.zip": {
+          "rows": 2157048,
+          "sha256": "9ba92ed788d59855945b9384a87b32aa64d7a21ed6add025bb265ed66751d330",
+          "size_bytes": 14408617
+        },
+        "GBPNZD/tick/2022/DAT_ASCII_GBPNZD_T_202205.zip": {
+          "rows": 2695726,
+          "sha256": "69c7a3c86963dfdc8bfe25436524b088cffa5714bb5ffa98725da07c26140e81",
+          "size_bytes": 17875119
+        },
+        "GBPNZD/tick/2022/DAT_ASCII_GBPNZD_T_202206.zip": {
+          "rows": 3962059,
+          "sha256": "48e7152bab569a37ffa5e32673489a0000c037e44cc3e6cefb9be395ae2991e4",
+          "size_bytes": 25581847
+        },
+        "GBPNZD/tick/2022/DAT_ASCII_GBPNZD_T_202207.zip": {
+          "rows": 3855765,
+          "sha256": "4afbbb44128112297df841d24a4c67300694895d5ace6246323e7a9f40fee3b7",
+          "size_bytes": 25472187
+        },
+        "GBPNZD/tick/2022/DAT_ASCII_GBPNZD_T_202208.zip": {
+          "rows": 2542311,
+          "sha256": "ff75b746746cafe35957f1d423732672da9924d6bec865631aff8b8f8e87206f",
+          "size_bytes": 16942940
+        },
+        "GBPNZD/tick/2022/DAT_ASCII_GBPNZD_T_202209.zip": {
+          "rows": 3146367,
+          "sha256": "02ed143b10c700fe5e89f0ca87764e0ce9153a9b27945e34b07d681273227e9b",
+          "size_bytes": 20850129
+        },
+        "GBPNZD/tick/2022/DAT_ASCII_GBPNZD_T_202210.zip": {
+          "rows": 3973654,
+          "sha256": "89a5c94714cf2ec485c9a387ec5e5c82b94247a0a3e45425a559b36dda95f3dd",
+          "size_bytes": 26894032
+        },
+        "GBPNZD/tick/2022/DAT_ASCII_GBPNZD_T_202211.zip": {
+          "rows": 3542043,
+          "sha256": "cad541e7213e4f39356c618505a7c63b2eaed5fddc1dc390b5441ed9518a4352",
+          "size_bytes": 23877349
+        },
+        "GBPNZD/tick/2022/DAT_ASCII_GBPNZD_T_202212.zip": {
+          "rows": 3772622,
+          "sha256": "bb153c275fe6d3d88cf1cc7817db07fa42d2092bd247e89f0bf91eeb2396eba1",
+          "size_bytes": 25173341
+        },
+        "GBPNZD/tick/2023/DAT_ASCII_GBPNZD_T_202301.zip": {
+          "rows": 5293758,
+          "sha256": "e1010ca414f41e232589fd78a61677c99720e4abc52fb77cb0c182822c99b481",
+          "size_bytes": 34800927
+        },
+        "GBPNZD/tick/2023/DAT_ASCII_GBPNZD_T_202302.zip": {
+          "rows": 5753818,
+          "sha256": "3b3a3837b0c6c824423140e8d501366718169b0c9389874080d5bc2a8587021c",
+          "size_bytes": 36622879
+        },
+        "GBPNZD/tick/2023/DAT_ASCII_GBPNZD_T_202303.zip": {
+          "rows": 4662042,
+          "sha256": "64a39faa3864780049fd5d9080230ccae4416aa1bcef3cd883f561df8c7f3f84",
+          "size_bytes": 29867941
+        },
+        "GBPNZD/tick/2023/DAT_ASCII_GBPNZD_T_202304.zip": {
+          "rows": 2628709,
+          "sha256": "0e26f612aad5aad899db48085663ea710928d44d953ce5ac659d369bdb01ddfe",
+          "size_bytes": 17043682
+        },
+        "GBPNZD/tick/2023/DAT_ASCII_GBPNZD_T_202305.zip": {
+          "rows": 2527828,
+          "sha256": "048119da1455f03e0716c1272e958152b68a9d11b618cdeaf1fd5fa1b2710fd7",
+          "size_bytes": 16496958
+        },
+        "GBPNZD/tick/2023/DAT_ASCII_GBPNZD_T_202306.zip": {
+          "rows": 2335902,
+          "sha256": "ef61aecb2ecf0fc94d58ed413b3b91a2400bcfb073365f70cf20f6d5adb0632f",
+          "size_bytes": 15471048
+        },
+        "GBPNZD/tick/2023/DAT_ASCII_GBPNZD_T_202307.zip": {
+          "rows": 2427438,
+          "sha256": "cb8f9cb9354f907e5288b71e87d8727e160573b65991ad5658360d0ccc9616ec",
+          "size_bytes": 16159849
+        },
+        "GBPNZD/tick/2023/DAT_ASCII_GBPNZD_T_202308.zip": {
+          "rows": 2959505,
+          "sha256": "2ee9f75abf0e441e21e49e06b0cfb69fce13bb1b1d37ce34f97e6cbf9f089b61",
+          "size_bytes": 19912865
+        },
+        "GBPNZD/tick/2023/DAT_ASCII_GBPNZD_T_202309.zip": {
+          "rows": 2951301,
+          "sha256": "ea7b25141d89326f554c354bef591b361e04ea23fce6b4d05dae3e7743729aca",
+          "size_bytes": 19413966
+        },
+        "GBPNZD/tick/2023/DAT_ASCII_GBPNZD_T_202310.zip": {
+          "rows": 3163012,
+          "sha256": "c1c8c8b65ffae903f450213f2cda0bd969687dfb0ff37aef4c76d426db6aa7b8",
+          "size_bytes": 20885659
+        },
+        "GBPNZD/tick/2023/DAT_ASCII_GBPNZD_T_202311.zip": {
+          "rows": 2616384,
+          "sha256": "16c47752bb83960f1ec338bfb72a0ca93a6a46fd102436f12f441c0f2eb21363",
+          "size_bytes": 17486105
+        },
+        "GBPNZD/tick/2023/DAT_ASCII_GBPNZD_T_202312.zip": {
+          "rows": 2614393,
+          "sha256": "c2742ad039dc6bd58096ebac1c4a46dbc645ba2a1e9da10414f21b13a76f6bdb",
+          "size_bytes": 17369743
+        },
+        "GBPNZD/tick/2024/DAT_ASCII_GBPNZD_T_202401.zip": {
+          "rows": 2927415,
+          "sha256": "36d543751a562a43afbac7876aa4930e236f7106656883764c2c06e2d9a1f35f",
+          "size_bytes": 19607985
+        },
+        "GBPNZD/tick/2024/DAT_ASCII_GBPNZD_T_202402.zip": {
+          "rows": 2190359,
+          "sha256": "4fa6d9a8a8a8c940a4e30616ee7ebc94638b03aa1a023a53da7280ee6bb413a8",
+          "size_bytes": 14702640
+        },
+        "GBPNZD/tick/2024/DAT_ASCII_GBPNZD_T_202403.zip": {
+          "rows": 1752455,
+          "sha256": "c9b8b9ef0b2834a821f969875d3ca87940f3b67b5e09b198a914bc6f3de8dc5c",
+          "size_bytes": 11868549
+        },
+        "GBPNZD/tick/2024/DAT_ASCII_GBPNZD_T_202404.zip": {
+          "rows": 2126746,
+          "sha256": "aacf289b153a982c0a27946e4915c70c93c84104063f40b3c0039377893fff67",
+          "size_bytes": 14263836
+        },
+        "GBPNZD/tick/2024/DAT_ASCII_GBPNZD_T_202405.zip": {
+          "rows": 2248480,
+          "sha256": "a206f608dce6176fea4e88df8fa4605cb8442be9ee21f6fcac0e7bba63c6708b",
+          "size_bytes": 14524276
+        },
+        "GBPNZD/tick/2024/DAT_ASCII_GBPNZD_T_202406.zip": {
+          "rows": 2589805,
+          "sha256": "43c93460798ecc3b6dc3c33c3e9f7b8f399f69a9b057fe5189d33bb3c12f5565",
+          "size_bytes": 15919095
+        },
+        "GBPNZD/tick/2024/DAT_ASCII_GBPNZD_T_202407.zip": {
+          "rows": 2478533,
+          "sha256": "2e3189396dfa5bc947386cb9b254b2e36a5e92aed773b98a82d26e5210541c17",
+          "size_bytes": 15409784
+        },
+        "GBPNZD/tick/2024/DAT_ASCII_GBPNZD_T_202408.zip": {
+          "rows": 2792293,
+          "sha256": "7ce9a8a13c055ef3d7bd0b0b767f28a0898af8b49787aef09555e1c45fb7bcb0",
+          "size_bytes": 17709714
+        },
+        "GBPNZD/tick/2024/DAT_ASCII_GBPNZD_T_202409.zip": {
+          "rows": 2725965,
+          "sha256": "513c780740848c7699747c0a4b9d7c1d2a6089b073775f3b1d69cbb3d5edc546",
+          "size_bytes": 16921802
+        },
+        "GBPNZD/tick/2024/DAT_ASCII_GBPNZD_T_202410.zip": {
+          "rows": 3128361,
+          "sha256": "55c813bacdaca6e25f2c5ced03fe0f2ecd6ae349c576390c2c90c5627b2734cf",
+          "size_bytes": 19584937
+        },
+        "GBPNZD/tick/2024/DAT_ASCII_GBPNZD_T_202411.zip": {
+          "rows": 3184720,
+          "sha256": "8305835ae08cf73a9fbba0114dad1b8b9392bfb65b5c8f8227a53430227c611f",
+          "size_bytes": 20056845
+        },
+        "GBPNZD/tick/2024/DAT_ASCII_GBPNZD_T_202412.zip": {
+          "rows": 2272016,
+          "sha256": "910fcd6ffc50f19071dd1cb3d94601aefa1e36521a23e184c6eed06b6ed099fa",
+          "size_bytes": 15198089
+        },
+        "GBPNZD/tick/2025/DAT_ASCII_GBPNZD_T_202501.zip": {
+          "rows": 2370425,
+          "sha256": "e58da14faaeb3ca61eb64e3e604dad1ff58c4e794b40dd77f4c7bc3f64d07ccd",
+          "size_bytes": 16342671
+        },
+        "GBPNZD/tick/2025/DAT_ASCII_GBPNZD_T_202502.zip": {
+          "rows": 1821609,
+          "sha256": "9dd0794a94f7cd7a09e02f4d04952a8b2f4c8c35e218780c9ab4632a7111ac95",
+          "size_bytes": 12789979
+        },
+        "GBPNZD/tick/2025/DAT_ASCII_GBPNZD_T_202503.zip": {
+          "rows": 1854456,
+          "sha256": "572591d1ba5b0a03eda11df530df697808e5dde856513aed0193d11ebe840aa0",
+          "size_bytes": 13248969
+        },
+        "GBPNZD/tick/2025/DAT_ASCII_GBPNZD_T_202504.zip": {
+          "rows": 3045862,
+          "sha256": "44e37917ba52b431ca5a86ba0dedcf4202ad079d21ecca5a38990773f529c20b",
+          "size_bytes": 21858108
+        },
+        "GBPNZD/tick/2025/DAT_ASCII_GBPNZD_T_202505.zip": {
+          "rows": 1728310,
+          "sha256": "7d299e51f01f3c1e7dbf41f8d21330f0bd9f6870def5f5bbe40f5e8dfda498a7",
+          "size_bytes": 12396577
+        },
+        "GBPNZD/tick/2025/DAT_ASCII_GBPNZD_T_202506.zip": {
+          "rows": 1926428,
+          "sha256": "0f6855b6e750d04544bb85cc0c1ba4496dddb26182b101dec0a790e8ca0bf6c3",
+          "size_bytes": 13449394
+        },
+        "GBPNZD/tick/2025/DAT_ASCII_GBPNZD_T_202507.zip": {
+          "rows": 1725679,
+          "sha256": "ff52fc9003514c3eee024d6e03902d8693408b6336ccf6cca80f65620ef40640",
+          "size_bytes": 12092147
+        },
+        "GBPNZD/tick/2025/DAT_ASCII_GBPNZD_T_202508.zip": {
+          "rows": 1492783,
+          "sha256": "18626c9f02def044122e072bac9a38a9558bb47e6874f7631c25602414b0b856",
+          "size_bytes": 10426873
+        },
+        "GBPNZD/tick/2025/DAT_ASCII_GBPNZD_T_202509.zip": {
+          "rows": 1795946,
+          "sha256": "00a704d6f00cf08ccd7b7cd1977b43f700b81389af7624fc43bcbedfcd7fefc4",
+          "size_bytes": 12377033
+        },
+        "GBPNZD/tick/2025/DAT_ASCII_GBPNZD_T_202510.zip": {
+          "rows": 1893661,
+          "sha256": "d76ab755e03e8f0b2017e66652d7de6652a7ada4fa2af22a06806d182a846c94",
+          "size_bytes": 13267821
+        },
+        "GBPNZD/tick/2025/DAT_ASCII_GBPNZD_T_202511.zip": {
+          "rows": 1743416,
+          "sha256": "b03fb48dc07bf02a11e7d0a15f864f648d8bf39c4500913934e637fa7de64170",
+          "size_bytes": 12086165
+        },
+        "GBPNZD/tick/2025/DAT_ASCII_GBPNZD_T_202512.zip": {
+          "rows": 1493339,
+          "sha256": "0ce04021efd004b3c746f0028c4ec3f448b571343d7b582b879014be94aa22ae",
+          "size_bytes": 10519223
+        },
+        "GBPNZD/tick/2026/DAT_ASCII_GBPNZD_T_202601.zip": {
+          "rows": 1846778,
+          "sha256": "d376d660aa25b5564d354b91e6c9de1268ed0a1c3ad9b465694b4988f2a95ec0",
+          "size_bytes": 12837720
+        },
+        "GBPNZD/tick/2026/DAT_ASCII_GBPNZD_T_202602.zip": {
+          "rows": 1857153,
+          "sha256": "f9b6b8d0b024610819e1eda0eb35ed6a335b6ee85375d916a305d980e490be73",
+          "size_bytes": 12586183
+        },
+        "GBPNZD/tick/2026/DAT_ASCII_GBPNZD_T_202603.zip": {
+          "rows": 2960765,
+          "sha256": "4de77915c550c70d451b131859b58f3161d10bee86817bcf9aaaf8fa3c9801a3",
+          "size_bytes": 19956137
+        },
+        "GBPNZD/tick/2026/DAT_ASCII_GBPNZD_T_202604.zip": {
+          "rows": 703485,
+          "sha256": "eba1eb4b0cf3166ef3bc442c22ff8268ea7480948847e0d4ea160e6715a37658",
+          "size_bytes": 4749376
+        }
+      },
+      "latest_month": "202604",
+      "total_files": 196,
+      "total_size_bytes": 2236065477
+    },
+    "GBPUSD": {
+      "earliest_month": "201001",
+      "files": {
+        "GBPUSD/tick/2010/DAT_ASCII_GBPUSD_T_201001.zip": {
+          "rows": 538516,
+          "sha256": "20824703d973d476f3a23d9960170d0a734fa687d480fff8412c2c12bb220f8c",
+          "size_bytes": 2103675
+        },
+        "GBPUSD/tick/2010/DAT_ASCII_GBPUSD_T_201002.zip": {
+          "rows": 524409,
+          "sha256": "82d2a9a9048709c2b0befa7fa68c44776d021b2d73c582889bd9309eb7411063",
+          "size_bytes": 2043608
+        },
+        "GBPUSD/tick/2010/DAT_ASCII_GBPUSD_T_201003.zip": {
+          "rows": 658497,
+          "sha256": "a84861718639b4de255f5a5dfb53cdf4dca3e51409c11ddcd7c4eff3d23b6f27",
+          "size_bytes": 2450084
+        },
+        "GBPUSD/tick/2010/DAT_ASCII_GBPUSD_T_201004.zip": {
+          "rows": 690235,
+          "sha256": "268de752c08ca8698a4051e1fe02cf2223eaacd2265b7eceb0988d593b40624b",
+          "size_bytes": 2457158
+        },
+        "GBPUSD/tick/2010/DAT_ASCII_GBPUSD_T_201005.zip": {
+          "rows": 865121,
+          "sha256": "9a2dce0961f43fdd23ae3724d88d28ca4d5f92500f205ea00a25370ecf3103d6",
+          "size_bytes": 3292736
+        },
+        "GBPUSD/tick/2010/DAT_ASCII_GBPUSD_T_201006.zip": {
+          "rows": 683503,
+          "sha256": "888916cadeba5a71d8b3d525ad487e5ef73d47148f242ff44073ade0122a7fcf",
+          "size_bytes": 2621694
+        },
+        "GBPUSD/tick/2010/DAT_ASCII_GBPUSD_T_201007.zip": {
+          "rows": 334681,
+          "sha256": "c90a93c54b69eec0b89c947a37926eb31e0115d96c087ee10d729f9b5af470f1",
+          "size_bytes": 1284185
+        },
+        "GBPUSD/tick/2010/DAT_ASCII_GBPUSD_T_201008.zip": {
+          "rows": 297804,
+          "sha256": "4f40a3a3be9b1b25a01776e92306d860ead6f576963bb09e90cf17c85b9f7659",
+          "size_bytes": 1154830
+        },
+        "GBPUSD/tick/2010/DAT_ASCII_GBPUSD_T_201009.zip": {
+          "rows": 278679,
+          "sha256": "9a163e77b699a9cf504967261b5012375c3129d8b0792a856f487490f0366536",
+          "size_bytes": 1093393
+        },
+        "GBPUSD/tick/2010/DAT_ASCII_GBPUSD_T_201010.zip": {
+          "rows": 361094,
+          "sha256": "5e34d4127d9a018b27135eb3191a364ea1c299e02172c68160936ad9b0658cd9",
+          "size_bytes": 1344367
+        },
+        "GBPUSD/tick/2010/DAT_ASCII_GBPUSD_T_201011.zip": {
+          "rows": 415349,
+          "sha256": "293a145d67be31056d49f6189b894a6ed85c28993feaf3c441d41cd4cdb69a4e",
+          "size_bytes": 1518364
+        },
+        "GBPUSD/tick/2010/DAT_ASCII_GBPUSD_T_201012.zip": {
+          "rows": 332603,
+          "sha256": "4cd842c819ffaf22890d512a8c7565a883c69da04f0319dfab956be84b042e40",
+          "size_bytes": 1244371
+        },
+        "GBPUSD/tick/2011/DAT_ASCII_GBPUSD_T_201101.zip": {
+          "rows": 376050,
+          "sha256": "35633c507afd11f05c71acc79870134cdef5ad29f6334ae1d3616cb261ad62cd",
+          "size_bytes": 1373679
+        },
+        "GBPUSD/tick/2011/DAT_ASCII_GBPUSD_T_201102.zip": {
+          "rows": 328302,
+          "sha256": "e251b3b6e3de29dfb077d66b84e71167ca43c6b0963ddf6966818baf2a63c1fa",
+          "size_bytes": 1180858
+        },
+        "GBPUSD/tick/2011/DAT_ASCII_GBPUSD_T_201103.zip": {
+          "rows": 327640,
+          "sha256": "ca0bc4c92998fba8a2e3340719c3df141746ad4fa29aa41609ae6fc3e9ae16e3",
+          "size_bytes": 1220304
+        },
+        "GBPUSD/tick/2011/DAT_ASCII_GBPUSD_T_201104.zip": {
+          "rows": 270759,
+          "sha256": "d7c47727a2c9948b78b6174bd05623ebe361bf5820f64e8b8b112cbaf749efa1",
+          "size_bytes": 1123517
+        },
+        "GBPUSD/tick/2011/DAT_ASCII_GBPUSD_T_201105.zip": {
+          "rows": 354105,
+          "sha256": "d5ffcf08005542fe8c723cbb38a193889c3be8c4a5e72b587a2fa1ed4d1f3da6",
+          "size_bytes": 1846273
+        },
+        "GBPUSD/tick/2011/DAT_ASCII_GBPUSD_T_201106.zip": {
+          "rows": 340184,
+          "sha256": "9ab483bc313d9a598a57bcc9574fff714554ef0b19fc86d4719baa970d648531",
+          "size_bytes": 1754462
+        },
+        "GBPUSD/tick/2011/DAT_ASCII_GBPUSD_T_201107.zip": {
+          "rows": 324863,
+          "sha256": "0e5beeb97bb58be96acc9e495f76a06c67146c778e71c8d35258b256cd926f91",
+          "size_bytes": 1697132
+        },
+        "GBPUSD/tick/2011/DAT_ASCII_GBPUSD_T_201108.zip": {
+          "rows": 415661,
+          "sha256": "fd9945c2586aa681ae4d113f9d77b30b6b0364f69a755239e0dbb5ed17254a0e",
+          "size_bytes": 2136592
+        },
+        "GBPUSD/tick/2011/DAT_ASCII_GBPUSD_T_201109.zip": {
+          "rows": 413345,
+          "sha256": "09ba92fae751fffd865eb892eb6ea2a91b84bf0983b893d5b16675081e0d01ce",
+          "size_bytes": 2127986
+        },
+        "GBPUSD/tick/2011/DAT_ASCII_GBPUSD_T_201110.zip": {
+          "rows": 401440,
+          "sha256": "8920b948d14ed8d768d3aaf27b13a19d2648412c5cd66c9a94b6a80cae8ecf1a",
+          "size_bytes": 2073785
+        },
+        "GBPUSD/tick/2011/DAT_ASCII_GBPUSD_T_201111.zip": {
+          "rows": 401538,
+          "sha256": "4af4a3c06edcf2c290ebb069e492c575dd70d0df7b9f146a0746149c26b48d48",
+          "size_bytes": 2067840
+        },
+        "GBPUSD/tick/2011/DAT_ASCII_GBPUSD_T_201112.zip": {
+          "rows": 1198324,
+          "sha256": "968ff1bab536f698617d23fa3cc998c8d9d073c03a74d7da769bfd098c3a6711",
+          "size_bytes": 6752809
+        },
+        "GBPUSD/tick/2012/DAT_ASCII_GBPUSD_T_201201.zip": {
+          "rows": 1403117,
+          "sha256": "8ce22148737e4fbe9695aa1a7b1062f875c3712d649197f7238c4346406a9034",
+          "size_bytes": 7857219
+        },
+        "GBPUSD/tick/2012/DAT_ASCII_GBPUSD_T_201202.zip": {
+          "rows": 1268971,
+          "sha256": "811bab08784124e62f07423b0dc018fe84e3bf8ffb186565f322cdf6b5713ba5",
+          "size_bytes": 7135718
+        },
+        "GBPUSD/tick/2012/DAT_ASCII_GBPUSD_T_201203.zip": {
+          "rows": 1104145,
+          "sha256": "19decbffc9d3f9bce03742c72dbc3e971d99de3447db4ce464989c771198e747",
+          "size_bytes": 6310647
+        },
+        "GBPUSD/tick/2012/DAT_ASCII_GBPUSD_T_201204.zip": {
+          "rows": 1055614,
+          "sha256": "562628256b071a4415b9c6ff158dea874e3f9fe846901df3573cad7e949c98ea",
+          "size_bytes": 5939970
+        },
+        "GBPUSD/tick/2012/DAT_ASCII_GBPUSD_T_201205.zip": {
+          "rows": 1251600,
+          "sha256": "dc574491d1db54f9a1f84b50956609b8ffa914e8ff3c3e6255b47f729805f695",
+          "size_bytes": 7056339
+        },
+        "GBPUSD/tick/2012/DAT_ASCII_GBPUSD_T_201206.zip": {
+          "rows": 1242141,
+          "sha256": "4147eb5601c272690e0d2aaba46ad6d911db319e2ee9418b0d9dc56b178fcdfe",
+          "size_bytes": 7069415
+        },
+        "GBPUSD/tick/2012/DAT_ASCII_GBPUSD_T_201207.zip": {
+          "rows": 1230499,
+          "sha256": "b895a2598e275eb37cf18eb241bdc6e380c12d984771ecb36eb328505273ace5",
+          "size_bytes": 6959173
+        },
+        "GBPUSD/tick/2012/DAT_ASCII_GBPUSD_T_201208.zip": {
+          "rows": 1075493,
+          "sha256": "9a5218c715c2f17871aeaeafb0863609ebc59dc5e08f5fb788e1a526aff4823c",
+          "size_bytes": 6062289
+        },
+        "GBPUSD/tick/2012/DAT_ASCII_GBPUSD_T_201209.zip": {
+          "rows": 1264498,
+          "sha256": "2db463ac9fe28146262fb1cc89b61e59f38f16b3a0b8e75e86289654d7c53937",
+          "size_bytes": 6923128
+        },
+        "GBPUSD/tick/2012/DAT_ASCII_GBPUSD_T_201210.zip": {
+          "rows": 1226053,
+          "sha256": "097912bb61948f201c7eceb0b6ed9b442c115cdd257e0c5139d6402169b905cd",
+          "size_bytes": 6694375
+        },
+        "GBPUSD/tick/2012/DAT_ASCII_GBPUSD_T_201211.zip": {
+          "rows": 984243,
+          "sha256": "86282c12203d454d0c9aea9f4f07217fec0e1463584ef08d78e094532ba4b429",
+          "size_bytes": 5418361
+        },
+        "GBPUSD/tick/2012/DAT_ASCII_GBPUSD_T_201212.zip": {
+          "rows": 788469,
+          "sha256": "ac7c1abab6ac005a53975240e42f98dcd9ae12e31a4c8908f6bd26630ee51409",
+          "size_bytes": 4378214
+        },
+        "GBPUSD/tick/2013/DAT_ASCII_GBPUSD_T_201301.zip": {
+          "rows": 1133516,
+          "sha256": "41ed38ab8c5754315f9216c1f01cf839976503dbccb8a06a40d253aabbe57cc1",
+          "size_bytes": 6336850
+        },
+        "GBPUSD/tick/2013/DAT_ASCII_GBPUSD_T_201302.zip": {
+          "rows": 1038742,
+          "sha256": "e268696cdc0005f0f43b67b926fe6995008701f50153e2494bcaf7e9b6890cd1",
+          "size_bytes": 5918737
+        },
+        "GBPUSD/tick/2013/DAT_ASCII_GBPUSD_T_201303.zip": {
+          "rows": 1204772,
+          "sha256": "001d210f80d6cdf6abe6d97e5de3cfe1c067c1bb747059d792a1434107384eef",
+          "size_bytes": 6728644
+        },
+        "GBPUSD/tick/2013/DAT_ASCII_GBPUSD_T_201304.zip": {
+          "rows": 1208970,
+          "sha256": "c44f98d36740255f107965d0b01200f19091e3d7a1eb475f69f0272ab2e61402",
+          "size_bytes": 6676423
+        },
+        "GBPUSD/tick/2013/DAT_ASCII_GBPUSD_T_201305.zip": {
+          "rows": 1231231,
+          "sha256": "31a00d3bb10d6ce1cc85688ae5dbea1b6ac30c707042dc136dc96312a63f026a",
+          "size_bytes": 6969534
+        },
+        "GBPUSD/tick/2013/DAT_ASCII_GBPUSD_T_201306.zip": {
+          "rows": 1295707,
+          "sha256": "435bc1e41755326df1b3bebac58b06a53e617d6b7f8e4e1b5703f414c55c92a0",
+          "size_bytes": 7346932
+        },
+        "GBPUSD/tick/2013/DAT_ASCII_GBPUSD_T_201307.zip": {
+          "rows": 1376897,
+          "sha256": "a445b95b376d0cbe42efd8aeab64d6dcef921b694c4fc17e8b8223916145189a",
+          "size_bytes": 7782833
+        },
+        "GBPUSD/tick/2013/DAT_ASCII_GBPUSD_T_201308.zip": {
+          "rows": 1210165,
+          "sha256": "896ee5c5766adf067e16f8fe5ae0b745272d1c85e58bdcc7a20938f9bdfab360",
+          "size_bytes": 6789199
+        },
+        "GBPUSD/tick/2013/DAT_ASCII_GBPUSD_T_201309.zip": {
+          "rows": 1123687,
+          "sha256": "7c4e37860a2b002df00ea6c6728cf1aa5d77cdd0f343d61a980ae6bedcbd0865",
+          "size_bytes": 6176233
+        },
+        "GBPUSD/tick/2013/DAT_ASCII_GBPUSD_T_201310.zip": {
+          "rows": 1161069,
+          "sha256": "f39a1741b9cebd301151fe2b381da26392e379a7f96c34a234a6ad25ea6307cc",
+          "size_bytes": 6431277
+        },
+        "GBPUSD/tick/2013/DAT_ASCII_GBPUSD_T_201311.zip": {
+          "rows": 1200065,
+          "sha256": "e40b596c0ca9172a6e04d3bfb99a764a31077c67d4e0f5eb293e2cfe505c5944",
+          "size_bytes": 6613927
+        },
+        "GBPUSD/tick/2013/DAT_ASCII_GBPUSD_T_201312.zip": {
+          "rows": 1131918,
+          "sha256": "7d60681d662cdf2356e0482fc27eeb29f6a9156c7b2278a51d453d0942618885",
+          "size_bytes": 6201246
+        },
+        "GBPUSD/tick/2014/DAT_ASCII_GBPUSD_T_201401.zip": {
+          "rows": 1164089,
+          "sha256": "a710bb554bbd76a6f99d3f722c4051378b7c3e0105474c7fd614d8c04401b256",
+          "size_bytes": 6507261
+        },
+        "GBPUSD/tick/2014/DAT_ASCII_GBPUSD_T_201402.zip": {
+          "rows": 1015219,
+          "sha256": "dde31264490f92d4f5fbf57e3d708f99262c61c06eb5649efa6b0c5ccae59287",
+          "size_bytes": 5691227
+        },
+        "GBPUSD/tick/2014/DAT_ASCII_GBPUSD_T_201403.zip": {
+          "rows": 652503,
+          "sha256": "d139ba2121ba3d5cb5912f34947bb2d424a97622003f4ddbc63c884061026f9d",
+          "size_bytes": 3874592
+        },
+        "GBPUSD/tick/2014/DAT_ASCII_GBPUSD_T_201404.zip": {
+          "rows": 537845,
+          "sha256": "bdd77b9cabbf2211c53eb69462f421a1f85edf0082a7a27384349548a090be20",
+          "size_bytes": 3147989
+        },
+        "GBPUSD/tick/2014/DAT_ASCII_GBPUSD_T_201405.zip": {
+          "rows": 576064,
+          "sha256": "623ec6ec217f030ed33e5048a92124ef694df88f72162647562522380e1db3da",
+          "size_bytes": 3322761
+        },
+        "GBPUSD/tick/2014/DAT_ASCII_GBPUSD_T_201406.zip": {
+          "rows": 591878,
+          "sha256": "d1aceba6458ae6db5c193f3597cd7ac05fd40066218e8b40a3e7e205291313b9",
+          "size_bytes": 3378578
+        },
+        "GBPUSD/tick/2014/DAT_ASCII_GBPUSD_T_201407.zip": {
+          "rows": 659405,
+          "sha256": "ed52f4d9248df65a99b6f641a414e30d67d39672b6c5d8b1318f7cb043fdaf04",
+          "size_bytes": 3599971
+        },
+        "GBPUSD/tick/2014/DAT_ASCII_GBPUSD_T_201408.zip": {
+          "rows": 721096,
+          "sha256": "c47373d1092cf5da2ed5f26782afb27b3f8e7e436c7dff22b4bf1cda9ad2e2a5",
+          "size_bytes": 3483085
+        },
+        "GBPUSD/tick/2014/DAT_ASCII_GBPUSD_T_201409.zip": {
+          "rows": 1204543,
+          "sha256": "f9b527befba8987b73dd5edadd01d0d7535ba9878f8062625ddb1668dee7df84",
+          "size_bytes": 5951872
+        },
+        "GBPUSD/tick/2014/DAT_ASCII_GBPUSD_T_201410.zip": {
+          "rows": 1503004,
+          "sha256": "a34d2bd5cd72c9670b8045dd3f0c91a78ee4ecb31eaf75f17fff8954e0813883",
+          "size_bytes": 8532632
+        },
+        "GBPUSD/tick/2014/DAT_ASCII_GBPUSD_T_201411.zip": {
+          "rows": 1747367,
+          "sha256": "ca5a90e1b67a11970aa69dacbe6ab060a08bdcf6c97d27f69cf38f305027d8bf",
+          "size_bytes": 9205076
+        },
+        "GBPUSD/tick/2014/DAT_ASCII_GBPUSD_T_201412.zip": {
+          "rows": 1493515,
+          "sha256": "df729040b9aedc08c03e1d7da8620821b436b91d598e1e2dd87b364d90b561ce",
+          "size_bytes": 7984998
+        },
+        "GBPUSD/tick/2015/DAT_ASCII_GBPUSD_T_201501.zip": {
+          "rows": 1720089,
+          "sha256": "ee077cd8d01caeb606d4c64ff6320034f8432c79ebb2e2735d2a98242fc29dfe",
+          "size_bytes": 9318577
+        },
+        "GBPUSD/tick/2015/DAT_ASCII_GBPUSD_T_201502.zip": {
+          "rows": 1427220,
+          "sha256": "245295501c2d21433e27a8532092478fc2159d7f692df07fba6f82531a994e4f",
+          "size_bytes": 7744425
+        },
+        "GBPUSD/tick/2015/DAT_ASCII_GBPUSD_T_201503.zip": {
+          "rows": 1895782,
+          "sha256": "5d16b5d843667d7812918749ad7f4133e8179e204b21b2f031d96a48a0576a70",
+          "size_bytes": 10444219
+        },
+        "GBPUSD/tick/2015/DAT_ASCII_GBPUSD_T_201504.zip": {
+          "rows": 1753671,
+          "sha256": "be5346865ef64438cba739712924ece5ca8aeeb78a30ed8bfb7cb1dbc11c303e",
+          "size_bytes": 9746701
+        },
+        "GBPUSD/tick/2015/DAT_ASCII_GBPUSD_T_201505.zip": {
+          "rows": 1766505,
+          "sha256": "0d7d15f98132252b55afcc3d46c1654145388737bf14d778180683a4a0b62404",
+          "size_bytes": 9682033
+        },
+        "GBPUSD/tick/2015/DAT_ASCII_GBPUSD_T_201506.zip": {
+          "rows": 1702964,
+          "sha256": "4659fc5b3d6393405b4735339ddd13ea6ad19f63bcc115de90a0199e25b9882f",
+          "size_bytes": 9218106
+        },
+        "GBPUSD/tick/2015/DAT_ASCII_GBPUSD_T_201507.zip": {
+          "rows": 1629228,
+          "sha256": "22cfe42ef08f5fb089f376f41c36c1f8dae308572a3617524a5751a8a6595bd4",
+          "size_bytes": 8661508
+        },
+        "GBPUSD/tick/2015/DAT_ASCII_GBPUSD_T_201508.zip": {
+          "rows": 1545234,
+          "sha256": "475d2f50972e1c9ac705912db20a01c7d04b615fb021369414c08f5cec8dd3ce",
+          "size_bytes": 8279207
+        },
+        "GBPUSD/tick/2015/DAT_ASCII_GBPUSD_T_201509.zip": {
+          "rows": 1275680,
+          "sha256": "f301e043f0298f28d93572c2b890e74313f8b2ba3366c10ac9ce87aa727eadb0",
+          "size_bytes": 6885335
+        },
+        "GBPUSD/tick/2015/DAT_ASCII_GBPUSD_T_201510.zip": {
+          "rows": 1262943,
+          "sha256": "37981645e54f4c7fdfe317fcc2b699ea913fb8d9129bf8e78b72f3deb4860181",
+          "size_bytes": 6708111
+        },
+        "GBPUSD/tick/2015/DAT_ASCII_GBPUSD_T_201511.zip": {
+          "rows": 1227835,
+          "sha256": "e3eb5e123fb2ddb068b2b667cc4f72f41a021b0a344cf3580246526a066efb20",
+          "size_bytes": 6417041
+        },
+        "GBPUSD/tick/2015/DAT_ASCII_GBPUSD_T_201512.zip": {
+          "rows": 1416452,
+          "sha256": "29194473b07ad0450b889ec7ddecd11881bd3f210ba6fa3361d40f01c4ab0222",
+          "size_bytes": 7480821
+        },
+        "GBPUSD/tick/2016/DAT_ASCII_GBPUSD_T_201601.zip": {
+          "rows": 1600455,
+          "sha256": "2492995088d78ea6f401df1bb7e7010cde729c0f562e30f40319c3338c80df5f",
+          "size_bytes": 8601707
+        },
+        "GBPUSD/tick/2016/DAT_ASCII_GBPUSD_T_201602.zip": {
+          "rows": 1924249,
+          "sha256": "8596bf7fcc340432b27227adfdb4878cf62c954318bf9193a5d9c080d2942004",
+          "size_bytes": 10319597
+        },
+        "GBPUSD/tick/2016/DAT_ASCII_GBPUSD_T_201603.zip": {
+          "rows": 1573079,
+          "sha256": "ade1786e6b4fe243709c765eb0c3d3d5657cb6d7bf71a64a60226eb5643c0cd0",
+          "size_bytes": 8550679
+        },
+        "GBPUSD/tick/2016/DAT_ASCII_GBPUSD_T_201604.zip": {
+          "rows": 1504422,
+          "sha256": "78a1bb7f6b2e01654aa9a7ca860a2f0f6664e201e3a125ef503e696ebda3224b",
+          "size_bytes": 8244443
+        },
+        "GBPUSD/tick/2016/DAT_ASCII_GBPUSD_T_201605.zip": {
+          "rows": 1329535,
+          "sha256": "de984794b3932f5536d395e93ff5622df8939c0072bf4f2c515439779362125a",
+          "size_bytes": 7343208
+        },
+        "GBPUSD/tick/2016/DAT_ASCII_GBPUSD_T_201606.zip": {
+          "rows": 1927011,
+          "sha256": "074586b25f4957f679c3946d6b6cb88466aaf687bd554ca2037e38f4c894ecb5",
+          "size_bytes": 11000966
+        },
+        "GBPUSD/tick/2016/DAT_ASCII_GBPUSD_T_201607.zip": {
+          "rows": 1383509,
+          "sha256": "572fd5733497dc5920018085561372416a9286c7817214fd7cc85b0146e9afdf",
+          "size_bytes": 7972243
+        },
+        "GBPUSD/tick/2016/DAT_ASCII_GBPUSD_T_201608.zip": {
+          "rows": 954729,
+          "sha256": "4a7efd4c6ded10337f3bd62d2e7f06579282fd3241b1fe73243fdfe5c11de93d",
+          "size_bytes": 5461906
+        },
+        "GBPUSD/tick/2016/DAT_ASCII_GBPUSD_T_201609.zip": {
+          "rows": 1077491,
+          "sha256": "feece367512f1f0d9e93f758e31f272c2afa8f12d88b1df88191f85a64462e5a",
+          "size_bytes": 6065444
+        },
+        "GBPUSD/tick/2016/DAT_ASCII_GBPUSD_T_201610.zip": {
+          "rows": 1230856,
+          "sha256": "e723d85b64c0753ace1609d3ee438949fa35069bdc4c1c2780ae38531ebef663",
+          "size_bytes": 6962661
+        },
+        "GBPUSD/tick/2016/DAT_ASCII_GBPUSD_T_201611.zip": {
+          "rows": 1490067,
+          "sha256": "343cec814c90e3ff99edc773a827828124289002157967a879a7090e4738187a",
+          "size_bytes": 8396055
+        },
+        "GBPUSD/tick/2016/DAT_ASCII_GBPUSD_T_201612.zip": {
+          "rows": 1150552,
+          "sha256": "08a9dd18fa184dcb3380c2845ee8893b88ae1f3461679a8598b0023b5066885d",
+          "size_bytes": 6442250
+        },
+        "GBPUSD/tick/2017/DAT_ASCII_GBPUSD_T_201701.zip": {
+          "rows": 1673593,
+          "sha256": "257a423b4dc81729db9f635a83f99ada37b7a42b921ab2bb562a1b1f3e3354cd",
+          "size_bytes": 9220092
+        },
+        "GBPUSD/tick/2017/DAT_ASCII_GBPUSD_T_201702.zip": {
+          "rows": 1473353,
+          "sha256": "42b3c6fc4887459ac81217dfe169e2bd83c3dcda3ce2927a8a4066a03aadb721",
+          "size_bytes": 7917996
+        },
+        "GBPUSD/tick/2017/DAT_ASCII_GBPUSD_T_201703.zip": {
+          "rows": 1433478,
+          "sha256": "387ddc5bfe4a16976109efbf7b61735fec6776756d1beb8e97d3dba799213015",
+          "size_bytes": 7693049
+        },
+        "GBPUSD/tick/2017/DAT_ASCII_GBPUSD_T_201704.zip": {
+          "rows": 1176197,
+          "sha256": "9287da264e8eedadcf5bcafd4e1c7f72a555d1866f9fffb489074e271f495c0c",
+          "size_bytes": 6197547
+        },
+        "GBPUSD/tick/2017/DAT_ASCII_GBPUSD_T_201705.zip": {
+          "rows": 1331192,
+          "sha256": "51c7870c21c8e3616dc10d38d960ec8e40172b8667ab33d485060c9cddfff7f1",
+          "size_bytes": 6956376
+        },
+        "GBPUSD/tick/2017/DAT_ASCII_GBPUSD_T_201706.zip": {
+          "rows": 1191779,
+          "sha256": "267e63ea617a4fca670042d71d50d41173c00ec41936be510a0eba109ec0bd92",
+          "size_bytes": 6410730
+        },
+        "GBPUSD/tick/2017/DAT_ASCII_GBPUSD_T_201707.zip": {
+          "rows": 1077183,
+          "sha256": "36bd7e250680b823deb5ff75769fc45c3353e9233ce3c9b606cf891b49539d2c",
+          "size_bytes": 5744533
+        },
+        "GBPUSD/tick/2017/DAT_ASCII_GBPUSD_T_201708.zip": {
+          "rows": 1083248,
+          "sha256": "4bde3d5b9bf03cce1216961d69cbce4d2f82ff66cca2a2a434f0a5a8636cd20a",
+          "size_bytes": 5737658
+        },
+        "GBPUSD/tick/2017/DAT_ASCII_GBPUSD_T_201709.zip": {
+          "rows": 1146070,
+          "sha256": "a115ef3db315d330b96edb8c075ff1368fd927b5d3a74d6e93ab6509ee0d598f",
+          "size_bytes": 6175876
+        },
+        "GBPUSD/tick/2017/DAT_ASCII_GBPUSD_T_201710.zip": {
+          "rows": 1012192,
+          "sha256": "53846db7e6b5d9ca6ab5647d2844bd041f6eb06481621c8ae55e67d5d456cc66",
+          "size_bytes": 5594955
+        },
+        "GBPUSD/tick/2017/DAT_ASCII_GBPUSD_T_201711.zip": {
+          "rows": 1111927,
+          "sha256": "ee7b58c1db50e2dde74c2025f4441c6b91ea6445d4c498aa6052cbd76925ee97",
+          "size_bytes": 6061170
+        },
+        "GBPUSD/tick/2017/DAT_ASCII_GBPUSD_T_201712.zip": {
+          "rows": 1008440,
+          "sha256": "000a7f7129d20e1771ae304c59fe44045203ba58143d95b40cecddc69f7822cf",
+          "size_bytes": 5466655
+        },
+        "GBPUSD/tick/2018/DAT_ASCII_GBPUSD_T_201801.zip": {
+          "rows": 1426792,
+          "sha256": "0087f4107a51b6af96a5937d6fed967b5dd3e1531c16437634ff3b60cd06a6b6",
+          "size_bytes": 7783957
+        },
+        "GBPUSD/tick/2018/DAT_ASCII_GBPUSD_T_201802.zip": {
+          "rows": 1501853,
+          "sha256": "cbfc05302303dc7bd43371407157af5febad1839bd276f0e9baa9479e8e34f7f",
+          "size_bytes": 8330614
+        },
+        "GBPUSD/tick/2018/DAT_ASCII_GBPUSD_T_201803.zip": {
+          "rows": 1391349,
+          "sha256": "ae5cae10f51ddbec5b45557f0db0f8d00e65ad87c860dfc502407dc4a40c800f",
+          "size_bytes": 7567098
+        },
+        "GBPUSD/tick/2018/DAT_ASCII_GBPUSD_T_201804.zip": {
+          "rows": 1016750,
+          "sha256": "c6618efb3c76ddba31cb52679d32cc058d4e0c254b355f7f8f237af491d3235e",
+          "size_bytes": 5532825
+        },
+        "GBPUSD/tick/2018/DAT_ASCII_GBPUSD_T_201805.zip": {
+          "rows": 1544621,
+          "sha256": "5e9d4c417647922a580be76816cddb700da19f84dd470180250a563cb409e9c5",
+          "size_bytes": 8516202
+        },
+        "GBPUSD/tick/2018/DAT_ASCII_GBPUSD_T_201806.zip": {
+          "rows": 1390731,
+          "sha256": "4639152b2ecf734e2c12b4156089f5dccb47609bc219c6d8e2ab70ee0d443e84",
+          "size_bytes": 7367885
+        },
+        "GBPUSD/tick/2018/DAT_ASCII_GBPUSD_T_201807.zip": {
+          "rows": 1196307,
+          "sha256": "7b8e77886f3b8c3413cb0e033c7c929f4cc4ff8644874c3f3ea70ce80824a391",
+          "size_bytes": 6476614
+        },
+        "GBPUSD/tick/2018/DAT_ASCII_GBPUSD_T_201808.zip": {
+          "rows": 1142166,
+          "sha256": "21c81319a07c75e7a909e9accf094b73e73eaf706ba379e847590d89b130919f",
+          "size_bytes": 6159044
+        },
+        "GBPUSD/tick/2018/DAT_ASCII_GBPUSD_T_201809.zip": {
+          "rows": 1091394,
+          "sha256": "c73803a622b2790764a4f5a302dcb7cc477bf4e2dce8fddf7b1390249aefca13",
+          "size_bytes": 5880474
+        },
+        "GBPUSD/tick/2018/DAT_ASCII_GBPUSD_T_201810.zip": {
+          "rows": 1654398,
+          "sha256": "8a30c2103878e19bd3b13d0bbc9cffe3f13b6f2ac1b32c171ae1e28e8fae1e4e",
+          "size_bytes": 8540752
+        },
+        "GBPUSD/tick/2018/DAT_ASCII_GBPUSD_T_201811.zip": {
+          "rows": 1564876,
+          "sha256": "acc55d3a665b2136bfad890058a6bca56f84bde57b2320b325d4e6f060e74729",
+          "size_bytes": 8466522
+        },
+        "GBPUSD/tick/2018/DAT_ASCII_GBPUSD_T_201812.zip": {
+          "rows": 2348567,
+          "sha256": "41803c3a02b551ebabbf91a9fddec85346eabf1f9d2b4c04f7579da84d0135a7",
+          "size_bytes": 13384745
+        },
+        "GBPUSD/tick/2019/DAT_ASCII_GBPUSD_T_201901.zip": {
+          "rows": 3523382,
+          "sha256": "2daaf8928519ee71c0322842e164a04930ef13e4d5be8e3075659f543b956fc5",
+          "size_bytes": 21032485
+        },
+        "GBPUSD/tick/2019/DAT_ASCII_GBPUSD_T_201902.zip": {
+          "rows": 2949760,
+          "sha256": "888d965e71a85dcb0fff141a0b2cbbb34e4029f6166d6ee1837c1c7d246c100b",
+          "size_bytes": 17249080
+        },
+        "GBPUSD/tick/2019/DAT_ASCII_GBPUSD_T_201903.zip": {
+          "rows": 3509830,
+          "sha256": "69a0b0ac4cad61e6b3640bf2d95ac4eced296ad809971c161a9d309fcc7b8e76",
+          "size_bytes": 21022103
+        },
+        "GBPUSD/tick/2019/DAT_ASCII_GBPUSD_T_201904.zip": {
+          "rows": 2698687,
+          "sha256": "23a8554011e9dacf8b045a0cf2bb911d40d41195a8c96755c72fe6b3c546571c",
+          "size_bytes": 15804161
+        },
+        "GBPUSD/tick/2019/DAT_ASCII_GBPUSD_T_201905.zip": {
+          "rows": 2016211,
+          "sha256": "9cc001b6121b0a1b3c7fd2af95029633e472313efffd1c994eb5a04cabd58428",
+          "size_bytes": 12059672
+        },
+        "GBPUSD/tick/2019/DAT_ASCII_GBPUSD_T_201906.zip": {
+          "rows": 2089945,
+          "sha256": "ed9d896ec8b46422483554b7008ed264f0fcadaff4f07e5bb50b79809a4a054f",
+          "size_bytes": 12381471
+        },
+        "GBPUSD/tick/2019/DAT_ASCII_GBPUSD_T_201907.zip": {
+          "rows": 2003552,
+          "sha256": "63636c989363445859034acc16f206136596759b892a066049dd1bbdb8d7be13",
+          "size_bytes": 12024722
+        },
+        "GBPUSD/tick/2019/DAT_ASCII_GBPUSD_T_201908.zip": {
+          "rows": 2724069,
+          "sha256": "ac31928bd9ed83de0fbbe4d8345ea0fbc8aed474fd606e01c9a78600f7982542",
+          "size_bytes": 16258979
+        },
+        "GBPUSD/tick/2019/DAT_ASCII_GBPUSD_T_201909.zip": {
+          "rows": 2373271,
+          "sha256": "b9bdc05f506c8d9193bca6af91903598756536dee7eccfb8dd6299e9636505ec",
+          "size_bytes": 14116856
+        },
+        "GBPUSD/tick/2019/DAT_ASCII_GBPUSD_T_201910.zip": {
+          "rows": 2818618,
+          "sha256": "1935ef7ab7d705083349d6037f38a81038054772ca4088d81376b92b1bcf328e",
+          "size_bytes": 17267591
+        },
+        "GBPUSD/tick/2019/DAT_ASCII_GBPUSD_T_201911.zip": {
+          "rows": 1748298,
+          "sha256": "75fcfb05863648c3df7d0b86382cdb732d0d87e9da24ecf3cc2a1b862f444d32",
+          "size_bytes": 10454541
+        },
+        "GBPUSD/tick/2019/DAT_ASCII_GBPUSD_T_201912.zip": {
+          "rows": 2131867,
+          "sha256": "9b4b0ab4a57e1269d29ca0ba9cb6d3bd92e176556915f1c4ff5bf9d64a987296",
+          "size_bytes": 13032688
+        },
+        "GBPUSD/tick/2020/DAT_ASCII_GBPUSD_T_202001.zip": {
+          "rows": 2148828,
+          "sha256": "b8339c70087e4b1feb84e0684ca6f7e0099b11424d36ae570bbbf7c20419e7ff",
+          "size_bytes": 12927259
+        },
+        "GBPUSD/tick/2020/DAT_ASCII_GBPUSD_T_202002.zip": {
+          "rows": 2232793,
+          "sha256": "1083e85d94f76a839a1214fc9fda2e2bbd7812c79a791fe8fae6ba3d07c96ced",
+          "size_bytes": 13231346
+        },
+        "GBPUSD/tick/2020/DAT_ASCII_GBPUSD_T_202003.zip": {
+          "rows": 5311959,
+          "sha256": "055926ae9337b7cd8817649be835ed6c61e1f2f5e0dcad3ce18d878ec90d522b",
+          "size_bytes": 33311274
+        },
+        "GBPUSD/tick/2020/DAT_ASCII_GBPUSD_T_202004.zip": {
+          "rows": 2414516,
+          "sha256": "9558ab47427368e9d8abe7752a32b1db0879c14bc083c4af98a32cc85b3baadf",
+          "size_bytes": 15246724
+        },
+        "GBPUSD/tick/2020/DAT_ASCII_GBPUSD_T_202005.zip": {
+          "rows": 2264025,
+          "sha256": "5c1bdfc16a32611fec354b38486238d3afde4a69acf2cd604055701ef7841d3c",
+          "size_bytes": 14066836
+        },
+        "GBPUSD/tick/2020/DAT_ASCII_GBPUSD_T_202006.zip": {
+          "rows": 3038109,
+          "sha256": "88ad407e60d32ee008937fb044d5d711cc510b360b676f3db49b227788c1fd4a",
+          "size_bytes": 18997126
+        },
+        "GBPUSD/tick/2020/DAT_ASCII_GBPUSD_T_202007.zip": {
+          "rows": 2272787,
+          "sha256": "1a96bff6ed0b96c6cae8d43e9de06918e5aa749230fa5b63ba9ed7f002cf252f",
+          "size_bytes": 14211879
+        },
+        "GBPUSD/tick/2020/DAT_ASCII_GBPUSD_T_202008.zip": {
+          "rows": 2197745,
+          "sha256": "48bf40fbe085294c13490ec287edb227c36ee177fad24a6041769ab4b5fa2ae1",
+          "size_bytes": 13852566
+        },
+        "GBPUSD/tick/2020/DAT_ASCII_GBPUSD_T_202009.zip": {
+          "rows": 2620570,
+          "sha256": "4e3a96d12d3fb6406c3000cb885936dcf7f79da16a8e6b09b04ddc9e2a0537ab",
+          "size_bytes": 16953195
+        },
+        "GBPUSD/tick/2020/DAT_ASCII_GBPUSD_T_202010.zip": {
+          "rows": 2622233,
+          "sha256": "438182fc4b7a427e0be64ba13f2aee54c77d3caabfe9db1128896b1cbbb1ebfa",
+          "size_bytes": 16752531
+        },
+        "GBPUSD/tick/2020/DAT_ASCII_GBPUSD_T_202011.zip": {
+          "rows": 2594978,
+          "sha256": "abc6214221491858228a9421bc17ce8cbdf78b7cec9593f80883e3065e57c476",
+          "size_bytes": 16581757
+        },
+        "GBPUSD/tick/2020/DAT_ASCII_GBPUSD_T_202012.zip": {
+          "rows": 2476321,
+          "sha256": "08ff5c60e60ea862ef72f6a2070fe0ca090bdfaf2e8c6be3e450132da9bc0216",
+          "size_bytes": 16258168
+        },
+        "GBPUSD/tick/2021/DAT_ASCII_GBPUSD_T_202101.zip": {
+          "rows": 2260098,
+          "sha256": "d8d9cd36cd68ff61bbff4efb9a3cfff4cc0a30f8479b4e99fa77b0dd36f813ea",
+          "size_bytes": 14573952
+        },
+        "GBPUSD/tick/2021/DAT_ASCII_GBPUSD_T_202102.zip": {
+          "rows": 1685324,
+          "sha256": "1b0ad983ebb844b5bb514263d864a5c05b7fdd86c5bd2664d9d03b0fc927bf0d",
+          "size_bytes": 10909589
+        },
+        "GBPUSD/tick/2021/DAT_ASCII_GBPUSD_T_202103.zip": {
+          "rows": 2008728,
+          "sha256": "4a1fa691b73ecc1f6f84481e45a982f8b3d8d93e36588b61d955ce27fe20b7e9",
+          "size_bytes": 13214366
+        },
+        "GBPUSD/tick/2021/DAT_ASCII_GBPUSD_T_202104.zip": {
+          "rows": 1380953,
+          "sha256": "141600176078ba60b75b4d6a99942aa2723704b7eb6628ec3886b57a4995e4fa",
+          "size_bytes": 9148465
+        },
+        "GBPUSD/tick/2021/DAT_ASCII_GBPUSD_T_202105.zip": {
+          "rows": 1471411,
+          "sha256": "2a438a8748ca72a443f1296ce4c2e7d0d3d6bff6085864f265bc05d92ea6ee56",
+          "size_bytes": 9678344
+        },
+        "GBPUSD/tick/2021/DAT_ASCII_GBPUSD_T_202106.zip": {
+          "rows": 1734710,
+          "sha256": "32a185e37bfd1533b0f354f434dae37dc32b3825b7049e718f73b889367d4e91",
+          "size_bytes": 11213613
+        },
+        "GBPUSD/tick/2021/DAT_ASCII_GBPUSD_T_202107.zip": {
+          "rows": 1973281,
+          "sha256": "5110a501fab83f08a3b66620aab5222bea0362f3c7ee8b7d315e663b66acdea1",
+          "size_bytes": 12660945
+        },
+        "GBPUSD/tick/2021/DAT_ASCII_GBPUSD_T_202108.zip": {
+          "rows": 1111519,
+          "sha256": "b438c51595d4c27ef8752c8ac673f7f141a553f862bbd2c10faee49bc45d9cd4",
+          "size_bytes": 7316226
+        },
+        "GBPUSD/tick/2021/DAT_ASCII_GBPUSD_T_202109.zip": {
+          "rows": 1440430,
+          "sha256": "d0b06d697e2dd4ad838f63a560291ee4d1a29b57c6d141eb37993b710a3568db",
+          "size_bytes": 9373335
+        },
+        "GBPUSD/tick/2021/DAT_ASCII_GBPUSD_T_202110.zip": {
+          "rows": 1532512,
+          "sha256": "0179c17536bccfcaf5d8cc96dd2f752c5c313489f52376ee3ee19064d2cbd8c3",
+          "size_bytes": 9972344
+        },
+        "GBPUSD/tick/2021/DAT_ASCII_GBPUSD_T_202111.zip": {
+          "rows": 1906378,
+          "sha256": "47b46a9d4e5e68d3f996059c7c65f5f5a5ea02f309cd9cb48087f82cd39d9497",
+          "size_bytes": 12289150
+        },
+        "GBPUSD/tick/2021/DAT_ASCII_GBPUSD_T_202112.zip": {
+          "rows": 1827681,
+          "sha256": "c60bee6496995d6ea972dcb4a163e4324c554e6a46b7d433043cadbc23337e03",
+          "size_bytes": 11627640
+        },
+        "GBPUSD/tick/2022/DAT_ASCII_GBPUSD_T_202201.zip": {
+          "rows": 1668277,
+          "sha256": "733681402e877326c784adc84152446845602f5bcb02f9659169fddd5c58ca26",
+          "size_bytes": 10656182
+        },
+        "GBPUSD/tick/2022/DAT_ASCII_GBPUSD_T_202202.zip": {
+          "rows": 2067812,
+          "sha256": "c3477d6502ea5d9807310d5d215a4e4f8e4ccbef9840d146735176d64b470424",
+          "size_bytes": 13180415
+        },
+        "GBPUSD/tick/2022/DAT_ASCII_GBPUSD_T_202203.zip": {
+          "rows": 2832613,
+          "sha256": "74e333ac8af37862236f2e136dd68ec6afe237436abedd19b19c44ffb8d25b85",
+          "size_bytes": 17983919
+        },
+        "GBPUSD/tick/2022/DAT_ASCII_GBPUSD_T_202204.zip": {
+          "rows": 2264785,
+          "sha256": "f8b5ffddecff8bf7f7136276ea19eb323bb43700f75461a7091a6e861d12c863",
+          "size_bytes": 14364729
+        },
+        "GBPUSD/tick/2022/DAT_ASCII_GBPUSD_T_202205.zip": {
+          "rows": 2926954,
+          "sha256": "9af2aa44684f078ce297f792a62b55237d10d1a1f4ca426af4107edd502e33e6",
+          "size_bytes": 18802289
+        },
+        "GBPUSD/tick/2022/DAT_ASCII_GBPUSD_T_202206.zip": {
+          "rows": 3376110,
+          "sha256": "5afb825a519abede4d2771de33ae8d68595de6c712c57e4ee438669b410ca273",
+          "size_bytes": 21514038
+        },
+        "GBPUSD/tick/2022/DAT_ASCII_GBPUSD_T_202207.zip": {
+          "rows": 3854085,
+          "sha256": "6b0447fa0fdeba6a87de963758d774fe9e89929a1e548f973f7834fa373dd37a",
+          "size_bytes": 24278736
+        },
+        "GBPUSD/tick/2022/DAT_ASCII_GBPUSD_T_202208.zip": {
+          "rows": 3569248,
+          "sha256": "c9191ebf55a2f3c48ff1a7220dec602ec90cc328692910aaa3defa8395607a2c",
+          "size_bytes": 22613095
+        },
+        "GBPUSD/tick/2022/DAT_ASCII_GBPUSD_T_202209.zip": {
+          "rows": 4834358,
+          "sha256": "5a8c85a24189b8883be551fd4c4299381b30a8c349c70bdc8bf95c41c4316a0a",
+          "size_bytes": 30733672
+        },
+        "GBPUSD/tick/2022/DAT_ASCII_GBPUSD_T_202210.zip": {
+          "rows": 6326252,
+          "sha256": "5f92139f273db32d925abc8c285d665742982decba155a5d0ae59f001db5d974",
+          "size_bytes": 39684217
+        },
+        "GBPUSD/tick/2022/DAT_ASCII_GBPUSD_T_202211.zip": {
+          "rows": 5690692,
+          "sha256": "dd94aac527405ebc24ce03fdde32aa76078e8544a6d6ee3765117d65df0ebe7d",
+          "size_bytes": 35414851
+        },
+        "GBPUSD/tick/2022/DAT_ASCII_GBPUSD_T_202212.zip": {
+          "rows": 4311650,
+          "sha256": "df4e4a5892c43a4e48a93aef1346ce282ba3177525ea950a838a804d204f77d0",
+          "size_bytes": 27031363
+        },
+        "GBPUSD/tick/2023/DAT_ASCII_GBPUSD_T_202301.zip": {
+          "rows": 3569528,
+          "sha256": "69043e70310efac354c1026cc1ddb19d7c7fcc1b4a8305bc1ed515aef9ecadf2",
+          "size_bytes": 22732190
+        },
+        "GBPUSD/tick/2023/DAT_ASCII_GBPUSD_T_202302.zip": {
+          "rows": 2606271,
+          "sha256": "aa2551f577175766e5c4a09fdfdddf63e5cc9ea8915a3772a92182e72425b8fa",
+          "size_bytes": 16645123
+        },
+        "GBPUSD/tick/2023/DAT_ASCII_GBPUSD_T_202303.zip": {
+          "rows": 2488123,
+          "sha256": "77ae7409b816d6efec6edc9eaf73185d35aabfe25d06d59eb7064603de1829a4",
+          "size_bytes": 15754093
+        },
+        "GBPUSD/tick/2023/DAT_ASCII_GBPUSD_T_202304.zip": {
+          "rows": 1359824,
+          "sha256": "75c4a9dc409b63fcda2835943f36cae06483c5bb1d9a65428c698675649de7e4",
+          "size_bytes": 8749992
+        },
+        "GBPUSD/tick/2023/DAT_ASCII_GBPUSD_T_202305.zip": {
+          "rows": 1477960,
+          "sha256": "5a876829771b9b2d8ecc3f9e537462323eab033f6a86d62585f07d2e5c2bcaee",
+          "size_bytes": 9492375
+        },
+        "GBPUSD/tick/2023/DAT_ASCII_GBPUSD_T_202306.zip": {
+          "rows": 1521918,
+          "sha256": "00de8e7c2baaa5deb6e4cc382f9c449406acfa6533dcaf08ad799f4170136893",
+          "size_bytes": 9707186
+        },
+        "GBPUSD/tick/2023/DAT_ASCII_GBPUSD_T_202307.zip": {
+          "rows": 1541196,
+          "sha256": "aa78a1097f3e96c59116cc2f0c426be3197d8f191bd5cd45ecdc3aa0ee19eebc",
+          "size_bytes": 9836320
+        },
+        "GBPUSD/tick/2023/DAT_ASCII_GBPUSD_T_202308.zip": {
+          "rows": 2393897,
+          "sha256": "bfbdca1e98194226f4ed341530f6b6aa4e2caf10c53553ba1b69036ec5a77036",
+          "size_bytes": 15168110
+        },
+        "GBPUSD/tick/2023/DAT_ASCII_GBPUSD_T_202309.zip": {
+          "rows": 1944829,
+          "sha256": "5bbe1dee141c9e27deb45b01948e296f31770d3564a8140303144b5f65bcd501",
+          "size_bytes": 12309046
+        },
+        "GBPUSD/tick/2023/DAT_ASCII_GBPUSD_T_202310.zip": {
+          "rows": 2105144,
+          "sha256": "a2076522d0f3ee96a824c19153cb477f4e62dbf6a308499f3ec1e65819ca74b9",
+          "size_bytes": 13464020
+        },
+        "GBPUSD/tick/2023/DAT_ASCII_GBPUSD_T_202311.zip": {
+          "rows": 1946597,
+          "sha256": "d4a8e50a2d3894b308829b9bcb10d0f6e975985b9b50c9398dd1076c9f0ff0d1",
+          "size_bytes": 12454417
+        },
+        "GBPUSD/tick/2023/DAT_ASCII_GBPUSD_T_202312.zip": {
+          "rows": 2053529,
+          "sha256": "67459131f4f55b5ca7317e5904ef4b9eda243374adb8e262ee41dd06d610831c",
+          "size_bytes": 13022994
+        },
+        "GBPUSD/tick/2024/DAT_ASCII_GBPUSD_T_202401.zip": {
+          "rows": 2146970,
+          "sha256": "9d6ad5449985d0bcc7e21b1a1c1ed136208b91329d6cf5b975f3ec87bace566d",
+          "size_bytes": 13735128
+        },
+        "GBPUSD/tick/2024/DAT_ASCII_GBPUSD_T_202402.zip": {
+          "rows": 1577446,
+          "sha256": "29f9d9476da91d8a9b1e192686ae740c5cc7ec234de5811f0f24aab71fe67b7b",
+          "size_bytes": 10064305
+        },
+        "GBPUSD/tick/2024/DAT_ASCII_GBPUSD_T_202403.zip": {
+          "rows": 1441689,
+          "sha256": "95f4cefaa1ec46147356c1896c656238657da1c0b257a576174ffe2c48f6f80c",
+          "size_bytes": 9142597
+        },
+        "GBPUSD/tick/2024/DAT_ASCII_GBPUSD_T_202404.zip": {
+          "rows": 1640965,
+          "sha256": "aeb4ab0d738536c4f3ce20d928862ffc171da6e505780a3513a1dccd145f91a2",
+          "size_bytes": 10499541
+        },
+        "GBPUSD/tick/2024/DAT_ASCII_GBPUSD_T_202405.zip": {
+          "rows": 1438772,
+          "sha256": "82816d9eda7fa72dea9f12d75273d11f828d120e438be371071c19bd4dacb4a4",
+          "size_bytes": 9222936
+        },
+        "GBPUSD/tick/2024/DAT_ASCII_GBPUSD_T_202406.zip": {
+          "rows": 1247414,
+          "sha256": "e31be6e44698404ec86d20394c1e3728afb043649f479f019d01af22936804d3",
+          "size_bytes": 7965217
+        },
+        "GBPUSD/tick/2024/DAT_ASCII_GBPUSD_T_202407.zip": {
+          "rows": 1668925,
+          "sha256": "d298df38b192cb20d1e0f0d798a5a3ffb897398972a37ae4ac10c02b7c1c58e3",
+          "size_bytes": 10345492
+        },
+        "GBPUSD/tick/2024/DAT_ASCII_GBPUSD_T_202408.zip": {
+          "rows": 1739640,
+          "sha256": "bfe0b46b64c569ae2116210021c3cccfcde87e03cad021f88f973ebdf495897e",
+          "size_bytes": 11108827
+        },
+        "GBPUSD/tick/2024/DAT_ASCII_GBPUSD_T_202409.zip": {
+          "rows": 1937063,
+          "sha256": "c9c71292bdb749b1980f8443a8efb50ee12f17781b2f774d1e4b32f3e6eae2c7",
+          "size_bytes": 12197022
+        },
+        "GBPUSD/tick/2024/DAT_ASCII_GBPUSD_T_202410.zip": {
+          "rows": 2217806,
+          "sha256": "398682f99deca509cd480b7f846aace951a8bfd0490eb78843e26b67626e1dd7",
+          "size_bytes": 13898878
+        },
+        "GBPUSD/tick/2024/DAT_ASCII_GBPUSD_T_202411.zip": {
+          "rows": 2745142,
+          "sha256": "444dd370c5867aacbbd2e35bfe5859f169fe2e10892ccdb3e8633e3fc3938f1a",
+          "size_bytes": 17111715
+        },
+        "GBPUSD/tick/2024/DAT_ASCII_GBPUSD_T_202412.zip": {
+          "rows": 2152123,
+          "sha256": "11293d447fac7bf6172d35da2617988bd8422b17ed456c26dc6092e31003481c",
+          "size_bytes": 13587276
+        },
+        "GBPUSD/tick/2025/DAT_ASCII_GBPUSD_T_202501.zip": {
+          "rows": 2660109,
+          "sha256": "665455f96f31328ee663d1fe9088098c700fcbba8d85352cbc6fdb4f17cdaee1",
+          "size_bytes": 17001617
+        },
+        "GBPUSD/tick/2025/DAT_ASCII_GBPUSD_T_202502.zip": {
+          "rows": 2193261,
+          "sha256": "d26d6dc30825449f8702e624b86c1ed4f99818c68079e55332443ac42020ba85",
+          "size_bytes": 13881477
+        },
+        "GBPUSD/tick/2025/DAT_ASCII_GBPUSD_T_202503.zip": {
+          "rows": 2078885,
+          "sha256": "4fe9df338b05381ea5b6b9d9fda054f37b049c16713c6a0698f9928f7ea9f77e",
+          "size_bytes": 13231530
+        },
+        "GBPUSD/tick/2025/DAT_ASCII_GBPUSD_T_202504.zip": {
+          "rows": 3629551,
+          "sha256": "a80cb227c94b26f5a31da8adaa710ae4d0997ab919f8292ba22e96b84eace475",
+          "size_bytes": 23001912
+        },
+        "GBPUSD/tick/2025/DAT_ASCII_GBPUSD_T_202505.zip": {
+          "rows": 1963424,
+          "sha256": "c7fea263563ea365bd5d81daf07af32f9589f32ce39b1471e280bd1e202170dc",
+          "size_bytes": 12762822
+        },
+        "GBPUSD/tick/2025/DAT_ASCII_GBPUSD_T_202506.zip": {
+          "rows": 1831134,
+          "sha256": "58e9492760f40b61d87f74692da13e98ca6c46e3688a842570cb3d1178440b31",
+          "size_bytes": 11912027
+        },
+        "GBPUSD/tick/2025/DAT_ASCII_GBPUSD_T_202507.zip": {
+          "rows": 1820380,
+          "sha256": "a27293f3c2619854be24162dd9472c24175cdf2239b2a82c4b5d8a2b02051f11",
+          "size_bytes": 11807241
+        },
+        "GBPUSD/tick/2025/DAT_ASCII_GBPUSD_T_202508.zip": {
+          "rows": 1454417,
+          "sha256": "1f959fe9f6ebc5f4a4c643a1e8d6629c25175e4ed0e6196812a87560436b8ddb",
+          "size_bytes": 9445222
+        },
+        "GBPUSD/tick/2025/DAT_ASCII_GBPUSD_T_202509.zip": {
+          "rows": 1686674,
+          "sha256": "9968322805c31cf23c3430eeb02a6c060156d60e0fc90493b655b1e0cb11380b",
+          "size_bytes": 10870822
+        },
+        "GBPUSD/tick/2025/DAT_ASCII_GBPUSD_T_202510.zip": {
+          "rows": 1791723,
+          "sha256": "c182757b21dc7f06ebb8b55c8af7e2fff7f31aaa87defb5f8d4f97a91c923a06",
+          "size_bytes": 11563329
+        },
+        "GBPUSD/tick/2025/DAT_ASCII_GBPUSD_T_202511.zip": {
+          "rows": 1675253,
+          "sha256": "960aff134df0a9e5cc0a774c8e0951364f6772c4ab69f55ebd125024db3422ab",
+          "size_bytes": 10654624
+        },
+        "GBPUSD/tick/2025/DAT_ASCII_GBPUSD_T_202512.zip": {
+          "rows": 1623208,
+          "sha256": "2e4babc75c0749ad617bf89ea73475705761ff9b1b6620c64ece375e38c83910",
+          "size_bytes": 10353051
+        },
+        "GBPUSD/tick/2026/DAT_ASCII_GBPUSD_T_202601.zip": {
+          "rows": 1808163,
+          "sha256": "e6d9381768da14a72cb1d40511954e9df8c465330ef3e39b815236540ec6eae8",
+          "size_bytes": 11659197
+        },
+        "GBPUSD/tick/2026/DAT_ASCII_GBPUSD_T_202602.zip": {
+          "rows": 1631274,
+          "sha256": "02505c92d460de9dab12bea54beec99203d55540794097196b8ec50fcac7a21b",
+          "size_bytes": 10621767
+        },
+        "GBPUSD/tick/2026/DAT_ASCII_GBPUSD_T_202603.zip": {
+          "rows": 3206939,
+          "sha256": "5bbf28d0b23d62422e676b45e7bfc7d50e8fbaea0ea7e5676ed102f9768dc9ab",
+          "size_bytes": 20559209
+        },
+        "GBPUSD/tick/2026/DAT_ASCII_GBPUSD_T_202604.zip": {
+          "rows": 903053,
+          "sha256": "41af7c7c757f20aeda3479f005a725233e4f770b81b0a8269c34c769656ad244",
+          "size_bytes": 5710838
+        }
+      },
+      "latest_month": "202604",
+      "total_files": 196,
+      "total_size_bytes": 1936133009
     }
   }
 }

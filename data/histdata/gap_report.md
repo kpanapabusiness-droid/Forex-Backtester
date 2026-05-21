@@ -1,6 +1,6 @@
 # HistData coverage and gap report
 
-Generated: 2026-05-21T00:00:39+00:00  
+Generated: 2026-05-21T05:01:46+00:00  
 Window: 201001 → 202604 (196 months)
 
 ## Summary
@@ -25,9 +25,9 @@ Window: 201001 → 202604 (196 months)
 | GBPAUD | 196 | 196 | 100.0% | 201001 | 202604 |  2464.6 |  395201851 |
 | GBPCAD | 196 | 196 | 100.0% | 201001 | 202604 |  2208.9 |  363171075 |
 | GBPCHF | 196 | 196 | 100.0% | 201001 | 202604 |  1893.2 |  316692936 |
-| GBPJPY | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
-| GBPNZD | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
-| GBPUSD | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
+| GBPJPY | 196 | 196 | 100.0% | 201001 | 202604 |  2723.3 |  439207056 |
+| GBPNZD | 196 | 196 | 100.0% | 201001 | 202604 |  2236.1 |  354515902 |
+| GBPUSD | 196 | 196 | 100.0% | 201001 | 202604 |  1936.1 |  324727260 |
 | NZDCAD | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
 | NZDCHF | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
 | NZDJPY | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
@@ -35,7 +35,7 @@ Window: 201001 → 202604 (196 months)
 | USDCAD | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
 | USDCHF | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
 | USDJPY | 0 | 196 |   0.0% | — | — |     0.0 |          0 |
-| **TOTAL** | **3528** | **5488** | ** 64.3%** | — | — | **34785.2** | **5863735850** |
+| **TOTAL** | **4116** | **5488** | ** 75.0%** | — | — | **41680.6** | **6982186068** |
 
 ## Per-pair detail
 
@@ -149,18 +149,21 @@ Window: 201001 → 202604 (196 months)
 
 ### GBPJPY
 
-- **No months observed.**
-- Real coverage gap (before HistData has data): 196 months, 201001–202604
+- First observed month: **201001**  (real coverage start)
+- Last observed month:  **202604**
+- Observed months: **196 / 196**
 
 ### GBPNZD
 
-- **No months observed.**
-- Real coverage gap (before HistData has data): 196 months, 201001–202604
+- First observed month: **201001**  (real coverage start)
+- Last observed month:  **202604**
+- Observed months: **196 / 196**
 
 ### GBPUSD
 
-- **No months observed.**
-- Real coverage gap (before HistData has data): 196 months, 201001–202604
+- First observed month: **201001**  (real coverage start)
+- Last observed month:  **202604**
+- Observed months: **196 / 196**
 
 ### NZDCAD
 

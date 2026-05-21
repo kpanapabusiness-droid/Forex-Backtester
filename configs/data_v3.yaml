@@ -1,0 +1,53 @@
+# configs/data_v3.yaml
+# v3.0 data-layer config — paths into the HistData M1 layer + parquet cache roots.
+#
+# Used by `core.data.histdata_loader.load_m1(pair, ...)` and
+# `core.data.aggregator.aggregate(pair, tf, ...)`. All paths are relative to
+# the repo root.
+#
+# CC_06 PR-A landed: data loader + aggregator + per-pair parquet caching with
+# m1_manifest.json-keyed invalidation. See docs/dispatches/backtester_reconfig_log.md.
+
+data:
+  # Root of the HistData layer. Contains:
+  #   <PAIR>/tick/<YYYY>/...zip      (canonical raw — out of scope for the loader)
+  #   <PAIR>/m1/{bid,ask}/<YYYY>/... (derived, read by load_m1)
+  #   m1_manifest.json               (cache-invalidation source)
+  histdata_root: data/histdata
+
+  # Parquet cache root. Layout under this dir:
+  #   m1/<PAIR>.parquet              (joined bid+ask M1, by load_m1)
+  #   {M5,M15,M30,H1,H4,D1,W1}/<PAIR>.parquet  (aggregated TFs, by aggregate)
+  #   *.parquet.meta.json            (sidecar with cache_key + source manifest sha256)
+  cache_root: data/cache
+
+# 28-pair universe — same set as KH-24 and the L_arc series.
+pairs:
+  - AUDCAD
+  - AUDCHF
+  - AUDJPY
+  - AUDNZD
+  - AUDUSD
+  - CADCHF
+  - CADJPY
+  - CHFJPY
+  - EURAUD
+  - EURCAD
+  - EURCHF
+  - EURGBP
+  - EURJPY
+  - EURNZD
+  - EURUSD
+  - GBPAUD
+  - GBPCAD
+  - GBPCHF
+  - GBPJPY
+  - GBPNZD
+  - GBPUSD
+  - NZDCAD
+  - NZDCHF
+  - NZDJPY
+  - NZDUSD
+  - USDCAD
+  - USDCHF
+  - USDJPY

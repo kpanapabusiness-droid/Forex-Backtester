@@ -106,6 +106,7 @@ Chat decides next step from the diagnostic.
 |---|---|
 | `L_PROTOCOL.md` | Only at major redesign events |
 | `docs/sub_protocols/*` | When sub-protocol is amended |
+| `docs/templates/ARC_CLOSURE_TEMPLATE.md` | Only at major redesign events (template version bump) |
 | `WORKFLOW.md` (this file) | When operational conventions evolve |
 | `ARC_TRACKER.md` | Auto on arc open / close per L_PROTOCOL §6 |
 | `ARC_HISTORY.md` | Never (frozen at v3.0 start) |

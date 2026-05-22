@@ -42,7 +42,6 @@ from core.sim.panel import Panel
 from core.sim.risk.reset_floor import ResetFloorAccount
 from core.sim.trailing_stop import TrailManager
 from core.strategies.kh24.exits.kijun_d1 import make_kijun_d1_exit_predicate
-from core.strategies.kh24.filters.d1_regime import D1RegimeParams, evaluate_d1_regime
 from core.strategies.kh24.filters.h1_cir import H1CIRParams, evaluate_h1_cir
 from core.strategies.kh24.signal import KH24SignalParams, evaluate_kh24_signal
 
@@ -57,8 +56,14 @@ class KH24Config:
     """
 
     signal: KH24SignalParams = field(default_factory=KH24SignalParams)
-    d1_regime: D1RegimeParams = field(default_factory=D1RegimeParams)
     h1_cir: H1CIRParams = field(default_factory=H1CIRParams)
+    # Note: there is no separate D1 regime filter in this assembly. The EA's
+    # ``EvalSignal`` enforces the D1 regime check via signal conditions
+    # C8 (prev D1 close > prev D1 Kijun) and C9 (close ≤ Kijun + 1×ATR).
+    # The standalone ``core.strategies.kh24.filters.d1_regime`` module is
+    # retained for future arcs that want the gate without the bundled
+    # C1-C7 conditions, but it's not used here. See PR-E.1.5 diff doc
+    # Section C for the bisect evidence (Step 1 == Step 2 byte-identical).
     # SL = entry - sl_atr_mult × ATR(14) at entry
     sl_atr_mult: float = 2.0
     # Trailing stop: activate at +trail_activation_atr × ATR; trail behind highest close
@@ -84,7 +89,6 @@ class _PerPairState:
 
     signal_mask: pd.Series  # bool, indexed by H4 timestamp
     atr_h4: pd.Series  # float
-    d1_regime: pd.Series  # bool
     h1_cir: pd.Series  # bool
     exit_predicate: ExitPredicate
     h4_open_ask: pd.Series  # for entry-price computation
@@ -122,12 +126,10 @@ def _precompute_pair(
 ) -> _PerPairState:
     """Run the signal + filters once per pair; return a runtime cache."""
     sig_result = evaluate_kh24_signal(df_h4, df_d1, params=cfg.signal)
-    regime = evaluate_d1_regime(df_h4, df_d1, params=cfg.d1_regime)
     cir = evaluate_h1_cir(df_h4, df_h1, params=cfg.h1_cir)
     return _PerPairState(
         signal_mask=pd.Series(sig_result.signal_mask, index=df_h4.index),
         atr_h4=pd.Series(sig_result.atr_h4, index=df_h4.index),
-        d1_regime=pd.Series(regime, index=df_h4.index),
         h1_cir=pd.Series(cir, index=df_h4.index),
         exit_predicate=make_kijun_d1_exit_predicate(
             pair, df_h4, df_d1, kijun_period=cfg.signal.d1_kijun_period
@@ -181,10 +183,10 @@ def build_kh24_runtime(
             state = per_pair[pair]
             if t not in state.signal_mask.index:
                 continue
-            # Read precomputed booleans at this H4 timestamp
+            # Read precomputed booleans at this H4 timestamp.
+            # (No separate D1 regime gate — signal C8+C9 enforce identical logic.
+            # See PR-E.1.5 diff doc Section C.)
             if not bool(state.signal_mask.loc[t]):
-                continue
-            if not bool(state.d1_regime.loc[t]):
                 continue
             if not bool(state.h1_cir.loc[t]):
                 continue

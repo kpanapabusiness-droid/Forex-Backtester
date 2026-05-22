@@ -39,10 +39,9 @@ from core.sim.account import Account, Direction, ExposureRules
 from core.sim.exit_hooks import ExitPredicate
 from core.sim.multipair_backtester import Order, StrategyFn
 from core.sim.panel import Panel
-from core.sim.risk.reset_floor import ResetFloorAccount
+from core.sim.risk.live_balance import LiveBalanceRisk
 from core.sim.trailing_stop import TrailManager
 from core.strategies.kh24.exits.kijun_d1 import make_kijun_d1_exit_predicate
-from core.strategies.kh24.filters.d1_regime import D1RegimeParams, evaluate_d1_regime
 from core.strategies.kh24.filters.h1_cir import H1CIRParams, evaluate_h1_cir
 from core.strategies.kh24.signal import KH24SignalParams, evaluate_kh24_signal
 
@@ -57,23 +56,38 @@ class KH24Config:
     """
 
     signal: KH24SignalParams = field(default_factory=KH24SignalParams)
-    d1_regime: D1RegimeParams = field(default_factory=D1RegimeParams)
     h1_cir: H1CIRParams = field(default_factory=H1CIRParams)
+    # Note: there is no separate D1 regime filter in this assembly. The EA's
+    # ``EvalSignal`` enforces the D1 regime check via signal conditions
+    # C8 (prev D1 close > prev D1 Kijun) and C9 (close ≤ Kijun + 1×ATR).
+    # The standalone ``core.strategies.kh24.filters.d1_regime`` module is
+    # retained for future arcs that want the gate without the bundled
+    # C1-C7 conditions, but it's not used here. See PR-E.1.5 diff doc
+    # Section C for the bisect evidence (Step 1 == Step 2 byte-identical).
     # SL = entry - sl_atr_mult × ATR(14) at entry
     sl_atr_mult: float = 2.0
     # Trailing stop: activate at +trail_activation_atr × ATR; trail behind highest close
     # by trail_distance_atr × ATR (bar-close updates only)
     trail_activation_atr: float = 2.0
     trail_distance_atr: float = 1.5
-    # Risk: 1% of reset-floor balance per trade
+    # Risk: 1% of LIVE balance per trade — matches EA's
+    # AccountInfoDouble(ACCOUNT_BALANCE) × RiskPercent/100 convention
+    # (compounds with realised PnL). Per PR-E.1.6 diff doc Section E.
     risk_pct: float = 0.01
     starting_balance: float = 100_000.0
-    # Exposure: KH-24 deployment cap = 2 concurrent open positions account-wide
+    # Exposure (per PR-E.1.6 diff doc Section F):
+    #   - Per-currency cap = 2 (matches EA's ExposureCap=2 applied PER currency
+    #     via CountCurrencyExposure)
+    #   - Per-pair cap = 1 (implicit in EA via FindPosition gate)
+    #   - NO total cap (EA does not impose one; total open positions can exceed 2
+    #     as long as no single currency reaches the per-currency cap)
+    # Prior misconfiguration (max_concurrent_total=2) was wildly more restrictive
+    # than the EA and accounted for a large fraction of trade-count drift.
     exposure: ExposureRules = field(
         default_factory=lambda: ExposureRules(
-            max_concurrent_total=2,
+            max_concurrent_total=None,
             max_concurrent_per_pair=1,
-            max_concurrent_per_currency=None,
+            max_concurrent_per_currency=2,
         )
     )
 
@@ -84,7 +98,6 @@ class _PerPairState:
 
     signal_mask: pd.Series  # bool, indexed by H4 timestamp
     atr_h4: pd.Series  # float
-    d1_regime: pd.Series  # bool
     h1_cir: pd.Series  # bool
     exit_predicate: ExitPredicate
     h4_open_ask: pd.Series  # for entry-price computation
@@ -98,14 +111,13 @@ class KH24Runtime:
     ``account``, ``trail_manager``, and ``exit_predicates`` are the
     same objects the driver should be constructed with.
 
-    ``floor`` is the reset-floor accounting layer; the driver calls
-    ``floor.update_at_day_close(t, balance)`` at each daily UTC
-    boundary (handled inside the strategy callable on each new-day
-    bar).
+    ``risk`` is the live-balance sizing layer (matches EA's
+    ``AccountInfoDouble(ACCOUNT_BALANCE)`` convention). Sizing is
+    consulted at signal time and reads the account's current balance.
     """
 
     account: Account
-    floor: ResetFloorAccount
+    risk: LiveBalanceRisk
     trail_manager: TrailManager
     exit_predicates: tuple[ExitPredicate, ...]
     strategy: StrategyFn
@@ -122,12 +134,10 @@ def _precompute_pair(
 ) -> _PerPairState:
     """Run the signal + filters once per pair; return a runtime cache."""
     sig_result = evaluate_kh24_signal(df_h4, df_d1, params=cfg.signal)
-    regime = evaluate_d1_regime(df_h4, df_d1, params=cfg.d1_regime)
     cir = evaluate_h1_cir(df_h4, df_h1, params=cfg.h1_cir)
     return _PerPairState(
         signal_mask=pd.Series(sig_result.signal_mask, index=df_h4.index),
         atr_h4=pd.Series(sig_result.atr_h4, index=df_h4.index),
-        d1_regime=pd.Series(regime, index=df_h4.index),
         h1_cir=pd.Series(cir, index=df_h4.index),
         exit_predicate=make_kijun_d1_exit_predicate(
             pair, df_h4, df_d1, kijun_period=cfg.signal.d1_kijun_period
@@ -163,7 +173,7 @@ def build_kh24_runtime(
         )
 
     account = Account(starting_balance=cfg.starting_balance, exposure=cfg.exposure)
-    floor = ResetFloorAccount(starting_balance=cfg.starting_balance, risk_pct=cfg.risk_pct)
+    risk = LiveBalanceRisk(risk_pct=cfg.risk_pct)
     trail_manager = TrailManager()
     exit_predicates = tuple(per_pair[p].exit_predicate for p in sorted(per_pair))
 
@@ -172,40 +182,34 @@ def build_kh24_runtime(
         snapshot: dict[str, pd.Series | None],
         acct: Account,
     ) -> list[Order]:
-        # Daily ratchet: at first H4 bar of each UTC day, update floor
-        # using prior balance.
-        floor.update_at_day_close(t, acct.balance)
-
         orders: list[Order] = []
         for pair in sorted(per_pair):  # deterministic order
             state = per_pair[pair]
             if t not in state.signal_mask.index:
                 continue
-            # Read precomputed booleans at this H4 timestamp
+            # Read precomputed booleans at this H4 timestamp.
+            # (No separate D1 regime gate — signal C8+C9 enforce identical logic.
+            # See PR-E.1.5 diff doc Section C.)
             if not bool(state.signal_mask.loc[t]):
-                continue
-            if not bool(state.d1_regime.loc[t]):
                 continue
             if not bool(state.h1_cir.loc[t]):
                 continue
-            # Compute SL from ATR-at-signal; entry price is approximated
-            # as bar's open_ask + spread (driver will use the actual
-            # next-bar open_ask when filling, but we need a numeric SL
-            # *price* for the Order). KH-24's SL is anchored to the
-            # entry price, so we use this H4 bar's close_ask as a
-            # proxy for next-bar open (acceptable: spread is small on
-            # FX majors; the exact entry price is unknown until next bar).
             bar = snapshot.get(pair)
             if bar is None:
                 continue
             atr_val = state.atr_h4.loc[t]
             if pd.isna(atr_val) or atr_val <= 0:
                 continue
-            # Use close_ask of current bar as a proxy for next-bar entry
+            # SL anchored to the realised entry price post-fill is a
+            # future fix (PR-E.1.6 diff doc Section H DEFERRED). For now,
+            # use this bar's close_ask as a proxy for next-bar open_ask
+            # entry. KH-24 EA pattern: SL = entry - 2*ATR(14).
             entry_proxy = float(bar["close_ask"])
             sl_price = entry_proxy - cfg.sl_atr_mult * float(atr_val)
-            size = floor.risk_size(
-                entry_price=entry_proxy, sl_price=sl_price, risk_pct=cfg.risk_pct
+            # Size from LIVE balance (compounds with PnL) — matches EA's
+            # AccountInfoDouble(ACCOUNT_BALANCE) × RiskPercent/100.
+            size = risk.risk_size(
+                acct, entry_price=entry_proxy, sl_price=sl_price, risk_pct=cfg.risk_pct
             )
             orders.append(
                 Order(
@@ -223,7 +227,7 @@ def build_kh24_runtime(
 
     return KH24Runtime(
         account=account,
-        floor=floor,
+        risk=risk,
         trail_manager=trail_manager,
         exit_predicates=exit_predicates,
         strategy=strategy,

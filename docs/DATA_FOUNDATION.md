@@ -141,17 +141,21 @@ Backup script properties:
 
 HistData tick data carries real bid and ask prices per quote update. Once the
 M1 derived layer is built, the actual spread at each minute is
-`ask[close] - bid[close]` (or any preferred aggregation: median across the
-minute, mean, etc.).
+`ask[close] - bid[close]`.
 
-`configs/spread_floors_5ers.yaml` becomes a **fallback** for bars with no
-quote activity (HistData minutes with zero ticks — rare but possible at
-weekend boundaries and on illiquid crosses). For all bars with valid bid+ask
-ticks, the real measured spread is used.
+**Strict deprecation of `spread_floors_5ers.yaml`** (locked in PR-B,
+2026-05-22). The file has been deleted along with `core/spread_floor.py`,
+the body-hash lock test, and the `.gitattributes` pin. v3 uses ONLY the
+per-bar real spread from the HistData M1 layer. Bars with zero/negative or
+NaN spread (`bid_ask_data_quality != ok`) are flagged and silently dropped
+from trade simulation — no fallback to any external floor file. This
+matches L_PROTOCOL §1 non-negotiable on real bid/ask.
 
-This dispatch does NOT modify `spread_floors_5ers.yaml`. A downstream
-protocol-redesign dispatch handles the spread-floor file as a separate
-concern.
+The full data-quality scan across all 28 pairs is in
+[docs/dispatches/pr_b_data_quality.md](dispatches/pr_b_data_quality.md).
+Per-bar gating is implemented in `core/spread/real_spread.py` and consulted
+by `core.sim.multipair_backtester._check_exits` /
+`._fill_pending_entries`.
 
 ## Aggregation
 
@@ -192,9 +196,31 @@ timestamp_utc,open,high,low,close,volume
    download log are tracked. Re-derivation is reproducible from script +
    manifest + source URL.
 
+## Cache layer (added in v3 backtester PR-A)
+
+The HistData raw layer (zips + M1 CSVs) is read-only input. The v3
+backtester maintains its own parquet cache for fast iteration:
+
+```
+data/cache/
+  m1/<PAIR>.parquet           # joined bid+ask M1 (per pair)
+  {M5,M15,M30,H1,H4,D1,W1}/<PAIR>.parquet   # aggregated TFs
+  *.parquet.meta.json         # sidecar: cache_key + source manifest sha
+  features/<arc_id>/<feature_set_hash>.parquet   # PR-D feature cache
+  features/<arc_id>/<feature_set_hash>.parquet.meta.json
+```
+
+- **Cache keys** derive from `data/histdata/m1_manifest.json` via
+  `core.data.cache_keys`. Any change to the upstream M1 layer
+  rewrites the manifest and cascades through.
+- **Aggregator** is `core.data.aggregator.aggregate(pair, tf, ...)`.
+  Higher TFs are derived from M1 at run time, not pre-materialised.
+  See [BACKTESTER_ARCHITECTURE.md](BACKTESTER_ARCHITECTURE.md).
+- The cache directory is gitignored; it is rebuilt locally on first
+  run.
+
 ## Out of scope (for this foundation dispatch)
 
-- Modifying `configs/spread_floors_5ers.yaml`.
 - Running the backtester or any L-arc step.
 - Modifying any L-arc or protocol document.
 - Cleaning up prior data directories (`data/external/...` etc.) — chat

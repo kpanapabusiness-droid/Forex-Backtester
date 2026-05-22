@@ -52,7 +52,10 @@ def test_kh24_runtime_builds_without_error(panels: tuple[Panel, Panel, Panel]) -
     runtime = build_kh24_runtime(h4, d1, h1)
     assert runtime.config.signal.atr_period == 14
     assert runtime.account.starting_balance == 100_000.0
-    assert runtime.config.exposure.max_concurrent_total == 2
+    # Per PR-E.1.6 diff doc Section F: EA caps per-currency at 2, no total cap.
+    assert runtime.config.exposure.max_concurrent_total is None
+    assert runtime.config.exposure.max_concurrent_per_currency == 2
+    assert runtime.config.exposure.max_concurrent_per_pair == 1
     # One exit predicate per pair
     assert len(runtime.exit_predicates) == len(h4.pairs)
 
@@ -164,4 +167,7 @@ def test_kh24_config_locked_defaults() -> None:
     assert cfg.trail_distance_atr == 1.5
     assert cfg.risk_pct == 0.01
     assert cfg.starting_balance == 100_000.0
-    assert cfg.exposure.max_concurrent_total == 2
+    # PR-E.1.6 §F: per-currency cap=2 matches EA; no total cap
+    assert cfg.exposure.max_concurrent_total is None
+    assert cfg.exposure.max_concurrent_per_currency == 2
+    assert cfg.exposure.max_concurrent_per_pair == 1

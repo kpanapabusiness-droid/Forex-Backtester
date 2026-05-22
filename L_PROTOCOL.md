@@ -8,7 +8,6 @@
 > **Amendment 1 (2026-05-22):** Step 5 search policy clarified — informed by Steps 3-4, not exhaustive. Multi-cluster handling + holdout decision rule specified. See §2 Step 5.
 > **Amendment 2 (2026-05-22):** ML architecture mechanics specified for A2, A3, A4, A6. See §2 Step 5 ML mechanics subsection.
 > **Amendment 3 (2026-05-22):** Risk-normalised gates. §3 constraints preserved 1:1; evaluation now occurs at scaled risk `r_safe` / `r_hard` rather than at the WFO base risk. Scalability bounds, per-day DD recount, and explicit evaluation order added. Full text archived at `archive/L_PROTOCOL_v3_0_AMENDMENT_3.md`. See §3.
-> **Amendment 4 (2026-05-23):** Step 4 fitted-classifier persistence. The best-AUC classifier per candidate cluster is refit on the full lineage-filtered pool after CV selection, pickled to `results/<arc>/step_4/classifiers/<cluster_id>.pkl`, and consumed by A2 / A6 at Step 5 without retraining. "Architecture-specific retraining policy" table added to §2 Step 5 clarifying that A2 / A6 reuse Step 4's classifier across folds and A3 / A4 still retrain per fold. Engine reference: [docs/PROTOCOL_RUNTIME.md §7](docs/PROTOCOL_RUNTIME.md).
 >
 > This protocol is the umbrella. It accepts any signal, any feature space, any architecture. Sub-protocols may layer on top to add signal-class-specific specificity. The overseer's gates and verdicts apply universally.
 
@@ -147,14 +146,6 @@ The protocol is **gates-as-rankings**. Each step computes its metrics but does n
 - `step_4/feature_importance.csv` — per-cluster permutation importance
 - `step_4/extraction_summary.md` — diagnostic narrative
 - `step_4/manifest.json`
-- `step_4/classifiers/<cluster_id>.pkl` — joblib pickle of the
-  best-AUC classifier per candidate cluster, refit on the full
-  lineage-filtered pool after CV selection. Consumed by A2 / A6 at
-  Step 5 without retraining (see Step 5 "Architecture-specific
-  retraining policy" below).
-- `step_4/classifiers/manifest.json` — SHA256 + provenance
-  (joblib / sklearn / lightgbm versions, `auc_in_sample`,
-  `auc_oos_cv5`, `trained_on_pool_size`, feature order).
 
 **Failure diagnostics:** if all AUC near 0.50, surface top features by importance anyway — tells us where the model thought signal was. Surface whether any individual feature class shows signal even if combined doesn't. Continue to Step 5 with whatever filter candidates the extraction produced (including "no filter" as a valid candidate).
 
@@ -285,23 +276,10 @@ A1 (system_level_filter) and A5 (portfolio_composition) are rule-based — no ML
 - Threshold sweep at Step 5: test {(0.3, 0.5), (0.4, 0.6), (0.5, 0.7)} as three variant configs
 - Output recorded: per-signal size decisions
 
-**Architecture-specific retraining policy (locked 2026-05-23):**
-
-| Architecture | Retraining at Step 5 | Source of fit |
-|---|---|---|
-| A1 | N/A — no classifier | rule-based filter only |
-| A2 | **No retrain** | Step 4's persisted best-AUC classifier (`step_4/classifiers/<cluster_id>.pkl`), loaded via `core.steps.classifier_persistence.build_a2_config_from_step4` |
-| A3 | **Per-fold retrain** | new path-so-far classifier, trained on each WFO fold's IS window |
-| A4 | **Per-fold retrain** | new path-so-far classifier with different target ("will trade close profitably?"), per fold |
-| A5 | N/A — no classifier | portfolio composition of upstream constituents |
-| A6 | **No retrain** | same persisted classifier as A2 (Step 4 best-AUC), loaded via `build_a6_config_from_step4` |
-
-A2 and A6 use the single Step-4-fit classifier across every WFO fold. A3 and A4 fit a fresh classifier on the IS window of each fold. The "global model" caution in the next bullet applies to A3 / A4 only — A2 / A6 are explicitly exempt per Amendment 2.
-
 **Shared discipline across all ML architectures:**
 - All classifiers respect causal lineage tags from Step 1 — no "suspect" or "unverified" features enter training
 - Deterministic training: `random_state=42`, `n_jobs=1` per Appendix A
-- For A3 / A4: per-fold WFO trains classifier on IS, evaluates on OOS — no global model trained once and used across folds. A2 / A6 are exempt per the Architecture-specific retraining policy table above.
+- Per-fold WFO trains classifier on IS, evaluates on OOS — no global model trained once and used across folds
 - Selection bias: each unique architecture × parameter set counts toward Step 5's total N
 
 3. **WFO structure (locked):**

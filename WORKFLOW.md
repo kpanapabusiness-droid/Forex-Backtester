@@ -46,6 +46,10 @@ When the work is an arc closure, the artefact set on the arc branch includes the
 
 The parser invocation is pre-PR, not post-merge — so reviewers see the tracker change in the same diff as the closure. See `scripts/tracker_parser/README.md` for full usage.
 
+**For PASS verdicts (DEPLOYABLE / VIABLE / *-PROVISIONAL / *-PENDING-STEP6)** the artefact set additionally includes:
+- `§4 deployment_spec` in the closure doc per template v1.2 §4 — self-contained porting specification.
+- `best_architecture.config_artefact_path` populated in §1 tracker_payload and the referenced YAML file present at that path (relative to repo root). The parser HALTs at exit code 1 if either is missing or the file does not exist (template Section 4-L). Reconstruct the YAML from artefacts if it does not exist, document reconstruction in §4.10.
+
 ---
 
 ## §3 Branch + worktree conventions
@@ -117,7 +121,7 @@ Chat decides next step from the diagnostic.
 |---|---|
 | `L_PROTOCOL.md` | Only at major redesign events |
 | `docs/sub_protocols/*` | When sub-protocol is amended |
-| `docs/templates/ARC_CLOSURE_TEMPLATE.md` | Only at major redesign events (template version bump) |
+| `docs/templates/ARC_CLOSURE_TEMPLATE.md` | Only at major redesign events (template version bump). Current: v1.2 (2026-05-23, deployment_spec addition). |
 | `WORKFLOW.md` (this file) | When operational conventions evolve |
 | `ARC_TRACKER.md` | Auto on arc open / close per L_PROTOCOL §6 |
 | `ARC_HISTORY.md` | Never (frozen at v3.0 start) |

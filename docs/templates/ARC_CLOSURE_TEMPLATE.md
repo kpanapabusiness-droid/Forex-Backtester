@@ -1,4 +1,4 @@
-# ARC_CLOSURE.md Template (Locked v1.1)
+# ARC_CLOSURE.md Template (Locked v1.2)
 
 > **Location:** `docs/templates/ARC_CLOSURE_TEMPLATE.md`
 > **Status:** locked. Every arc closure MUST follow this template.
@@ -10,6 +10,7 @@
 > **Design priority:** machine-parseability over human readability. §1 YAML is the source of truth for the tracker. §2 + §3 exist only to preserve cross-arc synthesis quality that prose enables and YAML doesn't.
 >
 > **v1.1 (2026-05-22, L_PROTOCOL Amendment 3):** risk-normalised gate fields added to `best_architecture` block. Two fields renamed (see §"Schema versioning" at end of template). `primary_failure_mode` enum extended.
+> **v1.2 (2026-05-23, deployment-spec addition):** `config_artefact_path`, `deployment_spec_section_present`, `template_version` fields added to `best_architecture` block. New §4 deployment_spec section: REQUIRED for any PASS verdict, OPTIONAL for FAIL / HALT / DISCOVERY_COMPLETE. Parser enforces config path + §4 presence for PASS verdicts.
 
 ---
 
@@ -29,7 +30,7 @@
 ```yaml
 tracker_payload:
 
-  template_version: v1.1   # NEW in v1.1 — parser uses this to dispatch schema. Omit or set to v1.0 for legacy closures.
+  template_version: v1.2   # Schema dispatch. Accepts v1.0, v1.1, v1.2 (parser detects via this field OR v1.1/v1.2-exclusive fields).
 
   # ────── Identity ──────
   arc_name: <arc_name>
@@ -107,6 +108,10 @@ tracker_payload:
     holdout_dd_at_r_hard_pct: <float or null>
     sizing_convention: reset_floor | equity_pct  # gate FAILs equity_pct unless chat approves
 
+    # ── v1.2 deployment-spec fields ──
+    config_artefact_path: <relative path to canonical config YAML from repo root, or null for non-PASS verdicts>
+    deployment_spec_section_present: <bool>   # parser sanity-check — must be true if verdict starts with PASS-
+
   # ────── Cost decomposition (null if winning arch is not classifier-based) ──────
   cost_decomposition:
     admit_pool:      {n_fraction: <float>, mean_r: <float>}
@@ -168,6 +173,76 @@ Examples of useful cross-arc observations:
 - "Third V-shape cohort with Step 4 AUC < 0.55 — confirms entry-feature ceiling pattern"
 - "Pipeline D1 admit/reject pools mirror Arc 5 within ±10% on all metrics — fourth instance"
 - "Cross-arc co-fire with Arc 7 = 5.4% on c1 trades — worth EXP-05 style pooling"
+
+---
+
+## §4 deployment_spec
+
+> REQUIRED if verdict ∈ {PASS-DEPLOYABLE, PASS-VIABLE, PASS-DEPLOYABLE-PROVISIONAL, PASS-VIABLE-PROVISIONAL, PASS-*-PENDING-STEP6}. OPTIONAL for FAIL / HALT / DISCOVERY_COMPLETE.
+>
+> Self-contained porting specification. An EA developer must be able to implement this strategy on MT5 (or any platform) using ONLY this section + the YAML at `best_architecture.config_artefact_path`. No reverse-engineering from other artefacts required.
+
+### 4.1 Pair set
+
+- **Pairs:** <explicit list>
+- **Timeframe:** <primary TF>
+- **Higher-TF references:** <D1 lagged, W1, etc.>
+
+### 4.2 Signal definition
+
+Pseudocode of the entry trigger logic. Concrete enough to translate to MT5 line-by-line. Cite feature names matching `best_architecture.features_in_winning_config`. All thresholds numeric, no symbolic placeholders.
+
+### 4.3 Feature computation specs
+
+For each feature in `best_architecture.features_in_winning_config`:
+- **`<feature_name>`** — source bars, formula, lag rule, output type
+
+### 4.4 Filter chain (A1 / A2 / A6 architectures only)
+
+Ordered filter list applied AFTER signal generation, BEFORE entry. For each: type (hard veto / soft score / classifier admit), threshold, on-reject behaviour. For A2/A6 include classifier type, training-window definition, top features by importance, decision threshold.
+
+### 4.5 Entry mechanics
+
+- Trigger bar / fill bar / fill price / order type / slippage assumption
+
+### 4.6 Exit mechanics
+
+- Initial SL anchor, distance, update rule
+- Trail activation condition (incl. close/high reference)
+- Trail distance (incl. close/high reference for trail level)
+- Trail update frequency
+- TP, time exit if any
+- Bar-by-bar evaluation order
+
+### 4.7 Exposure cap
+
+- Type (unlimited / per-pair-N / per-currency-N / global-N / custom)
+- Counter logic, behaviour at cap
+
+### 4.8 Risk sizing
+
+- `r_safe` value from §1
+- Risk basis (reset-floor / equity-pct / other)
+- Floor reset condition
+- Position size formula
+- Lot rounding
+
+### 4.9 Session / time-of-day rules
+
+- Trading hours, day-of-week filter, news-window filter, holiday handling
+
+### 4.10 Discrepancies and caveats
+
+Known differences between backtest and expected live deployment.
+
+### 4.11 Deployment readiness checklist
+
+- [ ] Config YAML at `config_artefact_path` exists and is self-contained
+- [ ] All features in §4.3 reproduce against KH-24 live MT5 data within tolerance
+- [ ] Risk sizing at `r_safe` confirmed feasible against 5ers broker minimums
+- [ ] EA implementation matches §4.2-4.9 line-by-line
+- [ ] Backtest-vs-EA byte-identical pre-deployment shadow run on 30 days of data
+- [ ] Step 6 causal audit clean
 
 ```
 
@@ -251,6 +326,21 @@ If a tracker row is suspected wrong post-update:
 2. Add footnote describing suspected issue.
 3. Resolve in next protocol calibration review.
 
+### L. v1.2 PASS-verdict validation (parser-enforced)
+
+When `template_version == 1.2` AND `verdict` starts with `PASS-`, the parser additionally enforces (before applying any A-J mapping):
+
+1. `best_architecture.config_artefact_path` MUST be non-null.
+2. The file at `config_artefact_path` (interpreted relative to repo root) MUST exist.
+3. The closure doc MUST contain a `## §4 deployment_spec` heading.
+4. `best_architecture.deployment_spec_section_present` MUST be `true`.
+
+Any of (1)-(4) failing → parser HALTs with exit code 1, no tracker write. Fix the closure doc and re-run.
+
+Note: `config_artefact_path` is read by the parser for validation only — it is NOT written to any tracker column. The tracker schema is unchanged at v1.2.
+
+For non-PASS verdicts in v1.2, (L) is skipped; §4 is optional. For v1.0 / v1.1 closures, (L) is not evaluated.
+
 ---
 
 ## Section 5 — Parser implementation
@@ -266,7 +356,7 @@ Parser specification (preserved here for reference):
 - Output: append-only updates to `ARC_TRACKER.md` per Section 4 A-J above.
 - Idempotency: parsing the same closure doc twice produces identical tracker (no double-append). Tracked via sha256 in `scripts/tracker_parser/parsed.log`.
 - Determinism: same closure doc + same starting state → byte-identical output tracker.
-- **Schema version detection (v1.1+):** parser inspects the closure doc's referenced template version. v1.0 closures use legacy field names (`worst_fold_roi_pct`, `worst_fold_dd_pct`); v1.1+ closures use the renamed fields (`worst_fold_roi_base_pct`, `worst_fold_dd_base_pct`) and may populate Amendment 3 risk-normalised fields. Parser accepts both schemas — never rewrites historical closures.
+- **Schema version detection (v1.1+):** parser inspects the closure doc's referenced template version. v1.0 closures use legacy field names (`worst_fold_roi_pct`, `worst_fold_dd_pct`); v1.1+ closures use the renamed fields (`worst_fold_roi_base_pct`, `worst_fold_dd_base_pct`) and may populate Amendment 3 risk-normalised fields. v1.2 closures additionally carry `config_artefact_path`, `deployment_spec_section_present` in `best_architecture` and trigger PASS-verdict validation per Section 4-L. Detection order: 1.2 → 1.1 → 1.0 → error. Parser accepts all three schemas — never rewrites historical closures.
 
 ---
 
@@ -276,8 +366,9 @@ Parser specification (preserved here for reference):
 |---|---|---|
 | v1.0 | 2026-05-13 | Initial locked template. |
 | v1.1 | 2026-05-22 | L_PROTOCOL Amendment 3. Risk-normalised fields added to `best_architecture`. Two fields renamed: `worst_fold_roi_pct` → `worst_fold_roi_base_pct`, `worst_fold_dd_pct` → `worst_fold_dd_base_pct`. `primary_failure_mode` enum extended. Pre-v1.1 closures retain v1.0 field names; parser handles both via version detection. |
+| v1.2 | 2026-05-23 | Deployment-spec addition. Three new fields in `best_architecture`: `config_artefact_path`, `deployment_spec_section_present`, `template_version` (the last was conventional in v1.1; locked at v1.2). New §4 deployment_spec section: REQUIRED for PASS-* verdicts (DEPLOYABLE, VIABLE, *-PROVISIONAL, *-PENDING-STEP6), OPTIONAL otherwise. Parser HALTs on PASS verdict if config path missing / file absent / §4 heading missing (Section 4-L). Pre-v1.2 closures unaffected. |
 
-Closures MUST reference the template version they were written against (e.g., `template_version: v1.1` near the top of `§1 tracker_payload` is the convention going forward — pre-v1.1 closures without this field are assumed v1.0).
+Closures MUST reference the template version they were written against (e.g., `template_version: v1.2` near the top of `§1 tracker_payload` is the convention going forward — pre-v1.1 closures without this field are assumed v1.0; pre-v1.2 closures without `config_artefact_path` are assumed v1.1).
 
 ---
 

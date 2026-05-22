@@ -49,11 +49,33 @@ The parser detects the closure doc's template version automatically:
 
 | Detection rule | Outcome |
 |---|---|
-| `template_version` field present in `§1 tracker_payload` | Use it (accepts `v1.0`, `v1.1`, `1.0`, `1.1`). |
+| `template_version` field present in `§1 tracker_payload` | Use it (accepts `v1.0`, `v1.1`, `v1.2`, `1.0`, `1.1`, `1.2`). |
+| Any v1.2-exclusive field present in `best_architecture` (`config_artefact_path`, `deployment_spec_section_present`) | Infer v1.2. |
 | Any v1.1-exclusive field present (`worst_fold_dd_base_pct`, `k_safe`, etc.) | Infer v1.1. |
 | Otherwise | v1.0. |
 
-v1.0 closures use legacy field names (`worst_fold_roi_pct`, `worst_fold_dd_pct`). The parser internally renames them to v1.1 names (`*_base_pct`) and fills v1.1-exclusive Amendment 3 fields with `null`. v1.1+ closures are passed through. Either way, the mapping logic operates on a unified v1.1-shaped dict — historical closures are never rewritten.
+Detection precedence: 1.2 → 1.1 → 1.0 → error.
+
+v1.0 closures use legacy field names (`worst_fold_roi_pct`, `worst_fold_dd_pct`). The parser internally renames them to v1.1 names (`*_base_pct`) and fills v1.1-exclusive Amendment 3 fields with `null`. v1.1 closures are passed through.
+
+v1.2 closures add `config_artefact_path` + `deployment_spec_section_present` to the `best_architecture` block plus a new `§4 deployment_spec` section in the closure doc. Retrofitted v1.2 closures may retain v1.0-style field names (`worst_fold_roi_pct`); the parser renames them pre-validation via `_coerce_legacy_field_names` — purely additive on §1, no manual rewrite required.
+
+Either way, the mapping logic operates on a unified v1.1+-shaped dict — historical closures are never rewritten.
+
+## v1.2 PASS-verdict validation
+
+When `template_version == 1.2` AND `verdict` starts with `PASS-`, the parser enforces (after schema validation, BEFORE any tracker mutation):
+
+1. `best_architecture.config_artefact_path` MUST be non-null.
+2. The file at that path (resolved relative to repo root) MUST exist.
+3. The closure doc MUST contain a `## §4 deployment_spec` heading.
+4. `best_architecture.deployment_spec_section_present` MUST be `true`.
+
+Any failure → HALT exit code 1, no tracker write, no rolling-state update. Fix the closure (re-create the missing config YAML, add the §4 section, set the flag) and re-run.
+
+For non-PASS verdicts in v1.2 (FAIL / HALT / DISCOVERY_COMPLETE), the validation block is skipped — §4 is optional and `config_artefact_path` may be `null`.
+
+For v1.0 and v1.1 closures, the validation block is not evaluated.
 
 ## Idempotency
 
@@ -85,6 +107,7 @@ The parser exits with code 1 on any of:
 - `architectures_tested` entry not in `{A1, A2, A3, A4, A5, A6}`.
 - Archetype label not in the normalisation map (closures use varying casing; new archetypes require an explicit map update before the parser will accept them).
 - A `per_failure_mode_count` or `per_archetype_recurrence` row referenced in the closure does not exist in the tracker — parser will not create these rows; add them manually first.
+- **v1.2 PASS-verdict only:** `best_architecture.config_artefact_path` is null OR the file at that path does not exist OR the closure doc lacks a `## §4 deployment_spec` heading OR `best_architecture.deployment_spec_section_present` is not `true` (template Section 4-L).
 
 ## Determinism
 
@@ -119,13 +142,16 @@ tests/tracker_parser/
 │   ├── tracker_blank_state.md
 │   └── tracker_after_arc_11.md
 ├── test_schema_detection.py
+├── test_schema_v12.py
+├── test_pass_verdict_validation.py
 ├── test_yaml_extraction.py
 ├── test_mapping_A_through_K.py
 ├── test_idempotency.py
 ├── test_determinism.py
 ├── test_golden_arc8.py
 ├── test_golden_arc10.py
-└── test_golden_arc11.py
+├── test_golden_arc11.py
+└── test_v12_golden_arc10.py
 ```
 
 ## Testing
@@ -134,4 +160,4 @@ tests/tracker_parser/
 python -m pytest tests/tracker_parser/ -v
 ```
 
-41 tests cover: schema detection + normalisation, YAML extraction HALT cases, every Section 4 A-K mapping, idempotency, determinism, and three golden closures (Arc 11 full A-K; Arcs 8 & 10 Closed arcs summary row only — per the dispatch's Q-3 scope decision).
+60 tests cover: schema detection + normalisation (v1.0 / v1.1 / v1.2), YAML extraction HALT cases, every Section 4 A-K mapping, v1.2 PASS-verdict validation (Section 4-L), idempotency, determinism, and four golden closures (Arc 11 full A-K; Arcs 8 & 10 Closed arcs summary row only per Q-3; Arc 10 v1.2-retrofit metric-invariance + Section 4-L pass).

@@ -70,6 +70,59 @@ def _build_parser() -> argparse.ArgumentParser:
     return p
 
 
+def _validate_v12_pass_verdict(payload: dict, closure_path: Path) -> int:
+    """v1.2 PASS-verdict validation per template Section 4-L.
+
+    Checks (all must pass):
+      1. `best_architecture.config_artefact_path` is non-null.
+      2. The file at that path (relative to repo root) exists.
+      3. The closure doc contains a `## §4 deployment_spec` heading.
+      4. `best_architecture.deployment_spec_section_present` is true.
+
+    Returns 0 on pass, 1 on any failure (with logged error). No tracker writes happen if any
+    check fails — the caller short-circuits before the mapping layer.
+    """
+    ba = payload.get("best_architecture") or {}
+    config_path_str = ba.get("config_artefact_path")
+    if not config_path_str:
+        logging.error(
+            "v1.2 PASS-verdict validation: best_architecture.config_artefact_path is null or missing. "
+            "Closure %s has verdict %r — config_artefact_path is REQUIRED for PASS verdicts. "
+            "(template Section 4-L, item 1)",
+            closure_path,
+            payload.get("verdict"),
+        )
+        return 1
+
+    config_path = (_REPO_ROOT / config_path_str).resolve()
+    if not config_path.exists():
+        logging.error(
+            "v1.2 PASS-verdict validation: config_artefact_path %r does not exist (resolved to %s). "
+            "(template Section 4-L, item 2)",
+            config_path_str,
+            config_path,
+        )
+        return 1
+
+    if not extract.has_deployment_spec_heading(closure_path):
+        logging.error(
+            "v1.2 PASS-verdict validation: closure doc %s is missing the `## §4 deployment_spec` "
+            "heading. (template Section 4-L, item 3)",
+            closure_path,
+        )
+        return 1
+
+    if ba.get("deployment_spec_section_present") is not True:
+        logging.error(
+            "v1.2 PASS-verdict validation: best_architecture.deployment_spec_section_present is "
+            "%r — must be true for PASS verdicts. (template Section 4-L, item 4)",
+            ba.get("deployment_spec_section_present"),
+        )
+        return 1
+
+    return 0
+
+
 def _diff_tracker(before: bytes, after: bytes) -> str:
     """Return a human-readable summary of changes between two tracker byte sequences."""
     if before == after:
@@ -116,6 +169,15 @@ def main(argv: list[str] | None = None) -> int:
     except Exception as exc:  # pydantic.ValidationError, ValueError
         logging.error("schema validation failed: %s", exc)
         return 1
+
+    # v1.2 PASS-verdict validation (template Section 4-L). Runs BEFORE tracker mutation so a
+    # missing config artefact or missing §4 section blocks the write atomically.
+    if payload.get("template_version") == "1.2" and str(payload.get("verdict", "")).startswith(
+        "PASS-"
+    ):
+        rc = _validate_v12_pass_verdict(payload, closure_path)
+        if rc != 0:
+            return rc
 
     if args.verbose:
         print("--- Parsed payload (v1.1-normalised) ---")

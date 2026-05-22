@@ -11,6 +11,8 @@
 ```yaml
 tracker_payload:
 
+  template_version: v1.2
+
   # ────── Identity ──────
   arc_name: l_arc_8
   signal: pullback_resume_hhhl_long_v0.1 (HH/HL uptrend, pullback >=0.5xATR, bullish-close break of prior bar)
@@ -56,6 +58,10 @@ tracker_payload:
     oracle_worst_ratio: 999.0
     oracle_real_gap_sharpe: null
     features_in_winning_config: [swing_low_distance_14, prior_session_low_distance, atr_vs_trailing_100, kijun_26_distance, dollar_bloc_state, atr_percentile_100, spread_vs_trailing_100, spread_percentile_100, usd_strength_index, distance_to_round_number]
+
+    # ── v1.2 deployment-spec fields (added 2026-05-23 retrofit; FAIL arc — for documentation parity) ──
+    config_artefact_path: configs/l_arc_8/winning_config.yaml
+    deployment_spec_section_present: true
 
   # ────── Cost decomposition ──────
   # A6 is sizing-based, not binary admit/reject — the admit/reject framing
@@ -143,6 +149,139 @@ Two methodology caveats noted in the closure for cross-arc context: (1) the pool
 - **Search WFO FAIL + holdout PASS-DEPLOYABLE is a new pattern** — Top-3 holdout all clear the deployable gate (worst holdout ratio 19.4) while search WFO worst ratio is 1.749. Per §2 Step 5 the arc verdict is FAIL (both gates required). But the asymmetry is worth tagging: 2021-2025 holdout had a more favourable market regime for V-shape pullback-resume than 2010-2020 search. Cross-arc question: do other v3 arcs show this asymmetry? If yes, the 11-fold 2010-2020 search WFO may be biased toward a different regime than the deployment-window holdout.
 - **A6 with chance-AUC classifier still adds value** — A6 best (ratio 1.749) is 10× A1 best (ratio 0.171). Even at AUC 0.53, sizing differentiation moves the needle. This argues for A6-style sizing being a useful default architecture regardless of classifier strength, provided sizes are bounded (here: 0x/0.5x/1.0x mapping). Worth a v2.4 calibration thought.
 - **KH-24 co-fire on PR-HHHL: 0.000% across 6,757 signals** — Confirms the spec's "independence expected" prior. PR-HHHL bullish-resume and KH-24 bearish-exhaustion are structurally orthogonal. This frees PR-HHHL from any portfolio-overlap accounting if it's ever resurrected.
+
+---
+
+## §4 deployment_spec (FAIL arc — included for consistency, NOT for deployment; portfolio-eligibility flagged for Arc 8)
+
+> Abbreviated per dispatch — sub-sections 4.1-4.3 and 4.5-4.10 written from artefacts; §4.4 and §4.11 marked "FAIL arc — not applicable for deployment."
+>
+> FAIL verdict (closure §1 + §10). Config retained for portfolio-eligibility audit only (see closure §10 `portfolio_eligibility_pending_a5_spec`).
+
+### 4.1 Pair set
+
+- **Pairs:** AUDCAD, AUDCHF, AUDJPY, AUDNZD, AUDUSD, CADCHF, CADJPY, CHFJPY, EURAUD, EURCAD, EURCHF, EURGBP, EURJPY, EURNZD, EURUSD, GBPAUD, GBPCAD, GBPCHF, GBPJPY, GBPNZD, GBPUSD, NZDCAD, NZDCHF, NZDJPY, NZDUSD, USDCAD, USDCHF, USDJPY (28 FX pairs, KH-24 set)
+- **Timeframe:** H4 primary
+- **Higher-TF references:** D1 anchor (one-bar-lagged); W1 aux (Step 1 feature engineering only — Step 1 d1/w1 features came back all-NaN per closure §2 caveat, so the deployed-version feature catalogue was 23 features rather than the v3 27-feature default)
+
+### 4.2 Signal definition
+
+Pullback-resume HHHL long (PR-HHHL v0.1) — pullback within a confirmed HH/HL uptrend, with bullish close breaking the prior bar's high.
+
+Pseudocode:
+
+```
+# Maintain a rolling list of confirmed swing-highs (k=3, right_edge_lag=4) on H4.
+# Uptrend test: within the last trend_window_bars=30, the swing-highs are ascending
+# (each higher than the prior); same for swing-lows.
+#
+# At each H4 bar close on pair P:
+#   t       = bar close timestamp (UTC)
+#   atr14   = ATR(14) on H4 at bar t (Wilder)
+#
+#   # Trend filter: HH/HL uptrend confirmed
+#   if not hhhl_uptrend_confirmed(h4_bars, trend_window_bars=30,
+#                                  swing_lookback=3, right_edge_lag=4): skip
+#
+#   # Pullback: prior bar's close is at least 0.5×ATR below the most recent swing-high
+#   if close[t-1] > most_recent_swing_high - pullback_atr_mult=0.5 * atr14: skip
+#
+#   # Resume: current bar's close breaks prior bar's high AND closes in upper half of range
+#   if close[t] <= high[t-1]: skip
+#   bar_range = high[t] - low[t]
+#   if bar_range == 0: skip
+#   if (close[t] - low[t]) / bar_range < upper_half_threshold=0.5: skip
+#
+#   # Refractory: at least 20 H4 bars since last signal on this pair
+#   if h4_bars_since_last_signal[P] < spacing_bars=20: skip
+#
+#   EMIT signal (long) at t. Entry fills at next H4 bar's open.
+```
+
+Locked params per signal spec v0.1: swing_lookback=3, trend_window_bars=30, right_edge_lag=4, pullback_atr_mult=0.5, upper_half_threshold=0.5, spacing_bars=20, atr_period=14.
+
+### 4.3 Feature computation specs
+
+A6 meta-labeling uses the Step 1 27-feature default catalogue minus the 4 multi-TF features that came back all-NaN under the closure §2 aux-panel-integration gap. The 10 features in the winning config (closure §1 `best_architecture.features_in_winning_config`):
+
+- **`swing_low_distance_14`** — H4 bars, distance from current close to the most recent 14-bar swing-low low, as a fraction of ATR(14). Computed at signal-bar close.
+- **`prior_session_low_distance`** — H4 bars, distance from current close to the prior trading session's low, in ATR units. Session boundary is broker-day UTC.
+- **`atr_vs_trailing_100`** — current ATR(14) divided by the trailing-100-bar mean ATR(14). Vol-regime context.
+- **`kijun_26_distance`** — distance from current close to the H4 Ichimoku kijun-sen (26-bar midpoint), in ATR units.
+- **`dollar_bloc_state`** — categorical state of the dollar bloc (AUD/CAD/NZD vs USD). Computed cross-pair at signal-bar close.
+- **`atr_percentile_100`** — percentile rank of current ATR(14) within the trailing 100 bars.
+- **`spread_vs_trailing_100`** — current bid/ask spread relative to trailing 100-bar mean.
+- **`spread_percentile_100`** — percentile rank of current spread within trailing 100 bars.
+- **`usd_strength_index`** — cross-pair USD strength score at signal-bar close (composite over the 7 USD pairs in the set).
+- **`distance_to_round_number`** — H4 close distance to the nearest round-number level (00 / 50 pips), in ATR units.
+
+All features tagged with provisional causal lineage at Step 1; the A6 winning config does NOT trigger Step 6 (lazy — not dispatched because no PASS candidate).
+
+### 4.4 Filter chain (A1 / A2 / A6 architectures only)
+
+**FAIL arc — not applicable for deployment.** A6 meta-labeling uses the Step 4 RF classifier (AUC 0.530) to map per-signal classifier probability → sizing tier (0× / 0.5× / 1×) with lower/upper thresholds (0.3, 0.5). At AUC ≈ chance, the sizing differentiation does some work (A6 worst-ratio 1.75 vs A1 0.17) but cannot lift worst-fold ratio above the 2.0 PASS-VIABLE gate. Closure §10 finds the same FAIL under Amendment 3 with `step5_ratio_below_gate_after_scaling` as primary mode. Section retained for documentation parity only.
+
+### 4.5 Entry mechanics
+
+- **Trigger bar:** H4 bar satisfying §4.2.
+- **Fill bar:** next H4 bar (N+1).
+- **Fill price:** open of bar N+1.
+- **Order type:** market.
+- **Slippage assumption:** real bid/ask spreads (HistData M1 in backtest; broker feed in live).
+
+### 4.6 Exit mechanics
+
+- **Initial SL anchor:** entry price.
+- **Initial SL distance:** `1.5 × ATR(14)_H4` at signal bar (closure §1 `best_architecture.sl_atr: 1.5`).
+- **SL update rule:** static.
+- **Trail activation condition:** N/A (exit policy `sl_plus_tp_3r` has no trail).
+- **Trail distance / reference / frequency:** N/A.
+- **TP:** +3R take-profit (closure §1 `exit_policy: sl_plus_tp_3r`). Triggers when running PnL reaches 3× initial SL distance — closes 100% at next H4 bar's open (bar-close evaluation).
+- **Time exit:** 240 H4 bars after entry, force-close at bar N+241 open.
+- **Bar-by-bar evaluation order:** (1) SL hit → exit; (2) TP hit at +3R close → exit at next bar open; (3) time exit at bar 240.
+
+### 4.7 Exposure cap
+
+- **Type:** unlimited (closure §1 `best_architecture.exposure_cap: unlimited`).
+- **Per-pair invariant:** max 1 open per pair.
+- **Per-currency / global caps:** none.
+- **Behaviour at cap:** N/A.
+
+### 4.8 Risk sizing
+
+- **`r_safe` value:** 2.0176% — **above** locked `r_max = 2.0%` ceiling by 0.018pp (closure §10: `scalable_to_safe: false`).
+- **`r_hard` value:** 2.5219% — also above ceiling.
+- **Risk basis:** reset-floor (L arc convention).
+- **Position size formula:** standard reset-floor × r_pct sizing; capped at broker minimums.
+- **Note (closure §10):** the `r_safe > r_max` scenario is the symmetric inverse of Arc 11's `r_safe < r_min` failure — both are scalability failures, opposite ends of the DD distribution. Documented as `scalability_cap_low_dd_ceiling` cross-arc tag.
+- **Starting balance:** $100,000.
+
+### 4.9 Session / time-of-day rules
+
+- **Trading hours:** 24/5 standard FX session.
+- **Day-of-week filter:** none beyond weekend break.
+- **News-window filter:** none.
+- **Holiday handling:** broker calendar.
+
+### 4.10 Discrepancies and caveats
+
+- **Config YAML reconstruction.** `configs/l_arc_8/winning_config.yaml` was reconstructed retrospectively from closure §1, `step_5/wfo_results.csv` row 2 (config_id=30), and `scripts/l_arc_8/run_step5_wfo.py` + `scripts/l_arc_8/shared.py`. Original engine ran from the inline driver script. Reconstructed file is the source of truth going forward but pre-retrofit deployment would require source verification against the driver script.
+- **Step 1 multi-TF features all-NaN.** `compute_feature_matrix` requires `panel.aux={"d1":..., "w1":...}` but the Step 1 driver only passed an H4 panel. The 4 multi_tf features (`d1_close_slope_*`, `w1_close_slope_sign`, `d1_atr_percentile_100`) came back NaN. Effective Step 4 feature catalogue was 23 features instead of 27. Fix is staged but not re-run (engine PR scope).
+- **Pool-level WFO approximation.** Per-trade R outcomes from Step 1 carry through with exit-policy approximation. NOT a bar-by-bar multipair backtester. Understates intraday DD timing; ignores cross-pair concurrency interactions.
+- **Per-day max-DD series + chained DD not measured.** PROVISIONAL on those constraints, but the §10 verdict is DEFINITIVE because the ratio (0.882) and scalability (2.018% > 2.0%) failures are independent of those gaps.
+- **Engine ratio vs §3 ratio convention divergence.** Engine reports `worst_fold_ratio: 1.749` (per-fold ROI/DD inside the worst-ROI fold); §3 math reads 0.882 (cross-fold worst_ROI / worst_DD). Both fail the 2.0 gate. Same outcome.
+- **Holdout PASS-DEPLOYABLE vs Search FAIL asymmetry.** Top-3 holdout (2021-04 → 2026-04) shows ROI +19% to +43%, DD ≤ 1.7%, ratios 19-35 — comfortably above the gate. §2 Step 5 requires BOTH gates pass; search WFO doesn't, so arc verdict is FAIL despite holdout strength. Worth tracking as a cross-arc pattern.
+
+### 4.11 Deployment readiness checklist
+
+**FAIL arc — not applicable for deployment.**
+
+- [ ] N/A — FAIL verdict; not for deployment.
+- [ ] N/A — config retained for portfolio-eligibility audit only; A5 spec pending.
+- [ ] N/A
+- [ ] N/A
+- [ ] N/A
+- [ ] N/A (Step 6 not run — lazy dispatch only on PASS candidates)
 
 ---
 

@@ -1,0 +1,140 @@
+# Arc 10 winning_config — A1 system_level_filter
+#
+# RECONSTRUCTED RETROSPECTIVELY at 2026-05-23 from:
+#   - results/l_arc_10/ARC_CLOSURE.md §1 tracker_payload (best_architecture block)
+#   - results/l_arc_10/step_5/wfo_results.csv row 2 (winning candidate)
+#   - configs/l_arc_10_v3/arc_open.yaml (Step-1 signal + pair set + window)
+#   - scripts/l_arc_10_v3/step_5.py constants (RISK_PER_TRADE, INITIAL_BAL, fold windows)
+#   - results/l_arc_10/step_6/causal_audit_report.md (audit verdict)
+#
+# Original engine ran from inline driver script at scripts/l_arc_10_v3/step_5.py with these
+# parameters. Reconstructed file is the source of truth going forward but pre-retrofit
+# deployment would require source verification against the driver script.
+#
+# Verdict (closure §1): PASS-VIABLE (worst-fold ratio 5.4185, worst-fold DD 9.22% at r_base 0.5%).
+# Amendment 3 re-evaluation (closure §10): PASS-DEPLOYABLE-PROVISIONAL — chained DD + per-day DD
+# series still pending engine re-run with continuous-equity tracking.
+
+arc_name: l_arc_10
+template_version: v1.2
+protocol_version: L_PROTOCOL.md v3.0
+architecture: A1 system_level_filter
+
+# ── Signal (closure §1.signal + configs/l_arc_10_v3/arc_open.yaml signal block) ──
+signal:
+  name: D1 swing-low rejection long
+  short_name: DLR
+  version: v0.1
+  spec_doc: docs/archive/signal_specs/signal_spec_d1_swing_low_rejection_long_v0.1.md
+  module: signals.lchar_dlr_long
+  # Source: configs/l_arc_10_v3/arc_open.yaml lines 64-71
+  d1_swing_window_k: 3
+  d1_right_edge_offset: 4               # confirmation-lag right-edge offset (Arc 9 lesson)
+  d1_structure_lookback_bars: 30
+  d1_l1_freshness_max_bars: 20
+  atr_period_4h: 14
+  proximity_atr_mult: 0.25
+  reject_buffer_atr_mult: 0.10
+  upper_fraction_min: 0.6
+  refractory_bars_4h: 20
+
+# ── Pair set + window (configs/l_arc_10_v3/arc_open.yaml lines 26-55, 17-19) ──
+pairs:
+  - AUDCAD
+  - AUDCHF
+  - AUDJPY
+  - AUDNZD
+  - AUDUSD
+  - CADCHF
+  - CADJPY
+  - CHFJPY
+  - EURAUD
+  - EURCAD
+  - EURCHF
+  - EURGBP
+  - EURJPY
+  - EURNZD
+  - EURUSD
+  - GBPAUD
+  - GBPCAD
+  - GBPCHF
+  - GBPJPY
+  - GBPNZD
+  - GBPUSD
+  - NZDCAD
+  - NZDCHF
+  - NZDJPY
+  - NZDUSD
+  - USDCAD
+  - USDCHF
+  - USDJPY
+
+tf:
+  primary: H4
+  anchor: D1
+  cross_pair_aux: [D1, W1]
+
+window:
+  start: 2010-01-01
+  end: 2026-04-30                       # closure §1 pool_metadata.window_end
+
+# ── Entry + exit (closure §1 best_architecture + wfo_results.csv row 2) ──
+entry:
+  trigger_bar: signal_bar               # bar N close → enter bar N+1 open
+  fill: next_bar_open
+  order_type: market
+
+sl:
+  anchor: entry_price                   # L_PROTOCOL §2 Step 1 convention
+  atr_multiplier: 3.5                   # closure §1 best_architecture.sl_atr; wfo_results.csv col sl_multiplier
+  atr_period_4h: 14
+
+exit:
+  policy: sl_partial_close_1r_runner_trail   # closure §1 best_architecture.exit_policy
+  # Mechanics — close 50% at +1R; trail remaining 50% at 1R below subsequent peak.
+  partial_close_at_r: 1.0
+  partial_close_fraction: 0.5
+  runner_trail_distance_r: 1.0
+  runner_trail_reference: peak_high      # high-since-entry; bar-close updates
+  time_exit_bars: 240                    # signal's natural 4H horizon; carried from Step 1
+
+# ── Exposure cap (closure §1 best_architecture.exposure_cap; wfo_results.csv col exposure) ──
+exposure:
+  cap_mode: unlimited                    # closure §1 best_architecture.exposure_cap = "unlimited"
+  max_concurrent_per_pair: 1             # mirror of L_PROTOCOL §2 Step 1 (per-pair invariant)
+  max_concurrent_per_currency: null      # unlimited
+  max_concurrent_total: null             # unlimited
+
+# ── Risk sizing (scripts/l_arc_10_v3/step_5.py constants + closure §10 amendment-3 fields) ──
+risk:
+  sizing_convention: reset_floor         # L arc convention; locked v3.0 default
+  r_base_pct: 0.5                        # base risk (per L_PROTOCOL §2 Step 5 r_base)
+  r_safe_pct: 0.4339                     # closure §10: k_safe = 8.0 / 9.22 = 0.8677; 0.5 × 0.8677
+  r_hard_pct: 0.5423                     # closure §10: k_hard = 10.0 / 9.22 = 1.0846
+  scalable_to_safe: true
+  scalable_to_hard: true
+  starting_balance: 100000.0             # scripts/l_arc_10_v3/step_5.py INITIAL_BAL
+  floor_reset_condition: per_arc_engine_default
+
+# ── WFO structure (scripts/l_arc_10_v3/step_5.py SEARCH_*/HOLDOUT_*/N_SEARCH_FOLDS) ──
+wfo:
+  search_window:
+    start: 2010-01-01
+    end: 2020-12-31
+  n_search_folds: 11
+  holdout_window:
+    start: 2021-01-01
+    end: 2026-04-30
+  holdout_evaluation: one_shot_per_candidate
+
+# ── Verdict + audit lineage (closure §1, §10, step_6/causal_audit_report.md) ──
+verdict:
+  baseline: PASS-VIABLE                  # closure §1 verdict (pre-Amendment-3)
+  amendment_3_re_evaluation: PASS-DEPLOYABLE-PROVISIONAL   # closure §10
+  step_6_causal_audit: PASS              # results/l_arc_10/step_6/causal_audit_report.md §7
+
+# ── Caveats (closure §2 + §10 missing-data flags) ──
+caveats:
+  - chained_max_dd_base_pct not measured (per-fold equity reset only)
+  - per_day_max_dd_base series not built (Amendment 3 spec requires)
+  - oracle WFO locked to sl_only exit policy, not sl_partial_close_1r_runner_trail — not a fair upper bound

@@ -1,0 +1,169 @@
+# Arc 8 winning_config — A6 meta_labeling (FAIL arc, retained for documentation parity)
+#
+# RECONSTRUCTED RETROSPECTIVELY at 2026-05-23 from:
+#   - results/l_arc_8/ARC_CLOSURE.md §1 tracker_payload (best_architecture block)
+#   - results/l_arc_8/step_5/wfo_results.csv row 2 (config_id=30, A6, sl_atr=1.5, sl_plus_tp_3r, unlimited)
+#   - scripts/l_arc_8/shared.py (pair set, window, risk, SL Step 1 default, signal params)
+#   - scripts/l_arc_8/run_step5_wfo.py constants (A6 threshold pairs, exposure axis)
+#   - core/signals/pullback_resume_hhhl.py PullbackResumeParams (lines 46-55)
+#
+# Original engine ran from inline driver script at scripts/l_arc_8/run_step5_wfo.py with these
+# parameters. Reconstructed file is the source of truth going forward but pre-retrofit
+# deployment would require source verification against the driver script.
+#
+# Verdict (closure §1): FAIL — search WFO worst-fold ratio 1.749 below 2.0 §3 gate; holdout PASS-
+# DEPLOYABLE on top-3 (insufficient by L_PROTOCOL §2 Step 5 BOTH-gates rule).
+#
+# FAIL ARC — not for deployment. §4 deployment_spec retained for portfolio-eligibility audit only.
+
+arc_name: l_arc_8
+template_version: v1.2
+protocol_version: L_PROTOCOL.md v3.0
+architecture: A6 meta_labeling
+
+# ── Signal (closure §1.signal + scripts/l_arc_8/shared.py SIGNAL_PARAMS) ──
+signal:
+  name: Pullback-resume HHHL long
+  short_name: PR-HHHL
+  version: v0.1
+  module: core.signals.pullback_resume_hhhl
+  # Source: core/signals/pullback_resume_hhhl.py PullbackResumeParams lines 46-55
+  swing_lookback: 3
+  trend_window_bars: 30
+  right_edge_lag: 4                      # causal right-edge offset (Arc 9 lesson)
+  pullback_atr_mult: 0.5
+  upper_half_threshold: 0.5
+  spacing_bars: 20
+  atr_period: 14
+
+# ── Pair set + window (scripts/l_arc_8/shared.py lines 18-25, 31-32) ──
+pairs:
+  - AUDCAD
+  - AUDCHF
+  - AUDJPY
+  - AUDNZD
+  - AUDUSD
+  - CADCHF
+  - CADJPY
+  - CHFJPY
+  - EURAUD
+  - EURCAD
+  - EURCHF
+  - EURGBP
+  - EURJPY
+  - EURNZD
+  - EURUSD
+  - GBPAUD
+  - GBPCAD
+  - GBPCHF
+  - GBPJPY
+  - GBPNZD
+  - GBPUSD
+  - NZDCAD
+  - NZDCHF
+  - NZDJPY
+  - NZDUSD
+  - USDCAD
+  - USDCHF
+  - USDJPY
+
+tf:
+  primary: H4
+  anchor: D1
+  cross_pair_aux: [D1, W1]               # closure §2 caveat: aux-panel fix staged but not re-run
+
+window:
+  start: 2010-01-01                      # scripts/l_arc_8/shared.py WINDOW_START
+  end: 2026-04-10                        # closure §1 pool_metadata.window_end (data-limited)
+
+# ── Step 1 (closure §2 caveat) ──
+step_1:
+  sl_atr_mult: 2.0                       # scripts/l_arc_8/shared.py SL_ATR_MULT_STEP1
+  forward_bars: 240                      # scripts/l_arc_8/shared.py FORWARD_BARS
+  multi_tf_features_present: false       # closure §2 caveat — d1/w1 aux features all-NaN at Step 1
+
+# ── Entry + exit (closure §1 best_architecture + wfo_results.csv config_id=30 row) ──
+entry:
+  trigger_bar: signal_bar
+  fill: next_bar_open
+  order_type: market
+
+sl:
+  anchor: entry_price
+  atr_multiplier: 1.5                    # closure §1 best_architecture.sl_atr
+  atr_period_4h: 14
+
+exit:
+  policy: sl_plus_tp_3r                  # closure §1 best_architecture.exit_policy
+  tp_at_r: 3.0                           # +3R take-profit
+  time_exit_bars: 240                    # carried from Step 1
+
+# ── Exposure cap (closure §1 best_architecture.exposure_cap = "unlimited") ──
+exposure:
+  cap_mode: unlimited
+  max_concurrent_per_pair: null
+  max_concurrent_per_currency: null
+  max_concurrent_total: null
+
+# ── A6 meta-labeling classifier (closure §1 + run_step5_wfo.py A6_THRESHOLDS line 67) ──
+a6_meta_labeling:
+  classifier: rf                          # RandomForest (Step 4 best AUC 0.530)
+  classifier_hyperparameters:             # L_PROTOCOL Appendix A defaults
+    n_estimators: 200
+    max_depth: 6
+    min_samples_leaf: 50
+    random_state: 42
+  training_window_end: 2020-12-31         # L_PROTOCOL §2 Step 5 — no retrain at Step 5
+  thresholds:
+    lower: 0.3                            # config_id=30 extra.lo
+    upper: 0.5                            # config_id=30 extra.hi
+  sizing_map:
+    below_lower: 0.0                      # skip
+    between: 0.5                          # 0.5× risk
+    above_upper: 1.0                      # 1.0× risk
+  features_in_winning_config:             # closure §1 best_architecture.features_in_winning_config
+    - swing_low_distance_14
+    - prior_session_low_distance
+    - atr_vs_trailing_100
+    - kijun_26_distance
+    - dollar_bloc_state
+    - atr_percentile_100
+    - spread_vs_trailing_100
+    - spread_percentile_100
+    - usd_strength_index
+    - distance_to_round_number
+
+# ── Risk sizing (scripts/l_arc_8/shared.py RISK_PCT + closure §10 amendment-3 fields) ──
+risk:
+  sizing_convention: reset_floor
+  r_base_pct: 0.5                         # base risk
+  r_safe_pct: 2.0176                      # closure §10 — scalability FAILs by 0.018pp (>r_max 2.0%)
+  r_hard_pct: 2.5219                      # closure §10 — also exceeds r_max
+  scalable_to_safe: false                 # closure §10 — primary FAIL constraint
+  scalable_to_hard: false
+  starting_balance: 100000.0
+  floor_reset_condition: per_arc_engine_default
+
+# ── WFO structure (run_step5_wfo.py + L_PROTOCOL §2 Step 5) ──
+wfo:
+  search_window:
+    start: 2010-01-01
+    end: 2020-12-31
+  n_search_folds: 11
+  holdout_window:
+    start: 2021-04-01                     # data-limited
+    end: 2026-04-10
+  holdout_evaluation: one_shot_per_candidate
+
+# ── Verdict (closure §1 + §10) ──
+verdict:
+  baseline: FAIL                          # closure §1 verdict
+  amendment_3_re_evaluation: FAIL         # closure §10 — primary mode shifts to step5_ratio_below_gate_after_scaling
+  step_6_causal_audit: not_run            # Step 6 lazy — not triggered (no PASS candidate)
+
+# ── Caveats (closure §2 + §10) ──
+caveats:
+  - Step 1 multi_tf features (d1/w1 slope, d1 ATR percentile) all-NaN due to aux-panel integration gap
+  - pool-level WFO approximation (not bar-by-bar multipair backtester) — understates intraday DD timing
+  - per_day_max_dd_base series not built; chained_max_dd_base_pct not measured
+  - FAIL arc — config retained for portfolio-eligibility audit (see closure §10 portfolio-eligibility-pending-a5-spec)

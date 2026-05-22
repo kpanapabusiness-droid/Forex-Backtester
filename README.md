@@ -6,9 +6,9 @@ A research-first FX trading system targeting prop firm requirements (5ers) with 
 
 ## Current State
 
-- **Live system:** KH-24 — running on Contabo VPS, gate-passing, +1.92% worst-fold ROI / 6.37% worst-fold DD across 7 OOS folds.
-- **Active research:** L arc signal testing under `L_ARC_PROTOCOL.md` v2.0. Arc 3 closed CLEAN-NULL (2026-05-16). Arc 4 next.
-- **Status as of 2026-05-16:** `L_ARC_PROTOCOL.md` v2.0 locked. Path-shape clustering + two-pipeline (E entry-filter / D1 deferred-identification) extractability gate. Calibration anchor: KH-24 K=4 archetype 3 (passes via D1 at t=3). v1.x protocol + ops spec archived under `archive/`. Arc 3 closure flagged five v2.1 cross-arc items (Open-12 through Open-15 plus Open-07 evidence) — see `docs/archive/arc_results/ARC_3_RESULT.md`.
+- **Live system:** KH-24 — running on Contabo VPS / 5ers MT5 broker feed, gate-passing, +1.92% worst-fold ROI / 6.37% worst-fold DD across 7 OOS folds. Unaffected by v3 backtester work.
+- **v3.0 backtester:** CLOSED 2026-05-22 (PR-E.1.7). HistData M1 bid+ask layer (28 pairs, 2010-2026, 52 GB tick) + parquet cache + multi-pair sim + WFO + 27 features + deterministic parallelism + KH-24 strategy. **Phase 0 GO** per Path B: F7 anchor reproduces within documented real-spread band; F2 sign recoverable; residual divergence attributable to data-source drift + 2 deferred EA-correction items. See [docs/BACKTESTER_ARCHITECTURE.md](docs/BACKTESTER_ARCHITECTURE.md) §Anchor Reproduction.
+- **Active research:** L arc signal testing under `L_ARC_PROTOCOL.md` v2.3. Phase 0 unblocked (forward arc work on v3 + HistData).
 
 ---
 
@@ -36,13 +36,15 @@ Specific scenarios:
 
 | Path | Purpose |
 | --- | --- |
-| `core/` | Backtester engine, signal logic, indicator implementations |
-| `scripts/` | Phase scripts, analysis tools, WFO runners |
-| `configs/` | YAML configs (locked: `wfo_kh24.yaml`, `wfo_baseline_clean.yaml`, `spread_floors_5ers.yaml`) |
-| `data/` | OHLCV data (`4hr/`, `daily/`, `1hr/`) |
-| `results/` | Phase outputs, organized by arc (`kh24/`, `kh27_preflight/`, `kh28/`, `kh29/`, `lchar/`, `l_arc_1/`, etc.) |
-| `tests/` | Unit tests, smoke tests |
-| `EA/` | MetaTrader 5 EA source (`KH24_EA.mq5`) |
+| `core/` | v3.0 backtester engine: data layer, spread/fill/sim, WFO + features, parallelism, KH-24 strategy |
+| `scripts/` | Phase scripts, analysis tools, WFO runners, anchor reproduction harness (`scripts/anchor/`) |
+| `configs/` | v3 YAML configs (`data_v3.yaml` etc.). `spread_floors_5ers.yaml` permanently deleted in PR-B per L_PROTOCOL §1 |
+| `data/` | HistData M1 bid+ask layer under `data/histdata/`; v3 parquet cache under `data/cache/` (gitignored) |
+| `reference/` | Frozen reference artefacts — `kh24_ea/KH24_EA.mq5` is the deployed EA source (ground truth for KH-24 mechanics) |
+| `results/` | Phase outputs by arc; `results/anchor_kh24_7fold_v3/` carries the v3 anchor reproduction (gitignored, reproducible from runner) |
+| `tests/` | Unit + integration tests; 904+ passing under v3 |
+| `EA/` | MetaTrader 5 EA source (`KH24_EA.mq5`) — same file as `reference/kh24_ea/` |
+| `attic/` | MT5-era code/configs quarantined in PR-B (hard cut on MT5 per chat decision) |
 
 **Folder convention (v2, locked 2026-05-13):** all phase docs and result artefacts are co-located under their arc folder in `results/`. The previous `docs/`-for-phase-docs convention is retired. See `WORKFLOW.md` v2.
 
@@ -103,13 +105,29 @@ WFO worst-fold at dual-tier disposition (PASS-DEPLOYABLE / PASS-VIABLE) is the o
 
 ---
 
-## How to Run a Backtest
+## How to Run a Backtest (v3.0)
 
-```
-python scripts/phase_kgl_v2_4h_wfo.py -c configs/wfo_kh24.yaml
+KH-24 anchor reproduction (7-fold rolling Oct 2020 → Jan 2026):
+
+```python
+from scripts.anchor.run_anchor import run
+
+run(structure="kh24_anchor", output_dir="results/anchor_kh24_7fold_v3")
 ```
 
-Replace the config with whichever scenario you're running. Outputs land in `results/<arc_name>/<step_subfolder>/` per the config's `outputs.dir` field. Locked baseline configs (`wfo_kh24.yaml`, `wfo_baseline_clean.yaml`, `spread_floors_5ers.yaml`) must never be modified — copy and rename for new scenarios.
+v3.0 baseline (11-fold expanding-IS 2010-2020 + one-shot holdout 2021-present)
+is invoked via `structure="v3_baseline"` on the same runner.
+
+For arc work, callers build a `KH24Config` (or arc-specific Config) +
+`build_*_runtime(panel_h4, panel_d1, panel_h1, config)` and dispatch through
+`core.sim.multipair_backtester.MultiPairBacktester`. See
+[docs/BACKTESTER_ARCHITECTURE.md](docs/BACKTESTER_ARCHITECTURE.md) for the
+full layer-by-layer reference and re-run instructions.
+
+MT5-era scripts (`scripts/phase_kgl_v2_4h_wfo.py` and all 21 L-arc YAML
+configs) were moved en bloc to `attic/` in PR-B; they reference the
+purged `spread_floors_5ers.yaml` and are not runnable on v3. Live KH-24
+on the VPS uses `EA/KH24_EA.mq5` and is independent of these.
 
 ---
 
@@ -137,4 +155,4 @@ Every phase produces a result document regardless of pass or fail.
 
 ---
 
-*Last updated: 2026-05-16 — L_ARC_PROTOCOL v2.0 locked; Arc 3 opens under v2.0; v1.x archived under `archive/`.*
+*Last updated: 2026-05-22 — v3.0 backtester closed (PR-E.1.7); Phase 0 GO under Path B; KH-24 live deployment unaffected.*

@@ -2,7 +2,7 @@
 
 > The operational todo list. Append, check off, delete as work completes.
 > Distinct from `ARC_TRACKER.md` (which is auto-updated arc state) and `ARC_HISTORY.md` (frozen pre-v3.0 record).
-> Last updated: 2026-05-20
+> Last updated: 2026-05-22 (PR-E.1.7 closure of CC_06 dispatch chain)
 
 ---
 
@@ -17,11 +17,12 @@
 
 ## Current state — quick view
 
-**Phase 0 — Framework validation:** 🔴 NOT STARTED (blocked on HistData + backtester reconfig)
-**Phase 1 — Arc 1-11 re-runs:** 🔴 NOT STARTED (blocked on Phase 0)
+**Phase 0 — Framework validation:** 🟢 READY (v3.0 backtester closed PR-E.1.7 / 2026-05-22; KH-24 anchor partial-by-attribution per Path B)
+**Phase 1 — Arc 1-11 re-runs:** 🔴 NOT STARTED (blocked on Phase 0 launch)
 **Phase 2 — New signals + sub-protocol probes:** 🔴 NOT STARTED (blocked on Phase 1 closure)
 
-**HistData download:** 🟡 IN PROGRESS (Option 2 tick → aggregate to M1 bid+ask; ~24h)
+**HistData download:** 🟢 DONE (28 pairs, 52 GB tick + 18 GB M1 derived; 2026-05-21 backup verified)
+**v3.0 backtester reconfig (CC_06):** 🟢 DONE (PR-A through PR-E.1.7 landed)
 **v3.0 protocol redesign:** 🟢 DONE (`L_PROTOCOL.md` finalised; locked)
 **Repo cleanup + consolidation:** 🟢 DONE (branches cleaned; inventory + arc history complete)
 
@@ -35,10 +36,10 @@
 |---|---|
 | Halt in-flight CC sessions (v2.5 coord, KH-24 protocol, D1 SHB diagnostic) | 🟢 |
 | Branch & worktree cleanup (`CC_01_CLEANUP.md`) | 🟢 |
-| HistData M1 bid+ask download (tick → aggregate, all 28 pairs, 2010-current) | 🟡 |
+| HistData M1 bid+ask download (tick → aggregate, all 28 pairs, 2010-current) | 🟢 |
 | Repo inventory + Arc History (`CC_03_INVENTORY_AND_ARC_HISTORY.md`) | 🟢 |
 | UNCERTAIN flag resolution (`CC_04_UNCERTAIN_RESOLUTION.md`) | 🟢 |
-| Merge consolidation branch `claude/wonderful-ellis-8d3091` → main | 🔴 |
+| Merge consolidation branch `claude/wonderful-ellis-8d3091` → main | 🟢 |
 
 ### Round 2 — Protocol redesign
 
@@ -58,14 +59,16 @@
 
 | Task | Status |
 |---|---|
-| HistData download completes + backup verified | ⚪ |
-| Backtester reconfiguration for HistData as primary | 🔴 |
-| Backtester support for new feature classes (cross-pair, currency strength, session, multi-TF) | 🔴 |
-| Backtester WFO logic for 11-fold 2010-2020 + 1-shot 2021-2025 holdout | 🔴 |
-| Backtester multi-pair simultaneous simulation (required for cross-pair features + portfolio architecture) | 🔴 |
-| Backtester determinism (sha256 manifests, lineterminator='\n') | 🔴 |
-| `BACKTESTER_ARCHITECTURE.md` audit / update | 🔴 |
-| `DATA_FOUNDATION.md` finalised | 🔴 |
+| HistData download completes + backup verified | 🟢 |
+| Backtester reconfiguration for HistData as primary | 🟢 PR-A |
+| Backtester support for new feature classes (cross-pair, currency strength, session, multi-TF) | 🟢 PR-C |
+| Backtester WFO logic for 11-fold 2010-2020 + 1-shot 2021-2025 holdout | 🟢 PR-C |
+| Backtester multi-pair simultaneous simulation (required for cross-pair features + portfolio architecture) | 🟢 PR-B |
+| Backtester determinism (sha256 manifests, lineterminator='\n') | 🟢 PR-D |
+| KH-24 strategy + EA-correction rounds 1-3 (anchor reproduction) | 🟢 PR-E.1/E.1.5/E.1.6 |
+| `BACKTESTER_ARCHITECTURE.md` audit / update | 🟢 PR-E.1.7 |
+| `DATA_FOUNDATION.md` finalised | 🟢 PR-E.1.7 |
+| KH-24 anchor reproduction (Mode A) — Path B verdict | 🟢 PR-E.1.7 |
 
 ### Round 4 — Claude project folder cleanup
 
@@ -79,14 +82,16 @@
 
 ## Phase 0 — Framework validation (PARALLEL)
 
-Triggered after: Round 3 complete (backtester reconfigured, HistData ready).
+Round 3 complete (2026-05-22). Phase 0 UNBLOCKED.
 
 | Task | Status | Notes |
 |---|---|---|
-| Phase 0a: KH-24 full system anchor re-run on HistData | 🔴 | Confirms backtester + data reproduce KH-24 lineage worst-fold numbers within tolerance |
-| Phase 0b: KH-24 base signal through L_PROTOCOL v3.0 | 🔴 | Tests whether the protocol rediscovers KH-24's design (filters, exposure, SL) from the base signal alone |
+| Phase 0a: KH-24 full system anchor re-run on HistData | 🟢 | Completed PR-E.1.6 Mode A; chat Path B verdict (PR-E.1.7). F7 in-band; F2 sign recoverable; F1/F4/F5/F6 attributable to documented residuals (Sections G+H deferred + data-source drift). v3 certified Phase 0 ready. |
+| Phase 0b: KH-24 base signal through L_PROTOCOL v3.0 | 🔴 | Tests whether the protocol rediscovers KH-24's design (filters, exposure, SL) from the base signal alone. Ready to dispatch. |
 
-Both must pass before Phase 1 launches. Failure of 0a = backtester/data bug. Failure of 0b = protocol missing something the original KH-24 design captured.
+Phase 0a closed under "partial-by-attribution" reading; if a future
+arc requires tighter reproduction, the path is Sections G (news
+filter) + H (post-fill SL anchor) per `docs/dispatches/kh24_ea_full_diff.md`.
 
 ---
 

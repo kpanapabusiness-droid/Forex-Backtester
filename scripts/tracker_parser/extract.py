@@ -20,6 +20,7 @@ import yaml
 
 SECTION_HEADING_RE = re.compile(r"^## §1 tracker_payload\s*$", re.MULTILINE)
 FENCE_OPEN_RE = re.compile(r"^```yaml\s*$", re.MULTILINE)
+DEPLOYMENT_SPEC_HEADING_RE = re.compile(r"^## §4 deployment_spec\b", re.MULTILINE)
 
 
 class ClosureExtractionError(Exception):
@@ -83,3 +84,12 @@ def sha256_bytes(data: bytes) -> str:
 
 def closure_sha256(closure_path: Path) -> str:
     return sha256_bytes(closure_path.read_bytes())
+
+
+def has_deployment_spec_heading(closure_path: Path) -> bool:
+    """Return True if the closure doc contains a `## §4 deployment_spec` heading.
+
+    Used by the CLI for v1.2 PASS-verdict validation (template Section 4-L).
+    """
+    text = closure_path.read_text(encoding="utf-8")
+    return DEPLOYMENT_SPEC_HEADING_RE.search(text) is not None

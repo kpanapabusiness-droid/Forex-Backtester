@@ -1,0 +1,156 @@
+# Arc 11 winning_config — A2 classifier_filter (FAIL arc, retained for documentation parity)
+#
+# RECONSTRUCTED RETROSPECTIVELY at 2026-05-23 from:
+#   - results/l_arc_11/ARC_CLOSURE.md §1 tracker_payload (best_architecture block)
+#   - results/l_arc_11/step_5/wfo_results.csv row 3 (config_id=a2_shb_cluster0)
+#   - results/l_arc_11/run_summary.json (primary_classifier, primary_threshold, top features)
+#   - scripts/l_arc_11/run.py constants (lines 78-98 + A2Config builder lines 360-371)
+#   - results/l_arc_11/ARC_OPEN.md (pair set, window, signal class)
+#
+# Original engine ran from inline driver script at scripts/l_arc_11/run.py with these
+# parameters. Reconstructed file is the source of truth going forward but pre-retrofit
+# deployment would require source verification against the driver script.
+#
+# Verdict (closure §1): FAIL — best A2 worst-fold ratio -0.769; 4/10 negative folds; worst-fold
+# DD 38.4% / ROI -24.0%; holdout 1.30%/57.5%.
+#
+# FAIL ARC — not for deployment.
+
+arc_name: l_arc_11
+template_version: v1.2
+protocol_version: L_PROTOCOL.md v3.0
+architecture: A2 classifier_filter
+
+# ── Signal (closure §1.signal + results/l_arc_11/ARC_OPEN.md) ──
+signal:
+  name: Swing-high breakout in trend long
+  short_name: SHB
+  module: signals.lchar_swing_high_breakout_trend
+  # 3-bar swing detection with causal right-edge offset; structural trend filter;
+  # decisive break + bullish close + upper-half close + 0.10×ATR buffer; 20-bar refractory.
+  # Source: scripts/l_arc_11/run.py SHBSignalModule + ARC_OPEN.md
+  swing_window_k: 3
+  right_edge_offset: 4                  # confirmation-lag right-edge offset (Arc 9 lesson, closure §3)
+  refractory_bars: 20
+
+# ── Pair set + window (results/l_arc_11/ARC_OPEN.md line 11 + scripts/l_arc_11/run.py lines 79-86) ──
+pairs:
+  - AUDCAD
+  - AUDCHF
+  - AUDJPY
+  - AUDNZD
+  - AUDUSD
+  - CADCHF
+  - CADJPY
+  - CHFJPY
+  - EURAUD
+  - EURCAD
+  - EURCHF
+  - EURGBP
+  - EURJPY
+  - EURNZD
+  - EURUSD
+  - GBPAUD
+  - GBPCAD
+  - GBPCHF
+  - GBPJPY
+  - GBPNZD
+  - GBPUSD
+  - NZDCAD
+  - NZDCHF
+  - NZDJPY
+  - NZDUSD
+  - USDCAD
+  - USDCHF
+  - USDJPY
+
+tf:
+  primary: H4
+  anchor: D1
+  cross_pair_aux: [D1, W1]
+
+window:
+  start: 2010-01-01                     # scripts/l_arc_11/run.py WINDOW_START line 89
+  end: 2026-04-30                       # scripts/l_arc_11/run.py WINDOW_END line 90
+
+# ── Entry + exit (closure §1 + scripts/l_arc_11/run.py A2Config lines 360-371) ──
+entry:
+  trigger_bar: signal_bar
+  fill: next_bar_open
+  order_type: market
+
+sl:
+  anchor: entry_price
+  atr_multiplier: 2.0                   # closure §1 best_architecture.sl_atr; scripts/l_arc_11/run.py SL_ATR_MULT line 93
+  atr_period_4h: 14
+
+exit:
+  policy: sl_only                       # closure §1 best_architecture.exit_policy
+  trail_enabled: false                  # scripts/l_arc_11/run.py A2Config.trail_enabled
+  time_exit_bars: 240                   # scripts/l_arc_11/run.py HOLD_BARS line 94
+
+# ── Exposure cap (closure §1 best_architecture.exposure_cap = 2; scripts/l_arc_11/run.py A2Config) ──
+exposure:
+  cap_mode: per_pair_and_per_currency
+  max_concurrent_per_pair: 1            # scripts/l_arc_11/run.py A2Config.max_concurrent_per_pair
+  max_concurrent_per_currency: 2        # scripts/l_arc_11/run.py A2Config.max_concurrent_per_currency
+  max_concurrent_total: null
+
+# ── A2 classifier filter (closure §1 + run_summary.json primary_classifier / primary_threshold) ──
+a2_classifier_filter:
+  classifier: rf                        # results/l_arc_11/run_summary.json primary_classifier
+  classifier_hyperparameters:           # L_PROTOCOL Appendix A defaults
+    n_estimators: 200
+    max_depth: 6
+    min_samples_leaf: 50
+    random_state: 42
+  target: cluster_membership_c0          # closure §1 best_architecture.cluster = 0 (Bimodal)
+  training_window_end: 2020-12-31        # scripts/l_arc_11/run.py TRAIN_END line 91
+  threshold: 0.11937665572820917         # run_summary.json primary_threshold (AUC-best at training)
+  step4_e_auc: 0.6543                    # closure §1 clusters.c0.step4_e_auc
+  features_in_winning_config:            # closure §1 best_architecture.features_in_winning_config
+    - w1_close_slope_sign
+    - d1_atr_percentile_100
+    - prior_session_low_distance
+    - day_of_week
+    - session_london
+    - d1_close_slope_magnitude
+    - distance_to_round_number
+    - atr_percentile_100
+    - usd_strength_index
+    - spread_vs_trailing_100
+
+# ── Risk sizing (scripts/l_arc_11/run.py RISK_PCT line 95 + closure §10 amendment-3 fields) ──
+risk:
+  sizing_convention: reset_floor
+  r_base_pct: 0.5                       # base risk
+  r_safe_pct: 0.1043                    # closure §10 — below r_min 0.15% floor (FAIL scalability)
+  r_hard_pct: 0.1303                    # closure §10 — also below floor
+  scalable_to_safe: false               # closure §10 — primary FAIL constraint
+  scalable_to_hard: false
+  starting_balance: 100000.0            # scripts/l_arc_11/run.py STARTING_BALANCE line 96
+  floor_reset_condition: per_arc_engine_default
+
+# ── WFO structure (scripts/l_arc_11/run.py + L_PROTOCOL §2 Step 5) ──
+wfo:
+  search_window:
+    start: 2010-01-01
+    end: 2020-12-31
+  n_search_folds: 11                     # note: orchestrator returned 10 folds — see closure §3 canonical_orchestrator_step5_run_context_gap
+  holdout_window:
+    start: 2021-01-01
+    end: 2026-04-30
+  holdout_evaluation: one_shot_per_candidate
+
+# ── Verdict (closure §1 + §10) ──
+verdict:
+  baseline: FAIL                         # closure §1 verdict
+  amendment_3_re_evaluation: FAIL        # closure §10 — primary mode step5_not_scalable
+  step_6_causal_audit: not_run
+
+# ── Caveats (closure §2 + §3) ──
+caveats:
+  - canonical_orchestrator_step5_run_context_gap — ArcOrchestrator._run_step_5 did not thread per_trade_features through ArcFoldRunner; this driver constructed A1RunContext manually
+  - n_folds returned = 10 not 11 (same gap; see closure §1 sign_pos_folds "6/10")
+  - per_day_max_dd_base series not built; chained_max_dd_base_pct not measured
+  - FAIL arc — config not for deployment

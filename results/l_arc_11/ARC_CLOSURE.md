@@ -10,6 +10,7 @@
 
 ```yaml
 tracker_payload:
+  template_version: v1.2
   arc_name: l_arc_11
   signal: swing-high breakout in trend (SHB) long, 4H, causal 3-bar swing (right-edge t-4)
   tf: H4
@@ -58,6 +59,9 @@ tracker_payload:
     - atr_percentile_100
     - usd_strength_index
     - spread_vs_trailing_100
+    # ── v1.2 deployment-spec fields (added 2026-05-23 retrofit; FAIL arc — for documentation parity) ──
+    config_artefact_path: configs/l_arc_11/winning_config.yaml
+    deployment_spec_section_present: true
   cost_decomposition:
     admit_pool:
       n_fraction: 0.125
@@ -164,6 +168,142 @@ The worst-fold ratio -0.769 is below the §3 PASS-VIABLE/DEPLOYABLE threshold of
 - Canonical orchestrator (`core/arc/arc_orchestrator.py::_run_step_5`) does not plumb `run_context` through `ArcFoldRunner`. Result: A2 / A3 / A4 / A6 — all architectures requiring `per_trade_features` — silently produce 0-trade folds when invoked via `ArcOrchestrator.run()`. This driver bypassed `_run_step_5` and constructed `A1RunContext(per_trade_features=...)` manually before `ArcFoldRunner`. Surface this gap to master chat as a v3 infra blocker for any arc using classifier-based architectures via the orchestrator. Fix is a one-line change in `_run_step_5` to thread `run_context` through; the runner already accepts it.
 - First v3.0 arc to clear Step 4 entry-feature gate (RF AUC ≥ 0.65) on 1 candidate cluster(s). Confirms the v3 27-feature default envelope CAN extract for the SHB signal class with the right cluster geometry.
 - Swing-detection producer-level causal audit (Arc 9 lesson) PASS by construction: the producer `signals/lchar_swing_high_breakout_trend.py` uses `RIGHT_EDGE_OFFSET=4` to constrain 3-bar swing consumption to k ≤ t-4, making right-side detection bars k+1..k+3 ≤ t-1 — strictly prior to signal-bar open. Confirmation-lag idiom is causally clean; whitelisted by dispatch.
+
+---
+
+## §4 deployment_spec (FAIL arc — included for consistency, NOT for deployment)
+
+> Abbreviated per dispatch — sub-sections 4.1-4.3 and 4.5-4.10 written from artefacts; §4.4 and §4.11 marked "FAIL arc — not applicable for deployment."
+>
+> FAIL verdict (closure §1 + §10).
+
+### 4.1 Pair set
+
+- **Pairs:** AUDCAD, AUDCHF, AUDJPY, AUDNZD, AUDUSD, CADCHF, CADJPY, CHFJPY, EURAUD, EURCAD, EURCHF, EURGBP, EURJPY, EURNZD, EURUSD, GBPAUD, GBPCAD, GBPCHF, GBPJPY, GBPNZD, GBPUSD, NZDCAD, NZDCHF, NZDJPY, NZDUSD, USDCAD, USDCHF, USDJPY (28 FX pairs, KH-24 set)
+- **Timeframe:** H4 primary
+- **Higher-TF references:** D1 anchor (one-bar-lagged); W1 aux (for `w1_close_slope_sign` feature). D1 + W1 panels were built and passed via the manual A1RunContext path (driver bypassed orchestrator due to the `canonical_orchestrator_step5_run_context_gap` flagged in closure §3).
+
+### 4.2 Signal definition
+
+Swing-high breakout in trend (SHB) long — causal 3-bar swing-high breakout with structural trend filter, decisive break + bullish close + upper-half close + 0.10×ATR buffer, 20-bar refractory.
+
+Pseudocode:
+
+```
+# Maintain rolling 3-bar swing-highs on H4 with causal right-edge offset.
+# A swing-high at bar k is "confirmed" when bar k satisfies k <= t_eval - 4
+# (RIGHT_EDGE_OFFSET=4) — meaning 3 confirmation bars must close strictly
+# below H[k] AND those confirmation bars must close strictly prior to t_eval.
+# This makes the right-side detection causal: k+1..k+3 are all at t_eval-1 or earlier.
+#
+# At each H4 bar close on pair P:
+#   t       = bar close timestamp (UTC)
+#   atr14   = ATR(14) on H4 at bar t (Wilder)
+#
+#   # Trend filter: structural uptrend (HH/HL with right-edge causal lag)
+#   if not structural_uptrend(h4_bars, t, swing_window_k=3): skip
+#
+#   # Find the most recent confirmed swing-high prior to t
+#   Hs = most_recent_confirmed_swing_high(h4_bars,
+#                                          k=3, right_edge_offset=4)
+#   if Hs is null: skip
+#
+#   # Decisive break: bar close strictly above Hs.value + 0.10×ATR buffer
+#   if close[t] < Hs.value + 0.10 * atr14: skip
+#
+#   # Upper-half close: (close - low) / (high - low) >= 0.5
+#   bar_range = high[t] - low[t]
+#   if bar_range == 0: skip
+#   if (close[t] - low[t]) / bar_range < 0.5: skip
+#
+#   # Refractory: 20 H4 bars since last signal on this pair
+#   if h4_bars_since_last_signal[P] < 20: skip
+#
+#   EMIT signal (long) at t. Entry fills at next H4 bar's open.
+```
+
+Causal-clean per closure §3: confirmation-lag idiom whitelisted by dispatch.
+
+### 4.3 Feature computation specs
+
+The 10 features in the winning A2 config (closure §1 `best_architecture.features_in_winning_config`):
+
+- **`w1_close_slope_sign`** — sign of the W1 close-slope (linear-fit slope over the last N W1 bars). Categorical {-1, 0, +1}. Computed at signal-bar close from the W1 panel.
+- **`d1_atr_percentile_100`** — percentile rank of current D1 ATR(14) within the trailing 100 D1 bars. One-bar-lagged.
+- **`prior_session_low_distance`** — H4 close distance to prior session low, in ATR units.
+- **`day_of_week`** — categorical {0..4}, signal-bar UTC weekday.
+- **`session_london`** — boolean: is the signal bar within the London session (08:00-16:00 UTC, broker-day convention)?
+- **`d1_close_slope_magnitude`** — magnitude of the D1 close-slope over the last N D1 bars. One-bar-lagged.
+- **`distance_to_round_number`** — H4 close distance to nearest round-number level (00/50 pips), in ATR units.
+- **`atr_percentile_100`** — percentile rank of current H4 ATR(14) within trailing 100 bars.
+- **`usd_strength_index`** — cross-pair USD strength composite at signal-bar close.
+- **`spread_vs_trailing_100`** — current bid/ask spread relative to trailing 100-bar mean.
+
+Step 1 used the L_PROTOCOL §2 Step 1 27-feature default; Step 4 RF picked these 10 as top by permutation importance.
+
+### 4.4 Filter chain (A1 / A2 / A6 architectures only)
+
+**FAIL arc — not applicable for deployment.** A2 classifier_filter uses Step 4's best classifier (RF, AUC 0.6543) with AUC-best threshold 0.119 to admit/reject signals for cluster-0 (Bimodal, n=2,192 in Step 1 pool). Section retained for documentation parity only. Winning-fold metrics: ratio -0.769, ROI -24%, DD 38%, 4 negative folds — closure §10 finds FAIL on 7+ independent constraints under Amendment 3.
+
+### 4.5 Entry mechanics
+
+- **Trigger bar:** H4 bar satisfying §4.2 AND classifier admit at threshold 0.119.
+- **Fill bar:** next H4 bar (N+1).
+- **Fill price:** open of bar N+1.
+- **Order type:** market.
+- **Slippage assumption:** real bid/ask spreads.
+
+### 4.6 Exit mechanics
+
+- **Initial SL anchor:** entry price.
+- **Initial SL distance:** `2.0 × ATR(14)_H4` at signal bar (closure §1 `sl_atr: 2.0`).
+- **SL update rule:** static.
+- **Trail activation:** N/A (`trail_enabled: false`).
+- **Trail distance / reference / frequency:** N/A.
+- **TP:** none (`sl_only` exit policy).
+- **Time exit:** 240 H4 bars after entry.
+- **Bar-by-bar evaluation order:** (1) SL hit → exit at SL price; (2) time exit at bar 240.
+
+### 4.7 Exposure cap
+
+- **Type:** per-pair-1 + per-currency-2 (closure §1 `exposure_cap: 2`; driver's `max_concurrent_per_pair: 1`, `max_concurrent_per_currency: 2`).
+- **Counter logic:** independent counters per pair (max 1) and per currency (max 2 — counted across both base and quote currency exposure). New signal admitted only if both counters below cap.
+- **Behaviour at cap:** signal skipped (no queue).
+
+### 4.8 Risk sizing
+
+- **`r_safe` value:** 0.1043% — **below** locked `r_min = 0.15%` floor (closure §10: `scalable_to_safe: false`).
+- **`r_hard` value:** 0.1303% — also below floor.
+- **Risk basis:** reset-floor.
+- **Note (closure §10):** the `r_safe < r_min` scenario is the symmetric inverse of Arc 8's `r_safe > r_max` failure — both are scalability failures. Documented as `scalability_floor_failure_high_dd`.
+- **Starting balance:** $100,000.
+
+### 4.9 Session / time-of-day rules
+
+- **Trading hours:** 24/5 standard FX session. Signal evaluation per H4 bar close; classifier ingests `session_london` feature (boolean) so the model learns session preference rather than the engine hard-filtering by session.
+- **Day-of-week filter:** none beyond weekend break (model uses `day_of_week` as a categorical feature).
+- **News-window filter:** none.
+- **Holiday handling:** broker calendar.
+
+### 4.10 Discrepancies and caveats
+
+- **Config YAML reconstruction.** `configs/l_arc_11/winning_config.yaml` was reconstructed retrospectively from closure §1, `step_5/wfo_results.csv` row 3, `run_summary.json`, and `scripts/l_arc_11/run.py` constants. Original engine ran from the inline driver script. Reconstructed file is the source of truth going forward but pre-retrofit deployment would require source verification against `scripts/l_arc_11/run.py`.
+- **`canonical_orchestrator_step5_run_context_gap`.** `ArcOrchestrator._run_step_5` did not thread `per_trade_features` through `ArcFoldRunner`; A2/A3/A4/A6 architectures requiring `per_trade_features` silently produce 0-trade folds when invoked via `ArcOrchestrator.run()`. This driver constructed `A1RunContext(per_trade_features=...)` manually before `ArcFoldRunner`. Surface as v3 infra blocker for any arc using classifier-based architectures via the orchestrator. Fix is a one-line change in `_run_step_5` to thread `run_context` through; the runner already accepts it.
+- **Fold count 10 not 11.** Same orchestrator gap consequence — `sign_pos_folds: "6/10"` in §1. The full 11-fold sweep was not completed; downstream §10 evaluation treats the 10 reported folds as the basis.
+- **Pool size canonical vs hand-rolled.** Canonical Step 1 pool is 17,533 trades vs hand-rolled 7,149 (2.5× delta). Canonical builder correctly applies exposure caps at Step 5, not Step 1 — hand-rolled was biased toward signals the cap admitted first. Closure §3 cross-arc tag.
+- **Per-day max-DD series + chained DD not measured.** PROVISIONAL on those constraints; verdict DEFINITIVE because multiple independent constraints fail (ratio, scalability, sign-consistency, trade count, holdout DD).
+- **Step 4 AUC ≥ 0.65 was met (0.6543).** First v3.0 arc to clear the entry-feature gate. Architecture-side failures dominate — the classifier extraction is genuinely capturing some signal but the WFO outcome under chained-fold realism is FAIL.
+
+### 4.11 Deployment readiness checklist
+
+**FAIL arc — not applicable for deployment.**
+
+- [ ] N/A — FAIL verdict; not for deployment.
+- [ ] N/A
+- [ ] N/A
+- [ ] N/A
+- [ ] N/A
+- [ ] N/A (Step 6 not run — lazy dispatch only on PASS candidates)
 
 ---
 

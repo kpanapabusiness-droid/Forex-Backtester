@@ -1,15 +1,21 @@
-"""Pydantic models for ARC_CLOSURE.md §1 tracker_payload — v1.0 and v1.1 schemas + normalisation.
+"""Pydantic models for ARC_CLOSURE.md §1 tracker_payload — v1.0, v1.1, and v1.2 schemas + normalisation.
 
 Schema versions:
 - v1.0 — pre-Amendment 3 (legacy field names `worst_fold_roi_pct`, `worst_fold_dd_pct`)
 - v1.1 — post-Amendment 3 (renamed to `*_base_pct`, plus risk-normalised fields)
+- v1.2 — deployment-spec addition (adds `config_artefact_path`, `deployment_spec_section_present` to
+  `best_architecture`). PASS-verdict closures must point to a canonical config YAML; the parser CLI
+  enforces the file's existence + §4 heading presence before applying tracker mappings.
 
 Detection precedence (see `detect_schema_version`):
 1. `template_version` field present → use that
-2. Any v1.1-exclusive field present → v1.1
-3. Else → v1.0
+2. Any v1.2-exclusive field present → v1.2
+3. Any v1.1-exclusive field present → v1.1
+4. Else → v1.0
 
-`normalize_to_v11()` returns a v1.1-shaped dict that mapping logic consumes uniformly.
+`normalize_to_v12()` returns a v1.2-shaped dict that mapping logic consumes uniformly. The mapping
+layer only reads v1.0/v1.1-era fields, so v1.2-exclusive fields are not consumed downstream — they
+are validated at the CLI layer before tracker mutations begin.
 """
 
 from __future__ import annotations
@@ -18,7 +24,7 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-SchemaVersion = Literal["1.0", "1.1"]
+SchemaVersion = Literal["1.0", "1.1", "1.2"]
 
 V11_EXCLUSIVE_FIELDS = {
     "worst_fold_dd_base_pct",
@@ -30,6 +36,11 @@ V11_EXCLUSIVE_FIELDS = {
     "r_hard_pct",
     "scalable_to_safe",
     "scalable_to_hard",
+}
+
+V12_EXCLUSIVE_FIELDS = {
+    "config_artefact_path",
+    "deployment_spec_section_present",
 }
 
 VALID_FAILURE_MODES = {
@@ -62,30 +73,37 @@ VALID_VERDICTS = {
     "HALT",
     "DISCOVERY_COMPLETE",
     "PASS-DEPLOYABLE-PROVISIONAL",
+    "PASS-VIABLE-PROVISIONAL",
+    "PASS-DEPLOYABLE-PENDING-STEP6",
+    "PASS-VIABLE-PENDING-STEP6",
 }
 
 VALID_ARCHITECTURES = {"A1", "A2", "A3", "A4", "A5", "A6"}
 
 
 def detect_schema_version(payload: dict[str, Any]) -> SchemaVersion:
-    """Return '1.0' or '1.1' based on the rules in the module docstring.
+    """Return '1.0', '1.1', or '1.2' based on the rules in the module docstring.
 
-    Accepts `template_version` values: 'v1.0', 'v1.1', '1.0', '1.1'.
+    Accepts `template_version` values: 'v1.0', 'v1.1', 'v1.2', '1.0', '1.1', '1.2'.
     """
     raw = payload.get("template_version")
     if raw is not None:
         s = str(raw).lstrip("v").lstrip("V").strip()
+        if s == "1.2":
+            return "1.2"
         if s == "1.1":
             return "1.1"
         if s == "1.0":
             return "1.0"
         raise ValueError(
-            f"Unknown template_version {raw!r} — expected one of v1.0, v1.1, 1.0, 1.1"
+            f"Unknown template_version {raw!r} — expected one of v1.0, v1.1, v1.2, 1.0, 1.1, 1.2"
         )
 
     best_arch = payload.get("best_architecture") or {}
     if not isinstance(best_arch, dict):
         best_arch = {}
+    if any(k in best_arch for k in V12_EXCLUSIVE_FIELDS):
+        return "1.2"
     if any(k in best_arch for k in V11_EXCLUSIVE_FIELDS):
         return "1.1"
 
@@ -293,15 +311,76 @@ class TrackerPayloadV11(_TrackerPayloadBase):
         return d
 
 
+class BestArchitectureV12(BestArchitectureV11):
+    """v1.2 best_architecture block — adds deployment-spec pointer + flag.
+
+    `config_artefact_path` MUST be non-null for PASS-verdict closures and MUST point to a file
+    that exists relative to the repo root. `deployment_spec_section_present` MUST be true for
+    PASS-verdict closures. Both validations are enforced at the CLI layer
+    (`update_tracker_from_closure.py`), not in Pydantic — the validation needs a closure-doc-path
+    + repo-root context that the model doesn't have.
+    """
+
+    config_artefact_path: str | None = None
+    deployment_spec_section_present: bool | None = None
+
+
+class TrackerPayloadV12(_TrackerPayloadBase):
+    """v1.2 payload — deployment-spec addition."""
+
+    best_architecture: BestArchitectureV12 | None = None
+
+    def normalize_to_v12(self) -> dict[str, Any]:
+        d = self.model_dump()
+        d["template_version"] = "1.2"
+        return d
+
+
+def _coerce_legacy_field_names(payload: dict[str, Any]) -> dict[str, Any]:
+    """Rename v1.0 best_architecture fields to v1.1 names if present.
+
+    Used when a v1.2 closure retains the legacy `worst_fold_roi_pct` / `worst_fold_dd_pct` names
+    (retrofit pattern — §1 changes restricted to additive v1.2 fields). Idempotent and a no-op
+    if v1.1 names are already in place.
+    """
+    ba = payload.get("best_architecture")
+    if not isinstance(ba, dict):
+        return payload
+    if "worst_fold_roi_pct" in ba and "worst_fold_roi_base_pct" not in ba:
+        ba["worst_fold_roi_base_pct"] = ba.pop("worst_fold_roi_pct")
+    elif "worst_fold_roi_pct" in ba and "worst_fold_roi_base_pct" in ba:
+        # Both present — base_pct wins; legacy dropped (rare; retrofit edge case).
+        ba.pop("worst_fold_roi_pct")
+    if "worst_fold_dd_pct" in ba and "worst_fold_dd_base_pct" not in ba:
+        ba["worst_fold_dd_base_pct"] = ba.pop("worst_fold_dd_pct")
+    elif "worst_fold_dd_pct" in ba and "worst_fold_dd_base_pct" in ba:
+        ba.pop("worst_fold_dd_pct")
+    return payload
+
+
 def parse_payload(payload: dict[str, Any]) -> dict[str, Any]:
-    """Detect schema version, validate via the matching model, return v1.1-normalised dict.
+    """Detect schema version, validate via the matching model, return a normalised dict.
+
+    Returns a v1.1-shaped dict for v1.0/v1.1 closures (legacy compatibility — mapping logic
+    consumes a unified v1.1 shape). For v1.2 closures, returns a v1.2-shaped dict (a superset
+    of v1.1; mapping logic ignores the two extra fields).
+
+    For v1.2 closures that retain v1.0-style field names in `best_architecture` (the retrofit
+    pattern — see `_coerce_legacy_field_names`), legacy names are renamed pre-validation.
 
     Raises pydantic.ValidationError on schema violations and ValueError on unknown enum values.
     """
     version = detect_schema_version(payload)
-    model = TrackerPayloadV11 if version == "1.1" else TrackerPayloadV10
-    validated = model.model_validate(payload)
-    norm = validated.normalize_to_v11()
+    if version == "1.2":
+        payload = _coerce_legacy_field_names(payload)
+        validated = TrackerPayloadV12.model_validate(payload)
+        norm = validated.normalize_to_v12()
+    elif version == "1.1":
+        validated = TrackerPayloadV11.model_validate(payload)
+        norm = validated.normalize_to_v11()
+    else:
+        validated = TrackerPayloadV10.model_validate(payload)
+        norm = validated.normalize_to_v11()
 
     failure_mode = norm.get("primary_failure_mode")
     if failure_mode not in VALID_FAILURE_MODES:

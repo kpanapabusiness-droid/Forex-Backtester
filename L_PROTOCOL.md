@@ -560,15 +560,16 @@ expected_failure_modes: <if any anticipated>
 
 ### ARC_CLOSURE.md format
 
-All arc closure docs MUST follow `docs/templates/ARC_CLOSURE_TEMPLATE.md` v1.0.
+All arc closure docs MUST follow `docs/templates/ARC_CLOSURE_TEMPLATE.md` v1.2.
 
-The template has three required sections:
+Required sections:
 
 1. **§1 tracker_payload** — machine-parseable YAML block. Source of truth for ARC_TRACKER updates. Field names and structure are locked.
-2. **§2 Why <failed | succeeded>** — required prose, 100-300 words. Preserves cross-arc synthesis quality.
-3. **§3 Cross-arc observations** — required bullet list. What does this arc add to cumulative findings?
+2. **§2 Why <failed | succeeded>** — required prose, 100-300 words.
+3. **§3 Cross-arc observations** — required bullet list.
+4. **§4 deployment_spec** — REQUIRED for any verdict in {PASS-DEPLOYABLE, PASS-VIABLE, PASS-*-PROVISIONAL, PASS-*-PENDING-STEP6}. Self-contained porting specification. OPTIONAL for FAIL / HALT / DISCOVERY_COMPLETE verdicts.
 
-Closure docs not conforming to the template are invalid. Tracker updates cannot be applied until the closure is repaired (per template Section 4-K).
+Closure docs not conforming are invalid. Tracker updates blocked until repaired.
 
 ### ARC_TRACKER.md update mechanism
 

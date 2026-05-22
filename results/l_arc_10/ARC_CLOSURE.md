@@ -11,6 +11,8 @@
 ```yaml
 tracker_payload:
 
+  template_version: v1.2
+
   # ────── Identity ──────
   arc_name: l_arc_10
   signal: D1 swing-low rejection long (DLR, v0.1) — bullish rejection of confirmed ascending D1 swing-low, 4H entry
@@ -56,6 +58,10 @@ tracker_payload:
     oracle_worst_ratio: -1.1896   # caveat: oracle was locked to sl_only exit, not the partial-close policy — not a fair upper bound
     oracle_real_gap_sharpe: null   # not computed; oracle exit-policy mismatch makes the gap non-comparable
     features_in_winning_config: []   # A1 uses no classifier features — the signal conditions + SL/exit policy ARE the architecture
+
+    # ── v1.2 deployment-spec fields (added 2026-05-23 retrofit) ──
+    config_artefact_path: configs/l_arc_10/winning_config.yaml
+    deployment_spec_section_present: true
 
   # ────── Cost decomposition ──────
   cost_decomposition: null   # A1 is unfiltered — no admit/reject pools
@@ -149,6 +155,146 @@ A1 (no classifier filter, full Step 1 pool of 2,162 search-window trades) with S
 
 - **Oracle-WFO comparison pattern broken when oracle exit policy ≠ winning architecture exit policy.** Step 5's oracle locked to `sl_only` at SL=4.0 (the Step 3 best); winning A1 used `sl_partial_close_1r_runner_trail` at SL=3.5. Oracle reports -11.74% worst ROI while A1 reports +26.49% — implying A1 BEATS the oracle, which is structurally impossible if both used the same exit. The lesson: oracle WFO must sweep the same architecture × config grid as the realised candidates, or be reported only as "cluster-filter true-label upper bound CONDITIONAL on identical exit policy." Recommendation for protocol §2 Step 5 Amendment 2's oracle WFO definition: lock oracle to the WINNING architecture's config sans cluster-filter, not to a fixed (best_sl, sl_only).
 ```
+
+---
+
+## §4 deployment_spec (added 2026-05-23 retrofit)
+
+> PASS-VIABLE verdict (baseline) / PASS-DEPLOYABLE (Amendment 3 re-eval §10, finalised post-Step-6 audit). Self-contained porting spec for the A1 winning candidate. EA developer can implement this strategy on MT5 using ONLY this section + `configs/l_arc_10/winning_config.yaml`.
+
+### 4.1 Pair set
+
+- **Pairs:** AUDCAD, AUDCHF, AUDJPY, AUDNZD, AUDUSD, CADCHF, CADJPY, CHFJPY, EURAUD, EURCAD, EURCHF, EURGBP, EURJPY, EURNZD, EURUSD, GBPAUD, GBPCAD, GBPCHF, GBPJPY, GBPNZD, GBPUSD, NZDCAD, NZDCHF, NZDJPY, NZDUSD, USDCAD, USDCHF, USDJPY (28 FX pairs, KH-24 set)
+- **Timeframe:** H4 primary
+- **Higher-TF references:** D1 (anchor, one-bar-lagged per L_PROTOCOL §1 non-negotiable); W1 (aux, used for cross-pair feature context at Step 1 — does NOT feed entry trigger since A1 carries no classifier features)
+
+### 4.2 Signal definition
+
+D1 swing-low rejection long (DLR v0.1) — bullish rejection of a confirmed ascending D1 swing-low, evaluated on the H4 bar that closes during that D1 day.
+
+Pseudocode (translates line-by-line to MT5 EA):
+
+```
+# Setup: maintain a rolling list of ascending D1 swing-lows on the D1 series.
+# A swing-low is "confirmed" when the right-edge offset rule holds:
+#   d1_right_edge_offset = 4         # the swing-low bar k satisfies k <= t_eval - 4 on D1
+#   d1_swing_window_k    = 3         # k-3..k-1 strictly above L[k]; k+1..k+3 also above
+#                                    # (3-bar window each side; L[k] is the lowest of 7 bars)
+
+# At each H4 bar close on pair P:
+#   t       = bar close timestamp (UTC)
+#   atr14   = ATR(14) on H4 at bar t (Wilder, computed from H4 bars only)
+#   d1_bars = D1 series up to t with one-bar-lag (most recent D1 bar available = D1[t-1d])
+#
+#   # Identify candidate swing-low Ls:
+#   #   most recent ASCENDING swing-low on the D1 series with confirmation lag >= 4 bars
+#   #   AND the prior swing-low (one back) is BELOW Ls (ascending structure)
+#   Ls = most_recent_ascending_confirmed_swing_low(d1_bars,
+#                                                  k=d1_swing_window_k,
+#                                                  right_edge_offset=d1_right_edge_offset,
+#                                                  lookback_bars=d1_structure_lookback_bars=30)
+#   if Ls is null: skip
+#
+#   # Freshness check: Ls must be no older than 20 D1 bars
+#   age_d1 = (most_recent_d1_bar_index - Ls.bar_index)
+#   if age_d1 > d1_l1_freshness_max_bars=20: skip
+#
+#   # Proximity test: the H4 bar's low must be within 0.25 ATR_4H of Ls.value
+#   if (Ls.value - bar_low) > proximity_atr_mult=0.25 * atr14: skip
+#
+#   # Rejection geometry: H4 bar closes back above Ls.value with a buffer
+#   if bar_close < Ls.value + reject_buffer_atr_mult=0.10 * atr14: skip
+#
+#   # Bar quality: close in the upper 60% of the bar's range
+#   bar_range = bar_high - bar_low
+#   if bar_range == 0: skip
+#   if (bar_close - bar_low) / bar_range < upper_fraction_min=0.6: skip
+#
+#   # Refractory: at least 20 H4 bars since the last signal on this pair
+#   if h4_bars_since_last_signal[P] < refractory_bars_4h=20: skip
+#
+#   EMIT signal (long) at t. Entry fills at the next H4 bar's open.
+```
+
+All thresholds numeric, no symbolic placeholders. Per-pair state required: H4 ATR(14), per-pair last-signal-time, the D1 series with confirmation-lag swing detection.
+
+### 4.3 Feature computation specs
+
+A1 (system_level_filter) uses NO classifier features. The signal definition itself + SL + exit policy constitute the architecture. The `features_in_winning_config` list in §1 is empty by design.
+
+For Step 1 pool construction (used for clustering / characterization only — NOT consumed at entry time by A1), the standard L_PROTOCOL §2 Step 1 27-feature default catalogue was computed. Those features do NOT need to exist in the EA implementation since A1 doesn't filter on them. The EA only needs to compute ATR(14)_H4 + the D1 swing detection state described in §4.2.
+
+### 4.4 Filter chain (A1 / A2 / A6 architectures only)
+
+**A1 architecture — no filter chain.** A1 admits every signal that passes §4.2's trigger. No classifier admit-step, no soft-score, no rule-based hard veto downstream of the signal.
+
+The signal definition's own conditions (Ls freshness, proximity, rejection geometry, upper-fraction, refractory) constitute the entire filter chain — they are evaluated AT signal-bar close, not as a separate post-signal step.
+
+### 4.5 Entry mechanics
+
+- **Trigger bar:** H4 bar that satisfies §4.2's predicate (the "signal bar").
+- **Fill bar:** the next H4 bar after the trigger bar (i.e., bar N+1 where N is the signal bar).
+- **Fill price:** open of bar N+1.
+- **Order type:** market on bar N+1 open.
+- **Slippage assumption:** real bid/ask spread from MT5 broker feed (L_PROTOCOL §1 non-negotiable). No spread modelling for backtesting beyond what HistData M1 bid+ask provides.
+
+### 4.6 Exit mechanics
+
+- **Initial SL anchor:** entry price.
+- **Initial SL distance:** `2.0 × ATR(14)_H4` measured at the signal bar (NOT recomputed at fill).
+- **SL update rule:** static until the partial-close milestone.
+- **Partial close trigger:** when running PnL ≥ +1R (where R = the initial SL distance in price units), close 50% of position at next H4 bar's open. The +1R condition is evaluated bar-close, not intra-bar.
+- **Runner trail activation:** the remaining 50% trails from the partial-close moment forward.
+- **Trail distance:** 1R below the highest H4 close-since-entry (bar-close updates only, no intra-bar trail updates).
+- **Trail reference:** peak H4 close (high-since-entry). Bar-close updates only.
+- **Trail update frequency:** once per H4 bar close.
+- **TP:** none (the partial close + trail handles the upside).
+- **Time exit:** 240 H4 bars after entry (≈ 40 calendar days), regardless of PnL state. Force-closes any remaining size at the H4 open of bar N+240+1.
+- **Bar-by-bar evaluation order on each H4 bar:** (1) check SL hit; (2) if SL hit, exit at SL price; (3) else if pre-partial-close and close ≥ +1R, schedule partial close at next bar open; (4) else if post-partial-close, update trail level; (5) check trail hit; (6) check time exit. Stops and trail use the H4 close as the reference for "hit" — intra-bar wicks are NOT a trigger.
+
+### 4.7 Exposure cap
+
+- **Type:** unlimited (closure §1 `best_architecture.exposure_cap: unlimited`).
+- **Per-pair invariant:** max 1 open position per pair (L_PROTOCOL §2 Step 1 default; preserved at A1).
+- **Per-currency cap:** none.
+- **Global concurrent cap:** none.
+- **Behaviour at cap:** N/A — exposure is unlimited globally, and per-pair-1 means a new signal on a pair with an open position is simply skipped (no queue).
+
+### 4.8 Risk sizing
+
+- **`r_safe` value:** 0.4339% (closure §10: `k_safe = 8.0 / 9.22 = 0.8677`; `r_safe = 0.5% × 0.8677 = 0.4339%`).
+- **`r_hard` value:** 0.5423% (closure §10: `k_hard = 10.0 / 9.22 = 1.0846`).
+- **Risk basis:** reset-floor (L arc convention).
+- **Floor reset condition:** engine default — typically per-arc starting balance or last-reset-to-floor marker; see engine spec for the exact rule.
+- **Position size formula:** `lots = floor( (current_reset_floor × r_safe_pct / 100) / (sl_distance_in_price × pip_value × contract_size) , 0.01 )` (round down to the 0.01 lot step).
+- **Lot rounding:** down to the broker's minimum lot step (0.01 on 5ers).
+- **Starting balance assumption (backtest):** $100,000.
+
+### 4.9 Session / time-of-day rules
+
+- **Trading hours:** 24/5 (Sun 22:00 UTC open → Fri 22:00 UTC close, MT5 broker convention). No intraday session filter — the signal is evaluated at every H4 bar close.
+- **Day-of-week filter:** none beyond the standard weekend break.
+- **News-window filter:** none (no news-proximity exclusion; per L_PROTOCOL convention and KH-24 baseline).
+- **Holiday handling:** broker calendar — bars that don't exist in the H4 series are skipped naturally.
+
+### 4.10 Discrepancies and caveats
+
+- **Config YAML reconstruction.** `configs/l_arc_10/winning_config.yaml` was reconstructed retrospectively from closure §1, `step_5/wfo_results.csv`, and `scripts/l_arc_10_v3/step_5.py`. Original engine ran from the inline driver script. Reconstructed file is the source of truth going forward; pre-retrofit deployment would require source verification against `scripts/l_arc_10_v3/step_5.py`.
+- **Chained DD not measured (forwarded out of Step 6 scope per main #178).** Per-fold equity reset means cumulative cross-fold DD is unknown. The §10 PASS-DEPLOYABLE finalisation depends on `chained_max_dd_base_pct ≤ 11.52%` (which would scale to ≤ 10% at `k_safe = 0.87`). Plausible but unverified. Engine re-run with continuous-equity tracking still recommended for definitive measurement; verdict reverts to PROVISIONAL if a re-run surfaces a constraint #7 failure per §10 finalisation clause.
+- **Per-day max-DD series not built (forwarded out of Step 6 scope per main #178).** §10 constraint #6 (daily breaches at `r_safe` = 0) carries a missing-data flag because the per-day series under v3.0 pre-amendment wasn't emitted. Under `k_safe < 1`, the per-day breach count can only decrease relative to `r_base` count — but the `r_base` count itself wasn't stored. Verdict reverts per §10 finalisation clause if a re-run surfaces a constraint #6 failure.
+- **Oracle WFO not a fair upper bound.** Oracle was locked to `sl_only` at SL=4.0; winning A1 uses `sl_partial_close_1r_runner_trail` at SL=3.5. Oracle reports −11.74% worst ROI vs A1 +26.49%, which is structurally impossible if both used the same exit. Treat oracle as informational only.
+- **Pool-size drift from v2 engine.** v2→v3 produced +312% pool size (802 → 3,301 trades). Path features (mid-based) are spread-independent; pool size + exposure-derived metrics are not. Forward arcs need not reproduce v2 numbers.
+- **Spread floor source.** Per L_PROTOCOL §1 — real bid/ask from HistData M1; no fallback. Live EA must use MT5 broker spreads, not a synthetic floor.
+
+### 4.11 Deployment readiness checklist
+
+- [ ] Config YAML at `configs/l_arc_10/winning_config.yaml` exists and is self-contained. (✓ exists; ⚠️ reconstructed retrospectively — verify against `scripts/l_arc_10_v3/step_5.py` before deploying)
+- [ ] All features in §4.3 reproduce against KH-24 live MT5 data within tolerance. (N/A — A1 carries no classifier features)
+- [ ] Risk sizing at `r_safe = 0.4339%` confirmed feasible against 5ers broker minimums. (PENDING — minimum-lot feasibility check at small-balance accounts)
+- [ ] EA implementation matches §4.2-4.9 line-by-line. (PENDING — EA not yet implemented for Arc 10)
+- [ ] Backtest-vs-EA byte-identical pre-deployment shadow run on 30 days of data. (PENDING)
+- [x] Step 6 causal audit clean. (✓ — `results/l_arc_10/step_6/audit_report.md` PASS per main #178; verdict finalised PASS-DEPLOYABLE)
+- [ ] **Engine re-run with continuous-equity tracking + per-day max-DD emission still recommended for definitive measurement of constraints #6 / #7 (see §10 finalisation clause — verdict reverts on failure).**
 
 ---
 

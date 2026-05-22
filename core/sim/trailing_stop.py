@@ -129,10 +129,16 @@ class TrailManager:
     def update_all_at_close(
         self, snapshot: dict[str, pd.Series | None], account: Account
     ) -> dict[int, float]:
-        """Update every registered trail using the bar's mid-close.
+        """Update every registered trail using the bar's BID close.
+
+        Per PR-E.1.6 diff doc Section B: EA reads ``CopyClose(PERIOD_H4)``
+        which is bid-side single OHLC. Earlier (pre-PR-E.1.6) v3 used
+        ``(close_bid + close_ask) / 2`` (mid), which made the trail
+        activate earlier and ratchet higher than the EA — cutting big
+        winners short.
 
         Returns ``{position_id: new_sl_price}`` for positions whose
-        trail moved this bar (for logging / determinism).
+        trail moved this bar.
         """
         updates: dict[int, float] = {}
         for pos_id in sorted(self._states):
@@ -143,12 +149,41 @@ class TrailManager:
                 self.deregister(pos_id)
                 continue
             bar = snapshot.get(pos.pair)
-            if bar is None or pd.isna(bar.get("close_bid")) or pd.isna(bar.get("close_ask")):
+            if bar is None or pd.isna(bar.get("close_bid")):
                 continue
-            mid_close = float((bar["close_bid"] + bar["close_ask"]) / 2.0)
-            if state.update_at_close(mid_close):
+            close_bid = float(bar["close_bid"])
+            if state.update_at_close(close_bid):
                 updates[pos_id] = state.current_sl_price
         return updates
+
+    def trail_exit_triggers_at_close(
+        self, snapshot: dict[str, pd.Series | None], account: Account
+    ) -> dict[int, float]:
+        """Identify positions whose trail's activated AND bar close ≤ trail.
+
+        Per PR-E.1.6 diff doc Section B: the EA's trail exit fires when
+        the H4 bar's CLOSE (bid) falls to or below the trail level —
+        NOT on an intra-bar wick of the following bar. This method
+        flags such positions so the driver can queue them for next-bar
+        open fill (EA's pending_close pattern).
+
+        Returns ``{position_id: trail_level_when_triggered}``. Caller
+        decides what fill price to use.
+        """
+        triggers: dict[int, float] = {}
+        for pos_id in sorted(self._states):
+            state = self._states[pos_id]
+            if not state.activated:
+                continue
+            pos = account._open.get(pos_id)  # noqa: SLF001
+            if pos is None:
+                continue
+            bar = snapshot.get(pos.pair)
+            if bar is None or pd.isna(bar.get("close_bid")):
+                continue
+            if float(bar["close_bid"]) <= state.current_sl_price:
+                triggers[pos_id] = state.current_sl_price
+        return triggers
 
     def effective_sl(self, position: Position) -> float | None:
         """Return the live SL price for ``position``, including trail updates.

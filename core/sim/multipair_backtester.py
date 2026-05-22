@@ -111,15 +111,51 @@ class MultiPairBacktester:
 
     # internal: deferred entries from prior bar awaiting fill at next-bar open
     _pending: list[Order] = None  # type: ignore[assignment]
+    # internal: deferred CLOSES queued at bar-close (trail/kijun_d1 fire at
+    # bar close in the EA; fill at next-bar open). Per PR-E.1.6 diff doc
+    # Section B. {position_id: exit_reason}
+    _pending_closes: dict[int, str] = None  # type: ignore[assignment]
 
     def __post_init__(self) -> None:
         self._pending = []
+        self._pending_closes = {}
 
     def _effective_sl(self, pos: Position) -> float | None:
-        """SL price for ``pos`` accounting for any active trailing stop."""
-        if self.trail_manager is not None:
-            return self.trail_manager.effective_sl(pos)
+        """SL price for ``pos``. Per PR-E.1.6 diff doc Section B, the EA
+        freezes the broker SL at the initial hard stop forever — trail is
+        managed software-only and fires at bar close (queued via
+        ``_pending_closes``). So the intra-bar SL check should use the
+        ORIGINAL ``pos.sl_price``, not the trail level.
+        """
         return pos.sl_price
+
+    def _fill_pending_closes(self, t: pd.Timestamp, snapshot: dict[str, pd.Series | None]) -> None:
+        """Execute any closes queued at the prior bar's close.
+
+        Long exits fill at next-bar ``open_bid`` (EA pattern). The
+        ``_pending_closes`` dict maps position_id → exit_reason ("trailing_stop"
+        or "kijun_d1"). After fill, deregister any associated trail.
+        """
+        if not self._pending_closes:
+            return
+        for pos_id in sorted(self._pending_closes):
+            reason = self._pending_closes[pos_id]
+            pos = self.account._open.get(pos_id)  # noqa: SLF001
+            if pos is None:
+                continue  # already closed by intra-bar SL or other path
+            bar = snapshot.get(pos.pair)
+            if bar is None or not bool(is_tradable_bar(bar.to_frame().T).iloc[0]):
+                # Untradable bar: drop the close silently; retry next bar
+                continue
+            # Long market exit on next-bar open: bid (selling into the bid)
+            if pos.direction is Direction.LONG:
+                fill_px = float(bar["open_bid"])
+            else:
+                fill_px = float(bar["open_ask"])
+            self.account.close(pos_id, t, fill_px, reason)
+            if self.trail_manager is not None:
+                self.trail_manager.deregister(pos_id)
+        self._pending_closes = {}
 
     # ── exit checks ─────────────────────────────────────────────────
     def _check_exits(self, t: pd.Timestamp, snapshot: dict[str, pd.Series | None]) -> None:
@@ -180,13 +216,12 @@ class MultiPairBacktester:
                     self.trail_manager.deregister(pos_id)
                 continue
 
-            # Signal-driven exit predicates (e.g. kijun_d1)
+            # Signal-driven exit predicates (e.g. kijun_d1) fire at BAR CLOSE
+            # and queue a close-at-next-bar-open per PR-E.1.6 Section B+C.
             if self.exit_predicates:
                 decision = evaluate_predicates(list(self.exit_predicates), pos, snapshot, t)
                 if decision is not None:
-                    self.account.close(pos_id, t, decision.fill_price, decision.exit_reason)
-                    if self.trail_manager is not None:
-                        self.trail_manager.deregister(pos_id)
+                    self._pending_closes[pos_id] = decision.exit_reason
 
     # ── entry fills (deferred from prior bar) ───────────────────────
     def _fill_pending_entries(
@@ -249,14 +284,21 @@ class MultiPairBacktester:
 
     # ── per-bar processing ──────────────────────────────────────────
     def _process_bar(self, t: pd.Timestamp, snapshot: dict[str, pd.Series | None]) -> None:
-        # 1. fill any entries pending from prior bar
+        # 1a. fill any closes queued at the prior bar's close (trail / kijun_d1)
+        self._fill_pending_closes(t, snapshot)
+        # 1b. fill any entries pending from prior bar
         self._fill_pending_entries(t, snapshot)
-        # 2. check exits on currently open positions (SL/TP + predicates)
+        # 2. check intra-bar SL/TP exits + bar-close predicate exits
+        #    (predicate hits go to _pending_closes for next-bar-open fill)
         self._check_exits(t, snapshot)
-        # 3. update trailing stops at bar close (after exits — so a position
-        #    that already exited intra-bar doesn't get its trail ratcheted)
+        # 3. update trailing stops at bar close AND queue trail-triggered
+        #    closes for next-bar-open fill (EA pattern per PR-E.1.6 §B)
         if self.trail_manager is not None:
             self.trail_manager.update_all_at_close(snapshot, self.account)
+            trail_hits = self.trail_manager.trail_exit_triggers_at_close(snapshot, self.account)
+            for pos_id in trail_hits:
+                # Don't overwrite a predicate-driven exit that fired this bar
+                self._pending_closes.setdefault(pos_id, "trailing_stop")
         # 4. mark to market
         self.account.mark_to_market(t, self._close_mid(snapshot))
         # 5. ask the strategy for new orders

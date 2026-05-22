@@ -16,9 +16,11 @@ Conditions (long only):
     C8: prev D1 close > prev D1 Kijun(26)         — D1 regime up (lag-1)
     C9: prev D1 close ≤ prev D1 Kijun + 1.0×D1 ATR — D1 not too extended
 
-Inputs use **mid OHLC** ((bid + ask) / 2) so the signal logic is
-spread-neutral. The original MT5 reference used single-OHLC bars; the
-mid-OHLC port gives the same logic on v3's bid+ask schema.
+Inputs use **bid-side single OHLC** (close_bid, high_bid, low_bid,
+open_bid) to match the deployed MT5 EA, which reads single-side OHLC
+from ``CopyRates`` (MT5 returns the bid-side OHLC by broker
+convention). Earlier (pre-PR-E.1.6) v3 ports used mid-OHLC; PR-E.1.6
+corrects this per ``docs/dispatches/kh24_ea_full_diff.md`` Section A.
 
 D1 alignment uses the one-day-lag rule: each H4 bar at calendar day T
 sees only D1 data from day T-1 or earlier (per L_PROTOCOL §1
@@ -36,7 +38,7 @@ from dataclasses import dataclass
 import numpy as np
 import pandas as pd
 
-from core.features._helpers import kijun, mid_close, mid_high, mid_low, wilder_atr
+from core.features._helpers import kijun, wilder_atr
 
 
 @dataclass(frozen=True)
@@ -86,13 +88,15 @@ def _build_d1_lag1_arrays(
     D1 bar from day T-1 or earlier.
 
     Mirrors ``scripts/arc_kh24_v2/step1/_signal._build_d1_lag1_arrays``
-    but operates on v3 bid+ask (mid OHLC).
+    on v3 BID-side single OHLC (matches EA's CopyRates convention).
     """
     d1 = pd.DataFrame(index=df_d1.index.copy())
-    d1["d1_close"] = mid_close(df_d1).values
-    d1["d1_kijun"] = kijun(mid_high(df_d1), mid_low(df_d1), period=params.d1_kijun_period).values
+    d1["d1_close"] = df_d1["close_bid"].values
+    d1["d1_kijun"] = kijun(
+        df_d1["high_bid"], df_d1["low_bid"], period=params.d1_kijun_period
+    ).values
     d1["d1_atr"] = wilder_atr(
-        mid_high(df_d1), mid_low(df_d1), mid_close(df_d1), period=params.d1_atr_period
+        df_d1["high_bid"], df_d1["low_bid"], df_d1["close_bid"], period=params.d1_atr_period
     ).values
     d1["_date"] = d1.index.normalize()
     d1 = d1.drop_duplicates(subset=["_date"], keep="last").reset_index(drop=True)
@@ -153,15 +157,15 @@ def evaluate_kh24_signal(
             d1_atr_lag1=empty_f,
         )
 
-    open_mid = ((df_h4["open_bid"] + df_h4["open_ask"]) / 2.0).values
-    high_mid = mid_high(df_h4).values
-    low_mid = mid_low(df_h4).values
-    close_mid = mid_close(df_h4).values
+    open_bid = df_h4["open_bid"].values
+    high_bid = df_h4["high_bid"].values
+    low_bid = df_h4["low_bid"].values
+    close_bid = df_h4["close_bid"].values
 
     atr_h4 = wilder_atr(
-        mid_high(df_h4), mid_low(df_h4), mid_close(df_h4), period=params.atr_period
+        df_h4["high_bid"], df_h4["low_bid"], df_h4["close_bid"], period=params.atr_period
     ).values.astype(float)
-    kijun_h4 = kijun(mid_high(df_h4), mid_low(df_h4), period=params.kijun_period).values.astype(
+    kijun_h4 = kijun(df_h4["high_bid"], df_h4["low_bid"], period=params.kijun_period).values.astype(
         float
     )
 
@@ -171,11 +175,11 @@ def evaluate_kh24_signal(
     sig = np.zeros(n, dtype=bool)
     warm = max(params.atr_period, params.kijun_period, params.c6_depth_bars)
 
-    bar_range = high_mid - low_mid
-    body = np.abs(close_mid - open_mid)
+    bar_range = high_bid - low_bid
+    body = np.abs(close_bid - open_bid)
     # close_position is undefined when range is 0 — guard with safe-divide.
     with np.errstate(divide="ignore", invalid="ignore"):
-        close_pos = np.where(bar_range > 0, (close_mid - low_mid) / bar_range, np.nan)
+        close_pos = np.where(bar_range > 0, (close_bid - low_bid) / bar_range, np.nan)
         body_atr = np.where(atr_h4 > 0, body / atr_h4, np.nan)
 
     for i in range(warm, n):
@@ -187,7 +191,7 @@ def evaluate_kh24_signal(
             continue
 
         # C1: bearish bar
-        if not (close_mid[i] < open_mid[i]):
+        if not (close_bid[i] < open_bid[i]):
             continue
         # C2: substantial body
         if not np.isfinite(body_atr[i]) or body_atr[i] < params.long_body_threshold:
@@ -196,15 +200,15 @@ def evaluate_kh24_signal(
         if not np.isfinite(close_pos[i]) or close_pos[i] > params.long_close_position_max:
             continue
         # C4: close > 4H Kijun
-        if not (close_mid[i] > k):
+        if not (close_bid[i] > k):
             continue
         # C5: close ≤ Kijun + 1.0 × ATR
-        if close_mid[i] > k + params.c5_distance_cap_atr * a:
+        if close_bid[i] > k + params.c5_distance_cap_atr * a:
             continue
         # C6: 10-bar drop ≥ 0.5 × ATR
         if i < params.c6_depth_bars:
             continue
-        depth = (close_mid[i] - close_mid[i - params.c6_depth_bars]) / a
+        depth = (close_bid[i] - close_bid[i - params.c6_depth_bars]) / a
         if depth > -params.c6_depth_threshold:
             continue
         # C8: prev D1 close > prev D1 Kijun

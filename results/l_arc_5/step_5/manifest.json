@@ -1,0 +1,15 @@
+{
+  "deployable_after_holdout": false,
+  "generated_at": "2026-05-22T15:25:28+00:00",
+  "holdout_top_verdict": "fail",
+  "n_folds_search": 11,
+  "step": 5,
+  "top_3_ids": [
+    "A1_sl3.0_trailON_expunl",
+    "A1_sl4.0_trailON_expunl",
+    "A1_sl3.5_trailON_expunl"
+  ],
+  "total_configs": 24,
+  "winner_config_id": "A1_sl3.0_trailON_expunl",
+  "winner_verdict": "fail"
+}

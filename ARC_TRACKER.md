@@ -4,7 +4,7 @@
 > Schema locked at v3.0. Replaces STATUS.md, CHANGELOG.md, ARC_QUEUE.md, and ACTIVE_ARCS.md.
 > First populated on first arc open under L_PROTOCOL v3.0.
 
-Last auto-update: never (empty initial state)
+Last auto-update: manual: 2026-05-22
 
 ---
 
@@ -21,8 +21,7 @@ Last auto-update: never (empty initial state)
 
 | Arc | Signal | TF | Sub-protocol | Best architecture | Worst-fold ratio | Verdict | Failed at step | Closure doc |
 |---|---|---|---|---|---|---|---|---|
-
-(empty — no arcs closed under v3.0)
+| l_arc_5 | mtf_alignment.2_down_mixed.kijun.h_120 (LCHAR Entry 5, h=120 override) | H1 | vanilla | A1 system_level_filter | -0.9042 | FAIL | 5 | [results/l_arc_5/ARC_CLOSURE.md](results/l_arc_5/ARC_CLOSURE.md) |
 
 ---
 
@@ -44,7 +43,7 @@ Schema:
 
 | Architecture | Arcs tested | Won (best in arc) | Avg ratio when won |
 |---|---|---|---|
-| A1 system_level_filter | 0 | 0 | — |
+| A1 system_level_filter | 1 | 1 |  -0.9042 |
 | A2 classifier_filter | 0 | 0 | — |
 | A3 pipeline_de | 0 | 0 | — |
 | A4 pipeline_d_exits | 0 | 0 | — |
@@ -63,7 +62,7 @@ Schema:
 | Monotonic up | 0 | — | — |
 | Monotonic down | 0 | — | — |
 | Choppy | 0 | — | — |
-| Other / unclassified | 0 | — | — |
+| Other / unclassified | 3 |  1.2193  |  0.5033 |
 
 ---
 
@@ -76,7 +75,7 @@ Schema:
 | no_capturable_cluster | 0 | — | — |
 | entry_feature_auc_ceiling | 0 | — | — |
 | step5_wf_roi_below_gate | 0 | — | — |
-| step5_dd_above_gate | 0 | — | — |
+| step5_dd_above_gate | 1 |  l_arc_5  |  2026-05-22 |
 | step5_sign_consistency_fail | 0 | — | — |
 | step6_causal_audit_fail | 0 | — | — |
 | selection_bias | 0 | — | — |
@@ -93,8 +92,10 @@ Schema:
 
 | Cluster ID | Archetype | n | mfe_p50_r | ww_pp | reach_1r | step3_composite | step4_e_auc | step4_d1_auc | sl_atr | outcome |
 |---|---|---|---|---|---|---|---|---|---|---|
-
-(empty — no clusters logged yet)
+| l_arc_5.c0 | bimodal | 19091 | 5.5169 | 0.0063 | 1.0000 | 1.5795 | 0.7404224388022451 | None | 1.50 | passed_step3 |
+| l_arc_5.c1 | unclassified | 38037 | 1.9341 | 0.0388 | 0.9608 | 0.9359 | 0.5402625464907423 | None | 1.50 | dies_step4 |
+| l_arc_5.c2 | unclassified | 37749 | 0.5045 | 0.9704 | 0.0457 | 0.1844 | None | None | 1.50 | dies_step3 |
+| l_arc_5.c3 | monotonic_down | 31924 | 0.0575 | 0.9992 | 0.0024 | 0.0157 | None | None | 1.50 | dies_step3 |
 
 Schema:
 - `Cluster ID` — `<arc_name>.<cluster_id>` (e.g., `arc_07.c1`)
@@ -120,8 +121,9 @@ Schema:
 
 | Tag | Count | Arcs |
 |---|---|---|
-
-(empty — no tags logged yet)
+| v3_first_complete_arc | 1 | l_arc_5 |
+| thin_search_scope_24_configs | 1 | l_arc_5 |
+| h120_mtf_alignment_v3_replay | 1 | l_arc_5 |
 
 ---
 

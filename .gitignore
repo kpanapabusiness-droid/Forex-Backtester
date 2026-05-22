@@ -106,6 +106,13 @@ results/l_arc_2_redo/*
 !results/l_arc_2_redo2/**
 results/l_arc_2_redo2/**/trades_paths.csv
 results/l_arc_2_redo2/**/_run_log.txt
+# Arc 5 v3.0 (mtf_alignment.2_down_mixed.kijun.h_120, long, H1) — Step 1+
+# outputs (L_PROTOCOL v3.0 §6: arc results data is direct-to-main).
+# Heavy artefacts (pool.parquet ~30MB, paths.parquet ~200MB) excluded;
+# small CSVs + summaries + manifests + closure tracked.
+!results/l_arc_5/
+!results/l_arc_5/**
+results/l_arc_5/step_1/paths.parquet
 # Arc 7 (liquidity sweep + reclaim, long, 4H) — Step 1+ outputs
 # (L_ARC_PROTOCOL v2.1.2 §13: arc results data is direct-to-main).
 !results/l_arc_7/

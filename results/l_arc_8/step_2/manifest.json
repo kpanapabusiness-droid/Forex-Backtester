@@ -1,0 +1,25 @@
+{
+  "artefacts": {
+    "cluster_assignments.parquet": {
+      "sha256": "0abfddc5d6fadd8931cbb8e07d33747756bec207ddc1992508a07bf2f9506b47",
+      "size_bytes": 381609
+    },
+    "cluster_metrics.csv": {
+      "sha256": "c2cddbe4b1c997d22d9ead9bcdb833434b90909e06c3548a5dece90c2400ab62",
+      "size_bytes": 1047
+    },
+    "cluster_summary.md": {
+      "sha256": "8d48e2c1c6e3136f8ee4e98dc155811f95017ab35a95d0a9622c96f682c69065",
+      "size_bytes": 1954
+    },
+    "path_features.parquet": {
+      "sha256": "5c18dd0529634e527b1cf153bf1f9058651bd03a34c8fb97cf5ec2c5a22b4295",
+      "size_bytes": 363949
+    },
+    "silhouette_sweep.csv": {
+      "sha256": "5268aba09c40a5cc963d8240bf6bd300b9c0215f0463f4ff32af48a0b5857a91",
+      "size_bytes": 219
+    }
+  },
+  "generated_at": "2026-05-22T07:12:46Z"
+}

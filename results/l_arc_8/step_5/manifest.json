@@ -1,0 +1,25 @@
+{
+  "artefacts": {
+    "architectures_ranked.md": {
+      "sha256": "e018de1fc98c917644c27d941478dab575b8b8289a0fd6ba4bf4e6e9fb5b7c2c",
+      "size_bytes": 5073
+    },
+    "holdout_results.csv": {
+      "sha256": "8a6e606e21e1b446800cf5d81f095ea3469d0d1cd065b97047c1195692b14035",
+      "size_bytes": 646
+    },
+    "per_fold_metrics.csv": {
+      "sha256": "68e79f47e88097b12fb6f34619a478c79667c10be28d4936da8ebc8fcf0863be",
+      "size_bytes": 72028
+    },
+    "wfo_oracle.csv": {
+      "sha256": "017f5d9cf73db1bc4f420797ef025be53b604b689437d4b91f5ae03691756131",
+      "size_bytes": 3718
+    },
+    "wfo_results.csv": {
+      "sha256": "25bb9ee58c9fd33ea7485b634878971a1588eed92d516e7074581da4f53350bb",
+      "size_bytes": 13884
+    }
+  },
+  "generated_at": "2026-05-22T10:53:42Z"
+}

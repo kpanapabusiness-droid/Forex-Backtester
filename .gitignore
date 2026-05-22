@@ -148,6 +148,10 @@ results/replays_v2_1_1/**/trades_paths_extended.csv
 # L_ARC_PROTOCOL v2.2 governance: arc queue state file (FIFO selection
 # coordination between parallel CC sessions). Tracked by design.
 !results/ARC_QUEUE.md
+# L_PROTOCOL Amendment 3 retrospective re-evaluation (arcs 8, 10, 11)
+# — intent doc + SUMMARY.md + any per-arc supporting analysis.
+!results/re_evaluation_2026_05/
+!results/re_evaluation_2026_05/**
 results_phase*/
 __pycache__/
 .ipynb_checkpoints/

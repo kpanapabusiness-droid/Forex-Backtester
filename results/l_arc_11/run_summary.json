@@ -1,0 +1,173 @@
+{
+  "arc_name": "l_arc_11",
+  "candidate_cluster_ids": [
+    0,
+    1
+  ],
+  "holdout_results": [
+    {
+      "config_id": "a6_shb_metalabel_0.4_0.6_c0",
+      "deployable": false,
+      "holdout_dd_pct": 0.0,
+      "holdout_ratio": 0.0,
+      "holdout_roi_pct": 0.0,
+      "holdout_verdict": "fail",
+      "search_verdict": "fail"
+    },
+    {
+      "config_id": "a2_shb_cluster0",
+      "deployable": false,
+      "holdout_dd_pct": 0.5749685375158409,
+      "holdout_ratio": 0.0226167834402299,
+      "holdout_roi_pct": 0.0130039388979414,
+      "holdout_verdict": "fail",
+      "search_verdict": "fail"
+    },
+    {
+      "config_id": "a1_shb_baseline",
+      "deployable": false,
+      "holdout_dd_pct": 0.6733615695684885,
+      "holdout_ratio": -0.204651949473414,
+      "holdout_roi_pct": -0.1378047579126691,
+      "holdout_verdict": "fail",
+      "search_verdict": "fail"
+    }
+  ],
+  "k_selected": 4,
+  "n_configs_evaluated": 3,
+  "n_folds": 11,
+  "pool_sha256": "b1d1a5604db835e8a73576c9780a2cd48e59ccaae22ad4b2310547d08c4c35ea",
+  "pool_size": 17533,
+  "primary_classifier": "rf",
+  "primary_cluster": 0,
+  "primary_threshold": 0.11937665572820917,
+  "search_results": [
+    {
+      "config_id": "a6_shb_metalabel_0.4_0.6_c0",
+      "mean_fold_ratio": 0.0,
+      "min_trades_per_fold": 0,
+      "n_folds_evaluated": 10,
+      "n_negative_folds": 0,
+      "verdict": "fail",
+      "worst_fold_dd": 0.0,
+      "worst_fold_ratio": 0.0,
+      "worst_fold_roi": 0.0
+    },
+    {
+      "config_id": "a2_shb_cluster0",
+      "mean_fold_ratio": 0.430470649290689,
+      "min_trades_per_fold": 15,
+      "n_folds_evaluated": 10,
+      "n_negative_folds": 4,
+      "verdict": "fail",
+      "worst_fold_dd": 0.3835933871627093,
+      "worst_fold_ratio": -0.7686751434881255,
+      "worst_fold_roi": -0.2402732003844523
+    },
+    {
+      "config_id": "a1_shb_baseline",
+      "mean_fold_ratio": 0.2757329120037061,
+      "min_trades_per_fold": 21,
+      "n_folds_evaluated": 10,
+      "n_negative_folds": 6,
+      "verdict": "fail",
+      "worst_fold_dd": 0.405945294198647,
+      "worst_fold_ratio": -0.8899285122907781,
+      "worst_fold_roi": -0.3419045207834701
+    }
+  ],
+  "silhouettes": {
+    "2": 0.3961,
+    "3": 0.3953,
+    "4": 0.4934,
+    "5": 0.4764,
+    "6": 0.4593
+  },
+  "step_3_per_cluster": [
+    {
+      "cluster_id": 0,
+      "composite": 1.9803368676275148,
+      "is_candidate": true,
+      "mfe_p50": 7.766447800112799,
+      "n_trades": 2192,
+      "reach_1r": 1.0,
+      "selected_sl_mult": 1.5,
+      "shape_tag": "bimodal",
+      "ww_pp": 0.0018248175182481
+    },
+    {
+      "cluster_id": 1,
+      "composite": 0.9678177855054464,
+      "is_candidate": true,
+      "mfe_p50": 2.1086998724803827,
+      "n_trades": 6287,
+      "reach_1r": 0.9648480992524257,
+      "selected_sl_mult": 1.5,
+      "shape_tag": "unclassified",
+      "ww_pp": 0.0349928423731509
+    },
+    {
+      "cluster_id": 2,
+      "composite": 0.189860415972812,
+      "is_candidate": false,
+      "mfe_p50": 0.5110540687818848,
+      "n_trades": 5032,
+      "reach_1r": 0.0425278219395866,
+      "selected_sl_mult": 1.5,
+      "shape_tag": "unclassified",
+      "ww_pp": 0.9680047694753576
+    },
+    {
+      "cluster_id": 3,
+      "composite": 0.022128726732781,
+      "is_candidate": false,
+      "mfe_p50": 0.0900695627600085,
+      "n_trades": 4022,
+      "reach_1r": 0.0007458975634012,
+      "selected_sl_mult": 1.5,
+      "shape_tag": "monotonic_down",
+      "ww_pp": 0.9992541024365988
+    }
+  ],
+  "step_4_per_cluster": [
+    {
+      "best_classifier": "rf",
+      "best_classifier_mean_auc": 0.6543145632683272,
+      "best_threshold": 0.11937665572820917,
+      "cluster_id": 0,
+      "n_trades": 28368,
+      "top_10_features": [
+        "w1_close_slope_sign",
+        "d1_atr_percentile_100",
+        "prior_session_low_distance",
+        "day_of_week",
+        "session_london",
+        "d1_close_slope_magnitude",
+        "distance_to_round_number",
+        "atr_percentile_100",
+        "usd_strength_index",
+        "spread_vs_trailing_100"
+      ]
+    },
+    {
+      "best_classifier": "rf",
+      "best_classifier_mean_auc": 0.6315802372178603,
+      "best_threshold": 0.3207335409983906,
+      "cluster_id": 1,
+      "n_trades": 28990,
+      "top_10_features": [
+        "w1_close_slope_sign",
+        "kijun_26_distance",
+        "hour_of_day",
+        "atr_percentile_100",
+        "eur_strength_index",
+        "dollar_bloc_state",
+        "session_ldn_ny_overlap",
+        "signal_density_28",
+        "prior_session_low_distance",
+        "session_dead"
+      ]
+    }
+  ],
+  "verdict": "FAIL"
+}

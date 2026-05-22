@@ -1,8 +1,0 @@
-# Arc 11 v3.0 — Step 1 determinism audit
-
-L_PROTOCOL §1 non-negotiable: two-run byte-identical pool.
-
-run 1 sha256(pool csv): 1e9839975883ac3a81761963e9b3ce06c64f446b62cb045be089490fccebd8aa
-run 2 sha256(pool csv): 1e9839975883ac3a81761963e9b3ce06c64f446b62cb045be089490fccebd8aa
-
-verdict: PASS

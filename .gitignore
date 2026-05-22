@@ -131,6 +131,7 @@ results/l_arc_8/step1_quicktest/
 !results/l_arc_11/**
 results/l_arc_11/**/trades_paths.csv
 results/l_arc_11/**/trades_paths.parquet
+results/l_arc_11/**/paths.parquet
 results/l_arc_11/**/run.log
 # v2.1.1 Open-18 empirical replays (per-cohort: arc_3_stepwise, kh24_v2_c4,
 # arc_2_redo_c2). Track all small CSVs + REPLAY_RESULT.md; exclude the large

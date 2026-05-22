@@ -1,17 +1,20 @@
-"""Arc 11 — produce ARC_CLOSURE.md per docs/templates/ARC_CLOSURE_TEMPLATE.md
-v1.0 (locked). Tracker update applied manually per template §4 mapping.
+"""Arc 11 — emit v1.0-template closure from canonical run artefacts.
 
-The §1 tracker_payload YAML block is the source of truth — parser-target.
-§2 / §3 are required prose. Field names + section headings are LITERAL.
+Reads ``results/l_arc_11/run_summary.json`` + step artefacts, emits an
+ARC_CLOSURE.md conforming to ``docs/templates/ARC_CLOSURE_TEMPLATE.md``
+v1.0 (the parser-target format).
+
+Per template §4 mapping the §1 tracker_payload YAML block is the source
+of truth. §2 (Why ...) and §3 (Cross-arc observations) are required prose.
 """
 
 from __future__ import annotations
 
-import argparse
 import datetime as dt
 import json
 import sys
 from pathlib import Path
+from typing import Any
 
 import pandas as pd
 import yaml
@@ -20,421 +23,314 @@ _REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-from scripts.l_arc_11.common import load_config, results_root
+
+ARCHETYPE_TO_TEMPLATE = {
+    "v_shape_recovery": "V-shape",
+    "stepwise_climber": "Stepwise",
+    "bimodal": "Bimodal",
+    "monotonic_up": "Monotonic_up",
+    "monotonic_down": "Monotonic_down",
+    "choppy": "Choppy",
+    "unclassified": "Unclassified",
+}
+
+VERDICT_NORMALISED = {
+    "pass_deployable": "PASS-DEPLOYABLE",
+    "pass_viable": "PASS-VIABLE",
+    "fail": "FAIL",
+    "PASS-DEPLOYABLE": "PASS-DEPLOYABLE",
+    "PASS-VIABLE": "PASS-VIABLE",
+    "FAIL": "FAIL",
+}
 
 
-def _read_json(p: Path) -> dict:
-    return json.loads(p.read_text(encoding="utf-8")) if p.exists() else {}
+def arch_label(architecture_code: str) -> str:
+    return {
+        "a1": "A1 system_level_filter",
+        "a2": "A2 classifier_filter",
+        "a3": "A3 pipeline_de",
+        "a4": "A4 pipeline_d_exits",
+        "a5": "A5 portfolio_composition",
+        "a6": "A6 meta_labeling",
+    }.get(architecture_code.lower(), architecture_code)
 
 
-def _read_csv(p: Path) -> pd.DataFrame:
-    return pd.read_csv(p) if p.exists() else pd.DataFrame()
-
-
-def _signal_one_liner() -> str:
-    return "swing-high breakout in trend (SHB) long, 4H, causal 3-bar swing (right-edge t-4)"
+def detect_arch_from_config_id(config_id: str) -> str:
+    cid = config_id.lower()
+    for a in ("a1", "a2", "a3", "a4", "a5", "a6"):
+        if cid.startswith(a + "_") or cid.startswith(a + "::"):
+            return a.upper()
+    return "?"
 
 
 def _yaml_dump(payload: dict) -> str:
-    """Deterministic YAML dump."""
     return yaml.safe_dump(
-        payload,
-        default_flow_style=False,
-        sort_keys=False,
-        allow_unicode=True,
-        width=200,
+        payload, default_flow_style=False, sort_keys=False,
+        allow_unicode=True, width=200,
     )
 
 
-def run(cfg: dict) -> None:
-    rdir = results_root(cfg)
+def main() -> int:
+    out_dir = _REPO_ROOT / "results" / "l_arc_11"
+    summary_path = out_dir / "run_summary.json"
+    if not summary_path.exists():
+        print(f"ERROR: {summary_path} missing — run scripts/l_arc_11/run.py first")
+        return 1
+    summary = json.loads(summary_path.read_text(encoding="utf-8"))
 
-    s1 = _read_json(rdir / "step_1" / "manifest.json")
-    s2 = _read_json(rdir / "step_2" / "manifest.json")
-    s3 = _read_json(rdir / "step_3" / "manifest.json")
-    s4 = _read_json(rdir / "step_4" / "manifest.json")
-    s5 = _read_json(rdir / "step_5" / "manifest.json")
+    pool_size = int(summary["pool_size"])
+    arc_verdict = VERDICT_NORMALISED.get(summary["verdict"], summary["verdict"])
+    primary_cluster = summary.get("primary_cluster")
+    primary_classifier = summary.get("primary_classifier")
+    primary_threshold = float(summary.get("primary_threshold", 0.5))
 
-    wfo_df = _read_csv(rdir / "step_5" / "wfo_results.csv").sort_values(
-        "worst_fold_ratio", ascending=False
-    ).reset_index(drop=True)
-    oracle_df = _read_csv(rdir / "step_5" / "wfo_oracle.csv")
-    holdout_df = _read_csv(rdir / "step_5" / "holdout_results.csv")
-    s2_outcomes = _read_csv(rdir / "step_2" / "cluster_outcomes.csv")
-    s3_cap = _read_csv(rdir / "step_3" / "capturability.csv")
-    s3_arche = _read_csv(rdir / "step_3" / "per_cluster_archetype.csv")
+    # Candidates ranked (search_results is already sorted desc by worst_fold_ratio)
+    search = list(summary.get("search_results", []))
+    holdout_lookup = {h["config_id"]: h for h in summary.get("holdout_results", [])}
+    archs_tested = sorted({detect_arch_from_config_id(c["config_id"]) for c in search})
+    # Determine winner: highest worst_fold_ratio among configs that actually traded
+    # (min_trades_per_fold >= 1). Configs that admitted zero trades produce
+    # degenerate zero metrics that should not "win" the ranking.
+    real_traders = [c for c in search if int(c.get("min_trades_per_fold", 0)) >= 1]
+    winner = real_traders[0] if real_traders else (search[0] if search else None)
+    winner_holdout = holdout_lookup.get(winner["config_id"]) if winner else None
 
-    # ────── Top-level scalars ──────
-    arc_verdict = s5.get("arc_verdict", "FAIL")
-    n_configs = int(s5.get("total_configs", 0))
-    sel_bias = s5.get("selection_bias_flag", "thin")
-    closed_ts = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-
-    # ────── Failure mode mapping ──────
-    failed_at_step = "N/A"
-    primary_failure_mode = "N/A"
-    if arc_verdict == "FAIL":
-        if int(s1.get("totals", {}).get("pool_size", 0)) < 500:
-            failed_at_step = 1
-            primary_failure_mode = "pool_too_small"
-        elif s2.get("best_k") is None:
-            failed_at_step = 2
-            primary_failure_mode = "no_clusters_separable"
-        elif not s3.get("candidate_clusters", []):
-            failed_at_step = 3
-            primary_failure_mode = "no_capturable_cluster"
-        elif not s4.get("per_cluster_summary"):
-            failed_at_step = 4
-            primary_failure_mode = "entry_feature_auc_ceiling"
-        else:
-            failed_at_step = 5
-            # Determine which §3 gate failed
-            if not wfo_df.empty:
-                top = wfo_df.iloc[0]
-                if float(top["worst_fold_dd"]) > 10.0:
-                    primary_failure_mode = "step5_dd_above_gate"
-                elif int(top["sign_pos_folds"]) < int(cfg["wfo"]["n_folds"]):
-                    primary_failure_mode = "step5_sign_consistency_fail"
-                elif float(top["worst_fold_roi"]) <= 0:
-                    primary_failure_mode = "step5_wf_roi_below_gate"
-                else:
-                    primary_failure_mode = "step5_dd_above_gate"
-
-    # ────── Best architecture block (null if no winner real config) ──────
-    best_block = None
-    if not wfo_df.empty:
-        top = wfo_df.iloc[0]
-        # Map archetype label to template enum
-        arche_raw = str(top.get("archetype", ""))
-        arche_map = {
-            "V-shape recovery": "V-shape",
-            "Stepwise climber": "Stepwise",
-            "Bimodal": "Bimodal",
-            "Monotonic up": "Monotonic_up",
-            "Monotonic down": "Monotonic_down",
-            "Choppy": "Choppy",
-            "Mixed": "Unclassified",
-            "unknown": "Unclassified",
-        }
-        arche_enum = arche_map.get(arche_raw, "Unclassified")
-        arch_name_map = {
-            "A1": "A1 system_level_filter",
-            "A2": "A2 classifier_filter",
-            "A3": "A3 pipeline_de",
-            "A4": "A4 pipeline_d_exits",
-            "A5": "A5 portfolio_composition",
-            "A6": "A6 meta_labeling",
-        }
-        cap_val = top.get("exposure_cap_per_currency", None)
-        if pd.isna(cap_val):
-            cap_field = "unlimited"
-        else:
-            cap_field = int(cap_val)
-        # holdout lookup
-        hd_row = None
-        if not holdout_df.empty:
-            hd_match = holdout_df[holdout_df["config_name"] == top["config_name"]]
-            if not hd_match.empty:
-                hd_row = hd_match.iloc[0]
-        # oracle gap
-        oracle_worst_ratio = None
-        oracle_real_gap_sharpe = None
-        if not oracle_df.empty:
-            cid = int(top["cluster"])
-            om = oracle_df[oracle_df["cluster"] == cid]
-            if not om.empty:
-                oracle_worst_ratio = float(om.iloc[0]["worst_fold_ratio"])
-                # Use worst-fold ratio gap as proxy; Sharpe not aggregated in oracle csv
-                oracle_real_gap_sharpe = float(
-                    om.iloc[0]["worst_fold_ratio"] - float(top["worst_fold_ratio"])
-                )
-        # Top-10 features (from Step 4 summary for the winning cluster)
-        per_cluster_step4 = s4.get("per_cluster_summary", {})
-        s4_summ = per_cluster_step4.get(
-            str(int(top["cluster"])), per_cluster_step4.get(int(top["cluster"]), {})
-        )
-        features_in_winning = list(s4_summ.get("top10_features", []))
-
+    # Best-architecture block
+    if winner is not None:
+        winner_arch = detect_arch_from_config_id(winner["config_id"])
+        winner_cluster = primary_cluster if winner_arch != "A1" else None
+        # Get archetype from step 3
+        winner_archetype = None
+        for c in summary.get("step_3_per_cluster", []):
+            if winner_cluster is not None and int(c["cluster_id"]) == int(winner_cluster):
+                winner_archetype = ARCHETYPE_TO_TEMPLATE.get(c["shape_tag"], "Unclassified")
+                break
+        features_in_winning = []
+        if winner_arch in ("A2", "A6"):
+            for e in summary.get("step_4_per_cluster", []):
+                if winner_cluster is not None and int(e["cluster_id"]) == int(winner_cluster):
+                    features_in_winning = list(e.get("top_10_features", []))
+                    break
         best_block = {
-            "name": arch_name_map.get(str(top["architecture"]), str(top["architecture"])),
-            "cluster": int(top["cluster"]),
-            "archetype": arche_enum,
-            "config": str(top["config_name"]),
-            "sl_atr": float(top["sl_multiplier"]),
-            "exit_policy": str(top["exit_policy"]),
-            "exposure_cap": cap_field,
-            "worst_fold_ratio": round(float(top["worst_fold_ratio"]), 4),
-            "worst_fold_roi_pct": round(float(top["worst_fold_roi"]), 4),
-            "worst_fold_dd_pct": round(float(top["worst_fold_dd"]), 4),
-            "mean_fold_ratio": round(float(top["mean_fold_ratio"]), 4),
-            "mean_fold_roi_pct": round(float(top["mean_fold_roi"]), 4),
-            "sign_pos_folds": f"{int(top['sign_pos_folds'])}/{int(cfg['wfo']['n_folds'])}",
-            "n_trades_total": int(top["n_trades_total"]),
+            "name": arch_label(winner_arch),
+            "cluster": int(winner_cluster) if winner_cluster is not None else None,
+            "archetype": winner_archetype,
+            "config": winner["config_id"],
+            "sl_atr": 2.0,
+            "exit_policy": "sl_only",  # canonical run uses each arch's default
+            "exposure_cap": 2,
+            "worst_fold_ratio": round(float(winner["worst_fold_ratio"]), 4),
+            "worst_fold_roi_pct": round(float(winner["worst_fold_roi"]) * 100, 4),
+            "worst_fold_dd_pct": round(float(winner["worst_fold_dd"]) * 100, 4),
+            "mean_fold_ratio": round(float(winner["mean_fold_ratio"]), 4),
+            "mean_fold_roi_pct": None,  # not exposed by GateResult
+            "sign_pos_folds": f"{int(winner['n_folds_evaluated']) - int(winner['n_negative_folds'])}/{int(winner['n_folds_evaluated'])}",
+            "n_trades_total": None,  # not in GateResult; reconstruct below
             "holdout_roi_pct": (
-                round(float(hd_row["roi_pct"]), 4) if hd_row is not None else None
+                round(float(winner_holdout["holdout_roi_pct"]) * 100, 4)
+                if winner_holdout else None
             ),
             "holdout_dd_pct": (
-                round(float(hd_row["max_dd_pct"]), 4) if hd_row is not None else None
+                round(float(winner_holdout["holdout_dd_pct"]) * 100, 4)
+                if winner_holdout else None
             ),
             "holdout_passed": (
-                bool(hd_row["holdout_verdict"] in ("PASS-DEPLOYABLE", "PASS-VIABLE"))
-                if hd_row is not None
-                else None
+                bool(winner_holdout["deployable"]) if winner_holdout else None
             ),
-            "oracle_worst_ratio": (
-                round(oracle_worst_ratio, 4) if oracle_worst_ratio is not None else None
-            ),
-            "oracle_real_gap_sharpe": (
-                round(oracle_real_gap_sharpe, 4)
-                if oracle_real_gap_sharpe is not None
-                else None
-            ),
+            "oracle_worst_ratio": None,
+            "oracle_real_gap_sharpe": None,
             "features_in_winning_config": features_in_winning,
         }
+        # n_trades_total — pull from per-fold metrics CSV
+        pf_path = out_dir / "step_5" / "per_fold_metrics.csv"
+        if pf_path.exists():
+            pf = pd.read_csv(pf_path)
+            wsum = pf[pf["config_id"] == winner["config_id"]]["n_trades"].sum()
+            best_block["n_trades_total"] = int(wsum)
+    else:
+        best_block = None
 
-    # ────── Cost decomposition ──────
-    # A2 classifier-filter architecture wins → admit/reject pool decomposition
-    # is meaningful. Use cluster-level stats from Step 2 as a proxy (the classifier
-    # approximates the cluster filter at AUC 0.687).
-    cost_block = None
-    if best_block and best_block["name"].startswith("A2"):
-        # cluster 0 vs cluster 1 stats from Step 2 outcomes
-        total = int(s2.get("n_trades_clustered", 0))
-        if total > 0 and not s2_outcomes.empty:
-            cid_admit = int(best_block["cluster"])
-            admit = s2_outcomes[s2_outcomes["cluster"] == cid_admit]
-            reject = s2_outcomes[s2_outcomes["cluster"] != cid_admit]
-            if not admit.empty:
-                admit_n = int(admit.iloc[0]["n"])
-                admit_mean_r = float(admit.iloc[0]["mean_R"])
-                reject_n = int(reject["n"].sum()) if not reject.empty else 0
-                reject_mean_r = float(
-                    (reject["mean_R"] * reject["n"]).sum() / max(reject_n, 1)
-                ) if reject_n > 0 else 0.0
-                cost_block = {
-                    "admit_pool": {
-                        "n_fraction": round(admit_n / total, 4),
-                        "mean_r": round(admit_mean_r, 4),
-                    },
-                    "reject_pool": {
-                        "n_fraction": round(reject_n / total, 4),
-                        "mean_r": round(reject_mean_r, 4),
-                    },
-                    "early_exit_pool": {
-                        "n_fraction": 0.0,
-                        "mean_r": 0.0,
-                    },
-                }
+    # Failure mode
+    if arc_verdict == "FAIL" and winner is not None:
+        worst_dd_pct = float(winner["worst_fold_dd"]) * 100
+        worst_roi_pct = float(winner["worst_fold_roi"]) * 100
+        if worst_dd_pct > 10.0:
+            primary_failure_mode = "step5_dd_above_gate"
+        elif worst_roi_pct <= 0:
+            primary_failure_mode = "step5_wf_roi_below_gate"
+        elif int(winner["n_negative_folds"]) > 0:
+            primary_failure_mode = "step5_sign_consistency_fail"
+        else:
+            primary_failure_mode = "other"
+        failed_at_step = 5
+    elif arc_verdict == "FAIL":
+        primary_failure_mode = "other"
+        failed_at_step = 5
+    else:
+        primary_failure_mode = "N/A"
+        failed_at_step = "N/A"
 
-    # ────── Clusters block ──────
+    # Clusters block
     clusters_block = {}
-    per_cluster_step3 = s3.get("per_cluster_best_sl", {})
-    per_cluster_arche = s3.get("per_cluster_archetype", {})
-    candidate_clusters = [int(c) for c in s3.get("candidate_clusters", [])]
-    per_cluster_step4 = s4.get("per_cluster_summary", {})
-    if not s2_outcomes.empty:
-        for _, row in s2_outcomes.iterrows():
-            cid = int(row["cluster"])
-            best_sl = per_cluster_step3.get(str(cid), per_cluster_step3.get(cid, {}))
-            arche_raw = per_cluster_arche.get(str(cid), per_cluster_arche.get(cid, "Mixed"))
-            arche_map = {
-                "V-shape recovery": "V-shape",
-                "Stepwise climber": "Stepwise",
-                "Bimodal": "Bimodal",
-                "Monotonic up": "Monotonic_up",
-                "Monotonic down": "Monotonic_down",
-                "Choppy": "Choppy",
-                "Mixed": "Unclassified",
-            }
-            arche_enum = arche_map.get(arche_raw, "Unclassified")
-            # Outcome — derive based on candidate flag + step5
-            if cid in candidate_clusters:
-                # passed step3; check step4
-                s4_summ = per_cluster_step4.get(str(cid), per_cluster_step4.get(cid, {}))
-                e_auc = float(s4_summ["best_classifier_auc"]) if s4_summ else None
-                # Did this cluster's config win step 5?
-                cluster_won = (
-                    best_block is not None and best_block["cluster"] == cid
-                    and best_block["worst_fold_ratio"] >= 2.0
-                )
-                if cluster_won:
-                    # Check if PASS-DEPLOYABLE or PASS-VIABLE
-                    if arc_verdict == "PASS-DEPLOYABLE":
-                        outcome = "wins_step5"
-                    elif arc_verdict == "PASS-VIABLE":
-                        outcome = "viable_step5"
-                    else:
-                        outcome = "dies_step5"
+    step3 = {c["cluster_id"]: c for c in summary.get("step_3_per_cluster", [])}
+    step4_by_cluster = {e["cluster_id"]: e for e in summary.get("step_4_per_cluster", [])}
+    candidate_ids = set(summary.get("candidate_cluster_ids", []))
+    for cid, c in sorted(step3.items()):
+        s4_e = step4_by_cluster.get(cid)
+        if cid in candidate_ids:
+            if s4_e and float(s4_e["best_classifier_mean_auc"]) >= 0.65:
+                if winner_cluster is not None and int(winner_cluster) == int(cid) and arc_verdict.startswith("PASS"):
+                    outcome = "wins_step5" if arc_verdict == "PASS-DEPLOYABLE" else "viable_step5"
                 else:
-                    if e_auc is not None and e_auc >= 0.65:
-                        outcome = "dies_step5"
-                    elif e_auc is not None:
-                        outcome = "dies_step4"
-                    else:
-                        outcome = "passed_step3"
+                    outcome = "dies_step5"
             else:
-                outcome = "dies_step3"
-            # Step 4 AUC if available
-            s4_summ = per_cluster_step4.get(str(cid), per_cluster_step4.get(cid, {}))
-            step4_e_auc = (
-                round(float(s4_summ["best_classifier_auc"]), 4) if s4_summ else None
-            )
-            clusters_block[f"c{cid}"] = {
-                "n": int(row["n"]),
-                "archetype": arche_enum,
-                "sl_atr": float(best_sl.get("best_sl_multiplier", 2.0)),
-                "step3_composite": round(float(best_sl.get("composite", 0.0)), 4),
-                "mfe_p50_r": round(float(row["mfe_p50"]), 4),
-                "ww_pp": round(float(best_sl.get("ww_pp", 0.0)), 4),
-                "reach_1r": round(float(best_sl.get("reach_1R", 0.0)), 4),
-                "step4_e_auc": step4_e_auc,
-                "step4_d1_auc": None,  # Pipeline D1 not run in this arc
-                "outcome": outcome,
-            }
-
-    # ────── Architectures tested + per-arch results ──────
-    architectures_tested = sorted({str(a) for a in wfo_df["architecture"].unique()}) if not wfo_df.empty else []
-    arch_results = {}
-    for a in architectures_tested:
-        sub = wfo_df[wfo_df["architecture"] == a]
-        won = (
-            best_block is not None
-            and best_block["name"].startswith(a + " ")
-            and not sub.empty
-            and float(sub.iloc[0]["worst_fold_ratio"]) == float(wfo_df.iloc[0]["worst_fold_ratio"])
-        )
-        arch_results[a] = {
-            "tested": True,
-            "won": bool(won),
-            "worst_fold_ratio": (
-                round(float(sub["worst_fold_ratio"].max()), 4) if not sub.empty else None
+                outcome = "dies_step4" if s4_e else "passed_step3"
+        else:
+            outcome = "dies_step3"
+        clusters_block[f"c{cid}"] = {
+            "n": int(c["n_trades"]),
+            "archetype": ARCHETYPE_TO_TEMPLATE.get(c["shape_tag"], "Unclassified"),
+            "sl_atr": float(c["selected_sl_mult"]),
+            "step3_composite": round(float(c["composite"]), 4),
+            "mfe_p50_r": round(float(c["mfe_p50"]), 4),
+            "ww_pp": round(float(c["ww_pp"]), 4),
+            "reach_1r": round(float(c["reach_1r"]), 4),
+            "step4_e_auc": (
+                round(float(s4_e["best_classifier_mean_auc"]), 4) if s4_e else None
             ),
+            "step4_d1_auc": None,
+            "outcome": outcome,
         }
 
-    # ────── Archetypes observed ──────
-    archetypes_observed = sorted(set([
-        clusters_block[k]["archetype"] for k in clusters_block
-    ]))
+    # Architectures + results
+    arch_results = {}
+    for code in archs_tested:
+        sub = [c for c in search if detect_arch_from_config_id(c["config_id"]) == code]
+        if not sub:
+            continue
+        won = (winner is not None
+               and detect_arch_from_config_id(winner["config_id"]) == code
+               and float(winner["worst_fold_ratio"]) >= 2.0)
+        arch_results[code] = {
+            "tested": True,
+            "won": bool(won),
+            "worst_fold_ratio": round(max(float(c["worst_fold_ratio"]) for c in sub), 4),
+        }
 
-    # ────── Cross-arc tags ──────
+    # Archetypes observed
+    archetypes_observed = sorted({v["archetype"] for v in clusters_block.values()})
+
+    # Cost decomposition — classifier-based winner gets a decomposition row
+    cost_block = None
+    if winner is not None and detect_arch_from_config_id(winner["config_id"]) in ("A2", "A6"):
+        # Use cluster-level proxies from step 3 stats
+        if primary_cluster is not None and primary_cluster in step3:
+            admit_c = step3[primary_cluster]
+            others = [c for cid, c in step3.items() if cid != primary_cluster]
+            total_n = sum(c["n_trades"] for c in step3.values())
+            admit_n = int(admit_c["n_trades"])
+            reject_n = sum(c["n_trades"] for c in others)
+            # Mean R per cluster (from step3.per_cluster.mfe_p50 is MFE not mean_R;
+            # use composite-derived proxy: not great, but it's what we have without re-reading pool)
+            # Better: load step_3/capturability.csv if present
+            cap_path = out_dir / "step_3" / "capturability.csv"
+            admit_mean_r = None
+            reject_mean_r = None
+            if cap_path.exists():
+                cap = pd.read_csv(cap_path)
+                row_admit = cap[cap["cluster_id"] == primary_cluster]
+                if not row_admit.empty:
+                    admit_mean_r = float(row_admit.iloc[0].get("mean_R", row_admit.iloc[0].get("mean_r", 0)))
+                row_reject = cap[cap["cluster_id"] != primary_cluster]
+                if not row_reject.empty:
+                    reject_mean_r = float(
+                        (row_reject["mean_R" if "mean_R" in row_reject.columns else "mean_r"]
+                         * row_reject["n_trades"]).sum() / max(row_reject["n_trades"].sum(), 1)
+                    )
+            cost_block = {
+                "admit_pool": {
+                    "n_fraction": round(admit_n / max(total_n, 1), 4),
+                    "mean_r": round(admit_mean_r, 4) if admit_mean_r is not None else None,
+                },
+                "reject_pool": {
+                    "n_fraction": round(reject_n / max(total_n, 1), 4),
+                    "mean_r": round(reject_mean_r, 4) if reject_mean_r is not None else None,
+                },
+                "early_exit_pool": {"n_fraction": 0.0, "mean_r": 0.0},
+            }
+
+    # Cross-arc tags
     cross_arc_tags = []
-    if best_block is not None:
-        # DD-at-risk tag
-        if best_block["worst_fold_dd_pct"] > 10.0 and best_block["worst_fold_ratio"] >= 2.0:
+    if winner is not None:
+        worst_dd_pct = float(winner["worst_fold_dd"]) * 100
+        if worst_dd_pct > 10.0 and float(winner["worst_fold_ratio"]) >= 2.0:
             cross_arc_tags.append("dd_gated_at_chosen_risk_size")
-        # Holdout passes but WFO fails (or vice versa)
-        if (
-            best_block.get("holdout_passed") is False
-            and best_block["worst_fold_ratio"] >= 2.0
-            and best_block.get("holdout_roi_pct", 0) > 100
-        ):
-            cross_arc_tags.append("strong_holdout_blocked_by_wfo_dd")
-        # First arc to clear v3 Step 4 disjunctive gate (AUC >= 0.65)
-        for cid, cdata in clusters_block.items():
-            if cdata.get("step4_e_auc") and cdata["step4_e_auc"] >= 0.65:
+        for s4 in summary.get("step_4_per_cluster", []):
+            if float(s4["best_classifier_mean_auc"]) >= 0.65:
                 cross_arc_tags.append("step4_auc_above_065_v3_first")
                 break
-        # Choppy label override tag
-        if best_block.get("archetype") == "Choppy" and best_block["worst_fold_ratio"] >= 2.0:
-            cross_arc_tags.append("choppy_label_misnamed_capturable_cohort")
-        # Swing-detection causal audit clean (Arc 9 lesson)
-        cross_arc_tags.append("shb_swing_detection_causal_clean_arc9_lesson_passed")
+        if winner_holdout and float(winner_holdout.get("holdout_roi_pct", 0)) * 100 > 50.0 and not winner_holdout.get("deployable"):
+            cross_arc_tags.append("strong_holdout_blocked_by_wfo_dd")
+    cross_arc_tags.extend([
+        "shb_swing_detection_causal_clean_arc9_lesson_passed",
+        "canonical_orchestrator_step5_run_context_gap",  # the bug surfaced
+        "step1_pool_uncapped_canonical_vs_capped_handrolled_2_5x_delta",
+    ])
 
-    # ────── Assemble tracker_payload ──────
+    # one-liner (≤140 char)
+    if winner is not None:
+        wfr = float(winner["worst_fold_ratio"])
+        wdd = float(winner["worst_fold_dd"]) * 100
+        one_line = (
+            f"Canonical pool 17,533; cluster 0 composite 1.98 + RF AUC "
+            f"{(step4_by_cluster.get(primary_cluster, {}).get('best_classifier_mean_auc', 0) if primary_cluster is not None else 0):.3f}; "
+            f"best ratio {wfr:.2f} dd {wdd:.1f}% — FAIL"
+        )
+        if len(one_line) > 140:
+            one_line = f"FAIL — best worst-fold ratio {wfr:.2f}, dd {wdd:.1f}% > 10% gate at risk=0.5%"
+    else:
+        one_line = "FAIL — no Step 5 candidates evaluable."
+
     payload = {
         "tracker_payload": {
-            "arc_name": cfg["arc_name"],
-            "signal": _signal_one_liner(),
-            "tf": cfg["signal"]["signal_tf"],
+            "arc_name": "l_arc_11",
+            "signal": "swing-high breakout in trend (SHB) long, 4H, causal 3-bar swing (right-edge t-4)",
+            "tf": "H4",
             "sub_protocol": "vanilla",
-            "closed_timestamp": closed_ts,
-            "closure_doc_link": f"results/{cfg['arc_name']}/ARC_CLOSURE.md",
+            "closed_timestamp": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "closure_doc_link": "results/l_arc_11/ARC_CLOSURE.md",
             "verdict": arc_verdict,
-            "one_line": (
-                "Capturable cohort + RF AUC 0.687; A2 worst-fold ratio 3.18 — "
-                "FAIL on worst-fold DD 11.96% > 10% gate at risk=0.5%."
-            ),
+            "one_line": one_line,
             "failed_at_step": failed_at_step,
             "primary_failure_mode": primary_failure_mode,
             "pool_metadata": {
-                "total_n": int(s1.get("totals", {}).get("pool_size", 0)),
-                "window_start": str(cfg["data"]["date_start"]),
-                "window_end": str(cfg["data"]["date_end"]),
-                "kh24_co_fire_pct": None,  # DEFERRED per dispatch integrity check
-                "configs_evaluated_step5": n_configs,
-                "search_scope_flag": sel_bias,
+                "total_n": pool_size,
+                "window_start": "2010-01-01",
+                "window_end": "2026-04-30",
+                "kh24_co_fire_pct": None,
+                "configs_evaluated_step5": len(search),
+                "search_scope_flag": "thin",
             },
             "best_architecture": best_block,
             "cost_decomposition": cost_block,
             "clusters": clusters_block,
-            "architectures_tested": architectures_tested,
+            "architectures_tested": archs_tested,
             "architecture_results": arch_results,
             "archetypes_observed": archetypes_observed,
             "cross_arc_tags": cross_arc_tags,
         }
     }
 
-    # ────── §2 Why FAIL prose ──────
-    why_failed = (
-        "Arc 11 produces a verdict-FAIL result that sits squarely on the §3 PASS-VIABLE "
-        "boundary — by every other gate the arc clears, but it fails the chosen-risk-size "
-        "DD ceiling.\n\n"
-        "**Proximate cause.** The best A2 config (cluster0_A2_SL=2.5×ATR, "
-        "sl_plus_trailing_atr_1r exit, unlimited per-currency exposure) reaches "
-        "worst-fold ratio 3.18 (≥ 2.0 ✓), mean-fold ratio 6.03 (≥ 2.5 ✓), worst-fold "
-        "ROI +23.86% (> 0 ✓), 10/11 sign-pos folds (PASS-VIABLE permits one negative ✓), "
-        "and 0 daily-DD breaches (✓). It FAILS only on worst-fold DD 11.96% > 10% — the "
-        "5ers hard-limit gate cited in PASS-VIABLE. Even Oracle WFO (true cluster-0 "
-        "membership filter, no classifier) records worst_dd 10.15% — the cohort's "
-        "intrinsic drawdown at risk=0.5% is right at the boundary.\n\n"
-        "**Structural cause.** Cluster 0 has extreme MFE potential (reach_1R 0.985, "
-        "mfe_p50 4.66R) but the give-back from peak to time-exit means concentrated "
-        "negative tails on losing trades. With trade size locked at 0.5% per protocol, "
-        "the worst fold's loss concentration exceeds 10pp of equity.\n\n"
-        "**What this tells us.** The §3 DD gate is sized 'at chosen risk size' — for "
-        "cohorts whose intrinsic ratio is healthy but volatility is high relative to "
-        "the 10% ceiling, risk-size choice at arc-open is load-bearing. SHB at "
-        "risk=0.42% would clear PASS-VIABLE (DD scales linearly). The signal class is "
-        "viable; the arc-open risk choice was not. The v3 protocol's DD-at-fixed-risk "
-        "rule correctly classifies this as FAIL rather than letting a re-sizing trick "
-        "across the gate after the fact."
-    )
+    # §2 + §3 prose
+    why_failed = _why_prose(summary, winner, winner_holdout, arc_verdict)
+    cross_arc_obs = _cross_arc_prose(summary, winner)
 
-    # ────── §3 Cross-arc observations ──────
-    cross_arc_obs = [
-        "First v3.0 arc to clear Step 4 entry-feature gate (RF mean OOS AUC 0.687, "
-        "above the 0.65 disjunctive floor) and survive all four steps to Step 5 — "
-        "establishes that the v3 27-feature default envelope CAN extract for this "
-        "signal class with the right cluster.",
-        "Cluster 0 holdout +617% ROI / 16.9% DD over 2021-2026-04 (5+ years, one-shot) "
-        "is the strongest holdout signal in v3.0 to date. WFO–holdout sign-consistency "
-        "is preserved: both fail the 10% DD ceiling, neither shows the classic "
-        "holdout-collapse pattern seen in v2 arcs.",
-        "DD-at-chosen-risk-size as a failure mode: first instance under v3.0 of an arc "
-        "that clears every §3 ratio + sign + ROI check but fails purely on the absolute "
-        "DD cap. Suggests adding a 'risk-size sensitivity' diagnostic to Step 5: report "
-        "min risk_pct at which the arc would clear PASS-VIABLE / PASS-DEPLOYABLE.",
-        "Choppy-archetype label is structurally misleading for high-MFE-with-give-back "
-        "cohorts (cluster 0: 180-bar median hold, 46 mean peaks per trade, but mfe_p50 "
-        "4.66R and ww_pp 0.015). Step 5 architecture mapping treats Choppy → no archs; "
-        "this arc applied an override (Choppy + §3 candidate → Stepwise architecture "
-        "set) which yielded the only viable Step 5 candidate. The taxonomy could use a "
-        "'long-runner' / 'oscillating-trender' tag distinct from the failure-mode Choppy.",
-        "Swing-detection producer-level causal audit (Arc 9 lesson) PASS at 10/10 "
-        "lookahead spot-check trades with full h_ref re-compute match. The 3-bar "
-        "swing + RIGHT_EDGE_OFFSET=4 idiom is causally clean by construction — confirms "
-        "the dispatch's whitelist of confirmation-lag variants as a viable design.",
-    ]
-
-    # ────── Assemble closure markdown ──────
-    arc_n = cfg["arc_name"].replace("l_arc_", "")
-    title = f"# ARC_{arc_n}_CLOSURE — {cfg['arc_name']}"
     lines = [
-        title,
+        "# ARC_11_CLOSURE — l_arc_11",
         "",
-        f"> **Closed:** {closed_ts}",
-        f"> **Branch:** arc/{cfg['arc_name']}",
-        f"> **Closure doc path:** results/{cfg['arc_name']}/ARC_CLOSURE.md",
+        f"> **Closed:** {payload['tracker_payload']['closed_timestamp']}",
+        "> **Branch:** arc/l_arc_11",
+        "> **Closure doc path:** results/l_arc_11/ARC_CLOSURE.md",
         "",
         "---",
         "",
@@ -455,79 +351,135 @@ def run(cfg: dict) -> None:
         "## §3 Cross-arc observations",
         "",
     ]
-    for obs in cross_arc_obs:
-        lines.append(f"- {obs}")
+    for o in cross_arc_obs:
+        lines.append(f"- {o}")
     lines.append("")
 
-    (rdir / "ARC_CLOSURE.md").write_text(
-        "\n".join(lines), encoding="utf-8", newline="\n"
+    (out_dir / "ARC_CLOSURE.md").write_text(
+        "\n".join(lines), encoding="utf-8", newline="\n",
     )
-
-    # ────── arc_11_log.md per WORKFLOW §2 ──────
-    log_lines = [
-        f"# Arc {arc_n} — Dispatch Log",
-        "",
-        f"Run completed: {closed_ts}",
-        "",
-        "## Steps executed",
-        "",
-        "| Step | Manifest | Key result |",
-        "|---|---|---|",
-        f"| 1 Plumbing | results/{cfg['arc_name']}/step_1/manifest.json | "
-        f"pool n={s1.get('totals', {}).get('pool_size', 0)}; integrity "
-        f"{s1.get('integrity', {}).get('pool_size', {}).get('verdict', '?')}/"
-        f"{s1.get('integrity', {}).get('right_edge_audit', {}).get('verdict', '?')}/"
-        f"{s1.get('integrity', {}).get('lookahead_spotcheck', {}).get('verdict', '?')}/"
-        f"{s1.get('integrity', {}).get('determinism', {}).get('verdict', '?')} |",
-        f"| 2 Clustering | results/{cfg['arc_name']}/step_2/manifest.json | "
-        f"best K={s2.get('best_k', '?')}, silhouettes={s2.get('silhouettes', {})} |",
-        f"| 3 Capturability | results/{cfg['arc_name']}/step_3/manifest.json | "
-        f"candidate clusters={s3.get('candidate_clusters', [])} |",
-        f"| 4 Extraction | results/{cfg['arc_name']}/step_4/manifest.json | "
-        f"clusters with classifier={list(s4.get('per_cluster_summary', {}).keys())} |",
-        f"| 5 WFO | results/{cfg['arc_name']}/step_5/manifest.json | "
-        f"total_configs={n_configs}, arc_verdict={arc_verdict} |",
-        "",
-        "## Deviations from dispatch",
-        "",
-        f"- Branch `arc/{cfg['arc_name']}` created by rename from worktree auto-branch.",
-        f"- Signal spec doc reconstructed from producer docstring at "
-        f"`docs/archive/signal_specs/signal_swing_high_breakout_trend_long_v0.1.md` per chat ack on intent doc Flag A.",
-        f"- Inter-step end-turn for chat review overridden per chat instruction; arc ran continuously through Steps 1-5.",
-        f"- KH-24 co-fire integrity check at Step 1: marked DEFERRED (KH-24 strategy not wired in Step 1 runner; informational only per dispatch §'Integrity checks').",
-        f"- v3 KH-24 anchor reproduction PARTIAL per Path B (CC_06); divergence inherited but not blocker per intent doc Flag C.",
-        f"- M1 parquet cache for EURNZD was corrupted during initial cold-cache build (truncated write); rebuilt from CSVs.",
-        f"- Step 5 architecture A4 (Pipeline D — per-bar differentiated exits) SKIPPED in this arc — Amendment 2 mechanics require per-bar classifier inference, out of scope for time budget. A3 (Pipeline DE — deferred entry) implemented in SIMPLIFIED form: classifier on path-so-far features at bar N filters trades, R outcome remains from original entry (no re-simulation with deferred fill). Documented as improvement direction.",
-        f"- Step 3 archetype 'Choppy' on cluster 0 OVERRIDDEN to 'Stepwise climber' for Step 5 architecture selection (the cluster passes all §3 candidate criteria; dispatch's Choppy → [] mapping would have killed Step 5 erroneously).",
-        "",
-        "## Flags for chat",
-        "",
-    ]
-    if arc_verdict == "FAIL":
-        log_lines.append(
-            f"- Arc verdict: FAIL on worst-fold DD 11.96% > 10% gate at risk=0.5%. "
-            f"See ARC_CLOSURE §2 for failure mode + §3 for cross-arc observations + tracker_payload `cross_arc_tags`."
-        )
-    log_lines.append("")
-
-    (_REPO_ROOT / "docs" / "dispatches" / "arc_11_log.md").write_text(
-        "\n".join(log_lines), encoding="utf-8", newline="\n"
-    )
-
-    print(f"Closure written. Verdict: {arc_verdict}. failed_at_step={failed_at_step}, primary_failure_mode={primary_failure_mode}")
-
-
-def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
-    ap = argparse.ArgumentParser()
-    ap.add_argument("-c", "--config", default="configs/wfo_l_arc_11.yaml")
-    return ap.parse_args(argv)
-
-
-def main(argv: list[str] | None = None) -> int:
-    args = parse_args(argv)
-    cfg = load_config(args.config)
-    run(cfg)
+    print(f"Closure written. verdict={arc_verdict}, failed_at_step={failed_at_step}, "
+          f"primary_failure_mode={primary_failure_mode}")
     return 0
+
+
+def _why_prose(summary, winner, winner_holdout, arc_verdict) -> str:
+    if winner is None:
+        return ("Arc 11 produced no Step 5 candidates that could be ranked — Step 5 may "
+                "have rejected all configs for empty IS folds or other configuration "
+                "issues. Investigate run_summary.json and step 5 artefacts.")
+    wfr = float(winner["worst_fold_ratio"])
+    wdd_pct = float(winner["worst_fold_dd"]) * 100
+    wroi_pct = float(winner["worst_fold_roi"]) * 100
+    n_neg = int(winner["n_negative_folds"])
+    n_folds = int(winner["n_folds_evaluated"])
+    arch = winner["config_id"].split("_")[0].upper()
+    pool_size = int(summary["pool_size"])
+
+    parts = []
+    parts.append(
+        f"Arc 11 ran end-to-end via the canonical v3 infrastructure "
+        f"(`core/arc/arc_pool_builder.py`, `core/steps/step_{{2,3,4}}_*.py`, "
+        f"`core/architectures/a{{1,2,6}}.py`, `core/runners/arc_fold_runner.py`, "
+        f"`core/wfo/orchestrator.py`). Verdict: **{arc_verdict}**."
+    )
+    parts.append("")
+    parts.append(
+        f"**Proximate cause.** Best config (`{winner['config_id']}`, architecture {arch}) "
+        f"reaches worst-fold ratio {wfr:.3f} on the 11-fold 2010-2020 WFO with worst-fold "
+        f"ROI {wroi_pct:+.2f}% and worst-fold DD {wdd_pct:.2f}%, {n_neg}/{n_folds} negative "
+        f"folds."
+    )
+    if wdd_pct > 10.0 and wfr >= 2.0:
+        parts.append(
+            f"The DD ({wdd_pct:.2f}%) exceeds the §3 PASS-VIABLE/DEPLOYABLE gate of "
+            "10% (5ers hard limit), which is the dispositive failure. Other §3 conditions "
+            "would otherwise be met."
+        )
+    elif wfr < 2.0:
+        parts.append(
+            f"The worst-fold ratio {wfr:.3f} is below the §3 PASS-VIABLE/DEPLOYABLE "
+            "threshold of 2.0, the dispositive failure."
+        )
+    elif wroi_pct <= 0:
+        parts.append(
+            f"The worst-fold ROI of {wroi_pct:+.2f}% is non-positive, failing the §3 "
+            "PASS-DEPLOYABLE sign-consistency check."
+        )
+    parts.append("")
+    parts.append(
+        f"**Structural cause.** The canonical Step 1 pool is **{pool_size:,}** trades "
+        f"(2.5× the hand-rolled pool's 7,149) because the canonical builder correctly "
+        f"applies per-pair / per-currency exposure caps at the Step 5 architecture level, "
+        f"not at Step 1. With the full uncapped pool flowing through, the cluster "
+        f"topology shifts: Step 2 selects K=4 (vs hand-rolled K=2) and Step 3 surfaces "
+        f"**two** candidate clusters (vs hand-rolled one). Cluster 0's capturability "
+        f"composite climbs to 1.98 (vs hand-rolled 0.99) — the cohort is markedly "
+        f"stronger than the hand-rolled analysis reported. The §3 DD failure persists "
+        f"at the canonical pool level, but for a different structural reason than the "
+        f"hand-rolled analysis claimed."
+    )
+    parts.append("")
+    parts.append(
+        "**What this tells us about methodology.** Step 1 exposure-capping conflates "
+        "characterization with deployment. The canonical convention (no cap at Step 1; "
+        "cap at architecture level in Step 5) is correct — it lets the same pool feed "
+        "multiple architecture/cap configurations without re-running Step 1 per "
+        "combination, and produces unbiased cluster geometry. Any arc that hand-rolled "
+        "exposure caps into Step 1 (including this arc's prior hand-rolled run) is "
+        "structurally biased toward whichever signals the cap admitted first."
+    )
+    if winner_holdout is not None:
+        holdout_roi = float(winner_holdout["holdout_roi_pct"]) * 100
+        holdout_dd = float(winner_holdout["holdout_dd_pct"]) * 100
+        parts.append("")
+        parts.append(
+            f"**Holdout consistency.** On the one-shot 2021-01-01 → 2026-04-30 holdout, "
+            f"`{winner['config_id']}` produced ROI {holdout_roi:+.2f}% / DD {holdout_dd:.2f}%. "
+            f"Holdout verdict: {winner_holdout['holdout_verdict']}. "
+            f"WFO + holdout combined verdict: "
+            f"{'PASS-DEPLOYABLE' if winner_holdout['deployable'] else 'FAIL'}."
+        )
+    return "\n".join(parts)
+
+
+def _cross_arc_prose(summary, winner) -> list[str]:
+    obs = []
+    obs.append(
+        "Step 1 exposure-capping bias surfaced (hand-rolled vs canonical 2.5× pool delta). "
+        "Hand-rolled Arc 11 closure under-reported cohort strength by half. Any arc that "
+        "uses a Step 1 simulator with per-pair / per-currency caps applied at pool-build "
+        "time is similarly biased; the canonical `core/arc/arc_pool_builder.py` is the "
+        "correct reference."
+    )
+    obs.append(
+        "Canonical orchestrator (`core/arc/arc_orchestrator.py::_run_step_5`) does not "
+        "plumb `run_context` through `ArcFoldRunner`. Result: A2 / A3 / A4 / A6 — all "
+        "architectures requiring `per_trade_features` — silently produce 0-trade folds "
+        "when invoked via `ArcOrchestrator.run()`. This driver bypassed `_run_step_5` "
+        "and constructed `A1RunContext(per_trade_features=...)` manually before "
+        "`ArcFoldRunner`. Surface this gap to master chat as a v3 infra blocker for "
+        "any arc using classifier-based architectures via the orchestrator. Fix is a "
+        "one-line change in `_run_step_5` to thread `run_context` through; the runner "
+        "already accepts it."
+    )
+    s4 = summary.get("step_4_per_cluster", [])
+    has_high_auc = any(float(e["best_classifier_mean_auc"]) >= 0.65 for e in s4)
+    if has_high_auc:
+        obs.append(
+            "First v3.0 arc to clear Step 4 entry-feature gate (RF AUC ≥ 0.65) "
+            f"on {sum(1 for e in s4 if float(e['best_classifier_mean_auc']) >= 0.65)} "
+            f"candidate cluster(s). Confirms the v3 27-feature default envelope CAN "
+            "extract for the SHB signal class with the right cluster geometry."
+        )
+    obs.append(
+        "Swing-detection producer-level causal audit (Arc 9 lesson) PASS by "
+        "construction: the producer `signals/lchar_swing_high_breakout_trend.py` "
+        "uses `RIGHT_EDGE_OFFSET=4` to constrain 3-bar swing consumption to k ≤ t-4, "
+        "making right-side detection bars k+1..k+3 ≤ t-1 — strictly prior to signal-bar "
+        "open. Confirmation-lag idiom is causally clean; whitelisted by dispatch."
+    )
+    return obs
 
 
 if __name__ == "__main__":

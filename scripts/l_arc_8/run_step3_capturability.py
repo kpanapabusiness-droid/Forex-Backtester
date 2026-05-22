@@ -175,7 +175,9 @@ def main() -> Path:
     step1 = RESULTS_ROOT / "step_1"
     step2 = RESULTS_ROOT / "step_2"
     pool = pd.read_parquet(step1 / "pool.parquet")
-    feats = pd.read_parquet(step2 / "path_features.parquet")
+    # Note: step_2/path_features.parquet not read here — Step 3 operates on the
+    # pool's MFE/MAE summary fields (rescaling via _rescale_outcome_at_sl), not
+    # per-bar paths. Path features only feed the clustering at Step 2.
     assignments = pd.read_parquet(step2 / "cluster_assignments.parquet")
     metrics_step2 = pd.read_csv(step2 / "cluster_metrics.csv")
     # Join cluster_primary to pool by trade_id

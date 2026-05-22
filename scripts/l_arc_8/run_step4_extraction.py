@@ -38,7 +38,7 @@ import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.inspection import permutation_importance
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import f1_score, precision_recall_fscore_support, roc_auc_score
+from sklearn.metrics import precision_recall_fscore_support, roc_auc_score
 from sklearn.model_selection import TimeSeriesSplit
 from sklearn.preprocessing import StandardScaler
 
@@ -337,8 +337,8 @@ def _build_summary_md(
         f"_Generated: {datetime.now(timezone.utc).isoformat()}Z_",
         "",
         f"- Candidate clusters processed: {len(classifier_summaries)}",
-        f"- Classifiers tested: RF, LGBM, Logistic (Appendix A defaults)",
-        f"- CV: 5-fold TimeSeriesSplit",
+        "- Classifiers tested: RF, LGBM, Logistic (Appendix A defaults)",
+        "- CV: 5-fold TimeSeriesSplit",
         f"- Feature catalogue: {len(feature_cols)} (v3.0 Step 1)",
         "",
         "## Per-cluster, per-model OOS AUC + threshold metrics",

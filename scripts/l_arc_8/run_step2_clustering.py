@@ -83,11 +83,9 @@ def _path_feats_per_trade(paths_df: pd.DataFrame, trade_pool: pd.DataFrame) -> p
         # drawdown depth from running peak (low_r vs running max of close_r)
         running_peak = np.maximum.accumulate(close_r)
         dd_depth = float(np.min(low_r - running_peak))  # most-negative
-        # recovery: final_r relative to mfe — if mfe ~0, recovery = 0
-        mfe = float(np.max(high_r))
-        mae = float(np.min(low_r))
-        final_close = float(close_r[-1])
-        # Pool final_r used: it accounts for SL exits and time exits at close_bid
+        # Pool final_r/mfe_r/mae_r used directly: they account for SL exits +
+        # time exits at close_bid in original R units. Path-derived MFE/MAE
+        # were used in earlier iterations but the pool values are canonical.
         pool_row = pool_indexed.loc[tid]
         pool_final = float(pool_row["final_r"])
         pool_mfe = float(pool_row["mfe_r"])
@@ -332,7 +330,7 @@ def _build_summary_md(
         "Notes:",
         "- Clustering features (5): mono, n_local_peaks, ttp_rel, dd_depth, recovery_score. Standardised via StandardScaler before KMeans.",
         "- All K values reported above; primary K used for Step 3 capturability sweep.",
-        f"- If max silhouette below 0.30, see L_PROTOCOL §2 Step 2 failure-diagnostics path (continue with single-cluster assignment, flag in this report).",
+        "- If max silhouette below 0.30, see L_PROTOCOL §2 Step 2 failure-diagnostics path (continue with single-cluster assignment, flag in this report).",
         "",
     ]
     if silhouette_per_k[primary_k] < 0.30:

@@ -35,13 +35,11 @@ from core.parallel import build_panel_parallel, default_pool_size
 from core.signals.pullback_resume_hhhl import evaluate_pullback_resume_hhhl_signal
 from core.sim.panel import Panel
 from scripts.l_arc_8.shared import (
-    ARC_NAME,
     CACHE_ROOT,
     FORWARD_BARS,
     HISTDATA_ROOT,
     PAIRS_28,
     RESULTS_ROOT,
-    SIGNAL_DEF,
     SIGNAL_PARAMS,
     SL_ATR_MULT_STEP1,
     WINDOW_END_TARGET,

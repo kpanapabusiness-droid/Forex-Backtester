@@ -9,7 +9,6 @@ from __future__ import annotations
 
 from typing import Mapping
 
-
 ARC_OPEN_TEMPLATE = """# ARC_OPEN — {arc_name}
 
 ```

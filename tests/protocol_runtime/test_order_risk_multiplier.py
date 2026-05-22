@@ -8,11 +8,8 @@ Confirms:
 
 from __future__ import annotations
 
-import pandas as pd
-
 from core.sim.account import Account, Direction
 from core.sim.multipair_backtester import MultiPairBacktester, Order
-from core.sim.panel import Panel
 from tests.protocol_runtime._fixtures import build_synthetic_panel
 
 

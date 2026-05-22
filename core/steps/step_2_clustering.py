@@ -25,9 +25,9 @@ StandardScaler with no centering or scaling subtleties.
 
 from __future__ import annotations
 
+import hashlib
 from dataclasses import dataclass
 
-import hashlib
 import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
@@ -36,7 +36,6 @@ from sklearn.preprocessing import StandardScaler
 
 from core.steps._shape_tags import (
     ClusterCentroid,
-    TAG_ORDER,
     assign_shape_tag,
 )
 

@@ -16,7 +16,7 @@ ENTRY_FEATURE_KEYS + PATH_FEATURE_KEYS (8 + 7 = 15 features).
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Iterable, Mapping
+from typing import Any, Mapping
 
 import numpy as np
 import pandas as pd

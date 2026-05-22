@@ -25,7 +25,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import Any, Mapping
 
 import pandas as pd
 
@@ -39,20 +39,13 @@ from core.arc.arc_pool_builder import (
 from core.arc.signal_protocol import SignalEvaluation, SignalModule
 from core.arc.sub_protocol import resolve_step_override
 from core.architectures._protocol import Architecture, StrategyResult
-from core.architectures.a1_system_level_filter import (
-    A1Architecture,
-    A1Config,
-    A1RunContext,
-)
 from core.runners.arc_fold_runner import ArcFoldRunner
 from core.sim.panel import Panel
 from core.steps.step_2_clustering import Step2Result, run_step_2
 from core.steps.step_3_capturability import Step3Result, run_step_3
 from core.steps.step_4_extraction import Step4Result, run_step_4
 from core.wfo.folds import Fold, WfoStructure, build_v3_folds
-from core.wfo.gates import GateResult, classify_fold_stats
 from core.wfo.orchestrator import (
-    CandidateSearchResult,
     WfoSearchResult,
     run_holdout,
     run_search,

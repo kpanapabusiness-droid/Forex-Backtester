@@ -26,19 +26,16 @@ already restricts to its own cluster's admitted trades.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Sequence
 
 import pandas as pd
 
 from core.architectures._protocol import StrategyResult
 from core.runners._fold_stats_helpers import (
     build_fold_stats_from_run,
-    count_daily_5pct_breaches,
     max_drawdown_pct,
 )
 from core.sim.multipair_backtester import RunResult
 from core.wfo.folds import Fold
-from core.wfo.gates import FoldStats
 
 
 @dataclass(frozen=True)
@@ -94,8 +91,6 @@ class A5Architecture:
             equity = pd.Series([], dtype="float64", name="equity")
         else:
             sb = float(arch_config.starting_balance)
-            n_constituents = len(arch_config.constituents)
-            per_constituent_sb = sb / n_constituents
             combined = pd.Series(0.0, index=union_index)
             for c in arch_config.constituents:
                 eq = c.equity_curve.reindex(union_index).ffill()

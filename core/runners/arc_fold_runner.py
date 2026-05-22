@@ -15,9 +15,7 @@ And returns ``FoldStats`` per (fold, config). Plugs into the existing
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Callable, Mapping
-
-import pandas as pd
+from typing import Any, Mapping
 
 from core.arc.signal_protocol import SignalEvaluation
 from core.architectures._protocol import Architecture, StrategyResult

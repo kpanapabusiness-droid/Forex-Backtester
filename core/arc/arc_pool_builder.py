@@ -29,7 +29,7 @@ from __future__ import annotations
 import hashlib
 from dataclasses import dataclass, field
 from datetime import date
-from typing import Iterable, Mapping
+from typing import Mapping
 
 import numpy as np
 import pandas as pd
@@ -164,10 +164,8 @@ def _simulate_pair_pool(
     warmup = max(cfg.primary_tf_warmup_bars, 0)
 
     df_close_ask = df["close_ask"].values
-    df_open_ask = df["open_ask"].values
     df_low_bid = df["low_bid"].values
     df_close_bid = df["close_bid"].values
-    df_open_bid = df["open_bid"].values
     atr_arr = atr_series.values
     df_index = df.index
 
@@ -416,8 +414,8 @@ def write_arc_pool(
       - integrity_report.md
       - manifest.json (sha256s)
     """
-    from pathlib import Path
     import json
+    from pathlib import Path
 
     out = Path(out_dir) / "step_1"
     out.mkdir(parents=True, exist_ok=True)

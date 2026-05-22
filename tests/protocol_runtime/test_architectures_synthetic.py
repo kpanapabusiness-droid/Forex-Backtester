@@ -7,22 +7,19 @@ covers correctness for A1.
 
 from __future__ import annotations
 
+from datetime import date
+
 import numpy as np
 import pandas as pd
-import pytest
 
+from core.architectures._path_classifier import fit_path_classifier
 from core.architectures._protocol import StrategyResult
 from core.architectures.a1_system_level_filter import A1Architecture, A1Config, A1RunContext
 from core.architectures.a2_classifier_filter import A2Architecture, A2Config
-from core.architectures.a3_pipeline_de import A3Architecture, A3Config
-from core.architectures.a4_pipeline_d_exits import A4Architecture, A4Config
 from core.architectures.a5_portfolio_composition import A5Architecture, A5Config
 from core.architectures.a6_meta_labeling import A6Architecture, A6Config
-from core.architectures._path_classifier import fit_path_classifier
 from core.features_path_so_far import ALL_FEATURE_KEYS
-from core.steps._classifier_defaults import build_rf
 from core.wfo.folds import Fold
-from datetime import date
 from tests.protocol_runtime._fixtures import (
     SyntheticSignal,
     build_synthetic_panel,

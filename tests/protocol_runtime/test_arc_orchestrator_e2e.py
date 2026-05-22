@@ -9,8 +9,6 @@ from __future__ import annotations
 from datetime import date
 from pathlib import Path
 
-import pandas as pd
-
 from core.arc.arc_orchestrator import ArcConfig, ArcOrchestrator
 from core.architectures.a1_system_level_filter import A1Architecture, A1Config
 from core.wfo.folds import Fold, WfoStructure

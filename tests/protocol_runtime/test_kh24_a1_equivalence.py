@@ -12,12 +12,12 @@ workstation with the data layer available. See
 
 from __future__ import annotations
 
-from pathlib import Path
 from datetime import date
+from pathlib import Path
 
 import pytest
 
-from core.architectures.a1_system_level_filter import A1Architecture, A1RunContext
+from core.architectures.a1_system_level_filter import A1Architecture
 from core.runners.arc_fold_runner import ArcFoldRunner
 from core.sim.panel import Panel
 from core.strategies.kh24.a1_adapter import kh24_to_a1

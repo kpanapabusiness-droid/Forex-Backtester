@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-import numpy as np
-import pandas as pd
-
+from core.arc.arc_pool_builder import ArcPoolConfig, build_arc_pool
 from core.steps.step_2_clustering import (
     PATH_FEATURE_COLS,
     compute_path_features,
@@ -12,7 +10,6 @@ from core.steps.step_2_clustering import (
     step_2_sha256,
 )
 from tests.protocol_runtime._fixtures import build_synthetic_arc_pool_inputs
-from core.arc.arc_pool_builder import ArcPoolConfig, build_arc_pool
 
 
 def _build_step1_pool():

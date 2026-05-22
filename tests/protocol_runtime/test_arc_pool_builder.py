@@ -8,8 +8,6 @@
 
 from __future__ import annotations
 
-import pytest
-
 from core.arc.arc_pool_builder import ArcPoolConfig, build_arc_pool
 from tests.protocol_runtime._fixtures import build_synthetic_arc_pool_inputs
 

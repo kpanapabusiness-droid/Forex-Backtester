@@ -29,15 +29,13 @@ else is identical to A1.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Mapping
+from typing import Mapping
 
-import numpy as np
 import pandas as pd
 
 from core.arc.signal_protocol import SignalEvaluation
 from core.architectures._path_classifier import (
     PathClassifierFit,
-    fit_path_classifier,
     predict_admit,
 )
 from core.architectures._protocol import StrategyResult
@@ -47,8 +45,6 @@ from core.architectures.a1_system_level_filter import (
     _slice_panels_to_fold,
 )
 from core.features_path_so_far import (
-    ALL_FEATURE_KEYS,
-    ENTRY_FEATURE_KEYS,
     PATH_FEATURE_KEYS,
 )
 from core.runners._fold_stats_helpers import build_fold_stats_from_run
@@ -59,7 +55,6 @@ from core.sim.panel import Panel
 from core.sim.risk.live_balance import LiveBalanceRisk
 from core.sim.trailing_stop import TrailManager
 from core.wfo.folds import Fold
-
 
 DEFAULT_N_DEFER_VALUES = (3, 5)
 

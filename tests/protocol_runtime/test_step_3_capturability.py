@@ -2,9 +2,6 @@
 
 from __future__ import annotations
 
-import numpy as np
-import pandas as pd
-
 from core.arc.arc_pool_builder import ArcPoolConfig, build_arc_pool
 from core.steps.step_2_clustering import run_step_2
 from core.steps.step_3_capturability import (

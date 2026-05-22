@@ -32,7 +32,6 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Mapping, Protocol, runtime_checkable
 
-import numpy as np
 import pandas as pd
 
 from core.sim.exit_hooks import ExitPredicate

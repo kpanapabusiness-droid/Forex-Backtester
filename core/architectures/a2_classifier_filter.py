@@ -13,8 +13,8 @@ inserts the classifier admit/reject gate before A1 emits the order.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from typing import Any, Callable, Mapping
+from dataclasses import dataclass
+from typing import Any, Mapping
 
 import numpy as np
 import pandas as pd
@@ -22,20 +22,18 @@ import pandas as pd
 from core.arc.signal_protocol import SignalEvaluation
 from core.architectures._protocol import StrategyResult
 from core.architectures.a1_system_level_filter import (
-    A1Config,
     A1RunContext,
-    _slice_panels_to_fold,
     _slice_equity_to_oos,
+    _slice_panels_to_fold,
 )
+from core.runners._fold_stats_helpers import build_fold_stats_from_run
 from core.sim.account import Account, Direction, ExposureRules
 from core.sim.exit_hooks import ExitPredicate
 from core.sim.multipair_backtester import MultiPairBacktester, Order, StrategyFn
 from core.sim.panel import Panel
 from core.sim.risk.live_balance import LiveBalanceRisk
 from core.sim.trailing_stop import TrailManager
-from core.runners._fold_stats_helpers import build_fold_stats_from_run
 from core.wfo.folds import Fold
-
 
 # Classifier expected interface: object with predict_proba(X) -> ndarray
 ClassifierLike = Any

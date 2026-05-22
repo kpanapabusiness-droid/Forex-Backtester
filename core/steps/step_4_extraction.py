@@ -22,16 +22,13 @@ threshold) and A6 (same classifier, sized by confidence).
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Mapping
-
 import hashlib
+from dataclasses import dataclass
+
 import numpy as np
 import pandas as pd
 from sklearn.inspection import permutation_importance
 from sklearn.metrics import (
-    average_precision_score,
-    precision_recall_curve,
     roc_auc_score,
     roc_curve,
 )

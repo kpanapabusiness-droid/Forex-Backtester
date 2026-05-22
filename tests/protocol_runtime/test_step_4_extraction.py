@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import numpy as np
 import pandas as pd
-import pytest
 
 from core.steps.step_4_extraction import run_step_4, step_4_sha256
 

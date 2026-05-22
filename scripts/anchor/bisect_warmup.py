@@ -21,7 +21,6 @@ from __future__ import annotations
 
 import argparse
 import json
-from datetime import date
 from pathlib import Path
 
 import pandas as pd
@@ -35,7 +34,6 @@ from core.sim.panel import Panel
 from core.strategies.kh24.a1_adapter import kh24_to_a1
 from core.strategies.kh24.kh24 import KH24Config, build_kh24_runtime
 from core.wfo.folds import Fold, build_kh24_anchor_folds
-
 
 PAIRS_28 = (
     "AUDCAD AUDCHF AUDJPY AUDNZD AUDUSD CADCHF CADJPY CHFJPY "

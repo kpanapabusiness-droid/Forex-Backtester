@@ -26,8 +26,8 @@ MultiPairBacktester unchanged.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from typing import Any, Callable, Mapping, Sequence
+from dataclasses import dataclass
+from typing import Mapping, Sequence
 
 import pandas as pd
 
@@ -40,7 +40,6 @@ from core.sim.panel import Panel
 from core.sim.risk.live_balance import LiveBalanceRisk
 from core.sim.trailing_stop import TrailManager
 from core.wfo.folds import Fold
-
 
 # A filter predicate maps (feature_value_per_pair_at_t) -> bool. v3.0 keeps
 # the filter language tiny: a tuple of (feature_name, "ge"|"le", threshold).

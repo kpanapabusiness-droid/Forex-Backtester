@@ -22,10 +22,10 @@ real WFO at each candidate SL.
 
 from __future__ import annotations
 
+import hashlib
 from dataclasses import dataclass
 from typing import Mapping
 
-import hashlib
 import numpy as np
 import pandas as pd
 
@@ -86,7 +86,6 @@ def _cluster_metrics(
 ) -> tuple[float, float, float, float, float, float, float, float, int, int, int, float, float, float, dict[float, float]]:
     """Compute the per-cluster numbers; returns a tuple in field order."""
     mfe = trades_cluster["mfe_r"].values
-    mae = trades_cluster["mae_r"].values
     final_r = trades_cluster["final_r"].values
     bars_held = trades_cluster["bars_held"].values
 

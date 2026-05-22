@@ -120,7 +120,58 @@ Chat resolved the four interpretive calls on 2026-05-22:
 
 ---
 
-## PR-C — WFO + features (Tasks 4, 5) — pending
+## PR-C — v3.0 WFO + KH-24 anchor WFO + broader feature space (Tasks 4, 5)
+
+**Branch:** `infra/backtester-v3-pr-c` (worktree at `.claude/worktrees/pr-c-backtester-v3`).
+
+**Scope:**
+- **WFO Task 4** — two fold structures sharing one orchestrator. v3.0 mode: 11-fold expanding-IS 2010-2020 + one-shot holdout 2021-present, search and holdout strictly separated. KH-24 anchor mode: 7-fold rolling Oct-2020 → Jan-2026 with 9-month OOS + 3-year rolling IS, matching the published lineage.
+- **WFO §3 gates** — `classify_fold_stats` applies PASS-DEPLOYABLE / PASS-VIABLE / FAIL per L_PROTOCOL §3.
+- **Feature engineering Task 5** — registry-driven Step-1 feature pipeline. 27 features across 7 classes (price_geometry, session, vol_regime, distance, spread_regime, multi_tf, cross_pair). Each feature carries a `causal_lineage` tag (clean / suspect / unverified) for the Step 6 producer audit.
+
+**Added:**
+- [`core/wfo/__init__.py`](core/wfo/__init__.py) + [`folds.py`](core/wfo/folds.py) + [`gates.py`](core/wfo/gates.py) + [`orchestrator.py`](core/wfo/orchestrator.py) — WFO core (4 modules)
+- [`core/features/__init__.py`](core/features/__init__.py) + [`lineage.py`](core/features/lineage.py) + [`registry.py`](core/features/registry.py) + [`_helpers.py`](core/features/_helpers.py) + [`pipeline.py`](core/features/pipeline.py) — feature engine (5 modules)
+- [`core/features/price_geometry.py`](core/features/price_geometry.py) — 5 features
+- [`core/features/session.py`](core/features/session.py) — 7 features
+- [`core/features/vol_regime.py`](core/features/vol_regime.py) — 2 features
+- [`core/features/distance.py`](core/features/distance.py) — 3 features
+- [`core/features/spread_regime.py`](core/features/spread_regime.py) — 2 features
+- [`core/features/multi_tf.py`](core/features/multi_tf.py) — 4 features (panel-dependent, D1 lag-1 + W1)
+- [`core/features/cross_pair.py`](core/features/cross_pair.py) — 4 features (panel-dependent, lineage=suspect)
+- [`docs/features_reference.md`](docs/features_reference.md) — 27 features documented per class
+- [`tests/test_wfo_folds.py`](tests/test_wfo_folds.py) — 18 tests (fold counts, anchoring, no-overlap, holdout strictly after search)
+- [`tests/test_wfo_gates.py`](tests/test_wfo_gates.py) — 10 tests (each §3 gate path)
+- [`tests/test_wfo_orchestrator.py`](tests/test_wfo_orchestrator.py) — 8 tests (search/holdout separation, top-K ranking, deployable flag)
+- [`tests/test_features_individual.py`](tests/test_features_individual.py) — 13 tests (per-feature invariants)
+- [`tests/test_features_pipeline.py`](tests/test_features_pipeline.py) — 14 tests (registry shape, lookahead spot-check, two-run determinism, sha256 stability)
+
+**Status:** 63/63 PR-C tests pass; full repo sweep **836 passed / 305 skipped / 0 fail / 0 error**; ruff clean.
+
+**Verification per dispatch:**
+1. ✅ Tests pass for all new feature classes (per-class unit tests + pipeline integration).
+2. ✅ WFO orchestrator produces correct fold counts in both modes: **11** v3.0 folds + 1 holdout, **7** KH-24 anchor folds.
+3. ✅ Holdout provably untouched during search — `test_run_search_does_not_touch_holdout` asserts no holdout fold_id or holdout-year OOS appears in the search call log.
+4. ✅ Cross-pair features compute on multi-pair panel from PR-B (`test_panel_dependent_features_compute_with_panel` verifies non-NaN output for cross-pair features when panel is supplied).
+5. ✅ Two-run determinism preserved on the feature matrix — `test_pipeline_two_run_determinism` + `test_pipeline_sha256_stable` (CSV serialisation sha256 stable across runs).
+6. ✅ Lookahead spot-check: `test_lookahead_spotcheck_5_random_trades` truncates pair_df at 5 random timestamps and asserts feature values at those timestamps are identical to the full-history compute (no future-bar influence).
+7. ✅ `docs/features_reference.md` complete — every feature documented with definition, computation method, lineage tag, inputs.
+
+**Notes / interpretive choices in PR-C:**
+
+1. **WFO v3.0 fold 1 has empty IS.** The protocol says "11-fold WFO on 2010-2020". To get 11 OOS years from an 11-year window with anchored expanding IS, fold 1's IS = ∅ (no data strictly before 2010-01-01 in the training window). The orchestrator's `min_is_days=365` default skips fold 1; callers can pass `min_is_days=0` to evaluate every fold. This is documented in [`folds.py`](core/wfo/folds.py) and tested.
+
+2. **KH-24 anchor IS = 3-year rolling.** Published numbers used a rolling IS; I default `is_months=36`. Callers can override per arc. The 7-fold span is 63 months from 2020-10-01 → 2025-12-31 (last fold ends Dec 2025 inclusive); the dispatch shorthand "Oct 2020 → Jan 2026" refers to the exclusive upper bound.
+
+3. **§3 PASS-VIABLE gate interpretation.** The protocol allows "a single negative fold permitted" alongside "worst-fold ratio ≥ 2.0". With one negative fold the ratio gate is unsatisfiable on that fold (ROI < 0 → ratio < 0). I read this as: the worst-fold-ratio constraint applies to the worst **non-negative** fold's ratio (the negative fold is the documented exception). The `mean_fold_ratio ≥ 2.5` constraint still uses every fold. Tested in `test_negative_fold_blocks_deployable_but_allows_viable`.
+
+4. **Cross-pair features default to `suspect` lineage.** Cross-pair alignment via panel snapshots is non-trivial (ffill semantics, multi-pair time gaps). Step 6 producer audit is required before any cross-pair feature can ship; until then they're tagged suspect and surface in the lineage report. Individual cross-pair producers can be promoted to clean after audit (no code change to other modules).
+
+5. **D1 / W1 lag rule baked into multi-TF producers.** L_PROTOCOL §1 mandates one-day D1 lag (4H bar at day T sees D1 day T-1). Multi-TF features call `merge_asof(direction="backward")` on a shifted-by-1-day key. W1 alignment uses `allow_exact_matches=False` so week N's bar is invisible during week N. Both rules are tested for lookahead invariance in the spot-check.
+
+6. **Registry is global side-effect at import.** Each feature module registers its specs at import time. The pipeline imports every class module via `core.features.pipeline` to populate the registry; callers don't need to import each class individually. Tests use `registry.clear()` only if they need a clean slate (none currently do).
+
+---
 
 ## PR-D — parallelism + determinism harness (Tasks 7, 9c, 9d) — pending
 

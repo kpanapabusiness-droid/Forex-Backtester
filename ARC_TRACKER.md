@@ -86,13 +86,20 @@ Note: "in-cluster R" tracked as `mfe_p50_r` per template §4.E. Unclassified row
 | no_clusters_separable | 0 | — | — |
 | no_capturable_cluster | 0 | — | — |
 | entry_feature_auc_ceiling | 0 | — | — |
-| step5_wf_roi_below_gate | 0 | — | — |
-| step5_dd_above_gate | 1 | l_arc_11 | 2026-05-22 |
+| step5_not_scalable | 0 | — | — |
+| step5_chained_dd_above_gate | 0 | — | — |
+| step5_daily_dd_breach | 0 | — | — |
+| step5_wf_roi_below_gate_after_scaling | 0 | — | — |
+| step5_ratio_below_gate_after_scaling | 0 | — | — |
+| step5_negative_folds | 0 | — | — |
 | step5_sign_consistency_fail | 0 | — | — |
+| step5_trade_count_below_gate | 0 | — | — |
 | step6_causal_audit_fail | 0 | — | — |
 | selection_bias | 0 | — | — |
 | holdout_fail_after_is_pass | 0 | — | — |
 | admit_only_vs_deployment | 0 | — | — |
+| step5_dd_above_gate | 1 | l_arc_11 | 2026-05-22 |  <!-- deprecated by Amendment 3; retained for historical closures -->
+| step5_wf_roi_below_gate | 0 | — | — |  <!-- legacy (pre-Amendment-3); retained for historical closures -->
 | other | 0 | — | — |
 
 ---

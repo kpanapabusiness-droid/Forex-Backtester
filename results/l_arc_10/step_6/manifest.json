@@ -1,0 +1,19 @@
+{
+  "arc_name": "l_arc_10",
+  "step": "step_6",
+  "protocol_version": "v3.0",
+  "trigger": "Step 5 produced 1 PASS-DEPLOYABLE + 2 PASS-VIABLE candidates",
+  "verdict": "PASS",
+  "candidate_kills": 0,
+  "feature_downgrades": 0,
+  "priority_audits": {
+    "swing_detection_arc9_check": "PASS - producer uses confirmation-lag (right-edge offset k+1), not centred-at-signal",
+    "trailing_swing_features": "PASS - swing_low_distance_14, swing_high_distance_14 use one-sided rolling min/max with shift(1)",
+    "cross_pair_ffill_lookahead": "PASS - .shift(1) after .ffill() prevents future-bar leakage"
+  },
+  "caveats_surfaced_to_closure": [
+    "Per-fold equity reset (no cumulative DD across folds)",
+    "Exit-policy re-simulation uses mid-price path; spread on new exits not modelled",
+    "Step 4 AUC ~0.50 → cluster classifier near chance; A1 unfiltered IS the realised edge"
+  ]
+}

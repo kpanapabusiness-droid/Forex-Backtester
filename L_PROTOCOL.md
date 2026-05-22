@@ -5,6 +5,9 @@
 > **Purpose:** the methodology by which a single arc runs from open to verdict.
 > **Scope:** how to run things. Not what to run next.
 >
+> **Amendment 1 (2026-05-22):** Step 5 search policy clarified — informed by Steps 3-4, not exhaustive. Multi-cluster handling + holdout decision rule specified. See §2 Step 5.
+> **Amendment 2 (2026-05-22):** ML architecture mechanics specified for A2, A3, A4, A6. See §2 Step 5 ML mechanics subsection.
+>
 > This protocol is the umbrella. It accepts any signal, any feature space, any architecture. Sub-protocols may layer on top to add signal-class-specific specificity. The overseer's gates and verdicts apply universally.
 
 ---
@@ -161,10 +164,127 @@ The protocol is **gates-as-rankings**. Each step computes its metrics but does n
 
 2. For TF-flexible arcs, TF is an axis. Each architecture × TF combination is a candidate.
 
+**Search policy (informed by Steps 3-4, not exhaustive):**
+
+Step 5 search is constrained by what earlier steps surfaced. Exhaustive Cartesian search of the parameter space is explicitly rejected — too much noise exploration, too much selection bias, ignores the methodology's intent.
+
+Inputs from Step 3 (per surviving cluster):
+- Selected SL multiplier (capturability composite optimum)
+- Archetype label (V-shape, Stepwise, Bimodal, etc.)
+- Capturability composite + per-metric percentile distribution
+
+Inputs from Step 4 (per candidate cluster):
+- Filter / classifier candidate (rule or model)
+- Top features by importance
+- AUC and threshold-sweep results
+
+Step 5 search rules:
+
+**Architecture selection:** 2-3 from {A1..A6} that fit the dominant cluster archetype:
+- Stepwise climber → A1 (system filter), A2 (classifier filter), A4 (trailing-exit Pipeline D)
+- V-shape recovery → A1, A3 (Pipeline DE — deferred entry), A6 (meta-labeling)
+- Bimodal → A1, A4 (per-archetype Pipeline D exits)
+- Monotonic up → A1, A2, A6
+- Choppy → no architectures expected to survive; arc typically dies at Step 3 before reaching Step 5
+- A5 (portfolio composition) → only applies if 2+ candidate clusters survive Step 3
+
+If Step 4 produced NO usable filter/classifier (AUC at chance, no rule above noise), A1 still runs with "no filter" baseline (raw signal + system-level rules: exposure, SL, exit) — this tests whether the system works without filtering.
+
+**SL multiplier:** centred on Step 3's per-cluster selected SL, ±1 step either side (typically 3 values total). Example: if Step 3 selected SL=2.5×ATR, Step 5 tests SL ∈ {2.0, 2.5, 3.0}.
+
+**Exit policy:** 3-4 variants matched to archetype:
+- Stepwise climber → variants of `sl_plus_trailing_atr`, `sl_plus_trailing_swing`
+- V-shape recovery → variants of `sl_plus_tp_2r`, `sl_plus_tp_3r`, `sl_partial_close_1r_runner_trail`
+- Bimodal → `sl_partial_close_1r_runner_trail` plus `sl_plus_tp_2r`
+- Always include `sl_only` baseline for comparison
+
+**Exposure cap:** 2 sensible values per arc (typically: `max_concurrent_per_currency=2` matching KH-24, plus `unlimited` for comparison).
+
+**Pipeline DE bar count (A3 only):** {3, 5} as default test points.
+
+Per-arc config count: roughly 50-100 (3 architectures × 3 exits × 3 SLs × 2 exposure ≈ 54; doubles to ~108 if 2 candidate clusters survive Step 3).
+
+Selection bias accounting:
+- Total N (configs evaluated per arc) reported in closure doc
+- Bonferroni-equivalent stress: top survivor's worst-fold ratio must materially exceed the noise floor implied by N
+- Specifically: arcs reporting fewer than 50 evaluated configs receive a "thin search" flag; arcs reporting 100+ configs receive a "broad search" flag with elevated selection-bias risk
+
+**Multi-cluster handling:**
+
+If Step 3 surfaces 2+ candidate clusters (each passing §3 capturability checks):
+- Step 5 runs per-cluster independently (full architecture search per cluster)
+- A5 (portfolio composition) additionally runs combining the clusters at admit-only economics
+- Top-3 across ALL clusters proceed to holdout
+
+**Holdout decision rule:**
+
+After 11-fold WFO ranking by worst-fold ratio:
+- Top-3 candidates evaluated once on 2021-2025 holdout
+- Verdict per candidate: PASS-DEPLOYABLE / PASS-VIABLE / FAIL (per §3)
+- Arc verdict: best candidate's holdout result, conditional on the same candidate passing the 11-fold WFO gate
+- If top-1 fails holdout but top-2 or top-3 passes BOTH 11-fold AND holdout: report all three results; top-survivor becomes the arc's verdict candidate
+- If all top-3 fail either WFO or holdout: arc verdict = FAIL with explanatory section per §6 closure format
+
+The holdout is one-shot per candidate. Re-evaluating the same candidate after parameter tweaks is forbidden (selection bias laundering).
+
+**ML architecture mechanics (Amendment 2):**
+
+A1 (system_level_filter) and A5 (portfolio_composition) are rule-based — no ML mechanics needed. The four ML-based architectures require explicit mechanics to ensure cross-arc reproducibility.
+
+**A2 (classifier_filter):**
+- Classifier: Step 4's best-AUC classifier (RF, LGBM, or Logistic — whichever scored highest in Step 4 evaluation)
+- Threshold: AUC-best threshold from Step 4 threshold sweep
+- No retraining at Step 5 (use Step 4 output directly)
+- At each new signal: classifier predicts probability of belonging to candidate cluster; take trade if prob ≥ threshold, else skip
+- Output recorded: per-signal admit/reject decisions
+
+**A3 (Pipeline DE — deferred entry):**
+- Requires NEW classifier training (Step 4's entry-time classifier is not reusable)
+- Training data: Step 1 pool
+- Target: same as Step 4 (cluster membership)
+- Features: "path-so-far" features observable at bar N (entry deferred to bar N):
+  - Bar-relative MFE (high - entry) / ATR
+  - Bar-relative MAE (entry - low) / ATR
+  - Current close vs entry price (R-multiple)
+  - Bar count since signal
+  - Velocity: (close - signal_close) / N bars / ATR
+  - Bid-ask drift since signal
+  - Cumulative volume (if available)
+- Classifier: RandomForest with default hyperparameters from L_PROTOCOL Appendix A
+- N values tested: {3, 5} bars after signal
+- Threshold: AUC-best from training threshold sweep per fold
+- Decision: at bar N post-signal, classifier predicts; if above threshold, enter at next bar open; else cancel
+
+**A4 (Pipeline D exits — differentiated exit timing):**
+- Requires NEW classifier training (different target from A3)
+- Training data: Step 1 pool
+- Target: "will this trade close profitably?" — binary, 1 if final R > 0, else 0
+- Features: same path-so-far feature set as A3, evaluated at each bar post-entry up to time-exit horizon
+- Classifier: RandomForest with default hyperparameters
+- Decision rule: at each bar post-entry, classifier predicts confidence; if confidence drops below exit threshold, queue exit at next bar open
+- Initial SL still applies (classifier exit does NOT override SL)
+- Exit threshold: tested at {0.3, 0.4, 0.5} (configurable; higher threshold = exit sooner on uncertainty)
+
+**A6 (meta_labeling):**
+- Classifier: Step 4's best-AUC classifier (same as A2)
+- Mapping from confidence to position size:
+  - prob < lower_threshold → 0x (skip trade)
+  - lower_threshold ≤ prob < upper_threshold → 0.5x risk
+  - prob ≥ upper_threshold → 1.0x risk
+- Default thresholds: lower=0.4, upper=0.6
+- Threshold sweep at Step 5: test {(0.3, 0.5), (0.4, 0.6), (0.5, 0.7)} as three variant configs
+- Output recorded: per-signal size decisions
+
+**Shared discipline across all ML architectures:**
+- All classifiers respect causal lineage tags from Step 1 — no "suspect" or "unverified" features enter training
+- Deterministic training: `random_state=42`, `n_jobs=1` per Appendix A
+- Per-fold WFO trains classifier on IS, evaluates on OOS — no global model trained once and used across folds
+- Selection bias: each unique architecture × parameter set counts toward Step 5's total N
+
 3. **WFO structure (locked):**
    - **Training/search window:** 2010-01-01 → 2020-12-31, 11-fold WFO with 1-year folds
    - **Holdout window:** 2021-01-01 → present (currently ~2026-05) — ONE-SHOT evaluation only
-   - Step 5 search runs on the 11-fold WFO. Top candidate (by worst-fold ratio) is locked, then evaluated ONCE on the 2021-2025 holdout
+   - Step 5 search runs on the 11-fold WFO. Top-K candidates (default K=3, by worst-fold ratio) are locked, then evaluated ONCE on the 2021-2025 holdout (per item 6 and the Amendment 1 holdout decision rule)
    - Both 11-fold WFO and holdout must pass §3 gates for PASS-DEPLOYABLE
 
 4. For each candidate config:
@@ -217,7 +337,7 @@ The protocol is **gates-as-rankings**. Each step computes its metrics but does n
 
 All of:
 - worst-fold ROI/DD ratio ≥ 2.0
-- worst-fold ROI > 0 at any risk size; positive at all 7 folds
+- worst-fold ROI > 0 at any risk size; positive at all 11 folds (WFO)
 - at chosen risk size: DD ≤ 8%
 - at chosen risk size: 0 days breaching 5% daily DD
 - at chosen risk size: max DD ≤ 10% (5ers hard limit)
@@ -368,7 +488,6 @@ The following are deliberately out-of-scope:
 
 - Phase planning (what to run next) — lives in `RE_RUN_PLAN.md`
 - Specific arc plans — live in per-arc `ARC_OPEN.md`
-- ML scope deep specifics — deferred to a future amendment
 - Backtester implementation — lives in `BACKTESTER_ARCHITECTURE.md`
 - Data foundation specifics — live in `DATA_FOUNDATION.md`
 

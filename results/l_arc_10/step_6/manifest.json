@@ -2,18 +2,36 @@
   "arc_name": "l_arc_10",
   "step": "step_6",
   "protocol_version": "v3.0",
-  "trigger": "Step 5 produced 1 PASS-DEPLOYABLE + 2 PASS-VIABLE candidates",
+  "trigger": "Step 5 produced 1 PASS-DEPLOYABLE + 2 PASS-VIABLE candidates; Amendment 3 re-evaluation upgraded A1 Top-1 to PASS-DEPLOYABLE-PROVISIONAL pending Step 6",
   "verdict": "PASS",
   "candidate_kills": 0,
   "feature_downgrades": 0,
+  "deliverables": {
+    "causal_audit_report_md": "causal_audit_report.md",
+    "audit_report_md": "audit_report.md",
+    "byte_compare_log_json": "byte_compare_log.json"
+  },
   "priority_audits": {
     "swing_detection_arc9_check": "PASS - producer uses confirmation-lag (right-edge offset k+1), not centred-at-signal",
     "trailing_swing_features": "PASS - swing_low_distance_14, swing_high_distance_14 use one-sided rolling min/max with shift(1)",
     "cross_pair_ffill_lookahead": "PASS - .shift(1) after .ffill() prevents future-bar leakage"
   },
-  "caveats_surfaced_to_closure": [
-    "Per-fold equity reset (no cumulative DD across folds)",
-    "Exit-policy re-simulation uses mid-price path; spread on new exits not modelled",
-    "Step 4 AUC ~0.50 → cluster classifier near chance; A1 unfiltered IS the realised edge"
+  "byte_compare": {
+    "n_samples": 5,
+    "seed": 42,
+    "rtol": 1e-09,
+    "atol": 1e-09,
+    "all_features_abs_diff_zero": true,
+    "arc9_invariance_all_ok": true
+  },
+  "verdict_update": {
+    "tracker_re_evaluated_verdict_before": "PASS-DEPLOYABLE-PROVISIONAL",
+    "tracker_re_evaluated_verdict_after": "PASS-DEPLOYABLE",
+    "rationale": "Step 6 causal audit clean; Amendment 3 evaluation order item 3 finalises verdict"
+  },
+  "caveats_forwarded_to_closure": [
+    "Constraint #6 daily DD breaches at r_safe — per-day max-DD series not built (out of Step 6 scope)",
+    "Constraint #7 chained max DD at r_safe — Step 5 per-fold equity reset only (out of Step 6 scope)",
+    "Engine re-run of A1 winning config recommended for definitive constraints #6 + #7 measurement (closure §10 missing-data flags persist)"
   ]
 }

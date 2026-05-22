@@ -1,0 +1,399 @@
+{
+  "n_samples": 5,
+  "seed": 42,
+  "rtol": 1e-09,
+  "atol": 1e-09,
+  "overall_ok": true,
+  "entries": [
+    {
+      "trade_id": 295,
+      "pair": "CHFJPY",
+      "sig_idx_4h": 2458,
+      "signal_bar_time": "2011-07-12 08:00:00+00:00",
+      "signal_flag_true_at_recompute": true,
+      "feature_comparisons": [
+        {
+          "name": "L1_value",
+          "pool": 94.82,
+          "recomputed": 94.82,
+          "match": true,
+          "abs_diff": 0.0
+        },
+        {
+          "name": "L0_value",
+          "pool": 94.11,
+          "recomputed": 94.11,
+          "match": true,
+          "abs_diff": 0.0
+        },
+        {
+          "name": "L1_age_d1_bars",
+          "pool": 7.0,
+          "recomputed": 7.0,
+          "match": true,
+          "abs_diff": 0.0
+        },
+        {
+          "name": "L0_age_d1_bars",
+          "pool": 19.0,
+          "recomputed": 19.0,
+          "match": true,
+          "abs_diff": 0.0
+        },
+        {
+          "name": "L1_to_atr_proximity",
+          "pool": -0.10026850415755231,
+          "recomputed": -0.10026850415755231,
+          "match": true,
+          "abs_diff": 0.0
+        },
+        {
+          "name": "reject_buffer_atr",
+          "pool": 1.5290946884030112,
+          "recomputed": 1.5290946884030112,
+          "match": true,
+          "abs_diff": 0.0
+        },
+        {
+          "name": "upper_fraction",
+          "pool": 0.6701030927835118,
+          "recomputed": 0.6701030927835118,
+          "match": true,
+          "abs_diff": 0.0
+        },
+        {
+          "name": "atr14_at_signal",
+          "pool": 0.39892885942668377,
+          "recomputed": 0.39892885942668377,
+          "match": true,
+          "abs_diff": 0.0
+        }
+      ],
+      "all_features_match": true,
+      "arc9_swing_invariance": {
+        "d_t": 476,
+        "d_search_max": 472,
+        "l1_idx": 469,
+        "l1_age": 7.0,
+        "right_edge_constraint_ok": true,
+        "confirmation_window_in_past_ok": true,
+        "confirmation_window_max_d1_idx": 472,
+        "nan_perturbation_invariance_ok": true,
+        "all_ok": true
+      },
+      "trade_ok": true
+    },
+    {
+      "trade_id": 1430,
+      "pair": "NZDCAD",
+      "sig_idx_4h": 11656,
+      "signal_bar_time": "2017-04-03 12:00:00+00:00",
+      "signal_flag_true_at_recompute": true,
+      "feature_comparisons": [
+        {
+          "name": "L1_value",
+          "pool": 0.93507,
+          "recomputed": 0.93507,
+          "match": true,
+          "abs_diff": 0.0
+        },
+        {
+          "name": "L0_value",
+          "pool": 0.92718,
+          "recomputed": 0.92718,
+          "match": true,
+          "abs_diff": 0.0
+        },
+        {
+          "name": "L1_age_d1_bars",
+          "pool": 8.0,
+          "recomputed": 8.0,
+          "match": true,
+          "abs_diff": 0.0
+        },
+        {
+          "name": "L0_age_d1_bars",
+          "pool": 15.0,
+          "recomputed": 15.0,
+          "match": true,
+          "abs_diff": 0.0
+        },
+        {
+          "name": "L1_to_atr_proximity",
+          "pool": -0.510285306848558,
+          "recomputed": -0.510285306848558,
+          "match": true,
+          "abs_diff": 0.0
+        },
+        {
+          "name": "reject_buffer_atr",
+          "pool": 0.6961749543434399,
+          "recomputed": 0.6961749543434399,
+          "match": true,
+          "abs_diff": 0.0
+        },
+        {
+          "name": "upper_fraction",
+          "pool": 0.7371937639198306,
+          "recomputed": 0.7371937639198306,
+          "match": true,
+          "abs_diff": 0.0
+        },
+        {
+          "name": "atr14_at_signal",
+          "pool": 0.002743563220830592,
+          "recomputed": 0.002743563220830592,
+          "match": true,
+          "abs_diff": 0.0
+        }
+      ],
+      "all_features_match": true,
+      "arc9_swing_invariance": {
+        "d_t": 2261,
+        "d_search_max": 2257,
+        "l1_idx": 2253,
+        "l1_age": 8.0,
+        "right_edge_constraint_ok": true,
+        "confirmation_window_in_past_ok": true,
+        "confirmation_window_max_d1_idx": 2256,
+        "nan_perturbation_invariance_ok": true,
+        "all_ok": true
+      },
+      "trade_ok": true
+    },
+    {
+      "trade_id": 1449,
+      "pair": "NZDJPY",
+      "sig_idx_4h": 11874,
+      "signal_bar_time": "2017-05-22 16:00:00+00:00",
+      "signal_flag_true_at_recompute": true,
+      "feature_comparisons": [
+        {
+          "name": "L1_value",
+          "pool": 77.54,
+          "recomputed": 77.54,
+          "match": true,
+          "abs_diff": 0.0
+        },
+        {
+          "name": "L0_value",
+          "pool": 76.975,
+          "recomputed": 76.975,
+          "match": true,
+          "abs_diff": 0.0
+        },
+        {
+          "name": "L1_age_d1_bars",
+          "pool": 8.0,
+          "recomputed": 8.0,
+          "match": true,
+          "abs_diff": 0.0
+        },
+        {
+          "name": "L0_age_d1_bars",
+          "pool": 14.0,
+          "recomputed": 14.0,
+          "match": true,
+          "abs_diff": 0.0
+        },
+        {
+          "name": "L1_to_atr_proximity",
+          "pool": 0.035238036598362936,
+          "recomputed": 0.035238036598362936,
+          "match": true,
+          "abs_diff": 0.0
+        },
+        {
+          "name": "reject_buffer_atr",
+          "pool": 0.5432530642247063,
+          "recomputed": 0.5432530642247063,
+          "match": true,
+          "abs_diff": 0.0
+        },
+        {
+          "name": "upper_fraction",
+          "pool": 0.6975806451612672,
+          "recomputed": 0.6975806451612672,
+          "match": true,
+          "abs_diff": 0.0
+        },
+        {
+          "name": "atr14_at_signal",
+          "pool": 0.3405411072351841,
+          "recomputed": 0.3405411072351841,
+          "match": true,
+          "abs_diff": 0.0
+        }
+      ],
+      "all_features_match": true,
+      "arc9_swing_invariance": {
+        "d_t": 2303,
+        "d_search_max": 2299,
+        "l1_idx": 2295,
+        "l1_age": 8.0,
+        "right_edge_constraint_ok": true,
+        "confirmation_window_in_past_ok": true,
+        "confirmation_window_max_d1_idx": 2298,
+        "nan_perturbation_invariance_ok": true,
+        "all_ok": true
+      },
+      "trade_ok": true
+    },
+    {
+      "trade_id": 2160,
+      "pair": "NZDUSD",
+      "sig_idx_4h": 17635,
+      "signal_bar_time": "2020-12-21 12:00:00+00:00",
+      "signal_flag_true_at_recompute": true,
+      "feature_comparisons": [
+        {
+          "name": "L1_value",
+          "pool": 0.70536,
+          "recomputed": 0.70536,
+          "match": true,
+          "abs_diff": 0.0
+        },
+        {
+          "name": "L0_value",
+          "pool": 0.70053,
+          "recomputed": 0.70053,
+          "match": true,
+          "abs_diff": 0.0
+        },
+        {
+          "name": "L1_age_d1_bars",
+          "pool": 4.0,
+          "recomputed": 4.0,
+          "match": true,
+          "abs_diff": 0.0
+        },
+        {
+          "name": "L0_age_d1_bars",
+          "pool": 12.0,
+          "recomputed": 12.0,
+          "match": true,
+          "abs_diff": 0.0
+        },
+        {
+          "name": "L1_to_atr_proximity",
+          "pool": -0.9159819369033555,
+          "recomputed": -0.9159819369033555,
+          "match": true,
+          "abs_diff": 0.0
+        },
+        {
+          "name": "reject_buffer_atr",
+          "pool": 0.30410600305191954,
+          "recomputed": 0.30410600305191954,
+          "match": true,
+          "abs_diff": 0.0
+        },
+        {
+          "name": "upper_fraction",
+          "pool": 0.9596541786743429,
+          "recomputed": 0.9596541786743429,
+          "match": true,
+          "abs_diff": 0.0
+        },
+        {
+          "name": "atr14_at_signal",
+          "pool": 0.0027293114626819543,
+          "recomputed": 0.0027293114626819543,
+          "match": true,
+          "abs_diff": 0.0
+        }
+      ],
+      "all_features_match": true,
+      "arc9_swing_invariance": {
+        "d_t": 3422,
+        "d_search_max": 3418,
+        "l1_idx": 3418,
+        "l1_age": 4.0,
+        "right_edge_constraint_ok": true,
+        "confirmation_window_in_past_ok": true,
+        "confirmation_window_max_d1_idx": 3421,
+        "nan_perturbation_invariance_ok": true,
+        "all_ok": true
+      },
+      "trade_ok": true
+    },
+    {
+      "trade_id": 2553,
+      "pair": "GBPJPY",
+      "sig_idx_4h": 20651,
+      "signal_bar_time": "2022-11-03 20:00:00+00:00",
+      "signal_flag_true_at_recompute": true,
+      "feature_comparisons": [
+        {
+          "name": "L1_value",
+          "pool": 164.939,
+          "recomputed": 164.939,
+          "match": true,
+          "abs_diff": 0.0
+        },
+        {
+          "name": "L0_value",
+          "pool": 159.72,
+          "recomputed": 159.72,
+          "match": true,
+          "abs_diff": 0.0
+        },
+        {
+          "name": "L1_age_d1_bars",
+          "pool": 11.0,
+          "recomputed": 11.0,
+          "match": true,
+          "abs_diff": 0.0
+        },
+        {
+          "name": "L0_age_d1_bars",
+          "pool": 20.0,
+          "recomputed": 20.0,
+          "match": true,
+          "abs_diff": 0.0
+        },
+        {
+          "name": "L1_to_atr_proximity",
+          "pool": 0.22552032244449643,
+          "recomputed": 0.22552032244449643,
+          "match": true,
+          "abs_diff": 0.0
+        },
+        {
+          "name": "reject_buffer_atr",
+          "pool": 1.007324106918715,
+          "recomputed": 1.007324106918715,
+          "match": true,
+          "abs_diff": 0.0
+        },
+        {
+          "name": "upper_fraction",
+          "pool": 0.9826771653543372,
+          "recomputed": 0.9826771653543372,
+          "match": true,
+          "abs_diff": 0.0
+        },
+        {
+          "name": "atr14_at_signal",
+          "pool": 0.7981542330594495,
+          "recomputed": 0.7981542330594495,
+          "match": true,
+          "abs_diff": 0.0
+        }
+      ],
+      "all_features_match": true,
+      "arc9_swing_invariance": {
+        "d_t": 4006,
+        "d_search_max": 4002,
+        "l1_idx": 3995,
+        "l1_age": 11.0,
+        "right_edge_constraint_ok": true,
+        "confirmation_window_in_past_ok": true,
+        "confirmation_window_max_d1_idx": 3998,
+        "nan_perturbation_invariance_ok": true,
+        "all_ok": true
+      },
+      "trade_ok": true
+    }
+  ]
+}

@@ -155,9 +155,10 @@ A1 (no classifier filter, full Step 1 pool of 2,162 search-window trades) with S
 ## §10 Amendment 3 re-evaluation (added 2026-05-22)
 
 **Original verdict:** PASS-VIABLE (best A1 system_level_filter, worst-fold ratio 5.42, DD 9.22% at `r_base = 0.5%`)
-**Re-evaluated verdict:** **PASS-DEPLOYABLE-PROVISIONAL** (upgrade)
-**Re-evaluation status:** provisional (missing `chained_max_dd_base_pct` and per-day max-DD series; Step 6 already PASS — carries forward)
-**Re-evaluated primary_failure_mode:** N/A (passes amended DEPLOYABLE gate provisionally)
+**Re-evaluated verdict (initial, 2026-05-22 AM):** PASS-DEPLOYABLE-PROVISIONAL (upgrade)
+**Re-evaluated verdict (finalised, 2026-05-22 PM, post-Step-6):** **PASS-DEPLOYABLE** (confirmed)
+**Re-evaluation status:** confirmed — Step 6 Amendment 3 re-evaluation audit clean ([step_6/audit_report.md](step_6/audit_report.md)). The two missing-data flags (constraints #6 daily DD breaches and #7 chained max DD) are forwarded out of Step 6 scope per Amendment 3 §"Evaluation order"; engine re-run remains recommended for definitive measurement but does not block the verdict finalisation. If a subsequent re-run surfaces a constraint #6 / #7 failure, verdict reverts per Amendment 3 §"Failure-mode priority".
+**Re-evaluated primary_failure_mode:** N/A
 
 ### Scaling derivation
 - `worst_fold_dd_base_pct`: **9.22%** (closure §1 `worst_fold_dd_pct`)

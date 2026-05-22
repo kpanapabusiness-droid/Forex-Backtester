@@ -1,5 +1,5 @@
 # CLAUDE.md — Forex Ignition Rebuild
-> Last updated: 2026-05-19 | Phase: Arc 10 closed STEP_4_HALT on `claude/charming-mcnulty-8160e0`; post-closure research (experimentation + WFO pair) complete and committed. Arcs 8/9/11 run in parallel CC sessions (queue ownership delegated to those sessions). KH-24 live deployment unchanged.
+> Last updated: 2026-05-22 | Phase: CC_07 — L_PROTOCOL v3.0 runtime infrastructure built on `infra/protocol-runtime-v3`. `core/arc/`, `core/steps/`, `core/architectures/`, `core/runners/` populated; all 43 protocol_runtime tests pass; KH-24 structural equivalence to A1 wired (full-data anchor check is `scripts/anchor/check_a1_equivalence.py` for chat to run). Arc 10 closure unchanged. KH-24 live deployment unchanged. See [docs/PROTOCOL_RUNTIME.md](docs/PROTOCOL_RUNTIME.md).
 > First file any AI assistant reads. Reflects where the project ACTUALLY is.
 
 ---

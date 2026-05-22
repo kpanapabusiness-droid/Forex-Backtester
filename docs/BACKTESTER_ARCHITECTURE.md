@@ -328,10 +328,14 @@ invocations produce byte-identical output.
 ## Out of scope for v3.0 backtester docs
 
 - Per-arc signal definitions — live in arc-specific docs / configs
-- Architecture A1..A6 implementations — registered in
-  `core/architectures/` (added incrementally with each arc)
+- Architecture A1..A6 implementations — live in `core/architectures/`,
+  with step runners under `core/steps/` and the orchestrator at
+  `core/arc/arc_orchestrator.py`. See
+  [PROTOCOL_RUNTIME.md](PROTOCOL_RUNTIME.md) for the API reference.
+  Built by CC_07.
 - Step 6 producer-audit procedures — defined in L_PROTOCOL §2 Step 6
-- ML / classifier choices — sub-protocol per arc
+- ML / classifier choices — sub-protocol per arc (hook empty at v3.0;
+  see [PROTOCOL_RUNTIME.md §11](PROTOCOL_RUNTIME.md))
 - Live deployment EA — `EA/KH24_EA.mq5` is the only deployed system;
   ports of v3 candidates open only when a candidate clears
   PASS-DEPLOYABLE per §3.

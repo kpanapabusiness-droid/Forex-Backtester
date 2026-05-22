@@ -1,0 +1,4 @@
+config_id,search_verdict,search_worst_fold_ratio,holdout_verdict,holdout_roi_pct,holdout_dd_pct,holdout_ratio,holdout_n_trades,deployable
+a6_shb_metalabel_0.4_0.6_c0,fail,0.0,fail,0.0,0.0,0.0,0,False
+a2_shb_cluster0,fail,-0.7686751434881255,fail,0.013003938897941492,0.5749685375158409,0.02261678344022993,165,False
+a1_shb_baseline,fail,-0.8899285122907781,fail,-0.1378047579126691,0.6733615695684885,-0.20465194947341409,231,False

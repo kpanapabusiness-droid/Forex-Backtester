@@ -1,0 +1,129 @@
+# configs/arc_discovery_01.yaml
+# Signal Discovery Probe Arc — locked parameters per CC dispatch + chat resolutions.
+# Sub-protocol: signal_discovery_probe (locked v1.0)
+# Locked decisions from chat reply (this conversation):
+#   1. Trail activation honours dispatch literal: 2.0R = entry + 4.0xATR (SL=2.0xATR -> 1R=2.0xATR)
+#   2. Pool builder: discovery-specific (Option beta) sharing per-pair feature matrix across rules
+#   3. Bonferroni denominator: 0.05 / N_evaluated (Task 4 reading; 0.05/10000 reported alongside)
+#   4. Branch: arc/discovery_01 created at PR time from current worktree commit
+#   5. Exposure cap: unlimited concurrency at Step 1
+# Methodology constraint from chat reply: only top-3 raw performers spawn follow-up vanilla arcs.
+
+arc:
+  name: arc_discovery_01
+  signal_class: discovered_via_search
+  sub_protocol: signal_discovery_probe
+  tf_mode: locked
+  tf: H1   # H1 primary. Rationale: L-arc convention; KH-24 deploys on H4 so discovery on H1 keeps signals orthogonal.
+  direction: long_only
+
+search:
+  method: random_search
+  budget: 10000           # hard cap (Task 3)
+  random_seed: 42
+  pool_size_floor: 200    # Task 3 step 4 — reject rules with pool_size < 200
+  ranking_metric: mean_r_per_rule
+
+# Window — 2010-2020 IS only. Holdout 2021+ NEVER touched.
+window:
+  start: 2010-01-01
+  end:   2020-12-31
+
+pair_set:
+  # 28-pair universe, sourced from data_v3.yaml. Locked here for arc-isolation.
+  - AUDCAD
+  - AUDCHF
+  - AUDJPY
+  - AUDNZD
+  - AUDUSD
+  - CADCHF
+  - CADJPY
+  - CHFJPY
+  - EURAUD
+  - EURCAD
+  - EURCHF
+  - EURGBP
+  - EURJPY
+  - EURNZD
+  - EURUSD
+  - GBPAUD
+  - GBPCAD
+  - GBPCHF
+  - GBPJPY
+  - GBPNZD
+  - GBPUSD
+  - NZDCAD
+  - NZDCHF
+  - NZDJPY
+  - NZDUSD
+  - USDCAD
+  - USDCHF
+  - USDJPY
+
+# Locked exit policy — single config across all 10k rules (apples-to-apples).
+# Chat decision 1 (literal reading): activation 2.0R = 4.0xATR; trail 2.0xATR; no time exit.
+exit_policy:
+  initial_sl_atr_mult: 2.0
+  trail_activation_atr_mult: 4.0   # close >= entry + 4.0xATR (= 2.0R given SL=2.0xATR)
+  trail_distance_atr_mult: 2.0     # bar-close updates only
+  trail_update_basis: close_bid    # KH-24 convention per PR-E.1.6
+  time_exit: none
+
+# Risk — informational at Step 1; deployment risk lives in follow-up Step 5.
+risk:
+  risk_per_trade_pct: 0.5
+  exposure_cap: unlimited           # Step 1 builds ex-ante pool with no concurrency constraints
+
+# Rule grammar (Task 1).
+grammar:
+  max_atoms_per_rule: 5
+  operators: ["gt", "lt", "ge", "le", "eq", "ne"]   # > < >= <= == !=
+  combinators: ["AND", "OR"]
+  allow_not: true
+  threshold_quantiles: [0.10, 0.25, 0.50, 0.75, 0.90]
+
+# Causal lineage filter (Task 2).
+causal_filter:
+  accepted_lineage: ["clean"]
+  rejected_lineage: ["suspect", "unverified"]
+  exclude_classes: []   # could exclude e.g. "spread_regime" if known leaky; empty at v1.0
+
+# Bonferroni accounting (Task 4 + chat decision 3).
+bonferroni:
+  alpha: 0.05
+  denominator_mode: n_evaluated   # primary: 0.05 / N_evaluated
+  also_report: budget             # secondary report: 0.05 / search.budget = 0.05/10000 = 5e-6
+
+# Output paths (Task 4-7).
+output:
+  arc_root: results/arc_discovery_01
+  step1_discovery_subdir: step_1/discovery
+  artefacts:
+    top_10_raw: top_10_raw.md
+    bonferroni_survivors: bonferroni_survivors.md
+    full_search_log: full_search_log.parquet
+    causal_audit_rejections: causal_audit_rejections.md
+    compute_budget_used: compute_budget_used.md
+    manifest: ../manifest.json   # results/arc_discovery_01/step_1/manifest.json
+
+# Data layer — same as configs/data_v3.yaml. Override here for arc-isolation.
+data:
+  histdata_root: data/histdata
+  cache_root: data/cache
+
+# Determinism (Task 8).
+determinism:
+  random_state: 42
+  n_jobs: 1                # rule generation is serial; per-pair parallelism via parallelism.pool_size
+  text_line_terminator: "\n"
+
+parallelism:
+  # Per-pair feature-matrix compute can parallelise; rule evaluation can also parallelise.
+  # null = use default_pool_size(). Set to 1 for the determinism check run.
+  pool_size: null
+
+# Methodology constraint (chat reply): top-3 only spawn follow-up vanilla arcs.
+# Top-10 reported in top_10_raw.md for analysis. Closure doc distinguishes top-3 vs ranks 4-10.
+follow_up:
+  spawn_follow_up_top_k: 3
+  analysis_report_top_k: 10

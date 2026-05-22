@@ -1,0 +1,104 @@
+{
+  "K_tested": [
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "arc_name": "l_arc_10",
+  "cluster_summary": [
+    {
+      "K": 3,
+      "archetype": "monotonic_down",
+      "bars_held_p50": 21.0,
+      "centroid_path_drawdown_depth_r": 7.785747209056962,
+      "centroid_path_mono": -0.5216489512330558,
+      "centroid_path_peaks": 26.67080745341615,
+      "centroid_path_recovery_ratio": 0.2941380462548431,
+      "centroid_path_ttp_rel": 0.21866857659420044,
+      "cluster_id": 0,
+      "mae_p50": -5.120979718790339,
+      "mean_r": -0.8450526496578377,
+      "mfe_p50": 1.9951362622054782,
+      "mfe_p75": 3.5432944914108147,
+      "n": 1771,
+      "p25_r": -1.0000000000000053,
+      "p50_r": -0.9999999999999996,
+      "p75_r": -0.9999999999999936,
+      "share_of_pool": 0.536504089669797,
+      "wrong_way_pp": 0.5279503105590062
+    },
+    {
+      "K": 3,
+      "archetype": "v_shape_recovery",
+      "bars_held_p50": 20.0,
+      "centroid_path_drawdown_depth_r": 4.224092627540876,
+      "centroid_path_mono": 0.6173569227240223,
+      "centroid_path_peaks": 26.468586387434556,
+      "centroid_path_recovery_ratio": 0.7535984016402268,
+      "centroid_path_ttp_rel": 0.8058492506863649,
+      "cluster_id": 1,
+      "mae_p50": -1.8932804676045016,
+      "mean_r": 0.9282388987852496,
+      "mfe_p50": 5.267181992142362,
+      "mfe_p75": 7.780650040757397,
+      "n": 1528,
+      "p25_r": -1.0000000000000038,
+      "p50_r": -0.999999999999996,
+      "p75_r": 1.6019919443983448,
+      "share_of_pool": 0.46289003332323536,
+      "wrong_way_pp": 0.5058900523560209
+    },
+    {
+      "K": 3,
+      "archetype": "monotonic_down",
+      "bars_held_p50": 71.5,
+      "centroid_path_drawdown_depth_r": 140.81458944000207,
+      "centroid_path_mono": -0.7952028069960544,
+      "centroid_path_peaks": 28.0,
+      "centroid_path_recovery_ratio": 0.35619240767310323,
+      "centroid_path_ttp_rel": 0.05416666666666667,
+      "cluster_id": 2,
+      "mae_p50": -143.81413959028765,
+      "mean_r": -1.0000000000000533,
+      "mfe_p50": 3.070825844695452,
+      "mfe_p75": 4.481810285594444,
+      "n": 2,
+      "p25_r": -1.0000000000000573,
+      "p50_r": -1.0000000000000533,
+      "p75_r": -1.0000000000000493,
+      "share_of_pool": 0.0006058770069675856,
+      "wrong_way_pp": 0.5
+    }
+  ],
+  "determinism": {
+    "line_terminator": "\\n",
+    "n_jobs": 1,
+    "random_state": 42
+  },
+  "env": {
+    "numpy": "2.4.4",
+    "pandas": "3.0.2",
+    "python": "3.14.0",
+    "sklearn": "1.8.0"
+  },
+  "pool_size": 3301,
+  "primary_K": 3,
+  "protocol_version": "v3.0",
+  "run_timestamp_utc": "2026-05-22 10:48:55",
+  "sha256": {
+    "cluster_assignments": "ef7a85c8382670351a8b0538b9c61c929188cbddee561a400370f46a3aeb0a00",
+    "cluster_summary_md": "45c316f00513c840fc8353ea698b3f8d20312382dd69d4087dfe16432f00a5e7",
+    "pool_input": "f74a8766fd3cca03b797356cb809410bf150e86049fbd40c24a90eeb52c2e96b"
+  },
+  "silhouette_per_K": {
+    "2": 0.421486857637523,
+    "3": 0.4243376271377794,
+    "4": 0.27109567233613946,
+    "5": 0.2861928843319263,
+    "6": 0.2766791175180828
+  },
+  "step": "step_2",
+  "valid_for_clustering": 3301
+}

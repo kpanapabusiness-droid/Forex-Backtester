@@ -114,6 +114,11 @@ results/l_arc_2_redo2/**/_run_log.txt
 # (L_ARC_PROTOCOL v2.3 §13: arc results data is direct-to-main).
 !results/l_arc_8/
 !results/l_arc_8/**
+# arc_discovery_01 — signal_discovery_probe sub-protocol (L_PROTOCOL v3.0).
+# Arc results data is direct-to-main; the full_search_log.parquet may be
+# large but is the deliverable for follow-up vanilla arcs.
+!results/arc_discovery_01/
+!results/arc_discovery_01/**
 # Don't track the quicktest subfolder — smoke-test artefact only.
 results/l_arc_8/step1_quicktest/
 # Arc 9 (IB-trend long, 4H) — Step 1+ outputs and post-kill deployment

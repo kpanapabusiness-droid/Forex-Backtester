@@ -4,7 +4,7 @@
 > Schema locked at v3.0. Replaces STATUS.md, CHANGELOG.md, ARC_QUEUE.md, and ACTIVE_ARCS.md.
 > First populated on first arc open under L_PROTOCOL v3.0.
 
-Last auto-update: manual: 2026-05-22 (Arc 11 close via canonical infra)
+Last auto-update: manual: 2026-05-22 (Arc 11 close via canonical infra; arc_discovery_01 still active per prior update)
 
 ---
 
@@ -12,8 +12,7 @@ Last auto-update: manual: 2026-05-22 (Arc 11 close via canonical infra)
 
 | Arc | Signal | TF mode | Sub-protocol | Started | Branch | Step in progress |
 |---|---|---|---|---|---|---|
-
-(empty — no arcs running)
+| arc_discovery_01 | discovered_via_search (random search, n=10000) | locked H1 | signal_discovery_probe | 2026-05-22 | arc/discovery_01 | Step 1 — infrastructure landed; full 10k run pending compute slot |
 
 ---
 

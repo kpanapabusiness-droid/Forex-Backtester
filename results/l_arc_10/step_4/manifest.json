@@ -1,0 +1,62 @@
+{
+  "arc_name": "l_arc_10",
+  "candidates": [
+    1
+  ],
+  "classifiers": [
+    "lgbm",
+    "logistic",
+    "rf"
+  ],
+  "determinism": {
+    "line_terminator": "\\n",
+    "n_jobs": 1,
+    "random_state": 42
+  },
+  "env": {
+    "lightgbm": "4.6.0",
+    "numpy": "2.4.4",
+    "pandas": "3.0.2",
+    "python": "3.14.0",
+    "sklearn": "1.8.0"
+  },
+  "feature_count": 37,
+  "per_cluster_summary": {
+    "1": {
+      "best_classifier": "lgbm",
+      "best_mean_auc": 0.519896352756744,
+      "best_oos_auc": 0.5095280499609979,
+      "best_threshold": 0.49999999999999994,
+      "swing_audit": {
+        "audit_notes": [
+          "swing_high_distance_14 / swing_low_distance_14 use rolling(.max/.min, window=14).shift(1) on mid-OHLC \u2014 one-sided lookback, no future bars. Causal. (Trailing N-bar swing, not centred \u00b1N.)"
+        ],
+        "swing_features_in_top10": [
+          "prior_session_low_distance",
+          "prior_session_high_distance",
+          "swing_low_distance_14"
+        ]
+      },
+      "top_10_features": [
+        "atr_14",
+        "prior_session_low_distance",
+        "prior_session_high_distance",
+        "upper_fraction",
+        "distance_to_round_number",
+        "atr14_at_signal",
+        "eur_strength_index",
+        "atr_percentile_100",
+        "swing_low_distance_14",
+        "atr_vs_trailing_100"
+      ]
+    }
+  },
+  "protocol_version": "v3.0",
+  "run_timestamp_utc": "2026-05-22 10:49:09",
+  "sha256": {
+    "extraction_metrics_csv": "ba4804005f8f666d19dd2bea316b94fb9e13168bd7872b65455a3a709d25e0dd",
+    "extraction_summary_md": "36523ba3fd8ad40557c44b7c2c92c302275aea607e9951de4ad642c465989c03",
+    "feature_importance_csv": "cd32b3b3c4466bef4dca22d33ef8db7c25b3b7a082dcd95f5c935691569f74be"
+  },
+  "step": "step_4"
+}

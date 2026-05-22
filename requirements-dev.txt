@@ -5,3 +5,4 @@ pytest
 ruff
 pyyaml
 pydantic
+scipy

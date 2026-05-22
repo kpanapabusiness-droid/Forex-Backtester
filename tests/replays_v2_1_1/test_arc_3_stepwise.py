@@ -233,6 +233,7 @@ def test_frac_wrong_way_pre_peak():
 
 
 def test_hartigan_dip_wrapper_bimodal_and_unimodal():
+    pytest.importorskip("diptest")  # optional native-ext dep — skip if absent in CI clean env
     rng = np.random.default_rng(42)
     # Clearly bimodal: two gaussians at 0 and 3, sigma 0.3, n=200.
     bm = np.concatenate(

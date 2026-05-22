@@ -1,0 +1,4 @@
+rank,config_id,arch,sl_atr,exit_policy,exposure,extra,n_trades,mean_r,roi_pct,max_dd_pct,daily_5pct_breaches,roi_dd_ratio,verdict
+1,30,A6,1.5,sl_plus_tp_3r,unlimited,"{""hi"": 0.5, ""lo"": 0.3}",2323,0.1822424535482749,0.42780268358812235,0.017369295509861164,0,24.62982354956444,PASS-DEPLOYABLE
+2,27,A6,1.5,sl_plus_tp_2r,max_concurrent_per_pair_1,"{""hi"": 0.5, ""lo"": 0.3}",1429,0.16235098624020633,0.19333136389535577,0.009962562460937149,0,19.40578687997201,PASS-DEPLOYABLE
+3,24,A6,1.5,sl_plus_tp_2r,unlimited,"{""hi"": 0.5, ""lo"": 0.3}",2323,0.17074199427005074,0.35152217051294565,0.009981094724220976,0,35.21879916237163,PASS-DEPLOYABLE

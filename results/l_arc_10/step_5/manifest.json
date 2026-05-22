@@ -1,0 +1,134 @@
+{
+  "arc_name": "l_arc_10",
+  "candidate_clusters": [
+    1
+  ],
+  "determinism": {
+    "line_terminator": "\\n",
+    "n_jobs": 1,
+    "random_state": 42
+  },
+  "env": {
+    "numpy": "2.4.4",
+    "pandas": "3.0.2",
+    "python": "3.14.0"
+  },
+  "n_candidates": 1,
+  "n_configs_total": 96,
+  "protocol_version": "v3.0",
+  "run_timestamp_utc": "2026-05-22 10:58:04",
+  "sha256": {
+    "architectures_ranked_md": "1ad9ebac18a7df5cd2fcfd6bd21fedbef21eccf8c673757ce210210aaf8fa7e7",
+    "best_candidate_md": "c1c51eeea3db3a281d0d660919d77f39e3308bf728037fad659c332aee6c96c9",
+    "wfo_oracle_csv": "41bd3243e20165c3cf8918514dc19d4413cdf171481237ba966c271fd29c2fae",
+    "wfo_results_csv": "49c382fa9a0f0e1de143f6ecfc063dc08182ef7359c3a8ab71a7163656d8c8d1"
+  },
+  "step": "step_5",
+  "verdict": {
+    "best": {
+      "a3_n_bars": NaN,
+      "archetype": "v_shape_recovery",
+      "architecture": "A1",
+      "cluster_id": 1,
+      "exit_policy": "sl_partial_close_1r_runner_trail",
+      "exposure": "unlimited",
+      "max_per_currency": NaN,
+      "search_mean_dd": 0.038484269580982715,
+      "search_mean_ratio": 16.175388342813264,
+      "search_mean_roi": 0.498650417296612,
+      "search_n_total": 2162,
+      "search_neg_folds": 0,
+      "search_sign_consistency": 11,
+      "search_worst_dd": 0.09224133035508304,
+      "search_worst_ratio": 5.418504508840416,
+      "search_worst_roi": 0.2649053592818633,
+      "sl_multiplier": 3.5,
+      "threshold_pair": NaN,
+      "verdict_search": "PASS-VIABLE"
+    },
+    "pass_deployable_count": 1,
+    "pass_viable_count": 2,
+    "top_3": [
+      {
+        "a3_n_bars": NaN,
+        "archetype": "v_shape_recovery",
+        "architecture": "A1",
+        "cluster_id": 1,
+        "exit_policy": "sl_partial_close_1r_runner_trail",
+        "exposure": "unlimited",
+        "max_per_currency": NaN,
+        "search_mean_dd": 0.038484269580982715,
+        "search_mean_ratio": 16.175388342813264,
+        "search_mean_roi": 0.498650417296612,
+        "search_n_total": 2162,
+        "search_neg_folds": 0,
+        "search_sign_consistency": 11,
+        "search_worst_dd": 0.09224133035508304,
+        "search_worst_ratio": 5.418504508840416,
+        "search_worst_roi": 0.2649053592818633,
+        "sl_multiplier": 3.5,
+        "threshold_pair": NaN,
+        "verdict_search": "PASS-VIABLE"
+      },
+      {
+        "a3_n_bars": NaN,
+        "archetype": "v_shape_recovery",
+        "architecture": "A6",
+        "cluster_id": 1,
+        "exit_policy": "sl_partial_close_1r_runner_trail",
+        "exposure": "max_per_currency_2",
+        "max_per_currency": 2.0,
+        "search_mean_dd": 0.016799347144037288,
+        "search_mean_ratio": 6.012095573599658,
+        "search_mean_roi": 0.0886013720748242,
+        "search_n_total": 681,
+        "search_neg_folds": 0,
+        "search_sign_consistency": 11,
+        "search_worst_dd": 0.040338905957856865,
+        "search_worst_ratio": 2.921018767057929,
+        "search_worst_roi": 0.023507450733408985,
+        "sl_multiplier": 3.5,
+        "threshold_pair": [
+          0.5,
+          0.7
+        ],
+        "verdict_search": "PASS-DEPLOYABLE"
+      },
+      {
+        "a3_n_bars": NaN,
+        "archetype": "v_shape_recovery",
+        "architecture": "A6",
+        "cluster_id": 1,
+        "exit_policy": "sl_partial_close_1r_runner_trail",
+        "exposure": "unlimited",
+        "max_per_currency": NaN,
+        "search_mean_dd": 0.029787341408468136,
+        "search_mean_ratio": 12.370093506547049,
+        "search_mean_roi": 0.2906982234040101,
+        "search_n_total": 1661,
+        "search_neg_folds": 0,
+        "search_sign_consistency": 11,
+        "search_worst_dd": 0.08987714856943492,
+        "search_worst_ratio": 2.3911911668803714,
+        "search_worst_roi": 0.04967443826317508,
+        "sl_multiplier": 3.5,
+        "threshold_pair": [
+          0.3,
+          0.5
+        ],
+        "verdict_search": "PASS-VIABLE"
+      }
+    ]
+  },
+  "wfo": {
+    "holdout_window": [
+      "2021-01-01",
+      "2026-04-30"
+    ],
+    "n_search_folds": 11,
+    "search_window": [
+      "2010-01-01",
+      "2020-12-31"
+    ]
+  }
+}

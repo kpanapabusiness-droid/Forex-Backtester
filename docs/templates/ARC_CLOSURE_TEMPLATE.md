@@ -1,4 +1,4 @@
-# ARC_CLOSURE.md Template (Locked v1.0)
+# ARC_CLOSURE.md Template (Locked v1.1)
 
 > **Location:** `docs/templates/ARC_CLOSURE_TEMPLATE.md`
 > **Status:** locked. Every arc closure MUST follow this template.
@@ -8,6 +8,8 @@
 > Section headings are LITERAL — do not rephrase. Field names inside `§1 tracker_payload` are LITERAL — parser depends on exact spelling.
 >
 > **Design priority:** machine-parseability over human readability. §1 YAML is the source of truth for the tracker. §2 + §3 exist only to preserve cross-arc synthesis quality that prose enables and YAML doesn't.
+>
+> **v1.1 (2026-05-22, L_PROTOCOL Amendment 3):** risk-normalised gate fields added to `best_architecture` block. Two fields renamed (see §"Schema versioning" at end of template). `primary_failure_mode` enum extended.
 
 ---
 
@@ -27,6 +29,8 @@
 ```yaml
 tracker_payload:
 
+  template_version: v1.1   # NEW in v1.1 — parser uses this to dispatch schema. Omit or set to v1.0 for legacy closures.
+
   # ────── Identity ──────
   arc_name: <arc_name>
   signal: <signal description, terse, ≤80 char>
@@ -39,7 +43,7 @@ tracker_payload:
   verdict: PASS-DEPLOYABLE | PASS-VIABLE | FAIL | HALT | DISCOVERY_COMPLETE
   one_line: <≤140 char summary>
   failed_at_step: 1 | 2 | 3 | 4 | 5 | 6 | N/A
-  primary_failure_mode: <enum: pool_too_small | no_clusters_separable | no_capturable_cluster | entry_feature_auc_ceiling | step5_wf_roi_below_gate | step5_dd_above_gate | step5_sign_consistency_fail | step6_causal_audit_fail | selection_bias | holdout_fail_after_is_pass | admit_only_vs_deployment | other | N/A>
+  primary_failure_mode: <enum: pool_too_small | no_clusters_separable | no_capturable_cluster | entry_feature_auc_ceiling | step5_not_scalable | step5_wf_roi_below_gate_after_scaling | step5_ratio_below_gate_after_scaling | step5_chained_dd_above_gate | step5_daily_dd_breach | step5_negative_folds | step5_sign_consistency_fail | step5_trade_count_below_gate | step6_causal_audit_fail | selection_bias | holdout_fail_after_is_pass | admit_only_vs_deployment | step5_dd_above_gate | step5_wf_roi_below_gate | other | N/A>
 
   # ────── Pool metadata ──────
   pool_metadata:
@@ -51,6 +55,9 @@ tracker_payload:
     search_scope_flag: thin | normal | broad   # thin <50, normal 50-99, broad 100+
 
   # ────── Best architecture (null block if no winner) ──────
+  # v1.1 (Amendment 3): two fields renamed — worst_fold_roi_pct → worst_fold_roi_base_pct,
+  # worst_fold_dd_pct → worst_fold_dd_base_pct. Risk-normalised fields added below.
+  # Closures landed before v1.1 retain v1.0 field names; parser detects via template version.
   best_architecture:
     name: A1 system_level_filter | A2 classifier_filter | A3 pipeline_de | A4 pipeline_d_exits | A5 portfolio_composition | A6 meta_labeling | null
     cluster: <cluster_id> | aggregate | null
@@ -60,8 +67,8 @@ tracker_payload:
     exit_policy: <policy name or null>
     exposure_cap: <int or unlimited or null>
     worst_fold_ratio: <float or null>
-    worst_fold_roi_pct: <float or null>
-    worst_fold_dd_pct: <float or null>
+    worst_fold_roi_base_pct: <float or null>     # v1.1 renamed from worst_fold_roi_pct
+    worst_fold_dd_base_pct: <float or null>      # v1.1 renamed from worst_fold_dd_pct
     mean_fold_ratio: <float or null>
     mean_fold_roi_pct: <float or null>
     sign_pos_folds: <"X/N" string or null>
@@ -72,6 +79,33 @@ tracker_payload:
     oracle_worst_ratio: <float or null>
     oracle_real_gap_sharpe: <float or null>
     features_in_winning_config: [<feature_1>, <feature_2>, ...]   # empty list if no winner
+
+    # ── Amendment 3 risk-normalised fields ──
+    chained_max_dd_base_pct: <float or null>     # IS + holdout chained at r_base
+    per_day_max_dd_artefact_path: <path or null> # relative path to per-day series parquet
+    per_day_max_dd_base_summary:                 # summary for human inspection only
+      n_days: <int or null>
+      p50_pct: <float or null>
+      p95_pct: <float or null>
+      p99_pct: <float or null>
+      max_pct: <float or null>
+    k_safe: <float or null>
+    k_hard: <float or null>
+    r_safe_pct: <float or null>
+    r_hard_pct: <float or null>
+    scalable_to_safe: <bool or null>
+    scalable_to_hard: <bool or null>
+    worst_fold_roi_at_r_safe_pct: <float or null>
+    worst_fold_roi_at_r_hard_pct: <float or null>
+    chained_max_dd_at_r_safe_pct: <float or null>
+    chained_max_dd_at_r_hard_pct: <float or null>
+    daily_dd_breaches_at_r_safe: <int or null>   # recounted per-day, not count-scaled
+    daily_dd_breaches_at_r_hard: <int or null>
+    holdout_roi_at_r_safe_pct: <float or null>   # from holdout re-run; null if not re-run
+    holdout_dd_at_r_safe_pct: <float or null>
+    holdout_roi_at_r_hard_pct: <float or null>
+    holdout_dd_at_r_hard_pct: <float or null>
+    sizing_convention: reset_floor | equity_pct  # gate FAILs equity_pct unless chat approves
 
   # ────── Cost decomposition (null if winning arch is not classifier-based) ──────
   cost_decomposition:
@@ -230,8 +264,20 @@ Parser specification:
 - Output: append-only updates to `ARC_TRACKER.md` per Section 4 A-J above.
 - Idempotency: parsing the same closure doc twice produces identical tracker (no double-append).
 - Determinism: same closure doc → same tracker delta byte-for-byte.
+- **Schema version detection (v1.1+):** parser inspects the closure doc's referenced template version. v1.0 closures use legacy field names (`worst_fold_roi_pct`, `worst_fold_dd_pct`); v1.1+ closures use the renamed fields (`worst_fold_roi_base_pct`, `worst_fold_dd_base_pct`) and may populate Amendment 3 risk-normalised fields. Parser MUST accept both schemas — never rewrite historical closures.
 
 Suggested implementation: single Python script `scripts/update_tracker_from_closure.py`. Invoked manually post-PR-merge, or via post-merge git hook (bundles with WORKFLOW §3 auto-cleanup hook trigger point).
+
+---
+
+## Schema versioning
+
+| Template version | Date | Change |
+|---|---|---|
+| v1.0 | 2026-05-13 | Initial locked template. |
+| v1.1 | 2026-05-22 | L_PROTOCOL Amendment 3. Risk-normalised fields added to `best_architecture`. Two fields renamed: `worst_fold_roi_pct` → `worst_fold_roi_base_pct`, `worst_fold_dd_pct` → `worst_fold_dd_base_pct`. `primary_failure_mode` enum extended. Pre-v1.1 closures retain v1.0 field names; parser handles both via version detection. |
+
+Closures MUST reference the template version they were written against (e.g., `template_version: v1.1` near the top of `§1 tracker_payload` is the convention going forward — pre-v1.1 closures without this field are assumed v1.0).
 
 ---
 

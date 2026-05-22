@@ -7,6 +7,7 @@
 >
 > **Amendment 1 (2026-05-22):** Step 5 search policy clarified — informed by Steps 3-4, not exhaustive. Multi-cluster handling + holdout decision rule specified. See §2 Step 5.
 > **Amendment 2 (2026-05-22):** ML architecture mechanics specified for A2, A3, A4, A6. See §2 Step 5 ML mechanics subsection.
+> **Amendment 3 (2026-05-22):** Risk-normalised gates. §3 constraints preserved 1:1; evaluation now occurs at scaled risk `r_safe` / `r_hard` rather than at the WFO base risk. Scalability bounds, per-day DD recount, and explicit evaluation order added. Full text archived at `archive/L_PROTOCOL_v3_0_AMENDMENT_3.md`. See §3.
 >
 > This protocol is the umbrella. It accepts any signal, any feature space, any architecture. Sub-protocols may layer on top to add signal-class-specific specificity. The overseer's gates and verdicts apply universally.
 
@@ -333,34 +334,150 @@ A1 (system_level_filter) and A5 (portfolio_composition) are rule-based — no ML
 
 ## §3 Gates
 
+> **Amended 2026-05-22 by Amendment 3 (Risk-Normalised Gates).** Constraint thresholds preserved 1:1 with the prior protocol. Evaluation now happens at a per-arc derived `r_safe` (DEPLOYABLE) or `r_hard` (VIABLE), not at the WFO base risk. Full amendment archived at `archive/L_PROTOCOL_v3_0_AMENDMENT_3.md`.
+
+### Risk normalisation (scaling rule)
+
+WFO runs at base risk `r_base` (typically 0.5%). Engine emits required metrics at `r_base`. Gate evaluation happens at scaled risk.
+
+```
+k_safe = 8.0 / worst_fold_dd_base
+k_hard = 10.0 / worst_fold_dd_base
+r_safe = r_base × k_safe
+r_hard = r_base × k_hard
+```
+
+Linear scaling applies to: worst-fold ROI, chained max DD, holdout ROI/DD, per-day max-DD (then re-counted for daily breaches).
+
+Linear scaling does **NOT** apply to: daily breach **counts** themselves — step function in the underlying daily P&L distribution. See §"Daily DD measurement".
+
+Constraints not affected by risk scaling (sign-consistency, trade count, fold count) remain unchanged in evaluation procedure.
+
+### Scalability bounds (locked)
+
+- **Floor:** `r_safe ≥ r_min = 0.15%`. Locked value.
+- **Ceiling:** `r_safe ≤ r_max = 2.0%`. Locked value.
+- **Edge case:** `worst_fold_dd_base = 0%` → `k = ∞` → FAIL `step5_not_scalable`.
+- **Sizing convention:** linear DD scaling holds ONLY under reset-floor sizing (L arc convention). Arcs using %-of-current-equity sizing FAIL the scalability check by default unless chat approves a separate scaling treatment.
+
+Same bounds apply to `r_hard` for VIABLE evaluation.
+
 ### PASS-DEPLOYABLE (ship)
 
 All of:
-- worst-fold ROI/DD ratio ≥ 2.0
-- worst-fold ROI > 0 at any risk size; positive at all 11 folds (WFO)
-- at chosen risk size: DD ≤ 8%
-- at chosen risk size: 0 days breaching 5% daily DD
-- at chosen risk size: max DD ≤ 10% (5ers hard limit)
-- sign-consistency: 0 negative folds
-- ≥ 25 trades per fold
-- Step 6 causal audit clean
+
+1. **Scalable to safe:** `r_safe ∈ [0.15%, 2.0%]` (added by Amendment 3).
+2. **Worst-fold ROI/DD ratio at `r_safe`:** ≥ 2.0 (ratio invariant under linear scaling).
+3. **Worst-fold ROI at `r_safe`:** > 0 (linearly scaled from `r_base`).
+4. **Per-fold positivity:** positive at all 11 IS folds, 0 negative folds (sign does not scale; holdout has its own gate).
+5. **Worst-fold DD at `r_safe`:** ≤ 8% (by construction at `k_safe`).
+6. **Daily DD breaches at `r_safe`:** exactly 0 across all IS folds + holdout (see §"Daily DD measurement").
+7. **Chained max DD at `r_safe`:** ≤ 10% (linearly scaled).
+8. **Trades per fold:** ≥ 25 per fold (trade count does not scale).
+9. **Holdout at `r_safe`:** re-run holdout simulation at `r_safe`; result clears the prior §3 holdout gate.
+10. **Step 6 causal audit clean** (evaluated last per §"Evaluation order").
+
+> The pre-amendment §3 had "positive at all 11 folds" and "0 negative folds" as separate bullets. Merged into constraint #4 here. Same meaning, no threshold change.
 
 ### PASS-VIABLE (portfolio candidate, does NOT ship alone)
 
 All of:
-- worst-fold ROI/DD ratio ≥ 2.0
-- mean-fold ROI/DD ratio ≥ 2.5
-- worst-fold ROI may be negative (single negative fold permitted)
-- at chosen risk size: max DD ≤ 10%
-- at chosen risk size: 0 days breaching 5% daily DD
-- ≥ 25 trades per fold
-- Step 6 causal audit clean (if invoked)
 
-A PASS-VIABLE strategy becomes deployable when combined with another PASS-VIABLE / PASS-DEPLOYABLE into a portfolio whose COMBINED account performance passes PASS-DEPLOYABLE gates. Portfolio composition mechanics handled within Architecture A5.
+1. **Hard-scalable:** `r_hard ∈ [0.15%, 2.0%]` (added by Amendment 3).
+2. **Worst-fold ROI/DD ratio at `r_hard`:** ≥ 2.0 (ratio invariant).
+3. **Mean-fold ROI/DD ratio at `r_hard`:** ≥ 2.5 (ratio invariant).
+4. **Per-fold positivity:** up to 1 negative fold permitted across the 11 IS folds.
+5. **Worst-fold DD at `r_hard`:** ≤ 10% (by construction at `k_hard`; matches the 5ers hard limit).
+6. **Daily DD breaches at `r_hard`:** exactly 0.
+7. **Chained max DD at `r_hard`:** ≤ 10% (linearly scaled).
+8. **Trades per fold:** ≥ 25 per fold.
+9. **Holdout at `r_hard`:** re-run at `r_hard`; clears the prior §3 holdout gate.
+10. **Step 6 causal audit clean.**
+
+A PASS-VIABLE strategy becomes deployable when combined with another PASS-VIABLE / PASS-DEPLOYABLE into an A5 portfolio whose combined account performance passes PASS-DEPLOYABLE gates. Combined-portfolio DD spec when components are at `r_hard` is open — see §"A5 follow-up flag".
 
 ### FAIL
 
 Everything else. The arc's closure doc explains why and what would help.
+
+### Daily DD measurement
+
+Linear scaling of breach **counts** is mathematically wrong. Correct procedure:
+
+**Engine emits at `r_base`:** for each trading day in the IS + holdout trajectory, the maximum intraday drawdown percentage of that day's starting equity. Full per-day series persisted to a separate parquet artefact (NOT only summary stats).
+
+**Day-start equity definition:** account equity at 00:00 broker-day (the equity at the start of that calendar trading day in broker timezone), NOT the reset-floor sizing baseline. Under reset-floor sizing the two values are distinct: reset-floor is the per-trade sizing reference; day-start equity is the daily-DD reference. Engine must use day-start equity for daily DD measurement.
+
+**Engine artefact:** `step_5/per_day_max_dd_base.parquet`. Columns: `date`, `pair_set`, `day_max_dd_base_pct`, `n_trades_open_start_of_day`.
+
+**At gate evaluation:** for each day in the series, compute `day_max_dd_scaled = day_max_dd_base × k`. Count days where `day_max_dd_scaled ≥ 5%`. This is per-day re-evaluation, not count scaling.
+
+**Boundary:** UTC broker-day. Locked value.
+
+**Tolerance:** exactly 0 breaches in both tiers. No safety margin on the daily limit.
+
+### Chained max DD measurement
+
+Computed across the full IS + holdout trajectory: folds concatenated chronologically into one continuous equity curve, peak-to-trough across the whole curve.
+
+Scales linearly with `k`. Threshold preserved from the prior §3 chained-DD spec — only the risk at which evaluated changes.
+
+### Evaluation order
+
+Step 6 is lazy per §2. Amendment 3 specifies order explicitly:
+
+1. Constraints #1-#9 (all non-Step-6 constraints, both tiers) evaluated in priority order.
+2. If ALL clear → Step 6 causal audit dispatched.
+3. Step 6 clean → PASS-DEPLOYABLE / PASS-VIABLE finalised.
+4. Step 6 fails → FAIL with `primary_failure_mode = step6_causal_audit_fail`.
+
+Step 6 is the LAST gate, not concurrent with the others.
+
+### Failure-mode priority (tie-break)
+
+When multiple constraints fail simultaneously, `primary_failure_mode` is assigned by first-fail in this order:
+
+1. `pool_too_small` (Step 1 failure — encountered before Step 5 evaluation)
+2. `step5_not_scalable`
+3. `step5_dd_above_gate` (defensive — should not occur by construction)
+4. `step5_chained_dd_above_gate`
+5. `step5_daily_dd_breach`
+6. `holdout_fail_after_is_pass`
+7. `step5_sign_consistency_fail` / `step5_negative_folds`
+8. `step5_trade_count_below_gate`
+9. `step5_wf_roi_below_gate_after_scaling`
+10. `step5_ratio_below_gate_after_scaling`
+11. `step6_causal_audit_fail`
+
+Other §3 failure modes not listed (no clusters separable, no capturable cluster, etc.) remain ordered per the wider protocol.
+
+### Failure-mode taxonomy
+
+Added by Amendment 3:
+
+- `step5_not_scalable`
+- `step5_daily_dd_breach`
+- `step5_chained_dd_above_gate`
+- `step5_wf_roi_below_gate_after_scaling`
+- `step5_ratio_below_gate_after_scaling`
+- `step5_trade_count_below_gate`
+- `step5_negative_folds`
+
+Deprecated but retained for historical closures:
+
+- `step5_dd_above_gate` (replaced by scalability check + scaled gates)
+
+### A5 follow-up flag (deferred)
+
+Combined A5 portfolio DD when each component is independently scaled to `r_hard` (worst-fold DD = 10%) can produce combined account-wide DD > 10%. The current §2 Step 5 A5 spec does not address this; Amendment 3 does not either. A separate amendment will specify combined-portfolio DD constraints for VIABLE components. Deferred until the first VIABLE candidate emerges and A5 deployment is concretely on the table.
+
+### Holdout window
+
+Holdout = "2021-01-01 to present at time of arc closure" — matches §2 Step 5 and Appendix B. Moving target by design.
+
+### r_max note
+
+`r_max = 2.0%` is the gate ceiling. Locked value.
 
 ---
 

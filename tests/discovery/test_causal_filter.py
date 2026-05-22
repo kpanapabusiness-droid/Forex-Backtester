@@ -5,12 +5,10 @@ from __future__ import annotations
 import pandas as pd
 
 from core.discovery.causal_filter import (
-    CausalCheckResult,
     check_rule_causal,
     clean_feature_pool,
 )
 from core.discovery.grammar import Atom, Combinator, Node, Op, RuleSpec
-
 
 LINEAGE_DF = pd.DataFrame(
     [

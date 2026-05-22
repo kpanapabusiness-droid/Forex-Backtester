@@ -47,12 +47,10 @@ from core.discovery.quantile_grid import build_quantile_grid
 from core.discovery.random_search import (
     PairFixture,
     SearchConfig,
-    SearchResult,
     run_search,
 )
 from core.features.pipeline import compute_feature_matrix, feature_lineage_dataframe
 from core.sim.panel import Panel
-
 
 DEFAULT_CONFIG_PATH = Path("configs/arc_discovery_01.yaml")
 
@@ -222,7 +220,7 @@ def run(
         f"top-{search_cfg.analysis_top_k} mean R range: "
         f"{result.ranked_top[-1].mean_r:+.4f}..{result.ranked_top[0].mean_r:+.4f}"
         if result.ranked_top
-        else f"[discovery] search done; no eligible top-K rules",
+        else "[discovery] search done; no eligible top-K rules",
         flush=True,
     )
 
@@ -364,7 +362,7 @@ def main() -> int:
         pairs_override=pairs_override,
         output_root_override=args.output_root,
     )
-    print(f"[discovery] artefacts written:")
+    print("[discovery] artefacts written:")
     print(f"  top_10_raw.md            : {artefacts.top_10_raw}")
     print(f"  bonferroni_survivors.md  : {artefacts.bonferroni_survivors}")
     print(f"  full_search_log.parquet  : {artefacts.full_search_log}")

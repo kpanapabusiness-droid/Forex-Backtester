@@ -14,7 +14,6 @@ from __future__ import annotations
 import hashlib
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 import pytest
 
@@ -26,17 +25,14 @@ from core.discovery.io import (
     render_compute_budget_used_md,
     render_top_10_raw_md,
     write_full_search_log,
-    write_manifest,
 )
 from core.discovery.pool_simulator import DiscoveryExitConfig
 from core.discovery.quantile_grid import build_quantile_grid
 from core.discovery.random_search import (
-    PairFixture,
     SearchConfig,
     run_search,
 )
-
-from tests.discovery.test_search_smoke import _make_synthetic_pair, _lineage_df
+from tests.discovery.test_search_smoke import _lineage_df, _make_synthetic_pair
 
 
 def _sha256_file(p: Path) -> str:

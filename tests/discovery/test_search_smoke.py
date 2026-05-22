@@ -17,7 +17,7 @@ import numpy as np
 import pandas as pd
 
 from core.discovery.causal_filter import clean_feature_pool
-from core.discovery.grammar import Combinator, GrammarConfig, Op
+from core.discovery.grammar import GrammarConfig
 from core.discovery.pool_simulator import DiscoveryExitConfig
 from core.discovery.quantile_grid import build_quantile_grid
 from core.discovery.random_search import (

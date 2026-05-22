@@ -22,7 +22,7 @@ import json
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Iterable, Mapping, Sequence
+from typing import Mapping, Sequence
 
 import pandas as pd
 
@@ -109,7 +109,7 @@ def render_top_10_raw_md(
     lines: list[str] = []
     lines.append("# Top-10 raw performers — arc_discovery_01")
     lines.append("")
-    lines.append(f"> Ranking metric: mean R per rule (dispatch Override 1).")
+    lines.append("> Ranking metric: mean R per rule (dispatch Override 1).")
     lines.append(
         f"> Bonferroni threshold (primary, alpha/N_evaluated): "
         f"{report.threshold_primary:.3e} (N_evaluated={report.n_evaluated})"

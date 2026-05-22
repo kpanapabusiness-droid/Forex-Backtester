@@ -30,7 +30,7 @@ import json
 import random
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Iterable, Sequence
+from typing import Sequence
 
 # ── operators ─────────────────────────────────────────────────────────
 

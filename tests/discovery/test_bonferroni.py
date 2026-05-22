@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from core.discovery.bonferroni import (
-    BonferroniReport,
     bonferroni_survivors,
     build_bonferroni_report,
     rank_top_k,

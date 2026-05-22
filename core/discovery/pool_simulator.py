@@ -142,7 +142,9 @@ def simulate_pair_pool(
     mask_arr = trigger_mask.to_numpy(dtype=bool, copy=False)
     atr_arr = atr_series.to_numpy(dtype="float64", copy=False)
 
-    open_ask = pair_df["open_ask"].to_numpy(dtype="float64", copy=False)
+    # Entry fill goes through long_entry_fill_price(pair_df.iloc[...]) — open_ask
+    # is read from the bar row directly, not from a precomputed array. The other
+    # series are extracted as numpy arrays for the per-bar inner loop.
     open_bid = pair_df["open_bid"].to_numpy(dtype="float64", copy=False)
     low_bid = pair_df["low_bid"].to_numpy(dtype="float64", copy=False)
     high_bid = pair_df["high_bid"].to_numpy(dtype="float64", copy=False)

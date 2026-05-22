@@ -4,15 +4,12 @@ from __future__ import annotations
 
 from core.discovery.grammar import (
     Atom,
-    Combinator,
     GrammarConfig,
-    Node,
     Op,
     RuleSpec,
     generate_rule_population,
     rule_to_pretty,
 )
-
 
 FEATURE_POOL = (
     "atr_14",

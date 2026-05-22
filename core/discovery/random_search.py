@@ -27,10 +27,9 @@ the largest memory consumers (each ~28 features * 70k bars * 8 bytes
 from __future__ import annotations
 
 import time
-from dataclasses import dataclass, field
-from typing import Mapping, Sequence
+from dataclasses import dataclass
+from typing import Sequence
 
-import numpy as np
 import pandas as pd
 
 from core.discovery.bonferroni import (
@@ -40,9 +39,9 @@ from core.discovery.bonferroni import (
     build_bonferroni_report,
     rank_top_k,
 )
-from core.discovery.causal_filter import CausalCheckResult, check_rule_causal
+from core.discovery.causal_filter import check_rule_causal
 from core.discovery.grammar import GrammarConfig, RuleSpec, generate_rule_population
-from core.discovery.metrics import RuleMetrics, compute_rule_metrics, empty_metrics
+from core.discovery.metrics import RuleMetrics, compute_rule_metrics
 from core.discovery.pool_simulator import DiscoveryExitConfig, simulate_pair_pool
 from core.discovery.quantile_grid import QuantileGrid
 from core.discovery.rule_engine import compile_rule

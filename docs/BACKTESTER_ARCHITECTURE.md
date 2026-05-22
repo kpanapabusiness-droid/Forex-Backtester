@@ -1,345 +1,189 @@
-Released v2.0.0 on 2025-09-30 (Australia/Sydney)
-
-# Forex Backtester v2.0.0 — Current Status
-
-*Last updated: 2025-09-30*
-
-## 1. Version & Scope
-
-**Version**: v2.0.0 (stable baseline release)
-
-This is a mature, production-ready NNFX-style forex backtesting system. The current version represents a stable baseline with no functional logic changes from v1.9.x series. Key characteristics:
-
-- **Config-driven architecture**: All parameters sourced from YAML configurations
-- **Strict indicator contracts**: Enforced function signatures and return value domains
-- **Immutable audit fields**: Entry-time prices and levels never mutated post-entry
-- **Cache-aware indicators**: Intelligent caching for expensive calculations
-- **Comprehensive validation**: Multi-layer testing from unit to integration levels
-
-## 2. Architecture & Data Flow
-
-**High-level flow**: `configs/*.yaml` → `core/backtester.py` → indicators → `core/signal_logic.py` → trade simulation → output writers
-
-### Core Components
-
-1. **Configuration Layer** (`configs/`)
-   - `config.yaml`: Main strategy configuration
-   - `sweeps.yaml`: Parameter sweep definitions
-   - `batch_config.yaml`: Batch processing settings
-
-2. **Data Loaders** (`core/backtester.py`)
-   - CSV file discovery and loading
-   - OHLCV data normalization
-   - ATR calculation pipeline
-
-3. **Indicator Pipeline** (`indicators/` + `core/backtester_helpers.py`)
-   - Role-based indicator discovery and execution
-   - Cache-aware computation with configurable backends
-   - Contract validation and signal coercion
-
-4. **Signal Logic** (`core/signal_logic.py`)
-   - Entry/exit signal generation from indicator outputs
-   - One-Candle Rule and Pullback Rule enforcement
-   - Bridge-Too-Far logic for baseline-triggered entries
-
-5. **Trade Simulation** (`core/backtester.py`)
-   - Intrabar execution with configurable priority (tp_first/sl_first/best/worst)
-   - Partial fills (TP1) with breakeven and trailing stop logic
-   - DBCVIX risk filtering and position sizing
-
-6. **Output Writers**
-   - `results/trades.csv`: Individual trade records with audit fields
-   - `results/equity_curve.csv`: Time-series equity progression
-   - `results/summary.txt`: Aggregated performance metrics
-
-## 3. Indicator Contracts
-
-All indicators follow strict contracts enforced by `core/backtester_helpers.py` and `validators_util.py`:
-
-### Confirmation Indicators (C1/C2)
-```python
-def c1_<name>(df, *, signal_col="c1_signal", **kwargs) -> pd.DataFrame
-def c2_<name>(df, *, signal_col="c2_signal", **kwargs) -> pd.DataFrame
-```
-- **Input**: DataFrame with OHLCV columns
-- **Output**: Modified DataFrame with `df[signal_col] ∈ {-1, 0, +1}`
-- **Signal Domain**: `-1` (short), `0` (neutral), `+1` (long)
-
-### Baseline Indicators
-```python
-def baseline_<name>(df, *, signal_col="baseline_signal", **kwargs) -> pd.DataFrame
-```
-- **Input**: DataFrame with OHLCV columns
-- **Output**: Modified DataFrame with:
-  - `df["baseline"]`: Numeric price series (for pullback calculations)
-  - `df[signal_col] ∈ {-1, 0, +1}`: Direction signal based on close vs baseline
-
-### Volume Indicators
-```python
-def volume_<name>(df, *, signal_col="volume_signal", **kwargs) -> pd.DataFrame
-```
-- **Input**: DataFrame with OHLCV columns
-- **Output**: Modified DataFrame with `df[signal_col] ∈ {-1, 0, +1}` or `{0, 1}` (pass/fail)
-
-### Exit Indicators
-```python
-def exit_<name>(df, *, signal_col="exit_signal", **kwargs) -> pd.DataFrame
-```
-- **Input**: DataFrame with OHLCV columns
-- **Output**: Modified DataFrame with `df[signal_col] ∈ {0, 1}` ONLY
-- **Signal Domain**: `0` (hold), `1` (exit now)
-
-## 4. Entry/Exit Logic Implementation
-
-### Entry Logic
-- **Primary Trigger**: C1 signal flip (`+1` for long, `-1` for short)
-- **Confirmation Filters**: C2, volume, baseline directional agreement
-- **Entry Rules**:
-  - **One-Candle Rule**: Entry only on signal bar (mutually exclusive with Pullback)
-  - **Pullback Rule**: Entry when price returns within 1 ATR of baseline
-  - **Bridge-Too-Far**: Cancel baseline-triggered entries if C1 last signaled ≥ N days ago
-- **Continuation Trades**: Configurable re-entries while position open
-
-### Exit Logic
-- **C1 Reversal**: Exit when C1 flips opposite to position direction
-- **Baseline Cross**: Exit when price crosses baseline against position
-- **Exit Indicator**: Exit when exit indicator signals (if enabled)
-- **Take Profit**: TP1 at 1x ATR, partial close (half position)
-- **Stop Loss**: Initial SL at 1.5x ATR from entry
-- **Breakeven**: Move SL to entry price after TP1 hit
-- **Trailing Stop**: Activate after +2x ATR move, trail at 1.5x ATR behind price
-
-## 5. Risk & PnL Management
-
-### Position Sizing
-- **Base Risk**: Configurable percentage per trade (default: 2%)
-- **ATR-Based Sizing**: Position size calculated from SL distance in ATR units
-- **Overlap Filter**: Prevents simultaneous trades in correlated pairs
-
-### Risk Filters
-- **DBCVIX Integration**: Volatility regime filtering
-  - **Reduce Mode**: Lower position size during high volatility periods
-  - **Block Mode**: Prevent new entries during extreme volatility
-  - **CSV Source**: External volatility data integration
-  - **Status**: Present but disabled by default in configurations
-
-### Spread Modeling
-- **PnL-Only Impact**: Spreads affect profit/loss calculations only
-- **Trade Count Invariant**: Spread settings never change entry/exit timing
-- **Configurable Sources**: Per-pair fixed spreads or ATR-multiple dynamic spreads
-
-## 6. Output Schema
-
-### trades.csv Fields
-**Core Lifecycle**:
-- `pair`, `entry_date`, `entry_price`, `direction`, `direction_int`
-- `exit_date`, `exit_price`, `exit_reason`
-
-**Risk & Sizing**:
-- `atr_at_entry_price`, `atr_at_entry_pips`, `lots_total`, `lots_half`, `lots_runner`
-- `risk_pct_used`, `dbcvix_val`, `dbcvix_flag`
-
-**Immutable Audit Fields** (set at entry, never mutated):
-- `tp1_at_entry_price`, `sl_at_entry_price`
-
-**Dynamic State**:
-- `tp1_hit`, `breakeven_after_tp1`, `ts_active`, `ts_level`
-- `sl_at_exit_price` (final stop level at exit)
-
-**Results & Spread**:
-- `pnl`, `win`, `loss`, `scratch`, `spread_pips_used`
-
-**Empty File Behavior**:
-When no trades are generated, `trades.csv` is still created with all standard column headers but zero data rows. This maintains backward compatibility with scripts and tools that expect the file to exist. The writer logs `[WRITE TRADES SKIP] reason=empty` followed by `[WRITE TRADES OK] wrote=0 path=... (empty file with headers)`.
-
-### equity_curve.csv Fields
-- `date`, `equity`, `peak`, `drawdown`
-- Real-time equity progression with running drawdown calculation
-
-### summary.txt Metrics
-- Trade counts (total, wins, losses, scratches)
-- Win/loss rates (non-scratch basis)
-- ROI (dollars and percentage)
-- Expectancy per trade
-- Performance metrics (if equity curve available): Sharpe, Sortino, CAGR, Max DD, MAR
-
-## 7. Scripts & Commands
-
-### Core Operations
-```bash
-# Basic backtest
-python core/backtester.py -c configs/config.yaml
-
-# Walk-forward optimization
-python scripts/walk_forward.py --config configs/config.yaml
-
-# Batch parameter sweeps
-python scripts/batch_sweeper.py --config configs/sweeps.yaml
-
-# Self-contained smoke test (fast mode)
-python scripts/smoke_test_selfcontained_v198.py --mode fast
-
-# Self-contained smoke test (quiet)
-python scripts/smoke_test_selfcontained_v198.py -q --mode fast
-
-# Full smoke test
-python scripts/smoke_test_selfcontained_v198.py --mode full
-```
-
-### Phase B — Indicator Quality & Signal Research
-Phase B is a diagnostic pipeline only (no WFO selection, no leaderboard). It evaluates C1 and Volume indicators and produces a quality gate and approved pool for Phase C.
-
-```bash
-# C1 diagnostics (response curves, overlap, scratch/MAE)
-python scripts/phaseB_run_diagnostics.py --config configs/phaseB/phaseB_c1_diagnostics.yaml
-
-# Volume diagnostics (veto response, ON vs OFF, MAE tail)
-python scripts/phaseB_run_diagnostics.py --config configs/phaseB/phaseB_volume_diagnostics.yaml
-
-# Controlled overfit (fold-pair fit/check)
-python scripts/phaseB_run_controlled_overfit.py --config configs/phaseB/phaseB_controlled_overfit.yaml
-
-# Quality gate and approved pool (run after diagnostics)
-python -m analytics.phaseB_quality_gate --input results/phaseB --output results/phaseB
-```
-
-**Done** when: `results/phaseB/quality_gate.csv`, `approved_pool.json`, and `approved_pool.md` exist and tests pass. See `docs/archive/nnfx_era/PHASE_B_INDICATOR_QUALITY.md` for metrics and interpretation.
-
-#### Phase B.1 — Filtered run (new C1 archetypes only)
-Phase B.1 uses the **same Phase B runner and quality gate** with a filtered config: only the 6 new C1 archetypes (regime_sm, vol_dir, persist_momo × binary/neutral_gate). Legacy and fixture indicators (e.g. c1_coral, supertrend) are **excluded** from Phase B.1; they remain in the codebase and still resolve, but are not evaluated in this run. Approval for the archetype pool is determined **only** from Phase B.1 outputs.
-
-```bash
-# C1 diagnostics (6 archetypes only)
-python scripts/phaseB_run_diagnostics.py --config configs/phaseB1/phaseB1_c1_archetypes.yaml
-
-# Quality gate and approved pool for Phase B.1 (run after diagnostics)
-python -m analytics.phaseB_quality_gate --input results/phaseB1/c1_archetypes --output results/phaseB1
-```
-
-**Outputs**: `results/phaseB1/quality_gate.csv`, `approved_pool.json`, `approved_pool.md` under `results/phaseB1/`. See `docs/archive/nnfx_era/PHASE_B1_C1_ARCHETYPES.md` for the 6 indicators and behaviour.
-
-### Development & Validation
-```bash
-# Linting (gates CI)
-ruff check .
-
-# Test suite (gates CI)
-pytest -q
-
-# Test with custom config
-python -m pytest tests/ -c /dev/null
-```
-
-## 8. Configuration Surface
-
-### Main Config Groups (`config.yaml`)
-- **pairs**: Currency pair list
-- **timeframe**: Data frequency ("D" for daily)
-- **data**: Directory paths and date ranges
-- **indicators**: C1/C2/baseline/volume/exit selections with use flags
-- **indicator_params**: Per-function parameter overrides
-- **rules**: One-candle, pullback, bridge-too-far, continuation settings
-- **entry**: ATR multiples for TP/SL levels
-- **exit**: Exit condition toggles and trailing stop configuration
-- **risk**: Position sizing, account currency, FX quotes
-- **spreads**: Spread modeling configuration
-- **tracking**: Output options (equity curve, summary stats)
-- **cache**: Indicator caching settings
-- **walk_forward**: WFO window definitions
-- **monte_carlo**: MC analysis configuration
-
-### Batch Processing (`sweeps.yaml`)
-- **role_filters**: Which indicator roles to sweep
-- **discover**: Auto-discovery flags per role
-- **allowlist/blocklist**: Indicator filtering
-- **default_params**: Parameter grids per role
-- **static_overrides**: Config overrides for all runs
-- **parallel**: Worker count and execution limits
-- **scoring**: Composite score weighting
-
-## 9. Tests & CI
-
-### Test Coverage (`tests/`)
-- **test_smoke.py**: Basic functionality verification
-- **test_smoke_end_to_end.py**: Full backtest pipeline
-- **test_baseline_contract.py**: Indicator contract validation
-- **test_signal_exits.py**: Exit logic verification
-- **test_resolver_and_pipeline_smoke.py**: Indicator discovery and execution
-- **test_writer.py**: Output file generation
-- **conftest.py**: Test fixtures and utilities
-
-### CI Pipeline (`.github/workflows/ci.yml`)
-**Gating Checks** (must pass for merge):
-- `ruff check .` (linting)
-- `pytest -q` (test suite)
-
-**Non-Gating Checks**:
-- Smoke test execution (informational)
-
-**Environment**:
-- Ubuntu latest with Python 3.12
-- Pip cache enabled
-- Clean pytest environment (`PYTEST_DISABLE_PLUGIN_AUTOLOAD=1`)
-- Discord webhook notifications on failure
-
-## 10. Limitations & Assumptions
-
-### Current Limitations
-- **Repaint Detection**: Not yet implemented for indicator validation
-- **Cache Behavior**: Cache invalidation relies on data/parameter hashing
-- **Dataset Expectations**: Assumes clean OHLCV data with consistent timestamps
-- **Currency Conversion**: FX quotes required for cross-currency PnL calculation
-- **Intrabar Modeling**: Simplified intrabar execution (no tick-level simulation)
-
-### Key Assumptions
-- **Daily Timeframe**: Primary focus on daily bar data
-- **NNFX Methodology**: Follows No Nonsense Forex indicator hierarchy
-- **ATR-Based Sizing**: All position sizing and levels based on Average True Range
-- **Pip-Based Spreads**: Spread costs modeled in pip units
-- **Single-Leg Entries**: No complex order types or staged entries
-
-### Performance Considerations
-- **Memory Usage**: Full dataset loaded into memory for each pair
-- **Computation Time**: Scales with indicator complexity and data volume
-- **Cache Dependencies**: Indicator changes require cache invalidation
-- **Parallel Execution**: Batch sweeps benefit from multi-core systems
-
-## 11. Key File Structure (Updated 2025-11-08)
-
-```
-Forex_Backtester/
-├── core/                    # Engine components
-│   ├── backtester.py       # Main backtesting engine (v1.9.8)
-│   ├── signal_logic.py     # Entry/exit signal generation
-│   ├── backtester_helpers.py # Indicator pipeline & validation
-│   └── utils.py            # ATR, equity, FX utilities
-├── indicators/             # Trading indicators
-│   ├── confirmation_funcs.py  # 60+ C1/C2 indicators
-│   ├── baseline_funcs.py      # 20+ baseline indicators
-│   ├── volume_funcs.py        # Volume/volatility filters
-│   └── exit_funcs.py          # Exit signal indicators
-├── analytics/              # Performance analysis
-│   ├── metrics.py          # Sharpe, Sortino, CAGR, drawdown
-│   ├── monte_carlo.py      # Trade shuffling & bootstrapping
-│   ├── plot_equity_curves.py # Equity curve plotting
-│   └── stability_scan.py   # Stability analysis
-├── scripts/                # Entry point scripts
-│   ├── run_single_debug.py # Single backtest debug runner
-│   ├── run_from_yaml.py    # Run backtest from YAML config
-│   ├── batch_sweeper.py    # Parallel parameter optimization
-│   ├── walk_forward.py      # Walk-forward optimization
-│   └── smoke_test_selfcontained_v198.py # Comprehensive testing
-├── configs/                # Configuration files
-│   ├── config.yaml        # Main strategy config
-│   ├── sweeps.yaml         # Parameter sweep definitions
-│   └── batch_config.yaml   # Batch processing settings
-├── tests/                  # Test suite (pytest)
-├── results/                # Output directory (only c1_only_exits/** tracked)
-├── data/daily/             # Market data (OHLCV CSVs)
-├── cache/                  # Indicator computation cache
-└── attic/2025-11-08/       # Quarantined files (legacy scripts, tools, notebooks)
-```
+# Backtester Architecture (v3.0)
+
+> Single source of truth for the v3.0 backtester after CC_06 lands.
+> Updated through each staged PR. Final consolidation lands in PR-E
+> alongside the KH-24 anchor reproduction results.
+
+This document covers what the engine *is*; the higher-level **why**
+lives in [L_PROTOCOL.md](../L_PROTOCOL.md), and the per-arc *what*
+lives in arc closure docs under `docs/archive/arc_results/`.
+
+This document supersedes the v2.0.0 architecture write-up; that
+content lived in this file at the time of `09319bb` (2025-09-30) and
+is fully obsolete after the CC_06 reconfig.
 
 ---
 
-**Status**: Production-ready with comprehensive testing and validation. All core functionality implemented and verified through automated CI pipeline.
+## Layers (bottom-up)
+
+```
+                ┌────────────────────────────────────────────┐
+   PR-E         │   KH-24 anchor reproduction + final docs   │
+                ├────────────────────────────────────────────┤
+   PR-D         │   parallelism + determinism harness        │
+                ├────────────────────────────────────────────┤
+   PR-C         │   WFO + broader features                   │
+                ├────────────────────────────────────────────┤
+   PR-B         │   real spread + fill + multi-pair sim      │
+                ├────────────────────────────────────────────┤
+   PR-A         │   HistData loader + TF aggregator + cache  │
+                ├────────────────────────────────────────────┤
+                │   HistData M1 bid+ask layer (52 GB tick,   │
+                │   18 GB derived M1, 28 pairs, 2010-2026)   │
+                └────────────────────────────────────────────┘
+```
+
+Each layer is independently testable and depends only on the layers
+below.
+
+---
+
+## Data layer (PR-A)
+
+- **Loader:** `core.data.histdata_loader.load_m1(pair, ...)` reads
+  per-pair-month M1 bid + ask CSVs and joins them into a single
+  DataFrame with columns `open/high/low/close_{bid,ask} + volume +
+  spread_close + bid_ask_data_quality`.
+- **Aggregator:** `core.data.aggregator.aggregate(pair, tf, ...)`
+  deterministically aggregates M1 → {M5, M15, M30, H1, H4, D1, W1}.
+  Bid and ask are aggregated independently; data quality is
+  recomputed per aggregated bar.
+- **Parquet cache layout:**
+
+  ```
+  data/cache/
+    m1/<PAIR>.parquet           # joined bid+ask M1 (per pair)
+    {M5,M15,M30,H1,H4,D1,W1}/<PAIR>.parquet   # aggregated TFs
+    *.parquet.meta.json         # sidecar: cache_key + source manifest sha
+    features/<arc_id>/<feature_set_hash>.parquet   # PR-D feature cache
+    features/<arc_id>/<feature_set_hash>.parquet.meta.json
+  ```
+
+- **Cache invalidation:** keyed on
+  `data/histdata/m1_manifest.json`. The per-pair cache key is
+  `sha256(sorted (relpath, sha256) pairs)`; any change in the upstream
+  M1 layer regenerates the manifest and cascades through.
+- **Spread:** `spread_close = close_ask - close_bid`. Zero/negative
+  and NaN bars are flagged in `bid_ask_data_quality`; no fallback to
+  any external floor file (L_PROTOCOL §1 non-negotiable, enforced
+  since PR-B).
+
+## Spread + sim (PR-B)
+
+- **`core.spread.real_spread`** — per-bar spread + tradability mask +
+  data-quality summary.
+- **`core.sim.fill`** — 8 bar-level fill primitives. Long entry =
+  `open_ask`, long exit = `close_bid`, intra-bar SL/TP triggered
+  against `low_bid`/`high_bid`. Short symmetric.
+- **`core.sim.panel.Panel`** — multi-pair wrapper over
+  `dict[pair, DataFrame]` with union-of-timestamps iteration and
+  `snapshot_at(t)` for cross-pair access.
+- **`core.sim.account.Account`** — single account state across all 28
+  pairs: balance, equity curve, max-DD tracker, exposure caps
+  (total/per-pair/per-currency).
+- **`core.sim.multipair_backtester.MultiPairBacktester`** — bar-by-bar
+  driver with deferred next-bar-open entry fills and intra-bar SL/TP
+  exits. Single equity curve output.
+
+## WFO + features (PR-C)
+
+- **`core.wfo.folds`** — two builders. `build_v3_folds()` produces
+  11-fold expanding-IS 2010-2020 + one-shot holdout 2021-present (per
+  L_PROTOCOL §2 Step 5). `build_kh24_anchor_folds()` produces 7-fold
+  rolling Oct 2020 → Jan 2026 (matching the published KH-24 lineage).
+- **`core.wfo.gates`** — §3 PASS-DEPLOYABLE / PASS-VIABLE / FAIL
+  classifier on per-fold stats.
+- **`core.wfo.orchestrator`** — `run_search` runs candidates across
+  the fold list and ranks by worst-fold ratio; `run_holdout`
+  evaluates top-K candidates ONCE on the locked holdout. Holdout is
+  provably untouched during search (asserted by
+  `tests/test_wfo_orchestrator.py`).
+- **`core.features`** — 27 features across 7 classes
+  (price_geometry, session, vol_regime, distance, spread_regime,
+  multi_tf, cross_pair). Every feature carries a `causal_lineage`
+  tag ∈ {clean, suspect, unverified} that drives the Step 6 producer
+  audit. Full reference: [features_reference.md](features_reference.md).
+- **`core.features.pipeline.compute_feature_matrix(pair, pair_df,
+  panel)`** — walks the registry, emits a DataFrame + lineage table.
+
+## Parallelism + determinism (PR-D)
+
+### Parallelism
+
+- **`core.parallel.parallel_pair_map(func, pairs, pool_size)`** —
+  `multiprocessing.Pool` over per-pair work. NOT threading — Python's
+  GIL blocks numpy/pandas.
+- **`core.parallel.build_panel_parallel(pairs, tf, ...)`** — builds a
+  multi-pair Panel by aggregating each pair in parallel. Cold-cache
+  build hits the dispatch's "≥ 10× faster across 28 pairs" target.
+- **Pool size default:** `min(n_pairs, max(1, cpu_count() - 1))`.
+  Configurable via `configs/data_v3.yaml`'s `parallelism.pool_size`.
+- **Aggregation order:** results are always returned sorted by pair
+  name. The aggregation step (`pd.concat`, dict insertion, etc.)
+  iterates that sorted order, so output is byte-identical across pool
+  sizes.
+
+### Determinism contract
+
+- **`core.determinism`** centralises invariants:
+  - `RANDOM_STATE = 42`
+  - `N_JOBS = 1` (inside any per-row computation)
+  - `LINE_TERMINATOR = "\n"` (every text artefact)
+  - `seed_everything(seed)` seeds numpy + python `random` + sets
+    `PYTHONHASHSEED` for subprocess spawn.
+- **Two-run sha256 reproducibility** is the load-bearing contract.
+  `tests/test_determinism.py` runs the same mini pipeline twice and
+  asserts every output (panel CSV, feature matrix CSV, backtester
+  equity curve CSV) is byte-identical. The same test asserts
+  `pool_size=1 == pool_size=4` (parallelism doesn't change output).
+
+### Feature matrix cache
+
+- **Path:** `data/cache/features/<arc_id>/<feature_set_hash>.parquet`
+- **Cache key:** `sha256(signal_def + pool_sha256 + feature_set_version)`.
+  Any change in any component → new key → cache invalidates.
+- **Sidecar `.meta.json`** records all three input components in
+  plaintext so an audit can reconstruct what produced the cached
+  matrix.
+- **Workflow:**
+  ```python
+  from core.features.cache import get_or_compute, pool_sha_from_dataframe
+
+  pool_sha = pool_sha_from_dataframe(my_trade_pool)
+  features = get_or_compute(
+      arc_id="my_arc",
+      signal_def="kb_exhaustion_bar(c1-c6,c8,c9)",
+      pool_sha=pool_sha,
+      feature_set_version="v3.0",
+      compute_fn=lambda: compute_feature_matrix(pair, pair_df, panel),
+  )
+  ```
+
+## Anchor preservation (PR-E)
+
+Per L_PROTOCOL §8: any cross-arc evaluation framework must reproduce
+KH-24's documented worst-fold numbers within tolerance (±0.5pp ROI,
+±1pp DD). PR-E runs the KH-24 config through the v3 engine on the
+7-fold KH-24-anchor WFO structure and compares.
+
+Numbers to reproduce (from `ARC_HISTORY.md`):
+- Worst-fold ROI: +1.92% (fold 7, 2025-04-01 → 2026-01-01)
+- Worst-fold DD: 6.37% (fold 1, 2020-10-01 → 2021-07-01)
+- 214 trades across 7 OOS folds, all 7 positive
+
+Real-spread reconciliation already documented: F7 ROI drops to ~+1.28%
+under HistData spreads (vs +1.92% on the original 5ers MT5 data).
+PR-E's tolerance band includes both points.
+
+---
+
+## Out of scope for v3.0 backtester docs
+
+- Per-arc signal definitions — live in arc-specific docs / configs
+- Architecture A1..A6 implementations — registered in
+  `core/architectures/` (added incrementally with each arc)
+- Step 6 producer-audit procedures — defined in L_PROTOCOL §2 Step 6
+- ML / classifier choices — sub-protocol per arc
+- Live deployment EA — `EA/KH24_EA.mq5` is the only deployed system;
+  ports of v3 candidates open only when a candidate clears
+  PASS-DEPLOYABLE per §3.

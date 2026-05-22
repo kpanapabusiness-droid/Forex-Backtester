@@ -173,6 +173,71 @@ Chat resolved the four interpretive calls on 2026-05-22:
 
 ---
 
-## PR-D — parallelism + determinism harness (Tasks 7, 9c, 9d) — pending
+## PR-D — per-pair parallelism + feature matrix cache + determinism (Tasks 7, 9b, 9c, 9d)
+
+**Branch:** `infra/backtester-v3-pr-d` (worktree at `.claude/worktrees/pr-d-backtester-v3`).
+
+**Scope:**
+- **Task 7** — Centralised determinism invariants in `core.determinism` (`RANDOM_STATE=42`, `N_JOBS=1`, `LINE_TERMINATOR="\n"`, `seed_everything`, `write_text_deterministic`). End-to-end two-run sha256 test asserts byte-identical output across runs and across pool sizes.
+- **Task 9b** — Feature-matrix cache at `data/cache/features/<arc_id>/<feature_set_hash>.parquet` with sha256 cache_key = `sha256(signal_def + pool_sha256 + feature_set_version)`. Cache invalidates on any component change.
+- **Task 9c** — Per-pair parallelism via `multiprocessing.Pool` in `core.parallel.parallel_pair_map`. Default pool = `min(n_pairs, max(1, cpu_count() - 1))`. Configurable via `configs/data_v3.yaml`'s `parallelism.pool_size`.
+- **Task 9d** — Aggregation order is deterministic (sorted by pair name); two-run sha256 test passes with parallelism enabled.
+
+**Added:**
+- [`core/determinism.py`](core/determinism.py) — central constants + `seed_everything()` + `write_text_deterministic()`
+- [`core/parallel.py`](core/parallel.py) — `parallel_pair_map`, `parallel_load_m1`, `build_panel_parallel`, `default_pool_size`
+- [`core/features/cache.py`](core/features/cache.py) — `feature_cache_key`, `pool_sha_from_dataframe`, `cache_valid`, `get_or_compute`
+- [`scripts/data/benchmark_parallel.py`](scripts/data/benchmark_parallel.py) — 28-pair cold-cache speedup benchmark
+- [`tests/test_parallel.py`](tests/test_parallel.py) — 9 tests (mechanics, pool=1 vs pool=N, deterministic sorted aggregation)
+- [`tests/test_features_cache.py`](tests/test_features_cache.py) — 13 tests (key derivation, 3 invalidation cases, hit/miss timing)
+- [`tests/test_determinism.py`](tests/test_determinism.py) — 5 tests (two-run pool=1, two-run pool=4, pool=1 vs pool=4 byte-identical, feature-cache two-run, `seed_everything` idempotent)
+
+**Modified:**
+- [`configs/data_v3.yaml`](configs/data_v3.yaml) — added `parallelism` + `determinism` blocks
+- [`docs/BACKTESTER_ARCHITECTURE.md`](docs/BACKTESTER_ARCHITECTURE.md) — full v3.0 architecture doc (supersedes the v2.0.0 file that lived at that path)
+- [`docs/dispatches/backtester_reconfig_log.md`](docs/dispatches/backtester_reconfig_log.md) — this PR-D section
+
+**Status:** 27/27 PR-D tests pass; full repo sweep **890 passed / 305 skipped / 0 fail / 0 error**; ruff clean.
+
+**Verification per dispatch:**
+1. ✅ `test_determinism.py` passes with `pool=1` (`test_two_run_byte_identical_pool1`).
+2. ✅ `test_determinism.py` passes with `pool=4` (`test_two_run_byte_identical_pool4`).
+3. ✅ Output from `pool=1` and `pool=4` runs is byte-identical (`test_pool1_equals_pool4_byte_identical`).
+4. ✅ Feature matrix cache produces sub-second second-call timing (`test_cache_hit_is_at_least_5x_faster_than_compute`).
+5. ✅ Cache invalidates correctly on signal_def / pool_sha / feature_set_version changes (3 separate tests).
+6. ✅ All previously-passing tests from PR-A/B/C still pass (890 vs 863 previously — PR-D adds 27 new tests, no regressions).
+7. ✅ CSV/markdown/JSON outputs use LF line endings (sidecar meta JSON written with `newline="\n"`; markdown writes use `write_text_deterministic`).
+
+**Benchmark — 28-pair M5 cold-cache build** (12-core machine, single SSD, HistData full layer):
+
+| Pool size | Elapsed | Speedup |
+|---:|---:|---:|
+| 1 (serial) | 948.78 s | 1.00× (ref) |
+| 8 | 235.09 s | **4.04×** |
+| 11 (cpu-1) | 213.81 s | **4.44×** |
+
+**Benchmark — 28-pair M5 cache-hit reads** (warm parquet cache):
+
+| Pool size | Elapsed | Speedup |
+|---:|---:|---:|
+| 1 (serial) | 3.66 s | 1.00× (ref) |
+| 8 | 7.77 s | 0.47× (slower) |
+| 11 | 9.19 s | 0.40× (slower) |
+
+**Notes / interpretive choices in PR-D:**
+
+1. **Cold-cache speedup is 4.44×, under the dispatch's 10× target.** Per dispatch: "If under 5x, investigate before opening PR." Investigation: the workload is I/O-bound — each worker reads ~384 CSVs (~131 MB) and writes ~260 MB of parquet (M1 + M5) per pair. On a single SSD, concurrent parquet writes contend at the disk level past ~4 workers. The 10× target is realistic for CPU-bound work (e.g. heavy feature computation), not for the cold-cache build path. The 4.44× speedup is honest and reflects the SSD bandwidth ceiling on this machine.
+
+2. **Cache-hit parallelism HURTS performance.** Reading 28 pre-built parquets serially takes 3.66 s — the multiprocessing spawn overhead (~1-2 s per worker × N workers) exceeds the actual work. The v3 backtester should default to `pool_size=1` when working against warm caches; this is what callers in arc scripts will do (cache is built once, reused many times). `parallel_pair_map(pool_size=1)` is a no-Pool serial path so it costs nothing to leave the parallelism call in.
+
+3. **`feature_cache_key` uses NUL-byte separators.** Joining `signal_def + pool_sha + feature_set_version` with `\\0` makes injection impossible — a component containing the separator can't forge the key of another (sha,sha,sha) triple. Tested at all three invalidation paths.
+
+4. **Cache hit rebuilds the lineage DataFrame from the live registry.** The cached parquet stores only the feature matrix; lineage tags live in the in-process registry. This means lineage promotions (suspect → clean after Step 6 audit) take effect for subsequent cache reads without invalidating any cache entries — the matrix values aren't affected.
+
+5. **`parquet` roundtrip drops `DatetimeIndex.freq`.** `pd.read_parquet` returns a DatetimeIndex with `freq=None` even if the writer had `freq='5min'`. This is a known pyarrow/pandas issue. Tests use `pd.testing.assert_frame_equal(check_freq=False)` because column values + index positions are equal — only pandas-internal metadata differs.
+
+6. **`PYTHONHASHSEED` is set in `seed_everything()`.** Subprocess spawn (Windows) re-imports modules; setting `PYTHONHASHSEED` before spawn means worker dict/set ordering is deterministic. Parent and workers all hash identically.
+
+---
 
 ## PR-E — KH-24 anchor reproduction + docs (Tasks 8, 10) — pending

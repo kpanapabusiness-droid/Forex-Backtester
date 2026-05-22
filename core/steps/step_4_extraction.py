@@ -23,10 +23,15 @@ threshold) and A6 (same classifier, sized by confidence).
 from __future__ import annotations
 
 import hashlib
+import json
 from dataclasses import dataclass
+from datetime import datetime, timezone
+from pathlib import Path
 
+import joblib
 import numpy as np
 import pandas as pd
+import sklearn
 from sklearn.inspection import permutation_importance
 from sklearn.metrics import (
     roc_auc_score,
@@ -40,6 +45,12 @@ from core.steps._classifier_defaults import (
     build_rf,
     is_lgbm_available,
 )
+
+try:
+    import lightgbm as _lightgbm_mod  # type: ignore
+    _LGBM_VERSION = str(_lightgbm_mod.__version__)
+except ImportError:
+    _LGBM_VERSION = ""
 
 N_TS_FOLDS = 5
 
@@ -59,7 +70,18 @@ class ClassifierFoldResult:
 
 @dataclass(frozen=True)
 class ClusterExtraction:
-    """Aggregated extraction result for one candidate cluster."""
+    """Aggregated extraction result for one candidate cluster.
+
+    The ``fitted_classifier_*`` fields are populated when
+    :func:`run_step_4` is called with ``persistence_dir`` set. The
+    fitted estimator itself is NOT held in memory — only the path to
+    the joblib-pickled artefact, the sklearn / LGBM class name, and the
+    feature column order at fit time. Use
+    :func:`core.steps.classifier_persistence.load_classifier` to read
+    back the estimator. All three fields are ``None`` when persistence
+    was not requested or when the cluster did not produce a viable
+    best-AUC classifier.
+    """
 
     cluster_id: int
     n_trades: int
@@ -70,6 +92,9 @@ class ClusterExtraction:
     best_classifier_mean_auc: float
     best_threshold: float
     feature_importance: pd.DataFrame  # feature, mean_importance, std_importance
+    fitted_classifier_path: Path | None = None
+    fitted_classifier_type: str | None = None
+    fitted_classifier_feature_order: tuple[str, ...] | None = None
 
 
 @dataclass(frozen=True)
@@ -187,6 +212,79 @@ def _train_one_classifier(
     return fold_results, importance_frames
 
 
+_BUILDERS = {"rf": build_rf, "lr": build_lr, "lgbm": build_lgbm}
+
+
+def _sha256_file(path: Path) -> str:
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(65536), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def _persist_best_classifier(
+    *,
+    persistence_dir: Path,
+    cluster_id: int,
+    best_clf_name: str,
+    X: pd.DataFrame,
+    y: np.ndarray,
+    best_threshold: float,
+    best_mean_auc: float,
+) -> tuple[Path, str, tuple[str, ...], float, int]:
+    """Refit the best-AUC algorithm on the full lineage-filtered pool,
+    pickle it to disk, return (path, type_name, feature_order, in_sample_auc, n_train).
+
+    Per chat resolution Q1 + Q4: the persisted classifier trains on
+    the same data Step 4's CV iterated over (the full pool passed to
+    ``run_step_4``). When the upstream Step 4 pool inherits Step 1's
+    holdout window, the persisted classifier inherits the same data
+    scope. Document explicitly in the manifest + caller.
+    """
+    builder = _BUILDERS[best_clf_name]
+    model = builder()
+    model.fit(X, y)
+    in_sample_proba = model.predict_proba(X)[:, 1]
+    if len(set(y)) >= 2:
+        in_sample_auc = float(roc_auc_score(y, in_sample_proba))
+    else:
+        in_sample_auc = float("nan")
+
+    persistence_dir.mkdir(parents=True, exist_ok=True)
+    pkl_path = persistence_dir / f"{int(cluster_id)}.pkl"
+    joblib.dump(model, pkl_path, compress=3)
+
+    class_name = type(model).__name__
+    feat_order = tuple(X.columns)
+    return pkl_path, class_name, feat_order, in_sample_auc, int(len(X))
+
+
+def _write_manifest(
+    *,
+    persistence_dir: Path,
+    arc_name: str,
+    entries: dict,
+) -> None:
+    """Write classifiers/manifest.json with SHA256 + provenance.
+
+    Versions of joblib / sklearn / lightgbm captured for cross-env
+    troubleshooting (dispatch Risk #1). The loader emits a UserWarning
+    on mismatch but does not error — pinning is a separate concern.
+    """
+    manifest = {
+        "arc_name": arc_name,
+        "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "joblib_version": str(joblib.__version__),
+        "sklearn_version": str(sklearn.__version__),
+        "lightgbm_version": _LGBM_VERSION,
+        "classifiers": entries,
+    }
+    out = persistence_dir / "manifest.json"
+    out.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n",
+                   encoding="utf-8", newline="\n")
+
+
 def run_step_4(
     trades: pd.DataFrame,
     feature_matrix: pd.DataFrame,
@@ -195,6 +293,8 @@ def run_step_4(
     feature_lineage: pd.DataFrame | None = None,
     candidate_cluster_ids: tuple[int, ...] | None = None,
     n_ts_folds: int = N_TS_FOLDS,
+    persistence_dir: Path | None = None,
+    arc_name: str = "",
 ) -> Step4Result:
     """Run Step 4 across candidate clusters.
 
@@ -217,6 +317,17 @@ def run_step_4(
         25 trades in each of two classes (membership / non-membership).
     n_ts_folds
         5 by default per L_PROTOCOL Step 4.
+    persistence_dir
+        When supplied, after CV the best-AUC algorithm is refit on the
+        full lineage-filtered pool for that cluster, pickled via joblib
+        to ``persistence_dir / "{cluster_id}.pkl"``, and a
+        ``manifest.json`` is written alongside with SHA256 + provenance
+        per :mod:`core.steps.classifier_persistence`. When ``None``,
+        no classifier objects are written and ``ClusterExtraction``'s
+        ``fitted_classifier_*`` fields stay ``None``.
+    arc_name
+        Recorded in the manifest's ``arc_name`` field for traceability.
+        Defaults to empty string when persistence is not requested.
     """
     # Time-sort trades for TimeSeriesSplit
     trades_sorted = trades.sort_values(["entry_time", "trade_id"]).reset_index(drop=True)
@@ -239,6 +350,7 @@ def run_step_4(
     per_cluster: list[ClusterExtraction] = []
     all_metric_rows: list[dict] = []
     all_importance_rows: list[pd.DataFrame] = []
+    manifest_entries: dict = {}
 
     for cid in cluster_ids_to_run:
         # Build (X, y) in time order
@@ -303,6 +415,33 @@ def run_step_4(
         else:
             agg = pd.DataFrame(columns=["feature", "mean_importance", "std_importance"])
 
+        fitted_path: Path | None = None
+        fitted_type: str | None = None
+        fitted_feat_order: tuple[str, ...] | None = None
+        if persistence_dir is not None:
+            fitted_path, fitted_type, fitted_feat_order, in_sample_auc, n_train = (
+                _persist_best_classifier(
+                    persistence_dir=persistence_dir,
+                    cluster_id=int(cid),
+                    best_clf_name=best_clf,
+                    X=X,
+                    y=y,
+                    best_threshold=best_threshold,
+                    best_mean_auc=best_mean_auc,
+                )
+            )
+            manifest_entries[str(int(cid))] = {
+                "path": fitted_path.name,
+                "sha256": _sha256_file(fitted_path),
+                "classifier_type": fitted_type,
+                "classifier_name": best_clf,
+                "feature_order": list(fitted_feat_order),
+                "best_threshold": best_threshold,
+                "auc_in_sample": in_sample_auc,
+                "auc_oos_cv5": best_mean_auc,
+                "trained_on_pool_size": n_train,
+            }
+
         per_cluster.append(ClusterExtraction(
             cluster_id=int(cid),
             n_trades=int(len(X)),
@@ -313,6 +452,9 @@ def run_step_4(
             best_classifier_mean_auc=best_mean_auc,
             best_threshold=best_threshold,
             feature_importance=agg,
+            fitted_classifier_path=fitted_path,
+            fitted_classifier_type=fitted_type,
+            fitted_classifier_feature_order=fitted_feat_order,
         ))
         for fr in fold_results:
             all_metric_rows.append({
@@ -343,6 +485,12 @@ def run_step_4(
         feature_importance = feature_importance.sort_values(
             ["cluster_id", "classifier", "fold", "feature"]
         ).reset_index(drop=True)
+    if persistence_dir is not None and manifest_entries:
+        _write_manifest(
+            persistence_dir=persistence_dir,
+            arc_name=arc_name,
+            entries=manifest_entries,
+        )
     summary_md = _render_summary_md(per_cluster, excluded)
     return Step4Result(
         per_cluster=tuple(per_cluster),

@@ -39,8 +39,13 @@ from core.arc.arc_pool_builder import (
 from core.arc.signal_protocol import SignalEvaluation, SignalModule
 from core.arc.sub_protocol import resolve_step_override
 from core.architectures._protocol import Architecture, StrategyResult
+from core.architectures.a1_system_level_filter import A1RunContext
 from core.runners.arc_fold_runner import ArcFoldRunner
 from core.sim.panel import Panel
+from core.steps.classifier_persistence import (
+    build_a2_config_from_step4,
+    build_a6_config_from_step4,
+)
 from core.steps.step_2_clustering import Step2Result, run_step_2
 from core.steps.step_3_capturability import Step3Result, run_step_3
 from core.steps.step_4_extraction import Step4Result, run_step_4
@@ -50,6 +55,71 @@ from core.wfo.orchestrator import (
     run_holdout,
     run_search,
 )
+
+# Architectures that consume Step 4's persisted classifier through one
+# of the named builders. Keyed by ``Architecture.architecture_name``.
+# A3 / A4 retrain their own classifier per fold (see L_PROTOCOL §2 Step
+# 5 "Architecture-specific retraining policy") so they do not appear
+# here.
+_AUTO_BUILDERS = {
+    "A2": build_a2_config_from_step4,
+    "A6": build_a6_config_from_step4,
+}
+
+
+@dataclass(frozen=True)
+class AutoArchSpec:
+    """Tells :class:`ArcOrchestrator` to build an architecture config
+    from the Step 4 result at Step 5 dispatch time.
+
+    Used for A2 / A6 — the orchestrator looks up ``cluster_id`` in the
+    Step 4 result and invokes
+    :func:`core.steps.classifier_persistence.build_a2_config_from_step4`
+    (or the A6 equivalent) to instantiate the config, loading the
+    persisted classifier from disk. ``builder_kwargs`` pass through to
+    the builder (e.g. ``threshold_override`` for A2, or
+    ``lower_threshold`` / ``upper_threshold`` for A6).
+    """
+
+    architecture: Architecture
+    cluster_id: int
+    builder_kwargs: Mapping[str, Any] = field(default_factory=dict)
+
+
+def _build_per_trade_features(
+    pool_trades: pd.DataFrame,
+    feature_matrix: pd.DataFrame,
+) -> dict[tuple[str, pd.Timestamp], dict[str, float]]:
+    """Build the (pair, signal_time) -> feature_dict lookup that A1
+    filter rules and A2 / A6 classifier admit gates read via
+    :class:`A1RunContext`.
+
+    NaN / inf feature values are coerced to 0.0 — the architecture
+    layer's admit logic still rejects rows where the coercion would
+    mislead a classifier (it checks ``np.all(np.isfinite(row))`` before
+    calling ``predict_proba``, see
+    :mod:`core.architectures.a2_classifier_filter`). Mirrors the
+    convention from ``scripts/l_arc_11/run.py:build_per_trade_features``
+    so the orchestrator path produces identical lookups to the canonical
+    driver path.
+    """
+    pool = pool_trades.copy()
+    pool["signal_time"] = pd.to_datetime(pool["signal_time"], utc=True)
+    pool_by_tid = pool.set_index("trade_id")
+    out: dict[tuple[str, pd.Timestamp], dict[str, float]] = {}
+    fm = feature_matrix
+    if "trade_id" in fm.columns:
+        fm = fm.set_index("trade_id")
+    for tid, row in fm.iterrows():
+        if tid not in pool_by_tid.index:
+            continue
+        prow = pool_by_tid.loc[tid]
+        key = (str(prow["pair"]), pd.Timestamp(prow["signal_time"]))
+        out[key] = {
+            col: float(row[col]) if pd.notna(row[col]) else 0.0
+            for col in row.index
+        }
+    return out
 
 
 @dataclass(frozen=True)
@@ -70,6 +140,9 @@ class ArcConfig:
     feature_lineage: pd.DataFrame | None = None
     architectures: tuple[Architecture, ...] = ()
     architecture_configs: tuple[Any, ...] = ()  # 1:1 with architectures
+    # A2 / A6 specs that the orchestrator builds from Step 4 at Step 5
+    # dispatch time. See :class:`AutoArchSpec`. Empty by default.
+    auto_arch_specs: tuple[AutoArchSpec, ...] = ()
     wfo_structure: WfoStructure | None = None  # None -> build_v3_folds()
     invoke_step_6: bool = False  # set True after PASS-tier candidate detected
     hypothesis: str = ""
@@ -138,6 +211,11 @@ class ArcOrchestrator:
             cluster_centroids=s2.centroids,
         )
 
+    def _resolve_output_dir(self) -> Path:
+        """Resolve the on-disk output root used by Step 4 persistence
+        and final ``write()``. Falls back to ``results/<arc_name>``."""
+        return Path(self.cfg.output_dir or f"results/{self.cfg.arc_name}")
+
     def _run_step_4(
         self, pool: ArcPool, s2: Step2Result, s3: Step3Result
     ) -> Step4Result | None:
@@ -149,34 +227,78 @@ class ArcOrchestrator:
             return None
         if self.cfg.feature_matrix is None:
             return None
+        # Persistence at Step 4 time so Step 5 auto-builders can load
+        # the classifier downstream within the same run() call.
+        persistence_dir = self._resolve_output_dir() / "step_4" / "classifiers"
         return run_step_4(
             pool.trades,
             self.cfg.feature_matrix,
             s2.cluster_assignments,
             feature_lineage=self.cfg.feature_lineage,
             candidate_cluster_ids=candidate_ids,
+            persistence_dir=persistence_dir,
+            arc_name=self.cfg.arc_name,
         )
 
-    def _run_step_5(self, signal_eval: SignalEvaluation) -> WfoSearchResult | None:
+    def _run_step_5(
+        self,
+        signal_eval: SignalEvaluation,
+        pool: ArcPool,
+        s4: Step4Result | None,
+    ) -> WfoSearchResult | None:
         override = resolve_step_override(self.cfg.sub_protocol, "step_5")
         if override is not None:
             return override(signal_eval, self.panels)
-        if not self.cfg.architectures or not self.cfg.architecture_configs:
+        # No work if neither explicit configs nor auto specs were supplied
+        if not self.cfg.architectures and not self.cfg.auto_arch_specs:
             return None
+
         wfo_struct = self.cfg.wfo_structure or build_v3_folds()
         candidates: list[tuple[str, Any]] = []
-        # Pair (architecture, config) tuples; config_id makes them addressable
+
+        # Explicit (architecture, config) pairs supplied by the caller
         for arch, conf in zip(self.cfg.architectures, self.cfg.architecture_configs):
             cid = f"{arch.architecture_name}::{getattr(conf, 'config_id', repr(conf))}"
             candidates.append((cid, (arch, conf)))
 
-        # Wrap each (arch, conf) into a fold-runner adapter
+        # Auto-built configs from Step 4 (A2 / A6)
+        for spec in self.cfg.auto_arch_specs:
+            if s4 is None:
+                raise RuntimeError(
+                    "auto_arch_specs supplied but Step 4 did not run "
+                    "(no candidate clusters from Step 3, or no "
+                    "feature_matrix on ArcConfig)"
+                )
+            builder = _AUTO_BUILDERS.get(spec.architecture.architecture_name)
+            if builder is None:
+                raise RuntimeError(
+                    f"auto_arch_specs does not support architecture "
+                    f"{spec.architecture.architecture_name}; supported: "
+                    f"{sorted(_AUTO_BUILDERS)}"
+                )
+            conf = builder(s4, cluster_id=spec.cluster_id, **dict(spec.builder_kwargs))
+            cid = f"{spec.architecture.architecture_name}::{getattr(conf, 'config_id', repr(conf))}"
+            candidates.append((cid, (spec.architecture, conf)))
+
+        if not candidates:
+            return None
+
+        # Per-trade features for A1 filter rules + A2 / A6 admit gates.
+        # A1 / A5 ignore the context; building it once is cheap.
+        per_trade_features = None
+        if self.cfg.feature_matrix is not None:
+            per_trade_features = _build_per_trade_features(
+                pool.trades, self.cfg.feature_matrix
+            )
+        run_context = A1RunContext(per_trade_features=per_trade_features)
+
         def _runner(fold: Fold, paired: tuple[Architecture, Any]) -> Any:
             arch, conf = paired
             r = ArcFoldRunner(
                 architecture=arch,
                 signal_evaluation=signal_eval,
                 panels=self.panels,
+                run_context=run_context,
             )
             return r(fold, conf)
 
@@ -213,19 +335,27 @@ class ArcOrchestrator:
         s2 = self._run_step_2(pool)
         s3 = self._run_step_3(pool, s2)
         s4 = self._run_step_4(pool, s2, s3)
-        s5 = self._run_step_5(signal_eval)
+        s5 = self._run_step_5(signal_eval, pool, s4)
 
         # Holdout: top-K candidates from search re-evaluated on holdout window
         holdout = None
         if s5 is not None and s5.top_k:
             wfo_struct = self.cfg.wfo_structure or build_v3_folds()
             if wfo_struct.holdout is not None:
+                per_trade_features = None
+                if self.cfg.feature_matrix is not None:
+                    per_trade_features = _build_per_trade_features(
+                        pool.trades, self.cfg.feature_matrix
+                    )
+                run_context = A1RunContext(per_trade_features=per_trade_features)
+
                 def _runner(fold: Fold, paired: tuple[Architecture, Any]):
                     arch, conf = paired
                     r = ArcFoldRunner(
                         architecture=arch,
                         signal_evaluation=signal_eval,
                         panels=self.panels,
+                        run_context=run_context,
                     )
                     return r(fold, conf)
                 holdout = run_holdout(wfo_struct, s5.top_k, fold_runner=_runner)
@@ -382,4 +512,5 @@ __all__ = (
     "ArcConfig",
     "ArcOrchestrator",
     "ArcOrchestratorResult",
+    "AutoArchSpec",
 )

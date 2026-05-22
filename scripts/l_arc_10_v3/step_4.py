@@ -141,9 +141,7 @@ def _threshold_sweep(y_true: np.ndarray, y_prob: np.ndarray) -> dict:
     """Find AUC-best and F1-best thresholds."""
     thresholds = np.linspace(0.05, 0.95, 91)
     f1s = []
-    best_auc_thresh = 0.5
     best_f1 = -1.0
-    best_f1_thresh = 0.5
     best_f1_metrics = {}
     best_auc_metrics = {}
     if len(np.unique(y_true)) < 2:
@@ -160,7 +158,6 @@ def _threshold_sweep(y_true: np.ndarray, y_prob: np.ndarray) -> dict:
         n_admit = int(y_pred.sum())
         if f1 > best_f1:
             best_f1 = f1
-            best_f1_thresh = float(thr)
             best_f1_metrics = dict(threshold=float(thr), precision=prec, recall=rec, n_admit=n_admit, f1=f1)
         if abs(thr - 0.5) < 0.005:
             best_auc_metrics = dict(threshold=float(thr), precision=prec, recall=rec, n_admit=n_admit, f1=f1)
@@ -189,7 +186,7 @@ def _fold_eval(model_factory, X: np.ndarray, y: np.ndarray, splitter) -> dict:
         try:
             clf.fit(X[tr_idx], y[tr_idx])
             p = clf.predict_proba(X[te_idx])[:, 1]
-        except Exception as e:
+        except Exception:
             fold_aucs.append(np.nan)
             continue
         try:
@@ -412,7 +409,7 @@ def run(cfg_path: Path, *, write_manifest_flag: bool = True) -> dict:
             lines.append(
                 f"| {row['rank']} | {row['feature']} | {row['importance_mean']:.5f} | {row['importance_std']:.5f} |\n"
             )
-        lines.append(f"\n**Swing-feature audit (per dispatch §Step 4):**\n")
+        lines.append("\n**Swing-feature audit (per dispatch §Step 4):**\n")
         lines.append(
             f"- Swing-derived features in top 10: {s['swing_audit']['swing_features_in_top10']}\n"
         )
@@ -458,7 +455,7 @@ def run(cfg_path: Path, *, write_manifest_flag: bool = True) -> dict:
     if write_manifest_flag:
         write_manifest(out_dir / "manifest.json", manifest)
 
-    print(f"[step_4] candidate AUCs:", flush=True)
+    print("[step_4] candidate AUCs:", flush=True)
     for cid, s in summary_per_cluster.items():
         print(f"  c{cid}: best clf={s['best_classifier']} mean AUC={s['best_mean_auc']:.4f}", flush=True)
     return manifest

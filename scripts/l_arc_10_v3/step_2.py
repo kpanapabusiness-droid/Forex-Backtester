@@ -14,7 +14,6 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
-import json
 import platform
 import sys
 from pathlib import Path
@@ -57,7 +56,7 @@ def _archetype_label(centroid: dict) -> str:
     ttp = centroid.get("path_ttp_rel", np.nan)
     dd = centroid.get("path_drawdown_depth_r", np.nan)
     rec = centroid.get("path_recovery_ratio", np.nan)
-    ww = centroid.get("wrong_way_pp", np.nan)  # filled in cluster summary
+    # wrong_way_pp is available via centroid but not currently used in label rules.
 
     # Rules — match the qualitative archetypes in L_PROTOCOL §2 Step 2:
     #   V-shape recovery — high recovery ratio, moderate drawdown, low ttp_rel

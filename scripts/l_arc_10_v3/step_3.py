@@ -95,7 +95,6 @@ def _sl_sweep_per_cluster(grp: pd.DataFrame, paths: pd.DataFrame) -> dict[float,
     # Per-trade SL=2 outcomes
     final_r_2 = dict(zip(grp["trade_id"].to_numpy(), grp["final_r"].to_numpy()))
     mfe_r_2 = dict(zip(grp["trade_id"].to_numpy(), grp["mfe_r"].to_numpy()))
-    bars_held_2 = dict(zip(grp["trade_id"].to_numpy(), grp["bars_held"].to_numpy()))
 
     for M in SL_MULTIPLIERS:
         scale = 2.0 / M
@@ -111,7 +110,6 @@ def _sl_sweep_per_cluster(grp: pd.DataFrame, paths: pd.DataFrame) -> dict[float,
         for tid, tg in grp_paths.groupby("trade_id"):
             mae_arr = tg["mae_so_far_r"].to_numpy()
             mfe_arr = tg["mfe_so_far_r"].to_numpy()
-            close_arr = tg["close_r"].to_numpy()
             # Index where new SL is breached (mae_so_far_r in OLD units crosses thresh)
             breach_idx = -1
             for i, m in enumerate(mae_arr):
@@ -262,7 +260,7 @@ def run(cfg_path: Path, *, write_manifest_flag: bool = True) -> dict:
     lines.append("# Arc 10 v3.0 — Step 3 Capturability Summary\n\n")
     lines.append(f"- Primary K = {best_k}\n")
     lines.append(f"- Pool size: {len(pool)}\n")
-    lines.append(f"- Candidate flag rule: reach_1R ≥ 0.50 AND ww_pp ≤ 0.30 AND mfe_p50 ≥ 1.5R\n\n")
+    lines.append("- Candidate flag rule: reach_1R ≥ 0.50 AND ww_pp ≤ 0.30 AND mfe_p50 ≥ 1.5R\n\n")
     lines.append("## Per-cluster metrics (at Step 1 SL=2.0×ATR)\n\n")
     lines.append(
         "| Cluster | Archetype | n | reach_1R | reach_2R | mfe_p50 | mfe_p75 | ww_pp | mean_R | composite | candidate@2x | best_SL | composite@best | candidate@best |\n"

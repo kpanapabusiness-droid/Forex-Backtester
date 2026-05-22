@@ -40,7 +40,6 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
-import json
 import math
 import platform
 import sys
@@ -55,6 +54,7 @@ REPO_ROOT = _HERE.parent.parent.parent
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+import signals.lchar_dlr_long as dlr  # noqa: E402
 from core.determinism import RANDOM_STATE, seed_everything  # noqa: E402
 from core.features.pipeline import compute_feature_matrix  # noqa: E402
 from core.sim.panel import Panel  # noqa: E402
@@ -67,8 +67,6 @@ from scripts.l_arc_10_v3._common import (  # noqa: E402
     window_slice,
     write_manifest,
 )
-
-import signals.lchar_dlr_long as dlr  # noqa: E402
 
 PATH_FORWARD_BARS_DEFAULT = 240
 DIRECTION = 1  # long
@@ -247,7 +245,6 @@ def _simulate_pair(
 
     open_bid = df_h4["open_bid"].to_numpy()
     open_ask = df_h4["open_ask"].to_numpy()
-    high_bid = df_h4["high_bid"].to_numpy()
     low_bid = df_h4["low_bid"].to_numpy()
     close_bid = df_h4["close_bid"].to_numpy()
     spread_close = df_h4["spread_close"].to_numpy()
@@ -592,7 +589,7 @@ def run(cfg_path: Path, *, write_manifest_flag: bool = True) -> dict:
     feature_panel = FeaturePanel(h4_panel, d1_panel, w1_panel)
 
     # ── Phase 3: per-pair signal + simulation + features ────────────────────
-    print(f"[step_1] running signal + simulation + features ...", flush=True)
+    print("[step_1] running signal + simulation + features ...", flush=True)
     all_trades: list[TradeRow] = []
     all_paths_dfs: list[pd.DataFrame] = []
     feature_rows: list[pd.DataFrame] = []
@@ -645,7 +642,7 @@ def run(cfg_path: Path, *, write_manifest_flag: bool = True) -> dict:
         )
 
     # ── Phase 4: assemble pool ──────────────────────────────────────────────
-    print(f"[step_1] assembling pool ...", flush=True)
+    print("[step_1] assembling pool ...", flush=True)
     trades_df = pd.DataFrame([t.__dict__ for t in all_trades])
     if feature_rows:
         features_concat = pd.concat(feature_rows, ignore_index=True)
@@ -686,7 +683,7 @@ def run(cfg_path: Path, *, write_manifest_flag: bool = True) -> dict:
     paths_all.to_parquet(paths_path, engine="pyarrow", compression="snappy", index=False)
 
     # ── Phase 5: integrity checks ───────────────────────────────────────────
-    print(f"[step_1] running integrity checks ...", flush=True)
+    print("[step_1] running integrity checks ...", flush=True)
     rng = np.random.default_rng(RANDOM_STATE)
 
     n_lookahead = int(cfg["step_1"]["integrity"]["lookahead_spotcheck_n"])
@@ -772,7 +769,7 @@ def run(cfg_path: Path, *, write_manifest_flag: bool = True) -> dict:
     # ── Phase 6: write integrity report ─────────────────────────────────────
     lines = []
     lines.append("# Arc 10 v3.0 — Step 1 Integrity Report\n")
-    lines.append(f"- Protocol: L_PROTOCOL v3.0 vanilla\n")
+    lines.append("- Protocol: L_PROTOCOL v3.0 vanilla\n")
     lines.append(f"- Window: {cfg['window']['start']} → {cfg['window']['end']}\n")
     lines.append(f"- Pool size: **{integrity['pool_size']}** trades across {len(pairs)} pairs\n")
     lines.append(f"- Pool gate: {'PASS' if integrity['pool_size'] >= 500 else 'FAIL (< 500)'}\n")

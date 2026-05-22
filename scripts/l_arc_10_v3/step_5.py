@@ -26,7 +26,6 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
-import itertools
 import platform
 import sys
 import warnings
@@ -42,8 +41,6 @@ if str(REPO_ROOT) not in sys.path:
 
 from sklearn.ensemble import RandomForestClassifier  # noqa: E402
 from sklearn.linear_model import LogisticRegression  # noqa: E402
-from sklearn.metrics import roc_auc_score  # noqa: E402
-from sklearn.model_selection import TimeSeriesSplit  # noqa: E402
 from sklearn.pipeline import Pipeline  # noqa: E402
 from sklearn.preprocessing import StandardScaler  # noqa: E402
 
@@ -129,7 +126,6 @@ def _apply_exit_policy(
     sl_threshold_old = -(sl_multiplier / 2.0)
     new_mfe_at = mfe * scale
     new_close_at = close * scale
-    new_mae_at = mae * scale
 
     # Find SL breach index (in old-R units against new SL)
     sl_breach = -1
@@ -788,7 +784,6 @@ def run(cfg_path: Path, *, write_manifest_flag: bool = True) -> dict:
         target_holdout = (holdout_pool["cluster_primary"] == cid).astype(int).to_numpy()
 
         step4_clf_name = step4_per_cluster.get(cid, {}).get("best_classifier", "rf")
-        step4_threshold = step4_per_cluster.get(cid, {}).get("best_threshold")
         a2_factory = _classifier_factory_for_a2(step4_clf_name)
 
         # Architecture × config grid
@@ -1039,7 +1034,7 @@ def _write_best_candidate_report(path, best, holdout_records, candidates, df_ora
                 lines.append(f"- Realised / Oracle worst-ROI: {ro / ro_o if ro_o != 0 else 'n/a'}\n")
             except Exception:
                 pass
-    lines.append(f"\n## Top-3 summary\n")
+    lines.append("\n## Top-3 summary\n")
     lines.append(f"- PASS-DEPLOYABLE: {pass_dep}\n- PASS-VIABLE: {pass_vi}\n")
     path.write_text("".join(lines), encoding="utf-8", newline="\n")
 

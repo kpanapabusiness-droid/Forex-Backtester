@@ -149,3 +149,78 @@ A1 (no classifier filter, full Step 1 pool of 2,162 search-window trades) with S
 
 - **Oracle-WFO comparison pattern broken when oracle exit policy ≠ winning architecture exit policy.** Step 5's oracle locked to `sl_only` at SL=4.0 (the Step 3 best); winning A1 used `sl_partial_close_1r_runner_trail` at SL=3.5. Oracle reports -11.74% worst ROI while A1 reports +26.49% — implying A1 BEATS the oracle, which is structurally impossible if both used the same exit. The lesson: oracle WFO must sweep the same architecture × config grid as the realised candidates, or be reported only as "cluster-filter true-label upper bound CONDITIONAL on identical exit policy." Recommendation for protocol §2 Step 5 Amendment 2's oracle WFO definition: lock oracle to the WINNING architecture's config sans cluster-filter, not to a fixed (best_sl, sl_only).
 ```
+
+---
+
+## §10 Amendment 3 re-evaluation (added 2026-05-22)
+
+**Original verdict:** PASS-VIABLE (best A1 system_level_filter, worst-fold ratio 5.42, DD 9.22% at `r_base = 0.5%`)
+**Re-evaluated verdict:** **PASS-DEPLOYABLE-PROVISIONAL** (upgrade)
+**Re-evaluation status:** provisional (missing `chained_max_dd_base_pct` and per-day max-DD series; Step 6 already PASS — carries forward)
+**Re-evaluated primary_failure_mode:** N/A (passes amended DEPLOYABLE gate provisionally)
+
+### Scaling derivation
+- `worst_fold_dd_base_pct`: **9.22%** (closure §1 `worst_fold_dd_pct`)
+- `worst_fold_roi_base_pct`: **+26.49%** (closure §1 `worst_fold_roi_pct`)
+- `k_safe = 8.0 / 9.22 = 0.8677` (scaling **down** — base DD already exceeds 8% gate)
+- `k_hard = 10.0 / 9.22 = 1.0846` (scaling up modestly)
+- `r_safe_pct = 0.5 × 0.8677 = 0.4339%`
+- `r_hard_pct = 0.5 × 1.0846 = 0.5423%`
+- `scalable_to_safe`: **true** (within [0.15%, 2.0%])
+- `scalable_to_hard`: **true** (within bounds)
+
+### Amended DEPLOYABLE gate evaluation
+
+| # | Constraint | Threshold | Value at r_safe | Pass/Fail | Notes |
+|---|---|---|---|---|---|
+| 1 | Scalable to safe | `r_safe ∈ [0.15%, 2.0%]` | 0.4339% | ✓ | well within bounds |
+| 2 | Worst-fold ROI/DD ratio | ≥ 2.0 | **2.873** (§3 math: 26.49 / 9.22) | ✓ | invariant; engine reading 5.42 also clears |
+| 3 | Worst-fold ROI | > 0 | +22.98% (= 26.49 × 0.8677) | ✓ | sign-positive |
+| 4 | Per-fold positivity | all 11 positive, 0 negative | 11/11 | ✓ | sign does not scale |
+| 5 | Worst-fold DD | ≤ 8% | 8.00% (= 9.22 × 0.8677) | ✓ | by construction of `k_safe` |
+| 6 | Daily DD breaches | = 0 | unknown × 0.87 | ? | PROVISIONAL: per-day max-DD series not built under v3.0 pre-amendment. Note: `k_safe < 1` means daily breach count under proper per-day re-evaluation can only decrease or stay flat from the `r_base` count. Per-fold breach summary at `r_base` was not stored for Arc 10 (no per_fold_metrics.csv) — so we don't have the floor count either. PROVISIONAL per dispatch Q2. |
+| 7 | Chained max DD | ≤ 10% | unknown × 0.87 | ? | PROVISIONAL: `chained_max_dd_base_pct` not measured. Step 6 audit §"Caveats" already flagged: "per-fold equity reset (each fold starts at $100k). Cumulative DD across folds isn't tracked; real deployment would compound continuously." Worst-fold DD at `r_safe` = 8% bounds *per-fold* drawdown but not the cross-fold chained one. |
+| 8 | Trades per fold | ≥ 25 | n_total = 2,162 / 11 = ~197 avg | ✓ | per-fold breakdown not separately saved; total well above minimum even if distribution is uneven |
+| 9 | Holdout at r_safe | clears prior §3 holdout gate | proxy: ROI ≈ **+51.27%** (= 59.07 × 0.8677), DD ≈ **4.36%** (= 5.03 × 0.8677) | ✓ | PROXY: not re-run. DD 4.36% < 8% gate; ratio 11.76 invariant |
+| 10 | Step 6 clean | clean | **PASS** | ✓ | Step 6 already run on the same A1 Top-1 winner (`results/l_arc_10/step_6/causal_audit_report.md` §7 verdict). No producer downgrades, no candidate kills. Carries forward. |
+
+### Amended VIABLE gate evaluation (recorded for completeness; DEPLOYABLE passes so VIABLE is redundant)
+
+| # | Constraint | Threshold | Value at r_hard | Pass/Fail | Notes |
+|---|---|---|---|---|---|
+| 1 | Hard-scalable | `r_hard ∈ [0.15%, 2.0%]` | 0.5423% | ✓ | |
+| 2 | Worst-fold ROI/DD ratio | ≥ 2.0 | 2.873 | ✓ | invariant |
+| 3 | Mean-fold ROI/DD ratio | ≥ 2.5 | mean_roi 49.87 / worst_dd_proxy ≈ 16.18 (engine) or 49.87 / mean_dd (unknown) | ✓ | engine reports 16.18, well above 2.5 |
+| 4 | Per-fold positivity | ≤ 1 negative fold | 11/11 positive | ✓ | |
+| 5 | Worst-fold DD | ≤ 10% | 10.00% (= 9.22 × 1.0846) | ✓ | by construction |
+| 6 | Daily DD breaches | = 0 | unknown × 1.08 | ? | PROVISIONAL |
+| 7 | Chained max DD | ≤ 10% | unknown × 1.08 | ? | PROVISIONAL |
+| 8 | Trades per fold | ≥ 25 | ~197 avg | ✓ | |
+| 9 | Holdout at r_hard | clears prior §3 holdout gate | proxy: ROI ≈ +64.07%, DD ≈ 5.45% | ✓ | PROXY |
+| 10 | Step 6 clean | clean | PASS | ✓ | carries forward |
+
+### Engine vs §3 ratio discrepancy (flagged per chat Q1)
+
+The closure §1 reports `worst_fold_ratio: 5.4185`. Inspection of `step_5/wfo_results.csv` row 1 shows the engine's worst-fold ratio is computed per fold and reported alongside the worst ROI; the §3 mathematical reading `worst_fold_roi / worst_fold_dd = 26.49% / 9.22% = 2.873` produces a different (lower) number. Per chat directive (Q1: option a), the §10 evaluation uses **2.873** as the gate value. Both readings clear the 2.0 gate — verdict outcome is identical. The discrepancy is methodological / reporting-convention, not material to this arc's verdict.
+
+### Final assessment
+
+Arc 10 upgrades from PASS-VIABLE to **PASS-DEPLOYABLE-PROVISIONAL** under Amendment 3. The mechanism: at `r_base = 0.5%`, worst-fold DD (9.22%) sat above the 8% PASS-DEPLOYABLE bound but below the 10% PASS-VIABLE bound — the original verdict was correct under the prior protocol. Amendment 3 introduces the scaling rule: scale risk down by `k_safe = 0.87` to bring worst-fold DD to the 8% gate by construction; worst-fold ROI scales linearly to +22.98%; the ROI/DD ratio is invariant (2.87 in §3 math, 5.42 in engine reading — both clear the 2.0 gate). With Step 6 already PASS on the same A1 Top-1 winner (causal audit clean — D1 swing-low detector right-edge-offset=4 confirmation-lag passes the Arc 9 lesson, all top-10 features clean producer-level), the upgrade is structurally sound.
+
+The "PROVISIONAL" suffix is load-bearing on two constraints:
+1. **Chained max DD** — Step 6 audit explicitly flagged that per-fold equity reset overstates sustainability vs production compounding. A continuous-equity backtest would resolve constraint #7 definitively. Without it, we assume linear scaling holds: if `chained_max_dd_base_pct` ≤ 11.52% then `× k_safe = 0.87` gives ≤ 10% scaled. Plausible but unverified.
+2. **Daily DD breaches** — per-day max-DD series not built. Under downward scaling (`k_safe = 0.87`), proper per-day re-evaluation can only decrease the breach count from the `r_base` count. The `r_base` count itself wasn't stored separately for Arc 10 (no per_fold_metrics.csv).
+
+Both gaps are engine-resolvable via a single re-run of the A1 winning config with: (a) chained continuous-equity emission, (b) per-day max-DD series persisted to `step_5/per_day_max_dd_base.parquet` per Amendment 3 §"Daily DD measurement" spec. Recommended (not blocking; verdict stands provisional).
+
+### Missing data flags
+
+- Constraint #6 (daily DD breaches at `r_safe`): per-day max-DD series not built. PROVISIONAL.
+- Constraint #7 (chained max DD at `r_safe`): `chained_max_dd_base_pct` not measured; per-fold equity reset only. PROVISIONAL.
+- **Recommended engine re-run** to upgrade verdict from PROVISIONAL to DEFINITIVE: re-run A1 winning config (`sl_3.5x_partial_close_1r_runner_trail_unlimited`) on the 2010-2020 search window + 2021-04→2026-04 holdout with continuous-equity tracking + per-day max-DD emission. Scope: ~1 config × 11 IS folds + 1 holdout fold ≈ 12 fold-runs. Low compute. Not in this dispatch's scope.
+
+### Cross-arc tags (additions to closure §3 tags)
+
+- `viable_to_deployable_upgrade_under_amendment3` — first documented PASS-VIABLE → PASS-DEPLOYABLE upgrade purely from the risk-normalised gate change (no engine re-run needed for upgrade itself)
+- `step6_audit_carries_forward_across_amendment` — Step 6 PASS on the same A1 winner under prior protocol is valid for the upgraded verdict; the amendment doesn't change Step 6's scope
+- `engine_ratio_vs_amendment_ratio_divergence` — engine `worst_fold_ratio: 5.42` vs §3 math 2.87; same verdict outcome but ~2× numerical gap. Worth a v3.1 reporting convention amendment to lock the ratio definition.

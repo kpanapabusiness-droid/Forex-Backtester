@@ -441,27 +441,27 @@ hypothesis: <one paragraph what this arc tests>
 expected_failure_modes: <if any anticipated>
 ```
 
-### ARC_CLOSURE.md required sections
+### ARC_CLOSURE.md format
 
-1. Headline — verdict + one-sentence summary
-2. Best architecture — which won, ratio, key metrics, vs Oracle
-3. All architectures tested — full ranked table
-4. Step-by-step results — what each step produced, failure diagnostics where applicable
-5. Why it failed (or succeeded) — specific, actionable
-6. Improvements to try — concrete next experiments
-7. What else worth investigating — adjacent ideas this arc surfaced
+All arc closure docs MUST follow `docs/templates/ARC_CLOSURE_TEMPLATE.md` v1.0.
 
-### ARC_TRACKER.md auto-update
+The template has three required sections:
 
-Overseer parses Sections 1-3 of every closure doc and updates the tracker mechanically. Sections updated:
-- Active arcs (row removed)
-- Closed arcs summary (row added)
-- Per-feature contribution (rolling avg updated)
-- Per-architecture win rate (updated)
-- Per-archetype recurrence (updated)
-- Per-failure-mode count (updated)
+1. **§1 tracker_payload** — machine-parseable YAML block. Source of truth for ARC_TRACKER updates. Field names and structure are locked.
+2. **§2 Why <failed | succeeded>** — required prose, 100-300 words. Preserves cross-arc synthesis quality.
+3. **§3 Cross-arc observations** — required bullet list. What does this arc add to cumulative findings?
 
-Tracker is append-only. Bad rows flagged not deleted. Schema locked at v3.0.
+Closure docs not conforming to the template are invalid. Tracker updates cannot be applied until the closure is repaired (per template Section 4-K).
+
+### ARC_TRACKER.md update mechanism
+
+ARC_TRACKER updates are driven by each closure doc's `§1 tracker_payload` YAML block.
+
+Until parser ships: manual updates per `docs/templates/ARC_CLOSURE_TEMPLATE.md` Section 4 (steps A through K).
+
+Once parser ships (`scripts/update_tracker_from_closure.py`): same Section 4 mapping applied mechanically. Parser specification in template Section 5.
+
+Tracker is append-only at the row level. Bad rows flagged with ⚠️ prefix, never deleted. Schema changes require explicit chat-side redesign event documented in the closure doc that introduced them.
 
 ---
 

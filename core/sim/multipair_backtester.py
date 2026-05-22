@@ -66,6 +66,11 @@ class Order:
     atr_at_entry: float | None = None
     trail_activation_atr: float = 2.0
     trail_distance_atr: float = 1.5
+    # A6 meta-labeling sizing (per L_PROTOCOL Amendment 2 / chat decision §6.4).
+    # The driver multiplies ``size`` by this before opening the position.
+    # Default 1.0 preserves prior behaviour for every architecture that does
+    # not use meta-labeling.
+    risk_multiplier: float = 1.0
 
 
 # Strategy signature: callable(t, snapshot, account) -> list[Order]
@@ -243,12 +248,16 @@ class MultiPairBacktester:
                 fill_px = long_entry_fill_price(bar)
             else:
                 fill_px = short_entry_fill_price(bar)
+            effective_size = float(order.size) * float(order.risk_multiplier)
+            if effective_size <= 0.0:
+                # risk_multiplier=0 (A6 meta-labeling 0x sizing) — skip this fill
+                continue
             pos = self.account.open(
                 pair=order.pair,
                 direction=order.direction,
                 entry_time=t,
                 entry_price=fill_px,
-                size=order.size,
+                size=effective_size,
                 sl_price=order.sl_price,
                 tp_price=order.tp_price,
             )

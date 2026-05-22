@@ -1,23 +1,19 @@
-"""Generic WFO fold runner: runs a strategy over one Fold, returns FoldStats.
+"""KH-24 WFO fold runner — RETAINED for back-compatibility with
+:mod:`scripts.anchor.run_anchor` and the existing anchor reproduction
+path.
 
-PR-C's ``run_search`` and ``run_holdout`` expect a ``fold_runner``
-callable. This module provides the canonical implementation that:
+CC_07 (L_PROTOCOL v3.0 runtime) prefers the generic
+:class:`core.runners.arc_fold_runner.ArcFoldRunner` for new arcs;
+KH-24 itself is now expressible as an A1 config via
+:class:`core.strategies.kh24.signal_module.KH24SignalModule` +
+:class:`core.architectures.a1_system_level_filter.A1Config`. See
+``docs/PROTOCOL_RUNTIME.md`` §"KH-24 as A1" for the equivalence.
 
-  1. Slices the multi-pair panel(s) to ``fold.is_start..fold.oos_end``
-  2. Builds a strategy runtime from the slice (precomputes signals/filters)
-  3. Runs ``MultiPairBacktester`` over the OOS window only — the IS
-     window is used by the strategy for warmup / training, never for
-     simulated trading
-  4. Computes per-fold metrics (trade count, ROI, DD, daily-DD breaches,
-     mean R, Sharpe, sign-consistency) and returns a ``FoldStats``
-
-KH-24 is the first user, but the runner is strategy-agnostic — the
-caller supplies a ``strategy_factory(panel_h4, panel_d1, panel_h1, ...)
--> KH24Runtime``-shaped object. Future arcs plug in their own factory.
-
-The fold runner is callable: ``fold_runner(fold, candidate_config)`` —
-matches the ``FoldRunner[ConfigT]`` protocol in
-``core.wfo.orchestrator``.
+This module preserves the direct ``MultiPairBacktester`` invocation
+path (no A1 indirection) so the anchor regression test can confirm
+``KH24FoldRunner == A1(KH24SignalModule, KH24-as-A1-config)`` produces
+byte-identical fold stats. Once the regression check passes, future
+arcs should use ArcFoldRunner; KH24FoldRunner is frozen as a baseline.
 """
 
 from __future__ import annotations

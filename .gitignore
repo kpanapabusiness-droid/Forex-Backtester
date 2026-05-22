@@ -47,7 +47,7 @@ results_history/
 .aiderignore
 
 # Claude Code runtime state (not committed)
-.claude/scheduled_tasks.lock
+.claude/
 
 # MT5 exports (machine-specific)
 mt5/**

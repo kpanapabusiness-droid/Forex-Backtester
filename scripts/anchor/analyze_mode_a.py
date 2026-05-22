@@ -29,7 +29,6 @@ from pathlib import Path
 
 import pandas as pd
 
-
 # Published KH-24 numbers from ARC_HISTORY.md (1.0% risk on 5ers MT5 data,
 # spread_floors_5ers.yaml NOT applied — KH-24 uses raw MT5 per-bar spreads).
 PUBLISHED = pd.DataFrame(

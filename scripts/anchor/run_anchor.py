@@ -41,7 +41,6 @@ from core.sim.panel import Panel
 from core.strategies.kh24.kh24 import KH24Config, build_kh24_runtime
 from core.wfo.folds import Fold, WfoStructure, build_kh24_anchor_folds, build_v3_folds
 
-
 PAIRS_28 = (
     "AUDCAD AUDCHF AUDJPY AUDNZD AUDUSD CADCHF CADJPY CHFJPY "
     "EURAUD EURCAD EURCHF EURGBP EURJPY EURNZD EURUSD GBPAUD "

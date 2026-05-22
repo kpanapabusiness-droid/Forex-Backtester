@@ -1,0 +1,2 @@
+config_name,cluster,worst_fold_roi,worst_fold_dd,worst_fold_ratio,mean_fold_roi,mean_fold_dd,mean_fold_ratio,sign_pos_folds,n_trades_total,verdict
+ORACLE_cluster0,0,99.46737880730245,10.146452037923089,16.577896467883807,388.9888809071257,5.741760247043645,90.86907551648467,10,1411,FAIL

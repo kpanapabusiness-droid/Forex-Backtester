@@ -1,0 +1,616 @@
+{
+  "arc_name": "l_arc_11",
+  "data_window": [
+    "2010-01-01",
+    "2026-04-30"
+  ],
+  "env": {
+    "numpy": "2.4.4",
+    "pandas": "3.0.2",
+    "python": "3.14.0",
+    "sklearn": "1.8.0"
+  },
+  "integrity": {
+    "coverage": {
+      "AUDCAD": {
+        "end": "2026-04-10 20:00:00+00:00",
+        "n_bars": 26164,
+        "start": "2010-01-03 20:00:00+00:00"
+      },
+      "AUDCHF": {
+        "end": "2026-04-10 20:00:00+00:00",
+        "n_bars": 26169,
+        "start": "2010-01-03 20:00:00+00:00"
+      },
+      "AUDJPY": {
+        "end": "2026-04-10 20:00:00+00:00",
+        "n_bars": 26168,
+        "start": "2010-01-03 20:00:00+00:00"
+      },
+      "AUDNZD": {
+        "end": "2026-04-10 20:00:00+00:00",
+        "n_bars": 26168,
+        "start": "2010-01-03 20:00:00+00:00"
+      },
+      "AUDUSD": {
+        "end": "2026-04-10 20:00:00+00:00",
+        "n_bars": 26163,
+        "start": "2010-01-03 20:00:00+00:00"
+      },
+      "CADCHF": {
+        "end": "2026-04-10 20:00:00+00:00",
+        "n_bars": 26165,
+        "start": "2010-01-03 20:00:00+00:00"
+      },
+      "CADJPY": {
+        "end": "2026-04-10 20:00:00+00:00",
+        "n_bars": 26168,
+        "start": "2010-01-03 20:00:00+00:00"
+      },
+      "CHFJPY": {
+        "end": "2026-04-10 20:00:00+00:00",
+        "n_bars": 26167,
+        "start": "2010-01-03 20:00:00+00:00"
+      },
+      "EURAUD": {
+        "end": "2026-04-10 20:00:00+00:00",
+        "n_bars": 26164,
+        "start": "2010-01-03 20:00:00+00:00"
+      },
+      "EURCAD": {
+        "end": "2026-04-10 20:00:00+00:00",
+        "n_bars": 26168,
+        "start": "2010-01-03 20:00:00+00:00"
+      },
+      "EURCHF": {
+        "end": "2026-04-10 20:00:00+00:00",
+        "n_bars": 26170,
+        "start": "2010-01-03 20:00:00+00:00"
+      },
+      "EURGBP": {
+        "end": "2026-04-10 20:00:00+00:00",
+        "n_bars": 26166,
+        "start": "2010-01-03 20:00:00+00:00"
+      },
+      "EURJPY": {
+        "end": "2026-04-10 20:00:00+00:00",
+        "n_bars": 26161,
+        "start": "2010-01-03 20:00:00+00:00"
+      },
+      "EURNZD": {
+        "end": "2026-04-10 20:00:00+00:00",
+        "n_bars": 26166,
+        "start": "2010-01-03 20:00:00+00:00"
+      },
+      "EURUSD": {
+        "end": "2026-04-10 20:00:00+00:00",
+        "n_bars": 26170,
+        "start": "2010-01-03 20:00:00+00:00"
+      },
+      "GBPAUD": {
+        "end": "2026-04-10 20:00:00+00:00",
+        "n_bars": 26076,
+        "start": "2010-01-03 20:00:00+00:00"
+      },
+      "GBPCAD": {
+        "end": "2026-04-10 20:00:00+00:00",
+        "n_bars": 26147,
+        "start": "2010-01-03 20:00:00+00:00"
+      },
+      "GBPCHF": {
+        "end": "2026-04-10 20:00:00+00:00",
+        "n_bars": 26160,
+        "start": "2010-01-03 20:00:00+00:00"
+      },
+      "GBPJPY": {
+        "end": "2026-04-10 20:00:00+00:00",
+        "n_bars": 26165,
+        "start": "2010-01-03 20:00:00+00:00"
+      },
+      "GBPNZD": {
+        "end": "2026-04-10 20:00:00+00:00",
+        "n_bars": 26154,
+        "start": "2010-01-03 20:00:00+00:00"
+      },
+      "GBPUSD": {
+        "end": "2026-04-10 20:00:00+00:00",
+        "n_bars": 26169,
+        "start": "2010-01-03 20:00:00+00:00"
+      },
+      "NZDCAD": {
+        "end": "2026-04-10 20:00:00+00:00",
+        "n_bars": 26164,
+        "start": "2010-01-03 20:00:00+00:00"
+      },
+      "NZDCHF": {
+        "end": "2026-04-10 20:00:00+00:00",
+        "n_bars": 26168,
+        "start": "2010-01-03 20:00:00+00:00"
+      },
+      "NZDJPY": {
+        "end": "2026-04-10 20:00:00+00:00",
+        "n_bars": 26164,
+        "start": "2010-01-03 20:00:00+00:00"
+      },
+      "NZDUSD": {
+        "end": "2026-04-10 20:00:00+00:00",
+        "n_bars": 26162,
+        "start": "2010-01-03 20:00:00+00:00"
+      },
+      "USDCAD": {
+        "end": "2026-04-10 20:00:00+00:00",
+        "n_bars": 26164,
+        "start": "2010-01-03 20:00:00+00:00"
+      },
+      "USDCHF": {
+        "end": "2026-04-10 20:00:00+00:00",
+        "n_bars": 26165,
+        "start": "2010-01-03 20:00:00+00:00"
+      },
+      "USDJPY": {
+        "end": "2026-04-10 20:00:00+00:00",
+        "n_bars": 26165,
+        "start": "2010-01-03 20:00:00+00:00"
+      }
+    },
+    "d1_lag_perturbation": {
+      "n_nan_d1_atr_percentile_100": 0,
+      "n_nan_d1_close_slope_sign": 0,
+      "n_sampled": 3,
+      "verdict": "PASS"
+    },
+    "determinism": {
+      "run_1_sha256": "1e9839975883ac3a81761963e9b3ce06c64f446b62cb045be089490fccebd8aa",
+      "run_2_sha256": "1e9839975883ac3a81761963e9b3ce06c64f446b62cb045be089490fccebd8aa",
+      "verdict": "PASS"
+    },
+    "feature_lineage_summary": {
+      "clean": 23,
+      "suspect": 4,
+      "total_features": 27,
+      "unverified": 0
+    },
+    "kh24_co_fire": {
+      "status": "DEFERRED \u2014 KH-24 strategy not loaded at Step 1; informational only per dispatch."
+    },
+    "lookahead_spotcheck": {
+      "details": [
+        {
+          "break_magnitude_atr": 0.511605039744434,
+          "checks": {
+            "break_magnitude_positive": true,
+            "entry_after_signal": true,
+            "recompute_h_ref_matches": true,
+            "right_edge_offset_ge_4": true,
+            "trend_filter_swing_low_finite": true
+          },
+          "h_ref": 1.55676,
+          "h_ref_bar_offset": 4.0,
+          "overall": "PASS",
+          "pair": "EURCAD",
+          "signal_time": "2018-04-16 08:00:00+00:00"
+        },
+        {
+          "break_magnitude_atr": 0.1739837027862425,
+          "checks": {
+            "break_magnitude_positive": true,
+            "entry_after_signal": true,
+            "recompute_h_ref_matches": true,
+            "right_edge_offset_ge_4": true,
+            "trend_filter_swing_low_finite": true
+          },
+          "h_ref": 93.927,
+          "h_ref_bar_offset": 19.0,
+          "overall": "PASS",
+          "pair": "AUDJPY",
+          "signal_time": "2023-08-09 00:00:00+00:00"
+        },
+        {
+          "break_magnitude_atr": 0.6095268299624864,
+          "checks": {
+            "break_magnitude_positive": true,
+            "entry_after_signal": true,
+            "recompute_h_ref_matches": true,
+            "right_edge_offset_ge_4": true,
+            "trend_filter_swing_low_finite": true
+          },
+          "h_ref": 0.8916,
+          "h_ref_bar_offset": 6.0,
+          "overall": "PASS",
+          "pair": "AUDUSD",
+          "signal_time": "2010-08-27 12:00:00+00:00"
+        },
+        {
+          "break_magnitude_atr": 0.2115719659536248,
+          "checks": {
+            "break_magnitude_positive": true,
+            "entry_after_signal": true,
+            "recompute_h_ref_matches": true,
+            "right_edge_offset_ge_4": true,
+            "trend_filter_swing_low_finite": true
+          },
+          "h_ref": 0.99199,
+          "h_ref_bar_offset": 6.0,
+          "overall": "PASS",
+          "pair": "USDCHF",
+          "signal_time": "2019-06-11 12:00:00+00:00"
+        },
+        {
+          "break_magnitude_atr": 0.3500908798470433,
+          "checks": {
+            "break_magnitude_positive": true,
+            "entry_after_signal": true,
+            "recompute_h_ref_matches": true,
+            "right_edge_offset_ge_4": true,
+            "trend_filter_swing_low_finite": true
+          },
+          "h_ref": 1.7715,
+          "h_ref_bar_offset": 12.0,
+          "overall": "PASS",
+          "pair": "GBPAUD",
+          "signal_time": "2020-09-16 12:00:00+00:00"
+        },
+        {
+          "break_magnitude_atr": 1.2202049452006338,
+          "checks": {
+            "break_magnitude_positive": true,
+            "entry_after_signal": true,
+            "recompute_h_ref_matches": true,
+            "right_edge_offset_ge_4": true,
+            "trend_filter_swing_low_finite": true
+          },
+          "h_ref": 1.17744,
+          "h_ref_bar_offset": 8.0,
+          "overall": "PASS",
+          "pair": "EURUSD",
+          "signal_time": "2017-08-21 12:00:00+00:00"
+        },
+        {
+          "break_magnitude_atr": 0.3655532430151002,
+          "checks": {
+            "break_magnitude_positive": true,
+            "entry_after_signal": true,
+            "recompute_h_ref_matches": true,
+            "right_edge_offset_ge_4": true,
+            "trend_filter_swing_low_finite": true
+          },
+          "h_ref": 1.5301,
+          "h_ref_bar_offset": 5.0,
+          "overall": "PASS",
+          "pair": "GBPCAD",
+          "signal_time": "2010-04-07 16:00:00+00:00"
+        },
+        {
+          "break_magnitude_atr": 0.24943668180953804,
+          "checks": {
+            "break_magnitude_positive": true,
+            "entry_after_signal": true,
+            "recompute_h_ref_matches": true,
+            "right_edge_offset_ge_4": true,
+            "trend_filter_swing_low_finite": true
+          },
+          "h_ref": 94.558,
+          "h_ref_bar_offset": 7.0,
+          "overall": "PASS",
+          "pair": "CADJPY",
+          "signal_time": "2014-07-23 16:00:00+00:00"
+        },
+        {
+          "break_magnitude_atr": 0.656769388540626,
+          "checks": {
+            "break_magnitude_positive": true,
+            "entry_after_signal": true,
+            "recompute_h_ref_matches": true,
+            "right_edge_offset_ge_4": true,
+            "trend_filter_swing_low_finite": true
+          },
+          "h_ref": 1.30557,
+          "h_ref_bar_offset": 12.0,
+          "overall": "PASS",
+          "pair": "USDCAD",
+          "signal_time": "2016-07-08 12:00:00+00:00"
+        },
+        {
+          "break_magnitude_atr": 0.8228645418466727,
+          "checks": {
+            "break_magnitude_positive": true,
+            "entry_after_signal": true,
+            "recompute_h_ref_matches": true,
+            "right_edge_offset_ge_4": true,
+            "trend_filter_swing_low_finite": true
+          },
+          "h_ref": 1.85555,
+          "h_ref_bar_offset": 6.0,
+          "overall": "PASS",
+          "pair": "GBPNZD",
+          "signal_time": "2019-08-02 16:00:00+00:00"
+        }
+      ],
+      "n_fail": 0,
+      "n_pass": 10,
+      "n_sampled": 10,
+      "verdict": "PASS"
+    },
+    "per_pair_n": {
+      "max": 287,
+      "median": 256,
+      "min": 214,
+      "pairs_with_lt_30": [],
+      "pairs_with_zero": []
+    },
+    "pool_size": {
+      "min": 500,
+      "n": 7149,
+      "verdict": "PASS"
+    },
+    "right_edge_audit": {
+      "min_h_ref_bar_offset": 4.0,
+      "n_trades_with_offset_lt_4": 0,
+      "right_edge_required_offset": 4,
+      "verdict": "PASS"
+    },
+    "spread_mean_per_pair": {
+      "AUDCAD": 0.00032550833205931756,
+      "AUDCHF": 0.0003036279567427115,
+      "AUDJPY": 0.021010088657902787,
+      "AUDNZD": 0.00037939659125649705,
+      "AUDUSD": 0.00015926957917669957,
+      "CADCHF": 0.00032131205809287185,
+      "CADJPY": 0.02327537450321002,
+      "CHFJPY": 0.02806966790231968,
+      "EURAUD": 0.000348518575141416,
+      "EURCAD": 0.0003408185570162042,
+      "EURCHF": 0.0001729170806266714,
+      "EURGBP": 0.00015804631965145636,
+      "EURJPY": 0.01774083559496964,
+      "EURNZD": 0.0006187651914698456,
+      "EURUSD": 9.900000000000032e-05,
+      "GBPAUD": 0.0004925452523393154,
+      "GBPCAD": 0.0004889926186560597,
+      "GBPCHF": 0.0003922354740061162,
+      "GBPJPY": 0.033056831645327626,
+      "GBPNZD": 0.0009941982105987621,
+      "GBPUSD": 0.00019359088998433216,
+      "NZDCAD": 0.00040721258217397965,
+      "NZDCHF": 0.0004221266432283706,
+      "NZDJPY": 0.028247744993120365,
+      "NZDUSD": 0.00019987959636113455,
+      "USDCAD": 0.00020491362177037142,
+      "USDCHF": 0.00019135371679724825,
+      "USDJPY": 0.012122682973437797
+    }
+  },
+  "per_pair_coverage": {
+    "AUDCAD": {
+      "end": "2026-04-10 20:00:00+00:00",
+      "n_bars": 26164,
+      "start": "2010-01-03 20:00:00+00:00"
+    },
+    "AUDCHF": {
+      "end": "2026-04-10 20:00:00+00:00",
+      "n_bars": 26169,
+      "start": "2010-01-03 20:00:00+00:00"
+    },
+    "AUDJPY": {
+      "end": "2026-04-10 20:00:00+00:00",
+      "n_bars": 26168,
+      "start": "2010-01-03 20:00:00+00:00"
+    },
+    "AUDNZD": {
+      "end": "2026-04-10 20:00:00+00:00",
+      "n_bars": 26168,
+      "start": "2010-01-03 20:00:00+00:00"
+    },
+    "AUDUSD": {
+      "end": "2026-04-10 20:00:00+00:00",
+      "n_bars": 26163,
+      "start": "2010-01-03 20:00:00+00:00"
+    },
+    "CADCHF": {
+      "end": "2026-04-10 20:00:00+00:00",
+      "n_bars": 26165,
+      "start": "2010-01-03 20:00:00+00:00"
+    },
+    "CADJPY": {
+      "end": "2026-04-10 20:00:00+00:00",
+      "n_bars": 26168,
+      "start": "2010-01-03 20:00:00+00:00"
+    },
+    "CHFJPY": {
+      "end": "2026-04-10 20:00:00+00:00",
+      "n_bars": 26167,
+      "start": "2010-01-03 20:00:00+00:00"
+    },
+    "EURAUD": {
+      "end": "2026-04-10 20:00:00+00:00",
+      "n_bars": 26164,
+      "start": "2010-01-03 20:00:00+00:00"
+    },
+    "EURCAD": {
+      "end": "2026-04-10 20:00:00+00:00",
+      "n_bars": 26168,
+      "start": "2010-01-03 20:00:00+00:00"
+    },
+    "EURCHF": {
+      "end": "2026-04-10 20:00:00+00:00",
+      "n_bars": 26170,
+      "start": "2010-01-03 20:00:00+00:00"
+    },
+    "EURGBP": {
+      "end": "2026-04-10 20:00:00+00:00",
+      "n_bars": 26166,
+      "start": "2010-01-03 20:00:00+00:00"
+    },
+    "EURJPY": {
+      "end": "2026-04-10 20:00:00+00:00",
+      "n_bars": 26161,
+      "start": "2010-01-03 20:00:00+00:00"
+    },
+    "EURNZD": {
+      "end": "2026-04-10 20:00:00+00:00",
+      "n_bars": 26166,
+      "start": "2010-01-03 20:00:00+00:00"
+    },
+    "EURUSD": {
+      "end": "2026-04-10 20:00:00+00:00",
+      "n_bars": 26170,
+      "start": "2010-01-03 20:00:00+00:00"
+    },
+    "GBPAUD": {
+      "end": "2026-04-10 20:00:00+00:00",
+      "n_bars": 26076,
+      "start": "2010-01-03 20:00:00+00:00"
+    },
+    "GBPCAD": {
+      "end": "2026-04-10 20:00:00+00:00",
+      "n_bars": 26147,
+      "start": "2010-01-03 20:00:00+00:00"
+    },
+    "GBPCHF": {
+      "end": "2026-04-10 20:00:00+00:00",
+      "n_bars": 26160,
+      "start": "2010-01-03 20:00:00+00:00"
+    },
+    "GBPJPY": {
+      "end": "2026-04-10 20:00:00+00:00",
+      "n_bars": 26165,
+      "start": "2010-01-03 20:00:00+00:00"
+    },
+    "GBPNZD": {
+      "end": "2026-04-10 20:00:00+00:00",
+      "n_bars": 26154,
+      "start": "2010-01-03 20:00:00+00:00"
+    },
+    "GBPUSD": {
+      "end": "2026-04-10 20:00:00+00:00",
+      "n_bars": 26169,
+      "start": "2010-01-03 20:00:00+00:00"
+    },
+    "NZDCAD": {
+      "end": "2026-04-10 20:00:00+00:00",
+      "n_bars": 26164,
+      "start": "2010-01-03 20:00:00+00:00"
+    },
+    "NZDCHF": {
+      "end": "2026-04-10 20:00:00+00:00",
+      "n_bars": 26168,
+      "start": "2010-01-03 20:00:00+00:00"
+    },
+    "NZDJPY": {
+      "end": "2026-04-10 20:00:00+00:00",
+      "n_bars": 26164,
+      "start": "2010-01-03 20:00:00+00:00"
+    },
+    "NZDUSD": {
+      "end": "2026-04-10 20:00:00+00:00",
+      "n_bars": 26162,
+      "start": "2010-01-03 20:00:00+00:00"
+    },
+    "USDCAD": {
+      "end": "2026-04-10 20:00:00+00:00",
+      "n_bars": 26164,
+      "start": "2010-01-03 20:00:00+00:00"
+    },
+    "USDCHF": {
+      "end": "2026-04-10 20:00:00+00:00",
+      "n_bars": 26165,
+      "start": "2010-01-03 20:00:00+00:00"
+    },
+    "USDJPY": {
+      "end": "2026-04-10 20:00:00+00:00",
+      "n_bars": 26165,
+      "start": "2010-01-03 20:00:00+00:00"
+    }
+  },
+  "per_pair_n": {
+    "AUDCAD": 260,
+    "AUDCHF": 286,
+    "AUDJPY": 231,
+    "AUDNZD": 249,
+    "AUDUSD": 257,
+    "CADCHF": 286,
+    "CADJPY": 261,
+    "CHFJPY": 251,
+    "EURAUD": 270,
+    "EURCAD": 264,
+    "EURCHF": 269,
+    "EURGBP": 253,
+    "EURJPY": 215,
+    "EURNZD": 247,
+    "EURUSD": 263,
+    "GBPAUD": 254,
+    "GBPCAD": 256,
+    "GBPCHF": 268,
+    "GBPJPY": 214,
+    "GBPNZD": 233,
+    "GBPUSD": 249,
+    "NZDCAD": 287,
+    "NZDCHF": 272,
+    "NZDJPY": 235,
+    "NZDUSD": 273,
+    "USDCAD": 260,
+    "USDCHF": 255,
+    "USDJPY": 231
+  },
+  "per_pair_signal_fires": {
+    "AUDCAD": 607,
+    "AUDCHF": 652,
+    "AUDJPY": 629,
+    "AUDNZD": 612,
+    "AUDUSD": 637,
+    "CADCHF": 625,
+    "CADJPY": 639,
+    "CHFJPY": 637,
+    "EURAUD": 596,
+    "EURCAD": 632,
+    "EURCHF": 597,
+    "EURGBP": 619,
+    "EURJPY": 630,
+    "EURNZD": 599,
+    "EURUSD": 647,
+    "GBPAUD": 610,
+    "GBPCAD": 654,
+    "GBPCHF": 641,
+    "GBPJPY": 645,
+    "GBPNZD": 608,
+    "GBPUSD": 643,
+    "NZDCAD": 644,
+    "NZDCHF": 593,
+    "NZDJPY": 641,
+    "NZDUSD": 642,
+    "USDCAD": 639,
+    "USDCHF": 630,
+    "USDJPY": 643
+  },
+  "phase": "ARC_11_V3",
+  "protocol_version": "L_PROTOCOL v3.0 + Amendments 1+2 (2026-05-22)",
+  "run_timestamp_utc": "2026-05-22 07:40:08",
+  "sha256": {
+    "config": "23bd7eae84b31926ed3b6d914d4b3b4c92d7ce665f366b21de2971b7c2eb2598",
+    "feature_lineage_csv": "a549de469990cd9b5df172b0bc19ef89f2202de1d04d60203414e1324616fed1",
+    "pool_csv": "b25933e7010024fe2fcb9e2c46433a6caab772247ed9c8e5d997f36a65bb697b",
+    "pool_parquet": "1b6ed874958a188e3de24ec9a2315e0db074f3256d7e4fa09b032978ec3dfffc",
+    "signal_module": "1d2274983b4382fe654fc1d698ded5fa607c36721a59c2cc47f8bf723ecf93f6",
+    "spec_doc": "18e2a89da6026386674e530612c2ec4d1d93dae4cacb84d2fa3c022477471f61",
+    "trades_paths_parquet": "dfb613d8897957525082a7ea881a692d93ecc6a63f3902b7e9d786c00d136d85"
+  },
+  "signal_module": "signals.lchar_swing_high_breakout_trend",
+  "signal_params": {
+    "atr_period": 14,
+    "atr_smoothing": "wilder",
+    "break_buffer_atr": 0.1,
+    "close_upper_half_min": 0.5,
+    "h_ref_lookback": 20,
+    "refractory_bars": 20,
+    "right_edge_offset": 4,
+    "swing_k": 3,
+    "trend_filter_lookback": 30
+  },
+  "step": 1,
+  "totals": {
+    "feature_columns": 27,
+    "pool_size": 7149,
+    "signal_fires_total": 17591,
+    "trades_after_exposure_cap": 7149
+  }
+}

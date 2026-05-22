@@ -1,0 +1,48 @@
+{
+  "candidate_clusters": [
+    0
+  ],
+  "classifiers_run": [
+    "random_forest",
+    "logistic",
+    "lgbm"
+  ],
+  "env": {
+    "numpy": "2.4.4",
+    "pandas": "3.0.2",
+    "python": "3.14.0"
+  },
+  "feature_columns_n": 32,
+  "per_cluster_summary": {
+    "0": {
+      "auc_best_threshold": 0.267018076520682,
+      "best_classifier": "random_forest",
+      "best_classifier_auc": 0.6872665286550296,
+      "top10_features": [
+        "w1_close_slope_sign",
+        "kijun_26_distance",
+        "day_of_week",
+        "break_magnitude_atr",
+        "eur_strength_index",
+        "swing_low_distance_14",
+        "atr_vs_trailing_100",
+        "atr_percentile_100",
+        "distance_to_round_number",
+        "usd_strength_index"
+      ]
+    }
+  },
+  "run_timestamp_utc": "2026-05-22 07:43:13",
+  "sha256": {
+    "audit_swing_features_md": "7ea3714546fbcd3ce33539d8f1fade64f389112f80f9652bd3c7715ebee4f6f0",
+    "extraction_metrics_csv": "dd8bdba35fc6fcb7215de71828e9485a2e2b61addb6b51317a8b41af45709d36",
+    "feature_importance_csv": "209d32f70658a1ad36c6909aef51b11348d6a794c32b65f835a0ccf451b9ce84"
+  },
+  "step": 4,
+  "swing_features_in_top10_per_cluster": {
+    "0": [
+      "break_magnitude_atr",
+      "swing_low_distance_14"
+    ]
+  }
+}

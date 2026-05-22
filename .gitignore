@@ -124,12 +124,14 @@ results/l_arc_8/step1_quicktest/
 # (L_ARC_PROTOCOL v2.3 §13: arc results data is direct-to-main).
 !results/l_arc_10/
 !results/l_arc_10/**
-# Arc 11 (swing-high breakout in trend, long, 4H) — Step 1+ outputs
-# (L_ARC_PROTOCOL v2.3 §13: arc results data is direct-to-main). trades_paths.csv
-# excluded (43MB; regenerable from script + config).
+# Arc 11 v3.0 (swing-high breakout in trend, long, 4H) — closure + artefacts
+# tracked per L_PROTOCOL v3.0 §6. Trade-path parquet excluded (>40 MB; regen
+# from script + config). v2-era trades_paths.csv name also excluded.
 !results/l_arc_11/
 !results/l_arc_11/**
 results/l_arc_11/**/trades_paths.csv
+results/l_arc_11/**/trades_paths.parquet
+results/l_arc_11/**/run.log
 # v2.1.1 Open-18 empirical replays (per-cohort: arc_3_stepwise, kh24_v2_c4,
 # arc_2_redo_c2). Track all small CSVs + REPLAY_RESULT.md; exclude the large
 # regenerable forward-extended paths CSV (~40-50MB per cohort; rebuildable

@@ -52,7 +52,12 @@ def _gen_side_rows(
     spread_price = spec.spread_pips * 0.0001  # pip = 0.0001 for non-JPY pairs
 
     rows: list[tuple[str, float, float, float, float, int]] = []
-    for i in range(spec.minutes_per_month):
+    from calendar import monthrange
+
+    _, last_day = monthrange(year, month)
+    minutes_per_day = 24 * 60
+    cap = min(spec.minutes_per_month, last_day * minutes_per_day)
+    for i in range(cap):
         # Bid OHLC: small zigzag — open = base, high = base + 1.5pip,
         # low = base - 0.5pip, close = base + 1pip + i%3 * 0.1pip
         b = start_bid + i * 0.00002
@@ -62,10 +67,12 @@ def _gen_side_rows(
         c = round(b + 0.00010 + (i % 3) * 0.00001, 5)
         if side == "ask":
             o, h, lo, c = (round(x + spread_price, 5) for x in (o, h, lo, c))
-        ts = f"{year:04d}-{month:02d}-{i // 60 + 1:02d}T{i // 60 * 0:02d}:{i % 60:02d}:00Z"
-        # Keep timestamps in-month and unique per minute. Below we use a
-        # cleaner day-1 sequence — i ∈ [0,12), so all timestamps land on day 1.
-        ts = f"{year:04d}-{month:02d}-01T00:{i:02d}:00Z"
+        # Walk forward minute-by-minute within the month: day rolls every 1440 min.
+        day = i // minutes_per_day + 1
+        within_day = i % minutes_per_day
+        hour = within_day // 60
+        minute = within_day % 60
+        ts = f"{year:04d}-{month:02d}-{day:02d}T{hour:02d}:{minute:02d}:00Z"
         volume = 5 + (i % 4)
         rows.append((ts, o, h, lo, c, volume))
     return rows

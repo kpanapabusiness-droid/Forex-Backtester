@@ -1,0 +1,17 @@
+{
+  "artefacts": {
+    "capturability.csv": {
+      "sha256": "478a2c7fdf0bc771866f5d70923d9c3c088f7c50d7932bb55ce44cebe66bd255",
+      "size_bytes": 964
+    },
+    "capturability_summary.md": {
+      "sha256": "83d1c4bdb5072c15cb249358a16daad51cb36eb493b3537c85f8b8dbc51883c7",
+      "size_bytes": 3448
+    },
+    "sl_sweep.csv": {
+      "sha256": "bd9b793a24de188ec61de272f36ef6e8a5196dbb037db6951a70f4f630a16d60",
+      "size_bytes": 4569
+    }
+  },
+  "generated_at": "2026-05-22T07:14:29Z"
+}

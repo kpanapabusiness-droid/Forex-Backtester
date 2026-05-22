@@ -375,6 +375,14 @@ invocations produce byte-identical output.
 - Step 6 producer-audit procedures — defined in L_PROTOCOL §2 Step 6
 - ML / classifier choices — sub-protocol per arc (hook empty at v3.0;
   see [PROTOCOL_RUNTIME.md §11](PROTOCOL_RUNTIME.md))
+- Step 4 classifier persistence — the best-AUC classifier per
+  candidate cluster is refit on the full lineage-filtered pool and
+  pickled to `results/<arc>/step_4/classifiers/<cluster_id>.pkl`
+  with a SHA256 + provenance `manifest.json`. A2 / A6 architectures
+  load it without retraining via
+  `core.steps.classifier_persistence.build_a2_config_from_step4` /
+  `build_a6_config_from_step4`. Full reference:
+  [PROTOCOL_RUNTIME.md §7](PROTOCOL_RUNTIME.md).
 - Live deployment EA — `EA/KH24_EA.mq5` is the only deployed system;
   ports of v3 candidates open only when a candidate clears
   PASS-DEPLOYABLE per §3.

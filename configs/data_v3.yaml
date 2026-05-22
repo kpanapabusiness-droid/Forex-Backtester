@@ -21,6 +21,20 @@ data:
   #   *.parquet.meta.json            (sidecar with cache_key + source manifest sha256)
   cache_root: data/cache
 
+# PR-D — per-pair parallelism via multiprocessing.Pool. See core/parallel.py.
+parallelism:
+  # null → use default_pool_size(): min(n_pairs, max(1, cpu_count() - 1)).
+  # Set to 1 to force serial execution (determinism tests use this).
+  # Set to an int N to override (e.g. on CI with constrained cores).
+  pool_size: null
+
+# PR-D — determinism invariants. See core/determinism.py.
+determinism:
+  random_state: 42
+  # n_jobs: 1 is hardcoded inside any model fit / per-row computation —
+  # parallelism lives between work units (per-pair), not inside them.
+  text_line_terminator: "\n"
+
 # 28-pair universe — same set as KH-24 and the L_arc series.
 pairs:
   - AUDCAD

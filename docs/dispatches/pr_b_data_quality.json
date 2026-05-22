@@ -1,0 +1,293 @@
+{
+  "per_pair": [
+    {
+      "bad_pct": 0.0,
+      "bad_total": 0,
+      "nan_bid_or_ask": 0,
+      "ok": 5983418,
+      "pair": "AUDCAD",
+      "tf": "M1",
+      "total_bars": 5983418,
+      "zero_or_neg_spread": 0
+    },
+    {
+      "bad_pct": 0.0,
+      "bad_total": 0,
+      "nan_bid_or_ask": 0,
+      "ok": 5991708,
+      "pair": "AUDCHF",
+      "tf": "M1",
+      "total_bars": 5991708,
+      "zero_or_neg_spread": 0
+    },
+    {
+      "bad_pct": 0.0,
+      "bad_total": 0,
+      "nan_bid_or_ask": 0,
+      "ok": 5991955,
+      "pair": "AUDJPY",
+      "tf": "M1",
+      "total_bars": 5991955,
+      "zero_or_neg_spread": 0
+    },
+    {
+      "bad_pct": 0.0,
+      "bad_total": 0,
+      "nan_bid_or_ask": 0,
+      "ok": 5988525,
+      "pair": "AUDNZD",
+      "tf": "M1",
+      "total_bars": 5988525,
+      "zero_or_neg_spread": 0
+    },
+    {
+      "bad_pct": 1.0094317942078131e-06,
+      "bad_total": 6,
+      "nan_bid_or_ask": 0,
+      "ok": 5943932,
+      "pair": "AUDUSD",
+      "tf": "M1",
+      "total_bars": 5943938,
+      "zero_or_neg_spread": 6
+    },
+    {
+      "bad_pct": 0.0,
+      "bad_total": 0,
+      "nan_bid_or_ask": 0,
+      "ok": 5959542,
+      "pair": "CADCHF",
+      "tf": "M1",
+      "total_bars": 5959542,
+      "zero_or_neg_spread": 0
+    },
+    {
+      "bad_pct": 0.0,
+      "bad_total": 0,
+      "nan_bid_or_ask": 0,
+      "ok": 5985906,
+      "pair": "CADJPY",
+      "tf": "M1",
+      "total_bars": 5985906,
+      "zero_or_neg_spread": 0
+    },
+    {
+      "bad_pct": 0.0,
+      "bad_total": 0,
+      "nan_bid_or_ask": 0,
+      "ok": 5981864,
+      "pair": "CHFJPY",
+      "tf": "M1",
+      "total_bars": 5981864,
+      "zero_or_neg_spread": 0
+    },
+    {
+      "bad_pct": 0.0,
+      "bad_total": 0,
+      "nan_bid_or_ask": 0,
+      "ok": 6001531,
+      "pair": "EURAUD",
+      "tf": "M1",
+      "total_bars": 6001531,
+      "zero_or_neg_spread": 0
+    },
+    {
+      "bad_pct": 1.6679515453404271e-07,
+      "bad_total": 1,
+      "nan_bid_or_ask": 0,
+      "ok": 5995377,
+      "pair": "EURCAD",
+      "tf": "M1",
+      "total_bars": 5995378,
+      "zero_or_neg_spread": 1
+    },
+    {
+      "bad_pct": 0.0,
+      "bad_total": 0,
+      "nan_bid_or_ask": 0,
+      "ok": 5859740,
+      "pair": "EURCHF",
+      "tf": "M1",
+      "total_bars": 5859740,
+      "zero_or_neg_spread": 0
+    },
+    {
+      "bad_pct": 0.0,
+      "bad_total": 0,
+      "nan_bid_or_ask": 0,
+      "ok": 5912192,
+      "pair": "EURGBP",
+      "tf": "M1",
+      "total_bars": 5912192,
+      "zero_or_neg_spread": 0
+    },
+    {
+      "bad_pct": 0.0,
+      "bad_total": 0,
+      "nan_bid_or_ask": 0,
+      "ok": 5991374,
+      "pair": "EURJPY",
+      "tf": "M1",
+      "total_bars": 5991374,
+      "zero_or_neg_spread": 0
+    },
+    {
+      "bad_pct": 8.352005633928921e-07,
+      "bad_total": 5,
+      "nan_bid_or_ask": 0,
+      "ok": 5986581,
+      "pair": "EURNZD",
+      "tf": "M1",
+      "total_bars": 5986586,
+      "zero_or_neg_spread": 5
+    },
+    {
+      "bad_pct": 4.3588098504408515e-06,
+      "bad_total": 26,
+      "nan_bid_or_ask": 0,
+      "ok": 5964905,
+      "pair": "EURUSD",
+      "tf": "M1",
+      "total_bars": 5964931,
+      "zero_or_neg_spread": 26
+    },
+    {
+      "bad_pct": 0.0,
+      "bad_total": 0,
+      "nan_bid_or_ask": 0,
+      "ok": 5973942,
+      "pair": "GBPAUD",
+      "tf": "M1",
+      "total_bars": 5973942,
+      "zero_or_neg_spread": 0
+    },
+    {
+      "bad_pct": 3.346447503357742e-07,
+      "bad_total": 2,
+      "nan_bid_or_ask": 0,
+      "ok": 5976485,
+      "pair": "GBPCAD",
+      "tf": "M1",
+      "total_bars": 5976487,
+      "zero_or_neg_spread": 2
+    },
+    {
+      "bad_pct": 0.0,
+      "bad_total": 0,
+      "nan_bid_or_ask": 0,
+      "ok": 5981372,
+      "pair": "GBPCHF",
+      "tf": "M1",
+      "total_bars": 5981372,
+      "zero_or_neg_spread": 0
+    },
+    {
+      "bad_pct": 0.0,
+      "bad_total": 0,
+      "nan_bid_or_ask": 0,
+      "ok": 5986994,
+      "pair": "GBPJPY",
+      "tf": "M1",
+      "total_bars": 5986994,
+      "zero_or_neg_spread": 0
+    },
+    {
+      "bad_pct": 3.348698837951273e-07,
+      "bad_total": 2,
+      "nan_bid_or_ask": 0,
+      "ok": 5972467,
+      "pair": "GBPNZD",
+      "tf": "M1",
+      "total_bars": 5972469,
+      "zero_or_neg_spread": 2
+    },
+    {
+      "bad_pct": 0.0,
+      "bad_total": 0,
+      "nan_bid_or_ask": 0,
+      "ok": 5952993,
+      "pair": "GBPUSD",
+      "tf": "M1",
+      "total_bars": 5952993,
+      "zero_or_neg_spread": 0
+    },
+    {
+      "bad_pct": 0.0,
+      "bad_total": 0,
+      "nan_bid_or_ask": 0,
+      "ok": 5943505,
+      "pair": "NZDCAD",
+      "tf": "M1",
+      "total_bars": 5943505,
+      "zero_or_neg_spread": 0
+    },
+    {
+      "bad_pct": 0.0,
+      "bad_total": 0,
+      "nan_bid_or_ask": 0,
+      "ok": 5956242,
+      "pair": "NZDCHF",
+      "tf": "M1",
+      "total_bars": 5956242,
+      "zero_or_neg_spread": 0
+    },
+    {
+      "bad_pct": 0.0,
+      "bad_total": 0,
+      "nan_bid_or_ask": 0,
+      "ok": 5965949,
+      "pair": "NZDJPY",
+      "tf": "M1",
+      "total_bars": 5965949,
+      "zero_or_neg_spread": 0
+    },
+    {
+      "bad_pct": 0.0,
+      "bad_total": 0,
+      "nan_bid_or_ask": 0,
+      "ok": 5873328,
+      "pair": "NZDUSD",
+      "tf": "M1",
+      "total_bars": 5873328,
+      "zero_or_neg_spread": 0
+    },
+    {
+      "bad_pct": 0.0,
+      "bad_total": 0,
+      "nan_bid_or_ask": 0,
+      "ok": 5861972,
+      "pair": "USDCAD",
+      "tf": "M1",
+      "total_bars": 5861972,
+      "zero_or_neg_spread": 0
+    },
+    {
+      "bad_pct": 0.0,
+      "bad_total": 0,
+      "nan_bid_or_ask": 0,
+      "ok": 5912162,
+      "pair": "USDCHF",
+      "tf": "M1",
+      "total_bars": 5912162,
+      "zero_or_neg_spread": 0
+    },
+    {
+      "bad_pct": 0.0,
+      "bad_total": 0,
+      "nan_bid_or_ask": 0,
+      "ok": 5874673,
+      "pair": "USDJPY",
+      "tf": "M1",
+      "total_bars": 5874673,
+      "zero_or_neg_spread": 0
+    }
+  ],
+  "totals": {
+    "bad_pct": 2.518428359671577e-07,
+    "bad_total": 42,
+    "n_summaries": 28,
+    "nan_bid_or_ask": 0,
+    "ok": 166770634,
+    "total_bars": 166770676,
+    "zero_or_neg_spread": 42
+  }
+}

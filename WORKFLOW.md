@@ -35,6 +35,17 @@ Every non-trivial CC dispatch follows this pattern:
 
 The intent → log → PR pattern is mandatory for any CC dispatch touching more than 2-3 files. For trivial single-file edits the pattern can be skipped.
 
+### Arc-close artefact set
+
+When the work is an arc closure, the artefact set on the arc branch includes the tracker update produced by the parser:
+
+1. CC writes `results/<arc>/ARC_CLOSURE.md` per `docs/templates/ARC_CLOSURE_TEMPLATE.md`.
+2. CC runs `python scripts/update_tracker_from_closure.py results/<arc>/ARC_CLOSURE.md`.
+3. CC commits the closure doc + the tracker delta (`ARC_TRACKER.md`, `scripts/tracker_parser/rolling_state.json`, `scripts/tracker_parser/parsed.log`) in one atomic commit on the arc branch.
+4. CC opens the closure PR. Chat reviews + merges.
+
+The parser invocation is pre-PR, not post-merge — so reviewers see the tracker change in the same diff as the closure. See `scripts/tracker_parser/README.md` for full usage.
+
 ---
 
 ## §3 Branch + worktree conventions

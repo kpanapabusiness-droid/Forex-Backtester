@@ -8,7 +8,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from scripts.update_tracker_from_closure import _validate_v12_pass_verdict, main as cli_main
+from scripts.update_tracker_from_closure import _validate_v12_pass_verdict
+from scripts.update_tracker_from_closure import main as cli_main
 
 
 def _valid_closure_text(

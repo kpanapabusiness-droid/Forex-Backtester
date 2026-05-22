@@ -60,8 +60,8 @@ def test_v12_pass_verdict_validation_passes_against_live_repo(
     closure_arc_10: Path, request: pytest.FixtureRequest
 ) -> None:
     """Full CLI validation gate runs clean — config file exists, §4 present, flag true."""
-    from scripts.update_tracker_from_closure import _validate_v12_pass_verdict
     import scripts.update_tracker_from_closure as cli
+    from scripts.update_tracker_from_closure import _validate_v12_pass_verdict
 
     payload = extract.extract_payload(closure_arc_10)
     normalised = schema.parse_payload(payload)

@@ -4,7 +4,7 @@
 > Schema locked at v3.0. Replaces STATUS.md, CHANGELOG.md, ARC_QUEUE.md, and ACTIVE_ARCS.md.
 > First populated on first arc open under L_PROTOCOL v3.0.
 
-Last auto-update: manual: 2026-05-22 (Arc 10 Step 6 causal audit clean — `re_evaluated_verdict` upgraded from `PASS-DEPLOYABLE-PROVISIONAL` to `PASS-DEPLOYABLE` per Amendment 3 §"Evaluation order" item 3; see `results/l_arc_10/step_6/audit_report.md`. Prior update: 2026-05-22 Amendment 3 re-evaluation: arcs 8, 10, 11 — added `re_evaluated_verdict` column to Closed arcs summary; backfilled missing rows for arcs 8 and 10.)
+Last auto-update: parser: 2026-05-22 00:00:00
 
 ---
 
@@ -32,16 +32,21 @@ Last auto-update: manual: 2026-05-22 (Arc 10 Step 6 causal audit clean — `re_e
 
 | Feature | Arcs used | Avg WFO ratio with | Avg WFO ratio without | Verdict |
 |---|---|---|---|---|
-| w1_close_slope_sign | 1 | -0.769 | — | INSUFFICIENT |
-| d1_atr_percentile_100 | 1 | -0.769 | — | INSUFFICIENT |
-| prior_session_low_distance | 1 | -0.769 | — | INSUFFICIENT |
-| day_of_week | 1 | -0.769 | — | INSUFFICIENT |
-| session_london | 1 | -0.769 | — | INSUFFICIENT |
-| d1_close_slope_magnitude | 1 | -0.769 | — | INSUFFICIENT |
-| distance_to_round_number | 1 | -0.769 | — | INSUFFICIENT |
-| atr_percentile_100 | 1 | -0.769 | — | INSUFFICIENT |
-| usd_strength_index | 1 | -0.769 | — | INSUFFICIENT |
-| spread_vs_trailing_100 | 1 | -0.769 | — | INSUFFICIENT |
+| w1_close_slope_sign | 1 | -0.769 | 3.584 | INSUFFICIENT |
+| d1_atr_percentile_100 | 1 | -0.769 | 3.584 | INSUFFICIENT |
+| prior_session_low_distance | 2 | 0.490 | 5.418 | INSUFFICIENT |
+| day_of_week | 1 | -0.769 | 3.584 | INSUFFICIENT |
+| session_london | 1 | -0.769 | 3.584 | INSUFFICIENT |
+| d1_close_slope_magnitude | 1 | -0.769 | 3.584 | INSUFFICIENT |
+| distance_to_round_number | 2 | 0.490 | 5.418 | INSUFFICIENT |
+| atr_percentile_100 | 2 | 0.490 | 5.418 | INSUFFICIENT |
+| usd_strength_index | 2 | 0.490 | 5.418 | INSUFFICIENT |
+| spread_vs_trailing_100 | 2 | 0.490 | 5.418 | INSUFFICIENT |
+| swing_low_distance_14 | 1 | 1.749 | 5.418 | INSUFFICIENT |
+| atr_vs_trailing_100 | 1 | 1.749 | 5.418 | INSUFFICIENT |
+| kijun_26_distance | 1 | 1.749 | 5.418 | INSUFFICIENT |
+| dollar_bloc_state | 1 | 1.749 | 5.418 | INSUFFICIENT |
+| spread_percentile_100 | 1 | 1.749 | 5.418 | INSUFFICIENT |
 
 Schema:
 - `Avg WFO ratio with` — mean worst-fold ratio across arcs where this feature appeared in the winning config
@@ -54,12 +59,12 @@ Schema:
 
 | Architecture | Arcs tested | Won (best in arc) | Avg ratio when won |
 |---|---|---|---|
-| A1 system_level_filter | 1 | 0 | — |
+| A1 system_level_filter | 3 | 1 | 5.418 |
 | A2 classifier_filter | 1 | 0 | — |
-| A3 pipeline_de | 0 | 0 | — |
+| A3 pipeline_de | 1 | 0 | — |
 | A4 pipeline_d_exits | 0 | 0 | — |
 | A5 portfolio_composition | 0 | 0 | — |
-| A6 meta_labeling | 1 | 0 | — |
+| A6 meta_labeling | 3 | 1 | 1.749 |
 
 Note: Arc 11 has no architecture row marked "Won" because no config met §3 PASS thresholds. A2 is "best of FAIL" (highest worst_fold_ratio among configs that admitted trades); A6 admitted zero trades.
 
@@ -69,12 +74,12 @@ Note: Arc 11 has no architecture row marked "Won" because no config met §3 PASS
 
 | Archetype | Arcs where appeared | Avg in-cluster R | Avg in-cluster reach_1R |
 |---|---|---|---|
-| V-shape recovery | 0 | — | — |
+| V-shape recovery | 2 | 6.40 | 0.986 |
 | Stepwise climber | 0 | — | — |
 | Bimodal | 1 | 7.77 | 1.000 |
 | Monotonic up | 0 | — | — |
-| Monotonic down | 1 | 0.09 | 0.001 |
-| Choppy | 0 | — | — |
+| Monotonic down | 3 | 1.31 | 0.303 |
+| Choppy | 1 | 1.25 | 0.598 |
 | Unclassified | 1 | 1.31 | 0.504 |
 | Other / unclassified | 0 | — | — |
 
@@ -89,7 +94,7 @@ Note: "in-cluster R" tracked as `mfe_p50_r` per template §4.E. Unclassified row
 | pool_too_small | 0 | — | — |
 | no_clusters_separable | 0 | — | — |
 | no_capturable_cluster | 0 | — | — |
-| entry_feature_auc_ceiling | 0 | — | — |
+| entry_feature_auc_ceiling | 1 | l_arc_8 | 2026-05-22 |
 | step5_not_scalable | 0 | — | — |
 | step5_chained_dd_above_gate | 0 | — | — |
 | step5_daily_dd_breach | 0 | — | — |
@@ -119,6 +124,12 @@ Note: "in-cluster R" tracked as `mfe_p50_r` per template §4.E. Unclassified row
 | l_arc_11.c1 | Unclassified | 6287 | 2.1087 | 0.0350 | 0.9648 | 0.9678 | 0.6316 | — | 1.5 | dies_step4 |
 | l_arc_11.c2 | Unclassified | 5032 | 0.5111 | 0.9680 | 0.0425 | 0.1899 | — | — | 1.5 | dies_step3 |
 | l_arc_11.c3 | Monotonic_down | 4022 | 0.0901 | 0.9993 | 0.0007 | 0.0221 | — | — | 1.5 | dies_step3 |
+| l_arc_8.c0 | Monotonic_down | 1657 | 0.0690 | 0.0284 | 0.0000 | 0.3930 | — | — | 4.0 | dies_step3 |
+| l_arc_8.c1 | Choppy | 3560 | 1.2460 | 0.4003 | 0.5978 | 0.5620 | — | — | 1.5 | dies_step3 |
+| l_arc_8.c2 | V-shape | 1540 | 7.5270 | 0.0000 | 1.0000 | 1.0000 | 0.5300 | — | 1.5 | dies_step5 |
+| l_arc_10.c0 | monotonic_down | 1771 | 1.9950 | 0.5280 | 0.7100 | 0.6347 | — | — | 1.5 | dies_step3 |
+| l_arc_10.c1 | v_shape_recovery | 1528 | 5.2670 | 0.5060 | 0.9730 | 0.8628 | 0.5199 | — | 4.0 | wins_step5 |
+| l_arc_10.c2 | monotonic_down | 2 | 3.0710 | 0.5000 | 0.5000 | 0.6750 | — | — | 1.5 | dies_step3 |
 
 Schema:
 - `Cluster ID` — `<arc_name>.<cluster_id>` (e.g., `arc_07.c1`)
@@ -147,6 +158,17 @@ Schema:
 | shb_swing_detection_causal_clean_arc9_lesson_passed | 1 | l_arc_11 |
 | canonical_orchestrator_step5_run_context_gap | 1 | l_arc_11 |
 | step1_pool_uncapped_canonical_vs_capped_handrolled_2_5x_delta | 1 | l_arc_11 |
+| v_shape_auc_ceiling | 1 | l_arc_8 |
+| step4_classifier_at_chance | 1 | l_arc_8 |
+| oracle_real_gap_massive | 1 | l_arc_8 |
+| multi_tf_features_absent_at_step1 | 1 | l_arc_8 |
+| search_wfo_fail_holdout_pass_pattern | 1 | l_arc_8 |
+| v_shape_archetype_cross_arc_persistence | 1 | l_arc_10 |
+| exit_policy_dominates_classifier | 1 | l_arc_10 |
+| no_classifier_needed_for_v_shape_pass_viable | 1 | l_arc_10 |
+| v3_engine_first_pass_viable | 1 | l_arc_10 |
+| step4_auc_chance_full_pool_still_passes_via_exit_policy | 1 | l_arc_10 |
+| oracle_locked_to_sl_only_unfair_upper_bound | 1 | l_arc_10 |
 
 ---
 

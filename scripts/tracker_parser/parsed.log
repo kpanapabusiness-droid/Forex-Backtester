@@ -1,3 +1,5 @@
 # tracker_parser parsed-closures registry
 # one line per parse: <sha256>  <arc_name>
-16bc090125644bb42bb065bc3153e71b53e33d14153f9840d712dd0ef9e97661  l_arc_11
+0cc50c06e6107d5e05d6fde7fed64da33abacd49ccf4fe3d1fca68284b2095c1  l_arc_11
+0f9d4dfd2e40026249bec7797107476edf4787bbab44e55cf28cabcd1d2a6713  l_arc_10
+c9fb88a8b22c2ff51fdcb1525e57c25c1611190ffe321b7c4ecaab472bf92558  l_arc_8

@@ -19,18 +19,23 @@ Exit codes:
 from __future__ import annotations
 
 import argparse
-import copy
 import logging
 import sys
 from pathlib import Path
-from typing import Any
 
 # Ensure repo root is importable when invoked as a script
 _REPO_ROOT = Path(__file__).resolve().parent.parent
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-from scripts.tracker_parser import extract, mapping, registry, rolling_state, schema, tracker_io
+from scripts.tracker_parser import (  # noqa: E402
+    extract,
+    mapping,
+    registry,
+    rolling_state,
+    schema,
+    tracker_io,
+)
 
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -127,7 +132,6 @@ def main(argv: list[str] | None = None) -> int:
     rolling = rolling_state.load_state(args.rolling_state)
 
     before_bytes = state.to_bytes()
-    rolling_snapshot = copy.deepcopy(rolling)
 
     # 4. Apply mappings
     try:

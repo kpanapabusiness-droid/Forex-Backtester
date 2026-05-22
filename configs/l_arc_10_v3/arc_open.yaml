@@ -1,0 +1,103 @@
+# Arc 10 v3.0 — open config (locked at Step 1)
+# Signal: D1 swing-low rejection long (DLR), v0.1 per
+# docs/archive/signal_specs/signal_spec_d1_swing_low_rejection_long_v0.1.md
+# Protocol: L_PROTOCOL.md v3.0 vanilla
+# Engine: v3 backtester (HistData M1 bid+ask, multi-pair sim)
+
+arc_name: l_arc_10
+protocol_version: v3.0
+sub_protocol: vanilla
+
+# HistData lives in the main checkout (worktree gitignores data/histdata content).
+# Cache writes go to data/cache in the worktree.
+data:
+  histdata_root: "C:/Users/panap/Documents/Forex-Backtester/data/histdata"
+  cache_root: "data/cache"
+
+window:
+  start: "2010-01-01"
+  end: "2026-04-30"   # most recent complete month relative to 2026-05-22
+
+tf:
+  primary: H4
+  anchor: D1
+  cross_pair_aux: [D1, W1]
+
+pairs:
+  - AUDCAD
+  - AUDCHF
+  - AUDJPY
+  - AUDNZD
+  - AUDUSD
+  - CADCHF
+  - CADJPY
+  - CHFJPY
+  - EURAUD
+  - EURCAD
+  - EURCHF
+  - EURGBP
+  - EURJPY
+  - EURNZD
+  - EURUSD
+  - GBPAUD
+  - GBPCAD
+  - GBPCHF
+  - GBPJPY
+  - GBPNZD
+  - GBPUSD
+  - NZDCAD
+  - NZDCHF
+  - NZDJPY
+  - NZDUSD
+  - USDCAD
+  - USDCHF
+  - USDJPY
+
+risk_per_trade: 0.005  # 0.5% per L arc convention
+
+signal:
+  module: signals.lchar_dlr_long
+  spec: docs/archive/signal_specs/signal_spec_d1_swing_low_rejection_long_v0.1.md
+  # Mirror of locked module constants — asserted at runtime.
+  d1_swing_window_k: 3
+  d1_right_edge_offset: 4
+  d1_structure_lookback_bars: 30
+  d1_l1_freshness_max_bars: 20
+  atr_period_4h: 14
+  proximity_atr_mult: 0.25
+  reject_buffer_atr_mult: 0.10
+  upper_fraction_min: 0.6
+  refractory_bars_4h: 20
+
+step_1:
+  # Per dispatch §Step 1 — Plumbing.
+  sl:
+    atr_period: 14
+    atr_multiplier: 2.0
+  exit:
+    horizon_bars: 240          # signal's natural 4H horizon
+    path_forward_bars: 240
+  exposure:
+    cap_mode: unrestricted     # per dispatch — Step 5 will sweep {2, unlimited}
+  features:
+    use_default_27: true       # L_PROTOCOL §2 Step 1 default
+    arc_extras:                # per-arc signal-bar metadata carried into pool
+      - L1_value
+      - L0_value
+      - L1_age_d1_bars
+      - L0_age_d1_bars
+      - L1_to_atr_proximity
+      - reject_buffer_atr
+      - upper_fraction
+      - atr14_at_signal
+  integrity:
+    lookahead_spotcheck_n: 10        # elevated from default 5 per dispatch
+    d1_lag_nan_perturbation_n: 5     # elevated from default 3 per dispatch
+    require_two_run_determinism: true
+
+output:
+  results_dir: results/l_arc_10/step_1
+  pool_parquet: pool.parquet
+  integrity_md: integrity_report.md
+  manifest_json: manifest.json
+  float_format: "%.10g"

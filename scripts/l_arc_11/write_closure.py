@@ -14,7 +14,6 @@ import datetime as dt
 import json
 import sys
 from pathlib import Path
-from typing import Any
 
 import pandas as pd
 import yaml
@@ -81,8 +80,8 @@ def main() -> int:
     pool_size = int(summary["pool_size"])
     arc_verdict = VERDICT_NORMALISED.get(summary["verdict"], summary["verdict"])
     primary_cluster = summary.get("primary_cluster")
-    primary_classifier = summary.get("primary_classifier")
-    primary_threshold = float(summary.get("primary_threshold", 0.5))
+    # primary_classifier + primary_threshold not consumed by the closure writer;
+    # they live in run_summary.json for downstream tools (tracker parser etc.)
 
     # Candidates ranked (search_results is already sorted desc by worst_fold_ratio)
     search = list(summary.get("search_results", []))

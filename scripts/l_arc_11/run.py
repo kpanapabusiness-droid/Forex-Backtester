@@ -34,7 +34,6 @@ the closure §3 cross_arc_tags.
 from __future__ import annotations
 
 import datetime as dt
-import hashlib
 import json
 import sys
 import time
@@ -44,38 +43,37 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-import yaml
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-from core.arc.arc_pool_builder import ArcPoolConfig, build_arc_pool, write_arc_pool
-from core.architectures._protocol import StrategyResult
-from core.architectures.a1_system_level_filter import (
-    A1Architecture, A1Config, A1RunContext,
+from core.arc.arc_pool_builder import ArcPoolConfig, build_arc_pool, write_arc_pool  # noqa: E402
+from core.architectures._protocol import StrategyResult  # noqa: E402
+from core.architectures.a1_system_level_filter import (  # noqa: E402
+    A1Architecture,
+    A1Config,
+    A1RunContext,
 )
-from core.architectures.a2_classifier_filter import A2Architecture, A2Config
-from core.architectures.a6_meta_labeling import A6Architecture, A6Config
-from core.determinism import RANDOM_STATE, seed_everything
-from core.features.pipeline import compute_feature_matrix
-from core.runners.arc_fold_runner import ArcFoldRunner
-from core.sim.panel import Panel
-from core.steps._classifier_defaults import build_lgbm, build_lr, build_rf
-from core.steps.step_2_clustering import run_step_2
-from core.steps.step_3_capturability import run_step_3
-from core.steps.step_4_extraction import run_step_4
-from core.strategies.shb.signal_module import SHBSignalModule
-from core.wfo.folds import Fold, build_v3_folds
-from core.wfo.gates import FoldStats, classify_fold_stats
-from core.wfo.orchestrator import (
+from core.architectures.a2_classifier_filter import A2Architecture, A2Config  # noqa: E402
+from core.architectures.a6_meta_labeling import A6Architecture, A6Config  # noqa: E402
+from core.determinism import RANDOM_STATE, seed_everything  # noqa: E402
+from core.features.pipeline import compute_feature_matrix  # noqa: E402
+from core.runners.arc_fold_runner import ArcFoldRunner  # noqa: E402
+from core.sim.panel import Panel  # noqa: E402
+from core.steps._classifier_defaults import build_lgbm, build_lr, build_rf  # noqa: E402
+from core.steps.step_2_clustering import run_step_2  # noqa: E402
+from core.steps.step_3_capturability import run_step_3  # noqa: E402
+from core.steps.step_4_extraction import run_step_4  # noqa: E402
+from core.strategies.shb.signal_module import SHBSignalModule  # noqa: E402
+from core.wfo.folds import Fold, build_v3_folds  # noqa: E402
+from core.wfo.gates import FoldStats  # noqa: E402
+from core.wfo.orchestrator import (  # noqa: E402
     CandidateHoldoutResult,
     CandidateSearchResult,
-    WfoSearchResult,
     run_holdout,
     run_search,
 )
-
 
 ARC_NAME = "l_arc_11"
 PAIRS: tuple[str, ...] = (

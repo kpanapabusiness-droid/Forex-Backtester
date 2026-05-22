@@ -5,7 +5,6 @@ scripts/l_arc_11/run.py crashed at the final write step.
 from __future__ import annotations
 
 import json
-import sys
 from pathlib import Path
 
 import pandas as pd
@@ -33,7 +32,8 @@ def main() -> int:
             parts = [p.strip() for p in line.strip().strip("|").split("|")]
             if len(parts) == 2:
                 try:
-                    k = int(parts[0]); v = float(parts[1])
+                    k = int(parts[0])
+                    v = float(parts[1])
                     silhouettes[k] = v
                 except ValueError:
                     pass

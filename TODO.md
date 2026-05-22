@@ -2,7 +2,7 @@
 
 > The operational todo list. Append, check off, delete as work completes.
 > Distinct from `ARC_TRACKER.md` (which is auto-updated arc state) and `ARC_HISTORY.md` (frozen pre-v3.0 record).
-> Last updated: 2026-05-22 (PR-E.1.7 closure of CC_06 dispatch chain)
+> Last updated: 2026-05-22 (CC_08 closure template + tracker schema extension)
 
 ---
 
@@ -51,7 +51,7 @@
 | Land `L_PROTOCOL.md` on main | 🔴 |
 | Draft `docs/sub_protocols/heavy_ml_probe.md` | 🔴 |
 | Draft `docs/sub_protocols/signal_discovery_probe.md` | 🔴 |
-| Draft `ARC_TRACKER.md` skeleton (empty schema) | 🔴 |
+| Draft `ARC_TRACKER.md` skeleton (empty schema) | 🟢 |
 | Lock Wave 1 / Wave 2 arc composition | 🔴 |
 | Backup destination for HistData (separate folder off-repo) | 🟡 user pending |
 
@@ -77,6 +77,15 @@
 | Review `/mnt/project/` against new repo state | 🔴 |
 | Remove pre-reset docs (v2.x amendments, dispatch handovers, etc.) | 🔴 |
 | Sync currently-active docs (L_PROTOCOL, ARC_HISTORY, etc.) into project | 🔴 |
+
+### Round 5 — Closure infrastructure
+
+| Task | Status |
+|---|---|
+| Lock `docs/templates/ARC_CLOSURE_TEMPLATE.md` v1.0 | 🟢 |
+| Extend `ARC_TRACKER.md` schema (cluster registry, cost-decomp registry, tag registry) | 🟢 |
+| Land L_PROTOCOL §6 update referencing template | 🟢 |
+| Build tracker parser `scripts/update_tracker_from_closure.py` | ⚪ deferred until 2-3 Wave 1 closures land |
 
 ---
 
@@ -203,6 +212,7 @@ Triggered after: Phase 1 closes (all 11 arcs).
 |---|---|
 | `L_PROTOCOL.md` | Only at major redesign events |
 | `docs/sub_protocols/*` | When sub-protocol is amended |
+| `docs/templates/ARC_CLOSURE_TEMPLATE.md` | Only at major redesign events (template version bump) |
 | `ARC_TRACKER.md` | Auto on arc open/close |
 | `ARC_HISTORY.md` | Never (frozen at v3.0 start) |
 | `TODO.md` (this file) | Manually as work progresses |

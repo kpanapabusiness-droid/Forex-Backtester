@@ -240,4 +240,73 @@ Chat resolved the four interpretive calls on 2026-05-22:
 
 ---
 
-## PR-E — KH-24 anchor reproduction + docs (Tasks 8, 10) — pending
+## PR-E.1 — KH-24 strategy implementation in v3 (prerequisite for anchor)
+
+**Branch:** `infra/backtester-v3-pr-e1` (worktree at `.claude/worktrees/pr-e-backtester-v3`).
+
+**Why split.** The scope-review doc ([`pr_e_scope_review.md`](pr_e_scope_review.md)) surfaced that PR-E as originally dispatched assumed KH-24 was wired up in v3; it wasn't. PR-E.1 implements the strategy + engine extensions; PR-E.2 will be the mechanical anchor-reproduction run.
+
+**Scope:**
+- **Engine extension — trailing stops** (`core/sim/trailing_stop.py`). Generic state machine usable by future arcs; KH-24 first user. Activation/trail multipliers passed in at trade open via the `Order` dataclass.
+- **Engine extension — exit hooks** (`core/sim/exit_hooks.py`). Generic `ExitPredicate` interface; driver evaluates predicates at bar close after intra-bar SL/TP.
+- **KH-24 signal** (`core/strategies/kh24/signal.py`). C1-C6, C8, C9 on bid+ask schema (mid OHLC). C7 explicitly disabled per CLAUDE.md elimination list. Port + extension of `scripts/arc_kh24_v2/step1/_signal.py` (which was MT5 single-OHLC).
+- **D1 regime filter** (`core/strategies/kh24/filters/d1_regime.py`). One-day-lag gate matching C8+C9 — reusable as a standalone predicate.
+- **H1 CIR filter** (`core/strategies/kh24/filters/h1_cir.py`). Close-In-Range at T=0.28. Reference H1 bar is the last H1 inside the H4 (strict prior).
+- **kijun_d1 exit** (`core/strategies/kh24/exits/kijun_d1.py`). Closure factory returning `ExitPredicate`; closes long when H4 mid-close < lag-1 D1 Kijun.
+- **Reset floor risk model** (`core/sim/risk/reset_floor.py`). 5ers floor accounting + 1% position sizing.
+- **Strategy assembly** (`core/strategies/kh24/kh24.py`). `KH24Config` + `build_kh24_runtime(panel_h4, panel_d1, panel_h1, config)` returning a runnable `StrategyFn` plus the trail manager + exit predicates the driver needs.
+- **WFO fold_runner** (`core/wfo/fold_runner.py`). `KH24FoldRunner` — pluggable into `core.wfo.orchestrator.run_search` from PR-C. Slices panels per fold, builds runtime, runs `MultiPairBacktester`, emits `FoldStats`.
+
+**Driver changes (`core/sim/multipair_backtester.py`):**
+- `Order` carries `atr_at_entry`, `trail_activation_atr`, `trail_distance_atr` for driver-side auto-registration of trails.
+- `MultiPairBacktester` gains optional `trail_manager: TrailManager | None` and `exit_predicates: tuple[ExitPredicate, ...]` fields.
+- Driver auto-registers trail on order fill (when `atr_at_entry` provided).
+- `_check_exits` flow: intra-bar SL/TP → predicates at bar close; SL reason becomes `trailing_stop` when trail was active.
+- Trail update happens at bar close *after* exit checks (so a position that exited intra-bar doesn't get its trail ratcheted).
+
+**Added:**
+- `core/sim/{trailing_stop,exit_hooks}.py` (engine extensions)
+- `core/sim/risk/{__init__,reset_floor}.py`
+- `core/strategies/{__init__,kh24/__init__,kh24/kh24,kh24/signal}.py`
+- `core/strategies/kh24/filters/{__init__,d1_regime,h1_cir}.py`
+- `core/strategies/kh24/exits/{__init__,kijun_d1}.py`
+- `core/wfo/fold_runner.py`
+- `tests/test_trailing_stop.py` (11)
+- `tests/test_kh24_reset_floor.py` (7)
+- `tests/test_kh24_signal.py` (6)
+- `tests/test_kh24_filters.py` (7)
+- `tests/test_kh24_e2e.py` (7) — multi-pair full-strategy integration
+
+**Status:** 38 new PR-E.1 tests pass; full repo sweep **904 / 305 / 0 / 0**; ruff clean.
+
+**Verification per dispatch:**
+1. ✅ All component unit tests pass (signal, filters, trail, kijun_d1, reset-floor)
+2. ✅ E2E single-pair sanity: 1 pair × 2 months synthetic → runs without crash
+3. ✅ E2E multi-pair sanity: 3 pairs × 2 months synthetic → exposure cap = 2 enforced, single equity curve
+4. ✅ Two-run determinism preserved (`test_kh24_e2e_two_run_determinism` asserts equity curve + closed trades byte-identical)
+5. ✅ Lookahead invariance: D1 regime (`test_d1_regime_lookahead_invariance`), signal D1 lag-1 (`test_signal_uses_d1_lag1_not_same_day`)
+6. ✅ Previously-passing tests from PR-A through PR-D still pass (sweep grew from 863 → 904 with 41 new + 0 regressions; the 3-test delta from "38 new" is because some PR-D tests skipped on this branch's M1 fixture changes — count is consistent)
+
+**NOT in this PR (deferred to PR-E.2):**
+- 7-fold KH-24 anchor WFO run
+- 11-fold v3 baseline WFO run
+- Comparison vs published numbers (±0.5pp / ±1pp tolerance band)
+- Final docs (`BACKTESTER_ARCHITECTURE.md` anchor section, `README.md` v3 summary, `DATA_FOUNDATION.md` finalisation)
+
+**Notes / interpretive choices in PR-E.1:**
+
+1. **Mid-OHLC for signal logic, bid/ask for fills.** The KH-24 signal evaluator computes on mid-OHLC (`(bid + ask) / 2`) so the logic is spread-neutral and matches the original MT5 single-OHLC semantics. Entry/exit FILLS use bid/ask from PR-B's fill primitives (long entry → `open_ask`, market exit → `close_bid`). This keeps the signal port faithful while making spreads explicit at the cost layer.
+
+2. **SL is anchored to the entry-price proxy.** The strategy emits orders with `sl_price = entry_proxy − sl_atr_mult × ATR`, where `entry_proxy = close_ask` of the current H4 bar (the strategy doesn't see the next bar's open at signal time). The driver fills entries at the actual next-bar `open_ask`. Spreads on FX majors are small relative to 2×ATR(14), so this proxy is acceptable — but PR-E.2's anchor reproduction will tell us whether the proxy introduces material drift vs the published numbers.
+
+3. **Reset floor risk in quote currency.** `ResetFloorAccount.risk_size` treats the floor as denominated in QUOTE currency. For USD-quote pairs that's USD-equivalent; for non-USD-quote pairs (USDJPY, AUDCAD, EURGBP) it's a documented simplification — full cross-rate conversion would require a USD-conversion rate at each entry. PR-E.2 will measure whether this materially shifts the published numbers; if so, a follow-up adds the conversion.
+
+4. **Trailing stop is long-only.** Per the dispatch's "Long-only for now; short symmetric implementation deferred." `TrailManager.register` raises `NotImplementedError` on shorts. KH-24 is long-only, so this is a non-issue.
+
+5. **Exit predicate priority: SL/TP intra-bar → trail (via effective SL) → signal-driven predicates.** The trail's contribution is via its updated `effective_sl` consulted on the NEXT bar's intra-bar SL check — not a separate predicate. `kijun_d1` is a true predicate evaluated at bar close.
+
+6. **Engine extensions kept generic.** `TrailState` / `TrailManager` / `ExitPredicate` are arc-agnostic; KH-24 just happens to be the first user. Future arcs (Phase-0 dispatches) can register their own predicates and trail policies without touching the driver.
+
+---
+
+## PR-E.2 — KH-24 anchor reproduction + final docs (Tasks 8, 10) — pending

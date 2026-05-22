@@ -264,3 +264,54 @@ End. CC ends turn after PR creation. Chat decision points:
 1. Run `scripts/anchor/check_a1_equivalence.py` on workstation.
 2. If PASS: merge PR. If FAIL: surface verdict.json for diagnosis;
    CC HALTs per WORKFLOW §6 awaiting direction.
+
+---
+
+## 8. Post-merge anchor sequence (2026-05-22)
+
+### 8.1 Anchor check executed — FAIL
+
+Chat directed CC to run the full-data anchor check from the worktree
+pointing at the main project's HistData layer. Result: FAIL.
+
+- 5 of 7 folds byte-identical between legacy `KH24FoldRunner` and
+  `ArcFoldRunner(A1, kh24_to_a1)`.
+- F2 and F3 diverged by 1.05-1.41pp ROI / 0.31-1.37pp DD.
+- Hypothesis: legacy 30-day warmup NaN-masks `kijun(26)` on F2/F3 OOS
+  start (calendar boundaries consume the buffer).
+- Diagnostic at [docs/dispatches/cc_07_diagnostic.md](cc_07_diagnostic.md).
+- HALT per WORKFLOW §6.
+
+### 8.2 Bisect executed — hypothesis confirmed
+
+Chat directed C→B resolution. CC wrote
+`scripts/anchor/bisect_warmup.py` running the legacy path at both
+`warmup_days=30` and `warmup_days=365` plus the A1 path. Result:
+**all 7 folds match A1 byte-identically under warmup_days=365.**
+Bisect artefacts at `results/anchor_kh24_bisect_warmup/`.
+
+### 8.3 Option B applied — A1 ratified as new v3 anchor
+
+Per chat decision:
+
+- `docs/BACKTESTER_ARCHITECTURE.md §B` updated: v3 anchor numbers
+  reflect A1 (full-history warmup). Legacy 30-day-warmup numbers
+  preserved in new §B.1 for reference.
+- `docs/PROTOCOL_RUNTIME.md` §13 added: full-history warmup
+  convention documented; KH24FoldRunner retained as regression
+  baseline.
+- `ARC_HISTORY.md` KH-24 section footnoted: v3 anchor reflects
+  CC_07 warmup convention; live deployment numbers unchanged.
+- `scripts/anchor/check_a1_equivalence.py` ASCII-arrow fix
+  (Windows console encoding).
+- `scripts/anchor/bisect_warmup.py` retained as diagnostic harness.
+
+### 8.4 Anchor artefacts (committed for chat review)
+
+- `results/anchor_kh24_a1_check/verdict.json`, `summary.md`,
+  `a1_equivalence.parquet`, `a1_equivalence.csv` — initial FAIL.
+- `results/anchor_kh24_bisect_warmup/verdict.json`, `summary.md`,
+  `bisect_warmup.parquet`, `bisect_warmup.csv` — hypothesis CONFIRMED.
+
+PR #168 will be updated with these doc changes + a new commit. Chat
+reviews and merges.

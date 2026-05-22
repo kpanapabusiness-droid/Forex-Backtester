@@ -419,24 +419,57 @@ identity at every step.
 
 ---
 
-## §13 KH-24 anchor preservation
+## §13 Warmup convention (kijun-class features)
+
+Per the CC_07 anchor bisect (2026-05-22, `scripts/anchor/bisect_warmup.py`),
+the runtime adopts a **full-history warmup convention** for any feature
+that requires a multi-bar rolling lookback on an auxiliary TF (kijun,
+ATR, multi-TF lookbacks).
+
+Specifically: the SignalModule evaluates signal-class features
+(signal_mask, atr, additional_gates, exit_predicate) ONCE on the
+**full panel** (entire available history before the OOS window). For
+each WFO fold, the driver iterates only the OOS-window slice but reads
+pre-computed series via `.reindex(sliced_index)`.
+
+This differs from the legacy `KH24FoldRunner` convention which sliced
+the panel to `[oos_start − 30 days, oos_end]` before signal evaluation.
+The 30-day slice was buffer-management heuristic, NOT a methodology
+choice — it NaN-masked `kijun(26)` on the first OOS bars when
+weekends/holidays consumed the warmup buffer. CC_07's bisect (see
+`results/anchor_kh24_bisect_warmup/`) confirmed: when the legacy path
+runs with `warmup_days=365`, it converges to the A1 numbers
+byte-identically across all 7 KH-24 anchor folds.
+
+The full-history warmup is the correct version. The legacy
+`KH24FoldRunner` is retained in `core/wfo/fold_runner.py` as a
+regression baseline; new arcs use `ArcFoldRunner` (full-history
+warmup).
+
+## §14 KH-24 anchor preservation
 
 KH-24 is the canonical A1 instantiation. The equivalence chain:
 
 ```
-KH24FoldRunner(panels, KH24Config())
+KH24FoldRunner(panels, KH24Config())  with warmup_days=365 internal
   ≡  ArcFoldRunner(A1Architecture(), kh24_signal_evaluation, panels)(fold, kh24_to_a1(KH24Config())[0])
 ```
 
-The two paths should produce identical per-fold ROI / DD / trade
-count. Tolerance per L_PROTOCOL §8: ±0.5pp ROI / ±1pp DD against the
-v3 anchor reference (`scripts/anchor/run_anchor.py` mode A output).
+The two paths produce byte-identical per-fold ROI / DD / trade count
+on the full-history-warmup convention (verified 2026-05-22 across all
+7 KH-24 anchor folds, see `results/anchor_kh24_bisect_warmup/summary.md`).
+
+The default `KH24FoldRunner` `warmup_days=30` produces slightly
+different F2/F3 numbers (see [BACKTESTER_ARCHITECTURE.md §B.1](BACKTESTER_ARCHITECTURE.md))
+because the short warmup NaN-masks `kijun(26)` at fold boundaries
+where weekends/holidays consume the buffer. Both paths are deterministic;
+they differ only in their warmup-window convention.
 
 `tests/protocol_runtime/test_kh24_a1_equivalence.py` runs the
 structural equivalence check on the synthetic mini-fixture
-(`tests/fixtures/histdata_mini/`). Full-data verification needs real
-HistData — chat runs `scripts/anchor/check_a1_equivalence.py` on the
-workstation.
+(`tests/fixtures/histdata_mini/`). Full-data verification uses
+`scripts/anchor/check_a1_equivalence.py` against
+`scripts/anchor/bisect_warmup.py` (chat-side workstation runs).
 
 ---
 

@@ -97,7 +97,7 @@ def main() -> int:
     rows = []
     fail = False
     for fold in structure.folds:
-        print(f"[a1_equiv] fold {fold.fold_id} {fold.oos_start} → {fold.oos_end} ...")
+        print(f"[a1_equiv] fold {fold.fold_id} {fold.oos_start} -> {fold.oos_end} ...")
         fs_legacy = legacy(fold, kh24_cfg)
         fs_new = new(fold, a1_cfg)
         roi_diff_pp = (fs_new.roi_pct - fs_legacy.roi_pct) * 100

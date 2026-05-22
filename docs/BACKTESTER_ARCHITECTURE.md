@@ -211,31 +211,70 @@ The live EA on the Contabo VPS / 5ers MT5 broker feed is UNAFFECTED.
   PnL); SL anchor remains at signal-bar `close_ask` proxy
   (Section H deferred).
 
-### B. v3 vs published — fold-by-fold
+### B. v3 vs published — fold-by-fold (post-CC_07 anchor)
 
-| Fold | OOS window | Pub ROI | v3 ROI | Pub DD | v3 DD | Pub trades | v3 trades |
+The v3 anchor below is the **A1 architecture path** (CC_07's
+`ArcFoldRunner(A1, kh24_to_a1)` over the full-history-warmup signal
+evaluation). Per the CC_07 anchor regression (`scripts/anchor/check_a1_equivalence.py`
++ `scripts/anchor/bisect_warmup.py`, 2026-05-22) the A1 path matches
+the legacy `KH24FoldRunner` byte-identically on 5 of 7 folds and
+diverges on F2/F3 due to a warmup-buffer effect in the legacy
+`KH24FoldRunner` (its 30-day pre-OOS slice NaN-masks `kijun(26)` on
+the first OOS bars when calendar weekends/holidays consume the
+buffer). Running the legacy path with `warmup_days=365` recovers the
+A1 numbers byte-identically. The A1 numbers below are therefore the
+**correct full-history reproduction**; legacy 30-day-warmup numbers
+are preserved in §B.1 for historical reference. KH-24 live
+deployment numbers are unchanged.
+
+| Fold | OOS window | Pub ROI | v3 ROI (A1) | Pub DD | v3 DD (A1) | Pub trades | v3 trades (A1) |
 |---:|---|---:|---:|---:|---:|---:|---:|
 | 1 | 2020-10 → 2021-07 | +13.35% | -1.43% | 6.37% | 5.13% | 41 | 32 |
-| 2 | 2021-07 → 2022-04 | +9.63%  | +4.21% | 4.45% | 3.29% | 36 | 17 |
+| 2 | 2021-07 → 2022-04 | +9.63%  | +3.17% | 4.45% | 4.25% | 36 | 18 |
 | 3 | 2022-04 → 2023-01 | +11.90% | +6.69% | 4.43% | 3.95% | 25 | 29 |
 | 4 | 2023-01 → 2023-10 | +3.32%  | -5.34% | 3.80% | 5.41% | 32 | 19 |
 | 5 | 2023-10 → 2024-07 | +6.23%  | -6.51% | 3.09% | 9.22% | 23 | 20 |
 | 6 | 2024-07 → 2025-04 | +3.24%  | -1.13% | 5.03% | 11.51% | 30 | 29 |
 | 7 | 2025-04 → 2026-01 | +1.92%  | +2.31% | 4.06% | 3.88% | 27 | 19 |
 
-**Aggregates:** total trades 214 (pub) vs 165 (v3); positive folds
-7/7 (pub) vs 3/7 (v3); worst-fold ROI +1.92% (pub) vs -6.51% (v3);
-worst-fold DD 6.37% (pub) vs 11.51% (v3).
+**Aggregates (post-CC_07):** total trades 214 (pub) vs 166 (v3 A1);
+positive folds 7/7 (pub) vs 3/7 (v3 A1); worst-fold ROI +1.92% (pub)
+vs -6.51% (v3 A1, F5); worst-fold DD 6.37% (pub) vs 11.51% (v3 A1, F6).
 
 **F7 reproduces inside the documented real-spread band.** Published
 F7 +1.92% → expected ~+1.28% under HistData spread audit
-(ARC_HISTORY.md); v3 produced +2.31%. F7 is the only fold the
-original ±0.5pp tolerance criterion passes unambiguously.
+(ARC_HISTORY.md); v3 A1 produced +2.31%. F7 is the only fold the
+original ±0.5pp tolerance criterion passes unambiguously against pub.
 
 **F2 sign recovered.** PR-E.1.5's kijun_d1 fix moved F2 from -1.78%
-(initial) to +4.21% (final) vs published +9.63% — sign-consistent,
-direct evidence the engine's exit semantics now match the EA on the
-fold where they previously diverged most.
+(initial) to +4.21% / +3.17% (PR-E.1.6 / CC_07 A1) vs published
++9.63% — sign-consistent, direct evidence the engine's exit semantics
+now match the EA on the fold where they previously diverged most.
+CC_07 A1's +3.17% is preferred over PR-E.1.6's +4.21% because the
+latter benefitted from the legacy warmup's NaN-masked kijun on the
+first OOS bars; A1 evaluates the signal/kijun on the full panel, so
+no NaN buffer.
+
+### B.1. Pre-CC_07 anchor (legacy `KH24FoldRunner`, `warmup_days=30`)
+
+Preserved for reference. These numbers were produced by the legacy
+fold-runner with a 30-day slice before signal evaluation — the cause
+of the F2/F3 divergence diagnosed at CC_07 anchor regression. They
+are no longer the canonical anchor.
+
+| Fold | Pub ROI | legacy v3 ROI | Pub DD | legacy v3 DD | Pub trades | legacy v3 trades |
+|---:|---:|---:|---:|---:|---:|---:|
+| 1 | +13.35% | -1.43% | 6.37% | 5.13% | 41 | 32 |
+| 2 | +9.63%  | +4.58% | 4.45% | 2.89% | 36 | 18 |
+| 3 | +11.90% | +5.64% | 4.43% | 4.27% | 25 | 30 |
+| 4 | +3.32%  | -5.34% | 3.80% | 5.41% | 32 | 19 |
+| 5 | +6.23%  | -6.51% | 3.09% | 9.22% | 23 | 20 |
+| 6 | +3.24%  | -1.13% | 5.03% | 11.51% | 30 | 29 |
+| 7 | +1.92%  | +2.31% | 4.06% | 3.88% | 27 | 19 |
+
+The `KH24FoldRunner` class is retained in `core/wfo/fold_runner.py`
+to preserve this reproduction path for regression purposes; the
+canonical anchor going forward is the A1 path.
 
 ### C. Attributed sources of residual divergence
 

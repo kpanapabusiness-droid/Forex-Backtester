@@ -1,5 +1,5 @@
 # CLAUDE.md — Forex Ignition Rebuild
-> Last updated: 2026-05-22 | Phase: CC_07 — L_PROTOCOL v3.0 runtime infrastructure built on `infra/protocol-runtime-v3`. `core/arc/`, `core/steps/`, `core/architectures/`, `core/runners/` populated; all 43 protocol_runtime tests pass; KH-24 structural equivalence to A1 wired (full-data anchor check is `scripts/anchor/check_a1_equivalence.py` for chat to run). Arc 10 closure unchanged. KH-24 live deployment unchanged. See [docs/PROTOCOL_RUNTIME.md](docs/PROTOCOL_RUNTIME.md).
+> Last updated: 2026-05-22 | Phase: CC_07 — L_PROTOCOL v3.0 runtime infrastructure landed on `infra/protocol-runtime-v3`. `core/arc/`, `core/steps/`, `core/architectures/`, `core/runners/` populated; 43 protocol_runtime tests + 75 KH-24/sim regression tests pass. Full-data anchor regression: A1 path byte-identical to legacy `KH24FoldRunner` under matched warmup convention (5/7 folds identical with legacy default; all 7/7 identical with `warmup_days=365`). Per chat resolution C→B, A1 with full-history warmup ratified as new v3 anchor; see [docs/BACKTESTER_ARCHITECTURE.md §B](docs/BACKTESTER_ARCHITECTURE.md), [docs/PROTOCOL_RUNTIME.md §13-14](docs/PROTOCOL_RUNTIME.md). Arc 10 closure unchanged. KH-24 live deployment unchanged (published Pub-column numbers preserved).
 > First file any AI assistant reads. Reflects where the project ACTUALLY is.
 
 ---

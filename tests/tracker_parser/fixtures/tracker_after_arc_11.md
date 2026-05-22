@@ -1,10 +1,10 @@
 # ARC_TRACKER — Live State
 
-> **Auto-updated.** Do not edit manually except per `docs/templates/ARC_CLOSURE_TEMPLATE.md` Section 4 mapping (until parser ships).
+> **Auto-updated.** Do not edit manually except per `docs/templates/ARC_CLOSURE_TEMPLATE.md` Section 4 mapping.
 > Schema locked at v3.0. Replaces STATUS.md, CHANGELOG.md, ARC_QUEUE.md, and ACTIVE_ARCS.md.
 > First populated on first arc open under L_PROTOCOL v3.0.
 
-Last auto-update: manual: 2026-05-22 (Amendment 3 re-evaluation: arcs 8, 10, 11 — added `re_evaluated_verdict` column to Closed arcs summary; backfilled missing rows for arcs 8 and 10. Other tracker sections for arcs 8 and 10 NOT backfilled under this dispatch — separate work item.)
+Last auto-update: parser: 2026-05-22 12:33:35
 
 ---
 
@@ -18,13 +18,9 @@ Last auto-update: manual: 2026-05-22 (Amendment 3 re-evaluation: arcs 8, 10, 11 
 
 ## Closed arcs summary
 
-> `Re-evaluated verdict` column added 2026-05-22 per L_PROTOCOL Amendment 3 retrospective re-evaluation dispatch. Holds the Amendment-3-gate result for arcs closed before the amendment landed; `Verdict` retains the original-protocol result for audit trail. `—` indicates not yet re-evaluated.
-
 | Arc | Signal | TF | Sub-protocol | Best architecture | Worst-fold ratio | Verdict | Re-evaluated verdict | Failed at step | Closure doc |
 |---|---|---|---|---|---|---|---|---|---|
-| l_arc_10 | D1 swing-low rejection long (DLR, v0.1) — bullish rejection of confirmed ascending D1 swing-low, 4H entry | H4 | vanilla | A1 system_level_filter | 5.4185 | PASS-VIABLE | PASS-DEPLOYABLE-PROVISIONAL | N/A | results/l_arc_10/ARC_CLOSURE.md |
-| l_arc_8 | pullback_resume_hhhl_long_v0.1 (HH/HL uptrend, pullback >=0.5xATR, bullish-close break of prior bar) | 4H | vanilla | A6 meta_labeling | 1.749 | FAIL | FAIL | 5 | results/l_arc_8/ARC_CLOSURE.md |
-| l_arc_11 | swing-high breakout in trend (SHB) long, 4H, causal 3-bar swing (right-edge t-4) | H4 | vanilla | A2 classifier_filter | -0.7687 | FAIL | FAIL | 5 | results/l_arc_11/ARC_CLOSURE.md |
+| l_arc_11 | swing-high breakout in trend (SHB) long, 4H, causal 3-bar swing (right-edge t-4) | H4 | vanilla | A2 classifier_filter | -0.7687 | FAIL |  | 5 | results/l_arc_11/ARC_CLOSURE.md |
 
 ---
 
@@ -61,8 +57,6 @@ Schema:
 | A5 portfolio_composition | 0 | 0 | — |
 | A6 meta_labeling | 1 | 0 | — |
 
-Note: Arc 11 has no architecture row marked "Won" because no config met §3 PASS thresholds. A2 is "best of FAIL" (highest worst_fold_ratio among configs that admitted trades); A6 admitted zero trades.
-
 ---
 
 ## Per-archetype recurrence
@@ -77,8 +71,6 @@ Note: Arc 11 has no architecture row marked "Won" because no config met §3 PASS
 | Choppy | 0 | — | — |
 | Unclassified | 1 | 1.31 | 0.504 |
 | Other / unclassified | 0 | — | — |
-
-Note: "in-cluster R" tracked as `mfe_p50_r` per template §4.E. Unclassified row averages over Arc 11's c1 (mfe_p50 2.11) and c2 (mfe_p50 0.51).
 
 ---
 
@@ -152,9 +144,6 @@ Schema:
 
 ## Update mechanism
 
-Parser at `scripts/update_tracker_from_closure.py` applies the Section 4 A-K mapping from each closure doc's `§1 tracker_payload` YAML block. Invoke per `scripts/tracker_parser/README.md` — invocation is part of the standard arc-close workflow (run on the arc branch before opening the closure PR; tracker delta lands in the same atomic commit as the closure doc).
-
-- Parser writes the "Last auto-update" line as `parser: YYYY-MM-DD HH:MM:SS` (UTC, derived from the closure's `closed_timestamp`).
-- Manual updates (rare; for one-off cleanups or retroactive backfills) write `manual: YYYY-MM-DD` and an optional parenthetical describing the change.
+Parser at `scripts/update_tracker_from_closure.py`; invoke per `scripts/tracker_parser/README.md`.
 
 Tracker is APPEND-ONLY at the row level. Bad rows can be flagged with a `⚠️` prefix but cannot be deleted (history matters). Schema changes require explicit chat-side redesign event documented in the closure doc that introduced them.

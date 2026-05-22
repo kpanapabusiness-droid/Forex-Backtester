@@ -3,7 +3,7 @@
 > **Location:** `docs/templates/ARC_CLOSURE_TEMPLATE.md`
 > **Status:** locked. Every arc closure MUST follow this template.
 > **Referenced by:** `L_PROTOCOL.md` §6.
-> **Parser status:** spec-only. Manual updates per Section 4 mapping until parser ships.
+> **Parser status:** implemented at `scripts/update_tracker_from_closure.py`. Invoke per `scripts/tracker_parser/README.md` (run on the arc branch before opening the closure PR).
 >
 > Section headings are LITERAL — do not rephrase. Field names inside `§1 tracker_payload` are LITERAL — parser depends on exact spelling.
 >
@@ -253,20 +253,20 @@ If a tracker row is suspected wrong post-update:
 
 ---
 
-## Section 5 — Parser implementation notes (deferred)
+## Section 5 — Parser implementation
 
-Parser not yet built. Recommendation: build after 2-3 Wave 1 closures land — gives real golden inputs to validate against.
+Parser is implemented at `scripts/update_tracker_from_closure.py` (see `scripts/tracker_parser/README.md` for usage, error modes, and the standard arc-close workflow).
 
-Parser specification:
+Invocation is part of the standard arc-close workflow — run on the arc branch before opening the closure PR so the closure doc and the tracker delta land in one atomic commit. See README §"Workflow" for the canonical sequence.
+
+Parser specification (preserved here for reference):
 - Input: any `results/<arc_name>/ARC_CLOSURE.md` file.
 - Extract: `§1 tracker_payload` YAML block (everything between the fenced ` ```yaml ` and the closing ` ``` `).
 - Validate: schema match against this template's §1 spec; fail loudly on missing required fields.
 - Output: append-only updates to `ARC_TRACKER.md` per Section 4 A-J above.
-- Idempotency: parsing the same closure doc twice produces identical tracker (no double-append).
-- Determinism: same closure doc → same tracker delta byte-for-byte.
-- **Schema version detection (v1.1+):** parser inspects the closure doc's referenced template version. v1.0 closures use legacy field names (`worst_fold_roi_pct`, `worst_fold_dd_pct`); v1.1+ closures use the renamed fields (`worst_fold_roi_base_pct`, `worst_fold_dd_base_pct`) and may populate Amendment 3 risk-normalised fields. Parser MUST accept both schemas — never rewrite historical closures.
-
-Suggested implementation: single Python script `scripts/update_tracker_from_closure.py`. Invoked manually post-PR-merge, or via post-merge git hook (bundles with WORKFLOW §3 auto-cleanup hook trigger point).
+- Idempotency: parsing the same closure doc twice produces identical tracker (no double-append). Tracked via sha256 in `scripts/tracker_parser/parsed.log`.
+- Determinism: same closure doc + same starting state → byte-identical output tracker.
+- **Schema version detection (v1.1+):** parser inspects the closure doc's referenced template version. v1.0 closures use legacy field names (`worst_fold_roi_pct`, `worst_fold_dd_pct`); v1.1+ closures use the renamed fields (`worst_fold_roi_base_pct`, `worst_fold_dd_base_pct`) and may populate Amendment 3 risk-normalised fields. Parser accepts both schemas — never rewrites historical closures.
 
 ---
 

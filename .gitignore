@@ -41,6 +41,7 @@ results_history/
 *.txt
 *.png
 *.log
+!scripts/tracker_parser/parsed.log
 
 # Aider / agents
 .aider*

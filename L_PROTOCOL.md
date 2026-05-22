@@ -574,9 +574,7 @@ Closure docs not conforming to the template are invalid. Tracker updates cannot 
 
 ARC_TRACKER updates are driven by each closure doc's `§1 tracker_payload` YAML block.
 
-Until parser ships: manual updates per `docs/templates/ARC_CLOSURE_TEMPLATE.md` Section 4 (steps A through K).
-
-Once parser ships (`scripts/update_tracker_from_closure.py`): same Section 4 mapping applied mechanically. Parser specification in template Section 5.
+Parser at `scripts/update_tracker_from_closure.py` applies the Section 4 A-K mapping mechanically. Invoke per `scripts/tracker_parser/README.md` — invocation is part of the standard arc-close workflow (run on the arc branch before opening the closure PR; tracker delta lands in the same atomic commit as the closure doc).
 
 Tracker is append-only at the row level. Bad rows flagged with ⚠️ prefix, never deleted. Schema changes require explicit chat-side redesign event documented in the closure doc that introduced them.
 

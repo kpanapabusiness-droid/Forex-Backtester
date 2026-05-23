@@ -44,7 +44,14 @@ from core.runners.arc_fold_runner import ArcFoldRunner
 from core.sim.panel import Panel
 from core.steps.classifier_persistence import (
     build_a2_config_from_step4,
+    build_a3_config_from_step4,
+    build_a4_config_from_step4,
     build_a6_config_from_step4,
+)
+from core.steps.path_classifier_per_fold import (
+    PerFoldTrainingInputs,
+    build_path_classifier_fits_per_fold,
+    build_per_trade_entry_features,
 )
 from core.steps.step_2_clustering import Step2Result, run_step_2
 from core.steps.step_3_capturability import Step3Result, run_step_3
@@ -56,15 +63,24 @@ from core.wfo.orchestrator import (
     run_search,
 )
 
-# Architectures that consume Step 4's persisted classifier through one
-# of the named builders. Keyed by ``Architecture.architecture_name``.
-# A3 / A4 retrain their own classifier per fold (see L_PROTOCOL §2 Step
-# 5 "Architecture-specific retraining policy") so they do not appear
-# here.
+# Architecture auto-builders keyed by ``Architecture.architecture_name``.
+# A2 / A6 load Step 4's persisted classifier from disk and bind it to
+# the returned config (no Step 5 retraining). A3 / A4 retrain per fold
+# via :mod:`core.steps.path_classifier_per_fold`; their builders here
+# return a config with `classifier_fit=None`, and the orchestrator
+# threads per-fold fits via ``A1RunContext.path_classifier_fits`` at
+# Step 5 dispatch time. See L_PROTOCOL §2 Step 5 "Architecture-specific
+# retraining policy".
 _AUTO_BUILDERS = {
     "A2": build_a2_config_from_step4,
+    "A3": build_a3_config_from_step4,
+    "A4": build_a4_config_from_step4,
     "A6": build_a6_config_from_step4,
 }
+
+# Architectures that need per-fold path-classifier retraining (their
+# fits live in run_context, not in arch_config).
+_PER_FOLD_RETRAIN_ARCHS = frozenset({"A3", "A4"})
 
 
 @dataclass(frozen=True)
@@ -257,10 +273,127 @@ class ArcOrchestrator:
             train_end=self._resolve_train_end(),
         )
 
+    def _build_candidates_and_contexts(
+        self,
+        *,
+        signal_eval: SignalEvaluation,
+        pool: ArcPool,
+        s2: Step2Result,
+        s4: Step4Result | None,
+        wfo_struct: WfoStructure,
+    ) -> tuple[
+        list[tuple[str, tuple[Architecture, Any]]],
+        dict[str, tuple[Architecture, A1RunContext]],
+        A1RunContext,
+    ]:
+        """Build the Step 5 candidate list + per-candidate run_contexts.
+
+        Centralised so that ``_run_step_5`` (search loop) and the
+        ``run()`` holdout block share the same A3 / A4 per-fold fits
+        (built once for the full ``wfo_struct.folds + (holdout,)`` set).
+
+        Returns ``(candidates, per_candidate_arch, base_ctx)`` where:
+
+          - ``candidates`` is the ``(config_id, (architecture, conf))``
+            list passed to :func:`run_search` / :func:`run_holdout`.
+          - ``per_candidate_arch`` maps ``config_id ->
+            (Architecture, A1RunContext)`` — A3 / A4 specs get specific
+            ``path_classifier_fits`` keyed by ``fold_id``.
+          - ``base_ctx`` is the A1RunContext used by A1/A2/A5/A6 (and
+            any candidate not pre-registered in the per-candidate map).
+        """
+        candidates: list[tuple[str, tuple[Architecture, Any]]] = []
+        per_candidate_arch: dict[str, tuple[Architecture, A1RunContext]] = {}
+
+        per_trade_features = None
+        if self.cfg.feature_matrix is not None:
+            per_trade_features = _build_per_trade_features(
+                pool.trades, self.cfg.feature_matrix
+            )
+        base_ctx = A1RunContext(per_trade_features=per_trade_features)
+
+        # Lazily build shared entry-features lookup (A3/A4 only).
+        shared_entry_features: Mapping[tuple[str, pd.Timestamp], Mapping[str, float]] | None = None
+
+        def _ensure_entry_features() -> Mapping[tuple[str, pd.Timestamp], Mapping[str, float]]:
+            nonlocal shared_entry_features
+            if shared_entry_features is None:
+                inputs = PerFoldTrainingInputs(
+                    pool_trades=pool.trades,
+                    pool_paths=pool.paths,
+                    cluster_assignments=s2.cluster_assignments,
+                    panels=self.panels,
+                    primary_tf=signal_eval.primary_tf,
+                    candidate_cluster_id=None,
+                    n_defer=5,
+                )
+                shared_entry_features = build_per_trade_entry_features(inputs)
+            return shared_entry_features
+
+        # Explicit (architecture, config) pairs supplied by the caller.
+        for arch, conf in zip(self.cfg.architectures, self.cfg.architecture_configs):
+            cid = f"{arch.architecture_name}::{getattr(conf, 'config_id', repr(conf))}"
+            candidates.append((cid, (arch, conf)))
+            per_candidate_arch[cid] = (arch, base_ctx)
+
+        # Auto-built configs (A2 / A3 / A4 / A6)
+        for spec in self.cfg.auto_arch_specs:
+            if s4 is None:
+                raise RuntimeError(
+                    "auto_arch_specs supplied but Step 4 did not run "
+                    "(no candidate clusters from Step 3, or no "
+                    "feature_matrix on ArcConfig)"
+                )
+            arch_name = spec.architecture.architecture_name
+            builder = _AUTO_BUILDERS.get(arch_name)
+            if builder is None:
+                raise RuntimeError(
+                    f"auto_arch_specs does not support architecture "
+                    f"{arch_name}; supported: {sorted(_AUTO_BUILDERS)}"
+                )
+            conf = builder(s4, cluster_id=spec.cluster_id, **dict(spec.builder_kwargs))
+            cid = f"{arch_name}::{getattr(conf, 'config_id', repr(conf))}"
+            candidates.append((cid, (spec.architecture, conf)))
+
+            if arch_name in _PER_FOLD_RETRAIN_ARCHS:
+                # A3 / A4 — build per-fold fits including the holdout
+                # fold so the same map covers both search and holdout
+                # paths. Fits keyed by Fold.fold_id.
+                folds_for_fits: tuple[Fold, ...] = wfo_struct.folds
+                if wfo_struct.holdout is not None:
+                    folds_for_fits = folds_for_fits + (wfo_struct.holdout,)
+                n_defer = int(getattr(conf, "n_defer", 5))
+                inputs = PerFoldTrainingInputs(
+                    pool_trades=pool.trades,
+                    pool_paths=pool.paths,
+                    cluster_assignments=s2.cluster_assignments,
+                    panels=self.panels,
+                    primary_tf=signal_eval.primary_tf,
+                    candidate_cluster_id=int(spec.cluster_id) if arch_name == "A3" else None,
+                    n_defer=n_defer,
+                )
+                fits = build_path_classifier_fits_per_fold(
+                    inputs=inputs,
+                    folds=folds_for_fits,
+                    arch=arch_name,  # type: ignore[arg-type]
+                )
+                entry_feats = _ensure_entry_features()
+                ctx = A1RunContext(
+                    per_trade_features=per_trade_features,
+                    per_trade_entry_features=entry_feats,
+                    path_classifier_fits=fits,
+                )
+                per_candidate_arch[cid] = (spec.architecture, ctx)
+            else:
+                per_candidate_arch[cid] = (spec.architecture, base_ctx)
+
+        return candidates, per_candidate_arch, base_ctx
+
     def _run_step_5(
         self,
         signal_eval: SignalEvaluation,
         pool: ArcPool,
+        s2: Step2Result,
         s4: Step4Result | None,
     ) -> WfoSearchResult | None:
         override = resolve_step_override(self.cfg.sub_protocol, "step_5")
@@ -271,51 +404,25 @@ class ArcOrchestrator:
             return None
 
         wfo_struct = self.cfg.wfo_structure or build_v3_folds()
-        candidates: list[tuple[str, Any]] = []
-
-        # Explicit (architecture, config) pairs supplied by the caller
-        for arch, conf in zip(self.cfg.architectures, self.cfg.architecture_configs):
-            cid = f"{arch.architecture_name}::{getattr(conf, 'config_id', repr(conf))}"
-            candidates.append((cid, (arch, conf)))
-
-        # Auto-built configs from Step 4 (A2 / A6)
-        for spec in self.cfg.auto_arch_specs:
-            if s4 is None:
-                raise RuntimeError(
-                    "auto_arch_specs supplied but Step 4 did not run "
-                    "(no candidate clusters from Step 3, or no "
-                    "feature_matrix on ArcConfig)"
-                )
-            builder = _AUTO_BUILDERS.get(spec.architecture.architecture_name)
-            if builder is None:
-                raise RuntimeError(
-                    f"auto_arch_specs does not support architecture "
-                    f"{spec.architecture.architecture_name}; supported: "
-                    f"{sorted(_AUTO_BUILDERS)}"
-                )
-            conf = builder(s4, cluster_id=spec.cluster_id, **dict(spec.builder_kwargs))
-            cid = f"{spec.architecture.architecture_name}::{getattr(conf, 'config_id', repr(conf))}"
-            candidates.append((cid, (spec.architecture, conf)))
+        candidates, per_candidate_arch, base_ctx = self._build_candidates_and_contexts(
+            signal_eval=signal_eval, pool=pool, s2=s2, s4=s4, wfo_struct=wfo_struct,
+        )
+        # Stash for the run() holdout block — see ``run()`` below.
+        self._last_per_candidate_arch = per_candidate_arch
+        self._last_base_ctx = base_ctx
 
         if not candidates:
             return None
 
-        # Per-trade features for A1 filter rules + A2 / A6 admit gates.
-        # A1 / A5 ignore the context; building it once is cheap.
-        per_trade_features = None
-        if self.cfg.feature_matrix is not None:
-            per_trade_features = _build_per_trade_features(
-                pool.trades, self.cfg.feature_matrix
-            )
-        run_context = A1RunContext(per_trade_features=per_trade_features)
-
         def _runner(fold: Fold, paired: tuple[Architecture, Any]) -> Any:
             arch, conf = paired
+            cid = f"{arch.architecture_name}::{getattr(conf, 'config_id', repr(conf))}"
+            _arch, ctx = per_candidate_arch.get(cid, (arch, base_ctx))
             r = ArcFoldRunner(
                 architecture=arch,
                 signal_evaluation=signal_eval,
                 panels=self.panels,
-                run_context=run_context,
+                run_context=ctx,
             )
             return r(fold, conf)
 
@@ -352,27 +459,29 @@ class ArcOrchestrator:
         s2 = self._run_step_2(pool)
         s3 = self._run_step_3(pool, s2)
         s4 = self._run_step_4(pool, s2, s3)
-        s5 = self._run_step_5(signal_eval, pool, s4)
+        s5 = self._run_step_5(signal_eval, pool, s2, s4)
 
-        # Holdout: top-K candidates from search re-evaluated on holdout window
+        # Holdout: top-K candidates from search re-evaluated on holdout window.
+        # Uses the per-candidate context map stashed by _run_step_5 so A3/A4
+        # candidates see the same per-fold path-classifier fits at holdout
+        # (the holdout's fold_id is already keyed in the fits map per
+        # _build_candidates_and_contexts).
         holdout = None
         if s5 is not None and s5.top_k:
             wfo_struct = self.cfg.wfo_structure or build_v3_folds()
             if wfo_struct.holdout is not None:
-                per_trade_features = None
-                if self.cfg.feature_matrix is not None:
-                    per_trade_features = _build_per_trade_features(
-                        pool.trades, self.cfg.feature_matrix
-                    )
-                run_context = A1RunContext(per_trade_features=per_trade_features)
+                per_candidate_arch = getattr(self, "_last_per_candidate_arch", {})
+                base_ctx = getattr(self, "_last_base_ctx", A1RunContext())
 
                 def _runner(fold: Fold, paired: tuple[Architecture, Any]):
                     arch, conf = paired
+                    cid = f"{arch.architecture_name}::{getattr(conf, 'config_id', repr(conf))}"
+                    _arch, ctx = per_candidate_arch.get(cid, (arch, base_ctx))
                     r = ArcFoldRunner(
                         architecture=arch,
                         signal_evaluation=signal_eval,
                         panels=self.panels,
-                        run_context=run_context,
+                        run_context=ctx,
                     )
                     return r(fold, conf)
                 holdout = run_holdout(wfo_struct, s5.top_k, fold_runner=_runner)

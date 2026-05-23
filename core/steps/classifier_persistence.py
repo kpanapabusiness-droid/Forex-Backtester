@@ -225,9 +225,78 @@ def build_a6_config_from_step4(
     )
 
 
+def build_a3_config_from_step4(
+    step4_result: Step4Result,
+    cluster_id: int,
+    *,
+    n_defer: int = 5,
+    config_id: str | None = None,
+    **a3_kwargs: Any,
+) -> "A3Config":
+    """Build :class:`A3Config` for the orchestrator's auto-spec path.
+
+    A3 does NOT load a classifier from Step 4 — per L_PROTOCOL §2 Step 5
+    "Architecture-specific retraining policy", A3 retrains per fold via
+    :mod:`core.steps.path_classifier_per_fold`. This builder produces
+    the config object with sane defaults; the orchestrator then threads
+    per-fold fits via ``A1RunContext.path_classifier_fits``.
+
+    The Step4Result is consumed only for cluster-existence sanity
+    checking + config_id naming consistency with A2 / A6 builders.
+
+    ``n_defer`` ∈ {1, 3, 5, 8} per L_PROTOCOL Appendix B.
+    ``classifier_fit`` and ``per_trade_entry_features`` are left as
+    ``None`` on the returned config — the orchestrator supplies both
+    via run_context.
+    """
+    # Import deferred to break a circular import (a3_pipeline_de imports
+    # from a1_system_level_filter which is import-stable; classifier_persistence
+    # otherwise stays in a small dependency tree).
+    from core.architectures.a3_pipeline_de import A3Config
+
+    _lookup_extraction(step4_result, cluster_id)  # sanity-check existence
+    cid = config_id or f"a3_cluster{int(cluster_id)}_n{int(n_defer)}"
+    return A3Config(
+        config_id=cid,
+        n_defer=int(n_defer),
+        classifier_fit=None,
+        per_trade_entry_features=None,
+        **a3_kwargs,
+    )
+
+
+def build_a4_config_from_step4(
+    step4_result: Step4Result,
+    cluster_id: int,
+    *,
+    exit_threshold: float = 0.4,
+    config_id: str | None = None,
+    **a4_kwargs: Any,
+) -> "A4Config":
+    """Build :class:`A4Config` for the orchestrator's auto-spec path.
+
+    Like A3 (above), A4 retrains per fold — Step4Result is consumed
+    only for cluster sanity-check + config_id naming. ``exit_threshold``
+    ∈ {0.3, 0.4, 0.5} per L_PROTOCOL Amendment 2 §"A4".
+    """
+    from core.architectures.a4_pipeline_d_exits import A4Config
+
+    _lookup_extraction(step4_result, cluster_id)
+    cid = config_id or f"a4_cluster{int(cluster_id)}_t{exit_threshold:.2f}"
+    return A4Config(
+        config_id=cid,
+        classifier_fit=None,
+        exit_threshold=float(exit_threshold),
+        per_trade_entry_features=None,
+        **a4_kwargs,
+    )
+
+
 __all__ = (
     "ClassifierIntegrityError",
     "load_classifier",
     "build_a2_config_from_step4",
+    "build_a3_config_from_step4",
+    "build_a4_config_from_step4",
     "build_a6_config_from_step4",
 )

@@ -623,7 +623,11 @@ def _build_integrity_md(integrity: dict, lineage_df: pd.DataFrame, feat_df: pd.D
         "| Class | clean | suspect | unverified |",
         "|---|---:|---:|---:|",
     ]
-    by_class = lineage_df.groupby(["feature_class", "lineage"]).size().unstack(fill_value=0)
+    by_class = (
+        lineage_df.groupby(["feature_class", "causal_lineage"])
+        .size()
+        .unstack(fill_value=0)
+    )
     for cls in sorted(by_class.index):
         lines.append(
             f"| {cls} | {int(by_class.loc[cls].get('clean', 0))} "

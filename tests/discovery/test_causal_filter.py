@@ -12,11 +12,11 @@ from core.discovery.grammar import Atom, Combinator, Node, Op, RuleSpec
 
 LINEAGE_DF = pd.DataFrame(
     [
-        {"name": "atr_14", "lineage": "clean", "feature_class": "price_geometry"},
-        {"name": "session_london", "lineage": "clean", "feature_class": "session"},
-        {"name": "dxy_state", "lineage": "suspect", "feature_class": "cross_asset"},
-        {"name": "raw_volume_rank", "lineage": "unverified", "feature_class": "volume"},
-        {"name": "experimental_x", "lineage": "clean", "feature_class": "experimental"},
+        {"name": "atr_14", "causal_lineage": "clean", "feature_class": "price_geometry"},
+        {"name": "session_london", "causal_lineage": "clean", "feature_class": "session"},
+        {"name": "dxy_state", "causal_lineage": "suspect", "feature_class": "cross_asset"},
+        {"name": "raw_volume_rank", "causal_lineage": "unverified", "feature_class": "volume"},
+        {"name": "experimental_x", "causal_lineage": "clean", "feature_class": "experimental"},
     ]
 )
 

@@ -232,6 +232,12 @@ class BestArchitectureV11(BaseModel):
     holdout_roi_at_r_hard_pct: float | None = None
     holdout_dd_at_r_hard_pct: float | None = None
     sizing_convention: str | None = None
+    # Chained-DD reconstruction method per PR-186 review item 1.
+    # Phase 1 (this PR): accepted as optional.
+    # Phase 2 (post-Wave-2 first PASS arc): required for any PASS
+    # verdict whose template_version == "1.2" AND closed_timestamp >
+    # PR-186 merge date. Old closures grandfathered by closed_timestamp.
+    chained_dd_method: str | None = None
 
 
 class _TrackerPayloadBase(BaseModel):
@@ -293,6 +299,7 @@ class TrackerPayloadV10(_TrackerPayloadBase):
                 "holdout_roi_at_r_hard_pct",
                 "holdout_dd_at_r_hard_pct",
                 "sizing_convention",
+                "chained_dd_method",
             ):
                 ba.setdefault(f, None)
             d["best_architecture"] = ba

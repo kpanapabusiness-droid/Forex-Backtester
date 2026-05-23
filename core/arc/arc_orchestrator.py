@@ -190,10 +190,27 @@ class CandidateAmendedResult:
     Extension dataclass per chat directive Q4 — does NOT amend
     :class:`core.wfo.orchestrator.WfoSearchResult` in place.
     Backwards compatibility with pre-Amendment-3 readers preserved.
+
+    ``chained_dd_method`` records HOW the chained equity was
+    reconstructed for this candidate:
+
+      - ``"equity_stitching"`` (v3.0.1 default): per-fold OOS equity
+        series multiplicatively chained with continuity adjustment.
+        Cheap; assumes fold-independence approximately.
+      - ``"full_window_sim"`` (v3.0.2 follow-up): a single sim spans
+        IS + holdout per top-K candidate, producing true continuous
+        equity. Per chat directive Q6 the gold standard; deferred to
+        a separate PR.
+
+    Recorded per-candidate so analysts know which reconstruction the
+    chained DD came from. Tracker payload includes the same field
+    per ``ARC_CLOSURE_TEMPLATE.md`` v1.2 §1 schema (chat decision
+    PR-186 review item 1).
     """
 
     config_id: str
     chained_max_dd_base_pct: float
+    chained_dd_method: str   # "equity_stitching" | "full_window_sim"
     per_day_max_dd_artefact_path: Path | None
     amended_gate: AmendedGateResult
 
@@ -617,6 +634,12 @@ class ArcOrchestrator:
             amended_results.append(CandidateAmendedResult(
                 config_id=cid,
                 chained_max_dd_base_pct=chained_dd,
+                # v3.0.1 reconstructs chained equity via stitching;
+                # v3.0.2 follow-up replaces with full_window_sim per
+                # chat directive Q6. Recorded per-candidate so
+                # downstream analysts know which method produced the
+                # chained DD value.
+                chained_dd_method="equity_stitching",
                 per_day_max_dd_artefact_path=parquet_path,
                 amended_gate=amended_gate,
             ))

@@ -112,6 +112,10 @@ def test_full_pipeline_a1_only_emits_amendment_3_fields(tmp_path: Path) -> None:
     # ── Per-top-K amended gate fields ─────────────────────────────────
     for amended in result.amended_wfo.amended_results:
         assert isinstance(amended, CandidateAmendedResult)
+        # Chained-DD method recorded per PR-186 review item 1 — v3.0.1
+        # default is equity_stitching; v3.0.2 follow-up will swap in
+        # full_window_sim.
+        assert amended.chained_dd_method == "equity_stitching"
         gate = amended.amended_gate
         # Every tracker payload field per ARC_CLOSURE_TEMPLATE v1.2 §1
         assert gate.k_safe is not None

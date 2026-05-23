@@ -297,6 +297,8 @@ A1 (system_level_filter) and A5 (portfolio_composition) are rule-based — no ML
 
 A2 and A6 use the single Step-4-fit classifier across every WFO fold. A3 and A4 fit a fresh classifier on the IS window of each fold. The "global model" caution in the next bullet applies to A3 / A4 only — A2 / A6 are explicitly exempt per Amendment 2.
 
+**A4 same-bar exit precedence (locked 2026-05-23):** when both an A4 classifier-exit predicate AND a trailing-stop trigger fire on the same bar close, **the trailing-stop wins** (`exit_reason = "trailing_stop"`). Intra-bar SL/TP exits remain highest priority (they fire BEFORE either bar-close hook). Matches typical real-world execution where stop-side triggers fire before manual classifier-driven closes on a fast move. Implementation: `core/sim/multipair_backtester.py:_process_bar` step 3 uses direct assignment to `_pending_closes` (not `setdefault`); regression test at `tests/protocol_runtime/test_multipair_backtester_precedence.py`.
+
 **Shared discipline across all ML architectures:**
 - All classifiers respect causal lineage tags from Step 1 — no "suspect" or "unverified" features enter training
 - Deterministic training: `random_state=42`, `n_jobs=1` per Appendix A

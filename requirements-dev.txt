@@ -6,3 +6,5 @@ ruff
 pyyaml
 pydantic
 scipy
+scikit-learn
+joblib

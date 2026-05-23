@@ -66,8 +66,8 @@ def _make_synthetic_pair(pair: str, n: int = 2000, seed: int = 0) -> PairFixture
 def _lineage_df() -> pd.DataFrame:
     return pd.DataFrame(
         [
-            {"name": "feat_a", "lineage": "clean", "feature_class": "synthetic"},
-            {"name": "feat_b", "lineage": "clean", "feature_class": "synthetic"},
+            {"name": "feat_a", "causal_lineage": "clean", "feature_class": "synthetic"},
+            {"name": "feat_b", "causal_lineage": "clean", "feature_class": "synthetic"},
         ]
     )
 

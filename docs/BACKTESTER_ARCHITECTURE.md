@@ -383,6 +383,19 @@ invocations produce byte-identical output.
   `core.steps.classifier_persistence.build_a2_config_from_step4` /
   `build_a6_config_from_step4`. Full reference:
   [PROTOCOL_RUNTIME.md §7](PROTOCOL_RUNTIME.md).
+- A3 / A4 per-fold classifier orchestration — `core/steps/path_classifier_per_fold.py`
+  builds per-fold `PathClassifierFit` (target = cluster membership for
+  A3, `final_r > 0` for A4) on each fold's IS-only window. Threaded
+  via `A1RunContext.path_classifier_fits`. Cost-decomposition emitted
+  per top-K candidate in `StrategyResult.metadata`. Reference:
+  [PROTOCOL_RUNTIME.md §8](PROTOCOL_RUNTIME.md).
+- Amendment 3 risk-normalised gates — engine emits the full scaled-risk
+  evaluation (chained max DD, per-day max-DD parquet, scaled
+  DEPLOYABLE / VIABLE gates, holdout re-runs at r_safe / r_hard,
+  sizing-convention check, priority-ordered failure-mode taxonomy).
+  Modules: `core.wfo.amended_gates`, `core.wfo.chained_dd`,
+  `core.wfo.holdout_rerun`. Full reference:
+  [PROTOCOL_RUNTIME.md §8b](PROTOCOL_RUNTIME.md).
 - Live deployment EA — `EA/KH24_EA.mq5` is the only deployed system;
   ports of v3 candidates open only when a candidate clears
   PASS-DEPLOYABLE per §3.

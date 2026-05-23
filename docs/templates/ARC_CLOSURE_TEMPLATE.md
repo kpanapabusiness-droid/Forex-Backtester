@@ -107,6 +107,12 @@ tracker_payload:
     holdout_roi_at_r_hard_pct: <float or null>
     holdout_dd_at_r_hard_pct: <float or null>
     sizing_convention: reset_floor | equity_pct  # gate FAILs equity_pct unless chat approves
+    # Method used to reconstruct chained equity for `chained_max_dd_base_pct`.
+    # "equity_stitching" = v3.0.1 default (multiplicative chaining of per-fold
+    # OOS returns with continuity adjustment). "full_window_sim" = v3.0.2
+    # follow-up (single full-window sim per top-K candidate; chat directive
+    # Q6 gold standard). Optional pre-Wave 2 PASS arc; required post Wave 2.
+    chained_dd_method: equity_stitching | full_window_sim | null
 
     # ── v1.2 deployment-spec fields ──
     config_artefact_path: <relative path to canonical config YAML from repo root, or null for non-PASS verdicts>
@@ -367,8 +373,9 @@ Parser specification (preserved here for reference):
 | v1.0 | 2026-05-13 | Initial locked template. |
 | v1.1 | 2026-05-22 | L_PROTOCOL Amendment 3. Risk-normalised fields added to `best_architecture`. Two fields renamed: `worst_fold_roi_pct` → `worst_fold_roi_base_pct`, `worst_fold_dd_pct` → `worst_fold_dd_base_pct`. `primary_failure_mode` enum extended. Pre-v1.1 closures retain v1.0 field names; parser handles both via version detection. |
 | v1.2 | 2026-05-23 | Deployment-spec addition. Three new fields in `best_architecture`: `config_artefact_path`, `deployment_spec_section_present`, `template_version` (the last was conventional in v1.1; locked at v1.2). New §4 deployment_spec section: REQUIRED for PASS-* verdicts (DEPLOYABLE, VIABLE, *-PROVISIONAL, *-PENDING-STEP6), OPTIONAL otherwise. Parser HALTs on PASS verdict if config path missing / file absent / §4 heading missing (Section 4-L). Pre-v1.2 closures unaffected. |
+| v1.2.1 | 2026-05-23 | `chained_dd_method` field added to `best_architecture` per PR-186 review item 1. Records the method used to reconstruct chained equity for `chained_max_dd_base_pct`: `"equity_stitching"` (v3.0.1 engine default) or `"full_window_sim"` (v3.0.2 follow-up). Phase 1: parser accepts as OPTIONAL. Phase 2 (post-Wave-2 first PASS arc): parser REQUIRES the field for any PASS verdict with `closed_timestamp > PR-186 merge date`. Older closures grandfathered by closed_timestamp check. v1.2 / v1.2.1 share the same `template_version: v1.2` declaration — the field's presence/absence is the v1.2.1 discriminator, not a separate version string. |
 
-Closures MUST reference the template version they were written against (e.g., `template_version: v1.2` near the top of `§1 tracker_payload` is the convention going forward — pre-v1.1 closures without this field are assumed v1.0; pre-v1.2 closures without `config_artefact_path` are assumed v1.1).
+Closures MUST reference the template version they were written against (e.g., `template_version: v1.2` near the top of `§1 tracker_payload` is the convention going forward — pre-v1.1 closures without this field are assumed v1.0; pre-v1.2 closures without `config_artefact_path` are assumed v1.1). v1.2.1 stays under the `v1.2` declaration; the `chained_dd_method` field is the only discriminator and is OPTIONAL during Phase 1.
 
 ---
 

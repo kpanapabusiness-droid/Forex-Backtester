@@ -59,14 +59,15 @@ def feature_lineage_dataframe(names: list[str] | None = None) -> pd.DataFrame:
         {
             "name": s.name,
             "feature_class": s.feature_class,
-            "lineage": s.lineage.value,
+            "causal_lineage": s.lineage.value,
             "needs_panel": s.needs_panel,
             "description": s.description,
         }
         for s in specs
     ]
     df = pd.DataFrame(
-        rows, columns=["name", "feature_class", "lineage", "needs_panel", "description"]
+        rows,
+        columns=["name", "feature_class", "causal_lineage", "needs_panel", "description"],
     )
     return df.sort_values("name").reset_index(drop=True)
 

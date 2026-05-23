@@ -28,6 +28,7 @@ else is identical to A1.
 
 from __future__ import annotations
 
+import warnings
 from dataclasses import dataclass
 from typing import Mapping
 
@@ -63,20 +64,23 @@ DEFAULT_N_DEFER_VALUES = (3, 5)
 class A3Config:
     """A3 deferred-entry config.
 
-    ``classifier_fit`` is the per-fold-trained classifier; ``n_defer`` is
-    the bar count between signal and decision (in {3, 5} per Appendix B).
-    ``threshold_override`` is optional; otherwise the fit's AUC-best
-    threshold is used.
+    ``n_defer`` is the bar count between signal and decision (in {3, 5}
+    per Appendix B). ``threshold_override`` is optional; otherwise the
+    fit's AUC-best threshold is used.
 
-    ``per_trade_entry_features`` is the per-trade entry-feature lookup:
-    (pair, signal_time) -> dict of ENTRY_FEATURE_KEYS values. The
-    runtime combines these with path-so-far computed online to build
-    the full feature vector at decision time.
+    ``classifier_fit`` and ``per_trade_entry_features`` are DEPRECATED
+    single-fit paths kept for backwards-compat with synthetic tests +
+    direct-construction drivers. Prefer threading per-fold data via
+    :class:`A1RunContext` (``path_classifier_fits`` keyed by
+    ``fold.fold_id``, ``per_trade_entry_features`` shared across folds).
+    The deprecated fields emit a DeprecationWarning at runtime; per chat
+    directive Q2 they are scheduled for removal after 2 closed arcs use
+    the new path successfully.
     """
 
     config_id: str
-    classifier_fit: PathClassifierFit
     n_defer: int
+    classifier_fit: PathClassifierFit | None = None  # DEPRECATED; use run_context.path_classifier_fits
     threshold_override: float | None = None
     sl_atr_mult: float = 2.0
     trail_enabled: bool = True
@@ -87,7 +91,10 @@ class A3Config:
     max_concurrent_total: int | None = None
     max_concurrent_per_pair: int | None = 1
     max_concurrent_per_currency: int | None = 2
-    per_trade_entry_features: Mapping[tuple[str, pd.Timestamp], Mapping[str, float]] = None  # type: ignore[assignment]
+    # DEPRECATED; use run_context.per_trade_entry_features
+    per_trade_entry_features: Mapping[tuple[str, pd.Timestamp], Mapping[str, float]] | None = None
+    # Amendment 3 §"Sizing convention"
+    sizing_convention: str = "reset_floor"   # "reset_floor" | "equity_pct"
 
 
 def _path_features_so_far(
@@ -169,8 +176,18 @@ def _build_a3_strategy(
     cfg: A3Config,
     account: Account,
     risk: LiveBalanceRisk,
+    *,
+    classifier_fit: PathClassifierFit,
+    entry_features_lookup: Mapping[tuple[str, pd.Timestamp], Mapping[str, float]] | None,
 ) -> StrategyFn:
-    """A3 emits orders at signal+n_defer rather than signal — deferred entry."""
+    """A3 emits orders at signal+n_defer rather than signal — deferred entry.
+
+    ``classifier_fit`` and ``entry_features_lookup`` are resolved
+    upstream by :meth:`A3Architecture.run` from either ``run_context``
+    (canonical orchestrator path, per-fold) or ``arch_config``
+    (deprecated single-fit path; emits a DeprecationWarning at the
+    callsite).
+    """
     primary_panel = panels[signal_eval.primary_tf]
     per_pair = signal_eval.per_pair
 
@@ -227,8 +244,8 @@ def _build_a3_strategy(
                 continue
             # Build classifier feature vector
             entry_feats = (
-                cfg.per_trade_entry_features.get((pair, sig_t))
-                if cfg.per_trade_entry_features is not None
+                entry_features_lookup.get((pair, sig_t))
+                if entry_features_lookup is not None
                 else None
             )
             if entry_feats is None:
@@ -238,7 +255,7 @@ def _build_a3_strategy(
             )
             combined = {**entry_feats, **path_feats}
             admit, _proba = predict_admit(
-                cfg.classifier_fit,
+                classifier_fit,
                 combined,
                 threshold_override=cfg.threshold_override,
             )
@@ -289,6 +306,13 @@ class A3Architecture:
         config_id: str,
         run_context: A1RunContext | None = None,
     ) -> StrategyResult:
+        # Resolve classifier_fit + entry_features_lookup with the
+        # run_context (canonical, per-fold) path preferred over the
+        # deprecated arch_config (single-fit) path.
+        ctx = run_context
+        classifier_fit = _resolve_a3_classifier_fit(arch_config, ctx, fold)
+        entry_features_lookup = _resolve_a3_entry_features(arch_config, ctx)
+
         sliced = _slice_panels_to_fold(panels, fold)
         primary = sliced[signal_evaluation.primary_tf]
         account = Account(
@@ -312,6 +336,8 @@ class A3Architecture:
             cfg=arch_config,
             account=account,
             risk=risk,
+            classifier_fit=classifier_fit,
+            entry_features_lookup=entry_features_lookup,
         )
         bt = MultiPairBacktester(
             panel=primary,
@@ -337,14 +363,77 @@ class A3Architecture:
             closed_trades=run_result.closed_trades,
             metadata={
                 "n_defer": arch_config.n_defer,
-                "classifier_fit_auc": arch_config.classifier_fit.fit_auc,
+                "classifier_fit_auc": classifier_fit.fit_auc,
                 "threshold_used": (
                     arch_config.threshold_override
                     if arch_config.threshold_override is not None
-                    else arch_config.classifier_fit.threshold
+                    else classifier_fit.threshold
                 ),
             },
         )
+
+
+def _resolve_a3_classifier_fit(
+    cfg: "A3Config",
+    ctx: A1RunContext | None,
+    fold: Fold,
+) -> PathClassifierFit:
+    """Return the PathClassifierFit for A3 at ``fold``.
+
+    Preference order:
+      1. ``ctx.path_classifier_fits[fold.fold_id]`` (canonical
+         orchestrator path; per-fold retrained classifier).
+      2. ``cfg.classifier_fit`` (deprecated single-fit path; emits a
+         DeprecationWarning).
+
+    Raises ``RuntimeError`` if neither source supplies a fit.
+    """
+    if ctx is not None and ctx.path_classifier_fits is not None:
+        fit = ctx.path_classifier_fits.get(fold.fold_id)
+        if fit is not None:
+            return fit  # type: ignore[return-value]
+    if cfg.classifier_fit is not None:
+        warnings.warn(
+            "A3Config.classifier_fit is deprecated; pass per-fold fits "
+            "via A1RunContext.path_classifier_fits (keyed by fold_id). "
+            "Single-fit support will be removed after 2 closed arcs use "
+            "the new path successfully (per chat directive Q2).",
+            DeprecationWarning,
+            stacklevel=3,
+        )
+        return cfg.classifier_fit
+    raise RuntimeError(
+        f"A3 requires a path-classifier fit at fold {fold.fold_id}: pass "
+        f"via run_context.path_classifier_fits[{fold.fold_id}] (canonical) "
+        f"or arch_config.classifier_fit (deprecated)"
+    )
+
+
+def _resolve_a3_entry_features(
+    cfg: "A3Config",
+    ctx: A1RunContext | None,
+) -> Mapping[tuple[str, pd.Timestamp], Mapping[str, float]] | None:
+    """Return the entry-features lookup for A3.
+
+    Preference order:
+      1. ``ctx.per_trade_entry_features`` (canonical orchestrator path).
+      2. ``cfg.per_trade_entry_features`` (deprecated; emits a
+         DeprecationWarning).
+    Returns ``None`` if neither source supplies the lookup — A3's
+    strategy then rejects every signal (entry-features required).
+    """
+    if ctx is not None and ctx.per_trade_entry_features is not None:
+        return ctx.per_trade_entry_features
+    if cfg.per_trade_entry_features is not None:
+        warnings.warn(
+            "A3Config.per_trade_entry_features is deprecated; pass via "
+            "A1RunContext.per_trade_entry_features. Will be removed "
+            "after 2 closed arcs use the new path (chat directive Q2).",
+            DeprecationWarning,
+            stacklevel=3,
+        )
+        return cfg.per_trade_entry_features
+    return None
 
 
 __all__ = (

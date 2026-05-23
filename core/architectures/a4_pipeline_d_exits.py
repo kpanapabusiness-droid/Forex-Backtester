@@ -22,6 +22,7 @@ intra-bar exits-first ordering.
 
 from __future__ import annotations
 
+import warnings
 from dataclasses import dataclass
 from typing import Mapping
 
@@ -56,15 +57,21 @@ DEFAULT_EXIT_THRESHOLDS = (0.3, 0.4, 0.5)
 class A4Config:
     """A4 differentiated-exits config.
 
-    ``classifier_fit`` is per-fold-trained on (path-so-far features ->
-    final_r > 0). ``exit_threshold`` is the confidence floor; below it,
-    a bar-close exit is queued.
+    ``exit_threshold`` is the confidence floor; below it, a bar-close
+    exit is queued.
 
-    ``per_trade_entry_features`` is the same lookup A3 uses.
+    ``classifier_fit`` and ``per_trade_entry_features`` are DEPRECATED
+    single-fit paths kept for backwards-compat with synthetic tests +
+    direct-construction drivers. Prefer threading per-fold data via
+    :class:`A1RunContext` (``path_classifier_fits`` keyed by
+    ``fold.fold_id``, ``per_trade_entry_features`` shared across
+    folds). The deprecated fields emit a DeprecationWarning at
+    runtime; per chat directive Q2 they are scheduled for removal
+    after 2 closed arcs use the new path successfully.
     """
 
     config_id: str
-    classifier_fit: PathClassifierFit
+    classifier_fit: PathClassifierFit | None = None  # DEPRECATED
     exit_threshold: float = 0.4
     sl_atr_mult: float = 2.0
     trail_enabled: bool = True
@@ -75,7 +82,9 @@ class A4Config:
     max_concurrent_total: int | None = None
     max_concurrent_per_pair: int | None = 1
     max_concurrent_per_currency: int | None = 2
-    per_trade_entry_features: Mapping[tuple[str, pd.Timestamp], Mapping[str, float]] = None  # type: ignore[assignment]
+    per_trade_entry_features: Mapping[tuple[str, pd.Timestamp], Mapping[str, float]] | None = None  # DEPRECATED
+    # Amendment 3 §"Sizing convention"
+    sizing_convention: str = "reset_floor"   # "reset_floor" | "equity_pct"
 
 
 @dataclass
@@ -164,6 +173,11 @@ class A4Architecture:
         config_id: str,
         run_context: A1RunContext | None = None,
     ) -> StrategyResult:
+        # Resolve classifier_fit + entry_features_lookup via run_context
+        # (canonical, per-fold) or arch_config (deprecated single-fit).
+        classifier_fit = _resolve_a4_classifier_fit(arch_config, run_context, fold)
+        entry_features_lookup = _resolve_a4_entry_features(arch_config, run_context)
+
         sliced = _slice_panels_to_fold(panels, fold)
         primary = sliced[signal_evaluation.primary_tf]
         account = Account(
@@ -179,8 +193,8 @@ class A4Architecture:
 
         # Build per-pair exit predicates from the classifier + entry features
         entry_features_by_signal_time_per_pair: dict[str, dict[pd.Timestamp, Mapping[str, float]]] = {}
-        if arch_config.per_trade_entry_features is not None:
-            for (pair, sig_t), feats in arch_config.per_trade_entry_features.items():
+        if entry_features_lookup is not None:
+            for (pair, sig_t), feats in entry_features_lookup.items():
                 entry_features_by_signal_time_per_pair.setdefault(pair, {})[sig_t] = feats
 
         a4_predicates: list[ExitPredicate] = []
@@ -191,7 +205,7 @@ class A4Architecture:
             a4_predicates.append(_A4ExitPredicate(
                 pair=pair,
                 pair_df=df,
-                classifier_fit=arch_config.classifier_fit,
+                classifier_fit=classifier_fit,
                 exit_threshold=arch_config.exit_threshold,
                 entry_features_by_signal_time=entry_features_by_signal_time_per_pair.get(pair, {}),
                 primary_tf_index=df.index,
@@ -248,9 +262,58 @@ class A4Architecture:
             closed_trades=run_result.closed_trades,
             metadata={
                 "exit_threshold": arch_config.exit_threshold,
-                "classifier_fit_auc": arch_config.classifier_fit.fit_auc,
+                "classifier_fit_auc": classifier_fit.fit_auc,
             },
         )
+
+
+def _resolve_a4_classifier_fit(
+    cfg: "A4Config",
+    ctx: A1RunContext | None,
+    fold: Fold,
+) -> PathClassifierFit:
+    """Return the PathClassifierFit for A4 at ``fold``.
+
+    Mirror of :func:`core.architectures.a3_pipeline_de._resolve_a3_classifier_fit`.
+    """
+    if ctx is not None and ctx.path_classifier_fits is not None:
+        fit = ctx.path_classifier_fits.get(fold.fold_id)
+        if fit is not None:
+            return fit  # type: ignore[return-value]
+    if cfg.classifier_fit is not None:
+        warnings.warn(
+            "A4Config.classifier_fit is deprecated; pass per-fold fits "
+            "via A1RunContext.path_classifier_fits (keyed by fold_id). "
+            "Single-fit support will be removed after 2 closed arcs use "
+            "the new path successfully (per chat directive Q2).",
+            DeprecationWarning,
+            stacklevel=3,
+        )
+        return cfg.classifier_fit
+    raise RuntimeError(
+        f"A4 requires a path-classifier fit at fold {fold.fold_id}: pass "
+        f"via run_context.path_classifier_fits[{fold.fold_id}] (canonical) "
+        f"or arch_config.classifier_fit (deprecated)"
+    )
+
+
+def _resolve_a4_entry_features(
+    cfg: "A4Config",
+    ctx: A1RunContext | None,
+) -> Mapping[tuple[str, pd.Timestamp], Mapping[str, float]] | None:
+    """Return the entry-features lookup for A4. Mirror of A3 helper."""
+    if ctx is not None and ctx.per_trade_entry_features is not None:
+        return ctx.per_trade_entry_features
+    if cfg.per_trade_entry_features is not None:
+        warnings.warn(
+            "A4Config.per_trade_entry_features is deprecated; pass via "
+            "A1RunContext.per_trade_entry_features. Will be removed "
+            "after 2 closed arcs use the new path (chat directive Q2).",
+            DeprecationWarning,
+            stacklevel=3,
+        )
+        return cfg.per_trade_entry_features
+    return None
 
 
 __all__ = (

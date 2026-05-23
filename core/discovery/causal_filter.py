@@ -45,17 +45,17 @@ def clean_feature_pool(
 ) -> tuple[str, ...]:
     """Return the sorted tuple of feature names with accepted lineage.
 
-    ``lineage_df`` must have columns ``name``, ``lineage``, ``feature_class``
+    ``lineage_df`` must have columns ``name``, ``causal_lineage``, ``feature_class``
     (the shape produced by ``core.features.pipeline.feature_lineage_dataframe``).
     """
-    required = {"name", "lineage", "feature_class"}
+    required = {"name", "causal_lineage", "feature_class"}
     missing = required - set(lineage_df.columns)
     if missing:
         raise ValueError(f"lineage_df missing columns: {sorted(missing)}")
     accepted_set = {s.lower() for s in accepted}
     exclude_set = {s.lower() for s in exclude_classes}
     keep = lineage_df[
-        lineage_df["lineage"].str.lower().isin(accepted_set)
+        lineage_df["causal_lineage"].str.lower().isin(accepted_set)
         & ~lineage_df["feature_class"].str.lower().isin(exclude_set)
     ]
     return tuple(sorted(keep["name"].tolist()))
@@ -85,7 +85,7 @@ def check_rule_causal(
             missing.append(f)
             continue
         row = by_name.loc[f]
-        lineage_value = str(row["lineage"]).lower()
+        lineage_value = str(row["causal_lineage"]).lower()
         feat_class = str(row["feature_class"]).lower()
         if lineage_value not in accepted_set:
             bad.append(f)

@@ -301,13 +301,23 @@ class MultiPairBacktester:
         #    (predicate hits go to _pending_closes for next-bar-open fill)
         self._check_exits(t, snapshot)
         # 3. update trailing stops at bar close AND queue trail-triggered
-        #    closes for next-bar-open fill (EA pattern per PR-E.1.6 §B)
+        #    closes for next-bar-open fill (EA pattern per PR-E.1.6 §B).
+        #
+        # Precedence on same-bar tie between trail-stop and exit_predicate
+        # (e.g. A4 classifier exit): TRAIL WINS. Per L_PROTOCOL §2 Step 5
+        # "Architecture-specific retraining policy" subsection — matches
+        # typical real-world execution where the stop-side trigger fires
+        # before a manual classifier-driven close on a fast move. The
+        # previous `setdefault`-based behaviour (predicate-wins) was an
+        # implementation-order accident, not a design choice.
+        # Intra-bar SL/TP remain the highest-precedence exit (handled in
+        # step 2 above) — only same-bar predicate vs trail-stop ties are
+        # affected by this assignment.
         if self.trail_manager is not None:
             self.trail_manager.update_all_at_close(snapshot, self.account)
             trail_hits = self.trail_manager.trail_exit_triggers_at_close(snapshot, self.account)
             for pos_id in trail_hits:
-                # Don't overwrite a predicate-driven exit that fired this bar
-                self._pending_closes.setdefault(pos_id, "trailing_stop")
+                self._pending_closes[pos_id] = "trailing_stop"
         # 4. mark to market
         self.account.mark_to_market(t, self._close_mid(snapshot))
         # 5. ask the strategy for new orders

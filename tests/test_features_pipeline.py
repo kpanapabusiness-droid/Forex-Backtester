@@ -100,7 +100,12 @@ def test_feature_names_unique() -> None:
 
 def test_lineage_dataframe_has_required_columns() -> None:
     df = feature_lineage_dataframe()
-    assert set(df.columns) == {"name", "feature_class", "lineage", "needs_panel", "description"}
+    # Column renamed `lineage` → `causal_lineage` per L_PROTOCOL §1
+    # terminology (matches _filter_lineage in core.steps.step_4_extraction
+    # and clean_feature_pool in core.discovery.causal_filter).
+    assert set(df.columns) == {
+        "name", "feature_class", "causal_lineage", "needs_panel", "description",
+    }
     # Sorted by name
     assert list(df["name"]) == sorted(df["name"])
 

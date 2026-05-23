@@ -42,6 +42,7 @@ from core.architectures._protocol import Architecture, StrategyResult
 from core.architectures.a1_system_level_filter import A1RunContext
 from core.runners.arc_fold_runner import ArcFoldRunner
 from core.sim.panel import Panel
+from core.runners._fold_stats_helpers import compute_per_day_max_dd
 from core.steps.classifier_persistence import (
     build_a2_config_from_step4,
     build_a3_config_from_step4,
@@ -56,8 +57,19 @@ from core.steps.path_classifier_per_fold import (
 from core.steps.step_2_clustering import Step2Result, run_step_2
 from core.steps.step_3_capturability import Step3Result, run_step_3
 from core.steps.step_4_extraction import Step4Result, run_step_4
+from core.wfo.amended_gates import (
+    AmendedGateResult,
+    AmendedVerdict,
+    classify_amended_fold_stats,
+)
+from core.wfo.chained_dd import (
+    compute_chained_max_dd_from_continuous_equity,
+    stitch_per_fold_oos_equity,
+)
 from core.wfo.folds import Fold, WfoStructure, build_v3_folds
+from core.wfo.holdout_rerun import rescale_arch_config_risk
 from core.wfo.orchestrator import (
+    CandidateSearchResult,
     WfoSearchResult,
     run_holdout,
     run_search,
@@ -170,6 +182,35 @@ class ArcConfig:
     expected_failure_modes: str = ""
 
 
+@dataclass(frozen=True)
+class CandidateAmendedResult:
+    """Per-candidate Amendment 3 evaluation bundle.
+
+    Extension dataclass per chat directive Q4 — does NOT amend
+    :class:`core.wfo.orchestrator.WfoSearchResult` in place.
+    Backwards compatibility with pre-Amendment-3 readers preserved.
+    """
+
+    config_id: str
+    chained_max_dd_base_pct: float
+    per_day_max_dd_artefact_path: Path | None
+    amended_gate: AmendedGateResult
+
+
+@dataclass(frozen=True)
+class AmendedWfoSearchResult:
+    """Amendment 3 extension of :class:`WfoSearchResult`.
+
+    Holds per-top-K Amendment 3 evaluations alongside the original
+    WfoSearchResult so closure writers / verdict logic / tracker
+    payloads can read every Amendment 3 field without round-tripping
+    through the legacy result type.
+    """
+
+    base: WfoSearchResult
+    amended_results: tuple[CandidateAmendedResult, ...]
+
+
 @dataclass
 class ArcOrchestratorResult:
     """Complete output of one arc run."""
@@ -185,6 +226,8 @@ class ArcOrchestratorResult:
     arc_closure_md: str
     verdict: str  # "PASS_DEPLOYABLE" | "PASS_VIABLE" | "FAIL" | "INCOMPLETE"
     raw_strategy_results: tuple[StrategyResult, ...] = field(default_factory=tuple)
+    # Amendment 3 extension — None when no top-K candidates exist
+    amended_wfo: AmendedWfoSearchResult | None = None
 
 
 class ArcOrchestrator:
@@ -415,6 +458,11 @@ class ArcOrchestrator:
         # Stash for the run() holdout block — see ``run()`` below.
         self._last_per_candidate_arch = per_candidate_arch
         self._last_base_ctx = base_ctx
+        # Side-channel: collect per-(config_id, fold_id) StrategyResults
+        # so the Amendment 3 evaluation can read the per-fold OOS equity
+        # series without re-running sims. Keyed by config_id with a
+        # nested dict keyed by fold_id.
+        self._last_strategy_results: dict[str, dict[int, StrategyResult]] = {}
 
         if not candidates:
             return None
@@ -429,7 +477,10 @@ class ArcOrchestrator:
                 panels=self.panels,
                 run_context=ctx,
             )
-            return r(fold, conf)
+            stats = r(fold, conf)
+            if r.last_result is not None:
+                self._last_strategy_results.setdefault(cid, {})[fold.fold_id] = r.last_result
+            return stats
 
         return run_search(
             wfo_struct,
@@ -438,6 +489,193 @@ class ArcOrchestrator:
             min_is_days=365,
             top_k=3,
         )
+
+    # ── Amendment 3 evaluation pass ───────────────────────────────────
+
+    def _run_amendment_3_evaluation(
+        self,
+        *,
+        s5: WfoSearchResult,
+        holdout_results: tuple,
+        signal_eval: SignalEvaluation,
+        wfo_struct: WfoStructure,
+    ) -> AmendedWfoSearchResult:
+        """Per-top-K candidate Amendment 3 evaluation.
+
+        For each top-K candidate:
+          1. Stitch per-fold OOS equity + holdout OOS equity into a
+             continuous-equity proxy (per chat directive Q6 the gold
+             standard is a full-window sim; this implementation uses
+             equity-stitching per the v3.0.1 scope, documented in
+             :mod:`core.wfo.chained_dd`).
+          2. Compute ``chained_max_dd_base_pct`` from that.
+          3. Emit per-day max-DD parquet (UTC broker-day boundary).
+          4. Re-run holdout at ``r_safe`` / ``r_hard`` per the candidate's
+             scaling factors, if scalable.
+          5. Apply :func:`classify_amended_fold_stats`.
+
+        Returns :class:`AmendedWfoSearchResult` containing per-top-K
+        :class:`CandidateAmendedResult`. Extension dataclass per chat
+        directive Q4 — does NOT amend ``WfoSearchResult`` in place.
+        """
+        out_dir = self._resolve_output_dir()
+        step5_dir = out_dir / "step_5"
+        step5_dir.mkdir(parents=True, exist_ok=True)
+
+        per_candidate_arch = getattr(self, "_last_per_candidate_arch", {})
+        base_ctx = getattr(self, "_last_base_ctx", A1RunContext())
+        strategy_results = getattr(self, "_last_strategy_results", {})
+
+        holdout_by_cid: dict[str, Any] = {}
+        for h in holdout_results or ():
+            holdout_by_cid[h.config_id] = h
+
+        amended_results: list[CandidateAmendedResult] = []
+
+        for cand in s5.top_k:
+            cid = cand.config_id
+            # 1. Stitch per-fold OOS equity + holdout OOS equity
+            per_fold_equity: list[pd.Series] = []
+            for f_stats in cand.fold_stats:
+                sr = strategy_results.get(cid, {}).get(f_stats.fold_id)
+                if sr is not None and len(sr.equity_curve) > 0:
+                    per_fold_equity.append(sr.equity_curve)
+            # Holdout OOS equity (one-shot)
+            h_match = holdout_by_cid.get(cid)
+            if h_match is not None and wfo_struct.holdout is not None:
+                # Need to re-execute holdout to capture the StrategyResult's
+                # equity — run_holdout currently only returns FoldStats.
+                # Optimisation TODO: extend run_holdout to keep equity.
+                # For this PR we approximate by running the holdout sim
+                # explicitly here per top-K candidate (cheap; only top-K).
+                holdout_sr = self._rerun_holdout_capture_equity(
+                    cand=cand, fold=wfo_struct.holdout,
+                    signal_eval=signal_eval,
+                    per_candidate_arch=per_candidate_arch,
+                    base_ctx=base_ctx,
+                )
+                if holdout_sr is not None and len(holdout_sr.equity_curve) > 0:
+                    per_fold_equity.append(holdout_sr.equity_curve)
+
+            arch_config = cand.config
+            starting_balance = float(getattr(arch_config, "starting_balance", 100_000.0))
+            chained_equity = stitch_per_fold_oos_equity(
+                per_fold_equity, starting_balance=starting_balance,
+            )
+            chained_dd = compute_chained_max_dd_from_continuous_equity(chained_equity)
+
+            # 3. Per-day max-DD parquet (full IS+holdout trajectory)
+            per_day_df = compute_per_day_max_dd(
+                chained_equity, pair_set=",".join(self.cfg.pair_set)
+            )
+            parquet_path: Path | None = None
+            if not per_day_df.empty:
+                # Use cid-safe filename
+                safe_cid = cid.replace("::", "__").replace("/", "_")
+                parquet_path = step5_dir / f"per_day_max_dd_base__{safe_cid}.parquet"
+                per_day_df.to_parquet(
+                    parquet_path, engine="pyarrow", compression="snappy", index=False,
+                )
+
+            # 4. Re-run holdout at scaled risk(s)
+            from core.wfo.amended_gates import compute_scaling_factors
+            worst_fold_dd_base = max(
+                (f.max_dd_pct for f in cand.fold_stats), default=0.0
+            )
+            scaling = compute_scaling_factors(worst_fold_dd_base, r_base=self.cfg.risk_pct)
+            holdout_safe = None
+            holdout_hard = None
+            if scaling.scalable_to_safe:
+                holdout_safe = self._rerun_holdout_at_scaled_risk(
+                    cand=cand, fold=wfo_struct.holdout, k_scale=scaling.k_safe,
+                    signal_eval=signal_eval, per_candidate_arch=per_candidate_arch,
+                    base_ctx=base_ctx,
+                )
+            if scaling.scalable_to_hard:
+                holdout_hard = self._rerun_holdout_at_scaled_risk(
+                    cand=cand, fold=wfo_struct.holdout, k_scale=scaling.k_hard,
+                    signal_eval=signal_eval, per_candidate_arch=per_candidate_arch,
+                    base_ctx=base_ctx,
+                )
+
+            # 5. Classify with amended gate logic
+            sizing_convention = str(getattr(arch_config, "sizing_convention", "reset_floor"))
+            amended_gate = classify_amended_fold_stats(
+                folds=cand.fold_stats,
+                chained_max_dd_base_pct=chained_dd,
+                per_day_max_dd_df=per_day_df if not per_day_df.empty else None,
+                holdout_stats_at_r_safe=holdout_safe,
+                holdout_stats_at_r_hard=holdout_hard,
+                sizing_convention=sizing_convention,
+                accept_equity_pct=self.cfg.accept_equity_pct,
+                r_base=self.cfg.risk_pct,
+            )
+
+            amended_results.append(CandidateAmendedResult(
+                config_id=cid,
+                chained_max_dd_base_pct=chained_dd,
+                per_day_max_dd_artefact_path=parquet_path,
+                amended_gate=amended_gate,
+            ))
+
+        return AmendedWfoSearchResult(base=s5, amended_results=tuple(amended_results))
+
+    def _rerun_holdout_capture_equity(
+        self,
+        *,
+        cand: CandidateSearchResult,
+        fold: Fold,
+        signal_eval: SignalEvaluation,
+        per_candidate_arch: dict[str, tuple[Architecture, A1RunContext]],
+        base_ctx: A1RunContext,
+    ) -> StrategyResult | None:
+        """Re-run the holdout sim for ``cand`` and return its StrategyResult.
+
+        The existing :func:`run_holdout` only surfaces FoldStats; we
+        need the equity series for chained DD + per-day DD emission.
+        Cheap because only top-K candidates run through here.
+        """
+        cid = cand.config_id
+        arch, ctx = per_candidate_arch.get(cid, (None, base_ctx))  # type: ignore[assignment]
+        if arch is None:
+            return None
+        r = ArcFoldRunner(
+            architecture=arch,
+            signal_evaluation=signal_eval,
+            panels=self.panels,
+            run_context=ctx,
+        )
+        r(fold, cand.config)
+        return r.last_result
+
+    def _rerun_holdout_at_scaled_risk(
+        self,
+        *,
+        cand: CandidateSearchResult,
+        fold: Fold,
+        k_scale: float,
+        signal_eval: SignalEvaluation,
+        per_candidate_arch: dict[str, tuple[Architecture, A1RunContext]],
+        base_ctx: A1RunContext,
+    ) -> "FoldStats | None":
+        """Re-run holdout at ``risk_pct * k_scale`` per Amendment 3 §5.3."""
+        from core.wfo.gates import FoldStats  # local import for type
+        cid = cand.config_id
+        arch, ctx = per_candidate_arch.get(cid, (None, base_ctx))  # type: ignore[assignment]
+        if arch is None:
+            return None
+        try:
+            scaled_config = rescale_arch_config_risk(cand.config, k_scale=k_scale)
+        except (TypeError, ValueError):
+            return None
+        r = ArcFoldRunner(
+            architecture=arch,
+            signal_evaluation=signal_eval,
+            panels=self.panels,
+            run_context=ctx,
+        )
+        stats = r(fold, scaled_config)
+        return stats
 
     # ── full run ──────────────────────────────────────────────────────
 
@@ -491,9 +729,30 @@ class ArcOrchestrator:
                     return r(fold, conf)
                 holdout = run_holdout(wfo_struct, s5.top_k, fold_runner=_runner)
 
-        # Verdict
-        verdict = "INCOMPLETE"
+        # Amendment 3 evaluation pass (top-K candidates only)
+        amended_wfo: AmendedWfoSearchResult | None = None
         if s5 is not None and s5.top_k:
+            wfo_struct_amend = self.cfg.wfo_structure or build_v3_folds()
+            amended_wfo = self._run_amendment_3_evaluation(
+                s5=s5,
+                holdout_results=holdout or (),
+                signal_eval=signal_eval,
+                wfo_struct=wfo_struct_amend,
+            )
+
+        # Verdict — source from Amendment 3 result if present, else legacy.
+        verdict = "INCOMPLETE"
+        if amended_wfo is not None and amended_wfo.amended_results:
+            # Pick the best amended candidate by verdict ranking
+            # (PASS-DEPLOYABLE > PASS-VIABLE > FAIL).
+            ranked_amended = sorted(
+                amended_wfo.amended_results,
+                key=lambda r: _amended_verdict_rank(r.amended_gate.verdict),
+                reverse=True,
+            )
+            best_amended = ranked_amended[0]
+            verdict = best_amended.amended_gate.verdict.value.upper()
+        elif s5 is not None and s5.top_k:
             best = s5.top_k[0]
             verdict = best.gate.verdict.value.upper()
 
@@ -527,6 +786,7 @@ class ArcOrchestrator:
             arc_open_md=arc_open_md,
             arc_closure_md=arc_closure_md,
             verdict=verdict,
+            amended_wfo=amended_wfo,
         )
 
     def write(self, result: ArcOrchestratorResult, out_dir: Path | None = None) -> Path:
@@ -578,6 +838,15 @@ class ArcOrchestrator:
 
 
 # ── markdown helpers ───────────────────────────────────────────────────
+
+
+def _amended_verdict_rank(v: AmendedVerdict) -> int:
+    """Higher value = better verdict, for sorting amended candidates."""
+    if v == AmendedVerdict.PASS_DEPLOYABLE:
+        return 2
+    if v == AmendedVerdict.PASS_VIABLE:
+        return 1
+    return 0
 
 
 def _step_1_summary(pool: ArcPool) -> str:

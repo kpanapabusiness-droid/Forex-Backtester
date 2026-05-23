@@ -79,14 +79,55 @@ class A1Config:
 
 @dataclass(frozen=True)
 class A1RunContext:
-    """Optional precomputed per-trade feature lookup for filter rules.
+    """Optional precomputed per-trade feature lookup for filter rules
+    plus A3/A4 per-fold classifier orchestration data.
 
-    Maps (pair, signal_time) -> feature dict. None means no external
-    rules will be applied (filter_rules ignored). Provided by the
-    orchestrator after Step 1 produces the per-trade feature matrix.
+    The same context object is shared across every fold of a WFO run.
+    Each architecture reads only the fields it needs; A1 / A5 ignore
+    everything but ``per_trade_features``.
+
+    Fields
+    ------
+    per_trade_features
+        Map ``(pair, signal_time) -> feature dict`` consumed by A1
+        filter rules and A2 / A6 classifier admit / sizing gates.
+        ``None`` means no external rules are applied (filter_rules
+        ignored). Provided by the orchestrator after Step 1 produces
+        the per-trade feature matrix.
+
+    per_trade_entry_features
+        Same shape as ``per_trade_features`` but populated with
+        entry-time features for A3 / A4 path-classifier inference
+        (the 8 ``ENTRY_FEATURE_KEYS`` from ``core.features_path_so_far``).
+        ``None`` means callers must supply these via the deprecated
+        ``A3Config.per_trade_entry_features`` /
+        ``A4Config.per_trade_entry_features`` field (emits a
+        DeprecationWarning at run-time).
+
+    path_classifier_fits
+        Map ``fold_id -> PathClassifierFit`` carrying the per-fold-
+        trained path-classifier for A3 / A4. Keyed by ``Fold.fold_id``.
+        Built once by the orchestrator (via
+        ``core.steps.path_classifier_per_fold.build_path_classifier_fits_per_fold``)
+        and reused across the WFO search loop. ``None`` means callers
+        must supply a single fit via the deprecated
+        ``A3Config.classifier_fit`` / ``A4Config.classifier_fit``
+        field (emits a DeprecationWarning at run-time).
+
+    Deprecation: the per-fold path is the canonical way to wire A3 / A4
+    from the orchestrator. The single-fit fields on ``A3Config`` /
+    ``A4Config`` remain available for backwards compatibility with
+    synthetic tests and direct-construction drivers, but warn on use.
+    Per chat directive Q2 they are scheduled for removal after 2
+    closed arcs use the new path successfully.
     """
 
     per_trade_features: Mapping[tuple[str, pd.Timestamp], Mapping[str, float]] | None = None
+    per_trade_entry_features: Mapping[tuple[str, pd.Timestamp], Mapping[str, float]] | None = None
+    # Forward type hint to break a circular import — the actual type is
+    # core.architectures._path_classifier.PathClassifierFit but importing
+    # it here would pull RF defaults into the A1 module's import graph.
+    path_classifier_fits: Mapping[int, object] | None = None
 
 
 def _evaluate_filter_rules(

@@ -180,3 +180,21 @@ Dispatch line: "This is the test that would have caught the gap. CRITICAL." — 
 5. **Interpretive call 5** — also fix the second Arc 11 gap (`_run_step_5` builds `A1RunContext` from `cfg.feature_matrix`)? **Recommend yes** — without it the integration test in Task 7 cannot use the orchestrator path.
 
 Awaiting chat answers before executing Tasks 1-10.
+
+---
+
+## Addendum (2026-05-23, after PR #183 HOLD)
+
+Chat issued a HOLD on PR #183 after merge, directing **Path R** (revert) and **Option III** for the bug surfaced under Q1's critical condition (Step 4 CV trained on the full pool including the holdout window).
+
+**Locked path forward (now executed in `engine/step4-classifier-persistence-v2`):**
+
+- **Interpretive call 1 (Q1 data scope)** stays **Option A** for the no-holdout case — when `train_end=None`, persisted classifier trains on the full lineage-filtered Step 1 pool. When `train_end` is supplied (orchestrator threads it from `WfoStructure.holdout.oos_start`), both CV and refit restrict to `entry_time < train_end`. Option III adds this restriction; Option A still describes the data scope within whatever IS subset Step 4 operates on.
+- **Interpretive call 2** unchanged (line 282 applies to A3/A4 only).
+- **Interpretive call 3** unchanged (builders in `core/steps/classifier_persistence.py`).
+- **Interpretive call 4** unchanged (version-string drift warnings; no `pyproject.toml` pinning).
+- **Interpretive call 5** unchanged (orchestrator wiring landed as Task 6.5).
+
+**New manifest field:** `train_end` at top level (ISO timestamp or `null`). Declarative — loader does not enforce.
+
+**L_PROTOCOL.md:** the "Amendment 4 (2026-05-23)" top-of-doc line added in PR #183 was unauthorised per chat Q2 (subsection-only scope). Removed in this PR. `§"Architecture-specific retraining policy"` subsection under §2 Step 5 stays (Q2-approved). §2 Step 4 output list bullets for the `.pkl` artefacts + `manifest.json` stay (documents existing engine output without elevating to protocol commitment).

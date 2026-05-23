@@ -267,6 +267,7 @@ alongside with SHA256 + provenance:
 {
   "arc_name": "l_arc_X",
   "generated_at": "2026-05-23T...",
+  "train_end": "2021-01-01T00:00:00Z",
   "joblib_version": "1.5.3",
   "sklearn_version": "1.8.0",
   "lightgbm_version": "4.6.0",
@@ -309,13 +310,16 @@ against the manifest before loading and raises
 joblib / sklearn / lightgbm version drift relative to the manifest's
 recorded environment.
 
-**Data-scope inheritance.** Per chat resolution at PR dispatch
-(2026-05-23), the persisted classifier trains on the same data Step
-4's CV iterated over — i.e. the full pool passed to `run_step_4`.
-When the upstream Step 4 pool inherits the WFO holdout window, the
-persisted classifier inherits the same data scope. Documented
-explicitly in the manifest's `trained_on_pool_size` field; closure
-docs should call out the inheritance where it matters.
+**Holdout exclusion.** Step 4's CV and the persisted-classifier
+refit both restrict to trades with `entry_time < train_end` when a
+holdout window is configured. The orchestrator threads `train_end`
+from `WfoStructure.holdout.oos_start`; arcs running outside the
+orchestrator pass `train_end=…` to `run_step_4` directly. The
+manifest's top-level `train_end` field declares the IS cutoff (ISO
+timestamp, or `null` when no holdout is configured). A2 / A6 can
+then be evaluated cleanly on the holdout window because the
+classifier they consume has not seen it. Per-cluster
+`trained_on_pool_size` in the manifest reflects the IS-only subset.
 
 ### Orchestrator wiring for A2 / A6
 

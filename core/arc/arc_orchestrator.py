@@ -216,6 +216,22 @@ class ArcOrchestrator:
         and final ``write()``. Falls back to ``results/<arc_name>``."""
         return Path(self.cfg.output_dir or f"results/{self.cfg.arc_name}")
 
+    def _resolve_train_end(self) -> pd.Timestamp | None:
+        """Read the holdout-window start from ``cfg.wfo_structure`` and
+        return it as the Step 4 ``train_end``. Returns ``None`` when no
+        holdout window is configured — Step 4 then sees every trade in
+        the pool (the v3.0 pre-fix behavior). Holdout exclusion is a
+        chat-locked contract: when a holdout exists, Step 4's CV and
+        the persisted classifier MUST NOT see it.
+        """
+        wfo_struct = self.cfg.wfo_structure or build_v3_folds()
+        if wfo_struct.holdout is None:
+            return None
+        ts = pd.Timestamp(wfo_struct.holdout.oos_start)
+        if ts.tzinfo is None:
+            ts = ts.tz_localize("UTC")
+        return ts
+
     def _run_step_4(
         self, pool: ArcPool, s2: Step2Result, s3: Step3Result
     ) -> Step4Result | None:
@@ -238,6 +254,7 @@ class ArcOrchestrator:
             candidate_cluster_ids=candidate_ids,
             persistence_dir=persistence_dir,
             arc_name=self.cfg.arc_name,
+            train_end=self._resolve_train_end(),
         )
 
     def _run_step_5(

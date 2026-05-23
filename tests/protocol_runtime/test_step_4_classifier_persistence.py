@@ -243,6 +243,150 @@ def test_build_a2_raises_for_unknown_cluster_id(tmp_path: Path) -> None:
         build_a2_config_from_step4(res, cluster_id=99)
 
 
+def _train_holdout_inputs(n_train: int = 300, n_holdout: int = 200, seed: int = 11):
+    """Synthetic trades spanning a train + holdout window. The train
+    window emits the same signal structure as the original fixture;
+    the holdout window flips the feature -> cluster relationship so
+    a classifier trained on the union behaves differently from one
+    trained on train-only.
+    """
+    rng = np.random.default_rng(seed)
+    n = n_train + n_holdout
+    # Cluster split: alternating IDs through the whole pool
+    cluster_id = np.arange(n) % 2
+    # In the train window: f_signal correlates positively with cluster
+    f_signal_train = cluster_id[:n_train] + rng.normal(0, 0.5, n_train)
+    # In the holdout window: signal sign flips — adds bias if mixed in
+    f_signal_holdout = -cluster_id[n_train:] + rng.normal(0, 0.5, n_holdout)
+    f_signal = np.concatenate([f_signal_train, f_signal_holdout])
+    f_noise = rng.normal(0, 1, n)
+    # Calendar timestamps: train window 2018, holdout window 2021
+    train_ts = pd.date_range("2018-01-01", periods=n_train, freq="4h", tz="UTC")
+    holdout_ts = pd.date_range("2021-01-01", periods=n_holdout, freq="4h", tz="UTC")
+    timestamps = train_ts.append(holdout_ts)
+    trades = pd.DataFrame({
+        "trade_id": np.arange(1, n + 1),
+        "entry_time": timestamps,
+    })
+    fm = pd.DataFrame({
+        "trade_id": np.arange(1, n + 1),
+        "f_signal": f_signal,
+        "f_noise": f_noise,
+    })
+    assignments = pd.DataFrame({
+        "trade_id": np.arange(1, n + 1),
+        "cluster_id": cluster_id,
+    })
+    return trades, fm, assignments
+
+
+def test_train_end_excludes_holdout_from_persistence(tmp_path: Path) -> None:
+    """The persisted classifier MUST NOT see trades with
+    entry_time >= train_end. Both the CV evaluation AND the refit on
+    "the full lineage-filtered pool" restrict to the IS subset.
+    """
+    trades, fm, assignments = _train_holdout_inputs(n_train=300, n_holdout=200)
+    train_end = pd.Timestamp("2020-12-31", tz="UTC")
+    res = run_step_4(
+        trades, fm, assignments,
+        candidate_cluster_ids=(1,),
+        persistence_dir=tmp_path / "with_train_end",
+        arc_name="holdout_test",
+        train_end=train_end,
+    )
+    assert len(res.per_cluster) == 1
+    ce = res.per_cluster[0]
+    # ce.n_trades is total binary-classifier pool size (positives +
+    # negatives). After train_end filter, both classes together = the
+    # train window size = 300. The original pool was 500.
+    assert ce.n_trades == 300
+    # Manifest carries the train_end declaration
+    manifest = json.loads((tmp_path / "with_train_end" / "manifest.json").read_text(encoding="utf-8"))
+    assert manifest["train_end"] == "2020-12-31T00:00:00Z"
+    assert manifest["classifiers"]["1"]["trained_on_pool_size"] == 300
+
+
+def test_train_end_changes_persisted_classifier_predictions(tmp_path: Path) -> None:
+    """Persisting WITH vs WITHOUT train_end on a pool whose holdout
+    contradicts the train window should yield classifiers that disagree
+    on at least some held-out inputs. Confirms the filter is load-bearing,
+    not a no-op."""
+    trades, fm, assignments = _train_holdout_inputs(n_train=300, n_holdout=200)
+    train_end = pd.Timestamp("2020-12-31", tz="UTC")
+    res_with = run_step_4(
+        trades, fm, assignments,
+        candidate_cluster_ids=(1,),
+        persistence_dir=tmp_path / "with",
+        arc_name="holdout_test",
+        train_end=train_end,
+    )
+    res_without = run_step_4(
+        trades, fm, assignments,
+        candidate_cluster_ids=(1,),
+        persistence_dir=tmp_path / "without",
+        arc_name="holdout_test",
+    )
+    clf_with = load_classifier(res_with.per_cluster[0].fitted_classifier_path)
+    clf_without = load_classifier(res_without.per_cluster[0].fitted_classifier_path)
+    X = pd.DataFrame({
+        col: np.linspace(-2, 2, 80)
+        for col in res_with.per_cluster[0].fitted_classifier_feature_order
+    })
+    proba_with = clf_with.predict_proba(X)[:, 1]
+    proba_without = clf_without.predict_proba(X)[:, 1]
+    # At least some predictions must differ
+    assert not np.allclose(proba_with, proba_without), (
+        "persisted classifier appears unaffected by train_end — filter "
+        "is not load-bearing"
+    )
+    # Pool sizes differ as expected
+    assert res_with.per_cluster[0].n_trades < res_without.per_cluster[0].n_trades
+
+
+def test_train_end_null_in_manifest_when_unset(tmp_path: Path) -> None:
+    """Backwards-compat: train_end=None records null in manifest."""
+    trades, fm, assignments = _synthetic_step_4_inputs()
+    run_step_4(
+        trades, fm, assignments,
+        candidate_cluster_ids=(1,),
+        persistence_dir=tmp_path,
+        arc_name="synth",
+    )
+    manifest = json.loads((tmp_path / "manifest.json").read_text(encoding="utf-8"))
+    assert manifest["train_end"] is None
+
+
+def test_train_end_determinism(tmp_path: Path) -> None:
+    """Two run_step_4 calls with the same train_end produce
+    classifiers that predict identically on held-out X."""
+    trades, fm, assignments = _train_holdout_inputs()
+    train_end = pd.Timestamp("2020-12-31", tz="UTC")
+    res_a = run_step_4(
+        trades, fm, assignments,
+        candidate_cluster_ids=(1,),
+        persistence_dir=tmp_path / "a",
+        arc_name="determinism",
+        train_end=train_end,
+    )
+    res_b = run_step_4(
+        trades, fm, assignments,
+        candidate_cluster_ids=(1,),
+        persistence_dir=tmp_path / "b",
+        arc_name="determinism",
+        train_end=train_end,
+    )
+    clf_a = load_classifier(res_a.per_cluster[0].fitted_classifier_path)
+    clf_b = load_classifier(res_b.per_cluster[0].fitted_classifier_path)
+    X = pd.DataFrame({
+        col: np.linspace(-2, 2, 80)
+        for col in res_a.per_cluster[0].fitted_classifier_feature_order
+    })
+    np.testing.assert_array_equal(
+        clf_a.predict_proba(X)[:, 1],
+        clf_b.predict_proba(X)[:, 1],
+    )
+
+
 def test_determinism_prediction_equality(tmp_path: Path) -> None:
     """Two run_step_4 calls -> matching predictions on held-out X.
 

@@ -226,6 +226,100 @@ def test_a2_runs_end_to_end_via_orchestrator(
     assert (out / "step_4" / "extraction_metrics.csv").exists()
 
 
+def test_orchestrator_threads_train_end_from_wfo_holdout(
+    tmp_path: Path, force_candidate_sub_protocol: str
+) -> None:
+    """When ``WfoStructure.holdout`` is set, ``_run_step_4`` passes
+    ``holdout.oos_start`` as Step 4's ``train_end``. The persisted
+    classifier sees only pre-holdout data; manifest declares it.
+
+    This is the regression test for the holdout-contamination bug
+    surfaced under Q1's critical condition.
+    """
+    panel = build_synthetic_panel(
+        pairs=("EURUSD", "GBPUSD"),
+        n_bars=4500,           # wide enough to span 2017-2022 at 4h
+        start="2017-01-01",
+    )
+    signal = SyntheticSignal(period=15)
+    folds = (
+        Fold(
+            fold_id=1,
+            is_start=date(2017, 1, 1),
+            is_end=date(2017, 6, 30),
+            oos_start=date(2017, 7, 1),
+            oos_end=date(2017, 7, 31),
+        ),
+    )
+    # Holdout window starts 2021-01-01 — anything entry_time >= here
+    # must NOT appear in Step 4 inputs.
+    holdout_fold = Fold(
+        fold_id=99,
+        is_start=date(2017, 1, 1),
+        is_end=date(2020, 12, 31),
+        oos_start=date(2021, 1, 1),
+        oos_end=date(2022, 12, 31),
+    )
+    wfo = WfoStructure(name="train_end_test", folds=folds, holdout=holdout_fold)
+
+    cfg = ArcConfig(
+        arc_name="train_end_e2e",
+        signal_class="synthetic_periodic",
+        pair_set=("EURUSD", "GBPUSD"),
+        sl_atr_mult=2.0,
+        hold_bars=24,
+        risk_pct=0.005,
+        output_dir=tmp_path,
+        feature_matrix=_build_synthetic_feature_matrix(
+            # build with pool produced by Step 1 — peek first
+            pd.DataFrame({"trade_id": [], "pair": [], "signal_time": []})
+        ),
+        wfo_structure=wfo,
+        sub_protocol=force_candidate_sub_protocol,
+    )
+    orch = ArcOrchestrator(cfg, signal, {"H4": panel})
+    # Build pool first, then rebuild feature_matrix from real trade IDs
+    pool = orch._run_step_1()
+    fm = _build_synthetic_feature_matrix(pool.trades)
+    cfg2 = ArcConfig(
+        arc_name="train_end_e2e",
+        signal_class="synthetic_periodic",
+        pair_set=("EURUSD", "GBPUSD"),
+        sl_atr_mult=2.0,
+        hold_bars=24,
+        risk_pct=0.005,
+        output_dir=tmp_path,
+        feature_matrix=fm,
+        wfo_structure=wfo,
+        sub_protocol=force_candidate_sub_protocol,
+    )
+    orch2 = ArcOrchestrator(cfg2, signal, {"H4": panel})
+    s2 = orch2._run_step_2(pool)
+    s3 = orch2._run_step_3(pool, s2)
+    s4 = orch2._run_step_4(pool, s2, s3)
+    assert s4 is not None, "Step 4 should produce candidates under forced sub-protocol"
+    # Manifest declares train_end matching holdout.oos_start
+    manifest_path = tmp_path / "step_4" / "classifiers" / "manifest.json"
+    assert manifest_path.exists()
+    import json as _json
+    manifest = _json.loads(manifest_path.read_text(encoding="utf-8"))
+    assert manifest["train_end"] == "2021-01-01T00:00:00Z"
+    # Each cluster's trained_on_pool_size only counts pre-holdout trades
+    pre_holdout_count = (
+        pd.to_datetime(pool.trades["entry_time"], utc=True)
+        < pd.Timestamp("2021-01-01", tz="UTC")
+    ).sum()
+    # The cluster-1 train pool is a subset of pre_holdout_count
+    # (lineage filtering + class-balance trimming may reduce it further).
+    for ce in s4.per_cluster:
+        cluster_entry = manifest["classifiers"][str(ce.cluster_id)]
+        assert cluster_entry["trained_on_pool_size"] <= pre_holdout_count, (
+            f"cluster {ce.cluster_id} trained_on_pool_size "
+            f"{cluster_entry['trained_on_pool_size']} exceeds pre-holdout "
+            f"count {pre_holdout_count} — train_end filter did not fire"
+        )
+
+
 def test_a2_e2e_missing_persistence_raises_clear_error(
     tmp_path: Path, force_candidate_sub_protocol: str
 ) -> None:

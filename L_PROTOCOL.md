@@ -8,7 +8,6 @@
 > **Amendment 1 (2026-05-22):** Step 5 search policy clarified — informed by Steps 3-4, not exhaustive. Multi-cluster handling + holdout decision rule specified. See §2 Step 5.
 > **Amendment 2 (2026-05-22):** ML architecture mechanics specified for A2, A3, A4, A6. See §2 Step 5 ML mechanics subsection.
 > **Amendment 3 (2026-05-22):** Risk-normalised gates. §3 constraints preserved 1:1; evaluation now occurs at scaled risk `r_safe` / `r_hard` rather than at the WFO base risk. Scalability bounds, per-day DD recount, and explicit evaluation order added. Full text archived at `archive/L_PROTOCOL_v3_0_AMENDMENT_3.md`. See §3.
-> **Amendment 4 (2026-05-23):** Step 4 fitted-classifier persistence. The best-AUC classifier per candidate cluster is refit on the full lineage-filtered pool after CV selection, pickled to `results/<arc>/step_4/classifiers/<cluster_id>.pkl`, and consumed by A2 / A6 at Step 5 without retraining. "Architecture-specific retraining policy" table added to §2 Step 5 clarifying that A2 / A6 reuse Step 4's classifier across folds and A3 / A4 still retrain per fold. Engine reference: [docs/PROTOCOL_RUNTIME.md §7](docs/PROTOCOL_RUNTIME.md).
 >
 > This protocol is the umbrella. It accepts any signal, any feature space, any architecture. Sub-protocols may layer on top to add signal-class-specific specificity. The overseer's gates and verdicts apply universally.
 

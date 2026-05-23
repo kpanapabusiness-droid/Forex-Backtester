@@ -265,16 +265,30 @@ def _write_manifest(
     persistence_dir: Path,
     arc_name: str,
     entries: dict,
+    train_end: pd.Timestamp | None,
 ) -> None:
     """Write classifiers/manifest.json with SHA256 + provenance.
 
     Versions of joblib / sklearn / lightgbm captured for cross-env
     troubleshooting (dispatch Risk #1). The loader emits a UserWarning
     on mismatch but does not error — pinning is a separate concern.
+
+    ``train_end`` is recorded as an ISO timestamp (UTC) when the
+    holdout-exclusion contract was active, ``null`` otherwise. The
+    field is declarative — closures reading the manifest can audit
+    the data scope without re-running Step 4. The loader does not
+    enforce this field; it is informational.
     """
+    train_end_str: str | None = None
+    if train_end is not None:
+        ts = pd.Timestamp(train_end)
+        if ts.tzinfo is None:
+            ts = ts.tz_localize("UTC")
+        train_end_str = ts.strftime("%Y-%m-%dT%H:%M:%SZ")
     manifest = {
         "arc_name": arc_name,
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "train_end": train_end_str,
         "joblib_version": str(joblib.__version__),
         "sklearn_version": str(sklearn.__version__),
         "lightgbm_version": _LGBM_VERSION,
@@ -295,6 +309,7 @@ def run_step_4(
     n_ts_folds: int = N_TS_FOLDS,
     persistence_dir: Path | None = None,
     arc_name: str = "",
+    train_end: pd.Timestamp | None = None,
 ) -> Step4Result:
     """Run Step 4 across candidate clusters.
 
@@ -319,8 +334,8 @@ def run_step_4(
         5 by default per L_PROTOCOL Step 4.
     persistence_dir
         When supplied, after CV the best-AUC algorithm is refit on the
-        full lineage-filtered pool for that cluster, pickled via joblib
-        to ``persistence_dir / "{cluster_id}.pkl"``, and a
+        in-sample pool for that cluster (see ``train_end``), pickled via
+        joblib to ``persistence_dir / "{cluster_id}.pkl"``, and a
         ``manifest.json`` is written alongside with SHA256 + provenance
         per :mod:`core.steps.classifier_persistence`. When ``None``,
         no classifier objects are written and ``ClusterExtraction``'s
@@ -328,7 +343,43 @@ def run_step_4(
     arc_name
         Recorded in the manifest's ``arc_name`` field for traceability.
         Defaults to empty string when persistence is not requested.
+    train_end
+        When supplied, restrict BOTH the 5-fold TimeSeriesSplit CV
+        evaluation AND the persisted classifier refit to trades with
+        ``entry_time < train_end``. This is the holdout-exclusion
+        contract — Step 4's algorithm-selection and the persisted
+        artefact must not see the WFO holdout window so A2 / A6 can
+        be evaluated cleanly on it. ``None`` preserves backwards-compat
+        behavior (Step 4 sees every trade in the pool). The orchestrator
+        threads this from ``WfoStructure.holdout.oos_start`` when a
+        holdout window is configured.
     """
+    # Apply holdout exclusion FIRST so both CV and persistence see the
+    # same restricted pool. Filtering on trades.entry_time means cluster
+    # labels and features are subset together — no risk of class-balance
+    # drift from a later filter.
+    if train_end is not None:
+        cutoff = pd.Timestamp(train_end)
+        trades_in = trades.copy()
+        trades_in["entry_time"] = pd.to_datetime(trades_in["entry_time"], utc=True)
+        if cutoff.tzinfo is None:
+            cutoff = cutoff.tz_localize("UTC")
+        is_mask = trades_in["entry_time"] < cutoff
+        trades_in = trades_in.loc[is_mask].reset_index(drop=True)
+        is_trade_ids = set(trades_in["trade_id"].astype(int))
+        # Filter cluster_assignments and feature_matrix to the IS subset
+        cluster_assignments = cluster_assignments[
+            cluster_assignments["trade_id"].astype(int).isin(is_trade_ids)
+        ].reset_index(drop=True)
+        if "trade_id" in feature_matrix.columns:
+            feature_matrix = feature_matrix[
+                feature_matrix["trade_id"].astype(int).isin(is_trade_ids)
+            ].reset_index(drop=True)
+        else:
+            feature_matrix = feature_matrix.loc[
+                feature_matrix.index.isin(is_trade_ids)
+            ].copy()
+        trades = trades_in
     # Time-sort trades for TimeSeriesSplit
     trades_sorted = trades.sort_values(["entry_time", "trade_id"]).reset_index(drop=True)
 
@@ -490,6 +541,7 @@ def run_step_4(
             persistence_dir=persistence_dir,
             arc_name=arc_name,
             entries=manifest_entries,
+            train_end=train_end,
         )
     summary_md = _render_summary_md(per_cluster, excluded)
     return Step4Result(

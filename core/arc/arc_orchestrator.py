@@ -40,9 +40,9 @@ from core.arc.signal_protocol import SignalEvaluation, SignalModule
 from core.arc.sub_protocol import resolve_step_override
 from core.architectures._protocol import Architecture, StrategyResult
 from core.architectures.a1_system_level_filter import A1RunContext
+from core.runners._fold_stats_helpers import compute_per_day_max_dd
 from core.runners.arc_fold_runner import ArcFoldRunner
 from core.sim.panel import Panel
-from core.runners._fold_stats_helpers import compute_per_day_max_dd
 from core.steps.classifier_persistence import (
     build_a2_config_from_step4,
     build_a3_config_from_step4,
@@ -67,6 +67,7 @@ from core.wfo.chained_dd import (
     stitch_per_fold_oos_equity,
 )
 from core.wfo.folds import Fold, WfoStructure, build_v3_folds
+from core.wfo.gates import FoldStats
 from core.wfo.holdout_rerun import rescale_arch_config_risk
 from core.wfo.orchestrator import (
     CandidateSearchResult,

@@ -52,7 +52,6 @@ from core.wfo.gates import (
     FoldStats,
 )
 
-
 # ── Scalability bounds (locked per Amendment 3 §"Scalability bounds") ─
 
 R_MIN: float = 0.0015   # 0.15% lower bound on r_safe / r_hard

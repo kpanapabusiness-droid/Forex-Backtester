@@ -31,7 +31,6 @@ from core.arc.arc_orchestrator import (
     AmendedWfoSearchResult,
     ArcConfig,
     ArcOrchestrator,
-    AutoArchSpec,
     CandidateAmendedResult,
 )
 from core.architectures.a1_system_level_filter import A1Architecture, A1Config
@@ -140,10 +139,11 @@ def test_full_pipeline_a1_only_emits_amendment_3_fields(tmp_path: Path) -> None:
     # cases). When the chained equity is non-empty the parquet IS
     # emitted; the per-candidate path is on amended.per_day_max_dd_artefact_path.
     if step5_dir.exists():
-        parquets = list(step5_dir.glob("per_day_max_dd_base__*.parquet"))
-        # Either at least one parquet emitted, OR all candidates had
-        # empty chained equity (degenerate synthetic — accepted).
-        # Verify at least the directory was created.
+        # Glob is informational — either at least one parquet emitted,
+        # OR all candidates had empty chained equity (degenerate
+        # synthetic — accepted). Verify the directory exists; per-
+        # candidate paths are asserted via the amended-result loop below.
+        _ = list(step5_dir.glob("per_day_max_dd_base__*.parquet"))
         assert step5_dir.is_dir()
         # If parquets emitted, the manifest path on the amended result
         # should match an actual file

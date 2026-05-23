@@ -55,7 +55,6 @@ from core.features_path_so_far import (
 from core.sim.panel import Panel
 from core.wfo.folds import Fold
 
-
 # Default decide-bar offset used by A4 training (path-so-far at this
 # offset is the bar at which A4's training example is captured).
 # Mirrors A3's default n_defer; configurable per-arc if needed.

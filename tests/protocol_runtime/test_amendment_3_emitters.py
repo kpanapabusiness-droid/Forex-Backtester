@@ -21,7 +21,6 @@ from core.runners._fold_stats_helpers import compute_per_day_max_dd
 from core.wfo.chained_dd import compute_chained_max_dd_from_continuous_equity
 from core.wfo.holdout_rerun import rescale_arch_config_risk
 
-
 # ── compute_chained_max_dd_from_continuous_equity ───────────────────
 
 

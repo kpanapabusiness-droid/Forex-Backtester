@@ -29,7 +29,6 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import Mapping
 
-import numpy as np
 import pandas as pd
 import pytest
 
@@ -37,7 +36,6 @@ from core.sim.account import Account, Direction, ExposureRules, Position
 from core.sim.exit_hooks import ExitDecision, ExitPredicate
 from core.sim.multipair_backtester import MultiPairBacktester, Order
 from core.sim.panel import Panel
-from core.sim.trailing_stop import TrailManager
 
 
 def _make_two_bar_panel() -> Panel:

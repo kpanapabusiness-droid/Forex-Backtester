@@ -27,7 +27,7 @@ import hashlib
 import json
 import warnings
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import joblib
 import sklearn
@@ -35,6 +35,10 @@ import sklearn
 from core.architectures.a2_classifier_filter import A2Config
 from core.architectures.a6_meta_labeling import A6Config
 from core.steps.step_4_extraction import Step4Result
+
+if TYPE_CHECKING:
+    from core.architectures.a3_pipeline_de import A3Config
+    from core.architectures.a4_pipeline_d_exits import A4Config
 
 try:
     import lightgbm as _lightgbm_mod  # type: ignore

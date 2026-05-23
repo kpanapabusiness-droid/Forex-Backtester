@@ -39,7 +39,6 @@ from core.wfo.amended_gates import (
 )
 from core.wfo.gates import FoldStats
 
-
 # ── compute_scaling_factors ─────────────────────────────────────────
 
 

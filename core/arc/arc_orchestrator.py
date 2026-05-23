@@ -557,7 +557,9 @@ class ArcOrchestrator:
                 if holdout_sr is not None and len(holdout_sr.equity_curve) > 0:
                     per_fold_equity.append(holdout_sr.equity_curve)
 
-            arch_config = cand.config
+            _arch_unwrapped, arch_config = self._unwrap_cand_config(cand)
+            if arch_config is None:
+                arch_config = cand.config  # fall back to raw if not a tuple
             starting_balance = float(getattr(arch_config, "starting_balance", 100_000.0))
             chained_equity = stitch_per_fold_oos_equity(
                 per_fold_equity, starting_balance=starting_balance,
@@ -620,6 +622,21 @@ class ArcOrchestrator:
 
         return AmendedWfoSearchResult(base=s5, amended_results=tuple(amended_results))
 
+    def _unwrap_cand_config(
+        self, cand: CandidateSearchResult,
+    ) -> tuple[Architecture, Any] | tuple[None, None]:
+        """Unwrap a candidate's ``config`` field.
+
+        The search loop stores candidates as ``(config_id, (arch, conf))``;
+        ``CandidateSearchResult.config`` therefore holds the tuple
+        ``(architecture, arch_config)``. Returns ``(arch, conf)`` if so;
+        ``(None, None)`` if the shape is unexpected.
+        """
+        cfg = cand.config
+        if isinstance(cfg, tuple) and len(cfg) == 2:
+            return cfg[0], cfg[1]
+        return None, None
+
     def _rerun_holdout_capture_equity(
         self,
         *,
@@ -636,16 +653,20 @@ class ArcOrchestrator:
         Cheap because only top-K candidates run through here.
         """
         cid = cand.config_id
-        arch, ctx = per_candidate_arch.get(cid, (None, base_ctx))  # type: ignore[assignment]
+        arch, _ctx = per_candidate_arch.get(cid, (None, base_ctx))  # type: ignore[assignment]
+        _arch_from_cand, conf = self._unwrap_cand_config(cand)
         if arch is None:
+            arch = _arch_from_cand
+        if arch is None or conf is None:
             return None
+        ctx = per_candidate_arch.get(cid, (arch, base_ctx))[1]
         r = ArcFoldRunner(
             architecture=arch,
             signal_evaluation=signal_eval,
             panels=self.panels,
             run_context=ctx,
         )
-        r(fold, cand.config)
+        r(fold, conf)
         return r.last_result
 
     def _rerun_holdout_at_scaled_risk(
@@ -659,22 +680,24 @@ class ArcOrchestrator:
         base_ctx: A1RunContext,
     ) -> "FoldStats | None":
         """Re-run holdout at ``risk_pct * k_scale`` per Amendment 3 §5.3."""
-        from core.wfo.gates import FoldStats  # local import for type
         cid = cand.config_id
-        arch, ctx = per_candidate_arch.get(cid, (None, base_ctx))  # type: ignore[assignment]
-        if arch is None:
+        arch_in_map, _ctx = per_candidate_arch.get(cid, (None, base_ctx))  # type: ignore[assignment]
+        arch_from_cand, conf = self._unwrap_cand_config(cand)
+        arch = arch_in_map or arch_from_cand
+        if arch is None or conf is None:
             return None
         try:
-            scaled_config = rescale_arch_config_risk(cand.config, k_scale=k_scale)
+            scaled_conf = rescale_arch_config_risk(conf, k_scale=k_scale)
         except (TypeError, ValueError):
             return None
+        ctx = per_candidate_arch.get(cid, (arch, base_ctx))[1]
         r = ArcFoldRunner(
             architecture=arch,
             signal_evaluation=signal_eval,
             panels=self.panels,
             run_context=ctx,
         )
-        stats = r(fold, scaled_config)
+        stats = r(fold, scaled_conf)
         return stats
 
     # ── full run ──────────────────────────────────────────────────────

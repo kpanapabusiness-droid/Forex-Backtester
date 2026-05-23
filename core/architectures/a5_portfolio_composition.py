@@ -45,6 +45,15 @@ class A5Config:
     config_id: str
     constituents: tuple[StrategyResult, ...]
     starting_balance: float = 100_000.0
+    # Amendment 3 §"Sizing convention" — A5 inherits the convention
+    # from its constituents but carries the field for tracker payload
+    # uniformity. The combined-portfolio scaling-treatment story is
+    # an open follow-up per Amendment 3 §"A5 follow-up flag".
+    sizing_convention: str = "reset_floor"
+    # A5 has no direct risk_pct — sizing comes from constituents.
+    # Included for ``rescale_arch_config_risk`` compatibility (no-op
+    # rescale when k_scale ≠ 1 raises in the helper).
+    risk_pct: float = 0.005
 
 
 @dataclass(frozen=True)

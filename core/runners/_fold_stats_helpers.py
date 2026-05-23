@@ -111,10 +111,76 @@ def build_fold_stats_from_run(
     )
 
 
+def compute_per_day_max_dd(
+    equity: pd.Series,
+    *,
+    pair_set: str = "unknown",
+) -> pd.DataFrame:
+    """Per-day max-DD series at r_base — Amendment 3 §"Daily DD measurement".
+
+    For each UTC trading day in ``equity.index``, computes:
+
+      - ``date`` (UTC day, datetime.date)
+      - ``pair_set`` (label, useful for multi-arc registry rows)
+      - ``day_start_equity`` (first equity sample of that day —
+        the day's 00:00-UTC reference per Amendment 3 §"Day-start
+        equity definition"; NOT the reset-floor sizing baseline)
+      - ``day_max_dd_base_pct`` (``(day_start_equity - day_min_equity)
+        / day_start_equity`` as decimal fraction; 0.05 = 5%)
+      - ``n_trades_open_start_of_day`` (placeholder 0 — caller can
+        post-fill from account state if needed; not load-bearing for
+        the gate logic)
+
+    Per Amendment 3 §"Day-start equity definition": this is the
+    REFERENCE for daily DD scaling. The verdict logic in
+    ``core.wfo.amended_gates.count_daily_breaches_at_scaled_risk``
+    multiplies each row's ``day_max_dd_base_pct`` by ``k`` and counts
+    days at-or-above the 5% breach threshold.
+
+    Boundary: UTC broker-day (locked per Amendment 3 §"Boundary").
+    """
+    if equity is None or len(equity) == 0:
+        return pd.DataFrame(columns=[
+            "date", "pair_set", "day_start_equity",
+            "day_max_dd_base_pct", "n_trades_open_start_of_day",
+        ])
+    s = equity.dropna()
+    if len(s) == 0:
+        return pd.DataFrame(columns=[
+            "date", "pair_set", "day_start_equity",
+            "day_max_dd_base_pct", "n_trades_open_start_of_day",
+        ])
+
+    # Group by UTC calendar day. Use .first() / .min() to pick the
+    # day's opening equity + the intra-day low.
+    df = s.to_frame(name="equity")
+    df["date"] = df.index.tz_convert("UTC").date if hasattr(df.index, "tz_convert") else df.index.date
+
+    by_day = (
+        df.groupby("date")["equity"]
+        .agg(day_start_equity="first", day_min_equity="min")
+        .reset_index()
+    )
+    # DD as positive decimal fraction; clamp negative to 0 (shouldn't
+    # happen but defensive).
+    by_day["day_max_dd_base_pct"] = (
+        (by_day["day_start_equity"] - by_day["day_min_equity"])
+        / by_day["day_start_equity"]
+    ).clip(lower=0.0)
+    by_day["pair_set"] = pair_set
+    by_day["n_trades_open_start_of_day"] = 0  # placeholder; see docstring
+
+    return by_day[[
+        "date", "pair_set", "day_start_equity",
+        "day_max_dd_base_pct", "n_trades_open_start_of_day",
+    ]].reset_index(drop=True)
+
+
 __all__ = (
     "slice_equity_to_oos",
     "max_drawdown_pct",
     "count_daily_5pct_breaches",
+    "compute_per_day_max_dd",
     "filter_oos_trades",
     "build_fold_stats_from_run",
 )

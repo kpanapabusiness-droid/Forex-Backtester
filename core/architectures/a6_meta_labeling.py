@@ -66,6 +66,8 @@ class A6Config:
     max_concurrent_total: int | None = None
     max_concurrent_per_pair: int | None = 1
     max_concurrent_per_currency: int | None = 2
+    # Amendment 3 §"Sizing convention"
+    sizing_convention: str = "reset_floor"   # "reset_floor" | "equity_pct"
 
 
 def _confidence_to_multiplier(

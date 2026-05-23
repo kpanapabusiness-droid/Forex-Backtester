@@ -83,6 +83,8 @@ class A4Config:
     max_concurrent_per_pair: int | None = 1
     max_concurrent_per_currency: int | None = 2
     per_trade_entry_features: Mapping[tuple[str, pd.Timestamp], Mapping[str, float]] | None = None  # DEPRECATED
+    # Amendment 3 §"Sizing convention"
+    sizing_convention: str = "reset_floor"   # "reset_floor" | "equity_pct"
 
 
 @dataclass

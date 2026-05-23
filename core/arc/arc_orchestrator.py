@@ -161,6 +161,11 @@ class ArcConfig:
     auto_arch_specs: tuple[AutoArchSpec, ...] = ()
     wfo_structure: WfoStructure | None = None  # None -> build_v3_folds()
     invoke_step_6: bool = False  # set True after PASS-tier candidate detected
+    # Amendment 3 §"Sizing convention" — when any candidate uses
+    # ``sizing_convention="equity_pct"``, the scalability gate FAILs
+    # by default. Set this to True only after chat approval of a
+    # separate scaling treatment.
+    accept_equity_pct: bool = False
     hypothesis: str = ""
     expected_failure_modes: str = ""
 

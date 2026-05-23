@@ -75,6 +75,11 @@ class A1Config:
     max_concurrent_per_currency: int | None = 2
     # Hold-bars cap as a fallback time exit (None = use signal exit only)
     time_exit_bars: int | None = None
+    # Amendment 3 §"Sizing convention": linear DD scaling holds ONLY
+    # under reset-floor sizing. equity_pct sizing FAILs the scalability
+    # gate by default; chat must approve a separate scaling treatment
+    # via ``ArcConfig.accept_equity_pct = True``.
+    sizing_convention: str = "reset_floor"   # "reset_floor" | "equity_pct"
 
 
 @dataclass(frozen=True)

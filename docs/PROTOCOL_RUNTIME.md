@@ -412,6 +412,95 @@ Threshold pair sweep: {(0.3, 0.5), (0.4, 0.6), (0.5, 0.7)}.
 
 ---
 
+## §8b Amendment 3 emissions (risk-normalised gates)
+
+Per `archive/L_PROTOCOL_v3_0_AMENDMENT_3.md` + audit
+`docs/audits/engine_capability_audit_2026_05.md`, the engine now emits
+the full risk-normalised-gate evaluation as part of `ArcOrchestrator.run()`.
+
+**Trigger:** automatic when `s5.top_k` is non-empty. For each top-K
+candidate the orchestrator runs an Amendment 3 evaluation pass after
+search + holdout complete.
+
+**Module map:**
+
+| Module | Responsibility |
+|---|---|
+| `core.wfo.amended_gates` | Pure gate logic: scaling factors, scaled DEPLOYABLE / VIABLE gates, priority-ordered failure-mode taxonomy. `classify_amended_fold_stats(...)` returns `AmendedGateResult` with every Amendment 3 tracker payload field. |
+| `core.wfo.chained_dd` | Chained max DD across IS + holdout. `stitch_per_fold_oos_equity` + `compute_chained_max_dd_from_continuous_equity`. v3.0.1 uses equity stitching; v3.0.2 follow-up replaces with full-window sim per chat directive Q6. |
+| `core.runners._fold_stats_helpers.compute_per_day_max_dd` | Per-day max-DD series at r_base. UTC broker-day boundary (locked). Day-start equity = first equity sample of UTC day. |
+| `core.wfo.holdout_rerun` | `rescale_arch_config_risk(arch_config, k_scale)` — frozen-dataclass copy with `risk_pct *= k_scale`. Used for r_safe / r_hard holdout re-runs. |
+| `core.arc.arc_orchestrator._run_amendment_3_evaluation` | Per-top-K orchestration: equity stitching → chained DD → per-day DD parquet → holdout re-runs at scaled risks → amended gate classify. |
+
+**Locked thresholds (per `core/wfo/amended_gates`):**
+
+- `R_MIN = 0.15%`, `R_MAX = 2.00%` — scalability bounds (both r_safe and r_hard must fall in this range; failure → `step5_not_scalable`)
+- `CHAINED_DD_MAX_PCT = 10%` — scaled chained DD ceiling
+- Daily-DD breach threshold: 5% of day-start equity at scaled risk (exactly 0 breaches permitted in both tiers)
+
+**Scaling rule:**
+
+```
+k_safe  = 8.0  / worst_fold_dd_base_pp     # 8 = 8 percentage-point DEPLOYABLE cap
+k_hard  = 10.0 / worst_fold_dd_base_pp     # 10 = 10pp VIABLE / 5ers hard cap
+r_safe  = r_base × k_safe
+r_hard  = r_base × k_hard
+```
+
+**Failure-mode priority** (first-fail wins, per Amendment 3 §"Failure-mode priority"):
+
+1. `pool_too_small` (Step 1)
+2. `step5_not_scalable`
+3. `step5_dd_above_gate` (defensive — should not occur post-scaling)
+4. `step5_chained_dd_above_gate`
+5. `step5_daily_dd_breach`
+6. `holdout_fail_after_is_pass`
+7. `step5_negative_folds` / `step5_sign_consistency_fail`
+8. `step5_trade_count_below_gate`
+9. `step5_wf_roi_below_gate_after_scaling`
+10. `step5_ratio_below_gate_after_scaling`
+11. `step6_causal_audit_fail`
+
+**Artefacts emitted:**
+
+- `results/<arc>/step_5/per_day_max_dd_base__<safe_cid>.parquet` per top-K candidate. Schema: `date, pair_set, day_start_equity, day_max_dd_base_pct, n_trades_open_start_of_day`.
+- `AmendedWfoSearchResult.amended_results[*]` per top-K. Read via `ArcOrchestratorResult.amended_wfo`. Extension dataclass — does NOT amend `WfoSearchResult` in place (Q4 backwards-compat directive).
+
+**Holdout re-runs at scaled risk:**
+
+Per Amendment 3 §"Engine-side changes" #4 + §5.5: for each top-K
+candidate the orchestrator runs TWO additional holdout sims — one
+at `r_safe` (for DEPLOYABLE evaluation), one at `r_hard` (for VIABLE
+evaluation). Scaling done via `rescale_arch_config_risk`. Each sim's
+`config_id` carries the scaled-risk suffix (e.g.
+`a1_e2e_test_r0.0100`), so downstream artefacts can distinguish them.
+
+**Sizing convention:**
+
+Every arch config has a `sizing_convention: str = "reset_floor"` field;
+`ArcConfig.accept_equity_pct: bool = False` is the chat-approval
+override. Equity-pct sizing FAILs the scalability gate by default —
+linear DD scaling holds only under reset-floor sizing.
+
+**A4 same-bar exit precedence (per L_PROTOCOL §2 Step 5 lock):** when
+trailing-stop and A4 classifier-exit fire on the same bar close, the
+trail-stop wins. Intra-bar SL/TP remains the highest-priority exit.
+Implementation: `core/sim/multipair_backtester.py:_process_bar` step 3
+uses direct `_pending_closes[pos_id] = "trailing_stop"` (the prior
+`setdefault` behaviour gave priority to the predicate by accident of
+evaluation order — corrected per chat directive Q3).
+
+**Equity-stitching caveat (v3.0.2 follow-up):** chained DD is computed
+from per-fold OOS equity series multiplicatively chained with
+continuity adjustment in v3.0.1. Per chat directive Q6 the gold
+standard is a single full-window sim spanning IS + holdout per
+top-K candidate; deferred to a v3.0.2 follow-up (concern: per-fold
+classifier-selection at fold boundaries for A3 / A4 adds complexity
+outside this PR's scope contract). Documented in
+`core/wfo/chained_dd.py` module docstring.
+
+---
+
 ## §9 Step 5 fold runners
 
 ```python

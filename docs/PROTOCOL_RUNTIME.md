@@ -241,10 +241,97 @@ in `s4.extraction_metrics` + `summary_md`.
   - `best_classifier_mean_auc`: float
   - `best_threshold`: float (AUC-best, mean across folds)
   - `feature_importance`: top features (mean ± std across folds)
+  - `fitted_classifier_path`: `Path | None` — joblib pickle of the
+    best-AUC classifier, refit on the full lineage-filtered pool
+    after CV evaluation (`None` if `persistence_dir` was not supplied
+    or the cluster produced no viable classifier)
+  - `fitted_classifier_type`: e.g. `"RandomForestClassifier"`
+  - `fitted_classifier_feature_order`: the column order the persisted
+    classifier expects at `predict_proba` time
 
 A2 and A6 consume `best_classifier` + `best_threshold` directly. A3
 and A4 retrain their own classifier per fold (different feature set:
-path-so-far, not entry-time).
+path-so-far, not entry-time). See
+[§"Architecture-specific retraining policy" in L_PROTOCOL §2 Step 5](../L_PROTOCOL.md)
+for the locked policy.
+
+### Classifier persistence
+
+When `run_step_4` is called with `persistence_dir`, the best-AUC
+algorithm is refit on the full lineage-filtered pool for each
+candidate cluster and pickled via joblib (compression level 3) to
+`<persistence_dir>/<cluster_id>.pkl`. A `manifest.json` is written
+alongside with SHA256 + provenance:
+
+```json
+{
+  "arc_name": "l_arc_X",
+  "generated_at": "2026-05-23T...",
+  "train_end": "2021-01-01T00:00:00Z",
+  "joblib_version": "1.5.3",
+  "sklearn_version": "1.8.0",
+  "lightgbm_version": "4.6.0",
+  "classifiers": {
+    "1": {
+      "path": "1.pkl",
+      "sha256": "...",
+      "classifier_type": "RandomForestClassifier",
+      "classifier_name": "rf",
+      "feature_order": ["feat_a", "feat_b", ...],
+      "best_threshold": 0.62,
+      "auc_in_sample": 0.95,
+      "auc_oos_cv5": 0.66,
+      "trained_on_pool_size": 1288
+    }
+  }
+}
+```
+
+A2 / A6 instantiate themselves from Step 4 output via the persistence
+helpers — no retraining at Step 5:
+
+```python
+from core.steps.classifier_persistence import (
+    build_a2_config_from_step4,
+    build_a6_config_from_step4,
+)
+
+a2 = build_a2_config_from_step4(s4, cluster_id=1)            # uses best_threshold
+a2_sweep = build_a2_config_from_step4(s4, cluster_id=1,
+                                      threshold_override=0.65)
+a6 = build_a6_config_from_step4(s4, cluster_id=1,
+                                lower_threshold=0.4, upper_threshold=0.6)
+```
+
+`load_classifier(path)` (also in
+`core.steps.classifier_persistence`) SHA256-verifies the pickle
+against the manifest before loading and raises
+`ClassifierIntegrityError` on mismatch. It emits a `UserWarning` on
+joblib / sklearn / lightgbm version drift relative to the manifest's
+recorded environment.
+
+**Holdout exclusion.** Step 4's CV and the persisted-classifier
+refit both restrict to trades with `entry_time < train_end` when a
+holdout window is configured. The orchestrator threads `train_end`
+from `WfoStructure.holdout.oos_start`; arcs running outside the
+orchestrator pass `train_end=…` to `run_step_4` directly. The
+manifest's top-level `train_end` field declares the IS cutoff (ISO
+timestamp, or `null` when no holdout is configured). A2 / A6 can
+then be evaluated cleanly on the holdout window because the
+classifier they consume has not seen it. Per-cluster
+`trained_on_pool_size` in the manifest reflects the IS-only subset.
+
+### Orchestrator wiring for A2 / A6
+
+`ArcOrchestrator._run_step_5` accepts an `auto_arch_specs` field on
+`ArcConfig` (tuple of `AutoArchSpec(architecture, cluster_id,
+builder_kwargs)`) — at Step 5 dispatch, the orchestrator looks up
+each spec's cluster in the Step 4 result, calls the appropriate
+`build_*_config_from_step4` helper, and wires the resulting config
+into the WFO search. A1 `filter_rules` and the A2 / A6 admit gates
+all read the per-trade feature dict via `A1RunContext`; the
+orchestrator builds it once from `cfg.feature_matrix` and passes it
+to every `ArcFoldRunner` (A1 / A5 ignore it).
 
 ---
 

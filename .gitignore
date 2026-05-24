@@ -131,6 +131,9 @@ results/l_arc_7_v3.0.2/run.log
 # large but is the deliverable for follow-up vanilla arcs.
 !results/arc_discovery_01/
 !results/arc_discovery_01/**
+# Probe archives (partial runs, rescue artefacts, methodology learning) —
+# tracked so future arcs can reference what was tried + why it didn't ship.
+!archive/probes/**
 # Don't track the quicktest subfolder — smoke-test artefact only.
 results/l_arc_8/step1_quicktest/
 # Arc 9 (IB-trend long, 4H) — Step 1+ outputs and post-kill deployment

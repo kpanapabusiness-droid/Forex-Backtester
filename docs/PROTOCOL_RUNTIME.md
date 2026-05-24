@@ -751,7 +751,121 @@ structural equivalence check on the synthetic mini-fixture
 
 ---
 
-## §14 What lives elsewhere
+## §15 Signal parity (mid-price + 5ers EET + worst-case fills) — PR #187
+
+The v3 engine produces venue-independent signals. Three invariants:
+
+### §15.1 Mid-price feature computation
+
+All Step-1 price-derived features (price_geometry, vol_regime, multi_tf,
+cross_pair, distance, plus the load-bearing Arc 10 feature
+`L1_minus_L0_atr` in [core/features/multi_tf.py](../core/features/multi_tf.py))
+compute on **mid price** = `(close_bid + close_ask) / 2` per OHLC field.
+Spread is treated as pure cost, not as feature input.
+
+Exempt by design: `spread_regime.*` features read `spread_close` as a
+structural regime indicator (preserved per dispatch B.5). These do not
+leak bid/ask asymmetry into per-bar price-derived computations — they
+report the regime, they don't shape it.
+
+D1 lag rule (L_PROTOCOL §1 non-negotiable) is unchanged: features that
+use D1 lag-1 close now use D1 lag-1 **mid** close. The lag itself —
+`iClose(D1, 1)` semantics, enforced by
+[`_build_d1_lag1_series`](../core/features/multi_tf.py) via
+`merge_asof(direction="backward")` — is unaffected.
+
+Verification: [tests/test_feature_parity_mid.py](../tests/test_feature_parity_mid.py)
+locks the contract — same mid OHLC + different bid/ask spread → identical
+mid-price features.
+
+### §15.2 Worst-case fill execution
+
+[core/sim/fill.py](../core/sim/fill.py) and
+[core/sim/multipair_backtester.py](../core/sim/multipair_backtester.py)
+already implemented worst-case fills in V3:
+- Long entry: fills at `bar.open_ask`
+- Short entry: fills at `bar.open_bid`
+- Long SL hit: `bar.low_bid ≤ sl_price` → fills at `sl_price`
+- Short SL hit: `bar.high_ask ≥ sl_price` → fills at `sl_price`
+- Long TP hit: `bar.high_bid ≥ tp_price` → fills at `tp_price`
+- Short TP hit: `bar.low_ask ≤ tp_price` → fills at `tp_price`
+
+Spread cost is implicit in `(open_ask − open_bid)` and the bid/ask wing
+of SL/TP — no separate "spread deduction" step is applied.
+
+[core/sim/trailing_stop.py](../core/sim/trailing_stop.py): **trail
+activation + ratchet read MID close** (PR #187 reverses PR-E.1.6's bid-only
+trail); **trail hit detection still reads BID close** (worst-case-fill
+realism — long exits when its bid falls to the trail level). This
+asymmetric model (mid-anchored decision, bid-anchored fill) is the
+dispatch's strict reading of B.3. The live EA must be updated to match
+mid activation in a parallel deployment PR — until then, EA divergence
+from backtest is expected on the trail-activation side.
+
+### §15.3 5ers EET bar boundary
+
+[core/data/aggregator.py](../core/data/aggregator.py) supports two
+boundary conventions via the `boundary_convention` parameter:
+
+- `"utc"` (default, legacy) — bars anchored to UTC midnights / hours.
+- `"5ers_eet"` — bars anchored to the 5ers broker EET/EEST trading day
+  using the IANA `Europe/Athens` zone (functionally identical to
+  `Asia/Nicosia` for the 2010+ HistData range). DST handled automatically.
+
+Steady-state anchors:
+
+| TF | Winter (EET = UTC+2) | Summer (EEST = UTC+3) |
+|---|---|---|
+| H4 | UTC 22, 02, 06, 10, 14, 18 | UTC 21, 01, 05, 09, 13, 17 |
+| D1 | UTC 22:00 (= EET 00:00 next day) | UTC 21:00 (= EEST 00:00 next day) |
+| W1 | UTC Sun 22:00 (= EET Mon 00:00) | UTC Sun 21:00 (= EEST Mon 00:00) |
+
+Sub-hourly TFs (M5/M15/M30/H1) have bin widths smaller than the DST
+shift; the UTC bin SET is identical to local-anchored bins (only the
+display label differs). The 5ers_eet path stores them under the same
+schema as UTC for storage parity.
+
+**DST transition handling:**
+- Spring forward (last Sunday March): EET 03:00 → EEST 04:00. The local
+  day has 23 wall-clock hours. The H4 bar starting at local 00:00 on
+  the DST day spans 3 wall-clock hours (4 UTC hours). Subsequent bars
+  re-anchor to EEST.
+- Autumn fall-back (last Sunday October): EEST 04:00 → EET 03:00. The
+  local day has 25 wall-clock hours. The H4 bar starting at local
+  00:00 on the DST day spans 5 wall-clock hours (4 UTC hours). The
+  duplicate EET 02:00-03:00 wall-clock hour is unambiguous in the
+  underlying UTC index. An extra short bar (1 UTC hour) appears at
+  local "00:00 EET of next day" within the DST day's groupby — this
+  is an internally consistent artefact of per-local-day re-anchoring
+  and is documented in
+  [docs/calibration/histdata_mt5_aggregation_parity_2026_05.md](calibration/histdata_mt5_aggregation_parity_2026_05.md).
+
+Implementation: H4 uses per-local-date groupby + per-day
+`origin="start_day"` resample because pandas' `origin="start_day"` on
+a tz-aware multi-day index does NOT re-anchor at DST. D1 and W1 use
+pandas' built-in `resample("1D")` / `resample("W-MON")` on the
+tz-converted index, which is DST-aware out of the box.
+
+**Cache layout:**
+
+```
+data/cache/<TF>/<PAIR>.parquet            # UTC (legacy)
+data/cache/<TF>_5ers_eet/<PAIR>.parquet   # 5ers EET (new)
+```
+
+The two convention caches coexist; the convention is encoded in both
+the directory name and the cache_key sidecar so cross-pollination is
+impossible. UTC caches built pre-PR-#187 remain valid.
+
+Verification:
+- [tests/test_aggregator_5ers_eet.py](../tests/test_aggregator_5ers_eet.py)
+  — anchor + DST + cache namespace tests
+- [tests/test_aggregator.py](../tests/test_aggregator.py) — legacy UTC
+  byte-identity preserved
+
+---
+
+## §16 What lives elsewhere
 
 - Backtester (M1 loader, TF aggregator, fill, sim, account, panel,
   WFO folds + gates + orchestrator) — [BACKTESTER_ARCHITECTURE.md](BACKTESTER_ARCHITECTURE.md)

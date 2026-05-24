@@ -1,8 +1,14 @@
-"""Tests for the PR-E.1.6 trail mechanics rewrite.
+"""Tests for trail mechanics under PR #187 signal-parity convention.
 
-Verifies the EA pattern: trail activates on bid_close, exit fires when
-bar_close ≤ trail_level, fill at NEXT bar's open_bid (not intra-bar
-wick on the next bar).
+Trail activation + ratchet operate on MID close (supersedes PR-E.1.6's
+bid-only trail), so trail behaviour is venue-independent. Hit detection
+still uses bid-side close for worst-case-fill realism, and exit fills at
+NEXT bar's ``open_bid`` (not intra-bar wick on the next bar).
+
+Background: PR-E.1.6 switched the trail to bid-only to match the live
+EA's ``CopyClose(PERIOD_H4)`` (bid). PR #187 reverses that for the
+backtester so signals are venue-portable; the EA will be updated to mid
+in a parallel deployment PR.
 """
 
 from __future__ import annotations
@@ -43,25 +49,25 @@ def _panel_from_rows(pair: str, rows: list[tuple]) -> Panel:
     return Panel.from_frames({pair: df}, tf="H4")
 
 
-def test_trail_reads_bid_close_not_mid() -> None:
-    """Trail update should read close_bid, not (close_bid + close_ask)/2.
+def test_trail_reads_mid_close_per_signal_parity() -> None:
+    """Trail activation reads mid (close_bid + close_ask) / 2 per PR #187.
 
-    Construct a bar where close_bid = 1.10 and close_ask = 1.12. If trail
-    activation reads mid (1.11), trail activates; if it reads bid (1.10),
-    trail doesn't (threshold = 1.11). Verifies bid-side reading.
+    Construct a bar where close_bid = 1.10 and close_ask = 1.12. Activation
+    threshold is 1.11 (entry 1.10 + 2.0 × ATR 0.005). Mid = 1.11 → trail
+    activates. Under PR-E.1.6's pre-PR-187 bid-only trail, bid 1.10 < 1.11
+    would have left the trail inactive — this is the locked reversal.
     """
     pair = "EURUSD"
-    # Activation threshold at 1.11 (entry 1.10 + 2.0 × ATR 0.005 = 1.11)
     bar_with_wide_spread = (
         "2026-01-01 04:00:00",
         1.10,
         1.12,
         1.09,
-        1.10,  # bid: o, h, l, c=1.10 — JUST below activation 1.11
+        1.10,  # bid: c=1.10 — would NOT have activated under bid trail
         1.10,
         1.12,
         1.09,
-        1.12,  # ask: c=1.12 — mid=1.11 would activate
+        1.12,  # ask: c=1.12 — mid=1.11 activates under signal-parity trail
     )
     panel = _panel_from_rows(pair, [bar_with_wide_spread])
 
@@ -80,9 +86,10 @@ def test_trail_reads_bid_close_not_mid() -> None:
     bar = panel.pair_dfs[pair].iloc[0]
     tm.update_all_at_close({pair: bar}, acct)
     state = tm.get(pos.position_id)
-    # Bid close 1.10 < threshold 1.11 → trail must NOT have activated
-    assert state.activated is False, (
-        "Trail activated on bid_close=1.10 (threshold=1.11) — should have read bid, not mid"
+    # Mid close (1.10+1.12)/2 = 1.11 ≥ threshold 1.11 → trail activates
+    assert state.activated is True, (
+        "Trail did not activate on mid_close=1.11 (threshold=1.11) — should "
+        "have read mid per PR #187 signal parity"
     )
 
 

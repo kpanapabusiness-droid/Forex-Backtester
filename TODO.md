@@ -2,7 +2,7 @@
 
 > The operational todo list. Append, check off, delete as work completes.
 > Distinct from `ARC_TRACKER.md` (which is auto-updated arc state) and `ARC_HISTORY.md` (frozen pre-v3.0 record).
-> Last updated: 2026-05-22 (CC_08 closure template + tracker schema extension)
+> Last updated: 2026-05-24 (PR #187 signal parity engine — Sub-changes A.distance + A.trail + C.EET)
 
 ---
 
@@ -18,6 +18,15 @@
 ## Current state — quick view
 
 **Phase 0 — Framework validation:** 🟢 READY (v3.0 backtester closed PR-E.1.7 / 2026-05-22; KH-24 anchor partial-by-attribution per Path B)
+
+### Queued follow-up dispatches (post PR #187 — signal parity)
+
+- 🔴 **Legacy engine retirement.** Migrate `live/run_daily.py` + 32 other importers off `core/backtester.py` + `core/signal_logic.py` onto V3 paths (core/sim/multipair_backtester, core/features, core/architectures). Then delete both legacy files. **Gate:** KH-24 anchor preservation (±0.5pp ROI / ±1pp DD on worst-fold). Out of scope for PR #187 per chat resolution (KH-24 live deployment continuity). Separate dispatch needed.
+- 🔴 **5ers timezone verification.** PR #187 assumes 5ers = EET/EEST (EU DST rules). User to verify against 5ers documentation. If NY-close session rollover, a small follow-up PR adjusts the boundary convention parameter — engine code is convention-parameterised already.
+- 🔴 **Arc 10 signal-parity re-run.** Workstation execution of `py -m scripts.l_arc_10_v3.step_5` on the tightened engine to quantify the delta. Procedure documented in [docs/calibration/arc_10_signal_parity_rerun_2026_05.md](docs/calibration/arc_10_signal_parity_rerun_2026_05.md). Expected delta near-zero. Not blocking; documented as required follow-up per dispatch Task 4.
+- 🔴 **HistData ↔ 5ers MT5 4H comparison (5 majors).** User pulls 5ers MT5 H4 closes from VPS for EURUSD/GBPUSD/USDJPY/AUDUSD/USDCAD over a 30-day post-2020 window; comparison documented per [docs/calibration/histdata_mt5_aggregation_parity_2026_05.md §5](docs/calibration/histdata_mt5_aggregation_parity_2026_05.md). Acceptance: per-pair mean abs diff <5 pips on majors.
+- 🔴 **5ers_eet cache build for 28 pairs × 7 TFs.** One-time workstation operation to populate the new `data/cache/<TF>_5ers_eet/` cache directory. Procedure in PROTOCOL_RUNTIME.md §15.3.
+- 🔴 **EA mid-trail update.** Live MT5 EA currently uses `CopyClose(PERIOD_H4)` (bid-side) for trail logic per PR-E.1.6. To maintain backtest↔EA parity with PR #187's mid-trail, the EA must be updated to compute mid from bid+ask CopyClose calls. Separate deployment PR.
 **Phase 1 — Arc 1-11 re-runs:** 🔴 NOT STARTED (blocked on Phase 0 launch)
 **Phase 2 — New signals + sub-protocol probes:** 🔴 NOT STARTED (blocked on Phase 1 closure)
 

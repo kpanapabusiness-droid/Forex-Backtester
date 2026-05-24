@@ -7,7 +7,13 @@ pyyaml
 pydantic
 scipy
 scikit-learn
-joblib
+# joblib pinned to a minor version for cross-env classifier-pickle
+# stability — heavy_ml_probe PR-C persists per-fold classifiers via
+# joblib.dump for PR-E's A6 consumer, and joblib's pickle format has
+# evolved between 1.3 / 1.4 / 1.5. Bump in lockstep with vanilla Step 4
+# manifest's `joblib_version` audit field (see
+# core/steps/step_4_extraction.py:_write_manifest).
+joblib>=1.4,<1.6
 
 # heavy_ml_probe sub-protocol (docs/sub_protocols/heavy_ml_probe.md v1.0)
 # Used by core/heavy_ml_probe/* and tests/heavy_ml_probe/*.

@@ -1,0 +1,127 @@
+# configs/heavy_ml_probe/default.yaml
+# heavy_ml_probe sub-protocol — default invocation parameters (PR-A).
+# Sub-protocol spec: docs/sub_protocols/heavy_ml_probe.md (locked v1.0)
+# Overseer: L_PROTOCOL.md v3.0 (Amendments 1-3).
+# Build dispatch: docs/dispatches/heavy_ml_probe_build_intent.md
+#
+# This file is the canonical schema for any arc invoking heavy_ml_probe.
+# Per-arc YAMLs may shadow individual values but MUST NOT add unknown keys
+# without a spec amendment.
+#
+# Chat resolutions baked in:
+#   Q1 — survival target: time_to_reach_1r_censored_at_sl_or_time_exit
+#   Q2 — FLAML budget: max_iter counts as 1-trial-per-evaluation
+#   Q5b — A4 consumer: adapter (B1) — survival models wrap to predict_admit shape
+#
+# Schema version stamped into manifest.json so downstream tooling can
+# detect breaking changes. Bump on any incompatible key change.
+
+schema_version: "1.0"
+
+sub_protocol:
+  name: heavy_ml_probe
+  spec_path: docs/sub_protocols/heavy_ml_probe.md
+  spec_version: "1.0"
+
+# ── Compute budget (dispatch §6 #6) ──────────────────────────────────
+# Hard cap. Sum across folds = max_iter_per_fold × n_folds = 1000 × 11 =
+# 11000 evaluations per cluster per arc. The automl.py wrapper refuses
+# to exceed; if FLAML's internal accounting prevents enforcement, PR-B
+# HALTs per WORKFLOW §6.
+automl:
+  framework: flaml                # locked per dispatch §5
+  max_iter_per_fold: 1000         # one evaluation == one FLAML trial (Q2)
+  n_folds: 11                     # 11-fold TimeSeriesSplit on IS (spec §"AutoML inside CV")
+  metric: roc_auc                 # target = binary; AUC-ROC matches vanilla Step 4
+  ensemble: true                  # FLAML decides ensembling/stacking internally
+  estimator_list:                 # search space per spec §"What overrides the overseer"
+    - rf
+    - lgbm
+    - xgboost
+    - catboost
+    - extra_tree
+    - lrl1                        # logistic regression (L1)
+  time_budget_seconds: null       # null = let max_iter be the binding cap; set non-null for compute ceilings
+  early_stop: true                # FLAML's internal early stop; does not relax max_iter
+
+# ── Meta-labeling target (dispatch §6 + spec §"Meta-labeling target") ─
+# Binary target: did the trade reach +1R MFE before hitting SL?
+# Constructed from pool's per-trade MFE / MAE columns at Step 1.
+meta_labeling:
+  enabled: true
+  target_kind: reach_1r_before_sl
+  mfe_r_threshold: 1.0            # +1R MFE
+  # Threshold sweep at PR-C: report precision / recall at each.
+  threshold_sweep: [0.30, 0.40, 0.50, 0.60, 0.70]
+
+# ── Survival models (dispatch §6 + spec §"Survival model variant") ───
+# Q1 resolution: target = time-to-+1R-MFE censored at SL or time-exit.
+# Adapter (Q5b option B1) maps survival predictions to A4's predict_admit shape.
+survival:
+  enabled: true
+  target_kind: time_to_reach_1r_censored_at_sl_or_time_exit
+  # Horizon used by the A4 adapter when translating S(t | features) to
+  # an exit decision. "Probability of reaching +1R within the next K
+  # bars" at each post-entry bar. Tested at PR-D's defaults; arc-side
+  # configs may override.
+  adapter_horizon_bars: 5
+  adapter_exit_thresholds: [0.30, 0.40, 0.50]
+  min_n_warn: 200                 # warn if cluster has fewer trades (dispatch §6 #10)
+  cox_ph:
+    penalizer: 0.0                # ridge penalty; 0.0 = unpenalised
+    fit_intercept: true
+  rsf:
+    n_estimators: 200             # mirrors vanilla Step 4 RF default
+    min_samples_leaf: 50          # matches L_PROTOCOL Appendix A RF default
+    max_depth: 6                  # matches L_PROTOCOL Appendix A RF default
+
+# ── Holdout discipline (dispatch §6 #3 + L_PROTOCOL §1) ──────────────
+# Holdout 2021-01-01 → present is OFF-LIMITS during training. The
+# pipeline filters the input pool to entry_time < train_end before
+# AutoML / meta-label / survival see any data. Mirrors vanilla Step 4's
+# train_end argument (see core/steps/step_4_extraction.py).
+training_window:
+  is_start: "2010-01-01"
+  train_end: "2021-01-01"         # exclusive cutoff; trades with entry_time >= this are excluded
+
+# ── Causal lineage gate (dispatch §6 #2 + Q3 resolution) ─────────────
+# Pre-evaluation filter on feature columns. Features without a clean
+# tag are dropped from the training set BEFORE AutoML sees them. Uses
+# the registry-backed core.features.pipeline.feature_lineage_dataframe()
+# as source-of-truth (same pattern as core/discovery/causal_filter.py).
+causal_filter:
+  accepted_lineage: ["clean"]
+  rejected_lineage: ["suspect", "unverified"]
+  exclude_classes: []             # optional: exclude e.g. "spread_regime" if known leaky
+
+# ── Determinism (dispatch §6 #4, #5, #7) ─────────────────────────────
+determinism:
+  random_state: 42
+  n_jobs: 1                       # single-threaded for reproducibility
+  text_line_terminator: "\n"
+
+# ── Output layout (dispatch §7) ──────────────────────────────────────
+# Per-arc invocation supplies the arc root; outputs land under it.
+output:
+  step4_subdir: step_4/heavy_ml
+  step5_subdir: step_5/heavy_ml_augmented
+  classifiers_subdir: classifiers
+  survival_subdir: survival
+  artefacts:
+    automl_leaderboard: automl_leaderboard.csv
+    automl_feature_importance: automl_feature_importance.csv
+    survival_model_results: survival_model_results.csv
+    meta_label_results: meta_label_results.csv
+    compute_budget_used: compute_budget_used.md
+    step4_manifest: manifest.json
+    classifiers_manifest: manifest.json     # under classifiers_subdir
+    survival_manifest: manifest.json        # under survival_subdir
+    step5_manifest: manifest.json           # under step5_subdir
+
+# ── Library versions (informational; recorded into manifest at runtime) ─
+# Pinning is the operator's responsibility (managed via
+# requirements-dev.txt). Recording the runtime-resolved versions into
+# the manifest gives downstream tooling cross-env audit signal — same
+# pattern as core/steps/step_4_extraction.py:_LGBM_VERSION.
+library_versions:
+  record_at_runtime: true

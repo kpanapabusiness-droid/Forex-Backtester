@@ -1,4 +1,4 @@
-"""Pydantic models for ARC_CLOSURE.md §1 tracker_payload — v1.0, v1.1, and v1.2 schemas + normalisation.
+"""Pydantic models for ARC_CLOSURE.md §1 tracker_payload — v1.0, v1.1, v1.2, and v1.3 schemas + normalisation.
 
 Schema versions:
 - v1.0 — pre-Amendment 3 (legacy field names `worst_fold_roi_pct`, `worst_fold_dd_pct`)
@@ -6,16 +6,22 @@ Schema versions:
 - v1.2 — deployment-spec addition (adds `config_artefact_path`, `deployment_spec_section_present` to
   `best_architecture`). PASS-verdict closures must point to a canonical config YAML; the parser CLI
   enforces the file's existence + §4 heading presence before applying tracker mappings.
+- v1.3 — L_PROTOCOL Amendment 4 (Step 6 causal-audit framework). Adds top-level `step_6` block
+  to `tracker_payload`. REQUIRED for any v1.3 PASS verdict. Phase 2 tightening: any PASS verdict
+  with ``closed_timestamp > 2026-05-23T06:20:59Z`` (PR-186 merge) MUST carry Amendment 3 fields
+  in `best_architecture`; v1.3 PASS verdicts MUST additionally have a `step_6` block with
+  `overall_passed: true`. Pre-cutoff closures grandfathered.
 
 Detection precedence (see `detect_schema_version`):
 1. `template_version` field present → use that
-2. Any v1.2-exclusive field present → v1.2
-3. Any v1.1-exclusive field present → v1.1
-4. Else → v1.0
+2. Any v1.3-exclusive field present (top-level `step_6`) → v1.3
+3. Any v1.2-exclusive field present → v1.2
+4. Any v1.1-exclusive field present → v1.1
+5. Else → v1.0
 
-`normalize_to_v12()` returns a v1.2-shaped dict that mapping logic consumes uniformly. The mapping
-layer only reads v1.0/v1.1-era fields, so v1.2-exclusive fields are not consumed downstream — they
-are validated at the CLI layer before tracker mutations begin.
+`normalize_to_v13()` returns a v1.3-shaped dict that mapping logic consumes uniformly. The mapping
+layer reads v1.0/v1.1-era fields + the new `step_6` block; v1.2-exclusive fields are validated at
+the CLI layer before tracker mutations begin.
 """
 
 from __future__ import annotations
@@ -24,7 +30,11 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-SchemaVersion = Literal["1.0", "1.1", "1.2"]
+SchemaVersion = Literal["1.0", "1.1", "1.2", "1.3"]
+
+# PR-186 merge cutoff for Phase 2 tightening (per chat Q7).
+# After this timestamp, PASS verdicts must carry Amendment 3 fields.
+PHASE_2_CUTOFF_ISO: str = "2026-05-23T06:20:59Z"
 
 V11_EXCLUSIVE_FIELDS = {
     "worst_fold_dd_base_pct",
@@ -41,6 +51,11 @@ V11_EXCLUSIVE_FIELDS = {
 V12_EXCLUSIVE_FIELDS = {
     "config_artefact_path",
     "deployment_spec_section_present",
+}
+
+# v1.3-exclusive payload-level fields (NOT inside best_architecture).
+V13_EXCLUSIVE_TOP_LEVEL_FIELDS = {
+    "step_6",
 }
 
 VALID_FAILURE_MODES = {
@@ -82,13 +97,15 @@ VALID_ARCHITECTURES = {"A1", "A2", "A3", "A4", "A5", "A6"}
 
 
 def detect_schema_version(payload: dict[str, Any]) -> SchemaVersion:
-    """Return '1.0', '1.1', or '1.2' based on the rules in the module docstring.
+    """Return '1.0', '1.1', '1.2', or '1.3' based on the rules in the module docstring.
 
-    Accepts `template_version` values: 'v1.0', 'v1.1', 'v1.2', '1.0', '1.1', '1.2'.
+    Accepts `template_version` values: 'v1.0', 'v1.1', 'v1.2', 'v1.3', '1.0', '1.1', '1.2', '1.3'.
     """
     raw = payload.get("template_version")
     if raw is not None:
         s = str(raw).lstrip("v").lstrip("V").strip()
+        if s == "1.3":
+            return "1.3"
         if s == "1.2":
             return "1.2"
         if s == "1.1":
@@ -96,8 +113,13 @@ def detect_schema_version(payload: dict[str, Any]) -> SchemaVersion:
         if s == "1.0":
             return "1.0"
         raise ValueError(
-            f"Unknown template_version {raw!r} — expected one of v1.0, v1.1, v1.2, 1.0, 1.1, 1.2"
+            f"Unknown template_version {raw!r} — expected one of "
+            f"v1.0, v1.1, v1.2, v1.3, 1.0, 1.1, 1.2, 1.3"
         )
+
+    # v1.3 detected via top-level step_6 block presence.
+    if any(k in payload for k in V13_EXCLUSIVE_TOP_LEVEL_FIELDS):
+        return "1.3"
 
     best_arch = payload.get("best_architecture") or {}
     if not isinstance(best_arch, dict):
@@ -343,6 +365,67 @@ class TrackerPayloadV12(_TrackerPayloadBase):
         return d
 
 
+# ── v1.3 — Step 6 causal-audit framework (Amendment 4) ──
+
+
+class Step6Categories(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
+    lookahead: bool | None = None
+    selection_bias: bool | None = None
+    execution_realism: bool | None = None
+    statistical: bool | None = None
+    determinism: bool | None = None
+    deployment_readiness: bool | None = None
+
+
+class Step6Block(BaseModel):
+    """v1.3 ``§1 tracker_payload.step_6`` block per ARC_CLOSURE_TEMPLATE v1.3.
+
+    Field semantics:
+    - ``ran``: true when Step 6 dispatched (auto OR manual). False = "not run for this closure".
+    - ``trigger``: ``auto_pass`` (orchestrator dispatched), ``manual`` (CLI invoked),
+      ``not_applicable`` (didn't run).
+    - ``overall_passed``: null when ``ran=false``.
+    - ``manifest_path``: relative path to `step_6/manifest.json`. Null when ``ran=false``.
+    - ``verdict_impact``: ``none`` for PASS audits + manual invocations + ``--no-block``;
+      ``downgraded_to_fail`` when auto-dispatch detected a critical failure.
+    """
+
+    model_config = ConfigDict(extra="allow")
+
+    ran: bool
+    trigger: str  # auto_pass | manual | not_applicable
+    overall_passed: bool | None = None
+    manifest_path: str | None = None
+    categories: Step6Categories = Field(default_factory=Step6Categories)
+    critical_failures: list[str] = Field(default_factory=list)
+    warnings_count: int = 0
+    verdict_impact: str = "none"
+
+
+VALID_STEP6_TRIGGERS = {"auto_pass", "manual", "not_applicable"}
+VALID_STEP6_VERDICT_IMPACTS = {"none", "downgraded_to_fail"}
+
+
+class BestArchitectureV13(BestArchitectureV12):
+    """v1.3 best_architecture block — identical to v1.2 (Amendment 4 added no
+    best_architecture-level fields; the new ``step_6`` block is top-level).
+    """
+
+
+class TrackerPayloadV13(_TrackerPayloadBase):
+    """v1.3 payload — Amendment 4 Step 6 framework."""
+
+    best_architecture: BestArchitectureV13 | None = None
+    step_6: Step6Block | None = None
+
+    def normalize_to_v13(self) -> dict[str, Any]:
+        d = self.model_dump()
+        d["template_version"] = "1.3"
+        return d
+
+
 def _coerce_legacy_field_names(payload: dict[str, Any]) -> dict[str, Any]:
     """Rename v1.0 best_architecture fields to v1.1 names if present.
 
@@ -370,15 +453,20 @@ def parse_payload(payload: dict[str, Any]) -> dict[str, Any]:
 
     Returns a v1.1-shaped dict for v1.0/v1.1 closures (legacy compatibility — mapping logic
     consumes a unified v1.1 shape). For v1.2 closures, returns a v1.2-shaped dict (a superset
-    of v1.1; mapping logic ignores the two extra fields).
+    of v1.1; mapping logic ignores the two extra fields). For v1.3 closures, returns a
+    v1.3-shaped dict (superset of v1.2 + ``step_6`` block).
 
-    For v1.2 closures that retain v1.0-style field names in `best_architecture` (the retrofit
-    pattern — see `_coerce_legacy_field_names`), legacy names are renamed pre-validation.
+    For v1.2/v1.3 closures that retain v1.0-style field names in `best_architecture` (the
+    retrofit pattern — see `_coerce_legacy_field_names`), legacy names are renamed pre-validation.
 
     Raises pydantic.ValidationError on schema violations and ValueError on unknown enum values.
     """
     version = detect_schema_version(payload)
-    if version == "1.2":
+    if version == "1.3":
+        payload = _coerce_legacy_field_names(payload)
+        validated = TrackerPayloadV13.model_validate(payload)
+        norm = validated.normalize_to_v13()
+    elif version == "1.2":
         payload = _coerce_legacy_field_names(payload)
         validated = TrackerPayloadV12.model_validate(payload)
         norm = validated.normalize_to_v12()
@@ -405,6 +493,20 @@ def parse_payload(payload: dict[str, Any]) -> dict[str, Any]:
         if arch not in VALID_ARCHITECTURES:
             raise ValueError(
                 f"architecture {arch!r} not in {{A1…A6}}"
+            )
+
+    # v1.3 step_6 block enum validation
+    step6 = norm.get("step_6")
+    if isinstance(step6, dict):
+        trigger = step6.get("trigger")
+        if trigger is not None and trigger not in VALID_STEP6_TRIGGERS:
+            raise ValueError(
+                f"step_6.trigger {trigger!r} not in {sorted(VALID_STEP6_TRIGGERS)}"
+            )
+        impact = step6.get("verdict_impact")
+        if impact is not None and impact not in VALID_STEP6_VERDICT_IMPACTS:
+            raise ValueError(
+                f"step_6.verdict_impact {impact!r} not in {sorted(VALID_STEP6_VERDICT_IMPACTS)}"
             )
 
     return norm

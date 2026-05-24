@@ -553,9 +553,111 @@ The orchestrator:
    `core.wfo.orchestrator.run_search` + `run_holdout`
 4. Writes ARC_OPEN.md + ARC_CLOSURE.md skeleton + step artefacts
 
-Step 6 (causal audit) is **lazy**: not invoked by the orchestrator
-unless a candidate clears PASS-DEPLOYABLE / PASS-VIABLE — at v3.0
-launch it's a stub that says "deferred to chat."
+Step 6 (causal audit) is **post-gate auto-dispatched** per
+Amendment 4 — see §10b below.
+
+---
+
+## §10b Step 6 — causal audit framework (Amendment 4)
+
+`core/step_6/` implements the six-category causal-audit framework that
+L_PROTOCOL Amendment 4 (2026-05-24) ratifies. Step 6 dispatches AFTER
+the amended gate (Amendment 3) clears §3 constraints #1-9 on at least
+one top-K candidate — per §3 "Evaluation order" item 2.
+
+**Module map:**
+
+```
+core/step_6/
+├── __init__.py
+├── inputs.py                 # Step6Inputs bundle
+├── manifest.py               # CheckResult, CategoryAuditResult, Step6Result,
+│                             # Step6Manifest, Severity, VerdictImpact
+├── orchestrator.py           # run_step_6() dispatcher
+├── byte_compare.py           # Generic feature-producer byte-compare harness
+├── artefacts.py              # markdown/manifest writers
+├── io.py                     # from_arc_orchestrator_result + from_closure_dir
+├── dispatch.py               # maybe_dispatch_step_6 + replace_top_1_with_step6_fail
+├── lookahead.py              # §6.1
+├── selection_bias.py         # §6.2
+├── execution_realism.py      # §6.3
+├── statistical.py            # §6.4
+├── determinism.py            # §6.5
+└── deployment_readiness.py   # §6.6
+```
+
+**Trigger semantics** (chat resolution Q1):
+
+1. `_run_amendment_3_evaluation` produces per-top-K
+   :class:`AmendedGateResult` with `causal_audit_clean=True` (default).
+2. If at least one top-K candidate has verdict PASS-DEPLOYABLE / PASS-VIABLE,
+   `maybe_dispatch_step_6` runs Step 6 on the **Top-1** candidate (chat
+   resolution Q2).
+3. If Step 6 produces ≥ 1 critical failure, `replace_top_1_with_step6_fail`
+   re-classifies the Top-1's gate with `causal_audit_clean=False` →
+   `primary_failure_mode = step6_causal_audit_fail`.
+4. Top-2 / Top-3 candidates are NOT downgraded; feature-set divergence
+   surfaces as a `top_k_feature_set_divergence` warning on the lookahead
+   category.
+
+**Severity rules** (chat resolution Q4):
+
+- `critical` failure → category FAIL → Step 6 FAIL → verdict downgrade
+- `warning` failure → category PASS but flagged; counted in `n_warnings`
+- `info` failure → recorded; no effect on category outcome
+
+`CategoryAuditResult.passed = AND over critical-severity checks only`.
+
+**Manual CLI** — `scripts/run_step_6.py`:
+
+```bash
+# Run all six categories on a closure
+python scripts/run_step_6.py results/l_arc_10/ARC_CLOSURE.md
+
+# Restrict to one category
+python scripts/run_step_6.py results/l_arc_10/ARC_CLOSURE.md --category lookahead
+
+# Demote critical failures to warnings in the report (still no verdict modification)
+python scripts/run_step_6.py results/l_arc_10/ARC_CLOSURE.md --no-block
+
+# Validate inputs without running audits
+python scripts/run_step_6.py results/l_arc_10/ARC_CLOSURE.md --dry-run
+```
+
+Manual invocations write to `results/<arc>/step_6_manual_<timestamp>/`
+and **never modify the verdict** (chat resolution Q6).
+
+**Artefact layout** (per auto-dispatched run):
+
+```
+results/<arc>/step_6/
+├── manifest.json               # Step6Manifest (per dispatch Task 4 schema)
+├── summary.md                  # one-page roll-up
+├── lookahead_report.md
+├── selection_bias_report.md
+├── execution_realism_report.md
+├── statistical_report.md
+├── determinism_report.md
+├── deployment_readiness_report.md
+└── sha256_manifest.json        # per-file sha256 (excludes itself)
+```
+
+**Closure integration** — closure template v1.3 carries a new
+`§1 tracker_payload.step_6` block keyed off `Step6Manifest`. Parser
+v1.3 detection precedence: explicit `template_version: v1.3` → top-level
+`step_6` field → fall-through to v1.2. Phase 2 tightening: for any PASS
+verdict with `closed_timestamp > 2026-05-23T06:20:59Z` (PR-186 merge),
+Amendment 3 fields required; v1.3 PASS verdicts additionally require
+`step_6.overall_passed: true`.
+
+**Backwards compatibility:**
+
+- v1.0 / v1.1 / v1.2 / v1.2.1 closures grandfathered. Parser handles
+  them via existing detection.
+- Arc 10's hand-written Step 6 at `results/l_arc_10/step_6/` stays
+  canonical; manual CLI re-runs land in `step_6_manual_<ts>/` and do
+  NOT clobber.
+- Wave 2 onward closes at v1.3; Step 6 auto-dispatches.
 
 ---
 

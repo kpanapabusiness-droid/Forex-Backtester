@@ -27,6 +27,7 @@ SECTION_HEADINGS: dict[str, str] = {
     "## Cross-arc cluster registry": "cross_arc_cluster_registry",
     "## Cost-decomposition registry": "cost_decomposition_registry",
     "## Cross-arc tag registry": "cross_arc_tag_registry",
+    "## Step 6 audit registry": "step_6_audit_registry",
 }
 
 

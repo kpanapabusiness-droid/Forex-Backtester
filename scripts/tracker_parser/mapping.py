@@ -417,6 +417,46 @@ def apply_cross_arc_tags(
             )
 
 
+def apply_step_6_audit_registry(state: TrackerState, payload: dict[str, Any]) -> None:
+    """Section 4-M (v1.3 / Amendment 4) — append one row per auto-dispatched Step 6 run.
+
+    Append-only. Manual CLI invocations DO NOT add rows (per chat Q6).
+    Skips silently when ``payload`` carries no ``step_6`` block (pre-v1.3 closures).
+    Skips when ``step_6.ran == false`` (Step 6 didn't dispatch — typical for FAIL closures).
+    Skips when ``step_6.trigger == "manual"``.
+    """
+    if "step_6_audit_registry" not in state.tables:
+        # Older trackers without the section — silently no-op.
+        return
+    step6 = payload.get("step_6")
+    if not isinstance(step6, dict):
+        return
+    if not step6.get("ran"):
+        return
+    if step6.get("trigger") == "manual":
+        return
+
+    arc_name = payload["arc_name"]
+    verdict = payload["verdict"]
+    overall = step6.get("overall_passed")
+    cats = step6.get("categories") or {}
+    n_crit = sum(
+        1 for v in cats.values() if v is False  # explicit False; null/None means not run
+    )
+    n_warn = int(step6.get("warnings_count") or 0)
+    manifest_path = step6.get("manifest_path") or EMDASH
+    cells = [
+        arc_name,
+        verdict,
+        "true" if step6.get("ran") else "false",
+        "true" if overall else ("false" if overall is False else EMDASH),
+        str(n_crit),
+        str(n_warn),
+        str(manifest_path),
+    ]
+    state.append_row("step_6_audit_registry", cells)
+
+
 def apply_last_auto_update(state: TrackerState, payload: dict[str, Any]) -> None:
     """Section 4J — format `closed_timestamp` as YYYY-MM-DD HH:MM:SS in the Last auto-update line.
 
@@ -469,4 +509,5 @@ def apply_payload(
     apply_cluster_registry(state, payload)
     apply_cost_decomp(state, payload)
     apply_cross_arc_tags(state, payload, rolling)
+    apply_step_6_audit_registry(state, payload)
     apply_last_auto_update(state, payload)

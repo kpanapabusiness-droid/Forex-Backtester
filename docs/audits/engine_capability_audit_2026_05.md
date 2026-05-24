@@ -477,3 +477,19 @@
 | **Total** | **30** | **24** | **13** | **1** | **68** |
 
 End of audit.
+
+---
+
+## Post-audit update — 2026-05-24 (L_PROTOCOL Amendment 4 / CC_17)
+
+§"Step 6 — Causal audit" capability statuses transition MISSING → WIRED:
+
+1. **Producer-level feature trace as a runnable check** — WIRED at `core/step_6/lookahead.py`. Per-feature `causal_lineage` enforcement via the §6.1 `per_feature_lineage_clean` critical check.
+2. **Byte-compare from raw OHLC for feature reproduction** — WIRED at `core/step_6/byte_compare.py` (generic harness factored from Arc 10's `step_6_byte_compare.py`). Invoked by §6.1 `byte_compare_no_drift`.
+3. **D1 lag rule verification check** — WIRED at `core/step_6/lookahead.py:_check_d1_lag_rule` (static source-inspection check).
+4. **Automated trigger on PASS verdict** — WIRED at `core/step_6/dispatch.py:maybe_dispatch_step_6` + `core/arc/arc_orchestrator.py` `run()`. Post-gate per chat Q1.
+5. **Manifest / report artefact format** — WIRED at `core/step_6/manifest.py` + `core/step_6/artefacts.py`. Closure template v1.3 + parser v1.3 + tracker "Step 6 audit registry" section per dispatch Tasks 4-6.
+
+Capability count delta: Step 6 row updates from `0 WIRED / 0 PARTIAL / 5 MISSING` to `5 WIRED / 0 PARTIAL / 0 MISSING`. Overall: WIRED 30 → 35, MISSING 13 → 8.
+
+Remaining Tier 1 / 2 items (Amendment 3 engine emission, heavy_ml_probe sub-protocol, etc.) unchanged by this PR.

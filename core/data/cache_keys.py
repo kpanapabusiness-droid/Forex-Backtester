@@ -72,9 +72,16 @@ def m1_cache_key_for_pair(manifest: dict[str, Any], pair: str) -> str:
     return sha256_bytes("\n".join(lines).encode("utf-8"))
 
 
-def tf_cache_key(m1_key: str, tf: str) -> str:
-    """Cache key for an aggregated TF derives from the M1 key + TF label."""
-    return sha256_bytes(f"{m1_key}|{tf}".encode("utf-8"))
+def tf_cache_key(m1_key: str, tf: str, boundary_convention: str = "utc") -> str:
+    """Cache key for an aggregated TF derives from the M1 key + TF label.
+
+    ``boundary_convention="utc"`` (default) preserves byte-identical legacy keys.
+    Non-default conventions (e.g. ``"5ers_eet"``) append the label so caches
+    under different bar-boundary regimes never collide.
+    """
+    if boundary_convention == "utc":
+        return sha256_bytes(f"{m1_key}|{tf}".encode("utf-8"))
+    return sha256_bytes(f"{m1_key}|{tf}|{boundary_convention}".encode("utf-8"))
 
 
 def manifest_self_sha256(manifest_path: Path) -> str:

@@ -10,22 +10,22 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
-from core.features._helpers import mid_close, pip_size_for_pair
+from core.features._helpers import mid_close, mid_high, mid_low, pip_size_for_pair
 from core.features.lineage import CausalLineage, FeatureSpec
 from core.features.registry import register
 
 
 def _prior_session_high(pair_df: pd.DataFrame, panel=None) -> pd.Series:
-    """Distance from current mid-close to the prior-calendar-day's session high.
+    """Distance from current mid-close to the prior-calendar-day's mid session high.
 
     "Session" here is the calendar UTC day. Implementation: shift to prior
-    day, group by date, take max(high). This is by-construction strictly
-    prior (we only consult days earlier than the signal day).
+    day, group by date, take max(mid_high). Strictly prior by construction
+    (we only consult days earlier than the signal day).
     """
     df = pair_df.copy()
     df["_date"] = df.index.normalize()
-    daily_high = df.groupby("_date")["high_bid"].max().rename("prior_day_high_bid")
-    # Look up *previous* date's high for each row
+    df["_mid_high"] = mid_high(pair_df).values
+    daily_high = df.groupby("_date")["_mid_high"].max().rename("prior_day_high_mid")
     prev_date_high = pd.Series(
         df["_date"].map(lambda d: daily_high.get(d - pd.Timedelta(days=1), np.nan)).values,
         index=df.index,
@@ -42,9 +42,9 @@ register(
         feature_class="distance",
         description=(
             "Distance from the prior-bar mid-close to the prior-calendar-day's "
-            "bid-side session high. Positive ⇒ above prior day's high."
+            "mid-price session high. Positive ⇒ above prior day's high."
         ),
-        inputs={"reference": "prior_calendar_day_high_bid"},
+        inputs={"reference": "prior_calendar_day_high_mid"},
     )
 )
 
@@ -52,7 +52,8 @@ register(
 def _prior_session_low(pair_df: pd.DataFrame, panel=None) -> pd.Series:
     df = pair_df.copy()
     df["_date"] = df.index.normalize()
-    daily_low = df.groupby("_date")["low_ask"].min().rename("prior_day_low_ask")
+    df["_mid_low"] = mid_low(pair_df).values
+    daily_low = df.groupby("_date")["_mid_low"].min().rename("prior_day_low_mid")
     prev_date_low = pd.Series(
         df["_date"].map(lambda d: daily_low.get(d - pd.Timedelta(days=1), np.nan)).values,
         index=df.index,
@@ -69,9 +70,9 @@ register(
         feature_class="distance",
         description=(
             "Distance from the prior-bar mid-close to the prior-calendar-day's "
-            "ask-side session low. Positive ⇒ above prior day's low."
+            "mid-price session low. Positive ⇒ above prior day's low."
         ),
-        inputs={"reference": "prior_calendar_day_low_ask"},
+        inputs={"reference": "prior_calendar_day_low_mid"},
     )
 )
 

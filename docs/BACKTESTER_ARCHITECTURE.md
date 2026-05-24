@@ -52,7 +52,22 @@ below.
 
 ---
 
-## Data layer (PR-A)
+## Data layer (PR-A; PR #187 EET extension)
+
+Under PR #187, the M1→TF aggregator supports two bar-boundary
+conventions via `boundary_convention=` parameter:
+
+- `"utc"` (default, legacy) — UTC-anchored bins; existing caches
+  byte-identical to pre-PR #187.
+- `"5ers_eet"` — 5ers broker EET/EEST-anchored; per-day re-anchored
+  for H4 to handle DST transitions. Cache namespace
+  `data/cache/<TF>_5ers_eet/<PAIR>.parquet`.
+
+See [PROTOCOL_RUNTIME.md §15.3](PROTOCOL_RUNTIME.md) and
+[docs/calibration/histdata_mt5_aggregation_parity_2026_05.md](calibration/histdata_mt5_aggregation_parity_2026_05.md)
+for full convention specs and DST handling.
+
+### Pre-PR-#187 layer (unchanged for UTC)
 
 - **Loader:** `core.data.histdata_loader.load_m1(pair, ...)` reads
   per-pair-month M1 bid + ask CSVs and joins them into a single
@@ -82,13 +97,20 @@ below.
   any external floor file (L_PROTOCOL §1 non-negotiable, enforced
   since PR-B).
 
-## Spread + sim (PR-B)
+## Spread + sim (PR-B; PR #187 updates)
 
 - **`core.spread.real_spread`** — per-bar spread + tradability mask +
   data-quality summary.
 - **`core.sim.fill`** — 8 bar-level fill primitives. Long entry =
   `open_ask`, long exit = `close_bid`, intra-bar SL/TP triggered
-  against `low_bid`/`high_bid`. Short symmetric.
+  against `low_bid`/`high_bid`. Short symmetric. Worst-case fills
+  satisfy PR #187 Sub-change B — spread is implicit in the bid/ask
+  wings, no separate deduction step.
+- **`core.sim.trailing_stop.TrailManager`** — trail activation +
+  ratchet operate on **mid close** under PR #187 (signal-parity
+  convention; reverses PR-E.1.6's bid-only trail). Trail hit detection
+  remains bid-side for worst-case-fill realism. See
+  [PROTOCOL_RUNTIME.md §15.2](PROTOCOL_RUNTIME.md).
 - **`core.sim.panel.Panel`** — multi-pair wrapper over
   `dict[pair, DataFrame]` with union-of-timestamps iteration and
   `snapshot_at(t)` for cross-pair access.

@@ -249,6 +249,7 @@ Known differences between backtest and expected live deployment.
 - [ ] EA implementation matches §4.2-4.9 line-by-line
 - [ ] Backtest-vs-EA byte-identical pre-deployment shadow run on 30 days of data
 - [ ] Step 6 causal audit clean
+- [ ] **Signal parity verified against deployment venue (PR #187 hard requirement).** Re-aggregate HistData M1 → primary TF under `boundary_convention="5ers_eet"` and confirm aggregated closes match 5ers MT5 closes on the deployment pair set within tolerance (mean abs diff <5 pips on majors). Document the comparison artefact under `docs/calibration/` per the dispatch's C.4 procedure. Skipping this check is a hard FAIL of the deployment gate.
 
 ```
 

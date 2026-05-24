@@ -16,6 +16,12 @@ An arc's `ARC_OPEN.md` declares `sub_protocol: heavy_ml_probe`. Typical use:
 
 Not invoked by default. Compute-heavy. Run on selected arcs only.
 
+**Invocation (`scripts/heavy_ml_probe/run_probe.py`) exit codes** — standard Unix mapping; documented here for CI consumers (PR-A flag-1 disposition):
+
+- `0` — success; artefact set written
+- `1` — runtime failure (e.g. pool not found, holdout-guard violated, lineage gate rejected every feature)
+- `2` — argparse misuse (missing required flag, etc.; emitted by Python's argparse on its own)
+
 ---
 
 ## What overrides the overseer

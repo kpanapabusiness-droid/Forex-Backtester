@@ -1,25 +1,28 @@
 """CLI for the heavy_ml_probe sub-protocol.
 
-PR-A surface: load + validate config, load the pool, apply the causal
-lineage gate, write the stub summary + skeleton manifest. AutoML /
-meta-labeling / survival flows land in PR-B/C/D.
+PR-B surface: load + validate config, load pool, apply causal lineage
+gate, run AutoML across an 11-fold TimeSeriesSplit (when the pool
+supports it), write the artefact set + manifest. Meta-labeling /
+survival flows land in PR-C/D.
 
 Usage:
 
-    python -m scripts.heavy_ml_probe.run_probe \
-        --arc <arc_name> \
-        --pool <path/to/step_1/pool.parquet> \
-        --cluster-id <int> \
-        [--config configs/heavy_ml_probe/default.yaml] \
+    python -m scripts.heavy_ml_probe.run_probe \\
+        --arc <arc_name> \\
+        --pool <path/to/step_1/pool.parquet> \\
+        --cluster-id <int> \\
+        [--config configs/heavy_ml_probe/default.yaml] \\
         [--output-root results/<arc_name>]
 
 Default config path: ``configs/heavy_ml_probe/default.yaml``.
 Default output root: ``results/<arc_name>``.
 
-Exit codes:
-  0  pipeline ran successfully (stub artefacts written)
-  1  config / pool error (FileNotFoundError, schema mismatch, etc.)
-  2  internal error (re-raised to stderr for debugging)
+Exit codes (also documented in docs/sub_protocols/heavy_ml_probe.md):
+  0  pipeline ran successfully (artefact set written)
+  1  runtime failure (pool not found, holdout-guard violated, lineage
+     gate rejected every feature, etc.)
+  2  argparse misuse (missing required flag, etc. — argparse's own
+     default exit code)
 """
 
 from __future__ import annotations
@@ -28,6 +31,7 @@ import argparse
 import sys
 from pathlib import Path
 
+from core.heavy_ml_probe.automl import AllFeaturesRejected, HoldoutGuardViolation
 from core.heavy_ml_probe.pipeline import (
     PipelineResult,
     load_config,
@@ -38,7 +42,7 @@ DEFAULT_CONFIG_PATH = Path("configs/heavy_ml_probe/default.yaml")
 
 
 def _print_result_summary(result: PipelineResult) -> None:
-    print("[heavy_ml_probe] PR-A scaffolding run complete.")
+    print("[heavy_ml_probe] pipeline run complete.")
     print(f"  arc            : {result.cfg.arc_name}")
     print(f"  cluster_id     : {result.cfg.cluster_id}")
     print(f"  pool           : {result.cfg.pool_path.as_posix()}")
@@ -50,9 +54,19 @@ def _print_result_summary(result: PipelineResult) -> None:
         f"/ rejected={result.lineage_gate.n_rejected} "
         f"/ input={result.lineage_gate.n_input_columns}"
     )
+    if result.automl_result is not None:
+        ar = result.automl_result
+        print(
+            f"  AutoML         : status=ok  folds={ar.n_folds_total} "
+            f"(valid={ar.n_folds_valid})  "
+            f"AUC nanmean={ar.auc_mean:.4f}  "
+            f"total_modelcount={ar.total_modelcount}  "
+            f"wall={ar.total_fit_wall_seconds:.2f}s"
+        )
+    else:
+        print(f"  AutoML         : status={result.automl_skip_reason} (skipped)")
     print(
-        "[heavy_ml_probe] AutoML / meta-labeling / survival not yet implemented "
-        "(PR-B/C/D)."
+        "[heavy_ml_probe] Meta-labeling / survival not yet implemented (PR-C/D)."
     )
 
 
@@ -104,6 +118,13 @@ def main(argv: list[str] | None = None) -> int:
         result = run_pipeline(cfg)
     except (FileNotFoundError, ValueError) as e:
         print(f"[heavy_ml_probe] config / pool error: {e}", file=sys.stderr)
+        return 1
+    except HoldoutGuardViolation as e:
+        print(f"[heavy_ml_probe] holdout-guard violation: {e}", file=sys.stderr)
+        return 1
+    except AllFeaturesRejected as e:
+        print(f"[heavy_ml_probe] lineage gate rejected every feature: {e}",
+              file=sys.stderr)
         return 1
 
     _print_result_summary(result)

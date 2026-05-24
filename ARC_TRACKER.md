@@ -172,9 +172,20 @@ Schema:
 
 ---
 
+## Step 6 audit registry
+
+> Auto-dispatched Step 6 runs (per Amendment 4) append one row per arc. Manual CLI
+> invocations DO NOT append (read-only diagnostic per chat Q6).
+> Schema: Arc | Verdict | Step 6 ran | Step 6 passed | Critical fails | Warnings | Manifest
+
+| Arc | Verdict | Step 6 ran | Step 6 passed | Critical fails | Warnings | Manifest |
+|---|---|---|---|---|---|---|
+
+---
+
 ## Update mechanism
 
-Parser at `scripts/update_tracker_from_closure.py` applies the Section 4 A-K mapping from each closure doc's `§1 tracker_payload` YAML block. Invoke per `scripts/tracker_parser/README.md` — invocation is part of the standard arc-close workflow (run on the arc branch before opening the closure PR; tracker delta lands in the same atomic commit as the closure doc).
+Parser at `scripts/update_tracker_from_closure.py` applies the Section 4 A-M mapping from each closure doc's `§1 tracker_payload` YAML block. Invoke per `scripts/tracker_parser/README.md` — invocation is part of the standard arc-close workflow (run on the arc branch before opening the closure PR; tracker delta lands in the same atomic commit as the closure doc).
 
 - Parser writes the "Last auto-update" line as `parser: YYYY-MM-DD HH:MM:SS` (UTC, derived from the closure's `closed_timestamp`).
 - Manual updates (rare; for one-off cleanups or retroactive backfills) write `manual: YYYY-MM-DD` and an optional parenthetical describing the change.

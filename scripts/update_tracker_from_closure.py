@@ -70,6 +70,97 @@ def _build_parser() -> argparse.ArgumentParser:
     return p
 
 
+def _is_post_phase_2_cutoff(closed_ts: str | None) -> bool:
+    """Return True iff ``closed_ts`` is strictly after the PR-186 merge cutoff
+    (2026-05-23T06:20:59Z per chat Q7) and therefore subject to Phase 2 tightening.
+
+    Closures missing or with malformed timestamps are treated as PRE-cutoff
+    (grandfathered) — Phase 2 tightening kicks in only when we can confidently
+    determine the closure post-dates the merge.
+    """
+    if not closed_ts:
+        return False
+    from datetime import datetime, timezone
+    s = str(closed_ts).strip()
+    if s.endswith("Z"):
+        s = s[:-1] + "+00:00"
+    try:
+        dt = datetime.fromisoformat(s)
+    except ValueError:
+        return False
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    dt_utc = dt.astimezone(timezone.utc)
+    cutoff_s = schema.PHASE_2_CUTOFF_ISO[:-1] + "+00:00"
+    cutoff_dt = datetime.fromisoformat(cutoff_s).astimezone(timezone.utc)
+    return dt_utc > cutoff_dt
+
+
+def _validate_phase_2_amendment_3_fields(payload: dict, closure_path: Path) -> int:
+    """Phase 2 tightening: for PASS verdicts with closed_timestamp > PR-186 merge,
+    REQUIRE the Amendment 3 risk-normalised fields on `best_architecture`
+    (chat Q7 / template v1.3 Schema versioning row).
+
+    Pre-cutoff closures grandfathered (return 0).
+    """
+    ba = payload.get("best_architecture") or {}
+    required = (
+        "chained_max_dd_base_pct",
+        "k_safe",
+        "k_hard",
+        "r_safe_pct",
+        "r_hard_pct",
+        "scalable_to_safe",
+        "scalable_to_hard",
+    )
+    missing = [k for k in required if ba.get(k) is None]
+    if missing:
+        logging.error(
+            "Phase 2 tightening: PASS verdict at closed_timestamp=%r is post-PR-186-merge "
+            "(%s) but best_architecture is missing Amendment 3 fields: %s. Closure %s.",
+            payload.get("closed_timestamp"),
+            schema.PHASE_2_CUTOFF_ISO,
+            missing,
+            closure_path,
+        )
+        return 1
+    return 0
+
+
+def _validate_v13_pass_step6(payload: dict, closure_path: Path) -> int:
+    """Phase 2 tightening: v1.3 PASS verdicts MUST carry a step_6 block with
+    overall_passed=true (chat Q7 / template v1.3 Schema versioning row).
+
+    Manual invocations cannot satisfy this — only auto-dispatch can produce
+    overall_passed=true with verdict_impact=none.
+    """
+    step6 = payload.get("step_6")
+    if not isinstance(step6, dict):
+        logging.error(
+            "v1.3 PASS-verdict validation: §1 tracker_payload.step_6 block missing. "
+            "Closure %s has verdict %r — step_6 block REQUIRED for v1.3 PASS verdicts.",
+            closure_path,
+            payload.get("verdict"),
+        )
+        return 1
+    if not step6.get("ran"):
+        logging.error(
+            "v1.3 PASS-verdict validation: step_6.ran is false but verdict is %r. "
+            "PASS verdicts cannot ship without Step 6 dispatch.",
+            payload.get("verdict"),
+        )
+        return 1
+    if step6.get("overall_passed") is not True:
+        logging.error(
+            "v1.3 PASS-verdict validation: step_6.overall_passed is %r — must be true "
+            "for PASS verdicts. (verdict_impact=%r)",
+            step6.get("overall_passed"),
+            step6.get("verdict_impact"),
+        )
+        return 1
+    return 0
+
+
 def _validate_v12_pass_verdict(payload: dict, closure_path: Path) -> int:
     """v1.2 PASS-verdict validation per template Section 4-L.
 
@@ -170,12 +261,26 @@ def main(argv: list[str] | None = None) -> int:
         logging.error("schema validation failed: %s", exc)
         return 1
 
-    # v1.2 PASS-verdict validation (template Section 4-L). Runs BEFORE tracker mutation so a
-    # missing config artefact or missing §4 section blocks the write atomically.
-    if payload.get("template_version") == "1.2" and str(payload.get("verdict", "")).startswith(
-        "PASS-"
-    ):
+    template_version = payload.get("template_version")
+    verdict_str = str(payload.get("verdict", ""))
+    is_pass = verdict_str.startswith("PASS-")
+
+    # v1.2+ PASS-verdict validation (template Section 4-L) — config_artefact_path + §4 heading.
+    if template_version in ("1.2", "1.3") and is_pass:
         rc = _validate_v12_pass_verdict(payload, closure_path)
+        if rc != 0:
+            return rc
+
+    # Phase 2 tightening (template v1.3 Schema versioning row, chat Q7):
+    # PASS verdict closed after PR-186 merge MUST have Amendment 3 fields.
+    if is_pass and _is_post_phase_2_cutoff(payload.get("closed_timestamp")):
+        rc = _validate_phase_2_amendment_3_fields(payload, closure_path)
+        if rc != 0:
+            return rc
+
+    # v1.3 PASS verdicts MUST have a step_6 block with overall_passed=true.
+    if template_version == "1.3" and is_pass:
+        rc = _validate_v13_pass_step6(payload, closure_path)
         if rc != 0:
             return rc
 

@@ -49,22 +49,25 @@ The parser detects the closure doc's template version automatically:
 
 | Detection rule | Outcome |
 |---|---|
-| `template_version` field present in `§1 tracker_payload` | Use it (accepts `v1.0`, `v1.1`, `v1.2`, `1.0`, `1.1`, `1.2`). |
+| `template_version` field present in `§1 tracker_payload` | Use it (accepts `v1.0`, `v1.1`, `v1.2`, `v1.3`, `1.0`, `1.1`, `1.2`, `1.3`). |
+| Top-level `step_6` block present | Infer v1.3. |
 | Any v1.2-exclusive field present in `best_architecture` (`config_artefact_path`, `deployment_spec_section_present`) | Infer v1.2. |
 | Any v1.1-exclusive field present (`worst_fold_dd_base_pct`, `k_safe`, etc.) | Infer v1.1. |
 | Otherwise | v1.0. |
 
-Detection precedence: 1.2 → 1.1 → 1.0 → error.
+Detection precedence: 1.3 → 1.2 → 1.1 → 1.0 → error.
 
 v1.0 closures use legacy field names (`worst_fold_roi_pct`, `worst_fold_dd_pct`). The parser internally renames them to v1.1 names (`*_base_pct`) and fills v1.1-exclusive Amendment 3 fields with `null`. v1.1 closures are passed through.
 
 v1.2 closures add `config_artefact_path` + `deployment_spec_section_present` to the `best_architecture` block plus a new `§4 deployment_spec` section in the closure doc. Retrofitted v1.2 closures may retain v1.0-style field names (`worst_fold_roi_pct`); the parser renames them pre-validation via `_coerce_legacy_field_names` — purely additive on §1, no manual rewrite required.
 
-Either way, the mapping logic operates on a unified v1.1+-shaped dict — historical closures are never rewritten.
+v1.3 closures (L_PROTOCOL Amendment 4) add a top-level `step_6` block to `tracker_payload`. The block records Step 6 framework outcome (ran/trigger/overall_passed/categories/critical_failures/warnings_count/verdict_impact). REQUIRED for any v1.3 PASS verdict; OPTIONAL for FAIL/HALT closures (records `ran: false`).
+
+The mapping logic operates on a unified v1.1+-shaped dict — historical closures are never rewritten. v1.3 adds Section 4-M (Step 6 audit registry) which is silently no-op'd against trackers that lack the section.
 
 ## v1.2 PASS-verdict validation
 
-When `template_version == 1.2` AND `verdict` starts with `PASS-`, the parser enforces (after schema validation, BEFORE any tracker mutation):
+When `template_version` ∈ `{1.2, 1.3}` AND `verdict` starts with `PASS-`, the parser enforces (after schema validation, BEFORE any tracker mutation):
 
 1. `best_architecture.config_artefact_path` MUST be non-null.
 2. The file at that path (resolved relative to repo root) MUST exist.
@@ -73,9 +76,25 @@ When `template_version == 1.2` AND `verdict` starts with `PASS-`, the parser enf
 
 Any failure → HALT exit code 1, no tracker write, no rolling-state update. Fix the closure (re-create the missing config YAML, add the §4 section, set the flag) and re-run.
 
-For non-PASS verdicts in v1.2 (FAIL / HALT / DISCOVERY_COMPLETE), the validation block is skipped — §4 is optional and `config_artefact_path` may be `null`.
+For non-PASS verdicts (FAIL / HALT / DISCOVERY_COMPLETE), the validation block is skipped — §4 is optional and `config_artefact_path` may be `null`.
 
-For v1.0 and v1.1 closures, the validation block is not evaluated.
+For v1.0 and v1.1 closures, the v1.2 validation block is not evaluated.
+
+## Phase 2 tightening (v1.3 / Amendment 4)
+
+Cutoff: `2026-05-23T06:20:59Z` (PR-186 merge per chat resolution Q7).
+
+For any PASS verdict whose `closed_timestamp > 2026-05-23T06:20:59Z`, the parser REQUIRES Amendment 3 fields in `best_architecture` (`chained_max_dd_base_pct`, `k_safe`, `k_hard`, `r_safe_pct`, `r_hard_pct`, `scalable_to_safe`, `scalable_to_hard`). Missing any field → HALT.
+
+For `template_version: v1.3` PASS verdicts, the parser ADDITIONALLY requires:
+
+1. `step_6` block present.
+2. `step_6.ran == true`.
+3. `step_6.overall_passed == true`.
+
+PASS verdicts cannot ship without a clean Step 6 dispatch. Manual invocations cannot satisfy this requirement (they always carry `trigger: manual` and `verdict_impact: none`); only auto-dispatched runs produce `overall_passed: true` with engine confidence.
+
+Pre-cutoff closures (v1.0 / v1.1 / v1.2 / v1.2.1 closed before the cutoff) are grandfathered — none of the Phase 2 checks fire.
 
 ## Idempotency
 

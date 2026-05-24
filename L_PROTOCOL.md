@@ -8,6 +8,7 @@
 > **Amendment 1 (2026-05-22):** Step 5 search policy clarified — informed by Steps 3-4, not exhaustive. Multi-cluster handling + holdout decision rule specified. See §2 Step 5.
 > **Amendment 2 (2026-05-22):** ML architecture mechanics specified for A2, A3, A4, A6. See §2 Step 5 ML mechanics subsection.
 > **Amendment 3 (2026-05-22):** Risk-normalised gates. §3 constraints preserved 1:1; evaluation now occurs at scaled risk `r_safe` / `r_hard` rather than at the WFO base risk. Scalability bounds, per-day DD recount, and explicit evaluation order added. Full text archived at `archive/L_PROTOCOL_v3_0_AMENDMENT_3.md`. See §3.
+> **Amendment 4 (2026-05-24):** Step 6 causal-audit framework. Six audit categories (lookahead, selection bias, execution realism, statistical integrity, determinism, deployment readiness) as runnable engine code. Auto-dispatches post-gate on Top-1 PASS-tier candidate; manual CLI invokable on any closure. Critical failure downgrades verdict via `step6_causal_audit_fail`. Closure template bumped to v1.3 with `§1 tracker_payload.step_6` block; parser v1.3 + Phase 2 tightening (PR-186-merge cutoff). Full text archived at `archive/L_PROTOCOL_v3_0_AMENDMENT_4.md`. See §2 Step 6.
 >
 > This protocol is the umbrella. It accepts any signal, any feature space, any architecture. Sub-protocols may layer on top to add signal-class-specific specificity. The overseer's gates and verdicts apply universally.
 
@@ -330,28 +331,33 @@ A2 and A6 use the single Step-4-fit classifier across every WFO fold. A3 and A4 
 
 **Verdict assignment:** per §3.
 
-### Step 6 — Causal audit (lazy, deployment-only)
+### Step 6 — Causal audit framework (Amendment 4)
 
-**Trigger:** runs only when Step 5 produces ≥ 1 candidate clearing PASS-DEPLOYABLE or PASS-VIABLE.
+> Amendment 4 (2026-05-24) replaces the sparse pre-Amendment Step 6 spec with a six-category runnable framework. Full text at [archive/L_PROTOCOL_v3_0_AMENDMENT_4.md](archive/L_PROTOCOL_v3_0_AMENDMENT_4.md). Summary below; refer to the amendment for severity rules, manifest schema, and Phase 2 parser-tightening details.
 
-**Mechanics:**
+**Trigger:** post-gate. Step 6 dispatches AFTER §3 constraints #1-9 clear on at least one top-K candidate (per §3 "Evaluation order"). Auto-dispatch runs on the **Top-1 verdict-carrying candidate only**; feature-set divergence vs Top-2/Top-3 surfaces as a `top_k_feature_set_divergence` warning. Manual CLI (`scripts/run_step_6.py`) invokable on any closure regardless of verdict (read-only).
 
-1. For each feature in the winning candidate's filter / classifier:
-   - Producer-level trace: where does this feature's value come from? What columns of the underlying OHLC drive it? What time index? Any aggregations?
-   - Verify producer code uses no lookahead, no post-signal data, no leakage from related instruments.
-   - Verify the feature value at trade time T is reproducible from data available at time T only.
+**Six categories** (each independent, no cross-category dependencies):
 
-2. End-to-end check: regenerate a small random sample of feature values from raw OHLC, byte-compare to pool values.
+1. **§6.1 Lookahead** — per-feature producer trace + D1 lag rule + cluster-feature audit + byte-compare from raw OHLC + threshold-selection lineage.
+2. **§6.2 Selection bias** — verifies Step 5's recorded configs_evaluated + Bonferroni-equivalent noise floor + holdout-reuse detector + cluster-selection record.
+3. **§6.3 Execution realism** — HistData M1 bid+ask source present + spread regime delta + fill realism + lot rounding at `r_safe` + mid-price refactor active + UTC bar boundary.
+4. **§6.4 Statistical integrity** — Lo-corrected Sharpe sample-size + 28-pair survivorship + vol-regime coverage (≥3 years) + cross-pair daily-bucket correlation.
+5. **§6.5 Determinism** — `step_4/classifiers/manifest.json` sha256 verify + required artefacts present + seed pinning + LF line endings. (Sha256-verify only; does NOT re-run sims — CI provides the two-run guarantee.)
+6. **§6.6 Deployment readiness** — `## §4 deployment_spec` heading + `config_artefact_path` resolvable + all §4.X subsections present + features live-computable + checklist marked.
 
-3. If any feature fails — flag, and either:
-   - Downgrade candidate (if the failing feature is in a non-critical filter)
-   - Kill candidate (if the failing feature is load-bearing)
+**Severity rules:**
+- `critical` failure → category FAIL → Step 6 FAIL → verdict downgrade
+- `warning` failure → category PASS but flagged; counted in `n_warnings`
+- `info` failure → recorded; no effect on category outcome
 
-**Output:**
-- `step_6/causal_audit_report.md`
-- `step_6/manifest.json`
+`CategoryAuditResult.passed = AND over critical-severity checks only`.
 
-**Heavy compute, rare invocation.** Not setup until needed.
+**Output:** `results/<arc>/step_6/` per auto-dispatch — `manifest.json`, `summary.md`, six `<category>_report.md`, `sha256_manifest.json`. Manual CLI writes to `results/<arc>/step_6_manual_<timestamp>/` (never clobbers auto).
+
+**Verdict effect:** when auto-dispatched Step 6 produces a critical failure, the Top-1's amended gate is re-classified with `causal_audit_clean=False` → `primary_failure_mode = step6_causal_audit_fail` (priority 11 per §3). Manual invocations never modify the verdict.
+
+**Backwards compatibility:** v1.0/v1.1/v1.2/v1.2.1 closures grandfathered. Arc 10's existing hand-written Step 6 stays canonical. Wave 2 arcs close at v1.3; Step 6 auto-dispatches.
 
 ---
 
@@ -447,14 +453,14 @@ Scales linearly with `k`. Threshold preserved from the prior §3 chained-DD spec
 
 ### Evaluation order
 
-Step 6 is lazy per §2. Amendment 3 specifies order explicitly:
+Amendment 3 specifies order explicitly; Amendment 4 makes the Step 6 dispatch concrete:
 
-1. Constraints #1-#9 (all non-Step-6 constraints, both tiers) evaluated in priority order.
-2. If ALL clear → Step 6 causal audit dispatched.
-3. Step 6 clean → PASS-DEPLOYABLE / PASS-VIABLE finalised.
-4. Step 6 fails → FAIL with `primary_failure_mode = step6_causal_audit_fail`.
+1. Constraints #1-#9 (all non-Step-6 constraints, both tiers) evaluated in priority order with `causal_audit_clean=True` (default).
+2. If ALL clear for at least one top-K candidate → Step 6 framework auto-dispatches on the **Top-1 verdict-carrying candidate** (per Amendment 4 chat Q2).
+3. Step 6 critical-clean → PASS-DEPLOYABLE / PASS-VIABLE finalised.
+4. Step 6 critical-fails → Top-1's amended gate re-classified with `causal_audit_clean=False` → FAIL with `primary_failure_mode = step6_causal_audit_fail`.
 
-Step 6 is the LAST gate, not concurrent with the others.
+Step 6 is the LAST gate, not concurrent with the others. Manual CLI invocations never modify the verdict regardless of Step 6 outcome.
 
 ### Failure-mode priority (tie-break)
 

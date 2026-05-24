@@ -43,6 +43,12 @@ from core.architectures.a1_system_level_filter import A1RunContext
 from core.runners._fold_stats_helpers import compute_per_day_max_dd
 from core.runners.arc_fold_runner import ArcFoldRunner
 from core.sim.panel import Panel
+from core.step_6.dispatch import (
+    DispatchOutcome,
+    maybe_dispatch_step_6,
+    replace_top_1_with_step6_fail,
+)
+from core.step_6.manifest import AuditConfig as Step6AuditConfig
 from core.steps.classifier_persistence import (
     build_a2_config_from_step4,
     build_a3_config_from_step4,
@@ -173,7 +179,12 @@ class ArcConfig:
     # dispatch time. See :class:`AutoArchSpec`. Empty by default.
     auto_arch_specs: tuple[AutoArchSpec, ...] = ()
     wfo_structure: WfoStructure | None = None  # None -> build_v3_folds()
-    invoke_step_6: bool = False  # set True after PASS-tier candidate detected
+    # Step 6 auto-dispatch (Amendment 4). Default behavior is to run Step 6
+    # automatically on any PASS-tier candidate after the amended gate clears
+    # §3 constraints #1-9. ``skip_step_6=True`` is an escape hatch — chat
+    # may set it for diagnostic / dev runs that don't need the audit.
+    skip_step_6: bool = False
+    step_6_audit_config: Step6AuditConfig | None = None
     # Amendment 3 §"Sizing convention" — when any candidate uses
     # ``sizing_convention="equity_pct"``, the scalability gate FAILs
     # by default. Set this to True only after chat approval of a
@@ -246,6 +257,9 @@ class ArcOrchestratorResult:
     raw_strategy_results: tuple[StrategyResult, ...] = field(default_factory=tuple)
     # Amendment 3 extension — None when no top-K candidates exist
     amended_wfo: AmendedWfoSearchResult | None = None
+    # Amendment 4 extension — None when Step 6 did not dispatch (no PASS-tier
+    # candidate cleared §3 constraints #1-9, or skip_step_6=True).
+    step_6_dispatch: DispatchOutcome | None = None
 
 
 class ArcOrchestrator:
@@ -787,6 +801,46 @@ class ArcOrchestrator:
                 wfo_struct=wfo_struct_amend,
             )
 
+        # Amendment 4: Step 6 causal-audit auto-dispatch.
+        # Post-gate per chat Q1 — runs only after the amended gate clears
+        # §3 constraints #1-9 for at least one candidate.
+        step_6_dispatch: DispatchOutcome | None = None
+        if (
+            amended_wfo is not None
+            and amended_wfo.amended_results
+            and not self.cfg.skip_step_6
+        ):
+            arc_root = self._resolve_output_dir()
+            arc_root.mkdir(parents=True, exist_ok=True)
+            wfo_struct_amend = self.cfg.wfo_structure or build_v3_folds()
+            holdout_start = None
+            if wfo_struct_amend.holdout is not None:
+                holdout_start = pd.Timestamp(wfo_struct_amend.holdout.oos_start)
+                if holdout_start.tzinfo is None:
+                    holdout_start = holdout_start.tz_localize("UTC")
+            step_6_dispatch = maybe_dispatch_step_6(
+                arc_orchestrator_result=_LightOrchestratorView(
+                    arc_name=self.cfg.arc_name,
+                    pool=pool, step_4=s4, wfo_search=s5,
+                    amended_wfo=amended_wfo,
+                ),
+                amended_wfo=amended_wfo,
+                arc_root=arc_root,
+                audit_config=self.cfg.step_6_audit_config,
+                holdout_start=holdout_start,
+                panels=self.panels,
+                feature_matrix=self.cfg.feature_matrix,
+                feature_lineage=self.cfg.feature_lineage,
+                signal_module_name=type(self.signal_module).__module__,
+                primary_tf=signal_eval.primary_tf,
+                pair_set=tuple(self.cfg.pair_set),
+            )
+            # Per Amendment 4 + chat Q1: if Step 6 critical-failed, downgrade
+            # the Top-1 candidate by re-classifying its gate with
+            # causal_audit_clean=False.
+            if step_6_dispatch.downgrade_top_1:
+                amended_wfo = replace_top_1_with_step6_fail(amended_wfo)
+
         # Verdict — source from Amendment 3 result if present, else legacy.
         verdict = "INCOMPLETE"
         if amended_wfo is not None and amended_wfo.amended_results:
@@ -815,7 +869,7 @@ class ArcOrchestrator:
             "step_3_summary": s3.summary_md,
             "step_4_summary": s4.summary_md if s4 else "(no candidate clusters; Step 4 skipped)",
             "step_5_summary": _step_5_summary(s5),
-            "step_6_summary": "(lazy — deferred to chat at PASS verdict)",
+            "step_6_summary": _step_6_summary(step_6_dispatch),
             "pass_or_failed_phrase": "passed" if "PASS" in verdict else "failed",
             "why_explanation": "(populated by chat in closure prose)",
             "improvements_list": "(populated by chat)",
@@ -834,6 +888,7 @@ class ArcOrchestrator:
             arc_closure_md=arc_closure_md,
             verdict=verdict,
             amended_wfo=amended_wfo,
+            step_6_dispatch=step_6_dispatch,
         )
 
     def write(self, result: ArcOrchestratorResult, out_dir: Path | None = None) -> Path:
@@ -938,6 +993,54 @@ def _best_architecture_summary(s5: WfoSearchResult | None) -> str:
         f"worst ROI {best.gate.worst_fold_roi:+.4%}, "
         f"worst DD {best.gate.worst_fold_dd:.4%}."
     )
+
+
+@dataclass(frozen=True)
+class _LightOrchestratorView:
+    """Minimal duck-type passed to ``core.step_6.io.from_arc_orchestrator_result``.
+
+    The orchestrator hasn't constructed its full ArcOrchestratorResult by the
+    time Step 6 dispatches (verdict + closure rendering happen after). This
+    shim exposes just the fields the Step 6 io builder reads.
+    """
+
+    arc_name: str
+    pool: Any
+    step_4: Any
+    wfo_search: Any
+    amended_wfo: Any
+
+
+def _step_6_summary(dispatch: DispatchOutcome | None) -> str:
+    if dispatch is None:
+        return "(not dispatched — no PASS-tier candidate cleared §3 #1-9 OR skip_step_6=True)"
+    if not dispatch.dispatched:
+        return "(not dispatched — no PASS-tier candidate cleared §3 #1-9)"
+    res = dispatch.step_6_result
+    if res is None:
+        return "(dispatched; no result captured)"
+    lines = [
+        f"Step 6 result: **overall_passed={bool(res.overall_passed)}**",
+        f"Trigger: `{res.trigger.value}` · Verdict impact: `{res.verdict_impact.value}`",
+        "",
+        "| Category | Passed | Critical fails | Warnings |",
+        "|---|---|---:|---:|",
+    ]
+    for c in res.categories:
+        lines.append(
+            f"| {c.category} | {bool(c.passed)} | "
+            f"{c.n_critical_fails}/{c.n_critical} | {c.n_warnings} |"
+        )
+    if dispatch.divergence_warning:
+        lines.append("")
+        lines.append("> ⚠ Top-1 feature set differs from other PASS-tier candidates — chat may want to audit them too (per Amendment 4 §Q2).")
+    crit = res.critical_failures()
+    if crit:
+        lines.append("")
+        lines.append("**Critical failures:**")
+        for name in crit:
+            lines.append(f"- `{name}`")
+    return "\n".join(lines)
 
 
 def _step_5_summary(s5: WfoSearchResult | None) -> str:

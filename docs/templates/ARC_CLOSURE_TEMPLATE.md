@@ -1,4 +1,4 @@
-# ARC_CLOSURE.md Template (Locked v1.2)
+# ARC_CLOSURE.md Template (Locked v1.3)
 
 > **Location:** `docs/templates/ARC_CLOSURE_TEMPLATE.md`
 > **Status:** locked. Every arc closure MUST follow this template.
@@ -11,6 +11,7 @@
 >
 > **v1.1 (2026-05-22, L_PROTOCOL Amendment 3):** risk-normalised gate fields added to `best_architecture` block. Two fields renamed (see §"Schema versioning" at end of template). `primary_failure_mode` enum extended.
 > **v1.2 (2026-05-23, deployment-spec addition):** `config_artefact_path`, `deployment_spec_section_present`, `template_version` fields added to `best_architecture` block. New §4 deployment_spec section: REQUIRED for any PASS verdict, OPTIONAL for FAIL / HALT / DISCOVERY_COMPLETE. Parser enforces config path + §4 presence for PASS verdicts.
+> **v1.3 (2026-05-24, L_PROTOCOL Amendment 4):** Step 6 causal-audit framework. New `§1 tracker_payload.step_6` block. Step 6 auto-dispatches on any candidate that clears §3 constraints #1-9; manual CLI available for any closure. Step 6 critical-failure downgrades verdict to FAIL with `primary_failure_mode = step6_causal_audit_fail`. Parser v1.3 detection + Phase 2 tightening: for any PASS verdict with `closed_timestamp > 2026-05-23T06:20:59Z`, Amendment 3 fields required; for `template_version: v1.3` PASS, `step_6` block required.
 
 ---
 
@@ -30,7 +31,7 @@
 ```yaml
 tracker_payload:
 
-  template_version: v1.2   # Schema dispatch. Accepts v1.0, v1.1, v1.2 (parser detects via this field OR v1.1/v1.2-exclusive fields).
+  template_version: v1.3   # Schema dispatch. Accepts v1.0, v1.1, v1.2, v1.3 (parser detects via this field OR version-exclusive fields).
 
   # ────── Identity ──────
   arc_name: <arc_name>
@@ -156,6 +157,28 @@ tracker_payload:
   # ────── Cross-arc observation tags (terse, one-line each) ──────
   cross_arc_tags: [<tag_1>, <tag_2>]
   # Examples: "v_shape_auc_ceiling", "pipeline_d1_admit_vs_deployment", "co_fire_with_arc_7"
+
+  # ────── Step 6 causal-audit registry (v1.3 / Amendment 4) ──────
+  # REQUIRED for v1.3 PASS verdicts. OPTIONAL otherwise (e.g. FAIL/HALT
+  # closures that did not run Step 6, or manual CLI invocations on older
+  # closures). When ``ran: false`` for a non-PASS closure the rest of the
+  # block may be null. Manual CLI invocations record ``trigger: manual``
+  # and NEVER modify the verdict per Amendment 4 §"Discipline rules".
+  step_6:
+    ran: <bool>                  # true when Step 6 dispatched (auto OR manual)
+    trigger: auto_pass | manual | not_applicable
+    overall_passed: <bool or null>
+    manifest_path: results/<arc>/step_6/manifest.json     # null when ran=false
+    categories:
+      lookahead: <bool or null>
+      selection_bias: <bool or null>
+      execution_realism: <bool or null>
+      statistical: <bool or null>
+      determinism: <bool or null>
+      deployment_readiness: <bool or null>
+    critical_failures: [<list of "category.check_name" entries>]
+    warnings_count: <int>
+    verdict_impact: none | downgraded_to_fail
 ```
 
 ---
@@ -374,6 +397,7 @@ Parser specification (preserved here for reference):
 | v1.1 | 2026-05-22 | L_PROTOCOL Amendment 3. Risk-normalised fields added to `best_architecture`. Two fields renamed: `worst_fold_roi_pct` → `worst_fold_roi_base_pct`, `worst_fold_dd_pct` → `worst_fold_dd_base_pct`. `primary_failure_mode` enum extended. Pre-v1.1 closures retain v1.0 field names; parser handles both via version detection. |
 | v1.2 | 2026-05-23 | Deployment-spec addition. Three new fields in `best_architecture`: `config_artefact_path`, `deployment_spec_section_present`, `template_version` (the last was conventional in v1.1; locked at v1.2). New §4 deployment_spec section: REQUIRED for PASS-* verdicts (DEPLOYABLE, VIABLE, *-PROVISIONAL, *-PENDING-STEP6), OPTIONAL otherwise. Parser HALTs on PASS verdict if config path missing / file absent / §4 heading missing (Section 4-L). Pre-v1.2 closures unaffected. |
 | v1.2.1 | 2026-05-23 | `chained_dd_method` field added to `best_architecture` per PR-186 review item 1. Records the method used to reconstruct chained equity for `chained_max_dd_base_pct`: `"equity_stitching"` (v3.0.1 engine default) or `"full_window_sim"` (v3.0.2 follow-up). Phase 1: parser accepts as OPTIONAL. Phase 2 (post-Wave-2 first PASS arc): parser REQUIRES the field for any PASS verdict with `closed_timestamp > PR-186 merge date`. Older closures grandfathered by closed_timestamp check. v1.2 / v1.2.1 share the same `template_version: v1.2` declaration — the field's presence/absence is the v1.2.1 discriminator, not a separate version string. |
+| v1.3 | 2026-05-24 | L_PROTOCOL Amendment 4 — Step 6 causal-audit framework. New `§1 tracker_payload.step_6` block (`ran`, `trigger`, `overall_passed`, `manifest_path`, `categories`, `critical_failures`, `warnings_count`, `verdict_impact`). REQUIRED for any v1.3 PASS verdict. Parser v1.3 detection precedence: explicit `template_version: v1.3` → v1.3-exclusive `step_6` field → fall-through to v1.2 detection. Phase 2 tightening bundled (PR-186-merge-date cutoff): for any PASS verdict with `closed_timestamp > 2026-05-23T06:20:59Z` the parser REQUIRES Amendment 3 fields in `best_architecture`; for v1.3 PASS verdicts the parser ADDITIONALLY requires the `step_6` block + `step_6.overall_passed: true`. Closures landed before the cutoff (v1.0/v1.1/v1.2/v1.2.1) are grandfathered. |
 
 Closures MUST reference the template version they were written against (e.g., `template_version: v1.2` near the top of `§1 tracker_payload` is the convention going forward — pre-v1.1 closures without this field are assumed v1.0; pre-v1.2 closures without `config_artefact_path` are assumed v1.1). v1.2.1 stays under the `v1.2` declaration; the `chained_dd_method` field is the only discriminator and is OPTIONAL during Phase 1.
 

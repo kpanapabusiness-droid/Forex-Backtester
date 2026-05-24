@@ -1,0 +1,11 @@
+{
+  "artefacts": {
+    "integrity_report.md": "1802dd9f405034502209efc6887c5f882a5f26cd8f13fab1dac5de9bb398219b",
+    "paths.parquet": "124a7c1802485b2592dccb9927fac27caaa2921368cc745e0bc820226e09579f",
+    "pool.parquet": "60fbdfc27b8eb05374cbf8d5e4658723e282aed474852f99a3272aa3042a993f"
+  },
+  "causal_lineage": "clean",
+  "pool_sha256": "402048a2e231dcbc9394b38f82d8a1032ceb368fcb1b4ccce85a9fd8720ad460",
+  "primary_tf": "H4",
+  "signal_name": "liquidity_sweep_reclaim_long"
+}

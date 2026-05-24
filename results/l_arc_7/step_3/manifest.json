@@ -1,0 +1,13 @@
+{
+  "artefacts": {
+    "capturability.csv": {
+      "sha256": "ffaf8c57aab0790ce42c80388340ce924c0eae61b32d6f42a58ce8e9ed2822d6",
+      "size_bytes": 1155
+    },
+    "capturability_summary.md": {
+      "sha256": "e3e69c71a3f4eae45c333db9e09e51e72c5b2e3f6fb85b6dc17186a7bb291c5f",
+      "size_bytes": 582
+    }
+  },
+  "generated_at": "2026-05-24T16:11:44Z"
+}

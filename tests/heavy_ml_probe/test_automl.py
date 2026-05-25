@@ -435,14 +435,18 @@ def test_pipeline_writes_full_automl_artefact_set(pipeline_run):
     assert r.automl_leaderboard_path is not None and r.automl_leaderboard_path.exists()
     assert r.automl_importance_path is not None and r.automl_importance_path.exists()
     assert r.compute_budget_path is not None and r.compute_budget_path.exists()
-    # Manifest lists all four artefacts
+    # Manifest lists at minimum the four AutoML artefacts. PR-C/D add
+    # meta-label + survival when the pool carries those schemas — this
+    # test's pool doesn't, so only the AutoML set + the always-present
+    # stub_summary + aggregate compute_budget_used should appear.
     payload = json.loads(r.step4_manifest_path.read_text(encoding="utf-8"))
-    assert set(payload["artefacts"].keys()) == {
+    required = {
         "stub_summary",
         "automl_leaderboard",
         "automl_feature_importance",
         "compute_budget_used",
     }
+    assert required <= set(payload["artefacts"].keys())
     # Each path is recorded relative to step4_dir with forward slashes.
     for name in ("automl_leaderboard", "automl_feature_importance",
                  "compute_budget_used"):
@@ -511,9 +515,10 @@ def test_pipeline_skip_reason_missing_entry_time(tmp_path):
     r = run_pipeline(cfg, lineage_df=_synthetic_lineage_df())
     assert r.automl_skip_reason == "missing_entry_time"
     assert r.automl_result is None
-    # Only the stub_summary artefact lands when AutoML is skipped.
+    # When AutoML skips, only the always-present pipeline artefacts
+    # land: stub_summary + the PR-E aggregate compute_budget_used.md.
     payload = json.loads(r.step4_manifest_path.read_text(encoding="utf-8"))
-    assert set(payload["artefacts"].keys()) == {"stub_summary"}
+    assert set(payload["artefacts"].keys()) == {"stub_summary", "compute_budget_used"}
     assert payload["automl"]["skip_reason"] == "missing_entry_time"
 
 

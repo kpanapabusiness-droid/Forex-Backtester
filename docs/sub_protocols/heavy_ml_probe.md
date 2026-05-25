@@ -75,6 +75,47 @@ Causal audit runs identically to overseer §2 Step 6. Heavy ML doesn't bypass it
 
 `step_5/heavy_ml_augmented_architectures.csv` — A2/A4/A6 results using heavy-ML-trained components
 
+**Scope clarification (PR-E):** the augmented-architectures CSV is produced by the **overseer Step 5 loop**, not by `heavy_ml_probe` itself. PR-E ships **adapters** that translate heavy-ML-trained components into the existing `core/architectures/{A2,A4,A6}*.py` config shapes (per Q5a + Q5b), and emits `step_5/heavy_ml_augmented/heavy_ml_manifest.json` describing what's adapter-buildable. When the overseer's Step 5 loop runs against an arc whose `ARC_OPEN.md` declares `sub_protocol: heavy_ml_probe`, the loop reads this manifest, builds A2/A4/A6 via the adapters, runs them, and writes the augmented-architectures CSV alongside its vanilla Step 5 outputs. This keeps heavy_ml_probe narrow-scope (no direct A2/A4/A6 invocation).
+
+---
+
+## Invocation
+
+```
+python -m scripts.heavy_ml_probe.run_probe \
+    --arc <arc_name> \
+    --pool <path/to/step_1/pool.parquet> \
+    --cluster-id <int> \
+    [--config configs/heavy_ml_probe/default.yaml] \
+    [--output-root results/<arc_name>]
+```
+
+A single invocation runs AutoML (PR-B) + meta-labeling (PR-C) + Cox PH survival (PR-D) end-to-end. Stages are independent: each auto-skips if the pool lacks its required schema columns; skip reasons land in the manifest. Survival uses `statsmodels.duration.hazard_regression.PHReg` rather than the originally-spec'd `lifelines` (Python 3.14 cp314 wheel gap); RSF is deferred for the same reason.
+
+**Exit codes** (PR-E):
+
+- `0` — every stage succeeded OR every stage cleanly skipped with documented reason
+- `1` — runtime failure (pool not found, holdout-guard violated, lineage gate rejected every feature, uncaught exception)
+- `2` — argparse misuse (missing required flag — argparse's default)
+- `3` — partial success: at least one stage succeeded AND at least one stage was skipped. Adapters for `ok` stages will build cleanly; adapters for skipped stages raise `StageUnavailableError` with the skip reason
+
+**Step 5 adapter manifest** (PR-E) — `step_5/heavy_ml_augmented/heavy_ml_manifest.json` carries per-stage status + paths + buildability flags. Schema locked at `STEP5_MANIFEST_SCHEMA_VERSION = "1.0"`; adapters refuse to consume an unknown schema. The downstream overseer Step 5 loop (and any chat-side analysis script) constructs A2/A4/A6 via:
+
+```python
+from core.heavy_ml_probe.adapters import (
+    build_a2_from_heavy_ml,
+    build_a4_from_heavy_ml,
+    build_a6_from_heavy_ml,
+    FoldSelectionStrategy,
+)
+
+a2_cfg = build_a2_from_heavy_ml("results/<arc>/step_5/heavy_ml_augmented/heavy_ml_manifest.json")
+a4_cfg, cox_adapter = build_a4_from_heavy_ml(manifest_path, k_horizon=5, exit_threshold=0.4)
+a6_cfg = build_a6_from_heavy_ml(manifest_path, lower_threshold=0.3, upper_threshold=0.7)
+```
+
+Fold-selection strategy (per dispatch §3): `LAST_FOLD` (default — fold N classifier / Cox PH coefficients), `ENSEMBLE_MEAN` (average across all valid folds for sensitivity analysis), or `FULL_REFIT` (reserved — raises `NotImplementedError` in PR-E).
+
 ---
 
 ## Discipline rules specific to this sub-protocol

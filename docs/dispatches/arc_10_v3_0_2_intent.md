@@ -23,17 +23,15 @@ The corrected dispatch's "byte-identical UTC result is methodologically irreleva
 
 ---
 
-## §0.5 Path A — Step 6 deferred
+## §0.5 Step 6 — auto-dispatch (patches landed 2026-05-25)
 
-Step 6 framework still treats `features_in_winning_config: []` as critical failure (`core/step_6/lookahead.py:57-68` + `:119-128`). Arc 10's expected winning architecture is A1 with empty `features_in_winning_config` by design (rule-based; no classifier features). Auto-dispatch would false-flag.
+**Update 2026-05-25:** both blocker patches landed on `origin/main` prior to Step 1 launch:
+- **PR #207** — Step 6 lookahead A1 vacuous-pass (`c244568`). `_check_per_feature_lineage` and `_check_no_path_features_in_entry` now return `passed=True, severity=Severity.INFO` when `features_in_winning_config` is empty by-design (rule-based architectures like A1).
+- **PR #208** — W1 producer canonical alignment (`8ce3b3d`). `_w1_close_slope_sign` migrated from raw `merge_asof(direction="backward", allow_exact_matches=False)` (within-period lookahead under any convention) to canonical `get_htf_value_at(..., require_fully_closed=True)`.
 
-Per resolution continuation: Step 6 patch (`engine/step_6_a1_vacuous_pass`) is in flight on a separate chat. This arc proceeds **under Path A**:
-- Steps 1-5 complete under canonical 5ers_eet now
-- Provisional closure with Step 6 deferred
-- Manual CLI Step 6 run post-patch-merge via `python scripts/run_step_6.py results/l_arc_10_v3.0.2/`
-- Addendum `ARC_CLOSURE_ADDENDUM.md` ships separately ~30 min after patch lands
+Path A deferral pattern no longer applies. Step 6 auto-dispatches on PASS-tier Top-1 per L_PROTOCOL Amendment 4. Closure verdict ships non-PROVISIONAL.
 
-L_PROTOCOL Amendment 4 explicitly sanctions manual CLI: *"manual CLI invokable on any closure"*. Deferring on patch-availability grounds is a legitimate use of the manual path, not a methodology variance.
+§7.1 step_6 block shape now follows the standard `ran: true` path with full audit outcome populated by `core.step_6.dispatch.maybe_dispatch_step_6` at Step 5 close. §7.2 PROVISIONAL prose framing dropped; verdict carries through directly from Step 5 + Step 6.
 
 ---
 

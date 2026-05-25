@@ -40,7 +40,11 @@ Vanilla Step 4 (three classifiers with fixed defaults, 5-fold TimeSeriesSplit AU
 
 2. **Meta-labeling target.** Binary target = "did this trade reach +1R MFE before hitting SL?" instead of cluster membership. Aligns with the actual deployment question.
 
-3. **Survival model variant for Pipeline D.** When arc declares `pipeline_d_exits` as a target architecture, also train Cox Proportional Hazards model and Random Survival Forest on time-to-exit. Predicted hazard at each post-entry bar feeds Step 5 Pipeline D exit policy.
+3. **Survival model variant for Pipeline D.** When arc declares `pipeline_d_exits` as a target architecture, also train a Cox Proportional Hazards model on time-to-+1R-MFE censored at SL/time-exit (per chat resolution Q1). Predicted hazard at each post-entry bar feeds Step 5 Pipeline D exit policy via the adapter pattern (Q5b).
+
+   **Library:** Cox PH via `statsmodels.duration.hazard_regression.PHReg` (PR-D). The original dispatch named `lifelines`; replaced because lifelines is blocked on Python 3.14 (its transitive dep `ecos` has no cp314 wheel). statsmodels has a clean cp314 wheel and PHReg covers the Cox PH path with the same modelling semantics.
+
+   **Random Survival Forest — DEFERRED.** scikit-survival (RSF) is also blocked on Py 3.14 by the same `ecos` cp314 gap. Per PR-B flag-1 disposition, PR-D ships Cox PH only. RSF can be added later when the wheel ships; the spec section reserves the slot.
 
 4. **Per-feature causal lineage.** Every feature consumed by AutoML must carry a causal lineage tag from Step 1. Features without a clean tag are excluded from AutoML training set. No exceptions — Arc 9 lookahead lesson.
 

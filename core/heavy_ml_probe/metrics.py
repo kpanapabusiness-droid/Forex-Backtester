@@ -1,28 +1,19 @@
 """Metric wrappers for heavy_ml_probe.
 
-Thin wrappers around sklearn / lifelines / scikit-survival so the
-sub-protocol's per-model evaluation calls a single canonical surface.
-PR-A lands callable stubs that exercise the dependency imports
-defensively (so sklearn / lifelines / sksurv availability is detectable
-at module import without crashing scaffolding), with real bodies
-landing in PR-B/D where the data exists.
-
 Coverage:
 
   * ``auc_roc(y_true, y_score)`` — wraps ``sklearn.metrics.roc_auc_score``.
     Used by AutoML (PR-B) per-fold scoring and by meta-labeling (PR-C)
     threshold sweeps.
-  * ``concordance(y_event, y_time, predicted_risk)`` — wraps lifelines'
-    concordance index. Used by Cox PH (PR-D).
-  * ``integrated_brier_score(...)`` — wraps scikit-survival's
-    ``integrated_brier_score``. Used by Random Survival Forest (PR-D).
+  * ``concordance(y_event, y_time, predicted_risk)`` — Harrell's C-index,
+    implemented from scratch in PR-D. Used by Cox PH survival evaluation.
+  * ``integrated_brier_score(...)`` — deferred per PR-B/D library-block
+    decisions (sksurv is blocked on Python 3.14). Stub retained so the
+    public surface stays stable; raises ``NotImplementedError`` at call
+    time. Will be revisited if RSF is re-enabled.
 
 All metric functions return ``float`` and raise informatively on input
 shape mismatches; NaN / non-finite returns are propagated, not masked.
-
-Lifelines / scikit-survival are imported lazily so the rest of the
-sub-protocol can scaffold without them (matches the defensive
-``lightgbm`` import pattern in ``core/steps/_classifier_defaults.py``).
 """
 
 from __future__ import annotations
@@ -50,11 +41,26 @@ def auc_roc(y_true, y_score) -> float:
 
 
 def concordance(y_event, y_time, predicted_risk) -> float:
-    """C-index for survival models.
+    """Harrell's C-index — from-scratch implementation (PR-D).
 
-    Wraps ``lifelines.utils.concordance_index``. Imports lifelines
-    lazily so PR-A scaffolding does not require the library to be
-    installed in environments that won't run the survival path.
+    Per dispatch §4 fallback: lifelines + scikit-survival are blocked
+    on Python 3.14, so this implements the canonical pairwise-comparable
+    definition directly. Math reference: Harrell, F. E. Jr. (1982),
+    "Evaluating the yield of medical tests" (JAMA).
+
+    Definition. For all ordered pairs ``(i, j)`` where trade ``i`` had
+    ``event=1`` AND ``time_i < time_j`` (``j`` may be censored OR event):
+
+      * concordant if ``predicted_risk_i  >  predicted_risk_j``
+      * tied       if ``predicted_risk_i  ==  predicted_risk_j``
+      * discordant if ``predicted_risk_i  <  predicted_risk_j``
+
+    Returns ``(concordant + 0.5 * tied) / (concordant + discordant + tied)``.
+
+    Note: pairs where both trades have ``time_i == time_j`` are
+    skipped (no rank-order signal). Pairs where the earlier-time trade
+    is censored are also skipped (we cannot know it would have ranked
+    against ``j``).
 
     Parameters
     ----------
@@ -63,27 +69,69 @@ def concordance(y_event, y_time, predicted_risk) -> float:
     y_time : array-like of float
         Observed time (event time if observed, censoring time otherwise).
     predicted_risk : array-like of float
-        Higher = higher predicted risk.
-    """
-    try:
-        from lifelines.utils import concordance_index
-    except ImportError as e:  # pragma: no cover — environment-dependent
-        raise ImportError(
-            "lifelines is required for concordance(); install via "
-            "requirements-dev.txt"
-        ) from e
+        Higher = higher predicted risk → faster expected event. For Cox
+        PH this is ``exp(features @ coefficients)``.
 
-    y_event_arr = np.asarray(y_event)
-    y_time_arr = np.asarray(y_time)
-    pred_arr = np.asarray(predicted_risk)
+    Returns
+    -------
+    Concordance index in ``[0, 1]``. Returns ``float('nan')`` when no
+    comparable pairs exist (e.g. fold validation slice is all-censored
+    or all-same-time).
+    """
+    y_event_arr = np.asarray(y_event, dtype=int)
+    y_time_arr = np.asarray(y_time, dtype=float)
+    pred_arr = np.asarray(predicted_risk, dtype=float)
     if not (y_event_arr.shape == y_time_arr.shape == pred_arr.shape):
         raise ValueError(
             f"concordance shape mismatch: y_event={y_event_arr.shape} "
             f"y_time={y_time_arr.shape} predicted_risk={pred_arr.shape}"
         )
-    # lifelines' concordance_index uses ``higher risk = lower expected
-    # survival time``. Pass risk directly; do NOT negate.
-    return float(concordance_index(y_time_arr, -pred_arr, y_event_arr))
+    if y_event_arr.ndim != 1:
+        raise ValueError(
+            f"concordance expects 1-D arrays; got y_event.ndim={y_event_arr.ndim}"
+        )
+    n = len(y_event_arr)
+    if n < 2:
+        return float("nan")
+    # Drop rows with non-finite predictions/times — they cannot rank.
+    finite_mask = (
+        np.isfinite(y_time_arr) & np.isfinite(pred_arr)
+    )
+    if finite_mask.sum() < 2:
+        return float("nan")
+    e = y_event_arr[finite_mask]
+    t = y_time_arr[finite_mask]
+    r = pred_arr[finite_mask]
+    # Vectorised pair enumeration via broadcasting. O(n^2) memory; fine
+    # at synthetic-test scale (n ~ 400) and at validation-fold scale
+    # (n ~ a few hundred at typical L-arc pool sizes).
+    t_i = t.reshape(-1, 1)
+    t_j = t.reshape(1, -1)
+    r_i = r.reshape(-1, 1)
+    r_j = r.reshape(1, -1)
+    e_i = e.reshape(-1, 1)
+    # Comparable mask: i had event, t_i < t_j (strict — same-time pairs
+    # excluded since they carry no rank signal). j's event status is
+    # irrelevant — being censored at time > t_i still gives a valid
+    # ordering.
+    comparable = (e_i == 1) & (t_i < t_j)
+    n_comparable = int(comparable.sum())
+    if n_comparable == 0:
+        return float("nan")
+    # Higher risk → faster event → should rank with smaller time. So
+    # for comparable (i, j) with t_i < t_j, concordant means r_i > r_j.
+    concordant = int(((r_i > r_j) & comparable).sum())
+    tied = int(((r_i == r_j) & comparable).sum())
+    discordant = int(((r_i < r_j) & comparable).sum())
+    # Sanity: concordant + tied + discordant == n_comparable
+    if concordant + tied + discordant != n_comparable:
+        # Should not happen given the three branches partition the
+        # comparable set; defensive guard against future refactors.
+        raise RuntimeError(
+            f"concordance internal accounting drift: "
+            f"c={concordant}+t={tied}+d={discordant} != comparable={n_comparable}"
+        )
+    return float((concordant + 0.5 * tied) / n_comparable)
 
 
 def integrated_brier_score(
@@ -92,33 +140,20 @@ def integrated_brier_score(
     survival_predictions,
     times,
 ) -> float:
-    """IBS for survival predictions.
+    """IBS for survival predictions — DEFERRED per PR-B/D library-block.
 
-    Wraps ``sksurv.metrics.integrated_brier_score``. Imports sksurv
-    lazily for the same reason as :func:`concordance` above.
-
-    Parameters
-    ----------
-    survival_train : structured ndarray
-        Training survival data in sksurv's ``(event, time)`` structured
-        array shape (typically the output of
-        ``sksurv.util.Surv.from_arrays``).
-    survival_test : structured ndarray
-        Test survival data in the same shape.
-    survival_predictions : 2-D ndarray of shape (n_test, len(times))
-        Predicted survival probabilities at each evaluation time.
-    times : 1-D array of float
-        Time points at which IBS is evaluated.
+    scikit-survival's ``integrated_brier_score`` is the canonical
+    implementation but sksurv is blocked on Python 3.14 (transitive dep
+    ``ecos`` has no cp314 wheel). Per PR-B flag-1 disposition: RSF is
+    deferred; this function stays as a stable public-API stub. Raises
+    ``NotImplementedError`` at call time with a pointer to the deferral
+    rationale.
     """
-    try:
-        from sksurv.metrics import integrated_brier_score as _ibs
-    except ImportError as e:  # pragma: no cover — environment-dependent
-        raise ImportError(
-            "scikit-survival is required for integrated_brier_score(); "
-            "install via requirements-dev.txt"
-        ) from e
-    return float(
-        _ibs(survival_train, survival_test, survival_predictions, times)
+    raise NotImplementedError(
+        "integrated_brier_score is deferred per heavy_ml_probe PR-B "
+        "flag-1 disposition: scikit-survival is blocked on Python 3.14 "
+        "(ecos has no cp314 wheel). Will be reinstated when the wheel "
+        "ships AND chat re-enables RSF in the spec."
     )
 
 

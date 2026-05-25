@@ -7,15 +7,16 @@ Owns the end-to-end flow:
   3. Apply causal lineage gate (PR-A)
   4. Run AutoML across an 11-fold TimeSeriesSplit (PR-B)
   5. Meta-labeling (PR-C) — reach-1R-before-SL target + threshold sweep
-  6. [future] Survival (PR-D)
+  6. Cox PH survival (PR-D) — time-to-+1R censored at SL/time-exit
   7. Write artefact set + sha256 manifest
 
-PR-C adds step 5 — meta-labeling — and two new artefacts
-(``meta_label_results.csv``, ``classifiers/meta_label/manifest.json``).
-The meta-labeling stage is auto-skipped when the input pool lacks the
-columns required for target construction (see
-:data:`core.heavy_ml_probe.meta_labeling.REQUIRED_POOL_COLUMNS`); this
-keeps PR-B's classifier-membership smoke pools untouched.
+PR-D adds step 6 — Cox PH survival via ``statsmodels.PHReg`` (lifelines
++ scikit-survival both blocked on Py 3.14; RSF deferred per PR-B
+flag-1) — and two new artefacts (``survival_model_results.csv``,
+``classifiers/survival/manifest.json``). The survival stage is
+auto-skipped when the input pool lacks the columns required for target
+construction (see
+:data:`core.heavy_ml_probe.survival.SURVIVAL_REQUIRED_POOL_COLUMNS`).
 
 Skip-reason taxonomy — AutoML stage (PR-B):
 
@@ -44,6 +45,22 @@ Skip-reason taxonomy — meta-labeling stage (PR-C):
   * ``holdout_guard_violation`` — pool max ``entry_time`` >= train_end
     (propagated from ``run_automl`` inside ``run_meta_labeling``)
 
+Skip-reason taxonomy — survival stage (PR-D):
+
+  Survival is INDEPENDENT of vanilla AutoML AND meta-labeling — same
+  event definition as meta-labeling (+1R MFE before SL/time-exit) but
+  modelled as time-to-event with censoring. Does not require
+  ``final_r``. Skip reasons:
+
+  * ``ok`` — survival ran; artefacts present
+  * ``no_clean_features`` — lineage gate rejected every column
+  * ``missing_entry_time`` — pool has no ``entry_time`` column
+  * ``missing_trade_id`` — pool has no ``trade_id`` column
+  * ``missing_survival_columns:<list>`` — pool lacks any of
+    :data:`SURVIVAL_REQUIRED_POOL_COLUMNS` (``bars_to_1r_mfe`` /
+    ``bars_held`` / ``exit_reason``)
+  * ``holdout_guard_violation`` — pool max ``entry_time`` >= train_end
+
 Public surface stable from PR-A:
   - ``PipelineConfig`` (extended fields, additive only)
   - ``PipelineResult`` (extended fields, additive only)
@@ -56,7 +73,7 @@ Public surface stable from PR-A:
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -91,6 +108,12 @@ from core.heavy_ml_probe.meta_labeling import (
     MetaLabelResult,
     meta_label_results_to_dataframe,
     run_meta_labeling,
+)
+from core.heavy_ml_probe.survival import (
+    SURVIVAL_REQUIRED_POOL_COLUMNS,
+    SurvivalResult,
+    run_survival,
+    survival_results_to_dataframe,
 )
 
 
@@ -172,8 +195,12 @@ class PipelineResult:
     meta_label_skip_reason: str = "ok"
     meta_label_results_path: Path | None = None
     meta_label_classifier_manifest_path: Path | None = None
-    # Reserved for PR-D — empty in PR-C.
-    survival_artefacts: tuple[Path, ...] = field(default_factory=tuple)
+    # PR-D fields
+    survival_result: SurvivalResult | None = None
+    survival_skip_reason: str = "ok"
+    survival_results_path: Path | None = None
+    survival_classifier_manifest_path: Path | None = None
+    # Reserved for PR-E — empty in PR-D.
     step5_manifest_path: Path | None = None
 
 
@@ -423,6 +450,83 @@ def _run_meta_label_stage(
     return result, "ok", paths
 
 
+# ── PR-D: Survival stage skip / run decision ────────────────────────
+
+
+def _should_run_survival(
+    pool: pd.DataFrame,
+    gate: LineageGateResult,
+) -> tuple[bool, str]:
+    """Decide whether to run the survival stage.
+
+    Survival is INDEPENDENT of vanilla AutoML AND meta-labeling — its
+    target is constructed from the pool's MFE/exit columns (same as
+    meta-labeling, but modelled as time-to-event rather than binary).
+    A pool can carry the survival schema without carrying meta-label's
+    ``final_r`` (which only meta-labeling needs for kept/dropped means).
+
+    Skip if:
+      * gate rejected every feature (``no_clean_features``)
+      * pool lacks ``entry_time`` (TimeSeriesSplit ordering required)
+      * pool lacks ``trade_id`` (manifest persistence keying)
+      * pool lacks any of :data:`SURVIVAL_REQUIRED_POOL_COLUMNS`
+        (``bars_to_1r_mfe`` / ``bars_held`` / ``exit_reason``); logged
+        with the specific missing column names per the skip-reason
+        taxonomy
+    """
+    if gate.n_accepted == 0:
+        return False, "no_clean_features"
+    if "entry_time" not in pool.columns:
+        return False, "missing_entry_time"
+    if "trade_id" not in pool.columns:
+        return False, "missing_trade_id"
+    missing = [c for c in SURVIVAL_REQUIRED_POOL_COLUMNS if c not in pool.columns]
+    if missing:
+        return False, f"missing_survival_columns:{','.join(missing)}"
+    return True, "ok"
+
+
+def _run_survival_stage(
+    cfg: PipelineConfig,
+    pool: pd.DataFrame,
+    gate: LineageGateResult,
+) -> tuple[SurvivalResult | None, str, dict[str, Path]]:
+    """Run Cox PH survival + write the two new artefacts. Returns
+    (result_or_none, skip_reason, {logical_name: path})."""
+    should_run, reason = _should_run_survival(pool, gate)
+    if not should_run:
+        return None, reason, {}
+
+    art_cfg = cfg.raw_config["output"]["artefacts"]
+    results_path = cfg.step4_dir / str(art_cfg.get(
+        "survival_model_results", "survival_model_results.csv"
+    ))
+    classifiers_dir = cfg.step4_dir / "classifiers" / "survival"
+
+    result = run_survival(
+        pool=pool,
+        used_features=gate.accepted_features,
+        train_end=cfg.train_end,
+        arc_name=cfg.arc_name,
+        cluster_id=cfg.cluster_id,
+        classifiers_dir=classifiers_dir,
+        n_folds=cfg.automl_n_folds,
+        seed=cfg.random_state,
+    )
+
+    write_csv(
+        results_path,
+        survival_results_to_dataframe(result),
+        sort_by=["fold", "feature"],
+    )
+
+    paths = {
+        "survival_model_results": results_path,
+        "survival_classifier_manifest": result.classifier_manifest_path,
+    }
+    return result, "ok", paths
+
+
 def _stub_summary_md(
     cfg: PipelineConfig,
     gate: LineageGateResult,
@@ -431,6 +535,8 @@ def _stub_summary_md(
     automl_skip_reason: str,
     meta_label_result: MetaLabelResult | None = None,
     meta_label_skip_reason: str = "ok",
+    survival_result: SurvivalResult | None = None,
+    survival_skip_reason: str = "ok",
 ) -> str:
     """Render the Step 4 stub summary.
 
@@ -499,12 +605,32 @@ def _stub_summary_md(
         ]
     lines += [
         "",
+        "## Survival stage",
+        "",
+        f"- Status: **{survival_skip_reason}**",
+    ]
+    if survival_result is not None:
+        sr = survival_result
+        lines += [
+            f"- statsmodels version: `{sr.statsmodels_version}`",
+            f"- Folds total: **{sr.n_folds_total}** "
+            f"(valid concordance: **{sr.n_folds_valid}**)",
+            (
+                f"- Concordance (nanmean ± nanstd): "
+                f"**{sr.concordance_mean:.4f} ± {sr.concordance_std:.4f}**"
+                if pd.notna(sr.concordance_mean)
+                else "- Concordance: **NaN ± NaN** (no valid folds)"
+            ),
+            f"- Total events across training slices: **{sr.total_n_events}**",
+        ]
+    lines += [
+        "",
         "## Pipeline stages",
         "",
         "- [x] PR-A: scaffolding + causal lineage gate + deterministic IO + sha256 manifest",
         f"- [{'x' if automl_result is not None else ' '}] PR-B: AutoML (FLAML, 11-fold TimeSeriesSplit, 1000 evals/fold cap)",
         f"- [{'x' if meta_label_result is not None else ' '}] PR-C: Meta-labeling target (reach +1R MFE before SL)",
-        "- [ ] PR-D: Survival models (Cox PH only; A4 adapter)",
+        f"- [{'x' if survival_result is not None else ' '}] PR-D: Cox PH survival (statsmodels.PHReg; RSF deferred)",
         "- [ ] PR-E: Step 5 augmentation hook",
         "- [ ] PR-F: Docs + polish",
         "",
@@ -568,6 +694,44 @@ def _automl_extras_for_manifest(
             "total_modelcount": int(result.total_modelcount),
             # Wall-clock intentionally omitted — non-deterministic.
             "n_features_used": int(len(result.used_features)),
+        }
+    }
+
+
+def _survival_extras_for_manifest(
+    result: SurvivalResult | None,
+    skip_reason: str,
+) -> dict:
+    """Serialise the survival stage result for the manifest.
+
+    NaN-safe (JSON has no NaN; coerce to ``None``).
+    """
+    def _f(x):
+        if x is None:
+            return None
+        try:
+            if not pd.notna(x):
+                return None
+        except TypeError:
+            return None
+        return float(x)
+
+    if result is None:
+        return {"survival": {"skip_reason": str(skip_reason)}}
+    return {
+        "survival": {
+            "skip_reason": str(skip_reason),
+            "statsmodels_version": str(result.statsmodels_version),
+            "n_folds_total": int(result.n_folds_total),
+            "n_folds_valid": int(result.n_folds_valid),
+            "concordance_mean": _f(result.concordance_mean),
+            "concordance_std": _f(result.concordance_std),
+            "total_n_events": int(result.total_n_events),
+            "n_features_used": int(len(result.used_features)),
+            "classifier_manifest_path": (
+                result.classifier_manifest_path.name
+                if result.classifier_manifest_path is not None else None
+            ),
         }
     }
 
@@ -642,9 +806,9 @@ def run_pipeline(
         automl_result, automl_skip_reason, automl_paths = _run_automl_stage(cfg, pool, gate)
     except HoldoutGuardViolation:
         # Record the skip reason in the manifest, then re-raise. Meta-
-        # labeling would have hit the same guard had it been reached,
-        # so report the matching skip reason rather than masking it as
-        # "automl_skipped".
+        # labeling and survival would have hit the same guard had they
+        # been reached, so report the matching skip reason rather than
+        # masking as "automl_skipped".
         automl_skip_reason = "holdout_guard_violation"
         _emit_partial_manifest(
             cfg, gate, pool_size=len(pool),
@@ -653,6 +817,9 @@ def run_pipeline(
             meta_label_result=None,
             meta_label_skip_reason="holdout_guard_violation",
             meta_label_paths={},
+            survival_result=None,
+            survival_skip_reason="holdout_guard_violation",
+            survival_paths={},
         )
         raise
     except AllFeaturesRejected:
@@ -664,6 +831,9 @@ def run_pipeline(
             meta_label_result=None,
             meta_label_skip_reason="no_clean_features",
             meta_label_paths={},
+            survival_result=None,
+            survival_skip_reason="no_clean_features",
+            survival_paths={},
         )
         raise
 
@@ -685,6 +855,8 @@ def run_pipeline(
             automl_paths=automl_paths,
             meta_label_result=None, meta_label_skip_reason=meta_label_skip_reason,
             meta_label_paths={},
+            survival_result=None, survival_skip_reason="holdout_guard_violation",
+            survival_paths={},
         )
         raise
     except AllFeaturesRejected:
@@ -695,10 +867,47 @@ def run_pipeline(
             automl_paths=automl_paths,
             meta_label_result=None, meta_label_skip_reason=meta_label_skip_reason,
             meta_label_paths={},
+            survival_result=None, survival_skip_reason="no_clean_features",
+            survival_paths={},
         )
         raise
 
-    # ── Stub summary (PR-A artefact; PR-B/C extended content) ───────
+    # ── PR-D Survival stage (independent of AutoML + meta-labeling) ──
+    survival_result: SurvivalResult | None = None
+    survival_skip_reason: str = "ok"
+    survival_paths: dict[str, Path] = {}
+    try:
+        survival_result, survival_skip_reason, survival_paths = (
+            _run_survival_stage(cfg, pool, gate)
+        )
+    except HoldoutGuardViolation:
+        survival_skip_reason = "holdout_guard_violation"
+        _emit_partial_manifest(
+            cfg, gate, pool_size=len(pool),
+            automl_result=automl_result, automl_skip_reason=automl_skip_reason,
+            automl_paths=automl_paths,
+            meta_label_result=meta_label_result,
+            meta_label_skip_reason=meta_label_skip_reason,
+            meta_label_paths=meta_label_paths,
+            survival_result=None, survival_skip_reason=survival_skip_reason,
+            survival_paths={},
+        )
+        raise
+    except AllFeaturesRejected:
+        survival_skip_reason = "no_clean_features"
+        _emit_partial_manifest(
+            cfg, gate, pool_size=len(pool),
+            automl_result=automl_result, automl_skip_reason=automl_skip_reason,
+            automl_paths=automl_paths,
+            meta_label_result=meta_label_result,
+            meta_label_skip_reason=meta_label_skip_reason,
+            meta_label_paths=meta_label_paths,
+            survival_result=None, survival_skip_reason=survival_skip_reason,
+            survival_paths={},
+        )
+        raise
+
+    # ── Stub summary (PR-A artefact; PR-B/C/D extended content) ─────
     stub_summary_path = cfg.step4_dir / "stub_summary.md"
     write_text(
         stub_summary_path,
@@ -708,6 +917,8 @@ def run_pipeline(
             automl_skip_reason=automl_skip_reason,
             meta_label_result=meta_label_result,
             meta_label_skip_reason=meta_label_skip_reason,
+            survival_result=survival_result,
+            survival_skip_reason=survival_skip_reason,
         ),
     )
 
@@ -716,6 +927,7 @@ def run_pipeline(
         "stub_summary": stub_summary_path,
         **automl_paths,
         **meta_label_paths,
+        **survival_paths,
     }
     manifest_path = cfg.step4_dir / str(cfg.raw_config["output"]["artefacts"]["step4_manifest"])
     write_manifest(
@@ -731,6 +943,7 @@ def run_pipeline(
             **_gate_extras_for_manifest(gate),
             **_automl_extras_for_manifest(automl_result, automl_skip_reason),
             **_meta_label_extras_for_manifest(meta_label_result, meta_label_skip_reason),
+            **_survival_extras_for_manifest(survival_result, survival_skip_reason),
         },
     )
 
@@ -748,6 +961,10 @@ def run_pipeline(
         meta_label_skip_reason=meta_label_skip_reason,
         meta_label_results_path=meta_label_paths.get("meta_label_results"),
         meta_label_classifier_manifest_path=meta_label_paths.get("meta_label_classifier_manifest"),
+        survival_result=survival_result,
+        survival_skip_reason=survival_skip_reason,
+        survival_results_path=survival_paths.get("survival_model_results"),
+        survival_classifier_manifest_path=survival_paths.get("survival_classifier_manifest"),
     )
 
 
@@ -762,16 +979,21 @@ def _emit_partial_manifest(
     meta_label_result: MetaLabelResult | None = None,
     meta_label_skip_reason: str = "automl_skipped",
     meta_label_paths: dict[str, Path] | None = None,
+    survival_result: SurvivalResult | None = None,
+    survival_skip_reason: str = "automl_skipped",
+    survival_paths: dict[str, Path] | None = None,
 ) -> None:
     """Write a manifest reflecting the partial run before re-raising.
 
     Used when a guard fires mid-pipeline — gives downstream tooling
-    something to inspect even on the failure path. Updated in PR-C to
-    record meta-label skip reason alongside AutoML skip reason.
+    something to inspect even on the failure path. Extended in PR-D to
+    record survival skip reason alongside AutoML + meta-label.
     """
     cfg.step4_dir.mkdir(parents=True, exist_ok=True)
     if meta_label_paths is None:
         meta_label_paths = {}
+    if survival_paths is None:
+        survival_paths = {}
     stub_summary_path = cfg.step4_dir / "stub_summary.md"
     write_text(
         stub_summary_path,
@@ -781,12 +1003,15 @@ def _emit_partial_manifest(
             automl_skip_reason=automl_skip_reason,
             meta_label_result=meta_label_result,
             meta_label_skip_reason=meta_label_skip_reason,
+            survival_result=survival_result,
+            survival_skip_reason=survival_skip_reason,
         ),
     )
     artefact_paths: dict[str, Path] = {
         "stub_summary": stub_summary_path,
         **automl_paths,
         **meta_label_paths,
+        **survival_paths,
     }
     manifest_path = cfg.step4_dir / str(cfg.raw_config["output"]["artefacts"]["step4_manifest"])
     write_manifest(
@@ -802,6 +1027,7 @@ def _emit_partial_manifest(
             **_gate_extras_for_manifest(gate),
             **_automl_extras_for_manifest(automl_result, automl_skip_reason),
             **_meta_label_extras_for_manifest(meta_label_result, meta_label_skip_reason),
+            **_survival_extras_for_manifest(survival_result, survival_skip_reason),
         },
     )
 

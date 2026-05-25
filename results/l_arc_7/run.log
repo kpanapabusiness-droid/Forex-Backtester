@@ -1,0 +1,99 @@
+[01:47:07] [INFO] Arc 7 v3.0.1 driver — pool_size=8, out_root=C:\Users\panap\Documents\Forex-Backtester\.claude\worktrees\clever-elbakyan-ad50ee\results\l_arc_7
+[01:47:07] [INFO] Step 0 — building H4 + D1 + W1 panels (5ers_eet boundary, 28 pairs)
+[02:09:38] [INFO] Step 0 — panels built in 1351.0s
+[02:09:38] [INFO] Step 1 — applying liquidity_sweep_reclaim_long signal
+[02:10:06] [INFO] Step 1 — pool size 5175 trades in 28.2s
+[02:10:06] [INFO] computing Step-1 feature matrix per pair …
+[02:11:30] [INFO] step-1 feature matrix: 5175 trades × 27 features in 84.0s
+[02:11:32] [INFO] Step 2 — path-shape clustering K\u2208{2..6}
+[02:11:42] [INFO] Step 2 — K=4, 4 clusters, silhouettes={2: 0.3931, 3: 0.389, 4: 0.4884, 5: 0.4594, 6: 0.4402}, 9.8s
+[02:11:42] [INFO] Step 3 — capturability + SL sweep + archetype labels
+[02:11:44] [INFO] Step 3 — 4 clusters, 2 candidates: [(0, 'bimodal'), (1, 'unclassified')], 1.3s
+[02:11:44] [INFO] Step 4 — extraction per candidate cluster (train_end=2021-01-01 00:00:00+00:00)
+C:\Users\panap\AppData\Roaming\Python\Python314\site-packages\sklearn\linear_model\_logistic.py:1135: FutureWarning: 'penalty' was deprecated in version 1.8 and will be removed in 1.10. To avoid this warning, leave 'penalty' set to its default value and use 'l1_ratio' or 'C' instead. Use l1_ratio=0 instead of penalty='l2', l1_ratio=1 instead of penalty='l1', and C=np.inf instead of penalty=None.
+  warnings.warn(
+C:\Users\panap\AppData\Roaming\Python\Python314\site-packages\sklearn\linear_model\_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+C:\Users\panap\AppData\Roaming\Python\Python314\site-packages\sklearn\linear_model\_logistic.py:1135: FutureWarning: 'penalty' was deprecated in version 1.8 and will be removed in 1.10. To avoid this warning, leave 'penalty' set to its default value and use 'l1_ratio' or 'C' instead. Use l1_ratio=0 instead of penalty='l2', l1_ratio=1 instead of penalty='l1', and C=np.inf instead of penalty=None.
+  warnings.warn(
+C:\Users\panap\AppData\Roaming\Python\Python314\site-packages\sklearn\linear_model\_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+C:\Users\panap\AppData\Roaming\Python\Python314\site-packages\sklearn\linear_model\_logistic.py:1135: FutureWarning: 'penalty' was deprecated in version 1.8 and will be removed in 1.10. To avoid this warning, leave 'penalty' set to its default value and use 'l1_ratio' or 'C' instead. Use l1_ratio=0 instead of penalty='l2', l1_ratio=1 instead of penalty='l1', and C=np.inf instead of penalty=None.
+  warnings.warn(
+C:\Users\panap\AppData\Roaming\Python\Python314\site-packages\sklearn\linear_model\_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+C:\Users\panap\AppData\Roaming\Python\Python314\site-packages\sklearn\linear_model\_logistic.py:1135: FutureWarning: 'penalty' was deprecated in version 1.8 and will be removed in 1.10. To avoid this warning, leave 'penalty' set to its default value and use 'l1_ratio' or 'C' instead. Use l1_ratio=0 instead of penalty='l2', l1_ratio=1 instead of penalty='l1', and C=np.inf instead of penalty=None.
+  warnings.warn(
+C:\Users\panap\AppData\Roaming\Python\Python314\site-packages\sklearn\linear_model\_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+C:\Users\panap\AppData\Roaming\Python\Python314\site-packages\sklearn\linear_model\_logistic.py:1135: FutureWarning: 'penalty' was deprecated in version 1.8 and will be removed in 1.10. To avoid this warning, leave 'penalty' set to its default value and use 'l1_ratio' or 'C' instead. Use l1_ratio=0 instead of penalty='l2', l1_ratio=1 instead of penalty='l1', and C=np.inf instead of penalty=None.
+  warnings.warn(
+C:\Users\panap\AppData\Roaming\Python\Python314\site-packages\sklearn\linear_model\_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+C:\Users\panap\AppData\Roaming\Python\Python314\site-packages\sklearn\linear_model\_logistic.py:1135: FutureWarning: 'penalty' was deprecated in version 1.8 and will be removed in 1.10. To avoid this warning, leave 'penalty' set to its default value and use 'l1_ratio' or 'C' instead. Use l1_ratio=0 instead of penalty='l2', l1_ratio=1 instead of penalty='l1', and C=np.inf instead of penalty=None.
+  warnings.warn(
+C:\Users\panap\AppData\Roaming\Python\Python314\site-packages\sklearn\linear_model\_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+C:\Users\panap\AppData\Roaming\Python\Python314\site-packages\sklearn\linear_model\_logistic.py:1135: FutureWarning: 'penalty' was deprecated in version 1.8 and will be removed in 1.10. To avoid this warning, leave 'penalty' set to its default value and use 'l1_ratio' or 'C' instead. Use l1_ratio=0 instead of penalty='l2', l1_ratio=1 instead of penalty='l1', and C=np.inf instead of penalty=None.
+  warnings.warn(
+C:\Users\panap\AppData\Roaming\Python\Python314\site-packages\sklearn\linear_model\_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+C:\Users\panap\AppData\Roaming\Python\Python314\site-packages\sklearn\linear_model\_logistic.py:1135: FutureWarning: 'penalty' was deprecated in version 1.8 and will be removed in 1.10. To avoid this warning, leave 'penalty' set to its default value and use 'l1_ratio' or 'C' instead. Use l1_ratio=0 instead of penalty='l2', l1_ratio=1 instead of penalty='l1', and C=np.inf instead of penalty=None.
+  warnings.warn(
+C:\Users\panap\AppData\Roaming\Python\Python314\site-packages\sklearn\linear_model\_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+C:\Users\panap\AppData\Roaming\Python\Python314\site-packages\sklearn\linear_model\_logistic.py:1135: FutureWarning: 'penalty' was deprecated in version 1.8 and will be removed in 1.10. To avoid this warning, leave 'penalty' set to its default value and use 'l1_ratio' or 'C' instead. Use l1_ratio=0 instead of penalty='l2', l1_ratio=1 instead of penalty='l1', and C=np.inf instead of penalty=None.
+  warnings.warn(
+C:\Users\panap\AppData\Roaming\Python\Python314\site-packages\sklearn\linear_model\_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+C:\Users\panap\AppData\Roaming\Python\Python314\site-packages\sklearn\linear_model\_logistic.py:1135: FutureWarning: 'penalty' was deprecated in version 1.8 and will be removed in 1.10. To avoid this warning, leave 'penalty' set to its default value and use 'l1_ratio' or 'C' instead. Use l1_ratio=0 instead of penalty='l2', l1_ratio=1 instead of penalty='l1', and C=np.inf instead of penalty=None.
+  warnings.warn(
+C:\Users\panap\AppData\Roaming\Python\Python314\site-packages\sklearn\linear_model\_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+C:\Users\panap\AppData\Roaming\Python\Python314\site-packages\sklearn\linear_model\_logistic.py:1135: FutureWarning: 'penalty' was deprecated in version 1.8 and will be removed in 1.10. To avoid this warning, leave 'penalty' set to its default value and use 'l1_ratio' or 'C' instead. Use l1_ratio=0 instead of penalty='l2', l1_ratio=1 instead of penalty='l1', and C=np.inf instead of penalty=None.
+  warnings.warn(
+C:\Users\panap\AppData\Roaming\Python\Python314\site-packages\sklearn\linear_model\_logistic.py:1184: FutureWarning: 'n_jobs' has no effect since 1.8 and will be removed in 1.10. You provided 'n_jobs=1', please leave it unspecified.
+  warnings.warn(msg, category=FutureWarning)
+[02:12:35] [INFO] Step 4 — 2 cluster extractions in 51.4s
+[02:12:35] [INFO] Step 5 — architecture grid + WFO + Amendment 3 + Step 6
+[02:12:35] [INFO]   cluster 0 (bimodal) \u2192 archs ('A1', 'A4'), sl_window [1.5, 2.0]
+[02:12:35] [INFO]   building A4 per-fold fits (cluster-independent)...
+[02:14:39] [INFO]   cluster 1 (unclassified) \u2192 archs ('A1',), sl_window [1.5, 2.0]
+[02:14:39] [INFO] Step 5 — total config count: 28
+[02:14:39] [INFO] Step 5 — running 280 (candidate × fold) pairs
+[02:15:55] [INFO]   WFO progress 10/280 (avg 7.6s/run, ETA 2063s)
+[02:17:17] [INFO]   WFO progress 20/280 (avg 7.9s/run, ETA 2053s)
+[02:18:45] [INFO]   WFO progress 30/280 (avg 8.2s/run, ETA 2047s)
+[02:20:48] [INFO]   WFO progress 40/280 (avg 9.2s/run, ETA 2215s)
+[02:22:00] [INFO]   WFO progress 50/280 (avg 8.8s/run, ETA 2029s)
+[02:23:17] [INFO]   WFO progress 60/280 (avg 8.6s/run, ETA 1900s)
+[02:24:45] [INFO]   WFO progress 70/280 (avg 8.7s/run, ETA 1820s)
+[02:27:03] [INFO]   WFO progress 80/280 (avg 9.3s/run, ETA 1860s)
+[02:28:58] [INFO]   WFO progress 90/280 (avg 9.5s/run, ETA 1813s)
+[02:31:00] [INFO]   WFO progress 100/280 (avg 9.8s/run, ETA 1766s)
+[02:32:49] [INFO]   WFO progress 110/280 (avg 9.9s/run, ETA 1685s)
+[02:34:42] [INFO]   WFO progress 120/280 (avg 10.0s/run, ETA 1604s)
+[02:36:30] [INFO]   WFO progress 130/280 (avg 10.1s/run, ETA 1513s)
+[02:38:22] [INFO]   WFO progress 140/280 (avg 10.2s/run, ETA 1423s)
+[02:40:16] [INFO]   WFO progress 150/280 (avg 10.2s/run, ETA 1332s)
+[02:42:15] [INFO]   WFO progress 160/280 (avg 10.3s/run, ETA 1242s)
+[02:44:05] [INFO]   WFO progress 170/280 (avg 10.4s/run, ETA 1143s)
+[02:45:59] [INFO]   WFO progress 180/280 (avg 10.4s/run, ETA 1045s)
+[02:47:49] [INFO]   WFO progress 190/280 (avg 10.5s/run, ETA 943s)
+[02:49:43] [INFO]   WFO progress 200/280 (avg 10.5s/run, ETA 842s)
+[02:50:55] [INFO]   WFO progress 210/280 (avg 10.4s/run, ETA 725s)
+[02:52:10] [INFO]   WFO progress 220/280 (avg 10.2s/run, ETA 614s)
+[02:53:40] [INFO]   WFO progress 230/280 (avg 10.2s/run, ETA 509s)
+[02:55:49] [INFO]   WFO progress 240/280 (avg 10.3s/run, ETA 412s)
+[02:57:04] [INFO]   WFO progress 250/280 (avg 10.2s/run, ETA 305s)
+[02:58:25] [INFO]   WFO progress 260/280 (avg 10.1s/run, ETA 202s)
+[02:59:57] [INFO]   WFO progress 270/280 (avg 10.1s/run, ETA 101s)
+[03:02:16] [INFO]   WFO progress 280/280 (avg 10.2s/run, ETA 0s)
+[03:02:16] [INFO] Holdout — top-3 candidates × 1 holdout fold
+[03:04:01] [INFO] Amendment 3 — per-top-K evaluation
+[03:04:34] [INFO] Step 6 — maybe_dispatch_step_6 (auto)
+[03:04:34] [INFO] Final verdict: FAIL
+[03:04:34] [INFO] Oracle WFO per candidate cluster (locked to winning exit policy)
+[03:04:34] [INFO]   Oracle cluster 0 (sl=2.0, trail=True)
+[03:05:28] [INFO]   Oracle cluster 1 (sl=2.0, trail=True)
+[03:06:27] [INFO] Arc 7 v3.0.1 driver — done in 4760.0s (wall)

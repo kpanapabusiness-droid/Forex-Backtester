@@ -1,0 +1,2 @@
+cluster_id,archetype,kind,architecture,sl_multiplier,exit_policy,exposure,search_worst_roi,search_worst_dd,search_worst_ratio,search_mean_roi,search_mean_dd,search_mean_ratio,search_sign_consistency,search_neg_folds,search_n_total
+0,v_shape_recovery,oracle,A1_oracle,4.0,sl_only,unlimited,-0.4424823314426949,0.40844154461831306,-1.0833431056975187,-0.3494522599570222,0.33724851054425115,-1.0355525537439656,0,11,1097

@@ -1,0 +1,65 @@
+{
+  "arc_name": "l_arc_10",
+  "candidates": [
+    0
+  ],
+  "classifiers": [
+    "lgbm",
+    "logistic",
+    "rf"
+  ],
+  "determinism": {
+    "line_terminator": "\\n",
+    "n_jobs": 1,
+    "random_state": 42
+  },
+  "env": {
+    "lightgbm": "4.6.0",
+    "numpy": "2.4.4",
+    "pandas": "3.0.2",
+    "python": "3.14.0",
+    "sklearn": "1.8.0"
+  },
+  "feature_count": 37,
+  "per_cluster_summary": {
+    "0": {
+      "best_classifier": "logistic",
+      "best_mean_auc": 0.5131459604627523,
+      "best_oos_auc": 0.5075398196726462,
+      "best_threshold": 0.49999999999999994,
+      "swing_audit": {
+        "audit_notes": [
+          "L1/L0 features carried verbatim from the DLR producer (signals/lchar_dlr_long.py). Producer uses \u00b13-bar swing-low detector with right-edge offset 4 (confirmation-lag, NOT Arc 9's centred-at-signal failure mode). Producer-level trace passed at intent stage.",
+          "kijun_26_distance = kijun(high, low, 26).shift(1) \u2014 strictly prior bars. Causal."
+        ],
+        "swing_features_in_top10": [
+          "L0_value",
+          "L1_value",
+          "kijun_26_distance",
+          "L1_to_atr_proximity",
+          "prior_session_low_distance"
+        ]
+      },
+      "top_10_features": [
+        "L0_value",
+        "L1_value",
+        "atr14_at_signal",
+        "kijun_26_distance",
+        "L1_to_atr_proximity",
+        "d1_close_slope_magnitude",
+        "session_dead",
+        "session_tokyo",
+        "prior_session_low_distance",
+        "spread_percentile_100"
+      ]
+    }
+  },
+  "protocol_version": "v3.0",
+  "run_timestamp_utc": "2026-05-25 09:04:24",
+  "sha256": {
+    "extraction_metrics_csv": "902f404e212de5e635972b4f72997675bf14beb2c1dd22ec003485494ad3a1b0",
+    "extraction_summary_md": "41c2f570504125336d9e26496b235aaa75bb2795b8c2d2eec7821442f8411f5e",
+    "feature_importance_csv": "9e561ae0209e9007372fbcd57a72f704f61b85c6ceac5d58a96d7f10e1f279b0"
+  },
+  "step": "step_4"
+}

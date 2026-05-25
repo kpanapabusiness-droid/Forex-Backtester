@@ -282,6 +282,8 @@ def main() -> int:
             "sign_pos_folds": (
                 f"{int(base_top1['n_folds_evaluated']) - int(base_top1['n_negative_folds'])}"
                 f"/{int(base_top1['n_folds_evaluated'])}"
+                if base_top1.get("n_negative_folds") is not None
+                else f"?/{int(base_top1.get('n_folds_evaluated', 11))}"
             ),
             "n_trades_total": _winner_total_trades(out_dir, winner_config_id),
             "holdout_roi_pct": (
@@ -699,8 +701,12 @@ def _why_prose(summary, base_top1, winner_holdout, arc_verdict, winner_amended, 
     wfr = float(base_top1["worst_fold_ratio"])
     wdd_pct = float(base_top1["worst_fold_dd"]) * 100
     wroi_pct = float(base_top1["worst_fold_roi"]) * 100
-    n_neg = int(base_top1["n_negative_folds"])
-    n_folds = int(base_top1["n_folds_evaluated"])
+    n_neg = (
+        int(base_top1["n_negative_folds"])
+        if base_top1.get("n_negative_folds") is not None
+        else None
+    )
+    n_folds = int(base_top1.get("n_folds_evaluated", 11))
     pool = int(summary["pool_size"])
     arch_code = detect_arch_from_config_id(base_top1["config_id"])
     config_id = base_top1["config_id"]
@@ -718,11 +724,12 @@ def _why_prose(summary, base_top1, winner_holdout, arc_verdict, winner_amended, 
         f"architecture admission with Amendment 5.1 Gate-4 PASS-tier qualifier (PR #201)."
     )
     parts.append("")
+    neg_str = f"{n_neg}/{n_folds} negative folds" if n_neg is not None else f"{n_folds}-fold (per-fold negative count not preserved post-crash)"
     parts.append(
         f"**Proximate cause.** Best config (`{config_id}`, architecture {arch_code}) "
         f"reaches worst-fold ratio {wfr:.3f} on the 11-fold 2010-2020 WFO with "
         f"worst-fold ROI {wroi_pct:+.2f}% and worst-fold DD {wdd_pct:.2f}%, "
-        f"{n_neg}/{n_folds} negative folds."
+        f"{neg_str}."
     )
     if winner_amended is not None:
         r_safe = winner_amended.get("r_safe_pct")

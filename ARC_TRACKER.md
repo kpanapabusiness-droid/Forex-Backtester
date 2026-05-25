@@ -4,7 +4,7 @@
 > Schema locked at v3.0. Replaces STATUS.md, CHANGELOG.md, ARC_QUEUE.md, and ACTIVE_ARCS.md.
 > First populated on first arc open under L_PROTOCOL v3.0.
 
-Last auto-update: parser: 2026-05-26 08:30:00
+Last auto-update: parser: 2026-05-25 21:12:41
 
 ---
 
@@ -40,6 +40,7 @@ Last auto-update: parser: 2026-05-26 08:30:00
 | l_arc_7_v3_0_2 | liquidity sweep + reclaim long (4H) — A2/A6 follow-up (override) | 4H | vanilla | — | 4.363315680255243 | FAIL |  | 5 | results/l_arc_7_v3.0.2/ARC_CLOSURE.md |
 | l_arc_10_v3.0.2 | D1 swing-low rejection long (DLR, v0.1) — bullish rejection of confirmed ascending D1 swing-low, 4H entry | H4 | vanilla | A1 system_level_filter | 6.4273 | PASS-DEPLOYABLE |  | N/A | results/l_arc_10_v3.0.2/ARC_CLOSURE.md |
 | l_arc_8_v3.0.2 | pullback_resume_hhhl_long_v0.1 (PR-HHHL, 4H, causal HH/HL detection) | H4 | vanilla | A1 system_level_filter | -0.886 | FAIL |  | 5 | results/l_arc_8_v3.0.2/ARC_CLOSURE.md |
+| l_arc_11_v3.0.2 | swing-high breakout in trend (SHB) long, 4H, causal 3-bar swing (right-edge t-4) | H4 | vanilla | A1 system_level_filter | -0.74 | FAIL |  | 5 | results/l_arc_11_v3.0.2/ARC_CLOSURE.md |
 
 ---
 
@@ -47,28 +48,28 @@ Last auto-update: parser: 2026-05-26 08:30:00
 
 | Feature | Arcs used | Avg WFO ratio with | Avg WFO ratio without | Verdict |
 |---|---|---|---|---|
-| w1_close_slope_sign | 3 | 0.926 | 3.177 | HURTS |
-| d1_atr_percentile_100 | 1 | -0.769 | 2.709 | INSUFFICIENT |
-| prior_session_low_distance | 3 | 0.054 | 3.831 | HURTS |
-| day_of_week | 1 | -0.769 | 2.709 | INSUFFICIENT |
-| session_london | 1 | -0.769 | 2.709 | INSUFFICIENT |
-| d1_close_slope_magnitude | 2 | 1.797 | 2.378 | INSUFFICIENT |
-| distance_to_round_number | 3 | 0.054 | 3.831 | HURTS |
-| atr_percentile_100 | 4 | 1.132 | 3.653 | HURTS |
-| usd_strength_index | 2 | 0.490 | 2.901 | INSUFFICIENT |
-| spread_vs_trailing_100 | 2 | 0.490 | 2.901 | INSUFFICIENT |
-| swing_low_distance_14 | 2 | 0.466 | 3.831 | INSUFFICIENT |
-| atr_vs_trailing_100 | 3 | 1.765 | 3.653 | HURTS |
-| kijun_26_distance | 2 | 3.056 | 2.536 | INSUFFICIENT |
-| dollar_bloc_state | 1 | 1.749 | 2.901 | INSUFFICIENT |
-| spread_percentile_100 | 1 | 1.749 | 2.901 | INSUFFICIENT |
-| atr_14 | 2 | 1.773 | 2.771 | INSUFFICIENT |
-| prior_session_high_distance | 1 | -0.817 | 3.302 | INSUFFICIENT |
-| session_tokyo | 2 | 1.773 | 2.771 | INSUFFICIENT |
-| range_close_ratio | 1 | -0.817 | 3.302 | INSUFFICIENT |
-| d1_close_slope_sign | 1 | 4.363 | 2.771 | INSUFFICIENT |
-| session_ny | 1 | 4.363 | 2.771 | INSUFFICIENT |
-| session_dead | 1 | 4.363 | 2.771 | INSUFFICIENT |
+| w1_close_slope_sign | 3 | 0.926 | 2.394 | HURTS |
+| d1_atr_percentile_100 | 1 | -0.769 | 2.216 | INSUFFICIENT |
+| prior_session_low_distance | 3 | 0.054 | 2.917 | HURTS |
+| day_of_week | 1 | -0.769 | 2.216 | INSUFFICIENT |
+| session_london | 1 | -0.769 | 2.216 | INSUFFICIENT |
+| d1_close_slope_magnitude | 2 | 1.797 | 1.859 | INSUFFICIENT |
+| distance_to_round_number | 3 | 0.054 | 2.917 | HURTS |
+| atr_percentile_100 | 4 | 1.132 | 2.555 | HURTS |
+| usd_strength_index | 2 | 0.490 | 2.294 | INSUFFICIENT |
+| spread_vs_trailing_100 | 2 | 0.490 | 2.294 | INSUFFICIENT |
+| swing_low_distance_14 | 2 | 0.466 | 2.917 | INSUFFICIENT |
+| atr_vs_trailing_100 | 3 | 1.765 | 2.555 | HURTS |
+| kijun_26_distance | 2 | 3.056 | 1.881 | INSUFFICIENT |
+| dollar_bloc_state | 1 | 1.749 | 2.294 | INSUFFICIENT |
+| spread_percentile_100 | 1 | 1.749 | 2.294 | INSUFFICIENT |
+| atr_14 | 2 | 1.773 | 1.600 | INSUFFICIENT |
+| prior_session_high_distance | 1 | -0.817 | 2.291 | INSUFFICIENT |
+| session_tokyo | 2 | 1.773 | 1.600 | INSUFFICIENT |
+| range_close_ratio | 1 | -0.817 | 2.291 | INSUFFICIENT |
+| d1_close_slope_sign | 1 | 4.363 | 1.600 | INSUFFICIENT |
+| session_ny | 1 | 4.363 | 1.600 | INSUFFICIENT |
+| session_dead | 1 | 4.363 | 1.600 | INSUFFICIENT |
 
 Schema:
 - `Avg WFO ratio with` — mean worst-fold ratio across arcs where this feature appeared in the winning config
@@ -81,7 +82,7 @@ Schema:
 
 | Architecture | Arcs tested | Won (best in arc) | Avg ratio when won |
 |---|---|---|---|
-| A1 system_level_filter | 7 | 3 | 3.653 |
+| A1 system_level_filter | 8 | 3 | 3.653 |
 | A2 classifier_filter | 2 | 0 | — |
 | A3 pipeline_de | 2 | 0 | — |
 | A4 pipeline_d_exits | 3 | 0 | — |
@@ -98,11 +99,11 @@ Note: Arc 11 has no architecture row marked "Won" because no config met §3 PASS
 |---|---|---|---|
 | V-shape recovery | 3 | 6.03 | 0.981 |
 | Stepwise climber | 0 | — | — |
-| Bimodal | 4 | 7.76 | 1.000 |
+| Bimodal | 5 | 7.77 | 1.000 |
 | Monotonic up | 0 | — | — |
-| Monotonic down | 6 | 1.67 | 0.366 |
+| Monotonic down | 7 | 1.50 | 0.326 |
 | Choppy | 2 | 1.27 | 0.601 |
-| Unclassified | 3 | 1.47 | 0.595 |
+| Unclassified | 4 | 1.43 | 0.569 |
 | Other / unclassified | 0 | — | — |
 
 Note: "in-cluster R" tracked as `mfe_p50_r` per template §4.E. Unclassified row averages over Arc 11's c1 (mfe_p50 2.11) and c2 (mfe_p50 0.51).
@@ -117,7 +118,7 @@ Note: "in-cluster R" tracked as `mfe_p50_r` per template §4.E. Unclassified row
 | no_clusters_separable | 0 | — | — |
 | no_capturable_cluster | 0 | — | — |
 | entry_feature_auc_ceiling | 1 | l_arc_8 | 2026-05-22 |
-| step5_not_scalable | 2 | l_arc_7_v3_0_2 | 2026-05-25 |
+| step5_not_scalable | 3 | l_arc_11_v3.0.2 | 2026-05-25 |
 | step5_chained_dd_above_gate | 1 | l_arc_8_v3.0.2 | 2026-05-26 |
 | step5_daily_dd_breach | 0 | — | — |
 | step5_wf_roi_below_gate_after_scaling | 0 | — | — |
@@ -164,6 +165,10 @@ Note: "in-cluster R" tracked as `mfe_p50_r` per template §4.E. Unclassified row
 | l_arc_8_v3.0.2.c0 | Choppy | 3418 | 1.2910 | 0.3950 | 0.6042 | 0.5697 | — | — | 1.5 | dies_step3 |
 | l_arc_8_v3.0.2.c1 | Monotonic_down | 1628 | 0.0680 | 0.0295 | 0.0000 | 0.3928 | — | — | 4.0 | dies_step3 |
 | l_arc_8_v3.0.2.c2 | Bimodal | 1566 | 7.5500 | 0.0000 | 1.0000 | 1.0000 | 0.4822 | — | 1.5 | dies_step5 |
+| l_arc_11_v3.0.2.c0 | Bimodal | 2167 | 7.7855 | 0.0028 | 1.0000 | 1.9835 | 0.5056 | — | 1.5 | dies_step4 |
+| l_arc_11_v3.0.2.c1 | Unclassified | 6123 | 2.1082 | 0.0350 | 0.9647 | 0.9675 | 0.5056 | — | 1.5 | dies_step4 |
+| l_arc_11_v3.0.2.c2 | Unclassified | 5012 | 0.5187 | 0.9661 | 0.0431 | 0.1903 | — | — | 1.5 | dies_step3 |
+| l_arc_11_v3.0.2.c3 | Monotonic_down | 3977 | 0.0945 | 0.9992 | 0.0005 | 0.0228 | — | — | 1.5 | dies_step3 |
 
 Schema:
 - `Cluster ID` — `<arc_name>.<cluster_id>` (e.g., `arc_07.c1`)
@@ -189,7 +194,7 @@ Schema:
 | Tag | Count | Arcs |
 |---|---|---|
 | step4_auc_above_065_v3_first | 1 | l_arc_11 |
-| shb_swing_detection_causal_clean_arc9_lesson_passed | 1 | l_arc_11 |
+| shb_swing_detection_causal_clean_arc9_lesson_passed | 2 | l_arc_11, l_arc_11_v3.0.2 |
 | canonical_orchestrator_step5_run_context_gap | 1 | l_arc_11 |
 | step1_pool_uncapped_canonical_vs_capped_handrolled_2_5x_delta | 1 | l_arc_11 |
 | v_shape_auc_ceiling | 1 | l_arc_8 |
@@ -227,6 +232,13 @@ Schema:
 | archetype_shift_v_shape_to_bimodal_under_5ers_eet | 1 | l_arc_8_v3.0.2 |
 | chained_dd_blowout_pr_hhhl_bimodal_tight_sl | 1 | l_arc_8_v3.0.2 |
 | w1_producer_canonical_alignment_consumer | 1 | l_arc_8_v3.0.2 |
+| canonical_orchestrator_step5_run_context_gap_resolved_v3_0_2 | 1 | l_arc_11_v3.0.2 |
+| amendment_5_1_a5_gate_4_blocked_dispatch_time | 1 | l_arc_11_v3.0.2 |
+| eet_aggregation_signal_state_a_no_pool_shift | 1 | l_arc_11_v3.0.2 |
+| mid_feature_eet_htf_alignment_drift_attribution_in_section_10 | 1 | l_arc_11_v3.0.2 |
+| holdout_window_extended_2026_04_30_to_2026_05_25_4w | 1 | l_arc_11_v3.0.2 |
+| worst_fold_ratio_negative_at_step5_canonical_engine | 1 | l_arc_11_v3.0.2 |
+| worst_fold_dd_above_10pct_canonical_engine | 1 | l_arc_11_v3.0.2 |
 
 ---
 

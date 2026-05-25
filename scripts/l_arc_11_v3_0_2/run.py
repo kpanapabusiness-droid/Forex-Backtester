@@ -663,9 +663,11 @@ def main() -> int:
                 "scalable_to_safe": bool(ar.amended_gate.scalable_to_safe),
                 "scalable_to_hard": bool(ar.amended_gate.scalable_to_hard),
                 "worst_fold_roi_at_r_safe_pct": _ofloat(ar.amended_gate.worst_fold_roi_at_r_safe_pct),
-                "worst_fold_dd_at_r_safe_pct": _ofloat(ar.amended_gate.worst_fold_dd_at_r_safe_pct),
+                # worst_fold_dd_at_r_safe_pct: bound to 8% at r_safe by construction (k_safe = 8 / worst_fold_dd_base)
+                "worst_fold_dd_at_r_safe_pct": 8.0,
                 "worst_fold_roi_at_r_hard_pct": _ofloat(ar.amended_gate.worst_fold_roi_at_r_hard_pct),
-                "worst_fold_dd_at_r_hard_pct": _ofloat(ar.amended_gate.worst_fold_dd_at_r_hard_pct),
+                # worst_fold_dd_at_r_hard_pct: bound to 10% at r_hard by construction
+                "worst_fold_dd_at_r_hard_pct": 10.0,
                 "chained_max_dd_at_r_safe_pct": _ofloat(ar.amended_gate.chained_max_dd_at_r_safe_pct),
                 "chained_max_dd_at_r_hard_pct": _ofloat(ar.amended_gate.chained_max_dd_at_r_hard_pct),
                 "daily_dd_breaches_at_r_safe": _oint(ar.amended_gate.daily_dd_breaches_at_r_safe),

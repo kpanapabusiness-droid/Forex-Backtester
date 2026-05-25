@@ -25,7 +25,6 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 import pytest
 
@@ -33,12 +32,9 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-# Import the canonical path-simulate dispatcher
-from core.sim.exit_policies import simulate_path as canonical_simulate_path
-
-# Import the reference hand-rolled implementation
-from scripts.l_arc_10_v3.step_5 import _apply_exit_policy as reference_apply
-
+# sys.path mutation above must precede these imports → E402 explicitly waived.
+from core.sim.exit_policies import simulate_path as canonical_simulate_path  # noqa: E402
+from scripts.l_arc_10_v3.step_5 import _apply_exit_policy as reference_apply  # noqa: E402
 
 POLICIES = (
     "sl_only",

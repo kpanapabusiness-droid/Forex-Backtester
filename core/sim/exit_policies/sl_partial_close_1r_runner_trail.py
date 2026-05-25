@@ -168,7 +168,6 @@ class SlPartialClose1RRunnerTrailPolicy(ExitPolicy):
     ) -> ExitPolicyDecision | None:
         assert isinstance(state, PartialCloseRunnerTrailState)
         r_atr = ctx.r_atr
-        entry = ctx.entry_price
         # Always ratchet path-wide peak (per reference: peak runs from bar 0)
         if ctx.direction is Direction.LONG:
             high_bid = bar.get("high_bid")

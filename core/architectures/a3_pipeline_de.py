@@ -51,10 +51,10 @@ from core.features_path_so_far import (
 from core.runners._fold_stats_helpers import build_fold_stats_from_run
 from core.sim.account import Account, Direction, ExposureRules
 from core.sim.exit_hooks import ExitPredicate
+from core.sim.exit_policy_manager import ExitPolicyManager
 from core.sim.multipair_backtester import MultiPairBacktester, Order, StrategyFn
 from core.sim.panel import Panel
 from core.sim.risk.live_balance import LiveBalanceRisk
-from core.sim.exit_policy_manager import ExitPolicyManager
 from core.sim.trailing_stop import TrailManager
 from core.wfo.folds import Fold
 

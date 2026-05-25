@@ -19,7 +19,6 @@ from core.sim.exit_policies import (
     build_exit_policy,
 )
 
-
 EXPECTED_REGISTRY = {
     "sl_only": SlOnlyPolicy,
     "sl_plus_tp_2r": SlPlusTp2RPolicy,

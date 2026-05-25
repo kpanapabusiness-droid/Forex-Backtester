@@ -18,7 +18,6 @@ from core.sim.exit_policy_manager import ExitPolicyManager
 from core.sim.multipair_backtester import MultiPairBacktester, Order, StrategyFn
 from core.sim.panel import Panel
 
-
 # ────────────────────────────────────────────────────────────────────────
 # Synthetic 1-pair panel constructor — full bid/ask schema
 # ────────────────────────────────────────────────────────────────────────
@@ -36,7 +35,7 @@ def _make_panel(rows: list[dict]) -> Panel:
 def _bar(
     t: str,
     *,
-    o: float, h: float, l: float, c: float,
+    o: float, h: float, lo: float, c: float,
     spread: float = 0.0,
 ) -> dict:
     """One bar row with bid/ask derived from a mid + spread.
@@ -51,7 +50,7 @@ def _bar(
         "timestamp_utc": t,
         "open_bid": o - half, "open_ask": o + half,
         "high_bid": h - half, "high_ask": h + half,
-        "low_bid": l - half, "low_ask": l + half,
+        "low_bid": lo - half, "low_ask": lo + half,
         "close_bid": c - half, "close_ask": c + half,
         "spread_close": spread,
         "bid_ask_data_quality": "ok",
@@ -90,10 +89,10 @@ def test_driver_without_manager_runs_unchanged_for_plain_orders() -> None:
     """When no Order carries exit_policy, the driver behaves exactly as
     before (no exit-policy code paths touched)."""
     panel = _make_panel([
-        _bar("2026-01-01 00:00", o=1.100, h=1.101, l=1.099, c=1.100),
-        _bar("2026-01-01 01:00", o=1.100, h=1.102, l=1.099, c=1.101),
-        _bar("2026-01-01 02:00", o=1.101, h=1.103, l=1.100, c=1.102),
-        _bar("2026-01-01 03:00", o=1.102, h=1.104, l=1.101, c=1.103),
+        _bar("2026-01-01 00:00", o=1.100, h=1.101, lo=1.099, c=1.100),
+        _bar("2026-01-01 01:00", o=1.100, h=1.102, lo=1.099, c=1.101),
+        _bar("2026-01-01 02:00", o=1.101, h=1.103, lo=1.100, c=1.102),
+        _bar("2026-01-01 03:00", o=1.102, h=1.104, lo=1.101, c=1.103),
     ])
     acct = Account(starting_balance=100_000.0)
     bt = MultiPairBacktester(panel=panel, account=acct, strategy=_no_op_strategy)
@@ -108,9 +107,9 @@ def test_driver_without_manager_runs_unchanged_for_plain_orders() -> None:
 
 def test_order_with_exit_policy_but_no_manager_raises() -> None:
     panel = _make_panel([
-        _bar("2026-01-01 00:00", o=1.100, h=1.101, l=1.099, c=1.100),
-        _bar("2026-01-01 01:00", o=1.100, h=1.102, l=1.099, c=1.101),
-        _bar("2026-01-01 02:00", o=1.101, h=1.103, l=1.100, c=1.102),
+        _bar("2026-01-01 00:00", o=1.100, h=1.101, lo=1.099, c=1.100),
+        _bar("2026-01-01 01:00", o=1.100, h=1.102, lo=1.099, c=1.101),
+        _bar("2026-01-01 02:00", o=1.101, h=1.103, lo=1.100, c=1.102),
     ])
     acct = Account(starting_balance=100_000.0)
     strategy = _one_shot_long_at(
@@ -127,9 +126,9 @@ def test_order_with_exit_policy_but_no_manager_raises() -> None:
 
 def test_order_with_exit_policy_but_missing_atr_raises() -> None:
     panel = _make_panel([
-        _bar("2026-01-01 00:00", o=1.100, h=1.101, l=1.099, c=1.100),
-        _bar("2026-01-01 01:00", o=1.100, h=1.102, l=1.099, c=1.101),
-        _bar("2026-01-01 02:00", o=1.101, h=1.103, l=1.100, c=1.102),
+        _bar("2026-01-01 00:00", o=1.100, h=1.101, lo=1.099, c=1.100),
+        _bar("2026-01-01 01:00", o=1.100, h=1.102, lo=1.099, c=1.101),
+        _bar("2026-01-01 02:00", o=1.101, h=1.103, lo=1.100, c=1.102),
     ])
     acct = Account(starting_balance=100_000.0)
     strategy = _one_shot_long_at(
@@ -162,17 +161,17 @@ def test_partial_close_fires_intra_bar_and_runner_trails() -> None:
     """
     panel = _make_panel([
         # t=0: signal/no-order bar
-        _bar("2026-01-01 00:00", o=1.099, h=1.100, l=1.098, c=1.099),
+        _bar("2026-01-01 00:00", o=1.099, h=1.100, lo=1.098, c=1.099),
         # t=1: entry fills at open=1.100
-        _bar("2026-01-01 01:00", o=1.100, h=1.101, l=1.099, c=1.100),
+        _bar("2026-01-01 01:00", o=1.100, h=1.101, lo=1.099, c=1.100),
         # t=2: high reaches +1R (1.102) → intra-bar partial fires at 1.102
-        _bar("2026-01-01 02:00", o=1.100, h=1.102, l=1.099, c=1.101),
+        _bar("2026-01-01 02:00", o=1.100, h=1.102, lo=1.099, c=1.101),
         # t=3: high 1.103, close 1.1015 (peak 1.103, trail = 1.101). close 1.1015 > 1.101 → no fire
-        _bar("2026-01-01 03:00", o=1.101, h=1.103, l=1.100, c=1.1015),
+        _bar("2026-01-01 03:00", o=1.101, h=1.103, lo=1.100, c=1.1015),
         # t=4: close 1.101 = trail → at-close fires; queued for t=5 open
-        _bar("2026-01-01 04:00", o=1.1015, h=1.1020, l=1.1010, c=1.101),
+        _bar("2026-01-01 04:00", o=1.1015, h=1.1020, lo=1.1010, c=1.101),
         # t=5: runner closes at open_bid = 1.101
-        _bar("2026-01-01 05:00", o=1.101, h=1.102, l=1.100, c=1.101),
+        _bar("2026-01-01 05:00", o=1.101, h=1.102, lo=1.100, c=1.101),
     ])
     acct = Account(
         starting_balance=100_000.0,
@@ -212,13 +211,13 @@ def test_partial_close_runner_sl_hits_after_partial() -> None:
     closes at SL.
     """
     panel = _make_panel([
-        _bar("2026-01-01 00:00", o=1.099, h=1.100, l=1.098, c=1.099),
-        _bar("2026-01-01 01:00", o=1.100, h=1.101, l=1.099, c=1.100),
+        _bar("2026-01-01 00:00", o=1.099, h=1.100, lo=1.098, c=1.099),
+        _bar("2026-01-01 01:00", o=1.100, h=1.101, lo=1.099, c=1.100),
         # t=2: partial at +1R
-        _bar("2026-01-01 02:00", o=1.100, h=1.102, l=1.099, c=1.101),
+        _bar("2026-01-01 02:00", o=1.100, h=1.102, lo=1.099, c=1.101),
         # t=3: low touches SL=1.098 → runner closes at SL
-        _bar("2026-01-01 03:00", o=1.101, h=1.102, l=1.097, c=1.099),
-        _bar("2026-01-01 04:00", o=1.099, h=1.100, l=1.097, c=1.099),
+        _bar("2026-01-01 03:00", o=1.101, h=1.102, lo=1.097, c=1.099),
+        _bar("2026-01-01 04:00", o=1.099, h=1.100, lo=1.097, c=1.099),
     ])
     acct = Account(
         starting_balance=100_000.0,
@@ -261,17 +260,17 @@ def test_partial_close_same_bar_sl_suppression() -> None:
     doesn't fire on bar 3 either. Bar 4 has a clean SL touch.
     """
     panel = _make_panel([
-        _bar("2026-01-01 00:00", o=1.099, h=1.100, l=1.098, c=1.099),
-        _bar("2026-01-01 01:00", o=1.100, h=1.101, l=1.099, c=1.100),
+        _bar("2026-01-01 00:00", o=1.099, h=1.100, lo=1.098, c=1.099),
+        _bar("2026-01-01 01:00", o=1.100, h=1.101, lo=1.099, c=1.100),
         # t=2: tp1 bar. high=1.102 fires tp1; low=1.097 would breach SL
         # but is suppressed. Peak after bar 2 = 1.102 → trail = 1.100.
         # close=1.1015 > trail 1.100 so trail wouldn't fire even if we
         # got an evaluate_at_close on this bar (we don't: i > tp1_i).
-        _bar("2026-01-01 02:00", o=1.100, h=1.102, l=1.097, c=1.1015),
+        _bar("2026-01-01 02:00", o=1.100, h=1.102, lo=1.097, c=1.1015),
         # t=3: peak ratchets up; trail rises. close above trail → no fire.
-        _bar("2026-01-01 03:00", o=1.1015, h=1.1030, l=1.1010, c=1.1025),
+        _bar("2026-01-01 03:00", o=1.1015, h=1.1030, lo=1.1010, c=1.1025),
         # t=4: clean SL hit (low=1.097 ≤ SL=1.098); not tp1 bar.
-        _bar("2026-01-01 04:00", o=1.1025, h=1.1025, l=1.097, c=1.098),
+        _bar("2026-01-01 04:00", o=1.1025, h=1.1025, lo=1.097, c=1.098),
     ])
     acct = Account(
         starting_balance=100_000.0,
@@ -315,11 +314,11 @@ def test_sl_plus_tp_2r_fires_via_intrabar_tp() -> None:
     Test: entry 1.100, R_atr=0.002, tp_price=1.104. Bar high 1.104 → fires.
     """
     panel = _make_panel([
-        _bar("2026-01-01 00:00", o=1.099, h=1.100, l=1.098, c=1.099),
-        _bar("2026-01-01 01:00", o=1.100, h=1.101, l=1.099, c=1.100),
+        _bar("2026-01-01 00:00", o=1.099, h=1.100, lo=1.098, c=1.099),
+        _bar("2026-01-01 01:00", o=1.100, h=1.101, lo=1.099, c=1.100),
         # high reaches tp=1.104
-        _bar("2026-01-01 02:00", o=1.100, h=1.104, l=1.099, c=1.103),
-        _bar("2026-01-01 03:00", o=1.103, h=1.104, l=1.102, c=1.103),
+        _bar("2026-01-01 02:00", o=1.100, h=1.104, lo=1.099, c=1.103),
+        _bar("2026-01-01 03:00", o=1.103, h=1.104, lo=1.102, c=1.103),
     ])
     acct = Account(
         starting_balance=100_000.0,

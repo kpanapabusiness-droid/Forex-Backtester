@@ -10,7 +10,6 @@ import pytest
 from core.sim.account import Account, Direction
 from core.sim.exit_policies import (
     ExitAction,
-    ExitPolicyContext,
     NullPolicyState,
     SlOnlyPolicy,
     SlPartialClose1RRunnerTrailPolicy,

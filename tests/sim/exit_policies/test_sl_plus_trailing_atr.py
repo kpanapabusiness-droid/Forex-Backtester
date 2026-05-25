@@ -12,7 +12,6 @@ from core.sim.exit_policies import (
     ExitAction,
     ExitPolicyContext,
     SlPlusTrailingAtrPolicy,
-    TrailingAtrState,
 )
 
 

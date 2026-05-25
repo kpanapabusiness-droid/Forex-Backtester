@@ -1,7 +1,7 @@
 """L_PROTOCOL Amendment 5.1 (2026-05-25) — Gate 4 PASS-tier-constituent qualifier.
 
 Coverage:
-- ``AMENDMENT_5_1_CUTOFF_ISO`` constant pinned at the ratification-date placeholder
+- ``AMENDMENT_5_1_CUTOFF_ISO`` constant pinned at PR #201 merge timestamp
 - Schema accepts the reason string ``a5_gate_4_admission_blocked_by_no_pass_tier_constituent``
   as an entry in ``architectures_skipped_by_amendment_5`` (alongside architecture IDs)
 - Unknown reason strings still rejected
@@ -95,9 +95,9 @@ def _non_candidate_cluster() -> dict:
 # ── Schema vocabulary tests ────────────────────────────────────────────────
 
 
-def test_amendment_5_1_cutoff_placeholder_locked():
-    """Cutoff is pinned at ratification-date placeholder pending PR-merge backfill."""
-    assert AMENDMENT_5_1_CUTOFF_ISO == "2026-05-25T00:00:00Z"
+def test_amendment_5_1_cutoff_locked():
+    """Cutoff backfilled with PR #201 merge timestamp."""
+    assert AMENDMENT_5_1_CUTOFF_ISO == "2026-05-25T05:29:01Z"
 
 
 def test_schema_accepts_amendment_5_1_reason_string():
@@ -145,8 +145,8 @@ def test_is_post_amendment_5_1_cutoff_true_when_after():
 
 def test_is_post_amendment_5_1_cutoff_false_when_at_or_before():
     """Equality and strictly-before are pre-cutoff (grandfathered)."""
-    assert _is_post_amendment_5_1_cutoff("2026-05-25T00:00:00Z") is False
-    assert _is_post_amendment_5_1_cutoff("2026-05-24T23:59:59Z") is False
+    assert _is_post_amendment_5_1_cutoff("2026-05-25T05:29:01Z") is False
+    assert _is_post_amendment_5_1_cutoff("2026-05-25T05:29:00Z") is False
 
 
 def test_is_post_amendment_5_1_cutoff_missing_timestamp_grandfathered():

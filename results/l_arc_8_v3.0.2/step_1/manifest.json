@@ -1,0 +1,29 @@
+{
+  "artefacts": {
+    "feature_lineage.csv": {
+      "sha256": "393a1e0f9c05e55b71d69e28c6439f60454372d0bcce99caec599acd73d38b19",
+      "size_bytes": 4061
+    },
+    "features.parquet": {
+      "sha256": "aef8958937956de290ac916bcf472ad2311b98e6f8b418f083dd5cfdcda4ba34",
+      "size_bytes": 812138
+    },
+    "integrity_report.json": {
+      "sha256": "d1ef807b9467296afba6fd2ea25e1dc1f97886d589b8686ff30e467067ecc25d",
+      "size_bytes": 10829
+    },
+    "integrity_report.md": {
+      "sha256": "ce89cb8225704a0cbae946c10e0d08cb3098d80f9c87c9458421b600da5ab9d5",
+      "size_bytes": 6736
+    },
+    "paths.parquet": {
+      "sha256": "917ef562823116710a776418d9b7c1630fc77e889c843b984dffb792f3345a0f",
+      "size_bytes": 11775873
+    },
+    "pool.parquet": {
+      "sha256": "4420b7b41aa25a96e71218b6b68ffc6f06e2fd4f162dc1e008bf7b3875d87485",
+      "size_bytes": 653051
+    }
+  },
+  "generated_at": "2026-05-25T07:57:32Z"
+}

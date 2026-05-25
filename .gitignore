@@ -122,6 +122,10 @@ results/l_arc_7_v3.0.2/run.log
 # (L_ARC_PROTOCOL v2.3 §13: arc results data is direct-to-main).
 !results/l_arc_8/
 !results/l_arc_8/**
+# Arc 8 v3.0.2 (PR-HHHL long, 4H) — corrected retry under canonical 5ers_eet
+# (per docs/dispatches/arc_8_v3_0_2_intent.md + DISPATCH_arc_8_v3_0_2_CORRECTED.md).
+!results/l_arc_8_v3.0.2/
+!results/l_arc_8_v3.0.2/**
 # arc_discovery_01 — signal_discovery_probe sub-protocol (L_PROTOCOL v3.0).
 # Arc results data is direct-to-main; the full_search_log.parquet may be
 # large but is the deliverable for follow-up vanilla arcs.

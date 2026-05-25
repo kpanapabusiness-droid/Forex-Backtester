@@ -1,0 +1,508 @@
+{
+  "boundary_convention": "5ers_eet",
+  "coverage": {
+    "first_signal": "2010-01-12 22:00:00+00:00",
+    "last_signal": "2025-12-31 14:00:00+00:00"
+  },
+  "d1_lag_perturbation": {
+    "method": "static_inspection",
+    "n_samples_tested": 0,
+    "note": "PR-HHHL signal trigger is computed entirely from H4 bid OHLC + mid ATR. No D1 series is read inside evaluate_pullback_resume_hhhl_signal. NaN-perturbation of D1 inputs cannot change signal evaluation \u2014 test trivially passes by construction.",
+    "result": "PASS"
+  },
+  "kh24_cofire": {
+    "overall_n_cofire": 0,
+    "overall_n_signals": 6612,
+    "overall_rate": 0.0,
+    "per_pair": {
+      "AUDCAD": {
+        "n_cofire": 0,
+        "n_signals": 255,
+        "rate": 0.0
+      },
+      "AUDCHF": {
+        "n_cofire": 0,
+        "n_signals": 233,
+        "rate": 0.0
+      },
+      "AUDJPY": {
+        "n_cofire": 0,
+        "n_signals": 270,
+        "rate": 0.0
+      },
+      "AUDNZD": {
+        "n_cofire": 0,
+        "n_signals": 232,
+        "rate": 0.0
+      },
+      "AUDUSD": {
+        "n_cofire": 0,
+        "n_signals": 239,
+        "rate": 0.0
+      },
+      "CADCHF": {
+        "n_cofire": 0,
+        "n_signals": 231,
+        "rate": 0.0
+      },
+      "CADJPY": {
+        "n_cofire": 0,
+        "n_signals": 246,
+        "rate": 0.0
+      },
+      "CHFJPY": {
+        "n_cofire": 0,
+        "n_signals": 259,
+        "rate": 0.0
+      },
+      "EURAUD": {
+        "n_cofire": 0,
+        "n_signals": 220,
+        "rate": 0.0
+      },
+      "EURCAD": {
+        "n_cofire": 0,
+        "n_signals": 215,
+        "rate": 0.0
+      },
+      "EURCHF": {
+        "n_cofire": 0,
+        "n_signals": 195,
+        "rate": 0.0
+      },
+      "EURGBP": {
+        "n_cofire": 0,
+        "n_signals": 218,
+        "rate": 0.0
+      },
+      "EURJPY": {
+        "n_cofire": 0,
+        "n_signals": 243,
+        "rate": 0.0
+      },
+      "EURNZD": {
+        "n_cofire": 0,
+        "n_signals": 238,
+        "rate": 0.0
+      },
+      "EURUSD": {
+        "n_cofire": 0,
+        "n_signals": 247,
+        "rate": 0.0
+      },
+      "GBPAUD": {
+        "n_cofire": 0,
+        "n_signals": 237,
+        "rate": 0.0
+      },
+      "GBPCAD": {
+        "n_cofire": 0,
+        "n_signals": 225,
+        "rate": 0.0
+      },
+      "GBPCHF": {
+        "n_cofire": 0,
+        "n_signals": 215,
+        "rate": 0.0
+      },
+      "GBPJPY": {
+        "n_cofire": 0,
+        "n_signals": 254,
+        "rate": 0.0
+      },
+      "GBPNZD": {
+        "n_cofire": 0,
+        "n_signals": 233,
+        "rate": 0.0
+      },
+      "GBPUSD": {
+        "n_cofire": 0,
+        "n_signals": 240,
+        "rate": 0.0
+      },
+      "NZDCAD": {
+        "n_cofire": 0,
+        "n_signals": 230,
+        "rate": 0.0
+      },
+      "NZDCHF": {
+        "n_cofire": 0,
+        "n_signals": 233,
+        "rate": 0.0
+      },
+      "NZDJPY": {
+        "n_cofire": 0,
+        "n_signals": 263,
+        "rate": 0.0
+      },
+      "NZDUSD": {
+        "n_cofire": 0,
+        "n_signals": 249,
+        "rate": 0.0
+      },
+      "USDCAD": {
+        "n_cofire": 0,
+        "n_signals": 225,
+        "rate": 0.0
+      },
+      "USDCHF": {
+        "n_cofire": 0,
+        "n_signals": 211,
+        "rate": 0.0
+      },
+      "USDJPY": {
+        "n_cofire": 0,
+        "n_signals": 256,
+        "rate": 0.0
+      }
+    }
+  },
+  "lookahead_spotcheck": {
+    "details": [
+      {
+        "most_recent_sh_bar": 17855.0,
+        "pair": "NZDCAD",
+        "re_fires": true,
+        "right_edge_lag_bars": 5.0,
+        "right_edge_ok": true,
+        "signal_time": "2021-04-06 13:00:00+00:00"
+      },
+      {
+        "most_recent_sh_bar": 11369.0,
+        "pair": "EURJPY",
+        "re_fires": true,
+        "right_edge_lag_bars": 7.0,
+        "right_edge_ok": true,
+        "signal_time": "2017-03-03 10:00:00+00:00"
+      },
+      {
+        "most_recent_sh_bar": 11639.0,
+        "pair": "GBPJPY",
+        "re_fires": true,
+        "right_edge_lag_bars": 6.0,
+        "right_edge_ok": true,
+        "signal_time": "2017-05-05 09:00:00+00:00"
+      },
+      {
+        "most_recent_sh_bar": 9817.0,
+        "pair": "AUDJPY",
+        "re_fires": true,
+        "right_edge_lag_bars": 11.0,
+        "right_edge_ok": true,
+        "signal_time": "2016-03-15 22:00:00+00:00"
+      },
+      {
+        "most_recent_sh_bar": 5882.0,
+        "pair": "EURJPY",
+        "re_fires": true,
+        "right_edge_lag_bars": 11.0,
+        "right_edge_ok": true,
+        "signal_time": "2013-09-12 21:00:00+00:00"
+      }
+    ],
+    "n_fail": 0,
+    "n_pass": 5,
+    "n_samples": 5,
+    "result": "PASS"
+  },
+  "multi_tf_nan_rates": {
+    "d1_atr_percentile_100": 0.0205686630369026,
+    "d1_close_slope_magnitude": 0.0,
+    "d1_close_slope_sign": 0.0,
+    "w1_close_slope_sign": 0.00030248033877797946
+  },
+  "per_pair_diagnostics": [
+    {
+      "n_bars": 25405,
+      "pair": "AUDCAD",
+      "pullback_ok": 2471,
+      "resume_ok": 512,
+      "signal_count": 255,
+      "trend_ok": 3547
+    },
+    {
+      "n_bars": 25407,
+      "pair": "AUDCHF",
+      "pullback_ok": 2073,
+      "resume_ok": 437,
+      "signal_count": 233,
+      "trend_ok": 3226
+    },
+    {
+      "n_bars": 25403,
+      "pair": "AUDJPY",
+      "pullback_ok": 2457,
+      "resume_ok": 516,
+      "signal_count": 270,
+      "trend_ok": 3902
+    },
+    {
+      "n_bars": 25406,
+      "pair": "AUDNZD",
+      "pullback_ok": 2129,
+      "resume_ok": 402,
+      "signal_count": 232,
+      "trend_ok": 3072
+    },
+    {
+      "n_bars": 25401,
+      "pair": "AUDUSD",
+      "pullback_ok": 2239,
+      "resume_ok": 462,
+      "signal_count": 239,
+      "trend_ok": 3292
+    },
+    {
+      "n_bars": 25400,
+      "pair": "CADCHF",
+      "pullback_ok": 2121,
+      "resume_ok": 431,
+      "signal_count": 231,
+      "trend_ok": 3052
+    },
+    {
+      "n_bars": 25403,
+      "pair": "CADJPY",
+      "pullback_ok": 2360,
+      "resume_ok": 480,
+      "signal_count": 246,
+      "trend_ok": 3558
+    },
+    {
+      "n_bars": 25400,
+      "pair": "CHFJPY",
+      "pullback_ok": 2372,
+      "resume_ok": 488,
+      "signal_count": 259,
+      "trend_ok": 3536
+    },
+    {
+      "n_bars": 25405,
+      "pair": "EURAUD",
+      "pullback_ok": 2276,
+      "resume_ok": 443,
+      "signal_count": 220,
+      "trend_ok": 3199
+    },
+    {
+      "n_bars": 25406,
+      "pair": "EURCAD",
+      "pullback_ok": 2126,
+      "resume_ok": 409,
+      "signal_count": 215,
+      "trend_ok": 3112
+    },
+    {
+      "n_bars": 25401,
+      "pair": "EURCHF",
+      "pullback_ok": 1883,
+      "resume_ok": 377,
+      "signal_count": 195,
+      "trend_ok": 2690
+    },
+    {
+      "n_bars": 25399,
+      "pair": "EURGBP",
+      "pullback_ok": 2245,
+      "resume_ok": 428,
+      "signal_count": 218,
+      "trend_ok": 3194
+    },
+    {
+      "n_bars": 25409,
+      "pair": "EURJPY",
+      "pullback_ok": 2176,
+      "resume_ok": 438,
+      "signal_count": 243,
+      "trend_ok": 3422
+    },
+    {
+      "n_bars": 25399,
+      "pair": "EURNZD",
+      "pullback_ok": 2233,
+      "resume_ok": 433,
+      "signal_count": 238,
+      "trend_ok": 3301
+    },
+    {
+      "n_bars": 25405,
+      "pair": "EURUSD",
+      "pullback_ok": 2302,
+      "resume_ok": 478,
+      "signal_count": 247,
+      "trend_ok": 3270
+    },
+    {
+      "n_bars": 25319,
+      "pair": "GBPAUD",
+      "pullback_ok": 2497,
+      "resume_ok": 474,
+      "signal_count": 237,
+      "trend_ok": 3427
+    },
+    {
+      "n_bars": 25388,
+      "pair": "GBPCAD",
+      "pullback_ok": 2180,
+      "resume_ok": 442,
+      "signal_count": 225,
+      "trend_ok": 3306
+    },
+    {
+      "n_bars": 25402,
+      "pair": "GBPCHF",
+      "pullback_ok": 2134,
+      "resume_ok": 420,
+      "signal_count": 215,
+      "trend_ok": 3208
+    },
+    {
+      "n_bars": 25401,
+      "pair": "GBPJPY",
+      "pullback_ok": 2359,
+      "resume_ok": 511,
+      "signal_count": 254,
+      "trend_ok": 3744
+    },
+    {
+      "n_bars": 25383,
+      "pair": "GBPNZD",
+      "pullback_ok": 2061,
+      "resume_ok": 433,
+      "signal_count": 233,
+      "trend_ok": 3023
+    },
+    {
+      "n_bars": 25397,
+      "pair": "GBPUSD",
+      "pullback_ok": 2149,
+      "resume_ok": 444,
+      "signal_count": 240,
+      "trend_ok": 3182
+    },
+    {
+      "n_bars": 25402,
+      "pair": "NZDCAD",
+      "pullback_ok": 2362,
+      "resume_ok": 431,
+      "signal_count": 230,
+      "trend_ok": 3322
+    },
+    {
+      "n_bars": 25400,
+      "pair": "NZDCHF",
+      "pullback_ok": 2189,
+      "resume_ok": 434,
+      "signal_count": 233,
+      "trend_ok": 3240
+    },
+    {
+      "n_bars": 25403,
+      "pair": "NZDJPY",
+      "pullback_ok": 2527,
+      "resume_ok": 517,
+      "signal_count": 263,
+      "trend_ok": 4092
+    },
+    {
+      "n_bars": 25398,
+      "pair": "NZDUSD",
+      "pullback_ok": 2333,
+      "resume_ok": 477,
+      "signal_count": 249,
+      "trend_ok": 3513
+    },
+    {
+      "n_bars": 25401,
+      "pair": "USDCAD",
+      "pullback_ok": 2122,
+      "resume_ok": 424,
+      "signal_count": 225,
+      "trend_ok": 3119
+    },
+    {
+      "n_bars": 25403,
+      "pair": "USDCHF",
+      "pullback_ok": 2041,
+      "resume_ok": 410,
+      "signal_count": 211,
+      "trend_ok": 3164
+    },
+    {
+      "n_bars": 25401,
+      "pair": "USDJPY",
+      "pullback_ok": 2389,
+      "resume_ok": 488,
+      "signal_count": 256,
+      "trend_ok": 3544
+    }
+  ],
+  "pool_sha256_content": "d3543b1a996743d4b289cc1b0ee09becdd90e450c72cd65ed5fdccf3a7cc25d5",
+  "pool_size_per_pair": {
+    "AUDCAD": 255,
+    "AUDCHF": 233,
+    "AUDJPY": 270,
+    "AUDNZD": 232,
+    "AUDUSD": 239,
+    "CADCHF": 231,
+    "CADJPY": 246,
+    "CHFJPY": 259,
+    "EURAUD": 220,
+    "EURCAD": 215,
+    "EURCHF": 195,
+    "EURGBP": 218,
+    "EURJPY": 243,
+    "EURNZD": 238,
+    "EURUSD": 247,
+    "GBPAUD": 237,
+    "GBPCAD": 225,
+    "GBPCHF": 215,
+    "GBPJPY": 254,
+    "GBPNZD": 233,
+    "GBPUSD": 240,
+    "NZDCAD": 230,
+    "NZDCHF": 233,
+    "NZDJPY": 263,
+    "NZDUSD": 249,
+    "USDCAD": 225,
+    "USDCHF": 211,
+    "USDJPY": 256
+  },
+  "pool_size_total": 6612,
+  "pool_vs_arc8_v3_0_utc": {
+    "arc8_v3_0_utc_n": 6757,
+    "delta_pct": -0.02145922746781116,
+    "note": "Informational only \u2014 UTC vs 5ers_eet pools are not directly comparable.",
+    "v3_0_2_5ers_eet_n": 6612
+  },
+  "spread_data_quality_flag_rate": {
+    "AUDCAD": 0.0,
+    "AUDCHF": 0.0,
+    "AUDJPY": 0.0,
+    "AUDNZD": 0.0,
+    "AUDUSD": 0.0,
+    "CADCHF": 0.0,
+    "CADJPY": 0.0,
+    "CHFJPY": 0.0,
+    "EURAUD": 0.0,
+    "EURCAD": 0.0,
+    "EURCHF": 0.0,
+    "EURGBP": 0.0,
+    "EURJPY": 0.0,
+    "EURNZD": 0.0,
+    "EURUSD": 0.0,
+    "GBPAUD": 0.0,
+    "GBPCAD": 0.0,
+    "GBPCHF": 0.0,
+    "GBPJPY": 0.0,
+    "GBPNZD": 0.0,
+    "GBPUSD": 0.0,
+    "NZDCAD": 0.0,
+    "NZDCHF": 0.0,
+    "NZDJPY": 0.0,
+    "NZDUSD": 0.0,
+    "USDCAD": 0.0,
+    "USDCHF": 0.0,
+    "USDJPY": 0.0
+  }
+}

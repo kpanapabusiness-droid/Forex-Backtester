@@ -295,6 +295,10 @@ def _predicted_risk(results: Any, X: np.ndarray) -> np.ndarray:
     statsmodels' predict-bunch shape staying stable across versions —
     and so we can return a plain ndarray regardless of how PHReg
     structures its prediction return.
+
+    Per PR-D flag-1 disposition (chat-approved): the direct
+    ``exp(X @ params)`` path is the right home for this; the comment
+    above is the rationale that should land in spec / log review.
     """
     lp = X @ np.asarray(results.params, dtype=float)
     return np.exp(lp)

@@ -1,11 +1,10 @@
 """CLI for the heavy_ml_probe sub-protocol.
 
-PR-C surface: load + validate config, load pool, apply causal lineage
-gate, run AutoML across an 11-fold TimeSeriesSplit (when the pool
-supports it), run meta-labeling (reach-1R-before-SL target + threshold
-sweep + per-fold classifier persistence) when the pool carries the
-meta-label schema, write the artefact set + manifest. Survival flow
-lands in PR-D.
+PR-D surface: load + validate config, load pool, apply causal lineage
+gate, run AutoML (PR-B) + meta-labeling (PR-C) + Cox PH survival (PR-D
+via statsmodels.PHReg) — each stage auto-skips when the pool lacks its
+required schema. Writes the full artefact set + manifest. PR-E adds the
+Step 5 augmentation hook.
 
 Usage:
 
@@ -86,7 +85,29 @@ def _print_result_summary(result: PipelineResult) -> None:
         print(
             f"  Meta-labeling  : status={result.meta_label_skip_reason} (skipped)"
         )
-    print("[heavy_ml_probe] Survival not yet implemented (PR-D).")
+    if result.survival_result is not None:
+        sr = result.survival_result
+        c_mean = sr.concordance_mean
+        c_str = (
+            f"{c_mean:.4f}" if c_mean == c_mean else "NaN"  # NaN-safe
+        )
+        print(
+            f"  Survival (Cox) : status=ok  folds={sr.n_folds_total} "
+            f"(valid={sr.n_folds_valid})  "
+            f"concordance nanmean={c_str}  "
+            f"total_events={sr.total_n_events}  "
+            f"statsmodels={sr.statsmodels_version}"
+        )
+        print(f"  survival CSV   : {result.survival_results_path.as_posix()}")
+        print(
+            f"  survival models: "
+            f"{result.survival_classifier_manifest_path.parent.as_posix()}/"
+        )
+    else:
+        print(
+            f"  Survival (Cox) : status={result.survival_skip_reason} (skipped)"
+        )
+    print("[heavy_ml_probe] PR-E (Step 5 augmentation hook) not yet implemented.")
 
 
 def main(argv: list[str] | None = None) -> int:

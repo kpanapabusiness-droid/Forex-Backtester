@@ -367,9 +367,12 @@ def test_pipeline_writes_meta_label_artefacts(pipeline_run):
         and r.meta_label_classifier_manifest_path.exists()
     )
 
-    # Manifest should list all six artefacts now (stub + 3 AutoML + 2 meta-label)
+    # Manifest should list at minimum the 6 meta-label / AutoML artefacts.
+    # PR-D adds survival_model_results + survival_classifier_manifest
+    # when the pool also carries the survival schema (which the
+    # test_meta_labeling fixture does — same MFE columns).
     payload = json.loads(r.step4_manifest_path.read_text(encoding="utf-8"))
-    assert set(payload["artefacts"].keys()) == {
+    required = {
         "stub_summary",
         "automl_leaderboard",
         "automl_feature_importance",
@@ -377,6 +380,7 @@ def test_pipeline_writes_meta_label_artefacts(pipeline_run):
         "meta_label_results",
         "meta_label_classifier_manifest",
     }
+    assert required <= set(payload["artefacts"].keys())
     # Meta-label extras block
     ml = payload["meta_label"]
     assert ml["skip_reason"] == "ok"

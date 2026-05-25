@@ -12,6 +12,7 @@
 > **Amendment 5 (2026-05-23):** AUC-gated A2/A6 architecture selection. Amendment 1's uniform archetype gating is split into four gates: Gate 1 preserves A3/A4 archetype gating; Gate 2 admits A2 + A6 whenever Step 4 mean OOS AUC ≥ 0.65 regardless of archetype; Gate 3 always admits A1; Gate 4 admits A5 when ≥2 candidate clusters survive Step 3. Choppy clusters skip all architectures. Enforcement is dispatch-time; engine unchanged (all six architectures wired post-PR-186). Closure template v1.3.1 adds optional `architectures_skipped_by_amendment_5` field; parser v1.3 accepts it and requires it for post-ratification PASS verdicts. Full text archived at `archive/L_PROTOCOL_v3_0_AMENDMENT_5.md`. See §2 Step 5 "Architecture selection (Amendment 5)".
 > **Amendment 6 (2026-05-25):** Daily-DD measurement boundary changed from UTC broker-day to **5ers EET broker trading day** (Europe/Athens, EU DST rules). Amendment 3 §"Boundary" was authored under the pre-PR-189 UTC-bar engine assumption; under PR #189's 5ers EET aggregation the bar boundary and the daily-DD reset boundary must match for the gate to be coherent. Engine implementation landed via PR #197: `core.runners._fold_stats_helpers.compute_per_day_max_dd(boundary_convention="5ers_eet")` consuming `core.time_utils.session_boundary.utc_to_eet_trading_day`; `Panel.boundary_convention` carries the choice through orchestrator slicing. `boundary_convention="utc"` opt-in preserved for KH-24 anchor byte-identity. Convention-aware consumers also include `core/features/distance.py` (prior-session HL bucketing) and `core/sim/risk/reset_floor.py` (daily-floor ratchet). See §3 "Boundary" and PROTOCOL_RUNTIME §15.5. No archive file — Amendment 6 is documented inline at §3 only.
 > **Amendment 5.1 (2026-05-25):** Gate 4 PASS-tier-constituent qualifier. Sub-amendment to Amendment 5 §Gate 4 only. Gate 4 admits A5 if and only if (a) ≥2 candidate clusters survive Step 3 (preserved from Amendment 5) AND (b) at least one constituent candidate cluster has cleared Step 5 search-WFO at PASS-DEPLOYABLE or PASS-VIABLE tier under an architecture admitted by Gates 1, 2, or 3. If (a) holds but (b) does not, A5 is not admitted; closure records `a5_gate_4_admission_blocked_by_no_pass_tier_constituent` in `architectures_skipped_by_amendment_5`. Rationale: aligns Gate 4 with the standing engine-deferral policy (A5 build deferred until composable PASS-tier candidates exist). Enforcement dispatch-time; engine unchanged; closure template unchanged. Parser v1.3 accepts the new reason string; post-cutoff PASS closures with ≥2 candidate clusters and no PASS-tier constituent MUST cite this string. Cutoff `AMENDMENT_5_1_CUTOFF_ISO` (placeholder `2026-05-25T00:00:00Z`, backfilled to this PR's merge timestamp). No archive file — documented inline at §2 Step 5 Gate 4 only.
+> **Amendment 3.1 (2026-05-25):** `r_max` reframed as deployment cap, not gate threshold. Sub-amendment to Amendment 3 §"Scalability bounds" and §PASS-DEPLOYABLE constraint #1 and §PASS-VIABLE constraint #1. Floor `r_min = 0.15%` and zero-DD edge case unchanged (still FAIL `step5_not_scalable`). Ceiling `r_max = 2.0%`: when intrinsic `r_safe` (or `r_hard`) exceeds `r_max`, set `r_safe_deploy = r_max` (cap, not fail) and evaluate all DEPLOYABLE / VIABLE gates at `r_safe_deploy`. Realised chained DD at `r_safe_deploy` < 8% by construction — strategy is too risk-efficient to fully consume the budget at the per-trade cap. Triggered by Arc 7 v3.0.2 closure: 10/10 positive folds, worst-fold ratio 4.36, worst-fold DD 1.26%, chained DD 2.09% — intrinsic `r_safe = 3.16%` previously FAILed on ceiling overshoot; now PASS-DEPLOYABLE at `r_deploy = 2.0%`. Engine implementation: `core/wfo/amended_gates.py` — `R_MAX` becomes a cap parameter, `step5_not_scalable` ceiling branch removed, new tracker fields `r_safe_capped_at_rmax` and `r_hard_capped_at_rmax` (bool) added. Closure template enum unchanged (no new failure mode). No archive file — Amendment 3.1 documented inline at §3 only. Cutoff `AMENDMENT_3_1_CUTOFF_ISO` (placeholder `2026-05-25T00:00:00Z`, backfilled to PR merge timestamp).
 >
 > This protocol is the umbrella. It accepts any signal, any feature space, any architecture. Sub-protocols may layer on top to add signal-class-specific specificity. The overseer's gates and verdicts apply universally.
 
@@ -392,20 +393,20 @@ Linear scaling does **NOT** apply to: daily breach **counts** themselves — ste
 
 Constraints not affected by risk scaling (sign-consistency, trade count, fold count) remain unchanged in evaluation procedure.
 
-### Scalability bounds (locked)
+### Scalability bounds (revised by Amendment 3.1, 2026-05-25)
 
-- **Floor:** `r_safe ≥ r_min = 0.15%`. Locked value.
-- **Ceiling:** `r_safe ≤ r_max = 2.0%`. Locked value.
-- **Edge case:** `worst_fold_dd_base = 0%` → `k = ∞` → FAIL `step5_not_scalable`.
+- **Floor:** `r_safe ≥ r_min = 0.15%`. Locked value. Intrinsic `r_safe < r_min` → FAIL `step5_not_scalable` (strategy DD is too large to scale into the 8% safety budget at allowed per-trade risk).
+- **Ceiling:** `r_max = 2.0%` is the **deployment cap, not a gate condition** (Amendment 3.1). When intrinsic `r_safe > r_max`, set `r_safe_deploy = r_max` and evaluate DEPLOYABLE gates at `r_safe_deploy`. Realised chained DD at `r_safe_deploy` is `< 8%` by construction — the strategy is too risk-efficient to fully consume the DD budget at the per-trade cap. Tracker field `r_safe_capped_at_rmax: true` records the cap activation. This is **not** a failure mode.
+- **Edge case:** `worst_fold_dd_base = 0%` → `k_intrinsic = ∞` → FAIL `step5_not_scalable` (DD literally unmeasurable, distinct from "too clean to scale").
 - **Sizing convention:** linear DD scaling holds ONLY under reset-floor sizing (L arc convention). Arcs using %-of-current-equity sizing FAIL the scalability check by default unless chat approves a separate scaling treatment.
 
-Same bounds apply to `r_hard` for VIABLE evaluation.
+Same treatment applies to `r_hard` for VIABLE evaluation: capped at `r_max` when intrinsic overshoot occurs; floor and zero-DD edge case unchanged.
 
 ### PASS-DEPLOYABLE (ship)
 
 All of:
 
-1. **Scalable to safe:** `r_safe ∈ [0.15%, 2.0%]` (added by Amendment 3).
+1. **Scalable to safe:** intrinsic `r_safe ≥ r_min = 0.15%` (Amendment 3 floor preserved). Ceiling overshoot is no longer a gate condition (Amendment 3.1) — `r_safe_deploy = min(r_safe_intrinsic, r_max)`. All subsequent DEPLOYABLE gates evaluate at `r_safe_deploy`.
 2. **Worst-fold ROI/DD ratio at `r_safe`:** ≥ 2.0 (ratio invariant under linear scaling).
 3. **Worst-fold ROI at `r_safe`:** > 0 (linearly scaled from `r_base`).
 4. **Per-fold positivity:** positive at all 11 IS folds, 0 negative folds (sign does not scale; holdout has its own gate).
@@ -422,7 +423,7 @@ All of:
 
 All of:
 
-1. **Hard-scalable:** `r_hard ∈ [0.15%, 2.0%]` (added by Amendment 3).
+1. **Hard-scalable:** intrinsic `r_hard ≥ r_min = 0.15%` (Amendment 3 floor preserved). Ceiling overshoot capped per Amendment 3.1 — `r_hard_deploy = min(r_hard_intrinsic, r_max)`. All subsequent VIABLE gates evaluate at `r_hard_deploy`.
 2. **Worst-fold ROI/DD ratio at `r_hard`:** ≥ 2.0 (ratio invariant).
 3. **Mean-fold ROI/DD ratio at `r_hard`:** ≥ 2.5 (ratio invariant).
 4. **Per-fold positivity:** up to 1 negative fold permitted across the 11 IS folds.
@@ -516,7 +517,7 @@ Holdout = "2021-01-01 to present at time of arc closure" — matches §2 Step 5 
 
 ### r_max note
 
-`r_max = 2.0%` is the gate ceiling. Locked value.
+`r_max = 2.0%` is the **deployment cap** (per-trade risk feasibility on 5ers prop firm). Revised by Amendment 3.1 (2026-05-25) — no longer a gate threshold; strategies whose intrinsic `r_safe` or `r_hard` overshoots `r_max` deploy at `r_max` with sub-budget DD utilisation. Tracker fields `r_safe_capped_at_rmax` / `r_hard_capped_at_rmax` flag the cap activation. Locked value.
 
 ---
 

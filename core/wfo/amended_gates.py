@@ -1,4 +1,4 @@
-"""Amendment 3 risk-normalised gate logic.
+"""Amendment 3 risk-normalised gate logic, revised by Amendment 3.1.
 
 Lands the six Amendment 3 emission items per
 ``archive/L_PROTOCOL_v3_0_AMENDMENT_3.md`` and
@@ -11,6 +11,21 @@ Risk-normalised gates":
   - chained max DD at scaled risk
   - sizing-convention check (FAIL on equity_pct without chat approval)
   - priority-ordered failure-mode taxonomy
+
+**Amendment 3.1 (2026-05-25):** ``r_max = 2.0%`` reframed as a
+*deployment cap*, not a gate threshold. When intrinsic ``r_safe``
+(or ``r_hard``) exceeds ``R_MAX``, the engine caps the deploy risk
+at ``R_MAX`` and evaluates all DEPLOYABLE / VIABLE gates at the
+capped risk. Realised chained DD at the cap is ``< 8%`` (resp.
+``< 10%``) by construction — the strategy is too risk-efficient to
+fully consume the budget. Cap activation is recorded via the
+``r_safe_capped_at_rmax`` / ``r_hard_capped_at_rmax`` flags +
+``r_safe_intrinsic_pct`` / ``r_hard_intrinsic_pct`` audit fields.
+Floor (``r < R_MIN``) and zero-DD edge case still FAIL
+``step5_not_scalable``. ``ScalingFactors.k_safe`` / ``k_hard`` /
+``r_safe_pct`` / ``r_hard_pct`` now carry the *deploy* (post-cap)
+values so existing downstream consumers (holdout re-run scaling,
+Step 6 IO) transparently evaluate at the capped risk.
 
 This module is pure logic — no engine emission, no holdout re-runs.
 Inputs:
@@ -26,8 +41,8 @@ Inputs:
   - ``r_base``
 
 Output: :class:`AmendedGateResult` — verdict + ``primary_failure_mode``
-+ every Amendment 3 risk-normalised field that the tracker payload
-requires.
++ every Amendment 3 / 3.1 risk-normalised field that the tracker
+payload requires.
 
 Backwards compatibility: legacy ``core.wfo.gates.classify_fold_stats``
 is preserved unmodified for pre-Amendment-3 callers; this module's
@@ -52,10 +67,10 @@ from core.wfo.gates import (
     FoldStats,
 )
 
-# ── Scalability bounds (locked per Amendment 3 §"Scalability bounds") ─
+# ── Scalability bounds (Amendment 3 floor; Amendment 3.1 ceiling-as-cap) ─
 
-R_MIN: float = 0.0015   # 0.15% lower bound on r_safe / r_hard
-R_MAX: float = 0.0200   # 2.00% upper bound on r_safe / r_hard
+R_MIN: float = 0.0015   # 0.15% floor on intrinsic r_safe / r_hard (gate)
+R_MAX: float = 0.0200   # 2.00% deployment cap (Amendment 3.1 — NOT a gate)
 CHAINED_DD_MAX_PCT: float = 0.10   # 10% chained DD cap at scaled risk
 
 DEFAULT_R_BASE: float = 0.005   # KH-24 / L arc convention
@@ -100,15 +115,36 @@ class PrimaryFailureMode(Enum):
 
 @dataclass(frozen=True)
 class ScalingFactors:
-    """Computed scaling factors per Amendment 3 §"Scaling rule"."""
+    """Computed scaling factors per Amendment 3 §"Scaling rule" + Amendment 3.1 cap.
+
+    ``k_safe`` / ``k_hard`` / ``r_safe_pct`` / ``r_hard_pct`` carry the
+    **deploy** (post-cap) values — every downstream gate evaluation and
+    holdout re-run uses these. The pre-cap intrinsics are exposed via
+    ``k_safe_intrinsic`` / ``k_hard_intrinsic`` / ``r_safe_intrinsic_pct``
+    / ``r_hard_intrinsic_pct`` for audit. ``r_safe_capped_at_rmax`` /
+    ``r_hard_capped_at_rmax`` flag when the intrinsic overshot ``R_MAX``
+    and was capped — informational, not a failure mode.
+
+    ``scalable_to_safe`` / ``scalable_to_hard`` shift meaning per
+    Amendment 3.1: now ``(r_intrinsic >= R_MIN) AND (worst_fold_dd > 0)``
+    only. Ceiling overshoot no longer makes them False.
+    """
 
     worst_fold_dd_base_pct: float
+    # Deploy (post-cap) values — used by all downstream gate logic
     k_safe: float
     k_hard: float
     r_safe_pct: float
     r_hard_pct: float
     scalable_to_safe: bool
     scalable_to_hard: bool
+    # Intrinsic (pre-cap) values + cap-activation flags (Amendment 3.1)
+    k_safe_intrinsic: float
+    k_hard_intrinsic: float
+    r_safe_intrinsic_pct: float
+    r_hard_intrinsic_pct: float
+    r_safe_capped_at_rmax: bool
+    r_hard_capped_at_rmax: bool
 
 
 @dataclass(frozen=True)
@@ -135,15 +171,21 @@ class AmendedGateResult:
     min_trades_per_fold: int
     chained_max_dd_base_pct: float
 
-    # Scaling factors
+    # Scaling factors (Amendment 3.1: r_safe_pct / r_hard_pct are POST-CAP
+    # deploy values; r_safe_intrinsic_pct / r_hard_intrinsic_pct expose the
+    # pre-cap intrinsics for audit; *_capped_at_rmax flag the activation)
     k_safe: float
     k_hard: float
     r_safe_pct: float
     r_hard_pct: float
     scalable_to_safe: bool
     scalable_to_hard: bool
+    r_safe_intrinsic_pct: float
+    r_hard_intrinsic_pct: float
+    r_safe_capped_at_rmax: bool
+    r_hard_capped_at_rmax: bool
 
-    # Scaled metrics (at r_safe and r_hard)
+    # Scaled metrics (at r_safe and r_hard — deploy / capped risk)
     worst_fold_roi_at_r_safe_pct: float
     worst_fold_roi_at_r_hard_pct: float
     chained_max_dd_at_r_safe_pct: float
@@ -171,19 +213,29 @@ def compute_scaling_factors(
 ) -> ScalingFactors:
     """Compute Amendment 3 §"Scaling rule" k / r values from worst-fold DD at r_base.
 
-    ``k_safe = 8.0 / worst_fold_dd_base`` and
-    ``k_hard = 10.0 / worst_fold_dd_base`` are in PERCENTAGE-POINT units
-    (the source of all the linear-scaling-works arithmetic — DD scales
-    linearly with risk under reset-floor sizing). The output
-    ``r_safe_pct`` / ``r_hard_pct`` are in DECIMAL FRACTIONS (e.g.
-    ``0.0050`` = 0.5%); matches the convention used everywhere else
-    in the engine.
+    Per Amendment 3:
+    ``k_safe_intrinsic = 8.0 / worst_fold_dd_base`` and
+    ``k_hard_intrinsic = 10.0 / worst_fold_dd_base`` are in PERCENTAGE-POINT
+    units (the source of all the linear-scaling-works arithmetic — DD
+    scales linearly with risk under reset-floor sizing). The output
+    intrinsic / deploy r values are in DECIMAL FRACTIONS (e.g. ``0.0050``
+    = 0.5%); matches the convention used everywhere else in the engine.
 
-    Scalability bounds locked at ``[R_MIN, R_MAX]`` = ``[0.15%, 2.00%]``.
+    Amendment 3.1 (2026-05-25): ``r_max`` becomes a *deployment cap*.
+    When the intrinsic r overshoots ``R_MAX``, the deploy value is
+    capped at ``R_MAX`` and ``r_*_capped_at_rmax`` is flagged True.
+    Cap activation is informational, NOT a failure mode. The returned
+    ``k_safe`` / ``k_hard`` / ``r_safe_pct`` / ``r_hard_pct`` are the
+    *deploy* (post-cap) values — used everywhere downstream so gate
+    evaluation, chained-DD scaling, and holdout re-runs all happen at
+    the capped risk by construction.
+
+    Floor (``r_intrinsic < R_MIN``) preserved per Amendment 3: triggers
+    ``scalable_to_* = False`` and downstream ``step5_not_scalable``.
 
     Edge case: ``worst_fold_dd_base_pct <= 0`` → ``k = ∞`` →
-    ``scalable_to_safe = False``, ``scalable_to_hard = False`` per
-    Amendment 3 §"Scalability bounds" edge case.
+    ``scalable_to_* = False`` (DD literally unmeasurable, distinct from
+    "too clean to scale"). Preserved per Amendment 3.1.
     """
     # worst_fold_dd_base_pct is in DECIMAL FRACTION (e.g. 0.0922 = 9.22%).
     # The Amendment 3 spec writes 8.0 / 10.0 as the threshold; that's
@@ -192,27 +244,44 @@ def compute_scaling_factors(
     if dd_pp <= 0:
         return ScalingFactors(
             worst_fold_dd_base_pct=worst_fold_dd_base_pct,
-            k_safe=float("inf"),
-            k_hard=float("inf"),
-            r_safe_pct=float("inf"),
-            r_hard_pct=float("inf"),
-            scalable_to_safe=False,
-            scalable_to_hard=False,
+            k_safe=float("inf"), k_hard=float("inf"),
+            r_safe_pct=float("inf"), r_hard_pct=float("inf"),
+            scalable_to_safe=False, scalable_to_hard=False,
+            k_safe_intrinsic=float("inf"), k_hard_intrinsic=float("inf"),
+            r_safe_intrinsic_pct=float("inf"), r_hard_intrinsic_pct=float("inf"),
+            r_safe_capped_at_rmax=False, r_hard_capped_at_rmax=False,
         )
-    k_safe = 8.0 / dd_pp
-    k_hard = 10.0 / dd_pp
-    r_safe = r_base * k_safe
-    r_hard = r_base * k_hard
-    scalable_to_safe = R_MIN <= r_safe <= R_MAX
-    scalable_to_hard = R_MIN <= r_hard <= R_MAX
+    k_safe_intrinsic = 8.0 / dd_pp
+    k_hard_intrinsic = 10.0 / dd_pp
+    r_safe_intrinsic = r_base * k_safe_intrinsic
+    r_hard_intrinsic = r_base * k_hard_intrinsic
+
+    # Amendment 3.1: cap at R_MAX (deployment cap, not gate)
+    r_safe_capped_at_rmax = r_safe_intrinsic > R_MAX
+    r_hard_capped_at_rmax = r_hard_intrinsic > R_MAX
+    r_safe_deploy = min(r_safe_intrinsic, R_MAX)
+    r_hard_deploy = min(r_hard_intrinsic, R_MAX)
+    k_safe_deploy = r_safe_deploy / r_base
+    k_hard_deploy = r_hard_deploy / r_base
+
+    # Amendment 3.1: scalability = floor preserved; ceiling is no longer a gate
+    scalable_to_safe = r_safe_intrinsic >= R_MIN
+    scalable_to_hard = r_hard_intrinsic >= R_MIN
+
     return ScalingFactors(
         worst_fold_dd_base_pct=worst_fold_dd_base_pct,
-        k_safe=k_safe,
-        k_hard=k_hard,
-        r_safe_pct=r_safe,
-        r_hard_pct=r_hard,
+        k_safe=k_safe_deploy,
+        k_hard=k_hard_deploy,
+        r_safe_pct=r_safe_deploy,
+        r_hard_pct=r_hard_deploy,
         scalable_to_safe=scalable_to_safe,
         scalable_to_hard=scalable_to_hard,
+        k_safe_intrinsic=k_safe_intrinsic,
+        k_hard_intrinsic=k_hard_intrinsic,
+        r_safe_intrinsic_pct=r_safe_intrinsic,
+        r_hard_intrinsic_pct=r_hard_intrinsic,
+        r_safe_capped_at_rmax=r_safe_capped_at_rmax,
+        r_hard_capped_at_rmax=r_hard_capped_at_rmax,
     )
 
 
@@ -279,6 +348,9 @@ def classify_amended_fold_stats(
                 worst_fold_dd_base_pct=0.0, k_safe=float("inf"), k_hard=float("inf"),
                 r_safe_pct=float("inf"), r_hard_pct=float("inf"),
                 scalable_to_safe=False, scalable_to_hard=False,
+                k_safe_intrinsic=float("inf"), k_hard_intrinsic=float("inf"),
+                r_safe_intrinsic_pct=float("inf"), r_hard_intrinsic_pct=float("inf"),
+                r_safe_capped_at_rmax=False, r_hard_capped_at_rmax=False,
             ),
             per_day_max_dd_df=per_day_max_dd_df,
             holdout_safe=holdout_stats_at_r_safe,
@@ -337,6 +409,10 @@ def classify_amended_fold_stats(
             r_hard_pct=scaling.r_hard_pct,
             scalable_to_safe=scaling.scalable_to_safe,
             scalable_to_hard=scaling.scalable_to_hard,
+            r_safe_intrinsic_pct=scaling.r_safe_intrinsic_pct,
+            r_hard_intrinsic_pct=scaling.r_hard_intrinsic_pct,
+            r_safe_capped_at_rmax=scaling.r_safe_capped_at_rmax,
+            r_hard_capped_at_rmax=scaling.r_hard_capped_at_rmax,
             worst_fold_roi_at_r_safe_pct=wf_roi_at_safe,
             worst_fold_roi_at_r_hard_pct=wf_roi_at_hard,
             chained_max_dd_at_r_safe_pct=chained_dd_at_safe,
@@ -364,7 +440,10 @@ def classify_amended_fold_stats(
 
     # ── Priority-ordered evaluation per Amendment 3 §"Failure-mode priority" ──
 
-    # 2. step5_not_scalable: sizing convention + scalability bounds
+    # 2. step5_not_scalable: sizing convention + Amendment 3.1 floor-only check.
+    # Under Amendment 3.1 the R_MAX ceiling is a deployment cap, not a gate —
+    # only the R_MIN floor (and the zero-DD edge case in compute_scaling_factors)
+    # still trigger this failure mode.
     if sizing_convention == "equity_pct" and not accept_equity_pct:
         return _fail(
             PrimaryFailureMode.STEP5_NOT_SCALABLE,
@@ -374,8 +453,10 @@ def classify_amended_fold_stats(
     if not scaling.scalable_to_safe and not scaling.scalable_to_hard:
         return _fail(
             PrimaryFailureMode.STEP5_NOT_SCALABLE,
-            f"r_safe={scaling.r_safe_pct:.4%} / r_hard={scaling.r_hard_pct:.4%} "
-            f"outside [{R_MIN:.4%}, {R_MAX:.4%}] — config not scalable",
+            f"intrinsic r_safe={scaling.r_safe_intrinsic_pct:.4%} / "
+            f"r_hard={scaling.r_hard_intrinsic_pct:.4%} below floor "
+            f"R_MIN={R_MIN:.4%} (Amendment 3.1: ceiling overshoot is no "
+            f"longer a failure mode; only floor / zero-DD trigger)",
         )
 
     # 3. step5_dd_above_gate (defensive — should not occur post-scaling)
@@ -600,6 +681,10 @@ def _ok_result(
         r_hard_pct=scaling.r_hard_pct,
         scalable_to_safe=scaling.scalable_to_safe,
         scalable_to_hard=scaling.scalable_to_hard,
+        r_safe_intrinsic_pct=scaling.r_safe_intrinsic_pct,
+        r_hard_intrinsic_pct=scaling.r_hard_intrinsic_pct,
+        r_safe_capped_at_rmax=scaling.r_safe_capped_at_rmax,
+        r_hard_capped_at_rmax=scaling.r_hard_capped_at_rmax,
         worst_fold_roi_at_r_safe_pct=min(rois) * scaling.k_safe,
         worst_fold_roi_at_r_hard_pct=min(rois) * scaling.k_hard,
         chained_max_dd_at_r_safe_pct=chained_max_dd_base_pct * scaling.k_safe,
@@ -661,6 +746,10 @@ def _build_fail_result(
         r_hard_pct=scaling.r_hard_pct,
         scalable_to_safe=scaling.scalable_to_safe,
         scalable_to_hard=scaling.scalable_to_hard,
+        r_safe_intrinsic_pct=scaling.r_safe_intrinsic_pct,
+        r_hard_intrinsic_pct=scaling.r_hard_intrinsic_pct,
+        r_safe_capped_at_rmax=scaling.r_safe_capped_at_rmax,
+        r_hard_capped_at_rmax=scaling.r_hard_capped_at_rmax,
         worst_fold_roi_at_r_safe_pct=min(rois) * scaling.k_safe,
         worst_fold_roi_at_r_hard_pct=min(rois) * scaling.k_hard,
         chained_max_dd_at_r_safe_pct=chained_max_dd_base_pct * scaling.k_safe,

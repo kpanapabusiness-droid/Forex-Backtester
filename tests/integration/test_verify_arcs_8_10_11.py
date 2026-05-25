@@ -133,28 +133,37 @@ def test_arc_11_reproduces_step5_not_scalable() -> None:
 
 
 def test_arc_8_reproduces_fail_verdict() -> None:
-    """Arc 8: worst_fold_dd_base = 1.9826% → very low DD pushes r_safe
-    JUST above R_MAX = 2.00%. Engine reports step5_not_scalable.
+    """Arc 8: worst_fold_dd_base = 1.9826% → very low DD pushes intrinsic
+    r_safe JUST above R_MAX = 2.00%.
 
-    Closure §10 reports step5_ratio_below_gate_after_scaling. The
-    discrepancy is the closure's hand-derivation didn't apply the
-    R_MAX = 2.00% upper bound check; it concluded the arc was
-    scalable and failed on the ratio gate. Per dispatch §"Group 9":
-    engine wins on tiebreak. Verdict (FAIL) is identical in both
-    readings.
+    Amendment 3.1 (2026-05-25): r_max is the deployment cap, not a gate.
+    Intrinsic r_safe = 2.0175% is capped to R_MAX = 2.0%, and the
+    candidate is then evaluated against the remaining gates at the
+    capped risk. Arc 8's ratios (~1.39 mean, ~1.5 worst) fall below
+    the DEPLOYABLE 2.0 / VIABLE 2.5 ratio thresholds — so the verdict
+    is FAIL with primary_failure_mode = step5_ratio_below_gate_after_scaling.
 
-    Documented as a housekeeping follow-up for the closure: re-issue
-    Arc 8's §10 with the corrected primary_failure_mode after this PR
-    merges.
+    This matches Arc 8's closure §10 reading exactly. Pre-Amendment-3.1
+    the engine reported step5_not_scalable (ceiling overshoot); the
+    closure's hand-derivation skipped the ceiling check and landed on
+    ratio_below_gate. Amendment 3.1 reconciles the discrepancy by
+    eliminating the ceiling-as-gate branch — the engine now surfaces
+    the actual structural failure mode the closure documented.
     """
-    # k_safe = 8/1.9826 = 4.0351; r_safe = 0.005 * 4.0351 = 0.020175 > R_MAX
-    # k_hard = 10/1.9826 = 5.0439; r_hard = 0.005 * 5.0439 = 0.025220 > R_MAX
+    # k_safe_intrinsic = 8/1.9826 = 4.0351; r_safe_intrinsic = 2.0175% > R_MAX
+    # k_hard_intrinsic = 10/1.9826 = 5.0439; r_hard_intrinsic = 2.5220% > R_MAX
     sf = compute_scaling_factors(0.019826, r_base=0.005)
-    assert sf.r_safe_pct > R_MAX, (
-        f"r_safe = {sf.r_safe_pct:.6%} should exceed R_MAX = {R_MAX:.2%}"
+    assert sf.r_safe_intrinsic_pct > R_MAX, (
+        f"intrinsic r_safe = {sf.r_safe_intrinsic_pct:.6%} should exceed "
+        f"R_MAX = {R_MAX:.2%}"
     )
-    assert sf.scalable_to_safe is False
-    assert sf.scalable_to_hard is False
+    # Amendment 3.1: capped deploy values; flags set; still scalable
+    assert sf.r_safe_capped_at_rmax is True
+    assert sf.r_hard_capped_at_rmax is True
+    assert sf.r_safe_pct == pytest.approx(R_MAX, abs=1e-9)
+    assert sf.r_hard_pct == pytest.approx(R_MAX, abs=1e-9)
+    assert sf.scalable_to_safe is True
+    assert sf.scalable_to_hard is True
 
     folds = _synthesise_folds(
         worst_roi_base=0.017486, worst_dd_base=0.019826,
@@ -173,9 +182,8 @@ def test_arc_8_reproduces_fail_verdict() -> None:
     )
     # Verdict identical to closure: FAIL
     assert res.verdict == AmendedVerdict.FAIL
-    # Engine primary_failure_mode is step5_not_scalable (closure says
-    # step5_ratio_below_gate_after_scaling — discrepancy documented above)
-    assert res.primary_failure_mode == PrimaryFailureMode.STEP5_NOT_SCALABLE
+    # Amendment 3.1: engine now matches the closure's stated failure mode
+    assert res.primary_failure_mode == PrimaryFailureMode.STEP5_RATIO_BELOW_GATE_AFTER_SCALING
 
 
 # ── Arc 10 — PASS-DEPLOYABLE under Amendment 3 ──────────────────────

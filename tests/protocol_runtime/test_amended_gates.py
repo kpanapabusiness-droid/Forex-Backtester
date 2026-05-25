@@ -70,12 +70,25 @@ def test_scaling_factors_high_dd_breaches_floor() -> None:
     assert sf.scalable_to_safe is False
 
 
-def test_scaling_factors_low_dd_breaches_ceiling() -> None:
-    """Very-low base DD → huge k → r_safe above R_MAX → not scalable."""
-    # worst_fold_dd = 1% → k_safe = 8.0 → r_safe = 4% > R_MAX
+def test_scaling_factors_low_dd_caps_at_rmax() -> None:
+    """Very-low base DD → huge k → intrinsic r_safe above R_MAX.
+
+    Amendment 3.1 (2026-05-25): r_max is the deployment cap, not a gate.
+    The engine returns the capped deploy r_safe (= R_MAX), preserves the
+    intrinsic in r_safe_intrinsic_pct, and flags r_safe_capped_at_rmax.
+    The candidate remains scalable (scalable_to_safe stays True) — the
+    cap activation is informational.
+    """
+    # worst_fold_dd = 1% → k_safe_intrinsic = 8.0 → r_safe_intrinsic = 4% > R_MAX
     sf = compute_scaling_factors(0.01, r_base=0.005)
-    assert sf.r_safe_pct > R_MAX
-    assert sf.scalable_to_safe is False
+    assert sf.r_safe_intrinsic_pct > R_MAX
+    assert sf.r_safe_pct == pytest.approx(R_MAX, abs=1e-9)
+    assert sf.r_safe_capped_at_rmax is True
+    assert sf.scalable_to_safe is True
+    # k_safe is also rescaled to reflect the cap (= R_MAX / r_base)
+    assert sf.k_safe == pytest.approx(R_MAX / 0.005, abs=1e-9)
+    # k_safe_intrinsic preserves the pre-cap value for audit
+    assert sf.k_safe_intrinsic == pytest.approx(8.0, abs=1e-9)
 
 
 # ── count_daily_breaches_at_scaled_risk ─────────────────────────────
@@ -375,3 +388,241 @@ def test_amended_result_emits_all_tracker_fields() -> None:
     assert res.holdout_roi_at_r_safe_pct is not None
     assert res.holdout_dd_at_r_safe_pct is not None
     assert res.sizing_convention == "reset_floor"
+
+
+# ── Amendment 3.1 — r_max as deployment cap (2026-05-25) ────────────
+
+
+def test_r_safe_caps_at_rmax_when_intrinsic_overshoots() -> None:
+    """Amendment 3.1: intrinsic r_safe > R_MAX → capped at R_MAX, no FAIL.
+
+    Synthetic stats: worst_fold_dd_base = 1.0% → k_safe_intrinsic = 8.0
+    → r_safe_intrinsic = 4.0% (overshoots R_MAX = 2.0%). All other gates
+    pass. Expectation: r_safe_capped_at_rmax = True, r_safe_pct = 2.0%,
+    r_safe_intrinsic_pct = 4.0%, no step5_not_scalable failure,
+    PASS-DEPLOYABLE achieved (assuming other gates clear).
+    """
+    folds = tuple(
+        FoldStats(
+            fold_id=i + 1, n_trades=50,
+            roi_pct=0.04, max_dd_pct=0.01,    # 1% DD → intrinsic r_safe = 4% > R_MAX
+            days_breaching_daily_5pct=0, roi_dd_ratio=4.0,
+        )
+        for i in range(11)
+    )
+    res = classify_amended_fold_stats(
+        folds=folds,
+        chained_max_dd_base_pct=0.015,   # chained = 1.5% at r_base; * k_safe(=4.0) = 6% < 8%
+        per_day_max_dd_df=_good_per_day_df(),
+        holdout_stats_at_r_safe=_good_holdout(),
+        holdout_stats_at_r_hard=None,
+        sizing_convention="reset_floor",
+    )
+    assert res.verdict == AmendedVerdict.PASS_DEPLOYABLE
+    assert res.primary_failure_mode == PrimaryFailureMode.NONE
+    assert res.r_safe_capped_at_rmax is True
+    assert res.r_safe_pct == pytest.approx(R_MAX, abs=1e-9)
+    assert res.r_safe_intrinsic_pct == pytest.approx(0.04, abs=1e-9)
+    assert res.scalable_to_safe is True
+
+
+def test_r_safe_intrinsic_at_floor_still_fails() -> None:
+    """Amendment 3.1 preserves the R_MIN floor: intrinsic r_safe < R_MIN
+    still triggers step5_not_scalable.
+
+    Synthetic stats: worst_fold_dd_base = 60% → k_safe_intrinsic ≈ 0.133
+    → r_safe_intrinsic ≈ 0.067% (below R_MIN = 0.15%). Engine must FAIL.
+    """
+    folds = _synthesise_thin_dd_folds(worst_dd=0.60)
+    res = classify_amended_fold_stats(
+        folds=folds,
+        chained_max_dd_base_pct=0.60,
+        per_day_max_dd_df=None,
+        holdout_stats_at_r_safe=None,
+        holdout_stats_at_r_hard=None,
+        sizing_convention="reset_floor",
+    )
+    assert res.verdict == AmendedVerdict.FAIL
+    assert res.primary_failure_mode == PrimaryFailureMode.STEP5_NOT_SCALABLE
+    assert res.r_safe_capped_at_rmax is False
+
+
+def test_r_safe_intrinsic_in_range_unchanged() -> None:
+    """Amendment 3.1: when intrinsic r_safe ∈ [R_MIN, R_MAX], behaviour
+    identical to pre-amendment. r_safe_capped_at_rmax = False;
+    r_safe_pct == r_safe_intrinsic_pct.
+    """
+    # worst_fold_dd = 8% → k_safe = 1.0 → r_safe = 0.5% (in range)
+    sf = compute_scaling_factors(0.08, r_base=0.005)
+    assert sf.r_safe_capped_at_rmax is False
+    assert sf.r_hard_capped_at_rmax is False
+    assert sf.r_safe_pct == pytest.approx(0.005, abs=1e-9)
+    assert sf.r_safe_intrinsic_pct == pytest.approx(0.005, abs=1e-9)
+    assert sf.r_safe_pct == sf.r_safe_intrinsic_pct
+    assert sf.r_hard_pct == sf.r_hard_intrinsic_pct
+    assert sf.scalable_to_safe is True
+
+
+def test_zero_dd_still_fails() -> None:
+    """Amendment 3.1 preserves the zero-DD edge case: worst_fold_dd = 0
+    → k = ∞ → step5_not_scalable (DD literally unmeasurable, distinct
+    from "too clean to scale").
+    """
+    folds = tuple(
+        FoldStats(
+            fold_id=i + 1, n_trades=50,
+            roi_pct=0.03, max_dd_pct=0.0,     # zero DD
+            days_breaching_daily_5pct=0, roi_dd_ratio=999.0,
+        )
+        for i in range(11)
+    )
+    res = classify_amended_fold_stats(
+        folds=folds,
+        chained_max_dd_base_pct=0.0,
+        per_day_max_dd_df=None,
+        holdout_stats_at_r_safe=None,
+        holdout_stats_at_r_hard=None,
+        sizing_convention="reset_floor",
+    )
+    assert res.verdict == AmendedVerdict.FAIL
+    assert res.primary_failure_mode == PrimaryFailureMode.STEP5_NOT_SCALABLE
+    assert res.r_safe_capped_at_rmax is False
+
+
+def test_r_hard_caps_at_rmax_symmetric() -> None:
+    """Amendment 3.1: cap mechanics are symmetric for r_hard.
+
+    Same construction as test_r_safe_caps_at_rmax_when_intrinsic_overshoots,
+    but verifies that the r_hard intrinsic is independently capped, flagged,
+    and exposed. ``scalable_to_hard`` stays True (no FAIL on overshoot);
+    intrinsic and deploy values both populated.
+
+    (Note: with the same low-DD construction as test 1, both r_safe AND
+    r_hard cap and the verdict is PASS-DEPLOYABLE. The point of this test
+    is the r_hard symmetry of the cap mechanics, not differentiating
+    DEPLOYABLE from VIABLE — which is handled by other gates.)
+    """
+    folds = tuple(
+        FoldStats(
+            fold_id=i + 1, n_trades=50,
+            roi_pct=0.04, max_dd_pct=0.01,    # 1% DD → r_hard_intrinsic = 5% > R_MAX
+            days_breaching_daily_5pct=0, roi_dd_ratio=4.0,
+        )
+        for i in range(11)
+    )
+    res = classify_amended_fold_stats(
+        folds=folds,
+        chained_max_dd_base_pct=0.015,
+        per_day_max_dd_df=_good_per_day_df(),
+        holdout_stats_at_r_safe=_good_holdout(),
+        holdout_stats_at_r_hard=_good_holdout(),
+        sizing_convention="reset_floor",
+    )
+    # Worst-fold DD = 0.01 → k_hard_intrinsic = 10 → r_hard_intrinsic = 5% > R_MAX
+    assert res.r_hard_capped_at_rmax is True
+    assert res.r_hard_pct == pytest.approx(R_MAX, abs=1e-9)
+    assert res.r_hard_intrinsic_pct == pytest.approx(0.05, abs=1e-9)
+    assert res.scalable_to_hard is True
+    # And the r_safe cap is symmetric (test 1 covers PASS-DEPLOYABLE
+    # verdict explicitly; here we just confirm r_hard mechanics)
+    assert res.r_safe_capped_at_rmax is True
+    assert res.r_safe_pct == pytest.approx(R_MAX, abs=1e-9)
+
+
+def test_capped_chained_dd_correctly_below_8pp() -> None:
+    """Amendment 3.1: when r_safe is capped at R_MAX, realised chained
+    DD at the cap is < 8% by construction — strategy is too risk-
+    efficient to fully consume the budget.
+
+    Synthetic: intrinsic r_safe = 4% (worst_fold_dd = 1%), base chained
+    DD = 1.5%. Capped k_safe_deploy = R_MAX / r_base = 0.02 / 0.005 = 4.0
+    → scaled chained DD = 1.5% × 4.0 = 6.0%, below the 8% safety budget.
+    """
+    sf = compute_scaling_factors(0.01, r_base=0.005)
+    assert sf.r_safe_capped_at_rmax is True
+    assert sf.k_safe == pytest.approx(R_MAX / 0.005, abs=1e-9)
+    assert sf.k_safe == pytest.approx(4.0, abs=1e-9)
+    base_chained = 0.015
+    scaled_chained = base_chained * sf.k_safe
+    assert scaled_chained == pytest.approx(0.060, abs=1e-9)
+    assert scaled_chained < 0.08   # below DEPLOYABLE 8% safety budget
+    # Also confirm via the gate: chained DD comfortably under cap → PASS-DEPLOYABLE
+    folds = tuple(
+        FoldStats(
+            fold_id=i + 1, n_trades=50,
+            roi_pct=0.04, max_dd_pct=0.01,
+            days_breaching_daily_5pct=0, roi_dd_ratio=4.0,
+        )
+        for i in range(11)
+    )
+    res = classify_amended_fold_stats(
+        folds=folds,
+        chained_max_dd_base_pct=base_chained,
+        per_day_max_dd_df=_good_per_day_df(),
+        holdout_stats_at_r_safe=_good_holdout(),
+        holdout_stats_at_r_hard=None,
+        sizing_convention="reset_floor",
+    )
+    assert res.verdict == AmendedVerdict.PASS_DEPLOYABLE
+    assert res.chained_max_dd_at_r_safe_pct == pytest.approx(0.060, abs=1e-9)
+
+
+def test_arc_7_v3_0_2_passes_under_amendment_3_1() -> None:
+    """Arc 7 v3.0.2 motivating scenario: 10/10 positive folds, worst-fold
+    DD = 1.26%, worst-fold ratio = 4.36, chained DD = 2.09% — at
+    r_base = 0.5%. Pre-Amendment-3.1 FAILed step5_not_scalable
+    (intrinsic r_safe = 3.16% > R_MAX). Under Amendment 3.1, r_safe is
+    capped at R_MAX = 2.0% and the candidate clears PASS-DEPLOYABLE.
+    """
+    # Build 10 positive folds whose roll-up reproduces the Arc 7 v3.0.2 numbers
+    folds = list(
+        FoldStats(
+            fold_id=i + 1, n_trades=50,
+            roi_pct=0.10, max_dd_pct=0.008,
+            days_breaching_daily_5pct=0, roi_dd_ratio=12.5,
+        )
+        for i in range(10)
+    )
+    # Force fold 1 to be the worst-fold: ratio = 4.36, DD = 1.26%
+    folds[0] = FoldStats(
+        fold_id=1, n_trades=50,
+        roi_pct=0.0126 * 4.36, max_dd_pct=0.0126,
+        days_breaching_daily_5pct=0, roi_dd_ratio=4.36,
+    )
+    res = classify_amended_fold_stats(
+        folds=tuple(folds),
+        chained_max_dd_base_pct=0.0209,
+        per_day_max_dd_df=_good_per_day_df(),
+        holdout_stats_at_r_safe=_good_holdout(),
+        holdout_stats_at_r_hard=None,
+        sizing_convention="reset_floor",
+        r_base=0.005,
+    )
+    assert res.verdict == AmendedVerdict.PASS_DEPLOYABLE
+    assert res.primary_failure_mode == PrimaryFailureMode.NONE
+    assert res.r_safe_capped_at_rmax is True
+    assert res.r_safe_pct == pytest.approx(R_MAX, abs=1e-9)
+    # Intrinsic r_safe = 0.005 × (8.0 / 1.26) ≈ 3.17%
+    assert res.r_safe_intrinsic_pct == pytest.approx(0.005 * 8.0 / 1.26, abs=1e-4)
+
+
+def _synthesise_thin_dd_folds(*, worst_dd: float) -> tuple[FoldStats, ...]:
+    """11 folds with worst-fold DD = ``worst_dd`` (used by floor-test).
+    Filler folds use comfortable values; the worst-fold DD drives the
+    scalability check exclusively.
+    """
+    folds = [
+        FoldStats(
+            fold_id=1, n_trades=50,
+            roi_pct=-0.10, max_dd_pct=worst_dd,
+            days_breaching_daily_5pct=0,
+            roi_dd_ratio=-0.10 / worst_dd if worst_dd > 0 else 0.0,
+        )
+    ]
+    for i in range(2, 12):
+        folds.append(FoldStats(
+            fold_id=i, n_trades=50,
+            roi_pct=0.03, max_dd_pct=0.04,
+            days_breaching_daily_5pct=0, roi_dd_ratio=0.75,
+        ))
+    return tuple(folds)

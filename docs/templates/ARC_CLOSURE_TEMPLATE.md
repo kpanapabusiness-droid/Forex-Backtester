@@ -94,8 +94,12 @@ tracker_payload:
       max_pct: <float or null>
     k_safe: <float or null>
     k_hard: <float or null>
-    r_safe_pct: <float or null>
-    r_hard_pct: <float or null>
+    r_safe_pct: <float or null>           # POST-CAP (Amendment 3.1: min(r_intrinsic, r_max))
+    r_hard_pct: <float or null>           # POST-CAP
+    r_safe_intrinsic_pct: <float or null> # NEW (Amendment 3.1): pre-cap value, for audit
+    r_hard_intrinsic_pct: <float or null> # NEW (Amendment 3.1): pre-cap value, for audit
+    r_safe_capped_at_rmax: <bool>         # NEW (Amendment 3.1): true if intrinsic overshot r_max
+    r_hard_capped_at_rmax: <bool>         # NEW (Amendment 3.1): true if intrinsic overshot r_max
     scalable_to_safe: <bool or null>
     scalable_to_hard: <bool or null>
     worst_fold_roi_at_r_safe_pct: <float or null>
@@ -419,6 +423,7 @@ Parser specification (preserved here for reference):
 | v1.3 | 2026-05-24 | L_PROTOCOL Amendment 4 — Step 6 causal-audit framework. New `§1 tracker_payload.step_6` block (`ran`, `trigger`, `overall_passed`, `manifest_path`, `categories`, `critical_failures`, `warnings_count`, `verdict_impact`). REQUIRED for any v1.3 PASS verdict. Parser v1.3 detection precedence: explicit `template_version: v1.3` → v1.3-exclusive `step_6` field → fall-through to v1.2 detection. Phase 2 tightening bundled (PR-186-merge-date cutoff): for any PASS verdict with `closed_timestamp > 2026-05-23T06:20:59Z` the parser REQUIRES Amendment 3 fields in `best_architecture`; for v1.3 PASS verdicts the parser ADDITIONALLY requires the `step_6` block + `step_6.overall_passed: true`. Closures landed before the cutoff (v1.0/v1.1/v1.2/v1.2.1) are grandfathered. |
 | v1.3.1 | 2026-05-23 | L_PROTOCOL Amendment 5 — AUC-gated A2/A6 architecture selection. New top-level optional field `architectures_skipped_by_amendment_5` (subset of `{A1..A6}`, may be `[]`). Captures architectures admissible under Amendment 1's archetype-driven rule but skipped under Amendment 5's four-gate AUC-driven rule. Phase 1: parser accepts presence or absence on all closures. Phase 2: parser REQUIRES the field on any PASS verdict whose `closed_timestamp > AMENDMENT_5_CUTOFF_ISO` (placeholder `2026-05-23T00:00:00Z`; backfilled with this PR's merge timestamp post-merge). v1.3 / v1.3.1 share the same `template_version: v1.3` declaration — the field's presence/absence is the v1.3.1 discriminator. Mirrors the v1.2 / v1.2.1 `chained_dd_method` rollout pattern. |
 | v1.3.1+ | 2026-05-25 | L_PROTOCOL Amendment 5.1 — Gate 4 PASS-tier-constituent qualifier. Field `architectures_skipped_by_amendment_5` accepts new reason string `a5_gate_4_admission_blocked_by_no_pass_tier_constituent`. No version bump; documentation-only extension. |
+| v1.3.1+ (Amendment 3.1) | 2026-05-25 | `r_max` reframed as deployment cap (not gate). New optional fields `r_safe_intrinsic_pct`, `r_hard_intrinsic_pct`, `r_safe_capped_at_rmax`, `r_hard_capped_at_rmax`. `r_safe_pct` / `r_hard_pct` now record post-cap deploy values. No template version bump; no enum change. |
 
 Closures MUST reference the template version they were written against (e.g., `template_version: v1.2` near the top of `§1 tracker_payload` is the convention going forward — pre-v1.1 closures without this field are assumed v1.0; pre-v1.2 closures without `config_artefact_path` are assumed v1.1). v1.2.1 stays under the `v1.2` declaration; the `chained_dd_method` field is the only discriminator and is OPTIONAL during Phase 1. v1.3.1 stays under the `v1.3` declaration; the `architectures_skipped_by_amendment_5` field is the only discriminator and is OPTIONAL during Phase 1.
 

@@ -209,3 +209,99 @@ tests/test_features_individual.py 23 passed
 ## Footer update: `engine_capability_audit_2026_05.md`
 
 Signal-level EET alignment gap: MISSING → **WIRED**. See this audit doc + canonical utility at `core/signals/htf_alignment.py`.
+
+---
+
+## 2026-05-25 — `_w1_close_slope_sign` State A classification SUPERSEDED
+
+The 2026-05 audit (this doc, row at line 113 of the per-module table)
+classified `core/features/multi_tf.py::_w1_close_slope_sign` as State A
+under both UTC and EET, with the note "Already uses `merge_asof` against
+actual W1 timestamps; tz-invariant by construction". This classification
+was incomplete: the audit checked for the **timezone-shift** lookahead
+fault class (UTC-anchored `.floor()`/`.normalize()` keys against
+EET-shifted HTF labels) but missed a separate **within-period**
+lookahead fault class.
+
+### The within-period lookahead bug
+
+W1 panels are produced by `core/data/aggregator.py` at `freq='W-MON'`
+with `label='left'`, `closed='left'` — so the W1 bar for week N has its
+index timestamp at the Monday 00:00 UTC of week N but its `close_bid` /
+`close_ask` columns hold the END-OF-WEEK close (Sunday 23:59 UTC of
+week N). The pre-fix producer used:
+
+```python
+merged = pd.merge_asof(df, w1_pos, on='_t', direction='backward',
+                       allow_exact_matches=False)
+```
+
+At any H4 timestamp **strictly after** Monday 00:00 of week N (i.e.
+every mid-week H4 bar from Monday 00:00:01 through Sunday 23:59:59),
+`merge_asof(direction='backward')` returns week N's W1 bar — whose
+`close` is the **eventual** Sunday close. The producer then computed
+`sign(close[N] - close[N-1])`, leaking the future Sunday close as a
+sign-of-slope feature on every mid-week H4 bar.
+
+Convention-independent: this happens identically under UTC and EET
+storage (the bug is in the producer's alignment to its own panel, not
+in any tz-shift) — which is why the 2026-05 audit's State-A
+classification (looking only for tz-shift) missed it.
+
+### Identification
+
+Bug identified by Arc 8 v3.0.2 + Arc 10 v3.0.2 CC chat audits. The
+three sibling D1 producers (`_d1_close_slope_sign`,
+`_d1_close_slope_magnitude`, `_d1_atr_percentile_100`) plus the shared
+helper `_build_d1_lag1_series` were already canonical
+(`get_htf_value_at(..., require_fully_closed=True)`); the W1 producer
+was the lone non-canonical case in this file.
+
+### Fix
+
+Replaced the `merge_asof` body with the canonical
+`get_htf_value_at(..., require_fully_closed=True)` pattern that mirrors
+the D1 producers in the same file. The fix is purely an HTF-alignment
+swap — the slope is still pre-computed on the W1 series via `shift(1)`,
+just looked up at the **most recently fully-closed W1 bar** (week N-1
+when mid-week N) instead of the `merge_asof`-resolved same-week bar.
+
+Landed via PR `engine/w1_producer_canonical_alignment` (2026-05-25):
+
+- `core/features/multi_tf.py::_w1_close_slope_sign` rewritten.
+- `tests/test_features_multi_tf.py` added: three regression tests
+  covering within-week lookahead, lag correctness at multiple H4
+  timestamps, and a static source guard against `merge_asof`
+  reintroduction.
+
+### Updated classification
+
+The State A classification for `_w1_close_slope_sign` (line 113 above)
+now stands accurately post-fix. The pre-fix state was **State B under
+both UTC and EET** (silent within-period lookahead, convention-
+independent), not State A as previously documented.
+
+### Cross-arc impact
+
+Affected v3.0 / v3.0.x runs whose feature pipelines consumed
+`w1_close_slope_sign` (any arc whose Step 1 builds the full feature
+matrix). KH-24 is **not** affected: KH-24's signal config does not
+consume this feature (verified by grep against
+`configs/replays_v2_1_1/kh24*.yaml` and `core/strategies/kh24/`).
+
+### Future audits
+
+Audits of feature/signal pipelines must include **within-period**
+lookahead checks in addition to **timezone-shift** checks. The two
+fault classes are independent:
+
+- *Timezone-shift* — `.floor()`/`.normalize()`-derived keys against
+  EET-shifted HTF labels (the 2026-05 audit's focus).
+- *Within-period* — `merge_asof(direction='backward')` (or equivalent
+  soft-prior lookup) against `label='left'` HTF bars: at any LTF
+  timestamp inside HTF period N strictly after N's label, the lookup
+  returns N's bar with N's eventual close — a leak independent of tz.
+
+The canonical utility `get_htf_value_at(..., require_fully_closed=True)`
+defends against both by construction (the `bar_end[k] <= ts` check is
+both tz-invariant AND strict-period-closure).

@@ -621,9 +621,19 @@ def run(cfg_path: Path, *, write_manifest_flag: bool = True) -> dict:
     folds = _build_folds(SEARCH_START, SEARCH_END, N_SEARCH_FOLDS)
     holdout_folds = [(pd.Timestamp(HOLDOUT_START, tz="UTC"), pd.Timestamp(HOLDOUT_END, tz="UTC"))]
 
-    candidates = cap[cap["candidate_at_best_sl"] == True].copy()  # noqa
+    # L_PROTOCOL trades-per-fold gate is ≥25 — clusters with n<25 cannot
+    # support Step 5 architecture search (e.g. Arc 10 v3.0.2 EET c2 outlier
+    # n=1 vacuously passing the candidate-flag). Mirrors step_4.py min-n filter.
+    MIN_N_FOR_STEP_5 = 25
+    eligible_cap = cap[cap["n"] >= MIN_N_FOR_STEP_5]
+    candidates = eligible_cap[eligible_cap["candidate_at_best_sl"] == True].copy()  # noqa
     if len(candidates) == 0:
-        candidates = cap.sort_values("composite", ascending=False).head(1)
+        if len(eligible_cap) == 0:
+            raise RuntimeError(
+                f"No clusters with n >= {MIN_N_FOR_STEP_5}; cannot run Step 5. "
+                f"cap rows: {cap[['cluster_id','n']].to_dict('records')}"
+            )
+        candidates = eligible_cap.sort_values("composite", ascending=False).head(1)
     candidates = candidates.reset_index(drop=True)
 
     feature_cols = [

@@ -585,12 +585,15 @@ def run(cfg_path: Path, *, write_manifest_flag: bool = True) -> dict:
     paths_path = REPO_ROOT / cfg["output"]["results_dir"] / "trade_paths.parquet"
     paths = pd.read_parquet(paths_path)
 
-    assignments = pd.read_parquet(REPO_ROOT / "results/l_arc_10/step_2/cluster_assignments.parquet")
+    # Arc root + step dirs derived from Step 1 results_dir. Byte-identical
+    # resolution for Arc 10 v3.0; correct routing for Arc 10 v3.0.2.
+    arc_root = REPO_ROOT / Path(cfg["output"]["results_dir"]).parent
+    assignments = pd.read_parquet(arc_root / "step_2" / "cluster_assignments.parquet")
     pool = pool.merge(
         assignments[["trade_id", "cluster_primary", "archetype_primary", "primary_K"]], on="trade_id", how="left"
     )
-    cap = pd.read_csv(REPO_ROOT / "results/l_arc_10/step_3/capturability.csv")
-    step4_cluster_summary_files = list((REPO_ROOT / "results/l_arc_10/step_4").glob("manifest.json"))
+    cap = pd.read_csv(arc_root / "step_3" / "capturability.csv")
+    step4_cluster_summary_files = list((arc_root / "step_4").glob("manifest.json"))
     import json as _json
     step4 = _json.loads(step4_cluster_summary_files[0].read_text()) if step4_cluster_summary_files else {}
     step4_per_cluster = step4.get("per_cluster_summary", {})
@@ -598,7 +601,7 @@ def run(cfg_path: Path, *, write_manifest_flag: bool = True) -> dict:
     # Convert cluster keys back to int (JSON serialization changes int keys to strings)
     step4_per_cluster = {int(k): v for k, v in step4_per_cluster.items()}
 
-    out_dir = REPO_ROOT / "results/l_arc_10/step_5"
+    out_dir = arc_root / "step_5"
     out_dir.mkdir(parents=True, exist_ok=True)
 
     # Window slicing — for the WFO runner we always pass the full pre-OOS history

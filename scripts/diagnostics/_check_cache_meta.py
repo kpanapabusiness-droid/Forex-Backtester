@@ -1,5 +1,5 @@
-from pathlib import Path
 import json
+from pathlib import Path
 
 ROOT = Path("C:/Users/panap/Documents/Forex-Backtester/data/cache")
 for tf in ("H4", "D1", "W1"):

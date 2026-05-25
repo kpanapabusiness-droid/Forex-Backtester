@@ -30,7 +30,7 @@ def main():
                 print(f"  base_size ratio r=2%/r=0.5%: min={ratios_finite.min():.4f}, "
                       f"max={ratios_finite.max():.4f}, mean={ratios_finite.mean():.4f} "
                       f"(expected 4.0 for linear scaling)")
-            print(f"  First admit row diff (sized columns):")
+            print("  First admit row diff (sized columns):")
             for col in ("base_size", "account_balance_at_signal", "proba", "mult"):
                 print(f"    {col}: r=0.5%={admitted_a.iloc[0][col]}, r=2%={admitted_b.iloc[0][col]}")
 

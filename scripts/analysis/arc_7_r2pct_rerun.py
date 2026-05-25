@@ -605,7 +605,7 @@ def run_deliverable_a(
     summary_md.append("# Step 5 — WFO Summary (Arc 7 r=2%)\n")
     summary_md.append(f"**Config:** `{WINNING_CONFIG_ID}`")
     summary_md.append(f"**r_base:** {R_BASE:.4%}  (canonical: {R_CANONICAL:.4%})")
-    summary_md.append(f"**Boundary convention:** 5ers_eet")
+    summary_md.append("**Boundary convention:** 5ers_eet")
     summary_md.append(f"**Window end:** {window_end_str}")
     summary_md.append("")
     summary_md.append("## Per-fold OOS metrics")
@@ -722,7 +722,7 @@ def run_deliverable_b(
         architecture=arch, signal_evaluation=signal_eval,
         panels=panels, run_context=base_ctx,
     )
-    stats = runner(cont_fold, cfg)
+    _ = runner(cont_fold, cfg)  # discard stats; only equity curve + ledger needed
     sr = runner.last_result
     elapsed = time.perf_counter() - t0
     log.info("Deliverable B sim done in %.1fs (%.1fmin)", elapsed, elapsed / 60.0)

@@ -46,7 +46,6 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
-from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -56,16 +55,14 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 # Reuse helpers from the existing analysis driver
-from scripts.analysis.arc_7_r2pct_rerun import (  # noqa: E402
-    CLUSTER_ID, LOWER_THR, MAX_PER_CURRENCY, PAIRS_28, SL_MULT, STARTING_BALANCE,
-    UPPER_THR, WINNING_CONFIG_ID,
-    _build_panel_5ers_eet, _build_per_trade_features, _load_v301,
-)
-
 from core.arc.signal_protocol import SignalEvaluation  # noqa: E402
-from core.architectures.a1_system_level_filter import A1RunContext, _slice_panels_to_fold  # noqa: E402
+from core.architectures.a1_system_level_filter import (  # noqa: E402
+    A1RunContext,
+    _slice_panels_to_fold,
+)
 from core.architectures.a6_meta_labeling import (  # noqa: E402
-    A6Architecture, A6Config, _confidence_to_multiplier,
+    A6Config,
+    _confidence_to_multiplier,
 )
 from core.determinism import seed_everything  # noqa: E402
 from core.runners._fold_stats_helpers import build_fold_stats_from_run  # noqa: E402
@@ -82,6 +79,19 @@ from core.strategies.liquidity_sweep_reclaim_long.signal_module import (  # noqa
     LiquiditySweepReclaimLongSignal,
 )
 from core.wfo.folds import build_v3_folds  # noqa: E402
+from scripts.analysis.arc_7_r2pct_rerun import (  # noqa: E402
+    CLUSTER_ID,
+    LOWER_THR,
+    MAX_PER_CURRENCY,
+    PAIRS_28,
+    SL_MULT,
+    STARTING_BALANCE,
+    UPPER_THR,
+    WINNING_CONFIG_ID,
+    _build_panel_5ers_eet,
+    _build_per_trade_features,
+    _load_v301,
+)
 
 log = logging.getLogger("risk_leak_diag")
 
@@ -288,12 +298,13 @@ class InstrumentedBacktester(MultiPairBacktester):
         Bytes-equivalent to the base implementation modulo logging:
         same call order, same skip conditions, same fill path.
         """
-        from core.spread.real_spread import is_tradable_bar
         from core.sim.exit_policies import (
-            ExitPolicyContext, build_exit_policy,
+            ExitPolicyContext,
+            build_exit_policy,
         )
         from core.sim.fill import long_entry_fill_price, short_entry_fill_price
         from core.sim.multipair_backtester import _bar_field
+        from core.spread.real_spread import is_tradable_bar
 
         filled = []
         for order in self._pending:

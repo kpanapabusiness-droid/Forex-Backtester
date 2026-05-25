@@ -30,7 +30,6 @@ import argparse
 import logging
 import sys
 import time
-from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
 
@@ -40,35 +39,56 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from core.determinism import seed_everything  # noqa: E402
-from core.runners.arc_fold_runner import ArcFoldRunner  # noqa: E402
-from core.wfo.folds import build_v3_folds  # noqa: E402
-from core.steps.step_4_extraction import Step4Result  # noqa: E402
 from core.architectures.a1_system_level_filter import A1RunContext  # noqa: E402
 from core.architectures.a6_meta_labeling import A6Architecture  # noqa: E402
+from core.determinism import seed_everything  # noqa: E402
+from core.runners.arc_fold_runner import ArcFoldRunner  # noqa: E402
+from core.steps.classifier_persistence import build_a6_config_from_step4  # noqa: E402
+from core.steps.step_4_extraction import Step4Result  # noqa: E402
 from core.strategies.liquidity_sweep_reclaim_long.signal_module import (  # noqa: E402
     LiquiditySweepReclaimLongSignal,
+)
+from core.wfo.folds import build_v3_folds  # noqa: E402
+
+# ANALYSIS driver helpers
+from scripts.analysis.arc_7_r2pct_rerun import (  # noqa: E402
+    CLUSTER_ID,
+    LOWER_THR,
+    MAX_PER_CURRENCY,
+    SL_MULT,
+    STARTING_BALANCE,
+    UPPER_THR,
+    WINNING_CONFIG_ID,
+)
+from scripts.analysis.arc_7_r2pct_rerun import (  # noqa: E402
+    PAIRS_28 as ANALYSIS_PAIRS,
+)
+from scripts.analysis.arc_7_r2pct_rerun import (  # noqa: E402
+    _build_panel_5ers_eet as analysis_build_panel,
+)
+from scripts.analysis.arc_7_r2pct_rerun import (  # noqa: E402
+    _build_per_trade_features as analysis_build_features,
+)
+from scripts.analysis.arc_7_r2pct_rerun import (  # noqa: E402
+    _load_v301 as analysis_load_v301,
 )
 
 # V302 driver helpers
 from scripts.l_arc_7_v3_0_2.run import (  # noqa: E402
     PAIRS_28 as V302_PAIRS,
-    _build_panel_5ers_eet as v302_build_panel,
+)
+from scripts.l_arc_7_v3_0_2.run import (  # noqa: E402
     _build_a6_configs as v302_build_a6_configs,
+)
+from scripts.l_arc_7_v3_0_2.run import (  # noqa: E402
+    _build_panel_5ers_eet as v302_build_panel,
+)
+from scripts.l_arc_7_v3_0_2.run import (  # noqa: E402
     _build_per_trade_features_for_a2_a6 as v302_build_features,
+)
+from scripts.l_arc_7_v3_0_2.run import (  # noqa: E402
     _load_v301 as v302_load_v301,
 )
-
-# ANALYSIS driver helpers
-from scripts.analysis.arc_7_r2pct_rerun import (  # noqa: E402
-    CLUSTER_ID, LOWER_THR, MAX_PER_CURRENCY, PAIRS_28 as ANALYSIS_PAIRS,
-    SL_MULT, STARTING_BALANCE, UPPER_THR, WINNING_CONFIG_ID,
-    _build_panel_5ers_eet as analysis_build_panel,
-    _build_per_trade_features as analysis_build_features,
-    _load_v301 as analysis_load_v301,
-)
-from core.steps.classifier_persistence import build_a6_config_from_step4  # noqa: E402
-
 
 log = logging.getLogger("driver_script_diff")
 

@@ -50,7 +50,6 @@ What is NOT asserted:
 
 from __future__ import annotations
 
-from dataclasses import replace
 from datetime import date
 
 import numpy as np
@@ -58,13 +57,16 @@ import pandas as pd
 import pytest
 
 from core.architectures.a1_system_level_filter import (
-    A1Architecture, A1Config, A1RunContext,
+    A1Architecture,
+    A1Config,
+    A1RunContext,
 )
 from core.architectures.a6_meta_labeling import A6Architecture, A6Config
 from core.determinism import seed_everything
 from core.wfo.folds import Fold
 from tests.protocol_runtime._fixtures import (
-    SyntheticSignal, build_synthetic_panel,
+    SyntheticSignal,
+    build_synthetic_panel,
 )
 
 

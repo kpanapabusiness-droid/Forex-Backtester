@@ -1,6 +1,7 @@
 """Quick data-range probe for the diagnostic."""
-import pandas as pd
 from pathlib import Path
+
+import pandas as pd
 
 CACHE_ROOT = Path("C:/Users/panap/Documents/Forex-Backtester/data/cache")
 for tf in ("H4", "D1", "W1"):

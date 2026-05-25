@@ -227,10 +227,10 @@ This deferral is documented at three levels: this section, `core/heavy_ml_probe/
 
 ## Expected compute cost
 
-Per arc:
-- AutoML training: ~2-6 hours per cluster on standard hardware
-- Typical arc has 2-4 capturable clusters → ~8-24 hours total Step 4
-- Plus Step 5 with augmented architectures: ~2-4 hours additional
-- Total: half a day to a day per heavy-ML-augmented arc
+**Per cluster: ~10-30 minutes at production scale** (n ≈ 5000, 28 pairs × 11 years, 11-fold TimeSeriesSplit, `max_iter_per_fold=1000`). AutoML dominates wall-clock; Cox PH adds negligible overhead (~1-2s per fold at n_train ≈ 2500); meta-labeling reuses the AutoML wrapper with the reach-1R-before-SL target.
 
-Reason to invoke selectively — not on every arc.
+The original spec estimate of 2-6 hours was a conservative pre-build ceiling. Empirical measurement during PR-B development (synthetic-pool wall-clock with linear extrapolation) and PR-D (Cox PH production-scale probe) showed AutoML wall-clock is substantially lower than the pre-build ceiling. The exact production number will land in the first heavy_ml_probe arc's closure doc — until then the 10-30 min estimate is the right planning target.
+
+Per typical arc with 2-4 capturable clusters: ~1-2 hours total Step 4.
+
+Still selective per the discipline rules — AutoML's compute is bounded by `max_iter=1000` per fold, but feature-engineering and pool construction upstream remain the bigger arc-cost drivers.

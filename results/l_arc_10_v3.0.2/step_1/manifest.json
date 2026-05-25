@@ -1,0 +1,246 @@
+{
+  "arc_name": "l_arc_10_v3.0.2",
+  "boundary_convention": "5ers_eet",
+  "determinism": {
+    "line_terminator": "\\n",
+    "n_jobs": 1,
+    "random_state": 42
+  },
+  "env": {
+    "lightgbm": "4.6.0",
+    "numpy": "2.4.4",
+    "pandas": "3.0.2",
+    "python": "3.14.0",
+    "sklearn": "1.8.0"
+  },
+  "integrity_summary": {
+    "d1_lag_nan_perturbation_n_checked": 5,
+    "d1_lag_nan_perturbation_passed": true,
+    "lookahead_spotcheck_n_checked": 10,
+    "lookahead_spotcheck_passed": true,
+    "pool_gate_passed": true,
+    "pool_size": 3152
+  },
+  "pairs": [
+    "AUDCAD",
+    "AUDCHF",
+    "AUDJPY",
+    "AUDNZD",
+    "AUDUSD",
+    "CADCHF",
+    "CADJPY",
+    "CHFJPY",
+    "EURAUD",
+    "EURCAD",
+    "EURCHF",
+    "EURGBP",
+    "EURJPY",
+    "EURNZD",
+    "EURUSD",
+    "GBPAUD",
+    "GBPCAD",
+    "GBPCHF",
+    "GBPJPY",
+    "GBPNZD",
+    "GBPUSD",
+    "NZDCAD",
+    "NZDCHF",
+    "NZDJPY",
+    "NZDUSD",
+    "USDCAD",
+    "USDCHF",
+    "USDJPY"
+  ],
+  "per_pair_stats": {
+    "AUDCAD": {
+      "signals_fired": 131,
+      "skipped_bad_atr": 0,
+      "skipped_post_signal_no_entry_bar": 0,
+      "trades_emitted": 131
+    },
+    "AUDCHF": {
+      "signals_fired": 131,
+      "skipped_bad_atr": 0,
+      "skipped_post_signal_no_entry_bar": 0,
+      "trades_emitted": 131
+    },
+    "AUDJPY": {
+      "signals_fired": 101,
+      "skipped_bad_atr": 0,
+      "skipped_post_signal_no_entry_bar": 0,
+      "trades_emitted": 101
+    },
+    "AUDNZD": {
+      "signals_fired": 107,
+      "skipped_bad_atr": 0,
+      "skipped_post_signal_no_entry_bar": 0,
+      "trades_emitted": 107
+    },
+    "AUDUSD": {
+      "signals_fired": 112,
+      "skipped_bad_atr": 0,
+      "skipped_post_signal_no_entry_bar": 0,
+      "trades_emitted": 112
+    },
+    "CADCHF": {
+      "signals_fired": 133,
+      "skipped_bad_atr": 0,
+      "skipped_post_signal_no_entry_bar": 0,
+      "trades_emitted": 133
+    },
+    "CADJPY": {
+      "signals_fired": 110,
+      "skipped_bad_atr": 0,
+      "skipped_post_signal_no_entry_bar": 0,
+      "trades_emitted": 110
+    },
+    "CHFJPY": {
+      "signals_fired": 117,
+      "skipped_bad_atr": 0,
+      "skipped_post_signal_no_entry_bar": 0,
+      "trades_emitted": 117
+    },
+    "EURAUD": {
+      "signals_fired": 118,
+      "skipped_bad_atr": 0,
+      "skipped_post_signal_no_entry_bar": 0,
+      "trades_emitted": 118
+    },
+    "EURCAD": {
+      "signals_fired": 111,
+      "skipped_bad_atr": 0,
+      "skipped_post_signal_no_entry_bar": 0,
+      "trades_emitted": 111
+    },
+    "EURCHF": {
+      "signals_fired": 124,
+      "skipped_bad_atr": 0,
+      "skipped_post_signal_no_entry_bar": 0,
+      "trades_emitted": 124
+    },
+    "EURGBP": {
+      "signals_fired": 118,
+      "skipped_bad_atr": 0,
+      "skipped_post_signal_no_entry_bar": 0,
+      "trades_emitted": 118
+    },
+    "EURJPY": {
+      "signals_fired": 109,
+      "skipped_bad_atr": 0,
+      "skipped_post_signal_no_entry_bar": 0,
+      "trades_emitted": 109
+    },
+    "EURNZD": {
+      "signals_fired": 113,
+      "skipped_bad_atr": 0,
+      "skipped_post_signal_no_entry_bar": 0,
+      "trades_emitted": 113
+    },
+    "EURUSD": {
+      "signals_fired": 93,
+      "skipped_bad_atr": 0,
+      "skipped_post_signal_no_entry_bar": 0,
+      "trades_emitted": 93
+    },
+    "GBPAUD": {
+      "signals_fired": 107,
+      "skipped_bad_atr": 0,
+      "skipped_post_signal_no_entry_bar": 0,
+      "trades_emitted": 107
+    },
+    "GBPCAD": {
+      "signals_fired": 125,
+      "skipped_bad_atr": 0,
+      "skipped_post_signal_no_entry_bar": 0,
+      "trades_emitted": 125
+    },
+    "GBPCHF": {
+      "signals_fired": 109,
+      "skipped_bad_atr": 0,
+      "skipped_post_signal_no_entry_bar": 0,
+      "trades_emitted": 109
+    },
+    "GBPJPY": {
+      "signals_fired": 100,
+      "skipped_bad_atr": 0,
+      "skipped_post_signal_no_entry_bar": 0,
+      "trades_emitted": 100
+    },
+    "GBPNZD": {
+      "signals_fired": 104,
+      "skipped_bad_atr": 0,
+      "skipped_post_signal_no_entry_bar": 0,
+      "trades_emitted": 104
+    },
+    "GBPUSD": {
+      "signals_fired": 101,
+      "skipped_bad_atr": 0,
+      "skipped_post_signal_no_entry_bar": 0,
+      "trades_emitted": 101
+    },
+    "NZDCAD": {
+      "signals_fired": 133,
+      "skipped_bad_atr": 0,
+      "skipped_post_signal_no_entry_bar": 0,
+      "trades_emitted": 133
+    },
+    "NZDCHF": {
+      "signals_fired": 123,
+      "skipped_bad_atr": 0,
+      "skipped_post_signal_no_entry_bar": 0,
+      "trades_emitted": 123
+    },
+    "NZDJPY": {
+      "signals_fired": 112,
+      "skipped_bad_atr": 0,
+      "skipped_post_signal_no_entry_bar": 0,
+      "trades_emitted": 112
+    },
+    "NZDUSD": {
+      "signals_fired": 91,
+      "skipped_bad_atr": 0,
+      "skipped_post_signal_no_entry_bar": 0,
+      "trades_emitted": 91
+    },
+    "USDCAD": {
+      "signals_fired": 104,
+      "skipped_bad_atr": 0,
+      "skipped_post_signal_no_entry_bar": 0,
+      "trades_emitted": 104
+    },
+    "USDCHF": {
+      "signals_fired": 109,
+      "skipped_bad_atr": 0,
+      "skipped_post_signal_no_entry_bar": 0,
+      "trades_emitted": 109
+    },
+    "USDJPY": {
+      "signals_fired": 106,
+      "skipped_bad_atr": 0,
+      "skipped_post_signal_no_entry_bar": 0,
+      "trades_emitted": 106
+    }
+  },
+  "protocol_version": "v3.0.2",
+  "risk_per_trade": 0.005,
+  "run_timestamp_utc": "2026-05-25 08:21:03",
+  "sha256": {
+    "config": "60dc956f04a98fcfe3db6eb663e40c5cd95ed5bef481b821736afe76dd2eee1d",
+    "integrity_report_md": "ec674b9e4fab7f1765c6c2669d9a76bdbc2fab0141eb118104d685508beff58a",
+    "pool_parquet": "d624212bf10b24e986a4cd1a625becfd08b7ce4e8dc7922df4c543e6aacab486",
+    "signal_module": "a68406c8dc3c860b14a57d1360836d5c7cd8a0e304fe45a55c5b8fa4cb82896d",
+    "trade_paths_parquet": "05dea9e08dc157f83da7a79549a45321f5c99e9c11f192c178c8f1729b9ee58a"
+  },
+  "signal_spec": "docs/archive/signal_specs/signal_spec_d1_swing_low_rejection_long_v0.1.md",
+  "step": "step_1",
+  "totals": {
+    "signals_fired": 3152,
+    "skipped_bad_atr": 0,
+    "skipped_post_signal_no_entry_bar": 0,
+    "trades_emitted": 3152
+  },
+  "window": {
+    "end": "2026-04-30",
+    "start": "2010-01-01"
+  }
+}

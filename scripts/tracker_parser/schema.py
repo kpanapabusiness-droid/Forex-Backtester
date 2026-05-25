@@ -32,11 +32,63 @@ the CLI layer before tracker mutations begin.
 
 from __future__ import annotations
 
+import sys
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 SchemaVersion = Literal["1.0", "1.1", "1.2", "1.3"]
+
+# Deferral sentinel strings recognised by the parser-tolerance layer.
+# Closures that ship with Amendment 3 evaluation deferred (e.g. while the
+# engine risk-decoupling investigation was open — see Arc 10 v3.0.2) populate
+# Amendment 3 risk-normalised fields with these literals instead of the typed
+# value. The pre-validator below converts the sentinel to ``None`` for
+# float/bool/int fields and emits a WARNING (not ERROR).
+#
+# Mirrors the Amendment 5.1 tolerance pattern in
+# ``VALID_ARCHITECTURES_SKIPPED_REASONS`` — accept a documented-deferred
+# string in lieu of a typed value, with the closure addendum responsible
+# for backfilling.
+PENDING_SENTINELS: frozenset[str] = frozenset({
+    "PENDING_AMENDMENT_3_ADDENDUM",
+    "PENDING_STEP_5",   # Arc 10 v3.0.2 scaffold artefact; backfilled in same PR but tolerated for re-runs
+    "PENDING_STEP_1",
+    "PENDING_STEP_2",
+})
+
+
+def _coerce_pending_to_none(payload: dict[str, Any], *, allow_str_fields: set[str] | None = None) -> dict[str, Any]:
+    """Walk a payload dict; replace PENDING_* sentinel strings with None for
+    type-incompatible fields. Emits a WARNING line per replaced field.
+
+    ``allow_str_fields`` names fields whose declared type is ``str`` — sentinels
+    in those fields are passed through verbatim (the type system accepts them).
+
+    Recursive: descends into nested dicts (e.g. ``per_day_max_dd_base_summary``).
+    """
+    if allow_str_fields is None:
+        allow_str_fields = set()
+    pending_fields: list[str] = []
+    for key, val in list(payload.items()):
+        if isinstance(val, str) and val in PENDING_SENTINELS:
+            if key in allow_str_fields:
+                # str-typed field accepts the sentinel verbatim; mapping layer
+                # treats it as "not yet populated" per closure addendum contract.
+                pending_fields.append(f"{key} (str-tolerated)")
+                continue
+            payload[key] = None
+            pending_fields.append(key)
+        elif isinstance(val, dict):
+            payload[key] = _coerce_pending_to_none(val, allow_str_fields=allow_str_fields)
+    if pending_fields:
+        print(
+            f"WARNING: tracker_parser coerced {len(pending_fields)} deferred "
+            f"field(s) from PENDING sentinel to None: {pending_fields}. "
+            f"Closure addendum is the source of truth for these fields.",
+            file=sys.stderr,
+        )
+    return payload
 
 # PR-186 merge cutoff for Phase 2 tightening (per chat Q7).
 # After this timestamp, PASS verdicts must carry Amendment 3 fields.
@@ -105,6 +157,11 @@ VALID_FAILURE_MODES = {
     "step5_wf_roi_below_gate",
     "other",
     "N/A",
+    # Deferral sentinel — Amendment 3 evaluation gated on engine fix or
+    # equivalent post-Step-5 work. Closure addendum backfills the real
+    # primary_failure_mode (N/A on PASS confirmation, or a concrete failure
+    # mode if scaled-rerun surfaces one).
+    "PENDING_AMENDMENT_3_ADDENDUM",
 }
 
 VALID_VERDICTS = {
@@ -248,6 +305,23 @@ class BestArchitectureV11(BaseModel):
     """v1.1 best_architecture block — renamed fields + Amendment 3 risk-normalised fields."""
 
     model_config = ConfigDict(extra="allow")
+
+    @model_validator(mode="before")
+    @classmethod
+    def _tolerate_pending_sentinels(cls, data: Any) -> Any:
+        """Convert deferred-Amendment-3 sentinel strings to None for type-incompatible
+        fields. The closure addendum is the source of truth — closure ships PROVISIONAL
+        with sentinels and the post-engine-fix-merge addendum backfills real values."""
+        if isinstance(data, dict):
+            return _coerce_pending_to_none(
+                data,
+                allow_str_fields={
+                    "per_day_max_dd_artefact_path",
+                    "chained_dd_method",
+                    "config_artefact_path",
+                },
+            )
+        return data
 
     name: str | None = None
     cluster: Any = None
@@ -458,7 +532,17 @@ class Step6Block(BaseModel):
     verdict_impact: str = "none"
 
 
-VALID_STEP6_TRIGGERS = {"auto_pass", "manual", "not_applicable"}
+VALID_STEP6_TRIGGERS = {
+    "auto_pass",
+    "manual",
+    "not_applicable",
+    # Deferral triggers — Step 6 gates on Amendment 3 PASS-tier classification
+    # per L_PROTOCOL §3 "Evaluation order"; defers when Amendment 3 defers.
+    # Closure addendum backfills with the actual trigger ("auto_pass" or
+    # "manual") once Amendment 3 produces a PASS-tier candidate.
+    "deferred_pending_amendment_3_addendum",
+    "deferred_pending_framework_patch_engine_step_6_a1_vacuous_pass",
+}
 VALID_STEP6_VERDICT_IMPACTS = {"none", "downgraded_to_fail"}
 
 

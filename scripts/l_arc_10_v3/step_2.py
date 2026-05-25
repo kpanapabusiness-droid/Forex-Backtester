@@ -118,7 +118,12 @@ def run(cfg_path: Path, *, write_manifest_flag: bool = True) -> dict:
     pool = pd.read_parquet(pool_path)
     pool_size = int(len(pool))
 
-    out_dir = REPO_ROOT / "results/l_arc_10/step_2"
+    # Arc root derived from Step 1 output_dir (parent). Arc 10 v3.0.2 sets
+    # results_dir=results/l_arc_10_v3.0.2/step_1, so arc_root=results/l_arc_10_v3.0.2.
+    # Arc 10 v3.0 baseline (results_dir=results/l_arc_10/step_1) byte-identically
+    # resolves arc_root=results/l_arc_10 — pre-change semantics preserved.
+    arc_root = REPO_ROOT / Path(cfg["output"]["results_dir"]).parent
+    out_dir = arc_root / "step_2"
     out_dir.mkdir(parents=True, exist_ok=True)
 
     # Build feature matrix; drop rows with any NaN

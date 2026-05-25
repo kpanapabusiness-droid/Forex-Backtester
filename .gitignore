@@ -137,6 +137,14 @@ results/l_arc_8/step1_quicktest/
 # (L_ARC_PROTOCOL v2.3 §13: arc results data is direct-to-main).
 !results/l_arc_10/
 !results/l_arc_10/**
+# Arc 10 v3.0.2 — canonical 5ers_eet rerun under Wave 1 v3.0.2.
+# Same direct-to-main convention; exclude regenerable trade_paths parquet + raw run logs.
+!results/l_arc_10_v3.0.2/
+!results/l_arc_10_v3.0.2/**
+results/l_arc_10_v3.0.2/**/trade_paths.parquet
+results/l_arc_10_v3.0.2/**/paths.parquet
+results/l_arc_10_v3.0.2/**/run.log
+results/l_arc_10_v3.0.2/**/*_run.log
 # Arc 11 v3.0 (swing-high breakout in trend, long, 4H) — closure + artefacts
 # tracked per L_PROTOCOL v3.0 §6. Trade-path parquet excluded (>40 MB; regen
 # from script + config). v2-era trades_paths.csv name also excluded.

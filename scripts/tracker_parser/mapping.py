@@ -324,9 +324,16 @@ def apply_per_failure_mode(state: TrackerState, payload: dict[str, Any]) -> None
     """Section 4F — increment Count; update Recent example arc + date.
 
     Skip if primary_failure_mode == 'N/A' (PASS arcs).
+
+    Skip if primary_failure_mode is the deferred-Amendment-3 sentinel:
+    closure shipped PROVISIONAL with the real failure mode deferred to the
+    addendum. The addendum closure will trigger the per-failure-mode update
+    at that point (or write N/A on PASS confirmation).
     """
     mode = payload.get("primary_failure_mode")
     if mode == "N/A":
+        return
+    if mode == "PENDING_AMENDMENT_3_ADDENDUM":
         return
 
     closed_ts = str(payload["closed_timestamp"])

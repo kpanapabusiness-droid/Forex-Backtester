@@ -95,6 +95,33 @@ def _is_post_cutoff(closed_ts: str | None, cutoff_iso: str) -> bool:
     return dt_utc > cutoff_dt
 
 
+def _is_deferred_provisional(payload: dict) -> bool:
+    """True iff closure ships with explicit Amendment 3 deferral (PROVISIONAL pattern).
+
+    Detection rule: verdict ends in '-PROVISIONAL' AND `amendment_3_evaluation.ran`
+    is the literal False. When this returns True, downstream PASS-verdict gates
+    (config_artefact_path resolution, §4 deployment_spec heading, Amendment 3
+    fields populated, step_6 overall_passed) are downgraded from ERROR to WARNING
+    — the closure addendum is the source of truth for those fields and the
+    parser permits the deferred-state to commit so the §3 cross-arc work is not
+    blocked on the engine fix / addendum sequencing.
+
+    The closure addendum (post-engine-fix-merge or post-deferral-completion) MUST
+    backfill the deferred fields; the parser will then re-validate at full
+    strictness on re-parse.
+
+    Mirrors the Amendment 5.1 deferral-tolerance pattern in
+    ``VALID_ARCHITECTURES_SKIPPED_REASONS`` / ``_validate_amendment_5_1_field``.
+    """
+    verdict_str = str(payload.get("verdict", ""))
+    if not verdict_str.endswith("-PROVISIONAL"):
+        return False
+    a3 = payload.get("amendment_3_evaluation")
+    if not isinstance(a3, dict):
+        return False
+    return a3.get("ran") is False
+
+
 def _is_post_phase_2_cutoff(closed_ts: str | None) -> bool:
     """Return True iff ``closed_ts`` is strictly after the PR-186 merge cutoff
     (2026-05-23T06:20:59Z per chat Q7) and therefore subject to Phase 2 tightening.
@@ -388,24 +415,49 @@ def main(argv: list[str] | None = None) -> int:
     verdict_str = str(payload.get("verdict", ""))
     is_pass = verdict_str.startswith("PASS-")
 
+    # Detect deferral state — closure ships PROVISIONAL with Amendment 3 deferral
+    # block populated. Downstream PASS-verdict gates downgrade ERROR to WARNING
+    # since the closure addendum (post-engine-fix-merge or post-deferral) is the
+    # source of truth for the deferred fields.
+    deferred_provisional = _is_deferred_provisional(payload)
+
     # v1.2+ PASS-verdict validation (template Section 4-L) — config_artefact_path + §4 heading.
     if template_version in ("1.2", "1.3") and is_pass:
         rc = _validate_v12_pass_verdict(payload, closure_path)
         if rc != 0:
-            return rc
+            if deferred_provisional:
+                logging.warning(
+                    "Section 4-L validation failed but closure is in deferred-PROVISIONAL state; "
+                    "downgrading to WARNING. Closure addendum must backfill config_artefact_path + §4."
+                )
+            else:
+                return rc
 
     # Phase 2 tightening (template v1.3 Schema versioning row, chat Q7):
     # PASS verdict closed after PR-186 merge MUST have Amendment 3 fields.
     if is_pass and _is_post_phase_2_cutoff(payload.get("closed_timestamp")):
         rc = _validate_phase_2_amendment_3_fields(payload, closure_path)
         if rc != 0:
-            return rc
+            if deferred_provisional:
+                logging.warning(
+                    "Phase 2 Amendment 3 field validation failed but closure is in deferred-PROVISIONAL "
+                    "state; downgrading to WARNING. Closure addendum must backfill Amendment 3 fields."
+                )
+            else:
+                return rc
 
     # v1.3 PASS verdicts MUST have a step_6 block with overall_passed=true.
     if template_version == "1.3" and is_pass:
         rc = _validate_v13_pass_step6(payload, closure_path)
         if rc != 0:
-            return rc
+            if deferred_provisional:
+                logging.warning(
+                    "Step 6 overall_passed validation failed but closure is in deferred-PROVISIONAL "
+                    "state; downgrading to WARNING. Step 6 gates on Amendment 3 PASS-tier "
+                    "classification; closure addendum will populate step_6 block."
+                )
+            else:
+                return rc
 
     # L_PROTOCOL Amendment 5 (template v1.3.1 Schema versioning row):
     # PASS verdicts closed after Amendment-5 cutoff MUST carry

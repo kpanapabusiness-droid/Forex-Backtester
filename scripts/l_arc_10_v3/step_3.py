@@ -199,12 +199,15 @@ def run(cfg_path: Path, *, write_manifest_flag: bool = True) -> dict:
     paths_path = REPO_ROOT / cfg["output"]["results_dir"] / "trade_paths.parquet"
     paths = pd.read_parquet(paths_path)
 
-    assignments = pd.read_parquet(REPO_ROOT / "results/l_arc_10/step_2/cluster_assignments.parquet")
+    # Arc root + step dirs derived from Step 1 results_dir. Byte-identical
+    # resolution for Arc 10 v3.0; correct routing for Arc 10 v3.0.2.
+    arc_root = REPO_ROOT / Path(cfg["output"]["results_dir"]).parent
+    assignments = pd.read_parquet(arc_root / "step_2" / "cluster_assignments.parquet")
     pool = pool.merge(
         assignments[["trade_id", "cluster_primary", "archetype_primary", "primary_K"]], on="trade_id", how="left"
     )
 
-    out_dir = REPO_ROOT / "results/l_arc_10/step_3"
+    out_dir = arc_root / "step_3"
     out_dir.mkdir(parents=True, exist_ok=True)
 
     best_k = int(pool["primary_K"].iloc[0])

@@ -154,12 +154,29 @@ def _fold_metrics(trades_df: pd.DataFrame) -> dict:
         return dict(n=0, mean_r=0.0, sum_r=0.0, roi=0.0, dd=0.0, ratio=np.nan, sign=0)
     t = trades_df.sort_values("signal_bar_time")
     r = t["final_r"].to_numpy()
+    # Defensive: clamp per-trade R to sane bounds. simulate_path under
+    # sl_multiplier≠2.0 rescales R-multiples; numerical edge cases (zero-bar
+    # path slices, NaN propagation through compound transforms) can produce
+    # absurd r values that compound into overflow at the equity layer. R ∈
+    # [-1.5, +20] covers any realistic Step-5 outcome (including
+    # sl_partial_close_1r_runner_trail capturing the full V-shape MFE p99 ≈ 12R).
+    r_clipped = np.clip(np.nan_to_num(r, nan=0.0, posinf=20.0, neginf=-1.0), -1.5, 20.0)
     times = pd.to_datetime(t["signal_bar_time"])
-    curve, _ = _equity_curve(r, times.to_numpy())
-    ann_yrs = max((times.max() - times.min()).total_seconds() / (365.25 * 86400.0), 1e-6)
+    curve, _ = _equity_curve(r_clipped, times.to_numpy())
+    # Floor ann_yrs at 0.25 (3 months) — annualising over <3-month folds via
+    # 1/ann_yrs exponent produces absurd projections and floating-point overflow.
+    ann_yrs_raw = (times.max() - times.min()).total_seconds() / (365.25 * 86400.0)
+    ann_yrs = max(ann_yrs_raw, 0.25)
     final_bal = float(curve[-1]) if curve.size else INITIAL_BAL
     total_ret = (final_bal / INITIAL_BAL) - 1.0
-    roi_ann = (1.0 + total_ret) ** (1.0 / ann_yrs) - 1.0 if ann_yrs > 0 else 0.0
+    # Bracket total_ret before exponentiation; under reset-floor compounding
+    # at 0.5% risk × R∈[-1.5,20], post-clip per-trade multiplier ∈ [0.9925, 1.10],
+    # so final_bal/INITIAL_BAL stays well-bounded across any realistic fold.
+    # Belt-and-braces: catch OverflowError and fall back to a saturated value.
+    try:
+        roi_ann = (1.0 + total_ret) ** (1.0 / ann_yrs) - 1.0 if ann_yrs > 0 else 0.0
+    except OverflowError:
+        roi_ann = 1e6 if total_ret > 0 else -0.99
     dd = _max_drawdown(curve)
     ratio = roi_ann / dd if dd > 1e-6 else float("inf") if roi_ann > 0 else 0.0
     return dict(
@@ -585,12 +602,15 @@ def run(cfg_path: Path, *, write_manifest_flag: bool = True) -> dict:
     paths_path = REPO_ROOT / cfg["output"]["results_dir"] / "trade_paths.parquet"
     paths = pd.read_parquet(paths_path)
 
-    assignments = pd.read_parquet(REPO_ROOT / "results/l_arc_10/step_2/cluster_assignments.parquet")
+    # Arc root + step dirs derived from Step 1 results_dir. Byte-identical
+    # resolution for Arc 10 v3.0; correct routing for Arc 10 v3.0.2.
+    arc_root = REPO_ROOT / Path(cfg["output"]["results_dir"]).parent
+    assignments = pd.read_parquet(arc_root / "step_2" / "cluster_assignments.parquet")
     pool = pool.merge(
         assignments[["trade_id", "cluster_primary", "archetype_primary", "primary_K"]], on="trade_id", how="left"
     )
-    cap = pd.read_csv(REPO_ROOT / "results/l_arc_10/step_3/capturability.csv")
-    step4_cluster_summary_files = list((REPO_ROOT / "results/l_arc_10/step_4").glob("manifest.json"))
+    cap = pd.read_csv(arc_root / "step_3" / "capturability.csv")
+    step4_cluster_summary_files = list((arc_root / "step_4").glob("manifest.json"))
     import json as _json
     step4 = _json.loads(step4_cluster_summary_files[0].read_text()) if step4_cluster_summary_files else {}
     step4_per_cluster = step4.get("per_cluster_summary", {})
@@ -598,7 +618,7 @@ def run(cfg_path: Path, *, write_manifest_flag: bool = True) -> dict:
     # Convert cluster keys back to int (JSON serialization changes int keys to strings)
     step4_per_cluster = {int(k): v for k, v in step4_per_cluster.items()}
 
-    out_dir = REPO_ROOT / "results/l_arc_10/step_5"
+    out_dir = arc_root / "step_5"
     out_dir.mkdir(parents=True, exist_ok=True)
 
     # Window slicing — for the WFO runner we always pass the full pre-OOS history
@@ -618,9 +638,19 @@ def run(cfg_path: Path, *, write_manifest_flag: bool = True) -> dict:
     folds = _build_folds(SEARCH_START, SEARCH_END, N_SEARCH_FOLDS)
     holdout_folds = [(pd.Timestamp(HOLDOUT_START, tz="UTC"), pd.Timestamp(HOLDOUT_END, tz="UTC"))]
 
-    candidates = cap[cap["candidate_at_best_sl"] == True].copy()  # noqa
+    # L_PROTOCOL trades-per-fold gate is ≥25 — clusters with n<25 cannot
+    # support Step 5 architecture search (e.g. Arc 10 v3.0.2 EET c2 outlier
+    # n=1 vacuously passing the candidate-flag). Mirrors step_4.py min-n filter.
+    MIN_N_FOR_STEP_5 = 25
+    eligible_cap = cap[cap["n"] >= MIN_N_FOR_STEP_5]
+    candidates = eligible_cap[eligible_cap["candidate_at_best_sl"] == True].copy()  # noqa
     if len(candidates) == 0:
-        candidates = cap.sort_values("composite", ascending=False).head(1)
+        if len(eligible_cap) == 0:
+            raise RuntimeError(
+                f"No clusters with n >= {MIN_N_FOR_STEP_5}; cannot run Step 5. "
+                f"cap rows: {cap[['cluster_id','n']].to_dict('records')}"
+            )
+        candidates = eligible_cap.sort_values("composite", ascending=False).head(1)
     candidates = candidates.reset_index(drop=True)
 
     feature_cols = [
@@ -640,13 +670,37 @@ def run(cfg_path: Path, *, write_manifest_flag: bool = True) -> dict:
     config_records = []
     rank_records = []
 
+    # Amendment 5 (ratified 2026-05-23) — AUC-gated A2/A6 admission per L_PROTOCOL
+    # §2 Step 5 "Architecture selection". A6 (and A2) admit only if Step 4 mean
+    # OOS AUC ≥ 0.65. Skipped architectures recorded at end of run for closure
+    # §1 architectures_skipped_by_amendment_5 field.
+    AMENDMENT_5_AUC_BAR = 0.65
+    architectures_skipped_under_amendment_5: dict[int, list[str]] = {}
+
     for _, cand in candidates.iterrows():
         cid = int(cand["cluster_id"])
         arch_label = cand["archetype"]
         best_sl = float(cand["best_sl_multiplier"])
         sl_range = sorted({max(1.5, best_sl - 0.5), best_sl, min(4.0, best_sl + 0.5)})
         exit_policies = EXIT_POLICIES_BY_ARCHETYPE.get(arch_label, EXIT_POLICIES_BY_ARCHETYPE["unclassified"])
-        archs_to_run = ARCHETYPE_ARCHITECTURES.get(arch_label, ARCHETYPE_ARCHITECTURES["unclassified"])
+        archs_pre_amendment_5 = ARCHETYPE_ARCHITECTURES.get(arch_label, ARCHETYPE_ARCHITECTURES["unclassified"])
+
+        # Apply Amendment 5 Gate 2 — strip A2/A6 if classifier AUC < 0.65
+        # Step 4 manifest key is "best_mean_auc" (Arc 10 v3 convention).
+        cluster_auc = float(step4_per_cluster.get(cid, {}).get("best_mean_auc", 0.0))
+        archs_to_run = list(archs_pre_amendment_5)
+        skipped_for_cluster: list[str] = []
+        for skip_arch in ("A2", "A6"):
+            if skip_arch in archs_to_run and cluster_auc < AMENDMENT_5_AUC_BAR:
+                archs_to_run.remove(skip_arch)
+                skipped_for_cluster.append(skip_arch)
+        if skipped_for_cluster:
+            architectures_skipped_under_amendment_5[cid] = skipped_for_cluster
+            print(
+                f"[step_5] Amendment 5: c{cid} ({arch_label}) AUC={cluster_auc:.4f} < "
+                f"{AMENDMENT_5_AUC_BAR} -> skipping {skipped_for_cluster}",
+                flush=True,
+            )
 
         target_search = (search_pool["cluster_primary"] == cid).astype(int).to_numpy()
         target_holdout = (holdout_pool["cluster_primary"] == cid).astype(int).to_numpy()

@@ -154,12 +154,29 @@ def _fold_metrics(trades_df: pd.DataFrame) -> dict:
         return dict(n=0, mean_r=0.0, sum_r=0.0, roi=0.0, dd=0.0, ratio=np.nan, sign=0)
     t = trades_df.sort_values("signal_bar_time")
     r = t["final_r"].to_numpy()
+    # Defensive: clamp per-trade R to sane bounds. simulate_path under
+    # sl_multiplier≠2.0 rescales R-multiples; numerical edge cases (zero-bar
+    # path slices, NaN propagation through compound transforms) can produce
+    # absurd r values that compound into overflow at the equity layer. R ∈
+    # [-1.5, +20] covers any realistic Step-5 outcome (including
+    # sl_partial_close_1r_runner_trail capturing the full V-shape MFE p99 ≈ 12R).
+    r_clipped = np.clip(np.nan_to_num(r, nan=0.0, posinf=20.0, neginf=-1.0), -1.5, 20.0)
     times = pd.to_datetime(t["signal_bar_time"])
-    curve, _ = _equity_curve(r, times.to_numpy())
-    ann_yrs = max((times.max() - times.min()).total_seconds() / (365.25 * 86400.0), 1e-6)
+    curve, _ = _equity_curve(r_clipped, times.to_numpy())
+    # Floor ann_yrs at 0.25 (3 months) — annualising over <3-month folds via
+    # 1/ann_yrs exponent produces absurd projections and floating-point overflow.
+    ann_yrs_raw = (times.max() - times.min()).total_seconds() / (365.25 * 86400.0)
+    ann_yrs = max(ann_yrs_raw, 0.25)
     final_bal = float(curve[-1]) if curve.size else INITIAL_BAL
     total_ret = (final_bal / INITIAL_BAL) - 1.0
-    roi_ann = (1.0 + total_ret) ** (1.0 / ann_yrs) - 1.0 if ann_yrs > 0 else 0.0
+    # Bracket total_ret before exponentiation; under reset-floor compounding
+    # at 0.5% risk × R∈[-1.5,20], post-clip per-trade multiplier ∈ [0.9925, 1.10],
+    # so final_bal/INITIAL_BAL stays well-bounded across any realistic fold.
+    # Belt-and-braces: catch OverflowError and fall back to a saturated value.
+    try:
+        roi_ann = (1.0 + total_ret) ** (1.0 / ann_yrs) - 1.0 if ann_yrs > 0 else 0.0
+    except OverflowError:
+        roi_ann = 1e6 if total_ret > 0 else -0.99
     dd = _max_drawdown(curve)
     ratio = roi_ann / dd if dd > 1e-6 else float("inf") if roi_ann > 0 else 0.0
     return dict(
@@ -669,7 +686,8 @@ def run(cfg_path: Path, *, write_manifest_flag: bool = True) -> dict:
         archs_pre_amendment_5 = ARCHETYPE_ARCHITECTURES.get(arch_label, ARCHETYPE_ARCHITECTURES["unclassified"])
 
         # Apply Amendment 5 Gate 2 — strip A2/A6 if classifier AUC < 0.65
-        cluster_auc = float(step4_per_cluster.get(cid, {}).get("best_classifier_mean_auc", 0.0))
+        # Step 4 manifest key is "best_mean_auc" (Arc 10 v3 convention).
+        cluster_auc = float(step4_per_cluster.get(cid, {}).get("best_mean_auc", 0.0))
         archs_to_run = list(archs_pre_amendment_5)
         skipped_for_cluster: list[str] = []
         for skip_arch in ("A2", "A6"):

@@ -643,13 +643,36 @@ def run(cfg_path: Path, *, write_manifest_flag: bool = True) -> dict:
     config_records = []
     rank_records = []
 
+    # Amendment 5 (ratified 2026-05-23) — AUC-gated A2/A6 admission per L_PROTOCOL
+    # §2 Step 5 "Architecture selection". A6 (and A2) admit only if Step 4 mean
+    # OOS AUC ≥ 0.65. Skipped architectures recorded at end of run for closure
+    # §1 architectures_skipped_by_amendment_5 field.
+    AMENDMENT_5_AUC_BAR = 0.65
+    architectures_skipped_under_amendment_5: dict[int, list[str]] = {}
+
     for _, cand in candidates.iterrows():
         cid = int(cand["cluster_id"])
         arch_label = cand["archetype"]
         best_sl = float(cand["best_sl_multiplier"])
         sl_range = sorted({max(1.5, best_sl - 0.5), best_sl, min(4.0, best_sl + 0.5)})
         exit_policies = EXIT_POLICIES_BY_ARCHETYPE.get(arch_label, EXIT_POLICIES_BY_ARCHETYPE["unclassified"])
-        archs_to_run = ARCHETYPE_ARCHITECTURES.get(arch_label, ARCHETYPE_ARCHITECTURES["unclassified"])
+        archs_pre_amendment_5 = ARCHETYPE_ARCHITECTURES.get(arch_label, ARCHETYPE_ARCHITECTURES["unclassified"])
+
+        # Apply Amendment 5 Gate 2 — strip A2/A6 if classifier AUC < 0.65
+        cluster_auc = float(step4_per_cluster.get(cid, {}).get("best_classifier_mean_auc", 0.0))
+        archs_to_run = list(archs_pre_amendment_5)
+        skipped_for_cluster: list[str] = []
+        for skip_arch in ("A2", "A6"):
+            if skip_arch in archs_to_run and cluster_auc < AMENDMENT_5_AUC_BAR:
+                archs_to_run.remove(skip_arch)
+                skipped_for_cluster.append(skip_arch)
+        if skipped_for_cluster:
+            architectures_skipped_under_amendment_5[cid] = skipped_for_cluster
+            print(
+                f"[step_5] Amendment 5: c{cid} ({arch_label}) AUC={cluster_auc:.4f} < "
+                f"{AMENDMENT_5_AUC_BAR} → skipping {skipped_for_cluster}",
+                flush=True,
+            )
 
         target_search = (search_pool["cluster_primary"] == cid).astype(int).to_numpy()
         target_holdout = (holdout_pool["cluster_primary"] == cid).astype(int).to_numpy()

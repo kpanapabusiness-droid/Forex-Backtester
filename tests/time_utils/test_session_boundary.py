@@ -1,4 +1,4 @@
-"""Tests for core.utils.session_boundary — UTC ↔ EET trading-day bucketing.
+"""Tests for core.time_utils.session_boundary — UTC ↔ EET trading-day bucketing.
 
 Coverage:
     - Winter (UTC+2 EET) anchor: EET 00:00 = UTC 22:00 prior day
@@ -14,7 +14,7 @@ from __future__ import annotations
 import pandas as pd
 import pytest
 
-from core.utils.session_boundary import (
+from core.time_utils.session_boundary import (
     SUPPORTED_CONVENTIONS,
     utc_to_eet_trading_day,
 )

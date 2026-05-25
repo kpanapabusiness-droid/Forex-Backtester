@@ -93,7 +93,7 @@ bucketing. Three engine modules use it:
   bucketing for Amendment 6 (load-bearing; feeds
   `daily_dd_breaches_at_r_safe` / `daily_dd_breaches_at_r_hard`).
 
-The shared utility is `core.utils.session_boundary.utc_to_eet_trading_day`.
+The shared utility is `core.time_utils.session_boundary.utc_to_eet_trading_day`.
 Default `Panel.boundary_convention="utc"` preserves KH-24 anchor
 byte-identity; aggregator-driven constructors (`Panel.from_pairs`,
 `build_panel_parallel`) thread the caller's choice through.

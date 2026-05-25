@@ -537,7 +537,7 @@ Two EET-fault-class items resolved:
 - **`OPEN-FEATURES-DISTANCE-EET-SESSION-SEMANTICS`** — RESOLVED.
   [core/features/distance.py](../../core/features/distance.py)
   `_prior_session_high` / `_prior_session_low` now bucket bars by
-  trading day via the canonical `core.utils.session_boundary.utc_to_eet_trading_day`
+  trading day via the canonical `core.time_utils.session_boundary.utc_to_eet_trading_day`
   utility, keyed on `panel.boundary_convention`. Default `panel=None`
   preserves UTC behaviour for legacy callers.
 

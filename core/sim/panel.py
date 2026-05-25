@@ -32,7 +32,7 @@ from typing import Mapping
 import pandas as pd
 
 from core.data.aggregator import aggregate
-from core.utils.session_boundary import SUPPORTED_CONVENTIONS
+from core.time_utils.session_boundary import SUPPORTED_CONVENTIONS
 
 
 @dataclass(frozen=True)

@@ -917,7 +917,7 @@ day-bucketing was still UTC-anchored despite EET-aggregated bars. This is
 a distinct fault class from §15.4: session bucketing vs HTF lookup. The
 two utilities are intentionally separate.
 
-**Single source of truth:** [core/utils/session_boundary.py](../core/utils/session_boundary.py)
+**Single source of truth:** [core/time_utils/session_boundary.py](../core/time_utils/session_boundary.py)
 exposes `utc_to_eet_trading_day(ts, *, convention="5ers_eet")` —
 the only DST-aware mapping callers need. `convention="utc"` falls
 back to `.normalize()` byte-identically (legacy KH-24 safety).

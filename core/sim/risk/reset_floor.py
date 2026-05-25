@@ -35,7 +35,7 @@ from dataclasses import dataclass, field
 
 import pandas as pd
 
-from core.utils.session_boundary import SUPPORTED_CONVENTIONS, utc_to_eet_trading_day
+from core.time_utils.session_boundary import SUPPORTED_CONVENTIONS, utc_to_eet_trading_day
 
 
 @dataclass

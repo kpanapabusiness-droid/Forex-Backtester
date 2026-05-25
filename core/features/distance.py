@@ -8,7 +8,7 @@ Session boundary: "prior session" maps to the trading-day boundary
 identified by ``panel.boundary_convention`` (default ``"utc"`` for
 legacy KH-24 byte-identical safety when no panel is provided). Under
 ``"5ers_eet"`` (post-PR-189 engine default) sessions are EET trading
-days; see ``core.utils.session_boundary.utc_to_eet_trading_day`` for
+days; see ``core.time_utils.session_boundary.utc_to_eet_trading_day`` for
 DST handling.
 """
 
@@ -20,7 +20,7 @@ import pandas as pd
 from core.features._helpers import mid_close, mid_high, mid_low, pip_size_for_pair
 from core.features.lineage import CausalLineage, FeatureSpec
 from core.features.registry import register
-from core.utils.session_boundary import utc_to_eet_trading_day
+from core.time_utils.session_boundary import utc_to_eet_trading_day
 
 
 def _convention_from_panel(panel) -> str:

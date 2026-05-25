@@ -114,10 +114,10 @@ These are HTF-alignment fault class (PR #193 scope) not session-semantics — sa
 ## Files CC plans to modify (assuming chat answers go: Option A on D1, no protocol amendment on D2, treat D3 by linking aggregator docstring)
 
 **New:**
-- `core/utils/__init__.py` (new package)
-- `core/utils/session_boundary.py` (new — `utc_to_eet_trading_day` utility)
-- `tests/utils/__init__.py` (new package)
-- `tests/utils/test_session_boundary.py` (new)
+- `core/time_utils/__init__.py` (new package — name avoids shadowing legacy `core/utils.py`)
+- `core/time_utils/session_boundary.py` (new — `utc_to_eet_trading_day` utility)
+- `tests/time_utils/__init__.py` (new package)
+- `tests/time_utils/test_session_boundary.py` (new)
 - `tests/features/test_distance_eet_session_semantics.py` (new)
 - `tests/sim/risk/test_reset_floor_eet_daily_bucket.py` (new)
 

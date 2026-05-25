@@ -19,7 +19,7 @@ from typing import Iterable
 import pandas as pd
 
 from core.sim.multipair_backtester import RunResult
-from core.utils.session_boundary import (
+from core.time_utils.session_boundary import (
     SUPPORTED_CONVENTIONS,
     utc_to_eet_trading_day,
 )

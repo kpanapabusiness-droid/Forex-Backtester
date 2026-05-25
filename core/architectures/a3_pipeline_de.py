@@ -54,6 +54,7 @@ from core.sim.exit_hooks import ExitPredicate
 from core.sim.multipair_backtester import MultiPairBacktester, Order, StrategyFn
 from core.sim.panel import Panel
 from core.sim.risk.live_balance import LiveBalanceRisk
+from core.sim.exit_policy_manager import ExitPolicyManager
 from core.sim.trailing_stop import TrailManager
 from core.wfo.folds import Fold
 
@@ -95,6 +96,9 @@ class A3Config:
     per_trade_entry_features: Mapping[tuple[str, pd.Timestamp], Mapping[str, float]] | None = None
     # Amendment 3 §"Sizing convention"
     sizing_convention: str = "reset_floor"   # "reset_floor" | "equity_pct"
+    # Canonical exit-policy (see core.sim.exit_policies). None preserves
+    # prior behaviour.
+    exit_policy: str | None = None
 
 
 def _path_features_so_far(
@@ -286,6 +290,8 @@ def _build_a3_strategy(
                 atr_at_entry=atr,
                 trail_activation_atr=cfg.trail_activation_atr,
                 trail_distance_atr=cfg.trail_distance_atr,
+                exit_policy=cfg.exit_policy,
+                sl_atr_mult=cfg.sl_atr_mult if cfg.exit_policy else None,
             ))
         return orders
 
@@ -325,6 +331,9 @@ class A3Architecture:
         )
         risk = LiveBalanceRisk(risk_pct=arch_config.risk_pct)
         trail_manager = TrailManager() if arch_config.trail_enabled else None
+        exit_policy_manager = (
+            ExitPolicyManager() if arch_config.exit_policy is not None else None
+        )
         exit_predicates: list[ExitPredicate] = []
         for pair in sorted(signal_evaluation.per_pair):
             ep = signal_evaluation.per_pair[pair].exit_predicate
@@ -345,6 +354,7 @@ class A3Architecture:
             strategy=strategy,
             trail_manager=trail_manager,
             exit_predicates=tuple(exit_predicates),
+            exit_policy_manager=exit_policy_manager,
         )
         run_result = bt.run()
         fold_stats = build_fold_stats_from_run(
@@ -369,6 +379,7 @@ class A3Architecture:
                     if arch_config.threshold_override is not None
                     else classifier_fit.threshold
                 ),
+                "exit_policy": arch_config.exit_policy,
             },
         )
 

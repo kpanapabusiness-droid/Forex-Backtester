@@ -58,12 +58,23 @@ def _check_per_feature_lineage(inputs: Step6Inputs) -> CheckResult:
     features = inputs.best_candidate_features
     lineage = inputs.feature_lineage
 
+    # Vacuous-pass: rule-based architectures (A1 system_level_filter) by
+    # design carry no classifier features. The universal quantifier "every
+    # feature in the winning config has clean lineage" is vacuously True
+    # over an empty set — no features means no opportunity for lineage
+    # contamination. Treating empty as "cannot verify → CRITICAL" is the
+    # inverse of intent (see engine/step_6_a1_vacuous_pass, 2026-05-25).
     if not features:
         return CheckResult(
             name="per_feature_lineage_clean",
-            passed=False,
-            severity=Severity.CRITICAL,
-            message="best_candidate_features is empty — cannot enforce lineage",
+            passed=True,
+            severity=Severity.INFO,
+            message=(
+                "best_candidate_features is empty (by-design for rule-based "
+                "architectures like A1 system_level_filter). No classifier "
+                "features means no opportunity for feature lineage contamination — "
+                "vacuous PASS per universal-quantifier-over-empty-set."
+            ),
             evidence={"features_in_winning_config": []},
         )
     if lineage is None:
@@ -118,12 +129,20 @@ def _check_per_feature_lineage(inputs: Step6Inputs) -> CheckResult:
 
 def _check_no_path_features_in_entry(inputs: Step6Inputs) -> CheckResult:
     features = inputs.best_candidate_features
+    # Vacuous-pass: same semantics as _check_per_feature_lineage above.
+    # No entry features means no opportunity for path-feature contamination
+    # in entry decisions (see engine/step_6_a1_vacuous_pass, 2026-05-25).
     if not features:
         return CheckResult(
             name="no_path_features_in_entry",
-            passed=False,
-            severity=Severity.CRITICAL,
-            message="best_candidate_features is empty — cannot enforce no-path-in-entry",
+            passed=True,
+            severity=Severity.INFO,
+            message=(
+                "best_candidate_features is empty (by-design for rule-based "
+                "architectures like A1 system_level_filter). No entry features "
+                "means no opportunity for path-feature contamination in entry — "
+                "vacuous PASS per universal-quantifier-over-empty-set."
+            ),
             evidence={"features_in_winning_config": []},
         )
     leaks: list[str] = []

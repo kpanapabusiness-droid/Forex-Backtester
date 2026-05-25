@@ -111,6 +111,13 @@ results/l_arc_2_redo2/**/_run_log.txt
 # (L_ARC_PROTOCOL v2.1.2 §13: arc results data is direct-to-main).
 !results/l_arc_7/
 !results/l_arc_7/**
+# Arc 7 v3.0.2 — A2/A6 follow-up retry (architecture-map override).
+# Step 5+ artefacts; Step 1-4 reused from results/l_arc_7/.
+!results/l_arc_7_v3.0.2/
+!results/l_arc_7_v3.0.2/**
+# Exclude the multi-MB raw run log (the run_summary.json + closure capture
+# the verdict and metrics).
+results/l_arc_7_v3.0.2/run.log
 # Arc 8 (PR-HHHL pullback-resume, long, 4H) — Step 1+ outputs
 # (L_ARC_PROTOCOL v2.3 §13: arc results data is direct-to-main).
 !results/l_arc_8/

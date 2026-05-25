@@ -138,6 +138,13 @@ def _w1_close_slope_sign(pair_df: pd.DataFrame, panel=None) -> pd.Series:
     weekly bar (week N-1 visible during week N).
 
     Requires ``panel.aux["w1"]`` — a Panel keyed at W1.
+
+    Uses the canonical ``get_htf_value_at(..., require_fully_closed=True)``
+    pattern that the D1 producers in this module already follow. The slope
+    is pre-computed on the W1 series via ``shift(1)`` then looked up at
+    the most recently fully-closed W1 bar at each LTF timestamp — i.e. at
+    an H4 timestamp inside week N, the result is ``sign(W1_close[N-1] -
+    W1_close[N-2])``, never involving week N's own (not-yet-closed) close.
     """
     if panel is None or not hasattr(panel, "aux") or "w1" not in panel.aux:
         return pd.Series(np.nan, index=pair_df.index, name="w1_close_slope_sign")
@@ -145,16 +152,10 @@ def _w1_close_slope_sign(pair_df: pd.DataFrame, panel=None) -> pd.Series:
     w1_df = panel.aux["w1"].pair_dfs[pair]
     w1_close = (w1_df["close_bid"] + w1_df["close_ask"]) / 2.0
     slope = (w1_close - w1_close.shift(1)).rename("slope")
-    # Align by `merge_asof(direction='backward')` on week-start key, then enforce
-    # that the matched week's bar ended strictly before the signal bar.
-    df = pd.DataFrame({"_t": pair_df.index, "_idx": np.arange(len(pair_df))})
-    df = df.sort_values("_t")
-    w1_pos = slope.to_frame().reset_index().rename(columns={w1_df.index.name or "index": "_t"})
-    w1_pos.columns = ["_t", "slope"]
-    w1_pos = w1_pos.sort_values("_t")
-    merged = pd.merge_asof(df, w1_pos, on="_t", direction="backward", allow_exact_matches=False)
-    merged = merged.sort_values("_idx").reset_index(drop=True)
-    return np.sign(pd.Series(merged["slope"].values, index=pair_df.index)).astype("float64")
+    aligned = get_htf_value_at(
+        pair_df.index, slope.to_frame(), "slope", require_fully_closed=True
+    )
+    return np.sign(aligned).astype("float64")
 
 
 register(
@@ -164,11 +165,12 @@ register(
         lineage=CausalLineage.CLEAN,
         feature_class="multi_tf",
         description=(
-            "Sign of the prior-W1 close-on-close slope. -1 / 0 / +1. Strictly "
-            "prior W1 bar (no exact-match alignment — week N's bar isn't visible "
+            "Sign of the prior-W1 close-on-close slope. -1 / 0 / +1. Uses the "
+            "L_PROTOCOL §1 strict-prior rule (most recently fully-closed W1 "
+            "bar visible at the LTF timestamp; week N's W1 not visible "
             "until week N+1 starts)."
         ),
-        inputs={"reference_tf": "W1", "alignment": "strict_prior"},
+        inputs={"reference_tf": "W1", "alignment": "fully_closed_prior"},
         needs_panel=True,
     )
 )

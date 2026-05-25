@@ -1,0 +1,398 @@
+{
+  "arc_name": "l_arc_7",
+  "best_config_id": "A1::A1::cl0::sl2.0::trail1::expinf",
+  "boundary_convention": "5ers_eet",
+  "clusters": [
+    {
+      "capturability_composite": 1.9982013536532843,
+      "cluster_id": 0,
+      "is_candidate": true,
+      "mfe_p50": 7.870189218073309,
+      "n_trades": 636,
+      "reach_1r": 1.0,
+      "selected_sl": 1.5,
+      "shape_tag": "bimodal",
+      "wrong_way_pp": 0.0047169811320754715
+    },
+    {
+      "capturability_composite": 0.9678432480056479,
+      "cluster_id": 1,
+      "is_candidate": true,
+      "mfe_p50": 2.114999183571737,
+      "n_trades": 1839,
+      "reach_1r": 0.9603045133224578,
+      "selected_sl": 1.5,
+      "shape_tag": "unclassified",
+      "wrong_way_pp": 0.03969548667754214
+    },
+    {
+      "capturability_composite": 0.18654661792644897,
+      "cluster_id": 2,
+      "is_candidate": false,
+      "mfe_p50": 0.5059525595894241,
+      "n_trades": 1588,
+      "reach_1r": 0.045969773299748114,
+      "selected_sl": 1.5,
+      "shape_tag": "unclassified",
+      "wrong_way_pp": 0.9691435768261965
+    },
+    {
+      "capturability_composite": 0.02690714802589864,
+      "cluster_id": 3,
+      "is_candidate": false,
+      "mfe_p50": 0.0967214126816511,
+      "n_trades": 1112,
+      "reach_1r": 0.00539568345323741,
+      "selected_sl": 1.5,
+      "shape_tag": "monotonic_down",
+      "wrong_way_pp": 0.9964028776978417
+    }
+  ],
+  "k_selected": 4,
+  "oracle": {
+    "cluster_0": {
+      "fold_stats": [
+        {
+          "cluster_id": 0,
+          "fold_id": 2,
+          "max_dd_pct": 0.018569796633708276,
+          "n_trades": 30,
+          "roi_dd_ratio": 24.51723604292826,
+          "roi_pct": 0.45528008733780045
+        },
+        {
+          "cluster_id": 0,
+          "fold_id": 3,
+          "max_dd_pct": 0.017638280726529926,
+          "n_trades": 37,
+          "roi_dd_ratio": 24.749468078768267,
+          "roi_pct": 0.43653806580560595
+        },
+        {
+          "cluster_id": 0,
+          "fold_id": 4,
+          "max_dd_pct": 0.015685220492342,
+          "n_trades": 36,
+          "roi_dd_ratio": 30.905300873401767,
+          "roi_pct": 0.48475645858147653
+        },
+        {
+          "cluster_id": 0,
+          "fold_id": 5,
+          "max_dd_pct": 0.014349917571733345,
+          "n_trades": 28,
+          "roi_dd_ratio": 20.720740567919353,
+          "roi_pct": 0.2973409191749139
+        },
+        {
+          "cluster_id": 0,
+          "fold_id": 6,
+          "max_dd_pct": 0.012549345457914082,
+          "n_trades": 33,
+          "roi_dd_ratio": 23.525521327244906,
+          "roi_pct": 0.29522989421312174
+        },
+        {
+          "cluster_id": 0,
+          "fold_id": 7,
+          "max_dd_pct": 0.009071654796590124,
+          "n_trades": 24,
+          "roi_dd_ratio": 38.03200739493345,
+          "roi_pct": 0.3450132423081991
+        },
+        {
+          "cluster_id": 0,
+          "fold_id": 8,
+          "max_dd_pct": 0.014502242809478864,
+          "n_trades": 38,
+          "roi_dd_ratio": 25.25435337109016,
+          "roi_pct": 0.3662447645839306
+        },
+        {
+          "cluster_id": 0,
+          "fold_id": 9,
+          "max_dd_pct": 0.01479810386016652,
+          "n_trades": 36,
+          "roi_dd_ratio": 22.81019548130103,
+          "roi_pct": 0.3375476418029937
+        },
+        {
+          "cluster_id": 0,
+          "fold_id": 10,
+          "max_dd_pct": 0.0136115359986041,
+          "n_trades": 23,
+          "roi_dd_ratio": 18.130567313473346,
+          "roi_pct": 0.24678486966245727
+        },
+        {
+          "cluster_id": 0,
+          "fold_id": 11,
+          "max_dd_pct": 0.022810609714698216,
+          "n_trades": 34,
+          "roi_dd_ratio": 11.898870891690722,
+          "roi_pct": 0.2714204999559402
+        }
+      ]
+    },
+    "cluster_1": {
+      "fold_stats": [
+        {
+          "cluster_id": 1,
+          "fold_id": 2,
+          "max_dd_pct": 0.037403309142764525,
+          "n_trades": 87,
+          "roi_dd_ratio": 6.797246820795108,
+          "roi_pct": 0.25423952415787276
+        },
+        {
+          "cluster_id": 1,
+          "fold_id": 3,
+          "max_dd_pct": 0.02032856442064948,
+          "n_trades": 80,
+          "roi_dd_ratio": 16.991735899701606,
+          "roi_pct": 0.34541759785574655
+        },
+        {
+          "cluster_id": 1,
+          "fold_id": 4,
+          "max_dd_pct": 0.029840620609502485,
+          "n_trades": 80,
+          "roi_dd_ratio": 11.737005350535515,
+          "roi_pct": 0.35023952375703105
+        },
+        {
+          "cluster_id": 1,
+          "fold_id": 5,
+          "max_dd_pct": 0.02395818430540129,
+          "n_trades": 88,
+          "roi_dd_ratio": 10.823939676377998,
+          "roi_pct": 0.2593219416772097
+        },
+        {
+          "cluster_id": 1,
+          "fold_id": 6,
+          "max_dd_pct": 0.029553218413887163,
+          "n_trades": 81,
+          "roi_dd_ratio": 7.4472979907294325,
+          "roi_pct": 0.22009162411332994
+        },
+        {
+          "cluster_id": 1,
+          "fold_id": 7,
+          "max_dd_pct": 0.03877189424373564,
+          "n_trades": 81,
+          "roi_dd_ratio": 10.485329907438373,
+          "roi_pct": 0.406536102281879
+        },
+        {
+          "cluster_id": 1,
+          "fold_id": 8,
+          "max_dd_pct": 0.03615024518792792,
+          "n_trades": 85,
+          "roi_dd_ratio": 8.005333318184107,
+          "roi_pct": 0.28939476226344407
+        },
+        {
+          "cluster_id": 1,
+          "fold_id": 9,
+          "max_dd_pct": 0.035140635581365785,
+          "n_trades": 108,
+          "roi_dd_ratio": 8.359488558724141,
+          "roi_pct": 0.29375774108872177
+        },
+        {
+          "cluster_id": 1,
+          "fold_id": 10,
+          "max_dd_pct": 0.026597907253054873,
+          "n_trades": 94,
+          "roi_dd_ratio": 11.445993999074759,
+          "roi_pct": 0.3044394868064131
+        },
+        {
+          "cluster_id": 1,
+          "fold_id": 11,
+          "max_dd_pct": 0.03490406320448158,
+          "n_trades": 98,
+          "roi_dd_ratio": 14.281933215392488,
+          "roi_pct": 0.4984974996322442
+        }
+      ]
+    }
+  },
+  "pool_sha256": "402048a2e231dcbc9394b38f82d8a1032ceb368fcb1b4ccce85a9fd8720ad460",
+  "pool_size": 5175,
+  "ran_at": "2026-05-24T17:06:27Z",
+  "silhouette_per_k": {
+    "2": 0.3930684698809458,
+    "3": 0.3889762724285593,
+    "4": 0.4883643127188588,
+    "5": 0.45936242633159047,
+    "6": 0.44022601385800464
+  },
+  "step4_per_cluster": [
+    {
+      "best_classifier": "lr",
+      "best_classifier_mean_auc": 0.6191919406774266,
+      "best_threshold": 0.11403039725108385,
+      "cluster_id": 0,
+      "excluded_features": [
+        "dollar_bloc_state",
+        "eur_strength_index",
+        "signal_density_28",
+        "usd_strength_index"
+      ],
+      "fitted_classifier_path": "C:\\Users\\panap\\Documents\\Forex-Backtester\\.claude\\worktrees\\clever-elbakyan-ad50ee\\results\\l_arc_7\\step_4\\classifiers\\0.pkl",
+      "n_trades": 2993,
+      "top_features": [
+        "atr_14",
+        "atr_vs_trailing_100",
+        "w1_close_slope_sign",
+        "distance_to_round_number",
+        "atr_percentile_100",
+        "prior_session_high_distance",
+        "prior_session_low_distance",
+        "swing_low_distance_14",
+        "session_tokyo",
+        "range_close_ratio"
+      ]
+    },
+    {
+      "best_classifier": "rf",
+      "best_classifier_mean_auc": 0.6642231832414549,
+      "best_threshold": 0.35343754866234883,
+      "cluster_id": 1,
+      "excluded_features": [
+        "dollar_bloc_state",
+        "eur_strength_index",
+        "signal_density_28",
+        "usd_strength_index"
+      ],
+      "fitted_classifier_path": "C:\\Users\\panap\\Documents\\Forex-Backtester\\.claude\\worktrees\\clever-elbakyan-ad50ee\\results\\l_arc_7\\step_4\\classifiers\\1.pkl",
+      "n_trades": 2993,
+      "top_features": [
+        "w1_close_slope_sign",
+        "d1_close_slope_sign",
+        "atr_percentile_100",
+        "atr_14",
+        "d1_close_slope_magnitude",
+        "session_tokyo",
+        "session_ny",
+        "session_dead",
+        "kijun_26_distance",
+        "atr_vs_trailing_100"
+      ]
+    }
+  ],
+  "step5": {
+    "n_configs": 28,
+    "search_scope": "thin",
+    "skipped_configs": [
+      "Exit policies sl_plus_tp_2r, sl_plus_tp_3r, sl_partial_close_1r_runner_trail, sl_plus_trailing_swing, time_exit_n_bars: NOT TESTED \u2014 v3 A1/A2/A6 Configs don't expose tp_atr_mult / partial-close mechanics. Tested trail axis is trail_enabled \u2208 {True (sl+trailing_atr), False (sl_only)}."
+    ],
+    "top_3": [
+      {
+        "chained_dd_method": "equity_stitching",
+        "chained_max_dd_at_r_hard_pct": 0.24543302645843704,
+        "chained_max_dd_at_r_safe_pct": 0.19634642116674964,
+        "chained_max_dd_base_pct": 0.8390047334848105,
+        "config_id": "A1::A1::cl0::sl2.0::trail1::expinf",
+        "daily_dd_breaches_at_r_hard": 0,
+        "daily_dd_breaches_at_r_safe": 0,
+        "holdout_dd_at_r_hard_pct": null,
+        "holdout_dd_at_r_safe_pct": null,
+        "holdout_roi_at_r_hard_pct": null,
+        "holdout_roi_at_r_safe_pct": null,
+        "k_hard": 0.2925287744671352,
+        "k_safe": 0.2340230195737082,
+        "mean_fold_ratio": -0.09132136298970882,
+        "min_trades_per_fold": 247,
+        "n_negative_folds": 7,
+        "per_day_max_dd_artefact_path": "C:\\Users\\panap\\Documents\\Forex-Backtester\\.claude\\worktrees\\clever-elbakyan-ad50ee\\results\\l_arc_7\\step_5\\per_day_max_dd_base__A1__A1__cl0__sl2.0__trail1__expinf.parquet",
+        "primary_failure_mode": "step5_not_scalable",
+        "r_hard_pct": 0.0014626438723356761,
+        "r_safe_pct": 0.001170115097868541,
+        "reason": "r_safe=0.1170% / r_hard=0.1463% outside [0.1500%, 2.0000%] \u2014 config not scalable",
+        "scalable_to_hard": false,
+        "scalable_to_safe": false,
+        "sizing_convention": "reset_floor",
+        "verdict": "fail",
+        "worst_fold_dd_base_pct": 0.34184671296749547,
+        "worst_fold_ratio": -0.8172120095638017,
+        "worst_fold_roi_at_r_hard_pct": -0.07867957873677853,
+        "worst_fold_roi_at_r_safe_pct": -0.06294366298942282,
+        "worst_fold_roi_base_pct": -0.2689635536883499
+      },
+      {
+        "chained_dd_method": "equity_stitching",
+        "chained_max_dd_at_r_hard_pct": 0.24543302645843704,
+        "chained_max_dd_at_r_safe_pct": 0.19634642116674964,
+        "chained_max_dd_base_pct": 0.8390047334848105,
+        "config_id": "A1::A1::cl1::sl2.0::trail1::expinf",
+        "daily_dd_breaches_at_r_hard": 0,
+        "daily_dd_breaches_at_r_safe": 0,
+        "holdout_dd_at_r_hard_pct": null,
+        "holdout_dd_at_r_safe_pct": null,
+        "holdout_roi_at_r_hard_pct": null,
+        "holdout_roi_at_r_safe_pct": null,
+        "k_hard": 0.2925287744671352,
+        "k_safe": 0.2340230195737082,
+        "mean_fold_ratio": -0.09132136298970882,
+        "min_trades_per_fold": 247,
+        "n_negative_folds": 7,
+        "per_day_max_dd_artefact_path": "C:\\Users\\panap\\Documents\\Forex-Backtester\\.claude\\worktrees\\clever-elbakyan-ad50ee\\results\\l_arc_7\\step_5\\per_day_max_dd_base__A1__A1__cl1__sl2.0__trail1__expinf.parquet",
+        "primary_failure_mode": "step5_not_scalable",
+        "r_hard_pct": 0.0014626438723356761,
+        "r_safe_pct": 0.001170115097868541,
+        "reason": "r_safe=0.1170% / r_hard=0.1463% outside [0.1500%, 2.0000%] \u2014 config not scalable",
+        "scalable_to_hard": false,
+        "scalable_to_safe": false,
+        "sizing_convention": "reset_floor",
+        "verdict": "fail",
+        "worst_fold_dd_base_pct": 0.34184671296749547,
+        "worst_fold_ratio": -0.8172120095638017,
+        "worst_fold_roi_at_r_hard_pct": -0.07867957873677853,
+        "worst_fold_roi_at_r_safe_pct": -0.06294366298942282,
+        "worst_fold_roi_base_pct": -0.2689635536883499
+      },
+      {
+        "chained_dd_method": "equity_stitching",
+        "chained_max_dd_at_r_hard_pct": 0.2692247609497584,
+        "chained_max_dd_at_r_safe_pct": 0.21537980875980667,
+        "chained_max_dd_base_pct": 0.7539832020951175,
+        "config_id": "A1::A1::cl0::sl2.0::trail1::exp2",
+        "daily_dd_breaches_at_r_hard": 0,
+        "daily_dd_breaches_at_r_safe": 0,
+        "holdout_dd_at_r_hard_pct": 0.16290778259011968,
+        "holdout_dd_at_r_safe_pct": null,
+        "holdout_roi_at_r_hard_pct": -0.1143996966457439,
+        "holdout_roi_at_r_safe_pct": null,
+        "k_hard": 0.3570699721182844,
+        "k_safe": 0.28565597769462747,
+        "mean_fold_ratio": -0.25292529388857576,
+        "min_trades_per_fold": 193,
+        "n_negative_folds": 6,
+        "per_day_max_dd_artefact_path": "C:\\Users\\panap\\Documents\\Forex-Backtester\\.claude\\worktrees\\clever-elbakyan-ad50ee\\results\\l_arc_7\\step_5\\per_day_max_dd_base__A1__A1__cl0__sl2.0__trail1__exp2.parquet",
+        "primary_failure_mode": "step5_chained_dd_above_gate",
+        "r_hard_pct": 0.001785349860591422,
+        "r_safe_pct": 0.0014282798884731375,
+        "reason": "chained max DD at r_hard = 26.9225% > 10%",
+        "scalable_to_hard": true,
+        "scalable_to_safe": false,
+        "sizing_convention": "reset_floor",
+        "verdict": "fail",
+        "worst_fold_dd_base_pct": 0.28005715352304567,
+        "worst_fold_ratio": -0.8771484949878603,
+        "worst_fold_roi_at_r_hard_pct": -0.08663109510305603,
+        "worst_fold_roi_at_r_safe_pct": -0.0693048760824448,
+        "worst_fold_roi_base_pct": -0.24261657901146128
+      }
+    ]
+  },
+  "step6": null,
+  "verdict": "FAIL",
+  "wall_time_seconds": 4760.004043099994,
+  "window_end": "2026-04-30",
+  "window_start": "2010-01-01",
+  "winning_exit_policy": "sl_plus_trailing_atr",
+  "winning_sl_atr_mult": 2.0
+}

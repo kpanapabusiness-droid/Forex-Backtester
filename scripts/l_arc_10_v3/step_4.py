@@ -281,10 +281,26 @@ def run(cfg_path: Path, *, write_manifest_flag: bool = True) -> dict:
     )
     cap_csv = arc_root / "step_3" / "capturability.csv"
     cap = pd.read_csv(cap_csv)
-    candidates = cap[cap["candidate_at_best_sl"] == True]["cluster_id"].astype(int).tolist()  # noqa
+    # L_PROTOCOL trades-per-fold gate is ≥25 — a cluster with n<25 cannot
+    # support a candidate-cluster claim regardless of capturability metrics.
+    # Excludes outlier clusters (e.g. n=1 vacuously passing ww_pp≤0.30) before
+    # the candidate-flag fallback selects the highest-composite cluster.
+    # Backward-compatible: under Arc 10 v3.0 UTC where no cluster was flagged
+    # candidate AND c2 had n=2 (also below 25), the fallback already had to
+    # pick the highest non-outlier composite → c1 V-shape; net behaviour
+    # unchanged for the v3.0 baseline.
+    MIN_N_FOR_EXTRACTION = 25
+    eligible = cap[cap["n"] >= MIN_N_FOR_EXTRACTION]
+    candidates = eligible[eligible["candidate_at_best_sl"] == True]["cluster_id"].astype(int).tolist()  # noqa
     if not candidates:
-        # No candidates from Step 3; per dispatch run on the highest-composite cluster regardless.
-        candidates = [int(cap.sort_values("composite", ascending=False).iloc[0]["cluster_id"])]
+        # No bona-fide candidates from Step 3; per dispatch run on the
+        # highest-composite ELIGIBLE cluster regardless.
+        if len(eligible) == 0:
+            raise RuntimeError(
+                f"No clusters with n >= {MIN_N_FOR_EXTRACTION}; pool too thin "
+                f"for Step 4 extraction. cap rows: {cap[['cluster_id','n']].to_dict('records')}"
+            )
+        candidates = [int(eligible.sort_values("composite", ascending=False).iloc[0]["cluster_id"])]
 
     out_dir = arc_root / "step_4"
     out_dir.mkdir(parents=True, exist_ok=True)

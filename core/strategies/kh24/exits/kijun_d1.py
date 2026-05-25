@@ -31,6 +31,7 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
+from core.signals.htf_alignment import get_htf_row_at
 from core.sim.account import Direction, Position
 from core.sim.exit_hooks import ExitDecision, ExitPredicate
 from core.sim.fill import long_exit_market_price
@@ -49,27 +50,22 @@ def _build_d1_lag1_close_and_kijun(
     """Return ``(d1_close_lag1, d1_kijun_lag1)`` aligned to ``h4_index``.
 
     Both are computed on bid-side single OHLC (matches EA's ``CopyRates``
-    convention) and shifted one calendar day so the H4 bar at day T sees
-    only D1 data from day T−1 or earlier (L_PROTOCOL §1).
+    convention) and aligned to the most-recently fully-closed D1 bar at
+    each H4 timestamp (under whatever timezone convention the panels
+    share — L_PROTOCOL §1 lag-1 rule). Byte-identical to the legacy
+    normalize-and-shift idiom under UTC convention; fixes the silent
+    same-EET-day lookahead under 5ers EET convention.
     """
-    d1 = pd.DataFrame(index=df_d1.index.copy())
-    d1["d1_close"] = df_d1["close_bid"].values
-    d1["d1_kijun"] = _kijun_bid(df_d1, period=kijun_period).values
-    d1["_date"] = d1.index.normalize()
-    d1 = d1.drop_duplicates(subset=["_date"], keep="last").reset_index(drop=True)
-
-    shifted = pd.DataFrame(
+    d1_panel = pd.DataFrame(
         {
-            "_date": h4_index.normalize() - pd.Timedelta(days=1),
-            "_idx": np.arange(len(h4_index), dtype=np.int64),
-        }
-    ).sort_values("_date")
-    merged = pd.merge_asof(
-        shifted, d1[["_date", "d1_close", "d1_kijun"]], on="_date", direction="backward"
+            "d1_close": df_d1["close_bid"].values.astype(float),
+            "d1_kijun": _kijun_bid(df_d1, period=kijun_period).values.astype(float),
+        },
+        index=df_d1.index,
     )
-    merged = merged.sort_values("_idx").reset_index(drop=True)
-    d1_close = pd.Series(merged["d1_close"].values, index=h4_index, name="d1_close_lag1")
-    d1_kijun = pd.Series(merged["d1_kijun"].values, index=h4_index, name="d1_kijun_lag1")
+    rows = get_htf_row_at(h4_index, d1_panel, require_fully_closed=True)
+    d1_close = pd.Series(rows["d1_close"].to_numpy(dtype=float), index=h4_index, name="d1_close_lag1")
+    d1_kijun = pd.Series(rows["d1_kijun"].to_numpy(dtype=float), index=h4_index, name="d1_kijun_lag1")
     return d1_close, d1_kijun
 
 

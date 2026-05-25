@@ -12,3 +12,18 @@ repos:
     - id: end-of-file-fixer
     - id: check-yaml
     - id: check-added-large-files
+- repo: local
+  hooks:
+    - id: forbid-utc-anchor-in-signal-modules
+      name: Forbid UTC-anchored HTF idioms in signal modules
+      description: |
+        Blocks `.floor(` / `.normalize()` in core/signals/ + core/strategies/ +
+        signals/. These idioms produce silent wrong-alignment under 5ers EET
+        storage convention. Use core.signals.htf_alignment (get_htf_value_at /
+        get_htf_row_at / get_htf_index_at) instead. See
+        docs/audits/signal_module_eet_audit_2026_05.md for the bug class +
+        canonical fix pattern.
+      entry: scripts/lint/forbid_utc_anchor_in_signal_modules.py
+      language: python
+      files: '^(core/signals/|core/strategies/|signals/).*\.py$'
+      pass_filenames: true

@@ -52,6 +52,8 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
+from core.signals.htf_alignment import get_htf_index_at
+
 # Locked parameters (mirror in configs/wfo_l_arc_10.yaml).
 D1_SWING_WINDOW_K: int = 3                # k bars on each side for D1 swing-low
 D1_RIGHT_EDGE_OFFSET: int = 4             # L_1 must be at most D1[d_t - 4]
@@ -123,17 +125,27 @@ def _date_to_d1_index(
     bar_dates_4h: np.ndarray, d1_dates: np.ndarray
 ) -> np.ndarray:
     """For each 4H bar date, return the index of the D1 bar that contains it
-    (d_t). Equivalent to merge_asof(direction='backward') on the date floor.
+    (d_t).
 
     Returns -1 for 4H bars whose date predates all D1 bars.
+
+    Timezone-invariant via core.signals.htf_alignment: works correctly
+    under both UTC and 5ers EET storage conventions. Byte-identical to
+    the legacy ``np.searchsorted(d1_norm, bar_norm, side='right') - 1``
+    under UTC convention; correctly EET-shifted under 5ers EET
+    convention. The legacy idiom was State B under EET — it picked the
+    NEXT EET-day's D1 instead of the current EET-day's D1 (silent
+    lookahead) because normalizing to UTC midnight stripped the
+    EET-shift offset.
+
+    Uses ``require_fully_closed=False`` because Arc 10's contract is
+    "D1 CONTAINING this 4H bar" (downstream applies its own ``d_t - 4``
+    freshness offset), not "most-recently-closed D1".
     """
-    d1_ts = pd.to_datetime(d1_dates)
-    d1_norm = d1_ts.normalize().to_numpy()
-    bar_norm = pd.to_datetime(bar_dates_4h).normalize().to_numpy()
-    # searchsorted right-1: largest d1_idx with d1_norm[d1_idx] <= bar_norm[i]
-    idx = np.searchsorted(d1_norm, bar_norm, side="right") - 1
-    # Bound: -1 stays as -1 (out of left edge)
-    return idx.astype(int)
+    d1_index = pd.DatetimeIndex(pd.to_datetime(d1_dates))
+    d1_panel = pd.DataFrame({"_placeholder": np.zeros(len(d1_index))}, index=d1_index)
+    bar_index = pd.DatetimeIndex(pd.to_datetime(bar_dates_4h))
+    return get_htf_index_at(bar_index, d1_panel, require_fully_closed=False, invalid_sentinel=-1)
 
 
 def compute_signal(

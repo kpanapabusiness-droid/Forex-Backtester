@@ -39,6 +39,7 @@ import numpy as np
 import pandas as pd
 
 from core.features._helpers import kijun, wilder_atr
+from core.signals.htf_alignment import get_htf_row_at
 
 
 @dataclass(frozen=True)
@@ -84,40 +85,39 @@ def _build_d1_lag1_arrays(
     """Align D1 close/Kijun/ATR onto H4 bars using the one-day-lag rule.
 
     Returns ``(d1_close_lag1, d1_kijun_lag1, d1_atr_lag1)`` — each
-    aligned to ``df_h4.index``. Each H4 bar at calendar day T uses the
-    D1 bar from day T-1 or earlier.
+    aligned to ``df_h4.index``. Each H4 bar uses the most-recently
+    fully-closed D1 bar (i.e. the D1 bar from the prior trading day
+    under whatever timezone convention the panels share). Under UTC
+    convention this is byte-identical to the legacy ``.normalize() -
+    pd.Timedelta(days=1)`` idiom (verified by
+    ``tests/signals/test_htf_alignment::test_byte_identical_to_legacy_kh24_idiom_under_utc``);
+    under 5ers EET convention this is the FIX for the silent same-day
+    lookahead in the legacy idiom (see core/signals/htf_alignment.py
+    module docstring for the bug-class explanation).
 
     Mirrors ``scripts/arc_kh24_v2/step1/_signal._build_d1_lag1_arrays``
     on v3 BID-side single OHLC (matches EA's CopyRates convention).
     """
-    d1 = pd.DataFrame(index=df_d1.index.copy())
-    d1["d1_close"] = df_d1["close_bid"].values
-    d1["d1_kijun"] = kijun(
-        df_d1["high_bid"], df_d1["low_bid"], period=params.d1_kijun_period
-    ).values
-    d1["d1_atr"] = wilder_atr(
-        df_d1["high_bid"], df_d1["low_bid"], df_d1["close_bid"], period=params.d1_atr_period
-    ).values
-    d1["_date"] = d1.index.normalize()
-    d1 = d1.drop_duplicates(subset=["_date"], keep="last").reset_index(drop=True)
-
-    # Shift each H4 bar's calendar date back one day; merge_asof backward
-    # gives the latest D1 row whose date ≤ H4_date − 1 day.
-    shifted = pd.DataFrame(
+    d1_panel = pd.DataFrame(
         {
-            "_date": df_h4.index.normalize() - pd.Timedelta(days=1),
-            "_idx": np.arange(len(df_h4), dtype=np.int64),
-        }
-    ).sort_values("_date")
-    merged = pd.merge_asof(
-        shifted, d1[["_date", "d1_close", "d1_kijun", "d1_atr"]], on="_date", direction="backward"
+            "d1_close": df_d1["close_bid"].values.astype(float),
+            "d1_kijun": kijun(
+                df_d1["high_bid"], df_d1["low_bid"], period=params.d1_kijun_period
+            ).values.astype(float),
+            "d1_atr": wilder_atr(
+                df_d1["high_bid"],
+                df_d1["low_bid"],
+                df_d1["close_bid"],
+                period=params.d1_atr_period,
+            ).values.astype(float),
+        },
+        index=df_d1.index,
     )
-    merged = merged.sort_values("_idx").reset_index(drop=True)
-
+    rows = get_htf_row_at(df_h4.index, d1_panel, require_fully_closed=True)
     return (
-        merged["d1_close"].values.astype(float),
-        merged["d1_kijun"].values.astype(float),
-        merged["d1_atr"].values.astype(float),
+        rows["d1_close"].to_numpy(dtype=float),
+        rows["d1_kijun"].to_numpy(dtype=float),
+        rows["d1_atr"].to_numpy(dtype=float),
     )
 
 

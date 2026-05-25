@@ -493,3 +493,37 @@ End of audit.
 Capability count delta: Step 6 row updates from `0 WIRED / 0 PARTIAL / 5 MISSING` to `5 WIRED / 0 PARTIAL / 0 MISSING`. Overall: WIRED 30 → 35, MISSING 13 → 8.
 
 Remaining Tier 1 / 2 items (Amendment 3 engine emission, heavy_ml_probe sub-protocol, etc.) unchanged by this PR.
+
+---
+
+## Post-audit update — 2026-05-25 (Signal-level EET timezone alignment)
+
+§"Data / aggregator" capability — **Signal-level EET alignment**: MISSING → **WIRED**.
+
+PR #189 closed engine-level EET aggregation but did not audit signal modules.
+Several signal + feature modules used UTC-anchored HTF lookup idioms (`.floor("4h")`,
+`.normalize() + Timedelta(days=1) + merge_asof`, `.normalize() + searchsorted`)
+that produced State C (empty pool) or State B (silent wrong-value) outputs under
+the 5ers EET storage convention.
+
+WIRED via:
+- [core/signals/htf_alignment.py](../../core/signals/htf_alignment.py) — canonical utility
+  with `get_htf_value_at` / `get_htf_row_at` / `get_htf_index_at`. Byte-identical
+  to legacy KH-24 idiom under UTC; correct prior-EET-day alignment under EET.
+- Fixed modules: `core/strategies/kh24/{signal,exits/kijun_d1,filters/d1_regime}.py`,
+  `core/signals/mtf_alignment_2_down_mixed_kijun.py` (restored from origin/arc/l_arc_5),
+  `core/features/multi_tf.py`, `signals/lchar_d1atr_top_decile.py`, `signals/lchar_dlr_long.py`.
+- Tests: 19 unit tests + 14 regression tests including a static guard that
+  flags `.floor()` / `.normalize()` reintroduction in fixed modules.
+- Lint rule: pre-commit `forbid-utc-anchor-in-signal-modules` hook.
+
+Per-arc impact:
+- **Arc 3, Arc 5, Arc 10** verdicts suspect — re-run needed under EET post-merge.
+- **Arcs 4, 7, 8, 9, 11** unaffected (single-TF signals).
+- **KH-24** live deployment unaffected (uses UTC convention); latent landmine fixed.
+
+Full audit: [docs/audits/signal_module_eet_audit_2026_05.md](signal_module_eet_audit_2026_05.md).
+
+Open follow-ups: OPEN-RESET-FLOOR-EET (`core/sim/risk/reset_floor.py`),
+OPEN-FEATURES-DISTANCE-EET-SESSION-SEMANTICS (`core/features/distance.py`) — both
+require separate dispatches.

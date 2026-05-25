@@ -21,6 +21,7 @@ import numpy as np
 import pandas as pd
 
 from core.features._helpers import kijun, mid_close, mid_high, mid_low, wilder_atr
+from core.signals.htf_alignment import get_htf_row_at
 
 
 @dataclass(frozen=True)
@@ -45,29 +46,22 @@ def evaluate_d1_regime(
     if len(df_h4) == 0:
         return np.zeros(0, dtype=bool)
 
-    d1 = pd.DataFrame(index=df_d1.index.copy())
-    d1["d1_close"] = mid_close(df_d1).values
-    d1["d1_kijun"] = kijun(mid_high(df_d1), mid_low(df_d1), period=params.kijun_period).values
-    d1["d1_atr"] = wilder_atr(
-        mid_high(df_d1), mid_low(df_d1), mid_close(df_d1), period=params.atr_period
-    ).values
-    d1["_date"] = d1.index.normalize()
-    d1 = d1.drop_duplicates(subset=["_date"], keep="last").reset_index(drop=True)
-
-    shifted = pd.DataFrame(
+    d1_panel = pd.DataFrame(
         {
-            "_date": df_h4.index.normalize() - pd.Timedelta(days=1),
-            "_idx": np.arange(len(df_h4), dtype=np.int64),
-        }
-    ).sort_values("_date")
-    merged = pd.merge_asof(
-        shifted, d1[["_date", "d1_close", "d1_kijun", "d1_atr"]], on="_date", direction="backward"
+            "d1_close": mid_close(df_d1).values.astype(float),
+            "d1_kijun": kijun(
+                mid_high(df_d1), mid_low(df_d1), period=params.kijun_period
+            ).values.astype(float),
+            "d1_atr": wilder_atr(
+                mid_high(df_d1), mid_low(df_d1), mid_close(df_d1), period=params.atr_period
+            ).values.astype(float),
+        },
+        index=df_d1.index,
     )
-    merged = merged.sort_values("_idx").reset_index(drop=True)
-
-    d1c = merged["d1_close"].values.astype(float)
-    d1k = merged["d1_kijun"].values.astype(float)
-    d1a = merged["d1_atr"].values.astype(float)
+    rows = get_htf_row_at(df_h4.index, d1_panel, require_fully_closed=True)
+    d1c = rows["d1_close"].to_numpy(dtype=float)
+    d1k = rows["d1_kijun"].to_numpy(dtype=float)
+    d1a = rows["d1_atr"].to_numpy(dtype=float)
 
     finite = np.isfinite(d1c) & np.isfinite(d1k) & np.isfinite(d1a) & (d1a > 0)
     above_kijun = d1c > d1k

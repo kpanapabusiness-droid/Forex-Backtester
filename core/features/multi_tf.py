@@ -27,27 +27,19 @@ from core.features._helpers import (
 )
 from core.features.lineage import CausalLineage, FeatureSpec
 from core.features.registry import register
+from core.signals.htf_alignment import get_htf_value_at
 
 
 def _build_d1_lag1_series(pair_df: pd.DataFrame, d1_df: pd.DataFrame, column: str) -> pd.Series:
     """Return ``d1_df[column]`` aligned to ``pair_df.index`` with one-day lag.
 
     Per L_PROTOCOL §1: at calendar day T, only D1 bars from T-1 or
-    earlier are visible.
+    earlier are visible. Timezone-invariant — works correctly under both
+    UTC and 5ers EET storage conventions (byte-identical to the legacy
+    normalize-and-shift idiom under UTC; correct lag-1 under EET).
     """
-    d1 = d1_df[[column]].copy()
-    d1["_date"] = d1.index.normalize()
-    d1 = d1.sort_values("_date").drop_duplicates("_date", keep="last")
-
-    shifted = pd.DataFrame(
-        {
-            "_date": pair_df.index.normalize() - pd.Timedelta(days=1),
-            "_idx": np.arange(len(pair_df), dtype=np.int64),
-        }
-    ).sort_values("_date")
-    merged = pd.merge_asof(shifted, d1, on="_date", direction="backward")
-    merged = merged.sort_values("_idx").reset_index(drop=True)
-    return pd.Series(merged[column].values, index=pair_df.index, name=column)
+    out = get_htf_value_at(pair_df.index, d1_df[[column]], column, require_fully_closed=True)
+    return out.rename(column)
 
 
 def _d1_close_slope_sign(pair_df: pd.DataFrame, panel=None) -> pd.Series:

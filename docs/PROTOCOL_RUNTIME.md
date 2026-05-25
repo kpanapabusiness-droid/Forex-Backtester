@@ -501,6 +501,111 @@ outside this PR's scope contract). Documented in
 
 ---
 
+## §8c Exit-policy registry
+
+`core/sim/exit_policies/` holds the canonical exit-policy registry for
+the v3 multipair backtester. Each registered policy defines the
+post-SL behaviour of a position (TP placement, trailing logic,
+partial-close lifecycle) and is consumable by every architecture
+(A1..A6) via `arch_config.exit_policy = "<name>"`. Default `None`
+preserves prior behaviour (SL + optional `TrailManager` + signal-class
+exit predicates only — e.g. KH-24's `kijun_d1` path).
+
+### Registered policies
+
+| Name | Semantics summary | Reference |
+|---|---|---|
+| `sl_only` | Baseline. SL + (optional) signal-class predicates only. | [sl_only.py](../core/sim/exit_policies/sl_only.py) / [step_5.py:143-151](../scripts/l_arc_10_v3/step_5.py) |
+| `sl_plus_tp_2r` | SL + intra-bar TP at `entry + 2 × R_atr`. Decorates `Order.tp_price`; uses existing intra-bar TP infrastructure. | [sl_plus_tp_2r.py](../core/sim/exit_policies/sl_plus_tp_2r.py) / [step_5.py:153-161](../scripts/l_arc_10_v3/step_5.py) |
+| `sl_plus_tp_3r` | Same as TP_2R at `+3R`. | [sl_plus_tp_3r.py](../core/sim/exit_policies/sl_plus_tp_3r.py) / [step_5.py:163-171](../scripts/l_arc_10_v3/step_5.py) |
+| `sl_plus_trailing_atr` | Activate at MFE ≥ +1R; trail at `peak_high − R_atr`; bar-close eval; exit at next-bar open. | [sl_plus_trailing_atr.py](../core/sim/exit_policies/sl_plus_trailing_atr.py) / [step_5.py:173-193](../scripts/l_arc_10_v3/step_5.py) |
+| `sl_plus_trailing_swing` | Activate at MFE ≥ +1R; trail = running max of `min(prev_close, entry)`; capped at entry by design. | [sl_plus_trailing_swing.py](../core/sim/exit_policies/sl_plus_trailing_swing.py) / [step_5.py:195-217](../scripts/l_arc_10_v3/step_5.py) |
+| `sl_partial_close_1r_runner_trail` | Intra-bar partial close 50% at `entry + R_atr`; runner trails at `peak_high − R_atr` (path-wide peak); SL still binds on runner. | [sl_partial_close_1r_runner_trail.py](../core/sim/exit_policies/sl_partial_close_1r_runner_trail.py) / [step_5.py:219-250](../scripts/l_arc_10_v3/step_5.py) |
+
+`R_atr = sl_atr_mult × atr_at_entry` — the size of 1R in price units,
+computed at trade fill against the actual entry price and the
+mid-anchored ATR per PR #189 §15.1. The registry is SL-multiplier
+agnostic: policies anchor in R-units; the live engine carries the
+fill price through the policy state machine.
+
+### Architecture wiring
+
+```python
+A1Config(
+    config_id="kh24_with_partial_close",
+    sl_atr_mult=2.0,
+    trail_enabled=False,             # canonical trail off
+    exit_policy="sl_partial_close_1r_runner_trail",
+    ...,
+)
+```
+
+The architecture's `run(...)` instantiates an `ExitPolicyManager()`
+when `exit_policy is not None` and passes it to `MultiPairBacktester(
+exit_policy_manager=...)`. The driver:
+
+  1. Calls `policy.apply_to_order(ctx)` at trade fill time (anchored to
+     actual fill price). TP-style policies populate `Order.tp_price`
+     here so the existing intra-bar TP infrastructure handles fire+fill
+     at the exact TP level (realised R = exactly +2R / +3R).
+  2. Calls `manager.evaluate_intrabar_for_all(...)` BEFORE intra-bar
+     SL/TP — partial-close at +1R fires on bar high before SL is
+     evaluated against bar low. The manager's
+     `has_intrabar_partial_this_bar(pos_id)` flag SUPPRESSES same-bar
+     intra-bar SL/TP for the position that just partial-closed
+     (matches reference's `sl_breach > tp1_i` constraint so the runner
+     survives the same-bar low).
+  3. Calls `manager.evaluate_at_close_for_all(...)` AFTER trail-manager
+     ratchet. Trailing-style policies and partial-close runner-trail
+     fire here; queued at next-bar open per existing pattern.
+
+Account partial-fill semantics: see `core/sim/account.py:partial_close`
++ `current_size_of` + `ClosedTrade.parent_position_id`. Position is
+frozen; Account owns the live size via a shadow dict.
+
+### Same-bar precedence
+
+Intra-bar SL/TP > intra-bar policy (partial-close) > signal-class
+predicates (bar-close) > trail-manager (bar-close ratchet) > at-close
+policy (last-write-wins). Documented per architecture in each
+`AnConfig.exit_policy` field's docstring.
+
+### Path-replay (legacy Step 5 fast path)
+
+`core/sim/exit_policies/path_simulate.py` exposes the SAME canonical
+semantics applied to recorded path data (`mae_so_far_r / mfe_so_far_r /
+close_r / is_held` per-trade columns). Used by `scripts/l_arc_*/step_5.py`
+post-hoc evaluators (Arc 10 v3 = full path replay; Arc 8 = the coarser
+`simulate_pool_approximation` legacy fast path).
+
+```python
+from core.sim.exit_policies import simulate_path
+final_r_new, bars_held = simulate_path(
+    "sl_partial_close_1r_runner_trail",
+    trade_row,
+    path_rows,
+    sl_mult=2.5,
+)
+```
+
+Both execution paths (live bar-by-bar AND replay) share ONE definition
+per policy. Reference-parity test
+[tests/sim/exit_policies/test_path_simulate_reference_parity.py](../tests/sim/exit_policies/test_path_simulate_reference_parity.py)
+asserts byte-identical behaviour between the canonical replay module
+and the historical hand-rolled simulator
+([scripts/l_arc_10_v3/step_5.py:99-253](../scripts/l_arc_10_v3/step_5.py))
+across all 6 policies × 4 SL multipliers × 9 synthetic path scenarios
+(218 cases).
+
+### KH-24 invariant
+
+KH-24 uses `exit_policy=None` (its production parameters are SL +
+trail + `kijun_d1` predicate, all unchanged). The canonical exit-policy
+code paths are dormant on the KH-24 anchor. Anchor regression
+unaffected.
+
+---
+
 ## §9 Step 5 fold runners
 
 ```python

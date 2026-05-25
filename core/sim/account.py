@@ -73,6 +73,13 @@ class Position:
 
     ``size`` is in units of base currency (positive for both long and
     short — direction carries the sign).
+
+    ``entry_bid`` / ``entry_ask`` are the bid+ask quotes at the entry
+    bar (typically ``open_bid`` / ``open_ask`` of the entry bar). Stored
+    here so the eventual :class:`ClosedTrade` can carry both sides at
+    entry through to the trade ledger. Default ``NaN`` preserves
+    backwards compatibility for callers that construct positions
+    directly without bid/ask data (tests, EA reference adapters).
     """
 
     position_id: int
@@ -83,6 +90,8 @@ class Position:
     size: float  # positive units of base
     sl_price: float | None = None
     tp_price: float | None = None
+    entry_bid: float = float("nan")
+    entry_ask: float = float("nan")
 
     @property
     def base_currency(self) -> str:
@@ -112,6 +121,15 @@ class ClosedTrade:
         ``filter(parent_position_id is None)`` to get whole-position
         closes only, or ``groupby(position_id)`` to reconstruct
         multi-leg sequences.
+
+    ``entry_bid`` / ``entry_ask`` / ``exit_bid`` / ``exit_ask``: the
+    bid+ask quotes at the entry bar and the exit bar respectively. Used
+    by the Step 6 §6.3 spread P&L decomposition diagnostic to compute
+    half-spread cost per trade without re-running the simulator. Default
+    ``NaN`` preserves backwards compatibility — the diagnostic skips
+    trades with NaN bid/ask. Multi-leg partial-close records inherit
+    ``entry_bid`` / ``entry_ask`` from the parent ``Position`` and carry
+    their own ``exit_bid`` / ``exit_ask`` per leg.
     """
 
     position_id: int
@@ -125,6 +143,16 @@ class ClosedTrade:
     pnl: float
     exit_reason: str  # "market" | "stop_loss" | "take_profit" | "time_exit" | etc.
     parent_position_id: int | None = None
+    entry_bid: float = float("nan")
+    entry_ask: float = float("nan")
+    exit_bid: float = float("nan")
+    exit_ask: float = float("nan")
+    # SL price at the time the position was opened — inherited from the
+    # underlying Position. Required by the Step 6 §6.3 spread-decomposition
+    # diagnostic to convert price-unit spread cost into R-units
+    # (sl_distance = abs(entry_price - sl_price)). ``None`` for positions
+    # opened without an SL.
+    sl_price: float | None = None
 
 
 @dataclass(frozen=True)
@@ -212,9 +240,16 @@ class Account:
         size: float,
         sl_price: float | None = None,
         tp_price: float | None = None,
+        entry_bid: float | None = None,
+        entry_ask: float | None = None,
     ) -> Position:
         """Open a position. Exposure check is the caller's job (see
         ``exposure_check``); ``open`` itself does not gate on caps.
+
+        ``entry_bid`` / ``entry_ask`` are captured into the resulting
+        :class:`Position` so they ride through to the eventual
+        :class:`ClosedTrade` for the Step 6 §6.3 spread-decomposition
+        diagnostic. Defaults to ``NaN`` when not supplied.
         """
         pos = Position(
             position_id=self._next_position_id,
@@ -225,6 +260,8 @@ class Account:
             size=float(size),
             sl_price=None if sl_price is None else float(sl_price),
             tp_price=None if tp_price is None else float(tp_price),
+            entry_bid=float("nan") if entry_bid is None else float(entry_bid),
+            entry_ask=float("nan") if entry_ask is None else float(entry_ask),
         )
         self._open[pos.position_id] = pos
         self._next_position_id += 1
@@ -236,6 +273,8 @@ class Account:
         exit_time: pd.Timestamp,
         exit_price: float,
         exit_reason: str,
+        exit_bid: float | None = None,
+        exit_ask: float | None = None,
     ) -> ClosedTrade:
         """Close an open position; realise PnL on the *current* size.
 
@@ -246,6 +285,12 @@ class Account:
 
         Multi-leg closes (i.e. positions with prior partial closes) have
         ``parent_position_id`` populated on the recorded ClosedTrade.
+
+        ``exit_bid`` / ``exit_ask`` are persisted on the resulting
+        :class:`ClosedTrade` for the Step 6 §6.3 spread-decomposition
+        diagnostic. ``entry_bid`` / ``entry_ask`` are inherited from the
+        underlying :class:`Position`. Defaults to ``NaN`` when not
+        supplied — the diagnostic skips trades with NaN bid/ask.
         """
         if position_id not in self._open:
             raise KeyError(f"No open position with id={position_id}")
@@ -267,6 +312,11 @@ class Account:
             pnl=pnl,
             exit_reason=exit_reason,
             parent_position_id=pos.position_id if had_partials else None,
+            entry_bid=pos.entry_bid,
+            entry_ask=pos.entry_ask,
+            exit_bid=float("nan") if exit_bid is None else float(exit_bid),
+            exit_ask=float("nan") if exit_ask is None else float(exit_ask),
+            sl_price=pos.sl_price,
         )
         self._closed.append(trade)
         return trade
@@ -278,6 +328,8 @@ class Account:
         exit_price: float,
         exit_reason: str,
         size_to_close: float,
+        exit_bid: float | None = None,
+        exit_ask: float | None = None,
     ) -> ClosedTrade:
         """Realise PnL on ``size_to_close`` units; leave the rest open.
 
@@ -290,6 +342,13 @@ class Account:
         marking this as one leg of a multi-leg close. The matching final
         :meth:`close` for the same position will also have
         ``parent_position_id`` set (see :meth:`close`).
+
+        ``exit_bid`` / ``exit_ask`` are the bid+ask quotes at the bar
+        where this partial fill executed (typically the bar's
+        ``open_bid`` / ``open_ask``). Captured per leg so the Step 6
+        spread-decomposition diagnostic can decompose each leg's spread
+        cost independently. ``entry_bid`` / ``entry_ask`` are inherited
+        from the parent :class:`Position`.
         """
         if position_id not in self._open:
             raise KeyError(f"No open position with id={position_id}")
@@ -323,6 +382,11 @@ class Account:
             pnl=pnl,
             exit_reason=exit_reason,
             parent_position_id=pos.position_id,
+            entry_bid=pos.entry_bid,
+            entry_ask=pos.entry_ask,
+            exit_bid=float("nan") if exit_bid is None else float(exit_bid),
+            exit_ask=float("nan") if exit_ask is None else float(exit_ask),
+            sl_price=pos.sl_price,
         )
         self._closed.append(trade)
         return trade

@@ -79,6 +79,23 @@ class Step6Inputs:
     configs_evaluated_step5: int | None = None
     holdout_start: pd.Timestamp | None = None
 
+    # Top-1 candidate's closed-trade ledger (for the Step 6 §6.3 spread P&L
+    # decomposition diagnostic). Expected columns include the extended
+    # bid+ask schema (entry_bid, entry_ask, exit_bid, exit_ask) and
+    # sl_price for R-unit conversion. ``None`` for pre-extension closures —
+    # the diagnostic skips gracefully.
+    top_1_trade_ledger: pd.DataFrame | None = None
+    # Per-trade fold_id mapping (columns: leg_id OR trade_id, fold_id).
+    # Pairs with top_1_trade_ledger for per-fold aggregation. ``None``
+    # when fold assignments are not reconstructible — diagnostic skips.
+    top_1_fold_assignments: pd.DataFrame | None = None
+    # IS fold ids vs holdout fold id (informational; diagnostic uses
+    # holdout_fold_id to separate IS aggregation from holdout reporting).
+    holdout_fold_id: int | None = None
+    # r_base for converting R-units to %. Defaults to 0.005 in the
+    # diagnostic when None.
+    r_base_pct: float | None = None
+
     # Per-arc extras (e.g. classifier path, broker spread floor file). Free-form.
     extras: Mapping[str, Any] = field(default_factory=dict)
 

@@ -351,7 +351,7 @@ A2 and A6 use the single Step-4-fit classifier across every WFO fold. A3 and A4 
 
 1. **§6.1 Lookahead** — per-feature producer trace + D1 lag rule + cluster-feature audit + byte-compare from raw OHLC + threshold-selection lineage.
 2. **§6.2 Selection bias** — verifies Step 5's recorded configs_evaluated + Bonferroni-equivalent noise floor + holdout-reuse detector + cluster-selection record.
-3. **§6.3 Execution realism** — HistData M1 bid+ask source present + spread regime delta + fill realism + lot rounding at `r_safe` + mid-price refactor active + UTC bar boundary.
+3. **§6.3 Execution realism** — HistData M1 bid+ask source present + spread regime delta + fill realism + lot rounding at `r_safe` + mid-price refactor active + UTC bar boundary + spread P&L decomposition diagnostic (info-severity; verdict-flip threshold reported, does not modify verdict).
 4. **§6.4 Statistical integrity** — Lo-corrected Sharpe sample-size + 28-pair survivorship + vol-regime coverage (≥3 years) + cross-pair daily-bucket correlation.
 5. **§6.5 Determinism** — `step_4/classifiers/manifest.json` sha256 verify + required artefacts present + seed pinning + LF line endings. (Sha256-verify only; does NOT re-run sims — CI provides the two-run guarantee.)
 6. **§6.6 Deployment readiness** — `## §4 deployment_spec` heading + `config_artefact_path` resolvable + all §4.X subsections present + features live-computable + checklist marked.

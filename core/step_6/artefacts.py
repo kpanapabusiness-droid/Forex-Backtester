@@ -41,6 +41,14 @@ _REPORT_FILENAME = {
     "deployment_readiness": "deployment_readiness_report.md",
 }
 
+# Sentinel key honoured in ``CategoryAuditResult.diagnostic``. When
+# present, its value (a markdown string) is appended raw to the rendered
+# category report AFTER the standard checks/evidence sections. Used by
+# §6.3 to embed the spread P&L decomposition subsection's table without
+# JSON-escaping. Keep in sync with
+# ``core.step_6.execution_realism.APPENDED_MARKDOWN_KEY``.
+_APPENDED_MARKDOWN_KEY = "__appended_markdown__"
+
 
 def _severity_marker(severity: Severity, passed: bool) -> str:
     if passed:
@@ -72,12 +80,19 @@ def render_category_report(
         lines.append("- **--no-block:** critical failures rendered as DEMOTED-WARNING")
     lines.append("")
     if category.diagnostic:
-        lines.append("## Diagnostic")
-        lines.append("")
-        lines.append("```json")
-        lines.append(json.dumps(dict(category.diagnostic), indent=2, sort_keys=True))
-        lines.append("```")
-        lines.append("")
+        # The appended-markdown sentinel is rendered LAST, not in the
+        # JSON diagnostic block. Strip it before serialising the rest.
+        diagnostic_for_json = {
+            k: v for k, v in dict(category.diagnostic).items()
+            if k != _APPENDED_MARKDOWN_KEY
+        }
+        if diagnostic_for_json:
+            lines.append("## Diagnostic")
+            lines.append("")
+            lines.append("```json")
+            lines.append(json.dumps(diagnostic_for_json, indent=2, sort_keys=True, default=str))
+            lines.append("```")
+            lines.append("")
     lines.append("## Checks")
     lines.append("")
     lines.append("| # | Name | Status | Message |")
@@ -101,6 +116,16 @@ def render_category_report(
             lines.append("```")
         else:
             lines.append("_(no structured evidence)_")
+        lines.append("")
+    # Append any category-supplied raw markdown last (e.g. §6.3 spread
+    # P&L decomposition subsection — needs to render as a markdown table,
+    # not as JSON-escaped text in the diagnostic block).
+    appended = (
+        category.diagnostic.get(_APPENDED_MARKDOWN_KEY)
+        if category.diagnostic else None
+    )
+    if appended:
+        lines.append(str(appended).rstrip("\n"))
         lines.append("")
     return LINE_TERMINATOR.join(lines) + LINE_TERMINATOR
 

@@ -33,6 +33,8 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
+from core.signals.htf_alignment import get_htf_value_at
+
 # Canonical L4 parameters (locked, identical to configs/lchar/layer4.yaml).
 ATR_PERIOD: int = 14
 TRAILING_WINDOW: int = 100
@@ -68,19 +70,25 @@ def _trailing_top_decile(series: pd.Series, window: int, q: float) -> np.ndarray
 def _lookback_d1_to_1h(df_1h: pd.DataFrame, df_d1: pd.DataFrame, d1_mask: np.ndarray) -> np.ndarray:
     """Mirrors run_layer4.lookback_d1_to_lower.
 
-    For each 1H bar, return the D1 mask value at the D1 strictly before the D1
-    bar containing it (one-day lag). False where the lookup is out of range.
+    For each 1H bar, return the D1 mask value at the most-recently
+    fully-closed D1 bar at that 1H timestamp (one-day-lag rule per
+    L_PROTOCOL §1). False where the lookup is out of range.
+
+    Timezone-invariant via core.signals.htf_alignment: works correctly
+    under both UTC and 5ers EET storage conventions. The legacy idiom
+    (`df_1h["date"].dt.normalize().map(d1_index_lookup)`) hard-failed
+    under EET (State C — exact-match `.map` returns NaN for every bar
+    because EET-shifted D1 labels don't match UTC-midnight-normalized
+    H1 keys), producing a 0-trade signal pool.
     """
-    floor_d1 = df_1h["date"].dt.normalize()
-    idx_d1 = pd.Series(np.arange(len(df_d1), dtype=np.int64), index=df_d1["date"])
-    contain = floor_d1.map(idx_d1).to_numpy(dtype=float)
-    valid = ~np.isnan(contain)
-    contain_int = np.where(valid, contain, 0).astype(np.int64)
-    mr_idx = contain_int - 1
-    in_range = valid & (mr_idx >= 0)
-    out = np.zeros(len(df_1h), dtype=bool)
-    out[in_range] = d1_mask[mr_idx[in_range]]
-    return out
+    d1_panel = pd.DataFrame({"_mask": d1_mask.astype(float)}, index=pd.DatetimeIndex(df_d1["date"]))
+    aligned = get_htf_value_at(
+        pd.DatetimeIndex(df_1h["date"]),
+        d1_panel,
+        "_mask",
+        require_fully_closed=True,
+    )
+    return (aligned.fillna(0.0).to_numpy() > 0.5).astype(bool)
 
 
 def compute_signal(

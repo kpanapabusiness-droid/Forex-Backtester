@@ -67,6 +67,18 @@ See [PROTOCOL_RUNTIME.md §15.3](PROTOCOL_RUNTIME.md) and
 [docs/calibration/histdata_mt5_aggregation_parity_2026_05.md](calibration/histdata_mt5_aggregation_parity_2026_05.md)
 for full convention specs and DST handling.
 
+**Signal-module timezone responsibility:** Signal modules and multi-TF feature
+producers MUST use [`core/signals/htf_alignment.py`](../core/signals/htf_alignment.py)
+(`get_htf_value_at` / `get_htf_row_at` / `get_htf_index_at`) for any
+lookup of an HTF column at LTF anchor timestamps — NOT raw `.floor()`
+or `.normalize()` against UTC anchors. The engine handles bar
+*aggregation* tz-correctly (above); signal modules are responsible for
+the *alignment* step and must use the canonical utility to remain
+timezone-invariant under both UTC and 5ers EET conventions. See
+[PROTOCOL_RUNTIME.md §15.4](PROTOCOL_RUNTIME.md) and
+[docs/audits/signal_module_eet_audit_2026_05.md](audits/signal_module_eet_audit_2026_05.md)
+for the bug class this avoids.
+
 ### Pre-PR-#187 layer (unchanged for UTC)
 
 - **Loader:** `core.data.histdata_loader.load_m1(pair, ...)` reads

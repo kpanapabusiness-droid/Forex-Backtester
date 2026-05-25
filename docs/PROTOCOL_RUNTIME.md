@@ -863,6 +863,51 @@ Verification:
 - [tests/test_aggregator.py](../tests/test_aggregator.py) — legacy UTC
   byte-identity preserved
 
+### §15.4 Signal-module timezone-invariant HTF alignment
+
+[core/signals/htf_alignment.py](../core/signals/htf_alignment.py) is the canonical
+way for signal modules and multi-TF feature producers to look up an HTF column
+value (e.g. prior-day D1 close) at an LTF anchor timestamp (e.g. each H4 bar).
+Replaces the legacy UTC-anchored idioms that broke under the 5ers EET storage
+convention in §15.3:
+
+| Legacy idiom | Failure mode under EET | Canonical replacement |
+|---|---|---|
+| `ltf_index.floor("4h").map(idx_h4)` | State **C** — `.map()` exact-match returns NaN → empty signal pool | `get_htf_index_at(..., require_fully_closed=True)` |
+| `ltf_index.normalize().map(idx_d1)` | State **C** | `get_htf_index_at(...)` or `get_htf_value_at(...)` |
+| `df.index.normalize() - pd.Timedelta(days=1)` + `merge_asof(backward)` | State **B** — silently picks same-EET-day HTF (lookahead) | `get_htf_value_at(..., require_fully_closed=True)` or `get_htf_row_at(...)` |
+| `d1_ts.normalize()` + `np.searchsorted` | State **B** — picks neighbouring EET-day HTF | `get_htf_index_at(...)` |
+
+**Public API:**
+
+```python
+get_htf_value_at(current_timestamps, htf_panel, column, *, require_fully_closed=True) -> pd.Series
+get_htf_row_at(current_timestamps, htf_panel, *, require_fully_closed=True) -> pd.DataFrame
+get_htf_index_at(current_timestamps, htf_panel, *, require_fully_closed=True, invalid_sentinel=-1) -> np.ndarray
+```
+
+**`require_fully_closed` semantics:**
+
+- `True` (default) — returns the most-recently *fully closed* HTF bar at each
+  LTF ts (matches L_PROTOCOL §1 one-day-lag rule; byte-identical to the legacy
+  KH-24 `.normalize() - Timedelta(days=1) + merge_asof(backward)` idiom under
+  UTC convention). Used by KH-24, Arc 3, Arc 5, `core/features/multi_tf.py`.
+- `False` — returns the HTF bar *containing* each LTF ts (no fully-closed
+  back-off; caller applies its own freshness offset downstream). Used by Arc
+  10 DLR, which derives `d_t - 4` for the swing-low search constraint.
+
+**Timezone-awareness contract:** both `current_timestamps` and `htf_panel.index`
+must share the same tz-awareness (both tz-aware or both tz-naive). A mismatch
+raises `ValueError`. The engine guarantees tz-aware UTC output under both
+`boundary_convention="utc"` and `"5ers_eet"` (per §15.3), so the contract is
+auto-satisfied for any panels flowing through `core.data.aggregator`.
+
+**Verification:**
+- [tests/signals/test_htf_alignment.py](../tests/signals/test_htf_alignment.py) — 19 unit tests including byte-identical-to-legacy-KH-24 under UTC
+- [tests/signals/test_htf_alignment_timezone_invariance.py](../tests/signals/test_htf_alignment_timezone_invariance.py) — 14 regression tests including a static guard that flags reintroduction of `.floor()` / `.normalize()` in fixed modules
+
+**Audit report:** [docs/audits/signal_module_eet_audit_2026_05.md](audits/signal_module_eet_audit_2026_05.md)
+
 ---
 
 ## §16 What lives elsewhere

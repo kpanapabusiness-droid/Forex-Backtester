@@ -7,4 +7,27 @@ pyyaml
 pydantic
 scipy
 scikit-learn
-joblib
+# joblib pinned to a minor version for cross-env classifier-pickle
+# stability — heavy_ml_probe PR-C persists per-fold classifiers via
+# joblib.dump for PR-E's A6 consumer, and joblib's pickle format has
+# evolved between 1.3 / 1.4 / 1.5. Bump in lockstep with vanilla Step 4
+# manifest's `joblib_version` audit field (see
+# core/steps/step_4_extraction.py:_write_manifest).
+joblib>=1.4,<1.6
+
+# heavy_ml_probe sub-protocol (docs/sub_protocols/heavy_ml_probe.md v1.0)
+# Used by core/heavy_ml_probe/* and tests/heavy_ml_probe/*.
+# Pinned-version table lives in configs/heavy_ml_probe/default.yaml under
+# library_versions; the Step 4 manifest captures actual resolved versions
+# at runtime for env-drift audit (same convention as vanilla Step 4).
+flaml
+# Cox PH via statsmodels.duration.hazard_regression.PHReg (PR-D). The
+# original dispatch spec listed `lifelines` for Cox PH and
+# `scikit-survival` for RSF, but both are blocked on Python 3.14 because
+# their transitive dep `ecos` has no cp314 wheel. statsmodels has a
+# clean cp314 wheel and PHReg covers the Cox PH path; RSF is deferred
+# per PR-B flag-1 disposition.
+statsmodels
+xgboost
+catboost
+lightgbm

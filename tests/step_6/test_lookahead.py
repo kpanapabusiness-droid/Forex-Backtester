@@ -2,9 +2,14 @@
 
 from __future__ import annotations
 
+from dataclasses import replace
 from pathlib import Path
 
-from core.step_6.lookahead import audit
+from core.step_6.lookahead import (
+    _check_no_path_features_in_entry,
+    _check_per_feature_lineage,
+    audit,
+)
 from core.step_6.manifest import AuditConfig, Severity
 from tests.step_6._fixtures import build_clean_inputs, build_leaky_inputs
 
@@ -54,3 +59,31 @@ def test_category_is_lookahead(tmp_path: Path):
     inputs = build_clean_inputs(tmp_path)
     result = audit(inputs, AuditConfig())
     assert result.category == "lookahead"
+
+
+def test_per_feature_lineage_empty_features_vacuous_pass(tmp_path: Path):
+    """A1 winning config with features_in_winning_config: [] passes vacuously.
+
+    Rule-based architectures (A1 system_level_filter) by design have no
+    classifier features. The universal-quantifier "every feature is clean"
+    is vacuously True over an empty set — no features means no lineage
+    contamination opportunity, not a missing-check failure.
+    """
+    inputs = replace(build_clean_inputs(tmp_path), best_candidate_features=())
+    result = _check_per_feature_lineage(inputs)
+    assert result.passed is True
+    assert result.severity == Severity.INFO
+    assert "vacuous PASS" in result.message
+
+
+def test_no_path_features_in_entry_empty_features_vacuous_pass(tmp_path: Path):
+    """A1 winning config with features_in_winning_config: [] passes vacuously.
+
+    Same semantics as per_feature_lineage_clean — no entry features means
+    no opportunity for path-feature contamination in entry.
+    """
+    inputs = replace(build_clean_inputs(tmp_path), best_candidate_features=())
+    result = _check_no_path_features_in_entry(inputs)
+    assert result.passed is True
+    assert result.severity == Severity.INFO
+    assert "vacuous PASS" in result.message

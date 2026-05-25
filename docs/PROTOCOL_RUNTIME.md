@@ -740,6 +740,8 @@ core/step_6/
 
 `CategoryAuditResult.passed = AND over critical-severity checks only`.
 
+**Empty `features_in_winning_config` (vacuous pass):** rule-based architectures (A1 system_level_filter) by design have no classifier features. The `per_feature_lineage_clean` and `no_path_features_in_entry` checks treat `features_in_winning_config: []` as a vacuous pass per universal-quantifier-over-empty-set semantics: no features to check means no opportunity for lineage/path contamination, not a missing-check failure. Patch landed 2026-05-25 (`engine/step_6_a1_vacuous_pass`).
+
 **Manual CLI** — `scripts/run_step_6.py`:
 
 ```bash

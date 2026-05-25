@@ -19,7 +19,6 @@ from scripts.update_tracker_from_closure import (
     _validate_amendment_5_field,
 )
 
-
 _BASE_PAYLOAD: dict = {
     "template_version": "v1.3",
     "arc_name": "test_arc",

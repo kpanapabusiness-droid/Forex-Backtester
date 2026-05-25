@@ -1,9 +1,11 @@
 """CLI for the heavy_ml_probe sub-protocol.
 
-PR-B surface: load + validate config, load pool, apply causal lineage
+PR-C surface: load + validate config, load pool, apply causal lineage
 gate, run AutoML across an 11-fold TimeSeriesSplit (when the pool
-supports it), write the artefact set + manifest. Meta-labeling /
-survival flows land in PR-C/D.
+supports it), run meta-labeling (reach-1R-before-SL target + threshold
+sweep + per-fold classifier persistence) when the pool carries the
+meta-label schema, write the artefact set + manifest. Survival flow
+lands in PR-D.
 
 Usage:
 
@@ -65,9 +67,26 @@ def _print_result_summary(result: PipelineResult) -> None:
         )
     else:
         print(f"  AutoML         : status={result.automl_skip_reason} (skipped)")
-    print(
-        "[heavy_ml_probe] Meta-labeling / survival not yet implemented (PR-C/D)."
-    )
+    if result.meta_label_result is not None:
+        mr = result.meta_label_result
+        mr_ar = mr.automl_result
+        print(
+            f"  Meta-labeling  : status=ok  folds={mr_ar.n_folds_total} "
+            f"(valid={mr_ar.n_folds_valid})  "
+            f"AUC nanmean={mr_ar.auc_mean:.4f}  "
+            f"positive_rate={mr.positive_rate:.4f}  "
+            f"n_thresholds={len(mr.threshold_sweep)}"
+        )
+        print(f"  meta_label CSV : {result.meta_label_results_path.as_posix()}")
+        print(
+            f"  meta_label clfs: "
+            f"{result.meta_label_classifier_manifest_path.parent.as_posix()}/"
+        )
+    else:
+        print(
+            f"  Meta-labeling  : status={result.meta_label_skip_reason} (skipped)"
+        )
+    print("[heavy_ml_probe] Survival not yet implemented (PR-D).")
 
 
 def main(argv: list[str] | None = None) -> int:

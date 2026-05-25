@@ -52,7 +52,7 @@ any AutoML call.
 from __future__ import annotations
 
 import warnings
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Mapping, Sequence
 
 import numpy as np
@@ -109,7 +109,12 @@ class AllFeaturesRejected(RuntimeError):
 
 @dataclass(frozen=True)
 class FoldResult:
-    """One fold of the AutoML CV evaluation."""
+    """One fold of the AutoML CV evaluation.
+
+    ``fitted_estimator`` is populated only when ``run_automl`` is called
+    with ``keep_classifiers=True`` (PR-C meta-labeling path); it stays
+    ``None`` for PR-B's default invocation.
+    """
 
     fold: int                       # 1..n_folds
     train_start: pd.Timestamp
@@ -127,11 +132,17 @@ class FoldResult:
     max_iter: int                   # the cap we passed in
     estimator_list: tuple[str, ...] # FLAML's estimator_list for this fold
     fit_wall_seconds: float
+    fitted_estimator: Any | None = None  # inner sklearn-compatible classifier (PR-C opt-in)
 
 
 @dataclass(frozen=True)
 class AutoMLResult:
-    """Aggregated AutoML output across all folds."""
+    """Aggregated AutoML output across all folds.
+
+    PR-B fields populated unconditionally; PR-C added ``oof_predictions``
+    (empty unless ``collect_oof_predictions=True`` was passed to
+    :func:`run_automl`).
+    """
 
     fold_results: tuple[FoldResult, ...]
     leaderboard: pd.DataFrame       # one row per (fold, estimator) — long-form
@@ -145,6 +156,10 @@ class AutoMLResult:
     total_fit_wall_seconds: float
     flaml_version: str
     metric: str
+    # PR-C: out-of-fold predictions per validation trade, aggregated
+    # across all folds. Columns: ``trade_id, fold, y_true, y_pred_proba``.
+    # Empty DataFrame when ``collect_oof_predictions=False`` (default).
+    oof_predictions: pd.DataFrame = field(default_factory=pd.DataFrame)
 
 
 # ── Internal helpers ─────────────────────────────────────────────────
@@ -274,9 +289,19 @@ def _run_one_fold(
     metric: str,
     n_jobs: int,
     permutation_repeats: int,
-) -> tuple[FoldResult, pd.DataFrame, pd.DataFrame]:
+    keep_classifier: bool = False,
+    collect_oof: bool = False,
+    trade_id_col: str = "trade_id",
+) -> tuple[FoldResult, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """Train + evaluate one fold. Returns (fold_result, leaderboard_rows,
-    importance_rows)."""
+    importance_rows, oof_rows).
+
+    PR-C extensions (default-off, backwards-compatible with PR-B):
+      * ``keep_classifier=True`` → the fold's inner sklearn-compatible
+        estimator is stored on ``FoldResult.fitted_estimator``.
+      * ``collect_oof=True`` → returns a non-empty ``oof_rows`` DataFrame
+        with columns ``(trade_id, fold, y_true, y_pred_proba)``.
+    """
     import time
 
     from flaml import AutoML  # local import — heavy library, lazy load
@@ -311,8 +336,9 @@ def _run_one_fold(
             modelcount=0, max_iter=int(max_iter),
             estimator_list=(),
             fit_wall_seconds=0.0,
+            fitted_estimator=None,
         )
-        return fr, pd.DataFrame(), pd.DataFrame()
+        return fr, pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
 
     t0 = time.perf_counter()
     automl = AutoML()
@@ -423,6 +449,17 @@ def _run_one_fold(
                 stacklevel=2,
             )
 
+    # PR-C: collect OOF predictions for the threshold sweep.
+    oof_rows = pd.DataFrame()
+    if collect_oof and trade_id_col in pool_sorted.columns:
+        val_trade_ids = pool_sorted[trade_id_col].values[val_s:val_e]
+        oof_rows = pd.DataFrame({
+            trade_id_col: val_trade_ids,
+            "fold": fold_idx,
+            "y_true": y_val,
+            "y_pred_proba": proba_val,
+        })
+
     fr = FoldResult(
         fold=fold_idx,
         train_start=times.iloc[train_s], train_end=times.iloc[train_e - 1],
@@ -437,8 +474,11 @@ def _run_one_fold(
         max_iter=int(max_iter),
         estimator_list=tuple(automl.estimator_list or ()),
         fit_wall_seconds=float(fit_wall),
+        # PR-C: optionally keep the inner sklearn-compatible estimator
+        # for downstream persistence (meta-labeling → A6 consumer).
+        fitted_estimator=(inner_estimator if keep_classifier else None),
     )
-    return fr, leaderboard_rows, importance_rows
+    return fr, leaderboard_rows, importance_rows, oof_rows
 
 
 # ── Public surface ───────────────────────────────────────────────────
@@ -457,6 +497,9 @@ def run_automl(
     permutation_repeats: int = DEFAULT_PERMUTATION_REPEATS,
     entry_time_col: str = "entry_time",
     target_col: str = "y",
+    trade_id_col: str = "trade_id",
+    keep_classifiers: bool = False,
+    collect_oof_predictions: bool = False,
 ) -> AutoMLResult:
     """Run heavy_ml_probe AutoML across an 11-fold TimeSeriesSplit.
 
@@ -466,6 +509,8 @@ def run_automl(
         Step-1 trade pool. Must contain ``entry_time`` (or
         ``entry_time_col``), the binary target ``y`` (or
         ``target_col``), and every column listed in ``used_features``.
+        Must additionally contain ``trade_id_col`` (default ``trade_id``)
+        when ``collect_oof_predictions=True``.
     used_features
         Column order to pass to FLAML. Caller is responsible for
         applying the lineage gate first (see
@@ -478,12 +523,29 @@ def run_automl(
         TimeSeriesSplit fold count. Default 11 per spec.
     max_iter_per_fold
         FLAML budget per fold. Default 1000 per spec.
+    target_col
+        Pool column holding the binary target. Default ``"y"``.
+        Meta-labeling (PR-C) passes ``"y_meta_label"`` for the
+        reach-1R-before-SL target; vanilla PR-B path uses ``"y"``.
+    trade_id_col
+        Pool column identifying each trade. Only consulted when
+        ``collect_oof_predictions=True``. Default ``"trade_id"``.
+    keep_classifiers
+        PR-C opt-in. When True, each ``FoldResult.fitted_estimator``
+        carries the fold's inner sklearn-compatible classifier
+        (``automl.model.estimator``) for downstream persistence. PR-B
+        callers leave this False to keep memory bounded.
+    collect_oof_predictions
+        PR-C opt-in. When True, the returned ``AutoMLResult.oof_predictions``
+        DataFrame is non-empty with columns
+        ``(trade_id_col, fold, y_true, y_pred_proba)``. Used by
+        meta-labeling's threshold sweep.
 
     Returns
     -------
     :class:`AutoMLResult` with per-fold ``FoldResult`` snapshots, a
-    long-form leaderboard DataFrame, an importance DataFrame, and
-    aggregate AUC + budget stats.
+    long-form leaderboard DataFrame, an importance DataFrame, OOF
+    predictions (when requested), and aggregate AUC + budget stats.
 
     Raises
     ------
@@ -520,12 +582,20 @@ def run_automl(
             f"a pool of size {len(pool_sorted)}; pool too small"
         )
 
+    # PR-C: validate trade_id presence when OOF predictions are requested.
+    if collect_oof_predictions and trade_id_col not in pool_sorted.columns:
+        raise ValueError(
+            f"collect_oof_predictions=True requires pool to contain "
+            f"{trade_id_col!r} column; present: {sorted(pool_sorted.columns)[:10]}..."
+        )
+
     fold_results: list[FoldResult] = []
     leaderboard_frames: list[pd.DataFrame] = []
     importance_frames: list[pd.DataFrame] = []
+    oof_frames: list[pd.DataFrame] = []
 
     for fold_idx, (train_s, train_e, val_s, val_e) in enumerate(folds, start=1):
-        fr, lb, imp = _run_one_fold(
+        fr, lb, imp, oof = _run_one_fold(
             fold_idx=fold_idx,
             pool_sorted=pool_sorted,
             used_features=used_features,
@@ -538,12 +608,17 @@ def run_automl(
             metric=metric,
             n_jobs=n_jobs,
             permutation_repeats=permutation_repeats,
+            keep_classifier=keep_classifiers,
+            collect_oof=collect_oof_predictions,
+            trade_id_col=trade_id_col,
         )
         fold_results.append(fr)
         if not lb.empty:
             leaderboard_frames.append(lb)
         if not imp.empty:
             importance_frames.append(imp)
+        if not oof.empty:
+            oof_frames.append(oof)
 
     leaderboard = (
         pd.concat(leaderboard_frames, ignore_index=True)
@@ -566,6 +641,15 @@ def run_automl(
         auc_mean = float(np.nanmean(auc_vals)) if n_valid > 0 else float("nan")
         auc_std = float(np.nanstd(auc_vals, ddof=0)) if n_valid > 0 else float("nan")
 
+    # PR-C: assemble OOF predictions deterministically by (fold, trade_id).
+    oof_predictions = (
+        pd.concat(oof_frames, ignore_index=True)
+        .sort_values(["fold", trade_id_col], kind="mergesort")
+        .reset_index(drop=True)
+        if oof_frames
+        else pd.DataFrame(columns=[trade_id_col, "fold", "y_true", "y_pred_proba"])
+    )
+
     return AutoMLResult(
         fold_results=tuple(fold_results),
         leaderboard=leaderboard,
@@ -579,6 +663,7 @@ def run_automl(
         total_fit_wall_seconds=float(sum(fr.fit_wall_seconds for fr in fold_results)),
         flaml_version=_flaml_version(),
         metric=metric,
+        oof_predictions=oof_predictions,
     )
 
 

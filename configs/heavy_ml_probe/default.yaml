@@ -50,9 +50,11 @@ automl:
 meta_labeling:
   enabled: true
   target_kind: reach_1r_before_sl
-  mfe_r_threshold: 1.0            # +1R MFE
-  # Threshold sweep at PR-C: report precision / recall at each.
-  threshold_sweep: [0.30, 0.40, 0.50, 0.60, 0.70]
+  mfe_r_threshold: 1.0            # +1R MFE (dispatch §1 locked)
+  # Threshold sweep — dispatch §3 locked grid. Reports precision,
+  # recall, f1, n_kept, n_dropped, mean_R_kept_set, mean_R_dropped_set,
+  # edge_lift_r per threshold.
+  threshold_sweep: [0.50, 0.55, 0.60, 0.65, 0.70, 0.75, 0.80]
 
 # ── Survival models (dispatch §6 + spec §"Survival model variant") ───
 # Q1 resolution: target = time-to-+1R-MFE censored at SL or time-exit.

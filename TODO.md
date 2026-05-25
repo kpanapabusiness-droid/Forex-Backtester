@@ -226,6 +226,7 @@ All 🔴 NOT STARTED — defer to Phase 2 trigger.
 | Legacy engine retirement (migrate `live/run_daily.py` + 32 importers off `core/backtester.py` + `core/signal_logic.py`) | 🔴 | Gate: KH-24 anchor preservation (±0.5pp ROI / ±1pp DD). Out of scope for current PRs; separate dispatch needed. |
 | EA mid-trail update (live MT5 EA still uses bid-side `CopyClose`) | 🔴 | To restore backtest↔EA parity post-PR-#189; separate deployment PR |
 | Backfill `AMENDMENT_5_CUTOFF_ISO` in `scripts/tracker_parser/schema.py` with PR #194 merge timestamp | 🔴 | Placeholder pinned at `2026-05-23T00:00:00Z`. Mirror PR-186 / Amendment 3 backfill pattern. Trivial one-line follow-up PR. |
+| Backfill `AMENDMENT_5_1_CUTOFF_ISO` in `scripts/tracker_parser/schema.py` with PR Amendment-5.1 merge timestamp | 🔴 | Placeholder pinned at `2026-05-25T00:00:00Z`. Mirror `AMENDMENT_5_CUTOFF_ISO` backfill pattern. Trivial one-line follow-up PR. |
 | KH-24 anchor F2/F3 fold-2 anchor-drift bisect investigation | 🔴 | Pre-existing on main; F2/F3 divergence between legacy `KH24FoldRunner` (warmup_days=30) and A1 path (full-history warmup). Documented; queued investigation. |
 | Triple-spread sensitivity diagnostic (Step 6 §6.3 enhancement) | 🔴 | Optional Step 6 framework enhancement |
 | HistData ↔ 5ers MT5 spread comparison (calibration task) | 🔴 | User-side; procedure at [docs/calibration/histdata_mt5_aggregation_parity_2026_05.md §5](docs/calibration/histdata_mt5_aggregation_parity_2026_05.md) |

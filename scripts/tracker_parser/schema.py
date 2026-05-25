@@ -51,6 +51,16 @@ PHASE_2_CUTOFF_ISO: str = "2026-05-23T06:20:59Z"
 # `closed_timestamp` between the placeholder and the actual merge timestamp.
 AMENDMENT_5_CUTOFF_ISO: str = "2026-05-23T00:00:00Z"
 
+AMENDMENT_5_1_CUTOFF_ISO: str = "2026-05-25T00:00:00Z"
+# Placeholder. Backfill with PR merge timestamp post-merge (mirror
+# AMENDMENT_5_CUTOFF_ISO and AMENDMENT_3_CUTOFF_ISO patterns).
+# Cutoff: closures with closed_timestamp >= AMENDMENT_5_1_CUTOFF_ISO
+# and verdict in {PASS-DEPLOYABLE, PASS-VIABLE, *_PROVISIONAL}
+# and ≥2 candidate clusters surviving Step 3 in the closure body
+# MUST list either a constituent cluster's PASS-tier verdict OR
+# the string "a5_gate_4_admission_blocked_by_no_pass_tier_constituent"
+# in architectures_skipped_by_amendment_5.
+
 V11_EXCLUSIVE_FIELDS = {
     "worst_fold_dd_base_pct",
     "worst_fold_roi_base_pct",
@@ -109,6 +119,16 @@ VALID_VERDICTS = {
 }
 
 VALID_ARCHITECTURES = {"A1", "A2", "A3", "A4", "A5", "A6"}
+
+# Reason-string entries accepted in `architectures_skipped_by_amendment_5`
+# alongside {A1..A6} architecture IDs. Introduced by L_PROTOCOL Amendment 5.1
+# (2026-05-25) to record the case where Gate 4 admission of A5 was blocked
+# because no constituent candidate cluster cleared Step 5 PASS-tier under
+# Gates 1/2/3. Extend this set as protocol evolves with new amendment-skip
+# reason strings.
+VALID_ARCHITECTURES_SKIPPED_REASONS = {
+    "a5_gate_4_admission_blocked_by_no_pass_tier_constituent",
+}
 
 
 def detect_schema_version(payload: dict[str, Any]) -> SchemaVersion:
@@ -519,12 +539,21 @@ def parse_payload(payload: dict[str, Any]) -> dict[str, Any]:
             )
 
     # Amendment 5 (v1.3.1) field — enum-validate any entries when present.
+    # Amendment 5.1 (2026-05-25) extends the accepted vocabulary to include
+    # reason strings (see VALID_ARCHITECTURES_SKIPPED_REASONS) alongside the
+    # {A1..A6} architecture IDs. Unknown entries are still rejected — preserves
+    # the closed-vocabulary discipline of the prior validator.
     skipped = norm.get("architectures_skipped_by_amendment_5")
     if skipped is not None:
-        for arch in skipped:
-            if arch not in VALID_ARCHITECTURES:
+        for entry in skipped:
+            if (
+                entry not in VALID_ARCHITECTURES
+                and entry not in VALID_ARCHITECTURES_SKIPPED_REASONS
+            ):
                 raise ValueError(
-                    f"architectures_skipped_by_amendment_5 entry {arch!r} not in {{A1…A6}}"
+                    f"architectures_skipped_by_amendment_5 entry {entry!r} not in "
+                    f"{{A1…A6}} ∪ valid reason strings "
+                    f"({sorted(VALID_ARCHITECTURES_SKIPPED_REASONS)})"
                 )
 
     # v1.3 step_6 block enum validation

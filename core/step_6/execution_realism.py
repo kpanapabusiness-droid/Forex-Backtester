@@ -6,7 +6,7 @@ re-computation — these checks read recorded artefacts (HistData M1
 bid+ask under `data/histdata/`, pool spread regime samples) and the
 deployment_spec; they do not re-run the simulator.
 
-Six checks:
+Six checks + one info-severity diagnostic:
 
   1. ``real_spread_source_present`` (critical) — HistData M1 bid+ask
      directory exists per L_PROTOCOL §1 "Real bid/ask spreads. HistData
@@ -29,6 +29,12 @@ Six checks:
   6. ``utc_bar_boundary`` (info) — pool's signal_time / entry_time
      values carry a UTC tz; daily-DD measurement uses UTC broker-day per
      Amendment 3.
+  7. ``spread_pnl_decomposition`` (info) — post-sim spread tax
+     sensitivity diagnostic. Decomposes per-trade R into signal +
+     spread tax, computes verdict-flip factor under spread inflation
+     scenarios, classifies fragility. Auto-emits an interpretation
+     paragraph; never modifies the verdict. Skipped gracefully when the
+     ledger lacks bid+ask data (pre-PR closures).
 """
 
 from __future__ import annotations
@@ -45,6 +51,15 @@ from core.step_6.manifest import (
     CategoryAuditResult,
     CheckResult,
     Severity,
+)
+from core.step_6.spread_pnl_decomposition import (
+    GateThresholds,
+    SpreadDecompositionResult,
+    format_report_subsection,
+    run_spread_pnl_decomposition,
+)
+from core.step_6.spread_pnl_decomposition import (
+    manifest_entry as _spread_manifest_entry,
 )
 
 REAL_SPREAD_SOURCE = Path("data/histdata")  # post-PR-162; M1 bid+ask per L_PROTOCOL §1
@@ -296,8 +311,110 @@ def _check_utc_bar_boundary(inputs: Step6Inputs) -> CheckResult:
     )
 
 
+def _run_spread_pnl_diagnostic(
+    inputs: Step6Inputs,
+) -> tuple[CheckResult, SpreadDecompositionResult | None, str | None, dict | None]:
+    """Run the §6.3 spread P&L decomposition diagnostic, if data permits.
+
+    Returns ``(check_result, spread_result_or_None, subsection_md_or_None,
+    manifest_entry_or_None)``.
+
+    Skips gracefully (info-severity check, no artefacts) when the top-1
+    trade ledger or fold assignments are absent (pre-extension closures,
+    closures whose orchestrator hasn't wired the per-fold ledger
+    extraction yet). The diagnostic NEVER modifies the verdict — its
+    check is always info severity.
+    """
+    if inputs.top_1_trade_ledger is None or len(inputs.top_1_trade_ledger) == 0:
+        return (
+            CheckResult(
+                name="spread_pnl_decomposition",
+                passed=True,
+                severity=Severity.INFO,
+                message=(
+                    "skipped — no top-1 trade ledger supplied to Step 6 "
+                    "(pre-PR closure or orchestrator wiring pending)"
+                ),
+                evidence={"top_1_trade_ledger_present": False},
+            ),
+            None, None, None,
+        )
+    if (
+        inputs.top_1_fold_assignments is None
+        or len(inputs.top_1_fold_assignments) == 0
+    ):
+        return (
+            CheckResult(
+                name="spread_pnl_decomposition",
+                passed=True,
+                severity=Severity.INFO,
+                message=(
+                    "skipped — top-1 trade ledger present but no fold "
+                    "assignments supplied"
+                ),
+                evidence={
+                    "top_1_trade_ledger_present": True,
+                    "top_1_fold_assignments_present": False,
+                },
+            ),
+            None, None, None,
+        )
+    config_id = inputs.best_candidate_config_id or "top_1_unknown"
+    r_base_pct = float(inputs.r_base_pct) if inputs.r_base_pct is not None else 0.005
+    output_dir = inputs.arc_root / "step_6"
+    try:
+        result = run_spread_pnl_decomposition(
+            arc_name=inputs.arc_name,
+            top_1_config_id=config_id,
+            trade_ledger=inputs.top_1_trade_ledger,
+            fold_assignments=inputs.top_1_fold_assignments,
+            gate_thresholds=GateThresholds(),
+            r_base_pct=r_base_pct,
+            holdout_fold_id=inputs.holdout_fold_id,
+            output_dir=output_dir,
+        )
+    except Exception as exc:  # noqa: BLE001 — diagnostic must not block the audit
+        return (
+            CheckResult(
+                name="spread_pnl_decomposition",
+                passed=True,
+                severity=Severity.INFO,
+                message=f"diagnostic raised; skipped — {type(exc).__name__}: {exc}",
+                evidence={"error_type": type(exc).__name__, "error": str(exc)},
+            ),
+            None, None, None,
+        )
+    flip = result.verdict_flip_factor
+    flip_label = "robust" if flip is None else f"{flip:.2f}×"
+    summary_msg = (
+        f"fragility={result.fragility_classification}; verdict_flip={flip_label}; "
+        f"n_trades_with_spread_data={result.n_trades_with_spread_data}/"
+        f"{result.n_trades_total}"
+    )
+    check = CheckResult(
+        name="spread_pnl_decomposition",
+        passed=True,  # diagnostic; never blocks the audit
+        severity=Severity.INFO,
+        message=summary_msg,
+        evidence={
+            "verdict_flip_factor": (None if flip is None else float(flip)),
+            "fragility_classification": result.fragility_classification,
+            "artefacts": [p.name for p in result.output_artefacts],
+        },
+    )
+    return check, result, format_report_subsection(result), _spread_manifest_entry(result)
+
+
+# Sentinel key used to inject the spread-decomposition markdown into the
+# rendered ``execution_realism_report.md`` after the standard checks
+# section. ``core.step_6.artefacts.render_category_report`` reads this
+# key and appends its value raw (so the diagnostic's table renders as
+# markdown, not as JSON-escaped text).
+APPENDED_MARKDOWN_KEY = "__appended_markdown__"
+
+
 def audit(inputs: Step6Inputs, audit_config: AuditConfig) -> CategoryAuditResult:
-    checks = (
+    standard_checks = (
         _check_real_spread_source(inputs),
         _check_spread_regime(inputs, audit_config),
         _check_next_bar_open_fill(inputs),
@@ -305,14 +422,20 @@ def audit(inputs: Step6Inputs, audit_config: AuditConfig) -> CategoryAuditResult
         _check_mid_price_refactor(),
         _check_utc_bar_boundary(inputs),
     )
+    diag_check, diag_result, diag_md, diag_manifest = _run_spread_pnl_diagnostic(inputs)
+    checks = standard_checks + (diag_check,)
     diagnostic: dict[str, Any] = {
         "r_safe_pct": inputs.r_safe_pct,
         "sizing_convention": inputs.sizing_convention,
         "primary_tf": inputs.primary_tf,
     }
+    if diag_manifest is not None:
+        diagnostic["spread_pnl_decomposition"] = diag_manifest
+    if diag_md is not None:
+        diagnostic[APPENDED_MARKDOWN_KEY] = diag_md
     return CategoryAuditResult(
         category="execution_realism", checks=checks, diagnostic=diagnostic,
     )
 
 
-__all__ = ("audit",)
+__all__ = ("APPENDED_MARKDOWN_KEY", "audit")

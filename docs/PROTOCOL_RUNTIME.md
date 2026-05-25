@@ -791,6 +791,28 @@ Amendment 3 fields required; v1.3 PASS verdicts additionally require
   NOT clobber.
 - Wave 2 onward closes at v1.3; Step 6 auto-dispatches.
 
+**§6.3 spread P&L decomposition diagnostic:** `core/step_6/spread_pnl_decomposition.py`
+runs inside `execution_realism.audit()` as an INFO-severity check when
+`Step6Inputs.top_1_trade_ledger` + `top_1_fold_assignments` are
+populated. Decomposes each closed-leg's realised R into signal R
++ spread tax R using the extended ledger schema (`entry_bid`,
+`entry_ask`, `exit_bid`, `exit_ask`, `sl_price`), projects under
+spread-inflation scenarios `(1.25, 1.50, 2.00, 3.00)`, and reports a
+verdict-flip factor + fragility classification (`robust` / `tolerant`
+/ `marginal` / `fragile`). Three artefacts land alongside the
+standard reports: `spread_pnl_per_trade.parquet`,
+`spread_pnl_per_fold_per_scenario.csv`,
+`spread_pnl_verdict_flip_summary.csv`. The report subsection is
+appended to `execution_realism_report.md` via the
+`__appended_markdown__` sentinel key in `CategoryAuditResult.diagnostic`.
+Manifest entry (top-level field `spread_pnl_decomposition`) carries the
+fragility class + verdict-flip factor for the §1 tracker_payload audit
+block. **Never modifies the verdict** (Q6 / lazy-Step-6 discipline).
+Grandfathering: pre-PR closures whose ledger lacks bid/ask data
+trigger an INFO-severity "skipped" check; no artefacts emitted.
+KH-24 anchor verified byte-identical pre/post ledger extension via
+7-fold Mode A run under `boundary_convention="utc"`.
+
 ---
 
 ## §11 Sub-protocol mechanism

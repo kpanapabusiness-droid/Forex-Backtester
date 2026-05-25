@@ -97,6 +97,25 @@ class Order:
 StrategyFn = Callable[[pd.Timestamp, dict[str, pd.Series | None], Account], list[Order]]
 
 
+def _bar_field(bar: pd.Series | None, field_name: str) -> float:
+    """Return ``bar[field_name]`` as float, or ``NaN`` if absent / NaN / None.
+
+    Used to capture ``open_bid`` / ``open_ask`` at fill sites for the
+    Step 6 §6.3 spread-decomposition diagnostic without failing on
+    panels that don't carry those columns (synthetic test fixtures,
+    legacy non-HistData feeds).
+    """
+    if bar is None:
+        return float("nan")
+    try:
+        v = bar[field_name]
+    except (KeyError, IndexError):
+        return float("nan")
+    if v is None or pd.isna(v):
+        return float("nan")
+    return float(v)
+
+
 @dataclass(frozen=True)
 class RunResult:
     final_balance: float
@@ -191,7 +210,13 @@ class MultiPairBacktester:
                 fill_px = float(bar["open_bid"])
             else:
                 fill_px = float(bar["open_ask"])
-            self.account.close(pos_id, t, fill_px, reason)
+            # Capture both sides at the exit-fill bar's open for the Step 6
+            # §6.3 spread-decomposition diagnostic. NaN when the column is
+            # absent (older fixtures or non-HistData panels).
+            exit_bid_q = _bar_field(bar, "open_bid")
+            exit_ask_q = _bar_field(bar, "open_ask")
+            self.account.close(pos_id, t, fill_px, reason,
+                               exit_bid=exit_bid_q, exit_ask=exit_ask_q)
             if self.trail_manager is not None:
                 self.trail_manager.deregister(pos_id)
         self._pending_closes = {}
@@ -252,19 +277,29 @@ class MultiPairBacktester:
                     )
                     else "stop_loss"
                 )
+                # Bar's open quotes serve as the reference bid+ask for
+                # intra-bar SL/TP fills (the actual trigger price is the
+                # fill price; bid+ask captures the spread regime at the
+                # bar for the §6.3 spread-decomposition diagnostic).
+                exit_bid_q = _bar_field(bar, "open_bid")
+                exit_ask_q = _bar_field(bar, "open_ask")
                 if self.sl_first:
                     if sl_hit:
-                        self.account.close(pos_id, t, sl_px, sl_reason)
+                        self.account.close(pos_id, t, sl_px, sl_reason,
+                                           exit_bid=exit_bid_q, exit_ask=exit_ask_q)
                         closed_intra = True
                     elif tp_hit:
-                        self.account.close(pos_id, t, tp_px, "take_profit")
+                        self.account.close(pos_id, t, tp_px, "take_profit",
+                                           exit_bid=exit_bid_q, exit_ask=exit_ask_q)
                         closed_intra = True
                 else:
                     if tp_hit:
-                        self.account.close(pos_id, t, tp_px, "take_profit")
+                        self.account.close(pos_id, t, tp_px, "take_profit",
+                                           exit_bid=exit_bid_q, exit_ask=exit_ask_q)
                         closed_intra = True
                     elif sl_hit:
-                        self.account.close(pos_id, t, sl_px, sl_reason)
+                        self.account.close(pos_id, t, sl_px, sl_reason,
+                                           exit_bid=exit_bid_q, exit_ask=exit_ask_q)
                         closed_intra = True
 
             if closed_intra:
@@ -337,6 +372,11 @@ class MultiPairBacktester:
                 overrides = policy_obj.apply_to_order(policy_ctx)
                 if "tp_price" in overrides:
                     tp_price_final = float(overrides["tp_price"])
+            # Capture both bid+ask of the entry-fill bar's open. Both sides
+            # ride through to the eventual ClosedTrade for the Step 6 §6.3
+            # spread-decomposition diagnostic (cf. core/sim/account.py).
+            entry_bid_q = _bar_field(bar, "open_bid")
+            entry_ask_q = _bar_field(bar, "open_ask")
             pos = self.account.open(
                 pair=order.pair,
                 direction=order.direction,
@@ -345,6 +385,8 @@ class MultiPairBacktester:
                 size=effective_size,
                 sl_price=order.sl_price,
                 tp_price=tp_price_final,
+                entry_bid=entry_bid_q,
+                entry_ask=entry_ask_q,
             )
             # Auto-register trail if the order carries an ATR + manager is set
             if (
@@ -405,7 +447,7 @@ class MultiPairBacktester:
             intrabar_decisions = self.exit_policy_manager.evaluate_intrabar_for_all(
                 snapshot, self.account
             )
-            self._apply_intrabar_policy_decisions(t, intrabar_decisions)
+            self._apply_intrabar_policy_decisions(t, intrabar_decisions, snapshot)
         # 2b. intra-bar SL/TP + bar-close predicate exits
         #     (predicate hits go to _pending_closes for next-bar-open fill)
         self._check_exits(t, snapshot)
@@ -462,11 +504,16 @@ class MultiPairBacktester:
         self,
         t: pd.Timestamp,
         decisions: dict[int, ExitPolicyDecision],
+        snapshot: dict[str, pd.Series | None],
     ) -> None:
         """Apply each intra-bar PARTIAL/FULL close NOW on the current bar.
 
         ``decisions`` came from ``ExitPolicyManager.evaluate_intrabar_for_all``.
         Iteration in sorted(position_id) order for determinism.
+
+        ``snapshot`` is consulted to capture each fill's exit-side
+        ``open_bid`` / ``open_ask`` for the Step 6 §6.3 spread-decomposition
+        diagnostic.
         """
         for pos_id in sorted(decisions):
             decision = decisions[pos_id]
@@ -474,6 +521,10 @@ class MultiPairBacktester:
                 f"intra-bar exit-policy decision for pos={pos_id} missing "
                 "fill_price; this is a policy implementation bug"
             )
+            pos = self.account._open.get(pos_id)  # noqa: SLF001
+            bar = snapshot.get(pos.pair) if pos is not None else None
+            exit_bid_q = _bar_field(bar, "open_bid") if bar is not None else float("nan")
+            exit_ask_q = _bar_field(bar, "open_ask") if bar is not None else float("nan")
             if decision.action is ExitAction.PARTIAL_CLOSE:
                 current = self.account.current_size_of(pos_id)
                 size_to_close = current * float(decision.partial_fraction)
@@ -482,7 +533,8 @@ class MultiPairBacktester:
                 # If partial_fraction == 1.0 (a misuse), route to close().
                 if size_to_close >= current:
                     self.account.close(
-                        pos_id, t, float(decision.fill_price), decision.exit_reason
+                        pos_id, t, float(decision.fill_price), decision.exit_reason,
+                        exit_bid=exit_bid_q, exit_ask=exit_ask_q,
                     )
                     if self.exit_policy_manager is not None:
                         self.exit_policy_manager.deregister(pos_id)
@@ -495,11 +547,14 @@ class MultiPairBacktester:
                         float(decision.fill_price),
                         decision.exit_reason,
                         size_to_close,
+                        exit_bid=exit_bid_q,
+                        exit_ask=exit_ask_q,
                     )
                 continue
             # FULL_CLOSE
             self.account.close(
-                pos_id, t, float(decision.fill_price), decision.exit_reason
+                pos_id, t, float(decision.fill_price), decision.exit_reason,
+                exit_bid=exit_bid_q, exit_ask=exit_ask_q,
             )
             if self.exit_policy_manager is not None:
                 self.exit_policy_manager.deregister(pos_id)

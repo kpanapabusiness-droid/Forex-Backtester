@@ -85,7 +85,11 @@ class ArcPool:
 
     ``trades`` columns: pair, trade_id, signal_time, entry_time,
         entry_price, atr_at_signal, sl_at_entry_price, exit_time,
-        exit_price, exit_reason, bars_held, final_r, mfe_r, mae_r.
+        exit_price, exit_reason, bars_held, final_r, mfe_r, mae_r,
+        entry_bid, entry_ask, exit_bid, exit_ask (last four are bid+ask
+        quotes at the entry/exit fill bar for the Step 6 §6.3 spread-
+        decomposition diagnostic; NaN when the source panel lacks the
+        columns).
     ``paths`` columns: trade_id, bar_offset, timestamp, close_r,
         mfe_so_far_r, mae_so_far_r.
     ``integrity`` is the report rows.
@@ -166,8 +170,21 @@ def _simulate_pair_pool(
     df_close_ask = df["close_ask"].values
     df_low_bid = df["low_bid"].values
     df_close_bid = df["close_bid"].values
+    # Per-bar bid+ask quotes for the Step 6 §6.3 spread-decomposition
+    # diagnostic. Captured at fill sites only (entry-bar open / exit-bar
+    # open). The diagnostic skips trades with NaN bid/ask gracefully.
+    df_open_bid = df["open_bid"].values if "open_bid" in df.columns else None
+    df_open_ask = df["open_ask"].values if "open_ask" in df.columns else None
+    df_close_bid_arr = df_close_bid
+    df_close_ask_arr = df_close_ask
     atr_arr = atr_series.values
     df_index = df.index
+
+    def _q(arr: np.ndarray | None, idx: int) -> float:
+        if arr is None:
+            return float("nan")
+        v = arr[idx]
+        return float(v) if np.isfinite(v) else float("nan")
 
     for s in sig_indices:
         s = int(s)
@@ -190,6 +207,10 @@ def _simulate_pair_pool(
         sl_distance = entry_price - sl_price
         if sl_distance <= 0:
             continue
+        # Entry-bar bid+ask quotes at open (long entry fills at open_ask;
+        # we record both sides regardless for the diagnostic).
+        entry_bid_q = _q(df_open_bid, entry_idx)
+        entry_ask_q = _q(df_open_ask, entry_idx)
 
         # Forward-window scan
         max_off = min(cfg.hold_bars, n - 1 - entry_idx)
@@ -237,6 +258,17 @@ def _simulate_pair_pool(
             exit_price = float(df_close_bid[exit_idx])
             bars_held = max_off
 
+        # Exit-bar bid+ask quotes — open quotes for time exits (mirrors the
+        # driver's next-bar-open close convention); same-bar close quotes
+        # for intra-bar SL hits (representative of intra-bar spread regime
+        # at the fill).
+        if exit_reason == "hard_sl":
+            exit_bid_q = _q(df_close_bid_arr, exit_idx)
+            exit_ask_q = _q(df_close_ask_arr, exit_idx)
+        else:
+            exit_bid_q = _q(df_open_bid, exit_idx)
+            exit_ask_q = _q(df_open_ask, exit_idx)
+
         final_r = (exit_price - entry_price) / sl_distance
         trades.append(
             {
@@ -254,6 +286,10 @@ def _simulate_pair_pool(
                 "final_r": float(final_r),
                 "mfe_r": float(mfe_r),
                 "mae_r": float(mae_r),
+                "entry_bid": entry_bid_q,
+                "entry_ask": entry_ask_q,
+                "exit_bid": exit_bid_q,
+                "exit_ask": exit_ask_q,
             }
         )
         paths.extend(path_rows)
@@ -364,6 +400,9 @@ _TRADES_COLUMNS = (
     "pair", "trade_id", "signal_time", "entry_time", "entry_price",
     "atr_at_signal", "sl_at_entry_price", "exit_time", "exit_price",
     "exit_reason", "bars_held", "final_r", "mfe_r", "mae_r",
+    # Bid+ask at entry-bar open and exit-bar open (close for intra-bar
+    # SL hits) per the Step 6 §6.3 spread-decomposition diagnostic.
+    "entry_bid", "entry_ask", "exit_bid", "exit_ask",
 )
 _PATHS_COLUMNS = (
     "trade_id", "bar_offset", "timestamp",

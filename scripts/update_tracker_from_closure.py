@@ -110,6 +110,14 @@ def _is_post_amendment_5_cutoff(closed_ts: str | None) -> bool:
     return _is_post_cutoff(closed_ts, schema.AMENDMENT_5_CUTOFF_ISO)
 
 
+def _is_post_amendment_5_1_cutoff(closed_ts: str | None) -> bool:
+    """Return True iff ``closed_ts`` is strictly after the L_PROTOCOL Amendment 5.1
+    cutoff (placeholder pinned at the ratification date; backfilled with this PR's
+    actual merge timestamp post-merge — see ``schema.AMENDMENT_5_1_CUTOFF_ISO``).
+    """
+    return _is_post_cutoff(closed_ts, schema.AMENDMENT_5_1_CUTOFF_ISO)
+
+
 def _validate_phase_2_amendment_3_fields(payload: dict, closure_path: Path) -> int:
     """Phase 2 tightening: for PASS verdicts with closed_timestamp > PR-186 merge,
     REQUIRE the Amendment 3 risk-normalised fields on `best_architecture`
@@ -161,6 +169,84 @@ def _validate_amendment_5_field(payload: dict, closure_path: Path) -> int:
             closure_path,
         )
         return 1
+    return 0
+
+
+_A5_1_GATE_4_REASON = "a5_gate_4_admission_blocked_by_no_pass_tier_constituent"
+
+
+def _count_candidate_clusters_surviving_step_3(payload: dict) -> int:
+    """Re-derive the §3 candidate-cluster count from the closure body.
+
+    L_PROTOCOL §3 (capturability): a cluster is flagged as a candidate cluster
+    when ``reach_1r >= 0.50 AND ww_pp <= 0.30 AND mfe_p50_r >= 1.5``. We re-derive
+    here rather than persist the flag (the closure schema doesn't carry it
+    explicitly; only the underlying metrics).
+    """
+    clusters = payload.get("clusters") or {}
+    if not isinstance(clusters, dict):
+        return 0
+    count = 0
+    for c in clusters.values():
+        if not isinstance(c, dict):
+            continue
+        reach = c.get("reach_1r")
+        wwpp = c.get("ww_pp")
+        mfe = c.get("mfe_p50_r")
+        if reach is None or wwpp is None or mfe is None:
+            continue
+        try:
+            if float(reach) >= 0.50 and float(wwpp) <= 0.30 and float(mfe) >= 1.5:
+                count += 1
+        except (TypeError, ValueError):
+            continue
+    return count
+
+
+def _validate_amendment_5_1_gate_4_qualifier(payload: dict, closure_path: Path) -> int:
+    """L_PROTOCOL Amendment 5.1 (2026-05-25) — Gate 4 PASS-tier-constituent qualifier.
+
+    When a post-AMENDMENT_5_1_CUTOFF_ISO PASS closure declares ≥2 candidate
+    clusters surviving Step 3, ensure A5 admission state is explicit in
+    architectures_skipped_by_amendment_5:
+      - If A5 was admitted and ran: no entry needed
+      - If A5 was not admitted because no constituent PASSed: MUST list
+        "a5_gate_4_admission_blocked_by_no_pass_tier_constituent"
+    Pre-cutoff closures grandfathered.
+
+    Phase 1 (this PR): WARNING-level — logs and returns 0 (does not HALT).
+    Phase 2 (post-AMENDMENT_5_1_CUTOFF_ISO backfill): upgrade to ERROR-level
+    by returning 1 on the missing-reason branch.
+    """
+    n_candidate = _count_candidate_clusters_surviving_step_3(payload)
+    if n_candidate < 2:
+        return 0
+
+    arches_tested = payload.get("architectures_tested") or []
+    arch_results = payload.get("architecture_results") or {}
+    a5_ran = (
+        "A5" in arches_tested
+        or bool((arch_results.get("A5") or {}).get("tested"))
+    )
+    if a5_ran:
+        return 0
+
+    skipped = payload.get("architectures_skipped_by_amendment_5") or []
+    if _A5_1_GATE_4_REASON in skipped:
+        return 0
+
+    logging.warning(
+        "L_PROTOCOL Amendment 5.1 (Phase 1 WARNING): PASS verdict at closed_timestamp=%r is "
+        "post-Amendment-5.1-cutoff (%s) with %d candidate clusters surviving Step 3, but A5 was "
+        "not admitted and `architectures_skipped_by_amendment_5` does not include %r. "
+        "Per Gate 4 qualifier, either A5 must run or the reason string must be cited. "
+        "Closure %s. (Phase 2 will upgrade this to ERROR-level after cutoff backfill.)",
+        payload.get("closed_timestamp"),
+        schema.AMENDMENT_5_1_CUTOFF_ISO,
+        n_candidate,
+        _A5_1_GATE_4_REASON,
+        closure_path,
+    )
     return 0
 
 
@@ -328,6 +414,12 @@ def main(argv: list[str] | None = None) -> int:
         rc = _validate_amendment_5_field(payload, closure_path)
         if rc != 0:
             return rc
+
+    # L_PROTOCOL Amendment 5.1 — Gate 4 PASS-tier-constituent qualifier.
+    # Phase 1: WARNING-level check; never HALTs. Upgrade to ERROR after the
+    # AMENDMENT_5_1_CUTOFF_ISO backfill (see standing TODO).
+    if is_pass and _is_post_amendment_5_1_cutoff(payload.get("closed_timestamp")):
+        _validate_amendment_5_1_gate_4_qualifier(payload, closure_path)
 
     if args.verbose:
         print("--- Parsed payload (v1.1-normalised) ---")

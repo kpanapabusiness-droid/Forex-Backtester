@@ -59,6 +59,8 @@ Detection precedence: 1.3 → 1.2 → 1.1 → 1.0 → error.
 
 v1.3.1 (L_PROTOCOL Amendment 5) shares the `template_version: v1.3` declaration. The discriminator is the presence of the optional top-level `architectures_skipped_by_amendment_5` field — mirrors the v1.2 / v1.2.1 `chained_dd_method` rollout pattern. There is no separate `v1.3.1` literal; the parser treats v1.3 and v1.3.1 as one detection bucket and applies the Amendment-5 Phase-2 cutoff check below.
 
+v1.3.1+ (Amendment 5.1, 2026-05-25) extends the `architectures_skipped_by_amendment_5` vocabulary to accept the reason string `a5_gate_4_admission_blocked_by_no_pass_tier_constituent` alongside `{A1..A6}` architecture IDs. No template version bump — same `template_version: v1.3` declaration, same v1.3 detection bucket. Parser adds a Phase 1 WARNING-level check for Gate 4 qualifier compliance on post-cutoff PASS closures (see Phase 2 tightening section below).
+
 v1.0 closures use legacy field names (`worst_fold_roi_pct`, `worst_fold_dd_pct`). The parser internally renames them to v1.1 names (`*_base_pct`) and fills v1.1-exclusive Amendment 3 fields with `null`. v1.1 closures are passed through.
 
 v1.2 closures add `config_artefact_path` + `deployment_spec_section_present` to the `best_architecture` block plus a new `§4 deployment_spec` section in the closure doc. Retrofitted v1.2 closures may retain v1.0-style field names (`worst_fold_roi_pct`); the parser renames them pre-validation via `_coerce_legacy_field_names` — purely additive on §1, no manual rewrite required.
@@ -101,6 +103,8 @@ Pre-cutoff closures (v1.0 / v1.1 / v1.2 / v1.2.1 closed before the cutoff) are g
 ### v1.3.1 — Amendment 5 architecture-skip field
 
 For any PASS verdict whose `closed_timestamp > AMENDMENT_5_CUTOFF_ISO` (defined in `scripts/tracker_parser/schema.py`; pinned at the placeholder `2026-05-23T00:00:00Z` pending post-merge backfill), the parser additionally requires the optional top-level `architectures_skipped_by_amendment_5` field. The field is a subset of `{A1..A6}` and MAY be empty (`[]`) when the Amendment-5 four-gate set equals or supersets the Amendment-1 set. Pre-cutoff closures grandfathered. Mirrors the v1.2.1 `chained_dd_method` Phase 2 pattern.
+
+**Amendment 5.1 (2026-05-25 — Gate 4 PASS-tier-constituent qualifier):** Post-`AMENDMENT_5_1_CUTOFF_ISO` PASS closures with ≥2 candidate clusters surviving Step 3 must declare A5 admission state explicitly. If A5 was admitted and ran, no entry needed in `architectures_skipped_by_amendment_5`. If A5 was not admitted because no constituent cluster cleared Step 5 PASS-tier, the field MUST include `a5_gate_4_admission_blocked_by_no_pass_tier_constituent`. Phase 1 (current): WARNING-level check; closures parse with warnings logged. Phase 2 (future): upgrade to ERROR-level after backfill of `AMENDMENT_5_1_CUTOFF_ISO` to PR merge timestamp.
 
 ## Idempotency
 

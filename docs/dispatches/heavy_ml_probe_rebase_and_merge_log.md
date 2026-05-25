@@ -197,4 +197,71 @@ PR-F is now open + awaiting chat review per the final-merge dispatch §2.5 (hold
 
 ---
 
+## §10 PR-F amendment (Phase 3 dispatch §1) — landed
+
+Chat review of PR-F caught one piece of stale text: spec doc's "Expected compute cost" section still cited the pre-build "2-6 hours per cluster" ceiling. PR-B's empirical wall-clock + PR-D's production-scale probe established the as-built figure at ~10-30 min per cluster.
+
+Fix landed as a follow-up commit on PR-F's branch (NOT amending the original PR-F commit per dispatch §1.1):
+
+- `abf4163` — `docs(heavy_ml_probe): sync compute-cost estimate to empirical measurement`
+- Updated: `docs/sub_protocols/heavy_ml_probe.md` "Expected compute cost" section rewrite; `docs/dispatches/heavy_ml_probe_pr_f_log.md` §4.2 + §5.1 marked-as-fixed; new §6 "Future tech-debt" section recording the two non-urgent items chat flagged (adapter manifest schema duplication; possible operator-guide split).
+- No grep hits for stale "2-6 hours" / "6 hour" in `core/heavy_ml_probe/**` docstrings.
+- Verification: 149/149 + lint clean.
+- PR-F CI re-ran on push and passed.
+
+---
+
+## §11 Phase 3 — Build → Main landed
+
+| Step | Action | Result |
+|---|---|---|
+| §3.1 | Merge PR-F #203 → build branch | Merge commit `41928e9`; build CI green |
+| §3.2 | Verify main hasn't advanced into heavy_ml_probe surface | Main advanced 6 commits since stack baseline check, but **zero file overlap** with build branch; no rebase needed. Cross-branch file-overlap check: empty. |
+| §3.3 | Open `infra/heavy_ml_probe_build → main` PR | PR #206 opened |
+| §3.4 | Wait for CI | Both runs `pass`; mergeStateStatus CLEAN, mergeable MERGEABLE |
+| §3.5 | Merge to main with merge-commit | Merge commit **`0db7851`** |
+| §3.6 | Post-merge verification | Main CI: `success` ✓; local pytest tests/heavy_ml_probe: 149/149 ✓; sibling tests/discovery: 42/42 ✓ |
+| §3.7 | Branch cleanup | 6 PR branches deleted on origin; `infra/heavy_ml_probe_build` retained for 24-48h rollback safety net |
+
+### §11.1 Final SHA on main
+
+```
+0db7851 Merge pull request #206 from kpanapabusiness-droid/infra/heavy_ml_probe_build
+```
+
+### §11.2 PR-A → PR-F commit history visible on main
+
+The merge-commit method preserved the full audit trail:
+
+```
+0db7851 Merge pull request #206 from .../infra/heavy_ml_probe_build       ← final build → main
+41928e9 Merge pull request #203 from .../infra/heavy_ml_probe_pr_f        ← PR-F
+abf4163 docs(heavy_ml_probe): sync compute-cost estimate to empirical measurement  ← PR-F amendment
+d5ec992 [INFRA] heavy_ml_probe PR-F: docs polish + final-merge orchestration logs
+8be174c Merge pull request #198 from .../infra/heavy_ml_probe_pr_e        ← PR-E
+67c8b68 Merge pull request #196 from .../infra/heavy_ml_probe_pr_d        ← PR-D
+864b001 Merge pull request #192 from .../infra/heavy_ml_probe_pr_c        ← PR-C
+b76dcd5 Merge pull request #191 from .../infra/heavy_ml_probe_pr_b        ← PR-B
+2d52f1e Merge pull request #187 from .../infra/heavy_ml_probe_pr_a        ← PR-A
+1ed32fb [INFRA] heavy_ml_probe PR-E: integration + Step 5 adapters (gate PR)
+b8b5ec7 [INFRA] heavy_ml_probe PR-D: Cox PH survival via statsmodels.PHReg
+b4e7085 [INFRA] heavy_ml_probe PR-C: meta-labeling target + threshold sweep
+c0ba093 [INFRA] heavy_ml_probe PR-B: FLAML AutoML + 11-fold TimeSeriesSplit
+cb735ed [INFRA] heavy_ml_probe PR-A: scaffolding + lineage gate + IO
+```
+
+### §11.3 Branch state on origin after cleanup
+
+| Branch | Status |
+|---|---|
+| `main` | at `0db7851`, CI green, heavy_ml_probe landed |
+| `infra/heavy_ml_probe_build` | retained for 24-48h rollback safety net (at `41928e9`) |
+| `infra/heavy_ml_probe_pr_a` through `pr_f` | DELETED on origin |
+
+### §11.4 ARC_TRACKER question — surfaced for chat (not actioned)
+
+Per Phase 3 dispatch §4.5: should `ARC_TRACKER.md` get a row for heavy_ml_probe as available infrastructure? It's not an arc, but it's discoverable infrastructure that future arcs can invoke. Chat decides — CC does not action this.
+
+---
+
 End of log.

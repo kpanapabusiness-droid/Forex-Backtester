@@ -10,6 +10,10 @@ Public surface:
   * :class:`NullPolicyState` — no-op state for stateless policies.
   * :func:`build_exit_policy` — factory keyed by policy name.
   * :func:`available_policies` — sorted tuple of registered names.
+  * :func:`simulate_path` — post-hoc path replay (for legacy Step 5
+    scripts) with the same semantics as the live engine policies.
+  * :func:`available_path_simulators` — sorted tuple of policies with
+    a registered path simulator.
 
 Registered policies (alphabetised by name):
 
@@ -33,6 +37,11 @@ from core.sim.exit_policies._base import (
     NullPolicyState,
 )
 from core.sim.exit_policies._registry import available_policies, build_exit_policy
+from core.sim.exit_policies.path_simulate import (
+    available_path_simulators,
+    simulate_path,
+    simulate_pool_approximation,
+)
 from core.sim.exit_policies.sl_only import SlOnlyPolicy
 from core.sim.exit_policies.sl_partial_close_1r_runner_trail import (
     PartialCloseRunnerTrailState,
@@ -65,6 +74,9 @@ __all__ = (
     "SlPlusTrailingSwingPolicy",
     "TrailingAtrState",
     "TrailingSwingState",
+    "available_path_simulators",
     "available_policies",
     "build_exit_policy",
+    "simulate_path",
+    "simulate_pool_approximation",
 )

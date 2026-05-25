@@ -26,6 +26,12 @@ def from_arc_orchestrator_result(
     primary_tf: str | None = None,
     pair_set: tuple[str, ...] = (),
     holdout_start: pd.Timestamp | None = None,
+    top_1_trade_ledger: pd.DataFrame | None = None,
+    top_1_fold_assignments: pd.DataFrame | None = None,
+    holdout_fold_id: int | None = None,
+    r_base_pct: float | None = None,
+    panel_boundary_convention: str | None = None,
+    extras: Mapping[str, Any] | None = None,
 ) -> Step6Inputs:
     """Auto-dispatch path — builds from a live :class:`ArcOrchestratorResult`.
 
@@ -103,6 +109,12 @@ def from_arc_orchestrator_result(
         sizing_convention=sizing_convention,
         configs_evaluated_step5=configs_evaluated,
         holdout_start=holdout_start,
+        top_1_trade_ledger=top_1_trade_ledger,
+        top_1_fold_assignments=top_1_fold_assignments,
+        holdout_fold_id=holdout_fold_id,
+        r_base_pct=r_base_pct,
+        panel_boundary_convention=panel_boundary_convention,
+        extras=dict(extras) if extras else {},
     )
 
 
@@ -141,6 +153,7 @@ def from_closure_dir(closure_dir: Path, *, arc_name: str | None = None) -> Step6
     window_end = None
     holdout_start = None
 
+    panel_boundary_convention = None
     if payload:
         primary_tf = payload.get("tf")
         pool_meta = payload.get("pool_metadata") or {}
@@ -151,6 +164,7 @@ def from_closure_dir(closure_dir: Path, *, arc_name: str | None = None) -> Step6
             window_start = pd.Timestamp(ws)
         if we:
             window_end = pd.Timestamp(we)
+        panel_boundary_convention = pool_meta.get("boundary_convention")
         ba = payload.get("best_architecture") or {}
         if ba:
             best_arch_name = ba.get("name")
@@ -179,6 +193,13 @@ def from_closure_dir(closure_dir: Path, *, arc_name: str | None = None) -> Step6
                     best_features = tuple(order)
                     break
 
+    # Manual CLI: try to load the auto-dispatched spread P&L artefacts
+    # if they exist on disk, so the diagnostic re-renders without
+    # re-running the heavy reconstruction.
+    top_1_trade_ledger = _maybe_read_parquet(
+        closure_dir / "step_6" / "spread_pnl_per_trade.parquet",
+    )
+
     return Step6Inputs(
         arc_name=arc_name,
         arc_root=closure_dir,
@@ -199,6 +220,8 @@ def from_closure_dir(closure_dir: Path, *, arc_name: str | None = None) -> Step6
         sizing_convention=sizing_convention,
         configs_evaluated_step5=configs_evaluated,
         holdout_start=holdout_start,
+        top_1_trade_ledger=top_1_trade_ledger,
+        panel_boundary_convention=panel_boundary_convention,
     )
 
 

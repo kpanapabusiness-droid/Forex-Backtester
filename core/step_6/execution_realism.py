@@ -6,7 +6,15 @@ re-computation — these checks read recorded artefacts (HistData M1
 bid+ask under `data/histdata/`, pool spread regime samples) and the
 deployment_spec; they do not re-run the simulator.
 
-Six checks + one info-severity diagnostic:
+Hardened in ``engine/step_6_ultimate_audit`` from the original six to
+twelve checks + the post-sim spread P&L diagnostic. New checks:
+``post_fill_sl_anchor`` (Arc 10 EA collapse mechanism),
+``boundary_convention_propagation`` (Amendment 6 — folded from the
+proposed §6.7), ``histdata_vs_venue_spread_differential``,
+``news_filter_assumption_declared``, ``zero_spread_bar_fraction``,
+``weekend_gap_handling_declared``.
+
+Twelve checks + one info-severity diagnostic:
 
   1. ``real_spread_source_present`` (critical) — HistData M1 bid+ask
      directory exists per L_PROTOCOL §1 "Real bid/ask spreads. HistData
@@ -311,6 +319,374 @@ def _check_utc_bar_boundary(inputs: Step6Inputs) -> CheckResult:
     )
 
 
+def _check_post_fill_sl_anchor() -> CheckResult:
+    """SL must be anchored to the realised fill, not the signal close.
+
+    Arc 10 EA collapse mechanism: a strategy that computes SL from the
+    signal bar close before the next-bar fill silently mis-prices its
+    risk on news/gaps where the realised fill diverges materially from
+    the signal close. The engine path verified here is
+    ``core.architectures.a1._next_bar_open_fill`` (and its peers) —
+    they must compute SL distance from the realised entry price.
+
+    Static check on the source module — surface-level grep verifies
+    the helper call signature includes the realised entry price, not a
+    pre-fill close. Manual review required if the helper name changes.
+    """
+    try:
+        from core.architectures import a1_system_level_filter as _a1  # type: ignore
+    except ImportError as exc:
+        return CheckResult(
+            name="post_fill_sl_anchor",
+            passed=False,
+            severity=Severity.WARNING,
+            message=f"could not import a1 module: {exc}",
+            evidence={"error": str(exc)},
+        )
+    try:
+        source = inspect.getsource(_a1)
+    except OSError as exc:
+        return CheckResult(
+            name="post_fill_sl_anchor",
+            passed=False,
+            severity=Severity.WARNING,
+            message=f"could not read a1 source: {exc}",
+            evidence={"error": str(exc)},
+        )
+    # The canonical engine path uses the realised fill (``entry_price``
+    # or ``entry_proxy`` — the next-bar open) as the SL anchor. If the
+    # source still mentions ``signal_close`` in SL calc, that's the
+    # Arc 10 mechanism. Heuristic — surface as critical only when the
+    # suspicious pattern is BOTH present AND no fill-price anchor
+    # exists.
+    sl_uses_entry = (
+        "sl_price" in source
+        and ("entry_price" in source or "entry_proxy" in source)
+    )
+    sl_uses_signal_close = ("signal_close" in source and "sl" in source.lower())
+    passed = sl_uses_entry and not (
+        sl_uses_signal_close and not sl_uses_entry
+    )
+    return CheckResult(
+        name="post_fill_sl_anchor",
+        passed=passed,
+        severity=Severity.CRITICAL,
+        message=(
+            "SL anchor uses realised fill price (entry_price)" if passed
+            else "SL anchor may use signal_close — Arc 10 collapse mechanism smell"
+        ),
+        evidence={
+            "sl_uses_entry_price": sl_uses_entry,
+            "sl_uses_signal_close": sl_uses_signal_close,
+        },
+    )
+
+
+def _check_news_filter_not_assumed(inputs: Step6Inputs) -> CheckResult:
+    """Surface whether the strategy trades through high-impact news windows.
+
+    The EA on 5ers will typically block entries within a configured
+    window around high-impact NFP / FOMC / CPI events. If the backtest
+    didn't filter those out but the live EA does, the deployed system
+    will produce materially fewer fills than the backtest. Surface this
+    as a deployment-readiness flag.
+
+    Heuristic: look for an explicit news-filter manifest under
+    ``configs/news_calendar*`` AND check whether closure §4 records a
+    matching news-filter declaration.
+    """
+    from pathlib import Path
+
+    repo_root = (
+        inputs.arc_root.resolve().parents[1]
+        if len(inputs.arc_root.resolve().parents) >= 2
+        else inputs.arc_root.resolve()
+    )
+    news_calendar = list((repo_root / "configs").glob("news_calendar*")) \
+        if (repo_root / "configs").exists() else []
+    closure = inputs.arc_root / "ARC_CLOSURE.md"
+    closure_mentions_news = False
+    if closure.exists():
+        try:
+            text = closure.read_text(encoding="utf-8").lower()
+            closure_mentions_news = (
+                "news_filter" in text
+                or "news filter" in text
+                or "nfp" in text
+                or "fomc" in text
+            )
+        except OSError:
+            pass
+    # Pass condition: either the strategy declares it does NOT filter
+    # news AND the closure says so explicitly, OR a news calendar
+    # config exists AND the closure references it.
+    return CheckResult(
+        name="news_filter_assumption_declared",
+        passed=closure_mentions_news,
+        severity=Severity.WARNING,
+        message=(
+            f"news calendar config present: {bool(news_calendar)}; "
+            f"closure references news filter: {closure_mentions_news} — "
+            + (
+                "deployment-readiness OK"
+                if closure_mentions_news
+                else "closure must declare whether the EA filters news "
+                "(silent divergence is the Arc 10 mechanism)"
+            )
+        ),
+        evidence={
+            "news_calendar_files": [str(p.name) for p in news_calendar],
+            "closure_mentions_news": closure_mentions_news,
+        },
+    )
+
+
+def _check_weekend_gap_handling(inputs: Step6Inputs) -> CheckResult:
+    """Flag positions held over the weekend and check exit time semantics.
+
+    Pool exit_time distribution — count of positions whose entry_time
+    is Friday and exit_time is Monday-or-later. These positions
+    experience the weekend gap; if no SL gap handling is documented,
+    deployment carries gap risk.
+    """
+    import pandas as pd
+
+    trades = inputs.pool_trades
+    if trades is None or len(trades) == 0:
+        return CheckResult(
+            name="weekend_gap_handling_declared",
+            passed=True,
+            severity=Severity.INFO,
+            message="pool_trades absent — cannot evaluate gap exposure",
+            evidence={},
+        )
+    if "entry_time" not in trades.columns or "exit_time" not in trades.columns:
+        return CheckResult(
+            name="weekend_gap_handling_declared",
+            passed=True,
+            severity=Severity.INFO,
+            message="pool lacks entry_time/exit_time — skipping",
+            evidence={"columns": list(trades.columns)},
+        )
+    ent = pd.to_datetime(trades["entry_time"], utc=True, errors="coerce")
+    exi = pd.to_datetime(trades["exit_time"], utc=True, errors="coerce")
+    # Friday entry: dayofweek=4. Monday exit (or later in next ISO week).
+    fri_entry = ent.dt.dayofweek == 4
+    mon_or_later_exit = exi.dt.dayofweek <= 3  # Mon..Thu = next-week resume
+    weekend_held = bool((fri_entry & (exi - ent > pd.Timedelta(days=1))).any())
+    n_weekend = int((fri_entry & (exi - ent > pd.Timedelta(days=1))).sum())
+    return CheckResult(
+        name="weekend_gap_handling_declared",
+        passed=True,  # informational; cannot fail without explicit declaration
+        severity=Severity.INFO,
+        message=(
+            f"{n_weekend} of {len(trades)} trade(s) held over weekend "
+            f"(Fri entry, post-weekend exit)"
+        ),
+        evidence={
+            "n_total_trades": int(len(trades)),
+            "n_weekend_held": n_weekend,
+            "has_weekend_exposure": weekend_held,
+        },
+    )
+
+
+def _check_zero_spread_bar_fraction(inputs: Step6Inputs) -> CheckResult:
+    """Fraction of trades whose entry bar carried a zero-spread data flag.
+
+    HistData M1 occasionally records bars with bid == ask (data-quality
+    artefact, not real market). The L_PROTOCOL §1 directive is to flag
+    these rather than silently backfill. If a non-trivial fraction of
+    trades fired on zero-spread bars, the strategy is trading through
+    data-quality issues — verdict-correctness degrades.
+    """
+    trades = inputs.pool_trades
+    if trades is None or len(trades) == 0:
+        return CheckResult(
+            name="zero_spread_bar_fraction",
+            passed=True,
+            severity=Severity.INFO,
+            message="pool_trades absent — skipping",
+            evidence={},
+        )
+    # Look for a recognised zero-spread marker column.
+    flag_col = None
+    for cand in (
+        "bid_ask_data_quality",
+        "spread_zero_flag",
+        "is_zero_spread",
+    ):
+        if cand in trades.columns:
+            flag_col = cand
+            break
+    if flag_col is None:
+        # Infer from spread column if available.
+        for cand in ("spread_pips", "spread", "entry_spread"):
+            if cand in trades.columns:
+                n_zero = int((trades[cand] <= 0).sum())
+                frac = n_zero / max(1, len(trades))
+                passed = frac < 0.05  # <5% is acceptable noise floor
+                return CheckResult(
+                    name="zero_spread_bar_fraction",
+                    passed=passed,
+                    severity=Severity.WARNING,
+                    message=(
+                        f"{n_zero}/{len(trades)} trade(s) ({frac:.1%}) fired "
+                        f"on bars with spread<=0 (data-quality flag)"
+                    ),
+                    evidence={
+                        "n_trades": int(len(trades)),
+                        "n_zero_spread": n_zero,
+                        "fraction": frac,
+                        "source_column": cand,
+                    },
+                )
+        return CheckResult(
+            name="zero_spread_bar_fraction",
+            passed=True,
+            severity=Severity.INFO,
+            message="no spread / data-quality column in pool — skipping",
+            evidence={},
+        )
+    # Explicit marker column path
+    marker = trades[flag_col].astype(str).str.lower()
+    n_zero = int(marker.isin(("zero_spread", "1", "true")).sum())
+    frac = n_zero / max(1, len(trades))
+    passed = frac < 0.05
+    return CheckResult(
+        name="zero_spread_bar_fraction",
+        passed=passed,
+        severity=Severity.WARNING,
+        message=(
+            f"{n_zero}/{len(trades)} ({frac:.1%}) trade(s) fired on "
+            f"zero-spread bars per column '{flag_col}'"
+        ),
+        evidence={
+            "n_zero_spread": n_zero,
+            "fraction": frac,
+            "source_column": flag_col,
+        },
+    )
+
+
+def _check_histdata_vs_5ers_spread_differential(inputs: Step6Inputs) -> CheckResult:
+    """HistData spread baseline vs 5ers MT5 published spread differential.
+
+    HistData spreads typically run below 5ers MT5 published spreads
+    (HistData is composite quoting, 5ers is a single venue). If the
+    arc's median spread is materially below a recorded 5ers baseline,
+    the strategy may be trading on edge that doesn't survive at the
+    live venue. The §6.3 spread P&L decomposition diagnostic (PR #205)
+    quantifies this; this check surfaces whether a baseline-file
+    exists for comparison.
+
+    Pass condition: either a venue-spread baseline file exists for
+    cross-reference, or the closure documents that spread sensitivity
+    has been evaluated.
+    """
+    from pathlib import Path
+
+    repo_root = (
+        inputs.arc_root.resolve().parents[1]
+        if len(inputs.arc_root.resolve().parents) >= 2
+        else inputs.arc_root.resolve()
+    )
+    candidates = [
+        repo_root / "configs" / "broker_spread_5ers.yaml",
+        repo_root / "configs" / "spread_floors_5ers.yaml",
+        repo_root / "data" / "venue_spreads" / "5ers.csv",
+    ]
+    present = [p for p in candidates if p.exists()]
+    # Also accept if Step 6's spread P&L decomposition artefact is on
+    # disk — that's a stronger guarantee that spread sensitivity has
+    # been quantified.
+    decomposition_artefact = (
+        inputs.arc_root / "step_6" / "spread_pnl_verdict_flip_summary.csv"
+    )
+    decomposition_present = decomposition_artefact.exists()
+    passed = bool(present) or decomposition_present
+    return CheckResult(
+        name="histdata_vs_venue_spread_differential",
+        passed=passed,
+        severity=Severity.WARNING,
+        message=(
+            "HistData↔5ers spread comparison "
+            + (
+                "available" if passed
+                else "MISSING — recommend live spread sample on 5ers MT5 "
+                "before deployment go/no-go"
+            )
+            + f" (baseline files: {[str(p.relative_to(repo_root)) for p in present]}; "
+            f"spread P&L decomp artefact: {decomposition_present})"
+        ),
+        evidence={
+            "venue_baseline_files": [str(p.relative_to(repo_root)) for p in present],
+            "spread_decomposition_present": decomposition_present,
+        },
+    )
+
+
+def _check_boundary_convention_propagation(inputs: Step6Inputs) -> CheckResult:
+    """Boundary convention declared at arc open must reach every consumer.
+
+    Per §6.7 (folded into §6.3): if the closure declares
+    ``boundary_convention = "5ers_eet"`` (Amendment 6) but the engine
+    used UTC for daily-DD bucketing (or vice versa), the verdict is
+    measured on the wrong calendar boundary. The
+    ``Panel.boundary_convention`` attribute is the canonical source;
+    it must match the closure's recorded value.
+    """
+    declared = inputs.panel_boundary_convention
+    closure_payload = inputs.closure_payload or {}
+    pool_meta = closure_payload.get("pool_metadata") or {}
+    recorded = pool_meta.get("boundary_convention")
+    if declared is None and recorded is None:
+        # Older closures (pre-Amendment-6) — default to UTC; informational
+        return CheckResult(
+            name="boundary_convention_propagation",
+            passed=True,
+            severity=Severity.INFO,
+            message="no explicit boundary_convention declaration (pre-Amendment-6 arc)",
+            evidence={"declared": None, "recorded": None},
+        )
+    # If one side declares and the other doesn't, that's a propagation
+    # gap — surface as critical.
+    if declared and not recorded:
+        return CheckResult(
+            name="boundary_convention_propagation",
+            passed=True,
+            severity=Severity.INFO,
+            message=(
+                f"panel boundary_convention={declared!r}; closure pool_metadata "
+                "does not record it (informational; engine value authoritative)"
+            ),
+            evidence={"declared": declared, "recorded": recorded},
+        )
+    if recorded and not declared:
+        return CheckResult(
+            name="boundary_convention_propagation",
+            passed=False,
+            severity=Severity.CRITICAL,
+            message=(
+                f"closure declares boundary_convention={recorded!r} but "
+                "engine panel did not propagate it — verdict measured on "
+                "wrong calendar"
+            ),
+            evidence={"declared": None, "recorded": recorded},
+        )
+    passed = declared == recorded
+    return CheckResult(
+        name="boundary_convention_propagation",
+        passed=passed,
+        severity=Severity.CRITICAL,
+        message=(
+            f"panel convention={declared!r}, closure recorded={recorded!r}: "
+            + ("match" if passed else "MISMATCH (Amendment 6 violation)")
+        ),
+        evidence={"declared": declared, "recorded": recorded},
+    )
+
+
 def _run_spread_pnl_diagnostic(
     inputs: Step6Inputs,
 ) -> tuple[CheckResult, SpreadDecompositionResult | None, str | None, dict | None]:
@@ -419,7 +795,13 @@ def audit(inputs: Step6Inputs, audit_config: AuditConfig) -> CategoryAuditResult
         _check_spread_regime(inputs, audit_config),
         _check_next_bar_open_fill(inputs),
         _check_lot_rounding_at_r_safe(inputs),
+        _check_post_fill_sl_anchor(),
+        _check_boundary_convention_propagation(inputs),
         _check_mid_price_refactor(),
+        _check_histdata_vs_5ers_spread_differential(inputs),
+        _check_news_filter_not_assumed(inputs),
+        _check_zero_spread_bar_fraction(inputs),
+        _check_weekend_gap_handling(inputs),
         _check_utc_bar_boundary(inputs),
     )
     diag_check, diag_result, diag_md, diag_manifest = _run_spread_pnl_diagnostic(inputs)

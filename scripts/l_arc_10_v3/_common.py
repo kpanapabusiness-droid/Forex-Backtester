@@ -32,12 +32,18 @@ def load_config(path: Path | str) -> dict:
 
 
 def load_pair_tf(pair: str, tf: str, cfg: dict) -> pd.DataFrame:
-    """Aggregate a single pair to ``tf`` using the v3 cache."""
+    """Aggregate a single pair to ``tf`` using the v3 cache.
+
+    Boundary convention defaults to "utc" for backward-compat with Arc 10 v3.0;
+    Arc 10 v3.0.2 sets ``boundary_convention: 5ers_eet`` in cfg to route through
+    PR #189 EET aggregation + PR #197 Amendment 6 daily-DD boundary semantics.
+    """
     return aggregate(
         pair,
         tf,
         histdata_root=cfg["data"]["histdata_root"],
         cache_root=cfg["data"]["cache_root"],
+        boundary_convention=cfg.get("boundary_convention", "utc"),
     )
 
 

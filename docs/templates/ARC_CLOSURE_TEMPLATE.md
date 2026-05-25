@@ -1,4 +1,4 @@
-# ARC_CLOSURE.md Template (Locked v1.3)
+# ARC_CLOSURE.md Template (Locked v1.3.1)
 
 > **Location:** `docs/templates/ARC_CLOSURE_TEMPLATE.md`
 > **Status:** locked. Every arc closure MUST follow this template.
@@ -12,6 +12,7 @@
 > **v1.1 (2026-05-22, L_PROTOCOL Amendment 3):** risk-normalised gate fields added to `best_architecture` block. Two fields renamed (see §"Schema versioning" at end of template). `primary_failure_mode` enum extended.
 > **v1.2 (2026-05-23, deployment-spec addition):** `config_artefact_path`, `deployment_spec_section_present`, `template_version` fields added to `best_architecture` block. New §4 deployment_spec section: REQUIRED for any PASS verdict, OPTIONAL for FAIL / HALT / DISCOVERY_COMPLETE. Parser enforces config path + §4 presence for PASS verdicts.
 > **v1.3 (2026-05-24, L_PROTOCOL Amendment 4):** Step 6 causal-audit framework. New `§1 tracker_payload.step_6` block. Step 6 auto-dispatches on any candidate that clears §3 constraints #1-9; manual CLI available for any closure. Step 6 critical-failure downgrades verdict to FAIL with `primary_failure_mode = step6_causal_audit_fail`. Parser v1.3 detection + Phase 2 tightening: for any PASS verdict with `closed_timestamp > 2026-05-23T06:20:59Z`, Amendment 3 fields required; for `template_version: v1.3` PASS, `step_6` block required.
+> **v1.3.1 (2026-05-23, L_PROTOCOL Amendment 5):** AUC-gated A2/A6 architecture selection. New top-level optional field `architectures_skipped_by_amendment_5` (subset of `{A1..A6}`, may be `[]`). Field is informational — captures architectures that would have been tested under Amendment 1's archetype-driven rule but were skipped under Amendment 5's four-gate AUC-driven rule. Phase 1: parser accepts presence or absence. Phase 2: parser REQUIRES the field for any PASS verdict whose `closed_timestamp > AMENDMENT_5_CUTOFF_ISO` (placeholder `2026-05-23T00:00:00Z`, to be backfilled with this PR's merge timestamp post-merge). v1.3 / v1.3.1 share the same `template_version: v1.3` declaration — the field's presence/absence is the v1.3.1 discriminator, not a separate version string. Mirrors the v1.2 / v1.2.1 `chained_dd_method` rollout pattern exactly.
 
 ---
 
@@ -150,6 +151,19 @@ tracker_payload:
     A1: {tested: true, won: false, worst_fold_ratio: <float or null>}
     A2: {tested: true, won: true,  worst_fold_ratio: <float>}
     # repeat per architecture tested
+
+  # ────── Architectures skipped under L_PROTOCOL Amendment 5 (v1.3.1) ──────
+  # Amendment 5 (ratified 2026-05-23) gates A2/A6 on Step 4 mean OOS AUC ≥ 0.65
+  # (instead of the prior Amendment 1 archetype-driven rule). Architectures that
+  # WOULD have been tested under the prior rule but are deliberately skipped
+  # under Amendment 5's four-gate procedure are recorded here as an informational
+  # signal for cross-arc analytics. Empty list `[]` means no architectures were
+  # skipped (the Amendment-5 set equals or supersets the Amendment-1 set).
+  # Phase 1: OPTIONAL on all closures. Phase 2 (post-Amendment-5-PR merge):
+  # REQUIRED for any PASS verdict whose `closed_timestamp` is strictly after
+  # `AMENDMENT_5_CUTOFF_ISO` (placeholder `2026-05-23T00:00:00Z`, backfilled
+  # to PR-merge timestamp post-merge). Pre-cutoff closures grandfathered.
+  architectures_skipped_by_amendment_5: []   # subset of {A1..A6}, may be []
 
   # ────── Archetypes observed ──────
   archetypes_observed: [<archetype_1>, <archetype_2>, ...]   # union across clusters
@@ -399,8 +413,9 @@ Parser specification (preserved here for reference):
 | v1.2 | 2026-05-23 | Deployment-spec addition. Three new fields in `best_architecture`: `config_artefact_path`, `deployment_spec_section_present`, `template_version` (the last was conventional in v1.1; locked at v1.2). New §4 deployment_spec section: REQUIRED for PASS-* verdicts (DEPLOYABLE, VIABLE, *-PROVISIONAL, *-PENDING-STEP6), OPTIONAL otherwise. Parser HALTs on PASS verdict if config path missing / file absent / §4 heading missing (Section 4-L). Pre-v1.2 closures unaffected. |
 | v1.2.1 | 2026-05-23 | `chained_dd_method` field added to `best_architecture` per PR-186 review item 1. Records the method used to reconstruct chained equity for `chained_max_dd_base_pct`: `"equity_stitching"` (v3.0.1 engine default) or `"full_window_sim"` (v3.0.2 follow-up). Phase 1: parser accepts as OPTIONAL. Phase 2 (post-Wave-2 first PASS arc): parser REQUIRES the field for any PASS verdict with `closed_timestamp > PR-186 merge date`. Older closures grandfathered by closed_timestamp check. v1.2 / v1.2.1 share the same `template_version: v1.2` declaration — the field's presence/absence is the v1.2.1 discriminator, not a separate version string. |
 | v1.3 | 2026-05-24 | L_PROTOCOL Amendment 4 — Step 6 causal-audit framework. New `§1 tracker_payload.step_6` block (`ran`, `trigger`, `overall_passed`, `manifest_path`, `categories`, `critical_failures`, `warnings_count`, `verdict_impact`). REQUIRED for any v1.3 PASS verdict. Parser v1.3 detection precedence: explicit `template_version: v1.3` → v1.3-exclusive `step_6` field → fall-through to v1.2 detection. Phase 2 tightening bundled (PR-186-merge-date cutoff): for any PASS verdict with `closed_timestamp > 2026-05-23T06:20:59Z` the parser REQUIRES Amendment 3 fields in `best_architecture`; for v1.3 PASS verdicts the parser ADDITIONALLY requires the `step_6` block + `step_6.overall_passed: true`. Closures landed before the cutoff (v1.0/v1.1/v1.2/v1.2.1) are grandfathered. |
+| v1.3.1 | 2026-05-23 | L_PROTOCOL Amendment 5 — AUC-gated A2/A6 architecture selection. New top-level optional field `architectures_skipped_by_amendment_5` (subset of `{A1..A6}`, may be `[]`). Captures architectures admissible under Amendment 1's archetype-driven rule but skipped under Amendment 5's four-gate AUC-driven rule. Phase 1: parser accepts presence or absence on all closures. Phase 2: parser REQUIRES the field on any PASS verdict whose `closed_timestamp > AMENDMENT_5_CUTOFF_ISO` (placeholder `2026-05-23T00:00:00Z`; backfilled with this PR's merge timestamp post-merge). v1.3 / v1.3.1 share the same `template_version: v1.3` declaration — the field's presence/absence is the v1.3.1 discriminator. Mirrors the v1.2 / v1.2.1 `chained_dd_method` rollout pattern. |
 
-Closures MUST reference the template version they were written against (e.g., `template_version: v1.2` near the top of `§1 tracker_payload` is the convention going forward — pre-v1.1 closures without this field are assumed v1.0; pre-v1.2 closures without `config_artefact_path` are assumed v1.1). v1.2.1 stays under the `v1.2` declaration; the `chained_dd_method` field is the only discriminator and is OPTIONAL during Phase 1.
+Closures MUST reference the template version they were written against (e.g., `template_version: v1.2` near the top of `§1 tracker_payload` is the convention going forward — pre-v1.1 closures without this field are assumed v1.0; pre-v1.2 closures without `config_artefact_path` are assumed v1.1). v1.2.1 stays under the `v1.2` declaration; the `chained_dd_method` field is the only discriminator and is OPTIONAL during Phase 1. v1.3.1 stays under the `v1.3` declaration; the `architectures_skipped_by_amendment_5` field is the only discriminator and is OPTIONAL during Phase 1.
 
 ---
 

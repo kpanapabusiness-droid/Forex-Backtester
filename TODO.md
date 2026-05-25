@@ -2,7 +2,7 @@
 
 > The operational todo list. Append, check off, delete as work completes.
 > Distinct from `ARC_TRACKER.md` (which is auto-updated arc state) and `ARC_HISTORY.md` (frozen pre-v3.0 record).
-> Last updated: 2026-05-24 (post-PR-#189 signal parity state alignment)
+> Last updated: 2026-05-25 (post-L_PROTOCOL Amendment 5 ratification — AUC-gated A2/A6 architecture selection + parser v1.3.1 field)
 
 ---
 
@@ -25,7 +25,7 @@
 
 **HistData layer:** 🟢 DONE (28 pairs, 52 GB tick + 18 GB M1 derived; 2026-05-21 backup verified)
 **v3.0 backtester reconfig (CC_06):** 🟢 DONE (PR-A through PR-E.1.7 landed)
-**v3.0 protocol redesign:** 🟢 DONE (`L_PROTOCOL.md` finalised + Amendments 1, 2, 3, 4 inline)
+**v3.0 protocol redesign:** 🟢 DONE (`L_PROTOCOL.md` finalised + Amendments 1, 2, 3, 4, 5 inline)
 **Repo cleanup + consolidation:** 🟢 DONE (branches cleaned; inventory + arc history complete)
 
 ### Active parallel chat work
@@ -95,6 +95,8 @@
 | Build tracker parser `scripts/update_tracker_from_closure.py` | 🟢 | PR #179 built parser; PR #181 retrofitted Arcs 8/10/11 to template v1.2; PR #182 CC_11 follow-up backfilled parsed.log + parser registry |
 | Closure template v1.3 (Amendment 4 — Step 6) | 🟢 | PR #188 |
 | Parser v1.3 (template v1.3 detection + Phase 2 tightening, cutoff 2026-05-23T06:20:59Z) | 🟢 | PR #188 |
+| Closure template v1.3.1 (Amendment 5 — `architectures_skipped_by_amendment_5` field) | 🟢 | This PR |
+| Parser v1.3 Amendment-5 extension (optional field + Phase 2 enforcement, cutoff `AMENDMENT_5_CUTOFF_ISO` placeholder pending PR-merge backfill) | 🟢 | This PR |
 
 ### Round 6 — Engine consolidation (NEW)
 
@@ -165,9 +167,10 @@ path is Sections G (news filter) + H (post-fill SL anchor) per
 | Arc 7 v3.0.1 retry | 🔴 | Blocked on PR #180 closure + signal-parity engine merged |
 | Arc 10 re-run on signal-parity engine for definitive verdict | 🔴 | Procedure documented at [docs/calibration/arc_10_signal_parity_rerun_2026_05.md](docs/calibration/arc_10_signal_parity_rerun_2026_05.md); expected near-zero delta |
 | Wave 1 closes (cross-arc tracker review for patterns) | 🔴 | Gated on retries above |
-| Dispatch Wave 2 (6 arcs in parallel) | 🔴 | Gated on Wave 1 close |
+| Dispatch Wave 2 (6 arcs in parallel) | 🔴 | Gated on Wave 1 close. **Wave 2 dispatches must apply L_PROTOCOL Amendment 5 four-gate architecture-selection rule from first dispatch** (Phase 1 chat-side; out of scope for this PR). |
 | Wave 2 closes; cross-arc synthesis | 🔴 | |
 | Decision: any deployable found? | 🔴 | |
+| Retroactive audit Arc 8 v3.0 + Arc 11 v3.0 under L_PROTOCOL Amendment 5 | ⚪ | Deferred until Arc 7 v3.0.2 closes — verdict informs whether retroactive retries are worth running. Criterion per Amendment 5 §7: "FAIL closed with at least one Step 3 surviving cluster whose Step 4 AUC ≥ 0.65 was not evaluated under A2 AND A6 under prior protocol." Arc 10 v3.0 already evaluated A6 under Amendment 1's V-shape mapping; likely unaffected, verify at audit. |
 
 ---
 
@@ -213,6 +216,7 @@ All 🔴 NOT STARTED — defer to Phase 2 trigger.
 | Closure-writer YAML auto-emission | 🔴 | Currently hand-written; defer until orchestrator gains closure-emit capability |
 | Legacy engine retirement (migrate `live/run_daily.py` + 32 importers off `core/backtester.py` + `core/signal_logic.py`) | 🔴 | Gate: KH-24 anchor preservation (±0.5pp ROI / ±1pp DD). Out of scope for PR #189; separate dispatch needed. |
 | EA mid-trail update (live MT5 EA still uses bid-side `CopyClose`) | 🔴 | To restore backtest↔EA parity post-PR-#189; separate deployment PR |
+| Backfill `AMENDMENT_5_CUTOFF_ISO` in `scripts/tracker_parser/schema.py` with the actual PR-merge timestamp post-merge | 🔴 | Placeholder pinned at `2026-05-23T00:00:00Z` at landing time; mirror PR-186 / Amendment 3 backfill pattern. Trivial one-line follow-up PR. |
 
 ---
 
@@ -233,11 +237,11 @@ All 🔴 NOT STARTED — defer to Phase 2 trigger.
 ## Doc set state
 
 ### Locked / ready
-- `L_PROTOCOL.md` (v3.0 + Amendments 1, 2, 3, 4 inline) 🟢
+- `L_PROTOCOL.md` (v3.0 + Amendments 1, 2, 3, 4, 5 inline) 🟢
 - `ARC_HISTORY.md` (frozen) 🟢
-- `docs/templates/ARC_CLOSURE_TEMPLATE.md` v1.3 🟢
+- `docs/templates/ARC_CLOSURE_TEMPLATE.md` v1.3.1 🟢
 - `ARC_TRACKER.md` (parser-auto-updated) 🟢
-- `scripts/update_tracker_from_closure.py` (parser; supports template v1.0 / v1.1 / v1.2 / v1.3) 🟢
+- `scripts/update_tracker_from_closure.py` (parser; supports template v1.0 / v1.1 / v1.2 / v1.2.1 / v1.3 / v1.3.1) 🟢
 - `docs/sub_protocols/heavy_ml_probe.md` (spec; engine build in flight via PR #187) 🟢
 - `docs/sub_protocols/signal_discovery_probe.md` (spec + engine wired via PR #175) 🟢
 - `docs/audits/engine_capability_audit_2026_05.md` (PR #184; footer updated by PR #189 with signal-parity gap closure) 🟢
@@ -276,7 +280,7 @@ All 🔴 NOT STARTED — defer to Phase 2 trigger.
 |---|---|
 | `L_PROTOCOL.md` | Only at major redesign events (Amendments are inline) |
 | `docs/sub_protocols/*` | When sub-protocol is amended |
-| `docs/templates/ARC_CLOSURE_TEMPLATE.md` | Only at template version bump (locked at v1.3) |
+| `docs/templates/ARC_CLOSURE_TEMPLATE.md` | Only at template version bump (locked at v1.3.1) |
 | `ARC_TRACKER.md` | Auto on arc open/close via parser (`scripts/update_tracker_from_closure.py`) |
 | `ARC_HISTORY.md` | Never (frozen at v3.0 start) |
 | `TODO.md` (this file) | Manually as work progresses; full rewrites rare (every 2-3 months at major state transitions) |

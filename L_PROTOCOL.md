@@ -9,6 +9,7 @@
 > **Amendment 2 (2026-05-22):** ML architecture mechanics specified for A2, A3, A4, A6. See §2 Step 5 ML mechanics subsection.
 > **Amendment 3 (2026-05-22):** Risk-normalised gates. §3 constraints preserved 1:1; evaluation now occurs at scaled risk `r_safe` / `r_hard` rather than at the WFO base risk. Scalability bounds, per-day DD recount, and explicit evaluation order added. Full text archived at `archive/L_PROTOCOL_v3_0_AMENDMENT_3.md`. See §3.
 > **Amendment 4 (2026-05-24):** Step 6 causal-audit framework. Six audit categories (lookahead, selection bias, execution realism, statistical integrity, determinism, deployment readiness) as runnable engine code. Auto-dispatches post-gate on Top-1 PASS-tier candidate; manual CLI invokable on any closure. Critical failure downgrades verdict via `step6_causal_audit_fail`. Closure template bumped to v1.3 with `§1 tracker_payload.step_6` block; parser v1.3 + Phase 2 tightening (PR-186-merge cutoff). Full text archived at `archive/L_PROTOCOL_v3_0_AMENDMENT_4.md`. See §2 Step 6.
+> **Amendment 5 (2026-05-23):** AUC-gated A2/A6 architecture selection. Amendment 1's uniform archetype gating is split into four gates: Gate 1 preserves A3/A4 archetype gating; Gate 2 admits A2 + A6 whenever Step 4 mean OOS AUC ≥ 0.65 regardless of archetype; Gate 3 always admits A1; Gate 4 admits A5 when ≥2 candidate clusters survive Step 3. Choppy clusters skip all architectures. Enforcement is dispatch-time; engine unchanged (all six architectures wired post-PR-186). Closure template v1.3.1 adds optional `architectures_skipped_by_amendment_5` field; parser v1.3 accepts it and requires it for post-ratification PASS verdicts. Full text archived at `archive/L_PROTOCOL_v3_0_AMENDMENT_5.md`. See §2 Step 5 "Architecture selection (Amendment 5)".
 >
 > This protocol is the umbrella. It accepts any signal, any feature space, any architecture. Sub-protocols may layer on top to add signal-class-specific specificity. The overseer's gates and verdicts apply universally.
 
@@ -190,15 +191,22 @@ Inputs from Step 4 (per candidate cluster):
 
 Step 5 search rules:
 
-**Architecture selection:** 2-3 from {A1..A6} that fit the dominant cluster archetype:
-- Stepwise climber → A1 (system filter), A2 (classifier filter), A4 (trailing-exit Pipeline D)
-- V-shape recovery → A1, A3 (Pipeline DE — deferred entry), A6 (meta-labeling)
-- Bimodal → A1, A4 (per-archetype Pipeline D exits)
-- Monotonic up → A1, A2, A6
-- Choppy → no architectures expected to survive; arc typically dies at Step 3 before reaching Step 5
-- A5 (portfolio composition) → only applies if 2+ candidate clusters survive Step 3
+**Architecture selection (Amendment 5, ratified 2026-05-23):** the set of architectures evaluated per surviving cluster is the UNION over four independent gates. Replaces the Amendment 1 archetype-driven rule. Full text at [archive/L_PROTOCOL_v3_0_AMENDMENT_5.md](archive/L_PROTOCOL_v3_0_AMENDMENT_5.md).
+
+- **Gate 1 — Shape-required (archetype-driven):** adds A3 / A4 per archetype.
+  - V-shape recovery → A3
+  - Stepwise climber → A4
+  - Bimodal → A4
+  - Monotonic up / Monotonic down / Unclassified → (none)
+- **Gate 2 — Classifier-driven (AUC-driven):** if Step 4 mean OOS AUC ≥ 0.65 for the cluster → add A2 and A6. Fires REGARDLESS of archetype (A2 and A6 are archetype-agnostic by construction; the only relevant input quality is classifier predictive power).
+- **Gate 3 — Universal:** always add A1 (system-level filter). No shape or classifier dependence; baseline for every cluster.
+- **Gate 4 — Portfolio:** if ≥2 candidate clusters survive Step 3 within the arc → add A5 (portfolio composition).
+
+**Cluster skip condition:** Choppy clusters skip all architectures. Step 5 evaluation not performed for Choppy.
 
 If Step 4 produced NO usable filter/classifier (AUC at chance, no rule above noise), A1 still runs with "no filter" baseline (raw signal + system-level rules: exposure, SL, exit) — this tests whether the system works without filtering.
+
+The four-gate rule is enforced AT DISPATCH TIME, not engine time. Arc dispatches must list the architectures-tested set per cluster and cite the admitting gate (e.g. `A1: Gate 3; A3: Gate 1 V-shape; A2, A6: Gate 2 AUC=0.72`). Engine receives a fully-resolved set; engine does NOT apply the selection rule itself. Architectures admissible under the prior Amendment 1 rule but skipped under Amendment 5 are recorded in the closure's `architectures_skipped_by_amendment_5` field (optional pre-cutoff, required for post-cutoff PASS closures — see closure template v1.3.1).
 
 **SL multiplier:** centred on Step 3's per-cluster selected SL, ±1 step either side (typically 3 values total). Example: if Step 3 selected SL=2.5×ATR, Step 5 tests SL ∈ {2.0, 2.5, 3.0}.
 

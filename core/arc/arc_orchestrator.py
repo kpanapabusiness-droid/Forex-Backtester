@@ -224,6 +224,16 @@ class CandidateAmendedResult:
     chained_dd_method: str   # "equity_stitching" | "full_window_sim"
     per_day_max_dd_artefact_path: Path | None
     amended_gate: AmendedGateResult
+    # Holdout trade counts at the three risk tiers (Amendment 4 §6.5
+    # risk-leak detection). All three are observed under IDENTICAL
+    # signal-evaluation logic — only the sizing scales — so they MUST
+    # match. Divergence is a critical engine bug (the 2026-05-25 Arc 7
+    # rerun at r=2% vs r=0.5% surfaced exactly this — 36-38% fewer
+    # trades under the higher risk). ``None`` when the corresponding
+    # holdout sim did not run (scaling not feasible, no holdout fold).
+    holdout_n_trades_at_r_base: int | None = None
+    holdout_n_trades_at_r_safe: int | None = None
+    holdout_n_trades_at_r_hard: int | None = None
 
 
 @dataclass(frozen=True)
@@ -652,6 +662,17 @@ class ArcOrchestrator:
                 r_base=self.cfg.risk_pct,
             )
 
+            # §6.5 risk-leak detection inputs: capture trade counts at
+            # each scaled-risk holdout tier (Amendment 4 §6.5). Equal
+            # counts → admit logic is risk-independent (correct);
+            # divergent counts surface engine bugs like the 2026-05-25
+            # Arc 7 r=2% vs r=0.5% incident.
+            base_holdout_match = holdout_by_cid.get(cid)
+            holdout_n_base = (
+                int(base_holdout_match.holdout_stats.n_trades)
+                if base_holdout_match is not None
+                else None
+            )
             amended_results.append(CandidateAmendedResult(
                 config_id=cid,
                 chained_max_dd_base_pct=chained_dd,
@@ -663,6 +684,13 @@ class ArcOrchestrator:
                 chained_dd_method="equity_stitching",
                 per_day_max_dd_artefact_path=parquet_path,
                 amended_gate=amended_gate,
+                holdout_n_trades_at_r_base=holdout_n_base,
+                holdout_n_trades_at_r_safe=(
+                    int(holdout_safe.n_trades) if holdout_safe is not None else None
+                ),
+                holdout_n_trades_at_r_hard=(
+                    int(holdout_hard.n_trades) if holdout_hard is not None else None
+                ),
             ))
 
         return AmendedWfoSearchResult(base=s5, amended_results=tuple(amended_results))
@@ -821,10 +849,18 @@ class ArcOrchestrator:
             arc_root.mkdir(parents=True, exist_ok=True)
             wfo_struct_amend = self.cfg.wfo_structure or build_v3_folds()
             holdout_start = None
+            holdout_fold_id = None
             if wfo_struct_amend.holdout is not None:
                 holdout_start = pd.Timestamp(wfo_struct_amend.holdout.oos_start)
                 if holdout_start.tzinfo is None:
                     holdout_start = holdout_start.tz_localize("UTC")
+                holdout_fold_id = int(wfo_struct_amend.holdout.fold_id)
+            # Panel boundary convention threaded through for §6.3
+            # propagation check (Amendment 6).
+            primary_tf_name = signal_eval.primary_tf
+            panel_boundary_convention = getattr(
+                self.panels.get(primary_tf_name), "boundary_convention", None,
+            )
             step_6_dispatch = maybe_dispatch_step_6(
                 arc_orchestrator_result=_LightOrchestratorView(
                     arc_name=self.cfg.arc_name,
@@ -839,8 +875,13 @@ class ArcOrchestrator:
                 feature_matrix=self.cfg.feature_matrix,
                 feature_lineage=self.cfg.feature_lineage,
                 signal_module_name=type(self.signal_module).__module__,
-                primary_tf=signal_eval.primary_tf,
+                primary_tf=primary_tf_name,
                 pair_set=tuple(self.cfg.pair_set),
+                strategy_results=getattr(self, "_last_strategy_results", None),
+                holdout_results=tuple(holdout or ()),
+                holdout_fold_id=holdout_fold_id,
+                r_base_pct=float(self.cfg.risk_pct),
+                panel_boundary_convention=panel_boundary_convention,
             )
             # Per Amendment 4 + chat Q1: if Step 6 critical-failed, downgrade
             # the Top-1 candidate by re-classifying its gate with

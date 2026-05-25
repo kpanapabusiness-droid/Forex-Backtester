@@ -155,7 +155,11 @@ class AuditConfig:
 
     no_block: bool = False
     categories_to_run: tuple[str, ...] | None = None
-    byte_compare_n_samples: int = 5
+    # Default sample size bumped from 5 → 25 in
+    # ``engine/step_6_ultimate_audit``. Covers enough variation to
+    # surface a rolling-window off-by-one without exploding runtime on
+    # long arcs; manual CLI can override via ``--byte-compare-n``.
+    byte_compare_n_samples: int = 25
     byte_compare_seed: int = 42
     spread_delta_warn_pct: float = 0.20
     spread_delta_critical_pct: float = 0.50

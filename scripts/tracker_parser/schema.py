@@ -44,22 +44,15 @@ PHASE_2_CUTOFF_ISO: str = "2026-05-23T06:20:59Z"
 
 # L_PROTOCOL Amendment 5 cutoff for Phase 2 tightening on
 # `architectures_skipped_by_amendment_5`. After this timestamp, PASS verdicts
-# MUST carry the field (may be `[]`). PLACEHOLDER pinned at ratification date;
-# backfill with the Amendment-5 PR's actual merge timestamp post-merge. The
-# placeholder is functionally equivalent for all practical purposes — the PR
-# cannot merge before this instant, and no PASS closure will have a
-# `closed_timestamp` between the placeholder and the actual merge timestamp.
-AMENDMENT_5_CUTOFF_ISO: str = "2026-05-23T00:00:00Z"
+# MUST carry the field (may be `[]`). Backfilled with PR #194 merge timestamp
+# (mirrors PHASE_2_CUTOFF_ISO / Amendment 3 backfill pattern).
+AMENDMENT_5_CUTOFF_ISO: str = "2026-05-25T02:03:13Z"
 
-AMENDMENT_5_1_CUTOFF_ISO: str = "2026-05-25T00:00:00Z"
-# Placeholder. Backfill with PR merge timestamp post-merge (mirror
-# AMENDMENT_5_CUTOFF_ISO and AMENDMENT_3_CUTOFF_ISO patterns).
-# Cutoff: closures with closed_timestamp >= AMENDMENT_5_1_CUTOFF_ISO
-# and verdict in {PASS-DEPLOYABLE, PASS-VIABLE, *_PROVISIONAL}
-# and ≥2 candidate clusters surviving Step 3 in the closure body
-# MUST list either a constituent cluster's PASS-tier verdict OR
-# the string "a5_gate_4_admission_blocked_by_no_pass_tier_constituent"
-# in architectures_skipped_by_amendment_5.
+# L_PROTOCOL Amendment 5.1 cutoff. After this timestamp, PASS closures with
+# ≥2 candidate clusters surviving Step 3 MUST either run A5 or cite
+# "a5_gate_4_admission_blocked_by_no_pass_tier_constituent" in
+# architectures_skipped_by_amendment_5. Backfilled with PR #201 merge timestamp.
+AMENDMENT_5_1_CUTOFF_ISO: str = "2026-05-25T05:29:01Z"
 
 V11_EXCLUSIVE_FIELDS = {
     "worst_fold_dd_base_pct",

@@ -1,7 +1,7 @@
 """L_PROTOCOL Amendment 5 (v1.3.1) — `architectures_skipped_by_amendment_5` field.
 
 Coverage:
-- ``AMENDMENT_5_CUTOFF_ISO`` constant pinned at the ratification-date placeholder
+- ``AMENDMENT_5_CUTOFF_ISO`` constant pinned at PR #194 merge timestamp
 - Schema accepts the field as optional (presence or absence)
 - Schema accepts ``[]`` (Amendment-5 set ⊇ Amendment-1 set)
 - Schema enum-validates entries against ``{A1..A6}``
@@ -45,9 +45,9 @@ _BASE_PAYLOAD: dict = {
 }
 
 
-def test_amendment_5_cutoff_placeholder_locked():
-    """Cutoff is pinned at ratification-date placeholder pending PR-merge backfill."""
-    assert AMENDMENT_5_CUTOFF_ISO == "2026-05-23T00:00:00Z"
+def test_amendment_5_cutoff_locked():
+    """Cutoff backfilled with PR #194 merge timestamp."""
+    assert AMENDMENT_5_CUTOFF_ISO == "2026-05-25T02:03:13Z"
 
 
 def test_schema_accepts_field_absent():
@@ -82,14 +82,14 @@ def test_schema_rejects_invalid_architecture_in_field():
 
 def test_is_post_amendment_5_cutoff_true_when_after():
     """Closures strictly after the cutoff are post-cutoff."""
-    assert _is_post_amendment_5_cutoff("2026-05-24T00:00:00Z") is True
-    assert _is_post_amendment_5_cutoff("2026-05-23T12:00:00Z") is True
+    assert _is_post_amendment_5_cutoff("2026-05-26T00:00:00Z") is True
+    assert _is_post_amendment_5_cutoff("2026-05-25T06:00:00Z") is True
 
 
 def test_is_post_amendment_5_cutoff_false_when_at_or_before():
     """Equality and strictly-before are pre-cutoff (grandfathered)."""
-    assert _is_post_amendment_5_cutoff("2026-05-23T00:00:00Z") is False
-    assert _is_post_amendment_5_cutoff("2026-05-22T23:59:59Z") is False
+    assert _is_post_amendment_5_cutoff("2026-05-25T02:03:13Z") is False
+    assert _is_post_amendment_5_cutoff("2026-05-25T02:03:12Z") is False
 
 
 def test_is_post_amendment_5_cutoff_missing_timestamp_grandfathered():

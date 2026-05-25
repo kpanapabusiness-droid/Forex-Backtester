@@ -1027,12 +1027,21 @@ value (e.g. prior-day D1 close) at an LTF anchor timestamp (e.g. each H4 bar).
 Replaces the legacy UTC-anchored idioms that broke under the 5ers EET storage
 convention in §15.3:
 
-| Legacy idiom | Failure mode under EET | Canonical replacement |
+| Legacy idiom | Failure mode | Canonical replacement |
 |---|---|---|
-| `ltf_index.floor("4h").map(idx_h4)` | State **C** — `.map()` exact-match returns NaN → empty signal pool | `get_htf_index_at(..., require_fully_closed=True)` |
-| `ltf_index.normalize().map(idx_d1)` | State **C** | `get_htf_index_at(...)` or `get_htf_value_at(...)` |
-| `df.index.normalize() - pd.Timedelta(days=1)` + `merge_asof(backward)` | State **B** — silently picks same-EET-day HTF (lookahead) | `get_htf_value_at(..., require_fully_closed=True)` or `get_htf_row_at(...)` |
-| `d1_ts.normalize()` + `np.searchsorted` | State **B** — picks neighbouring EET-day HTF | `get_htf_index_at(...)` |
+| `ltf_index.floor("4h").map(idx_h4)` | EET-only: State **C** — `.map()` exact-match returns NaN → empty signal pool | `get_htf_index_at(..., require_fully_closed=True)` |
+| `ltf_index.normalize().map(idx_d1)` | EET-only: State **C** | `get_htf_index_at(...)` or `get_htf_value_at(...)` |
+| `df.index.normalize() - pd.Timedelta(days=1)` + `merge_asof(backward)` | EET-only: State **B** — silently picks same-EET-day HTF (lookahead) | `get_htf_value_at(..., require_fully_closed=True)` or `get_htf_row_at(...)` |
+| `d1_ts.normalize()` + `np.searchsorted` | EET-only: State **B** — picks neighbouring EET-day HTF | `get_htf_index_at(...)` |
+| `pd.merge_asof(direction='backward', allow_exact_matches=False)` against `label='left'` HTF bars | **Convention-independent** State **B** — at any LTF ts strictly inside HTF period N, picks N's own bar with its eventual end-of-period close (within-period lookahead) | `get_htf_value_at(..., require_fully_closed=True)` |
+
+The last row is a distinct fault class from the others: it is **not** a
+timezone-shift bug (it occurs identically under UTC and EET) but a
+**within-period** bug — `merge_asof(direction='backward')` against a
+left-labelled HTF bar matches the period's own label, and the bar's
+`close` column carries that period's eventual end-of-period close.
+Discovered cross-arc on `core/features/multi_tf.py::_w1_close_slope_sign`
+in 2026-05; fixed canonically via PR `engine/w1_producer_canonical_alignment`.
 
 **Public API:**
 

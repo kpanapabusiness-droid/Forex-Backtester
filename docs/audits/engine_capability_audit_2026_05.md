@@ -526,4 +526,54 @@ Full audit: [docs/audits/signal_module_eet_audit_2026_05.md](signal_module_eet_a
 
 Open follow-ups: OPEN-RESET-FLOOR-EET (`core/sim/risk/reset_floor.py`),
 OPEN-FEATURES-DISTANCE-EET-SESSION-SEMANTICS (`core/features/distance.py`) — both
-require separate dispatches.
+resolved by CC_20 (next section).
+
+---
+
+## Post-audit update — 2026-05-25 (CC_20 / Amendment 6 — EET session semantics)
+
+Two EET-fault-class items resolved:
+
+- **`OPEN-FEATURES-DISTANCE-EET-SESSION-SEMANTICS`** — RESOLVED.
+  [core/features/distance.py](../../core/features/distance.py)
+  `_prior_session_high` / `_prior_session_low` now bucket bars by
+  trading day via the canonical `core.utils.session_boundary.utc_to_eet_trading_day`
+  utility, keyed on `panel.boundary_convention`. Default `panel=None`
+  preserves UTC behaviour for legacy callers.
+
+- **`OPEN-RESET-FLOOR-EET`** — RESOLVED (forward hygiene).
+  [core/sim/risk/reset_floor.py](../../core/sim/risk/reset_floor.py)
+  `ResetFloorAccount.update_at_day_close` uses the same utility;
+  default `boundary_convention="5ers_eet"`. Note: the read-first
+  phase of CC_20 surfaced that this module is dormant in v3 runtime
+  (not instantiated by any architecture). The fix is forward
+  hygiene; the load-bearing analogous fix is in
+  `compute_per_day_max_dd` (see Amendment 6 below).
+
+**Newly tracked fix (CC_20 chat-decided):**
+
+- **`OPEN-COMPUTE-PER-DAY-MAX-DD-EET`** — RESOLVED.
+  [core/runners/_fold_stats_helpers.py](../../core/runners/_fold_stats_helpers.py)
+  `compute_per_day_max_dd` now accepts `boundary_convention`
+  (default `"5ers_eet"`); the orchestrator forwards
+  `panel.boundary_convention`. This is the load-bearing fix —
+  `daily_dd_breaches_at_r_safe` / `daily_dd_breaches_at_r_hard`
+  now bucket equity by the EET trading day matching 5ers' actual
+  reset boundary.
+
+**Amendment 6** (CC_20 PR) supersedes Amendment 3 §"Boundary" —
+the locked `UTC broker-day. Locked value.` framing is amended to
+`EET broker trading day. Locked value (version-amended).`
+Amendment 6 text lands in the parallel L_PROTOCOL.md docs PR;
+engine implementation lands here.
+
+**KH-24 anchor preservation:** KH-24 runs `convention="utc"`
+end-to-end. Verified byte-identical via
+[tests/protocol_runtime/test_kh24_a1_equivalence.py](../../tests/protocol_runtime/test_kh24_a1_equivalence.py)
++ [tests/replays_v2_1_1/](../../tests/replays_v2_1_1/).
+
+**Plumbing:** convention propagates via `Panel.boundary_convention`
+(mirrors `Panel.tf`). Default `"utc"` for legacy safety.
+
+See [PROTOCOL_RUNTIME.md §15.5](../PROTOCOL_RUNTIME.md) for the
+session-semantics convention contract.

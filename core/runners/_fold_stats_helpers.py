@@ -19,8 +19,17 @@ from typing import Iterable
 import pandas as pd
 
 from core.sim.multipair_backtester import RunResult
+from core.utils.session_boundary import (
+    SUPPORTED_CONVENTIONS,
+    utc_to_eet_trading_day,
+)
 from core.wfo.folds import Fold
 from core.wfo.gates import FoldStats
+
+# Per Amendment 6 (supersedes Amendment 3 §"Boundary"): daily-DD
+# measurement uses the EET broker trading day post-PR-189. KH-24 and
+# legacy callers may opt back to UTC via boundary_convention="utc".
+_EET_TZ: str = "Europe/Athens"
 
 
 def slice_equity_to_oos(equity: pd.Series, fold: Fold) -> pd.Series:
@@ -115,46 +124,66 @@ def compute_per_day_max_dd(
     equity: pd.Series,
     *,
     pair_set: str = "unknown",
+    boundary_convention: str = "5ers_eet",
 ) -> pd.DataFrame:
-    """Per-day max-DD series at r_base — Amendment 3 §"Daily DD measurement".
+    """Per-day max-DD series at r_base — Amendment 6 §"Daily DD measurement".
 
-    For each UTC trading day in ``equity.index``, computes:
+    For each trading day in ``equity.index``, computes:
 
-      - ``date`` (UTC day, datetime.date)
+      - ``date`` (broker-local trading-day calendar date, ``datetime.date``;
+        EET-local under ``"5ers_eet"``, UTC under ``"utc"``)
       - ``pair_set`` (label, useful for multi-arc registry rows)
       - ``day_start_equity`` (first equity sample of that day —
-        the day's 00:00-UTC reference per Amendment 3 §"Day-start
-        equity definition"; NOT the reset-floor sizing baseline)
+        the day's open reference per Amendment 6 §"Day-start equity
+        definition"; NOT the reset-floor sizing baseline)
       - ``day_max_dd_base_pct`` (``(day_start_equity - day_min_equity)
         / day_start_equity`` as decimal fraction; 0.05 = 5%)
       - ``n_trades_open_start_of_day`` (placeholder 0 — caller can
         post-fill from account state if needed; not load-bearing for
         the gate logic)
 
-    Per Amendment 3 §"Day-start equity definition": this is the
-    REFERENCE for daily DD scaling. The verdict logic in
+    Per Amendment 6 (supersedes Amendment 3 §"Boundary"): the boundary
+    is the EET broker trading day, matching 5ers' actual daily-DD reset
+    boundary. ``boundary_convention="utc"`` is retained for KH-24
+    anchor compatibility (byte-identical to pre-Amendment-6 output).
+
+    The verdict logic in
     ``core.wfo.amended_gates.count_daily_breaches_at_scaled_risk``
     multiplies each row's ``day_max_dd_base_pct`` by ``k`` and counts
     days at-or-above the 5% breach threshold.
-
-    Boundary: UTC broker-day (locked per Amendment 3 §"Boundary").
     """
+    if boundary_convention not in SUPPORTED_CONVENTIONS:
+        raise ValueError(
+            f"Unsupported boundary_convention {boundary_convention!r}; "
+            f"expected one of {SUPPORTED_CONVENTIONS}"
+        )
+
+    empty_cols = [
+        "date", "pair_set", "day_start_equity",
+        "day_max_dd_base_pct", "n_trades_open_start_of_day",
+    ]
     if equity is None or len(equity) == 0:
-        return pd.DataFrame(columns=[
-            "date", "pair_set", "day_start_equity",
-            "day_max_dd_base_pct", "n_trades_open_start_of_day",
-        ])
+        return pd.DataFrame(columns=empty_cols)
     s = equity.dropna()
     if len(s) == 0:
-        return pd.DataFrame(columns=[
-            "date", "pair_set", "day_start_equity",
-            "day_max_dd_base_pct", "n_trades_open_start_of_day",
-        ])
+        return pd.DataFrame(columns=empty_cols)
 
-    # Group by UTC calendar day. Use .first() / .min() to pick the
-    # day's opening equity + the intra-day low.
     df = s.to_frame(name="equity")
-    df["date"] = df.index.tz_convert("UTC").date if hasattr(df.index, "tz_convert") else df.index.date
+
+    # Trading-day-start key per row (tz-aware UTC timestamp), then map
+    # to a broker-local datetime.date label so audit reports read in
+    # the same timezone as the boundary.
+    if hasattr(df.index, "tz_convert"):
+        idx_utc = df.index.tz_convert("UTC")
+    else:
+        idx_utc = df.index
+    day_keys = utc_to_eet_trading_day(idx_utc, convention=boundary_convention)
+    if boundary_convention == "utc":
+        df["date"] = day_keys.date
+    else:
+        # day_keys are at EET midnight expressed in UTC. Convert to EET
+        # local so the date label reads as the EET calendar day.
+        df["date"] = day_keys.tz_convert(_EET_TZ).date
 
     by_day = (
         df.groupby("date")["equity"]
@@ -170,10 +199,7 @@ def compute_per_day_max_dd(
     by_day["pair_set"] = pair_set
     by_day["n_trades_open_start_of_day"] = 0  # placeholder; see docstring
 
-    return by_day[[
-        "date", "pair_set", "day_start_equity",
-        "day_max_dd_base_pct", "n_trades_open_start_of_day",
-    ]].reset_index(drop=True)
+    return by_day[empty_cols].reset_index(drop=True)
 
 
 __all__ = (

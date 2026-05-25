@@ -449,7 +449,7 @@ Linear scaling of breach **counts** is mathematically wrong. Correct procedure:
 
 **At gate evaluation:** for each day in the series, compute `day_max_dd_scaled = day_max_dd_base × k`. Count days where `day_max_dd_scaled ≥ 5%`. This is per-day re-evaluation, not count scaling.
 
-**Boundary:** UTC broker-day. Locked value.
+**Boundary:** EET broker trading day (Europe/Athens, EU DST rules). Locked value, version-amended per **Amendment 6** (supersedes prior `UTC broker-day. Locked value.` framing). Amendment 6 effective from CC_20 PR merge timestamp; full text in the parallel L_PROTOCOL amendment docs PR. Engine implementation: `core.runners._fold_stats_helpers.compute_per_day_max_dd(boundary_convention="5ers_eet")` consuming `core.utils.session_boundary.utc_to_eet_trading_day`. `boundary_convention="utc"` opt-in preserved for KH-24 anchor byte-identity.
 
 **Tolerance:** exactly 0 breaches in both tiers. No safety margin on the daily limit.
 

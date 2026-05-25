@@ -3,6 +3,13 @@
 Both features measure where the current price sits in absolute terms
 relative to a reference level. Causal lineage: clean — references are
 computed from bars closed strictly before the signal bar (shift(1)).
+
+Session boundary: "prior session" maps to the trading-day boundary
+identified by ``panel.boundary_convention`` (default ``"utc"`` for
+legacy KH-24 byte-identical safety when no panel is provided). Under
+``"5ers_eet"`` (post-PR-189 engine default) sessions are EET trading
+days; see ``core.utils.session_boundary.utc_to_eet_trading_day`` for
+DST handling.
 """
 
 from __future__ import annotations
@@ -13,17 +20,27 @@ import pandas as pd
 from core.features._helpers import mid_close, mid_high, mid_low, pip_size_for_pair
 from core.features.lineage import CausalLineage, FeatureSpec
 from core.features.registry import register
+from core.utils.session_boundary import utc_to_eet_trading_day
+
+
+def _convention_from_panel(panel) -> str:
+    """Read ``boundary_convention`` from panel; UTC fallback if absent."""
+    if panel is None:
+        return "utc"
+    return getattr(panel, "boundary_convention", "utc")
 
 
 def _prior_session_high(pair_df: pd.DataFrame, panel=None) -> pd.Series:
-    """Distance from current mid-close to the prior-calendar-day's mid session high.
+    """Distance from current mid-close to the prior trading-day's mid session high.
 
-    "Session" here is the calendar UTC day. Implementation: shift to prior
-    day, group by date, take max(mid_high). Strictly prior by construction
-    (we only consult days earlier than the signal day).
+    Trading-day boundary follows ``panel.boundary_convention`` (UTC or
+    EET). Implementation: bucket bars by their trading-day key, take
+    max(mid_high) per day, then for each bar look up the prior day's
+    high. Strictly prior by construction.
     """
+    convention = _convention_from_panel(panel)
     df = pair_df.copy()
-    df["_date"] = df.index.normalize()
+    df["_date"] = utc_to_eet_trading_day(df.index, convention=convention)
     df["_mid_high"] = mid_high(pair_df).values
     daily_high = df.groupby("_date")["_mid_high"].max().rename("prior_day_high_mid")
     prev_date_high = pd.Series(
@@ -41,17 +58,19 @@ register(
         lineage=CausalLineage.CLEAN,
         feature_class="distance",
         description=(
-            "Distance from the prior-bar mid-close to the prior-calendar-day's "
-            "mid-price session high. Positive ⇒ above prior day's high."
+            "Distance from the prior-bar mid-close to the prior trading-day's "
+            "mid-price session high. Positive ⇒ above prior day's high. "
+            "Trading-day boundary per Panel.boundary_convention (UTC or 5ers_eet)."
         ),
-        inputs={"reference": "prior_calendar_day_high_mid"},
+        inputs={"reference": "prior_trading_day_high_mid"},
     )
 )
 
 
 def _prior_session_low(pair_df: pd.DataFrame, panel=None) -> pd.Series:
+    convention = _convention_from_panel(panel)
     df = pair_df.copy()
-    df["_date"] = df.index.normalize()
+    df["_date"] = utc_to_eet_trading_day(df.index, convention=convention)
     df["_mid_low"] = mid_low(pair_df).values
     daily_low = df.groupby("_date")["_mid_low"].min().rename("prior_day_low_mid")
     prev_date_low = pd.Series(
@@ -69,10 +88,11 @@ register(
         lineage=CausalLineage.CLEAN,
         feature_class="distance",
         description=(
-            "Distance from the prior-bar mid-close to the prior-calendar-day's "
-            "mid-price session low. Positive ⇒ above prior day's low."
+            "Distance from the prior-bar mid-close to the prior trading-day's "
+            "mid-price session low. Positive ⇒ above prior day's low. "
+            "Trading-day boundary per Panel.boundary_convention (UTC or 5ers_eet)."
         ),
-        inputs={"reference": "prior_calendar_day_low_mid"},
+        inputs={"reference": "prior_trading_day_low_mid"},
     )
 )
 

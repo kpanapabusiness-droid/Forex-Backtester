@@ -79,6 +79,26 @@ timezone-invariant under both UTC and 5ers EET conventions. See
 [docs/audits/signal_module_eet_audit_2026_05.md](audits/signal_module_eet_audit_2026_05.md)
 for the bug class this avoids.
 
+**Session-bucketing responsibility:** distinct fault class from HTF lookup
+— covers prior-session HL features, reset-floor daily ratchet, and
+Amendment 6 daily-DD bucketing. `Panel` carries a `boundary_convention`
+attribute that downstream consumers consult for trading-day-aware
+bucketing. Three engine modules use it:
+
+- `core.features.distance._prior_session_*` — prior-session HL features
+  bucket bars by `panel.boundary_convention`.
+- `core.sim.risk.reset_floor.ResetFloorAccount` — daily floor ratchet
+  uses the same boundary (forward hygiene; dormant in v3 runtime).
+- `core.runners._fold_stats_helpers.compute_per_day_max_dd` — daily-DD
+  bucketing for Amendment 6 (load-bearing; feeds
+  `daily_dd_breaches_at_r_safe` / `daily_dd_breaches_at_r_hard`).
+
+The shared utility is `core.utils.session_boundary.utc_to_eet_trading_day`.
+Default `Panel.boundary_convention="utc"` preserves KH-24 anchor
+byte-identity; aggregator-driven constructors (`Panel.from_pairs`,
+`build_panel_parallel`) thread the caller's choice through.
+See [PROTOCOL_RUNTIME.md §15.5](PROTOCOL_RUNTIME.md).
+
 ### Pre-PR-#187 layer (unchanged for UTC)
 
 - **Loader:** `core.data.histdata_loader.load_m1(pair, ...)` reads

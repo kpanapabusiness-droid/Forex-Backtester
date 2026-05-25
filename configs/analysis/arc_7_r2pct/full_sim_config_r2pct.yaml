@@ -1,0 +1,38 @@
+# Arc 7 v3.0.2 best-config re-run at r_base = 2.0%
+# Deliverable B — single continuous sim 2010-01-01 → 2025-12-31
+#
+# Same A6 config + classifier as Deliverable A. Mechanism: single Fold
+# with oos_start = 2010-01-01, oos_end = 2025-12-31 (Option 1 from
+# dispatch §5.1 — "Single-fold WFO with extended OOS"). The architecture's
+# _slice_panels_to_fold(...) helper provides the 60-day warmup for HTF
+# alignment + indicator seeding.
+
+deliverable: B_full_sim
+config_id: "A6::A6::cl1::sl2.0::thr0.5-0.7::exp2"
+architecture: A6
+cluster_id: 1
+classifier_path: results/l_arc_7/step_4/classifiers/1.pkl
+
+# A6 hyperparameters (matches WFO config)
+sl_atr_mult: 2.0
+trail_enabled: true
+trail_activation_atr: 2.0
+trail_distance_atr: 1.5
+lower_threshold: 0.5
+upper_threshold: 0.7
+max_concurrent_per_pair: 1
+max_concurrent_per_currency: 2
+max_concurrent_total: null
+sizing_convention: reset_floor
+exit_policy: null
+
+# Risk override
+r_base: 0.02
+starting_balance: 100000.0
+
+# Full-sim window
+boundary_convention: 5ers_eet
+primary_tf: H4
+sim_start: 2010-01-01
+sim_end: 2025-12-31
+random_state: 42

@@ -53,6 +53,8 @@ The parser invocation is pre-PR, not post-merge — so reviewers see the tracker
 
 **Dispatch-time architecture selection (Amendment 5, PR #194).** When opening an arc, the architectures-tested set per surviving cluster is curated by the dispatcher according to the four-gate union (Gate 1 archetype; Gate 2 AUC ≥ 0.65; Gate 3 universal A1; Gate 4 portfolio if ≥ 2 clusters). The engine receives a fully-resolved set; the dispatch doc cites the admitting gate per architecture. Any architecture admissible under the prior Amendment 1 rule but skipped under Amendment 5 is recorded in the closure's optional `architectures_skipped_by_amendment_5` field (template v1.3.1; required for post-cutoff PASS verdicts). Amendment 5.1 (2026-05-25, this PR): Gate 4 is conditional on at least one constituent cluster clearing Step 5 PASS-tier. Dispatchers schedule A5 tentatively at arc-open and finalise admission after Step 5 search-WFO results land. Closure records `a5_gate_4_admission_blocked_by_no_pass_tier_constituent` if no constituent PASSes.
 
+**Deployment cap (Amendment 3.1, 2026-05-25, this PR):** `r_max = 2.0%` is the deployment cap, not a gate threshold. When intrinsic `r_safe` or `r_hard` exceeds `r_max`, the engine caps the deploy risk and evaluates gates at the cap. Closure records `r_safe_capped_at_rmax: true` (or `r_hard_capped_at_rmax: true`) plus the intrinsic pre-cap values for audit. Cap activation is informational, not a failure mode.
+
 ---
 
 ## §3 Branch + worktree conventions

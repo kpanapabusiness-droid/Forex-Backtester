@@ -93,6 +93,7 @@
 | Parser v1.3 (template v1.3 detection + Phase 2 tightening, cutoff 2026-05-23T06:20:59Z) | 🟢 | PR #188 |
 | Closure template v1.3.1 (Amendment 5 — `architectures_skipped_by_amendment_5` field) | 🟢 | PR #194 |
 | Parser v1.3 Amendment-5 extension (optional field + Phase 2 enforcement, cutoff `AMENDMENT_5_CUTOFF_ISO` placeholder pending PR-merge backfill) | 🟢 | PR #194 |
+| Backfill `AMENDMENT_3_1_CUTOFF_ISO` in `scripts/tracker_parser/schema.py` with PR Amendment-3.1 merge timestamp | 🔴 | Placeholder pinned at `2026-05-25T00:00:00Z`. Mirror existing cutoff backfill pattern. |
 | `docs/templates/TODO_REFRESH_TEMPLATE.md` committed | 🟢 | CC_22 PR (this) |
 
 ### Round 6 — Engine consolidation (initial sprint)

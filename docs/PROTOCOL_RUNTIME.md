@@ -461,18 +461,34 @@ search + holdout complete.
 
 **Locked thresholds (per `core/wfo/amended_gates`):**
 
-- `R_MIN = 0.15%`, `R_MAX = 2.00%` — scalability bounds (both r_safe and r_hard must fall in this range; failure → `step5_not_scalable`)
+- `R_MIN = 0.15%` — scalability floor (intrinsic `r_safe < R_MIN` or `r_hard < R_MIN` → `step5_not_scalable`)
+- `R_MAX = 2.00%` — deployment cap (Amendment 3.1, 2026-05-25). When intrinsic `r_safe` or `r_hard` exceeds `R_MAX`, the engine sets `r_deploy = R_MAX` and evaluates gates at the capped risk. Cap activation is recorded in `r_safe_capped_at_rmax` / `r_hard_capped_at_rmax` tracker fields. Cap activation is **not** a failure mode.
 - `CHAINED_DD_MAX_PCT = 10%` — scaled chained DD ceiling
 - Daily-DD breach threshold: 5% of day-start equity at scaled risk (exactly 0 breaches permitted in both tiers)
 
-**Scaling rule:**
+**Scaling rule (revised by Amendment 3.1):**
 
 ```
-k_safe  = 8.0  / worst_fold_dd_base_pp     # 8 = 8 percentage-point DEPLOYABLE cap
-k_hard  = 10.0 / worst_fold_dd_base_pp     # 10 = 10pp VIABLE / 5ers hard cap
-r_safe  = r_base × k_safe
-r_hard  = r_base × k_hard
+k_safe_intrinsic = 8.0  / worst_fold_dd_base_pp
+k_hard_intrinsic = 10.0 / worst_fold_dd_base_pp
+r_safe_intrinsic = r_base × k_safe_intrinsic
+r_hard_intrinsic = r_base × k_hard_intrinsic
+
+# Amendment 3.1: cap at deployment ceiling
+r_safe_deploy   = min(r_safe_intrinsic, R_MAX)
+r_hard_deploy   = min(r_hard_intrinsic, R_MAX)
+k_safe_deploy   = r_safe_deploy / r_base
+k_hard_deploy   = r_hard_deploy / r_base
+
+# Cap activation flags (informational, NOT failure modes)
+r_safe_capped_at_rmax = (r_safe_intrinsic > R_MAX)
+r_hard_capped_at_rmax = (r_hard_intrinsic > R_MAX)
+
+# step5_not_scalable now triggers ONLY on floor breach or zero-DD edge case:
+step5_not_scalable iff (r_safe_intrinsic < R_MIN) OR (r_hard_intrinsic < R_MIN) OR (worst_fold_dd_base == 0)
 ```
+
+Gate evaluation everywhere uses `r_safe_deploy` / `k_safe_deploy` (and `r_hard_deploy` / `k_hard_deploy` for VIABLE). In `core/wfo/amended_gates.py` the `ScalingFactors.k_safe` / `r_safe_pct` fields carry the *deploy* (post-cap) values for transparent downstream consumption; `k_safe_intrinsic` / `r_safe_intrinsic_pct` expose the pre-cap intrinsics for audit.
 
 **Failure-mode priority** (first-fail wins, per Amendment 3 §"Failure-mode priority"):
 

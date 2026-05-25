@@ -54,6 +54,14 @@ AMENDMENT_5_CUTOFF_ISO: str = "2026-05-25T02:03:13Z"
 # architectures_skipped_by_amendment_5. Backfilled with PR #201 merge timestamp.
 AMENDMENT_5_1_CUTOFF_ISO: str = "2026-05-25T05:29:01Z"
 
+# L_PROTOCOL Amendment 3.1 cutoff (r_max reframed as deployment cap, not gate).
+# Placeholder. Backfill with PR merge timestamp post-merge.
+# Closures with closed_timestamp >= AMENDMENT_3_1_CUTOFF_ISO and
+# r_safe_capped_at_rmax == true OR r_hard_capped_at_rmax == true
+# MUST also have r_safe_intrinsic_pct / r_hard_intrinsic_pct populated.
+# Pre-cutoff closures grandfathered.
+AMENDMENT_3_1_CUTOFF_ISO: str = "2026-05-25T00:00:00Z"
+
 V11_EXCLUSIVE_FIELDS = {
     "worst_fold_dd_base_pct",
     "worst_fold_roi_base_pct",
@@ -271,6 +279,16 @@ class BestArchitectureV11(BaseModel):
     r_hard_pct: float | None = None
     scalable_to_safe: bool | None = None
     scalable_to_hard: bool | None = None
+    # Amendment 3.1 (2026-05-25): r_max reframed as deployment cap.
+    # r_safe_pct / r_hard_pct above now record POST-CAP deploy values;
+    # the pre-cap intrinsics + cap-activation flags are recorded here.
+    # Phase 1 (this PR): accepted as optional on all closures.
+    # Phase 2 tightening enforced at the CLI layer for post-cutoff PASS
+    # closures with r_safe_capped_at_rmax / r_hard_capped_at_rmax == true.
+    r_safe_intrinsic_pct: float | None = None
+    r_hard_intrinsic_pct: float | None = None
+    r_safe_capped_at_rmax: bool | None = None
+    r_hard_capped_at_rmax: bool | None = None
     worst_fold_roi_at_r_safe_pct: float | None = None
     worst_fold_roi_at_r_hard_pct: float | None = None
     chained_max_dd_at_r_safe_pct: float | None = None

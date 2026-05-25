@@ -32,6 +32,7 @@ from typing import Mapping
 import pandas as pd
 
 from core.data.aggregator import aggregate
+from core.utils.session_boundary import SUPPORTED_CONVENTIONS
 
 
 @dataclass(frozen=True)
@@ -46,14 +47,31 @@ class Panel:
       - All DataFrames have the canonical column schema produced by
         ``aggregator.aggregate`` / ``histdata_loader.load_m1``.
       - Indices are tz-aware (UTC).
+
+    Boundary convention:
+      - ``boundary_convention`` ("utc" | "5ers_eet", default "utc")
+        identifies which trading-day boundary the bars in this panel
+        were aggregated under. Downstream consumers (distance.py
+        prior-session features, _fold_stats_helpers.compute_per_day_max_dd
+        daily-DD bucketing) read this to choose the matching session
+        bucketing logic. Default ``"utc"`` preserves legacy
+        byte-identical behaviour for KH-24 anchor; engine-side default
+        post-PR-189 is ``"5ers_eet"`` (set by aggregator-driven
+        constructors).
     """
 
     pair_dfs: Mapping[str, pd.DataFrame]
     tf: str
+    boundary_convention: str = "utc"
 
     def __post_init__(self) -> None:
         if not self.pair_dfs:
             raise ValueError("Panel needs at least one pair")
+        if self.boundary_convention not in SUPPORTED_CONVENTIONS:
+            raise ValueError(
+                f"Unsupported boundary_convention {self.boundary_convention!r}; "
+                f"expected one of {SUPPORTED_CONVENTIONS}"
+            )
         first_pair = next(iter(self.pair_dfs))
         first_cols = tuple(self.pair_dfs[first_pair].columns)
         for pair, df in self.pair_dfs.items():
@@ -106,8 +124,14 @@ class Panel:
         histdata_root: Path | str = "data/histdata",
         cache_root: Path | str = "data/cache",
         use_cache: bool = True,
+        boundary_convention: str = "utc",
     ) -> "Panel":
-        """Build a panel by aggregating each pair from the data layer."""
+        """Build a panel by aggregating each pair from the data layer.
+
+        ``boundary_convention`` is forwarded to ``aggregate`` AND stamped
+        onto the Panel so downstream consumers (distance.py,
+        compute_per_day_max_dd) see a single source of truth.
+        """
         pair_dfs = {
             p: aggregate(
                 p,
@@ -115,12 +139,22 @@ class Panel:
                 histdata_root=histdata_root,
                 cache_root=cache_root,
                 use_cache=use_cache,
+                boundary_convention=boundary_convention,
             )
             for p in pairs
         }
-        return cls(pair_dfs=pair_dfs, tf=tf)
+        return cls(pair_dfs=pair_dfs, tf=tf, boundary_convention=boundary_convention)
 
     @classmethod
-    def from_frames(cls, pair_dfs: Mapping[str, pd.DataFrame], tf: str) -> "Panel":
+    def from_frames(
+        cls,
+        pair_dfs: Mapping[str, pd.DataFrame],
+        tf: str,
+        boundary_convention: str = "utc",
+    ) -> "Panel":
         """Convenience constructor — same as the dataclass call."""
-        return cls(pair_dfs=dict(pair_dfs), tf=tf)
+        return cls(
+            pair_dfs=dict(pair_dfs),
+            tf=tf,
+            boundary_convention=boundary_convention,
+        )

@@ -49,7 +49,7 @@ def _slice_panel_by_dates(panel: Panel, start: date, end: date) -> Panel:
     sliced: dict[str, pd.DataFrame] = {}
     for pair, df in panel.pair_dfs.items():
         sliced[pair] = df.loc[start_ts:end_ts]
-    return Panel.from_frames(sliced, tf=panel.tf)
+    return Panel.from_frames(sliced, tf=panel.tf, boundary_convention=panel.boundary_convention)
 
 
 def _equity_to_daily_returns(equity: pd.Series) -> pd.Series:

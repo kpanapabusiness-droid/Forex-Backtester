@@ -598,9 +598,16 @@ class ArcOrchestrator:
             )
             chained_dd = compute_chained_max_dd_from_continuous_equity(chained_equity)
 
-            # 3. Per-day max-DD parquet (full IS+holdout trajectory)
+            # 3. Per-day max-DD parquet (full IS+holdout trajectory).
+            # Amendment 6: boundary follows the engine's Panel convention.
+            primary_tf = self.signal_module.primary_tf
+            panel_convention = getattr(
+                self.panels.get(primary_tf), "boundary_convention", "utc"
+            )
             per_day_df = compute_per_day_max_dd(
-                chained_equity, pair_set=",".join(self.cfg.pair_set)
+                chained_equity,
+                pair_set=",".join(self.cfg.pair_set),
+                boundary_convention=panel_convention,
             )
             parquet_path: Path | None = None
             if not per_day_df.empty:

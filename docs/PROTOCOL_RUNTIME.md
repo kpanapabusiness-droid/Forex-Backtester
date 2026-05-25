@@ -908,6 +908,81 @@ auto-satisfied for any panels flowing through `core.data.aggregator`.
 
 **Audit report:** [docs/audits/signal_module_eet_audit_2026_05.md](audits/signal_module_eet_audit_2026_05.md)
 
+### §15.5 EET session semantics — distance.py + reset_floor.py + compute_per_day_max_dd
+
+PR #189 fixed engine-level bar aggregation under EET. PR #193 (§15.4 above)
+fixed HTF-alignment lookups in signal modules. The CC_20 PR closes the
+remaining session-semantics fault class — three modules where
+day-bucketing was still UTC-anchored despite EET-aggregated bars. This is
+a distinct fault class from §15.4: session bucketing vs HTF lookup. The
+two utilities are intentionally separate.
+
+**Single source of truth:** [core/utils/session_boundary.py](../core/utils/session_boundary.py)
+exposes `utc_to_eet_trading_day(ts, *, convention="5ers_eet")` —
+the only DST-aware mapping callers need. `convention="utc"` falls
+back to `.normalize()` byte-identically (legacy KH-24 safety).
+
+**Propagation pattern:** `Panel.boundary_convention` (default `"utc"`
+for legacy safety) is the convention carrier. Aggregator-driven
+constructors (`Panel.from_pairs`, `build_panel_parallel`) thread
+the caller's choice into the Panel. Per-fold slicing
+(`_slice_panels_to_fold` in [core/architectures/a1_system_level_filter.py](../core/architectures/a1_system_level_filter.py),
+`_slice_panel_by_dates` in [core/wfo/fold_runner.py](../core/wfo/fold_runner.py))
+preserves it via `Panel.from_frames(..., boundary_convention=panel.boundary_convention)`.
+
+**Three convention-aware consumers:**
+
+1. **[core/features/distance.py](../core/features/distance.py)** —
+   `_prior_session_high` / `_prior_session_low` bucket bars by
+   trading day via `utc_to_eet_trading_day(df.index, convention=...)`
+   keyed on `panel.boundary_convention`. UTC fallback when
+   `panel=None` preserves legacy behaviour for callers that don't
+   provide a panel.
+
+2. **[core/sim/risk/reset_floor.py](../core/sim/risk/reset_floor.py)** —
+   `ResetFloorAccount` takes a `boundary_convention` kwarg
+   (default `"5ers_eet"`). The daily-close ratchet uses the
+   utility. Forward-hygiene fix — the module is dormant in v3
+   runtime (no architecture currently instantiates one) but the
+   convention surface is wired for future callers.
+
+3. **[core/runners/_fold_stats_helpers.py](../core/runners/_fold_stats_helpers.py)** —
+   `compute_per_day_max_dd` takes `boundary_convention` (default
+   `"5ers_eet"`). This is the **load-bearing fix per Amendment 6**:
+   the orchestrator's per-day max-DD parquet (which feeds
+   `daily_dd_breaches_at_r_safe` / `daily_dd_breaches_at_r_hard`
+   gates in [core/wfo/amended_gates.py](../core/wfo/amended_gates.py))
+   now buckets equity by the EET trading day, matching 5ers'
+   actual daily-DD reset boundary. The orchestrator
+   ([core/arc/arc_orchestrator.py](../core/arc/arc_orchestrator.py)
+   `_run_step_5`) reads `panel.boundary_convention` and forwards
+   it explicitly.
+
+**Amendment 6** (supersedes Amendment 3 §"Boundary"): the
+daily-DD measurement boundary is the EET broker trading day
+post-PR-189. The locked value in Amendment 3 §"Boundary"
+(`UTC broker-day. Locked value.`) was authored under the pre-PR-189
+UTC-bar engine assumption and is amended to EET to keep the
+boundary consistent with the bars.
+
+**KH-24 anchor preservation:** KH-24 runs `convention="utc"`
+end-to-end. Under UTC convention every consumer above takes the
+legacy code path (`.normalize()`-equivalent bucketing) — byte-
+identical to pre-CC_20 output. Anchor regression verified by
+[tests/protocol_runtime/test_kh24_a1_equivalence.py](../tests/protocol_runtime/test_kh24_a1_equivalence.py)
++ [tests/replays_v2_1_1/](../tests/replays_v2_1_1/).
+
+Verification:
+- [tests/utils/test_session_boundary.py](../tests/utils/test_session_boundary.py)
+  — DST, winter/summer anchors, UTC pass-through (16 tests)
+- [tests/features/test_distance_eet_session_semantics.py](../tests/features/test_distance_eet_session_semantics.py)
+  — prior-session bucket-shift visible at EET boundary bar; sha256-deterministic
+- [tests/sim/risk/test_reset_floor_eet_daily_bucket.py](../tests/sim/risk/test_reset_floor_eet_daily_bucket.py)
+  — same-EET-day idempotency vs UTC-day double-ratchet; sha256-deterministic
+- [tests/runners/test_per_day_max_dd_eet.py](../tests/runners/test_per_day_max_dd_eet.py)
+  — drawdown spanning UTC midnight unifies into one EET day → one breach
+  (zero under UTC bucketing); sha256-deterministic
+
 ---
 
 ## §16 What lives elsewhere

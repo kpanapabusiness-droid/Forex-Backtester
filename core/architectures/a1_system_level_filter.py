@@ -259,7 +259,7 @@ def _slice_panels_to_fold(
     end_ts = pd.Timestamp(fold.oos_end, tz="UTC") + pd.Timedelta(days=1) - pd.Timedelta(seconds=1)
     for tf, panel in panels.items():
         sliced = {p: df.loc[start_ts:end_ts] for p, df in panel.pair_dfs.items()}
-        out[tf] = Panel.from_frames(sliced, tf=panel.tf)
+        out[tf] = Panel.from_frames(sliced, tf=panel.tf, boundary_convention=panel.boundary_convention)
     return out
 
 

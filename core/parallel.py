@@ -90,10 +90,16 @@ def _load_m1_for(args: tuple[str, Path, Path]) -> pd.DataFrame:
     return load_m1(pair, histdata_root=histdata_root, cache_root=cache_root)
 
 
-def _aggregate_for(args: tuple[str, str, Path, Path]) -> pd.DataFrame:
+def _aggregate_for(args: tuple[str, str, Path, Path, str]) -> pd.DataFrame:
     """Worker-side: aggregate one pair to one TF. Picklable."""
-    pair, tf, histdata_root, cache_root = args
-    return aggregate(pair, tf, histdata_root=histdata_root, cache_root=cache_root)
+    pair, tf, histdata_root, cache_root, boundary_convention = args
+    return aggregate(
+        pair,
+        tf,
+        histdata_root=histdata_root,
+        cache_root=cache_root,
+        boundary_convention=boundary_convention,
+    )
 
 
 def parallel_load_m1(
@@ -127,16 +133,21 @@ def build_panel_parallel(
     histdata_root: Path | str = "data/histdata",
     cache_root: Path | str = "data/cache",
     pool_size: int | None = None,
+    boundary_convention: str = "utc",
 ) -> Panel:
     """Build a multi-pair ``Panel`` at ``tf`` by aggregating each pair in parallel.
 
     The first call warms the per-TF parquet cache; subsequent calls
     against the same ``cache_root`` are fast even at ``pool_size=1``.
     Aggregation order is deterministic (sorted by pair name).
+
+    ``boundary_convention`` is forwarded to ``aggregate`` AND stamped on
+    the returned Panel so downstream consumers see a single source of
+    truth.
     """
     histdata_root = Path(histdata_root)
     cache_root = Path(cache_root)
-    args = [(p, tf, histdata_root, cache_root) for p in sorted(pairs)]
+    args = [(p, tf, histdata_root, cache_root, boundary_convention) for p in sorted(pairs)]
     if pool_size is None:
         pool_size = default_pool_size(len(args))
     if pool_size <= 1:
@@ -145,5 +156,5 @@ def build_panel_parallel(
         with mp.Pool(processes=pool_size) as pool:
             results = list(pool.imap(_aggregate_for, args, chunksize=1))
 
-    pair_dfs = {p: df for (p, _, _, _), df in zip(args, results)}
-    return Panel.from_frames(pair_dfs, tf=tf)
+    pair_dfs = {p: df for (p, _, _, _, _), df in zip(args, results)}
+    return Panel.from_frames(pair_dfs, tf=tf, boundary_convention=boundary_convention)

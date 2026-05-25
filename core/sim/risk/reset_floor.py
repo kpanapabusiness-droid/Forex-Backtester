@@ -4,9 +4,9 @@ The 5ers prop firm tracks a "reset floor" balance separate from the
 running equity. Concretely:
 
   - Account starts at ``starting_balance`` (e.g. $100,000).
-  - Floor = MAX(prior floor, current balance) at each daily close
-    (UTC midnight) — ratchets up on winning days, never down on losing
-    days.
+  - Floor = MAX(prior floor, current balance) at each daily close —
+    ratchets up on winning days, never down on losing days. Daily
+    boundary follows ``boundary_convention`` (UTC or 5ers EET).
   - Per-trade risk is computed off the FLOOR, not equity. KH-24 uses
     1.0% of floor (L_arc convention is 0.5%, configurable).
 
@@ -35,6 +35,8 @@ from dataclasses import dataclass, field
 
 import pandas as pd
 
+from core.utils.session_boundary import SUPPORTED_CONVENTIONS, utc_to_eet_trading_day
+
 
 @dataclass
 class ResetFloorAccount:
@@ -43,18 +45,30 @@ class ResetFloorAccount:
     Usage::
 
         floor = ResetFloorAccount(starting_balance=100_000)
-        # ... at each daily UTC midnight, after mark-to-market:
+        # ... at each daily close (broker timezone), after mark-to-market:
         floor.update_at_day_close(t, account.balance)
         # ... when sizing a trade:
         size = floor.risk_size(entry_price=1.10, sl_price=1.098)
+
+    The daily-close boundary follows ``boundary_convention``. Default
+    ``"5ers_eet"`` matches the post-PR-189 engine convention and the
+    actual 5ers broker server timezone (EET/EEST via Europe/Athens).
+    Pass ``boundary_convention="utc"`` to preserve the legacy
+    UTC-midnight ratchet (KH-24 anchor compatibility).
     """
 
     starting_balance: float
     risk_pct: float = 0.01  # 1% per trade (KH-24 convention)
+    boundary_convention: str = "5ers_eet"
     _floor: float = field(init=False)
     _last_day_seen: pd.Timestamp | None = field(init=False, default=None)
 
     def __post_init__(self) -> None:
+        if self.boundary_convention not in SUPPORTED_CONVENTIONS:
+            raise ValueError(
+                f"Unsupported boundary_convention {self.boundary_convention!r}; "
+                f"expected one of {SUPPORTED_CONVENTIONS}"
+            )
         self._floor = float(self.starting_balance)
 
     @property
@@ -65,10 +79,10 @@ class ResetFloorAccount:
         """Ratchet the floor up if ``balance`` exceeded prior floor.
 
         Returns True iff the floor moved this call. Idempotent within
-        the same calendar day — only the FIRST call per UTC day
-        updates the floor (the daily close).
+        the same trading day (boundary per ``boundary_convention``) —
+        only the FIRST call per day updates the floor (the daily close).
         """
-        day = pd.Timestamp(t).normalize()
+        day = utc_to_eet_trading_day(pd.Timestamp(t), convention=self.boundary_convention)
         if self._last_day_seen is not None and day <= self._last_day_seen:
             return False
         self._last_day_seen = day

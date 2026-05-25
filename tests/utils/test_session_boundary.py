@@ -19,7 +19,6 @@ from core.utils.session_boundary import (
     utc_to_eet_trading_day,
 )
 
-
 # ── Anchor cases (winter / summer) ──────────────────────────────────
 
 

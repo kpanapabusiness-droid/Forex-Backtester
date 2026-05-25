@@ -46,7 +46,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from types import SimpleNamespace
 
-import numpy as np
 import pandas as pd
 
 from core.step_6 import AuditConfig

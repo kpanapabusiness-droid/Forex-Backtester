@@ -395,8 +395,6 @@ def _check_news_filter_not_assumed(inputs: Step6Inputs) -> CheckResult:
     ``configs/news_calendar*`` AND check whether closure §4 records a
     matching news-filter declaration.
     """
-    from pathlib import Path
-
     repo_root = (
         inputs.arc_root.resolve().parents[1]
         if len(inputs.arc_root.resolve().parents) >= 2
@@ -470,9 +468,9 @@ def _check_weekend_gap_handling(inputs: Step6Inputs) -> CheckResult:
         )
     ent = pd.to_datetime(trades["entry_time"], utc=True, errors="coerce")
     exi = pd.to_datetime(trades["exit_time"], utc=True, errors="coerce")
-    # Friday entry: dayofweek=4. Monday exit (or later in next ISO week).
+    # Friday entry: dayofweek=4. A position held > 1 day from a Friday
+    # entry crosses the weekend.
     fri_entry = ent.dt.dayofweek == 4
-    mon_or_later_exit = exi.dt.dayofweek <= 3  # Mon..Thu = next-week resume
     weekend_held = bool((fri_entry & (exi - ent > pd.Timedelta(days=1))).any())
     n_weekend = int((fri_entry & (exi - ent > pd.Timedelta(days=1))).sum())
     return CheckResult(
@@ -584,8 +582,6 @@ def _check_histdata_vs_5ers_spread_differential(inputs: Step6Inputs) -> CheckRes
     cross-reference, or the closure documents that spread sensitivity
     has been evaluated.
     """
-    from pathlib import Path
-
     repo_root = (
         inputs.arc_root.resolve().parents[1]
         if len(inputs.arc_root.resolve().parents) >= 2

@@ -45,6 +45,7 @@ from sklearn.pipeline import Pipeline  # noqa: E402
 from sklearn.preprocessing import StandardScaler  # noqa: E402
 
 from core.determinism import RANDOM_STATE, seed_everything  # noqa: E402
+from core.sim.exit_policies import simulate_path as _canonical_simulate_path  # noqa: E402
 from scripts.l_arc_10_v3._common import load_config, sha256_file, write_manifest  # noqa: E402
 
 warnings.filterwarnings("ignore", category=UserWarning)
@@ -104,153 +105,20 @@ def _apply_exit_policy(
 ) -> tuple[float, int]:
     """Simulate the realised R + bars_held under a new SL multiplier and exit policy.
 
-    Path values were stored in R-multiples relative to the Step 1 SL=2.0×ATR
-    (sl_distance_2). Under new SL multiplier M:
-        scale = 2.0 / M
-        SL breach threshold (in old-R units): -(M/2)
-        new R units = old R × scale
+    Delegates to :func:`core.sim.exit_policies.simulate_path` (the canonical
+    path-replay registry). The hand-rolled per-policy logic that historically
+    lived in this function was extracted to ``core/sim/exit_policies/
+    path_simulate.py`` as part of the canonical-exit-policy-registry PR
+    (engine/sl-partial-close-runner-trail-primitive). The semantics are
+    byte-identical (verified by ``tests/sim/exit_policies/
+    test_path_simulate_reference_parity.py``).
+
+    Path values are stored in R-multiples relative to Step 1's SL=2.0×ATR.
+    See the canonical module for full schema and scaling math.
 
     Returns (final_r_new, bars_held).
     """
-    if path_rows.empty:
-        return float(trade_row.get("final_r", 0.0)) * (2.0 / sl_multiplier), int(trade_row.get("bars_held", 0))
-
-    p = path_rows.sort_values("bar_offset")
-    bar_offsets = p["bar_offset"].to_numpy(dtype=int)
-    mae = p["mae_so_far_r"].to_numpy()
-    mfe = p["mfe_so_far_r"].to_numpy()
-    close = p["close_r"].to_numpy()
-    is_held = p["is_held"].to_numpy() if "is_held" in p.columns else np.ones(len(p), dtype=int)
-
-    scale = 2.0 / sl_multiplier
-    sl_threshold_old = -(sl_multiplier / 2.0)
-    new_mfe_at = mfe * scale
-    new_close_at = close * scale
-
-    # Find SL breach index (in old-R units against new SL)
-    sl_breach = -1
-    for i, m in enumerate(mae):
-        if np.isfinite(m) and m <= sl_threshold_old:
-            sl_breach = i
-            break
-
-    n = len(p)
-    # Helper — search for first index where new_mfe ≥ k
-    def first_at_least(arr, k):
-        idx = np.where(np.isfinite(arr) & (arr >= k))[0]
-        return int(idx[0]) if idx.size > 0 else -1
-
-    if exit_policy == "sl_only":
-        # Original simulation rule: SL or time exit (end of held path)
-        if sl_breach >= 0:
-            return -1.0, int(bar_offsets[sl_breach] + 1)
-        # Held path exit: final close * scale
-        # bars_held = held window length
-        held_idx = np.where(is_held == 1)[0]
-        end_i = held_idx[-1] if held_idx.size > 0 else n - 1
-        return float(new_close_at[end_i]), int(bar_offsets[end_i] + 1)
-
-    if exit_policy == "sl_plus_tp_2r":
-        tp_i = first_at_least(new_mfe_at, 2.0)
-        if tp_i >= 0 and (sl_breach < 0 or tp_i <= sl_breach):
-            return 2.0, int(bar_offsets[tp_i] + 1)
-        if sl_breach >= 0:
-            return -1.0, int(bar_offsets[sl_breach] + 1)
-        held_idx = np.where(is_held == 1)[0]
-        end_i = held_idx[-1] if held_idx.size > 0 else n - 1
-        return float(new_close_at[end_i]), int(bar_offsets[end_i] + 1)
-
-    if exit_policy == "sl_plus_tp_3r":
-        tp_i = first_at_least(new_mfe_at, 3.0)
-        if tp_i >= 0 and (sl_breach < 0 or tp_i <= sl_breach):
-            return 3.0, int(bar_offsets[tp_i] + 1)
-        if sl_breach >= 0:
-            return -1.0, int(bar_offsets[sl_breach] + 1)
-        held_idx = np.where(is_held == 1)[0]
-        end_i = held_idx[-1] if held_idx.size > 0 else n - 1
-        return float(new_close_at[end_i]), int(bar_offsets[end_i] + 1)
-
-    if exit_policy == "sl_plus_trailing_atr":
-        # Trail at 1 R below the peak MFE; activate at 1R.
-        trail_r = -1.0  # init below threshold
-        active = False
-        trail_exit_i = -1
-        for i in range(n):
-            if not np.isfinite(new_mfe_at[i]):
-                continue
-            if new_mfe_at[i] >= 1.0:
-                active = True
-                trail_r = max(trail_r, new_mfe_at[i] - 1.0)
-            if active and np.isfinite(new_close_at[i]) and new_close_at[i] <= trail_r:
-                trail_exit_i = i
-                break
-        if sl_breach >= 0 and (trail_exit_i < 0 or sl_breach <= trail_exit_i):
-            return -1.0, int(bar_offsets[sl_breach] + 1)
-        if trail_exit_i >= 0:
-            return float(new_close_at[trail_exit_i]), int(bar_offsets[trail_exit_i] + 1)
-        held_idx = np.where(is_held == 1)[0]
-        end_i = held_idx[-1] if held_idx.size > 0 else n - 1
-        return float(new_close_at[end_i]), int(bar_offsets[end_i] + 1)
-
-    if exit_policy == "sl_plus_trailing_swing":
-        # Trail at the running min of new_close_at after activation at 1R.
-        active = False
-        prev_low = -np.inf
-        trail_exit_i = -1
-        for i in range(n):
-            if not np.isfinite(new_mfe_at[i]):
-                continue
-            if new_mfe_at[i] >= 1.0:
-                active = True
-            if active:
-                if i > 0 and np.isfinite(new_close_at[i - 1]):
-                    prev_low = max(prev_low, min(new_close_at[i - 1], 0.0))
-                if np.isfinite(new_close_at[i]) and new_close_at[i] <= prev_low:
-                    trail_exit_i = i
-                    break
-        if sl_breach >= 0 and (trail_exit_i < 0 or sl_breach <= trail_exit_i):
-            return -1.0, int(bar_offsets[sl_breach] + 1)
-        if trail_exit_i >= 0:
-            return float(new_close_at[trail_exit_i]), int(bar_offsets[trail_exit_i] + 1)
-        held_idx = np.where(is_held == 1)[0]
-        end_i = held_idx[-1] if held_idx.size > 0 else n - 1
-        return float(new_close_at[end_i]), int(bar_offsets[end_i] + 1)
-
-    if exit_policy == "sl_partial_close_1r_runner_trail":
-        # Close 50% at 1R, trail the rest at 1 R below subsequent peak.
-        tp1_i = first_at_least(new_mfe_at, 1.0)
-        if tp1_i < 0:
-            # Never reached 1R; full position exits at SL or held end.
-            if sl_breach >= 0:
-                return -1.0, int(bar_offsets[sl_breach] + 1)
-            held_idx = np.where(is_held == 1)[0]
-            end_i = held_idx[-1] if held_idx.size > 0 else n - 1
-            return float(new_close_at[end_i]), int(bar_offsets[end_i] + 1)
-        # Close 50% at +1.0R; runner trails.
-        half_r = 1.0
-        # Trail runner: activate at tp1_i, trail at 1R below peak.
-        trail_r = 0.0  # peak so far - 1
-        trail_exit_i = -1
-        for i in range(tp1_i, n):
-            if np.isfinite(new_mfe_at[i]):
-                trail_r = max(trail_r, new_mfe_at[i] - 1.0)
-            if np.isfinite(new_close_at[i]) and new_close_at[i] <= trail_r and i > tp1_i:
-                trail_exit_i = i
-                break
-        if sl_breach >= 0 and sl_breach > tp1_i and (trail_exit_i < 0 or sl_breach <= trail_exit_i):
-            runner_r = -1.0
-        elif trail_exit_i >= 0:
-            runner_r = float(new_close_at[trail_exit_i])
-        else:
-            held_idx = np.where(is_held == 1)[0]
-            end_i = held_idx[-1] if held_idx.size > 0 else n - 1
-            runner_r = float(new_close_at[end_i])
-        final_r = 0.5 * half_r + 0.5 * runner_r
-        last_bar = trail_exit_i if trail_exit_i >= 0 else (sl_breach if sl_breach >= 0 else n - 1)
-        return float(final_r), int(bar_offsets[last_bar] + 1)
-
-    # Unknown policy — fall back to sl_only
-    return _apply_exit_policy(trade_row, path_rows, sl_multiplier, "sl_only")
+    return _canonical_simulate_path(exit_policy, trade_row, path_rows, sl_multiplier)
 
 
 # ---------------------------------------------------------------------------

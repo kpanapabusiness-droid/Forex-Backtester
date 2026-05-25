@@ -35,6 +35,7 @@ from core.arc.signal_protocol import SignalEvaluation
 from core.architectures._protocol import StrategyResult
 from core.sim.account import Account, Direction, ExposureRules
 from core.sim.exit_hooks import ExitPredicate
+from core.sim.exit_policy_manager import ExitPolicyManager
 from core.sim.multipair_backtester import MultiPairBacktester, Order, StrategyFn
 from core.sim.panel import Panel
 from core.sim.risk.live_balance import LiveBalanceRisk
@@ -80,6 +81,15 @@ class A1Config:
     # gate by default; chat must approve a separate scaling treatment
     # via ``ArcConfig.accept_equity_pct = True``.
     sizing_convention: str = "reset_floor"   # "reset_floor" | "equity_pct"
+    # Canonical exit-policy name from core.sim.exit_policies registry.
+    # None (default) preserves prior behaviour: SL + optional trail +
+    # signal-class exit predicates only. When set, the architecture
+    # instantiates an ExitPolicyManager and the driver registers the
+    # policy at trade fill; the manager's per-bar hooks then handle
+    # TP / trailing / partial-close lifecycle per
+    # [docs/PROTOCOL_RUNTIME.md §8c][]. KH-24 uses None (its trail +
+    # kijun_d1 path is unchanged).
+    exit_policy: str | None = None
 
 
 @dataclass(frozen=True)
@@ -243,6 +253,8 @@ def _build_a1_strategy(
                     atr_at_entry=atr,
                     trail_activation_atr=cfg.trail_activation_atr,
                     trail_distance_atr=cfg.trail_distance_atr,
+                    exit_policy=cfg.exit_policy,
+                    sl_atr_mult=cfg.sl_atr_mult if cfg.exit_policy else None,
                 )
             )
         return orders
@@ -297,6 +309,10 @@ class A1Architecture:
         )
         risk = LiveBalanceRisk(risk_pct=arch_config.risk_pct)
         trail_manager = TrailManager() if arch_config.trail_enabled else None
+        # Canonical exit-policy manager only when this config selects one
+        exit_policy_manager = (
+            ExitPolicyManager() if arch_config.exit_policy is not None else None
+        )
 
         # Signal-class-inherent exit predicates from the SignalModule
         exit_predicates: list[ExitPredicate] = []
@@ -319,6 +335,7 @@ class A1Architecture:
             strategy=strategy,
             trail_manager=trail_manager,
             exit_predicates=tuple(exit_predicates),
+            exit_policy_manager=exit_policy_manager,
         )
         run_result = bt.run()
 
@@ -342,6 +359,7 @@ class A1Architecture:
                 "sl_atr_mult": arch_config.sl_atr_mult,
                 "trail_enabled": arch_config.trail_enabled,
                 "n_filter_rules": len(arch_config.filter_rules),
+                "exit_policy": arch_config.exit_policy,
                 "exposure": (
                     arch_config.max_concurrent_total,
                     arch_config.max_concurrent_per_pair,

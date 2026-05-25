@@ -40,6 +40,7 @@ import pandas as pd
 
 from core.determinism import seed_everything, write_text_deterministic
 from core.manifest import write_manifest
+from core.sim.exit_policies import simulate_pool_approximation as _canonical_pool_sim
 from core.wfo.folds import build_v3_folds
 from scripts.l_arc_8.shared import RESULTS_ROOT, SL_ATR_MULT_STEP1
 
@@ -72,20 +73,21 @@ A6_THRESHOLDS: tuple[tuple[float, float], ...] = (
 
 
 def _apply_exit_policy(final_r: float, mfe_r: float, mae_r: float, policy: str) -> float:
-    """Approximate exit-policy effect on per-trade R outcome.
+    """Pool-level approximation — delegates to canonical registry.
 
-    sl_only: keep final_r as-is (the pool's exit reason already enforces SL).
-    sl_plus_tp_2r: if MFE >= 2R, cap at +2R; else final_r.
-        (Approximation: assumes TP fires before any pull-back to SL when MFE >= 2.)
-    sl_plus_tp_3r: same logic at +3R.
+    Historical hand-rolled body was extracted into
+    :func:`core.sim.exit_policies.simulate_pool_approximation` as part of
+    the canonical-exit-policy-registry PR
+    (engine/sl-partial-close-runner-trail-primitive). Behaviour preserved
+    byte-identically; this thin wrapper keeps the local call sites
+    compatible with the legacy signature.
+
+    See the canonical function's docstring for semantics + approximation
+    caveats. Higher-fidelity arcs should prefer
+    :func:`core.sim.exit_policies.simulate_path` (bar-by-bar over
+    recorded paths).
     """
-    if policy == "sl_only":
-        return final_r
-    if policy == "sl_plus_tp_2r":
-        return 2.0 if mfe_r >= 2.0 else final_r
-    if policy == "sl_plus_tp_3r":
-        return 3.0 if mfe_r >= 3.0 else final_r
-    return final_r
+    return _canonical_pool_sim(final_r, mfe_r, mae_r, policy)
 
 
 def _rescale_outcome_at_sl(

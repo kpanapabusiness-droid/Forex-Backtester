@@ -44,6 +44,7 @@ from core.architectures.a1_system_level_filter import (
 from core.runners._fold_stats_helpers import build_fold_stats_from_run
 from core.sim.account import Account, Direction, ExposureRules, Position
 from core.sim.exit_hooks import ExitDecision, ExitPredicate
+from core.sim.exit_policy_manager import ExitPolicyManager
 from core.sim.multipair_backtester import MultiPairBacktester
 from core.sim.panel import Panel
 from core.sim.risk.live_balance import LiveBalanceRisk
@@ -85,6 +86,11 @@ class A4Config:
     per_trade_entry_features: Mapping[tuple[str, pd.Timestamp], Mapping[str, float]] | None = None  # DEPRECATED
     # Amendment 3 §"Sizing convention"
     sizing_convention: str = "reset_floor"   # "reset_floor" | "equity_pct"
+    # Canonical exit-policy (see core.sim.exit_policies). None preserves
+    # prior behaviour. Same-bar precedence with A4's classifier exit
+    # predicate: intra-bar SL/TP > intra-bar policy (partial) >
+    # classifier predicate > trail > at-close policy (last-write-wins).
+    exit_policy: str | None = None
 
 
 @dataclass
@@ -190,6 +196,9 @@ class A4Architecture:
         )
         risk = LiveBalanceRisk(risk_pct=arch_config.risk_pct)
         trail_manager = TrailManager() if arch_config.trail_enabled else None
+        exit_policy_manager = (
+            ExitPolicyManager() if arch_config.exit_policy is not None else None
+        )
 
         # Build per-pair exit predicates from the classifier + entry features
         entry_features_by_signal_time_per_pair: dict[str, dict[pd.Timestamp, Mapping[str, float]]] = {}
@@ -229,6 +238,7 @@ class A4Architecture:
             max_concurrent_total=arch_config.max_concurrent_total,
             max_concurrent_per_pair=arch_config.max_concurrent_per_pair,
             max_concurrent_per_currency=arch_config.max_concurrent_per_currency,
+            exit_policy=arch_config.exit_policy,
         )
         strategy = _build_a1_strategy(
             signal_eval=signal_evaluation,
@@ -244,6 +254,7 @@ class A4Architecture:
             strategy=strategy,
             trail_manager=trail_manager,
             exit_predicates=tuple(a4_predicates),
+            exit_policy_manager=exit_policy_manager,
         )
         run_result = bt.run()
         fold_stats = build_fold_stats_from_run(
@@ -263,6 +274,7 @@ class A4Architecture:
             metadata={
                 "exit_threshold": arch_config.exit_threshold,
                 "classifier_fit_auc": classifier_fit.fit_auc,
+                "exit_policy": arch_config.exit_policy,
             },
         )
 

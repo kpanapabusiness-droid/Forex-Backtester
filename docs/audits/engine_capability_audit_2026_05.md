@@ -577,3 +577,66 @@ end-to-end. Verified byte-identical via
 
 See [PROTOCOL_RUNTIME.md §15.5](../PROTOCOL_RUNTIME.md) for the
 session-semantics convention contract.
+
+---
+
+## Post-audit update — 2026-05-25 (Canonical exit-policy registry)
+
+§"Backtester / sim" capabilities — **Exit-policy registry**: MISSING → **WIRED**
+for the full canonical policy catalogue.
+
+Pre-PR state: only `sl_only` was tacitly handled by the engine (default
+behaviour). The other six policies named in L_PROTOCOL §10 lived as
+hand-rolled post-hoc simulators inside `scripts/l_arc_*/step_5.py`,
+producing silent drift between arcs (the dispatch's "hand-rolled per-arc
+exit logic is creating silent drift" mandate). No canonical engine
+support existed for partial-fill semantics, so `sl_partial_close_1r_runner_trail`
+(Arc 10's load-bearing PASS-DEPLOYABLE exit) had no first-class home.
+
+WIRED via [core/sim/exit_policies/](../../core/sim/exit_policies/):
+
+- `_base.py` — `ExitPolicy` ABC + `ExitPolicyContext` / `ExitPolicyDecision`
+  / `ExitAction` / `ExitPolicyState` / `NullPolicyState`.
+- `_registry.py` — `build_exit_policy(name)` + `available_policies()`.
+- Six policy modules, one each:
+  - `sl_only.py`
+  - `sl_plus_tp_2r.py`, `sl_plus_tp_3r.py`
+  - `sl_plus_trailing_atr.py`, `sl_plus_trailing_swing.py`
+  - `sl_partial_close_1r_runner_trail.py`
+- `path_simulate.py` — replay surface for legacy Step 5 fast path
+  (`simulate_path` + `simulate_pool_approximation`).
+
+Account partial-fill: [core/sim/account.py](../../core/sim/account.py)
+gains `partial_close`, `current_size_of`, `ClosedTrade.parent_position_id`,
+and `_current_sizes` shadow dict. Position stays frozen.
+
+Driver wiring: [core/sim/multipair_backtester.py](../../core/sim/multipair_backtester.py)
+gains `exit_policy_manager: ExitPolicyManager | None` field + per-bar
+`evaluate_intrabar_for_all` (before intra-bar SL/TP with same-bar SL
+suppression) + `evaluate_at_close_for_all` (after trail-manager ratchet).
+Order schema gains `exit_policy: str | None` + `sl_atr_mult: float | None`.
+
+Architecture wiring: A1/A2/A3/A4/A6 configs gain `exit_policy: str | None = None`.
+KH-24 (a1_adapter) unchanged — defaults to None.
+
+Per-arc migration: [scripts/l_arc_10_v3/step_5.py](../../scripts/l_arc_10_v3/step_5.py)
+and [scripts/l_arc_8/run_step5_wfo.py](../../scripts/l_arc_8/run_step5_wfo.py)
+`_apply_exit_policy` bodies replaced by one-line delegates to the canonical
+registry. 150 LOC of hand-rolled per-policy branches deleted from Arc 10.
+Byte-identical parity asserted by
+[tests/sim/exit_policies/test_path_simulate_reference_parity.py](../../tests/sim/exit_policies/test_path_simulate_reference_parity.py)
+(218 cases: 6 policies × 4 SL multipliers × 9 scenarios).
+
+KH-24 anchor regression: 37/37 KH-24-specific tests + 105/105
+protocol_runtime tests pass on the branch. Full-data HistData anchor
+(scripts/anchor/check_a1_equivalence.py) requires chat-side run.
+
+Capability count delta:
+- "Live exit policy registry" row updates from `1 WIRED (sl_only implicit) /
+  0 PARTIAL / 6 MISSING` to `7 WIRED / 0 PARTIAL / 0 MISSING`.
+- "Account partial-fill semantics" row: MISSING → WIRED.
+- "Per-arc exit-policy hand-rolling" row (anti-capability): WIRED →
+  MISSING (deleted; the goal).
+
+Overall: WIRED 35 → 41 (Steps + registry policies count separately).
+Per-arc silent-drift surface area: closed.

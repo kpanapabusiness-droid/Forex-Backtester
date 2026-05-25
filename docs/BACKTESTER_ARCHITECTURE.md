@@ -151,7 +151,42 @@ See [PROTOCOL_RUNTIME.md §15.5](PROTOCOL_RUNTIME.md).
   (total/per-pair/per-currency).
 - **`core.sim.multipair_backtester.MultiPairBacktester`** — bar-by-bar
   driver with deferred next-bar-open entry fills and intra-bar SL/TP
-  exits. Single equity curve output.
+  exits. Single equity curve output. Optional hooks:
+  `trail_manager` (KH-24 trail), `exit_predicates` (signal-class
+  predicates), `exit_policy_manager` (canonical exit-policy registry).
+
+### Exit policies (architecture-pluggable)
+
+`core/sim/exit_policies/` is the canonical exit-policy registry.
+Architectures (A1..A6) opt in via `arch_config.exit_policy = "<name>"`;
+default `None` preserves prior behaviour. Six policies registered:
+
+  - `sl_only` — baseline (SL only).
+  - `sl_plus_tp_2r`, `sl_plus_tp_3r` — SL + intra-bar TP at +2R / +3R.
+  - `sl_plus_trailing_atr` — trail at peak − R_atr; activate at +1R.
+  - `sl_plus_trailing_swing` — trail = running max of `min(prev_close,
+    entry)`; activate at +1R.
+  - `sl_partial_close_1r_runner_trail` — Arc 10's load-bearing exit:
+    intra-bar partial 50% at +1R, runner trails at path-peak − R_atr.
+
+Two execution surfaces share one policy definition:
+
+  1. **Live engine** (`MultiPairBacktester` + `ExitPolicyManager`) —
+     bar-by-bar evaluation with PR #189 worst-case fills.
+  2. **Replay** (`core.sim.exit_policies.simulate_path`) — post-hoc
+     path-replay over recorded `mae/mfe/close_r` columns, used by
+     `scripts/l_arc_*/step_5.py` for fast Step 5 ranking. The
+     reference-parity test
+     [tests/sim/exit_policies/test_path_simulate_reference_parity.py](../tests/sim/exit_policies/test_path_simulate_reference_parity.py)
+     asserts byte-identity vs the historical hand-rolled simulator at
+     [scripts/l_arc_10_v3/step_5.py:99-253](../scripts/l_arc_10_v3/step_5.py).
+
+Account partial-fill semantics (`Account.partial_close` +
+`current_size_of` + `ClosedTrade.parent_position_id`) support
+multi-leg close-outs without breaking the `Position` frozen-dataclass
+contract. KH-24 (`exit_policy=None`) is untouched.
+
+Full spec + per-policy semantics: [PROTOCOL_RUNTIME.md §8c](PROTOCOL_RUNTIME.md).
 
 ## WFO + features (PR-C)
 

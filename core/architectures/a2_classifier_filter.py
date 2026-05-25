@@ -29,6 +29,7 @@ from core.architectures.a1_system_level_filter import (
 from core.runners._fold_stats_helpers import build_fold_stats_from_run
 from core.sim.account import Account, Direction, ExposureRules
 from core.sim.exit_hooks import ExitPredicate
+from core.sim.exit_policy_manager import ExitPolicyManager
 from core.sim.multipair_backtester import MultiPairBacktester, Order, StrategyFn
 from core.sim.panel import Panel
 from core.sim.risk.live_balance import LiveBalanceRisk
@@ -59,6 +60,9 @@ class A2Config:
     max_concurrent_per_currency: int | None = 2
     # Amendment 3 §"Sizing convention"
     sizing_convention: str = "reset_floor"   # "reset_floor" | "equity_pct"
+    # Canonical exit-policy name (see core.sim.exit_policies). None preserves
+    # prior behaviour (SL + optional trail + signal-class predicates only).
+    exit_policy: str | None = None
 
 
 def _build_a2_strategy(
@@ -149,6 +153,8 @@ def _build_a2_strategy(
                 atr_at_entry=atr,
                 trail_activation_atr=cfg.trail_activation_atr,
                 trail_distance_atr=cfg.trail_distance_atr,
+                exit_policy=cfg.exit_policy,
+                sl_atr_mult=cfg.sl_atr_mult if cfg.exit_policy else None,
             ))
         return orders
 
@@ -183,6 +189,9 @@ class A2Architecture:
         )
         risk = LiveBalanceRisk(risk_pct=arch_config.risk_pct)
         trail_manager = TrailManager() if arch_config.trail_enabled else None
+        exit_policy_manager = (
+            ExitPolicyManager() if arch_config.exit_policy is not None else None
+        )
         exit_predicates: list[ExitPredicate] = []
         for pair in sorted(signal_evaluation.per_pair):
             ep = signal_evaluation.per_pair[pair].exit_predicate
@@ -203,6 +212,7 @@ class A2Architecture:
             strategy=strategy,
             trail_manager=trail_manager,
             exit_predicates=tuple(exit_predicates),
+            exit_policy_manager=exit_policy_manager,
         )
         run_result = bt.run()
         fold_stats = build_fold_stats_from_run(
@@ -223,6 +233,7 @@ class A2Architecture:
                 "threshold": arch_config.threshold,
                 "classifier_type": type(arch_config.classifier).__name__,
                 "feature_count": len(arch_config.classifier_feature_order),
+                "exit_policy": arch_config.exit_policy,
             },
         )
 

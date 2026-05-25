@@ -30,6 +30,13 @@ import pandas as pd
 
 from core.sim.account import Account, ClosedTrade, Direction, Position
 from core.sim.exit_hooks import ExitPredicate, evaluate_predicates
+from core.sim.exit_policies import (
+    ExitAction,
+    ExitPolicyContext,
+    ExitPolicyDecision,
+    build_exit_policy,
+)
+from core.sim.exit_policy_manager import ExitPolicyManager
 from core.sim.fill import (
     long_entry_fill_price,
     long_sl_triggered,
@@ -71,6 +78,19 @@ class Order:
     # Default 1.0 preserves prior behaviour for every architecture that does
     # not use meta-labeling.
     risk_multiplier: float = 1.0
+    # Canonical exit-policy spec (registry name + the SL multiplier needed
+    # to compute R_atr = sl_atr_mult * atr_at_entry). When ``exit_policy``
+    # is set, the driver:
+    #   1. Calls policy.apply_to_order(ctx) BEFORE Order construction in
+    #      the strategy/architecture layer; the resulting kwargs (e.g.
+    #      tp_price for sl_plus_tp_2r) must be merged into THIS Order's
+    #      fields by the strategy code.
+    #   2. After fill, registers the policy with ``exit_policy_manager``
+    #      using ``(atr_at_entry, sl_atr_mult)`` for R_atr computation.
+    # ``exit_policy=None`` (default) preserves all pre-PR behaviour:
+    # KH-24 and other arcs without a canonical policy run unchanged.
+    exit_policy: str | None = None
+    sl_atr_mult: float | None = None
 
 
 # Strategy signature: callable(t, snapshot, account) -> list[Order]
@@ -111,8 +131,22 @@ class MultiPairBacktester:
     #     intra-bar SL checks on the NEXT bar.
     #   exit_predicates: signal-driven exit hooks. Evaluated at bar close
     #     after intra-bar SL/TP checks; first triggering predicate wins.
+    #   exit_policy_manager: canonical exit-policy state holder (see
+    #     [core/sim/exit_policy_manager.py][]). When set, the driver:
+    #       (a) registers any Order carrying ``exit_policy`` after fill,
+    #       (b) calls ``evaluate_intrabar_for_all`` BEFORE intra-bar SL/TP
+    #           (partial-close fires NOW at fill_price; size shadowed),
+    #       (c) honours the manager's same-bar-SL suppression set in
+    #           ``_check_exits`` (matches reference's ``sl_breach > tp1_i``
+    #           constraint for sl_partial_close_1r_runner_trail),
+    #       (d) calls ``evaluate_at_close_for_all`` AFTER trail-manager
+    #           ratchet; FULL_CLOSE decisions queue at-close exits
+    #           (filled at next-bar open per existing pattern).
+    #     When None, exit_policy is required to be None on every Order
+    #     (RuntimeError otherwise, fail-loud on wiring mistakes).
     trail_manager: TrailManager | None = None
     exit_predicates: tuple[ExitPredicate, ...] = ()
+    exit_policy_manager: ExitPolicyManager | None = None
 
     # internal: deferred entries from prior bar awaiting fill at next-bar open
     _pending: list[Order] = None  # type: ignore[assignment]
@@ -168,6 +202,16 @@ class MultiPairBacktester:
 
         Order: intra-bar SL/TP (against bid/ask high/low) first, then
         exit predicates (signal-driven, evaluated at bar close).
+
+        Exit-policy interaction: when the registered policy preempted
+        intra-bar SL/TP this bar (via a PARTIAL_CLOSE fire — currently
+        only ``sl_partial_close_1r_runner_trail`` does this), the
+        manager flags the position via
+        ``has_intrabar_partial_this_bar(pos_id)``. The driver skips
+        intra-bar SL/TP for that position THIS bar — matching the
+        reference's ``sl_breach > tp1_i`` constraint so the runner
+        survives same-bar SL touches after the partial fires.
+        Predicates still run (they're bar-close-evaluated).
         """
         for pos_id in sorted(self.account._open.keys()):  # noqa: SLF001
             pos = self.account._open.get(pos_id)  # noqa: SLF001
@@ -176,49 +220,58 @@ class MultiPairBacktester:
             bar = snapshot.get(pos.pair)
             if bar is None or not bool(is_tradable_bar(bar.to_frame().T).iloc[0]):
                 continue
-            sl_price = self._effective_sl(pos)
-            sl_hit, sl_px = False, float("nan")
-            tp_hit, tp_px = False, float("nan")
-            if pos.direction is Direction.LONG:
-                if sl_price is not None:
-                    sl_hit, sl_px = long_sl_triggered(bar, sl_price)
-                if pos.tp_price is not None:
-                    tp_hit, tp_px = long_tp_triggered(bar, pos.tp_price)
-            else:
-                if sl_price is not None:
-                    sl_hit, sl_px = short_sl_triggered(bar, sl_price)
-                if pos.tp_price is not None:
-                    tp_hit, tp_px = short_tp_triggered(bar, pos.tp_price)
-
-            # Intra-bar priority (SL/TP)
-            closed_intra = False
-            sl_reason = (
-                "trailing_stop"
-                if (
-                    self.trail_manager is not None
-                    and self.trail_manager.get(pos_id) is not None
-                    and self.trail_manager.get(pos_id).activated
-                )
-                else "stop_loss"
+            # Exit-policy same-bar SL suppression
+            suppress_intrabar = (
+                self.exit_policy_manager is not None
+                and self.exit_policy_manager.has_intrabar_partial_this_bar(pos_id)
             )
-            if self.sl_first:
-                if sl_hit:
-                    self.account.close(pos_id, t, sl_px, sl_reason)
-                    closed_intra = True
-                elif tp_hit:
-                    self.account.close(pos_id, t, tp_px, "take_profit")
-                    closed_intra = True
-            else:
-                if tp_hit:
-                    self.account.close(pos_id, t, tp_px, "take_profit")
-                    closed_intra = True
-                elif sl_hit:
-                    self.account.close(pos_id, t, sl_px, sl_reason)
-                    closed_intra = True
+
+            closed_intra = False
+            if not suppress_intrabar:
+                sl_price = self._effective_sl(pos)
+                sl_hit, sl_px = False, float("nan")
+                tp_hit, tp_px = False, float("nan")
+                if pos.direction is Direction.LONG:
+                    if sl_price is not None:
+                        sl_hit, sl_px = long_sl_triggered(bar, sl_price)
+                    if pos.tp_price is not None:
+                        tp_hit, tp_px = long_tp_triggered(bar, pos.tp_price)
+                else:
+                    if sl_price is not None:
+                        sl_hit, sl_px = short_sl_triggered(bar, sl_price)
+                    if pos.tp_price is not None:
+                        tp_hit, tp_px = short_tp_triggered(bar, pos.tp_price)
+
+                # Intra-bar priority (SL/TP)
+                sl_reason = (
+                    "trailing_stop"
+                    if (
+                        self.trail_manager is not None
+                        and self.trail_manager.get(pos_id) is not None
+                        and self.trail_manager.get(pos_id).activated
+                    )
+                    else "stop_loss"
+                )
+                if self.sl_first:
+                    if sl_hit:
+                        self.account.close(pos_id, t, sl_px, sl_reason)
+                        closed_intra = True
+                    elif tp_hit:
+                        self.account.close(pos_id, t, tp_px, "take_profit")
+                        closed_intra = True
+                else:
+                    if tp_hit:
+                        self.account.close(pos_id, t, tp_px, "take_profit")
+                        closed_intra = True
+                    elif sl_hit:
+                        self.account.close(pos_id, t, sl_px, sl_reason)
+                        closed_intra = True
 
             if closed_intra:
                 if self.trail_manager is not None:
                     self.trail_manager.deregister(pos_id)
+                if self.exit_policy_manager is not None:
+                    self.exit_policy_manager.deregister(pos_id)
                 continue
 
             # Signal-driven exit predicates (e.g. kijun_d1) fire at BAR CLOSE
@@ -252,6 +305,38 @@ class MultiPairBacktester:
             if effective_size <= 0.0:
                 # risk_multiplier=0 (A6 meta-labeling 0x sizing) — skip this fill
                 continue
+            # Canonical exit-policy decoration of Order fields at fill time.
+            # Policies' apply_to_order(ctx) is invoked HERE so tp_price /
+            # other order fields are anchored to the ACTUAL fill price, not
+            # the strategy-emit-time proxy. Anchoring to actual fill gives
+            # the TP-style policies' realised R exactly the spec'd value
+            # (+2R, +3R) under the existing intra-bar TP infrastructure.
+            tp_price_final = order.tp_price
+            policy_obj = None
+            if order.exit_policy is not None:
+                if self.exit_policy_manager is None:
+                    raise RuntimeError(
+                        f"Order on {order.pair} carries exit_policy="
+                        f"{order.exit_policy!r} but driver has no "
+                        "exit_policy_manager. Construct MultiPairBacktester "
+                        "with exit_policy_manager=ExitPolicyManager()."
+                    )
+                if order.atr_at_entry is None or order.sl_atr_mult is None:
+                    raise RuntimeError(
+                        f"Order on {order.pair} carries exit_policy="
+                        f"{order.exit_policy!r} but is missing atr_at_entry "
+                        "or sl_atr_mult (both required for R_atr)."
+                    )
+                policy_obj = build_exit_policy(order.exit_policy)
+                policy_ctx = ExitPolicyContext(
+                    entry_price=float(fill_px),
+                    atr_at_entry=float(order.atr_at_entry),
+                    sl_atr_mult=float(order.sl_atr_mult),
+                    direction=order.direction,
+                )
+                overrides = policy_obj.apply_to_order(policy_ctx)
+                if "tp_price" in overrides:
+                    tp_price_final = float(overrides["tp_price"])
             pos = self.account.open(
                 pair=order.pair,
                 direction=order.direction,
@@ -259,7 +344,7 @@ class MultiPairBacktester:
                 entry_price=fill_px,
                 size=effective_size,
                 sl_price=order.sl_price,
-                tp_price=order.tp_price,
+                tp_price=tp_price_final,
             )
             # Auto-register trail if the order carries an ATR + manager is set
             if (
@@ -272,6 +357,15 @@ class MultiPairBacktester:
                     atr_at_entry=order.atr_at_entry,
                     activation_atr_mult=order.trail_activation_atr,
                     trail_atr_mult=order.trail_distance_atr,
+                )
+            # Register the policy state with the manager (TP-only policies
+            # are no-op stateful here but still registered for uniformity).
+            if policy_obj is not None:
+                self.exit_policy_manager.register(
+                    position=pos,
+                    policy=policy_obj,
+                    atr_at_entry=float(order.atr_at_entry),
+                    sl_atr_mult=float(order.sl_atr_mult),
                 )
             filled.append(pos)
         self._pending = []
@@ -293,12 +387,27 @@ class MultiPairBacktester:
 
     # ── per-bar processing ──────────────────────────────────────────
     def _process_bar(self, t: pd.Timestamp, snapshot: dict[str, pd.Series | None]) -> None:
-        # 1a. fill any closes queued at the prior bar's close (trail / kijun_d1)
+        # 1a. fill any closes queued at the prior bar's close (trail / kijun_d1
+        #     / exit-policy at-close)
         self._fill_pending_closes(t, snapshot)
-        # 1b. fill any entries pending from prior bar
+        # 1b. fill any entries pending from prior bar (registers trail +
+        #     exit_policy_manager state on fill)
         self._fill_pending_entries(t, snapshot)
-        # 2. check intra-bar SL/TP exits + bar-close predicate exits
-        #    (predicate hits go to _pending_closes for next-bar-open fill)
+        # 2a. exit-policy INTRA-BAR evaluation. Fires BEFORE _check_exits
+        #     so that ``sl_partial_close_1r_runner_trail``'s partial-at-+1R
+        #     fires on the bar's high before the existing intra-bar SL is
+        #     evaluated against the bar's low (matches reference's
+        #     ``sl_breach > tp1_i`` constraint). The manager's
+        #     ``has_intrabar_partial_this_bar`` flag is consulted inside
+        #     ``_check_exits`` to suppress same-bar intra-bar SL/TP for
+        #     the position that just partial-closed.
+        if self.exit_policy_manager is not None:
+            intrabar_decisions = self.exit_policy_manager.evaluate_intrabar_for_all(
+                snapshot, self.account
+            )
+            self._apply_intrabar_policy_decisions(t, intrabar_decisions)
+        # 2b. intra-bar SL/TP + bar-close predicate exits
+        #     (predicate hits go to _pending_closes for next-bar-open fill)
         self._check_exits(t, snapshot)
         # 3. update trailing stops at bar close AND queue trail-triggered
         #    closes for next-bar-open fill (EA pattern per PR-E.1.6 §B).
@@ -318,6 +427,21 @@ class MultiPairBacktester:
             trail_hits = self.trail_manager.trail_exit_triggers_at_close(snapshot, self.account)
             for pos_id in trail_hits:
                 self._pending_closes[pos_id] = "trailing_stop"
+        # 3b. exit-policy AT-CLOSE evaluation. Runs after trail-manager
+        #     ratchet so trailing policies see the latest peak. FULL_CLOSE
+        #     decisions queue at next-bar open (last-write-wins over any
+        #     prior _pending_closes entry from trail/predicate — the
+        #     policy decision is the most specific).
+        if self.exit_policy_manager is not None:
+            at_close_decisions = self.exit_policy_manager.evaluate_at_close_for_all(
+                snapshot, self.account
+            )
+            for pos_id, decision in at_close_decisions.items():
+                if decision.action is ExitAction.FULL_CLOSE:
+                    self._pending_closes[pos_id] = decision.exit_reason
+                # PARTIAL_CLOSE at at_close timing is not currently emitted
+                # by any registered policy; would require manager-side
+                # extension to queue a pending partial-fill, deferred.
         # 4. mark to market
         self.account.mark_to_market(t, self._close_mid(snapshot))
         # 5. ask the strategy for new orders
@@ -332,6 +456,55 @@ class MultiPairBacktester:
             if not self.account.exposure_check(order.pair):
                 continue
             self._pending.append(order)
+
+    # ── exit-policy intra-bar fire ──────────────────────────────────
+    def _apply_intrabar_policy_decisions(
+        self,
+        t: pd.Timestamp,
+        decisions: dict[int, ExitPolicyDecision],
+    ) -> None:
+        """Apply each intra-bar PARTIAL/FULL close NOW on the current bar.
+
+        ``decisions`` came from ``ExitPolicyManager.evaluate_intrabar_for_all``.
+        Iteration in sorted(position_id) order for determinism.
+        """
+        for pos_id in sorted(decisions):
+            decision = decisions[pos_id]
+            assert decision.fill_price is not None, (
+                f"intra-bar exit-policy decision for pos={pos_id} missing "
+                "fill_price; this is a policy implementation bug"
+            )
+            if decision.action is ExitAction.PARTIAL_CLOSE:
+                current = self.account.current_size_of(pos_id)
+                size_to_close = current * float(decision.partial_fraction)
+                # Guard rail: avoid floating-point "close everything" via
+                # partial_close. The Account API rejects size >= current.
+                # If partial_fraction == 1.0 (a misuse), route to close().
+                if size_to_close >= current:
+                    self.account.close(
+                        pos_id, t, float(decision.fill_price), decision.exit_reason
+                    )
+                    if self.exit_policy_manager is not None:
+                        self.exit_policy_manager.deregister(pos_id)
+                    if self.trail_manager is not None:
+                        self.trail_manager.deregister(pos_id)
+                else:
+                    self.account.partial_close(
+                        pos_id,
+                        t,
+                        float(decision.fill_price),
+                        decision.exit_reason,
+                        size_to_close,
+                    )
+                continue
+            # FULL_CLOSE
+            self.account.close(
+                pos_id, t, float(decision.fill_price), decision.exit_reason
+            )
+            if self.exit_policy_manager is not None:
+                self.exit_policy_manager.deregister(pos_id)
+            if self.trail_manager is not None:
+                self.trail_manager.deregister(pos_id)
 
     # ── driver ──────────────────────────────────────────────────────
     def run(self) -> RunResult:

@@ -254,8 +254,10 @@ def test_pipeline_writes_manifest_and_stub_summary(synthetic_run):
     assert payload["cluster_id"] == 0
     assert payload["pool_size"] == 50
     assert payload["lineage_gate"]["n_accepted"] >= 3  # at least the clean cols above
-    # The stub summary should be the only listed artefact in PR-A.
-    assert set(payload["artefacts"].keys()) == {"stub_summary"}
+    # When all stages skip on this PR-A-vintage synthetic pool, the
+    # always-present pipeline artefacts are stub_summary + the PR-E
+    # aggregate compute_budget_used.md.
+    assert set(payload["artefacts"].keys()) == {"stub_summary", "compute_budget_used"}
     # And its recorded sha256 should match the on-disk file.
     listed = payload["artefacts"]["stub_summary"]
     assert listed["sha256"] == sha256_file(res.stub_summary_path)

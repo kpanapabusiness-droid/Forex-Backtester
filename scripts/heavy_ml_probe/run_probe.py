@@ -1,12 +1,13 @@
 """CLI for the heavy_ml_probe sub-protocol.
 
-PR-D surface: load + validate config, load pool, apply causal lineage
+PR-E surface: load + validate config, load pool, apply causal lineage
 gate, run AutoML (PR-B) + meta-labeling (PR-C) + Cox PH survival (PR-D
 via statsmodels.PHReg) — each stage auto-skips when the pool lacks its
-required schema. Writes the full artefact set + manifest. PR-E adds the
-Step 5 augmentation hook.
+required schema. Writes the full ``step_4/heavy_ml/`` artefact set +
+``step_5/heavy_ml_augmented/heavy_ml_manifest.json`` for downstream
+A2/A4/A6 adapter consumers (see ``core.heavy_ml_probe.adapters``).
 
-Usage:
+Usage::
 
     python -m scripts.heavy_ml_probe.run_probe \\
         --arc <arc_name> \\
@@ -19,11 +20,17 @@ Default config path: ``configs/heavy_ml_probe/default.yaml``.
 Default output root: ``results/<arc_name>``.
 
 Exit codes (also documented in docs/sub_protocols/heavy_ml_probe.md):
-  0  pipeline ran successfully (artefact set written)
+  0  pipeline ran successfully — all three stages succeeded OR all
+     three cleanly skipped for documented reasons
   1  runtime failure (pool not found, holdout-guard violated, lineage
-     gate rejected every feature, etc.)
+     gate rejected every feature, etc.) — uncaught exception
   2  argparse misuse (missing required flag, etc. — argparse's own
      default exit code)
+  3  partial success — at least one stage succeeded AND at least one
+     stage was skipped. Downstream adapters can still build for the
+     `ok` stages; the skipped-stage adapters will refuse to build
+     with a clear error message. Signals "manifests are emitted but
+     not every stage's input is available."
 """
 
 from __future__ import annotations
@@ -41,6 +48,12 @@ from core.heavy_ml_probe.pipeline import (
 
 DEFAULT_CONFIG_PATH = Path("configs/heavy_ml_probe/default.yaml")
 
+# Exit-code constants — public to make CI / shell-script use clearer.
+EXIT_OK: int = 0
+EXIT_RUNTIME_ERROR: int = 1
+EXIT_ARGPARSE_ERROR: int = 2  # argparse's own default
+EXIT_PARTIAL_SUCCESS: int = 3
+
 
 def _print_result_summary(result: PipelineResult) -> None:
     print("[heavy_ml_probe] pipeline run complete.")
@@ -50,6 +63,10 @@ def _print_result_summary(result: PipelineResult) -> None:
     print(f"  step4_dir      : {result.cfg.step4_dir.as_posix()}")
     print(f"  stub_summary   : {result.stub_summary_path.as_posix()}")
     print(f"  manifest       : {result.step4_manifest_path.as_posix()}")
+    if result.compute_budget_path is not None:
+        print(f"  budget         : {result.compute_budget_path.as_posix()}")
+    if result.step5_manifest_path is not None:
+        print(f"  step5 manifest : {result.step5_manifest_path.as_posix()}")
     print(
         f"  lineage gate   : accepted={result.lineage_gate.n_accepted} "
         f"/ rejected={result.lineage_gate.n_rejected} "
@@ -107,12 +124,37 @@ def _print_result_summary(result: PipelineResult) -> None:
         print(
             f"  Survival (Cox) : status={result.survival_skip_reason} (skipped)"
         )
-    print("[heavy_ml_probe] PR-E (Step 5 augmentation hook) not yet implemented.")
+    print(f"  overall status : {result.overall_status}")
+
+
+def _exit_code_from_overall_status(overall_status: str) -> int:
+    """Map :attr:`PipelineResult.overall_status` to a process exit code.
+
+    Per dispatch §4:
+
+      * ``"all_ok"``      → 0 (every stage succeeded)
+      * ``"all_skipped"`` → 0 (every stage cleanly skipped; documented
+                              reason in the manifest — no failure)
+      * ``"partial"``     → 3 (mix of success + skip; adapters for the
+                              `ok` stages will work, others raise)
+
+    Runtime failures (uncaught exceptions) are handled upstream and
+    return :data:`EXIT_RUNTIME_ERROR`.
+    """
+    if overall_status in ("all_ok", "all_skipped"):
+        return EXIT_OK
+    if overall_status == "partial":
+        return EXIT_PARTIAL_SUCCESS
+    # Unknown / future status → treat as partial (safe upper bound).
+    return EXIT_PARTIAL_SUCCESS
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        description="Run the heavy_ml_probe sub-protocol (PR-A: scaffolding + lineage gate).",
+        description=(
+            "Run the heavy_ml_probe sub-protocol (PR-E: AutoML + "
+            "meta-labeling + Cox PH survival + Step 5 manifest)."
+        ),
     )
     parser.add_argument(
         "--arc",
@@ -158,17 +200,17 @@ def main(argv: list[str] | None = None) -> int:
         result = run_pipeline(cfg)
     except (FileNotFoundError, ValueError) as e:
         print(f"[heavy_ml_probe] config / pool error: {e}", file=sys.stderr)
-        return 1
+        return EXIT_RUNTIME_ERROR
     except HoldoutGuardViolation as e:
         print(f"[heavy_ml_probe] holdout-guard violation: {e}", file=sys.stderr)
-        return 1
+        return EXIT_RUNTIME_ERROR
     except AllFeaturesRejected as e:
         print(f"[heavy_ml_probe] lineage gate rejected every feature: {e}",
               file=sys.stderr)
-        return 1
+        return EXIT_RUNTIME_ERROR
 
     _print_result_summary(result)
-    return 0
+    return _exit_code_from_overall_status(result.overall_status)
 
 
 if __name__ == "__main__":

@@ -77,6 +77,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Mapping
 
+import numpy as np
 import pandas as pd
 import yaml
 
@@ -85,7 +86,6 @@ from core.heavy_ml_probe.automl import (
     AllFeaturesRejected,
     AutoMLResult,
     HoldoutGuardViolation,
-    compute_budget_markdown,
     importance_to_dataframe,
     leaderboard_to_dataframe,
     run_automl,
@@ -200,8 +200,12 @@ class PipelineResult:
     survival_skip_reason: str = "ok"
     survival_results_path: Path | None = None
     survival_classifier_manifest_path: Path | None = None
-    # Reserved for PR-E — empty in PR-D.
+    # PR-E fields
     step5_manifest_path: Path | None = None
+    overall_status: str = "all_ok"  # "all_ok" | "all_skipped" | "partial"
+    # Note: `compute_budget_path` (PR-B field above) is now the aggregate
+    # compute_budget_used.md written at pipeline end covering all 3
+    # stages — PR-E moved the writer out of `_run_automl_stage`.
 
 
 def load_config(
@@ -345,7 +349,6 @@ def _run_automl_stage(
     art_cfg = cfg.raw_config["output"]["artefacts"]
     lb_path = cfg.step4_dir / str(art_cfg["automl_leaderboard"])
     imp_path = cfg.step4_dir / str(art_cfg["automl_feature_importance"])
-    budget_path = cfg.step4_dir / str(art_cfg["compute_budget_used"])
 
     write_csv(
         lb_path,
@@ -357,13 +360,10 @@ def _run_automl_stage(
         importance_to_dataframe(result),
         sort_by=["feature"],
     )
-    write_text(
-        budget_path,
-        compute_budget_markdown(result, train_end=cfg.train_end),
-    )
     paths["automl_leaderboard"] = lb_path
     paths["automl_feature_importance"] = imp_path
-    paths["compute_budget_used"] = budget_path
+    # ``compute_budget_used.md`` is now written at pipeline end (PR-E)
+    # to aggregate all three stages — see :func:`_write_aggregate_budget`.
     return result, "ok", paths
 
 
@@ -778,6 +778,286 @@ def _meta_label_extras_for_manifest(
     }
 
 
+# ── PR-E: aggregate compute-budget renderer ─────────────────────────
+
+
+def _compute_budget_aggregate_markdown(
+    cfg: PipelineConfig,
+    automl_result: AutoMLResult | None,
+    automl_skip_reason: str,
+    meta_label_result: MetaLabelResult | None,
+    meta_label_skip_reason: str,
+    survival_result: SurvivalResult | None,
+    survival_skip_reason: str,
+) -> str:
+    """Render the cross-stage compute-budget artefact.
+
+    Stable formatting (no timestamps, no wall-clock per
+    :func:`core.heavy_ml_probe.automl.compute_budget_markdown`'s
+    determinism convention).
+    """
+    lines: list[str] = []
+    lines.append("# heavy_ml_probe — compute budget used (all stages)")
+    lines.append("")
+    lines.append(f"- Arc: `{cfg.arc_name}`")
+    lines.append(f"- Cluster ID: `{cfg.cluster_id}`")
+    lines.append(
+        f"- Holdout cutoff (`train_end`): "
+        f"**{cfg.train_end.strftime('%Y-%m-%dT%H:%M:%SZ')}**"
+    )
+    lines.append("")
+
+    # ── AutoML ───────────────────────────────────────────────────────
+    lines.append("## AutoML stage (PR-B)")
+    lines.append("")
+    if automl_result is None:
+        lines.append(f"- Status: **{automl_skip_reason}** (skipped)")
+    else:
+        ar = automl_result
+        lines.append("- Status: **ok**")
+        lines.append(f"- FLAML version: `{ar.flaml_version}`")
+        lines.append(
+            f"- Folds total: **{ar.n_folds_total}** (valid AUC: **{ar.n_folds_valid}**)"
+        )
+        auc_m = "NaN" if not np.isfinite(ar.auc_mean) else f"{ar.auc_mean:.4f}"
+        auc_s = "NaN" if not np.isfinite(ar.auc_std) else f"{ar.auc_std:.4f}"
+        lines.append(f"- AUC (nanmean ± nanstd): **{auc_m} ± {auc_s}**")
+        if ar.n_folds_total > 0:
+            max_iter = ar.fold_results[0].max_iter
+            cap = max_iter * ar.n_folds_total
+            ratio = (
+                float(ar.total_modelcount) / float(cap) if cap > 0 else float("nan")
+            )
+            lines.append(f"- `max_iter_per_fold`: **{max_iter}**")
+            lines.append(f"- Cap (max_iter × n_folds): **{cap}**")
+            lines.append(f"- Total modelcount: **{ar.total_modelcount}**")
+            lines.append(f"- Consumption ratio (actual/cap): **{ratio:.4f}**")
+    lines.append("")
+
+    # ── Meta-labeling ────────────────────────────────────────────────
+    lines.append("## Meta-labeling stage (PR-C)")
+    lines.append("")
+    if meta_label_result is None:
+        lines.append(f"- Status: **{meta_label_skip_reason}** (skipped)")
+    else:
+        mr = meta_label_result
+        mr_ar = mr.automl_result
+        lines.append("- Status: **ok**")
+        lines.append(
+            f"- Target positive rate: **{mr.positive_rate:.4f}** "
+            f"({mr.target_distribution.get(1, 0)} of {mr.n_total})"
+        )
+        auc_m = "NaN" if not np.isfinite(mr_ar.auc_mean) else f"{mr_ar.auc_mean:.4f}"
+        auc_s = "NaN" if not np.isfinite(mr_ar.auc_std) else f"{mr_ar.auc_std:.4f}"
+        lines.append(
+            f"- Meta-label AUC (nanmean ± nanstd): **{auc_m} ± {auc_s}** "
+            f"(across {mr_ar.n_folds_valid}/{mr_ar.n_folds_total} folds)"
+        )
+        lines.append(f"- Total modelcount: **{mr_ar.total_modelcount}**")
+        lines.append(f"- Threshold sweep rows: **{len(mr.threshold_sweep)}**")
+    lines.append("")
+
+    # ── Survival ─────────────────────────────────────────────────────
+    lines.append("## Survival stage (PR-D — Cox PH via statsmodels.PHReg)")
+    lines.append("")
+    if survival_result is None:
+        lines.append(f"- Status: **{survival_skip_reason}** (skipped)")
+    else:
+        sr = survival_result
+        lines.append("- Status: **ok**")
+        lines.append(f"- statsmodels version: `{sr.statsmodels_version}`")
+        lines.append(
+            f"- Folds total: **{sr.n_folds_total}** "
+            f"(valid concordance: **{sr.n_folds_valid}**)"
+        )
+        c_m = "NaN" if not np.isfinite(sr.concordance_mean) else f"{sr.concordance_mean:.4f}"
+        c_s = "NaN" if not np.isfinite(sr.concordance_std) else f"{sr.concordance_std:.4f}"
+        lines.append(f"- Concordance (nanmean ± nanstd): **{c_m} ± {c_s}**")
+        lines.append(f"- Total events across training slices: **{sr.total_n_events}**")
+    lines.append("")
+    return "\n".join(lines)
+
+
+# ── PR-E: Step 5 augmentation manifest emission ─────────────────────
+
+
+def _stage_status(result, skip_reason: str) -> str:
+    """Map a per-stage (result, skip_reason) pair to the Step 5
+    manifest's `status` taxonomy.
+
+    Uses string literals (not the adapters module's enums) because
+    pipeline.py shouldn't import from adapters — circular dep risk
+    when PR-E adapters consume the manifest pipeline emits.
+    """
+    if result is not None:
+        return "ok"
+    if skip_reason in ("ok", ""):
+        return "ok"
+    # Treat all skip reasons as 'skipped' — they document why the stage
+    # didn't run but don't represent a runtime failure. Real failures
+    # would have raised before reaching this code path.
+    return "skipped"
+
+
+def _emit_step5_manifest(
+    cfg: PipelineConfig,
+    gate: LineageGateResult,
+    automl_result: AutoMLResult | None,
+    automl_skip_reason: str,
+    meta_label_result: MetaLabelResult | None,
+    meta_label_skip_reason: str,
+    survival_result: SurvivalResult | None,
+    survival_skip_reason: str,
+) -> Path:
+    """Write ``step_5/heavy_ml_augmented/heavy_ml_manifest.json``.
+
+    Locked schema:
+
+      .. code-block:: json
+
+        {
+          "schema_version": "1.0",
+          "sub_protocol": "heavy_ml_probe",
+          "arc_name": "...",
+          "cluster_id": 0,
+          "step4_dir": "<relative>",
+          "used_features": ["..."],
+          "stages": {
+            "automl": {"status": "ok|skipped", "skip_reason": "...",
+                       "classifier_manifest_path": null},
+            "meta_label": {"status": "...", "skip_reason": "...",
+                           "classifier_manifest_path": "classifiers/meta_label/manifest.json"},
+            "survival": {"status": "...", "skip_reason": "...",
+                         "classifier_manifest_path": "classifiers/survival/manifest.json"}
+          },
+          "adapters": {
+            "a2_buildable": bool,    # requires meta_label.status == ok
+            "a4_buildable": bool,    # requires survival.status == ok
+            "a6_buildable": bool     # requires meta_label.status == ok
+          },
+          "schema_doc": "<reference>"
+        }
+
+    Path stored in :attr:`PipelineResult.step5_manifest_path`. Read by
+    :func:`core.heavy_ml_probe.adapters.build_a2_from_heavy_ml` and
+    siblings.
+
+    Determinism: no ``generated_at`` timestamp (mirrors PR-C's
+    classifier-manifest convention — top-level Step 4 manifest carries
+    ``created_at``; sidecars don't duplicate).
+    """
+    import os
+
+    from core.heavy_ml_probe.adapters import STEP5_MANIFEST_SCHEMA_VERSION
+
+    step5_dir = cfg.step5_dir
+    step5_dir.mkdir(parents=True, exist_ok=True)
+    # step4_dir relative to output_root for display only — both dirs
+    # are guaranteed descendants of output_root.
+    step4_rel = os.path.relpath(
+        cfg.step4_dir.resolve(), start=cfg.output_root.resolve()
+    ).replace("\\", "/")
+
+    # Per-stage classifier manifest paths recorded RELATIVE to this
+    # Step 5 manifest's location. Step 4 and Step 5 dirs are siblings
+    # under output_root, so the relative path includes ``..`` segments;
+    # ``os.path.relpath`` handles that cleanly (``Path.relative_to``
+    # requires descendant-only).
+    def _rel_classifier_manifest(result, sub_subdir: str) -> str | None:
+        if result is None or getattr(result, "classifier_manifest_path", None) is None:
+            return None
+        abs_path = Path(result.classifier_manifest_path).resolve()
+        return os.path.relpath(abs_path, start=step5_dir.resolve()).replace("\\", "/")
+
+    meta_label_clf_rel = _rel_classifier_manifest(meta_label_result, "meta_label")
+    survival_clf_rel = _rel_classifier_manifest(survival_result, "survival")
+
+    automl_status = _stage_status(automl_result, automl_skip_reason)
+    meta_label_status = _stage_status(meta_label_result, meta_label_skip_reason)
+    survival_status = _stage_status(survival_result, survival_skip_reason)
+
+    payload = {
+        "schema_version": STEP5_MANIFEST_SCHEMA_VERSION,
+        "sub_protocol": "heavy_ml_probe",
+        "arc_name": str(cfg.arc_name),
+        "cluster_id": int(cfg.cluster_id),
+        "step4_dir": step4_rel,
+        "used_features": list(gate.accepted_features),
+        "stages": {
+            "automl": {
+                "status": automl_status,
+                "skip_reason": str(automl_skip_reason),
+                # AutoML doesn't persist a classifier directory yet (PR-B
+                # writes only leaderboard + importance + budget). The
+                # field stays in the schema so PR-E's adapters can grow
+                # an AutoML-direct path later; for now adapters source
+                # FLAML output via the meta_label classifier manifest.
+                "classifier_manifest_path": None,
+            },
+            "meta_label": {
+                "status": meta_label_status,
+                "skip_reason": str(meta_label_skip_reason),
+                "classifier_manifest_path": meta_label_clf_rel,
+            },
+            "survival": {
+                "status": survival_status,
+                "skip_reason": str(survival_skip_reason),
+                "classifier_manifest_path": survival_clf_rel,
+            },
+        },
+        "adapters": {
+            "a2_buildable": bool(meta_label_status == "ok"),
+            "a4_buildable": bool(survival_status == "ok"),
+            "a6_buildable": bool(meta_label_status == "ok"),
+        },
+        "schema_doc": (
+            "core.heavy_ml_probe.adapters.STEP5_MANIFEST_SCHEMA_VERSION; "
+            "consumed by build_a{2,4,6}_from_heavy_ml"
+        ),
+    }
+    manifest_path = step5_dir / "heavy_ml_manifest.json"
+    blob = json.dumps(payload, sort_keys=True, indent=2)
+    if not blob.endswith("\n"):
+        blob = blob + "\n"
+    manifest_path.write_bytes(blob.encode("utf-8"))
+    return manifest_path
+
+
+def _pipeline_overall_status(
+    automl_skip_reason: str,
+    meta_label_skip_reason: str,
+    survival_skip_reason: str,
+    automl_result: AutoMLResult | None,
+    meta_label_result: MetaLabelResult | None,
+    survival_result: SurvivalResult | None,
+) -> str:
+    """Map per-stage outcomes to the pipeline's overall status.
+
+    Returns one of:
+
+      * ``"all_ok"`` — every stage succeeded (result is not None).
+      * ``"all_skipped"`` — every stage cleanly skipped.
+      * ``"partial"`` — at least one stage succeeded AND at least one
+        stage was skipped or failed. Drives ``run_probe.py``'s exit
+        code 3 per dispatch §4.
+
+    Note: "failure" (uncaught exception) is handled at a higher level
+    by ``run_probe.py``'s ``try/except`` → exit code 1. This function
+    only sees the (result, skip_reason) tuples for stages that
+    completed without raising.
+    """
+    statuses = [
+        _stage_status(automl_result, automl_skip_reason),
+        _stage_status(meta_label_result, meta_label_skip_reason),
+        _stage_status(survival_result, survival_skip_reason),
+    ]
+    if all(s == "ok" for s in statuses):
+        return "all_ok"
+    if all(s == "skipped" for s in statuses):
+        return "all_skipped"
+    return "partial"
+
+
 def run_pipeline(
     cfg: PipelineConfig,
     *,
@@ -907,6 +1187,32 @@ def run_pipeline(
         )
         raise
 
+    # ── PR-E aggregate compute_budget_used.md (covers all 3 stages) ──
+    art_cfg = cfg.raw_config["output"]["artefacts"]
+    budget_path = cfg.step4_dir / str(art_cfg["compute_budget_used"])
+    write_text(
+        budget_path,
+        _compute_budget_aggregate_markdown(
+            cfg,
+            automl_result=automl_result,
+            automl_skip_reason=automl_skip_reason,
+            meta_label_result=meta_label_result,
+            meta_label_skip_reason=meta_label_skip_reason,
+            survival_result=survival_result,
+            survival_skip_reason=survival_skip_reason,
+        ),
+    )
+
+    # ── PR-E Step 5 manifest (downstream A2/A4/A6 adapter consumer) ─
+    step5_manifest_path = _emit_step5_manifest(
+        cfg, gate,
+        automl_result=automl_result, automl_skip_reason=automl_skip_reason,
+        meta_label_result=meta_label_result,
+        meta_label_skip_reason=meta_label_skip_reason,
+        survival_result=survival_result,
+        survival_skip_reason=survival_skip_reason,
+    )
+
     # ── Stub summary (PR-A artefact; PR-B/C/D extended content) ─────
     stub_summary_path = cfg.step4_dir / "stub_summary.md"
     write_text(
@@ -922,9 +1228,10 @@ def run_pipeline(
         ),
     )
 
-    # ── Manifest ─────────────────────────────────────────────────────
+    # ── Top-level Step 4 manifest ────────────────────────────────────
     artefact_paths: dict[str, Path] = {
         "stub_summary": stub_summary_path,
+        "compute_budget_used": budget_path,
         **automl_paths,
         **meta_label_paths,
         **survival_paths,
@@ -947,6 +1254,15 @@ def run_pipeline(
         },
     )
 
+    overall = _pipeline_overall_status(
+        automl_skip_reason=automl_skip_reason,
+        meta_label_skip_reason=meta_label_skip_reason,
+        survival_skip_reason=survival_skip_reason,
+        automl_result=automl_result,
+        meta_label_result=meta_label_result,
+        survival_result=survival_result,
+    )
+
     return PipelineResult(
         cfg=cfg,
         lineage_gate=gate,
@@ -956,7 +1272,7 @@ def run_pipeline(
         automl_skip_reason=automl_skip_reason,
         automl_leaderboard_path=automl_paths.get("automl_leaderboard"),
         automl_importance_path=automl_paths.get("automl_feature_importance"),
-        compute_budget_path=automl_paths.get("compute_budget_used"),
+        compute_budget_path=budget_path,
         meta_label_result=meta_label_result,
         meta_label_skip_reason=meta_label_skip_reason,
         meta_label_results_path=meta_label_paths.get("meta_label_results"),
@@ -965,6 +1281,8 @@ def run_pipeline(
         survival_skip_reason=survival_skip_reason,
         survival_results_path=survival_paths.get("survival_model_results"),
         survival_classifier_manifest_path=survival_paths.get("survival_classifier_manifest"),
+        step5_manifest_path=step5_manifest_path,
+        overall_status=overall,
     )
 
 

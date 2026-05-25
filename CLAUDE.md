@@ -1,45 +1,63 @@
 # CLAUDE.md — Forex Ignition Rebuild
-> Last updated: 2026-05-22 | Phase: CC_07 — L_PROTOCOL v3.0 runtime infrastructure landed on `infra/protocol-runtime-v3`. `core/arc/`, `core/steps/`, `core/architectures/`, `core/runners/` populated; 43 protocol_runtime tests + 75 KH-24/sim regression tests pass. Full-data anchor regression: A1 path byte-identical to legacy `KH24FoldRunner` under matched warmup convention (5/7 folds identical with legacy default; all 7/7 identical with `warmup_days=365`). Per chat resolution C→B, A1 with full-history warmup ratified as new v3 anchor; see [docs/BACKTESTER_ARCHITECTURE.md §B](docs/BACKTESTER_ARCHITECTURE.md), [docs/PROTOCOL_RUNTIME.md §13-14](docs/PROTOCOL_RUNTIME.md). Arc 10 closure unchanged. KH-24 live deployment unchanged (published Pub-column numbers preserved).
+> Last updated: 2026-05-25 | Phase: Post-Phase-1-engine-build. L_PROTOCOL v3.0 + Amendments 1-6 locked. v3.0 engine wired end-to-end across `core/arc/`, `core/steps/`, `core/architectures/` (A1, A2, A3, A4, A6 — A5 deferred), `core/runners/`, `core/step_6/`, `core/sim/exit_policies/`, `core/time_utils/`. KH-24 anchor preserved (A1 path byte-identical to legacy `KH24FoldRunner` under `boundary_convention="utc"`). KH-24 live deployment on Contabo VPS / 5ers MT5 unchanged.
 > First file any AI assistant reads. Reflects where the project ACTUALLY is.
 
 ---
 
 ## Active protocol
 
-L_ARC_PROTOCOL v2.0 (`L_ARC_PROTOCOL.md`) governs Arcs 3+. Path-shape clustering + two-pipeline (E entry-filter / D1 deferred-identification) extractability gate. Calibration anchor: KH-24 K=4 archetype 3 (passes via Pipeline D1 at t=3). Next engine PR: Pipeline D1 backtester extension (conditional exits at bar N).
+**L_PROTOCOL v3.0** (`L_PROTOCOL.md`) is the overseer methodology for all forward research. Five steps as rankings + lazy Step 6 (causal audit). WFO at Step 5 is the only deployment gate. Six amendments are inline / inline-archived:
 
-Historical: Arcs 1, 2 ran under v1.0 protocol (`archive/L_ARC_PROTOCOL_v1_0.md` + v1.1/v1.2 amendments).
+- **Amendment 1** — Step 5 search policy (informed by Steps 3-4, not exhaustive).
+- **Amendment 2** — ML architecture mechanics for A2, A3, A4, A6.
+- **Amendment 3** — risk-normalised gates (`r_safe` / `r_hard` scaling; priority-ordered failure modes).
+- **Amendment 4** — Step 6 causal-audit framework (six categories; auto-dispatch on Top-1 PASS candidate).
+- **Amendment 5** — AUC-gated A2/A6 architecture selection (four-gate dispatch-time rule).
+- **Amendment 6** — 5ers EET broker trading day as the daily-DD measurement boundary.
+
+Archive files: `archive/L_PROTOCOL_v3_0_AMENDMENT_3.md`, `..._AMENDMENT_4.md`, `..._AMENDMENT_5.md`. Amendments 1, 2, 6 are documented inline in `L_PROTOCOL.md` only.
+
+Historical: Arcs 1, 2, ..., 11 (under v1.x and v2.x protocols) live in `ARC_HISTORY.md` (frozen). v3.0 Wave 1 closures landed for Arcs 8 (FAIL), 10 (PASS-VIABLE → re-eval PASS-DEPLOYABLE under Amendment 3), 11 (FAIL); Arcs 5 + 7 v3.0 closures in flight.
 
 ---
 
 ## Read These First, In Order
 
-1. **`L_ARC_PROTOCOL.md`** — methodology of record for all L arc signal-testing work. Locked v2.0. Self-contained: deliverables, gates, exit-family map, and workflow all live in the v2.0 doc.
-2. **`SESSION_ZERO.md`** — 5-minute primer on current state.
-3. **`STATUS.md`** — tight current-state snapshot.
-
-For v1.x historical reference (Arcs 1, 2): `archive/L_ARC_PROTOCOL_v1_0.md`, `archive/L_ARC_OPERATIONAL_SPEC_v1_0.md`, plus v1.1/v1.2 amendments in the same folder.
+1. **`L_PROTOCOL.md`** — the methodology of record. Self-contained for gates, deliverables, and architectures.
+2. **`TODO.md`** — operational tracker: current phase, in-flight arcs, engine work, standing items.
+3. **`ARC_TRACKER.md`** — auto-managed arc state. Read for closed-arc status; do not hand-edit.
+4. **`WORKFLOW.md`** — operational conventions, dispatch artefact pattern, branch strategy.
 
 Then, depending on scope:
-- Touching the live system → `docs/KH24_SYSTEM_LOCK.md`
-- Running an L arc step → the arc's `PHASE_L_ARC_N_OPEN.md` under `results/l_arc_N/`
-- Phase close → `WORKFLOW.md` v2
+- Touching the live KH-24 system → `docs/KH24_SYSTEM_LOCK.md`
+- Engine work or runtime questions → `docs/PROTOCOL_RUNTIME.md` + `docs/BACKTESTER_ARCHITECTURE.md`
+- Opening or closing an arc → `docs/templates/ARC_CLOSURE_TEMPLATE.md` + `scripts/tracker_parser/README.md`
+- Capability inventory → `docs/audits/engine_capability_audit_2026_05.md`
+- Project history / narrative → `project_brief.md`
+
+Sub-protocols at `docs/sub_protocols/` (`heavy_ml_probe.md`, `signal_discovery_probe.md`) define the canonical Step-1 / Step-4 overrides.
 
 ---
 
 ## CRITICAL: Current State
 
-**Live system KH-24 is locked, passing, deployed.** Out of scope for L arc work; do not modify without an explicit modification phase.
+**Live system KH-24 is locked, passing, deployed.** Out of scope for any forward research work without an explicit modification phase.
 
-**Active research: L arc signal testing under `L_ARC_PROTOCOL.md` v2.1.2 base + v2.2 + v2.3 amendments.** Arc 10 (DLR — D1 swing-low rejection long) closed `STEP_4_HALT` 2026-05-18 per §16a Path A. First arc to run end-to-end under v2.3 (5-step pipeline, halt at end of Step 4). Step 4 near-miss: c1 V-shape recovery E AUC 0.6296 (margin −0.0204), D1 AUC 0.5897 (margin −0.0103); disjunctive §8 fails on both. Post-closure experimentation pass (EXP-01–06) and WFO pair (base + oracle c1) conducted as research probes over §16a at chat-side direction. Oracle WFO Sharpe 4.61 vs base −1.29 (gap +5.90) — synthesis recommends BUILD clusterifier; explicit DO NOT DEPLOY. EXP-01 bootstrap shows realisable classifier P(AUC ≥ 0.65) = 12.5%. Closure: `docs/archive/arc_results/ARC_10_RESULT.md`. Two material corrections to prior framing: Arc 6 reclassified Stepwise (not V-shape, per EXP-05); fold-2 date 2023-07 → 2024-06 (not Q2 2022, per EXP-04). Open-06 (AUC threshold) weakened; Open-04 (external features) deferred pending Arc 8/9/11. Arc 4 RE-RUN closed FAIL Step 6 2026-05-18 — Pipeline D1 reject + early-exit pool drag swamps admit-pool edge (Open-22/23/24 spawned, closed in v2.3 with engine PR pending for Open-24). Arc 3 closed CLEAN-NULL at Step 3 (2026-05-16). Arcs 5/6/7 closed under v2.1.2 (see STATUS.md "Recent Closures"). Arcs 1, 2 historical (ran under v1.x). KH-24 live deployment unaffected.
+**Active research:** Phase 1 Wave 1 v3.0 retries under signal-parity engine. Wave 1 composition: Arcs 5, 7, 8, 10, 11. Arcs 8 / 10 / 11 closed; Arcs 5 / 7 closure PRs in flight (#172, #180). Wave 1 retries (Arc 5 v3.0.1, Arc 7 v3.0.1, Arc 10 signal-parity rerun) gated on those closures + signal-parity engine merged (PRs #189, #193, #195, #197 — all merged 2026-05-25). Arc 10's existing PASS-VIABLE / Amendment-3 re-evaluated PASS-DEPLOYABLE verdict stands under UTC convention; a separate parity rerun is documented at `docs/calibration/arc_10_signal_parity_rerun_2026_05.md`.
+
+**Parallel chats:**
+- `heavy_ml_probe` sub-protocol build (PR #187 PR-A landed; PR-B/C/D/E/F to follow).
+- `signal_discovery_probe` 10k local run (user-side workstation operation).
+
+Wave 2 (Arcs 4-RERUN, 4-original, 6, 3, 1, 2) gated on Wave 1 closure. Phase 2 (sub-protocols + new signal classes) gated on Phase 1 closure.
 
 ---
 
 ## What the Project Is
 
-A long-only 4H trend-pullback system (KH-24) is in production. Parallel research arcs (the L arc series) are testing the top-N signals from the L characterization atlas (`docs/LCHAR_TOPN_REGISTRY.md`) through a six-step pipeline that ends with a WFO gate. The goal of L arc work is one or more PASS-DEPLOYABLE survivor systems that complement or supersede KH-24.
+A long-only 4H trend-pullback system (KH-24) is in production. Parallel research arcs run through `L_PROTOCOL.md` v3.0 — five gates-as-rankings steps plus a lazy Step 6 causal audit framework. The goal is one or more PASS-DEPLOYABLE survivor systems that complement or supersede KH-24.
 
-The signal under test in any given L arc is from the registry. From Arc 3 onward the test follows `L_ARC_PROTOCOL.md` v2.0 exactly — v2.0 is self-contained for deliverables, gates, and workflow.
+Any arc (standard, discovery, or diagnostic probe) plugs into the same overseer protocol, with sub-protocols at `docs/sub_protocols/` overriding specific steps when needed. The closure format and tracker integration are universal.
 
 ---
 
@@ -48,20 +66,20 @@ The signal under test in any given L arc is from the registry. From Arc 3 onward
 | Rule | Detail |
 |------|--------|
 | Structure-first | Signal is price structure, not indicator |
-| WFO worst-fold is the only judge at step 6 | Average fold, best fold — irrelevant |
-| Dual-tier disposition at step 6 | PASS-DEPLOYABLE / PASS-VIABLE / clean-null; DD < 8% applies to both PASS tiers |
-| Ex-ante population always | `build_ex_ante_bounded_population` — no exceptions |
+| WFO worst-fold is the only judge at Step 5 | Average fold, best fold — irrelevant |
+| Dual-tier disposition at Step 5 | PASS-DEPLOYABLE / PASS-VIABLE / FAIL; DD ≤ 8% at `r_safe` (DEPLOYABLE), ≤ 10% at `r_hard` (VIABLE) |
+| Step 6 causal audit is mandatory for PASS | Auto-dispatches on Top-1; critical failure downgrades verdict to FAIL with `primary_failure_mode = step6_causal_audit_fail` |
+| Risk-normalised gates (Amendment 3) | Engine emits at `r_base`; gates evaluate at scaled `r_safe` / `r_hard` per scalability bounds (0.15% ≤ r ≤ 2.0%) |
+| Ex-ante population always | `build_ex_ante_bounded_population` (or equivalent) — no outcome-aware filtering anywhere |
 | No lookahead / no repainting | Hard invariant; lookahead-invariant tests required at every step |
 | Config-driven (YAML only) | No hardcoded parameters |
-| Volume = veto only | Never generates trades |
-| Clean labels = evaluation only | Never in population selection |
-| Full distributions, never medians-only | No metric summarised as a single number |
-| Effect size before significance | AUC + forward-geometry effect size both required in step 3 |
-| Within-arc thresholds do not move | Calibration adjustments are cross-arc only (v2.0 §12) |
+| Real bid/ask spreads | HistData M1 bid+ask is canonical; zero-spread bars are a data-quality flag, not silently backfilled |
+| Determinism | `random_state=42`, `n_jobs=1`, `lineterminator='\n'`; sha256 manifests; CI-enforced two-run identity |
+| Anchor preservation | KH-24 worst-fold numbers within ±0.5pp ROI / ±1pp DD; A1 path byte-identical to legacy `KH24FoldRunner` under matched warmup |
 
 ---
 
-## KH-24 System Parameters (Locked, Out of Scope for L Arc)
+## KH-24 System Parameters (Locked, Out of Scope for Forward Research)
 
 ```
 Signal:     kb_exhaustion_bar (c1–c6, c8, c9)
@@ -70,53 +88,45 @@ Direction:  Long only
 Timeframe:  4H with D1 regime filter (one-day lag)
 Pairs:      28 FX currency pairs
 Broker:     5ers
-Data:       data/4hr/, data/daily/, data/1hr/
+Data:       HistData M1 bid+ask (cache at data/cache/<TF>/<PAIR>.parquet)
 Entry:      Bar N+1 open after signal on bar N close
 Stop:       Entry price - 2.0 × ATR(14) [entry price anchor]
 Trail:      Activates at close ≥ entry + 2.0 ATR (close-based)
             1.5 ATR behind highest close, bar-close updates only
 Exits:      trailing_stop | kijun_d1 | stoploss
-Risk:       1.0% of current reset floor balance (KH-24 era; L arc uses 0.5%)
+Risk:       1.0% of current reset floor balance (KH-24 era; v3 arcs use 0.5% default)
 Filters:    exposure cap=2; 1H CIR T=0.28
-Spread:     Per-bar MT5 data — never hardcoded
+Spread:     Per-bar HistData M1 bid+ask
 D1 align:   One-day lag — each 4H bar sees prior calendar day's D1 close
+Convention: boundary_convention="utc" (KH-24 anchor; A1 path byte-identical)
 ```
 
-KH-24 WFO gate: PASS. Worst-fold ROI +1.92% (F7); worst-fold DD 6.37% (F1); 214 trades across Oct 2020–Jan 2026; all 7 folds positive. Live on Contabo VPS / 5ers.
+KH-24 WFO gate: PASS. Worst-fold ROI +1.92% (F7); worst-fold DD 6.37% (F1); 214 trades across Oct 2020–Jan 2026; all 7 folds positive. Live on Contabo VPS / 5ers MT5.
 
 ---
 
-## L Arc Configuration (Per L_ARC_PROTOCOL v2.0)
+## v3.0 Engine Status
 
-```
-Signal:        Per docs/LCHAR_TOPN_REGISTRY.md entry (currently 5 signals, arcs 1–5)
-Direction:     Long only (all registry signals)
-Timeframe:     1H primary (registry-defined)
-Pairs:         28 FX, same set as KH-24
-Entry:         Bar N+1 open
-SL:            2.0 × ATR(14)_1H from entry price
-Time exit:     Bar N+1+h open (h from registry entry)
-Spread:        configs/spread_floors_5ers.yaml (locked, sha256 in arc-open doc)
-Exposure cap:  Max 1 open position per pair (no currency cap, no concurrent-trade cap)
-Risk:          0.5% of reset floor balance (L6 convention)
-WFO:           7 anchored expanding folds, OOS Oct 2020 – Jan 2026
-```
-
-Cost accounting: spread is the only per-trade cost. Commission/swap/slippage applied as aggregate haircut at PASS-DEPLOYABLE evaluation only (per operational spec §7.4).
-
----
-
-## Engine Status
-
-- Python backtester: D1 lookahead fix applied (one-day lag). Source of truth.
-- EA v2.01: KH-24 deployed on VPS. No L arc EAs exist yet — porting opens only when a PASS-DEPLOYABLE survivor exists.
-- Determinism: byte-identical outputs on re-run required. CI-enforced.
+- **Step 1 (Plumbing):** `core/arc/arc_pool_builder.py` + `core/features/pipeline.py` + `core/arc/integrity.py`. Signal-module Protocol at `core/arc/signal_protocol.py`. 27 features across 7 classes.
+- **Step 2 (Clustering):** `core/steps/step_2_clustering.py`. KMeans over K ∈ {2..6}, silhouette selection, shape-tag assignment.
+- **Step 3 (Capturability):** `core/steps/step_3_capturability.py`. Composite + candidate-cluster flag.
+- **Step 4 (Extraction):** `core/steps/step_4_extraction.py`. RF + LGBM + LR, 5-fold TimeSeriesSplit, classifier persistence (PR #185), holdout-window training filter.
+- **Step 5 (WFO):** `core/wfo/` + `core/architectures/` (A1, A2, A3, A4, A6 wired; A5 deferred). Amendment 3 risk-normalised gates wired (PR #186). Architecture-selection enforcement is dispatch-time per Amendment 5 (PR #194). Exit-policy registry at `core/sim/exit_policies/` (PR #195) includes `sl_partial_close_1r_runner_trail`.
+- **Step 6 (Causal audit):** `core/step_6/` six-category framework (PR #188). Auto-dispatches on Top-1 PASS candidate per Amendment 4; manual CLI at `scripts/run_step_6.py`.
+- **Signal parity (PR #189):** mid-price features + 5ers EET bar boundaries + worst-case fills. EET aggregation opt-in via `boundary_convention="5ers_eet"`; UTC default preserves KH-24 anchor.
+- **Signal-module timezone alignment (PR #193):** canonical `core/signals/htf_alignment.py` utility replaces UTC-anchored HTF-lookup idioms. Audit at `docs/audits/signal_module_eet_audit_2026_05.md`.
+- **EET session semantics (PR #197 / Amendment 6):** `core/time_utils/session_boundary.utc_to_eet_trading_day`; `Panel.boundary_convention` carries convention through orchestrator slicing; `compute_per_day_max_dd(boundary_convention="5ers_eet")` is the load-bearing daily-DD bucketing.
+- **Tracker parser:** `scripts/update_tracker_from_closure.py` (template v1.0 / v1.1 / v1.2 / v1.2.1 / v1.3 / v1.3.1).
+- **Determinism:** `core/determinism.py` — `seed_everything()`, `RANDOM_STATE=42`, `LINE_TERMINATOR="\n"`. CI-gated.
+- **Legacy paths:** `core/backtester.py` + `core/signal_logic.py` retained for KH-24 anchor reproduction; 33 importers. Migration deferred until KH-24 anchor preservation is no longer load-bearing.
 
 Key scripts:
-- `scripts/phase_kgl_v2_4h_wfo.py` — WFO runner
-- `scripts/lchar/run_layer4.py` — canonical L registry signal source
-- `configs/wfo_kh24.yaml` — locked KH-24 config (do not modify)
-- `configs/spread_floors_5ers.yaml` — locked spread floor (do not modify)
+- `scripts/anchor/run_anchor.py` — KH-24 anchor harness (7-fold rolling Oct 2020 → Jan 2026)
+- `scripts/anchor/check_a1_equivalence.py` — A1-vs-legacy byte-equivalence harness
+- `scripts/run_step_6.py` — manual Step 6 CLI on any closure
+- `scripts/update_tracker_from_closure.py` — closure → tracker parser
+
+Full engine capability map: [docs/audits/engine_capability_audit_2026_05.md](docs/audits/engine_capability_audit_2026_05.md).
 
 ---
 
@@ -133,7 +143,7 @@ Key scripts:
 - `signal_flip` exit (cuts winners); `kijun_4h` exit (fires on normal pullbacks)
 - D1b slope filter (net negative across folds)
 - Choppiness gate (redistributes damage)
-- TP1 half-off structure (inferior to no-TP1)
+- TP1 half-off structure as standalone gate (replaced by canonical `sl_partial_close_1r_runner_trail` primitive in `core/sim/exit_policies/`, which IS deployable per Arc 10)
 - Currency exposure cap (KH era; superseded by exposure cap=2 in KH-22)
 - `agree_count` gate (too rare)
 - FOMC proximity filter (p=0.889)
@@ -143,47 +153,24 @@ Key scripts:
 - Same-day D1 alignment (lookahead; permanently replaced by one-day lag)
 - KH-25 re-entry exposure cap (KH-27 KILL — re-entries fire post-original-exit)
 - 1H timeframe port of KH-24 (KI arc: mean R 0.004, t=0.095)
-- L6.0 verbatim-as-gate framing (replaced by `L_ARC_PROTOCOL.md` v1.0; v1.x in turn superseded by v2.0 for Arcs 3+)
-- Arc 2 signal (mtf_alignment.2_down_mixed.kijun, h=120) — SHELVED 2026-05-16, not permanently eliminated; cluster 2 has strong magnitude (fwd_mfe_p50 5.83R, t-stat +52) on unextractable paths, reopenable via v2.x calibration; see `results/l_arc_2_redo/ARC_2_REDO_RESULT.md`
-- Arc 4 signal (`bar_range_top_decile__neg__h_001`, 1H) — SHELVED 2026-05-17 then re-evaluated under corrected p50 spread floors 2026-05-18. Re-run verdict: FAIL Step 6 under §10 full-pool deployment reckoning. Admit-pool edge intact (+0.125R per trade); structural failure on reject-pool (−0.232R × 32%) + early-exit-pool (−0.685R × 11%) drag. Same Pipeline D1 architectural failure as Arc 5. Signal not permanently eliminated — Pipeline E feasibility could be revisited as long-shot, but Step 4 E AUC 0.55 (gate 0.65) is the blocker. See `docs/archive/arc_results/ARC_4_RERUN_RESULT.md`.
-
-## Cross-arc lessons
-
-- **Pipeline D1 admit-only economics ≠ deployment economics (Arc 4 + Arc 5).** Two arcs in a row PASSED §9 admit-only stability and FAILED §10 full-pool deployment. Pipeline D1 carries mandatory cost on the reject pool (~−0.2 to −0.5R per rejected trade, classifier-discrimination-dependent) and on the early-exit pool (~−0.5 to −0.7R on 10-15% of signal flow, pre-t SL hits before classifier evaluates). Any Pipeline D1 candidate's deployment viability is `(admit_rate × admit_mean) vs (reject_rate × |reject_mean|) + (early_exit_rate × |early_exit_mean|)` — both Arc 4 and Arc 5 had costs ~2× the edge. Full-pool reporting mandatory at Step 4+. See `docs/archive/arc_results/ARC_4_RERUN_RESULT.md` and `PROTOCOL_IMPROVEMENT_BACKLOG.md` (Open-22/23/24).
-
-- **Spread-floor changes are not population-invariant under exposure caps.** Changing the spread floor file shifts entry/exit fill prices, which shifts when stops fire, which shifts when the `max_concurrent_per_pair` cap releases, which shifts admission for subsequent signals. Trade pool can drift ±1-2% from a pure cost-model change. Path features (mid-based) remain spread-independent; PnL and exposure-derived metrics do not. Future arcs swapping spread files should expect Step 1 pool drift and propagate through Step 2 cluster sizes + Step 4 per-fold classifier retraining.
-
-- **V-shape recovery: capturable, near-miss extractable, cross-arc deployable (Arc 7 + Arc 10).** Two V-shape near-misses on record (Arc 7 c1/c3/agg, Arc 10 c1) — capturable at Step 3 but missing Step 4 disjunctive E/D1 AUC gate. Cross-arc pool (EXP-05) closes the gap: pooled AUC 0.6348 with generic 17-feature subset vs 0.6057 (Arc 10 alone) / 0.4954 (Arc 7 c3 alone at common SL). WFO oracle on Arc 10 c1 confirms real OOS edge if cluster ID known at entry (Sharpe 4.61, expectancy 1.55R/trade). Single load-bearing feature: `L1_minus_L0_atr` (D1 HL slope magnitude) carries 116% of HTF LOO drop on Arc 10. Reading: V-shape archetype is a cross-arc deployable abstraction once a classifier with extended feature envelope is built; Arc 10 alone is in the noise zone (EXP-01 P(AUC ≥ 0.65) under bootstrap = 12.5%). Cross-arc clusterifier build is the leading v2.4 candidate. See `docs/archive/arc_results/ARC_10_RESULT.md` and `results/l_arc_10/experiments/ARC_10_EXPERIMENT_SYNTHESIS.md`.
+- L6.0 verbatim-as-gate framing (replaced by `L_ARC_PROTOCOL.md` v1.0; v1.x → v2.x → v3.0 `L_PROTOCOL.md`)
+- Amendment 1's uniform archetype-driven architecture gating for A2/A6 (superseded by Amendment 5's four-gate AUC-driven rule; A2/A6 are archetype-agnostic by construction)
 
 ### Not eliminated, but flagged
 
-- Failed-breakout reversal long (Arc 6, 2026-05-17): path quality clean at v2.1.2 Step 3 (c2 **Stepwise climber**, mfe_p50=4.47R, ww_pp=0.000) but entry-time predictability below 0.65 deployability bar (best Pipeline E AUC 0.600 / 0.590); D1 admission collapses on threshold sweep. Not permanently eliminated; may return under richer feature regime, multi-TF entry context, or ensemble approach. See `docs/archive/arc_results/ARC_6_RESULT.md`. *(Note: Arc 6 was previously narrated as V-shape in some Arc 10 docs; per EXP-05 it is Stepwise.)*
-- D1 swing-low rejection long (Arc 10 DLR, 2026-05-18): path quality clean at v2.3 Step 3 (c1 V-shape recovery, composite 0.4934 at SL=3.0×ATR, fwd_mfe_p50 3.08R, wrong_way_pp 0.000) but entry-time predictability near-miss on disjunctive §8 — c1 E AUC 0.6296 (margin −0.0204), D1 AUC 0.5897 (margin −0.0103). Both Path A near-miss < 0.03. Post-closure WFO oracle Sharpe 4.61 vs base −1.29 (gap +5.90) confirms structural OOS edge if cluster ID known at entry; realisable classifier ceiling pending feature-envelope expansion (per closure §"Why we can't filter to c1"). Not permanently eliminated; cross-arc clusterifier build with Arc 7 c3 is the leading v2.4 candidate (EXP-05 pool AUC 0.6348). See `docs/archive/arc_results/ARC_10_RESULT.md`.
+- **Arc 2 signal** (`mtf_alignment.2_down_mixed.kijun`, h=120) — SHELVED 2026-05-16 under v2.x; not permanently eliminated. Cluster 2 has strong magnitude (fwd_mfe_p50 5.83R) on unextractable paths. Reopenable under v3.0 if signal-module re-fits cleanly. See `results/l_arc_2_redo/ARC_2_REDO_RESULT.md`.
+- **Arc 4 signal** (`bar_range_top_decile__neg__h_001`, 1H) — SHELVED under v2.x; queued for Wave 2 v3.0 retry (Arc 4-RERUN + Arc 4-original).
+- **Arc 6 signal** (failed-breakout reversal long) — Stepwise cohort with clean path quality but entry-time predictability below v2.x deployability bar; queued for Wave 2 v3.0 retry. May respond differently under Amendment 5's AUC-driven A2/A6 admit.
+- **Arc 10 DLR signal** (D1 swing-low rejection long) — v3.0 PASS-VIABLE → Amendment-3 re-evaluated PASS-DEPLOYABLE. PR #193 audit flagged the signal module as State B under EET storage (safe under Arc 10's UTC convention; signal module fixed canonically). Cross-arc clusterifier build with Arc 7 c3 is a parallel research candidate.
 
 ---
 
-## Vocabulary (post-Arc-10)
-
-Terms used across post-Arc-10 dispatches and downstream docs. Defined here; referenced elsewhere — do not redefine.
-
-- **Reverse FE.** Envelope-expansion activity that runs outside the gated pipeline. Method: qualitative characterisation of the target cluster's entries → encoded hypothesis catalog (pre-registered, hashed before validation) → cheap separation tests → routing to classifier or filter path. Distinct from Step 4, which evaluates a fixed envelope and does not iterate on failure. Anti-snooping protocol mandatory.
-- **Classifier path.** Extend the entry-time feature envelope via new feature families (multi-TF trend alignment, pre-entry pattern context, volatility-regime descriptors, within-cluster sub-clustering), re-test through Step 4 on the extended envelope. Validation: AUC against existing gate (E ≥ 0.65 / D1 ≥ 0.60).
-- **Filter path.** Hand-engineer deterministic entry-time conditions (e.g. `D1 slope > X AND compression ratio < Y AND realised-vol-percentile > Z`) that select cluster-like setups by construction. Validate on post-filter trade-set P&L (Sharpe, expectancy, max DD), not classifier AUC. Sidesteps the AUC gate entirely. More robust at small N; interpretable. Acceptance criteria pending (backlog item).
-- **§16a Path A — disjunctive-gate ambiguity.** "Single criterion fail with margin < 0.03 → HALT" is ambiguous when a disjunctive Step 4 gate (E OR D1) fails on both criteria. Default reading: compound (Step 4 as one §8 gate → HALT). Strict reading (two numeric criteria → KILL) is available and should be documented in the closure when invoked. Arc 10 invoked compound. v2.4 cycle is the natural place to formalise.
-
 ## Conventions
 
-- **Queue ownership.** `results/ARC_QUEUE.md` is owned by exactly one CC session at any time. Sessions that are not the queue owner must not modify it. Parallel sessions on the same project must coordinate via the queue owner. Arc 10 ran on `claude/charming-mcnulty-8160e0` while Arcs 8/9/11 ran in a parallel session that held queue ownership.
-- **Determinism baseline.** `random_state=42`, `n_jobs=1`, `lineterminator="\n"` throughout for any work that must be byte-identical-reproducible. Audited via two-run sha256 comparison.
-- **Closure docs land at `docs/archive/arc_results/ARC_<N>_RESULT.md`** per L_ARC_PROTOCOL §13. LIVE docs are retired at closure. (Arc 7 onward.)
-
-## Activity catalog (downstream-route names)
-
-- **Pipeline E / Pipeline D1** — classifier-gated extractability per protocol §3 / §8.
-- **Reverse FE diagnostic** — envelope expansion outside the gated pipeline (pre-registered).
-- **Cross-arc clusterifier build** — multi-arc pool + extended feature catalog (e.g. V-shape pool with `L1_minus_L0_atr` mandatory).
-- **Filter-path probe** — deterministic conditions, P&L validation, post-filter trade-set metrics.
-- **v2.X calibration packet** — cross-arc cycle bundling closures + experimentation + WFO evidence for protocol amendments.
+- **Queue ownership.** `results/ARC_QUEUE.md` (if/when restored under v3.0) is owned by exactly one CC session at any time. Parallel sessions on the same project must coordinate via the queue owner.
+- **Determinism baseline.** `random_state=42`, `n_jobs=1`, `lineterminator="\n"` throughout. Audited via two-run sha256 comparison; CI-enforced at the mini-pipeline level via `tests/test_determinism.py`.
+- **Closure docs.** v3.0 arcs land closures at `results/<arc>/ARC_CLOSURE.md` per `docs/templates/ARC_CLOSURE_TEMPLATE.md` (current v1.3.1). Tracker parser invoked pre-PR per `scripts/tracker_parser/README.md`. Historical v1.x/v2.x closures preserved at `docs/archive/arc_results/ARC_<N>_RESULT.md`.
+- **Branch hygiene.** One worktree per active CC session; arc branches under `arc/<arc_name>`; infra branches under `infra/<work>`; cut from `origin/main`.
 
 ---
 
@@ -200,14 +187,15 @@ GPT-4 and Aider are permanently excluded from all implementation work.
 
 ---
 
-## Folder Convention (v2, Locked 2026-05-13)
+## Folder Convention
 
-All result documents are co-located with their artefacts under the arc folder.
-- L arc work: `results/l_arc_N/<step_subfolder>/...` (folder convention inherited from v1.x ops spec §2; v2.0 keeps the same layout).
-- Future non-L-arc work: same pattern under `results/<arc_name>/`.
-- `docs/` retained for non-arc-specific system specs (e.g. `docs/KH24_SYSTEM_LOCK.md`).
+All v3.0 result documents are co-located with their artefacts under the arc folder.
+- `results/<arc_name>/ARC_OPEN.md` + `ARC_CLOSURE.md`
+- `results/<arc_name>/step_<N>/` step artefacts
+- `results/<arc_name>/step_6/` (auto-dispatched) or `step_6_manual_<timestamp>/` (manual CLI)
+- `docs/` retained for non-arc system specs (`KH24_SYSTEM_LOCK.md`, `PROTOCOL_RUNTIME.md`, `BACKTESTER_ARCHITECTURE.md`, `DATA_FOUNDATION.md`, sub-protocols, audits, calibration).
 
-See `WORKFLOW.md` v2 for details.
+See `WORKFLOW.md` for branch + dispatch conventions.
 
 ---
 
@@ -215,11 +203,12 @@ See `WORKFLOW.md` v2 for details.
 
 - Prop firm: 5ers
 - Account constraints: max DD 10%, daily DD 5% — breach closes account permanently
-- Per-trade risk: KH-24 uses 1%; L arc uses 0.5%
-- Step 6 gate: DD < 8% applies to both PASS-DEPLOYABLE and PASS-VIABLE tiers; 8% is safety margin against the 10% prop limit
+- Per-trade risk: KH-24 uses 1% (live); v3.0 arcs use 0.5% as `r_base` (Amendment 3 scales to `r_safe` / `r_hard` at gate evaluation)
+- Daily DD measurement boundary: 5ers EET broker trading day (Amendment 6, PR #197)
+- Step 5 DD gates: ≤ 8% at `r_safe` (DEPLOYABLE), ≤ 10% at `r_hard` (VIABLE); both reflect safety margin against the 5ers hard limits
 
 ---
 
 ## Methodology in One Line
 
-WFO worst-fold at dual-tier disposition is the only judge of success. Pre-committed gates, accepted results, every phase a documented finding regardless of pass or fail. The protocol is the barrel; chat creativity is the aim within the barrel.
+L_PROTOCOL v3.0 overseer. Five steps as rankings; WFO at Step 5 is the only deployment gate; Step 6 causal audit is the lazy verdict-downgrade. Six architectures tested per arc under Amendment 5's four-gate dispatch rule. Risk-normalised gates (Amendment 3); EET daily-DD boundary (Amendment 6). First system clearing PASS-DEPLOYABLE ships and the project's 20%-annualised-on-$100k goal is met.

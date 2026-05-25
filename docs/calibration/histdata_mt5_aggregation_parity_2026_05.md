@@ -1,15 +1,17 @@
 # HistData → 5ers MT5 Aggregation Parity (2026-05)
 
-> **Source PR:** [PR #187 Signal Parity Engine](../../signal_parity_intent.md)
+> **Source PR:** PR #189 (signal parity engine)
 > **Author:** CC (jovial-mcnulty-1b0855)
 > **Date:** 2026-05-24
 > **Status:** investigation framework + DST findings; cross-broker 5-major comparison deferred to user pull from VPS
+>
+> **PR-numbering note:** the source dispatch (`CC_15_SIGNAL_PARITY_ENGINE.md`) used the notional label "PR #187"; the actual GitHub PR is #189. PR #187 was instead the heavy_ml_probe PR-A from a parallel chat. See TODO.md §"PR numbering convention" for the full mapping.
 
 ---
 
 ## §1 Why
 
-PR #187 changed the engine's bar boundary convention from UTC-anchored
+PR #189 changed the engine's bar boundary convention from UTC-anchored
 to 5ers-broker EET/EEST-anchored so that aggregated artefacts match
 what 5ers MT5 produces on the same M1 stream. This doc records:
 
@@ -100,7 +102,7 @@ It IS a short bar (1h instead of 4h) that downstream consumers should
 be aware of if they assume every H4 bar has exactly 4 real hours of
 underlying data.
 
-**Mitigation options** (not implemented in PR #187, candidates for
+**Mitigation options** (not implemented in PR #189, candidates for
 follow-up):
 - Drop the +24h artefact bar entirely (loses 1 hour of M1 data)
 - Merge into the next day's bar 0 (breaks per-day independence)

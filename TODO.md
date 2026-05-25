@@ -2,7 +2,7 @@
 
 > The operational todo list. Append, check off, delete as work completes.
 > Distinct from `ARC_TRACKER.md` (which is auto-updated arc state) and `ARC_HISTORY.md` (frozen pre-v3.0 record).
-> Last updated: 2026-05-25 (post-L_PROTOCOL Amendment 5 ratification — AUC-gated A2/A6 architecture selection + parser v1.3.1 field)
+> Last updated: 2026-05-25 (CC_22 comprehensive docs refresh — post-Phase-1-engine-build sweep)
 
 ---
 
@@ -17,16 +17,12 @@
 
 ## Current state — quick view
 
-- **Phase 0 — Framework validation:** 🟢 CLOSED (Phase 0a complete under Path B verdict per PR-E.1.7; Phase 0b skipped by chat decision)
-- **Phase 1 — Arc 1-11 re-runs:** 🟡 IN PROGRESS — Wave 1 partial (Arcs 8, 10, 11 closed; Arcs 5, 7 closures in flight via PRs #172 + #180); Wave 1 retries under signal-parity engine: 🔴 NOT STARTED
+- **Phase 0 — Framework validation:** 🟢 CLOSED (Phase 0a Path B verdict per PR-E.1.7; Phase 0b skipped by chat decision)
+- **Phase 1 — Arc 1-11 re-runs:** 🟡 IN PROGRESS — Wave 1 partial (Arcs 8 / 10 / 11 closed; Arcs 5 / 7 closures in flight via PRs #172 + #180); Wave 1 retries under signal-parity engine: 🔴 NOT STARTED (engine prerequisites now met as of PR #197 merge)
 - **Phase 2 — Sub-protocols + new signals:** 🔴 NOT STARTED (blocked on Phase 1 closure)
-- **Engine state:** post-PR-#189. Steps 1-5 wired end-to-end + signal parity (mid features + 5ers EET bars + worst-case fills). Step 6 framework wired via PR #188 (Amendment 4).
-- **Architectures wired:** A1, A2, A3, A4, A6 (A5 not built — deferred until Wave 2 produces ≥1 VIABLE candidate; Arc 8 first candidate)
-
-**HistData layer:** 🟢 DONE (28 pairs, 52 GB tick + 18 GB M1 derived; 2026-05-21 backup verified)
-**v3.0 backtester reconfig (CC_06):** 🟢 DONE (PR-A through PR-E.1.7 landed)
-**v3.0 protocol redesign:** 🟢 DONE (`L_PROTOCOL.md` finalised + Amendments 1, 2, 3, 4, 5 inline)
-**Repo cleanup + consolidation:** 🟢 DONE (branches cleaned; inventory + arc history complete)
+- **Engine state:** **post-PR-#197**. Steps 1-5 + signal parity (mid features + 5ers EET bars + worst-case fills) + Step 6 framework (Amendment 4) + Amendment 3 risk-normalised gates + Amendment 5 four-gate architecture selection + Amendment 6 EET daily-DD boundary + canonical exit-policy registry (incl. `sl_partial_close_1r_runner_trail`) + signal-level EET timezone canonical utility + EET session semantics across distance / reset-floor / per-day-max-DD.
+- **Architectures wired:** A1, A2, A3, A4, A6 (A5 not built — deferred until Wave 2 produces ≥ 1 VIABLE candidate; Arc 8 first candidate)
+- **Protocol state:** L_PROTOCOL v3.0 + Amendments 1, 2, 3, 4, 5, 6 inline (Amendment 6 inline-only per CC_22 — no archive file). Closure template v1.3.1. Parser v1.3 with Amendment-5 + Amendment-3 cutoff validation.
 
 ### Active parallel chat work
 
@@ -83,7 +79,7 @@
 |---|---|
 | Review `/mnt/project/` against new repo state | 🟢 |
 | Remove pre-reset docs (v2.x amendments, dispatch handovers, etc.) | 🟢 |
-| Sync currently-active docs (L_PROTOCOL, ARC_HISTORY, etc.) into project | 🟢 (synced through PR #189) |
+| Sync currently-active docs (L_PROTOCOL, ARC_HISTORY, etc.) into project | 🟢 (synced through PR #197) |
 
 ### Round 5 — Closure infrastructure
 
@@ -95,10 +91,11 @@
 | Build tracker parser `scripts/update_tracker_from_closure.py` | 🟢 | PR #179 built parser; PR #181 retrofitted Arcs 8/10/11 to template v1.2; PR #182 CC_11 follow-up backfilled parsed.log + parser registry |
 | Closure template v1.3 (Amendment 4 — Step 6) | 🟢 | PR #188 |
 | Parser v1.3 (template v1.3 detection + Phase 2 tightening, cutoff 2026-05-23T06:20:59Z) | 🟢 | PR #188 |
-| Closure template v1.3.1 (Amendment 5 — `architectures_skipped_by_amendment_5` field) | 🟢 | This PR |
-| Parser v1.3 Amendment-5 extension (optional field + Phase 2 enforcement, cutoff `AMENDMENT_5_CUTOFF_ISO` placeholder pending PR-merge backfill) | 🟢 | This PR |
+| Closure template v1.3.1 (Amendment 5 — `architectures_skipped_by_amendment_5` field) | 🟢 | PR #194 |
+| Parser v1.3 Amendment-5 extension (optional field + Phase 2 enforcement, cutoff `AMENDMENT_5_CUTOFF_ISO` placeholder pending PR-merge backfill) | 🟢 | PR #194 |
+| `docs/templates/TODO_REFRESH_TEMPLATE.md` committed | 🟢 | CC_22 PR (this) |
 
-### Round 6 — Engine consolidation (NEW)
+### Round 6 — Engine consolidation (initial sprint)
 
 | GitHub PR | Description | Status |
 |---|---|---|
@@ -107,6 +104,18 @@
 | #186 | L_PROTOCOL Amendment 3 implementation + A3/A4 wiring + Step 4/5 fixes | 🟢 merged 2026-05-23 |
 | #188 | Step 6 causal audit framework + Amendment 4 + parser v1.3 + closure template v1.3 | 🟢 merged 2026-05-24 |
 | #189 | Signal parity engine (mid features + trail mid + 5ers EET bar boundaries) | 🟢 merged 2026-05-24 |
+
+### Round 7 — Final Engine Consolidation (NEW)
+
+Closes the post-Round-6 engine sprint. All items merged 2026-05-25.
+
+| Item | Status | PR | Notes |
+|---|---|---|---|
+| Signal-level EET timezone audit + canonical alignment utility | 🟢 | #193 | `core/signals/htf_alignment.py`; 8 modules fixed; 33 new tests |
+| Amendment 5 — AUC-gated A2/A6 architecture selection + parser v1.3.1 field | 🟢 | #194 | Dispatch-time enforcement; engine unchanged |
+| Canonical exit-policy registry + `sl_partial_close_1r_runner_trail` primitive + per-arc migration | 🟢 | #195 | `core/sim/exit_policies/`; Account partial-fill semantics; 218-test reference parity |
+| EET session semantics: distance / reset_floor / `compute_per_day_max_dd` + **Amendment 6** | 🟢 | #197 | `core/time_utils/session_boundary.py`; `Panel.boundary_convention` propagation; daily-DD boundary now EET broker trading day |
+| CC_22 docs comprehensive refresh — post-Phase-1-engine-build state alignment | 🟢 | this PR | Tier 1-4 audit; full TODO + engine_capability_audit refresh; Amendment 6 prefatory block in L_PROTOCOL |
 
 ---
 
@@ -163,9 +172,9 @@ path is Sections G (news filter) + H (post-fill SL anchor) per
 | Wave 1 closures: Arcs 8, 10, 11 | 🟢 | |
 | Wave 1 closures: Arcs 5, 7 | 🟡 | PRs #172 + #180 open |
 | Arcs 8/10/11 retroactive Amendment-3 re-evaluation | 🟢 | PR #177 |
-| Arc 5 v3.0.1 retry under signal-parity engine + Amendment 3 gates | 🔴 | Blocked on PR #172 closure + signal-parity engine merged (#189 ✓) |
-| Arc 7 v3.0.1 retry | 🔴 | Blocked on PR #180 closure + signal-parity engine merged |
-| Arc 10 re-run on signal-parity engine for definitive verdict | 🔴 | Procedure documented at [docs/calibration/arc_10_signal_parity_rerun_2026_05.md](docs/calibration/arc_10_signal_parity_rerun_2026_05.md); expected near-zero delta |
+| Arc 5 v3.0.1 retry under signal-parity engine + Amendment 3 gates + signal-EET fix | 🔴 | Blocked on PR #172 closure. Engine prerequisites met (PRs #189, #193, #197). |
+| Arc 7 v3.0.1 retry | 🔴 | Blocked on PR #180 closure. Engine prerequisites met. |
+| Arc 10 signal-parity rerun on UTC convention | 🔴 | Procedure documented at [docs/calibration/arc_10_signal_parity_rerun_2026_05.md](docs/calibration/arc_10_signal_parity_rerun_2026_05.md); expected near-zero delta. PR #193 + Amendment 6 do NOT change Arc 10 UTC-baseline numbers. |
 | Wave 1 closes (cross-arc tracker review for patterns) | 🔴 | Gated on retries above |
 | Dispatch Wave 2 (6 arcs in parallel) | 🔴 | Gated on Wave 1 close. **Wave 2 dispatches must apply L_PROTOCOL Amendment 5 four-gate architecture-selection rule from first dispatch** (Phase 1 chat-side; out of scope for this PR). |
 | Wave 2 closes; cross-arc synthesis | 🔴 | |
@@ -210,46 +219,55 @@ All 🔴 NOT STARTED — defer to Phase 2 trigger.
 |---|---|---|
 | A5 portfolio composition spec + build | 🔴 | Deferred until Wave 2 produces VIABLE candidates. Arc 8 first candidate. |
 | Full-window sim for chained DD (`chained_dd_method: full_window_sim`) | 🔴 | v3.0.2 follow-up; replaces equity-stitching default from PR #186. Required post-Wave-2 per closure template v1.3. |
-| Audit doc footer (items MISSING → WIRED as they ship) | 🟡 | PR #189 began this with the signal-parity footer; further audits as engine items WIRE up |
+| Audit doc footer (items MISSING → WIRED as they ship) | 🟢 | engine_capability_audit_2026_05.md refreshed in CC_22 with post-PR-#197 footer |
 | Arc 8 closure §10 correction | 🔴 | `primary_failure_mode` → `step5_not_scalable`; tracker per-failure-mode adjustment |
 | Cross-platform CI | 🔴 | Linux-only currently; user dev is Windows. Non-blocking housekeeping. |
 | Closure-writer YAML auto-emission | 🔴 | Currently hand-written; defer until orchestrator gains closure-emit capability |
-| Legacy engine retirement (migrate `live/run_daily.py` + 32 importers off `core/backtester.py` + `core/signal_logic.py`) | 🔴 | Gate: KH-24 anchor preservation (±0.5pp ROI / ±1pp DD). Out of scope for PR #189; separate dispatch needed. |
+| Legacy engine retirement (migrate `live/run_daily.py` + 32 importers off `core/backtester.py` + `core/signal_logic.py`) | 🔴 | Gate: KH-24 anchor preservation (±0.5pp ROI / ±1pp DD). Out of scope for current PRs; separate dispatch needed. |
 | EA mid-trail update (live MT5 EA still uses bid-side `CopyClose`) | 🔴 | To restore backtest↔EA parity post-PR-#189; separate deployment PR |
-| Backfill `AMENDMENT_5_CUTOFF_ISO` in `scripts/tracker_parser/schema.py` with the actual PR-merge timestamp post-merge | 🔴 | Placeholder pinned at `2026-05-23T00:00:00Z` at landing time; mirror PR-186 / Amendment 3 backfill pattern. Trivial one-line follow-up PR. |
+| Backfill `AMENDMENT_5_CUTOFF_ISO` in `scripts/tracker_parser/schema.py` with PR #194 merge timestamp | 🔴 | Placeholder pinned at `2026-05-23T00:00:00Z`. Mirror PR-186 / Amendment 3 backfill pattern. Trivial one-line follow-up PR. |
+| KH-24 anchor F2/F3 fold-2 anchor-drift bisect investigation | 🔴 | Pre-existing on main; F2/F3 divergence between legacy `KH24FoldRunner` (warmup_days=30) and A1 path (full-history warmup). Documented; queued investigation. |
+| Triple-spread sensitivity diagnostic (Step 6 §6.3 enhancement) | 🔴 | Optional Step 6 framework enhancement |
+| HistData ↔ 5ers MT5 spread comparison (calibration task) | 🔴 | User-side; procedure at [docs/calibration/histdata_mt5_aggregation_parity_2026_05.md §5](docs/calibration/histdata_mt5_aggregation_parity_2026_05.md) |
+| Cross-arc V-shape clusterifier (Phase 2 research) | 🔴 | EXP-05 pool: AUC 0.6348 with `L1_minus_L0_atr` mandatory. Arc 7 c3 + Arc 10 c1 pooled. Leading v2.4-era candidate; carry into Phase 2. |
+| Closure-writer YAML auto-emission | 🔴 | Quality-of-life; defer |
 
 ---
 
 ## Standing items / open questions
 
 - **Signal parity gap:** 🟢 RESOLVED via PR #189 (mid-price feature refactor + 5ers EET bar boundaries). All future engine output is venue-independent. Pre-PR-#189 closures (Arcs 8, 10, 11; Arcs 5, 7 closures in flight) carry venue-specific signal artefacts; retries documented in Phase 1 task list.
+- **Signal-module timezone gap:** 🟢 RESOLVED via PR #193 (canonical `core/signals/htf_alignment.py` utility + 8 modules fixed). Audit at `docs/audits/signal_module_eet_audit_2026_05.md`.
+- **EET session semantics gap:** 🟢 RESOLVED via PR #197 (Amendment 6; daily-DD boundary aligned to EET broker trading day; `core/time_utils/session_boundary.py` canonical). Three convention-aware consumers wired: `distance.py`, `reset_floor.py`, `compute_per_day_max_dd`.
 - **5ers timezone verification:** PR #189 assumes 5ers = EET/EEST (EU DST rules). User to verify against 5ers documentation. If NY-close session rollover, a small follow-up PR adjusts the boundary convention parameter (engine code is convention-parameterised already).
 - **HistData ↔ 5ers MT5 4H comparison (5 majors):** User pulls 5ers MT5 H4 closes from VPS for EURUSD/GBPUSD/USDJPY/AUDUSD/USDCAD over a 30-day post-2020 window; comparison procedure in [docs/calibration/histdata_mt5_aggregation_parity_2026_05.md §5](docs/calibration/histdata_mt5_aggregation_parity_2026_05.md). Acceptance: per-pair mean abs diff <5 pips on majors.
 - **5ers_eet cache build for 28 pairs × 7 TFs:** One-time workstation operation per PROTOCOL_RUNTIME.md §15.3.
 - **Cross-asset data (DXY / US10Y / SPX as features):** on hold per user. Revisit if Phase 1 doesn't produce deployable.
-- **KH-24 live VPS health:** confirmed running normally on 5ers MT5 broker feed. Independent of local data state. Untouched by PR #189 (legacy engine path preserved).
+- **KH-24 live VPS health:** confirmed running normally on 5ers MT5 broker feed. Independent of local data state. Untouched by Phase-1-engine-build sprint (legacy engine path preserved).
 - **OpenWebUI / OpenClaw:** evaluated and skipped — no immediate value.
 - **Obsidian:** skipped — user doesn't search docs themselves.
-- **`STATUS.md` and `CHANGELOG.md`:** untouched by reset. User decides if reset/delete or retain as historical record.
+- **`STATUS.md` and `CHANGELOG.md` and `SESSION_ZERO.md`:** untouched by reset and untouched by CC_22 per chat decision. Pre-v3.0 legacy; separate cleanup decision not in scope.
 
 ---
 
 ## Doc set state
 
 ### Locked / ready
-- `L_PROTOCOL.md` (v3.0 + Amendments 1, 2, 3, 4, 5 inline) 🟢
+- `L_PROTOCOL.md` (v3.0 + Amendments 1, 2, 3, 4, 5, 6 inline) 🟢
 - `ARC_HISTORY.md` (frozen) 🟢
 - `docs/templates/ARC_CLOSURE_TEMPLATE.md` v1.3.1 🟢
+- `docs/templates/TODO_REFRESH_TEMPLATE.md` (NEW, CC_22 PR) 🟢
 - `ARC_TRACKER.md` (parser-auto-updated) 🟢
 - `scripts/update_tracker_from_closure.py` (parser; supports template v1.0 / v1.1 / v1.2 / v1.2.1 / v1.3 / v1.3.1) 🟢
 - `docs/sub_protocols/heavy_ml_probe.md` (spec; engine build in flight via PR #187) 🟢
 - `docs/sub_protocols/signal_discovery_probe.md` (spec + engine wired via PR #175) 🟢
-- `docs/audits/engine_capability_audit_2026_05.md` (PR #184; footer updated by PR #189 with signal-parity gap closure) 🟢
-- `docs/calibration/histdata_mt5_aggregation_parity_2026_05.md` (NEW, from PR #189) 🟢
-- `docs/calibration/arc_10_signal_parity_rerun_2026_05.md` (NEW, from PR #189 Task 4) 🟢
-- `docs/BACKTESTER_ARCHITECTURE.md`, `docs/PROTOCOL_RUNTIME.md` (updated through PR #189) 🟢
+- `docs/audits/engine_capability_audit_2026_05.md` (REFRESHED in CC_22 PR with post-PR-#197 footer summarising items resolved across PRs #185-#197) 🟢
+- `docs/audits/signal_module_eet_audit_2026_05.md` (landed PR #193) 🟢
+- `docs/calibration/histdata_mt5_aggregation_parity_2026_05.md` (from PR #189; PR-# corrections in CC_22) 🟢
+- `docs/calibration/arc_10_signal_parity_rerun_2026_05.md` (from PR #189; PR-# corrections + PR #193 / Amendment 6 impact notes in CC_22) 🟢
+- `docs/BACKTESTER_ARCHITECTURE.md`, `docs/PROTOCOL_RUNTIME.md` (updated through PR #197 + CC_22 refresh; Amendment 5 architecture-selection note added) 🟢
 - `REPO_INVENTORY.md` (classification of pre-reset .md files) 🟢
-- `README.md`, `CLAUDE.md`, `project_brief.md` (active orientation) 🟢
+- `README.md`, `CLAUDE.md`, `project_brief.md`, `WORKFLOW.md` (CC_22 comprehensive refresh) 🟢
 
 ### To create
 - Step 6 framework auto-dispatch verification on first PASS arc (Wave 2)
@@ -278,13 +296,15 @@ All 🔴 NOT STARTED — defer to Phase 2 trigger.
 
 | Doc | Update cadence |
 |---|---|
-| `L_PROTOCOL.md` | Only at major redesign events (Amendments are inline) |
+| `L_PROTOCOL.md` | Only at major redesign events (Amendments are inline; current: 1-6) |
 | `docs/sub_protocols/*` | When sub-protocol is amended |
 | `docs/templates/ARC_CLOSURE_TEMPLATE.md` | Only at template version bump (locked at v1.3.1) |
+| `docs/templates/TODO_REFRESH_TEMPLATE.md` | Stable — generic placeholders, rarely changed |
 | `ARC_TRACKER.md` | Auto on arc open/close via parser (`scripts/update_tracker_from_closure.py`) |
 | `ARC_HISTORY.md` | Never (frozen at v3.0 start) |
-| `TODO.md` (this file) | Manually as work progresses; full rewrites rare (every 2-3 months at major state transitions) |
-| `README.md`, `CLAUDE.md`, `project_brief.md` | Rarely |
+| `TODO.md` (this file) | Manually as work progresses; full rewrites every 2-3 weeks at major state transitions or after substantial PR clusters |
+| `README.md`, `CLAUDE.md`, `project_brief.md` | Rarely; bundled with TODO refresh |
+| `WORKFLOW.md` | When operational conventions evolve |
 | `BACKTESTER_ARCHITECTURE.md`, `DATA_FOUNDATION.md`, `PROTOCOL_RUNTIME.md` | When backtester / data source / runtime changes |
 | Per-arc `ARC_OPEN.md` / `ARC_CLOSURE.md` | Write-once |
 | `docs/calibration/*` | Per calibration / cross-broker run; ad-hoc |
@@ -303,5 +323,10 @@ This file uses **GitHub PR numbers** throughout. Earlier internal dispatch markd
 | CC_15 "PR #187 signal parity" | **PR #189** | Signal parity engine (this is the dispatch's notional "PR #187") |
 | (not in CC_15 dispatch) | PR #187 | heavy_ml_probe PR-A (parallel chat) |
 | (not in CC_15 dispatch) | PR #188 | Step 6 causal audit framework + Amendment 4 + parser v1.3 (this mastermind chat) |
+| (not in any dispatch label) | PR #193 | Signal-level EET timezone audit + fix |
+| (not in any dispatch label) | PR #194 | Amendment 5 — AUC-gated A2/A6 + parser v1.3.1 field |
+| (not in any dispatch label) | PR #195 | Canonical exit-policy registry + `sl_partial_close_1r_runner_trail` |
+| CC_20 "EET session semantics" | **PR #197** | EET session semantics + Amendment 6 daily-DD boundary |
+| CC_22 "Comprehensive docs refresh" | this PR | Post-Phase-1-engine-build docs sweep |
 
 When referring to historical PR numbers within closure docs or dispatch logs, the dispatch's notional label is the source of truth for that closure's narrative; the table above provides the bridge to current GitHub state.

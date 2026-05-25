@@ -52,13 +52,13 @@ below.
 
 ---
 
-## Data layer (PR-A; PR #187 EET extension)
+## Data layer (PR-A; PR #189 EET extension)
 
-Under PR #187, the M1→TF aggregator supports two bar-boundary
+Under PR #189, the M1→TF aggregator supports two bar-boundary
 conventions via `boundary_convention=` parameter:
 
 - `"utc"` (default, legacy) — UTC-anchored bins; existing caches
-  byte-identical to pre-PR #187.
+  byte-identical to pre-PR #189.
 - `"5ers_eet"` — 5ers broker EET/EEST-anchored; per-day re-anchored
   for H4 to handle DST transitions. Cache namespace
   `data/cache/<TF>_5ers_eet/<PAIR>.parquet`.
@@ -129,17 +129,17 @@ See [PROTOCOL_RUNTIME.md §15.5](PROTOCOL_RUNTIME.md).
   any external floor file (L_PROTOCOL §1 non-negotiable, enforced
   since PR-B).
 
-## Spread + sim (PR-B; PR #187 updates)
+## Spread + sim (PR-B; PR #189 updates)
 
 - **`core.spread.real_spread`** — per-bar spread + tradability mask +
   data-quality summary.
 - **`core.sim.fill`** — 8 bar-level fill primitives. Long entry =
   `open_ask`, long exit = `close_bid`, intra-bar SL/TP triggered
   against `low_bid`/`high_bid`. Short symmetric. Worst-case fills
-  satisfy PR #187 Sub-change B — spread is implicit in the bid/ask
+  satisfy PR #189 Sub-change B — spread is implicit in the bid/ask
   wings, no separate deduction step.
 - **`core.sim.trailing_stop.TrailManager`** — trail activation +
-  ratchet operate on **mid close** under PR #187 (signal-parity
+  ratchet operate on **mid close** under PR #189 (signal-parity
   convention; reverses PR-E.1.6's bid-only trail). Trail hit detection
   remains bid-side for worst-case-fill realism. See
   [PROTOCOL_RUNTIME.md §15.2](PROTOCOL_RUNTIME.md).

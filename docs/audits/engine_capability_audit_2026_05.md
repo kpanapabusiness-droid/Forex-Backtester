@@ -1,45 +1,64 @@
-# Engine Capability Audit — 2026-05-23
+# Engine Capability Audit — 2026-05-23 (refreshed 2026-05-25 post-PR-#197)
 
-> Read-only enumeration of which L_PROTOCOL v3.0 (+ Amendments 1/2/3) capabilities are wired end-to-end, partially wired, or missing.
-> Methodology: every claim cites the file + arc/test that exercised it (WIRED), or the file + scope estimate (PARTIAL/MISSING).
-> No engine code changed.
-> CC_12 (Step 4 holdout-window training filter + classifier persistence) is in flight — items it covers are classified PARTIAL against current `main`.
-> Wave 1 = Arcs 5, 7 in flight + 8, 10, 11 closed. Wave 2 (not dispatched yet) = Arcs 4 RERUN, 4, 6, 3, 1, 2. Phase 2 = sub-protocols + 6 new signal classes.
+> Read-only enumeration of which L_PROTOCOL v3.0 (+ Amendments 1-6) capabilities are wired end-to-end, partially wired, or missing.
+> Methodology: every claim cites the file + arc/test/PR that exercised it (WIRED), or the file + scope estimate (PARTIAL/MISSING).
+> **Refreshed 2026-05-25 in CC_22:** post-Phase-1-engine-build sprint (8 PRs: #185 / #186 / #188 / #189 / #193 / #194 / #195 / #197). Most prior MISSING items are now WIRED. Per-section statuses below reflect current `main` (commit `198d78f`). See "Post-Phase-1-engine-build summary" at end for the PR-by-PR resolution map.
+> Wave 1 = Arcs 5, 7 closures in flight + 8, 10, 11 closed. Wave 2 (not dispatched yet) = Arcs 4 RERUN, 4, 6, 3, 1, 2. Phase 2 = sub-protocols + 6 new signal classes.
 
 ---
 
-## Executive summary
+## Executive summary (refreshed 2026-05-25)
 
 - **Total capabilities audited:** 68
-- **WIRED:** 30
-- **PARTIAL:** 24
-- **MISSING:** 13
-- **UNKNOWN:** 1 (A4 trail-precedence semantics under exit predicate — needs runtime inspection)
+- **WIRED:** 56 (was 30 at original audit)
+- **PARTIAL:** 9 (was 24)
+- **MISSING:** 2 (was 13) — A5 portfolio composition + heavy_ml_probe engine path
+- **UNKNOWN:** 1 (A4 trail-precedence semantics — original status; downgraded to documented in PROTOCOL_RUNTIME §"A4 same-bar exit precedence" via PR #195)
 
-### Blocks Wave 2 dispatch (must clear before Wave 2 arcs run cleanly)
+### Tier 1 — Was "Blocks Wave 2 dispatch"; now ✅ MOSTLY CLEARED
 
-1. **Amendment 3 engine emission (MISSING).** No engine site emits `step_5/per_day_max_dd_base.parquet`, `chained_max_dd_base_pct`, scaled-risk holdout re-runs, `k_safe` / `r_safe` / `k_hard` / `r_hard`, or the sizing-convention check. The tracker parser schema knows the field names (`scripts/tracker_parser/schema.py:80+`) but no engine writes them. Wave 2 arcs producing PASS candidates will land closures that are PROVISIONAL by construction, as Arc 10's already is ([results/l_arc_10/ARC_CLOSURE.md](results/l_arc_10/ARC_CLOSURE.md): "Engine re-run with continuous-equity tracking + per-day max-DD emission still recommended for definitive measurement").
-2. **`core/wfo/gates.py` is pre-Amendment-3.** `classify_fold_stats` evaluates raw-risk only; no scalability bounds, no priority-ordered failure modes, no `step5_not_scalable` / `step5_chained_dd_above_gate` emission ([core/wfo/gates.py:120-193](core/wfo/gates.py:120)). Until this is rewritten, every closure must hand-derive risk-normalised verdicts (Arc 10's §10 re-evaluation table is the manual workaround).
-3. **Step 4 lineage filter silent-bypass (PARTIAL).** `_filter_lineage` checks for column `causal_lineage` ([core/steps/step_4_extraction.py:94](core/steps/step_4_extraction.py:94)); `feature_lineage_dataframe` emits column `lineage` ([core/features/pipeline.py:62](core/features/pipeline.py:62)). Result: every Arc using `compute_feature_matrix` (Arc 11 confirmed) silently skips the lineage filter and trains on every feature regardless of tag. Bug; not a CC_12 item.
-4. **Step 4 holdout-window training filter + classifier persistence (PARTIAL, CC_12 in flight).** Step 4 trains on full pool via 5-fold TimeSeriesSplit without restricting to `train_end ≤ 2020-12-31` ([core/steps/step_4_extraction.py:222-265](core/steps/step_4_extraction.py:222)); returns only `best_classifier: str`, not a fitted model. Arc 11 works around both by manually prefitting on `entry_time < 2021-01-01` ([scripts/l_arc_11/run.py:191-218](scripts/l_arc_11/run.py:191)). CC_12 PR will land both fixes.
-5. **`ArcOrchestrator._run_step_5` doesn't plumb `run_context` (PARTIAL).** Orchestrator's `_runner` constructs `ArcFoldRunner` without passing `run_context` ([core/arc/arc_orchestrator.py:174-181](core/arc/arc_orchestrator.py:174)), so A2/A6 (which require `per_trade_features` via `A1RunContext`) silently run as no-admit baselines. Arc 11 bypasses by invoking `run_search` directly ([scripts/l_arc_11/run.py:1-32](scripts/l_arc_11/run.py:1)). Documented as a closure cross_arc_tag `canonical_orchestrator_step5_run_context_gap`.
-6. **Per-fold retrain orchestration for A3/A4 (MISSING).** A3 and A4 accept a pre-fit `PathClassifierFit` via `arch_config` ([core/architectures/a3_pipeline_de.py:78](core/architectures/a3_pipeline_de.py:78), [core/architectures/a4_pipeline_d_exits.py:67](core/architectures/a4_pipeline_d_exits.py:67)). Per Amendment 2 §"A3" / §"A4" a NEW classifier must be trained per fold (not reused across folds). No driver code instantiates the per-fold retrain loop — only the pre-fit-once pattern exists. Any Wave 2 arc dispatching A3 or A4 against the v3.0 architecture set would need this orchestration first.
+1. **Amendment 3 engine emission:** ✅ **WIRED via PR #186.** `core.wfo.amended_gates`, `core.wfo.chained_dd`, `core.wfo.holdout_rerun`, `core.runners._fold_stats_helpers.compute_per_day_max_dd` + `core.arc.arc_orchestrator._run_amendment_3_evaluation`. Per-day max-DD parquet, chained DD via equity-stitching (v3.0.2 follow-up: full-window sim), scaled-risk holdout re-runs, priority-ordered failure-mode taxonomy — all emitted automatically when `s5.top_k` non-empty.
+2. **`core/wfo/gates.py` Amendment-3 rewrite:** ✅ **WIRED via PR #186** — `amended_gates.classify_amended_fold_stats(...)` returns `AmendedGateResult` with every Amendment-3 tracker field. Legacy `classify_fold_stats` preserved for backwards-compatibility; the new gate runs on top.
+3. **Step 4 lineage filter column-name mismatch:** ✅ **WIRED via PR #185** — column name reconciled (`lineage` ↔ `causal_lineage`). `_filter_lineage` now enforces lineage tags at training time.
+4. **Step 4 holdout-window training filter + classifier persistence:** ✅ **WIRED via PR #185.** `Step4Result.per_cluster[*].fitted_classifier_path` + `core/steps/classifier_persistence.py` with SHA256 + provenance manifest; `train_end` parameter restricts CV + refit to IS-only; A2 / A6 instantiate via `build_a2_config_from_step4` / `build_a6_config_from_step4` with no Step-5 retrain (per Amendment 2 lock).
+5. **`ArcOrchestrator._run_step_5` `run_context` plumbing:** ✅ **WIRED via PR #186** — `ArcConfig.auto_arch_specs` tuple drives Step-5 dispatch; orchestrator builds `A1RunContext` from `cfg.feature_matrix` and threads through every `ArcFoldRunner`. A2 / A6 admit gates now operational via orchestrator (was: arc-script bypass only).
+6. **Per-fold retrain orchestration for A3 / A4:** ✅ **WIRED via PR #186** — `core/steps/path_classifier_per_fold.py` builds per-fold `PathClassifierFit` (target = cluster membership for A3; `final_r > 0` for A4). Threaded via `A1RunContext.path_classifier_fits`. Cost-decomposition emitted per top-K in `StrategyResult.metadata`.
 
-### Blocks Phase 2 sub-protocols
+### Tier 2 — Blocks Phase 2 sub-protocols
 
-1. **`heavy_ml_probe` engine path (MISSING).** `docs/sub_protocols/heavy_ml_probe.md` specifies autogluon / FLAML AutoML inside CV, meta-labeling target, survival-models (Cox PH / RSF) for Pipeline D. Grep for `autogluon|FLAML|CoxPH|RandomSurvivalForest|survival` in `core/` returns zero matches. Spec-only.
-2. **`signal_discovery_probe` is not integrated via the sub-protocol registry (PARTIAL).** Engine path exists at `core/discovery/` + `scripts/arc_discovery_01/run_discovery.py` and is documented as ready for the 10k run ([ARC_TRACKER.md:14](ARC_TRACKER.md:14): "Step 1 — infrastructure landed; full 10k run pending compute slot"). But the sub-protocol registry at `core/arc/sub_protocol.py` is empty (`_REGISTRY: dict[str, Mapping[str, StepOverride]] = {}` — no `signal_discovery_probe` registered). Sub-protocols invoke via standalone scripts today, not via the `ArcOrchestrator` Protocol §5 hook.
+1. **`heavy_ml_probe` engine path:** **MISSING — in flight via PR #187 (parallel chat).** Spec at `docs/sub_protocols/heavy_ml_probe.md`. PR #187 PR-A landed; PR-B/C/D/E/F to follow per build plan. Engine still does not import autogluon/FLAML/lifelines/scikit-survival.
+2. **`signal_discovery_probe` sub-protocol registry registration:** PARTIAL — engine path operational via PR #175 standalone CLI; sub-protocol registry at `core/arc/sub_protocol.py` still empty. Cosmetic for Phase 2; the standalone CLI invocation pattern works.
 
-### Blocks specific Wave-1-in-flight arc work
+### Tier 3 — Was "Blocks specific Wave-1-in-flight arc work"; now mixed
 
-1. **`ArcOrchestrator` doesn't auto-build the feature matrix.** `ArcConfig.feature_matrix` and `feature_lineage` are required external inputs ([core/arc/arc_orchestrator.py:69-70](core/arc/arc_orchestrator.py:69)). Arcs 5 and 7 in flight must hand-roll feature-matrix construction (as Arc 11 did at [scripts/l_arc_11/run.py:138-178](scripts/l_arc_11/run.py:138)). Cosmetic friction, not a hard blocker.
-2. **Integrity report missing 3 of 6 protocol checks.** `core/arc/integrity.py` emits pool_size, per_pair_distribution, coverage_window, lookahead_spot (declared-lineage only — no actual trace), determinism. **Missing:** D1-lag NaN-perturbation test, spread-floor activation rate per pair, KH-24 co-fire rate. L_PROTOCOL §2 Step 1 lists all six. Arcs in flight report these by hand (Arc 10 Step 1 banner mentions "3/3 D1-lag NaN-perturbation" — done outside the integrity report).
+1. **`ArcOrchestrator` auto-feature-matrix construction:** PARTIAL — `ArcConfig.feature_matrix` still required as external input. Wave 1 arcs (5, 7) carry the hand-roll pattern from Arc 11. Cosmetic.
+2. **Integrity report 3-of-6 missing checks:** PARTIAL unchanged (D1-lag NaN-perturbation, spread-floor activation, KH-24 co-fire still by-hand at arc-script level).
+
+### Tier 4 — Step 6 framework
+
+✅ **WIRED via PR #188 (Amendment 4).** Full six-category framework at `core/step_6/`. Auto-dispatches on Top-1 PASS candidate per Amendment 4; manual CLI at `scripts/run_step_6.py`. Closure template v1.3 + parser v1.3 + tracker registry. See post-audit append §"Post-audit update — 2026-05-24 (L_PROTOCOL Amendment 4 / CC_17)" below for the per-capability migration.
+
+### Tier 5 — Signal parity + EET session semantics
+
+✅ **WIRED via PRs #189 + #193 + #197 (Amendment 6).**
+
+- PR #189: mid-price features + 5ers EET bar boundaries + worst-case fills. Engine output venue-independent.
+- PR #193: signal-module timezone alignment via canonical `core/signals/htf_alignment.py`. 8 modules fixed; pre-commit lint rule blocks regression.
+- PR #197 / Amendment 6: 5ers EET broker trading day is the daily-DD measurement boundary. `core/time_utils/session_boundary.utc_to_eet_trading_day` is the single source of truth; `Panel.boundary_convention` carries the choice through orchestrator slicing. Three convention-aware consumers: `distance.py`, `reset_floor.py`, `compute_per_day_max_dd` (load-bearing).
+
+### Tier 6 — Canonical exit-policy registry
+
+✅ **WIRED via PR #195.** `core/sim/exit_policies/` with `ExitPolicy` ABC + six registered policies including `sl_partial_close_1r_runner_trail` (Arc 10's load-bearing exit). Account partial-fill semantics added (`partial_close`, `current_size_of`, `_current_sizes`, `ClosedTrade.parent_position_id`). Driver wiring + per-arc migration (Arc 10 v3, Arc 8) complete; 218 byte-identical reference-parity tests.
+
+### Tier 7 — Architecture selection (Amendment 5)
+
+✅ **DOCUMENTED via PR #194.** Engine unchanged (all six architectures wired post-PR-186); enforcement is dispatch-time. Closure template v1.3.1 adds `architectures_skipped_by_amendment_5` optional field; parser v1.3 validates it on post-cutoff PASS verdicts.
 
 ### Housekeeping / non-blocking
 
-- Closure-writer template `core/arc/_closure_template.py` emits a generic skeleton ([core/arc/_closure_template.py:37-88](core/arc/_closure_template.py:37)) — does NOT emit v1.2 `§1 tracker_payload` YAML block, `best_architecture` fields, or `§4 deployment_spec`. Every closure to date is hand-written or retrofitted by arc scripts (Arcs 8/10/11). PARTIAL.
-- CI runs `ubuntu-latest` only (no Windows runner) — cross-platform byte-identical reproduction is not tested in CI ([.github/workflows/ci.yml:7](.github/workflows/ci.yml:7)). Two-run sha256 within a single platform IS exercised by [tests/test_determinism.py](tests/test_determinism.py).
-- Step 6 framework is essentially MISSING as protocol-level infrastructure. Arc 10's Step 6 was hand-written + had an arc-specific byte-compare script ([scripts/l_arc_10_v3/step_6_byte_compare.py](scripts/l_arc_10_v3/step_6_byte_compare.py)).
+- Closure-writer template `core/arc/_closure_template.py` still emits generic skeleton; v1.3.1 `§1 tracker_payload` YAML block + §4 deployment_spec still hand-written. PARTIAL unchanged.
+- CI runs `ubuntu-latest` only; no Windows runner. PARTIAL unchanged. Two-run sha256 within Linux IS exercised.
+- Arc 8 v3.0 closure §10 correction (`primary_failure_mode` → `step5_not_scalable`) — pending; tracked in TODO.md.
 
 ---
 
@@ -140,26 +159,21 @@
 - **Status:** WIRED
 - **Evidence:** `permutation_importance(model, X_test, y_test, n_repeats=5, random_state=42, n_jobs=1)` ([core/steps/step_4_extraction.py:171-178](core/steps/step_4_extraction.py:171)). Aggregated per cluster + classifier + fold; mean importance ranked descending ([core/steps/step_4_extraction.py:292-302](core/steps/step_4_extraction.py:292)).
 
-#### Holdout-window training filtering (CC_12 in flight)
-- **Status:** PARTIAL — being addressed in CC_12 PR (in flight)
-- **Evidence:** `run_step_4` does NOT restrict training data to IS window. It accepts trades and runs `TimeSeriesSplit` over the entire sorted-by-`entry_time` pool ([core/steps/step_4_extraction.py:222](core/steps/step_4_extraction.py:222)). The 5-fold split's final fold's TEST partition includes holdout-window trades.
-- **Arc-side workaround:** Arc 11 pre-fits the deployment classifier on `entry_time < 2021-01-01` ([scripts/l_arc_11/run.py:191-218](scripts/l_arc_11/run.py:191)) AFTER Step 4 has been run on the full pool. So Step 4 metrics are reported on a CV that includes holdout, but the actual deployed classifier (A2/A6 input) is trained only on IS.
-- **Scope:** Half-day engine PR — add `is_end: date | None` parameter to `run_step_4`, filter trades by `entry_time <= is_end`, propagate through call sites. CC_12 already includes this.
+#### Holdout-window training filtering
+- **Status:** **WIRED** (PR #185)
+- **Evidence:** `run_step_4` accepts `train_end: pd.Timestamp | None` parameter; restricts CV + refit to `entry_time < train_end`. Orchestrator threads `train_end` from `WfoStructure.holdout.oos_start`. Persisted classifier manifest records `train_end` field; `trained_on_pool_size` reflects IS-only subset.
 
-#### Fitted classifier persistence (CC_12 in flight)
-- **Status:** PARTIAL — being addressed in CC_12 PR (in flight)
-- **Evidence:** `Step4Result.per_cluster[*].best_classifier` is `str` ("rf"/"lgbm"/"lr") not the fitted model object ([core/steps/step_4_extraction.py:60-72](core/steps/step_4_extraction.py:60)). Arc 11 manually rebuilds the classifier via `prefit_classifier` ([scripts/l_arc_11/run.py:191-218](scripts/l_arc_11/run.py:191)) — wasteful (re-trains on a separately-constructed IS subset) and a hand-rolled bypass.
-- **Scope:** Half-day engine PR — extend `ClusterExtraction` to hold the fitted model + return alongside metrics. CC_12 already includes this.
+#### Fitted classifier persistence
+- **Status:** **WIRED** (PR #185)
+- **Evidence:** `Step4Result.per_cluster[*].fitted_classifier_path` (pathlib.Path) + `fitted_classifier_type` + `fitted_classifier_feature_order`. Joblib-pickled to `step_4/classifiers/<cluster_id>.pkl` with `step_4/classifiers/manifest.json` SHA256 + provenance (joblib/sklearn/lightgbm versions, `auc_in_sample`, `auc_oos_cv5`, `trained_on_pool_size`, feature_order, `best_threshold`, `classifier_name`). `core/steps/classifier_persistence.py:load_classifier(path)` SHA256-verifies before load and warns on version drift. `build_a2_config_from_step4` + `build_a6_config_from_step4` instantiate A2 / A6 configs directly from Step 4 output (no Step-5 retrain per Amendment 2 lock).
 
 #### Feature-importance pipeline end-to-end
 - **Status:** WIRED
 - **Evidence:** `Step4Result.feature_importance` aggregates per (cluster, classifier, fold, feature) rows; mean + std emitted; orchestrator writes `step_4/feature_importance.csv` ([core/arc/arc_orchestrator.py:311-313](core/arc/arc_orchestrator.py:311)). Confirmed in Arc 11's `step_4_per_cluster.top_10_features` field ([scripts/l_arc_11/run.py:586-589](scripts/l_arc_11/run.py:586)).
 
 #### Lineage filter (additional finding)
-- **Status:** PARTIAL — bug in current `main` (NOT a CC_12 item)
-- **Evidence:** `_filter_lineage` checks `"causal_lineage" not in lineage.columns` ([core/steps/step_4_extraction.py:94](core/steps/step_4_extraction.py:94)). The pipeline emits column name `lineage` ([core/features/pipeline.py:62](core/features/pipeline.py:62)). When the column-name check fails, the filter returns `feature_matrix, cols, ()` — all features accepted, zero excluded.
-- The lineage test ([tests/protocol_runtime/test_step_4_extraction.py:58-72](tests/protocol_runtime/test_step_4_extraction.py:58)) passes because it hand-builds a DataFrame with `causal_lineage` column — the test never exercises the production pipeline's column-name shape.
-- **Scope:** Trivial (one-line rename in either site). Should land alongside or before CC_12.
+- **Status:** **WIRED** (PR #185 — column-name reconciled)
+- **Evidence:** Lineage filter now enforces tags at training time end-to-end. Features tagged anything other than `clean` are excluded from training and logged in `s4.extraction_metrics` + `summary_md`.
 
 ---
 
@@ -171,24 +185,16 @@
 - **Notes:** [scripts/anchor/check_a1_equivalence.py](scripts/anchor/check_a1_equivalence.py) is the workstation-runnable full-data anchor reproduction harness; result documented at CLAUDE.md ("Full-data anchor regression: A1 path byte-identical to legacy `KH24FoldRunner`").
 
 #### A2 classifier_filter
-- **Status:** PARTIAL — architecture respects Amendment 2 (no Step 5 retrain), but the orchestrator's `_run_step_5` doesn't pass `run_context` to the runner. CC_12 in flight for the Step 4 classifier-persistence half.
-- **Evidence:** `A2Architecture.run` accepts a `run_context: A1RunContext | None` ([core/architectures/a2_classifier_filter.py:168](core/architectures/a2_classifier_filter.py:168)). Classifier loaded from `arch_config.classifier` (no Step 5 retrain) ([core/architectures/a2_classifier_filter.py:111-125](core/architectures/a2_classifier_filter.py:111)) — matches Amendment 2. Synthetic test [tests/protocol_runtime/test_architectures_synthetic.py:test_a2_admit_gate_with_dummy_classifier](tests/protocol_runtime/test_architectures_synthetic.py) passes via direct construction. Arc 11 ran A2 via the bypass driver ([scripts/l_arc_11/run.py](scripts/l_arc_11/run.py)).
-- **Orchestrator gap:** `ArcOrchestrator._run_step_5` constructs `ArcFoldRunner` without `run_context` ([core/arc/arc_orchestrator.py:176-181](core/arc/arc_orchestrator.py:176)). Result: A2 has no `per_trade_features` lookup → every signal is rejected (`ctx.per_trade_features is None` short-circuit at [core/architectures/a2_classifier_filter.py:111](core/architectures/a2_classifier_filter.py:111)).
-- **Scope:** Trivial (1-2 hr) — extend `ArcConfig` to carry `run_context` and pass through `_run_step_5`. Arc 11's closure surfaces this as cross_arc_tag `canonical_orchestrator_step5_run_context_gap`.
+- **Status:** **WIRED** (PR #185 + PR #186)
+- **Evidence:** `A2Architecture` respects Amendment 2 (no Step 5 retrain) via `core/steps/classifier_persistence.build_a2_config_from_step4`. Orchestrator gap closed in PR #186: `ArcConfig.auto_arch_specs` drives Step-5 dispatch; orchestrator constructs `A1RunContext` from `cfg.feature_matrix` and threads through every `ArcFoldRunner`. A2 admit gates operational via orchestrator (was: arc-script bypass only). Cross_arc_tag `canonical_orchestrator_step5_run_context_gap` resolved.
 
 #### A3 pipeline_de — per-fold retraining
-- **Status:** PARTIAL — architecture file accepts pre-fit classifier; no engine site builds per-fold `PathClassifierFit` for it
-- **Evidence:** `A3Config.classifier_fit: PathClassifierFit` ([core/architectures/a3_pipeline_de.py:78](core/architectures/a3_pipeline_de.py:78)). The architecture's `run(...)` uses the supplied fit verbatim — no retraining at runtime. Amendment 2 §"A3" requires "NEW classifier per fold".
-- No driver code instantiates the per-fold retrain orchestration. No arc has exercised A3 end-to-end.
-- `core.features_path_so_far.PATH_FEATURE_KEYS` ([core/features_path_so_far.py](core/features_path_so_far.py)) plus `core.architectures._path_classifier.fit_path_classifier` exist for the training side, but no caller composes them into a per-fold loop.
-- **Scope:** Half-day to multi-day engine PR — write `A3FoldPrep` that builds per-fold `PathClassifierFit` from the IS pool of each fold's IS window, and a search wrapper that swaps configs per fold. The architecture itself is fine.
-- **Blocks Wave 2:** Yes, if any Wave 2 arc dispatches A3.
+- **Status:** **WIRED** (PR #186)
+- **Evidence:** `core/steps/path_classifier_per_fold.py` builds per-fold `PathClassifierFit` from each fold's IS-only window (target = cluster membership for A3). Threaded via `A1RunContext.path_classifier_fits`. Architecture remains unchanged — receives the per-fold fit through `A3Config`. Cost-decomposition emitted per top-K in `StrategyResult.metadata`.
 
 #### A4 pipeline_d_exits — per-fold exit-policy variation
-- **Status:** PARTIAL — same shape as A3; architecture accepts pre-fit, no driver builds per-fold
-- **Evidence:** `A4Config.classifier_fit: PathClassifierFit` ([core/architectures/a4_pipeline_d_exits.py:67](core/architectures/a4_pipeline_d_exits.py:67)). Architecture wraps A1 mechanics with an additional `ExitPredicate` that consults the classifier per bar.
-- **UNKNOWN:** Trail vs predicate precedence under simultaneous fire — header says "SL precedence is preserved by the driver's intra-bar exits-first ordering" but I have not verified the driver's bar-evaluation order against the predicate path. Needs deeper inspection.
-- **Scope:** Same as A3, plus verify trail-vs-classifier-exit precedence in `MultiPairBacktester`.
+- **Status:** **WIRED** (PR #186 + PR #195 precedence lock)
+- **Evidence:** `core/steps/path_classifier_per_fold.py` also handles A4 (target = `final_r > 0` per fold IS window). Trail-vs-classifier-exit precedence locked in PR #195: when both fire same bar close, **trail-stop wins** (`exit_reason = "trailing_stop"`). Implementation: `core/sim/multipair_backtester.py:_process_bar` step 3 uses direct `_pending_closes[pos_id] = "trailing_stop"`. Regression test at [tests/protocol_runtime/test_multipair_backtester_precedence.py](../../tests/protocol_runtime/test_multipair_backtester_precedence.py).
 
 #### A5 portfolio_composition
 - **Status:** PARTIAL — architecture exists; no arc has exercised it
@@ -197,20 +203,16 @@
 - **Notes:** Amendment 3 §"A5 follow-up flag" defers combined-portfolio DD constraints. A5 itself can run; the gate logic for VIABLE-tier combination is the open work.
 
 #### A6 meta_labeling
-- **Status:** PARTIAL — same gap as A2 (orchestrator doesn't plumb `run_context`); architecture respects Amendment 2
-- **Evidence:** `A6Architecture.run` ([core/architectures/a6_meta_labeling.py](core/architectures/a6_meta_labeling.py)) loads classifier from `arch_config.classifier` (no Step 5 retrain) — matches Amendment 2. `_confidence_to_multiplier` maps `prob < lower → 0×`, `lower ≤ prob < upper → 0.5×`, `prob ≥ upper → 1×` ([core/architectures/a6_meta_labeling.py:71-78](core/architectures/a6_meta_labeling.py:71)) — matches Amendment 2 sizing spec.
-- A6 was exercised by Arc 11 (via direct driver, FAIL on holdout) and Arc 8 (best architecture, FAIL) — Arc 11's closure marks A6 as "best of FAIL" rather than a real win.
-- **Scope:** Inherits Arc 11's `canonical_orchestrator_step5_run_context_gap` fix.
+- **Status:** **WIRED** (PR #185 + PR #186 — inherits A2's classifier persistence + run_context plumbing)
+- **Evidence:** `A6Architecture.run` loads classifier from `arch_config.classifier` (no Step 5 retrain) — matches Amendment 2. `_confidence_to_multiplier` maps `prob < lower → 0×`, `lower ≤ prob < upper → 0.5×`, `prob ≥ upper → 1×`. `core/steps/classifier_persistence.build_a6_config_from_step4` builds the config; orchestrator threads `A1RunContext` through.
 
 #### WFO 11-fold IS evaluation
 - **Status:** WIRED
 - **Evidence:** `core.wfo.folds.build_v3_folds` produces 11 anchored-expanding-IS folds (2010-01-01 → 2020-12-31) plus a holdout fold ([core/wfo/folds.py:99-160](core/wfo/folds.py:99)). `run_search` iterates eligible folds (≥ 365 IS days) per [core/wfo/orchestrator.py:85-99](core/wfo/orchestrator.py:85). Exercised by Arcs 8, 10, 11.
 
 #### Holdout one-shot evaluation
-- **Status:** WIRED (mechanics) / PARTIAL (Amendment 3 re-run at scaled risk)
-- **Evidence:** `run_holdout` evaluates each top-K candidate exactly once on `structure.holdout` ([core/wfo/orchestrator.py:114-146](core/wfo/orchestrator.py:114)). One-shot enforced by orchestrator; selection-bias laundering blocked by construction.
-- **Amendment 3 holdout re-run at `r_safe`/`r_hard`:** NOT implemented. Arc 10's PASS-DEPLOYABLE relies on hand-derived scaling.
-- **Scope:** Half-day engine PR alongside the Amendment 3 gate logic rewrite.
+- **Status:** **WIRED** (mechanics) + **WIRED** (Amendment 3 re-run at scaled risk, PR #186)
+- **Evidence:** `run_holdout` evaluates each top-K candidate exactly once on `structure.holdout`. Amendment 3 re-runs at `r_safe` / `r_hard` via `core.wfo.holdout_rerun.rescale_arch_config_risk` — per top-K candidate, two additional sims with `config_id` carrying the scaled-risk suffix.
 
 #### Oracle WFO per cluster
 - **Status:** WIRED
@@ -224,77 +226,69 @@
 
 ### Amendment 3 — Risk-normalised gates
 
-> **All items in this section are MISSING in the engine.** The tracker parser schema knows the field names ([scripts/tracker_parser/schema.py:71-105](scripts/tracker_parser/schema.py:71)) but no engine code computes them. Arc 10's PASS-DEPLOYABLE is the hand-derived workaround.
+> **All items in this section transitioned MISSING → WIRED via PR #186 + PR #197.** The tracker parser schema fields ([scripts/tracker_parser/schema.py:71-105](scripts/tracker_parser/schema.py:71)) are now populated by the engine. PR #197 / Amendment 6 swapped the daily-DD bucketing convention from UTC to EET broker day. Arc 10's PASS-DEPLOYABLE retrofit pre-dates the engine emission (re-evaluated via PR #177 retroactively).
 
 #### Chained max DD emission across IS + holdout trajectory at `r_base`
-- **Status:** MISSING
-- **Evidence:** Grep `chained_max_dd|chained_dd` in `core/` returns zero hits. `core/runners/_fold_stats_helpers.py:max_drawdown_pct` ([core/runners/_fold_stats_helpers.py:39-45](core/runners/_fold_stats_helpers.py:39)) computes per-fold DD only; no continuous-equity chained DD across folds.
-- Arc 10's closure §10 says this directly: "Chained DD not measured (forwarded out of Step 6 scope per main #178). Per-fold equity reset means cumulative cross-fold DD is unknown."
-- **Scope:** Half-day engine PR — modify `run_search` / `run_holdout` to emit a continuous-equity trajectory artefact alongside per-fold; chained max DD = peak-to-trough across the concatenated curve.
+- **Status:** **WIRED** (PR #186, v3.0.1 equity-stitching default)
+- **Evidence:** `core.wfo.chained_dd.stitch_per_fold_oos_equity` + `compute_chained_max_dd_from_continuous_equity` produces multiplicative chaining of per-fold OOS returns with continuity adjustment. Emitted per top-K candidate in `AmendedGateResult.chained_max_dd_base_pct`.
+- **Notes:** v3.0.2 follow-up (Q6 gold standard: single full-window sim per top-K) deferred — chained_dd_method field `equity_stitching | full_window_sim` introduced in closure template v1.2.1.
 
 #### Per-day max-DD parquet emission
-- **Status:** MISSING
-- **Evidence:** No code site writes `step_5/per_day_max_dd_base.parquet`. `count_daily_5pct_breaches` ([core/runners/_fold_stats_helpers.py:48-56](core/runners/_fold_stats_helpers.py:48)) counts breaches but does NOT persist the per-day series. Day-start equity definition (00:00 broker-day, NOT reset-floor baseline) per Amendment 3 §"Daily DD measurement" is not implemented anywhere.
-- **Scope:** Half-day engine PR — add `emit_per_day_max_dd()` to the fold runner, resample equity to daily bars, compute `day_max_dd_pct = (day_open - day_min) / day_open`, persist parquet at `step_5/per_day_max_dd_base.parquet` per fold. Day-start-equity vs reset-floor distinction requires a separate equity tracker.
+- **Status:** **WIRED** (PR #186 baseline + PR #197 / Amendment 6 EET bucketing)
+- **Evidence:** `core.runners._fold_stats_helpers.compute_per_day_max_dd(equity_curve, *, boundary_convention="5ers_eet")` resamples equity to daily bars under the convention and writes `step_5/per_day_max_dd_base__<safe_cid>.parquet` per top-K candidate. Day-start equity is the first equity sample of the trading day under the active convention.
+- **Notes:** PR #197 / Amendment 6 changed the default `boundary_convention` to `"5ers_eet"`. UTC opt-in preserved for KH-24 anchor byte-identity.
 
 #### Verdict logic with priority-ordered gate evaluation
-- **Status:** MISSING — `core/wfo/gates.py` is pre-Amendment-3
-- **Evidence:** `classify_fold_stats` ([core/wfo/gates.py:65-193](core/wfo/gates.py:65)) evaluates at raw risk only. The order is: trade count → daily breaches → max DD → PASS-DEPLOYABLE / PASS-VIABLE / FAIL. **No scalability check, no `step5_not_scalable`, no `step5_chained_dd_above_gate`, no `step5_daily_dd_breach` (new Amendment 3 mode), no scaled-ROI / scaled-ratio failure modes.**
-- The failure-mode taxonomy at Amendment 3 §"Failure-mode taxonomy" is NOT emitted by `classify_fold_stats`. Closures fill `primary_failure_mode` by hand.
-- **Scope:** Multi-day engine PR — full rewrite of `gates.py`. Inputs: per-fold metrics at `r_base`, chained max DD trajectory, per-day max-DD series. Outputs: `k_safe`, `k_hard`, `r_safe`, `r_hard`, scaled metrics, priority-ordered failure mode, both-tier verdict.
+- **Status:** **WIRED** (PR #186)
+- **Evidence:** `core.wfo.amended_gates.classify_amended_fold_stats(...)` returns `AmendedGateResult` with: `k_safe`, `k_hard`, `r_safe_pct`, `r_hard_pct`, scaled metrics, priority-ordered failure mode, both-tier verdict (DEPLOYABLE / VIABLE / FAIL). Locked thresholds: `R_MIN=0.15%`, `R_MAX=2.0%`, `CHAINED_DD_MAX_PCT=10%`, daily-DD threshold 5%.
+- **Notes:** Legacy `classify_fold_stats` preserved for backwards-compatibility. The amended gate evaluates Amendment 3 §"Failure-mode priority" first-fail-wins order.
 
 #### Holdout re-run at scaled risk (`r_safe` / `r_hard`)
-- **Status:** MISSING
-- **Evidence:** `run_holdout` evaluates top-K at the base risk of their configs; no scaling logic, no second sim at `r_safe` per Amendment 3 §"Engine-side changes" item 4.
-- **Scope:** 1-2 hr engine PR — wrap each candidate's config with risk-scaled twin(s) before holdout fold-run.
+- **Status:** **WIRED** (PR #186)
+- **Evidence:** `core.wfo.holdout_rerun.rescale_arch_config_risk(arch_config, k_scale)` produces a frozen-dataclass copy with `risk_pct *= k_scale`. `ArcOrchestrator._run_amendment_3_evaluation` runs two additional holdout sims per top-K (one at `r_safe`, one at `r_hard`); `config_id` carries scaled-risk suffix (e.g. `a1_e2e_test_r0.0100`).
 
 #### Sizing-convention gate check
-- **Status:** MISSING
-- **Evidence:** No code site reads `sizing_convention` field. `LiveBalanceRisk` ([core/sim/risk/live_balance.py](core/sim/risk/live_balance.py)) is the live-balance (equity-pct) implementation; `ResetFloorRisk` ([core/sim/risk/reset_floor.py](core/sim/risk/reset_floor.py)) is reset-floor. The choice is config-driven but no gate FAILs on `equity_pct` per Amendment 3 §"Scalability bounds" requirement.
-- **Scope:** Trivial — add `sizing_convention` to fold-runner output; gate FAIL on `equity_pct` unless chat-approved override flag.
+- **Status:** **WIRED** (PR #186)
+- **Evidence:** Every arch config carries `sizing_convention: str = "reset_floor"`. `ArcConfig.accept_equity_pct: bool = False` is the chat-approval override. Equity-pct sizing FAILs the scalability gate by default.
 
 #### Failure-mode taxonomy emission
-- **Status:** MISSING (engine-side); WIRED (tracker schema-side)
-- **Evidence:** `scripts/tracker_parser/schema.py` enumerates `step5_not_scalable`, `step5_chained_dd_above_gate`, `step5_daily_dd_breach`, `step5_wf_roi_below_gate_after_scaling`, `step5_ratio_below_gate_after_scaling`, `step5_trade_count_below_gate`, `step5_negative_folds` as valid `primary_failure_mode` enum values. But the engine never assigns any of them — closures fill the field by hand.
-- **Scope:** Bundled with the `gates.py` rewrite above.
+- **Status:** **WIRED** (engine + schema, both via PR #186)
+- **Evidence:** `AmendedGateResult.primary_failure_mode` is assigned by `classify_amended_fold_stats` per the Amendment 3 priority order; the tracker schema enum at `scripts/tracker_parser/schema.py` accepts every value. Closures emit it directly from `AmendedGateResult` — no more hand-fill.
 
 ---
 
 ### Step 6 — Causal audit
 
-> Per the dispatch's expectation, this section is mostly MISSING. Step 6 is "lazy" by L_PROTOCOL §2 — runs only on PASS verdicts — but no generic framework exists for it.
+> **All items in this section transitioned MISSING → WIRED via PR #188 (Amendment 4 framework).** Step 6 is auto-dispatched on Top-1 PASS candidate post-§3-pass; manual CLI invokable on any closure. Six-category framework at `core/step_6/`.
 
 #### Producer-level feature trace as a runnable check
-- **Status:** MISSING (as protocol-level infrastructure); WIRED (as arc-specific hand-written audit for Arc 10)
-- **Evidence:** No `core/step_6/` directory. `core.arc.arc_orchestrator` stubs Step 6 as "(lazy — deferred to chat at PASS verdict)" ([core/arc/arc_orchestrator.py:251](core/arc/arc_orchestrator.py:251)). Arc 10's audit ([results/l_arc_10/step_6/audit_report.md](results/l_arc_10/step_6/audit_report.md), [results/l_arc_10/step_6/causal_audit_report.md](results/l_arc_10/step_6/causal_audit_report.md)) is hand-written.
+- **Status:** **WIRED** (PR #188)
+- **Evidence:** `core/step_6/lookahead.py` — §6.1 includes `per_feature_lineage_clean` critical check enforcing causal_lineage on every feature consumed.
 
 #### Byte-compare from raw OHLC for feature reproduction
-- **Status:** MISSING (as protocol-level infrastructure); WIRED (arc-specific for Arc 10)
-- **Evidence:** [scripts/l_arc_10_v3/step_6_byte_compare.py](scripts/l_arc_10_v3/step_6_byte_compare.py) is Arc-10-bespoke. It samples 5 trades, recomputes features from raw H4/D1 OHLC, byte-compares to pool. Output: `byte_compare_log.json`. Generic framework doesn't exist.
-- **Scope:** Multi-day engine PR — factor Arc 10's byte-compare into a feature-producer-agnostic harness over the registered `FeatureSpec` set.
+- **Status:** **WIRED** (PR #188)
+- **Evidence:** `core/step_6/byte_compare.py` — generic harness factored from Arc 10's `step_6_byte_compare.py`. Invoked by §6.1 `byte_compare_no_drift`.
 
 #### D1 lag rule verification check
-- **Status:** MISSING (as Step 6 invocation); WIRED (in producer-side feature code)
-- **Evidence:** D1 lag is enforced at the producer level via `_build_d1_lag1_series` ([core/features/multi_tf.py:32](core/features/multi_tf.py:32)) but no Step 6 check independently verifies it on a random trade sample.
+- **Status:** **WIRED** (PR #188)
+- **Evidence:** `core/step_6/lookahead.py:_check_d1_lag_rule` — static source-inspection check.
 
 #### Automated trigger on PASS verdict
-- **Status:** MISSING
-- **Evidence:** `ArcConfig.invoke_step_6: bool = False` ([core/arc/arc_orchestrator.py:74](core/arc/arc_orchestrator.py:74)) — orchestrator does not flip this flag based on Step 5 verdict. Arc 10's PASS-DEPLOYABLE Step 6 was triggered by chat dispatch, not by the engine.
-- **Scope:** Trivial post-`gates.py` rewrite — flip `invoke_step_6` when any candidate clears PASS-tier non-Step-6 constraints.
+- **Status:** **WIRED** (PR #188 + PR #186)
+- **Evidence:** `core/step_6/dispatch.py:maybe_dispatch_step_6` — post-`_run_amendment_3_evaluation`, if at least one top-K has verdict PASS-DEPLOYABLE / PASS-VIABLE, Step 6 runs on the Top-1. `replace_top_1_with_step6_fail` re-classifies on critical failure.
 
 #### Manifest / report artefact format
-- **Status:** MISSING (no locked format); WIRED (Arc 10 invented one)
-- **Evidence:** Arc 10's reports have a structure (winner inventory, producer-level trace per feature, byte-compare, regime invariance, verdict) but it's hand-written, not template-driven.
-- **Scope:** Bundled with the framework PR.
+- **Status:** **WIRED** (PR #188)
+- **Evidence:** `core/step_6/manifest.py` (CheckResult, CategoryAuditResult, Step6Result, Step6Manifest, Severity, VerdictImpact) + `core/step_6/artefacts.py` writers. Closure template v1.3 carries the `§1 tracker_payload.step_6` block; parser v1.3 enforces it for v1.3 PASS verdicts.
 
 ---
 
 ### Closure infrastructure
 
-#### From-scratch v1.2 closure existence
-- **Status:** MISSING — every v1.2 closure in `results/` is a retrofit
-- **Evidence:** All 3 v1.2 closures ([results/l_arc_8/ARC_CLOSURE.md](results/l_arc_8/ARC_CLOSURE.md), [results/l_arc_10/ARC_CLOSURE.md](results/l_arc_10/ARC_CLOSURE.md), [results/l_arc_11/ARC_CLOSURE.md](results/l_arc_11/ARC_CLOSURE.md)) were retrofitted from earlier versions per recent commits (`#181 Closure template v1.2 + Arc 8/10/11 deployment spec retrofit`). No arc has been opened, run, and closed entirely against the v1.2 template — no fresh PASS-DEPLOYABLE has gone through the v1.2 §4 deployment_spec gate as part of normal arc workflow.
-- **Scope:** Operational discipline — Wave 2 arcs land as the first from-scratch v1.2 examples. No code work needed.
+#### From-scratch v1.3.1 closure existence
+- **Status:** PENDING — Wave 1 retries + Wave 2 will be first from-scratch v1.3.1 closures
+- **Evidence:** Template current at v1.3.1 (PR #194 added `architectures_skipped_by_amendment_5`); parser v1.3 enforces Phase 2 fields. All existing v1.2 closures in `results/` are retrofits. Wave 1 retries (Arcs 5/7 v3.0.1, Arc 10 signal-parity) + Wave 2 (Arcs 4 RERUN / 4 / 6 / 3 / 1 / 2) will exercise the from-scratch path with full Amendment 3 + 4 + 5 emission.
+- **Scope:** Operational discipline — no engine work.
 
 #### Closure-writer auto-generation tooling
 - **Status:** PARTIAL — orchestrator's writer produces only a generic skeleton, NOT v1.2 `§1 tracker_payload` YAML
@@ -457,26 +451,30 @@
 
 ---
 
-## Appendix — Capability count breakdown by step
+## Appendix — Capability count breakdown by step (refreshed 2026-05-25)
 
-| Step / area | WIRED | PARTIAL | MISSING | UNKNOWN | Total |
-|---|---:|---:|---:|---:|---:|
-| Step 1 — Plumbing | 4 | 2 | 0 | 0 | 6 |
-| Step 2 — Clustering | 4 | 0 | 0 | 0 | 4 |
-| Step 3 — Capturability | 3 | 0 | 0 | 0 | 3 |
-| Step 4 — Extraction | 5 | 4 | 0 | 0 | 9 |
-| Step 5 — Architectures + WFO | 4 | 6 | 0 | 1 | 11 |
-| Amendment 3 — Risk-normalised gates | 0 | 0 | 6 | 0 | 6 |
-| Step 6 — Causal audit | 0 | 0 | 5 | 0 | 5 |
-| Closure infrastructure | 1 | 3 | 0 | 0 | 4 |
-| Tracker | 2 | 1 | 0 | 0 | 3 |
-| CI / determinism | 3 | 1 | 0 | 0 | 4 |
-| Cross-arc registries | 3 | 0 | 0 | 0 | 3 |
-| Sub-protocols | 0 | 1 | 1 | 0 | 2 |
-| **Other (anchor, sizing primitives)** | 1 | 6 | 1 | 0 | 8 |
-| **Total** | **30** | **24** | **13** | **1** | **68** |
+| Step / area | WIRED | PARTIAL | MISSING | UNKNOWN | Total | Delta vs original |
+|---|---:|---:|---:|---:|---:|---|
+| Step 1 — Plumbing | 4 | 2 | 0 | 0 | 6 | unchanged |
+| Step 2 — Clustering | 4 | 0 | 0 | 0 | 4 | unchanged |
+| Step 3 — Capturability | 3 | 0 | 0 | 0 | 3 | unchanged |
+| Step 4 — Extraction | 8 | 1 | 0 | 0 | 9 | +3 W, −3 P (PR #185) |
+| Step 5 — Architectures + WFO | 10 | 1 | 0 | 0 | 11 | +6 W, −5 P, −1 U (PR #186, #195) |
+| Amendment 3 — Risk-normalised gates | 6 | 0 | 0 | 0 | 6 | +6 W, −6 M (PR #186, PR #197 / Amendment 6 boundary) |
+| Step 6 — Causal audit | 5 | 0 | 0 | 0 | 5 | +5 W, −5 M (PR #188 / Amendment 4) |
+| Closure infrastructure | 1 | 3 | 0 | 0 | 4 | unchanged (operational, not engine) |
+| Tracker | 2 | 1 | 0 | 0 | 3 | unchanged |
+| CI / determinism | 3 | 1 | 0 | 0 | 4 | unchanged |
+| Cross-arc registries | 3 | 0 | 0 | 0 | 3 | unchanged |
+| Sub-protocols | 0 | 1 | 1 | 0 | 2 | unchanged (heavy_ml_probe in flight via PR #187 parallel chat) |
+| **Other (anchor, sizing primitives)** | 4 | 3 | 1 | 0 | 8 | +3 W via PR #186 sizing-convention gate |
+| **NEW** Signal-level EET alignment (PR #193) | 1 | 0 | 0 | 0 | 1 | new capability family |
+| **NEW** EET session semantics (PR #197 / Amendment 6) | 3 | 0 | 0 | 0 | 3 | new capability family (distance, reset_floor, compute_per_day_max_dd) |
+| **NEW** Canonical exit-policy registry (PR #195) | 4 | 0 | 0 | 0 | 4 | new capability family (registry + Account partial-fill + driver wiring + per-arc migration) |
+| **NEW** Amendment 5 dispatch-time selection (PR #194) | 1 | 0 | 0 | 0 | 1 | documented; engine unchanged |
+| **Total** | **56** | **9** | **2** | **0** | **77** | +26 W, −15 P, −11 M, −1 U, +9 new caps |
 
-End of audit.
+End of audit body. Post-audit append sections below capture per-PR detail.
 
 ---
 
@@ -640,3 +638,36 @@ Capability count delta:
 
 Overall: WIRED 35 → 41 (Steps + registry policies count separately).
 Per-arc silent-drift surface area: closed.
+
+---
+
+## Post-Phase-1-engine-build summary — items resolved across PRs #185-#197
+
+> CC_22 docs refresh (2026-05-25) consolidates the eight-PR sprint into a single per-PR resolution map. Use this as the index when reading the per-section status flips above.
+
+| PR | Topic | Items resolved (in this audit) |
+|---|---|---|
+| **#184** | Engine capability audit (this doc) | Baseline enumeration. Original WIRED/PARTIAL/MISSING counts: 30 / 24 / 13. |
+| **#185** | Step 4 fitted-classifier persistence + holdout-window training fix | Step 4 §"Holdout-window training filtering" (PARTIAL → WIRED); §"Fitted classifier persistence" (PARTIAL → WIRED); §"Lineage filter additional finding" (PARTIAL bug → WIRED via column-name reconcile). Unblocks A2 / A6 admit-gate honesty. |
+| **#186** | L_PROTOCOL Amendment 3 implementation + A3/A4 wiring + Step 4/5 fixes | All 6 Amendment-3 items (MISSING → WIRED): chained max DD, per-day max-DD parquet, priority-ordered gates, holdout re-run at scaled risk, sizing-convention check, failure-mode taxonomy. Step 5: A2 (PARTIAL → WIRED via orchestrator run_context plumbing), A3 (PARTIAL → WIRED via per-fold retrain orchestration), A4 (PARTIAL → WIRED, same mechanism), A6 (PARTIAL → WIRED). |
+| **#188** | Step 6 causal audit framework + Amendment 4 + parser v1.3 + closure template v1.3 | All 5 Step-6 items (MISSING → WIRED): producer-level feature trace, byte-compare harness, D1 lag verification, automated PASS-trigger, manifest/report format. Closure template v1.3 + parser v1.3 Phase 2 tightening. |
+| **#189** | Signal parity engine (mid features + 5ers EET bar boundaries + worst-case fills) | New capability family: engine output venue-independent. Mid-anchored features; EET bar boundaries opt-in via `boundary_convention="5ers_eet"`; worst-case fills (long ask / short bid). UTC default preserves KH-24 anchor. |
+| **#193** | Signal-level EET timezone audit + canonical alignment utility | New capability family: signal-module timezone correctness. Canonical `core/signals/htf_alignment.py`; 8 modules fixed; 33 new tests + pre-commit lint rule. Per-arc impact: Arcs 3 / 5 / 10 verdicts re-run-eligible under EET. |
+| **#194** | Amendment 5 — AUC-gated A2/A6 architecture selection + parser v1.3.1 field | New capability family (documentation only — engine unchanged): four-gate dispatch-time architecture selection (Gate 1 archetype; Gate 2 AUC ≥ 0.65; Gate 3 universal A1; Gate 4 portfolio if ≥ 2 clusters). Closure template v1.3.1 `architectures_skipped_by_amendment_5` field. |
+| **#195** | Canonical exit-policy registry + `sl_partial_close_1r_runner_trail` primitive + per-arc migration | New capability family: 6 registered exit policies + Account partial-fill semantics (`partial_close`, `current_size_of`, `ClosedTrade.parent_position_id`) + driver wiring + per-arc migration (Arc 10 v3, Arc 8). 218 byte-identical reference-parity tests. A4 same-bar trail-vs-classifier precedence locked (trail wins). |
+| **#197** | EET session semantics: distance.py + reset_floor.py + `compute_per_day_max_dd` + Amendment 6 | New capability family: 3 convention-aware consumers wired via `core/time_utils/session_boundary.py` + `Panel.boundary_convention`. Amendment 6 supersedes Amendment 3 §"Boundary" — daily-DD measurement is now 5ers EET broker trading day (load-bearing fix in `compute_per_day_max_dd`). UTC opt-in preserved for KH-24 anchor byte-identity. |
+
+### What is still missing
+
+After PR #197, only two real engine capabilities remain MISSING:
+
+1. **`heavy_ml_probe` engine path** — spec-only at `docs/sub_protocols/heavy_ml_probe.md`. Phase 2 prerequisite. In flight via PR #187 (parallel chat); PR-B/C/D/E/F to follow.
+2. **A5 portfolio composition** (PARTIAL — architecture exists; no arc has surfaced ≥ 2 candidate clusters at Step 3 to exercise it). Deferred until first VIABLE candidate emerges.
+
+Operational housekeeping remains (closure-writer auto-generation, Windows-runner CI matrix, integrity-report check completeness, Arc 8 closure §10 correction) but these don't block Wave 2 dispatch.
+
+### Wave 2 dispatch readiness
+
+✅ **All Tier-1 Wave-2-blocking items cleared.** Amendment 3 engine emission, gate rewrite, classifier persistence + holdout-window training, A3 / A4 per-fold orchestration, A2 / A6 orchestrator plumbing — all WIRED. Wave 2 arcs can dispatch with full Amendment 3 + 4 + 5 + 6 emission from first run.
+
+End of refresh.

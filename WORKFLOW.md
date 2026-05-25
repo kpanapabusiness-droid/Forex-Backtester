@@ -47,8 +47,11 @@ When the work is an arc closure, the artefact set on the arc branch includes the
 The parser invocation is pre-PR, not post-merge — so reviewers see the tracker change in the same diff as the closure. See `scripts/tracker_parser/README.md` for full usage.
 
 **For PASS verdicts (DEPLOYABLE / VIABLE / *-PROVISIONAL / *-PENDING-STEP6)** the artefact set additionally includes:
-- `§4 deployment_spec` in the closure doc per template v1.2 §4 — self-contained porting specification.
+- `§4 deployment_spec` in the closure doc per template v1.3.1 §4 — self-contained porting specification (deployment_spec section was introduced at v1.2; template is currently v1.3.1).
 - `best_architecture.config_artefact_path` populated in §1 tracker_payload and the referenced YAML file present at that path (relative to repo root). The parser HALTs at exit code 1 if either is missing or the file does not exist (template Section 4-L). Reconstruct the YAML from artefacts if it does not exist, document reconstruction in §4.10.
+- **Step 6 auto-dispatch (Amendment 4, PR #188).** Step 6 (causal audit) auto-dispatches on the Top-1 candidate after §3 constraints #1-9 clear; a critical failure re-classifies the verdict with `primary_failure_mode = step6_causal_audit_fail`. The closure's `§1 tracker_payload.step_6` block is REQUIRED for v1.3 PASS verdicts (parser-enforced post-cutoff `2026-05-23T06:20:59Z`). Manual `scripts/run_step_6.py` invocations write to `step_6_manual_<ts>/` and never modify the verdict.
+
+**Dispatch-time architecture selection (Amendment 5, PR #194).** When opening an arc, the architectures-tested set per surviving cluster is curated by the dispatcher according to the four-gate union (Gate 1 archetype; Gate 2 AUC ≥ 0.65; Gate 3 universal A1; Gate 4 portfolio if ≥ 2 clusters). The engine receives a fully-resolved set; the dispatch doc cites the admitting gate per architecture. Any architecture admissible under the prior Amendment 1 rule but skipped under Amendment 5 is recorded in the closure's optional `architectures_skipped_by_amendment_5` field (template v1.3.1; required for post-cutoff PASS verdicts).
 
 ---
 
@@ -121,7 +124,8 @@ Chat decides next step from the diagnostic.
 |---|---|
 | `L_PROTOCOL.md` | Only at major redesign events |
 | `docs/sub_protocols/*` | When sub-protocol is amended |
-| `docs/templates/ARC_CLOSURE_TEMPLATE.md` | Only at major redesign events (template version bump). Current: v1.2 (2026-05-23, deployment_spec addition). |
+| `docs/templates/ARC_CLOSURE_TEMPLATE.md` | Only at major redesign events (template version bump). Current: v1.3.1 (2026-05-23, Amendment 5 `architectures_skipped_by_amendment_5` field). |
+| `docs/templates/TODO_REFRESH_TEMPLATE.md` | Stable — generic structure for periodic TODO.md rewrites. Add `[FILL]` placeholders per refresh. |
 | `WORKFLOW.md` (this file) | When operational conventions evolve |
 | `ARC_TRACKER.md` | Auto on arc open / close per L_PROTOCOL §6 |
 | `ARC_HISTORY.md` | Never (frozen at v3.0 start) |

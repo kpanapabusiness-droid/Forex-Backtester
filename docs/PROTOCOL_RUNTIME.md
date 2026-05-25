@@ -412,6 +412,33 @@ Threshold pair sweep: {(0.3, 0.5), (0.4, 0.6), (0.5, 0.7)}.
 
 ---
 
+## §8a Architecture selection — Amendment 5 four-gate (dispatch-time)
+
+Per L_PROTOCOL Amendment 5 (ratified 2026-05-23, PR #194), the architectures
+admitted for each surviving cluster are the UNION over four independent gates:
+
+- **Gate 1 — Shape-required:** archetype-driven (V-shape → A3; Stepwise → A4;
+  Bimodal → A4; Monotonic up/down / Unclassified → none).
+- **Gate 2 — Classifier-driven:** if Step 4 mean OOS AUC ≥ 0.65 → add A2 and A6,
+  REGARDLESS of archetype.
+- **Gate 3 — Universal:** always add A1.
+- **Gate 4 — Portfolio:** if ≥ 2 candidate clusters survive Step 3 → add A5.
+
+Choppy clusters skip all architectures.
+
+**Engine impact: zero.** All six architectures are wired post-PR-186; Amendment
+5 enforcement is **dispatch-time** — the arc's `ArcConfig.architecture_configs`
+tuple is curated by the dispatcher to reflect the four-gate union per cluster.
+The orchestrator + `ArcFoldRunner` receive a fully-resolved set and do not
+re-evaluate the gating rule. Closures record any architecture admissible under
+the prior Amendment 1 rule but skipped under Amendment 5 in the optional
+top-level `architectures_skipped_by_amendment_5` field (template v1.3.1).
+
+Full rule text: L_PROTOCOL §2 Step 5 "Architecture selection (Amendment 5)"
+and `archive/L_PROTOCOL_v3_0_AMENDMENT_5.md`.
+
+---
+
 ## §8b Amendment 3 emissions (risk-normalised gates)
 
 Per `archive/L_PROTOCOL_v3_0_AMENDMENT_3.md` + audit
@@ -428,7 +455,7 @@ search + holdout complete.
 |---|---|
 | `core.wfo.amended_gates` | Pure gate logic: scaling factors, scaled DEPLOYABLE / VIABLE gates, priority-ordered failure-mode taxonomy. `classify_amended_fold_stats(...)` returns `AmendedGateResult` with every Amendment 3 tracker payload field. |
 | `core.wfo.chained_dd` | Chained max DD across IS + holdout. `stitch_per_fold_oos_equity` + `compute_chained_max_dd_from_continuous_equity`. v3.0.1 uses equity stitching; v3.0.2 follow-up replaces with full-window sim per chat directive Q6. |
-| `core.runners._fold_stats_helpers.compute_per_day_max_dd` | Per-day max-DD series at r_base. UTC broker-day boundary (locked). Day-start equity = first equity sample of UTC day. |
+| `core.runners._fold_stats_helpers.compute_per_day_max_dd` | Per-day max-DD series at r_base. **5ers EET broker-day boundary** under Amendment 6 (PR #197); `boundary_convention="utc"` opt-in preserved for KH-24. Day-start equity = first equity sample of the trading day under the active convention. See §15.5 for the propagation pattern. |
 | `core.wfo.holdout_rerun` | `rescale_arch_config_risk(arch_config, k_scale)` — frozen-dataclass copy with `risk_pct *= k_scale`. Used for r_safe / r_hard holdout re-runs. |
 | `core.arc.arc_orchestrator._run_amendment_3_evaluation` | Per-top-K orchestration: equity stitching → chained DD → per-day DD parquet → holdout re-runs at scaled risks → amended gate classify. |
 
@@ -856,7 +883,7 @@ structural equivalence check on the synthetic mini-fixture
 
 ---
 
-## §15 Signal parity (mid-price + 5ers EET + worst-case fills) — PR #187
+## §15 Signal parity (mid-price + 5ers EET + worst-case fills) — PR #189
 
 The v3 engine produces venue-independent signals. Three invariants:
 
@@ -899,7 +926,7 @@ Spread cost is implicit in `(open_ask − open_bid)` and the bid/ask wing
 of SL/TP — no separate "spread deduction" step is applied.
 
 [core/sim/trailing_stop.py](../core/sim/trailing_stop.py): **trail
-activation + ratchet read MID close** (PR #187 reverses PR-E.1.6's bid-only
+activation + ratchet read MID close** (PR #189 reverses PR-E.1.6's bid-only
 trail); **trail hit detection still reads BID close** (worst-case-fill
 realism — long exits when its bid falls to the trail level). This
 asymmetric model (mid-anchored decision, bid-anchored fill) is the

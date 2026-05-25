@@ -10,6 +10,7 @@
 > **Amendment 3 (2026-05-22):** Risk-normalised gates. §3 constraints preserved 1:1; evaluation now occurs at scaled risk `r_safe` / `r_hard` rather than at the WFO base risk. Scalability bounds, per-day DD recount, and explicit evaluation order added. Full text archived at `archive/L_PROTOCOL_v3_0_AMENDMENT_3.md`. See §3.
 > **Amendment 4 (2026-05-24):** Step 6 causal-audit framework. Six audit categories (lookahead, selection bias, execution realism, statistical integrity, determinism, deployment readiness) as runnable engine code. Auto-dispatches post-gate on Top-1 PASS-tier candidate; manual CLI invokable on any closure. Critical failure downgrades verdict via `step6_causal_audit_fail`. Closure template bumped to v1.3 with `§1 tracker_payload.step_6` block; parser v1.3 + Phase 2 tightening (PR-186-merge cutoff). Full text archived at `archive/L_PROTOCOL_v3_0_AMENDMENT_4.md`. See §2 Step 6.
 > **Amendment 5 (2026-05-23):** AUC-gated A2/A6 architecture selection. Amendment 1's uniform archetype gating is split into four gates: Gate 1 preserves A3/A4 archetype gating; Gate 2 admits A2 + A6 whenever Step 4 mean OOS AUC ≥ 0.65 regardless of archetype; Gate 3 always admits A1; Gate 4 admits A5 when ≥2 candidate clusters survive Step 3. Choppy clusters skip all architectures. Enforcement is dispatch-time; engine unchanged (all six architectures wired post-PR-186). Closure template v1.3.1 adds optional `architectures_skipped_by_amendment_5` field; parser v1.3 accepts it and requires it for post-ratification PASS verdicts. Full text archived at `archive/L_PROTOCOL_v3_0_AMENDMENT_5.md`. See §2 Step 5 "Architecture selection (Amendment 5)".
+> **Amendment 6 (2026-05-25):** Daily-DD measurement boundary changed from UTC broker-day to **5ers EET broker trading day** (Europe/Athens, EU DST rules). Amendment 3 §"Boundary" was authored under the pre-PR-189 UTC-bar engine assumption; under PR #189's 5ers EET aggregation the bar boundary and the daily-DD reset boundary must match for the gate to be coherent. Engine implementation landed via PR #197: `core.runners._fold_stats_helpers.compute_per_day_max_dd(boundary_convention="5ers_eet")` consuming `core.time_utils.session_boundary.utc_to_eet_trading_day`; `Panel.boundary_convention` carries the choice through orchestrator slicing. `boundary_convention="utc"` opt-in preserved for KH-24 anchor byte-identity. Convention-aware consumers also include `core/features/distance.py` (prior-session HL bucketing) and `core/sim/risk/reset_floor.py` (daily-floor ratchet). See §3 "Boundary" and PROTOCOL_RUNTIME §15.5. No archive file — Amendment 6 is documented inline at §3 only.
 >
 > This protocol is the umbrella. It accepts any signal, any feature space, any architecture. Sub-protocols may layer on top to add signal-class-specific specificity. The overseer's gates and verdicts apply universally.
 
@@ -449,7 +450,7 @@ Linear scaling of breach **counts** is mathematically wrong. Correct procedure:
 
 **At gate evaluation:** for each day in the series, compute `day_max_dd_scaled = day_max_dd_base × k`. Count days where `day_max_dd_scaled ≥ 5%`. This is per-day re-evaluation, not count scaling.
 
-**Boundary:** EET broker trading day (Europe/Athens, EU DST rules). Locked value, version-amended per **Amendment 6** (supersedes prior `UTC broker-day. Locked value.` framing). Amendment 6 effective from CC_20 PR merge timestamp; full text in the parallel L_PROTOCOL amendment docs PR. Engine implementation: `core.runners._fold_stats_helpers.compute_per_day_max_dd(boundary_convention="5ers_eet")` consuming `core.time_utils.session_boundary.utc_to_eet_trading_day`. `boundary_convention="utc"` opt-in preserved for KH-24 anchor byte-identity.
+**Boundary:** EET broker trading day (Europe/Athens, EU DST rules). Locked value, version-amended per **Amendment 6** (supersedes prior `UTC broker-day. Locked value.` framing). Amendment 6 effective from PR #197 merge (2026-05-25); Amendment 6 is documented inline here — no separate archive file. Engine implementation: `core.runners._fold_stats_helpers.compute_per_day_max_dd(boundary_convention="5ers_eet")` consuming `core.time_utils.session_boundary.utc_to_eet_trading_day`. `boundary_convention="utc"` opt-in preserved for KH-24 anchor byte-identity.
 
 **Tolerance:** exactly 0 breaches in both tiers. No safety margin on the daily limit.
 
@@ -597,7 +598,7 @@ expected_failure_modes: <if any anticipated>
 
 ### ARC_CLOSURE.md format
 
-All arc closure docs MUST follow `docs/templates/ARC_CLOSURE_TEMPLATE.md` v1.2.
+All arc closure docs MUST follow `docs/templates/ARC_CLOSURE_TEMPLATE.md` (current v1.3.1).
 
 Required sections:
 

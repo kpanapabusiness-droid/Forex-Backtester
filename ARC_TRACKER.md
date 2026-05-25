@@ -4,7 +4,7 @@
 > Schema locked at v3.0. Replaces STATUS.md, CHANGELOG.md, ARC_QUEUE.md, and ACTIVE_ARCS.md.
 > First populated on first arc open under L_PROTOCOL v3.0.
 
-Last auto-update: parser: 2026-05-25 05:26:22
+Last auto-update: manual: 2026-05-25 (add Available sub-protocols section; backfill signal_discovery_probe and heavy_ml_probe)
 
 ---
 
@@ -13,6 +13,17 @@ Last auto-update: parser: 2026-05-25 05:26:22
 | Arc | Signal | TF mode | Sub-protocol | Started | Branch | Step in progress |
 |---|---|---|---|---|---|---|
 | arc_discovery_01 | discovered_via_search (random search, n=10000) | locked H1 | signal_discovery_probe | 2026-05-22 | arc/discovery_01 | Step 1 — infrastructure landed; full 10k run pending compute slot |
+
+---
+
+## Available sub-protocols
+
+> Sub-protocols are reusable engine paths invokable by arcs via `sub_protocol: <name>` in `ARC_OPEN.md`. Distinct from arcs themselves — they're shipped infrastructure, not research units. A row appears here when a sub-protocol's build lands on main.
+
+| Sub-protocol | Status | Landed | Entry point | Spec |
+|---|---|---|---|---|
+| signal_discovery_probe | LANDED | (pre-tracker) | scripts/arc_discovery_01/ | docs/sub_protocols/signal_discovery_probe.md |
+| heavy_ml_probe | LANDED | 2026-05-25 | scripts/heavy_ml_probe/run_probe.py | docs/sub_protocols/heavy_ml_probe.md |
 
 ---
 

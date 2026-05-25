@@ -680,7 +680,7 @@ def run(cfg_path: Path, *, write_manifest_flag: bool = True) -> dict:
             architectures_skipped_under_amendment_5[cid] = skipped_for_cluster
             print(
                 f"[step_5] Amendment 5: c{cid} ({arch_label}) AUC={cluster_auc:.4f} < "
-                f"{AMENDMENT_5_AUC_BAR} → skipping {skipped_for_cluster}",
+                f"{AMENDMENT_5_AUC_BAR} -> skipping {skipped_for_cluster}",
                 flush=True,
             )
 

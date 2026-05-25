@@ -70,13 +70,12 @@ def _build_parser() -> argparse.ArgumentParser:
     return p
 
 
-def _is_post_phase_2_cutoff(closed_ts: str | None) -> bool:
-    """Return True iff ``closed_ts`` is strictly after the PR-186 merge cutoff
-    (2026-05-23T06:20:59Z per chat Q7) and therefore subject to Phase 2 tightening.
+def _is_post_cutoff(closed_ts: str | None, cutoff_iso: str) -> bool:
+    """Return True iff ``closed_ts`` is strictly after ``cutoff_iso``.
 
     Closures missing or with malformed timestamps are treated as PRE-cutoff
     (grandfathered) — Phase 2 tightening kicks in only when we can confidently
-    determine the closure post-dates the merge.
+    determine the closure post-dates the cutoff.
     """
     if not closed_ts:
         return False
@@ -91,9 +90,24 @@ def _is_post_phase_2_cutoff(closed_ts: str | None) -> bool:
     if dt.tzinfo is None:
         dt = dt.replace(tzinfo=timezone.utc)
     dt_utc = dt.astimezone(timezone.utc)
-    cutoff_s = schema.PHASE_2_CUTOFF_ISO[:-1] + "+00:00"
+    cutoff_s = cutoff_iso[:-1] + "+00:00" if cutoff_iso.endswith("Z") else cutoff_iso
     cutoff_dt = datetime.fromisoformat(cutoff_s).astimezone(timezone.utc)
     return dt_utc > cutoff_dt
+
+
+def _is_post_phase_2_cutoff(closed_ts: str | None) -> bool:
+    """Return True iff ``closed_ts`` is strictly after the PR-186 merge cutoff
+    (2026-05-23T06:20:59Z per chat Q7) and therefore subject to Phase 2 tightening.
+    """
+    return _is_post_cutoff(closed_ts, schema.PHASE_2_CUTOFF_ISO)
+
+
+def _is_post_amendment_5_cutoff(closed_ts: str | None) -> bool:
+    """Return True iff ``closed_ts`` is strictly after the L_PROTOCOL Amendment 5
+    cutoff (placeholder pinned at the ratification date; backfilled with this PR's
+    actual merge timestamp post-merge — see ``schema.AMENDMENT_5_CUTOFF_ISO``).
+    """
+    return _is_post_cutoff(closed_ts, schema.AMENDMENT_5_CUTOFF_ISO)
 
 
 def _validate_phase_2_amendment_3_fields(payload: dict, closure_path: Path) -> int:
@@ -121,6 +135,29 @@ def _validate_phase_2_amendment_3_fields(payload: dict, closure_path: Path) -> i
             payload.get("closed_timestamp"),
             schema.PHASE_2_CUTOFF_ISO,
             missing,
+            closure_path,
+        )
+        return 1
+    return 0
+
+
+def _validate_amendment_5_field(payload: dict, closure_path: Path) -> int:
+    """L_PROTOCOL Amendment 5 Phase 2 tightening (template v1.3.1 Schema versioning row):
+    PASS verdicts closed strictly after the Amendment-5 cutoff MUST carry the
+    `architectures_skipped_by_amendment_5` field (may be `[]`).
+
+    Pre-cutoff closures grandfathered. The field is informational — it captures
+    architectures admissible under Amendment 1's archetype-driven rule but skipped
+    under Amendment 5's four-gate AUC-driven rule. `[]` indicates the Amendment-5
+    set equals or supersets the Amendment-1 set.
+    """
+    if payload.get("architectures_skipped_by_amendment_5") is None:
+        logging.error(
+            "L_PROTOCOL Amendment 5: PASS verdict at closed_timestamp=%r is post-Amendment-5-cutoff "
+            "(%s) but `architectures_skipped_by_amendment_5` is missing. Closure %s. "
+            "Use `[]` when no architectures were skipped under Amendment 5.",
+            payload.get("closed_timestamp"),
+            schema.AMENDMENT_5_CUTOFF_ISO,
             closure_path,
         )
         return 1
@@ -281,6 +318,14 @@ def main(argv: list[str] | None = None) -> int:
     # v1.3 PASS verdicts MUST have a step_6 block with overall_passed=true.
     if template_version == "1.3" and is_pass:
         rc = _validate_v13_pass_step6(payload, closure_path)
+        if rc != 0:
+            return rc
+
+    # L_PROTOCOL Amendment 5 (template v1.3.1 Schema versioning row):
+    # PASS verdicts closed after Amendment-5 cutoff MUST carry
+    # `architectures_skipped_by_amendment_5`.
+    if is_pass and _is_post_amendment_5_cutoff(payload.get("closed_timestamp")):
+        rc = _validate_amendment_5_field(payload, closure_path)
         if rc != 0:
             return rc
 

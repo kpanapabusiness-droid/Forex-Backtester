@@ -1,4 +1,4 @@
-"""Pydantic models for ARC_CLOSURE.md §1 tracker_payload — v1.0, v1.1, v1.2, and v1.3 schemas + normalisation.
+"""Pydantic models for ARC_CLOSURE.md §1 tracker_payload — v1.0, v1.1, v1.2, v1.3, and v1.3.1 schemas + normalisation.
 
 Schema versions:
 - v1.0 — pre-Amendment 3 (legacy field names `worst_fold_roi_pct`, `worst_fold_dd_pct`)
@@ -11,6 +11,12 @@ Schema versions:
   with ``closed_timestamp > 2026-05-23T06:20:59Z`` (PR-186 merge) MUST carry Amendment 3 fields
   in `best_architecture`; v1.3 PASS verdicts MUST additionally have a `step_6` block with
   `overall_passed: true`. Pre-cutoff closures grandfathered.
+- v1.3.1 — L_PROTOCOL Amendment 5 (AUC-gated A2/A6 architecture selection). Adds top-level
+  OPTIONAL field ``architectures_skipped_by_amendment_5`` (subset of ``{A1..A6}``, may be ``[]``).
+  v1.3.1 shares ``template_version: v1.3`` declaration with v1.3 — the field's presence is the
+  discriminator. Phase 2 tightening: any PASS verdict with ``closed_timestamp >
+  AMENDMENT_5_CUTOFF_ISO`` MUST carry the field. Pre-cutoff closures grandfathered. Cutoff
+  placeholder is the ratification date; backfill with this PR's merge timestamp post-merge.
 
 Detection precedence (see `detect_schema_version`):
 1. `template_version` field present → use that
@@ -35,6 +41,15 @@ SchemaVersion = Literal["1.0", "1.1", "1.2", "1.3"]
 # PR-186 merge cutoff for Phase 2 tightening (per chat Q7).
 # After this timestamp, PASS verdicts must carry Amendment 3 fields.
 PHASE_2_CUTOFF_ISO: str = "2026-05-23T06:20:59Z"
+
+# L_PROTOCOL Amendment 5 cutoff for Phase 2 tightening on
+# `architectures_skipped_by_amendment_5`. After this timestamp, PASS verdicts
+# MUST carry the field (may be `[]`). PLACEHOLDER pinned at ratification date;
+# backfill with the Amendment-5 PR's actual merge timestamp post-merge. The
+# placeholder is functionally equivalent for all practical purposes — the PR
+# cannot merge before this instant, and no PASS closure will have a
+# `closed_timestamp` between the placeholder and the actual merge timestamp.
+AMENDMENT_5_CUTOFF_ISO: str = "2026-05-23T00:00:00Z"
 
 V11_EXCLUSIVE_FIELDS = {
     "worst_fold_dd_base_pct",
@@ -287,6 +302,14 @@ class _TrackerPayloadBase(BaseModel):
     archetypes_observed: list[str]
     cross_arc_tags: list[str] = Field(default_factory=list)
 
+    # L_PROTOCOL Amendment 5 (v1.3.1). Architectures admissible under
+    # Amendment 1's archetype-driven rule but skipped under Amendment 5's
+    # four-gate AUC-driven rule. OPTIONAL on Phase 1; required for post-cutoff
+    # PASS verdicts (enforced at the CLI layer — needs closed_timestamp +
+    # cutoff context the model doesn't have). May be `[]` when the
+    # Amendment-5 set equals or supersets the Amendment-1 set.
+    architectures_skipped_by_amendment_5: list[str] | None = None
+
 
 class TrackerPayloadV10(_TrackerPayloadBase):
     """v1.0 payload — legacy field names in best_architecture."""
@@ -494,6 +517,15 @@ def parse_payload(payload: dict[str, Any]) -> dict[str, Any]:
             raise ValueError(
                 f"architecture {arch!r} not in {{A1…A6}}"
             )
+
+    # Amendment 5 (v1.3.1) field — enum-validate any entries when present.
+    skipped = norm.get("architectures_skipped_by_amendment_5")
+    if skipped is not None:
+        for arch in skipped:
+            if arch not in VALID_ARCHITECTURES:
+                raise ValueError(
+                    f"architectures_skipped_by_amendment_5 entry {arch!r} not in {{A1…A6}}"
+                )
 
     # v1.3 step_6 block enum validation
     step6 = norm.get("step_6")

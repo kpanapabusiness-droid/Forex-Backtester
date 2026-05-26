@@ -38,7 +38,7 @@ Last auto-update: parser: 2026-05-25 09:24:04
 | l_arc_11 | swing-high breakout in trend (SHB) long, 4H, causal 3-bar swing (right-edge t-4) | H4 | vanilla | A2 classifier_filter | -0.7687 | FAIL | FAIL | 5 | results/l_arc_11/ARC_CLOSURE.md |
 | l_arc_7 | liquidity sweep + reclaim long (4H structural reversal) | 4H | vanilla | — | -0.8172120095638017 | FAIL |  | 5 | results/l_arc_7/ARC_CLOSURE.md |
 | l_arc_7_v3_0_2 | liquidity sweep + reclaim long (4H) — A2/A6 follow-up (override) | 4H | vanilla | — | 4.363315680255243 | FAIL |  | 5 | results/l_arc_7_v3.0.2/ARC_CLOSURE.md |
-| l_arc_10_v3.0.2 | D1 swing-low rejection long (DLR, v0.1) — bullish rejection of confirmed ascending D1 swing-low, 4H entry | H4 | vanilla | A1 system_level_filter | 6.4273 | PASS-DEPLOYABLE-PROVISIONAL |  | N/A | results/l_arc_10_v3.0.2/ARC_CLOSURE.md |
+| l_arc_10_v3.0.2 | D1 swing-low rejection long (DLR, v0.1) — bullish rejection of confirmed ascending D1 swing-low, 4H entry | H4 | vanilla | A1 system_level_filter | 6.4273 | PASS-DEPLOYABLE |  | N/A | results/l_arc_10_v3.0.2/ARC_CLOSURE.md |
 
 ---
 

@@ -1,0 +1,13 @@
+{
+  "files": {
+    "deployment_readiness_report.md": "c7049e94fff7258f3149cbf3e96886fdd364e95a60acf1e2911907972e945ef5",
+    "determinism_report.md": "e339f9c9e6a76d5f9328016c792262e27e609dbf511cf02819d85d265f90d50b",
+    "execution_realism_report.md": "7967928268ecef645f066e3e8fcc3a983de51b860e5a0b02402cdc2499b8e2c9",
+    "lookahead_report.md": "956781bc57a039e222085e64487b28ee13a5d9404a075cea9a97b6062906209b",
+    "manifest.json": "dce60123e5e5a58f6a58858175c23e1d7d2398e8c5d4d82d479fa5a178633d78",
+    "selection_bias_report.md": "85518e91716a6413dfc8ec9813acb711b5bfe20b9673903d2663d7fd292615c7",
+    "statistical_report.md": "deaa3ed06e2e2b8b319671e7f3d155f1ccfe4fa90fbf6bb1220416640e3fb992",
+    "summary.md": "f61ef95af882f4a78db444fa53767a37c6b546d59c38b1c05a11044f41a4ec55"
+  },
+  "generated_at": "2026-05-25T21:31:15Z"
+}

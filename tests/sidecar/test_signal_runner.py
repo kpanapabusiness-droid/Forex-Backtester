@@ -1,22 +1,14 @@
 """Test signal_runner — verifies the wrapper invokes compute_signal correctly.
 
-The dispatch §1.6 "byte-identical to UTC rerun" guarantee is too
-expensive to test here without the UTC cache; instead we:
-
-  1. Exercise the wrapper on synthetic panels (smoke test that it
-     returns None when no signal fires, and that the returned dict has
-     the right keys when one does).
-  2. Provide a marked test that fires only when the UTC cache is
-     present and a ledger row is available — verifies byte-equivalence
-     against the recorded ledger atr14 / L1 / L0 fields.
-
-The byte-identity test (2) skips on CI; it runs only on the workstation
-where data/cache/utc/ + the UTC rerun trade ledger are populated.
+Unit-test scope is limited to wrapper plumbing: dict shape on signal,
+``None`` on empty / no-signal panels. The dispatch §1.6 "byte-identical
+to UTC rerun" guarantee is validated by Dispatch C v2 (Phase 2 parity
+validation), which compares sidecar output against a per-signal lab
+audit fixture across 28 pairs against a pre-built UTC cache —
+deliberately out of unit-test scope.
 """
 
 from __future__ import annotations
-
-from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -124,12 +116,15 @@ def test_run_signal_constructs_signal_dict_on_synthetic_force():
         }
 
 
-@pytest.mark.skipif(
-    not Path("data/cache/utc/EURUSD/H4.parquet").exists()
-    and not Path("data/cache/H4/EURUSD.parquet").exists(),
-    reason="UTC cache not available in this worktree",
+@pytest.mark.skip(
+    reason=(
+        "Byte-identity verification against the UTC rerun belongs to Dispatch C v2 "
+        "(Phase 2 parity validation), not a unit test. Phase 2 compares sidecar "
+        "output against a per-signal lab audit fixture (L1/L0 + atr14 + signal-bar "
+        "boundary) across 28 pairs with a pre-built UTC cache. trade_ledger_utc "
+        "alone lacks L1/L0 columns, and a 28-pair UTC cache rebuild from M1 is "
+        "outside the unit-test budget."
+    )
 )
 def test_run_signal_byte_identity_vs_ledger():
-    """Verify a known signal fires byte-identically to the UTC rerun trade
-    ledger. Skipped if cache isn't present (CI / fresh worktrees)."""
-    pytest.skip("byte-identity test gated on workstation-local UTC cache + ledger fixture")
+    """Placeholder — see Dispatch C v2 for the proper byte-identity harness."""

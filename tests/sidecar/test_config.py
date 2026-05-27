@@ -51,6 +51,34 @@ def test_canonical_subset_contains_load_bearing_fields(winning_config_path):
     assert "EURUSD" in subset["pairs"]
 
 
+def test_canonical_subset_excludes_risk_parameters(winning_config_path):
+    """Per config.py rationale: risk fields are NOT in the hashed subset.
+
+    Per-trade risk is an EA-input deployment parameter, not part of the
+    signal/exit contract. Changing r_safe_pct in the YAML must NOT
+    invalidate the EA's accepted-signal whitelist.
+    """
+    cfg = load_winning_config(winning_config_path)
+    subset = canonical_hashed_subset(cfg)
+    forbidden = {k for k in subset if k.startswith("risk.")}
+    assert forbidden == set(), (
+        f"risk-related keys leaked into hashed subset: {forbidden}"
+    )
+
+
+def test_config_hash_invariant_under_r_safe_change(winning_config_path, tmp_path):
+    """Mutating risk.r_safe_pct must NOT change the config_hash."""
+    cfg_a = load_winning_config(winning_config_path)
+    h_a = compute_config_hash(cfg_a)
+    cfg_b = load_winning_config(winning_config_path)
+    cfg_b.setdefault("risk", {})["r_safe_pct"] = 0.005439  # legacy EET value
+    h_b = compute_config_hash(cfg_b)
+    cfg_c = load_winning_config(winning_config_path)
+    cfg_c.setdefault("risk", {})["r_safe_pct"] = 0.004336  # UTC verdict value
+    h_c = compute_config_hash(cfg_c)
+    assert h_a == h_b == h_c
+
+
 def test_load_sidecar_config_uses_winning_pairs_when_no_override(
     winning_config_path, sidecar_root
 ):

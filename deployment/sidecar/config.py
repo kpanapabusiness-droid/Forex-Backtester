@@ -27,10 +27,33 @@ from typing import Any
 
 import yaml
 
-# Canonical hashed-subset keys. Anything outside this set is informational
-# (comments, file path, provenance) and does not change the deployed
-# behaviour. Anything in this set changes behaviour and must invalidate
-# the EA's accepted-signal whitelist.
+# Canonical hashed-subset keys.
+#
+# The hash covers the SIGNAL + EXIT CONTRACT — the fields that, if they
+# drift, mean the live system is no longer trading what the WFO verdict
+# was earned on. Specifically:
+#
+#   - signal identity (module, name, version)
+#   - architecture (rule-based A1 variant)
+#   - SL geometry (ATR period, multiplier, anchor, reference)
+#   - exit-policy mechanics (partial fraction, trail formula, update freq)
+#   - time-exit bound
+#   - universe (pairs, primary/anchor TFs, boundary convention)
+#   - fill semantics (entry side, spread source)
+#   - arc + verdict labels (provenance integrity)
+#
+# The hash deliberately EXCLUDES deployment-time risk parameters
+# (``risk.r_safe_pct``, ``risk.r_hard_pct``, ``risk.r_base_pct``).
+# Rationale: per-trade risk is an EA input (``Risk_Per_Trade``) chosen
+# at deploy time per portfolio sizing; the underlying signal + exit
+# contract is risk-invariant. The checked-in winning_config carries
+# the v3.0.2 EET-era r_safe_pct=0.005439 as a provenance artefact,
+# while the live UTC deployment trades at r_safe=0.4336% per
+# COMPARISON_REPORT.md §4. If the hash included r_safe_pct, swapping
+# r_safe between EET (0.005439) and UTC (0.004336) would require
+# either editing the locked v3.0.2 config artefact or recomputing the
+# hash — both worse than just keeping risk out of the contract that
+# the hash protects.
 _HASHED_SUBSET_KEYS = (
     "arc_name",
     "verdict",
@@ -55,7 +78,6 @@ _HASHED_SUBSET_KEYS = (
     "timeframes.primary",
     "timeframes.anchor",
     "pairs",
-    "risk.r_safe_pct",
     "fills.entry_long",
     "fills.spread_source",
 )

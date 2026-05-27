@@ -162,8 +162,8 @@ void ArcPollSignals()
          continue;
         }
       // News check.
-      datetime delay_to;
-      string news_reason;
+      datetime delay_to = 0;
+      string news_reason = "";
       int decision = 0;
       if(Enable_News_Filter)
          decision = ArcNewsDecide(sig, News_Window_Sec, News_Delay_Buffer_Sec,

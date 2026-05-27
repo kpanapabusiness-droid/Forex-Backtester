@@ -1,0 +1,128 @@
+# Arc 10 v3.0.2 — UTC convention rerun (sidecar deployment-spec)
+#
+# Sidecar override of configs/l_arc_10_v3.0.2/winning_config.yaml with
+# exactly ONE change:
+#   1. boundary_convention: "5ers_eet"  →  "utc"
+#
+# All other fields are byte-identical to the locked v3.0.2 winning_config.
+# The verdict field is preserved as PASS-DEPLOYABLE because that is the
+# v3.0.2 EET verdict; this rerun does not re-issue the verdict (see
+# results/l_arc_10_v3_0_2_utc_rerun/COMPARISON_REPORT.md for the UTC
+# verdict computed under dispatch §3).
+#
+# This file is not consumed by the rerun pipeline itself (scripts/
+# l_arc_10_v3/ reads only arc_open.yaml). Kept as a provenance artefact
+# symmetric to the v3.0.2 deployment convention.
+#
+# Phase branch: phase/arc_10_v3_0_2_utc_rerun
+# Anchor: arc-10-v3.0.2-DEPLOYABLE (commit 244fb76)
+# See: utc_rerun_intent.md
+
+arc_name: l_arc_10_v3.0.2
+verdict: PASS-DEPLOYABLE
+boundary_convention: "utc"
+
+signal:
+  name: dlr_d1_swing_low_rejection_long
+  module: signals.lchar_dlr_long
+  version: v0.1
+  spec_path: docs/archive/signal_specs/signal_spec_d1_swing_low_rejection_long_v0.1.md
+
+direction: long
+
+architecture:
+  name: A1
+  variant: system_level_filter
+  cluster_id: 0
+  archetype: v_shape_recovery
+  # A1 is rule-based; features_in_winning_config is intentionally empty.
+  features_in_winning_config: []
+
+stop_loss:
+  type: atr_multiple
+  atr_period: 14
+  multiplier: 3.5
+  anchor: mid
+  reference: entry_price
+
+exit_policy:
+  name: sl_partial_close_1r_runner_trail
+  partial_close_at: 1.0   # R-multiple
+  partial_close_fraction: 0.5
+  runner_trail_atr_below_peak: 1.0
+  update_frequency: bar_close
+
+time_exit:
+  max_bars: 240   # ~40 days at H4
+
+timeframes:
+  primary: H4
+  anchor: D1   # one-bar-lagged (KH-24 convention)
+  cross_pair_aux: [D1, W1]
+
+window:
+  start: "2010-01-01"
+  end: "2026-04-30"
+  holdout_start: "2021-01-01"
+  holdout_end: "2026-04-30"
+
+pairs:
+  - AUDCAD
+  - AUDCHF
+  - AUDJPY
+  - AUDNZD
+  - AUDUSD
+  - CADCHF
+  - CADJPY
+  - CHFJPY
+  - EURAUD
+  - EURCAD
+  - EURCHF
+  - EURGBP
+  - EURJPY
+  - EURNZD
+  - EURUSD
+  - GBPAUD
+  - GBPCAD
+  - GBPCHF
+  - GBPJPY
+  - GBPNZD
+  - GBPUSD
+  - NZDCAD
+  - NZDCHF
+  - NZDJPY
+  - NZDUSD
+  - USDCAD
+  - USDCHF
+  - USDJPY
+
+risk:
+  sizing_convention: reset_floor
+  r_base_pct: 0.005
+  # Amendment 3 deploy values (post-cap; both intrinsics < R_MAX so no cap):
+  r_safe_pct: 0.005439   # k_safe = 1.0879
+  r_hard_pct: 0.006799   # k_hard = 1.3598
+  recommended_deploy_pct: 0.005439   # = r_safe (DEPLOYABLE tier)
+
+exposure:
+  per_currency_cap: null   # unlimited
+  global_cap: null
+
+fills:
+  entry_long: open_ask
+  entry_short: open_bid    # not used (long only)
+  spread_source: histdata_m1_bid_ask
+
+determinism:
+  random_state: 42
+  n_jobs: 1
+  line_terminator: "\n"
+
+provenance:
+  bespoke_pipeline_pr: 214
+  bespoke_pipeline_branch: arc/l_arc_10_v3.0.2
+  addendum_branch: arc/l_arc_10_v3.0.2_addendum
+  amendment_3_artefact: results/l_arc_10_v3.0.2/step_5/amendment_3/amended_gate_classification.json
+  step_6_artefact: results/l_arc_10_v3.0.2/step_6/manifest.json
+  utc_rerun_phase_branch: phase/arc_10_v3_0_2_utc_rerun
+  utc_rerun_anchor_tag: arc-10-v3.0.2-DEPLOYABLE

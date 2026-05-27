@@ -16,7 +16,6 @@ Output: results/l_arc_10_v3.0.2/exhaustive_audit/section_2_10_engine_path.json.
 from __future__ import annotations
 
 import json
-import sys
 from pathlib import Path
 
 _HERE = Path(__file__).resolve()

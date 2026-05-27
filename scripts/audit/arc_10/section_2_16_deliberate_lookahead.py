@@ -128,7 +128,6 @@ def _compute_signal_with_swing_bug(df_4h, df_d1, dlr_mod, **kwargs):
 
 def _run_post_signal_nan_test(pool, dlr_mod, signal_fn, label: str) -> dict:
     """Pick sample trades; NaN bars after signal_bar; check whether signal flips."""
-    rng = np.random.default_rng(42)
     failures: list[dict] = []
     n_checked = 0
     for pair in TEST_PAIRS:

@@ -167,8 +167,6 @@ def run() -> dict:
         print(f"[2.1] {pair} ...", flush=True)
         h4, d1 = _load_pair_data(pair)
         h4_bid, d1_bid = _bid_views(h4, d1)
-        base_sig = dlr.compute_signal(h4_bid, d1_bid, signal_col="signal").reset_index(drop=True)
-        base_mask = base_sig["signal"].to_numpy(dtype=bool)
         date_arr = pd.to_datetime(h4_bid["date"]).reset_index(drop=True)
         # Build a date → bar_index lookup for this pair.
         date_to_idx = pd.Series(np.arange(len(date_arr)), index=date_arr)

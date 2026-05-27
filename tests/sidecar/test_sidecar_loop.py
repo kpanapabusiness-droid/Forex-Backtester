@@ -58,8 +58,8 @@ def test_verify_mt5_h4_alignment_accepts_anchored_bars(fake_mt5):
 def test_verify_mt5_h4_alignment_rejects_drifted_bars(fake_mt5):
     """If the broker emits bars at e.g. 21:00 / 01:00 UTC (EET-anchored),
     the probe must refuse."""
+
     from tests.sidecar.conftest import _synth_h4_panel
-    import pandas as pd
 
     drifted = _synth_h4_panel(n_bars=24, start_iso="2026-01-01T01:00:00")
     fake_mt5.h4_panel = drifted

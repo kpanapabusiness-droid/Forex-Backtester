@@ -17,7 +17,7 @@ metadata into a Signal envelope via ``signal_emitter.build_envelope``.
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import timedelta, timezone
 from typing import Any
 
 import pandas as pd

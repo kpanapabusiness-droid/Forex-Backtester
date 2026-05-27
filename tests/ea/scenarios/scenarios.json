@@ -1,0 +1,126 @@
+{
+  "$comment": "12 Strategy Tester scenarios per dispatch §4.2 / phase_1_build_intent.md §5.2.",
+  "schema_version": "1.0",
+  "scenarios": [
+    {
+      "id": "s1",
+      "title": "Entry → trail → trail SL exit",
+      "pair": "EURUSD",
+      "signal_bar_close_price": 1.0842,
+      "atr14": 0.00214,
+      "narrative": "Bar N+1 fills near 1.0842. Price rallies to >+1R triggering partial close (50%). Peak ratchets across subsequent H4 bars; trail SL = peak - 1R follows. Eventually a bar closes below trail; EA queues full close of remaining 50% at next-bar open.",
+      "expected_events": ["entry", "partial_close", "trail_modify", "exit"],
+      "expected_exit_reason_substring": "trail_stop"
+    },
+    {
+      "id": "s2",
+      "title": "Entry → SL hit (no partial)",
+      "pair": "GBPUSD",
+      "signal_bar_close_price": 1.2540,
+      "atr14": 0.00350,
+      "narrative": "Bar N+1 fills near 1.2540. Price drops directly to -1R before any +1R cross. Broker SL fires; EA's intra-tick TP1 check never fires; bar_ordinal updates do nothing for trail. exit fires at broker fill.",
+      "expected_events": ["entry", "exit"],
+      "expected_exit_reason_substring": "broker_closed"
+    },
+    {
+      "id": "s3",
+      "title": "Entry → partial → BE-equivalent trail SL hit (zero net R)",
+      "pair": "AUDUSD",
+      "signal_bar_close_price": 0.6580,
+      "atr14": 0.00120,
+      "narrative": "TP1 fires; trail activates at peak - 1R. Peak doesn't extend (small post-TP1 reversal). Bar closes back at entry-equivalent (peak = entry+R, trail = entry). Full close at next bar open. Net R = 0.5 (partial captured) + 0 (runner) = 0.25 in lot-weighted terms.",
+      "expected_events": ["entry", "partial_close", "trail_modify", "exit"],
+      "expected_exit_reason_substring": "trail_stop"
+    },
+    {
+      "id": "s4",
+      "title": "Entry → partial → big runner with multiple ratchets → exit",
+      "pair": "USDJPY",
+      "signal_bar_close_price": 152.40,
+      "atr14": 0.40,
+      "narrative": "TP1 fires. Over 8-15 bars, peak high ratchets up steadily; trail SL ratchets up each bar via PositionModify. Eventually a bar closes below the highest trail level; runner exits.",
+      "expected_events": ["entry", "partial_close", "trail_modify", "trail_modify", "trail_modify", "exit"],
+      "expected_exit_reason_substring": "trail_stop"
+    },
+    {
+      "id": "s5",
+      "title": "Entry → partial → time exit at bar 240",
+      "pair": "NZDUSD",
+      "signal_bar_close_price": 0.6010,
+      "atr14": 0.00140,
+      "narrative": "TP1 fires. Price drifts sideways for 240 H4 bars without trail-stopping. bar_ordinal reaches 240; time exit queued; close at next bar open.",
+      "expected_events": ["entry", "partial_close", "exit"],
+      "expected_exit_reason_substring": "time_exit"
+    },
+    {
+      "id": "s6",
+      "title": "News block at signal time",
+      "pair": "EURUSD",
+      "signal_bar_close_price": 1.0842,
+      "atr14": 0.00214,
+      "narrative": "Calendar contains a high-impact USD or EUR event within ±120s of entry_bar_open_utc. EA delays entry until event_time + 125s. If delay would push past signal+1h, signal is discarded. This scenario sets up the delay case; news event fires before entry, then entry fires at delay_to.",
+      "expected_events": ["news_delay", "entry"],
+      "expected_exit_reason_substring": ""
+    },
+    {
+      "id": "s7",
+      "title": "Equity guard block at signal time",
+      "pair": "EURUSD",
+      "signal_bar_close_price": 1.0842,
+      "atr14": 0.00214,
+      "narrative": "Account equity has drawn down to ≥3.5% from EET day open (Daily_DD_Halt_Pct). EA's equity-guard rejects entry; signal moves to signals_failed/ with reason=daily_dd_halt.",
+      "expected_events": ["equity_block"],
+      "expected_exit_reason_substring": ""
+    },
+    {
+      "id": "s8",
+      "title": "Same-bar dual-touch event (log only)",
+      "pair": "GBPJPY",
+      "signal_bar_close_price": 192.50,
+      "atr14": 0.80,
+      "narrative": "A single H4 bar contains both bar.high >= entry+1R (TP1 trigger) AND bar.low <= entry-1R (would-have-been SL). EA fires partial intra-tick first (Bid touches +1R before SL); SL then fires later in the same bar on the broker. Phase 2 will measure the R impact vs Python convention.",
+      "expected_events": ["entry", "partial_close", "exit"],
+      "expected_exit_reason_substring": "broker_closed"
+    },
+    {
+      "id": "s9",
+      "title": "EA restart mid-trade, pre-partial",
+      "pair": "USDCAD",
+      "signal_bar_close_price": 1.3580,
+      "atr14": 0.00180,
+      "narrative": "Place entry; restart EA via Strategy Tester restart hook. On reinit, RecoveryManager enumerates broker positions filtered by magic, reconstructs entry_bar_time, peak_high_bid from H4 bars, finds no partial in deal history → tp1_fired=false. Continues management normally.",
+      "expected_events": ["entry", "recovery_reconstructed"],
+      "expected_exit_reason_substring": ""
+    },
+    {
+      "id": "s10",
+      "title": "EA restart mid-trade, post-partial",
+      "pair": "USDCAD",
+      "signal_bar_close_price": 1.3580,
+      "atr14": 0.00180,
+      "narrative": "Place entry, TP1 fires, restart. On reinit, deal history shows a partial-close deal with volume < initial; reconstruct tp1_fired=true, partial_close_price=<deal price>, peak_high_bid from H4 highs. Trail level may need broker SL ratchet. Continues management.",
+      "expected_events": ["entry", "partial_close", "recovery_reconstructed"],
+      "expected_exit_reason_substring": ""
+    },
+    {
+      "id": "s11",
+      "title": "Sidecar stale heartbeat (existing positions managed; new entries blocked)",
+      "pair": "EURUSD",
+      "signal_bar_close_price": 1.0842,
+      "atr14": 0.00214,
+      "narrative": "Active position exists. ea.heartbeat is fresh but sidecar.heartbeat is older than Sidecar_Heartbeat_Max_Age_Sec. EA ArcPollSignals() and news refresh are skipped this tick; existing position management continues (TP1, trail, time exit). New synthetic signal dropped into signals_out/ is NOT picked up while heartbeat stale.",
+      "expected_events": [],
+      "expected_exit_reason_substring": ""
+    },
+    {
+      "id": "s12",
+      "title": "Invalid config_hash (signal rejected)",
+      "pair": "EURUSD",
+      "signal_bar_close_price": 1.0842,
+      "atr14": 0.00214,
+      "narrative": "Fake_sidecar emits with config_hash that doesn't match Expected_Config_Hash. EA's ArcSignalParse returns config_hash_mismatch; signal moves to signals_failed/. No order placed.",
+      "expected_events": [],
+      "expected_exit_reason_substring": ""
+    }
+  ]
+}

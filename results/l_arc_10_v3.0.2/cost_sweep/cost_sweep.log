@@ -1,0 +1,69 @@
+[cost_sweep] loading inputs…
+[cost_sweep] 3301 trades loaded (2162 search, 1139 holdout)
+[cost_sweep] §5.2 entry-time assertion: n_at_2200_UTC=0, n_at_2100_UTC=0
+[cost_sweep] zero-spread trades: n_zero_either=0 (0.00% of 3301)
+[cost_sweep] running baseline assertion (no costs — must reproduce UTC re-run)…
+[cost_sweep] baseline: worst_ratio=5.4185 worst_roi=0.264905 worst_dd=0.092241 holdout_roi=0.5907 verdict=DD_WATCH
+[cost_sweep] OK baseline reproduces UTC re-run published numbers (within 1e-4).
+[cost_sweep] cell 1/30: spread×1.0, swap=OFF, slip=0.0pip/fill
+   -> worst_ratio=5.286 worst_roi=26.12% worst_dd=9.26% holdout_roi=58.33% verdict=DD_WATCH
+[cost_sweep] cell 2/30: spread×1.0, swap=OFF, slip=0.5pip/fill
+   -> worst_ratio=4.916 worst_roi=25.01% worst_dd=9.37% holdout_roi=56.02% verdict=DD_WATCH
+[cost_sweep] cell 3/30: spread×1.0, swap=OFF, slip=1.0pip/fill
+   -> worst_ratio=4.568 worst_roi=23.90% worst_dd=9.48% holdout_roi=53.75% verdict=DD_WATCH
+[cost_sweep] cell 4/30: spread×1.0, swap=ON, slip=0.0pip/fill
+   -> worst_ratio=2.690 worst_roi=14.96% worst_dd=9.98% holdout_roi=37.88% verdict=DD_WATCH
+[cost_sweep] cell 5/30: spread×1.0, swap=ON, slip=0.5pip/fill
+   -> worst_ratio=2.451 worst_roi=13.54% worst_dd=10.12% holdout_roi=35.87% verdict=FAIL_DD_HARD
+[cost_sweep] cell 6/30: spread×1.0, swap=ON, slip=1.0pip/fill
+   -> worst_ratio=2.225 worst_roi=12.14% worst_dd=10.26% holdout_roi=33.90% verdict=FAIL_DD_HARD
+[cost_sweep] cell 7/30: spread×1.5, swap=OFF, slip=0.0pip/fill
+   -> worst_ratio=4.864 worst_roi=24.62% worst_dd=9.66% holdout_roi=54.94% verdict=DD_WATCH
+[cost_sweep] cell 8/30: spread×1.5, swap=OFF, slip=0.5pip/fill
+   -> worst_ratio=4.521 worst_roi=23.58% worst_dd=9.76% holdout_roi=52.69% verdict=DD_WATCH
+[cost_sweep] cell 9/30: spread×1.5, swap=OFF, slip=1.0pip/fill
+   -> worst_ratio=4.199 worst_roi=22.54% worst_dd=9.87% holdout_roi=50.46% verdict=DD_WATCH
+[cost_sweep] cell 10/30: spread×1.5, swap=ON, slip=0.0pip/fill
+   -> worst_ratio=2.427 worst_roi=12.90% worst_dd=10.47% holdout_roi=34.94% verdict=FAIL_DD_HARD
+[cost_sweep] cell 11/30: spread×1.5, swap=ON, slip=0.5pip/fill
+   -> worst_ratio=2.204 worst_roi=11.51% worst_dd=10.61% holdout_roi=32.97% verdict=FAIL_DD_HARD
+[cost_sweep] cell 12/30: spread×1.5, swap=ON, slip=1.0pip/fill
+   -> worst_ratio=1.992 worst_roi=10.13% worst_dd=10.76% holdout_roi=31.04% verdict=FAIL_DD_HARD
+[cost_sweep] cell 13/30: spread×2.0, swap=OFF, slip=0.0pip/fill
+   -> worst_ratio=4.476 worst_roi=19.88% worst_dd=10.05% holdout_roi=51.63% verdict=FAIL_DD_HARD
+[cost_sweep] cell 14/30: spread×2.0, swap=OFF, slip=0.5pip/fill
+   -> worst_ratio=4.157 worst_roi=18.87% worst_dd=10.15% holdout_roi=49.42% verdict=FAIL_DD_HARD
+[cost_sweep] cell 15/30: spread×2.0, swap=OFF, slip=1.0pip/fill
+   -> worst_ratio=3.857 worst_roi=17.87% worst_dd=10.26% holdout_roi=47.24% verdict=FAIL_DD_HARD
+[cost_sweep] cell 16/30: spread×2.0, swap=ON, slip=0.0pip/fill
+   -> worst_ratio=2.183 worst_roi=10.88% worst_dd=10.96% holdout_roi=32.06% verdict=FAIL_DD_HARD
+[cost_sweep] cell 17/30: spread×2.0, swap=ON, slip=0.5pip/fill
+   -> worst_ratio=1.973 worst_roi=9.51% worst_dd=11.11% holdout_roi=30.13% verdict=FAIL_DD_HARD
+[cost_sweep] cell 18/30: spread×2.0, swap=ON, slip=1.0pip/fill
+   -> worst_ratio=1.774 worst_roi=8.16% worst_dd=11.28% holdout_roi=28.24% verdict=FAIL_DD_HARD
+[cost_sweep] cell 19/30: spread×3.0, swap=OFF, slip=0.0pip/fill
+   -> worst_ratio=2.354 worst_roi=10.91% worst_dd=10.87% holdout_roi=45.32% verdict=FAIL_DD_HARD
+[cost_sweep] cell 20/30: spread×3.0, swap=OFF, slip=0.5pip/fill
+   -> worst_ratio=2.130 worst_roi=9.98% worst_dd=10.99% holdout_roi=43.21% verdict=FAIL_DD_HARD
+[cost_sweep] cell 21/30: spread×3.0, swap=OFF, slip=1.0pip/fill
+   -> worst_ratio=1.904 worst_roi=9.06% worst_dd=11.12% holdout_roi=41.13% verdict=FAIL_DD_HARD
+[cost_sweep] cell 22/30: spread×3.0, swap=ON, slip=0.0pip/fill
+   -> worst_ratio=0.623 worst_roi=3.32% worst_dd=12.21% holdout_roi=26.58% verdict=FAIL_DD_HARD
+[cost_sweep] cell 23/30: spread×3.0, swap=ON, slip=0.5pip/fill
+   -> worst_ratio=0.442 worst_roi=2.45% worst_dd=12.40% holdout_roi=24.74% verdict=FAIL_DD_HARD
+[cost_sweep] cell 24/30: spread×3.0, swap=ON, slip=1.0pip/fill
+   -> worst_ratio=0.276 worst_roi=1.59% worst_dd=12.59% holdout_roi=22.93% verdict=FAIL_DD_HARD
+[cost_sweep] cell 25/30: spread×4.0, swap=OFF, slip=0.0pip/fill
+   -> worst_ratio=0.492 worst_roi=2.62% worst_dd=11.82% holdout_roi=39.43% verdict=FAIL_DD_HARD
+[cost_sweep] cell 26/30: spread×4.0, swap=OFF, slip=0.5pip/fill
+   -> worst_ratio=0.317 worst_roi=1.75% worst_dd=11.96% holdout_roi=37.41% verdict=FAIL_DD_HARD
+[cost_sweep] cell 27/30: spread×4.0, swap=OFF, slip=1.0pip/fill
+   -> worst_ratio=0.156 worst_roi=0.90% worst_dd=12.15% holdout_roi=35.42% verdict=FAIL_DD_HARD
+[cost_sweep] cell 28/30: spread×4.0, swap=ON, slip=0.0pip/fill
+   -> worst_ratio=-0.588 worst_roi=-4.41% worst_dd=13.51% holdout_roi=21.46% verdict=FAIL_DD_HARD
+[cost_sweep] cell 29/30: spread×4.0, swap=ON, slip=0.5pip/fill
+   -> worst_ratio=-0.653 worst_roi=-5.22% worst_dd=13.69% holdout_roi=19.70% verdict=FAIL_DD_HARD
+[cost_sweep] cell 30/30: spread×4.0, swap=ON, slip=1.0pip/fill
+   -> worst_ratio=-0.709 worst_roi=-6.01% worst_dd=14.41% holdout_roi=17.97% verdict=FAIL_DD_HARD
+
+[cost_sweep] wrote C:\Users\panap\Documents\Forex-Backtester\.claude\worktrees\dazzling-shannon-51d9ac\results\l_arc_10_v3.0.2\cost_sweep\grid_results.csv (30 cells)

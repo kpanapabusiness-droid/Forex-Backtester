@@ -73,10 +73,18 @@ def build_scenario_envelope(
 
 
 def write_scenario(
-    scenario_id: str, out_dir: str | Path, *, config_hash: str = "0" * 64
+    scenario_id: str,
+    out_dir: str | Path,
+    *,
+    config_hash: str = "0" * 64,
+    signal_bar_close_utc: str | None = None,
 ) -> Path:
     """Write the scenario's envelope into ``out_dir/signals_out/``."""
-    env = build_scenario_envelope(scenario_id, config_hash=config_hash)
+    env = build_scenario_envelope(
+        scenario_id,
+        config_hash=config_hash,
+        signal_bar_close_utc=signal_bar_close_utc,
+    )
     return emit_signal(env, Path(out_dir) / "signals_out")
 
 
@@ -85,6 +93,18 @@ def _build_arg_parser() -> argparse.ArgumentParser:
     p.add_argument("--scenario", required=True, help="Scenario id (s1..s12)")
     p.add_argument("--out", required=True, type=Path, help="Sidecar root directory")
     p.add_argument("--config-hash", default="0" * 64)
+    p.add_argument(
+        "--signal-bar-close",
+        default=None,
+        help=(
+            "Explicit UTC timestamp for the signal bar close, e.g. "
+            '"2026-03-10T08:00:00Z". The entry bar opens at the same '
+            "instant (it is the next H4 bar). Use this to anchor "
+            "Strategy Tester scenarios in the past so historical ticks "
+            "exist for exit playout. When omitted, defaults to the "
+            "next H4 boundary after 'now' (live-deploy behaviour)."
+        ),
+    )
     return p
 
 
@@ -92,7 +112,12 @@ def main(argv: list[str] | None = None) -> int:
     args = _build_arg_parser().parse_args(argv)
     out_dir = args.out
     (out_dir / "signals_out").mkdir(parents=True, exist_ok=True)
-    path = write_scenario(args.scenario, out_dir, config_hash=args.config_hash)
+    path = write_scenario(
+        args.scenario,
+        out_dir,
+        config_hash=args.config_hash,
+        signal_bar_close_utc=args.signal_bar_close,
+    )
     print(f"Wrote envelope to {path}")
     return 0
 

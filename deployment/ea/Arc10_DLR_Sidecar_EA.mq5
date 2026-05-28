@@ -137,7 +137,14 @@ void ArcPollSignals()
    g_last_poll = TimeCurrent();
    string files[];
    int n = ArcSignalListInbox(Sidecar_Inbox_Dir, files);
-   PrintFormat("[ARC10] poll: dir=%s found=%d", Sidecar_Inbox_Dir, n);
+   // Diagnostic — state-change-aware to keep ST + live journals readable.
+   // Prints when: (a) any envelope found, (b) first-zero after non-zero
+   // (last batch fully processed), (c) very first poll (baseline).
+   // Skips sustained-zero polls.
+   static int g_arc_last_poll_n = -1;
+   if(n > 0 || g_arc_last_poll_n > 0 || g_arc_last_poll_n == -1)
+      PrintFormat("[ARC10] poll: dir=%s found=%d", Sidecar_Inbox_Dir, n);
+   g_arc_last_poll_n = n;
    for(int i = 0; i < n; i++)
      {
       string full = Sidecar_Inbox_Dir + "\\" + files[i];

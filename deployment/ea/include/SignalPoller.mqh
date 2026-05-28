@@ -124,7 +124,7 @@ int ArcJsonGetInt(const string buf, const string key, bool &found)
 //+------------------------------------------------------------------+
 bool ArcReadFileContent(const string file_path, string &out)
   {
-   int h = FileOpen(file_path, FILE_READ | FILE_TXT | FILE_ANSI);
+   int h = FileOpen(file_path, FILE_READ | FILE_TXT | FILE_ANSI | FILE_COMMON);
    if(h == INVALID_HANDLE)
       return false;
    out = "";
@@ -207,14 +207,18 @@ bool ArcSignalParse(
   }
 
 //+------------------------------------------------------------------+
-//| List *.json files in a relative-to-MQL5/Files inbox directory.    |
+//| List *.json files in an inbox directory under Terminal\Common\    |
+//| Files (FILE_COMMON). The common-folder root is mandatory because  |
+//| Strategy Tester wipes the per-agent MQL5\Files\ sandbox at run    |
+//| start; only the Common folder is shared between the EA, the       |
+//| sidecar process, and tester agents.                               |
 //+------------------------------------------------------------------+
 int ArcSignalListInbox(const string inbox_dir, string &out_files[])
   {
    ArrayResize(out_files, 0);
    string pattern = inbox_dir + "\\*.json";
    string fname;
-   long handle = FileFindFirst(pattern, fname);
+   long handle = FileFindFirst(pattern, fname, FILE_COMMON);
    if(handle == INVALID_HANDLE)
       return 0;
    ArrayResize(out_files, 1);
@@ -240,7 +244,7 @@ bool ArcSignalMoveTo(
   {
    string src = inbox_dir + "\\" + fname;
    string dst = dest_dir + "\\" + fname;
-   if(!FileMove(src, 0, dst, FILE_REWRITE))
+   if(!FileMove(src, FILE_COMMON, dst, FILE_REWRITE | FILE_COMMON))
      {
       PrintFormat("[ARC10] FileMove failed: %s -> %s err=%d", src, dst, GetLastError());
       return false;

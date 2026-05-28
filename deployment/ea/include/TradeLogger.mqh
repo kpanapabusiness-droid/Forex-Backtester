@@ -32,12 +32,12 @@ void ArcTradeLogEnsureHeader(const string path)
   {
    if(g_arc_trade_log_header_written)
       return;
-   if(FileIsExist(path))
+   if(FileIsExist(path, FILE_COMMON))
      {
       g_arc_trade_log_header_written = true;
       return;
      }
-   int h = FileOpen(path, FILE_WRITE | FILE_TXT | FILE_ANSI);
+   int h = FileOpen(path, FILE_WRITE | FILE_TXT | FILE_ANSI | FILE_COMMON);
    if(h == INVALID_HANDLE)
      {
       PrintFormat("[ARC10] trade log header write failed err=%d", GetLastError());
@@ -51,7 +51,7 @@ void ArcTradeLogEnsureHeader(const string path)
 void ArcTradeLogAppend(const string path, const string csv_row)
   {
    ArcTradeLogEnsureHeader(path);
-   int h = FileOpen(path, FILE_READ | FILE_WRITE | FILE_BIN);
+   int h = FileOpen(path, FILE_READ | FILE_WRITE | FILE_BIN | FILE_COMMON);
    if(h == INVALID_HANDLE)
      {
       PrintFormat("[ARC10] trade log append open failed err=%d", GetLastError());

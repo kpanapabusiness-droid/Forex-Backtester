@@ -23,6 +23,25 @@ enum ENUM_ARC_EXIT_REASON
    ARC_EXIT_EXTERNAL_CLOSE
   };
 
+//+------------------------------------------------------------------+
+//| Map exit-reason enum to canonical string name for trade_log.csv. |
+//| Phase 2 parity assertions match on these substrings              |
+//| (see tests/ea/scenarios/scenarios.json expected_exit_reason_*).  |
+//+------------------------------------------------------------------+
+string ArcExitReasonName(ENUM_ARC_EXIT_REASON r)
+  {
+   switch(r)
+     {
+      case ARC_EXIT_TRAIL_STOP:             return "trail_stop";
+      case ARC_EXIT_TIME_EXIT:              return "time_exit";
+      case ARC_EXIT_SL_HIT:                 return "sl_hit";
+      case ARC_EXIT_EQUITY_GUARD_CLOSE_ALL: return "equity_guard_force";  // matches ArcInferStrategicCloseReason vocab
+      case ARC_EXIT_EXTERNAL_CLOSE:         return "external_close";
+      case ARC_EXIT_NONE:
+      default:                              return "none";
+     }
+  }
+
 struct ArcPosition
   {
    bool              in_use;
@@ -35,7 +54,7 @@ struct ArcPosition
    datetime          entry_time_utc;
    double            sl_initial_price;
    double            sl_distance_price;
-   double            r_atr;                  // = sl_distance_price / atr_multiplier
+   double            r_atr;                  // = 1R in price units = sl_distance_price (= sl_atr_mult × ATR_at_entry); matches core/sim/exit_policies/_base.py:95
    double            initial_lots;
    double            current_lots;
    double            peak_high_bid;          // ratcheted on bar close
@@ -45,6 +64,7 @@ struct ArcPosition
    int               bar_ordinal;            // increments on every new H4 bar
    double            partial_close_price;    // -1 until fired
    datetime          partial_close_time;
+   bool              partial_close_logged;   // true once partial_close row written
    bool              pending_close;
    ENUM_ARC_EXIT_REASON pending_close_reason;
   };
@@ -75,6 +95,7 @@ void ArcPositionReset(int i)
    g_arc_positions[i].bar_ordinal = 0;
    g_arc_positions[i].partial_close_price = 0.0;
    g_arc_positions[i].partial_close_time = 0;
+   g_arc_positions[i].partial_close_logged = false;
    g_arc_positions[i].pending_close = false;
    g_arc_positions[i].pending_close_reason = ARC_EXIT_NONE;
   }
@@ -198,7 +219,13 @@ ulong ArcPlaceEntry(
    g_arc_positions[slot].entry_time_utc = TimeGMT();
    g_arc_positions[slot].sl_initial_price = sl_price;
    g_arc_positions[slot].sl_distance_price = sig.sl_distance_price;
-   g_arc_positions[slot].r_atr = sig.sl_distance_price / sig.sl_atr_multiplier;
+   // r_atr = 1R in price units = sl_distance_price (= sl_atr_multiplier
+   // × ATR_at_signal_bar). Matches core/sim/exit_policies/_base.py:95
+   // (ExitPolicyContext.r_atr = sl_atr_mult * atr_at_entry). The earlier
+   // formula (r_atr = sl_distance / sl_atr_multiplier) treated r_atr as
+   // 1×ATR rather than 1R, causing TP1 / trail to fire 3.5× too tight
+   // and Phase 2 parity would have diverged systematically.
+   g_arc_positions[slot].r_atr = sig.sl_distance_price;
    g_arc_positions[slot].initial_lots = lots;
    g_arc_positions[slot].current_lots = lots;
    slot_out = slot;
@@ -212,7 +239,7 @@ ulong ArcPlaceEntry(
 void ArcPositionsSave(const string path)
   {
    string tmp = path + ".tmp";
-   int h = FileOpen(tmp, FILE_WRITE | FILE_TXT | FILE_ANSI);
+   int h = FileOpen(tmp, FILE_WRITE | FILE_TXT | FILE_ANSI | FILE_COMMON);
    if(h == INVALID_HANDLE)
      {
       PrintFormat("[ARC10] positions save: FileOpen failed err=%d path=%s",
@@ -255,8 +282,8 @@ void ArcPositionsSave(const string path)
      }
    FileWriteString(h, "\n  ]\n}\n");
    FileClose(h);
-   FileDelete(path);
-   FileMove(tmp, 0, path, FILE_REWRITE);
+   FileDelete(path, FILE_COMMON);
+   FileMove(tmp, FILE_COMMON, path, FILE_REWRITE | FILE_COMMON);
   }
 
 #endif // ARC10_POSITION_MANAGER_MQH

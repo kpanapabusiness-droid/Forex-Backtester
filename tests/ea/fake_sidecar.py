@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -23,6 +24,18 @@ from typing import Any
 from deployment.sidecar.signal_emitter import build_envelope, emit_signal
 
 SCENARIOS_PATH = Path(__file__).parent / "scenarios" / "scenarios.json"
+
+
+def default_out_dir() -> Path | None:
+    """Resolve the default sidecar-root: ``<APPDATA>\\MetaQuotes\\Terminal\\Common\\Files\\Arc10``.
+
+    Mirrors the EA's FILE_COMMON path resolution. Returns None on
+    non-Windows hosts (APPDATA undefined) — caller must pass --out.
+    """
+    appdata = os.environ.get("APPDATA")
+    if not appdata:
+        return None
+    return Path(appdata) / "MetaQuotes" / "Terminal" / "Common" / "Files" / "Arc10"
 
 
 def load_scenarios() -> dict[str, dict[str, Any]]:
@@ -37,11 +50,19 @@ def build_scenario_envelope(
     config_hash: str = "0" * 64,
     signal_bar_close_utc: str | None = None,
 ) -> dict[str, Any]:
-    """Build a signal envelope for the given scenario id."""
+    """Build a signal envelope for the given scenario id.
+
+    If ``signal_bar_close_utc`` is None, the scenario's
+    ``historical_signal_bar_close`` field (if present and non-null) is
+    used; otherwise the legacy default (next H4 boundary after now) is
+    used. Explicit CLI override always wins.
+    """
     scenarios = load_scenarios()
     if scenario_id not in scenarios:
         raise KeyError(f"unknown scenario {scenario_id!r}; available={sorted(scenarios)}")
     spec = scenarios[scenario_id]
+    if signal_bar_close_utc is None:
+        signal_bar_close_utc = spec.get("historical_signal_bar_close")
     if signal_bar_close_utc is None:
         now = datetime.now(timezone.utc).replace(minute=0, second=0, microsecond=0)
         anchor = now.replace(hour=(now.hour // 4) * 4)
@@ -73,18 +94,50 @@ def build_scenario_envelope(
 
 
 def write_scenario(
-    scenario_id: str, out_dir: str | Path, *, config_hash: str = "0" * 64
+    scenario_id: str,
+    out_dir: str | Path,
+    *,
+    config_hash: str = "0" * 64,
+    signal_bar_close_utc: str | None = None,
 ) -> Path:
     """Write the scenario's envelope into ``out_dir/signals_out/``."""
-    env = build_scenario_envelope(scenario_id, config_hash=config_hash)
+    env = build_scenario_envelope(
+        scenario_id,
+        config_hash=config_hash,
+        signal_bar_close_utc=signal_bar_close_utc,
+    )
     return emit_signal(env, Path(out_dir) / "signals_out")
 
 
 def _build_arg_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="python -m tests.ea.fake_sidecar")
     p.add_argument("--scenario", required=True, help="Scenario id (s1..s12)")
-    p.add_argument("--out", required=True, type=Path, help="Sidecar root directory")
+    default_out = default_out_dir()
+    p.add_argument(
+        "--out",
+        default=default_out,
+        type=Path,
+        required=default_out is None,
+        help=(
+            "Sidecar root directory (parent of signals_out/). The EA "
+            "uses FILE_COMMON so this MUST resolve to "
+            "<APPDATA>\\MetaQuotes\\Terminal\\Common\\Files\\Arc10 "
+            "for ST scenarios. Defaults to that path on Windows."
+        ),
+    )
     p.add_argument("--config-hash", default="0" * 64)
+    p.add_argument(
+        "--signal-bar-close",
+        default=None,
+        help=(
+            "Explicit UTC timestamp for the signal bar close, e.g. "
+            '"2026-03-10T08:00:00Z". The entry bar opens at the same '
+            "instant (it is the next H4 bar). Use this to anchor "
+            "Strategy Tester scenarios in the past so historical ticks "
+            "exist for exit playout. When omitted, defaults to the "
+            "next H4 boundary after 'now' (live-deploy behaviour)."
+        ),
+    )
     return p
 
 
@@ -92,7 +145,12 @@ def main(argv: list[str] | None = None) -> int:
     args = _build_arg_parser().parse_args(argv)
     out_dir = args.out
     (out_dir / "signals_out").mkdir(parents=True, exist_ok=True)
-    path = write_scenario(args.scenario, out_dir, config_hash=args.config_hash)
+    path = write_scenario(
+        args.scenario,
+        out_dir,
+        config_hash=args.config_hash,
+        signal_bar_close_utc=args.signal_bar_close,
+    )
     print(f"Wrote envelope to {path}")
     return 0
 

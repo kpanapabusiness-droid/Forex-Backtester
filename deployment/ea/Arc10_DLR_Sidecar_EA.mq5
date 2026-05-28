@@ -85,6 +85,84 @@ void ArcDeferredAdd(const ArcSignalEnvelope &sig, datetime fire_at_utc, const st
    PrintFormat("[ARC10] deferred buffer full; dropping signal %s", sig.signal_id);
   }
 
+// ─── Broker-side close inference (Option 1 + Bug A fix) ──────────
+// When the broker closes a position (PositionSelectByTicket=false on
+// next OnTick), we need to (a) capture the actual broker fill price
+// from deal history, and (b) infer the strategic reason — trail_stop
+// vs initial_sl_hit vs equity_guard_force vs external_close — so
+// trade_log.csv carries Phase 2-parseable reasons rather than the
+// opaque "broker_closed" label that loses both info pieces.
+
+//+------------------------------------------------------------------+
+//| Pull the most-recent OUT-side deal price for a given position    |
+//| ticket from broker deal history. Returns 0.0 if not found (e.g.  |
+//| HistorySelect failed or position was never opened on this acct). |
+//+------------------------------------------------------------------+
+double ArcGetBrokerCloseFillPrice(ulong ticket)
+  {
+   datetime now = TimeCurrent();
+   // Look back 7 days — generous for any normal close-detection window.
+   if(!HistorySelect(now - 86400 * 7, now + 60))
+      return 0.0;
+   double latest_fill = 0.0;
+   datetime latest_time = 0;
+   int total = HistoryDealsTotal();
+   for(int i = 0; i < total; i++)
+     {
+      ulong deal = HistoryDealGetTicket(i);
+      if(deal == 0)
+         continue;
+      if(HistoryDealGetInteger(deal, DEAL_POSITION_ID) != (long)ticket)
+         continue;
+      if(HistoryDealGetInteger(deal, DEAL_ENTRY) != DEAL_ENTRY_OUT)
+         continue;
+      datetime dt = (datetime)HistoryDealGetInteger(deal, DEAL_TIME);
+      // For a partial-then-final sequence, take the LATEST OUT deal
+      // (the runner close, not the TP1 partial).
+      if(dt > latest_time)
+        {
+         latest_time = dt;
+         latest_fill = HistoryDealGetDouble(deal, DEAL_PRICE);
+        }
+     }
+   return latest_fill;
+  }
+
+//+------------------------------------------------------------------+
+//| Infer the strategic close reason from the broker fill price +    |
+//| position state at the time of close-detection. Resolves Phase 2  |
+//| parity needs: trail_stop (post-tp1 trail-SL hit) vs initial_     |
+//| sl_hit (pre- or post-tp1 hard SL hit) vs equity_guard_force      |
+//| (DD-triggered close-all) vs external_close (couldn't classify).  |
+//+------------------------------------------------------------------+
+string ArcInferStrategicCloseReason(int slot, double fill_price)
+  {
+   if(g_arc_eq_force_closed_this_tick)
+      return "equity_guard_force";
+   if(fill_price <= 0.0)
+      return "external_close";  // no deal history available
+
+   double sl_init     = g_arc_positions[slot].sl_initial_price;
+   double trail       = g_arc_positions[slot].trail_sl_current;
+   double sl_distance = g_arc_positions[slot].sl_distance_price;
+   // Tolerance: 20% of sl_distance. Covers normal-condition tick
+   // slippage AND moderate gap-fill scenarios. Larger gaps still
+   // classify correctly because the fill is on the LOSING side of
+   // the SL level, never the winning side, so |fill - SL_level|
+   // stays small relative to sl_distance.
+   double tol = sl_distance * 0.20;
+   bool fill_near_trail = (trail > 0.0) && (MathAbs(fill_price - trail) < tol);
+   bool fill_near_init  = MathAbs(fill_price - sl_init) < tol;
+
+   // Trail wins when tp1_fired AND fill is near the ratcheted trail
+   // (even if also near initial — trail is the more specific match).
+   if(g_arc_positions[slot].tp1_fired && fill_near_trail)
+      return "trail_stop";
+   if(fill_near_init)
+      return "initial_sl_hit";
+   return "external_close";
+  }
+
 // ─── Entry pipeline ───────────────────────────────────────────────
 void ArcAttemptEntry(const ArcSignalEnvelope &sig)
   {
@@ -137,6 +215,14 @@ void ArcPollSignals()
    g_last_poll = TimeCurrent();
    string files[];
    int n = ArcSignalListInbox(Sidecar_Inbox_Dir, files);
+   // Diagnostic — state-change-aware to keep ST + live journals readable.
+   // Prints when: (a) any envelope found, (b) first-zero after non-zero
+   // (last batch fully processed), (c) very first poll (baseline).
+   // Skips sustained-zero polls.
+   static int g_arc_last_poll_n = -1;
+   if(n > 0 || g_arc_last_poll_n > 0 || g_arc_last_poll_n == -1)
+      PrintFormat("[ARC10] poll: dir=%s found=%d", Sidecar_Inbox_Dir, n);
+   g_arc_last_poll_n = n;
    for(int i = 0; i < n; i++)
      {
       string full = Sidecar_Inbox_Dir + "\\" + files[i];
@@ -219,6 +305,14 @@ void ArcManagePositions()
       // Verify position still exists at the broker.
       if(!PositionSelectByTicket(g_arc_positions[slot].ticket))
         {
+         // Broker-side close — pull actual fill price from deal history
+         // (Bug A: previously logged fill_price=0, losing P&L recoverability)
+         // and infer strategic reason from fill-vs-SL-levels comparison +
+         // equity-guard flag (Option 1: trail_stop / initial_sl_hit /
+         // equity_guard_force / external_close vocabulary, replacing the
+         // opaque "broker_closed" reason that lost both info pieces).
+         double broker_fill = ArcGetBrokerCloseFillPrice(g_arc_positions[slot].ticket);
+         string strategic_reason = ArcInferStrategicCloseReason(slot, broker_fill);
          ArcLogTradeEvent(Trade_Log_Path, "exit",
                           g_arc_positions[slot].signal_id,
                           g_arc_positions[slot].pair,
@@ -235,13 +329,36 @@ void ArcManagePositions()
                           g_arc_positions[slot].tp1_bar_ordinal,
                           g_arc_positions[slot].bar_ordinal,
                           g_arc_positions[slot].partial_close_price,
-                          0, "broker_closed",
+                          broker_fill, strategic_reason,
                           0, 0, AccountInfoDouble(ACCOUNT_EQUITY), "");
          ArcPositionReset(slot);
          g_arc_pos_count--;
          continue;
         }
       ArcExitOnTickTp1(slot, g_trade);
+      // Emit partial_close trade-log row on the first tick after a TP1
+      // partial fires (idempotent via partial_close_logged flag).
+      if(g_arc_positions[slot].tp1_fired
+         && !g_arc_positions[slot].partial_close_logged)
+        {
+         ArcLogTradeEvent(Trade_Log_Path, "partial_close",
+                          g_arc_positions[slot].signal_id,
+                          g_arc_positions[slot].pair,
+                          g_arc_positions[slot].ticket,
+                          g_arc_positions[slot].entry_price_fill,
+                          g_arc_positions[slot].sl_initial_price,
+                          g_arc_positions[slot].sl_distance_price,
+                          g_arc_positions[slot].r_atr,
+                          g_arc_positions[slot].initial_lots,
+                          g_arc_positions[slot].current_lots,
+                          0, 0, true,
+                          g_arc_positions[slot].tp1_bar_ordinal,
+                          g_arc_positions[slot].bar_ordinal,
+                          g_arc_positions[slot].partial_close_price,
+                          0, "+1R",
+                          0, 0, AccountInfoDouble(ACCOUNT_EQUITY), "");
+         g_arc_positions[slot].partial_close_logged = true;
+        }
       if(g_arc_positions[slot].pending_close)
         {
          double px = ArcExitExecuteQueued(slot, g_trade);
@@ -262,7 +379,7 @@ void ArcManagePositions()
                           g_arc_positions[slot].bar_ordinal,
                           g_arc_positions[slot].partial_close_price,
                           px,
-                          StringFormat("reason=%d", g_arc_positions[slot].pending_close_reason),
+                          ArcExitReasonName(g_arc_positions[slot].pending_close_reason),
                           0, 0, AccountInfoDouble(ACCOUNT_EQUITY), "");
          ArcPositionReset(slot);
          g_arc_pos_count--;
@@ -317,14 +434,20 @@ bool ArcIsNewH4Bar()
 // ─── MT5 callbacks ────────────────────────────────────────────────
 int OnInit()
   {
-   PrintFormat("[ARC10] EA init magic=%I64d sidecar_inbox=%s", Magic_Number, Sidecar_Inbox_Dir);
+   // All EA file IO uses FILE_COMMON — paths resolve under
+   // <APPDATA>\MetaQuotes\Terminal\Common\Files\. Required for
+   // Strategy Tester compatibility (the per-agent MQL5\Files\ sandbox
+   // is wiped at test start; only Common\Files\ persists across runs
+   // and is shared with the Python sidecar process).
+   PrintFormat("[ARC10] EA init magic=%I64d sidecar_inbox=Common\\Files\\%s",
+               Magic_Number, Sidecar_Inbox_Dir);
    for(int i = 0; i < ARC10_MAX_POSITIONS; i++)
       ArcPositionReset(i);
    for(int i = 0; i < ARC10_MAX_DEFERRED; i++)
       g_deferred[i].in_use = false;
    ArcEquityInit();
    ArcNewsEnsureInit();
-   ArcRecoveryRun(Magic_Number, SL_ATR_Multiplier_Expected);
+   ArcRecoveryRun(Magic_Number, SL_ATR_Multiplier_Expected, Trade_Log_Path);
    ArcPositionsSave(Ea_Positions_Path);
    g_last_bar_time = iTime(_Symbol, PERIOD_H4, 0);
    return INIT_SUCCEEDED;
@@ -340,6 +463,17 @@ void OnTick()
   {
    bool sidecar_stale = ArcSidecarHeartbeatStale(Sidecar_Heartbeat_Path,
                                                  Sidecar_Heartbeat_Max_Age_Sec);
+   // Heartbeat-stale state-change diagnostic. Sentinel -1 makes first
+   // tick always print, giving a baseline reading at startup.
+   static int g_arc_last_stale_int = -1;
+   int cur_stale_int = sidecar_stale ? 1 : 0;
+   if(cur_stale_int != g_arc_last_stale_int)
+     {
+      PrintFormat("[ARC10] sidecar-heartbeat stale=%s at sim_utc=%s",
+                  sidecar_stale ? "true" : "false",
+                  TimeToString(TimeGMT(), TIME_DATE | TIME_SECONDS));
+      g_arc_last_stale_int = cur_stale_int;
+     }
    bool close_all = ArcEquityOnTick(Daily_DD_Halt_Pct, Daily_DD_CloseAll_Pct,
                                     Total_DD_Halt_Pct, Total_DD_CloseAll_Pct);
    if(close_all)
@@ -357,5 +491,9 @@ void OnTick()
    if(ArcIsNewH4Bar())
       ArcOnNewH4Bar();
    ArcEaHeartbeatWrite(Ea_Heartbeat_Path);
+   // Clear single-tick equity-force-closed flag at end of OnTick so it
+   // only labels closes detected THIS tick (set in
+   // ArcEquityCloseAllManaged, consumed by ArcInferStrategicCloseReason).
+   g_arc_eq_force_closed_this_tick = false;
   }
 //+------------------------------------------------------------------+

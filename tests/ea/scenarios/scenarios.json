@@ -1,6 +1,6 @@
 {
-  "$comment": "12 Strategy Tester scenarios per dispatch §4.2 / phase_1_build_intent.md §5.2. historical_signal_bar_close carries the verified date for price-driven scenarios — picked by scanning HistData M1 for real-market sequences that produce each scenario's expected play UNDER CANONICAL R (where 1R = sl_distance_price = sl_atr_mult × ATR, per core/sim/exit_policies/_base.py:95). Schema 1.2 re-validates all dates after the r_atr bug fix in commit 164ffb5 — the prior dates (schema 1.1) were picked under the buggy EA r_atr = ATR formula and are no longer valid.",
-  "schema_version": "1.2",
+  "$comment": "12 Strategy Tester scenarios per dispatch §4.2 / phase_1_build_intent.md §5.2. Schema 1.3 reflects Option 1 + Bug A fix: exit reason vocabulary replaced opaque 'broker_closed' with strategic reasons {trail_stop, initial_sl_hit, equity_guard_force, external_close, time_exit}, and broker-side exit rows now carry actual fill_price via deal-history lookup. schema 1.2 re-validated dates under canonical R (1R = sl_distance_price = sl_atr_mult × ATR per core/sim/exit_policies/_base.py:95) after the r_atr fix in commit 164ffb5. historical_signal_bar_close carries the verified date for price-driven scenarios — picked by scanning HistData M1 for real-market sequences that produce each scenario's expected play.",
+  "schema_version": "1.3",
   "scenarios": [
     {
       "id": "s1",
@@ -23,7 +23,7 @@
       "atr14": 0.00350,
       "narrative": "Bar N+1 fills near 1.2540. Price drops directly to -1R before any +1R cross. Broker SL fires; EA's intra-tick TP1 check never fires; bar_ordinal updates do nothing for trail. exit fires at broker fill.",
       "expected_events": ["entry", "exit"],
-      "expected_exit_reason_substring": "broker_closed",
+      "expected_exit_reason_substring": "initial_sl_hit",
       "historical_signal_bar_close": "2026-04-02T00:00:00Z",
       "historical_signal_bar_close_backup": "2026-04-01T16:00:00Z",
       "st_date_range": ["2026-04-01", "2026-04-04"],
@@ -113,7 +113,7 @@
       "atr14": 0.80,
       "narrative": "A single H4 bar contains both bar.high >= entry+1R (TP1 trigger) AND bar.low <= entry-1R (would-have-been SL). EA fires partial intra-tick first (Bid touches +1R before SL); SL then fires later in the same bar on the broker. Phase 2 will measure the R impact vs Python convention.",
       "expected_events": ["entry", "partial_close", "exit"],
-      "expected_exit_reason_substring": "broker_closed",
+      "expected_exit_reason_substring": "initial_sl_hit",
       "historical_signal_bar_close": null,
       "st_date_range": null,
       "setup_note": "NO_HISTORICAL_CANDIDATE: post-r_atr-fix re-scan confirms ZERO historical bars in 6+ years (2020-2026) of GBPJPY data where a single H4 bar straddles BOTH entry+sl_distance (=+2.80) AND entry-sl_distance (=-2.80) from a valid entry-bar open. The widest H4 bars (top 5 reach 5.4-6.8 yen range, e.g. 2022-09-26 BoJ intervention 6.79 yen, 2024-08-05 yen-carry unwind 5.68 yen) ALL gap past their entries rather than straddling — the entry-bar open lands outside the 5.60-wide central band. Genuine same-bar 2-sided ±2.80 events from-entry do not occur in the historical record. Options: (a) skip s8 — runtime gracefully handles the no-s8-event case; (b) test with synthetic data (manufacture a Custom Symbol bar in MT5 that produces the dual-touch); (c) defer Phase 2 same-bar precedence verification to code inspection. The prior schema-1.1 use of 2022-09-22 BoJ day was based on the BUGGY R (+1×ATR threshold easier to hit) — invalid under canonical R."

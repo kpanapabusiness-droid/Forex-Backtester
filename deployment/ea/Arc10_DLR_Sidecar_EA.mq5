@@ -85,6 +85,84 @@ void ArcDeferredAdd(const ArcSignalEnvelope &sig, datetime fire_at_utc, const st
    PrintFormat("[ARC10] deferred buffer full; dropping signal %s", sig.signal_id);
   }
 
+// ─── Broker-side close inference (Option 1 + Bug A fix) ──────────
+// When the broker closes a position (PositionSelectByTicket=false on
+// next OnTick), we need to (a) capture the actual broker fill price
+// from deal history, and (b) infer the strategic reason — trail_stop
+// vs initial_sl_hit vs equity_guard_force vs external_close — so
+// trade_log.csv carries Phase 2-parseable reasons rather than the
+// opaque "broker_closed" label that loses both info pieces.
+
+//+------------------------------------------------------------------+
+//| Pull the most-recent OUT-side deal price for a given position    |
+//| ticket from broker deal history. Returns 0.0 if not found (e.g.  |
+//| HistorySelect failed or position was never opened on this acct). |
+//+------------------------------------------------------------------+
+double ArcGetBrokerCloseFillPrice(ulong ticket)
+  {
+   datetime now = TimeCurrent();
+   // Look back 7 days — generous for any normal close-detection window.
+   if(!HistorySelect(now - 86400 * 7, now + 60))
+      return 0.0;
+   double latest_fill = 0.0;
+   datetime latest_time = 0;
+   int total = HistoryDealsTotal();
+   for(int i = 0; i < total; i++)
+     {
+      ulong deal = HistoryDealGetTicket(i);
+      if(deal == 0)
+         continue;
+      if(HistoryDealGetInteger(deal, DEAL_POSITION_ID) != (long)ticket)
+         continue;
+      if(HistoryDealGetInteger(deal, DEAL_ENTRY) != DEAL_ENTRY_OUT)
+         continue;
+      datetime dt = (datetime)HistoryDealGetInteger(deal, DEAL_TIME);
+      // For a partial-then-final sequence, take the LATEST OUT deal
+      // (the runner close, not the TP1 partial).
+      if(dt > latest_time)
+        {
+         latest_time = dt;
+         latest_fill = HistoryDealGetDouble(deal, DEAL_PRICE);
+        }
+     }
+   return latest_fill;
+  }
+
+//+------------------------------------------------------------------+
+//| Infer the strategic close reason from the broker fill price +    |
+//| position state at the time of close-detection. Resolves Phase 2  |
+//| parity needs: trail_stop (post-tp1 trail-SL hit) vs initial_     |
+//| sl_hit (pre- or post-tp1 hard SL hit) vs equity_guard_force      |
+//| (DD-triggered close-all) vs external_close (couldn't classify).  |
+//+------------------------------------------------------------------+
+string ArcInferStrategicCloseReason(int slot, double fill_price)
+  {
+   if(g_arc_eq_force_closed_this_tick)
+      return "equity_guard_force";
+   if(fill_price <= 0.0)
+      return "external_close";  // no deal history available
+
+   double sl_init     = g_arc_positions[slot].sl_initial_price;
+   double trail       = g_arc_positions[slot].trail_sl_current;
+   double sl_distance = g_arc_positions[slot].sl_distance_price;
+   // Tolerance: 20% of sl_distance. Covers normal-condition tick
+   // slippage AND moderate gap-fill scenarios. Larger gaps still
+   // classify correctly because the fill is on the LOSING side of
+   // the SL level, never the winning side, so |fill - SL_level|
+   // stays small relative to sl_distance.
+   double tol = sl_distance * 0.20;
+   bool fill_near_trail = (trail > 0.0) && (MathAbs(fill_price - trail) < tol);
+   bool fill_near_init  = MathAbs(fill_price - sl_init) < tol;
+
+   // Trail wins when tp1_fired AND fill is near the ratcheted trail
+   // (even if also near initial — trail is the more specific match).
+   if(g_arc_positions[slot].tp1_fired && fill_near_trail)
+      return "trail_stop";
+   if(fill_near_init)
+      return "initial_sl_hit";
+   return "external_close";
+  }
+
 // ─── Entry pipeline ───────────────────────────────────────────────
 void ArcAttemptEntry(const ArcSignalEnvelope &sig)
   {
@@ -227,6 +305,14 @@ void ArcManagePositions()
       // Verify position still exists at the broker.
       if(!PositionSelectByTicket(g_arc_positions[slot].ticket))
         {
+         // Broker-side close — pull actual fill price from deal history
+         // (Bug A: previously logged fill_price=0, losing P&L recoverability)
+         // and infer strategic reason from fill-vs-SL-levels comparison +
+         // equity-guard flag (Option 1: trail_stop / initial_sl_hit /
+         // equity_guard_force / external_close vocabulary, replacing the
+         // opaque "broker_closed" reason that lost both info pieces).
+         double broker_fill = ArcGetBrokerCloseFillPrice(g_arc_positions[slot].ticket);
+         string strategic_reason = ArcInferStrategicCloseReason(slot, broker_fill);
          ArcLogTradeEvent(Trade_Log_Path, "exit",
                           g_arc_positions[slot].signal_id,
                           g_arc_positions[slot].pair,
@@ -243,7 +329,7 @@ void ArcManagePositions()
                           g_arc_positions[slot].tp1_bar_ordinal,
                           g_arc_positions[slot].bar_ordinal,
                           g_arc_positions[slot].partial_close_price,
-                          0, "broker_closed",
+                          broker_fill, strategic_reason,
                           0, 0, AccountInfoDouble(ACCOUNT_EQUITY), "");
          ArcPositionReset(slot);
          g_arc_pos_count--;
@@ -405,5 +491,9 @@ void OnTick()
    if(ArcIsNewH4Bar())
       ArcOnNewH4Bar();
    ArcEaHeartbeatWrite(Ea_Heartbeat_Path);
+   // Clear single-tick equity-force-closed flag at end of OnTick so it
+   // only labels closes detected THIS tick (set in
+   // ArcEquityCloseAllManaged, consumed by ArcInferStrategicCloseReason).
+   g_arc_eq_force_closed_this_tick = false;
   }
 //+------------------------------------------------------------------+

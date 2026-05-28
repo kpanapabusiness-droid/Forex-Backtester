@@ -329,6 +329,60 @@ Read literally, this implies the original SL is REPLACED by the trail. The canon
 
 This is a Python-vs-live improvement, not a divergence — Phase 2 will record it as such.
 
+### §6.5 Phase 2 parity tolerance — trail-exit fill-price divergence
+
+Discovered during s1 ST validation: the broker-SL ratchet documented in §6.3 means trail exits in the EA almost always fill at the **trail-SL price** (broker-side SL execution), not at the Python sim's idealised **next-bar open_bid**.
+
+Reasoning:
+- §6.1 says the EA queues a close at next-bar open when `close_bid <= trail_level` on bar N.
+- §6.3 says the EA also ratchets broker SL to `trail_level` at bar N+1's start (when `ArcOnNewH4Bar` runs for the new bar).
+- Empirically: if bar N closed below trail, bar N+1's open is approximately bar N's close (small gap) and the broker-SL fires on the very first bid tick of bar N+1, **before** the queued close path can run on the second OnTick.
+- Result: trail exits fill at `trail_level` (broker SL price), and `ArcExitExecuteQueued`'s next-bar-open path is structurally unreachable for trail exits under normal market conditions.
+
+**Comparison**:
+
+| Layer | Trail-exit fill price |
+|---|---|
+| Python canonical (`sl_partial_close_1r_runner_trail.py`) | `bar_N+1.open_bid` |
+| EA (live) | `min(trail_level, bar_N+1.open_bid)` — broker SL execution |
+
+EA fill is therefore **≥** Python fill (favorable slippage) on long positions, except when bar N+1 gaps UP above trail and never comes back down (rare; would imply trend reversal post-trigger).
+
+**Quantitative tolerance for Phase 2 parity assertions** (long-side):
+
+| Bar character | Typical EA-vs-Python fill gap (price) | In R-units (r_atr = sl_distance) |
+|---|---|---|
+| Clean rejection candle (close ≈ trail) | 0 to ~5 pips | 0 to 0.07R |
+| Normal trend-end bar (close 10-30 pips below trail) | 5 to 25 pips | 0.07 to 0.33R |
+| Hard drop (close 50+ pips below trail) | 50+ pips | 0.7R+ |
+| Weekend/news gap-down through SL | gap-open vs next-bar open | up to several R |
+
+**Phase 2 parity strategy:**
+1. **Structural equivalence** must match: events sequence (entry / partial_close / trail_modify / exit) and strategic exit reason (trail_stop / initial_sl_hit / time_exit / equity_guard_force) per trade.
+2. **Exit fill prices** for `trail_stop` and `initial_sl_hit` reasons may diverge by up to ~0.5R per trade — flag for review only if any single trade exceeds ~1R divergence.
+3. **Aggregate P&L** in R-units is expected to be **slightly favorable** for the EA across the ledger; if EA underperforms Python on aggregate trail exits, that's the signal for deeper investigation (likely a broker SL gap behavior we mis-modelled).
+4. **Entry fills, TP1 partial fills, time_exit fills** should match within 1-2 ticks — these are conventional broker fills with no SL-price-execution wrinkle.
+
+The future `sl_partial_close_1r_runner_trail_broker_sl.py` Python variant (planned post-ST-validation) will model the EA's fill convention directly via `fill = min(trail_level, bar_N+1.open_bid)`, allowing a WFO rerun under the live convention and a direct PASS-DEPLOYABLE re-check (see "ST scenarios complete: WFO variant" follow-up).
+
+### §6.6 Exit-reason vocabulary (post Option-1 + Bug-A fix)
+
+The EA's `trade_log.csv` `reason` column emits strategic close reasons inferred from fill-price-vs-SL-levels comparison (broker-side closes) or the `ArcExitReasonName` enum mapping (EA-queued closes). Vocabulary:
+
+| Reason | Source | When emitted |
+|---|---|---|
+| `trail_stop` | broker-SL hit at ratcheted trail level OR queued trail close | tp1_fired=true and fill ≈ trail_sl_current |
+| `initial_sl_hit` | broker-SL hit at original SL | fill ≈ sl_initial_price (tp1 not yet fired OR trail not ratcheted) |
+| `time_exit` | EA-queued time exit (bar_ordinal ≥ Time_Exit_Bars) | always queued; never preempted by broker |
+| `equity_guard_force` | `ArcEquityCloseAllManaged` force-close-all | DD breach exceeded `Daily_DD_CloseAll_Pct` or `Total_DD_CloseAll_Pct` |
+| `external_close` | fallback when fill-price doesn't match any known SL level | manual close in MT5 GUI, margin-call closure, or fill-price unavailable from history |
+
+The opaque `broker_closed` reason from the prior implementation is **removed**. Phase 2 assertions match on substring per scenarios.json's `expected_exit_reason_substring`.
+
+Implementation: `ArcInferStrategicCloseReason(slot, fill_price)` in `Arc10_DLR_Sidecar_EA.mq5`. Tolerance: 20% of `sl_distance_price` for the "fill close to SL level" check — covers tick slippage + moderate gap-fill on broker SL execution. The `g_arc_eq_force_closed_this_tick` global flag (set in `ArcEquityCloseAllManaged`, cleared at end of `OnTick`) gates the `equity_guard_force` label so it only fires for closes from THIS tick's force-close-all action.
+
+Bug-A fix (same commit): `broker_fill = ArcGetBrokerCloseFillPrice(ticket)` pulls the actual broker fill price from `HistoryDealGetDouble(DEAL_ENTRY_OUT_deal, DEAL_PRICE)` and logs it as the exit row's `fill_price`. Previously logged `fill_price = 0` on broker-side closes, which made Phase 2 P&L reconciliation impossible.
+
 ---
 
 ## §7 EA restart recovery algorithm

@@ -35,7 +35,7 @@ string ArcExitReasonName(ENUM_ARC_EXIT_REASON r)
       case ARC_EXIT_TRAIL_STOP:             return "trail_stop";
       case ARC_EXIT_TIME_EXIT:              return "time_exit";
       case ARC_EXIT_SL_HIT:                 return "sl_hit";
-      case ARC_EXIT_EQUITY_GUARD_CLOSE_ALL: return "equity_guard_close_all";
+      case ARC_EXIT_EQUITY_GUARD_CLOSE_ALL: return "equity_guard_force";  // matches ArcInferStrategicCloseReason vocab
       case ARC_EXIT_EXTERNAL_CLOSE:         return "external_close";
       case ARC_EXIT_NONE:
       default:                              return "none";

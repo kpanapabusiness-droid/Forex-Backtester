@@ -23,6 +23,11 @@ datetime g_arc_eq_day_start_utc = 0;       // EET-day-start instant in UTC
 bool     g_arc_eq_entries_halted_today = false;
 bool     g_arc_eq_entries_halted_total = false;
 bool     g_arc_eq_close_all_pending = false;
+// Set when ArcEquityCloseAllManaged force-closes positions; consumed by
+// ArcInferStrategicCloseReason in the main EA to label the resulting
+// broker-side close as "equity_guard_force" rather than "external_close".
+// Cleared at end of OnTick.
+bool     g_arc_eq_force_closed_this_tick = false;
 
 //+------------------------------------------------------------------+
 //| Return UTC instant of EET 00:00 for ``now_utc``'s current EET day.|
@@ -178,6 +183,7 @@ void ArcEquityCloseAllManaged(long magic, CTrade &trade)
       trade.PositionClose(t);
      }
    g_arc_eq_close_all_pending = false;
+   g_arc_eq_force_closed_this_tick = true;   // consumed by ArcInferStrategicCloseReason
    PrintFormat("[ARC10] close-all triggered by equity guard");
   }
 

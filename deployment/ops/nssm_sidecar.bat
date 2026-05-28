@@ -17,7 +17,10 @@ set SERVICE_NAME=Arc10Sidecar
 set PYTHON_EXE=C:\Users\panap\AppData\Local\Python\bin\python.exe
 set REPO_ROOT=C:\Users\panap\Documents\Forex-Backtester
 set WINNING_CFG=%REPO_ROOT%\configs\l_arc_10_v3.0.2_utc_rerun\winning_config.yaml
-set SIDECAR_ROOT=%REPO_ROOT%\deployment\runtime
+REM SIDECAR_ROOT must live under Terminal\Common\Files because the EA
+REM uses FILE_COMMON for all file IO (required for Strategy Tester
+REM compatibility; see deployment/README.md §1).
+set SIDECAR_ROOT=%APPDATA%\MetaQuotes\Terminal\Common\Files\Arc10
 set LOG_DIR=%SIDECAR_ROOT%\logs
 
 if not exist "%PYTHON_EXE%" (

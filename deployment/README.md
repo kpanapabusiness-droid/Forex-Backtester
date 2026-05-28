@@ -65,19 +65,21 @@ deployment/
 └── README.md                               # this file
 ```
 
-Runtime IPC layout (created at deploy time under `<sidecar_root>/`):
+Runtime IPC layout (created at deploy time under `<sidecar_root>/`,
+which lives at `<APPDATA>\MetaQuotes\Terminal\Common\Files\Arc10\` —
+see §1 "Set runtime directory"):
 
 ```
-<sidecar_root>/
-├── signals_out/                            # sidecar writes; EA polls
+<sidecar_root>/                             # = Terminal\Common\Files\Arc10\
+├── signals_out/                            # sidecar writes; EA polls (FILE_COMMON)
 │   └── <pair>_<bar_iso>.json
 ├── signals_processed/                      # EA moves here after successful entry
 ├── signals_failed/                         # EA moves here on validation/news/equity reject
-├── sidecar.heartbeat                       # sidecar writes; EA + watchdog read
-├── ea.heartbeat                            # EA writes
+├── sidecar.heartbeat                       # sidecar writes; EA + watchdog read (FILE_COMMON)
+├── ea.heartbeat                            # EA writes (FILE_COMMON)
 ├── sidecar_state.json                      # sidecar internal
-├── ea_positions.json                       # EA internal
-├── trade_log.csv                           # EA appends
+├── ea_positions.json                       # EA internal (FILE_COMMON)
+├── trade_log.csv                           # EA appends (FILE_COMMON)
 └── logs/                                   # NSSM-captured stdout/stderr
 ```
 
@@ -96,31 +98,40 @@ Runtime IPC layout (created at deploy time under `<sidecar_root>/`):
 
 ### 1. Set runtime directory
 
-Pick a path (default: `C:\Users\<you>\Documents\Forex-Backtester\deployment\runtime`):
+The EA uses `FILE_COMMON` for **all** file IO, so the sidecar root
+must live under MT5's shared common folder:
+
+```
+<APPDATA>\MetaQuotes\Terminal\Common\Files\Arc10\
+```
+
+On the standard Windows install this is
+`C:\Users\<you>\AppData\Roaming\MetaQuotes\Terminal\Common\Files\Arc10\`.
+This path is shared between the live terminal, all Strategy Tester
+agents, and the Python sidecar — no directory junctions or path
+juggling required. It also survives Strategy Tester's per-agent
+`MQL5\Files\` sandbox wipe, so the EA-vs-sidecar handshake works
+identically in tester and production.
 
 ```powershell
-$env:ARC10_SIDECAR_ROOT = "C:\Arc10\runtime"
+$env:ARC10_SIDECAR_ROOT = "$env:APPDATA\MetaQuotes\Terminal\Common\Files\Arc10"
 New-Item -ItemType Directory -Force -Path "$env:ARC10_SIDECAR_ROOT\signals_out"
 New-Item -ItemType Directory -Force -Path "$env:ARC10_SIDECAR_ROOT\signals_processed"
 New-Item -ItemType Directory -Force -Path "$env:ARC10_SIDECAR_ROOT\signals_failed"
 New-Item -ItemType Directory -Force -Path "$env:ARC10_SIDECAR_ROOT\logs"
 ```
 
-The sidecar will use these paths; the EA needs them too — they must be
-reachable from MT5's `MQL5/Files/` directory. Either:
+The EA's input defaults (`Sidecar_Inbox_Dir = "Arc10\signals_out"`,
+etc.) resolve directly to subdirectories under this root — no further
+configuration needed.
 
-  - **Option A:** Set `$ARC10_SIDECAR_ROOT` to a path INSIDE `MQL5/Files/`
-    (e.g. `<terminal_data>/MQL5/Files/Arc10/runtime/`), then point the
-    EA's `Sidecar_Inbox_Dir` input parameter to the relative path
-    `Arc10\runtime\signals_out` (MT5 file IO is rooted at `MQL5/Files/`).
-  - **Option B:** Use a Windows directory junction from `MQL5/Files/Arc10`
-    to your chosen `$ARC10_SIDECAR_ROOT`:
-    ```
-    mklink /J "<terminal_data>\MQL5\Files\Arc10" "C:\Arc10\runtime"
-    ```
-
-Option B is what we recommend (sidecar logs and trade-log accessible
-without navigating into MT5's deep directory tree).
+> **VPS deployment note:** the live VPS runbook (Contabo) must use the
+> same Common\\Files path. If a prior deployment used a custom
+> `sidecar_root` outside Common\\Files (e.g. `C:\Arc10\runtime`),
+> migrate it: stop the NSSM service, copy state files to the new path,
+> update `deployment/ops/nssm_sidecar.bat` and the watchdog config,
+> restart. The EA must be re-deployed from this branch (its file IO
+> changed) for the new path to be read.
 
 ### 2. Compute the canonical config_hash
 
@@ -180,7 +191,9 @@ The watchdog fires every 30s; restarts the NSSM service if
 4. Attach to one chart per traded pair (28 charts, one per pair, all H4). The EA polls `signals_out/` regardless of attached symbol but lot-size + intra-tick TP1 checks reference the chart's symbol — attach to each pair you trade.
 5. In each chart's EA input dialog, set:
    - `Risk_Per_Trade` = `0.0043` (default; UTC r_safe)
-   - `Sidecar_Inbox_Dir` = path resolving to `<sidecar_root>/signals_out`
+   - `Sidecar_Inbox_Dir` = `Arc10\signals_out` (default — resolves to
+     `<APPDATA>\MetaQuotes\Terminal\Common\Files\Arc10\signals_out\`
+     via `FILE_COMMON`)
    - `Expected_Config_Hash` = the sha256 from step 2
    - `Magic_Number` = `1010202601` (or chosen value not already in use)
    - `Enable_News_Filter` = `true` (only if you've whitelisted the FF URL)

@@ -19,13 +19,13 @@ void ArcEaHeartbeatWrite(const string path)
       "{\n  \"last_heartbeat_utc\": \"%s\",\n  \"ea_pid_proxy\": %d,\n  \"positions_tracked\": %d\n}\n",
       ts, (int)AccountInfoInteger(ACCOUNT_LOGIN), g_arc_pos_count);
    string tmp = path + ".tmp";
-   int h = FileOpen(tmp, FILE_WRITE | FILE_TXT | FILE_ANSI);
+   int h = FileOpen(tmp, FILE_WRITE | FILE_TXT | FILE_ANSI | FILE_COMMON);
    if(h == INVALID_HANDLE)
       return;
    FileWriteString(h, body);
    FileClose(h);
-   FileDelete(path);
-   FileMove(tmp, 0, path, FILE_REWRITE);
+   FileDelete(path, FILE_COMMON);
+   FileMove(tmp, FILE_COMMON, path, FILE_REWRITE | FILE_COMMON);
   }
 
 //+------------------------------------------------------------------+
@@ -34,10 +34,10 @@ void ArcEaHeartbeatWrite(const string path)
 //+------------------------------------------------------------------+
 bool ArcSidecarHeartbeatStale(const string path, int max_age_sec)
   {
-   if(!FileIsExist(path))
+   if(!FileIsExist(path, FILE_COMMON))
       return true;
    string buf;
-   int h = FileOpen(path, FILE_READ | FILE_TXT | FILE_ANSI);
+   int h = FileOpen(path, FILE_READ | FILE_TXT | FILE_ANSI | FILE_COMMON);
    if(h == INVALID_HANDLE)
       return true;
    buf = "";

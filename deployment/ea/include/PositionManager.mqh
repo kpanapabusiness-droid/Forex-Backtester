@@ -212,7 +212,7 @@ ulong ArcPlaceEntry(
 void ArcPositionsSave(const string path)
   {
    string tmp = path + ".tmp";
-   int h = FileOpen(tmp, FILE_WRITE | FILE_TXT | FILE_ANSI);
+   int h = FileOpen(tmp, FILE_WRITE | FILE_TXT | FILE_ANSI | FILE_COMMON);
    if(h == INVALID_HANDLE)
      {
       PrintFormat("[ARC10] positions save: FileOpen failed err=%d path=%s",
@@ -255,8 +255,8 @@ void ArcPositionsSave(const string path)
      }
    FileWriteString(h, "\n  ]\n}\n");
    FileClose(h);
-   FileDelete(path);
-   FileMove(tmp, 0, path, FILE_REWRITE);
+   FileDelete(path, FILE_COMMON);
+   FileMove(tmp, FILE_COMMON, path, FILE_REWRITE | FILE_COMMON);
   }
 
 #endif // ARC10_POSITION_MANAGER_MQH

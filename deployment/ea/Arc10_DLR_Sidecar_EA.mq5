@@ -137,6 +137,7 @@ void ArcPollSignals()
    g_last_poll = TimeCurrent();
    string files[];
    int n = ArcSignalListInbox(Sidecar_Inbox_Dir, files);
+   PrintFormat("[ARC10] poll: dir=%s found=%d", Sidecar_Inbox_Dir, n);
    for(int i = 0; i < n; i++)
      {
       string full = Sidecar_Inbox_Dir + "\\" + files[i];
@@ -317,7 +318,13 @@ bool ArcIsNewH4Bar()
 // ─── MT5 callbacks ────────────────────────────────────────────────
 int OnInit()
   {
-   PrintFormat("[ARC10] EA init magic=%I64d sidecar_inbox=%s", Magic_Number, Sidecar_Inbox_Dir);
+   // All EA file IO uses FILE_COMMON — paths resolve under
+   // <APPDATA>\MetaQuotes\Terminal\Common\Files\. Required for
+   // Strategy Tester compatibility (the per-agent MQL5\Files\ sandbox
+   // is wiped at test start; only Common\Files\ persists across runs
+   // and is shared with the Python sidecar process).
+   PrintFormat("[ARC10] EA init magic=%I64d sidecar_inbox=Common\\Files\\%s",
+               Magic_Number, Sidecar_Inbox_Dir);
    for(int i = 0; i < ARC10_MAX_POSITIONS; i++)
       ArcPositionReset(i);
    for(int i = 0; i < ARC10_MAX_DEFERRED; i++)
@@ -340,6 +347,17 @@ void OnTick()
   {
    bool sidecar_stale = ArcSidecarHeartbeatStale(Sidecar_Heartbeat_Path,
                                                  Sidecar_Heartbeat_Max_Age_Sec);
+   // Heartbeat-stale state-change diagnostic. Sentinel -1 makes first
+   // tick always print, giving a baseline reading at startup.
+   static int g_arc_last_stale_int = -1;
+   int cur_stale_int = sidecar_stale ? 1 : 0;
+   if(cur_stale_int != g_arc_last_stale_int)
+     {
+      PrintFormat("[ARC10] sidecar-heartbeat stale=%s at sim_utc=%s",
+                  sidecar_stale ? "true" : "false",
+                  TimeToString(TimeGMT(), TIME_DATE | TIME_SECONDS));
+      g_arc_last_stale_int = cur_stale_int;
+     }
    bool close_all = ArcEquityOnTick(Daily_DD_Halt_Pct, Daily_DD_CloseAll_Pct,
                                     Total_DD_Halt_Pct, Total_DD_CloseAll_Pct);
    if(close_all)

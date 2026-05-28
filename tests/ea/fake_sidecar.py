@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -23,6 +24,18 @@ from typing import Any
 from deployment.sidecar.signal_emitter import build_envelope, emit_signal
 
 SCENARIOS_PATH = Path(__file__).parent / "scenarios" / "scenarios.json"
+
+
+def default_out_dir() -> Path | None:
+    """Resolve the default sidecar-root: ``<APPDATA>\\MetaQuotes\\Terminal\\Common\\Files\\Arc10``.
+
+    Mirrors the EA's FILE_COMMON path resolution. Returns None on
+    non-Windows hosts (APPDATA undefined) — caller must pass --out.
+    """
+    appdata = os.environ.get("APPDATA")
+    if not appdata:
+        return None
+    return Path(appdata) / "MetaQuotes" / "Terminal" / "Common" / "Files" / "Arc10"
 
 
 def load_scenarios() -> dict[str, dict[str, Any]]:
@@ -91,7 +104,19 @@ def write_scenario(
 def _build_arg_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="python -m tests.ea.fake_sidecar")
     p.add_argument("--scenario", required=True, help="Scenario id (s1..s12)")
-    p.add_argument("--out", required=True, type=Path, help="Sidecar root directory")
+    default_out = default_out_dir()
+    p.add_argument(
+        "--out",
+        default=default_out,
+        type=Path,
+        required=default_out is None,
+        help=(
+            "Sidecar root directory (parent of signals_out/). The EA "
+            "uses FILE_COMMON so this MUST resolve to "
+            "<APPDATA>\\MetaQuotes\\Terminal\\Common\\Files\\Arc10 "
+            "for ST scenarios. Defaults to that path on Windows."
+        ),
+    )
     p.add_argument("--config-hash", default="0" * 64)
     p.add_argument(
         "--signal-bar-close",

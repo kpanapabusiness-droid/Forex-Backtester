@@ -1,0 +1,64 @@
+{
+  "arc_name": "l_arc_10",
+  "candidates": [
+    1
+  ],
+  "classifiers": [
+    "lgbm",
+    "logistic",
+    "rf"
+  ],
+  "determinism": {
+    "line_terminator": "\\n",
+    "n_jobs": 1,
+    "random_state": 42
+  },
+  "env": {
+    "lightgbm": "4.6.0",
+    "numpy": "2.4.4",
+    "pandas": "3.0.2",
+    "python": "3.14.0",
+    "sklearn": "1.8.0"
+  },
+  "feature_count": 37,
+  "per_cluster_summary": {
+    "1": {
+      "best_classifier": "lgbm",
+      "best_mean_auc": 0.5180377740164911,
+      "best_oos_auc": 0.5058869632954888,
+      "best_threshold": 0.49999999999999994,
+      "swing_audit": {
+        "audit_notes": [
+          "swing_high_distance_14 / swing_low_distance_14 use rolling(.max/.min, window=14).shift(1) on mid-OHLC \u2014 one-sided lookback, no future bars. Causal. (Trailing N-bar swing, not centred \u00b1N.)",
+          "kijun_26_distance = kijun(high, low, 26).shift(1) \u2014 strictly prior bars. Causal."
+        ],
+        "swing_features_in_top10": [
+          "prior_session_low_distance",
+          "prior_session_high_distance",
+          "kijun_26_distance",
+          "swing_low_distance_14"
+        ]
+      },
+      "top_10_features": [
+        "atr_14",
+        "upper_fraction",
+        "prior_session_low_distance",
+        "prior_session_high_distance",
+        "distance_to_round_number",
+        "atr14_at_signal",
+        "kijun_26_distance",
+        "atr_vs_trailing_100",
+        "w1_close_slope_sign",
+        "swing_low_distance_14"
+      ]
+    }
+  },
+  "protocol_version": "v3.0",
+  "run_timestamp_utc": "2026-05-27 09:11:19",
+  "sha256": {
+    "extraction_metrics_csv": "64ce807cd8ec3a5e8bfffa72ca4ed15ffd2fdca98c61e72eb4a4fbafc37002e4",
+    "extraction_summary_md": "ed0dbe284f411086b1de9284c96e7f89c2209cb4947725d1d712d072ca8226ed",
+    "feature_importance_csv": "5fc36f232f14b2abb13d5fbda8e2562ab4e78ba44576bfff8715974cd523de9f"
+  },
+  "step": "step_4"
+}

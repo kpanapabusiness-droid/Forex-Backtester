@@ -1,0 +1,329 @@
+{
+  "category": "section_2_16_deliberate_lookahead",
+  "anchor_commit": "244fb76",
+  "method": "In-memory monkey-patching of signals.lchar_dlr_long. The on-disk module is never modified. For each planted bug, runs the \u00a72.1 post-signal H4 NaN-perturbation test on a small sample of pool trades; records whether the audit detects a difference between buggy + unperturbed and buggy + future-bar-NaN'd. A perfectly causal module returns no difference. A buggy module that reads future bars returns differences in atr14 / signal / L1_value etc.",
+  "results": {
+    "swing_search_into_future": {
+      "post_signal_h4_nan_test": {
+        "n_checked": 15,
+        "n_detected_differences": 0,
+        "audit_catches_bug": false,
+        "sample_differences": []
+      },
+      "trim_byte_compare_test": {
+        "n_checked": 15,
+        "n_detected_differences": 8,
+        "audit_catches_bug": true,
+        "sample_differences": [
+          {
+            "pair": "AUDCAD",
+            "trade_id": 1067,
+            "bar_idx": 8957,
+            "base_signal": false,
+            "trim_signal": true,
+            "base_atr14": 0.0057164783103635175,
+            "trim_atr14": 0.0057164783103635175,
+            "base_L1": 0.93545,
+            "trim_L1": 0.94925
+          },
+          {
+            "pair": "AUDCAD",
+            "trade_id": 399,
+            "bar_idx": 3415,
+            "base_signal": false,
+            "trim_signal": true,
+            "base_atr14": 0.0027796205423163134,
+            "trim_atr14": 0.0027796205423163134,
+            "base_L1": 1.0596,
+            "trim_L1": 1.06446
+          },
+          {
+            "pair": "AUDCAD",
+            "trade_id": 742,
+            "bar_idx": 6122,
+            "base_signal": false,
+            "trim_signal": true,
+            "base_atr14": 0.0029093917721714226,
+            "trim_atr14": 0.0029093917721714226,
+            "base_L1": 0.98269,
+            "trim_L1": 0.99145
+          },
+          {
+            "pair": "AUDCAD",
+            "trade_id": 2866,
+            "bar_idx": 23992,
+            "base_signal": false,
+            "trim_signal": true,
+            "base_atr14": 0.0026292759777405716,
+            "trim_atr14": 0.0026292759777405716,
+            "base_L1": 0.89312,
+            "trim_L1": 0.89377
+          },
+          {
+            "pair": "EURUSD",
+            "trade_id": 1399,
+            "bar_idx": 11831,
+            "base_signal": false,
+            "trim_signal": true,
+            "base_atr14": 0.00289924514688207,
+            "trim_atr14": 0.00289924514688207,
+            "base_L1": 1.11319,
+            "trim_L1": 1.11663
+          },
+          {
+            "pair": "GBPJPY",
+            "trade_id": 1661,
+            "bar_idx": 14161,
+            "base_signal": false,
+            "trim_signal": true,
+            "base_atr14": 0.4428998233556219,
+            "trim_atr14": 0.4428998233556219,
+            "base_L1": 142.838,
+            "trim_L1": 144.009
+          },
+          {
+            "pair": "GBPJPY",
+            "trade_id": 1413,
+            "bar_idx": 11999,
+            "base_signal": false,
+            "trim_signal": true,
+            "base_atr14": 0.4801802258035971,
+            "trim_atr14": 0.4801802258035971,
+            "base_L1": 144.026,
+            "trim_L1": 145.266
+          },
+          {
+            "pair": "GBPJPY",
+            "trade_id": 1354,
+            "bar_idx": 11450,
+            "base_signal": false,
+            "trim_signal": true,
+            "base_atr14": 0.5564135792302951,
+            "trim_atr14": 0.5564135792302951,
+            "base_L1": 137.756,
+            "trim_L1": 138.56
+          }
+        ]
+      },
+      "any_test_catches": true
+    },
+    "atr_uses_future_bar": {
+      "post_signal_h4_nan_test": {
+        "n_checked": 15,
+        "n_detected_differences": 15,
+        "audit_catches_bug": true,
+        "sample_differences": [
+          {
+            "pair": "AUDCAD",
+            "trade_id": 1383,
+            "bar_idx": 11712,
+            "base_atr14": 0.003012801005724808,
+            "pert_atr14": null,
+            "base_signal": true,
+            "pert_signal": false
+          },
+          {
+            "pair": "AUDCAD",
+            "trade_id": 1067,
+            "bar_idx": 8957,
+            "base_atr14": 0.005786729859623268,
+            "pert_atr14": null,
+            "base_signal": true,
+            "pert_signal": false
+          },
+          {
+            "pair": "AUDCAD",
+            "trade_id": 399,
+            "bar_idx": 3415,
+            "base_atr14": 0.0027082190750080137,
+            "pert_atr14": null,
+            "base_signal": true,
+            "pert_signal": false
+          },
+          {
+            "pair": "AUDCAD",
+            "trade_id": 742,
+            "bar_idx": 6122,
+            "base_atr14": 0.0028630066455877443,
+            "pert_atr14": null,
+            "base_signal": true,
+            "pert_signal": false
+          },
+          {
+            "pair": "AUDCAD",
+            "trade_id": 2866,
+            "bar_idx": 23992,
+            "base_atr14": 0.0025943276936162473,
+            "pert_atr14": null,
+            "base_signal": true,
+            "pert_signal": false
+          },
+          {
+            "pair": "EURUSD",
+            "trade_id": 1399,
+            "bar_idx": 11831,
+            "base_atr14": 0.002800727636390491,
+            "pert_atr14": null,
+            "base_signal": true,
+            "pert_signal": false
+          },
+          {
+            "pair": "EURUSD",
+            "trade_id": 921,
+            "bar_idx": 7670,
+            "base_atr14": 0.003514727903054175,
+            "pert_atr14": null,
+            "base_signal": true,
+            "pert_signal": false
+          },
+          {
+            "pair": "EURUSD",
+            "trade_id": 1839,
+            "bar_idx": 15630,
+            "base_atr14": 0.0018044906043487162,
+            "pert_atr14": null,
+            "base_signal": true,
+            "pert_signal": false
+          },
+          {
+            "pair": "EURUSD",
+            "trade_id": 2387,
+            "bar_idx": 20040,
+            "base_atr14": 0.0032165588205806165,
+            "pert_atr14": null,
+            "base_signal": true,
+            "pert_signal": false
+          },
+          {
+            "pair": "EURUSD",
+            "trade_id": 68,
+            "bar_idx": 666,
+            "base_atr14": 0.006160074384705427,
+            "pert_atr14": null,
+            "base_signal": true,
+            "pert_signal": false
+          }
+        ]
+      },
+      "trim_byte_compare_test": {
+        "n_checked": 15,
+        "n_detected_differences": 15,
+        "audit_catches_bug": true,
+        "sample_differences": [
+          {
+            "pair": "AUDCAD",
+            "trade_id": 1383,
+            "bar_idx": 11712,
+            "base_signal": true,
+            "trim_signal": true,
+            "base_atr14": 0.003012801005724808,
+            "trim_atr14": 0.0030935152914390992,
+            "base_L1": 1.00663,
+            "trim_L1": 1.00663
+          },
+          {
+            "pair": "AUDCAD",
+            "trade_id": 1067,
+            "bar_idx": 8957,
+            "base_signal": true,
+            "trim_signal": true,
+            "base_atr14": 0.005786729859623268,
+            "trim_atr14": 0.005808872716766128,
+            "base_L1": 0.94925,
+            "trim_L1": 0.94925
+          },
+          {
+            "pair": "AUDCAD",
+            "trade_id": 399,
+            "bar_idx": 3415,
+            "base_signal": true,
+            "trim_signal": true,
+            "base_atr14": 0.0027082190750080137,
+            "trim_atr14": 0.0028582190750080128,
+            "base_L1": 1.06446,
+            "trim_L1": 1.06446
+          },
+          {
+            "pair": "AUDCAD",
+            "trade_id": 742,
+            "bar_idx": 6122,
+            "base_signal": true,
+            "trim_signal": true,
+            "base_atr14": 0.0028630066455877443,
+            "trim_atr14": 0.002908720931302036,
+            "base_L1": 0.99145,
+            "trim_L1": 0.99145
+          },
+          {
+            "pair": "AUDCAD",
+            "trade_id": 2866,
+            "bar_idx": 23992,
+            "base_signal": true,
+            "trim_signal": true,
+            "base_atr14": 0.0025943276936162473,
+            "trim_atr14": 0.002823613407901957,
+            "base_L1": 0.89377,
+            "trim_L1": 0.89377
+          },
+          {
+            "pair": "EURUSD",
+            "trade_id": 1399,
+            "bar_idx": 11831,
+            "base_signal": true,
+            "trim_signal": true,
+            "base_atr14": 0.002800727636390491,
+            "trim_atr14": 0.0029778704935333506,
+            "base_L1": 1.11663,
+            "trim_L1": 1.11663
+          },
+          {
+            "pair": "EURUSD",
+            "trade_id": 921,
+            "bar_idx": 7670,
+            "base_signal": true,
+            "trim_signal": true,
+            "base_atr14": 0.003514727903054175,
+            "trim_atr14": 0.0036918707601970506,
+            "base_L1": 1.26138,
+            "trim_L1": 1.26138
+          },
+          {
+            "pair": "EURUSD",
+            "trade_id": 1839,
+            "bar_idx": 15630,
+            "base_signal": true,
+            "trim_signal": true,
+            "base_atr14": 0.0018044906043487162,
+            "trim_atr14": 0.0018444906043487087,
+            "base_L1": 1.10735,
+            "trim_L1": 1.10735
+          },
+          {
+            "pair": "EURUSD",
+            "trade_id": 2387,
+            "bar_idx": 20040,
+            "base_signal": true,
+            "trim_signal": true,
+            "base_atr14": 0.0032165588205806165,
+            "trim_atr14": 0.003582987392009194,
+            "base_L1": 1.01226,
+            "trim_L1": 1.01226
+          },
+          {
+            "pair": "EURUSD",
+            "trade_id": 68,
+            "bar_idx": 666,
+            "base_signal": true,
+            "trim_signal": true,
+            "base_atr14": 0.006160074384705427,
+            "trim_atr14": 0.006195788670419708,
+            "base_L1": 1.2153,
+            "trim_L1": 1.2153
+          }
+        ]
+      },
+      "any_test_catches": true
+    }
+  },
+  "overall_audit_sensitivity": true
+}

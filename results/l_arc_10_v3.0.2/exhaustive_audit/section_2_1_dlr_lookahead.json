@@ -1,0 +1,42 @@
+{
+  "category": "section_2_1_dlr_signal_lookahead",
+  "anchor_commit": "244fb76",
+  "boundary_convention": "5ers_eet",
+  "pool_path": "results\\l_arc_10_v3.0.2\\step_1\\pool.parquet",
+  "pool_size": 3152,
+  "rtol": 1e-09,
+  "atol": 1e-09,
+  "checks": [
+    {
+      "name": "byte_compare_under_truncation",
+      "n_total_pool_trades": 3152,
+      "n_checked": 280,
+      "n_passed": 280,
+      "n_failed": 0,
+      "verdict": "PASS",
+      "notes": "Per-trade DLR field byte-compare. For 10 sampled trades per pair (seed=42), trim H4 + D1 to bars whose timestamp <= signal_time and recompute the DLR signal stage; compare (L1_value, L0_value, L1_age_d1_bars, L0_age_d1_bars, L1_to_atr_proximity, reject_buffer_atr, upper_fraction, atr14_at_signal, d_t_idx, d_for_l1_search_max) at signal bar against pool values. Tolerance 1e-9 (absolute + relative).",
+      "failures": []
+    },
+    {
+      "name": "post_signal_nan_perturbation",
+      "n_total_pool_trades": 3152,
+      "n_checked": 280,
+      "n_passed": 280,
+      "n_failed": 0,
+      "verdict": "PASS",
+      "notes": "Per-trade post-signal H4 NaN-perturbation. For 10 sampled trades per pair (seed=42), NaN every H4 OHLC row strictly after signal_bar_time and re-run the DLR signal; verify the boolean signal at the original index remains True AND all DLR field values at that index reproduce byte-identically.",
+      "failures": []
+    },
+    {
+      "name": "d1_row_at_dt_nan_perturbation",
+      "n_total_pool_trades": 3152,
+      "n_checked": 3152,
+      "n_passed": 3152,
+      "n_failed": 0,
+      "verdict": "PASS",
+      "notes": "Per-trade D1[d_t] NaN-perturbation. For ALL pool trades, NaN the D1 row corresponding to the D1 trading day that CONTAINS the 4H signal bar (d_t in the DLR module). Re-run the DLR signal; verify the boolean signal at the original 4H index remains True. The DLR signal module docstring asserts D1[d_t] is structurally unread because the swing search bounds at d_t-4 and the latest D1 bar peeked for swing-confirm is d_t-1.",
+      "failures": []
+    }
+  ],
+  "overall_verdict": "PASS"
+}

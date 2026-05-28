@@ -81,6 +81,10 @@ void ArcReconstructPosition(int slot, ulong ticket, double sl_atr_multiplier,
      }
    g_arc_positions[slot].peak_high_bid = peak;
    g_arc_positions[slot].bar_ordinal = n_bars;
+   // Anchor rollover dispatch to this pair's current H4 bar — the held
+   // bars up to now are already folded into peak/bar_ordinal above, so
+   // the next handled rollover is this pair's next H4 close.
+   g_arc_positions[slot].last_processed_h4_bar = iTime(symbol, PERIOD_H4, 0);
 
    // Check for partial-close in deal history.
    HistorySelect(entry_time - 60, now + 60);

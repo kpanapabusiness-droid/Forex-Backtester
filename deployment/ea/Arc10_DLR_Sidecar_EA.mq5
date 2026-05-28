@@ -57,7 +57,6 @@ input int     Signal_Poll_Min_Interval_Sec = 5;
 // ─── Globals ──────────────────────────────────────────────────────
 CTrade           g_trade;
 datetime         g_last_poll = 0;
-datetime         g_last_bar_time = 0;
 
 // Pending news-delayed signals (held until delay_until_utc passes).
 struct ArcDeferredSignal
@@ -387,13 +386,33 @@ void ArcManagePositions()
      }
   }
 
-void ArcOnNewH4Bar()
+// ─── Per-position H4-bar-rollover dispatch ───────────────────────
+// Single-chart-multi-pair safe. Each in-use position tracks its own
+// pair's last-processed H4 bar; bar-rollover handling (peak ratchet,
+// trail-hit + SL ratchet, time exit, trail_modify logging) fires when
+// THAT pair's iTime(pair, H4, 0) advances — not when the chart symbol's
+// bar rolls over. The chart-gated predecessor (ArcIsNewH4Bar) starved
+// non-chart pairs of these updates under single-chart deployment.
+//
+// iTime(pair, H4, 0) returns 0 for a pair not subscribed in Market
+// Watch; we skip those slots so an unsubscribed pair never spuriously
+// "advances" against last_processed_h4_bar==0 (deployment requires all
+// traded pairs subscribed — see deployment/README.md §5).
+void ArcOnNewH4BarPerPosition()
   {
+   bool any_advanced = false;
    for(int slot = 0; slot < ARC10_MAX_POSITIONS; slot++)
      {
       if(!g_arc_positions[slot].in_use)
          continue;
-      bool should_close = ArcExitOnNewBar(slot, Time_Exit_Bars, g_trade);
+      datetime cur_bar = iTime(g_arc_positions[slot].pair, PERIOD_H4, 0);
+      if(cur_bar == 0)
+         continue;  // pair not subscribed / data not yet available
+      if(cur_bar == g_arc_positions[slot].last_processed_h4_bar)
+         continue;
+      g_arc_positions[slot].last_processed_h4_bar = cur_bar;
+      any_advanced = true;
+      ArcExitOnNewBar(slot, Time_Exit_Bars, g_trade);
       if(g_arc_positions[slot].trail_sl_current > 0
          && g_arc_positions[slot].peak_high_bid > 0)
         {
@@ -417,18 +436,8 @@ void ArcOnNewH4Bar()
                           0, 0, AccountInfoDouble(ACCOUNT_EQUITY), "");
         }
      }
-   ArcPositionsSave(Ea_Positions_Path);
-  }
-
-bool ArcIsNewH4Bar()
-  {
-   datetime cur = iTime(_Symbol, PERIOD_H4, 0);
-   if(cur != g_last_bar_time)
-     {
-      g_last_bar_time = cur;
-      return true;
-     }
-   return false;
+   if(any_advanced)
+      ArcPositionsSave(Ea_Positions_Path);
   }
 
 // ─── MT5 callbacks ────────────────────────────────────────────────
@@ -449,7 +458,6 @@ int OnInit()
    ArcNewsEnsureInit();
    ArcRecoveryRun(Magic_Number, SL_ATR_Multiplier_Expected, Trade_Log_Path);
    ArcPositionsSave(Ea_Positions_Path);
-   g_last_bar_time = iTime(_Symbol, PERIOD_H4, 0);
    return INIT_SUCCEEDED;
   }
 
@@ -488,8 +496,7 @@ void OnTick()
      }
 
    ArcManagePositions();
-   if(ArcIsNewH4Bar())
-      ArcOnNewH4Bar();
+   ArcOnNewH4BarPerPosition();
    ArcEaHeartbeatWrite(Ea_Heartbeat_Path);
    // Clear single-tick equity-force-closed flag at end of OnTick so it
    // only labels closes detected THIS tick (set in

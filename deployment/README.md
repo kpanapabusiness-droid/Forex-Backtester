@@ -188,8 +188,12 @@ The watchdog fires every 30s; restarts the NSSM service if
 1. Open MetaEditor (F4 inside MT5).
 2. Copy `deployment/ea/Arc10_DLR_Sidecar_EA.mq5` and the `deployment/ea/include/` directory into `MQL5/Experts/Arc10_Sidecar/` (preserving structure).
 3. Compile. Resolve any include-path errors by editing the `#include "include/*.mqh"` directives if you placed the includes elsewhere.
-4. Attach to one chart per traded pair (28 charts, one per pair, all H4). The EA polls `signals_out/` regardless of attached symbol but lot-size + intra-tick TP1 checks reference the chart's symbol — attach to each pair you trade.
-5. In each chart's EA input dialog, set:
+4. **Attach to exactly ONE chart — single-chart-multi-pair topology.**
+   - Attach the EA to a **single H4 chart**. Recommended symbol: **EURUSD** — the most actively-ticking pair on 5ers, so `OnTick` fires frequently and position management stays responsive across all pairs.
+   - **Subscribe all 28 traded pairs in Market Watch** (right-click Market Watch → "Show All", or add each pair). The EA reads every position's pair via `SymbolInfoDouble(pair, …)` and `iTime(pair, PERIOD_H4, 0)` for intra-tick TP1, lot sizing, and per-position bar-rollover handling (trail ratchet / time exit / peak update). An **unsubscribed** pair returns zero/stale prices and a zero `iTime`, so its position would be **silently skipped** by the rollover dispatch — every traded pair MUST be in Market Watch.
+   - **Do NOT attach one chart per pair.** Each attached instance polls the shared `signals_out/` inbox independently and would place **duplicate entries** for the same signal (the per-pair concurrency cap is per-EA-instance, not cross-instance). The prior "28 charts, one per pair" instruction was incorrect and is removed.
+   - The EA polls `signals_out/` and manages every position regardless of the chart's own symbol; bar-rollover updates are driven per-position off each position's own pair (not the chart symbol), so non-chart pairs are managed correctly.
+5. In the EA input dialog, set:
    - `Risk_Per_Trade` = `0.0043` (default; UTC r_safe)
    - `Sidecar_Inbox_Dir` = `Arc10\signals_out` (default — resolves to
      `<APPDATA>\MetaQuotes\Terminal\Common\Files\Arc10\signals_out\`

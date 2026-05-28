@@ -62,6 +62,7 @@ struct ArcPosition
    bool              tp1_fired;
    int               tp1_bar_ordinal;        // -1 until fired
    int               bar_ordinal;            // increments on every new H4 bar
+   datetime          last_processed_h4_bar;  // this pair's last H4 bar processed by the rollover dispatch (single-chart-multi-pair)
    double            partial_close_price;    // -1 until fired
    datetime          partial_close_time;
    bool              partial_close_logged;   // true once partial_close row written
@@ -93,6 +94,7 @@ void ArcPositionReset(int i)
    g_arc_positions[i].tp1_fired = false;
    g_arc_positions[i].tp1_bar_ordinal = -1;
    g_arc_positions[i].bar_ordinal = 0;
+   g_arc_positions[i].last_processed_h4_bar = 0;
    g_arc_positions[i].partial_close_price = 0.0;
    g_arc_positions[i].partial_close_time = 0;
    g_arc_positions[i].partial_close_logged = false;
@@ -228,6 +230,10 @@ ulong ArcPlaceEntry(
    g_arc_positions[slot].r_atr = sig.sl_distance_price;
    g_arc_positions[slot].initial_lots = lots;
    g_arc_positions[slot].current_lots = lots;
+   // Anchor the rollover dispatch to this pair's current H4 bar so the
+   // first per-position bar-rollover handling fires at the NEXT H4 close
+   // on this pair (not the chart symbol's).
+   g_arc_positions[slot].last_processed_h4_bar = iTime(symbol, PERIOD_H4, 0);
    slot_out = slot;
    g_arc_pos_count++;
    return t;

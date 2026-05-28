@@ -50,11 +50,19 @@ def build_scenario_envelope(
     config_hash: str = "0" * 64,
     signal_bar_close_utc: str | None = None,
 ) -> dict[str, Any]:
-    """Build a signal envelope for the given scenario id."""
+    """Build a signal envelope for the given scenario id.
+
+    If ``signal_bar_close_utc`` is None, the scenario's
+    ``historical_signal_bar_close`` field (if present and non-null) is
+    used; otherwise the legacy default (next H4 boundary after now) is
+    used. Explicit CLI override always wins.
+    """
     scenarios = load_scenarios()
     if scenario_id not in scenarios:
         raise KeyError(f"unknown scenario {scenario_id!r}; available={sorted(scenarios)}")
     spec = scenarios[scenario_id]
+    if signal_bar_close_utc is None:
+        signal_bar_close_utc = spec.get("historical_signal_bar_close")
     if signal_bar_close_utc is None:
         now = datetime.now(timezone.utc).replace(minute=0, second=0, microsecond=0)
         anchor = now.replace(hour=(now.hour // 4) * 4)

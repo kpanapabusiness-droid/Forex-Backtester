@@ -361,7 +361,7 @@ int OnInit()
       g_deferred[i].in_use = false;
    ArcEquityInit();
    ArcNewsEnsureInit();
-   ArcRecoveryRun(Magic_Number, SL_ATR_Multiplier_Expected);
+   ArcRecoveryRun(Magic_Number, SL_ATR_Multiplier_Expected, Trade_Log_Path);
    ArcPositionsSave(Ea_Positions_Path);
    g_last_bar_time = iTime(_Symbol, PERIOD_H4, 0);
    return INIT_SUCCEEDED;

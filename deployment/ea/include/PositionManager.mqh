@@ -54,7 +54,7 @@ struct ArcPosition
    datetime          entry_time_utc;
    double            sl_initial_price;
    double            sl_distance_price;
-   double            r_atr;                  // = sl_distance_price / atr_multiplier
+   double            r_atr;                  // = 1R in price units = sl_distance_price (= sl_atr_mult × ATR_at_entry); matches core/sim/exit_policies/_base.py:95
    double            initial_lots;
    double            current_lots;
    double            peak_high_bid;          // ratcheted on bar close
@@ -219,7 +219,13 @@ ulong ArcPlaceEntry(
    g_arc_positions[slot].entry_time_utc = TimeGMT();
    g_arc_positions[slot].sl_initial_price = sl_price;
    g_arc_positions[slot].sl_distance_price = sig.sl_distance_price;
-   g_arc_positions[slot].r_atr = sig.sl_distance_price / sig.sl_atr_multiplier;
+   // r_atr = 1R in price units = sl_distance_price (= sl_atr_multiplier
+   // × ATR_at_signal_bar). Matches core/sim/exit_policies/_base.py:95
+   // (ExitPolicyContext.r_atr = sl_atr_mult * atr_at_entry). The earlier
+   // formula (r_atr = sl_distance / sl_atr_multiplier) treated r_atr as
+   // 1×ATR rather than 1R, causing TP1 / trail to fire 3.5× too tight
+   // and Phase 2 parity would have diverged systematically.
+   g_arc_positions[slot].r_atr = sig.sl_distance_price;
    g_arc_positions[slot].initial_lots = lots;
    g_arc_positions[slot].current_lots = lots;
    slot_out = slot;

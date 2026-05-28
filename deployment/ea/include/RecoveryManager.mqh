@@ -45,7 +45,12 @@ void ArcReconstructPosition(int slot, ulong ticket, double sl_atr_multiplier,
    double sl_price = PositionGetDouble(POSITION_SL);
    double volume = PositionGetDouble(POSITION_VOLUME);
    double sl_distance = entry_price - sl_price;
-   double r_atr = sl_distance / sl_atr_multiplier;
+   // r_atr = 1R in price units = sl_distance (matches ArcPlaceEntry's
+   // canonical definition, fixed alongside PositionManager.mqh r_atr
+   // bug). sl_atr_multiplier param retained for future asymmetric
+   // SL/TP configurations even though unused under current 1R = 1R
+   // policy.
+   double r_atr = sl_distance;
 
    g_arc_positions[slot].in_use = true;
    g_arc_positions[slot].ticket = ticket;

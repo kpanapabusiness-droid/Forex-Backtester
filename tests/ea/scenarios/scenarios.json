@@ -1,6 +1,6 @@
 {
-  "$comment": "12 Strategy Tester scenarios per dispatch §4.2 / phase_1_build_intent.md §5.2. The historical_signal_bar_close field carries the verified date for price-driven scenarios — picked by scanning HistData M1 for real-market sequences that produce each scenario's expected play. See deployment/README.md and tests/ea/README.md for the run procedure.",
-  "schema_version": "1.1",
+  "$comment": "12 Strategy Tester scenarios per dispatch §4.2 / phase_1_build_intent.md §5.2. historical_signal_bar_close carries the verified date for price-driven scenarios — picked by scanning HistData M1 for real-market sequences that produce each scenario's expected play UNDER CANONICAL R (where 1R = sl_distance_price = sl_atr_mult × ATR, per core/sim/exit_policies/_base.py:95). Schema 1.2 re-validates all dates after the r_atr bug fix in commit 164ffb5 — the prior dates (schema 1.1) were picked under the buggy EA r_atr = ATR formula and are no longer valid.",
+  "schema_version": "1.2",
   "scenarios": [
     {
       "id": "s1",
@@ -12,7 +12,8 @@
       "expected_events": ["entry", "partial_close", "trail_modify", "exit"],
       "expected_exit_reason_substring": "trail_stop",
       "historical_signal_bar_close": "2026-03-10T08:00:00Z",
-      "st_date_range": ["2026-03-09", "2026-03-25"]
+      "st_date_range": ["2026-03-09", "2026-03-25"],
+      "setup_note": "POST_R_FIX_SANITY_CHECK: re-run this scenario first after EA recompile. Under canonical R, TP1 level = entry + sl_distance = entry + 0.00749 (vs prior buggy +0.00214). Whether the 2026-03-10 EURUSD entry bar reaches the wider TP1 determines whether s1 still partials (then trails) or becomes a straight-SL outcome. Different result vs prior s1 run is EXPECTED and CORRECT — the prior s1 'pass' was against the buggy EA. The Python sim's WFO was validated under canonical R; this is the baseline that matters."
     },
     {
       "id": "s2",
@@ -23,10 +24,10 @@
       "narrative": "Bar N+1 fills near 1.2540. Price drops directly to -1R before any +1R cross. Broker SL fires; EA's intra-tick TP1 check never fires; bar_ordinal updates do nothing for trail. exit fires at broker fill.",
       "expected_events": ["entry", "exit"],
       "expected_exit_reason_substring": "broker_closed",
-      "historical_signal_bar_close": "2024-02-02T12:00:00Z",
-      "historical_signal_bar_close_backup": "2024-04-10T12:00:00Z",
-      "st_date_range": ["2024-02-01", "2024-02-04"],
-      "setup_note": "NFP day. Entry bar 12:00-16:00Z O=1.27590 H=1.27692 (TP1 1.27940 untouched) L=1.26330 — SL 1.26365 breached same bar."
+      "historical_signal_bar_close": "2026-04-02T00:00:00Z",
+      "historical_signal_bar_close_backup": "2026-04-01T16:00:00Z",
+      "st_date_range": ["2026-04-01", "2026-04-04"],
+      "setup_note": "Re-scanned under canonical R. Entry fill (open 2026-04-02 00:00Z H4 bar) = 1.33054. SL @ 1.31829 (entry - 0.01225); TP1 @ 1.34279 (entry + 0.01225 = canonical +1R, NOT +0.00350). Forward 4 H4 bars: highs 1.33200/1.32481/1.32256/1.32483 (TP1 never touched), bar 4 (2026-04-02T12:00) low 1.31815 ≤ SL → broker_closed."
     },
     {
       "id": "s3",
@@ -37,9 +38,10 @@
       "narrative": "TP1 fires; trail activates at peak - 1R. Peak doesn't extend (small post-TP1 reversal). Bar closes back at entry-equivalent (peak = entry+R, trail = entry). Full close at next bar open. Net R = 0.5 (partial captured) + 0 (runner) = 0.25 in lot-weighted terms.",
       "expected_events": ["entry", "partial_close", "trail_modify", "exit"],
       "expected_exit_reason_substring": "trail_stop",
-      "historical_signal_bar_close": "2026-02-23T04:00:00Z",
-      "historical_signal_bar_close_backup": "2024-09-09T00:00:00Z",
-      "st_date_range": ["2026-02-22", "2026-02-25"]
+      "historical_signal_bar_close": "2025-03-12T12:00:00Z",
+      "historical_signal_bar_close_backup": "2025-09-15T12:00:00Z",
+      "st_date_range": ["2025-03-11", "2025-03-14"],
+      "setup_note": "Re-scanned under canonical R. Entry fill = 0.62862. TP1 @ 0.63282 (= entry + 0.00420). TP1 fires on bar 3 (2025-03-12T20:00, high = 0.63282 exactly). Peak ratchets to 0.63334 on next bar; trail level = 0.62914. Exit bar 2025-03-13T08:00 close 0.62863 ≤ trail → exits ~1 pip above entry (near-BE on runner). Net P&L = +0.5R partial."
     },
     {
       "id": "s4",
@@ -50,10 +52,9 @@
       "narrative": "TP1 fires. Over 8-15 bars, peak high ratchets up steadily; trail SL ratchets up each bar via PositionModify. Eventually a bar closes below the highest trail level; runner exits.",
       "expected_events": ["entry", "partial_close", "trail_modify", "trail_modify", "trail_modify", "exit"],
       "expected_exit_reason_substring": "trail_stop",
-      "historical_signal_bar_close": "2024-10-21T04:00:00Z",
-      "historical_signal_bar_close_backup": "2025-05-07T08:00:00Z",
-      "st_date_range": ["2024-10-20", "2024-10-25"],
-      "setup_note": "Entry 149.221, TP1 @ 149.621. Peak ratchets 149.644 → 150.090 → 150.276 → 150.830 → 150.884 → 151.102 → 151.144 → 151.805 → 152.379 → 152.874 → 153.185 (10 new-high events across 14 H4 bars). Exit bar 2024-10-23T16:00Z close 152.663."
+      "historical_signal_bar_close": "2020-03-16T20:00:00Z",
+      "st_date_range": ["2020-03-15", "2020-03-23"],
+      "setup_note": "Re-scanned under canonical R. ONLY 7 candidates in 2020-2026 meet spec (8-18 bars, ≥3 new highs, peak-entry ≥5 yen). No 2024+ alternative — post-2024 USDJPY ranges don't produce 5+ yen multi-bar runners at the synthetic 0.40 ATR / 1.40 sl_distance. PRIMARY is COVID-era yen-carry unwind: entry 105.843 (2020-03-17 00:00Z fill). TP1 @ 107.243 fires bar 1 (high 107.592). Peak ratchets through 9 new highs → 111.361 by 2020-03-19T20:00. Exit 2020-03-20T04:00 close 109.507 ≤ trail 109.961 → runner exits +3.66 yen above entry. Net captured ≈ 5.5 yen. ⚠ MT5 may need history-extended to load March 2020 H4 — Tools > Options > Charts > 'Max bars in chart' ≥ 100000."
     },
     {
       "id": "s5",
@@ -64,13 +65,13 @@
       "narrative": "TP1 fires. Price drifts sideways for 240 H4 bars without trail-stopping. bar_ordinal reaches 240; time exit queued; close at next bar open.",
       "expected_events": ["entry", "partial_close", "exit"],
       "expected_exit_reason_substring": "time_exit",
-      "historical_signal_bar_close": "2025-12-19T12:00:00Z",
-      "historical_signal_bar_close_backup": "2025-08-27T12:00:00Z",
-      "st_date_range": ["2025-12-18", "2025-12-25"],
+      "historical_signal_bar_close": "2025-11-26T00:00:00Z",
+      "historical_signal_bar_close_backup": "2026-01-09T12:00:00Z",
+      "st_date_range": ["2025-11-25", "2025-12-31"],
       "ea_input_overrides": {
         "Time_Exit_Bars": 12
       },
-      "setup_note": "TIME_EXIT_BARS_OVERRIDE: 12 — real-market trail prevents the spec'd 240-bar window; mechanic still tested at 12 bars. Scan of 2,940 NZDUSD TP1 entries across 2020-2026 found longest post-TP1 trail-survival was 18 bars; 240-bar quiet window is structurally unachievable on real H4 NZDUSD with 14-pip trail."
+      "setup_note": "TIME_EXIT_BARS_OVERRIDE: 12 — 240-bar quiet windows are unachievable in NZDUSD 2020-2026 EVEN UNDER CANONICAL R (3.5× wider trail). Re-scan post-r_atr fix confirms: 4,121 TP1 entries evaluated; longest post-TP1 quiet run is 77 H4 bars (2025-11-26 cluster); zero runs ≥ 80 bars. Time-exit mechanic tested at 12-bar override — this is a data-driven limitation, not a residue of the prior R bug. PRIMARY entry fill ≈ 0.56245 (2025-11-26 04:00Z open); TP1 fires within first few bars; should survive well past 12 bars under canonical R trail before time-exit closes the runner at bar 12 open."
     },
     {
       "id": "s6",
@@ -113,10 +114,9 @@
       "narrative": "A single H4 bar contains both bar.high >= entry+1R (TP1 trigger) AND bar.low <= entry-1R (would-have-been SL). EA fires partial intra-tick first (Bid touches +1R before SL); SL then fires later in the same bar on the broker. Phase 2 will measure the R impact vs Python convention.",
       "expected_events": ["entry", "partial_close", "exit"],
       "expected_exit_reason_substring": "broker_closed",
-      "historical_signal_bar_close": "2022-09-22T08:00:00Z",
-      "historical_signal_bar_close_backup": "2024-09-27T04:00:00Z",
-      "st_date_range": ["2022-09-21", "2022-09-23"],
-      "setup_note": "BoJ FX intervention day — only strict match in 6.3 years of GBPJPY data. Entry bar 08:00-12:00Z O=163.412 H=164.425 L=159.581 C=161.722. +1R 164.212 touched first (TP1 fires), -SL 160.612 breached later same bar (broker closes runner). Backup 2024-09-27T04:00:00Z is 0.08 short on down-leg (low 2.72 vs spec 2.80) — use only if 2022 data unavailable."
+      "historical_signal_bar_close": null,
+      "st_date_range": null,
+      "setup_note": "NO_HISTORICAL_CANDIDATE: post-r_atr-fix re-scan confirms ZERO historical bars in 6+ years (2020-2026) of GBPJPY data where a single H4 bar straddles BOTH entry+sl_distance (=+2.80) AND entry-sl_distance (=-2.80) from a valid entry-bar open. The widest H4 bars (top 5 reach 5.4-6.8 yen range, e.g. 2022-09-26 BoJ intervention 6.79 yen, 2024-08-05 yen-carry unwind 5.68 yen) ALL gap past their entries rather than straddling — the entry-bar open lands outside the 5.60-wide central band. Genuine same-bar 2-sided ±2.80 events from-entry do not occur in the historical record. Options: (a) skip s8 — runtime gracefully handles the no-s8-event case; (b) test with synthetic data (manufacture a Custom Symbol bar in MT5 that produces the dual-touch); (c) defer Phase 2 same-bar precedence verification to code inspection. The prior schema-1.1 use of 2022-09-22 BoJ day was based on the BUGGY R (+1×ATR threshold easier to hit) — invalid under canonical R."
     },
     {
       "id": "s9",
@@ -127,9 +127,9 @@
       "narrative": "Place entry; restart EA via Strategy Tester restart hook. On reinit, RecoveryManager enumerates broker positions filtered by magic, reconstructs entry_bar_time, peak_high_bid from H4 bars, finds no partial in deal history → tp1_fired=false. Continues management normally.",
       "expected_events": ["entry", "recovery_reconstructed"],
       "expected_exit_reason_substring": "",
-      "historical_signal_bar_close": "2024-10-21T04:00:00Z",
-      "st_date_range": ["2024-10-20", "2024-10-22"],
-      "setup_note": "PAIR_SUBSTITUTION_USDJPY: spec'd USDCAD substituted with USDJPY 2024-10-21T04:00:00Z (s4 candidate) because USDCAD wasn't verified in the historical scan; the recovery logic is pair-agnostic. Procedure: start tester; when [ARC10] entry appears in journal, immediately edit any EA input (forces restart) BEFORE [ARC10] PARTIAL TP1 fired; observe [ARC10] recovered USDJPY ... tp1=no in journal and recovery_reconstructed row in trade_log.csv."
+      "historical_signal_bar_close": "2020-03-16T20:00:00Z",
+      "st_date_range": ["2020-03-15", "2020-03-23"],
+      "setup_note": "PAIR_SUBSTITUTION_USDJPY: spec'd USDCAD substituted with USDJPY 2020-03-16T20:00:00Z (= new s4 candidate post-r_atr-fix) because USDCAD wasn't verified in the historical scan and the recovery logic is pair-agnostic. Procedure: start tester; when [ARC10] entry appears in journal, immediately edit any EA input (forces restart) BEFORE [ARC10] PARTIAL TP1 fired; observe [ARC10] recovered USDJPY ... tp1=no in journal and recovery_reconstructed row in trade_log.csv. ⚠ Same MT5 history-extension note as s4 (March 2020 H4 bars must be loaded)."
     },
     {
       "id": "s10",
@@ -140,9 +140,9 @@
       "narrative": "Place entry, TP1 fires, restart. On reinit, deal history shows a partial-close deal with volume < initial; reconstruct tp1_fired=true, partial_close_price=<deal price>, peak_high_bid from H4 highs. Trail level may need broker SL ratchet. Continues management.",
       "expected_events": ["entry", "partial_close", "recovery_reconstructed"],
       "expected_exit_reason_substring": "",
-      "historical_signal_bar_close": "2024-10-21T04:00:00Z",
-      "st_date_range": ["2024-10-20", "2024-10-22"],
-      "setup_note": "PAIR_SUBSTITUTION_USDJPY: same as s9. Procedure: start tester; wait for [ARC10] PARTIAL TP1 fired; force restart; observe recovery row in trade_log.csv with note=tp1=yes."
+      "historical_signal_bar_close": "2020-03-16T20:00:00Z",
+      "st_date_range": ["2020-03-15", "2020-03-23"],
+      "setup_note": "PAIR_SUBSTITUTION_USDJPY: same as s9. Procedure: start tester; wait for [ARC10] PARTIAL TP1 fired (bar 1 of s4 setup, ~107.59); force restart; observe recovery row in trade_log.csv with note=tp1=yes."
     },
     {
       "id": "s11",

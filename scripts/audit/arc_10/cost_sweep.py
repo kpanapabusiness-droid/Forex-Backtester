@@ -47,14 +47,8 @@ from core.sim.costs import (  # noqa: E402
     compute_swap_usd,
 )
 from scripts.l_arc_10_v3.step_5 import (  # noqa: E402
-    HOLDOUT_END,
-    HOLDOUT_START,
     INITIAL_BAL,
-    N_SEARCH_FOLDS,
     RISK_PER_TRADE,
-    SEARCH_END,
-    SEARCH_START,
-    _build_folds,
     _fold_metrics,
 )
 

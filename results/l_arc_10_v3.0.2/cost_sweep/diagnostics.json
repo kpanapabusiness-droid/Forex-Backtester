@@ -1,0 +1,34 @@
+{
+  "entry_time_assertion": {
+    "n_2200_utc": 0,
+    "n_2100_utc": 0
+  },
+  "zero_spread": {
+    "n_zero_entry": 0,
+    "n_zero_exit": 0,
+    "n_zero_either": 0,
+    "total": 3301,
+    "pct_zero_either": 0.0
+  },
+  "baseline_check": {
+    "expected": {
+      "worst_ratio": 5.4185045,
+      "worst_dd": 0.0922413,
+      "worst_roi": 0.2649054
+    },
+    "got": {
+      "worst_ratio": 5.418504508840411,
+      "worst_dd": 0.09224133035508304,
+      "worst_roi": 0.2649053592818631
+    },
+    "match": true
+  },
+  "fx_constants": {
+    "USDJPY": 109.6032,
+    "USDCAD": 1.2412,
+    "USDCHF": 0.9324,
+    "NZDUSD": 0.7047,
+    "GBPUSD": 1.4067,
+    "AUDUSD": 0.776
+  }
+}

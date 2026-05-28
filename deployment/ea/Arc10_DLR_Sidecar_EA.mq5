@@ -250,6 +250,29 @@ void ArcManagePositions()
          continue;
         }
       ArcExitOnTickTp1(slot, g_trade);
+      // Emit partial_close trade-log row on the first tick after a TP1
+      // partial fires (idempotent via partial_close_logged flag).
+      if(g_arc_positions[slot].tp1_fired
+         && !g_arc_positions[slot].partial_close_logged)
+        {
+         ArcLogTradeEvent(Trade_Log_Path, "partial_close",
+                          g_arc_positions[slot].signal_id,
+                          g_arc_positions[slot].pair,
+                          g_arc_positions[slot].ticket,
+                          g_arc_positions[slot].entry_price_fill,
+                          g_arc_positions[slot].sl_initial_price,
+                          g_arc_positions[slot].sl_distance_price,
+                          g_arc_positions[slot].r_atr,
+                          g_arc_positions[slot].initial_lots,
+                          g_arc_positions[slot].current_lots,
+                          0, 0, true,
+                          g_arc_positions[slot].tp1_bar_ordinal,
+                          g_arc_positions[slot].bar_ordinal,
+                          g_arc_positions[slot].partial_close_price,
+                          0, "+1R",
+                          0, 0, AccountInfoDouble(ACCOUNT_EQUITY), "");
+         g_arc_positions[slot].partial_close_logged = true;
+        }
       if(g_arc_positions[slot].pending_close)
         {
          double px = ArcExitExecuteQueued(slot, g_trade);
@@ -270,7 +293,7 @@ void ArcManagePositions()
                           g_arc_positions[slot].bar_ordinal,
                           g_arc_positions[slot].partial_close_price,
                           px,
-                          StringFormat("reason=%d", g_arc_positions[slot].pending_close_reason),
+                          ArcExitReasonName(g_arc_positions[slot].pending_close_reason),
                           0, 0, AccountInfoDouble(ACCOUNT_EQUITY), "");
          ArcPositionReset(slot);
          g_arc_pos_count--;

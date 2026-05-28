@@ -23,6 +23,25 @@ enum ENUM_ARC_EXIT_REASON
    ARC_EXIT_EXTERNAL_CLOSE
   };
 
+//+------------------------------------------------------------------+
+//| Map exit-reason enum to canonical string name for trade_log.csv. |
+//| Phase 2 parity assertions match on these substrings              |
+//| (see tests/ea/scenarios/scenarios.json expected_exit_reason_*).  |
+//+------------------------------------------------------------------+
+string ArcExitReasonName(ENUM_ARC_EXIT_REASON r)
+  {
+   switch(r)
+     {
+      case ARC_EXIT_TRAIL_STOP:             return "trail_stop";
+      case ARC_EXIT_TIME_EXIT:              return "time_exit";
+      case ARC_EXIT_SL_HIT:                 return "sl_hit";
+      case ARC_EXIT_EQUITY_GUARD_CLOSE_ALL: return "equity_guard_close_all";
+      case ARC_EXIT_EXTERNAL_CLOSE:         return "external_close";
+      case ARC_EXIT_NONE:
+      default:                              return "none";
+     }
+  }
+
 struct ArcPosition
   {
    bool              in_use;
@@ -45,6 +64,7 @@ struct ArcPosition
    int               bar_ordinal;            // increments on every new H4 bar
    double            partial_close_price;    // -1 until fired
    datetime          partial_close_time;
+   bool              partial_close_logged;   // true once partial_close row written
    bool              pending_close;
    ENUM_ARC_EXIT_REASON pending_close_reason;
   };
@@ -75,6 +95,7 @@ void ArcPositionReset(int i)
    g_arc_positions[i].bar_ordinal = 0;
    g_arc_positions[i].partial_close_price = 0.0;
    g_arc_positions[i].partial_close_time = 0;
+   g_arc_positions[i].partial_close_logged = false;
    g_arc_positions[i].pending_close = false;
    g_arc_positions[i].pending_close_reason = ARC_EXIT_NONE;
   }

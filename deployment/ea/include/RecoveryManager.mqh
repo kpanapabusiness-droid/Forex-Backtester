@@ -92,6 +92,9 @@ void ArcReconstructPosition(int slot, ulong ticket, double sl_atr_multiplier)
          g_arc_positions[slot].partial_close_time = (datetime)HistoryDealGetInteger(deal, DEAL_TIME);
          // Reconstruct initial = current + closed volume.
          g_arc_positions[slot].initial_lots = volume + HistoryDealGetDouble(deal, DEAL_VOLUME);
+         // The partial_close row was presumably written pre-crash (or
+         // is unreconstructable post-hoc); suppress phantom re-emit.
+         g_arc_positions[slot].partial_close_logged = true;
         }
      }
 

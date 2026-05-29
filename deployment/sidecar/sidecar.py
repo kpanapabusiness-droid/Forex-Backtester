@@ -38,6 +38,7 @@ from deployment.sidecar.boundary import (
     expected_utc_offset_hours,
     is_h4_anchor,
     next_h4_close,
+    prev_h4_close,
 )
 from deployment.sidecar.config import (
     SidecarConfig,
@@ -272,13 +273,17 @@ def main_loop(
     mt5_module: Mt5Module,
     *,
     iterations: int | None = None,
+    quick_test: bool = False,
     sleep_func=time.sleep,
     now_func=lambda: datetime.now(timezone.utc),
 ) -> None:
     """Run the sidecar main loop.
 
     ``iterations=None`` means run forever; integer values cap the loop
-    count (for tests).
+    count (for tests). ``quick_test=True`` bypasses the wait-for-next-H4
+    sleep entirely and runs exactly one cycle immediately against the
+    most-recently-closed H4 bar, then returns — for diagnostic iteration
+    without waiting up to 4h for the next live boundary.
     """
     state = load_state(cfg.state_path)
     state.restart_count += 1
@@ -289,6 +294,16 @@ def main_loop(
         state.restart_count,
         len(cfg.pairs),
     )
+
+    if quick_test:
+        last_close = prev_h4_close(now_func(), cfg.boundary_convention)
+        logger.info(
+            "quick-test mode: bypassing H4 boundary wait; running against "
+            "last closed bar at %s",
+            last_close.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        )
+        _loop_iteration(cfg, mt5_module, state)
+        return
 
     count = 0
     while iterations is None or count < iterations:
@@ -310,12 +325,18 @@ def initialize_and_run(
     cfg: SidecarConfig,
     *,
     iterations: int | None = None,
+    quick_test: bool = False,
     connect: Mt5ConnectParams | None = None,
 ) -> None:
     """Production entry: import MT5, initialize with backoff, verify anchors, run loop.
 
     ``connect`` selects which broker terminal to attach to (multi-broker VPS).
     None reproduces the legacy default-attach behaviour.
+
+    ``quick_test=True`` skips the wait-for-next-H4 sleep in the loop. The
+    anchor probe (broker-grid correctness) and broker-offset sanity check
+    still run — they are convention correctness gates, independent of bar
+    freshness — so quick-test exercises the real production path.
     """
     from deployment.sidecar.mt5_data_fetcher import import_mt5  # local import
 
@@ -332,7 +353,7 @@ def initialize_and_run(
         verify_mt5_h4_alignment(
             mt5, probe_symbol=probe_symbol, convention=cfg.boundary_convention
         )
-        main_loop(cfg, mt5, iterations=iterations)
+        main_loop(cfg, mt5, iterations=iterations, quick_test=quick_test)
     finally:
         mt5.shutdown()
 

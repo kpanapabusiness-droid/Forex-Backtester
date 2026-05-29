@@ -23,7 +23,7 @@ def test_cli_without_mt5_path_builds_empty_connect(
 ):
     captured: dict[str, object] = {}
 
-    def fake_run(cfg, *, iterations=None, connect=None):
+    def fake_run(cfg, *, iterations=None, connect=None, quick_test=False):
         captured["connect"] = connect
         captured["iterations"] = iterations
 
@@ -39,7 +39,7 @@ def test_cli_with_mt5_path_threads_into_connect(
 ):
     captured: dict[str, object] = {}
 
-    def fake_run(cfg, *, iterations=None, connect=None):
+    def fake_run(cfg, *, iterations=None, connect=None, quick_test=False):
         captured["connect"] = connect
 
     monkeypatch.setattr(cli, "initialize_and_run", fake_run)

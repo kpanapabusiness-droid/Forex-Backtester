@@ -117,6 +117,26 @@ def next_h4_close(now_utc: datetime, convention: str) -> datetime:
     raise RuntimeError("next_h4_close: no anchor found (unreachable)")
 
 
+def prev_h4_close(now_utc: datetime, convention: str) -> datetime:
+    """Return the most recent H4 boundary <= ``now_utc`` (UTC-aware).
+
+    The close instant of the most-recently-closed H4 bar — the downward
+    mirror of :func:`next_h4_close`. Used by ``--quick-test`` to log which
+    bar the immediate cycle targets; the cycle itself fetches the latest
+    bars from MT5, so this is advisory.
+    """
+    _validate_convention(convention)
+    now_utc = _ensure_aware_utc(now_utc)
+    local = now_utc.astimezone(_tz_for(convention))
+    # Today's then yesterday's anchors guarantee a hit (>= 6 anchors/day).
+    for day_offset in (0, -1):
+        local_date = (local + timedelta(days=day_offset)).date()
+        for inst in reversed(_anchor_instants_utc(local_date, convention)):
+            if inst <= now_utc:
+                return inst
+    raise RuntimeError("prev_h4_close: no anchor found (unreachable)")
+
+
 def _next_anchor_after(sig_utc: datetime, convention: str) -> datetime:
     """The first H4 anchor open-instant strictly after ``sig_utc`` (UTC),
     ignoring the weekend gap (pure grid successor)."""
@@ -221,5 +241,6 @@ __all__ = (
     "expected_utc_offset_hours",
     "is_h4_anchor",
     "next_h4_close",
+    "prev_h4_close",
     "project_entry_bar_open",
 )

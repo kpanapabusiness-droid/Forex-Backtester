@@ -26,12 +26,29 @@ from deployment.sidecar.boundary import (
     expected_utc_offset_hours,
     is_h4_anchor,
     next_h4_close,
+    prev_h4_close,
     project_entry_bar_open,
 )
 
 
 def _utc(y, m, d, h, mi=0, s=0):
     return datetime(y, m, d, h, mi, s, tzinfo=timezone.utc)
+
+
+def test_prev_h4_close_utc_grid():
+    # Between anchors → the most recent one at or before now.
+    assert prev_h4_close(_utc(2026, 5, 27, 12, 0, 1), CONVENTION_UTC) == _utc(2026, 5, 27, 12)
+    # Exactly on an anchor → that anchor (<= is inclusive).
+    assert prev_h4_close(_utc(2026, 5, 27, 12, 0, 0), CONVENTION_UTC) == _utc(2026, 5, 27, 12)
+    # Just past midnight rolls back to the prior day's 20:00 anchor.
+    assert prev_h4_close(_utc(2026, 5, 27, 0, 30), CONVENTION_UTC) == _utc(2026, 5, 27, 0)
+    assert prev_h4_close(_utc(2026, 5, 27, 3, 59), CONVENTION_UTC) == _utc(2026, 5, 27, 0)
+
+
+def test_prev_h4_close_eet_summer():
+    # EEST (UTC+3): local anchors 00/04/.../20 → UTC 21/01/05/09/13/17.
+    # now = 15:17 UTC summer → local 18:17 → most recent anchor local 16:00 = 13:00 UTC.
+    assert prev_h4_close(_utc(2026, 5, 27, 15, 17), CONVENTION_EET) == _utc(2026, 5, 27, 13)
 
 
 # --------------------------------------------------------------------------- #

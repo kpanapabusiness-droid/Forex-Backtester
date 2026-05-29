@@ -191,7 +191,7 @@ def main() -> None:
     print(f"[postprocess]   full_search_log.parquet  sha256={sha_log}")
     print(f"[postprocess]   causal_audit_rejections  sha256={_sha(rej_path)}")
     print(f"[postprocess]   compute_budget_used.md   sha256={_sha(budget_path)}")
-    print(f"[postprocess]   manifest.json            (see file)")
+    print("[postprocess]   manifest.json            (see file)")
 
 
 def _sha(p: Path) -> str:

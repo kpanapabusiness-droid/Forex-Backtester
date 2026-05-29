@@ -1,0 +1,158 @@
+# configs/arc_discovery_02.yaml
+# Signal Discovery Probe Arc — re-dispatch of arc_discovery_01 with three amendments
+# resolving the 36-hour no-time-exit pathology that killed _01 at 511/10000 rules.
+# Sub-protocol: signal_discovery_probe (locked v1.0)
+#
+# Amendments from arc_discovery_01:
+#   A. time_exit_bars: 240 (was None) — 4H × 240 = 40 calendar days, KH-24 convention
+#   B. pool_size_floor: 500 (was 200)
+#   C. iteration_budget_per_rule: 5_000_000 (was none); total_wallclock_cap_hours: 24
+#
+# Chat-locked decisions (this conversation):
+#   1. 4H primary TF (chat override of intent-doc lean) — "240 bars = 40 days at 4H"
+#   2. Bar-iteration counter (deterministic) replaces 90s wall-clock cap
+#   3. Branch cut from origin/main HEAD (commit 7c238e8)
+#   4. Rule-boundary HALT for 24h aggregate cap (finish-current-rule-then-dump)
+#   5. DiscoveryExitConfig.time_exit_bars optional default None (backward-compat)
+#
+# Methodology constraint (carried from _01): top-3 only spawn follow-up vanilla arcs.
+
+arc:
+  name: arc_discovery_02
+  signal_class: discovered_via_search
+  sub_protocol: signal_discovery_probe
+  tf_mode: locked
+  tf: H4   # AMENDED — chat decision 1
+  direction: long_only
+
+search:
+  method: random_search
+  budget: 10000           # hard cap
+  random_seed: 42
+  pool_size_floor: 500    # AMENDED — was 200
+  ranking_metric: mean_r_per_rule
+
+# Window — 2010-2020 IS only. Holdout 2021+ NEVER touched.
+window:
+  start: 2010-01-01
+  end:   2020-12-31
+
+pair_set:
+  - AUDCAD
+  - AUDCHF
+  - AUDJPY
+  - AUDNZD
+  - AUDUSD
+  - CADCHF
+  - CADJPY
+  - CHFJPY
+  - EURAUD
+  - EURCAD
+  - EURCHF
+  - EURGBP
+  - EURJPY
+  - EURNZD
+  - EURUSD
+  - GBPAUD
+  - GBPCAD
+  - GBPCHF
+  - GBPJPY
+  - GBPNZD
+  - GBPUSD
+  - NZDCAD
+  - NZDCHF
+  - NZDJPY
+  - NZDUSD
+  - USDCAD
+  - USDCHF
+  - USDJPY
+
+# Locked exit policy — Amendment E (chat 2026-05-25): time_exit_bars 240 → 60.
+# 60 bars at 4H = 10 calendar days; matches Stepwise-climber typical duration.
+exit_policy:
+  initial_sl_atr_mult: 2.0
+  trail_activation_atr_mult: 4.0   # close >= entry + 2.0R (chat decision 1 from _01)
+  trail_distance_atr_mult: 2.0
+  trail_update_basis: close_bid
+  time_exit_bars: 60               # AMENDED E — was 240 in original amendment A
+
+risk:
+  risk_per_trade_pct: 0.5
+  exposure_cap: unlimited
+
+grammar:
+  max_atoms_per_rule: 5
+  operators: ["gt", "lt", "ge", "le", "eq", "ne"]
+  combinators: ["AND", "OR"]
+  allow_not: true
+  threshold_quantiles: [0.10, 0.25, 0.50, 0.75, 0.90]
+
+causal_filter:
+  accepted_lineage: ["clean"]
+  rejected_lineage: ["suspect", "unverified"]
+  exclude_classes: []
+
+bonferroni:
+  alpha: 0.05
+  denominator_mode: n_evaluated
+  also_report: budget
+
+# AMENDMENT C — chat decision 2: deterministic bar-iteration counter as a
+# safety net for pathological rules. UNCHANGED at 5M.
+# AMENDMENT F — chat 2026-05-25: aggregate wall-clock HALT REMOVED. Run is
+# interruptible via Ctrl-C; checkpointing (below) preserves work-in-progress.
+caps:
+  iteration_budget_per_rule: 5000000
+  total_wallclock_cap_hours: null   # AMENDED F — removed; interruptible via checkpoints
+
+# AMENDMENT D (revised 2026-05-25) — Trigger-density band tightened:
+#   Was [0.5%, 8%]. Now [0.5%, 4%].
+# Rationale: rules in the 4-8% band are "loose filter" territory, not signal
+# territory. Real Stepwise edges trigger on 1-3% of bars. Tightening focuses
+# the search where signal would actually live AND eliminates the slow-tail
+# rules that consumed most of the smoke wall-clock + triggered the iter-cap.
+density_filter:
+  enabled: true
+  band_lo: 0.005   # 0.5% of bars
+  band_hi: 0.04    # 4% of bars (AMENDED — was 0.08)
+  calibration_pair: EURUSD
+  calibration_window_start: 2010-01-01
+  calibration_window_end: 2010-06-30
+  max_generation_attempts: 50000
+
+# AMENDMENT F — checkpointing.
+# Every checkpoint_every rules: flush incremental full_search_log.parquet
+# + write CHECKPOINT.md with current top-10 raw + Bonferroni survivors.
+# If chat kills the process, the latest CHECKPOINT.md is the deliverable.
+checkpoint:
+  enabled: true
+  every_n_rules: 500
+
+output:
+  arc_root: results/arc_discovery_02
+  step1_discovery_subdir: step_1/discovery
+  artefacts:
+    top_10_raw: top_10_raw.md
+    bonferroni_survivors: bonferroni_survivors.md
+    full_search_log: full_search_log.parquet
+    causal_audit_rejections: causal_audit_rejections.md
+    compute_budget_used: compute_budget_used.md
+    preflight_smoke: preflight_smoke_test.md
+    manifest: ../manifest.json
+
+data:
+  histdata_root: data/histdata
+  cache_root: data/cache
+
+determinism:
+  random_state: 42
+  n_jobs: 1
+  text_line_terminator: "\n"
+
+parallelism:
+  pool_size: null
+
+# Methodology constraint (carried from _01): top-3 only.
+follow_up:
+  spawn_follow_up_top_k: 3
+  analysis_report_top_k: 10

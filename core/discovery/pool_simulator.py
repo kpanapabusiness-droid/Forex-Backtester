@@ -43,14 +43,22 @@ from core.sim.fill import long_entry_fill_price
 
 @dataclass(frozen=True)
 class DiscoveryExitConfig:
-    """Locked exit-policy parameters for this arc."""
+    """Locked exit-policy parameters for this arc.
+
+    ``time_exit_bars``: optional time-exit cap. If set, any trade still open
+    at off == ``time_exit_bars`` exits at THAT bar's ``open_bid`` with
+    ``exit_reason='time_exit'``. Convention from arc_discovery_02 dispatch
+    Amendment A: 240 bars at 4H (= 40 calendar days, matches KH-24 forward-
+    window length). Default ``None`` preserves arc_discovery_01 behaviour
+    (no time exit) for backward compatibility with the partial-archive
+    rescue scripts and the existing tests.
+    """
 
     initial_sl_atr_mult: float = 2.0
     trail_activation_atr_mult: float = 4.0   # close >= entry + 4.0xATR = 2.0R
     trail_distance_atr_mult: float = 2.0     # ratchet at close - 2.0xATR
     primary_tf_warmup_bars: int = 100        # ATR/Kijun warmup
-    # No time exit. Simulation runs to end-of-data on each trade if neither
-    # SL nor trail triggers — bounded by the pair's data window.
+    time_exit_bars: int | None = None        # Amendment A — None == no time exit
 
 
 @dataclass(frozen=True)
@@ -66,7 +74,7 @@ class TradeRow:
     sl_at_entry_price: float
     exit_time: pd.Timestamp
     exit_price: float
-    exit_reason: str   # "hard_sl" | "trail" | "end_of_data"
+    exit_reason: str   # "hard_sl" | "trail" | "time_exit" | "end_of_data"
     bars_held: int
     final_r: float
     mfe_r: float
@@ -100,7 +108,8 @@ def simulate_pair_pool(
     atr_series: pd.Series,
     cfg: DiscoveryExitConfig,
     next_trade_id: int = 0,
-) -> tuple[list[TradeRow], int]:
+    iteration_budget: int | None = None,
+) -> tuple[list[TradeRow], int, int, bool]:
     """Simulate all triggers in one pair under the locked exit policy.
 
     Parameters
@@ -120,12 +129,30 @@ def simulate_pair_pool(
         Locked exit-policy parameters.
     next_trade_id
         Starting trade_id for this pair (caller increments across pairs).
+    iteration_budget
+        arc_discovery_02 Amendment C — deterministic bar-iteration cap shared
+        ACROSS PAIRS for one rule's evaluation. If the consumed iterations
+        reach this budget mid-pair, the simulator returns ``aborted=True``
+        immediately at the next trade boundary (preserves in-progress trade's
+        outcome; does NOT mid-trade truncate). Pass ``None`` to disable
+        (arc_discovery_01 backward-compat).
 
     Returns
     -------
-    (trades, next_trade_id) where ``next_trade_id`` is the first unused id.
+    Tuple of ``(trades, next_trade_id, iterations_consumed, aborted)``:
+      * ``trades`` — list of TradeRow for every signal triggered in this pair
+        that completed before the budget (if any) was exhausted.
+      * ``next_trade_id`` — first unused trade_id after this pair.
+      * ``iterations_consumed`` — count of ``off``-loop iterations spent on
+        this pair (sum across all trades). Caller subtracts this from its
+        running budget.
+      * ``aborted`` — True if the budget was exhausted; remaining triggers in
+        this pair are NOT simulated. The caller treats the rule as
+        ``evaluation_timeout=True`` and discards any partial trades.
 
-    Deterministic: same inputs -> identical output.
+    Deterministic: same inputs (including ``iteration_budget``) -> identical
+    output. The budget check fires at deterministic trade boundaries (same
+    trade order, same per-trade bar count).
     """
     if not (
         len(pair_df.index) == len(trigger_mask) and len(pair_df.index) == len(atr_series)
@@ -160,8 +187,14 @@ def simulate_pair_pool(
     sig_indices = np.flatnonzero(mask_arr)
     trades: list[TradeRow] = []
     tid = int(next_trade_id)
+    iterations_consumed = 0
+    time_exit_bars = cfg.time_exit_bars  # None or int
 
     for s_int in sig_indices:
+        # Amendment C — bar-iteration budget check at trade boundary (deterministic).
+        if iteration_budget is not None and iterations_consumed >= iteration_budget:
+            return trades, tid, iterations_consumed, True
+
         s = int(s_int)
         if s < warmup:
             continue
@@ -194,8 +227,9 @@ def simulate_pair_pool(
         exit_price = float("nan")
         bars_held = 0
 
-        # Iterate forward to end of data (no time exit)
+        # Iterate forward, bounded by end-of-data (and optionally time_exit_bars).
         for off in range(0, n - entry_idx):
+            iterations_consumed += 1
             bidx = entry_idx + off
 
             # Priority 1: deferred trail exit queued from the previous bar's close.
@@ -210,6 +244,21 @@ def simulate_pair_pool(
                 # If next-bar open_bid is NaN (data gap), fall through to
                 # check SL/trail this bar; exit at this bar's close_bid if
                 # nothing else fires (recovery path below).
+
+            # Priority 1.5 — Amendment A: time exit at bar offset == time_exit_bars.
+            # Fires AT THE OPEN of that bar (before mfe/mae/SL/trail this bar) so
+            # downstream R is purely from the open_bid fill on the cap-anniversary
+            # bar. KH-24 forward-window convention; 240 at 4H = 40 calendar days.
+            if time_exit_bars is not None and off == time_exit_bars:
+                fill = float(open_bid[bidx])
+                if np.isfinite(fill):
+                    exit_idx = bidx
+                    exit_reason = "time_exit"
+                    exit_price = fill
+                    bars_held = off
+                    break
+                # If open_bid is NaN (data gap on the exit bar), fall through —
+                # the SL/trail/end-of-data branches will catch it.
 
             # mfe / mae update using this bar's high_bid / low_bid in R-units.
             bar_high = float(high_bid[bidx])
@@ -283,7 +332,7 @@ def simulate_pair_pool(
         )
         tid += 1
 
-    return trades, tid
+    return trades, tid, iterations_consumed, False
 
 
 __all__ = ("DiscoveryExitConfig", "TradeRow", "simulate_pair_pool")

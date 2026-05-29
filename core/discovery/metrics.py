@@ -30,7 +30,14 @@ from core.discovery.pool_simulator import TradeRow
 
 @dataclass(frozen=True)
 class RuleMetrics:
-    """Per-rule summary statistics."""
+    """Per-rule summary statistics.
+
+    ``time_exit_hit_pct`` (Amendment A bookkeeping): fraction of trades that
+    exited via the 240-bar time cap. Tells chat how often the time cap is
+    biting on each rule — high values (>0.5) suggest the rule produces many
+    trades that drift sideways past the cap; low values (<0.1) suggest most
+    trades resolve via SL or trail. NaN when pool is empty.
+    """
 
     pool_size: int
     mean_r: float
@@ -45,6 +52,7 @@ class RuleMetrics:
     p_value: float
     n_pairs_with_trades: int
     n_trail_activated: int
+    time_exit_hit_pct: float = float("nan")  # Amendment A
 
     def to_dict(self) -> dict:
         return {
@@ -61,6 +69,7 @@ class RuleMetrics:
             "p_value": self.p_value,
             "n_pairs_with_trades": self.n_pairs_with_trades,
             "n_trail_activated": self.n_trail_activated,
+            "time_exit_hit_pct": self.time_exit_hit_pct,
         }
 
 
@@ -81,6 +90,7 @@ def empty_metrics() -> RuleMetrics:
         p_value=nan,
         n_pairs_with_trades=0,
         n_trail_activated=0,
+        time_exit_hit_pct=nan,
     )
 
 
@@ -106,6 +116,8 @@ def compute_rule_metrics(trades: Sequence[TradeRow]) -> RuleMetrics:
     mean_bars_held = float(np.mean(bars))
     n_pairs = len({t.pair for t in trades})
     n_trail = int(sum(1 for t in trades if t.activated_trail))
+    n_time_exit = int(sum(1 for t in trades if t.exit_reason == "time_exit"))
+    time_exit_hit_pct = float(n_time_exit) / float(n) if n > 0 else float("nan")
 
     # Lo small-sample-corrected Sharpe (Lo 2002):
     #   sharpe_lo = mean / std * sqrt(n) / sqrt(n - 1)
@@ -140,6 +152,7 @@ def compute_rule_metrics(trades: Sequence[TradeRow]) -> RuleMetrics:
         p_value=p_value,
         n_pairs_with_trades=n_pairs,
         n_trail_activated=n_trail,
+        time_exit_hit_pct=time_exit_hit_pct,
     )
 
 

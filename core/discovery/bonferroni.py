@@ -83,6 +83,7 @@ class RankedRule:
     bonferroni_pass_primary: bool
     bonferroni_pass_budget: bool
     follow_up_eligible: bool   # True for ranks 1-3 only (chat methodology constraint)
+    time_exit_hit_pct: float | None = None   # arc_discovery_02 Amendment A
 
 
 def rank_top_k(
@@ -127,6 +128,12 @@ def rank_top_k(
                 bonferroni_pass_primary=bool(pass_primary),
                 bonferroni_pass_budget=bool(pass_budget),
                 follow_up_eligible=(i <= follow_up_top_k),
+                time_exit_hit_pct=(
+                    float(r["time_exit_hit_pct"])
+                    if r.get("time_exit_hit_pct") is not None
+                    and _is_finite(r.get("time_exit_hit_pct"))
+                    else None
+                ),
             )
         )
     return tuple(out)

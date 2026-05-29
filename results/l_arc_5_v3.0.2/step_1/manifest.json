@@ -1,0 +1,14 @@
+{
+  "artefacts": {
+    "integrity_report.md": "56b77ecfae81f93d28566e8e3fba98a3c5b7fbe0e215de356b9b9466e9a6d570",
+    "paths.parquet": "bc603eef7de9ee1a3465e162f88cd8d0149d087e7f13f3ba6dd4ab734b176748",
+    "pool.parquet": "5aeb85fb66b439d3a9932f71a4633002a24efeb70d25612423bce5249d59c162"
+  },
+  "boundary_convention": "5ers_eet",
+  "cache_root_absolute": "C:\\Users\\panap\\Documents\\Forex-Backtester\\data\\cache",
+  "causal_lineage": "clean",
+  "histdata_root_absolute": "C:\\Users\\panap\\Documents\\Forex-Backtester\\data\\histdata",
+  "pool_sha256": "a82ecfac1f238268a8aa93b3e0987459a09655b9162e600977d5594be6eaf5dc",
+  "primary_tf": "H1",
+  "signal_name": "mtf_alignment_2_down_mixed_kijun_h120"
+}

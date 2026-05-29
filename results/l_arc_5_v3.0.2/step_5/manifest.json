@@ -1,0 +1,41 @@
+{
+  "artefacts": {
+    "holdout_results.csv": {
+      "sha256": "9f6326251a2bf1e8d5a0fc3e06115eaae596648c1b34fb5b6b5e7d78c2f8c1b6",
+      "size_bytes": 382
+    },
+    "per_day_max_dd_base__A1__A1__cl0__sl2.0__sl_plus_tp_2r__exp2.parquet": {
+      "sha256": "d32badf348757ca79c1a25ede53270fe8710db25b7bac21b2ebc0537e72bf829",
+      "size_bytes": 107635
+    },
+    "per_day_max_dd_base__A1__A1__cl0__sl2.0__sl_plus_tp_2r__expinf.parquet": {
+      "sha256": "645ca366dcf4bab1c88a28f8758b86e5d093cd6708fb070f74b5c5483edc2793",
+      "size_bytes": 107707
+    },
+    "per_day_max_dd_base__A1__A1__cl1__sl2.0__sl_plus_tp_2r__exp2.parquet": {
+      "sha256": "d32badf348757ca79c1a25ede53270fe8710db25b7bac21b2ebc0537e72bf829",
+      "size_bytes": 107635
+    },
+    "per_fold_metrics.csv": {
+      "sha256": "c261ccfe05e2f303a7549c08e4258aa0f0b5236f8687034df09b780eb068d251",
+      "size_bytes": 21668
+    },
+    "skipped_configs.md": {
+      "sha256": "a06084fa8b6c51f2f08c565b4c89568085758f232a63984d6506881ecc86966d",
+      "size_bytes": 31
+    },
+    "wfo_oracle.csv": {
+      "sha256": "ccda876f3f3818d61d4f7fa8e311bbf4e8dc958c7b35c18353ce2f1d66303b76",
+      "size_bytes": 1392
+    },
+    "wfo_results.csv": {
+      "sha256": "14e77555ba52e6aa3e390bd9f9385836f1a0d21e7a9e9d519e327211eca054e5",
+      "size_bytes": 22176
+    },
+    "wfo_summary.md": {
+      "sha256": "441d53638dfd3330f490dce3d7524e36fad6e54d6b654bb02b11c62795181e66",
+      "size_bytes": 787
+    }
+  },
+  "generated_at": "2026-05-29T11:15:59Z"
+}

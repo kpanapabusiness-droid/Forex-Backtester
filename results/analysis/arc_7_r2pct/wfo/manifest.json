@@ -1,0 +1,29 @@
+{
+  "artefacts": {
+    "holdout_results.csv": {
+      "sha256": "5cdf26f9637841e45060015ef7312793e66d812e9a70c3a749cfc1877d8d0813",
+      "size_bytes": 181
+    },
+    "per_day_max_dd_chained.parquet": {
+      "sha256": "ca49de7360233cf2f61f373d1981ff6281a0a01c4947d90470c4a8b72f1e031b",
+      "size_bytes": 46576
+    },
+    "summary_stats.json": {
+      "sha256": "e718c657b5b226657107b61426ef065456d96ad1413e925440e489c5339cbbbb",
+      "size_bytes": 3497
+    },
+    "wfo_results.csv": {
+      "sha256": "efd00ee01a407ad84c164b5325c006c160a527b42e5e8adb243c78ad520fc5d5",
+      "size_bytes": 966
+    },
+    "wfo_summary.md": {
+      "sha256": "5d3ae3f9dd524e869d00d262adb78e84f28796adc85cc822313885c91ffdacbe",
+      "size_bytes": 1136
+    }
+  },
+  "boundary_convention": "5ers_eet",
+  "config_id": "A6::A6::cl1::sl2.0::thr0.5-0.7::exp2",
+  "generated_at": "2026-05-25T06:59:22Z",
+  "r_base": 0.02,
+  "window_end": "2025-12-31"
+}

@@ -1,0 +1,77 @@
+{
+  "average_r_per_trade": 0.7525499268211033,
+  "boundary_convention": "5ers_eet",
+  "config_id": "A6::A6::cl1::sl2.0::thr0.5-0.7::exp2",
+  "daily_breaches_5pct": 0,
+  "deliverable": "B_full_sim_r2pct",
+  "ending_equity": 656722.2270746485,
+  "fivers_survival": {
+    "daily_dd_breached": false,
+    "limits": {
+      "daily_dd_pct": 0.05,
+      "max_dd_pct": 0.1
+    },
+    "margin_to_daily_dd_pct": 0.02358358429843182,
+    "margin_to_max_dd_pct": 0.0009712887481089089,
+    "max_dd_breached": false,
+    "survived": true
+  },
+  "max_dd_duration_days": 1,
+  "max_drawdown_pct": 0.0990287112518911,
+  "n_trades": 256,
+  "n_whole_closes": 256,
+  "r_base": 0.02,
+  "sharpe_annualized": 1.4598659901996682,
+  "sim_end": "2025-12-31",
+  "sim_mechanism": "single_fold_extended_oos",
+  "sim_start": "2010-01-01",
+  "starting_equity": 100000.0,
+  "top_5_drawdowns": [
+    {
+      "depth_pct": 0.0990287112518911,
+      "duration_days": 46,
+      "end_ts": "2010-12-20",
+      "peak_ts": "2010-11-04",
+      "trough_to_recovery_days": 44,
+      "trough_ts": "2010-11-05"
+    },
+    {
+      "depth_pct": 0.05837765336273548,
+      "duration_days": 13,
+      "end_ts": "2023-05-11",
+      "peak_ts": "2023-04-28",
+      "trough_to_recovery_days": 12,
+      "trough_ts": "2023-04-28"
+    },
+    {
+      "depth_pct": 0.04569438999450026,
+      "duration_days": 235,
+      "end_ts": "2014-10-06",
+      "peak_ts": "2014-02-12",
+      "trough_to_recovery_days": 102,
+      "trough_ts": "2014-06-26"
+    },
+    {
+      "depth_pct": 0.04565113911425182,
+      "duration_days": 293,
+      "end_ts": "2016-09-06",
+      "peak_ts": "2015-11-17",
+      "trough_to_recovery_days": 26,
+      "trough_ts": "2016-08-11"
+    },
+    {
+      "depth_pct": 0.04535458958244939,
+      "duration_days": 118,
+      "end_ts": "2018-08-09",
+      "peak_ts": "2018-04-13",
+      "trough_to_recovery_days": 3,
+      "trough_ts": "2018-08-06"
+    }
+  ],
+  "total_return_pct": 5.567222270746485,
+  "wall_time_seconds": 212.20218750002095,
+  "win_rate": 0.70703125,
+  "worst_rolling_30day_dd_pct": 0.10260332984492157,
+  "worst_single_day_dd_pct": 0.026416415701568184,
+  "years_with_negative_return": []
+}

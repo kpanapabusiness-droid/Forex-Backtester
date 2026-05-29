@@ -1,0 +1,38 @@
+{
+  "0": {
+    "amendment_1_archs": [],
+    "archetype": "Choppy",
+    "architectures_admitted": [],
+    "gates_fired": [],
+    "is_candidate": false,
+    "mean_oos_auc": null,
+    "skip_reason": "amendment_5_cluster_skip_choppy"
+  },
+  "1": {
+    "amendment_1_archs": [],
+    "archetype": "Monotonic down",
+    "architectures_admitted": [],
+    "gates_fired": [],
+    "is_candidate": false,
+    "mean_oos_auc": null,
+    "skip_reason": "step_3_not_candidate"
+  },
+  "2": {
+    "amendment_1_archs": [
+      "A1",
+      "A4"
+    ],
+    "archetype": "Bimodal",
+    "architectures_admitted": [
+      "A1",
+      "A4"
+    ],
+    "gates_fired": [
+      "Gate 1 (Bimodal)",
+      "Gate 3 (universal A1)"
+    ],
+    "is_candidate": true,
+    "mean_oos_auc": 0.4821629826115318,
+    "skip_reason": null
+  }
+}

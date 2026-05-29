@@ -1,0 +1,25 @@
+{
+  "artefacts": {
+    "amendment_5_admission.json": {
+      "sha256": "6fb87aef8ba0f3d42d284db09225cc316d4cfa437852bea6cdf769fdb8db6b25",
+      "size_bytes": 801
+    },
+    "amendment_5_admission.md": {
+      "sha256": "dcdb2736640536be9c2b3f76f8c118861d1d570a7c5544110d2583b8f5f0d7a8",
+      "size_bytes": 1240
+    },
+    "extraction_metrics.csv": {
+      "sha256": "58eed49305b6b5e33cc5eb1333a6a98fc2fef633f32ef815896b8a6859554042",
+      "size_bytes": 495
+    },
+    "extraction_summary.md": {
+      "sha256": "d6b9e9fc6fb1e339c7e34dea0de2732877258f6c3afe328e223b7811c59d5a88",
+      "size_bytes": 3445
+    },
+    "feature_importance.csv": {
+      "sha256": "924cbd2ceae1ab219cd0e24fcc62acc7b2f953627ed9c6657dd5554c7d583052",
+      "size_bytes": 1545
+    }
+  },
+  "generated_at": "2026-05-25T09:38:36Z"
+}

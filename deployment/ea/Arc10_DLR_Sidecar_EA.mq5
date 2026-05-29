@@ -57,7 +57,10 @@ input int     Signal_Poll_Min_Interval_Sec = 5;
 // ─── Globals ──────────────────────────────────────────────────────
 CTrade           g_trade;
 datetime         g_last_poll = 0;
-datetime         g_last_bar_time = 0;
+// Note: the chart-symbol-bound g_last_bar_time global was removed in the
+// single-chart-multi-pair topology fix. Per-position bar tracking via
+// ArcPosition.last_processed_h4_bar replaces it; see
+// ArcOnNewH4BarPerPosition below.
 
 // Pending news-delayed signals (held until delay_until_utc passes).
 struct ArcDeferredSignal
@@ -387,12 +390,38 @@ void ArcManagePositions()
      }
   }
 
-void ArcOnNewH4Bar()
+// ─── Per-position H4-bar-rollover handler (topology fix) ──────────
+// Single-chart-multi-pair safe: each in-use position self-gates on its
+// OWN pair's H4 bar advancement (via per-position last_processed_h4_bar)
+// rather than on the chart symbol's bar (the old ArcIsNewH4Bar approach).
+//
+// Called every OnTick. For each position, checks whether iTime(slot.pair,
+// PERIOD_H4, 0) has advanced past the stored last_processed_h4_bar. If
+// yes, runs the new-bar logic for THAT pair specifically (ArcExitOnNewBar
+// reads iHigh/iClose at shift=1 = the just-closed bar, safely available
+// once the per-pair shift=0 has rolled).
+//
+// Skips pairs that haven't ticked yet for the new bar (iTime returns 0
+// or the prior bar's open time — gate condition prevents stale-data
+// processing). Also skips pairs not yet in Market Watch (iTime returns
+// 0; SymbolSelect call in ArcPlaceEntry / ArcReconstructPosition ensures
+// subscription, but this is defensive).
+void ArcOnNewH4BarPerPosition()
   {
+   bool any_processed = false;
    for(int slot = 0; slot < ARC10_MAX_POSITIONS; slot++)
      {
       if(!g_arc_positions[slot].in_use)
          continue;
+      datetime cur_bar = iTime(g_arc_positions[slot].pair, PERIOD_H4, 0);
+      if(cur_bar == 0)
+         continue;  // pair not yet ticking; iTime not yet authoritative
+      if(cur_bar == g_arc_positions[slot].last_processed_h4_bar)
+         continue;  // this pair's H4 hasn't rolled since last processing
+      g_arc_positions[slot].last_processed_h4_bar = cur_bar;
+      // Run the new-bar logic for THIS pair. ArcExitOnNewBar internally
+      // reads iHigh/iClose at shift=1 = the just-closed bar for this
+      // pair, now safely available since shift=0 has advanced.
       bool should_close = ArcExitOnNewBar(slot, Time_Exit_Bars, g_trade);
       if(g_arc_positions[slot].trail_sl_current > 0
          && g_arc_positions[slot].peak_high_bid > 0)
@@ -416,19 +445,10 @@ void ArcOnNewH4Bar()
                           0, "",
                           0, 0, AccountInfoDouble(ACCOUNT_EQUITY), "");
         }
+      any_processed = true;
      }
-   ArcPositionsSave(Ea_Positions_Path);
-  }
-
-bool ArcIsNewH4Bar()
-  {
-   datetime cur = iTime(_Symbol, PERIOD_H4, 0);
-   if(cur != g_last_bar_time)
-     {
-      g_last_bar_time = cur;
-      return true;
-     }
-   return false;
+   if(any_processed)
+      ArcPositionsSave(Ea_Positions_Path);
   }
 
 // ─── MT5 callbacks ────────────────────────────────────────────────
@@ -449,7 +469,9 @@ int OnInit()
    ArcNewsEnsureInit();
    ArcRecoveryRun(Magic_Number, SL_ATR_Multiplier_Expected, Trade_Log_Path);
    ArcPositionsSave(Ea_Positions_Path);
-   g_last_bar_time = iTime(_Symbol, PERIOD_H4, 0);
+   // No chart-symbol bar init needed — per-position bar tracking via
+   // ArcPosition.last_processed_h4_bar (set in ArcPlaceEntry +
+   // ArcReconstructPosition) replaces the prior chart-symbol gate.
    return INIT_SUCCEEDED;
   }
 
@@ -488,8 +510,12 @@ void OnTick()
      }
 
    ArcManagePositions();
-   if(ArcIsNewH4Bar())
-      ArcOnNewH4Bar();
+   // Per-position bar-rollover handler — self-gates by checking each
+   // pair's own iTime(PERIOD_H4, 0) against the slot's
+   // last_processed_h4_bar. Replaces the prior chart-symbol-gated
+   // ArcIsNewH4Bar + ArcOnNewH4Bar pair for single-chart-multi-pair
+   // deployment compatibility.
+   ArcOnNewH4BarPerPosition();
    ArcEaHeartbeatWrite(Ea_Heartbeat_Path);
    // Clear single-tick equity-force-closed flag at end of OnTick so it
    // only labels closes detected THIS tick (set in

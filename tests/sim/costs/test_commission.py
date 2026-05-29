@@ -30,6 +30,13 @@ def test_alternate_rate():
     assert compute_commission_usd(1.0, rate_per_lot_rt=6.0) == 6.0
 
 
+@pytest.mark.parametrize("lots,expected", [(1.0, 5.0), (0.5, 2.5), (2.0, 10.0), (0.0, 0.0)])
+def test_G4_fundednext_five_dollar_round_turn(lots, expected):
+    """G4 (FundedNext sweep §4): $5/lot round-turn — confirmed FundedNext rate,
+    NOT the $4 5ers default. The sweep passes rate_per_lot_rt=5.0 explicitly."""
+    assert compute_commission_usd(lots, rate_per_lot_rt=5.0) == expected
+
+
 def test_negative_lots_raises():
     with pytest.raises(ValueError, match="must be >= 0"):
         compute_commission_usd(-1.0)

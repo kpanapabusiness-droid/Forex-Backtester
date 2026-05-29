@@ -35,7 +35,6 @@ from datetime import datetime, timedelta, timezone
 
 from deployment.sidecar.boundary import (
     CONVENTION_UTC,
-    expected_utc_offset_hours,
     is_h4_anchor,
     next_h4_close,
     prev_h4_close,
@@ -83,7 +82,6 @@ def verify_mt5_h4_alignment(
     probe_symbol: str = "EURUSD",
     probe_count: int = 24,
     convention: str = CONVENTION_UTC,
-    now_func=lambda: datetime.now(timezone.utc),
 ) -> None:
     """Assert that MT5 returns bars on the expected H4 grid for ``convention``.
 
@@ -94,11 +92,14 @@ def verify_mt5_h4_alignment(
     Raises :class:`Mt5FetchError` on mismatch — the sidecar must NOT proceed if
     the broker is emitting bars off the grid the WFO lab validated.
 
-    Additionally (EET only) cross-checks the broker server's UTC offset against
-    the IANA-expected EET/EEST offset for "now" via ``symbol_info_tick``: a
-    server that fails to apply EU DST would still emit on-grid bars but with a
-    wrong absolute offset, which the anchor check alone cannot catch. The offset
-    check is best-effort — skipped if the module exposes no ``symbol_info_tick``.
+    This bar-anchor probe is the authoritative startup gate. The broker's
+    server *wall-clock* offset is a separate, operationally irrelevant axis:
+    a broker may run an EET server clock while publishing UTC-anchored bars
+    (5ers) or EET-anchored bars (FundedNext). What matters is that the data
+    fetcher converts the broker's bar timestamps to the correct UTC grid for
+    the configured convention — which this probe verifies directly. A broker
+    that mishandles DST in its *bars* is caught here; DST handling in its
+    *clock* alone does not affect us, so the server clock is not checked.
 
     Per dispatch §1.4 + intent §11.6.
     """
@@ -120,53 +121,6 @@ def verify_mt5_h4_alignment(
         raise Mt5FetchError(
             f"H4 anchor probe failed — broker is emitting bars off the {convention!r} "
             f"grid. Examples: {bad[:5]}. Sidecar refuses to start under this convention."
-        )
-
-    _verify_broker_offset(
-        mt5_module,
-        probe_symbol=probe_symbol,
-        convention=convention,
-        now_func=now_func,
-    )
-
-
-def _verify_broker_offset(
-    mt5_module: Mt5Module,
-    *,
-    probe_symbol: str,
-    convention: str,
-    now_func,
-) -> None:
-    """Cross-check the broker server's UTC offset against the calendar expectation.
-
-    Best-effort: returns silently if the module exposes no ``symbol_info_tick``.
-    MT5's ``symbol_info_tick(symbol).time`` is the last-tick instant in the
-    broker server wall clock encoded as a UTC-epoch; the gap between it and the
-    real "now" is the broker's UTC offset. We tolerate ±1h of clock skew /
-    tick-staleness around the IANA-expected offset.
-    """
-    if convention == CONVENTION_UTC:
-        expected = 0.0
-    else:
-        now = now_func()
-        expected = expected_utc_offset_hours(convention, now)
-
-    tick_fn = getattr(mt5_module, "symbol_info_tick", None)
-    if tick_fn is None:
-        return  # offset sanity check unavailable on this module
-    tick = tick_fn(probe_symbol)
-    tick_epoch = getattr(tick, "time", None)
-    if tick_epoch is None:
-        return
-    now = now_func()
-    broker_wall = datetime.fromtimestamp(int(tick_epoch), tz=timezone.utc)
-    observed_offset = (broker_wall - now).total_seconds() / 3600.0
-    if abs(observed_offset - expected) > 1.0:
-        raise Mt5FetchError(
-            f"Broker UTC-offset sanity check failed for {convention!r}: observed "
-            f"~{observed_offset:+.1f}h, expected ~{expected:+.1f}h. A server that "
-            "fails to apply EU DST emits on-grid bars at the wrong absolute time. "
-            "Sidecar refuses to start."
         )
 
 

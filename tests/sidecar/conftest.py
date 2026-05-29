@@ -95,9 +95,13 @@ class FakeMt5:
         self.initialize_calls = 0
         self.shutdown_calls = 0
         self.copy_calls: list[tuple[str, int, int, int]] = []
+        # Capture (args, kwargs) of every initialize() call so tests can
+        # assert how --mt5-path / login / etc. are threaded into initialize.
+        self.init_calls: list[tuple[tuple[Any, ...], dict[str, Any]]] = []
 
     def initialize(self, *args: Any, **kwargs: Any) -> bool:
         self.initialize_calls += 1
+        self.init_calls.append((args, kwargs))
         return self._init_returns
 
     def shutdown(self) -> None:

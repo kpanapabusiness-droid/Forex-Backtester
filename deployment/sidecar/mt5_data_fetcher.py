@@ -31,6 +31,7 @@ from __future__ import annotations
 
 import importlib
 import time
+from dataclasses import dataclass
 from typing import Any, Protocol
 
 import pandas as pd
@@ -40,6 +41,44 @@ from deployment.sidecar.boundary import _EET_TZ, CONVENTION_UTC
 
 class Mt5FetchError(RuntimeError):
     """Raised on MT5 fetch failure (no bars, connection drop, type error)."""
+
+
+@dataclass(frozen=True)
+class Mt5ConnectParams:
+    """Optional terminal-attach parameters for ``mt5.initialize()``.
+
+    All-None (the default) reproduces the legacy ``mt5.initialize()`` call:
+    attach to whichever running terminal answers first. That is
+    non-deterministic when two MT5 terminals run on one Windows host (the
+    multi-broker VPS topology), so supplying ``path`` — the absolute path to a
+    specific broker's ``terminal64.exe`` — makes the attach deterministic.
+
+    ``login`` / ``password`` / ``server`` are future-proofing for sidecar-side
+    re-auth; they stay None while terminals remain logged in via the Windows
+    session and the sidecar merely attaches.
+    """
+
+    path: str | None = None
+    login: int | None = None
+    password: str | None = None
+    server: str | None = None
+
+    def to_initialize_kwargs(self) -> dict[str, Any]:
+        """Build the kwargs for ``mt5.initialize()``, omitting any None field.
+
+        An empty dict (the all-None default) means ``initialize()`` is called
+        with no arguments — byte-identical to the legacy default-attach path.
+        """
+        kwargs: dict[str, Any] = {}
+        if self.path is not None:
+            kwargs["path"] = self.path
+        if self.login is not None:
+            kwargs["login"] = int(self.login)
+        if self.password is not None:
+            kwargs["password"] = self.password
+        if self.server is not None:
+            kwargs["server"] = self.server
+        return kwargs
 
 
 class Mt5Module(Protocol):
@@ -163,6 +202,7 @@ def fetch_d1_bars(
 def with_mt5_initialize(
     mt5_module: Mt5Module,
     *,
+    connect: Mt5ConnectParams | None = None,
     initial_backoff_sec: float = 1.0,
     max_backoff_sec: float = 60.0,
     alert_after_failures: int = 3,
@@ -173,12 +213,19 @@ def with_mt5_initialize(
     Returns True on success. Raises Mt5FetchError if it never connects
     after ``alert_after_failures`` consecutive failures.
 
+    ``connect`` carries optional terminal-attach parameters. The default
+    (None / all-None) calls ``initialize()`` with no arguments — the legacy
+    default-attach path. Supplying ``connect.path`` attaches deterministically
+    to a specific broker terminal (multi-broker VPS); see
+    :class:`Mt5ConnectParams`.
+
     ``sleep_func`` is injectable for tests.
     """
+    init_kwargs = (connect or Mt5ConnectParams()).to_initialize_kwargs()
     backoff = float(initial_backoff_sec)
     failures = 0
     while True:
-        ok = bool(mt5_module.initialize())
+        ok = bool(mt5_module.initialize(**init_kwargs))
         if ok:
             return True
         failures += 1
@@ -192,6 +239,7 @@ def with_mt5_initialize(
 
 
 __all__ = (
+    "Mt5ConnectParams",
     "Mt5FetchError",
     "Mt5Module",
     "fetch_d1_bars",

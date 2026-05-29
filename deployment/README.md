@@ -149,6 +149,10 @@ print(compute_config_hash(load_winning_config(
 
 Copy the printed sha256 into the EA's `Expected_Config_Hash` input.
 
+> **Multi-broker VPS:** when two MT5 terminals run on the same host, each
+> sidecar must attach to a specific terminal (not the first one that answers).
+> See [§ Multi-broker deployment (single VPS)](#multi-broker-deployment-single-vps).
+
 ### 3. Install sidecar as NSSM service
 
 Edit `deployment/ops/nssm_sidecar.bat` to set `PYTHON_EXE`, `REPO_ROOT`,
@@ -210,6 +214,139 @@ EA's Experts journal should show `[ARC10] entry placed` shortly after.
 
 ---
 
+## Multi-broker deployment (single VPS)
+
+To run Arc 10 on two brokers simultaneously from one Windows VPS (e.g. 5ers
+under the `utc` convention and FundedNext under `5ers_eet`), run **two
+independent MT5 terminals + two independent sidecars**, fully isolated from
+each other. The two brokers use different bar-grid conventions, so they are
+driven by separate `winning_config.yaml` files and separate sidecar roots —
+nothing is shared.
+
+The single hard problem this solves: `mt5.initialize()` with no path attaches
+to **whichever terminal answers first**, which is non-deterministic when two
+terminals are running. The `--mt5-path` argument pins each sidecar to its
+broker's terminal.
+
+### 1. Install each MT5 to a distinct path, portable mode
+
+Install the two terminals to separate directories so their data never collides:
+
+```
+C:\MT5_5ers\          # 5ers terminal install
+C:\MT5_FundedNext\    # FundedNext terminal install
+```
+
+Launch each with the **`/portable`** flag so all data (config, logs, and the
+`Common\Files` sandbox) lives **inside the install directory** instead of the
+shared `%APPDATA%\MetaQuotes\Terminal\Common\Files\`:
+
+```cmd
+C:\MT5_5ers\terminal64.exe /portable
+C:\MT5_FundedNext\terminal64.exe /portable
+```
+
+The decisive property of `/portable`: it relocates `Common\Files` into the
+install dir, giving each broker its **own** common sandbox:
+
+```
+C:\MT5_5ers\MetaTrader 5\Common\Files\Arc10\            # 5ers sidecar root
+C:\MT5_FundedNext\MetaTrader 5\Common\Files\Arc10\      # FundedNext sidecar root
+```
+
+Without `/portable`, both terminals would share the single
+`%APPDATA%\...\Common\Files\Arc10\`, and the two sidecars + two EAs would read
+and overwrite each other's `signals_out/`, heartbeats, state, and trade logs.
+With `/portable`, there is **one `Common\Files` per MT5**, no shared sandbox.
+
+> Confirm the exact `Common\Files` location per terminal: in MetaEditor (F4)
+> run `Print(TerminalInfoString(TERMINAL_COMMONDATA_PATH))`, or check
+> `File → Open Data Folder` in the terminal. Under `/portable` it resolves
+> under the install directory; the `\Common\Files\Arc10\` suffix is where each
+> sidecar root lives.
+
+### 2. Log each terminal in once, leave the Windows session running
+
+Launch each terminal interactively once, log into its broker account, enable
+AutoTrading + DLL imports (Tools → Options → Expert Advisors), then leave the
+Windows session logged in. The sidecars do **not** re-authenticate — they only
+*attach* to an already-logged-in terminal. (`--mt5-login` / `--mt5-password` /
+`--mt5-server` exist as future-proofing for sidecar-side re-auth but are not
+needed in this topology.)
+
+### 3. Create each sidecar's runtime directories
+
+```powershell
+foreach ($root in @(
+  "C:\MT5_5ers\MetaTrader 5\Common\Files\Arc10",
+  "C:\MT5_FundedNext\MetaTrader 5\Common\Files\Arc10"
+)) {
+  New-Item -ItemType Directory -Force -Path "$root\signals_out"
+  New-Item -ItemType Directory -Force -Path "$root\signals_processed"
+  New-Item -ItemType Directory -Force -Path "$root\signals_failed"
+  New-Item -ItemType Directory -Force -Path "$root\logs"
+}
+```
+
+### 4. Launch each sidecar pinned to its terminal
+
+Pass `--mt5-path` (the absolute path to that broker's `terminal64.exe`) plus
+the broker-appropriate `--winning-config` and `--sidecar-root`:
+
+```powershell
+# 5ers (UTC convention)
+py -m deployment.sidecar `
+  --winning-config "configs\l_arc_10_v3.0.2_utc_rerun\winning_config.yaml" `
+  --sidecar-root  "C:\MT5_5ers\MetaTrader 5\Common\Files\Arc10" `
+  --mt5-path      "C:\MT5_5ers\terminal64.exe"
+
+# FundedNext (EET convention)
+py -m deployment.sidecar `
+  --winning-config "configs\l_arc_10_v3.0.2_eet\winning_config.yaml" `
+  --sidecar-root  "C:\MT5_FundedNext\MetaTrader 5\Common\Files\Arc10" `
+  --mt5-path      "C:\MT5_FundedNext\terminal64.exe"
+```
+
+The convention (`utc` vs `5ers_eet`) is read from each `winning_config.yaml`'s
+`boundary_convention` key — the sidecar wakes, fetches, normalises broker time,
+and probes the bar grid accordingly. (Swap the EET winning-config path for
+whichever EET-convention config you deploy; the FundedNext panel-diff was
+validated at tag `arc-10-eet-parity-validated`.)
+
+Without `--mt5-path` the sidecar falls back to the legacy default attach
+(first terminal to answer) — fine for a single-broker host, non-deterministic
+with two terminals running. **Always pass `--mt5-path` on a multi-broker VPS.**
+
+For NSSM, install **two services** (e.g. `Arc10Sidecar5ers`,
+`Arc10SidecarFundedNext`), each with its own `--mt5-path`, `--winning-config`,
+and `--sidecar-root` in the launch arguments, and a watchdog per service
+pointed at that service's `sidecar.heartbeat`.
+
+### 5. Attach each EA to its own terminal
+
+Compile + attach the EA inside **each** terminal separately (step 5 of the
+single-broker setup, run once per terminal). Each EA's `Sidecar_Inbox_Dir`
+resolves to *its own* terminal's `Common\Files\Arc10\signals_out` via
+`FILE_COMMON`, so the two EAs never see each other's signals. Use a distinct
+`Magic_Number` per terminal. Set `Expected_Config_Hash` from that broker's
+winning-config (the UTC and EET configs hash differently because
+`boundary_convention` is in the hashed subset).
+
+### FundedNext symbol mapping
+
+FundedNext exposes all 28 traded pairs as **plain symbols with no suffix**
+(`EURUSD`, `GBPUSD`, … — confirmed in the `arc-10-eet-parity-validated`
+panel-diff). This is exactly the sidecar's **default identity mapping**:
+`SidecarConfig.mt5_symbol_for(pair)` returns the canonical pair unchanged when
+no `mt5_symbol_map` is configured. **No `mt5_symbol_map` is required for
+FundedNext** — omit it from the sidecar config entirely.
+
+Only configure `mt5_symbol_map` (see [sidecar-config-schema](#sidecar-config-schema))
+for a broker that appends a suffix (e.g. `EURUSD.r`, `EURUSD.raw`). Neither
+5ers nor FundedNext does, so both run with identity mapping.
+
+---
+
 ## trade-log-schema
 
 `<sidecar_root>/trade_log.csv` — 24 columns, header on first line:
@@ -239,6 +376,8 @@ Optional `sidecar.yaml` (passed via `--sidecar-config`):
 pairs: [EURUSD, GBPUSD]
 
 # Map canonical pair to broker symbol (some brokers append .raw / .r / etc).
+# OPTIONAL — omit entirely for identity mapping. 5ers and FundedNext both use
+# plain unsuffixed symbols, so neither needs this block.
 mt5_symbol_map:
   EURUSD: EURUSD
   GBPUSD: GBPUSD

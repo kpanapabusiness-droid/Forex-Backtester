@@ -10,6 +10,7 @@ import pytest
 
 from deployment.sidecar.boundary import CONVENTION_EET, CONVENTION_UTC
 from deployment.sidecar.mt5_data_fetcher import (
+    Mt5ConnectParams,
     Mt5FetchError,
     _rates_to_df,
     fetch_d1_bars,
@@ -94,6 +95,57 @@ def test_initialize_backs_off_then_raises():
         )
     assert fake.initialize_calls == 3
     assert sleeps == [1, 2]  # backoff 1s then 2s before 3rd attempt
+
+
+def test_initialize_default_attach_passes_no_args(fake_mt5):
+    """No --mt5-path: initialize() must be called with no arguments — the
+    legacy default-attach path, byte-identical to pre-multi-broker behaviour."""
+    with_mt5_initialize(fake_mt5, sleep_func=lambda *_: None)
+    assert fake_mt5.init_calls == [((), {})]
+
+
+def test_initialize_default_connect_object_is_equivalent(fake_mt5):
+    """An all-None Mt5ConnectParams is equivalent to passing nothing."""
+    with_mt5_initialize(fake_mt5, connect=Mt5ConnectParams(), sleep_func=lambda *_: None)
+    assert fake_mt5.init_calls == [((), {})]
+
+
+def test_initialize_with_path_attaches_deterministically(fake_mt5):
+    """--mt5-path threads through to initialize(path=...)."""
+    path = r"C:\MT5_FundedNext\terminal64.exe"
+    with_mt5_initialize(
+        fake_mt5, connect=Mt5ConnectParams(path=path), sleep_func=lambda *_: None
+    )
+    assert fake_mt5.init_calls == [((), {"path": path})]
+
+
+def test_initialize_with_full_credentials(fake_mt5):
+    """login/password/server are forwarded as kwargs alongside path."""
+    connect = Mt5ConnectParams(
+        path=r"C:\MT5_5ers\terminal64.exe",
+        login=12345,
+        password="secret",
+        server="FiveERS-Server",
+    )
+    with_mt5_initialize(fake_mt5, connect=connect, sleep_func=lambda *_: None)
+    assert fake_mt5.init_calls == [
+        (
+            (),
+            {
+                "path": r"C:\MT5_5ers\terminal64.exe",
+                "login": 12345,
+                "password": "secret",
+                "server": "FiveERS-Server",
+            },
+        )
+    ]
+
+
+def test_connect_params_omits_none_fields():
+    """Only supplied fields appear in the initialize kwargs; login coerced to int."""
+    assert Mt5ConnectParams().to_initialize_kwargs() == {}
+    assert Mt5ConnectParams(path="p").to_initialize_kwargs() == {"path": "p"}
+    assert Mt5ConnectParams(login="42").to_initialize_kwargs() == {"login": 42}
 
 
 def test_h4_timestamps_are_utc_naive_and_anchored(fake_mt5):

@@ -2,7 +2,7 @@
 
 > The operational todo list. Append, check off, delete as work completes.
 > Distinct from `ARC_TRACKER.md` (which is auto-updated arc state) and `ARC_HISTORY.md` (frozen pre-v3.0 record).
-> Last updated: 2026-05-25 (CC_22 comprehensive docs refresh — post-Phase-1-engine-build sweep)
+> Last updated: 2026-05-29 (post-Arc-10-deployment refresh — Wave 1 closed, Arc 10 LIVE; project now in live-ops + Arc 10 improvements mode)
 
 ---
 
@@ -18,16 +18,19 @@
 ## Current state — quick view
 
 - **Phase 0 — Framework validation:** 🟢 CLOSED (Phase 0a Path B verdict per PR-E.1.7; Phase 0b skipped by chat decision)
-- **Phase 1 — Arc 1-11 re-runs:** 🟡 IN PROGRESS — Wave 1 partial (Arcs 8 / 10 / 11 closed; Arcs 5 / 7 closures in flight via PRs #172 + #180); Wave 1 retries under signal-parity engine: 🔴 NOT STARTED (engine prerequisites now met as of PR #197 merge)
-- **Phase 2 — Sub-protocols + new signals:** 🔴 NOT STARTED (blocked on Phase 1 closure)
-- **Engine state:** **post-PR-#197**. Steps 1-5 + signal parity (mid features + 5ers EET bars + worst-case fills) + Step 6 framework (Amendment 4) + Amendment 3 risk-normalised gates + Amendment 5 four-gate architecture selection + Amendment 6 EET daily-DD boundary + canonical exit-policy registry (incl. `sl_partial_close_1r_runner_trail`) + signal-level EET timezone canonical utility + EET session semantics across distance / reset-floor / per-day-max-DD.
-- **Architectures wired:** A1, A2, A3, A4, A6 (A5 not built — deferred until Wave 2 produces ≥ 1 VIABLE candidate; Arc 8 first candidate)
-- **Protocol state:** L_PROTOCOL v3.0 + Amendments 1, 2, 3, 4, 5, 6 inline (Amendment 6 inline-only per CC_22 — no archive file). Closure template v1.3.1. Parser v1.3 with Amendment-5 + Amendment-3 cutoff validation.
+- **Phase 1 — Arc 1-11 re-runs:** 🟡 PARTIAL — **Wave 1 CLOSED** (all 5 arcs run under v3.0.2: Arc 10 PASS-DEPLOYABLE → **LIVE**; Arcs 5 / 7 / 8 / 11 FAIL). **Wave 2 ⚪ PARKED** — deprioritized; project pivoted to deployment of the Arc 10 survivor.
+- **Arc 10 — Live operations:** 🟡 ACTIVE — deployed on FundedNext (EET) + 5ers (UTC) demo; demo soak in progress; FundedNext $100k Challenge purchase pending soak verification. Operational source of truth = `arc_10/`.
+- **Arc 10 — Improvements (research):** 🟡 the only open research thread — small exploratory probes on the deployed signal; nothing structural.
+- **Phase 2 — Sub-protocols + new signals:** ⚪ PARKED — deprioritized along with Wave 2; project focus is deployment + Arc 10 improvements, not new signal classes.
+- **Engine state:** **post-deployment-week** (post-PR-#236). Steps 1-5 + signal parity + Step 6 framework (Amendment 4) + Amendment 3 / 3.1 risk-normalised gates + Amendment 5 architecture selection + Amendment 6 EET daily-DD boundary + canonical exit-policy registry. **Live deployment stack wired & operationally validated:** convention-aware Python sidecar (UTC + EET, byte-identical parity proven on both) + thin MQL5 EA + multi-broker plumbing (`--mt5-path`) + `--quick-test`.
+- **Architectures wired:** A1, A2, A3, A4, A6 (A5 not built — deferred; no VIABLE candidate triggered it)
+- **Protocol state:** L_PROTOCOL v3.0 + Amendments 1, 2, 3, 3.1, 4, 5, 6 inline. Closure template v1.3.1. Parser v1.3 with Amendment-5 + Amendment-3 cutoff validation.
 
 ### Active parallel chat work
 
-- **heavy_ml_probe** sub-protocol build — PR #187 (PR-A) OPEN; PR-B/C/D/E/F to follow per build plan
-- **signal_discovery_probe** 10k local run — user-side workstation operation, IN PROGRESS
+- **Arc 10 live operations** — chat-side mastermind work (demo soak, Challenge decision). Operational, NOT a research-pipeline item; detail lives in `arc_10/04_runbook/`.
+- **heavy_ml_probe** sub-protocol build — 🟢 COMPLETE (PR-A → PR-F merged; latest #206 / #203). Not currently invoked (Phase 2 parked).
+- **signal_discovery_probe** discovery runs — 🟢 infra built; `arc_discovery_01` ARCHIVED_PARTIAL (step-1 compute blowup), `arc_discovery_02` PARKED (#233).
 
 ---
 
@@ -116,7 +119,40 @@ Closes the post-Round-6 engine sprint. All items merged 2026-05-25.
 | Amendment 5 — AUC-gated A2/A6 architecture selection + parser v1.3.1 field | 🟢 | #194 | Dispatch-time enforcement; engine unchanged |
 | Canonical exit-policy registry + `sl_partial_close_1r_runner_trail` primitive + per-arc migration | 🟢 | #195 | `core/sim/exit_policies/`; Account partial-fill semantics; 218-test reference parity |
 | EET session semantics: distance / reset_floor / `compute_per_day_max_dd` + **Amendment 6** | 🟢 | #197 | `core/time_utils/session_boundary.py`; `Panel.boundary_convention` propagation; daily-DD boundary now EET broker trading day |
-| CC_22 docs comprehensive refresh — post-Phase-1-engine-build state alignment | 🟢 | this PR | Tier 1-4 audit; full TODO + engine_capability_audit refresh; Amendment 6 prefatory block in L_PROTOCOL |
+| CC_22 docs comprehensive refresh — post-Phase-1-engine-build state alignment | 🟢 | #207-#209 era | Tier 1-4 audit; full TODO + engine_capability_audit refresh; Amendment 6 prefatory block in L_PROTOCOL |
+
+### Round 8 — Arc 10 deployment week (2026-05-25 → 2026-05-29)
+
+Closes Wave 1 (all 5 arcs run under v3.0.2) and takes the Arc 10 survivor from PASS-DEPLOYABLE to LIVE.
+
+| Task | Status | PR / Tag |
+|---|---|---|
+| Amendment 3.1 (r_max as deployment cap, not gate threshold) | 🟢 | #211 |
+| Step 6 ultimate audit — wire spread P&L + harden every category | 🟢 | #212 |
+| Driver-divergence investigation + risk-decoupling regression test | 🟢 | #213 |
+| Arc 10 v3.0.2 PASS-DEPLOYABLE-PROVISIONAL under canonical 5ers_eet | 🟢 | #214 |
+| Arc 10 v3.0.2 Amendment 3 + Step 6 addendum (bespoke methodology preserved) | 🟢 | #216 |
+| Arc 10 v3.0.2 exhaustive contamination audit — AUDIT-CLEAN | 🟢 | #217 |
+| Arc 10 v3.0.2 UTC rerun — PASS-DEPLOYABLE (convention-sensitivity characterised) | 🟢 | #218 |
+| Arc 8 v3.0.2 retry — FAIL (chained DD blowout) | 🟢 | #231 |
+| Arc 11 v3.0.2 retry — FAIL (step5_not_scalable) | 🟢 | #215 |
+| Arc 7 v3.0.2 retry — FAIL (A2/A6 follow-up + r=2% analysis) | 🟢 | #202 + #210 |
+| Arc 5 v3.0.2 retry — FAIL (step5_not_scalable) | 🟢 | #235 |
+| Phase 1 sidecar + thin MQL5 EA (UTC-native deployment build) | 🟢 | #219 (+ #220 / #221 fixes) |
+| Arc 10 cost-realism sweep (swap dominates; r_safe required) | 🟢 | #222 + #232 (FundedNext EET swap-free) |
+| EA: FILE_COMMON + canonical R (r_atr fix) + strategic exit reasons | 🟢 | #223 |
+| EA topology fix — single-chart-multi-pair (per-position H4 bar gate) | 🟢 | #225 + tag `arc-10-topology-validated` |
+| Phase 2 parity — sidecar↔lab byte-identical (UTC) | 🟢 | #226 |
+| Phase 2 EET parity — broker-convention-aware sidecar + FundedNext parity | 🟢 | #227 + tag `arc-10-eet-parity-validated` |
+| Multi-broker plumbing (`--mt5-path` + portable-mode docs) | 🟢 | #228 |
+| Sidecar `--quick-test` flag (bypass H4 boundary wait) | 🟢 | #229 |
+| Broker server-clock offset check removal (#227 regression fix) | 🟢 | #230 |
+| Park arc_discovery_02 (manifest fix + resumable artefact) | 🟢 | #233 |
+| `arc_10/` consolidated holy grail folder (30+ docs across 5 subfolders) | 🟢 | #234 |
+| Arc 10 deployment retrospective + generic `docs/SIDECAR_EA_BUILD_GUIDE.md` | 🟢 | #236 |
+| VPS deployment (Python, MT5×2, services + watchdogs, EAs×2) | 🟢 | runbook in `arc_10/03_deployment/04_vps_setup_guide.md` |
+
+Rounds 1-7 above are historical record — unchanged.
 
 ---
 
@@ -154,15 +190,17 @@ path is Sections G (news filter) + H (post-fill SL anchor) per
 
 **Deferred:** Arc 9 (IB-trend) — only if Wave 2 surfaces nothing. Known lookahead-corrupted under v2.x; low expected value.
 
-### Wave 1 status
+### Wave 1 status — CLOSED (all 5 arcs run under v3.0.2)
 
-| Arc | Verdict (closure) | Re-eval verdict (Amend 3) | Closure PR |
-|---|---|---|---|
-| Arc 8 | FAIL (step 5) | FAIL | merged (PR #173) |
-| Arc 10 | PASS-VIABLE | PASS-DEPLOYABLE | merged (PR #174) — re-eval PR #177 |
-| Arc 11 | FAIL (step 5) | FAIL | merged (PR #171) |
-| Arc 5 | FAIL (step 5) | — | 🟡 OPEN — PR #172 in flight |
-| Arc 7 | FAIL (step 5) | — | 🟡 OPEN — PR #180 in flight |
+| Arc | v3.0 verdict | v3.0.2 retry verdict | Closure PR | Live status |
+|---|---|---|---|---|
+| Arc 10 | PASS-VIABLE → PASS-DEPLOYABLE | **PASS-DEPLOYABLE** (ratio 6.43 EET) | #174 / re-eval #177 / v3.0.2 #214/#216/#217/#218 | **LIVE on demo (FN EET + 5ers UTC); Challenge pending** |
+| Arc 8 | FAIL (step 5) | FAIL (chained DD blowout) | #173 / v3.0.2 #231 | n/a |
+| Arc 11 | FAIL (step 5) | FAIL (step5_not_scalable) | #171 / v3.0.2 #215 | n/a |
+| Arc 7 | FAIL (step 5) | FAIL (step5_not_scalable) | v3.0.2 #202 (+ r=2% analysis #210) | n/a |
+| Arc 5 | FAIL (step 5) | FAIL (step5_not_scalable) | v3.0.2 #235 | n/a |
+
+→ **One deployable found: Arc 10.** Project's strategy-level goal (a PASS-DEPLOYABLE survivor) is met.
 
 ### Phase 1 task list
 
@@ -170,38 +208,72 @@ path is Sections G (news filter) + H (post-fill SL anchor) per
 |---|---|---|
 | Wave 1 composition locked | 🟢 | Arc 5, 8, 10, 11, 7 |
 | Wave 2 composition locked | 🟢 | Arc 4 RERUN, 4 original, 6, 3, 1, 2 (+ Arc 9 deferred) |
-| Wave 1 closures: Arcs 8, 10, 11 | 🟢 | |
-| Wave 1 closures: Arcs 5, 7 | 🟡 | PRs #172 + #180 open |
+| Wave 1 closures: all 5 arcs (v3.0.2) | 🟢 | Arc 10 PASS-DEPLOYABLE; Arcs 5/7/8/11 FAIL |
 | Arcs 8/10/11 retroactive Amendment-3 re-evaluation | 🟢 | PR #177 |
-| Arc 5 v3.0.1 retry under signal-parity engine + Amendment 3 gates + signal-EET fix | 🔴 | Blocked on PR #172 closure. Engine prerequisites met (PRs #189, #193, #197). |
-| Arc 7 v3.0.1 retry | 🔴 | Blocked on PR #180 closure. Engine prerequisites met. |
-| Arc 10 signal-parity rerun on UTC convention | 🔴 | Procedure documented at [docs/calibration/arc_10_signal_parity_rerun_2026_05.md](docs/calibration/arc_10_signal_parity_rerun_2026_05.md); expected near-zero delta. PR #193 + Amendment 6 do NOT change Arc 10 UTC-baseline numbers. |
-| Wave 1 closes (cross-arc tracker review for patterns) | 🔴 | Gated on retries above |
-| Dispatch Wave 2 (6 arcs in parallel) | 🔴 | Gated on Wave 1 close. **Wave 2 dispatches must apply L_PROTOCOL Amendment 5 four-gate architecture-selection rule from first dispatch** (Phase 1 chat-side; out of scope for this PR). |
-| Wave 2 closes; cross-arc synthesis | 🔴 | |
-| Decision: any deployable found? | 🔴 | |
-| Retroactive audit Arc 8 v3.0 + Arc 11 v3.0 under L_PROTOCOL Amendment 5 | ⚪ | Deferred until Arc 7 v3.0.2 closes — verdict informs whether retroactive retries are worth running. Criterion per Amendment 5 §7: "FAIL closed with at least one Step 3 surviving cluster whose Step 4 AUC ≥ 0.65 was not evaluated under A2 AND A6 under prior protocol." Arc 10 v3.0 already evaluated A6 under Amendment 1's V-shape mapping; likely unaffected, verify at audit. |
+| Arc 5 v3.0.2 retry under signal-parity engine + Amendment 3 gates | 🟢 | FAIL (step5_not_scalable) — PR #235 |
+| Arc 7 v3.0.2 retry | 🟢 | FAIL (step5_not_scalable) — PR #202 + r=2% analysis #210 |
+| ~~Arc 10 signal-parity rerun on UTC convention~~ | 🟢 | **Superseded** — UTC rerun (#218) + Phase 2 parity proven byte-identical on both UTC (#226) and EET (#227). |
+| Wave 1 closes (cross-arc tracker review for patterns) | 🟢 | Wave 1 complete; only Arc 10 viable |
+| **Decision: any deployable found?** | 🟢 | **YES — Arc 10. Goal achieved at the strategy level.** |
+| **Arc 10 deployment to live** | 🟢 | **Deployed 2026-05-29 on FundedNext (EET) + 5ers (UTC) demo. See `arc_10/`.** |
+| Dispatch Wave 2 (6 arcs in parallel) | ⚪ | **PARKED** — deprioritized. Project pivoted to deploying + improving the Arc 10 survivor rather than running more research arcs. Reopenable if Arc 10 fails its live kill criteria. **Any future Wave 2 dispatch must apply Amendment 5 four-gate architecture selection from first dispatch.** |
+| Wave 2 closes; cross-arc synthesis | ⚪ | PARKED (gated on Wave 2 reopen) |
+| Retroactive audit Arc 8 v3.0 + Arc 11 v3.0 under L_PROTOCOL Amendment 5 | ⚪ | Deferred. Criterion per Amendment 5 §7: "FAIL closed with at least one Step 3 surviving cluster whose Step 4 AUC ≥ 0.65 was not evaluated under A2 AND A6 under prior protocol." Low priority given deployment pivot. |
+
+---
+
+## Arc 10 — Live operations
+
+> **Live system status as of 2026-05-29.** Operational detail lives in `arc_10/04_runbook/`. This TODO captures research-pipeline / decision-gate status only; it references `arc_10/`, it does not duplicate it.
+
+Deployed on a single Contabo VPS (Frankfurt): FundedNext ($100k Challenge target, EET convention, 0.50% risk) + 5ers ($10k demo, UTC convention, 0.40% risk). Convention-aware Python sidecar + thin MQL5 EA per broker; watchdog auto-restart on stale heartbeat.
+
+| Item | Status | Notes |
+|---|---|---|
+| Demo soak (both brokers) | 🟡 | In progress; verify before market reopen Sunday 2026-06-01 |
+| FundedNext $100k Challenge purchase | ⚪ | Pending soak verification + operator decision |
+| Risk ramp Week 1 (0.20%) | 🔴 | Triggers on Challenge purchase |
+| Risk ramp Week 2 (0.30%) | 🔴 | Triggers Week 1 + 1 if clean |
+| Risk ramp Week 3+ (0.50% target) | 🔴 | Triggers Week 2 + 1 if clean |
+| KH-24 retirement | 🔴 | Triggers on Arc 10 reaching funded status |
+| Weekly reconciliation script build | ⚪ | Deferred until 4+ weeks of live data exist; spec at `arc_10/04_runbook/02_weekly_check.md` |
+| First 50-trade comparison vs live-tracking framework | 🔴 | Triggers automatically when ~50 trades closed; framework at `arc_10/04_runbook/06_live_tracking_framework.md` |
+| FundedNext rules quarterly verification | 🔴 | Recurring — first one Q3 2026 |
+| 5ers copy-trading policy clarification | ⚪ | Pending written 5ers confirmation before opening parallel 5ers accounts |
+
+---
+
+## Arc 10 — Improvements (research)
+
+> The only open research thread. Small, exploratory probes on the deployed signal — nothing structural, nothing that gates deployment. Lower priority than live operations.
+
+| Task | Status | Notes |
+|---|---|---|
+| Arc 10 improvement probes | 🟡 | Exploratory; scope set chat-side as interesting ideas surface. Must not touch the locked deployed config — any candidate improvement goes through a fresh validation arc, not an in-place edit. |
+| Cross-arc V-shape clusterifier (carry-over candidate) | 🔴 | EXP-05 pool: AUC 0.6348 with `L1_minus_L0_atr` mandatory; Arc 7 c3 + Arc 10 c1 pooled. Leading research candidate to fold into Arc 10 improvements if pursued. |
 
 ---
 
 ## Phase 2 — Sub-protocols + new signals
 
-Triggered after: Phase 1 closes (all 11 arcs).
+> ⚪ **PARKED.** Deprioritized along with Wave 2. Project focus is deploying + improving the Arc 10 survivor, not opening new signal classes. Reopenable if Arc 10 fails live and the research pipeline is restarted.
+
+Originally triggered after: Phase 1 closes (all 11 arcs). Wave 1 closed, but Wave 2 was parked rather than run, so the Phase 1 trigger condition is intentionally not met.
 
 ### Sub-protocol probes
 
 | Task | Status | Notes |
 |---|---|---|
-| `heavy_ml_probe` build (PR-A scaffolding + lineage gate + IO) | 🟡 | PR #187 (parallel chat); PR-B/C/D/E/F to follow |
-| `signal_discovery_probe` infrastructure | 🟢 | Built via PR #175 (arc_discovery_01 dispatch) |
-| `signal_discovery_probe` 10k local run by user | 🟡 | User-side workstation operation, in progress |
-| Discovery top-3 follow-up arcs | 🔴 | Post-local-run + signal-parity engine merged (#189 ✓) |
-| `heavy_ml_probe` invocation on best Phase 1 cohort-edge arc | 🔴 | Blocked on Phase 1 close + heavy_ml_probe build complete |
-| t=x contamination probe (drafted pre-reset) | 🔴 | Low priority; diagnostic only; useful for Pipeline D / DE validation |
+| `heavy_ml_probe` build | 🟢 | COMPLETE — PR-A → PR-F merged (latest #206 / #203). Spec + engine shipped. |
+| `signal_discovery_probe` infrastructure | 🟢 | Built via PR #175 |
+| `signal_discovery_probe` discovery runs | 🟢 | `arc_discovery_01` ARCHIVED_PARTIAL (step-1 compute blowup, 511/10000 rules); `arc_discovery_02` PARKED (#233) |
+| Discovery top-3 follow-up arcs | ⚪ | PARKED with Phase 2 |
+| `heavy_ml_probe` invocation on best Phase 1 cohort-edge arc | ⚪ | PARKED with Phase 2 (build is ready; not invoked) |
+| t=x contamination probe (drafted pre-reset) | ⚪ | PARKED; low priority diagnostic |
 
 ### New signal classes (each becomes a Phase 2 arc)
 
-All 🔴 NOT STARTED — defer to Phase 2 trigger.
+All ⚪ PARKED — defer to Phase 2 reopen (which is itself parked behind the deployment pivot).
 
 | Task | Notes |
 |---|---|
@@ -214,12 +286,26 @@ All 🔴 NOT STARTED — defer to Phase 2 trigger.
 
 ---
 
+## Engine consolidation — deployment stack (WIRED this deployment week)
+
+| Item | Status | PR | Notes |
+|---|---|---|---|
+| Phase 1 sidecar + thin MQL5 EA (UTC-native) | 🟢 | #219 | The live deployment build (+ #220/#221 fixes) |
+| Sidecar convention-aware boundary (UTC + EET) | 🟢 | #227 | `deployment/sidecar/boundary.py` |
+| Phase 2 parity (UTC + EET, byte-identical) | 🟢 | #226 / #227 | Both conventions proven against lab |
+| Multi-broker `--mt5-path` | 🟢 | #228 | Deterministic MT5 attach + portable mode |
+| Sidecar `--quick-test` | 🟢 | #229 | Bypass H4 boundary wait for smoke tests |
+| Broker server-clock offset check removal | 🟢 | #230 | #227 regression fix |
+| EA `r_atr` bug fix (canonical R = sl_distance) | 🟢 | #223 | + FILE_COMMON + strategic exit reasons |
+| EA topology fix (per-position H4 tracking) | 🟢 | #225 | single-chart-multi-pair |
+| Arc 10 deployment-readiness | 🟢 | (deployment week) | Was OPEN; now CLOSED — system live on FundedNext + 5ers demo |
+
 ## Engine consolidation — items the engine still needs
 
 | Item | Status | Notes |
 |---|---|---|
-| A5 portfolio composition spec + build | 🔴 | Deferred until Wave 2 produces VIABLE candidates. Arc 8 first candidate. |
-| Full-window sim for chained DD (`chained_dd_method: full_window_sim`) | 🔴 | v3.0.2 follow-up; replaces equity-stitching default from PR #186. Required post-Wave-2 per closure template v1.3. |
+| A5 portfolio composition spec + build | 🔴 | Deferred — no VIABLE candidate triggered it (Wave 2 parked). |
+| Full-window sim for chained DD (`chained_dd_method: full_window_sim`) | ⚪ | v3.0.2 follow-up; replaces equity-stitching default from PR #186. Was "required post-Wave-2"; parked with Wave 2. |
 | Audit doc footer (items MISSING → WIRED as they ship) | 🟢 | engine_capability_audit_2026_05.md refreshed in CC_22 with post-PR-#197 footer |
 | Arc 8 closure §10 correction | 🔴 | `primary_failure_mode` → `step5_not_scalable`; tracker per-failure-mode adjustment |
 | Cross-platform CI | 🔴 | Linux-only currently; user dev is Windows. Non-blocking housekeeping. |
@@ -229,22 +315,25 @@ All 🔴 NOT STARTED — defer to Phase 2 trigger.
 | KH-24 anchor F2/F3 fold-2 anchor-drift bisect investigation | 🔴 | Pre-existing on main; F2/F3 divergence between legacy `KH24FoldRunner` (warmup_days=30) and A1 path (full-history warmup). Documented; queued investigation. |
 | Triple-spread sensitivity diagnostic (Step 6 §6.3 enhancement) | 🔴 | Optional Step 6 framework enhancement |
 | HistData ↔ 5ers MT5 spread comparison (calibration task) | 🔴 | User-side; procedure at [docs/calibration/histdata_mt5_aggregation_parity_2026_05.md §5](docs/calibration/histdata_mt5_aggregation_parity_2026_05.md) |
-| Cross-arc V-shape clusterifier (Phase 2 research) | 🔴 | EXP-05 pool: AUC 0.6348 with `L1_minus_L0_atr` mandatory. Arc 7 c3 + Arc 10 c1 pooled. Leading v2.4-era candidate; carry into Phase 2. |
+| Cross-arc V-shape clusterifier | 🔴 | EXP-05 pool: AUC 0.6348 with `L1_minus_L0_atr` mandatory. Arc 7 c3 + Arc 10 c1 pooled. Moved to the **Arc 10 — Improvements** section as the leading candidate to pursue. |
 | Closure-writer YAML auto-emission | 🔴 | Quality-of-life; defer |
 
 ---
 
 ## Standing items / open questions
 
-- **Signal parity gap:** 🟢 RESOLVED via PR #189 (mid-price feature refactor + 5ers EET bar boundaries). All future engine output is venue-independent. Pre-PR-#189 closures (Arcs 8, 10, 11; Arcs 5, 7 closures in flight) carry venue-specific signal artefacts; retries documented in Phase 1 task list.
+- **Signal parity gap:** 🟢 RESOLVED via PR #189 (mid-price feature refactor + 5ers EET bar boundaries). All Wave 1 arcs were subsequently re-run under v3.0.2 on the parity engine; Arc 10's live deployment additionally proves sidecar↔lab byte-identity on both UTC (#226) and EET (#227).
 - **Signal-module timezone gap:** 🟢 RESOLVED via PR #193 (canonical `core/signals/htf_alignment.py` utility + 8 modules fixed). Audit at `docs/audits/signal_module_eet_audit_2026_05.md`.
 - **EET session semantics gap:** 🟢 RESOLVED via PR #197 (Amendment 6; daily-DD boundary aligned to EET broker trading day; `core/time_utils/session_boundary.py` canonical). Three convention-aware consumers wired: `distance.py`, `reset_floor.py`, `compute_per_day_max_dd`.
-- **5ers timezone verification:** PR #189 assumes 5ers = EET/EEST (EU DST rules). User to verify against 5ers documentation. If NY-close session rollover, a small follow-up PR adjusts the boundary convention parameter (engine code is convention-parameterised already).
+- **Broker convention verification:** 🟢 RESOLVED at deployment. 5ers deployed on **UTC** boundaries; FundedNext on **EET** boundaries. Sidecar is convention-aware and parity-proven on both (#226 / #227). The earlier "is 5ers EET or NY-close?" open question is moot — 5ers is deployed UTC.
 - **HistData ↔ 5ers MT5 4H comparison (5 majors):** User pulls 5ers MT5 H4 closes from VPS for EURUSD/GBPUSD/USDJPY/AUDUSD/USDCAD over a 30-day post-2020 window; comparison procedure in [docs/calibration/histdata_mt5_aggregation_parity_2026_05.md §5](docs/calibration/histdata_mt5_aggregation_parity_2026_05.md). Acceptance: per-pair mean abs diff <5 pips on majors.
 - **5ers_eet cache build for 28 pairs × 7 TFs:** One-time workstation operation per PROTOCOL_RUNTIME.md §15.3.
 - **Cross-asset data (DXY / US10Y / SPX as features):** on hold per user. Revisit if Phase 1 doesn't produce deployable.
 - **KH-24 live VPS health:** confirmed running normally on 5ers MT5 broker feed. Independent of local data state. Untouched by Phase-1-engine-build sprint (legacy engine path preserved).
 - **KMeans cluster-label assumption in `core/steps/classifier_persistence.py`:** 🔴 OPEN (low priority). The A2 orchestrator path assumes Step-2 cluster IDs start at 0, but KMeans can return labels `[1,2,3,4]` in different environments → `test_a2_end_to_end.py` cross-environment CI flake (`ValueError: cluster_id 0 not present in Step4Result`). Fix: cluster-label → candidate lookup must iterate over the actual returned labels, not assume a 0-based range. Affects strategy research only (L_PROTOCOL Step 2 clustering); does NOT affect deployment, sidecar, EA, or live trading. Fix post-FundedNext deploy.
+- **GitHub PAT exposure (Arc 10 deployment):** A fine-grained PAT was pasted into chat during VPS setup; redacted from `arc_10/` docs via a follow-up commit. Operator declined to revoke; token expires Aug 2026. Tracked in `arc_10/05_history/04_open_items.md`.
+- **`tests/ea/scenarios.json` path:** actual location is `tests/ea/scenarios/scenarios.json`; corrected in `arc_10/02_validation/04_st_scenarios.md` during PR #234 follow-up.
+- **Weekly reconciliation script:** deferred until 4+ weeks of live data, then build per `arc_10/04_runbook/02_weekly_check.md`. (Also tracked in the Arc 10 live-operations table above.)
 - **OpenWebUI / OpenClaw:** evaluated and skipped — no immediate value.
 - **Obsidian:** skipped — user doesn't search docs themselves.
 - **`STATUS.md` and `CHANGELOG.md` and `SESSION_ZERO.md`:** untouched by reset and untouched by CC_22 per chat decision. Pre-v3.0 legacy; separate cleanup decision not in scope.
@@ -260,7 +349,7 @@ All 🔴 NOT STARTED — defer to Phase 2 trigger.
 - `docs/templates/TODO_REFRESH_TEMPLATE.md` (NEW, CC_22 PR) 🟢
 - `ARC_TRACKER.md` (parser-auto-updated) 🟢
 - `scripts/update_tracker_from_closure.py` (parser; supports template v1.0 / v1.1 / v1.2 / v1.2.1 / v1.3 / v1.3.1) 🟢
-- `docs/sub_protocols/heavy_ml_probe.md` (spec; engine build in flight via PR #187) 🟢
+- `docs/sub_protocols/heavy_ml_probe.md` (spec + engine COMPLETE via PR-A → PR-F, latest #206 / #203) 🟢
 - `docs/sub_protocols/signal_discovery_probe.md` (spec + engine wired via PR #175) 🟢
 - `docs/audits/engine_capability_audit_2026_05.md` (REFRESHED in CC_22 PR with post-PR-#197 footer summarising items resolved across PRs #185-#197) 🟢
 - `docs/audits/signal_module_eet_audit_2026_05.md` (landed PR #193) 🟢
@@ -269,11 +358,14 @@ All 🔴 NOT STARTED — defer to Phase 2 trigger.
 - `docs/BACKTESTER_ARCHITECTURE.md`, `docs/PROTOCOL_RUNTIME.md` (updated through PR #197 + CC_22 refresh; Amendment 5 architecture-selection note added) 🟢
 - `REPO_INVENTORY.md` (classification of pre-reset .md files) 🟢
 - `README.md`, `CLAUDE.md`, `project_brief.md`, `WORKFLOW.md` (CC_22 comprehensive refresh) 🟢
+- **`arc_10/` consolidated holy grail folder (30+ docs across 5 subfolders: strategy / validation / deployment / runbook / history)** — single source of truth for the deployed Arc 10 system (PR #234; retrospective added #236) 🟢
+- **`docs/SIDECAR_EA_BUILD_GUIDE.md`** — generic, system-agnostic guide for building a Python sidecar + thin MQL5 EA from a validated lab signal (PR #236) 🟢
 
 ### To create
-- Step 6 framework auto-dispatch verification on first PASS arc (Wave 2)
-- A5 portfolio composition spec
-- Full-window-sim implementation for `chained_dd_method: full_window_sim` (v3.0.2)
+- Weekly reconciliation script + corresponding markdown (deferred until 4+ weeks live data)
+- Step 6 framework auto-dispatch verification on first PASS arc (⚪ parked with Wave 2)
+- A5 portfolio composition spec (⚪ parked — no VIABLE candidate)
+- Full-window-sim implementation for `chained_dd_method: full_window_sim` (⚪ parked with Wave 2)
 
 ### Per-arc folders (created when arc opens)
 - `results/<arc_name>/ARC_OPEN.md`

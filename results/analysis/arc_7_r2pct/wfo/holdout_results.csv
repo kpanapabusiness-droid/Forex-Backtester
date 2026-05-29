@@ -1,0 +1,2 @@
+fold_id,oos_start,oos_end,n_trades,roi_pct,max_dd_pct,days_breaching_daily_5pct,roi_dd_ratio
+12,2021-01-01,2025-12-31,87,0.6195417478400163,0.05837765336273556,1,10.612652481771232

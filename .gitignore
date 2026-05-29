@@ -118,6 +118,15 @@ results/l_arc_2_redo2/**/_run_log.txt
 # Exclude the multi-MB raw run log (the run_summary.json + closure capture
 # the verdict and metrics).
 results/l_arc_7_v3.0.2/run.log
+# Arc 7 r=2% analysis re-run (user override, not an arc closure).
+# Driver + configs cherry-picked into main via PR #208-era cleanup; this
+# branch carries only the report + the artefacts produced by the script
+# at its original --window-end="2025-12-31" default. See
+# docs/dispatches/driver_script_divergence_investigation.md for context.
+!results/analysis/
+!results/analysis/**
+# Multi-MB sklearn warning spew — summary_stats.json + manifests capture metrics.
+results/analysis/arc_7_r2pct/run.log
 # Arc 8 (PR-HHHL pullback-resume, long, 4H) — Step 1+ outputs
 # (L_ARC_PROTOCOL v2.3 §13: arc results data is direct-to-main).
 !results/l_arc_8/

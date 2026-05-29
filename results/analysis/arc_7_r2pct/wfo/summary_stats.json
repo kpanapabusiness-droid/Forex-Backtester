@@ -1,0 +1,126 @@
+{
+  "all_folds_positive": true,
+  "chained_max_dd_pct": 0.05837765336273563,
+  "config_id": "A6::A6::cl1::sl2.0::thr0.5-0.7::exp2",
+  "deliverable": "A_wfo_r2pct",
+  "holdout": {
+    "days_breaching_daily_5pct": 1,
+    "fold_id": 12,
+    "max_dd_pct": 0.05837765336273556,
+    "n_trades": 87,
+    "oos_end": "2025-12-31",
+    "oos_start": "2021-01-01",
+    "roi_dd_ratio": 10.612652481771232,
+    "roi_pct": 0.6195417478400163
+  },
+  "is_elapsed_seconds": 135.43049979995703,
+  "mean_fold_ratio": 4.580061100409646,
+  "min_trades_per_fold": 11,
+  "n_is_folds": 10,
+  "per_fold": [
+    {
+      "days_breaching_daily_5pct": 0,
+      "fold_id": 2,
+      "max_dd_pct": 0.029285421276906035,
+      "n_trades": 14,
+      "oos_end": "2011-12-31",
+      "oos_start": "2011-01-01",
+      "roi_dd_ratio": 4.192482490265853,
+      "roi_pct": 0.1227786159234876
+    },
+    {
+      "days_breaching_daily_5pct": 0,
+      "fold_id": 3,
+      "max_dd_pct": 0.022839173223905374,
+      "n_trades": 11,
+      "oos_end": "2012-12-31",
+      "oos_start": "2012-01-01",
+      "roi_dd_ratio": 4.0689596731067335,
+      "roi_pct": 0.09293167481517006
+    },
+    {
+      "days_breaching_daily_5pct": 0,
+      "fold_id": 4,
+      "max_dd_pct": 0.02332306130729218,
+      "n_trades": 17,
+      "oos_end": "2013-12-31",
+      "oos_start": "2013-01-01",
+      "roi_dd_ratio": 12.81666071616643,
+      "roi_pct": 0.29892376363791295
+    },
+    {
+      "days_breaching_daily_5pct": 0,
+      "fold_id": 5,
+      "max_dd_pct": 0.0456943899945003,
+      "n_trades": 11,
+      "oos_end": "2014-12-31",
+      "oos_start": "2014-01-01",
+      "roi_dd_ratio": 0.7711220537925301,
+      "roi_pct": 0.03523595185935591
+    },
+    {
+      "days_breaching_daily_5pct": 0,
+      "fold_id": 6,
+      "max_dd_pct": 0.02711749607686938,
+      "n_trades": 14,
+      "oos_end": "2015-12-31",
+      "oos_start": "2015-01-01",
+      "roi_dd_ratio": 4.0248369790674765,
+      "roi_pct": 0.10914350098990111
+    },
+    {
+      "days_breaching_daily_5pct": 0,
+      "fold_id": 7,
+      "max_dd_pct": 0.03494881127998845,
+      "n_trades": 14,
+      "oos_end": "2016-12-31",
+      "oos_start": "2016-01-01",
+      "roi_dd_ratio": 4.2816643769141915,
+      "roi_pct": 0.14963908027302342
+    },
+    {
+      "days_breaching_daily_5pct": 0,
+      "fold_id": 8,
+      "max_dd_pct": 0.038988954004364626,
+      "n_trades": 17,
+      "oos_end": "2017-12-31",
+      "oos_start": "2017-01-01",
+      "roi_dd_ratio": 2.79139048763934,
+      "roi_pct": 0.10883339533079117
+    },
+    {
+      "days_breaching_daily_5pct": 0,
+      "fold_id": 9,
+      "max_dd_pct": 0.04535458958244934,
+      "n_trades": 14,
+      "oos_end": "2018-12-31",
+      "oos_start": "2018-01-01",
+      "roi_dd_ratio": 2.824887633827293,
+      "roi_pct": 0.1281216192487733
+    },
+    {
+      "days_breaching_daily_5pct": 0,
+      "fold_id": 10,
+      "max_dd_pct": 0.03141449190037015,
+      "n_trades": 19,
+      "oos_end": "2019-12-31",
+      "oos_start": "2019-01-01",
+      "roi_dd_ratio": 3.3353863630087464,
+      "roi_pct": 0.10477946788534331
+    },
+    {
+      "days_breaching_daily_5pct": 0,
+      "fold_id": 11,
+      "max_dd_pct": 0.022510120526097,
+      "n_trades": 16,
+      "oos_end": "2020-12-31",
+      "oos_start": "2020-01-01",
+      "roi_dd_ratio": 6.693220230307866,
+      "roi_pct": 0.1506651940919408
+    }
+  ],
+  "r_base": 0.02,
+  "worst_fold_dd_pct": 0.0456943899945003,
+  "worst_fold_ratio": 0.7711220537925301,
+  "worst_fold_roi_pct": 0.03523595185935591
+}

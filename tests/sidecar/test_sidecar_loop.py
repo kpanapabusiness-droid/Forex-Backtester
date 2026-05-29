@@ -93,33 +93,13 @@ def test_verify_mt5_h4_alignment_eet_rejects_drifted_bars(fake_mt5):
         )
 
 
-def test_verify_broker_offset_eet_winter_pass(fake_mt5):
-    """EET winter: a server correctly applying +2 passes the offset sanity check."""
-    now = datetime(2024, 1, 15, 12, 0, tzinfo=timezone.utc)
+def test_verify_mt5_h4_alignment_utc_accepts_eet_server_clock(fake_mt5):
+    """Regression (PR #227 bug): 5ers runs an EET server clock (+3 summer) while
+    publishing UTC-anchored bars. The UTC-convention probe must accept it — the
+    server wall-clock offset is irrelevant once bars convert to the correct UTC
+    grid. The old _verify_broker_offset check wrongly rejected this."""
     fake_mt5.symbol_info_tick = lambda sym: SimpleNamespace(
-        time=_broker_epoch(2024, 1, 15, 14)  # broker wall clock = now + 2h
+        time=_broker_epoch(2024, 7, 15, 15)  # broker wall clock = real-now + 3h (EEST)
     )
-    verify_mt5_h4_alignment(
-        fake_mt5,
-        probe_symbol="EURUSD",
-        probe_count=6,
-        convention="5ers_eet",
-        now_func=lambda: now,
-    )
-
-
-def test_verify_broker_offset_eet_rejects_server_stuck_on_utc(fake_mt5):
-    """A misconfigured server that fails to apply EU DST still emits on-grid
-    bars but at the wrong absolute offset (here 0h vs expected +2h) → refuse."""
-    now = datetime(2024, 1, 15, 12, 0, tzinfo=timezone.utc)
-    fake_mt5.symbol_info_tick = lambda sym: SimpleNamespace(
-        time=_broker_epoch(2024, 1, 15, 12)  # broker wall clock = now (no offset)
-    )
-    with pytest.raises(Exception, match="offset sanity check failed"):
-        verify_mt5_h4_alignment(
-            fake_mt5,
-            probe_symbol="EURUSD",
-            probe_count=6,
-            convention="5ers_eet",
-            now_func=lambda: now,
-        )
+    # Bars are UTC-anchored (conftest default); convention="utc" must pass.
+    verify_mt5_h4_alignment(fake_mt5, probe_symbol="EURUSD", probe_count=6)

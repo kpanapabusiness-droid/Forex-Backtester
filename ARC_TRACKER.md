@@ -4,7 +4,7 @@
 > Schema locked at v3.0. Replaces STATUS.md, CHANGELOG.md, ARC_QUEUE.md, and ACTIVE_ARCS.md.
 > First populated on first arc open under L_PROTOCOL v3.0.
 
-Last auto-update: parser: 2026-05-25 21:12:41
+Last auto-update: manual: 2026-05-29 (arc_discovery_01_partial archived; supersedes parser: 2026-05-25 21:12:41)
 
 ---
 
@@ -12,7 +12,8 @@ Last auto-update: parser: 2026-05-25 21:12:41
 
 | Arc | Signal | TF mode | Sub-protocol | Started | Branch | Step in progress |
 |---|---|---|---|---|---|---|
-| arc_discovery_01 | discovered_via_search (random search, n=10000) | locked H1 | signal_discovery_probe | 2026-05-22 | arc/discovery_01 | Step 1 — infrastructure landed; full 10k run pending compute slot |
+
+(empty — no arcs running)
 
 ---
 
@@ -41,6 +42,7 @@ Last auto-update: parser: 2026-05-25 21:12:41
 | l_arc_10_v3.0.2 | D1 swing-low rejection long (DLR, v0.1) — bullish rejection of confirmed ascending D1 swing-low, 4H entry | H4 | vanilla | A1 system_level_filter | 6.4273 | PASS-DEPLOYABLE |  | N/A | results/l_arc_10_v3.0.2/ARC_CLOSURE.md |
 | l_arc_8_v3.0.2 | pullback_resume_hhhl_long_v0.1 (PR-HHHL, 4H, causal HH/HL detection) | H4 | vanilla | A1 system_level_filter | -0.886 | FAIL |  | 5 | results/l_arc_8_v3.0.2/ARC_CLOSURE.md |
 | l_arc_11_v3.0.2 | swing-high breakout in trend (SHB) long, 4H, causal 3-bar swing (right-edge t-4) | H4 | vanilla | A1 system_level_filter | -0.74 | FAIL |  | 5 | results/l_arc_11_v3.0.2/ARC_CLOSURE.md |
+| arc_discovery_01_partial | discovered_via_search (random search, n=10000; 511 rules completed before kill) | H1 | signal_discovery_probe | N/A | N/A | ARCHIVED_PARTIAL | N/A | step_1_compute_blowup | archive/probes/arc_discovery_01_partial/README.md |
 
 ---
 

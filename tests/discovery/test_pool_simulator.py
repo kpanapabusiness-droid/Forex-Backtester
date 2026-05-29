@@ -81,7 +81,7 @@ def test_hard_sl_fires_intra_bar():
     ])
     trigger = _signal_at(df.index, 0)
     atr = _atr(df.index, 1.0)
-    trades, _ = simulate_pair_pool("EURUSD", df, trigger, atr, _cfg())
+    trades, _, _, _ = simulate_pair_pool("EURUSD", df, trigger, atr, _cfg())
     assert len(trades) == 1
     t = trades[0]
     assert t.exit_reason == "hard_sl"
@@ -115,7 +115,7 @@ def test_trail_arms_then_ratchets_then_hits():
     ])
     trigger = _signal_at(df.index, 0)
     atr = _atr(df.index, 1.0)
-    trades, _ = simulate_pair_pool("EURUSD", df, trigger, atr, _cfg())
+    trades, _, _, _ = simulate_pair_pool("EURUSD", df, trigger, atr, _cfg())
     assert len(trades) == 1
     t = trades[0]
     assert t.activated_trail is True
@@ -138,7 +138,7 @@ def test_trail_not_armed_before_activation_threshold():
     ])
     trigger = _signal_at(df.index, 0)
     atr = _atr(df.index, 1.0)
-    trades, _ = simulate_pair_pool("EURUSD", df, trigger, atr, _cfg())
+    trades, _, _, _ = simulate_pair_pool("EURUSD", df, trigger, atr, _cfg())
     assert len(trades) == 1
     t = trades[0]
     assert t.activated_trail is False
@@ -163,7 +163,7 @@ def test_no_time_exit_runs_to_end_of_data():
     df = _ohlc(bars)
     trigger = _signal_at(df.index, 0)
     atr = _atr(df.index, 1.0)
-    trades, _ = simulate_pair_pool("EURUSD", df, trigger, atr, _cfg())
+    trades, _, _, _ = simulate_pair_pool("EURUSD", df, trigger, atr, _cfg())
     assert len(trades) == 1
     t = trades[0]
     assert t.exit_reason == "end_of_data"
@@ -186,8 +186,8 @@ def test_deterministic_two_runs():
     ])
     trigger = _signal_at(df.index, 0)
     atr = _atr(df.index, 1.0)
-    a, _ = simulate_pair_pool("EURUSD", df, trigger, atr, _cfg())
-    b, _ = simulate_pair_pool("EURUSD", df, trigger, atr, _cfg())
+    a, _, _, _ = simulate_pair_pool("EURUSD", df, trigger, atr, _cfg())
+    b, _, _, _ = simulate_pair_pool("EURUSD", df, trigger, atr, _cfg())
     assert len(a) == len(b)
     for ta, tb in zip(a, b):
         assert ta.to_dict() == tb.to_dict()
@@ -202,5 +202,5 @@ def test_warmup_excludes_early_signals():
     # Trigger at bar 2 (excluded by warmup=5)
     trigger = _signal_at(df.index, 2)
     atr = _atr(df.index, 1.0)
-    trades, _ = simulate_pair_pool("EURUSD", df, trigger, atr, _cfg(warmup=5))
+    trades, _, _, _ = simulate_pair_pool("EURUSD", df, trigger, atr, _cfg(warmup=5))
     assert trades == []

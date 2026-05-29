@@ -140,6 +140,15 @@ results/analysis/arc_7_r2pct/run.log
 # large but is the deliverable for follow-up vanilla arcs.
 !results/arc_discovery_01/
 !results/arc_discovery_01/**
+# Probe archives (partial runs, rescue artefacts, methodology learning) —
+# tracked so future arcs can reference what was tried + why it didn't ship.
+!archive/probes/**
+# arc_discovery_02 — signal_discovery_probe sub-protocol, re-dispatch of _01
+# with three amendments (time exit + pool floor + iter cap) + chat-driven
+# amendments D-F (density filter + cap relax + checkpointing). Parked after
+# 15h search completed and crashed on manifest write.
+!results/arc_discovery_02/
+!results/arc_discovery_02/**
 # Don't track the quicktest subfolder — smoke-test artefact only.
 results/l_arc_8/step1_quicktest/
 # Arc 9 (IB-trend long, 4H) — Step 1+ outputs and post-kill deployment

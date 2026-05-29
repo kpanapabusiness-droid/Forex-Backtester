@@ -45,6 +45,7 @@ from deployment.sidecar.config import (
 )
 from deployment.sidecar.heartbeat import write_heartbeat
 from deployment.sidecar.mt5_data_fetcher import (
+    Mt5ConnectParams,
     Mt5FetchError,
     Mt5Module,
     fetch_d1_bars,
@@ -325,8 +326,12 @@ def initialize_and_run(
     *,
     iterations: int | None = None,
     quick_test: bool = False,
+    connect: Mt5ConnectParams | None = None,
 ) -> None:
     """Production entry: import MT5, initialize with backoff, verify anchors, run loop.
+
+    ``connect`` selects which broker terminal to attach to (multi-broker VPS).
+    None reproduces the legacy default-attach behaviour.
 
     ``quick_test=True`` skips the wait-for-next-H4 sleep in the loop. The
     anchor probe (broker-grid correctness) and broker-offset sanity check
@@ -338,6 +343,7 @@ def initialize_and_run(
     mt5 = import_mt5()
     with_mt5_initialize(
         mt5,
+        connect=connect,
         initial_backoff_sec=cfg.mt5_reconnect_initial_sec,
         max_backoff_sec=cfg.mt5_reconnect_max_sec,
         alert_after_failures=cfg.mt5_reconnect_alert_after,

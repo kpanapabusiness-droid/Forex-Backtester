@@ -104,7 +104,7 @@ def test_quick_test_cli_implies_single_iteration(
     initialize_and_run."""
     captured: dict[str, object] = {}
 
-    def _fake_run(cfg, *, iterations=None, quick_test=False):
+    def _fake_run(cfg, *, iterations=None, quick_test=False, connect=None):
         captured["iterations"] = iterations
         captured["quick_test"] = quick_test
 

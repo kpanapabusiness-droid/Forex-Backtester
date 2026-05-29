@@ -42,7 +42,6 @@ import json
 import sys
 import time
 from pathlib import Path
-from typing import Any
 
 # Force UTF-8 stdout/stderr on Windows so log lines with non-ASCII chars
 # from downstream libraries don't crash with UnicodeEncodeError under cp1252.
@@ -52,22 +51,24 @@ try:
 except (AttributeError, ValueError):
     pass
 
-import numpy as np
 import pandas as pd
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
+from core.arc.arc_orchestrator import (  # noqa: E402
+    ArcConfig,
+    ArcOrchestrator,
+    AutoArchSpec,
+)
 from core.architectures.a1_system_level_filter import (  # noqa: E402
-    A1Architecture, A1Config,
+    A1Architecture,
+    A1Config,
 )
 from core.architectures.a2_classifier_filter import A2Architecture  # noqa: E402
 from core.architectures.a4_pipeline_d_exits import A4Architecture  # noqa: E402
 from core.architectures.a6_meta_labeling import A6Architecture  # noqa: E402
-from core.arc.arc_orchestrator import (  # noqa: E402
-    ArcConfig, ArcOrchestrator, AutoArchSpec,
-)
 from core.determinism import RANDOM_STATE, seed_everything  # noqa: E402
 from core.features.pipeline import compute_feature_matrix  # noqa: E402
 from core.sim.panel import Panel  # noqa: E402
@@ -448,7 +449,7 @@ def main() -> int:
 
     seed_everything(RANDOM_STATE)
     t_start = time.time()
-    _log(f"=== Arc 11 v3.0.2 START ===")
+    _log("=== Arc 11 v3.0.2 START ===")
     _log(f"Window: {WINDOW_START} -> {WINDOW_END} (holdout {HOLDOUT_START} -> {HOLDOUT_END})")
     _log(f"r_base={RISK_PCT:.4f}, starting_balance={STARTING_BALANCE:.0f}")
 
@@ -459,7 +460,9 @@ def main() -> int:
 
     # 2. Build pool (canonical, uncapped) for admission probe
     from core.arc.arc_pool_builder import (
-        ArcPoolConfig, build_arc_pool, write_arc_pool,
+        ArcPoolConfig,
+        build_arc_pool,
+        write_arc_pool,
     )
     signal_module = SHBSignalModule()
     panels = {"H4": h4_panel, "D1": d1_panel, "W1": w1_panel}

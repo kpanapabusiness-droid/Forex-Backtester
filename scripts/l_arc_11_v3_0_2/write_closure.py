@@ -713,15 +713,15 @@ def _why_prose(summary, base_top1, winner_holdout, arc_verdict, winner_amended, 
 
     parts: list[str] = []
     parts.append(
-        f"Arc 11 v3.0.2 ran end-to-end via the canonical `ArcOrchestrator` path "
-        f"(L_PROTOCOL v3.0 + Amendments 3/4/5/5.1/6). PR #186 closed the "
-        f"`canonical_orchestrator_step5_run_context_gap` flagged in Arc 11 v3.0's closure -- "
-        f"A2/A4/A6 admit gates now fire correctly via `_run_step_5` (no inline-driver "
-        f"bypass needed). Engine deltas vs v3.0: EET-aggregated panels (PR #197), "
-        f"mid-anchored features (PR #189 §15.1), canonical HTF alignment (PR #193), "
-        f"persisted Step 4 classifier with holdout-window training filter (PR #185), "
-        f"canonical exit-policy registry (CC_18 / PR #195), Amendment 5 four-gate "
-        f"architecture admission with Amendment 5.1 Gate-4 PASS-tier qualifier (PR #201)."
+        "Arc 11 v3.0.2 ran end-to-end via the canonical `ArcOrchestrator` path "
+        "(L_PROTOCOL v3.0 + Amendments 3/4/5/5.1/6). PR #186 closed the "
+        "`canonical_orchestrator_step5_run_context_gap` flagged in Arc 11 v3.0's closure -- "
+        "A2/A4/A6 admit gates now fire correctly via `_run_step_5` (no inline-driver "
+        "bypass needed). Engine deltas vs v3.0: EET-aggregated panels (PR #197), "
+        "mid-anchored features (PR #189 §15.1), canonical HTF alignment (PR #193), "
+        "persisted Step 4 classifier with holdout-window training filter (PR #185), "
+        "canonical exit-policy registry (CC_18 / PR #195), Amendment 5 four-gate "
+        "architecture admission with Amendment 5.1 Gate-4 PASS-tier qualifier (PR #201)."
     )
     parts.append("")
     neg_str = f"{n_neg}/{n_folds} negative folds" if n_neg is not None else f"{n_folds}-fold (per-fold negative count not preserved post-crash)"
@@ -772,38 +772,37 @@ def _why_prose(summary, base_top1, winner_holdout, arc_verdict, winner_amended, 
 def _cross_arc_prose(summary, base_top1, winner_holdout, arc_verdict) -> list[str]:
     obs: list[str] = []
     s4 = summary.get("step_4_per_cluster", [])
-    candidate_set = set(summary.get("candidate_cluster_ids", []))
     archs_skipped = summary.get("architectures_skipped_by_amendment_5", [])
     arch_keys = set(archs_skipped)
 
     obs.append(
-        f"**Capturable-not-extractable cross-arc tally (continuation):** Arc 11 v3.0.2 "
-        f"surfaces the second instance under canonical engine of strong §2 capturability "
-        f"clearing §3 capturability gates on multiple clusters yet failing Step 5 (paired "
-        f"with Arc 7 v3.0.2 V-shape / Bimodal). v3.0.2 retests under canonical "
-        f"orchestrator + Amendment 5 four-gate selection. Compare against Arc 5, 8, 10 "
-        f"v3.0.2 capturable-not-extractable instances when they close."
+        "**Capturable-not-extractable cross-arc tally (continuation):** Arc 11 v3.0.2 "
+        "surfaces the second instance under canonical engine of strong §2 capturability "
+        "clearing §3 capturability gates on multiple clusters yet failing Step 5 (paired "
+        "with Arc 7 v3.0.2 V-shape / Bimodal). v3.0.2 retests under canonical "
+        "orchestrator + Amendment 5 four-gate selection. Compare against Arc 5, 8, 10 "
+        "v3.0.2 capturable-not-extractable instances when they close."
     )
     obs.append(
-        f"**Canonical orchestrator gap closure (PR #186) was load-bearing for A2/A6 "
-        f"evaluation.** v3.0 used inline-driver bypass with hand-constructed "
-        f"`A1RunContext(per_trade_features=...)` because `ArcOrchestrator._run_step_5` did "
-        f"not thread `run_context` through `ArcFoldRunner`. v3.0.2 runs A2/A6 through the "
-        f"canonical orchestrator path. The cross_arc_tag "
-        f"`canonical_orchestrator_step5_run_context_gap` is now resolved; recorded in v3.0.2 "
-        f"as `canonical_orchestrator_step5_run_context_gap_resolved_v3_0_2`."
+        "**Canonical orchestrator gap closure (PR #186) was load-bearing for A2/A6 "
+        "evaluation.** v3.0 used inline-driver bypass with hand-constructed "
+        "`A1RunContext(per_trade_features=...)` because `ArcOrchestrator._run_step_5` did "
+        "not thread `run_context` through `ArcFoldRunner`. v3.0.2 runs A2/A6 through the "
+        "canonical orchestrator path. The cross_arc_tag "
+        "`canonical_orchestrator_step5_run_context_gap` is now resolved; recorded in v3.0.2 "
+        "as `canonical_orchestrator_step5_run_context_gap_resolved_v3_0_2`."
     )
     if "a5_gate_4_admission_blocked_by_no_pass_tier_constituent" in arch_keys:
         obs.append(
-            f"**Amendment 5.1 Gate-4 qualifier applied.** Arc 11 has 2 candidate clusters "
-            f"surviving Step 3 (c0 Bimodal + c1 Unclassified). Under the original Amendment 5 "
-            f"Gate 4 rule, A5 would have been admitted at dispatch time. Under Amendment 5.1 "
-            f"(merged 2026-05-25 via PR #201) Gate 4 requires (a) ≥2 candidate clusters AND "
-            f"(b) ≥1 constituent cluster cleared Step 5 PASS-tier under Gates 1-3. Condition "
-            f"(b) cannot be satisfied at dispatch time -- A5 deferred to closure addendum. "
-            f"Recorded as `a5_gate_4_admission_blocked_by_no_pass_tier_constituent` in "
-            f"`architectures_skipped_by_amendment_5`. If Top-1 surprises PASS-tier post-Step-5 "
-            f"(unlikely per verdict prior), an ARC_CLOSURE_ADDENDUM.md flags A5 re-eval."
+            "**Amendment 5.1 Gate-4 qualifier applied.** Arc 11 has 2 candidate clusters "
+            "surviving Step 3 (c0 Bimodal + c1 Unclassified). Under the original Amendment 5 "
+            "Gate 4 rule, A5 would have been admitted at dispatch time. Under Amendment 5.1 "
+            "(merged 2026-05-25 via PR #201) Gate 4 requires (a) ≥2 candidate clusters AND "
+            "(b) ≥1 constituent cluster cleared Step 5 PASS-tier under Gates 1-3. Condition "
+            "(b) cannot be satisfied at dispatch time -- A5 deferred to closure addendum. "
+            "Recorded as `a5_gate_4_admission_blocked_by_no_pass_tier_constituent` in "
+            "`architectures_skipped_by_amendment_5`. If Top-1 surprises PASS-tier post-Step-5 "
+            "(unlikely per verdict prior), an ARC_CLOSURE_ADDENDUM.md flags A5 re-eval."
         )
     if any(float(e["best_classifier_mean_auc"]) >= 0.65 for e in s4):
         clears = [int(e["cluster_id"]) for e in s4 if float(e["best_classifier_mean_auc"]) >= 0.65]
@@ -817,32 +816,32 @@ def _cross_arc_prose(summary, base_top1, winner_holdout, arc_verdict) -> list[st
         )
     if "A2" in arch_keys or "A6" in arch_keys:
         obs.append(
-            f"**Amendment 5 Gate 2 SKIPPED for c1 (AUC < 0.65).** v3.0 c1 AUC was 0.6316 -- "
-            f"below the 0.65 threshold by 1.84pp. v3.0.2 confirms (or re-derives) AUC; if "
-            f"still < 0.65, A2 + A6 on c1 are recorded in `architectures_skipped_by_amendment_5` "
-            f"per Amendment 5 §3 -- captures the precise cluster-level skip pattern for "
-            f"cross-arc analytics."
+            "**Amendment 5 Gate 2 SKIPPED for c1 (AUC < 0.65).** v3.0 c1 AUC was 0.6316 -- "
+            "below the 0.65 threshold by 1.84pp. v3.0.2 confirms (or re-derives) AUC; if "
+            "still < 0.65, A2 + A6 on c1 are recorded in `architectures_skipped_by_amendment_5` "
+            "per Amendment 5 §3 -- captures the precise cluster-level skip pattern for "
+            "cross-arc analytics."
         )
     # c1 exit slate decision rationale (per chat resolution §1.A5.3)
     obs.append(
-        f"**c1 Unclassified exit slate decision.** Per chat resolution §1.A5.3, c1 ran the "
-        f"same 3-exit slate as c0 Bimodal (`sl_only`, `sl_plus_tp_2r`, "
-        f"`sl_partial_close_1r_runner_trail`) despite Unclassified archetype not admitting "
-        f"partial-close per the L_PROTOCOL §2 Step 5 archetype-driven exit slate. Rationale: "
-        f"cross-cluster comparability + selection-bias transparency. `sl_partial_close_1r_runner_trail` "
-        f"on Unclassified is itself an informative test -- does the partial-close primitive "
-        f"only work on V-shape / Bimodal archetypes, or does it generalize? Cross-arc with "
-        f"Arc 7 c1 V-shape (in flight) and Arc 10 c1 V-shape (PASS-DEPLOYABLE)."
+        "**c1 Unclassified exit slate decision.** Per chat resolution §1.A5.3, c1 ran the "
+        "same 3-exit slate as c0 Bimodal (`sl_only`, `sl_plus_tp_2r`, "
+        "`sl_partial_close_1r_runner_trail`) despite Unclassified archetype not admitting "
+        "partial-close per the L_PROTOCOL §2 Step 5 archetype-driven exit slate. Rationale: "
+        "cross-cluster comparability + selection-bias transparency. `sl_partial_close_1r_runner_trail` "
+        "on Unclassified is itself an informative test -- does the partial-close primitive "
+        "only work on V-shape / Bimodal archetypes, or does it generalize? Cross-arc with "
+        "Arc 7 c1 V-shape (in flight) and Arc 10 c1 V-shape (PASS-DEPLOYABLE)."
     )
     # EET HTF alignment drift attribution placeholder (per chat resolution §2)
     obs.append(
-        f"**EET HTF alignment drift attribution (per chat resolution §2).** v3.0 ran on UTC "
-        f"bars; v3.0.2 runs on 5ers EET bars. Every D1-lagged feature (D1 slope sign / "
-        f"magnitude / ATR percentile / W1 slope sign) picks a different prior-EET-day D1 "
-        f"close than the prior-UTC-day D1 close. v3.0.2's Step 4 AUC delta vs v3.0 is "
-        f"primarily driven by these HTF-alignment shifts (mid-feature swap is a smaller "
-        f"delta). See §10 for the per-feature decomposition where tractable; aggregate "
-        f"comparison reported when per-feature isolation is non-trivial."
+        "**EET HTF alignment drift attribution (per chat resolution §2).** v3.0 ran on UTC "
+        "bars; v3.0.2 runs on 5ers EET bars. Every D1-lagged feature (D1 slope sign / "
+        "magnitude / ATR percentile / W1 slope sign) picks a different prior-EET-day D1 "
+        "close than the prior-UTC-day D1 close. v3.0.2's Step 4 AUC delta vs v3.0 is "
+        "primarily driven by these HTF-alignment shifts (mid-feature swap is a smaller "
+        "delta). See §10 for the per-feature decomposition where tractable; aggregate "
+        "comparison reported when per-feature isolation is non-trivial."
     )
     obs.append(
         f"**Holdout window extension confounder (per chat resolution §1.A5.4).** v3.0 holdout "
@@ -854,11 +853,11 @@ def _cross_arc_prose(summary, base_top1, winner_holdout, arc_verdict) -> list[st
     # Verdict-flip status
     if arc_verdict == "FAIL":
         obs.append(
-            f"**Verdict re-confirmation.** v3.0 = FAIL; v3.0.2 = FAIL. The canonical engine "
-            f"path produces structurally similar failure (worst-fold ratio negative or "
-            f"low-positive; scalability floor likely breached again). Confirms Arc 11 v3.0 "
-            f"closure §10 retroactive prediction: \"the amendment doesn't materially change "
-            f"Arc 11's outcome\"."
+            "**Verdict re-confirmation.** v3.0 = FAIL; v3.0.2 = FAIL. The canonical engine "
+            "path produces structurally similar failure (worst-fold ratio negative or "
+            "low-positive; scalability floor likely breached again). Confirms Arc 11 v3.0 "
+            "closure §10 retroactive prediction: \"the amendment doesn't materially change "
+            "Arc 11's outcome\"."
         )
     return obs
 
@@ -970,8 +969,8 @@ def _section_10_quantitative_comparison(summary, base_top1, winner_holdout, arc_
         "",
         "### Amendment 3 scalability tier",
         "",
-        f"- v3.0 §10 retroactive: r_safe=0.1043%, r_hard=0.1303% -- BOTH below 0.15% floor "
-        f"-> primary_failure_mode `step5_not_scalable` (deprecated v3.0 closure's `step5_dd_above_gate`)",
+        "- v3.0 §10 retroactive: r_safe=0.1043%, r_hard=0.1303% -- BOTH below 0.15% floor "
+        "-> primary_failure_mode `step5_not_scalable` (deprecated v3.0 closure's `step5_dd_above_gate`)",
     ])
     if winner_amended is not None:
         r_safe = winner_amended.get("r_safe_pct")
@@ -1093,23 +1092,23 @@ def _deployment_spec_fail(summary, best_block, winner_cluster) -> str:
         "",
         "### 4.6 Exit mechanics",
         "",
-        f"- **Initial SL anchor:** entry price.",
+        "- **Initial SL anchor:** entry price.",
         f"- **Initial SL distance:** `{best_block.get('sl_atr', 2.0)} x ATR(14)_H4` at signal bar.",
         f"- **Exit policy:** `{best_block.get('exit_policy', 'sl_only')}` per CC_18 canonical registry.",
-        f"- **SL update rule:** static.",
-        f"- **Trail:** disabled (`trail_enabled=False` in canonical run; KH-24-style trail "
-        f"is signal-class agnostic for SHB).",
-        f"- **Time exit:** 240 H4 bars after entry (`hold_bars=240` at pool builder; "
-        f"engine fallback).",
-        f"- **Bar-by-bar evaluation order:** intra-bar SL/TP > intra-bar policy > "
-        f"signal-class predicates (bar-close) > trail-manager (bar-close ratchet) > "
-        f"at-close policy (last-write-wins) per PROTOCOL_RUNTIME §8c.",
+        "- **SL update rule:** static.",
+        "- **Trail:** disabled (`trail_enabled=False` in canonical run; KH-24-style trail "
+        "is signal-class agnostic for SHB).",
+        "- **Time exit:** 240 H4 bars after entry (`hold_bars=240` at pool builder; "
+        "engine fallback).",
+        "- **Bar-by-bar evaluation order:** intra-bar SL/TP > intra-bar policy > "
+        "signal-class predicates (bar-close) > trail-manager (bar-close ratchet) > "
+        "at-close policy (last-write-wins) per PROTOCOL_RUNTIME §8c.",
         "",
         "### 4.7 Exposure cap",
         "",
         f"- **Type:** `max_concurrent_per_pair=1` + "
         f"`max_concurrent_per_currency={best_block.get('exposure_cap', 2)}`.",
-        f"- **Behaviour at cap:** signal skipped (no queue).",
+        "- **Behaviour at cap:** signal skipped (no queue).",
         "",
         "### 4.8 Risk sizing",
         "",
@@ -1117,8 +1116,8 @@ def _deployment_spec_fail(summary, best_block, winner_cluster) -> str:
         f"{best_block.get('r_safe_pct', 'n/a')}%",
         f"- **`r_hard` (Amendment 3 evaluation):** "
         f"{best_block.get('r_hard_pct', 'n/a')}%",
-        f"- **Sizing convention:** `reset_floor` (L-arc convention; linear DD scaling holds).",
-        f"- **Starting balance:** $100,000.",
+        "- **Sizing convention:** `reset_floor` (L-arc convention; linear DD scaling holds).",
+        "- **Starting balance:** $100,000.",
         "",
         "### 4.9 Session / time-of-day rules",
         "",

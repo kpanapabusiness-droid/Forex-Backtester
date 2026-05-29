@@ -17,7 +17,7 @@ metadata into a Signal envelope via ``signal_emitter.build_envelope``.
 
 from __future__ import annotations
 
-from datetime import timedelta, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Any
 
 import pandas as pd
@@ -27,12 +27,47 @@ from signals.lchar_dlr_long import (
     compute_signal,
 )
 
+# Forex weekend gap on the UTC 4h boundary grid (bars open 00/04/08/12/16/20).
+# The week's last bar opens Friday 20:00 UTC; no H4 bars exist from Saturday
+# 00:00 UTC through Sunday 16:00 UTC. The first tradeable bar after the gap is
+# the Sunday 20:00 UTC bar, which captures the Sunday ~21:00/22:00 UTC reopen
+# under both US-DST regimes (5pm ET = 22:00 UTC winter / 21:00 UTC summer).
+_REOPEN_HOUR_UTC = 20
+
 
 def _to_utc_iso_z(ts: pd.Timestamp) -> str:
     """Format a pandas Timestamp as ``YYYY-MM-DDTHH:MM:SSZ`` (UTC, second precision)."""
     if ts.tzinfo is None:
         ts = ts.tz_localize(timezone.utc)
     return ts.tz_convert(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def _project_entry_bar_open(signal_bar_open_utc: datetime) -> datetime:
+    """Project the entry bar open (next tradeable H4 bar open) from the
+    signal bar open, under the UTC 4h boundary convention.
+
+    Normal case: next H4 bar opens at ``signal_bar_open + 4h``. Across the
+    forex weekend gap no H4 bars exist from Saturday 00:00 UTC through Sunday
+    16:00 UTC, so if the naive +4h candidate lands in that dead zone it is
+    snapped forward to the Sunday 20:00 UTC reopen bar. This matches the lab,
+    which fills at the next actual panel row (Friday-20:00 signal → Sunday
+    20:00 entry).
+
+    Residual the sidecar cannot foresee: a small number of long-holiday
+    weekends (e.g. New Year) have no Sunday bar at all and the true next bar is
+    Monday. The sidecar has no holiday calendar, so it projects to the standard
+    Sunday reopen; the live EA fills at the first actual post-reopen tick
+    regardless, so the envelope timestamp is advisory only in that rare case.
+    """
+    cand = signal_bar_open_utc + timedelta(hours=4)
+    wd = cand.weekday()  # Mon=0 .. Sat=5, Sun=6
+    in_weekend_gap = (wd == 5) or (wd == 6 and cand.hour < _REOPEN_HOUR_UTC)
+    if not in_weekend_gap:
+        return cand
+    days_to_sunday = 6 - wd  # Sat(5) → +1 day; Sun(6) → same day
+    return (cand + timedelta(days=days_to_sunday)).replace(
+        hour=_REOPEN_HOUR_UTC, minute=0, second=0, microsecond=0
+    )
 
 
 def run_signal(
@@ -68,13 +103,14 @@ def run_signal(
     if bar_open.tzinfo is not None:
         bar_open = bar_open.tz_convert(timezone.utc).tz_localize(None)
     # Treat as UTC.
-    bar_close_dt = (bar_open.to_pydatetime() + timedelta(hours=4)).replace(
-        tzinfo=timezone.utc
-    )
+    bar_open_utc = bar_open.to_pydatetime().replace(tzinfo=timezone.utc)
+    bar_close_dt = bar_open_utc + timedelta(hours=4)
     bar_close_iso = bar_close_dt.strftime("%Y-%m-%dT%H:%M:%SZ")
 
-    # Entry fires at bar_t+1 open = bar_close_dt.
-    entry_open_iso = bar_close_iso
+    # Entry fires at the next TRADEABLE H4 bar open. On weekdays this is the
+    # signal-bar close (+4h); across the forex weekend gap it snaps to the
+    # Sunday reopen bar rather than a non-existent Saturday bar.
+    entry_open_iso = _project_entry_bar_open(bar_open_utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
     return {
         "pair": pair,

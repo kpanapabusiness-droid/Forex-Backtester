@@ -10,11 +10,55 @@ deliberately out of unit-test scope.
 
 from __future__ import annotations
 
+from datetime import datetime, timezone
+
 import numpy as np
 import pandas as pd
 import pytest
 
-from deployment.sidecar.signal_runner import run_signal, signal_to_audit_dict
+from deployment.sidecar.signal_runner import (
+    _project_entry_bar_open,
+    run_signal,
+    signal_to_audit_dict,
+)
+
+
+def _utc(y, m, d, h):
+    return datetime(y, m, d, h, tzinfo=timezone.utc)
+
+
+def test_entry_projection_weekday_is_naive_plus_4h():
+    """On a normal weekday the entry bar is just signal_bar_open + 4h."""
+    # Monday 08:00 → Monday 12:00.
+    assert _project_entry_bar_open(_utc(2018, 10, 8, 8)) == _utc(2018, 10, 8, 12)
+    # A within-week bar that straddles midnight: Thu 20:00 → Fri 00:00.
+    assert _project_entry_bar_open(_utc(2018, 10, 11, 20)) == _utc(2018, 10, 12, 0)
+
+
+def test_entry_projection_friday_2000_snaps_to_sunday_reopen():
+    """The regression case: a Friday 20:00 signal must project the entry to
+    the Sunday 20:00 UTC reopen bar, NOT the non-existent Saturday 00:00 bar.
+
+    Mirrors the three GBPJPY weekend-edge ledger rows
+    (e.g. 2018-10-12 20:00 → 2018-10-14 20:00)."""
+    # 2018-10-12 is a Friday; 2018-10-14 is the following Sunday.
+    got = _project_entry_bar_open(_utc(2018, 10, 12, 20))
+    assert got == _utc(2018, 10, 14, 20)
+    assert got.weekday() == 6  # Sunday
+    assert got.hour == 20
+    # Explicitly: it must NOT be the naive Saturday 00:00.
+    assert got != _utc(2018, 10, 13, 0)
+
+
+def test_entry_projection_friday_1600_stays_in_week():
+    """Friday 16:00 → Friday 20:00 is still a (short) tradeable bar, not a gap."""
+    assert _project_entry_bar_open(_utc(2018, 10, 12, 16)) == _utc(2018, 10, 12, 20)
+
+
+def test_entry_projection_sunday_reopen_bar_advances_normally():
+    """The Sunday 20:00 reopen bar is itself tradeable; its next bar is the
+    normal Monday 00:00 — no further snapping."""
+    assert _project_entry_bar_open(_utc(2018, 10, 14, 20)) == _utc(2018, 10, 15, 0)
 
 
 def test_run_signal_returns_none_on_empty_panels():

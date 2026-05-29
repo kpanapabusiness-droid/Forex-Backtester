@@ -1,0 +1,19 @@
+{
+  "amendment_5_1_cutoff_applied": true,
+  "n_candidate_clusters": 2,
+  "a5_gate_4_a_satisfied": true,
+  "a5_skipped_by_5_1": true,
+  "a2_a6_skipped_clusters": [
+    0,
+    1
+  ],
+  "architectures_skipped_by_amendment_5": [
+    "a5_gate_4_admission_blocked_by_no_pass_tier_constituent",
+    "A2",
+    "A6"
+  ],
+  "n_a1_configs": 18,
+  "n_auto_specs": 36,
+  "total_configs_step_5": 54,
+  "search_scope_flag": "normal"
+}

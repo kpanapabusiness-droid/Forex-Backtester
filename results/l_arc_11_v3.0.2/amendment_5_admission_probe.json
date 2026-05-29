@@ -1,0 +1,91 @@
+{
+  "candidate_ids": [
+    0,
+    1
+  ],
+  "cluster_archetypes": {
+    "0": "bimodal",
+    "1": "unclassified",
+    "2": "unclassified",
+    "3": "monotonic_down"
+  },
+  "n_candidates": 2,
+  "step_3_per_cluster": [
+    {
+      "cluster_id": 0,
+      "archetype": "bimodal",
+      "n_trades": 2167,
+      "composite": 1.9835309852112402,
+      "reach_1r": 1.0,
+      "mfe_p50": 7.785476697212395,
+      "ww_pp": 0.0027688047992616522,
+      "selected_sl_mult": 1.5,
+      "is_candidate": true
+    },
+    {
+      "cluster_id": 1,
+      "archetype": "unclassified",
+      "n_trades": 6123,
+      "composite": 0.9674771754642331,
+      "reach_1r": 0.9647231749142577,
+      "mfe_p50": 2.1082154079196767,
+      "ww_pp": 0.034950187816429855,
+      "selected_sl_mult": 1.5,
+      "is_candidate": true
+    },
+    {
+      "cluster_id": 2,
+      "archetype": "unclassified",
+      "n_trades": 5012,
+      "composite": 0.19030096298936588,
+      "reach_1r": 0.04309656823623304,
+      "mfe_p50": 0.5187170588742414,
+      "ww_pp": 0.9660814046288907,
+      "selected_sl_mult": 1.5,
+      "is_candidate": false
+    },
+    {
+      "cluster_id": 3,
+      "archetype": "monotonic_down",
+      "n_trades": 3977,
+      "composite": 0.022793139767941176,
+      "reach_1r": 0.0005028916268544129,
+      "mfe_p50": 0.09454910292210185,
+      "ww_pp": 0.9992456625597184,
+      "selected_sl_mult": 1.5,
+      "is_candidate": false
+    }
+  ],
+  "step_4_per_cluster": [
+    {
+      "cluster_id": 0,
+      "archetype": "bimodal",
+      "best_classifier": "lr",
+      "best_classifier_mean_auc": 0.5056015686295856,
+      "best_threshold": 0.1537452080582666,
+      "admit_a2_a6_gate2": false,
+      "admit_a4_gate1": true
+    },
+    {
+      "cluster_id": 1,
+      "archetype": "unclassified",
+      "best_classifier": "rf",
+      "best_classifier_mean_auc": 0.5056282247215524,
+      "best_threshold": 0.35458022993258753,
+      "admit_a2_a6_gate2": false,
+      "admit_a4_gate1": false
+    }
+  ],
+  "admit_per_cluster": {
+    "0": {
+      "A2": false,
+      "A4": true,
+      "A6": false
+    },
+    "1": {
+      "A2": false,
+      "A4": false,
+      "A6": false
+    }
+  }
+}

@@ -61,12 +61,12 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 import signals.lchar_dlr_long as dlr  # noqa: E402
+from core.data.aggregator import aggregate  # noqa: E402
 from deployment.sidecar.signal_runner import run_signal  # noqa: E402
 from scripts.l_arc_10_v3._common import (  # noqa: E402
     bid_view_for_signal,
     window_slice,
 )
-from core.data.aggregator import aggregate  # noqa: E402
 
 # ── Constants mirroring the UTC rerun ────────────────────────────────────
 HISTDATA_ROOT = "C:/Users/panap/Documents/Forex-Backtester/data/histdata"

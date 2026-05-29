@@ -155,6 +155,13 @@ results/l_arc_10_v3_0_2_utc_rerun/**/trade_paths.parquet
 results/l_arc_10_v3_0_2_utc_rerun/**/paths.parquet
 results/l_arc_10_v3_0_2_utc_rerun/**/run.log
 results/l_arc_10_v3_0_2_utc_rerun/**/*_run.log
+# Phase 2 sidecar/lab signal parity (Dispatch C v2) — report + consolidated
+# parity artefacts tracked; per-pair divergence_<PAIR>.parquet are regenerable
+# intermediates (regen via scripts/phase_2_parity/parity_harness.py --all).
+!results/phase_2_parity/
+!results/phase_2_parity/parity_report.md
+!results/phase_2_parity/divergence_ledger.parquet
+!results/phase_2_parity/parity_summaries.parquet
 # Arc 11 v3.0 (swing-high breakout in trend, long, 4H) — closure + artefacts
 # tracked per L_PROTOCOL v3.0 §6. Trade-path parquet excluded (>40 MB; regen
 # from script + config). v2-era trades_paths.csv name also excluded.

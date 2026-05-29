@@ -96,6 +96,13 @@ class Step6Inputs:
     # diagnostic when None.
     r_base_pct: float | None = None
 
+    # Boundary convention threaded through the primary panel — "utc" |
+    # "5ers_eet". Consumed by the §6.3 boundary-propagation check (catches
+    # the case where a closure declares one convention but the engine used
+    # the other for daily-DD bucketing / reset-floor anchoring). ``None``
+    # when the closure doesn't carry it (older arcs).
+    panel_boundary_convention: str | None = None
+
     # Per-arc extras (e.g. classifier path, broker spread floor file). Free-form.
     extras: Mapping[str, Any] = field(default_factory=dict)
 

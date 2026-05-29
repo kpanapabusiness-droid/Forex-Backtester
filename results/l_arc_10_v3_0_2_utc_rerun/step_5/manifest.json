@@ -1,0 +1,124 @@
+{
+  "arc_name": "l_arc_10",
+  "candidate_clusters": [
+    1
+  ],
+  "determinism": {
+    "line_terminator": "\\n",
+    "n_jobs": 1,
+    "random_state": 42
+  },
+  "env": {
+    "numpy": "2.4.4",
+    "pandas": "3.0.2",
+    "python": "3.14.0"
+  },
+  "n_candidates": 1,
+  "n_configs_total": 48,
+  "protocol_version": "v3.0",
+  "run_timestamp_utc": "2026-05-27 09:15:56",
+  "sha256": {
+    "architectures_ranked_md": "5ab159859b804c102954d36a9434e5bc973752e5a22a526d3e3a1e1a8090a82e",
+    "best_candidate_md": "9fae0831f462916d1f6174302c3738ca1c599cad3629b57b9a8a1b9982ffbdc4",
+    "wfo_oracle_csv": "41bd3243e20165c3cf8918514dc19d4413cdf171481237ba966c271fd29c2fae",
+    "wfo_results_csv": "6afda4b4fcd8abdae0805d4f544afee9cb443110b1c52046f44b3fd1dba81fab"
+  },
+  "step": "step_5",
+  "verdict": {
+    "best": {
+      "a3_n_bars": NaN,
+      "archetype": "v_shape_recovery",
+      "architecture": "A1",
+      "cluster_id": 1,
+      "exit_policy": "sl_partial_close_1r_runner_trail",
+      "exposure": "unlimited",
+      "max_per_currency": NaN,
+      "search_mean_dd": 0.03820372316408353,
+      "search_mean_ratio": 16.28306242457494,
+      "search_mean_roi": 0.4990950486584189,
+      "search_n_total": 2162,
+      "search_neg_folds": 0,
+      "search_sign_consistency": 11,
+      "search_worst_dd": 0.09224133035508304,
+      "search_worst_ratio": 5.418504508840416,
+      "search_worst_roi": 0.2649053592818633,
+      "sl_multiplier": 3.5,
+      "verdict_search": "PASS-VIABLE"
+    },
+    "pass_deployable_count": 0,
+    "pass_viable_count": 2,
+    "top_3": [
+      {
+        "a3_n_bars": NaN,
+        "archetype": "v_shape_recovery",
+        "architecture": "A1",
+        "cluster_id": 1,
+        "exit_policy": "sl_partial_close_1r_runner_trail",
+        "exposure": "unlimited",
+        "max_per_currency": NaN,
+        "search_mean_dd": 0.03820372316408353,
+        "search_mean_ratio": 16.28306242457494,
+        "search_mean_roi": 0.4990950486584189,
+        "search_n_total": 2162,
+        "search_neg_folds": 0,
+        "search_sign_consistency": 11,
+        "search_worst_dd": 0.09224133035508304,
+        "search_worst_ratio": 5.418504508840416,
+        "search_worst_roi": 0.2649053592818633,
+        "sl_multiplier": 3.5,
+        "verdict_search": "PASS-VIABLE"
+      },
+      {
+        "a3_n_bars": NaN,
+        "archetype": "v_shape_recovery",
+        "architecture": "A1",
+        "cluster_id": 1,
+        "exit_policy": "sl_partial_close_1r_runner_trail",
+        "exposure": "unlimited",
+        "max_per_currency": NaN,
+        "search_mean_dd": 0.04436390324613854,
+        "search_mean_ratio": 11.231784362814928,
+        "search_mean_roi": 0.3826427955540955,
+        "search_n_total": 2162,
+        "search_neg_folds": 0,
+        "search_sign_consistency": 11,
+        "search_worst_dd": 0.10092395667929091,
+        "search_worst_ratio": 2.0906394488092768,
+        "search_worst_roi": 0.13550014147973144,
+        "sl_multiplier": 4.0,
+        "verdict_search": "FAIL"
+      },
+      {
+        "a3_n_bars": NaN,
+        "archetype": "v_shape_recovery",
+        "architecture": "A1",
+        "cluster_id": 1,
+        "exit_policy": "sl_partial_close_1r_runner_trail",
+        "exposure": "max_per_currency_2",
+        "max_per_currency": 2.0,
+        "search_mean_dd": 0.031396629382170235,
+        "search_mean_ratio": 10.565207369299403,
+        "search_mean_roi": 0.22701055940094816,
+        "search_n_total": 1080,
+        "search_neg_folds": 0,
+        "search_sign_consistency": 11,
+        "search_worst_dd": 0.08572326487535543,
+        "search_worst_ratio": 2.0386223518519975,
+        "search_worst_roi": 0.13355658728351627,
+        "sl_multiplier": 3.5,
+        "verdict_search": "PASS-VIABLE"
+      }
+    ]
+  },
+  "wfo": {
+    "holdout_window": [
+      "2021-01-01",
+      "2026-04-30"
+    ],
+    "n_search_folds": 11,
+    "search_window": [
+      "2010-01-01",
+      "2020-12-31"
+    ]
+  }
+}

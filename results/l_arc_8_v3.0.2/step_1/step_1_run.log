@@ -1,0 +1,44 @@
+[step1] l_arc_8_v3.0.2 — boundary_convention='5ers_eet', 28 pairs
+[step1] H4 panel build (pool_size=11, cache_root=C:\Users\panap\AppData\Local\Temp\pr_e2_cache)...
+[step1] H4 panel built: 4.5s
+[step1] Evaluating signal + simulating trades per pair...
+[step1]   AUDCAD: bars= 25405 trend_ok= 3547 pullback= 2471 resume= 512 signals= 255 trades_built= 255
+[step1]   AUDCHF: bars= 25407 trend_ok= 3226 pullback= 2073 resume= 437 signals= 233 trades_built= 233
+[step1]   AUDJPY: bars= 25403 trend_ok= 3902 pullback= 2457 resume= 516 signals= 270 trades_built= 270
+[step1]   AUDNZD: bars= 25406 trend_ok= 3072 pullback= 2129 resume= 402 signals= 232 trades_built= 232
+[step1]   AUDUSD: bars= 25401 trend_ok= 3292 pullback= 2239 resume= 462 signals= 239 trades_built= 239
+[step1]   CADCHF: bars= 25400 trend_ok= 3052 pullback= 2121 resume= 431 signals= 231 trades_built= 231
+[step1]   CADJPY: bars= 25403 trend_ok= 3558 pullback= 2360 resume= 480 signals= 246 trades_built= 246
+[step1]   CHFJPY: bars= 25400 trend_ok= 3536 pullback= 2372 resume= 488 signals= 259 trades_built= 259
+[step1]   EURAUD: bars= 25405 trend_ok= 3199 pullback= 2276 resume= 443 signals= 220 trades_built= 220
+[step1]   EURCAD: bars= 25406 trend_ok= 3112 pullback= 2126 resume= 409 signals= 215 trades_built= 215
+[step1]   EURCHF: bars= 25401 trend_ok= 2690 pullback= 1883 resume= 377 signals= 195 trades_built= 195
+[step1]   EURGBP: bars= 25399 trend_ok= 3194 pullback= 2245 resume= 428 signals= 218 trades_built= 218
+[step1]   EURJPY: bars= 25409 trend_ok= 3422 pullback= 2176 resume= 438 signals= 243 trades_built= 243
+[step1]   EURNZD: bars= 25399 trend_ok= 3301 pullback= 2233 resume= 433 signals= 238 trades_built= 238
+[step1]   EURUSD: bars= 25405 trend_ok= 3270 pullback= 2302 resume= 478 signals= 247 trades_built= 247
+[step1]   GBPAUD: bars= 25319 trend_ok= 3427 pullback= 2497 resume= 474 signals= 237 trades_built= 237
+[step1]   GBPCAD: bars= 25388 trend_ok= 3306 pullback= 2180 resume= 442 signals= 225 trades_built= 225
+[step1]   GBPCHF: bars= 25402 trend_ok= 3208 pullback= 2134 resume= 420 signals= 215 trades_built= 215
+[step1]   GBPJPY: bars= 25401 trend_ok= 3744 pullback= 2359 resume= 511 signals= 254 trades_built= 254
+[step1]   GBPNZD: bars= 25383 trend_ok= 3023 pullback= 2061 resume= 433 signals= 233 trades_built= 233
+[step1]   GBPUSD: bars= 25397 trend_ok= 3182 pullback= 2149 resume= 444 signals= 240 trades_built= 240
+[step1]   NZDCAD: bars= 25402 trend_ok= 3322 pullback= 2362 resume= 431 signals= 230 trades_built= 230
+[step1]   NZDCHF: bars= 25400 trend_ok= 3240 pullback= 2189 resume= 434 signals= 233 trades_built= 233
+[step1]   NZDJPY: bars= 25403 trend_ok= 4092 pullback= 2527 resume= 517 signals= 263 trades_built= 263
+[step1]   NZDUSD: bars= 25398 trend_ok= 3513 pullback= 2333 resume= 477 signals= 249 trades_built= 249
+[step1]   USDCAD: bars= 25401 trend_ok= 3119 pullback= 2122 resume= 424 signals= 225 trades_built= 225
+[step1]   USDCHF: bars= 25403 trend_ok= 3164 pullback= 2041 resume= 410 signals= 211 trades_built= 211
+[step1]   USDJPY: bars= 25401 trend_ok= 3544 pullback= 2389 resume= 488 signals= 256 trades_built= 256
+[step1] Pool size: 6,612 trades
+[step1] Pool vs Arc 8 v3.0 (6,757 trades, UTC): 6,612 (-2.1%) — informational, not a baseline
+[step1] Building forward path rows...
+[step1] Path rows: 418,056
+[step1] Building D1 + W1 panels (5ers_eet) for multi_tf features...
+[step1] Computing 27-feature v3 catalogue at signal-bar close...
+[step1] Feature matrix: (6612, 30)
+[step1] multi_tf NaN rates: {'d1_atr_percentile_100': 0.0205686630369026, 'd1_close_slope_magnitude': 0.0, 'd1_close_slope_sign': 0.0, 'w1_close_slope_sign': 0.00030248033877797946}
+[step1] Running integrity checks...
+[step1]   computing KH-24 co-fire rate (informational)...
+[step1] Writing artefacts...
+[step1] DONE in 165.1s — artefacts under results\l_arc_8_v3.0.2\step_1

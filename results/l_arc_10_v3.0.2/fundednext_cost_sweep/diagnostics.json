@@ -1,0 +1,55 @@
+{
+  "anchor_note": "EET pool byte-identity to 244fb76 verified; computed at HEAD (UTC grid + cost primitives post-date anchor).",
+  "winning_config": {
+    "cluster_id": 0,
+    "architecture": "A1",
+    "sl_multiplier": 3.5,
+    "exit_policy": "sl_partial_close_1r_runner_trail",
+    "exposure": "unlimited"
+  },
+  "commission_rate_per_lot_rt": 5.0,
+  "swap": "OFF (FundedNext swap-free; primitive not invoked)",
+  "baseline_check": {
+    "expected": {
+      "worst_roi": 0.22456294795253906,
+      "worst_dd": 0.07353866008324712,
+      "worst_ratio": 6.4272759551420195,
+      "n_total": 2059
+    },
+    "got": {
+      "worst_roi": 0.22456294795253884,
+      "worst_dd": 0.07353866008324711,
+      "worst_ratio": 6.4272759551420116,
+      "n_total": 2059
+    },
+    "match": true
+  },
+  "zero_spread": {
+    "n": 0,
+    "pct": 0.0,
+    "total": 3152
+  },
+  "r_recommended_band": {
+    "dd_target": 0.08,
+    "central_1.5x_0.5slip": {
+      "worst_dd_at_rbase": 0.0779934448816649,
+      "r_recommended": 0.005128636138676752
+    },
+    "optimistic_1.0x_0.5slip": {
+      "worst_dd_at_rbase": 0.07494729627039103,
+      "r_recommended": 0.005337083789612642
+    },
+    "adverse_2.0x_1.0slip": {
+      "worst_dd_at_rbase": 0.08199404196216556,
+      "r_recommended": 0.004878403240378998
+    }
+  },
+  "fx_constants": {
+    "USDJPY": 109.6032,
+    "USDCAD": 1.2412,
+    "USDCHF": 0.9324,
+    "NZDUSD": 0.7047,
+    "GBPUSD": 1.4067,
+    "AUDUSD": 0.776
+  }
+}

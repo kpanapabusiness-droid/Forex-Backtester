@@ -1,0 +1,104 @@
+{
+  "K_tested": [
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "arc_name": "l_arc_10",
+  "cluster_summary": [
+    {
+      "K": 3,
+      "archetype": "v_shape_recovery",
+      "bars_held_p50": 22.0,
+      "centroid_path_drawdown_depth_r": 4.153208291814399,
+      "centroid_path_mono": 0.6189553100144016,
+      "centroid_path_peaks": 26.356999330207636,
+      "centroid_path_recovery_ratio": 0.7542312005453864,
+      "centroid_path_ttp_rel": 0.8044006154784759,
+      "cluster_id": 0,
+      "mae_p50": -1.8724862903764596,
+      "mean_r": 0.8598343776842519,
+      "mfe_p50": 5.309026494934016,
+      "mfe_p75": 7.895270234463923,
+      "n": 1493,
+      "p25_r": -1.0000000000000036,
+      "p50_r": -0.9999999999999964,
+      "p75_r": 1.4825801295117793,
+      "share_of_pool": 0.47366751269035534,
+      "wrong_way_pp": 0.49497655726724715
+    },
+    {
+      "K": 3,
+      "archetype": "monotonic_down",
+      "bars_held_p50": 21.0,
+      "centroid_path_drawdown_depth_r": 7.717224229416984,
+      "centroid_path_mono": -0.5144580670568351,
+      "centroid_path_peaks": 26.607961399276235,
+      "centroid_path_recovery_ratio": 0.2931384861812885,
+      "centroid_path_ttp_rel": 0.22231982356322968,
+      "cluster_id": 1,
+      "mae_p50": -5.127498457354957,
+      "mean_r": -0.8430567155683496,
+      "mfe_p50": 1.964215838435885,
+      "mfe_p75": 3.511986737848166,
+      "n": 1658,
+      "p25_r": -1.0000000000000053,
+      "p50_r": -0.9999999999999989,
+      "p75_r": -0.9999999999999931,
+      "share_of_pool": 0.5260152284263959,
+      "wrong_way_pp": 0.5295536791314838
+    },
+    {
+      "K": 3,
+      "archetype": "monotonic_down",
+      "bars_held_p50": 138.0,
+      "centroid_path_drawdown_depth_r": 168.22463191594633,
+      "centroid_path_mono": -0.8032209154971155,
+      "centroid_path_peaks": 26.0,
+      "centroid_path_recovery_ratio": 0.2918725914959393,
+      "centroid_path_ttp_rel": 0.1125,
+      "cluster_id": 2,
+      "mae_p50": -168.5469364076536,
+      "mean_r": -1.0000000000000113,
+      "mfe_p50": 6.032221566383562,
+      "mfe_p75": 6.032221566383562,
+      "n": 1,
+      "p25_r": -1.0000000000000113,
+      "p50_r": -1.0000000000000113,
+      "p75_r": -1.0000000000000113,
+      "share_of_pool": 0.00031725888324873094,
+      "wrong_way_pp": 0.0
+    }
+  ],
+  "determinism": {
+    "line_terminator": "\\n",
+    "n_jobs": 1,
+    "random_state": 42
+  },
+  "env": {
+    "numpy": "2.4.4",
+    "pandas": "3.0.2",
+    "python": "3.14.0",
+    "sklearn": "1.8.0"
+  },
+  "pool_size": 3152,
+  "primary_K": 3,
+  "protocol_version": "v3.0",
+  "run_timestamp_utc": "2026-05-25 09:02:08",
+  "sha256": {
+    "cluster_assignments": "b3479e15e97c9e797cee87afdd38ae3c57dfee5923edbab4ffea37c06233f91a",
+    "cluster_summary_md": "478f5b24fef815f9ccb96f5748d98467f27349b23bf55c445f0573355dcc8d0d",
+    "pool_input": "d624212bf10b24e986a4cd1a625becfd08b7ce4e8dc7922df4c543e6aacab486"
+  },
+  "silhouette_per_K": {
+    "2": 0.4259111486461593,
+    "3": 0.42752647482954304,
+    "4": 0.28305555985087777,
+    "5": 0.2936838036821634,
+    "6": 0.2782009676005877
+  },
+  "step": "step_2",
+  "valid_for_clustering": 3152
+}

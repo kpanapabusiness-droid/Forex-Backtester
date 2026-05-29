@@ -93,6 +93,7 @@
 | Parser v1.3 (template v1.3 detection + Phase 2 tightening, cutoff 2026-05-23T06:20:59Z) | 🟢 | PR #188 |
 | Closure template v1.3.1 (Amendment 5 — `architectures_skipped_by_amendment_5` field) | 🟢 | PR #194 |
 | Parser v1.3 Amendment-5 extension (optional field + Phase 2 enforcement, cutoff `AMENDMENT_5_CUTOFF_ISO` placeholder pending PR-merge backfill) | 🟢 | PR #194 |
+| Backfill `AMENDMENT_3_1_CUTOFF_ISO` in `scripts/tracker_parser/schema.py` with PR Amendment-3.1 merge timestamp | 🔴 | Placeholder pinned at `2026-05-25T00:00:00Z`. Mirror existing cutoff backfill pattern. |
 | `docs/templates/TODO_REFRESH_TEMPLATE.md` committed | 🟢 | CC_22 PR (this) |
 
 ### Round 6 — Engine consolidation (initial sprint)
@@ -243,6 +244,7 @@ All 🔴 NOT STARTED — defer to Phase 2 trigger.
 - **5ers_eet cache build for 28 pairs × 7 TFs:** One-time workstation operation per PROTOCOL_RUNTIME.md §15.3.
 - **Cross-asset data (DXY / US10Y / SPX as features):** on hold per user. Revisit if Phase 1 doesn't produce deployable.
 - **KH-24 live VPS health:** confirmed running normally on 5ers MT5 broker feed. Independent of local data state. Untouched by Phase-1-engine-build sprint (legacy engine path preserved).
+- **KMeans cluster-label assumption in `core/steps/classifier_persistence.py`:** 🔴 OPEN (low priority). The A2 orchestrator path assumes Step-2 cluster IDs start at 0, but KMeans can return labels `[1,2,3,4]` in different environments → `test_a2_end_to_end.py` cross-environment CI flake (`ValueError: cluster_id 0 not present in Step4Result`). Fix: cluster-label → candidate lookup must iterate over the actual returned labels, not assume a 0-based range. Affects strategy research only (L_PROTOCOL Step 2 clustering); does NOT affect deployment, sidecar, EA, or live trading. Fix post-FundedNext deploy.
 - **OpenWebUI / OpenClaw:** evaluated and skipped — no immediate value.
 - **Obsidian:** skipped — user doesn't search docs themselves.
 - **`STATUS.md` and `CHANGELOG.md` and `SESSION_ZERO.md`:** untouched by reset and untouched by CC_22 per chat decision. Pre-v3.0 legacy; separate cleanup decision not in scope.

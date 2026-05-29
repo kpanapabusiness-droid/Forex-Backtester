@@ -1,0 +1,27 @@
+{
+  "artefacts": {
+    "equity_curve.parquet": {
+      "sha256": "4846a2be7746abf54324113eee75f2b7d4a13012ba643f4c53ec504b43dfbaf8",
+      "size_bytes": 278367
+    },
+    "per_day_max_dd.parquet": {
+      "sha256": "d25044e69cd8c80bd9672451ae9999d552d5bb5cbabd41044605047713466cb1",
+      "size_bytes": 49574
+    },
+    "summary_stats.json": {
+      "sha256": "920bcac170c1ac428de38ac23187aad46acb8304e214f680a955f3b74eba38ce",
+      "size_bytes": 2170
+    },
+    "trade_ledger.parquet": {
+      "sha256": "855bbe37f84448d0890145285f0e0af18550c3095bbae7a7302eeeb05d475ed4",
+      "size_bytes": 27527
+    }
+  },
+  "boundary_convention": "5ers_eet",
+  "config_id": "A6::A6::cl1::sl2.0::thr0.5-0.7::exp2",
+  "generated_at": "2026-05-25T07:02:55Z",
+  "r_base": 0.02,
+  "sim_end": "2025-12-31",
+  "sim_mechanism": "single_fold_extended_oos",
+  "sim_start": "2010-01-01"
+}

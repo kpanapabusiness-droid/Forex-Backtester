@@ -69,6 +69,9 @@ from core.parallel import default_pool_size  # noqa: E402
 from core.runners._fold_stats_helpers import compute_per_day_max_dd  # noqa: E402
 from core.runners.arc_fold_runner import ArcFoldRunner  # noqa: E402
 from core.runners.oracle_fold_runner import OracleFoldRunner  # noqa: E402
+from core.signals.mtf_alignment_2_down_mixed_kijun import (  # noqa: E402
+    MtfAlignment2DownMixedKijunSignal,
+)
 from core.sim.panel import Panel  # noqa: E402
 from core.step_6.dispatch import (  # noqa: E402
     maybe_dispatch_step_6,
@@ -101,9 +104,6 @@ from core.steps.step_3_capturability import (  # noqa: E402
     run_step_3,
 )
 from core.steps.step_4_extraction import Step4Result, run_step_4  # noqa: E402
-from core.signals.mtf_alignment_2_down_mixed_kijun import (  # noqa: E402
-    MtfAlignment2DownMixedKijunSignal,
-)
 from core.wfo.amended_gates import (  # noqa: E402
     AmendedGateResult,
     AmendedVerdict,

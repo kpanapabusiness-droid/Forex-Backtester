@@ -55,6 +55,10 @@ SEARCH_LOG_COLUMNS: tuple[str, ...] = (
     "raw_rank",
     "bonferroni_pass_primary",
     "bonferroni_pass_budget",
+    # arc_discovery_02 Amendments A + C — added 2026-05-24
+    "evaluation_timeout",
+    "iterations_consumed",
+    "time_exit_hit_pct",
 )
 
 
@@ -100,14 +104,20 @@ def render_top_10_raw_md(
     specs_by_id: Mapping[int, RuleSpec],
     report: BonferroniReport,
     follow_up_top_k: int,
+    arc_name: str = "arc_discovery_01",
+    show_time_exit_hit_pct: bool = False,
 ) -> str:
     """Render the top-10 raw markdown table.
 
     Chat methodology constraint applied: top-K (default 3) are flagged
     ``follow_up_eligible=true``; ranks beyond that are analysis-only.
+
+    ``show_time_exit_hit_pct``: when True (arc_discovery_02), adds the
+    ``Time-exit hit %`` column showing the fraction of each rule's trades
+    that exited via the 240-bar time cap.
     """
     lines: list[str] = []
-    lines.append("# Top-10 raw performers — arc_discovery_01")
+    lines.append(f"# Top-10 raw performers — {arc_name}")
     lines.append("")
     lines.append("> Ranking metric: mean R per rule (dispatch Override 1).")
     lines.append(
@@ -115,7 +125,7 @@ def render_top_10_raw_md(
         f"{report.threshold_primary:.3e} (N_evaluated={report.n_evaluated})"
     )
     lines.append(
-        f"> Bonferroni threshold (budget, alpha/10000): "
+        f"> Bonferroni threshold (budget, alpha/{report.n_generated}): "
         f"{report.threshold_budget:.3e}"
     )
     lines.append(
@@ -125,22 +135,37 @@ def render_top_10_raw_md(
         f"> Ranks {follow_up_top_k + 1}-{len(ranked)}: analysis-only; do NOT enter the deployment-track pipeline."
     )
     lines.append("")
-    lines.append(
-        "| Rank | Rule ID | Mean R | Pool size | p-value | Bonf. primary | Bonf. budget | Follow-up | Rule spec |"
-    )
-    lines.append(
-        "|---|---|---|---|---|---|---|---|---|"
-    )
+    if show_time_exit_hit_pct:
+        lines.append(
+            "| Rank | Rule ID | Mean R | Pool size | p-value | Bonf. primary | Bonf. budget | Time-exit % | Follow-up | Rule spec |"
+        )
+        lines.append("|---|---|---|---|---|---|---|---|---|---|")
+    else:
+        lines.append(
+            "| Rank | Rule ID | Mean R | Pool size | p-value | Bonf. primary | Bonf. budget | Follow-up | Rule spec |"
+        )
+        lines.append("|---|---|---|---|---|---|---|---|---|")
     for r in ranked:
         spec = specs_by_id.get(r.rule_id)
         spec_text = rule_to_pretty(spec) if spec is not None else "?"
         primary = "PASS" if r.bonferroni_pass_primary else "fail"
         budget = "PASS" if r.bonferroni_pass_budget else "fail"
         follow_up = "YES (deployment-track)" if r.follow_up_eligible else "no (analysis-only)"
-        lines.append(
-            f"| {r.rank} | {r.rule_id} | {r.mean_r:+.4f} | {r.pool_size} | "
-            f"{r.p_value:.3e} | {primary} | {budget} | {follow_up} | `{spec_text}` |"
-        )
+        if show_time_exit_hit_pct:
+            te_pct = (
+                f"{100.0 * r.time_exit_hit_pct:.1f}%"
+                if r.time_exit_hit_pct is not None
+                else "—"
+            )
+            lines.append(
+                f"| {r.rank} | {r.rule_id} | {r.mean_r:+.4f} | {r.pool_size} | "
+                f"{r.p_value:.3e} | {primary} | {budget} | {te_pct} | {follow_up} | `{spec_text}` |"
+            )
+        else:
+            lines.append(
+                f"| {r.rank} | {r.rule_id} | {r.mean_r:+.4f} | {r.pool_size} | "
+                f"{r.p_value:.3e} | {primary} | {budget} | {follow_up} | `{spec_text}` |"
+            )
     lines.append("")
     return "\n".join(lines)
 
@@ -150,20 +175,21 @@ def render_bonferroni_survivors_md(
     log_df: pd.DataFrame,
     specs_by_id: Mapping[int, RuleSpec],
     report: BonferroniReport,
+    arc_name: str = "arc_discovery_01",
 ) -> str:
     """Render bonferroni_survivors.md.
 
     Survivors are ranked by p-value ASC (most-significant first).
     """
     lines: list[str] = []
-    lines.append("# Bonferroni survivors — arc_discovery_01")
+    lines.append(f"# Bonferroni survivors — {arc_name}")
     lines.append("")
     lines.append(
         f"> Primary threshold (alpha={report.alpha}, denominator=N_evaluated="
         f"{report.n_evaluated}): p < {report.threshold_primary:.3e}"
     )
     lines.append(
-        f"> Budget threshold (alpha/10000, transparency only): p < {report.threshold_budget:.3e}"
+        f"> Budget threshold (alpha/{report.n_generated}, transparency only): p < {report.threshold_budget:.3e}"
     )
     lines.append("")
     if not survivor_ids:
@@ -199,6 +225,7 @@ def render_bonferroni_survivors_md(
 def render_causal_rejections_md(
     rejected: Sequence[dict],
     n_generated: int,
+    arc_name: str = "arc_discovery_01",
 ) -> str:
     """Render causal_audit_rejections.md.
 
@@ -207,7 +234,7 @@ def render_causal_rejections_md(
     file readable.
     """
     lines: list[str] = []
-    lines.append("# Causal-audit rejections — arc_discovery_01")
+    lines.append(f"# Causal-audit rejections — {arc_name}")
     lines.append("")
     lines.append(
         f"> Total rules generated: {n_generated}; rejected by causal filter: "
@@ -242,29 +269,57 @@ def render_compute_budget_used_md(
     n_pairs: int,
     primary_tf: str,
     schema_version: str = "1.0",
+    arc_name: str = "arc_discovery_01",
+    n_evaluation_timeouts: int = 0,
+    time_exit_hit_pct_summary: dict | None = None,
+    halted_at_aggregate_cap: bool = False,
+    rules_run: int | None = None,
 ) -> str:
-    """Render compute_budget_used.md per dispatch Task 7."""
+    """Render compute_budget_used.md per dispatch Task 7.
+
+    arc_discovery_02 additions:
+      * ``n_evaluation_timeouts`` — rules that exceeded the per-rule
+        bar-iteration cap.
+      * ``time_exit_hit_pct_summary`` — dict with mean / p50 / p90 of the
+        time-exit-hit-rate distribution across evaluated rules.
+      * ``halted_at_aggregate_cap`` — True if the aggregate wall-clock cap
+        fired and the search stopped at a rule boundary before completing.
+      * ``rules_run`` — count of rules whose evaluation finished. Less than
+        ``report.n_generated`` only on aggregate-HALT.
+    """
     secs = int(wall_clock_seconds)
     hms = f"{secs // 3600:02d}:{(secs % 3600) // 60:02d}:{secs % 60:02d}"
+    actual_rules_run = rules_run if rules_run is not None else report.n_generated
     lines = [
-        "# Compute budget used — arc_discovery_01",
+        f"# Compute budget used — {arc_name}",
         "",
         f"- Total rules generated: **{report.n_generated}**",
+        f"- Rules whose evaluation completed: **{actual_rules_run}**",
         f"- Rejected at causal lineage: **{report.n_causal_rejected}**",
         f"- Rejected at pool size floor: **{report.n_pool_floor_rejected}**",
+        f"- Evaluation timeouts (per-rule bar-iter cap): **{n_evaluation_timeouts}**",
         f"- Other / degenerate rejections: **{report.n_other_rejected}**",
         f"- Successfully evaluated: **{report.n_evaluated}**",
         "",
         f"- Bonferroni alpha: {report.alpha}",
         f"- Primary threshold (alpha/N_evaluated): **{report.threshold_primary:.3e}**",
-        f"- Budget threshold (alpha/10000): {report.threshold_budget:.3e}",
+        f"- Budget threshold (alpha/{report.n_generated}): {report.threshold_budget:.3e}",
         "",
         f"- Pairs evaluated: {n_pairs}",
         f"- Primary TF: {primary_tf}",
         f"- Wall-clock time: **{hms}**",
+        f"- Halted at aggregate-wallclock cap: **{halted_at_aggregate_cap}**",
         f"- Search-log schema version: {schema_version}",
         "",
     ]
+    if time_exit_hit_pct_summary is not None:
+        lines.append("## Time-exit hit rate distribution (across evaluated rules)")
+        lines.append("")
+        for k in ("mean", "p50", "p90", "max"):
+            v = time_exit_hit_pct_summary.get(k)
+            if v is not None:
+                lines.append(f"- {k}: {100.0 * float(v):.1f}%")
+        lines.append("")
     return "\n".join(lines)
 
 
@@ -272,6 +327,7 @@ def write_manifest(
     manifest_path: Path,
     artefact_paths: Mapping[str, Path],
     extras: Mapping[str, object] | None = None,
+    arc_name: str = "arc_discovery_01",
 ) -> str:
     """Write the sha256 manifest sidecar and return its own sha256.
 
@@ -294,7 +350,7 @@ def write_manifest(
             "sha256": _sha256_file(p),
         }
     payload: dict[str, object] = {
-        "arc_name": "arc_discovery_01",
+        "arc_name": arc_name,
         "step": "step_1/discovery",
         "created_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "artefacts": artefacts,
@@ -302,11 +358,28 @@ def write_manifest(
     if extras:
         payload.update(extras)
     manifest_path.parent.mkdir(parents=True, exist_ok=True)
-    blob = json.dumps(payload, sort_keys=True, indent=2)
+    # JSON-safe encoder for date/datetime/Path values that can sneak in via the
+    # YAML config (window_start/end are parsed as datetime.date) or other extras.
+    # arc_discovery_02 first hit this when the 15h full run died on the final
+    # write because pyyaml gave dates not strings. Coerce here so the manifest
+    # writer is robust to any future caller-supplied type.
+    blob = json.dumps(payload, sort_keys=True, indent=2, default=_json_default)
     if not blob.endswith("\n"):
         blob = blob + "\n"
     manifest_path.write_bytes(blob.encode("utf-8"))
     return _sha256_file(manifest_path)
+
+
+def _json_default(o):
+    """JSON serializer for objects ``json`` doesn't handle natively."""
+    from datetime import date, datetime
+    if isinstance(o, datetime):
+        return o.strftime("%Y-%m-%dT%H:%M:%SZ")
+    if isinstance(o, date):
+        return o.isoformat()
+    if isinstance(o, Path):
+        return str(o).replace("\\", "/")
+    raise TypeError(f"Object of type {o.__class__.__name__} is not JSON serializable")
 
 
 @dataclass(frozen=True)

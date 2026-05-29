@@ -583,9 +583,13 @@ def run(cfg_path: Path, *, write_manifest_flag: bool = True) -> dict:
         print(f"  [{pair}] h4_bars={coverage[pair]['n_bars']:>7} gaps_24h={coverage[pair]['gaps_gt_24h']}", flush=True)
 
     # ── Phase 2: build the FeaturePanel (H4 main + D1/W1 aux) ───────────────
-    h4_panel = Panel(pair_dfs=h4_panel_dfs, tf="H4")
-    d1_panel = Panel(pair_dfs=d1_panel_dfs, tf="D1")
-    w1_panel = Panel(pair_dfs=w1_panel_dfs, tf="W1")
+    # boundary_convention defaults to "utc" for backward-compat with Arc 10 v3.0;
+    # Arc 10 v3.0.2 sets "5ers_eet" via cfg, propagating to multi_tf producers
+    # and (via PROTOCOL_RUNTIME §15.5) to compute_per_day_max_dd at Step 5.
+    bc = cfg.get("boundary_convention", "utc")
+    h4_panel = Panel(pair_dfs=h4_panel_dfs, tf="H4", boundary_convention=bc)
+    d1_panel = Panel(pair_dfs=d1_panel_dfs, tf="D1", boundary_convention=bc)
+    w1_panel = Panel(pair_dfs=w1_panel_dfs, tf="W1", boundary_convention=bc)
     feature_panel = FeaturePanel(h4_panel, d1_panel, w1_panel)
 
     # ── Phase 3: per-pair signal + simulation + features ────────────────────
@@ -817,11 +821,12 @@ def run(cfg_path: Path, *, write_manifest_flag: bool = True) -> dict:
     sha_signal_module = sha256_file(REPO_ROOT / "signals" / "lchar_dlr_long.py")
 
     manifest = dict(
-        arc_name="l_arc_10",
-        protocol_version="v3.0",
+        arc_name=cfg.get("arc_name", "l_arc_10"),
+        protocol_version=cfg.get("protocol_version", "v3.0"),
         step="step_1",
         signal_spec="docs/archive/signal_specs/signal_spec_d1_swing_low_rejection_long_v0.1.md",
         window=dict(start=cfg["window"]["start"], end=cfg["window"]["end"]),
+        boundary_convention=cfg.get("boundary_convention", "utc"),
         pairs=pairs,
         risk_per_trade=cfg["risk_per_trade"],
         totals=dict(

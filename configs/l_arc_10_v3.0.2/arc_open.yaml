@@ -1,0 +1,112 @@
+# Arc 10 v3.0.2 — open config under canonical 5ers_eet
+# Signal: D1 swing-low rejection long (DLR), v0.1 per
+# docs/archive/signal_specs/signal_spec_d1_swing_low_rejection_long_v0.1.md
+# Protocol: L_PROTOCOL.md v3.0 vanilla + Amendment 5/5.1 + Amendment 6 EET boundary
+# Engine: v3 backtester post PR #185/#186/#188/#189/#193/#194/#195/#197/#201/#207/#208
+
+arc_name: l_arc_10_v3.0.2
+protocol_version: v3.0.2
+sub_protocol: vanilla
+
+# Canonical boundary convention — propagates to:
+#   - core.data.aggregator.aggregate (PR #189 EET bar boundaries)
+#   - Panel.boundary_convention (PROTOCOL_RUNTIME §15.5)
+#   - core.features.distance (prior-session bucketing)
+#   - core.runners._fold_stats_helpers.compute_per_day_max_dd (Amendment 6 daily-DD)
+#   - core.sim.risk.reset_floor.ResetFloorAccount (forward-hygiene)
+# Locked, non-negotiable.
+boundary_convention: "5ers_eet"
+
+# HistData lives in the main checkout (worktree gitignores data/histdata content).
+# Cache writes go to data/cache in the worktree; aggregator namespaces 5ers_eet
+# caches under data/cache/<TF>_5ers_eet/ per PROTOCOL_RUNTIME §15.3.
+data:
+  histdata_root: "C:/Users/panap/Documents/Forex-Backtester/data/histdata"
+  cache_root: "data/cache"
+
+window:
+  start: "2010-01-01"
+  end: "2026-04-30"
+
+tf:
+  primary: H4
+  anchor: D1
+  cross_pair_aux: [D1, W1]
+
+pairs:
+  - AUDCAD
+  - AUDCHF
+  - AUDJPY
+  - AUDNZD
+  - AUDUSD
+  - CADCHF
+  - CADJPY
+  - CHFJPY
+  - EURAUD
+  - EURCAD
+  - EURCHF
+  - EURGBP
+  - EURJPY
+  - EURNZD
+  - EURUSD
+  - GBPAUD
+  - GBPCAD
+  - GBPCHF
+  - GBPJPY
+  - GBPNZD
+  - GBPUSD
+  - NZDCAD
+  - NZDCHF
+  - NZDJPY
+  - NZDUSD
+  - USDCAD
+  - USDCHF
+  - USDJPY
+
+risk_per_trade: 0.005  # 0.5% per L arc convention
+
+signal:
+  module: signals.lchar_dlr_long
+  spec: docs/archive/signal_specs/signal_spec_d1_swing_low_rejection_long_v0.1.md
+  # Mirror of locked module constants — asserted at runtime.
+  d1_swing_window_k: 3
+  d1_right_edge_offset: 4
+  d1_structure_lookback_bars: 30
+  d1_l1_freshness_max_bars: 20
+  atr_period_4h: 14
+  proximity_atr_mult: 0.25
+  reject_buffer_atr_mult: 0.10
+  upper_fraction_min: 0.6
+  refractory_bars_4h: 20
+
+step_1:
+  sl:
+    atr_period: 14
+    atr_multiplier: 2.0
+  exit:
+    horizon_bars: 240
+    path_forward_bars: 240
+  exposure:
+    cap_mode: unrestricted     # Step 5 sweeps {2, unlimited}
+  features:
+    use_default_27: true
+    arc_extras:
+      - L1_value
+      - L0_value
+      - L1_age_d1_bars
+      - L0_age_d1_bars
+      - L1_to_atr_proximity
+      - reject_buffer_atr
+      - upper_fraction
+      - atr14_at_signal
+  integrity:
+    lookahead_spotcheck_n: 10
+    d1_lag_nan_perturbation_n: 5
+    require_two_run_determinism: true
+
+output:
+  results_dir: results/l_arc_10_v3.0.2/step_1
+  pool_parquet: pool.parquet
+  integrity_md: integrity_report.md
+  manifest_json: manifest.json
+  float_format: "%.10g"

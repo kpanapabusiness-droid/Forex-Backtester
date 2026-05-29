@@ -1,0 +1,170 @@
+{
+  "arc_name": "l_arc_10_v3.0.2",
+  "boundary_convention": "5ers_eet",
+  "r_base_pct": 0.005,
+  "winning_config": {
+    "cluster_id": 0,
+    "architecture": "A1",
+    "sl_multiplier": 3.5,
+    "exit_policy": "sl_partial_close_1r_runner_trail",
+    "exposure": "unlimited"
+  },
+  "cross_check_vs_pr_214": {
+    "worst_fold_roi_addendum": 0.22456294795253906,
+    "worst_fold_roi_pr_214": 0.224562947952539,
+    "worst_fold_dd_addendum": 0.07353866008324712,
+    "worst_fold_dd_pr_214": 0.0735386600832471,
+    "n_total_addendum": 2059,
+    "n_total_pr_214": 2059,
+    "passed": true
+  },
+  "is_folds": [
+    {
+      "fold_id": 1,
+      "n_trades": 201,
+      "roi_pct": 0.40171840501464784,
+      "max_dd_pct": 0.03234859541392799,
+      "days_breaching_daily_5pct": 0,
+      "roi_dd_ratio": 12.41841878679172
+    },
+    {
+      "fold_id": 2,
+      "n_trades": 182,
+      "roi_pct": 0.4497484601838089,
+      "max_dd_pct": 0.02962749064373433,
+      "days_breaching_daily_5pct": 0,
+      "roi_dd_ratio": 15.180106394833084
+    },
+    {
+      "fold_id": 3,
+      "n_trades": 179,
+      "roi_pct": 0.5213004151192362,
+      "max_dd_pct": 0.02027968363804844,
+      "days_breaching_daily_5pct": 0,
+      "roi_dd_ratio": 25.705549673426862
+    },
+    {
+      "fold_id": 4,
+      "n_trades": 195,
+      "roi_pct": 0.7232340970436884,
+      "max_dd_pct": 0.07353866008324712,
+      "days_breaching_daily_5pct": 0,
+      "roi_dd_ratio": 9.834746733554487
+    },
+    {
+      "fold_id": 5,
+      "n_trades": 192,
+      "roi_pct": 0.5196888506102577,
+      "max_dd_pct": 0.024050765613764263,
+      "days_breaching_daily_5pct": 0,
+      "roi_dd_ratio": 21.60799614266082
+    },
+    {
+      "fold_id": 6,
+      "n_trades": 190,
+      "roi_pct": 0.32331305458375703,
+      "max_dd_pct": 0.050303278844764245,
+      "days_breaching_daily_5pct": 0,
+      "roi_dd_ratio": 6.4272759551420116
+    },
+    {
+      "fold_id": 7,
+      "n_trades": 170,
+      "roi_pct": 0.4698294061149557,
+      "max_dd_pct": 0.032477401464868,
+      "days_breaching_daily_5pct": 0,
+      "roi_dd_ratio": 14.46634844303007
+    },
+    {
+      "fold_id": 8,
+      "n_trades": 191,
+      "roi_pct": 0.7365593322915127,
+      "max_dd_pct": 0.024596936344245847,
+      "days_breaching_daily_5pct": 0,
+      "roi_dd_ratio": 29.945165608554408
+    },
+    {
+      "fold_id": 9,
+      "n_trades": 175,
+      "roi_pct": 0.22456294795253906,
+      "max_dd_pct": 0.030507387515113414,
+      "days_breaching_daily_5pct": 0,
+      "roi_dd_ratio": 7.360936685951565
+    },
+    {
+      "fold_id": 10,
+      "n_trades": 196,
+      "roi_pct": 0.532838812225561,
+      "max_dd_pct": 0.04034401500170652,
+      "days_breaching_daily_5pct": 0,
+      "roi_dd_ratio": 13.207381868240489
+    },
+    {
+      "fold_id": 11,
+      "n_trades": 188,
+      "roi_pct": 0.5842355828439032,
+      "max_dd_pct": 0.025768643386584685,
+      "days_breaching_daily_5pct": 0,
+      "roi_dd_ratio": 22.672345380357115
+    }
+  ],
+  "holdout_at_r_base": {
+    "fold_id": 12,
+    "n_trades": 1093,
+    "roi_pct": 0.5283139074626766,
+    "max_dd_pct": 0.0549908606530898,
+    "days_breaching_daily_5pct": 0,
+    "roi_dd_ratio": 9.607303853553926
+  },
+  "holdout_at_r_safe": {
+    "fold_id": 13,
+    "n_trades": 1093,
+    "roi_pct": 0.5858728676469229,
+    "max_dd_pct": 0.0597051637130079,
+    "days_breaching_daily_5pct": 0,
+    "roi_dd_ratio": 9.81276712451723
+  },
+  "holdout_at_r_hard": {
+    "fold_id": 14,
+    "n_trades": 1093,
+    "roi_pct": 0.7776012006741619,
+    "max_dd_pct": 0.0741788864321915,
+    "days_breaching_daily_5pct": 0,
+    "roi_dd_ratio": 10.48278341823025
+  },
+  "chained_max_dd_base_pct": 0.07353866008324704,
+  "per_day_max_dd_artefact_path": "results\\l_arc_10_v3.0.2\\step_5\\amendment_3\\per_day_max_dd_base.parquet",
+  "amended_gate": {
+    "verdict": "pass_deployable",
+    "primary_failure_mode": "none",
+    "reason": "PASS-DEPLOYABLE at r_safe=0.5439%: worst-fold ratio 6.43, chained DD 8.0000%, 0 daily breaches",
+    "worst_fold_roi_base_pct": 0.22456294795253906,
+    "worst_fold_dd_base_pct": 0.07353866008324712,
+    "worst_fold_ratio": 6.4272759551420116,
+    "mean_fold_ratio": 16.25693378841297,
+    "n_negative_folds": 0,
+    "min_trades_per_fold": 170,
+    "chained_max_dd_base_pct": 0.07353866008324704,
+    "k_safe": 1.0878631716900813,
+    "k_hard": 1.3598289646126016,
+    "r_safe_pct": 0.005439315858450406,
+    "r_hard_pct": 0.006799144823063008,
+    "scalable_to_safe": true,
+    "scalable_to_hard": true,
+    "r_safe_intrinsic_pct": 0.005439315858450406,
+    "r_hard_intrinsic_pct": 0.006799144823063008,
+    "r_safe_capped_at_rmax": false,
+    "r_hard_capped_at_rmax": false,
+    "worst_fold_roi_at_r_safe_pct": 0.24429376080372378,
+    "worst_fold_roi_at_r_hard_pct": 0.30536720100465475,
+    "chained_max_dd_at_r_safe_pct": 0.0799999999999999,
+    "chained_max_dd_at_r_hard_pct": 0.09999999999999988,
+    "daily_dd_breaches_at_r_safe": 0,
+    "daily_dd_breaches_at_r_hard": 0,
+    "holdout_roi_at_r_safe_pct": 0.5858728676469229,
+    "holdout_dd_at_r_safe_pct": 0.0597051637130079,
+    "holdout_roi_at_r_hard_pct": 0.7776012006741619,
+    "holdout_dd_at_r_hard_pct": 0.0741788864321915,
+    "sizing_convention": "reset_floor"
+  }
+}

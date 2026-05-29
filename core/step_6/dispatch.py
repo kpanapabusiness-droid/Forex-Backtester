@@ -116,6 +116,12 @@ def maybe_dispatch_step_6(
     signal_module_name: str | None = None,
     primary_tf: str | None = None,
     pair_set: tuple[str, ...] = (),
+    strategy_results: Mapping[str, Mapping[int, Any]] | None = None,
+    holdout_results: tuple = (),
+    holdout_fold_id: int | None = None,
+    r_base_pct: float | None = None,
+    panel_boundary_convention: str | None = None,
+    extras: Mapping[str, Any] | None = None,
 ) -> DispatchOutcome:
     """If the Top-1 amended candidate is PASS-tier, run Step 6 and return
     the outcome bundle. Otherwise return a no-op outcome.
@@ -129,6 +135,21 @@ def maybe_dispatch_step_6(
 
     cfg = audit_config or AuditConfig()
 
+    # Per Amendment 4 + §6.3 spread P&L wiring: extract Top-1's
+    # closed-trade ledger + fold assignments from the orchestrator's
+    # strategy-results side-channel so the diagnostic runs end-to-end.
+    # Returns (None, None, holdout_fold_id) when reconstruction fails;
+    # the diagnostic then skips gracefully (info-severity).
+    from core.step_6.ledger_extraction import extract_top_1_ledger_bundle
+    top_1_trade_ledger, top_1_fold_assignments, _hfid = (
+        extract_top_1_ledger_bundle(
+            top_1_config_id=top1.config_id,
+            strategy_results=strategy_results,
+            holdout_results=holdout_results,
+            holdout_fold_id=holdout_fold_id,
+        )
+    )
+
     # Build Step6Inputs from the live result. Pass through any extras the
     # auto-dispatch path can supply.
     inputs = from_arc_orchestrator_result(
@@ -140,6 +161,12 @@ def maybe_dispatch_step_6(
         primary_tf=primary_tf,
         pair_set=pair_set,
         holdout_start=holdout_start,
+        top_1_trade_ledger=top_1_trade_ledger,
+        top_1_fold_assignments=top_1_fold_assignments,
+        holdout_fold_id=holdout_fold_id,
+        r_base_pct=r_base_pct,
+        panel_boundary_convention=panel_boundary_convention,
+        extras=extras,
     )
 
     result = run_step_6(inputs, trigger=TriggerSource.AUTO_PASS, audit_config=cfg)

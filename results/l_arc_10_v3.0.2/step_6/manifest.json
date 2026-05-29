@@ -1,0 +1,68 @@
+{
+  "arc_name": "l_arc_10_v3.0.2",
+  "categories": {
+    "deployment_readiness": {
+      "n_checks": 8,
+      "n_critical": 4,
+      "n_critical_fails": 0,
+      "n_info": 0,
+      "n_warnings": 0,
+      "passed": true
+    },
+    "determinism": {
+      "n_checks": 8,
+      "n_critical": 1,
+      "n_critical_fails": 0,
+      "n_info": 1,
+      "n_warnings": 1,
+      "passed": true
+    },
+    "execution_realism": {
+      "n_checks": 13,
+      "n_critical": 3,
+      "n_critical_fails": 0,
+      "n_info": 0,
+      "n_warnings": 2,
+      "passed": true
+    },
+    "lookahead": {
+      "n_checks": 9,
+      "n_critical": 1,
+      "n_critical_fails": 0,
+      "n_info": 1,
+      "n_warnings": 0,
+      "passed": true
+    },
+    "selection_bias": {
+      "n_checks": 8,
+      "n_critical": 3,
+      "n_critical_fails": 0,
+      "n_info": 0,
+      "n_warnings": 1,
+      "passed": true
+    },
+    "statistical": {
+      "n_checks": 10,
+      "n_critical": 2,
+      "n_critical_fails": 0,
+      "n_info": 0,
+      "n_warnings": 2,
+      "passed": true
+    }
+  },
+  "critical_failures": [],
+  "n_warnings": 6,
+  "overall_passed": true,
+  "ran_at": "2026-05-25T21:31:15Z",
+  "report_paths": {
+    "deployment_readiness": "deployment_readiness_report.md",
+    "determinism": "determinism_report.md",
+    "execution_realism": "execution_realism_report.md",
+    "lookahead": "lookahead_report.md",
+    "selection_bias": "selection_bias_report.md",
+    "statistical": "statistical_report.md"
+  },
+  "summary_path": "summary.md",
+  "trigger": "auto_pass",
+  "verdict_impact": "none"
+}

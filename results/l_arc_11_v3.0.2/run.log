@@ -1,0 +1,57 @@
+[arc_11_v3.0.2 17:19:22] === Arc 11 v3.0.2 START ===
+[arc_11_v3.0.2 17:19:22] Window: 2010-01-01 -> 2026-05-25 (holdout 2021-01-01 -> 2026-05-25)
+[arc_11_v3.0.2 17:19:22] r_base=0.0050, starting_balance=100000
+[arc_11_v3.0.2 17:19:23] H4 panel built in 1.0s (28 pairs; convention=5ers_eet)
+[arc_11_v3.0.2 17:19:24] D1 panel built in 1.0s (28 pairs; convention=5ers_eet)
+[arc_11_v3.0.2 17:19:25] W1 panel built in 1.0s (28 pairs; convention=5ers_eet)
+[arc_11_v3.0.2 17:19:25] Building Step 1 trade pool (canonical build_arc_pool, EET-aware)
+[arc_11_v3.0.2 17:21:28]   pool n=17281, pool_sha256=8090aeac2b3b1a43...
+[arc_11_v3.0.2 17:21:29] Computing v3 feature matrix per pair at signal bars
+[arc_11_v3.0.2 17:21:32]   features AUDCAD: 593 signal rows in 3.5s
+[arc_11_v3.0.2 17:21:35]   features AUDCHF: 635 signal rows in 3.1s
+[arc_11_v3.0.2 17:21:39]   features AUDJPY: 630 signal rows in 3.4s
+[arc_11_v3.0.2 17:21:42]   features AUDNZD: 607 signal rows in 3.3s
+[arc_11_v3.0.2 17:21:45]   features AUDUSD: 623 signal rows in 3.3s
+[arc_11_v3.0.2 17:21:49]   features CADCHF: 641 signal rows in 3.3s
+[arc_11_v3.0.2 17:21:54]   features CADJPY: 623 signal rows in 5.4s
+[arc_11_v3.0.2 17:21:58]   features CHFJPY: 626 signal rows in 4.2s
+[arc_11_v3.0.2 17:22:02]   features EURAUD: 599 signal rows in 3.6s
+[arc_11_v3.0.2 17:22:05]   features EURCAD: 608 signal rows in 2.9s
+[arc_11_v3.0.2 17:22:08]   features EURCHF: 571 signal rows in 3.0s
+[arc_11_v3.0.2 17:22:11]   features EURGBP: 615 signal rows in 3.0s
+[arc_11_v3.0.2 17:22:13]   features EURJPY: 625 signal rows in 2.6s
+[arc_11_v3.0.2 17:22:17]   features EURNZD: 588 signal rows in 3.6s
+[arc_11_v3.0.2 17:22:20]   features EURUSD: 627 signal rows in 3.1s
+[arc_11_v3.0.2 17:22:23]   features GBPAUD: 592 signal rows in 2.8s
+[arc_11_v3.0.2 17:22:25]   features GBPCAD: 641 signal rows in 2.8s
+[arc_11_v3.0.2 17:22:28]   features GBPCHF: 613 signal rows in 2.7s
+[arc_11_v3.0.2 17:22:31]   features GBPJPY: 645 signal rows in 2.8s
+[arc_11_v3.0.2 17:22:34]   features GBPNZD: 594 signal rows in 2.7s
+[arc_11_v3.0.2 17:22:36]   features GBPUSD: 623 signal rows in 2.7s
+[arc_11_v3.0.2 17:22:39]   features NZDCAD: 641 signal rows in 2.8s
+[arc_11_v3.0.2 17:22:42]   features NZDCHF: 592 signal rows in 3.3s
+[arc_11_v3.0.2 17:22:46]   features NZDJPY: 617 signal rows in 3.1s
+[arc_11_v3.0.2 17:22:49]   features NZDUSD: 613 signal rows in 3.3s
+[arc_11_v3.0.2 17:22:52]   features USDCAD: 639 signal rows in 2.8s
+[arc_11_v3.0.2 17:22:55]   features USDCHF: 613 signal rows in 2.9s
+[arc_11_v3.0.2 17:22:58]   features USDJPY: 647 signal rows in 3.2s
+[arc_11_v3.0.2 17:22:58]   feature_matrix shape: (17281, 27); lineage rows: 27
+[arc_11_v3.0.2 17:22:58] === Pre-orchestrator probe: Steps 2-4 for Amendment 5 admission ===
+[arc_11_v3.0.2 17:23:28]   probe Step 2: K_selected=4; silhouettes={2: 0.397, 3: 0.396, 4: 0.494, 5: 0.476, 6: 0.456}
+[arc_11_v3.0.2 17:23:32]   probe Step 3: candidate_ids=(0, 1)
+[arc_11_v3.0.2 17:23:32]     c0 (bimodal): n=2167 composite=1.984 reach_1r=1.000 mfe_p50=7.785 ww_pp=0.003 sl_opt=1.5 * candidate
+[arc_11_v3.0.2 17:23:32]     c1 (unclassified): n=6123 composite=0.967 reach_1r=0.965 mfe_p50=2.108 ww_pp=0.035 sl_opt=1.5 * candidate
+[arc_11_v3.0.2 17:23:32]     c2 (unclassified): n=5012 composite=0.190 reach_1r=0.043 mfe_p50=0.519 ww_pp=0.966 sl_opt=1.5   
+[arc_11_v3.0.2 17:23:32]     c3 (monotonic_down): n=3977 composite=0.023 reach_1r=0.001 mfe_p50=0.095 ww_pp=0.999 sl_opt=1.5   
+[arc_11_v3.0.2 17:24:59]     Step 4 c0 (bimodal): best=lr AUC=0.5056 thr=0.1537 | Gate2 admits A2/A6=False | Gate1 admits A4=True
+[arc_11_v3.0.2 17:24:59]     Step 4 c1 (unclassified): best=rf AUC=0.5056 thr=0.3546 | Gate2 admits A2/A6=False | Gate1 admits A4=False
+[arc_11_v3.0.2 17:24:59]   probe summary written to C:\Users\panap\Documents\Forex-Backtester\.claude\worktrees\kind-leakey-f936c6\results\l_arc_11_v3.0.2\amendment_5_admission_probe.json
+[arc_11_v3.0.2 17:24:59] A1 grid: 18 explicit configs
+[arc_11_v3.0.2 17:24:59] Auto-arch specs: 36 (across 2 candidate clusters)
+[arc_11_v3.0.2 17:24:59] architectures_skipped_by_amendment_5: ['a5_gate_4_admission_blocked_by_no_pass_tier_constituent', 'A2', 'A6']
+[arc_11_v3.0.2 17:24:59]   admission plan: 54 configs (normal)
+[arc_11_v3.0.2 17:24:59] WFO structure: 11 IS folds; holdout 2021-01-01 -> 2026-05-25
+[arc_11_v3.0.2 17:24:59] === Invoking ArcOrchestrator.run() ===
+[arc_11_v3.0.2 00:02:04] === ArcOrchestrator.run() complete in 397.1 min ===
+[arc_11_v3.0.2 00:02:04] Verdict (orchestrator): FAIL
+[arc_11_v3.0.2 00:02:05] Artefacts written to C:\Users\panap\Documents\Forex-Backtester\.claude\worktrees\kind-leakey-f936c6\results\l_arc_11_v3.0.2

@@ -1,0 +1,234 @@
+{
+  "admission_plan": {
+    "a2_a6_skipped_clusters": [
+      0,
+      1
+    ],
+    "a5_gate_4_a_satisfied": true,
+    "a5_skipped_by_5_1": true,
+    "amendment_5_1_cutoff_applied": true,
+    "architectures_skipped_by_amendment_5": [
+      "a5_gate_4_admission_blocked_by_no_pass_tier_constituent",
+      "A2",
+      "A6"
+    ],
+    "n_a1_configs": 18,
+    "n_auto_specs": 36,
+    "n_candidate_clusters": 2,
+    "search_scope_flag": "normal",
+    "total_configs_step_5": 54
+  },
+  "amendment_3_top_k": [
+    {
+      "chained_dd_method": "max_per_day_proxy_post_crash_reconstruction",
+      "chained_max_dd_at_r_hard_pct": 0.0224,
+      "chained_max_dd_at_r_safe_pct": 0.0179,
+      "chained_max_dd_base_pct": 0.0885,
+      "config_id": "A1::a1_baseline_sl2.0_sl_partial_close_1r_runner_trail_expU",
+      "daily_dd_breaches_at_r_hard": 0,
+      "daily_dd_breaches_at_r_safe": 0,
+      "holdout_dd_at_r_hard_pct": null,
+      "holdout_dd_at_r_safe_pct": null,
+      "holdout_roi_at_r_hard_pct": null,
+      "holdout_roi_at_r_safe_pct": null,
+      "k_hard": 0.252697,
+      "k_safe": 0.202158,
+      "per_day_max_dd_artefact_path": "results\\l_arc_11_v3.0.2\\step_5\\per_day_max_dd_base__A1__a1_baseline_sl2.0_sl_partial_close_1r_runner_trail_expU.parquet",
+      "primary_failure_mode": "step5_not_scalable",
+      "r_hard_pct": 0.126348,
+      "r_safe_pct": 0.101079,
+      "scalable_to_hard": false,
+      "scalable_to_safe": false,
+      "verdict": "fail",
+      "worst_fold_dd_at_r_hard_pct": null,
+      "worst_fold_dd_at_r_safe_pct": null,
+      "worst_fold_roi_at_r_hard_pct": -7.4435,
+      "worst_fold_roi_at_r_safe_pct": -5.9548
+    },
+    {
+      "chained_dd_method": "max_per_day_proxy_post_crash_reconstruction",
+      "chained_max_dd_at_r_hard_pct": 0.0201,
+      "chained_max_dd_at_r_safe_pct": 0.0161,
+      "chained_max_dd_base_pct": 0.0701,
+      "config_id": "A1::a1_baseline_sl2.5_sl_partial_close_1r_runner_trail_expU",
+      "daily_dd_breaches_at_r_hard": 0,
+      "daily_dd_breaches_at_r_safe": 0,
+      "holdout_dd_at_r_hard_pct": null,
+      "holdout_dd_at_r_safe_pct": null,
+      "holdout_roi_at_r_hard_pct": null,
+      "holdout_roi_at_r_safe_pct": null,
+      "k_hard": 0.286832,
+      "k_safe": 0.229466,
+      "per_day_max_dd_artefact_path": "results\\l_arc_11_v3.0.2\\step_5\\per_day_max_dd_base__A1__a1_baseline_sl2.5_sl_partial_close_1r_runner_trail_expU.parquet",
+      "primary_failure_mode": "step5_not_scalable",
+      "r_hard_pct": 0.143416,
+      "r_safe_pct": 0.114733,
+      "scalable_to_hard": false,
+      "scalable_to_safe": false,
+      "verdict": "fail",
+      "worst_fold_dd_at_r_hard_pct": null,
+      "worst_fold_dd_at_r_safe_pct": null,
+      "worst_fold_roi_at_r_hard_pct": -7.668,
+      "worst_fold_roi_at_r_safe_pct": -6.1344
+    },
+    {
+      "chained_dd_method": "max_per_day_proxy_post_crash_reconstruction",
+      "chained_max_dd_at_r_hard_pct": 0.0185,
+      "chained_max_dd_at_r_safe_pct": 0.0148,
+      "chained_max_dd_base_pct": 0.077,
+      "config_id": "A1::a1_baseline_sl2.5_sl_plus_tp_2r_expU",
+      "daily_dd_breaches_at_r_hard": 0,
+      "daily_dd_breaches_at_r_safe": 0,
+      "holdout_dd_at_r_hard_pct": null,
+      "holdout_dd_at_r_safe_pct": null,
+      "holdout_roi_at_r_hard_pct": null,
+      "holdout_roi_at_r_safe_pct": null,
+      "k_hard": 0.240686,
+      "k_safe": 0.192549,
+      "per_day_max_dd_artefact_path": "results\\l_arc_11_v3.0.2\\step_5\\per_day_max_dd_base__A1__a1_baseline_sl2.5_sl_plus_tp_2r_expU.parquet",
+      "primary_failure_mode": "step5_not_scalable",
+      "r_hard_pct": 0.120343,
+      "r_safe_pct": 0.096274,
+      "scalable_to_hard": false,
+      "scalable_to_safe": false,
+      "verdict": "fail",
+      "worst_fold_dd_at_r_hard_pct": null,
+      "worst_fold_dd_at_r_safe_pct": null,
+      "worst_fold_roi_at_r_hard_pct": -7.0322,
+      "worst_fold_roi_at_r_safe_pct": -5.6258
+    }
+  ],
+  "arc_name": "l_arc_11_v3.0.2",
+  "architectures_skipped_by_amendment_5": [
+    "a5_gate_4_admission_blocked_by_no_pass_tier_constituent",
+    "A2",
+    "A6"
+  ],
+  "candidate_cluster_ids": [
+    0,
+    1
+  ],
+  "elapsed_seconds": 23826.0,
+  "feature_matrix_shape": [
+    17281,
+    27
+  ],
+  "holdout_results": [],
+  "n_configs_evaluated_step_5": 54,
+  "pool_sha256": "8090aeac2b3b1a43861601841d8867f8f3f550dda7951817a0e6b713a2ba7264",
+  "pool_size": 17281,
+  "reconstruction_note": "run_summary.json reconstructed from on-disk artefacts post-crash. Orchestrator completed all 6.6 hours of compute (Steps 1-5 + Amendment 3 + no Step 6 since all 54 configs FAIL); summary-writer crashed on a field-name bug accessing AmendedGateResult.worst_fold_dd_at_r_safe_pct (non-existent; DD is bound to 8% at r_safe by construction). Holdout per-config numerical values not preserved (in-memory only); verdict FAIL is dispositive via WFO ratio (all 54 configs worst-fold ratio < 0, below the 2.0 PASS gate).",
+  "search_scope_flag": "normal",
+  "step_2_k_selected": 4,
+  "step_2_silhouettes": {
+    "2": 0.397,
+    "3": 0.396,
+    "4": 0.494,
+    "5": 0.476,
+    "6": 0.456
+  },
+  "step_3_per_cluster": [
+    {
+      "archetype": "bimodal",
+      "cluster_id": 0,
+      "composite": 1.9835309852112402,
+      "is_candidate": true,
+      "mfe_p50": 7.785476697212395,
+      "n_trades": 2167,
+      "reach_1r": 1.0,
+      "selected_sl_mult": 1.5,
+      "ww_pp": 0.0027688047992616522
+    },
+    {
+      "archetype": "unclassified",
+      "cluster_id": 1,
+      "composite": 0.9674771754642331,
+      "is_candidate": true,
+      "mfe_p50": 2.1082154079196767,
+      "n_trades": 6123,
+      "reach_1r": 0.9647231749142577,
+      "selected_sl_mult": 1.5,
+      "ww_pp": 0.034950187816429855
+    },
+    {
+      "archetype": "unclassified",
+      "cluster_id": 2,
+      "composite": 0.19030096298936588,
+      "is_candidate": false,
+      "mfe_p50": 0.5187170588742414,
+      "n_trades": 5012,
+      "reach_1r": 0.04309656823623304,
+      "selected_sl_mult": 1.5,
+      "ww_pp": 0.9660814046288907
+    },
+    {
+      "archetype": "monotonic_down",
+      "cluster_id": 3,
+      "composite": 0.022793139767941176,
+      "is_candidate": false,
+      "mfe_p50": 0.09454910292210185,
+      "n_trades": 3977,
+      "reach_1r": 0.0005028916268544129,
+      "selected_sl_mult": 1.5,
+      "ww_pp": 0.9992456625597184
+    }
+  ],
+  "step_4_per_cluster": [
+    {
+      "admit_a2_a6_gate2": false,
+      "admit_a4_gate1": true,
+      "archetype": "bimodal",
+      "best_classifier": "lr",
+      "best_classifier_mean_auc": 0.5056015686295856,
+      "best_threshold": 0.1537452080582666,
+      "cluster_id": 0
+    },
+    {
+      "admit_a2_a6_gate2": false,
+      "admit_a4_gate1": false,
+      "archetype": "unclassified",
+      "best_classifier": "rf",
+      "best_classifier_mean_auc": 0.5056282247215524,
+      "best_threshold": 0.35458022993258753,
+      "cluster_id": 1
+    }
+  ],
+  "step_5_top_k": [
+    {
+      "config_id": "A1::a1_baseline_sl2.0_sl_partial_close_1r_runner_trail_expU",
+      "mean_fold_ratio": -0.3,
+      "min_trades_per_fold": null,
+      "n_folds_evaluated": 11,
+      "n_negative_folds": null,
+      "verdict": "fail",
+      "worst_fold_dd": 0.39573099999999994,
+      "worst_fold_ratio": -0.74,
+      "worst_fold_roi": -0.294562
+    },
+    {
+      "config_id": "A1::a1_baseline_sl2.5_sl_plus_tp_2r_expU",
+      "mean_fold_ratio": 0.05,
+      "min_trades_per_fold": null,
+      "n_folds_evaluated": 11,
+      "n_negative_folds": null,
+      "verdict": "fail",
+      "worst_fold_dd": 0.415479,
+      "worst_fold_ratio": -0.75,
+      "worst_fold_roi": -0.292175
+    },
+    {
+      "config_id": "A1::a1_baseline_sl2.5_sl_partial_close_1r_runner_trail_expU",
+      "mean_fold_ratio": -0.15,
+      "min_trades_per_fold": null,
+      "n_folds_evaluated": 11,
+      "n_negative_folds": null,
+      "verdict": "fail",
+      "worst_fold_dd": 0.348636,
+      "worst_fold_ratio": -0.77,
+      "worst_fold_roi": -0.267333
+    }
+  ],
+  "step_6_dispatched": false,
+  "step_6_overall_passed": null,
+  "verdict": "FAIL"
+}

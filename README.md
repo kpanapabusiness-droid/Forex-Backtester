@@ -14,6 +14,18 @@ A research-first FX trading system targeting prop-firm requirements (5ers) with 
 
 ---
 
+## Arc 10 Documentation
+
+The complete Arc 10 system — strategy, validation, deployment, runbook, history — is consolidated in **[`arc_10/`](./arc_10/)**.
+
+If you want to:
+- Understand what Arc 10 does → [`arc_10/00_executive_summary.md`](./arc_10/00_executive_summary.md)
+- See the validation work → [`arc_10/02_validation/`](./arc_10/02_validation/)
+- Deploy or operate the system → [`arc_10/03_deployment/`](./arc_10/03_deployment/) + [`arc_10/04_runbook/`](./arc_10/04_runbook/)
+- Understand the lineage → [`arc_10/05_history/`](./arc_10/05_history/)
+
+---
+
 ## Start Here
 
 For new sessions, read in this order:

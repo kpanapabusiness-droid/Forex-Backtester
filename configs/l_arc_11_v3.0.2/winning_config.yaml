@@ -1,0 +1,99 @@
+arc_name: l_arc_11_v3.0.2
+signal_class: swing_high_breakout_trend_long
+tf: H4
+pairs:
+- AUDCAD
+- AUDCHF
+- AUDJPY
+- AUDNZD
+- AUDUSD
+- CADCHF
+- CADJPY
+- CHFJPY
+- EURAUD
+- EURCAD
+- EURCHF
+- EURGBP
+- EURJPY
+- EURNZD
+- EURUSD
+- GBPAUD
+- GBPCAD
+- GBPCHF
+- GBPJPY
+- GBPNZD
+- GBPUSD
+- NZDCAD
+- NZDCHF
+- NZDJPY
+- NZDUSD
+- USDCAD
+- USDCHF
+- USDJPY
+boundary_convention: 5ers_eet
+window_start: '2010-01-01'
+window_end: '2026-05-25'
+holdout_start: '2021-01-01'
+holdout_end: '2026-05-25'
+best_architecture:
+  name: A1 system_level_filter
+  cluster: null
+  archetype: null
+  config: A1::a1_baseline_sl2.0_sl_partial_close_1r_runner_trail_expU
+  sl_atr: 2.0
+  exit_policy: sl_partial_close_1r_runner_trail
+  exposure_cap: unlimited
+  worst_fold_ratio: -0.74
+  worst_fold_roi_base_pct: -29.4562
+  worst_fold_dd_base_pct: 39.5731
+  mean_fold_ratio: -0.3
+  mean_fold_roi_pct: null
+  sign_pos_folds: ?/11
+  n_trades_total: null
+  holdout_roi_pct: null
+  holdout_dd_pct: null
+  holdout_passed: null
+  oracle_worst_ratio: null
+  oracle_real_gap_sharpe: null
+  features_in_winning_config: []
+  chained_max_dd_base_pct: 0.0885
+  per_day_max_dd_artefact_path: results\l_arc_11_v3.0.2\step_5\per_day_max_dd_base__A1__a1_baseline_sl2.0_sl_partial_close_1r_runner_trail_expU.parquet
+  per_day_max_dd_base_summary:
+    n_days: null
+    p50_pct: null
+    p95_pct: null
+    p99_pct: null
+    max_pct: null
+  k_safe: 0.2022
+  k_hard: 0.2527
+  r_safe_pct: 0.1011
+  r_hard_pct: 0.1263
+  scalable_to_safe: false
+  scalable_to_hard: false
+  worst_fold_roi_at_r_safe_pct: -5.9548
+  worst_fold_roi_at_r_hard_pct: -7.4435
+  chained_max_dd_at_r_safe_pct: 0.0179
+  chained_max_dd_at_r_hard_pct: 0.0224
+  daily_dd_breaches_at_r_safe: 0
+  daily_dd_breaches_at_r_hard: 0
+  holdout_roi_at_r_safe_pct: null
+  holdout_dd_at_r_safe_pct: null
+  holdout_roi_at_r_hard_pct: null
+  holdout_dd_at_r_hard_pct: null
+  sizing_convention: reset_floor
+  chained_dd_method: max_per_day_proxy_post_crash_reconstruction
+  config_artefact_path: configs/l_arc_11_v3.0.2/winning_config.yaml
+  deployment_spec_section_present: true
+engine_versions:
+  canonical_exit_registry: 'CC_18 / PR #195'
+  amendment_3_risk_normalised_gates: 'PR #186'
+  amendment_4_step_6: 'PR #188'
+  amendment_5_four_gate: 'PR #194'
+  amendment_5_1_gate_4_qualifier: 'PR #201'
+  amendment_6_eet_daily_dd: 'CC_20 / PR #197'
+  mid_feature_pipeline: "PR #189 \xA715.1"
+  canonical_htf_alignment: 'PR #193'
+  orchestrator_run_context_plumbing: 'PR #186'
+  step_4_classifier_persistence: 'PR #185'
+verdict: FAIL
+deployment_status: FAIL -- NOT FOR DEPLOYMENT (documentation parity only)

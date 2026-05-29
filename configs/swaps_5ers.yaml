@@ -1,0 +1,49 @@
+# 5ers per-pair swap rates (points per night per 1.0 standard lot)
+# Source: CC dispatch §9 (Arc 10 v3.0.2 cost-realism sweep, REVISED Option B)
+# Unit: points = 1/10 pip; long-only strategy → swap_long_points consumed.
+# Convention: triple-swap on Friday rollover (per 5ers / standard FX broker convention).
+# Verification (dispatch): EURGBP −$5.45 estimate vs −$5.80 actual; CHFJPY −$5.14 vs −$5.09 actual.
+# Constant across 2010–2025 sweep window (conservative for pre-2015 folds when rates may have been
+# different — but this dispatch's purpose is to find the cost level where Arc 10 fails the gate,
+# so the constant-rate assumption is informative of robustness rather than calibrated history).
+
+pairs:
+  AUDCAD: {swap_long_points: -5.1,   swap_short_points: -3.5}
+  AUDCHF: {swap_long_points: -6.3,   swap_short_points: -7.2}
+  AUDJPY: {swap_long_points: -15.6,  swap_short_points: -16.1}
+  AUDNZD: {swap_long_points: -16.2,  swap_short_points: -15.3}
+  AUDUSD: {swap_long_points: -9.8,   swap_short_points: -9.2}
+  CADCHF: {swap_long_points: -9.2,   swap_short_points: -10.8}
+  CADJPY: {swap_long_points: -19.98, swap_short_points: -19.33}
+  CHFJPY: {swap_long_points: -8.4,   swap_short_points: -9.7}
+  EURAUD: {swap_long_points: -7.7,   swap_short_points: -7.0}
+  EURCAD: {swap_long_points: -8.91,  swap_short_points: -8.1}
+  EURCHF: {swap_long_points: -6.9,   swap_short_points: -7.4}
+  EURGBP: {swap_long_points: -6.7,   swap_short_points: -5.4}
+  EURJPY: {swap_long_points: -17.28, swap_short_points: -19.3}
+  EURNZD: {swap_long_points: -15.54, swap_short_points: -14.34}
+  EURUSD: {swap_long_points: -19.8,  swap_short_points: -19.6}
+  GBPAUD: {swap_long_points: -8.82,  swap_short_points: -9.21}
+  GBPCAD: {swap_long_points: -9.8,   swap_short_points: -11.9}
+  GBPCHF: {swap_long_points: -11.34, swap_short_points: -12.7}
+  GBPJPY: {swap_long_points: -31.7,  swap_short_points: -34.8}
+  GBPNZD: {swap_long_points: -13.54, swap_short_points: -11.66}
+  GBPUSD: {swap_long_points: -16.8,  swap_short_points: -16.0}
+  NZDCAD: {swap_long_points: -8.4,   swap_short_points: -9.3}
+  NZDCHF: {swap_long_points: -8.4,   swap_short_points: -9.3}
+  NZDJPY: {swap_long_points: -16.55, swap_short_points: -17.11}
+  NZDUSD: {swap_long_points: -2.7,   swap_short_points: -1.1}
+  USDCAD: {swap_long_points: -9.2,   swap_short_points: -10.1}
+  USDCHF: {swap_long_points: -11.3,  swap_short_points: -12.8}
+  USDJPY: {swap_long_points: -27.6,  swap_short_points: -27.3}
+
+# Friday rollover multiplier (standard FX convention: weekend interest accrues on Friday rollover).
+friday_multiplier: 3.0
+
+# Rollover instant in UTC by DST period.
+# 5ers / standard FX broker rollover is at 17:00 ET (close of NY trading day):
+#   EDT (summer, US-DST in effect): 17:00 EDT = 21:00 UTC
+#   EST (winter, US-DST NOT in effect): 17:00 EST = 22:00 UTC
+# == 24:00 EET (broker timezone) year-round.
+rollover_utc_summer: "21:00"
+rollover_utc_winter: "22:00"

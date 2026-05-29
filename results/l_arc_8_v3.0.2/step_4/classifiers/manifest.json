@@ -1,0 +1,45 @@
+{
+  "arc_name": "l_arc_8_v3.0.2",
+  "classifiers": {
+    "2": {
+      "auc_in_sample": 0.9988269699465404,
+      "auc_oos_cv5": 0.4821629826115318,
+      "best_threshold": Infinity,
+      "classifier_name": "lgbm",
+      "classifier_type": "LGBMClassifier",
+      "feature_order": [
+        "atr_14",
+        "atr_percentile_100",
+        "atr_vs_trailing_100",
+        "d1_atr_percentile_100",
+        "d1_close_slope_magnitude",
+        "d1_close_slope_sign",
+        "day_of_week",
+        "distance_to_round_number",
+        "hour_of_day",
+        "kijun_26_distance",
+        "prior_session_high_distance",
+        "prior_session_low_distance",
+        "range_close_ratio",
+        "session_dead",
+        "session_ldn_ny_overlap",
+        "session_london",
+        "session_ny",
+        "session_tokyo",
+        "spread_percentile_100",
+        "spread_vs_trailing_100",
+        "swing_high_distance_14",
+        "swing_low_distance_14",
+        "w1_close_slope_sign"
+      ],
+      "path": "2.pkl",
+      "sha256": "879fe9562f8009e490211cdf240c1eb3bf9e6365e8864888a59397c276662e49",
+      "trained_on_pool_size": 3337
+    }
+  },
+  "generated_at": "2026-05-25T09:38:36Z",
+  "joblib_version": "1.5.3",
+  "lightgbm_version": "4.6.0",
+  "sklearn_version": "1.8.0",
+  "train_end": "2021-01-01T00:00:00Z"
+}

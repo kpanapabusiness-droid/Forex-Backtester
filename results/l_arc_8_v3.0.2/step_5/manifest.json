@@ -1,0 +1,33 @@
+{
+  "artefacts": {
+    "architectures_ranked.md": {
+      "sha256": "b834484dc22946f7ec57579bf456838194d91e0304a3847dca634464ebdae5e5",
+      "size_bytes": 1900
+    },
+    "best_candidate.md": {
+      "sha256": "a388da1730766882885db4bdab092aef6bf31a72388f4249ca6fb4b517bb7ca0",
+      "size_bytes": 892
+    },
+    "per_day_max_dd_base__A1__a1_sl1.5_exit-sl_partial_close_1r_runner_trail_exp-max_per_currency_2.parquet": {
+      "sha256": "3d62d6a70a3dadf8b2a5a09b832b5ee5f31099c70d90c917c1064b5fd57687fa",
+      "size_bytes": 99023
+    },
+    "per_day_max_dd_base__A1__a1_sl1.5_exit-sl_partial_close_1r_runner_trail_exp-unlimited.parquet": {
+      "sha256": "5eba4cf6def187e17631bab9bf00618cc32421d23bb19cb79c21e9de730c2b3a",
+      "size_bytes": 99281
+    },
+    "per_day_max_dd_base__A1__a1_sl2.0_exit-sl_partial_close_1r_runner_trail_exp-max_per_currency_2.parquet": {
+      "sha256": "52b0b16b67b22d018c954e53bf1cef65b669cff04f1ead9ac2d4f26514007e57",
+      "size_bytes": 101259
+    },
+    "per_fold_metrics.csv": {
+      "sha256": "bf41f579fa747731c20ca98952d469f1149fc05968d6e5245a774256ecfb953b",
+      "size_bytes": 43464
+    },
+    "wfo_results.csv": {
+      "sha256": "805d78950a10415108dd915e019942f0f0f2b1b0fc978a4911c97f64c1f44487",
+      "size_bytes": 4701
+    }
+  },
+  "generated_at": "2026-05-25T22:17:37Z"
+}

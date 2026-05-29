@@ -1,0 +1,50 @@
+{
+  "analysis_top_k": 10,
+  "arc_name": "arc_discovery_02",
+  "artefacts": {
+    "bonferroni_survivors": {
+      "path": "results/arc_discovery_02/step_1/discovery/bonferroni_survivors.md",
+      "sha256": "82db334f3781fa7b13fa5b5d2a7c5e81601485e68f5d6203333a36f295bcb45a"
+    },
+    "causal_audit_rejections": {
+      "path": "results/arc_discovery_02/step_1/discovery/causal_audit_rejections.md",
+      "sha256": "af2ac0c1606333151e24187287793abaf81881bf5a8fe69edf23141635d28059"
+    },
+    "compute_budget_used": {
+      "path": "results/arc_discovery_02/step_1/discovery/compute_budget_used.md",
+      "sha256": "42109e610396e7a7c8442890881f95834e6357f3a1383e03c27a703684a67fe9"
+    },
+    "full_search_log": {
+      "path": "results/arc_discovery_02/step_1/discovery/full_search_log.parquet",
+      "sha256": "555d3da69c768ac4b23bc1cfcb730d1ddbace198d92005301bbdb2d79c678eea"
+    },
+    "top_10_raw": {
+      "path": "results/arc_discovery_02/step_1/discovery/top_10_raw.md",
+      "sha256": "cc628ba24ffcb9025aee94cc46d05a922fb949285abbdf90680ec4484aa6bbc2"
+    }
+  },
+  "bonferroni_alpha": 0.05,
+  "bonferroni_threshold_budget": 5e-06,
+  "bonferroni_threshold_primary": 2.1431633090441493e-05,
+  "created_at": "2026-05-29T08:34:48Z",
+  "density_filter_enabled": true,
+  "follow_up_top_k": 3,
+  "halted_at_aggregate_cap": false,
+  "iteration_budget_per_rule": 5000000,
+  "manifest_repaired": true,
+  "manifest_repaired_reason": "Original run died on json.dumps(date) at end-of-search; manifest regenerated from existing artefacts on disk via scripts.arc_discovery_02.repair_manifest. All five artefacts unchanged; their sha256s are recorded below.",
+  "n_causal_rejected": 47470,
+  "n_evaluated": 2333,
+  "n_evaluation_timeouts": 132,
+  "n_generated": 10000,
+  "n_pairs": 28,
+  "n_pool_floor_rejected": 65,
+  "n_survivors": 1011,
+  "primary_tf": "H4",
+  "rules_run": 50000,
+  "step": "step_1/discovery",
+  "total_wallclock_cap_hours": null,
+  "wall_clock_seconds": null,
+  "window_end": "2020-12-31",
+  "window_start": "2010-01-01"
+}

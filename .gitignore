@@ -126,15 +126,37 @@ results/l_arc_7_v3.0.2/run.log
 # Exclude the multi-MB raw run log (the run_summary.json + closure capture
 # the verdict and metrics).
 results/l_arc_5_v3.0.2/run.log
+# Arc 7 r=2% analysis re-run (user override, not an arc closure).
+# Driver + configs cherry-picked into main via PR #208-era cleanup; this
+# branch carries only the report + the artefacts produced by the script
+# at its original --window-end="2025-12-31" default. See
+# docs/dispatches/driver_script_divergence_investigation.md for context.
+!results/analysis/
+!results/analysis/**
+# Multi-MB sklearn warning spew — summary_stats.json + manifests capture metrics.
+results/analysis/arc_7_r2pct/run.log
 # Arc 8 (PR-HHHL pullback-resume, long, 4H) — Step 1+ outputs
 # (L_ARC_PROTOCOL v2.3 §13: arc results data is direct-to-main).
 !results/l_arc_8/
 !results/l_arc_8/**
+# Arc 8 v3.0.2 (PR-HHHL long, 4H) — corrected retry under canonical 5ers_eet
+# (per docs/dispatches/arc_8_v3_0_2_intent.md + DISPATCH_arc_8_v3_0_2_CORRECTED.md).
+!results/l_arc_8_v3.0.2/
+!results/l_arc_8_v3.0.2/**
 # arc_discovery_01 — signal_discovery_probe sub-protocol (L_PROTOCOL v3.0).
 # Arc results data is direct-to-main; the full_search_log.parquet may be
 # large but is the deliverable for follow-up vanilla arcs.
 !results/arc_discovery_01/
 !results/arc_discovery_01/**
+# Probe archives (partial runs, rescue artefacts, methodology learning) —
+# tracked so future arcs can reference what was tried + why it didn't ship.
+!archive/probes/**
+# arc_discovery_02 — signal_discovery_probe sub-protocol, re-dispatch of _01
+# with three amendments (time exit + pool floor + iter cap) + chat-driven
+# amendments D-F (density filter + cap relax + checkpointing). Parked after
+# 15h search completed and crashed on manifest write.
+!results/arc_discovery_02/
+!results/arc_discovery_02/**
 # Don't track the quicktest subfolder — smoke-test artefact only.
 results/l_arc_8/step1_quicktest/
 # Arc 9 (IB-trend long, 4H) — Step 1+ outputs and post-kill deployment
@@ -145,6 +167,39 @@ results/l_arc_8/step1_quicktest/
 # (L_ARC_PROTOCOL v2.3 §13: arc results data is direct-to-main).
 !results/l_arc_10/
 !results/l_arc_10/**
+# Arc 10 v3.0.2 — canonical 5ers_eet rerun under Wave 1 v3.0.2.
+# Same direct-to-main convention; exclude regenerable trade_paths parquet + raw run logs.
+!results/l_arc_10_v3.0.2/
+!results/l_arc_10_v3.0.2/**
+results/l_arc_10_v3.0.2/**/trade_paths.parquet
+results/l_arc_10_v3.0.2/**/paths.parquet
+results/l_arc_10_v3.0.2/**/run.log
+results/l_arc_10_v3.0.2/**/*_run.log
+# Arc 10 v3.0.2 UTC convention rerun (phase/arc_10_v3_0_2_utc_rerun).
+# Same artefact-tracking pattern as v3.0.2; trade_paths.parquet is byte-identical
+# to results/l_arc_10/step_1/trade_paths.parquet (verified by sha256 in
+# COMPARISON_REPORT §6), so we exclude it as regenerable from Step 1.
+!results/l_arc_10_v3_0_2_utc_rerun/
+!results/l_arc_10_v3_0_2_utc_rerun/**
+results/l_arc_10_v3_0_2_utc_rerun/**/trade_paths.parquet
+results/l_arc_10_v3_0_2_utc_rerun/**/paths.parquet
+results/l_arc_10_v3_0_2_utc_rerun/**/run.log
+results/l_arc_10_v3_0_2_utc_rerun/**/*_run.log
+# Phase 2 sidecar/lab signal parity (Dispatch C v2) — report + consolidated
+# parity artefacts tracked; per-pair divergence_<PAIR>.parquet are regenerable
+# intermediates (regen via scripts/phase_2_parity/parity_harness.py --all).
+!results/phase_2_parity/
+!results/phase_2_parity/parity_report.md
+!results/phase_2_parity/divergence_ledger.parquet
+!results/phase_2_parity/parity_summaries.parquet
+# Phase 2 EET (FundedNext 5ers_eet convention) — report + consolidated parity
+# artefacts + the EET ground-truth ledger tracked; per-pair divergence_<PAIR>.parquet
+# are regenerable intermediates (regen via parity_harness.py --convention 5ers_eet).
+!results/phase_2_parity_eet/
+!results/phase_2_parity_eet/parity_report.md
+!results/phase_2_parity_eet/divergence_ledger_eet.parquet
+!results/phase_2_parity_eet/parity_summaries.parquet
+!results/phase_2_parity_eet/trade_ledger_eet.parquet
 # Arc 11 v3.0 (swing-high breakout in trend, long, 4H) — closure + artefacts
 # tracked per L_PROTOCOL v3.0 §6. Trade-path parquet excluded (>40 MB; regen
 # from script + config). v2-era trades_paths.csv name also excluded.

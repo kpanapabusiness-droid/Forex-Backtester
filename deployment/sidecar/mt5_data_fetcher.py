@@ -35,6 +35,8 @@ from typing import Any, Protocol
 
 import pandas as pd
 
+from deployment.sidecar.boundary import _EET_TZ, CONVENTION_UTC
+
 
 class Mt5FetchError(RuntimeError):
     """Raised on MT5 fetch failure (no bars, connection drop, type error)."""
@@ -63,11 +65,46 @@ def import_mt5() -> Mt5Module:
     return importlib.import_module("MetaTrader5")  # type: ignore[return-value]
 
 
-def _rates_to_df(rates: Any, *, source: str) -> pd.DataFrame:
+def _bar_time_to_utc_naive(
+    epoch_series: pd.Series, convention: str
+) -> pd.Series:
+    """Map MT5 ``time`` epoch seconds to the canonical UTC-naive ``date`` column.
+
+    MT5's ``copy_rates_from_pos`` reports ``time`` as the bar-open instant in
+    the **broker server's wall clock**, encoded as "seconds since 1970 as if
+    that wall clock were UTC".
+
+      - ``"utc"`` (5ers): the server runs UTC, so the wall clock IS UTC and the
+        epoch decodes directly to true UTC. Preserved verbatim.
+      - ``"5ers_eet"`` (FundedNext): the server runs broker EET/EEST, so the
+        decoded value is the Europe/Athens local wall clock. We localise it to
+        Europe/Athens and convert to true UTC. DST (+2 winter / +3 summer) is
+        resolved by the IANA tz db — byte-identical to the lab's EET aggregator,
+        which also anchors on Europe/Athens. H4/D1 anchors avoid the ambiguous
+        transition hour, so localisation is never ambiguous/non-existent.
+    """
+    naive_wall = pd.to_datetime(epoch_series, unit="s")  # broker wall clock, naive
+    if convention == CONVENTION_UTC:
+        return naive_wall.astype("datetime64[ns]")
+    # EET: interpret the broker wall clock as Europe/Athens local → true UTC.
+    return (
+        naive_wall.dt.tz_localize(
+            _EET_TZ, ambiguous=True, nonexistent="shift_forward"
+        )
+        .dt.tz_convert("UTC")
+        .dt.tz_localize(None)
+        .astype("datetime64[ns]")
+    )
+
+
+def _rates_to_df(
+    rates: Any, *, source: str, convention: str = CONVENTION_UTC
+) -> pd.DataFrame:
     """Convert MT5 ``copy_rates_from_pos`` ndarray output to canonical DataFrame.
 
     Raises Mt5FetchError if ``rates`` is None, empty, or missing required
-    fields.
+    fields. ``convention`` selects broker-wall-clock → UTC normalisation
+    (see :func:`_bar_time_to_utc_naive`).
     """
     if rates is None:
         raise Mt5FetchError(f"{source}: copy_rates_from_pos returned None")
@@ -79,15 +116,10 @@ def _rates_to_df(rates: Any, *, source: str) -> pd.DataFrame:
     missing = required - set(df.columns)
     if missing:
         raise Mt5FetchError(f"{source}: missing fields {sorted(missing)} (got {list(df.columns)})")
-    # 'time' is unix epoch seconds (MT5 convention) in UTC. Force ns precision
-    # to match the UTC rerun's cache parquet schema (data/cache/utc/* are
-    # written with datetime64[ns]; the signal module consumes them as such).
+    # Normalise the broker-server bar-open time to a UTC-naive datetime64[ns]
+    # ``date`` column matching the lab cache parquet schema and convention.
     df = df.assign(
-        date=(
-            pd.to_datetime(df["time"], unit="s", utc=True)
-            .dt.tz_localize(None)
-            .astype("datetime64[ns]")
-        ),
+        date=_bar_time_to_utc_naive(df["time"], convention),
         open=df["open"].astype(float),
         high=df["high"].astype(float),
         low=df["low"].astype(float),
@@ -101,16 +133,18 @@ def fetch_h4_bars(
     *,
     count: int,
     mt5_module: Mt5Module,
+    convention: str = CONVENTION_UTC,
 ) -> pd.DataFrame:
     """Fetch the most recent ``count`` H4 bars for ``symbol``.
 
     ``mt5_module`` is the live ``MetaTrader5`` (or a test fake). The
     function does NOT call ``initialize``/``shutdown`` — that lifecycle
-    is the caller's (see :func:`with_mt5_session`).
+    is the caller's (see :func:`with_mt5_session`). ``convention`` selects
+    broker-time normalisation.
     """
     tf_h4 = mt5_module.TIMEFRAME_H4
     rates = mt5_module.copy_rates_from_pos(symbol, tf_h4, 0, int(count))
-    return _rates_to_df(rates, source=f"H4/{symbol}")
+    return _rates_to_df(rates, source=f"H4/{symbol}", convention=convention)
 
 
 def fetch_d1_bars(
@@ -118,11 +152,12 @@ def fetch_d1_bars(
     *,
     count: int,
     mt5_module: Mt5Module,
+    convention: str = CONVENTION_UTC,
 ) -> pd.DataFrame:
     """Fetch the most recent ``count`` D1 bars for ``symbol``."""
     tf_d1 = mt5_module.TIMEFRAME_D1
     rates = mt5_module.copy_rates_from_pos(symbol, tf_d1, 0, int(count))
-    return _rates_to_df(rates, source=f"D1/{symbol}")
+    return _rates_to_df(rates, source=f"D1/{symbol}", convention=convention)
 
 
 def with_mt5_initialize(

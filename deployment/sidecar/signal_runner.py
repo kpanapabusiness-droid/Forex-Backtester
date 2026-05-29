@@ -22,17 +22,11 @@ from typing import Any
 
 import pandas as pd
 
+from deployment.sidecar.boundary import CONVENTION_UTC, project_entry_bar_open
 from signals.lchar_dlr_long import (
     ATR_PERIOD_4H,
     compute_signal,
 )
-
-# Forex weekend gap on the UTC 4h boundary grid (bars open 00/04/08/12/16/20).
-# The week's last bar opens Friday 20:00 UTC; no H4 bars exist from Saturday
-# 00:00 UTC through Sunday 16:00 UTC. The first tradeable bar after the gap is
-# the Sunday 20:00 UTC bar, which captures the Sunday ~21:00/22:00 UTC reopen
-# under both US-DST regimes (5pm ET = 22:00 UTC winter / 21:00 UTC summer).
-_REOPEN_HOUR_UTC = 20
 
 
 def _to_utc_iso_z(ts: pd.Timestamp) -> str:
@@ -42,38 +36,24 @@ def _to_utc_iso_z(ts: pd.Timestamp) -> str:
     return ts.tz_convert(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
-def _project_entry_bar_open(signal_bar_open_utc: datetime) -> datetime:
-    """Project the entry bar open (next tradeable H4 bar open) from the
-    signal bar open, under the UTC 4h boundary convention.
+def _project_entry_bar_open(
+    signal_bar_open_utc: datetime, convention: str = CONVENTION_UTC
+) -> datetime:
+    """Project the entry bar open (next tradeable H4 bar open) from the signal
+    bar open. Delegates to the convention-aware boundary module.
 
-    Normal case: next H4 bar opens at ``signal_bar_open + 4h``. Across the
-    forex weekend gap no H4 bars exist from Saturday 00:00 UTC through Sunday
-    16:00 UTC, so if the naive +4h candidate lands in that dead zone it is
-    snapped forward to the Sunday 20:00 UTC reopen bar. This matches the lab,
-    which fills at the next actual panel row (Friday-20:00 signal → Sunday
-    20:00 entry).
-
-    Residual the sidecar cannot foresee: a small number of long-holiday
-    weekends (e.g. New Year) have no Sunday bar at all and the true next bar is
-    Monday. The sidecar has no holiday calendar, so it projects to the standard
-    Sunday reopen; the live EA fills at the first actual post-reopen tick
-    regardless, so the envelope timestamp is advisory only in that rare case.
+    The ``convention`` defaults to ``"utc"`` so the legacy call signature (and
+    the validated UTC weekend-gap behaviour) is preserved; the EET deployment
+    threads ``"5ers_eet"`` through from the sidecar config.
     """
-    cand = signal_bar_open_utc + timedelta(hours=4)
-    wd = cand.weekday()  # Mon=0 .. Sat=5, Sun=6
-    in_weekend_gap = (wd == 5) or (wd == 6 and cand.hour < _REOPEN_HOUR_UTC)
-    if not in_weekend_gap:
-        return cand
-    days_to_sunday = 6 - wd  # Sat(5) → +1 day; Sun(6) → same day
-    return (cand + timedelta(days=days_to_sunday)).replace(
-        hour=_REOPEN_HOUR_UTC, minute=0, second=0, microsecond=0
-    )
+    return project_entry_bar_open(signal_bar_open_utc, convention)
 
 
 def run_signal(
     df_4h: pd.DataFrame,
     df_d1: pd.DataFrame,
     pair: str,
+    convention: str = CONVENTION_UTC,
 ) -> dict[str, Any] | None:
     """Invoke the canonical DLR signal on the freshly fetched panels.
 
@@ -110,7 +90,9 @@ def run_signal(
     # Entry fires at the next TRADEABLE H4 bar open. On weekdays this is the
     # signal-bar close (+4h); across the forex weekend gap it snaps to the
     # Sunday reopen bar rather than a non-existent Saturday bar.
-    entry_open_iso = _project_entry_bar_open(bar_open_utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    entry_open_iso = _project_entry_bar_open(bar_open_utc, convention).strftime(
+        "%Y-%m-%dT%H:%M:%SZ"
+    )
 
     return {
         "pair": pair,

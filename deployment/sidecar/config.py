@@ -27,6 +27,8 @@ from typing import Any
 
 import yaml
 
+from deployment.sidecar.boundary import CONVENTION_UTC, SUPPORTED_CONVENTIONS
+
 # Canonical hashed-subset keys.
 #
 # The hash covers the SIGNAL + EXIT CONTRACT — the fields that, if they
@@ -158,6 +160,10 @@ class SidecarConfig:
 
     # Pairs to process each cycle.
     pairs: tuple[str, ...]
+    # Broker H4/D1 bar-grid convention ("utc" for 5ers, "5ers_eet" for
+    # FundedNext). Drives entry projection, wake clock, anchor probe, and
+    # broker-time → UTC normalisation. Sourced from winning_config.
+    boundary_convention: str = CONVENTION_UTC
     # Map canonical pair (EURUSD) to broker symbol (e.g. EURUSD.r on some brokers).
     mt5_symbol_map: dict[str, str] = field(default_factory=dict)
 
@@ -204,6 +210,13 @@ def load_sidecar_config(
             "no pairs declared (neither winning_config['pairs'] nor sidecar_yaml['pairs'])"
         )
 
+    convention = str(winning.get("boundary_convention", CONVENTION_UTC))
+    if convention not in SUPPORTED_CONVENTIONS:
+        raise ValueError(
+            f"winning_config boundary_convention {convention!r} unsupported; "
+            f"expected one of {SUPPORTED_CONVENTIONS}"
+        )
+
     root = Path(sidecar_root)
     return SidecarConfig(
         winning_config=winning,
@@ -214,6 +227,7 @@ def load_sidecar_config(
         heartbeat_path=root / "sidecar.heartbeat",
         log_dir=root / "logs",
         pairs=pairs,
+        boundary_convention=convention,
         mt5_symbol_map=dict(sidecar_dict.get("mt5_symbol_map", {})),
         bar_publish_buffer_sec=int(
             sidecar_dict.get("bar_publish_buffer_sec", DEFAULT_BAR_PUBLISH_BUFFER_SECONDS)

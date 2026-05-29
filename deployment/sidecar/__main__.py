@@ -8,6 +8,7 @@ import sys
 from pathlib import Path
 
 from deployment.sidecar.config import load_sidecar_config
+from deployment.sidecar.mt5_data_fetcher import Mt5ConnectParams
 from deployment.sidecar.sidecar import initialize_and_run
 
 
@@ -45,6 +46,32 @@ def _build_arg_parser() -> argparse.ArgumentParser:
         default="INFO",
         choices=("DEBUG", "INFO", "WARNING", "ERROR"),
     )
+    p.add_argument(
+        "--mt5-path",
+        default=None,
+        help=(
+            "Absolute path to the target broker's MT5 terminal64.exe. Makes the "
+            "sidecar attach deterministically to that terminal — required when "
+            "multiple MT5 terminals run on one host (multi-broker VPS). Omitted: "
+            "legacy default-attach (first terminal to answer)."
+        ),
+    )
+    p.add_argument(
+        "--mt5-login",
+        type=int,
+        default=None,
+        help="MT5 account login for sidecar-side re-auth (optional; rarely needed).",
+    )
+    p.add_argument(
+        "--mt5-password",
+        default=None,
+        help="MT5 account password for sidecar-side re-auth (optional; rarely needed).",
+    )
+    p.add_argument(
+        "--mt5-server",
+        default=None,
+        help="MT5 broker server name for sidecar-side re-auth (optional; rarely needed).",
+    )
     return p
 
 
@@ -60,7 +87,13 @@ def main(argv: list[str] | None = None) -> int:
         sidecar_yaml_path=args.sidecar_config,
         sidecar_root=args.sidecar_root,
     )
-    initialize_and_run(cfg, iterations=args.iterations)
+    connect = Mt5ConnectParams(
+        path=args.mt5_path,
+        login=args.mt5_login,
+        password=args.mt5_password,
+        server=args.mt5_server,
+    )
+    initialize_and_run(cfg, iterations=args.iterations, connect=connect)
     return 0
 
 

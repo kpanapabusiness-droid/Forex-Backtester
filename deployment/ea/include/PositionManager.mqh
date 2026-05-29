@@ -65,6 +65,7 @@ struct ArcPosition
    double            partial_close_price;    // -1 until fired
    datetime          partial_close_time;
    bool              partial_close_logged;   // true once partial_close row written
+   datetime          last_processed_h4_bar;  // per-position bar-rollover gate (single-chart-multi-pair topology fix)
    bool              pending_close;
    ENUM_ARC_EXIT_REASON pending_close_reason;
   };
@@ -96,6 +97,7 @@ void ArcPositionReset(int i)
    g_arc_positions[i].partial_close_price = 0.0;
    g_arc_positions[i].partial_close_time = 0;
    g_arc_positions[i].partial_close_logged = false;
+   g_arc_positions[i].last_processed_h4_bar = 0;
    g_arc_positions[i].pending_close = false;
    g_arc_positions[i].pending_close_reason = ARC_EXIT_NONE;
   }
@@ -178,6 +180,16 @@ ulong ArcPlaceEntry(
    err_out = "";
    slot_out = -1;
    string symbol = sig.pair;
+   // Auto-subscribe the symbol to Market Watch defensively. Required for
+   // single-chart-multi-pair deployment — the EA is attached to a chart
+   // for one symbol (e.g. EURUSD) but trades any envelope.pair the
+   // sidecar emits. Without Market Watch subscription, SymbolInfoDouble
+   // and iTime/iHigh/iClose return 0/stale data for non-chart pairs.
+   if(!SymbolSelect(symbol, true))
+     {
+      err_out = StringFormat("symbol_select_failed:%s", symbol);
+      return 0;
+     }
    double lots = ArcComputeLots(symbol, risk_pct, sig.sl_distance_price);
    if(lots <= 0.0)
      {
@@ -226,6 +238,11 @@ ulong ArcPlaceEntry(
    // 1×ATR rather than 1R, causing TP1 / trail to fire 3.5× too tight
    // and Phase 2 parity would have diverged systematically.
    g_arc_positions[slot].r_atr = sig.sl_distance_price;
+   // Per-position bar-rollover gate — anchored at entry-bar open so the
+   // first new-bar event for this pair correctly triggers ArcExitOnNewBar.
+   // Required for the single-chart-multi-pair topology fix (replaces the
+   // chart-symbol-bound ArcIsNewH4Bar global gate).
+   g_arc_positions[slot].last_processed_h4_bar = iTime(symbol, PERIOD_H4, 0);
    g_arc_positions[slot].initial_lots = lots;
    g_arc_positions[slot].current_lots = lots;
    slot_out = slot;

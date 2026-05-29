@@ -81,6 +81,12 @@ void ArcReconstructPosition(int slot, ulong ticket, double sl_atr_multiplier,
      }
    g_arc_positions[slot].peak_high_bid = peak;
    g_arc_positions[slot].bar_ordinal = n_bars;
+   // Per-position bar-rollover gate (topology fix). Anchored at the
+   // CURRENT bar so the first NEW bar after recovery triggers
+   // ArcOnNewH4BarPerPosition's per-pair logic. Auto-subscribe symbol
+   // defensively in case the EA was reattached without Market Watch.
+   SymbolSelect(symbol, true);
+   g_arc_positions[slot].last_processed_h4_bar = iTime(symbol, PERIOD_H4, 0);
 
    // Check for partial-close in deal history.
    HistorySelect(entry_time - 60, now + 60);

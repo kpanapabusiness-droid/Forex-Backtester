@@ -74,7 +74,6 @@ CACHE_ROOT = "C:/Users/panap/Documents/Forex-Backtester/data/cache"
 WINDOW_START = "2010-01-01"
 WINDOW_END = "2026-04-30"
 D1_PAD_DAYS = 45
-BOUNDARY = "utc"
 
 DEFAULT_H4_BARS = 300
 DEFAULT_D1_BARS = 100
@@ -84,10 +83,29 @@ RANDOM_SEED = 42
 # Byte-identity tolerance on price/ratio fields (dispatch §4).
 PRICE_TOL = 1e-9
 
-ARC_DIR = REPO_ROOT / "results" / "l_arc_10_v3_0_2_utc_rerun"
-POOL_PATH = ARC_DIR / "step_1" / "pool.parquet"
-LEDGER_PATH = ARC_DIR / "trade_ledger_utc.parquet"
-OUT_DIR = REPO_ROOT / "results" / "phase_2_parity"
+
+class ConventionPaths:
+    """Resolve the convention-specific ground-truth + output paths.
+
+    ``utc``   → 5ers rerun (``l_arc_10_v3_0_2_utc_rerun``), the original
+                Dispatch C v2 target.
+    ``5ers_eet`` → FundedNext EET validation: the locked v3.0.2 EET pool plus
+                the EET ledger projected from it (see build_eet_ledger.py).
+    """
+
+    def __init__(self, convention: str) -> None:
+        self.convention = convention
+        if convention == "utc":
+            arc = REPO_ROOT / "results" / "l_arc_10_v3_0_2_utc_rerun"
+            self.pool_path = arc / "step_1" / "pool.parquet"
+            self.ledger_path = arc / "trade_ledger_utc.parquet"
+            self.out_dir = REPO_ROOT / "results" / "phase_2_parity"
+        elif convention == "5ers_eet":
+            self.pool_path = REPO_ROOT / "results" / "l_arc_10_v3.0.2" / "step_1" / "pool.parquet"
+            self.out_dir = REPO_ROOT / "results" / "phase_2_parity_eet"
+            self.ledger_path = self.out_dir / "trade_ledger_eet.parquet"
+        else:
+            raise SystemExit(f"unsupported --convention {convention!r}")
 
 # Audit fields the sidecar envelope carries that ARE byte-comparable.
 # Maps run_signal output key → lab compute_signal column.
@@ -112,12 +130,12 @@ PAIRS = [
 ]
 
 
-def _build_lab_panels(pair: str) -> tuple[pd.DataFrame, pd.DataFrame]:
+def _build_lab_panels(pair: str, convention: str) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Reconstruct the lab's bid-view H4 + D1 panels (mirrors step_1)."""
     h4 = aggregate(pair, "H4", histdata_root=HISTDATA_ROOT, cache_root=CACHE_ROOT,
-                   boundary_convention=BOUNDARY)
+                   boundary_convention=convention)
     d1 = aggregate(pair, "D1", histdata_root=HISTDATA_ROOT, cache_root=CACHE_ROOT,
-                   boundary_convention=BOUNDARY)
+                   boundary_convention=convention)
     h4_w = window_slice(h4, WINDOW_START, WINDOW_END)
     pad_start = (pd.Timestamp(WINDOW_START, tz="UTC") - pd.Timedelta(days=D1_PAD_DAYS)).strftime("%Y-%m-%d")
     d1_w = window_slice(d1, pad_start, WINDOW_END)
@@ -154,12 +172,13 @@ def _candidate_positions(lab: pd.DataFrame, rng: np.random.Generator) -> dict[st
     }
 
 
-def run_pair(pair: str, *, h4_bars: int = DEFAULT_H4_BARS, d1_bars: int = DEFAULT_D1_BARS,
-             write: bool = True) -> dict:
+def run_pair(pair: str, *, convention: str = "utc", h4_bars: int = DEFAULT_H4_BARS,
+             d1_bars: int = DEFAULT_D1_BARS, write: bool = True) -> dict:
     """Run parity validation for a single pair. Returns a summary dict and,
-    if ``write``, appends divergence rows to results/phase_2_parity/."""
-    print(f"[{pair}] building panels ...", flush=True)
-    df_h4_bid, df_d1_bid = _build_lab_panels(pair)
+    if ``write``, appends divergence rows to the convention's output dir."""
+    paths = ConventionPaths(convention)
+    print(f"[{pair}] ({convention}) building panels ...", flush=True)
+    df_h4_bid, df_d1_bid = _build_lab_panels(pair, convention)
 
     # Lab full-panel signal frame (reproduces pool.parquet by construction).
     lab = dlr.compute_signal(df_h4_bid, df_d1_bid).reset_index(drop=True)
@@ -167,7 +186,7 @@ def run_pair(pair: str, *, h4_bars: int = DEFAULT_H4_BARS, d1_bars: int = DEFAUL
     d1_dates = pd.to_datetime(df_d1_bid["date"])
 
     # ── Cross-check: lab frame must reproduce pool.parquet for this pair ──
-    pool = pd.read_parquet(POOL_PATH)
+    pool = pd.read_parquet(paths.pool_path)
     pool["signal_bar_time"] = pd.to_datetime(pool["signal_bar_time"], utc=True)
     pool_p = pool[pool["pair"] == pair].sort_values("signal_bar_time").reset_index(drop=True)
     lab_sig_pos = np.where(lab["signal"].to_numpy(dtype=bool))[0]
@@ -175,7 +194,7 @@ def run_pair(pair: str, *, h4_bars: int = DEFAULT_H4_BARS, d1_bars: int = DEFAUL
     xcheck = _cross_check_pool(lab, lab_sig_pos, lab_sig_times, pool_p)
 
     # ── Ledger signal-bar set for this pair ──
-    ledger = pd.read_parquet(LEDGER_PATH)
+    ledger = pd.read_parquet(paths.ledger_path)
     ledger["signal_bar_time"] = pd.to_datetime(ledger["signal_bar_time"], utc=True)
     ledger["entry_time"] = pd.to_datetime(ledger["entry_time"], utc=True)
     ledg_p = ledger[ledger["pair"] == pair].sort_values("signal_bar_time").reset_index(drop=True)
@@ -204,7 +223,7 @@ def run_pair(pair: str, *, h4_bars: int = DEFAULT_H4_BARS, d1_bars: int = DEFAUL
         bar_open = h4_dates.iloc[i]
         d1_win = df_d1_bid[d1_dates <= bar_open].tail(d1_bars).reset_index(drop=True)
 
-        sig = run_signal(h4_win, d1_win, pair)
+        sig = run_signal(h4_win, d1_win, pair, convention=convention)
         sidecar_fires = sig is not None
         lab_fires = bool(lab["signal"].iloc[i])
 
@@ -291,6 +310,7 @@ def run_pair(pair: str, *, h4_bars: int = DEFAULT_H4_BARS, d1_bars: int = DEFAUL
     div_df = pd.DataFrame(div_rows)
     summary = {
         "pair": pair,
+        "convention": convention,
         "h4_bars": h4_bars,
         "d1_bars": d1_bars,
         "n_candidate_bars": int(positions.size),
@@ -310,9 +330,9 @@ def run_pair(pair: str, *, h4_bars: int = DEFAULT_H4_BARS, d1_bars: int = DEFAUL
     }
 
     if write:
-        OUT_DIR.mkdir(parents=True, exist_ok=True)
+        paths.out_dir.mkdir(parents=True, exist_ok=True)
         if len(div_df) > 0:
-            div_df.to_parquet(OUT_DIR / f"divergence_{pair}.parquet",
+            div_df.to_parquet(paths.out_dir / f"divergence_{pair}.parquet",
                               engine="pyarrow", compression="snappy", index=False)
 
     _print_summary(summary, ledger_uncovered)
@@ -361,17 +381,22 @@ def main(argv=None) -> int:
     p = argparse.ArgumentParser(description="Phase 2 parity validation harness")
     p.add_argument("--pair", type=str, default=None)
     p.add_argument("--all", action="store_true")
+    p.add_argument("--convention", type=str, default="utc", choices=("utc", "5ers_eet"))
     p.add_argument("--h4-bars", type=int, default=DEFAULT_H4_BARS)
     p.add_argument("--d1-bars", type=int, default=DEFAULT_D1_BARS)
     args = p.parse_args(argv)
 
     if args.pair:
-        run_pair(args.pair, h4_bars=args.h4_bars, d1_bars=args.d1_bars)
+        run_pair(args.pair, convention=args.convention, h4_bars=args.h4_bars, d1_bars=args.d1_bars)
         return 0
     if args.all:
-        summaries = [run_pair(pair, h4_bars=args.h4_bars, d1_bars=args.d1_bars) for pair in PAIRS]
-        OUT_DIR.mkdir(parents=True, exist_ok=True)
-        pd.DataFrame(summaries).to_parquet(OUT_DIR / "parity_summaries.parquet", index=False)
+        out_dir = ConventionPaths(args.convention).out_dir
+        summaries = [
+            run_pair(pair, convention=args.convention, h4_bars=args.h4_bars, d1_bars=args.d1_bars)
+            for pair in PAIRS
+        ]
+        out_dir.mkdir(parents=True, exist_ok=True)
+        pd.DataFrame(summaries).to_parquet(out_dir / "parity_summaries.parquet", index=False)
         return 0
     p.error("specify --pair PAIR or --all")
     return 2

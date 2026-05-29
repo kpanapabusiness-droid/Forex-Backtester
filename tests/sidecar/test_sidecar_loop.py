@@ -4,12 +4,17 @@ from __future__ import annotations
 
 import json
 from datetime import datetime, timezone
+from types import SimpleNamespace
 
 import pytest
 
 from deployment.sidecar.config import load_sidecar_config
 from deployment.sidecar.sidecar import _loop_iteration, main_loop, verify_mt5_h4_alignment
 from deployment.sidecar.state_manager import load_state
+
+
+def _broker_epoch(y, m, d, h):
+    return int(datetime(y, m, d, h, tzinfo=timezone.utc).timestamp())
 
 
 def test_loop_iteration_writes_heartbeat_and_state(
@@ -63,5 +68,58 @@ def test_verify_mt5_h4_alignment_rejects_drifted_bars(fake_mt5):
 
     drifted = _synth_h4_panel(n_bars=24, start_iso="2026-01-01T01:00:00")
     fake_mt5.h4_panel = drifted
-    with pytest.raises(Exception, match="non-UTC-anchored bars"):
+    with pytest.raises(Exception, match="off the 'utc' grid"):
         verify_mt5_h4_alignment(fake_mt5, probe_symbol="EURUSD", probe_count=6)
+
+
+def test_verify_mt5_h4_alignment_eet_accepts_broker_local_anchored_bars(fake_mt5):
+    """FundedNext: the broker emits bars at LOCAL 00/04/.../20 (EET/EEST). The
+    fetcher normalises those to the EET-anchored UTC instants, which the EET
+    probe must accept. (conftest's panel epochs are at local 00/04/.../20.)"""
+    verify_mt5_h4_alignment(
+        fake_mt5, probe_symbol="EURUSD", probe_count=6, convention="5ers_eet"
+    )
+
+
+def test_verify_mt5_h4_alignment_eet_rejects_drifted_bars(fake_mt5):
+    """Broker-local bars at 01:00/05:00/... are off the EET grid → refuse."""
+    from tests.sidecar.conftest import _synth_h4_panel
+
+    drifted = _synth_h4_panel(n_bars=24, start_iso="2026-01-01T01:00:00")
+    fake_mt5.h4_panel = drifted
+    with pytest.raises(Exception, match="off the '5ers_eet' grid"):
+        verify_mt5_h4_alignment(
+            fake_mt5, probe_symbol="EURUSD", probe_count=6, convention="5ers_eet"
+        )
+
+
+def test_verify_broker_offset_eet_winter_pass(fake_mt5):
+    """EET winter: a server correctly applying +2 passes the offset sanity check."""
+    now = datetime(2024, 1, 15, 12, 0, tzinfo=timezone.utc)
+    fake_mt5.symbol_info_tick = lambda sym: SimpleNamespace(
+        time=_broker_epoch(2024, 1, 15, 14)  # broker wall clock = now + 2h
+    )
+    verify_mt5_h4_alignment(
+        fake_mt5,
+        probe_symbol="EURUSD",
+        probe_count=6,
+        convention="5ers_eet",
+        now_func=lambda: now,
+    )
+
+
+def test_verify_broker_offset_eet_rejects_server_stuck_on_utc(fake_mt5):
+    """A misconfigured server that fails to apply EU DST still emits on-grid
+    bars but at the wrong absolute offset (here 0h vs expected +2h) → refuse."""
+    now = datetime(2024, 1, 15, 12, 0, tzinfo=timezone.utc)
+    fake_mt5.symbol_info_tick = lambda sym: SimpleNamespace(
+        time=_broker_epoch(2024, 1, 15, 12)  # broker wall clock = now (no offset)
+    )
+    with pytest.raises(Exception, match="offset sanity check failed"):
+        verify_mt5_h4_alignment(
+            fake_mt5,
+            probe_symbol="EURUSD",
+            probe_count=6,
+            convention="5ers_eet",
+            now_func=lambda: now,
+        )

@@ -162,6 +162,14 @@ results/l_arc_10_v3_0_2_utc_rerun/**/*_run.log
 !results/phase_2_parity/parity_report.md
 !results/phase_2_parity/divergence_ledger.parquet
 !results/phase_2_parity/parity_summaries.parquet
+# Phase 2 EET (FundedNext 5ers_eet convention) — report + consolidated parity
+# artefacts + the EET ground-truth ledger tracked; per-pair divergence_<PAIR>.parquet
+# are regenerable intermediates (regen via parity_harness.py --convention 5ers_eet).
+!results/phase_2_parity_eet/
+!results/phase_2_parity_eet/parity_report.md
+!results/phase_2_parity_eet/divergence_ledger_eet.parquet
+!results/phase_2_parity_eet/parity_summaries.parquet
+!results/phase_2_parity_eet/trade_ledger_eet.parquet
 # Arc 11 v3.0 (swing-high breakout in trend, long, 4H) — closure + artefacts
 # tracked per L_PROTOCOL v3.0 §6. Trade-path parquet excluded (>40 MB; regen
 # from script + config). v2-era trades_paths.csv name also excluded.

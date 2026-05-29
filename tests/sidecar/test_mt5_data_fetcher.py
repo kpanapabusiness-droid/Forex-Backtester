@@ -2,16 +2,26 @@
 
 from __future__ import annotations
 
+from datetime import datetime, timezone
+
 import numpy as np
 import pandas as pd
 import pytest
 
+from deployment.sidecar.boundary import CONVENTION_EET, CONVENTION_UTC
 from deployment.sidecar.mt5_data_fetcher import (
     Mt5FetchError,
+    _rates_to_df,
     fetch_d1_bars,
     fetch_h4_bars,
     with_mt5_initialize,
 )
+
+
+def _broker_epoch(y, m, d, h):
+    """MT5 ``time`` for a broker wall-clock instant: the wall-clock numbers
+    encoded as 'seconds since 1970 as if UTC'."""
+    return int(datetime(y, m, d, h, tzinfo=timezone.utc).timestamp())
 
 
 def test_fetch_h4_returns_canonical_dataframe(fake_mt5):
@@ -94,3 +104,46 @@ def test_h4_timestamps_are_utc_naive_and_anchored(fake_mt5):
     assert pd.Timestamp(first).tz is None
     assert pd.Timestamp(first).hour in (0, 4, 8, 12, 16, 20)
     assert pd.Timestamp(first).minute == 0
+
+
+def _rates(epochs):
+    return [
+        {"time": e, "open": 1.0, "high": 1.1, "low": 0.9, "close": 1.05} for e in epochs
+    ]
+
+
+def test_utc_convention_passes_broker_time_through_unchanged():
+    """5ers: broker server runs UTC, so the epoch decodes directly to UTC."""
+    rates = _rates([_broker_epoch(2013, 1, 14, 0)])
+    df = _rates_to_df(rates, source="t", convention=CONVENTION_UTC)
+    assert pd.Timestamp(df["date"].iloc[0]) == pd.Timestamp("2013-01-14 00:00:00")
+
+
+def test_eet_convention_winter_normalizes_to_true_utc():
+    """FundedNext winter (UTC+2): broker wall-clock Mon 00:00 EET-local must
+    normalise to the true UTC instant Sun 22:00."""
+    rates = _rates([_broker_epoch(2013, 1, 14, 0)])
+    df = _rates_to_df(rates, source="t", convention=CONVENTION_EET)
+    assert pd.Timestamp(df["date"].iloc[0]) == pd.Timestamp("2013-01-13 22:00:00")
+    assert df["date"].dtype == np.dtype("datetime64[ns]")
+    assert df["date"].dt.tz is None
+
+
+def test_eet_convention_summer_normalizes_to_true_utc():
+    """FundedNext summer (UTC+3): broker wall-clock 12:00 EEST-local → 09:00 UTC."""
+    rates = _rates([_broker_epoch(2024, 7, 8, 12)])
+    df = _rates_to_df(rates, source="t", convention=CONVENTION_EET)
+    assert pd.Timestamp(df["date"].iloc[0]) == pd.Timestamp("2024-07-08 09:00:00")
+
+
+def test_eet_convention_resolves_dst_per_bar():
+    """A single fetch spanning the spring-forward boundary applies +2 before and
+    +3 after, resolved by the tz db (broker wall-clock 12:00 each day)."""
+    rates = _rates(
+        [_broker_epoch(2019, 3, 29, 12), _broker_epoch(2019, 4, 1, 12)]
+    )
+    df = _rates_to_df(rates, source="t", convention=CONVENTION_EET)
+    # 2019-03-29 winter: 12:00 EET → 10:00 UTC.
+    assert pd.Timestamp(df["date"].iloc[0]) == pd.Timestamp("2019-03-29 10:00:00")
+    # 2019-04-01 summer: 12:00 EEST → 09:00 UTC.
+    assert pd.Timestamp(df["date"].iloc[1]) == pd.Timestamp("2019-04-01 09:00:00")

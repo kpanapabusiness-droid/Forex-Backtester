@@ -139,7 +139,7 @@ During s8 investigation, the user noticed P&L numbers didn't match expected. Tra
 
 | Artifact | Path |
 |---|---|
-| Scenario definitions | `tests/ea/scenarios.json` |
+| Scenario definitions | `tests/ea/scenarios/scenarios.json` |
 | Synthetic sidecar | `tests/ea/fake_sidecar.py` |
 | EA source | `deployment/ea/Arc10_DLR_Sidecar_EA.mq5` + includes |
 | Sample trade_log outputs | Captured in chat history during dispatches |

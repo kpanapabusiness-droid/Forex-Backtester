@@ -44,7 +44,7 @@
 
 ### Token PAT exposure remediation
 **Status:** open (operator decision)
-**What:** GitHub fine-grained PAT was pasted into chat during VPS deployment session. Token starts with `github_pat_11BWNZKSA0...`.
+**What:** GitHub fine-grained PAT was pasted into chat during VPS deployment session. Token value redacted from this doc (`github_pat_[REDACTED]`).
 **Risk:** anyone reading the chat history has read/write access to the repo until token expires (Aug 27, 2026 per session memory).
 **Resolution path:** revoke the token; generate new one; update VPS git remote URL.
 **Status note:** operator declined to revoke. Token expires Aug 2026 regardless. Decision logged.

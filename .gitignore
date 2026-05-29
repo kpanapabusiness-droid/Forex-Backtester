@@ -118,6 +118,14 @@ results/l_arc_2_redo2/**/_run_log.txt
 # Exclude the multi-MB raw run log (the run_summary.json + closure capture
 # the verdict and metrics).
 results/l_arc_7_v3.0.2/run.log
+# Arc 5 v3.0.2 — mtf_alignment.2_down_mixed.kijun.h_120 — first canonical
+# 5ers_eet test with canonical W1 producer (PR #208). Step 1-5+ artefacts;
+# A1-only rerun after initial 8h wall-budget HALT on full Amendment-5 grid.
+!results/l_arc_5_v3.0.2/
+!results/l_arc_5_v3.0.2/**
+# Exclude the multi-MB raw run log (the run_summary.json + closure capture
+# the verdict and metrics).
+results/l_arc_5_v3.0.2/run.log
 # Arc 8 (PR-HHHL pullback-resume, long, 4H) — Step 1+ outputs
 # (L_ARC_PROTOCOL v2.3 §13: arc results data is direct-to-main).
 !results/l_arc_8/

@@ -41,6 +41,16 @@ def _build_arg_parser() -> argparse.ArgumentParser:
         help="Run N cycles then exit (default: run forever)",
     )
     p.add_argument(
+        "--quick-test",
+        action="store_true",
+        help=(
+            "Diagnostic: bypass the wait-for-next-H4-close sleep, run one "
+            "cycle immediately against the most-recently-closed H4 bar, then "
+            "exit. Implies --iterations 1. Anchor probe + heartbeat still run; "
+            "real production output path (no special filenames)."
+        ),
+    )
+    p.add_argument(
         "--log-level",
         default="INFO",
         choices=("DEBUG", "INFO", "WARNING", "ERROR"),
@@ -60,7 +70,10 @@ def main(argv: list[str] | None = None) -> int:
         sidecar_yaml_path=args.sidecar_config,
         sidecar_root=args.sidecar_root,
     )
-    initialize_and_run(cfg, iterations=args.iterations)
+    # --quick-test runs exactly one cycle; honour an explicit --iterations only
+    # to stay consistent, but a single immediate run is always implied.
+    iterations = 1 if args.quick_test else args.iterations
+    initialize_and_run(cfg, iterations=iterations, quick_test=args.quick_test)
     return 0
 
 

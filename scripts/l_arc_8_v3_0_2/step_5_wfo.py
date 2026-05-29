@@ -40,8 +40,6 @@ from pathlib import Path
 import pandas as pd
 
 from core.arc.arc_orchestrator import ArcConfig, ArcOrchestrator
-from core.arc.arc_pool_builder import ArcPool
-from core.arc.signal_protocol import SignalEvaluation
 from core.architectures._protocol import Architecture
 from core.architectures.a1_system_level_filter import (
     A1Architecture,
@@ -249,7 +247,8 @@ def main() -> Path:
     feat_df = pd.read_parquet(RESULTS_ROOT / "step_1" / "features.parquet")
     lineage_df = pd.read_csv(RESULTS_ROOT / "step_1" / "feature_lineage.csv")
     assignments = pd.read_parquet(RESULTS_ROOT / "step_2" / "cluster_assignments.parquet")
-    cap_df = pd.read_csv(RESULTS_ROOT / "step_3" / "capturability.csv")
+    # Step 3 capturability is consumed by the Step 4 admission JSON we read below;
+    # not needed at Step 5 dispatch time.
     admission = json.loads((RESULTS_ROOT / "step_4" / "amendment_5_admission.json").read_text(encoding="utf-8"))
     print(f"[step5] pool: {len(pool_my)} trades, paths: {len(paths_my)} rows, features: {feat_df.shape}")
 

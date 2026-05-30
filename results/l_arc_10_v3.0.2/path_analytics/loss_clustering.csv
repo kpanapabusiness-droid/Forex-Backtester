@@ -1,0 +1,11 @@
+metric,value
+n_trades,3152.0
+win_rate,0.7135152284263959
+runs_observed,998.0
+runs_expected,1289.608502538071
+runs_z,-12.707846787224842
+runs_p,5.3486978774630064e-37
+max_losing_streak,10.0
+dispersion_index_month,1.873106738223017
+dispersion_index_week,1.898138355383436
+base_loss_rate,0.2864847715736041

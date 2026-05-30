@@ -190,6 +190,13 @@ results/l_arc_10_v3.0.2_canonical/**/*_run.log
 results/l_arc_10_v3.0.2_canonical_compound/**/trade_paths.parquet
 results/l_arc_10_v3.0.2_canonical_compound/**/run.log
 results/l_arc_10_v3.0.2_canonical_compound/**/*_run.log
+# Arc 10 v3.0.2 EA-FAITHFUL WFO (floating-equity sizing — the basis-correct
+# canonical; supersedes linear + closed-equity compound). results/* deny-by-default.
+!results/l_arc_10_v3.0.2_ea_faithful/
+!results/l_arc_10_v3.0.2_ea_faithful/**
+results/l_arc_10_v3.0.2_ea_faithful/**/trade_paths.parquet
+results/l_arc_10_v3.0.2_ea_faithful/**/run.log
+results/l_arc_10_v3.0.2_ea_faithful/**/*_run.log
 # Arc 10 v3.0.2 UTC convention rerun (phase/arc_10_v3_0_2_utc_rerun).
 # Same artefact-tracking pattern as v3.0.2; trade_paths.parquet is byte-identical
 # to results/l_arc_10/step_1/trade_paths.parquet (verified by sha256 in

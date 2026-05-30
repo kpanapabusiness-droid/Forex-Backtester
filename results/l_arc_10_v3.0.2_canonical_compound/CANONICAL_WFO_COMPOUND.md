@@ -1,5 +1,15 @@
 # Arc 10 v3.0.2 — CANONICAL WFO, COMPOUND SIZING (FundedNext, EET, 3.5R)
 
+> ⚠️ **SUPERSEDED (2026-05-31) — CLOSED-EQUITY SIZING BASIS.** This run sized off
+> *closed* equity (`e_bal`, excluding floating). The live EA sizes off
+> `ACCOUNT_EQUITY` **including floating open P&L** (`PositionManager.mqh:143`), so the
+> basis-correct canonical is now
+> [`results/l_arc_10_v3.0.2_ea_faithful/EA_FAITHFUL_WFO.md`](../l_arc_10_v3.0.2_ea_faithful/EA_FAITHFUL_WFO.md).
+> Cite the EA-faithful run for every figure. Good news: the floating-vs-closed
+> procyclical delta is **benign** (+0.16pp worst-fold trailing DD at 0.50% gov-on),
+> so the closed-equity numbers below are close to the live basis; the **launch-at-0.40%
+> decision stands** (0.40% trailing 8.21%, daily 4.11%; 0.50% trailing 10.89%, daily 5.16%).
+
 > **Supersedes the linear canonical run** ([`results/l_arc_10_v3.0.2_canonical/`](../l_arc_10_v3.0.2_canonical/CANONICAL_WFO.md)). Same structure; corrected sizing basis. The linear run sized fixed-%-of-INITIAL; the live EA sizes **fixed-%-of-CLOSED-EQUITY at each trade's open** (concurrent opens share the snapshot; equity steps only on close; per-fold reset, compound within fold). Every ROI/DD recomputed via `simulate_continuous(compound=True)` run per fold — no re-implementation. v3.0.2 LOCKED; governors EA-faithful, not tuned. Costs ON (cell 5); r_base {0.40%,0.50%}; EET; frame sha `05dea9…9ee58a`; deterministic (two-run sha identity); PR-gated.
 
 > **Validation gate PASSED** (frame integrity): linear zero-cost + governors-OFF reproduces the **9.22%** portfolio worst-fold trailing DD (abort-if-not).

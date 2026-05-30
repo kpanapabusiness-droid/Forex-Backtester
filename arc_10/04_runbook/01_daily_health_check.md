@@ -55,6 +55,7 @@ Get-Content "C:\Users\Administrator\AppData\Roaming\MetaQuotes\Terminal\Common\F
 - Repeated tracebacks → check error message, may need bug fix
 - "anchor probe failed" → MT5 broker disconnected at boot or config mismatch
 - Multiple consecutive cycles with NO pairs processed → MT5 lost connection
+- `FLOOR_FAIL` / `halted_floor_unset` in the EA journal or `ea.heartbeat` → `Initial_Equity_Floor` is unset or `< 5000`; the EA has halted and is not trading (see floor note below)
 
 If anything looks bad, refer to `04_incident_response.md`.
 
@@ -67,6 +68,16 @@ If you want to look at the MT5 windows:
 - Each chart with EA attached shows smiley face icon (top-right)
 - Experts tab at bottom shows recent `[ARC10] ...` log lines (no errors)
 - No red "X" icons or warning popups
+
+## After an EA reattach / recompile — confirm the DD floor
+
+The total-DD floor is an operator-set input (`Initial_Equity_Floor`), not auto-captured (OPEN-001, fix `b386287`). **After any EA reattach or recompile:**
+
+1. Set `Initial_Equity_Floor` to the broker's **static** starting balance (5ers and FundedNext are set independently; the value is per-account, operator-held).
+2. Confirm the EA journal shows `equity init: floor=<value> source=input` — `source=input` is the proof it is operator-set, not captured.
+3. A `FLOOR_FAIL` / halt means the floor is unset or `< 5000` — the EA refuses to trade until you set it. Fix the input and reattach.
+
+The value survives terminal restart via the MT5 saved profile, so this is normally a one-time action per account (and again only on a broker scale-up — edit the input and reattach). Full record: [`../05_history/07_open_issue_dd_restart_rebaselining.md`](../05_history/07_open_issue_dd_restart_rebaselining.md).
 
 ## What to do if everything looks good
 

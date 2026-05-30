@@ -48,6 +48,7 @@ Attached to **ONE chart** on the 5ers MT5 (any pair; EURUSD H4 is the convention
 | Input | Value |
 |---|---|
 | Risk_Per_Trade | `0.0040` |
+| **Initial_Equity_Floor** | _operator-set; the broker's **static starting balance** (per-account, not committed here)_ |
 | Total_DD_Halt_Pct | `0.07` |
 | Total_DD_CloseAll_Pct | `0.08` |
 | Daily_DD_Halt_Pct | `0.035` |
@@ -73,6 +74,8 @@ Attached to **ONE chart** on the 5ers MT5 (any pair; EURUSD H4 is the convention
 | Signal_Poll_Min_Interval_Sec | `5` |
 
 Plus on the Common tab: ✅ "Allow Algo Trading".
+
+> **`Initial_Equity_Floor` (OPEN-001, `b386287`).** The total-DD floor is now a solely operator-set input — there is **no live-equity capture**. Set it to the broker's static starting balance and confirm the journal shows `equity init: floor=<value> source=input`. If it is left unset / `< 5000`, the EA **fails loud**: refuses to trade, fires `Alert()`, and journals `FLOOR_FAIL`. The value survives terminal restart via the MT5 saved profile; a broker scale-up is handled by editing this input and reattaching (manual). See [`../05_history/07_open_issue_dd_restart_rebaselining.md`](../05_history/07_open_issue_dd_restart_rebaselining.md).
 
 ## News filter URL whitelisted in MT5
 

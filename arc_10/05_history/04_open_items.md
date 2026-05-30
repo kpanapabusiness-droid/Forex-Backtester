@@ -12,6 +12,12 @@
 
 ## Open
 
+### Sidecar does not consume the EA `ea.heartbeat` `status` field (OPEN-001 residual #1)
+**Status:** open (next discrete task)
+**What:** the OPEN-001 fail-loud condition writes `status: halted_floor_unset` to `ea.heartbeat`, but `sidecar.py` doesn't read that field. On an *unattended* VPS a floor-fail halt is signalled only by the in-terminal `Alert()` + journal `FLOOR_FAIL` token — it is not pushed to the operator.
+**Why it matters:** without an unattended alert path, a halted-on-unset-floor EA could sit halted (not trading, not protecting) without the operator knowing until the next manual check.
+**Resolve when:** wire the always-up sidecar to grep the journal `FLOOR_FAIL` token or read the heartbeat `status` field, producing an operator alert. See [`07_open_issue_dd_restart_rebaselining.md`](07_open_issue_dd_restart_rebaselining.md) (residual #1).
+
 ### §6.1-A TP1/SL same-bar diagnostic
 **Status:** open (deferred)
 **What:** scenario s8 (same-bar TP1 + SL touch) couldn't be engineered against real broker data. No canonical-R candidate exists where price traverses 4.5×ATR within a single H4 bar.
@@ -95,7 +101,10 @@
 
 ## Resolved
 
-(Move items here with resolution date when closed. Starts empty.)
+### OPEN-001 — EA restart re-baselines the total-DD floor
+**Status:** resolved (2026-05-30)
+**What:** the total-DD floor was snapshotted from live equity at every `OnInit`, so a mid-drawdown restart re-baselined it downward and could sink the EA halt below the broker's static termination point (silent protection failure).
+**Resolution:** `b386287` (#242) — floor is now a solely operator-set `Initial_Equity_Floor` input, used directly with no live-equity capture, fail-loud below `5000`. Full record: [`07_open_issue_dd_restart_rebaselining.md`](07_open_issue_dd_restart_rebaselining.md).
 
 ## How to add new items
 

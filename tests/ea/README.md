@@ -10,7 +10,8 @@ parse path is exercised exactly as in production.
 
 ## Scenarios
 
-12 scenarios per dispatch §4.2 / `phase_1_build_intent.md` §5.2 — see
+17 scenarios — s1-s12 per dispatch §4.2 / `phase_1_build_intent.md`
+§5.2; s13-s17 per the OPEN-001 floor-fix dispatch. See
 [scenarios/scenarios.json](scenarios/scenarios.json) for the full
 spec. Summary:
 
@@ -28,6 +29,22 @@ spec. Summary:
 | s10 | EA restart mid-trade, post-partial                   | RecoveryManager reconstruction (post-tp1)            |
 | s11 | Sidecar stale heartbeat                              | EA-side heartbeat-stale degradation                  |
 | s12 | Invalid config_hash                                  | Schema validation reject path                        |
+| s13 | Floor set, restart — floor unchanged                 | Operator-set floor survives restart (source=input)   |
+| s14 | Floor=100000, equity below floor, restart            | Floor decoupled from live equity (the original bug)  |
+| s15 | Floor 100000 → 125000                                | Manual scale-up via input edit                       |
+| s16 | Floor=125000, equity below floor, restart            | Decoupling holds at scaled-up anchor                 |
+| s17 | Floor input = 0                                       | Fail-loud: halt + Alert + sentinel-fail + heartbeat  |
+
+**s13-s17 (floor fix).** The total-DD floor is solely operator-set via
+the `Initial_Equity_Floor` input — static, never captured from live
+equity. Observable for all five is the
+`[ARC10] equity init: floor=… source=…` journal line
+(`source=input` on success, `source=sentinel-fail` on the unset/
+implausible path). These are restart-driven (s9/s10 input-edit trigger)
+and input-override scenarios; s17 additionally checks the fail-loud
+`Alert`, the `[ARC10] FLOOR_FAIL` journal token, the
+`ea.heartbeat` `"status": "halted_floor_unset"` line, and an
+`equity_block` row with reason `floor_unset_halt`.
 
 ## Running a scenario
 
@@ -133,7 +150,7 @@ documented expectations.
 
 The Python side IS testable locally — `tests/sidecar/test_signal_emitter.py`
 covers schema validation, and the test below verifies `fake_sidecar`
-produces valid envelopes for all 12 scenarios:
+produces valid envelopes for all 17 scenarios:
 
 ```bash
 py -m pytest tests/ea/test_fake_sidecar.py -v

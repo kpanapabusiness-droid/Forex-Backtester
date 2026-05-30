@@ -11,13 +11,17 @@
 
 #include "SignalPoller.mqh"
 #include "TradeLogger.mqh"
+#include "EquityGuards.mqh"   // g_arc_eq_floor_fail (status surfaced to sidecar)
 
 void ArcEaHeartbeatWrite(const string path)
   {
    string ts = ArcUtcIsoZ(TimeGMT());
+   // ``status`` is the EA's outward state line for the always-up sidecar:
+   // "halted_floor_unset" signals a fail-loud floor halt (see EquityGuards).
+   string status = g_arc_eq_floor_fail ? "halted_floor_unset" : "ok";
    string body = StringFormat(
-      "{\n  \"last_heartbeat_utc\": \"%s\",\n  \"ea_pid_proxy\": %d,\n  \"positions_tracked\": %d\n}\n",
-      ts, (int)AccountInfoInteger(ACCOUNT_LOGIN), g_arc_pos_count);
+      "{\n  \"last_heartbeat_utc\": \"%s\",\n  \"ea_pid_proxy\": %d,\n  \"positions_tracked\": %d,\n  \"status\": \"%s\"\n}\n",
+      ts, (int)AccountInfoInteger(ACCOUNT_LOGIN), g_arc_pos_count, status);
    string tmp = path + ".tmp";
    int h = FileOpen(tmp, FILE_WRITE | FILE_TXT | FILE_ANSI | FILE_COMMON);
    if(h == INVALID_HANDLE)

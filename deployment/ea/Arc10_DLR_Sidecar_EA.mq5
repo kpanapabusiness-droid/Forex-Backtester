@@ -30,6 +30,7 @@
 
 // ─── EA inputs ────────────────────────────────────────────────────
 input double  Risk_Per_Trade              = 0.0043;    // UTC r_safe
+input double  Initial_Equity_Floor        = 0;         // operator-set static total-DD anchor; 0 = unset (fail-loud halt)
 input double  Total_DD_Halt_Pct           = 0.07;
 input double  Total_DD_CloseAll_Pct       = 0.08;
 input double  Daily_DD_Halt_Pct           = 0.035;
@@ -465,7 +466,7 @@ int OnInit()
       ArcPositionReset(i);
    for(int i = 0; i < ARC10_MAX_DEFERRED; i++)
       g_deferred[i].in_use = false;
-   ArcEquityInit();
+   ArcEquityInit(Initial_Equity_Floor);
    ArcNewsEnsureInit();
    ArcRecoveryRun(Magic_Number, SL_ATR_Multiplier_Expected, Trade_Log_Path);
    ArcPositionsSave(Ea_Positions_Path);

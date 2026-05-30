@@ -17,7 +17,8 @@
 
 #include "PositionManager.mqh"
 
-double   g_arc_eq_total_floor = 0.0;       // initial account equity (high water for total DD)
+double   g_arc_eq_total_floor = 0.0;       // operator-set static total-DD anchor (Initial_Equity_Floor)
+bool     g_arc_eq_floor_fail = false;      // true if floor input unset/implausible → EA halts (fail-loud)
 double   g_arc_eq_day_start = 0.0;         // equity at start of current EET day
 datetime g_arc_eq_day_start_utc = 0;       // EET-day-start instant in UTC
 bool     g_arc_eq_entries_halted_today = false;
@@ -93,18 +94,40 @@ datetime ArcLastSunOfMonthUtc(int year, int month, int hour, int min, int sec)
   }
 
 //+------------------------------------------------------------------+
-//| Called at OnInit. Snapshots floor + current EET-day start.        |
+//| Called at OnInit. Sets the operator-supplied STATIC total-DD floor |
+//| and the current EET-day start for daily DD.                        |
+//|                                                                    |
+//| Total-DD floor is solely operator-set (``Initial_Equity_Floor``):  |
+//| static, anchored to initial / last-scale-up balance, never trails, |
+//| no live-equity capture. An unset/implausible floor (<= 0 or        |
+//| < 1000) HALTS the EA (fail-loud) rather than silently capturing    |
+//| live equity — this makes correctness independent of MT5            |
+//| profile-persistence. Daily DD stays floating/equity-based and is   |
+//| anchored here to current live equity — deliberately untouched.     |
 //+------------------------------------------------------------------+
-void ArcEquityInit()
+void ArcEquityInit(double floor_input)
   {
-   g_arc_eq_total_floor = AccountInfoDouble(ACCOUNT_EQUITY);
+   if(floor_input < 1000.0)   // covers 0 = unset and implausibly-small values
+     {
+      g_arc_eq_floor_fail = true;
+      g_arc_eq_total_floor = 0.0;
+      Alert("[ARC10] FLOOR UNSET — EA halted, set Initial_Equity_Floor");
+      PrintFormat("[ARC10] ERROR FLOOR_FAIL: Initial_Equity_Floor=%.2f implausible "
+                  "(<= 0 or < 1000) — EA halted, no entries will be placed", floor_input);
+      PrintFormat("[ARC10] equity init: floor=%.2f source=sentinel-fail", g_arc_eq_total_floor);
+     }
+   else
+     {
+      g_arc_eq_floor_fail = false;
+      g_arc_eq_total_floor = floor_input;
+      PrintFormat("[ARC10] equity init: floor=%.2f source=input", g_arc_eq_total_floor);
+     }
+   // Daily DD anchor — floating/equity-based, NOT the floor. Untouched.
    g_arc_eq_day_start_utc = ArcEetDayStartUtc(TimeGMT());
-   g_arc_eq_day_start = g_arc_eq_total_floor;
+   g_arc_eq_day_start = AccountInfoDouble(ACCOUNT_EQUITY);
    g_arc_eq_entries_halted_today = false;
    g_arc_eq_entries_halted_total = false;
    g_arc_eq_close_all_pending = false;
-   PrintFormat("[ARC10] equity init: floor=%.2f day_start_utc=%s",
-               g_arc_eq_total_floor, TimeToString(g_arc_eq_day_start_utc));
   }
 
 //+------------------------------------------------------------------+
@@ -117,6 +140,11 @@ bool ArcEquityOnTick(
    double total_halt_pct,
    double total_close_all_pct)
   {
+   // Floor unset → EA is halted; never compute total DD against a bogus
+   // (zero) floor or auto-close on it. Entries are already blocked at
+   // ArcEquityAllowEntry, so there is nothing to close.
+   if(g_arc_eq_floor_fail)
+      return false;
    // EET-day rollover.
    datetime current_day_utc = ArcEetDayStartUtc(TimeGMT());
    if(current_day_utc != g_arc_eq_day_start_utc)
@@ -154,6 +182,11 @@ bool ArcEquityOnTick(
 //+------------------------------------------------------------------+
 bool ArcEquityAllowEntry(string &reason_out)
   {
+   if(g_arc_eq_floor_fail)
+     {
+      reason_out = "floor_unset_halt";
+      return false;
+     }
    if(g_arc_eq_entries_halted_total)
      {
       reason_out = "total_dd_halt";

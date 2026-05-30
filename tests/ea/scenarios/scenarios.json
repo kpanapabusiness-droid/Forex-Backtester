@@ -1,5 +1,5 @@
 {
-  "$comment": "12 Strategy Tester scenarios per dispatch §4.2 / phase_1_build_intent.md §5.2. Schema 1.3 reflects Option 1 + Bug A fix: exit reason vocabulary replaced opaque 'broker_closed' with strategic reasons {trail_stop, initial_sl_hit, equity_guard_force, external_close, time_exit}, and broker-side exit rows now carry actual fill_price via deal-history lookup. schema 1.2 re-validated dates under canonical R (1R = sl_distance_price = sl_atr_mult × ATR per core/sim/exit_policies/_base.py:95) after the r_atr fix in commit 164ffb5. historical_signal_bar_close carries the verified date for price-driven scenarios — picked by scanning HistData M1 for real-market sequences that produce each scenario's expected play.",
+  "$comment": "19 Strategy Tester scenarios per dispatch §4.2 / phase_1_build_intent.md §5.2 + OPEN-001 floor-fix dispatch (s13-s17) + OPEN-001 daily-anchor correction (s18-s19). Schema 1.3 reflects Option 1 + Bug A fix: exit reason vocabulary replaced opaque 'broker_closed' with strategic reasons {trail_stop, initial_sl_hit, equity_guard_force, external_close, time_exit}, and broker-side exit rows now carry actual fill_price via deal-history lookup. schema 1.2 re-validated dates under canonical R (1R = sl_distance_price = sl_atr_mult × ATR per core/sim/exit_policies/_base.py:95) after the r_atr fix in commit 164ffb5. historical_signal_bar_close carries the verified date for price-driven scenarios — picked by scanning HistData M1 for real-market sequences that produce each scenario's expected play. s13-s17 verify the OPEN-001 fix: Total-DD floor is solely operator-set (Initial_Equity_Floor input), static, never captured from live equity; observable is the '[ARC10] equity init: floor=… source=…' journal line. Schema structure unchanged from 1.3 (new scenarios reuse existing fields + ea_input_overrides).",
   "schema_version": "1.3",
   "scenarios": [
     {
@@ -169,6 +169,118 @@
       "historical_signal_bar_close": "2026-03-10T08:00:00Z",
       "st_date_range": ["2026-03-09", "2026-03-11"],
       "setup_note": "BAD_HASH_OVERRIDE: pass --config-hash \"1111111111111111111111111111111111111111111111111111111111111111\" (or any 64-char value != EA's Expected_Config_Hash). Verify in journal: [ARC10] signal parse failed EURUSD_...: config_hash_mismatch and envelope moved to signals_failed\\."
+    },
+    {
+      "id": "s13",
+      "title": "Floor input set, EA restarted — floor unchanged after restart",
+      "pair": "EURUSD",
+      "signal_bar_close_price": 1.0842,
+      "atr14": 0.00214,
+      "narrative": "Operator sets Initial_Equity_Floor=100000. EA inits; journal shows floor=100000.00 source=input. EA is restarted via input-edit (forces OnInit, same trigger as s9/s10). After restart the floor is re-read from the input and is still 100000.00 source=input — it is NOT recaptured from live equity, so it is independent of MT5 profile-persistence.",
+      "expected_events": [],
+      "expected_exit_reason_substring": "",
+      "historical_signal_bar_close": "2026-03-10T08:00:00Z",
+      "st_date_range": ["2026-03-09", "2026-03-11"],
+      "ea_input_overrides": {
+        "Initial_Equity_Floor": 100000
+      },
+      "setup_note": "FLOOR_RESTART: set Initial_Equity_Floor=100000 in the EA inputs. Start tester; verify journal '[ARC10] equity init: floor=100000.00 source=input'. While running, edit any OTHER EA input (e.g. a whitespace-neutral toggle) to force a restart per the s9/s10 input-edit procedure; verify the post-restart init line again reads floor=100000.00 source=input. PASS = floor value identical across both inits and source=input both times. No trade events expected (logging/observable-only verification)."
+    },
+    {
+      "id": "s14",
+      "title": "Floor=100000, equity below floor, restart — floor still 100000 (bug case)",
+      "pair": "EURUSD",
+      "signal_bar_close_price": 1.0842,
+      "atr14": 0.00214,
+      "narrative": "The original-bug case. Initial_Equity_Floor=100000 while live equity sits below the floor (target ~94000). EA is restarted. Under the old code the floor would be re-snapshotted from live equity (94000), permanently lowering the total-DD anchor. Under the fix the floor is re-read from the input and stays 100000.00 source=input — the floor is decoupled from live equity entirely.",
+      "expected_events": [],
+      "expected_exit_reason_substring": "",
+      "historical_signal_bar_close": "2026-03-10T08:00:00Z",
+      "st_date_range": ["2026-03-09", "2026-03-11"],
+      "ea_input_overrides": {
+        "Initial_Equity_Floor": 100000
+      },
+      "setup_note": "FLOOR_VS_EQUITY_DECOUPLE: set Initial_Equity_Floor=100000. Driving ST equity to a precise 94000 requires staging prior losing trades and is impractical in the tester — but it is NOT required to prove the fix: because the floor is sourced from the input (source=input) and never from AccountInfoDouble(ACCOUNT_EQUITY), the post-restart floor is provably independent of whatever equity is. PASS = post-restart journal reads floor=100000.00 source=input (NOT a live-equity value). If the operator does want the literal sub-floor-equity condition, stage a losing position on another pair before restart and confirm the init line still prints floor=100000.00 source=input despite equity < 100000."
+    },
+    {
+      "id": "s15",
+      "title": "Floor input changed 100000 → 125000 — manual scale-up path",
+      "pair": "EURUSD",
+      "signal_bar_close_price": 1.0842,
+      "atr14": 0.00214,
+      "narrative": "Manual scale-up: the operator raises Initial_Equity_Floor from 100000 to 125000 (e.g. after a 5ers scale-up) and restarts the EA. The new floor is adopted from the input: journal reads floor=125000.00 source=input. Scale-up is purely an operator input edit — there is no scale-up state struct, JSON state file, or live capture.",
+      "expected_events": [],
+      "expected_exit_reason_substring": "",
+      "historical_signal_bar_close": "2026-03-10T08:00:00Z",
+      "st_date_range": ["2026-03-09", "2026-03-11"],
+      "ea_input_overrides": {
+        "Initial_Equity_Floor": 125000
+      },
+      "setup_note": "FLOOR_SCALE_UP: run once with Initial_Equity_Floor=100000 (verify floor=100000.00 source=input), then change the input to 125000 and restart. PASS = post-change journal reads floor=125000.00 source=input. Demonstrates the only supported scale-up mechanism is editing the operator input."
+    },
+    {
+      "id": "s16",
+      "title": "Floor=125000, equity below floor, restart — floor still 125000",
+      "pair": "EURUSD",
+      "signal_bar_close_price": 1.0842,
+      "atr14": 0.00214,
+      "narrative": "Post-scale-up variant of s14. Initial_Equity_Floor=125000 while live equity sits below it (target ~120000). After restart the floor is re-read from the input and stays 125000.00 source=input — never recaptured to 120000. Confirms the decoupling holds at the scaled-up anchor too.",
+      "expected_events": [],
+      "expected_exit_reason_substring": "",
+      "historical_signal_bar_close": "2026-03-10T08:00:00Z",
+      "st_date_range": ["2026-03-09", "2026-03-11"],
+      "ea_input_overrides": {
+        "Initial_Equity_Floor": 125000
+      },
+      "setup_note": "FLOOR_VS_EQUITY_DECOUPLE_SCALED: identical procedure to s14 at the scaled-up value. set Initial_Equity_Floor=125000; restart. PASS = post-restart journal reads floor=125000.00 source=input (NOT a live-equity value such as 120000). The floor's independence from live equity is what the fix guarantees."
+    },
+    {
+      "id": "s17",
+      "title": "Floor input = 0 — EA refuses to trade, fires Alert, journals sentinel-fail",
+      "pair": "EURUSD",
+      "signal_bar_close_price": 1.0842,
+      "atr14": 0.00214,
+      "narrative": "Fail-loud path. Initial_Equity_Floor is left at its default 0 (unset). On OnInit the EA detects the implausible floor (< 1000), sets g_arc_eq_floor_fail, fires Alert('[ARC10] FLOOR UNSET — EA halted, set Initial_Equity_Floor'), journals an ERROR FLOOR_FAIL line plus 'floor=0.00 source=sentinel-fail', and refuses all entries. A dropped signal envelope is rejected at the equity gate with reason floor_unset_halt and logged as an equity_block row. The EA's ea.heartbeat carries status=halted_floor_unset for the always-up sidecar to detect.",
+      "expected_events": ["equity_block"],
+      "expected_exit_reason_substring": "",
+      "historical_signal_bar_close": "2026-03-10T08:00:00Z",
+      "st_date_range": ["2026-03-09", "2026-03-11"],
+      "ea_input_overrides": {
+        "Initial_Equity_Floor": 0
+      },
+      "setup_note": "FLOOR_UNSET_FAILLOUD: leave Initial_Equity_Floor=0 (default). Start tester. PASS requires ALL of: (1) Alert popup '[ARC10] FLOOR UNSET — EA halted, set Initial_Equity_Floor'; (2) journal '[ARC10] ERROR FLOOR_FAIL: Initial_Equity_Floor=0.00 implausible ...'; (3) journal '[ARC10] equity init: floor=0.00 source=sentinel-fail'; (4) ea.heartbeat JSON contains \"status\": \"halted_floor_unset\"; (5) staging the s7-style envelope yields an equity_block row in trade_log.csv with reason floor_unset_halt and the signal moved to signals_failed\\ — NO entry/order is placed."
+    },
+    {
+      "id": "s18",
+      "title": "Daily day-start fixed across ticks, re-snapshots at EET rollover",
+      "pair": "EURUSD",
+      "signal_bar_close_price": 1.0842,
+      "atr14": 0.00214,
+      "narrative": "Verifies the daily-DD day-start anchor (OPEN-001 correction). At OnInit the EA snapshots day-start equity once ('[ARC10] daily day-start: equity=… source=init-snapshot'). Across every tick of that EET day the anchor is HELD FIXED — there is no per-tick reassignment, so daily_dd = (day_start - equity)/day_start moves only because live equity moves, correctly registering intraday loss. At the next EET-day rollover (00:00 EET = 22:00 UTC winter / 21:00 UTC summer) the anchor re-snapshots to current equity once ('… source=eet-rollover'). The total-DD floor is independent and unaffected.",
+      "expected_events": [],
+      "expected_exit_reason_substring": "",
+      "historical_signal_bar_close": "2026-03-10T08:00:00Z",
+      "st_date_range": ["2026-03-09", "2026-03-12"],
+      "ea_input_overrides": {
+        "Initial_Equity_Floor": 100000
+      },
+      "setup_note": "DAILY_ANCHOR_FIXED_AND_ROLLOVER: set Initial_Equity_Floor=100000 (so total-floor logic is valid and visibly separate). Run across ≥2 EET days. PASS = (a) exactly ONE '[ARC10] daily day-start: … source=init-snapshot' line at start; (b) NO further day-start lines until a rollover — proving the anchor is fixed across intraday ticks (it is mutated only at OnInit and rollover); (c) exactly ONE '… source=eet-rollover' line per EET-day boundary crossed (22:00 UTC winter / 21:00 UTC summer), each showing the fresh equity snapshot. The floor journal line ('floor=100000.00 source=input') is unchanged across the whole run. Observable-only; no trade events required."
+    },
+    {
+      "id": "s19",
+      "title": "Mid-day restart re-snapshots daily day-start (not persisted, not live)",
+      "pair": "EURUSD",
+      "signal_bar_close_price": 1.0842,
+      "atr14": 0.00214,
+      "narrative": "Verifies the accepted restart behavior of the daily anchor (OPEN-001 correction item 3). A mid-day EA restart (OnInit re-fire via input-edit, same trigger as s9/s10) re-snapshots day-start to CURRENT equity — it does NOT restore a prior day-start from any state file and does NOT live-track. This is deliberate: daily risk is bounded to one day by the natural EET rollover, and there is intentionally no JSON state on the daily side. The total floor, by contrast, is re-read from the operator input (s13/s14) and is decoupled from this.",
+      "expected_events": [],
+      "expected_exit_reason_substring": "",
+      "historical_signal_bar_close": "2026-03-10T08:00:00Z",
+      "st_date_range": ["2026-03-09", "2026-03-11"],
+      "ea_input_overrides": {
+        "Initial_Equity_Floor": 100000
+      },
+      "setup_note": "DAILY_ANCHOR_RESTART_RESNAPSHOT: set Initial_Equity_Floor=100000. Start tester; note the first '[ARC10] daily day-start: equity=<E0> source=init-snapshot'. While running and BEFORE any EET rollover, edit any EA input to force a restart (s9/s10 input-edit procedure). PASS = a SECOND 'source=init-snapshot' line appears reflecting the equity at restart (<E1>, current equity — NOT <E0> restored from disk, NOT the 100000 floor). Confirms the daily anchor re-snapshots on restart and is neither persisted nor live-tracked. The floor line still reads 'floor=100000.00 source=input' both times (total-floor logic untouched)."
     }
   ]
 }

@@ -468,6 +468,43 @@ def write_summary(cells, perfold_raw, cont_raw, perfold_trail, cont_trail, D, ma
         "annualised (illustrative; no withdrawals / firm caps modelled).\n"
     )
 
+    # ════════════ 1b — FULL per-fold WFO results table ════════════
+    L.append("## 1b. Full per-fold WFO results (all 11 search folds + holdout)\n")
+    L.append(
+        "> The fold-by-fold breakdown behind the per-fold matrix cells (worst-fold = "
+        "min ROI / max DD over folds 1–11; holdout reported, not gated). Governed "
+        "(from-initial firing); costed cell 5. Full 2×2 (off/on × risk) detail in "
+        "`per_fold.csv`. At 0.40% the governors never fire so on == off; at 0.50% the "
+        "governed worst fold (F1) deepens vs off — the governor-locks-a-recoverable-dip "
+        "effect (see Cut 3).\n"
+    )
+    for risk in RISK_LEVELS:
+        for gov in ("off", "on"):
+            by_fold = perfold_raw[(risk, gov)]
+            tbl = pd.DataFrame(
+                [
+                    dict(
+                        fold=("Holdout" if f == HOLDOUT_FOLD else f"F{f}"),
+                        n_trades=by_fold[f]["n_trades"],
+                        roi_pct=by_fold[f]["roi"] * 100,
+                        trailing_dd_pct=by_fold[f]["dd_trailing"] * 100,
+                        from_init_dd_pct=by_fold[f]["dd_static"] * 100,
+                        daily_dd_pct=by_fold[f]["daily_dd_close_max"] * 100,
+                        killed=int(by_fold[f]["killed"]),
+                        fires=len(by_fold[f]["fires"]),
+                    )
+                    for f in fold_tids
+                ]
+            )
+            agg = cells[(risk, gov, "per_fold")]
+            L.append(
+                f"**{risk * 100:.2f}% r_base — governors {gov.upper()}** "
+                f"(worst-fold ROI {agg['worst_roi'] * 100:.2f}% / mean {agg['mean_roi'] * 100:.2f}% / "
+                f"worst trailing DD {agg['trailing_dd'] * 100:.2f}% / worst from-init DD "
+                f"{agg['from_initial_dd'] * 100:.2f}% / worst daily {agg['daily_dd'] * 100:.2f}%):\n"
+            )
+            L.append(df_to_md(tbl, "{:.2f}") + "\n")
+
     # ════════════ CUT 2 — risk-level decision read ════════════
     L.append("## 2. Risk-level decision (0.40% vs 0.50% vs the limits)\n")
     dec_rows = []

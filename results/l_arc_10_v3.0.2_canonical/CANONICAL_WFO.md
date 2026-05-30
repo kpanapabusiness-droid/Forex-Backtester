@@ -23,6 +23,78 @@
 
 > Per-fold = the CEILING (each fold a fresh-tier reset hitting its own worst year; linear). Continuous = the FLOOR (one unbroken compounding curve 2010→2026, never reset). True risk lives between. `mean ROI%` is per-fold only (continuous is a single curve → NaN). Continuous period ROI is compound-annualised (illustrative; no withdrawals / firm caps modelled).
 
+## 1b. Full per-fold WFO results (all 11 search folds + holdout)
+
+> The fold-by-fold breakdown behind the per-fold matrix cells (worst-fold = min ROI / max DD over folds 1–11; holdout reported, not gated). Governed (from-initial firing); costed cell 5. Full 2×2 (off/on × risk) detail in `per_fold.csv`. At 0.40% the governors never fire so on == off; at 0.50% the governed worst fold (F1) deepens vs off — the governor-locks-a-recoverable-dip effect (see Cut 3).
+
+**0.40% r_base — governors OFF** (worst-fold ROI 13.77% / mean 28.85% / worst trailing DD 7.73% / worst from-init DD 5.55% / worst daily 3.86%):
+
+| fold | n_trades | roi_pct | trailing_dd_pct | from_init_dd_pct | daily_dd_pct | killed | fires |
+|---|---|---|---|---|---|---|---|
+| F1 | 201 | 23.24 | 7.73 | 3.04 | 3.86 | 0 | 0 |
+| F2 | 182 | 25.83 | 7.55 | 2.26 | 3.39 | 0 | 0 |
+| F3 | 179 | 28.47 | 3.89 | 0.17 | 1.50 | 0 | 0 |
+| F4 | 195 | 40.19 | 6.40 | 0.61 | 2.04 | 0 | 0 |
+| F5 | 192 | 28.91 | 6.18 | 5.55 | 2.52 | 0 | 0 |
+| F6 | 190 | 20.77 | 5.75 | 4.77 | 2.84 | 0 | 0 |
+| F7 | 171 | 28.51 | 5.52 | 2.28 | 2.44 | 0 | 0 |
+| F8 | 190 | 42.56 | 6.96 | 2.14 | 1.71 | 0 | 0 |
+| F9 | 176 | 13.77 | 5.09 | 0.80 | 2.08 | 0 | 0 |
+| F10 | 195 | 30.97 | 7.58 | 1.25 | 2.27 | 0 | 0 |
+| F11 | 188 | 34.08 | 6.21 | 4.06 | 2.70 | 0 | 0 |
+| Holdout | 1093 | 20.03 | 5.36 | 1.04 | 1.97 | 0 | 0 |
+
+**0.40% r_base — governors ON** (worst-fold ROI 13.77% / mean 28.85% / worst trailing DD 7.73% / worst from-init DD 5.55% / worst daily 3.86%):
+
+| fold | n_trades | roi_pct | trailing_dd_pct | from_init_dd_pct | daily_dd_pct | killed | fires |
+|---|---|---|---|---|---|---|---|
+| F1 | 201 | 23.24 | 7.73 | 3.04 | 3.86 | 0 | 1 |
+| F2 | 182 | 25.83 | 7.55 | 2.26 | 3.39 | 0 | 0 |
+| F3 | 179 | 28.47 | 3.89 | 0.17 | 1.50 | 0 | 0 |
+| F4 | 195 | 40.19 | 6.40 | 0.61 | 2.04 | 0 | 0 |
+| F5 | 192 | 28.91 | 6.18 | 5.55 | 2.52 | 0 | 0 |
+| F6 | 190 | 20.77 | 5.75 | 4.77 | 2.84 | 0 | 0 |
+| F7 | 171 | 28.51 | 5.52 | 2.28 | 2.44 | 0 | 0 |
+| F8 | 190 | 42.56 | 6.96 | 2.14 | 1.71 | 0 | 0 |
+| F9 | 176 | 13.77 | 5.09 | 0.80 | 2.08 | 0 | 0 |
+| F10 | 195 | 30.97 | 7.58 | 1.25 | 2.27 | 0 | 0 |
+| F11 | 188 | 34.08 | 6.21 | 4.06 | 2.70 | 0 | 0 |
+| Holdout | 1093 | 20.03 | 5.36 | 1.04 | 1.97 | 0 | 0 |
+
+**0.50% r_base — governors OFF** (worst-fold ROI 17.22% / mean 36.08% / worst trailing DD 9.51% / worst from-init DD 6.94% / worst daily 4.76%):
+
+| fold | n_trades | roi_pct | trailing_dd_pct | from_init_dd_pct | daily_dd_pct | killed | fires |
+|---|---|---|---|---|---|---|---|
+| F1 | 201 | 29.11 | 9.51 | 3.80 | 4.76 | 0 | 0 |
+| F2 | 182 | 32.30 | 9.31 | 2.83 | 4.20 | 0 | 0 |
+| F3 | 179 | 35.60 | 4.80 | 0.21 | 1.82 | 0 | 0 |
+| F4 | 195 | 50.27 | 7.66 | 0.76 | 2.44 | 0 | 0 |
+| F5 | 192 | 36.16 | 7.71 | 6.94 | 3.16 | 0 | 0 |
+| F6 | 190 | 25.97 | 7.16 | 5.96 | 3.48 | 0 | 0 |
+| F7 | 171 | 35.65 | 6.85 | 2.85 | 3.05 | 0 | 0 |
+| F8 | 190 | 53.23 | 8.60 | 2.68 | 2.02 | 0 | 0 |
+| F9 | 176 | 17.22 | 6.29 | 1.00 | 2.56 | 0 | 0 |
+| F10 | 195 | 38.73 | 9.22 | 1.57 | 2.79 | 0 | 0 |
+| F11 | 188 | 42.62 | 7.72 | 5.08 | 3.22 | 0 | 0 |
+| Holdout | 1093 | 23.35 | 6.56 | 1.31 | 2.34 | 0 | 0 |
+
+**0.50% r_base — governors ON** (worst-fold ROI 17.22% / mean 35.53% / worst trailing DD 10.44% / worst from-init DD 6.94% / worst daily 4.76%):
+
+| fold | n_trades | roi_pct | trailing_dd_pct | from_init_dd_pct | daily_dd_pct | killed | fires |
+|---|---|---|---|---|---|---|---|
+| F1 | 201 | 23.05 | 10.44 | 3.80 | 4.76 | 0 | 2 |
+| F2 | 182 | 32.30 | 9.31 | 2.83 | 4.20 | 0 | 1 |
+| F3 | 179 | 35.60 | 4.80 | 0.21 | 1.82 | 0 | 0 |
+| F4 | 195 | 50.27 | 7.66 | 0.76 | 2.44 | 0 | 0 |
+| F5 | 192 | 36.16 | 7.71 | 6.94 | 3.16 | 0 | 0 |
+| F6 | 190 | 25.97 | 7.16 | 5.96 | 3.48 | 0 | 0 |
+| F7 | 171 | 35.65 | 6.85 | 2.85 | 3.05 | 0 | 0 |
+| F8 | 190 | 53.23 | 8.60 | 2.68 | 2.02 | 0 | 0 |
+| F9 | 176 | 17.22 | 6.29 | 1.00 | 2.56 | 0 | 0 |
+| F10 | 195 | 38.73 | 9.22 | 1.57 | 2.79 | 0 | 0 |
+| F11 | 188 | 42.62 | 7.72 | 5.08 | 3.22 | 0 | 0 |
+| Holdout | 1093 | 23.35 | 6.56 | 1.31 | 2.34 | 0 | 0 |
+
 ## 2. Risk-level decision (0.40% vs 0.50% vs the limits)
 
 | risk_pct | worst_fold_trailing_dd_pct | under_10pct_hard | under_8pct_deploy | worst_daily_dd_pct | under_5pct_daily | worst_fold_roi_pct | mean_fold_roi_pct |

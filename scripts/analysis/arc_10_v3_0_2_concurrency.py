@@ -43,7 +43,6 @@ NOT a tuning trigger: descriptive risk-surface only. Findings inform the
 
 from __future__ import annotations
 
-from collections import defaultdict
 from pathlib import Path
 
 import numpy as np
@@ -94,7 +93,9 @@ def pctd(x, ps=(50, 90, 99)):
 # ──────────────────────────────────────────────────────────────────────────
 # Build per-trade held-bar mark-to-market table on the real H4-EET clock.
 # ──────────────────────────────────────────────────────────────────────────
-def build_mtm(meta: pd.DataFrame, paths: pd.DataFrame) -> tuple[pd.DataFrame, dict, pd.DatetimeIndex]:
+def build_mtm(
+    meta: pd.DataFrame, paths: pd.DataFrame
+) -> tuple[pd.DataFrame, dict, pd.DatetimeIndex]:
     cache_idx: dict[str, pd.DatetimeIndex] = {}
     pos_maps: dict[str, dict] = {}
     for pair in meta["pair"].unique():
@@ -135,12 +136,19 @@ def build_mtm(meta: pd.DataFrame, paths: pd.DataFrame) -> tuple[pd.DataFrame, di
         ts = idx[epos + offs]
         base, quote = t.pair[:3], t.pair[3:]
         for k in range(nb):
-            rows.append((t.trade_id, ts[k], float(mtm[k]), float(open_units[k]),
-                         base, quote))
-        intervals[t.trade_id] = dict(entry_ts=ts[0], exit_ts=ts[-1], base=base, quote=quote,
-                                     realized=float(t.realized_r_3p5), fold=int(t.fold),
-                                     segment=t.segment, outcome=t.outcome, pair=t.pair,
-                                     entry_time=ts[0])
+            rows.append((t.trade_id, ts[k], float(mtm[k]), float(open_units[k]), base, quote))
+        intervals[t.trade_id] = dict(
+            entry_ts=ts[0],
+            exit_ts=ts[-1],
+            base=base,
+            quote=quote,
+            realized=float(t.realized_r_3p5),
+            fold=int(t.fold),
+            segment=t.segment,
+            outcome=t.outcome,
+            pair=t.pair,
+            entry_time=ts[0],
+        )
 
     mtm_df = pd.DataFrame(rows, columns=["trade_id", "ts", "mtm_r", "open_units", "base", "quote"])
 
@@ -230,7 +238,9 @@ def main() -> int:
     A = pd.read_csv(OUTDIR / "A_entry_mae.csv")[
         ["trade_id", "pair", "fold", "segment", "outcome", "dep_exit_offset"]
     ]
-    B = pd.read_csv(OUTDIR / "B_exit_mfe.csv")[["trade_id", "realized_r_3p5", "exit_reason_deployed"]]
+    B = pd.read_csv(OUTDIR / "B_exit_mfe.csv")[
+        ["trade_id", "realized_r_3p5", "exit_reason_deployed"]
+    ]
     pool = pd.read_parquet(ARC / "step_1" / "pool.parquet")[["trade_id", "entry_time"]]
     meta = A.merge(B, on="trade_id").merge(pool, on="trade_id")
     meta["entry_time"] = pd.to_datetime(meta["entry_time"], utc=True)
@@ -243,7 +253,6 @@ def main() -> int:
     for c in ["entry_ts", "exit_ts", "entry_time"]:
         iv[c] = pd.to_datetime(iv[c], utc=True)
     iv["realized"] = iv["realized"].astype(float)
-    GT = float(iv["realized"].sum())
     base_loss_rate = float((iv["realized"] <= 0).mean())
 
     L = ["\n\n---\n\n## Concurrency / correlation / loss-clustering (3.5R)\n"]
@@ -286,17 +295,20 @@ def main() -> int:
     cc = port["open_count"]
     total_bars = len(clock)
     c1 = pctd(cc, (50, 90, 99))
-    conc_tbl = pd.DataFrame([
-        dict(metric="open trades p50", value=f"{c1['p50']:.1f}"),
-        dict(metric="open trades p90", value=f"{c1['p90']:.1f}"),
-        dict(metric="open trades p99", value=f"{c1['p99']:.1f}"),
-        dict(metric="open trades mean", value=f"{cc.mean():.2f}"),
-        dict(metric="peak concurrency", value=f"{int(cc.max())}"),
-        dict(metric="total H4 bars in span", value=f"{total_bars}"),
-    ])
+    conc_tbl = pd.DataFrame(
+        [
+            dict(metric="open trades p50", value=f"{c1['p50']:.1f}"),
+            dict(metric="open trades p90", value=f"{c1['p90']:.1f}"),
+            dict(metric="open trades p99", value=f"{c1['p99']:.1f}"),
+            dict(metric="open trades mean", value=f"{cc.mean():.2f}"),
+            dict(metric="peak concurrency", value=f"{int(cc.max())}"),
+            dict(metric="total H4 bars in span", value=f"{total_bars}"),
+        ]
+    )
     for nlv in N_LEVELS:
-        conc_tbl.loc[len(conc_tbl)] = dict(metric=f"fraction of time N>={nlv}",
-                                           value=f"{float((cc >= nlv).mean()):.4f}")
+        conc_tbl.loc[len(conc_tbl)] = dict(
+            metric=f"fraction of time N>={nlv}", value=f"{float((cc >= nlv).mean()):.4f}"
+        )
     # concurrency-at-entry: trades already open (entered strictly before) at each entry bar
     iv_sorted = iv.sort_values("entry_ts")
     ent_ts = iv_sorted["entry_ts"].to_numpy()
@@ -311,8 +323,10 @@ def main() -> int:
     ce = pctd(np.array(at_entry), (50, 90, 99))
 
     peak_conc = int(cc.max())
-    headline.append(f"peak concurrency **{peak_conc}** open trades (mean {cc.mean():.1f}, "
-                    f"p99 {c1['p99']:.0f}); N>=10 {float((cc>=10).mean())*100:.0f}% of bars")
+    headline.append(
+        f"peak concurrency **{peak_conc}** open trades (mean {cc.mean():.1f}, "
+        f"p99 {c1['p99']:.0f}); N>=10 {float((cc >= 10).mean()) * 100:.0f}% of bars"
+    )
 
     # ════════════ CUT 2 — Currency exposure ════════════
     net_risk = port["net_risk"]  # ts x ccy, risk-weighted signed net (forward-filled)
@@ -322,28 +336,38 @@ def main() -> int:
     for c in ccys:
         g = net_risk[c].to_numpy()  # risk-% signed net
         gc = net_count[c].to_numpy()  # count signed net
-        cur_rows.append(dict(
-            ccy=c,
-            peak_net_long_pct=float(max(g.max(), 0.0)) * 100,
-            peak_net_short_pct=float(max(-g.min(), 0.0)) * 100,
-            peak_abs_net_pct=float(np.abs(g).max()) * 100,
-            peak_net_long_trades=int(max(gc.max(), 0)),
-            peak_net_short_trades=int(max(-gc.min(), 0)),
-            median_abs_net_pct=float(np.median(np.abs(g))) * 100,
-        ))
-    cur_df = pd.DataFrame(cur_rows).sort_values("peak_abs_net_pct", ascending=False).reset_index(drop=True)
+        cur_rows.append(
+            dict(
+                ccy=c,
+                peak_net_long_pct=float(max(g.max(), 0.0)) * 100,
+                peak_net_short_pct=float(max(-g.min(), 0.0)) * 100,
+                peak_abs_net_pct=float(np.abs(g).max()) * 100,
+                peak_net_long_trades=int(max(gc.max(), 0)),
+                peak_net_short_trades=int(max(-gc.min(), 0)),
+                median_abs_net_pct=float(np.median(np.abs(g))) * 100,
+            )
+        )
+    cur_df = (
+        pd.DataFrame(cur_rows)
+        .sort_values("peak_abs_net_pct", ascending=False)
+        .reset_index(drop=True)
+    )
     worst = cur_df.iloc[0]
     worst_dir = "short" if worst.peak_net_short_pct >= worst.peak_net_long_pct else "long"
-    worst_trades = int(worst.peak_net_short_trades if worst_dir == "short" else worst.peak_net_long_trades)
-    headline.append(f"worst currency concentration: net-{worst_dir} **{worst.ccy}** "
-                    f"peak {worst.peak_abs_net_pct:.2f}% ({worst_trades} trades same-direction)")
+    worst_trades = int(
+        worst.peak_net_short_trades if worst_dir == "short" else worst.peak_net_long_trades
+    )
+    headline.append(
+        f"worst currency concentration: net-{worst_dir} **{worst.ccy}** "
+        f"peak {worst.peak_abs_net_pct:.2f}% ({worst_trades} trades same-direction)"
+    )
 
     # ════════════ CUT 3 — Portfolio open-equity DD + correlation ════════════
     open_sum = pd.Series(port["open_sum"], index=clock)  # forward-filled open MtM
     realized_at_exit = iv.groupby("exit_ts")["realized"].sum().reindex(clock, fill_value=0.0)
     realized_cum = realized_at_exit.cumsum()
     closed_before = realized_cum.shift(1).fillna(0.0)
-    port_R = (open_sum + closed_before)  # cumulative portfolio R (open MtM + closed realized)
+    port_R = open_sum + closed_before  # cumulative portfolio R (open MtM + closed realized)
     equity = 1.0 + R_BASE * port_R
     peak = equity.cummax()
     dd_rel = (peak - equity) / peak
@@ -368,13 +392,20 @@ def main() -> int:
         pr_ = os_ + cb
         eq_ = 1.0 + R_BASE * pr_
         pk_ = eq_.cummax()
-        fold_dd.append(dict(fold=int(f), n_trades=len(ivf),
-                            portfolio_dd_pct=float(((pk_ - eq_) / pk_).max()) * 100))
+        fold_dd.append(
+            dict(
+                fold=int(f),
+                n_trades=len(ivf),
+                portfolio_dd_pct=float(((pk_ - eq_) / pk_).max()) * 100,
+            )
+        )
     fold_dd_df = pd.DataFrame(fold_dd)
     worst_fold_port_dd = float(fold_dd_df["portfolio_dd_pct"].max()) if len(fold_dd_df) else np.nan
 
-    headline.append(f"open-book max DD (pooled) **{maxdd_rel*100:.2f}%** / worst-fold "
-                    f"portfolio DD **{worst_fold_port_dd:.2f}%** vs sequential-gate 7.80%")
+    headline.append(
+        f"open-book max DD (pooled) **{maxdd_rel * 100:.2f}%** / worst-fold "
+        f"portfolio DD **{worst_fold_port_dd:.2f}%** vs sequential-gate 7.80%"
+    )
 
     # pairwise increment correlation: shared-leg vs no-shared-leg
     inc_series = {}
@@ -402,18 +433,27 @@ def main() -> int:
                     if av.std() > 1e-12 and bv.std() > 1e-12:
                         r = float(np.corrcoef(av, bv)[0, 1])
                         shared = (base_arr[i] in (base_arr[j], quote_arr[j])) or (
-                            quote_arr[i] in (base_arr[j], quote_arr[j]))
+                            quote_arr[i] in (base_arr[j], quote_arr[j])
+                        )
                         (shared_corr if shared else noshare_corr).append(r)
                         n_pairs_eval += 1
             j += 1
-    corr_tbl = pd.DataFrame([
-        dict(group="shares a currency leg", n_pairs=len(shared_corr),
-             mean_corr=float(np.mean(shared_corr)) if shared_corr else np.nan,
-             median_corr=float(np.median(shared_corr)) if shared_corr else np.nan),
-        dict(group="no shared leg", n_pairs=len(noshare_corr),
-             mean_corr=float(np.mean(noshare_corr)) if noshare_corr else np.nan,
-             median_corr=float(np.median(noshare_corr)) if noshare_corr else np.nan),
-    ])
+    corr_tbl = pd.DataFrame(
+        [
+            dict(
+                group="shares a currency leg",
+                n_pairs=len(shared_corr),
+                mean_corr=float(np.mean(shared_corr)) if shared_corr else np.nan,
+                median_corr=float(np.median(shared_corr)) if shared_corr else np.nan,
+            ),
+            dict(
+                group="no shared leg",
+                n_pairs=len(noshare_corr),
+                mean_corr=float(np.mean(noshare_corr)) if noshare_corr else np.nan,
+                median_corr=float(np.median(noshare_corr)) if noshare_corr else np.nan,
+            ),
+        ]
+    )
 
     # top-5 drawdown episodes of the open book (pooled)
     dd_events = top_dd_episodes(equity, net_risk, iv, n=5)
@@ -458,16 +498,20 @@ def main() -> int:
     disp_week = float(lpw.var() / lpw.mean()) if lpw.mean() else np.nan
     clustered_temporal = (p_runs < 0.05) or (disp_month > 1.25) or (disp_week > 1.25)
 
-    headline.append(f"loss arrival: runs-test p={p_runs:.3g}, monthly dispersion "
-                    f"{disp_month:.2f} (Poisson=1) -> "
-                    f"**{'CLUSTERED' if clustered_temporal else 'dispersed/random'}**")
+    headline.append(
+        f"loss arrival: runs-test p={p_runs:.3g}, monthly dispersion "
+        f"{disp_month:.2f} (Poisson=1) -> "
+        f"**{'CLUSTERED' if clustered_temporal else 'dispersed/random'}**"
+    )
 
     # ════════════ CUT 5 — Loss clustering on shared currency ════════════
     losers = iv[iv["realized"] <= 0].copy()
-    losers_leg = pd.concat([
-        losers.assign(ccy=losers["base"]),
-        losers.assign(ccy=losers["quote"]),
-    ])[["trade_id", "ccy", "exit_ts"]]
+    losers_leg = pd.concat(
+        [
+            losers.assign(ccy=losers["base"]),
+            losers.assign(ccy=losers["quote"]),
+        ]
+    )[["trade_id", "ccy", "exit_ts"]]
     shock_rows = []
     for K in (3, 4, 5):
         for T in (4, 8, 12):  # bars; map to time via 4h
@@ -489,29 +533,38 @@ def main() -> int:
     worst_events = currency_shock_events(losers_leg, K=3, tol=pd.Timedelta(hours=32))
     # co-exposed conditional loss rate
     co_loss = conditional_co_loss(iv, base_loss_rate)
-    headline.append(f"worst currency-shock: {worst_events[0]['ccy']} {worst_events[0]['n']} losses "
-                    f"in {worst_events[0]['span_h']:.0f}h" if worst_events else "no currency shock >=3")
+    headline.append(
+        f"worst currency-shock: {worst_events[0]['ccy']} {worst_events[0]['n']} losses "
+        f"in {worst_events[0]['span_h']:.0f}h"
+        if worst_events
+        else "no currency shock >=3"
+    )
 
     # ════════════ CUT 6 — Same-pair concurrency ════════════
     same_pair = same_pair_analysis(iv, mtm_df, clock)
 
     # write CSVs
     pd.DataFrame({"ts": clock, "open_trades": cc}).to_csv(
-        OUTDIR / "concurrency.csv", index=False, lineterminator="\n")
+        OUTDIR / "concurrency.csv", index=False, lineterminator="\n"
+    )
     cur_df.to_csv(OUTDIR / "currency_exposure.csv", index=False, lineterminator="\n")
-    pd.DataFrame(dd_events).to_csv(OUTDIR / "openbook_drawdown.csv", index=False, lineterminator="\n")
-    lc = pd.DataFrame([
-        dict(metric="n_trades", value=len(seq)),
-        dict(metric="win_rate", value=float((seq.realized > 0).mean())),
-        dict(metric="runs_observed", value=runs),
-        dict(metric="runs_expected", value=float(mu)),
-        dict(metric="runs_z", value=float(z)),
-        dict(metric="runs_p", value=p_runs),
-        dict(metric="max_losing_streak", value=int(streaks.max())),
-        dict(metric="dispersion_index_month", value=disp_month),
-        dict(metric="dispersion_index_week", value=disp_week),
-        dict(metric="base_loss_rate", value=base_loss_rate),
-    ])
+    pd.DataFrame(dd_events).to_csv(
+        OUTDIR / "openbook_drawdown.csv", index=False, lineterminator="\n"
+    )
+    lc = pd.DataFrame(
+        [
+            dict(metric="n_trades", value=len(seq)),
+            dict(metric="win_rate", value=float((seq.realized > 0).mean())),
+            dict(metric="runs_observed", value=runs),
+            dict(metric="runs_expected", value=float(mu)),
+            dict(metric="runs_z", value=float(z)),
+            dict(metric="runs_p", value=p_runs),
+            dict(metric="max_losing_streak", value=int(streaks.max())),
+            dict(metric="dispersion_index_month", value=disp_month),
+            dict(metric="dispersion_index_week", value=disp_week),
+            dict(metric="base_loss_rate", value=base_loss_rate),
+        ]
+    )
     lc.to_csv(OUTDIR / "loss_clustering.csv", index=False, lineterminator="\n")
 
     # ── assemble SUMMARY ──
@@ -520,90 +573,134 @@ def main() -> int:
 
     L.append("### 1. Concurrency (open trades per H4 bar)\n")
     L.append(df_to_md(conc_tbl) + "\n")
-    L.append("Concurrency-at-entry (already-open trades when each fires): "
-             f"p50={ce['p50']:.0f}, p90={ce['p90']:.0f}, p99={ce['p99']:.0f}, "
-             f"mean={np.mean(at_entry):.1f}, max={int(np.max(at_entry))}.\n")
+    L.append(
+        "Concurrency-at-entry (already-open trades when each fires): "
+        f"p50={ce['p50']:.0f}, p90={ce['p90']:.0f}, p99={ce['p99']:.0f}, "
+        f"mean={np.mean(at_entry):.1f}, max={int(np.max(at_entry))}.\n"
+    )
 
     L.append("### 2. Currency exposure (risk-weighted net, % of account)\n")
-    L.append("> net = Σ(+base / −quote) over open trades × open_units × 0.5%. "
-             "Ranked by peak |net|. One adverse move in the top currency hits all "
-             "same-direction legs at once.\n")
+    L.append(
+        "> net = Σ(+base / −quote) over open trades × open_units × 0.5%. "
+        "Ranked by peak |net|. One adverse move in the top currency hits all "
+        "same-direction legs at once.\n"
+    )
     L.append(df_to_md(cur_df) + "\n")
 
     L.append("### 3. Correlated joint drawdown\n")
-    L.append(f"- Pooled open-book equity max DD: **{maxdd_rel*100:.2f}%** "
-             f"(relative) / {maxdd_pp:.2f} account-pp peak-to-trough.\n")
+    L.append(
+        f"- Pooled open-book equity max DD: **{maxdd_rel * 100:.2f}%** "
+        f"(relative) / {maxdd_pp:.2f} account-pp peak-to-trough.\n"
+    )
     L.append("- Per-fold (OOS-year, reset) portfolio DD:\n")
     L.append(df_to_md(fold_dd_df, "{:.2f}") + "\n")
-    L.append(f"- **Worst-fold portfolio DD = {worst_fold_port_dd:.2f}%** vs the "
-             "per-trade-sequential gate figure **7.80%** (Step-0). "
-             + ("Concurrency AMPLIFIES the DD beyond the gate number."
-                if worst_fold_port_dd > 7.8 else
-                "Concurrency does NOT push worst-fold DD above the gate number — "
-                "overlap is largely offsetting / well-diversified here.") + "\n")
+    L.append(
+        f"- **Worst-fold portfolio DD = {worst_fold_port_dd:.2f}%** vs the "
+        "per-trade-sequential gate figure **7.80%** (Step-0). "
+        + (
+            "Concurrency AMPLIFIES the DD beyond the gate number."
+            if worst_fold_port_dd > 7.8
+            else "Concurrency does NOT push worst-fold DD above the gate number — "
+            "overlap is largely offsetting / well-diversified here."
+        )
+        + "\n"
+    )
     L.append("- Pairwise per-bar MtM-increment correlation, co-open trades:\n")
-    L.append(df_to_md(corr_tbl) + f"\n\n> {n_pairs_eval} co-open pairs (overlap>="
-             f"{MIN_OVERLAP} bars). Shares-a-leg vs no-shared-leg quantifies how "
-             "much shared currency legs co-move the open book.\n")
+    L.append(
+        df_to_md(corr_tbl) + f"\n\n> {n_pairs_eval} co-open pairs (overlap>="
+        f"{MIN_OVERLAP} bars). Shares-a-leg vs no-shared-leg quantifies how "
+        "much shared currency legs co-move the open book.\n"
+    )
     L.append("- Top-5 open-book drawdown episodes:\n")
     L.append(df_to_md(pd.DataFrame(dd_events), "{:.3f}") + "\n")
 
     L.append("### 4. Loss clustering — temporal\n")
-    temporal_tbl = pd.DataFrame([
-        dict(metric="runs_observed", value=f"{runs}"),
-        dict(metric="runs_expected", value=f"{mu:.1f}"),
-        dict(metric="runs_z", value=f"{z:.2f}"),
-        dict(metric="runs_p (Wald-Wolfowitz)", value=f"{p_runs:.2e}"),
-        dict(metric="max_losing_streak", value=f"{int(streaks.max())}"),
-        dict(metric="dispersion_index_month (Poisson=1)", value=f"{disp_month:.3f}"),
-        dict(metric="dispersion_index_week (Poisson=1)", value=f"{disp_week:.3f}"),
-        dict(metric="base_loss_rate", value=f"{base_loss_rate:.4f}"),
-    ])
+    temporal_tbl = pd.DataFrame(
+        [
+            dict(metric="runs_observed", value=f"{runs}"),
+            dict(metric="runs_expected", value=f"{mu:.1f}"),
+            dict(metric="runs_z", value=f"{z:.2f}"),
+            dict(metric="runs_p (Wald-Wolfowitz)", value=f"{p_runs:.2e}"),
+            dict(metric="max_losing_streak", value=f"{int(streaks.max())}"),
+            dict(metric="dispersion_index_month (Poisson=1)", value=f"{disp_month:.3f}"),
+            dict(metric="dispersion_index_week (Poisson=1)", value=f"{disp_week:.3f}"),
+            dict(metric="base_loss_rate", value=f"{base_loss_rate:.4f}"),
+        ]
+    )
     L.append(df_to_md(temporal_tbl) + "\n")
-    L.append(f"> Verdict: **{'CLUSTERED' if clustered_temporal else 'dispersed / ~random'}**. "
-             f"Runs-test z={z:.1f}, p={p_runs:.2e} (p>0.05 would mean win/loss order is "
-             f"random; here losses arrive in non-random clusters); monthly dispersion "
-             f"{disp_month:.2f}, weekly {disp_week:.2f} (Poisson=1; >1.25 = "
-             f"over-dispersed/bursty). Max losing streak {int(streaks.max())} trades.\n")
+    L.append(
+        f"> Verdict: **{'CLUSTERED' if clustered_temporal else 'dispersed / ~random'}**. "
+        f"Runs-test z={z:.1f}, p={p_runs:.2e} (p>0.05 would mean win/loss order is "
+        f"random; here losses arrive in non-random clusters); monthly dispersion "
+        f"{disp_month:.2f}, weekly {disp_week:.2f} (Poisson=1; >1.25 = "
+        f"over-dispersed/bursty). Max losing streak {int(streaks.max())} trades.\n"
+    )
     L.append("Losing-streak length distribution (count of streaks):\n")
     sd = pd.Series(streaks).value_counts().sort_index()
-    L.append(df_to_md(pd.DataFrame({"streak_len": sd.index.astype(int), "count": sd.to_numpy().astype(int)}), "{:.0f}") + "\n")
+    L.append(
+        df_to_md(
+            pd.DataFrame({"streak_len": sd.index.astype(int), "count": sd.to_numpy().astype(int)}),
+            "{:.0f}",
+        )
+        + "\n"
+    )
 
     L.append("### 5. Loss clustering — shared currency leg (root cause)\n")
-    L.append("> Currency-shock window = >=K losing trades sharing one currency leg "
-             "exiting within T H4 bars. Sweep:\n")
+    L.append(
+        "> Currency-shock window = >=K losing trades sharing one currency leg "
+        "exiting within T H4 bars. Sweep:\n"
+    )
     L.append(df_to_md(shock_df, "{:.0f}") + "\n")
     L.append("Worst currency-shock events (K>=3, T=8 bars / 32h):\n")
-    we_df = pd.DataFrame([dict(ccy=e["ccy"], n_losses=e["n"], span_hours=e["span_h"],
-                              start=str(e["start"])[:16], trades=",".join(map(str, e["trades"][:8])))
-                         for e in worst_events[:5]])
+    we_df = pd.DataFrame(
+        [
+            dict(
+                ccy=e["ccy"],
+                n_losses=e["n"],
+                span_hours=e["span_h"],
+                start=str(e["start"])[:16],
+                trades=",".join(map(str, e["trades"][:8])),
+            )
+            for e in worst_events[:5]
+        ]
+    )
     L.append((df_to_md(we_df, "{:.0f}") if len(we_df) else "_(none)_") + "\n")
-    L.append(f"> Co-exposed conditional loss rate: when a trade loses, the fraction of "
-             f"concurrently-open trades that also lose — **sharing a currency leg "
-             f"{co_loss['shared_co_loss']:.4f}** (n={co_loss['n_shared']}) vs **no shared "
-             f"leg {co_loss['noshare_co_loss']:.4f}** (n={co_loss['n_noshare']}); base "
-             f"loss rate {base_loss_rate:.4f}. The load-bearing contrast is "
-             f"shared-vs-no-shared: a co-open trade sharing a currency leg with a loser "
-             f"is **{co_loss['shared_co_loss']/co_loss['noshare_co_loss']:.2f}x** more "
-             "likely to also lose than one with no shared leg — direct evidence that "
-             "shared currency legs, not time alone, drive joint losses.\n")
+    L.append(
+        f"> Co-exposed conditional loss rate: when a trade loses, the fraction of "
+        f"concurrently-open trades that also lose — **sharing a currency leg "
+        f"{co_loss['shared_co_loss']:.4f}** (n={co_loss['n_shared']}) vs **no shared "
+        f"leg {co_loss['noshare_co_loss']:.4f}** (n={co_loss['n_noshare']}); base "
+        f"loss rate {base_loss_rate:.4f}. The load-bearing contrast is "
+        f"shared-vs-no-shared: a co-open trade sharing a currency leg with a loser "
+        f"is **{co_loss['shared_co_loss'] / co_loss['noshare_co_loss']:.2f}x** more "
+        "likely to also lose than one with no shared leg — direct evidence that "
+        "shared currency legs, not time alone, drive joint losses.\n"
+    )
 
     L.append("### 6. Same-pair concurrency\n")
-    L.append(f"- Bars with the same pair open >1x simultaneously: {same_pair['bars_stacked']} "
-             f"({same_pair['bars_stacked']/total_bars*100:.2f}% of span). "
-             f"Overlapping same-pair trade-pairs: {same_pair['stacked_pairs']}.\n")
-    L.append(f"- Gap between consecutive same-pair entries (H4 bars): "
-             f"p50={same_pair['gap_p50']:.0f}, p25={same_pair['gap_p25']:.0f}, "
-             f"min={same_pair['gap_min']:.0f} (n={same_pair['n_gaps']}).\n")
-    L.append(f"- Stacked same-pair co-outcome: both win {same_pair['both_win']:.3f}, "
-             f"both lose {same_pair['both_lose']:.3f}, split {same_pair['split']:.3f} "
-             f"(n={same_pair['stacked_pairs']} pairs; independence would give "
-             f"both-lose≈{base_loss_rate**2:.3f}).\n")
+    L.append(
+        f"- Bars with the same pair open >1x simultaneously: {same_pair['bars_stacked']} "
+        f"({same_pair['bars_stacked'] / total_bars * 100:.2f}% of span). "
+        f"Overlapping same-pair trade-pairs: {same_pair['stacked_pairs']}.\n"
+    )
+    L.append(
+        f"- Gap between consecutive same-pair entries (H4 bars): "
+        f"p50={same_pair['gap_p50']:.0f}, p25={same_pair['gap_p25']:.0f}, "
+        f"min={same_pair['gap_min']:.0f} (n={same_pair['n_gaps']}).\n"
+    )
+    L.append(
+        f"- Stacked same-pair co-outcome: both win {same_pair['both_win']:.3f}, "
+        f"both lose {same_pair['both_lose']:.3f}, split {same_pair['split']:.3f} "
+        f"(n={same_pair['stacked_pairs']} pairs; independence would give "
+        f"both-lose≈{base_loss_rate**2:.3f}).\n"
+    )
 
-    L.append("\n> **Thin-cell flags:** per-fold portfolio DD for short OOS years and "
-             "any K/T shock cell with n_shock_events small are directional-only; "
-             "same-pair stacked-pair co-outcome (n="
-             f"{same_pair['stacked_pairs']}) is directional if <30.\n")
+    L.append(
+        "\n> **Thin-cell flags:** per-fold portfolio DD for short OOS years and "
+        "any K/T shock cell with n_shock_events small are directional-only; "
+        "same-pair stacked-pair co-outcome (n="
+        f"{same_pair['stacked_pairs']}) is directional if <30.\n"
+    )
 
     with open(OUTDIR / "SUMMARY.md", "a", encoding="utf-8") as f:
         f.write("\n".join(L))
@@ -611,8 +708,10 @@ def main() -> int:
     print("[step0] DD = per-trade-sequential; concurrency UNMODELLED in 7.80%")
     print(f"[concurrency] peak={peak_conc} mean={cc.mean():.2f} p99={c1['p99']:.0f}")
     print(f"[currency] worst {worst.ccy} net-{worst_dir} {worst.peak_abs_net_pct:.2f}%")
-    print(f"[dd] pooled={maxdd_rel*100:.2f}% worst-fold-port={worst_fold_port_dd:.2f}% vs 7.80%")
-    print(f"[corr] shared={corr_tbl.iloc[0].mean_corr:.3f} noshare={corr_tbl.iloc[1].mean_corr:.3f} npairs={n_pairs_eval}")
+    print(f"[dd] pooled={maxdd_rel * 100:.2f}% worst-fold-port={worst_fold_port_dd:.2f}% vs 7.80%")
+    print(
+        f"[corr] shared={corr_tbl.iloc[0].mean_corr:.3f} noshare={corr_tbl.iloc[1].mean_corr:.3f} npairs={n_pairs_eval}"
+    )
     print(f"[loss] runs_p={p_runs:.3g} disp_month={disp_month:.2f} clustered={clustered_temporal}")
     print(f"[shared] co-loss={co_loss['shared_co_loss']:.3f} base={base_loss_rate:.3f}")
     print(f"[samepair] stacked_bars={same_pair['bars_stacked']} pairs={same_pair['stacked_pairs']}")
@@ -651,14 +750,17 @@ def top_dd_episodes(equity: pd.Series, net_risk: pd.DataFrame, iv: pd.DataFrame,
         open_ids = sorted(tids[open_mask].tolist())
         row = net_risk.loc[t1]
         dom = str(row.abs().idxmax()) if len(row) else ""
-        chosen.append(dict(
-            rank=len(chosen) + 1,
-            peak_ts=str(t0)[:16], trough_ts=str(t1)[:16],
-            depth_pct=float(r.dd) * 100,
-            n_open_at_trough=int(open_mask.sum()),
-            dominant_ccy=dom,
-            trades_at_trough=",".join(map(str, open_ids[:8])),
-        ))
+        chosen.append(
+            dict(
+                rank=len(chosen) + 1,
+                peak_ts=str(t0)[:16],
+                trough_ts=str(t1)[:16],
+                depth_pct=float(r.dd) * 100,
+                n_open_at_trough=int(open_mask.sum()),
+                dominant_ccy=dom,
+                trades_at_trough=",".join(map(str, open_ids[:8])),
+            )
+        )
         if len(chosen) >= n:
             break
     return chosen
@@ -674,8 +776,15 @@ def currency_shock_events(losers_leg, K, tol):
             mask = (ts >= ts[i]) & (ts <= ts[i] + tol)
             if mask.sum() >= K:
                 span_h = (ts[mask].max() - ts[mask].min()) / np.timedelta64(1, "h")
-                events.append(dict(ccy=c, n=int(mask.sum()), span_h=float(span_h),
-                                   start=pd.Timestamp(ts[i]), trades=tr[mask].tolist()))
+                events.append(
+                    dict(
+                        ccy=c,
+                        n=int(mask.sum()),
+                        span_h=float(span_h),
+                        start=pd.Timestamp(ts[i]),
+                        trades=tr[mask].tolist(),
+                    )
+                )
                 i += int(mask.sum())
             else:
                 i += 1
@@ -705,9 +814,12 @@ def conditional_co_loss(iv, base_rate):
             else:
                 ns_tot += 1
                 ns_loss += int(real[j] <= 0)
-    return dict(shared_co_loss=(sh_loss / sh_tot if sh_tot else np.nan),
-                noshare_co_loss=(ns_loss / ns_tot if ns_tot else np.nan),
-                n_shared=sh_tot, n_noshare=ns_tot)
+    return dict(
+        shared_co_loss=(sh_loss / sh_tot if sh_tot else np.nan),
+        noshare_co_loss=(ns_loss / ns_tot if ns_tot else np.nan),
+        n_shared=sh_tot,
+        n_noshare=ns_tot,
+    )
 
 
 def same_pair_analysis(iv, mtm_df, clock):
@@ -754,10 +866,15 @@ def same_pair_analysis(iv, mtm_df, clock):
     sp = max(stacked_pairs, 1)
     gaps = np.array(gaps) if gaps else np.array([np.nan])
     return dict(
-        bars_stacked=bars_stacked, stacked_pairs=stacked_pairs,
-        both_win=both_win / sp, both_lose=both_lose / sp, split=split / sp,
-        gap_p50=float(np.nanpercentile(gaps, 50)), gap_p25=float(np.nanpercentile(gaps, 25)),
-        gap_min=float(np.nanmin(gaps)), n_gaps=int(np.sum(np.isfinite(gaps))),
+        bars_stacked=bars_stacked,
+        stacked_pairs=stacked_pairs,
+        both_win=both_win / sp,
+        both_lose=both_lose / sp,
+        split=split / sp,
+        gap_p50=float(np.nanpercentile(gaps, 50)),
+        gap_p25=float(np.nanpercentile(gaps, 25)),
+        gap_min=float(np.nanmin(gaps)),
+        n_gaps=int(np.sum(np.isfinite(gaps))),
     )
 
 

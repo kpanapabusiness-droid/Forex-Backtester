@@ -40,7 +40,6 @@ sys.path.insert(0, str(ROOT))
 
 from core.sim.exit_policies.path_simulate import (  # noqa: E402
     simulate_path,
-    simulate_sl_partial_close_1r_runner_trail,
 )
 
 ARC = ROOT / "results" / "l_arc_10_v3.0.2"
@@ -67,11 +66,7 @@ def _prep_arrays(path_rows: pd.DataFrame, sl_mult: float):
     mae = p["mae_so_far_r"].to_numpy()
     mfe = p["mfe_so_far_r"].to_numpy()
     close = p["close_r"].to_numpy()
-    is_held = (
-        p["is_held"].to_numpy()
-        if "is_held" in p.columns
-        else np.ones(len(p), dtype=int)
-    )
+    is_held = p["is_held"].to_numpy() if "is_held" in p.columns else np.ones(len(p), dtype=int)
     scale = 2.0 / sl_mult
     sl_threshold_old = -(sl_mult / 2.0)
     new_mfe_at = mfe * scale
@@ -282,9 +277,7 @@ def main() -> int:
         held = pr["is_held"].to_numpy(dtype=int)
 
         # Deployed-policy replay (canonical) + instrumented mirror.
-        canon_r, canon_bars = simulate_path(
-            POLICY, pd.Series(t._asdict()), pr, SL_MULT
-        )
+        canon_r, canon_bars = simulate_path(POLICY, pd.Series(t._asdict()), pr, SL_MULT)
         inst = instrumented_partial(pr, SL_MULT)
         parity_max = max(parity_max, abs(inst["final_r"] - canon_r))
 
@@ -305,6 +298,7 @@ def main() -> int:
             bars_to_trough = -1
         # literal is_held window (2.0 sl_only)
         tmae_held = float(np.nanmin(mae2[held_mask])) if held_mask.any() else np.nan
+
         # early-window dip depth (first k bars incl. entry bar at offset 0)
         def dip_first_k(k: int) -> float:
             m = bo <= (k - 1)
@@ -368,7 +362,7 @@ def main() -> int:
     der.to_csv(OUTDIR / "A_entry_mae.csv", index=False, lineterminator="\n")
     der.to_csv(OUTDIR / "B_exit_mfe.csv", index=False, lineterminator="\n")
     write_summary(der, pool)
-    print(f"[done] wrote {OUTDIR/'A_entry_mae.csv'}, B_exit_mfe.csv, SUMMARY.md")
+    print(f"[done] wrote {OUTDIR / 'A_entry_mae.csv'}, B_exit_mfe.csv, SUMMARY.md")
     return 0
 
 
@@ -474,9 +468,7 @@ def write_summary(der: pd.DataFrame, pool: pd.DataFrame) -> None:
     L.append("## Sample sizes\n")
     seg = der.groupby("segment").size().rename("n").reset_index()
     L.append(df_to_md(seg, "{:.0f}") + "\n")
-    fold_tbl = (
-        der.groupby(["segment", "fold"]).size().rename("n").reset_index().sort_values("fold")
-    )
+    fold_tbl = der.groupby(["segment", "fold"]).size().rename("n").reset_index().sort_values("fold")
     L.append(df_to_md(fold_tbl, "{:.0f}") + "\n")
     oc = der.groupby("outcome").size().rename("n").reset_index()
     L.append("Outcome split (deployed policy):\n")
@@ -616,9 +608,7 @@ def write_summary(der: pd.DataFrame, pool: pd.DataFrame) -> None:
                 if tgt <= base:
                     row[f"->{tgt}R"] = np.nan
                 else:
-                    row[f"->{tgt}R"] = (
-                        float(np.mean(mfe[reached_base] >= tgt)) if nb else np.nan
-                    )
+                    row[f"->{tgt}R"] = float(np.mean(mfe[reached_base] >= tgt)) if nb else np.nan
             b2.append(row)
         L.append(f"**{frame} frame:**\n")
         L.append(df_to_md(pd.DataFrame(b2), "{:.4f}") + "\n")
@@ -634,11 +624,15 @@ def write_summary(der: pd.DataFrame, pool: pd.DataFrame) -> None:
     L.append(df_to_md(pd.DataFrame(b3)) + "\n")
 
     L.append("## B4 — exit_reason mix (deployed policy, 3.5R frame)\n")
-    er = der.groupby("exit_reason_deployed").agg(
-        n=("realized_r_3p5", "size"),
-        mean_realized_r=("realized_r_3p5", "mean"),
-        median_realized_r=("realized_r_3p5", "median"),
-    ).reset_index()
+    er = (
+        der.groupby("exit_reason_deployed")
+        .agg(
+            n=("realized_r_3p5", "size"),
+            mean_realized_r=("realized_r_3p5", "mean"),
+            median_realized_r=("realized_r_3p5", "median"),
+        )
+        .reset_index()
+    )
     er["share"] = er["n"] / n
     er = er[["exit_reason_deployed", "n", "share", "mean_realized_r", "median_realized_r"]]
     L.append(df_to_md(er) + "\n")

@@ -194,7 +194,7 @@ def main() -> int:
                 L.append(f"> band {k} {coh} cohort thin: n={nn}.\n")
 
     for k in BANDS:
-        L.append(f"### Band {k} = [{k}R, {k+1}R]\n")
+        L.append(f"### Band {k} = [{k}R, {k + 1}R]\n")
         tbl = []
         for coh in ["completer", "reverser"]:
             x = bp[(bp.band == k) & (bp.cohort == coh)]["intra_band_pullback_r"].to_numpy()
@@ -213,7 +213,7 @@ def main() -> int:
 
     print("[attrition]\n", attr_df.to_string(index=False))
     print("[headline]\n", head_df.to_string(index=False))
-    print(f"[done] wrote {OUTDIR/'band_pullbacks.csv'} ({len(bp)} rows) + appended SUMMARY.md")
+    print(f"[done] wrote {OUTDIR / 'band_pullbacks.csv'} ({len(bp)} rows) + appended SUMMARY.md")
     return 0
 
 

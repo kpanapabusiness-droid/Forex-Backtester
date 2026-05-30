@@ -115,16 +115,29 @@ def main() -> int:
     yr_rows = []
     for y, g in der.groupby("year"):
         r = g["realized_r_3p5"].to_numpy()
-        yr_rows.append(dict(year=int(y), n=int(r.size),
-                            win_rate=float((r > 0).mean()), mean_r=float(r.mean()),
-                            total_r=float(r.sum())))
+        yr_rows.append(
+            dict(
+                year=int(y),
+                n=int(r.size),
+                win_rate=float((r > 0).mean()),
+                mean_r=float(r.mean()),
+                total_r=float(r.sum()),
+            )
+        )
     by_year = pd.DataFrame(yr_rows).sort_values("year").reset_index(drop=True)
     by_year.to_csv(OUTDIR / "by_year.csv", index=False, lineterminator="\n")
     seg_rows = []
     for s, g in der.groupby("segment"):
         r = g["realized_r_3p5"].to_numpy()
-        seg_rows.append(dict(segment=s, n=int(r.size), win_rate=float((r > 0).mean()),
-                             mean_r=float(r.mean()), total_r=float(r.sum())))
+        seg_rows.append(
+            dict(
+                segment=s,
+                n=int(r.size),
+                win_rate=float((r > 0).mean()),
+                mean_r=float(r.mean()),
+                total_r=float(r.sum()),
+            )
+        )
     seg_tbl = pd.DataFrame(seg_rows).sort_values("segment").reset_index(drop=True)
 
     # ── Cut 3: per calendar month (pooled) ──────────────────────────────────
@@ -132,24 +145,39 @@ def main() -> int:
     exp_uniform = GN / 12.0
     for mo in range(1, 13):
         r = der[der.month == mo]["realized_r_3p5"].to_numpy()
-        mo_rows.append(dict(month=mo, n=int(r.size),
-                            win_rate=float((r > 0).mean()) if r.size else np.nan,
-                            mean_r=float(r.mean()) if r.size else np.nan,
-                            total_r=float(r.sum()),
-                            expected_n_if_uniform=exp_uniform,
-                            n_over_expected=float(r.size / exp_uniform)))
+        mo_rows.append(
+            dict(
+                month=mo,
+                n=int(r.size),
+                win_rate=float((r > 0).mean()) if r.size else np.nan,
+                mean_r=float(r.mean()) if r.size else np.nan,
+                total_r=float(r.sum()),
+                expected_n_if_uniform=exp_uniform,
+                n_over_expected=float(r.size / exp_uniform),
+            )
+        )
     by_month = pd.DataFrame(mo_rows)
     by_month.to_csv(OUTDIR / "by_month.csv", index=False, lineterminator="\n")
 
     # ── Cut 4: frequency / clustering ───────────────────────────────────────
     ym = der.groupby(["year", "month"]).size().rename("n").reset_index()
     full_idx = pd.period_range(
-        pd.Period(year=int(der.year.min()), month=int(der[der.year == der.year.min()].month.min()), freq="M"),
-        pd.Period(year=int(der.year.max()), month=int(der[der.year == der.year.max()].month.max()), freq="M"),
+        pd.Period(
+            year=int(der.year.min()),
+            month=int(der[der.year == der.year.min()].month.min()),
+            freq="M",
+        ),
+        pd.Period(
+            year=int(der.year.max()),
+            month=int(der[der.year == der.year.max()].month.max()),
+            freq="M",
+        ),
         freq="M",
     )
     ym_series = (
-        ym.assign(p=[pd.Period(year=int(y), month=int(m), freq="M") for y, m in zip(ym.year, ym.month)])
+        ym.assign(
+            p=[pd.Period(year=int(y), month=int(m), freq="M") for y, m in zip(ym.year, ym.month)]
+        )
         .set_index("p")["n"]
         .reindex(full_idx, fill_value=0)
     )
@@ -160,21 +188,25 @@ def main() -> int:
     moy = by_month["n"].to_numpy().astype(float)
     chi2, pval = stats.chisquare(moy, f_exp=np.full(12, moy.sum() / 12.0))
     clustered = (cv > 0.5) or (pval < 0.05)
-    freq_tbl = pd.DataFrame([
-        dict(metric="active months (span, incl. zeros)", value=f"{len(counts)}"),
-        dict(metric="monthly count mean", value=f"{counts.mean():.4f}"),
-        dict(metric="monthly count median", value=f"{np.median(counts):.4f}"),
-        dict(metric="monthly count CV (std/mean)", value=f"{cv:.4f}"),
-        dict(metric="max-month / median-month", value=f"{max_med:.4f}"),
-        dict(metric="month-of-year chi-square stat (dof=11)", value=f"{chi2:.4f}"),
-        dict(metric="month-of-year chi-square p-value", value=f"{pval:.4g}"),
-    ])
+    freq_tbl = pd.DataFrame(
+        [
+            dict(metric="active months (span, incl. zeros)", value=f"{len(counts)}"),
+            dict(metric="monthly count mean", value=f"{counts.mean():.4f}"),
+            dict(metric="monthly count median", value=f"{np.median(counts):.4f}"),
+            dict(metric="monthly count CV (std/mean)", value=f"{cv:.4f}"),
+            dict(metric="max-month / median-month", value=f"{max_med:.4f}"),
+            dict(metric="month-of-year chi-square stat (dof=11)", value=f"{chi2:.4f}"),
+            dict(metric="month-of-year chi-square p-value", value=f"{pval:.4g}"),
+        ]
+    )
 
     # ── Cut 5: pair x year matrices ─────────────────────────────────────────
-    cnt_mat = der.pivot_table(index="pair", columns="year", values="trade_id",
-                              aggfunc="count", fill_value=0).astype(int)
-    tr_mat = der.pivot_table(index="pair", columns="year", values="realized_r_3p5",
-                             aggfunc="sum", fill_value=0.0)
+    cnt_mat = der.pivot_table(
+        index="pair", columns="year", values="trade_id", aggfunc="count", fill_value=0
+    ).astype(int)
+    tr_mat = der.pivot_table(
+        index="pair", columns="year", values="realized_r_3p5", aggfunc="sum", fill_value=0.0
+    )
     cnt_mat.to_csv(OUTDIR / "pair_year_count.csv", lineterminator="\n")
     tr_mat.to_csv(OUTDIR / "pair_year_total_r.csv", lineterminator="\n")
 
@@ -182,10 +214,16 @@ def main() -> int:
     dow_rows = []
     for d in range(7):
         r = der[der.dow == d]["realized_r_3p5"].to_numpy()
-        dow_rows.append(dict(dow=d, weekday=DOW_NAMES[d], n=int(r.size),
-                             win_rate=float((r > 0).mean()) if r.size else np.nan,
-                             mean_r=float(r.mean()) if r.size else np.nan,
-                             total_r=float(r.sum())))
+        dow_rows.append(
+            dict(
+                dow=d,
+                weekday=DOW_NAMES[d],
+                n=int(r.size),
+                win_rate=float((r > 0).mean()) if r.size else np.nan,
+                mean_r=float(r.mean()) if r.size else np.nan,
+                total_r=float(r.sum()),
+            )
+        )
     by_dow = pd.DataFrame(dow_rows)
     by_dow.to_csv(OUTDIR / "by_dow.csv", index=False, lineterminator="\n")
 
@@ -195,21 +233,63 @@ def main() -> int:
     top5_share = float(top5["total_r"].sum() / GT)
     neg = by_pair[by_pair["total_r"] < 0][["pair", "n", "total_r"]].sort_values("total_r")
 
-    write_summary(by_pair, by_year, seg_tbl, by_month, freq_tbl, clustered, cv, pval,
-                  cnt_mat, tr_mat, by_dow, top5, bot5, top5_share, neg, GN, GT)
+    write_summary(
+        by_pair,
+        by_year,
+        seg_tbl,
+        by_month,
+        freq_tbl,
+        clustered,
+        cv,
+        pval,
+        cnt_mat,
+        tr_mat,
+        by_dow,
+        top5,
+        bot5,
+        top5_share,
+        neg,
+        GN,
+        GT,
+    )
 
-    print("[by_pair top/bottom]\n", by_pair[["pair", "n", "win_rate", "mean_r", "total_r",
-          "profit_factor", "rank_gap"]].head(5).to_string(index=False))
-    print(" ...\n", by_pair[["pair", "n", "win_rate", "mean_r", "total_r",
-          "profit_factor", "rank_gap"]].tail(5).to_string(index=False))
+    print(
+        "[by_pair top/bottom]\n",
+        by_pair[["pair", "n", "win_rate", "mean_r", "total_r", "profit_factor", "rank_gap"]]
+        .head(5)
+        .to_string(index=False),
+    )
+    print(
+        " ...\n",
+        by_pair[["pair", "n", "win_rate", "mean_r", "total_r", "profit_factor", "rank_gap"]]
+        .tail(5)
+        .to_string(index=False),
+    )
     print(f"[freq] CV={cv:.4f} chi2_p={pval:.4g} clustered={clustered}")
     print(f"[concentration] top5_share={top5_share:.4f} neg_pairs={len(neg)}")
-    print(f"[done] wrote 6 CSVs + appended SUMMARY.md")
+    print("[done] wrote 6 CSVs + appended SUMMARY.md")
     return 0
 
 
-def write_summary(by_pair, by_year, seg_tbl, by_month, freq_tbl, clustered, cv, pval,
-                  cnt_mat, tr_mat, by_dow, top5, bot5, top5_share, neg, GN, GT):
+def write_summary(
+    by_pair,
+    by_year,
+    seg_tbl,
+    by_month,
+    freq_tbl,
+    clustered,
+    cv,
+    pval,
+    cnt_mat,
+    tr_mat,
+    by_dow,
+    top5,
+    bot5,
+    top5_share,
+    neg,
+    GN,
+    GT,
+):
     L = ["\n\n---\n\n## Trade distribution analytics (3.5R)\n"]
     L.append(
         "> Descriptive, read-only re-aggregation of the deployed-policy frame "
@@ -241,22 +321,45 @@ def write_summary(by_pair, by_year, seg_tbl, by_month, freq_tbl, clustered, cv, 
     )
 
     L.append("### 1. Per pair (sorted by total R)\n")
-    L.append("> Flag: pairs with n<30 are directional-only. `rank_gap = rank_total_r - "
-             "rank_mean_r`: large negative = high-volume-low-edge; large positive = "
-             "low-volume-high-edge.\n")
-    cols1 = ["pair", "n", "n_win", "win_rate", "mean_r", "total_r", "mean_win_r",
-             "mean_loss_r", "profit_factor", "share_of_trades", "share_of_total_r",
-             "rank_total_r", "rank_mean_r", "rank_gap"]
+    L.append(
+        "> Flag: pairs with n<30 are directional-only. `rank_gap = rank_total_r - "
+        "rank_mean_r`: large negative = high-volume-low-edge; large positive = "
+        "low-volume-high-edge.\n"
+    )
+    cols1 = [
+        "pair",
+        "n",
+        "n_win",
+        "win_rate",
+        "mean_r",
+        "total_r",
+        "mean_win_r",
+        "mean_loss_r",
+        "profit_factor",
+        "share_of_trades",
+        "share_of_total_r",
+        "rank_total_r",
+        "rank_mean_r",
+        "rank_gap",
+    ]
     L.append(df_to_md(by_pair[cols1]) + "\n")
     thin_p = by_pair[by_pair.n < THIN_N]
     if len(thin_p):
-        L.append("> **n<30 (directional-only):** "
-                 + ", ".join(f"{r.pair}(n={int(r.n)})" for r in thin_p.itertuples()) + "\n")
+        L.append(
+            "> **n<30 (directional-only):** "
+            + ", ".join(f"{r.pair}(n={int(r.n)})" for r in thin_p.itertuples())
+            + "\n"
+        )
     disagree = by_pair[by_pair.rank_gap.abs() >= 7].sort_values("rank_gap")
     if len(disagree):
-        L.append("> **Rank disagreement (|gap|>=7):** "
-                 + ", ".join(f"{r.pair}(total#{int(r.rank_total_r)}/mean#{int(r.rank_mean_r)})"
-                             for r in disagree.itertuples()) + "\n")
+        L.append(
+            "> **Rank disagreement (|gap|>=7):** "
+            + ", ".join(
+                f"{r.pair}(total#{int(r.rank_total_r)}/mean#{int(r.rank_mean_r)})"
+                for r in disagree.itertuples()
+            )
+            + "\n"
+        )
 
     L.append("### 2. Per year\n")
     L.append(df_to_md(by_year) + "\n")
@@ -264,8 +367,11 @@ def write_summary(by_pair, by_year, seg_tbl, by_month, freq_tbl, clustered, cv, 
     L.append(df_to_md(seg_tbl) + "\n")
     thin_y = by_year[by_year.n < THIN_N]
     if len(thin_y):
-        L.append("> **n<30 (directional-only):** "
-                 + ", ".join(f"{int(r.year)}(n={int(r.n)})" for r in thin_y.itertuples()) + "\n")
+        L.append(
+            "> **n<30 (directional-only):** "
+            + ", ".join(f"{int(r.year)}(n={int(r.n)})" for r in thin_y.itertuples())
+            + "\n"
+        )
 
     L.append("### 3. Per calendar month (pooled across years)\n")
     L.append(df_to_md(by_month) + "\n")
@@ -275,8 +381,12 @@ def write_summary(by_pair, by_year, seg_tbl, by_month, freq_tbl, clustered, cv, 
     L.append(
         f"> Verdict: **{'CLUSTERED / bursty' if clustered else '~random-uniform'}** "
         f"(CV={cv:.2f}; month-of-year chi-square p={pval:.3g}). "
-        + ("CV>0.5 and/or p<0.05 indicate non-uniform monthly arrival."
-           if clustered else "Monthly arrival is close to uniform.") + "\n"
+        + (
+            "CV>0.5 and/or p<0.05 indicate non-uniform monthly arrival."
+            if clustered
+            else "Monthly arrival is close to uniform."
+        )
+        + "\n"
     )
 
     L.append("### 5. Pair x year — DIRECTIONAL ONLY (most cells n<30)\n")
@@ -293,10 +403,12 @@ def write_summary(by_pair, by_year, seg_tbl, by_month, freq_tbl, clustered, cv, 
     L.append(df_to_md(by_dow) + "\n")
     thin_d = by_dow[by_dow.n < THIN_N]
     if len(thin_d):
-        L.append("> **n<30 (directional-only):** "
-                 + ", ".join(f"{r.weekday}(n={int(r.n)})" for r in thin_d.itertuples())
-                 + " — these are late-Friday-UTC 4H bars rolled onto the next EET "
-                 "trading day.\n")
+        L.append(
+            "> **n<30 (directional-only):** "
+            + ", ".join(f"{r.weekday}(n={int(r.n)})" for r in thin_d.itertuples())
+            + " — these are late-Friday-UTC 4H bars rolled onto the next EET "
+            "trading day.\n"
+        )
 
     L.append("### 7. Concentration\n")
     L.append(f"Top-5 by total R (={top5_share:.1%} of all realized R):\n")

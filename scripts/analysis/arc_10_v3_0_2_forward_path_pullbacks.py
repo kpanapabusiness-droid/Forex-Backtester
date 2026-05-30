@@ -131,15 +131,31 @@ def main() -> int:
 
         # RAW pass — full 240-bar path
         for r in band_rows_for_trade(mfe, clo, "RAW"):
-            rows.append(dict(trade_id=tid, fold=m["fold"], segment=m["segment"],
-                             cluster=m["cluster"], outcome=m["outcome"], **r))
+            rows.append(
+                dict(
+                    trade_id=tid,
+                    fold=m["fold"],
+                    segment=m["segment"],
+                    cluster=m["cluster"],
+                    outcome=m["outcome"],
+                    **r,
+                )
+            )
 
         # SL-FLOOR pass — truncate at first bar mae_3p5 <= -1R (inclusive)
         sl = np.where(mae <= SL_3P5)[0]
         end = int(sl[0]) if sl.size else mfe.size - 1
         for r in band_rows_for_trade(mfe[: end + 1], clo[: end + 1], "SL_FLOOR"):
-            rows.append(dict(trade_id=tid, fold=m["fold"], segment=m["segment"],
-                             cluster=m["cluster"], outcome=m["outcome"], **r))
+            rows.append(
+                dict(
+                    trade_id=tid,
+                    fold=m["fold"],
+                    segment=m["segment"],
+                    cluster=m["cluster"],
+                    outcome=m["outcome"],
+                    **r,
+                )
+            )
 
     fp = pd.DataFrame(rows)
     fp.to_csv(OUTDIR / "forward_path_pullbacks.csv", index=False, lineterminator="\n")
@@ -165,8 +181,14 @@ def main() -> int:
             s = sub[sub.band == k]
             ne = len(s)
             nc = int((s.cohort == "completer").sum())
-            out.append(dict(band=k, n_entered=ne, n_completed=nc,
-                            completion_rate=(nc / ne if ne else np.nan)))
+            out.append(
+                dict(
+                    band=k,
+                    n_entered=ne,
+                    n_completed=nc,
+                    completion_rate=(nc / ne if ne else np.nan),
+                )
+            )
         return pd.DataFrame(out)
 
     attr_raw = attrition("RAW")
@@ -180,15 +202,17 @@ def main() -> int:
     # ---- headline: natural (RAW) vs censored (deployed-held prior) ----
     head = []
     for k in BANDS:
-        head.append(dict(
-            band=k,
-            completion_RAW=attr_raw.loc[attr_raw.band == k, "completion_rate"].iloc[0],
-            completion_SL_floor=attr_sl.loc[attr_sl.band == k, "completion_rate"].iloc[0],
-            completion_deployed_held_prior=prior_comp[k],
-            completer_p90_RAW=comp_p90("RAW", k),
-            completer_p90_SL_floor=comp_p90("SL_FLOOR", k),
-            completer_p90_deployed_held_prior=prior_p90[k],
-        ))
+        head.append(
+            dict(
+                band=k,
+                completion_RAW=attr_raw.loc[attr_raw.band == k, "completion_rate"].iloc[0],
+                completion_SL_floor=attr_sl.loc[attr_sl.band == k, "completion_rate"].iloc[0],
+                completion_deployed_held_prior=prior_comp[k],
+                completer_p90_RAW=comp_p90("RAW", k),
+                completer_p90_SL_floor=comp_p90("SL_FLOOR", k),
+                completer_p90_deployed_held_prior=prior_p90[k],
+            )
+        )
     head_df = pd.DataFrame(head)
 
     # ---- SUMMARY append ----
@@ -236,7 +260,7 @@ def main() -> int:
                 tn = [c for c, row in zip(["completer", "reverser"], tbl) if row["n"] < THIN_N]
                 if tn:
                     note = f"  _(thin: {', '.join(tn)})_"
-            L.append(f"#### Band {k} = [{k}R,{k+1}R]{note}\n")
+            L.append(f"#### Band {k} = [{k}R,{k + 1}R]{note}\n")
             L.append(df_to_md(pd.DataFrame(tbl)) + "\n")
 
     with open(OUTDIR / "SUMMARY.md", "a", encoding="utf-8") as f:
@@ -245,7 +269,9 @@ def main() -> int:
     print("[RAW attrition]\n", attr_raw.to_string(index=False))
     print("[SL_FLOOR attrition]\n", attr_sl.to_string(index=False))
     print("[headline]\n", head_df.to_string(index=False))
-    print(f"[done] wrote {OUTDIR/'forward_path_pullbacks.csv'} ({len(fp)} rows) + appended SUMMARY.md")
+    print(
+        f"[done] wrote {OUTDIR / 'forward_path_pullbacks.csv'} ({len(fp)} rows) + appended SUMMARY.md"
+    )
     return 0
 
 

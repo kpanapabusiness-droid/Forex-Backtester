@@ -48,6 +48,7 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(Path(__file__).parent))
 
 import arc_10_v3_0_2_concurrency as conc  # noqa: E402  reuse identical reconstruction
+
 from core.time_utils.session_boundary import utc_to_eet_trading_day  # noqa: E402
 
 ARC = conc.ARC
@@ -81,7 +82,6 @@ def mae_overlay(meta: pd.DataFrame, paths: pd.DataFrame) -> pd.DataFrame:
         held = bo <= int(t.dep_exit_offset)
         mfe = pr["mfe_so_far_r"].to_numpy()[held] * SCALE
         mae = pr["mae_so_far_r"].to_numpy()[held] * SCALE
-        clo = pr["close_r"].to_numpy()[held] * SCALE
         nb = mae.size
         if nb == 0:
             continue
@@ -103,7 +103,9 @@ def main() -> int:
     A = pd.read_csv(OUTDIR / "A_entry_mae.csv")[
         ["trade_id", "pair", "fold", "segment", "outcome", "dep_exit_offset"]
     ]
-    B = pd.read_csv(OUTDIR / "B_exit_mfe.csv")[["trade_id", "realized_r_3p5", "exit_reason_deployed"]]
+    B = pd.read_csv(OUTDIR / "B_exit_mfe.csv")[
+        ["trade_id", "realized_r_3p5", "exit_reason_deployed"]
+    ]
     pool = pd.read_parquet(ARC / "step_1" / "pool.parquet")[["trade_id", "entry_time"]]
     meta = A.merge(B, on="trade_id").merge(pool, on="trade_id")
     meta["entry_time"] = pd.to_datetime(meta["entry_time"], utc=True)
@@ -141,12 +143,16 @@ def main() -> int:
     day_key = pd.DatetimeIndex(day_key)
     mtm_day = utc_to_eet_trading_day(pd.DatetimeIndex(mtm_df["ts"]), convention="5ers_eet")
     mtm_df = mtm_df.assign(day=pd.DatetimeIndex(mtm_day))
-    iv_exit_day = pd.DatetimeIndex(utc_to_eet_trading_day(pd.DatetimeIndex(iv["exit_ts"]), convention="5ers_eet"))
+    iv_exit_day = pd.DatetimeIndex(
+        utc_to_eet_trading_day(pd.DatetimeIndex(iv["exit_ts"]), convention="5ers_eet")
+    )
     iv = iv.assign(exit_day=iv_exit_day)
 
     open_by_day = mtm_df.groupby("day")["trade_id"].nunique()
     closes_by_day = iv.groupby("exit_day")["trade_id"].nunique()
-    sl_by_day = iv[iv.exit_reason_deployed.isin(SL_REASONS)].groupby("exit_day")["trade_id"].nunique()
+    sl_by_day = (
+        iv[iv.exit_reason_deployed.isin(SL_REASONS)].groupby("exit_day")["trade_id"].nunique()
+    )
 
     # contiguous day blocks over the sorted clock
     days = pd.Series(day_key)
@@ -160,7 +166,7 @@ def main() -> int:
             end += 1
         carry = start - 1 if start > 0 else start
         ds_eq = eq_close[carry]
-        seg = eq_close[start:end + 1]
+        seg = eq_close[start : end + 1]
         low_rel = int(np.argmin(seg))
         low_pos = start + low_rel
         dd_daystart = max(0.0, (ds_eq - eq_close[low_pos]) / ds_eq)
@@ -171,27 +177,29 @@ def main() -> int:
             hi = max(hi, e)
             dd_dayhigh = max(dd_dayhigh, (hi - e) / hi)
         # conservative
-        cons_low = float(np.min(eq_cons[start:end + 1]))
+        cons_low = float(np.min(eq_cons[start : end + 1]))
         dd_cons = max(0.0, (ds_eq - cons_low) / ds_eq)
         # realized / floating split at the day-start-trough, expressed as % of
         # day-start equity (same basis as dd_daystart, so the two sum to it)
         realized_drop = -R_BASE * (closed_before_a[low_pos] - closed_before_a[carry]) / ds_eq
         floating_drop = -R_BASE * (open_sum_a[low_pos] - open_sum_a[carry]) / ds_eq
         total_drop = R_BASE * (port_R[carry] - port_R[low_pos]) / ds_eq
-        rows.append(dict(
-            day=pd.Timestamp(d).tz_convert("Europe/Athens").date(),
-            n_bars=end - start + 1,
-            n_open=int(open_by_day.get(d, 0)),
-            n_closes=int(closes_by_day.get(d, 0)),
-            n_sl_closes=int(sl_by_day.get(d, 0)),
-            dd_daystart_pct=dd_daystart * 100,
-            dd_dayhigh_pct=dd_dayhigh * 100,
-            dd_cons_daystart_pct=dd_cons * 100,
-            realized_drop_pct=realized_drop * 100,
-            floating_drop_pct=floating_drop * 100,
-            total_drop_pct=total_drop * 100,
-            dominant_ccy=dom_ccy.get(clock[low_pos], ""),
-        ))
+        rows.append(
+            dict(
+                day=pd.Timestamp(d).tz_convert("Europe/Athens").date(),
+                n_bars=end - start + 1,
+                n_open=int(open_by_day.get(d, 0)),
+                n_closes=int(closes_by_day.get(d, 0)),
+                n_sl_closes=int(sl_by_day.get(d, 0)),
+                dd_daystart_pct=dd_daystart * 100,
+                dd_dayhigh_pct=dd_dayhigh * 100,
+                dd_cons_daystart_pct=dd_cons * 100,
+                realized_drop_pct=realized_drop * 100,
+                floating_drop_pct=floating_drop * 100,
+                total_drop_pct=total_drop * 100,
+                dominant_ccy=dom_ccy.get(clock[low_pos], ""),
+            )
+        )
         start = end + 1
 
     dd = pd.DataFrame(rows)
@@ -202,13 +210,19 @@ def main() -> int:
     w = dd.loc[dd.dd_daystart_pct.idxmax()]
     wh = dd.dd_dayhigh_pct.max()
     wc = dd.dd_cons_daystart_pct.max()
-    print(f"[daily DD] worst day-start={w.dd_daystart_pct:.2f}% day-high={wh:.2f}% "
-          f"conservative={wc:.2f}%")
-    print(f"[worst day] {w.day} ccy={w.dominant_ccy} realized={w.realized_drop_pct:.2f} "
-          f"floating={w.floating_drop_pct:.2f} n_open={int(w.n_open)} n_sl={int(w.n_sl_closes)}")
+    print(
+        f"[daily DD] worst day-start={w.dd_daystart_pct:.2f}% day-high={wh:.2f}% "
+        f"conservative={wc:.2f}%"
+    )
+    print(
+        f"[worst day] {w.day} ccy={w.dominant_ccy} realized={w.realized_drop_pct:.2f} "
+        f"floating={w.floating_drop_pct:.2f} n_open={int(w.n_open)} n_sl={int(w.n_sl_closes)}"
+    )
     for thr in DD_THRESHOLDS:
-        print(f"  days >{thr}% (day-start): {int((dd.dd_daystart_pct > thr).sum())} | "
-              f"(day-high): {int((dd.dd_dayhigh_pct > thr).sum())}")
+        print(
+            f"  days >{thr}% (day-start): {int((dd.dd_daystart_pct > thr).sum())} | "
+            f"(day-high): {int((dd.dd_dayhigh_pct > thr).sum())}"
+        )
     print(f"[done] wrote daily_dd.csv ({len(dd)} days) + appended SUMMARY.md")
     return 0
 
@@ -254,42 +268,70 @@ def write_summary(dd: pd.DataFrame) -> None:
 
     L.append("### 1. Daily DD distribution (account-%)\n")
     dist = []
-    for ref, col in [("day-start", "dd_daystart_pct"), ("day-high", "dd_dayhigh_pct"),
-                     ("conservative MAE (day-start)", "dd_cons_daystart_pct")]:
+    for ref, col in [
+        ("day-start", "dd_daystart_pct"),
+        ("day-high", "dd_dayhigh_pct"),
+        ("conservative MAE (day-start)", "dd_cons_daystart_pct"),
+    ]:
         x = dd[col].to_numpy()
-        dist.append(dict(reference=ref,
-                         p50=float(np.percentile(x, 50)), p90=float(np.percentile(x, 90)),
-                         p99=float(np.percentile(x, 99)), max=float(x.max()),
-                         mean=float(x.mean())))
+        dist.append(
+            dict(
+                reference=ref,
+                p50=float(np.percentile(x, 50)),
+                p90=float(np.percentile(x, 90)),
+                p99=float(np.percentile(x, 99)),
+                max=float(x.max()),
+                mean=float(x.mean()),
+            )
+        )
     L.append(df_to_md(pd.DataFrame(dist)) + "\n")
     cnt = []
     for thr in DD_THRESHOLDS:
-        cnt.append(dict(threshold_pct=thr,
-                        days_daystart=int((dd.dd_daystart_pct > thr).sum()),
-                        days_dayhigh=int((dd.dd_dayhigh_pct > thr).sum()),
-                        days_conservative=int((dd.dd_cons_daystart_pct > thr).sum())))
+        cnt.append(
+            dict(
+                threshold_pct=thr,
+                days_daystart=int((dd.dd_daystart_pct > thr).sum()),
+                days_dayhigh=int((dd.dd_dayhigh_pct > thr).sum()),
+                days_conservative=int((dd.dd_cons_daystart_pct > thr).sum()),
+            )
+        )
     L.append(f"Days exceeding threshold (of {n_days} trading days):\n")
     L.append(df_to_md(pd.DataFrame(cnt), "{:.0f}") + "\n")
 
     L.append("### 2. Worst-10 days (by DAY-START close-mark DD)\n")
     top = dd.sort_values("dd_daystart_pct", ascending=False).head(10).copy()
     top["day"] = top["day"].astype(str)
-    cols = ["day", "dd_daystart_pct", "dd_dayhigh_pct", "dd_cons_daystart_pct",
-            "n_open", "n_closes", "n_sl_closes", "realized_drop_pct",
-            "floating_drop_pct", "dominant_ccy"]
+    cols = [
+        "day",
+        "dd_daystart_pct",
+        "dd_dayhigh_pct",
+        "dd_cons_daystart_pct",
+        "n_open",
+        "n_closes",
+        "n_sl_closes",
+        "realized_drop_pct",
+        "floating_drop_pct",
+        "dominant_ccy",
+    ]
     L.append(df_to_md(top[cols]) + "\n")
     thin = top[top.n_bars < 3] if "n_bars" in top else top.iloc[:0]
     if len(thin):
-        L.append("> **THIN-DAY FLAG (<3 H4 bars):** "
-                 + ", ".join(str(r.day) for r in thin.itertuples()) + " — partial sessions.\n")
+        L.append(
+            "> **THIN-DAY FLAG (<3 H4 bars):** "
+            + ", ".join(str(r.day) for r in thin.itertuples())
+            + " — partial sessions.\n"
+        )
 
     L.append("### 3. Realized vs floating (worst-10 days)\n")
-    L.append("> Closed losses are unrecoverable; floating may reverse before the "
-             "daily close — which matters depends on the (unconfirmed) 5ers basis. "
-             "Split is of the day-start trough drop.\n")
+    L.append(
+        "> Closed losses are unrecoverable; floating may reverse before the "
+        "daily close — which matters depends on the (unconfirmed) 5ers basis. "
+        "Split is of the day-start trough drop.\n"
+    )
     rf = top[["day", "total_drop_pct", "realized_drop_pct", "floating_drop_pct"]].copy()
-    rf["realized_share_pct"] = np.where(rf.total_drop_pct != 0,
-                                        rf.realized_drop_pct / rf.total_drop_pct * 100, np.nan)
+    rf["realized_share_pct"] = np.where(
+        rf.total_drop_pct != 0, rf.realized_drop_pct / rf.total_drop_pct * 100, np.nan
+    )
     L.append(df_to_md(rf) + "\n")
 
     L.append("### 4. Conservative intrabar bound vs close-mark\n")
@@ -299,31 +341,50 @@ def write_summary(dd: pd.DataFrame) -> None:
         "uncertainty band from unrecorded intrabar lows + the simultaneity/"
         "cumulative-MAE conservatism. True worst-day daily DD lies between these. "
         "Even the upper bound "
-        + (f"stays under 5% ({5 - wc_val:.2f}pp margin)." if wc_val < 5
-           else f"BREACHES 5% ({wc_val - 5:.2f}pp over).") + "\n"
+        + (
+            f"stays under 5% ({5 - wc_val:.2f}pp margin)."
+            if wc_val < 5
+            else f"BREACHES 5% ({wc_val - 5:.2f}pp over)."
+        )
+        + "\n"
     )
 
     L.append("### 5. Currency attribution of the daily-DD tail\n")
     tail = dd[dd.dd_daystart_pct > 3]
-    L.append(f"> Days with day-start DD > 3% ({len(tail)} days), grouped by dominant "
-             "adverse currency at the trough:\n")
+    L.append(
+        f"> Days with day-start DD > 3% ({len(tail)} days), grouped by dominant "
+        "adverse currency at the trough:\n"
+    )
     if len(tail):
-        ca = (tail.groupby("dominant_ccy")
-              .agg(n_days=("day", "size"), max_dd_pct=("dd_daystart_pct", "max"),
-                   mean_dd_pct=("dd_daystart_pct", "mean"))
-              .reset_index().sort_values("n_days", ascending=False))
+        ca = (
+            tail.groupby("dominant_ccy")
+            .agg(
+                n_days=("day", "size"),
+                max_dd_pct=("dd_daystart_pct", "max"),
+                mean_dd_pct=("dd_daystart_pct", "mean"),
+            )
+            .reset_index()
+            .sort_values("n_days", ascending=False)
+        )
         L.append(df_to_md(ca) + "\n")
-        L.append("> Cross-check: the max-DD episode (concurrency probe) was "
-                 "CHF-dominated; the daily-DD tail "
-                 + ("CONCENTRATES on the same CHF/EUR/JPY legs."
-                    if set(ca.dominant_ccy.head(3)) & {"CHF", "EUR", "JPY"}
-                    else "spreads across currencies.") + "\n")
+        L.append(
+            "> Cross-check: the max-DD episode (concurrency probe) was "
+            "CHF-dominated; the daily-DD tail "
+            + (
+                "CONCENTRATES on the same CHF/EUR/JPY legs."
+                if set(ca.dominant_ccy.head(3)) & {"CHF", "EUR", "JPY"}
+                else "spreads across currencies."
+            )
+            + "\n"
+        )
     else:
         L.append("> No day exceeds 3% day-start DD.\n")
 
-    L.append("\n> **Note:** figures are linear (1R=0.5%, additive open+closed MtM) vs "
-             "the gate's per-trade compounding — risk-surface comparable, not "
-             "byte-identical. Live-relevant basis is whichever 5ers confirms.\n")
+    L.append(
+        "\n> **Note:** figures are linear (1R=0.5%, additive open+closed MtM) vs "
+        "the gate's per-trade compounding — risk-surface comparable, not "
+        "byte-identical. Live-relevant basis is whichever 5ers confirms.\n"
+    )
 
     with open(OUTDIR / "SUMMARY.md", "a", encoding="utf-8") as f:
         f.write("\n".join(L))

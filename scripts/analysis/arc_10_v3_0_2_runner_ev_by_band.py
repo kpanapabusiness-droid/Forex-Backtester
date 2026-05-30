@@ -78,26 +78,40 @@ def main() -> int:
         fr = fr[np.isfinite(fr)]
         n = int(fr.size)
         if n == 0:
-            rows.append(dict(band_kR=f"{k}R", n_reached=0, E_runner_final_r=np.nan,
-                             kR=float(k), diff_E_minus_kR=np.nan, p25=np.nan, p50=np.nan,
-                             p75=np.nan, p90=np.nan, mean=np.nan, tail_share_ge_kR_plus_2=np.nan))
+            rows.append(
+                dict(
+                    band_kR=f"{k}R",
+                    n_reached=0,
+                    E_runner_final_r=np.nan,
+                    kR=float(k),
+                    diff_E_minus_kR=np.nan,
+                    p25=np.nan,
+                    p50=np.nan,
+                    p75=np.nan,
+                    p90=np.nan,
+                    mean=np.nan,
+                    tail_share_ge_kR_plus_2=np.nan,
+                )
+            )
             continue
         E = float(np.mean(fr))
         qs = np.percentile(fr, PCTS)
         tail = float(np.mean(fr >= (k + 2)))
-        rows.append(dict(
-            band_kR=f"{k}R",
-            n_reached=n,
-            E_runner_final_r=E,
-            kR=float(k),
-            diff_E_minus_kR=E - k,
-            p25=float(qs[0]),
-            p50=float(qs[1]),
-            p75=float(qs[2]),
-            p90=float(qs[3]),
-            mean=E,
-            tail_share_ge_kR_plus_2=tail,
-        ))
+        rows.append(
+            dict(
+                band_kR=f"{k}R",
+                n_reached=n,
+                E_runner_final_r=E,
+                kR=float(k),
+                diff_E_minus_kR=E - k,
+                p25=float(qs[0]),
+                p50=float(qs[1]),
+                p75=float(qs[2]),
+                p90=float(qs[3]),
+                mean=E,
+                tail_share_ge_kR_plus_2=tail,
+            )
+        )
 
     tab = pd.DataFrame(rows)
     tab.to_csv(OUTDIR / "runner_ev_by_band.csv", index=False, lineterminator="\n")
@@ -127,7 +141,7 @@ def main() -> int:
     L.append(
         "> Descriptive only — no second-partial policy added, no WFO. Runner leg "
         "(partial_fired, n={nr}). `runner_final_r` = per-unit runner realized R at "
-        "deployed exit (3.5R frame). \"reached kR\" = runner LIVE peak "
+        'deployed exit (3.5R frame). "reached kR" = runner LIVE peak '
         "`runner_peak_mfe_r` >= k (running-max => first live cross of kR). "
         "`diff = E[runner_final | reached kR] - kR`: **diff<0 => banking at kR "
         "beats holding by |diff| per runner unit**; the most-negative band is the "
@@ -147,14 +161,25 @@ def main() -> int:
 
     L.append("### Decision summary\n")
     L.append(f"> k* taken over reliable (n_reached>={THIN_N}) bands; {raw_note}.\n")
-    dec = pd.DataFrame([
-        dict(metric="best second-partial level k* (reliable)", value=str(kstar),
-             note=f"most-negative diff among non-thin bands; n_reached={kstar_n}"),
-        dict(metric="per-unit EV gain |diff| at k*", value=f"{kstar_gain:.4f}",
-             note="R per runner unit banked vs held"),
-        dict(metric="tail_share (final>=k*R+2) at k*", value=f"{kstar_tail:.4f}",
-             note="upside fraction the partial gives up"),
-    ])
+    dec = pd.DataFrame(
+        [
+            dict(
+                metric="best second-partial level k* (reliable)",
+                value=str(kstar),
+                note=f"most-negative diff among non-thin bands; n_reached={kstar_n}",
+            ),
+            dict(
+                metric="per-unit EV gain |diff| at k*",
+                value=f"{kstar_gain:.4f}",
+                note="R per runner unit banked vs held",
+            ),
+            dict(
+                metric="tail_share (final>=k*R+2) at k*",
+                value=f"{kstar_tail:.4f}",
+                note="upside fraction the partial gives up",
+            ),
+        ]
+    )
     L.append(df_to_md(dec) + "\n")
     L.append(
         f"> Read: among reliable bands, banking the runner at **{kstar}** gives the "
@@ -172,7 +197,7 @@ def main() -> int:
 
     print("[runner EV by band]\n", tab.to_string(index=False))
     print(f"[decision] k*={kstar} |diff|={kstar_gain:.4f} tail_share={kstar_tail:.4f} n={kstar_n}")
-    print(f"[done] wrote {OUTDIR/'runner_ev_by_band.csv'} + appended SUMMARY.md")
+    print(f"[done] wrote {OUTDIR / 'runner_ev_by_band.csv'} + appended SUMMARY.md")
     return 0
 
 

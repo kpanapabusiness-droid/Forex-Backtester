@@ -54,8 +54,9 @@ sys.path.insert(0, str(ROOT / "scripts" / "analysis"))
 sys.path.insert(0, str(ROOT / "scripts" / "l_arc_10_v3_0_2_governed"))
 sys.path.insert(0, str(ROOT / "scripts" / "audit" / "arc_10"))
 
-import governed_wfo as gw  # noqa: E402  reuses build_schedules + simulate_fold
 import fundednext_cost_sweep as fc  # noqa: E402  exact published cost model
+import governed_wfo as gw  # noqa: E402  reuses build_schedules + simulate_fold
+
 from core.time_utils.session_boundary import utc_to_eet_trading_day  # noqa: E402
 
 OUTDIR = ROOT / "results" / "l_arc_10_v3.0.2_fundednext_floating"
@@ -70,8 +71,7 @@ def per_trade_cost_r(pool: pd.DataFrame) -> dict:
     byte-faithful to the published FundedNext sweep."""
     out = {}
     for _, r in pool.iterrows():
-        c = fc.apply_costs_to_trade(r, spread_mult=1.5, slip_per_fill_pips=0.5,
-                                    commission_on=True)
+        c = fc.apply_costs_to_trade(r, spread_mult=1.5, slip_per_fill_pips=0.5, commission_on=True)
         out[int(r["trade_id"])] = float(c["total_cost_r"])
     return out
 
@@ -81,8 +81,15 @@ def apply_cost(sched: dict, cost_r: dict) -> dict:
     out = {}
     for tid, s in sched.items():
         c = cost_r.get(tid, 0.0)
-        out[tid] = dict(e=s["e"], x=s["x"], close=s["close"] - c, mae=s["mae"] - c,
-                        realized=s["realized"] - c, base=s["base"], quote=s["quote"])
+        out[tid] = dict(
+            e=s["e"],
+            x=s["x"],
+            close=s["close"] - c,
+            mae=s["mae"] - c,
+            realized=s["realized"] - c,
+            base=s["base"],
+            quote=s["quote"],
+        )
     return out
 
 
@@ -114,19 +121,25 @@ def process_trace(trace, sched, day_key, clock):
             for q in quotes:
                 netc[q] = netc.get(q, 0) - 1
             dom = max(netc, key=lambda k: abs(netc[k])) if netc else ""
-            worst = (dd, d, dict(
-                date=str(pd.Timestamp(d).tz_convert("Europe/Athens").date()),
-                n_open=len(open_tids),
-                realized_drop_pct=(realized_ds - real_tr) / ds_eq * 100,
-                floating_drop_pct=(floating_ds - floating_tr) / ds_eq * 100,
-                dominant_ccy=dom))
+            worst = (
+                dd,
+                d,
+                dict(
+                    date=str(pd.Timestamp(d).tz_convert("Europe/Athens").date()),
+                    n_open=len(open_tids),
+                    realized_drop_pct=(realized_ds - real_tr) / ds_eq * 100,
+                    floating_drop_pct=(floating_ds - floating_tr) / ds_eq * 100,
+                    dominant_ccy=dom,
+                ),
+            )
     return day_dd, worst
 
 
 def main() -> int:
     OUTDIR.mkdir(parents=True, exist_ok=True)
     A = pd.read_csv(gw.SRC / "A_entry_mae.csv")[
-        ["trade_id", "pair", "fold", "segment", "outcome", "dep_exit_offset"]]
+        ["trade_id", "pair", "fold", "segment", "outcome", "dep_exit_offset"]
+    ]
     B = pd.read_csv(gw.SRC / "B_exit_mfe.csv")[["trade_id", "realized_r_3p5"]]
     pool = pd.read_parquet(gw.ARC / "step_1" / "pool.parquet")
     meta = A.merge(B, on="trade_id").merge(pool[["trade_id", "entry_time"]], on="trade_id")
@@ -134,7 +147,9 @@ def main() -> int:
     paths = pd.read_parquet(gw.ARC / "step_1" / "trade_paths.parquet")
 
     sched_raw, iv, clock = gw.build_schedules(meta, paths)
-    day_key = pd.DatetimeIndex(utc_to_eet_trading_day(pd.DatetimeIndex(clock), convention="5ers_eet"))
+    day_key = pd.DatetimeIndex(
+        utc_to_eet_trading_day(pd.DatetimeIndex(clock), convention="5ers_eet")
+    )
     cost_r = per_trade_cost_r(pool.merge(B, on="trade_id"))
     sched_cost = apply_cost(sched_raw, cost_r)
     fold_tids = {f: sorted(meta[meta.fold == f]["trade_id"]) for f in sorted(meta.fold.unique())}
@@ -147,9 +162,9 @@ def main() -> int:
         "gov_static": dict(governed=True, total_ref="static"),
         "gov_trailing": dict(governed=True, total_ref="trailing"),
     }
-    res = {}      # (cost,gov) -> fold -> metrics
-    daily = {}    # (cost,gov) -> fold -> {day: dd}
-    worst = {}    # (cost,gov) -> fold -> worst-day detail
+    res = {}  # (cost,gov) -> fold -> metrics
+    daily = {}  # (cost,gov) -> fold -> {day: dd}
+    worst = {}  # (cost,gov) -> fold -> worst-day detail
     for cl, sc in scheds.items():
         for gl, kw in govs.items():
             res[(cl, gl)] = {}
@@ -165,8 +180,10 @@ def main() -> int:
 
     # ── validation gate ──
     zc_off_wd = max(res[("zerocost", "off")][f]["dd_trailing"] for f in folds_only)
-    print(f"[validate] zero-cost governors-off worst-fold trailing DD = {zc_off_wd:.4f} "
-          "(expect ~0.0922 session ungoverned portfolio)")
+    print(
+        f"[validate] zero-cost governors-off worst-fold trailing DD = {zc_off_wd:.4f} "
+        "(expect ~0.0922 session ungoverned portfolio)"
+    )
     assert abs(zc_off_wd - 0.0922) < 0.002, "validation gate failed"
 
     emit(res, daily, worst, fold_tids, folds_only, cost_r)
@@ -175,9 +192,13 @@ def main() -> int:
     for gl in ["off", "gov_static", "gov_trailing"]:
         wd = max(res[("costed", gl)][f]["dd_trailing"] for f in folds_only)
         dmax = max(max(daily[("costed", gl)][f].values()) for f in fold_tids)
-        kills = sum(len([x for x in res[("costed", gl)][f]["fires"] if x[0] == "total_close_all"])
-                    for f in fold_tids)
-        print(f"[costed/{gl}] worst-fold trailing DD={wd*100:.2f}% worst daily DD={dmax*100:.2f}% kills={kills}")
+        kills = sum(
+            len([x for x in res[("costed", gl)][f]["fires"] if x[0] == "total_close_all"])
+            for f in fold_tids
+        )
+        print(
+            f"[costed/{gl}] worst-fold trailing DD={wd * 100:.2f}% worst daily DD={dmax * 100:.2f}% kills={kills}"
+        )
     print(f"[done] {OUTDIR}")
     return 0
 
@@ -186,7 +207,9 @@ def _daily_stats(day_dd: dict) -> dict:
     v = np.array(list(day_dd.values())) * 100
     if v.size == 0:
         return dict(max=0, p99=0, p90=0)
-    return dict(max=float(v.max()), p99=float(np.percentile(v, 99)), p90=float(np.percentile(v, 90)))
+    return dict(
+        max=float(v.max()), p99=float(np.percentile(v, 99)), p90=float(np.percentile(v, 90))
+    )
 
 
 def emit(res, daily, worst, fold_tids, folds_only, cost_r):
@@ -195,12 +218,22 @@ def emit(res, daily, worst, fold_tids, folds_only, cost_r):
     for (cl, gl), r in res.items():
         for f, m in r.items():
             ds = _daily_stats(daily[(cl, gl)][f])
-            rows.append(dict(cost=cl, gov=gl, fold=f, n_trades=m["n_trades"],
-                             roi=m["roi"], trailing_dd=m["dd_trailing"], static_dd=m["dd_static"],
-                             daily_dd_max=ds["max"] / 100, daily_dd_p99=ds["p99"] / 100,
-                             daily_dd_p90=ds["p90"] / 100,
-                             killed=int(m["killed"]),
-                             n_fires=len(m["fires"])))
+            rows.append(
+                dict(
+                    cost=cl,
+                    gov=gl,
+                    fold=f,
+                    n_trades=m["n_trades"],
+                    roi=m["roi"],
+                    trailing_dd=m["dd_trailing"],
+                    static_dd=m["dd_static"],
+                    daily_dd_max=ds["max"] / 100,
+                    daily_dd_p99=ds["p99"] / 100,
+                    daily_dd_p90=ds["p90"] / 100,
+                    killed=int(m["killed"]),
+                    n_fires=len(m["fires"]),
+                )
+            )
     pd.DataFrame(rows).to_csv(OUTDIR / "per_fold_dd.csv", index=False, lineterminator="\n")
 
     # ---- CSV: daily_dd (every day, costed gov_static + off) ----
@@ -224,9 +257,17 @@ def emit(res, daily, worst, fold_tids, folds_only, cost_r):
     for gl in ["gov_static", "gov_trailing"]:
         for f, m in res[("costed", gl)].items():
             for gov, date, n_flat, surr in m["fires"]:
-                gl_rows.append(dict(gov_config=gl, fold=f, governor=gov, date=date,
-                                    n_flattened=n_flat, r_surrendered=surr,
-                                    kill=int(gov == "total_close_all")))
+                gl_rows.append(
+                    dict(
+                        gov_config=gl,
+                        fold=f,
+                        governor=gov,
+                        date=date,
+                        n_flattened=n_flat,
+                        r_surrendered=surr,
+                        kill=int(gov == "total_close_all"),
+                    )
+                )
     pd.DataFrame(gl_rows).to_csv(OUTDIR / "governor_log.csv", index=False, lineterminator="\n")
 
     write_summary(res, daily, worst, fold_tids, folds_only, cost_r)
@@ -246,7 +287,10 @@ def write_summary(res, daily, worst, fold_tids, folds_only, cost_r):
         return res[(cl, gl)][12][key]
 
     def kills(cl, gl):
-        return sum(len([x for x in res[(cl, gl)][f]["fires"] if x[0] == "total_close_all"]) for f in fold_tids)
+        return sum(
+            len([x for x in res[(cl, gl)][f]["fires"] if x[0] == "total_close_all"])
+            for f in fold_tids
+        )
 
     def wf_roi(cl, gl):
         return min(res[(cl, gl)][f]["roi"] for f in folds_only)
@@ -278,32 +322,36 @@ def write_summary(res, daily, worst, fold_tids, folds_only, cost_r):
 
     # validation
     L.append("## Validation\n")
-    L.append(f"> Zero-cost governors-OFF worst-fold trailing DD = "
-             f"**{wf_trailing('zerocost','off')*100:.2f}%** — reproduces the session's "
-             "9.22% ungoverned portfolio worst-fold DD. ✓ Costed output trusted.\n")
+    L.append(
+        f"> Zero-cost governors-OFF worst-fold trailing DD = "
+        f"**{wf_trailing('zerocost', 'off') * 100:.2f}%** — reproduces the session's "
+        "9.22% ungoverned portfolio worst-fold DD. ✓ Costed output trusted.\n"
+    )
 
     # headline
     gs_daily = worst_daily("costed", "gov_static")
     gs_trail = wf_trailing("costed", "gov_static")
     gt_trail = wf_trailing("costed", "gov_trailing")
     gs_static = wf_static("costed", "gov_static")
-    days_over_45 = sum(1 for f in fold_tids for v in daily[("costed", "gov_static")][f].values() if v * 100 > 4.5)
+    days_over_45 = sum(
+        1 for f in fold_tids for v in daily[("costed", "gov_static")][f].values() if v * 100 > 4.5
+    )
     L.append("## Headline\n")
     L.append(
-        f"- **Floating DAILY DD (costed, governed-static): worst {gs_daily*100:.2f}%, "
-        f"holdout {max(daily[('costed','gov_static')][12].values())*100:.2f}%.** Days over "
+        f"- **Floating DAILY DD (costed, governed-static): worst {gs_daily * 100:.2f}%, "
+        f"holdout {max(daily[('costed', 'gov_static')][12].values()) * 100:.2f}%.** Days over "
         f"4.5% (the daily close-all trigger): **{days_over_45}**.\n"
         f"- **Floating TRAILING DD (costed, governed-static): worst-fold "
-        f"{gs_trail*100:.2f}% (trailing-peak metric) / {gs_static*100:.2f}% (from-initial / "
-        f"5ers basis); holdout {ho('costed','gov_static','dd_trailing')*100:.2f}%.**\n"
+        f"{gs_trail * 100:.2f}% (trailing-peak metric) / {gs_static * 100:.2f}% (from-initial / "
+        f"5ers basis); holdout {ho('costed', 'gov_static', 'dd_trailing') * 100:.2f}%.**\n"
         f"- **Total-DD reference bounds (costed, governed):** static "
-        f"{gs_trail*100:.2f}% trailing-peak / {gs_static*100:.2f}% from-initial, "
-        f"**{kills('costed','gov_static')} kills**; trailing-peak total-DD reference "
-        f"{gt_trail*100:.2f}%, **{kills('costed','gov_trailing')} kills**. FundedNext's "
+        f"{gs_trail * 100:.2f}% trailing-peak / {gs_static * 100:.2f}% from-initial, "
+        f"**{kills('costed', 'gov_static')} kills**; trailing-peak total-DD reference "
+        f"{gt_trail * 100:.2f}%, **{kills('costed', 'gov_trailing')} kills**. FundedNext's "
         "semi-static rule sits between (nearer static pre-scaling).\n"
         f"- **Cost impact** (vs session zero-cost): daily {SESSION_ZEROCOST['daily']}% → "
-        f"{worst_daily('costed','off')*100:.2f}% (governors-off, like-for-like); trailing "
-        f"{SESSION_ZEROCOST['trailing_hi']}% → {wf_trailing('costed','off')*100:.2f}% "
+        f"{worst_daily('costed', 'off') * 100:.2f}% (governors-off, like-for-like); trailing "
+        f"{SESSION_ZEROCOST['trailing_hi']}% → {wf_trailing('costed', 'off') * 100:.2f}% "
         "(governors-off). Costs move floating DD by tenths of a point.\n"
     )
 
@@ -314,73 +362,136 @@ def write_summary(res, daily, worst, fold_tids, folds_only, cost_r):
         rows = []
         for f in fold_tids:
             ds = _daily_stats(daily[("costed", gl)][f])
-            cnt = {t: sum(1 for v in daily[("costed", gl)][f].values() if v * 100 > t) for t in DAILY_THRESH}
-            rows.append(dict(fold=f, max_pct=ds["max"], p99_pct=ds["p99"], p90_pct=ds["p90"],
-                             **{f"d>{t}%": cnt[t] for t in DAILY_THRESH}))
+            cnt = {
+                t: sum(1 for v in daily[("costed", gl)][f].values() if v * 100 > t)
+                for t in DAILY_THRESH
+            }
+            rows.append(
+                dict(
+                    fold=f,
+                    max_pct=ds["max"],
+                    p99_pct=ds["p99"],
+                    p90_pct=ds["p90"],
+                    **{f"d>{t}%": cnt[t] for t in DAILY_THRESH},
+                )
+            )
         L.append(df_to_md(pd.DataFrame(rows), "{:.2f}") + "\n")
-    L.append("> The daily 4.5% close-all caps governed daily DD at the trigger (plus the "
-             "modelled bar overshoot); governors-off shows the uncapped natural floating "
-             "daily DD. Difference = what the daily governors save.\n")
+    L.append(
+        "> The daily 4.5% close-all caps governed daily DD at the trigger (plus the "
+        "modelled bar overshoot); governors-off shows the uncapped natural floating "
+        "daily DD. Difference = what the daily governors save.\n"
+    )
     L.append("Worst-day (costed, governed-static), per fold:\n")
-    wd = pd.DataFrame([dict(fold=f, **{"daily_dd_pct": worst[("costed", "gov_static")][f][0] * 100},
-                           **worst[("costed", "gov_static")][f][2])
-                       for f in fold_tids if worst[("costed", "gov_static")][f]])
+    wd = pd.DataFrame(
+        [
+            dict(
+                fold=f,
+                **{"daily_dd_pct": worst[("costed", "gov_static")][f][0] * 100},
+                **worst[("costed", "gov_static")][f][2],
+            )
+            for f in fold_tids
+            if worst[("costed", "gov_static")][f]
+        ]
+    )
     L.append(df_to_md(wd.sort_values("daily_dd_pct", ascending=False).head(8), "{:.2f}") + "\n")
 
     # Cut 2 — floating trailing DD
     L.append("## 2. Floating trailing DD (high-water-mark reference)\n")
     t2 = []
-    for gl, lab in [("gov_static", "governed-static"), ("gov_trailing", "governed-trailing"), ("off", "governors-off")]:
-        t2.append(dict(config=lab + " (costed)", worst_fold_pct=wf_trailing("costed", gl) * 100,
-                       holdout_pct=ho("costed", gl, "dd_trailing") * 100,
-                       max_fold_pct=max(res[("costed", gl)][f]["dd_trailing"] for f in fold_tids) * 100))
+    for gl, lab in [
+        ("gov_static", "governed-static"),
+        ("gov_trailing", "governed-trailing"),
+        ("off", "governors-off"),
+    ]:
+        t2.append(
+            dict(
+                config=lab + " (costed)",
+                worst_fold_pct=wf_trailing("costed", gl) * 100,
+                holdout_pct=ho("costed", gl, "dd_trailing") * 100,
+                max_fold_pct=max(res[("costed", gl)][f]["dd_trailing"] for f in fold_tids) * 100,
+            )
+        )
     L.append(df_to_md(pd.DataFrame(t2), "{:.2f}") + "\n")
-    L.append("> Note the counterintuitive ordering: **governed-static trailing DD "
-             f"({wf_trailing('costed','gov_static')*100:.2f}%) > governors-off "
-             f"({wf_trailing('costed','off')*100:.2f}%)**. The daily 4.5% close-all "
-             "flattens a floating dip (2010-05) that would have RECOVERED by natural "
-             "exit, locking the loss and deepening the trailing-peak max-DD by ~0.9pp. "
-             "The governor trades a tail-risk cap (it bounds the from-initial DD and "
-             "prevents same-day escalation) for a slightly worse routine trailing DD — a "
-             "real effect, not an artifact. On the from-initial 5ers basis the governed "
-             f"DD is {wf_static('costed','gov_static')*100:.2f}% (≤8%).\n")
+    L.append(
+        "> Note the counterintuitive ordering: **governed-static trailing DD "
+        f"({wf_trailing('costed', 'gov_static') * 100:.2f}%) > governors-off "
+        f"({wf_trailing('costed', 'off') * 100:.2f}%)**. The daily 4.5% close-all "
+        "flattens a floating dip (2010-05) that would have RECOVERED by natural "
+        "exit, locking the loss and deepening the trailing-peak max-DD by ~0.9pp. "
+        "The governor trades a tail-risk cap (it bounds the from-initial DD and "
+        "prevents same-day escalation) for a slightly worse routine trailing DD — a "
+        "real effect, not an artifact. On the from-initial 5ers basis the governed "
+        f"DD is {wf_static('costed', 'gov_static') * 100:.2f}% (≤8%).\n"
+    )
 
     # Cut 3 — total-DD bounds
     L.append("## 3. Total-DD reference bounds (static vs trailing)\n")
-    t3 = pd.DataFrame([
-        dict(reference="static-from-initial (lower strictness)",
-             worst_fold_dd_pct=wf_static("costed", "gov_static") * 100,
-             kills=kills("costed", "gov_static")),
-        dict(reference="trailing-peak (upper strictness)",
-             worst_fold_dd_pct=wf_trailing("costed", "gov_trailing") * 100,
-             kills=kills("costed", "gov_trailing")),
-    ])
+    t3 = pd.DataFrame(
+        [
+            dict(
+                reference="static-from-initial (lower strictness)",
+                worst_fold_dd_pct=wf_static("costed", "gov_static") * 100,
+                kills=kills("costed", "gov_static"),
+            ),
+            dict(
+                reference="trailing-peak (upper strictness)",
+                worst_fold_dd_pct=wf_trailing("costed", "gov_trailing") * 100,
+                kills=kills("costed", "gov_trailing"),
+            ),
+        ]
+    )
     L.append(df_to_md(t3, "{:.2f}") + "\n")
-    L.append("> **FundedNext's actual rule is SEMI-STATIC** (limit scales with account "
-             "size; scaling timeline unconfirmed — doc §6.3 open blocker). It is NOT "
-             "modelled here; it lands BETWEEN these bounds, nearer the static bound early "
-             "(pre-scaling). Static = lower bound on strictness, trailing = upper bound.\n")
+    L.append(
+        "> **FundedNext's actual rule is SEMI-STATIC** (limit scales with account "
+        "size; scaling timeline unconfirmed — doc §6.3 open blocker). It is NOT "
+        "modelled here; it lands BETWEEN these bounds, nearer the static bound early "
+        "(pre-scaling). Static = lower bound on strictness, trailing = upper bound.\n"
+    )
 
     # Cut 4 — cost impact
     L.append("## 4. Cost impact (costed vs zero-cost floating DD)\n")
-    t4 = pd.DataFrame([
-        dict(metric="worst-fold trailing DD %", governors="off",
-             zero_cost=wf_trailing("zerocost", "off") * 100, costed=wf_trailing("costed", "off") * 100,
-             delta_pp=(wf_trailing("costed", "off") - wf_trailing("zerocost", "off")) * 100),
-        dict(metric="worst daily DD %", governors="off",
-             zero_cost=worst_daily("zerocost", "off") * 100, costed=worst_daily("costed", "off") * 100,
-             delta_pp=(worst_daily("costed", "off") - worst_daily("zerocost", "off")) * 100),
-        dict(metric="worst-fold trailing DD %", governors="gov_static",
-             zero_cost=wf_trailing("zerocost", "gov_static") * 100, costed=wf_trailing("costed", "gov_static") * 100,
-             delta_pp=(wf_trailing("costed", "gov_static") - wf_trailing("zerocost", "gov_static")) * 100),
-        dict(metric="mean-fold ROI %", governors="gov_static",
-             zero_cost=mean_roi("zerocost", "gov_static") * 100, costed=mean_roi("costed", "gov_static") * 100,
-             delta_pp=(mean_roi("costed", "gov_static") - mean_roi("zerocost", "gov_static")) * 100),
-    ])
+    t4 = pd.DataFrame(
+        [
+            dict(
+                metric="worst-fold trailing DD %",
+                governors="off",
+                zero_cost=wf_trailing("zerocost", "off") * 100,
+                costed=wf_trailing("costed", "off") * 100,
+                delta_pp=(wf_trailing("costed", "off") - wf_trailing("zerocost", "off")) * 100,
+            ),
+            dict(
+                metric="worst daily DD %",
+                governors="off",
+                zero_cost=worst_daily("zerocost", "off") * 100,
+                costed=worst_daily("costed", "off") * 100,
+                delta_pp=(worst_daily("costed", "off") - worst_daily("zerocost", "off")) * 100,
+            ),
+            dict(
+                metric="worst-fold trailing DD %",
+                governors="gov_static",
+                zero_cost=wf_trailing("zerocost", "gov_static") * 100,
+                costed=wf_trailing("costed", "gov_static") * 100,
+                delta_pp=(
+                    wf_trailing("costed", "gov_static") - wf_trailing("zerocost", "gov_static")
+                )
+                * 100,
+            ),
+            dict(
+                metric="mean-fold ROI %",
+                governors="gov_static",
+                zero_cost=mean_roi("zerocost", "gov_static") * 100,
+                costed=mean_roi("costed", "gov_static") * 100,
+                delta_pp=(mean_roi("costed", "gov_static") - mean_roi("zerocost", "gov_static"))
+                * 100,
+            ),
+        ]
+    )
     L.append(df_to_md(t4, "{:.2f}") + "\n")
-    L.append(f"> Session zero-cost floating figures were daily 4.66% / trailing 8.59-9.22%. "
-             "Costs (mean ~0.044R/trade) move floating DD by only tenths of a point — the "
-             "system is DD-bound by structure/concurrency, not by FundedNext costs.\n")
+    L.append(
+        "> Session zero-cost floating figures were daily 4.66% / trailing 8.59-9.22%. "
+        "Costs (mean ~0.044R/trade) move floating DD by only tenths of a point — the "
+        "system is DD-bound by structure/concurrency, not by FundedNext costs.\n"
+    )
 
     # Cut 5 — governor firing + verdict
     L.append("## 5. Governor firing + kills + costed gate verdict\n")
@@ -389,25 +500,54 @@ def write_summary(res, daily, worst, fold_tids, folds_only, cost_r):
         for f, m in res[("costed", gl)].items():
             for gov, date, n_flat, surr in m["fires"]:
                 counts[gov] = counts.get(gov, 0) + 1
-        L.append(f"**costed / {gl}** — " + (", ".join(f"{k}: {v}" for k, v in sorted(counts.items())) or "no fires") + "\n")
-        kl = [(f, x[1], x[2], x[3]) for f, m in res[("costed", gl)].items() for x in m["fires"] if x[0] == "total_close_all"]
+        L.append(
+            f"**costed / {gl}** — "
+            + (", ".join(f"{k}: {v}" for k, v in sorted(counts.items())) or "no fires")
+            + "\n"
+        )
+        kl = [
+            (f, x[1], x[2], x[3])
+            for f, m in res[("costed", gl)].items()
+            for x in m["fires"]
+            if x[0] == "total_close_all"
+        ]
         if kl:
-            L.append("> **KILL EVENTS:**\n" + df_to_md(pd.DataFrame(
-                [dict(fold=f, date=d, n_flattened=n, r_surrendered=s) for f, d, n, s in kl]), "{:.3f}") + "\n")
+            L.append(
+                "> **KILL EVENTS:**\n"
+                + df_to_md(
+                    pd.DataFrame(
+                        [dict(fold=f, date=d, n_flattened=n, r_surrendered=s) for f, d, n, s in kl]
+                    ),
+                    "{:.3f}",
+                )
+                + "\n"
+            )
         else:
             L.append("> No kill events.\n")
-    vs_init = gw._gate(wf_roi("costed", "gov_static"), mean_roi("costed", "gov_static"),
-                       wf_static("costed", "gov_static"), kills("costed", "gov_static") > 0)
-    vs_trail = gw._gate(wf_roi("costed", "gov_static"), mean_roi("costed", "gov_static"),
-                        wf_trailing("costed", "gov_static"), kills("costed", "gov_static") > 0)
-    vt = gw._gate(wf_roi("costed", "gov_trailing"), mean_roi("costed", "gov_trailing"),
-                  wf_trailing("costed", "gov_trailing"), kills("costed", "gov_trailing") > 0)
+    vs_init = gw._gate(
+        wf_roi("costed", "gov_static"),
+        mean_roi("costed", "gov_static"),
+        wf_static("costed", "gov_static"),
+        kills("costed", "gov_static") > 0,
+    )
+    vs_trail = gw._gate(
+        wf_roi("costed", "gov_static"),
+        mean_roi("costed", "gov_static"),
+        wf_trailing("costed", "gov_static"),
+        kills("costed", "gov_static") > 0,
+    )
+    vt = gw._gate(
+        wf_roi("costed", "gov_trailing"),
+        mean_roi("costed", "gov_trailing"),
+        wf_trailing("costed", "gov_trailing"),
+        kills("costed", "gov_trailing") > 0,
+    )
     L.append(
         f"> **Costed governed gate verdict:** static total-DD ref = **{vs_init}** on the "
-        f"from-initial 5ers basis ({wf_static('costed','gov_static')*100:.2f}% DD, worst-fold "
-        f"ROI {wf_roi('costed','gov_static')*100:.2f}%, mean {mean_roi('costed','gov_static')*100:.1f}%) "
-        f"/ **{vs_trail}** on the trailing-peak metric ({wf_trailing('costed','gov_static')*100:.2f}% "
-        f"DD); trailing-ref = **{vt}** ({kills('costed','gov_trailing')} kills). Consistent "
+        f"from-initial 5ers basis ({wf_static('costed', 'gov_static') * 100:.2f}% DD, worst-fold "
+        f"ROI {wf_roi('costed', 'gov_static') * 100:.2f}%, mean {mean_roi('costed', 'gov_static') * 100:.1f}%) "
+        f"/ **{vs_trail}** on the trailing-peak metric ({wf_trailing('costed', 'gov_static') * 100:.2f}% "
+        f"DD); trailing-ref = **{vt}** ({kills('costed', 'gov_trailing')} kills). Consistent "
         "with the uncosted governed WFO — costs compress magnitude but do not change the "
         "verdict structure; the binding constraint remains concurrency-driven DD, not cost.\n"
     )

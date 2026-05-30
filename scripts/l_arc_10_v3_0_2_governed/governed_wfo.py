@@ -57,6 +57,7 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts" / "analysis"))
 
 import arc_10_v3_0_2_concurrency as conc  # noqa: E402  shared reconstruction
+
 from core.time_utils.session_boundary import utc_to_eet_trading_day  # noqa: E402
 
 ARC = conc.ARC
@@ -127,9 +128,15 @@ def build_schedules(meta, paths):
         rng = np.arange(e, x + 1)
         close = pd.Series(g["mtm_r"].to_numpy(), index=ps).reindex(rng).ffill().to_numpy()
         mae = pd.Series(g["mae_mark_r"].to_numpy(), index=ps).reindex(rng).ffill().to_numpy()
-        sched[tid] = dict(e=e, x=x, close=close, mae=mae,
-                          realized=float(close[-1]),
-                          base=g["base"].iloc[0], quote=g["quote"].iloc[0])
+        sched[tid] = dict(
+            e=e,
+            x=x,
+            close=close,
+            mae=mae,
+            realized=float(close[-1]),
+            base=g["base"].iloc[0],
+            quote=g["quote"].iloc[0],
+        )
     iv = pd.DataFrame(intervals).T.reset_index().rename(columns={"index": "trade_id"})
     return sched, iv, clock
 
@@ -151,8 +158,17 @@ def max_dd_trailing(curve: np.ndarray) -> float:
 
 
 # ──────────────────────────────────────────────────────────────────────────
-def simulate_fold(tids, sched, day_key, clock, *, governed: bool, total_ref: str,
-                  trigger_mark: str = "close", trace: list | None = None):
+def simulate_fold(
+    tids,
+    sched,
+    day_key,
+    clock,
+    *,
+    governed: bool,
+    total_ref: str,
+    trigger_mark: str = "close",
+    trace: list | None = None,
+):
     """Event-driven portfolio sim over one fold's trades. Returns metrics + logs.
 
     total_ref in {"static","trailing"} sets the total-DD reference for governors
@@ -206,9 +222,15 @@ def simulate_fold(tids, sched, day_key, clock, *, governed: bool, total_ref: str
         # 1. entries
         for tid in entries.get(p, []):
             if governed and (killed or total_halt or daily_halt or daily_closed):
-                gov = ("total_halt" if total_halt else
-                       "daily_close_all" if daily_closed else
-                       "daily_halt" if daily_halt else "killed")
+                gov = (
+                    "total_halt"
+                    if total_halt
+                    else "daily_close_all"
+                    if daily_closed
+                    else "daily_halt"
+                    if daily_halt
+                    else "killed"
+                )
                 skipped.append((tid, gov))
                 continue
             open_t[tid] = True
@@ -226,15 +248,15 @@ def simulate_fold(tids, sched, day_key, clock, *, governed: bool, total_ref: str
         total_dd = (ref - trig_eq) / ref
         daily_dd = (day_start_eq - trig_eq) / day_start_eq
         daily_dd_intrabar_max = max(daily_dd_intrabar_max, daily_dd)
-        daily_dd_close_max = max(daily_dd_close_max,
-                                 (day_start_eq - close_eq) / day_start_eq)
+        daily_dd_close_max = max(daily_dd_close_max, (day_start_eq - close_eq) / day_start_eq)
         if trace is not None:  # per-bar diagnostics (pre-flatten open book)
-            trace.append((p, float(close_eq), float(realized), float(day_start_eq),
-                          tuple(open_t)))
+            trace.append((p, float(close_eq), float(realized), float(day_start_eq), tuple(open_t)))
 
         # 3. governor actions (severity order); flatten at the trigger mark
         if governed and not killed and total_dd >= TOTAL_KILL:
-            surr = _flatten(open_t, sched, p, realized_add := [], flattened, "total_close_all", trigger_mark)
+            surr = _flatten(
+                open_t, sched, p, realized_add := [], flattened, "total_close_all", trigger_mark
+            )
             realized += R_BASE * realized_add[0]
             fires.append(("total_close_all", _date(clock[p]), surr[0], surr[1]))
             killed = True
@@ -283,8 +305,11 @@ def simulate_fold(tids, sched, day_key, clock, *, governed: bool, total_ref: str
         dd_static=float(np.max(1.0 - curve)) if curve.size else 0.0,
         daily_dd_intrabar_max=daily_dd_intrabar_max,
         daily_dd_close_max=daily_dd_close_max,
-        fires=fires, skipped=skipped, flattened=flattened,
-        killed=killed, n_trades=len(tids),
+        fires=fires,
+        skipped=skipped,
+        flattened=flattened,
+        killed=killed,
+        n_trades=len(tids),
     )
 
 
@@ -314,7 +339,8 @@ def _date(ts):
 def main() -> int:
     OUTDIR.mkdir(parents=True, exist_ok=True)
     A = pd.read_csv(SRC / "A_entry_mae.csv")[
-        ["trade_id", "pair", "fold", "segment", "outcome", "dep_exit_offset"]]
+        ["trade_id", "pair", "fold", "segment", "outcome", "dep_exit_offset"]
+    ]
     B = pd.read_csv(SRC / "B_exit_mfe.csv")[["trade_id", "realized_r_3p5"]]
     pool = pd.read_parquet(ARC / "step_1" / "pool.parquet")[["trade_id", "entry_time"]]
     meta = A.merge(B, on="trade_id").merge(pool, on="trade_id")
@@ -322,7 +348,9 @@ def main() -> int:
     paths = pd.read_parquet(ARC / "step_1" / "trade_paths.parquet")
 
     sched, iv, clock = build_schedules(meta, paths)
-    day_key = pd.DatetimeIndex(utc_to_eet_trading_day(pd.DatetimeIndex(clock), convention="5ers_eet"))
+    day_key = pd.DatetimeIndex(
+        utc_to_eet_trading_day(pd.DatetimeIndex(clock), convention="5ers_eet")
+    )
     fold_tids = {f: sorted(meta[meta.fold == f]["trade_id"]) for f in sorted(meta.fold.unique())}
 
     configs = {
@@ -343,11 +371,15 @@ def main() -> int:
     ung_worst_roi = min(ung[f]["roi"] for f in folds_only)
     ung_mean_roi = float(np.mean([ung[f]["roi"] for f in folds_only]))
     ung_worst_dd = max(ung[f]["dd_trailing"] for f in folds_only)
-    print(f"[validate] ungoverned portfolio: mean_roi={ung_mean_roi:.4f} "
-          f"worst_roi={ung_worst_roi:.4f} worst_dd_trailing={ung_worst_dd:.4f}")
-    print(f"           prior sequential gate: mean={PRIOR['mean_roi']:.4f} "
-          f"worst={PRIOR['worst_roi']:.4f} dd={PRIOR['worst_dd']:.4f} "
-          f"(concurrency-probe portfolio worst-fold DD ~0.0922)")
+    print(
+        f"[validate] ungoverned portfolio: mean_roi={ung_mean_roi:.4f} "
+        f"worst_roi={ung_worst_roi:.4f} worst_dd_trailing={ung_worst_dd:.4f}"
+    )
+    print(
+        f"           prior sequential gate: mean={PRIOR['mean_roi']:.4f} "
+        f"worst={PRIOR['worst_roi']:.4f} dd={PRIOR['worst_dd']:.4f} "
+        f"(concurrency-probe portfolio worst-fold DD ~0.0922)"
+    )
 
     emit_artefacts(results, fold_tids, sched)
     write_summary(results, fold_tids, sched, ung_mean_roi, ung_worst_roi, ung_worst_dd)
@@ -370,21 +402,36 @@ def emit_artefacts(results, fold_tids, sched):
         for f, m in results[c].items():
             if m is None:
                 continue
-            rows.append(dict(config=c, fold=f, n_trades=m["n_trades"],
-                             roi=m["roi"], dd_trailing=m["dd_trailing"],
-                             dd_static=m["dd_static"],
-                             daily_dd_intrabar_max=m["daily_dd_intrabar_max"],
-                             killed=int(m["killed"]),
-                             n_fires=len(m["fires"])))
+            rows.append(
+                dict(
+                    config=c,
+                    fold=f,
+                    n_trades=m["n_trades"],
+                    roi=m["roi"],
+                    dd_trailing=m["dd_trailing"],
+                    dd_static=m["dd_static"],
+                    daily_dd_intrabar_max=m["daily_dd_intrabar_max"],
+                    killed=int(m["killed"]),
+                    n_fires=len(m["fires"]),
+                )
+            )
     pd.DataFrame(rows).to_csv(OUTDIR / "per_fold_gate.csv", index=False, lineterminator="\n")
     # firing log
     fl = []
     for c in ["governed_static", "governed_trailing"]:
         for f, m in results[c].items():
             for gov, date, n_flat, surr in m["fires"]:
-                fl.append(dict(config=c, fold=f, governor=gov, date=date,
-                               n_flattened=n_flat, r_surrendered=surr,
-                               kill_event=int(gov == "total_close_all")))
+                fl.append(
+                    dict(
+                        config=c,
+                        fold=f,
+                        governor=gov,
+                        date=date,
+                        n_flattened=n_flat,
+                        r_surrendered=surr,
+                        kill_event=int(gov == "total_close_all"),
+                    )
+                )
     pd.DataFrame(fl).to_csv(OUTDIR / "governor_firing_log.csv", index=False, lineterminator="\n")
     # tax decomposition (governed_static primary)
     tax = []
@@ -401,9 +448,15 @@ def emit_artefacts(results, fold_tids, sched):
             for tid, gov, mark, nat in m["flattened"]:
                 surr_r += nat - mark
                 n_flat += 1
-        tax.append(dict(config=c, n_entries_skipped=n_skip,
-                        skipped_signal_R=skipped_r, n_positions_flattened=n_flat,
-                        R_surrendered_by_closeall=surr_r))
+        tax.append(
+            dict(
+                config=c,
+                n_entries_skipped=n_skip,
+                skipped_signal_R=skipped_r,
+                n_positions_flattened=n_flat,
+                R_surrendered_by_closeall=surr_r,
+            )
+        )
     pd.DataFrame(tax).to_csv(OUTDIR / "roi_tax_decomposition.csv", index=False, lineterminator="\n")
 
 
@@ -456,9 +509,16 @@ def write_summary(results, fold_tids, sched, ung_mean, ung_worst, ung_worst_dd):
         ddday = max(r[f]["daily_dd_intrabar_max"] for f in fold_tids)
         kills = sum(len([x for x in r[f]["fires"] if x[0] == "total_close_all"]) for f in fold_tids)
         ho = r[12]
-        return dict(worst_roi=wr, mean_roi=mr, worst_dd_trailing=wd_t,
-                    worst_dd_static=wd_s, daily_dd_max=ddday, kills=kills,
-                    ho_roi=ho["roi"], ho_dd=ho["dd_trailing"])
+        return dict(
+            worst_roi=wr,
+            mean_roi=mr,
+            worst_dd_trailing=wd_t,
+            worst_dd_static=wd_s,
+            daily_dd_max=ddday,
+            kills=kills,
+            ho_roi=ho["roi"],
+            ho_dd=ho["dd_trailing"],
+        )
 
     gs, gt = agg("governed_static"), agg("governed_trailing")
     gi = agg("governed_static_intrabar")  # conservative MAE upper bound
@@ -479,61 +539,91 @@ def write_summary(results, fold_tids, sched, ung_mean, ung_worst, ung_worst_dd):
         f"7.80%).** Under the stricter trailing-peak total-DD reference: **{verdict_t}**. "
         f"Total kill events (8% close-all): static **{gs['kills']}**, trailing-ref "
         f"**{gt['kills']}**.\n"
-        f"- **ROI tax** (governed vs ungoverned-portfolio mean fold ROI {ung_mean*100:.1f}%): "
+        f"- **ROI tax** (governed vs ungoverned-portfolio mean fold ROI {ung_mean * 100:.1f}%): "
         f"static **{tax_s:.1f}%** (mild), trailing **{tax_t:.1f}%** (heavy — kills flatten "
         "would-be winners).\n"
         f"- **Worst-fold DD decomposition (trailing-peak / max-DD metric):** prior "
-        f"sequential gate 7.80% → ungoverned PORTFOLIO {ung_worst_dd*100:.2f}% "
+        f"sequential gate 7.80% → ungoverned PORTFOLIO {ung_worst_dd * 100:.2f}% "
         "(+concurrency, the load-bearing jump) → governed-static "
-        f"{gs['worst_dd_trailing']*100:.2f}% (+daily close-all locking a floating dip). "
+        f"{gs['worst_dd_trailing'] * 100:.2f}% (+daily close-all locking a floating dip). "
         f"On the **from-initial DD metric** (the static governor's own / 5ers basis), "
-        f"governed-static worst-fold DD is only **{gs['worst_dd_static']*100:.2f}%** "
+        f"governed-static worst-fold DD is only **{gs['worst_dd_static'] * 100:.2f}%** "
         "(≤8%).\n"
-        f"- **Governed worst daily DD (close-mark):** static {gs['daily_dd_max']*100:.2f}%, "
-        f"trailing {gt['daily_dd_max']*100:.2f}% (the 4.5% daily close-all fired; see §2).\n"
+        f"- **Governed worst daily DD (close-mark):** static {gs['daily_dd_max'] * 100:.2f}%, "
+        f"trailing {gt['daily_dd_max'] * 100:.2f}% (the 4.5% daily close-all fired; see §2).\n"
         f"- **Conservative intrabar-MAE upper bound (NOT the gate; overstates — see "
-        f"§modelling):** worst-fold DD {gi['worst_dd_trailing']*100:.2f}%, "
-        f"{gi['kills']} kills, mean ROI {gi['mean_roi']*100:.1f}%.\n"
+        f"§modelling):** worst-fold DD {gi['worst_dd_trailing'] * 100:.2f}%, "
+        f"{gi['kills']} kills, mean ROI {gi['mean_roi'] * 100:.1f}%.\n"
     )
 
     # ── Cut 1: gate table ──
     L.append("## 1. Governed gate — side by side\n")
-    gate = pd.DataFrame([
-        dict(metric="worst-fold ROI %", prior_sequential=PRIOR["worst_roi"] * 100,
-             ungoverned_portfolio=ung_worst * 100, governed_static=gs["worst_roi"] * 100,
-             governed_trailing=gt["worst_roi"] * 100),
-        dict(metric="mean-fold ROI %", prior_sequential=PRIOR["mean_roi"] * 100,
-             ungoverned_portfolio=ung_mean * 100, governed_static=gs["mean_roi"] * 100,
-             governed_trailing=gt["mean_roi"] * 100),
-        dict(metric="worst-fold DD %", prior_sequential=PRIOR["worst_dd"] * 100,
-             ungoverned_portfolio=ung_worst_dd * 100,
-             governed_static=gs["worst_dd_trailing"] * 100,
-             governed_trailing=gt["worst_dd_trailing"] * 100),
-        dict(metric="holdout ROI %", prior_sequential=np.nan,
-             ungoverned_portfolio=results["ungoverned"][12]["roi"] * 100,
-             governed_static=gs["ho_roi"] * 100, governed_trailing=gt["ho_roi"] * 100),
-        dict(metric="kill events", prior_sequential=0, ungoverned_portfolio=0,
-             governed_static=gs["kills"], governed_trailing=gt["kills"]),
-    ])
+    gate = pd.DataFrame(
+        [
+            dict(
+                metric="worst-fold ROI %",
+                prior_sequential=PRIOR["worst_roi"] * 100,
+                ungoverned_portfolio=ung_worst * 100,
+                governed_static=gs["worst_roi"] * 100,
+                governed_trailing=gt["worst_roi"] * 100,
+            ),
+            dict(
+                metric="mean-fold ROI %",
+                prior_sequential=PRIOR["mean_roi"] * 100,
+                ungoverned_portfolio=ung_mean * 100,
+                governed_static=gs["mean_roi"] * 100,
+                governed_trailing=gt["mean_roi"] * 100,
+            ),
+            dict(
+                metric="worst-fold DD %",
+                prior_sequential=PRIOR["worst_dd"] * 100,
+                ungoverned_portfolio=ung_worst_dd * 100,
+                governed_static=gs["worst_dd_trailing"] * 100,
+                governed_trailing=gt["worst_dd_trailing"] * 100,
+            ),
+            dict(
+                metric="holdout ROI %",
+                prior_sequential=np.nan,
+                ungoverned_portfolio=results["ungoverned"][12]["roi"] * 100,
+                governed_static=gs["ho_roi"] * 100,
+                governed_trailing=gt["ho_roi"] * 100,
+            ),
+            dict(
+                metric="kill events",
+                prior_sequential=0,
+                ungoverned_portfolio=0,
+                governed_static=gs["kills"],
+                governed_trailing=gt["kills"],
+            ),
+        ]
+    )
     L.append(df_to_md(gate, "{:.2f}") + "\n")
-    L.append(f"> **PASS-DEPLOYABLE check** (worst-fold ROI>5%, mean>8%, worst-fold DD<=8%, "
-             f"no in-sample kill): static-governed = **{verdict_s_init}** on the "
-             f"from-initial 5ers basis ({gs['worst_dd_static']*100:.2f}% DD) / "
-             f"**{verdict_s}** on the trailing-peak metric "
-             f"({gs['worst_dd_trailing']*100:.2f}% DD); trailing-ref-governed = "
-             f"**{verdict_t}** ({gt['kills']} kills).\n")
+    L.append(
+        f"> **PASS-DEPLOYABLE check** (worst-fold ROI>5%, mean>8%, worst-fold DD<=8%, "
+        f"no in-sample kill): static-governed = **{verdict_s_init}** on the "
+        f"from-initial 5ers basis ({gs['worst_dd_static'] * 100:.2f}% DD) / "
+        f"**{verdict_s}** on the trailing-peak metric "
+        f"({gs['worst_dd_trailing'] * 100:.2f}% DD); trailing-ref-governed = "
+        f"**{verdict_t}** ({gt['kills']} kills).\n"
+    )
 
     # per-fold detail
     L.append("### Per-fold (governed static)\n")
-    pf = pd.DataFrame([
-        dict(fold=f, n_trades=results["governed_static"][f]["n_trades"],
-             roi_pct=results["governed_static"][f]["roi"] * 100,
-             dd_trailing_pct=results["governed_static"][f]["dd_trailing"] * 100,
-             daily_dd_pct=results["governed_static"][f]["daily_dd_intrabar_max"] * 100,
-             killed=int(results["governed_static"][f]["killed"]),
-             ung_roi_pct=results["ungoverned"][f]["roi"] * 100,
-             ung_dd_pct=results["ungoverned"][f]["dd_trailing"] * 100)
-        for f in fold_tids])
+    pf = pd.DataFrame(
+        [
+            dict(
+                fold=f,
+                n_trades=results["governed_static"][f]["n_trades"],
+                roi_pct=results["governed_static"][f]["roi"] * 100,
+                dd_trailing_pct=results["governed_static"][f]["dd_trailing"] * 100,
+                daily_dd_pct=results["governed_static"][f]["daily_dd_intrabar_max"] * 100,
+                killed=int(results["governed_static"][f]["killed"]),
+                ung_roi_pct=results["ungoverned"][f]["roi"] * 100,
+                ung_dd_pct=results["ungoverned"][f]["dd_trailing"] * 100,
+            )
+            for f in fold_tids
+        ]
+    )
     L.append(df_to_md(pf, "{:.2f}") + "\n")
 
     # ── Cut 2: firing log ──
@@ -543,11 +633,21 @@ def write_summary(results, fold_tids, sched, ung_mean, ung_worst, ung_worst_dd):
         for f, m in results[c].items():
             for gov, date, n_flat, surr in m["fires"]:
                 counts[gov] = counts.get(gov, 0) + 1
-        L.append(f"**{c}** — " + (", ".join(f"{k}: {v}" for k, v in sorted(counts.items())) or "no fires") + "\n")
-        kills = [(f, *x) for f, m in results[c].items() for x in m["fires"] if x[0] == "total_close_all"]
+        L.append(
+            f"**{c}** — "
+            + (", ".join(f"{k}: {v}" for k, v in sorted(counts.items())) or "no fires")
+            + "\n"
+        )
+        kills = [
+            (f, *x) for f, m in results[c].items() for x in m["fires"] if x[0] == "total_close_all"
+        ]
         if kills:
-            kdf = pd.DataFrame([dict(fold=f, date=date, n_flattened=n, r_surrendered=s)
-                                for f, gov, date, n, s in kills])
+            kdf = pd.DataFrame(
+                [
+                    dict(fold=f, date=date, n_flattened=n, r_surrendered=s)
+                    for f, gov, date, n, s in kills
+                ]
+            )
             L.append("> **KILL EVENTS (8% total close-all):**\n")
             L.append(df_to_md(kdf, "{:.3f}") + "\n")
         else:
@@ -558,16 +658,19 @@ def write_summary(results, fold_tids, sched, ung_mean, ung_worst, ung_worst_dd):
     for c in ["governed_static", "governed_trailing"]:
         r = results[c]
         n_skip = sum(len(m["skipped"]) for m in r.values())
-        skip_R = float(sum(sched[tid]["realized"]
-                           for m in r.values() for tid, gov in m["skipped"]))
+        skip_R = float(sum(sched[tid]["realized"] for m in r.values() for tid, gov in m["skipped"]))
         n_flat = sum(len(m["flattened"]) for m in r.values())
-        surr_R = float(sum(nat - mark for m in r.values() for tid, gov, mark, nat in m["flattened"]))
-        L.append(f"**{c}:** (a) entries skipped by halts = **{n_skip}** trades, "
-                 f"counterfactual natural R = **{skip_R:.2f}R** "
-                 f"({skip_R * R_BASE * 100:.2f}% account); (b) positions flattened by "
-                 f"close-alls = **{n_flat}**, R surrendered vs natural exit = "
-                 f"**{surr_R:.2f}R** ({surr_R * R_BASE * 100:.2f}%). Total modelled tax "
-                 f"≈ {(skip_R + surr_R):.2f}R.\n")
+        surr_R = float(
+            sum(nat - mark for m in r.values() for tid, gov, mark, nat in m["flattened"])
+        )
+        L.append(
+            f"**{c}:** (a) entries skipped by halts = **{n_skip}** trades, "
+            f"counterfactual natural R = **{skip_R:.2f}R** "
+            f"({skip_R * R_BASE * 100:.2f}% account); (b) positions flattened by "
+            f"close-alls = **{n_flat}**, R surrendered vs natural exit = "
+            f"**{surr_R:.2f}R** ({surr_R * R_BASE * 100:.2f}%). Total modelled tax "
+            f"≈ {(skip_R + surr_R):.2f}R.\n"
+        )
 
     # ── Cut 4: halt↔close-all interaction ──
     L.append("## 4. Halt ↔ close-all interaction (halts' protective value)\n")
@@ -584,35 +687,56 @@ def write_summary(results, fold_tids, sched, ung_mean, ung_worst, ung_worst_dd):
             daily_halt_no_close += max(dh - dc, 0)
             total_halt_ev += th
             total_halt_no_kill += max(th - tk, 0)
-        L.append(f"**{c}:** daily 3.5% halt fired {daily_halt_days}x; of those, "
-                 f"**{daily_halt_no_close}** did NOT escalate to a 4.5% close-all "
-                 "(book drained under threshold while halted = halt's protective value). "
-                 f"Total 7% halt fired {total_halt_ev}x; **{total_halt_no_kill}** did NOT "
-                 "escalate to an 8% kill.\n")
+        L.append(
+            f"**{c}:** daily 3.5% halt fired {daily_halt_days}x; of those, "
+            f"**{daily_halt_no_close}** did NOT escalate to a 4.5% close-all "
+            "(book drained under threshold while halted = halt's protective value). "
+            f"Total 7% halt fired {total_halt_ev}x; **{total_halt_no_kill}** did NOT "
+            "escalate to an 8% kill.\n"
+        )
 
     # ── Cut 5: corrected worst-day / worst-fold ──
     L.append("## 5. Corrected worst-day / worst-fold vs ungoverned\n")
-    L.append(df_to_md(pd.DataFrame([
-        dict(metric="worst daily DD % (close-mark)", ungoverned="4.66",
-             governed_static=f"{gs['daily_dd_max']*100:.2f}",
-             governed_trailing=f"{gt['daily_dd_max']*100:.2f}"),
-        dict(metric="worst-fold DD % (trailing-peak / max-DD)", ungoverned=f"{ung_worst_dd*100:.2f}",
-             governed_static=f"{gs['worst_dd_trailing']*100:.2f}",
-             governed_trailing=f"{gt['worst_dd_trailing']*100:.2f}"),
-        dict(metric="worst-fold DD % (from-initial / 5ers basis)", ungoverned="-",
-             governed_static=f"{gs['worst_dd_static']*100:.2f}",
-             governed_trailing=f"{gt['worst_dd_static']*100:.2f}"),
-        dict(metric="conservative intrabar-MAE DD % (upper bound)", ungoverned="-",
-             governed_static=f"{gi['worst_dd_trailing']*100:.2f}",
-             governed_trailing="-"),
-    ])) + "\n")
+    L.append(
+        df_to_md(
+            pd.DataFrame(
+                [
+                    dict(
+                        metric="worst daily DD % (close-mark)",
+                        ungoverned="4.66",
+                        governed_static=f"{gs['daily_dd_max'] * 100:.2f}",
+                        governed_trailing=f"{gt['daily_dd_max'] * 100:.2f}",
+                    ),
+                    dict(
+                        metric="worst-fold DD % (trailing-peak / max-DD)",
+                        ungoverned=f"{ung_worst_dd * 100:.2f}",
+                        governed_static=f"{gs['worst_dd_trailing'] * 100:.2f}",
+                        governed_trailing=f"{gt['worst_dd_trailing'] * 100:.2f}",
+                    ),
+                    dict(
+                        metric="worst-fold DD % (from-initial / 5ers basis)",
+                        ungoverned="-",
+                        governed_static=f"{gs['worst_dd_static'] * 100:.2f}",
+                        governed_trailing=f"{gt['worst_dd_static'] * 100:.2f}",
+                    ),
+                    dict(
+                        metric="conservative intrabar-MAE DD % (upper bound)",
+                        ungoverned="-",
+                        governed_static=f"{gi['worst_dd_trailing'] * 100:.2f}",
+                        governed_trailing="-",
+                    ),
+                ]
+            )
+        )
+        + "\n"
+    )
     L.append(
         "> Two DD readings matter: the **trailing-peak max-DD** (comparable to the prior "
         "7.80% and the standard max-drawdown) and the **from-initial DD** (what the static "
         "governor and 5ers High Stakes actually reference). Under static governance the "
         "from-initial worst-fold DD is "
-        f"{gs['worst_dd_static']*100:.2f}% (≤8%, would clear DEPLOYABLE on DD), while the "
-        f"trailing-peak reading is {gs['worst_dd_trailing']*100:.2f}% (>8% → VIABLE). The "
+        f"{gs['worst_dd_static'] * 100:.2f}% (≤8%, would clear DEPLOYABLE on DD), while the "
+        f"trailing-peak reading is {gs['worst_dd_trailing'] * 100:.2f}% (>8% → VIABLE). The "
         "**concurrency-aware portfolio already exceeded the 8% deployable bound (9.22% "
         "trailing) before any governor** — that, not the governors, is what removes "
         "PASS-DEPLOYABLE under the trailing metric. Under the **trailing-peak total-DD "
@@ -631,8 +755,8 @@ def write_summary(results, fold_tids, sched, ung_mean, ung_worst, ung_worst_dd):
         "ROI / 7.80% worst-fold DD) is **SUPERSEDED**, not deleted, by this governed WFO. "
         "Canonical governed verdict (static total-DD reference = 5ers basis): "
         f"**{verdict_s_init}** on the from-initial 5ers DD metric "
-        f"({gs['worst_dd_static']*100:.2f}%), **{verdict_s}** on the trailing-peak "
-        f"max-DD metric ({gs['worst_dd_trailing']*100:.2f}%); 0 kills; ROI tax "
+        f"({gs['worst_dd_static'] * 100:.2f}%), **{verdict_s}** on the trailing-peak "
+        f"max-DD metric ({gs['worst_dd_trailing'] * 100:.2f}%); 0 kills; ROI tax "
         f"{tax_s:.1f}%. Under the stricter trailing-peak total-DD reference: "
         f"**{verdict_t}** ({gt['kills']} in-sample kill events). The PASS-DEPLOYABLE→"
         "VIABLE downgrade on the trailing metric is driven by CONCURRENCY (portfolio "

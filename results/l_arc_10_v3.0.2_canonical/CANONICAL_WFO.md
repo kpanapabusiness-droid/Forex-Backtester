@@ -1,5 +1,16 @@
 # Arc 10 v3.0.2 — CANONICAL WFO (FundedNext, EET, 3.5R)
 
+> ⚠️ **SUPERSEDED (2026-05-31) — LINEAR SIZING BASIS.** This run sized fixed-%-of-
+> *initial* (1R = r_base of 1.0 throughout). The live EA sizes **fixed-%-of-equity
+> at each trade's open**, so the canonical run is now
+> [`results/l_arc_10_v3.0.2_canonical_compound/CANONICAL_WFO_COMPOUND.md`](../l_arc_10_v3.0.2_canonical_compound/CANONICAL_WFO_COMPOUND.md).
+> Cite the compound run for every risk/DD/ROI figure. The **launch-at-0.40% decision
+> stands** on the corrected basis (0.50% worst-fold trailing DD 10.73% > 10% hard;
+> 0.40% 8.20%). Note one shift: under compound, 0.40% per-fold trailing is 8.20%
+> (PASS-VIABLE on trailing, still DEPLOYABLE on from-initial), not the 7.73%
+> DEPLOYABLE reported below. The 23.35% holdout CAGR below is also retired — the
+> compound run scores the holdout per-year (no CAGR).
+
 > **THE single authoritative gate run.** Every risk/DD/ROI number at the exact settings the system trades, consolidated here so all docs cite one source. **Supersedes every prior gate run** (ungoverned per-trade-sequential 49.87 / 22.46 / 7.80; `governed_wfo`; `fundednext_floating`; `whole_period_dd`) — those are superseded, not deleted. v3.0.2 logic LOCKED; governors are EA-faithful re-modelling, **not tuned**. Frame sha `05dea9…9ee58a` (manifest-matched). Costs ON in every cell (FundedNext cell 5: swap-OFF, 1.5× spread, $5/lot RT commission, 0.5 pip slip × n_fills; `cost_r` imported from `scripts/audit/arc_10/fundednext_cost_sweep.py`). r_base parameterised {0.40%, 0.50%}; deterministic (two-run sha identity); EET only; PR-gated.
 
 > **Validation gate PASSED:** governors-OFF + zero-cost reproduces the **9.22%** portfolio worst-fold trailing DD (abort-if-not check in driver). Costed output trusted.

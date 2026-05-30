@@ -377,7 +377,6 @@ def write_summary(runs, ho_lin, clock, day_key, sched, eps):
     offc, stc = runs["off_compound"], runs["static_compound"]
     offl, stl = runs["off_linear"], runs["static_linear"]
     frac, longest = time_underwater(stc["curve"], stc["bars"], clock)
-    daily = daily_dd_from_trace(stc["trace"], day_key)
 
     over10_c = max(offc["dd_trailing"], stc["dd_trailing"]) * 100
     verdict10 = "EXCEEDS 10%" if over10_c > 10 else "stays under 10%"

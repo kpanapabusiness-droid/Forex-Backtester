@@ -122,12 +122,22 @@ void ArcEquityInit(double floor_input)
       g_arc_eq_total_floor = floor_input;
       PrintFormat("[ARC10] equity init: floor=%.2f source=input", g_arc_eq_total_floor);
      }
-   // Daily DD anchor — floating/equity-based, NOT the floor. Untouched.
+   // Daily-DD day-start anchor: a FIXED equity SNAPSHOT, taken once here at
+   // OnInit and again only at each EET-day rollover (see ArcEquityOnTick).
+   // It is NOT the total floor, NOT live/per-tick equity — between rollovers
+   // it is held constant so daily_dd = (day_start - equity)/day_start
+   // registers real intraday loss as equity falls. Re-snapshotting on a
+   // mid-day OnInit re-fire (restart) is DELIBERATE and ACCEPTED: daily risk
+   // is bounded to one day by the natural rollover, and we intentionally do
+   // NOT persist day-start to a state file or restore a prior value (no JSON
+   // state on the daily side). Do not "fix" this to live-track or to persist.
    g_arc_eq_day_start_utc = ArcEetDayStartUtc(TimeGMT());
-   g_arc_eq_day_start = AccountInfoDouble(ACCOUNT_EQUITY);
+   g_arc_eq_day_start = AccountInfoDouble(ACCOUNT_EQUITY);   // fixed snapshot
    g_arc_eq_entries_halted_today = false;
    g_arc_eq_entries_halted_total = false;
    g_arc_eq_close_all_pending = false;
+   PrintFormat("[ARC10] daily day-start: equity=%.2f eet_day_utc=%s source=init-snapshot",
+               g_arc_eq_day_start, TimeToString(g_arc_eq_day_start_utc));
   }
 
 //+------------------------------------------------------------------+
@@ -145,15 +155,18 @@ bool ArcEquityOnTick(
    // ArcEquityAllowEntry, so there is nothing to close.
    if(g_arc_eq_floor_fail)
       return false;
-   // EET-day rollover.
+   // EET-day rollover: re-snapshot the daily day-start to current equity and
+   // hold it fixed until the next rollover. Only mutation of g_arc_eq_day_start
+   // outside OnInit — never updated per-tick.
    datetime current_day_utc = ArcEetDayStartUtc(TimeGMT());
    if(current_day_utc != g_arc_eq_day_start_utc)
      {
       g_arc_eq_day_start_utc = current_day_utc;
-      g_arc_eq_day_start = AccountInfoDouble(ACCOUNT_EQUITY);
+      g_arc_eq_day_start = AccountInfoDouble(ACCOUNT_EQUITY);   // fixed snapshot
       g_arc_eq_entries_halted_today = false;
       // Total-DD halt state persists across days.
-      PrintFormat("[ARC10] EET day rollover: day_start_equity=%.2f", g_arc_eq_day_start);
+      PrintFormat("[ARC10] daily day-start: equity=%.2f eet_day_utc=%s source=eet-rollover",
+                  g_arc_eq_day_start, TimeToString(g_arc_eq_day_start_utc));
      }
    double equity = AccountInfoDouble(ACCOUNT_EQUITY);
    double daily_dd = (g_arc_eq_day_start - equity) / g_arc_eq_day_start;

@@ -10,8 +10,9 @@ parse path is exercised exactly as in production.
 
 ## Scenarios
 
-17 scenarios — s1-s12 per dispatch §4.2 / `phase_1_build_intent.md`
-§5.2; s13-s17 per the OPEN-001 floor-fix dispatch. See
+19 scenarios — s1-s12 per dispatch §4.2 / `phase_1_build_intent.md`
+§5.2; s13-s17 per the OPEN-001 floor-fix dispatch; s18-s19 per the
+OPEN-001 daily-anchor correction. See
 [scenarios/scenarios.json](scenarios/scenarios.json) for the full
 spec. Summary:
 
@@ -34,6 +35,8 @@ spec. Summary:
 | s15 | Floor 100000 → 125000                                | Manual scale-up via input edit                       |
 | s16 | Floor=125000, equity below floor, restart            | Decoupling holds at scaled-up anchor                 |
 | s17 | Floor input = 0                                       | Fail-loud: halt + Alert + sentinel-fail + heartbeat  |
+| s18 | Daily day-start fixed across ticks, rollover re-snap | Daily anchor is a fixed snapshot, resets at EET roll |
+| s19 | Mid-day restart re-snapshots daily day-start         | Restart re-snapshot (not persisted, not live-track)  |
 
 **s13-s17 (floor fix).** The total-DD floor is solely operator-set via
 the `Initial_Equity_Floor` input — static, never captured from live
@@ -45,6 +48,16 @@ and input-override scenarios; s17 additionally checks the fail-loud
 `Alert`, the `[ARC10] FLOOR_FAIL` journal token, the
 `ea.heartbeat` `"status": "halted_floor_unset"` line, and an
 `equity_block` row with reason `floor_unset_halt`.
+
+**s18-s19 (daily-anchor correction).** The daily-DD day-start is a
+**fixed equity snapshot**, taken once at `OnInit` and again only at each
+EET-day rollover — never the total floor and never live/per-tick. Both
+emit `[ARC10] daily day-start: equity=… source=init-snapshot|eet-rollover`.
+A mid-day restart **re-snapshots** day-start to current equity (item 3 of
+the correction) — deliberately not persisted to a state file and not
+live-tracked, because daily risk is bounded to one day by the natural
+rollover. s18 checks fixed-across-ticks + rollover reset; s19 checks the
+restart re-snapshot. Total-floor logic is untouched by both.
 
 ## Running a scenario
 
@@ -150,7 +163,7 @@ documented expectations.
 
 The Python side IS testable locally — `tests/sidecar/test_signal_emitter.py`
 covers schema validation, and the test below verifies `fake_sidecar`
-produces valid envelopes for all 17 scenarios:
+produces valid envelopes for all 19 scenarios:
 
 ```bash
 py -m pytest tests/ea/test_fake_sidecar.py -v

@@ -18,10 +18,10 @@ def test_scenarios_file_exists():
     assert SCENARIOS_PATH.exists()
     data = json.loads(SCENARIOS_PATH.read_text(encoding="utf-8"))
     assert "scenarios" in data
-    assert len(data["scenarios"]) == 17
+    assert len(data["scenarios"]) == 19
 
 
-@pytest.mark.parametrize("scenario_id", [f"s{i}" for i in range(1, 18)])
+@pytest.mark.parametrize("scenario_id", [f"s{i}" for i in range(1, 20)])
 def test_each_scenario_builds_valid_envelope(scenario_id):
     env = build_scenario_envelope(scenario_id, config_hash="abc" + "0" * 61)
     validate_signal_payload(env)

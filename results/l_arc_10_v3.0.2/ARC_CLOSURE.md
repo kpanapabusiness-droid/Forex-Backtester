@@ -1,5 +1,14 @@
 # ARC_10_v3.0.2_CLOSURE — l_arc_10_v3.0.2
 
+> ⚠️ **GATE NUMBERS SUPERSEDED (2026-05-30).** The single authoritative gate run is now
+> [`results/l_arc_10_v3.0.2_canonical/CANONICAL_WFO.md`](../l_arc_10_v3.0.2_canonical/CANONICAL_WFO.md)
+> — costed (FundedNext cell 5), governed, 2×2×2 matrix (risk × governance × view),
+> both DD references. Cite it for every risk/DD/ROI figure. The **PASS-DEPLOYABLE
+> verdict below still stands**; the canonical run refines deployment risk to
+> **launch-at-0.40%** (fresh-tier worst-fold trailing DD 7.73% ≤ 8% at 0.40% vs 10.44%
+> > 10% at 0.50%). The ungoverned per-trade-sequential numbers in this closure
+> (mean 49.87% / worst 22.46% / DD 7.80%) are superseded, not deleted.
+
 > **Closed:** 2026-05-25T09:24:04Z (Step 5 manifest run_timestamp)
 > **Finalised:** 2026-05-26 (Amendment 3 + Step 6 addendum landed)
 > **Branch:** arc/l_arc_10_v3.0.2 (bespoke Step 1-5) + arc/l_arc_10_v3.0.2_addendum (Amendment 3 + Step 6)

@@ -1,5 +1,13 @@
 # Arc 10 v3.0.2 — FundedNext Cost Sweep: Report
 
+> ⚠️ **SUPERSEDED (2026-05-30) by the canonical gate run:**
+> [`results/l_arc_10_v3.0.2_canonical/CANONICAL_WFO.md`](../../l_arc_10_v3.0.2_canonical/CANONICAL_WFO.md).
+> This sweep is per-trade-SEQUENTIAL (concurrency-blind) and ungoverned; the
+> canonical run is portfolio-concurrent, governed, and reports both DD references
+> and both risk levels in one matrix. The `cost_r` cell-5 model here remains the
+> canonical cost source (the canonical run imports it). Cite the canonical run for
+> all gate numbers.
+
 > Analysis-only post-hoc cost overlay on the **EET** WFO pool for the FundedNext
 > deployment target (EET broker day, swap-free, **$5/lot round-turn** commission).
 > No engine changes. `simulate_path` invoked only to reconstruct winning-config

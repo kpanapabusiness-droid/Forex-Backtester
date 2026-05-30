@@ -291,8 +291,6 @@ def main() -> int:
 # Emit CSVs + CANONICAL_WFO.md
 # ───────────────────────────────────────────────────────────────────────────
 def emit(cells, perfold_raw, cont_raw, perfold_trail, cont_trail, D):
-    fold_tids = D["fold_tids"]
-
     # ---- matrix.csv (the 8-row headline) ----
     rows = []
     for risk in RISK_LEVELS:
@@ -578,7 +576,7 @@ def write_summary(cells, perfold_raw, cont_raw, perfold_trail, cont_trail, D, ma
         L.append(
             f"**{risk * 100:.2f}% — from-initial firing:** "
             + (", ".join(f"{k}: {v}" for k, v in sorted(counts.items())) or "no fires")
-            + f". **8% total-kill flags (trailing-fired sensitivity):** "
+            + ". **8% total-kill flags (trailing-fired sensitivity):** "
             + ("; ".join(flags) if flags else "none")
             + ".\n"
         )

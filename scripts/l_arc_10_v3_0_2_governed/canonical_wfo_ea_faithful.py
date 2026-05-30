@@ -451,7 +451,7 @@ def write_summary(search_res, holdout_res, matrix, D):
             for g, date in m["fires"]:
                 if g == "total_close_all":
                     kill_flags.append(f"{risk * 100:.2f}% {y} {date}")
-    L.append(f"> **8% total-kill events (from-initial firing):** "
+    L.append("> **8% total-kill events (from-initial firing):** "
              + ("; ".join(kill_flags) if kill_flags else "none") + ". "
              "Procyclical sizing makes kills more likely than prior runs — reported honestly.\n")
 

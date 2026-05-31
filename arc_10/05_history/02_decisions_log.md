@@ -45,31 +45,28 @@
 
 ### Risk_Per_Trade per broker
 
-**FundedNext: 0.50%** — at r_base, cost sweep central case lands at 7.80% worst-fold DD (2.2pp margin to 10% hard limit).
+**FundedNext: 0.40% (operating tier)** — EA-faithful floating-equity run: worst-fold DD 5.49% from-initial / 8.21% trailing, daily 4.11%, 0 kills. The only level clearing both hard limits on the conservative trailing basis. 0.50% FAILS (10.89% trailing / 5.16% daily) and is a gated, evidence-only upgrade — not a routine step.
 
-**5ers: 0.40%** — at r_base 0.5%, cost sweep central case breaches 10% DD hard limit (10.47%). Linear scaling to 0.40% brings central worst-fold DD to 8.38% (1.6pp margin).
+**5ers: 0.40%** — legacy UTC cost sweep had r_base 0.5% breaching the 10% hard limit on the realistic central cell; 0.40% is the secondary-path operating level (not re-run on floating-equity sizing).
 
-**Rationale documented:** `02_validation/05_cost_sweep.md`. Re-evaluate after 4+ weeks of live data.
+**Rationale documented:** `02_validation/07_canonical_wfo.md` (canonical), `05_cost_sweep.md` (legacy cost sensitivity). Re-evaluate after 4+ weeks of live data.
 
-### Why FundedNext at 0.50% specifically (not 0.45% or 0.55%)
+### Why FundedNext at 0.40% (and why 0.50% is gated, not routine)
 
-Amendment 3 linear scaling formula: `r_recommended = 0.005 × (0.080 / worst_DD_at_r_base)`.
+> **Supersession note.** An earlier version of this entry locked FundedNext at **0.50%** via the Amendment-3 linear-scaling formula on the legacy linear-overlay cost sweep (central-cell worst-fold DD 7.80%, "deploy at r_base, 2.2pp margin"). That premise was **superseded** by the EA-faithful floating-equity run (`02_validation/07_canonical_wfo.md`), which sizes exactly as the live EA does (`ACCOUNT_EQUITY × r_base`, floating P&L included). On that basis 0.50% FAILS the conservative trailing/daily hard limits. The 0.40% rationale below replaces it.
 
-Three reference cells were evaluated:
+The EA-faithful run sweeps 0.40% and 0.50%:
 
-| Cell | Worst DD @ r_base 0.5% | r_recommended |
-|---|---|---|
-| Optimistic (1.0× spread / 0.5 slip) | 7.49% | 0.0053 |
-| **Central (1.5× spread / 0.5 slip)** | **7.80%** | **0.0051** |
-| Adverse (2.0× spread / 1.0 slip) | 8.20% | 0.0049 |
+| risk | worst-fold trailing DD | worst-fold from-init DD | worst daily DD | verdict |
+|---|---|---|---|---|
+| **0.40%** | **8.21%** | **5.49%** | **4.11%** | PASS (clears both hard limits) |
+| 0.50% | 10.89% | 6.85% | 5.16% | FAIL trailing (>10%) + daily (>5%) |
 
-**Why 0.50% wins over 0.55%:** the adverse cell recommends scaling *down* to 0.49%. Deploying at 0.55% violates the adverse cell entirely (would push worst-fold DD to 9.02% pre-live-haircut, ~10.2% post-haircut — breaches hard limit). 0.55% only works if you assume optimistic costs every single trade.
+**Why 0.40% is the operating tier:** it is the only level clearing both the 10% trailing and 5% daily hard limits with margin (trailing 1.8pp, daily 0.9pp), at 0 kills, while PASS-DEPLOYABLE on FundedNext's actual from-initial basis (5.49% < 8% target).
 
-**Why 0.50% wins over 0.45%:** at 0.45%, you're leaving expected ROI on the table without meaningful DD reduction. Central case worst-fold DD at 0.45% would be ~7.0% — versus 7.8% at 0.50%. 0.8pp DD reduction for 10% expected-ROI reduction is not a favorable trade. You haven't moved out of the worst-fold envelope; you've just reduced position size into a still-risky envelope.
+**Why 0.50% is not routine:** on the live-matched floating-equity basis it breaches the trailing (10.89%) and daily (5.16%) limits. It passes only from-initial (6.85%). It is a future **evidence-gated** upgrade — admissible only deep in a banked buffer AND after a real live gap-event confirms the tick EA caps daily under 5% (`04_runbook/09_risk_and_payout_protocol.md` §7). Never an automatic buffer-triggered step.
 
-**Why 0.50% wins over 0.49% (rounding):** operationally, 0.50% is a cleaner round number to communicate, calculate, and remember. The 0.01pp difference is statistical noise vs operational simplicity.
-
-The choice is **deploy at central-case recommendation, accept adverse-cell tightness, monitor live for haircut accuracy**. If live worst-fold DD systematically exceeds 8.8% in the first 6 months, reassess.
+The choice is **deploy at 0.40%, treat 0.50% as a gated upgrade, monitor live for tick-gap behaviour.** If live worst-fold DD systematically exceeds the 8.21% trailing / 5.49% from-initial envelope in the first 6 months, reassess.
 
 ### Why 5ers at 0.40% specifically (not 0.42% or 0.38%)
 
@@ -94,7 +91,7 @@ Same Amendment 3 scaling on UTC central case:
 
 1. **Pair-specific swap rates are broker-specific, time-varying, and unstable.** Swap on AUDJPY at 5ers in Q1 2026 ≠ swap on AUDJPY at 5ers in Q3 2026 ≠ swap on AUDJPY at any other broker. Per-pair filter trained on historical swap data is overfitting to a moment-in-time snapshot.
 
-2. **Expected hold time isn't known in advance.** A trade could TP1-and-trail-for-a-day OR be a runner held 30 days. Filter would need to use ex-ante hold-time prediction, which is exactly the kind of forward-information bias `02_history/03_eliminated_approaches.md` documents as a permanent failure mode.
+2. **Expected hold time isn't known in advance.** A trade could TP1-and-trail-for-a-day OR be a runner held 30 days. Filter would need to use ex-ante hold-time prediction, which is exactly the kind of forward-information bias `05_history/03_eliminated_approaches.md` documents as a permanent failure mode.
 
 3. **Reduces signal count without proportionate DD reduction.** Backtest analysis showed swap-filter variants reduced trade count by 15-25% but only improved worst-fold DD by 0.5-1.0pp. Worse ratio outcomes than the unfiltered version.
 
@@ -115,7 +112,7 @@ Same Amendment 3 scaling on UTC central case:
 ### Risk ramp for first 3 weeks live
 **Week 1:** 0.20%
 **Week 2:** 0.30%
-**Week 3+:** 0.50%
+**Week 3+:** 0.40% (operating tier)
 
 **Why:** real live execution may differ from backtest in subtle ways. Validating at low risk first means costs are small if discovered. Increment only if previous week was clean.
 
@@ -124,7 +121,7 @@ Same Amendment 3 scaling on UTC central case:
 ### FundedNext as primary, 5ers as secondary
 **When:** post-cost-sweep
 **What:** deploy on FundedNext $100k Challenge first; keep 5ers as fallback
-**Why:** FundedNext (EET, swap-free) produces ~1.7× holdout ROI of 5ers (44% vs 27%) with more DD margin. Economic case is decisive.
+**Why:** FundedNext (EET, swap-free) produces materially higher holdout ROI than 5ers (UTC, swaps ON) with more DD margin — swap-free removes the dominant UTC cost vector. Economic case is decisive. (Canonical FundedNext per-year holdout in `02_validation/07_canonical_wfo.md`; UTC not re-run on floating-equity.)
 **Status:** primary deployment
 
 ### High Stakes program on 5ers (vs Hyper Growth)
@@ -181,7 +178,7 @@ Same Amendment 3 scaling on UTC central case:
 **When:** L_ARC_PROTOCOL design (Step 5)
 **What:** worst-fold ROI/DD ratio must be ≥ 2.0 to PASS-DEPLOYABLE
 **Why:** below 2.0 means a single bad fold is too close to wiping out a year. 2.0 is the boundary between "edge survives in worst case" and "edge is luck-dependent across folds".
-**Status:** locked. Arc 10 v3.0.2 hits 5.42 (UTC) / 6.43 (EET).
+**Status:** locked. Arc 10 v3.0.2 clears it comfortably on the EA-faithful run — every fold positive, worst-fold ROI/DD well above 2.0, 0 kills (`02_validation/07_canonical_wfo.md`).
 
 ### Sign consistency 11/11 required
 **When:** L_ARC_PROTOCOL design (Step 5)

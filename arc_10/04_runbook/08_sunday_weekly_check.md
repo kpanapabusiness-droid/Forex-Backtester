@@ -314,7 +314,7 @@ Weekly review is a discipline, not a response to perceived need. Most of the tim
 
 ## Monthly extension (first Sunday of each month)
 
-In addition to the weekly check, run an extended analysis once a month. See `arc_10/04_runbook/09_monthly_calibration.md` (TBD — build when first month of live data exists).
+In addition to the weekly check, run an extended analysis once a month. See `arc_10/04_runbook/10_monthly_calibration.md` (TBD — build when first month of live data exists; the `09` slot is taken by `09_risk_and_payout_protocol.md`).
 
 ---
 

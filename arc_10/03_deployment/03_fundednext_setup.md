@@ -86,13 +86,12 @@ Tools → Options → Expert Advisors:
 
 ## Risk per trade rationale
 
-0.50% locked per cost sweep (`02_validation/05_cost_sweep.md`):
+**0.40% operating tier**, locked per the EA-faithful canonical run (`02_validation/07_canonical_wfo.md`):
 - FundedNext is swap-free → strict improvement vs UTC (no dominant swap cost)
-- At r_base 0.5%, central case (1.5× spread, swap-OFF, 0.5 slip) lands at 7.80% worst-fold DD — within target
-- Adjacent cells recommend 0.49% (adverse) to 0.53% (optimistic) — band spans r_base
-- Deploy at 0.50%, accept central case with 2.2pp margin to 10% hard limit
+- At 0.40% (floating-equity sizing, cell-5 costs, governed): worst-fold DD **5.49% from-initial / 8.21% trailing**, worst daily **4.11%**, 0 kills — the only level clearing both hard limits on the conservative trailing basis
+- 0.50% FAILS (10.89% trailing / 5.16% daily) — gated, evidence-only upgrade, not the deploy level (`04_runbook/09_risk_and_payout_protocol.md` §7)
 
-Expected live (after haircuts): worst-fold DD ~8.8%, worst-fold ratio ~3.4, holdout ROI ~44%.
+Modelled-live figures (EA-faithful already includes costs + governors): worst-fold DD 5.49% from-initial / 8.21% trailing; holdout per-year, 6/6 positive (no CAGR).
 
 ## Connection details (operational)
 
@@ -106,13 +105,13 @@ Expected live (after haircuts): worst-fold DD ~8.8%, worst-fold ratio ~3.4, hold
 
 | Item | Value |
 |---|---|
-| Risk per trade ($) | $500 (0.50% of $100k) |
+| Risk per trade ($) | $400 (0.40% of $100k) |
 | SL distance | 3.5 × ATR_at_signal |
 | Commission | $5 per lot round-turn |
 | Swap | None (swap-free add-on) |
 | Average expected R per trade | ~0.7-0.9R (cost sweep central case) |
-| Expected trades per year | ~225 |
-| Expected annual ROI (cost-adjusted) | ~44% (after haircuts) |
+| Expected trades per year | ~190-210 |
+| Expected annual ROI | mean-fold 32.48%; holdout per-year 24–53% (no CAGR) |
 
 ## Challenge phase rules (verify current rules before buying)
 
@@ -173,11 +172,11 @@ In MT5:
 
 ## Risk ramp for first weeks live
 
-Don't deploy at full 0.50% on day one. Ramp:
+Don't deploy at the full 0.40% operating tier on day one. Ramp:
 
 - **Week 1:** Risk_Per_Trade = `0.0020` (0.20%, $200/trade)
 - **Week 2:** if Week 1 clean → `0.0030` (0.30%)
-- **Week 3+:** if Week 2 clean → `0.0050` (0.50%, target)
+- **Week 3+:** if Week 2 clean → `0.0040` (0.40%, operating tier)
 
 If anything anomalous happens in any week, hold or scale back. Don't ramp up under pressure.
 
@@ -188,7 +187,7 @@ If anything anomalous happens in any week, hold or scale back. Don't ramp up und
 | Account credentials | Demo login | Challenge login | Funded login |
 | Sidecar | Same | Same | Same |
 | EA | Same | Same | Same |
-| Risk | 0.20-0.50% (ramping) | 0.50% | 0.50% |
+| Risk | 0.20-0.40% (ramping) | 0.40% | 0.40% |
 | Hard DD limit | 10% | 10% | 10% |
 | Profit target | N/A | +8% (Phase 1) | None |
 | Profit split | N/A | None (challenge) | 80% |
@@ -200,4 +199,4 @@ After first overnight position holds, check the trade in MT5's history:
 - View → Reports → click trade
 - Check "Swap" column: should be `0.00` for ALL closed trades that held overnight
 
-If swap is NOT 0 on swap-eligible trades, swap-free add-on is not active. Contact FundedNext support immediately. **Don't continue trading at 0.50% risk if swap is being applied** — cost sweep economics break.
+If swap is NOT 0 on swap-eligible trades, swap-free add-on is not active. Contact FundedNext support immediately. **Don't continue trading if swap is being applied** — the swap-free assumption underpins the EET cost economics, and at any risk level the daily/total DD margin erodes once swap is charged.

@@ -2,7 +2,9 @@
 
 > **Source artifact:** `results/l_arc_10_v3.0.2/fundednext_cost_sweep/fundednext_cost_sweep_report.md` (full report) + `results/l_arc_10_v3.0.2/fundednext_cost_sweep/`
 > **Verdict:** EET is the deployable venue. UTC remains viable as fallback.
-> **Risk locked:** 0.50% EET (FundedNext) / 0.40% UTC (5ers).
+> **Operating risk: 0.40% (both venues).** The 0.50% column FAILS the conservative trailing/daily basis — gated upgrade only.
+>
+> ⚠️ **Basis note (read first).** The grids below are the **legacy linear-overlay cost-sensitivity sweep.** They establish the canonical **cost basis** — cell 5 = 1.5× spread, $5/lot RT commission, swaps off, 0.5 pip slip — and prove sign-consistency under spread stress; that analysis stands. But the **absolute ROI/DD outputs and the risk decision are superseded** by the EA-faithful floating-equity run at 0.40%: `02_validation/07_canonical_wfo.md` → `results/l_arc_10_v3.0.2_ea_faithful/`. Where a grid cell's ROI/DD differs from the canonical doc, the canonical doc wins. Read the grids for cost *sensitivity*, not for deployable absolutes.
 
 ## Executive summary
 
@@ -12,16 +14,15 @@
 | Commission | $5/lot RT | $4/lot RT |
 | Daily-DD boundary | EET (broker midnight) | UTC (midnight) |
 | Max DD limit | 10% | 10% |
-| **Backtest worst-fold ratio (central cell)** | **5.44** | **2.43** |
-| **Backtest worst-fold DD (central cell)** | **7.80%** | **10.47%** |
-| **Backtest worst-fold ROI (central cell)** | **18.47%** | **12.90%** |
-| **Backtest holdout ROI (central cell)** | **46.24%** | **34.94%** |
-| Recommended risk | **0.50%** (r_base) | **0.40%** |
-| Expected live holdout ROI | **~44%** | **~28%** |
-| Expected live worst-fold DD | **~8.8%** | **~9.5%** |
-| Verdict | **PASS-DEPLOYABLE** | **DD-tight, deployable with discipline** |
+| Canonical cost basis | cell 5: 1.5× spread / 0.5 slip / swaps off | cell 10: 1.5× spread / 0.5 slip / swaps ON |
+| **Operating risk** | **0.40%** | **0.40%** |
+| **Worst-fold ROI @ 0.40% (EA-faithful)** | **14.42%** | legacy — not re-run on floating-equity |
+| **Worst-fold DD @ 0.40% (EA-faithful)** | **5.49% from-init / 8.21% trailing** | legacy — see UTC note in `01_wfo_results.md` |
+| **Worst daily DD @ 0.40%** | **4.11%** | legacy |
+| **Holdout @ 0.40%** | per-year (no CAGR), 6/6 positive | legacy |
+| Verdict | **PASS-DEPLOYABLE (from-init) / PASS-VIABLE (trailing)** | secondary, deploy at 0.40% with discipline |
 
-**EET wins on every economic axis.** UTC remains deployable but with thinner margins and lower returns.
+**EET is the deployable venue** — swap-free turns the cost economics favourable. The EA-faithful absolute outputs are in `07_canonical_wfo.md`; the grids below show cost *sensitivity* on the legacy linear-overlay basis. UTC has not been re-run on floating-equity sizing — treat its figures as indicative.
 
 ## Methodology
 
@@ -38,13 +39,15 @@ Both sweeps verified clean: G1–G4 correctness gates passed, baseline reproduct
 
 ## EET Results (FundedNext)
 
-### Baseline (pre-cost overlay)
+### Baseline (canonical, EA-faithful)
 
-From `results/l_arc_10_v3.0.2/` EET WFO. PASS-DEPLOYABLE: worst-fold ratio 6.43, worst-fold DD 7.35%, holdout 52.83%.
+EA-faithful floating-equity run at the 0.40% operating tier: worst-fold ROI 14.42% (F9 2018), worst-fold DD 5.49% from-initial / 8.21% trailing, worst daily 4.11%, 0 kills. PASS-DEPLOYABLE on from-initial. Source: `07_canonical_wfo.md` → `results/l_arc_10_v3.0.2_ea_faithful/`.
 
-See `01_wfo_results.md` for full per-fold breakdown.
+See `01_wfo_results.md` and `07_canonical_wfo.md` for the full per-fold breakdown.
 
-### 15-cell grid at r_base = 0.5%
+### 15-cell cost-sensitivity grid (legacy linear-overlay, r_base 0.5%)
+
+> Cost *sensitivity* only — absolute ROI/DD superseded by `07_canonical_wfo.md`. The cell-5 (1.5× / 0.5 slip) cost definition is retained as the canonical cost basis.
 
 | Cell | Spread | Slip | Ratio | DD | Worst ROI | Mean ROI | Holdout ROI | Holdout DD | Verdict |
 |---|---|---|---|---|---|---|---|---|---|
@@ -64,27 +67,19 @@ See `01_wfo_results.md` for full per-fold breakdown.
 | 14 | 4.0× | 0.5 | 1.85 | 9.70% | 8.83% | 25.85% | 29.85% | 8.73% | FAIL (ratio) |
 | 15 | 4.0× | 1.0 | 1.62 | 9.85% | 7.68% | 24.36% | 28.03% | 8.92% | FAIL (ratio) |
 
-**Sign consistency 11/11 in every cell of the EET grid**, including 4× spread stress. Worst fold by ROI: F9 (2018) at 18.47%. Worst fold by DD: F4 (2013) at 7.80%.
+**Sign consistency 11/11 in every cell of the EET grid**, including 4× spread stress — the load-bearing robustness result, and it holds on the EA-faithful run too. (The per-cell ROI/DD above are legacy linear-overlay sensitivity figures; canonical absolutes at 0.40% are worst ROI 14.42% / worst DD 5.49% from-init / 8.21% trailing — see `07_canonical_wfo.md`. The worst-DD fold under EA-faithful is F10 2019 on trailing and F5 2014 on from-initial, not F4 2013.)
 
 ### Recommended risk for EET
 
-Per Amendment 3 linear scaling: `r_recommended = 0.005 × (0.080 / worst_DD_at_r_base)`.
+**Recommendation: deploy at the 0.40% operating tier.**
 
-| Reference cell | Worst DD @ r_base | r_recommended |
-|---|---|---|
-| Optimistic (1.0× / 0.5 slip) | 7.49% | 0.0053 |
-| **Central (1.5× / 0.5 slip)** | **7.80%** | **0.0051** |
-| Adverse (2.0× / 1.0 slip) | 8.20% | 0.0049 |
-
-**Recommendation: deploy at r_base = 0.50%.**
-
-Justification: r_recommended barely moves off r_base across the realistic band (0.49%–0.53%). The pool sits at the 8% DD target at 0.5% risk, leaving essentially no headroom to scale risk up. The adverse cell actually recommends scaling *down* to 0.49%. Deploying at 0.50% accepts the central-case worst-fold DD of 7.80% with hard-limit margin to 10%.
+The legacy Amendment-3 linear-scaling exercise suggested ~0.50% on the linear-overlay basis. The EA-faithful floating-equity run supersedes it: at **0.50%** worst-fold DD is **10.89% trailing / 6.85% from-initial**, daily **5.16%** — the trailing and daily figures FAIL the hard limits. At **0.40%** worst-fold DD is **8.21% trailing / 5.49% from-initial**, daily **4.11%**, 0 kills — the only level clearing both hard limits on the conservative trailing basis. 0.50% is a gated, evidence-only upgrade (`07_canonical_wfo.md`; `04_runbook/09_risk_and_payout_protocol.md` §7), not the deploy level.
 
 ## UTC Results (5ers)
 
-### Baseline (pre-cost overlay)
+### Baseline (legacy linear-overlay — not re-run on floating-equity)
 
-PASS-DEPLOYABLE but tighter: worst-fold ratio 5.42, worst-fold DD 9.22%, holdout 59.07%.
+UTC was tighter than EET on the legacy linear-overlay WFO (swaps ON dominate the cost surface). It has **not** been re-validated on the EA-faithful floating-equity basis; treat UTC figures as indicative and deploy the secondary path at 0.40%. See the UTC note in `01_wfo_results.md`.
 
 ### 30-cell grid at r_base = 0.5%
 
@@ -150,18 +145,21 @@ Backtest numbers above are pre-deployment. Expected live applies haircuts for un
 - Mean / holdout DD: × 1.05
 - Worst-fold DD: × 1.13
 
-### EET expected live (r = 0.50%, central cell)
+### EET expected live (0.40% operating tier)
 
-| Metric | Backtest | Expected live |
-|---|---|---|
-| Worst-fold ROI | 18.47% | **~16.6%** |
-| Worst-fold DD | 7.80% | **~8.8%** |
-| Worst-fold ratio | 5.44 | ~3.4 |
-| Mean fold ROI | 43.50% | **~41.3%** |
-| Holdout ROI | 46.24% | **~43.9%** |
-| Holdout DD | 6.17% | **~6.5%** |
+The EA-faithful canonical run already models cell-5 costs and the governors, so its 0.40% figures **are** the modelled-live expectation — no separate haircut overlay is applied. The only residual not in the model is the intrabar tick-gap (live-only).
 
-Worst-fold DD ~8.8% leaves ~1.2pp to the 10% hard limit.
+| Metric | EA-faithful @ 0.40% |
+|---|---|
+| Worst-fold ROI | 14.42% (F9 2018) |
+| Mean-fold ROI | 32.48% |
+| Worst-fold DD (from-initial) | 5.49% (F5 2014) — 2.5pp margin to 8% target |
+| Worst-fold DD (trailing) | 8.21% (F10 2019) — 1.8pp margin to 10% hard limit |
+| Worst daily DD | 4.11% (F1 2010) — under 5% |
+| Holdout | per-year, 6/6 positive (no CAGR) |
+| Kills | 0 |
+
+Source: `07_canonical_wfo.md`. The legacy haircut method above applied to the superseded linear-overlay 0.50% run and is retained only for historical context.
 
 ### UTC expected live (r = 0.40%, central cell)
 
@@ -181,13 +179,13 @@ Worst-fold DD ~9.5% leaves ~0.5pp to the 10% hard limit. Tighter margin than EET
 ### Primary: EET on FundedNext
 
 Economic case is decisive:
-- ~1.7× holdout ROI vs UTC (44% vs 26.6% expected live)
+- materially higher holdout ROI vs UTC (swap-free removes the dominant UTC cost vector; canonical FundedNext per-year holdout in `07_canonical_wfo.md`, UTC not re-run on floating-equity)
 - ~0.7pp more DD margin to the 10% hard limit
 - Higher ratio cushion across every realistic cell
 - 11/11 sign consistency holds even at 4× spread stress
 
 **Deployment parameters:**
-- Risk: 0.50% per trade (r_base, no scaling needed)
+- Risk: 0.40% per trade (operating tier; 0.50% gated upgrade only)
 - Account: FundedNext $100k Challenge + swap-free add-on (non-negotiable)
 - Commission expectation: $5/lot round-turn
 - Spread expectation: 1×–1.5× HistData baseline (verified via demo)
@@ -217,7 +215,7 @@ UTC is deployable, but with materially lower returns and thinner DD margin. The 
 
 ## Bottom line
 
-**EET on FundedNext is the deployable venue. Deploy at r = 0.50% once MT5 parity is verified** (done — see `02_phase_2_parity_eet.md`).
+**EET on FundedNext is the deployable venue. Deploy at the 0.40% operating tier** (MT5 parity verified — see `02_phase_2_parity_eet.md`; canonical numbers in `07_canonical_wfo.md`).
 
 UTC on 5ers remains a viable fallback at r = 0.40% with ~27% expected live ROI.
 

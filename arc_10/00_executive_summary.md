@@ -8,23 +8,21 @@ The system was developed under the L_ARC_PROTOCOL research methodology — six-s
 
 ## What it produces
 
-Across 14 years of historical data (2010-2024 in-sample folds + 2021-2026 holdout), Arc 10 v3.0.2 produces:
+Across 14 years of EA-faithful walk-forward validation (2010–2020 in-sample folds F1–F11 + 2021–2026 holdout, floating-equity sizing matched to the live EA), Arc 10 v3.0.2 at the **0.40% operating tier** produces — FundedNext, EET, governed, costed (full basis in `02_validation/07_canonical_wfo.md`):
 
-- **Worst-fold ROI: 22.46%** annualised (EET convention, F9 2018)
-- **Worst-fold DD: 7.35%** (F4 2013)
-- **Worst-fold ratio: 6.43** (F6 2015 — the load-bearing fold)
-- **Mean fold ROI: 49.87%** annualised
-- **Holdout ROI: 52.83%** (2021-2026, 1,093 trades)
-- **Sign consistency: 11/11 folds positive** — even at 4× spread stress
+- **Worst-fold ROI: 14.42%** annualised (F9 2018)
+- **Mean fold ROI: 32.48%** annualised
+- **Worst-fold DD: 5.49% from-initial** (FundedNext's actual MLL basis, F5 2014) / **8.21% trailing** (conservative planning anchor, F10 2019)
+- **Worst daily DD: 4.11%** (F1 2010) — under the 5% daily limit
+- **Holdout, per year (never a CAGR):** 2021 +38.79% · 2022 +24.11% · 2023 +27.26% · 2024 +42.86% · 2025 +52.55% · 2026 +2.72% (raw ~4-month partial, not annualised)
+- **0 account kills** across all 11 folds + 6 holdout years
+- **Sign consistency: 11/11 folds + 6/6 holdout years positive**
 
-Pre-cost. After realistic cost modeling (1.5× spread, 0.5 pip slippage, $5 commission, swap-free):
-- Worst-fold ROI: 18.47% → ~16.6% expected live (after haircuts)
-- Worst-fold DD: 7.80% → ~8.8% expected live
-- Holdout ROI: 46.24% → ~44% expected live
+These are post-cost (1.5× spread, $5/lot RT commission, swaps off, 0.5 pip slip) and governed (daily 3.5/4.5%, total 7/8%). **0.40% is the only risk level clearing both hard limits on the conservative trailing basis;** 0.50% FAILS it (trailing 10.89%, daily 5.16%) and is a gated upgrade only — see `02_validation/07_canonical_wfo.md`.
 
 ## Where it runs
 
-- **FundedNext** ($100k Challenge → funded): EET convention, 0.50% risk per trade. Primary deployment target.
+- **FundedNext** ($100k Challenge → funded): EET convention, **0.40% operating risk per trade** (0.50% is a gated, evidence-only upgrade — not routine; see `02_validation/07_canonical_wfo.md`). Primary deployment target.
 - **5ers** ($10k demo): UTC convention, 0.40% risk per trade. Secondary deployment, used for cross-broker validation and as fallback.
 
 Both run on a single Contabo Cloud VPS (Frankfurt, 4 cores, 8 GB RAM, Windows Server 2022).
@@ -65,7 +63,7 @@ The sidecar is **convention-aware**: same code, two convention paths, selected b
 
 ## What changes when going from Challenge to funded
 
-Nothing in the code or config. Same MT5 install, same sidecar service, same EA. Only the FundedNext account login changes; EA re-initializes against the new balance. Risk stays at 0.50%.
+Nothing in the code or config. Same MT5 install, same sidecar service, same EA. Only the FundedNext account login changes; EA re-initializes against the new balance. Risk stays at the 0.40% operating tier.
 
 ## How to run a sanity check
 

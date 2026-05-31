@@ -30,19 +30,22 @@ Backtest distribution from the WFO pool (EET v3.0.2, ~3,152 trades over 14 years
 
 **Why mean is positive but median is negative:** asymmetric R distribution. Most trades lose ~1R (initial SL hit) or partial-close-then-trail to ~0R. The minority of trades that catch runners produce +2R, +3R, +5R outcomes. The right tail funds the strategy.
 
+> **Source note:** these per-trade R stats are pool-level (the WFO trade pool), **not** rows in the EA-faithful `matrix.csv`/`per_fold.csv`. They are **basis-invariant**: R-multiples are normalised to per-trade risk, so the floating-equity sizing correction (which re-bases ROI/DD) does not change them. Mean R +0.42 therefore stands under the canonical run. Re-derive from the trade pool if a precise distribution is needed.
+
 **Variance bands are wide because:** 50 trades is small statistical mass. Backtest at 50 trades had folds with win rates of 30% AND 48% within the same year. Don't react to a single 50-trade window.
 
 ## Cumulative ROI expectation
 
-Based on EET expected live (44% annualised holdout ROI, after haircuts). At 0.50% risk per trade, ~225 trades per year.
+Anchored on the EA-faithful **0.40% operating tier**: mean-fold ROI **32.48%/yr**, full holdout years ranging 24.11%–52.55%, worst search fold 14.42%. At 0.40%, ~190–210 trades/year (so ~200 trades ≈ one year). Derived from `07_canonical_wfo.md` per-fold + holdout — no haircut overlay (the EA-faithful run already includes costs + governors).
 
-| Trade count | Expected days elapsed | Expected ROI | 25% confidence band | 75% confidence band |
+| Trade count | Expected days elapsed | Expected ROI (central) | 25% low band | 75% high band |
 |---|---|---|---|---|
-| 25 | ~40 | +4% | −2% to +10% | — |
-| 50 | ~80 | +9% | 0% to +18% | — |
-| 100 | ~160 | +19% | +5% to +33% | — |
-| 200 | ~320 | +38% | +15% to +60% | — |
-| 365 (one year) | ~365 | +44% | +20% to +70% | — |
+| 25 | ~45 | +4% | −3% | +9% |
+| 50 | ~90 | +8% | −2% | +16% |
+| 100 | ~180 | +16% | +2% | +28% |
+| 200 (~one year) | ~365 | +32% | +14% (worst fold) | +53% (best holdout yr) |
+
+Central tracks the mean-fold / mean-holdout-year (~32%); the low band is the worst observed fold (F9 2018, 14.42%), the high band the best holdout year (2025, 52.55%). Derived, not haircut — bands are wide because annual variance across folds is wide.
 
 **How to use:**
 - Live ROI inside the 25-75% band → normal, no action
@@ -101,7 +104,7 @@ The internal "something's wrong" threshold:
 
 **At 7% total DD:**
 1. Stop and verify the system is operating correctly (no bugs, no operator error, no broker issue)
-2. Cross-check against backtest worst-fold DD (expected live ~8.8% EET, ~9.5% UTC)
+2. Cross-check against the EA-faithful worst-fold DD at 0.40%: **8.21% trailing / 5.49% from-initial** (FundedNext measures from-initial). UTC is the legacy secondary path.
 3. If system is operating correctly and DD is within expected worst-fold range → continue per plan (this is what the system is designed to survive)
 4. If anything looks off → trigger emergency kill procedure (`04_runbook/05_emergency_kill.md`) and investigate
 

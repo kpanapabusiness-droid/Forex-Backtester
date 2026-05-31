@@ -100,7 +100,7 @@ This was quantified in the Phase 2 EET parity work and is documented as a known 
 
 ## What can go wrong
 
-- **Gap-through-SL:** If price gaps below SL on Sunday open or during a news event, fill is at the gap-open price, not the SL level. Loss exceeds 1R. This is the "tail risk" not modeled in haircuts. Mitigation: position sizing keeps single-trade max loss to 0.5% of account at worst, so even a 2-3R gap is survivable.
+- **Gap-through-SL:** If price gaps below SL on Sunday open or during a news event, fill is at the gap-open price, not the SL level. Loss exceeds 1R. This is the "tail risk" not modeled in haircuts. Mitigation: position sizing keeps single-trade max loss to ~0.40% of account at worst (the operating risk tier), so even a 2-3R gap is survivable.
 - **Broker SL ignored:** Hypothetically, a broker could decline to honor the SL order during a freeze. Not seen in practice with 5ers or FundedNext, but possible. Mitigation: EA also tracks position state and would close manually if it detected the SL wasn't filling.
 - **EA crashes mid-position:** Recovery logic reconstructs position state from broker on restart. Logs as `recovery_reconstructed` event. Trail SL is re-anchored at the last known peak (conservative).
 - **Sidecar dies but EA stays alive:** EA detects stale heartbeat (>10 minutes by default), blocks new entries, manages existing positions normally. Watchdog auto-restarts sidecar within 5 minutes.

@@ -2,7 +2,7 @@
 
 > The operational todo list. Append, check off, delete as work completes.
 > Distinct from `ARC_TRACKER.md` (which is auto-updated arc state) and `ARC_HISTORY.md` (frozen pre-v3.0 record).
-> Last updated: 2026-05-29 (post-Arc-10-deployment refresh — Wave 1 closed, Arc 10 LIVE; project now in live-ops + Arc 10 improvements mode)
+> Last updated: 2026-05-31 — **Arc 10 analysis COMPLETE + documented; live-ready at 0.40%; awaiting operator go-live actions.** Risk-surface work closed (EA-faithful canonical run is authoritative); only live-only residuals + the operator go-live checklist remain open.
 
 ---
 
@@ -19,8 +19,9 @@
 
 - **Phase 0 — Framework validation:** 🟢 CLOSED (Phase 0a Path B verdict per PR-E.1.7; Phase 0b skipped by chat decision)
 - **Phase 1 — Arc 1-11 re-runs:** 🟡 PARTIAL — **Wave 1 CLOSED** (all 5 arcs run under v3.0.2: Arc 10 PASS-DEPLOYABLE → **LIVE**; Arcs 5 / 7 / 8 / 11 FAIL). **Wave 2 ⚪ PARKED** — deprioritized; project pivoted to deployment of the Arc 10 survivor.
-- **Arc 10 — Live operations:** 🟡 ACTIVE — deployed on FundedNext (EET) + 5ers (UTC) demo; demo soak in progress; FundedNext $100k Challenge purchase pending soak verification. Operational source of truth = `arc_10/`.
-- **Arc 10 — Improvements (research):** 🟡 the only open research thread — small exploratory probes on the deployed signal; nothing structural.
+- **Arc 10 — Analysis + risk surface:** 🟢 COMPLETE — canonical gate is the **EA-faithful** floating-equity run (`arc_10/02_validation/07_canonical_wfo.md`); operating risk **0.40%**; sizing-basis, governors, slippage and gap analysis all resolved. Documented in `arc_10/`. Do not re-open the risk analysis — it is canonical.
+- **Arc 10 — Live operations:** 🟡 ACTIVE — analysis-complete, live-ready at 0.40%; awaiting operator go-live actions (see **Operator go-live checklist** below). Operational source of truth = `arc_10/` (start at `arc_10/START_HERE.md`).
+- **Arc 10 — Improvements (research):** ⚪ PARKED/CLOSED — the exploratory probes resolved into the canonical run; no open structural research thread.
 - **Phase 2 — Sub-protocols + new signals:** ⚪ PARKED — deprioritized along with Wave 2; project focus is deployment + Arc 10 improvements, not new signal classes.
 - **Engine state:** **post-deployment-week** (post-PR-#236). Steps 1-5 + signal parity + Step 6 framework (Amendment 4) + Amendment 3 / 3.1 risk-normalised gates + Amendment 5 architecture selection + Amendment 6 EET daily-DD boundary + canonical exit-policy registry. **Live deployment stack wired & operationally validated:** convention-aware Python sidecar (UTC + EET, byte-identical parity proven on both) + thin MQL5 EA + multi-broker plumbing (`--mt5-path`) + `--quick-test`.
 - **Architectures wired:** A1, A2, A3, A4, A6 (A5 not built — deferred; no VIABLE candidate triggered it)
@@ -154,6 +155,20 @@ Closes Wave 1 (all 5 arcs run under v3.0.2) and takes the Arc 10 survivor from P
 
 Rounds 1-7 above are historical record — unchanged.
 
+### Round 9 — Arc 10 risk-surface + canonical documentation (2026-05-29 → 2026-05-31)
+
+Closes the Arc 10 analysis to a single authoritative basis. All canonical numbers trace to `arc_10/02_validation/07_canonical_wfo.md` and `results/l_arc_10_v3.0.2_ea_faithful/`.
+
+| Task | Status | PR / Tag |
+|---|---|---|
+| Arc 10 risk-surface analysis — path analytics, governed gate | 🟢 | #242-#244 era |
+| Sizing-basis correction → EA-faithful floating-equity (live-matched) canonical run | 🟢 | #243 |
+| Daily-governor sweep — keep close-all at 4.5% (3.5/4.5 daily, 7/8 total) | 🟢 | (in `07_canonical_wfo.md` findings) |
+| Slippage budget (~5× margin) + gap risk bounded to single-currency | 🟢 | (in `07_canonical_wfo.md` findings) |
+| OPEN-001 — EA total-DD floor re-baseline (operator-set static floor, fail-loud) | 🟢 | #242 / #244 (residual #1 alerting deferred — #245) |
+| Canonical EA-faithful documentation pass | 🟢 | #246 |
+| CLAUDE.md + TODO + `arc_10/START_HERE.md` finished-state pass | 🟢 | this PR |
+
 ---
 
 ## Phase 0 — Framework validation
@@ -194,7 +209,7 @@ path is Sections G (news filter) + H (post-fill SL anchor) per
 
 | Arc | v3.0 verdict | v3.0.2 retry verdict | Closure PR | Live status |
 |---|---|---|---|---|
-| Arc 10 | PASS-VIABLE → PASS-DEPLOYABLE | **PASS-DEPLOYABLE** (ratio 6.43 EET) | #174 / re-eval #177 / v3.0.2 #214/#216/#217/#218 | **LIVE on demo (FN EET + 5ers UTC); Challenge pending** |
+| Arc 10 | PASS-VIABLE → PASS-DEPLOYABLE | **PASS-DEPLOYABLE** (EA-faithful canonical, 0.40% FundedNext) | #174 / re-eval #177 / v3.0.2 #214/#216/#217/#218 / canonical #243/#246 | **Analysis-complete, live-ready at 0.40%; awaiting operator go-live** |
 | Arc 8 | FAIL (step 5) | FAIL (chained DD blowout) | #173 / v3.0.2 #231 | n/a |
 | Arc 11 | FAIL (step 5) | FAIL (step5_not_scalable) | #171 / v3.0.2 #215 | n/a |
 | Arc 7 | FAIL (step 5) | FAIL (step5_not_scalable) | v3.0.2 #202 (+ r=2% analysis #210) | n/a |
@@ -224,17 +239,32 @@ path is Sections G (news filter) + H (post-fill SL anchor) per
 
 ## Arc 10 — Live operations
 
-> **Live system status as of 2026-05-29.** Operational detail lives in `arc_10/04_runbook/`. This TODO captures research-pipeline / decision-gate status only; it references `arc_10/`, it does not duplicate it.
+> **Analysis-complete, live-ready at 0.40% as of 2026-05-31.** Operating tier is **0.40%** (EA-faithful canonical run). Operational detail lives in `arc_10/04_runbook/`; start at `arc_10/START_HERE.md`. This TODO captures decision-gate / go-live status only; it references `arc_10/`, it does not duplicate it.
 
-Deployed on a single Contabo VPS (Frankfurt): FundedNext ($100k Challenge target, EET convention, 0.50% risk) + 5ers ($10k demo, UTC convention, 0.40% risk). Convention-aware Python sidecar + thin MQL5 EA per broker; watchdog auto-restart on stale heartbeat.
+Target deployment: a single Contabo VPS (Frankfurt) — FundedNext ($100k Challenge, EET convention, **0.40% operating risk**). Convention-aware Python sidecar + thin MQL5 EA; watchdog auto-restart on stale heartbeat.
+
+### Operator go-live checklist (physical actions — not analysis)
+
+| # | Action | Status |
+|---|---|---|
+| 1 | Set EA input `Initial_Equity_Floor = 100000` on FundedNext (fail-loud if unset) | 🔴 |
+| 2 | Pull `main` → local + VPS | 🔴 |
+| 3 | Buy FundedNext $100k; attach EA at **0.40%**; confirm journal `equity init: floor=100000.00 source=input` | 🔴 |
+
+### Live-only residuals (cannot be closed by backtest — external / first-live-event)
 
 | Item | Status | Notes |
 |---|---|---|
-| Demo soak (both brokers) | 🟡 | In progress; verify before market reopen Sunday 2026-06-01 |
-| FundedNext $100k Challenge purchase | ⚪ | Pending soak verification + operator decision |
-| Risk ramp Week 1 (0.20%) | 🔴 | Triggers on Challenge purchase |
-| Risk ramp Week 2 (0.30%) | 🔴 | Triggers Week 1 + 1 if clean |
-| Risk ramp Week 3+ (0.50% target) | 🔴 | Triggers Week 2 + 1 if clean |
+| Tick-gap validation on first live spike day | ⚪ | Confirm the tick EA caps daily DD < 5% on the first live volatility spike. The one unclosable backtest gap (open book marked at H4-bar resolution, not tick). |
+| 0.50% risk — future evidence-gated upgrade | ⚪ | NOT a routine step. Requires a substantial banked buffer **and** a live gap-event confirming the tick EA caps daily < 5%. 0.50% FAILS the conservative trailing basis (10.89% / daily 5.16%). |
+| OPEN-001 residual #1 — unattended floor-fail alerting | ⚪ | PR #245, deferred. Alert on EA total-DD floor-fail when unattended. |
+| FundedNext confirm — cycle 4%-measurement basis (balance vs equity) | ⚪ | Pending written FundedNext confirmation. |
+| FundedNext confirm — exact scale-event profit mechanic | ⚪ | Pending written FundedNext confirmation. |
+
+### Standing live-ops items
+
+| Item | Status | Notes |
+|---|---|---|
 | KH-24 retirement | 🔴 | Triggers on Arc 10 reaching funded status |
 | Weekly reconciliation script build | ⚪ | Deferred until 4+ weeks of live data exist; spec at `arc_10/04_runbook/02_weekly_check.md` |
 | First 50-trade comparison vs live-tracking framework | 🔴 | Triggers automatically when ~50 trades closed; framework at `arc_10/04_runbook/06_live_tracking_framework.md` |
@@ -245,12 +275,12 @@ Deployed on a single Contabo VPS (Frankfurt): FundedNext ($100k Challenge target
 
 ## Arc 10 — Improvements (research)
 
-> The only open research thread. Small, exploratory probes on the deployed signal — nothing structural, nothing that gates deployment. Lower priority than live operations.
+> ⚪ **PARKED / CLOSED.** The exploratory probes resolved into the EA-faithful canonical run; there is no open structural research thread on Arc 10. The deployed config is locked. Any future candidate improvement goes through a fresh validation arc, not an in-place edit. Listed below as parked candidates only.
 
 | Task | Status | Notes |
 |---|---|---|
-| Arc 10 improvement probes | 🟡 | Exploratory; scope set chat-side as interesting ideas surface. Must not touch the locked deployed config — any candidate improvement goes through a fresh validation arc, not an in-place edit. |
-| Cross-arc V-shape clusterifier (carry-over candidate) | 🔴 | EXP-05 pool: AUC 0.6348 with `L1_minus_L0_atr` mandatory; Arc 7 c3 + Arc 10 c1 pooled. Leading research candidate to fold into Arc 10 improvements if pursued. |
+| Arc 10 improvement probes | ⚪ | PARKED — resolved into the canonical run; reopen only as a fresh validation arc if pursued. Must not touch the locked deployed config. |
+| Cross-arc V-shape clusterifier (carry-over candidate) | ⚪ | PARKED. EXP-05 pool: AUC 0.6348 with `L1_minus_L0_atr` mandatory; Arc 7 c3 + Arc 10 c1 pooled. Leading candidate if the research thread reopens. |
 
 ---
 

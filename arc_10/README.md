@@ -9,6 +9,8 @@
 
 ## Read this first
 
+**→ [`START_HERE.md`](START_HERE.md) — the one-glance entry point for the live system (status, the system in one paragraph, expected performance, where everything is).**
+
 This folder is the single source of truth for Arc 10. If you want to:
 
 - **Understand what Arc 10 is** → start at `00_executive_summary.md`
@@ -26,6 +28,7 @@ Everything in this folder is curated. Underlying data lives in `results/` and is
 
 | Question | Document |
 |---|---|
+| **Where do I start?** | **`START_HERE.md`** |
 | What does Arc 10 do? | `00_executive_summary.md` |
 | How does the signal work? | `01_strategy/signal_logic.md` |
 | **Canonical numbers (source of truth)** | **`02_validation/07_canonical_wfo.md`** |

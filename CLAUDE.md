@@ -1,12 +1,14 @@
 # CLAUDE.md — Forex Ignition Rebuild
-> Last updated: 2026-05-25 | Phase: Post-Phase-1-engine-build. L_PROTOCOL v3.0 + Amendments 1-6 locked. v3.0 engine wired end-to-end across `core/arc/`, `core/steps/`, `core/architectures/` (A1, A2, A3, A4, A6 — A5 deferred), `core/runners/`, `core/step_6/`, `core/sim/exit_policies/`, `core/time_utils/`. KH-24 anchor preserved (A1 path byte-identical to legacy `KH24FoldRunner` under `boundary_convention="utc"`). KH-24 live deployment on Contabo VPS / 5ers MT5 unchanged.
+> Last updated: 2026-05-31 | Phase: **Arc 10 DEPLOYED — live operations; forward research parked.** L_PROTOCOL v3.0 + Amendments 1-7 locked. v3.0 engine wired end-to-end across `core/arc/`, `core/steps/`, `core/architectures/` (A1, A2, A3, A4, A6 — A5 deferred), `core/runners/`, `core/step_6/`, `core/sim/exit_policies/`, `core/time_utils/`. KH-24 anchor preserved (A1 path byte-identical to legacy `KH24FoldRunner` under `boundary_convention="utc"`). KH-24 live deployment on Contabo VPS / 5ers MT5 unchanged.
 > First file any AI assistant reads. Reflects where the project ACTUALLY is.
+>
+> **Arc 10 is deployed and analysis-complete; for live state read `arc_10/START_HERE.md`. Do not re-open the risk analysis — it is canonical in `arc_10/02_validation/07_canonical_wfo.md`.**
 
 ---
 
 ## Active protocol
 
-**L_PROTOCOL v3.0** (`L_PROTOCOL.md`) is the overseer methodology for all forward research. Five steps as rankings + lazy Step 6 (causal audit). WFO at Step 5 is the only deployment gate. Six amendments are inline / inline-archived:
+**L_PROTOCOL v3.0** (`L_PROTOCOL.md`) is the overseer methodology for all forward research. Five steps as rankings + lazy Step 6 (causal audit). WFO at Step 5 is the only deployment gate. Seven amendments are inline / inline-archived:
 
 - **Amendment 1** — Step 5 search policy (informed by Steps 3-4, not exhaustive).
 - **Amendment 2** — ML architecture mechanics for A2, A3, A4, A6.
@@ -14,19 +16,22 @@
 - **Amendment 4** — Step 6 causal-audit framework (six categories; auto-dispatch on Top-1 PASS candidate).
 - **Amendment 5** — AUC-gated A2/A6 architecture selection (four-gate dispatch-time rule).
 - **Amendment 6** — 5ers EET broker trading day as the daily-DD measurement boundary.
+- **Amendment 7** — portfolio-level DD gating + EA-faithful floating-equity sizing (`ACCOUNT_EQUITY × r_base`, floating P&L included, re-read per entry) + both DD references reported (from-initial = broker MLL basis; trailing = conservative planning anchor). Applies to all future arcs.
 
 Archive files: `archive/L_PROTOCOL_v3_0_AMENDMENT_3.md`, `..._AMENDMENT_4.md`, `..._AMENDMENT_5.md`. Amendments 1, 2, 6 are documented inline in `L_PROTOCOL.md` only.
 
-Historical: Arcs 1, 2, ..., 11 (under v1.x and v2.x protocols) live in `ARC_HISTORY.md` (frozen). v3.0 Wave 1 closures landed for Arcs 8 (FAIL), 10 (PASS-VIABLE → re-eval PASS-DEPLOYABLE under Amendment 3), 11 (FAIL); Arcs 5 + 7 v3.0 closures in flight.
+Historical: Arcs 1, 2, ..., 11 (under v1.x and v2.x protocols) live in `ARC_HISTORY.md` (frozen). v3.0 Wave 1 is CLOSED (all 5 arcs run under v3.0.2): Arc 10 PASS-DEPLOYABLE → **LIVE**; Arcs 5 / 7 / 8 / 11 FAIL.
 
 ---
 
 ## Read These First, In Order
 
-1. **`L_PROTOCOL.md`** — the methodology of record. Self-contained for gates, deliverables, and architectures.
-2. **`TODO.md`** — operational tracker: current phase, in-flight arcs, engine work, standing items.
-3. **`ARC_TRACKER.md`** — auto-managed arc state. Read for closed-arc status; do not hand-edit.
-4. **`WORKFLOW.md`** — operational conventions, dispatch artefact pattern, branch strategy.
+1. **`arc_10/START_HERE.md`** — entry point for the deployed live system. Arc 10 is the deployable survivor; read this for live state.
+2. **`arc_10/02_validation/07_canonical_wfo.md`** — canonical results reference (EA-faithful, floating-equity). Source of truth for every Arc 10 number.
+3. **`L_PROTOCOL.md`** — the methodology of record. Self-contained for gates, deliverables, and architectures.
+4. **`TODO.md`** — operational tracker: current phase, in-flight arcs, engine work, standing items.
+5. **`ARC_TRACKER.md`** — auto-managed arc state. Read for closed-arc status; do not hand-edit.
+6. **`WORKFLOW.md`** — operational conventions, dispatch artefact pattern, branch strategy.
 
 Then, depending on scope:
 - Touching the live KH-24 system → `docs/KH24_SYSTEM_LOCK.md`
@@ -43,13 +48,13 @@ Sub-protocols at `docs/sub_protocols/` (`heavy_ml_probe.md`, `signal_discovery_p
 
 **Live system KH-24 is locked, passing, deployed.** Out of scope for any forward research work without an explicit modification phase.
 
-**Active research:** Phase 1 Wave 1 v3.0 retries under signal-parity engine. Wave 1 composition: Arcs 5, 7, 8, 10, 11. Arcs 8 / 10 / 11 closed; Arcs 5 / 7 closure PRs in flight (#172, #180). Wave 1 retries (Arc 5 v3.0.1, Arc 7 v3.0.1, Arc 10 signal-parity rerun) gated on those closures + signal-parity engine merged (PRs #189, #193, #195, #197 — all merged 2026-05-25). Arc 10's existing PASS-VIABLE / Amendment-3 re-evaluated PASS-DEPLOYABLE verdict stands under UTC convention; a separate parity rerun is documented at `docs/calibration/arc_10_signal_parity_rerun_2026_05.md`.
+**Arc 10 is LIVE-READY / DEPLOYED — analysis COMPLETE.** Arc 10 v3.0.2 (DLR signal) is the deployable survivor: deployed on FundedNext (EET, $100k Challenge) at **0.40% operating risk**, EA-faithful floating-equity sizing. The canonical gate is the **EA-faithful** run (`arc_10/02_validation/07_canonical_wfo.md`): worst-fold ROI 14.42%, mean-fold 32.48%, worst-fold trailing DD 8.21% / from-init 5.49% / daily 4.11%, 0 kills, PASS-DEPLOYABLE on FundedNext's from-initial basis. **0.50% is a marginal / evidence-gated future upgrade, not the operating tier** (FAILS trailing 10.89% / daily 5.16%). The risk-surface analysis (0.40% vs 0.50%, sizing basis, governors, gap/slippage) is canonical and closed — do not re-open it; if a number is questioned it traces to the EA-faithful CSVs in `results/l_arc_10_v3.0.2_ea_faithful/`.
 
-**Parallel chats:**
-- `heavy_ml_probe` sub-protocol build (PR #187 PR-A landed; PR-B/C/D/E/F to follow).
-- `signal_discovery_probe` 10k local run (user-side workstation operation).
+The earlier "PASS-VIABLE → Amendment-3 PASS-DEPLOYABLE under UTC / parity rerun pending" framing is **superseded** by the EA-faithful run. The UTC / signal-parity-rerun narrative is legacy.
 
-Wave 2 (Arcs 4-RERUN, 4-original, 6, 3, 1, 2) gated on Wave 1 closure. Phase 2 (sub-protocols + new signal classes) gated on Phase 1 closure.
+**Live-only residuals** (cannot be closed by backtest, tracked in `TODO.md`): tick-gap behaviour on first live spike day; 0.50% as a future evidence-gated upgrade; two pending FundedNext written confirms (cycle 4%-measurement basis; exact scale-event profit mechanic). OPEN-001 (EA floor re-baseline) is RESOLVED.
+
+**Forward research is PARKED.** Wave 2 (Arcs 4-RERUN, 4-original, 6, 3, 1, 2) and Phase 2 (sub-protocols + new signal classes) are deprioritized behind the deployment pivot. Reopenable if Arc 10 fails its live kill criteria.
 
 ---
 
@@ -161,7 +166,7 @@ Full engine capability map: [docs/audits/engine_capability_audit_2026_05.md](doc
 - **Arc 2 signal** (`mtf_alignment.2_down_mixed.kijun`, h=120) — SHELVED 2026-05-16 under v2.x; not permanently eliminated. Cluster 2 has strong magnitude (fwd_mfe_p50 5.83R) on unextractable paths. Reopenable under v3.0 if signal-module re-fits cleanly. See `results/l_arc_2_redo/ARC_2_REDO_RESULT.md`.
 - **Arc 4 signal** (`bar_range_top_decile__neg__h_001`, 1H) — SHELVED under v2.x; queued for Wave 2 v3.0 retry (Arc 4-RERUN + Arc 4-original).
 - **Arc 6 signal** (failed-breakout reversal long) — Stepwise cohort with clean path quality but entry-time predictability below v2.x deployability bar; queued for Wave 2 v3.0 retry. May respond differently under Amendment 5's AUC-driven A2/A6 admit.
-- **Arc 10 DLR signal** (D1 swing-low rejection long) — v3.0 PASS-VIABLE → Amendment-3 re-evaluated PASS-DEPLOYABLE. PR #193 audit flagged the signal module as State B under EET storage (safe under Arc 10's UTC convention; signal module fixed canonically). Cross-arc clusterifier build with Arc 7 c3 is a parallel research candidate.
+- **Arc 10 DLR signal** (D1 swing-low rejection long) — **DEPLOYED.** PASS-DEPLOYABLE under the EA-faithful canonical run (`arc_10/02_validation/07_canonical_wfo.md`); live on FundedNext at 0.40%. Cross-arc clusterifier build with Arc 7 c3 is a parked research candidate (see `TODO.md` Arc 10 — Improvements).
 
 ---
 
@@ -211,4 +216,4 @@ See `WORKFLOW.md` for branch + dispatch conventions.
 
 ## Methodology in One Line
 
-L_PROTOCOL v3.0 overseer. Five steps as rankings; WFO at Step 5 is the only deployment gate; Step 6 causal audit is the lazy verdict-downgrade. Six architectures tested per arc under Amendment 5's four-gate dispatch rule. Risk-normalised gates (Amendment 3); EET daily-DD boundary (Amendment 6). First system clearing PASS-DEPLOYABLE ships and the project's 20%-annualised-on-$100k goal is met.
+L_PROTOCOL v3.0 overseer. Five steps as rankings; WFO at Step 5 is the only deployment gate; Step 6 causal audit is the lazy verdict-downgrade. Six architectures tested per arc under Amendment 5's four-gate dispatch rule. Risk-normalised gates (Amendment 3); EET daily-DD boundary (Amendment 6); EA-faithful floating-equity sizing + portfolio-level DD gating (Amendment 7). First system clearing PASS-DEPLOYABLE ships and the project's 20%-annualised-on-$100k goal is met — **met by Arc 10, now deployed.**

@@ -48,7 +48,7 @@ input int     Sidecar_Heartbeat_Max_Age_Sec = 600;     // 10 min
 input string  Expected_Config_Hash        = "";        // fill at deploy
 input string  News_Calendar_URL           = ARC10_NEWS_DEFAULT_URL;
 input bool    Enable_News_Filter          = true;
-input int     News_Window_Sec             = 120;
+input int     News_Window_Sec             = 300;       // ±5min high-impact blackout (FIX 3); entries delayed past it, exits deferred within it
 input int     News_Delay_Buffer_Sec       = 5;
 input int     News_Delay_Max_Sec          = 3600;
 input int     News_Refresh_Sec            = 14400;     // 4h
@@ -187,7 +187,10 @@ void ArcAttemptEntry(const ArcSignalEnvelope &sig)
      }
    string err;
    int slot;
-   ulong ticket = ArcPlaceEntry(sig, Risk_Per_Trade, Magic_Number, g_trade, err, slot);
+   // base_equity = STATIC initial-balance floor (Initial_Equity_Floor), NOT
+   // ACCOUNT_EQUITY — FundedNext-aligned constant risk-per-trade (FIX 1).
+   ulong ticket = ArcPlaceEntry(sig, Risk_Per_Trade, Initial_Equity_Floor,
+                                Magic_Number, g_trade, err, slot);
    if(ticket == 0)
      {
       PrintFormat("[ARC10] entry failed %s: %s", sig.signal_id, err);
@@ -339,7 +342,32 @@ void ArcManagePositions()
          g_arc_pos_count--;
          continue;
         }
-      ArcExitOnTickTp1(slot, g_trade);
+      // FIX 3: defer the EA's OWN discretionary exits (TP1 partial, queued
+      // trail/time close) while inside the ±News_Window_Sec high-impact
+      // blackout. Closing in-window forfeits 60% of in-window profit
+      // (FundedNext article 10701685). Detection still runs every bar
+      // (ArcExitOnNewBar sets pending_close and it stays queued); only
+      // EXECUTION is held until the window clears, then fires on a later
+      // tick. NOT gated: risk-governor close-alls (ArcEquityCloseAllManaged,
+      // run earlier in OnTick) and broker-side SL fills (which surface via
+      // the PositionSelectByTicket==false branch above) — both must always
+      // fire for safety, and losses count 100% regardless of the window.
+      bool news_exit_blocked =
+         Enable_News_Filter
+         && ArcNewsInBlackout(g_arc_positions[slot].pair, TimeGMT(), News_Window_Sec);
+      // Diagnostic, throttled to ≤1 line/60s across all slots so a multi-tick
+      // blackout window doesn't flood the journal. Only meaningful when a
+      // close is actually being held (pending_close) or TP1 is suppressed.
+      static datetime g_arc_last_blackout_log = 0;
+      if(news_exit_blocked && TimeGMT() - g_arc_last_blackout_log >= 60)
+        {
+         PrintFormat("[ARC10] news-exit blackout: holding discretionary exits for %s (%s) pending_close=%s",
+                     g_arc_positions[slot].pair, g_arc_positions[slot].signal_id,
+                     g_arc_positions[slot].pending_close ? "true" : "false");
+         g_arc_last_blackout_log = TimeGMT();
+        }
+      if(!news_exit_blocked)
+         ArcExitOnTickTp1(slot, g_trade);
       // Emit partial_close trade-log row on the first tick after a TP1
       // partial fires (idempotent via partial_close_logged flag).
       if(g_arc_positions[slot].tp1_fired
@@ -363,7 +391,7 @@ void ArcManagePositions()
                           0, 0, AccountInfoDouble(ACCOUNT_EQUITY), "");
          g_arc_positions[slot].partial_close_logged = true;
         }
-      if(g_arc_positions[slot].pending_close)
+      if(g_arc_positions[slot].pending_close && !news_exit_blocked)
         {
          double px = ArcExitExecuteQueued(slot, g_trade);
          ArcLogTradeEvent(Trade_Log_Path, "exit",

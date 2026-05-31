@@ -12,11 +12,26 @@
 
 ## Open
 
-### Sidecar does not consume the EA `ea.heartbeat` `status` field (OPEN-001 residual #1)
-**Status:** open (next discrete task)
-**What:** the OPEN-001 fail-loud condition writes `status: halted_floor_unset` to `ea.heartbeat`, but `sidecar.py` doesn't read that field. On an *unattended* VPS a floor-fail halt is signalled only by the in-terminal `Alert()` + journal `FLOOR_FAIL` token — it is not pushed to the operator.
-**Why it matters:** without an unattended alert path, a halted-on-unset-floor EA could sit halted (not trading, not protecting) without the operator knowing until the next manual check.
-**Resolve when:** wire the always-up sidecar to grep the journal `FLOOR_FAIL` token or read the heartbeat `status` field, producing an operator alert. See [`07_open_issue_dd_restart_rebaselining.md`](07_open_issue_dd_restart_rebaselining.md) (residual #1).
+### Unattended alerting for EA floor-fail / halt (OPEN-001 residual #1)
+**Status:** OPEN — deferred (logged for cold pickup; not yet scheduled)
+**Symptom:** a floor-fail halt — or any EA halt — is currently visible only at the MT5 terminal. On an unattended VPS the operator is not notified. The state is *safe* (the EA halts and does not trade incorrectly) but *silent*: a halted EA can sit not-trading / not-protecting until the next manual check.
+
+**Already emitted by the EA on fail-loud (no new EA detection work needed — only consume + push):**
+- `Alert()` — in-terminal only, does not leave the VPS.
+- journal token `FLOOR_FAIL`.
+- `ea.heartbeat` field `status: halted_floor_unset`.
+
+**Consumption (sidecar is the natural consumer — it is always-up):**
+- **Option A (preferred):** sidecar reads the `ea.heartbeat` `status` field each cycle; on a halt status, fire an outbound alert. Structured, no log-parsing fragility — this is what the heartbeat `status` field was built for, currently unwired.
+- **Option B (fallback):** sidecar greps the MT5 Experts log for `FLOOR_FAIL`. Works but brittle to log path / rotation / format changes.
+
+**Outbound channel (the part that actually reaches the operator off-VPS):**
+- MT5 native `SendNotification()` → MetaQuotes mobile app (zero infra), or
+- sidecar → Telegram bot / webhook / email (most controllable; Telegram is typical for VPS trading alerts).
+
+**Open scope decision (resolve before building):** floor-fail-only, OR general EA-health alerting (also covers EA crashed entirely / heartbeat gone stale / sidecar↔EA link lost). The general version is barely more work once sidecar→push is wired, and closes a larger unattended blind spot. **Recommended if running hands-off.**
+
+**Resolve when:** picked up as a discrete task — decide the scope above, wire consumption (Option A preferred) to an outbound channel, and verify an alert reaches the operator off-VPS. Cross-ref: [`07_open_issue_dd_restart_rebaselining.md`](07_open_issue_dd_restart_rebaselining.md) Residual #1.
 
 ### §6.1-A TP1/SL same-bar diagnostic
 **Status:** open (deferred)

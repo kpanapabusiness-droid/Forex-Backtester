@@ -28,6 +28,7 @@ Everything in this folder is curated. Underlying data lives in `results/` and is
 |---|---|
 | What does Arc 10 do? | `00_executive_summary.md` |
 | How does the signal work? | `01_strategy/signal_logic.md` |
+| **Canonical numbers (source of truth)** | **`02_validation/07_canonical_wfo.md`** |
 | What are the WFO numbers? | `02_validation/01_wfo_results.md` |
 | EET vs UTC — which is better? | `02_validation/05_cost_sweep.md` |
 | How is it deployed on VPS? | `03_deployment/04_vps_setup_guide.md` |
@@ -43,7 +44,7 @@ Everything in this folder is curated. Underlying data lives in `results/` and is
 |---|---|
 | Strategy version | Arc 10 v3.0.2 |
 | Active brokers | FundedNext (EET, $100k), 5ers (UTC, $10k) |
-| Risk per trade — FundedNext | 0.50% |
+| Risk per trade — FundedNext | 0.40% (operating; 0.50% gated upgrade only) |
 | Risk per trade — 5ers | 0.40% |
 | Max DD limit (hard, both) | 10% |
 | Daily DD limit (hard, both) | 5% |

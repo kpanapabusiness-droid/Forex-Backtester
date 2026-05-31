@@ -16,7 +16,7 @@ With a pre-mortem, you have a calibration: most failures will fit one of these p
 
 **What it looks like:** total DD approaches 8-9%. Lasts 2-8 weeks. Multiple consecutive losing weeks. Win rate drops to ~30%.
 
-**Why it happens:** the backtest had F4 2013 with 7.35% worst-fold DD. Live worst-fold DD expected ~8.8% after haircuts. Hitting this in any single year is roughly expected.
+**Why it happens:** the EA-faithful backtest at 0.40% has worst-fold DD of 8.21% trailing (F10 2019) / 5.49% from-initial (F5 2014); FundedNext measures from-initial. Hitting a worst-fold-equivalent period in any single year is roughly expected.
 
 **Confidence this is the issue:** if total DD is between 5-8.5%, system is running, no operational errors → very likely this is just a worst-fold-equivalent period.
 

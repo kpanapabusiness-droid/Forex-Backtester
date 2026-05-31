@@ -78,7 +78,7 @@ User pasted GitHub PAT in chat. Twice. Was offered the chance to revoke. Decline
 
 ### Risk locking happened BEFORE deployment, not during
 
-The 0.50% / 0.40% risk decisions were locked from the cost sweep, weeks before deployment. By the time we were in the VPS setting up services, those numbers were inputs, not variables.
+The risk decisions were locked from the validation work, weeks before deployment — later re-based by the EA-faithful floating-equity run to **0.40% operating / 0.50% gated** (`../02_validation/07_canonical_wfo.md`). By the time we were in the VPS setting up services, those numbers were inputs, not variables.
 
 **Why this mattered:** during the operational chaos of deployment (NSSM quoting bugs, FILE_COMMON discovery, EA inputs), there was zero cognitive load on "what should the risk be?" That question was settled.
 
@@ -108,7 +108,7 @@ When we found that 5ers panel-diff showed UTC bar anchors (despite EET server cl
 - **Watchdog at 5min interval with 4h10min stale threshold.** Aggressive enough to catch real issues, tolerant enough not to spuriously restart during normal H4 gaps.
 - **Same compiled .ex5 on both brokers.** Single source of truth for execution logic; only inputs differ.
 - **Config hash verification per envelope.** Catches operator misconfig before any wrong trade fires.
-- **Risk ramp 0.20 → 0.30 → 0.50.** First-weeks-live should be cheap; risk goes up only after evidence accumulates.
+- **Risk ramp 0.20 → 0.30 → 0.40 (operating tier).** First-weeks-live should be cheap; risk goes up only after evidence accumulates.
 
 ## The questionable calls
 

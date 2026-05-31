@@ -33,9 +33,9 @@ If either 5ers or FundedNext kills the account (10% total DD or 5% daily DD brea
 
 **Action:** investigate root cause before opening any new account. Do not buy another Challenge until you understand what happened. This is the only "involuntary kill" — the others are deliberate.
 
-### #2 — Operator-level: total DD ≥ 8.5% (expected worst-fold + buffer)
+### #2 — Operator-level: total DD ≥ 8.5% (past the auto-CloseAll)
 
-Backtest worst-fold DD (cost-adjusted, EET live-expected) is 8.8%. Hitting 8.5% means you're at the edge of "this is what the system is designed to survive."
+EA-faithful worst-fold DD at the 0.40% operating tier is **8.21% trailing / 5.49% from-initial** (FundedNext, the primary firm, measures from-initial). Hitting 8.5% total means you're past the worst backtested trailing fold and past the system's own protection — "this is beyond what the system is designed to survive."
 
 System auto-halts new entries at 7%, auto-CloseAll at 8%. The 8.5% threshold gives a 0.5pp buffer past CloseAll for cases where positions slipped through CloseAll before fully exiting.
 
@@ -43,7 +43,7 @@ System auto-halts new entries at 7%, auto-CloseAll at 8%. The 8.5% threshold giv
 
 ### #3 — Variance-level: cumulative ROI below 25% confidence band at 200+ trades
 
-The live-tracking framework specifies a 25% confidence band at 200 trades of approximately +15% ROI. If actual cumulative ROI at 200 trades is below this (e.g. cumulative +5% or negative), this exceeds normal variance.
+The live-tracking framework (`06_live_tracking_framework.md`, re-derived from `07_canonical_wfo.md`) specifies a 25% low band at 200 trades (~one year) of approximately **+14% ROI** — the worst observed fold (F9 2018). If actual cumulative ROI at 200 trades is well below this (e.g. cumulative +5% or negative), this exceeds normal variance.
 
 **Threshold:** cumulative ROI < +5% at 200+ trades.
 
@@ -113,7 +113,7 @@ If you killed the system, here's what's required before restarting:
 | Kill type | Restart conditions |
 |---|---|
 | #1 prop firm hard limit | Cannot restart same account; open new account ONLY after root cause + fix |
-| #2 8.5%+ DD | Restart at reduced risk (0.30% instead of 0.50%); revert to full risk after 50 trades clean |
+| #2 8.5%+ DD | Restart at reduced risk (0.30%); return to the 0.40% operating tier after 50 trades clean |
 | #3 ROI below band at 200+ trades | Significant investigation required; may need re-validation against new data; consider whether strategy is still alive |
 | #4 4 negative months in 6 | Investigate regime; consider risk reduction; restart only if you understand cause |
 | #5 prolonged DD | Same as #4 |
@@ -148,8 +148,8 @@ Unproductive activities (avoid):
 
 | Criterion | Threshold | Rationale |
 |---|---|---|
-| DD limit | 8.5% | Backtest worst-fold live-expected ~8.8%; 8.5% catches imminent breach |
-| ROI band | 25% confidence at 200+ trades | Below this, sample large enough that bad ROI is signal |
+| DD limit | 8.5% | EA-faithful worst-fold 8.21% trailing / 5.49% from-init @ 0.40%; 8.5% sits just past the 8% auto-CloseAll |
+| ROI band | < +5% at 200+ trades (low band ~+14%) | Below the worst-fold floor, sample large enough that bad ROI is signal |
 | Negative months | 4 in 6 | Backtest rarely had 3, never had 4. Outside experience. |
 | DD duration | 60 days | Backtest had recovery within 60 days in nearly all cases |
 | Near-misses | 3 in 6 months | Pattern of near-misses = operating too close to limits |

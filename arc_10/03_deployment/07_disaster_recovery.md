@@ -134,7 +134,7 @@ Some things can't be recovered after loss:
 - VPS provider issue requiring reprovision: ~5%
 - Repo loss: <1%
 - Both repo + local lost simultaneously: <<1%
-- Broker account terminated due to system fault: <2% (with 0.50% risk + 7%/8% DD halts)
+- Broker account terminated due to system fault: <2% (with 0.40% operating risk + 7%/8% DD halts)
 - Broker account terminated due to broker rule change: ~5%
 - Strategy degradation requiring kill: see kill criteria for specific triggers
 

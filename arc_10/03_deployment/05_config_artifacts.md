@@ -207,7 +207,7 @@ Get-Content "C:\Users\Administrator\AppData\Roaming\MetaQuotes\Terminal\Common\F
 
 ## What you CAN change without re-validation
 
-- `Risk_Per_Trade` between 0% and the recommended max (0.5%/0.4%) — pure linear scaling, no edge changes
+- `Risk_Per_Trade` between 0% and the 0.40% operating tier — pure linear scaling, no edge changes. (0.50% is a gated upgrade, not a free knob — see `04_runbook/09_risk_and_payout_protocol.md` §7.)
 - `Sidecar_Heartbeat_Max_Age_Sec` (looser = more tolerant of sidecar lag, tighter = faster halt on issues)
 - `News_*` parameters (slight changes to news handling don't affect strategy)
 - `Signal_Poll_Min_Interval_Sec` (responsiveness vs CPU)

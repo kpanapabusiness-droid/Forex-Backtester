@@ -74,23 +74,23 @@ Locked at **0.40% per trade**. Rationale: cost sweep central case at r_base 0.5%
 
 ### Risk for Arc 10
 
-Locked at **0.50% per trade** (r_base). Rationale: cost sweep central case at r_base 0.5% lands at 7.80% worst-fold DD, 2.2pp margin to 10% limit. No scaling needed.
+Locked at the **0.40% operating tier**. Rationale (EA-faithful floating-equity, `02_validation/07_canonical_wfo.md`): at 0.40% worst-fold DD is 5.49% from-initial / 8.21% trailing, daily 4.11%, 0 kills — the only level clearing both hard limits on the conservative trailing basis. 0.50% FAILS (10.89% trailing / 5.16% daily) and is a gated upgrade only.
 
 ## Cross-broker comparison
 
 | Item | 5ers | FundedNext |
 |---|---|---|
 | Account size we use | $10k demo | $100k Challenge → funded |
-| Risk per trade | 0.40% | 0.50% |
-| Risk dollars/trade | $40 | $500 |
+| Risk per trade | 0.40% | 0.40% (operating; 0.50% gated) |
+| Risk dollars/trade | $40 | $400 |
 | Commission | $4/lot RT | $5/lot RT |
 | Swap | ON (real cost) | OFF (swap-free) |
 | Bar anchor | UTC | EET |
 | Max DD | 10% | 10% |
 | Daily DD | 5% | 5% |
 | Profit split | 80% | 80% |
-| Expected live ROI | ~27% | ~44% |
-| Expected worst-fold DD | ~9.5% | ~8.8% |
+| Expected ROI @ 0.40% | legacy (not re-run on floating-equity) | mean-fold 32.48%; holdout 24–53%/yr (no CAGR) |
+| Worst-fold DD @ 0.40% | legacy | 5.49% from-init / 8.21% trailing |
 
 ## What FundedNext rules to verify before purchasing Challenge
 
@@ -131,7 +131,7 @@ The sidecar + EA work against any MT5 broker. Adding a new broker requires:
 
 ## On the swap-free add-on with FundedNext
 
-The cost sweep analysis is **critically dependent** on swap-free being applied. Under UTC convention (swap on), worst-fold DD at r_base 0.5% is 10.47% — breaches the 10% hard limit. Under EET with swap-off, it's 7.80% — safely within bounds.
+The cost economics are **critically dependent** on swap-free being applied. With swap ON, swap is the dominant cost vector and erodes the DD margin (the legacy UTC sweep breached the 10% hard limit at r_base 0.5%). With swap OFF (EET, FundedNext), the EA-faithful run at 0.40% lands at 5.49% from-initial / 8.21% trailing — safely within bounds (`02_validation/07_canonical_wfo.md`).
 
 **If FundedNext stops providing swap-free**, the deployment math changes:
 - Option A: scale risk down to ~0.30-0.35% to bring DD back under limit

@@ -519,6 +519,18 @@ Holdout = "2021-01-01 to present at time of arc closure" — matches §2 Step 5 
 
 `r_max = 2.0%` is the **deployment cap** (per-trade risk feasibility on 5ers prop firm). Revised by Amendment 3.1 (2026-05-25) — no longer a gate threshold; strategies whose intrinsic `r_safe` or `r_hard` overshoots `r_max` deploy at `r_max` with sub-budget DD utilisation. Tracker fields `r_safe_capped_at_rmax` / `r_hard_capped_at_rmax` flag the cap activation. Locked value.
 
+### Amendment 7 — portfolio-level DD gating + EA-faithful (floating-equity) sizing
+
+Effective 2026-05-31 (Arc 10 v3.0.2 EA-faithful canonical run). Applies to all future arcs at Step 5. Two binding requirements:
+
+**(a) DD is gated portfolio-level, not per-trade-sequential.** Drawdown gates (daily, total/trailing, from-initial) are evaluated on the **concurrent open book** — the full set of simultaneously-open positions marked together — not on a sequential per-trade or per-fold-isolated basis. Concurrency and correlated-currency clusters drive DD non-linearly: a single-currency cluster that is a benign per-trade event can be a portfolio breach when its positions are open together. The per-day max-DD artefact (Amendment 6) and the chained-DD measurement both consume the concurrent-book equity curve. This generalises the deferred A5 combined-portfolio-DD flag to every architecture.
+
+**(b) Sizing must match the live execution basis (floating-equity), and be validated against it.** The Step 5 deployable run sizes each entry exactly as the deployed EA does — `risk_amount = ACCOUNT_EQUITY × r_base` with equity **including floating open P&L**, re-read per entry — not linear-overlay or closed-balance sizing. Linear/closed sizing understates the procyclical concurrency tail (entries size larger when the open book is up, into a possible reversal). The deployable verdict is taken from the EA-faithful (floating-equity) run; linear and closed-equity runs are retained as reconstruction-validation steps only (each must reproduce the same portfolio worst-fold trailing DD under a `mult ≡ r_base` + zero-cost reduction). Where a strategy has no live EA yet, the floating-equity simulator stands in and must be re-validated against the EA once built.
+
+**DD reporting:** report on **both** the trailing (peak-to-trough) and from-initial references. From-initial is the prop-firm MLL basis (the deployment-binding number); trailing is the conservative planning anchor. A candidate that passes from-initial but fails trailing is gated, not deployable, at that risk.
+
+Precedent: Arc 10 v3.0.2 — `results/l_arc_10_v3.0.2_ea_faithful/` + `arc_10/02_validation/07_canonical_wfo.md`. Amendment 7 is documented inline here — no separate archive file.
+
 ---
 
 ## §4 Architecture search conventions

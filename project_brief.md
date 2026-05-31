@@ -1,19 +1,22 @@
 # FOREX IGNITION REBUILD — PROJECT BRIEF
-> Last updated: 2026-05-25 | Post-Phase-1-engine-build; L_PROTOCOL v3.0 + Amendments 1-6 locked; Phase 1 Wave 1 partially closed (Arcs 8/10/11); Wave 1 retries pending under signal-parity engine
+> Last updated: 2026-05-31 | Arc 10 DEPLOYED on FundedNext at 0.40%; Wave 1 closed; the PASS-DEPLOYABLE survivor goal is achieved; forward research parked. L_PROTOCOL v3.0 + Amendments 1-7 locked.
 
 ---
 
 ## 1. PROJECT OVERVIEW
 
-Research-first FX trading system targeting the 5ers prop firm. Goal: 20% annualised gross ROI on a $100k funded account, sustained on average. First strategy clearing PASS-DEPLOYABLE ships and the primary goal is achieved.
+Research-first FX trading system. Original goal: 20% annualised gross ROI on a $100k funded account, sustained on average — the first strategy clearing PASS-DEPLOYABLE ships and the primary goal is achieved. **The goal is achieved.** Arc 10 v3.0.2 (DLR signal) is the PASS-DEPLOYABLE survivor, now live on FundedNext ($100k Challenge, EET) at 0.40% operating risk; its canonical EA-faithful gate (mean-fold ROI 32.48%, worst-fold 14.42%) clears the 20% target. FundedNext is the live venue for Arc 10; 5ers remains the original prop-firm reference (KH-24 is live there).
+
+> Live state + canonical numbers: `arc_10/START_HERE.md` (entry point) and `arc_10/02_validation/07_canonical_wfo.md` (source of truth for every Arc 10 figure).
 
 ### Current state
 
-- **KH-24** is live on a Contabo VPS connected to 5ers MT5. Sub-deployable under the new v3.0 ratio gate (worst-fold ROI/DD = 0.30 vs the 2.0 minimum), but still earning. Deployment status preserved separately from research framework.
-- **L_PROTOCOL v3.0 + Amendments 1-6** is locked. The overseer methodology for all forward research. Five steps + lazy Step 6 (causal audit framework, Amendment 4). Gates-as-rankings: only Step 5 WFO is the deployment gate; all steps run regardless of intermediate quality. Amendments cover: search policy + ML mechanics (1, 2), risk-normalised gates (3), Step 6 causal-audit framework (4), AUC-gated A2/A6 architecture selection (5), EET broker-day daily-DD boundary (6).
+- **Arc 10 v3.0.2** is **DEPLOYED** — live on FundedNext ($100k Challenge, EET) at 0.40% operating risk, EA-faithful floating-equity sizing. PASS-DEPLOYABLE under the canonical EA-faithful gate (`arc_10/02_validation/07_canonical_wfo.md`): worst-fold ROI 14.42%, mean-fold 32.48%, trailing DD 8.21% / from-init 5.49% / daily 4.11%, 0 kills. 0.50% is a marginal, evidence-gated future upgrade — not the operating tier.
+- **KH-24** is live on a Contabo VPS connected to 5ers MT5 — the other deployed live system. Sub-deployable under the new v3.0 ratio gate (worst-fold ROI/DD = 0.30 vs the 2.0 minimum), but still earning. Deployment status preserved separately from research framework.
+- **L_PROTOCOL v3.0 + Amendments 1-7** is locked. The overseer methodology for all forward research. Five steps + lazy Step 6 (causal audit framework, Amendment 4). Gates-as-rankings: only Step 5 WFO is the deployment gate; all steps run regardless of intermediate quality. Amendments cover: search policy + ML mechanics (1, 2), risk-normalised gates (3), Step 6 causal-audit framework (4), AUC-gated A2/A6 architecture selection (5), EET broker-day daily-DD boundary (6), portfolio-level DD gating + EA-faithful floating-equity sizing (7).
 - **HistData M1 bid+ask** is the canonical data foundation. 5ers MT5 retained only for live operation. All research and backtesting runs on HistData. EET aggregation convention available alongside the legacy UTC default.
 - **v3.0 engine** is operational. Step 1-5 + Step 6 framework wired end-to-end across `core/arc/`, `core/steps/`, `core/architectures/` (A1, A2, A3, A4, A6 — A5 deferred until ≥1 VIABLE candidate), `core/runners/`. Signal parity (mid features + EET bar boundaries + worst-case fills) landed PR #189; signal-module timezone audit + canonical alignment utility PR #193; Step 6 framework + Amendment 4 PR #188; Amendment 3 risk-normalised gates PR #186; canonical exit-policy registry + `sl_partial_close_1r_runner_trail` PR #195; EET session semantics + Amendment 6 PR #197.
-- **11 prior arcs** (under v1.x, v2.x protocols) are documented in `ARC_HISTORY.md` (frozen). Wave 1 v3.0 closures landed for Arcs 8 (FAIL), 10 (PASS-VIABLE → re-evaluated PASS-DEPLOYABLE under Amendment 3), 11 (FAIL). Arcs 5 and 7 closures in flight under v3.0.
+- **11 prior arcs** (under v1.x, v2.x protocols) are documented in `ARC_HISTORY.md` (frozen). Wave 1 v3.0 is **CLOSED**: Arc 10 PASS-DEPLOYABLE → **LIVE** on FundedNext at 0.40%; Arcs 5 / 7 / 8 / 11 FAIL.
 
 ### What we learned from the 11 arcs
 
@@ -40,9 +43,9 @@ The cross-arc record is in `ARC_HISTORY.md`. Headline patterns:
 - Repo consolidation merged; HistData layer DONE (28 pairs, 52 GB tick + 18 GB M1 derived; verified 2026-05-21).
 - v3.0 backtester DONE (PR-A through PR-E.1.7 + CC_07 runtime + 8-PR Phase-1-engine-build sprint #185/#186/#188/#189/#193/#194/#195/#197).
 - Phase 0 CLOSED (Phase 0a Path B verdict; Phase 0b skipped by chat decision).
-- **Phase 1 Wave 1 IN PROGRESS** (Arcs 8/10/11 closed; Arcs 5/7 closures in flight; Wave 1 retries under signal-parity engine pending after closure PRs land).
-- Phase 1 Wave 2 (Arcs 4-RERUN, 4-original, 6, 3, 1, 2) NOT STARTED — gated on Wave 1 closure.
-- Phase 2 (sub-protocol probes + new signal classes) NOT STARTED. `heavy_ml_probe` build in flight via parallel chat (PR #187 PR-A). `signal_discovery_probe` engine wired via PR #175; 10k local run in progress (user-side).
+- **Phase 1 Wave 1 CLOSED** — Arc 10 PASS-DEPLOYABLE → deployed live on FundedNext at 0.40%; Arcs 5 / 7 / 8 / 11 FAIL.
+- Phase 1 Wave 2 (Arcs 4-RERUN, 4-original, 6, 3, 1, 2) **PARKED** — forward research deprioritized behind the deployment pivot; reopenable if Arc 10 fails its live kill criteria.
+- Phase 2 (sub-protocol probes + new signal classes) **PARKED** behind the deployment pivot. `heavy_ml_probe` / `signal_discovery_probe` builds remain available for the next research wave if reopened.
 
 ---
 
@@ -91,6 +94,8 @@ Listed in `CLAUDE.md`. Highlights:
 ## 4. LIVE SYSTEM REFERENCE
 
 KH-24 spec, deployment history, anchor numbers — see `ARC_HISTORY.md` KH-24 section. Live deployment is locked; out of scope for any L-arc work without an explicit modification phase.
+
+**Arc 10 v3.0.2** joins KH-24 as a deployed live system — live on FundedNext ($100k Challenge, EET) at 0.40% operating risk. Live state + canonical numbers: `arc_10/START_HERE.md` + `arc_10/02_validation/07_canonical_wfo.md`. The risk-surface analysis is canonical and closed.
 
 ---
 

@@ -97,7 +97,7 @@ Markdown docs reference these. Do not edit unless re-running the corresponding v
 | UTC WFO ledger | `results/l_arc_10_v3_0_2_utc_rerun/trade_ledger_utc.parquet` |
 | Phase 2 UTC parity report | `results/phase_2_parity/parity_report.md` |
 | Phase 2 EET parity report | `results/phase_2_parity_eet/parity_report.md` |
-| Cost sweep report | `ARC_10_DEPLOYMENT_COMPARISON_EET_VS_UTC.md` |
+| Canonical WFO (EA-faithful, source of truth) | `02_validation/07_canonical_wfo.md` |
 | FundedNext anchor verdict | `results/fundednext_panel_diff/panel_diff_report.md` |
 | Winning config — UTC | `configs/l_arc_10_v3.0.2_utc_rerun/winning_config.yaml` |
 | Winning config — EET | `configs/l_arc_10_v3.0.2/winning_config.yaml` |

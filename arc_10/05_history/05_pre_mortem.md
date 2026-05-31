@@ -72,15 +72,17 @@ With a pre-mortem, you have a calibration: most failures will fit one of these p
 
 **Response:** acceptable if rare. If frequent: reduce `Signal_Poll_Min_Interval_Sec` to 2-3 seconds (faster polling = more responsive but more CPU).
 
-### 7. Equity calculation drift
+### 7. EA restart re-baselines the total-DD floor (OPEN-001 — RESOLVED 2026-05-30)
 
-**What it looks like:** EA's reported equity diverges from broker's reported equity. Daily DD calculations off by 0.1-0.3%.
+> **Mechanism/magnitude corrected 2026-05-30.** This item previously read "Equity calculation drift" and described the EA caching equity at H4 boundaries with <0.5% drift. **Both were wrong.** The real risk was the total-DD floor being snapshotted from live equity at every `OnInit`, which a mid-drawdown restart would re-baseline downward — sinking the EA's halt below the broker's static termination point (silent protection failure). It was **not** driven by NSSM restarts: NSSM wraps the Python sidecar, not the EA terminal; `OnInit` re-fires only on terminal restart, crash auto-restart, or manual reattach/recompile. The original ~1–3%/6mo estimate was therefore overstated (it assumed NSSM was hitting the EA).
 
-**Why it happens:** EA caches equity at H4 boundaries and during trade events. Broker calculates continuously. Floating positions, swap (if applicable), commissions credited at different cadences cause drift.
+**What it looks like:** after a restart taken while the account is drawn down, the EA's journal shows a total-DD `floor` below the broker's static initial balance. The EA's halt/close-all thresholds are now computed off the sunken floor, so the broker could terminate the account before the EA's halt fires.
 
-**Confidence this is the issue:** if difference is <0.5% and self-corrects after next H4 cycle.
+**Why it happened:** `g_arc_eq_total_floor` was captured at every `OnInit` from `AccountInfoDouble(ACCOUNT_EQUITY)` (`EquityGuards.mqh:100`) — not an input, not persisted. Any re-init re-baselined it to whatever equity was at that moment.
 
-**Response:** acceptable. The system's DD halt thresholds have safety margin to absorb 0.5% drift. If divergence grows >1%: investigate.
+**Status — RESOLVED by `b386287` (#242).** The floor is now solely an operator-set input, `Initial_Equity_Floor` (default `0`), used directly with **no live-equity capture anywhere**. A fail-loud guard (`< 5000` → refuse to trade + `Alert()` + journal `FLOOR_FAIL`) prevents an unset/implausible floor from silently mis-protecting. Scale-up is a manual input edit; MT5's saved profile persists the input across restart (verified live). Full record: [`07_open_issue_dd_restart_rebaselining.md`](07_open_issue_dd_restart_rebaselining.md).
+
+**Response (if a floor mismatch is ever observed post-resolution):** confirm the journal shows `source=input` and `floor` = the broker's static balance. A `FLOOR_FAIL`/halt means the floor is unset — set `Initial_Equity_Floor` and reattach. This is now an operator-config check, not a code bug.
 
 ### 8. Hidden bug surfacing under specific conditions
 

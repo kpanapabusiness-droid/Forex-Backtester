@@ -209,3 +209,5 @@ Get-Content "C:\Users\Administrator\AppData\Roaming\MetaQuotes\Terminal\Common\F
 ```
 
 If everything shows Running/Ready and heartbeats are recent, you're back to healthy state.
+
+> **If the restart involved reattaching or recompiling an EA**, also confirm the total-DD floor: the EA journal should show `equity init: floor=<broker static balance> source=input`. A `FLOOR_FAIL` / `halted_floor_unset` means `Initial_Equity_Floor` is unset (`< 5000`) — set it and reattach. A plain terminal restart (no reattach) preserves the input via the MT5 profile, so no action is needed. See [`01_daily_health_check.md`](01_daily_health_check.md) ("After an EA reattach / recompile") and [`../05_history/07_open_issue_dd_restart_rebaselining.md`](../05_history/07_open_issue_dd_restart_rebaselining.md).

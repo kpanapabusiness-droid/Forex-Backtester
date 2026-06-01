@@ -1,13 +1,21 @@
 //+------------------------------------------------------------------+
 //| NewsFilter.mqh                                                    |
 //|                                                                   |
-//| ForexFactory weekly XML calendar — red-impact ±120s blackout.     |
-//| Per phase_1_build_intent.md §8:                                   |
+//| ForexFactory weekly XML calendar — high-impact ±5min blackout     |
+//| (FIX 3 — widened from ±120s; FundedNext profit-split rule article |
+//| 10701685: a trade opened OR closed within 5 min before/after a    |
+//| high-impact event has only 40% of in-window PROFIT credited while |
+//| losses count 100%, so we keep BOTH entries and the strategy's own |
+//| (non-forced) exits out of the window).                            |
+//| Per phase_1_build_intent.md §8 (window widened by FIX 3):         |
 //|   Feed: https://nfs.faireconomy.media/ff_calendar_thisweek.xml    |
 //|   Refresh: every 4 hours                                          |
-//|   Policy: DELAY entry until event_time + 120s + 5s buffer.        |
+//|   Entry policy: DELAY entry until event_time + window + 5s buffer.|
 //|           Discard if delay would exceed signal.entry_bar_open_utc |
 //|           + 3600s.                                                |
+//|   Exit policy: ArcNewsInBlackout() defers the EA's discretionary  |
+//|           TP1 / trail / time closes while in-window. Risk-governor |
+//|           close-alls and broker-side SL fills are NOT gated.      |
 //|   Tester-mode: filter wholly disabled (matches Python sim).       |
 //+------------------------------------------------------------------+
 #ifndef ARC10_NEWS_FILTER_MQH
@@ -199,6 +207,37 @@ int ArcNewsDecide(
       return 1;
      }
    return 0;
+  }
+
+//+------------------------------------------------------------------+
+//| True if ``now_utc`` falls within ±window_sec of a high-impact     |
+//| event touching ``pair``'s base or quote currency (FIX 3).         |
+//|                                                                   |
+//| Used to defer the strategy's own (non-forced) EXITS — TP1 partial,|
+//| trail-stop close, time-exit close — out of the FundedNext profit- |
+//| split blackout (article 10701685). Symmetric ±window: covers the  |
+//| 5 min BEFORE and AFTER the event. Returns false in tester mode    |
+//| (filter disabled, matches Python sim) and when no calendar is     |
+//| loaded. Callers MUST NOT gate risk-governor close-alls or broker- |
+//| side SL fills with this — only the EA's discretionary closes.     |
+//+------------------------------------------------------------------+
+bool ArcNewsInBlackout(const string pair, datetime now_utc, int window_sec)
+  {
+   ArcNewsEnsureInit();
+   if(g_arc_news_tester_mode)
+      return false;
+   string base_ccy  = StringSubstr(pair, 0, 3);
+   string quote_ccy = StringSubstr(pair, 3, 3);
+   for(int i = 0; i < g_arc_news_count; i++)
+     {
+      datetime evt = g_arc_news[i].time_utc;
+      if(now_utc < evt - window_sec || now_utc > evt + window_sec)
+         continue;
+      string ccy = g_arc_news[i].currency;
+      if(ccy == base_ccy || ccy == quote_ccy)
+         return true;
+     }
+   return false;
   }
 
 //+------------------------------------------------------------------+

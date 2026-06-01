@@ -1,16 +1,20 @@
 //+------------------------------------------------------------------+
 //| EquityGuards.mqh                                                  |
 //|                                                                   |
-//| 5ers EET broker trading day daily-DD tracking + total-DD guard.   |
-//| Per dispatch §2.9 thresholds:                                     |
-//|   Daily DD >= 3.5% : halt new entries today                       |
-//|   Daily DD >= 4.5% : close all + halt today                       |
-//|   Total DD >= 7%   : halt new entries                             |
-//|   Total DD >= 8%   : close all + halt indefinitely                |
+//| Daily-DD + total-DD guards, both anchored to the STATIC initial   |
+//| balance floor (FIX 2 — FundedNext daily limit = fixed % of INITIAL |
+//| balance, not of day-start equity; help article 8019811).          |
+//| Thresholds (of the static floor):                                 |
+//|   Daily DD >= 3.5% : halt new entries today      ($3,500 @ $100k)  |
+//|   Daily DD >= 4.5% : close all + halt today       ($4,500 @ $100k) |
+//|   Total DD >= 7%   : halt new entries             ($7,000 @ $100k) |
+//|   Total DD >= 8%   : close all + halt indefinitely ($8,000 @ $100k)|
 //|                                                                   |
-//| EET trading-day boundary: 00:00 EET = 22:00 UTC (winter) or 21:00 |
-//| UTC (summer). We use a fixed EET offset look-up — MT5 server time |
-//| can drift; UTC is the canonical anchor.                           |
+//| The EET trading-day boundary is still tracked, but ONLY to reset  |
+//| the per-day entry-halt flag at rollover — the daily anchor itself |
+//| no longer re-snapshots equity. EET 00:00 = 22:00 UTC (winter) or  |
+//| 21:00 UTC (summer); fixed EET-offset look-up (MT5 server time can  |
+//| drift; UTC is the canonical anchor).                              |
 //+------------------------------------------------------------------+
 #ifndef ARC10_EQUITY_GUARDS_MQH
 #define ARC10_EQUITY_GUARDS_MQH
@@ -19,8 +23,8 @@
 
 double   g_arc_eq_total_floor = 0.0;       // operator-set static total-DD anchor (Initial_Equity_Floor)
 bool     g_arc_eq_floor_fail = false;      // true if floor input unset/implausible → EA halts (fail-loud)
-double   g_arc_eq_day_start = 0.0;         // equity at start of current EET day
-datetime g_arc_eq_day_start_utc = 0;       // EET-day-start instant in UTC
+double   g_arc_eq_day_start = 0.0;         // daily-DD anchor = STATIC initial floor (FIX 2; = g_arc_eq_total_floor, not day-start equity)
+datetime g_arc_eq_day_start_utc = 0;       // EET-day-start instant in UTC (tracks rollover for the entry-halt flag reset only)
 bool     g_arc_eq_entries_halted_today = false;
 bool     g_arc_eq_entries_halted_total = false;
 bool     g_arc_eq_close_all_pending = false;
@@ -102,8 +106,8 @@ datetime ArcLastSunOfMonthUtc(int year, int month, int hour, int min, int sec)
 //| no live-equity capture. An unset/implausible floor (<= 0 or        |
 //| < 1000) HALTS the EA (fail-loud) rather than silently capturing    |
 //| live equity — this makes correctness independent of MT5            |
-//| profile-persistence. Daily DD stays floating/equity-based and is   |
-//| anchored here to current live equity — deliberately untouched.     |
+//| profile-persistence. Daily DD is ALSO anchored to this static      |
+//| floor (FIX 2) — see the ``g_arc_eq_day_start`` note below.         |
 //+------------------------------------------------------------------+
 void ArcEquityInit(double floor_input)
   {
@@ -122,21 +126,30 @@ void ArcEquityInit(double floor_input)
       g_arc_eq_total_floor = floor_input;
       PrintFormat("[ARC10] equity init: floor=%.2f source=input", g_arc_eq_total_floor);
      }
-   // Daily-DD day-start anchor: a FIXED equity SNAPSHOT, taken once here at
-   // OnInit and again only at each EET-day rollover (see ArcEquityOnTick).
-   // It is NOT the total floor, NOT live/per-tick equity — between rollovers
-   // it is held constant so daily_dd = (day_start - equity)/day_start
-   // registers real intraday loss as equity falls. Re-snapshotting on a
-   // mid-day OnInit re-fire (restart) is DELIBERATE and ACCEPTED: daily risk
-   // is bounded to one day by the natural rollover, and we intentionally do
-   // NOT persist day-start to a state file or restore a prior value (no JSON
-   // state on the daily side). Do not "fix" this to live-track or to persist.
+   // Daily-DD anchor (FIX 2): the STATIC initial-balance floor, NOT a
+   // day-start equity snapshot and NOT live/per-tick equity. FundedNext's
+   // daily loss limit is a FIXED percentage of the INITIAL balance, not of
+   // day-start equity (FundedNext help article 8019811 — Daily Loss Limit
+   // = Initial Balance × %). Anchoring to day-start equity was dangerous on
+   // growth: once equity rose past ~$111k the EA's 4.5%-of-day-start trigger
+   // exceeded the fixed $4,500 dollar limit, so the EA believed it had room
+   // while the account was actually breaching. Anchoring to the static floor
+   // makes the governors fire at fixed dollars (3.5% → $3,500 halt /
+   // 4.5% → $4,500 close-all of the floor) at every equity level.
+   //
+   // CONSEQUENCE: the anchor is held constant for the life of the account
+   // (it equals the total-DD floor). It is NOT re-snapshotted at EET
+   // rollover anymore (see ArcEquityOnTick) — only the per-day entry-halt
+   // FLAG resets at rollover. Behaviour is identical to the old equity-
+   // snapshot scheme while equity == initial; the fix's value appears only
+   // once equity moves off the initial balance. Do NOT "fix" this back to a
+   // day-start equity snapshot — that re-introduces the growth breach.
    g_arc_eq_day_start_utc = ArcEetDayStartUtc(TimeGMT());
-   g_arc_eq_day_start = AccountInfoDouble(ACCOUNT_EQUITY);   // fixed snapshot
+   g_arc_eq_day_start = g_arc_eq_total_floor;   // STATIC floor anchor (FIX 2)
    g_arc_eq_entries_halted_today = false;
    g_arc_eq_entries_halted_total = false;
    g_arc_eq_close_all_pending = false;
-   PrintFormat("[ARC10] daily day-start: equity=%.2f eet_day_utc=%s source=init-snapshot",
+   PrintFormat("[ARC10] daily-DD anchor: static_floor=%.2f eet_day_utc=%s source=init-static-floor",
                g_arc_eq_day_start, TimeToString(g_arc_eq_day_start_utc));
   }
 
@@ -155,20 +168,26 @@ bool ArcEquityOnTick(
    // ArcEquityAllowEntry, so there is nothing to close.
    if(g_arc_eq_floor_fail)
       return false;
-   // EET-day rollover: re-snapshot the daily day-start to current equity and
-   // hold it fixed until the next rollover. Only mutation of g_arc_eq_day_start
-   // outside OnInit — never updated per-tick.
+   // EET-day rollover: the daily-DD anchor is STATIC (= initial-balance
+   // floor, FIX 2) and is deliberately NOT re-snapshotted here — FundedNext's
+   // daily limit is a fixed % of the initial balance, not of day-start equity
+   // (article 8019811). We only reset the per-day entry-halt FLAG so a day
+   // that hit the 3.5% halt clears at the next EET day; if equity is still
+   // below the threshold the next tick re-sets the flag immediately.
    datetime current_day_utc = ArcEetDayStartUtc(TimeGMT());
    if(current_day_utc != g_arc_eq_day_start_utc)
      {
       g_arc_eq_day_start_utc = current_day_utc;
-      g_arc_eq_day_start = AccountInfoDouble(ACCOUNT_EQUITY);   // fixed snapshot
       g_arc_eq_entries_halted_today = false;
-      // Total-DD halt state persists across days.
-      PrintFormat("[ARC10] daily day-start: equity=%.2f eet_day_utc=%s source=eet-rollover",
+      // Total-DD halt state persists across days. Daily anchor held static.
+      PrintFormat("[ARC10] eet-rollover: daily-DD anchor held static=%.2f eet_day_utc=%s",
                   g_arc_eq_day_start, TimeToString(g_arc_eq_day_start_utc));
      }
    double equity = AccountInfoDouble(ACCOUNT_EQUITY);
+   // Both DDs reference the STATIC floor now (FIX 2). g_arc_eq_day_start
+   // == g_arc_eq_total_floor, so daily_dd and total_dd share a basis and
+   // differ only by their thresholds (daily 3.5/4.5 < total 7/8). This is
+   // the fixed-dollar FundedNext daily limit: 4.5% of the floor = $4,500.
    double daily_dd = (g_arc_eq_day_start - equity) / g_arc_eq_day_start;
    double total_dd = (g_arc_eq_total_floor - equity) / g_arc_eq_total_floor;
    if(total_dd >= total_close_all_pct)

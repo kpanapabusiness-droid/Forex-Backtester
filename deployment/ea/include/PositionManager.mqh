@@ -138,12 +138,21 @@ int ArcPositionFindByPair(const string sym)
   }
 
 //+------------------------------------------------------------------+
-//| Compute lot size from risk %, account equity, SL distance (price) |
+//| Compute lot size from risk %, STATIC base equity, SL distance.    |
+//|                                                                   |
+//| FundedNext-aligned sizing: risk is a fixed % of the STATIC        |
+//| initial-balance floor (``base_equity``, threaded in from the      |
+//| caller — = Initial_Equity_Floor), NOT floating ACCOUNT_EQUITY.    |
+//| This makes risk-per-trade constant ($risk_pct × floor) regardless |
+//| of current equity, matching FundedNext's static DD limits and     |
+//| removing procyclical breach-risk-scaling. base_equity is passed   |
+//| as a parameter because the floor global lives in EquityGuards.mqh,|
+//| which is #included AFTER this file (so not in scope here).        |
+//| Do NOT read ACCOUNT_EQUITY for sizing.                            |
 //+------------------------------------------------------------------+
-double ArcComputeLots(const string symbol, double risk_pct, double sl_distance_price)
+double ArcComputeLots(const string symbol, double risk_pct, double sl_distance_price, double base_equity)
   {
-   double equity = AccountInfoDouble(ACCOUNT_EQUITY);
-   double risk_amount = equity * risk_pct;
+   double risk_amount = base_equity * risk_pct;
    double tick_value = SymbolInfoDouble(symbol, SYMBOL_TRADE_TICK_VALUE);
    double tick_size  = SymbolInfoDouble(symbol, SYMBOL_TRADE_TICK_SIZE);
    if(tick_size <= 0.0 || tick_value <= 0.0 || sl_distance_price <= 0.0)
@@ -172,6 +181,7 @@ double ArcComputeLots(const string symbol, double risk_pct, double sl_distance_p
 ulong ArcPlaceEntry(
    const ArcSignalEnvelope &sig,
    double risk_pct,
+   double base_equity,
    long magic,
    CTrade &trade,
    string &err_out,
@@ -190,12 +200,19 @@ ulong ArcPlaceEntry(
       err_out = StringFormat("symbol_select_failed:%s", symbol);
       return 0;
      }
-   double lots = ArcComputeLots(symbol, risk_pct, sig.sl_distance_price);
+   double lots = ArcComputeLots(symbol, risk_pct, sig.sl_distance_price, base_equity);
    if(lots <= 0.0)
      {
       err_out = "lot_size_zero";
       return 0;
      }
+   // Sizing audit line — proves the STATIC initial-balance basis in the
+   // journal (base_equity should equal Initial_Equity_Floor, e.g. 100000,
+   // NOT current ACCOUNT_EQUITY). risk_amount = base_equity × risk_pct.
+   PrintFormat("[ARC10] sizing %s: base_equity=%.2f risk_pct=%.4f risk_amount=%.2f "
+               "sl_dist=%.5f lots=%.2f basis=static-initial",
+               symbol, base_equity, risk_pct, base_equity * risk_pct,
+               sig.sl_distance_price, lots);
    double ask = SymbolInfoDouble(symbol, SYMBOL_ASK);
    if(ask <= 0.0)
      {

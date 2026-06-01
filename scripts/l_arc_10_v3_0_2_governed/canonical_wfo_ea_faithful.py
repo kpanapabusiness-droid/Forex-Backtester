@@ -1,12 +1,17 @@
-"""Arc 10 v3.0.2 — EA-FAITHFUL WFO (floating-equity sizing, FundedNext, EET, 3.5R).
+"""Arc 10 v3.0.2 — EA-FAITHFUL (floating-equity) WFO — REFERENCE-ONLY (FundedNext, EET, 3.5R).
 
-THE basis-correct canonical run. Sizes every entry exactly as the live EA does
-(verified `PositionManager.mqh:143`): `risk_amount = ACCOUNT_EQUITY × r_base`,
-where ACCOUNT_EQUITY **includes floating open P&L** and is re-read live at each
-entry. Every prior gate (linear `_canonical`; closed-equity compound
-`_canonical_compound`; governed) sizes on a DIFFERENT basis and is superseded —
-this is the first run whose sizing matches what trades live. v3.0.2 LOCKED;
-governors EA-faithful, not tuned. PR-gated.
+REFERENCE-ONLY procyclical comparison — NOT the canonical gate. The live EA now
+sizes on the FIXED INITIAL balance, so the canonical deploy-faithful basis is the
+fixed-initial / linear path (`governed_wfo.simulate_fold`, mult ≡ r_base); see the
+CANONICAL RUN DEFINITION in `governed_wfo.py`. This floating-equity run is retained
+to MEASURE the procyclical concurrency tail (sizing off equity INCL. floating open
+P&L vs the fixed-initial basis) — the comparison that justified keeping the EA on
+fixed-initial sizing — not to set the gate.
+
+This run sizes every entry off floating equity (the EA's PRE-fix behaviour,
+`PositionManager.mqh:143`-style): `risk_amount = ACCOUNT_EQUITY × r_base`, where
+ACCOUNT_EQUITY **includes floating open P&L** and is re-read live at each entry.
+v3.0.2 LOCKED; governors EA-faithful, not tuned. PR-gated.
 
 THE SIZING MODEL — match the EA exactly (the only change vs compound):
   At each entry, in chronological (bar) order:
@@ -76,7 +81,14 @@ DAILY_HALT, DAILY_CLOSE, TOTAL_HALT, TOTAL_KILL = 0.035, 0.045, 0.07, 0.08
 # ONLY the per-entry sizing differs: mult = rb × equity_INCL_FLOATING, not rb × e_bal).
 # ───────────────────────────────────────────────────────────────────────────
 def simulate_floating(tids, sched, day_key, clock, *, rb, governed, total_ref,
-                      trigger_mark="close"):
+                      daily_ref="static", trigger_mark="close"):
+    # daily_ref in {"static","day_start"} sets the DAILY-DD anchor (mirrors
+    # total_ref's static option, for the daily window). "static" (DEFAULT) =
+    # fixed initial (1.0): daily DD = (1.0 - intraday_low)/1.0, matching
+    # FundedNext (daily limit = a fixed % of initial) and the live EA fix.
+    # "day_start" = re-captured day-start equity (prior behaviour). The daily
+    # governors fire off this anchor, and slot 3 of the trace carries it so
+    # whole_period_dd.daily_dd_from_trace reports the same reference.
     e_min = min(sched[t]["e"] for t in tids)
     x_max = max(sched[t]["x"] for t in tids)
     entries: dict = {}
@@ -109,6 +121,7 @@ def simulate_floating(tids, sched, day_key, clock, *, rb, governed, total_ref,
             day = d
             daily_halt = daily_closed = False
             day_start = prev_float
+        daily_anchor = 1.0 if daily_ref == "static" else day_start
 
         # ── ENTRIES: EA-faithful floating-equity sizing ──
         for tid in entries.get(p, []):
@@ -128,8 +141,8 @@ def simulate_floating(tids, sched, day_key, clock, *, rb, governed, total_ref,
         close_eq = book("close")
         peak_ref = 1.0 if total_ref == "static" else peak_float
         total_dd = (peak_ref - trig) / peak_ref
-        daily_dd = (day_start - trig) / day_start
-        trace.append((p, float(close_eq), float(e_bal), float(day_start), tuple(open_t)))
+        daily_dd = (daily_anchor - trig) / daily_anchor
+        trace.append((p, float(close_eq), float(e_bal), float(daily_anchor), tuple(open_t)))
 
         if governed and not killed and total_dd >= TOTAL_KILL:
             e_bal += wp._flat(open_t, mult, sched, p, flattened, "total_close_all", trigger_mark)
@@ -325,17 +338,20 @@ def emit(search_res, holdout_res, D):
 
 
 def write_summary(search_res, holdout_res, matrix, D):
-    L = ["# Arc 10 v3.0.2 — EA-FAITHFUL WFO (floating-equity sizing, FundedNext, EET, 3.5R)\n"]
+    L = ["# Arc 10 v3.0.2 — EA-FAITHFUL (floating-equity) WFO — REFERENCE-ONLY (FundedNext, EET, 3.5R)\n"]
     L.append(
-        "> **The basis-correct canonical run.** Sizes every entry as the live EA does "
-        "(`PositionManager.mqh:143`): `risk_amount = ACCOUNT_EQUITY × r_base`, equity "
-        "**including floating open P&L**, re-read per entry. Supersedes the linear "
-        "`_canonical`, the closed-equity `_canonical_compound`, and all earlier gates — "
-        "first run whose sizing matches what trades live. Reconstruction "
-        "(`build_schedules`, open-book marks, `_flat`) reused verbatim; only the per-entry "
-        "sizing differs from the compound run (floating equity vs closed `e_bal`). v3.0.2 "
-        "LOCKED; governors EA-faithful, not tuned. Costs ON (cell 5); r_base {0.40%,0.50%}; "
-        "EET; frame sha `05dea9…9ee58a`; deterministic; PR-gated.\n"
+        "> **REFERENCE-ONLY — the floating-equity procyclical comparison, NOT the canonical "
+        "gate.** The live EA now sizes on the FIXED INITIAL balance, so the canonical "
+        "deploy-faithful basis is the fixed-initial / linear path "
+        "(`governed_wfo.simulate_fold`); see the canonical run definition in `governed_wfo.py`. "
+        "This run sizes every entry off floating equity "
+        "(`risk_amount = ACCOUNT_EQUITY × r_base`, equity **including floating open P&L**, "
+        "re-read per entry) to MEASURE the procyclical concurrency tail vs the fixed-initial "
+        "basis. Reconstruction (`build_schedules`, open-book marks, `_flat`) reused verbatim; "
+        "only the per-entry sizing differs from the compound run (floating equity vs closed "
+        "`e_bal`). Daily DD on the static (fixed-initial) anchor by default. v3.0.2 LOCKED; "
+        "governors EA-faithful, not tuned. Costs ON (cell 5); r_base {0.40%,0.50%}; EET; "
+        "frame sha `05dea9…9ee58a`; deterministic; PR-gated.\n"
     )
     L.append(
         f"> **Validation gate PASSED** (reconstruction integrity): linear (mult≡r_base) + "

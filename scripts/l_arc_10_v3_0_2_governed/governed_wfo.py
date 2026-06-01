@@ -42,6 +42,20 @@ MODELLING (locked, stated for the modelled-vs-live gap):
 
 Figures are linear (additive open+closed MtM, 1R=0.5%) vs the gate's per-trade
 compounding — risk-surface comparable. Deterministic; EET only.
+
+CANONICAL SIZING PATH (deploy-faithful): the fixed-initial / linear path
+(`simulate_fold`, mult ≡ R_BASE = risk a fixed % of the INITIAL balance) is the
+CANONICAL basis — it matches the live EA's fixed-initial sizing. The
+floating-equity path (`canonical_wfo_ea_faithful.simulate_floating`) is now
+REFERENCE-ONLY (the procyclical comparison), not the canonical gate.
+
+CANONICAL RUN DEFINITION (after the FundedNext-alignment edits): a canonical WFO
+= fixed-initial sizing + `daily_ref="static"` (daily DD vs the fixed initial =
+the FundedNext daily basis) + `total_ref="trailing"` (the planning anchor:
+"safe from wherever we begin") REPORTED ALONGSIDE `total_ref="static"` (what
+FundedNext actually enforces from-initial), governed (3.5/4.5 daily, 7/8 total),
+cell-5 costs, EET. `total_ref` logic is unchanged by these edits — both
+references are already produced.
 """
 
 from __future__ import annotations
@@ -166,14 +180,23 @@ def simulate_fold(
     *,
     governed: bool,
     total_ref: str,
+    daily_ref: str = "static",
     trigger_mark: str = "close",
     trace: list | None = None,
 ):
     """Event-driven portfolio sim over one fold's trades. Returns metrics + logs.
 
     total_ref in {"static","trailing"} sets the total-DD reference for governors
-    3 & 4. Daily governors are always day-start referenced. Per-fold reset to
-    INITIAL=1.0; equity in account multiples (1R contributes R_BASE).
+    3 & 4. daily_ref in {"static","day_start"} sets the DAILY-DD anchor for the
+    daily governors (3.5% halt / 4.5% close-all) and the reported daily DD:
+      * "static" (DEFAULT) — anchor = the fixed initial (1.0). Daily DD =
+        (1.0 - intraday_low)/1.0. Matches FundedNext (daily limit = a fixed % of
+        the initial balance) and the live EA fix. Mirrors total_ref's static
+        option but for the daily window.
+      * "day_start" — anchor = re-captured day-start equity (the prior
+        behaviour), retained for reference/comparison.
+    Per-fold reset to INITIAL=1.0; equity in account multiples (1R contributes
+    R_BASE).
 
     trigger_mark: equity used to TRIGGER and FILL the governors —
       * "close"   = bar-close MtM (PRIMARY, realistic; bar-resolution of the
@@ -218,6 +241,10 @@ def simulate_fold(
             day = d
             daily_halt = daily_closed = False
             day_start_eq = prev_close_eq
+        # daily-DD anchor: "static" = fixed initial (FundedNext daily limit = a
+        # fixed % of initial; the live EA fix); "day_start" = re-captured
+        # day-start equity (legacy reference). Mirrors total_ref's static option.
+        daily_anchor = 1.0 if daily_ref == "static" else day_start_eq
 
         # 1. entries
         for tid in entries.get(p, []):
@@ -246,11 +273,13 @@ def simulate_fold(
         close_eq = book("close")
         ref = 1.0 if total_ref == "static" else total_peak
         total_dd = (ref - trig_eq) / ref
-        daily_dd = (day_start_eq - trig_eq) / day_start_eq
+        daily_dd = (daily_anchor - trig_eq) / daily_anchor
         daily_dd_intrabar_max = max(daily_dd_intrabar_max, daily_dd)
-        daily_dd_close_max = max(daily_dd_close_max, (day_start_eq - close_eq) / day_start_eq)
-        if trace is not None:  # per-bar diagnostics (pre-flatten open book)
-            trace.append((p, float(close_eq), float(realized), float(day_start_eq), tuple(open_t)))
+        daily_dd_close_max = max(daily_dd_close_max, (daily_anchor - close_eq) / daily_anchor)
+        if trace is not None:  # per-bar diagnostics (pre-flatten open book); slot 3
+            # carries the daily anchor so daily_dd_from_trace reports the same
+            # reference the governors fired on.
+            trace.append((p, float(close_eq), float(realized), float(daily_anchor), tuple(open_t)))
 
         # 3. governor actions (severity order); flatten at the trigger mark
         if governed and not killed and total_dd >= TOTAL_KILL:

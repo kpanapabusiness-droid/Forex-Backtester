@@ -1,12 +1,16 @@
 # Canonical WFO — Arc 10 v3.0.2 (deploy-faithful: fixed-initial + daily_ref=initial)
 
 > **This is the source of truth for every Arc 10 number.** All other validation docs resolve to the figures here. Where an older doc still cites a different ROI/DD, this doc wins and that doc is stale.
-> **⟳ CANONICAL REPOINTED (2026-06-02) to [`_final_canonical`](../../results/l_arc_10_v3.0.2_final_canonical/FINAL_CANONICAL_WFO.md).** The matrix, basis, and per-fold numbers below are the **fixed-initial + `daily_ref=initial`-resetting** deploy-faithful run that matches the live EA post-FIX-2b (PR #252/#253). This is a **numbers-only** repoint; the full prose reconciliation (the legacy 0.50% sweep narrative, the floating-equity procyclical appendix in §"Findings appendix", and the §"Risk position" 0.50% framing) is a **separate pending task** — those sections still reference the superseded floating run and are flagged inline.
+> **⟳ CANONICAL = [`_final_canonical`](../../results/l_arc_10_v3.0.2_final_canonical/FINAL_CANONICAL_WFO.md) (2026-06-02, #254).** The matrix, basis, and per-fold numbers below are the **fixed-initial + `daily_ref=initial`-resetting** deploy-faithful run that matches the live EA post-FIX-2b (PR #252/#253). **Prose reconciliation COMPLETE** (this pass): the §"Why this run is canonical", §"Findings appendix", and §"Risk position" sections now read on the fixed-initial basis; the superseded floating run's numbers are retained, clearly relabelled, in §"Floating-equity reference (superseded)" and as historical context — never deleted.
 > **Source artifacts (committed, tracked):** `results/l_arc_10_v3.0.2_final_canonical/` — `matrix.csv`, `per_fold.csv`, `governor_log.csv`, `FINAL_CANONICAL_WFO.md`. Every matrix/per-fold figure below traces to those CSVs. Nothing here is asserted without a CSV row behind it. (Superseded floating run retained at `results/l_arc_10_v3.0.2_ea_faithful/`.)
 
 ## Why this run is canonical
 
-This is the first WFO whose **position sizing matches what trades live.** The live EA sizes every entry as `risk_amount = ACCOUNT_EQUITY × r_base` with equity **including floating open P&L**, re-read per entry (`PositionManager.mqh:143`). This run reproduces that exactly: `mult = r_base × (realized + Σ open floating MtM)` at each entry, equity stepping continuously on floating marks and on closes, per-fold reset. Earlier runs sized linearly or off closed balance — close, but not what the broker sees. The basis correction is the whole point: it measures the **procyclical concurrency tail** (entries size larger when the open book is up, into a possible reversal) that linear/closed sizing cannot see.
+This is the WFO whose **two deployment-binding params match what trades live**, post-FIX-1/2b:
+1. **Sizing = fixed-initial.** The live EA sizes every entry as `1R ≡ r_base × INITIAL` balance, constant per trade (deployed `ArcComputeLots`). This run reproduces that exactly — NOT floating-equity, NOT closed-balance. (An earlier run sized off floating equity to probe the *procyclical concurrency tail*; that run is now the superseded reference — see §"Floating-equity reference". Fixed-initial drops that tail, which is why 0.40% trailing DD improves 8.21% → 7.73%.)
+2. **Daily-DD basis = `daily_ref="initial"`, resetting each EET day.** The live EA `Daily_DD_Basis=INITIAL` with a mandatory daily reset (EquityGuards.mqh FIX 2b). The earlier non-resetting `static_noreset` mode is **quarantined** — it froze F5 2014 / F6 2015 at −5.99% / −5.45% because the daily window never reset; under the deployed resetting basis those folds recover to **+28.91% / +20.77% with 0 daily-governor fires** (the daily-reset proof — see `FINAL_CANONICAL_WFO.md` §"F5/F6 recovery proof").
+
+v3.0.2 signal / exit / cost cell are LOCKED and identical across every run in the supersession chain; only these two basis params changed to reach deploy-faithfulness.
 
 ## The basis (state this wherever these numbers are quoted)
 
@@ -76,9 +80,21 @@ Every run below is retained on disk and self-validates against the **9.22% recon
 
 The final canonical run differs from the (now superseded) EA-faithful floating run in two aligned, validated params only: **sizing** (fixed-initial vs floating equity — the live EA sizes fixed-initial via `ArcComputeLots`) and **daily-DD basis** (`daily_ref="initial"` resetting each EET day — the live EA `Daily_DD_Basis=INITIAL`, EquityGuards.mqh FIX 2b). v3.0.2 signal/exit/cost are LOCKED and identical. Fixed-initial moves 0.40% worst-fold trailing DD from 8.21% → **7.73%** (−0.47pp; it drops the procyclical tail floating sizing measured), lifting the trailing verdict from PASS-VIABLE to **PASS-DEPLOYABLE**.
 
+### Floating-equity reference (superseded — NOT the deployment basis)
+
+Retained for comparison only. The floating run (`results/l_arc_10_v3.0.2_ea_faithful/`) sized off `ACCOUNT_EQUITY × r_base` (floating P&L included) and used a non-resetting daily measure — it was the procyclical-tail probe, not the deployed basis. Numbers relabelled, never deleted:
+
+| risk% | gov | worst-fold ROI% | mean-fold ROI% | trailing DD% | from-init DD% | daily DD% | verdict (trailing) |
+|---|---|---|---|---|---|---|---|
+| 0.40 | on | 14.42 | 32.48 | 8.21 | 5.49 | 4.11 | PASS-VIABLE |
+| 0.50 | on | 18.23 | 40.95 | 10.89 | 6.85 | 5.16 | FAIL |
+
+The canonical fixed-initial run supersedes both rows: at 0.40% it improves trailing DD to 7.73% (PASS-DEPLOYABLE), and 0.50% is no longer swept (the deploy-faithful sweep stops at 0.45% to bound the margin).
+
 ## Findings appendix
 
-> **⚠ LEGACY — pending full reconciliation.** This appendix reports the floating-vs-closed *procyclical amplification* at 0.50%, which was the point of the now-superseded floating run. Under the canonical fixed-initial basis the relevant fixed-vs-floating delta at **0.40%** is in `FINAL_CANONICAL_WFO.md` §4 (fixed-initial trailing 7.73% vs floating 8.21% = −0.47pp). The 0.50% figures below are retained for historical context only and are NOT canonical.
+> **LEGACY CONTEXT (reconciled).** The *procyclical amplification* block immediately below reports floating-vs-closed deltas at 0.50% — the point of the now-superseded reference run. It is **historical context only, NOT part of the deploy-faithful gate.** The remaining findings (daily-DD sweep, gap risk, slippage) are basis-agnostic governor findings and carry over unchanged.
+> The current fixed-initial-vs-reference delta (`FINAL_CANONICAL_WFO.md` §4) is at **0.40%**: fixed-initial trailing 7.73% vs the reference run's 8.21% = −0.47pp.
 
 **Procyclical amplification (`EA_FAITHFUL_WFO.md` §4, 0.50% gov-on):** sizing off floating equity vs closed equity moves worst-fold trailing DD from 10.73% → 10.89% = **+0.16pp**; from-init 6.89% → 6.85% (−0.04pp); daily 5.00% → 5.16% (+0.15pp); mean-fold ROI 40.72% → 40.95% (+0.23pp). **Benign** — floating sizing amplifies DD only marginally when the open book is up. (These four figures are from the cross-run comparison in `EA_FAITHFUL_WFO.md`, derived from the compound and floating CSVs.)
 
@@ -101,4 +117,4 @@ The final canonical run differs from the (now superseded) EA-faithful floating r
 - **Canonical for the MODELLED system, not ground truth.** Two unclosable gaps remain: (1) intrabar tick resolution — the open book is marked at H4-bar resolution of the intrabar low, a tick trigger could differ; (2) live close-all slippage on N concurrent positions is unmodelled (budgeted ~5× safe above, but not proven live).
 - The **tick-gap assumption is the live-only residual.** Everything else is settled in backtest.
 - Same-bar entry order is the deterministic trade-id tiebreak (H4 has no finer timestamp); same-bar opens contribute ~0 floating (offset-0 mark).
-- Every figure in this doc traces to a row in `results/l_arc_10_v3.0.2_ea_faithful/`. The CSVs are not duplicated here beyond the key rows; read them for full precision.
+- Every canonical figure in this doc traces to a row in `results/l_arc_10_v3.0.2_final_canonical/` (the floating reference rows trace to `results/l_arc_10_v3.0.2_ea_faithful/`). The CSVs are not duplicated here beyond the key rows; read them for full precision.

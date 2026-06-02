@@ -158,9 +158,10 @@ def main() -> int:
     # configs: (cost_label, sched) x (gov_label, kw)
     scheds = {"zerocost": sched_raw, "costed": sched_cost}
     # Superseded diagnostic: pin daily_ref="day_start" so this run keeps its
-    # original day-start daily-DD anchor (process_trace reads trace slot 3 as
-    # literal day-start equity). The canonical/EA runs use the new static
-    # default; this legacy diagnostic is preserved byte-for-byte.
+    # original day-start daily-DD anchor (process_trace reads trace slot 3 as the
+    # day-start numerator anchor, which equals day-start equity for day_start mode).
+    # The canonical/EA runs use the new `initial` default (FundedNext fixed-$/day,
+    # resets each EET day); this legacy diagnostic is preserved byte-for-byte.
     govs = {
         "off": dict(governed=False, total_ref="static", daily_ref="day_start"),
         "gov_static": dict(governed=True, total_ref="static", daily_ref="day_start"),

@@ -69,13 +69,21 @@ def simulate_continuous(
     governed: bool,
     total_ref: str,
     compound: bool,
+    daily_ref: str = "initial",
     trigger_mark: str = "close",
 ):
     """One unbroken governed portfolio path over `tids` (no fold reset).
 
     compound=True: each trade's account contribution is scaled by the running
     realised balance at its entry (mult = R_BASE * E_bal_entry). compound=False:
-    mult = R_BASE always (linear)."""
+    mult = R_BASE always (linear).
+
+    daily_ref in gw.DAILY_REF_MODES sets the DAILY-DD basis (EA-faithful FIX 2b;
+    daily window resets each EET day): "initial" (FundedNext fixed-$/day, default),
+    "day_start" (5ers %/day — the natural unit for a compounding no-reset curve),
+    "static_noreset" (quarantined freeze basis). Total governors (total_ref) are
+    unchanged. See gw.daily_anchors()."""
+    gw.check_daily_ref(daily_ref)
     e_min = min(sched[t]["e"] for t in tids)
     x_max = max(sched[t]["x"] for t in tids)
     entries = {}
@@ -125,12 +133,13 @@ def simulate_continuous(
             mult[tid] = (RB * e_bal) if compound else RB
             open_t[tid] = True
 
+        daily_num, daily_den = gw.daily_anchors(daily_ref, day_start)
         trig = book(trigger_mark)
         close_eq = book("close")
         peak_ref = 1.0 if total_ref == "static" else peak_float
         total_dd = (peak_ref - trig) / peak_ref
-        daily_dd = (day_start - trig) / day_start
-        trace.append((p, float(close_eq), float(e_bal), float(day_start), tuple(open_t)))
+        daily_dd = (daily_num - trig) / daily_den
+        trace.append((p, float(close_eq), float(e_bal), float(daily_num), tuple(open_t)))
 
         if governed and not killed and total_dd >= TOTAL_KILL:
             e_bal += _flat(open_t, mult, sched, p, flattened, "total_close_all", trigger_mark)
@@ -272,15 +281,21 @@ def time_underwater(curve, bars, clock):
     return frac, longest_days
 
 
-def daily_dd_from_trace(trace, day_key):
+def daily_dd_from_trace(trace, day_key, daily_ref="initial"):
+    """Per-EET-day max daily DD from a sim trace. Slot 3 carries the daily
+    NUMERATOR anchor (day-start equity for the resetting bases; 1.0 for
+    static_noreset). The denominator matches the basis — mirroring the in-sim daily
+    governor: fixed initial (1.0) for "initial"/"static_noreset", day-start equity
+    for "day_start"."""
     by_day = {}
-    for p, close_eq, e_bal, day_start, open_tids in trace:
-        by_day.setdefault(day_key[p], []).append((close_eq, day_start))
+    for p, close_eq, e_bal, daily_num, open_tids in trace:
+        by_day.setdefault(day_key[p], []).append((close_eq, daily_num))
     out = {}
     for d, rows in by_day.items():
-        ds = rows[0][1]
+        num_anchor = rows[0][1]  # day-start numerator anchor
         lo = min(r[0] for r in rows)
-        out[d] = max(0.0, (ds - lo) / ds)
+        den = num_anchor if daily_ref == "day_start" else 1.0
+        out[d] = max(0.0, (num_anchor - lo) / den)
     return out
 
 
@@ -303,6 +318,11 @@ def main() -> int:
     allt = sorted(meta["trade_id"])
     holdt = sorted(meta[meta.fold == 12]["trade_id"])
 
+    # daily_ref="day_start" for this 16y NO-RESET curve: on a compounding curve that
+    # banks a multi-x buffer, the EA's fixed-$/day "initial" basis would spuriously
+    # breach the daily limit on normal moves once equity ≫ 1.0 (a fixed $ is a tiny %
+    # of a grown account). day_start (%/day vs the day's equity) is the physical unit
+    # here; the per-fold/per-year-reset canonical runs use "initial" (near-1.0 equity).
     runs = {}
     for lab, kw in {
         "off_compound": dict(governed=False, total_ref="static", compound=True),
@@ -311,10 +331,11 @@ def main() -> int:
         "off_linear": dict(governed=False, total_ref="static", compound=False),
         "static_linear": dict(governed=True, total_ref="static", compound=False),
     }.items():
-        runs[lab] = simulate_continuous(allt, schedc, day_key, clock, **kw)
+        runs[lab] = simulate_continuous(allt, schedc, day_key, clock, daily_ref="day_start", **kw)
     # holdout standalone (linear, governors-off) cross-check vs prior 6.56%
     ho_lin = simulate_continuous(
-        holdt, schedc, day_key, clock, governed=False, total_ref="static", compound=False
+        holdt, schedc, day_key, clock, governed=False, total_ref="static",
+        compound=False, daily_ref="day_start",
     )
 
     print(

@@ -256,12 +256,17 @@ def main() -> int:
         # ----- continuous view (compound; no fold reset) -----
         for gov in ("off", "on"):
             governed = gov == "on"
+            # Continuous floor = 16y no-reset compounding curve → daily_ref="day_start"
+            # (%/day vs the day's equity); a fixed-$/day "initial" basis would
+            # spuriously breach once the curve banks a multi-x buffer. The per-fold
+            # canonical view above uses simulate_fold's "initial" default (near-1.0).
             run = wp.simulate_continuous(
                 D["allt"], D["sched_cost"], D["day_key"], D["clock"],
                 governed=governed, total_ref="static", compound=True,
+                daily_ref="day_start",
             )
             cont_raw[(risk, gov)] = run
-            day_dd = wp.daily_dd_from_trace(run["trace"], D["day_key"])
+            day_dd = wp.daily_dd_from_trace(run["trace"], D["day_key"], daily_ref="day_start")
             cells[(risk, gov, "continuous")] = dict(
                 worst_roi=continuous_roi(run, D["sched_cost"], D["allt"], D["clock"]),
                 mean_roi=float("nan"),  # one curve — no per-fold mean
@@ -273,6 +278,7 @@ def main() -> int:
         cont_trail[risk] = wp.simulate_continuous(
             D["allt"], D["sched_cost"], D["day_key"], D["clock"],
             governed=True, total_ref="trailing", compound=True,
+            daily_ref="day_start",
         )
         print(
             f"[risk {risk * 100:.2f}%] per-fold(gov) trailing "

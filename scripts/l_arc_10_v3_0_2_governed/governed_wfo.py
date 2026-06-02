@@ -50,17 +50,26 @@ floating-equity path (`canonical_wfo_ea_faithful.simulate_floating`) is now
 REFERENCE-ONLY (the procyclical comparison), not the canonical gate.
 
 CANONICAL RUN DEFINITION (after the FundedNext-alignment edits): a canonical WFO
-= fixed-initial sizing + `daily_ref="static"` (daily DD vs the fixed initial =
-the FundedNext daily basis) + `total_ref="trailing"` (the planning anchor:
-"safe from wherever we begin") REPORTED ALONGSIDE `total_ref="static"` (what
-FundedNext actually enforces from-initial), governed (3.5/4.5 daily, 7/8 total),
-cell-5 costs, EET. `total_ref` logic is unchanged by these edits — both
-references are already produced.
+= fixed-initial sizing + `daily_ref="initial"` (EA-faithful FundedNext daily
+basis: daily DD = (day-start equity − intraday low) vs a FIXED initial denom, the
+daily window RESETTING each EET day — mirrors EquityGuards.mqh FIX 2b) +
+`total_ref="trailing"` (the planning anchor: "safe from wherever we begin")
+REPORTED ALONGSIDE `total_ref="static"` (what FundedNext actually enforces
+from-initial), governed (3.5/4.5 daily, 7/8 total), cell-5 costs, EET. `total_ref`
+logic is unchanged by these edits — both references are already produced.
+
+The OLD `daily_ref="static"` (anchor fixed at initial AND never reset → daily DD
+== total-from-initial → daily governor freezes a fold permanently once it dips
+3.5% below initial: the F5/F6 −5.99%/−5.45% freeze artifact) is NON-PHYSICAL and
+has been quarantined as `daily_ref="static_noreset"` (warns; never the default,
+never canonical). FundedNext resets the daily window every day — the bug was the
+missing reset, not the basis.
 """
 
 from __future__ import annotations
 
 import sys
+import warnings
 from pathlib import Path
 
 import numpy as np
@@ -88,6 +97,49 @@ TOTAL_KILL = 0.08
 
 # prior (ungoverned, per-trade-sequential) deployment gate — SUPERSEDED
 PRIOR = dict(mean_roi=0.4987, worst_roi=0.2246, worst_dd=0.0780)
+
+# Daily-DD basis names, aligned to the deployed EA's `Daily_DD_Basis` (FIX 2b).
+DAILY_REF_MODES = ("initial", "day_start", "static_noreset")
+
+
+def check_daily_ref(daily_ref: str) -> None:
+    """Validate a daily-DD basis name (call once at sim entry).
+
+    Raises on an unknown name; warns LOUDLY if the quarantined non-resetting basis
+    is selected, so a future run cannot pick it by accident."""
+    if daily_ref not in DAILY_REF_MODES:
+        raise ValueError(f"daily_ref must be one of {DAILY_REF_MODES}, got {daily_ref!r}")
+    if daily_ref == "static_noreset":
+        warnings.warn(
+            "daily_ref='static_noreset' is the NON-RESETTING daily-DD basis that "
+            "produced the F5/F6 freeze artifact (daily DD measured cumulatively from "
+            "the fixed initial, never reset, so the daily governor halts a fold "
+            "permanently once it dips 3.5% below initial). It is NON-PHYSICAL and NOT "
+            "deploy-faithful — the live EA (EquityGuards.mqh FIX 2b) resets the daily "
+            "window every EET day. Do NOT use it for a canonical/governed gate run.",
+            stacklevel=2,
+        )
+
+
+def daily_anchors(daily_ref: str, day_start_eq: float) -> tuple[float, float]:
+    """(numerator_anchor, denominator) for the daily-DD basis — EA-faithful (FIX 2b).
+
+    daily DD = (numerator_anchor − intraday_equity) / denominator. The numerator
+    RESETS each EET day to the day-start equity for both physical bases (mandatory,
+    like the EA); only the denominator differs:
+      * "initial"  (FundedNext, CANONICAL DEFAULT): denom = fixed initial (1.0) — a
+        fixed $/day budget; numerator = day-start equity (resets daily).
+      * "day_start" (5ers): denom = day-start equity — a fixed %/day budget;
+        numerator = day-start equity (resets daily).
+      * "static_noreset" (QUARANTINED): numerator = fixed initial (1.0), never
+        resets → daily DD == total-from-initial → the freeze artifact; denom = 1.0.
+    When equity ≈ initial (per-fold reset) initial ≈ day_start (fixed-$ ≈ %-of-day-
+    start); they diverge once a buffer is banked."""
+    if daily_ref == "static_noreset":
+        return 1.0, 1.0
+    if daily_ref == "initial":
+        return day_start_eq, 1.0
+    return day_start_eq, day_start_eq  # day_start
 
 
 # ──────────────────────────────────────────────────────────────────────────
@@ -180,21 +232,24 @@ def simulate_fold(
     *,
     governed: bool,
     total_ref: str,
-    daily_ref: str = "static",
+    daily_ref: str = "initial",
     trigger_mark: str = "close",
     trace: list | None = None,
 ):
     """Event-driven portfolio sim over one fold's trades. Returns metrics + logs.
 
     total_ref in {"static","trailing"} sets the total-DD reference for governors
-    3 & 4. daily_ref in {"static","day_start"} sets the DAILY-DD anchor for the
-    daily governors (3.5% halt / 4.5% close-all) and the reported daily DD:
-      * "static" (DEFAULT) — anchor = the fixed initial (1.0). Daily DD =
-        (1.0 - intraday_low)/1.0. Matches FundedNext (daily limit = a fixed % of
-        the initial balance) and the live EA fix. Mirrors total_ref's static
-        option but for the daily window.
-      * "day_start" — anchor = re-captured day-start equity (the prior
-        behaviour), retained for reference/comparison.
+    3 & 4. daily_ref in DAILY_REF_MODES sets the DAILY-DD basis for the daily
+    governors (3.5% halt / 4.5% close-all) and the reported daily DD — EA-faithful
+    (EquityGuards.mqh FIX 2b), with the daily window RESETTING each EET day:
+      * "initial" (DEFAULT, FundedNext) — daily DD = (day-start equity − intraday
+        low) / FIXED initial (1.0): a fixed $/day budget; numerator resets daily.
+        This is the deployed EA's INITIAL basis and the canonical gate default.
+      * "day_start" (5ers) — daily DD vs the re-captured day-start equity; resets
+        daily.
+      * "static_noreset" (QUARANTINED) — the OLD non-resetting basis (anchor fixed
+        at initial, never reset → freeze artifact). Warns; never canonical.
+    See daily_anchors() for the (numerator, denominator) per basis.
     Per-fold reset to INITIAL=1.0; equity in account multiples (1R contributes
     R_BASE).
 
@@ -212,6 +267,7 @@ def simulate_fold(
     for the trigger comparison varies with trigger_mark."""
     if not tids:
         return None
+    check_daily_ref(daily_ref)
     e_min = min(sched[t]["e"] for t in tids)
     x_max = max(sched[t]["x"] for t in tids)
     entries = {}
@@ -241,10 +297,12 @@ def simulate_fold(
             day = d
             daily_halt = daily_closed = False
             day_start_eq = prev_close_eq
-        # daily-DD anchor: "static" = fixed initial (FundedNext daily limit = a
-        # fixed % of initial; the live EA fix); "day_start" = re-captured
-        # day-start equity (legacy reference). Mirrors total_ref's static option.
-        daily_anchor = 1.0 if daily_ref == "static" else day_start_eq
+        # daily-DD basis (EA FIX 2b): both physical bases RESET each EET day
+        # (numerator = day-start equity); only the denom differs. "initial" =
+        # fixed initial denom (FundedNext fixed-$/day, canonical default);
+        # "day_start" = day-start denom (5ers); "static_noreset" = the quarantined
+        # non-resetting freeze basis (numerator fixed at 1.0). See daily_anchors().
+        daily_num, daily_den = daily_anchors(daily_ref, day_start_eq)
 
         # 1. entries
         for tid in entries.get(p, []):
@@ -273,13 +331,14 @@ def simulate_fold(
         close_eq = book("close")
         ref = 1.0 if total_ref == "static" else total_peak
         total_dd = (ref - trig_eq) / ref
-        daily_dd = (daily_anchor - trig_eq) / daily_anchor
+        daily_dd = (daily_num - trig_eq) / daily_den
         daily_dd_intrabar_max = max(daily_dd_intrabar_max, daily_dd)
-        daily_dd_close_max = max(daily_dd_close_max, (daily_anchor - close_eq) / daily_anchor)
+        daily_dd_close_max = max(daily_dd_close_max, (daily_num - close_eq) / daily_den)
         if trace is not None:  # per-bar diagnostics (pre-flatten open book); slot 3
-            # carries the daily anchor so daily_dd_from_trace reports the same
-            # reference the governors fired on.
-            trace.append((p, float(close_eq), float(realized), float(daily_anchor), tuple(open_t)))
+            # carries the daily NUMERATOR anchor (day-start equity for the resetting
+            # bases; 1.0 for static_noreset) so daily_dd_from_trace / process_trace
+            # report the same reference the governors fired on.
+            trace.append((p, float(close_eq), float(realized), float(daily_num), tuple(open_t)))
 
         # 3. governor actions (severity order); flatten at the trigger mark
         if governed and not killed and total_dd >= TOTAL_KILL:

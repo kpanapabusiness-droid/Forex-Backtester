@@ -35,6 +35,7 @@ input double  Total_DD_Halt_Pct           = 0.07;
 input double  Total_DD_CloseAll_Pct       = 0.08;
 input double  Daily_DD_Halt_Pct           = 0.035;
 input double  Daily_DD_CloseAll_Pct       = 0.045;
+input ArcDailyDdBasis Daily_DD_Basis      = DAILY_DD_BASIS_INITIAL;  // daily-DD denominator; daily ALWAYS resets at EET rollover. INITIAL = fixed % of initial (FundedNext); DAY_START = % of day-start equity (5ers)
 input int     Time_Exit_Bars              = 240;
 input double  SL_ATR_Multiplier_Expected  = 3.5;       // for parity-check only
 input string  Sidecar_Inbox_Dir           = "Arc10\\signals_out";
@@ -494,7 +495,7 @@ int OnInit()
       ArcPositionReset(i);
    for(int i = 0; i < ARC10_MAX_DEFERRED; i++)
       g_deferred[i].in_use = false;
-   ArcEquityInit(Initial_Equity_Floor);
+   ArcEquityInit(Initial_Equity_Floor, Daily_DD_Basis);
    ArcNewsEnsureInit();
    ArcRecoveryRun(Magic_Number, SL_ATR_Multiplier_Expected, Trade_Log_Path);
    ArcPositionsSave(Ea_Positions_Path);

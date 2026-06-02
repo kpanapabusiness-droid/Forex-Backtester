@@ -1,5 +1,5 @@
 {
-  "$comment": "19 Strategy Tester scenarios per dispatch §4.2 / phase_1_build_intent.md §5.2 + OPEN-001 floor-fix dispatch (s13-s17) + OPEN-001 daily-anchor correction (s18-s19). Schema 1.3 reflects Option 1 + Bug A fix: exit reason vocabulary replaced opaque 'broker_closed' with strategic reasons {trail_stop, initial_sl_hit, equity_guard_force, external_close, time_exit}, and broker-side exit rows now carry actual fill_price via deal-history lookup. schema 1.2 re-validated dates under canonical R (1R = sl_distance_price = sl_atr_mult × ATR per core/sim/exit_policies/_base.py:95) after the r_atr fix in commit 164ffb5. historical_signal_bar_close carries the verified date for price-driven scenarios — picked by scanning HistData M1 for real-market sequences that produce each scenario's expected play. s13-s17 verify the OPEN-001 fix: Total-DD floor is solely operator-set (Initial_Equity_Floor input), static, never captured from live equity; observable is the '[ARC10] equity init: floor=… source=…' journal line. Schema structure unchanged from 1.3 (new scenarios reuse existing fields + ea_input_overrides).",
+  "$comment": "20 Strategy Tester scenarios per dispatch §4.2 / phase_1_build_intent.md §5.2 + OPEN-001 floor-fix dispatch (s13-s17) + OPEN-001 daily-anchor correction (s18-s19) + FIX 2b daily-DD basis/mandatory-reset correction (s18-s19 rewritten, s20 added). FIX 2b: daily DD now RESETS every EET trading day (mandatory, both bases) and Daily_DD_Basis selects only the denominator (INITIAL=fixed % of initial floor / DAY_START=% of day-start equity); the FIX 2 static-non-resetting daily anchor was a bug (froze accounts permanently once ~3.5% below initial). s18 = reset+basis observable; s19 = restart re-snapshot; s20 = fires-then-clears-at-rollover regression guard. Schema 1.3 reflects Option 1 + Bug A fix: exit reason vocabulary replaced opaque 'broker_closed' with strategic reasons {trail_stop, initial_sl_hit, equity_guard_force, external_close, time_exit}, and broker-side exit rows now carry actual fill_price via deal-history lookup. schema 1.2 re-validated dates under canonical R (1R = sl_distance_price = sl_atr_mult × ATR per core/sim/exit_policies/_base.py:95) after the r_atr fix in commit 164ffb5. historical_signal_bar_close carries the verified date for price-driven scenarios — picked by scanning HistData M1 for real-market sequences that produce each scenario's expected play. s13-s17 verify the OPEN-001 fix: Total-DD floor is solely operator-set (Initial_Equity_Floor input), static, never captured from live equity; observable is the '[ARC10] equity init: floor=… source=…' journal line. Schema structure unchanged from 1.3 (new scenarios reuse existing fields + ea_input_overrides).",
   "schema_version": "1.3",
   "scenarios": [
     {
@@ -252,11 +252,11 @@
     },
     {
       "id": "s18",
-      "title": "Daily-DD anchor is the STATIC floor, never re-snapshots (FIX 2)",
+      "title": "Daily-DD resets at EET rollover; basis selects denominator (FIX 2b)",
       "pair": "EURUSD",
       "signal_bar_close_price": 1.0842,
       "atr14": 0.00214,
-      "narrative": "Verifies the daily-DD anchor after FIX 2. FundedNext's daily loss limit is a fixed % of the INITIAL balance, not of day-start equity (help article 8019811), so the anchor is the STATIC floor (= Initial_Equity_Floor), set once at OnInit ('[ARC10] daily-DD anchor: static_floor=100000.00 … source=init-static-floor') and NEVER re-snapshotted to equity. daily_dd = (static_floor - equity)/static_floor, so the 4.5% close-all fires at a fixed $4,500 at every equity level. At each EET-day rollover (00:00 EET = 22:00 UTC winter / 21:00 UTC summer) the EA logs '[ARC10] eet-rollover: daily-DD anchor held static=100000.00 …' and resets ONLY the per-day entry-halt flag — the anchor value does not change. The total-DD floor shares the same static basis and is unaffected.",
+      "narrative": "Verifies the daily-DD reset + basis after FIX 2b (supersedes the FIX 2 static-anchor behaviour s18 used to assert). The daily-DD measurement is a day-start EQUITY snapshot that RESETS every EET trading day — mandatory, both bases. At OnInit the EA logs '[ARC10] daily-DD basis=INITIAL reset=daily' (the basis+reset proof line) and '[ARC10] daily day-start: equity=… source=init-snapshot'. At each EET-day rollover (00:00 EET = 22:00 UTC winter / 21:00 UTC summer) it logs '[ARC10] eet-rollover: daily-DD reset day_start_equity=… basis=INITIAL …', RE-SNAPSHOTTING the day-start equity to the current equity and clearing the per-day entry-halt flag. daily_dd = (day_start_equity - equity) / denom, where denom = Initial_Equity_Floor for INITIAL (fixed $/day — 4.5% = $4,500) or this day's start equity for DAY_START. The TOTAL-DD floor is separate, static, and unaffected ('floor=100000.00 source=input' throughout).",
       "expected_events": [],
       "expected_exit_reason_substring": "",
       "historical_signal_bar_close": "2026-03-10T08:00:00Z",
@@ -264,15 +264,15 @@
       "ea_input_overrides": {
         "Initial_Equity_Floor": 100000
       },
-      "setup_note": "DAILY_ANCHOR_STATIC_FLOOR: set Initial_Equity_Floor=100000. Run across ≥2 EET days. PASS = (a) exactly ONE '[ARC10] daily-DD anchor: static_floor=100000.00 … source=init-static-floor' line at start; (b) every '[ARC10] eet-rollover: daily-DD anchor held static=100000.00 …' line per EET-day boundary crossed shows the SAME 100000.00 value (the anchor never trails equity); (c) at no point does the daily anchor print a live-equity value. The floor journal line ('floor=100000.00 source=input') is unchanged across the whole run. Observable-only; no trade events required."
+      "setup_note": "DAILY_RESET_AND_BASIS: set Initial_Equity_Floor=100000, Daily_DD_Basis=INITIAL (default). Run across ≥2 EET days. PASS = (a) exactly ONE '[ARC10] daily-DD basis=INITIAL reset=daily' line + ONE 'daily day-start: equity=… source=init-snapshot' at start; (b) one '[ARC10] eet-rollover: daily-DD reset day_start_equity=… basis=INITIAL …' line per EET boundary crossed, each re-snapshotting day_start_equity to that day's current equity (the value tracks equity at rollover, it does NOT stay pinned to 100000); (c) the TOTAL floor line 'floor=100000.00 source=input' is unchanged across the whole run. Optional: re-run with Daily_DD_Basis=DAY_START and confirm the basis token flips to DAY_START in both the attach and rollover lines. Observable-only; no trade events required."
     },
     {
       "id": "s19",
-      "title": "Mid-day restart — daily anchor stays the static floor, never live equity (FIX 2)",
+      "title": "Mid-day restart re-snapshots the daily day-start to current equity (FIX 2b)",
       "pair": "EURUSD",
       "signal_bar_close_price": 1.0842,
       "atr14": 0.00214,
-      "narrative": "Verifies the restart behavior of the daily anchor after FIX 2. A mid-day EA restart (OnInit re-fire via input-edit, same trigger as s9/s10) re-reads the daily anchor from the STATIC floor (= Initial_Equity_Floor), NOT from current equity. Whether the restart happens at $100k or after the account has drawn down, the daily anchor is always the 100000 floor — it never captures live equity, so the daily DD limit cannot drift with equity. The total floor is likewise re-read from the operator input (s13/s14); both now share the static-floor basis.",
+      "narrative": "Verifies the restart behaviour of the daily day-start after FIX 2b. A mid-day EA restart (OnInit re-fire via input-edit, same trigger as s9/s10) re-snapshots the daily day-start to the CURRENT equity (source=init-snapshot) — it is NOT persisted to a state file and NOT the static floor. Daily risk is bounded to one day by the natural rollover, so a fresh snapshot on restart is correct. The basis line '[ARC10] daily-DD basis=INITIAL reset=daily' prints again. The TOTAL floor is independently re-read from the operator input (s13/s14) and stays 100000.00 source=input — total and daily are separate (total never resets; daily resets at rollover and re-snapshots on restart).",
       "expected_events": [],
       "expected_exit_reason_substring": "",
       "historical_signal_bar_close": "2026-03-10T08:00:00Z",
@@ -280,7 +280,24 @@
       "ea_input_overrides": {
         "Initial_Equity_Floor": 100000
       },
-      "setup_note": "DAILY_ANCHOR_RESTART_STATIC: set Initial_Equity_Floor=100000. Start tester; note the first '[ARC10] daily-DD anchor: static_floor=100000.00 … source=init-static-floor'. While running and BEFORE any EET rollover, edit any EA input to force a restart (s9/s10 input-edit procedure). PASS = the SECOND 'source=init-static-floor' line still reads static_floor=100000.00 — NOT a live-equity value at restart. Confirms the daily anchor is the static floor and is decoupled from live equity. The floor line also reads 'floor=100000.00 source=input' both times (total-floor logic untouched)."
+      "setup_note": "DAILY_RESTART_RESNAPSHOT: set Initial_Equity_Floor=100000. Start tester; note the first 'daily day-start: equity=… source=init-snapshot' and 'daily-DD basis=INITIAL reset=daily'. While running and BEFORE any EET rollover, edit any EA input to force a restart (s9/s10 input-edit procedure). PASS = a SECOND 'source=init-snapshot' line printing the restart-time CURRENT equity (re-snapshot, not the static floor, not a persisted prior value), and the basis line re-printed. The TOTAL floor line reads 'floor=100000.00 source=input' both times (total-floor logic untouched)."
+    },
+    {
+      "id": "s20",
+      "title": "Daily governor fires then CLEARS at rollover — no permanent freeze (FIX 2b)",
+      "pair": "EURUSD",
+      "signal_bar_close_price": 1.0842,
+      "atr14": 0.00214,
+      "narrative": "The FIX 2b regression guard. Under the FIX 2 bug, daily DD was anchored to the static floor and never reset, so once equity sat ~3.5% below initial the daily governors fired on every bar PERMANENTLY and froze the account — not a daily limit. After FIX 2b, the daily measurement resets at EET rollover: a day that hits the 3.5% halt clears at the next EET day, and because day-start equity re-snapshots to the (lower) current equity, daily_dd restarts near zero and entries resume — even while the account is still down from initial. Demonstrated: day 1 a forced daily halt blocks a signal (equity_block, reason=daily_dd_halt); at the EET rollover the EA logs 'eet-rollover: daily-DD reset day_start_equity=…' and clears the entry-halt flag; day 2 a fresh signal is ACCEPTED (entry). The total-DD halt (static floor, 7/8%) is untouched and would still hold if a real total breach existed.",
+      "expected_events": ["equity_block", "entry"],
+      "expected_exit_reason_substring": "",
+      "historical_signal_bar_close": "2026-03-10T08:00:00Z",
+      "st_date_range": ["2026-03-09", "2026-03-12"],
+      "ea_input_overrides": {
+        "Initial_Equity_Floor": 100000,
+        "Daily_DD_Halt_Pct": 0.00001
+      },
+      "setup_note": "DAILY_CLEAR_AT_ROLLOVER: set Initial_Equity_Floor=100000, Daily_DD_Halt_Pct=0.00001 (so any floating loss on day 1 trips the daily halt, like s7), Daily_DD_CloseAll_Pct at its 0.045 default. Stage a day-1 signal envelope at 2026-03-10T08:00:00Z (within EET day 2026-03-10) plus a tiny floating loss → day-1 signal is rejected at the equity gate with reason=daily_dd_halt (equity_block row). Run past the next EET rollover (22:00 UTC 2026-03-10 → EET day 2026-03-11); confirm the journal shows '[ARC10] eet-rollover: daily-DD reset day_start_equity=… basis=INITIAL …' AND that g_arc_eq_entries_halted_today has cleared. Stage a day-2 signal (e.g. 2026-03-11T08:00:00Z); with the day-2 floating P&L flat-or-positive at that tick it is ACCEPTED → entry row. PASS = day-1 equity_block(daily_dd_halt) → rollover-reset line → day-2 entry (account did NOT freeze). Contrast: under the FIX 2 bug the day-2 signal would also be blocked indefinitely. (If staging precise floating losses in ST is impractical, the regression is equivalently provable by inspecting the rollover line: day_start_equity re-snapshots to current equity each day and the halt flag clears — code path in ArcEquityOnTick.)"
     }
   ]
 }

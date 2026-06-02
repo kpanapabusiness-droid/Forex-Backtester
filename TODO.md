@@ -2,7 +2,7 @@
 
 > The operational todo list. Append, check off, delete as work completes.
 > Distinct from `ARC_TRACKER.md` (which is auto-updated arc state) and `ARC_HISTORY.md` (frozen pre-v3.0 record).
-> Last updated: 2026-05-31 — **Arc 10 analysis COMPLETE + documented; live-ready at 0.40%; awaiting operator go-live actions.** Risk-surface work closed (EA-faithful canonical run is authoritative); only live-only residuals + the operator go-live checklist remain open.
+> Last updated: 2026-06-02 — **Arc 10 analysis COMPLETE + documented; deployed both terminals (FundedNext + 5ers); EA fixes + backtester alignment DONE.** Risk-surface work closed (canonical = **fixed-initial** run, matching the deployed EA; floating EA-faithful run retained as reference). Remaining: the Amendment-8 / canonical-reconciliation doc pass (this pass) + live-only residuals + deferred items.
 
 ---
 
@@ -19,13 +19,13 @@
 
 - **Phase 0 — Framework validation:** 🟢 CLOSED (Phase 0a Path B verdict per PR-E.1.7; Phase 0b skipped by chat decision)
 - **Phase 1 — Arc 1-11 re-runs:** 🟡 PARTIAL — **Wave 1 CLOSED** (all 5 arcs run under v3.0.2: Arc 10 PASS-DEPLOYABLE → **LIVE**; Arcs 5 / 7 / 8 / 11 FAIL). **Wave 2 ⚪ PARKED** — deprioritized; project pivoted to deployment of the Arc 10 survivor.
-- **Arc 10 — Analysis + risk surface:** 🟢 COMPLETE — canonical gate is the **EA-faithful** floating-equity run (`arc_10/02_validation/07_canonical_wfo.md`); operating risk **0.40%**; sizing-basis, governors, slippage and gap analysis all resolved. Documented in `arc_10/`. Do not re-open the risk analysis — it is canonical.
+- **Arc 10 — Analysis + risk surface:** 🟢 COMPLETE — canonical gate is the **fixed-initial** run (`arc_10/02_validation/07_canonical_wfo.md`, matches the deployed EA; floating EA-faithful run retained as reference); operating risk **0.40%**; sizing-basis, governors, slippage and gap analysis all resolved. Documented in `arc_10/`. Do not re-open the risk analysis — it is canonical.
 - **Arc 10 — Live operations:** 🟡 ACTIVE — analysis-complete, live-ready at 0.40%; awaiting operator go-live actions (see **Operator go-live checklist** below). Operational source of truth = `arc_10/` (start at `arc_10/START_HERE.md`).
 - **Arc 10 — Improvements (research):** ⚪ PARKED/CLOSED — the exploratory probes resolved into the canonical run; no open structural research thread.
 - **Phase 2 — Sub-protocols + new signals:** ⚪ PARKED — deprioritized along with Wave 2; project focus is deployment + Arc 10 improvements, not new signal classes.
 - **Engine state:** **post-deployment-week** (post-PR-#236). Steps 1-5 + signal parity + Step 6 framework (Amendment 4) + Amendment 3 / 3.1 risk-normalised gates + Amendment 5 architecture selection + Amendment 6 EET daily-DD boundary + canonical exit-policy registry. **Live deployment stack wired & operationally validated:** convention-aware Python sidecar (UTC + EET, byte-identical parity proven on both) + thin MQL5 EA + multi-broker plumbing (`--mt5-path`) + `--quick-test`.
 - **Architectures wired:** A1, A2, A3, A4, A6 (A5 not built — deferred; no VIABLE candidate triggered it)
-- **Protocol state:** L_PROTOCOL v3.0 + Amendments 1, 2, 3, 3.1, 4, 5, 6 inline. Closure template v1.3.1. Parser v1.3 with Amendment-5 + Amendment-3 cutoff validation.
+- **Protocol state:** L_PROTOCOL v3.0 + Amendments 1, 2, 3, 3.1, 4, 5, 5.1, 6, 7, 8 inline. Amendment 8 (2026-06-02): fixed-initial default sizing + provenance stamp + decorrelation gate (self-run front-end `ARC_RUN_TEMPLATE.md`; broker rules `BROKER_RULES.md`). Closure template v1.3.1. Parser v1.3 with Amendment-5 + Amendment-3 cutoff validation.
 
 ### Active parallel chat work
 
@@ -169,6 +169,21 @@ Closes the Arc 10 analysis to a single authoritative basis. All canonical number
 | Canonical EA-faithful documentation pass | 🟢 | #246 |
 | CLAUDE.md + TODO + `arc_10/START_HERE.md` finished-state pass | 🟢 | this PR |
 
+> **Note (2026-06-02, Round 10):** Round 9 established the floating EA-faithful run as canonical. Round 10 **reconciles the canonical basis to fixed-initial** (the basis the deployed EA actually sizes); the floating run is retained as a reference comparison. Round 9 rows are kept as the historical record of the analysis; the authoritative basis is now fixed-initial per `07_canonical_wfo.md`.
+
+### Round 10 — Amendment 8 + self-run template + broker ref + canonical reconciliation (2026-06-02)
+
+Doc-only pass. EA fixes (FundedNext-aligned sizing, daily-DD anchor, ±5min news — PRs #249/#250) + backtester alignment are **DONE/deployed both terminals** (FundedNext + 5ers); this round closes the documentation.
+
+| Task | Status | PR / Tag |
+|---|---|---|
+| L_PROTOCOL Amendment 8 — fixed-initial default basis + provenance stamp + decorrelation gate (inline) | 🟢 | this PR |
+| `ARC_RUN_TEMPLATE.md` — self-run spec (CC-auto vs analyst-stop split, gates, defaults block) | 🟢 | this PR |
+| `BROKER_RULES.md` — per-broker measurement table + per-account EA inputs (FundedNext cited; 5ers TBD-VERIFY) | 🟢 | this PR |
+| Canonical framing reconciled floating → **fixed-initial** (CLAUDE.md + `07_canonical_wfo.md`; floating retained as reference) | 🟢 | this PR |
+| EA FundedNext-aligned sizing + daily-DD anchor + ±5min news (live) | 🟢 | #249 / #250 |
+| Memory: canonical-gate entry needs updating to fixed-initial (analyst handles separately) | 🔴 | flagged in PR body |
+
 ---
 
 ## Phase 0 — Framework validation
@@ -209,7 +224,7 @@ path is Sections G (news filter) + H (post-fill SL anchor) per
 
 | Arc | v3.0 verdict | v3.0.2 retry verdict | Closure PR | Live status |
 |---|---|---|---|---|
-| Arc 10 | PASS-VIABLE → PASS-DEPLOYABLE | **PASS-DEPLOYABLE** (EA-faithful canonical, 0.40% FundedNext) | #174 / re-eval #177 / v3.0.2 #214/#216/#217/#218 / canonical #243/#246 | **Analysis-complete, live-ready at 0.40%; awaiting operator go-live** |
+| Arc 10 | PASS-VIABLE → PASS-DEPLOYABLE | **PASS-DEPLOYABLE** (fixed-initial canonical, 0.40% FundedNext; floating EA-faithful = reference) | #174 / re-eval #177 / v3.0.2 #214/#216/#217/#218 / canonical #243/#246 / reconciled this PR | **Deployed both terminals at 0.40%** |
 | Arc 8 | FAIL (step 5) | FAIL (chained DD blowout) | #173 / v3.0.2 #231 | n/a |
 | Arc 11 | FAIL (step 5) | FAIL (step5_not_scalable) | #171 / v3.0.2 #215 | n/a |
 | Arc 7 | FAIL (step 5) | FAIL (step5_not_scalable) | v3.0.2 #202 (+ r=2% analysis #210) | n/a |
@@ -239,7 +254,7 @@ path is Sections G (news filter) + H (post-fill SL anchor) per
 
 ## Arc 10 — Live operations
 
-> **Analysis-complete, live-ready at 0.40% as of 2026-05-31.** Operating tier is **0.40%** (EA-faithful canonical run). Operational detail lives in `arc_10/04_runbook/`; start at `arc_10/START_HERE.md`. This TODO captures decision-gate / go-live status only; it references `arc_10/`, it does not duplicate it.
+> **Analysis-complete, deployed both terminals at 0.40% as of 2026-06-02.** Operating tier is **0.40%** (fixed-initial canonical run; floating EA-faithful retained as reference). Operational detail lives in `arc_10/04_runbook/`; start at `arc_10/START_HERE.md`. This TODO captures decision-gate / go-live status only; it references `arc_10/`, it does not duplicate it.
 
 Target deployment: a single Contabo VPS (Frankfurt) — FundedNext ($100k Challenge, EET convention, **0.40% operating risk**). Convention-aware Python sidecar + thin MQL5 EA; watchdog auto-restart on stale heartbeat.
 
@@ -275,7 +290,7 @@ Target deployment: a single Contabo VPS (Frankfurt) — FundedNext ($100k Challe
 
 ## Arc 10 — Improvements (research)
 
-> ⚪ **PARKED / CLOSED.** The exploratory probes resolved into the EA-faithful canonical run; there is no open structural research thread on Arc 10. The deployed config is locked. Any future candidate improvement goes through a fresh validation arc, not an in-place edit. Listed below as parked candidates only.
+> ⚪ **PARKED / CLOSED.** The exploratory probes resolved into the fixed-initial canonical run (floating EA-faithful = reference); there is no open structural research thread on Arc 10. The deployed config is locked. Any future candidate improvement goes through a fresh validation arc, not an in-place edit. Listed below as parked candidates only.
 
 | Task | Status | Notes |
 |---|---|---|

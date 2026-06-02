@@ -92,15 +92,19 @@ def run_fold(tids, D, *, governed, is_2026=False):
 
     ROI = compound return over the fold; full-year folds annualised over their own
     ~1y span (= annual return), 2026 reported RAW (not annualised)."""
+    # Per-fold / per-year reset (equity starts 1.0, compounds within ~1y) → daily_ref
+    # ="initial" = the EA-faithful FundedNext fixed-$/day basis (equity stays near
+    # 1.0, so initial ≈ day_start). daily_dd_from_trace reports on the same basis.
     run = wp.simulate_continuous(
         tids, D["sched_cost"], D["day_key"], D["clock"],
         governed=governed, total_ref="static", compound=True,
+        daily_ref="initial",
     )
     e_ps = [D["sched_cost"][t]["e"] for t in tids]
     span = (D["clock"][max(e_ps)] - D["clock"][min(e_ps)]).total_seconds() / (365.25 * 86400.0)
     raw = float(run["e_bal_final"] - 1.0)
     roi = raw if is_2026 else float(gw.annualise(run["e_bal_final"], span))
-    day_dd = wp.daily_dd_from_trace(run["trace"], D["day_key"])
+    day_dd = wp.daily_dd_from_trace(run["trace"], D["day_key"], daily_ref="initial")
     return dict(
         n=len(tids), roi=roi, raw=raw, span=float(span),
         trailing_dd=float(run["dd_trailing"]), from_initial_dd=float(run["dd_static"]),

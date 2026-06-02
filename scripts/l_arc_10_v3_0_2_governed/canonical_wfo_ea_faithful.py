@@ -81,14 +81,18 @@ DAILY_HALT, DAILY_CLOSE, TOTAL_HALT, TOTAL_KILL = 0.035, 0.045, 0.07, 0.08
 # ONLY the per-entry sizing differs: mult = rb × equity_INCL_FLOATING, not rb × e_bal).
 # ───────────────────────────────────────────────────────────────────────────
 def simulate_floating(tids, sched, day_key, clock, *, rb, governed, total_ref,
-                      daily_ref="static", trigger_mark="close"):
-    # daily_ref in {"static","day_start"} sets the DAILY-DD anchor (mirrors
-    # total_ref's static option, for the daily window). "static" (DEFAULT) =
-    # fixed initial (1.0): daily DD = (1.0 - intraday_low)/1.0, matching
-    # FundedNext (daily limit = a fixed % of initial) and the live EA fix.
-    # "day_start" = re-captured day-start equity (prior behaviour). The daily
-    # governors fire off this anchor, and slot 3 of the trace carries it so
-    # whole_period_dd.daily_dd_from_trace reports the same reference.
+                      daily_ref="initial", trigger_mark="close"):
+    # daily_ref in gw.DAILY_REF_MODES sets the DAILY-DD basis — EA-faithful
+    # (EquityGuards.mqh FIX 2b), with the daily window RESETTING each EET day:
+    #   "initial" (DEFAULT, FundedNext) = (day-start equity − intraday low) / FIXED
+    #     initial (1.0) — a fixed $/day budget; numerator resets daily. The
+    #     canonical gate basis matching the deployed EA's INITIAL basis.
+    #   "day_start" (5ers) = vs the re-captured day-start equity; resets daily.
+    #   "static_noreset" (QUARANTINED) = the OLD non-resetting freeze basis (warns).
+    # The daily governors fire off this basis, and slot 3 of the trace carries the
+    # daily NUMERATOR anchor so whole_period_dd.daily_dd_from_trace reports the same
+    # reference. See gw.daily_anchors().
+    gw.check_daily_ref(daily_ref)
     e_min = min(sched[t]["e"] for t in tids)
     x_max = max(sched[t]["x"] for t in tids)
     entries: dict = {}
@@ -121,7 +125,7 @@ def simulate_floating(tids, sched, day_key, clock, *, rb, governed, total_ref,
             day = d
             daily_halt = daily_closed = False
             day_start = prev_float
-        daily_anchor = 1.0 if daily_ref == "static" else day_start
+        daily_num, daily_den = gw.daily_anchors(daily_ref, day_start)
 
         # ── ENTRIES: EA-faithful floating-equity sizing ──
         for tid in entries.get(p, []):
@@ -141,8 +145,8 @@ def simulate_floating(tids, sched, day_key, clock, *, rb, governed, total_ref,
         close_eq = book("close")
         peak_ref = 1.0 if total_ref == "static" else peak_float
         total_dd = (peak_ref - trig) / peak_ref
-        daily_dd = (daily_anchor - trig) / daily_anchor
-        trace.append((p, float(close_eq), float(e_bal), float(daily_anchor), tuple(open_t)))
+        daily_dd = (daily_num - trig) / daily_den
+        trace.append((p, float(close_eq), float(e_bal), float(daily_num), tuple(open_t)))
 
         if governed and not killed and total_dd >= TOTAL_KILL:
             e_bal += wp._flat(open_t, mult, sched, p, flattened, "total_close_all", trigger_mark)
@@ -210,13 +214,16 @@ def holdout_year_tids(D):
 
 
 def run_fold(tids, D, *, rb, governed, is_2026=False):
+    # CANONICAL FundedNext basis: daily_ref="initial" (fixed-$/day, resets each EET
+    # day) = the deployed EA's INITIAL basis. daily_dd_from_trace reports on the same.
     run = simulate_floating(tids, D["sched_cost"], D["day_key"], D["clock"],
-                            rb=rb, governed=governed, total_ref="static")
+                            rb=rb, governed=governed, total_ref="static",
+                            daily_ref="initial")
     e_ps = [D["sched_cost"][t]["e"] for t in tids]
     span = (D["clock"][max(e_ps)] - D["clock"][min(e_ps)]).total_seconds() / (365.25 * 86400.0)
     raw = float(run["e_bal_final"] - 1.0)
     roi = raw if is_2026 else float(gw.annualise(run["e_bal_final"], span))
-    day_dd = wp.daily_dd_from_trace(run["trace"], D["day_key"])
+    day_dd = wp.daily_dd_from_trace(run["trace"], D["day_key"], daily_ref="initial")
     return dict(
         n=len(tids), roi=roi, raw=raw, span=float(span),
         trailing_dd=float(run["dd_trailing"]), from_initial_dd=float(run["dd_static"]),
@@ -349,7 +356,8 @@ def write_summary(search_res, holdout_res, matrix, D):
         "re-read per entry) to MEASURE the procyclical concurrency tail vs the fixed-initial "
         "basis. Reconstruction (`build_schedules`, open-book marks, `_flat`) reused verbatim; "
         "only the per-entry sizing differs from the compound run (floating equity vs closed "
-        "`e_bal`). Daily DD on the static (fixed-initial) anchor by default. v3.0.2 LOCKED; "
+        "`e_bal`). Daily DD on the EA-faithful `initial` basis (fixed-$/day, daily window "
+        "resets each EET day = deployed EA INITIAL basis). v3.0.2 LOCKED; "
         "governors EA-faithful, not tuned. Costs ON (cell 5); r_base {0.40%,0.50%}; EET; "
         "frame sha `05dea9…9ee58a`; deterministic; PR-gated.\n"
     )

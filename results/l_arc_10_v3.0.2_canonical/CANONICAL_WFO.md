@@ -1,5 +1,7 @@
 # Arc 10 v3.0.2 — CANONICAL WFO (FundedNext, EET, 3.5R)
 
+> **⛔ SUPERSEDED by [`_final_canonical`](../l_arc_10_v3.0.2_final_canonical/FINAL_CANONICAL_WFO.md)** (fixed-initial sizing + `daily_ref=initial`-resetting = the deploy-faithful basis matching the live EA post-FIX-2b). This run used a **linear** (fixed-%-of-initial, pre-daily-reset-alignment) basis, retained for reference only. The interim `_canonical_compound` / `_ea_faithful` pointers below are themselves also superseded by `_final_canonical`.
+
 > ⚠️ **SUPERSEDED (2026-05-31) — LINEAR SIZING BASIS.** This run sized fixed-%-of-
 > *initial* (1R = r_base of 1.0 throughout). The live EA sizes **fixed-%-of-equity
 > at each trade's open**, so the canonical run is now

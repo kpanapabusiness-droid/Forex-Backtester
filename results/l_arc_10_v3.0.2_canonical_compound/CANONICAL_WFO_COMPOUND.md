@@ -1,5 +1,7 @@
 # Arc 10 v3.0.2 — CANONICAL WFO, COMPOUND SIZING (FundedNext, EET, 3.5R)
 
+> **⛔ SUPERSEDED by [`_final_canonical`](../l_arc_10_v3.0.2_final_canonical/FINAL_CANONICAL_WFO.md)** (fixed-initial sizing + `daily_ref=initial`-resetting = the deploy-faithful basis matching the live EA post-FIX-2b). This run used a **closed-equity compound (non-resetting daily)** basis, retained for reference only. The interim `_ea_faithful` pointer below is itself also superseded by `_final_canonical`.
+
 > ⚠️ **SUPERSEDED (2026-05-31) — CLOSED-EQUITY SIZING BASIS.** This run sized off
 > *closed* equity (`e_bal`, excluding floating). The live EA sizes off
 > `ACCOUNT_EQUITY` **including floating open P&L** (`PositionManager.mqh:143`), so the

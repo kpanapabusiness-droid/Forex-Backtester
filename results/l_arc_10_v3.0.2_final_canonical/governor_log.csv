@@ -1,0 +1,9 @@
+risk_pct,segment,fold,governor,date,kill
+0.4,search,F1,daily_halt,2010-05-06,0
+0.4,search,F2,daily_halt,2011-03-15,0
+0.42,search,F1,daily_halt,2010-05-06,0
+0.42,search,F2,daily_halt,2011-03-15,0
+0.44999999999999996,search,F1,daily_close_all,2010-05-06,0
+0.44999999999999996,search,F2,daily_halt,2011-03-15,0
+0.44999999999999996,search,F11,daily_halt,2020-10-28,0
+0.44999999999999996,holdout,2025,daily_halt,2025-01-27,0

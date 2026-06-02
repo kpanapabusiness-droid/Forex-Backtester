@@ -1,0 +1,6 @@
+{
+  "pool_size": 5056,
+  "pool_sha256": "2fd4b56dd213f362ddcbe8397a13355fe482fa22dfde7eb3f0eceb2a3afbb94b",
+  "window_start": "2010-01-01",
+  "window_end": "2025-12-31"
+}

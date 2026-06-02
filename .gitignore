@@ -118,6 +118,15 @@ results/l_arc_2_redo2/**/_run_log.txt
 # Exclude the multi-MB raw run log (the run_summary.json + closure capture
 # the verdict and metrics).
 results/l_arc_7_v3.0.2/run.log
+# Arc 7 v3.0 exit-extraction — replication test of the Arc 10 exit-extraction
+# recovery (full-pool A1 + runner-trail) on Arc 7's pool, reset-floor engine +
+# Amendment 3 (L_PROTOCOL v3.0). Arc results data is direct-to-main; exclude
+# the regenerable paths.parquet + raw run logs.
+!results/arc_7_v3.0_exit_extraction/
+!results/arc_7_v3.0_exit_extraction/**
+results/arc_7_v3.0_exit_extraction/**/paths.parquet
+results/arc_7_v3.0_exit_extraction/run.log
+results/arc_7_v3.0_exit_extraction/a1_primary.log
 # Arc 5 v3.0.2 — mtf_alignment.2_down_mixed.kijun.h_120 — first canonical
 # 5ers_eet test with canonical W1 producer (PR #208). Step 1-5+ artefacts;
 # A1-only rerun after initial 8h wall-budget HALT on full Amendment-5 grid.

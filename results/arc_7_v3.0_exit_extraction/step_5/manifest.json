@@ -1,0 +1,29 @@
+{
+  "artefacts": {
+    "per_day_max_dd__A3__cl0__sl_partial_close_1r_runner_trail__sl3.0__n5__exp2.parquet": {
+      "sha256": "548701bbec9a942ce3acff090ee1dc8f48e9b941c3c137fe78fd5a18ed0ad6fe",
+      "size_bytes": 96255
+    },
+    "per_day_max_dd__A3__cl0__sl_partial_close_1r_runner_trail__sl3.5__n5__exp2.parquet": {
+      "sha256": "6ae6400eb5ab73cc6865fa8ffd174aba31a8a49c3a997ca16289538e01dee0d5",
+      "size_bytes": 98905
+    },
+    "per_day_max_dd__A3__cl0__sl_plus_tp_3r__sl3.5__n5__exp2.parquet": {
+      "sha256": "2750c84aa43f911a10c791d310b24ba8d45454f3d768902c82b51eb610668801",
+      "size_bytes": 103388
+    },
+    "per_fold.csv": {
+      "sha256": "65c088841f63145125fb426d756b429a78f61199731f33cefbe89ecd5e977861",
+      "size_bytes": 5445
+    },
+    "stage_a_triage.csv": {
+      "sha256": "62947e962b345d40243f41993632a57b96e794857dc752b8aa20a07c51bf2b18",
+      "size_bytes": 13386
+    },
+    "wfo_results.csv": {
+      "sha256": "f9d8d4759ad6c2f40ac763e89130ee326f8707505992638b2fb080cd7243e6a9",
+      "size_bytes": 2059
+    }
+  },
+  "generated_at": "2026-06-02T08:20:50Z"
+}

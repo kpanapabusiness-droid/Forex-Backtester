@@ -219,7 +219,8 @@ def main(argv: list[str] | None = None) -> int:
     # ── Step 2-3: clustering + capturability (candidate V-shape clusters) ──
     log.info("Step 2 — clustering")
     step2 = run_step_2(pool.trades, pool.paths)
-    s2_dir = out / "step_2"; s2_dir.mkdir(exist_ok=True)
+    s2_dir = out / "step_2"
+    s2_dir.mkdir(exist_ok=True)
     step2.cluster_assignments.to_parquet(s2_dir / "cluster_assignments.parquet", engine="pyarrow", compression="snappy", index=False)
     step2.cluster_summary.to_csv(s2_dir / "cluster_summary.csv", index=False, lineterminator="\n")
     (s2_dir / "cluster_summary.md").write_text(step2.summary_md, encoding="utf-8", newline="\n")
@@ -227,7 +228,8 @@ def main(argv: list[str] | None = None) -> int:
     log.info("Step 3 — capturability")
     step3 = run_step_3(pool.trades, pool.paths, step2.cluster_assignments,
                        declared_sl_mult=pool_cfg.sl_atr_mult, cluster_centroids=step2.centroids)
-    s3_dir = out / "step_3"; s3_dir.mkdir(exist_ok=True)
+    s3_dir = out / "step_3"
+    s3_dir.mkdir(exist_ok=True)
     step3.capturability_csv.to_csv(s3_dir / "capturability.csv", index=False, lineterminator="\n")
     (s3_dir / "capturability_summary.md").write_text(step3.summary_md, encoding="utf-8", newline="\n")
     candidate_clusters = [c for c in step3.per_cluster if c.is_candidate]
@@ -247,7 +249,8 @@ def main(argv: list[str] | None = None) -> int:
                 persistence_dir=out / "step_4" / "classifiers",
                 arc_name="arc_7_v3.0_exit_extraction", train_end=train_end_ts,
             )
-            s4_dir = out / "step_4"; s4_dir.mkdir(exist_ok=True)
+            s4_dir = out / "step_4"
+            s4_dir.mkdir(exist_ok=True)
             s4.extraction_metrics.to_csv(s4_dir / "extraction_metrics.csv", index=False, lineterminator="\n")
             (s4_dir / "extraction_summary.md").write_text(s4.summary_md, encoding="utf-8", newline="\n")
         except Exception as exc:  # noqa: BLE001
@@ -355,7 +358,8 @@ def main(argv: list[str] | None = None) -> int:
             el = time.perf_counter() - t_a
             log.info("  Stage A %d/%d (%.0fs, avg %.1fs/cfg)", i, len(configs), el, el / i)
     stage_a = pd.DataFrame(stage_a_rows)
-    s5_dir = out / "step_5"; s5_dir.mkdir(exist_ok=True)
+    s5_dir = out / "step_5"
+    s5_dir.mkdir(exist_ok=True)
     stage_a.sort_values(["screened_out", "worst_ratio"], ascending=[True, False]).to_csv(
         s5_dir / "stage_a_triage.csv", index=False, lineterminator="\n")
 
@@ -398,7 +402,7 @@ def main(argv: list[str] | None = None) -> int:
             pdmdd_written[cid] = str(pdmdd_path)
         # Amendment-3 scaling from worst-fold DD@r_base
         worst_dd_base = max((s.max_dd_pct for s in search_stats), default=0.0)
-        scaling = compute_scaling_factors(worst_dd_base, r_base=R_BASE)
+        _ = compute_scaling_factors(worst_dd_base, r_base=R_BASE)  # scaling recomputed inside the gate
         gate = classify_amended_fold_stats(
             folds=search_stats, chained_max_dd_base_pct=chained_dd,
             per_day_max_dd_df=per_day if not per_day.empty else None,

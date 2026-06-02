@@ -26,17 +26,32 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from core.arc.arc_pool_builder import ArcPoolConfig, build_arc_pool  # noqa: E402
-from core.architectures.a1_system_level_filter import A1Architecture, A1Config, A1RunContext  # noqa: E402
+from core.architectures.a1_system_level_filter import (  # noqa: E402
+    A1Architecture,
+    A1Config,
+    A1RunContext,
+)
 from core.determinism import seed_everything  # noqa: E402
 from core.runners._fold_stats_helpers import compute_per_day_max_dd  # noqa: E402
-from core.strategies.liquidity_sweep_reclaim_long.signal_module import LiquiditySweepReclaimLongSignal  # noqa: E402
-from core.wfo.amended_gates import classify_amended_fold_stats, compute_scaling_factors  # noqa: E402
-from core.wfo.chained_dd import compute_chained_max_dd_from_continuous_equity, stitch_per_fold_oos_equity  # noqa: E402
+from core.strategies.liquidity_sweep_reclaim_long.signal_module import (  # noqa: E402
+    LiquiditySweepReclaimLongSignal,
+)
+from core.wfo.amended_gates import (  # noqa: E402
+    classify_amended_fold_stats,
+    compute_scaling_factors,
+)
+from core.wfo.chained_dd import (  # noqa: E402
+    compute_chained_max_dd_from_continuous_equity,
+    stitch_per_fold_oos_equity,
+)
 from core.wfo.folds import build_v3_folds  # noqa: E402
-
 from scripts.arc_7.run_arc_7 import PAIRS_28, _build_panel_5ers_eet  # noqa: E402
 from scripts.arc_7_v3_0_exit_extraction.run import (  # noqa: E402
-    R_BASE, STARTING_BALANCE, OPERATING_R, _run_config_over_folds, _exp_str,
+    OPERATING_R,
+    R_BASE,
+    STARTING_BALANCE,
+    _exp_str,
+    _run_config_over_folds,
 )
 
 log = logging.getLogger("a1_primary_stageb")
@@ -51,7 +66,8 @@ def main() -> int:
     t0 = time.perf_counter()
     sibling = REPO_ROOT.parent / "nice-mirzakhani-baa9e5"
     out = REPO_ROOT / "results" / "arc_7_v3.0_exit_extraction"
-    s5 = out / "step_5"; s5.mkdir(parents=True, exist_ok=True)
+    s5 = out / "step_5"
+    s5.mkdir(parents=True, exist_ok=True)
 
     log.info("Building panels + pool …")
     ph4 = _build_panel_5ers_eet(list(PAIRS_28), "H4", histdata_root=sibling / "data" / "histdata", cache_root=sibling / "data" / "cache")

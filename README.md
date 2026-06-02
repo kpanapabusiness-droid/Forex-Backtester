@@ -2,12 +2,15 @@
 
 A research-first FX trading system targeting prop-firm requirements (5ers) with WFO-validated edge.
 
+> **New here? Start at [`NAVIGATION.md`](./NAVIGATION.md)** — the intent-router that maps what
+> you're trying to do (start an arc / deploy the EA / question a number / …) to the exact docs.
+
 ---
 
 ## Current State
 
-- **Live systems:** **Arc 10 v3.0.2** (DLR signal) — deployed on FundedNext ($100k Challenge, EET) at **0.40%** operating risk; PASS-DEPLOYABLE under the canonical EA-faithful gate. **KH-24** — running on Contabo VPS / 5ers MT5 broker feed, gate-passing, +1.92% worst-fold ROI / 6.37% worst-fold DD across 7 OOS folds. Live state + canonical Arc 10 numbers → [`arc_10/START_HERE.md`](./arc_10/START_HERE.md) + [`arc_10/02_validation/07_canonical_wfo.md`](./arc_10/02_validation/07_canonical_wfo.md).
-- **Active methodology:** `L_PROTOCOL.md` v3.0 + Amendments 1-6 (locked). Five steps as rankings; WFO at Step 5 is the only deployment gate; Step 6 causal-audit framework auto-dispatches on Top-1 PASS candidate.
+- **Live systems:** **Arc 10 v3.0.2** (DLR signal) — deployed on FundedNext ($100k Challenge, EET) at **0.40%** operating risk; PASS-DEPLOYABLE under the canonical **fixed-initial** gate ([`results/l_arc_10_v3.0.2_final_canonical/`](./results/l_arc_10_v3.0.2_final_canonical/) — fixed-initial sizing + `daily_ref=initial`-resetting, matching the live EA post-FIX-2b; worst-fold ROI 13.77% / mean 28.85% / trailing DD 7.73% / daily 4.06%). The earlier EA-faithful floating-equity run is retained as a reference only. **KH-24** — running on Contabo VPS / 5ers MT5 broker feed, gate-passing, +1.92% worst-fold ROI / 6.37% worst-fold DD across 7 OOS folds. Live state + canonical Arc 10 numbers → [`arc_10/START_HERE.md`](./arc_10/START_HERE.md) + [`arc_10/02_validation/07_canonical_wfo.md`](./arc_10/02_validation/07_canonical_wfo.md).
+- **Active methodology:** `L_PROTOCOL.md` v3.0 + Amendments 1-8 (locked) — Amendment 7 = portfolio-level DD gating + both-DD-references reporting; Amendment 8 = standing run-basis defaults (fixed-initial sizing, `daily_ref=initial`-resetting) + provenance stamp + decorrelation gate. Five steps as rankings; WFO at Step 5 is the only deployment gate; Step 6 causal-audit framework auto-dispatches on Top-1 PASS candidate.
 - **v3.0 engine:** post-Phase-1-engine-build sprint (8 PRs: #185 / #186 / #188 / #189 / #193 / #194 / #195 / #197). Steps 1–5 + Step 6 framework wired end-to-end. Architectures A1, A2, A3, A4, A6 operational; A5 deferred until ≥ 1 VIABLE candidate. Signal parity (mid features + 5ers EET aggregation + worst-case fills) merged.
 - **Data layer:** HistData M1 bid+ask, 28 pairs, 2010-2026 (52 GB tick + 18 GB M1 derived; verified 2026-05-21).
 - **Research status:** Phase 1 Wave 1 is **CLOSED** — Arc 10 PASS-DEPLOYABLE → deployed at 0.40%; Arcs 5 / 7 / 8 / 11 FAIL. The PASS-DEPLOYABLE survivor goal is **achieved**. Forward research (Wave 2 + Phase 2) is **PARKED** behind the deployment pivot; reopenable if Arc 10 fails its live kill criteria.
@@ -82,7 +85,7 @@ Canonical reads — everything else is reachable from these six:
 
 | File | When to read |
 | --- | --- |
-| `L_PROTOCOL.md` | Methodology of record. First read for any forward research work. Locked v3.0 + Amendments 1-6 inline. |
+| `L_PROTOCOL.md` | Methodology of record. First read for any forward research work. Locked v3.0 + Amendments 1-8 inline. |
 | `TODO.md` | Live operational tracker — current phase, in-flight PRs, standing items. Update at major state transitions. |
 | `ARC_TRACKER.md` | Auto-managed arc state via `scripts/update_tracker_from_closure.py`. Read-only for chat. |
 | `CLAUDE.md` | First-read context for AI assistants. Locked philosophy + KH-24 spec + permanently-eliminated list. |

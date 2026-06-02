@@ -111,7 +111,7 @@ def write_scenario(
 
 def _build_arg_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="python -m tests.ea.fake_sidecar")
-    p.add_argument("--scenario", required=True, help="Scenario id (s1..s19)")
+    p.add_argument("--scenario", required=True, help="Scenario id (s1..s20)")
     default_out = default_out_dir()
     p.add_argument(
         "--out",

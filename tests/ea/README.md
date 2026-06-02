@@ -10,9 +10,10 @@ parse path is exercised exactly as in production.
 
 ## Scenarios
 
-19 scenarios — s1-s12 per dispatch §4.2 / `phase_1_build_intent.md`
-§5.2; s13-s17 per the OPEN-001 floor-fix dispatch; s18-s19 per the
-OPEN-001 daily-anchor correction. See
+20 scenarios — s1-s12 per dispatch §4.2 / `phase_1_build_intent.md`
+§5.2; s13-s17 per the OPEN-001 floor-fix dispatch; s18-s20 per the
+FIX 2b daily-DD basis + mandatory-reset correction (s18-s19 were
+rewritten from the superseded FIX 2 static-anchor wording). See
 [scenarios/scenarios.json](scenarios/scenarios.json) for the full
 spec. Summary:
 
@@ -35,8 +36,9 @@ spec. Summary:
 | s15 | Floor 100000 → 125000                                | Manual scale-up via input edit                       |
 | s16 | Floor=125000, equity below floor, restart            | Decoupling holds at scaled-up anchor                 |
 | s17 | Floor input = 0                                       | Fail-loud: halt + Alert + sentinel-fail + heartbeat  |
-| s18 | Daily day-start fixed across ticks, rollover re-snap | Daily anchor is a fixed snapshot, resets at EET roll |
+| s18 | Daily resets at EET rollover; basis selects denom    | FIX 2b: mandatory daily reset + Daily_DD_Basis        |
 | s19 | Mid-day restart re-snapshots daily day-start         | Restart re-snapshot (not persisted, not live-track)  |
+| s20 | Daily governor fires then clears at rollover         | FIX 2b regression guard: no permanent freeze         |
 
 **s13-s17 (floor fix).** The total-DD floor is solely operator-set via
 the `Initial_Equity_Floor` input — static, never captured from live
@@ -49,15 +51,26 @@ and input-override scenarios; s17 additionally checks the fail-loud
 `ea.heartbeat` `"status": "halted_floor_unset"` line, and an
 `equity_block` row with reason `floor_unset_halt`.
 
-**s18-s19 (daily-anchor correction).** The daily-DD day-start is a
-**fixed equity snapshot**, taken once at `OnInit` and again only at each
-EET-day rollover — never the total floor and never live/per-tick. Both
-emit `[ARC10] daily day-start: equity=… source=init-snapshot|eet-rollover`.
-A mid-day restart **re-snapshots** day-start to current equity (item 3 of
-the correction) — deliberately not persisted to a state file and not
+**s18-s20 (FIX 2b daily-DD basis + mandatory reset).** Daily DD now
+**resets every EET trading day** (mandatory, both bases) — the day-start
+equity is re-snapshotted at each EET rollover and the within-day loss
+restarts from zero, so each new day gets a fresh daily budget (this is
+the actual bug fix; the superseded FIX 2 anchored daily to the static
+floor and never reset, freezing accounts permanently once ~3.5% below
+initial). `Daily_DD_Basis` (default `INITIAL`) selects only the
+denominator: `INITIAL` = fixed % of the initial floor (FundedNext: 5% ×
+$100k = $5,000/day, fixed); `DAY_START` = % of this day's start equity
+(5ers-style). Both governors (3.5/4.5) inherit the basis. On attach the
+EA emits `[ARC10] daily-DD basis=<INITIAL|DAY_START> reset=daily` plus
+`[ARC10] daily day-start: equity=… source=init-snapshot`; each rollover
+emits `[ARC10] eet-rollover: daily-DD reset day_start_equity=… basis=… …`.
+A mid-day restart **re-snapshots** day-start to current equity
+(`source=init-snapshot`) — deliberately not persisted and not
 live-tracked, because daily risk is bounded to one day by the natural
-rollover. s18 checks fixed-across-ticks + rollover reset; s19 checks the
-restart re-snapshot. Total-floor logic is untouched by both.
+rollover. s18 checks the reset + basis observables; s19 checks the
+restart re-snapshot; s20 is the regression guard (daily halt fires, then
+CLEARS at rollover so trading resumes — no permanent freeze). The TOTAL-DD
+floor (static, 7/8%) is untouched by all three.
 
 ## Running a scenario
 

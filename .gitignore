@@ -197,6 +197,14 @@ results/l_arc_10_v3.0.2_canonical_compound/**/*_run.log
 results/l_arc_10_v3.0.2_ea_faithful/**/trade_paths.parquet
 results/l_arc_10_v3.0.2_ea_faithful/**/run.log
 results/l_arc_10_v3.0.2_ea_faithful/**/*_run.log
+# Arc 10 v3.0.2 FINAL CANONICAL WFO (deploy-faithful: fixed-initial sizing +
+# daily_ref=initial-resetting — matches the live EA post-FIX-2b; supersedes
+# ea_faithful + prior _canonical / _canonical_compound). results/* deny-by-default.
+!results/l_arc_10_v3.0.2_final_canonical/
+!results/l_arc_10_v3.0.2_final_canonical/**
+results/l_arc_10_v3.0.2_final_canonical/**/trade_paths.parquet
+results/l_arc_10_v3.0.2_final_canonical/**/run.log
+results/l_arc_10_v3.0.2_final_canonical/**/*_run.log
 # Arc 10 v3.0.2 UTC convention rerun (phase/arc_10_v3_0_2_utc_rerun).
 # Same artefact-tracking pattern as v3.0.2; trade_paths.parquet is byte-identical
 # to results/l_arc_10/step_1/trade_paths.parquet (verified by sha256 in

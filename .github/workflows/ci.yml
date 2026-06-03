@@ -72,6 +72,17 @@ jobs:
           echo "PYTEST_EXIT=$exit_code" >> "$GITHUB_OUTPUT"
           exit $exit_code
 
+      - name: Engine smoke (MultiPairBacktester, gating)
+        id: engine_smoke
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        shell: bash
+        run: |
+          set -o pipefail
+          # Proves the sole gate engine runs end-to-end on the clean base
+          # (winner = partial+runner; same-bar stop = take-the-loss -1R).
+          python scripts/smoke_test_multipair.py
+
       - name: Smoke (non-gating)
         id: smoke
         shell: bash

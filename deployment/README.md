@@ -1,8 +1,10 @@
-# Arc 10 DLR — Phase 1 Sidecar + Thin EA Deployment
+# Sidecar + Thin EA — signal-agnostic deployment template
 
-> **Status:** Phase 1 build artefacts. **DO NOT trade live without Phase 2 parity validation.**
-> **Verdict source:** [results/l_arc_10_v3_0_2_utc_rerun/COMPARISON_REPORT.md](../results/l_arc_10_v3_0_2_utc_rerun/COMPARISON_REPORT.md) — PASS-DEPLOYABLE at `r_safe = 0.4336%` under UTC convention.
-> **Dispatch:** Dispatch B v2 (sidecar build) — see [../phase_1_build_intent.md](../phase_1_build_intent.md).
+> **Status:** deployment/runbook MACHINERY ONLY — a signal-agnostic template. **Not wired to any
+> live system; deployable-system count = 0.** The Arc-10 (DLR) system this was first built for is
+> KILLED (gate-fidelity defect — see [../docs/ARC_10_GATE_FIDELITY_DEFECT.md](../docs/ARC_10_GATE_FIDELITY_DEFECT.md));
+> its result artefacts are archived under `archive/`. Do NOT trade any system live off this template
+> without a fresh PASS-DEPLOYABLE verdict from the sole gate engine (`MultiPairBacktester`).
 
 ---
 

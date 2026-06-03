@@ -169,17 +169,16 @@ default `None` preserves prior behaviour. Six policies registered:
   - `sl_partial_close_1r_runner_trail` — Arc 10's load-bearing exit:
     intra-bar partial 50% at +1R, runner trails at path-peak − R_atr.
 
-Two execution surfaces share one policy definition:
+There is ONE execution surface: the **live engine**
+(`MultiPairBacktester` + `ExitPolicyManager`) — bar-by-bar evaluation
+with worst-case fills, honouring the stop SL-first (take-the-loss).
+This is the sole engine that scores a trade at Step 5.
 
-  1. **Live engine** (`MultiPairBacktester` + `ExitPolicyManager`) —
-     bar-by-bar evaluation with PR #189 worst-case fills.
-  2. **Replay** (`core.sim.exit_policies.simulate_path`) — post-hoc
-     path-replay over recorded `mae/mfe/close_r` columns, used by
-     `scripts/l_arc_*/step_5.py` for fast Step 5 ranking. The
-     reference-parity test
-     [tests/sim/exit_policies/test_path_simulate_reference_parity.py](../tests/sim/exit_policies/test_path_simulate_reference_parity.py)
-     asserts byte-identity vs the historical hand-rolled simulator at
-     [scripts/l_arc_10_v3/step_5.py:99-253](../scripts/l_arc_10_v3/step_5.py).
+The former post-hoc path-replay scorer (`simulate_path`, used for "fast
+Step 5 ranking") was **RETIRED 2026-06-02** for a gate-fidelity defect
+(it skipped pre-partial stops and flattered the gate — see
+[ARC_10_GATE_FIDELITY_DEFECT.md](ARC_10_GATE_FIDELITY_DEFECT.md)). It is
+archived; there is no fast-replay code path in the live tree.
 
 Account partial-fill semantics (`Account.partial_close` +
 `current_size_of` + `ClosedTrade.parent_position_id`) support

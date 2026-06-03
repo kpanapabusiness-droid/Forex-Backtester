@@ -15,12 +15,14 @@
 
 ## The defect
 
-The Step-5 gate ranked candidates using a fast path *replay* (`simulate_path`
-/ `realized_r_3p5`, now retired) instead of walking bars through the SL-honest
-`MultiPairBacktester`. For the `sl_partial_close_1r_runner_trail` exit, that
-replay only applied the −3.5×ATR stop to the **runner, after** the +1R partial
-fired (a `sl_breach > tp1` guard). It **ignored stop breaches that happened
-before the partial** — and it suppressed a same-bar stop. So a trade whose low
+The Step-5 gate ranked candidates using a fast path *replay* (the
+`simulate_path` precomputed-realised-R scorer, now retired) instead of walking
+bars through the SL-honest `MultiPairBacktester`. For the
+`sl_partial_close_1r_runner_trail` exit, that replay only applied the −3.5×ATR
+stop to the **runner, after** the +1R partial fired (a guard that compared the
+stop-breach bar index against the partial bar index and skipped the stop when
+it came first). It **ignored stop breaches that happened before the partial** —
+and it suppressed a same-bar stop. So a trade whose low
 pierced the stop on the way up was booked as a partial+runner **win** instead
 of a −1R **loss**.
 
@@ -67,7 +69,8 @@ bar-walking engine — is what you actually deployed.
 
 1. **The fast replay is RETIRED (2026-06-02).** `MultiPairBacktester`
    (`core/sim/`) is the **sole** engine that may score a trade for a gate.
-   There is no `realized_r_3p5` / `sl_breach > tp1` path in the live tree.
+   There is no precomputed-realised-R / stop-after-partial replay path in the
+   live tree.
 2. **Take-the-loss is a locked invariant.** Any stop breach at or before the
    +1R partial bar resolves to −1R (full position); a same-bar stop is SL-first;
    ambiguity never resolves to a win. Pinned by

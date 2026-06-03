@@ -47,24 +47,30 @@ if str(_REPO_ROOT) not in sys.path:
 from core.arc.arc_pool_builder import ArcPoolConfig, build_arc_pool, write_arc_pool  # noqa: E402
 from core.architectures._protocol import Architecture, StrategyResult  # noqa: E402
 from core.architectures.a1_system_level_filter import (  # noqa: E402
-    A1Architecture, A1Config, A1RunContext,
+    A1Architecture,
+    A1Config,
+    A1RunContext,
 )
 from core.architectures.a4_pipeline_d_exits import A4Architecture  # noqa: E402
 from core.determinism import RANDOM_STATE, seed_everything  # noqa: E402
 from core.features.pipeline import compute_feature_matrix  # noqa: E402
 from core.runners._fold_stats_helpers import (  # noqa: E402
-    count_daily_5pct_breaches, filter_oos_trades, max_drawdown_pct,
-    slice_equity_to_oos, compute_per_day_max_dd,
+    compute_per_day_max_dd,
+    count_daily_5pct_breaches,
+    filter_oos_trades,
+    max_drawdown_pct,
 )
 from core.runners.arc_fold_runner import ArcFoldRunner  # noqa: E402
 from core.runners.oracle_fold_runner import OracleFoldRunner  # noqa: E402
 from core.sim.costs import (  # noqa: E402
-    compute_commission_usd, compute_extra_spread_price, compute_slippage_pips,
+    compute_extra_spread_price,
+    compute_slippage_pips,
 )
 from core.sim.panel import Panel  # noqa: E402
 from core.steps.classifier_persistence import build_a4_config_from_step4  # noqa: E402
 from core.steps.path_classifier_per_fold import (  # noqa: E402
-    PerFoldTrainingInputs, build_path_classifier_fits_per_fold,
+    PerFoldTrainingInputs,
+    build_path_classifier_fits_per_fold,
     build_per_trade_entry_features,
 )
 from core.steps.step_2_clustering import run_step_2  # noqa: E402
@@ -72,11 +78,14 @@ from core.steps.step_3_capturability import run_step_3  # noqa: E402
 from core.steps.step_4_extraction import run_step_4  # noqa: E402
 from core.strategies.shb.signal_module import SHBSignalModule  # noqa: E402
 from core.wfo.amended_gates import (  # noqa: E402
-    AmendedVerdict, classify_amended_fold_stats, compute_scaling_factors,
+    AmendedVerdict,
+    classify_amended_fold_stats,
+    compute_scaling_factors,
     count_daily_breaches_at_scaled_risk,
 )
 from core.wfo.chained_dd import (  # noqa: E402
-    compute_chained_max_dd_from_continuous_equity, stitch_per_fold_oos_equity,
+    compute_chained_max_dd_from_continuous_equity,
+    stitch_per_fold_oos_equity,
 )
 from core.wfo.folds import Fold, build_v3_folds  # noqa: E402
 from core.wfo.gates import FoldStats  # noqa: E402

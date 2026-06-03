@@ -71,7 +71,6 @@ PCTS = [10, 25, 50, 75, 90, 95]
 # per-bar OHLC reconstruction (pool-R units) + SL-honest exit from index 0
 # ─────────────────────────────────────────────────────────────────────────────
 def recon_ohlc(mae, mfe, close):
-    n = len(mae)
     lo = np.where(np.r_[True, mae[1:] < mae[:-1]], mae, close)
     hi = np.where(np.r_[True, mfe[1:] > mfe[:-1]], mfe, close)
     lo = np.minimum(lo, close)
@@ -223,7 +222,6 @@ def analysis_B(trades, summ):
         realised = {tid: sl_honest(t["hi"], t["lo"], t["close"], sl) for tid, t in trades.items()}
         r = np.array(list(realised.values()))
         # winners at this SL stopped before peak: prepeak_dip (unstopped) >= sl
-        win_mask = r > 0
         win_tids = [tid for tid, v in realised.items() if v > 0]
         pdip = summ.set_index("trade_id").loc[win_tids, "prepeak_dip_atr"]
         pct_stopped_before_peak = float((pdip >= sl).mean() * 100) if len(pdip) else 0.0
@@ -263,8 +261,6 @@ def analysis_C(trades, summ, baseline_mean):
                          dict(zip(summ.trade_id, summ.realised_R)), summ) * 100,
                      net_mean_R_vs_full=baseline_mean,
                      note="all trades filled at bar-0"))
-
-    base_full_mean = baseline_mean  # net basis: mean over the FULL pool (no-fills = 0 contribution? no)
 
     # C1 — limit-buy below signal at -L*ATR (R2 limit = -L/2)
     for L in LIMIT_L:
@@ -363,9 +359,11 @@ def analysis_D(trades, summ):
         rmae = np.minimum.accumulate(t["lo"]) * ATR_PER_POOLR
         w = tid in win_tids
         for k in range(len(rmfe)):
-            by_t_all_mfe[k].append(rmfe[k]); by_t_all_mae[k].append(rmae[k])
+            by_t_all_mfe[k].append(rmfe[k])
+            by_t_all_mae[k].append(rmae[k])
             if w:
-                by_t_win_mfe[k].append(rmfe[k]); by_t_win_mae[k].append(rmae[k])
+                by_t_win_mfe[k].append(rmfe[k])
+                by_t_win_mae[k].append(rmae[k])
 
     def pct(a, p):
         return float(np.percentile(a, p)) if len(a) else float("nan")
@@ -491,7 +489,6 @@ def write_doc(summ, dist_tbl, hist_tbl, cum, sl_tbl, c_tbl, env_df, baseline_mea
     win = summ[summ.is_winner == 1]
     sg = sl_tbl.set_index("sl_mult_atr")
     spread = float(sg.mean_R.max() - sg.mean_R.min())
-    best_sl = float(sg.mean_R.idxmax())
     tight_region = sg.loc[[1.0, 1.5, 2.0]].mean_R
     plateau_region = sg.loc[[2.5, 3.0, 3.5, 4.0]].mean_R
     plateau_spread = float(plateau_region.max() - plateau_region.min())

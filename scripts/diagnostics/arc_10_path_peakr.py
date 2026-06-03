@@ -46,11 +46,11 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
-from core.sim.exit_policies.path_simulate import simulate_path  # noqa: E402
-from core.steps._classifier_defaults import build_rf  # noqa: E402
-
 from sklearn.metrics import roc_auc_score  # noqa: E402
 from sklearn.model_selection import TimeSeriesSplit  # noqa: E402
+
+from core.sim.exit_policies.path_simulate import simulate_path  # noqa: E402
+from core.steps._classifier_defaults import build_rf  # noqa: E402
 
 # ── paths ───────────────────────────────────────────────────────────────────
 PATHS_PQ = ROOT / "results" / "l_arc_10" / "step_1" / "trade_paths.parquet"
@@ -224,8 +224,8 @@ def analysis_A(df: pd.DataFrame):
 
     # cross-tab terminal_peak bucket x realized bucket
     ct = pd.crosstab(df.peak_atr_bucket, df.realized_bucket)
-    ct = ct.reindex(index=[l for l in PEAK_ATR_LABELS if l in ct.index],
-                    columns=[l for l in REALIZED_LABELS if l in ct.columns])
+    ct = ct.reindex(index=[lab for lab in PEAK_ATR_LABELS if lab in ct.index],
+                    columns=[lab for lab in REALIZED_LABELS if lab in ct.columns])
     return bucket_tbl, ct
 
 

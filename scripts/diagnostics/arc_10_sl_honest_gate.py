@@ -50,10 +50,9 @@ ROOT = Path(__file__).resolve().parents[2]
 for _p in ["", "scripts/analysis", "scripts/l_arc_10_v3_0_2_governed", "scripts/audit/arc_10"]:
     sys.path.insert(0, str(ROOT / _p))
 
-import canonical_wfo as cw  # noqa: E402
-import canonical_wfo_ea_faithful as eaf  # noqa: E402  holdout_year_tids
 import fundednext_floating as ff  # noqa: E402
 import governed_wfo as gw  # noqa: E402
+
 from core.time_utils.session_boundary import utc_to_eet_trading_day  # noqa: E402
 
 OUTDIR = ROOT / "results" / "diagnostics" / "arc_10_sl_honest_gate"
@@ -183,8 +182,7 @@ def main():
     print("[build] SL-honest schedules…", flush=True)
     D_h = build_D(meta_h, paths, cost_r)
 
-    hy_r = eaf.holdout_year_tids(dict(fold_tids=D_r["fold_tids"],
-                                      _meta=meta)) if False else holdout_years(meta)
+    hy_r = holdout_years(meta)
     hy_h = holdout_years(meta_h)  # same tid->year mapping (entry_time unchanged)
 
     # ── run both engines, all folds ──

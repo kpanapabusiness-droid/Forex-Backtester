@@ -18,6 +18,7 @@ from typing import Iterable
 
 import pandas as pd
 
+from core.sim.costs.model import CostModel, apply_cost_model
 from core.sim.multipair_backtester import RunResult
 from core.time_utils.session_boundary import (
     SUPPORTED_CONVENTIONS,
@@ -30,6 +31,13 @@ from core.wfo.gates import FoldStats
 # measurement uses the EET broker trading day post-PR-189. KH-24 and
 # legacy callers may opt back to UTC via boundary_convention="utc".
 _EET_TZ: str = "Europe/Athens"
+
+# FundedNext is the gate default cost profile (1.5x spread, $5/lot RT, 0.5
+# pip/fill slippage, swaps off) — the higher cost, as the conservative bound.
+# This is the chokepoint that resolves HONEST_ENGINE_SWEEP.md Part C: every
+# FoldStats-producing gate path nets broker costs by default. A cost-free
+# FoldStats requires an EXPLICIT CostModel.zero() — never the silent default.
+_DEFAULT_FUNDEDNEXT: CostModel = CostModel.fundednext()
 
 
 def slice_equity_to_oos(equity: pd.Series, fold: Fold) -> pd.Series:
@@ -84,13 +92,22 @@ def build_fold_stats_from_run(
     fold: Fold,
     run_result: RunResult,
     starting_balance: float,
+    cost_model: CostModel = _DEFAULT_FUNDEDNEXT,
 ) -> FoldStats:
     """Convert a RunResult into a FoldStats restricted to fold's OOS window.
 
     Trade count uses OOS-only entries; ROI uses OOS-restricted equity;
     DD uses OOS-restricted equity; daily-breach count uses OOS days.
+
+    Broker costs (``cost_model``, FundedNext by default) are netted at this
+    gate-scoring layer: the engine output is gross, and ``apply_cost_model``
+    rebuilds a net equity curve by debiting each closed position's cost at its
+    final exit bar (so net ROI / DD / daily-breach are all faithful). Pass
+    ``CostModel.zero()`` for an EXPLICIT cost-free FoldStats — there is no
+    silent cost-free default.
     """
-    equity = slice_equity_to_oos(run_result.equity_curve, fold)
+    costed = apply_cost_model(run_result, cost_model)
+    equity = slice_equity_to_oos(costed.net_equity, fold)
     if len(equity) == 0:
         return FoldStats(
             fold_id=fold.fold_id,

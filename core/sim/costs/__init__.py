@@ -12,10 +12,15 @@ Public API:
         compute_slippage_pips,
         compute_extra_spread_price,
         rollover_instants_utc,
+        # gate-layer model (nets the primitives onto a gross RunResult):
+        CostModel,
+        CostedRunResult,
+        apply_cost_model,
     )
 """
 
 from core.sim.costs.commission import compute_commission_usd
+from core.sim.costs.model import CostedRunResult, CostModel, apply_cost_model
 from core.sim.costs.slippage import compute_slippage_pips
 from core.sim.costs.spread_multiplier import compute_extra_spread_price
 from core.sim.costs.swap import compute_swap_usd, rollover_instants_utc
@@ -26,4 +31,7 @@ __all__ = [
     "compute_commission_usd",
     "compute_slippage_pips",
     "compute_extra_spread_price",
+    "CostModel",
+    "CostedRunResult",
+    "apply_cost_model",
 ]

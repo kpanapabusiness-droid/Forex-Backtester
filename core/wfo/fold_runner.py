@@ -98,7 +98,16 @@ def _annualised_roi(equity: pd.Series) -> float:
 
 
 def _build_fold_stats(fold: Fold, result: RunResult, starting_balance: float) -> FoldStats:
-    """Convert a RunResult into the FoldStats the §3 gate consumes."""
+    """Convert a RunResult into the FoldStats the §3 gate consumes.
+
+    COST-FREE BY DESIGN. This is the KH-24 anchor path — an engine determinism
+    fixture (byte-identity to the legacy ``KH24FoldRunner``), NOT a deployable
+    gate (see CLAUDE.md). It intentionally does NOT net broker costs: the
+    architecture gate path (A1-A6) nets FundedNext costs via
+    ``core.runners._fold_stats_helpers.build_fold_stats_from_run``; this anchor
+    must stay gross to preserve byte-identity. The exception is explicit here so
+    it is never a silent cost-free gate number.
+    """
     equity = result.equity_curve
     if len(equity) == 0:
         return FoldStats(

@@ -3,6 +3,7 @@ target-version = "py312"
 
 exclude = [
   "notebooks/**",
+  "archive/**",
   "research/**",
   "results/**",
   "results_history/**",

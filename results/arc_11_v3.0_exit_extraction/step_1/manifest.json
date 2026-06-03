@@ -1,0 +1,11 @@
+{
+  "artefacts": {
+    "integrity_report.md": "e11ee7eb4b7ba4b02cda9f140a14690ef34bab4c48cd651c48e768c2b01be095",
+    "paths.parquet": "5074d9ae45ce2f9470623d05504c25a8d0f091167319739f6a088305437e1b0e",
+    "pool.parquet": "0ee1979d551b5d147053e926e1f7069644975864add8c87ab9de9d0ac8a25847"
+  },
+  "causal_lineage": "clean",
+  "pool_sha256": "8090aeac2b3b1a43861601841d8867f8f3f550dda7951817a0e6b713a2ba7264",
+  "primary_tf": "H4",
+  "signal_name": "shb_swing_high_breakout_trend_long"
+}

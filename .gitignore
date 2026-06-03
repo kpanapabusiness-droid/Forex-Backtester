@@ -126,6 +126,13 @@ results/l_arc_7_v3.0.2/run.log
 # Exclude the multi-MB raw run log (the run_summary.json + closure capture
 # the verdict and metrics).
 results/l_arc_5_v3.0.2/run.log
+# Arc 11 v3.0 exit-extraction re-run (world #2: ArcFoldRunner + Amendment 3).
+# Step 1-5 artefacts + closure; raw logs excluded (run_summary.json + closure
+# capture the verdict/metrics).
+!results/arc_11_v3.0_exit_extraction/
+!results/arc_11_v3.0_exit_extraction/**
+results/arc_11_v3.0_exit_extraction/run.log
+results/arc_11_v3.0_exit_extraction/warm_cache.log
 # Arc 7 r=2% analysis re-run (user override, not an arc closure).
 # Driver + configs cherry-picked into main via PR #208-era cleanup; this
 # branch carries only the report + the artefacts produced by the script

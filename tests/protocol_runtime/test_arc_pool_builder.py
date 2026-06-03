@@ -62,8 +62,6 @@ def test_bars_to_1r_mfe_is_sl_honest() -> None:
     where set it is (a) <= bars_held and (b) backed by mfe_r >= 1.0 (the
     high genuinely reached +1R); a same-bar +1R/SL trade leaves it NaN even
     though raw mfe_r touched +1R. See core.sim.honest_label."""
-    import numpy as np
-
     pool = _run_builder()
     df = pool.trades
     assert "bars_to_1r_mfe" in df.columns

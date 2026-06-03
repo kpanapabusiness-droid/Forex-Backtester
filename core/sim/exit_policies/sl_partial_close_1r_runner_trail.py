@@ -1,26 +1,4 @@
-"""``sl_partial_close_1r_runner_trail`` — Arc 10's load-bearing exit.
-
-Reference: [scripts/l_arc_10_v3/step_5.py:219-250][]:
-
-  tp1_i = first_at_least(new_mfe_at, 1.0)   # MFE (high) first ≥ +1R
-  if tp1_i < 0:
-      # never reached → falls through to SL / time-exit semantics
-      ...
-  half_r = 1.0
-  trail_r = 0.0
-  trail_exit_i = -1
-  for i in range(tp1_i, n):
-      if isfinite(new_mfe_at[i]):
-          trail_r = max(trail_r, new_mfe_at[i] - 1.0)
-      if isfinite(new_close_at[i]) and new_close_at[i] <= trail_r and i > tp1_i:
-          trail_exit_i = i; break
-  if sl_breach >= 0 and sl_breach > tp1_i and (trail_exit_i < 0 or sl_breach <= trail_exit_i):
-      runner_r = -1.0
-  elif trail_exit_i >= 0:
-      runner_r = float(new_close_at[trail_exit_i])
-  else:
-      runner_r = float(new_close_at[end_held])
-  final_r = 0.5 * half_r + 0.5 * runner_r
+"""``sl_partial_close_1r_runner_trail`` — close 50% at +1R, trail the runner.
 
 Semantics (long):
 
@@ -31,37 +9,36 @@ Semantics (long):
 * **Stage 2 — runner phase (post-tp1).** Remaining 50% open.
   - Original SL still binds (intra-bar SL infrastructure handles).
   - Trail anchor: ``peak_mfe_since_entry`` = running max of
-    ``bar.high_bid``. The reference uses peak MFE over the entire
-    path (initialised before tp1_i); canonical engine mirrors that
-    by ratcheting peak from bar 0, not from tp1.
+    ``bar.high_bid``, ratcheted from bar 0 (path-wide peak).
   - Trail level: ``peak_high_bid − R_atr`` (i.e. 1R below peak).
   - Trail-hit detection: ``bar.close_bid <= trail_level`` AND the
-    current bar is strictly AFTER the tp1 bar (reference's
-    ``i > tp1_i`` constraint — same-bar partial + trail-exit is
-    forbidden). Queues a runner full-close at next-bar open_bid.
+    current bar is strictly AFTER the tp1 bar (same-bar partial +
+    trail-exit is forbidden). Queues a runner full-close at next-bar
+    open_bid.
 
 Short side mirrors with ask-anchored trough peak + +1R-above-trough
 trail level.
 
-Wire interactions:
+Wire interactions (SL-first / take-the-loss):
 
-* The driver's existing intra-bar SL check fires on ``bar.low_bid <=
-  sl_price`` (long); when the SL fires after a partial, the
-  remaining 50% closes at ``sl_price`` (size = current_size after
-  partial). The ``parent_position_id`` linkage on the multi-leg
-  ClosedTrade lets consumers reconstruct the full close sequence.
-* The driver's existing exit_predicates and trail_manager run
-  independently. If both fire on the same bar as the partial-close
-  manager, precedence per [PROTOCOL_RUNTIME.md §8b][] (trail wins
-  vs predicate; intra-bar SL wins over both). This policy operates
-  on the same bar as the partial fire intra-bar — by design
-  (partial first, then SL if SL was breached on the SAME bar as
-  partial trigger, which the reference does not handle — the
-  reference's ``sl_breach > tp1_i`` means same-bar SL is ignored).
-* For determinism, the partial fires BEFORE the intra-bar SL check
-  on the same bar (matches reference's loop-order: tp1 detection
-  scans MFE first, then SL is only evaluated against
-  ``sl_breach > tp1_i``).
+* The driver evaluates the intra-bar stop (``bar.low_bid <= sl_price``
+  long) in ``_check_exits`` BEFORE this policy's intra-bar partial
+  hook. So if a bar breaches the stop on the SAME bar its +1R partial
+  would fire, the FULL position closes at -1R and the partial never
+  fires — the stop always takes the loss (see
+  tests/sim/test_take_the_loss_invariant.py). When the stop fires on a
+  LATER bar, after a partial has already closed 50%, the remaining 50%
+  closes at ``sl_price``; the ``parent_position_id`` linkage on the
+  multi-leg ClosedTrade lets consumers reconstruct the close sequence.
+* The driver's exit_predicates and trail_manager run independently.
+  Precedence per [PROTOCOL_RUNTIME.md §8b][]: intra-bar SL/TP is the
+  highest-precedence exit; among bar-close exits, trail wins vs
+  predicate.
+
+This policy's CODE is SL-honest: it never overrides or defers the
+driver's stop. (A retired fast-replay scorer once let the runner
+survive a same-bar stop touch; that shortcut is gone — see
+RESET_MANIFEST.md.)
 """
 
 from __future__ import annotations

@@ -153,12 +153,11 @@ class MultiPairBacktester:
     #   exit_policy_manager: canonical exit-policy state holder (see
     #     [core/sim/exit_policy_manager.py][]). When set, the driver:
     #       (a) registers any Order carrying ``exit_policy`` after fill,
-    #       (b) calls ``evaluate_intrabar_for_all`` BEFORE intra-bar SL/TP
-    #           (partial-close fires NOW at fill_price; size shadowed),
-    #       (c) honours the manager's same-bar-SL suppression set in
-    #           ``_check_exits`` (matches reference's ``sl_breach > tp1_i``
-    #           constraint for sl_partial_close_1r_runner_trail),
-    #       (d) calls ``evaluate_at_close_for_all`` AFTER trail-manager
+    #       (b) calls ``evaluate_intrabar_for_all`` AFTER intra-bar SL/TP
+    #           (``_check_exits``), so a position that breaches its stop on
+    #           the same bar its +1R partial would fire takes the full -1R
+    #           and the partial never fires (SL-first / take-the-loss),
+    #       (c) calls ``evaluate_at_close_for_all`` AFTER trail-manager
     #           ratchet; FULL_CLOSE decisions queue at-close exits
     #           (filled at next-bar open per existing pattern).
     #     When None, exit_policy is required to be None on every Order
@@ -228,15 +227,16 @@ class MultiPairBacktester:
         Order: intra-bar SL/TP (against bid/ask high/low) first, then
         exit predicates (signal-driven, evaluated at bar close).
 
-        Exit-policy interaction: when the registered policy preempted
-        intra-bar SL/TP this bar (via a PARTIAL_CLOSE fire — currently
-        only ``sl_partial_close_1r_runner_trail`` does this), the
-        manager flags the position via
-        ``has_intrabar_partial_this_bar(pos_id)``. The driver skips
-        intra-bar SL/TP for that position THIS bar — matching the
-        reference's ``sl_breach > tp1_i`` constraint so the runner
-        survives same-bar SL touches after the partial fires.
-        Predicates still run (they're bar-close-evaluated).
+        SL-first / take-the-loss: intra-bar SL/TP is ALWAYS evaluated for
+        every open position. ``_process_bar`` runs this check BEFORE the
+        exit-policy intra-bar partial, so when a bar breaches the stop on
+        the SAME bar its +1R partial would fire, the stop wins — the FULL
+        position closes at -1R and the partial never fires. The old
+        same-bar partial-suppression shortcut (which let the runner
+        survive a same-bar stop touch, flattering realised R) was retired
+        2026-06-02; see RESET_MANIFEST.md and
+        tests/sim/test_take_the_loss_invariant.py. Predicates still run
+        (they're bar-close-evaluated).
         """
         for pos_id in sorted(self.account._open.keys()):  # noqa: SLF001
             pos = self.account._open.get(pos_id)  # noqa: SLF001
@@ -245,62 +245,56 @@ class MultiPairBacktester:
             bar = snapshot.get(pos.pair)
             if bar is None or not bool(is_tradable_bar(bar.to_frame().T).iloc[0]):
                 continue
-            # Exit-policy same-bar SL suppression
-            suppress_intrabar = (
-                self.exit_policy_manager is not None
-                and self.exit_policy_manager.has_intrabar_partial_this_bar(pos_id)
-            )
 
             closed_intra = False
-            if not suppress_intrabar:
-                sl_price = self._effective_sl(pos)
-                sl_hit, sl_px = False, float("nan")
-                tp_hit, tp_px = False, float("nan")
-                if pos.direction is Direction.LONG:
-                    if sl_price is not None:
-                        sl_hit, sl_px = long_sl_triggered(bar, sl_price)
-                    if pos.tp_price is not None:
-                        tp_hit, tp_px = long_tp_triggered(bar, pos.tp_price)
-                else:
-                    if sl_price is not None:
-                        sl_hit, sl_px = short_sl_triggered(bar, sl_price)
-                    if pos.tp_price is not None:
-                        tp_hit, tp_px = short_tp_triggered(bar, pos.tp_price)
+            sl_price = self._effective_sl(pos)
+            sl_hit, sl_px = False, float("nan")
+            tp_hit, tp_px = False, float("nan")
+            if pos.direction is Direction.LONG:
+                if sl_price is not None:
+                    sl_hit, sl_px = long_sl_triggered(bar, sl_price)
+                if pos.tp_price is not None:
+                    tp_hit, tp_px = long_tp_triggered(bar, pos.tp_price)
+            else:
+                if sl_price is not None:
+                    sl_hit, sl_px = short_sl_triggered(bar, sl_price)
+                if pos.tp_price is not None:
+                    tp_hit, tp_px = short_tp_triggered(bar, pos.tp_price)
 
-                # Intra-bar priority (SL/TP)
-                sl_reason = (
-                    "trailing_stop"
-                    if (
-                        self.trail_manager is not None
-                        and self.trail_manager.get(pos_id) is not None
-                        and self.trail_manager.get(pos_id).activated
-                    )
-                    else "stop_loss"
+            # Intra-bar priority (SL/TP)
+            sl_reason = (
+                "trailing_stop"
+                if (
+                    self.trail_manager is not None
+                    and self.trail_manager.get(pos_id) is not None
+                    and self.trail_manager.get(pos_id).activated
                 )
-                # Bar's open quotes serve as the reference bid+ask for
-                # intra-bar SL/TP fills (the actual trigger price is the
-                # fill price; bid+ask captures the spread regime at the
-                # bar for the §6.3 spread-decomposition diagnostic).
-                exit_bid_q = _bar_field(bar, "open_bid")
-                exit_ask_q = _bar_field(bar, "open_ask")
-                if self.sl_first:
-                    if sl_hit:
-                        self.account.close(pos_id, t, sl_px, sl_reason,
-                                           exit_bid=exit_bid_q, exit_ask=exit_ask_q)
-                        closed_intra = True
-                    elif tp_hit:
-                        self.account.close(pos_id, t, tp_px, "take_profit",
-                                           exit_bid=exit_bid_q, exit_ask=exit_ask_q)
-                        closed_intra = True
-                else:
-                    if tp_hit:
-                        self.account.close(pos_id, t, tp_px, "take_profit",
-                                           exit_bid=exit_bid_q, exit_ask=exit_ask_q)
-                        closed_intra = True
-                    elif sl_hit:
-                        self.account.close(pos_id, t, sl_px, sl_reason,
-                                           exit_bid=exit_bid_q, exit_ask=exit_ask_q)
-                        closed_intra = True
+                else "stop_loss"
+            )
+            # Bar's open quotes serve as the reference bid+ask for
+            # intra-bar SL/TP fills (the actual trigger price is the
+            # fill price; bid+ask captures the spread regime at the
+            # bar for the §6.3 spread-decomposition diagnostic).
+            exit_bid_q = _bar_field(bar, "open_bid")
+            exit_ask_q = _bar_field(bar, "open_ask")
+            if self.sl_first:
+                if sl_hit:
+                    self.account.close(pos_id, t, sl_px, sl_reason,
+                                       exit_bid=exit_bid_q, exit_ask=exit_ask_q)
+                    closed_intra = True
+                elif tp_hit:
+                    self.account.close(pos_id, t, tp_px, "take_profit",
+                                       exit_bid=exit_bid_q, exit_ask=exit_ask_q)
+                    closed_intra = True
+            else:
+                if tp_hit:
+                    self.account.close(pos_id, t, tp_px, "take_profit",
+                                       exit_bid=exit_bid_q, exit_ask=exit_ask_q)
+                    closed_intra = True
+                elif sl_hit:
+                    self.account.close(pos_id, t, sl_px, sl_reason,
+                                       exit_bid=exit_bid_q, exit_ask=exit_ask_q)
+                    closed_intra = True
 
             if closed_intra:
                 if self.trail_manager is not None:
@@ -435,22 +429,23 @@ class MultiPairBacktester:
         # 1b. fill any entries pending from prior bar (registers trail +
         #     exit_policy_manager state on fill)
         self._fill_pending_entries(t, snapshot)
-        # 2a. exit-policy INTRA-BAR evaluation. Fires BEFORE _check_exits
-        #     so that ``sl_partial_close_1r_runner_trail``'s partial-at-+1R
-        #     fires on the bar's high before the existing intra-bar SL is
-        #     evaluated against the bar's low (matches reference's
-        #     ``sl_breach > tp1_i`` constraint). The manager's
-        #     ``has_intrabar_partial_this_bar`` flag is consulted inside
-        #     ``_check_exits`` to suppress same-bar intra-bar SL/TP for
-        #     the position that just partial-closed.
+        # 2a. intra-bar SL/TP + bar-close predicate exits. Runs BEFORE the
+        #     exit-policy intra-bar partial so the stop is SL-first: when a
+        #     bar breaches the stop on the SAME bar its +1R partial would
+        #     fire, the stop wins and the FULL position closes at -1R — the
+        #     partial never fires (take-the-loss invariant; the old same-bar
+        #     partial-suppression shortcut was retired 2026-06-02). Predicate
+        #     hits go to _pending_closes for next-bar-open fill.
+        self._check_exits(t, snapshot)
+        # 2b. exit-policy INTRA-BAR evaluation (e.g.
+        #     ``sl_partial_close_1r_runner_trail``'s partial-at-+1R). Only
+        #     positions that SURVIVED the intra-bar stop above are still open
+        #     here, so a same-bar stop breach has already taken the loss.
         if self.exit_policy_manager is not None:
             intrabar_decisions = self.exit_policy_manager.evaluate_intrabar_for_all(
                 snapshot, self.account
             )
             self._apply_intrabar_policy_decisions(t, intrabar_decisions, snapshot)
-        # 2b. intra-bar SL/TP + bar-close predicate exits
-        #     (predicate hits go to _pending_closes for next-bar-open fill)
-        self._check_exits(t, snapshot)
         # 3. update trailing stops at bar close AND queue trail-triggered
         #    closes for next-bar-open fill (EA pattern per PR-E.1.6 §B).
         #

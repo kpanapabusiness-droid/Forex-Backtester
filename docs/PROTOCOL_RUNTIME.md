@@ -591,13 +591,15 @@ exit_policy_manager=...)`. The driver:
      actual fill price). TP-style policies populate `Order.tp_price`
      here so the existing intra-bar TP infrastructure handles fire+fill
      at the exact TP level (realised R = exactly +2R / +3R).
-  2. Calls `manager.evaluate_intrabar_for_all(...)` BEFORE intra-bar
-     SL/TP — partial-close at +1R fires on bar high before SL is
-     evaluated against bar low. The manager's
-     `has_intrabar_partial_this_bar(pos_id)` flag SUPPRESSES same-bar
-     intra-bar SL/TP for the position that just partial-closed
-     (matches reference's `sl_breach > tp1_i` constraint so the runner
-     survives the same-bar low).
+  2. Calls `manager.evaluate_intrabar_for_all(...)` AFTER intra-bar
+     SL/TP (`_check_exits`). The stop is SL-first: if a bar breaches the
+     stop on the same bar its +1R partial would fire, the full position
+     has already closed at -1R in step (2a) and the partial never fires
+     (take-the-loss). The old same-bar partial-suppression shortcut —
+     which let the runner survive a same-bar stop touch — was retired
+     2026-06-02 (see RESET_MANIFEST.md and
+     docs/ARC_10_GATE_FIDELITY_DEFECT.md; pinned by
+     tests/sim/test_take_the_loss_invariant.py).
   3. Calls `manager.evaluate_at_close_for_all(...)` AFTER trail-manager
      ratchet. Trailing-style policies and partial-close runner-trail
      fire here; queued at next-bar open per existing pattern.

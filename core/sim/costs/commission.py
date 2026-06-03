@@ -7,6 +7,12 @@ closed trade (entry-leg + exit-leg combined as a single round-turn).
 (not reduced after TP1 partial close — commission is for the full round-turn
 of the position, not per-leg).
 
+Gate default note: the gate cost model (``core.sim.costs.model.CostModel``)
+passes the FundedNext rate ``rate_per_lot_rt=5.0`` explicitly — the higher
+cost, as the conservative bound. This primitive's ``$4.00`` default (5ers) is
+left unchanged; only the caller's override differs, so the cost math here is
+untouched.
+
 Pure post-hoc R-adjustment primitive. Does NOT modify simulate_path. Designed
 for the deferred-haircut model documented at core/sim/account.py:23-28.
 """

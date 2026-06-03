@@ -6,7 +6,7 @@ holds one ``ExitPolicyManager`` instance per backtest run and:
   * Calls :meth:`register` at trade fill time for any Order carrying a
     policy spec — the manager constructs per-position
     :class:`ExitPolicyState` via ``policy.make_state(ctx)``.
-  * Calls :meth:`evaluate_intrabar_for_all` once per bar, BEFORE the
+  * Calls :meth:`evaluate_intrabar_for_all` once per bar, AFTER the
     existing intra-bar SL/TP check. Used by policies whose triggers
     fire at a specific intra-bar price level (currently only
     ``sl_partial_close_1r_runner_trail``).
@@ -15,18 +15,19 @@ holds one ``ExitPolicyManager`` instance per backtest run and:
     runner-trail portion of partial-close.
   * Calls :meth:`deregister` on full close.
 
-Same-bar SL preemption
-----------------------
-When a policy fires a PARTIAL_CLOSE intra-bar, the manager records the
-position id in :attr:`positions_with_intrabar_partial_this_bar`. The
-driver uses this set to SKIP the existing intra-bar SL/TP check for
-that position THIS bar — matching the reference's
-``sl_breach > tp1_i`` constraint for ``sl_partial_close_1r_runner_trail``
-(the partial fires on the bar's high BEFORE the bar's low is
-considered for SL purposes; runner survives the same-bar low).
+Same-bar stop is SL-first (take-the-loss)
+-----------------------------------------
+The driver evaluates the intra-bar stop BEFORE this manager's intra-bar
+hook, so a position that breaches its stop on the same bar its +1R
+partial would fire is already closed at -1R — the partial never fires.
+There is NO same-bar stop suppression (the old same-bar partial-close
+shortcut that let the runner survive a same-bar stop touch was retired
+2026-06-02; see RESET_MANIFEST.md).
 
-The set is cleared at the START of each :meth:`evaluate_intrabar_for_all`
-call, so it is per-bar transient.
+:attr:`positions_with_intrabar_partial_this_bar` is retained purely as
+informational per-bar bookkeeping (which positions fired a partial this
+bar); it is cleared at the START of each :meth:`evaluate_intrabar_for_all`
+call, so it is per-bar transient. It no longer gates the driver's stop.
 
 Determinism
 -----------
@@ -72,8 +73,8 @@ class ExitPolicyManager:
         self._regs: dict[int, _PolicyRegistration] = {}
         # Per-bar transient set: positions that had an intra-bar
         # PARTIAL_CLOSE this bar. Cleared at the start of each
-        # evaluate_intrabar_for_all call. Read by the driver to
-        # suppress intra-bar SL/TP on the same bar.
+        # evaluate_intrabar_for_all call. Informational bookkeeping only —
+        # the driver is SL-first and does NOT suppress same-bar stops.
         self.positions_with_intrabar_partial_this_bar: set[int] = set()
 
     # ── lifecycle ───────────────────────────────────────────────────
@@ -127,7 +128,8 @@ class ExitPolicyManager:
     def has_intrabar_partial_this_bar(self, position_id: int) -> bool:
         """True iff this position fired a partial close this bar.
 
-        Driver uses this to suppress intra-bar SL/TP on the same bar.
+        Informational only (the driver is SL-first and does not suppress
+        same-bar stops). Retained for diagnostics/tests.
         """
         return position_id in self.positions_with_intrabar_partial_this_bar
 

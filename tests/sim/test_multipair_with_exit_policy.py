@@ -3,7 +3,7 @@
 Synthetic-bar fixtures that exercise:
   * exit_policy=None preserves prior driver behaviour
   * sl_partial_close_1r_runner_trail fires partial intra-bar + runner trail
-  * Same-bar SL suppression on the tp1 bar (reference's sl_breach > tp1_i)
+  * Same-bar stop takes the loss on the tp1 bar (SL-first; no suppression)
   * sl_plus_tp_2r uses existing intra-bar TP infrastructure (no new code path)
   * Fail-loud RuntimeError when Order carries exit_policy but driver lacks manager
 """
@@ -244,32 +244,23 @@ def test_partial_close_runner_sl_hits_after_partial() -> None:
     assert legs[1].size == pytest.approx(5_000.0)
 
 
-def test_partial_close_same_bar_sl_suppression() -> None:
-    """The tp1 bar has BOTH high >= +1R AND low <= SL. Reference forbids
-    runner SL-out on tp1 bar (``sl_breach > tp1_i`` constraint). Canonical
-    engine honours this via the manager's suppression flag.
+def test_partial_close_same_bar_sl_takes_the_loss() -> None:
+    """The tp1 bar has BOTH high >= +1R AND low <= SL. SL-first / take-the-loss:
+    the driver evaluates the intra-bar stop BEFORE the +1R partial, so the
+    FULL position closes at the stop (-1R) on the tp1 bar and the partial
+    NEVER fires. (The old engine suppressed the same-bar stop and let the
+    runner survive — that result-flattering shortcut was retired 2026-06-02.)
 
-    The salient assertion: the runner does NOT exit on the tp1 bar (t=2)
-    via stop_loss. Without suppression, intra-bar SL on the partial-bar's
-    low (1.097 ≤ SL 1.098) would close the runner at SL_price=1.098 with
-    exit_time=t=2. With suppression, the runner survives bar 2 and exits
-    on a subsequent bar via runner_trail or actual stop_loss.
-
-    Bar layout: bar 2 has high=1.102 (tp1) AND low=1.097 (would breach SL).
-    Bar 3 close is engineered above the runner-trail level so the trail
-    doesn't fire on bar 3 either. Bar 4 has a clean SL touch.
+    Bar layout: bar 2 has high=1.102 (would fire tp1) AND low=1.097
+    (breaches SL=1.098). Expect a SINGLE stop_loss leg of full size on
+    bar 2 — no partial.
     """
     panel = _make_panel([
         _bar("2026-01-01 00:00", o=1.099, h=1.100, lo=1.098, c=1.099),
         _bar("2026-01-01 01:00", o=1.100, h=1.101, lo=1.099, c=1.100),
-        # t=2: tp1 bar. high=1.102 fires tp1; low=1.097 would breach SL
-        # but is suppressed. Peak after bar 2 = 1.102 → trail = 1.100.
-        # close=1.1015 > trail 1.100 so trail wouldn't fire even if we
-        # got an evaluate_at_close on this bar (we don't: i > tp1_i).
+        # t=2: high=1.102 would fire tp1; low=1.097 breaches SL. SL wins.
         _bar("2026-01-01 02:00", o=1.100, h=1.102, lo=1.097, c=1.1015),
-        # t=3: peak ratchets up; trail rises. close above trail → no fire.
         _bar("2026-01-01 03:00", o=1.1015, h=1.1030, lo=1.1010, c=1.1025),
-        # t=4: clean SL hit (low=1.097 ≤ SL=1.098); not tp1 bar.
         _bar("2026-01-01 04:00", o=1.1025, h=1.1025, lo=1.097, c=1.098),
     ])
     acct = Account(
@@ -289,17 +280,13 @@ def test_partial_close_same_bar_sl_suppression() -> None:
     )
     result = bt.run()
     legs = list(result.closed_trades)
-    assert len(legs) == 2
-    # Leg 1: partial at +1R on tp1 bar
-    assert legs[0].exit_reason == "partial_close_1r"
-    assert legs[0].exit_price == pytest.approx(1.102)
+    # Single full-size stop_loss leg on the tp1 bar — partial never fired.
+    assert len(legs) == 1
+    assert legs[0].exit_reason == "stop_loss"
+    assert legs[0].exit_price == pytest.approx(1.098)
     assert legs[0].exit_time == pd.Timestamp("2026-01-01 02:00", tz="UTC")
-    # Leg 2: NOT closed on tp1 bar at SL — suppression worked
-    assert legs[1].exit_time != pd.Timestamp("2026-01-01 02:00", tz="UTC")
-    # Specifically: SL hit on bar 4
-    assert legs[1].exit_reason == "stop_loss"
-    assert legs[1].exit_price == pytest.approx(1.098)
-    assert legs[1].exit_time == pd.Timestamp("2026-01-01 04:00", tz="UTC")
+    assert legs[0].size == pytest.approx(10_000.0)
+    assert legs[0].parent_position_id is None
 
 
 # ────────────────────────────────────────────────────────────────────────

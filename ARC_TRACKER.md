@@ -4,7 +4,7 @@
 > Schema locked at v3.0. Replaces STATUS.md, CHANGELOG.md, ARC_QUEUE.md, and ACTIVE_ARCS.md.
 > First populated on first arc open under L_PROTOCOL v3.0.
 
-Last auto-update: parser: 2026-06-03 00:00:00
+Last auto-update: parser: 2026-06-02 08:40:00
 
 ---
 
@@ -44,7 +44,7 @@ Last auto-update: parser: 2026-06-03 00:00:00
 | l_arc_11_v3.0.2 | swing-high breakout in trend (SHB) long, 4H, causal 3-bar swing (right-edge t-4) | H4 | vanilla | A1 system_level_filter | -0.74 | FAIL |  | 5 | results/l_arc_11_v3.0.2/ARC_CLOSURE.md |
 | arc_discovery_01_partial | discovered_via_search (random search, n=10000; 511 rules completed before kill) | H1 | signal_discovery_probe | N/A | N/A | ARCHIVED_PARTIAL | N/A | step_1_compute_blowup | archive/probes/arc_discovery_01_partial/README.md |
 | l_arc_5_v3.0.2 | mtf_alignment.2_down_mixed.kijun.h_120 (1H structural; H4+D1 aux) | H1 | vanilla | A1 system_level_filter | -0.9518780593556826 | FAIL |  | 5 | results/l_arc_5_v3.0.2/ARC_CLOSURE.md |
-| arc_11_v3.0_exit_extraction | swing-high breakout in trend (SHB), long, 4H, causal 3-bar swing (right-edge t-4) | 4H | vanilla | A1 system_level_filter | -0.847 | FAIL |  | 5 | results/arc_11_v3.0_exit_extraction/ARC_CLOSURE.md |
+| arc_7_v3.0_exit_extraction | liquidity sweep + reclaim long (4H structural reversal) — exit-extraction re-run | 4H | vanilla | A3 pipeline_de | -0.6144233009627034 | FAIL |  | 5 | results/arc_7_v3.0_exit_extraction/ARC_7_V3.0_CLOSURE.md |
 
 ---
 
@@ -52,29 +52,29 @@ Last auto-update: parser: 2026-06-03 00:00:00
 
 | Feature | Arcs used | Avg WFO ratio with | Avg WFO ratio without | Verdict |
 |---|---|---|---|---|
-| w1_close_slope_sign | 3 | 0.926 | 1.453 | HURTS |
-| d1_atr_percentile_100 | 1 | -0.769 | 1.524 | INSUFFICIENT |
-| prior_session_low_distance | 4 | -0.197 | 2.289 | HURTS |
-| day_of_week | 1 | -0.769 | 1.524 | INSUFFICIENT |
-| session_london | 1 | -0.769 | 1.524 | INSUFFICIENT |
-| d1_close_slope_magnitude | 3 | 0.881 | 1.472 | HURTS |
-| distance_to_round_number | 4 | -0.197 | 2.289 | HURTS |
-| atr_percentile_100 | 4 | 1.132 | 1.403 | NEUTRAL |
-| usd_strength_index | 2 | 0.490 | 1.496 | INSUFFICIENT |
-| spread_vs_trailing_100 | 3 | 0.009 | 1.846 | HURTS |
-| swing_low_distance_14 | 2 | 0.466 | 1.826 | INSUFFICIENT |
-| atr_vs_trailing_100 | 3 | 1.765 | 1.403 | LIFTS |
-| kijun_26_distance | 3 | 1.720 | 1.426 | NEUTRAL |
-| dollar_bloc_state | 1 | 1.749 | 1.496 | INSUFFICIENT |
-| spread_percentile_100 | 2 | 0.399 | 1.846 | INSUFFICIENT |
-| atr_14 | 3 | 0.865 | 0.989 | NEUTRAL |
-| prior_session_high_distance | 1 | -0.817 | 1.228 | INSUFFICIENT |
-| session_tokyo | 2 | 1.773 | 0.600 | INSUFFICIENT |
-| range_close_ratio | 1 | -0.817 | 1.228 | INSUFFICIENT |
-| d1_close_slope_sign | 2 | 1.706 | 0.989 | INSUFFICIENT |
-| session_ny | 1 | 4.363 | 0.600 | INSUFFICIENT |
-| session_dead | 2 | 1.706 | 0.989 | INSUFFICIENT |
-| session_ldn_ny_overlap | 1 | -0.952 | -0.847 | INSUFFICIENT |
+| w1_close_slope_sign | 3 | 0.926 | 1.486 | HURTS |
+| d1_atr_percentile_100 | 1 | -0.769 | 1.550 | INSUFFICIENT |
+| prior_session_low_distance | 4 | -0.197 | 2.328 | HURTS |
+| day_of_week | 1 | -0.769 | 1.550 | INSUFFICIENT |
+| session_london | 1 | -0.769 | 1.550 | INSUFFICIENT |
+| d1_close_slope_magnitude | 3 | 0.881 | 1.505 | HURTS |
+| distance_to_round_number | 4 | -0.197 | 2.328 | HURTS |
+| atr_percentile_100 | 4 | 1.132 | 1.442 | HURTS |
+| usd_strength_index | 2 | 0.490 | 1.525 | INSUFFICIENT |
+| spread_vs_trailing_100 | 3 | 0.009 | 1.879 | HURTS |
+| swing_low_distance_14 | 2 | 0.466 | 1.860 | INSUFFICIENT |
+| atr_vs_trailing_100 | 3 | 1.765 | 1.442 | LIFTS |
+| kijun_26_distance | 3 | 1.720 | 1.465 | NEUTRAL |
+| dollar_bloc_state | 1 | 1.749 | 1.525 | INSUFFICIENT |
+| spread_percentile_100 | 2 | 0.399 | 1.879 | INSUFFICIENT |
+| atr_14 | 3 | 0.865 | 1.047 | NEUTRAL |
+| prior_session_high_distance | 1 | -0.817 | 1.266 | INSUFFICIENT |
+| session_tokyo | 2 | 1.773 | 0.647 | INSUFFICIENT |
+| range_close_ratio | 1 | -0.817 | 1.266 | INSUFFICIENT |
+| d1_close_slope_sign | 2 | 1.706 | 1.047 | INSUFFICIENT |
+| session_ny | 1 | 4.363 | 0.647 | INSUFFICIENT |
+| session_dead | 2 | 1.706 | 1.047 | INSUFFICIENT |
+| session_ldn_ny_overlap | 1 | -0.952 | -0.614 | INSUFFICIENT |
 
 Schema:
 - `Avg WFO ratio with` — mean worst-fold ratio across arcs where this feature appeared in the winning config
@@ -87,10 +87,10 @@ Schema:
 
 | Architecture | Arcs tested | Won (best in arc) | Avg ratio when won |
 |---|---|---|---|
-| A1 system_level_filter | 10 | 4 | 2.528 |
+| A1 system_level_filter | 10 | 3 | 3.653 |
 | A2 classifier_filter | 2 | 0 | — |
-| A3 pipeline_de | 2 | 0 | — |
-| A4 pipeline_d_exits | 4 | 0 | — |
+| A3 pipeline_de | 3 | 0 | — |
+| A4 pipeline_d_exits | 3 | 0 | — |
 | A5 portfolio_composition | 1 | 0 | — |
 | A6 meta_labeling | 4 | 1 | 1.749 |
 
@@ -104,11 +104,11 @@ Note: Arc 11 has no architecture row marked "Won" because no config met §3 PASS
 |---|---|---|---|
 | V-shape recovery | 3 | 6.03 | 0.981 |
 | Stepwise climber | 0 | — | — |
-| Bimodal | 7 | 7.75 | 1.000 |
+| Bimodal | 7 | 7.76 | 1.000 |
 | Monotonic up | 0 | — | — |
 | Monotonic down | 9 | 1.24 | 0.267 |
 | Choppy | 2 | 1.27 | 0.601 |
-| Unclassified | 6 | 1.38 | 0.546 |
+| Unclassified | 6 | 1.38 | 0.545 |
 | Other / unclassified | 0 | — | — |
 
 Note: "in-cluster R" tracked as `mfe_p50_r` per template §4.E. Unclassified row averages over Arc 11's c1 (mfe_p50 2.11) and c2 (mfe_p50 0.51).
@@ -124,7 +124,7 @@ Note: "in-cluster R" tracked as `mfe_p50_r` per template §4.E. Unclassified row
 | no_capturable_cluster | 0 | — | — |
 | entry_feature_auc_ceiling | 1 | l_arc_8 | 2026-05-22 |
 | step5_not_scalable | 4 | l_arc_5_v3.0.2 | 2026-05-29 |
-| step5_chained_dd_above_gate | 2 | arc_11_v3.0_exit_extraction | 2026-06-03 |
+| step5_chained_dd_above_gate | 2 | arc_7_v3.0_exit_extraction | 2026-06-02 |
 | step5_daily_dd_breach | 0 | — | — |
 | step5_wf_roi_below_gate_after_scaling | 0 | — | — |
 | step5_ratio_below_gate_after_scaling | 0 | — | — |
@@ -178,10 +178,10 @@ Note: "in-cluster R" tracked as `mfe_p50_r` per template §4.E. Unclassified row
 | l_arc_5_v3.0.2.c1 | Unclassified | 42779 | 2.0955 | 0.0358 | 0.9648 | 0.9653 | 0.5110 | — | 1.5 | dies_step5 |
 | l_arc_5_v3.0.2.c2 | Unclassified | 39004 | 0.5081 | 0.9693 | 0.0477 | 0.1874 | — | — | 1.5 | dies_step3 |
 | l_arc_5_v3.0.2.c3 | Monotonic_down | 32604 | 0.0585 | 0.9994 | 0.0021 | 0.0162 | — | — | 1.5 | dies_step3 |
-| arc_11_v3.0_exit_extraction.c0 | Bimodal | 2167 | 7.7850 | 0.0030 | 1.0000 | 1.9840 | 0.5056 | — | 1.5 | dies_step5 |
-| arc_11_v3.0_exit_extraction.c1 | Unclassified | 6123 | 2.1080 | 0.0350 | 0.9650 | 0.9670 | 0.5056 | — | 1.5 | dies_step5 |
-| arc_11_v3.0_exit_extraction.c2 | Unclassified | 5012 | 0.5190 | 0.9660 | 0.0430 | 0.1900 | — | — | 1.5 | dies_step3 |
-| arc_11_v3.0_exit_extraction.c3 | Monotonic_down | 3977 | 0.0950 | 0.9990 | 0.0010 | 0.0230 | — | — | 1.5 | dies_step3 |
+| arc_7_v3.0_exit_extraction.c0 | Bimodal | 616 | 7.8625 | 0.0049 | 1.0000 | 1.9968 | 0.5037 | — | 1.5 | dies_step5 |
+| arc_7_v3.0_exit_extraction.c1 | Unclassified | 1794 | 2.1127 | 0.0385 | 0.9604 | 0.9675 | 0.5284 | — | 1.5 | dies_step5 |
+| arc_7_v3.0_exit_extraction.c2 | Unclassified | 1556 | 0.5060 | 0.9680 | 0.0440 | 0.1865 | — | — | 1.5 | dies_step3 |
+| arc_7_v3.0_exit_extraction.c3 | Monotonic_down | 1089 | 0.0967 | 0.9960 | 0.0060 | 0.0269 | — | — | 1.5 | dies_step3 |
 
 Schema:
 - `Cluster ID` — `<arc_name>.<cluster_id>` (e.g., `arc_07.c1`)
@@ -257,10 +257,12 @@ Schema:
 | amendment_5_four_gate_admission | 1 | l_arc_5_v3.0.2 |
 | amendment_6_eet_daily_dd_boundary | 1 | l_arc_5_v3.0.2 |
 | signal_module_eet_audit_state_a_restored_canonically | 1 | l_arc_5_v3.0.2 |
-| shb_capturable_not_extractable_exit_route | 1 | arc_11_v3.0_exit_extraction |
-| exit_extraction_fails_after_entry_route_de_fail | 1 | arc_11_v3.0_exit_extraction |
-| full_pool_long_only_concurrency_carryover_dd | 1 | arc_11_v3.0_exit_extraction |
-| sl_only_long_hold_oos_carryover_degenerate | 1 | arc_11_v3.0_exit_extraction |
+| capturable_not_extractable_reaffirmed | 1 | arc_7_v3.0_exit_extraction |
+| exit_extraction_does_not_generalise | 1 | arc_7_v3.0_exit_extraction |
+| full_pool_loser_dominated | 1 | arc_7_v3.0_exit_extraction |
+| entry_auc_ceiling_4h | 1 | arc_7_v3.0_exit_extraction |
+| v_shape_relabeled_bimodal_under_eet | 1 | arc_7_v3.0_exit_extraction |
+| co_fire_with_arc_10 | 1 | arc_7_v3.0_exit_extraction |
 
 ---
 

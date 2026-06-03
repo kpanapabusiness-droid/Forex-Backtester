@@ -3,7 +3,7 @@
     "Bimodal": {
       "n_arcs": 7,
       "n_clusters": 7,
-      "sum_mfe": 54.23869596540709,
+      "sum_mfe": 54.3162310766408,
       "sum_reach": 7.0
     },
     "Choppy": {
@@ -15,14 +15,14 @@
     "Monotonic down": {
       "n_arcs": 9,
       "n_clusters": 11,
-      "sum_mfe": 13.633796118354404,
-      "sum_reach": 2.9337119882011216
+      "sum_mfe": 13.635517531036054,
+      "sum_reach": 2.9387119882011215
     },
     "Unclassified": {
       "n_arcs": 6,
       "n_clusters": 11,
-      "sum_mfe": 15.213221085887826,
-      "sum_reach": 6.00213865169316
+      "sum_mfe": 15.204920321851997,
+      "sum_reach": 5.998562286029838
     },
     "V-shape recovery": {
       "n_arcs": 3,
@@ -34,8 +34,8 @@
   "architectures": {
     "A1": {
       "n_tested": 10,
-      "n_won": 4,
-      "sum_won_ratio": 10.112800000000002
+      "n_won": 3,
+      "sum_won_ratio": 10.959800000000001
     },
     "A2": {
       "n_tested": 2,
@@ -43,12 +43,12 @@
       "sum_won_ratio": 0.0
     },
     "A3": {
-      "n_tested": 2,
+      "n_tested": 3,
       "n_won": 0,
       "sum_won_ratio": 0.0
     },
     "A4": {
-      "n_tested": 4,
+      "n_tested": 3,
       "n_won": 0,
       "sum_won_ratio": 0.0
     },
@@ -68,139 +68,139 @@
       "n_with": 3,
       "n_without": 4,
       "sum_with": 2.5942256113357587,
-      "sum_without": 3.9542999999999995
+      "sum_without": 4.186876699037296
     },
     "atr_percentile_100": {
       "n_with": 4,
       "n_without": 6,
       "sum_with": 4.526403670691442,
-      "sum_without": 8.42092194064432
+      "sum_without": 8.653498639681615
     },
     "atr_vs_trailing_100": {
       "n_with": 3,
       "n_without": 6,
       "sum_with": 5.295103670691442,
-      "sum_without": 8.42092194064432
+      "sum_without": 8.653498639681615
     },
     "d1_atr_percentile_100": {
       "n_with": 1,
       "n_without": 9,
       "sum_with": -0.7687,
-      "sum_without": 13.716025611335759
+      "sum_without": 13.948602310373055
     },
     "d1_close_slope_magnitude": {
       "n_with": 3,
       "n_without": 7,
       "sum_with": 2.6427376208995605,
-      "sum_without": 10.3045879904362
+      "sum_without": 10.537164689473496
     },
     "d1_close_slope_sign": {
       "n_with": 2,
       "n_without": 4,
       "sum_with": 3.4114376208995605,
-      "sum_without": 3.9542999999999995
+      "sum_without": 4.186876699037296
     },
     "day_of_week": {
       "n_with": 1,
       "n_without": 9,
       "sum_with": -0.7687,
-      "sum_without": 13.716025611335759
+      "sum_without": 13.948602310373055
     },
     "distance_to_round_number": {
       "n_with": 4,
       "n_without": 6,
       "sum_with": -0.7887900689194842,
-      "sum_without": 13.736115680255242
+      "sum_without": 13.968692379292538
     },
     "dollar_bloc_state": {
       "n_with": 1,
       "n_without": 8,
       "sum_with": 1.749,
-      "sum_without": 11.96702561133576
+      "sum_without": 12.199602310373056
     },
     "kijun_26_distance": {
       "n_with": 3,
       "n_without": 6,
       "sum_with": 5.16043762089956,
-      "sum_without": 8.555587990436198
+      "sum_without": 8.788164689473493
     },
     "prior_session_high_distance": {
       "n_with": 1,
       "n_without": 6,
       "sum_with": -0.8172120095638017,
-      "sum_without": 7.365737620899562
+      "sum_without": 7.598314319936859
     },
     "prior_session_low_distance": {
       "n_with": 4,
       "n_without": 6,
       "sum_with": -0.7887900689194842,
-      "sum_without": 13.736115680255242
+      "sum_without": 13.968692379292538
     },
     "range_close_ratio": {
       "n_with": 1,
       "n_without": 6,
       "sum_with": -0.8172120095638017,
-      "sum_without": 7.365737620899562
+      "sum_without": 7.598314319936859
     },
     "session_dead": {
       "n_with": 2,
       "n_without": 4,
       "sum_with": 3.4114376208995605,
-      "sum_without": 3.9542999999999995
+      "sum_without": 4.186876699037296
     },
     "session_ldn_ny_overlap": {
       "n_with": 1,
       "n_without": 1,
       "sum_with": -0.9518780593556826,
-      "sum_without": -0.847
+      "sum_without": -0.6144233009627034
     },
     "session_london": {
       "n_with": 1,
       "n_without": 9,
       "sum_with": -0.7687,
-      "sum_without": 13.716025611335759
+      "sum_without": 13.948602310373055
     },
     "session_ny": {
       "n_with": 1,
       "n_without": 5,
       "sum_with": 4.363315680255243,
-      "sum_without": 3.0024219406443167
+      "sum_without": 3.2349986396816135
     },
     "session_tokyo": {
       "n_with": 2,
       "n_without": 5,
       "sum_with": 3.5461036706914415,
-      "sum_without": 3.0024219406443167
+      "sum_without": 3.2349986396816135
     },
     "spread_percentile_100": {
       "n_with": 2,
       "n_without": 7,
       "sum_with": 0.7971219406443175,
-      "sum_without": 12.918903670691442
+      "sum_without": 13.151480369728738
     },
     "spread_vs_trailing_100": {
       "n_with": 3,
       "n_without": 7,
       "sum_with": 0.028421940644317467,
-      "sum_without": 12.918903670691442
+      "sum_without": 13.151480369728738
     },
     "swing_low_distance_14": {
       "n_with": 2,
       "n_without": 7,
       "sum_with": 0.9317879904361984,
-      "sum_without": 12.78423762089956
+      "sum_without": 13.016814319936856
     },
     "usd_strength_index": {
       "n_with": 2,
       "n_without": 8,
       "sum_with": 0.9803000000000001,
-      "sum_without": 11.96702561133576
+      "sum_without": 12.199602310373056
     },
     "w1_close_slope_sign": {
       "n_with": 3,
       "n_without": 7,
       "sum_with": 2.7774036706914416,
-      "sum_without": 10.169921940644318
+      "sum_without": 10.402498639681614
     }
   },
   "tags": {
@@ -280,9 +280,21 @@
       ],
       "count": 1
     },
+    "capturable_not_extractable_reaffirmed": {
+      "arcs": [
+        "arc_7_v3.0_exit_extraction"
+      ],
+      "count": 1
+    },
     "chained_dd_blowout_pr_hhhl_bimodal_tight_sl": {
       "arcs": [
         "l_arc_8_v3.0.2"
+      ],
+      "count": 1
+    },
+    "co_fire_with_arc_10": {
+      "arcs": [
+        "arc_7_v3.0_exit_extraction"
       ],
       "count": 1
     },
@@ -310,15 +322,21 @@
       ],
       "count": 1
     },
+    "entry_auc_ceiling_4h": {
+      "arcs": [
+        "arc_7_v3.0_exit_extraction"
+      ],
+      "count": 1
+    },
     "ets_boundary_per_pr_189": {
       "arcs": [
         "l_arc_7"
       ],
       "count": 1
     },
-    "exit_extraction_fails_after_entry_route_de_fail": {
+    "exit_extraction_does_not_generalise": {
       "arcs": [
-        "arc_11_v3.0_exit_extraction"
+        "arc_7_v3.0_exit_extraction"
       ],
       "count": 1
     },
@@ -334,9 +352,9 @@
       ],
       "count": 1
     },
-    "full_pool_long_only_concurrency_carryover_dd": {
+    "full_pool_loser_dominated": {
       "arcs": [
-        "arc_11_v3.0_exit_extraction"
+        "arc_7_v3.0_exit_extraction"
       ],
       "count": 1
     },
@@ -395,12 +413,6 @@
       ],
       "count": 1
     },
-    "shb_capturable_not_extractable_exit_route": {
-      "arcs": [
-        "arc_11_v3.0_exit_extraction"
-      ],
-      "count": 1
-    },
     "shb_swing_detection_causal_clean_arc9_lesson_passed": {
       "arcs": [
         "l_arc_11",
@@ -417,12 +429,6 @@
     "sl_multiplier_signal_specific": {
       "arcs": [
         "l_arc_8_v3.0.2"
-      ],
-      "count": 1
-    },
-    "sl_only_long_hold_oos_carryover_degenerate": {
-      "arcs": [
-        "arc_11_v3.0_exit_extraction"
       ],
       "count": 1
     },
@@ -509,6 +515,12 @@
     "v_shape_auc_ceiling": {
       "arcs": [
         "l_arc_8"
+      ],
+      "count": 1
+    },
+    "v_shape_relabeled_bimodal_under_eet": {
+      "arcs": [
+        "arc_7_v3.0_exit_extraction"
       ],
       "count": 1
     },

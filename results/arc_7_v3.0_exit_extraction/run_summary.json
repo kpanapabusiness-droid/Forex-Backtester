@@ -1,0 +1,145 @@
+{
+  "arc_name": "arc_7_v3.0_exit_extraction",
+  "ran_at": "2026-06-02T08:20:50Z",
+  "wall_time_seconds": 2622.293036400002,
+  "pool_size": 5056,
+  "pool_sha256": "2fd4b56dd213f362ddcbe8397a13355fe482fa22dfde7eb3f0eceb2a3afbb94b",
+  "window_start": "2010-01-01",
+  "window_end": "2025-12-31",
+  "boundary_convention": "5ers_eet",
+  "k_selected": 4,
+  "silhouette_per_k": {
+    "2": 0.39248811612672546,
+    "3": 0.38884680644713904,
+    "4": 0.48825212099165066,
+    "5": 0.4597999177399836,
+    "6": 0.440536459122878
+  },
+  "candidate_clusters": [
+    {
+      "cluster_id": 0,
+      "shape_tag": "bimodal",
+      "composite": 1.9968099938008559,
+      "selected_sl": 1.5,
+      "mfe_p50": 7.86253511123371,
+      "reach_1r": 1.0,
+      "wrong_way_pp": 0.00487012987012987,
+      "n_trades": 616
+    },
+    {
+      "cluster_id": 1,
+      "shape_tag": "unclassified",
+      "composite": 0.9674611705602674,
+      "selected_sl": 1.5,
+      "mfe_p50": 2.112746676374748,
+      "reach_1r": 0.9604236343366778,
+      "wrong_way_pp": 0.038461538461538464,
+      "n_trades": 1794
+    }
+  ],
+  "step4_entry_auc": [
+    {
+      "cluster_id": 0,
+      "best_classifier": "rf",
+      "best_auc": 0.503706954303192,
+      "n_trades": 2993
+    },
+    {
+      "cluster_id": 1,
+      "best_classifier": "lgbm",
+      "best_auc": 0.5284044859521634,
+      "n_trades": 2993
+    }
+  ],
+  "a3_cluster": 0,
+  "n_configs": 48,
+  "n_a1": 24,
+  "n_a3": 24,
+  "triage_folds": [
+    1,
+    6,
+    8
+  ],
+  "n_screened_out": 44,
+  "stage_b_finalists": [
+    "A3::cl0::sl_partial_close_1r_runner_trail::sl3.5::n5::exp2",
+    "A3::cl0::sl_plus_tp_3r::sl3.5::n5::exp2",
+    "A3::cl0::sl_partial_close_1r_runner_trail::sl3.0::n5::exp2"
+  ],
+  "final_verdict": "FAIL",
+  "best_config_id": "A3::cl0::sl_partial_close_1r_runner_trail::sl3.5::n5::exp2",
+  "stage_b": [
+    {
+      "config_id": "A3::cl0::sl_partial_close_1r_runner_trail::sl3.5::n5::exp2",
+      "verdict": "fail",
+      "primary_failure_mode": "step5_chained_dd_above_gate",
+      "worst_fold_ratio": -0.6144233009627034,
+      "mean_fold_ratio": 0.07042847828945052,
+      "worst_fold_roi_base_pct": -0.0392652515547377,
+      "worst_fold_dd_base_pct": 0.07887750566537122,
+      "worst_fold_dd_at_0p40_pct": 0.06310200453229697,
+      "n_negative_folds": 5,
+      "min_trades_per_fold": 0,
+      "chained_max_dd_base_pct": 0.28490069604293744,
+      "k_safe": 1.0142308548572876,
+      "r_safe_pct": 0.005071154274286438,
+      "scalable_to_safe": true,
+      "scalable_to_hard": true,
+      "worst_fold_roi_at_r_safe_pct": -0.03982402965054806,
+      "chained_max_dd_at_r_safe_pct": 0.2889550764970647,
+      "daily_dd_breaches_at_r_safe": 0,
+      "holdout_roi_pct": -0.12572482990838463,
+      "holdout_dd_base_pct": 0.1822557355023928,
+      "holdout_n_trades": 438,
+      "per_day_max_dd_path": "C:\\Users\\panap\\Documents\\Forex-Backtester\\.claude\\worktrees\\clever-jemison-051222\\results\\arc_7_v3.0_exit_extraction\\step_5\\per_day_max_dd__A3__cl0__sl_partial_close_1r_runner_trail__sl3.5__n5__exp2.parquet"
+    },
+    {
+      "config_id": "A3::cl0::sl_plus_tp_3r::sl3.5::n5::exp2",
+      "verdict": "fail",
+      "primary_failure_mode": "step5_chained_dd_above_gate",
+      "worst_fold_ratio": -0.6344735257396364,
+      "mean_fold_ratio": 0.034603218673909295,
+      "worst_fold_roi_base_pct": -0.07250609018709564,
+      "worst_fold_dd_base_pct": 0.13337346704943315,
+      "worst_fold_dd_at_0p40_pct": 0.10669877363954652,
+      "n_negative_folds": 7,
+      "min_trades_per_fold": 0,
+      "chained_max_dd_base_pct": 0.3850297386458567,
+      "k_safe": 0.5998194526228297,
+      "r_safe_pct": 0.002999097263114148,
+      "scalable_to_safe": true,
+      "scalable_to_hard": true,
+      "worst_fold_roi_at_r_safe_pct": -0.043490563327845226,
+      "chained_max_dd_at_r_safe_pct": 0.23094832707806892,
+      "daily_dd_breaches_at_r_safe": 0,
+      "holdout_roi_pct": -0.1032104414845123,
+      "holdout_dd_base_pct": 0.2049066822841868,
+      "holdout_n_trades": 256,
+      "per_day_max_dd_path": "C:\\Users\\panap\\Documents\\Forex-Backtester\\.claude\\worktrees\\clever-jemison-051222\\results\\arc_7_v3.0_exit_extraction\\step_5\\per_day_max_dd__A3__cl0__sl_plus_tp_3r__sl3.5__n5__exp2.parquet"
+    },
+    {
+      "config_id": "A3::cl0::sl_partial_close_1r_runner_trail::sl3.0::n5::exp2",
+      "verdict": "fail",
+      "primary_failure_mode": "step5_chained_dd_above_gate",
+      "worst_fold_ratio": -0.6673565537655092,
+      "mean_fold_ratio": 0.18034980558125913,
+      "worst_fold_roi_base_pct": -0.054918913355174404,
+      "worst_fold_dd_base_pct": 0.09623408824745766,
+      "worst_fold_dd_at_0p40_pct": 0.07698727059796613,
+      "n_negative_folds": 6,
+      "min_trades_per_fold": 0,
+      "chained_max_dd_base_pct": 0.4405940573385127,
+      "k_safe": 0.8313062601506328,
+      "r_safe_pct": 0.004156531300753164,
+      "scalable_to_safe": true,
+      "scalable_to_hard": true,
+      "worst_fold_roi_at_r_safe_pct": -0.04565443647282667,
+      "chained_max_dd_at_r_safe_pct": 0.36626859805067247,
+      "daily_dd_breaches_at_r_safe": 0,
+      "holdout_roi_pct": -0.276304417477789,
+      "holdout_dd_base_pct": 0.31603827679933383,
+      "holdout_n_trades": 504,
+      "per_day_max_dd_path": "C:\\Users\\panap\\Documents\\Forex-Backtester\\.claude\\worktrees\\clever-jemison-051222\\results\\arc_7_v3.0_exit_extraction\\step_5\\per_day_max_dd__A3__cl0__sl_partial_close_1r_runner_trail__sl3.0__n5__exp2.parquet"
+    }
+  ]
+}

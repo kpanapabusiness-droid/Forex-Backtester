@@ -92,6 +92,18 @@ def test_target_same_bar_sl_tie_censored():
     assert e.tolist() == [0]
 
 
+def test_target_same_bar_hard_sl_censored():
+    """HONEST_ENGINE_SWEEP.md FLAG-D2: the simulators emit ``'hard_sl'``.
+    A same-bar +1R/SL tie with a ``hard_sl`` exit is SL-first → event=0
+    (censored), not a spurious event=1."""
+    pool = pd.DataFrame([{
+        "bars_to_1r_mfe": 5.0, "bars_held": 5.0, "exit_reason": "hard_sl",
+    }])
+    d, e = build_survival_target(pool)
+    assert d.tolist() == [5]
+    assert e.tolist() == [0]
+
+
 def test_target_same_bar_non_sl_event():
     """+1R and time-exit on same bar (not SL) → event=1 (reached before
     non-adverse close)."""

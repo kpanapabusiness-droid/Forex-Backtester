@@ -15,7 +15,7 @@
 
 1. **(Part C) Mandatory broker costs are not applied on ANY gate-scoring path.** The 1.5× spread stress, $5/lot commission, and 0.5 pip × n_fills slippage primitives exist (`core/sim/costs/`) but are never called by the driver, the fold runners, the architectures, or the gates. They were post-hoc R-adjustments wired to the now-retired `simulate_path` replay and are orphaned. Today every gate verdict is scored on **raw HistData bid/ask spread only (1.0×), zero commission, zero slippage**. Re-wire (or re-establish) the deployment-gate cost application before the engine produces a PASS verdict.
 
-2. **(Part D) heavy_ml's training labels cannot be proven honest, and carry a latent take-the-loss bug-class.** The `bars_to_1r_mfe` label is computed *nowhere* in `core/` or `scripts/` (only read), so its provenance is unverifiable. Separately, the label same-bar tie-break compares `exit_reason` against `"sl"` while the pool builders emit `"hard_sl"` with no normalization — so a same-bar (+1R high AND SL low) trade would be labelled a **win**, exactly the Arc-10 defect re-entering in label space. Latent today (no in-tree producer of `bars_to_1r_mfe`) but a live trap the moment heavy_ml is wired for discovery.
+2. **(Part D) heavy_ml's training labels cannot be proven honest, and carry a latent take-the-loss bug-class.** ✅ **RESOLVED 2026-06-03** ([`FIX_PART_D_HEAVYML_LABELS_REPORT.md`](FIX_PART_D_HEAVYML_LABELS_REPORT.md)). The `bars_to_1r_mfe` label is computed *nowhere* in `core/` or `scripts/` (only read), so its provenance is unverifiable. Separately, the label same-bar tie-break compares `exit_reason` against `"sl"` while the pool builders emit `"hard_sl"` with no normalization — so a same-bar (+1R high AND SL low) trade would be labelled a **win**, exactly the Arc-10 defect re-entering in label space. *Fix:* `bars_to_1r_mfe` now has an in-tree, reproducible producer (`core/sim/honest_label.reached_1r_before_sl`) called by both pool simulators, and the tie-break normalizes every stop spelling (`is_stop_loss_exit`) so a `hard_sl` same-bar tie is a **LOSS**; CI-gated regression added.
 
 **What IS sound:** the trade-by-trade SL/exit accounting (Part A — take-the-loss invariant holds, now pinned by 5 regression cases), no-lookahead / ex-ante construction (Part B), and determinism (Part E). The engine's *mechanics* are honest; what is missing is **(C) cost realism on the gate path** and **(D) provenance + correctness of the ML training labels** that feed the A2/A4/A6 architectures.
 
@@ -24,7 +24,7 @@
 | **A** | Take-the-loss invariant | **PASS** (fixture committed, CI-green) |
 | **B** | No lookahead / ex-ante populations | **PASS** (one watch-item) |
 | **C** | Cost + rule fidelity (FundedNext) | **FAIL** (spread 1.5× / commission / slippage not wired) |
-| **D** | heavy_ml label contamination | **FLAG** (provenance unverifiable + bug-class tie-break) |
+| **D** | heavy_ml label contamination | **RESOLVED** (2026-06-03; was FLAG) — in-tree producer + `hard_sl`-aware tie-break, see [`FIX_PART_D_HEAVYML_LABELS_REPORT.md`](FIX_PART_D_HEAVYML_LABELS_REPORT.md) |
 | **E** | Determinism + reconstruction | **PASS** (one FLAG: no full-data anchor in CI) |
 
 ---
@@ -103,7 +103,9 @@ Half-spread cost IS paid implicitly (entries at ask, exits at bid via `core/sim/
 
 ---
 
-## PART D — heavy_ml LABEL-CONTAMINATION — **FLAG**
+## PART D — heavy_ml LABEL-CONTAMINATION — **FLAG → RESOLVED (2026-06-03)**
+
+> **RESOLVED.** Both vectors below are fixed — see [`FIX_PART_D_HEAVYML_LABELS_REPORT.md`](FIX_PART_D_HEAVYML_LABELS_REPORT.md). FLAG-D1: `bars_to_1r_mfe` now has an in-tree, reproducible producer ([`core/sim/honest_label.reached_1r_before_sl`](core/sim/honest_label.py)) called by both pool simulators. FLAG-D2: the same-bar tie-break normalizes every stop spelling via `is_stop_loss_exit`, so a `hard_sl` +1R/SL tie labels as a **LOSS**. CI-gated regression at [`tests/heavy_ml/test_label_take_the_loss.py`](tests/heavy_ml/test_label_take_the_loss.py). The original finding is preserved below.
 
 Central question — are heavy_ml's labels honest-engine-derived or replay-derived? **Classification: FLAG — CANNOT VERIFY, plus a latent bug-class.**
 

@@ -51,5 +51,26 @@ def test_pool_schema_columns() -> None:
         "pair", "trade_id", "signal_time", "entry_time", "entry_price",
         "atr_at_signal", "sl_at_entry_price", "exit_time", "exit_price",
         "exit_reason", "bars_held", "final_r", "mfe_r", "mae_r",
+        # SL-honest meta-label provenance (HONEST_ENGINE_SWEEP.md Part D).
+        "bars_to_1r_mfe",
     }
     assert set(pool.trades.columns) >= expected
+
+
+def test_bars_to_1r_mfe_is_sl_honest() -> None:
+    """The emitted bars_to_1r_mfe is the take-the-loss producer's output:
+    where set it is (a) <= bars_held and (b) backed by mfe_r >= 1.0 (the
+    high genuinely reached +1R); a same-bar +1R/SL trade leaves it NaN even
+    though raw mfe_r touched +1R. See core.sim.honest_label."""
+    pool = _run_builder()
+    df = pool.trades
+    assert "bars_to_1r_mfe" in df.columns
+    reached = df["bars_to_1r_mfe"].notna()
+    # Every honest +1R reach must be at/within the holding window.
+    assert bool((df.loc[reached, "bars_to_1r_mfe"] <= df.loc[reached, "bars_held"]).all())
+    # And must be corroborated by the raw excursion having touched +1R.
+    assert bool((df.loc[reached, "mfe_r"] >= 1.0 - 1e-9).all())
+    # A hard_sl trade may have raw mfe_r >= 1.0 yet NaN bars_to_1r_mfe (the
+    # +1R high landed on the stop bar → take-the-loss says "not reached").
+    # The reverse — a set bars_to_1r_mfe whose mfe_r < 1R — must never occur.
+    assert not bool(((df["bars_to_1r_mfe"].notna()) & (df["mfe_r"] < 1.0 - 1e-9)).any())

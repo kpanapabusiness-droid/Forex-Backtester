@@ -50,6 +50,7 @@ from core.arc.signal_protocol import (
     validate_panels,
 )
 from core.sim.fill import long_entry_fill_price
+from core.sim.honest_label import reached_1r_before_sl
 from core.sim.panel import Panel
 
 
@@ -169,6 +170,7 @@ def _simulate_pair_pool(
 
     df_close_ask = df["close_ask"].values
     df_low_bid = df["low_bid"].values
+    df_high_bid = df["high_bid"].values
     df_close_bid = df["close_bid"].values
     # Per-bar bid+ask quotes for the Step 6 §6.3 spread-decomposition
     # diagnostic. Captured at fill sites only (entry-bar open / exit-bar
@@ -270,6 +272,22 @@ def _simulate_pair_pool(
             exit_ask_q = _q(df_open_ask, exit_idx)
 
         final_r = (exit_price - entry_price) / sl_distance
+        # SL-honest meta-label provenance: the first forward offset at which
+        # the trade reached +1R MFE STRICTLY BEFORE its hard stop (take-the-
+        # loss ordering; same-bar +1R/SL → NaN). Both exits here are open
+        # through the resolved bar (hard_sl intrabar at sl_price, time_exit
+        # at the bar close), so the exit bar is included in the scan. This is
+        # the in-tree producer that closes HONEST_ENGINE_SWEEP.md FLAG-D1.
+        bars_to_1r_mfe = reached_1r_before_sl(
+            high_bid=df_high_bid,
+            low_bid=df_low_bid,
+            entry_idx=entry_idx,
+            exit_off=int(bars_held),
+            entry_price=entry_price,
+            sl_price=sl_price,
+            sl_distance=sl_distance,
+            exit_at_bar_open=False,
+        )
         trades.append(
             {
                 "pair": pair,
@@ -286,6 +304,7 @@ def _simulate_pair_pool(
                 "final_r": float(final_r),
                 "mfe_r": float(mfe_r),
                 "mae_r": float(mae_r),
+                "bars_to_1r_mfe": bars_to_1r_mfe,
                 "entry_bid": entry_bid_q,
                 "entry_ask": entry_ask_q,
                 "exit_bid": exit_bid_q,
@@ -400,6 +419,10 @@ _TRADES_COLUMNS = (
     "pair", "trade_id", "signal_time", "entry_time", "entry_price",
     "atr_at_signal", "sl_at_entry_price", "exit_time", "exit_price",
     "exit_reason", "bars_held", "final_r", "mfe_r", "mae_r",
+    # SL-honest meta-label provenance (HONEST_ENGINE_SWEEP.md Part D): first
+    # forward offset reaching +1R strictly before the hard stop, NaN if
+    # never. Produced by core.sim.honest_label.reached_1r_before_sl.
+    "bars_to_1r_mfe",
     # Bid+ask at entry-bar open and exit-bar open (close for intra-bar
     # SL hits) per the Step 6 §6.3 spread-decomposition diagnostic.
     "entry_bid", "entry_ask", "exit_bid", "exit_ask",

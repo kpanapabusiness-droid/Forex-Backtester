@@ -20,7 +20,7 @@ Public API:
 """
 
 from core.sim.costs.commission import compute_commission_usd
-from core.sim.costs.model import CostModel, CostedRunResult, apply_cost_model
+from core.sim.costs.model import CostedRunResult, CostModel, apply_cost_model
 from core.sim.costs.slippage import compute_slippage_pips
 from core.sim.costs.spread_multiplier import compute_extra_spread_price
 from core.sim.costs.swap import compute_swap_usd, rollover_instants_utc

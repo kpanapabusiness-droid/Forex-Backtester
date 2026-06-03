@@ -40,7 +40,7 @@ import pandas as pd
 from core.sim.costs.commission import compute_commission_usd
 from core.sim.costs.slippage import compute_slippage_pips
 from core.sim.costs.spread_multiplier import compute_extra_spread_price
-from core.utils import LOT_SIZE, get_pip_size, pips_to_price
+from core.utils import LOT_SIZE, pips_to_price
 
 if TYPE_CHECKING:  # avoid runtime import cost / cycles; only used for typing
     from core.sim.multipair_backtester import RunResult

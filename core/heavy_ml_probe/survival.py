@@ -75,23 +75,23 @@ from core.heavy_ml_probe.automl import (
     _select_used_features,
 )
 from core.heavy_ml_probe.io import sha256_file
-from core.heavy_ml_probe.meta_labeling import (
-    SL_EXIT_REASON,
+from core.heavy_ml_probe.labels import (
+    SURVIVAL_REQUIRED_POOL_COLUMNS,
     PoolSchemaError,
+    _validate_pool_schema,
+    build_survival_target,
 )
 from core.heavy_ml_probe.metrics import concordance
 
 # Locked threshold per dispatch §3. Cox PH is unstable below this n.
 MIN_N_WARN: int = 200
 
-# Survival target consumes a subset of the meta-label schema (final_r
-# not required). Kept as a separate constant so future schema drift
-# can fork cleanly.
-SURVIVAL_REQUIRED_POOL_COLUMNS: tuple[str, ...] = (
-    "bars_to_1r_mfe",
-    "bars_held",
-    "exit_reason",
-)
+# ``SURVIVAL_REQUIRED_POOL_COLUMNS`` + ``build_survival_target`` + the
+# take-the-loss same-bar tie-break now live in the sklearn-free
+# ``core.heavy_ml_probe.labels`` module (imported above, re-exported via
+# ``__all__``). The survival event/duration construction shares its +1R-MFE
+# definition and SL/time-exit censoring with the meta-label, including the
+# ``"hard_sl"``-aware tie-break.
 
 
 # ── Result types ─────────────────────────────────────────────────────
@@ -136,112 +136,6 @@ class SurvivalResult:
     statsmodels_version: str
     skip_reason: str = "ok"
     classifier_manifest_path: Path | None = None
-
-
-# ── Target construction ──────────────────────────────────────────────
-
-
-def _validate_pool_schema(pool: pd.DataFrame) -> None:
-    """HALT loud on missing columns. Mirrors PR-C convention."""
-    missing = [c for c in SURVIVAL_REQUIRED_POOL_COLUMNS if c not in pool.columns]
-    if missing:
-        raise PoolSchemaError(
-            f"survival target requires pool columns "
-            f"{sorted(SURVIVAL_REQUIRED_POOL_COLUMNS)}; "
-            f"missing: {sorted(missing)} — pool has: "
-            f"{sorted(pool.columns)[:20]}"
-            + ("..." if len(pool.columns) > 20 else "")
-        )
-
-
-def build_survival_target(
-    pool: pd.DataFrame,
-    *,
-    sl_exit_reason: str = SL_EXIT_REASON,
-) -> tuple[np.ndarray, np.ndarray]:
-    """Construct ``(duration, event)`` for Cox PH.
-
-    Per dispatch §3:
-
-      * ``event[i] = 1`` if trade ``i`` reached +1R MFE strictly before
-        SL hit or time-exit (i.e. it's a real event).
-      * ``event[i] = 0`` otherwise (censored at the close bar).
-      * ``duration[i]`` = bars to first of ``{+1R MFE, SL hit, time-exit}``.
-
-    Same-bar tie-break (mirrors PR-C ``build_meta_label_target``):
-
-      * ``bars_to_1r_mfe is NaN`` → event=0, duration=bars_held
-      * ``bars_to_1r_mfe <  bars_held`` → event=1, duration=bars_to_1r_mfe
-      * ``bars_to_1r_mfe == bars_held``:
-            ``exit_reason == "sl"`` → event=0 (SL wins same-bar tie),
-                duration=bars_held
-            otherwise              → event=1 (reached +1R same bar as
-                non-adverse close), duration=bars_to_1r_mfe
-      * ``bars_to_1r_mfe >  bars_held`` → event=0 (defensive; shouldn't
-        happen on consistent data), duration=bars_held
-
-    Returns
-    -------
-    duration : np.ndarray[int] of shape (len(pool),)
-        Time-to-first-event in bars. Always positive.
-    event : np.ndarray[int] of shape (len(pool),)
-        Binary event indicator.
-
-    Raises
-    ------
-    PoolSchemaError
-        If any required column is missing.
-    ValueError
-        If ``bars_held`` has NaN values (data integrity guard).
-    """
-    _validate_pool_schema(pool)
-    bars_to_1r = pool["bars_to_1r_mfe"]
-    bars_held = pool["bars_held"]
-    exit_reason = pool["exit_reason"].astype(str).str.lower()
-
-    if bars_held.isna().any():
-        raise ValueError(
-            "survival target: bars_held column has NaN values; "
-            "every closed trade must have a known duration."
-        )
-
-    n = len(pool)
-    event = np.zeros(n, dtype=int)
-    duration = np.zeros(n, dtype=int)
-    sl_lower = sl_exit_reason.lower()
-
-    reached = bars_to_1r.notna().values
-    b1r = bars_to_1r.values
-    bh = bars_held.values
-    er = exit_reason.values
-
-    for i in range(n):
-        held_i = int(bh[i])
-        if not reached[i]:
-            event[i] = 0
-            duration[i] = held_i
-            continue
-        first_r = float(b1r[i])
-        if first_r < held_i:
-            event[i] = 1
-            duration[i] = int(first_r)
-        elif first_r == held_i:
-            if er[i] == sl_lower:
-                event[i] = 0      # SL-wins tie-break
-                duration[i] = held_i
-            else:
-                event[i] = 1      # +1R on same bar as non-adverse close
-                duration[i] = held_i
-        else:
-            # Defensive — shouldn't happen on consistent pool data.
-            event[i] = 0
-            duration[i] = held_i
-
-    # Cox PH requires duration > 0 — clip any 0-duration entries to 1
-    # (trades that closed on bar 0 are degenerate; clipping preserves
-    # them in the dataset without breaking the fit).
-    duration = np.maximum(duration, 1)
-    return duration, event
 
 
 # ── Internal: PHReg fit + concordance ─────────────────────────────────
@@ -613,7 +507,7 @@ def run_survival(
             "lineage gate rejected every feature — cannot fit Cox PH on an "
             "empty design matrix"
         )
-    _validate_pool_schema(pool)
+    _validate_pool_schema(pool, SURVIVAL_REQUIRED_POOL_COLUMNS, target="survival")
     if trade_id_col not in pool.columns:
         raise PoolSchemaError(
             f"survival requires {trade_id_col!r} column for fold-result "

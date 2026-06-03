@@ -39,6 +39,13 @@ import numpy as np
 import pandas as pd
 
 from core.sim.fill import long_entry_fill_price
+from core.sim.honest_label import reached_1r_before_sl
+
+# Exit reasons whose fill lands at the OPEN of the exit bar (queued
+# next-bar-open fills): that bar's intrabar high is unreachable, so the
+# +1R producer scan stops one bar earlier. Intrabar / at-close exits
+# ("hard_sl", "end_of_data") leave the trade open through the bar.
+_OPEN_FILL_EXIT_REASONS: frozenset[str] = frozenset({"trail", "time_exit"})
 
 
 @dataclass(frozen=True)
@@ -80,6 +87,10 @@ class TradeRow:
     mfe_r: float
     mae_r: float
     activated_trail: bool
+    # SL-honest meta-label provenance (HONEST_ENGINE_SWEEP.md Part D): first
+    # forward offset reaching +1R strictly before the hard stop (take-the-
+    # loss; same-bar +1R/SL → NaN). NaN if +1R never reached before SL.
+    bars_to_1r_mfe: float = float("nan")
 
     def to_dict(self) -> dict:
         return {
@@ -98,6 +109,7 @@ class TradeRow:
             "mfe_r": self.mfe_r,
             "mae_r": self.mae_r,
             "activated_trail": self.activated_trail,
+            "bars_to_1r_mfe": self.bars_to_1r_mfe,
         }
 
 
@@ -311,6 +323,22 @@ def simulate_pair_pool(
 
         final_r = (exit_price - entry_price) / sl_distance
 
+        # SL-honest meta-label provenance: first forward offset reaching +1R
+        # STRICTLY before the hard stop (take-the-loss; same-bar +1R/SL →
+        # NaN). Trail / time exits fill at the next bar's open, so that bar's
+        # high is excluded; hard_sl / end_of_data leave the trade open
+        # through the resolved bar. Closes HONEST_ENGINE_SWEEP.md FLAG-D1.
+        bars_to_1r_mfe = reached_1r_before_sl(
+            high_bid=high_bid,
+            low_bid=low_bid,
+            entry_idx=entry_idx,
+            exit_off=int(bars_held),
+            entry_price=entry_price,
+            sl_price=sl_price,
+            sl_distance=sl_distance,
+            exit_at_bar_open=(str(exit_reason) in _OPEN_FILL_EXIT_REASONS),
+        )
+
         trades.append(
             TradeRow(
                 pair=pair,
@@ -328,6 +356,7 @@ def simulate_pair_pool(
                 mfe_r=float(mfe_r),
                 mae_r=float(mae_r),
                 activated_trail=trail_armed,
+                bars_to_1r_mfe=bars_to_1r_mfe,
             )
         )
         tid += 1

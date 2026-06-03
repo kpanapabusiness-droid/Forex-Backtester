@@ -75,141 +75,24 @@ from core.heavy_ml_probe.automl import (
     run_automl,
 )
 from core.heavy_ml_probe.io import sha256_file
-
-# Locked target name + threshold sweep grid per dispatch §3.
-META_LABEL_TARGET_COL: str = "y_meta_label"
-DEFAULT_THRESHOLD_SWEEP: tuple[float, ...] = (0.50, 0.55, 0.60, 0.65, 0.70, 0.75, 0.80)
-DEFAULT_MFE_R_THRESHOLD: float = 1.0  # +1R per dispatch §1
-
-
-class PoolSchemaError(ValueError):
-    """Raised when the input pool is missing columns required for
-    meta-label target construction. Per dispatch §1 (last paragraph),
-    schema mismatches HALT loudly — they are NOT papered over.
-    """
-
-
-# Columns the meta-labeling stage requires on the input pool. The
-# classifier-pipeline stage adds ``entry_time`` + ``trade_id`` (already
-# required by PR-B's ``run_automl``) on top of these.
-REQUIRED_POOL_COLUMNS: tuple[str, ...] = (
-    "bars_to_1r_mfe",   # int, NaN if MFE never reached +1R
-    "bars_held",        # int, total bars trade was open (= bars_to_close)
-    "exit_reason",      # str, e.g. "sl" | "time_exit" | "tp" | ...
-    "final_r",          # float, realised R-multiple at close (for kept/dropped means)
+from core.heavy_ml_probe.labels import (
+    DEFAULT_MFE_R_THRESHOLD,
+    META_LABEL_TARGET_COL,
+    REQUIRED_POOL_COLUMNS,
+    SL_EXIT_REASON,
+    PoolSchemaError,
+    _validate_pool_schema,
+    build_meta_label_target,
 )
 
-# Exit-reason value that triggers the same-bar SL tie-break. Lowercased
-# during comparison so producer drift between ``SL`` / ``Sl`` / ``sl``
-# is absorbed.
-SL_EXIT_REASON: str = "sl"
-
-
-# ── Target construction ──────────────────────────────────────────────
-
-
-def _validate_pool_schema(pool: pd.DataFrame) -> None:
-    """Per dispatch §1 last paragraph: HALT loud on missing columns."""
-    missing = [c for c in REQUIRED_POOL_COLUMNS if c not in pool.columns]
-    if missing:
-        raise PoolSchemaError(
-            f"meta-label target requires pool columns {sorted(REQUIRED_POOL_COLUMNS)}; "
-            f"missing: {sorted(missing)} — pool has: {sorted(pool.columns)[:20]}"
-            + ("..." if len(pool.columns) > 20 else "")
-        )
-
-
-def build_meta_label_target(
-    pool: pd.DataFrame,
-    *,
-    mfe_r_threshold: float = DEFAULT_MFE_R_THRESHOLD,
-    sl_exit_reason: str = SL_EXIT_REASON,
-) -> np.ndarray:
-    """Construct the binary meta-label target over ``pool``.
-
-    Parameters
-    ----------
-    pool
-        Must contain :data:`REQUIRED_POOL_COLUMNS`.
-    mfe_r_threshold
-        Multiple of R that defines the favourable event. Default 1.0
-        per dispatch §1. Exposed for sensitivity probes.
-    sl_exit_reason
-        Exit-reason string that triggers the same-bar tie-break per
-        dispatch §1. Case-insensitive at comparison time.
-
-    Returns
-    -------
-    ``np.ndarray`` of shape ``(len(pool),)`` with values in ``{0, 1}``
-    in the same row order as ``pool``.
-
-    Raises
-    ------
-    PoolSchemaError
-        If any required column is missing.
-    ValueError
-        If a per-trade record has missing ``bars_held`` (defensive — the
-        pool should always have this).
-
-    Notes
-    -----
-    The ``mfe_r_threshold`` parameter is non-default *only* for
-    sensitivity analyses; production runs MUST use 1.0 per spec. The
-    threshold value is recorded in the meta-label manifest so audits
-    can detect non-spec overrides.
-    """
-    _validate_pool_schema(pool)
-    bars_to_1r = pool["bars_to_1r_mfe"]
-    bars_held = pool["bars_held"]
-    exit_reason = pool["exit_reason"].astype(str).str.lower()
-
-    if bars_held.isna().any():
-        raise ValueError(
-            "meta-label target: bars_held column has NaN values; this is "
-            "structurally inconsistent (every closed trade has a known "
-            "duration). Inspect pool integrity."
-        )
-
-    # The mfe_r_threshold parameter is recorded but the bars_to_1r_mfe
-    # column already reflects the +1R event in production pools. For
-    # non-1.0 sensitivity analyses, callers must pre-compute the
-    # equivalent ``bars_to_<threshold>r_mfe`` column. PR-C surfaces a
-    # ValueError in that case rather than silently using the wrong
-    # column.
-    if not np.isclose(mfe_r_threshold, 1.0):
-        raise ValueError(
-            f"mfe_r_threshold={mfe_r_threshold} != 1.0 not supported in "
-            f"PR-C; production pools carry `bars_to_1r_mfe` only. To run "
-            f"a sensitivity analysis with a different threshold, pre-compute "
-            f"the equivalent column upstream + pass via a future "
-            f"`bars_to_event_col` override (not yet implemented)."
-        )
-
-    n = len(pool)
-    y = np.zeros(n, dtype=int)
-
-    # Vectorised branches:
-    reached = bars_to_1r.notna().values
-    bars_1r_arr = bars_to_1r.values
-    bars_held_arr = bars_held.values
-    exit_arr = exit_reason.values
-    sl_lower = sl_exit_reason.lower()
-
-    for i in range(n):
-        if not reached[i]:
-            y[i] = 0
-            continue
-        b1r = float(bars_1r_arr[i])
-        bh = float(bars_held_arr[i])
-        if b1r < bh:
-            y[i] = 1
-        elif b1r == bh:
-            # Same-bar tie: SL wins (conservative).
-            y[i] = 0 if exit_arr[i] == sl_lower else 1
-        else:
-            # bars_to_1r_mfe > bars_held: defensive — shouldn't happen.
-            y[i] = 0
-    return y
+# Locked threshold-sweep grid per dispatch §3 (meta-label specific). The
+# target name, +1R threshold, required-column schema, the SL tie-break
+# anchor, ``PoolSchemaError`` and ``build_meta_label_target`` itself now
+# live in the sklearn-free ``core.heavy_ml_probe.labels`` module (imported
+# above, re-exported via ``__all__``) so label honesty — including the
+# take-the-loss same-bar tie-break — can be tested in CI's minimal env
+# without the AutoML / joblib machinery present.
+DEFAULT_THRESHOLD_SWEEP: tuple[float, ...] = (0.50, 0.55, 0.60, 0.65, 0.70, 0.75, 0.80)
 
 
 # ── Threshold sweep ──────────────────────────────────────────────────
@@ -529,7 +412,7 @@ def run_meta_labeling(
         If ``used_features`` is empty (propagated).
     """
     # 1. Schema validation up-front
-    _validate_pool_schema(pool)
+    _validate_pool_schema(pool, REQUIRED_POOL_COLUMNS, target="meta-label")
     if final_r_col not in pool.columns:
         raise PoolSchemaError(
             f"meta-labeling threshold sweep requires {final_r_col!r} column "

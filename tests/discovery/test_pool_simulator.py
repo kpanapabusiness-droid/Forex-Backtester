@@ -204,3 +204,36 @@ def test_warmup_excludes_early_signals():
     atr = _atr(df.index, 1.0)
     trades, _, _, _ = simulate_pair_pool("EURUSD", df, trigger, atr, _cfg(warmup=5))
     assert trades == []
+
+
+# ── SL-honest bars_to_1r_mfe producer (HONEST_ENGINE_SWEEP.md Part D) ───
+
+
+def test_bars_to_1r_mfe_same_bar_tie_is_nan_despite_mfe():
+    """A bar whose high reaches +1R (102.0) AND whose low breaches the stop
+    (98.0) resolves SL-first: raw mfe_r touches +1R but bars_to_1r_mfe is
+    NaN (take-the-loss). entry 100.0, sl 98.0, sl_distance 2.0 = 1R."""
+    df = _ohlc([
+        {"ts": "2020-01-01T00", "open_ask": 99.0, "high_bid": 100.0, "low_bid": 98.5, "close_bid": 99.0},
+        {"ts": "2020-01-01T01", "open_ask": 100.0, "high_bid": 100.5, "low_bid": 99.5, "close_bid": 100.2},
+        {"ts": "2020-01-01T02", "open_ask": 100.1, "high_bid": 102.5, "low_bid": 97.5, "close_bid": 98.6},
+    ])
+    t = simulate_pair_pool("EURUSD", df, _signal_at(df.index, 0), _atr(df.index, 1.0), _cfg())[0][0]
+    assert t.exit_reason == "hard_sl"
+    assert t.mfe_r >= 1.0                      # raw excursion touched +1R
+    assert np.isnan(t.bars_to_1r_mfe)          # honest: not reached before SL
+
+
+def test_bars_to_1r_mfe_reached_before_sl_offset():
+    """+1R reached at forward offset 1 (no stop that bar); stop at offset 2.
+    bars_to_1r_mfe == 1 < bars_held == 2."""
+    df = _ohlc([
+        {"ts": "2020-01-01T00", "open_ask": 99.0, "high_bid": 100.0, "low_bid": 98.5, "close_bid": 99.0},
+        {"ts": "2020-01-01T01", "open_ask": 100.0, "high_bid": 100.5, "low_bid": 99.5, "close_bid": 100.2},
+        {"ts": "2020-01-01T02", "open_ask": 100.1, "high_bid": 102.5, "low_bid": 99.5, "close_bid": 101.0},
+        {"ts": "2020-01-01T03", "open_ask": 101.0, "high_bid": 101.5, "low_bid": 97.5, "close_bid": 98.0},
+    ])
+    t = simulate_pair_pool("EURUSD", df, _signal_at(df.index, 0), _atr(df.index, 1.0), _cfg())[0][0]
+    assert t.exit_reason == "hard_sl"
+    assert t.bars_held == 2
+    assert t.bars_to_1r_mfe == 1.0

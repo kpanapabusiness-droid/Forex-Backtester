@@ -227,17 +227,31 @@ def test_target_case_insensitive_sl_exit_reason():
         assert y.tolist() == [0], f"exit_reason={er!r} should trigger SL tie-break"
 
 
+def test_target_same_bar_hard_sl_is_loss():
+    """HONEST_ENGINE_SWEEP.md FLAG-D2 regression: the pool simulators emit
+    ``exit_reason='hard_sl'`` (not ``'sl'``). A same-bar +1R/SL tie with a
+    ``hard_sl`` exit MUST label 0 (LOSS) — the old ``== 'sl'`` compare let it
+    through as a WIN."""
+    pool = pd.DataFrame([{
+        "bars_to_1r_mfe": 5.0, "bars_held": 5.0,
+        "exit_reason": "hard_sl", "final_r": -1.0,
+    }])
+    assert build_meta_label_target(pool).tolist() == [0]
+
+
 def test_target_vectorised_over_pool():
-    """Mixed cases vectorise correctly."""
+    """Mixed cases vectorise correctly — incl. the producer-native
+    ``hard_sl`` spelling alongside the legacy ``sl``."""
     pool = pd.DataFrame([
         {"bars_to_1r_mfe": 2.0, "bars_held": 5.0, "exit_reason": "tp", "final_r": 2.0},          # 1
         {"bars_to_1r_mfe": np.nan, "bars_held": 10.0, "exit_reason": "sl", "final_r": -1.0},      # 0
         {"bars_to_1r_mfe": 5.0, "bars_held": 5.0, "exit_reason": "sl", "final_r": -1.0},          # 0 (tie + SL)
+        {"bars_to_1r_mfe": 5.0, "bars_held": 5.0, "exit_reason": "hard_sl", "final_r": -1.0},     # 0 (tie + hard_sl)
         {"bars_to_1r_mfe": 5.0, "bars_held": 5.0, "exit_reason": "time_exit", "final_r": 1.0},    # 1 (tie + non-SL)
         {"bars_to_1r_mfe": np.nan, "bars_held": 30.0, "exit_reason": "time_exit", "final_r": 0.3},  # 0
     ])
     y = build_meta_label_target(pool)
-    assert y.tolist() == [1, 0, 0, 1, 0]
+    assert y.tolist() == [1, 0, 0, 0, 1, 0]
 
 
 def test_target_halts_loud_on_missing_column():

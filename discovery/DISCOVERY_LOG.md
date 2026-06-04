@@ -17,6 +17,7 @@ at arc step (i).
 | 1003 | 1000s | 2026-06-04 | Cross trend-momentum long (Donchian-20 breakout in uptrend, 8 trending crosses) — universe lever; cheap-kill | N | n/e | -9.75% | n/e | 12.39% | 4078 | FAIL (triage) | N |
 | 1004 | 1000s | 2026-06-04 | Cross-trend exit/cost engineering (let-it-run / 3R vs partial-runner) — EXIT lever; cheap-kill | N | n/e | -9.75% | n/e | n/e | 4078 | FAIL (triage) | N |
 | 3000 | 3000s | 2026-06-04 | Mean-reversion long on coupled crosses (RSI<25 oversold) — instrument-universe + reversion lever; cheap-kill | N | n/e | -20.22% | n/e | 22.54% | 1009 | FAIL (triage) | N |
+| 2000 | 2000s | 2026-06-04 | Trend-following long via full-size convexity harvest (Donchian breakout + full-size trailing) — fat tail is generic not trend-selected; cheap-kill at triage | N | n/e | -13.97% | n/e | 15.8% | 1617 | FAIL (triage) | N |
 
 ---
 
@@ -302,3 +303,60 @@ portfolio/selection to avoid collision.
 **FLAGS (code not merged):** none requiring the canonical core. Signal + drivers scratch `_disco3_work/`
 (reproducible from the arc doc). No reusable experiment tool needed (null baseline not required — an
 all-negative triage is decisive).
+
+### arc_2000
+
+**Trend-following long via full-size convexity harvest** (chat 2000–2999, first continuous arc). Full
+record: [`arcs/arc_2000_trend_convexity_harvest.md`](arcs/arc_2000_trend_convexity_harvest.md). No
+council (cheap-kill; falsified at observation).
+
+**Idea + why (fresh insight, NOT "arc 1002 again").** The four prior arcs all *screened* on +1R-before-SL
+*capture* — a WIN-RATE statistic, structurally blind to a low-win-rate / fat-tailed (convex) payoff (the
+time-series-momentum profile, edge in the right tail not the hit rate). And every engine triage used the
+50%-partial exit, which CAPS the right tail at half size. So the prior failures might be a measurement
+artifact. Untested question: does a trend entry have a fat harvestable right tail, and does a FULL-SIZE
+tail-preserving trailing exit (`sl_plus_trailing_atr`: −1R floor, uncapped upside, 1R-from-peak trail)
+bank enough of it to clear costs? Entry = Donchian breakout long (canonical TSMOM/trend entry).
+
+**What happened.** OBSERVATION (canonical pool MFE distribution, H4 majors, IS 2010-2020, hold 360,
+SL=2·ATR) — built a periodic (time-random) long base and Donchian breakouts (N=20/55/120 ±SMA200). The
+**fat tail is real but the trend entry does NOT create it**: periodic base already P(mfe≥5R)=.147,
+P(mfe≥8R)=.077, meanMFE 2.46R; Donchian-120 lifts only to .165/.088/2.69 — trivial. The right tail is a
+generic property of being long a vol-clustering FX major at any time, not trend-selected. cap+1R≈.49
+everywhere too → win-rate lens and convexity lens AGREE: trend entry adds ~no separable edge on either.
+Hypothesis falsified at observation. Cheap-kill triage (3 IS folds 2013/2016/2019, honest engine, costs
+ON) on the untested full-size trails: `sl_plus_trailing_atr` worst −13.97% / mean −9.50% / 3-of-3 neg
+(WORSE than the 50%-partial's −7.14% — the per-winner 1R give-back + full-size whipsaw losses dominate);
+`sl_plus_trailing_swing` mean −0.04% but 2/3 neg with a +20.81% thin (n=23) fold and a −19.86% / DD-20%
+blowup (regime-luck, the FX-majors-only trend signature); periodic null + trailing_atr −11.00% (donchian
+−9.50% barely beats it). All N on all-folds-positive.
+
+**Verdict: FAIL (cheap-kill).** Trend-following-long-via-convexity-harvest is not deployable on H4 majors.
+
+**Convergence with arc 1004 (landed on main mid-arc).** The 1000s chat independently engineered exits
+(let-it-run / 3R / wide-trail) on its CROSS trend-momentum signal and found no exit flips net-positive —
+"EDGE<COST is an ENTRY/COST problem, not an exit problem." My arc is the MAJORS + full-size-trailing
+complement and reaches the identical verdict from the convexity angle. Two chats, two universes, two exit
+families: **payoff/exit engineering cannot rescue a sub-cost trend.** And my MFE observation explains WHY —
+the harvestable tail is generic (a random long has it too), so there is no trend-specific convexity for any
+exit to harvest.
+
+**Threads / lessons.** (1) The fat right tail in FX-major longs is generic, not trend-selected — both the
+win-rate lens (+1R≈.49) and the convexity lens (MFE tail) say the trend entry adds nothing; the prior
+arcs' win-rate screen was NOT hiding a convexity edge. (2) No full-size trailing harvest rescues a
+~coin-flip long (atr trail worse than partial; swing trail is regime-luck/blowup, not all-folds edge) —
+converges with arc 1004 on crosses. (3) With arcs 1003/1004/3000, the count is now SEVEN+ directional-long
+FAILs sharing the EDGE<COST signature across entry construction, timeframe (H4/D1), the full 28-pair
+universe (majors+crosses), BOTH mechanism families (continuation+reversion), AND now payoff/exit structure
+— the constraint is structural. (4) Surviving steers (coordinated): calendar-flow/non-price-direction
+(1000s), portfolio/selection of decorrelated sub-cost edges (3000s). For the 2000s range, the open lane is
+a construction that **raises per-trade gross edge or cuts per-trade cost/frequency** enough to clear the
+EDGE<COST hurdle (not another entry/exit re-cut), OR a genuinely different instrument-structure (e.g.
+relative-value/spread between coupled pairs) — to be decided fresh at arc 2001's observation.
+
+**Tooling:** built + registered `discovery/tools/trend_entry_signals.py` (`DonchianBreakoutLongSignal`,
+`PeriodicLongSignal`) — reusable trend-entry + random-base experiment tools (mask + ATR geometry only;
+scoring stays canonical). TOOL_REGISTRY BUILT updated.
+
+**FLAGS (code not merged):** none requiring the canonical core. Drivers in scratch `_disco2000_work/`
+(reproducible from the arc doc).

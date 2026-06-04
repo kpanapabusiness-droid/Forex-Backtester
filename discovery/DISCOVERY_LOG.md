@@ -12,6 +12,7 @@ at arc step (i).
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | 0 | trial | 2026-06-04 | Pullback-in-uptrend long (close>SMA50 & pierce prior-5-bar-low); best ver = excursion-banking exit | N | N | -14.2% | -14.3% | 17.1% | 4985 | FAIL | N |
 | 1000 | 1000s | 2026-06-04 | Cross-sectional momentum long (top-quintile 24-bar ret, rising; partial/runner exit) | N | N | -21.20% | -15.36% | 24.50% | 7757 | FAIL | N |
+| 1001 | 1000s | 2026-06-04 | Volatility-contraction breakout long (low-ATR coil + 10-bar-high break) — cheap-kill at triage | N | n/e | -9.41% | n/e | 12.30% | 3186 | FAIL (triage) | N |
 
 ---
 
@@ -124,3 +125,38 @@ canonical (`ArcFoldRunner`). Reusable by all future arcs.
 
 **FLAGS (code not merged):** none requiring the canonical core. Signal + drivers in scratch `_disco_work/`
 (reproducible from the arc doc).
+
+### arc_1001
+
+**Volatility-contraction breakout long** (chat 1000–1999). Full record:
+[`arcs/arc_1001_contraction_breakout_long.md`](arcs/arc_1001_contraction_breakout_long.md). No council
+(cheap-killed at triage; no worthwhile-ceiling fork to evaluate).
+
+**Idea + why.** Arc 0 + arc 1000 both bet on PRICE DIRECTION and failed (direction ≈ coin-flip on H4
+majors). The ignored regularity: VOLATILITY clusters (autocorrelated). Idea: after a low-vol coil (ATR
+percentile-in-trailing-100 < 0.33), enter long on a break above the prior 10-bar high — vol-clustering makes
+expansion-timing predictable, and a squeeze-break triggers stops + breakout flow that generic breakouts
+(which fade) lack. The coil is the differentiator.
+
+**What happened.** Observation (honest +1R-before-SL capture, IS 2010–2020, unconditional 0.4877):
+contraction-breakout **0.4880** (+0.0003) ≈ generic-breakout 0.4863 ≈ base. The coil adds ZERO directional
+lift — the hypothesis is FALSIFIED at observation. (coil-only 0.4895, oversold-reversion 0.4844 — both dry.)
+Formal cheap-kill: pool 3,186 IS trades (capture 0.4862, matches obs); 3-fold honest triage 2013 −9.41% /
+2016 −1.15% / 2019 −5.43% — ALL negative, worst −9.41%, mean −5.33%, no lucky fold. → KILL at triage
+(protocol §5d), before full WFO.
+
+**Verdict: FAIL (cheap-kill).** The coil predicts vol EXPANSION but not DIRECTION; a long-only break is still
+a directional coin-flip, inheriting the same sub-cost base as the prior two arcs.
+
+**Threads / lessons.** (1) A volatility coil confers NO directional long edge on H4-major breakouts
+(contraction-brk = generic-brk = unconditional ~0.487). (2) THIRD independent long family (pullback, XS
+momentum, contraction-breakout) with the SAME ~coin-flip-base / sub-cost outcome — strong accumulating
+evidence that the limiting factor for an H4-major LONG is the cost/SL-first hurdle against a ~0.49
+directional base, NOT the entry construction. Direction-prediction entries (continuation, reversion,
+momentum, breakout, squeeze) are systematically dry at this TF/RR. **Implication for future arcs:** try a
+structurally different LEVER — payoff/RR asymmetry, portfolio/selection (the open XS-as-universe thread), a
+different timeframe, or a non-directional construction — rather than another H4 directional-long entry
+trigger. (Did NOT need the null baseline — an all-negative triage is decisive; the null is for distinguishing
+a sub-cost edge that survives to a full WFO.)
+
+**FLAGS (code not merged):** none. Signal + drivers scratch `_disco_work/` (reproducible from the arc doc).

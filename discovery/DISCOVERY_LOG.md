@@ -25,6 +25,7 @@ at arc step (i).
 | 3002 | 3000s | 2026-06-04 | Volume-confirmation long (vol-spike on trending crosses) — the last untouched data column; full IS 7/10 neg | N | n/e | -16.25% | n/e | 20.57% | 839 | FAIL (IS WFO) | N |
 | 3003 | 3000s | 2026-06-04 | Regime detection for momentum (Kaufman Efficiency-Ratio): is the trending regime detectable in advance? REGIME INVERSION (strong trends revert); best-case band catastrophic | N | n/e | -63.11% | n/e | 66.51% | 9250 | FAIL (IS WFO) | N |
 | 2001 | 2000s | 2026-06-04 | Weekend-gap-fill long, MAJORS (buy big weekly-open down-gap, reversion to prior close) — CONVERGES w/ arc 1006 (JPY crosses); REAL edge but uncapturable: majors mean-NEG (vs 1006 crosses mean-POS), honest i+1 entry lands in adverse continuation (MAE −1.1R), thin (~13-17/fold); HEAVY diagnosis-council KILL, OOS preserved pristine | N | n/e (OOS preserved) | -4.57% | n/e | n/e | 176 | FAIL (IS+council) | N |
+| 2002 | 2000s | 2026-06-05 | H1 entry-resolution test of the weekend gap-fill (enter ~6h closer to the gap open) — does finer resolution capture the fill the H4 i+1 entry missed? NO: H1 capture 0.450 ≡ H4 0.45-0.47, MAE −1.2R ≡ H4; the down-gap's adverse continuation is TF-INVARIANT. Confirmatory cheap-kill; vindicates arc-2001 council (uncapturable, not an H4 artifact) | N | n/e | -2.02% | n/e | n/e | 151 | FAIL (triage) | N |
 
 ---
 
@@ -636,3 +637,44 @@ null-confirmation (the decisive closure test as leads narrow).
 
 **FLAGS (code not merged):** none. Built + registered `make_price_target_exit_predicate` (works; just not the
 right exit for an overshoot edge). Drivers scratch `_disco_work/`.
+
+### arc_2002
+
+**H1 entry-resolution test of the weekend gap-fill** (chat 2000s). Full record:
+[`arcs/arc_2002_h1_gap_resolution.md`](arcs/arc_2002_h1_gap_resolution.md). No council (confirmatory
+cheap-kill); reused BUILT `WeekendGapFillLongSignal` on H1.
+
+**Idea + why.** The arc-2001 HEAVY council ruled the gap-fill "uncapturable at H4 RESOLUTION" — the honest
+i+1 entry fills 8h after the gap open, deep in the adverse continuation. Entry resolution is the one
+UNBLOCKED, non-curve-fit, non-colliding lever (distinct from 1000s' cross-gap-portfolio): on **H1** the i+1
+entry is ~2h after the open (~6h earlier), so it should capture the fill the H4 entry misses. Mechanistic
+change (finer bars), not a tuned parameter — so the council's contamination/thinness objection doesn't block
+it. Is "at H4 resolution" load-bearing, or uncapturable at any resolution?
+
+**What happened.** H1 majors, IS 2010–2020 (H1 loads ~1s/pair from m1 cache). Characterize: H1 capture
+**0.450–0.454 ≡ H4 0.45–0.47**; meanMAE **−1.2 to −1.3R ≡ H4**; stop 0.76–0.80. Entering 6h closer changes
+NOTHING — because the down-gap continues adversely for hours-to-days, so shaving 6h off a multi-hour
+continuation doesn't escape it. Triage (3 folds, comparable thr2.0 SL2.0 partial): +2.43/−2.02/−1.04, mean
+−0.21%, 2/3 neg — the same near-break-even-to-sub-cost as H4. → confirmatory cheap-kill.
+
+**Verdict: FAIL (confirmatory).** Entry resolution is NOT the binding constraint. The gap-fill's adverse
+continuation is **TIMEFRAME-INVARIANT** (H4 ≡ H1); the long-only fill entry is structurally late at any bar
+size. Empirically vindicates the arc-2001 council ("the mechanism survives; the trade does not") — and
+complements arc 1007 (1000s: the gap edge is OVERSHOOT not fill, capping at the target is worse) and arc
+3001 (intraday down-spikes CONTINUE not revert). The long-side gap-fill is now closed across resolutions
+AND exit structures.
+
+**Threads / lessons.** (1) The weekend gap-fill's adverse continuation is TF-INVARIANT (H4≡H1) — entry
+resolution was never the lever. (2) Convergent closure of the long-side gap-fill from 4 angles across 2
+chats: universe (1006 crosses>majors), exit-at-target (1007 overshoot-not-fill), entry-resolution (2002
+TF-invariant), and intraday-analog (3001 spikes continue). (3) The only live gap paths remain the two named
+in arc 2001 — neither a long-only price-signal: the cross-universe net-positive PORTFOLIO (1000s' active
+thread) and the blocked UP-gap SHORT (FLAG-1, stronger side, human-gated code). (4) **The price-only
+long-only H4/H1/D1 space is now comprehensively mapped across 15 arcs / 3 chats with no capturable
+EDGE>COST edge found.** Next 2000s arc should weigh a LIGHT generative council (§5b, flagged by arc 3001)
+for a genuinely non-price-structure construction, vs documenting the structural blockers as the standing
+result.
+
+**FLAGS (code not merged):** none new (carries FLAG-1 long-only-blocks-short-side, FLAG-2 H4-cost-vs-
+reversion from arc 2001). No new tool (reused `WeekendGapFillLongSignal(primary_tf="H1")`). Driver scratch
+`_disco2000_work/`.

@@ -17,6 +17,7 @@ at arc step (i).
 | 1003 | 1000s | 2026-06-04 | Cross trend-momentum long (Donchian-20 breakout in uptrend, 8 trending crosses) — universe lever; cheap-kill | N | n/e | -9.75% | n/e | 12.39% | 4078 | FAIL (triage) | N |
 | 1004 | 1000s | 2026-06-04 | Cross-trend exit/cost engineering (let-it-run / 3R vs partial-runner) — EXIT lever; cheap-kill | N | n/e | -9.75% | n/e | n/e | 4078 | FAIL (triage) | N |
 | 1005 | 1000s | 2026-06-04 | Turn-of-month USD-long calendar drift (USDCHF/USDXXX, 6-bar time exit) — non-directional mechanism; cheap-kill | N | n/e | -2.78% | n/e | 2.96% | 128 | FAIL (triage) | N |
+| 1006 | 1000s | 2026-06-04 | Weekend gap-down-fill long, JPY crosses (gap<-0.5ATR, 24-bar time exit) — generative-council idea; REAL but fold-fragile (FIRST mean-positive IS edge +0.69%, beats random) | N | N | -6.79% | -4.13% | 8.57% | 396 | FAIL | N |
 | 2000 | 2000s | 2026-06-04 | Trend-following long via full-size convexity harvest (Donchian breakout + full-size trailing) — fat tail is generic not trend-selected; cheap-kill at triage | N | n/e | -13.97% | n/e | 15.8% | 1617 | FAIL (triage) | N |
 | 3000 | 3000s | 2026-06-04 | Mean-reversion long on coupled crosses (RSI<25 oversold) — instrument-universe + reversion lever; cheap-kill | N | n/e | -20.22% | n/e | 22.54% | 1009 | FAIL (triage) | N |
 | 3001 | 3000s | 2026-06-04 | Drift-lens scan (mean fwd drift, the metric +1R-before-SL is blind to) across 28 pairs × 6 conds — directional-long death is METRIC-ROBUST; best cell post-up-spike trending-cross net −10.78% | N | n/e | -28.07% | n/e | 32.38% | 1375 | FAIL (triage) | N |
@@ -513,3 +514,36 @@ meta-pivot (is this apparatus capable of any edge, and what structural change is
 lone guess. Portfolio/selection still premature (no net-positive component).
 
 **FLAGS (code not merged):** none. Scan + signal + drivers scratch `_disco3_work/`.
+
+### arc_1006
+
+**Weekend gap-down-fill long, JPY crosses (generative-council idea)** (chat 1000–1999). Full record:
+[`arcs/arc_1006_weekend_gap_fill_long.md`](arcs/arc_1006_weekend_gap_fill_long.md). Council transcript (LIGHT
+generative, §5b): [`results/arc_1006_weekend_gap_fill/council_transcript.md`](results/arc_1006_weekend_gap_fill/council_transcript.md).
+
+**Idea + why.** Directional + calendar closed fleet-wide (arc 3001 flagged a §5b generative council). Convened
+it (5 lenses); synthesized the WEEKEND GAP-FILL (untouched by arcs 0–3001; price-only, long-only): big weekend
+gap-downs tend to FILL (weekend positioning/liquidity overhang reverts Monday). Rejected SL-geometry (1/W cancels
+the sign), triangular divergence (dead at H4), deferred the Devil's null-confirmation (premature).
+
+**What happened.** Observation: big gap-downs (<−0.5 ATR) fill (+0.20 ATR pooled fwd); **JPY crosses strongest**
+(EURJPY +0.48 ATR, capture 0.54 — biggest gross edge of the run); moderate gap-downs CONTINUE down. Best version:
+long a JPY cross on a >0.5-ATR weekend gap-down, 24-bar time exit, SL=2ATR. Pool 396 trades, **mean final_r
++0.1127 gross**. Triage 2013 −2.06% / 2016 +3.20% / 2019 +7.45% (2/3 POSITIVE, mean +2.86%, tiny DDs) → PROCEED.
+Full WFO: IS mean **+0.69% (FIRST mean-positive IS of the run)**, beats random null (−0.60%), DDs 2–9% — BUT
+all-folds-positive NO (5/10 IS neg worst −6.79%; OOS 4/6 neg worst −4.13%). One reasoned refinement (uptrend
+filter close>SMA50): negatives 5/10→4/10 but still not all-folds-positive AND over-thinned (min 5 trades/fold).
+
+**Verdict: FAIL** (not all-folds-positive) — but **categorically the most promising result of the run**: a REAL,
+mean-positive, beats-random, low-DD edge that is merely FOLD-FRAGILE (JPY-cross weekend gaps are tail-event-
+timing-dependent), not a coin-flip.
+
+**Threads / lessons.** (1) Weekend gap-FILL is REAL on JPY crosses — first net-positive long edge; fold-fragile,
+large-gap-only (moderate gap-downs continue down). (2) **RE-OPENS the portfolio thread**: arc 3001 noted you
+can't diversify net-NEGATIVE components positive — but this is the FIRST net-POSITIVE (fold-fragile) component;
+a decorrelated combination of ≥2 such edges could plausibly reach all-folds-positive (diversification cuts
+fold-variance, preserves positive mean). **HIGH-VALUE fleet steer: hunt for a 2nd net-positive edge to combine.**
+(3) Generative council earned its keep (steered off the exhausted rut to the first promising lead) and queued
+untested ideas: spread-tier gating, vol/cost-ratio conditioning, Asia→London timing, Devil's null-confirmation.
+
+**FLAGS (code not merged):** none. Reused BUILT `make_time_exit_predicate`; drivers scratch `_disco_work/`.

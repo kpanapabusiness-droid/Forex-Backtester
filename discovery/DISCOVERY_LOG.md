@@ -20,6 +20,7 @@ at arc step (i).
 | 2000 | 2000s | 2026-06-04 | Trend-following long via full-size convexity harvest (Donchian breakout + full-size trailing) — fat tail is generic not trend-selected; cheap-kill at triage | N | n/e | -13.97% | n/e | 15.8% | 1617 | FAIL (triage) | N |
 | 3000 | 3000s | 2026-06-04 | Mean-reversion long on coupled crosses (RSI<25 oversold) — instrument-universe + reversion lever; cheap-kill | N | n/e | -20.22% | n/e | 22.54% | 1009 | FAIL (triage) | N |
 | 3001 | 3000s | 2026-06-04 | Drift-lens scan (mean fwd drift, the metric +1R-before-SL is blind to) across 28 pairs × 6 conds — directional-long death is METRIC-ROBUST; best cell post-up-spike trending-cross net −10.78% | N | n/e | -28.07% | n/e | 32.38% | 1375 | FAIL (triage) | N |
+| 3002 | 3000s | 2026-06-04 | Volume-confirmation long (vol-spike on trending crosses) — the last untouched data column; full IS 7/10 neg | N | n/e | -16.25% | n/e | 20.57% | 839 | FAIL (IS WFO) | N |
 
 ---
 
@@ -430,3 +431,44 @@ drift angle. (3) Faint trending-cross momentum is regime-fragile + net-negative 
 since the 3000s side has now closed the price-structure directional space.
 
 **FLAGS (code not merged):** none. Scan + signal + drivers scratch `_disco3_work/`.
+
+### arc_3002
+
+**Volume-confirmation long — the last untouched data column** (chat 3000–3999). Full record:
+[`arcs/arc_3002_volume_confirmation_long.md`](arcs/arc_3002_volume_confirmation_long.md). No council
+(no reachable ceiling once full IS unmasked the lucky triage).
+
+**Idea + why.** Every arc conditioned on price/vol/structure/timeframe/calendar; **none used `volume`** — yet
+the panel carries a tick-count `volume` column (activity proxy). Volume-confirmation (price moving on high
+volume = informed = continuation) is the last untouched data axis. Re-used arc 3001's forward-drift lens with
+volume conditionings, 28 pairs, IS.
+
+**What happened.** Group-level volume-conditioned drift (gross R): NO cell clears the ~0.05–0.10R cost hurdle;
+best group cell = TREND_X vol-spike(>2.5×) **+0.0475R** (thin n=710). Per-pair flags were scattered single-pair
+(GBPJPY lovol_pull +0.092 etc.) = regime-luck, not built. Triaged the best cross-pair cell (vol-spike long, 12
+trending crosses; pool n=839, cap 0.478, **gross mean final_r +0.0035** ≈ nil): 3-fold (2013/2016/2019) =
+**+11.43 / +11.97 / −16.25 → mean +2.38%, 2/3 pos → NOT deeply negative → proceeded** (first non-negative
+triage in 3000s). **Full IS WFO (all 10 folds) unmasked it: 2011−13.6, 2012−0.8, 2013+11.4, 2014−11.5,
+2015−3.6, 2016+12.0, 2017−9.9, 2018−12.9, 2019−16.3, 2020+6.1 → worst −16.25%, mean −3.91%, 7/10 NEGATIVE →
+FAIL.** The triage was lucky (sampled 2013 & 2016, the two most momentum-friendly years).
+
+**Verdict: FAIL.** Volume-confirmation does not rescue the directional base. **Diagnosis (unifying): volume
+predicts move MAGNITUDE, not DIRECTION** — exactly arc 1001's volatility-contraction finding re-derived on the
+volume axis. Both volume & volatility say a *bigger* move is coming, not *which way*; a long-only bet on them is
+a higher-variance directional coin-flip → regime-dependent, net sub-cost. Direction (≈0.49) is the binding
+constraint regardless of the magnitude predictor.
+
+**Threads / lessons.** (1) **Volume = magnitude, not direction** (unifies arc 1001); the last untouched data
+column is now closed. (2) **METHODOLOGICAL — the 3-fold triage {2013,2016,2019} over-samples momentum-friendly
+years** (2013/2016 are positive for almost every momentum-ish signal — cf. arc 1000 +11.98% 2013, arc 3001
++16.74% 2013); a regime-dependent signal can show a *positive* triage mean yet be 7/10 neg on full IS. **A
+non-negative 3-fold triage is necessary but not sufficient — confirm with full IS before any
+diagnosis/council investment** (or include a chop year 2014/2017/2018 in the triage). (3) Single-pair drift
+flags = regime-luck (GBPJPY +0.092R), not edge — keep the cross-pair-robustness discipline. **Surviving steer:**
+price/volume/structure/timeframe directional space is now systematically closed from the 3000s side and
+calendar is weakening (1005) → **arc 3003 is the right point for a LIGHT generative council (§5b)** — a genuine
+idea-fork — or a meta-pivot (is this apparatus capable of any edge, and what must change?).
+
+**FLAGS (code not merged):** none requiring the canonical core. Methodological note only: the chat-convention
+triage year-set {2013,2016,2019} is momentum-biased (lesson 2); canonical `build_v3_folds` is unaffected.
+Scan + signal + drivers scratch `_disco3_work/`.

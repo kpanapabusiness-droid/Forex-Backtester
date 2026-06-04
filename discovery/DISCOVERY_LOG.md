@@ -15,6 +15,7 @@ at arc step (i).
 | 1001 | 1000s | 2026-06-04 | Volatility-contraction breakout long (low-ATR coil + 10-bar-high break) — cheap-kill at triage | N | n/e | -9.41% | n/e | 12.30% | 3186 | FAIL (triage) | N |
 | 1002 | 1000s | 2026-06-04 | D1 daily trend-following long (Donchian-20 breakout in uptrend) — TF lever; cheap-kill at triage | N | n/e | -5.72% | n/e | 6.61% | 831 | FAIL (triage) | N |
 | 1003 | 1000s | 2026-06-04 | Cross trend-momentum long (Donchian-20 breakout in uptrend, 8 trending crosses) — universe lever; cheap-kill | N | n/e | -9.75% | n/e | 12.39% | 4078 | FAIL (triage) | N |
+| 1004 | 1000s | 2026-06-04 | Cross-trend exit/cost engineering (let-it-run / 3R vs partial-runner) — EXIT lever; cheap-kill | N | n/e | -9.75% | n/e | n/e | 4078 | FAIL (triage) | N |
 
 ---
 
@@ -216,3 +217,29 @@ directional-long FAIL across entry/TF/universe → **change the MECHANISM**: non
 construction whose gross edge clears cost.
 
 **FLAGS (code not merged):** none. Signal + drivers scratch `_disco_work/`.
+
+### arc_1004
+
+**Cross-trend exit/cost engineering (EXIT lever)** (chat 1000–1999). Full record:
+[`arcs/arc_1004_cross_trend_exit_engineering.md`](arcs/arc_1004_cross_trend_exit_engineering.md). No council.
+
+**Idea + why.** arc 1003 cross trend = +0.10R gross drift but sub-cost (EDGE<COST). Hypothesis: the
++1R-partial-runner CAPS the runner; a let-it-run exit captures more of the +drift per winner → higher
+R-per-trade amortizes the per-trade cost. Test reasoned exit variants on the SAME cross trend signal.
+
+**What happened.** Triage across exits (3 folds): baseline partial+runner worst −9.75%/mean −5.49%; wide-trail
+let-it-run worst −9.75%/mean −4.07%; standard trail worst −11.45%/mean −5.16%; 3R target worst −11.71%/mean
+−4.73%. Let-it-run/asymmetric IMPROVE the trending year (2013 +1.43%→+4.75–6.43%) but leave choppy folds
+(2016/2019) deeply negative. No exit flips net-positive → cheap-kill.
+
+**Verdict: FAIL (cheap-kill).** Exit engineering does NOT beat EDGE<COST.
+
+**Threads / lessons.** (1) Exits can't rescue the cross trend — arc 0's "exits don't rescue a coin-flip entry"
+extends to a POSITIVE-drift instrument: thin +drift + coin-flip split + per-trade spread = net-negative
+regardless of harvest. (2) EDGE<COST is an ENTRY/COST problem, not an exit problem — the fix must raise
+per-trade gross edge or cut per-trade cost (frequency), not redistribute the exit. (3) Cross-trend family now
+CLOSED across entry + all exit structures. Next: change the MECHANISM — calendar-flow (turn-of-month) tested
+with the CORRECT metric (mean forward DRIFT; +1R-before-SL is blind to small drifts) and correct long-only
+USD-pair-structure handling.
+
+**FLAGS (code not merged):** none. Driver scratch `_disco_work/arc1004_exits.py`.

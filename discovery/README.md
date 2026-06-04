@@ -17,6 +17,21 @@ cheap kills (pool floor, oracle-best-cluster ceiling, triage) → diagnose → a
 survivor stress-test → document. The sole judge is **all-folds-positive on IS and OOS**, honest engine,
 FundedNext guardrails; ROI / DD / correlation are characterized, not gated.
 
+Run the arc's measurement by **calling** the canonical apparatus via the standard entry point in
+[`TOOL_REGISTRY.md`](./TOOL_REGISTRY.md) (pool build, clustering, the per-fold runners, fold sets,
+cost chokepoint, discovery judge, SL-honest engine) — never re-roll a driver in scratch. Experiment
+tools (filters, exits, transforms, null baselines) go in `tools/`, checked-then-reused via the same
+registry.
+
+## Data
+
+The canonical price corpus is the recovered **~65 GB HistData backup** at
+`C:\Users\panap\histdata_backup` — point the loader's `histdata_root` there. The working-tree
+`data/histdata/` holds **manifests only** (and `data/cache/` may be absent), so a fresh chat does
+**not** need to "regenerate 12-24 h": load straight from the backup. First load is ~75 s/pair, then
+parquet-cached under `data/cache/`; the one-time cache warm is shared across chats (parquet on disk).
+Real bid/ask, EET sessions (`boundary_convention="5ers_eet"`), H4 the working timeframe.
+
 ## The Council of Five
 
 At idea-forks (light), on the diagnosis (heavy), and on every survivor before promotion to `passed/`
@@ -29,11 +44,13 @@ The council always RECOMMENDS; CC always COMMITS.
 | Path | What |
 |---|---|
 | `DISCOVERY_PROTOCOL.md` | The authoritative protocol. Read it first. |
+| `TOOL_REGISTRY.md` | Two-tier registry: CANONICAL (LOCKED measurement — call, never reimplement) + BUILT (CC experiment tools, reused across arcs) + the standard measurement entry point. |
 | `DISCOVERY_LOG.md` | Two-tier append-only log: Tier-1 machine-scannable ledger + Tier-2 free-form reasoning. Chats APPEND only. |
 | `LESSONS.md` | Operator-compressed distillation of the log. Chats READ only. |
 | `arcs/` | Per-arc full records: `arc_<id>_<slug>.md`. |
 | `passed/` | Deep records for survivors (config, per-fold IS+OOS, costs, council verdict, exact repro command + frame sha). The operator's deep-dive target. |
 | `results/` | Raw run artifacts per arc. |
+| `tools/` | Committed BUILT experiment tools (filters, exits, transforms, null baselines) — reused across arcs, not re-rolled in scratch. |
 
 ## Chat-range convention
 

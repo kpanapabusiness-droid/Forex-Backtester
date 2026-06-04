@@ -61,7 +61,7 @@ Any arc (standard, discovery, or diagnostic probe) plugs into the same overseer 
 | Dual-tier disposition at Step 5 | PASS-DEPLOYABLE / PASS-VIABLE / FAIL; DD ≤ 8% at `r_safe` (DEPLOYABLE), ≤ 10% at `r_hard` (VIABLE) |
 | Step 6 causal audit is mandatory for PASS | Auto-dispatches on Top-1; critical failure downgrades verdict to FAIL |
 | Risk-normalised gates | Engine emits at `r_base`; gates evaluate at scaled `r_safe` / `r_hard` (0.15% ≤ r ≤ 2.0%) |
-| Ex-ante population always | `build_ex_ante_bounded_population` (or equivalent) — no outcome-aware filtering anywhere |
+| Ex-ante population always | `build_arc_pool` (`core/arc/arc_pool_builder.py`; the spec name `build_ex_ante_bounded_population` is an alias for it) — no outcome-aware filtering anywhere |
 | No lookahead / no repainting | Hard invariant; lookahead-invariant tests required at every step |
 | Config-driven (YAML only) | No hardcoded parameters |
 | Real bid/ask spreads | HistData M1 bid+ask is canonical; zero-spread bars are a data-quality flag, not silently backfilled |

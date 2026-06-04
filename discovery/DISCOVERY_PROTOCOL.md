@@ -54,6 +54,23 @@ result" is valid.
 Each arc follows this loop. CC runs it autonomously; the council (§7) is invoked at the marked
 junctures.
 
+**Tooling discipline (applies to every step below).** Measurement is CALLED, never re-rolled: run
+the arc's measurement through the **standard entry point** in [`TOOL_REGISTRY.md`](./TOOL_REGISTRY.md)
+— it wires the canonical, LOCKED apparatus (pool build, clustering/capturability, the per-fold
+runners, the fold sets, the cost chokepoint, the discovery judge, the SL-honest engine). Do NOT
+write a driver that reimplements any of it in scratch. For **experiment** tooling (filters,
+clusterers, transforms, exit probes, signals, null baselines): check `TOOL_REGISTRY.md` (BUILT)
+FIRST — if it exists, call it; if not, build it under `discovery/tools/` (committed, not scratch),
+use it, and append a BUILT row at arc end (step (i)). If a CANONICAL measurement tool looks wrong,
+FLAG it in the arc doc (§9) — never patch it mid-run.
+
+**Data foundation.** The canonical price corpus is the recovered ~65 GB HistData backup at
+`C:\Users\panap\histdata_backup` — point the loader's `histdata_root` there (NOT the working-tree
+`data/histdata`, which holds manifests only, and `data/cache` may be absent). First load per pair is
+~75 s, then parquet-cached under `data/cache`; the one-time cache warm is shared across chats (on
+disk). A fresh chat does NOT need to "regenerate 12-24 h" — just load from the backup. (See
+[`README.md`](./README.md).)
+
 **(a) READ + SYNTHESIZE THE LOG.** Before anything else, read the full DISCOVERY_LOG (both tiers,
 §6) + LESSONS.md. Explicitly summarize what's been tried across all chats, what's dead, what
 threads are open. SHOW this reading in the arc doc — an arc that skips this produces no learning.
@@ -80,9 +97,11 @@ Pull main first so the log is current (other chats append continuously).
 - [COUNCIL — optional, light] If genuinely stuck or at a real idea-fork, convene the council for
   generative perspectives. CC synthesizes its own idea from them (generative = CC decides).
 
-**(c) CHARACTERIZE.** Build the ex-ante population (`build_ex_ante_bounded_population`). Look at
-what the trades actually do: path shapes, pre-entry and post-entry behavior, where the move
-happens, adverse excursion, regime/session/vol concentration. Cluster path shapes if useful.
+**(c) CHARACTERIZE.** Build the ex-ante population — call `build_arc_pool` (the in-tree function;
+`build_ex_ante_bounded_population` is a doc alias for it) via the standard entry point in
+[`TOOL_REGISTRY.md`](./TOOL_REGISTRY.md). Look at what the trades actually do: path shapes, pre-entry
+and post-entry behavior, where the move happens, adverse excursion, regime/session/vol
+concentration. Cluster path shapes if useful (`run_step_2` / `run_step_3`, both canonical).
 
 **(d) CHEAP KILLS (compute-savers — honest engine throughout, less data early).**
 - **Pool floor:** < 50 trades over IS (~1/week) -> KILL (too thin).
@@ -106,11 +125,15 @@ sweep only to confirm a reasoned hypothesis, never as blind primary search. heav
 HERE as a PROBE (does extractable structure exist in these features?) — a question-answering
 instrument, not a solution; it does not absolve CC of understanding WHY. An idea is only marked
 unusable after its best reasoned version has failed — so "FAIL" means the FAMILY is dead, not that
-the first naive cut failed.
+the first naive cut failed. The filters / exits / transforms / probes you build here are EXPERIMENT
+tools: check [`TOOL_REGISTRY.md`](./TOOL_REGISTRY.md) (BUILT) first, reuse if present, else build
+under `discovery/tools/` and register at step (i).
 
 **(g) VALIDATE.** Full honest WFO on IS -> all-folds-positive? If yes, measure OOS (2021-current)
 -> all-folds-positive? The SOLE judge is all-folds-positive on IS AND OOS, honest engine,
-FundedNext guardrails. ROI / DD / correlation are CHARACTERIZED, not gated (a weak-but-decorrelated
+FundedNext guardrails (canonical: `build_v3_folds` IS folds + `build_oos_year_folds` for OOS, scored
+by `ArcFoldRunner`, judged by `judge_all_folds_positive` — all via the entry point in
+[`TOOL_REGISTRY.md`](./TOOL_REGISTRY.md)). ROI / DD / correlation are CHARACTERIZED, not gated (a weak-but-decorrelated
 system has portfolio value; risk is scalable). Bonferroni-style correction, if applied, is applied
 to the small set of FINALISTS that reach WFO — NOT to every searched candidate (search-stage
 correction is too harsh; the holdout does the real work).
@@ -124,6 +147,15 @@ away. This is the Arc-10 insurance — the adversarial review on every survivor 
 what tried and WHY, what happened, the verdict. Append to the log. Commit (docs only) to main.
 
 **(j) NEXT ARC.** Check the stop sentinel (§9). If absent, go to (a) for the next idea.
+
+**(k) SELF-DEBLOAT (shed, then loop).** The arc's detail is now persisted (step (i): arc doc +
+DISCOVERY_LOG append, committed) — the SAVE is done. ONLY now, shed this arc's transient working
+detail from context (raw WFO output, the council transcript, data dumps, scratch reasoning),
+retaining just loop-state: chat identity, the assigned arc-id range, and the loop position. Then
+begin the next arc FRESH by re-reading the log at step (a) — the written corpus, not your context,
+is what carries learning forward. ORDERING IS CRITICAL: append-to-log (i) BEFORE shedding (k); never
+shed before the save or the arc's lesson is lost. This is a soft self-debloat (stay oriented), not a
+hard wipe.
 
 ## 6. DOCUMENTATION (the learning mechanism)
 CC does not truly learn across sessions; the WRITTEN CORPUS is what compounds. Two-tier log:

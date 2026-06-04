@@ -19,14 +19,16 @@ that reset this repo (internal consistency ≠ correctness).
   as engine fixtures; neither is a live system.
 - **All pre-2026-06-02 gate numbers are NOT trustworthy** (retired replay). They survive only as a
   record of what was tried — see [`ARC_HISTORY.md`](./ARC_HISTORY.md).
-- **Forward research: the discovery pipeline is BUILT and trial-validated, but pre-continuous.**
+- **Forward research: the discovery pipeline is BUILT, trial-validated, and CLEARED for continuous operation.**
   The self-running discovery programme now lives in-repo under [`discovery/`](./discovery/) — read
   [`discovery/DISCOVERY_PROTOCOL.md`](./discovery/DISCOVERY_PROTOCOL.md) (authoritative) +
   [`discovery/README.md`](./discovery/README.md), with operator dispatch via
-  [`docs/DISCOVERY_DISPATCH_TEMPLATE.md`](./docs/DISCOVERY_DISPATCH_TEMPLATE.md). Arc 0 (supervised
-  trial) ran end-to-end on the honest engine and FAILED its signal — correctly — so the machinery is
-  validated; **deployable-system count is still 0**. Continuous multi-chat operation is pending
-  operator authorization.
+  [`docs/DISCOVERY_DISPATCH_TEMPLATE.md`](./docs/DISCOVERY_DISPATCH_TEMPLATE.md), the per-chat run
+  dispatch [`discovery/CONTINUOUS_RUN_DISPATCH.md`](./discovery/CONTINUOUS_RUN_DISPATCH.md), and the
+  overseer handover [`discovery/CONTINUOUS_OVERSEER_HANDOVER.md`](./discovery/CONTINUOUS_OVERSEER_HANDOVER.md).
+  Arc 0 (supervised trial) ran end-to-end on the honest engine and FAILED its signal — correctly — so
+  the machinery is validated; **deployable-system count is still 0**. Continuous multi-chat operation
+  is now AUTHORIZED (protocol §10 staging: trial DONE → chats run continuously from arc 1).
 
 ## What exists (the base)
 
@@ -35,7 +37,7 @@ that reset this repo (internal consistency ≠ correctness).
 - The signal library, the ML toolkit (`scripts/heavy_ml_probe/`), the tracker parser, the data pipeline.
 - A signal-agnostic MetaTrader 5 EA template + deployment/runbook machinery (`EA/`, `MQL5/`, `deployment/`) — not wired to any live system.
 - The elimination ledger ([`ARC_HISTORY.md`](./ARC_HISTORY.md)) and the gate-fidelity lesson ([`docs/ARC_10_GATE_FIDELITY_DEFECT.md`](./docs/ARC_10_GATE_FIDELITY_DEFECT.md)).
-- The self-running discovery pipeline ([`discovery/`](./discovery/)) — protocol, tool registry, measurement glue (`core/wfo/discovery_measure.py`), and the `/llm-council-discovery` skill. Built and trial-validated (Arc 0); pre-continuous, deployable-system count = 0.
+- The self-running discovery pipeline ([`discovery/`](./discovery/)) — protocol, tool registry, measurement glue (`core/wfo/discovery_measure.py`), the continuous-run dispatch + overseer handover, and the `/llm-council-discovery` skill. Built and trial-validated (Arc 0); continuous operation AUTHORIZED, deployable-system count = 0.
 
 ## How to start a new arc
 

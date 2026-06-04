@@ -23,14 +23,16 @@ The repo was reset to a verified-green base (`reset/clean-base`).
   replay. **Required reading:** [`docs/ARC_10_GATE_FIDELITY_DEFECT.md`](./docs/ARC_10_GATE_FIDELITY_DEFECT.md).
 - **KH-24 is retired/closed** — not a live system. Its strategy code is retained only as the A1
   byte-identity engine anchor.
-- **Forward research: the discovery pipeline is BUILT and trial-validated, but pre-continuous.**
+- **Forward research: the discovery pipeline is BUILT, trial-validated, and CLEARED for continuous operation.**
   The self-running discovery programme now lives in-repo under [`discovery/`](./discovery/) — start
   at [`discovery/DISCOVERY_PROTOCOL.md`](./discovery/DISCOVERY_PROTOCOL.md) (authoritative) +
   [`discovery/README.md`](./discovery/README.md); operator dispatch via
-  [`docs/DISCOVERY_DISPATCH_TEMPLATE.md`](./docs/DISCOVERY_DISPATCH_TEMPLATE.md). Arc 0 (supervised
-  trial) ran end-to-end on the honest engine and FAILED its signal — correctly — so the machinery is
-  validated and **deployable-system count is still 0**. Continuous multi-chat operation is pending
-  operator authorization.
+  [`docs/DISCOVERY_DISPATCH_TEMPLATE.md`](./docs/DISCOVERY_DISPATCH_TEMPLATE.md), the per-chat run
+  dispatch [`discovery/CONTINUOUS_RUN_DISPATCH.md`](./discovery/CONTINUOUS_RUN_DISPATCH.md), and the
+  overseer handover [`discovery/CONTINUOUS_OVERSEER_HANDOVER.md`](./discovery/CONTINUOUS_OVERSEER_HANDOVER.md).
+  Arc 0 (supervised trial) ran end-to-end on the honest engine and FAILED its signal — correctly — so
+  the machinery is validated and **deployable-system count is still 0**. Continuous multi-chat
+  operation is now AUTHORIZED (protocol §10 staging: trial DONE → chats run continuously from arc 1).
 
 All pre-2026-06-02 gate numbers were produced by the retired replay and are NOT trustworthy.
 See [`RESET_MANIFEST.md`](./RESET_MANIFEST.md) for what was kept / archived / retired and how to
@@ -107,4 +109,4 @@ test collection.
 
 ---
 
-*Last updated: 2026-06-04 — clean-base reset: fast replay retired, `MultiPairBacktester` is the sole gate engine, deployable-system count = 0. Discovery pipeline now built + trial-validated (pre-continuous); see [`discovery/`](./discovery/).*
+*Last updated: 2026-06-04 — clean-base reset: fast replay retired, `MultiPairBacktester` is the sole gate engine, deployable-system count = 0. Discovery pipeline built + trial-validated + cleared for continuous operation; see [`discovery/`](./discovery/).*

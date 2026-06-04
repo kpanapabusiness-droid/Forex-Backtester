@@ -21,6 +21,7 @@ at arc step (i).
 | 3000 | 3000s | 2026-06-04 | Mean-reversion long on coupled crosses (RSI<25 oversold) — instrument-universe + reversion lever; cheap-kill | N | n/e | -20.22% | n/e | 22.54% | 1009 | FAIL (triage) | N |
 | 3001 | 3000s | 2026-06-04 | Drift-lens scan (mean fwd drift, the metric +1R-before-SL is blind to) across 28 pairs × 6 conds — directional-long death is METRIC-ROBUST; best cell post-up-spike trending-cross net −10.78% | N | n/e | -28.07% | n/e | 32.38% | 1375 | FAIL (triage) | N |
 | 3002 | 3000s | 2026-06-04 | Volume-confirmation long (vol-spike on trending crosses) — the last untouched data column; full IS 7/10 neg | N | n/e | -16.25% | n/e | 20.57% | 839 | FAIL (IS WFO) | N |
+| 3003 | 3000s | 2026-06-04 | Regime detection for momentum (Kaufman Efficiency-Ratio): is the trending regime detectable in advance? REGIME INVERSION (strong trends revert); best-case band catastrophic | N | n/e | -63.11% | n/e | 66.51% | 9250 | FAIL (IS WFO) | N |
 
 ---
 
@@ -472,3 +473,43 @@ idea-fork — or a meta-pivot (is this apparatus capable of any edge, and what m
 **FLAGS (code not merged):** none requiring the canonical core. Methodological note only: the chat-convention
 triage year-set {2013,2016,2019} is momentum-biased (lesson 2); canonical `build_v3_folds` is unaffected.
 Scan + signal + drivers scratch `_disco3_work/`.
+
+### arc_3003
+
+**Regime detection for momentum — is the trending regime detectable in advance?** (chat 3000–3999). Full
+record: [`arcs/arc_3003_regime_detection_momentum.md`](arcs/arc_3003_regime_detection_momentum.md). No council.
+
+**Idea + why.** The central unsolved question after 12 arcs: momentum drift is real but regime-dependent (good
+trending years 2013/2016/2020, bad chop — arcs 1003/3001/3002). If the trending regime were detectable IN
+ADVANCE, trade momentum only then. Tested with Kaufman Efficiency Ratio (causal trending-ness ∈[0,1]) — the
+most direct "is this trending now" measure, not yet tried (arcs 1000/1001 tried dispersion/vol-level regimes).
+
+**What happened.** Bucketed forward 12-bar drift by ER60 on trending crosses (momentum entries above SMA50):
+chop→trend drift = −0.010 / −0.001 / +0.011 / +0.019 / **−0.061** (top ER bucket). **REGIME INVERSION** — the
+strongest-trending regime has the MOST NEGATIVE forward drift (strong trends REVERT, don't persist); the naive
+"trade momentum when trending" is actively wrong; the mid-ER band is mildly positive but sub-cost. Fail-the-
+best-version: gated momentum to the mid-ER sweet spot [0.09,0.23] (best band). Pool n=9250, capture 0.478,
+**gross mean final_r −0.0547** (the +0.019R *raw* drift evaporates to NEGATIVE SL-honest expectancy). Full IS
+WFO (skipped the lucky 3-fold triage per arc 3002's lesson): 2011−63, 2012+11, 2013+32, 2014−61, 2015−19,
+2016−31, 2017−4, 2018−30, 2019−45, 2020−43 → **worst −63.11%, mean −25.30%, 8/10 neg, DDs to 66% →
+catastrophic FAIL.**
+
+**Verdict: FAIL.** The trending regime is NOT detectable in advance as a cost-clearing momentum filter; the
+strongest-trend regime inverts (reverts). Closes the regime-detection lever — the central remaining hope for
+rescuing the faint momentum drift.
+
+**Threads / lessons.** (1) **Trending regime NOT detectable for momentum** (ER inverts: strong trends revert
+−0.061R). **Regime-conditioning has now failed across THREE measures — dispersion (1000), vol-level (1001),
+trending-ness/ER (3003)** → no exploitable regime structure for a long-only FX directional bet; extremes
+mean-revert, the middle is random. (2) **METHODOLOGICAL: raw forward drift OVERSTATES SL-honest expectancy**
+(+0.019R raw → −0.055R SL-honest; take-the-loss kills slow drifts). The drift lens (arc 3001) is an OPTIMISTIC
+cheap pre-filter; a sub-+0.05R drift cell is ~guaranteed SL-honest-negative. Only the engine verdict counts.
+(3) Wide regime band fires too often (9250 trades) → frequency amplifies a negative edge (−25%/66%DD).
+**Surviving:** the 3000s side has now closed directional entries (both metrics), instrument universe, volume,
+and regime detection; combined with 1000s/2000s (timeframe, exits, calendar, convexity) the
+price/volume/structure/regime directional space is exhausted. **Arc 3004 → LIGHT generative council (§5b):** I
+am genuinely at a stuck-point/idea-fork; convene the council for generative perspectives / to pressure-test a
+meta-pivot (is this apparatus capable of any edge, and what structural change is required?) before another
+lone guess. Portfolio/selection still premature (no net-positive component).
+
+**FLAGS (code not merged):** none. Scan + signal + drivers scratch `_disco3_work/`.

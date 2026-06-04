@@ -18,6 +18,7 @@ at arc step (i).
 | 1004 | 1000s | 2026-06-04 | Cross-trend exit/cost engineering (let-it-run / 3R vs partial-runner) — EXIT lever; cheap-kill | N | n/e | -9.75% | n/e | n/e | 4078 | FAIL (triage) | N |
 | 1005 | 1000s | 2026-06-04 | Turn-of-month USD-long calendar drift (USDCHF/USDXXX, 6-bar time exit) — non-directional mechanism; cheap-kill | N | n/e | -2.78% | n/e | 2.96% | 128 | FAIL (triage) | N |
 | 1006 | 1000s | 2026-06-04 | Weekend gap-down-fill long, JPY crosses (gap<-0.5ATR, 24-bar time exit) — generative-council idea; REAL but fold-fragile (FIRST mean-positive IS edge +0.69%, beats random) | N | N | -6.79% | -4.13% | 8.57% | 396 | FAIL | N |
+| 1007 | 1000s | 2026-06-04 | Gap-fill exit-AT-target (TP at gap origin) — best-version test of arc 1006; edge is OVERSHOOT not fill, capping it is WORSE (IS mean -1.21%, loses to null) | N | N | -6.76% | -3.93% | 6.95% | 396 | FAIL | N |
 | 2000 | 2000s | 2026-06-04 | Trend-following long via full-size convexity harvest (Donchian breakout + full-size trailing) — fat tail is generic not trend-selected; cheap-kill at triage | N | n/e | -13.97% | n/e | 15.8% | 1617 | FAIL (triage) | N |
 | 3000 | 3000s | 2026-06-04 | Mean-reversion long on coupled crosses (RSI<25 oversold) — instrument-universe + reversion lever; cheap-kill | N | n/e | -20.22% | n/e | 22.54% | 1009 | FAIL (triage) | N |
 | 3001 | 3000s | 2026-06-04 | Drift-lens scan (mean fwd drift, the metric +1R-before-SL is blind to) across 28 pairs × 6 conds — directional-long death is METRIC-ROBUST; best cell post-up-spike trending-cross net −10.78% | N | n/e | -28.07% | n/e | 32.38% | 1375 | FAIL (triage) | N |
@@ -606,3 +607,32 @@ BUILT updated.
 **FLAGS (code not merged):** **FLAG-1** long-only apparatus blocks the stronger UP-gap short side (canonical-
 core change, operator-gated, NOT merged); **FLAG-2** future-arc seed: is H4+FundedNext cost structure
 generically hostile to fill/mean-reversion entries? Drivers scratch `_disco2000_work/`.
+
+### arc_1007
+
+**Gap-fill best-version test: exit AT the fill target** (chat 1000–1999). Full record:
+[`arcs/arc_1007_gap_fill_exit_at_target.md`](arcs/arc_1007_gap_fill_exit_at_target.md). No council.
+
+**Idea + why.** Develop the run's only net-positive lead (arc 1006 gap-fill, 24-bar exit was arbitrary).
+Mechanism-aligned hypothesis: exit AT the gap origin (prior-week close) to take the reversion cleanly. Built
+`make_price_target_exit_predicate` (BUILT). One reasoned version, measured IS then OOS.
+
+**What happened.** EXIT-AT-TARGET IS WORSE: IS mean +0.69% (24-bar) → **−1.21%** (exit-at-target), now LOSES
+to the random null (−0.60%); not all-folds-positive (6/10 IS neg, OOS 4/6 neg). **Diagnosis:** the gap-fill
+edge is the OVERSHOOT — the JPY-cross snapback runs PAST the gap origin and continues; capping at the origin
+cut the big winners while keeping full −1R losers → asymmetry flipped negative. The arbitrary 24-bar "let it
+run" exit was capturing the overshoot.
+
+**Verdict: FAIL.** Arc 1006's 24-bar version remains the best version of the gap-fill; it is NOT
+all-folds-positive in any tested exit.
+
+**Threads / lessons.** (1) The JPY-cross weekend gap-down edge is OVERSHOOT/continuation, NOT fill-to-origin
+(re-frames the mechanism: big gap-down → snapback past the prior close). (2) Confirms arc 1004 ON THE POSITIVE
+LEAD: exit engineering can't fix fold-fragility (it's tail-event-timing-driven, not exit-driven). (3) The BEST
+version of a lead can be the naive one — the "mechanism-aligned" refinement was a worse hypothesis (mechanism
+mis-stated). (4) gap-fill stays the portfolio-component candidate (arc 1006 24-bar version); needs a 2nd
+net-positive edge. Queued/untested: spread-tier gating, vol/cost conditioning, Asia→London, Devil's
+null-confirmation (the decisive closure test as leads narrow).
+
+**FLAGS (code not merged):** none. Built + registered `make_price_target_exit_predicate` (works; just not the
+right exit for an overshoot edge). Drivers scratch `_disco_work/`.

@@ -16,6 +16,7 @@ at arc step (i).
 | 1002 | 1000s | 2026-06-04 | D1 daily trend-following long (Donchian-20 breakout in uptrend) — TF lever; cheap-kill at triage | N | n/e | -5.72% | n/e | 6.61% | 831 | FAIL (triage) | N |
 | 1003 | 1000s | 2026-06-04 | Cross trend-momentum long (Donchian-20 breakout in uptrend, 8 trending crosses) — universe lever; cheap-kill | N | n/e | -9.75% | n/e | 12.39% | 4078 | FAIL (triage) | N |
 | 1004 | 1000s | 2026-06-04 | Cross-trend exit/cost engineering (let-it-run / 3R vs partial-runner) — EXIT lever; cheap-kill | N | n/e | -9.75% | n/e | n/e | 4078 | FAIL (triage) | N |
+| 3000 | 3000s | 2026-06-04 | Mean-reversion long on coupled crosses (RSI<25 oversold) — instrument-universe + reversion lever; cheap-kill | N | n/e | -20.22% | n/e | 22.54% | 1009 | FAIL (triage) | N |
 
 ---
 
@@ -243,3 +244,61 @@ with the CORRECT metric (mean forward DRIFT; +1R-before-SL is blind to small dri
 USD-pair-structure handling.
 
 **FLAGS (code not merged):** none. Driver scratch `_disco_work/arc1004_exits.py`.
+
+### arc_3000
+
+**Mean-reversion long on less-efficient / coupled crosses** (chat 3000–3999, FIRST continuous
+arc of the 3000s range). Full record: [`arcs/arc_3000_reversion_long_crosses.md`](arcs/arc_3000_reversion_long_crosses.md).
+No council (cheap-kill at triage; no reachable ceiling).
+
+**Idea + why.** Fresh eyes; honest-era corpus = arcs 0 + 1000/1001/1002 (1003 landed on main mid-arc). Four
+(then five) directional-long arcs share one signature: ~0.49 directional base, beats random, fails costs. Arc
+1002's steer: change a fundamental lever — instrument universe (crosses), portfolio/selection, or a
+non-directional construction. I attacked TWO untouched axes at once: (1) **instrument universe** — crosses are
+less efficient than the hyper-arbitraged majors, and the tightly-coupled ones (EUR/GBP, EUR/CHF, AUD/NZD,
+NZD/CAD…) behave like spreads between linked economies; (2) **mean-reversion** — the FIRST non-continuation
+mechanism in the programme (all prior arcs bet on continuation/trend), and coupled crosses are where reversion
+should be strongest. Long-only forced by the apparatus → "reversion" = buy the oversold/stretched-down side.
+
+**What happened.** Observation #1 (honest +1R-before-SL LONG capture, all 28 pairs, IS 2010–2020): the base is
+**instrument-invariant** — MAJOR 0.4859, COUPLED 0.4742, TREND_X 0.4719; nothing ≥ 0.50, crosses *worse* than
+majors. z-decile buckets show NO monotone reversion lift as price stretches down on any group; the faint
+high-capture cells sit at *positive* z (the already-dry continuation axis). Observation #2 (fail the BEST
+reversion version: RSI/z/Bollinger/consec-down/big-drop × two barrier scales, on the 9 most-coupled crosses):
+only **RSI<25** lifts non-trivially, and it peaks at **0.4907** (still < 0.50), thin (~30 fires/pair/yr), and
+only 6/9 pairs lift. Characterize: pool 1,009 IS trades, capture **0.4936** (sanity-matches obs), mean final_r
+**−0.14R**, 80% hard_sl. Cheap kills: pool floor PASS (1,009); oracle ceiling SKIPPED (capture<0.50 ⇒ no
+reachable upside; a high oracle ceiling there is the Arc-0 hindsight trap — ritual not rigor); 3-fold honest
+triage (A1, SL=2·ATR, 1% reset-floor, exposure 1/pair 2/ccy, `sl_partial_close_1r_runner_trail` = reversion's
+best banking exit, FundedNext costs ON, SL-first; OOS 2013/2016/2019): **−20.22% / −5.17% / −12.89% → worst
+−20.22%, mean −12.76%, 3/3 negative → KILL at triage.**
+
+**Verdict: FAIL (cheap-kill).** Mean-reversion long on coupled crosses is not deployable. Reason reached
+twice: the directional-long base is instrument-invariant (crosses ≤ majors, all sub-0.50), and the reversion
+tilt — best version, best instruments — never crosses 0.50 (real but sub-cost). Buying oversold dips does NOT
+catch the positive gross drift crosses have (mean final_r −0.14R), so reversion is gross-coin-flip *and*
+cost-bled.
+
+**Convergence with arc 1003 (landed mid-arc).** The 1000s chat independently hit crosses from the
+*trend-momentum* angle and found the identical cross base **0.4712** < majors — two chats, two cross signals,
+one conclusion: the instrument-universe lever is **closed** for a directional long. Arc 1003 sharpened the
+constraint to **EDGE < COST** (crosses trend gross-positive +0.10R/trade but wider spreads eat it); my
+reversion case is the complement (gross-coin-flip *and* cost-bled). Together arcs 1003 + 3000 close BOTH
+directional mechanism families (continuation AND reversion) on crosses.
+
+**Threads / lessons.** (1) The FX directional-long coin-flip base is **INSTRUMENT-INVARIANT** (28-pair scan;
+crosses worse, not better) — the "less-efficient crosses" steer is closed, the way arc 1002 closed the
+timeframe steer. Independently corroborated by arc 1003. (2) **Mean-reversion confers no deployable long
+edge** — first non-continuation mechanism tested, lands sub-cost too (RSI<25 best, ~0.491 < 0.50). (3) **SIX
+directional-long arcs now fail identically across BOTH mechanism families, two timeframes, the full 28-pair
+universe, two chats** → overwhelming evidence the constraint is structural (gross edge too small × cost ×
+SL-first), not the entry. (4) The excursion-banking partial/runner exit does not rescue a sub-0.50 entry
+(re-confirmed). **Surviving steers (both away from trade-level price-direction; either is a fresh arc, not a
+rescue):** (a) non-price-direction / calendar-flow (turn-of-month — arc 1003's steer, not yet tested), (b)
+portfolio/selection of decorrelated sub-cost edges (mine; subsumes arc 0/1000's portfolio thread).
+**Coordination:** arc 1003 named the calendar/flow steer, so the 3000s range should prefer
+portfolio/selection to avoid collision.
+
+**FLAGS (code not merged):** none requiring the canonical core. Signal + drivers scratch `_disco3_work/`
+(reproducible from the arc doc). No reusable experiment tool needed (null baseline not required — an
+all-negative triage is decisive).

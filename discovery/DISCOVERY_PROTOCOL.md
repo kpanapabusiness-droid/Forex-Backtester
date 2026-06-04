@@ -234,12 +234,19 @@ and re-convenes; thin-confidence -> flag and gather. Never blocks on the human.
   for a check-in; STOP is reserved for deliberate full halts only.
 
 ## 10. RUN STAGING (trial before continuous)
-- **Arc 1 (first ever, and the first arc of each new chat) is a SUPERVISED TRIAL.** It runs ONE
-  arc to completion and HALTS for operator review of the full loop: log read, characterization,
-  cheap kills, council invocation, validation, documentation, log append, commit. Do NOT enter
-  continuous operation until the operator confirms the loop works end-to-end.
-- After the trial is confirmed: continuous operation, 2-3 parallel chats (CPU-core bound on the
-  operator's machine — do not oversubscribe; throughput degrades past ~3 concurrent WFO streams).
+- **The supervised trial is DONE (Arc 0).** The full loop — log read, characterization, cheap
+  kills, council invocation, validation, documentation, log append, commit — ran end-to-end and is
+  confirmed. New chats do NOT re-run a supervised halt. Each new chat runs CONTINUOUSLY from its
+  first arc; it does NOT halt for review after arc 1. ("Never block on the operator," §8, governs.)
+- **One unverified mechanism: self-debloat (step k) across an arc boundary.** It has never run live
+  (Arc 0 was a single arc). On its arc1->2 transition each new chat confirms, non-blocking: log
+  appended -> context shed -> arc 2 re-read the log fresh and continued. It reports this once and
+  proceeds; it does NOT halt. If self-debloat does not free context in practice, fall back to a hard
+  reset + re-read protocol/range/log, note it, and continue. To gate this safely, the operator
+  launches ONE chat first, confirms its arc1->2, then brings up the rest.
+- After self-debloat is confirmed on the first chat: continuous operation, 2-3 parallel chats (CPU-
+  core bound on the operator's machine — do not oversubscribe; throughput degrades past ~3 concurrent
+  WFO streams).
 - **Operator check-in ritual (passive, read-only, run continues):** the operator drags the current
   DISCOVERY_LOG (Tier-1 table + recent Tier-2 reasoning) and LESSONS.md into a separate chat and
   reads -> scans the `passed` column -> opens `discovery/passed/<name>/` for any Y -> decides

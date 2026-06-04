@@ -144,7 +144,7 @@ This compounds reusable tooling the same way the log + LESSONS compound knowledg
 
 | Tool | What it does | Path | How to call | Created by |
 |---|---|---|---|---|
-| _(empty — the first arc to need one appends here)_ | | | | |
+| `build_null_signal_evaluation` | Random-entry NULL baseline (soundness control). Builds a random `SignalEvaluation` with the SAME per-pair fire-count as a real eval, placed at random eligible bars (≥ warmup, next bar exists), deterministic seed; reuses the real ATR so only entry TIMING is randomized. EXPERIMENT part = mask randomization ONLY; scoring stays canonical (run the returned eval through `ArcFoldRunner`). Never realizes P&L itself. | `discovery/tools/null_entry_baseline.py` | `build_null_signal_evaluation(real_eval, seed=42, warmup=100)` → run through `ArcFoldRunner` + `run_config_over_folds` | arc 1000 |
 
 **First expected entry — the random-entry NULL baseline.** The council mandates a random-entry
 soundness control (does the real signal beat random entry under the same exit?). No canonical or

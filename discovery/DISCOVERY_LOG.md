@@ -11,6 +11,7 @@ at arc step (i).
 | arc_id | chat | timestamp | hypothesis | IS_all_folds_pos | OOS_all_folds_pos | worst_fold_ROI_IS | worst_fold_ROI_OOS | worst_DD | n_trades | VERDICT | passed |
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | 0 | trial | 2026-06-04 | Pullback-in-uptrend long (close>SMA50 & pierce prior-5-bar-low); best ver = excursion-banking exit | N | N | -14.2% | -14.3% | 17.1% | 4985 | FAIL | N |
+| 1000 | 1000s | 2026-06-04 | Cross-sectional momentum long (top-quintile 24-bar ret, rising; partial/runner exit) | N | N | -21.20% | -15.36% | 24.50% | 7757 | FAIL | N |
 
 ---
 
@@ -64,3 +65,62 @@ the-dip-in-uptrend H4 majors, the resume/fail split is not in entry-time price s
 **FLAGS (code not merged):** council's preferred BE-after-+1R exit policy absent from
 `core/sim/exit_policies/` (needs human-gated code to test); `build_ex_ante_bounded_population` named
 in protocol/CLAUDE.md is `build_arc_pool` in-tree (doc nit); arc drivers kept in scratch `_arc0_work/`.
+
+### arc_1000
+
+**Cross-sectional momentum long** (chat 1000–1999, first continuous arc). Full record:
+[`arcs/arc_1000_xsect_momentum_long.md`](arcs/arc_1000_xsect_momentum_long.md). Council transcript:
+[`results/arc_1000_xsect_momentum_long/council_transcript.md`](results/arc_1000_xsect_momentum_long/council_transcript.md).
+
+**Idea + why.** Arc 0 closed single-pair entry-time price structure for a long. So I probed the axes
+ORTHOGONAL to it: WHEN (time-of-day/session, day-of-week, vol regime, prior move) and WHICH
+(cross-sectional relative strength across the 8 majors). Observation (138,816 hypothetical honest longs,
+IS 2010–2020, unconditional capture 0.4877): the WHEN axes are DRY (max lift +1.3pp, noise, DST-confounded
+seasonality artifact). The WHICH axis showed a faint, monotone, mechanistic momentum tilt (strongest
+cross-sectional quintile capture 0.495 vs weakest 0.483) — so the best reasoned version = long the
+top-quintile 24-bar-return pair that is also rising (refractory 6, SL=2·ATR, partial/runner exit). Because:
+cross-sectional FX momentum is a continuation effect; the absolute-positive filter keeps us long a real uptrend.
+
+**What happened.** Pool 7,757 IS trades, honest capture 0.4939 (matches obs). Cluster structure MIRRORS
+arc 0 (~50% resume / ~50% fail; cluster 0 mfe_p50 5.79R; clusters 2/3 wrong-way 0.97/1.0). Cheap kills:
+oracle ceiling STRONG (worst-fold +22.4%), raw 3-fold triage NOT deeply negative (2013 +11.98%, 2016 −0.92%,
+2019 −3.03%) → proceeded to diagnose (did not cheap-kill).
+
+**The crux (why it died).** Diagnosis: the selection lever is CLOSED — every entry-time observable,
+INCLUDING the cross-sectional ones that are the signal's whole novelty (rank/dispersion/board-drift/relative-
+strength), separates good {0,1} from bad {2,3} at AUC ≈ 0.50–0.51; good-fraction by tercile flat 0.48–0.51.
+The regime hypothesis is FALSIFIED: the highest cross-sectional-dispersion (clearest-trend) quintile is the
+WORST (mean final_r −0.24R). The 2013 +11.98% is regime/luck, not separable edge. HEAVY council (5 lenses +
+peer review + chairman): KILL — dispersion inversion = falsification not tuning; capture 0.4939 over 7,757
+is indistinguishable from 0.50 (CI ±0.011); oracle ceiling is hindsight exit-variance; the lone "keep
+testing" dissent (extension-ceiling sweep) was settled against by all 5 reviewers as a non-orthogonal
+re-cut of the already-falsified dispersion axis ("ritual not rigor"). CC committed (no override); did NOT
+run the sweep. Full WFO verdict-of-record: IS 7/10 folds neg (worst −21.20%) → NOT all-folds-positive; OOS
+5/6 neg (worst −15.36%) → NOT all-folds-positive. Null baseline: REAL mean fold ROI −4.36% (7/10 neg) BEATS
+random −9.19% (9–10/10 neg) → a real but SUB-COST edge, the SAME signature as arc 0.
+
+**Verdict: FAIL.** Family dead for deployment.
+
+**Threads / what didn't help.** Cross-sectional momentum as a TRADE-LEVEL directional long is closed (the
+discriminator is post-entry, not in the cross-sectional structure). The extension-ceiling refinement is
+closed (non-orthogonal to the falsified dispersion axis). Temporal/regime conditioning of a naive long is
+closed. OPEN (future candidate arc, NOT a rescue of this one — council's reframe): use cross-sectional rank
+to select WHICH pairs/universe to run a *different* entry on, or harvest portfolio diversification from a
+decorrelated sub-cost edge — a DIFFERENT claim (selection/portfolio, not trade-level direction) needing its
+own ex-ante population. Extends arc 0's portfolio thread.
+
+**Carry-forward lessons (candidate for LESSONS.md):** (1) cross-sectional relative strength adds NO
+separable entry-time edge on H4 majors (AUC≈0.50, same as arc 0's single-pair features) — the dry zone is
+wider than single-pair structure; (2) a dispersion INVERSION (worst performance in the clearest-trend
+regime) is a falsification, not a regime to filter — don't sweep to rescue it; (3) WHEN-context
+(session/DoW/vol) does not condition a naive long-capture edge on H4 majors; (4) two independent long
+families (arc 0 pullback, arc 1000 XS-momentum) now share the SAME real-but-sub-cost signature (beat
+random, fail costs) — evidence the binding constraint on H4-major longs is the cost/SL-first hurdle against
+a ~coin-flip directional base, not the specific entry construction.
+
+**Tooling:** built + registered the random-entry NULL baseline (`discovery/tools/null_entry_baseline.py`,
+TOOL_REGISTRY BUILT) — the protocol's first expected BUILT tool; mask randomization only, scoring stays
+canonical (`ArcFoldRunner`). Reusable by all future arcs.
+
+**FLAGS (code not merged):** none requiring the canonical core. Signal + drivers in scratch `_disco_work/`
+(reproducible from the arc doc).

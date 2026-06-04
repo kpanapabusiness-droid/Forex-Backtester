@@ -14,6 +14,7 @@ at arc step (i).
 | 1000 | 1000s | 2026-06-04 | Cross-sectional momentum long (top-quintile 24-bar ret, rising; partial/runner exit) | N | N | -21.20% | -15.36% | 24.50% | 7757 | FAIL | N |
 | 1001 | 1000s | 2026-06-04 | Volatility-contraction breakout long (low-ATR coil + 10-bar-high break) — cheap-kill at triage | N | n/e | -9.41% | n/e | 12.30% | 3186 | FAIL (triage) | N |
 | 1002 | 1000s | 2026-06-04 | D1 daily trend-following long (Donchian-20 breakout in uptrend) — TF lever; cheap-kill at triage | N | n/e | -5.72% | n/e | 6.61% | 831 | FAIL (triage) | N |
+| 1003 | 1000s | 2026-06-04 | Cross trend-momentum long (Donchian-20 breakout in uptrend, 8 trending crosses) — universe lever; cheap-kill | N | n/e | -9.75% | n/e | 12.39% | 4078 | FAIL (triage) | N |
 
 ---
 
@@ -185,5 +186,33 @@ across entry construction AND timeframe. **STRONG STEER: stop testing directiona
 change a more fundamental lever** — instrument universe (less-efficient CROSSES; the backup has ~28 pairs),
 portfolio/selection of decorrelated sub-cost signals (XS-as-universe thread), or a non-directional
 construction. Another major-directional-long entry is very likely wasted compute.
+
+**FLAGS (code not merged):** none. Signal + drivers scratch `_disco_work/`.
+
+### arc_1003
+
+**Cross trend-momentum long (instrument-universe lever)** (chat 1000–1999). Full record:
+[`arcs/arc_1003_cross_trend_momentum_long.md`](arcs/arc_1003_cross_trend_momentum_long.md). No council (cheap-kill).
+
+**Idea + why.** 4 major-directional-longs failed (coin-flip base). Lever = INSTRUMENT UNIVERSE: crosses
+(JPY + commodity crosses) carry rate diffs / trend more than the hyper-efficient majors. Test if the cross
+directional base clears coin-flip.
+
+**What happened.** Cross observation (H4, honest +1R-before-SL LONG capture, IS 2010–2020): unconditional
+cross base **0.4712** — WORSE than majors (0.4877); every cross < 0.50. Momentum-breakout lift +0.0270 (to
+0.4982) — the run's LARGEST conditioning effect, but still coin-flip gross. Apparatus check (cross Donchian-20
+breakout-in-uptrend, 4,078 trades, capture 0.4809, **mean final_r +0.1021 gross — crosses DO trend**): triage
+2013 +1.43% / 2016 −8.15% / 2019 −9.75% — worst −9.75%, mean −5.49% → cheap-kill.
+
+**Verdict: FAIL (cheap-kill).** Crosses trend (positive gross drift) but the WIDER cross spreads eat the thin
+edge → net sub-cost.
+
+**Threads / lessons.** (1) Crosses are NOT a better directional-long universe (base 0.4712 < majors 0.4877).
+(2) **Binding constraint sharpened to EDGE < COST**: on crosses gross drift is POSITIVE (+0.10R/trade) yet
+the wider spreads consume it; on majors gross edge ≈ 0. Both net sub-cost — the hurdle is finding an edge
+LARGE enough to clear spread+commission+slippage+SL-first, not finding *a* directional edge. (3) FIFTH
+directional-long FAIL across entry/TF/universe → **change the MECHANISM**: non-price-direction (calendar/flow
+— turn-of-month rebalancing, NOT yet tested; arc 1000 covered hour/day-of-week but not day-of-month), or a
+construction whose gross edge clears cost.
 
 **FLAGS (code not merged):** none. Signal + drivers scratch `_disco_work/`.

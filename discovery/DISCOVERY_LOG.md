@@ -16,8 +16,9 @@ at arc step (i).
 | 1002 | 1000s | 2026-06-04 | D1 daily trend-following long (Donchian-20 breakout in uptrend) — TF lever; cheap-kill at triage | N | n/e | -5.72% | n/e | 6.61% | 831 | FAIL (triage) | N |
 | 1003 | 1000s | 2026-06-04 | Cross trend-momentum long (Donchian-20 breakout in uptrend, 8 trending crosses) — universe lever; cheap-kill | N | n/e | -9.75% | n/e | 12.39% | 4078 | FAIL (triage) | N |
 | 1004 | 1000s | 2026-06-04 | Cross-trend exit/cost engineering (let-it-run / 3R vs partial-runner) — EXIT lever; cheap-kill | N | n/e | -9.75% | n/e | n/e | 4078 | FAIL (triage) | N |
-| 3000 | 3000s | 2026-06-04 | Mean-reversion long on coupled crosses (RSI<25 oversold) — instrument-universe + reversion lever; cheap-kill | N | n/e | -20.22% | n/e | 22.54% | 1009 | FAIL (triage) | N |
+| 1005 | 1000s | 2026-06-04 | Turn-of-month USD-long calendar drift (USDCHF/USDXXX, 6-bar time exit) — non-directional mechanism; cheap-kill | N | n/e | -2.78% | n/e | 2.96% | 128 | FAIL (triage) | N |
 | 2000 | 2000s | 2026-06-04 | Trend-following long via full-size convexity harvest (Donchian breakout + full-size trailing) — fat tail is generic not trend-selected; cheap-kill at triage | N | n/e | -13.97% | n/e | 15.8% | 1617 | FAIL (triage) | N |
+| 3000 | 3000s | 2026-06-04 | Mean-reversion long on coupled crosses (RSI<25 oversold) — instrument-universe + reversion lever; cheap-kill | N | n/e | -20.22% | n/e | 22.54% | 1009 | FAIL (triage) | N |
 
 ---
 
@@ -360,3 +361,34 @@ scoring stays canonical). TOOL_REGISTRY BUILT updated.
 
 **FLAGS (code not merged):** none requiring the canonical core. Drivers in scratch `_disco2000_work/`
 (reproducible from the arc doc).
+
+### arc_1005
+
+**Turn-of-month USD-long (calendar-flow mechanism)** (chat 1000–1999). Full record:
+[`arcs/arc_1005_turn_of_month_usd_long.md`](arcs/arc_1005_turn_of_month_usd_long.md). No council (cheap-kill).
+
+**Idea + why.** 6 prior families fail on EDGE<COST (entry/cost problem, not exit). Steer: change the
+MECHANISM → non-price-direction CALENDAR FLOW (month-end rebalancing). Tested with the CORRECT metric (mean
+forward DRIFT in ATR; +1R-before-SL is blind to small drifts), PER PAIR (month-end USD flow pushes XXXUSD vs
+USDXXX oppositely).
+
+**What happened.** D1 turn-of-month (last 2 + first 3 trading days), mean forward-5d drift: a REAL USD-strength
+signal — EURUSD −0.18 ATR, GBPUSD −0.26 (18% years pos), USDCHF **+0.177** (73% years pos), concentrated in
+EUR/GBP/CHF. Long-only-exploitable via USDCHF. Built a signal-class TIME-EXIT predicate (A1Config.time_exit_bars
+is NOT wired into the Order — FLAG); long at 3rd-to-last trading day, 6-bar time exit, SL=2ATR. Triage: USDCHF
+2013 +0.68% / 2016 −2.78% / 2019 −0.27% (worst −2.78%, mean −0.79%, tiny DDs 1–3%, mean final_r ≈ break-even
+gross); USDXXX basket worst −3.55%, mean −1.61%. Both sub-cost → cheap-kill. (USDCHF = 1-of-8 cherry-pick.)
+
+**Verdict: FAIL (cheap-kill).** The drift is REAL but too small (~0.18 ATR/5d) to clear FundedNext cost +
+the ~31% 2ATR stop-out. EDGE<COST.
+
+**Threads / lessons.** (1) A real turn-of-month USD-strength drift exists (USDCHF +0.177 ATR/5d) but is
+SUB-COST — the FIRST non-directional mechanism, and EDGE<COST holds for it too → the cost hurdle is
+**mechanism-general**. (2) SIX families across all levers (entry/TF/universe/exit/mechanism) now say the
+realizable gross edge of simple long-only FX signals (~0.1–0.2 ATR or coin-flip capture) is below the
+FundedNext cost hurdle. A deployable long needs a MUCH larger per-trade gross edge or a different cost regime.
+(3) month-of-year seasonality = 11-sample noise. (4) Built reusable `make_time_exit_predicate` (BUILT) +
+`build_null_signal_evaluation` (arc 1000) — calendar/hold and soundness tooling now in place.
+
+**FLAGS (code not merged):** `A1Config.time_exit_bars` defined but NOT wired into the Order by A1 (worked
+around with the signal-class time-exit predicate; config-level time exit silently no-ops — human-gated fix).

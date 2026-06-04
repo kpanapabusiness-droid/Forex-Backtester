@@ -27,6 +27,7 @@ at arc step (i).
 | 2001 | 2000s | 2026-06-04 | Weekend-gap-fill long, MAJORS (buy big weekly-open down-gap, reversion to prior close) — CONVERGES w/ arc 1006 (JPY crosses); REAL edge but uncapturable: majors mean-NEG (vs 1006 crosses mean-POS), honest i+1 entry lands in adverse continuation (MAE −1.1R), thin (~13-17/fold); HEAVY diagnosis-council KILL, OOS preserved pristine | N | n/e (OOS preserved) | -4.57% | n/e | n/e | 176 | FAIL (IS+council) | N |
 | 2002 | 2000s | 2026-06-05 | H1 entry-resolution test of the weekend gap-fill (enter ~6h closer to the gap open) — does finer resolution capture the fill the H4 i+1 entry missed? NO: H1 capture 0.450 ≡ H4 0.45-0.47, MAE −1.2R ≡ H4; the down-gap's adverse continuation is TF-INVARIANT. Confirmatory cheap-kill; vindicates arc-2001 council (uncapturable, not an H4 artifact) | N | n/e | -2.02% | n/e | n/e | 151 | FAIL (triage) | N |
 | 2003 | 2000s | 2026-06-05 | Cross-pair relative-value divergence catch-up (long the under-performing leg when the synthetic cross is extreme) — LIGHT generative-council idea; cheap-kill at obs: the laggard CONTINUES lagging (z<−2 fwd drift −0.05 to −0.11 ATR; per-group z<−1 fwd10 −0.20 EURvGBP / −0.15 AUDvNZD), NO reversion — relative perf is momentum/coin-flip (re-confirms 1000/3001). Council's strongest call = CONCEDE: long-only constraint is the binding blocker (FLAG-1) | N | n/e | n/e | n/e | n/e | n/e | FAIL (obs) | N |
+| 3004 | 3000s | 2026-06-05 | Stop-confound test (council-driven): is the universal 2*ATR SL the wall? Pure time-exit on best +drift entry — stop removed lifts mean ~4-5pp but STILL not all-folds-pos → ESCALATION (apparatus structurally incapable; needs 2nd leg/shorts/cost regime) | N | n/e | -20.43% | n/e | n/e | 799 | FAIL → ESCALATION | N |
 
 ---
 
@@ -714,3 +715,49 @@ bid-ask spread-spike mean-reversion (microstructure liquidity dislocation) — a
 **FLAG-1 (REINFORced — most actionable):** add short support (operator/human-gated canonical-core change,
 NOT self-merged) to unlock the gap-fill's dominant UP-gap short leg — the single highest-leverage operator
 decision the programme has surfaced. **FLAGS (code not merged):** none new. Driver scratch `_disco2000_work/`.
+
+### arc_3004
+
+**The stop confound (council-driven) → clean ESCALATION** (chat 3000–3999). Full record:
+[`arcs/arc_3004_stop_confound_and_escalation.md`](arcs/arc_3004_stop_confound_and_escalation.md). Council
+transcript: [`results/arc_3004_stop_confound/council_transcript.md`](results/arc_3004_stop_confound/council_transcript.md).
+**Operator-facing finding:** [`ESCALATION_apparatus_capability.md`](ESCALATION_apparatus_capability.md).
+
+**Idea + why.** Genuine stuck-point after 3000–3003 closed the price/volume/structure/regime directional space.
+Per §5b/§7 convened the LIGHT generative council (`/llm-council-discovery`). The council surfaced a confound I
+(and ALL 13 prior arcs) had missed: **every arc used a 2·ATR SL-first stop.** The take-the-loss tax converts
+positive gross drift → negative honest expectancy (+0.019R raw → −0.055R, arc 3003), so "directional space is
+closed" was confounded with "a tight stop truncates a slow drift." Chairman (commit): investigate-X-first —
+re-score the strongest +gross-drift entry with the stop REMOVED (pure time-exit) before escalating; read TWO
+numbers (stop effect, cost effect); stop-removed+all-folds-positive → stop was the wall, else → escalate clean.
+
+**What happened.** Clean A/B on the post-up-spike trending-cross entry (arc 3001 pool, gross +0.088R), full IS
+WFO, FundedNext costs ON, scored only by MultiPairBacktester. Stop removed via the BUILT
+`make_time_exit_predicate` (arc 1005 — reused, not rebuilt; geometry only) + wide 6·ATR sizing-only SL.
+BASELINE (2·ATR partial/runner): mean −4.52%, 6/10 neg. STOP-REMOVED time-exit: N=6 mean −2.13%/8neg; N=12
+−3.46%/8neg; N=24 −2.77%/7neg; N=48 **+0.62%/5neg, worst −20.4%**. **Removing the stop lifts mean ~4–5pp (the
+take-the-loss tax is REAL) but NO horizon is all-folds-positive** — the residual ≈ cost and is regime-dependent
+(chop years stay negative regardless of stop). The chairman's "stop-removed but still sub-cost" branch.
+
+**Verdict: FAIL — and the directional space is now CLEANLY closed.** The stop was a contributing ~4–5pp drag,
+NOT the binding wall. → **ESCALATION raised** (operator decision, NOT a halt; loop continues): the fixed
+apparatus (long-only, single-instrument, per-trade SL/TP, price+volume, FundedNext costs) cannot express a
+deployable FX edge — it can only bet DIRECTION, which liquid FX prices to a coin-flip; durable FX edges are
+relative-value/carry needing a structural unlock. Ranked unlocks: (1) second simultaneous leg (market-neutral /
+cost-mutualising — the only lever not requiring beating 0.50 per-trade), (2) shorting, (3) a real tighter-cost
+execution regime (NB must match an obtainable broker or it re-introduces Arc-10 gate-mismatch).
+
+**Threads / lessons.** (1) **The 2·ATR SL was a real ~4–5pp drag but NOT the wall** — removing it (pure
+time-exit) lifts mean −4.52%→~0% yet still 5–8/10 folds negative; the deeper wall is gross-drift≈cost +
+regime-dependence. Retires "the stop was the wall" with a clean unconfounded test. (2) **Directional space is
+closed structurally, not by tuning** → escalation. (3) **TOOLING DISCIPLINE: check TOOL_REGISTRY BUILT FIRST
+before writing** — I started to rebuild the time-exit predicate; the Write failed (it existed, arc 1005); I
+called the BUILT tool instead. Cross-chat tools compound (reused arc 1005's time-exit). (4) The council earns
+its keep at a real stuck-point — it found a confound 4 arcs missed and its measure-then-decide prevented
+escalating on confounded data (Arc-10 lesson in research-conclusion space). **Remaining thin in-apparatus
+thread:** cross-rate triangulation lag (Mechanism lens) — likely M1/sub-cost, a future cheap-kill candidate.
+
+**FLAGS (code not merged):** **`A1Config.time_exit_bars` defined but UNWIRED** (never consumed by A1; a time
+exit must be an `ExitPredicate`). Caused a silent no-op in an early version of this arc's test. Independently
+flagged by arc 1005; re-flagged. Fix human-gated (wire it, or remove the dead param). Scratch drivers
+`_disco3_work/`.

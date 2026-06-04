@@ -1,5 +1,5 @@
 # CLAUDE.md — Forex Ignition Rebuild
-> Last updated: 2026-06-02 | Phase: **CLEAN BASE — no deployable system; forward research not started.** The repo was reset to a verified-green base (`reset/clean-base`). The fast path-replay scorer was retired; the SL-honest `MultiPairBacktester` is the **sole** engine that scores any trade. All pre-2026-06-02 gate numbers were produced by the retired replay and are NOT trustworthy. **Deployable-system count = 0.**
+> Last updated: 2026-06-04 | Phase: **DISCOVERY PIPELINE BUILT — pre-continuous; deployable-system count = 0.** The repo was reset to a verified-green base (`reset/clean-base`); the self-running discovery pipeline is now built in-repo and trial-validated (Arc 0 ran end-to-end on the honest engine and FAILED its signal, correctly), but continuous multi-chat operation is pending operator authorization. The fast path-replay scorer was retired; the SL-honest `MultiPairBacktester` is the **sole** engine that scores any trade. All pre-2026-06-02 gate numbers were produced by the retired replay and are NOT trustworthy. **Deployable-system count = 0.**
 > First file any AI assistant reads. Reflects where the project ACTUALLY is.
 >
 > **Before opening any new arc, read [docs/ARC_10_GATE_FIDELITY_DEFECT.md](docs/ARC_10_GATE_FIDELITY_DEFECT.md) — the lesson that reset this repo (internal consistency ≠ correctness).**
@@ -12,7 +12,7 @@
 - **Arc 10 (DLR) is KILLED** — gate-fidelity defect. Its deployment verdict rested on a fast replay that skipped pre-partial stops; the SL-honest engine fails it. Archived; the lesson is kept live at [docs/ARC_10_GATE_FIDELITY_DEFECT.md](docs/ARC_10_GATE_FIDELITY_DEFECT.md).
 - **KH-24 is retired/closed** — not a live system, not deployable. Its strategy code (`core/strategies/kh24/`) and anchor harness (`scripts/anchor/`) are retained ONLY as the A1 byte-identity engine anchor (a determinism fixture), never as a deployable or live system.
 - **The fast replay is retired (2026-06-02).** No live-tree code path scores P&L from a precomputed shortcut. `MultiPairBacktester` (`core/sim/`) is the sole gate engine.
-- **Forward research is not started.** A separate self-running discovery protocol is being authored elsewhere — do NOT create it here.
+- **Forward research: the discovery pipeline is BUILT and trial-validated (pre-continuous).** The self-running discovery programme now lives in-repo under [discovery/](discovery/) — protocol [discovery/DISCOVERY_PROTOCOL.md](discovery/DISCOVERY_PROTOCOL.md) (authoritative), one-screen orientation [discovery/README.md](discovery/README.md), operator dispatch layer [docs/DISCOVERY_DISPATCH_TEMPLATE.md](docs/DISCOVERY_DISPATCH_TEMPLATE.md), measurement glue `core/wfo/discovery_measure.py`. Arc 0 (supervised trial) ran end-to-end on the honest engine and FAILED its signal — correctly — so the machinery is validated. Continuous multi-chat operation is **pending operator authorization**; deployable-system count remains 0.
 
 ---
 

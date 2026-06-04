@@ -26,6 +26,7 @@ at arc step (i).
 | 3003 | 3000s | 2026-06-04 | Regime detection for momentum (Kaufman Efficiency-Ratio): is the trending regime detectable in advance? REGIME INVERSION (strong trends revert); best-case band catastrophic | N | n/e | -63.11% | n/e | 66.51% | 9250 | FAIL (IS WFO) | N |
 | 2001 | 2000s | 2026-06-04 | Weekend-gap-fill long, MAJORS (buy big weekly-open down-gap, reversion to prior close) — CONVERGES w/ arc 1006 (JPY crosses); REAL edge but uncapturable: majors mean-NEG (vs 1006 crosses mean-POS), honest i+1 entry lands in adverse continuation (MAE −1.1R), thin (~13-17/fold); HEAVY diagnosis-council KILL, OOS preserved pristine | N | n/e (OOS preserved) | -4.57% | n/e | n/e | 176 | FAIL (IS+council) | N |
 | 2002 | 2000s | 2026-06-05 | H1 entry-resolution test of the weekend gap-fill (enter ~6h closer to the gap open) — does finer resolution capture the fill the H4 i+1 entry missed? NO: H1 capture 0.450 ≡ H4 0.45-0.47, MAE −1.2R ≡ H4; the down-gap's adverse continuation is TF-INVARIANT. Confirmatory cheap-kill; vindicates arc-2001 council (uncapturable, not an H4 artifact) | N | n/e | -2.02% | n/e | n/e | 151 | FAIL (triage) | N |
+| 2003 | 2000s | 2026-06-05 | Cross-pair relative-value divergence catch-up (long the under-performing leg when the synthetic cross is extreme) — LIGHT generative-council idea; cheap-kill at obs: the laggard CONTINUES lagging (z<−2 fwd drift −0.05 to −0.11 ATR; per-group z<−1 fwd10 −0.20 EURvGBP / −0.15 AUDvNZD), NO reversion — relative perf is momentum/coin-flip (re-confirms 1000/3001). Council's strongest call = CONCEDE: long-only constraint is the binding blocker (FLAG-1) | N | n/e | n/e | n/e | n/e | n/e | FAIL (obs) | N |
 
 ---
 
@@ -678,3 +679,38 @@ result.
 **FLAGS (code not merged):** none new (carries FLAG-1 long-only-blocks-short-side, FLAG-2 H4-cost-vs-
 reversion from arc 2001). No new tool (reused `WeekendGapFillLongSignal(primary_tf="H1")`). Driver scratch
 `_disco2000_work/`.
+
+### arc_2003
+
+**Cross-pair relative-value divergence (laggard catch-up long)** (chat 2000s). Full record:
+[`arcs/arc_2003_crosspair_divergence.md`](arcs/arc_2003_crosspair_divergence.md). LIGHT generative council
+(§5b) summarized inline in the arc doc (no separate transcript — light/generative).
+
+**Idea + why.** 15 arcs closed the obvious price-structure space → genuine dry-log fork → LIGHT generative
+council (3 lenses). Two of three converged on **cross-pair relative-value divergence**: long the
+under-performing leg of a correlated XXX/USD pair when the synthetic cross is at an extreme (relative-value,
+NOT single-pair direction — distinct from arc 3000's absolute RSI-oversold-on-the-cross). The Devil lens'
+strongest self-judged call was **CONCEDE** (the binding blocker is the long-only constraint; the gap-fill's
+strong side is short). CC synthesized: test the convergent divergence idea; defer the M1 spread-spike idea
+(sub-pip reversion vs ~3-pip cost → EDGE<COST).
+
+**What happened.** Drift observation (D1, ex-ante, correlated groups EURUSD↔GBPUSD, AUDUSD↔NZDUSD): the
+laggard does NOT catch up. At z<−2 (A under-performed) fwd drift of A = −0.109/−0.046/−0.007 ATR (5/10/20
+bars), frac+ ~0.49–0.53; per-group z<−1 fwd10 −0.202 EURvGBP, −0.150 AUDvNZD (laggard keeps lagging). The
+catch-up hypothesis is FALSIFIED — relative performance of correlated majors is weak momentum/coin-flip, not
+mean-reverting. → cheap-kill at observation.
+
+**Verdict: FAIL (cheap-kill).** No relative-value reversion in FX majors (3rd confirm with 1000/3001).
+
+**Threads / lessons.** (1) No relative-value catch-up in correlated majors — the laggard continues lagging
+(pairwise-divergence angle confirms the cross-sectional 1000 + drift 3001 findings). (2) **The generative
+council INDEPENDENTLY reached arc 2001's FLAG-1 via its CONCEDE lens**: across 16 arcs/3 chats the one real
+edge (weekend gap-fill) is mechanism+direction+magnitude-confirmed and its STRONGER leg is the UP-gap SHORT,
+which long-only structurally forbids — **the binding blocker is the constraint, not the search space.** (3) A
+generative council on a heavily-mapped space mostly re-surfaces the known answer-space; its value here was
+the independent CONCEDE corroboration + cheap in/out on the divergence idea. (4) Low-odds untested seed: M1
+bid-ask spread-spike mean-reversion (microstructure liquidity dislocation) — almost certainly EDGE<COST.
+
+**FLAG-1 (REINFORced — most actionable):** add short support (operator/human-gated canonical-core change,
+NOT self-merged) to unlock the gap-fill's dominant UP-gap short leg — the single highest-leverage operator
+decision the programme has surfaced. **FLAGS (code not merged):** none new. Driver scratch `_disco2000_work/`.

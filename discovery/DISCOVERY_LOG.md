@@ -28,6 +28,7 @@ at arc step (i).
 | 2002 | 2000s | 2026-06-05 | H1 entry-resolution test of the weekend gap-fill (enter ~6h closer to the gap open) — does finer resolution capture the fill the H4 i+1 entry missed? NO: H1 capture 0.450 ≡ H4 0.45-0.47, MAE −1.2R ≡ H4; the down-gap's adverse continuation is TF-INVARIANT. Confirmatory cheap-kill; vindicates arc-2001 council (uncapturable, not an H4 artifact) | N | n/e | -2.02% | n/e | n/e | 151 | FAIL (triage) | N |
 | 2003 | 2000s | 2026-06-05 | Cross-pair relative-value divergence catch-up (long the under-performing leg when the synthetic cross is extreme) — LIGHT generative-council idea; cheap-kill at obs: the laggard CONTINUES lagging (z<−2 fwd drift −0.05 to −0.11 ATR; per-group z<−1 fwd10 −0.20 EURvGBP / −0.15 AUDvNZD), NO reversion — relative perf is momentum/coin-flip (re-confirms 1000/3001). Council's strongest call = CONCEDE: long-only constraint is the binding blocker (FLAG-1) | N | n/e | n/e | n/e | n/e | n/e | FAIL (obs) | N |
 | 3004 | 3000s | 2026-06-05 | Stop-confound test (council-driven): is the universal 2*ATR SL the wall? Pure time-exit on best +drift entry — stop removed lifts mean ~4-5pp but STILL not all-folds-pos → ESCALATION (apparatus structurally incapable; needs 2nd leg/shorts/cost regime) | N | n/e | -20.43% | n/e | n/e | 799 | FAIL → ESCALATION | N |
+| 3005 | 3000s | 2026-06-05 | Cross-rate triangulation residual (synthetic vs quoted cross) — last non-directional in-apparatus thread; residual sub-spread, conv-corr ~0 at H4 | N | n/e | n/e | n/e | n/e | n/e | FAIL (obs cheap-kill) | N |
 
 ---
 
@@ -761,3 +762,32 @@ thread:** cross-rate triangulation lag (Mechanism lens) — likely M1/sub-cost, 
 exit must be an `ExitPredicate`). Caused a silent no-op in an early version of this arc's test. Independently
 flagged by arc 1005; re-flagged. Fix human-gated (wire it, or remove the dead param). Scratch drivers
 `_disco3_work/`.
+
+### arc_3005
+
+**Cross-rate triangulation residual — closing the last in-apparatus thread** (chat 3000–3999). Full record:
+[`arcs/arc_3005_triangulation_residual.md`](arcs/arc_3005_triangulation_residual.md). No council (cheap-kill at
+observation).
+
+**Idea + why.** The arc-3004 council named ONE remaining concrete in-apparatus idea that is genuinely
+*non-directional*: cross-rate triangulation lag (synthetic cross from its two USD legs vs the quoted cross).
+Low conviction (Mechanism lens: "likely M1, dislocation may be < the cross spread") but closing it completes the
+escalation's coverage. Tested at H4: residual = (quoted_mid − synthetic)/synthetic, bps, contemporaneous closes.
+
+**What happened.** Across 6 triples (EURGBP, EURJPY, GBPJPY, AUDJPY, EURAUD, AUDCAD): residual median ≈ 0
+(±0.05 bps); |residual| exceeds the cross spread only 1.3–6.1% of bars (within spread-noise); **forward-6-bar
+convergence correlation ≈ 0.00–0.02** (no predictive power). Triangular arb pins quoted=synthetic at H4 closes;
+any lag is sub-second/tick — out of apparatus scope and below the cost floor. Nothing to trade.
+
+**Verdict: FAIL (cheap-kill at observation).** No H4 triangulation dislocation. The last concrete
+non-directional in-apparatus thread is closed.
+
+**Threads / lessons.** (1) No H4 triangular-arb residual (median ≈0, within spread, conv-corr ≈0). (2) **The
+3000s chat's in-apparatus space is now comprehensively exhausted** — directional (both metrics; all
+instruments/timeframes/regimes/exits/stop-geometry), volume, calendar, convexity, and triangulation all closed.
+The operative finding is the **arc-3004 escalation**: a deployable FX edge needs a structural unlock (second
+leg / shorts / real tighter-cost regime) = the operator's decision. No grounded in-apparatus arc remains;
+further long-only single-instrument directional variants would grind a cleanly-closed space. **3000s chat has
+reached its in-apparatus terminus; escalation pending operator.**
+
+**FLAGS (code not merged):** none. Driver scratch `_disco3_work/observe6_triangulation.py`.

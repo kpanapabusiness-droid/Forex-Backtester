@@ -23,6 +23,7 @@ at arc step (i).
 | 3001 | 3000s | 2026-06-04 | Drift-lens scan (mean fwd drift, the metric +1R-before-SL is blind to) across 28 pairs × 6 conds — directional-long death is METRIC-ROBUST; best cell post-up-spike trending-cross net −10.78% | N | n/e | -28.07% | n/e | 32.38% | 1375 | FAIL (triage) | N |
 | 3002 | 3000s | 2026-06-04 | Volume-confirmation long (vol-spike on trending crosses) — the last untouched data column; full IS 7/10 neg | N | n/e | -16.25% | n/e | 20.57% | 839 | FAIL (IS WFO) | N |
 | 3003 | 3000s | 2026-06-04 | Regime detection for momentum (Kaufman Efficiency-Ratio): is the trending regime detectable in advance? REGIME INVERSION (strong trends revert); best-case band catastrophic | N | n/e | -63.11% | n/e | 66.51% | 9250 | FAIL (IS WFO) | N |
+| 2001 | 2000s | 2026-06-04 | Weekend-gap-fill long, MAJORS (buy big weekly-open down-gap, reversion to prior close) — CONVERGES w/ arc 1006 (JPY crosses); REAL edge but uncapturable: majors mean-NEG (vs 1006 crosses mean-POS), honest i+1 entry lands in adverse continuation (MAE −1.1R), thin (~13-17/fold); HEAVY diagnosis-council KILL, OOS preserved pristine | N | n/e (OOS preserved) | -4.57% | n/e | n/e | 176 | FAIL (IS+council) | N |
 
 ---
 
@@ -547,3 +548,61 @@ fold-variance, preserves positive mean). **HIGH-VALUE fleet steer: hunt for a 2n
 untested ideas: spread-tier gating, vol/cost-ratio conditioning, Asia→London timing, Devil's null-confirmation.
 
 **FLAGS (code not merged):** none. Reused BUILT `make_time_exit_predicate`; drivers scratch `_disco_work/`.
+
+### arc_2001
+
+**Weekend-gap-fill long, MAJORS** (chat 2000s). Full record:
+[`arcs/arc_2001_weekend_gap_fill_long.md`](arcs/arc_2001_weekend_gap_fill_long.md). HEAVY diagnosis council:
+[`results/arc_2001_weekend_gap_fill_long/council_transcript.md`](results/arc_2001_weekend_gap_fill_long/council_transcript.md).
+
+**Idea + why.** EDGE<COST exhausts price-DIRECTION; the price-only corpus leaves price-STRUCTURE / time-
+STRUCTURE. Untouched axis: weekend/weekly-open GAPs — discrete, sometimes-large moves with a documented
+partial-fill tendency, attacking EDGE<COST from the move-size side. Observe first (drift metric).
+
+**What happened.** OBSERVATION (H4 majors, IS 2010-2020): a clean, monotone, SYMMETRIC gap-fill — DOWN
+>1·ATR weekly-open gaps drift +0.45 ATR/~1day (frac+ 0.59); UP >1·ATR gaps drift −0.57 ATR (frac+ 0.36).
+The ONLY conditioning variable in the programme to push the directional hit-rate clearly >0.50 with sizable
+drift. Long-only tradeable side = buy big down-gaps. Characterize (threshold×SL grid): the down-gap's
+ADVERSE continuation is large (median MAE −1.1 to −1.3R, P(MAE≤−0.5R)=0.77-0.89) — the honest i+1 entry
+(after the gap bar) lands INSIDE the continuation, so honest +1R-before-SL capture only 0.45-0.47 and gross
+meanFinalR is positive but small (+0.07..+0.18R). 3-fold triage looked near-break-even (favorable-fold
+LUCK), but the FULL 10-fold IS WFO is mean −1 to −2.5%, 6-7/10 folds negative for every threshold/SL/exit.
+
+**Diagnosis + HEAVY council.** Diagnosis: real edge, but the i+1 entry sits in the adverse continuation and
+the small surviving edge is cost-eaten. Council (5 lenses + 3 reviewers + chairman) → **KILL**: (1) the
+delayed/confirmation-entry refinement is a contamination trap (invented+tuned on IS, validatable only by
+spending pristine OOS); (2) the sample can't support the all-folds-positive judge even if real (~6-8
+trades/OOS-year filtered → coin-flip); (3) the exciting 0.59/monotone drift is measured from the
+UNTRADEABLE gap-bar open (hindsight framing); the tradeable i+1 edge is the small one costs eat. "The
+mechanism survives; the trade does not." CC committed (no override). **OOS deliberately NOT touched** (no
+IS-clearing system + preserve the holdout).
+
+**Verdict: FAIL** (real edge, uncapturable) — the 9th EDGE<COST result, but the first whose binding
+constraint is CAPTURABILITY/frequency/long-only-access, not absence of edge.
+
+**Convergence with arc 1006 (chat 1000s, landed mid-arc).** 1000s independently found weekend gap-down-fill
+(generative council) on JPY CROSSES — the run's MOST promising result (FIRST mean-POSITIVE IS edge +0.69%,
+beats random) but fold-fragile FAIL. **Two chats, two universes, converged: weekend gap-fill is the realest
+edge found.** CROSS-FINDING: mean-POSITIVE on JPY crosses, mean-NEGATIVE on majors → **JPY crosses are the
+better gap universe; majors too efficient.** My distinct adds: (1) majors are the weaker gap universe (don't
+pursue gap-fill there); (2) **FLAG-1 the long-only apparatus blocks the STRONGER short side** (UP-gaps:
+−0.57 ATR drift, 0.64 accuracy — the better edge, structurally untradeable; short support = human-gated
+code, NOT self-merged); (3) the OOS-pristine + n-too-thin-for-the-judge discipline.
+
+**Threads / lessons.** (1) Weekend gap-fill = the first real, monotone, mechanistically-clean edge (weekend-
+illiquidity repricing toward prior close), fails on CAPTURABILITY not edge. (2) A 3-fold triage can be
+favorable-fold LUCK — run the full IS WFO before believing it (the same 2013-regime-luck that burned
+1000/1003). (3) OOS-pristine discipline: when the only rescue is an IS-tuned refinement, FAIL-on-IS +
+preserve-OOS, don't burn the holdout (HEAVY council). (4) **HIGH-VALUE open thread (shared w/ 1006's steer):
+gap-fill on JPY crosses is net-POSITIVE-but-fold-fragile; a decorrelated COMBINATION of ≥2 net-positive
+gap-type edges may reach all-folds-positive — but the single most promising gap signal (the UP-gap short) is
+blocked by long-only.** The 2000s lane next should AVOID the majors gap-fill (done) and the 1000s
+gap-portfolio thread (theirs); a lower-timeframe gap test (more events) or the FLAG-2 upstream diagnostic
+(is H4+FundedNext generically hostile to fill/reversion?) are open.
+
+**Tooling:** built + registered `discovery/tools/gap_signals.py` (`WeekendGapFillLongSignal`). TOOL_REGISTRY
+BUILT updated.
+
+**FLAGS (code not merged):** **FLAG-1** long-only apparatus blocks the stronger UP-gap short side (canonical-
+core change, operator-gated, NOT merged); **FLAG-2** future-arc seed: is H4+FundedNext cost structure
+generically hostile to fill/mean-reversion entries? Drivers scratch `_disco2000_work/`.

@@ -11,6 +11,23 @@
 
 ## TOP VERDICT
 
+> **2026-06-04 — RE-VERIFICATION PASS (supersedes the 2026-06-03 verdict preserved below).** Both blockers are now RESOLVED and were independently re-verified against the current tree this pass: **Part C** by PR #264 (`e8bbef2`), **Part D** by PR #263 (`fba3fe6`). The engine stays 100% gross; costs and labels are made honest at the gate-scoring + label layers, not by mutating the engine. Evidence: full `pytest -m "not research"` green (**1656 passed, 294 skipped, 7 deselected**) and the 35 honesty-critical cases (Parts A/C/D/E) pass.
+
+**✅ `MultiPairBacktester` is honest end-to-end and safe as the sole gate engine.**
+
+| Part | Re-verified verdict (2026-06-04) |
+|------|----------------------------------|
+| **A** Take-the-loss | **PASS** — 5-case fixture green; SL-first default + pre-partial ordering. |
+| **B** No lookahead / ex-ante | **PASS** (one watch-item) — N→N+1 entry, D1 backward-merge one-bar lag, no future-bar reads; cross-pair SUSPECT features excluded by the causal-lineage gate. |
+| **C** FundedNext costs | **RESOLVED (PR #264)** — 1.5× spread / $5-lot RT commission / 0.5 pip×n_fills slippage / swaps-OFF netted at the single chokepoint `build_fold_stats_from_run`, **ON by default** for A1–A6, **no silent-zero path**; engine stays gross; costs only ever subtract, so every gate metric is strictly *harder* than gross. |
+| **D** heavy_ml labels | **RESOLVED (PR #263)** — in-tree `reached_1r_before_sl` producer + `is_stop_loss_exit` tie-break (`hard_sl` same-bar → LOSS); full simulator→pool→label chain CI-pinned. |
+| **E** Determinism | **PASS** (one FLAG) — two-run sha identity incl. costs-on; no full-data A1-vs-legacy anchor automated in CI. |
+
+The parts that were always sound (A, B, E) are unchanged; the resolutions to C and D are detailed in their sections below (each carries a RESOLVED banner over its preserved original finding).
+
+<details>
+<summary><strong>Superseded 2026-06-03 verdict — "NOT YET safe" (preserved for the audit trail)</strong></summary>
+
 **NOT YET safe as the sole gate engine — the following must be resolved before it underwrites research:**
 
 1. **(Part C) Mandatory broker costs are not applied on ANY gate-scoring path.** The 1.5× spread stress, $5/lot commission, and 0.5 pip × n_fills slippage primitives exist (`core/sim/costs/`) but are never called by the driver, the fold runners, the architectures, or the gates. They were post-hoc R-adjustments wired to the now-retired `simulate_path` replay and are orphaned. Today every gate verdict is scored on **raw HistData bid/ask spread only (1.0×), zero commission, zero slippage**. Re-wire (or re-establish) the deployment-gate cost application before the engine produces a PASS verdict.
@@ -19,11 +36,13 @@
 
 **What IS sound:** the trade-by-trade SL/exit accounting (Part A — take-the-loss invariant holds, now pinned by 5 regression cases), no-lookahead / ex-ante construction (Part B), and determinism (Part E). The engine's *mechanics* are honest; what is missing is **(C) cost realism on the gate path** and **(D) provenance + correctness of the ML training labels** that feed the A2/A4/A6 architectures.
 
+</details>
+
 | Part | Subject | Verdict |
 |------|---------|---------|
 | **A** | Take-the-loss invariant | **PASS** (fixture committed, CI-green) |
 | **B** | No lookahead / ex-ante populations | **PASS** (one watch-item) |
-| **C** | Cost + rule fidelity (FundedNext) | **FAIL** (spread 1.5× / commission / slippage not wired) |
+| **C** | Cost + rule fidelity (FundedNext) | **RESOLVED** (2026-06-04; was FAIL) — costs netted at the `build_fold_stats_from_run` chokepoint, FundedNext ON by default for A1–A6, no silent-zero path (PR #264 `e8bbef2`) |
 | **D** | heavy_ml label contamination | **RESOLVED** (2026-06-03; was FLAG) — in-tree producer + `hard_sl`-aware tie-break, see [`FIX_PART_D_HEAVYML_LABELS_REPORT.md`](FIX_PART_D_HEAVYML_LABELS_REPORT.md) |
 | **E** | Determinism + reconstruction | **PASS** (one FLAG: no full-data anchor in CI) |
 
@@ -73,9 +92,17 @@ CI-gated: the file carries no `research` marker and CI runs `pytest -q -m "not r
 
 ---
 
-## PART C — COST + RULE FIDELITY — **FAIL**
+## PART C — COST + RULE FIDELITY — **FAIL → RESOLVED (2026-06-04)**
 
-**The single most important finding of this sweep.** The cost primitives are implemented and unit-tested, but **none of them is called on any gate-scoring path.**
+> **RESOLVED — PR #264 (`e8bbef2`), independently re-verified 2026-06-04.** The orphaned cost primitives are now wired at the gate-scoring layer (NOT in the engine — the engine stays 100% gross, so Parts A and E are untouched). A new `CostModel` + `apply_cost_model` ([`core/sim/costs/model.py`](core/sim/costs/model.py)) computes each closed position's FundedNext cost from the GROSS closed-trade ledger using the existing primitives, and the single shared chokepoint [`build_fold_stats_from_run`](core/runners/_fold_stats_helpers.py:90) nets a cost-debited equity curve before computing `FoldStats`. Re-verified this pass:
+>
+> - **Costs ON by default for every gate path.** All of A1–A6 route through that one chokepoint — [a1:344](core/architectures/a1_system_level_filter.py:344), [a2:218](core/architectures/a2_classifier_filter.py:218), [a3:360](core/architectures/a3_pipeline_de.py:360), [a4:260](core/architectures/a4_pipeline_d_exits.py:260), [a5:125](core/architectures/a5_portfolio_composition.py:125), [a6:229](core/architectures/a6_meta_labeling.py:229) — and the chokepoint defaults to `CostModel.fundednext()` ([`_fold_stats_helpers.py:40,95`](core/runners/_fold_stats_helpers.py:40)).
+> - **No silent-zero / bypass path.** `CostModel.zero()` is used in no `core/` gate path (docstrings + tests only), and no architecture passes a `cost_model=` override (grep of `core/**` is clean). The only cost-free path is the KH-24 anchor [`core/wfo/fold_runner.py:_build_fold_stats`](core/wfo/fold_runner.py:100) — explicitly cost-free-*by-design* as the byte-identity determinism fixture (documented at [`:103-109`](core/wfo/fold_runner.py:103)), NOT a deployable gate.
+> - **Per-cost fidelity.** Spread = `compute_extra_spread_price` at 1.5× ([`model.py:182-188`](core/sim/costs/model.py:182)); commission = `$5/lot` RT lot-scaled ([`model.py:168-170`](core/sim/costs/model.py:168)); slippage = `0.5 pip × n_fills` where `n_fills` tracks the actual SL-honest leg structure (3 if the +1R partial fired, else 2) ([`model.py:162-175`](core/sim/costs/model.py:162)); swaps OFF and **fail-loud** if enabled ([`model.py:205-208`](core/sim/costs/model.py:205)); EET clock unchanged.
+> - **Conservative direction.** Costs only ever subtract and accumulate forward, so net ROI / max-DD / daily-5% breach are all strictly *harder* than gross — a loss is made worse, never flattered. Slippage over-applies on partial legs (full original size × n_fills) by design.
+> - **CI-gated** by [`tests/sim/test_cost_application.py`](tests/sim/test_cost_application.py) (exact haircut math, default-on guarantee, swaps fail-loud, NaN bid/ask → 0 spread, two-run determinism). Full `pytest -m "not research"` green (**1656 passed**). The original FAIL finding is preserved below for the audit trail.
+
+**[Original 2026-06-03 finding — superseded by the resolution above.]** The single most important finding of this sweep. The cost primitives are implemented and unit-tested, but **none of them is called on any gate-scoring path.**
 
 ### Evidence the costs are orphaned
 
@@ -148,3 +175,16 @@ Central question — are heavy_ml's labels honest-engine-derived or replay-deriv
 - [x] Determinism confirmed (one FLAG: no full-data anchor in CI).
 
 **Conservative bias upheld throughout: "probably honest" was recorded as FLAG, not PASS.**
+
+---
+
+## RE-VERIFICATION ADDENDUM — 2026-06-04
+
+The two blockers this report flagged were subsequently resolved by operator-approved follow-up PRs (per the dispatch's "report, do not patch" rule — the original sweep did not patch them) and **independently re-verified this pass** against the current tree:
+
+- **Part C (was FAIL) → RESOLVED** — PR #264 (`e8bbef2`). Costs wired at the `build_fold_stats_from_run` chokepoint, FundedNext ON by default for A1–A6, no silent-zero path; engine stays gross; conservative direction confirmed (every gate metric strictly harder than gross). See the Part C RESOLVED banner above.
+- **Part D (was FLAG) → RESOLVED** — PR #263 (`fba3fe6`). In-tree `reached_1r_before_sl` producer + `is_stop_loss_exit` tie-break; full simulator→pool→label chain CI-pinned.
+
+Empirical confirmation this pass: the 35 honesty-critical cases (`test_take_the_loss_invariant`, `test_cost_application`, `test_label_take_the_loss`, `test_determinism`) pass, and the full CI suite `pytest -m "not research"` is green — **1656 passed, 294 skipped, 7 deselected** (no collateral regression from the cost wiring on the shared chokepoint).
+
+**Final top verdict: `MultiPairBacktester` is honest end-to-end and safe as the sole gate engine.** Residual non-blocking items remain as written: Part B's cross-pair `SUSPECT` features (excluded by the causal-lineage gate, flagged for the Step-6 cross-pair audit) and Part E's absence of an automated full-data A1-vs-legacy anchor in CI.

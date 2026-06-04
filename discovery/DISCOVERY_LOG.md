@@ -13,6 +13,7 @@ at arc step (i).
 | 0 | trial | 2026-06-04 | Pullback-in-uptrend long (close>SMA50 & pierce prior-5-bar-low); best ver = excursion-banking exit | N | N | -14.2% | -14.3% | 17.1% | 4985 | FAIL | N |
 | 1000 | 1000s | 2026-06-04 | Cross-sectional momentum long (top-quintile 24-bar ret, rising; partial/runner exit) | N | N | -21.20% | -15.36% | 24.50% | 7757 | FAIL | N |
 | 1001 | 1000s | 2026-06-04 | Volatility-contraction breakout long (low-ATR coil + 10-bar-high break) — cheap-kill at triage | N | n/e | -9.41% | n/e | 12.30% | 3186 | FAIL (triage) | N |
+| 1002 | 1000s | 2026-06-04 | D1 daily trend-following long (Donchian-20 breakout in uptrend) — TF lever; cheap-kill at triage | N | n/e | -5.72% | n/e | 6.61% | 831 | FAIL (triage) | N |
 
 ---
 
@@ -160,3 +161,29 @@ trigger. (Did NOT need the null baseline — an all-negative triage is decisive;
 a sub-cost edge that survives to a full WFO.)
 
 **FLAGS (code not merged):** none. Signal + drivers scratch `_disco_work/` (reproducible from the arc doc).
+
+### arc_1002
+
+**D1 timeframe directional long (daily trend-following)** (chat 1000–1999). Full record:
+[`arcs/arc_1002_d1_trend_following_long.md`](arcs/arc_1002_d1_trend_following_long.md). No council (cheap-kill).
+
+**Idea + why.** 3 H4 directional longs failed identically (coin-flip base). Lever pivot = TIMEFRAME: daily
+trends are classically more persistent. Test whether the coin-flip base is H4-specific or general.
+
+**What happened.** D1 observation (honest +1R-before-SL LONG capture, IS 2010–2020): unconditional **0.4908**
+(≈ H4 0.4877); uptrend +0.0000, momentum-breakout +0.0051, pullback −0.0013, oversold +0.0087 (0.4996) — NO
+trigger lifts the D1 base above coin-flip, none cross-pair consistent. The directional base is TIMEFRAME-
+INVARIANT. Apparatus check on the textbook case (D1 Donchian-20 breakout-in-uptrend, 831 trades, capture
+0.4838): 3-fold triage 2013 −1.95% / 2016 −5.72% / 2019 −4.71% — all negative, mean −4.13% → cheap-kill.
+
+**Verdict: FAIL (cheap-kill).** Changing TF does not escape the constraint.
+
+**Threads / lessons.** (1) The FX-major directional-long coin-flip base is TIMEFRAME-INVARIANT (D1≈H4); even
+textbook daily trend-following is sub-cost. (2) FOUR independent directional-long attempts now FAIL the same
+way (pullback H4, XS-mom H4, contraction-brk H4, trend-following D1) — the approach is comprehensively dry
+across entry construction AND timeframe. **STRONG STEER: stop testing directional-long entries on majors;
+change a more fundamental lever** — instrument universe (less-efficient CROSSES; the backup has ~28 pairs),
+portfolio/selection of decorrelated sub-cost signals (XS-as-universe thread), or a non-directional
+construction. Another major-directional-long entry is very likely wasted compute.
+
+**FLAGS (code not merged):** none. Signal + drivers scratch `_disco_work/`.

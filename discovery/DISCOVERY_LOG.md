@@ -19,6 +19,7 @@ at arc step (i).
 | 1005 | 1000s | 2026-06-04 | Turn-of-month USD-long calendar drift (USDCHF/USDXXX, 6-bar time exit) — non-directional mechanism; cheap-kill | N | n/e | -2.78% | n/e | 2.96% | 128 | FAIL (triage) | N |
 | 2000 | 2000s | 2026-06-04 | Trend-following long via full-size convexity harvest (Donchian breakout + full-size trailing) — fat tail is generic not trend-selected; cheap-kill at triage | N | n/e | -13.97% | n/e | 15.8% | 1617 | FAIL (triage) | N |
 | 3000 | 3000s | 2026-06-04 | Mean-reversion long on coupled crosses (RSI<25 oversold) — instrument-universe + reversion lever; cheap-kill | N | n/e | -20.22% | n/e | 22.54% | 1009 | FAIL (triage) | N |
+| 3001 | 3000s | 2026-06-04 | Drift-lens scan (mean fwd drift, the metric +1R-before-SL is blind to) across 28 pairs × 6 conds — directional-long death is METRIC-ROBUST; best cell post-up-spike trending-cross net −10.78% | N | n/e | -28.07% | n/e | 32.38% | 1375 | FAIL (triage) | N |
 
 ---
 
@@ -392,3 +393,40 @@ FundedNext cost hurdle. A deployable long needs a MUCH larger per-trade gross ed
 
 **FLAGS (code not merged):** `A1Config.time_exit_bars` defined but NOT wired into the Order by A1 (worked
 around with the signal-class time-exit predicate; config-level time exit silently no-ops — human-gated fix).
+
+### arc_3001
+
+**Drift-lens scan — is the directional-long death a capture-metric artifact?** (chat 3000–3999). Full record:
+[`arcs/arc_3001_drift_lens_scan.md`](arcs/arc_3001_drift_lens_scan.md). No council (cheap-kill).
+
+**Idea + why.** A *methodological* probe, not a new family. Six directional-long arcs (0,1000–1003,3000) all
+judged entries with **+1R-before-SL capture**, which arc 1004 flagged as **blind to small persistent drift**
+(arc 1003 saw +0.10R gross under sub-0.50 capture). Before declaring the directional-long space dead, re-scan
+it with the **correct mean forward-DRIFT lens**. Distinct from the 1000s chat: they take the calendar/time
+drift axis (month-end); I take price/volatility/structure. (Reconsidered my own arc-3000 "portfolio/selection"
+suggestion and rejected it as **premature** — you can't diversify net-negative components positive; need a
+net-positive component first, and none exists.)
+
+**What happened.** `fwd_drift_12 = (mid_close[s+12] − entry@s+1 ask)/(2·ATR[s])`, R units, gross, 28 pairs, IS
+2010–2020. **NO instrument × condition clears the ~0.05–0.10R cost hurdle.** By group (uncond / up-spike /
+dn-spike / uptrend / mom_hi / low-vol): MAJOR −0.019/+0.007/−0.072/−0.031/−0.032/−0.004; COUPLED
+−0.083/−0.101/−0.138/−0.074/−0.101/−0.131; TREND_X −0.012/**+0.023**/−0.014/−0.012/−0.005/−0.021. Best cell
+anywhere = TREND_X post-up-spike **+0.023R gross** (< cost). Confirmatory triage on that best cell
+(post-up-spike continuation, 12 trending crosses; pool n=1375, cap 0.4982, gross mean final_r +0.088R): net
+**2013 +16.74% / 2016 −28.07% / 2019 −21.01% → worst −28.07%, mean −10.78%, 2/3 neg → KILL.**
+
+**Verdict: FAIL (metric-robust closure).** The directional-long failure is NOT a capture-metric artifact — the
+drift lens agrees with the capture lens. No cost-clearing forward drift exists in price/vol/structure on any
+instrument; the lone positive cell is sub-cost and regime-fragile (the arc-1003/1004 momentum-on-crosses
+signature). Directional price-structure long is now closed under BOTH metrics.
+
+**Threads / lessons.** (1) **Directional-long death is METRIC-ROBUST** (capture AND drift; 28×6 scan, best
+gross drift +0.023R < cost) — closes the arc-1004 "blind-to-drift" loophole. (2) **Coupled crosses drift
+NEGATIVE for longs** (−0.08R/12bars; worse oversold/low-vol) — independent re-confirm of arc 3000 from the
+drift angle. (3) Faint trending-cross momentum is regime-fragile + net-negative — re-confirms 1003/1004. (4)
+**Portfolio/selection is premature/empty** until a net-positive component exists (none does). **Surviving steer
+(singular, non-price-structure):** flow/calendar (1000s chat's axis) or a genuinely novel construction — arc
+3002 needs a *generatively different* idea (candidate for a LIGHT generative council at the idea-fork, §5b),
+since the 3000s side has now closed the price-structure directional space.
+
+**FLAGS (code not merged):** none. Scan + signal + drivers scratch `_disco3_work/`.

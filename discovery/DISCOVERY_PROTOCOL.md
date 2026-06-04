@@ -1,6 +1,6 @@
 # DISCOVERY PROTOCOL — Autonomous Self-Running Signal Discovery
 
-> **Status:** v1.0 (draft for first-arc trial)
+> **Status:** v1.1 (continuous)
 > **Purpose:** find a deployable trading system through continuous, autonomous, self-documenting
 > discovery. CC generates ideas, develops complete systems, validates honestly, documents, learns
 > from the accumulated record, and repeats — with minimal human input.

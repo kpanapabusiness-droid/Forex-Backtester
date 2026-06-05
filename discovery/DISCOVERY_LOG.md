@@ -50,6 +50,7 @@ at arc step (i).
 | 2010 | 2000s | 2026-06-05 | **Market-neutral RELATIVE-VALUE** (the arc-3004 escalation's #1 unlock — "the only lever that doesn't need to beat 0.50"), shorts now open (PR #273): long-outperformer/short-underperformer of a cointegrated pair (EUR-GBP, AUD-NZD, EUR-AUD), relative-MOMENTUM bet (arc-2003 *because*: laggard keeps lagging), candidate 2018-positive 4th leg. FALSIFIED at obs (H4+D1, the COST REALITY decides): relative-strength has ≈ZERO predictive power (corr(relstr,fwd_rel) −0.048..+0.006), frac+ coin-flip (0.43–0.55). The 2nd leg DOUBLES FundedNext cost (~6–14 bp) without doubling edge (relative move ~2–10 bp) → every H4 cell net-NEG; the only +D1 cells (EUR-GBP \|z\|≥2 +4.5bp) are THIN (~19/yr), NON-MONOTONE in \|z\| (arc-3007 not-a-lever tell), and net-NEG once full 2-leg slippage+commission counted. **CLOSES arc-2003's CONCEDE with the real reason:** relative-value's blocker was NOT long-only (now lifted) but doubled-cost-vs-coin-flip; shorts do NOT revive it. Escalation #1 unlock is itself EDGE<COST on majors | N | n/e | n/e | n/e | n/e | ~17k obs/grp | KILL (obs cheap-kill) | N | KILL |
 | 1015 | 1000s | 2026-06-05 | **3-way PORTFOLIO combination WFO** — the route's deployable gate (arc 1013/2006 flag): combine ALL THREE net-positive long-only components (gap-fill 1006 JPY-cross H4 + month-end 1011 USD-major D1 + failed-breakdown-reclaim 1013 USD-major H4) under equal + risk-parity, gate all-folds-positive on the COMBINED book. All three reproduce **BYTE-EXACT** (gap +0.685%, me +0.232%, fbr +1.854% 9/10 — fbr needs `trail_enabled=True`, the double-trail quirk in 1013's committed config). The 3rd component WORKS as 1013 predicted (positive 2015/16/20) → cuts arc-2006's 2-way risk-parity 4/10-neg(worst −1.53%) to **2/10 neg (worst −0.77%, mean +0.55%)** — strongest book in the corpus — but STILL not all-folds-positive → KILL. **Provably blocked, combination-method-invariant, by 2015 & 2018:** 2015 positive ONLY in fbr (+3.17; gap/me both neg), 2018 positive ONLY in me (+0.90; gap −6.79 & fbr −4.20 both neg) → no convex weighting passes both (2015 wants fbr, 2018 wants me; opposite directions, neither solo is AFP). CONVERGES w/ arcs 2008 (2000s) + 3009 (3000s) — triple-independent same verdict/same fold; the 2008/3009 follow-ups (2009 climax-short, 3010 trend-short) already confirm the 2018 leg is NOT a structural/trend short. Components UNCHANGED (still PORTFOLIO). **Precise 4th-component spec: positive in BOTH 2015 & 2018 (strong-USD/risk-off) → structurally a SHORT/USD-trend leg, NOT long-reversion → FLAG-1 shorts/2nd-leg unlock the named blocker w/ a 2-fold acceptance test (now the live frontier = flow-event short asymmetries, e.g. up-gap weekend short).** Route is exactly ONE regime-orthogonal component from deployable | N | n/e (OOS preserved) | -0.77% (risk-parity combined) | n/e | n/e | 396+121+172 | FAIL → KILL (combined book; components unchanged) | N | KILL |
 | 2011 | 2000s | 2026-06-05 | **Failed-breakout REJECT SHORT @ swing HIGH** — the TRUE forward-confirming mirror of arc 1013's reclaim-long (1014 tested the wrong/continuation mirror, 2009 the climax continuation; NONE tested the reject-reversal): price sweeps buy-stops above a 40-bar swing high then REJECTS back below with a big upper wick (bull-trap → reversal DOWN), candidate 2018-positive 4th leg. POOLED obs LOOKED like the first passing short (drift +0.171→+0.463 monotone in shadow, structure-control AT-swept +0.261 vs elsewhere −0.213) — but capture COIN-FLIP (0.47–0.51, not 1013's 0.55–0.61). **ROBUSTNESS KILLS it:** mean≫median (s≥1.25 mean +0.261 vs median −0.069 = thin-tail), excluding the 2 thin outlier pairs (AUDUSD n25 +1.26, USDJPY n31 +1.49) collapses it (s≥1.0 +0.085, s≥1.25 **−0.133 NEG**); deeper cell INVERTS negative (opposite of 1013). Structure-control "pass" was a PAIR-MIX confound; USD-quote split (arc-2009 USD-beta). arc-1013 reclaim-long has **NO tradeable short mirror in ANY of 3 constructions** (1014/2009/2011) → asymmetric long-only edge; structural-short route to 2018 fully closed | N | n/e | n/e | n/e | n/e | ~121k obs | KILL (obs cheap-kill, robustness-confirmed) | N | KILL |
+| 1016 | 1000s | 2026-06-05 | **Up-gap weekend SHORT** — the dispatch's #1 short lead + arc-1015's named 2018-leg candidate: the mirror of the arc-1006 gap-fill LONG (PORTFOLIO), a weekly-open UP gap reverting DOWN (arc 2001/2003: up-gaps drift −0.57 ATR / frac+ 0.64 = the "stronger leg"), checked specifically for its 2015 & 2018 sign. FALSIFIED at obs (direction-aware observe, H4, JPY crosses + USD majors): the honest i+1 short is **coin-flip-or-adverse** — JPY up-gap cap 0.448 (<0.50) drift −0.093 (the up-gap CONTINUES up at i+1, doesn't revert), per-pair 1/5; USD majors cap 0.418 drift −0.065, 3/7. **2015 & 2018 acceptance test FAILS as a real edge:** USD majors 2015 −0.65 / 2018 −0.21 both NEG; JPY 2015 +0.36 / 2018 +1.99 LOOK positive but = **regime-luck within a coin-flip** (overall cap<0.50, drift −0.09, per-pair 1/5, tiny n, wild per-year swings — arc-3010 lesson). Diagnosis: arc-2001's −0.57 ATR was the untradeable gap-bar-OPEN (hindsight); by i+1 the reversion is spent → **backward-confirming** like arc 1014; JPY-cross carry up-drift is a short headwind. §5f doesn't bite (sub-0.50/≤0 drift); no engine/null/council spent. **The 2018-positive 4th leg is NOT in any short construction (1014 structure / 2009 climax / 2011 reject / 3010 trend / 1016 flow) — the route's 2018 wall stands** | N | n/e | n/e | n/e | n/e | ~309k obs | KILL (obs cheap-kill) | N | KILL |
 
 ---
 
@@ -2133,3 +2134,56 @@ conditioning + LOO are one-off scratch observers). The first-ever engine short-r
 verified only (arc 1014) — a future short clearing observation will be the first to exercise it
 end-to-end. Drivers scratch `_disco2000_work/arc2011_observe_failed_breakout_short.py`,
 `arc2011_loo.py` (reproducible from the arc doc).
+
+### arc_1016
+
+**Up-gap weekend SHORT — the dispatch's #1 short lead & arc-1015's named 2018-leg candidate** (chat
+1000s). Full record: [`arcs/arc_1016_upgap_weekend_short.md`](arcs/arc_1016_upgap_weekend_short.md). No
+council (falsified at observation; arc-1014/3010 discipline).
+
+**Idea + why.** My arc 1015 specced the missing 4th portfolio component: positive in BOTH 2015 & 2018,
+structurally a SHORT. The dispatch's #1/#2 leads + arcs 1014/1015 all name the same first target — the
+**up-gap weekend SHORT**, the mirror of the arc-1006 gap-fill LONG (PORTFOLIO): arcs 2001/2003 measured
+weekly-open UP gaps drifting −0.57 ATR / frac+ 0.64 ("the stronger leg," long-only-blocked, now open
+PR #273). Unlike arc 1014's backward-confirming breakdown short, this is a discrete weekend-illiquidity
+flow event where the reversion might still be ahead of the i+1 entry. Its **2015 & 2018 sign is the
+acceptance test.**
+
+**What happened — FALSIFIED at observation.** Direction-aware honest observe (`observe_long_capture(
+direction="short")`, H4, weekly-open UP-gap bars ≥ thr·ATR, i+1 short). **No capturable i+1 short edge
+on either universe:** JPY crosses up-gap thr+0.5 cap 0.4484 (<0.50), drift −0.093 (NEGATIVE for the
+short → the up-gap CONTINUES up at i+1, doesn't revert), per-pair 1/5; USD majors cap 0.4175, drift
+−0.065, 3/7; coin-flip-or-adverse across thresholds 0.5/1.0/1.5 on both. **2015 & 2018 test:** USD
+majors 2015 −0.65 / 2018 −0.21 both NEGATIVE; JPY crosses 2015 +0.36 (cap 0.357) / 2018 +1.99 (n=31)
+*look* positive but are **regime-luck within a coin-flip** (overall cap<0.50 + drift −0.09, per-pair
+1/5, tiny n, per-year drift swinging +2.15/−2.74/−1.88) — arc-3010's exact lesson.
+
+**Verdict: KILL (cheap-kill at observation).** Cap<0.50 + ≤0 short drift → §5f exit-sweep doesn't bite
+(reserved for beats-null / +gross-drift entries); a sub-0.50/adverse gross signal is guaranteed sub-cost
+on the honest engine (arc 3003) → no pool/engine/null/council spent.
+
+**Diagnosis.** arc-2001's "+0.57 ATR / stronger leg" was measured from the **untradeable gap-bar OPEN**
+(hindsight, arc-2001's own caveat). At the honest i+1 entry the reversion is **already spent** and the
+up-gap continues up — the **backward-confirming** failure of arc 1014, re-confirmed on a flow event. The
+gap-fill-long mirror does NOT flip favorably: the down-gap-fill long catches a reversion still ahead of
+i+1 AND rides the Abenomics JPY-cross up-drift tailwind, whereas the up-gap short fights that same
+up-drift as a headwind and the surviving i+1 magnitude is below the coin-flip/cost line. Forward-
+confirming reversal structure is tradeable (1013); backward-confirming flow continuation is not.
+
+**Threads / lessons.** (1) **The up-gap weekend SHORT — the top-named short lead and the named 2018-leg
+candidate — is a cheap-kill at the honest i+1 entry;** arc-2001's "stronger short leg" is a gap-bar-open
+hindsight artifact. (2) **The 2018-positive 4th component is NOT in ANY short construction tried** —
+structure (1014), climax (2009), reject (2011), trend (3010), now flow (1016) all KILL; shorts revive
+neither directional structure nor trend nor a symmetric flow-leg. The arc-1015 3-way book's 2018 wall
+stands. (3) **The arc-3010 "regime-luck within a coin-flip" screen is load-bearing for the 2018 hunt:** a
+cell positive in 2015/2018 but sub-0.50 + per-pair-minority + tiny-n is noise, not the leg — promoting it
+to the engine would be fishing the 2 target folds (arc-1012 trap); the test is "robustly short-positive
+in 2015 & 2018," not "the 2015/2018 cells happen to be positive." (4) **Surviving frontier for the 2018
+leg:** market-neutral relative-value (arc 2010 KILLed — doubled cost vs coin-flip) and a genuinely
+tighter-cost execution regime (operator decision) — the in-apparatus short leads are now exhausted; the
+3-way book (1015) stands as the strongest non-deployable result, arc-3004 escalation reinforced.
+
+**Tooling:** no new BUILT tool (reused the direction-aware `observe_long_capture`; up-gap mask is a
+one-off scratch helper). **FLAGS (code not merged):** none. Carries FLAG-1 (shorts open but the named
+flow/structure/trend short leads now dead for the 2018 leg) + the `A1Config.time_exit_bars`-unwired flag.
+Driver scratch `_disco_work/arc1016_upgap_short_obs.py`.

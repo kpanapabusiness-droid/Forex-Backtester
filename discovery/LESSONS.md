@@ -49,3 +49,13 @@ liquid FX** and found no capturable edge:
 
 Items (1)/(2) require the operator's shorts/second-leg unlock first; item (3) and any novel-directional
 mechanism with a *because* are open immediately.
+
+**Strategist-proposed scopes (2026-06-05): see [`DISCOVERY_DIRECTION.md`](./DISCOVERY_DIRECTION.md)** for
+the generative council's `explore-now` MENU (one-leg cross-instrument/state-CONDITIONAL candidates that
+attack named *unconditional* corpus findings — M1 driver-shock cross-TF residual, O1 inelasticity-state
+conditioning, L1 triangulation second-moment, plus long-shots), and
+[`NEEDS_ENABLEMENT.md`](./NEEDS_ENABLEMENT.md) for the operator-gated queue. Two headline findings: the
+`explore-now` frontier is THIN and conditional (the corpus is mature); and the standing "netted book is
+the #1 unlock for relative-value" escalation is **overstated→wrong by cost arithmetic** — the cheap
+high-value build is instead the **single co-simulated equity curve** (settles the existing book's
+gate question honestly, zero fabrication surface).

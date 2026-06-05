@@ -34,6 +34,7 @@ at arc step (i).
 | 1009 | 1000s | 2026-06-05 | AUDIT of arc 1006 gap-fill (SAME component, not a new edge): reproduce + robustness. REPRODUCES +0.685% IS via registered tools; NOT single-pair (leave-one-out all +); but threshold-FRAGILE (lives at 0.5ATR, ~0 by 1.25) AND edge over a FAIR same-exit null is ~+0.36pp (~HALF the headline; null itself +0.327% from JPY-basket drift). Component HOLDS but thinner | N | n/e (not re-run) | -6.79% | n/e | n/e | 260 | PORTFOLIO (re-affirmed, thinner) | N | PORTFOLIO |
 | 3006 | 3000s | 2026-06-05 | Multi-TF breakout-RETEST long (resistance→support flip; the last untested long-only lane, arc-1008 flag) — FALSIFIED at obs: retest-hold capture ≤ base in all 18 L×tol×hold cells, fwd drift NEGATIVE in 17/18 (−0.35..+0.00 ATR); catches FADING breakouts not defended supports; monotone-in-L only converges TO coin-flip, never above | N | n/e | n/e | n/e | n/e | 1200 | FAIL (obs cheap-kill) | N | KILL |
 | 1010 | 1000s | 2026-06-05 | Round-number / order-cluster reversion long (Osler 2003: take-profit clusters at big-figure "00" levels → bounce off support) — novel structural microstructure mechanism, decorrelated portfolio candidate; FALSIFIED at obs: support-rejection capture only 0.4883 (+0.5pp, drift ~0) sub-0.50, per-pair lift 3/9 >0.50 = NOISE, and the H4 lift EVAPORATES at H1 (0.4746 < base; EURUSD 0.5155→0.4834). Round-number effect arbitraged at H4/H1 like gotobi | N | n/e | n/e | n/e | n/e | n/e | FAIL (obs cheap-kill) | N | KILL |
+| 3008 | 3000s | 2026-06-05 | Month-end London-4pm-fix flow dislocation-and-reversion long (buy abnormal DOWN-push into the 16:00 WM/Reuters fix on the last weekday of month, bet post-fix reversion) — arc-1010's last named discrete-flow lane; REAL & month-end-specific (corr −0.121 vs −0.035 non-ME; big-down-push +4.3bp/2h frac+ .576) and BEATS the fair null (−0.28% vs −0.73%, 9/10 neg) but SUB-COST: best of 8 exit/SL×threshold cells (stop-removed time3) is −0.22 to −0.28% IS-mean, none all-folds-positive; H1 cost-in-R (1R≈H4-ATR) ~2× taxes the +0.12R/3h drift; 4th flow effect real-but-uncapturable (gotobi/round-no/triangulation). OOS preserved | N | n/e (OOS preserved) | -0.22% (best, stop-removed N=3 thr0.25) | n/e | 1.41% (stop-removed) | 160 | FAIL → KILL | N | KILL |
 | 3007 | 3000s | 2026-06-05 | Intraday-SPREAD cost-timing lever on EDGE<COST (restrict cross-trend +gross signal to tightest-spread hours to cut cost — the one untried cost lever, arc 1003/1004) — BACKFIRES: spread×edge entangled, tight-spread/liquid hours have WEAKEST (negative −0.02R) gross edge; only +gross bucket is mid-spread (+0.12R) which nets ≤0 SL-honest (triage mean −0.02%, not all-folds-pos on friendly yrs). Cannot cut cost w/o cutting edge | N | n/e | -0.13% (mid-spread triage) | n/e | 0.14% | 2955 | FAIL → KILL | N | KILL |
 | 1011 | 1000s | 2026-06-05 | Month-end reversion long, USD majors (big DOWN move into month-end reverses — WMR-fix mechanical rebalancing over-extension; D1, ~2-bar time exit) — **2nd net-positive DECORRELATED long-only component**. MECHANISM-CONTROLLED: month-end vs random-day +0.249 ATR EXCESS (generic reversion NEGATIVE −0.063 → timing is causal). IS mean +0.23% (sl_only 2-bar), beats fair null +0.56pp, threshold-robust (0.75–1.5), leave-one-pair-out all+; but 7/10 folds → NOT all-folds-pos. Corr +0.117 vs arc 1006 → portfolio thread ACTIVE | N | n/e (OOS preserved) | -1.14% | n/e | n/e | 121 | FAIL → PORTFOLIO | N | PORTFOLIO |
 | 2005 | 2000s | 2026-06-05 | Attack EDGE<COST from the COST side: restrict cross-trend +gross entry (Donchian-20+SMA200, 12 crosses) to its cheapest bars (spread/ATR trailing-rolling-quantile, BUILT make_low_cost_mask). MONOTONE IS lift −7.96%(all)→+1.72%(cheapest 15%), beats matched random-cheap null (≈−0.3%) IN-SAMPLE — but OOS −2.26% (4/6 neg) + q full-sample-swept → NOT durable. CONVERGES w/ arc 3007 (3000s, absolute spread-timing): cost↓ entangled with edge↓ (liquid hours = weakest gross edge) → both chats CLOSE the cost side. DIRECTION remains the wall (3004); cost+stop are secondary ~5–10pp drags | N | N | +1.42% (cheapest-15% IS) | -8.33% | 6.01% | 682 | FAIL | N | KILL |
@@ -1313,3 +1314,75 @@ portfolio-combination arc.
 the portfolio route needs) + the `A1Config.time_exit_bars`-unwired flag (worked around via the BUILT
 `make_time_exit_predicate`). Driver scratch `_disco2000_work/arc2006_combo.py` (reproducible:
 `PYTHONPATH=. py _disco2000_work/arc2006_combo.py`).
+
+### arc_3008
+
+**Month-end London-4pm-fix flow dislocation-and-reversion (long)** (chat 3000–3999). Full record:
+[`arcs/arc_3008_month_end_fix_reversion.md`](arcs/arc_3008_month_end_fix_reversion.md). No council (a
+documented-mechanism observation that beat its placebo+null but died at the cost floor — confirmatory, not
+a stuck-point fork nor a survivor).
+
+**Idea + why (log-seeded).** Fresh eyes, honest-era only (22-arc corpus). Pre-shorts lane = a 2nd
+*decorrelated* net-positive long-only PORTFOLIO component (the one win, weekend gap-fill arc 1006, is a
+discrete-flow-event reversion). Arc 1010 named the last untested discrete-flow lane verbatim: **month-end
+fixing-flow dislocation-and-reversion**, distinct from arc 1005's turn-of-month *drift*. The London 4pm
+WM/Reuters fix is the most-documented FX flow event (Melvin & Prins 2015; Evans 2018): month-end equity
+hedging rebalances at the 16:00 London benchmark; the mechanical, predictable flow pushes price INTO the
+fix and partially REVERSES after. Long-only side = buy an abnormal DOWN push into the fix → bet post-fix
+reversion. The gap-fill archetype on a decorrelated, calendar-timed *intraday* event → a candidate 2nd
+portfolio component.
+
+**What happened.** H1, 7 USD majors, IS 2010–2020. Fix-hour bar = the 15:00–16:00 London bar (DST-robust
+via Europe/London tz), ending at the 16:00 fix. **OBSERVATION (bp):** a real, month-end-SPECIFIC reversion
+— corr(push, +2h) **−0.121 on month-end** vs −0.035 non-ME; big down-push into the month-end fix reverts
+**+4.31bp/2h, frac+ 0.576** (n=59) vs only +1.44bp non-ME. **Honest ATR/R lens (BUILT `observe_long_capture`,
+next-bar-open entry):** gross **+0.11–0.12R/3h drift** at every threshold — but capture 0.24–0.26
+(uninformative: +1R=2·ATR over 6 H1 bars is far; drift is the lens) and the cross-section is the arc-1010
+NOISE signature (only USDCAD/USDCHF robustly positive across thresholds; GBP/NZD/JPY negative). Because it
+beat the placebo AND showed +gross drift (non-coin-flip), §5f required the honest engine before a FAIL —
+with the reversion-appropriate exit (short time-exit; arc 2004). **Full 10-fold IS WFO** (BUILT
+`MonthEndFixReversionLongSignal`, ArcFoldRunner→MultiPairBacktester, FundedNext ON), best-version sweep
+(2 thresholds × 4 exits): **every cell net-NEGATIVE, none all-folds-positive.** Best = stop-removed time3
+(−0.22 to −0.28% IS-mean, 5/10 neg, maxDD 1.53%). **Fair null (same exit/SL/universe):** REAL −0.28% vs
+NULL −0.73% (9/10 neg) → **REAL but SUB-COST edge** (arc-0/1000 signature). OOS preserved (IS never cleared;
+~3 trades/pair/yr too thin for the judge anyway — arc-2001/2003 discipline).
+
+**Verdict: FAIL → KILL** (§11 beats-null-but-net-negative; NOT PORTFOLIO, which needs mean-POSITIVE net
+of cost). The fix reversion genuinely exists but its +0.12R/3h gross drift does not clear FundedNext cost +
+take-the-loss on the H1 construction.
+
+**Convergence with arc 1011/1012 (chat 1000s, landed concurrently).** The 1000s chat independently tested
+**month-end reversion long on USD majors** and reached **PORTFOLIO** (the 2nd net-positive component): arc
+1011 is a **D1 multi-bar over-extension INTO month-end** (mean +0.23% IS, mechanism-controlled +0.249 ATR
+excess vs random day, beats fair null +0.56pp; 7/10 folds → PORTFOLIO). Mine is the **H1 intraday
+16:00-fix-WINDOW** dislocation of the same broad idea — sub-cost, KILL. **Two chats converged: month-end
+reversion is REAL on USD majors.** The disposition split is explained by my lesson #2: the D1 R (2·D1-ATR)
+is large so cost-in-R is low and the drift clears; my H1 R (2·H1-ATR≈H4-ATR) is small so the same spread
+costs ~2× in R and eats it. **The capturable expression is the D1 over-extension (arc-1011 PORTFOLIO), NOT
+the intraday fix window (my KILL).** My arc CORROBORATES theirs and adds the negative boundary on resolution.
+
+**The arc-2004/3004 reversion A/B reproduces on a NEW family.** Removing the SL-first 2·ATR stop halves DD
+(5.97→1.53%) and lifts mean from −1.3% toward zero (−0.28%) — buy-into-weakness = large adverse excursion =
+the take-the-loss tax bites hardest — but never manufactures the edge. Two independent reversion families
+(weekend gap-fill majors, month-end fix) now share this exact signature: the stop is a real drag, not the
+wall; residual edge ≈ cost.
+
+**Threads / lessons.** (1) **Month-end fix reversion is REAL (placebo- AND null-beating) but sub-cost on H1
+majors** — the 4th documented microstructure/flow effect to be real-but-uncapturable on honest data (gotobi
+1008, round-numbers 1010, triangulation 3005, now the fix). A famous *because* with a measurable footprint
+STILL dies at the cost floor. (2) **The H1 cost-in-R penalty is a structural tax on intraday reversion:**
+1R = 2·H1-ATR ≈ H4-ATR, so the same spread costs ~2× in R — an intraday reversion needs a *larger* gross
+drift than an H4 signal; +0.12R/3h is not enough. (3) **The discrete-liquidity-EVENT lane (arc 1010's last
+named long-only thread) is now mapped:** month-end **D1** over-extension reversion is mean-POSITIVE →
+**PORTFOLIO (arc 1011, the 2nd decorrelated long-only component)**; the month-end **H1 fix-window** version
+(this arc) is sub-cost KILL. There are now **TWO net-positive long-only PORTFOLIO components** (arc-1006
+gap-fill + arc-1011 D1 month-end reversion). **Arc 2006 already combined those two → KILL** (mutually-negative
+2015 fold + tail-corr; pick a 3rd by its ROI on the book's NEGATIVE folds). My net-negative fix-window variant
+is NOT a usable 3rd. Reinforces the arc-3004 escalation + FLAG-1 shorts/second-leg unlock as highest-leverage. (4) **The fix's STRONGER leg is the UP-push SHORT** (the
+up-push into the fix reverts DOWN, the better side — FLAG-1 again), structurally blocked by long-only.
+
+**FLAGS (code not merged):** none new. Carries FLAG-1 (long-only blocks the stronger UP-push-into-fix short
+leg — operator/human-gated) + the `A1Config.time_exit_bars`-unwired flag (arcs 1005/3004; worked around via
+the BUILT `ExitPredicate`). BUILT + registered `MonthEndFixReversionLongSignal`
+(`discovery/tools/fix_flow_signals.py`). Drivers scratch `_disco3_work/arc3008_observe_fix.py`,
+`arc3008_capture.py`, `arc3008_wfo.py`.

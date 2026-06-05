@@ -37,6 +37,7 @@ at arc step (i).
 | 3007 | 3000s | 2026-06-05 | Intraday-SPREAD cost-timing lever on EDGE<COST (restrict cross-trend +gross signal to tightest-spread hours to cut cost — the one untried cost lever, arc 1003/1004) — BACKFIRES: spread×edge entangled, tight-spread/liquid hours have WEAKEST (negative −0.02R) gross edge; only +gross bucket is mid-spread (+0.12R) which nets ≤0 SL-honest (triage mean −0.02%, not all-folds-pos on friendly yrs). Cannot cut cost w/o cutting edge | N | n/e | -0.13% (mid-spread triage) | n/e | 0.14% | 2955 | FAIL → KILL | N | KILL |
 | 1011 | 1000s | 2026-06-05 | Month-end reversion long, USD majors (big DOWN move into month-end reverses — WMR-fix mechanical rebalancing over-extension; D1, ~2-bar time exit) — **2nd net-positive DECORRELATED long-only component**. MECHANISM-CONTROLLED: month-end vs random-day +0.249 ATR EXCESS (generic reversion NEGATIVE −0.063 → timing is causal). IS mean +0.23% (sl_only 2-bar), beats fair null +0.56pp, threshold-robust (0.75–1.5), leave-one-pair-out all+; but 7/10 folds → NOT all-folds-pos. Corr +0.117 vs arc 1006 → portfolio thread ACTIVE | N | n/e (OOS preserved) | -1.14% | n/e | n/e | 121 | FAIL → PORTFOLIO | N | PORTFOLIO |
 | 2005 | 2000s | 2026-06-05 | Attack EDGE<COST from the COST side: restrict cross-trend +gross entry (Donchian-20+SMA200, 12 crosses) to its cheapest bars (spread/ATR trailing-rolling-quantile, BUILT make_low_cost_mask). MONOTONE IS lift −7.96%(all)→+1.72%(cheapest 15%), beats matched random-cheap null (≈−0.3%) IN-SAMPLE — but OOS −2.26% (4/6 neg) + q full-sample-swept → NOT durable. CONVERGES w/ arc 3007 (3000s, absolute spread-timing): cost↓ entangled with edge↓ (liquid hours = weakest gross edge) → both chats CLOSE the cost side. DIRECTION remains the wall (3004); cost+stop are secondary ~5–10pp drags | N | N | +1.42% (cheapest-15% IS) | -8.33% | 6.01% | 682 | FAIL | N | KILL |
+| 1012 | 1000s | 2026-06-05 | Month-end reversion §5f best-version completion + survivor-ceiling test (same arc-1011 component, not a new edge): full registered exit/SL menu × time-cap, 24 configs → **0 all-folds-positive** (best 7/10 = baseline; te5 + all TP/trail DILUTE). Negative folds = contiguous **2014/2015/2016 USD-bull block** (SNB-unpeg/EUR-collapse); both pre-registered reasoned refinements FAIL to rescue — quarter-end-only 4/10 (thins to 0), trend-filter close>SMA100 4/10; post-hoc inverse close<SMA100 8/10 but still 2015/16 neg & fishing → not claimed. Survivor ceiling CLOSED; exits/filters can't lift it. OOS preserved | N | n/e (OOS preserved) | -1.14% | n/e | 1.43% | 121 | FAIL survivor → PORTFOLIO (ceiling confirmed) | N | PORTFOLIO |
 
 ---
 
@@ -1184,3 +1185,59 @@ regime (none found yet).
 **FLAGS (code not merged):** none new. Carries FLAG-1 (long-only blocks the UP-gap short side) + the
 `A1Config.time_exit_bars`-unwired flag. Drivers scratch `_disco2000_work/arc2005_cost_side.py`,
 `arc2005_null_control.py`, `arc2005_oos.py`.
+
+### arc_1012
+
+**Month-End Reversion: best-version completion (§5f) + survivor-ceiling test** (chat 1000–1999).
+Full record: [`arcs/arc_1012_month_end_best_version.md`](arcs/arc_1012_month_end_best_version.md).
+Additive PORTFOLIO note:
+[`portfolio-candidates/arc_1011_month_end_reversion_long/best_version_audit_arc1012.md`](portfolio-candidates/arc_1011_month_end_reversion_long/best_version_audit_arc1012.md).
+No council (a protocol-mandated best-version completion on an existing PORTFOLIO component, cf. 1009).
+
+**Idea + why.** Honest-era corpus = 23 arcs. Two PORTFOLIO components exist; the gap-fill (1006) was
+thoroughly worked across 6 arcs and is firmly fold-fragile, but the month-end reversion (1011) was only
+3 days old and **under-explored** — 1011 sampled exits informally and never diagnosed its 3 negative
+folds. §5f MANDATES the best HONEST exit be tested before a FAIL on a NON-coin-flip entry (month-end
+beats a fair null +0.56pp, mechanism-controlled +0.249 ATR excess), so completing it is required, not
+optional. It is also the one asset with genuine **survivor** upside (all-folds-positive → PASS). Decisive
+either way. (Chose this over a 3rd-component hunt because closing whether either existing component can be
+a *solo* survivor is logically prior to combining them — a solo survivor beats any portfolio.)
+
+**What happened.** Reproduced arc 1011 byte-for-byte via the registered tools (sl_only/te2/sl2.0 → mean
++0.232%, 7/10; per-fold vector identical). **§5f nested exit/SL sweep (24 configs)** — full registered
+menu × SL{1.5,2.0,2.5} × time-cap{2,3,5}, anti-fishing (same config must be all-folds-positive, no
+per-fold cherry-pick): **0/24 all-folds-positive.** Best fold count 7/10 (the baseline); the higher-mean
+te3/sl2.0 (+0.505%) is WORSE on folds (6/10); te5 and ALL tp/trail policies dilute (mean ≤0). The
+reversion is a tight ~2-3 day event — holding past it gives the move back. No config cleared IS → **OOS
+never touched.** **Negative-fold diagnosis:** fold→year maps the 3 negatives (folds 5/6/7) to a
+CONTIGUOUS **2014/2015/2016** block = the strong-USD-bull regime (EUR 1.39→1.05, SNB unpeg Jan-2015, oil
+crash) — a regime drag, not random fold-fragility. Two pre-registered, mechanism-reasoned refinements,
+both tested without tuning to the bad folds: **(A) quarter-end-only** (larger flow) → FALSIFIED (4/10,
+thins to min-trades 0); **(B) trend filter close>SMA100** (informed trend overwhelms flow) → FALSIFIED
+(4/10; SMA50/200 worse). The **inverse** (close<SMA100) is marginally better (8/10, +0.302% — a coherent
+"rebalancing buys the already-weak leg" story) but is **post-hoc/fishing AND still leaves 2015/2016
+negative** — the SNB-unpeg/USD-peak folds survive every honest cut. Not claimed.
+
+**Verdict: FAIL the survivor judge → PORTFOLIO (re-affirmed, survivor ceiling CLOSED).** The month-end
+reversion's best HONEST version is not all-folds-positive; its 2014-2016 regime block is irreducible by
+exit/SL or pre-registered filter. It remains a valid PORTFOLIO component (mean-positive, decorrelated,
+threshold-robust) — it just cannot stand alone. The month-end analogue of arc 1009's gap-fill audit.
+
+**Threads / lessons.** (1) **Both PORTFOLIO components are now best-version-closed as non-survivors**
+(gap-fill 1006/1007/1009/2002/2004; month-end 1011/1012) — neither exits nor reasoned filters lift either
+to all-folds-positive; both are regime/tail-timing-fragile. PORTFOLIO-combination + the arc-3004
+escalation (shorts/second-leg) are the only live paths. (2) **§5f exit menu is exhausted on the month-end
+signal** (0/24) — a future arc need not re-sweep exits on it. (3) **A contiguous-in-time negative-fold
+block is a REGIME drag, not exit-fixable** — diagnose the regime but never let "which filter flips those
+folds" drive the choice (the Arc-10/§5f fishing trap; here both reasoned refinements FAILED and the
+post-hoc inverse still fell short, so the verdict rests on NO fished number). (4) **Thread (fresh-arc,
+pre-register first):** month-end reversion may be stronger for below-trend/oversold currencies
+("rebalancing buys the underweight") — needs its own ex-ante population + fair null, not a post-hoc
+contrast. (5) **Next in this range:** a 3rd decorrelated discrete-flow-event component (arc 1011's named
+hunt), as both existing components' solo ceilings are now closed and a naive 2-way combination is
+gap-fill-variance dominated (6/10).
+
+**FLAGS (code not merged):** none requiring the canonical core. No new BUILT tool (reused
+`MonthEndReversionLongSignal` + `make_time_exit_predicate`; quarter-end / SMA masks are one-off
+conditioning helpers in scratch). Carries the standing `A1Config.time_exit_bars`-unwired flag (arcs
+1005/3004). Drivers scratch `_disco_work/arc1012_*.py` (reproducible from the arc doc).

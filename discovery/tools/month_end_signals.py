@@ -1,20 +1,26 @@
-"""Month-end reversion long SignalModule (EXPERIMENT tool).
+"""Month-end reversion SignalModules (EXPERIMENT tools).
 
-Built by arc 1011 (chat 1000s). EXPERIMENT tool per `discovery/TOOL_REGISTRY.md`: defines an entry
-MASK + ATR (price geometry) ONLY; never realizes P&L. Scoring routes through the canonical apparatus
-(`build_arc_pool`, `ArcFoldRunner` → `MultiPairBacktester`). Conforms to
-`core.arc.signal_protocol.SignalModule`.
+Built by arc 1011 (chat 1000s, the LONG) and arc 3017 (chat 3000s, the SHORT mirror).
+EXPERIMENT tools per `discovery/TOOL_REGISTRY.md`: define an entry MASK + ATR (price geometry)
+ONLY; never realize P&L. Scoring routes through the canonical apparatus (`build_arc_pool`,
+`ArcFoldRunner` -> `MultiPairBacktester`). Conform to `core.arc.signal_protocol.SignalModule`.
 
 Mechanism (arc 1011 observation + control): month-end mechanical rebalancing flows (the WMR 4pm London
-fix on the last business day) are large and INELASTIC — a big move INTO month-end over-extends and
-REVERSES once the flow completes. The long-only tradeable side is a big DOWN move into month-end (a
-currency sold into the fix): buy it, expecting reversion UP. The arc-1011 control proved the timing is
-load-bearing: a big 2-day down move on a RANDOM day CONTINUES down (fwd2 -0.063, the dead generic-
-reversion finding of arcs 3000/3001), while the SAME move into MONTH-END reverses (+0.186, +0.249 ATR
-month-end excess). So this is NOT generic reversion — it is a calendar-flow effect.
+fix on the last business day) are large and INELASTIC -- a big move INTO month-end over-extends and
+REVERSES once the flow completes. The effect is DIRECTION-SYMMETRIC:
+  - LONG side (arc 1011): a big DOWN move into month-end (a currency sold into the fix) -> buy it,
+    expecting reversion UP. The arc-1011 control proved the timing is load-bearing: a big 2-day down
+    move on a RANDOM day CONTINUES down (fwd2 -0.063, the dead generic-reversion finding of arcs
+    3000/3001), while the SAME move into MONTH-END reverses (+0.186, +0.249 ATR month-end excess).
+  - SHORT side (arc 3017): a big UP move into month-end (a currency bought into the fix) -> sell it,
+    expecting reversion DOWN. Arc-3017 obs: capture 0.5508 (>0.50), month-end EXCESS drift +0.0996 ATR
+    over the random-day big-UP control (generic big-up CONTINUES up -0.0405). Motivation: the long side
+    is NEGATIVE in the strong-USD block (2014/15/16) because EURUSD-type down-moves continue; the short
+    side fires on USDXXX over-extensions in those years -> candidate 2015 & 2018-positive 4th portfolio
+    leg.
 
 Ex-ante (no-lookahead): bar i is flagged the last trading day of its month when bar i+1 is in a new
-month (calendar knowledge — the last business day is date-determinable in advance; same convention as
+month (calendar knowledge -- the last business day is date-determinable in advance; same convention as
 arc 1005). The move INTO month-end uses close_mid[i] and close_mid[i-`into_bars`] (both known at bar i
 close); ATR is Wilder(14) on MID, shift(1) (strictly prior bars, excludes bar i). The signal fires at
 bar i close; the pool/engine enters at the next bar's open (the first trading day of the next month).
@@ -37,6 +43,23 @@ from core.arc.signal_protocol import (
 from core.sim.account import Direction
 from core.sim.panel import Panel
 from discovery.tools.trend_entry_signals import _atr_shift1_mid
+
+
+def _month_end_into_move(df: pd.DataFrame, into_bars: int, atr_period: int):
+    """Return (idx, is_last_month_end, into_move_in_atr, atr) -- shared ex-ante geometry."""
+    n = len(df)
+    idx = df.index
+    close_mid = (df["close_bid"].to_numpy(float) + df["close_ask"].to_numpy(float)) / 2.0
+    atr = _atr_shift1_mid(df, atr_period)
+    ym = pd.PeriodIndex(idx, freq="M")
+    is_last = np.zeros(n, dtype=bool)
+    if n >= 2:
+        is_last[:-1] = ym[1:] != ym[:-1]
+    into = np.full(n, np.nan)
+    k = into_bars
+    with np.errstate(invalid="ignore", divide="ignore"):
+        into[k:] = (close_mid[k:] - close_mid[:-k]) / atr[k:]
+    return idx, is_last, into, atr
 
 
 @dataclass(frozen=True)
@@ -67,22 +90,7 @@ class MonthEndReversionLongSignal:
         per_pair: dict[str, PerPairSignalState] = {}
         for pair in sorted(primary.pairs):
             df = primary.pair_dfs[pair]
-            n = len(df)
-            idx = df.index
-            close_mid = (df["close_bid"].to_numpy(float) + df["close_ask"].to_numpy(float)) / 2.0
-            atr = _atr_shift1_mid(df, self.atr_period)
-
-            # last trading day of the month: bar i+1 is in a new calendar month
-            ym = pd.PeriodIndex(idx, freq="M")
-            is_last = np.zeros(n, dtype=bool)
-            if n >= 2:
-                is_last[:-1] = ym[1:] != ym[:-1]
-
-            into = np.full(n, np.nan)
-            k = self.into_bars
-            with np.errstate(invalid="ignore", divide="ignore"):
-                into[k:] = (close_mid[k:] - close_mid[:-k]) / atr[k:]
-
+            idx, is_last, into, atr = _month_end_into_move(df, self.into_bars, self.atr_period)
             fire = (
                 is_last
                 & np.isfinite(into)
@@ -90,9 +98,8 @@ class MonthEndReversionLongSignal:
                 & (atr > 0)
                 & (into <= -self.threshold_atr)
             )
-            mask = np.zeros(n, dtype=bool)
+            mask = np.zeros(len(df), dtype=bool)
             mask[fire] = True
-
             per_pair[pair] = PerPairSignalState(
                 signal_mask=pd.Series(mask, index=idx, name="signal_mask"),
                 atr=pd.Series(atr, index=idx, name="atr_14_shift1"),
@@ -112,19 +119,29 @@ class MonthEndReversionLongSignal:
 class MonthEndReversionShortSignal:
     """SHORT a big UP move into month-end, betting on the post-fix rebalancing reversion DOWN.
 
-    The direction-mirror of ``MonthEndReversionLongSignal`` (arc 1019, chat 1000s; independently
-    reproduced by arc 2015, chat 2000s — same construction/verdict). Same ex-ante month-end detection
-    + ATR geometry; fires when the move INTO month-end is a big UP move (``into >= +threshold_atr``,
-    where into = (close[i] - close[i-into_bars])/atr) and declares ``Direction.SHORT`` on both the
-    per-pair state and the evaluation so the canonical Step-1 pool + architecture emit a short (entry
-    next bar at open_bid, SL ABOVE entry, ``final_r`` short-signed).
+    The direction-mirror of ``MonthEndReversionLongSignal`` — built INDEPENDENTLY and concurrently by
+    THREE chats: arc 1019 (chat 1000s), arc 2015 (chat 2000s), arc 3017 (chat 3000s) — same construction,
+    same pool (n=116, gross +0.1713), same verdict. Same ex-ante month-end detection + ATR geometry; fires
+    when the move INTO month-end is a big UP move (``into >= +threshold_atr``, where
+    into = (close[i] - close[i-into_bars])/atr) and declares ``Direction.SHORT`` on both the per-pair
+    state and the evaluation so the canonical Step-1 pool + architecture emit a short (entry next bar at
+    open_bid, SL ABOVE entry, ``final_r`` short-signed).
 
-    Mechanism (arc 1019/2015 observation + control, mirror of arc 1011): month-end mechanical
-    rebalancing reverts BOTH directions; arc 1011 captured only the long/down side and is 2015-negative
-    (in a strong-USD trend a big down move into month-end IS the trend → continues, doesn't revert). The
-    SHORT side fades a big UP move into month-end — positive precisely in strong-USD years (2015 +0.46 ATR,
-    2018 +0.37 ATR gross; month-end excess +0.089 vs the random-day control; honest short capture 0.55).
-    Conforms to ``core.arc.signal_protocol.SignalModule``. Intended TF = D1, USD majors.
+    Mechanism (observation + control, mirror of arc 1011): month-end mechanical rebalancing reverts BOTH
+    directions; arc 1011 captured only the long/down side and is 2015-negative (in a strong-USD trend a
+    big down move into month-end IS the trend → continues, doesn't revert). The SHORT side fades a big UP
+    move into month-end — positive precisely in strong-USD years (2015 +0.46 ATR, 2018 +0.37 ATR gross;
+    month-end excess +0.089 vs the random-day control; honest short capture 0.5508, the first corpus short
+    >0.50). Conforms to ``core.arc.signal_protocol.SignalModule``. Intended TF = D1, USD majors.
+
+    **Disposition: PORTFOLIO** (the corpus's first 2018-positive short component; recorded under arc
+    1019's ``portfolio-candidates/`` folder). The honest-engine result is exit-sensitive — with a
+    reversion-horizon time exit it is mean-positive every exit, beats the fair same-side null by ~+0.8pp
+    (partial-runner +0.683%, 7/10); a long 120-bar hold washes it toward noise. **arc-3017 caution
+    (Arc-10 defense): the per-fold ROI / all-folds-positive / 2015-2018-sign is `A1Config.risk_pct`-
+    convention-DEPENDENT (A1Config.risk_pct is PERCENT 0.5=0.5%, vs ArcPoolConfig FRACTION 0.005=0.5%;
+    and the daily-DD cap makes ROI nonlinear in risk) — judge fold-sign in the linear/low-risk regime;
+    the gated 4-way combo must report risk-sensitivity.** Not all-folds-positive (best 7/10) → PORTFOLIO.
     """
 
     threshold_atr: float = 1.0
@@ -146,21 +163,7 @@ class MonthEndReversionShortSignal:
         per_pair: dict[str, PerPairSignalState] = {}
         for pair in sorted(primary.pairs):
             df = primary.pair_dfs[pair]
-            n = len(df)
-            idx = df.index
-            close_mid = (df["close_bid"].to_numpy(float) + df["close_ask"].to_numpy(float)) / 2.0
-            atr = _atr_shift1_mid(df, self.atr_period)
-
-            ym = pd.PeriodIndex(idx, freq="M")
-            is_last = np.zeros(n, dtype=bool)
-            if n >= 2:
-                is_last[:-1] = ym[1:] != ym[:-1]
-
-            into = np.full(n, np.nan)
-            k = self.into_bars
-            with np.errstate(invalid="ignore", divide="ignore"):
-                into[k:] = (close_mid[k:] - close_mid[:-k]) / atr[k:]
-
+            idx, is_last, into, atr = _month_end_into_move(df, self.into_bars, self.atr_period)
             fire = (
                 is_last
                 & np.isfinite(into)
@@ -168,9 +171,8 @@ class MonthEndReversionShortSignal:
                 & (atr > 0)
                 & (into >= self.threshold_atr)
             )
-            mask = np.zeros(n, dtype=bool)
+            mask = np.zeros(len(df), dtype=bool)
             mask[fire] = True
-
             per_pair[pair] = PerPairSignalState(
                 signal_mask=pd.Series(mask, index=idx, name="signal_mask"),
                 atr=pd.Series(atr, index=idx, name="atr_14_shift1"),

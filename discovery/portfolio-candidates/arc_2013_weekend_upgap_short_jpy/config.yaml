@@ -1,0 +1,42 @@
+# arc 2013 — Weekend UP-gap SHORT (JPY crosses). PORTFOLIO component config.
+# EXPERIMENT signal: discovery/tools/gap_signals.py :: WeekendUpGapShortSignal (BUILT, arc 2013).
+# Scored SOLELY by MultiPairBacktester via the canonical apparatus (FundedNext costs ON, SL-first).
+
+signal:
+  class: WeekendUpGapShortSignal          # discovery/tools/gap_signals.py
+  threshold_atr: 1.0                       # fire when (open_mid - prev_close)/ATR >= +1.0 (UP gap)
+  gap_hours: 20.0                          # weekly/holiday open detected via index dt > 20h (H4 step=4h)
+  atr_period: 14                           # Wilder(14) on MID, shift(1) (strictly prior bars)
+  direction: SHORT                         # load-bearing (PR #273 short path); entry next bar, SL ABOVE entry
+
+universe:
+  pairs: [EURJPY, GBPJPY, AUDJPY, NZDJPY, CADJPY, CHFJPY]   # JPY crosses (1006's mean-positive gap universe)
+  timeframe: H4
+  boundary_convention: 5ers_eet
+
+engine:                                    # A1Config defaults (canonical)
+  architecture: A1Architecture
+  exit_policy: sl_plus_trailing_atr        # mechanism-aligned overshoot-capture (mirrors 1006/1007); component exit
+  sl_atr_mult: 2.0
+  risk_pct: 0.005
+  sizing_convention: reset_floor
+  max_concurrent_per_pair: 1
+  max_concurrent_per_currency: 2           # NOTE: all 6 crosses share JPY → caps concurrent shorts at 2 (honest)
+  starting_balance: 100000.0
+
+cost_model: CostModel.fundednext           # 1.5x spread, 0.5 pip/fill slippage, $5/lot RT, swaps OFF
+
+data:
+  histdata_root: 'C:\Users\panap\histdata_backup'   # recovered 65 GB corpus
+  cache_root: data/cache
+
+windows:
+  IS: [2010-01-01, 2020-12-31]             # development window (build_v3_folds folds 2..11)
+  OOS: PRESERVED                           # 2021+ NOT measured (not all-folds-positive; combination arc gates it)
+
+repro: |
+  PYTHONPATH=. python _disco2000_work/arc2013_engine_wfo.py   # exit-menu IS WFO (both thresholds)
+  PYTHONPATH=. python _disco2000_work/arc2013_null.py         # fair same-side null (5 seeds)
+  # observation + robustness:
+  PYTHONPATH=. python _disco2000_work/arc2013_observe_upgap_short.py
+  PYTHONPATH=. python _disco2000_work/arc2013_robustness.py

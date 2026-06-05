@@ -48,6 +48,11 @@ def build_null_signal_evaluation(
 
     Deterministic: the RNG is seeded once and advanced per pair in sorted order,
     so the same (real_eval, seed) always yields byte-identical masks.
+
+    Direction-aware (arc 2013): the per-pair ``direction`` and the eval-level
+    ``direction`` are carried through unchanged, so a SHORT signal's null is a
+    SHORT random entry (a fair same-side baseline). Longs are byte-identical —
+    ``direction`` defaults to ``Direction.LONG``.
     """
     rng = np.random.default_rng(seed)
     per_pair: dict[str, PerPairSignalState] = {}
@@ -67,12 +72,14 @@ def build_null_signal_evaluation(
         per_pair[pair] = PerPairSignalState(
             signal_mask=pd.Series(new_mask, index=mask.index),
             atr=state.atr,
+            direction=state.direction,
         )
     return SignalEvaluation(
         primary_tf=real_eval.primary_tf,
         per_pair=per_pair,
         signal_name=f"null_random_entry_seed{seed}",
         causal_lineage="clean",
+        direction=real_eval.direction,
     )
 
 

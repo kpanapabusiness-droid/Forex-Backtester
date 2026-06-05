@@ -13,6 +13,11 @@ exclude = [
   ".venv/**",
   ".git/**",
   "__pycache__/**",
+  # Discovery-fleet scratch working dirs (throwaway; committed but never a gate
+  # path) — excluded from lint like archive/research/results. Matches top-level
+  # (_disco_work, _disco2000_work, _disco3_work) and nested (discovery/_disco1_work).
+  "_*_work/**",
+  "**/_*_work/**",
 ]
 
 [lint]

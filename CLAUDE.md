@@ -13,6 +13,7 @@
 - **KH-24 is retired/closed** — not a live system, not deployable. Its strategy code (`core/strategies/kh24/`) and anchor harness (`scripts/anchor/`) are retained ONLY as the A1 byte-identity engine anchor (a determinism fixture), never as a deployable or live system.
 - **The fast replay is retired (2026-06-02).** No live-tree code path scores P&L from a precomputed shortcut. `MultiPairBacktester` (`core/sim/`) is the sole gate engine.
 - **Forward research: the discovery pipeline is BUILT, trial-validated, and CLEARED for continuous operation.** The self-running discovery programme now lives in-repo under [discovery/](discovery/) — protocol [discovery/DISCOVERY_PROTOCOL.md](discovery/DISCOVERY_PROTOCOL.md) (authoritative), one-screen orientation [discovery/README.md](discovery/README.md), operator dispatch layer [docs/DISCOVERY_DISPATCH_TEMPLATE.md](docs/DISCOVERY_DISPATCH_TEMPLATE.md), per-chat run dispatch [discovery/CONTINUOUS_RUN_DISPATCH.md](discovery/CONTINUOUS_RUN_DISPATCH.md), overseer handover [discovery/CONTINUOUS_OVERSEER_HANDOVER.md](discovery/CONTINUOUS_OVERSEER_HANDOVER.md), measurement glue `core/wfo/discovery_measure.py`. Arc 0 (supervised trial) ran end-to-end on the honest engine and FAILED its signal — correctly — so the machinery is validated. Continuous multi-chat operation is now **AUTHORIZED** (protocol §10 staging updated: trial DONE → chats run continuously from arc 1); deployable-system count remains 0.
+- **Short-side capability is ENABLED (2026-06-05, PR #273).** The v3 short path is merged and the honest-engine sweep's short-side re-read addendum reads SAFE (Parts C/D symmetric on short legs; longs byte-identical). The pre-reset "short signals eliminated" verdict is superseded. No short discovery arc has opened yet — the capability is available (gated canonical core) and the programme's immediate lane stays the long-only PORTFOLIO route until the operator flips it to short / relative-value work. **Deployable-system count = 0.**
 
 ---
 
@@ -106,7 +107,7 @@ Each entry below was tried and is **not deployable** — recorded so it is not r
 - Exit indicator sweeps (57 tested, none deployable).
 - Full NNFX stack as strategy.
 - GPT-4 / Aider for any implementation task.
-- Short signals.
+- ~~Short signals~~ — **RE-ENABLED 2026-06-05 (PR #273):** the v3 short path is merged and the honest-engine sweep short-side addendum reads SAFE (Parts C/D symmetric). The pre-reset elimination is superseded; the short capability is available but gated canonical core, and no short discovery arc has opened yet.
 - `signal_flip` exit; `kijun_4h` exit.
 - D1b slope filter.
 - Choppiness gate.

@@ -215,5 +215,6 @@ mirror — no prior verdict changes.
 short cases, `test_cost_application` short cases, `test_short_enablement`,
 `test_label_take_the_loss`, `test_determinism`) pass under `pytest -m "not research"`.
 Caveat, unchanged from the long verdict: Part B's cross-pair `SUSPECT` features
-remain causal-lineage-gated, and no short discovery arc may open until this PR is
-merged (it is human-gated canonical core; deployable-system count stays 0).
+remain causal-lineage-gated. The short path is now **MERGED** (PR #273, 2026-06-05,
+squash-merged as `d826219`), so this sweep no longer blocks short arcs — the short
+engine path remains human-gated canonical core, and deployable-system count stays 0.

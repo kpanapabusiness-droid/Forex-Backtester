@@ -21,10 +21,14 @@ Each spawned session is the real per-chat discovery run (the dispatch you pass v
 * spawn one fresh `claude` session per range and stream its output to a log,
 * respawn a fresh session when one exits (never `--resume`).
 
-Why fresh every time: the discovery design depends on each arc starting from a clean,
-un-bloated context. `--resume` would reload the previous transcript and defeat the whole
-point. The launcher therefore **never** resumes — it always starts a new session, and the
-session itself self-debloats and re-reads the shared log between arcs.
+Why fresh every time: a chat cannot clear its own context window (the transcript is
+append-only), so it has a FINITE arc budget — it runs to a graceful handoff (finish the
+current arc → commit + push → stop). Continuity is **handoff + bootstrap, NOT self-debloat**
+(protocol §10): step-(k) re-orientation drops working detail from active attention but does
+NOT free the context window. A fresh session then bootstraps purely from the shared log
+(pull main, read protocol + log + LESSONS + registry, resume at the highest arc-id in its
+range + 1). The launcher embodies exactly this — it **never** `--resume`s; it always spawns a
+NEW session per range, and the LOG (not the prior transcript) carries the learning forward.
 
 ## The model value
 

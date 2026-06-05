@@ -1,0 +1,62 @@
+# PORTFOLIO-CANDIDATE config record — arc 1006 (weekend gap-down-fill long, JPY crosses).
+# Transcribed from arcs/arc_1006_weekend_gap_fill_long.md (NOT re-run). This is a DOCUMENTATION
+# record, not a turnkey runnable config: the arc-1006 signal driver was scratch (_disco_work/),
+# later generalized into the registered WeekendGapFillLongSignal (discovery/tools/gap_signals.py).
+
+arc_id: 1006
+name: arc_1006_weekend_gap_fill_long
+disposition: PORTFOLIO          # mean-positive net of costs, NOT all-folds-positive (protocol §11)
+verdict: FAIL                   # the sole judge (all-folds-positive IS AND OOS) — failed both
+
+signal:
+  mechanism: weekend gap-down-fill long (buy a significant weekly-open DOWN gap, bet on upward fill)
+  direction: long
+  universe: [EURJPY, GBPJPY, AUDJPY, CADJPY, CHFJPY]    # 5 JPY crosses (gap-fill is JPY-cross-specific)
+  timeframe: H4
+  boundary_convention: 5ers_eet
+  week_open_detection: timestamp gap > 36h              # flags the weekly-open bar
+  entry_trigger: (open_mid - prior_close_mid) / ATR <= -0.50   # gap-down deeper than 0.5 ATR
+  entry_fill: next-bar open                             # ex-ante: open[i] & close[i-1] known at bar i close; ATR shift1
+  # Now reproducible via the registered signal (set threshold_atr=0.5; the registered default is 1.0):
+  registered_equivalent: "discovery/tools/gap_signals.py :: WeekendGapFillLongSignal(threshold_atr=0.5, gap_hours=36)"
+
+exit:
+  type: time_exit
+  n_bars: 24                                            # 24-bar time exit
+  tool: "discovery/tools/time_exit_predicate.py :: make_time_exit_predicate"
+  exit_policy: null                                     # no TP/trail overlay
+  trail_enabled: false
+
+risk:
+  sl: 2.0 ATR                                           # SL = signal-bar close ∓ 2·ATR
+  atr: "wilder_atr(mid, 14).shift(1)"                   # canonical, ex-ante
+  risk_pct: 0.005   # canonical default — the arc record does not separately override it
+
+window:
+  is: [2010-01-01, 2020-12-31]
+  oos: "2021-01-01 .. present (per-year folds)"
+
+engine:                                                 # all CANONICAL / LOCKED (called, never re-rolled)
+  scorer: "MultiPairBacktester (SL-first, take-the-loss)"   # the sole gate engine
+  architecture: "A1Architecture + ArcFoldRunner"
+  costs: "FundedNext (1.5x spread, 0.5 pip/fill slippage, $5/lot RT, no swaps), ON"
+  cost_chokepoint: build_fold_stats_from_run
+  is_folds: "build_v3_folds (IS folds, is_days >= 365)"
+  oos_folds: "build_oos_year_folds(start_year=2021)"
+  judge: judge_all_folds_positive
+  null_baseline: "discovery/tools/null_entry_baseline.py :: build_null_signal_evaluation"
+
+pool:
+  builder: "core/arc/arc_pool_builder.py :: build_arc_pool"
+  n_trades_is: 396
+  capture_is: 0.5000
+  mean_final_r_gross: 0.1127       # positive gross — the fill works before costs / fold-fragility
+
+reproduction_note: >
+  Arc-1006 drivers were scratch (_disco_work/arc1006_observe.py, arc1006_kill.py, arc1006_wfo.py,
+  arc1006_refine.py; run as `PYTHONPATH=. py _disco_work/<script>.py`) and are NOT committed, so there
+  is no committed turnkey repro command. To reproduce: build the signal above (or call the registered
+  WeekendGapFillLongSignal with threshold_atr=0.5, gap_hours=36) over the 5 JPY crosses, set the
+  24-bar make_time_exit_predicate, and run it through ArcFoldRunner on build_v3_folds (IS) +
+  build_oos_year_folds(2021) (OOS), judged by judge_all_folds_positive, costs ON at
+  build_fold_stats_from_run. histdata_root = C:\Users\panap\histdata_backup.

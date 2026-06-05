@@ -6,8 +6,10 @@ input. **[`DISCOVERY_PROTOCOL.md`](./DISCOVERY_PROTOCOL.md) is authoritative**; 
 one-screen orientation.
 
 > **Precondition (hard gate, protocol §0):** discovery is valid ONLY on a verified-honest engine.
-> Confirm [`../HONEST_ENGINE_SWEEP.md`](../HONEST_ENGINE_SWEEP.md) reads clean before any arc. As of
-> 2026-06-04 it does — `MultiPairBacktester` is honest end-to-end and safe as the sole gate engine.
+> Confirm the engine-honesty audit [`HONEST_ENGINE_SWEEP.md`](../HONEST_ENGINE_SWEEP.md) (it lives at
+> the **repo root**, not in `discovery/`) reads clean before any arc. As of 2026-06-05 it does —
+> `MultiPairBacktester` is honest end-to-end and safe as the sole gate engine, and the short-side
+> re-read addendum reads SAFE for shorts (Parts C/D symmetric).
 
 ## The arc loop (in brief)
 

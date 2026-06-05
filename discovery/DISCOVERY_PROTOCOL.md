@@ -228,7 +228,7 @@ book. (You cannot diversify net-negative components positive — arcs 3000/3001 
 edges land here; anything at or below the null baseline is KILL, §11.)
 
 ## 7. THE COUNCIL OF FIVE (judgment stand-in while operator is away)
-A separate skill (the customized `llm-council-discovery`, see COUNCIL_OF_FIVE_SKILL_DISPATCH).
+A separate skill (the customized `llm-council-discovery`, see [`../docs/DISCOVERY_COUNCIL_SKILL.md`](../docs/DISCOVERY_COUNCIL_SKILL.md)).
 Invoke it deterministically via the slash trigger **`/llm-council-discovery`** (the slash form maps
 1:1 to the skill, zero collision with the stock general-purpose council — required for autonomous
 protocol-driven calls; natural-language phrases like "discovery council" exist as operator

@@ -57,6 +57,7 @@ at arc step (i).
 | 3012 | 3000s | 2026-06-05 | **Risk-off vol-EXPANSION SHORT on high-risk-beta majors (AUD/NZD)** — the candidate 2015 **&** 2018-positive 4th PORTFOLIO leg, attacked from the one un-tested conditioner: a realized-vol-EXPANSION (risk-off) trigger (dollar-smile/flight-to-quality *because*; distinct from price-trend 3010 & vol-LEVEL closed-ground). FALSIFIED at obs (H4, AUDUSD/NZDUSD/AUDJPY, direction-aware short): pooled cap **0.5025** (coin-flip) + drift mean **+0.264 / median −0.004** (thin-tail artifact, arc-2011 tell). **Acceptance test FAILS on the BINDING fold:** 2015 strong + (cap 0.654/+0.748) but **2018 robustly NEGATIVE — cap 0.369/−1.17, all 3 pairs agree** (AUDUSD −1.24, NZDUSD −1.09, AUDJPY −0.30). Diagnosis: 2018's vol spikes are **capitulation lows** → short bounces (backward-confirming, arc-2009/1016 mode); 2015's are mid-trend → continues. Vol-EXPANSION confers no directional edge either side (controls cap ~0.50) — symmetric completion of arc-1001 vol-contraction + closed-ground vol-LEVEL: vol = magnitude not direction. 6th dead route to the 2018 leg (structure 1014/2009/2011, trend 3010, flow 1016, continuation-long 2012, now vol-state short); arc-3004 escalation reinforced. No engine/null/council spent | n/e | n/e | n/e | n/e | n/e | ~57k obs | KILL (obs cheap-kill) | N | KILL |
 | 2012 | 2000s | 2026-06-05 | **DEEP multi-factor trend-CONTINUATION long** (1013's forward-confirm property applied to continuation, the one untested face of dispatch item d) — the portfolio's missing 4th leg must be trend/2018-POSITIVE (a continuation long: trend-positive, a LONG so no short-mirror death). Construction: uptrend (close>SMA200 & SMA50>SMA200) × shallow pullback holding the 40-bar higher-low × strong prior impulse (SMA50 slope) × FORWARD-confirm resume (close>prior-high). FALSIFIED at obs (H4 USD majors, IS): cell cap 0.479–0.486 (≤ base 0.486, all <0.50); impulse gate ANTI-predictive (stronger trend → worse, 3003 echo). **Q2 forward-confirm does NOT rescue continuation** (resume −0.105 vs into-dip −0.156, both neg) — mechanism: forward-confirming a REVERSAL (1013) enters BEFORE the move starts (works); a CONTINUATION enters AFTER the bounce (late) → reverts. **Q3 STRUCTURE CONTROL INVERTS (decisive):** FULL conjunction 0.4787/−0.105 WORSE than generic resume-in-uptrend 0.4956/+0.007 — deep trend structure is ANTI-load-bearing (mirror-image of 1013 where structure HELPS). Per-pair 1/7 pos (USDJPY only); **2018 drift −0.233 NEG** → not the trend leg. Closes the deep-continuation-long face: 1013's forward-confirm property is REVERSAL-SPECIFIC; no structural directional bet (long OR short, shallow OR deep) yields the 2018 leg → arc-3004 escalation reinforced | N | n/e | n/e | n/e | n/e | ~121k obs | KILL (obs cheap-kill) | N | KILL |
 | 1017 | 1000s | 2026-06-05 | **Carry-unwind cascade SHORT on JPY crosses** (vol-ignition conditioned) — a genuinely novel risk-off FLOW mechanism for the 2018 leg: leveraged carry force-unwinds in risk-off → JPY bought back → persistent down-cascade; short the vol-expansion big-red IGNITION fired from a built-up carry uptrend (forward-confirming, enters at the START of the unwind, unlike trend-short 3010). REAL structural effect (**structure control PASSES**: in-carry-uptrend drift +0.134 ATR / median +0.068 = continues DOWN vs same big-red bar NOT-in-uptrend median −0.178 = reverts UP) **but sub-cost**: capture coin-flip 0.50, drift on the JPY-cross cost line, **deeper cell INVERTS** (2011/3011 tell). Honest engine §5f (exit menu swept, entry shows gross drift): 5-pair best exit sl_only mean **+0.013%, 4/10 folds pos, NOT all-folds-positive**; beats fair null by only +0.044pp (noise floor, ~10× below 1006's +0.36pp). First-read "2015&2018 both +0.19%" was a **JPY currency-exposure-cap artifact** — all-JPY-quote crosses fire simultaneously in one risk-off cascade, the 2-per-ccy cap guts the clustered fires (uncapped pool 92–109/yr → capped engine 0–3/yr in 2015/16/19). Single-pair (cap removed) best AUDJPY +0.011% 6/10, beats null +0.022pp; NZDJPY dead (+0.0001pp); none all-folds-positive. **NEW lesson: a correlated-cascade signal is structurally un-scalable into a portfolio leg.** 2018 IS genuinely engine-positive (AUDJPY +0.07–0.10%, pool +1.04R — the only short positive in 2018) but tiny/un-scalable + 2015 marginal → KILL. The 2018 leg is now unfound across EVERY route (structure 1014/2009/2011, trend 3010, up-gap flow 1016, rel-value 2010, deep-continuation 2012, carry-unwind flow 1017). OOS preserved | N | n/e (OOS preserved) | +0.011% (AUDJPY best-exit, not AFP) | n/e | ~0.05% | 1204 | FAIL → KILL (sub-cost, un-scalable) | N | KILL |
+| 2014 | 2000s | 2026-06-05 | **Failed-breakdown reclaim long × downtrend-regime GATE** — improve the corpus's strongest edge (arc 1013, IS 9/10, ONLY 2018 neg) toward a SOLO PASS by conditioning OUT the strong-USD regime with a PRE-REGISTERED downtrend-STRENGTH/PERSISTENCE gate (the one conditioner obs#3's binary D1≤SMA50 + arc-3013's level-variants never tried; arc-1013 thread #5's open refinement). FALSIFIED at obs (no engine/null/council). **Hypothesis INVERTED:** strong-SMA200-down-slope is the BEST bucket (+0.218, n103, reclaim bounces sharpest when stretched down), mild-down NEG (−0.245); edge strongest in BALANCED context (near-SMA200 +0.397) — a mean-reversion-when-not-trending-up texture, not a 2018 separator. **Decisive: 2018 is NOT regime-separable — it's a near-total wipeout** (18/19 trades −1R; **6/7 pairs 100% −1R**; both "best-context" 2018 trades −1.00; gate drops 58% of 2018 fires yet kept trades still −0.69). Only non-loser = USDJPY (+0.24, n2 — the lone USD-aligned pair) but ~2 trades/yr = un-scalable (arc-1017 mode). Any gate removing the neg pockets (consec_below200>100 −0.30; mild-down) DESTROYS good folds (2012 +1.14→−0.09, 2013→−0.31, 2019→−0.47, 2020→+0.12). **NEW lesson: 1013's 2018 drag is mechanism-intrinsic & entry-time-UNCONDITIONABLE** (in risk-off the failed breakdown becomes a real breakdown, reclaim doesn't hold) — independently re-confirms 1013/3013 via a new conditioner; closes the "improve 1013 toward solo-PASS" lane. 1013 UNCHANGED (still PORTFOLIO); route's 2018 wall stands (arc-3004 escalation reinforced) | N | n/e | n/e | n/e | n/e | 237 (obs) | FAIL (obs cheap-kill) | N | KILL |
 | 2013 | 2000s | 2026-06-05 | **Weekend UP-gap weekend SHORT, JPY crosses** (the gap-fill's "stronger leg", arc 2001/2003 FLAG-1; 1015's named 2018-leg candidate) — the up-gap reverting DOWN, mirror of the 1006 down-gap LONG. **CONVERGES with independent 1000s arc 1016 → KILL.** **FIRST end-to-end SHORT engine run** — validates the merged PR #273 short path (pool builds sign-correctly, costs net symmetrically, no canonical change). Obs: honest i+1 short capture clears 0.50 only in a single fragile band (≥1.0 cap 0.518/drift +0.08/median +0.146) — but **≥0.5 median −0.115, ≥1.5 INVERTS −0.22, drop-AUDJPY → −0.107** (1016 independently got cap 0.448/drift −0.093). §5f honest engine (non-coin-flip at ≥1.0, so engine-run required): mean-positive under overshoot exits (trailing_atr **+0.745%** IS, beats random-ANY-bar null +1.74%) BUT **NOT all-folds-positive (5/10 neg)** and the positive mean is **THIN REGIME-LUCK — excluding 2018(+5.08,n8)+2019(+5.92,n10) the other 8 folds avg −0.44%** (net-neg); fails the 2015 half of the spec (−0.57). Diagnosis: arc-2001's −0.57 ATR was the untradeable gap-bar-OPEN (hindsight); by i+1 reversion is spent (backward-confirming, arc 1014) + JPY-basket up-drift taxes the short. Real-but-regime-luck = KILL not PORTFOLIO (Arc-10 defense: independent reproduction + fold-decomposition caught the thin-fold over-claim). 2018-leg unfound in EVERY short (1014/2009/2011/3011 structure, 3010 trend, 1016/2013 flow, 3012 vol, 2012 cont-long). OOS preserved | N | n/e (OOS preserved) | -3.18% (best-exit IS worst-fold) | n/e | n/e | 137 | FAIL → KILL (regime-luck, converges 1016) | N | KILL |
 
 ---
@@ -2624,3 +2625,53 @@ byte-identical). Both registered.
 
 **FLAGS (code not merged):** none requiring the canonical core. Two EXPERIMENT-tool additions in
 discovery/tools/ (flow freely §9). Drivers scratch `_disco2000_work/arc2013_*.py` (reproducible).
+
+### arc_2014
+
+**Failed-breakdown reclaim long × downtrend-regime GATE** (chat 2000s). Full record:
+[`arcs/arc_2014_fbr_downtrend_regime_gate.md`](arcs/arc_2014_fbr_downtrend_regime_gate.md). No council
+(falsified at observation; no worthwhile-ceiling fork).
+
+**Idea + why.** Every 2018-leg attempt (16 arcs) hunted a *separate* 4th portfolio component — all dead.
+The untried highest-EV lever: improve arc **1013 itself** (the strongest edge — IS 9/10 folds positive,
+the ONLY negative fold 2018) past its single 2018 fold → a *solo* PASS, the first survivor. arc 1013
+thread #5 left this open: condition OUT the strong-USD regime with a PRE-REGISTERED causal measure (NOT
+fished to flip 2018 — the arc-1012 trap). The reclaim is a liquidity-GRAB reversal; *because*: in an
+extreme/established downtrend (2018 strong-USD) a swept low is an INFORMATIONAL breakdown and the reclaim
+is a dead-cat pause, so a TAIL gate on downtrend STRENGTH/PERSISTENCE should drop the falling-knives and
+keep the 9 good folds. obs#3 only tested a BINARY D1≤SMA50 split (found mild-down FINE); arc 3013 tested
+liquidity LEVELS — neither tested downtrend strength as a continuous gate.
+
+**What happened — the data led AWAY from the hypothesis.** Reproduced the 1013 pool (K=40, shadow≥1.25,
+7 USD majors, H4, IS; n=237, mean final_r +0.137 ✓). Edge by downtrend-strength buckets:
+- **Hypothesis INVERTED:** strong-SMA200-down-slope is the *strongest* bucket (+0.218, n=103) — reclaim
+  bounces are sharpest when stretched down; mild-down is the negative slice (−0.245, n=27). Edge peaks in
+  BALANCED context (near-SMA200 +0.397) and is weak in established UPtrend (dist>1 +0.041, win 0.10). A
+  mean-reversion-works-when-not-trending-up texture — NOT a 2018 separator.
+- **Decisive 2018 decomposition — not regime-separable, a near-total wipeout:** 18/19 trades hit the full
+  −1R stop; **6 of 7 pairs went 100% to −1R** (AUDUSD/EURUSD/GBPUSD/NZDUSD/USDCAD/USDCHF). Both 2018 trades
+  in the "best context" (near-SMA200) are −1.00. The candidate gate drops 58% of 2018 fires yet the *kept*
+  trades still average −0.69. The lone non-loser is USDJPY (+0.24, 2 trades — the one pair trending *up
+  with* USD in 2018), but at ~2 trades/yr that is un-scalable (arc-1017 mode; arc 3010 already killed the
+  USD-trend-alignment angle).
+- Any gate that removes the negative pockets (consec_below200>100: −0.30; mild-down) **destroys the good
+  folds** (2012 +1.14→−0.09, 2013 +0.36→−0.31, 2019 −0.08→−0.47, 2020 +0.40→+0.12). No free lunch.
+
+**Verdict: KILL (cheap-kill at obs; no engine/null/council — like 3013/3010/1014/1016).** 1013 UNCHANGED
+(still PORTFOLIO).
+
+**Threads / lessons.** (1) **NEW:** 1013's 2018 drag is not a tail of bad-context trades but a near-uniform
+−1R wipeout across all 7 pairs and ALL trend-contexts (incl. the "best") → the strong-USD-regime failure of
+the reclaim-long is **mechanism-intrinsic and entry-time-UNCONDITIONABLE** (in risk-off the failed breakdown
+becomes a real breakdown; the reclaim doesn't hold). Independently re-confirms 1013/3013 via a new
+conditioner; **closes the "improve 1013 toward a solo PASS" lane.** (2) The reclaim's entry edge is real and
+textured (best in balanced/strong-down context, weak in uptrend) but that texture does not isolate 2018 —
+building an all-folds gate on it is the arc-1012 fishing trap. (3) The 2018 portfolio leg is now unfound
+across ALL routes INCLUDING improving the best existing component — the route's 2018 wall stands
+(arc-3004 escalation reinforced). The portfolio route remains exactly one regime-orthogonal +2018&+2015
+component short of deployable, and no construction (separate-component OR component-improvement) has
+produced it.
+
+**FLAGS (code not merged):** none. No new BUILT tool (the downtrend features are one-off diagnostic, not a
+reusable signal). Driver scratch `_disco2000_work/arc2014_observe_downtrend_gate.py` (reproducible from the
+arc doc).

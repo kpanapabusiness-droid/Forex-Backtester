@@ -104,3 +104,21 @@ reset under a lock) produced **no git collision**. `origin/main` and all `disco/
 The test runs left `fx-worktrees\{1000,2000,3000}` on `disco/{1000,2000,3000}` — these are exactly the
 worktrees the production fleet creates and reuses (each is hard-synced + `clean -fd` before every spawn),
 so they are safe to leave for the real run, or removable with `git worktree remove`.
+
+## Follow-up — council sub-agent tool (post-6-test verification)
+
+The 6 tests above ran with the dispatch's literal `--allowedTools "Bash,Read,Edit,Write"`. A subsequent
+check found that set **insufficient** for the mandatory `/llm-council-discovery` survivor stress-test,
+which spawns sub-agents (5 lenses → 5 reviewers → 1 chairman). Verified live, headless, `claude-opus-4-8`:
+
+| Probe | `--allowedTools` | Result |
+|-------|------------------|--------|
+| A — skill invokes headless? | `Read,Glob,Agent,Skill` | ✅ skill ran, returned its step-0 input-validation refusal (no sub-agents — step 0 refuses thin input first) |
+| B — does `Agent` spawn? | `Agent` | ✅ `SPAWNED=yes, RETURNED=PING` — `Agent` is the correct token, sub-agent spawning works headless |
+| C — minimal fix | `Bash,Read,Edit,Write,Agent` (no `Skill`) | ✅ skill still invoked — the `Skill` tool is NOT gated by `--allowedTools`; only `Agent` was missing |
+
+Conclusion: the **only** addition needed is **`Agent`** (sub-agent spawning; legacy alias `Task`).
+`DEFAULT_ALLOWED_TOOLS` was updated to `Bash,Read,Edit,Write,Agent`. Without `Agent`, the council reaches
+step 0/1 then is hard-denied at the sub-agent spawn (headless `-p` cannot prompt; `acceptEdits` does not
+auto-approve non-edit tools) — silently breaking the mandatory survivor council. This corrected the one
+real defect in the dispatch's spawn spec.

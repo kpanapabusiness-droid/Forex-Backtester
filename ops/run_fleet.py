@@ -43,7 +43,11 @@ DEFAULT_HOURS = 8.0
 DEFAULT_MAX_TURNS = 250
 DEFAULT_MAX_SESSIONS = 100
 DEFAULT_MIN_HEALTHY_SECS = 120             # exits faster than this look like a failed start
-DEFAULT_ALLOWED_TOOLS = "Bash,Read,Edit,Write"
+DEFAULT_ALLOWED_TOOLS = "Bash,Read,Edit,Write,Agent"  # Agent = sub-agent spawning, REQUIRED by the
+#   mandatory /llm-council-discovery survivor stress-test (it spawns 5 lens + 5 reviewer + 1 chairman
+#   sub-agents). Verified headless: with only Bash,Read,Edit,Write the council is hard-denied at the
+#   spawn step; adding Agent lets it run. The dispatch's literal 4-tool set omitted this. ('Task' is the
+#   legacy alias for 'Agent'.) The Skill tool itself is NOT gated by --allowedTools (skills invoke regardless).
 DEFAULT_PERMISSION_MODE = "acceptEdits"
 MAX_FAST_EXITS = 3                         # consecutive fast exits -> HALT that range
 BACKOFF_SCHEDULE = [10, 30, 60]            # seconds, between crash-loop retries

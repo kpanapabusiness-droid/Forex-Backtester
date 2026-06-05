@@ -77,7 +77,7 @@ python ops/run_fleet.py --dispatch <path> [options]
   --claude <path>              path to claude.exe
                                (default: C:\Users\panap\.local\bin\claude.exe, then PATH)
   --permission-mode acceptEdits  --permission-mode for claude
-  --allowed-tools Bash,Read,Edit,Write   --allowedTools for claude
+  --allowed-tools Bash,Read,Edit,Write,Agent  --allowedTools for claude (Agent = council sub-agents; see note)
   --add-dir <dir>              extra --add-dir for claude (repeatable)
   --output-format <fmt>        optional --output-format for claude (default: text)
   --prompt-stdin               deliver the prompt via stdin instead of an argv positional
@@ -91,9 +91,14 @@ python ops/run_fleet.py --dispatch <path> [options]
 claude -p "<dispatch contents>\n\nRange: <range>. Resume." \
   --model claude-opus-4-8 \
   --permission-mode acceptEdits \
-  --allowedTools "Bash,Read,Edit,Write" \
+  --allowedTools "Bash,Read,Edit,Write,Agent" \
   --max-turns 250
 ```
+
+> **`Agent` is included on purpose** (the dispatch's literal spec was `Bash,Read,Edit,Write`). The
+> mandatory `/llm-council-discovery` survivor stress-test spawns sub-agents (5 lenses + 5 reviewers +
+> 1 chairman); the sub-agent tool is named **`Agent`** (legacy alias `Task`). Without it the council is
+> hard-denied at the spawn step in headless mode. See the note below for the verification.
 
 cwd = `<worktrees-root>\<range>`. stdin is `/dev/null` (so claude does not stall waiting on
 stdin when the prompt is an argv positional). Output (stdout+stderr) streams to
@@ -145,11 +150,18 @@ stdin when the prompt is an argv positional). Output (stdout+stderr) streams to
 
 ## Notes / gotchas
 
-* **Council skill / tools.** The spawned sessions get `--allowedTools "Bash,Read,Edit,Write"`
-  (the dispatch's spec). If a session needs the `/llm-council-discovery` skill (only on a
-  survivor) and that turns out to require a tool not in this list, extend it with
-  `--allowed-tools`. Slash-command skills generally resolve in `-p` mode regardless, but
-  watch the first survivor.
+* **Council skill / tools (verified).** The mandatory `/llm-council-discovery` survivor stress-test
+  spawns sub-agents (its steps literally "spawn all 5 lenses as sub-agents", then "5 fresh reviewers",
+  then a chairman). The sub-agent tool is **`Agent`** (legacy alias `Task`), so the default allow-list
+  here is `Bash,Read,Edit,Write,Agent` — NOT the dispatch's literal `Bash,Read,Edit,Write`, which would
+  break the council. Verified live, headless, `claude-opus-4-8`:
+  - `--allowedTools "Agent"` → a headless session spawns a sub-agent successfully.
+  - The skill **does** invoke in `-p` mode (returns its step-0 input-validation refusal) — the `Skill`
+    tool is NOT gated by `--allowedTools`; you do not need to allow-list it.
+  - With only `Bash,Read,Edit,Write` the skill reaches step 0/1 but is hard-denied at the sub-agent
+    spawn (headless `-p` cannot prompt for approval); `acceptEdits` does NOT auto-approve non-edit tools.
+  - Sub-agents inherit the parent allow-list and cannot spawn further sub-agents — no escalation beyond
+    what the parent can already do.
 * **Concurrent pushes to main** occasionally race; the CC sessions resolve that in-session
   (fetch/rebase/retry). The launcher does not serialize pushes — worktree `fetch`/`reset`
   are local. (Git plumbing inside the launcher is serialized with a lock to avoid ref races.)

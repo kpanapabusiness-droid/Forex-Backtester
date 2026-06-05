@@ -32,6 +32,7 @@ at arc step (i).
 | 1008 | 1000s | 2026-06-05 | Gotobi-day Tokyo-morning USDJPY long (5/10/15/20/25+EOM, fix-window) — documented JP corp USD-settlement microstructure flow; FALSIFIED at obs: gotobi premium ≤+0.25bp gross (best window, frac+ 0.501 coin-flip) vs ~2bp cost, absent at H4 AND H1; only +era (2010-14) is generic Abenomics drift not gotobi-specific | N | n/e | n/e | n/e | n/e | n/e | FAIL (obs cheap-kill) | N | KILL |
 | 2004 | 2000s | 2026-06-05 | Stop-tax A/B on the FILL/REVERSION family (weekend gap-fill majors) — completes arc-3004's escalation for the OTHER mechanism family. Removing the 2·ATR SL-first stop ~HALVES DD/loss-tail (maxDD 3.76→1.56%, worst −3.11→−1.12%; larger relative effect than 3004's momentum case, matches the −1.1R MAE mechanism) + lifts mean to ~0, but NO config/horizon is all-folds-positive → residual edge ≈ cost, regime-dependent. Stop is a real drag for BOTH families but NOT the wall; FLAG-2 answered (H4+FundedNext hostile to fill via EDGE≈COST, not a fill-specific stop tax). OOS preserved | N | n/e (OOS preserved) | -1.92% (best stop-removed N=24) | n/e | 1.56% (stop-removed N=6) | 176 | FAIL | N | KILL |
 | 1009 | 1000s | 2026-06-05 | AUDIT of arc 1006 gap-fill (SAME component, not a new edge): reproduce + robustness. REPRODUCES +0.685% IS via registered tools; NOT single-pair (leave-one-out all +); but threshold-FRAGILE (lives at 0.5ATR, ~0 by 1.25) AND edge over a FAIR same-exit null is ~+0.36pp (~HALF the headline; null itself +0.327% from JPY-basket drift). Component HOLDS but thinner | N | n/e (not re-run) | -6.79% | n/e | n/e | 260 | PORTFOLIO (re-affirmed, thinner) | N | PORTFOLIO |
+| 3006 | 3000s | 2026-06-05 | Multi-TF breakout-RETEST long (resistance→support flip; the last untested long-only lane, arc-1008 flag) — FALSIFIED at obs: retest-hold capture ≤ base in all 18 L×tol×hold cells, fwd drift NEGATIVE in 17/18 (−0.35..+0.00 ATR); catches FADING breakouts not defended supports; monotone-in-L only converges TO coin-flip, never above | N | n/e | n/e | n/e | n/e | 1200 | FAIL (obs cheap-kill) | N | KILL |
 
 ---
 
@@ -936,3 +937,46 @@ under FundedNext costs → the shorts/second-leg unlock (arc-3004 escalation, FL
 
 **FLAGS (code not merged):** none. No canonical-core change; no new BUILT tool (reused 3 existing). Driver
 scratch `_disco_work/arc1009_gapfill_robustness.py` (reproducible from the arc doc + the addendum).
+
+### arc_3006
+
+**Multi-TF breakout-retest (resistance→support flip), long-only** (chat 3000–3999). Full record:
+[`arcs/arc_3006_breakout_retest_structure.md`](arcs/arc_3006_breakout_retest_structure.md). No council (falsified
+at observation; no worthwhile-ceiling fork).
+
+**Idea + why.** Fresh eyes, honest-era only (20th arc). Arc 1008 flagged the ONE long-only lane still untested:
+**multi-TF STRUCTURE as a setup (not a regime filter)** — also the arc-3004 frontier item "structural mechanisms
+available NOW (no shorts)." Hypothesis with a real *because*: when price clears a well-established prior swing-high
+(resistance) and then **retests and HOLDS** it, the broken level flips to **support** (trapped breakout-sellers
+cover + fresh buyers defend = order-flow MEMORY at a real level) → a long on the holding retest should beat the
+0.4877 coin-flip base. A **two-stage** structural setup (break THEN retest-hold), distinct from arc-0 SMA-pullback
+(no level memory) and the generic breakout (fades). Observe before believing.
+
+**What happened.** 7 USD majors, H4, IS 2010–2020, canonical `observe_long_capture` (honest +1R-before-SL capture
++ 24-bar gross drift) joined with a retest-hold conditioning mask. Primary (L=120, K=20, tol=0.25·ATR): retest-hold
+capture **0.4733 < base 0.4860** (lift −0.0127), forward drift **−0.2353 ATR vs base −0.0474** (5× more negative),
+on 6/7 pairs (only USDJPY capture 0.535 but drift −0.161 = hindsight-noise cherry). 18-cell robustness sweep
+(L∈{60,120,250} × tol∈{0.15,0.25,0.40} × loose/strict hold): capture lift ∈[−0.025,+0.001] (≤ base everywhere bar
+one noise cell), drift NEGATIVE in 17/18 cells (−0.35..+0.00). **Monotone in L:** bigger/more-significant levels
+give *less negative* drift (−0.30 at L=60 → ~−0.03 at L=250) — i.e. significant structural levels only converge
+the retest **TO** the coin-flip base, never above it.
+
+**Verdict: FAIL (cheap-kill at observation) → KILL.** The retest-hold catches **fading breakouts** (the level is
+retested *because* the breakout stalled, and stalled H4-major breakouts drift down), NOT defended supports. The
+"former resistance flips to support" textbook mechanism is falsified, parameter-robustly, on liquid majors. Entry
+is coin-flip-or-worse → §5f exit-sweep does not bite (reserved for entries that beat null or show +gross drift);
+no pool/engine/council spent (like arcs 1001/1002/3005/1008).
+
+**Threads / lessons.** (1) **Structural-level memory is arbitraged on liquid H4 majors** — retest-and-hold of a
+broken prior-high gives no long edge (capture ≤ base, drift negative in every cell; selects fading breakouts). (2)
+**The monotone-in-L signature is the tell** — more-significant levels don't help, they merely stop hurting; a
+directional structural bet asymptotes to ~0.49 however "important" the level. 20th arc to land on the directional
+coin-flip, now from a 2-stage structural angle. (3) **The last untested long-only lane (multi-TF structure, the
+arc-1008 flag) is now CLOSED** → pre-shorts, only portfolio construction (a 2nd net-positive long-only component
+to combine with the arc-1006 gap-fill — still not found across 20 arcs/3 chats) and the standing arc-3004
+escalation (shorts / second-leg / tighter-cost unlock = operator decision) remain. **Reinforces the escalation:**
+every grounded in-apparatus long-only direction the corpus can name is now closed.
+
+**FLAGS (code not merged):** none. No canonical-core change; no new BUILT tool (retest mask is a one-off
+conditioning helper kept in scratch). Reused BUILT `observe_long_capture`. Drivers scratch
+`_disco3_work/arc3006_observe.py`, `arc3006_sweep.py` (reproducible from the arc doc).

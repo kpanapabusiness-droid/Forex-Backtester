@@ -30,6 +30,7 @@ at arc step (i).
 | 3004 | 3000s | 2026-06-05 | Stop-confound test (council-driven): is the universal 2*ATR SL the wall? Pure time-exit on best +drift entry — stop removed lifts mean ~4-5pp but STILL not all-folds-pos → ESCALATION (apparatus structurally incapable; needs 2nd leg/shorts/cost regime) | N | n/e | -20.43% | n/e | n/e | 799 | FAIL → ESCALATION | N | KILL |
 | 3005 | 3000s | 2026-06-05 | Cross-rate triangulation residual (synthetic vs quoted cross) — last non-directional in-apparatus thread; residual sub-spread, conv-corr ~0 at H4 | N | n/e | n/e | n/e | n/e | n/e | FAIL (obs cheap-kill) | N | KILL |
 | 1008 | 1000s | 2026-06-05 | Gotobi-day Tokyo-morning USDJPY long (5/10/15/20/25+EOM, fix-window) — documented JP corp USD-settlement microstructure flow; FALSIFIED at obs: gotobi premium ≤+0.25bp gross (best window, frac+ 0.501 coin-flip) vs ~2bp cost, absent at H4 AND H1; only +era (2010-14) is generic Abenomics drift not gotobi-specific | N | n/e | n/e | n/e | n/e | n/e | FAIL (obs cheap-kill) | N | KILL |
+| 2004 | 2000s | 2026-06-05 | Stop-tax A/B on the FILL/REVERSION family (weekend gap-fill majors) — completes arc-3004's escalation for the OTHER mechanism family. Removing the 2·ATR SL-first stop ~HALVES DD/loss-tail (maxDD 3.76→1.56%, worst −3.11→−1.12%; larger relative effect than 3004's momentum case, matches the −1.1R MAE mechanism) + lifts mean to ~0, but NO config/horizon is all-folds-positive → residual edge ≈ cost, regime-dependent. Stop is a real drag for BOTH families but NOT the wall; FLAG-2 answered (H4+FundedNext hostile to fill via EDGE≈COST, not a fill-specific stop tax). OOS preserved | N | n/e (OOS preserved) | -1.92% (best stop-removed N=24) | n/e | 1.56% (stop-removed N=6) | 176 | FAIL | N | KILL |
 
 ---
 
@@ -840,3 +841,52 @@ the highest-leverage operator move.
 **FLAGS (code not merged):** none. No canonical-core change; no new BUILT tool (gotobi-date tagging is a
 one-off calendar helper kept in scratch, like arc 3005's triangulation observer). Drivers scratch
 `_disco_work/arc1008_observe.py`, `arc1008_h1_fixwindow.py` (reproducible from the arc doc).
+
+### arc_2004
+
+**The stop-tax on the FILL/REVERSION family — completing the arc-3004 escalation** (chat 2000s). Full record:
+[`arcs/arc_2004_stop_tax_reversion.md`](arcs/arc_2004_stop_tax_reversion.md). No council (confirmatory A/B
+diagnostic on an already-characterized signal; not a stuck-point fork, not a survivor — cf. 2002/3005).
+
+**Idea + why (log-seeded).** Arc 3004 lifted the one confound shared by all 13 prior arcs — the universal
+2·ATR SL-first stop — but on a SINGLE entry: the post-up-spike **momentum/continuation** cell (it found the
+stop is a real ~4–5pp drag, NOT the wall). It never tested a **reversion/fill** entry, and that is exactly
+where the take-the-loss tax should bite HARDEST: a fill entry buys into weakness → large adverse excursion
+(arc 2001 measured the majors gap-fill MAE at −1.1 to −1.3R, P(MAE≤−0.5R)=0.77–0.89), so a 2·ATR stop converts
+a large fraction of eventual-reverters into −1R losers. So "the stop isn't the wall" was only proven for one
+mechanism family. This also directly answers arc 2001's **FLAG-2** (is H4+FundedNext generically hostile to
+fill/reversion?). Universe = **majors** (the 2000s-owned arc-2001 result; deliberately NOT the 1000s JPY-cross
+portfolio component — a family diagnostic, not a portfolio build). Reused BUILT `WeekendGapFillLongSignal` +
+`make_time_exit_predicate` (geometry/timing only; scoring canonical).
+
+**What happened.** Clean A/B, full 10-fold IS WFO, FundedNext costs ON. STOP-PRESENT vs STOP-REMOVED share the
+identical N-bar time exit, isolating the stop (sl_only sl2.0 vs sl_only sl6.0-sizing-only, N∈{6,12,24,48}); plus
+the partial/runner baseline. Pool n=176 (matches arc 2001 ✓). **Removing the SL-first stop ~HALVES DD and the
+loss tail** — maxDD 3.76→1.56% (N=6), 5.13→1.94% (N=12), 3.94→2.22% (N=24); worst fold −3.11→−1.12% (N=6),
+−4.90→−1.35% (N=12) — and lifts mean toward zero (−0.50→−0.07% N=6; −1.08→−0.16% N=12). This is a **LARGER
+relative DD/tail effect than arc 3004 saw on momentum**, exactly as the −1.1R-MAE mechanism predicts. **BUT no
+config — present or removed, any horizon — is all-folds-positive** (best stop-removed N=24: worst −1.92%, 4/10
+neg, mean −0.04% ≈ break-even). The only mean-positive readings (N=48 +0.13/+0.29%) are the cherry-picked best
+of the sweep — claiming them = exit-fishing (§5f); the robust read is break-even + regime-dependent (+2.8%
+trending folds vs −2 to −3% chop folds, stop or no stop). IS not all-folds-positive → **OOS preserved pristine**
+(§4 + arc-2001 council; ~6–8 trades/OOS-yr too thin for the judge anyway).
+
+**Verdict: FAIL → KILL.** The robust read is ≈ the null line; §11 → KILL, not PORTFOLIO (break-even,
+all-folds-failing is not a portfolio component). Arc 2001 already KILLED majors gap-fill; this confirms no
+exit/SL (incl. the stop-removed extreme) rescues it.
+
+**Threads / lessons.** (1) **The 2·ATR SL-first stop is a real drag for BOTH mechanism families but NOT the
+binding wall for either** — 3004 (momentum: ~4–5pp mean drag) + 2004 (reversion: ~HALVES DD, larger relative
+effect). For both: the stop fattens the loss tail (removal fixes that), it does not manufacture the EDGE≈COST
+deficit. The stop-geometry confound is now lifted on both families; the escalation stands on both. (2)
+**FLAG-2 answered:** H4+FundedNext IS hostile to fill/reversion entries — but via the same EDGE≈COST wall, NOT
+a fill-specific stop tax (the honest i+1 entry's residual edge after cost ≈ 0; the stop only added variance).
+(3) **A reversion entry's relative sensitivity to the SL-first tax (≈halved DD) is bigger than a momentum
+entry's** — useful if a future net-positive reversion edge ever appears: prefer a stop-removed/time-exit
+construction there, but only the gross edge clearing cost makes it deployable. (4) Driver-convention note (not
+a code flag): `FoldStats.roi_pct`/`max_dd_pct` are FRACTIONS (×100 for %) — a first-pass print looked 100×
+too small; corrected before reading the verdict.
+
+**FLAGS (code not merged):** none new. Carries FLAG-1 (long-only blocks the stronger UP-gap short side,
+operator/human-gated) + the `A1Config.time_exit_bars`-unwired flag (arcs 1005/3004; worked around via the
+BUILT `ExitPredicate`). Driver scratch `_disco2000_work/arc2004_gap_stoptax.py`.

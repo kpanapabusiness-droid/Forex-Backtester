@@ -38,6 +38,7 @@ at arc step (i).
 | 1011 | 1000s | 2026-06-05 | Month-end reversion long, USD majors (big DOWN move into month-end reverses — WMR-fix mechanical rebalancing over-extension; D1, ~2-bar time exit) — **2nd net-positive DECORRELATED long-only component**. MECHANISM-CONTROLLED: month-end vs random-day +0.249 ATR EXCESS (generic reversion NEGATIVE −0.063 → timing is causal). IS mean +0.23% (sl_only 2-bar), beats fair null +0.56pp, threshold-robust (0.75–1.5), leave-one-pair-out all+; but 7/10 folds → NOT all-folds-pos. Corr +0.117 vs arc 1006 → portfolio thread ACTIVE | N | n/e (OOS preserved) | -1.14% | n/e | n/e | 121 | FAIL → PORTFOLIO | N | PORTFOLIO |
 | 2005 | 2000s | 2026-06-05 | Attack EDGE<COST from the COST side: restrict cross-trend +gross entry (Donchian-20+SMA200, 12 crosses) to its cheapest bars (spread/ATR trailing-rolling-quantile, BUILT make_low_cost_mask). MONOTONE IS lift −7.96%(all)→+1.72%(cheapest 15%), beats matched random-cheap null (≈−0.3%) IN-SAMPLE — but OOS −2.26% (4/6 neg) + q full-sample-swept → NOT durable. CONVERGES w/ arc 3007 (3000s, absolute spread-timing): cost↓ entangled with edge↓ (liquid hours = weakest gross edge) → both chats CLOSE the cost side. DIRECTION remains the wall (3004); cost+stop are secondary ~5–10pp drags | N | N | +1.42% (cheapest-15% IS) | -8.33% | 6.01% | 682 | FAIL | N | KILL |
 | 1012 | 1000s | 2026-06-05 | Month-end reversion §5f best-version completion + survivor-ceiling test (same arc-1011 component, not a new edge): full registered exit/SL menu × time-cap, 24 configs → **0 all-folds-positive** (best 7/10 = baseline; te5 + all TP/trail DILUTE). Negative folds = contiguous **2014/2015/2016 USD-bull block** (SNB-unpeg/EUR-collapse); both pre-registered reasoned refinements FAIL to rescue — quarter-end-only 4/10 (thins to 0), trend-filter close>SMA100 4/10; post-hoc inverse close<SMA100 8/10 but still 2015/16 neg & fishing → not claimed. Survivor ceiling CLOSED; exits/filters can't lift it. OOS preserved | N | n/e (OOS preserved) | -1.14% | n/e | 1.43% | 121 | FAIL survivor → PORTFOLIO (ceiling confirmed) | N | PORTFOLIO |
+| 2006 | 2000s | 2026-06-05 | 2-way PORTFOLIO combination WFO — the route's gated next step (arc 1011 flag): co-simulate the ONLY two net-positive long-only components (gap-fill 1006 JPY-cross H4 + month-end 1011 USD-major D1) under equal + risk-parity weights, gate all-folds-positive on the COMBINED book. Both reproduce EXACTLY (gap +0.685%, me +0.232%, corr +0.117 ✓). Risk-parity cuts worst-fold −6.79%(gap solo)→−1.53% but STILL 4/10 neg — BLOCKED by a mutually-negative fold (2015, both lose): no convex/co-sim combo can pass (P&L additive). The two edges are flow-reversion → TAIL-CORRELATED (both bleed 2015/16/18/20) despite corr +0.117. ⇒ ≥3 components needed, SELECTED for fold-complementarity (regime-orthogonality), not avg-corr. Components UNCHANGED (still PORTFOLIO); 3rd-component spec = net-pos on 2015/16/18/20, esp 2015 | N | n/e (OOS preserved) | -1.53% (risk-parity combined) | n/e | n/e | 396+121 | FAIL → KILL (combined book; components unchanged) | N | KILL |
 
 ---
 
@@ -1241,3 +1242,74 @@ gap-fill-variance dominated (6/10).
 `MonthEndReversionLongSignal` + `make_time_exit_predicate`; quarter-end / SMA masks are one-off
 conditioning helpers in scratch). Carries the standing `A1Config.time_exit_bars`-unwired flag (arcs
 1005/3004). Drivers scratch `_disco_work/arc1012_*.py` (reproducible from the arc doc).
+
+### arc_2006
+
+**2-way PORTFOLIO combination WFO (gap-fill 1006 + month-end 1011) — the route's gated next step**
+(chat 2000s). Full record: [`arcs/arc_2006_portfolio_combination_2way.md`](arcs/arc_2006_portfolio_combination_2way.md).
+No council (not a PASS survivor, not an idea-fork/diagnosis — a direct quantitative combination test).
+
+**Idea + why (log-seeded).** After 23 arcs the directional space (both metrics, all instruments/TFs/
+regimes/exits/stop, both EDGE and COST sides) is comprehensively closed, leaving exactly TWO net-positive
+long-only components — both PORTFOLIO, both *discrete flow-event reversion* edges: weekend gap-fill on
+JPY crosses (1006/1009) and month-end reversion on USD majors (1011), corr ≈ +0.117. Arc 1011 flagged the
+**combined-book all-folds-positive WFO (co-simulated, risk-weighted) as the gated next step, NOT claimed**
+— and nobody had actually RUN it (the "naive 2-way add is 6/10" was a back-of-envelope fold-ROI add). The
+PORTFOLIO route's entire premise is that decorrelated mean-positive components combine to all-folds-positive
+(§6/§11). With exactly the 2 components the route was built on, the single most decision-relevant unrun
+experiment is the honest risk-parity combination — decisive either way (PASS candidate, or a rigorous "2
+is not enough, here is the 3rd's exact spec").
+
+**What happened.** Reproduced each component via its REGISTERED signal over the SAME canonical IS folds
+(`build_v3_folds`, 10 expanding folds, OOS years 2011–2020), scored solely by `MultiPairBacktester`,
+FundedNext ON, SL-first. **Reproduction is EXACT** (Arc-10 discipline — don't trust transcription):
+gap-fill IS mean **+0.685%**, month-end **+0.232%**, corr **+0.117** — matching the 1009/1011 records to
+the basis point and confirming fold-alignment (`build_v3_folds` date windows are TF/universe-agnostic, so
+fold *j* is the same calendar year for the H4 and D1 signals). Combined via the BUILT
+`combine_fold_roi` under equal + risk-parity (inverse-fold-vol) weights, fit-on-IS-then-frozen:
+- **equal** (0.5/0.5): mean +0.459%, **4/10 neg**, NOT all-folds-positive.
+- **risk-parity** (gap 0.128 / me 0.872): mean +0.290%, **4/10 neg**, NOT all-folds-positive; worst fold
+  −1.53%. Risk-parity does its job on *variance* (gap-fill solo worst −6.79% → equal-weight −2.94% →
+  risk-parity −1.53%) but cannot pass the gate.
+- **The blocker is a mutually-negative fold:** fold 6 = **OOS year 2015** is negative for BOTH components
+  (gap −4.19%, me −1.14%). **No convex combination — and no honest single-engine co-simulation — can make
+  2015 positive** (book P&L is additive: two books that both lose over a window sum to a loss over it). The
+  conclusion is **combination-method-invariant**; it does not rest on the linear-combination approximation.
+- IS not all-folds-positive → **OOS deliberately NOT touched** (§4 + holdout preservation).
+
+**Verdict: FAIL the sole judge (combined 2-way book) → KILL.** Not deployable, and *provably* blocked by
+≥1 mutually-negative fold. **The two components are UNCHANGED** (reproduced exactly, not re-tested/weakened)
+— they retain PORTFOLIO status; no new `portfolio-candidates/` entry (would double-count 1006/1011). The
+portfolio **thread stays ACTIVE**: a 3rd component is now a hard requirement with a precise spec.
+
+**Threads / lessons.** (1) **Two near-zero-correlated mean-positive components are NOT enough** for an
+all-folds-positive book when they share even one mutually-negative fold (2015) — the route needs **≥3**,
+*selected for fold-complementarity*, not just low average correlation. (2) **Average-correlation
+decorrelation ≠ fold-complementarity — TAIL-correlation is the real test.** corr +0.117 looked great, but
+both edges are flow-reversion and bleed in the *same* risk-off years (2015 CHF-depeg, 2016, 2018, 2020);
+the risk-parity 2-way is negative in exactly those years. **Re-usable selection criterion: rank a candidate
+3rd by its ROI on the existing book's NEGATIVE folds, not by standalone mean or average correlation.** A 3rd
+*reversion-flavored* flow edge would likely inherit the same 2015 tail and not fix it — the diversifying leg
+must be a *different mechanism family / regime* (positive when reversion bleeds). (3) **Risk-parity is the
+right weighting (cut worst-fold −6.79%→−1.53%) but is a variance lever, not an edge lever** — the gate is
+robust to re-weighting; only a complementary component moves it. (4) **The mutually-negative-fold test is a
+cheap, combination-method-invariant pre-screen** for any portfolio-combination arc: if components share a
+fold where all are negative, stop — no weighting/co-sim passes; you need a component positive on that fold
+first. (5) **Reinforces the arc-3004 escalation:** the regime-orthogonal leg the long-only portfolio route
+needs (positive in risk-off) is most naturally a short / second-leg / relative-value construction — the
+directional/trend long menu that would win in those years is comprehensively dead — so shorts/second-leg
+unlock (FLAG-1) stays the highest-leverage operator move. **Surviving pre-shorts lane:** a 3rd long-only
+flow edge with a *different regime signature* than weekend-gap / month-end reversion (positive in 2015/16/
+18/20), if one exists.
+
+**Tooling:** built + registered `discovery/tools/combine_fold_roi.py` (`fit_weights`, `combine_fold_rois`,
+`rois_from_fold_stats`, `CombinedBook`) — EXPERIMENT tool: equal / inverse-vol-risk-parity linear
+combination of canonical per-fold `FoldStats` ROI into a combined-book series for the all-folds-positive
+judge (never realizes P&L; the engine did, upstream). Documents its first-order-linear-vs-co-simulation
+LIMITATION (faithful here: disjoint universes + disjoint event timing). Reusable by every future
+portfolio-combination arc.
+
+**FLAGS (code not merged):** none new. Carries FLAG-1 (long-only blocks the short/regime-orthogonal leg
+the portfolio route needs) + the `A1Config.time_exit_bars`-unwired flag (worked around via the BUILT
+`make_time_exit_predicate`). Driver scratch `_disco2000_work/arc2006_combo.py` (reproducible:
+`PYTHONPATH=. py _disco2000_work/arc2006_combo.py`).

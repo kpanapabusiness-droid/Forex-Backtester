@@ -31,6 +31,7 @@ at arc step (i).
 | 3005 | 3000s | 2026-06-05 | Cross-rate triangulation residual (synthetic vs quoted cross) — last non-directional in-apparatus thread; residual sub-spread, conv-corr ~0 at H4 | N | n/e | n/e | n/e | n/e | n/e | FAIL (obs cheap-kill) | N | KILL |
 | 1008 | 1000s | 2026-06-05 | Gotobi-day Tokyo-morning USDJPY long (5/10/15/20/25+EOM, fix-window) — documented JP corp USD-settlement microstructure flow; FALSIFIED at obs: gotobi premium ≤+0.25bp gross (best window, frac+ 0.501 coin-flip) vs ~2bp cost, absent at H4 AND H1; only +era (2010-14) is generic Abenomics drift not gotobi-specific | N | n/e | n/e | n/e | n/e | n/e | FAIL (obs cheap-kill) | N | KILL |
 | 2004 | 2000s | 2026-06-05 | Stop-tax A/B on the FILL/REVERSION family (weekend gap-fill majors) — completes arc-3004's escalation for the OTHER mechanism family. Removing the 2·ATR SL-first stop ~HALVES DD/loss-tail (maxDD 3.76→1.56%, worst −3.11→−1.12%; larger relative effect than 3004's momentum case, matches the −1.1R MAE mechanism) + lifts mean to ~0, but NO config/horizon is all-folds-positive → residual edge ≈ cost, regime-dependent. Stop is a real drag for BOTH families but NOT the wall; FLAG-2 answered (H4+FundedNext hostile to fill via EDGE≈COST, not a fill-specific stop tax). OOS preserved | N | n/e (OOS preserved) | -1.92% (best stop-removed N=24) | n/e | 1.56% (stop-removed N=6) | 176 | FAIL | N | KILL |
+| 1009 | 1000s | 2026-06-05 | AUDIT of arc 1006 gap-fill (SAME component, not a new edge): reproduce + robustness. REPRODUCES +0.685% IS via registered tools; NOT single-pair (leave-one-out all +); but threshold-FRAGILE (lives at 0.5ATR, ~0 by 1.25) AND edge over a FAIR same-exit null is ~+0.36pp (~HALF the headline; null itself +0.327% from JPY-basket drift). Component HOLDS but thinner | N | n/e (not re-run) | -6.79% | n/e | n/e | 260 | PORTFOLIO (re-affirmed, thinner) | N | PORTFOLIO |
 
 ---
 
@@ -890,3 +891,48 @@ too small; corrected before reading the verdict.
 **FLAGS (code not merged):** none new. Carries FLAG-1 (long-only blocks the stronger UP-gap short side,
 operator/human-gated) + the `A1Config.time_exit_bars`-unwired flag (arcs 1005/3004; worked around via the
 BUILT `ExitPredicate`). Driver scratch `_disco2000_work/arc2004_gap_stoptax.py`.
+
+### arc_1009
+
+**Weekend gap-fill robustness/firmness audit (the one PORTFOLIO component)** (chat 1000–1999). Full record:
+[`arcs/arc_1009_gapfill_robustness_audit.md`](arcs/arc_1009_gapfill_robustness_audit.md). PORTFOLIO record
+updated additively: [`portfolio-candidates/arc_1006_weekend_gap_fill_long/robustness_audit_arc1009.md`](portfolio-candidates/arc_1006_weekend_gap_fill_long/robustness_audit_arc1009.md).
+No council (not a survivor; an audit, not a new signal).
+
+**Idea + why.** After arc 1008 (gotobi absent) the novel-long-only well is near-dry, and a generative council
+on a heavily-mapped space re-surfaces FLAG-1 (arc 2003). The highest-value CHEAP arc that doesn't grind dead
+directional ground = **firm the one asset.** The gap-fill record (arc 1006) was TRANSCRIBED, not re-run (no
+committed turnkey repro), and arc 1006 picked ONE config (thr 0.5) with a null that wasn't a same-exit
+apples-to-apples — so two artifact risks were unchecked (single-pair dependence; threshold-fragility). If the
+programme's only asset is an artifact, the PORTFOLIO route is empty — decision-relevant. Reused 3 BUILT tools
+(`WeekendGapFillLongSignal`, `make_time_exit_predicate`, `build_null_signal_evaluation`); canonical engine; IS only.
+
+**What happened.** (1) **REPRODUCED** arc 1006 exactly via the registered tools: thr=0.5 → IS mean **+0.685%**
+(≈ +0.69%), worst −6.79%, 5/10 neg, 260 IS trades (the record's 396 is the pool count). First committed-tool
+reproduction — record verified. (2) **Threshold-FRAGILE:** 0.5→+0.685%, 0.75→+0.191%, 1.0→+0.244%,
+1.25→+0.021% — the edge is concentrated at 0.5 ATR and ~vanishes by 1.25; it lives in the many small-to-
+moderate gaps, NOT the rare huge ones (consistent with arc 1007's overshoot reframe). (3) **NOT a single-pair
+artifact:** leave-one-out at 0.5 stays positive everywhere (+0.27% to +1.34%) — EURJPY strongest contributor,
+CADJPY/GBPJPY are drags. (4) **De-inflation (the key finding):** a FAIR random null (matched fire-rate, SAME
+24-bar exit + 2·ATR SL + same 5 pairs, only entry timing randomized) is itself IS-mean-**positive +0.327%**;
+the real +0.685% beats it by only **~+0.36pp — about HALF the headline.** A random long JPY-cross basket earns
+~+0.33pp in-sample from Abenomics-era JPY weakness + the exit/SL geometry; the gap-SPECIFIC excess is thin.
+Arc 1006's reported null (−0.60%) was not a same-exit apples-to-apples and inflated the apparent edge ~3.6×.
+
+**Verdict: PORTFOLIO (re-affirmed, thinner).** The component HOLDS — reproduced, beats a fair null,
+mean-positive net of costs, not single-pair — but is materially thinner (gap-specific excess ~+0.36pp) and
+threshold-fragile. Disposition unchanged (PORTFOLIO, not all-folds-positive). This is the SAME 1006 edge,
+audited — NOT a 2nd component (the operator's PORTFOLIO scan should read 1006 + 1009 as one asset).
+
+**Threads / lessons.** (1) **Always null with IDENTICAL exit/SL/universe** — a null that differs in exit (arc
+1006's −0.60%) inflates the apparent edge several-fold; the honest gap-specific excess is ~+0.36pp, ~half the
++0.69% headline (the rest is JPY-basket drift + 24-bar/2·ATR geometry random entries share). Arc-10 lesson in
+null-construction space. (2) **A random long basket can be IS-mean-positive purely from in-sample regime
+drift** (random JPY-cross longs +0.327%, 2010–2020) — IS-mean-positive ALONE is weak evidence; the fair null
++ OOS separate edge from drift. (3) **The gap-fill edge is threshold-fragile** (lives at 0.5 ATR) and pair-
+weighted (EUR/CHF/AUD-JPY carry it; CAD/GBP-JPY drag) — a future combination arc should weight accordingly.
+(4) **17 arcs, still ONE (thin) net-positive long-only component** — even the best long-only edge is marginal
+under FundedNext costs → the shorts/second-leg unlock (arc-3004 escalation, FLAG-1) remains highest-leverage.
+
+**FLAGS (code not merged):** none. No canonical-core change; no new BUILT tool (reused 3 existing). Driver
+scratch `_disco_work/arc1009_gapfill_robustness.py` (reproducible from the arc doc + the addendum).

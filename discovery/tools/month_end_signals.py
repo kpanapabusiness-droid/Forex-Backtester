@@ -119,26 +119,29 @@ class MonthEndReversionLongSignal:
 class MonthEndReversionShortSignal:
     """SHORT a big UP move into month-end, betting on the post-fix rebalancing reversion DOWN.
 
-    The direction-mirror of ``MonthEndReversionLongSignal``, built INDEPENDENTLY and concurrently by
-    arc 1019 (chat 1000s) and arc 3017 (chat 3000s) — same logic, same pool (n=116, gross +0.1713).
-    Same ex-ante month-end detection + ATR geometry; fires when the move INTO month-end is a big UP
-    move (``into >= +threshold_atr``, where into = (close[i] - close[i-into_bars])/atr) and declares
-    ``Direction.SHORT`` on both the per-pair state and the evaluation so the canonical Step-1 pool
-    + architecture emit a short (entry next bar at open_bid, SL ABOVE entry, ``final_r`` short-signed).
+    The direction-mirror of ``MonthEndReversionLongSignal`` — built INDEPENDENTLY and concurrently by
+    THREE chats: arc 1019 (chat 1000s), arc 2015 (chat 2000s), arc 3017 (chat 3000s) — same construction,
+    same pool (n=116, gross +0.1713), same verdict. Same ex-ante month-end detection + ATR geometry; fires
+    when the move INTO month-end is a big UP move (``into >= +threshold_atr``, where
+    into = (close[i] - close[i-into_bars])/atr) and declares ``Direction.SHORT`` on both the per-pair
+    state and the evaluation so the canonical Step-1 pool + architecture emit a short (entry next bar at
+    open_bid, SL ABOVE entry, ``final_r`` short-signed).
 
-    Mechanism (observation + control, mirror of arc 1011): month-end mechanical rebalancing reverts
-    BOTH directions; arc 1011 captured only the long/down side and is 2015-negative (in a strong-USD
-    trend a big down move into month-end IS the trend → continues, doesn't revert). The SHORT side
-    fades a big UP move into month-end — a counter-trend bounce that mechanical reversion +
-    trend-resumption pushes back down — positive precisely in strong-USD years (2015 +0.46 ATR, 2018
-    +0.37 ATR gross; month-end excess +0.089 vs the random-day control; honest short capture 0.5508,
-    the first corpus short >0.50). Conforms to ``core.arc.signal_protocol.SignalModule``.
+    Mechanism (observation + control, mirror of arc 1011): month-end mechanical rebalancing reverts BOTH
+    directions; arc 1011 captured only the long/down side and is 2015-negative (in a strong-USD trend a
+    big down move into month-end IS the trend → continues, doesn't revert). The SHORT side fades a big UP
+    move into month-end — positive precisely in strong-USD years (2015 +0.46 ATR, 2018 +0.37 ATR gross;
+    month-end excess +0.089 vs the random-day control; honest short capture 0.5508, the first corpus short
+    >0.50). Conforms to ``core.arc.signal_protocol.SignalModule``. Intended TF = D1, USD majors.
 
-    **Disposition (independent-reproduction resolution, arc 3017):** PORTFOLIO. The honest-engine
-    result is exit-sensitive — with a reversion-horizon time exit it is mean-positive every exit and
-    beats the fair same-side null by ~+0.8pp (arc 1019: partial-runner mean +0.683%, 7/10, robustly
-    2018-positive); a long 120-bar hold washes it toward noise. Intended TF = D1, USD majors, SHORT
-    reversion exit (≤5-bar time exit or partial-runner). Not all-folds-positive (best 7/10) → PORTFOLIO.
+    **Disposition: PORTFOLIO** (the corpus's first 2018-positive short component; recorded under arc
+    1019's ``portfolio-candidates/`` folder). The honest-engine result is exit-sensitive — with a
+    reversion-horizon time exit it is mean-positive every exit, beats the fair same-side null by ~+0.8pp
+    (partial-runner +0.683%, 7/10); a long 120-bar hold washes it toward noise. **arc-3017 caution
+    (Arc-10 defense): the per-fold ROI / all-folds-positive / 2015-2018-sign is `A1Config.risk_pct`-
+    convention-DEPENDENT (A1Config.risk_pct is PERCENT 0.5=0.5%, vs ArcPoolConfig FRACTION 0.005=0.5%;
+    and the daily-DD cap makes ROI nonlinear in risk) — judge fold-sign in the linear/low-risk regime;
+    the gated 4-way combo must report risk-sensitivity.** Not all-folds-positive (best 7/10) → PORTFOLIO.
     """
 
     threshold_atr: float = 1.0

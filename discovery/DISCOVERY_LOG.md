@@ -44,6 +44,7 @@ at arc step (i).
 | 1014 | 1000s | 2026-06-05 | **FIRST SHORT ARC.** Confirmed-breakdown continuation SHORT (deep swing-low pierce, NO reclaim, close-below — the short mirror of arc 1013's reclaim-long), H4 USD majors — FALSIFIED at obs: confirmed-breakdown short cap 0.4893 (<0.50) + drift −0.046 (REVERTS, bad for short); deeper close-below reverts HARDER (−0.21 @ 0.25-0.5 ATR); **structure control FAILS** (big-red AT swept-low 0.4998 ≈ big-red ELSEWHERE 0.4963 — swing-low NOT load-bearing for the short, unlike the long); per-pair 3/7 = noise. Diagnosis: reclaim is FORWARD-confirming (move hasn't started → 1013 long wins), confirmed-breakdown is BACKWARD-confirming (move already happened → i+1 short enters the local low → reverts). The 1013 long has NO tradeable short mirror; shorts don't revive directional STRUCTURE (coin-flip by symmetry). Live short frontier = FLOW-event shorts w/ acc>0.50 (up-gap weekend short, 2001/2003) | N | n/e | n/e | n/e | n/e | ~4500 obs | FAIL (obs cheap-kill) | N | KILL |
 | 2006 | 2000s | 2026-06-05 | 2-way PORTFOLIO combination WFO — the route's gated next step (arc 1011 flag): co-simulate the ONLY two net-positive long-only components (gap-fill 1006 JPY-cross H4 + month-end 1011 USD-major D1) under equal + risk-parity weights, gate all-folds-positive on the COMBINED book. Both reproduce EXACTLY (gap +0.685%, me +0.232%, corr +0.117 ✓). Risk-parity cuts worst-fold −6.79%(gap solo)→−1.53% but STILL 4/10 neg — BLOCKED by a mutually-negative fold (2015, both lose): no convex/co-sim combo can pass (P&L additive). The two edges are flow-reversion → TAIL-CORRELATED (both bleed 2015/16/18/20) despite corr +0.117. ⇒ ≥3 components needed, SELECTED for fold-complementarity (regime-orthogonality), not avg-corr. Components UNCHANGED (still PORTFOLIO); 3rd-component spec = net-pos on 2015/16/18/20, esp 2015 | N | n/e (OOS preserved) | -1.53% (risk-parity combined) | n/e | n/e | 396+121 | FAIL → KILL (combined book; components unchanged) | N | KILL |
 | 2008 | 2000s | 2026-06-05 | 3-way PORTFOLIO combination WFO (gap-fill 1006 + month-end 1011 + **failed-breakdown 1013**, the new regime-orthogonal 3rd component) — the route's gated next step now a 3rd exists (arc-1013 spec). All 3 reproduce EXACTLY (≤0.005pp: gap +0.685%, me +0.232%, fbr +1.854%; corr gap-me +0.117 ✓, gap-fbr +0.189, me-fbr −0.366). C did as arc 1013 predicted — CUT the 2-way book's 4 bleed folds to 2 (fixed 2016 & 2020 outright) — but **2015+2018 survive**: risk-parity worst −0.77% (2/10 neg), equal worst −3.36% (3/10 neg). **PROVABLY blocked — 0/5151 convex weightings all-folds-positive** (best max-min −0.222%, 2014/15/18 neg): 2018 needs heavy month-end (its only +leg), 2015 needs heavy fbr & is HURT by month-end → mutually exclusive. **2018 = binding fold: flow-reversion (gap −6.79) AND structural stop-run reversal (fbr −4.20) BOTH lose** in the strong-USD trend year (avg-corr hid the shared 2018 tail). All 3 edges are fade/short-trend → the 4th leg must be trend-continuation/short, dead long-only → escalation/FLAG-1, arc-2007 climax-sweep SHORT the named target. Components UNCHANGED (still PORTFOLIO) | N | n/e (OOS preserved) | -0.77% (risk-parity combined) | n/e | n/e | 396+121+172 | FAIL → KILL (combined 3-way book; components unchanged) | N | KILL |
+| 3010 | 3000s | 2026-06-05 | **Sustained-USD-strength SHORT** — can a trend-following / established-downtrend-conditioned short on USD majors provide the 2018-positive 4th PORTFOLIO leg the 3-way book (3009/2008) needs? FALSIFIED at obs (H4 USD majors, IS, direction-aware observe): short base cap 0.485 / drift −0.015 (coin-flip, mirrors the long base). **The established-downtrend regime filter INVERTS** — drift −0.127 (vs +0.067 non-DN), ALL 7 pairs negative (−0.02..−0.32): the **symmetric completion of arc 3003** (strong uptrends revert/long ↔ strong downtrends revert/short). 2018-positivity is **uncapturable regime-luck within a yearly coin-flip** (unconditional +0.152 in 2018 / +0.125 in 2015 but negative 5/10 yrs, mean −0.015; the regime filter KILLS 2015 to −0.107). The 2018 leg is NOT trend-buildable → the route's 2018 wall stands, arc-3004 escalation reinforced. Confirms arc 1014 from the trend angle: shorts revive neither directional STRUCTURE (1014) nor TREND (3010); value of shorts = genuine flow-event asymmetries (up-gap 1015, climax-sweep 2000s), not symmetric direction/trend. No engine/council spent (3003 lesson #2) | n/e | n/e | n/e | n/e | n/e | ~121k obs | FAIL (obs cheap-kill) | N | KILL |
 | 3009 | 3000s | 2026-06-05 | **3-way PORTFOLIO combination WFO** (INDEPENDENT concurrent re-run of arc 2008 — same verdict, complementary findings; Arc-10 independent-reproduction). Combine gap-fill 1006 (JPY-cross H4) + month-end 1011 (USD-major D1) + failed-breakdown-reclaim 1013 (USD-major H4) under equal + risk-parity, gate all-folds-positive on the COMBINED book. **All 3 reproduce EXACTLY** (gap +0.685%, me +0.232%, fbr +1.854% — caught arc-1013's native-trail double-trail via reproduce-live, trail_enabled=True). **The 2-way's combination-invariant 2015 block is GONE — NO mutually-negative fold** (fbr +3.17 rescues 2015; me +0.90 rescues 2018). But still NOT all-folds-positive: risk-parity 2/10 neg {2015,2018}, equal 3/10. fbr rescued 2016+2020 → blockers narrowed {2015,16,18,20}→{2015,2018}, worst-fold −1.53→−0.77%. **2018 = the hard wall** (strong-USD trend yr: gap −6.79 & fbr −4.20 both deep-neg, only me +0.90) — arc 2008's convex-search proves 0/5151 weightings pass (2015-needs-fbr vs 2018-needs-me are mutually exclusive). 4th-component spec = net-pos on 2015 AND esp 2018 → a SHORT / trend / risk-off-positive leg (longs dead those yrs; shorts now OPEN PR#273; named targets = climax-sweep short 2007, up-gap short 2001/2003). Components UNCHANGED | N | n/e (OOS preserved) | -0.77% (risk-parity combined) | n/e | n/e | 260+98+208 | FAIL → KILL (combined book; components unchanged) | N | KILL |
 | 2009 | 2000s | 2026-06-05 | **Climax-sweep SHORT** (down-trend continuation) — the named 4th-component target (arc 2008): the violent fast-3-bar-drop big-range bar that sweeps a swing low & closes below → continuation DOWN, the engine-unvalidated thread arc 1014 flagged (arc 2007's −0.33 "falling knife"). FALSIFIED at obs: cell coin-flip (cap 0.49–0.505) + short drift near-zero-to-REVERTING (−0.04 to −0.06; only thin range≥2 tail +0.009); arc-2007 −0.33 does NOT reproduce in a clean SHORT construction. Climax monotonicity INVERTS (small −0.155→climax −0.038; deep pierce reverts to only +0.006). **STRUCTURE CONTROL decisive + ANTI-load-bearing:** climax AT swept-low drift −0.043 (REVERTS) vs ELSEWHERE +0.128 (CONTINUES) — the swing-low sweep is a REVERSAL setup (arc-1013 long), shorting it shorts INTO the bounce. Per-pair 3/7 = noise, split by USD quote-convention (XXXUSD continue/USDXXX revert = directional USD-beta). Swing-low sweep has NO tradeable short mirror (confirmed both leans: 1014 clean + 2009 climax). 2018's trend-continuation leg is NOT a structural short → reinforces arc-3004 escalation | N | n/e | n/e | n/e | n/e | ~121k obs | KILL (obs cheap-kill) | N | KILL |
 
@@ -1856,3 +1857,63 @@ orthogonal trend-continuation 4th leg remains unfound.
 **FLAGS (code not merged):** none. No canonical-core change; no new BUILT tool (reused direction-aware
 `observe_long_capture`; conditioning is a one-off scratch observer). Driver scratch
 `_disco2000_work/arc2009_observe_climax_short.py` (reproducible from the arc doc).
+
+### arc_3010
+
+**Sustained-USD-strength SHORT — can a trend-following short provide the 2018-positive 4th portfolio leg?**
+(chat 3000s). Full record: [`arcs/arc_3010_sustained_trend_short.md`](arcs/arc_3010_sustained_trend_short.md).
+No council (falsified at observation; regime-inversion is a falsification, not a tuning fork — arc-1014/3003
+discipline).
+
+**Idea + why.** My own arc 3009 (and the 2000s' concurrent arc 2008) left the portfolio route blocked on
+exactly **2 folds — 2015 and especially 2018** (strong-USD trend years), with a sharp spec: the 4th leg must
+be net-positive there → a SHORT / trend / risk-off-positive construction. arc 1014 (1000s) had just shown
+*structural* shorts are coin-flip and CLAIMED the up-gap weekend short (1015); the 2000s lane is the
+climax-sweep short. The unclaimed, highest-EV open question for my range was the **deployment blocker
+itself**: can a TREND-following short — conditioned on an established downtrend (the regime the portfolio
+needs), held through a trend year — provide the 2018 leg? This is the symmetric mirror of arc 3003 (same
+question for momentum *longs* via Kaufman ER → regime INVERSION). Observation-grounded, decision-relevant,
+cheap.
+
+**What happened — FALSIFIED at observation (no engine needed; arc-3003 lesson #2).** Reused the BUILT
+direction-aware `observe_long_capture(direction="short")` on 7 USD majors H4, IS, joined an established
+-downtrend regime (close<SMA200 & SMA50<SMA200) + year. **Short base: cap 0.4849, drift −0.0151 ATR** (a
+coin-flip mirroring the long base, per arc 1014). **The downtrend regime filter INVERTS the short:**
+downtrend drift **−0.127** vs non-downtrend +0.067, and negative on **all 7 pairs** (−0.02 to −0.32) — an
+established downtrend REVERTS UP against the trend-aligned short, exactly as arc 3003 found strong uptrends
+revert against the momentum long. **The 2018/2015 portfolio question: answered negatively.** The
+*unconditional* short is faintly positive in 2018 (+0.152) and 2015 (+0.125) — but only as regime-luck
+within a yearly coin-flip (positive 5/10 years, mean drift −0.015, below the 0.50 line); the regime filter
+that should *isolate* the favorable trend instead KILLS 2015 (downtrend −0.107) and is negative on every
+pair. So the 2018-positivity is **uncapturable** — it cannot be conditioned on or separated from the
+coin-flip.
+
+**Verdict: KILL (cheap-kill at observation).** A trend-following short does not provide the 2018-positive
+leg; the short is a coin-flip, the regime filter is anti-predictive (inverts), and the 2018 positivity is
+uncapturable regime-luck.
+
+**Threads / lessons.** (1) **Regime-conditioning on trend strength is anti-predictive in BOTH directions —
+the symmetric completion of arc 3003.** Strong uptrends revert (3003 momentum long); strong downtrends
+revert (3010 trend short). "The trend is established" makes a directional bet WORSE on liquid FX H4, both
+sides — a now-two-sided robust closure of regime detection as a directional lever. (2) **The portfolio's
+2018 wall is not a price-trend problem** — no conditionable trend short isolates the 2018 positivity, so the
+4th leg (if it exists) is NOT a trend-following short. Sharpens the arc-3009/2008 spec into a
+near-impossibility within the price-direction apparatus → arc-3004 escalation reinforced (the 2018-positive
+leg needs genuinely non-directional structure / relative-value / a second leg; carry is OFF on FundedNext).
+(3) **Confirms arc 1014 from the trend angle:** shorts revive neither directional STRUCTURE (1014) nor TREND
+(3010) — the short base ≈ the long base by symmetry, both failing identically. The value of shorts is
+confined to genuine ASYMMETRIES (flow events with measured accuracy >0.50), not symmetric direction/trend.
+(4) **What remains open (not closed by this arc):** the FLOW-EVENT short asymmetries — up-gap weekend short
+(1000s arc 1015) and climax-sweep short (2000s) — are not trend-direction bets and stay the live short
+frontier; but they are reversions/bursts, so whether either is specifically *2018-trend-positive* (the
+portfolio's need) is itself doubtful (reversion edges bleed in trend years — the very reason 2018 is the
+wall). **Fleet steer:** the portfolio's 2018 leg likely needs a genuinely non-price-direction construction
+(relative-value/second-leg) or the route is escalation-bound; another directional short (any flavor) is
+unlikely to be the 2018 leg.
+
+**Tooling:** no new BUILT tool — reused the BUILT direction-aware `observe_long_capture(direction="short")`.
+
+**FLAGS (code not merged):** none. No canonical-core change. Carries FLAG-1 (shorts unblocked PR #273, but
+trend-direction shorts now shown dead, so FLAG-1's value narrows to flow-event asymmetries + the standing
+escalation) and the `A1Config.time_exit_bars`-unwired flag. Driver scratch
+`_disco3_work/arc3010_trend_short_obs.py` (reproducible from the arc doc).

@@ -30,8 +30,9 @@ a dispatch per launched chat with these elements. Keep it short — the protocol
 the dispatch only sets framing + the chat's range.
 
 A run dispatch MUST contain:
-- **Mode:** CONTINUOUS — run arcs back-to-back until the STOP sentinel appears (NOT one-and-halt;
-  that was Arc 0 only).
+- **Mode:** CONTINUOUS — run arcs back-to-back until the STOP sentinel appears OR the chat's context
+  budget runs low and it gracefully hands off (finish arc, commit + push, stop; a fresh chat resumes
+  from the log — protocol §10). NOT one-and-halt (that was Arc 0); also NOT a single immortal chat.
 - **Arc-id range:** assign this chat a unique 1000-wide block (chat A 1000-1999, B 2000-2999,
   C 3000-3999, ...). Per-arc files `discovery/arcs/arc_<id>_<slug>.md`. State the range explicitly.
 - **Authoritative spec:** "Follow `discovery/DISCOVERY_PROTOCOL.md` exactly." Do not restate it.
@@ -52,7 +53,9 @@ A run dispatch MUST contain:
    (CPU-bound on WFO; oversubscribing past ~3 degrades throughput). Start with the smallest N that
    feels useful; scale only if arc-completion time doesn't degrade.
 3. Give each session its dispatch with its assigned arc-id range.
-4. Each runs continuously, pulling main each arc to read the others' appended lessons.
+4. Each runs arcs continuously (pulling main each arc to read the others' appended lessons) until it
+   hands off at its context budget; relaunch a fresh session per range on handoff (protocol §10 — a
+   hands-off harness `ops/run_fleet.py` has landed, harness-tested 2026-06-05; not yet run for a full unattended session).
 
 ## HOW TO HALT
 - **Graceful stop (the normal way):** create an empty file `discovery/STOP` on main. Each chat sees

@@ -17,9 +17,13 @@ Use ids only within your range — never collide with another chat's block. (Ope
 - Canonical data: load via `histdata_root` = `C:\Users\panap\histdata_backup\` (one-time ~9min cache
   warm, then cached). Do NOT conclude "regenerate 12-24h" — the corpus is intact at that path.
 
-## MODE: CONTINUOUS
-Run arcs back-to-back per `discovery/DISCOVERY_PROTOCOL.md` §5 (a→k), continuously, until the STOP
-sentinel appears. This is NOT one-and-halt (that was Arc 0). Each arc:
+## MODE: CONTINUOUS (within a finite arc budget — hand off, don't run forever)
+Run arcs back-to-back per `discovery/DISCOVERY_PROTOCOL.md` §5 (a→k) until EITHER the STOP sentinel
+appears OR your context budget runs low. This is NOT one-and-halt (that was Arc 0) — but it is also
+NOT immortal: a chat runs ~4–8 arcs, then gracefully HANDS OFF (finish the current arc fully, commit +
+**push**, stop) and a fresh chat bootstraps from the log and resumes at the next arc-id in your range
+(protocol §10). The step-(k) re-orient drops working detail from active attention between arcs; it
+does NOT free the context window. Each arc:
 1. (a) Pull main → read DISCOVERY_LOG (both tiers) + LESSONS + TOOL_REGISTRY. Show the reading.
    FRESH EYES: no pre-reset eliminated-list, no signal-level priors. Honest-era log only.
 2. (b–h) Observe → idea (documented *because*) → characterize → cheap kills (pool floor 50; oracle
@@ -36,25 +40,32 @@ sentinel appears. This is NOT one-and-halt (that was Arc 0). Each arc:
 4. (i) Document: full arc doc + Tier-1 row + Tier-2 reasoning. Commit DOCS ONLY direct to main
    (append-only). If CODE needs changing in the canonical core, FLAG it in the arc doc — do NOT
    merge code. (Experiment tools under discovery/tools/ are the exception — those are yours to add.)
-5. (k) SELF-DEBLOAT: AFTER the log append (the save), shed this arc's transient detail (WFO output,
-   council transcript, data dumps, scratch) from context; retain only loop-state (your identity,
-   range, position). Then start the next arc fresh from the log. Append-BEFORE-shed always.
+5. (k) RE-ORIENT: AFTER the log append (the save), drop this arc's transient detail (WFO output,
+   council transcript, data dumps, scratch) from ACTIVE ATTENTION and re-anchor on loop-state (your
+   identity, range, position); start the next arc fresh from the log. This does NOT free the context
+   window (the transcript is append-only) — so when context runs low, HAND OFF (§10). Append-BEFORE-
+   re-orient always.
 6. (j) STOP check: at the top of each arc, check for `discovery/STOP`. If present, finish the
    CURRENT arc fully (never abort mid-arc), write a halt note, and stop.
 
-## FIRST-RUN VERIFICATION (this chat's arc 1 → arc 2 only)
-Self-debloat (step k) has never executed live (Arc 0 ran one arc). On YOUR transition from arc 1 to
-arc 2, explicitly confirm: the log append happened, context was shed, and arc 2 correctly re-read the
-log fresh and continued. Report this once after arc 2 starts cleanly, then proceed continuously
-without further per-arc reporting. If self-debloat does NOT free context in practice, fall back to a
-hard context reset + re-read protocol/range/log, and note it.
+## CONTINUITY (handoff + bootstrap, NOT in-chat self-clearing)
+A chat cannot free its own context window (the transcript is append-only), so continuity is handoff +
+bootstrap. When you approach a low-context handoff: FINISH the current arc fully (arc doc + both-tier
+log + commit + **push**), then stop — never block on the operator, never background-and-wait. The NEXT
+chat on your range bootstraps purely from the log: pull main, read protocol + log + LESSONS + registry,
+find the highest arc-id in your range, resume at +1. If you ARE that bootstrapping chat, confirm once
+that the log alone re-oriented you (no in-context memory of a prior chat needed), then proceed. The LOG
+is the memory; context starts empty.
 
 ## OUTPUT / RHYTHM
-- Per arc: arc doc + both-tier log append, committed. No per-arc operator report (the log IS the
-  report). Exception: the one-time arc-1→2 self-debloat confirmation above.
-- A survivor (IS+OOS all-folds-positive + council-cleared) → full `discovery/passed/<name>/` deep
-  record (config, IS+OOS results, honest-engine verification, council verdict, repro command + frame
-  sha). This is the high-value event; everything else is routine.
+- Per arc: arc doc + both-tier log append (Tier-1 row INCLUDING the `disposition` column), committed.
+  No per-arc operator report (the log IS the report).
+- Disposition (protocol §11): **PASS** (IS+OOS all-folds-positive + council-cleared) → full
+  `discovery/passed/<name>/` deep record (config, IS+OOS results, honest-engine verification, council
+  verdict, repro command + frame sha) — the high-value event. **PORTFOLIO** (mean-positive net of
+  costs but not all-folds-positive) → `discovery/portfolio-candidates/<name>/` (config, per-fold
+  IS+OOS series, correlation profile) — a decorrelated component for a later combination arc, not
+  deployable solo. **KILL** (everything else, incl. beats-null-but-net-negative) → log row only.
 
 ## GUARDRAILS (the anti-Arc-10 lines — never cross)
 - Never reimplement the canonical measurement core (call it). Bug there is invisible to the gate.
@@ -73,6 +84,9 @@ hard context reset + re-read protocol/range/log, and note it.
   skip that arc, document, continue.
 
 ## DEFINITION OF DONE
-N/A — this is continuous. It ends only on `discovery/STOP`. "Working correctly" = arcs flowing,
-both-tier log appended each arc, canonical core called (not re-rolled), experiment tools registered +
-reused, self-debloat confirmed on arc 1→2, survivors getting `passed/` records, no code auto-merged.
+N/A for a single chat — the RUN is continuous ACROSS chats; an individual chat ends on `discovery/STOP`
+OR on a graceful low-context handoff (finish arc → commit + **push** → stop), after which a fresh chat
+resumes from the log. "Working correctly" = arcs flowing, both-tier log appended each arc (with
+`disposition`), canonical core called (not re-rolled), experiment tools registered + reused,
+handoff-and-bootstrap continuity (NOT in-chat self-clearing), survivors getting `passed/` records and
+PORTFOLIO edges getting `portfolio-candidates/` records, no code auto-merged.

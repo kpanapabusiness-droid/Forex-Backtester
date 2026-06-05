@@ -88,6 +88,16 @@ Pull main first so the log is current (other chats append continuously).
 - **Honest-era only carries weight:** the discovery log + LESSONS accumulate from THIS clean process
   (post-reset). Those entries are trustworthy and inform the search. Pre-reset signal-level
   conclusions do not.
+- **Closed ground (the honest-era complement to fresh eyes).** The honest-era corpus has
+  comprehensively mapped *single-condition, shallow directional prediction on liquid FX* (momentum /
+  breakout / mean-reversion / trend; H1/H4/D1; majors + crosses; capture AND drift lenses;
+  stop-removed, arc 3004) and found forward drift ≈ cost everywhere — see the LESSONS.md "Closed
+  ground" entry. Don't re-invent those shallow cuts as-is (long OR short); that grinds proven-dead
+  ground. This is a don't-repeat-yourself prior, NOT a ban on a direction: **a genuinely NOVEL
+  directional mechanism with a documented *because* still earns a fresh test.** Carry is OFF
+  (FundedNext swap-free). The frontier's top items (relative-value, short-side) need the operator's
+  shorts/second-leg unlock first; the pre-unlock lane is a 2nd net-positive long-only component to
+  combine with the gap-fill (arc 1006, the one PORTFOLIO edge).
 
 **(b) FORM AN IDEA (observe, don't guess).**
 - Log-seeded: a thread from the log is interesting -> look at how it applies on the charts / data.
@@ -129,6 +139,21 @@ the first naive cut failed. The filters / exits / transforms / probes you build 
 tools: check [`TOOL_REGISTRY.md`](./TOOL_REGISTRY.md) (BUILT) first, reuse if present, else build
 under `discovery/tools/` and register at step (i).
 
+**Exit/SL is a required IS-optimised dimension of the best version.** Before a FAIL verdict on any
+entry whose base is NOT a coin-flip (it beats the null baseline OR shows gross forward drift), the
+entry MUST be evaluated under the registered exit menu AND a small SL-multiple set, with the exit/SL
+treated as a nested WFO hyperparameter: **selected on the IS portion of each 2010–2020 walk-forward
+fold, scored on that same fold's OOS.** The chosen exit/SL is then **FROZEN onto the 2021+ holdout —
+never re-selected per holdout year** (§4 forbids per-year re-selection). NEVER pick the single best
+exit across the full sample and report its number — that is exit-fishing, an Arc-10-class gate
+inflation. "Best version" = the best HONEST exit, not the default 2·ATR partial/runner. The
+registered exits are the canonical registry names — `sl_only`, `sl_plus_tp_2r`, `sl_plus_tp_3r`,
+`sl_plus_trailing_atr`, `sl_plus_trailing_swing`, `sl_partial_close_1r_runner_trail`
+([`TOOL_REGISTRY.md`](./TOOL_REGISTRY.md)) — plus any geometry-only exit built for the arc. This bites
+only for the handful of non-coin-flip entries (e.g. arcs 1003, 1006/2001); it leaves the coin-flip
+triage/observation cheap-kills (§5d) intact, and would have prevented splitting an entry's FAIL from
+its exit sweep across two arcs (1003→1004).
+
 **(g) VALIDATE.** Full honest WFO on IS -> all-folds-positive? If yes, measure OOS (2021-current)
 -> all-folds-positive? The SOLE judge is all-folds-positive on IS AND OOS, honest engine,
 FundedNext guardrails (canonical: `build_v3_folds` IS folds + `build_oos_year_folds` for OOS, scored
@@ -148,14 +173,16 @@ what tried and WHY, what happened, the verdict. Append to the log. Commit (docs 
 
 **(j) NEXT ARC.** Check the stop sentinel (§9). If absent, go to (a) for the next idea.
 
-**(k) SELF-DEBLOAT (shed, then loop).** The arc's detail is now persisted (step (i): arc doc +
-DISCOVERY_LOG append, committed) — the SAVE is done. ONLY now, shed this arc's transient working
-detail from context (raw WFO output, the council transcript, data dumps, scratch reasoning),
-retaining just loop-state: chat identity, the assigned arc-id range, and the loop position. Then
-begin the next arc FRESH by re-reading the log at step (a) — the written corpus, not your context,
-is what carries learning forward. ORDERING IS CRITICAL: append-to-log (i) BEFORE shedding (k); never
-shed before the save or the arc's lesson is lost. This is a soft self-debloat (stay oriented), not a
-hard wipe.
+**(k) RE-ORIENT (drop working detail from active attention, then loop).** The arc's detail is now
+persisted (step (i): arc doc + DISCOVERY_LOG append, committed) — the SAVE is done. ONLY now, drop
+this arc's transient working detail from *active attention* (raw WFO output, the council transcript,
+data dumps, scratch reasoning) and re-anchor on loop-state: chat identity, the assigned arc-id range,
+and the loop position. Begin the next arc FRESH by re-reading the log at step (a) — the written
+corpus, not your context, carries learning forward. **This does NOT free the context window** — the
+transcript is append-only and cannot be cleared from inside the chat; (k) is a soft re-orientation,
+not a memory wipe, so a chat has a FINITE arc budget (~4–8 arcs) and then gracefully hands off (§10).
+ORDERING IS CRITICAL: append-to-log (i) BEFORE re-orienting (k); never drop detail before the save or
+the arc's lesson is lost.
 
 ## 6. DOCUMENTATION (the learning mechanism)
 CC does not truly learn across sessions; the WRITTEN CORPUS is what compounds. Two-tier log:
@@ -163,8 +190,10 @@ CC does not truly learn across sessions; the WRITTEN CORPUS is what compounds. T
 **Tier 1 — strict schema table (top of DISCOVERY_LOG.md, machine-scannable).** One row per arc,
 fixed fields:
 `arc_id | chat | timestamp | hypothesis (one line) | IS-all-folds-pos (Y/N) | OOS-all-folds-pos
-(Y/N) | worst-fold ROI (IS/OOS) | worst DD | n_trades | VERDICT | passed (Y/N)`
-The `passed (Y/N)` column is the operator's check-in scan (grep "| Y |").
+(Y/N) | worst-fold ROI (IS/OOS) | worst DD | n_trades | VERDICT | passed (Y/N) | disposition (PASS/PORTFOLIO/KILL)`
+The `passed (Y/N)` column is the operator's check-in scan (grep "| Y |"); `disposition` is the
+three-way outcome (PASS / PORTFOLIO / KILL, §11), with **passed=Y ⇔ PASS** (redundant by design —
+`passed` stays the grep target, `disposition` distinguishes a PORTFOLIO component from a KILL).
 
 **Tier 2 — free-form reasoning (below the table, per arc, under a `## arc_NNNN` header).**
 Unstructured. The why/because, the approach taken and the reason, what was tried, what didn't
@@ -189,6 +218,14 @@ gets `discovery/passed/<name>/`: exact config (every parameter), full results (p
 costs, DD profile), honest-engine verification, council verdict, and the EXACT reproduction
 command + frame sha (so any passer can be independently re-verified — the thing that would have
 caught Arc 10). This is the operator's deep-dive target.
+
+**`portfolio-candidates/` folder — decorrelated components (PORTFOLIO disposition).** A signal that is
+mean-positive net of costs but NOT all-folds-positive is recorded under
+`discovery/portfolio-candidates/<name>/` with its exact config, per-fold IS+OOS series, and a
+correlation profile vs existing candidates. These are NOT survivors and never auto-deploy; they are
+inputs to a future portfolio-combination arc, itself gated by all-folds-positive WFO on the *combined*
+book. (You cannot diversify net-negative components positive — arcs 3000/3001 — so only mean-positive
+edges land here; anything at or below the null baseline is KILL, §11.)
 
 ## 7. THE COUNCIL OF FIVE (judgment stand-in while operator is away)
 A separate skill (the customized `llm-council-discovery`, see COUNCIL_OF_FIVE_SKILL_DISPATCH).
@@ -236,25 +273,54 @@ and re-convenes; thin-confidence -> flag and gather. Never blocks on the human.
 ## 10. RUN STAGING (trial before continuous)
 - **The supervised trial is DONE (Arc 0).** The full loop — log read, characterization, cheap
   kills, council invocation, validation, documentation, log append, commit — ran end-to-end and is
-  confirmed. New chats do NOT re-run a supervised halt. Each new chat runs CONTINUOUSLY from its
-  first arc; it does NOT halt for review after arc 1. ("Never block on the operator," §8, governs.)
-- **One unverified mechanism: self-debloat (step k) across an arc boundary.** It has never run live
-  (Arc 0 was a single arc). On its arc1->2 transition each new chat confirms, non-blocking: log
-  appended -> context shed -> arc 2 re-read the log fresh and continued. It reports this once and
-  proceeds; it does NOT halt. If self-debloat does not free context in practice, fall back to a hard
-  reset + re-read protocol/range/log, note it, and continue. To gate this safely, the operator
-  launches ONE chat first, confirms its arc1->2, then brings up the rest.
-- After self-debloat is confirmed on the first chat: continuous operation, 2-3 parallel chats (CPU-
-  core bound on the operator's machine — do not oversubscribe; throughput degrades past ~3 concurrent
-  WFO streams).
+  confirmed. New chats do NOT re-run a supervised halt. Each new chat runs arcs back-to-back from
+  its first arc with NO supervised review-halt — it does not pause for operator sign-off after arc 1
+  (and it is NOT immortal either; continuity within its finite arc budget is the next bullet).
+  ("Never block on the operator," §8, governs.)
+- **Continuity is handoff + bootstrap, NOT self-debloat.** Self-debloat (step k) does NOT free a
+  chat's context window — the transcript is append-only and cannot be cleared from inside the chat.
+  A single chat therefore runs a FINITE arc budget (~4–8 arcs observed: chat 1000s 8, 3000s 6, 2000s
+  4) and then must stop. The run survives this via three mechanisms:
+  1. **Graceful handoff** — when context runs low, FINISH the current arc completely (arc doc +
+     both-tier log + commit + **push**), then stop. Never block on the operator; never
+     background-and-wait (run jobs foreground/synchronous so control returns automatically).
+  2. **Bootstrap** — a fresh chat pulls main, reads protocol + log + LESSONS + registry, finds the
+     highest arc-id in its assigned range, and resumes at +1. The LOG is the memory; context starts
+     empty. (No hand-maintained resume pointer — "highest arc-id in range + 1" is contention-free.)
+  3. **Hands-off operation** needs an EXTERNAL relaunch harness — operator infrastructure OUTSIDE
+     `discovery/` and the canonical core (no Arc-10 exposure) — respawning fresh `claude -p` sessions
+     per range until `discovery/STOP` or a time budget, with crash-loop backoff. **The harness has landed — `ops/run_fleet.py`** (operator infra, harness-tested
+     2026-06-05; not yet run for a full unattended session); until it does, the realistic mode is **manual per-range
+     relaunch on handoff (semi-automatic):** the operator starts a fresh chat on a range when its
+     prior chat hands off. Per-arc pushes mean a mid-arc crash loses only the in-flight arc.
+  Append-and-push BEFORE stopping, ALWAYS — a stranded uncommitted arc is the only real failure mode.
+- **Parallelism:** 2-3 concurrent chats (CPU-core bound on the operator's machine — do not
+  oversubscribe; throughput degrades past ~3 concurrent WFO streams).
 - **Operator check-in ritual (passive, read-only, run continues):** the operator drags the current
   DISCOVERY_LOG (Tier-1 table + recent Tier-2 reasoning) and LESSONS.md into a separate chat and
-  reads -> scans the `passed` column -> opens `discovery/passed/<name>/` for any Y -> decides
-  whether to dig deeper. The discovery chats KEEP RUNNING throughout; the check-in never halts
-  them. If nothing's worth noting, do nothing — it carries on. A passer that survived IS+OOS+council
-  is worth attention; nothing else needs it.
+  reads -> scans the `passed` column for `Y` (a PASS survivor) AND the `disposition` column for
+  `PORTFOLIO` -> opens `discovery/passed/<name>/` for any PASS / `discovery/portfolio-candidates/<name>/`
+  for any PORTFOLIO -> decides whether to dig deeper. The discovery chats KEEP RUNNING throughout; the
+  check-in never halts them. If nothing's worth noting, do nothing — it carries on. A PASS survivor
+  that cleared IS+OOS+council is the high-value event; a PORTFOLIO component is a decorrelated input
+  for a later combination arc; nothing else needs attention.
 
 ## 11. WHAT GRADUATES
+**Three-way disposition — every arc ends in exactly one (PASS / PORTFOLIO / KILL).**
+- **PASS** — all-folds-positive IS+OOS + council-cleared -> `discovery/passed/<name>/`. A deployment
+  CANDIDATE (still needs the independent re-verification below; ROI/DD characterized at review).
+- **PORTFOLIO** — **mean-positive net of costs but NOT all-folds-positive** (arc 1006's +0.69% IS is
+  the archetype) -> `discovery/portfolio-candidates/<name>/`, recorded with config, per-fold IS+OOS
+  series, and a correlation profile vs existing candidates. A decorrelated component that MAY combine
+  to all-folds-positive; NOT deployable solo, never a survivor, never auto-deploys — the *combined*
+  book is its own all-folds-positive WFO gate.
+- **KILL** — everything else, INCLUDING beats-null-but-net-negative. Beating the null baseline is
+  necessary but NOT sufficient: you cannot diversify net-negative components positive (arcs
+  3000/3001), so a real-but-net-negative signal is KILL, not PORTFOLIO.
+
+The Tier-1 ledger records this in a `disposition` column; the existing `passed` (Y/N) column is
+retained as the operator's grep target, with passed=Y ⇔ PASS.
+
 A survivor (IS+OOS all-folds-positive + council-cleared, fully recorded in `passed/`) is a
 CANDIDATE worth the operator's deep review — NOT an auto-deploy. Deployment is a separate,
 human-made decision on the operator's return. Discovery FINDS candidates; it does not deploy them.

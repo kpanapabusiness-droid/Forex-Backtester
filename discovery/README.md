@@ -15,7 +15,9 @@ read log + lessons → observe (data/charts) → form an idea → characterize (
 cheap kills (pool floor, oracle-best-cluster ceiling, triage) → diagnose → address the diagnosis
 (fail the BEST version) → validate (honest WFO, all-folds-positive on IS **and** OOS) → council
 survivor stress-test → document. The sole judge is **all-folds-positive on IS and OOS**, honest engine,
-FundedNext guardrails; ROI / DD / correlation are characterized, not gated.
+FundedNext guardrails; ROI / DD / correlation are characterized, not gated. Every arc ends in one
+disposition — **PASS** (all-folds-positive IS+OOS), **PORTFOLIO** (mean-positive but not
+all-folds-positive — a decorrelated component), or **KILL** (protocol §11).
 
 Run the arc's measurement by **calling** the canonical apparatus via the standard entry point in
 [`TOOL_REGISTRY.md`](./TOOL_REGISTRY.md) (pool build, clustering, the per-fold runners, fold sets,
@@ -49,6 +51,7 @@ The council always RECOMMENDS; CC always COMMITS.
 | `LESSONS.md` | Operator-compressed distillation of the log. Chats READ only. |
 | `arcs/` | Per-arc full records: `arc_<id>_<slug>.md`. |
 | `passed/` | Deep records for survivors (config, per-fold IS+OOS, costs, council verdict, exact repro command + frame sha). The operator's deep-dive target. |
+| `portfolio-candidates/` | PORTFOLIO-disposition components: mean-positive but not all-folds-positive edges (config, per-fold IS+OOS, correlation profile). Decorrelated inputs to a future portfolio-combination arc; not deployable solo. |
 | `results/` | Raw run artifacts per arc. |
 | `tools/` | Committed BUILT experiment tools (filters, exits, transforms, null baselines) — reused across arcs, not re-rolled in scratch. |
 

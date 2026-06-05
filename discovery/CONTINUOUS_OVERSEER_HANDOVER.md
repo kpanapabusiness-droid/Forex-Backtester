@@ -21,8 +21,8 @@ live (accounts dormant).
   (CANONICAL locked + BUILT-tools-accumulate), `core/wfo/discovery_measure.py` (per-year OOS +
   all-folds-positive judge), the `llm-council-discovery` skill (`docs/DISCOVERY_COUNCIL_SKILL.md`).
 - Arc 0 (supervised trial) ran end-to-end, machinery confirmed, FAILED its signal correctly.
-- Foundation landed (survey, registry, measurement glue, data-path, self-debloat step).
-- Status: PRE-CONTINUOUS — about to authorize multi-chat. The operator will hand you the
+- Foundation landed (survey, registry, measurement glue, data-path, the step-(k) re-orient).
+- Status: CONTINUOUS authorized — a chat runs a finite ~4–8-arc budget then gracefully hands off and a fresh chat resumes from the log (the hands-off harness `ops/run_fleet.py` has landed, harness-tested 2026-06-05; not yet run for a full unattended session). The operator will hand you the
   CONTINUOUS_RUN_DISPATCH to give to CC.
 
 ## HOW THE PIPELINE WORKS (so you can oversee it)
@@ -30,7 +30,7 @@ Each CC chat loops: read shared log+lessons+registry → observe data → invent
 (unlimited creativity) → develop on IS (2010-2020) → cheap-kill (pool floor 50, oracle-best-cluster
 ceiling used asymmetrically, 3-fold triage) → diagnose + fail the best version → validate all-folds-
 positive on IS then OOS (2021-present) on the honest engine with costs → council stress-test
-survivors → document → self-debloat → repeat. Sole judge = all-folds-positive IS+OOS, honest engine.
+survivors → document → re-orient, loop, and hand off at the context budget (a fresh chat resumes from the log). Sole judge = all-folds-positive IS+OOS, honest engine.
 Survivors are CANDIDATES, never auto-deployed. Each chat owns a static 1000-wide arc-id range. Chats
 coordinate by append-only docs to main; CODE is human-gated (never auto-merged) — except experiment
 tools under `discovery/tools/`, which CC builds + registers freely.
@@ -45,17 +45,26 @@ tools under `discovery/tools/`, which CC builds + registers freely.
 3. Each session gets the CONTINUOUS_RUN_DISPATCH with a UNIQUE assigned range (A:1000-1999,
    B:2000-2999, C:3000-3999). You help assign ranges so none collide.
 
-### The one thing to verify on the FIRST continuous run
-Self-debloat (protocol step k) has never run live (Arc 0 was one arc). On a chat's arc 1→2
-transition, confirm: log appended → context shed → arc 2 re-read the log fresh and continued. If it
-works, continuous is trusted. If context doesn't actually free, the fallback is a hard reset +
-re-read protocol/range/log. Watch for this report from the first chat.
+### Continuity to verify (handoff + bootstrap, NOT in-chat self-clearing)
+A chat cannot free its own context window (the transcript is append-only), so a chat runs a finite
+~4–8 arcs and then must hand off. Continuity is two mechanisms: (1) **graceful handoff** — the chat
+finishes its current arc, commits + pushes, and stops; (2) **bootstrap** — a fresh chat pulls main,
+reads protocol + log + LESSONS + registry, finds the highest arc-id in that range, and resumes at +1.
+Verify on the first handoff that a fresh chat resumed correctly from the LOG ALONE (no in-context
+handover needed). True hands-off operation needs an EXTERNAL relaunch harness (operator infra, outside
+`discovery/` + core) that respawns fresh `claude -p` per range until STOP / a time budget — that
+harness — `ops/run_fleet.py` — has landed (operator infra, harness-tested 2026-06-05) but has not
+yet run a full unattended session; until it does, relaunch per range manually on each handoff.
 
 ### Routine check-in (passive — NEVER stops the run)
 The operator drags `discovery/DISCOVERY_LOG.md` (+ `LESSONS.md`) into a chat. You help read it:
-- Scan the Tier-1 table `passed` column for any `Y`. None → nothing to do, runs continue untouched.
-- A `Y` → open `discovery/passed/<name>/` (config, IS+OOS results, honest-engine verification,
+- Scan the Tier-1 table TWO ways: the `passed` column for any `Y` (a PASS survivor) AND the
+  `disposition` column for `PORTFOLIO` (a mean-positive decorrelated component). Neither → nothing to
+  do, runs continue untouched.
+- A `Y` / PASS → open `discovery/passed/<name>/` (config, IS+OOS results, honest-engine verification,
   council verdict, repro command + frame sha). This is the high-value event.
+- A `PORTFOLIO` → open `discovery/portfolio-candidates/<name>/` (config, per-fold IS+OOS series,
+  correlation profile) — a candidate input to a future portfolio-combination arc, not a solo deployable.
 - Check-ins never require stopping. The log IS the status.
 
 ### Reviewing a survivor (the payoff — be skeptical)

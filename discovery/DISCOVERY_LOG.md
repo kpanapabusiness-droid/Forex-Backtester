@@ -64,6 +64,7 @@ at arc step (i).
 | 1019 | 1000s | 2026-06-05 | **Month-end reversion SHORT** (the untested direction-mirror of the proven long `me`, arc 1011) — a big UP move into month-end REVERTS DOWN (same WMR-fix inelastic-rebalancing flow, short side), targeting the strong-USD binding folds 2015 & 2018. **The 4th net-positive component AND the FIRST one robustly positive in 2018** — the wall that blocked the 3-way book (1015/2008/3009) and killed ~12 prior routes. Obs: month-end up-move ≥+1 ATR short drift +0.075 (median +0.096 = NOT thin-tail), **month-end excess +0.089 ATR** vs random-day control, honest short **capture 0.5508 >0.50 (first corpus short to clear it)**, 2018 capture 0.818. Engine §5f: **mean-positive net of costs under EVERY exit** (sl_only-2bar +0.043% → partial-runner **+0.683%, 7/10**), **beats fair null +0.80pp** (5/10 vs 2/10). **2018 robustly positive** (every exit-except-tp2r, every thr 0.75–1.5, every leave-one-pair-out drop +0.59..+1.99); **2015 fragile** (thr ≤1.0, GBPUSD-leaning). corr +0.157 vs me-long, regime-complementary (short 2015 +0.40 where me-long −1.14). NOT all-folds-positive (7/10) → PORTFOLIO. 4-way combination = gated next arc 1020. OOS preserved | N | n/e (OOS preserved) | -0.91% (best-exit partial-runner) | n/e | n/e | 116 | FAIL → PORTFOLIO | N | PORTFOLIO |
 | 3015 | 3000s | 2026-06-05 | **End-of-week (Friday) position-squaring reversion** — is there a WEEKLY analog of the month-end leg (`me`, arc 1011, the one demonstrably 2018-positive mechanical-flow reversion)? Does mechanical reversion concentrate at the end-of-week squaring boundary, positive in 2015 & 2018? FALSIFIED at obs (D1, 7 USD majors, big-down-move→buy by day-of-week). **NO day-of-week concentrates reversion** — Friday cap **0.502 / drift −0.045** (vs the month-end subset of the SAME setup cap 0.511 / drift +0.193, reproducing `me`). **2015/2018 acceptance FAILS** (2018 cap 0.421/−0.346 robustly neg; 2015 cap 0.417/med −0.51); per-pair = USD-quote-beta split (4/7 = noise, arc-2009/3012 tell); best-version sweep thins below pool floor before turning + (thr1.5 "positive" rests on 2&5 samples = thin-tail). Diagnosis: `me` survives 2018 via the **hard inelastic WMR/index rebalancing mandate unique to month-end** — the weekly boundary has no forced-rebalancing driver → the calendar-flow reversion edge does NOT generalize down the calendar hierarchy (month-end ≠ week-end). **9th dead route to the 2018 leg**; the mechanical-flow well is dry at the weekly scale. No engine/null/council spent | n/e | n/e | n/e | n/e | n/e | 4225 down-move obs (261 Fri) | KILL (obs cheap-kill) | N | KILL |
 | 3016 | 3000s | 2026-06-05 | **Intraday session structure: Asian-range / London-open break** (continue OR fade) — the single genuinely-UNMAPPED data modality (every prior arc is H4/D1/W1 daily-scale or calendar-flow; arc 1000 only did H4 hour-CONDITIONING, not a session-RANGE construction). DST-clean (Europe/London) Asian range × first London-open break, H1 majors. FALSIFIED at obs: **the break does NOT continue** (long-cont cap **0.375**/drift −0.116, short-cont 0.396/−0.039) AND **does NOT cleanly fade** — the naive `1−cont_cap≈0.62` is an asymmetric-SL artifact; the fade's OWN honest capture is **0.386** (short up-break) / 0.383 (long down-break): cont 0.375 + fade 0.386 = 0.76 < 1 = the break entry is a **high-vol London-open WHIPSAW point where a 2·ATR SL is hit BOTH ways**. Net fade drift after entry spread (~0.08 ATR) is **~+0.02R ≈ 0**, ~10× below the ~0.125R H1 cost (~2× H4). Only positive cell EURUSD +0.19 = **1/4 pairs (single-pair noise tell)**; 2015 (+0.174)/2018 (+0.251) drift-positive but inside cap 0.385/0.433 (<0.50) → won't survive engine (arc-3004/3012 "+drift inside sub-0.50 capture collapses SL-honest"). **Intraday session structure is sub-cost — extends the H1 cost wall (1008/3008/1010) from discrete-flow events to session-RANGE; the last unmapped modality mapped dead.** Reusable caution: `1−cont_cap ≠ fade capture` (asymmetric SL). No engine/null/council spent | n/e | n/e | n/e | n/e | n/e | 7983 IS break obs | KILL (obs cheap-kill) | N | KILL |
+| 2016 | 2000s | 2026-06-05 | **DIAGNOSTIC (HEAVY council redirected the arc): is the 4-way book's residual block REAL signal or measurement-floor NOISE?** Planned a 19th +2015-leg hunt; first obs killed vol-shock fade (extreme 1-bar move CONTINUES, cap 0.20–0.35); the `/llm-council-discovery` (unanimous: Soundness lens strongest, gate-loosening the worst blind-spot) **redirected to measuring whether the block is real BEFORE hunting**. Reproduced the 4 components EXACTLY (gap +0.685/me_long +0.232/fbr +1.854/me_short +0.683) at IS-best convex w={gap 0,me_long .65,fbr .2,me_short .15} (worst −0.124%, mean +0.624%). **(1) 2015 decomp: single-component-driven** (me_long −0.742% contrib nearly cancels fbr +0.635%, net book2015 −0.047%), NOT a 4-way co-drawdown. **(2) NOISE FLOOR (decisive): bootstrap of honest per-trade P&L → book 2015 ROI −0.047% ± sd 0.71%, 95% CI [−1.22%,+1.55%], P(neg)=0.42; |worst-fold|/sd = 0.067σ** (2018 = 0.176σ); 6/10 folds within ±1σ of zero, only 2011/12/19/20 clear the floor. **(3) corr CI: ALL 6 pairwise component fold-ROI corr 95% CIs SPAN ZERO at n=10** (me_long·fbr −0.366 [−0.81,+0.34]) → the "2015↔2018 anti-correlation" motivating ~18 leg-hunts is an n=10 artifact. ⇒ **hunting a 5th leg to flip a 0.07σ fold = chasing noise / fold-painting**; the leg-hunt-to-paint-folds route hits its MEASUREMENT FLOOR. Components UNCHANGED (PORTFOLIO); book strict-gate FAIL (did NOT loosen the gate — the rejected lens). **OPERATOR FLAG: the all-folds-positive calendar-year gate on thin-component books is applied BELOW its noise floor — governance call (reconsider fold/gate resolution OR pursue components whose per-fold ROI clears the floor).** No OOS spent (book fails IS AFP → unearned). NEW lesson: quantify a marginal fold's bootstrap CI before hunting a leg to flip it | N | n/e (not earned) | -0.047% (book 2015, =0.067σ) | n/e | 0.71% (book per-fold sd) | 396+121+172+145 | DIAGNOSTIC → KILL (residual block = noise; leg-hunt route hits measurement floor) | N | KILL |
 
 ---
 
@@ -2968,3 +2969,65 @@ component = **PORTFOLIO** (confirmed, via 1019). Components UNCHANGED.
 registered by arc 1019 (`MonthEndReversionShortSignal`); I removed my duplicate registry row + duplicate
 component dir on merge (kept 1019's canonical record). Drivers scratch `_disco2000_work/arc2015_*.py`
 (reproducible; the 4-way reproduces the 3 committed component headlines EXACTLY before combining).
+
+### arc_2016
+
+**DIAGNOSTIC: is the 4-way book's residual block REAL or measurement-floor NOISE?** (chat 2000s). Full
+record: [`arcs/arc_2016_portfolio_2015_noise_floor.md`](arcs/arc_2016_portfolio_2015_noise_floor.md).
+
+**Why this arc exists (the council redirected it).** I resumed at the arc-2015 thread-1 spec — "the
+sharpest open spec is a robust +2015 leg" — intending a 19th leg-hunt. First obs (vol-shock fade, the
+acute-2015-event candidate) died cheaply: fading an extreme 1-bar move (≥1.5–2.5 ATR) on D1 USD majors has
+capture 0.20–0.35 and NEGATIVE drift — the extreme move CONTINUES (closed-ground momentum, not reversion);
+2015 not positive. I then convened `/llm-council-discovery` at the idea-fork. **Peer review was unusually
+unanimous: all 5 reviewers ranked the Soundness lens strongest and all 5 named the Alternative-framing
+(loosen the gate) lens the biggest blind-spot.** The chairman's directive: do NOT open a 19th leg-hunt;
+first compute three numbers — (1) is worst-fold −0.124% distinguishable from zero at ~10–15 trades/fold?
+(2) the 2015↔2018 correlation CI at n≈10; (3) per-component 2015 decomposition — and *"if inside noise OR
+single-component-driven, skip the 5th leg entirely."* Strongest dissent: there is **no out-of-sample 2015**
+(a leg engineered to clear a fixed year is in-sample by construction; the real test is forward survival,
+unearned while the book fails IS AFP). I committed (heavy weight) and converted the arc to that diagnostic,
+IS-only (did not spend the combined-book OOS — §5g: book fails IS AFP).
+
+**What the diagnostic found (`arc2016_diagnostic.py`, canonical apparatus + honest per-trade P&L from
+`StrategyResult.closed_trades`).** Reproduced all 4 components EXACTLY (gap +0.685 / me_long +0.232 / fbr
++1.854 / me_short +0.683) at IS-best convex w={gap 0, me_long .65, fbr .2, me_short .15} (worst −0.124%,
+mean +0.624%, book per-fold std 0.703%). The two negative folds are 2015 (−0.047%) and 2018 (−0.124%).
+- **(1) 2015 is single-component-driven, not co-drawdown:** me_long −0.742% contribution (w.65 × −1.141%,
+  n=10) nearly cancels fbr +0.635% (w.2 × +3.174%); gap at weight 0. A me_long-vs-fbr near-cancellation.
+- **(2) NOISE FLOOR (decisive):** bootstrap (10k, seed 42) of each component's 2015 honest per-trade P&L,
+  combined at frozen weights → **book 2015 ROI −0.047% ± sd 0.71%, 95% CI [−1.22%, +1.55%], P(neg)=0.42**.
+  **|worst-fold|/sd = 0.067σ** (2018 = 0.176σ). Per-component 2015 sampling sd is enormous (gap ±2.64%,
+  fbr ±2.62%, me_short ±1.27%, me_long ±0.68%) — these are 10–28-trade folds. 6/10 book folds sit within
+  ±1σ of zero; only 2011/12/19/20 clear the floor.
+- **(3) corr CI:** all 6 pairwise component fold-ROI correlations' Fisher-z 95% CIs SPAN ZERO at n=10
+  (me_long·fbr −0.366 [−0.81,+0.34]; fbr·me_short +0.406 [−0.30,+0.83]; etc).
+
+**Verdict + meaning. KILL** (no new component) — but a **programme-redirecting** result. The residual
+negative folds are **statistically zero**; a 5th leg that flips a 0.07σ fold would be **fold-painting**
+(selecting against the test statistic — the council's unanimous concern). The convex-search worst-fold
+"improvements" across the ~18-arc leg-hunt (−0.222→−0.124) were largely **moving inside the noise floor**,
+not closing a real gap (me_short's +2018 was real *as a component*, but the book-level wall it "breached"
+was already sub-noise). **I did NOT loosen the gate** (the rejected lens); the book stays a strict-gate
+FAIL, components UNCHANGED (PORTFOLIO).
+
+**OPERATOR FLAG (governance — theirs, not mine).** The all-folds-positive calendar-year gate, applied to
+books of thin decorrelated components, is evaluated **below its own noise floor** (±0.7% per-fold here).
+Two honest forward paths, the operator's call: **(A)** reconsider fold/gate resolution for thin-component
+books (pooled-trade or regime-block gating with explicit SE); **(B)** redirect discovery toward components
+whose *per-fold* ROI clears the noise floor (more trades/fold and/or larger per-trade edge), not
+ever-thinner legs whose yearly ROIs are sampling-error-dominated. The genuine forward test (4-way 2021+ OOS)
+stays deferred until a book earns the OOS look.
+
+**Threads / lessons.**
+1. **NEW high-value lesson: the portfolio-book gate has a NOISE FLOOR set by component trade-counts.** A
+   negative fold smaller than ~1 book-σ is statistically zero; "fix it with a 5th leg" chases noise and
+   invites fold-painting. **Quantify a marginal fold's bootstrap CI BEFORE hunting a component to flip it.**
+2. **The 2015↔2018 anti-correlation is an n=10 story, not a structural constraint** (all corr CIs span 0).
+   Treat per-fold correlations at n≈10 as uninformative in future combination arcs.
+3. The council process caught a sunk-cost treadmill (a 19th noise-painting arc) and dissolved the question
+   with a measurement — generative council at a genuine fork earned its cost.
+
+**FLAGS (code not merged):** none touching canonical core; no new BUILT tool (one-off arithmetic on
+canonical outputs; `closed_trades` P&L is a read of `StrategyResult`). Drivers scratch
+`_disco2000_work/arc2016_*.py` (reproduce the 4 headlines EXACTLY before any bootstrap).

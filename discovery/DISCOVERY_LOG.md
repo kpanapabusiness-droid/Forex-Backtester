@@ -45,6 +45,7 @@ at arc step (i).
 | 2006 | 2000s | 2026-06-05 | 2-way PORTFOLIO combination WFO — the route's gated next step (arc 1011 flag): co-simulate the ONLY two net-positive long-only components (gap-fill 1006 JPY-cross H4 + month-end 1011 USD-major D1) under equal + risk-parity weights, gate all-folds-positive on the COMBINED book. Both reproduce EXACTLY (gap +0.685%, me +0.232%, corr +0.117 ✓). Risk-parity cuts worst-fold −6.79%(gap solo)→−1.53% but STILL 4/10 neg — BLOCKED by a mutually-negative fold (2015, both lose): no convex/co-sim combo can pass (P&L additive). The two edges are flow-reversion → TAIL-CORRELATED (both bleed 2015/16/18/20) despite corr +0.117. ⇒ ≥3 components needed, SELECTED for fold-complementarity (regime-orthogonality), not avg-corr. Components UNCHANGED (still PORTFOLIO); 3rd-component spec = net-pos on 2015/16/18/20, esp 2015 | N | n/e (OOS preserved) | -1.53% (risk-parity combined) | n/e | n/e | 396+121 | FAIL → KILL (combined book; components unchanged) | N | KILL |
 | 2008 | 2000s | 2026-06-05 | 3-way PORTFOLIO combination WFO (gap-fill 1006 + month-end 1011 + **failed-breakdown 1013**, the new regime-orthogonal 3rd component) — the route's gated next step now a 3rd exists (arc-1013 spec). All 3 reproduce EXACTLY (≤0.005pp: gap +0.685%, me +0.232%, fbr +1.854%; corr gap-me +0.117 ✓, gap-fbr +0.189, me-fbr −0.366). C did as arc 1013 predicted — CUT the 2-way book's 4 bleed folds to 2 (fixed 2016 & 2020 outright) — but **2015+2018 survive**: risk-parity worst −0.77% (2/10 neg), equal worst −3.36% (3/10 neg). **PROVABLY blocked — 0/5151 convex weightings all-folds-positive** (best max-min −0.222%, 2014/15/18 neg): 2018 needs heavy month-end (its only +leg), 2015 needs heavy fbr & is HURT by month-end → mutually exclusive. **2018 = binding fold: flow-reversion (gap −6.79) AND structural stop-run reversal (fbr −4.20) BOTH lose** in the strong-USD trend year (avg-corr hid the shared 2018 tail). All 3 edges are fade/short-trend → the 4th leg must be trend-continuation/short, dead long-only → escalation/FLAG-1, arc-2007 climax-sweep SHORT the named target. Components UNCHANGED (still PORTFOLIO) | N | n/e (OOS preserved) | -0.77% (risk-parity combined) | n/e | n/e | 396+121+172 | FAIL → KILL (combined 3-way book; components unchanged) | N | KILL |
 | 3009 | 3000s | 2026-06-05 | **3-way PORTFOLIO combination WFO** (INDEPENDENT concurrent re-run of arc 2008 — same verdict, complementary findings; Arc-10 independent-reproduction). Combine gap-fill 1006 (JPY-cross H4) + month-end 1011 (USD-major D1) + failed-breakdown-reclaim 1013 (USD-major H4) under equal + risk-parity, gate all-folds-positive on the COMBINED book. **All 3 reproduce EXACTLY** (gap +0.685%, me +0.232%, fbr +1.854% — caught arc-1013's native-trail double-trail via reproduce-live, trail_enabled=True). **The 2-way's combination-invariant 2015 block is GONE — NO mutually-negative fold** (fbr +3.17 rescues 2015; me +0.90 rescues 2018). But still NOT all-folds-positive: risk-parity 2/10 neg {2015,2018}, equal 3/10. fbr rescued 2016+2020 → blockers narrowed {2015,16,18,20}→{2015,2018}, worst-fold −1.53→−0.77%. **2018 = the hard wall** (strong-USD trend yr: gap −6.79 & fbr −4.20 both deep-neg, only me +0.90) — arc 2008's convex-search proves 0/5151 weightings pass (2015-needs-fbr vs 2018-needs-me are mutually exclusive). 4th-component spec = net-pos on 2015 AND esp 2018 → a SHORT / trend / risk-off-positive leg (longs dead those yrs; shorts now OPEN PR#273; named targets = climax-sweep short 2007, up-gap short 2001/2003). Components UNCHANGED | N | n/e (OOS preserved) | -0.77% (risk-parity combined) | n/e | n/e | 260+98+208 | FAIL → KILL (combined book; components unchanged) | N | KILL |
+| 2009 | 2000s | 2026-06-05 | **Climax-sweep SHORT** (down-trend continuation) — the named 4th-component target (arc 2008): the violent fast-3-bar-drop big-range bar that sweeps a swing low & closes below → continuation DOWN, the engine-unvalidated thread arc 1014 flagged (arc 2007's −0.33 "falling knife"). FALSIFIED at obs: cell coin-flip (cap 0.49–0.505) + short drift near-zero-to-REVERTING (−0.04 to −0.06; only thin range≥2 tail +0.009); arc-2007 −0.33 does NOT reproduce in a clean SHORT construction. Climax monotonicity INVERTS (small −0.155→climax −0.038; deep pierce reverts to only +0.006). **STRUCTURE CONTROL decisive + ANTI-load-bearing:** climax AT swept-low drift −0.043 (REVERTS) vs ELSEWHERE +0.128 (CONTINUES) — the swing-low sweep is a REVERSAL setup (arc-1013 long), shorting it shorts INTO the bounce. Per-pair 3/7 = noise, split by USD quote-convention (XXXUSD continue/USDXXX revert = directional USD-beta). Swing-low sweep has NO tradeable short mirror (confirmed both leans: 1014 clean + 2009 climax). 2018's trend-continuation leg is NOT a structural short → reinforces arc-3004 escalation | N | n/e | n/e | n/e | n/e | ~121k obs | KILL (obs cheap-kill) | N | KILL |
 
 ---
 
@@ -1779,3 +1780,79 @@ framing that the 2-way's *combination-invariant* 2015 block is GONE (no mutually
 3-way failure is a weighting/magnitude shortfall, not an additive-P&L impossibility. Both reduce to the same
 4th-component spec and the same steer: the 4th leg must be SHORT / trend / risk-off-positive (positive in
 2018), now unblocked by PR #273.
+
+### arc_2009
+
+**Climax-sweep SHORT (down-trend continuation) — the named 4th-PORTFOLIO-component target** (chat
+2000s). Full record: [`arcs/arc_2009_climax_sweep_short.md`](arcs/arc_2009_climax_sweep_short.md). No
+council (falsified at observation by three independent cheap discriminators — arc-1014/1010/3006
+precedent).
+
+**Idea + why (log-seeded — the route's named next target).** My range's portfolio route is BLOCKED on
+one named fold: arcs 2006/2008 gridded the convex simplex (0/5151 weightings all-folds-positive); the
+binding fold is **2018** (strong-USD trend year) where all three PORTFOLIO components (gap-fill 1006,
+month-end 1011, failed-breakdown 1013) — all fade/reversion-flavored, implicitly short-trend — lose.
+Arc 2008's 4th-component spec named the concrete target: **arc 2007's climax-sweep SHORT** (the
+trend-continuation leg, positive in 2018). Arc 2007 (a LONG arc) had measured the CLIMAX sweep below a
+swing low as a FALLING KNIFE (drift −0.124→−0.333, worse the bigger = the short leg); arc 1014 tested
+the CLEAN confirmed-breakdown short → KILL but **explicitly left the climax/fast-violent-drop variant
+engine-unvalidated** ("the −0.33 was inside a fast-3-bar-drop construction; the clean confirmed-
+breakdown doesn't carry it"). This arc fills that exact gap, testing whether the climax-sweep SHORT is
+a real, STRUCTURE-LOAD-BEARING trend-continuation short via arc 1014's structure control mirrored.
+
+**What happened — FALSIFIED at observation (three discriminators).** 7 USD majors, H4, IS, short lens
+(direction-aware `observe_long_capture`; short drift>0 ⇔ price fell ⇔ good for short; base cap 0.4849,
+drift −0.0151). (Q1) The cell (swept & close_below & fast-drop & big-range) is coin-flip (cap
+0.49–0.505, lift ≤+0.02) and short drift is NEGATIVE/reverting (−0.04 to −0.06; only the thin range≥2
+tail +0.009) → **arc 2007's −0.33 does NOT reproduce in a clean SHORT construction.** (Q2) Climax
+monotonicity INVERTS — small-range −0.155 → climax −0.038, deep pierce reverts only to +0.006 (the arc
+1014 "deeper reverts harder, thin tail faintly continues," on the climax variant). (Q3) **STRUCTURE
+CONTROL decisive AND anti-load-bearing:** climax AT a swept swing-low drift **−0.043 (REVERTS UP)** vs
+the SAME climax ELSEWHERE **+0.128 (CONTINUES DOWN)** — the swing-low sweep is the *wrong side*:
+sweeping a swing low is a REVERSAL setup (arc 1013's reclaim-long, AT-swept-low cap 0.55–0.61), so the
+climax-sweep short shorts INTO the bounce. (Q4) Per-pair 3/7 positive = noise, and the split is by
+quote convention (EUR/GBP/AUD-USD continue +0.28–0.31; USD-CAD/JPY/CHF revert −0.30 to −0.51) =
+directional USD-beta, not structure.
+
+**Verdict: KILL (cheap-kill at observation).** Coin-flip-or-reverting short whose only "edge" is
+USD-beta quote-convention noise; entry doesn't beat base + no robust positive gross short drift → §5f
+exit-sweep doesn't bite; no pool/engine/council spent. The named 4th-component target (arc-2008
+climax-sweep SHORT) is dead.
+
+**Diagnosis (why the sweep has no tradeable short, from BOTH leans).** arc 1013 proved the swing-low
+sweep is a REVERSAL structure (deep pierce-and-reclaim LONG, AT-swept-low load-bearing). A reversal
+structure has no symmetric short: the clean confirmed-breakdown (1014, backward-confirming, enters the
+local low → reverts) and the climax/violent variant (2009, the swept low is *where the bounce starts* →
+shorting it shorts into the reversal) BOTH fail at exactly the swept-low structure. arc 2007's −0.33
+was a within-sweep-reclaim-long sub-bucket artifact, NOT a robust short edge — it does not survive a
+clean dedicated SHORT construction with a structure control. The "elsewhere climax continues +0.128" is
+shallow momentum (a big fast drop, not at any level, continues) = closed ground (momentum shorts dead
+by symmetry); stripping the anti-load-bearing structure leaves a dead shallow short → not the 4th
+component, no engine compute.
+
+**Convergence with arc 1014 (chat 1000s).** 1014 found the CLEAN confirmed-breakdown short reverts and
+the swing-low is INERT for the short; 2009 closes the climax/fast-drop variant 1014 flagged as
+unvalidated and goes further — for the climax the structure is ANTI-load-bearing (the swept low is
+where the short loses, drift −0.043 vs elsewhere +0.128). Two chats, two short constructions of the
+swing-low sweep, one conclusion: **the sweep is a reversal structure with NO tradeable short mirror.**
+
+**Threads / lessons.** (1) **The swing-low sweep is a REVERSAL structure with no tradeable short —
+confirmed from both leans** (1013 reclaim-long edge, 1014 clean-breakdown short reverts/inert, 2009
+climax-breakdown short reverts/anti-load-bearing). arc 2007's −0.33 falling knife was a long-construction
+sub-bucket artifact. The named 4th-component climax-sweep SHORT (arc 2008) is closed. (2) **Structure
+control is the one-line decisive discriminator for any structural short** (mirrors 1014) — "climax AT
+swept-low −0.043 reverts vs elsewhere +0.128 continues" killed it in one read; a structural short whose
+structure helps the OPPOSITE direction is dead. (3) **The 2018 binding fold's trend-continuation leg is
+NOT a structural-continuation short** — both shorts the corpus can name from structure inherit the
+reversal/coin-flip; the genuine trend-positive leg would be long-trend (dead, arcs 0–3006) or a
+non-structural short → reinforces the arc-3004 escalation (route blocked on a leg the apparatus + now
+structural shorts can't express). (4) **Per-pair USD-quote-convention split is a short-side noise tell**
+— positive on XXXUSD + negative on USDXXX (or vice-versa) = directional USD beta, demand the structure
+control first. (5) **Surviving short frontier (unchanged):** the FLOW-event up-gap weekend SHORT (arcs
+2001/2003, accuracy 0.64) is the one short where direction is not a coin-flip — but it is a fade edge
+(would inherit the 2018 fade-book tail) and is the 1000s chat's named arc-1015 lane; the regime-
+orthogonal trend-continuation 4th leg remains unfound.
+
+**FLAGS (code not merged):** none. No canonical-core change; no new BUILT tool (reused direction-aware
+`observe_long_capture`; conditioning is a one-off scratch observer). Driver scratch
+`_disco2000_work/arc2009_observe_climax_short.py` (reproducible from the arc doc).

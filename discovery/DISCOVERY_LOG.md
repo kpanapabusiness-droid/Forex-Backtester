@@ -50,6 +50,7 @@ at arc step (i).
 | 2010 | 2000s | 2026-06-05 | **Market-neutral RELATIVE-VALUE** (the arc-3004 escalation's #1 unlock — "the only lever that doesn't need to beat 0.50"), shorts now open (PR #273): long-outperformer/short-underperformer of a cointegrated pair (EUR-GBP, AUD-NZD, EUR-AUD), relative-MOMENTUM bet (arc-2003 *because*: laggard keeps lagging), candidate 2018-positive 4th leg. FALSIFIED at obs (H4+D1, the COST REALITY decides): relative-strength has ≈ZERO predictive power (corr(relstr,fwd_rel) −0.048..+0.006), frac+ coin-flip (0.43–0.55). The 2nd leg DOUBLES FundedNext cost (~6–14 bp) without doubling edge (relative move ~2–10 bp) → every H4 cell net-NEG; the only +D1 cells (EUR-GBP \|z\|≥2 +4.5bp) are THIN (~19/yr), NON-MONOTONE in \|z\| (arc-3007 not-a-lever tell), and net-NEG once full 2-leg slippage+commission counted. **CLOSES arc-2003's CONCEDE with the real reason:** relative-value's blocker was NOT long-only (now lifted) but doubled-cost-vs-coin-flip; shorts do NOT revive it. Escalation #1 unlock is itself EDGE<COST on majors | N | n/e | n/e | n/e | n/e | ~17k obs/grp | KILL (obs cheap-kill) | N | KILL |
 | 1015 | 1000s | 2026-06-05 | **3-way PORTFOLIO combination WFO** — the route's deployable gate (arc 1013/2006 flag): combine ALL THREE net-positive long-only components (gap-fill 1006 JPY-cross H4 + month-end 1011 USD-major D1 + failed-breakdown-reclaim 1013 USD-major H4) under equal + risk-parity, gate all-folds-positive on the COMBINED book. All three reproduce **BYTE-EXACT** (gap +0.685%, me +0.232%, fbr +1.854% 9/10 — fbr needs `trail_enabled=True`, the double-trail quirk in 1013's committed config). The 3rd component WORKS as 1013 predicted (positive 2015/16/20) → cuts arc-2006's 2-way risk-parity 4/10-neg(worst −1.53%) to **2/10 neg (worst −0.77%, mean +0.55%)** — strongest book in the corpus — but STILL not all-folds-positive → KILL. **Provably blocked, combination-method-invariant, by 2015 & 2018:** 2015 positive ONLY in fbr (+3.17; gap/me both neg), 2018 positive ONLY in me (+0.90; gap −6.79 & fbr −4.20 both neg) → no convex weighting passes both (2015 wants fbr, 2018 wants me; opposite directions, neither solo is AFP). CONVERGES w/ arcs 2008 (2000s) + 3009 (3000s) — triple-independent same verdict/same fold; the 2008/3009 follow-ups (2009 climax-short, 3010 trend-short) already confirm the 2018 leg is NOT a structural/trend short. Components UNCHANGED (still PORTFOLIO). **Precise 4th-component spec: positive in BOTH 2015 & 2018 (strong-USD/risk-off) → structurally a SHORT/USD-trend leg, NOT long-reversion → FLAG-1 shorts/2nd-leg unlock the named blocker w/ a 2-fold acceptance test (now the live frontier = flow-event short asymmetries, e.g. up-gap weekend short).** Route is exactly ONE regime-orthogonal component from deployable | N | n/e (OOS preserved) | -0.77% (risk-parity combined) | n/e | n/e | 396+121+172 | FAIL → KILL (combined book; components unchanged) | N | KILL |
 | 2011 | 2000s | 2026-06-05 | **Failed-breakout REJECT SHORT @ swing HIGH** — the TRUE forward-confirming mirror of arc 1013's reclaim-long (1014 tested the wrong/continuation mirror, 2009 the climax continuation; NONE tested the reject-reversal): price sweeps buy-stops above a 40-bar swing high then REJECTS back below with a big upper wick (bull-trap → reversal DOWN), candidate 2018-positive 4th leg. POOLED obs LOOKED like the first passing short (drift +0.171→+0.463 monotone in shadow, structure-control AT-swept +0.261 vs elsewhere −0.213) — but capture COIN-FLIP (0.47–0.51, not 1013's 0.55–0.61). **ROBUSTNESS KILLS it:** mean≫median (s≥1.25 mean +0.261 vs median −0.069 = thin-tail), excluding the 2 thin outlier pairs (AUDUSD n25 +1.26, USDJPY n31 +1.49) collapses it (s≥1.0 +0.085, s≥1.25 **−0.133 NEG**); deeper cell INVERTS negative (opposite of 1013). Structure-control "pass" was a PAIR-MIX confound; USD-quote split (arc-2009 USD-beta). arc-1013 reclaim-long has **NO tradeable short mirror in ANY of 3 constructions** (1014/2009/2011) → asymmetric long-only edge; structural-short route to 2018 fully closed | N | n/e | n/e | n/e | n/e | ~121k obs | KILL (obs cheap-kill, robustness-confirmed) | N | KILL |
+| 2012 | 2000s | 2026-06-05 | **DEEP multi-factor trend-CONTINUATION long** (1013's forward-confirm property applied to continuation, the one untested face of dispatch item d) — the portfolio's missing 4th leg must be trend/2018-POSITIVE (a continuation long: trend-positive, a LONG so no short-mirror death). Construction: uptrend (close>SMA200 & SMA50>SMA200) × shallow pullback holding the 40-bar higher-low × strong prior impulse (SMA50 slope) × FORWARD-confirm resume (close>prior-high). FALSIFIED at obs (H4 USD majors, IS): cell cap 0.479–0.486 (≤ base 0.486, all <0.50); impulse gate ANTI-predictive (stronger trend → worse, 3003 echo). **Q2 forward-confirm does NOT rescue continuation** (resume −0.105 vs into-dip −0.156, both neg) — mechanism: forward-confirming a REVERSAL (1013) enters BEFORE the move starts (works); a CONTINUATION enters AFTER the bounce (late) → reverts. **Q3 STRUCTURE CONTROL INVERTS (decisive):** FULL conjunction 0.4787/−0.105 WORSE than generic resume-in-uptrend 0.4956/+0.007 — deep trend structure is ANTI-load-bearing (mirror-image of 1013 where structure HELPS). Per-pair 1/7 pos (USDJPY only); **2018 drift −0.233 NEG** → not the trend leg. Closes the deep-continuation-long face: 1013's forward-confirm property is REVERSAL-SPECIFIC; no structural directional bet (long OR short, shallow OR deep) yields the 2018 leg → arc-3004 escalation reinforced | N | n/e | n/e | n/e | n/e | ~121k obs | KILL (obs cheap-kill) | N | KILL |
 
 ---
 
@@ -2133,3 +2134,62 @@ conditioning + LOO are one-off scratch observers). The first-ever engine short-r
 verified only (arc 1014) — a future short clearing observation will be the first to exercise it
 end-to-end. Drivers scratch `_disco2000_work/arc2011_observe_failed_breakout_short.py`,
 `arc2011_loo.py` (reproducible from the arc doc).
+
+### arc_2012
+
+**Deep multi-factor trend-CONTINUATION long** (chat 2000s). Full record:
+[`arcs/arc_2012_deep_trend_continuation_long.md`](arcs/arc_2012_deep_trend_continuation_long.md). No
+council (a structure-control INVERSION is a falsification, not a tuning fork — arc-3003/1014 discipline;
+capture<0.50 ⇒ no reachable ceiling, the oracle-best-cluster there is the Arc-0 hindsight trap).
+
+**Idea + why.** The portfolio route (2006/2008/3009/1015) is provably blocked on **2018** (and 2015): all
+three PORTFOLIO components are fade/reversion → tail-correlated, all bleed trend years; 0/5151 convex
+weightings clear all-folds-positive. The missing 4th leg must be **trend/2018-POSITIVE**. The short and
+relative-value routes to that leg are exhausted (structural shorts 1014/2009/2011, trend-short 3010,
+relative-value 2010). The one untested face (dispatch item d) is a **deep multi-factor directional
+LONG** in the arc-1013 template. Every prior trend cut was SHALLOW (Donchian/SMA → coin-flip; 3003:
+strong trends revert), but 1013 proved a DEEP conjunction extracts an edge where the shallow version is
+dead — via being **forward-confirming** (the reclaim enters AFTER the adverse low, before the up-move).
+Nobody applied that property to trend CONTINUATION — intrinsically trend-positive, a LONG (no
+short-mirror death). Hypothesis: uptrend × shallow pullback holding the higher-low × strong impulse ×
+forward-confirm resume (close>prior-high) extracts the trend edge and is +2018.
+
+**What happened — FALSIFIED at observation (decisive, no engine).** H4 USD majors, IS 2010-2020, honest
++1R-before-SL long capture + i+1 drift via direction-aware `observe_long_capture`. Base cap 0.4860,
+drift −0.0474. (Q1) the deep continuation cell cap 0.4787–0.4865 (≤ base, all <0.50) and a STRONGER
+impulse gate makes it WORSE (impulse≥0.5 → 0.4787/−0.105) — the more "established" the trend, the worse
+(trade-level echo of 3003's regime inversion). (Q2) the forward-confirm RESUME does NOT rescue
+continuation: resume −0.105 vs into-the-dip −0.156, **both negative, both sub-0.50**. (Q3) STRUCTURE
+CONTROL **inverts** — FULL deep conjunction 0.4787/−0.105 is WORSE than the generic resume-in-uptrend
+0.4956/+0.0070; the deep trend structure pulls a near-coin-flip bounce NEGATIVE (the exact opposite of
+1013, where AT-structure ≫ elsewhere). (Q4) 1/7 pairs positive (USDJPY +0.094, the carry pair); 6/7
+negative — below the noise floor. (Q5) **2018 drift −0.233 (NEGATIVE)**; per-year is a coin-flip (4/11
+positive, range −1.33[2019]..+0.81[2020]). Not the trend leg.
+
+**Verdict: KILL (cheap-kill at observation).** Sub-0.50, forward-confirm reversal-specific, structure
+anti-load-bearing, 2018 negative.
+
+**Threads / lessons.** (1) **arc-1013's forward-confirm property is REVERSAL-SPECIFIC, not a general
+edge.** It works only because the reclaim enters BEFORE the bet's move begins; applied to continuation the
+same trigger enters AFTER the bounce (late) and reverts. Forward-confirming is necessary-not-sufficient —
+it helps only when the confirmed event is the START of the move, not its tail. This is the mechanistic
+reason 1013 has no continuation sibling (and complements the 1014/2009 finding that it has no short
+mirror). (2) **Deep multi-factor structure does NOT rescue trend continuation** — the trade-level
+completion of 3003: the cleaner/stronger the trend structure (impulse↑, full vs generic), the MORE
+negative. Structure HELPS reversals (1013), HURTS continuation. (3) **The portfolio's 2018-positive leg is
+not a structural-continuation long either** (2018 −0.233), adding to the closed structural-short
+(1014/2009/2011) and trend-short (3010) routes — every directional FACE is now mapped: shallow long/short
+dead, deep reversal long = the 3 existing fades, deep continuation long dead here, structural/trend short
+dead. The trend/2018 flavor is not expressible as a price-structure directional bet in either direction →
+**arc-3004 escalation reinforced from the long-continuation angle**: the 4th leg needs a genuinely
+non-price-direction construction (or the route is escalation-bound). (4) **Surviving frontier
+(unchanged):** the FLOW-event up-gap weekend SHORT (arcs 2001/2003, acc 0.64 — the one place direction
+beats 0.50) is STILL unrun (1000s used arc 1015 for the portfolio combination, not the up-gap short) and
+is the next live target — descends from arc 2001 (2000s lineage). It is a FADE so likely inherits the
+2018 tail (not the portfolio's 2018 leg), but is the single highest-acc directional edge in the corpus
+and a candidate 4th decorrelated PORTFOLIO component / standalone test.
+
+**Tooling:** no new BUILT tool — reused the BUILT direction-aware `observe_long_capture(direction="long")`.
+
+**FLAGS (code not merged):** none. No canonical-core change. Conditioning is a one-off scratch observer.
+Driver `_disco2000_work/arc2012_observe_trend_continuation.py` (reproducible from the arc doc).

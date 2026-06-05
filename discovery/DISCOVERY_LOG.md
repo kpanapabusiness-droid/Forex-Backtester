@@ -34,6 +34,7 @@ at arc step (i).
 | 1009 | 1000s | 2026-06-05 | AUDIT of arc 1006 gap-fill (SAME component, not a new edge): reproduce + robustness. REPRODUCES +0.685% IS via registered tools; NOT single-pair (leave-one-out all +); but threshold-FRAGILE (lives at 0.5ATR, ~0 by 1.25) AND edge over a FAIR same-exit null is ~+0.36pp (~HALF the headline; null itself +0.327% from JPY-basket drift). Component HOLDS but thinner | N | n/e (not re-run) | -6.79% | n/e | n/e | 260 | PORTFOLIO (re-affirmed, thinner) | N | PORTFOLIO |
 | 3006 | 3000s | 2026-06-05 | Multi-TF breakout-RETEST long (resistance→support flip; the last untested long-only lane, arc-1008 flag) — FALSIFIED at obs: retest-hold capture ≤ base in all 18 L×tol×hold cells, fwd drift NEGATIVE in 17/18 (−0.35..+0.00 ATR); catches FADING breakouts not defended supports; monotone-in-L only converges TO coin-flip, never above | N | n/e | n/e | n/e | n/e | 1200 | FAIL (obs cheap-kill) | N | KILL |
 | 1010 | 1000s | 2026-06-05 | Round-number / order-cluster reversion long (Osler 2003: take-profit clusters at big-figure "00" levels → bounce off support) — novel structural microstructure mechanism, decorrelated portfolio candidate; FALSIFIED at obs: support-rejection capture only 0.4883 (+0.5pp, drift ~0) sub-0.50, per-pair lift 3/9 >0.50 = NOISE, and the H4 lift EVAPORATES at H1 (0.4746 < base; EURUSD 0.5155→0.4834). Round-number effect arbitraged at H4/H1 like gotobi | N | n/e | n/e | n/e | n/e | n/e | FAIL (obs cheap-kill) | N | KILL |
+| 1013 | 1000s | 2026-06-05 | DEEP multi-factor: failed-breakdown RECLAIM (stop-run reversal) long, USD majors H4 — deep wick that pierces a 40-bar swing low (sweeps stops) + reclaims it + lower-shadow ≥1.25 ATR. **STRONGEST + cleanest directional edge in the corpus** → PORTFOLIO (3rd component). Structure control-proven (same-wick-AT-swing-low cap 0.52-0.61 vs SAME-wick-elsewhere coin-flip + NEG drift; generic wick-reversion dead). Engine IS mean +1.85% (9/10), every exit mean-pos; OOS +0.94% (3/6, mean-POS forward); beats a NEGATIVE same-exit null by +2.96pp (cleanest null in corpus); robust K∈{40,60}×shadow≥1.25 + LOO all+. NOT all-folds-pos (only neg fold = 2018 strong-USD regime; OOS neg 2022/25 same signature). POSITIVE in 2015/16/20 → the arc-2006 regime-orthogonal 3rd leg | N | N | -4.20% | -2.76% | 4.87% | 172 | FAIL → PORTFOLIO | N | PORTFOLIO |
 | 3008 | 3000s | 2026-06-05 | Month-end London-4pm-fix flow dislocation-and-reversion long (buy abnormal DOWN-push into the 16:00 WM/Reuters fix on the last weekday of month, bet post-fix reversion) — arc-1010's last named discrete-flow lane; REAL & month-end-specific (corr −0.121 vs −0.035 non-ME; big-down-push +4.3bp/2h frac+ .576) and BEATS the fair null (−0.28% vs −0.73%, 9/10 neg) but SUB-COST: best of 8 exit/SL×threshold cells (stop-removed time3) is −0.22 to −0.28% IS-mean, none all-folds-positive; H1 cost-in-R (1R≈H4-ATR) ~2× taxes the +0.12R/3h drift; 4th flow effect real-but-uncapturable (gotobi/round-no/triangulation). OOS preserved | N | n/e (OOS preserved) | -0.22% (best, stop-removed N=3 thr0.25) | n/e | 1.41% (stop-removed) | 160 | FAIL → KILL | N | KILL |
 | 3007 | 3000s | 2026-06-05 | Intraday-SPREAD cost-timing lever on EDGE<COST (restrict cross-trend +gross signal to tightest-spread hours to cut cost — the one untried cost lever, arc 1003/1004) — BACKFIRES: spread×edge entangled, tight-spread/liquid hours have WEAKEST (negative −0.02R) gross edge; only +gross bucket is mid-spread (+0.12R) which nets ≤0 SL-honest (triage mean −0.02%, not all-folds-pos on friendly yrs). Cannot cut cost w/o cutting edge | N | n/e | -0.13% (mid-spread triage) | n/e | 0.14% | 2955 | FAIL → KILL | N | KILL |
 | 1011 | 1000s | 2026-06-05 | Month-end reversion long, USD majors (big DOWN move into month-end reverses — WMR-fix mechanical rebalancing over-extension; D1, ~2-bar time exit) — **2nd net-positive DECORRELATED long-only component**. MECHANISM-CONTROLLED: month-end vs random-day +0.249 ATR EXCESS (generic reversion NEGATIVE −0.063 → timing is causal). IS mean +0.23% (sl_only 2-bar), beats fair null +0.56pp, threshold-robust (0.75–1.5), leave-one-pair-out all+; but 7/10 folds → NOT all-folds-pos. Corr +0.117 vs arc 1006 → portfolio thread ACTIVE | N | n/e (OOS preserved) | -1.14% | n/e | n/e | 121 | FAIL → PORTFOLIO | N | PORTFOLIO |
@@ -1458,3 +1459,82 @@ shorts target.
 stronger leg — here the climax-sweep SHORT) + the standing `A1Config.time_exit_bars`-unwired flag (arcs
 1005/3004; worked around via the BUILT `make_time_exit_predicate`). Drivers scratch
 `_disco2000_work/arc2007_observe.py`, `arc2007_observe2.py`, `arc2007_wfo.py` (reproducible from the arc doc).
+
+### arc_1013
+
+**DEEP multi-factor directional — failed-breakdown RECLAIM (stop-run reversal) long** (chat 1000s; the
+DEEP-arc dispatch). Full record: [`arcs/arc_1013_failed_breakdown_reclaim_long.md`](arcs/arc_1013_failed_breakdown_reclaim_long.md).
+PORTFOLIO record: [`portfolio-candidates/arc_1013_failed_breakdown_reclaim_long/`](portfolio-candidates/arc_1013_failed_breakdown_reclaim_long/).
+No council (PORTFOLIO, not a PASS survivor — arc-1011 precedent).
+
+**Idea + why (ideation shown, per dispatch).** The shallow single-trigger directional slice is closed
+(25 arcs: direction ≈ coin-flip, instrument/TF/metric-invariant). The OPEN frontier (§5a carve-out) is
+DEEP, multi-factor directional. Structural *because*: resting sell-stops cluster below visible swing lows;
+a bar that PIERCES a K-bar swing low (sweeps the stops) and CLOSES BACK ABOVE it (failed breakdown) with a
+large rejection wick is a **stop-run / liquidity grab** — the down-move was liquidity-driven, not
+informational, and the **reclaim confirms the adverse excursion is OVER *at entry*** (the mechanistic fix to
+the capturability wall that killed every prior reversion — gap-fill/RSI/month-end-fix all entered INTO the
+adverse move, arcs 2001/2002/3000/3001/3008). Distinct from the closed corpus: the **inverse of arc 3006**
+(break-and-HOLD continuation → break-and-FAIL reversal), NOT indicator-reversion (3000/3001), and unlike
+arc 0's bare pierce-the-dip the **reclaim + conjunction** is the whole point.
+
+**What happened — the data led, and inverted my priors.** Observation (7 USD majors, H4, IS; base cap
+0.4860): the bare reclaim ≈ coin-flip. My hypothesised session + D1-uptrend conjunctions FAILED/INVERTED
+(reclaim is BETTER when D1 ≤ SMA50, not in an uptrend; session = noise). But DEPTH separated, inverted from
+my guess: a wick that spikes >1 ATR below a 40-bar swing low and still reclaims captures **0.55–0.61**, broad
+across 6–7/7 pairs, both lenses agreeing — the strongest directional capture in the corpus. **DECISIVE
+CONTROL** (arc-1011 discipline): a same-magnitude rejection wick AT a swept swing low captures 0.52→0.61,
+the SAME wick elsewhere stays a coin-flip (~0.49–0.51) with NEGATIVE drift, and the excess GROWS with
+rejection size → the **structure is the mechanism, not the generic wick** (generic deep-down reversion is
+dead). Honest engine (committed IS config K=40, shadow≥1.25, sl_plus_trailing_atr, SL=2.0): **IS mean
++1.854%, 9/10 folds positive** (only 2018 neg), and **EVERY exit is mean-positive** (+0.83% to +1.85% —
+unprecedented for a directional long). Soundness: fair same-exit NULL is firmly NEGATIVE (−1.107% avg, 3
+seeds) → real **beats null by +2.96pp** (cleanest null in the corpus); robust across K∈{40,60}×shadow≥1.25
+(shadow=1.0 dilutes — the rejection gate is load-bearing); leave-one-pair-out positive dropping any pair.
+**One-shot frozen OOS (2021+): mean +0.936%, 3/6 positive — mean-POSITIVE forward** (the edge persists,
+where arc 2005 died OOS). NOT all-folds-positive (IS 2018; OOS 2022/25) — the negatives cluster in
+persistent strong-USD/risk-off years where breakdowns are real, not swept (arc-1012-class regime drag, not
+fished).
+
+**Verdict: FAIL the sole judge → PORTFOLIO.** The strongest, cleanest, most-robust directional long in the
+corpus (IS +1.85% vs gap-fill +0.69% / month-end +0.23%; the only one to beat a NEGATIVE null and survive
+OOS mean-positive), but not all-folds-positive → the **3rd PORTFOLIO component**, of a NEW mechanism family
+(structural stop-run reversal vs the two flow-event reversions).
+
+**Convergence with arc 2007 (chat 2000s, landed concurrently) — the decisive mechanistic split.** The
+2000s chat independently built the SAME family (DEEP liquidity-sweep reversal long) and reached **KILL**
+(loses to the fair null) — its construction conditioned on a **fast 3-bar drop + climax**, i.e. it ENTERED
+AFTER a multi-bar plunge (buying into weakness, sitting in the adverse excursion → take-the-loss converts
+the fat MAE tail into −1R losers worse than random; the arc-2001/2004 reversion stop-tax). Mine reaches
+**PORTFOLIO** because the **same-bar rejection wick** means the reversal ALREADY happened within the signal
+bar — the i+1 entry lands AFTER the low, not inside the drop — and the **shadow≥1.25 gate + structure
+control** prove the edge is the reclaim of a swept level, not "buy a fast drop." **Two chats, two
+constructions of the same idea, opposite verdicts: the load-bearing distinction is WHEN you enter relative
+to the adverse excursion** (same-bar confirmation = PORTFOLIO; after-the-drop = worse-than-null KILL).
+Arc 2007 also found the *climax* sweep is a falling-knife SHORT edge (FLAG-1) — consistent with my dropping
+the deep-but-non-reclaiming bars.
+
+**Threads / lessons.** (1) **DEPTH was the missing axis — the dispatch's thesis confirmed.** The shallow
+slice hid a deep-tail structural edge; the multi-factor conjunction (swing-low structure × pierce-reclaim
+sequence × deep-rejection magnitude) reaches cap 0.55–0.61 where every shallow single-trigger cut was 0.49.
+"Deep, not broad." (2) **The RECLAIM fixes the capturability wall** — the first reversion whose honest i+1
+entry is mean-positive net of cost, because the confirmation lands AFTER the adverse move (the structural
+answer to arcs 2001/2002/3008). (3) **My session/MTF priors were wrong and the data inverted them** —
+develop-on-IS-let-data-lead earned its keep; DEPTH, which I'd guessed was "informational/down-weighted,"
+was the real conditioner. (4) **Cleanest null in the corpus** (real beats a −1.1% null by +2.96pp) — a
+genuine directional structural edge, not the exit/drift artifacts that thinned the flow components (cf. arc
+1009's gap-fill null was *positive*). (5) **The high-value 3rd component (arc-2006 spec):** positive in
+2015/16/20 — three of the four years the 2-way book bled — sharing only 2018. A 3-way combination (the
+2000s' arc-2006 machinery) should cut the book's mutually-negative folds from four to ≈one (2018). **HIGH-VALUE
+fleet steer for the 2000s range: run the 3-way combination WFO** (gap-fill 1006 + month-end 1011 + this),
+ranking by ROI on the 2-way book's negative folds, gated all-folds-positive on the combined book. (6) **The
+named regime weakness** (persistent strong-USD trend years 2018/2022/2025 where breakdowns are real) is the
+honest open thread: a pre-registered, causal regime filter (NOT fished to flip 2018) could in principle lift
+it toward all-folds-positive — a fresh arc, the arc-1012 trap explicitly avoided.
+
+**Tooling:** built + registered `discovery/tools/failed_breakdown_signals.py :: FailedBreakdownReclaimLongSignal`
+(EXPERIMENT signal — mask + ATR geometry only; scoring canonical). TOOL_REGISTRY BUILT updated.
+
+**FLAGS (code not merged):** none requiring the canonical core. Carries the standing `A1Config.time_exit_bars`
+-unwired flag (arcs 1005/3004; worked around via the BUILT `make_time_exit_predicate`). Drivers scratch
+`_disco_work/arc1013_*.py` (reproducible from the arc doc; obs cached `_disco_work/obs_h4_usd.parquet`).

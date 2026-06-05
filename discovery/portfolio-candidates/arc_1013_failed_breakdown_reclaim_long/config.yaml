@@ -1,0 +1,68 @@
+# PORTFOLIO-CANDIDATE config record — arc 1013 (failed-breakdown reclaim long, USD majors).
+# Produced live by arc 1013 (NOT transcribed). Turnkey-reproducible: the signal is the registered
+# FailedBreakdownReclaimLongSignal (discovery/tools/failed_breakdown_signals.py).
+
+arc_id: 1013
+name: arc_1013_failed_breakdown_reclaim_long
+disposition: PORTFOLIO          # mean-positive net of costs IS+OOS, NOT all-folds-positive (protocol §11)
+verdict: FAIL                   # the sole judge (all-folds-positive IS AND OOS) — failed IS (9/10) AND OOS (3/6)
+
+signal:
+  mechanism: >
+    Failed-breakdown RECLAIM (stop-run reversal). Resting sell-stops cluster below visible swing lows;
+    a bar that PIERCES a K-bar swing low (sweeps the stops) and CLOSES BACK ABOVE it (the breakdown
+    FAILED) with a LARGE lower rejection shadow is a liquidity grab — the down-move was liquidity-driven,
+    not informational, and the reclaim confirms the adverse excursion is OVER *at entry* (the fix to the
+    gap-fill capturability wall, arcs 2001/2002, which entered INSIDE the continuation). Control-proven
+    the STRUCTURE is load-bearing (not generic wick-bounce, which is dead 3000/3001): a same-magnitude
+    rejection wick AT a swept swing low captures 0.52-0.61, the SAME wick elsewhere stays a coin-flip
+    ~0.49-0.51 with negative drift; the structure excess grows with rejection size.
+  direction: long
+  universe: [EURUSD, GBPUSD, AUDUSD, NZDUSD, USDCAD, USDCHF, USDJPY]   # 7 USD majors
+  timeframe: H4
+  boundary_convention: 5ers_eet
+  swing_lookback_K: 40                                   # prior K-bar min low = low_bid.shift(1).rolling(40).min()
+  entry_trigger: >
+    fire at bar i when (low_bid[i] < prior_low) AND (close_mid[i] > prior_low) AND
+    (min(open_mid,close_mid)[i] - low_bid[i])/ATR >= 1.25     # pierced + reclaimed + deep rejection shadow
+  min_shadow_atr: 1.25                                   # rejection-strength gate (robust sweet spot; 1.0 dilutes)
+  entry_fill: next-bar open                              # ex-ante: swing low shift1, pierce/reclaim/shadow read bar i; ATR shift1
+  registered_signal: "discovery/tools/failed_breakdown_signals.py :: FailedBreakdownReclaimLongSignal(swing_lookback=40, min_shadow_atr=1.25)"
+
+exit:
+  type: registry
+  exit_policy: sl_plus_trailing_atr                      # best mean on IS; ALL exits were mean-positive (robust choice)
+  note: "every registry exit + time-exit was mean-POSITIVE on IS (+0.83% to +1.85%); trailing_atr best (1/10 neg)"
+
+risk:
+  sl: 2.0 ATR                                            # SL = signal-bar close - 2*ATR
+  atr: "wilder_atr(mid, 14).shift(1)"                    # canonical, ex-ante
+  risk_pct: 0.005
+
+window:
+  is: [2010-01-01, 2020-12-31]
+  oos: "2021-01-01 .. present (per-year folds) — MEASURED ONCE, frozen (committed IS config; NOT tuned to OOS, §4)"
+
+engine:                                                  # all CANONICAL / LOCKED (called, never re-rolled)
+  scorer: "MultiPairBacktester (SL-first, take-the-loss)"
+  architecture: "A1Architecture + ArcFoldRunner"
+  costs: "FundedNext (1.5x spread, 0.5 pip/fill slippage, $5/lot RT, no swaps), ON"
+  cost_chokepoint: build_fold_stats_from_run
+  is_folds: "build_v3_folds (IS folds, is_days >= 365) -> 10 folds"
+  oos_folds: "build_oos_year_folds(start_year=2021)"
+  judge: judge_all_folds_positive
+  null_baseline: "discovery/tools/null_entry_baseline.py :: build_null_signal_evaluation"
+
+results_summary:
+  is_mean_fold_roi: +0.01854         # +1.854%, 9/10 folds positive (only 2018 negative)
+  oos_mean_fold_roi: +0.00936        # +0.936%, 3/6 folds positive (mean-positive forward)
+  null_avg: -0.01107                 # random-entry, matched fire-rate, SAME exit -> NEGATIVE
+  null_excess_pp: +2.96              # real beats null by +2.96pp (decisive)
+  n_trades_is: 172                   # K=40 shadow>=1.25 over IS (pool floor PASS)
+
+reproduction: >
+  PYTHONPATH=. py _disco_work/arc1013_wfo.py (exit menu) ; arc1013_null_robust.py (null + K/shadow grid) ;
+  arc1013_oos.py (one-shot OOS + per-fold) ; arc1013_loo.py (leave-one-pair-out) ;
+  arc1013_observe.py / arc1013_refine.py / arc1013_control.py (observation + structure control).
+  Drivers are scratch (_disco_work/) and reproducible from the arc doc; the SIGNAL is committed + registered
+  (FailedBreakdownReclaimLongSignal). histdata_root = C:\Users\panap\histdata_backup.

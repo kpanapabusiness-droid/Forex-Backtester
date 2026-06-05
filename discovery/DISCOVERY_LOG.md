@@ -60,8 +60,9 @@ at arc step (i).
 | 2014 | 2000s | 2026-06-05 | **Failed-breakdown reclaim long × downtrend-regime GATE** — improve the corpus's strongest edge (arc 1013, IS 9/10, ONLY 2018 neg) toward a SOLO PASS by conditioning OUT the strong-USD regime with a PRE-REGISTERED downtrend-STRENGTH/PERSISTENCE gate (the one conditioner obs#3's binary D1≤SMA50 + arc-3013's level-variants never tried; arc-1013 thread #5's open refinement). FALSIFIED at obs (no engine/null/council). **Hypothesis INVERTED:** strong-SMA200-down-slope is the BEST bucket (+0.218, n103, reclaim bounces sharpest when stretched down), mild-down NEG (−0.245); edge strongest in BALANCED context (near-SMA200 +0.397) — a mean-reversion-when-not-trending-up texture, not a 2018 separator. **Decisive: 2018 is NOT regime-separable — it's a near-total wipeout** (18/19 trades −1R; **6/7 pairs 100% −1R**; both "best-context" 2018 trades −1.00; gate drops 58% of 2018 fires yet kept trades still −0.69). Only non-loser = USDJPY (+0.24, n2 — the lone USD-aligned pair) but ~2 trades/yr = un-scalable (arc-1017 mode). Any gate removing the neg pockets (consec_below200>100 −0.30; mild-down) DESTROYS good folds (2012 +1.14→−0.09, 2013→−0.31, 2019→−0.47, 2020→+0.12). **NEW lesson: 1013's 2018 drag is mechanism-intrinsic & entry-time-UNCONDITIONABLE** (in risk-off the failed breakdown becomes a real breakdown, reclaim doesn't hold) — independently re-confirms 1013/3013 via a new conditioner; closes the "improve 1013 toward solo-PASS" lane. 1013 UNCHANGED (still PORTFOLIO); route's 2018 wall stands (arc-3004 escalation reinforced) | N | n/e | n/e | n/e | n/e | 237 (obs) | FAIL (obs cheap-kill) | N | KILL |
 | 1018 | 1000s | 2026-06-05 | **Weekend gap-FILL long on USD-NEUTRAL crosses** (EURGBP/AUDNZD/GBPCHF/AUDCAD/NZDCAD) — target the (+2015,+2018) 4th leg via a NEW principle: **decorrelation from the USD regime** (apply the proven gap-fill mechanism 1006 to crosses whose gaps are intra-bloc-news-driven, not USD-driven) rather than predicting the regime (9 routes failed). FALSIFIED at obs (H4, IS, down-gap≥0.5ATR, i+1 fill): **no robust fill edge** — cap **0.4881 (coin-flip ≈ base)**, fill drift mean +0.078 but **median 0.000** (thin-tail artifact, 2011 tell); EURGBP (cleanest USD-neutral) drift −0.014≈0. **Acceptance test FAILS: 2018 drift −0.085 (cap 0.500, NEG); 2015 +0.390 (cap 0.525 barely >coin-flip)** — USD-neutrality gave noise, not +2018. **Lesson: the gap-fill edge is JPY-cross-SPECIFIC (carry/USD-related), NOT a universal weekend-gap property — USD-neutral gaps are efficient/random-walk; removing the USD/carry exposure that makes 2015/2018 negative ALSO removes the edge (edge & tail are the SAME exposure → net-zero, can't diversify a book, §11).** 10th dead route to the 2018 leg; closes the "USD-neutral net-positive fade" sub-route. No engine/null/council. OOS untouched | N | n/e | n/e | n/e | n/e | 463 obs | KILL (obs cheap-kill) | N | KILL |
 | 2013 | 2000s | 2026-06-05 | **Weekend UP-gap weekend SHORT, JPY crosses** (the gap-fill's "stronger leg", arc 2001/2003 FLAG-1; 1015's named 2018-leg candidate) — the up-gap reverting DOWN, mirror of the 1006 down-gap LONG. **CONVERGES with independent 1000s arc 1016 → KILL.** **FIRST end-to-end SHORT engine run** — validates the merged PR #273 short path (pool builds sign-correctly, costs net symmetrically, no canonical change). Obs: honest i+1 short capture clears 0.50 only in a single fragile band (≥1.0 cap 0.518/drift +0.08/median +0.146) — but **≥0.5 median −0.115, ≥1.5 INVERTS −0.22, drop-AUDJPY → −0.107** (1016 independently got cap 0.448/drift −0.093). §5f honest engine (non-coin-flip at ≥1.0, so engine-run required): mean-positive under overshoot exits (trailing_atr **+0.745%** IS, beats random-ANY-bar null +1.74%) BUT **NOT all-folds-positive (5/10 neg)** and the positive mean is **THIN REGIME-LUCK — excluding 2018(+5.08,n8)+2019(+5.92,n10) the other 8 folds avg −0.44%** (net-neg); fails the 2015 half of the spec (−0.57). Diagnosis: arc-2001's −0.57 ATR was the untradeable gap-bar-OPEN (hindsight); by i+1 reversion is spent (backward-confirming, arc 1014) + JPY-basket up-drift taxes the short. Real-but-regime-luck = KILL not PORTFOLIO (Arc-10 defense: independent reproduction + fold-decomposition caught the thin-fold over-claim). 2018-leg unfound in EVERY short (1014/2009/2011/3011 structure, 3010 trend, 1016/2013 flow, 3012 vol, 2012 cont-long). OOS preserved | N | n/e (OOS preserved) | -3.18% (best-exit IS worst-fold) | n/e | n/e | 137 | FAIL → KILL (regime-luck, converges 1016) | N | KILL |
+| 1019 | 1000s | 2026-06-05 | **Month-end reversion SHORT** (the untested direction-mirror of the proven long `me`, arc 1011) — a big UP move into month-end REVERTS DOWN (same WMR-fix inelastic-rebalancing flow, short side), targeting the strong-USD binding folds 2015 & 2018. **The 4th net-positive component AND the FIRST one robustly positive in 2018** — the wall that blocked the 3-way book (1015/2008/3009) and killed ~12 prior routes. Obs: month-end up-move ≥+1 ATR short drift +0.075 (median +0.096 = NOT thin-tail), **month-end excess +0.089 ATR** vs random-day control, honest short **capture 0.5508 >0.50 (first corpus short to clear it)**, 2018 capture 0.818. Engine §5f: **mean-positive net of costs under EVERY exit** (sl_only-2bar +0.043% → partial-runner **+0.683%, 7/10**), **beats fair null +0.80pp** (5/10 vs 2/10). **2018 robustly positive** (every exit-except-tp2r, every thr 0.75–1.5, every leave-one-pair-out drop +0.59..+1.99); **2015 fragile** (thr ≤1.0, GBPUSD-leaning). corr +0.157 vs me-long, regime-complementary (short 2015 +0.40 where me-long −1.14). NOT all-folds-positive (7/10) → PORTFOLIO. 4-way combination = gated next arc 1020. OOS preserved | N | n/e (OOS preserved) | -0.91% (best-exit partial-runner) | n/e | n/e | 116 | FAIL → PORTFOLIO | N | PORTFOLIO |
 | 3015 | 3000s | 2026-06-05 | **End-of-week (Friday) position-squaring reversion** — is there a WEEKLY analog of the month-end leg (`me`, arc 1011, the one demonstrably 2018-positive mechanical-flow reversion)? Does mechanical reversion concentrate at the end-of-week squaring boundary, positive in 2015 & 2018? FALSIFIED at obs (D1, 7 USD majors, big-down-move→buy by day-of-week). **NO day-of-week concentrates reversion** — Friday cap **0.502 / drift −0.045** (vs the month-end subset of the SAME setup cap 0.511 / drift +0.193, reproducing `me`). **2015/2018 acceptance FAILS** (2018 cap 0.421/−0.346 robustly neg; 2015 cap 0.417/med −0.51); per-pair = USD-quote-beta split (4/7 = noise, arc-2009/3012 tell); best-version sweep thins below pool floor before turning + (thr1.5 "positive" rests on 2&5 samples = thin-tail). Diagnosis: `me` survives 2018 via the **hard inelastic WMR/index rebalancing mandate unique to month-end** — the weekly boundary has no forced-rebalancing driver → the calendar-flow reversion edge does NOT generalize down the calendar hierarchy (month-end ≠ week-end). **9th dead route to the 2018 leg**; the mechanical-flow well is dry at the weekly scale. No engine/null/council spent | n/e | n/e | n/e | n/e | n/e | 4225 down-move obs (261 Fri) | KILL (obs cheap-kill) | N | KILL |
-| 3017 | 3000s | 2026-06-05 | **Month-End Reversion SHORT** — the unharvested symmetric mirror of arc 1011 (sell a big UP move into month-end, bet post-fix rebalancing reversion DOWN), aimed at the precise 2015 & 2018-positive 4th-portfolio-leg spec (1015/2008/3009). **FIRST short in the corpus to clear >0.50 capture (0.5508) WITH a passing structure control** (+0.0996 ATR month-end excess; generic big-UP *continues* up −0.041 → timing load-bearing, mechanism direction-symmetric, strengthens 1011) AND lean the RIGHT WAY (obs 2015 drift +0.437/2018 cap 0.818). Every prior short died on sign/capture (<0.50: 1014/2011/3011/1016) or failed control (2009/3010/3012) — this one gets the SIGN right. But on the honest engine §5f (exit menu × SL): **0/9 exits all-folds-positive** (best 7/10 sl_partial_runner), mean **+0.007%** (~30× below 1011 long's +0.23%), beats the fair same-side null by only **+0.012pp = NOISE FLOOR** (~30× below 1006's +0.36pp, below even 1017's +0.044pp). Robustness-fragile (drop-top-2-pairs GBPUSD+USDJPY → capture 0.4605/drift −0.027, arc-2011 tell). **Un-scalable (arc-1017 mode):** gross +0.171R (HIGHER than 1011 long's +0.064R) but net ≈0 — winning fires cluster on simultaneous USDXXX month-end up-extensions in strong-USD years (10 dates ≥3 fires, concentrated 2011/12/14/**2018**) → the 2-per-USD exposure cap erodes precisely the clustered winners. **NEW lesson: the 2018-leg hunt has found a candidate with the RIGHT SIGN + a REAL control-passing mechanism that STILL fails — on MAGNITUDE not sign. The strong-USD-year reversion well is inherently tiny + USD-exposure-capped → a correctly-signed mechanism-real 4th leg is sub-cost; the route's 2018 wall is a MAGNITUDE/scale wall, not only a sign wall.** 11th dead route to the 2018 leg (strongest-signed). OOS preserved. | N | n/e (OOS preserved) | -0.009% (best-exit partial_runner worst-fold) | n/e | ~0.05% | 116 | FAIL → KILL (sub-cost, noise-floor null, un-scalable) | N | KILL |
+| 3017 | 3000s | 2026-06-05 | **Month-End Reversion SHORT — INDEPENDENT REPRODUCTION of arc 1019** (concurrent same-idea convergence; Arc-10 defense). Sell a big UP move into month-end, bet post-fix rebalancing reversion DOWN — the unharvested SHORT side of `me` (1011), aimed at the 2015 & 2018-positive 4th-leg spec. **Signal REPRODUCES 1019 exactly** (pool n=116, gross +0.1713, capture **0.5508 >0.50** first corpus short, month-end structure-control excess **+0.0996 ATR**, 2015 drift +0.437/2018 cap 0.818; linear-regime partial-runner 7/10, 2015 +, 2018 +, beats null). **My initial KILL was an ERROR — RETRACTED → PORTFOLIO** (deferring to 1019's folder; not duplicated). The error: I passed `A1Config.risk_pct=0.005` (the `ArcPoolConfig` FRACTION) but **`A1Config.risk_pct` is in PERCENT (0.5=0.5%)** → every per-fold ROI 100×-compressed; I then misjudged the compressed real-vs-null margin (+0.012pp) against the corpus's uncompressed benchmarks (+0.36pp) as "noise floor." The **scale-INVARIANT** judgments (fold-sign pattern, real>null) agreed with 1019 all along. **TWO FLAGs (code human-gated, not patched): (1)** the `risk_pct` PERCENT-vs-FRACTION unit split between A1Config & ArcPoolConfig (A1Config default 0.005 = 0.005% silently 100×-low; the registry entry-point omits risk_pct → copies inherit the trap) — pin the canonical discovery risk_pct; **(2)** the daily-DD cap makes per-fold ROI NONLINEAR in risk_pct — at risk 0.5 the partial-runner fold-SIGNS flip (2015/2018 NEGATIVE, blow through the 5% cap) vs low-risk 7/10/2015+/2018+ → **the all-folds-positive / 2015-2018 verdict for this thin, USD-concurrency-clustered short is risk-convention-DEPENDENT**; the gated 4-way combo (arc 1020) must report risk-sensitivity, not a single-risk number. **Lesson: independent reproduction caught a 100× apparatus discrepancy → traced to a measurement convention, not the signal; scale-invariant metrics are the trustworthy cross-config judges.** OOS preserved. | N | n/e (OOS preserved) | +0.004% (linear-regime partial-runner 2015; risk-convention-dependent) | n/e | n/e | 116 | PORTFOLIO (independent reproduction confirms arc 1019; KILL retracted; risk_pct FLAG) | N | PORTFOLIO |
 | 3016 | 3000s | 2026-06-05 | **Intraday session structure: Asian-range / London-open break** (continue OR fade) — the single genuinely-UNMAPPED data modality (every prior arc is H4/D1/W1 daily-scale or calendar-flow; arc 1000 only did H4 hour-CONDITIONING, not a session-RANGE construction). DST-clean (Europe/London) Asian range × first London-open break, H1 majors. FALSIFIED at obs: **the break does NOT continue** (long-cont cap **0.375**/drift −0.116, short-cont 0.396/−0.039) AND **does NOT cleanly fade** — the naive `1−cont_cap≈0.62` is an asymmetric-SL artifact; the fade's OWN honest capture is **0.386** (short up-break) / 0.383 (long down-break): cont 0.375 + fade 0.386 = 0.76 < 1 = the break entry is a **high-vol London-open WHIPSAW point where a 2·ATR SL is hit BOTH ways**. Net fade drift after entry spread (~0.08 ATR) is **~+0.02R ≈ 0**, ~10× below the ~0.125R H1 cost (~2× H4). Only positive cell EURUSD +0.19 = **1/4 pairs (single-pair noise tell)**; 2015 (+0.174)/2018 (+0.251) drift-positive but inside cap 0.385/0.433 (<0.50) → won't survive engine (arc-3004/3012 "+drift inside sub-0.50 capture collapses SL-honest"). **Intraday session structure is sub-cost — extends the H1 cost wall (1008/3008/1010) from discrete-flow events to session-RANGE; the last unmapped modality mapped dead.** Reusable caution: `1−cont_cap ≠ fade capture` (asymmetric SL). No engine/null/council spent | n/e | n/e | n/e | n/e | n/e | 7983 IS break obs | KILL (obs cheap-kill) | N | KILL |
 
 ---
@@ -2789,6 +2790,65 @@ into-move / month-end are one-off scratch conditioners. Drivers
 **FLAGS (code not merged):** none. No canonical-core change. Carries standing FLAG-1 + the
 `A1Config.time_exit_bars`-unwired flag.
 
+### arc_1019
+
+**Month-End Reversion SHORT** (chat 1000–1999). Full record:
+[`arcs/arc_1019_month_end_reversion_short.md`](arcs/arc_1019_month_end_reversion_short.md); PORTFOLIO
+candidate dossier [`portfolio-candidates/arc_1019_month_end_reversion_short/`](portfolio-candidates/arc_1019_month_end_reversion_short/).
+
+**Idea + because.** The route is blocked at 2018 (and 2015) — the 3-way book (gap 1006 + me-long 1011 +
+fbr 1013) is provably un-passable (0/5151 convex weightings; 2018 positive only in the weak me-long, 2015
+only in fbr, mutually exclusive). ~12 routes to a 2018-positive leg died. The ONE survivor of the 2018 hunt
+is `me` (month-end mechanical/inelastic-rebalancing reversion), 2018-positive via the WMR/index rebalancing
+mandate. **The gap nobody had tested: `me` (arc 1011) tested only the long/DOWN side and is 2015-negative;
+the SHORT side of the same flow was never run.** Because the WMR-fix rebalancing reverts BOTH directions, the
+short (fade a big UP move into month-end) should be positive precisely in strong-USD years — there a big up
+move into month-end on a USD major is a counter-trend bounce that mechanical reversion + trend-resumption
+pushes back down. NOT a structural coin-flip short (which died by symmetry, 1014/2009/2011): the flow is real
+and directional-agnostic, and `me` already proved its timing load-bearing.
+
+**What happened.** Built + registered `MonthEndReversionShortSignal` (direction-mirror of the 1011 long).
+Observation (D1, 7 USD majors, IS): month-end up-move ≥+1 ATR → short drift +0.075 (median +0.096 → NOT a
+thin-tail artifact, the tell that killed 2011/3012/3014); **month-end excess +0.089 ATR** over the random-day
+control (timing load-bearing); honest short **capture 0.5508 — the FIRST corpus short to clear 0.50** (every
+prior short sub-0.50: 1014 .489, 2011/3011 .473, 1016 .448). **2018 capture 0.818.** Both binding folds
+gross-positive (2015 +0.464, 2018 +0.365, both frac .727). Honest engine §5f (exit menu swept): mean-positive
+net of FundedNext costs under EVERY exit (sl_only-2bar +0.043% → sl_partial_close_1r_runner_trail **+0.683%,
+7/10, worst −0.91%**); **beats the fair same-exit null by +0.80pp** (5/10 vs 2/10). NOT all-folds-positive →
+**PORTFOLIO**.
+
+**Robustness / the honest split.** **2018 is the robust leg** — positive under every exit (except tp_2r),
+every threshold 0.75–1.5 (+0.68 to +1.72), and every leave-one-pair-out drop (+0.59 to +1.99). **2015 is
+fragile** — positive only at threshold ≤1.0 and collapses when GBPUSD is dropped (drop-GBPUSD: mean −0.016%,
+2015 −0.16). For the portfolio this is acceptable: 2015 is already strongly handled by fbr (+3.17), so this
+component's unique value is the **robust 2018 contributor that only the weak me-long previously provided.**
+
+**Decorrelation.** corr +0.157 vs me-long (near-zero); cannot co-fire (up vs down move); opposite pairs
+(short = EUR/GBP/JPY/CAD-driven, long = AUD/NZD-driven); **regime-complementary on 2015** (short +0.40 where
+me-long −1.14), both 2018-positive. This is the regime-orthogonality the 3-way book lacked.
+
+**Threads / lessons.** (1) **The proven long mechanical-flow edge `me` has a real, mechanism-controlled,
+null-beating SHORT mirror** — found by applying the winning calendar-flow template to the now-open short side,
+not by predicting the regime (the 10 failed routes' approach). (2) **A mechanical/inelastic flow is the only
+construction that has produced a robustly 2018-positive leg** — both directions of month-end rebalancing
+work; the failed 2018 routes were all directional/structural/trend bets (coin-flip in a strong trend),
+whereas the flow is regime-agnostic. (3) **The directional asymmetry of `me` (long 2015-neg, short
+2015/2018-pos) is a quote-convention + trend-interaction effect:** in strong-USD years the long's "big down
+move into month-end" IS the trend (continues), while the short's "big up move" is the counter-trend bounce
+(reverts) — so the two sides are naturally regime-complementary, not redundant. (4) **The 4-way combination
+is now the gated next arc (1020):** four net-positive components, and for the first time 2018 has a ROBUST
+contributor (not just the weak me-long +0.90). Whether the convex search now clears all-folds-positive is the
+open question.
+
+**Tooling.** Built + registered `discovery/tools/month_end_signals.py :: MonthEndReversionShortSignal`
+(EXPERIMENT tool — mask + ATR geometry + `Direction.SHORT` only; scoring canonical). Reused BUILT
+`make_time_exit_predicate`, `build_null_signal_evaluation` (direction-aware), `observe_long_capture`
+(direction="short"). Drivers `_disco_work/arc1019_observe_monthend_short.py`, `arc1019_wfo.py`,
+`arc1019_robust.py` (reproducible from the arc doc).
+
+**FLAGS (code not merged):** none requiring the canonical core. Carries the standing
+`A1Config.time_exit_bars`-unwired flag (arcs 1005/1011; worked around via `make_time_exit_predicate`).
+OOS untouched.
 ### arc_3016
 
 **Intraday session structure: Asian-range / London-open break (continue OR fade)** (chat 3000s). Full
@@ -2851,55 +2911,58 @@ dry; remaining arcs are low-EV map-completion until the operator opens a new lev
 
 ### arc_3017
 
-**Month-End Reversion SHORT — the unharvested symmetric mirror of arc 1011.** Full record:
-[`arcs/arc_3017_month_end_reversion_short.md`](arcs/arc_3017_month_end_reversion_short.md).
+**Month-End Reversion SHORT — INDEPENDENT REPRODUCTION of arc 1019 (Arc-10 defense).** Full record:
+[`arcs/arc_3017_month_end_reversion_short.md`](arcs/arc_3017_month_end_reversion_short.md). I formed this idea
+independently (the unharvested SHORT side of `me`/1011, for the 2015 & 2018-positive 4th leg) and ran it
+concurrently with chat 1000s' arc 1019 — genuine convergence, the protocol's cross-check working as designed.
 
-**Idea + because.** The route is exactly one regime-orthogonal component from deployable (1015/2008/3009):
-the 3-way book (gap-fill 1006 + month-end 1011 + failed-breakdown 1013) is provably blocked by {2015, 2018}
-— 2015 positive ONLY via fbr, 2018 positive ONLY via me — so the 4th leg must be positive in BOTH. `me`
-(1011) is the ONE demonstrably 2018-positive mechanism, but only its LONG side is harvested. Month-end
-WMR/index rebalancing is INELASTIC and **direction-symmetric**; the LONG side bleeds 2014/15/16 (USD-bull,
-EURUSD down-moves continue) → the unharvested SHORT side (sell big UP moves into month-end → revert DOWN)
-should fire on USDXXX over-extensions in those very years → candidate 2015 & 2018-positive leg, sharing the
-*validated* 1011 mechanism. Not closed shallow-directional ground; shorts open (PR #273).
+**Idea + because.** The 3-way book (1006+1011+1013) is provably blocked by {2015, 2018} — 2015 positive ONLY
+via fbr, 2018 ONLY via me — so the 4th leg must be positive in BOTH. `me` (1011) is the ONE demonstrably
+2018-positive mechanism, but only its LONG side was harvested. Month-end WMR/index rebalancing is INELASTIC and
+**direction-symmetric**; the LONG side bleeds 2014/15/16 (EURUSD down-moves continue), so the unharvested SHORT
+side (sell big UP moves into month-end → revert DOWN) should fire on USDXXX over-extensions in those years.
 
-**What happened — the most interesting near-miss in the 2018-leg hunt.** This is the FIRST short in the
-corpus to clear **>0.50 capture (0.5508)** with a **PASSING structure control** (month-end excess +0.0996 ATR;
-generic random-day big-UP *continues* up −0.041 = bad for a short). Median drift positive (passes the
-thin-tail test that killed 2011/3011/3012/1018). And it leans the RIGHT WAY: obs 2015 drift **+0.437**, 2018
-capture **0.818**. Every prior short died on SIGN/capture (<0.50: 1014 .489, 2011/3011 .473, 1016 .448) or a
-failed control (2009, 3010 inverts, 3012 2018-neg). The month-end short gets the sign right — confirming the
-month-end mechanism is genuinely direction-symmetric (strengthens 1011's mechanism story).
+**What happened — signal CONFIRMED, then a 100× engine discrepancy.** Observation reproduced 1019 exactly: the
+FIRST short in the corpus to clear **>0.50 capture (0.5508)** with a **PASSING structure control** (month-end
+excess +0.0996 ATR vs 1019's +0.089; generic big-UP continues up −0.041), median drift positive, obs 2015
+drift +0.437 / 2018 capture 0.818. Every prior short died on SIGN/capture (<0.50) or a failed control; this one
+gets the sign right (the month-end mechanism is genuinely direction-symmetric — strengthens 1011). **But my
+first engine WFO read ROI ~100× SMALLER than 1019 and the whole corpus, and I (wrongly) concluded KILL.**
 
-**Why it dies anyway — MAGNITUDE, not sign.** Honest engine §5f (registered exit menu × SL, FundedNext ON):
-**0/9 exits all-folds-positive** (best 7/10 sl_partial_runner), mean **+0.007%** (~30× below 1011 long's
-+0.23%), beats the fair same-side null by only **+0.012pp = the noise floor** (~30× below 1006's +0.36pp,
-below even 1017's +0.044pp). The pool gross mean_final_r is +0.1713R — HIGHER than the 1011 long's +0.0635R —
-yet net engine ROI ≈0. The reason is **un-scalability (arc-1017 mode):** 122 fires on 74 month-end dates, but
-10 dates carry ≥3 simultaneous USDXXX fires concentrated in strong-USD years (2011:6, 2012:7, 2014:6,
-**2018:7**); USD is in all 7 pairs, so the 2-per-USD exposure cap drops the 3rd+ simultaneous fire → it erodes
-precisely the **clustered winning short trades in strong-USD years**. The uncapped pool is 2015/2018-positive;
-the capped, costed engine washes to noise. Robustness already flagged this from the other side: drop-top-2-pairs
-(GBPUSD+USDJPY) collapses capture to 0.4605 / drift −0.027 (arc-2011 pair-mix tell) — the gross edge is
-concentrated and fragile.
+**The error (RETRACTED) + the Arc-10 lesson it forced.** Diagnosis: I passed `A1Config.risk_pct=0.005` — the
+value `ArcPoolConfig` takes as a FRACTION (0.005 = 0.5%) — but **`A1Config.risk_pct` is in PERCENT (0.5 =
+0.5%)**; its default 0.005 means 0.005%. So every per-fold ROI was 100×-compressed. I then compounded it by
+judging the compressed real-vs-null margin (+0.012pp) against the corpus's UNCOMPRESSED benchmarks (1006
++0.36pp) and calling it "noise floor." **The scale-INVARIANT judgments agreed with 1019 the whole time:** at my
+(linear, low-risk) scale the partial-runner was 7/10 with **2015 +0.004% and 2018 +0.009% (both positive) and
+real > null** — the same fold-sign pattern 1019 reports (7/10, 2015+, 2018+, beats null +0.80pp). Confirming
+the 1011-long through my harness (+0.0023% vs 1011's reported +0.23%, exact 100× with matching 7/10 sign
+pattern) nailed it as a harness convention, not the signal.
 
-**Verdict: FAIL → KILL** (§11). Marginally mean-positive (+0.007%) but beats the null by only +0.012pp →
-not a *real* net edge (beating null necessary-but-not-sufficient; 1017 precedent KILLs real-but-sub-cost +
-noise-floor + un-scalable even when "genuinely 2018-positive"). The per-fold magnitudes (~0.01–0.03%) are 30×
-too small to rescue the book's ~−0.77% 2015/2018 deficits; a risk-parity combine would just game the
-artificially-tiny fold-vol (fitting to noise). NOT PORTFOLIO. **OOS NOT touched** (preserve holdout, §4).
+**A second, deeper FLAG.** The per-fold ROI is not merely scaled but RESHAPED by risk_pct through the daily-DD
+cap: at risk 0.5 the partial-runner fold-SIGNS flip (3/10; 2015 −1.07%, 2018 −1.08% — the high-vol strong-USD
+folds blow through the 5% daily cap and truncate), the OPPOSITE of the low-risk 7/10/2015+/2018+. So the
+all-folds-positive / 2015-2018-sign verdict for this thin (n≈116, ~10/yr), USD-concurrency-clustered short is
+**risk_pct-convention-DEPENDENT.** The signal edge is robustly real; the engine *disposition* is only as firm
+as the pinned risk convention.
 
-**Threads / lessons.** (1) **The route's 2018 wall is a MAGNITUDE/scale wall, not only a sign wall** — a
-correctly-signed, control-passing, mechanism-real 4th leg STILL fails because the strong-USD-year reversion
-well is inherently tiny AND USD-exposure-capped. (2) **Any 2015/2018-positive leg that fires on USD pairs in
-strong-USD years hits the same exposure-cap un-scalability (1017 + 3017)** — a structural ceiling on
-USD-clustered strong-USD-year edges; the next 2018-leg attempt should AVOID USD-clustered fires (non-USD
-instruments, or a single-pair non-cascade construction). (3) The month-end mechanism is symmetric and real on
-both sides; only the long side (EUR/commodity pairs, un-capped, larger) was ever big enough to be PORTFOLIO,
-and even that is not deployable. (4) 11th dead route to the 2018 leg, the strongest-signed. Components UNCHANGED
-(1006/1011/1013 still PORTFOLIO).
+**Verdict: PORTFOLIO — independent reproduction CONFIRMS arc 1019; my KILL is RETRACTED.** The component lives
+in 1019's `portfolio-candidates/arc_1019_month_end_reversion_short/`; this arc does not duplicate it. OOS
+preserved (§4).
 
-**FLAGS (code not merged):** none requiring the canonical core. Built + registered
-`discovery/tools/month_end_signals.py :: MonthEndReversionShortSignal` (EXPERIMENT tool — mask + ATR geometry +
-`Direction.SHORT`; scoring canonical). Carries the standing `A1Config.time_exit_bars`-unwired flag (worked
-around via BUILT `make_time_exit_predicate`). Drivers scratch `_disco_work/arc3017_*.py`.
+**FLAGS (code human-gated, NOT patched — §9).** (1) **`A1Config.risk_pct` PERCENT (0.5) vs `ArcPoolConfig`
+FRACTION (0.005); A1Config default 0.005 = 0.005% silently 100×-compresses ROI; the registry standard-entry
+example omits `risk_pct` from A1Config so copies inherit the trap.** Recommend pinning the canonical discovery
+`A1Config.risk_pct` in TOOL_REGISTRY's entry point (or unifying the two configs' units). (2) **The daily-DD cap
+makes per-fold ROI / all-folds-positive / 2015-2018-sign nonlinear in risk_pct** for thin concurrency-clustered
+books — the gated 4-way combination (arc 1020) MUST report risk-sensitivity, not a single-risk number, or it
+repeats the Arc-10 single-config trust.
+
+**Threads / lessons.** (1) **Independent reproduction works exactly as intended** — two chats, same idea, a
+100× engine gap → traced to a measurement convention, not the signal; the signal is confirmed and a real
+apparatus trap is surfaced. (2) **Scale-invariant metrics (fold-sign pattern, real-vs-null in the linear
+regime) are the trustworthy cross-config judges; absolute ROI magnitude is config-fragile** — never judge a
+verdict on an absolute pp-margin compared across configs. (3) The month-end short is the corpus's first
+2018-positive PORTFOLIO short, but flag-don't-celebrate: its engine disposition rests on the risk convention.
+Built/confirmed `discovery/tools/month_end_signals.py :: MonthEndReversionShortSignal` (registry credits arc
+1019 + 3017). Drivers scratch `_disco_work/arc3017_*.py`.

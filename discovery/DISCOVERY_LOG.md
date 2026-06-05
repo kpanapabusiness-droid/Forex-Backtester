@@ -57,6 +57,7 @@ at arc step (i).
 | 3012 | 3000s | 2026-06-05 | **Risk-off vol-EXPANSION SHORT on high-risk-beta majors (AUD/NZD)** — the candidate 2015 **&** 2018-positive 4th PORTFOLIO leg, attacked from the one un-tested conditioner: a realized-vol-EXPANSION (risk-off) trigger (dollar-smile/flight-to-quality *because*; distinct from price-trend 3010 & vol-LEVEL closed-ground). FALSIFIED at obs (H4, AUDUSD/NZDUSD/AUDJPY, direction-aware short): pooled cap **0.5025** (coin-flip) + drift mean **+0.264 / median −0.004** (thin-tail artifact, arc-2011 tell). **Acceptance test FAILS on the BINDING fold:** 2015 strong + (cap 0.654/+0.748) but **2018 robustly NEGATIVE — cap 0.369/−1.17, all 3 pairs agree** (AUDUSD −1.24, NZDUSD −1.09, AUDJPY −0.30). Diagnosis: 2018's vol spikes are **capitulation lows** → short bounces (backward-confirming, arc-2009/1016 mode); 2015's are mid-trend → continues. Vol-EXPANSION confers no directional edge either side (controls cap ~0.50) — symmetric completion of arc-1001 vol-contraction + closed-ground vol-LEVEL: vol = magnitude not direction. 6th dead route to the 2018 leg (structure 1014/2009/2011, trend 3010, flow 1016, continuation-long 2012, now vol-state short); arc-3004 escalation reinforced. No engine/null/council spent | n/e | n/e | n/e | n/e | n/e | ~57k obs | KILL (obs cheap-kill) | N | KILL |
 | 2012 | 2000s | 2026-06-05 | **DEEP multi-factor trend-CONTINUATION long** (1013's forward-confirm property applied to continuation, the one untested face of dispatch item d) — the portfolio's missing 4th leg must be trend/2018-POSITIVE (a continuation long: trend-positive, a LONG so no short-mirror death). Construction: uptrend (close>SMA200 & SMA50>SMA200) × shallow pullback holding the 40-bar higher-low × strong prior impulse (SMA50 slope) × FORWARD-confirm resume (close>prior-high). FALSIFIED at obs (H4 USD majors, IS): cell cap 0.479–0.486 (≤ base 0.486, all <0.50); impulse gate ANTI-predictive (stronger trend → worse, 3003 echo). **Q2 forward-confirm does NOT rescue continuation** (resume −0.105 vs into-dip −0.156, both neg) — mechanism: forward-confirming a REVERSAL (1013) enters BEFORE the move starts (works); a CONTINUATION enters AFTER the bounce (late) → reverts. **Q3 STRUCTURE CONTROL INVERTS (decisive):** FULL conjunction 0.4787/−0.105 WORSE than generic resume-in-uptrend 0.4956/+0.007 — deep trend structure is ANTI-load-bearing (mirror-image of 1013 where structure HELPS). Per-pair 1/7 pos (USDJPY only); **2018 drift −0.233 NEG** → not the trend leg. Closes the deep-continuation-long face: 1013's forward-confirm property is REVERSAL-SPECIFIC; no structural directional bet (long OR short, shallow OR deep) yields the 2018 leg → arc-3004 escalation reinforced | N | n/e | n/e | n/e | n/e | ~121k obs | KILL (obs cheap-kill) | N | KILL |
 | 1017 | 1000s | 2026-06-05 | **Carry-unwind cascade SHORT on JPY crosses** (vol-ignition conditioned) — a genuinely novel risk-off FLOW mechanism for the 2018 leg: leveraged carry force-unwinds in risk-off → JPY bought back → persistent down-cascade; short the vol-expansion big-red IGNITION fired from a built-up carry uptrend (forward-confirming, enters at the START of the unwind, unlike trend-short 3010). REAL structural effect (**structure control PASSES**: in-carry-uptrend drift +0.134 ATR / median +0.068 = continues DOWN vs same big-red bar NOT-in-uptrend median −0.178 = reverts UP) **but sub-cost**: capture coin-flip 0.50, drift on the JPY-cross cost line, **deeper cell INVERTS** (2011/3011 tell). Honest engine §5f (exit menu swept, entry shows gross drift): 5-pair best exit sl_only mean **+0.013%, 4/10 folds pos, NOT all-folds-positive**; beats fair null by only +0.044pp (noise floor, ~10× below 1006's +0.36pp). First-read "2015&2018 both +0.19%" was a **JPY currency-exposure-cap artifact** — all-JPY-quote crosses fire simultaneously in one risk-off cascade, the 2-per-ccy cap guts the clustered fires (uncapped pool 92–109/yr → capped engine 0–3/yr in 2015/16/19). Single-pair (cap removed) best AUDJPY +0.011% 6/10, beats null +0.022pp; NZDJPY dead (+0.0001pp); none all-folds-positive. **NEW lesson: a correlated-cascade signal is structurally un-scalable into a portfolio leg.** 2018 IS genuinely engine-positive (AUDJPY +0.07–0.10%, pool +1.04R — the only short positive in 2018) but tiny/un-scalable + 2015 marginal → KILL. The 2018 leg is now unfound across EVERY route (structure 1014/2009/2011, trend 3010, up-gap flow 1016, rel-value 2010, deep-continuation 2012, carry-unwind flow 1017). OOS preserved | N | n/e (OOS preserved) | +0.011% (AUDJPY best-exit, not AFP) | n/e | ~0.05% | 1204 | FAIL → KILL (sub-cost, un-scalable) | N | KILL |
+| 1018 | 1000s | 2026-06-05 | **Weekend gap-FILL long on USD-NEUTRAL crosses** (EURGBP/AUDNZD/GBPCHF/AUDCAD/NZDCAD) — target the (+2015,+2018) 4th leg via a NEW principle: **decorrelation from the USD regime** (apply the proven gap-fill mechanism 1006 to crosses whose gaps are intra-bloc-news-driven, not USD-driven) rather than predicting the regime (9 routes failed). FALSIFIED at obs (H4, IS, down-gap≥0.5ATR, i+1 fill): **no robust fill edge** — cap **0.4881 (coin-flip ≈ base)**, fill drift mean +0.078 but **median 0.000** (thin-tail artifact, 2011 tell); EURGBP (cleanest USD-neutral) drift −0.014≈0. **Acceptance test FAILS: 2018 drift −0.085 (cap 0.500, NEG); 2015 +0.390 (cap 0.525 barely >coin-flip)** — USD-neutrality gave noise, not +2018. **Lesson: the gap-fill edge is JPY-cross-SPECIFIC (carry/USD-related), NOT a universal weekend-gap property — USD-neutral gaps are efficient/random-walk; removing the USD/carry exposure that makes 2015/2018 negative ALSO removes the edge (edge & tail are the SAME exposure → net-zero, can't diversify a book, §11).** 10th dead route to the 2018 leg; closes the "USD-neutral net-positive fade" sub-route. No engine/null/council. OOS untouched | N | n/e | n/e | n/e | n/e | 463 obs | KILL (obs cheap-kill) | N | KILL |
 
 ---
 
@@ -2565,3 +2566,50 @@ non-price-direction construction (the only un-closed frontier).
 **Tooling:** no new BUILT tool — weekly resample + Donchian convexity is a one-off scratch observer
 (like arc 2000's H4 MFE probe). **FLAGS (code not merged):** none. No canonical-core change. Driver
 `_disco3_work/arc3014_observe_weekly_trend.py` (reproducible from the arc doc).
+
+### arc_1018
+
+**Weekend gap-FILL long on USD-NEUTRAL crosses** (chat 1000s). Full record:
+[`arcs/arc_1018_usdneutral_gapfill.md`](arcs/arc_1018_usdneutral_gapfill.md). No council (a coin-flip-capture /
+median-zero-drift / 2018-negative cell is a decisive observation cheap-kill — arc 1010/1016/2011 discipline).
+
+**Idea + why.** Nine routes that tried to *predict* the strong-USD/risk-off 2015/2018 regime for the missing
+4th portfolio leg all failed. A genuinely different principle: reach the (+2015,+2018) fold profile by
+**decorrelation FROM the USD regime** instead — apply the PROVEN net-positive gap-fill flow mechanism (arc
+1006, JPY crosses) to **USD-NEUTRAL crosses** (EURGBP, AUDNZD, GBPCHF, AUDCAD, NZDCAD) whose weekend gaps are
+intra-bloc-news-driven, not USD-driven. If the fill edge survives there (a flow fade, not a directional bet)
+its fold profile should be orthogonal to the USD regime that kills 1006/1011/1013 in 2015/2018. Not closed
+ground (gap-fill on USD-neutral crosses is untested; arc-3000's closure was a directional reversion *capture*
+cut, not the weekend-gap flow event).
+
+**What happened — FALSIFIED at observation.** Weekend down-gap (≥0.5·ATR) fill long, i+1 entry, 24-bar fill
+drift, H4 IS, 5 USD-neutral crosses (BUILT `observe_long_capture` + the 1006 gap mask). n=463 (thin,
+~8/pair/yr). **No robust fill edge:** cap **0.4881 (coin-flip ≈ the 0.49 base)**, fill drift mean +0.078 ATR
+but **median 0.000** → the positive mean is a thin-tail artifact (the 2011/1010 tell). EURGBP — the cleanest
+USD-neutral, where the decorrelation thesis is strongest — drift **−0.014 ≈ 0** (cap 0.512); per-pair mixed
+(AUDCAD −0.276, NZDCAD +0.152, AUDNZD +0.154, GBPCHF +0.456), median-zero pooled. **Acceptance test FAILS on
+the binding folds:** 2015 +0.390 (cap 0.525, barely >coin-flip) but **2018 −0.085 (cap 0.500, NEGATIVE)** —
+USD-neutrality gave noise, not +2018. Per-year pure noise (2012 +0.92 .. 2019 −1.34).
+
+**Verdict: KILL (observation cheap-kill, §5d).** Cap ≈ base + median fill-drift 0.000 + 2018-negative → no
+robust edge; §5f doesn't bite (sub-0.50/median-zero, no gross drift to bank); no pool/engine/null/council
+spent. OOS untouched.
+
+**Threads / lessons.** (1) **The weekend gap-fill edge is JPY-cross-SPECIFIC (carry/USD-related), NOT a
+universal weekend-gap property.** On USD-neutral crosses the fill drift is coin-flip / median-zero — those
+gaps are efficient/random-walk with no systematic reversion. Sharpens arc 1006/1009: 1006's edge AND its
+null's +0.33% JPY-basket drift both ride JPY-cross carry/USD structure; remove that exposure and the fill
+edge vanishes with it. (2) **Decorrelation-from-USD is NOT a free path to the (+2015,+2018) leg** — removing
+the USD/carry exposure that makes 2015/2018 negative *also* removes the edge; the edge and the tail are the
+SAME exposure. A USD-neutral instrument is decorrelated from the blockers but net-zero (can't diversify a
+book positive, §11 / arcs 3000/3001). Closes the "USD-neutral net-positive fade" sub-route: net-positive FX
+fades are USD/JPY/carry-driven (hence 2015/2018-exposed), so a USD-neutral one is net-zero. **10th dead route
+to the 2018 leg.** (3) The portfolio's 4th-leg spec (net-positive AND +2015 AND +2018) is now empirically
+unreachable by USD-prediction (9 routes) AND USD-decorrelation (this arc) — converging hard on the arc-3004
+escalation: the apparatus's net-positive edges are USD/carry-exposed calm-year fades, structurally
+2015/2018-tailed. The 3-way book (1015) remains the strongest non-deployable result.
+
+**Tooling:** no new BUILT tool — reused BUILT `observe_long_capture` (long lens, `restrict` mask) + the
+arc-1006 weekly-gap mask logic (one-off scratch). CALLED canonical `Panel.from_pairs`.
+
+**FLAGS (code not merged):** none. Driver `_disco_work/arc1018_observe_usdneutral_gapfill.py` (reproducible).

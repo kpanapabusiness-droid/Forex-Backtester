@@ -48,12 +48,13 @@ def _leg(
     entry_spread: float = _PIP,
     exit_spread: float = _PIP,
     pair: str = "EURUSD",
+    direction: Direction = Direction.LONG,
 ) -> ClosedTrade:
     """A gross ClosedTrade leg with symmetric bid/ask around the fill prices."""
     return ClosedTrade(
         position_id=position_id,
         pair=pair,
-        direction=Direction.LONG,
+        direction=direction,
         entry_time=pd.Timestamp("2020-01-01", tz="UTC"),
         entry_price=entry_price,
         exit_time=pd.Timestamp(exit_time, tz="UTC"),
@@ -138,6 +139,57 @@ def test_take_the_loss_two_fills_exact_haircut() -> None:
     assert row["total_cost"] == pytest.approx(2.5)
     assert row["gross_pnl"] == pytest.approx(-20.0)
     assert row["net_pnl"] == pytest.approx(-22.5)  # a loss is made worse, never flattered
+
+
+# ── short legs: costs are direction-agnostic (symmetric haircut) ─────────
+
+
+def test_short_leg_costs_match_long_leg_exactly() -> None:
+    """FundedNext costs depend only on size + bid/ask spread, never on side.
+    A SHORT leg must incur exactly the same commission / slippage / spread
+    haircut as the otherwise-identical LONG leg (cost-model symmetry — part of
+    the short-enablement gate: HONEST_ENGINE_SWEEP.md Part C on short legs)."""
+    long_leg = _leg(
+        position_id=1, parent_position_id=None, size=10_000.0,
+        entry_price=1.10000, exit_price=1.09800, pnl=-20.0,
+        exit_time="2020-01-02", direction=Direction.LONG,
+    )
+    # Same magnitudes, opposite side: a short that moved +20 in its favour.
+    short_leg = _leg(
+        position_id=2, parent_position_id=None, size=10_000.0,
+        entry_price=1.10000, exit_price=1.09800, pnl=20.0,
+        exit_time="2020-01-02", direction=Direction.SHORT,
+    )
+    long_row = apply_cost_model(_run_result((long_leg,)), CostModel.fundednext()).breakdown.iloc[0]
+    short_row = apply_cost_model(_run_result((short_leg,)), CostModel.fundednext()).breakdown.iloc[0]
+    # The cost columns are identical regardless of direction.
+    for col in ("commission", "slippage", "spread", "total_cost", "n_fills", "n_legs"):
+        assert short_row[col] == pytest.approx(long_row[col]), col
+    # Concretely: commission 0.5, slippage 1.0, spread 1.0 => 2.5 (entry+stop, 2 fills).
+    assert short_row["total_cost"] == pytest.approx(2.5)
+    # Costs always WORSEN the result: a short's gross win is reduced, never inflated.
+    assert short_row["net_pnl"] == pytest.approx(short_row["gross_pnl"] - 2.5)
+    assert short_row["net_pnl"] < short_row["gross_pnl"]
+
+
+def test_short_partial_win_three_fills_symmetric() -> None:
+    """A short +1R partial + runner (2 legs => 3 fills) pays the same haircut as
+    the long partial-win fixture."""
+    legs = (
+        _leg(position_id=1, parent_position_id=1, size=5_000.0,
+             entry_price=1.10000, exit_price=1.09800, pnl=10.0,
+             exit_time="2020-01-02", direction=Direction.SHORT),
+        _leg(position_id=1, parent_position_id=1, size=5_000.0,
+             entry_price=1.10000, exit_price=1.09900, pnl=5.0,
+             exit_time="2020-01-03", direction=Direction.SHORT),
+    )
+    row = apply_cost_model(_run_result(legs), CostModel.fundednext()).breakdown.iloc[0]
+    assert row["n_legs"] == 2
+    assert row["n_fills"] == 3
+    assert row["commission"] == pytest.approx(0.5)
+    assert row["slippage"] == pytest.approx(1.5)
+    assert row["spread"] == pytest.approx(1.0)
+    assert row["total_cost"] == pytest.approx(3.0)
 
 
 # ── default-on guarantee at the gate-scoring layer ───────────────────────

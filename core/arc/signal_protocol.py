@@ -34,6 +34,7 @@ from typing import Mapping, Protocol, runtime_checkable
 
 import pandas as pd
 
+from core.sim.account import Direction
 from core.sim.exit_hooks import ExitPredicate
 from core.sim.panel import Panel
 
@@ -58,6 +59,14 @@ class PerPairSignalState:
     the primary TF and per-trade path emission — Step 1's path builder
     uses it to slice forward windows correctly. For most signal modules
     this is the primary TF's index unchanged.
+
+    ``direction`` is the side the signal trades (LONG default). It is the
+    single source of truth that flows into the Step-1 pool bar-walk
+    (``arc_pool_builder._simulate_pair_pool``) and the Step-5 architecture
+    Order emission, so a short signal module sets ``Direction.SHORT`` here
+    and every entry / SL / MFE-MAE / final_r computation mirrors. Default
+    ``Direction.LONG`` keeps every existing long signal byte-identical (the
+    column is not serialised into the pool sha; longs are unaffected).
     """
 
     signal_mask: pd.Series  # bool, indexed by primary-TF timestamp
@@ -65,16 +74,26 @@ class PerPairSignalState:
     additional_gates: Mapping[str, pd.Series] = field(default_factory=dict)
     exit_predicate: ExitPredicate | None = None
     path_feature_anchor: pd.Index | None = None
+    direction: Direction = Direction.LONG
 
 
 @dataclass(frozen=True)
 class SignalEvaluation:
-    """Output of :meth:`SignalModule.evaluate` — what arc-pool-builder consumes."""
+    """Output of :meth:`SignalModule.evaluate` — what arc-pool-builder consumes.
+
+    ``direction`` is the arc-level declared side (LONG default), surfaced
+    here for convenience so a consumer that holds only the evaluation (not a
+    per-pair state) can read the side. The authoritative per-trade source
+    remains ``PerPairSignalState.direction``; an arc whose pairs all trade
+    one side sets both to the same value. Default ``Direction.LONG`` keeps
+    existing long signals byte-identical.
+    """
 
     primary_tf: str
     per_pair: Mapping[str, PerPairSignalState]
     signal_name: str
     causal_lineage: str  # "clean" | "suspect" | "unverified"
+    direction: Direction = Direction.LONG
 
 
 @runtime_checkable

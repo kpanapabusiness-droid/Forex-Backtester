@@ -382,7 +382,13 @@ class MultiPairBacktester:
                 entry_bid=entry_bid_q,
                 entry_ask=entry_ask_q,
             )
-            # Auto-register trail if the order carries an ATR + manager is set
+            # Auto-register trail if the order carries an ATR + manager is set.
+            # The LONG gate is intentional: the legacy KH-24 ``TrailManager`` is
+            # long-only (``core/sim/trailing_stop.py`` raises for a short, and
+            # is deferred per the short-enablement spec item #9). A SHORT order
+            # therefore skips this KH-24-style trail and trails instead via the
+            # canonical, already-symmetric ``sl_plus_trailing_atr`` exit policy
+            # (Order.exit_policy), which the exit-policy manager drives below.
             if (
                 self.trail_manager is not None
                 and order.atr_at_entry is not None

@@ -210,3 +210,165 @@ def test_stop_after_partial_books_partial_plus_runner_minus_1r() -> None:
     assert partial.exit_price == pytest.approx(_ENTRY + _R)
     assert runner.exit_price == pytest.approx(_SL)
     assert (runner.exit_price - runner.entry_price) / _R == pytest.approx(-1.0)
+
+
+# ── Direction.SHORT mirror (short-side enablement) ──────────────────────────
+#
+# The SAME take-the-loss invariant, mirrored for a short: the stop sits ABOVE
+# entry and the +1R partial BELOW it. Every fixture below is the corresponding
+# long fixture reflected around the entry (p' = 2*_ENTRY - p, with high<->low
+# swapped), so a green short test is a direct proof of long/short symmetry on
+# the SOLE gate engine. Short entry fills at open_bid; the stop fires on
+# high_ask >= sl (core.sim.fill.short_sl_triggered), still SL-first.
+
+_SL_SHORT = 1.102  # entry + 1R (stop ABOVE entry); short +1R partial = 1.098.
+
+
+def _one_shot_short(t_target: str, **order_kwargs) -> StrategyFn:
+    target = pd.Timestamp(t_target, tz="UTC")
+    emitted = {"done": False}
+
+    def strategy(t, snapshot, account):
+        if emitted["done"] or t != target:
+            return []
+        emitted["done"] = True
+        return [Order(pair="EURUSD", direction=Direction.SHORT, size=10_000.0, **order_kwargs)]
+
+    return strategy
+
+
+def _run_short(rows: list[dict]):
+    panel = _make_panel(rows)
+    acct = Account(
+        starting_balance=100_000.0,
+        exposure=ExposureRules(max_concurrent_per_pair=1),
+    )
+    strategy = _one_shot_short(
+        "2026-01-01 00:00",
+        sl_price=_SL_SHORT,
+        atr_at_entry=0.001,
+        sl_atr_mult=2.0,
+        exit_policy="sl_partial_close_1r_runner_trail",
+    )
+    bt = MultiPairBacktester(
+        panel=panel, account=acct, strategy=strategy,
+        exit_policy_manager=ExitPolicyManager(),
+    )
+    return bt.run()
+
+
+def _assert_single_minus_1r_stop_short(result, *, exit_bar: str) -> None:
+    legs = list(result.closed_trades)
+    assert len(legs) == 1, f"expected one full -1R short stop leg, got {legs}"
+    leg = legs[0]
+    assert leg.direction == Direction.SHORT
+    assert leg.exit_reason == "stop_loss"
+    assert leg.parent_position_id is None, "partial must NOT have fired"
+    assert leg.size == pytest.approx(10_000.0), "full position must close"
+    assert leg.exit_price == pytest.approx(_SL_SHORT)
+    assert leg.entry_price == pytest.approx(_ENTRY)
+    # Short realised R = (entry - exit) / 1R == -1.0 exactly.
+    assert (leg.entry_price - leg.exit_price) / _R == pytest.approx(-1.0)
+    # A short stop is a loss, never flattered: pnl = -size * 1R.
+    assert leg.pnl == pytest.approx(-10_000.0 * _R)  # -20.0
+    assert leg.exit_time == pd.Timestamp(exit_bar, tz="UTC")
+
+
+def test_short_stop_before_partial_bar_is_minus_1r() -> None:
+    """Short stop (above entry) breaches STRICTLY BEFORE +1R is reached -> -1R."""
+    result = _run_short([
+        _bar("2026-01-01 00:00", o=1.101, h=1.102, lo=1.100, c=1.101),
+        # entry fills here at open=1.100 (short sells the bid)
+        _bar("2026-01-01 01:00", o=1.100, h=1.101, lo=1.099, c=1.100),
+        # stop breach (high>=1.102); low 1.0995 never reaches +1R (1.098)
+        _bar("2026-01-01 02:00", o=1.100, h=1.102, lo=1.0995, c=1.101),
+        _bar("2026-01-01 03:00", o=1.101, h=1.101, lo=1.100, c=1.101),
+    ])
+    _assert_single_minus_1r_stop_short(result, exit_bar="2026-01-01 02:00")
+
+
+def test_short_same_bar_stop_and_partial_is_sl_first_minus_1r() -> None:
+    """THE dispatch case: a short whose stop ABOVE entry is breached on the
+    SAME bar its +1R partial BELOW entry would fire -> SL-first -> full -1R,
+    the partial never fires."""
+    result = _run_short([
+        _bar("2026-01-01 00:00", o=1.101, h=1.102, lo=1.100, c=1.101),
+        _bar("2026-01-01 01:00", o=1.100, h=1.101, lo=1.099, c=1.100),
+        # high 1.103 (>=SL 1.102) AND low 1.098 (=+1R) on the SAME bar
+        _bar("2026-01-01 02:00", o=1.100, h=1.103, lo=1.098, c=1.101),
+        _bar("2026-01-01 03:00", o=1.101, h=1.101, lo=1.100, c=1.101),
+    ])
+    _assert_single_minus_1r_stop_short(result, exit_bar="2026-01-01 02:00")
+
+
+def test_short_stop_then_recover_is_still_minus_1r() -> None:
+    """Short stop breaches on bar 02:00; a later bar dropping past +1R must
+    NOT resurrect the already-closed trade (the Arc-10 bug class, mirrored)."""
+    result = _run_short([
+        _bar("2026-01-01 00:00", o=1.101, h=1.102, lo=1.100, c=1.101),
+        _bar("2026-01-01 01:00", o=1.100, h=1.101, lo=1.099, c=1.100),
+        # stop breach (high 1.103 >= SL 1.102); low 1.0995 never hits +1R
+        _bar("2026-01-01 02:00", o=1.100, h=1.103, lo=1.0995, c=1.101),
+        # full recovery PAST +1R (low 1.097) — must NOT resurrect the trade
+        _bar("2026-01-01 03:00", o=1.099, h=1.099, lo=1.097, c=1.097),
+        _bar("2026-01-01 04:00", o=1.097, h=1.098, lo=1.096, c=1.097),
+    ])
+    _assert_single_minus_1r_stop_short(result, exit_bar="2026-01-01 02:00")
+
+
+def test_short_clean_win_partial_then_runner_trail_books_a_win() -> None:
+    """No stop ever touched: short +1R partial fires (50% at 1.098), the runner
+    trails (trough + 1R) to a profit. The mirror of the long clean win — two
+    profitable legs, NO stop_loss leg."""
+    result = _run_short([
+        _bar("2026-01-01 00:00", o=1.101, h=1.102, lo=1.100, c=1.101),
+        # entry fills at open=1.100; no stop, no +1R yet
+        _bar("2026-01-01 01:00", o=1.100, h=1.1005, lo=1.099, c=1.0992),
+        # +1R partial fires intra-bar (low 1.097 <= 1.098); high 1.0995 < SL
+        _bar("2026-01-01 02:00", o=1.099, h=1.0995, lo=1.097, c=1.0975),
+        # runner trails out: trough 1.097 -> trail level 1.099; close_ask
+        # 1.0995 >= 1.099 AND strictly after the tp1 bar -> queue full close
+        _bar("2026-01-01 03:00", o=1.098, h=1.100, lo=1.0975, c=1.0995),
+        # runner fills at next-bar open_ask = 1.0995
+        _bar("2026-01-01 04:00", o=1.0995, h=1.100, lo=1.099, c=1.0995),
+    ])
+    legs = list(result.closed_trades)
+    assert len(legs) == 2, f"expected partial + runner legs, got {legs}"
+    assert all(leg.direction == Direction.SHORT for leg in legs)
+    assert all(leg.parent_position_id is not None for leg in legs)
+    assert {leg.exit_reason for leg in legs} == {"partial_close_1r", "runner_trail_stop"}
+    assert all(leg.exit_reason != "stop_loss" for leg in legs)
+    partial = next(leg for leg in legs if leg.exit_reason == "partial_close_1r")
+    runner = next(leg for leg in legs if leg.exit_reason == "runner_trail_stop")
+    assert partial.size == pytest.approx(5_000.0)
+    assert runner.size == pytest.approx(5_000.0)
+    assert partial.exit_price == pytest.approx(_ENTRY - _R)  # short +1R level (below)
+    assert partial.pnl > 0.0
+    assert runner.pnl > 0.0
+    assert (partial.pnl + runner.pnl) > 0.0  # a genuine, honestly-booked short win
+
+
+def test_short_stop_after_partial_books_partial_plus_runner_minus_1r() -> None:
+    """Short +1R partial banks 50% at 1.098; the runner is later stopped at the
+    SL above entry (-1R on the runner half). Mirror of the long counterpart."""
+    result = _run_short([
+        _bar("2026-01-01 00:00", o=1.101, h=1.102, lo=1.100, c=1.101),
+        _bar("2026-01-01 01:00", o=1.100, h=1.1005, lo=1.099, c=1.0992),
+        # +1R partial fires (low 1.097 <= 1.098); no stop this bar
+        _bar("2026-01-01 02:00", o=1.099, h=1.0995, lo=1.097, c=1.0975),
+        # runner stop: high 1.103 >= SL 1.102 -> runner closes at SL (-1R)
+        _bar("2026-01-01 03:00", o=1.099, h=1.103, lo=1.0985, c=1.102),
+        _bar("2026-01-01 04:00", o=1.102, h=1.102, lo=1.101, c=1.102),
+    ])
+    legs = list(result.closed_trades)
+    assert len(legs) == 2, f"expected partial + runner-stop legs, got {legs}"
+    assert all(leg.direction == Direction.SHORT for leg in legs)
+    assert all(leg.parent_position_id is not None for leg in legs)
+    partial = next(leg for leg in legs if leg.exit_reason == "partial_close_1r")
+    runner = next(leg for leg in legs if leg.exit_reason == "stop_loss")
+    assert partial.size == pytest.approx(5_000.0)
+    assert runner.size == pytest.approx(5_000.0)
+    # Partial banked +1R on its half; runner realised exactly -1R on its half.
+    assert partial.exit_price == pytest.approx(_ENTRY - _R)
+    assert runner.exit_price == pytest.approx(_SL_SHORT)
+    assert (runner.entry_price - runner.exit_price) / _R == pytest.approx(-1.0)

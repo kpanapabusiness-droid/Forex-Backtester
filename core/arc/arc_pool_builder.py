@@ -49,7 +49,8 @@ from core.arc.signal_protocol import (
     SignalModule,
     validate_panels,
 )
-from core.sim.fill import long_entry_fill_price
+from core.sim.account import Direction
+from core.sim.fill import long_entry_fill_price, short_entry_fill_price
 from core.sim.honest_label import reached_1r_before_sl
 from core.sim.panel import Panel
 
@@ -119,22 +120,27 @@ def _simulate_pair_pool(
 ) -> tuple[list[dict], list[dict], int]:
     """Apply the signal to one pair and return (trades, paths, next_trade_id).
 
-    The simulation:
+    The simulation (mirrored by ``state.direction``; LONG default):
       - Signal fires at bar N close (state.signal_mask).
-      - Entry at bar N+1 open using core.sim.fill.long_entry_fill_price.
-      - SL at signal-bar close_ask − sl_atr_mult × ATR (proxy for true
-        post-fill anchor; matches v3 KH-24 convention).
+      - Entry at bar N+1 open. Long fills at ``open_ask``
+        (``long_entry_fill_price``); short fills at ``open_bid``
+        (``short_entry_fill_price``).
+      - SL anchored at the signal bar. Long: ``close_ask − sl_atr_mult ×
+        ATR`` (below entry). Short: ``close_bid + sl_atr_mult × ATR`` (above
+        entry). ``sl_distance`` is the positive entry↔SL gap either way.
       - Forward-window scan: each bar from N+1 .. min(N+1+hold_bars, end)
-        emits close_r / mfe_so_far_r / mae_so_far_r relative to entry +
-        SL distance.
-      - Exit on: hard SL hit (high_bid for short / low_bid for long
-        falls past SL), time-cap (bar N+1+hold_bars open), or
-        additional_gates falling false (signal-inherent exit).
+        emits close_r / mfe_so_far_r / mae_so_far_r in R relative to entry.
+        Long tracks the bid side (it exits at the bid); short tracks the ask
+        side (it buys back at the ask), matching ``core.sim.fill``.
+      - Exit on: hard SL hit (long: ``low_bid ≤ sl``; short: ``high_ask ≥
+        sl``) or time-cap (bar N+1+hold_bars).
 
-    Only long-side simulation is implemented at v3.0 launch; short
-    handling is structurally trivial but not exercised by any registry
-    signal. Short signals raise NotImplementedError if signal mask sets
-    direction to short (the SignalModule contract is long-only at v3.0).
+    Direction comes from ``state.direction`` (``PerPairSignalState``); a
+    long signal (the default) is byte-identical to the pre-short builder —
+    the short branches are reached only when a short signal module sets
+    ``Direction.SHORT``. The ``final_r`` sign and the SL-honest +1R-before-SL
+    label are both mirrored so a short's realised R and take-the-loss
+    provenance are computed in the short's own frame.
     """
     trades: list[dict] = []
     paths: list[dict] = []
@@ -168,10 +174,25 @@ def _simulate_pair_pool(
     n = len(df)
     warmup = max(cfg.primary_tf_warmup_bars, 0)
 
+    direction = state.direction
+    is_long = direction is Direction.LONG
+
     df_close_ask = df["close_ask"].values
     df_low_bid = df["low_bid"].values
     df_high_bid = df["high_bid"].values
     df_close_bid = df["close_bid"].values
+    # Ask-side intrabar extremes — needed only for short trades (a short is
+    # stopped on the ASK rising to SL and bought back on the ASK falling, per
+    # core.sim.fill). Extracted only when the signal is short so existing
+    # long arcs / synthetic long fixtures without ask columns are untouched.
+    if not is_long:
+        if "high_ask" not in df.columns or "low_ask" not in df.columns:
+            raise ValueError(
+                "short arc-pool simulation requires high_ask/low_ask columns; "
+                f"pair {pair!r} panel has {sorted(df.columns)[:12]}"
+            )
+        df_high_ask = df["high_ask"].values
+        df_low_ask = df["low_ask"].values
     # Per-bar bid+ask quotes for the Step 6 §6.3 spread-decomposition
     # diagnostic. Captured at fill sites only (entry-bar open / exit-bar
     # open). The diagnostic skips trades with NaN bid/ask gracefully.
@@ -198,15 +219,21 @@ def _simulate_pair_pool(
         atr = float(atr_arr[s])
         if not np.isfinite(atr) or atr <= 0:
             continue
-        # Entry fill at next-bar open_ask
+        # Entry fill at next-bar open. Long buys the ask; short sells the bid.
         entry_bar = df.iloc[entry_idx]
-        entry_price = float(long_entry_fill_price(entry_bar))
-        # SL anchored to signal-bar close_ask (consistent with current v3 KH-24)
-        sl_anchor = float(df_close_ask[s])
-        sl_price = sl_anchor - cfg.sl_atr_mult * atr
+        if is_long:
+            entry_price = float(long_entry_fill_price(entry_bar))
+            # SL anchored to signal-bar close_ask (consistent with v3 KH-24).
+            sl_anchor = float(df_close_ask[s])
+            sl_price = sl_anchor - cfg.sl_atr_mult * atr
+        else:
+            entry_price = float(short_entry_fill_price(entry_bar))
+            # Mirror: anchor to signal-bar close_bid, stop ABOVE entry.
+            sl_anchor = float(df_close_bid[s])
+            sl_price = sl_anchor + cfg.sl_atr_mult * atr
         if sl_price <= 0 or not np.isfinite(sl_price):
             continue
-        sl_distance = entry_price - sl_price
+        sl_distance = (entry_price - sl_price) if is_long else (sl_price - entry_price)
         if sl_distance <= 0:
             continue
         # Entry-bar bid+ask quotes at open (long entry fills at open_ask;
@@ -226,16 +253,33 @@ def _simulate_pair_pool(
         bars_held = 0
         for off in range(0, max_off + 1):
             bidx = entry_idx + off
-            bar_low = float(df_low_bid[bidx])
-            bar_close_bid = float(df_close_bid[bidx])
-            close_r = (bar_close_bid - entry_price) / sl_distance
-            # Intra-bar excursions in R
-            bar_min_r = (bar_low - entry_price) / sl_distance
-            mae_r = min(mae_r, bar_min_r)
-            mfe_so_far_high = (
-                float(df["high_bid"].iat[bidx]) - entry_price
-            ) / sl_distance
-            mfe_r = max(mfe_r, mfe_so_far_high)
+            if is_long:
+                bar_low = float(df_low_bid[bidx])
+                bar_close_bid = float(df_close_bid[bidx])
+                close_r = (bar_close_bid - entry_price) / sl_distance
+                # Intra-bar excursions in R
+                bar_min_r = (bar_low - entry_price) / sl_distance
+                mae_r = min(mae_r, bar_min_r)
+                mfe_so_far_high = (
+                    float(df["high_bid"].iat[bidx]) - entry_price
+                ) / sl_distance
+                mfe_r = max(mfe_r, mfe_so_far_high)
+                # SL check (long): low_bid <= sl_price
+                stop_hit = bar_low <= sl_price
+            else:
+                # Short mirror: track the ask side (buy-back), stop ABOVE entry.
+                bar_high = float(df_high_ask[bidx])
+                bar_close_ask = float(df_close_ask[bidx])
+                close_r = (entry_price - bar_close_ask) / sl_distance
+                # Adverse excursion = price rising; favourable = price falling.
+                bar_min_r = (entry_price - bar_high) / sl_distance
+                mae_r = min(mae_r, bar_min_r)
+                mfe_so_far_low = (
+                    entry_price - float(df_low_ask[bidx])
+                ) / sl_distance
+                mfe_r = max(mfe_r, mfe_so_far_low)
+                # SL check (short): high_ask >= sl_price
+                stop_hit = bar_high >= sl_price
             path_rows.append(
                 {
                     "trade_id": tid,
@@ -246,18 +290,20 @@ def _simulate_pair_pool(
                     "mae_so_far_r": mae_r,
                 }
             )
-            # SL check (long): low_bid <= sl_price
-            if off > 0 and bar_low <= sl_price:
+            if off > 0 and stop_hit:
                 exit_idx = bidx
                 exit_reason = "hard_sl"
                 exit_price = sl_price
                 bars_held = off
                 break
         if exit_idx is None:
-            # Time exit at the end of the forward window
+            # Time exit at the end of the forward window (long exits at the
+            # bid, short buys back at the ask).
             exit_idx = entry_idx + max_off
             exit_reason = "time_exit"
-            exit_price = float(df_close_bid[exit_idx])
+            exit_price = (
+                float(df_close_bid[exit_idx]) if is_long else float(df_close_ask[exit_idx])
+            )
             bars_held = max_off
 
         # Exit-bar bid+ask quotes — open quotes for time exits (mirrors the
@@ -271,23 +317,41 @@ def _simulate_pair_pool(
             exit_bid_q = _q(df_open_bid, exit_idx)
             exit_ask_q = _q(df_open_ask, exit_idx)
 
-        final_r = (exit_price - entry_price) / sl_distance
+        final_r = (
+            (exit_price - entry_price) if is_long else (entry_price - exit_price)
+        ) / sl_distance
         # SL-honest meta-label provenance: the first forward offset at which
         # the trade reached +1R MFE STRICTLY BEFORE its hard stop (take-the-
         # loss ordering; same-bar +1R/SL → NaN). Both exits here are open
         # through the resolved bar (hard_sl intrabar at sl_price, time_exit
         # at the bar close), so the exit bar is included in the scan. This is
         # the in-tree producer that closes HONEST_ENGINE_SWEEP.md FLAG-D1.
-        bars_to_1r_mfe = reached_1r_before_sl(
-            high_bid=df_high_bid,
-            low_bid=df_low_bid,
-            entry_idx=entry_idx,
-            exit_off=int(bars_held),
-            entry_price=entry_price,
-            sl_price=sl_price,
-            sl_distance=sl_distance,
-            exit_at_bar_open=False,
-        )
+        # Short mirrors on the ask side (stop above entry, favourable down).
+        if is_long:
+            bars_to_1r_mfe = reached_1r_before_sl(
+                high_bid=df_high_bid,
+                low_bid=df_low_bid,
+                entry_idx=entry_idx,
+                exit_off=int(bars_held),
+                entry_price=entry_price,
+                sl_price=sl_price,
+                sl_distance=sl_distance,
+                exit_at_bar_open=False,
+            )
+        else:
+            bars_to_1r_mfe = reached_1r_before_sl(
+                high_bid=df_high_bid,
+                low_bid=df_low_bid,
+                high_ask=df_high_ask,
+                low_ask=df_low_ask,
+                direction="short",
+                entry_idx=entry_idx,
+                exit_off=int(bars_held),
+                entry_price=entry_price,
+                sl_price=sl_price,
+                sl_distance=sl_distance,
+                exit_at_bar_open=False,
+            )
         trades.append(
             {
                 "pair": pair,

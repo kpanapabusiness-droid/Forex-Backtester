@@ -67,6 +67,46 @@ class Direction(Enum):
         return 1 if self is Direction.LONG else -1
 
 
+# Accepted spellings for the discovery/arc ``direction:`` config key. The
+# legacy discovery YAMLs wrote ``long_only`` (documentary); ``long`` is the
+# canonical value going forward. A short arc sets ``short``.
+_LONG_SPELLINGS: frozenset[str] = frozenset({"long", "long_only"})
+_SHORT_SPELLINGS: frozenset[str] = frozenset({"short", "short_only"})
+
+
+def parse_direction(raw: object, *, default: "Direction | None" = Direction.LONG) -> "Direction":
+    """Map a config ``direction:`` value to a :class:`Direction`.
+
+    This is the load-bearing parser for the discovery/arc ``direction:`` key
+    (today inert in ``configs/arc_discovery_*.yaml`` — no loader read it). A
+    discovery/arc run turns its YAML side into the apparatus by calling this
+    and passing the result to ``DiscoveryExitConfig(direction=...)`` /
+    ``ArcConfig(direction=...)`` / the signal module's emitted
+    ``PerPairSignalState.direction``.
+
+    Accepts (case-insensitive, whitespace-trimmed): ``long`` / ``long_only``
+    → :attr:`Direction.LONG`; ``short`` / ``short_only`` → :attr:`Direction.SHORT`.
+    ``None`` / missing returns ``default`` (LONG) so an absent key preserves
+    the long default. Any other value raises ``ValueError`` (a typo'd side is
+    a loud failure, never a silent long).
+    """
+    if raw is None:
+        if default is None:
+            raise ValueError("direction is required (no default)")
+        return default
+    if isinstance(raw, Direction):
+        return raw
+    s = str(raw).strip().lower()
+    if s in _LONG_SPELLINGS:
+        return Direction.LONG
+    if s in _SHORT_SPELLINGS:
+        return Direction.SHORT
+    raise ValueError(
+        f"unrecognised direction {raw!r}; expected one of "
+        f"{sorted(_LONG_SPELLINGS | _SHORT_SPELLINGS)}"
+    )
+
+
 @dataclass(frozen=True)
 class Position:
     """Open position record. Immutable once opened.

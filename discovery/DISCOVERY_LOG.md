@@ -72,6 +72,7 @@ at arc step (i).
 | 3018 | 3000s | 2026-06-05 | **Failed-breakdown-reclaim LONG on CROSSES** (2018-neutral decorrelated 5th-leg candidate) — the 4-way book (arc 1020) is ~0.11% from deployable, blocked only by MARGINAL 2015(−0.08)&2016(−0.12); apply the corpus's STRONGEST structural edge (`fbr` 1013, USD majors) to a DIFFERENT universe (crosses) for a decorrelated, plausibly-2018-NEUTRAL component to lift 2015/2016 (documented spec-override: arc-1020 wanted NON-reversion but 2015/2016's only tradeable edge IS reversion; the new lever is 2018-NEUTRALITY-via-universe, not non-reversion). FALSIFIED at obs (H4, JPY crosses cached + non-JPY crosses warmed). **STRUCTURE CONTROL INVERTS on BOTH universes — opposite of arc 1013:** swept-low reclaim cap **JPY 0.4633 / non-JPY 0.4248 (both <0.50)**, WORSE than a generic deep down-wick (0.5463 / 0.4620) → the swing-low pierce/reclaim REMOVES edge on crosses (anti-load-bearing). **Target-year sign WRONG:** 2016 drift JPY +0.067/med −0.708, non-JPY **−0.952**; 2018 neg both (−0.455/−0.154); 2015 either strongly neg (JPY −0.997) or a THIN-TAIL artifact (non-JPY mean +1.25/median −0.295, n=9). Diagnosis: the `fbr` edge is **USD-major-SPECIFIC** — USD-major swing-lows at dense stop-clusters are defended reversal PIVOTS (1013 control-proven, 3013 level-confirmed), but cross swing-lows are swept routinely WITHOUT being supports (thinner/momentum/carry-driven) → reclaim enters mid-cascade, a falling knife (worst on carry JPY crosses in risk-off 2015/2018, arc 1017). **Generalizes arc 1018 (cross gaps efficient) from FLOW to STRUCTURE: corpus edges are universe-specific, don't transfer off USD majors.** The 2015/2016 leg is mechanistically hard — its only edge IS reversion, and the reversion that works (USD-major `fbr`) is the one that's −2018 → 2015/2016-lift & 2018-lift want OPPOSITE universes/directions. §5f doesn't bite (sub-0.50, anti-structure, wrong sign). 1013 UNCHANGED. No engine/null/council spent | n/e | n/e | n/e | n/e | n/e | ~330 IS fbr obs (177 JPY + 153 non-JPY) | KILL (obs cheap-kill) | N | KILL |
 | 1023 | 1000s | 2026-06-05 | **INDEPENDENT verification of arc 2016's portfolio NOISE-FLOOR** (different method + chat; Arc-10 norm) — re-ran all 4 components through the canonical apparatus, **reproduced every headline EXACTLY** (gap +0.685% / me_long +0.232% / fbr +1.854% 9/10 / me_short +0.683%) at `risk_pct=0.005` (the low-risk LINEAR regime; at the intended 0.5 the daily-DD cap blows through → ROIs in the 100s of %, flipped signs — arc-3017 FLAG-1 reproduced), book at arc-2016 frozen weights reproduces to the decimal (mean +0.624%, worst −0.124%@2018, 2015 −0.047%, 8/10). **CONFIRMED via an ACROSS-fold lens** (vs 2016's within-fold per-trade bootstrap): worst fold **−0.167 across-fold-sd from zero** ≈ 2016's 0.176σ; **across-fold sd (0.741%) ≈ 2016's within-fold sampling sd (0.703%)** ⇒ fold-to-fold variation is essentially ALL sampling noise (decisive method-independent statement); P(≥1 neg fold in 10) = 0.887. **NEW: the book MEAN is significantly POSITIVE — t=2.66 (p≈0.026), fold-bootstrap CI [+0.22%,+1.09%], P(mean≤0)=0.** ⇒ the 4-way book is a genuine positive-expectancy edge that fails ONLY the per-year all-folds gate, and that gate sits below its noise floor. Decision-support for the operator's path A (mean/pooled/regime-block gate) vs path B (denser components); **strict all-folds gate STAYS FAIL — quantifies why, does NOT loosen it.** Components UNCHANGED (all 4 PORTFOLIO); combined-book OOS NOT spent (§5g); no council (a measurement resolving a measurement). FLAGs: arc-3017 risk-convention (load-bearing) + the gate-resolution governance question (operator's call) | N | n/e (OOS preserved) | -0.124% (book worst, =−0.167σ, stat. zero) | n/e | n/e | 260+98+208+145 | KILL (no new component; book stays strict-gate FAIL) | N | KILL |
 | 2017 | 2000s | 2026-06-05 | **DIAGNOSTIC: per-component SOLO noise-floor — is any single edge "all-folds-positive up to noise," and where is the ONE real fold-level obstacle?** (follow-through on arc 2016). Bootstrap (honest per-trade P&L, seed 42) EVERY IS fold's 95% CI for each of the 4 components; classify POS(CI>0)/NEG(CI<0)/~0(spans 0). **The components split: (a) TOO THIN TO RESOLVE — gap 10/10, me_long 9/10, me_short 8/10 folds within-noise** (even gap's +8.23%/−6.79% folds span 0) → strict all-folds-positive is **VACUOUS** for them ("AFP-up-to-noise"=True but means *can't reject anything*, NOT a pass); **(b) ONE edge resolves folds — fbr** (strongest, +1.854%/yr) carries the **corpus's ONLY statistically-real negative fold: 2018 (−4.20%, n18, CI strictly <0)**; me_long has a real POSITIVE 2018 (+0.90%, CI>0). ⇒ **the route's single genuine fold-level obstacle is fbr's −2018** (NOT a missing +2015/+2016 leg — those are within-noise for every component); the book's −0.124% 2018 is me_long(+real) vs fbr(−real) near-cancellation = the arc-2016 noise residual; arc 2014 already proved fbr-2018 mechanism-intrinsic/unconditionable. **Explains the concurrent arc-1021 Arc-10 near-miss** (an AFP book that disqualified on robustness) — sub-noise folds let exit×weight optimization PAINT a pass; statistical grounding for 1021's "require AFP under sl_only AND risk-parity" rule. Key ratios (σ-units, corr CIs, CI/point) are scale-invariant → robust to the arc-3017 risk_pct convention flag; headlines reproduce committed values exactly. **OPERATOR FLAG reinforced: the AFP-calendar-year gate is structurally mismatched to this corpus — vacuous on thin components, trips on the one thick component's intrinsic single-year hole; cannot return a confident PASS.** Components UNCHANGED (PORTFOLIO). No OOS. NEW lesson: "AFP up to noise" is only meaningful where folds RESOLVE; report per-fold CI resolvability, not just sign | N | n/e (not earned) | fbr 2018 −4.20% (CI<0, only real neg fold) | n/e | per-comp per-fold CI ±2.6%/±0.7% | 396+121+172+145 | DIAGNOSTIC → KILL (no new component; route's one real obstacle = fbr-2018, mechanism-intrinsic) | N | KILL |
+| 1024 | 1000s | 2026-06-05 | **DIAGNOSTIC: arc-3017 FLAG-1 (`risk_pct` "unit split") RESOLVED — it is a FRACTION; headlines are at 0.5% deployable risk.** While reproducing components for arc 1023 I hit an empirical contradiction with FLAG-1 (which claims `A1Config.risk_pct` is PERCENT, so 0.005=0.005% "100× too low", verdict "risk-convention-dependent"). Code: `live_balance.py` sizes `risk_amount = balance × risk_pct`, default `0.01 = "1% per trade"` (FRACTION, no ×100; `A1Architecture` passes it straight through). Empirical risk-sweep of committed fbr (sl_plus_trailing_atr): **PERFECTLY LINEAR across the deployable band** — 0.25%/0.5%/1% → +0.927%/+1.854%/+3.705% (per-unit-risk const ~0.927%), **fold signs STABLE 9/10**; DD-cap only bites at ~2% (8/10), 5% (7/10), catastrophic at the absurd 50% (2/10, −129%). ⇒ `risk_pct` is a FRACTION; the +1.854% headline is at **0.005 = 0.5% per trade, a normal deployable risk** (NOT 0.005%); 3017's "risk 0.5 flips signs" is just **50% risk** destroying the account, NOT a convention ambiguity. **arc-3017 FLAG-1 WITHDRAWN; my arc-1023 restatement of it as "load-bearing" CORRECTED.** Net: the whole portfolio characterization (component headlines, 4-way book, arc-2016/2017/1023 noise-floor + book-mean-positive t=2.66) is at a sound 0.5% deployable risk with stable fold signs across 0.25–1% — no risk-convention asterisk remains; deployability blocked only by the per-year-gate noise floor (operator path A/B). Process lesson: a flag contradicting a direct code-read + linear-scaling check gets diagnosed, not propagated. Code correct; no canonical change. OOS untouched; no council | n/e | n/e | n/e | n/e | n/e | fbr risk-sweep 6 levels × 10 folds | KILL (diagnostic; FLAG-1 resolved/withdrawn) | N | KILL |
 
 ---
 
@@ -3360,3 +3361,51 @@ Noise-floor stats = one-off arithmetic on canonical `FoldStats.roi_pct`. Driver
 governance question (operator's call — the per-year gate is below its noise floor for thin books; whether
 to adopt a mean/pooled/regime-block gate is an operator/protocol decision, FLAGGED not taken). Carries the
 standing `A1Config.time_exit_bars`-unwired flag. OOS never touched.
+**[CORRECTION, arc 1024]** the "risk-convention FLAG-1 (load-bearing)" restatement above is WITHDRAWN —
+arc 1024 proves `risk_pct` is a FRACTION (0.005 = 0.5% deployable risk), so the noise-floor finding holds
+at deployable risk with stable fold signs; there is no risk-convention asterisk. See arc 1024.
+
+### arc_1024
+
+**DIAGNOSTIC — arc-3017 FLAG-1 (`risk_pct` "unit split") RESOLVED** (chat 1000–1999). Full record:
+[`arcs/arc_1024_risk_convention_flag_resolved.md`](arcs/arc_1024_risk_convention_flag_resolved.md).
+
+**Idea + because.** While reproducing the 4 components at deployable risk for arc 1023 I hit an empirical
+contradiction with arc-3017 FLAG-1, which claims `A1Config.risk_pct` is PERCENT (0.5=0.5%) so the
+components were run at `0.005 = 0.005%` ("100× too low") and the verdict is "risk-convention-dependent."
+Two facts contradicted it: at 0.005 I reproduce the headlines EXACTLY (not 100× smaller), and at 0.5 ROIs
+EXPLODE to the 100s of % (50%-risk ruin, not a "cap"). The code settles it: `live_balance.py` →
+`risk_amount = balance × risk_pct`, default `0.01 = "1% per trade"` — a FRACTION, no ×100, passed straight
+through by `A1Architecture`. Per the framework-bug-vs-methodology discipline, a flag that contradicts a
+direct code read gets a HALT + diagnostic, not propagation.
+
+**What happened.** Risk-sweep of the committed fbr config over the 10 IS folds at risk_pct ∈ {0.0025,
+0.005, 0.01, 0.02, 0.05, 0.5}: **perfectly LINEAR across the deployable band** — 0.25%/0.5%/1% →
++0.927%/+1.854%/+3.705% (per-unit-risk constant ~0.927%), **fold signs stable at 9/10**. The daily-5%-DD
+cap only begins biting at ~2% (8/10), bites at 5% (7/10), and is catastrophic at the absurd 50% (2/10,
+−129%). ⇒ `risk_pct` is a FRACTION; the +1.854% headline is at **0.5% per trade, a normal deployable
+risk**; 3017's "risk 0.5 flips signs" is the **50%-risk** regime (account-destroying), not a deployable
+convention ambiguity.
+
+**Verdict: FLAG-1 RESOLVED/WITHDRAWN** (KILL — diagnostic, no component). The entire portfolio
+characterization (component headlines, the 4-way book, arc-2016/2017/1023 noise-floor + book-mean-positive
+t=2.66) is at a sound 0.5% deployable risk, with fold signs stable across the 0.25–1% deployable band — no
+risk-convention asterisk remains. My arc-1023 restatement of FLAG-1 as "load-bearing" is corrected.
+Code is correct; no canonical change. OOS untouched; no council.
+
+**Threads / lessons.** (1) **`risk_pct` is a FRACTION (0.005 = 0.5%); committed discovery risk = 0.5%/trade,
+deployable.** No hidden 100× scaling. (2) **Fold signs stable across 0.25–1%;** DD-cap non-binding for
+these thin signals until ~2%, catastrophic only at absurd risk → the noise-floor (1023/2016) and
+me_short-2018-positivity (1019/3017) results carry to deployable risk unchanged. (3) **Process: a prior
+chat's flag contradicting a code-read + linear-scaling check is diagnosed + corrected, not propagated** —
+a wrong flag mislabels the whole corpus's numbers as untrustworthy. (4) Net: deployability picture is
+clean — the book is a genuine positive-mean edge at 0.5% risk, blocked only by the per-year-gate noise
+floor (operator path A/B). The real standing flag is `A1Config.time_exit_bars`-unwired (arc 1005), not
+risk-convention.
+
+**Tooling.** No new BUILT tool — CALLED `Panel.from_pairs`, `FailedBreakdownReclaimLongSignal`,
+`A1Architecture`/`ArcFoldRunner`, `run_config_over_folds`; one-off risk-sweep arithmetic on canonical
+`FoldStats.roi_pct`. Driver `_disco_work/arc1024_risk_convention.py`.
+
+**FLAGS (code not merged):** arc-3017 FLAG-1 **WITHDRAWN** (resolved — `risk_pct` is a fraction, code
+correct). Standing real flag: `A1Config.time_exit_bars`-unwired (arc 1005). OOS never touched.

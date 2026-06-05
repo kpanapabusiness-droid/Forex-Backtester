@@ -61,6 +61,7 @@ at arc step (i).
 | 1018 | 1000s | 2026-06-05 | **Weekend gap-FILL long on USD-NEUTRAL crosses** (EURGBP/AUDNZD/GBPCHF/AUDCAD/NZDCAD) — target the (+2015,+2018) 4th leg via a NEW principle: **decorrelation from the USD regime** (apply the proven gap-fill mechanism 1006 to crosses whose gaps are intra-bloc-news-driven, not USD-driven) rather than predicting the regime (9 routes failed). FALSIFIED at obs (H4, IS, down-gap≥0.5ATR, i+1 fill): **no robust fill edge** — cap **0.4881 (coin-flip ≈ base)**, fill drift mean +0.078 but **median 0.000** (thin-tail artifact, 2011 tell); EURGBP (cleanest USD-neutral) drift −0.014≈0. **Acceptance test FAILS: 2018 drift −0.085 (cap 0.500, NEG); 2015 +0.390 (cap 0.525 barely >coin-flip)** — USD-neutrality gave noise, not +2018. **Lesson: the gap-fill edge is JPY-cross-SPECIFIC (carry/USD-related), NOT a universal weekend-gap property — USD-neutral gaps are efficient/random-walk; removing the USD/carry exposure that makes 2015/2018 negative ALSO removes the edge (edge & tail are the SAME exposure → net-zero, can't diversify a book, §11).** 10th dead route to the 2018 leg; closes the "USD-neutral net-positive fade" sub-route. No engine/null/council. OOS untouched | N | n/e | n/e | n/e | n/e | 463 obs | KILL (obs cheap-kill) | N | KILL |
 | 2013 | 2000s | 2026-06-05 | **Weekend UP-gap weekend SHORT, JPY crosses** (the gap-fill's "stronger leg", arc 2001/2003 FLAG-1; 1015's named 2018-leg candidate) — the up-gap reverting DOWN, mirror of the 1006 down-gap LONG. **CONVERGES with independent 1000s arc 1016 → KILL.** **FIRST end-to-end SHORT engine run** — validates the merged PR #273 short path (pool builds sign-correctly, costs net symmetrically, no canonical change). Obs: honest i+1 short capture clears 0.50 only in a single fragile band (≥1.0 cap 0.518/drift +0.08/median +0.146) — but **≥0.5 median −0.115, ≥1.5 INVERTS −0.22, drop-AUDJPY → −0.107** (1016 independently got cap 0.448/drift −0.093). §5f honest engine (non-coin-flip at ≥1.0, so engine-run required): mean-positive under overshoot exits (trailing_atr **+0.745%** IS, beats random-ANY-bar null +1.74%) BUT **NOT all-folds-positive (5/10 neg)** and the positive mean is **THIN REGIME-LUCK — excluding 2018(+5.08,n8)+2019(+5.92,n10) the other 8 folds avg −0.44%** (net-neg); fails the 2015 half of the spec (−0.57). Diagnosis: arc-2001's −0.57 ATR was the untradeable gap-bar-OPEN (hindsight); by i+1 reversion is spent (backward-confirming, arc 1014) + JPY-basket up-drift taxes the short. Real-but-regime-luck = KILL not PORTFOLIO (Arc-10 defense: independent reproduction + fold-decomposition caught the thin-fold over-claim). 2018-leg unfound in EVERY short (1014/2009/2011/3011 structure, 3010 trend, 1016/2013 flow, 3012 vol, 2012 cont-long). OOS preserved | N | n/e (OOS preserved) | -3.18% (best-exit IS worst-fold) | n/e | n/e | 137 | FAIL → KILL (regime-luck, converges 1016) | N | KILL |
 | 3015 | 3000s | 2026-06-05 | **End-of-week (Friday) position-squaring reversion** — is there a WEEKLY analog of the month-end leg (`me`, arc 1011, the one demonstrably 2018-positive mechanical-flow reversion)? Does mechanical reversion concentrate at the end-of-week squaring boundary, positive in 2015 & 2018? FALSIFIED at obs (D1, 7 USD majors, big-down-move→buy by day-of-week). **NO day-of-week concentrates reversion** — Friday cap **0.502 / drift −0.045** (vs the month-end subset of the SAME setup cap 0.511 / drift +0.193, reproducing `me`). **2015/2018 acceptance FAILS** (2018 cap 0.421/−0.346 robustly neg; 2015 cap 0.417/med −0.51); per-pair = USD-quote-beta split (4/7 = noise, arc-2009/3012 tell); best-version sweep thins below pool floor before turning + (thr1.5 "positive" rests on 2&5 samples = thin-tail). Diagnosis: `me` survives 2018 via the **hard inelastic WMR/index rebalancing mandate unique to month-end** — the weekly boundary has no forced-rebalancing driver → the calendar-flow reversion edge does NOT generalize down the calendar hierarchy (month-end ≠ week-end). **9th dead route to the 2018 leg**; the mechanical-flow well is dry at the weekly scale. No engine/null/council spent | n/e | n/e | n/e | n/e | n/e | 4225 down-move obs (261 Fri) | KILL (obs cheap-kill) | N | KILL |
+| 3016 | 3000s | 2026-06-05 | **Intraday session structure: Asian-range / London-open break** (continue OR fade) — the single genuinely-UNMAPPED data modality (every prior arc is H4/D1/W1 daily-scale or calendar-flow; arc 1000 only did H4 hour-CONDITIONING, not a session-RANGE construction). DST-clean (Europe/London) Asian range × first London-open break, H1 majors. FALSIFIED at obs: **the break does NOT continue** (long-cont cap **0.375**/drift −0.116, short-cont 0.396/−0.039) AND **does NOT cleanly fade** — the naive `1−cont_cap≈0.62` is an asymmetric-SL artifact; the fade's OWN honest capture is **0.386** (short up-break) / 0.383 (long down-break): cont 0.375 + fade 0.386 = 0.76 < 1 = the break entry is a **high-vol London-open WHIPSAW point where a 2·ATR SL is hit BOTH ways**. Net fade drift after entry spread (~0.08 ATR) is **~+0.02R ≈ 0**, ~10× below the ~0.125R H1 cost (~2× H4). Only positive cell EURUSD +0.19 = **1/4 pairs (single-pair noise tell)**; 2015 (+0.174)/2018 (+0.251) drift-positive but inside cap 0.385/0.433 (<0.50) → won't survive engine (arc-3004/3012 "+drift inside sub-0.50 capture collapses SL-honest"). **Intraday session structure is sub-cost — extends the H1 cost wall (1008/3008/1010) from discrete-flow events to session-RANGE; the last unmapped modality mapped dead.** Reusable caution: `1−cont_cap ≠ fade capture` (asymmetric SL). No engine/null/council spent | n/e | n/e | n/e | n/e | n/e | 7983 IS break obs | KILL (obs cheap-kill) | N | KILL |
 
 ---
 
@@ -2783,6 +2784,66 @@ regime-orthogonal component from deployable, and that component increasingly loo
 **Tooling.** No new BUILT tool — reused BUILT direction-aware `observe_long_capture`; day-of-week /
 into-move / month-end are one-off scratch conditioners. Drivers
 `_disco3_work/arc3015_observe_dow_reversion.py` + `arc3015_friday_bestversion.py` (reproducible).
+
+**FLAGS (code not merged):** none. No canonical-core change. Carries standing FLAG-1 + the
+`A1Config.time_exit_bars`-unwired flag.
+
+### arc_3016
+
+**Intraday session structure: Asian-range / London-open break (continue OR fade)** (chat 3000s). Full
+record: [`arcs/arc_3016_session_break_fade.md`](arcs/arc_3016_session_break_fade.md). No council
+(cheap-kill at observation; honest capture far below 0.50 both directions).
+
+**Idea + why.** With the flow/short/portfolio space saturated by the 1000s/2000s chats (now 10 dead
+routes to the 2018 leg, all one USD/carry/risk-reversion-fade exposure — arc 1018's lesson: edge & tail
+are the same exposure, can't diversify) and my own 3015 closing the weekly-calendar route, I targeted the
+ONE genuinely-unmapped data modality for collision-freedom + information: **intraday session structure.**
+Every prior arc is H4/D1/W1 daily-scale or calendar-flow; arc 1000's dry hour-of-day result was capture
+CONDITIONING, never a session-RANGE construction. The classic, documented London-open break of the Asian
+range — either a liquidity-ignition CONTINUATION or a stop-run FADE — is a genuinely different
+(intraday-liquidity) exposure, decorrelated from every daily-fade edge, so a positive would be
+portfolio-relevant regardless of the 2018 wall. Stated the H1 cost reality up front (1R=2·ATR≈24pip,
+FundedNext RT≈3pip≈**~0.125R ≈ 2× the H4 cost-in-R**, arc-3008) → the edge must clear ~2×, not be marginal.
+
+**What happened — falsified at observation.** DST-clean (Europe/London) Asian range (London-hours 0–7)
+× first London-open break (hours 8–11), H1 EURUSD/GBPUSD/USDJPY/AUDUSD, honest +1R-before-SL capture both
+directions. (1) **No continuation:** long-cont cap 0.375/drift −0.116, short-cont 0.396/−0.039 — the break
+reverses, no momentum-ignition. (2) **No clean fade either — and a measurement trap caught:** the naive
+`1−cont_cap ≈ 0.62` is NOT the fade's capture (the SLs are asymmetric). Measured as its own direction, the
+fade's honest capture is **0.386** (short the up-break) / 0.383 (long the down-break). cont 0.375 + fade
+0.386 = **0.76 < 1** → the break entry sits at a **high-volatility London-open WHIPSAW point where a 2·ATR
+SL is hit BOTH ways** before +1R. Net fade drift after the entry spread (~0.08 ATR on H1) is **~+0.02R ≈ 0**,
+~10× below the ~0.125R cost. (3) **No robustness:** only EURUSD short-up-break fade is positive (+0.19,
+1/4 pairs = single-pair noise tell, arcs 1010/2011/3012); the long-down-break fade is 4/4 negative. The
+fade IS drift-positive in 2015 (+0.174) and 2018 (+0.251) — but inside capture 0.385/0.433 (<0.50): the
+gross drift does NOT survive the take-the-loss 2·ATR SL.
+
+**The crux (why it died).** Entering immediately after a London-open break is entering ON a volatility
+spike: the next bars extend (stopping the fade) or snap back (stopping the continuation) with near-equal
+frequency, so ANY directional bet with a 2·ATR SL there loses to the stop (cap ~0.38 both ways). The
+residual fade drift (~0.02R) is the ceiling on any exit and is ~10× below cost → no exit/SL sweep rescues
+it, §5f does not bite (no non-coin-flip entry). This extends the corpus's **H1 cost wall** (gotobi 1008,
+month-end-fix 3008, round-number-H1 1010) from discrete-flow events to **session-RANGE structure**.
+
+**Verdict: KILL (cheap-kill at observation).** No pool/engine/null/council spent.
+
+**Threads / lessons.** (1) **Intraday session structure is sub-cost — the last unmapped data modality is
+now mapped dead.** The London-open break is a whipsaw entry (honest cap ~0.38 BOTH directions = a 2·ATR SL
+hit both ways), net drift ≈0 after spread; the H1 cost wall extends to session-RANGE constructions. (2)
+**`1−continuation_capture` ≠ the fade's capture** (asymmetric SL) — a reusable measurement caution; always
+measure the contrarian leg in its own direction (the naive flip suggested a 0.62 "fade edge" the honest
+0.38 refuted). (3) **A gross-drift cell inside sub-0.50 honest capture is dead even when 2015/2018-positive**
+(re-confirms 3004/3012; the 2·ATR take-the-loss SL is the arbiter) → this fade's +2015/+2018 drift is NOT
+a 2018-leg lead. (4) **Surviving frontier (further narrowed):** with intraday session structure dead, the
+in-apparatus (H1/H4/D1/W1 FX-major OHLCV) search is comprehensively exhausted — direction, flow, calendar
+(monthly taken / weekly+intraday dead), structure, vol, regime, relative-value, session structure. The
+portfolio route stands one regime-orthogonal 2018-leg component from deployable, and that component must
+come from a lever the in-apparatus search cannot supply (operator-gated tighter-cost execution regime —
+arc-3004 escalation #3 — or a non-OHLCV data source). Honest read: the H4/D1-FX-major idea well is nearly
+dry; remaining arcs are low-EV map-completion until the operator opens a new lever.
+
+**Tooling.** No new BUILT tool — scratch observers `_disco3_work/arc3016_observe_session_break.py` +
+`arc3016_observe_fade.py` (canonical `Panel.from_pairs` H1 + `reached_1r_before_sl`; reproducible).
 
 **FLAGS (code not merged):** none. No canonical-core change. Carries standing FLAG-1 + the
 `A1Config.time_exit_bars`-unwired flag.

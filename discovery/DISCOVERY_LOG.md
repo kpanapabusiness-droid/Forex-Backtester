@@ -36,6 +36,7 @@ at arc step (i).
 | 1010 | 1000s | 2026-06-05 | Round-number / order-cluster reversion long (Osler 2003: take-profit clusters at big-figure "00" levels → bounce off support) — novel structural microstructure mechanism, decorrelated portfolio candidate; FALSIFIED at obs: support-rejection capture only 0.4883 (+0.5pp, drift ~0) sub-0.50, per-pair lift 3/9 >0.50 = NOISE, and the H4 lift EVAPORATES at H1 (0.4746 < base; EURUSD 0.5155→0.4834). Round-number effect arbitraged at H4/H1 like gotobi | N | n/e | n/e | n/e | n/e | n/e | FAIL (obs cheap-kill) | N | KILL |
 | 3007 | 3000s | 2026-06-05 | Intraday-SPREAD cost-timing lever on EDGE<COST (restrict cross-trend +gross signal to tightest-spread hours to cut cost — the one untried cost lever, arc 1003/1004) — BACKFIRES: spread×edge entangled, tight-spread/liquid hours have WEAKEST (negative −0.02R) gross edge; only +gross bucket is mid-spread (+0.12R) which nets ≤0 SL-honest (triage mean −0.02%, not all-folds-pos on friendly yrs). Cannot cut cost w/o cutting edge | N | n/e | -0.13% (mid-spread triage) | n/e | 0.14% | 2955 | FAIL → KILL | N | KILL |
 | 1011 | 1000s | 2026-06-05 | Month-end reversion long, USD majors (big DOWN move into month-end reverses — WMR-fix mechanical rebalancing over-extension; D1, ~2-bar time exit) — **2nd net-positive DECORRELATED long-only component**. MECHANISM-CONTROLLED: month-end vs random-day +0.249 ATR EXCESS (generic reversion NEGATIVE −0.063 → timing is causal). IS mean +0.23% (sl_only 2-bar), beats fair null +0.56pp, threshold-robust (0.75–1.5), leave-one-pair-out all+; but 7/10 folds → NOT all-folds-pos. Corr +0.117 vs arc 1006 → portfolio thread ACTIVE | N | n/e (OOS preserved) | -1.14% | n/e | n/e | 121 | FAIL → PORTFOLIO | N | PORTFOLIO |
+| 2005 | 2000s | 2026-06-05 | Attack EDGE<COST from the COST side: restrict cross-trend +gross entry (Donchian-20+SMA200, 12 crosses) to its cheapest bars (spread/ATR trailing-rolling-quantile, BUILT make_low_cost_mask). MONOTONE IS lift −7.96%(all)→+1.72%(cheapest 15%), beats matched random-cheap null (≈−0.3%) IN-SAMPLE — but OOS −2.26% (4/6 neg) + q full-sample-swept → NOT durable. CONVERGES w/ arc 3007 (3000s, absolute spread-timing): cost↓ entangled with edge↓ (liquid hours = weakest gross edge) → both chats CLOSE the cost side. DIRECTION remains the wall (3004); cost+stop are secondary ~5–10pp drags | N | N | +1.42% (cheapest-15% IS) | -8.33% | 6.01% | 682 | FAIL | N | KILL |
 
 ---
 
@@ -1128,3 +1129,58 @@ gated arc. The arc-3004 escalation (shorts/second-leg) still dominates for a *so
 -unwired flag (arcs 1005/3004; worked around via the BUILT `make_time_exit_predicate`). Drivers scratch
 `_disco_work/arc1011_observe_monthend_reversion.py`, `arc1011_control_monthend_vs_random.py`, `arc1011_wfo.py`,
 `arc1011_robustness.py` (reproducible from the arc doc).
+
+### arc_2005
+
+**Attacking EDGE<COST from the COST side (cost-regime conditioning)** (chat 2000s). Full record:
+[`arcs/arc_2005_cost_side_attack.md`](arcs/arc_2005_cost_side_attack.md). No council (the decisive control —
+random-on-cheap-bars null — settled the soundness question in-arc; cf. 2002/3005). Built + registered
+`make_low_cost_mask` (BUILT).
+
+**Idea + why (log-seeded).** The programme's binding constraint is EDGE<COST; every arc attacked the EDGE side.
+Arc 3004's peer review flagged "the cost is a wall INDEPENDENT of the stop." FundedNext cost = 1.5×spread+…, and
+spread varies a lot by bar. Arc 1003's cross trend-momentum has +0.10R GROSS but nets sub-cost because crosses'
+WIDE spreads eat it. So the never-run experiment: restrict that +gross entry to its cheapest bars (spread/ATR in
+a trailing-rolling LOW quantile) — does cutting cost flip the net sign? Tests WHICH half of EDGE<COST binds.
+
+**What happened.** Donchian-20+SMA200 on 12 trending crosses, full IS WFO, costs ON. **MONOTONE cost effect:**
+mean −7.96%(all bars) → −3.38%(cheapest 50%) → −0.38%(30%) → **+1.72%(15%)**; neg folds 8→7→7→2; maxDD
+27.55→6.01%. The cheapest-15% (+1.72%, 2/10 neg) is the best long-only IS mean in the programme. **Decisive
+control — random entry on the SAME cheap bars** (3 seeds): mean ≈ −0.3%, ~5/10 neg → the real cross-trend
+selection beats random-cheap IN-SAMPLE (so it's not merely "cheap bars cost less"; a zero-edge long stays
+break-even even when cheap). **BUT OOS (2021-26) = mean −2.26%, 4/6 neg** → the edge does NOT survive; combined
+with the IS positivity being concentrated ONLY at the most aggressive q (q full-sample-swept), the IS +1.72% is
+q-overfit + favorable-regime.
+
+**Verdict: FAIL → KILL (conservative, §8/§11).** Genuine PORTFOLIO-vs-KILL fork (IS mean-positive + beats null =
+arc-1006 profile), but OOS-negative ⇒ net-negative forward ⇒ KILL (can't diversify net-negative positive), and
+the q-sweep means it isn't the clean un-swept IS-positive arc 1006 had. A proper nested cost-quantile WFO +
+HEAVY council is the flagged path that could in principle re-qualify a milder version — current evidence does
+not support PORTFOLIO.
+
+**Convergence with arc 3007 (chat 3000s, landed mid-arc) — reconciling a contradiction.** 3007 INDEPENDENTLY
+attacked the cost side on the SAME signal via **intraday spread-timing** and found it **backfires**: the
+tight-spread tercile (= liquid London/NY hours) has the WEAKEST/NEGATIVE gross edge (tight −0.0199R, mid +0.12R,
+wide −0.035R), "you cannot cut cost without cutting edge — spread×edge entangled." Reconciliation: 3007 used
+**absolute** spread/hours (→ liquid hours, low gross edge); I used **trailing-relative** cheapness (→ different
+bars, cheap vs a pair's own recent norm), and the Donchian selection beats random-cheap IN-SAMPLE on those bars
+— but my OOS-negative confirms it doesn't generalize, and 3007 supplies the mechanism (cost↓ entangled with
+edge↓). **Both chats reach the same KILL; together they CLOSE the cost side of EDGE<COST from two independent
+angles.**
+
+**Threads / lessons.** (1) **The COST side of EDGE<COST is closed (two chats, two cheapness definitions).** Cost
+is NOT a free lever on a directional FX entry — the cost-saving direction (liquid/tight-spread) is entangled
+with the weakest gross edge (3007), and a trailing-relative-cheapness IS-positive does not survive OOS (2005).
+(2) **Completes the "stop + cost" closure of the arc-3004 escalation:** removing the STOP (3004) lifts mean but
+not to all-folds-positive; cutting COST lifts IS mean (2005) or backfires (3007) but yields no durable edge.
+Both secondary ~5–10pp drags are now lifted across both chats and **DIRECTION is still the binding wall** — the
+real unlock is the 2nd leg / shorts (relative-value), not cheaper execution (a raw-spread ECN helps margins, not
+the directional edge). (3) **Methodological:** a MONOTONE in-sample lift + beats-random can STILL be
+non-durable (OOS-negative) when the conditioning variable is entangled with the edge and the cut depth is
+full-sample-swept — the OOS + a sister-chat's mechanism analysis (3007) caught it. (4) `make_low_cost_mask`
+(BUILT) is reusable, but apply it ONLY to a signal whose gross edge is demonstrably decoupled from the spread
+regime (none found yet).
+
+**FLAGS (code not merged):** none new. Carries FLAG-1 (long-only blocks the UP-gap short side) + the
+`A1Config.time_exit_bars`-unwired flag. Drivers scratch `_disco2000_work/arc2005_cost_side.py`,
+`arc2005_null_control.py`, `arc2005_oos.py`.

@@ -53,6 +53,7 @@ at arc step (i).
 | 2011 | 2000s | 2026-06-05 | **Failed-breakout REJECT SHORT @ swing HIGH** — the TRUE forward-confirming mirror of arc 1013's reclaim-long (1014 tested the wrong/continuation mirror, 2009 the climax continuation; NONE tested the reject-reversal): price sweeps buy-stops above a 40-bar swing high then REJECTS back below with a big upper wick (bull-trap → reversal DOWN), candidate 2018-positive 4th leg. POOLED obs LOOKED like the first passing short (drift +0.171→+0.463 monotone in shadow, structure-control AT-swept +0.261 vs elsewhere −0.213) — but capture COIN-FLIP (0.47–0.51, not 1013's 0.55–0.61). **ROBUSTNESS KILLS it:** mean≫median (s≥1.25 mean +0.261 vs median −0.069 = thin-tail), excluding the 2 thin outlier pairs (AUDUSD n25 +1.26, USDJPY n31 +1.49) collapses it (s≥1.0 +0.085, s≥1.25 **−0.133 NEG**); deeper cell INVERTS negative (opposite of 1013). Structure-control "pass" was a PAIR-MIX confound; USD-quote split (arc-2009 USD-beta). arc-1013 reclaim-long has **NO tradeable short mirror in ANY of 3 constructions** (1014/2009/2011) → asymmetric long-only edge; structural-short route to 2018 fully closed | N | n/e | n/e | n/e | n/e | ~121k obs | KILL (obs cheap-kill, robustness-confirmed) | N | KILL |
 | 1016 | 1000s | 2026-06-05 | **Up-gap weekend SHORT** — the dispatch's #1 short lead + arc-1015's named 2018-leg candidate: the mirror of the arc-1006 gap-fill LONG (PORTFOLIO), a weekly-open UP gap reverting DOWN (arc 2001/2003: up-gaps drift −0.57 ATR / frac+ 0.64 = the "stronger leg"), checked specifically for its 2015 & 2018 sign. FALSIFIED at obs (direction-aware observe, H4, JPY crosses + USD majors): the honest i+1 short is **coin-flip-or-adverse** — JPY up-gap cap 0.448 (<0.50) drift −0.093 (the up-gap CONTINUES up at i+1, doesn't revert), per-pair 1/5; USD majors cap 0.418 drift −0.065, 3/7. **2015 & 2018 acceptance test FAILS as a real edge:** USD majors 2015 −0.65 / 2018 −0.21 both NEG; JPY 2015 +0.36 / 2018 +1.99 LOOK positive but = **regime-luck within a coin-flip** (overall cap<0.50, drift −0.09, per-pair 1/5, tiny n, wild per-year swings — arc-3010 lesson). Diagnosis: arc-2001's −0.57 ATR was the untradeable gap-bar-OPEN (hindsight); by i+1 the reversion is spent → **backward-confirming** like arc 1014; JPY-cross carry up-drift is a short headwind. §5f doesn't bite (sub-0.50/≤0 drift); no engine/null/council spent. **The 2018-positive 4th leg is NOT in any short construction (1014 structure / 2009 climax / 2011 reject / 3010 trend / 1016 flow) — the route's 2018 wall stands** | N | n/e | n/e | n/e | n/e | ~309k obs | KILL (obs cheap-kill) | N | KILL |
 | 2012 | 2000s | 2026-06-05 | **DEEP multi-factor trend-CONTINUATION long** (1013's forward-confirm property applied to continuation, the one untested face of dispatch item d) — the portfolio's missing 4th leg must be trend/2018-POSITIVE (a continuation long: trend-positive, a LONG so no short-mirror death). Construction: uptrend (close>SMA200 & SMA50>SMA200) × shallow pullback holding the 40-bar higher-low × strong prior impulse (SMA50 slope) × FORWARD-confirm resume (close>prior-high). FALSIFIED at obs (H4 USD majors, IS): cell cap 0.479–0.486 (≤ base 0.486, all <0.50); impulse gate ANTI-predictive (stronger trend → worse, 3003 echo). **Q2 forward-confirm does NOT rescue continuation** (resume −0.105 vs into-dip −0.156, both neg) — mechanism: forward-confirming a REVERSAL (1013) enters BEFORE the move starts (works); a CONTINUATION enters AFTER the bounce (late) → reverts. **Q3 STRUCTURE CONTROL INVERTS (decisive):** FULL conjunction 0.4787/−0.105 WORSE than generic resume-in-uptrend 0.4956/+0.007 — deep trend structure is ANTI-load-bearing (mirror-image of 1013 where structure HELPS). Per-pair 1/7 pos (USDJPY only); **2018 drift −0.233 NEG** → not the trend leg. Closes the deep-continuation-long face: 1013's forward-confirm property is REVERSAL-SPECIFIC; no structural directional bet (long OR short, shallow OR deep) yields the 2018 leg → arc-3004 escalation reinforced | N | n/e | n/e | n/e | n/e | ~121k obs | KILL (obs cheap-kill) | N | KILL |
+| 1017 | 1000s | 2026-06-05 | **Carry-unwind cascade SHORT on JPY crosses** (vol-ignition conditioned) — a genuinely novel risk-off FLOW mechanism for the 2018 leg: leveraged carry force-unwinds in risk-off → JPY bought back → persistent down-cascade; short the vol-expansion big-red IGNITION fired from a built-up carry uptrend (forward-confirming, enters at the START of the unwind, unlike trend-short 3010). REAL structural effect (**structure control PASSES**: in-carry-uptrend drift +0.134 ATR / median +0.068 = continues DOWN vs same big-red bar NOT-in-uptrend median −0.178 = reverts UP) **but sub-cost**: capture coin-flip 0.50, drift on the JPY-cross cost line, **deeper cell INVERTS** (2011/3011 tell). Honest engine §5f (exit menu swept, entry shows gross drift): 5-pair best exit sl_only mean **+0.013%, 4/10 folds pos, NOT all-folds-positive**; beats fair null by only +0.044pp (noise floor, ~10× below 1006's +0.36pp). First-read "2015&2018 both +0.19%" was a **JPY currency-exposure-cap artifact** — all-JPY-quote crosses fire simultaneously in one risk-off cascade, the 2-per-ccy cap guts the clustered fires (uncapped pool 92–109/yr → capped engine 0–3/yr in 2015/16/19). Single-pair (cap removed) best AUDJPY +0.011% 6/10, beats null +0.022pp; NZDJPY dead (+0.0001pp); none all-folds-positive. **NEW lesson: a correlated-cascade signal is structurally un-scalable into a portfolio leg.** 2018 IS genuinely engine-positive (AUDJPY +0.07–0.10%, pool +1.04R — the only short positive in 2018) but tiny/un-scalable + 2015 marginal → KILL. The 2018 leg is now unfound across EVERY route (structure 1014/2009/2011, trend 3010, up-gap flow 1016, rel-value 2010, deep-continuation 2012, carry-unwind flow 1017). OOS preserved | N | n/e (OOS preserved) | +0.011% (AUDJPY best-exit, not AFP) | n/e | ~0.05% | 1204 | FAIL → KILL (sub-cost, un-scalable) | N | KILL |
 
 ---
 
@@ -2338,3 +2339,70 @@ and a candidate 4th decorrelated PORTFOLIO component / standalone test.
 
 **FLAGS (code not merged):** none. No canonical-core change. Conditioning is a one-off scratch observer.
 Driver `_disco2000_work/arc2012_observe_trend_continuation.py` (reproducible from the arc doc).
+
+### arc_1017
+
+**Carry-unwind cascade SHORT on JPY crosses** (chat 1000s). Full record:
+[`arcs/arc_1017_carry_unwind_cascade_short.md`](arcs/arc_1017_carry_unwind_cascade_short.md). No council
+(a sub-cost / not-all-folds-positive engine result is a clean quantitative KILL, not an idea-fork /
+diagnosis / survivor — arc-1015/2011 no-council convention).
+
+**Idea + why.** The deployable gate is an all-folds-positive COMBINED book; the strongest (3-way 1006+1011+1013)
+is provably blocked by 2015 & 2018 (strong-USD/risk-off), and the missing 4th leg must be net-positive AND
+positive in BOTH. Every prior 2018-leg attempt died (structural shorts 1014/2009/2011·3011, trend-short 3010,
+up-gap flow short 1016, relative-value 2010, deep-continuation long 2012). The one documented mechanism
+intrinsically aligned with BOTH risk-off years and NOT a symmetric directional coin-flip, still UNMAPPED: the
+**carry-unwind cascade** — leveraged carry (long risk-cross/short JPY) force-unwinds in risk-off, JPY bought
+back, persistent one-way cascade ("up the stairs, down the elevator"). Short the vol-expansion big-red IGNITION
+fired from a built-up carry uptrend = enter at the START of the unwind (forward-confirming, arc-1013), distinct
+from arc 3010's established-downtrend short (which reverts). Uses the merged short path (PR #273) non-trivially.
+
+**What happened.** OBSERVATION (direction-aware short lens, H4 carry crosses AUD/NZD/EUR/GBP/CAD-JPY, IS): the
+ignition cell (carry-uptrend & vol≥1.5 & big-red≥1.0) is **capture 0.50 (coin-flip)** with **positive forward
+short drift +0.134 ATR** (median +0.068). The **structure control PASSES** — the strongest point for the
+mechanism: in-carry-uptrend median +0.068 (continues DOWN) vs the SAME big-red+vol bar NOT-in-uptrend median
+−0.178 (reverts UP); the carry context genuinely flips a reverting big-red bar into a weakly-continuing one. BUT
+the **deeper cell INVERTS** (vol2.0/down1.5 → drift −0.017; the 2011/3011 artifact tell, opposite of 1013) and
+per-year drift is noise (−1.26..+1.21). Per §5f (entry shows gross structure-controlled drift → sweep the exit
+menu on the engine before FAIL): 5-pair IS WFO, **best exit sl_only mean +0.013%, 4/10 folds positive, NOT
+all-folds-positive** (every other exit mean ≤ 0). Fair 5-seed null: real +0.013% vs null −0.031% → beats random
+by **+0.044pp = noise floor** (~10× below arc 1006's +0.36pp-over-null).
+
+**The exposure-cap discovery (the load-bearing finding).** My first engine read showed 2015 & 2018 OOS folds
+both **+0.19%** — the exact regime-orthogonal profile the route needs — and I nearly proceeded to a 4-way
+combination. The per-fold **n_trades killed it: 2015 n=0, 2016 n=0, 2019 n=0, 2018 n=3** on the engine, vs
+**92/103/109** in the uncapped pool. Cause: all 5 pairs share **JPY quote**, and carry-unwind ignitions fire
+*simultaneously* across them (ONE correlated risk-off cascade), so the FundedNext **2-per-currency exposure cap**
+guts exactly the clustered cascade trades — the positive "2015/2018 folds" were near-zero-trade accounting
+artifacts. Removing the confound (single-pair AUDJPY): best mean **+0.011%, 6/10, beats null +0.022pp**, none
+all-folds-positive; NZDJPY dead (+0.0001pp); EURJPY 2015 flips negative across exits. Real but noise-floor.
+
+**Verdict: KILL.** Real-but-sub-cost (arc-0/1000 signature): beats random by a noise-floor margin, not
+all-folds-positive under any exit/pair, capture coin-flip, drift on the cost line and inverting deeper. Mean
+60× below the PORTFOLIO archetype and within noise → §11 + conservative bias forbid a portfolio leg on
++0.02pp-over-null noise (cannot diversify a noise-floor component positive, arcs 3000/3001). OOS 2021+ NOT
+touched (IS not all-folds-positive, §4).
+
+**Threads / lessons.** (1) **The carry-unwind cascade short is a REAL structural effect but sub-cost** —
+structure control passes, but magnitude on the cost line + coin-flip capture → net noise, like every directional
+construction (forward-confirming is necessary-not-sufficient, re-confirms 1013/2011/2012). (2) **NEW: a
+correlated-cascade signal is structurally UN-SCALABLE into a portfolio leg.** A single-quote-currency cross-basket
+fires together in the target regime, so the currency-exposure cap guts the clustered trades that carry the edge
+(uncapped 92–109/yr → capped 0–3/yr); the book is internally one redundant bet and capped too thin to size. This
+is a general portfolio-construction prior: a risk-off-positive flow edge concentrated in one currency cannot
+become the magnitude-meaningful 2018 leg. (3) **2018 is genuinely engine-positive here (AUDJPY +0.07–0.10%, pool
++1.04R — the ONLY short construction positive in 2018 on the honest engine), but tiny + un-scalable + 2015
+marginal/inconsistent** → "directionally right, magnitude-dead"; the 3-way's 2018 deficit (−0.77% risk-parity)
+dwarfs a +0.07% contribution. (4) **The 2018-positive 4th leg is now unfound across EVERY mapped route** —
+structure / climax / reject (1014/2009/2011·3011), trend (3010), up-gap flow (1016), relative-value (2010),
+deep-continuation long (2012), carry-unwind flow short (1017, the last named risk-off flow idea) — reinforcing
+the arc-3004 escalation: the apparatus's only net-positive edges are calm-year fades; risk-off-positive
+constructions are noise-floor / un-scalable. The 3-way book (1015) stands as the strongest non-deployable result.
+
+**Tooling:** BUILT + registered `CarryUnwindCascadeShortSignal` (`discovery/tools/carry_unwind_signals.py`).
+Reused BUILT `observe_long_capture` (short lens) + `build_null_signal_evaluation`; CALLED `build_arc_pool`,
+`ArcFoldRunner`, `run_config_over_folds`, `judge_all_folds_positive`, `build_v3_folds` — scoring stayed canonical.
+
+**FLAGS (code not merged):** none requiring the canonical core. The exposure-cap effect is a realistic gate
+constraint correctly applied (not a defect). Carries the standing `A1Config.time_exit_bars`-unwired flag +
+FLAG-1. Drivers scratch `_disco_work/arc1017_*.py` (reproducible from the arc doc).

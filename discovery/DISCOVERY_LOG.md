@@ -44,6 +44,7 @@ at arc step (i).
 | 1014 | 1000s | 2026-06-05 | **FIRST SHORT ARC.** Confirmed-breakdown continuation SHORT (deep swing-low pierce, NO reclaim, close-below — the short mirror of arc 1013's reclaim-long), H4 USD majors — FALSIFIED at obs: confirmed-breakdown short cap 0.4893 (<0.50) + drift −0.046 (REVERTS, bad for short); deeper close-below reverts HARDER (−0.21 @ 0.25-0.5 ATR); **structure control FAILS** (big-red AT swept-low 0.4998 ≈ big-red ELSEWHERE 0.4963 — swing-low NOT load-bearing for the short, unlike the long); per-pair 3/7 = noise. Diagnosis: reclaim is FORWARD-confirming (move hasn't started → 1013 long wins), confirmed-breakdown is BACKWARD-confirming (move already happened → i+1 short enters the local low → reverts). The 1013 long has NO tradeable short mirror; shorts don't revive directional STRUCTURE (coin-flip by symmetry). Live short frontier = FLOW-event shorts w/ acc>0.50 (up-gap weekend short, 2001/2003) | N | n/e | n/e | n/e | n/e | ~4500 obs | FAIL (obs cheap-kill) | N | KILL |
 | 2006 | 2000s | 2026-06-05 | 2-way PORTFOLIO combination WFO — the route's gated next step (arc 1011 flag): co-simulate the ONLY two net-positive long-only components (gap-fill 1006 JPY-cross H4 + month-end 1011 USD-major D1) under equal + risk-parity weights, gate all-folds-positive on the COMBINED book. Both reproduce EXACTLY (gap +0.685%, me +0.232%, corr +0.117 ✓). Risk-parity cuts worst-fold −6.79%(gap solo)→−1.53% but STILL 4/10 neg — BLOCKED by a mutually-negative fold (2015, both lose): no convex/co-sim combo can pass (P&L additive). The two edges are flow-reversion → TAIL-CORRELATED (both bleed 2015/16/18/20) despite corr +0.117. ⇒ ≥3 components needed, SELECTED for fold-complementarity (regime-orthogonality), not avg-corr. Components UNCHANGED (still PORTFOLIO); 3rd-component spec = net-pos on 2015/16/18/20, esp 2015 | N | n/e (OOS preserved) | -1.53% (risk-parity combined) | n/e | n/e | 396+121 | FAIL → KILL (combined book; components unchanged) | N | KILL |
 | 2008 | 2000s | 2026-06-05 | 3-way PORTFOLIO combination WFO (gap-fill 1006 + month-end 1011 + **failed-breakdown 1013**, the new regime-orthogonal 3rd component) — the route's gated next step now a 3rd exists (arc-1013 spec). All 3 reproduce EXACTLY (≤0.005pp: gap +0.685%, me +0.232%, fbr +1.854%; corr gap-me +0.117 ✓, gap-fbr +0.189, me-fbr −0.366). C did as arc 1013 predicted — CUT the 2-way book's 4 bleed folds to 2 (fixed 2016 & 2020 outright) — but **2015+2018 survive**: risk-parity worst −0.77% (2/10 neg), equal worst −3.36% (3/10 neg). **PROVABLY blocked — 0/5151 convex weightings all-folds-positive** (best max-min −0.222%, 2014/15/18 neg): 2018 needs heavy month-end (its only +leg), 2015 needs heavy fbr & is HURT by month-end → mutually exclusive. **2018 = binding fold: flow-reversion (gap −6.79) AND structural stop-run reversal (fbr −4.20) BOTH lose** in the strong-USD trend year (avg-corr hid the shared 2018 tail). All 3 edges are fade/short-trend → the 4th leg must be trend-continuation/short, dead long-only → escalation/FLAG-1, arc-2007 climax-sweep SHORT the named target. Components UNCHANGED (still PORTFOLIO) | N | n/e (OOS preserved) | -0.77% (risk-parity combined) | n/e | n/e | 396+121+172 | FAIL → KILL (combined 3-way book; components unchanged) | N | KILL |
+| 3009 | 3000s | 2026-06-05 | **3-way PORTFOLIO combination WFO** (INDEPENDENT concurrent re-run of arc 2008 — same verdict, complementary findings; Arc-10 independent-reproduction). Combine gap-fill 1006 (JPY-cross H4) + month-end 1011 (USD-major D1) + failed-breakdown-reclaim 1013 (USD-major H4) under equal + risk-parity, gate all-folds-positive on the COMBINED book. **All 3 reproduce EXACTLY** (gap +0.685%, me +0.232%, fbr +1.854% — caught arc-1013's native-trail double-trail via reproduce-live, trail_enabled=True). **The 2-way's combination-invariant 2015 block is GONE — NO mutually-negative fold** (fbr +3.17 rescues 2015; me +0.90 rescues 2018). But still NOT all-folds-positive: risk-parity 2/10 neg {2015,2018}, equal 3/10. fbr rescued 2016+2020 → blockers narrowed {2015,16,18,20}→{2015,2018}, worst-fold −1.53→−0.77%. **2018 = the hard wall** (strong-USD trend yr: gap −6.79 & fbr −4.20 both deep-neg, only me +0.90) — arc 2008's convex-search proves 0/5151 weightings pass (2015-needs-fbr vs 2018-needs-me are mutually exclusive). 4th-component spec = net-pos on 2015 AND esp 2018 → a SHORT / trend / risk-off-positive leg (longs dead those yrs; shorts now OPEN PR#273; named targets = climax-sweep short 2007, up-gap short 2001/2003). Components UNCHANGED | N | n/e (OOS preserved) | -0.77% (risk-parity combined) | n/e | n/e | 260+98+208 | FAIL → KILL (combined book; components unchanged) | N | KILL |
 
 ---
 
@@ -1683,3 +1684,98 @@ BUILT `make_time_exit_predicate`. Simplex grid is a one-off arithmetic check ove
 second-leg leg the portfolio route demonstrably needs for fold 2018) + the standing
 `A1Config.time_exit_bars`-unwired flag. Drivers scratch `_disco2000_work/arc2008_combo3.py`,
 `arc2008_feasibility.py` (reproducible from the arc doc).
+
+### arc_3009
+
+**3-way PORTFOLIO combination WFO (gap-fill 1006 + month-end 1011 + failed-breakdown 1013)** (chat 3000s).
+Full record: [`arcs/arc_3009_portfolio_combination_3way.md`](arcs/arc_3009_portfolio_combination_3way.md).
+No council (not a PASS survivor, not an idea-fork/diagnosis — a direct quantitative combination test with a
+decisive arithmetic result; arc-2006 precedent).
+
+**Idea + why (log-seeded — the route's explicit gated next step).** After 29 arcs the directional space is
+comprehensively closed, leaving THREE live net-positive long-only PORTFOLIO components: (A) weekend gap-fill
+JPY-cross H4 (+0.685%), (B) month-end reversion USD-major D1 (+0.232%), (C) failed-breakdown RECLAIM
+USD-major H4 (+1.854%, the strongest, a NEW structural-stop-run mechanism family). Arc 2006 combined A+B →
+KILL, *provably* blocked by a mutually-negative 2015 fold; its spec called for a 3rd positive on the bleed
+years. Arc 1013 landed C (positive 2015/16/20 — 3 of the 2-way's 4 bleed years) and named the 3-way
+combination as the HIGH-VALUE next step. I ran it: the single most decision-relevant unrun experiment, the
+deployable gate for the entire long-only PORTFOLIO thesis.
+
+**Method (measurement CALLED; combination is the one BUILT tool).** Reproduced each component LIVE via its
+REGISTERED signal over the SAME `build_v3_folds` IS folds (Arc-10 discipline — don't trust transcription),
+scored solely by `MultiPairBacktester` (FundedNext ON, SL-first), then linear-combined per-fold ROI via the
+BUILT `combine_fold_roi` under equal + risk-parity (fit-on-IS-frozen), judged all-folds-positive on the
+combined book. **All three reproduce EXACTLY** (gap +0.685%, me +0.232%, fbr +1.854%, per-fold byte-identical)
+— and the live re-run CAUGHT a config detail transcription would have hidden: the faithful arc-1013 component
+needs **trail_enabled=True** (native A1 trail ON TOP OF the `sl_plus_trailing_atr` exit policy — a
+double-trail; with trail off the same signal scores +2.084%/2-neg). A probe pinned the published series to
+trail=True at L1=0.03.
+
+**What happened.** Per-fold IS (folds 2–11 → 2011–2020):
+```
+gap (A): -0.07,+8.23,-2.06,+2.94,-4.19,+3.20,+0.53,-6.79,+7.45,-2.39   +0.685%
+me  (B): +0.40,+0.29,+0.96,-0.23,-1.14,-0.51,+0.34,+0.90,+1.16,+0.15   +0.232%
+fbr (C): +7.55,+3.05,+0.91,+0.19,+3.17,+2.55,+1.23,-4.20,+0.05,+4.03   +1.854%
+```
+- **Mutually-negative-fold pre-screen (arc-2006 lesson #4): PASSES.** Every fold has ≥1 positive component —
+  the 2-way's *provable* 2015 block is GONE (fbr +3.17 rescues 2015; me +0.90 rescues 2018). The 3-way is no
+  longer combination-invariant-blocked.
+- **equal** (1/3 each): +2.63,+3.86,−0.07,+0.97,−0.72,+1.75,+0.70,−3.36,+2.89,+0.60 → mean +0.924%, **3/10
+  neg** (2013,2015,2018), NOT all-folds-positive.
+- **risk-parity** (gap 0.106/me 0.726/fbr 0.168): +1.55,+1.60,+0.63,+0.18,−0.74,+0.40,+0.51,−0.77,+1.64,+0.53
+  → mean +0.552%, **2/10 neg** (2015,2018), worst −0.77%, NOT all-folds-positive.
+- IS not all-folds-positive → **OOS deliberately NOT touched** (§4 + holdout preservation).
+
+**Verdict: FAIL the sole judge (combined 3-way book) → KILL.** Components UNCHANGED (reproduced exactly,
+retain PORTFOLIO); no new `portfolio-candidates/` entry. But this is the CLOSEST the route has come and a
+*weaker* failure than the 2-way: not a mutually-negative fold (gone), just a weighting/magnitude shortfall
+on 2 folds.
+
+**Threads / lessons.** (1) **Three mean-positive components STILL fall short — but the route is converging,
+not dead.** Adding the regime-different 3rd (structural stop-run reversal) removed 2 of the 2-way's 4 blocker
+folds (2016, 2020), halved the worst fold (−1.53→−0.77 risk-parity), and dissolved the combination-invariant
+2015 block. Fold-complementarity works; the book is **one component short.** (2) **2018 is the corpus's
+recurring portfolio wall** — a persistent strong-USD *trend* year where flow-reversion (gap-fill, month-end)
+AND structural-reclaim-long (failed-breakdown) all bleed together (gap −6.79 & fbr −4.20 deep-neg, only me
++0.90). Sharpens arc-2006's tail-correlation lesson: even a *different long mechanism family* shares the
+strong-trend tail, because **all three are LONG and none profits from a sustained directional risk-off move**
+— the diversifier must change SIGN-exposure (short/trend), not just mechanism family. (3) **The
+mutually-negative-fold screen distinguishes "impossible" from "needs a 4th component"** — the 3-way passes it
+where the 2-way failed, correctly flagging the book is worth pursuing. (4) **Risk-parity helps variance, not
+the gate** (re-confirmed on 3 components). (5) **Reproduce-live caught the arc-1013 double-trail** —
+Arc-10 discipline working; verdict invariant to it. **The 4th-component spec (razor-sharp): net-positive on
+2015 AND especially 2018** (deficits −0.74%/−0.77% risk-parity) → structurally a **SHORT / trend /
+risk-off-positive** leg (the long menu for those years is dead). **Shorts are now OPEN (PR #273)** — the
+named, well-motivated first targets are the **climax-sweep SHORT** (arc 2007: violent forced sweep is a
+falling knife, drift −0.33) and the **up-gap weekend SHORT** (arcs 2001/2003) — either is a high-value next
+arc whose explicit job is to be positive in 2018/2015. **HIGH-VALUE fleet steer: the next arc should be a
+short construction targeted at the strong-USD/risk-off regime** (the 4th portfolio leg), not another
+long-only flow edge (which would inherit the same 2018 tail).
+
+**Tooling:** no new BUILT tool — reused `combine_fold_roi` + the three registered signals +
+`make_time_exit_predicate` (all CALLED; scoring canonical). The combiner's first-order-linear LIMITATION is
+slightly less clean than arc 2006 (month-end + failed-breakdown share the USD-majors universe, though
+disjoint TF/event-timing) — FLAGGED; the KILL is robust to it (co-sim shares risk budget, doesn't ADD return;
+2018's two-deep-negatives block is additive-P&L invariant). If a future 4-way clears IS linearly, verify
+under co-simulation before any `passed/` claim.
+
+**FLAGS (code not merged):** none requiring the canonical core. Repro/doc note for the operator's deep-dive:
+the committed arc-1013 `sl_plus_trailing_atr` config double-trails (native A1 trail + exit-policy trail), so
+its exit-menu rows are "exit_policy + native trail," not the policy alone — a labeling clarification, not a
+disposition change. Carries FLAG-1 (the regime-orthogonal 4th leg is a short/relative-value construction —
+now UNBLOCKED, PR #273) + the standing `A1Config.time_exit_bars`-unwired flag. Drivers scratch
+`_disco3_work/arc3009_combo3.py` + `arc3009_fbr_probe.py` (reproducible:
+`PYTHONPATH=. py _disco3_work/arc3009_combo3.py`, `histdata_root=C:\Users\panap\histdata_backup`).
+
+**Convergence with arc 2008 (chat 2000s, ran concurrently — independent reproduction).** The 2000s chat
+built and ran the identical 3-way combination in parallel and reached the SAME verdict (KILL, combined book
+not all-folds-positive, blockers 2015+2018) — two independent chats, two drivers, one conclusion (the
+Arc-10 independent-reproduction defense, here for free). The findings are complementary: arc 2008 ran an
+EXHAUSTIVE convex-weight grid (0/5151 weightings all-folds-positive; best max-min −0.222%) and proved the
+block is convex-hull-wide, with the sharp mechanism that **2015-needs-fbr and 2018-needs-month-end are
+mutually exclusive** (heavy month-end fixes 2018 but worsens 2015; heavy fbr the reverse). My run adds the
+exact-reproduction discipline (caught arc-1013's native-trail double-trail, trail_enabled=True) and the
+framing that the 2-way's *combination-invariant* 2015 block is GONE (no mutually-negative fold) — so the
+3-way failure is a weighting/magnitude shortfall, not an additive-P&L impossibility. Both reduce to the same
+4th-component spec and the same steer: the 4th leg must be SHORT / trend / risk-off-positive (positive in
+2018), now unblocked by PR #273.

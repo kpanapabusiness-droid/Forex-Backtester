@@ -23,7 +23,6 @@ from __future__ import annotations
 
 import math
 
-import numpy as np
 import pandas as pd
 import pytest
 
@@ -32,7 +31,6 @@ from core.arc.signal_protocol import PerPairSignalState
 from core.discovery.pool_simulator import DiscoveryExitConfig, simulate_pair_pool
 from core.sim.account import Direction, parse_direction
 from core.sim.honest_label import reached_1r_before_sl
-
 
 # ── 1. honest label — SHORT branch (take-the-loss in label space) ───────────
 #

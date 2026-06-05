@@ -34,6 +34,7 @@ at arc step (i).
 | 1009 | 1000s | 2026-06-05 | AUDIT of arc 1006 gap-fill (SAME component, not a new edge): reproduce + robustness. REPRODUCES +0.685% IS via registered tools; NOT single-pair (leave-one-out all +); but threshold-FRAGILE (lives at 0.5ATR, ~0 by 1.25) AND edge over a FAIR same-exit null is ~+0.36pp (~HALF the headline; null itself +0.327% from JPY-basket drift). Component HOLDS but thinner | N | n/e (not re-run) | -6.79% | n/e | n/e | 260 | PORTFOLIO (re-affirmed, thinner) | N | PORTFOLIO |
 | 3006 | 3000s | 2026-06-05 | Multi-TF breakout-RETEST long (resistance→support flip; the last untested long-only lane, arc-1008 flag) — FALSIFIED at obs: retest-hold capture ≤ base in all 18 L×tol×hold cells, fwd drift NEGATIVE in 17/18 (−0.35..+0.00 ATR); catches FADING breakouts not defended supports; monotone-in-L only converges TO coin-flip, never above | N | n/e | n/e | n/e | n/e | 1200 | FAIL (obs cheap-kill) | N | KILL |
 | 1010 | 1000s | 2026-06-05 | Round-number / order-cluster reversion long (Osler 2003: take-profit clusters at big-figure "00" levels → bounce off support) — novel structural microstructure mechanism, decorrelated portfolio candidate; FALSIFIED at obs: support-rejection capture only 0.4883 (+0.5pp, drift ~0) sub-0.50, per-pair lift 3/9 >0.50 = NOISE, and the H4 lift EVAPORATES at H1 (0.4746 < base; EURUSD 0.5155→0.4834). Round-number effect arbitraged at H4/H1 like gotobi | N | n/e | n/e | n/e | n/e | n/e | FAIL (obs cheap-kill) | N | KILL |
+| 3007 | 3000s | 2026-06-05 | Intraday-SPREAD cost-timing lever on EDGE<COST (restrict cross-trend +gross signal to tightest-spread hours to cut cost — the one untried cost lever, arc 1003/1004) — BACKFIRES: spread×edge entangled, tight-spread/liquid hours have WEAKEST (negative −0.02R) gross edge; only +gross bucket is mid-spread (+0.12R) which nets ≤0 SL-honest (triage mean −0.02%, not all-folds-pos on friendly yrs). Cannot cut cost w/o cutting edge | N | n/e | -0.13% (mid-spread triage) | n/e | 0.14% | 2955 | FAIL → KILL | N | KILL |
 
 ---
 
@@ -1031,3 +1032,45 @@ from arc 1005's turn-of-month *drift*).
 **FLAGS (code not merged):** none. No canonical-core change; no new BUILT tool (round-number grid is a one-off
 conditioning helper kept in scratch, like 3005's triangulation observer / 1008's gotobi tagger). Reused BUILT
 `observe_long_capture`. Drivers scratch `_disco_work/arc1010_observe_roundnumber.py`, `arc1010_h1_confirm.py`.
+
+### arc_3007
+
+**Intraday-spread cost-timing lever on EDGE<COST** (chat 3000–3999). Full record:
+[`arcs/arc_3007_spread_cost_timing.md`](arcs/arc_3007_spread_cost_timing.md). No council (cheap-kill — the lever
+backfires at observation; engine-confirmed the lone positive bucket).
+
+**Idea + why.** The corpus-wide binding constraint is **EDGE<COST** (arcs 1003/1004: the fix is "raise gross
+edge OR cut per-trade cost"). Every cost lever tried = frequency-via-exits (1004, didn't flip it). The ONE
+untried cost lever = **intraday SPREAD TIMING**: FX spreads vary 3–5× across the day, the honest engine charges
+1.5× the *actual bar spread*, so restricting a positive-gross-drift signal to the tightest-spread window cuts
+realized cost. Tested on arc 1003's cross-trend long (Donchian-20 + SMA200-uptrend, 12 crosses — the textbook
++0.10R-gross-but-net-negative EDGE<COST case).
+
+**What happened.** Intraday spread profile: median spread_R 0.0256 (tight) → 0.0764 (wide), **2.99× range** —
+real cost range. But splitting the cross-trend pool (n=4539, capture 0.4807, gross +0.0218R) by entry-spread
+tercile shows spread and gross-edge are **entangled the wrong way**: **tight** spread_R 0.0138 → gross
+**−0.0199R** (NEGATIVE); **mid** 0.0328 → **+0.1207R**; **wide** 0.0858 → −0.0354R. The tightest-6-UTC-hour
+window is gross −0.0158R too. The cost-saving direction (tight spread = liquid London/NY hours) has the
+WEAKEST gross edge — high efficiency arbitrages the breakout. The lever **backfires**: timing to low spread =
+timing to low edge. Confirm (don't hand-wave the +0.12R mid bucket — Arc-10 discipline): mid-spread-band
+[0.02,0.05] cross-trend (2955 fires), 3-fold honest triage 2013/2016/2019 = +0.08% / +0.01% / −0.13% → **mean
+−0.02%, worst −0.13%, not all-folds-pos, net-NEGATIVE** on the momentum-friendly years (so full-IS ≤ this, arc
+3002 lesson). The +0.12R gross collapses under take-the-loss + cost (arc-3003 signature).
+
+**Verdict: FAIL → KILL.** Spread-timing cannot flip the cross-trend net-positive: the cost-saving direction has
+negative gross edge, and the lone positive-gross bucket nets ≤0 SL-honest. Spread and edge are entangled (both
+liquidity-driven) — you cannot cut cost without cutting edge.
+
+**Threads / lessons.** (1) **Cost-timing lever closed — spread×edge entangled.** Tight-spread/liquid hours
+(cheapest) carry the weakest gross edge; the one +gross bucket (mid-spread) is non-monotone and dies SL-honest.
+Arcs 1003/1004's "cut per-trade cost" steer is now tested and dead. (2) **Non-monotone gross-vs-spread is the
+tell it isn't a lever** — a monotone relation would be exploitable; a bulging middle bucket is regime/selection
+noise (engine-confirmed). (3) **EDGE<COST is now closed from BOTH sides** — edge-side (raise gross: every
+entry/TF/universe/regime, arcs 0–3006) and cost-side (cut cost: exits/frequency 1004, spread-timing 3007).
+**Cements the arc-3004 escalation:** the apparatus cannot express a deployable edge; a structural unlock
+(shorts / second leg / genuinely tighter-cost broker regime) is the operator's decision. No 2nd net-positive
+long-only component found (still only the arc-1006 gap-fill).
+
+**FLAGS (code not merged):** none. No canonical-core change; no new BUILT tool (mid-spread filter is a one-off
+wrapper in scratch). Reused BUILT `observe_long_capture` + `DonchianBreakoutLongSignal`. Drivers scratch
+`_disco3_work/arc3007_observe.py`, `arc3007_triage.py`.

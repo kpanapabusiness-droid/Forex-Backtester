@@ -33,6 +33,7 @@ at arc step (i).
 | 2004 | 2000s | 2026-06-05 | Stop-tax A/B on the FILL/REVERSION family (weekend gap-fill majors) — completes arc-3004's escalation for the OTHER mechanism family. Removing the 2·ATR SL-first stop ~HALVES DD/loss-tail (maxDD 3.76→1.56%, worst −3.11→−1.12%; larger relative effect than 3004's momentum case, matches the −1.1R MAE mechanism) + lifts mean to ~0, but NO config/horizon is all-folds-positive → residual edge ≈ cost, regime-dependent. Stop is a real drag for BOTH families but NOT the wall; FLAG-2 answered (H4+FundedNext hostile to fill via EDGE≈COST, not a fill-specific stop tax). OOS preserved | N | n/e (OOS preserved) | -1.92% (best stop-removed N=24) | n/e | 1.56% (stop-removed N=6) | 176 | FAIL | N | KILL |
 | 1009 | 1000s | 2026-06-05 | AUDIT of arc 1006 gap-fill (SAME component, not a new edge): reproduce + robustness. REPRODUCES +0.685% IS via registered tools; NOT single-pair (leave-one-out all +); but threshold-FRAGILE (lives at 0.5ATR, ~0 by 1.25) AND edge over a FAIR same-exit null is ~+0.36pp (~HALF the headline; null itself +0.327% from JPY-basket drift). Component HOLDS but thinner | N | n/e (not re-run) | -6.79% | n/e | n/e | 260 | PORTFOLIO (re-affirmed, thinner) | N | PORTFOLIO |
 | 3006 | 3000s | 2026-06-05 | Multi-TF breakout-RETEST long (resistance→support flip; the last untested long-only lane, arc-1008 flag) — FALSIFIED at obs: retest-hold capture ≤ base in all 18 L×tol×hold cells, fwd drift NEGATIVE in 17/18 (−0.35..+0.00 ATR); catches FADING breakouts not defended supports; monotone-in-L only converges TO coin-flip, never above | N | n/e | n/e | n/e | n/e | 1200 | FAIL (obs cheap-kill) | N | KILL |
+| 1010 | 1000s | 2026-06-05 | Round-number / order-cluster reversion long (Osler 2003: take-profit clusters at big-figure "00" levels → bounce off support) — novel structural microstructure mechanism, decorrelated portfolio candidate; FALSIFIED at obs: support-rejection capture only 0.4883 (+0.5pp, drift ~0) sub-0.50, per-pair lift 3/9 >0.50 = NOISE, and the H4 lift EVAPORATES at H1 (0.4746 < base; EURUSD 0.5155→0.4834). Round-number effect arbitraged at H4/H1 like gotobi | N | n/e | n/e | n/e | n/e | n/e | FAIL (obs cheap-kill) | N | KILL |
 
 ---
 
@@ -980,3 +981,53 @@ every grounded in-apparatus long-only direction the corpus can name is now close
 **FLAGS (code not merged):** none. No canonical-core change; no new BUILT tool (retest mask is a one-off
 conditioning helper kept in scratch). Reused BUILT `observe_long_capture`. Drivers scratch
 `_disco3_work/arc3006_observe.py`, `arc3006_sweep.py` (reproducible from the arc doc).
+
+### arc_1010
+
+**Round-number / order-cluster reversion long (Osler 2003 microstructure)** (chat 1000–1999). Full record:
+[`arcs/arc_1010_round_number_reversion_long.md`](arcs/arc_1010_round_number_reversion_long.md). No council
+(falsified at observation; no worthwhile-ceiling fork).
+
+**Idea + why.** Fresh eyes, honest-era only (21-arc corpus). My pre-shorts lane = a 2nd *decorrelated*
+net-positive long-only component, or a novel structural mechanism with a *because*. The one win (weekend
+gap-fill, PORTFOLIO) is a discrete-flow-event reversion. The cleanest untested novel mechanism with a strong
+documented *because* is **round-number / order-cluster reversion** (Osler 2003, J. Finance): take-profit
+orders cluster at big-figure "00" levels → price reverses UP off a round-number support (shorts covering =
+buying). An ORDER-FLOW microstructure mechanism, structurally distinct from indicator-reversion (RSI/z, arcs
+3000/3001), decorrelated from the weekend gap (fires intraweek on any pair) → a candidate 2nd portfolio
+component. Long-tradeable = bar dips INTO a big-figure support from above and bounces. Observe-first (§5b).
+
+**What happened.** `observe_long_capture` (honest +1R-before-SL, gross, IS 2010–2020, 9 pairs = 7 USD majors
++ EURJPY/GBPJPY), 156,130 bars, base capture 0.4831. (A) raw proximity to nearest round = NO structure
+(nearest-bucket 0.4765 < base). (B) **support-rejection** (low touches round-below within 0.1·ATR, close
+holds) capture **0.4883** vs 0.4817, drift +0.0048 vs −0.0525 — a tiny +0.5pp lift, drift only to ~zero,
+sub-0.50. (C) best dist-to-support bucket 0.4948 (sub-0.50); the sharper pierce-and-recover "spring" bucket
+0.4873 — NOT better. (D) **per-pair the tell:** EURUSD 0.5155 / USDJPY 0.5003 / GBPUSD 0.5013 lift but
+AUDUSD 0.4822 / USDCAD 0.4464 / USDCHF / EURJPY / GBPJPY do not — **3/9 >0.50 = noise-consistent, NOT robust.**
+Finer-resolution **H1 confirm** (arc-2002/1008 discipline, 3 best pairs, 204,807 bars): the lift **evaporates**
+— touched 0.4746 *below* base 0.4755; EURUSD 0.5155→0.4834, USDJPY 0.5003→0.4638 (its +0.118 drift sits under
+sub-0.47 capture = thin-tail artifact). The H4 "3/9 >0.50" does not replicate → confirmed noise.
+
+**Verdict: FAIL (cheap-kill at observation) → KILL.** No robust capturable round-number long edge at H4
+(sub-0.50, drift ~0, noise cross-section) and the marginal lift evaporates at H1. One of the most-published
+FX microstructure effects is fully arbitraged at H4/H1 in 2010–2020 — the gotobi (1008) / triangulation
+(3005) dissolution again. Engine compute not spent (a sub-0.50/~0-drift gross signal is guaranteed sub-cost,
+arc 3003).
+
+**Threads / lessons.** (1) **Round-number big-figure order-cluster reversal (Osler) is absent/arbitraged at
+H4 & H1** — the 2nd documented-microstructure mechanism (after gotobi) to dissolve on honest data; a famous
+*because* ≠ a surviving edge. The "structural price LEVEL as a setup" sub-lane is now dry for round numbers.
+(2) **A 3/9-pairs-above-0.50 cross-section is the NOISE signature; a finer-TF re-test is the cheap
+discriminator** (arc 2002/1008) — the H4 lift did not survive to H1. Re-usable: when a marginal capture lift
+is carried by a minority of pairs, confirm at a finer TF before believing. (3) **Positive drift under sub-0.50
+capture = thin-tail artifact, not edge** (re-confirms arc 3003; the drift lens alone misleads — capture +
+cross-pair robustness + finer-TF confirm together make the KILL airtight). (4) **21 arcs, still ONE thin
+net-positive long-only component** — the novel-structural-mechanism well keeps coming up dry (gotobi,
+round-numbers, triangulation); arc-3004 escalation + FLAG-1 shorts/second-leg unlock stays highest-leverage.
+**Surviving pre-shorts untested sub-lanes:** multi-timeframe STRUCTURE as a setup, and other discrete
+liquidity/flow EVENTS beyond the weekend gap (e.g. month-end fixing-flow *dislocation-and-reversion*, distinct
+from arc 1005's turn-of-month *drift*).
+
+**FLAGS (code not merged):** none. No canonical-core change; no new BUILT tool (round-number grid is a one-off
+conditioning helper kept in scratch, like 3005's triangulation observer / 1008's gotobi tagger). Reused BUILT
+`observe_long_capture`. Drivers scratch `_disco_work/arc1010_observe_roundnumber.py`, `arc1010_h1_confirm.py`.

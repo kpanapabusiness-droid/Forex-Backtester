@@ -67,6 +67,7 @@ at arc step (i).
 | 3015 | 3000s | 2026-06-05 | **End-of-week (Friday) position-squaring reversion** — is there a WEEKLY analog of the month-end leg (`me`, arc 1011, the one demonstrably 2018-positive mechanical-flow reversion)? Does mechanical reversion concentrate at the end-of-week squaring boundary, positive in 2015 & 2018? FALSIFIED at obs (D1, 7 USD majors, big-down-move→buy by day-of-week). **NO day-of-week concentrates reversion** — Friday cap **0.502 / drift −0.045** (vs the month-end subset of the SAME setup cap 0.511 / drift +0.193, reproducing `me`). **2015/2018 acceptance FAILS** (2018 cap 0.421/−0.346 robustly neg; 2015 cap 0.417/med −0.51); per-pair = USD-quote-beta split (4/7 = noise, arc-2009/3012 tell); best-version sweep thins below pool floor before turning + (thr1.5 "positive" rests on 2&5 samples = thin-tail). Diagnosis: `me` survives 2018 via the **hard inelastic WMR/index rebalancing mandate unique to month-end** — the weekly boundary has no forced-rebalancing driver → the calendar-flow reversion edge does NOT generalize down the calendar hierarchy (month-end ≠ week-end). **9th dead route to the 2018 leg**; the mechanical-flow well is dry at the weekly scale. No engine/null/council spent | n/e | n/e | n/e | n/e | n/e | 4225 down-move obs (261 Fri) | KILL (obs cheap-kill) | N | KILL |
 | 3017 | 3000s | 2026-06-05 | **Month-End Reversion SHORT — INDEPENDENT REPRODUCTION of arc 1019** (concurrent same-idea convergence; Arc-10 defense). Sell a big UP move into month-end, bet post-fix rebalancing reversion DOWN — the unharvested SHORT side of `me` (1011), aimed at the 2015 & 2018-positive 4th-leg spec. **Signal REPRODUCES 1019 exactly** (pool n=116, gross +0.1713, capture **0.5508 >0.50** first corpus short, month-end structure-control excess **+0.0996 ATR**, 2015 drift +0.437/2018 cap 0.818; linear-regime partial-runner 7/10, 2015 +, 2018 +, beats null). **My initial KILL was an ERROR — RETRACTED → PORTFOLIO** (deferring to 1019's folder; not duplicated). The error: I passed `A1Config.risk_pct=0.005` (the `ArcPoolConfig` FRACTION) but **`A1Config.risk_pct` is in PERCENT (0.5=0.5%)** → every per-fold ROI 100×-compressed; I then misjudged the compressed real-vs-null margin (+0.012pp) against the corpus's uncompressed benchmarks (+0.36pp) as "noise floor." The **scale-INVARIANT** judgments (fold-sign pattern, real>null) agreed with 1019 all along. **TWO FLAGs (code human-gated, not patched): (1)** the `risk_pct` PERCENT-vs-FRACTION unit split between A1Config & ArcPoolConfig (A1Config default 0.005 = 0.005% silently 100×-low; the registry entry-point omits risk_pct → copies inherit the trap) — pin the canonical discovery risk_pct; **(2)** the daily-DD cap makes per-fold ROI NONLINEAR in risk_pct — at risk 0.5 the partial-runner fold-SIGNS flip (2015/2018 NEGATIVE, blow through the 5% cap) vs low-risk 7/10/2015+/2018+ → **the all-folds-positive / 2015-2018 verdict for this thin, USD-concurrency-clustered short is risk-convention-DEPENDENT**; the gated 4-way combo (arc 1020) must report risk-sensitivity, not a single-risk number. **Lesson: independent reproduction caught a 100× apparatus discrepancy → traced to a measurement convention, not the signal; scale-invariant metrics are the trustworthy cross-config judges.** OOS preserved. | N | n/e (OOS preserved) | +0.004% (linear-regime partial-runner 2015; risk-convention-dependent) | n/e | n/e | 116 | PORTFOLIO (independent reproduction confirms arc 1019; KILL retracted; risk_pct FLAG) | N | PORTFOLIO |
 | 3016 | 3000s | 2026-06-05 | **Intraday session structure: Asian-range / London-open break** (continue OR fade) — the single genuinely-UNMAPPED data modality (every prior arc is H4/D1/W1 daily-scale or calendar-flow; arc 1000 only did H4 hour-CONDITIONING, not a session-RANGE construction). DST-clean (Europe/London) Asian range × first London-open break, H1 majors. FALSIFIED at obs: **the break does NOT continue** (long-cont cap **0.375**/drift −0.116, short-cont 0.396/−0.039) AND **does NOT cleanly fade** — the naive `1−cont_cap≈0.62` is an asymmetric-SL artifact; the fade's OWN honest capture is **0.386** (short up-break) / 0.383 (long down-break): cont 0.375 + fade 0.386 = 0.76 < 1 = the break entry is a **high-vol London-open WHIPSAW point where a 2·ATR SL is hit BOTH ways**. Net fade drift after entry spread (~0.08 ATR) is **~+0.02R ≈ 0**, ~10× below the ~0.125R H1 cost (~2× H4). Only positive cell EURUSD +0.19 = **1/4 pairs (single-pair noise tell)**; 2015 (+0.174)/2018 (+0.251) drift-positive but inside cap 0.385/0.433 (<0.50) → won't survive engine (arc-3004/3012 "+drift inside sub-0.50 capture collapses SL-honest"). **Intraday session structure is sub-cost — extends the H1 cost wall (1008/3008/1010) from discrete-flow events to session-RANGE; the last unmapped modality mapped dead.** Reusable caution: `1−cont_cap ≠ fade capture` (asymmetric SL). No engine/null/council spent | n/e | n/e | n/e | n/e | n/e | 7983 IS break obs | KILL (obs cheap-kill) | N | KILL |
+| 1022 | 1000s | 2026-06-05 | **Failed-breakdown RECLAIM long across UNIVERSES** (JPY crosses + non-USD crosses) — does the corpus's strongest edge (fbr, arc 1013) extend off USD majors to give a decorrelated +2018 (& +2016) 5th PORTFOLIO leg, since fbr's 2018-wipeout (arc 2014) is plausibly USD-major-specific & crosses' 2018 risk-off mean-reverts? FALSIFIED at obs: **fbr is USD-major-SPECIFIC.** MAJORS reproduce 1013 (cap **0.5865**, structure excess **+0.108**, 7/7 pairs); **JPY-crosses cap 0.481<0.50, structure excess −0.001 (swing-low NOT load-bearing), 2018 cap 0.389 WORSE**; **non-USD-crosses cap 0.495≈coin-flip, structure excess only +0.035** (2018 cap 0.515 = regime-luck inside an overall sub-0.50/weak-structure universe; 4/9 pairs >0.50 = noise). Diagnosis: the stop-run-reclaim needs the **deep, coordinated stop book only USD majors carry** — extends arc-3013's "clustered stops ≠ grab without a structural pivot" to the UNIVERSE axis. **Heuristic: FLOW edges port across universes (gap-fill majors→crosses, 1006), STRUCTURAL stop-liquidity edges do NOT.** fbr-on-crosses route to the 2018/2016 leg CLOSED; 1013 stays 9/10 IS, 2018 immovable in the reversal-long family. No engine/null/council spent (coin-flip cap + non-load-bearing structure → §5d, like 1014/2009/3010/3013). OOS never touched | n/e | n/e | n/e | n/e | n/e | 237 maj / 212 JPY / 309 xUSD obs | KILL (obs cheap-kill) | N | KILL |
 
 ---
 
@@ -3124,3 +3125,54 @@ runner harvests fat-tail variance that inflates IS.
 
 **FLAGS (code not merged):** none requiring the canonical core. Carries the standing
 `A1Config.time_exit_bars`-unwired flag + the arc-1020 gap-reproduction nit (immaterial — gap 0-weight).
+
+### arc_1022
+
+**Failed-breakdown RECLAIM long across UNIVERSES** (chat 1000–1999). Full record:
+[`arcs/arc_1022_failed_breakdown_reclaim_universe.md`](arcs/arc_1022_failed_breakdown_reclaim_universe.md).
+
+**Idea + because.** The 4-way book (arc 1020) is blocked at 2015 & 2016. Chasing a 2016-event-specific
+patch (Brexit/election) is overfit (no Brexit in the 2021+ holdout); the honest need is a 5th leg with a
+GENERALIZABLE mechanism whose fold profile relieves 2016/2018 structurally. Key fact (arc 1020): 2016 is
+strongly +fbr (+2.55) & +gap (+3.20); the block is the CONVEX tension (weighting them up for 2016 breaks
+2018, where fbr is wiped). So the ideal leg is +2018 AND +2016. fbr is +2016 −2018 on USD majors because
+in strong-USD 2018 the failed breakdown becomes a real one (arc 2014: 18/19 −1R). **Hypothesis: that
+2018-wipeout is USD-major-specific; on JPY / non-USD crosses (no persistent 2018 USD trend, risk-off
+mean-reverts) the stop-run-reclaim could survive 2018 → a decorrelated fbr-class +2018 leg.** The
+universe lever is proven productive (gap-fill ports majors→JPY crosses, 1006).
+
+**What happened — FALSIFIED at obs; fbr is USD-major-specific.** Observed fbr capture/drift + the
+arc-1013 load-bearing STRUCTURE CONTROL (deep wick AT swept swing-low vs ELSEWHERE) on three H4
+universes, IS only. **MAJORS reproduce 1013** (cap 0.5865, structure excess +0.108, 7/7 pairs >0.50 —
+apparatus + edge reproduce). **JPY-crosses: the swing-low is NOT load-bearing** (cap 0.481<0.50,
+structure excess −0.001, 2018 cap 0.389 WORSE than majors). **non-USD-crosses: coin-flip, weak
+structure** (cap 0.495, excess only +0.035; 2018 cap 0.515 is regime-luck inside an overall sub-0.50
+universe with negative drift — the 3010/3012/2013 tell; 4/9 pairs >0.50 = noise, and carving them is
+forbidden outcome-aware filtering). The crosses-avoid-2018 hypothesis is moot: crosses carry no fbr edge
+in ANY year.
+
+**Diagnosis.** The stop-run-reclaim needs **deep, coordinated resting-stop liquidity below a structural
+swing low** — USD majors carry the densest stop book (most participation, clearest levels), so the
+sweep-and-reclaim is a genuine reversal there (excess +0.108); crosses' thinner stop liquidity makes the
+swing-low location non-load-bearing → coin-flip. This **extends arc 3013's lesson ("clustered stops ≠
+grab without a structural pivot") to the UNIVERSE axis.**
+
+**Verdict: KILL (cheap-kill at observation).** No +2018/+2016 fbr-class leg off USD majors. Components
+UNCHANGED (1013 still PORTFOLIO). No pool/engine/null/council spent (coin-flip capture + non-load-bearing
+structure on both cross universes; §5f doesn't bite on a coin-flip entry). OOS never touched.
+
+**Threads / lessons.** (1) **fbr's edge is USD-major-SPECIFIC, tied to stop-liquidity depth, not a
+universal stop-run** — load-bearing only on majors, coin-flip on crosses. (2) **NEW heuristic: FLOW edges
+port across universes (gap-fill majors→JPY crosses, 1006); STRUCTURAL stop-liquidity edges do NOT** —
+flow follows the instrument, stop-structure follows the most-participated instrument. Useful prior for
+future universe-lever arcs. (3) **fbr-on-crosses route to the +2018 leg CLOSED** — adds to the dead-2018
+list (structure 1014/2009/2011/3011, trend 3010, flow 1016/2013, vol 3012, rel-value 2010, cont-long
+2012, carry 1017, re-leveling 3013, downtrend-gate 2014, now re-universing). The book's residual
+2015/2016 block is not addressable by re-universing the existing best edge. (4) Surviving frontier
+unchanged: a genuinely novel non-price-direction mechanism, or the operator-gated tighter-cost regime.
+
+**Tooling.** No new BUILT tool — CALLED `observe_long_capture(direction="long")` + the BUILT
+`FailedBreakdownReclaimLongSignal` (1013) fire logic (replicated inline as a restrict mask) + a
+structure-control deep-wick-elsewhere conditioner (scratch). Driver `_disco_work/arc1022_obs_universe.py`.
+
+**FLAGS (code not merged):** none. Carries the standing `A1Config.time_exit_bars`-unwired flag.

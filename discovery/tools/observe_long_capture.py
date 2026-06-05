@@ -43,20 +43,29 @@ def observe_long_capture(
     drift_bars: int | None = None,
     warmup: int = 100,
     restrict: dict[str, np.ndarray] | None = None,
+    direction: str = "long",
 ) -> pd.DataFrame:
-    """Per-bar hypothetical-long honest capture + forward drift across every pair.
+    """Per-bar hypothetical honest capture + forward drift across every pair.
+
+    Despite the historical name, this is direction-aware: ``direction="long"``
+    (default) is byte-identical to the original long lens; ``direction="short"``
+    mirrors every site (entry = next-bar ``open_bid``; SL = signal-bar
+    ``close_bid`` + sl_mult·ATR, ABOVE entry; capture via the short
+    +1R-before-SL label on the ask side; drift sign flipped so a falling price
+    reads as positive forward drift). Still CHARACTERIZATION ONLY — not a gate.
 
     Parameters
     ----------
     panel : Panel — the primary-TF panel (uses each pair's bars).
-    sl_mult : SL = signal-bar close_ask − sl_mult·ATR (default 2.0, matching the pool).
+    sl_mult : SL = signal-bar close ∓ sl_mult·ATR (default 2.0, matching the pool).
     hold : forward bars scanned for the +1R-before-SL label.
     drift_bars : if set, also compute forward `drift_bars`-bar mid-close drift in ATR
-        (gross). If None, ``fwd_drift_atr`` is NaN.
+        (gross, signed by direction). If None, ``fwd_drift_atr`` is NaN.
     warmup : skip the first ``warmup`` bars per pair (ATR/feature stabilization).
     restrict : optional {pair -> bool ndarray aligned to that pair's bars} to compute
         only on selected bars (efficient for sparse conditions, e.g. week-opens). None =
         every bar.
+    direction : ``"long"`` (default) or ``"short"``.
 
     Returns
     -------
@@ -64,17 +73,27 @@ def observe_long_capture(
     evaluated bar with a finite ATR and a fillable next bar. Take-the-loss honest;
     gross; CHARACTERIZATION ONLY (see module docstring).
     """
+    side = str(direction).strip().lower()
+    if side not in ("long", "short"):
+        raise ValueError(f"direction must be 'long' or 'short'; got {direction!r}")
+    is_long = side == "long"
     rows = []
     for pair in sorted(panel.pairs):
         df = panel.pair_dfs[pair]
         atr = wilder_atr(mid_high(df), mid_low(df), mid_close(df), 14).shift(1).values
         mc = mid_close(df).values
-        open_ask = df["open_ask"].values
-        close_ask = df["close_ask"].values
-        high_bid = df["high_bid"].values
-        low_bid = df["low_bid"].values
         idx = df.index
         n = len(df)
+        if is_long:
+            open_ask = df["open_ask"].values
+            close_ask = df["close_ask"].values
+            high_bid = df["high_bid"].values
+            low_bid = df["low_bid"].values
+        else:
+            open_bid = df["open_bid"].values
+            close_bid = df["close_bid"].values
+            high_ask = df["high_ask"].values
+            low_ask = df["low_ask"].values
         sel = restrict.get(pair) if restrict is not None else None
         for t in range(max(warmup, 0), n - 1):
             if sel is not None and not sel[t]:
@@ -82,19 +101,32 @@ def observe_long_capture(
             a = atr[t]
             if not np.isfinite(a) or a <= 0:
                 continue
-            entry = float(open_ask[t + 1])
-            sl = float(close_ask[t]) - sl_mult * a
-            sl_dist = entry - sl
+            if is_long:
+                entry = float(open_ask[t + 1])
+                sl = float(close_ask[t]) - sl_mult * a
+                sl_dist = entry - sl
+            else:
+                entry = float(open_bid[t + 1])
+                sl = float(close_bid[t]) + sl_mult * a
+                sl_dist = sl - entry
             if sl_dist <= 0 or not np.isfinite(sl_dist):
                 continue
             exit_off = min(hold, n - 1 - (t + 1))
-            res = reached_1r_before_sl(
-                high_bid=high_bid, low_bid=low_bid, entry_idx=t + 1, exit_off=exit_off,
-                entry_price=entry, sl_price=sl, sl_distance=sl_dist, exit_at_bar_open=False,
-            )
+            if is_long:
+                res = reached_1r_before_sl(
+                    high_bid=high_bid, low_bid=low_bid, entry_idx=t + 1, exit_off=exit_off,
+                    entry_price=entry, sl_price=sl, sl_distance=sl_dist, exit_at_bar_open=False,
+                )
+            else:
+                res = reached_1r_before_sl(
+                    high_bid=high_ask, low_bid=low_ask, high_ask=high_ask, low_ask=low_ask,
+                    direction="short", entry_idx=t + 1, exit_off=exit_off,
+                    entry_price=entry, sl_price=sl, sl_distance=sl_dist, exit_at_bar_open=False,
+                )
             drift = float("nan")
             if drift_bars is not None:
-                drift = (float(mc[min(t + drift_bars, n - 1)]) - entry) / a
+                fwd = float(mc[min(t + drift_bars, n - 1)])
+                drift = ((fwd - entry) if is_long else (entry - fwd)) / a
             rows.append({
                 "pair": pair, "signal_time": idx[t],
                 "capture": 1 if np.isfinite(res) else 0,

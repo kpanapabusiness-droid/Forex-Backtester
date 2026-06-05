@@ -186,6 +186,7 @@ def _build_a1_strategy(
 
     # Reindex per-pair series onto the fold-sliced primary panel
     series_cache: dict[str, dict[str, pd.Series]] = {}
+    directions: dict[str, Direction] = {}
     for pair, state in per_pair.items():
         df = primary_panel.pair_dfs.get(pair)
         if df is None:
@@ -196,6 +197,7 @@ def _build_a1_strategy(
         for k, v in state.additional_gates.items():
             gates[k] = v.reindex(df.index).fillna(False).astype(bool)
         series_cache[pair] = {"mask": mask, "atr": atr, **gates}
+        directions[pair] = state.direction
 
     def strategy(
         t: pd.Timestamp,
@@ -229,15 +231,22 @@ def _build_a1_strategy(
                 )
                 if not _evaluate_filter_rules(cfg.filter_rules, feats):
                     continue
-            # ATR + entry proxy
+            # ATR + entry proxy (mirrored by the signal's direction). Long
+            # anchors to close_ask and stops below; short anchors to close_bid
+            # and stops above. risk_size uses abs(entry-sl) so it is side-safe.
             atr = float(cached["atr"].loc[t])
             if not (atr > 0):
                 continue
             bar = snapshot.get(pair)
             if bar is None:
                 continue
-            entry_proxy = float(bar["close_ask"])
-            sl_price = entry_proxy - cfg.sl_atr_mult * atr
+            direction = directions.get(pair, Direction.LONG)
+            if direction is Direction.LONG:
+                entry_proxy = float(bar["close_ask"])
+                sl_price = entry_proxy - cfg.sl_atr_mult * atr
+            else:
+                entry_proxy = float(bar["close_bid"])
+                sl_price = entry_proxy + cfg.sl_atr_mult * atr
             if sl_price <= 0:
                 continue
             size = risk.risk_size(
@@ -246,7 +255,7 @@ def _build_a1_strategy(
             orders.append(
                 Order(
                     pair=pair,
-                    direction=Direction.LONG,
+                    direction=direction,
                     size=size,
                     sl_price=sl_price,
                     tp_price=None,

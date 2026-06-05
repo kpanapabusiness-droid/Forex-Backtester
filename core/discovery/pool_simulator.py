@@ -6,22 +6,29 @@ activation at +2.0R close-based + trail 2.0xATR + no time exit). Returns
 per-trade R-multiples plus aggregate path geometry for downstream
 metric computation.
 
-Exit semantics (long-only, matches dispatch §Override 2 + chat decision 1):
+Exit semantics (LONG default; mirrored by ``DiscoveryExitConfig.direction``):
 
-  * Entry         : bar N+1 open_ask  (next-bar open after signal bar N close)
-  * Initial SL    : entry - 2.0 * ATR(14)_at_signal_bar (anchored at entry)
+  * Entry         : bar N+1 open. Long fills at open_ask; short at open_bid.
+  * Initial SL    : long entry - 2.0*ATR (below); short entry + 2.0*ATR (above).
                     1R = 2.0 * ATR (SL distance equals 1R by construction)
-  * Hard SL hit   : intra-bar low_bid <= sl_price  -> fill at sl_price
-  * Trail arm     : bar close_bid >= entry + 4.0 * ATR  (= entry + 2.0R)
-                    On the arming bar, trail level = close_bid - 2.0 * ATR
-  * Trail ratchet : on each subsequent bar's close_bid:
-                      new_trail = max(prev_trail, close_bid - 2.0 * ATR)
-                    (ratchet-only; never lowers)
-  * Trail hit     : bar close_bid <= current_trail
-                    Exit at NEXT bar open_bid (KH-24 pattern; if no next
-                    bar exists, exit at this bar's close_bid)
+  * Hard SL hit   : long intra-bar low_bid <= sl; short high_ask >= sl
+                    -> fill at sl_price
+  * Trail arm     : long close_bid >= entry + 4.0*ATR (= +2.0R); short
+                    close_ask <= entry - 4.0*ATR. On the arming bar, trail
+                    level = close ∓ 2.0*ATR (long below close, short above).
+  * Trail ratchet : on each subsequent bar's close (close_bid long /
+                    close_ask short): long new_trail = max(prev, close-2.0*ATR);
+                    short new_trail = min(prev, close+2.0*ATR). Ratchet-only —
+                    never moves against the trade.
+  * Trail hit     : long close_bid <= trail; short close_ask >= trail.
+                    Exit at NEXT bar open (open_bid long / open_ask short;
+                    if no next bar exists, exit at this bar's close).
   * Time exit     : NONE — trade runs to end of data if neither SL nor
                     trail fires
+
+Short trades track the ASK side (where a short is stopped / bought back),
+matching ``core.sim.fill``; longs track the BID side, byte-identically to
+the pre-short simulator (direction defaults LONG).
 
 If a trade reaches the end of its pair's data without either trigger,
 it's marked ``exit_reason='end_of_data'`` and exited at the last
@@ -38,7 +45,8 @@ from dataclasses import dataclass
 import numpy as np
 import pandas as pd
 
-from core.sim.fill import long_entry_fill_price
+from core.sim.account import Direction
+from core.sim.fill import long_entry_fill_price, short_entry_fill_price
 from core.sim.honest_label import reached_1r_before_sl
 
 # Exit reasons whose fill lands at the OPEN of the exit bar (queued
@@ -66,6 +74,12 @@ class DiscoveryExitConfig:
     trail_distance_atr_mult: float = 2.0     # ratchet at close - 2.0xATR
     primary_tf_warmup_bars: int = 100        # ATR/Kijun warmup
     time_exit_bars: int | None = None        # Amendment A — None == no time exit
+    # Trade side for this discovery arc. LONG default keeps every existing
+    # arc byte-identical; a short discovery arc sets Direction.SHORT (the
+    # load-bearing target of the configs' ``direction:`` key, parsed via
+    # ``core.sim.account.parse_direction``). The simulator mirrors entry /
+    # SL / trail / final_r / +1R-before-SL label by this field.
+    direction: Direction = Direction.LONG
 
 
 @dataclass(frozen=True)
@@ -181,13 +195,37 @@ def simulate_pair_pool(
     mask_arr = trigger_mask.to_numpy(dtype=bool, copy=False)
     atr_arr = atr_series.to_numpy(dtype="float64", copy=False)
 
-    # Entry fill goes through long_entry_fill_price(pair_df.iloc[...]) — open_ask
-    # is read from the bar row directly, not from a precomputed array. The other
-    # series are extracted as numpy arrays for the per-bar inner loop.
+    direction = cfg.direction
+    is_long = direction is Direction.LONG
+
+    # Entry fill goes through {long,short}_entry_fill_price(pair_df.iloc[...]) —
+    # the open is read from the bar row directly, not a precomputed array. The
+    # other series are extracted as numpy arrays for the per-bar inner loop.
     open_bid = pair_df["open_bid"].to_numpy(dtype="float64", copy=False)
     low_bid = pair_df["low_bid"].to_numpy(dtype="float64", copy=False)
     high_bid = pair_df["high_bid"].to_numpy(dtype="float64", copy=False)
     close_bid = pair_df["close_bid"].to_numpy(dtype="float64", copy=False)
+    # Ask-side arrays — needed only for short trades (stop / buy-back on the
+    # ask). Extracted only when short so existing long fixtures without ask
+    # columns are untouched.
+    if is_long:
+        open_ask = low_ask = high_ask = close_ask = None
+    else:
+        for _col in ("open_ask", "high_ask", "low_ask", "close_ask"):
+            if _col not in pair_df.columns:
+                raise ValueError(
+                    f"short discovery simulation requires {_col}; pair {pair!r} "
+                    f"panel has {sorted(pair_df.columns)[:12]}"
+                )
+        open_ask = pair_df["open_ask"].to_numpy(dtype="float64", copy=False)
+        low_ask = pair_df["low_ask"].to_numpy(dtype="float64", copy=False)
+        high_ask = pair_df["high_ask"].to_numpy(dtype="float64", copy=False)
+        close_ask = pair_df["close_ask"].to_numpy(dtype="float64", copy=False)
+    # Direction-selected fill / close arrays: long exits at the bid, short
+    # buys back at the ask. For long these alias the bid arrays exactly, so
+    # the long bar-walk reads identical values to the pre-short simulator.
+    exit_open = open_bid if is_long else open_ask
+    close_arr = close_bid if is_long else close_ask
     index_arr = pair_df.index
 
     n = len(pair_df)
@@ -217,15 +255,24 @@ def simulate_pair_pool(
         if not np.isfinite(atr) or atr <= 0.0:
             continue
 
-        # Entry @ next-bar open_ask
-        entry_price = float(long_entry_fill_price(pair_df.iloc[entry_idx]))
+        # Entry @ next-bar open. Long buys the ask; short sells the bid.
+        entry_bar = pair_df.iloc[entry_idx]
+        if is_long:
+            entry_price = float(long_entry_fill_price(entry_bar))
+        else:
+            entry_price = float(short_entry_fill_price(entry_bar))
         if not np.isfinite(entry_price) or entry_price <= 0.0:
             continue
-        sl_price = entry_price - sl_mult * atr
+        if is_long:
+            sl_price = entry_price - sl_mult * atr
+            trail_activation_close = entry_price + trail_arm_mult * atr
+        else:
+            # Mirror: stop ABOVE entry; trail arms once price drops +2R below.
+            sl_price = entry_price + sl_mult * atr
+            trail_activation_close = entry_price - trail_arm_mult * atr
         if sl_price <= 0.0 or not np.isfinite(sl_price):
             continue
-        sl_distance = entry_price - sl_price       # == sl_mult * atr by construction
-        trail_activation_close = entry_price + trail_arm_mult * atr
+        sl_distance = abs(entry_price - sl_price)  # == sl_mult * atr by construction
         trail_distance = trail_dist_mult * atr
 
         # State machine
@@ -246,7 +293,7 @@ def simulate_pair_pool(
 
             # Priority 1: deferred trail exit queued from the previous bar's close.
             if pending_trail_exit:
-                fill = float(open_bid[bidx])
+                fill = float(exit_open[bidx])
                 if np.isfinite(fill):
                     exit_idx = bidx
                     exit_reason = "trail"
@@ -262,7 +309,7 @@ def simulate_pair_pool(
             # downstream R is purely from the open_bid fill on the cap-anniversary
             # bar. KH-24 forward-window convention; 240 at 4H = 40 calendar days.
             if time_exit_bars is not None and off == time_exit_bars:
-                fill = float(open_bid[bidx])
+                fill = float(exit_open[bidx])
                 if np.isfinite(fill):
                     exit_idx = bidx
                     exit_reason = "time_exit"
@@ -272,34 +319,60 @@ def simulate_pair_pool(
                 # If open_bid is NaN (data gap on the exit bar), fall through —
                 # the SL/trail/end-of-data branches will catch it.
 
-            # mfe / mae update using this bar's high_bid / low_bid in R-units.
-            bar_high = float(high_bid[bidx])
-            bar_low = float(low_bid[bidx])
-            if np.isfinite(bar_high):
-                mfe_r = max(mfe_r, (bar_high - entry_price) / sl_distance)
-            if np.isfinite(bar_low):
-                mae_r = min(mae_r, (bar_low - entry_price) / sl_distance)
+            # mfe / mae update in R-units + hard-SL extreme (direction-mirrored).
+            if is_long:
+                # Long tracks bid extremes; stop fires on low_bid <= sl.
+                bar_high = float(high_bid[bidx])
+                bar_low = float(low_bid[bidx])
+                if np.isfinite(bar_high):
+                    mfe_r = max(mfe_r, (bar_high - entry_price) / sl_distance)
+                if np.isfinite(bar_low):
+                    mae_r = min(mae_r, (bar_low - entry_price) / sl_distance)
+                stop_hit = np.isfinite(bar_low) and bar_low <= sl_price
+            else:
+                # Short tracks ask extremes; favourable = price falling
+                # (low_ask), adverse = price rising (high_ask); stop fires on
+                # high_ask >= sl.
+                bar_high = float(high_ask[bidx])
+                bar_low = float(low_ask[bidx])
+                if np.isfinite(bar_low):
+                    mfe_r = max(mfe_r, (entry_price - bar_low) / sl_distance)
+                if np.isfinite(bar_high):
+                    mae_r = min(mae_r, (entry_price - bar_high) / sl_distance)
+                stop_hit = np.isfinite(bar_high) and bar_high >= sl_price
 
-            # Priority 2: hard SL — intra-bar low_bid <= sl_price.
-            if off > 0 and np.isfinite(bar_low) and bar_low <= sl_price:
+            # Priority 2: hard SL.
+            if off > 0 and stop_hit:
                 exit_idx = bidx
                 exit_reason = "hard_sl"
                 exit_price = sl_price
                 bars_held = off
                 break
 
-            # Priority 3: trail logic at bar close.
-            bar_close = float(close_bid[bidx])
+            # Priority 3: trail logic at bar close (close_bid long / close_ask
+            # short). Long arms once close climbs +2R and trails BELOW; short
+            # arms once close drops +2R and trails ABOVE (ratchet-only either
+            # way — the trail never moves against the trade).
+            bar_close = float(close_arr[bidx])
             if not np.isfinite(bar_close):
                 continue
-            if not trail_armed and bar_close >= trail_activation_close:
-                trail_armed = True
-                trail_price = bar_close - trail_distance
-            elif trail_armed:
-                trail_price = max(trail_price, bar_close - trail_distance)
+            if is_long:
+                if not trail_armed and bar_close >= trail_activation_close:
+                    trail_armed = True
+                    trail_price = bar_close - trail_distance
+                elif trail_armed:
+                    trail_price = max(trail_price, bar_close - trail_distance)
+                trail_hit = trail_armed and bar_close <= trail_price
+            else:
+                if not trail_armed and bar_close <= trail_activation_close:
+                    trail_armed = True
+                    trail_price = bar_close + trail_distance
+                elif trail_armed:
+                    trail_price = min(trail_price, bar_close + trail_distance)
+                trail_hit = trail_armed and bar_close >= trail_price
 
-            if trail_armed and bar_close <= trail_price:
-                # Trail hit at bar close -> exit at next-bar open_bid.
+            if trail_hit:
+                # Trail hit at bar close -> exit at next-bar open.
                 pending_trail_exit = True
                 # If this IS the last bar, fall through to end-of-data branch.
                 if bidx == n - 1:
@@ -311,9 +384,10 @@ def simulate_pair_pool(
                     break
 
         if exit_idx is None:
-            # Reached end of data without SL or trail firing.
+            # Reached end of data without SL or trail firing (long exits at the
+            # last close_bid; short buys back at the last close_ask).
             exit_idx = n - 1
-            last_close = float(close_bid[exit_idx])
+            last_close = float(close_arr[exit_idx])
             if not np.isfinite(last_close):
                 # Skip degenerate trade — no usable exit price.
                 continue
@@ -321,23 +395,41 @@ def simulate_pair_pool(
             exit_price = last_close
             bars_held = exit_idx - entry_idx
 
-        final_r = (exit_price - entry_price) / sl_distance
+        final_r = (
+            (exit_price - entry_price) if is_long else (entry_price - exit_price)
+        ) / sl_distance
 
         # SL-honest meta-label provenance: first forward offset reaching +1R
         # STRICTLY before the hard stop (take-the-loss; same-bar +1R/SL →
         # NaN). Trail / time exits fill at the next bar's open, so that bar's
-        # high is excluded; hard_sl / end_of_data leave the trade open
+        # extreme is excluded; hard_sl / end_of_data leave the trade open
         # through the resolved bar. Closes HONEST_ENGINE_SWEEP.md FLAG-D1.
-        bars_to_1r_mfe = reached_1r_before_sl(
-            high_bid=high_bid,
-            low_bid=low_bid,
-            entry_idx=entry_idx,
-            exit_off=int(bars_held),
-            entry_price=entry_price,
-            sl_price=sl_price,
-            sl_distance=sl_distance,
-            exit_at_bar_open=(str(exit_reason) in _OPEN_FILL_EXIT_REASONS),
-        )
+        # Short mirrors on the ask side (stop above entry, favourable down).
+        if is_long:
+            bars_to_1r_mfe = reached_1r_before_sl(
+                high_bid=high_bid,
+                low_bid=low_bid,
+                entry_idx=entry_idx,
+                exit_off=int(bars_held),
+                entry_price=entry_price,
+                sl_price=sl_price,
+                sl_distance=sl_distance,
+                exit_at_bar_open=(str(exit_reason) in _OPEN_FILL_EXIT_REASONS),
+            )
+        else:
+            bars_to_1r_mfe = reached_1r_before_sl(
+                high_bid=high_bid,
+                low_bid=low_bid,
+                high_ask=high_ask,
+                low_ask=low_ask,
+                direction="short",
+                entry_idx=entry_idx,
+                exit_off=int(bars_held),
+                entry_price=entry_price,
+                sl_price=sl_price,
+                sl_distance=sl_distance,
+                exit_at_bar_open=(str(exit_reason) in _OPEN_FILL_EXIT_REASONS),
+            )
 
         trades.append(
             TradeRow(

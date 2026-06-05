@@ -116,7 +116,7 @@ class _A4ExitPredicate:
     def __call__(
         self, position: Position, snapshot: dict[str, pd.Series | None], t: pd.Timestamp
     ) -> ExitDecision | None:
-        if position.pair != self.pair or position.direction is not Direction.LONG:
+        if position.pair != self.pair:
             return None
         # Recover signal_time = bar preceding entry_time on this pair
         entry_ts = pd.Timestamp(position.entry_time)
@@ -136,10 +136,13 @@ class _A4ExitPredicate:
         entry_idx = int(idx_arr[0])
         if t_idx < entry_idx:
             return None
-        sl_distance = float(position.entry_price) - float(position.sl_price or 0)
+        # abs() keeps the long value identical (stop below entry) and is the
+        # positive entry↔SL gap for a short (stop above entry).
+        sl_distance = abs(float(position.entry_price) - float(position.sl_price or 0))
         if sl_distance <= 0:
             return None
-        # Re-use the same path-so-far computation as A3
+        # Re-use the same path-so-far computation as A3 (direction-aware so a
+        # short's path features are computed in the short's own frame).
         from core.architectures.a3_pipeline_de import _path_features_so_far
         path_feats = _path_features_so_far(
             self.pair_df,
@@ -147,6 +150,7 @@ class _A4ExitPredicate:
             n_defer=t_idx - sig_idx,
             sl_anchor_price=float(position.entry_price),
             sl_distance=sl_distance,
+            direction=position.direction,
         )
         combined = {**entry_feats, **path_feats}
         admit, proba = predict_admit(
@@ -156,11 +160,17 @@ class _A4ExitPredicate:
         # classifier predicts P(final_r > 0). High proba = let it run.
         # Low proba = exit.
         if proba < self.exit_threshold:
-            # fill_price is recorded but the driver's PR-E.1.6 path
-            # discards it and fills at next-bar open_bid (long exits).
-            # Provide a sane value anyway for any consumer that reads it.
+            # fill_price is recorded but the driver's PR-E.1.6 path discards it
+            # and fills at next-bar open (open_bid for a long exit, open_ask for
+            # a short). Provide a sane value anyway for any consumer that reads
+            # it (long marks at the bid, short buys back at the ask).
             bar = snapshot.get(self.pair)
-            fp = float(bar["close_bid"]) if bar is not None else float(position.entry_price)
+            if bar is None:
+                fp = float(position.entry_price)
+            elif position.direction is Direction.LONG:
+                fp = float(bar["close_bid"])
+            else:
+                fp = float(bar["close_ask"])
             return ExitDecision(fill_price=fp, exit_reason="pipeline_d_exit")
         return None
 

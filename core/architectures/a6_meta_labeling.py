@@ -95,6 +95,7 @@ def _build_a6_strategy(
     primary_panel = panels[signal_eval.primary_tf]
     per_pair = signal_eval.per_pair
     series_cache: dict[str, dict[str, pd.Series]] = {}
+    directions: dict[str, Direction] = {}
     for pair, state in per_pair.items():
         df = primary_panel.pair_dfs.get(pair)
         if df is None:
@@ -106,6 +107,7 @@ def _build_a6_strategy(
             for k, v in state.additional_gates.items()
         }
         series_cache[pair] = {"mask": mask, "atr": atr, **gates}
+        directions[pair] = state.direction
 
     feat_keys = cfg.classifier_feature_order
 
@@ -149,8 +151,14 @@ def _build_a6_strategy(
             bar = snapshot.get(pair)
             if bar is None:
                 continue
-            entry_proxy = float(bar["close_ask"])
-            sl_price = entry_proxy - cfg.sl_atr_mult * atr
+            # Entry proxy mirrored by the signal's direction (see A1).
+            direction = directions.get(pair, Direction.LONG)
+            if direction is Direction.LONG:
+                entry_proxy = float(bar["close_ask"])
+                sl_price = entry_proxy - cfg.sl_atr_mult * atr
+            else:
+                entry_proxy = float(bar["close_bid"])
+                sl_price = entry_proxy + cfg.sl_atr_mult * atr
             if sl_price <= 0:
                 continue
             base_size = risk.risk_size(
@@ -158,7 +166,7 @@ def _build_a6_strategy(
             )
             orders.append(Order(
                 pair=pair,
-                direction=Direction.LONG,
+                direction=direction,
                 size=base_size,
                 sl_price=sl_price,
                 tp_price=None,

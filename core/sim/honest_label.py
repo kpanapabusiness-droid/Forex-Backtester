@@ -81,44 +81,68 @@ def reached_1r_before_sl(
     sl_distance: float,
     exit_at_bar_open: bool = False,
     r_threshold: float = ONE_R,
+    direction: str = "long",
+    high_ask: Sequence[float] | None = None,
+    low_ask: Sequence[float] | None = None,
 ) -> float:
     """Honest ``bars_to_1r_mfe`` via a take-the-loss forward bar walk.
 
     Walks bar offsets ``0 .. exit_off`` (``bidx = entry_idx + off``) and
-    returns the FIRST offset at which the trade's high reaches
-    ``+r_threshold`` R, counted with take-the-loss ordering:
+    returns the FIRST offset at which the trade reaches ``+r_threshold`` R in
+    its favour, counted with take-the-loss ordering:
 
-      * On every bar with ``off > 0`` the hard stop is checked FIRST — if
-        the bar's ``low_bid`` breaches ``sl_price`` the walk ends and the
-        bar is NOT eligible to register +1R. A same-bar (+1R high AND SL
-        low) trade therefore resolves SL-first → +1R was NOT reached first →
-        result is ``NaN`` (unless a STRICTLY earlier bar already reached
-        +1R). This is exactly the engine's same-bar SL-first resolution,
-        applied to the label.
-      * A bar that does not breach the stop is eligible: if its high reaches
-        ``+r_threshold`` R the offset is returned immediately (it is, by the
-        walk order, strictly before any stop breach).
+      * On every bar with ``off > 0`` the hard stop is checked FIRST — if the
+        bar's adverse extreme breaches ``sl_price`` the walk ends and the bar
+        is NOT eligible to register +1R. A same-bar (+1R AND SL) trade
+        therefore resolves SL-first → +1R was NOT reached first → result is
+        ``NaN`` (unless a STRICTLY earlier bar already reached +1R). This is
+        exactly the engine's same-bar SL-first resolution, applied to the
+        label.
+      * A bar that does not breach the stop is eligible: if its favourable
+        extreme reaches ``+r_threshold`` R the offset is returned immediately
+        (it is, by the walk order, strictly before any stop breach).
+
+    Direction-symmetric (the take-the-loss invariant in label space, both
+    sides — the Arc-10 defect surface):
+
+      * ``direction="long"`` (default): the favourable extreme is the bar
+        ``high_bid`` (price up: ``(high - entry) / sl_distance``) and the
+        stop fires when ``low_bid <= sl_price`` (the stop sits BELOW entry).
+        Long callers pass only ``high_bid`` / ``low_bid`` — byte-identical to
+        the pre-short signature.
+      * ``direction="short"``: the favourable extreme is the bar ``low_ask``
+        (price down: ``(entry - low_ask) / sl_distance``) and the stop fires
+        when ``high_ask >= sl_price`` (the stop sits ABOVE entry). Short
+        callers MUST pass ``high_ask`` + ``low_ask`` (the ask side is where a
+        short is stopped / bought back, matching ``core.sim.fill``'s short
+        predicates); ``high_bid`` / ``low_bid`` are ignored for a short.
 
     Parameters
     ----------
     high_bid, low_bid
-        Per-bar intrabar extremes for the whole pair, indexed by absolute
-        bar index (the simulator's native arrays). Only indices
+        Per-bar intrabar bid extremes (the long side's favourable / stop
+        arrays), indexed by absolute bar index. Only indices
         ``entry_idx .. entry_idx + exit_off`` are read.
     entry_idx
         Absolute index of the entry bar (forward offset 0).
     exit_off
         ``bars_held`` — the forward offset of the trade's exit bar.
     entry_price, sl_price, sl_distance
-        Entry fill, stop price, and ``entry_price - sl_price`` (== 1R).
+        Entry fill, stop price, and ``abs(entry_price - sl_price)`` (== 1R).
     exit_at_bar_open
         Set when the trade leaves at the OPEN of the exit bar (e.g. a queued
-        trail / time exit filled next-bar-open): that bar's intrabar high is
-        unreachable, so the scan stops at ``exit_off - 1``. Leave ``False``
+        trail / time exit filled next-bar-open): that bar's intrabar extreme
+        is unreachable, so the scan stops at ``exit_off - 1``. Leave ``False``
         when the trade is open through the exit bar (intrabar stop, at-close
-        time exit, end-of-data), so the exit bar's high is included.
+        time exit, end-of-data), so the exit bar is included.
     r_threshold
         Favourable-event multiple. Default :data:`ONE_R` (1.0).
+    direction
+        ``"long"`` (default) or ``"short"``. Selects the favourable / stop
+        geometry above.
+    high_ask, low_ask
+        Per-bar intrabar ask extremes — REQUIRED for ``direction="short"``,
+        ignored for ``direction="long"``.
 
     Returns
     -------
@@ -135,16 +159,39 @@ def reached_1r_before_sl(
     """
     if not math.isfinite(sl_distance) or sl_distance <= 0:
         return float("nan")
+    side = str(direction).strip().lower()
+    if side not in ("long", "short"):
+        raise ValueError(f"direction must be 'long' or 'short'; got {direction!r}")
     last = exit_off - 1 if exit_at_bar_open else exit_off
+
+    if side == "long":
+        for off in range(0, last + 1):
+            bidx = entry_idx + off
+            lo = float(low_bid[bidx])
+            # Take-the-loss: stop is checked before +1R. A stop breach ends
+            # the walk; this bar can never register +1R (same-bar tie → SL).
+            if off > 0 and math.isfinite(lo) and lo <= sl_price:
+                return float("nan")
+            hi = float(high_bid[bidx])
+            if math.isfinite(hi) and (hi - entry_price) / sl_distance >= r_threshold:
+                return float(off)
+        return float("nan")
+
+    # short — mirror geometry on the ask side (stop ABOVE entry, favourable
+    # is price falling). Same take-the-loss ordering: the stop is evaluated
+    # FIRST so a same-bar (+1R-low AND SL-high) trade resolves SL-first → NaN.
+    if high_ask is None or low_ask is None:
+        raise ValueError(
+            "direction='short' requires high_ask and low_ask arrays "
+            "(the ask side is where a short is stopped / bought back)"
+        )
     for off in range(0, last + 1):
         bidx = entry_idx + off
-        lo = float(low_bid[bidx])
-        # Take-the-loss: stop is checked before +1R. A stop breach ends the
-        # walk; this bar can never register +1R (same-bar tie → SL wins).
-        if off > 0 and math.isfinite(lo) and lo <= sl_price:
+        hi = float(high_ask[bidx])
+        if off > 0 and math.isfinite(hi) and hi >= sl_price:
             return float("nan")
-        hi = float(high_bid[bidx])
-        if math.isfinite(hi) and (hi - entry_price) / sl_distance >= r_threshold:
+        lo = float(low_ask[bidx])
+        if math.isfinite(lo) and (entry_price - lo) / sl_distance >= r_threshold:
             return float(off)
     return float("nan")
 

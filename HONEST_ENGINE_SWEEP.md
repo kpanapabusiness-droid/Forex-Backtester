@@ -188,3 +188,32 @@ The two blockers this report flagged were subsequently resolved by operator-appr
 Empirical confirmation this pass: the 35 honesty-critical cases (`test_take_the_loss_invariant`, `test_cost_application`, `test_label_take_the_loss`, `test_determinism`) pass, and the full CI suite `pytest -m "not research"` is green — **1656 passed, 294 skipped, 7 deselected** (no collateral regression from the cost wiring on the shared chokepoint).
 
 **Final top verdict: `MultiPairBacktester` is honest end-to-end and safe as the sole gate engine.** Residual non-blocking items remain as written: Part B's cross-pair `SUSPECT` features (excluded by the causal-lineage gate, flagged for the Step-6 cross-pair audit) and Part E's absence of an automated full-data A1-vs-legacy anchor in CI.
+
+---
+
+## SHORT-SIDE RE-READ ADDENDUM — 2026-06-05
+
+Scope: the short-side enablement PR (`feature/short-side-enablement`, per
+[`discovery/SHORTS_ENABLEMENT_PROBE.md`](discovery/SHORTS_ENABLEMENT_PROBE.md))
+exercises the engine's already-symmetric short path for the first time. The
+sweep is re-read for shorts; the dispatch requires **Part C** (FundedNext cost
+netting symmetric on short legs) and **Part D** (the direction-aware
+`reached_1r_before_sl` is the label producer of record) to read **SAFE**. Longs
+are byte-identical (default `Direction.LONG` everywhere; `tests/test_determinism.py`
+and the A1-vs-legacy anchor green), so this addendum only adds the short
+mirror — no prior verdict changes.
+
+| Part | Short-side re-read (2026-06-05) |
+|------|--------------------------------|
+| **A** Take-the-loss | **SAFE (short)** — `tests/sim/test_take_the_loss_invariant.py` gained a 5-case `Direction.SHORT` mirror (every fixture the reflection of its long counterpart around entry). The dispatch case — a short stop ABOVE entry breached on the SAME bar its +1R partial BELOW entry would fire → SL-first → full −1R, partial suppressed — is `test_short_same_bar_stop_and_partial_is_sl_first_minus_1r`. Short SL fires on `high_ask >= sl` (`core/sim/fill.py:78`); the SL-first `_check_exits`→partial ordering is shared, not re-authored. |
+| **C** FundedNext costs | **SAFE (short)** — the cost model is direction-agnostic (size + bid/ask spread only; `core/sim/costs/*`). `tests/sim/test_cost_application.py::test_short_leg_costs_match_long_leg_exactly` pins commission / slippage / spread / total identical on a SHORT leg vs the otherwise-identical LONG leg; `test_short_partial_win_three_fills_symmetric` pins the 3-fill partial haircut. Costs still only ever subtract — a short's gross win is reduced, never inflated. |
+| **D** labels | **SAFE (short)** — `core/sim/honest_label.reached_1r_before_sl` is now direction-aware (short: favourable = `low_ask` below entry, stop = `high_ask` above SL) and remains the in-tree producer of record, called by **both** Step-1 pool producers on the short branch. The same-bar +1R/SL tie still resolves SL-first → NaN → LOSS for shorts (`tests/sim/test_short_enablement.py::test_short_label_same_bar_plus1r_and_sl_is_nan`, plus the full producer suite). The two producers are cross-checked to agree trade-for-trade on a losing short (`test_two_producers_agree_on_a_losing_short`, with a long control). |
+| **E** Determinism | **SAFE** — longs byte-identical (two-run sha + serial-vs-parallel green, A1 anchor green); the short path adds no RNG / time / unordered iteration. No committed short fixtures exist yet (no short arc has opened), so there is nothing to regenerate; short fixture/sha generation happens when a short arc is dispatched. |
+
+**Short-side verdict: the honest-engine sweep reads SAFE for shorts.** The
+35 honesty-critical cases plus the new short mirror (`test_take_the_loss_invariant`
+short cases, `test_cost_application` short cases, `test_short_enablement`,
+`test_label_take_the_loss`, `test_determinism`) pass under `pytest -m "not research"`.
+Caveat, unchanged from the long verdict: Part B's cross-pair `SUSPECT` features
+remain causal-lineage-gated, and no short discovery arc may open until this PR is
+merged (it is human-gated canonical core; deployable-system count stays 0).

@@ -23,6 +23,9 @@ arc:
   sub_protocol: signal_discovery_probe
   tf_mode: locked
   tf: H4   # AMENDED — chat decision 1
+  # Load-bearing as of short-side enablement: a run parses this via
+  # core.sim.account.parse_direction -> DiscoveryExitConfig.direction
+  # (long_only is an accepted alias for Direction.LONG). A short arc sets `short`.
   direction: long_only
 
 search:

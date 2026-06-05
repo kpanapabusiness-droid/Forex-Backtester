@@ -107,14 +107,23 @@ def _path_features_so_far(
     n_defer: int,
     sl_anchor_price: float,
     sl_distance: float,
+    direction: Direction = Direction.LONG,
 ) -> dict[str, float]:
     """Compute path-so-far features at bar (signal_idx + n_defer).
 
     The simulator treats bar signal_idx+1 as the would-be entry; we
     compute path-so-far relative to that "tentative entry price" =
-    open_ask(signal_idx+1). The classifier decides at signal_idx +
-    n_defer whether the path-so-far features admit entry at
-    signal_idx + n_defer + 1.
+    open_ask(signal_idx+1) for a long / open_bid for a short. The
+    classifier decides at signal_idx + n_defer whether the path-so-far
+    features admit entry at signal_idx + n_defer + 1.
+
+    The features are computed in the TRADE's own frame, so they carry the
+    same meaning for either side: ``mfe_so_far_r`` is the best favourable
+    excursion (price up for a long, down for a short), ``mae_so_far_r`` the
+    worst adverse one, ``close_r`` the signed progress. ``direction=LONG``
+    (default) is byte-identical to the pre-short helper (``sgn=1.0`` and the
+    bid-side arrays); ``direction=SHORT`` mirrors onto the ask side with the
+    sign flipped.
 
     Returns a dict matching PATH_FEATURE_KEYS. Bars used: from
     signal_idx+1 up to signal_idx+n_defer (inclusive).
@@ -124,18 +133,26 @@ def _path_features_so_far(
     n = len(pair_df)
     if entry_idx >= n or decide_idx >= n:
         return {k: float("nan") for k in PATH_FEATURE_KEYS}
-    entry_price = float(pair_df["open_ask"].iat[entry_idx])
-    closes_bid = pair_df["close_bid"].values
-    highs_bid = pair_df["high_bid"].values
-    lows_bid = pair_df["low_bid"].values
+    if direction is Direction.LONG:
+        entry_price = float(pair_df["open_ask"].iat[entry_idx])
+        closes = pair_df["close_bid"].values
+        favs = pair_df["high_bid"].values   # favourable extreme (price up)
+        advs = pair_df["low_bid"].values    # adverse extreme (price down)
+        sgn = 1.0
+    else:
+        entry_price = float(pair_df["open_bid"].iat[entry_idx])
+        closes = pair_df["close_ask"].values
+        favs = pair_df["low_ask"].values    # favourable extreme (price down)
+        advs = pair_df["high_ask"].values   # adverse extreme (price up)
+        sgn = -1.0
     # close_r at each held bar
     close_r_series: list[float] = []
     mfe_so_far = 0.0
     mae_so_far = 0.0
     for bidx in range(entry_idx, decide_idx + 1):
-        close_r = (closes_bid[bidx] - entry_price) / sl_distance
-        mfe_bar = (highs_bid[bidx] - entry_price) / sl_distance
-        mae_bar = (lows_bid[bidx] - entry_price) / sl_distance
+        close_r = sgn * (closes[bidx] - entry_price) / sl_distance
+        mfe_bar = sgn * (favs[bidx] - entry_price) / sl_distance
+        mae_bar = sgn * (advs[bidx] - entry_price) / sl_distance
         if mfe_bar > mfe_so_far:
             mfe_so_far = mfe_bar
         if mae_bar < mae_so_far:
@@ -147,7 +164,7 @@ def _path_features_so_far(
     prev_mfe = None
     running_mfe = 0.0
     for bidx in range(entry_idx, decide_idx + 1):
-        m = (highs_bid[bidx] - entry_price) / sl_distance
+        m = sgn * (favs[bidx] - entry_price) / sl_distance
         if m > running_mfe:
             running_mfe = m
             if prev_mfe is not None and running_mfe > prev_mfe:
@@ -196,6 +213,7 @@ def _build_a3_strategy(
     per_pair = signal_eval.per_pair
 
     series_cache: dict[str, dict[str, pd.Series]] = {}
+    directions: dict[str, Direction] = {}
     for pair, state in per_pair.items():
         df = primary_panel.pair_dfs.get(pair)
         if df is None:
@@ -207,6 +225,7 @@ def _build_a3_strategy(
             for k, v in state.additional_gates.items()
         }
         series_cache[pair] = {"mask": mask, "atr": atr, **gates}
+        directions[pair] = state.direction
 
     n_defer = cfg.n_defer
 
@@ -240,10 +259,18 @@ def _build_a3_strategy(
             atr = float(cached["atr"].iloc[signal_bar_idx])
             if not (atr > 0):
                 continue
-            # Tentative entry price + SL (computed once at signal bar)
-            entry_proxy = float(df["close_ask"].iat[signal_bar_idx])
-            sl_price = entry_proxy - cfg.sl_atr_mult * atr
-            sl_distance = entry_proxy - sl_price
+            direction = directions.get(pair, Direction.LONG)
+            # Tentative entry price + SL (computed once at signal bar),
+            # mirrored by direction (long anchors close_ask / stop below;
+            # short anchors close_bid / stop above). sl_distance via abs keeps
+            # the long value identical and is positive for a short.
+            if direction is Direction.LONG:
+                entry_proxy = float(df["close_ask"].iat[signal_bar_idx])
+                sl_price = entry_proxy - cfg.sl_atr_mult * atr
+            else:
+                entry_proxy = float(df["close_bid"].iat[signal_bar_idx])
+                sl_price = entry_proxy + cfg.sl_atr_mult * atr
+            sl_distance = abs(entry_proxy - sl_price)
             if sl_distance <= 0:
                 continue
             # Build classifier feature vector
@@ -255,7 +282,7 @@ def _build_a3_strategy(
             if entry_feats is None:
                 continue
             path_feats = _path_features_so_far(
-                df, signal_bar_idx, n_defer, entry_proxy, sl_distance
+                df, signal_bar_idx, n_defer, entry_proxy, sl_distance, direction
             )
             combined = {**entry_feats, **path_feats}
             admit, _proba = predict_admit(
@@ -268,11 +295,16 @@ def _build_a3_strategy(
             bar_now = snapshot.get(pair)
             if bar_now is None:
                 continue
-            # Use current bar's close_ask as the *re-anchored* entry proxy
-            # so the order fills at this bar's next-bar open. This matches
-            # "wait N bars, then enter at next-bar open" semantics.
-            new_entry_proxy = float(bar_now["close_ask"])
-            new_sl_price = new_entry_proxy - cfg.sl_atr_mult * atr
+            # Use the current bar's close as the *re-anchored* entry proxy so
+            # the order fills at this bar's next-bar open. This matches "wait N
+            # bars, then enter at next-bar open" semantics. Mirrored by
+            # direction (long close_ask / stop below; short close_bid / above).
+            if direction is Direction.LONG:
+                new_entry_proxy = float(bar_now["close_ask"])
+                new_sl_price = new_entry_proxy - cfg.sl_atr_mult * atr
+            else:
+                new_entry_proxy = float(bar_now["close_bid"])
+                new_sl_price = new_entry_proxy + cfg.sl_atr_mult * atr
             if new_sl_price <= 0:
                 continue
             size = risk.risk_size(
@@ -283,7 +315,7 @@ def _build_a3_strategy(
             )
             orders.append(Order(
                 pair=pair,
-                direction=Direction.LONG,
+                direction=direction,
                 size=size,
                 sl_price=new_sl_price,
                 tp_price=None,

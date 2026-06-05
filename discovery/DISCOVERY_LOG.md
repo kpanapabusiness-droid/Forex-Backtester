@@ -41,6 +41,7 @@ at arc step (i).
 | 2005 | 2000s | 2026-06-05 | Attack EDGE<COST from the COST side: restrict cross-trend +gross entry (Donchian-20+SMA200, 12 crosses) to its cheapest bars (spread/ATR trailing-rolling-quantile, BUILT make_low_cost_mask). MONOTONE IS lift −7.96%(all)→+1.72%(cheapest 15%), beats matched random-cheap null (≈−0.3%) IN-SAMPLE — but OOS −2.26% (4/6 neg) + q full-sample-swept → NOT durable. CONVERGES w/ arc 3007 (3000s, absolute spread-timing): cost↓ entangled with edge↓ (liquid hours = weakest gross edge) → both chats CLOSE the cost side. DIRECTION remains the wall (3004); cost+stop are secondary ~5–10pp drags | N | N | +1.42% (cheapest-15% IS) | -8.33% | 6.01% | 682 | FAIL | N | KILL |
 | 1012 | 1000s | 2026-06-05 | Month-end reversion §5f best-version completion + survivor-ceiling test (same arc-1011 component, not a new edge): full registered exit/SL menu × time-cap, 24 configs → **0 all-folds-positive** (best 7/10 = baseline; te5 + all TP/trail DILUTE). Negative folds = contiguous **2014/2015/2016 USD-bull block** (SNB-unpeg/EUR-collapse); both pre-registered reasoned refinements FAIL to rescue — quarter-end-only 4/10 (thins to 0), trend-filter close>SMA100 4/10; post-hoc inverse close<SMA100 8/10 but still 2015/16 neg & fishing → not claimed. Survivor ceiling CLOSED; exits/filters can't lift it. OOS preserved | N | n/e (OOS preserved) | -1.14% | n/e | 1.43% | 121 | FAIL survivor → PORTFOLIO (ceiling confirmed) | N | PORTFOLIO |
 | 2007 | 2000s | 2026-06-05 | **DEEP multi-factor** liquidity-sweep reversal long (sweep prior swing-low × immediate reclaim × fast-3-bar drop × SMA200 uptrend; developed freely on IS) — the open-frontier "can depth clear all-folds-positive?" test. Obs: conjunction lifts +1R-capture 0.486→0.52 but drift sub-cost (+0.03 ATR); the CLIMAX (forced) variant is a FALLING KNIFE (drift −0.33, the short leg). Honest engine: ALL 7 exits × 2 SLs mean-NEGATIVE, none all-folds-pos, and **LOSES TO THE FAIR NULL** (real −1.76% vs null −0.33% te6) → not even a real edge. Buying structural weakness = adverse-excursion = worse than random under take-the-loss; a chart pattern that resembles a grab is NOT a grab (no forced-flow control, cf. 1011). OOS preserved | N | n/e (OOS preserved) | -5.61% (PRIMARY L20 te6) | n/e | 5.61% (worst, te6) | 508–763 | FAIL → KILL (worse than null) | N | KILL |
+| 1014 | 1000s | 2026-06-05 | **FIRST SHORT ARC.** Confirmed-breakdown continuation SHORT (deep swing-low pierce, NO reclaim, close-below — the short mirror of arc 1013's reclaim-long), H4 USD majors — FALSIFIED at obs: confirmed-breakdown short cap 0.4893 (<0.50) + drift −0.046 (REVERTS, bad for short); deeper close-below reverts HARDER (−0.21 @ 0.25-0.5 ATR); **structure control FAILS** (big-red AT swept-low 0.4998 ≈ big-red ELSEWHERE 0.4963 — swing-low NOT load-bearing for the short, unlike the long); per-pair 3/7 = noise. Diagnosis: reclaim is FORWARD-confirming (move hasn't started → 1013 long wins), confirmed-breakdown is BACKWARD-confirming (move already happened → i+1 short enters the local low → reverts). The 1013 long has NO tradeable short mirror; shorts don't revive directional STRUCTURE (coin-flip by symmetry). Live short frontier = FLOW-event shorts w/ acc>0.50 (up-gap weekend short, 2001/2003) | N | n/e | n/e | n/e | n/e | ~4500 obs | FAIL (obs cheap-kill) | N | KILL |
 | 2006 | 2000s | 2026-06-05 | 2-way PORTFOLIO combination WFO — the route's gated next step (arc 1011 flag): co-simulate the ONLY two net-positive long-only components (gap-fill 1006 JPY-cross H4 + month-end 1011 USD-major D1) under equal + risk-parity weights, gate all-folds-positive on the COMBINED book. Both reproduce EXACTLY (gap +0.685%, me +0.232%, corr +0.117 ✓). Risk-parity cuts worst-fold −6.79%(gap solo)→−1.53% but STILL 4/10 neg — BLOCKED by a mutually-negative fold (2015, both lose): no convex/co-sim combo can pass (P&L additive). The two edges are flow-reversion → TAIL-CORRELATED (both bleed 2015/16/18/20) despite corr +0.117. ⇒ ≥3 components needed, SELECTED for fold-complementarity (regime-orthogonality), not avg-corr. Components UNCHANGED (still PORTFOLIO); 3rd-component spec = net-pos on 2015/16/18/20, esp 2015 | N | n/e (OOS preserved) | -1.53% (risk-parity combined) | n/e | n/e | 396+121 | FAIL → KILL (combined book; components unchanged) | N | KILL |
 
 ---
@@ -1538,3 +1539,66 @@ it toward all-folds-positive — a fresh arc, the arc-1012 trap explicitly avoid
 **FLAGS (code not merged):** none requiring the canonical core. Carries the standing `A1Config.time_exit_bars`
 -unwired flag (arcs 1005/3004; worked around via the BUILT `make_time_exit_predicate`). Drivers scratch
 `_disco_work/arc1013_*.py` (reproducible from the arc doc; obs cached `_disco_work/obs_h4_usd.parquet`).
+
+### arc_1014
+
+**Confirmed-breakdown continuation SHORT — the short mirror of arc 1013 (the programme's FIRST short arc).**
+Full record: [`arcs/arc_1014_confirmed_breakdown_short.md`](arcs/arc_1014_confirmed_breakdown_short.md). No
+council (falsified at observation; no worthwhile-ceiling fork).
+
+**Idea + why.** Shorts are now open (PR #273; engine short-symmetric, `PerPairSignalState.direction` flows
+into the pool bar-walk + Step-5 emission; `observe_long_capture(direction="short")` mirrors entry/SL/label/
+drift). The dispatch's lead priority is the short asymmetries the corpus flagged, and my range's own arc 1013
+(strongest directional long in the corpus — deep failed-breakdown RECLAIM, PORTFOLIO 3rd) is NEGATIVE in the
+strong-USD trend years 2018/22/25 *because* there "breakdowns are real, not swept." The arc-2006 portfolio
+spec needs a component positive in exactly those risk-off years. Hypothesis (§5a DEEP carve-out, extend the
+1013 template incl. its short mirror): the SHORT mirror — a deep pierce of a swing low that does NOT reclaim
+(closes BELOW with down-momentum) = a CONFIRMED breakdown → continuation DOWN, positive when the longs bleed.
+Corpus corroboration: arc 2007's climax sweep is a falling knife (drift −0.124→−0.333, worse the bigger,
+FLAG-1); arc 1013 flagged the non-reclaim leg as the short. NOT a shallow breakout short (dead by symmetry) —
+the multi-factor cell (depth × swing-low structure × close-below × momentum).
+
+**What happened — FALSIFIED at observation; the data inverted the corpus prior.** H4 USD majors, IS, short
+lens. **Confirmed breakdown (pierce, no-reclaim, close-below): cap 0.4893 (<0.50), drift −0.046** (price
+drifts UP after = the breakdown REVERTS, bad for the short). **Deeper close-below reverts HARDER** (drift
+−0.212 at 0.25-0.5 ATR below), opposite of the continuation hypothesis; only the thin extreme tail (>1 ATR,
+n=623) faintly continues (+0.077, cap 0.504 = coin-flip). Down-momentum (climax) buckets are non-monotone
+noise (the arc-3007 "not a lever" tell) — does NOT reproduce arc 2007's −0.33 in this clean construction.
+**STRUCTURE CONTROL decisive (the 1013 discipline mirrored):** big-red bar AT a swept swing-low (cap 0.4998,
+drift +0.018) ≈ big-red ELSEWHERE (cap 0.4963, drift +0.055) — the swing-low structure is **NOT load-bearing
+for the short** (contrast 1013's long: AT-swept-low 0.55-0.61 vs elsewhere ~0.49). Per-pair deep cell 3/7
+positive (EUR/GBP/AUD continue; JPY/CHF/CAD revert −0.4..−0.67) = the arc-1010 noise signature.
+
+**Verdict: KILL (cheap-kill at observation).** Coin-flip-or-worse short that reverts; structure control fails,
+momentum non-monotone, cross-section noise. Entry doesn't beat base + no positive gross short drift → §5f
+exit-sweep doesn't bite; no pool/engine/council spent (arc-1001/1002/3006/1010 discipline).
+
+**Diagnosis — the load-bearing asymmetry (why the 1013 long has no tradeable short mirror).** arc 1013's
+reclaim-LONG wins because the reclaim is **FORWARD-confirming**: the wick swept stops and closed back above,
+so the i+1 long enters AFTER the adverse low — the move it bets on hasn't started. The confirmed-breakdown
+SHORT is the mirror image but the asymmetry does NOT flip: a close BELOW the swept level is
+**BACKWARD-confirming** — the down-move already happened in the signal bar, so the honest i+1 short enters at
+the local low, and on liquid majors (down-moves revert, arcs 3000/3001/3008) it reverts UP against the short.
+Forward-confirming reversal structure (reclaim) is tradeable; backward-confirming continuation structure
+(confirmed breakdown) is shorting realized weakness = the arc-2001/2004/2007 sell-into-the-move stop-tax. The
+−0.33 "falling knife" (2007) was inside a fast-3-bar-drop sweep-reclaim construction (a momentum/breakout
+short = closed ground), never engine-validated; the clean confirmed-breakdown doesn't carry it.
+
+**Threads / lessons.** (1) **The arc-1013 reclaim-long does NOT mirror to a tradeable short** — forward-
+confirming reversal structure is capturable; backward-confirming continuation structure is a coin-flip that
+reverts on the honest i+1 short. **Shorts do not revive directional STRUCTURE** (the structural short base
+0.485 ≈ the long base 0.488 by symmetry; the swing-low structure that was load-bearing for the long is inert
+for the short — control-proven). (2) **The regime-orthogonal short the portfolio needs (positive 2018/22/25)
+is NOT a confirmed-breakdown continuation short.** (3) **The live short frontier is the FLOW-EVENT shorts
+where the corpus measured directional accuracy >0.50, NOT structural-continuation shorts** (those inherit the
+coin-flip). Named candidate, the natural next arc (1015): the **up-gap weekend SHORT** (arcs 2001/2003:
+up-gaps drift −0.57 ATR, frac+ 0.64 — the gap-fill's STRONGER leg, direction NOT a coin-flip, was blocked by
+long-only, now unblocked). Distinct mechanism family (flow event, not structural continuation). (4) **The
+arc-1013 structure control, mirrored on the short, was the decisive one-line discriminator** — "big-red AT
+swept-low ≈ big-red elsewhere" killed the structural claim immediately; the right first test for any
+structural short. (5) **First live short measurement in the programme** — the PR-#273 short path works
+end-to-end in observation (base short cap ≈ 0.485 reproduces the long-base mirror).
+
+**FLAGS (code not merged):** none. No canonical-core change; no new BUILT tool (reused the direction-aware
+`observe_long_capture`; conditioning is a one-off scratch observer). Driver scratch
+`_disco_work/arc1014_observe_short.py` (reproducible from the arc doc).

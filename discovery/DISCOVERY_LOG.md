@@ -68,6 +68,7 @@ at arc step (i).
 | 3017 | 3000s | 2026-06-05 | **Month-End Reversion SHORT — INDEPENDENT REPRODUCTION of arc 1019** (concurrent same-idea convergence; Arc-10 defense). Sell a big UP move into month-end, bet post-fix rebalancing reversion DOWN — the unharvested SHORT side of `me` (1011), aimed at the 2015 & 2018-positive 4th-leg spec. **Signal REPRODUCES 1019 exactly** (pool n=116, gross +0.1713, capture **0.5508 >0.50** first corpus short, month-end structure-control excess **+0.0996 ATR**, 2015 drift +0.437/2018 cap 0.818; linear-regime partial-runner 7/10, 2015 +, 2018 +, beats null). **My initial KILL was an ERROR — RETRACTED → PORTFOLIO** (deferring to 1019's folder; not duplicated). The error: I passed `A1Config.risk_pct=0.005` (the `ArcPoolConfig` FRACTION) but **`A1Config.risk_pct` is in PERCENT (0.5=0.5%)** → every per-fold ROI 100×-compressed; I then misjudged the compressed real-vs-null margin (+0.012pp) against the corpus's uncompressed benchmarks (+0.36pp) as "noise floor." The **scale-INVARIANT** judgments (fold-sign pattern, real>null) agreed with 1019 all along. **TWO FLAGs (code human-gated, not patched): (1)** the `risk_pct` PERCENT-vs-FRACTION unit split between A1Config & ArcPoolConfig (A1Config default 0.005 = 0.005% silently 100×-low; the registry entry-point omits risk_pct → copies inherit the trap) — pin the canonical discovery risk_pct; **(2)** the daily-DD cap makes per-fold ROI NONLINEAR in risk_pct — at risk 0.5 the partial-runner fold-SIGNS flip (2015/2018 NEGATIVE, blow through the 5% cap) vs low-risk 7/10/2015+/2018+ → **the all-folds-positive / 2015-2018 verdict for this thin, USD-concurrency-clustered short is risk-convention-DEPENDENT**; the gated 4-way combo (arc 1020) must report risk-sensitivity, not a single-risk number. **Lesson: independent reproduction caught a 100× apparatus discrepancy → traced to a measurement convention, not the signal; scale-invariant metrics are the trustworthy cross-config judges.** OOS preserved. | N | n/e (OOS preserved) | +0.004% (linear-regime partial-runner 2015; risk-convention-dependent) | n/e | n/e | 116 | PORTFOLIO (independent reproduction confirms arc 1019; KILL retracted; risk_pct FLAG) | N | PORTFOLIO |
 | 3016 | 3000s | 2026-06-05 | **Intraday session structure: Asian-range / London-open break** (continue OR fade) — the single genuinely-UNMAPPED data modality (every prior arc is H4/D1/W1 daily-scale or calendar-flow; arc 1000 only did H4 hour-CONDITIONING, not a session-RANGE construction). DST-clean (Europe/London) Asian range × first London-open break, H1 majors. FALSIFIED at obs: **the break does NOT continue** (long-cont cap **0.375**/drift −0.116, short-cont 0.396/−0.039) AND **does NOT cleanly fade** — the naive `1−cont_cap≈0.62` is an asymmetric-SL artifact; the fade's OWN honest capture is **0.386** (short up-break) / 0.383 (long down-break): cont 0.375 + fade 0.386 = 0.76 < 1 = the break entry is a **high-vol London-open WHIPSAW point where a 2·ATR SL is hit BOTH ways**. Net fade drift after entry spread (~0.08 ATR) is **~+0.02R ≈ 0**, ~10× below the ~0.125R H1 cost (~2× H4). Only positive cell EURUSD +0.19 = **1/4 pairs (single-pair noise tell)**; 2015 (+0.174)/2018 (+0.251) drift-positive but inside cap 0.385/0.433 (<0.50) → won't survive engine (arc-3004/3012 "+drift inside sub-0.50 capture collapses SL-honest"). **Intraday session structure is sub-cost — extends the H1 cost wall (1008/3008/1010) from discrete-flow events to session-RANGE; the last unmapped modality mapped dead.** Reusable caution: `1−cont_cap ≠ fade capture` (asymmetric SL). No engine/null/council spent | n/e | n/e | n/e | n/e | n/e | 7983 IS break obs | KILL (obs cheap-kill) | N | KILL |
 | 3018 | 3000s | 2026-06-05 | **Failed-breakdown-reclaim LONG on CROSSES** (2018-neutral decorrelated 5th-leg candidate) — the 4-way book (arc 1020) is ~0.11% from deployable, blocked only by MARGINAL 2015(−0.08)&2016(−0.12); apply the corpus's STRONGEST structural edge (`fbr` 1013, USD majors) to a DIFFERENT universe (crosses) for a decorrelated, plausibly-2018-NEUTRAL component to lift 2015/2016 (documented spec-override: arc-1020 wanted NON-reversion but 2015/2016's only tradeable edge IS reversion; the new lever is 2018-NEUTRALITY-via-universe, not non-reversion). FALSIFIED at obs (H4, JPY crosses cached + non-JPY crosses warmed). **STRUCTURE CONTROL INVERTS on BOTH universes — opposite of arc 1013:** swept-low reclaim cap **JPY 0.4633 / non-JPY 0.4248 (both <0.50)**, WORSE than a generic deep down-wick (0.5463 / 0.4620) → the swing-low pierce/reclaim REMOVES edge on crosses (anti-load-bearing). **Target-year sign WRONG:** 2016 drift JPY +0.067/med −0.708, non-JPY **−0.952**; 2018 neg both (−0.455/−0.154); 2015 either strongly neg (JPY −0.997) or a THIN-TAIL artifact (non-JPY mean +1.25/median −0.295, n=9). Diagnosis: the `fbr` edge is **USD-major-SPECIFIC** — USD-major swing-lows at dense stop-clusters are defended reversal PIVOTS (1013 control-proven, 3013 level-confirmed), but cross swing-lows are swept routinely WITHOUT being supports (thinner/momentum/carry-driven) → reclaim enters mid-cascade, a falling knife (worst on carry JPY crosses in risk-off 2015/2018, arc 1017). **Generalizes arc 1018 (cross gaps efficient) from FLOW to STRUCTURE: corpus edges are universe-specific, don't transfer off USD majors.** The 2015/2016 leg is mechanistically hard — its only edge IS reversion, and the reversion that works (USD-major `fbr`) is the one that's −2018 → 2015/2016-lift & 2018-lift want OPPOSITE universes/directions. §5f doesn't bite (sub-0.50, anti-structure, wrong sign). 1013 UNCHANGED. No engine/null/council spent | n/e | n/e | n/e | n/e | n/e | ~330 IS fbr obs (177 JPY + 153 non-JPY) | KILL (obs cheap-kill) | N | KILL |
+| 3019 | 3000s | 2026-06-05 | **Forward-confirmed extreme-shock CONTINUATION** (the candidate 5th portfolio leg for the +2015/+2016 residual, arc 1020/1021 spec) — an EXTREME ≥3-ATR single-bar shock (forced flow: liquidations/stop-cascades/CB) → multi-day continuation, entered FORWARD-CONFIRMED (bar after shock breaks its extreme; the fix to the i+1-bounce death of 1016/2009/3012). Built `ShockContinuationSignal` (BUILT, kept). **Corpus's STRONGEST continuation IS result + most promising 5th-leg candidate ever:** magnitude-MONOTONE capture 0.498@1ATR (coin-flip=generic momentum dead, closed ground) → **0.589@3ATR** (edge ONLY in the extreme tail, NOT shallow-breakout); forward-confirm load-bearing (0.589>0.543 unconf>0.488 base); all 7 USD majors >0.50; honest §5f LINEAR regime EVERY exit mean-positive & beats fair null (tp_3r **9/10 +0.034, beats null +0.048 [9 vs 3]**; tp_2r 9/10 +0.051 [9 vs 1]); **+2015 AND +2016 under EVERY exit** (the exact 4-way blockers); the EXACT MIRROR of me-short (me-short +2018/weak-15-16, this +15/+16/weak-18). **HEAVY council** at the disposition fork (all 5 reviewers ranked Soundness strongest): verdict = do NOT record on IS (selection-suspect: 15 routes died vs same 2015/16/18 target; thin n=287≈26/yr; 3.0-ATR a post-hoc peak), run the cheap event-removal test then OOS first; strongest dissent = EPOCH-dependence (post-2020 shocks may mean-revert). **Test 1 event-removal:** REFUTES naive coincidence (drop SNB/CNY/Brexit/election windows → 2015 +0.188, 2016 +1.204 both still pos; big days are VARIED macro shocks: FOMC/oil-panic/NFP) but CONFIRMS thinness (2015 flips −0.049 dropping top-2/22 days; 2016 robust +0.528). **Test 2 one-shot frozen-exit OOS (tp_3r@3ATR, §5f-faithful select-on-IS-freeze): FAILS — 2/6 folds, mean −0.0022, LOSES to null (−0.005pp)** (2021/22 + [Fed-hiking/LDI shocks continued], 2023-25 neg [post-shock mean-reverted]). IS 9/10-beats-null → OOS 2/6-below-null = **EPOCH-DEPENDENT**: 2010-2020 shocks trended, 2021+ shocks revert. ALSO un-scalable (shocks cluster across pairs on macro days → FundedNext 5%-daily-DD cap breaches 0→7-84/yr from risk 0.005→0.5; daily-DD analog of arc-1017 currency-cap). **A textbook Arc-10 SAVE** — recording PORTFOLIO on the IS evidence (my initial lean) would have been a fabricated route-unblocking component; council + one-shot OOS caught it. NEW lesson: a continuation/tail edge can be epoch-specific even with a clean mechanism + clean IS null-beat → IS-mean-positive+beats-null is NECESSARY-not-SUFFICIENT; OOS before PORTFOLIO recording for epoch-vulnerable edges. OOS spent (frozen, no re-selection). Components UNCHANGED; 5th leg still unfound | N | N | +0.034 (IS tp_3r best non-fat-tail) | -0.0022 (OOS combined, loses to null) | n/e | 287 IS / 143 OOS | FAIL (OOS, loses to null) → KILL | N | KILL |
 
 ---
 
@@ -3168,3 +3169,62 @@ runner harvests fat-tail variance that inflates IS.
 
 **FLAGS (code not merged):** none requiring the canonical core. Carries the standing
 `A1Config.time_exit_bars`-unwired flag + the arc-1020 gap-reproduction nit (immaterial — gap 0-weight).
+
+### arc_3019
+
+**Forward-confirmed extreme-shock CONTINUATION** — the corpus's strongest continuation IS result and most
+promising 5th-leg candidate ever, KILLED by a one-shot OOS. Full record:
+[`arcs/arc_3019_shock_continuation.md`](arcs/arc_3019_shock_continuation.md). Council transcript summarized in
+the arc doc (not separately saved; the verdict drove the two decisive tests).
+
+**Idea + because.** 2015 (SNB/China-deval) and 2016 (oil/Brexit/Trump) were extreme-EVENT years where the
+book's reversion legs bled because the big moves CONTINUED. The missing +2015/+2016 leg must be a
+CONTINUATION. Generic momentum is closed ground (coin-flip) and the i+1-entry-after-a-big-move death
+(backward-confirming → catches the bounce) killed every prior shock trade (1016/2009/3012). The novel fix:
+an EXTREME ≥3-ATR shock (forced flow — liquidations/stop-cascades/CB) creates multi-day pressure; harvest it
+only when FORWARD-CONFIRMED (the bar after the shock breaks its extreme), entering on the resumption (the
+1013-reclaim property applied to continuation).
+
+**IS — the strongest continuation result in the corpus.** Magnitude-MONOTONE capture 0.498@1ATR (coin-flip,
+= why shallow momentum is closed ground) → 0.589@3ATR (the edge is ONLY in the extreme tail). Forward-confirm
+load-bearing (0.589 > 0.543 unconf). Honest §5f, linear regime: EVERY exit mean-positive & beats the fair
+null; tp_3r 9/10 +0.034 (beats null +0.048, 9 vs 3); 2015 AND 2016 positive under EVERY exit — the exact
+4-way blockers; the exact mirror of me-short. This looked like THE route-unblocking find.
+
+**Why I didn't record it on IS — council + two tests.** I convened the HEAVY council at the
+PORTFOLIO-vs-KILL fork. All 5 reviewers ranked the Soundness lens strongest; the chairman verdict: do NOT
+record on IS (the "+ exactly where the book needed it" is selection-suspect — 15 routes died vs the same
+target; n thin; 3.0-ATR a post-hoc peak), run the cheap event-removal test then OOS first; strongest dissent
+= epoch-dependence (post-2020 shocks may mean-revert). I committed (heavy weight; the reasoning beat my
+PORTFOLIO lean). **Test 1 (event-removal):** refuted the naive "just SNB+Brexit+Trump" coincidence (both
+years stay positive without the mega-event windows; the big days are varied macro shocks — FOMC/oil/NFP) but
+confirmed 2015 is thin (flips negative dropping its top-2 of 22 days; 2016 robust). **Test 2 (one-shot frozen
+OOS, tp_3r@3ATR, select-on-IS-freeze):** FAILS — 2/6 folds, mean −0.0022, **loses to the null** (−0.005pp).
+2021/2022 positive (Fed-hiking/LDI shocks continued); 2023-2025 negative (post-shock mean-reverted).
+
+**Diagnosis + lesson.** A real but EPOCH-SPECIFIC tail edge: the mechanism captured the 2010-2020 shock
+regime (shocks trended for days, esp. 2016) but does NOT generalize to 2021+ (shocks mean-revert faster).
+IS 9/10-beats-null → OOS 2/6-below-null. **NEW lesson: a continuation/tail edge can be epoch-dependent even
+with a clean mechanism, a clean magnitude-monotone signature, AND a clean IS null-beat — so IS-mean-positive
++ beats-null is NECESSARY but NOT SUFFICIENT; an epoch-vulnerable edge must clear OOS before any PORTFOLIO
+recording.** This is a higher-value negative than the prior continuation kills (those were coin-flip on IS;
+this PASSED IS and died OOS). Independently, it is un-scalable: shocks cluster across pairs on macro-event
+days → the FundedNext 5%-daily-DD cap breaches 0→7-84/yr from risk 0.005→0.5 (the daily-DD analog of
+arc-1017's currency-cap un-scalability) — a second, independent disqualifier.
+
+**Arc-10 SAVE.** Recording PORTFOLIO on the IS evidence (my initial lean) would have fabricated the corpus's
+headline "route-unblocking 5th leg." The HEAVY council's refusal-to-record-on-IS + the one-shot OOS caught
+it. The event-removal test (council's idea) is a cheap, reusable soundness instrument for event-concentrated
+edges.
+
+**Threads.** (1) The +2015/+2016/non-(−2018) 5th leg remains unfound; the strongest candidate yet died OOS.
+(2) A future +2015/+2016 mechanism should be NON-epoch-vulnerable (calendar/flow-mechanical like me/me-short,
+not regime/event-driven like this — mechanical flows recur across epochs; shock-directionality doesn't).
+(3) Tail/shock strategies are structurally cap-hostile on FundedNext (cap-clustering) — a standing prior for
+any future shock/event idea. (4) `ShockContinuationSignal` BUILT + registered, kept (real IS mechanism,
+epoch-bound).
+
+**FLAGS (code not merged):** none requiring the canonical core. New BUILT tool `ShockContinuationSignal`
+(experiment tool, committed). Carries the arc-3017 `risk_pct` FLAG (judged in the linear regime + reported
+risk-sensitivity, which is severe here and REINFORCES the daily-DD-cap-nonlinearity flag) and the arc-1005
+`time_exit_bars`-unwired flag. Scratch drivers `_disco3_work/arc3019_*.py` (reproducible).

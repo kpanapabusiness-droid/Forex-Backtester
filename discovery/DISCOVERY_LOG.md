@@ -35,6 +35,7 @@ at arc step (i).
 | 3006 | 3000s | 2026-06-05 | Multi-TF breakout-RETEST long (resistance→support flip; the last untested long-only lane, arc-1008 flag) — FALSIFIED at obs: retest-hold capture ≤ base in all 18 L×tol×hold cells, fwd drift NEGATIVE in 17/18 (−0.35..+0.00 ATR); catches FADING breakouts not defended supports; monotone-in-L only converges TO coin-flip, never above | N | n/e | n/e | n/e | n/e | 1200 | FAIL (obs cheap-kill) | N | KILL |
 | 1010 | 1000s | 2026-06-05 | Round-number / order-cluster reversion long (Osler 2003: take-profit clusters at big-figure "00" levels → bounce off support) — novel structural microstructure mechanism, decorrelated portfolio candidate; FALSIFIED at obs: support-rejection capture only 0.4883 (+0.5pp, drift ~0) sub-0.50, per-pair lift 3/9 >0.50 = NOISE, and the H4 lift EVAPORATES at H1 (0.4746 < base; EURUSD 0.5155→0.4834). Round-number effect arbitraged at H4/H1 like gotobi | N | n/e | n/e | n/e | n/e | n/e | FAIL (obs cheap-kill) | N | KILL |
 | 3007 | 3000s | 2026-06-05 | Intraday-SPREAD cost-timing lever on EDGE<COST (restrict cross-trend +gross signal to tightest-spread hours to cut cost — the one untried cost lever, arc 1003/1004) — BACKFIRES: spread×edge entangled, tight-spread/liquid hours have WEAKEST (negative −0.02R) gross edge; only +gross bucket is mid-spread (+0.12R) which nets ≤0 SL-honest (triage mean −0.02%, not all-folds-pos on friendly yrs). Cannot cut cost w/o cutting edge | N | n/e | -0.13% (mid-spread triage) | n/e | 0.14% | 2955 | FAIL → KILL | N | KILL |
+| 1011 | 1000s | 2026-06-05 | Month-end reversion long, USD majors (big DOWN move into month-end reverses — WMR-fix mechanical rebalancing over-extension; D1, ~2-bar time exit) — **2nd net-positive DECORRELATED long-only component**. MECHANISM-CONTROLLED: month-end vs random-day +0.249 ATR EXCESS (generic reversion NEGATIVE −0.063 → timing is causal). IS mean +0.23% (sl_only 2-bar), beats fair null +0.56pp, threshold-robust (0.75–1.5), leave-one-pair-out all+; but 7/10 folds → NOT all-folds-pos. Corr +0.117 vs arc 1006 → portfolio thread ACTIVE | N | n/e (OOS preserved) | -1.14% | n/e | n/e | 121 | FAIL → PORTFOLIO | N | PORTFOLIO |
 
 ---
 
@@ -1074,3 +1075,56 @@ long-only component found (still only the arc-1006 gap-fill).
 **FLAGS (code not merged):** none. No canonical-core change; no new BUILT tool (mid-spread filter is a one-off
 wrapper in scratch). Reused BUILT `observe_long_capture` + `DonchianBreakoutLongSignal`. Drivers scratch
 `_disco3_work/arc3007_observe.py`, `arc3007_triage.py`.
+
+### arc_1011
+
+**Month-end reversion long (mechanical rebalancing-flow over-extension)** (chat 1000–1999). Full record:
+[`arcs/arc_1011_month_end_reversion_long.md`](arcs/arc_1011_month_end_reversion_long.md). PORTFOLIO record:
+[`portfolio-candidates/arc_1011_month_end_reversion_long/`](portfolio-candidates/arc_1011_month_end_reversion_long/).
+No council (council is mandatory only for a PASS survivor; this is PORTFOLIO).
+
+**Idea + why.** Fresh eyes, honest-era only (22-arc corpus; my prior arc 1010 round-numbers KILL, concurrent
+3006 breakout-retest KILL). My pre-shorts lane = a 2nd *decorrelated* net-positive long-only component. The
+ONLY mechanism family that has produced net-positive is the discrete liquidity/flow-EVENT reversion (weekend
+gap-fill, arc 1006). So I applied that WINNING TEMPLATE to a structurally different event/universe:
+**month-end mechanical rebalancing** (WMR 4pm London fix, last business day) — large inelastic flows that
+over-extend a currency into the fix and then REVERSE. Distinct from arc 1005 (which measured turn-of-month
+*drift over the window*, sub-cost); here the object is the discrete spike-into-month-end → reversion.
+Long-tradeable = a big DOWN move into month-end → buy the reversion UP.
+
+**What happened.** Observation (D1, 7 USD majors, IS): the reversion concentrates in EXTREME down moves —
+≤ −1 ATR into month-end → fwd2 **+0.186 ATR, 61.6% pos** (comparable to the gap-fill). **CRITICAL CONTROL
+(the decisive test, since generic reversion is dead — 3000/3001):** the SAME ≤ −1 ATR 2-day down move,
+month-end vs RANDOM day → month-end +0.186 vs random **−0.063** (random big-down CONTINUES down, all 7 pairs)
+→ **+0.249 ATR month-end EXCESS** = the *timing* is the mechanism, not generic reversion. Canonical engine
+(`MultiPairBacktester`, FundedNext costs): pool n=121 (floor PASS), gross +0.0635; full IS WFO sl_only + 2-bar
+time exit **mean +0.23%, 7/10 folds positive** (3-bar +0.50%/6-10; longer holds + TP/trail dilute); **beats
+the fair same-exit null (random entry, matched fire-rate) by +0.56pp** (real +0.23% vs −0.33%). Robustness
+(arc-1009 discipline): threshold-robust (0.75–1.5 all +0.18 to +0.27%), per-fold broad-based, leave-one-pair-out
+all positive. **NOT all-folds-positive (7/10) → OOS deliberately NOT touched** (holdout preserved).
+
+**Verdict: FAIL the sole judge → PORTFOLIO.** Mean-positive net of costs, mechanism-controlled, robust,
+decorrelated — but fold-fragile. The **2nd net-positive decorrelated long-only component**, found by applying
+the winning discrete-flow template to a new event/universe (deliberate, not luck). Fold-ROI corr vs arc 1006
+gap-fill = **+0.117** (near-zero; structurally disjoint events + universes) → **the portfolio thread is now
+ACTIVE.** A naive 2-way fold-add is still 6/10 (the gap-fill's ±8% swings dominate my ±1%) → the combined-book
+all-folds-positive WFO (co-simulated, risk-weighted, likely a 3rd component) is the gated next step, NOT claimed.
+
+**Threads / lessons.** (1) **Month-end mechanical-rebalancing reversion is a REAL, controlled, decorrelated
+net-positive long-only edge** — 2nd PORTFOLIO component. (2) **The random-day control is the decisive test for
+ANY reversion claim** (generic reversion is dead): a reversion edge must beat its own same-magnitude
+random-day control, not just the base — month-end's +0.249 ATR excess passes. Re-usable discipline. (3) **The
+winning template GENERALIZES across events** — "discrete flow-event over-extension → reversion" worked for both
+the weekend gap (1006) and the month-end fix (1011); a 3rd decorrelated flow event is the natural next hunt.
+(4) **More threshold-robust than the gap-fill** (0.75–1.5 vs the gap-fill's single 0.5), though thinner in mean
+(+0.23% vs +0.69%). (5) **Portfolio thread ACTIVE** (2 components, corr +0.12) but 2 are not yet enough for
+all-folds-positive (gap-fill variance dominates) → wants ≥3 and/or risk-weighting; that combination is its own
+gated arc. The arc-3004 escalation (shorts/second-leg) still dominates for a *solo* deployable.
+
+**Tooling:** built + registered `discovery/tools/month_end_signals.py :: MonthEndReversionLongSignal`
+(EXPERIMENT signal — mask + ATR geometry only; scoring canonical). TOOL_REGISTRY BUILT updated.
+
+**FLAGS (code not merged):** none requiring the canonical core. Carries the standing `A1Config.time_exit_bars`
+-unwired flag (arcs 1005/3004; worked around via the BUILT `make_time_exit_predicate`). Drivers scratch
+`_disco_work/arc1011_observe_monthend_reversion.py`, `arc1011_control_monthend_vs_random.py`, `arc1011_wfo.py`,
+`arc1011_robustness.py` (reproducible from the arc doc).

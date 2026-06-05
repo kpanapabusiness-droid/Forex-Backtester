@@ -1,0 +1,61 @@
+# PORTFOLIO-CANDIDATE config record — arc 1011 (month-end reversion long, USD majors).
+# Produced live by arc 1011 (NOT transcribed). Turnkey-reproducible: the signal is the registered
+# MonthEndReversionLongSignal (discovery/tools/month_end_signals.py).
+
+arc_id: 1011
+name: arc_1011_month_end_reversion_long
+disposition: PORTFOLIO          # mean-positive net of costs, NOT all-folds-positive (protocol §11)
+verdict: FAIL                   # the sole judge (all-folds-positive IS AND OOS) — failed IS (7/10), OOS not touched
+
+signal:
+  mechanism: >
+    month-end mechanical-rebalancing reversion (long). The WMR 4pm London fix on the last business day
+    generates large inelastic rebalancing flows; a currency sold into the fix over-extends and reverses.
+    Long-tradeable side: a big DOWN move into month-end -> buy the reversion UP. Control-proven that the
+    month-end TIMING is load-bearing (not generic reversion, which is dead): +0.249 ATR month-end excess.
+  direction: long
+  universe: [EURUSD, GBPUSD, USDJPY, USDCHF, AUDUSD, USDCAD, NZDUSD]   # 7 USD majors
+  timeframe: D1
+  boundary_convention: 5ers_eet
+  last_trading_day_detection: "calendar month of bar i+1 != month of bar i (ex-ante calendar knowledge, arc-1005 convention)"
+  move_into_lookback_bars: 2                            # into = (close_mid[i] - close_mid[i-2]) / ATR
+  entry_trigger: "into <= -1.00 ATR"                    # big down move into month-end (canonical thr; robust 0.75-1.5)
+  entry_fill: next-bar open                             # ex-ante: close[i] & close[i-2] known at bar i close; ATR shift1
+  registered_signal: "discovery/tools/month_end_signals.py :: MonthEndReversionLongSignal(threshold_atr=1.0, into_bars=2)"
+
+exit:
+  type: time_exit
+  n_bars: 2                                             # 2-bar time exit (best by folds-positive; 3-bar = higher mean +0.50%, 6/10)
+  tool: "discovery/tools/time_exit_predicate.py :: make_time_exit_predicate"
+  exit_policy: sl_only                                  # no TP/trail overlay (partial/runner/tp_2r all worse)
+  trail_enabled: false
+
+risk:
+  sl: 2.0 ATR                                           # SL = signal-bar close - 2*ATR
+  atr: "wilder_atr(mid, 14).shift(1)"                   # canonical, ex-ante
+  risk_pct: 0.005
+
+window:
+  is: [2010-01-01, 2020-12-31]
+  oos: "2021-01-01 .. present (per-year folds) — NOT TOUCHED (not all-folds-positive on IS; holdout preserved)"
+
+engine:                                                 # all CANONICAL / LOCKED (called, never re-rolled)
+  scorer: "MultiPairBacktester (SL-first, take-the-loss)"
+  architecture: "A1Architecture + ArcFoldRunner"
+  costs: "FundedNext (1.5x spread, 0.5 pip/fill slippage, $5/lot RT, no swaps), ON"
+  cost_chokepoint: build_fold_stats_from_run
+  is_folds: "build_v3_folds (IS folds, is_days >= 365) -> 10 folds"
+  oos_folds: "build_oos_year_folds(start_year=2021)"
+  judge: judge_all_folds_positive
+  null_baseline: "discovery/tools/null_entry_baseline.py :: build_null_signal_evaluation"
+
+pool:
+  builder: "core/arc/arc_pool_builder.py :: build_arc_pool"
+  n_trades_is: 121
+  mean_final_r_gross: 0.0635       # positive gross before costs / fold-fragility
+
+reproduction: >
+  PYTHONPATH=. py _disco_work/arc1011_wfo.py  (and arc1011_robustness.py for the robustness panel;
+  arc1011_observe_monthend_reversion.py + arc1011_control_monthend_vs_random.py for the observation +
+  the month-end-vs-random control). Drivers are scratch (_disco_work/) and reproducible from the arc doc;
+  the SIGNAL is committed + registered (MonthEndReversionLongSignal). histdata_root = C:\Users\panap\histdata_backup.

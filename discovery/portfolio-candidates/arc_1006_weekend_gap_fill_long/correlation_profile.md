@@ -36,4 +36,9 @@ vectors above are what the arc record preserves; do not fabricate a per-trade se
 - **Universe-specific:** concentrated in JPY crosses (EURJPY strongest, mean fwd +0.48 ATR); majors
   continue down (arc 2001). A majors-based or non-gap component is unlikely to co-fire with it.
 - **Expectation (UNVERIFIED until a peer exists):** low co-firing and low fold-correlation with a
-  trend/calendar component. **Status: pending** — to be computed when a 2nd component is recorded here.
+  trend/calendar component. **RESOLVED (arc 1011, 2026-06-05):** the 2nd component (month-end reversion long, USD majors) is recorded at
+[`../arc_1011_month_end_reversion_long/`](../arc_1011_month_end_reversion_long/). Fold-ROI Pearson corr =
+**+0.117** (near-zero / decorrelated); structurally cannot co-fire (weekly-open vs month-end) on disjoint
+universes (JPY crosses vs USD majors). A naive 2-way fold-add is still 6/10 positive (this component's ±8%
+fold swings dominate) → the combined-book all-folds-positive WFO (co-simulated, risk-weighted, likely a 3rd
+component) is the gated next step.

@@ -1,99 +1,87 @@
-# arc 2013 — Weekend UP-gap weekend SHORT, JPY crosses (the gap-fill's stronger leg, finally tested) — PORTFOLIO
+# arc 2013 — Weekend UP-gap weekend SHORT, JPY crosses (the gap-fill's "stronger leg", finally engine-tested) — KILL
 
 - **Chat / range:** 2000s (2000–2999)
 - **Arc id:** 2013
 - **Date:** 2026-06-05
-- **Disposition:** **PORTFOLIO** — mean-positive net of costs (best overshoot exit +0.745% IS), beats its
-  fair same-side null by +1.74%, but NOT all-folds-positive (5/10 neg). The corpus's **first SHORT
-  component** and a candidate **2018-leg** for a future 4-way combination arc.
-- **Council:** none (PORTFOLIO ≠ PASS; the mandatory survivor council §5h applies only to IS+OOS
-  all-folds-positive survivors, as for the 3 existing components).
-- **Tooling:** BUILT `WeekendUpGapShortSignal` (discovery/tools/gap_signals.py); made the BUILT
-  `build_null_signal_evaluation` direction-aware (carries `direction` through — additive, longs
-  byte-identical). Reused BUILT direction-aware `observe_long_capture(direction="short")`. **No
-  canonical-core change** (the short Step-1/engine path was already merged, PR #273). Drivers:
-  `_disco2000_work/arc2013_observe_upgap_short.py`, `arc2013_robustness.py`, `arc2013_engine_wfo.py`,
-  `arc2013_null.py`.
+- **Disposition:** **KILL** — **CONVERGES with the independent 1000s arc 1016** (same idea, same KILL).
+  The honest engine shows a thin mean-positive (+0.745% IS best exit) but it is **2018/2019-thin-regime-luck**
+  (without those 2 folds the other 8 average **−0.44%**), the entry observation is **coin-flip-to-adverse**
+  (independently reproduced by 1016: JPY cap 0.448 / drift −0.093), and against the **fair weekly-open null**
+  the lift is marginal (+0.27 ATR). Not a robust component → KILL (NOT PORTFOLIO).
+- **Council:** none (convergent independent reproduction + own fold-decomposition are decisive; arc-3010/1016
+  regime-luck discipline).
+- **Tooling:** BUILT `WeekendUpGapShortSignal` (kept — valid reusable short signal); made BUILT
+  `build_null_signal_evaluation` direction-aware (additive, longs byte-identical). Reused
+  `observe_long_capture(direction="short")`. **No canonical-core change** (short path merged, PR #273).
+  Drivers: `_disco2000_work/arc2013_observe_upgap_short.py`, `arc2013_robustness.py`,
+  `arc2013_engine_wfo.py`, `arc2013_null.py`.
 
 ---
 
-## Idea + why (the still-unrun highest-acc directional edge in the corpus)
+## Idea + why
 
-arc 2001 (2000s) found the weekly-open gap-fill is clean, monotone, **symmetric** on H4: DOWN >1ATR gaps
-drift +0.45 (frac+ 0.59), UP >1ATR gaps drift −0.57 (**frac DOWN 0.64**). The UP-gap leg has the bigger
-drift / higher hindsight accuracy — flagged repeatedly (FLAG-1, arcs 2001/2003/1014) as the gap-fill's
-STRONGER leg, but untradeable under long-only. arc 1006 (1000s) found the DOWN-gap FILL LONG is
-mean-POSITIVE on **JPY CROSSES** (+0.685% IS, the corpus's one PORTFOLIO long) but mean-NEGATIVE on majors.
-Shorts merged (PR #273); the 1000s chat referenced the up-gap short as the frontier but used arc 1015 for
-the 3-way portfolio combination — so it was **still unrun**. It descends from arc 2001 (2000s lineage) → my
-range. Natural test: the **UP-gap weekend SHORT on JPY crosses** — the direction-mirror of 1006's
-mean-positive long, on its stronger leg, and (1015's spec) a candidate SHORT 2018-leg.
+arc 2001 found the weekly-open gap-fill is monotone, **symmetric** on H4 (UP >1ATR gaps drift −0.57, frac
+DOWN 0.64 — flagged the "stronger leg", FLAG-1). arc 1006 found the DOWN-gap fill LONG is mean-positive on
+**JPY crosses** (the corpus's one PORTFOLIO long). Shorts merged (PR #273). The up-gap SHORT on JPY crosses
+— the direction-mirror of 1006's strong leg, and 1015's named candidate 2018-leg — was the highest-acc
+still-untested short. (Concurrently the 1000s chat tested the SAME idea as arc 1016; we converge.)
 
 ## What happened
 
-### Observation (honest i+1 SHORT capture/drift, direction-aware `observe_long_capture`)
-- **JPY crosses, up-gap≥1.0:** honest capture **0.518 (>0.50)**, drift **+0.08** (median **+0.146**); ≥0.5:
-  cap 0.515 but drift ~0 / median −0.115; **≥1.5 inverts** to −0.22 (non-monotone — the thin-tail tell).
-- **Majors:** up-gap short drift **−0.355** (price CONTINUES up) → dead. The 1006 cross>major asymmetry
-  holds for the short.
-- **Symmetry surprise:** honestly entered, the DOWN-gap LONG is the STRONGER leg (short-lens drift −0.46 =
-  +0.46 long) and the UP-gap SHORT the weaker (+0.08) — the **opposite** of arc 2001's hindsight "up-gap
-  stronger." Cause: the **JPY-basket upward drift** (arc 1009) helps the long, fights the short.
-
-### Robustness gauntlet (the arc-2011 discipline, before any engine spend)
-- median (≥1.0) **+0.146 > mean +0.081** (central tendency positive — NOT a thin-tail artifact at this gate,
-  unlike arc 2011); leave-one-pair-out 5/6 positive but **drop AUDJPY → −0.107** (single-pair sensitivity).
-- **Fair-null lift (decisive):** a random weekly-open SHORT loses (drift −0.188 — basket headwind); up-gap≥1.0
-  **+0.27 ATR over the null**. The timing carries information → a NON-coin-flip entry → §5f REQUIRES the
-  honest engine before any FAIL.
+### Observation (direction-aware `observe_long_capture`, H4)
+- **JPY crosses, up-gap≥1.0:** honest i+1 capture 0.518, drift +0.08 (median +0.146) — but **≥0.5: drift
+  −0.004 / median −0.115 (negative typical)**, and **≥1.5 INVERTS to −0.22** (non-monotone — thin-tail tell).
+  Leave-one-pair-out: drop AUDJPY → **−0.107** (single-pair dependence). Only a single fragile threshold band.
+- **Majors:** drift −0.355 (continues up) → dead (1006 cross>major asymmetry mirrored).
+- **Independent 1000s arc 1016** found the SAME entry coin-flip-to-adverse (JPY cap **0.448** / drift
+  **−0.093**, per-pair 1/5) — they KILLED at observation. My +0.08/≥1.0 is the fragile edge of their result,
+  not a contradiction: the up-gap reversion is spent by the i+1 entry (backward-confirming, arc 1014 mode),
+  and the **JPY-basket up-drift** (arc 1009) is a short headwind.
 
 ### Honest engine IS WFO (§5f exit menu) — the FIRST end-to-end short engine run
-The short pool builds sign-correctly (mean final_r +0.137 at thr 1.0); WFO runs clean, no canonical change.
-- **thr ≥0.5:** all exits net-negative → dead.
-- **thr ≥1.0:** mean-POSITIVE under the whole OVERSHOOT-exit family — `sl_plus_trailing_atr` **+0.745%**,
-  `tp_3r` +0.510%, `partial_runner` +0.324%, `tp_2r` +0.015% (mechanism-aligned, 1006/1007 overshoot);
-  non-overshoot `sl_only` −1.97% / `trailing_swing` −1.43% negative. **NOT all-folds-positive** (5/10 neg,
-  worst −3.18%); thin (1–14 trades/fold).
-- **Per-fold (trailing_atr):** +2011 +2012 −2013 −2014 −2015(n2) −2016 +2017 **+2018(+5.08)** **+2019(+5.92)**
-  −2020(n1). **Strongly positive on the binding 2018 fold** (where gap-fill −6.79 & fbr −4.20 both bleed);
-  bleeds a complementary set {2013/14/16}.
+This DID validate the merged short path end-to-end: the short pool builds sign-correctly (mean final_r
++0.137 at thr 1.0), WFO runs clean, FundedNext costs net symmetrically — **no FLAG, no canonical change**.
+- thr ≥0.5: all exits net-negative → dead.
+- thr ≥1.0: mean-positive under the overshoot-exit family (`sl_plus_trailing_atr` +0.745%, tp_3r +0.510%,
+  partial +0.324%, tp_2r +0.015%); non-overshoot exits negative. **NOT all-folds-positive** (5/10 neg).
+- **The positive mean is REGIME-LUCK, not an edge** — per-fold (trailing_atr): 2011 +1.91(n5), 2012
+  +2.21(n14), 2013 −2.24, 2014 −3.14, 2015 −0.57(n2), 2016 −3.18, 2017 +1.97, **2018 +5.08(n8)**, **2019
+  +5.92(n10)**, 2020 −0.51(n1). **Excluding 2018+2019, the other 8 folds average −0.44%** (net-negative).
+  The entire IS positivity is 2 thin lucky years (n=8, n=10) — exactly the "2018-positivity is uncapturable
+  regime-luck within a yearly coin-flip" the 1000s arc 1016 / arc 3010 diagnosed. And it does **not** even
+  satisfy 1015's spec (2015 = −0.57, negative).
+- **Fair-null caveat:** the engine null (`build_null_signal_evaluation`) is random-ANY-bar (−0.99%), so the
+  +1.7% "lift" partly reflects up-gaps firing at price extremes vs any bar. The FAIRER weekly-open null
+  (obs R3) gives only +0.27 ATR — a much smaller, regime-luck-consistent margin.
 
-### Fair same-side null on the engine (decisive PORTFOLIO-vs-KILL test)
-Random JPY-cross weekly-open SHORT (5 seeds): trailing_atr **−0.99%**, tp_3r **−1.17%** → REAL beats null by
-**+1.74% / +1.68%** (seed-tight). Much cleaner than 1006's +0.36pp. The up-gap TIMING is the edge, not the
-JPY-cross-short basket.
+## Verdict: KILL
 
-## Verdict: PORTFOLIO
-
-Mean-positive net of costs, beats its fair same-side null by a large margin, decorrelated by construction
-(first SHORT component), and **strongly 2018-positive** (+5.08%) — the most portfolio-relevant new component
-since 1013. NOT all-folds-positive (thin, 5/10 neg) → not PASS. Recorded under
-[`../portfolio-candidates/arc_2013_weekend_upgap_short_jpy/`](../portfolio-candidates/arc_2013_weekend_upgap_short_jpy/).
-**OOS preserved** (not AFP; exit IS-selected — the combination arc is the proper AFP gate that touches OOS).
+Mean-positive on the engine ONLY via 2 thin regime-luck folds (2018/2019); net-negative across the other 8;
+entry coin-flip-to-adverse (independently reproduced by 1016); fragile (≥0.5 median-neg, ≥1.5 inverts,
+single-pair dependent); fails the 2015 half of the 4th-leg spec. A real-but-regime-luck signal is KILL, not
+PORTFOLIO (§11 — you cannot diversify thin regime-luck into a robust book; arcs 3000/3001 spirit).
 
 ## Threads / lessons
 
-1. **The gap-fill's UP-gap SHORT is REAL and net-positive on JPY crosses** — the first short edge to survive
-   the honest engine. But honestly entered (i+1, costs) it is the **WEAKER** leg vs the down-gap long
-   (+0.745% best-exit vs 1006's +0.69% at a far higher null margin), NOT the "stronger" leg the hindsight
-   gap-bar-open measure suggested — because the **JPY-basket upward drift** flatters the long and taxes the
-   short (the same drift that inflated 1006's null, arc 1009). The "up-gap is stronger" flag (2001/2003) is
-   a hindsight artifact; honest direction matters.
-2. **First end-to-end short engine run — the canonical short path works** (pool + architecture + engine
-   build sign-correctly; FundedNext costs net symmetrically; no FLAG). The PR #273 short path is now
-   exercised, not just observation-verified (closes the arc-2011 "never exercised end-to-end" note).
-3. **A candidate 2018-leg exists at last** — strongly positive on the binding 2018 fold (+5.08%) with a
-   complementary bleed set. It does NOT cover 2015 (the spec's other half), so it is not a guaranteed
-   portfolio-closer, but it materially loosens the 2018 constraint. **Named next step: a 4-way combination
-   WFO** (gap-fill 1006 + month-end 1011 + fbr 1013 + up-gap-short 2013) — 2018 may now be satisfiable by
-   up-gap-short + month-end, potentially freeing fbr weight for 2015. That arc is the proper all-folds-positive
-   gate (and the OOS touch).
-4. **The overshoot mechanism mirrors for the short** (arc 1007): the gap-fill edge is the overshoot PAST the
-   prior close, captured by a let-it-run trailing exit; tp/partial that cap it are weaker, `sl_only`/swing
-   negative. Same as the down-gap long.
+1. **The up-gap weekend SHORT is dead — convergent KILL across two independent chats** (2000s arc 2013
+   engine + 1000s arc 1016 observation). The honest i+1 short is coin-flip-to-adverse; arc-2001's −0.57 ATR
+   "stronger leg" was the **untradeable gap-bar-OPEN (hindsight)** — by i+1 the reversion is spent
+   (backward-confirming, arc 1014) and the JPY-basket up-drift taxes the short. The gap-fill's tradeable
+   edge is the DOWN-gap LONG only (1006); its "stronger" up leg has no honest short.
+2. **The Arc-10 defense worked (again)** — independent reproduction (1016) + my own fold-decomposition
+   caught a thin-regime-luck "positive" before it was recorded as a PORTFOLIO component. The engine's
+   mean-positive was real but driven entirely by 2 thin years; trusting it would have been the
+   single-engine-trust trap (§11). **Lesson: for a thin signal, decompose the mean by fold/year before any
+   PORTFOLIO claim — a +mean carried by 1–2 thin folds is regime-luck, not a component.**
+3. **First end-to-end SHORT engine run is GREEN** — the merged PR #273 short path (Step-1 pool +
+   architecture + `MultiPairBacktester` + cost netting) builds sign-correctly and nets costs symmetrically
+   on a real arc. The short engine path is now exercised, not just observation-verified (closes arc 2011's
+   "never exercised end-to-end" note). Reusable: `WeekendUpGapShortSignal` (BUILT), direction-aware null.
+4. **The 2018-positive 4th leg remains unfound in ANY short construction** — structure (1014/2009/2011/3011),
+   trend (3010), continuation-long (2012), flow (1016/2013), vol-state short (3012): all KILL. The portfolio
+   route's 2018 wall stands; arc-3004 escalation reinforced.
 
 ## FLAGS (code not merged)
-None requiring the canonical core. Two EXPERIMENT-tool changes (discovery/tools/, flow freely per §9):
-BUILT `WeekendUpGapShortSignal`; `build_null_signal_evaluation` made direction-aware (additive, longs
-byte-identical). Both registered in `TOOL_REGISTRY.md`. The standing `A1Config.time_exit_bars`-unwired flag
-(arc 1005) is unchanged (I used the registered trailing exit, not a time exit).
+None requiring the canonical core. Two EXPERIMENT-tool additions (discovery/tools/, flow freely §9): BUILT
+`WeekendUpGapShortSignal`; `build_null_signal_evaluation` made direction-aware (additive, longs
+byte-identical). Both registered in `TOOL_REGISTRY.md`.

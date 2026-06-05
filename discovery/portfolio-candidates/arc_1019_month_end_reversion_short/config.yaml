@@ -1,0 +1,68 @@
+# PORTFOLIO-CANDIDATE config record — arc 1019 (month-end reversion SHORT, USD majors).
+# Produced live by arc 1019 (NOT transcribed). Turnkey-reproducible: the signal is the registered
+# MonthEndReversionShortSignal (discovery/tools/month_end_signals.py), the direction-mirror of the
+# arc-1011 MonthEndReversionLongSignal.
+
+arc_id: 1019
+name: arc_1019_month_end_reversion_short
+disposition: PORTFOLIO          # mean-positive net of costs, NOT all-folds-positive (protocol §11)
+verdict: FAIL                   # the sole judge (all-folds-positive IS AND OOS) — failed IS (7/10), OOS not touched
+
+signal:
+  mechanism: >
+    month-end mechanical-rebalancing reversion (SHORT) — the direction-mirror of arc 1011's long `me`.
+    The WMR 4pm London fix on the last business day generates large inelastic rebalancing flows; a
+    currency BOUGHT into the fix over-extends UP and reverts DOWN. Short-tradeable side: a big UP move
+    into month-end -> sell the reversion DOWN. Control-proven that the month-end TIMING is load-bearing
+    (not generic reversion, which is dead): +0.089 ATR month-end excess vs the random-day control.
+    Positive precisely in strong-USD years (2015/2018) where a big up move into month-end on a USD major
+    is a counter-trend bounce that reverts -> the regime-complementary leg to the 2015-negative long `me`.
+  direction: short
+  universe: [EURUSD, GBPUSD, USDJPY, USDCHF, AUDUSD, USDCAD, NZDUSD]   # 7 USD majors
+  timeframe: D1
+  boundary_convention: 5ers_eet
+  last_trading_day_detection: "calendar month of bar i+1 != month of bar i (ex-ante calendar knowledge, arc-1005 convention)"
+  move_into_lookback_bars: 2                            # into = (close_mid[i] - close_mid[i-2]) / ATR
+  entry_trigger: "into >= +1.00 ATR"                    # big UP move into month-end (canonical thr)
+  entry_fill: next-bar open (open_bid, short)           # ex-ante: close[i] & close[i-2] known at bar i close; ATR shift1
+  registered_signal: "discovery/tools/month_end_signals.py :: MonthEndReversionShortSignal(threshold_atr=1.0, into_bars=2)"
+
+exit:
+  primary_characterization: sl_partial_close_1r_runner_trail   # best: 7/10, mean +0.683%, 2015 +0.40 / 2018 +0.86
+  also_positive:                                               # mean-positive net of costs under every exit tested
+    - "sl_only + time-exit 2-bar (make_time_exit_predicate): 5/10, +0.043%, beats null +0.80pp"
+    - "sl_only + time-exit 3-bar: 6/10, +0.102%"
+    - "sl_only + time-exit 5-bar: 6/10, +0.218%"
+    - "sl_plus_tp_2r: 5/10, +0.362% (BUT 2018 negative -0.43 under tp_2r — the only exit that flips 2018)"
+  note: "the combination arc (1020) freezes one exit per §5f; here every exit is mean-positive and 2018 is positive under all but tp_2r"
+
+risk:
+  sl: 2.0 ATR                                           # SL = signal-bar close + 2*ATR (ABOVE entry, short)
+  atr: "wilder_atr(mid, 14).shift(1)"                   # canonical, ex-ante
+  risk_pct: 0.005
+
+window:
+  is: [2010-01-01, 2020-12-31]
+  oos: "2021-01-01 .. present (per-year folds) — NOT TOUCHED (not all-folds-positive on IS; holdout preserved)"
+
+engine:                                                 # all CANONICAL / LOCKED (called, never re-rolled)
+  scorer: "MultiPairBacktester (SL-first, take-the-loss)"
+  architecture: "A1Architecture + ArcFoldRunner"
+  costs: "FundedNext (1.5x spread, 0.5 pip/fill slippage, $5/lot RT, no swaps), ON"
+  cost_chokepoint: build_fold_stats_from_run
+  is_folds: "build_v3_folds (IS folds, is_days >= 365) -> 10 folds (fold 6=2015, fold 9=2018)"
+  oos_folds: "build_oos_year_folds(start_year=2021)"
+  judge: judge_all_folds_positive
+  null_baseline: "discovery/tools/null_entry_baseline.py :: build_null_signal_evaluation (direction-aware short)"
+
+pool:
+  builder: "core/arc/arc_pool_builder.py :: build_arc_pool"
+  n_trades_is: 116
+  mean_final_r_gross: 0.1713       # positive gross before fold-fragility
+
+reproduction: >
+  PYTHONPATH=. py _disco_work/arc1019_wfo.py  (exit sweep + null);
+  PYTHONPATH=. py _disco_work/arc1019_robust.py  (threshold + leave-one-pair-out + decorrelation);
+  PYTHONPATH=. py _disco_work/arc1019_observe_monthend_short.py  (observation + month-end-vs-random control + per-year).
+  Drivers are scratch (_disco_work/) and reproducible from the arc doc; the SIGNAL is committed + registered
+  (MonthEndReversionShortSignal). histdata_root = C:\Users\panap\histdata_backup.

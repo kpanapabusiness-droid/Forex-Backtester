@@ -34,6 +34,7 @@ from core.arc.signal_protocol import (
     SignalEvaluation,
     SignalModule,
 )
+from core.sim.account import Direction
 from core.sim.panel import Panel
 from discovery.tools.trend_entry_signals import _atr_shift1_mid
 
@@ -107,6 +108,87 @@ class MonthEndReversionLongSignal:
         )
 
 
-assert isinstance(MonthEndReversionLongSignal(), SignalModule)
+@dataclass(frozen=True)
+class MonthEndReversionShortSignal:
+    """SHORT a big UP move into month-end, betting on the post-fix rebalancing reversion DOWN.
 
-__all__ = ("MonthEndReversionLongSignal",)
+    The direction-mirror of ``MonthEndReversionLongSignal`` (arc 1019, chat 1000s). Same ex-ante
+    month-end detection + ATR geometry; fires when the move INTO month-end is a big UP move
+    (``into >= +threshold_atr``, where into = (close[i] - close[i-into_bars])/atr) and declares
+    ``Direction.SHORT`` on both the per-pair state and the evaluation so the canonical Step-1 pool
+    + architecture emit a short (entry next bar at open_bid, SL ABOVE entry, ``final_r`` short-signed).
+
+    Mechanism (arc 1019 observation + control, mirror of arc 1011): month-end mechanical rebalancing
+    reverts BOTH directions; arc 1011 captured only the long/down side and is 2015-negative (in a
+    strong-USD trend a big down move into month-end IS the trend → continues, doesn't revert). The
+    SHORT side fades a big UP move into month-end — a counter-trend bounce that mechanical reversion +
+    trend-resumption pushes back down — and is positive precisely in strong-USD years (2015 +0.46 ATR,
+    2018 +0.37 ATR gross; month-end excess +0.089 vs the random-day control; honest short capture 0.55).
+    Conforms to ``core.arc.signal_protocol.SignalModule``. Intended TF = D1, USD majors.
+    """
+
+    threshold_atr: float = 1.0
+    into_bars: int = 2
+    atr_period: int = 14
+    signal_name: str = "month_end_reversion_short_v0.1"
+    primary_tf: str = "D1"
+    auxiliary_tfs: tuple[str, ...] = ()
+    causal_lineage: str = "clean"
+
+    def required_aux_data(self) -> list[str]:
+        return list(self.auxiliary_tfs)
+
+    def _name(self) -> str:
+        return f"month_end_rev_short_thr{self.threshold_atr:.2f}_in{self.into_bars}_v0.1"
+
+    def evaluate(self, panels: Mapping[str, Panel]) -> SignalEvaluation:
+        primary = panels[self.primary_tf]
+        per_pair: dict[str, PerPairSignalState] = {}
+        for pair in sorted(primary.pairs):
+            df = primary.pair_dfs[pair]
+            n = len(df)
+            idx = df.index
+            close_mid = (df["close_bid"].to_numpy(float) + df["close_ask"].to_numpy(float)) / 2.0
+            atr = _atr_shift1_mid(df, self.atr_period)
+
+            ym = pd.PeriodIndex(idx, freq="M")
+            is_last = np.zeros(n, dtype=bool)
+            if n >= 2:
+                is_last[:-1] = ym[1:] != ym[:-1]
+
+            into = np.full(n, np.nan)
+            k = self.into_bars
+            with np.errstate(invalid="ignore", divide="ignore"):
+                into[k:] = (close_mid[k:] - close_mid[:-k]) / atr[k:]
+
+            fire = (
+                is_last
+                & np.isfinite(into)
+                & np.isfinite(atr)
+                & (atr > 0)
+                & (into >= self.threshold_atr)
+            )
+            mask = np.zeros(n, dtype=bool)
+            mask[fire] = True
+
+            per_pair[pair] = PerPairSignalState(
+                signal_mask=pd.Series(mask, index=idx, name="signal_mask"),
+                atr=pd.Series(atr, index=idx, name="atr_14_shift1"),
+                additional_gates={},
+                exit_predicate=None,
+                path_feature_anchor=None,
+                direction=Direction.SHORT,
+            )
+        return SignalEvaluation(
+            primary_tf=self.primary_tf,
+            per_pair=per_pair,
+            signal_name=self._name(),
+            causal_lineage=self.causal_lineage,
+            direction=Direction.SHORT,
+        )
+
+
+assert isinstance(MonthEndReversionLongSignal(), SignalModule)
+assert isinstance(MonthEndReversionShortSignal(), SignalModule)
+
+__all__ = ("MonthEndReversionLongSignal", "MonthEndReversionShortSignal")

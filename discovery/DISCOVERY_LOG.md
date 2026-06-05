@@ -29,6 +29,7 @@ at arc step (i).
 | 2003 | 2000s | 2026-06-05 | Cross-pair relative-value divergence catch-up (long the under-performing leg when the synthetic cross is extreme) — LIGHT generative-council idea; cheap-kill at obs: the laggard CONTINUES lagging (z<−2 fwd drift −0.05 to −0.11 ATR; per-group z<−1 fwd10 −0.20 EURvGBP / −0.15 AUDvNZD), NO reversion — relative perf is momentum/coin-flip (re-confirms 1000/3001). Council's strongest call = CONCEDE: long-only constraint is the binding blocker (FLAG-1) | N | n/e | n/e | n/e | n/e | n/e | FAIL (obs) | N | KILL |
 | 3004 | 3000s | 2026-06-05 | Stop-confound test (council-driven): is the universal 2*ATR SL the wall? Pure time-exit on best +drift entry — stop removed lifts mean ~4-5pp but STILL not all-folds-pos → ESCALATION (apparatus structurally incapable; needs 2nd leg/shorts/cost regime) | N | n/e | -20.43% | n/e | n/e | 799 | FAIL → ESCALATION | N | KILL |
 | 3005 | 3000s | 2026-06-05 | Cross-rate triangulation residual (synthetic vs quoted cross) — last non-directional in-apparatus thread; residual sub-spread, conv-corr ~0 at H4 | N | n/e | n/e | n/e | n/e | n/e | FAIL (obs cheap-kill) | N | KILL |
+| 1008 | 1000s | 2026-06-05 | Gotobi-day Tokyo-morning USDJPY long (5/10/15/20/25+EOM, fix-window) — documented JP corp USD-settlement microstructure flow; FALSIFIED at obs: gotobi premium ≤+0.25bp gross (best window, frac+ 0.501 coin-flip) vs ~2bp cost, absent at H4 AND H1; only +era (2010-14) is generic Abenomics drift not gotobi-specific | N | n/e | n/e | n/e | n/e | n/e | FAIL (obs cheap-kill) | N | KILL |
 
 ---
 
@@ -791,3 +792,51 @@ further long-only single-instrument directional variants would grind a cleanly-c
 reached its in-apparatus terminus; escalation pending operator.**
 
 **FLAGS (code not merged):** none. Driver scratch `_disco3_work/observe6_triangulation.py`.
+
+### arc_1008
+
+**Gotobi-day Tokyo-morning USDJPY long (microstructure settlement flow)** (chat 1000–1999). Full record:
+[`arcs/arc_1008_gotobi_usdjpy_tokyo_fix.md`](arcs/arc_1008_gotobi_usdjpy_tokyo_fix.md). No council (falsified
+at observation; no worthwhile-ceiling fork).
+
+**Idea + why.** Fresh eyes, honest-era only. 16 arcs closed shallow directional prediction; the ONE net-positive
+lead (weekend gap-fill, arc 1006, PORTFOLIO) is a discrete-FLOW-event reversion, not continuous prediction. My
+pre-shorts lane (dispatch) = hunt a **decorrelated** 2nd net-positive long-only component; refining the gap-fill
+gives a *correlated* one (already mapped 4 ways). The most-documented, untested, decorrelated long-only FLOW is
+the **gotobi effect**: on days divisible by 5 (+ month-end), Japanese corporates settle invoices → banks buy
+USD/JPY → documented upward USDJPY drift into the 9:55 JST (=00:55 UTC) fixing. Long-only-tradeable (long
+USDJPY, a major), event-timed, decorrelated from weekend gaps. Attacks frontier item 3 (execution/
+microstructure, available NOW pre-shorts). Documented to have decayed post-2015 → **observe before believing.**
+
+**What happened.** The panel's EET-00:00 H4 bar (starts 22 UTC winter / 21 UTC summer, ends 01/02 UTC) fully
+contains the Tokyo run-up + the 00:55 UTC fix. OBSERVATION (gross mid bp, gotobi tagged 5/10/15/20/25 + last
+trading day, prior-trading-day shift; EURUSD placebo): gotobi Tokyo-morning USDJPY return **−0.06 bp** vs
+non-gotobi **+0.13 bp** — gotobi is WORSE (frac+ 0.490). By era: 2010–2014 gotobi +2.00bp ≈ non +1.98bp (NOT
+gotobi-specific — generic Abenomics Tokyo-morning USDJPY drift, identical on non-gotobi days, gone by 2015);
+2015–2020 −0.98 vs −0.88; 2021+ −0.97 vs −0.49 (gotobi worse). The gotobi *premium* ≈ −0.2 bp gross vs ~2 bp
+FundedNext round-trip. H1 fix-window check (rule out a run-into-fix the H4 bar nets against the post-fix hour):
+largest gotobi premium anywhere **+0.25 bp** (fix-hour-only, frac+ 0.501 = coin flip), negative in the other
+four windows — confirms the H4 finding at finer resolution (arc 2002 discipline). **No edge at any resolution.**
+
+**Verdict: FAIL (cheap-kill at observation) → KILL.** The documented gotobi mechanism produces no capturable
+H4/H1 USDJPY bias in 2010–2026 — fully arbitraged (one of the most-published FX seasonalities) or never of a
+surviving magnitude. Premium ≤ +0.25 bp gross (coin-flip) ≪ ~2 bp cost; the honest engine (costs + SL-first)
+can only make a no-edge gross signal worse (arc 3003) → engine compute not spent. No pool/council/null needed.
+
+**Threads / lessons.** (1) **Gotobi is absent/arbitraged in 2010–2026** (gotobi ≤ non-gotobi every era; the
+only +era is generic regime drift). A real *because* (the flow genuinely existed) does NOT imply a still-
+capturable edge — the famous seasonality dissolves on honest data. (2) **A documented flow is not a free pass
+past observation** — arc 1005 (turn-of-month) found a real-but-sub-cost flow, arc 1008 a famous-but-~zero one;
+calendar/microstructure-flow magnitude (not existence) is what's measured against the cost floor. The
+microstructure-settlement-flow frontier item is now tested and dry for gotobi. (3) **Mean is additive across
+sub-bars** — the cheap H1 run-into-fix vs post-fix split is the right way to rule out a netted-away intraday
+run (quantifies arc 2002's resolution discipline). (4) **Surviving pre-shorts long-only lanes** narrow further:
+calendar/flow now weakly mapped (TOM sub-cost 1005, gotobi absent 1008); remaining untested = multi-timeframe
+STRUCTURE as a setup (not a regime filter), and the standing escalation note — after 17 arcs the only net-
+positive long-only edge is the weekend gap-fill (PORTFOLIO); no 2nd decorrelated net-positive long-only
+component has been found, reinforcing arc 3004's escalation + the 2001/2003 FLAG-1 shorts/second-leg unlock as
+the highest-leverage operator move.
+
+**FLAGS (code not merged):** none. No canonical-core change; no new BUILT tool (gotobi-date tagging is a
+one-off calendar helper kept in scratch, like arc 3005's triangulation observer). Drivers scratch
+`_disco_work/arc1008_observe.py`, `arc1008_h1_fixwindow.py` (reproducible from the arc doc).

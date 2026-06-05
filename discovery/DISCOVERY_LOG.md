@@ -39,6 +39,7 @@ at arc step (i).
 | 1011 | 1000s | 2026-06-05 | Month-end reversion long, USD majors (big DOWN move into month-end reverses — WMR-fix mechanical rebalancing over-extension; D1, ~2-bar time exit) — **2nd net-positive DECORRELATED long-only component**. MECHANISM-CONTROLLED: month-end vs random-day +0.249 ATR EXCESS (generic reversion NEGATIVE −0.063 → timing is causal). IS mean +0.23% (sl_only 2-bar), beats fair null +0.56pp, threshold-robust (0.75–1.5), leave-one-pair-out all+; but 7/10 folds → NOT all-folds-pos. Corr +0.117 vs arc 1006 → portfolio thread ACTIVE | N | n/e (OOS preserved) | -1.14% | n/e | n/e | 121 | FAIL → PORTFOLIO | N | PORTFOLIO |
 | 2005 | 2000s | 2026-06-05 | Attack EDGE<COST from the COST side: restrict cross-trend +gross entry (Donchian-20+SMA200, 12 crosses) to its cheapest bars (spread/ATR trailing-rolling-quantile, BUILT make_low_cost_mask). MONOTONE IS lift −7.96%(all)→+1.72%(cheapest 15%), beats matched random-cheap null (≈−0.3%) IN-SAMPLE — but OOS −2.26% (4/6 neg) + q full-sample-swept → NOT durable. CONVERGES w/ arc 3007 (3000s, absolute spread-timing): cost↓ entangled with edge↓ (liquid hours = weakest gross edge) → both chats CLOSE the cost side. DIRECTION remains the wall (3004); cost+stop are secondary ~5–10pp drags | N | N | +1.42% (cheapest-15% IS) | -8.33% | 6.01% | 682 | FAIL | N | KILL |
 | 1012 | 1000s | 2026-06-05 | Month-end reversion §5f best-version completion + survivor-ceiling test (same arc-1011 component, not a new edge): full registered exit/SL menu × time-cap, 24 configs → **0 all-folds-positive** (best 7/10 = baseline; te5 + all TP/trail DILUTE). Negative folds = contiguous **2014/2015/2016 USD-bull block** (SNB-unpeg/EUR-collapse); both pre-registered reasoned refinements FAIL to rescue — quarter-end-only 4/10 (thins to 0), trend-filter close>SMA100 4/10; post-hoc inverse close<SMA100 8/10 but still 2015/16 neg & fishing → not claimed. Survivor ceiling CLOSED; exits/filters can't lift it. OOS preserved | N | n/e (OOS preserved) | -1.14% | n/e | 1.43% | 121 | FAIL survivor → PORTFOLIO (ceiling confirmed) | N | PORTFOLIO |
+| 2007 | 2000s | 2026-06-05 | **DEEP multi-factor** liquidity-sweep reversal long (sweep prior swing-low × immediate reclaim × fast-3-bar drop × SMA200 uptrend; developed freely on IS) — the open-frontier "can depth clear all-folds-positive?" test. Obs: conjunction lifts +1R-capture 0.486→0.52 but drift sub-cost (+0.03 ATR); the CLIMAX (forced) variant is a FALLING KNIFE (drift −0.33, the short leg). Honest engine: ALL 7 exits × 2 SLs mean-NEGATIVE, none all-folds-pos, and **LOSES TO THE FAIR NULL** (real −1.76% vs null −0.33% te6) → not even a real edge. Buying structural weakness = adverse-excursion = worse than random under take-the-loss; a chart pattern that resembles a grab is NOT a grab (no forced-flow control, cf. 1011). OOS preserved | N | n/e (OOS preserved) | -5.61% (PRIMARY L20 te6) | n/e | 5.61% (worst, te6) | 508–763 | FAIL → KILL (worse than null) | N | KILL |
 | 2006 | 2000s | 2026-06-05 | 2-way PORTFOLIO combination WFO — the route's gated next step (arc 1011 flag): co-simulate the ONLY two net-positive long-only components (gap-fill 1006 JPY-cross H4 + month-end 1011 USD-major D1) under equal + risk-parity weights, gate all-folds-positive on the COMBINED book. Both reproduce EXACTLY (gap +0.685%, me +0.232%, corr +0.117 ✓). Risk-parity cuts worst-fold −6.79%(gap solo)→−1.53% but STILL 4/10 neg — BLOCKED by a mutually-negative fold (2015, both lose): no convex/co-sim combo can pass (P&L additive). The two edges are flow-reversion → TAIL-CORRELATED (both bleed 2015/16/18/20) despite corr +0.117. ⇒ ≥3 components needed, SELECTED for fold-complementarity (regime-orthogonality), not avg-corr. Components UNCHANGED (still PORTFOLIO); 3rd-component spec = net-pos on 2015/16/18/20, esp 2015 | N | n/e (OOS preserved) | -1.53% (risk-parity combined) | n/e | n/e | 396+121 | FAIL → KILL (combined book; components unchanged) | N | KILL |
 
 ---
@@ -1386,3 +1387,74 @@ leg — operator/human-gated) + the `A1Config.time_exit_bars`-unwired flag (arcs
 the BUILT `ExitPredicate`). BUILT + registered `MonthEndFixReversionLongSignal`
 (`discovery/tools/fix_flow_signals.py`). Drivers scratch `_disco3_work/arc3008_observe_fix.py`,
 `arc3008_capture.py`, `arc3008_wfo.py`.
+
+### arc_2007
+
+**DEEP multi-factor liquidity-sweep reversal long** (chat 2000s — the range's DEEP-arc entry). Full
+record: [`arcs/arc_2007_liquidity_sweep_reversal_long.md`](arcs/arc_2007_liquidity_sweep_reversal_long.md).
+No council (the fair-null + honest engine settled it in-arc decisively — loses to random; not a
+stuck-point fork nor a survivor, cf. 2004/3008).
+
+**Idea + why (the dispatch's open frontier).** The corpus closed *shallow single-condition* directional
+prediction; the DEEP, multi-factor structural lane was untested (§5(a) carve-out: a novel conjunction
+with a documented *because* earns a fresh test). I built the genuinely multi-condition entry the
+programme never ran: a **liquidity-grab / Wyckoff-spring** long — a fast DOWN move that pierces a prior
+swing low (runs resting sell-stops) and **immediately reclaims** it (a large buyer used the stop-cascade
+liquidity to fill) → revert UP. The DEEP claim: each single condition is a corpus-proven coin-flip, but
+the *intersection* (sweep × reclaim × fast-3-bar-drop × SMA200 uptrend), developed FREELY on IS, isolates
+the genuine forced-sweep cell. Forced/triggered flow is the same family as the only two wins (gap-fill
+1006, month-end 1011).
+
+**What happened.** OBSERVATION (H4 majors, IS, `observe_long_capture`, n reported at every cut): base
+capture 0.486. The nested conjunction lifts +1R-capture to **0.52** (L30 sweep&reclaim&uptrend&fast3,
+n=484) — but forward drift only **+0.034 ATR** (sub-cost; cost hurdle ~0.05–0.10R). **Key finding: the
+CLIMAX (big-range, forced) sweep is a FALLING KNIFE** — capture ticks up but drift goes strongly NEGATIVE,
+*worse the bigger the climax* (−0.124 → −0.280 → −0.333) → my *because*'s strongest prediction (violent
+forced sweep = exhaustion = reversion) is **falsified**; the violent leg continues DOWN (the **SHORT**
+edge, FLAG-1). Round-2 refinement (depth/reclaim-strength/trend/horizon): "strong reclaim" DROPS capture
+to 0.45 (buys after the bounce ran); >0.55 cells are tiny-n noise (n=4–57). Best robust long version =
+sweep & reclaim & close>SMA200 & drop3<−1·ATR → marginally non-coin-flip → §5f honest best-version test.
+**Honest WFO** (10 IS folds, registered exit menu × SL × time-caps, anti-fishing single-config): **every
+config mean-NEGATIVE, none all-folds-positive** (PRIMARY L20: −1.76% to −5.26%, 1–5/10 pos; L30: −0.28%
+to −1.79%, 3–4/10). **Decisive — the entry LOSES TO THE FAIR NULL** (random entry, matched fire-rate,
+identical exit/SL/universe): real −1.76/−2.39/−1.96% vs null −0.33/−0.66/−0.59% at te6/12/24 → worse than
+random at every horizon (~1.4–1.7pp). OOS NOT touched (IS never cleared).
+
+**Verdict: FAIL → KILL** (§11: loses to the null ⇒ net-negative, below the baseline ⇒ KILL, not
+PORTFOLIO).
+
+**Diagnosis (why it loses to random).** The capture lift (0.486→0.52) is a **thin-tail artifact** — a
+quick +1R bounce fires often enough to tick capture above 0.50, but drift is ~0 and the entry **buys into
+recent weakness** (a fast down move), sitting in large adverse excursion → take-the-loss converts a
+disproportionate share into −1R losers, *more* than a random entry suffers. The small capture edge is
+more than offset by the fat adverse tail → underperforms random. This is the **arc-2001/2004 reversion
+stop-tax** mechanism reproduced on a *structural chart* setup. It fails where month-end (1011) succeeded
+because 1011 has a **forced-flow control** (month-end vs random-day +0.249 ATR EXCESS — timing is causal);
+the sweep-reclaim *looks* like a grab but is **not tied to any measurable forced participant** — a chart
+pattern, arbitrated to coin-flip like round-numbers (1010) and breakout-retest (3006).
+
+**Threads / lessons.** (1) **DEEP multi-factor depth does NOT escape the directional coin-flip** — the
+first genuinely multi-condition structural long, developed freely toward all-folds-positive, lands at
+cap 0.52 and *below the fair null* on the honest engine. Reinforces the arc-3004 escalation from a deeper
+angle: the wall is DIRECTION, not the shallowness of prior cuts. The clean directional falsification the
+programme never ran on a multi-factor entry. (2) **A climactic forced sweep below a swing low is a
+FALLING KNIFE** (drift −0.33, worse the bigger) — "violent = exhaustion = reversion" is wrong on liquid
+H4 majors; the violent leg is the **SHORT** edge → a concrete, well-motivated first target the moment
+shorts unlock (FLAG-1). (3) **Buying structural weakness is worse than random under take-the-loss**
+unless a forced-flow control proves the timing is causal (the arc-1011 random-day-control discipline);
+a chart pattern that *resembles* a grab is not a grab — edge needs a measurable forced participant.
+(4) **Capture-lens lift with ~0 drift is a thin-tail artifact the engine reverses for a buy-weakness
+entry** — distrust a capture-only lift; require beats-fair-null on the engine (re-usable screen). (5)
+**Surviving lanes unchanged:** the two PORTFOLIO components still need a 3rd regime-orthogonal component
+positive in 2015/16/18/20 (arc-2006 spec), and the long menu that would win those risk-off years is dead
+→ shorts/second-leg unlock (FLAG-1) stays highest-leverage; the climax-sweep SHORT is the named first
+shorts target.
+
+**Tooling:** built + registered `discovery/tools/sweep_signals.py :: SweepReclaimReversalLongSignal`
+(EXPERIMENT `SignalModule`; mask + ATR geometry only). Reused BUILT `observe_long_capture`,
+`make_time_exit_predicate`, `build_null_signal_evaluation`. TOOL_REGISTRY BUILT updated.
+
+**FLAGS (code not merged):** none new requiring the canonical core. Carries FLAG-1 (long-only blocks the
+stronger leg — here the climax-sweep SHORT) + the standing `A1Config.time_exit_bars`-unwired flag (arcs
+1005/3004; worked around via the BUILT `make_time_exit_predicate`). Drivers scratch
+`_disco2000_work/arc2007_observe.py`, `arc2007_observe2.py`, `arc2007_wfo.py` (reproducible from the arc doc).

@@ -112,17 +112,17 @@ class MonthEndReversionLongSignal:
 class MonthEndReversionShortSignal:
     """SHORT a big UP move into month-end, betting on the post-fix rebalancing reversion DOWN.
 
-    The direction-mirror of ``MonthEndReversionLongSignal`` (arc 1019, chat 1000s). Same ex-ante
-    month-end detection + ATR geometry; fires when the move INTO month-end is a big UP move
-    (``into >= +threshold_atr``, where into = (close[i] - close[i-into_bars])/atr) and declares
-    ``Direction.SHORT`` on both the per-pair state and the evaluation so the canonical Step-1 pool
-    + architecture emit a short (entry next bar at open_bid, SL ABOVE entry, ``final_r`` short-signed).
+    The direction-mirror of ``MonthEndReversionLongSignal`` (arc 1019, chat 1000s; independently
+    reproduced by arc 2015, chat 2000s — same construction/verdict). Same ex-ante month-end detection
+    + ATR geometry; fires when the move INTO month-end is a big UP move (``into >= +threshold_atr``,
+    where into = (close[i] - close[i-into_bars])/atr) and declares ``Direction.SHORT`` on both the
+    per-pair state and the evaluation so the canonical Step-1 pool + architecture emit a short (entry
+    next bar at open_bid, SL ABOVE entry, ``final_r`` short-signed).
 
-    Mechanism (arc 1019 observation + control, mirror of arc 1011): month-end mechanical rebalancing
-    reverts BOTH directions; arc 1011 captured only the long/down side and is 2015-negative (in a
-    strong-USD trend a big down move into month-end IS the trend → continues, doesn't revert). The
-    SHORT side fades a big UP move into month-end — a counter-trend bounce that mechanical reversion +
-    trend-resumption pushes back down — and is positive precisely in strong-USD years (2015 +0.46 ATR,
+    Mechanism (arc 1019/2015 observation + control, mirror of arc 1011): month-end mechanical
+    rebalancing reverts BOTH directions; arc 1011 captured only the long/down side and is 2015-negative
+    (in a strong-USD trend a big down move into month-end IS the trend → continues, doesn't revert). The
+    SHORT side fades a big UP move into month-end — positive precisely in strong-USD years (2015 +0.46 ATR,
     2018 +0.37 ATR gross; month-end excess +0.089 vs the random-day control; honest short capture 0.55).
     Conforms to ``core.arc.signal_protocol.SignalModule``. Intended TF = D1, USD majors.
     """

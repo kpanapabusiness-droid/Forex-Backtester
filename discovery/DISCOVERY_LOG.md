@@ -7180,6 +7180,39 @@ data, or the path-A gate-governance decision), not further OHLC obs.
 
 **Tooling.** BUILT + registered: `discovery/tools/quarter_end_signals.py::QuarterEndUsdReversionShortSignal` (reusable quarter-end / year-end-only directional signal; mask + ATR + `Direction.SHORT`; canonical-scored). Soft note (not a FLAG): the IS exit menu showed one fold with n=0 trades yet +5.77% ROI (`trailing_swing`, fold 6) — an open-runner / per-year-reset book-keeping artifact in the canonical per-fold reporting; inflates the IS mean but does not change the KILL (OOS-negative regardless). Worth a glance by any future arc depending on per-fold n-vs-ROI consistency; not patched (canonical, human-gated). No canonical change, no council, OOS measure-once (holdout pristine, not tuned).
 
+---
+**chat-1000s graceful handoff after arc 1056** (2026-06-06). Single deep arc this session: **1056** — the
+honest-§5f **per-trade bootstrap** of the 2-leg me_long+fbr deploy book, resolving arc-1043's explicitly-
+owed thread. Outcome: per-trade resampling does **not robustly rescue** the deploy mean's significance —
+it is **BORDERLINE** (cluster bootstrap RP t=2.27 SIG+, but equal-weight t=1.91 non-sig at 5%; the SIG+
+reading leans on IS-fit RP weights) and **fat-tail-fragile** (within-year sampling sd 1.08% > across-year
+spread 0.55% → the per-year ROIs are fbr-runner-tail-dominated; the borderline significance rests on a
+lucky tight clustering of noisy annual numbers). Two corrections landed: (i) the right object is the honest
+**2-leg** book (arc-2044 F1), materially stronger than the 4-leg arc 1043 found non-sig (gap+me_short are
+honest drag — confirms arc-2044 PART A from the significance angle); (ii) the cluster/fold-level bootstrap
+is the correct SE-of-mean — the within-fold per-trade resample is per-year uncertainty (the fragility
+diagnostic), and a two-level cluster+trade resample double-counts within-year variance (verified by the
+variance algebra). Components UNCHANGED (all 4 PORTFOLIO); deployable count 0; lever = operator path-A.
+
+**Why hand off after one arc:** 1056 required several gate-fidelity debugging passes (ClosedTrade.pnl is
+GROSS not net; roi_pct is an OOS-window-sliced equity ratio not Σpnl/SB; the cluster-vs-two-level estimator
+algebra) — these loaded a lot of engine-internals detail that doesn't compress. A fresh chat resumes at
+**arc 1057** at full context. Arc 1056 is fully persisted + pushed (per-arc-push safety).
+
+**Concrete next-thread pointer (a clean, additive decision-support diagnostic, no 2000s collision):**
+**TAIL-DEPENDENCE of the honest 2-leg deploy mean.** Arc 1056 found the +0.41%/yr mean is fat-tail-
+fragile (within-year sd > across-year spread, carried by fbr's convex +R runners). Quantify it directly:
+on the already-captured per-position net P&L (driver `discovery/_disco1_work/arc1056_honest_pertrade_bootstrap.py`),
+measure what fraction of the book's positive mean comes from the top-k% of fbr-runner winners, and
+re-score the cluster-bootstrap significance with the runner tail winsorized/capped (e.g. cap realized R at
++2R / +3R — GEOMETRY-only cap, the engine still takes-the-loss). A mean that survives a +2R cap is broad-
+based and deployment-robust; one that collapses is tail-luck. Decision-grade for path-A, zero fabrication
+surface, builds straight on 1056. (NB the 2000s chat is in the quarter-end / IMM-roll / book-vehicle lane
+— arcs 2056/2057/2058 — so the tail-dependence diagnostic is non-colliding.)
+
+The OHLC-only EDGE frontier remains exhausted (explore-now MENU fully closed, 1054/1055); the only within-
+charter value is decision-support diagnostics on the characterized object until an operator charter unlock
+(NEEDS_ENABLEMENT) or the path-A decision.
 ### arc_2059 — 2-leg (me_long + one partner) OOS deployment-vehicle geometry
 
 **What / why.** Fresh-eyes log read confirms the OHLC edge frontier is mined out on every axis I

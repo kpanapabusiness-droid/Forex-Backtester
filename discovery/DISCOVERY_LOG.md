@@ -169,6 +169,7 @@ at arc step (i).
 | 2066 | 2000s | 2026-06-06 | **Fresh-eyes novelty scan → terminal-state confirmation → graceful handoff** (no new edge). Resumed 2065+1; full honest-era re-read (protocol/full ledger/LESSONS/registry/NEEDS_ENABLEMENT). Per §2/§5a + the arc-3004 anti-"apparatus incapable" warning, did NOT merely declare closure — generated & interrogated ~15 candidate mechanisms (cross-pair/risk-barometer lead-lag, vol-TRANSITION direction, fbr×calendar CONJUNCTION, un-swept spring, rally-origin demand zone, multi-day streak, NR7 range-expansion, time-of-year seasonality, Wed rollover, correlation-regime-breakdown, commodity lead-lag, options gamma-pin, CB-floor fade, order-flow, 2nd survivor-family flow) → **EVERY ONE maps to a documented closure** (closed-ground directional / a mapped fbr conditioner re-skin / relative-value dead 2003/2010/2065 / DATA-GATED no-commodity-or-options / un-gateable single-epoch / sub-cost-or-priced-in calendar). No novel OHLC-constructible mechanism survives the closed-ground filter. Terminal state independently re-confirmed: 4 PORTFOLIO components, 0 PASS; book never AFP (2018 wall, combination-invariant); **Path-B PROVEN closed (3021, ρ≈0.12→P(AFP) plateaus ~0.33 never→0.9 any N)**; §5f exit-honesty collapsed the deploy object to me_long-solo (mean-honest) / {me_long,fbr} (vehicle-best, hump-peaks-at-2 2059/2060), both vehicle-INFEASIBLE (Calmar 0.06–0.4, T_min 2–26yr, ~99% underwater, deploy-mean convex-tail-carried 2063); §11 verification COMPLETE (signal+outcome+cost, raw-price, engine honest end-to-end); explore-now MENU exhausted (M1/O1/L1/Q1/G1/S1); NEEDS_ENABLEMENT queue operator-gated. Sole lever = **operator path-A gate-governance call** (or a charter unlock) — outside autonomous scope. Convergent with arc 2065's closing read + sibling 1000s 1049/1059/1060/1062 handoffs + the standing "FIVE consecutive 2000s bootstraps, operator signal maximal." No engine/null/council; no new BUILT tool; no canonical change; no FLAG; OOS NEVER touched. Components UNCHANGED (all 4 PORTFOLIO). NEW lesson: with a *proof* densification can't satisfy the gate (3021) + an *enumerated-exhausted* frontier + a *complete* deployment dossier & §11 verification, the honest autonomous move is a documented fresh-scan→confirmation→handoff, NOT a 66th cheap-kill on a re-skin; the arc-3004 trap is avoided by *demonstrating* the re-attempt (the candidate→closure map) + grounding closure in proof+enumeration, not asserting it. | n/e | n/e (OOS preserved) | n/e (no new edge) | n/e | n/e | n/e | KILL (fresh-scan: no novel mechanism; terminal-state confirmed; graceful handoff to operator path-A) | N | KILL |
 | 2068 | 2000s | 2026-06-06 | **Terminal re-confirmation, ADDITIVE: split the NEEDS_ENABLEMENT queue by the question it answers (SALVAGE-existing-book cost/measurement: E/D/F/J/C/W — vs CREATE-missing-+2015/+2018-edge-leg: M/O only), re-weighted by the §5f exit-honesty collapse.** Fresh bootstrap, resumed 2067+1; full honest-era re-read; no STOP; OOS untouched. Confirms terminus (passed/ EMPTY=0 PASS; 4 PORTFOLIO; Path-B PROVEN closed 3021; MENU exhausted; §11 complete; §5f collapsed the book → deploy object me_long-solo/{me_long,fbr}, vehicle-infeasible). Genuine fresh §2/§5a candidate NOT in 2066's map — **gap-fill-FAILURE as a continuation signal** (down-gap that doesn't fill i+1 → directional drift?) → maps to closed ground (shallow directional + backward-confirming, arc-1014/1016 mode; §5d obs cheap-kill). **ADDITIVE (neither 2066 nor 2067 did this): the §5f correction POSTDATES the queue's 2026-06-05 ranking → re-weights the operator decision tree — (1) Path-A's evidentiary basis (t=2.66/P(mean<0)=0.004, arc 1023/2019) is RETRACTED by §5f; Path-A now rests on me_long-solo's honest mean, a materially smaller claim (not recorded anywhere prior); (2) cost-unlock D's target SHRANK (the mean-positive pillar it would leverage didn't survive honest exits) → D below its 2026-06-05 rank; (3) only M-minimal-probe / O reach the binding leg.** Analysis for the operator, NOT a queue edit (discovery chat writes only arc doc + log). No engine/null/council/canonical/FLAG/BUILT-tool. | n/e | n/e (OOS preserved) | n/e | n/e | n/e | n/e | KILL (no new component; terminal re-confirmation + §5f-reweighted enablement decision tree) | N | KILL |
 | 2067 | 2000s | 2026-06-06 | **Independent terminal re-confirmation, sharpened on the BINDING CONSTRAINT** (no new edge). Fresh bootstrap, resumed 2066+1; full honest-era re-read. Rather than repeat 2066's broad ~15-candidate sweep, aimed the §2/§5a re-attempt at the *one thing that blocks deployment*: the book is never AFP solely because **2015 is positive only in fbr and 2018 only in me_short (opposite weight demands, no convex pass)** — so deployability reduces to "is there an OHLC-only leg positive in BOTH 2015 AND 2018?" Both are risk-off/strong-USD/vol-expansion years; a leg positive there must monetize (i) directional USD/safe-haven trend [coin-flip net cost, closed ground; carry-unwind 1017 KILL], (ii) long-vol/convexity [**sibling arc 1062, same day, KILL** — 2018-vol is directional-trend not straddle-friendly, 2015 is whipsaw], or (iii) correlation-regime/cross-factor [relative-value/lead-lag closed 2003/2010/2065]. My own independent fresh idea (long-vol convexity leg) **converged exactly onto just-killed 1062** — different instance, no shared memory, same dead end ⇒ terminus is imagination-independent. SHARP additive closure: the missing leg is **structurally unreachable in OHLC-only** because risk-off positivity needs a directional macro view (NEEDS_ENABLEMENT **M**) or long-vol/options exposure (item **O**) — data the apparatus lacks — and every OHLC proxy is closed/just-killed. Also VERIFIED the explore-now MENU is genuinely run-by-arc-id (M1 1027/2023, O1 1029/1030/1055/2027/2061, L1 1031/2028/1054, Q1 1028, G1 2018/2052, S1 in fbr arcs), not merely declared. Path-B PROVEN closed (3021); §5f deploy object = me_long-solo/{me_long,fbr}, both vehicle-INFEASIBLE; §11 verification COMPLETE. Sole lever = **operator path-A gate-governance call** and/or charter unlock **M (macro) / O (options)** — the only unlocks that reach the missing risk-off leg. No engine/null/council; no BUILT tool; no canonical change; no FLAG; OOS NEVER touched. Components UNCHANGED (4 PORTFOLIO). NEW lesson: at a terminal state where the AFP failure has collapsed to one named missing leg, the highest-value move is to *characterize that leg's unreachability mechanistically* (tie it to the specific missing data M/O) rather than run an (N+1)th generic sweep — converts "couldn't find it" into "provably outside the charter, here's the unlock," decision-grade for the operator; the arc-3004 trap is avoided by *demonstrating* an independent re-attempt that converged on already-dead ground (1062). | n/e | n/e (OOS preserved) | n/e (no new edge) | n/e | n/e | n/e | KILL (independent terminal re-confirmation; binding leg OHLC-unreachable → operator path-A / charter M,O) | N | KILL |
+| 2069 | 2000s | 2026-06-06 | **Terminal re-confirmation, ADDITIVE: close the dynamic / regime-conditioned ALLOCATION family — the last "smart allocator" rebuttal to path-B.** Fresh bootstrap, resumed 2068+1; full honest-era re-read; no STOP; OOS untouched. (1) Re-verified THIS chat's dispatch frontier item-by-item: up-gap weekend short → gap family 1016/2013/2032/2062/2064 (short legs KILL); failed-breakdown up-sweep SHORT (fbr mirror) → **2011+3011 both KILL** (coin-flip cap 0.47–0.51, pair-mix confound, NEG 2018); relative-value → 2003/2010/2065; regime-orthogonal +2015/+2018 leg → OHLC-unreachable (2067, M/O); deep multi-factor → 1013 win-component, 2007/2012/2047 KILL. Every named item maps to a recorded closure; shorts merged (PR#273) already priced in (me_short a component). (2) **ADDITIVE — closed a combination-side rebuttal NOT on record:** the recorded path-B closures cover static convex weights (2008/1015/1020/2022), densification (3021), and time-varying SIZING (1036 vol-target scalar, sign-blind); the **ex-ante regime-conditioned ALLOCATOR** (rotate the MIX between the opposite-demand legs — hold fbr in 2015-type, me_short in 2018-type) was only ASSERTED dead (NEEDS_ENABLEMENT item W). Closed here by composition, two independent sufficient arguments: (i) 2015 and 2018 are ex-ante observationally CO-REGIME (both risk-off/strong-USD/vol-expansion, 2067) — the only separator (whipsaw 2015 vs trend 2018, 1062) is exactly the regime axis LESSONS records as INVERTING, so no causal signal routes weight between them; (ii) even granting a separator, the favor-this-leg-this-fold MAPPING is fold-sign LOOKAHEAD — with n=2 binding folds any "working" rule is 2-point arc-1021 paint (generalizes 1036's fold-sign-blindness from a scalar to a conditioned allocator). Deliberately did NOT run an n=2 regime fit (would manufacture spurious separation = the arc-3004/1021 trap). ⇒ no allocation over the existing 4 legs — static, densified, OR dynamic — can manufacture AFP; the obstruction (two opposite-demand folds inside one observable regime) is allocation-invariant. §5f doesn't bite (no new entry); §5d class. Analysis only; no queue edit. No engine/null/council/canonical/FLAG/BUILT-tool. | n/e | n/e (OOS preserved) | n/e (no new edge) | n/e | n/e | n/e | KILL (no new component; dynamic-allocation family closed; terminal re-confirmation + graceful handoff) | N | KILL |
 
 ---
 
@@ -8643,3 +8644,80 @@ vehicle-optimum). Deploy object UNCHANGED. Deployable-system count = 0. No new B
 change; no FLAG; no council; no engine/null run; OOS NEVER touched. Graceful handoff for chat-2000s;
 convergent with arc 2066/2067 + sibling 1000s/3000s handoffs, adding the salvage-vs-create enablement
 split and the §5f re-weighting of the operator decision tree.
+
+## arc_2069 — Terminal re-confirmation, additive: the dynamic / regime-conditioned ALLOCATION family is closed
+
+**Chat 2000s.** Fresh bootstrap, resumed 2068+1. No new edge. Full step-(a) honest-era re-read (protocol
+v1.1; Tier-1 ledger arc 0→2068 across all three chats + recent Tier-2 2055–2068 + sibling 1052/1062;
+LESSONS incl. Closed-ground prior; TOOL_REGISTRY; NEEDS_ENABLEMENT; DISCOVERY_DIRECTION). No
+`discovery/STOP` (checked). OOS NEVER touched. Fresh eyes (honest-era only).
+
+**Why not a verbatim repeat of 2066/2067/2068.** Those ran a broad sweep (2066), tied the binding leg to
+M/O (2067), and re-weighted the enablement queue by §5f (2068). This arc does two things neither did: it
+re-verifies *this chat's own dispatch frontier list* item-by-item against the record (rather than
+inheriting the closure wholesale), and it closes a specific combination-side rebuttal — the dynamic
+regime-conditioned allocator — that is asserted-dead but never *derived* dead.
+
+**Dispatch frontier re-verified (each named item → recorded honest-era closure):** up-gap weekend SHORT →
+gap family (1016/2013/2032/2062/2064), gap is a PORTFOLIO leg, short legs KILL; **failed-breakdown up-sweep
+SHORT (fbr's mirror, the dispatch's flagged "arguably stronger leg") → arcs 2011 + 3011, BOTH KILL** —
+capture coin-flip 0.47–0.51 vs fbr-long 0.55–0.61, the pooled structure-control "pass" is a thin-tail /
+pair-mix confound (AUDUSD/USDJPY outliers; NEG excluding them) and NEG in 2018; fbr-long has no tradeable
+short mirror across 3 constructions (1014/2009/2011·3011); relative-value / market-neutral → 2003/2010/2065
+(relative perf is momentum/coin-flip); regime-orthogonal +2015/+2018 leg (2006 spec) → OHLC-unreachable
+(2067, needs M/O); deep multi-factor directional either side → 1013 the one win (already a component),
+2007/2012/2047 KILL (deep structure is anti-load-bearing for continuation; the 1013 forward-confirm
+property is reversal-specific). Shorts are merged (PR #273) and me_short is already a component, so "shorts
+are open" is already priced into the terminus — the dispatch list (written pre-merge) is fully run.
+
+**The additive contribution — derive (not assert) the dynamic-allocation closure.** The path-B-closed case
+has three recorded closures of the *combination* question: static convex weights (no fixed weighting
+passes, 2008/1015/1020/2022 + co-sim item E); densification (more decorrelated legs can't satisfy AFP,
+3021, a shared factor floors book variance); and time-varying SIZING (an ex-ante vol-target *scalar* on
+total exposure is fold-sign-blind, `corr(leverage, daily P&L)≈0`, 1036). The natural remaining rebuttal —
+*"a smart allocator could rotate the relative WEIGHTS between the two opposite-demand legs by an ex-ante
+regime read: hold fbr in 2015-type conditions, me_short in 2018-type"* — is **distinct** from 1036 (which
+scales one scalar, not the inter-leg mix) and was only *asserted* dead (NEEDS_ENABLEMENT item W, "dynamic
+weights, not a route to PASS"). I close it by composition, two independent sufficient arguments:
+1. **The two opposite-demand folds are ex-ante observationally CO-REGIME.** 2015 and 2018 are both
+   risk-off / strong-USD / vol-expansion years (2067); the only feature separating them is whipsaw-vol
+   (2015) vs directional-trend-vol (2018) (1062) — and that trend-vs-whipsaw axis is exactly the regime
+   measure LESSONS records as failing / "strong-trend regimes invert." So no ex-ante regime variable cleanly
+   routes weight to fbr in 2015 and me_short in 2018.
+2. **Even granting a perfect separator, the favor-this-leg-this-fold MAPPING is fold-sign lookahead.** You
+   only know "2015 wants fbr, 2018 wants me_short" from the per-fold *outcomes*; with **n = 2 binding folds**
+   any regime rule that "works" is fit to two points = arc-1021 paint, indistinguishable from luck OOS. This
+   generalizes 1036's fold-sign-blindness from a scalar to a conditioned allocator (conditioning allocation
+   on which leg pays which fold = conditioning on the label).
+
+I deliberately did NOT run a "best ex-ante regime variable separating the fold set" data fit — at n = 2
+binding folds that fit is overfit-guaranteed and would *manufacture* a spurious separation, the exact
+arc-3004 / arc-1021 failure mode. The honest instrument is the composition argument, as 3021 settled
+densification with portfolio math rather than a leg hunt. ⇒ the combination question is now closed on all
+three axes a deployer would try — static weights, more legs, AND dynamic/regime-conditioned allocation —
+because the obstruction (two opposite-demand folds inside one observable regime) is invariant to how you
+allocate among the legs you have. The only escape remains a genuinely NEW leg that is itself +2015 AND
++2018, which 2067 showed is OHLC-unreachable (M / O). §5f doesn't bite (no new entry; combination/allocation
+closure, not an entry test); §5d cheap-kill class.
+
+**Verdict — KILL** (no new component; terminal re-confirmation + additive dynamic-allocation closure +
+graceful handoff). Sole lever = operator path-A gate-governance call and/or charter unlock M (macro) / O
+(options). Per §8 conservative, non-grinding, non-blocking; per §10 graceful handoff.
+
+**NEW lesson.** A thin mean-positive PORTFOLIO whose AFP failure is two folds with *opposite* leg-demands
+inside a *single observable regime* cannot be rescued by ANY allocation scheme over the existing legs — not
+static weights, not densification, and not an ex-ante regime-conditioned allocator that rotates between the
+legs. The dynamic-allocator rebuttal dies twice over: (i) the opposite-demand folds are ex-ante co-regime
+(no separating signal — the only separator, trend-vs-whipsaw, is the regime axis that inverts), and (ii)
+with n = 2 binding folds the favor-this-leg-this-fold mapping is fold-sign lookahead / 2-point paint. This
+generalizes the 1036 vol-target SIZING closure to the full dynamic-ALLOCATION family, completing the
+combination-side closure (static 2008/1015/2022 + densify 3021 + dynamic here). The arc-3004 trap is avoided
+by closing via composition rather than a spurious n = 2 regime fit.
+
+**Bookkeeping.** Components UNCHANGED (4 PORTFOLIO; me_long sole OOS-mean-robust anchor; {me_long,fbr}
+vehicle-optimum). Deploy object UNCHANGED. Deployable-system count = 0. No new BUILT tool; no canonical
+change; no FLAG; no council; no engine/null run; OOS NEVER touched. **Fourth consecutive 2000s terminal arc
+(2066/2067/2068/2069) — operator signal saturated.** Graceful handoff for chat-2000s; convergent with arc
+2066/2067/2068 + sibling 1000s 1052/1062 / 3000s 3021 handoffs. Absent an operator path-A call or an M/O
+charter unlock, the next within-charter bootstrap re-derives this terminus — the operator decision is the
+genuine next event.

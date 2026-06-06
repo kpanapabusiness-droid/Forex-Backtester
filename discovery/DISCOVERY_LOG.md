@@ -8302,3 +8302,28 @@ gate-governance call OR a charter unlock — and respawning further within-chart
 engine/null/council/canonical/FLAG; OOS untouched. A fresh chat resumes at arc 1063 via the bootstrap;
 absent an operator unlock it lands on the same proven floor. No STOP sentinel present (only the operator
 sets it, §9).
+**chat-2000s bootstrap re-confirmation #3 (no new arc; 2026-06-06).** A FOURTH consecutive 2000s bootstrap
+(pulled main, STOP absent, highest range arc-id = 2065 → resume 2066) ran the §5a/§2 fresh-eyes search
+before opening anything: re-read protocol, the full Tier-1 ledger, recent Tier-2 (2059–2065, 1061, 1062),
+`LESSONS.md`, `DISCOVERY_DIRECTION.md`, `NEEDS_ENABLEMENT.md`, and the three prior bootstrap notes.
+**Independently re-derived the identical terminus.** Additive datum vs the prior three notes: I did not
+merely repeat the L1 *shallow* Tier-1 check — I opened the BUILT `discovery/tools/triangulation_ou_amplitude.py`
+AND read arc **1054**'s full Tier-2 reasoning end-to-end, confirming the OU-amplitude KILL is rigorous, not
+a label: σ ≈ 0.4–0.9 bp **resolution-invariant** M1→H4, 4–7× below the single-cross round-trip cost,
+`%>cost` <1.1% at every resolution → the L1 falsifier fires (triangular arb pins the *variance*, not just
+the mean). So the freshest-looking menu lead is closed even to a *deep* re-read, not only a Tier-1 scan.
+Everything else reconfirmed: explore-now MENU dead (M1 1027/2023, O1 1029/1025/1055, L1 1054, Q1 1028, G1
+2052/2018, S1 modifier); relative-value dead on all three forms (single-leg 2003, cross-sectional 2065,
+triangulation 1054; cointegration-spread form needs a spread-instrument charter); 5th-leg closed on BOTH
+weighting (2022) and construction (1062); path-B closed by portfolio-math proof (3021); 4-way book failure
+proven FUNDAMENTAL by co-sim item E; arc-2019 decisive (a 5th reversion leg cannot make the book AFP).
+**Surfaced the operator-side fork interactively a THIRD time** (set STOP / charter unlock D·C·J·M·E / path-A
+gate-governance / hand back); the operator did not select, so per §8 (never block on the operator) this chat
+hands back rather than grind — declining to manufacture a low-EV §5a-closed-ground arc or a duplicate
+decision-support arc (that lane is exhausted: 2016/2017/2019/1023/1056/1057 + the deploy-geometry matrix
+2053–2060). **Strengthened operator signal: FOUR consecutive 2000s bootstraps now hit the identical terminus
+and surfaced the identical fork across THREE interactive prompts with no selection — respawning further 2000s
+chats before an operator-side decision has ~zero marginal EV. The next productive move is genuinely a human
+decision: a `NEEDS_ENABLEMENT.md` charter unlock OR the path-A gate-governance call OR setting STOP.**
+Components UNCHANGED (all 4 PORTFOLIO); deployable-system count = 0; no engine/null/council/canonical/FLAG;
+OOS untouched. No STOP sentinel set (only the operator sets it, §9).

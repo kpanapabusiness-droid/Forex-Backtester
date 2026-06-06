@@ -111,6 +111,7 @@ at arc step (i).
 | 2036 | 2000s | 2026-06-06 | **INDEPENDENT §11 OUTCOME-layer audit of fbr (per-trade R vs raw price)** — discharges the step arcs 2034/2035 both flagged: the SIGNAL layer is independently verified but the OUTCOME layer (entry/exit/R under take-the-loss + exit policy — the layer the reset-causing Arc-10 defect lived in: skipped pre-partial stops) was never re-derived from raw price. Done for fbr 1013 (load-bearing, arc 2033), under its COMMITTED config (`sl_plus_trailing_atr`, SL2.0, **trail_enabled=True → accidental DOUBLE-TRAIL** flagged 1015/3009; exit mix `trailing_stop_atr` 97 / native `trailing_stop` 24 / `stop_loss` 89 — both trails bind). Built GEOMETRY-ONLY `independent_outcome_audit_fbr.py` (BUILT); reads ONLY the trusted loader + the engine's `ClosedTrade` ledger (the CLAIM), re-derives every check from raw OHLC + documented conventions (never the engine exit code), verifying the convention-robust INVARIANTS (NOT re-implementing the double-trail walk = transcription). **ALL 6 checks 210/210 over IS folds 2011-2020:** (1) entry==`open_ask[entry]`; (2) SL==`close_ask[sig]−2·indepATR[sig]` (R-denominator re-derived w/ arc-2034 independent Wilder ATR); (3) **TAKE-THE-LOSS — no missed earlier stop (the Arc-10 defect test)**; (4) stop-bar consistency; (5) exit px stop→`sl`/trail→`open_bid`; (6) gross pnl==`(exit−entry)·size`. Decisive honesty signature: **`stop_loss` exits cluster at exactly −1.001R** (−1.035…−0.978, the sub-−1R = real `open_ask`-vs-`close_ask` entry slippage + exit half-spread); trails +1.10/+1.35 mean; overall +0.237R/trade gross. **§11 WIN in the one investigated case:** an apparent same-bar SL-first violation (USDCAD 2019-10-01: exit-bar low dipped below SL yet trail-exited at a profit) is CORRECT — engine bar loop fills pending closes (trail @ `open_bid` 1.32338 > sl 1.32154) BEFORE the intra-bar SL check, so the position closed at the open before the later low; the take-the-loss reference for a queued exit is the FILL price, not the fill bar's intra-bar low (a gap-down-through-stop at the open WOULD still be caught). ⇒ **fbr's GROSS OUTCOME layer independently CONFIRMED HONEST** (joins its 2034 signal verification). Scope: verifies gross entry/exit/R (the bespoke un-test-covered geometry); per-trade COST re-derivation (cost netted at canonical chokepoint, honest-sweep Part C/PR#264 RESOLVED) + the same audit for gap/me_long/me_short remain the next §11 slices. NEW lesson: the §11 defense has 2 layers (signal=which bars fire, 2034/35; OUTCOME=what each realizes, here) — the OUTCOME layer is higher-stakes (Arc-10 lived there); verify convention-robust invariants vs raw price (no-missed-stop + a `stop_loss` R-cluster at ≈−1R), NOT a re-coded exit walk, and encode the engine's intra-bar ORDERING (fill-pending-closes precede intra-bar SL) or a legit next-bar-open trail fill false-positives. No canonical change, no FLAG (engine correct), no council, OOS untouched. Components UNCHANGED (all 4 PORTFOLIO). | n/e | n/e (OOS preserved) | n/e (verification) | n/e | 210 fbr trades audited; stop_loss R=−1.001; 6/6 checks 210/210 | fbr 1013 (verify only) | DIAGNOSTIC → KILL (no new component; fbr OUTCOME layer independently verified honest) | N | KILL |
 | 2035 | 2000s | 2026-06-06 | **INDEPENDENT §11 signal verification of the remaining 3 book components (gap 1006, me_long 1011, me_short 1019)** — extends arc 2034 (which verified fbr) so the WHOLE deployable book's signal layer is independently confirmed honest, not just the load-bearing leg. Same method (fresh re-derivation with independent code + causal-truncation no-lookahead vs raw price); reuses arc-2034's independent Wilder ATR (already proven == committed `_atr_shift1_mid`, so the shared ATR/mid construction is pre-validated). Built `independent_signal_audit_book.py` (BUILT). **ALL THREE PASS: gap (H4 JPY) 551 fires re-derive BYTE-IDENTICAL, 15/15 no-lookahead; me_long (D1 USD) 187 identical, 21/21 no-lookahead, 21/21 price-isolation; me_short (D1 USD) 179 identical, 21/21 no-lookahead, 21/21 price-isolation.** With fbr (2034: 356/356, 21/21) the entire 4-way book's signals are independently verified — no geometry bug, no price-lookahead. **NEW wrinkle handled — the price-vs-CALENDAR lookahead distinction:** the month-end legs legitimately read the NEXT bar's TIMESTAMP (`is_last[i]=month(i+1)≠month(i)`, ex-ante calendar knowledge) but NOT its price → naive truncate-at-i would false-positive; correct test truncates at i+1 AND isolates price (corrupt bar i+1's PRICE keeping its timestamp → fire@i unchanged, 21/21 both legs) → proves calendar-only use. gap reads only ≤i (inter-bar time-gap + open[i]/close[i-1]) → truncates cleanly at i. Scope boundary (as 2034): verifies the SIGNAL (the Arc-10-prone bespoke code); the OUTCOME layer (per-trade R/cost/SL-honest exit) stays engine-trusted (heavily-tested) — independent trade-R re-derivation from raw price is the remaining §11 step before deployment. NEW lesson: the causal-truncation no-lookahead test must distinguish PRICE-lookahead (violation) from CALENDAR-lookahead (legit ex-ante timestamp) — truncate at i+k AND price-isolate; generalizes the no-lookahead invariant to event-anchored signals. No canonical change, no FLAG (all 3 signals CORRECT), no council, no OOS. Components UNCHANGED (all 4 PORTFOLIO). | n/e | n/e (OOS preserved) | n/e (verification) | n/e | gap 551 / me_long 187 / me_short 179 fires re-derived 100% match; no-lookahead+price-iso all pass | gap/me_long/me_short (verify only) | DIAGNOSTIC → KILL (no new component; whole book signal layer independently verified honest) | N | KILL |
 | 1037 | 1000s | 2026-06-06 | **INDEPENDENT REPRODUCTION of arc 2035 (concurrent, different code path) — §11 signal-layer verification of gap/me_long/me_short.** Ran the SAME §11 work independently and concurrently (2035 landed on main mid-write); both chats CONVERGE on the identical verdict — **all three signal layers HONEST** (fire sets re-derive BYTE-IDENTICAL to each chat's own committed run; no future-PRICE lookahead) — AND both independently arrived at the SAME calendar-vs-price methodological distinction. My fresh code: month-end via manual timestamp month/year compare (NOT `pd.PeriodIndex`), weekly-open via manual per-bar hour-delta loop (NOT `.diff().dt`), ATR via 2034's fresh Wilder loop; checks = fresh fire-set re-derivation + causal-truncation + **future-PRICE-perturbation** (corrupt ALL bars>i OHLC keep timestamps → fire@i+atr@i invariant). Results: me_long 179≡179, me_short 179≡179, gap 551≡551 byte-identical; future-price-perturbation 21/21+21/21+15/15 invariant → NO future-price lookahead. **me_long count differs from 2035 (mine 179 vs 187) = BENIGN data-window artifact** (each chat's D1 cache spans a slightly different end-date → different month-end count; each re-derives byte-identical to ITS OWN data, verdict identical) — a reminder a raw fire COUNT is cache-extent-dependent, the signal-LOGIC verdict is not. Method nuance vs 2035: my proof corrupts ALL future bars (>i), 2035's price-isolation corrupts the calendar bar i+1 — corrupting all-future is a strictly stronger no-future-price test (immaterial to verdict, both pass). **Two chats, different code, same byte-identical result + same calendar-vs-price lesson = strongest Arc-10 cross-confirmation; whole 4-way book signal layer now independently verified by TWO chats.** DEFERS the committed tool to 2035's `independent_signal_audit_book.py` (filename collision; theirs landed first — no duplicate registered). OUTCOME layer (per-trade R/cost/exit) still the next §11 step. Components UNCHANGED (all 4 PORTFOLIO). No canonical change, no FLAG, no council, no OOS | n/e | n/e (OOS preserved) | n/e (verification) | n/e | me 179≡179 / gap 551≡551 re-derived 100%; 21/21+15/15 no-future-price | 4-comp book (verify only; converges 2035) | DIAGNOSTIC → KILL (independent reproduction of 2035; book signal layer honest, confirmed by 2 chats) | N | KILL |
+| 1038 | 1000s | 2026-06-06 | **§11 INDEPENDENT OUTCOME-LAYER verification of `fbr` (the load-bearing component; the next §11 step arcs 2034/2035 explicitly DEFERRED)** — "reproduces via the canonical apparatus" (~14 arcs) is NOT independent verification (the engine agreeing with itself = the Arc-10 trap, now at the OUTCOME level; Arc 10 WAS an outcome defect — a replay skipping pre-+1R-partial stops). Re-derive EVERY committed `fbr` trade's realised entry/SL/exit/R/cost from RAW PRICE with INDEPENDENT code (BUILT `independent_outcome_audit.py`; imports neither `SlPlusTrailingAtrPolicy` nor the backtester loop), replicating the engine's per-bar **intra-bar SL-FIRST → +1R-activated 1R-below-peak trailing-atr** order. Ground-truth ledger = the canonical gate (A1→MultiPairBacktester, the exact `validate_4way_book` fbr config) over a full-span 2010-2020 fold = **210 closed trades**. **ALL 210 pass BYTE-IDENTICAL on all 7 outcome dims:** entry==next-bar open_ask (210/210); SL==close_ask[fire]−2·ATR_indep (210/210, re-confirms SL geometry AND arc-2034 ATR); exit_time+reason (210/210); exit_price (210/210); final_r (210/210); engine pnl==sign·(exit−entry)·size (210/210); **FundedNext cost** comm+slip+spread==`apply_cost_model` per-position breakdown (210/210). **Take-the-loss directly observed** (USDJPY 2011-02-22 stop fills EXACTLY at sl_price 82.69054 = −1.0000R; trail-out winners +0.16..+3.50R land the exact next-bar open_bid fill). `fbr` OUTCOME layer independently CONFIRMED HONEST — the FIRST genuine §11 outcome check in the programme; with 2034 (signal) `fbr` is now end-to-end §11-verified (deepest coverage of any component). **Scope (honest, as 2034/2035):** audits the OUTCOME of EXECUTED trades; per-trade R is size-INVARIANT → fully independent; trade identities (which fires→trades after the cap) + `size` come from the engine ledger (= signal-verified 2034 + heavily-tested `LiveBalanceRisk`, not the Arc-10-prone geometry); size enters only the linear/formulaic cost + gross-P&L check (both pass). **NEW lesson: a §11 OUTCOME check re-derives each committed trade's realised R AND cost from raw price replicating intra-bar SL-FIRST-then-trail — `fbr`'s 210 pass byte-identical, −1R stops exact at sl_price.** Next §11 step = the OTHER 3 components' outcome layers, esp **`me_short`'s `sl_partial_close_1r_runner_trail`** (the partial-runner = the EXACT mechanism the retired Arc-10 shortcut flattered → sharpest possible outcome check). No canonical change, no FLAG (outcome layer CORRECT), no council, no OOS. Components UNCHANGED (all 4 PORTFOLIO) | n/e | n/e (OOS preserved) | n/e (verification) | n/e | 210 fbr trades re-derived 100% match (7/7 dims); take-the-loss −1R exact at sl_price | fbr 1013 (verify only) | DIAGNOSTIC → KILL (no new component; `fbr` OUTCOME layer independently verified honest) | N | KILL |
 
 ---
 
@@ -5076,6 +5077,83 @@ not independently re-derived). NEW lesson: the no-lookahead truncation test must
 (violation) from CALENDAR-lookahead (legit timestamp) — truncate at i+k AND price-isolate; generalizes the
 invariant to event-anchored signals. **Tooling:** BUILT `independent_signal_audit_book.py` (registered).
 No canonical change, no FLAG, no council, OOS untouched.
+
+### arc_1038 — §11 INDEPENDENT OUTCOME-LAYER verification of the `fbr` component
+
+**Why this arc.** The edge-hunt is closed on every documented lever (path-B provably closed 3021, MENU
+exhausted, all short/2018 routes dead, all `fbr` entry-quality refinements collapse), and the deployability
+lever is now the operator's path-A gate call — fully quantified by the recent book-characterization arcs.
+So the highest-value AUTONOMOUS work is the §11 Arc-10 institutional defense. Arcs 2034/2035/1037 started
+it but verified ONLY the SIGNAL layer (fire set + no-lookahead), and BOTH explicitly DEFERRED the OUTCOME
+layer as "the next §11 step, owed for all 4 components before deployment." Arc 10 itself was an
+OUTCOME-layer defect (a replay that skipped pre-+1R-partial stops), so the outcome layer is the most
+Arc-10-relevant verification possible — and it was open. `fbr` is the load-bearing leg (arc 2033 — the
+book's heaviest), so it is the target.
+
+**The because.** "Reproduces exactly via the canonical apparatus" — true of ~14 arcs for `fbr` — is the
+same engine code (signal → `ArcFoldRunner` → `MultiPairBacktester`) agreeing with itself. A bug in the
+SL-first take-the-loss, the `sl_plus_trailing_atr` trailing geometry, or the FundedNext cost netting would
+reproduce identically forever. The genuine §11 check re-derives the realised outcome from RAW PRICE with
+independent code.
+
+**What I did.** Traced the engine's exact outcome path first (read `multipair_backtester._process_bar`
+ordering, `sl_plus_trailing_atr` geometry, `fill.py` SL/entry conventions, `_fold_stats_helpers` +
+`costs/model.py` netting, `a1_system_level_filter` entry/SL construction) so the independent walk
+replicates it: per bar, intra-bar SL FIRST (`low_bid ≤ sl` → fill at `sl_price`, take-the-loss), survivor
+offered to the +1R-activated 1R-below-peak trail at bar close, queued trail close fills next bar `open_bid`
+(closes fill in step 1a before the next bar's exit checks → SL can't pre-empt a queued trail). The hard SL
+is frozen at `pos.sl_price` forever (`_effective_sl`), trail only adds an at-close exit — confirmed in
+code. Built `independent_outcome_audit.py`: ran the canonical fbr gate over a full-span 2010-2020 fold to
+get the engine's 210-trade ledger + the `apply_cost_model` breakdown, then re-derived every trade's
+entry/SL/exit/R/cost from raw OHLC, importing neither the exit policy nor the backtester loop (only the
+trusted `Panel.from_pairs` loader + arc-2034's proven independent Wilder ATR).
+
+**Result.** 210/210 on all 7 dims (entry, SL, exit_time+reason, exit_price, final_r, gross-pnl
+consistency, FundedNext cost). The take-the-loss invariant is directly visible: the USDJPY 2011-02-22 stop
+fills at exactly the independently-re-derived sl_price (82.69054) = −1.0000R; trail-out winners (+0.16 to
++3.50R) land the exact next-bar `open_bid` fill bar and price; per-position cost (commission scaling with
+size, slippage at n_fills=2, 1.5× spread widening) matches the engine's netting to 1e-6.
+
+**Honesty on scope.** This audits the OUTCOME of executed trades. Per-trade R is size-invariant → the
+R/exit verification is fully independent of size. The trade IDENTITIES (which fires survive the exposure
+cap) and each trade's `size` (`LiveBalanceRisk`, compounding balance) come from the engine ledger — that
+is the entry/sizing layer (signal already verified 2034; sizing is simple + in the 1656-test suite), not
+the Arc-10-prone outcome geometry. Size enters only the linear cost + the gross-pnl check, both of which
+pass. Re-deriving size itself = replaying the account = re-rolling the engine, out of scope for "re-derive
+trade-R."
+
+**Verdict.** DIAGNOSTIC → KILL (no new component; `fbr` UNCHANGED, PORTFOLIO). With 2034 (signal) `fbr`
+is now end-to-end §11-verified — the deepest coverage of any component. No canonical change, no FLAG
+(outcome layer correct), no council, no OOS.
+
+**Threads.** (1) The OTHER 3 components' outcome layers are the explicit next §11 step (mirrors how 2035
+followed 2034 on the signal side). Highest-value = `me_short`'s `sl_partial_close_1r_runner_trail` — the
++1R partial + runner is the EXACT mechanism the retired Arc-10 replay flattered (same-bar partial
+suppression), so independently re-deriving its two-leg outcome (partial @+1R close, runner trail/SL,
+n_fills=3 cost, short-side mirror) is the sharpest possible outcome check; then gap (24-bar time-exit
+predicate) + `me_long` (`sl_only` + 2-bar time-exit). Reuse this arc's walk skeleton. (2) Once done, the
+whole book is end-to-end §11-verified — the pre-deployment institutional gate the operator's path-A call
+rests on. **Tooling:** BUILT `independent_outcome_audit.py` (registered). NEW lesson recorded in the
+Tier-1 row.
+
+**ADDENDUM (post-merge — convergence with concurrent 2000s arc 2036 + a config fork).** On pull, the
+2000s chat had independently done the SAME fbr outcome audit (arc 2036) — cross-chat Arc-10 reproduction
+(like 2034/2035↔1037); both find the fbr OUTCOME layer HONEST. The convergence surfaced a real config
+fork: I followed `validate_4way_book.py` → `trail_enabled=False` (single `sl_plus_trailing_atr` trail);
+2036 used the committed arc-1013 headline → `trail_enabled=True` (the double-trail, KH-24 `TrailManager`
++ `sl_plus_trailing_atr` both active, flagged 1015/3009/1024). Measured both (same 210 entries):
+`trail_enabled=True` → exits 89 stop_loss/24 native trailing_stop/97 trailing_stop_atr, **+1.854%/9-of-10**
+(the byte-exact headline); `trail_enabled=False` → 89 stop_loss/121 trailing_stop_atr, **+2.084%/8-of-10**
+(2019 flips +0.05→−0.17). So the two §11 audits are COMPLEMENTARY — 2036 verified the byte-exact headline,
+this arc the cosim-book `trail_enabled=False` variant → fbr outcome honest under BOTH trail configs. My
+Tier-1 "exact `validate_4way_book` fbr config" is accurate; the "committed config" framing was loose (the
++1.854% headline is `trail_enabled=True`) — corrected in the arc doc. **FLAG (provenance, not honesty;
+code human-gated, not patched):** the cosim book + deployment-char arcs (1033/2033/`equity_risk_profile`,
+all via `validate_4way_book.py`) run fbr at `trail_enabled=False` = +2.084%/8-of-10, ≠ the component
+headline `trail_enabled=True` = +1.854%/9-of-10 (the documented double-trail / "within ~1.49pp" fork,
+now quantified: only the 2019 fold sign differs; the 2018 binding fold is −4.20/−4.39 either way → the
+book's 2018 wall is config-ROBUST). Worth operator awareness when the two are cited together. Components
+UNCHANGED.
 
 ### arc 2036 — independent §11 OUTCOME-layer audit of fbr (per-trade R vs raw price)
 

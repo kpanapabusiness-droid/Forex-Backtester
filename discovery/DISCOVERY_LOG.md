@@ -8245,3 +8245,22 @@ macro-rates / E co-sim) — not another within-charter arc.** A fresh chat resum
 absent an operator unlock the marginal EV of new 1000s arcs is low. Components UNCHANGED (all 4 PORTFOLIO);
 deployable-system count = 0; no engine/null/council/canonical/FLAG; OOS untouched. Handoff is due to fresh-eyes
 exhaustion, not a STOP sentinel (none present — only the operator sets it, §9).
+**chat-2000s bootstrap re-confirmation #2 (no new arc; 2026-06-06).** A THIRD consecutive 2000s bootstrap
+(pulled main, STOP absent, highest range arc-id = 2065 → resume 2066) ran the §5a/§2 fresh-eyes search before
+opening anything. **Independently re-derived the same terminus — robust even to a shallow read.** Concrete
+new datum vs the prior two notes: the `explore-now` MENU's L1 (triangulation residual 2nd-moment / OU
+amplitude) is the ONE item a Tier-1-table-only scan can mistake as open (its KILL lives in arc **1054**, a
+1000s row easy to skip on a range-filtered grep). I chased L1 specifically as the freshest-looking lead, read
+the BUILT `discovery/tools/triangulation_ou_amplitude.py` + arc-1054's reasoning, and confirmed it is dead
+(σ resolution-invariant ~0.4–0.9 bp, 4–7× below the single-cross round-trip cost down to M1; `%>cost` <1.1%
+at every resolution → the L1 falsifier fires). So the menu is closed even to a fresh reader who only had the
+Tier-1 ledger: M1 1027/2023, O1 1029/1025/1055, L1 **1054**, Q1 1028, G1 2052/2018, S1 modifier — all dead.
+Everything else (portfolio route 3021/2022 proof, ~22 dead 2018-leg routes, relative-value 2003/2065/1054,
+arc-2019 decisive) reconfirmed. **Re-surfaced the operator-side fork interactively a 2nd time** (charter
+unlock D·C·J·M / path-A gate-governance / set STOP / graceful handoff); the operator again did not select, so
+per §8 this chat hands back rather than grinds — declining to manufacture a low-EV arc or duplicate the
+exhausted decision-support lane. **Strengthened operator signal: TWO consecutive 2000s bootstraps now hit the
+identical terminus and surfaced the identical fork with no selection — the next productive move is genuinely
+operator-side (a charter unlock from `NEEDS_ENABLEMENT.md` OR the path-A gate-governance call OR a STOP), and
+respawning further 2000s chats before then has ~zero marginal EV.** Components UNCHANGED (all 4 PORTFOLIO);
+deployable-system count = 0; no engine/null/council/canonical/FLAG; OOS untouched. No STOP sentinel set.

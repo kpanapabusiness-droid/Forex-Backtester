@@ -177,6 +177,8 @@ at arc step (i).
 | 1066 | 1000s | 2026-06-06 | **Fresh-eyes novelty scan → demonstrated re-attempt → close the LAST unexamined in-charter DATA surface (raw `tick/`) firsthand → independent 1000s terminus + STOP recommendation** (no new edge). Fresh bootstrap, resumed 1065+1; full honest-era re-read (protocol/full ledger/LESSONS/registry/front-door); no `STOP`; OOS untouched. Per §2/§5a + arc-3004 anti-"apparatus incapable" + 2066's no-67th-re-skin lesson: did NOT assert closure — (1) generated 10 fresh candidates, EVERY one maps to a documented closure (raw-tick microstructure ×3, CB-day drift, vol-transition/long-vol=1062, streak/NR7=closed-ground directional, corr-regime-breakdown=relvalue 2003/2010/2065, order-flow=data-gated, 2nd forced-flow CONTINUATION=no OHLC-constructible event→M/O), AND the binding-constraint filter is independently decisive (none is risk-off-SELECTIVE = positive 2015 AND 2018; all are regime-flat or directional/reversion the corpus proved fails there). (2) **ADDITIVE firsthand closure:** every honest-era arc derives H4/H1/D1 from `m1/`; the raw `tick/` data was NEVER opened (microstructure/order-flow closures were assertion or m1-derived). Verified firsthand: `histdata_backup\<PAIR>\` has BOTH `m1/` AND `tick/` for all 28 pairs (EURUSD/tick ~1.7GB, yearly from 2010 = full IS+OOS) → tick is in-charter AND never examined. Closed WITHOUT a tick load on two grounded args: (i) microstructure is regime-AGNOSTIC by construction → can't be 2015/2018-selective → CANNOT supply the binding leg even if a real edge exists; (ii) cost-wall monotonicity (2028 H4→H1 wall: finer = monotone worse, FundedNext 1.5× spread targets exactly the spread microstructure lives in, paid per-fill) → tick is the WORST cost regime. ⇒ **upgrades "OHLC-only exhausted" → "ALL in-charter data surfaces (OHLC bars + raw tick) reasoned-closed against the binding constraint,"** removing the last unstated data caveat (parallel to 2071 firsthand-closing E2's external gate). Terminal state independently re-confirmed from the 1000s range: 4 PORTFOLIO, 0 PASS; book never AFP (combination-invariant 2015/2018 wall; Path-B PROVEN closed 3021); binding leg OHLC-unreachable (2067, M/O) AND now tick-unreachable; §11 complete; MENU exhausted; dispatch frontier items all map to closures. Sole lever = operator path-A and/or charter unlock M/O. **Recommend the operator set `discovery/STOP`** — concurs with 2071 but from an INDEPENDENT range reaching the same terminus by a different last-thread (imagination-independent convergence = the decision-grade signal). NEW lesson: an "OHLC-exhausted" terminus carries an unstated caveat until the RAW data layer (tick) under the bars is closed too — and that closure is reasoned not run (microstructure = wrong KIND of edge for a regime-selective constraint + worst cost regime); verify the finest data layer exists and argue why it can't supply the SPECIFIC missing leg before claiming a price-only charter is mined out. No engine/null/council; no canonical change; no FLAG; no new BUILT tool (firsthand `ls` + log re-read only). Components UNCHANGED (all 4 PORTFOLIO); deploy object UNCHANGED; deployable count = 0 | n/e | n/e (OOS preserved) | n/e (no new edge) | n/e | n/e | n/e | KILL (fresh-scan: no novel mechanism; raw-tick axis reasoned-closed; terminal-state independently re-confirmed; STOP recommended) | N | KILL |
 | 2072 | 2000s | 2026-06-06 | **Saturation-confirmed MINIMAL handoff (7th consecutive 2000s terminal arc) — deliberately short, footprint matched to the zero info delta.** Resumed 2071+1; full honest-era re-read; no STOP; OOS NEVER touched. Arc 2071 predicted 2072 would re-derive the identical terminus; it does. Genuine fresh-eyes pass (anti-arc-3004, not a rubber-stamp): firsthand `ls` — `passed/` EMPTY (0 PASS), `portfolio-candidates/` = exactly 4 (gap/me_long/fbr/me_short), STOP absent. Independent mechanism generation → every candidate maps to a documented closure; the one not pre-mapped (**tick / finer-than-M1 microstructure** — backup carries unused `tick/`) maps to a PROVEN closure (arc 1052 "intrabar = LAST data resolution, OHLC charter mined out" + 1031 "go finer → variance collapses faster than cost"; tick is strictly finer than M1 → same mechanism, brutal tick-cost), not an open frontier. NEEDS_ENABLEMENT (run-1+2) all operator-gated; conservation law proves nothing in-charter is fundable. Re-questioned (§2) and UPHELD 2071's E2-non-fetch (data-foundation change + Arc-10 EET-alignment contamination + sub-fundable EV — overturning a sound conservative prior to "do something" is motion not progress, §8). Reconciles the two protocol pulls (arc-3004 don't-rubber-stamp + §5a don't-grind) by DOING the genuine pass then recording it MINIMALLY. **Operator escalation (the real next event):** a chat can't set STOP (§9); absent an operator action the harness re-derives this terminus (2073, 2074, …). Either (1) set `discovery/STOP` for the 2000s range, OR (2) authorize ONE enablement — E (co-sim, BUILT/in-review, cleanest) ≻ run-2 fundable rank U (cross-asset trend basket, best fundable shot + long-vol diversifier; precond: verify FundedNext tradability + gap-tail) ≻ X (CME order-flow, free corr pre-test) ≻ M (macro/rates); E2 (free equity fetch) cheapest data unlock at the binding +2015/+2018 constraint but operator-gated. §5d/§5f don't bite (no entry; charter-scope closure). No engine/null/council/canonical/FLAG/BUILT-tool. | n/e | n/e (OOS preserved) | n/e (no new edge) | n/e | n/e | n/e | KILL (no new component; 7th consecutive terminal arc; saturation-confirmed minimal handoff; recommend operator STOP or one enablement) | N | KILL |
 | 1067 | 1000s | 2026-06-06 | **The leg-hunt is COUNTERPRODUCTIVE under the honest deploy object — terminal re-confirmation + the one unmade synthesis (9th consecutive terminal arc across both ranges).** Fresh bootstrap, resumed 1066+1; full honest-era re-read (protocol/full ledger 0→2072/LESSONS/registry/NEEDS_ENABLEMENT); no STOP; OOS NEVER touched. Firsthand terminus: `passed/` EMPTY (0 PASS), `portfolio-candidates/` = exactly 4 (gap 1006/me_long 1011/fbr 1013/me_short 1019). Genuine fresh-eyes generation (anti-arc-3004, NOT a rubber-stamp) — 4 candidates (vol-of-vol/realized-vol-TRANSITION state; survivor-state meta-filter [me_long gated on fbr's recent outcome]; day-of-week×month-end; spread-time-series regime gate) EACH maps to a recorded closure (closed-ground vol-level+3012+1062 / 2048+2069+1065 / 3015+1029 / O1 1030/1055/2027); my own generation converged onto already-dead ground (imagination-independent terminus, as 2067→1062). **ADDITIVE — the one synthesis no prior terminal arc (1066/2066-2072) made explicit, and the strongest STOP argument because it speaks to what the harness DEFAULT-DOES next (hunt a 5th leg): a 5th leg is closed by THREE independent args, the 3rd making the hunt COUNTERPRODUCTIVE not merely futile.** (1) can't be FOUND — the +2015&+2018 risk-off-selective leg is OHLC/tick-unreachable (2067/1066, needs macro-M/options-O); (2) can't reach AFP even if found — path-B PROVEN closed (3021, shared risk-off factor floors P(AFP)~0.33 at any N); (3) **NEW: a 5th leg moves the HONEST deploy case BACKWARD** — under §5f the binding obstacle MIGRATED from 'a missing fold-sign leg' (committed-exit framing, 1015/2008/3009, still echoed in 1066/2067/2071) to 'a tail-fragile, NON-CERTIFIABLE mean' (1057 q95-winsorize/drop-1-runner erases sig; 1058 me_long-solo non-sig top-5=114-139% of net P&L; 2063 convex-tail-carried); the ONLY leg-kind that lifts a deep risk-off fold is a high-variance TAIL edge (2022 shock sd 3.78%) → adding it RAISES tail-carry/per-year variance = exactly the property that makes the mean un-certifiable → the leg-hunt is negative-EV on the binding axis. Both framings point to the SAME operator-only lever. §5d/§5f don't bite (no entry; charter-scope closure). No engine/null/council/canonical/FLAG/BUILT-tool. **Operator escalation: 9th consecutive terminal arc; a chat can't set STOP (§9) and the harness will keep re-deriving this terminus AND burning compute on a counterproductive leg-hunt → recommend the operator (1) set `discovery/STOP`, OR (2) authorize ONE enablement (E co-sim / fundable U≻X≻M / cheap E2 equity-close at the binding constraint).** NEW lesson: when an exit/measurement correction MIGRATES a thin book's deployment obstacle (here missing-leg → tail-fragile mean), the default autonomous move (hunt another decorrelated leg) can become negative-EV — the only fold-lifting leg-kind (high-variance tail) worsens the new obstacle; re-derive the binding obstacle AFTER a correction before continuing the hunt the PRE-correction obstacle implied. | n/e | n/e (OOS preserved) | n/e (no new edge) | n/e | n/e | n/e | KILL (no new component; leg-hunt shown counterproductive under honest deploy object; terminal re-confirmation + STOP reinforced) | N | KILL |
+| 2073 | 2000s | 2026-06-06 | **Saturation is now self-confirming across bootstraps (8th consecutive 2000s terminal arc).** Resumed 2072+1; full honest-era re-read; no STOP; OOS NEVER touched. The one genuinely additive datum: arc 2072 PREDICTED 2073 would re-derive the identical terminus — I am 2073 and confirm it empirically; the terminus is now self-predicting AND self-confirming across context-isolated chats (the strongest evidence the remaining lever is exogenous = an operator decision). Genuine fresh-eyes pass (anti-arc-3004): firsthand `ls` — `passed/` EMPTY (0 PASS), `portfolio-candidates/` = exactly 4 (gap/me_long/fbr/me_short), STOP absent; DISCOVERY_DIRECTION last touched 2026-06-06 (run 2), NO run-3 menu added since 2070-2072 closed it (run-1 M1/O1/L1/S1/Q1/G1 arc-mapped; run-2 E1 tested→KILL 2070, E2 firsthand data-gated 2071/2072). Independent mechanism generation → every candidate maps to a documented closure (session-handover micro-gaps → no intraday FX closure/EET-thinnest-hour 2070 + microstructure cluster; asymmetric-vol directional → vol=magnitude 1001/3012; entry-level survivor co-occurrence → 2066/1034 sub-pool-floor; correlation-breakdown disable-in-2015/18 → fold-sign lookahead n=2 2069 + relative-value 2003/2010/2065); conservation law proves nothing in-charter is fundable. Re-questioned (§2) and UPHELD E2-non-fetch (data-foundation + Arc-10 EET-alignment + sub-fundable EV; motion≠progress §8). **Operator escalation (real next event):** a chat can't set STOP (§9); absent operator action the harness re-derives this terminus (2074, …). Either (1) set `discovery/STOP` for the 2000s range, OR (2) authorize ONE enablement — E (co-sim, BUILT/in-review) ≻ U (cross-asset trend basket; precond FundedNext tradability + gap-tail) ≻ X (CME order-flow, free corr pre-test) ≻ M (macro/rates); E2 (free equity fetch) cheapest data unlock at the binding +2015/+2018 constraint but operator-gated. §5d/§5f don't bite (no entry; charter-scope closure). No engine/null/council/canonical/FLAG/BUILT-tool. | n/e | n/e (OOS preserved) | n/e (no new edge) | n/e | n/e | n/e | KILL (no new component; 8th consecutive terminal arc; saturation self-confirming; recommend operator STOP or one enablement) | N | KILL |
+| 2074 | 2000s | 2026-06-06 | **Saturation self-confirming — 9th consecutive 2000s terminal arc (minimal handoff).** Resumed 2073+1; full honest-era re-read; no STOP; OOS NEVER touched. Arc 2073 predicted 2074 would re-derive the identical terminus — I am 2074 and confirm it; marginal value of a further FULL re-derivation is now NEGATIVE (pure cost), so I do the genuine pass + record it minimally (anti-grind §5a + anti-rubber-stamp arc-3004, reconciled). Genuine fresh-eyes pass (firsthand, not inherited): `ls` — `passed/` EMPTY (0 PASS), `portfolio-candidates/` = exactly 4 (gap 1006/me_long 1011/fbr 1013/me_short 1019), STOP absent; DISCOVERY_DIRECTION last touched 2026-06-06 (run 2), no run-3 menu. Independent mechanism generation (before consulting closures) → every candidate maps to a documented closure or operator-gated enablement: central-bank level/peg defense → one-off/event-risk (the 2015 SNB unpeg is the very blocking fold); vol-of-vol/term-structure → vol=magnitude-not-direction 1001/3012 + L1 menu; intraday-seasonality/lead-lag → microstructure cluster 1008/1010/2020/2027/2050/2051/3008 + EET-boundary 2070 + rel-value 2003/2010/2065; spread mean-reversion → 2005/3007; options/order-flow/macro → external data operator-gated (M/X); 5th component / 2018-positive 4th leg → unfound across every route (structure 1014/2009/2011/3011, trend 3010, flow 1016, rel-value 2010, deep-continuation 2012, carry-unwind 1017, vol-state 3012), conservation law (freq×per-trade-edge≈const) explains structurally. Convergence of free generation onto the documented wall = arc-3004 trap inverted (cf. 2067↔1062, 2072↔tick, 2073↔session-handover). Re-questioned (§2) and UPHELD E2-non-fetch (data-foundation change + Arc-10 EET-alignment contamination + sub-fundable EV; motion≠progress §8). **Operator escalation (the real & only next event):** a chat can't set STOP (§9); absent operator action the harness re-derives this terminus (2075, …) at pure cost. Either (1) set `discovery/STOP` for the 2000s range (honest default — in-charter frontier closed with no exceptions, NINE independent chats confirm), OR (2) authorize ONE enablement — E (co-sim equity curve, BUILT/in-review, cleanest) ≻ U (cross-asset trend basket; precond FundedNext tradability + gap-tail) ≻ X (CME order-flow, free corr pre-test) ≻ M (macro/rates); E2 (free daily-equity fetch) cheapest data unlock at the binding +2015/+2018 constraint but operator-gated. §5d/§5f don't bite (no entry; charter-scope closure). No engine/null/council/canonical/FLAG/BUILT-tool. | n/e | n/e (OOS preserved) | n/e (no new edge) | n/e | n/e | n/e | KILL (no new component; 9th consecutive terminal arc; saturation self-confirming; recommend operator STOP or one enablement) | N | KILL |
 
 ---
 
@@ -9151,3 +9153,105 @@ leg — can become NEGATIVE-EV, because the only fold-lifting leg-kind (a high-v
 the new obstacle. Re-derive the binding obstacle AFTER a correction before continuing to hunt for what the
 PRE-correction obstacle implied; the leg-hunt and the real deployment obstacle can point opposite ways.
 Convergent with the 1066 + 2066–2072 terminus; graceful handoff.
+## arc_2073 — Saturation is now self-confirming across bootstraps (8th consecutive 2000s terminal arc)
+
+**Chat 2000s. Disposition: KILL.** Full record: `discovery/arcs/arc_2073_saturation_self_confirming_handoff.md`.
+Resumed 2072+1; full step-(a) honest-era re-read; `discovery/STOP` absent; OOS NEVER touched. Fresh eyes.
+
+**The one genuinely additive datum.** Arc 2072 predicted *"absent an operator action the harness will keep
+re-deriving this terminus (2073, 2074, …)."* I am 2073 and confirm it empirically. The terminus is now
+self-predicting AND self-confirming across context-isolated bootstraps — the strongest evidence an
+autonomous programme can produce that its remaining lever is exogenous (an operator decision, not more
+search). I reconcile the two protocol pulls (arc-3004/§2/§5a demonstrate-the-re-attempt + §5a/§8
+don't-grind) by doing the genuine pass and recording it minimally.
+
+**Genuine fresh-eyes pass (firsthand, not inherited).** `ls`: `passed/` EMPTY (0 PASS);
+`portfolio-candidates/` = exactly 4 (gap 1006 / me_long 1011 / fbr 1013 / me_short 1019); STOP absent.
+`DISCOVERY_DIRECTION` last touched 2026-06-06 (run 2) — NO run-3 menu since 2070-2072 closed it (run-1
+M1/O1/L1/S1/Q1/G1 arc-mapped; run-2 E1 tested→KILL 2070, E2 firsthand data-gated 2071/2072). Independent
+mechanism generation → every candidate maps to a documented closure: session-handover micro-gaps (FX has
+no intraday closure; EET boundary = thinnest hour, no footprint, 2070 + microstructure cluster
+1008/1010/2020/2027/2050/2051/3008); asymmetric-vol/leverage-effect directional → vol=magnitude-not-
+direction (1001/3012); entry-level survivor co-occurrence gate → survivor×survivor doesn't compose,
+sub-pool-floor (2066/1034); correlation-breakdown regime gate to disable the book in 2015/2018 →
+fold-sign lookahead at n=2 binding folds (2069) + relative-value closed (2003/2010/2065). The run-2
+conservation law (`frequency × per-trade-edge ≈ const` in a price-only charter) proves structurally why:
+continuous→coin-flip OR discrete→thin-rare-leg, never both fundable AND edge-positive. Convergence of an
+independent generation onto the documented wall is the arc-3004 trap inverted (cf. 2067↔1062, 2072↔tick).
+
+**Re-questioned (§2) and UPHELD.** E2 free-daily-equity fetch not run, concurring with 2071/2072:
+external source = data-foundation change (operator-gated §1/§5); EET-alignment of daily equity closes =
+Arc-10 contamination surface, canonical-adjacent code a chat FLAGS not merges (§9); EV sub-fundable.
+Overturning a sound conservative prior to "do something" is motion not progress (§8).
+
+**Verdict — KILL** (no new component; 8th consecutive 2000s terminal arc, 2066-2073). Components UNCHANGED
+(4 PORTFOLIO; me_long sole OOS-mean-robust anchor; {me_long,fbr} vehicle-optimum). Deploy object UNCHANGED.
+Deployable-system count = 0. No engine/null/council/canonical change/FLAG/BUILT tool; driver = firsthand
+`ls` + re-read.
+
+**Operator escalation (the real next event).** A chat cannot set `discovery/STOP` (§9). Either (1) set
+`discovery/STOP` for the 2000s range — in-charter frontier closed with no exceptions, eight independent
+chats confirm it; OR (2) authorize ONE enablement (info-per-dollar): E (co-sim equity curve, BUILT/in-
+review, cleanest) ≻ U (cross-asset trend basket — best fundable shot + long-vol diversifier; precond
+FundedNext tradability + gap-tail control) ≻ X (CME signed order-flow, free corr pre-test gates the build)
+≻ M (macro/rates, project-redefining); E2 (free daily-equity fetch) is the cheapest data unlock at the
+binding +2015/+2018 constraint but operator-gated.
+
+**NEW lesson.** When a range's terminal arcs begin predicting their own successors (2071→2072→2073) and
+each independent, context-isolated bootstrap re-derives the identical terminus, saturation is no longer
+merely asserted or enumerated — it is empirically self-confirming across chats, the highest grade of
+evidence that the remaining lever is exogenous. The honest response is a minimal handoff that records the
+confirmation and escalates; spawning full re-derivations past this point is the §5a grind the protocol
+exists to prevent. Convergent with arc 2066/2067/2068/2069/2070/2071/2072 + sibling 1000s 1064/1065 /
+3000s 3021 handoffs.
+
+## arc_2074 — Saturation self-confirming, 9th consecutive 2000s terminal arc (minimal handoff)
+
+**Chat 2000s. Disposition: KILL.** Full record: `discovery/arcs/arc_2074_saturation_self_confirming_handoff.md`.
+Resumed 2073+1; full step-(a) honest-era re-read; `discovery/STOP` absent; OOS NEVER touched. Fresh eyes.
+
+**The one datum I add.** Arc 2073 predicted *"absent an operator action the harness re-derives this terminus
+(2074, …)."* I am 2074 and confirm it. The terminus is self-predicting AND self-confirming across
+context-isolated bootstraps over THREE ranges — the marginal value of a further FULL re-derivation is now
+NEGATIVE (pure cost). I reconcile the two protocol pulls (arc-3004/§2 demonstrate-the-re-attempt + §5a/§8
+don't-grind) by doing the genuine pass and recording it minimally.
+
+**Genuine fresh-eyes pass (firsthand, not inherited).** `ls`: `passed/` EMPTY (0 PASS);
+`portfolio-candidates/` = exactly 4 (gap 1006 / me_long 1011 / fbr 1013 / me_short 1019); STOP absent;
+`DISCOVERY_DIRECTION` last touched 2026-06-06 (run 2), no run-3 menu. Independent mechanism generation
+(before consulting the closure list) → every candidate maps to a documented closure or operator-gated
+enablement: central-bank level/peg defense → one-off/event-risk (the 2015 SNB unpeg *is* the blocking
+fold); vol-of-vol / vol term-structure → vol=magnitude-not-direction (1001/3012) + L1 menu; intraday
+seasonality / cross-pair lead-lag → microstructure cluster (1008/1010/2020/2027/2050/2051/3008) +
+EET-boundary (2070) + relative-value (2003/2010/2065); spread mean-reversion / cost-timing → 2005/3007;
+options-implied / order-flow / macro-rates → external data, operator-gated (M/X); a 5th decorrelated
+component / 2018-positive 4th leg → unfound across EVERY route (structure 1014/2009/2011/3011, trend 3010,
+flow 1016, rel-value 2010, deep-continuation 2012, carry-unwind 1017, vol-state 3012), with the run-2
+conservation law (`freq × per-trade-edge ≈ const` in a price-only charter) the structural reason.
+Convergence of free generation onto the documented wall = the arc-3004 trap inverted (cf. 2067↔1062,
+2072↔tick, 2073↔session-handover).
+
+**Re-questioned (§2) and UPHELD.** E2 free-daily-equity fetch not run, concurring with 2071/2072/2073:
+external source = a data-foundation change (operator-gated §1/§5); EET-alignment of daily equity closes =
+an Arc-10 contamination surface, canonical-adjacent code a chat FLAGS not merges (§9); EV sub-fundable.
+Overturning a sound conservative prior to "do something" is motion, not progress (§8).
+
+**Verdict — KILL** (no new component; 9th consecutive 2000s terminal arc, 2066-2074). Components UNCHANGED
+(4 PORTFOLIO; me_long sole OOS-mean-robust anchor; {me_long, fbr} vehicle-optimum). Deploy object
+UNCHANGED. Deployable-system count = 0. No engine/null/council/canonical change/FLAG/BUILT tool; driver =
+firsthand `ls` + re-read.
+
+**Operator escalation (the real — and only — next event).** A chat cannot set `discovery/STOP` (§9).
+Either (1) set `discovery/STOP` for the 2000s range — in-charter frontier closed with no exceptions, NINE
+independent chats confirm it (the honest default); OR (2) authorize ONE enablement (info-per-dollar): E
+(co-sim equity curve, BUILT/in-review, cleanest) ≻ U (cross-asset trend basket — best fundable shot +
+long-vol diversifier; precond FundedNext tradability + gap-tail control) ≻ X (CME signed order-flow, free
+corr pre-test gates the build) ≻ M (macro/rates, project-redefining); E2 (free daily-equity fetch) cheapest
+data unlock at the binding +2015/+2018 constraint but operator-gated.
+
+**NEW lesson.** At grade-A saturation (terminal arcs predicting their own successors + every
+context-isolated bootstrap re-deriving the identical terminus across three ranges), each additional FULL
+re-derivation has *negative* marginal value. The honest steady-state is one minimal confirmation +
+escalation per bootstrap, footprint matched to the zero info delta — and the recognition that the loop
+should not keep being respawned on this range absent an operator decision. Convergent with arcs 2066-2073
++ sibling 1000s 1064/1065 / 3000s 3021 handoffs.

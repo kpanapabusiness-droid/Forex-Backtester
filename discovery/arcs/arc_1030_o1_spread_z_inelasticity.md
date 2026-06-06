@@ -127,6 +127,14 @@ null, no council spent — a §5d cheap-kill of a refinement. OOS never touched.
 
 Not invoked (cheap-kill at observation; nothing reached WFO/survivor stage).
 
+**Independent convergence (Arc-10 norm).** The concurrent 2000s arc **2027** tested the SAME O1
+spread-as-signal thread from a different angle — spread-z conditioning on a *generic* large-displacement
+fade (a new entry, n=8175) rather than as a conditioner on the surviving edges — and reached the SAME
+refutation: NON-monotone, refuted in its own direction (widest-spread z>2 displacements CONTINUE, fade
+cap 0.461, not revert). Two independent constructions, one verdict: spread-as-inelasticity is not a lever.
+2027 confirms spread is REAL/orthogonal-to-|disp| (a genuine discriminator), which makes the shared
+falsification stronger — the signal exists and simply points the wrong way.
+
 ## (i) Disposition + NEW lesson
 
 **KILL (cheap-kill at observation).** Components UNCHANGED (all 4 still PORTFOLIO). The O1 inelasticity-

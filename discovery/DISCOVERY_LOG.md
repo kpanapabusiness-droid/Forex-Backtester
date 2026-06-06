@@ -8266,6 +8266,42 @@ respawning further 2000s chats before then has ~zero marginal EV.** Components U
 deployable-system count = 0; no engine/null/council/canonical/FLAG; OOS untouched. No STOP sentinel set.
 
 ---
+**chat-1000s bootstrap re-confirmation (no new arc; 2026-06-06).** A fresh 1000s chat bootstrapped (pulled
+main, STOP absent, highest 1000s arc-id = 1062 → resume 1063) and ran the §5a/§2 fresh-eyes pass the
+protocol demands. This note is APPEND-ONLY ADDITIVE to the prior re-confirmations: rather than re-assert the
+inherited "exhausted" verdict, I **independently verified the closure by reading the actual killing arcs**
+for the dispatch's own headline frontier items, so the next 1000s chat can skip these re-checks:
+- **Up-gap weekend SHORT** (the dispatch's #1 short lead, framed there as "−0.57 ATR / 0.64 acc, the
+  stronger leg") → **already KILL at arc 1016**: that framing is the RAW unconditional drift; under the
+  honest take-the-loss i+1 lens the up-gap **continues** (capture 0.448 < 0.50; per-pair 1/5 JPY, 3/7 USD)
+  and **2015/2018 both fail** the acceptance test. The dispatch's WHERE-TO-LOOK list reflects pre-test raw
+  observations (arcs 2001/2003); the honest tests already killed them.
+- **Intraday/session axis** → fully mapped dead across four constructions: Asian-range/London-open break
+  (3016), session/overnight inventory reversal (1026), London-open sweep-and-reversal "judas swing" (2050),
+  session drift (1047). H1 cost wall (~2× H4) compounds the sub-edge.
+- **Relative-value / market-neutral** (dispatch item) → dead on all three forms: single-leg laggard (2003),
+  cross-sectional ranking + reversal mirror (2065 — pooled capture 0.456, no SL∈{1,1.5,2,2.5} clears 0.50),
+  triangulation residual (1054 — σ 4–7× sub-cost down to M1).
+- **Regime-orthogonal 5th leg** → closed on BOTH axes: weighting (2022 dilemma proof) AND construction
+  (trend-resumption 1060 and direction-agnostic convexity/straddle 1062 both fail the binding 2015 fold).
+- **Portfolio combination** → the 4-way book's AFP failure is FUNDAMENTAL not a combiner artifact (co-sim
+  item E; arc 2019/3021 variance-floor proof).
+Every OHLC-constructible mechanism I could generate maps to a specific killing arc or to a
+`NEEDS_ENABLEMENT` item — no candidate is both OHLC-constructible AND unmapped. The arc-3004 anti-"apparatus
+incapable" guard is satisfied: the closure is mechanistically explained (unified theory — real FX edges are
+rare forced-flow dislocations off a large surprise spot displacement at an identifiable institutional flow;
+everything else is coin-flip-at-cost) and triangulated across all three chats + multiple bootstraps, not
+premature. **Deliberately declined to manufacture a low-EV arc** (would re-grind §5a closed ground) or to
+duplicate the exhausted decision-support lane. **Surfaced the genuine operator-side fork interactively**
+(path-A gate-governance memo — the §5g-firewalled call that could deploy the sound ~3-bet mean-positive book
+me_long+fbr+gap, t>2 / CI excludes 0 per 1043/1056/2021 / `NEEDS_ENABLEMENT` charter unlock E·D·C·M /
+keep-grinding / STOP); the operator did not select, so per §8 (never block on the operator) this chat hands
+back rather than grinds. **Operator signal stands: the next productive move is operator-side — the path-A
+gate-governance call OR a charter unlock — and respawning further within-charter 1000s chats before then has
+~zero marginal EV.** Components UNCHANGED (all 4 PORTFOLIO); deployable-system count = 0; no
+engine/null/council/canonical/FLAG; OOS untouched. A fresh chat resumes at arc 1063 via the bootstrap;
+absent an operator unlock it lands on the same proven floor. No STOP sentinel present (only the operator
+sets it, §9).
 **chat-2000s bootstrap re-confirmation #3 (no new arc; 2026-06-06).** A FOURTH consecutive 2000s bootstrap
 (pulled main, STOP absent, highest range arc-id = 2065 → resume 2066) ran the §5a/§2 fresh-eyes search
 before opening anything: re-read protocol, the full Tier-1 ledger, recent Tier-2 (2059–2065, 1061, 1062),

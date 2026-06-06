@@ -171,6 +171,32 @@ cost-robust 4-way" to "weakly-positive, not-significant, early-loaded, thin-cush
 on EVERY axis under BOTH the committed and the honest-exit reading; the deployability decision is the
 operator's path-A call, with the full pillar suite now quantified as reading-dependent.
 
+## CONVERGENCE — independent concurrent reproduction (arc 1044, 1000s chat)
+
+The 1000s chat ran the diversification slice of F2 concurrently (arc 1044, landed on main at my
+push). **Same direction, complementary methods + one methodological reconciliation (Arc-10 defense):**
+- **Agreement:** both find the diversification pillar is exit-optimistic — 2 of 4 legs (gap, me_short)
+  mean-negative under honest exits, me_long + fbr carry the book, and the book is not significant
+  (1043). Both conclude the portfolio thesis SURVIVES IN WEAKENED FORM, not collapses.
+- **ENB reconciliation (the one numeric "discrepancy" — resolved, not a conflict):** I report honest
+  ENB **~2.7–2.9**, arc 1044 reports **~1.8**. The difference is the matrix: I used arc-2019's
+  **CORRELATION** matrix (trace=4; isolates decorrelation STRUCTURE) and **reproduced arc-2019's
+  committed ENB 3.31/4 + top-eig 38.9% EXACTLY** as the anchor; arc 1044 used the **COVARIANCE** matrix
+  (variance-weighted effective bets). Both are valid, and they say complementary things: under
+  arc-2019's own definition the decorrelation structure largely HOLDS (~2.8), but variance-weighted the
+  count drops further (~1.8) because honest fbr's high variance dominates the book. The honest takeaway
+  is the same — diversification is weaker than the committed 3.32 — measured two ways.
+- **Book-comparison triangulation (complementary, both correct):** arc 1044 compared the 4-way book vs
+  **me_long SOLO** and found the book BEATS solo on risk-adjusted Sharpe under conservative metrics
+  (fbr's −0.44…−0.65 correlation with me_long adds real variance reduction). I [A4] compared the 4-way
+  book vs the **2-leg me_long+fbr** and found the 2-leg BEATS the 4-leg (gap+me_short drag). Together
+  these pin the honest sweet spot precisely: **{me_long + fbr}** — adding fbr to me_long HELPS (1044),
+  adding gap+me_short to {me_long,fbr} HURTS (this arc). The honest deploy object is the 2-leg
+  me_long+fbr book (still not all-folds-positive → no survivor).
+- **Combined statement:** F2 is now resolved by two chats — diversification weaker (ENB
+  3.32→~1.8 covariance / ~2.8 correlation), temporal stability gone, cost cushion quartered — and the
+  honest book is best expressed as the decorrelated 2-leg me_long+fbr, weakly-positive, not significant.
+
 ## (k) Re-orient
 
 Detail persisted (this doc + DISCOVERY_LOG append, committed + pushed). Tools: REUSED

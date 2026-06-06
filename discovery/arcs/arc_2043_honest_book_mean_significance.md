@@ -167,6 +167,26 @@ statistically significant under honest exits* — not the headline t=2.66.
 committed component). Lever unchanged = operator path-A gate-governance call. No canonical change, no
 new BUILT tool, no council, **no OOS** (book fails IS AFP; §5g operator firewall).
 
+## CONVERGENCE — independent concurrent reproduction (arc 1043, 1000s chat)
+
+The 1000s chat resolved the SAME arc-1042 F3 concurrently (arc 1043, landed on main at push). **Same
+verdict, complementary method** (Arc-10 independent-reproduction):
+- **Agreement:** both reproduce the committed anchor (RP t=+2.16, CI strictly >0 ≡ arc 1023) and both
+  conclude the honest §5f book mean is **positive but NOT statistically significant — every CI spans
+  zero** under every metric/weighting. F3 is resolved the same way by two chats with different code +
+  seeds.
+- **Complementary, not redundant:** arc 1043 held **n=10 constant** (fold-bootstrap of all 10 IS folds
+  incl. warmup, seed 42) → honest t ∈ [0.83, 1.52], isolating the *pure exit effect* (committed
+  2.16 → honest ~1.3 at constant n). This arc used the **8 EVALUABLE folds** (seed 123) — the
+  genuinely no-lookahead honest series, since warmup folds use the frozen full-sample pick = not honest
+  → honest t ≤ 0.96, and explicitly **decomposed the two confounds** (n-effect: committed RP
+  2.16→1.28 at n=8; exit-effect on top: →0.96) plus the **Part-3 diversification finding** (no leg
+  individually significant even committed). arc 1043 added the valuable **F2**: arcs 2021 (temporal),
+  3022 (cost-κ), 2019 (ENB) were ALL computed on committed-exit series → owed an honest-exit recheck.
+- **Combined statement:** the honest series is non-significant whether measured at n=10-with-warmup
+  (1043's ~1.3) or n=8-honest-evaluable (this arc's ≤0.96); the significance pillar is gone under
+  honest exits by two independent paths.
+
 ## (i) NEW lesson
 
 For a thin, mean-positive PORTFOLIO book whose edge is a **diversification effect across thin

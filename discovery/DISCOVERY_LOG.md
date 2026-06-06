@@ -8208,3 +8208,40 @@ respawning further 2000s chats is low until an operator-side decision is made** 
 the path-A gate-governance call OR authorizing a charter unlock, both human decisions. Components UNCHANGED
 (all 4 PORTFOLIO); deployable-system count = 0; no engine/null/council/canonical/FLAG; OOS untouched. No STOP
 sentinel set (only the operator sets it, §9).
+
+---
+**chat-1000s bootstrap re-confirmation (no new arc; 2026-06-06).** A fresh 1000s chat bootstrapped into the
+identical state (pulled main, STOP absent, highest 1000s arc-id = 1062 → resume point 1063) and, before
+opening any arc, executed the §5a/§2 fresh-eyes pass the protocol demands: re-read the full Tier-1 ledger
+(arcs 0–1062), recent Tier-2 reasoning, `LESSONS.md`, `TOOL_REGISTRY.md` (canonical + all BUILT tools),
+`DISCOVERY_DIRECTION.md`, `NEEDS_ENABLEMENT.md`. **Independent finding CONVERGES with the concurrent chat-2000s
+re-confirmation (8 lines up) and the 3000s handoffs: the within-charter (OHLC-only / FundedNext / take-the-loss /
+AFP) frontier is exhausted.** Did NOT stop at assertion — generated a fresh candidate set and mapped each to its
+killing lesson (so the next 1000s chat need not re-generate them): **(i) fair-value-gap / 3-bar-imbalance reclaim**
+→ a non-survived level, so by arc-2029's "significance-by-survival" mechanism it holds no concentrated stops →
+coin-flip (the structural-level family, dead 2029/1010/1034); **(ii) Wyckoff secondary-test refinement of fbr**
+(shallower re-dip holding above the swept low) → an fbr ENTRY-quality conditioner, closed on every axis already
+(2014/2017/2020/1025/2030/1040/3013/3020/2052/1055/2029/2030); **(iii) daily-open / rollover micro-gap fill** →
+the fix/daily-flow magnitude territory, sub-cost (1051/3008/2025); **(iv) correlation-break catch-up between
+co-moving majors** → relative-value, closed on all three forms (single-leg 2003, cross-sectional 2065,
+triangulation 1054 — laggard continues, no reversion, doubled cost); **(v) turn-of-month / index-rebalance
+directional drift** → tested sub-cost (1005) / instrument-neutral (IMM 2057) / priced-in (2026); **(vi)
+equity-month-return-conditioned WMR rebalancing magnitude on me_long** → genuinely untested but DATA-GATED (the
+histdata corpus is 28 FX pairs only, no equity series — verified 2033/1047), so it is a `NEEDS_ENABLEMENT` item,
+not within-charter, and is a lower-prior variant of the existing queue's C/J (regime-conditioning a ~cost base
+edge, the axis that has failed across every internal proxy). No candidate is both OHLC-constructible AND not
+already mapped — so a test would re-grind §5a closed ground, not probe an open corner. This satisfies the
+arc-3004 anti-"apparatus incapable" guard: the closure is triangulated and mechanistically explained across all
+three chats (the unified theory — real FX edges are intrinsically-rare forced-flow dislocations keying off a
+LARGE SURPRISE spot displacement at an identifiable institutional flow; everything else is coin-flip-at-cost),
+not premature. Also confirmed the deployment dossier is complete on every axis (mean 1042 / significance
+2043·1043·1056·1057 / diversification·ENB 1044·2044 / temporal 2021·2044 / cost-κ 3022·2044 / vehicle geometry
+at solo·2·3·4-leg × IS·OOS 1033·2033·2045·2053–2060·1053 / tail-robustness 1057·1058·2063·1058 / gate-coarsening
+path-A map 1032 / AFP noise-floor 2016·2017·2019·1023) → the decision-support lane is also exhausted; appending
+another would duplicate it. **Per §8 (never block on the operator) the genuinely highest-EV next actions are
+OPERATOR-side — the path-A gate-governance call (adopt a mean/pooled/CI gate vs keep strict AFP; §5g firewalls
+this from an autonomous chat) OR a `NEEDS_ENABLEMENT` charter unlock (D limit-fill / C calendar / J COT / M
+macro-rates / E co-sim) — not another within-charter arc.** A fresh chat resumes at arc 1063 via the bootstrap;
+absent an operator unlock the marginal EV of new 1000s arcs is low. Components UNCHANGED (all 4 PORTFOLIO);
+deployable-system count = 0; no engine/null/council/canonical/FLAG; OOS untouched. Handoff is due to fresh-eyes
+exhaustion, not a STOP sentinel (none present — only the operator sets it, §9).

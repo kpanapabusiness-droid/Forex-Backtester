@@ -94,6 +94,7 @@ at arc step (i).
 | 2026 | 2000s | 2026-06-05 | **Japanese FISCAL-YEAR-END (31 March) repatriation** — a multi-WEEK, LARGE-displacement, calendar-anchored forced flow (distinct from the sub-cost intraday fix flows 2025/3008, and from price-triggered `me`): Japanese institutions close books 31 March → repatriate foreign assets / settle hedges → JPY-BUYING into the fiscal year-end → JPY-pairs should FALL (JPY strengthens) into 31 March. The arc-2024/2025 hypothesis (a LARGE-displacement forced flow CAN clear cost) tested on a new instance; candidate risk-off-ish decorrelated component. FALSIFIED — **hypothesis INVERTS at obs** (4 JPY pairs, D1, IS, last-10-bar JPY-strength drift, March vs other month-ends). **JPY WEAKENS into March-end, the OPPOSITE of repatriation-strength:** March jpy_strength NEG on all 4 (−0.10..−0.59 ATR), March EXCESS NEG on all 4 (−0.10..−0.62) — robust across the JPY leg; **AND coin-flip per-year** (March>0 only 4-6/11; frac+ 0.36-0.55; n=11/pair thin). Mechanism: the well-known scheduled repatriation is FRONT-LOADED into Feb/early-March → by the actual year-end the JPY-buying is done and the late-March approach sees squaring/reversal → JPY weakness = a textbook "the flow everyone knows is in the price" (2015 is the lone +JPY-strength March on all 4, an SNB/EUR-collapse idiosyncratic risk-off, not a March tell; 2018 mixed-neg). Wrong-sign + coin-flip + thin → no above-cost entry, §5f doesn't bite. **NEW lesson — the TWO failure modes of known-calendar forced flows: (i) SUB-COST (displacement too small — the fix-flow family 3008/2025) or (ii) PRICED-IN (displacement large enough but the flow is anticipated → front-run → realized move at the date is coin-flip-to-reversed — this arc).** The corpus's surviving edges (gap/me/fbr) avoid BOTH by keying off a SURPRISE displacement (weekend gap / ≥1-ATR move into the fix / deep stop-sweep), NOT a known calendar date → tradeability needs LARGE displacement AND not-fully-anticipated; a known date supplies at most one. Sharpens the arc-2024/2025 unifying read. Operative frontier unchanged (operator path-A). Components UNCHANGED. No engine/null/council. OOS untouched | n/e | n/e | n/e | n/e | n/e | 11 March / 121 other month-ends ×4 pairs | KILL (obs cheap-kill; hypothesis inverted / priced-in) | N | KILL |
 | 2027 | 2000s | 2026-06-06 | **Spread-as-SIGNAL: liquidity-vacuum displacement reversion** — the untested O1 / Divergent-lens "bid-ask spread as a signal, not a cost" sub-thread (arc 1029 closed only the calendar-density inelasticity proxy; spread-z left open, cost-trap-flagged). because: a large 1-bar displacement is ambiguous — (i) fundamental repricing (tight spread → CONTINUES) vs (ii) liquidity-vacuum spike (flow hits a thin book → spread BLOWS OUT → REVERTS as liquidity returns); arc 2016 killed *generic* vol-shock fade because it lumped (i)+(ii), and spread is the lag-free discriminator. Candidate THICK fold-resolving standalone (arc-2017 option B). **PRECONDITION PASSES — spread is REAL, not synthetic** (H4 4 majors, all data_quality ok; EURUSD med 0.50/p99 5.0/max 19.9p, GBPUSD med 1.1/p99 9.4; corr(spread,bar_range) weak −0.08..+0.15 → spread ORTHOGONAL to |disp|, a genuine discriminator). **FALSIFIED at obs** (large-disp pop |Δmid|/ATR≥1.0, spread_z causal trailing-100, FADE = down→long/up→short via canonical observe_long_capture, IS n=8175). **NON-MONOTONE — refuted in its own direction:** fade cap by spread_z = ≤0:0.476 / 0–1:0.480 / 1–2:0.525 / **>2 (widest, n=393):0.461** — the clearest liquidity vacuums CONTINUE (robust at DISP 1.0 AND 1.5), opposite the thesis. No magnitude confound (|disp| flat 1.53→1.63 across buckets). The lone reverting band (1–2 sd, n=118) is **thin-tail/pair-mix NOISE** (EURUSD n=11 +1.67 & USDJPY n=19 +1.49 carry it; bulk AUDUSD n=58 flat +0.052; GBPUSD n=30 NEG −0.386; per-year single-trade folds). Continuation/spread-momentum framing also dead (widest-spread cont cap ~0.539, drift +0.063 ATR sub-cost w/ highest entry cost, pair-mixed). Coin-flip cap → §5f doesn't bite; §5d cheap-kill, no engine/null/council (cf. 2016/3016/1014). **Closes the O1 spread-as-signal sub-thread** (precondition-verified, so mechanism not data). **NEW lesson: spread-blowout is entangled with REAL repricing, not revertible inelasticity (spread-side completion of 2016 + cost-timing 3007/2005) — on H4 FX spread co-moves with INFORMATION, not fillable air-pockets → spread stays a COST, never an alpha; a revertible dislocation needs a STRUCTURAL tell (swept level/gap/fix), the order-flow-imbalance tell (spread) does not separate the revertible subset.** Operative frontier unchanged (operator path-A, arc 2019/3021). Components UNCHANGED. OOS untouched | n/e | n/e | n/e | n/e | n/e | 8175 large-disp fade obs (IS, 4 majors) | KILL (obs cheap-kill; spread-as-signal closed) | N | KILL |
 | 2028 | 2000s | 2026-06-06 | **L1: triangulation residual SECOND MOMENT (OU amplitude)** — the LAST untested DISCOVERY_DIRECTION menu door. Arc 3005 killed the cross-rate residual LEVEL (mean≈0) and 1027/2023 the driver-shock first moment (both = DIRECTION); the residual's VARIANCE as a convergence/OU harvest was never traded. because: triangular arb pins the residual MEAN to ≈0 but the residual is the diff of 3 asynchronously-updating quotes → its AMPLITUDE spikes when a leg is stale (session handover/one-ccy news/fix); behaves as mean-reverting OU around 0 → harvest the amplitude (one-leg quoted-cross convergence trade at \|z\|>2), not direction. Falsifier: find a resolution where half-life<~5 bars AND amplitude σ>single-cross cost on >~5% of bars. FALSIFIED at obs (reused BUILT `triangle_log_residual_bp`, 3 JPY triangles EUR/GBP/AUD-JPY≡XXXUSD×USDJPY, **H1** the cost-wall resolution, IS, n≈68k/triangle). **(1) OU half-life ≈0.6–1.1 bars — reverts WITHIN one H1 bar** (entry is next-bar → convergence gone before you act). **(2) amplitude arb-bounded sub-cost:** resid std 0.57–0.80bp, \|r\| med 0.12–0.14bp vs cross spread 1.2–1.9bp (~10×); \|r\|>1×spread on only **1.2–4.3%** of bars (<5% falsifier), σ<spread. **(3) loses on cost at the extreme trigger:** at \|z\|>2 (n≈3k) harvest \|r\| 1.5–1.9bp vs RT cost ~3.7–5.7bp (2×1.5×-spread) = **~2–3× below cost.** M1 NOT loaded (reasoned): amplitude is arb-pinned (can't grow) while spread cost RISES finer (H1 wall ~2×H4) + half-life already sub-bar → monotone against tradeability (H4 3005 1.3–6.1% → H1 1.2–4.3%), door already shut. §5f doesn't bite (no above-cost entry); §5d cheap-kill, no engine/null/council. **FULLY CLOSES the triangulation thread: level (3005) + driver-shock 1st moment (1027/2023) + 2nd-moment/OU amplitude (this arc).** NEW lesson: triangular arb pins BOTH moments out of reach — the mean to ≈0 (direction dead) AND the amplitude below the cross spread with sub-bar half-life (variance dead); the same arb that creates the transient dislocation collapses it faster than the spread can be paid → an arb-enforced residual is untradeable in EITHER moment. Generalizes the H1 cost wall from discrete-flow events to the continuous cross-rate identity. **Autonomous explore-now menu now exhausted** (M1/O1/L1/Q1/G1 closed; S1 = non-standalone modifier). Lever unchanged = operator path-A. Components UNCHANGED. OOS untouched | n/e | n/e | n/e | n/e | n/e | ~205k H1 residual bars (3 triangles) | KILL (obs cheap-kill; triangulation fully closed) | N | KILL |
+| 2029 | 2000s | 2026-06-06 | **Prior-day / prior-week-low sweep-reclaim — is "human-watched liquidity" a CLEANER fbr?** Not a menu item: a fresh extension of the corpus's ONLY clean directional structural edge (fbr 1013, PORTFOLIO). fbr longs a sweep-and-reclaim of a rolling-40-bar swing low (swept stops below a visible level → failed breakdown → reclaim). That reference is ALGORITHMIC; the levels human desks/retail actually mark + cluster stops at are the prior-DAY low (PDL) and prior-WEEK low (PWL). because: if fbr is about concentrated resting liquidity getting grabbed, the most-watched calendar-anchored levels should hold MORE concentrated stops → a cleaner higher-conviction grab-reversal. Prediction: PDL/PWL honest +1R capture should EXCEED fbr's (0.52–0.61). FALSIFIED 3 ways (obs cheap-kill, H4 4 majors, IS 2010–2020, shadow≥1.0, canonical `observe_long_capture`; fbr-swing reproduced as anchor cap 0.547/drift +0.086). **(1) PDL is WEAKER not stronger** (n=424 cap 0.524<0.547, drift −0.007≈0). **(2) PWL marginally higher capture but 70% the SAME trades** (n=175 cap 0.560, drift +0.003≈0; PDL∩fbr 38%, PWL∩fbr 70%) — mostly fbr re-tagged. **(3) the genuinely-DISTINCT part is a pure coin-flip** (§5f-decisive): PDL∧¬fbr n=261 cap **0.502** drift −0.052; PWL∧¬fbr n=52 cap **0.500** drift −0.221. Both pair-mix confounds (arc-2011/3011 tell: PDL∖fbr GBPUSD 0.571 vs AUDUSD 0.486/USDJPY 0.449/EURUSD 0.479 — 3/4 sub-0.50; per-year drift neg 6/11). §5f doesn't bite (distinct base is coin-flip, no non-coin-flip entry for the engine); §5d cheap-kill, no engine/null/council (matches 2016/2027/2028). MECHANISM: **significance-by-survival beats calendar-anchoring** — a rolling-K-bar swing low that is STILL INTACT has survived K bars of testing = genuinely dense resting stops; PDL/PWL are mechanically refreshed every day/week regardless of significance → bulk are trivially-recent low-significance levels → no concentrated stops → capture collapses to 0.50 once fbr's survived-swing subset is removed. fbr's reference is the BETTER liquidity proxy; the survival filter is load-bearing. STRENGTHENS arc 1013 (isolates WHY it works), does not extend the book. Components UNCHANGED (all 4 PORTFOLIO). Lever unchanged = operator path-A | N | n/e | n/e | n/e | n/e | 424 (PDL obs pop; 261 distinct-from-fbr) | KILL (obs cheap-kill; PDL/PWL not a cleaner fbr) | N | KILL |
 
 ---
 
@@ -4376,3 +4377,70 @@ UNCHANGED.
 
 **Tooling:** no new tool — canonical `Panel.from_pairs`, `mid_close`, BUILT `triangle_log_residual_bp`
 only; no TOOL_REGISTRY append. **FLAGS:** none. Driver: `_arc2028_work/` (scratch, not committed).
+
+### arc_2029 — prior-day / prior-week-low sweep-reclaim: is "human-watched liquidity" a cleaner fbr?
+
+**Why this arc.** Arc 2028 closed the last `DISCOVERY_DIRECTION` menu door and noted the autonomous
+`explore-now` menu is exhausted. But "the apparatus is incapable / we're out of ideas" is the exact
+search-ending trap the arc-3004 council flagged, and the dispatch + frontier explicitly invite
+**extending the arc-1013 deep-structural template** — `fbr`, the corpus's ONLY clean directional
+structural edge (PORTFOLIO: IS 9/10, OOS +0.94%, structure control-proven) — with a documented *because*.
+This arc is NOT a menu item; it is a fresh, mechanism-grounded extension of the one directional win.
+
+**The because.** fbr longs a sweep-and-reclaim of a rolling-40-bar swing low: resting sell-stops cluster
+below a visible swing low, a bar pierces it (sweeps the stops) and closes back above with a deep rejection
+wick (failed breakdown), so the down-move was liquidity-driven and the reclaim confirms the adverse
+excursion is over at entry. The reference level it uses is an *algorithmic* construct. The levels human
+desks and retail platforms actually mark and cluster stops at are the **prior-day low (PDL)** and
+**prior-week low (PWL)** — the single most-watched intraday/swing references in FX. If the fbr edge is
+about concentrated resting liquidity getting grabbed, the most-watched calendar-anchored levels should
+hold *more* concentrated stops → a cleaner, higher-conviction grab-reversal. **Falsifiable prediction:**
+honest +1R capture at a PDL/PWL sweep-reclaim should EXCEED fbr's rolling-swing capture (0.52–0.61).
+
+**What I did.** H4, the 4 cached majors (AUDUSD/EURUSD/GBPUSD/USDJPY), IS 2010–2020. Per bar, computed
+ex-ante (no-lookahead): PDL = min `low_bid` of the prior completed EET trading day
+(`utc_to_eet_trading_day`, factorized integer day-ids, prior-group `.shift(1)`); PWL = min `low_bid` of
+the prior completed ISO week; fbr-swing = rolling-40 `low_bid.shift(1).min()` (arc-1013 reference,
+reproduced as the anchor). Fire (each level) = `low_bid<level & close_mid>level & shadow≥1.0·ATR` — the
+fbr sweep-reclaim test, identical except the level. Scored honest +1R-before-SL capture + 24-bar drift via
+canonical `observe_long_capture` (gross, characterization only — NOT a gate), plus the decisive
+distinct-from-fbr subsets (`PDL∧¬fbr`, `PWL∧¬fbr`). (NB: first PDL pass fired n=0 — a tz bug, prior-day-low
+keys were tz-aware Timestamps mapped against a tz-naive index → all-NaN; fixed with factorized integer
+day-ids and re-run. Caught because a real "never sweeps yesterday's low" is implausible.)
+
+**What happened — FALSIFIED three ways** (baseline unconditional capture ≈ 0.4877):
+- fbr-swing anchor: n=287, cap **0.547**, drift **+0.086** (reproduces arc 1013's 0.52–0.61 band).
+- **(1) PDL is WEAKER, not stronger:** n=424, cap 0.524 (< fbr 0.547), drift −0.007 ≈ 0 — the
+  prediction's *direction* is refuted at the population level.
+- **(2) PWL marginally higher capture but mostly the SAME trades:** n=175, cap 0.560, drift +0.003 ≈ 0;
+  70% of PWL fires are also fbr fires (PDL 38%) — PWL is largely fbr re-tagged, and its drift is ≈ 0
+  vs fbr's +0.086.
+- **(3) the genuinely-DISTINCT part is a pure coin-flip** (the §5f-decisive check): `PDL∧¬fbr` n=261 cap
+  **0.502** drift −0.052; `PWL∧¬fbr` n=52 cap **0.500** drift −0.221. The new trades PDL/PWL add beyond
+  fbr capture at exactly 0.50 with zero/negative drift.
+- Both are **pair-mix confounds** (arc-2011/3011 tell): PDL∖fbr per-pair GBPUSD 0.571 vs AUDUSD 0.486 /
+  USDJPY 0.449 / EURUSD 0.479 (3 of 4 sub-0.50); per-year drift sign flips yearly, negative in 6 of 11.
+
+**Why it really fails (the mechanism).** **Significance-by-survival beats calendar-anchoring for
+liquidity-grab edges.** A rolling-K-bar swing low that is *still intact* is a level that has SURVIVED K
+bars of testing — that survival is exactly what makes it a genuinely dense, much-watched pool of resting
+stops. The prior-day / prior-week low is *mechanically refreshed every day/week regardless of structural
+significance*, so the bulk of PDL/PWL sweeps occur at trivially-recent, low-significance levels with no
+concentrated stops → no reliable grab-reversal (capture collapses to 0.50 once fbr's survived-swing subset
+is removed). So fbr's rolling-swing reference is NOT an arbitrary algorithmic choice to be improved upon —
+it is the *better* liquidity proxy because the survival filter is load-bearing; the calendar anchor removes
+that filter and dilutes quality (PDL adds n=424 vs fbr 287, but the marginal trades are noise).
+
+**Verdict — KILL (obs cheap-kill, §5d).** §5f does not bite: the distinct base is a coin-flip (0.50,
+drift ≈ 0), so there is no non-coin-flip entry to put on the engine; no engine / null / council spent
+(matches 2016/2027/2028). This closes the single most natural extension of the corpus's one directional
+win — **prior-day / prior-week-low sweep-reclaim is not a cleaner fbr** — and STRENGTHENS arc 1013 by
+isolating *why* it works (the swing-survival significance filter, not the calendar visibility of the level).
+
+**Threads.** None on the reference-level axis (swing-survival is the load-bearing feature; calendar-anchored
+levels dilute it). The operative deployability lever remains operator **path-A (gate-governance)** on the
+existing mean-positive, cost-robust, ~3-bet 4-component book. Components UNCHANGED (all 4 PORTFOLIO).
+
+**Tooling:** no new tool — canonical `Panel.from_pairs`, `observe_long_capture`, `utc_to_eet_trading_day`,
+BUILT `_atr_shift1_mid` only; no TOOL_REGISTRY append. **FLAGS:** none. Driver: `_arc2029_work/` (scratch,
+not committed).

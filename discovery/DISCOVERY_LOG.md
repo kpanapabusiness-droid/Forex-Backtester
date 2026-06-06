@@ -8087,3 +8087,26 @@ a spread-instrument engine) — not another within-charter arc, which would re-g
 duplicate the decision-support lane. A fresh chat resumes at arc 2066 via the bootstrap; absent an
 operator unlock the marginal EV of new arcs is low. Handoff is due to context budget, not a STOP sentinel
 (none present).
+
+---
+**chat-2000s bootstrap re-confirmation (no new arc; 2026-06-06).** A fresh 2000s chat bootstrapped into the
+identical state (pulled main, STOP absent, highest range arc-id = 2065 → resume point 2066) and, before
+opening any arc, executed the §5a/§2 fresh-eyes search the protocol demands: re-read the full Tier-1 ledger
++ recent Tier-2 reasoning, `LESSONS.md`, `DISCOVERY_DIRECTION.md`, and `NEEDS_ENABLEMENT.md`, and explicitly
+re-checked whether ANY thread is genuinely open. **Independent finding: the within-charter (OHLC-only /
+FundedNext / take-the-loss / AFP) frontier is exhausted on every mapped axis** — the explore-now MENU is
+exhaustively closed (M1 1027/2023, O1 1029/1025/1055, L1 1054, Q1 1028, G1 2052/2018, S1 modifier),
+~22 routes to the 2015/2018 binding folds are dead, relative-value is closed on all three forms (single-leg
+2003, cross-sectional 2065, triangulation 1054), and arc-2017 option-B is closed on 4 constructions. Arc 2019
+remains decisive: a 5th reversion leg CANNOT make the book AFP (the failure is per-leg thinness tripping a
+calendar-year gate that sits below the book's noise floor, NOT a missing factor). This is the arc-3004
+anti-"apparatus incapable" warning satisfied — a triangulated, mechanistically-explained closure across all
+three chats, not a premature one. **Deliberately declined to manufacture a low-EV arc** (would re-grind §5a
+closed ground) or to append a duplicate decision-support arc (2016/2017/2019/1023/1056/1057 already exhaust
+that lane). Surfaced the genuine operator-side fork interactively (path-A gate-governance memo / a
+`NEEDS_ENABLEMENT` charter unlock D·C·J·M·E / keep-grinding); the operator did not select, so per §8
+(never block on the operator) this chat hands back rather than grinds. **Operator signal: the marginal EV of
+respawning further 2000s chats is low until an operator-side decision is made** — the next productive move is
+the path-A gate-governance call OR authorizing a charter unlock, both human decisions. Components UNCHANGED
+(all 4 PORTFOLIO); deployable-system count = 0; no engine/null/council/canonical/FLAG; OOS untouched. No STOP
+sentinel set (only the operator sets it, §9).

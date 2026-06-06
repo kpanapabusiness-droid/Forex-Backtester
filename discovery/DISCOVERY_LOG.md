@@ -91,6 +91,7 @@ at arc step (i).
 | 3022 | 3000s | 2026-06-05 | **COST-ROBUSTNESS (cost cushion) of the 4-component book — the last unmapped axis after noise (2016/2017/1023), time (2021), densification (3021).** Every "sub-cost" kill AND the book's "mean-positive **net of costs**" pass is measured at ONE cost point (FundedNext); the deploy conclusion's robustness to that single assumption was never checked, and the book's *net* edge is small vs gross → cushion could be thin. Re-net each component's gross per-fold `RunResult` at a κ-multiplier of the FundedNext cost VECTOR (BUILT `scaled_fundednext(κ)`; cost MATH canonical via `build_fold_stats_from_run`, no engine re-run — A1 trade set is gross-geometry-invariant). All 4 components reproduce **BYTE-EXACT** at κ=1 (gap +0.685/me_long +0.232/fbr +1.854/me_short +0.683; risk-parity book **+0.589% = arc 2019 exact**) — caught that default per-currency=2 cap is load-bearing (None-override inflated gap to +1.23%). **RESULT — the book's mean edge is COST-ROBUST, NOT knife-edge: break-even κ = 3.32** (book mean→0 only at 3.3× FundedNext cost; cost eats **30% of gross, 70% survives**; positive out to ~3× FN). **AND the AFP failure is NOT a cost artifact — the book is 2/10 NEG even COST-FREE (κ=0)** → cost is not the wall, the per-year gate vs thin components is (independent confirmation of 2016/2017 from the cost angle; n_neg climbs 2→7 across κ 0→5 but the failure pre-exists at zero cost). Per-component cushion ordering is mechanism-meaningful: gap **2.10** (cost-FRAGILE, 47.6% drag, H4/frequent/JPY-cross — the corpus's most cost-exposed leg, ties arc 1009 fragility) < me_long 2.38 < fbr 3.84 < me_short **5.84** (17% drag, D1/infrequent/overshoot); risk-parity down-weights the fragile gap (0.077) so the BOOK cushion (3.3) > its weakest leg — variance-optimal weighting is also cost-optimal here. **Net for path-A: the deploy case now has 3 robustness legs — mean-positive (t=2.66, 1023) + temporally-stable (2021) + cost-robust (this arc) — and AFP-failure is confirmed cost-independent; path-A unblocked of the cost objection, path-B stays closed (3021).** NEW lesson: separate cost-robustness-of-the-MEAN from gate-satisfiability (a book can survive 3× cost yet its per-year gate be cost-SENSITIVE — moot once the gate fails cost-free). Components UNCHANGED (all 4 PORTFOLIO); gate NOT loosened; no OOS, no council | n/e | n/e (not earned) | book κ=0 −0.265% (2/10 neg even cost-free) | n/e | book break-even κ=3.32 | 396+121+172+145 | DIAGNOSTIC → KILL (no new component; book cost-robust but stays strict-gate FAIL; informs path-A) | N | KILL |
 | 2025 | 2000s | 2026-06-05 | **GOTOBI (五十日) Tokyo-fix settlement flow** — a documented, calendar-anchored, regime-ORTHOGONAL intra-month forced flow distinct from arc 3008's month-end London WMR fix: on days÷5 (5/10/15/20/25+month-end) Japanese corporates settle in USD → USD-buying into the 09:55 JST (00:55 UTC) Tokyo fix → USD-vs-JPY drifts up the Tokyo morning. A thick (~6/mo), calendar-driven candidate component if > cost. FALSIFIED at obs (4 JPY pairs USDJPY/EUR/GBP/AUD-JPY, H1, IS; the 00:00-UTC fix-spanning bar open→close vs non-gotobi). **The effect is REAL & mechanism-consistent:** gotobi-day fix-bar mean POSITIVE on ALL 4 pairs (+0.10..+0.28p) while non-gotobi Tokyo mornings are NEGATIVE (−0.13..−0.97p) — normal Tokyo morning drifts down, gotobi flips it up; gotobi EXCESS +0.24..+1.14p (strongest on JPY crosses; EURJPY even +2018 +1.05p, 8/11 folds). **DECISIVE: ~10–60× SUB-COST** — drift +0.1..+0.28p « ~3–6p H1 RT cost on every pair; frac+ ≈0.50-0.52 (tiny mean, not a directional bet). Resolution-invariant (M1 captures only the pre-fix leg, still « cost; cf. arc-2002 TF-invariance). §5f doesn't bite (no above-cost entry). **Closes the Gotobi/intra-month Tokyo-fix flow, complementing arc 3008 (month-end WMR fix) → the FIX-FLOW FAMILY is real-but-sub-cost (2 independent fixes, same verdict).** NEW lesson: pure calendar-fix flows are sub-pip-to-~1-pip = an order of magnitude below FX spread+commission → un-capturable net; the corpus's surviving edges (gap/me/fbr) clear cost only because they condition on a LARGE (≥1 ATR) displacement. Operative frontier unchanged (operator path-A). Components UNCHANGED. No engine/null/council. OOS untouched | n/e | n/e | n/e | n/e | n/e | 561 gotobi / 2287 non-gotobi bars ×4 pairs | KILL (obs cheap-kill; fix-flow family sub-cost) | N | KILL |
 | 2026 | 2000s | 2026-06-05 | **Japanese FISCAL-YEAR-END (31 March) repatriation** — a multi-WEEK, LARGE-displacement, calendar-anchored forced flow (distinct from the sub-cost intraday fix flows 2025/3008, and from price-triggered `me`): Japanese institutions close books 31 March → repatriate foreign assets / settle hedges → JPY-BUYING into the fiscal year-end → JPY-pairs should FALL (JPY strengthens) into 31 March. The arc-2024/2025 hypothesis (a LARGE-displacement forced flow CAN clear cost) tested on a new instance; candidate risk-off-ish decorrelated component. FALSIFIED — **hypothesis INVERTS at obs** (4 JPY pairs, D1, IS, last-10-bar JPY-strength drift, March vs other month-ends). **JPY WEAKENS into March-end, the OPPOSITE of repatriation-strength:** March jpy_strength NEG on all 4 (−0.10..−0.59 ATR), March EXCESS NEG on all 4 (−0.10..−0.62) — robust across the JPY leg; **AND coin-flip per-year** (March>0 only 4-6/11; frac+ 0.36-0.55; n=11/pair thin). Mechanism: the well-known scheduled repatriation is FRONT-LOADED into Feb/early-March → by the actual year-end the JPY-buying is done and the late-March approach sees squaring/reversal → JPY weakness = a textbook "the flow everyone knows is in the price" (2015 is the lone +JPY-strength March on all 4, an SNB/EUR-collapse idiosyncratic risk-off, not a March tell; 2018 mixed-neg). Wrong-sign + coin-flip + thin → no above-cost entry, §5f doesn't bite. **NEW lesson — the TWO failure modes of known-calendar forced flows: (i) SUB-COST (displacement too small — the fix-flow family 3008/2025) or (ii) PRICED-IN (displacement large enough but the flow is anticipated → front-run → realized move at the date is coin-flip-to-reversed — this arc).** The corpus's surviving edges (gap/me/fbr) avoid BOTH by keying off a SURPRISE displacement (weekend gap / ≥1-ATR move into the fix / deep stop-sweep), NOT a known calendar date → tradeability needs LARGE displacement AND not-fully-anticipated; a known date supplies at most one. Sharpens the arc-2024/2025 unifying read. Operative frontier unchanged (operator path-A). Components UNCHANGED. No engine/null/council. OOS untouched | n/e | n/e | n/e | n/e | n/e | 11 March / 121 other month-ends ×4 pairs | KILL (obs cheap-kill; hypothesis inverted / priced-in) | N | KILL |
+| 2027 | 2000s | 2026-06-06 | **Spread-as-SIGNAL: liquidity-vacuum displacement reversion** — the untested O1 / Divergent-lens "bid-ask spread as a signal, not a cost" sub-thread (arc 1029 closed only the calendar-density inelasticity proxy; spread-z left open, cost-trap-flagged). because: a large 1-bar displacement is ambiguous — (i) fundamental repricing (tight spread → CONTINUES) vs (ii) liquidity-vacuum spike (flow hits a thin book → spread BLOWS OUT → REVERTS as liquidity returns); arc 2016 killed *generic* vol-shock fade because it lumped (i)+(ii), and spread is the lag-free discriminator. Candidate THICK fold-resolving standalone (arc-2017 option B). **PRECONDITION PASSES — spread is REAL, not synthetic** (H4 4 majors, all data_quality ok; EURUSD med 0.50/p99 5.0/max 19.9p, GBPUSD med 1.1/p99 9.4; corr(spread,bar_range) weak −0.08..+0.15 → spread ORTHOGONAL to |disp|, a genuine discriminator). **FALSIFIED at obs** (large-disp pop |Δmid|/ATR≥1.0, spread_z causal trailing-100, FADE = down→long/up→short via canonical observe_long_capture, IS n=8175). **NON-MONOTONE — refuted in its own direction:** fade cap by spread_z = ≤0:0.476 / 0–1:0.480 / 1–2:0.525 / **>2 (widest, n=393):0.461** — the clearest liquidity vacuums CONTINUE (robust at DISP 1.0 AND 1.5), opposite the thesis. No magnitude confound (|disp| flat 1.53→1.63 across buckets). The lone reverting band (1–2 sd, n=118) is **thin-tail/pair-mix NOISE** (EURUSD n=11 +1.67 & USDJPY n=19 +1.49 carry it; bulk AUDUSD n=58 flat +0.052; GBPUSD n=30 NEG −0.386; per-year single-trade folds). Continuation/spread-momentum framing also dead (widest-spread cont cap ~0.539, drift +0.063 ATR sub-cost w/ highest entry cost, pair-mixed). Coin-flip cap → §5f doesn't bite; §5d cheap-kill, no engine/null/council (cf. 2016/3016/1014). **Closes the O1 spread-as-signal sub-thread** (precondition-verified, so mechanism not data). **NEW lesson: spread-blowout is entangled with REAL repricing, not revertible inelasticity (spread-side completion of 2016 + cost-timing 3007/2005) — on H4 FX spread co-moves with INFORMATION, not fillable air-pockets → spread stays a COST, never an alpha; a revertible dislocation needs a STRUCTURAL tell (swept level/gap/fix), the order-flow-imbalance tell (spread) does not separate the revertible subset.** Operative frontier unchanged (operator path-A, arc 2019/3021). Components UNCHANGED. OOS untouched | n/e | n/e | n/e | n/e | n/e | 8175 large-disp fade obs (IS, 4 majors) | KILL (obs cheap-kill; spread-as-signal closed) | N | KILL |
 
 ---
 
@@ -4178,3 +4179,74 @@ frontier unchanged (operator path-A gate call); components UNCHANGED.
 
 **Tooling:** no new tool (self-contained obs). No TOOL_REGISTRY append. **FLAGS:** none. Driver:
 `_disco2_work/arc_2026_jpy_fye_repat_obs.py`.
+
+### arc_2027 — spread-as-signal: liquidity-vacuum displacement reversion
+
+**Why this arc.** The corpus is deeply converged (path-B math-closed, arc 3021; 5th-leg structurally
+closed, arc 2022; lever = operator path-A). The remaining *autonomous* frontier is the handful of
+genuinely-untested `DISCOVERY_DIRECTION.md` menu threads. The freshest unattacked one is O1's spread-z
+proxy / the Divergent lens's "**bid-ask spread as a SIGNAL, not a cost**" — arc 1029 closed only the
+*calendar-density* inelasticity proxy and explicitly left spread-z untested (cost-trap-flagged). It is the
+one open thread that attacks the corpus's actual blocker (component thinness / fold-resolution) via a
+*thickness* mechanism: wide-spread displacements are far more frequent than deep stop-sweeps, so a real
+spread-conditioned reversion would be a candidate thick fold-resolving standalone (arc-2017 option B).
+
+**The because.** A large 1-bar displacement is ambiguous: (i) fundamental repricing — information arrives,
+the book stays tight, the move continues; or (ii) a liquidity-vacuum spike — a flow hits a thin book,
+price gaps AND the spread blows out, then reverts as liquidity returns. Arc 2016 killed *generic* vol-shock
+fade ("extreme move continues") because it lumped (i)+(ii). The spread at the displacement bar is the
+lag-free discriminator that 2016 lacked.
+
+**Precondition (hard cheap-kill) — PASSES.** The thread is meaningless if HistData `spread_close` is
+synthetic/constant. It is not: H4 4 majors, all bars `data_quality='ok'`, spread varies materially
+(EURUSD med 0.50 / p99 5.0 / max 19.9 pips; GBPUSD med 1.1 / p99 9.4; USDJPY/AUDUSD similar), moderate
+persistence (autocorr 0.20–0.40). Critically, **corr(spread, bar_range) is weak (−0.08..+0.15)** → spread
+is orthogonal to displacement magnitude, so it *can* in principle separate wide- from tight-spread big
+bars (it is not a restatement of bar size). Thread is testable on its merits.
+
+**What I did.** Population = large-displacement H4 bars (|Δmid_close|/ATR ≥ 1.0; ATR Wilder(14) mid shift1;
+spread_z = (spread_close − trailing-100-bar median)/trailing-100-bar std, all causal/shift1 — a bar never
+enters its own threshold). FADE = bet reversion: down-move → LONG, up-move → SHORT, scored through the
+canonical `observe_long_capture` (honest +1R-before-SL capture + 24-bar fwd drift; gross, characterization
+only). IS 2010–2020, 4 cached majors, n=8175 fade obs. Then split by spread_z bucket; diagnosed the
+magnitude confound, per-pair/per-year robustness, and the continuation framing; threshold-checked at
+DISP 1.0 and 1.5.
+
+**What happened — FALSIFIED, three ways.**
+1. **Non-monotone, refuted in its own direction.** Fade capture by spread_z: ≤0 → 0.476, 0–1 → 0.480,
+   1–2 → 0.525, **>2 (widest, n=393) → 0.461.** The thesis needs *monotone up*; instead the genuinely-wide
+   spread blowouts — the clearest liquidity vacuums — **continue** (fade-fail), robust at both DISP
+   thresholds. The discriminator the council hoped for runs backwards at the extreme.
+2. **No magnitude confound.** Mean |disp| is flat across buckets (1.53 → 1.63), so the >2 continuation is
+   a genuine spread effect, not "bigger moves continue more."
+3. **The one reverting band (1–2 sd) is thin-tail / pair-mix noise** (arc-2011 tell): carried by EURUSD
+   n=11 (drift +1.67) + USDJPY n=19 (+1.49); the bulk pair AUDUSD n=58 is flat (+0.052); GBPUSD n=30 is
+   negative (−0.386); per-year folds are single-trade (2013 n=1 cap 1.0, 2018 n=1 cap 0.0).
+
+The **continuation / spread-momentum** inverse is also dead: widest-spread continuation cap only ~0.539,
+drift +0.063 ATR (sub-cost, and the entry cost is *highest* exactly there), per-pair signs mixed → not
+robust + closed-ground momentum. Coin-flip capture (0.46–0.48) → §5f doesn't bite (no non-coin-flip entry
+to put on the engine); §5d cheap-kill, no engine/null/council spent (matches 2016/3016/1014).
+
+**Why it really fails (the mechanism).** A wide bid-ask spread at a large-displacement bar is NOT a
+revertible air-pocket. On H4 FX the spread widens *with* genuine repricing (news / session handover /
+crisis) — market-makers widen quotes during real uncertainty, not because of a transient fillable vacuum.
+So spread-conditioning makes the fade WORSE precisely where the spread is widest, and spread carries no
+clean revert-vs-continue tell. This is the **spread-side completion** of arc 2016 (extreme move continues)
+and the cost-timing closures 3007/2005 (cost↓ entangled with edge↓): the order-flow-imbalance proxy
+(spread) is entangled with *information*, not with revertible inelasticity.
+
+**What this closes.** The O1 / Divergent-lens "spread as a signal" sub-thread — the last untested O1 proxy
+after 1029 closed calendar-density. Precondition-verified (spread real, varies, orthogonal to |disp|), so
+the closure is about the mechanism, not a data artifact. **Lesson for the corpus: spread stays a COST,
+never an alpha, at H4; a revertible dislocation needs a STRUCTURAL tell (swept stop level / weekend gap /
+month-end fix over-extension), which the four surviving edges already use — the order-flow tell does not
+exist in the spread series.** Reinforces the unified theory rather than breaking it.
+
+**Threads.** None worth opening from here on the spread axis (level + density + spread-z inelasticity
+proxies all closed). L1 (triangulation residual OU amplitude at M1→H1) remains the last menu item but is
+cost-walled (H1 wall); S1 (take-the-loss entry geometry) is a tautological modifier (fbr already embodies
+it). Operative lever remains operator path-A. Components UNCHANGED (all 4 PORTFOLIO).
+
+**Tooling:** no new tool — canonical `Panel.from_pairs`, `observe_long_capture`, `wilder_atr` + mid
+helpers only; no TOOL_REGISTRY append. **FLAGS:** none. Driver: `_arc2027_work/` (scratch, not committed).

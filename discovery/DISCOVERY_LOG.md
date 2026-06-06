@@ -133,6 +133,7 @@ at arc step (i).
 | 2047 | 2000s | 2026-06-06 | **Survival-filtered swing-HIGH breakout CONTINUATION long** (decisive momentum close ABOVE a K-bar *surviving* swing high — the never-tested continuation analog of fbr, carrying fbr's proven swing-survival significance filter; corpus breakouts 1001-1003 used RAW Donchian highs without it). Aimed at the unfound 2014/2018 regime-orthogonal leg (strong-USD trend breaks should continue). FALSIFIED at obs 4 ways: breakout capture **~0.49-0.50 COIN-FLIP** (K20 .4953/K40 .4976/K60 .4889 vs baseline .4877), **breakout ≈ control** (K40 .4976 vs .4958 → swing-survival NOT load-bearing for continuation, opposite of fbr's reversal where AT-low .52-.61 ≫ elsewhere), drift **NEGATIVE** (−.03→−.14, deeper-K WORSE), and **NOT 2014/2018-positive** (2014 cap .4398 among worst, 2016 drift −1.15; the one tail USDJPY .556 = 2011/3011 pair-mix). Mechanism: swing-survival significance is load-bearing ONLY for the FORWARD-confirming reclaim (fbr: move hasn't started, i+1 enters before it), NOT the BACKWARD-confirming break (the breakout bar IS the stop-run → resting stops already spent → i+1 enters the exhaustion high → mild revert; breakOUT-side completion of arc 1014, sharpens 2029's survival-filter scope). §5f doesn't bite (coin-flip entry); no engine/null/council spent. | N | n/e | n/e | n/e | n/e | 2944 (K40 obs) | FAIL (obs cheap-kill) | N | KILL |
 | 1047 | 1000s | 2026-06-06 | **FX intraday SESSION seasonality (Ranaldo 2009)** — a currency depreciates during its own local trading hours (settlement/inventory flow); candidate decorrelated/regime-orthogonal intraday leg. REAL in-sign for EUR/GBP/USD into 2010-2026 (local<0<foreign: EUR diff +0.259, GBP +0.127, USD +0.141 bp/hr) but **SUB-COST** (best EUR ~1.42bp gross/session < ~1.88bp FundedNext RT), **UNSTABLE** (net-of-cost-positive years: EUR 7/17, GBP 3/17, USD 4/17), and **REGIME-DEPENDENT not the 2018 leg** — the USD local-depreciation flow **INVERTS in strong-USD 2018 (net −4.09bp: USD bought-at-home overwhelms settlement flow)**, so it fails in exactly the trending/risk-off years a 2018 leg needs. JPY inverts (Tokyo-STRONG, fixing/carry buying), AUD flat. Closes the named session/time-of-day microstructure lane; extends the corpus "small continuous intraday flow ≈ cost, arbitraged" finding (1008/1010/3008) to the session axis + adds the residual flow is itself regime-conditional. Re-verified the corpus is pure-FX (no metals/indices in the backup). Obs cheap-kill — gross capture < cost so §5f exit step cannot bite; no engine/null/council, OOS untouched | N | n/e | n/e | n/e | n/e | ~100k H1 bars/pair × 8 | FAIL (obs cheap-kill) | N | KILL |
 | 1048 | 1000s | 2026-06-06 | **NFP-day (first-Friday) overreaction REVERSION** — survivor-template (large forced dislocation→reversion) on the highest-impact scheduled US event, calendar-derivable, candidate regime-orthogonal (NFP=noise→fade could work in 2018). FALSIFIED at obs (D1, 7 USD majors; measurement-fix: 5ers_eet D1 timestamps START at 22:00UTC so the Friday SESSION bar is Thursday-stamped → session=ts+1day). **corr(NFP move, fwd k-day drift) ≈ 0** (−0.008/−0.010/−0.007 at k=1/2/3d) = NEITHER reversion NOR continuation — the payroll surprise is priced EFFICIENTLY at the swing scale, nothing to fade. The tiny small-thr fade (NFP +0.047 ATR k2) is SUB-COST and NOT NFP-specific (≈ FRI control +0.039); bigger moves CONTINUE (thr≥1.0 fade −0.025..−0.065). NOT 2018-positive (2018 −0.255, 2015 −0.196; 5/17 yrs). Closes the scheduled-macro-event overreaction-reversion lane: INFORMATION events are priced efficiently & don't revert, unlike the survivors' MECHANICAL forced flows (rebalancing/fix/stop-runs). Coin-flip base → §5f doesn't bite; no engine/null/council, OOS untouched | N | n/e | n/e | n/e | n/e | NFP n=4053 (7 pairs D1) | FAIL (obs cheap-kill) | N | KILL |
+| 1049 | 1000s | 2026-06-06 | **Failed-breakdown RECLAIM (arc 1013, corpus's BEST edge) on CROSSES — the 2018 universe test.** 1013 is USD-majors only; its ONLY failing fold (2018) is diagnosed (1014/2014/3013) as a USD-TREND artifact → on USD-NEUTRAL crosses 2018 was no clean trend, so the reclaim may HOLD = the regime-orthogonal 2018-leg. Obs (4 H4-cached crosses AUDJPY/EURGBP/EURJPY/GBPJPY vs 7 majors; reused BUILT fbr signal + observe_long_capture). **2018 hypothesis DIRECTIONALLY CONFIRMED pooled** — crosses 2018 drift **+1.486** vs majors **−1.282** (USD-trend confound validated). **But cross-fbr is WEAK/UNUSABLE overall:** capture **0.508** (≈coin-flip; majors 0.582), mean drift **−0.128 ATR (NEG)**, 9/17 yrs, 2015 −1.808 neg → §11 mean-neg = KILL. **And the 2018 cross-positivity is THIN-TAIL/pair-inconsistent:** EURGBP +3.462(n4) + GBPJPY +2.374(n2) carry the whole pooled +1.486; AUDJPY (only decent cross, cap 0.566) is 2018-NEGATIVE; EURJPY +0.173(n6) weak. The 2018 weakness RELAXES on crosses but doesn't yield a robust leg (thin-tail confound, arcs 2011/3011/3012). 1013 UNCHANGED (USD majors). Coin-flip+neg base → no engine/null/council; OOS untouched. **chat-1000s graceful handoff after 1047-1049.** | N | n/e | n/e | n/e | n/e | cross fbr n=238 (4 pairs) | FAIL (obs cheap-kill) | N | KILL |
 
 ---
 
@@ -6468,3 +6469,57 @@ canonical change, no council, OOS untouched.
 look for MECHANICAL/structural forced flow (information-free dislocation), not news/event reactions —
 those are priced efficiently. Intraday + scheduled-news + all shallow directional + pure-FX universe are
 closed.
+
+### arc_1049 — failed-breakdown RECLAIM (arc 1013, best edge) on CROSSES: the 2018 universe test
+
+**Because.** The corpus's BEST edge (arc 1013 failed-breakdown reclaim, USD majors H4, IS 9/10) fails only
+on 2018, diagnosed (1014/2014/3013) as a USD-TREND artifact ("in risk-off the failed breakdown becomes a
+real breakdown"). 1013 was only ever run on USD MAJORS. 2018 was a USD-SPECIFIC one-way trend → on
+USD-NEUTRAL crosses 2018 was no clean trend, so the reclaim may HOLD there = the regime-orthogonal
+(2018-positive) complement. Remove the named confound (USD trend) by changing UNIVERSE, not mechanism —
+untested by 1013's refinements (1014/2014/3013/1040/2030), a universe lever on a deep structural edge (not
+a shallow-directional re-test).
+
+**Method (obs only).** Driver `_disco_work/arc1049_fbr_crosses.py`. Reused BUILT `FailedBreakdownReclaimLongSignal`
+(K=40, shadow≥1.25) on the 4 H4-cached USD-neutral crosses (AUDJPY/EURGBP/EURJPY/GBPJPY) vs the 7 USD
+majors (1013 ref); honest +1R capture + 24-bar fwd drift via `observe_long_capture` restricted to fbr fires,
+grouped by year.
+
+**Finding 1 — 2018 hypothesis DIRECTIONALLY CONFIRMED (pooled).** MAJORS 2018 drift −1.282 (the failing
+fold) vs CROSSES 2018 +1.486 (n13) — the reclaim flips positive on USD-neutral crosses in 2018. The
+USD-trend diagnosis is validated: 2018 weakness is USD-specific and relaxes on crosses.
+
+**Finding 2 — cross edge WEAK overall (not usable).** Cross fbr pooled: capture 0.508 (≈coin-flip; majors
+0.582), mean drift −0.128 ATR (NEG), 9/17 +yrs, 2015 −1.808 neg. §11: mean-negative = KILL. The reclaim is
+materially weaker on crosses — its USD-majors strength was partly USD-SPECIFIC structure, not pure mechanism.
+
+**Finding 3 — 2018 cross-positivity is THIN-TAIL + pair-inconsistent (decisive).** Per-pair 2018: EURGBP
++3.462 (n4), GBPJPY +2.374 (n2) carry the whole pooled +1.486; EURJPY +0.173 (n6, weak); AUDJPY −0.318 (n1)
+— and AUDJPY is the only individually-decent cross overall (cap 0.566, drift +0.197). 6 trades on 2 pairs
+masquerade as a 2018 edge = the thin-tail/pair-mix confound (2011/3011/3012). Not robust.
+
+**Verdict — KILL (obs cheap-kill).** Cross-universe route to the 2018 leg closed: hypothesis directionally
+confirmed (real mechanistic insight — fbr's 2018 weakness IS USD-trend-specific) but no usable component
+(cross-fbr coin-flip/mean-negative; 2018 cross-signal thin-tail). 1013 UNCHANGED. No engine/null/council
+(coin-flip + neg gross drift; §5f doesn't bite). OOS untouched. No canonical change.
+
+**NEW lesson.** The corpus's best structural edge transplants POORLY across universe: failed-breakdown
+reclaim is materially weaker on USD-neutral crosses (capture 0.582→0.508, drift +0.191→−0.128) — its
+USD-majors strength was partly USD-SPECIFIC, not pure mechanism. Its 2018 weakness DOES relax on crosses
+(confirming the USD-trend diagnosis) but the relaxation is thin-tail/pair-inconsistent → removing the named
+confound by changing universe still yields no robust 2018 leg. Re-pointing/refining existing reversion edges
+(universe/level/gate/exit/confluence — 1012/1014/2014/3013/1040/2030/1049) cannot reach 2018; only a
+genuinely novel mechanism can. And: always check per-pair n before believing a pooled single-fold sign on a
+near-coin-flip base (thin-tail confound recurs: 2011/3011/3012/1049).
+
+**Tooling.** No new BUILT tool. Driver `_disco_work/arc1049_fbr_crosses.py`. Cross universe limited to the 4
+H4-cached crosses (others need ~75s/pair backup loads; coin-flip overall + thin-tail 2018 make a broader run
+low-EV). No canonical change, no council, OOS untouched.
+
+**Threads / handoff (chat-1000s graceful handoff after arcs 1047-1049).** 2018/2014 component unfound (~21
+dead routes). Reinforced prior: re-pointing/refining existing reversion edges cannot reach 2018; only a
+genuinely novel MECHANICAL/structural mechanism (information-free dislocation) can — intraday (sub-cost,
+1047), scheduled-news (efficient, 1048), all shallow directional, and pure-FX universe are closed. This
+session ran 1047 (Ranaldo session-flow), 1048 (NFP overreaction), 1049 (fbr-on-crosses) — three KILLs, each
+closing a named lane with a documented *because*; deployable-system count remains 0. A fresh chat resumes at
+arc 1050.

@@ -8056,3 +8056,34 @@ the genuinely highest-value next actions are OPERATOR-side: the path-A gate-gove
 charter unlock (operator-gated macro/options/COT data, `NEEDS_ENABLEMENT.md`). A fresh chat resumes at arc
 1062 via the bootstrap, but absent an operator unlock it will land on the same proven floor. No STOP
 sentinel present (only the operator sets it, §9).
+
+---
+**chat-2000s graceful handoff after arc 2065** (2026-06-06). One fresh-eyes arc this session: **2065
+(market-neutral cross-sectional momentum SPREAD)** — the LESSONS #1 relative-value frontier item ("the
+only lever that doesn't require beating 0.50 per trade"), gated on shorts and run as the first actual
+dollar-neutral two-leg book (arc 1000 was long-only top-quintile; 2003 long-only single-leg). Finding:
+the momentum spread is gross-NEGATIVE coin-flip in every cell (the FX cross-section REVERTS not trends,
+2015 neg 5/5), and its reversal mirror — though gross-positive with a broad median at monthly hold — 
+COLLAPSES under the honest take-the-loss lens (pooled capture 0.456, no SL∈{1,1.5,2,2.5} clears 0.50;
+the long-losers leg is the killer — losers CONTINUE, no reversion to harvest). NEW lesson: the
+"market-neutral doesn't require beating 0.50 per trade" framing is FALSE under take-the-loss — each leg
+still must beat the symmetric ±R barrier, and netting the USD factor out leaves a cross-section that
+reverts in the TAIL (positive forward mean) but not the take-the-loss BODY (sub-0.50 capture); 2015 is
+unfillable from the relative angle too (capture 0.369), confirming arc 1060 that the binding folds are
+hard price-structure REGIMES, not directional/relative coverage gaps. Closes the cross-sectional-ranking
+branch of relative-value (single-leg catch-up already dead, 2003). Components UNCHANGED (all 4 PORTFOLIO);
+deployable-system count = 0; lever = operator path-A.
+
+**State for the next 2000s chat:** the OHLC-only frontier — ABSOLUTE (directional/calendar-flow/regime/
+structural/state-conditioning) AND RELATIVE (single-leg catch-up 2003 + cross-sectional ranking 2065) — is
+now exhausted on every mapped axis, by all three chats independently. The third relative-value form, a
+true stationary-spread cointegration PAIRS trade, is NOT cleanly testable in the current apparatus (the
+canonical engine scores per-pair take-the-loss legs, not a synthetic spread instrument with an SL on the
+spread) → it would need a spread-instrument engine (a `NEEDS_ENABLEMENT` charter), and the strong prior
+from 2003/2065 is that a spread reversion collapses under take-the-loss the same way (stopped out on
+divergence-widening before reverting). The genuinely highest-value next actions are OPERATOR-side — the
+path-A gate-governance decision OR a charter unlock (`NEEDS_ENABLEMENT.md`: macro/options/COT/calendar or
+a spread-instrument engine) — not another within-charter arc, which would re-grind closed ground (§5a) or
+duplicate the decision-support lane. A fresh chat resumes at arc 2066 via the bootstrap; absent an
+operator unlock the marginal EV of new arcs is low. Handoff is due to context budget, not a STOP sentinel
+(none present).

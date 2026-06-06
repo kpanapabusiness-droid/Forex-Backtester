@@ -147,6 +147,7 @@ at arc step (i).
 | 1053 | 1000s | 2026-06-06 | **Deployment-vehicle feasibility of me_long-SOLO (the actual honest deploy object)** — DIAGNOSTIC, OOS-preserving, BUILT-tools-only (canonical `cosim_book_fold` single-component curve + `equity_risk_profile` + `propfirm_feasibility`; no new code). because: arc 1046 showed that under honest frozen §5f exits the 4-way book COLLAPSES to me_long-SOLO out-of-sample (fbr mean-neg OOS, adding any leg adds neg folds) → me_long-solo (committed=honest exit sl_only/2-bar D1/SL2.0) is the REAL honest deploy object, yet every vehicle profile (2033 prop-firm / 1033 Calmar / 2045 honest-2way) was computed on the 4-way or 2-way BOOK, NEVER on solo — the number the operator's path-A call needs, never computed. Reproduces committed me_long EXACT (IS per-year max dev **0.004pp**; IS mean +0.232% 7/10; OOS mean +0.487% 5/6, only 2021 −0.63 neg). **RESULT — the honest solo object is vehicle-WORSE than the book it was preferred over:** IS ann +0.191%/maxDD 3.00%/**Calmar 0.064**/99% underwater/Sharpe 0.175; OOS ann +0.532%/maxDD 1.73%/Calmar 0.308/Sharpe 0.387; FULL-contiguous ann +0.319%/maxDD 3.00%/**Calmar 0.106**/1951d(99%) underwater. Prop-firm T_min **4.7–26 yr** (vs weeks-months) = decisively vehicle-INFEASIBLE. **KEY: solo Calmar 0.064(IS)/0.106(full) ≪ the 4-way/2-way book's ~0.245** (1033/2045) — pruning to the single OOS-robust leg REMOVES the drawdown-smoothing diversification; me_long alone is the lumpiest single curve in the corpus. **NEW lesson: a thin reversion book has THREE corners, none deployable, pruning trades between them — (1) 4-way maximizes diversification-smoothing (Calmar ~0.245) but drag legs kill mean/Sharpe+OOS; (2) 2-way {me_long+fbr} maximizes Sharpe/sig but fbr dies OOS, Calmar unchanged; (3) me_long-SOLO is the only IS+OOS-robust mean but WORST Calmar (no diversification left).** The mean/Sharpe-vs-Calmar split (2033/2045) is a genuine 3-way frontier; leg-selection trades quality axes but EVERY corner is vehicle-infeasible (confirms 1024 risk-invariance from the other side: neither leverage NOR leg-subset rescues a corner). **The operator's path-A call now has the COMPLETE object map: NO leg-subset of the corpus is BOTH AFP/OOS-robust AND vehicle-feasible.** Components UNCHANGED (me_long PORTFOLIO; solo not AFP); lever = operator path-A. OOS measured-once as characterization (1046 precedent), not tuned (not spent §4) | N | n/e (OOS char.) | n/e | n/e | solo maxDD 3.00% / Calmar 0.064(IS)/0.106(full) / 99% underwater / T_min 4.7–26yr | me_long solo (98 IS trades) | DIAGNOSTIC → KILL (no new component; honest solo deploy object vehicle-profiled — worst Calmar of all corners) | N | KILL |
 | 1054 | 1000s | 2026-06-06 | **Triangulation residual SECOND MOMENT (OU amplitude) at finer resolution — strategist MENU item L1, the LAST named explore-now thread** (arc 2023: "only menu-L1 remains"). Arc 3005 killed the cross-rate residual at the LEVEL (mean≈0) at H4 only; its VARIANCE / OU mean-reversion amplitude at finer resolution (the convergence/stat-arb harvest — amplitude not direction, sidesteps the beat-0.50 wall) was never measured. obs cheap-kill (BUILT `triangulation_ou_amplitude.py`, reuses arc-1027 `triangle_log_residual_bp`; 3 triangles EURJPY=EURUSD·USDJPY / GBPJPY=GBPUSD·USDJPY / EURGBP=EURUSD/GBPUSD; M1/M15/H1/H4; IS 2010-2020). **L1 FALSIFIER FIRES AT EVERY RESOLUTION → triangulation FULLY closed (level AND variance):** fraction of bars where \|residual\| > single-cross FundedNext round-trip cost (1.5×spread+slip+comm ≈2.8-4.0bp) is **<1.1% at every resolution × triangle** (max 1.08% EURJPY-H4; far below the 5% threshold; even at half-cost max 3.37%). The OU half-life IS short (M1 0.9-2.1 min, council's "shortens at finer res" CONFIRMED) but the **amplitude condition FAILS: σ≈0.4-0.9bp vs cost ≈2.8-4.0bp (~4-7× larger), and σ is resolution-INVARIANT** (M1→H4) — going finer does NOT raise the harvestable amplitude (arb pins the VARIANCE not just the mean; relative cost only grows). 2σ→0 convergence nets positive on <1.1% of bars even crediting full reversion (optimistic; partial + carries directional risk between entry/convergence); spread-ONLY cost (~1.1bp) ≈ the entire 2σ move. **The convergence/stat-arb analog of the H1 cost wall** (gotobi/round-number/fix/session). Closes the explore-now MENU's last thread (M1 1027/2023, O1-density 1029, Q1 1028, G1 2052 already dead) → the OHLC-only EDGE frontier is mined out on BOTH the directional axis (1052) AND the convergence axis (this). NEW lesson: the residual is dead in BOTH moments at EVERY resolution down to M1 — OU amplitude structurally pinned ~4-7× below the single-cross round-trip cost & resolution-invariant; a fast OU half-life is necessary-not-sufficient, amplitude-vs-cost (not reversion speed) is the binding test for a convergence trade. Components UNCHANGED; lever = operator path-A (deploy object me_long-solo, 1046/1053). No engine/null/council; OOS untouched (IS-only, holdout pristine) | n/e | n/e | n/e | n/e | residual σ 0.4-0.9bp vs cost 2.8-4.0bp; %>cost <1.1% all res | ~3.9M M1 / 17.7k H4 residual obs ×3 triangles | KILL (obs cheap-kill; L1 closed, explore-now MENU exhausted) | N | KILL |
 | 1055 | 1000s | 2026-06-06 | **O1 spread-z inelasticity-state conditioning of fbr — the LAST untested O1 sub-thread** (arc 1029: "spread-z, the only untested O1 sub-thread"; the council's cost-trap-flagged proxy). O1 thesis: a wide entry-bar bid-ask spread = inelastic book → forced flow moves price more → LARGER reversion; concentrate fbr (1013) onto its highest-spread-z bars to raise edge-per-trade & worst-fold (attack the fold-resolution blocker). obs cheap-kill (BUILT-tools only: fbr signal + `observe_long_capture`; n=235≡canonical fbr, 7 USD majors, IS; entry-spread-z = causal 250-bar trailing z; realized round-trip spread cost in R charged). **FALSIFIED + INVERTED on all 3 O1 clauses.** (1) NON-monotone, BACKWARDS: gross drift HIGHEST in the TIGHT-spread tercile (LO +0.300/net +0.264) vs the WIDE/"inelastic" tercile (HI +0.102/net +0.029) — fbr's edge lives in LIQUID bars, not inelastic ones. (2) COST TRAP confirmed: HI_wide median spread 2.89bp ≈ **4× the tight 0.75bp**, realized cost_R doubles 0.036→0.073 with NO gross-edge gain → net worse than tight (charging the realized wide spread, the council's mandated guard, is what kills the wide cell). (3) TOP-DECILE craters fold resolution: 2/9 pos years, worst −6.04 (vs full −1.53), ZERO 2018 fires → the O1 "top decile → higher worst-fold" prediction decisively FALSE (same thinning death as 1029). Diagnosis: for a stop-run reclaim, a wide spread marks a GENUINE-stress breakdown where the reclaim FAILS (the 2018 mechanism, 2014/2052), so inelasticity ANTI-selects the edge; fbr is a LIQUID-market stop-run, not an illiquidity event. **Closes the last O1 proxy → O1 fully closed (density 1029, depth 1025, spread-z 1055); with M1 (1027/2023), L1 (1054), Q1 (1028), G1 (2052) the explore-now MENU is now EXHAUSTIVELY closed.** NEW lesson: the inelasticity-state thesis is INVERTED for the corpus's strongest reversion edge — wide entry-spread is a NEGATIVE signal (genuine-stress breakdown) not the positive one O1 hypothesized; the honest spread-z proxy anti-selects the edge AND triggers the cost trap AND thins fold resolution (3 independent failures). Components UNCHANGED; lever = operator path-A (deploy object me_long-solo). No engine/null/council; OOS untouched (IS-only) | n/e | n/e | n/e | n/e | tight-tercile drift +0.300 vs wide +0.102 (inverted); HI 4× cost; top-decile 2/9 yrs | 235 fbr fires (spread-z conditioned) | KILL (obs cheap-kill; O1 fully closed, MENU exhausted) | N | KILL |
+| 1056 | 1000s | 2026-06-06 | **Honest-§5f PER-TRADE bootstrap of the 2-leg deploy book — resolves arc-1043's explicitly-owed thread** (1043: honest book significance killed only at n=10 FOLD-bootstrap, flagged "a per-TRADE bootstrap MIGHT tighten the honest CI"; 2016 did per-trade on the COMMITTED book, never the honest §5f). Object = the honest **2-leg me_long+fbr** book (arc 2044 FLAG F1: gap & me_short flip mean-NEG under honest §5f; the 4-leg arc 1043 tested is the drag-loaded wrong object). Reuses arc-2044 honest machinery (18-cfg grid, `nested_exit_selection` afp_then_mean, 8 evaluable folds 2013-2020); reproduces me_long +0.203% / fbr +1.001%. Bootstrap unit = per-POSITION **NET** P&L (two Arc-10 fidelity fixes the anchor caught: ClosedTrade.pnl is GROSS→net via canonical `apply_cost_model` breakdown; gate `roi_pct` = OOS-window-sliced equity ratio → filter positions by `final_exit_time∈OOS` ÷ OOS-start equity, reproduces fs.roi_pct ≤0.02pp, ≤0.89pp on 3 slow tp_3r boundary cells, disclosed). THREE estimators: (A) **cluster/fold-level** = the textbook SE-of-mean (verified algebra: cluster-Var=σ²_b/8+σ̄²_ε/8=true); (B) within-fold per-trade = per-YEAR estimation uncertainty, NOT the SE of the mean; (C) two-level = double-counts σ̄²_ε (over-conservative bound). **RESULT — per-trade does NOT robustly rescue significance.** Honest 2-leg RP book (wts me_long 0.740/fbr 0.260) point **+0.411%/yr**, 6/8 pos, worst −0.211%(2018): cluster **t=2.27 (SIG+)** but equal-weight **t=1.91 (non-sig at 5%)** → BORDERLINE, only-SIG+-reading leans on IS-fit RP weights. GUARD (per-trade's real finding): within-year sampling sd **1.08%** EXCEEDS across-year spread **0.55%** (ratio ~0.5) → the per-year ROIs are fat-tail-(fbr-runner)-dominated; the borderline significance rests on a LUCKY tight clustering of noisy annual numbers, not a thick edge. Corrects arc-1043's object (2-leg materially STRONGER than the 4-leg it found non-sig — confirms arc-2044 PART A from the significance angle: gap+me_short are honest drag) but the deploy mean stays BORDERLINE/fat-tail-fragile, weaker than the committed t=2.66. NEW lesson: for a thin book carried by few fat-tailed trades, cluster-bootstrap significance is FRAGILE when within-year sd > across-year spread; the within-fold per-trade bootstrap is the fragility DIAGNOSTIC, not a higher-power SE (two-level double-counts). Components UNCHANGED; lever = operator path-A; no canonical change, no council, OOS untouched | n/e | n/e (OOS untouched) | honest 2-leg RP worst −0.211%(2018); cluster t=2.27 SIG+ / equal t=1.91 ~0 | n/e | n/e | me_long 102 + fbr ~210 (per-position, 8 folds) | DIAGNOSTIC → KILL (no new component; arc-1043 owed thread resolved — significance not robustly rescued) | N | KILL |
 
 ---
 
@@ -6928,3 +6929,99 @@ resumes at arc 1056, but absent a charter unlock (operator-gated macro/options d
 or the operator's path-A decision, the only remaining within-charter value is decision-support diagnostics
 on the characterized object (the 2000s chat is actively in that lane: 2053/2054 vehicle maps) — NOT new
 edge obs-kills, which would grind proven-dead ground.
+
+---
+## arc_1056 — honest-§5f PER-TRADE bootstrap of the 2-leg deploy book (resolves arc-1043's owed thread)
+
+Full record: [`arcs/arc_1056_honest_pertrade_bootstrap_significance.md`](arcs/arc_1056_honest_pertrade_bootstrap_significance.md).
+
+**Why this arc (the gap).** The chat-1000s edge frontier is exhausted (1054/1055 closed the explore-now
+MENU); the only remaining within-charter value is decision-support diagnostics on the characterized object
+for the operator's path-A gate-governance call. Arc 1043 left ONE explicitly-owed such diagnostic: it
+killed the path-A "significant mean-positive" pillar (committed t=2.66 → honest §5f fold-bootstrap t≈1.3,
+CIs span zero) but flagged *"n=10 low power; a per-TRADE bootstrap (arc-2016 method) MIGHT tighten the
+honest CI."* Arc 2016 ran a per-trade bootstrap, but on the COMMITTED book — the honest-§5f per-trade
+bootstrap was never done. Highest-EV remaining within-charter work; zero fabrication surface (significance
+arithmetic on canonically-scored trades).
+
+**Object correction (load-bearing).** I ran it on the honest **2-leg me_long+fbr** book, NOT the 4-leg
+arc 1043 used — because arc 2044 FLAG F1 established that under honest §5f exits gap & me_short flip
+mean-NEGATIVE, so the honest book's best expression (and the real deploy object) is the 2-leg. Testing the
+4-leg would re-answer a question on the wrong, drag-loaded object.
+
+**Method + two Arc-10 fidelity fixes the reproduction anchor caught.** Reused arc 2044's exact honest
+machinery (18-cfg registry grid × `nested_exit_selection` afp_then_mean; warmup folds 2011/12 excluded →
+8 evaluable 2013-2020). Reproduced me_long +0.203% / fbr +1.001% before trusting anything. The first cut
+of the bootstrap was WRONG twice and the anchor caught both — exactly why the anchor exists:
+1. I first scored a single full-sample-best exit (partial-runner/SL1.5, fbr +2.92%) — the §5f-FORBIDDEN
+   pick, an Arc-10 optimism; the cross-check vs the honest nested series flagged it. Fixed → nested series.
+2. `ClosedTrade.pnl` is **GROSS**; the gate scores NET (cost netted at the canonical chokepoint
+   `apply_cost_model`). Bootstrapping gross pnl is cost-blind. Fixed → per-POSITION
+   `net_pnl = gross − total_cost` from the breakdown (a partial+runner is ONE position; legs are not
+   independent → resample positions, not legs).
+3. `build_fold_stats_from_run`'s `roi_pct` = the net-equity curve **sliced to the OOS window**, end/start
+   − 1 — the equity GAIN realized (position EXIT) inside the OOS year over the OOS-start equity. Filtering
+   positions by `final_exit_time ∈ OOS` and dividing by the OOS-start equity reproduces `fs.roi_pct` to
+   ≤0.02pp (max residual 0.89pp on three slow `tp_3r`/low-trade cells where a position open at the year
+   boundary carries unrealized MtM a closed-trade bootstrap can't see — disclosed; book-level center bias
+   ~0.05-0.08pp, verdict invariant since point means use the gate-exact nested series).
+
+**The statistical crux (worked through carefully, §2).** Three estimators, and which is the right SE of
+the mean is NOT obvious:
+- **(A) cluster / fold-level bootstrap** (resample the 8 yearly book ROIs) — this is the **textbook-correct
+  SE-of-mean for per-year-clustered data.** Variance algebra: each realized yearly ROI already embeds its
+  own trade-sampling noise, so cluster-Var = σ²_b/8 + σ̄²_ε/8 = the true Var(θ̂). [= arc 1043's method.]
+- **(B) within-fold per-trade bootstrap** (resample each fold's positions, hold membership) — this is NOT
+  the SE of the mean; it measures **per-year estimation uncertainty** (how much a single year's ROI would
+  swing under a re-draw of its trades).
+- **(C) two-level (cluster + trade)** — resample years AND trades. Algebra: two-level-Var = true +
+  σ̄²_ε/8 → it **double-counts** the within-year variance, so it OVERSTATES uncertainty. Reported only as
+  an over-conservative bound, explicitly not the verdict estimator.
+
+**Result.** Honest 2-leg RP book (IS-frozen wts me_long 0.740 / fbr 0.260), point **+0.4110%/yr**, 6/8
+pos, worst −0.211% (2018), across-fold sd 0.5481%:
+
+| estimator | 95% CI | P(mean<0) | t | |
+|---|---|---|---|---|
+| (A) cluster (correct SE) | [+0.068%, +0.772%] | 0.008 | **+2.27** | SIG+ |
+| (B) within-fold per-trade | [−0.337%, +1.167%] | 0.156 | +1.07 | ~0 |
+| (C) two-level (double-counts) | [−0.406%, +1.261%] | 0.172 | +0.97 | ~0 |
+
+Equal weights (no IS fit): point +0.6021%, cluster **t=1.91** (CI [−0.042%, +1.176%], P=0.035) → non-sig
+at 5%; within-fold t=+0.94. **GUARD:** within-year sampling sd (RMS) **1.08%** (RP) / 1.81% (equal)
+**EXCEEDS** the across-year spread **0.55%** / 0.97% → ratio across/within ≈ 0.5.
+
+**What it means (the honest, nuanced resolution of arc 1043's thread):**
+1. **Per-trade resampling does NOT cleanly rescue significance.** The correct estimator (cluster) gives RP
+   t=2.27 (SIG+) but equal-weight t=1.91 (non-sig at 5%) → **BORDERLINE**, and the only SIG+ reading leans
+   on **IS-fit RP weights** (a mild in-sample tightening that down-weights fbr's fat-tail leg to 0.26).
+   The "higher power" arc 1043 hoped per-trade resampling would buy is **illusory for the SE of the mean**
+   — the within-fold bootstrap answers per-year uncertainty, not the mean's SE, and the two-level
+   double-counts.
+2. **It corrected the object.** The honest **2-leg** book is materially stronger than the **4-leg** arc
+   1043 found non-significant — confirming arc 2044 PART A from the significance angle (gap+me_short are
+   honest drag; dropping them restores most of the lost t). The deploy case is **less dead than the 4-leg
+   number implied** — but still **borderline**, not the robust t=2.66 the committed book advertised.
+3. **The per-trade dimension's genuine contribution is a FRAGILITY tell.** within-year sampling sd >
+   across-year spread (ratio ~0.5) → the per-year ROIs are dominated by fat-tail (fbr-runner) sampling
+   noise; the borderline significance rests on a **lucky tight clustering** of those noisy annual numbers,
+   not a thick consistent edge. (Refines arc 1023's committed "across ≈ within" to honest "across <
+   within" — the honest 2-leg book is *even more* sampling-dominated.)
+
+**Verdict: DIAGNOSTIC → KILL** (no new component; components UNCHANGED, all 4 PORTFOLIO). The honest
+deploy object's mean is positive (+0.41%/yr) and **borderline-but-not-robustly significant**
+(RP-weighting-dependent, fat-tail-fragile). The gate-resolution / deploy decision stays the operator's
+path-A governance call; deployable-system count = 0.
+
+**NEW lesson.** For a thin book whose per-year ROIs are carried by a few fat-tailed trades, the cluster
+(fold-level) bootstrap is the correct SE-of-mean, but its significance is **fragile when within-year
+sampling sd > across-year spread** — that inequality is the tell that the per-year consistency is a tight
+realized clustering of noisy annual numbers, not a thick edge. The within-fold per-trade bootstrap is the
+**fragility diagnostic** for this, NOT a higher-power SE of the mean; a two-level cluster+trade resample
+**double-counts** within-year variance and must not be read as the SE. And: when re-deriving a thin book's
+significance, test the **honest deploy object** (the 2-leg here), not a drag-loaded superset.
+
+**Tooling.** No new BUILT tool (reused `nested_exit_selection` 2040 + `combine_fold_roi` 2006 + canonical
+`apply_cost_model` / `build_fold_stats_from_run` reads; cf. arc 2016's no-new-tool precedent). Driver
+`discovery/_disco1_work/arc1056_honest_pertrade_bootstrap.py`. No canonical change, no FLAG-as-code, no
+council, OOS untouched.

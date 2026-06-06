@@ -160,6 +160,8 @@ at arc step (i).
 | 2061 | 2000s | 2026-06-06 | **US-bank-holiday thin-session reversion (scheduled-thinness gap-fill)** — the one inelasticity proxy O1 never tested: the weekend gap-fill (`gap` 1006) reverts via CLOSED-market thinness; O1's thesis died on the SPREAD-Z proxy (1030/1055) because wide spread = info-STRESS (continues), but a SCHEDULED US bank holiday is thinness that is calendar-known + NOT stress-driven → should revert like the weekend gap. Genuinely untested (distinct from 1005/3015/2026/2057/1048); magnitude-gated (≥1 ATR) for a fair above-cost shot; checked for 2015/2018 sign. FALSIFIED — **thesis INVERTS on its core premise** (D1, 7 USD majors, US-federal-holidays ∪ Good Friday, 1179 holiday-session bars 3.6%): **(1) holidays MUTE not amplify displacement** (holiday \|move\| mean 0.323 ATR vs non-hol 0.500 — 24h-global FX stays liquid, only US participation thins → smaller move, premise false); **(2) no reversion, faint continuation** (corr(move,fwd_k) +0.042/+0.002/+0.013 ≈0-to-pos vs non-hol −0.008 generic reversion — holiday REMOVES the faint reversion); **(3) magnitude gate kills on thinness+sign** (\|move\|≥1.0 only n=51 over 16yr×7 = ~3/yr untradeable; fade drift NEGATIVE fade2 −0.138/fade3 −0.227 = big holiday move CONTINUES, worse than ≈flat control); **(4) not the leg** (2015 fade3 −1.40 / 2018 −0.12 both neg); **(5) pair-mix** (5/7 neg, USDCAD/GBPUSD lone +, USD-quote-beta 2009/3012 tell). Diagnosis: the gap-fill needs a genuine market-CLOSURE window (weekend, ~48h no price discovery → true repricing gap) — a single-center holiday leaves FX fully open globally → mild thinness, muted move, ordinary continuing price discovery. **Scheduled single-center thinness ≠ closed-market thinness.** NEW lesson — a FIFTH calendar/structural failure mode (after sub-cost/priced-in/instrument-neutral/fat-tail-mirage): **(v) thinness-too-mild** — the only tradeable thinness in 24h FX is an actual closure window; reduced-participation thinness neither amplifies nor reverts. Cleaner closure of O1's scheduled-thinness sub-route than the spread-z proxy (fails because holiday thinness barely EXISTS, not because it's stress). §5f doesn't bite (no above-cost/above-0.50 cell); §5d cheap-kill, no engine/null/council. Components UNCHANGED (all 4 PORTFOLIO); deploy object UNCHANGED (me_long-solo / {me_long,fbr}); lever = operator path-A. OOS untouched | n/e | n/e | n/e | n/e | n/e | 1179 holiday-session bars (51 at \|move\|≥1.0) | KILL (obs cheap-kill; thinness-too-mild, premise inverts) | N | KILL |
 | 2060 | 2000s | 2026-06-06 | **Leg-count OPTIMUM of the OOS deployment vehicle — is 2 the sweet spot? (direct follow-up to 2059)** because: 2059 found {me_long,fbr} beats solo (2055) AND the 4-way book (2056) but left open whether a 3rd partner to the winning pair helps further. Cheap completion reusing BUILT `subset_deploy_profile.py` (no new tool): ran the two 3-leg books CONTAINING the winning pair, {me_long,fbr,gap} + {me_long,fbr,me_short}; §4 identical to 2059 (frozen-IS RP weights, committed exits, OOS measure-once char off already-spent series). **RESULT — OOS Calmar is HUMP-SHAPED in leg count, PEAKING at 2:** solo 0.310 -> **{me_long,fbr} 0.405** -> 3-leg 0.367 ({,gap}) / 0.393 ({,me_short}) -> 4-way 0.328; OOS return same shape (+0.487 -> **+0.697** -> +0.602/+0.526 -> +0.47%/yr). So {me_long,fbr} is the GLOBAL OOS-vehicle optimum across ALL leg counts (1/2/3/4), not just the best 2-leg. **Mechanism (decomposes the hump):** maxDD keeps FALLING with each added leg (1.75->1.72->1.34/1.64->1.43%, the 2054 staggered-trough depth-diversification) BUT return falls faster because every partner beyond the first is a weak-OOS-mean leg (gap 2/6, me_short 4/6 neg) whose mean-drag outweighs its incremental DD-cut -> Calmar declines past 2. The FIRST partner (fbr) is special — lifts return (decorrelated 2024 +7.61% tail when me_long flat) MORE than DD -> Calmar 0.31->0.405; every subsequent partner only drags mean. Quantitatively resolves 2059's 'fbr is the unique value-adding partner': no ADDITIONAL partner helps either; optimum = anchor + single best tail-decorrelating partner, then stop. **STILL KILL (caveats unchanged):** T_min 2.0yr (vehicle-infeasible, daily-5% cap never binds at any leg count), not-AFP OOS (2/6 neg), {me_long,fbr} doubly fat-tail-fragile (ex-both-tail-yrs ~+0.06%/yr flat, 2059); path-A UNCHANGED. **NEW lesson: the OOS deploy-vehicle Calmar is hump-shaped in leg count (peaks at 2) — the 'more decorrelated legs = better book' intuition is FALSE on the VEHICLE axis here (4-way is the WORST vehicle 0.328, solo 2nd-worst 0.31, the 2-leg optimum sits between); deploy the anchor + its single tail-decorrelating partner, not the full book. Generalizes 2054 (depth-div) + 2059 (unique partner) into a leg-count optimum.** Confirms+sharpens 2059's deploy recommendation: vehicle-axis object = 2-leg {me_long,fbr} (global leg-count optimum); mean-axis object = me_long-solo (1046). Components UNCHANGED (all 4 PORTFOLIO). No council/canonical/FLAG; OOS measure-once char. | N | n/e (OOS measure-once char., frozen IS weights+committed exits; not AFP — 2/6 neg) | OOS Calmar by legs: solo 0.310 / {me_long,fbr} 0.405 / 3-leg 0.367-0.393 / 4-way 0.328 (hump peaks at 2); ret +0.697 best | 3-leg worst-yr -0.62..-0.91% | maxDD monotone-down 1.75->1.43% in legs | 2-3 leg books | DIAGNOSTIC -> KILL (no new component; OOS vehicle Calmar hump-shaped, peaks at 2-leg {me_long,fbr}; 3rd+ leg drags mean > DD-cut; path-A unchanged) | N | KILL |
 | 1058 | 1000s | 2026-06-06 | **TAIL-ROBUSTNESS of me_long-SOLO (the operator's honest OOS deploy object, 1046/1053) — resolves arc-1057's fork: is the actual single-leg object tail-robust, or also a few-trade artifact?** Arc 1057 showed the 2-leg book's borderline significance is fbr-runner-tail-FRAGILE; me_long-solo (committed sl_only/SL2.0/2-bar D1 USD) is the leg the operator would actually run (book collapses to it OOS, 1046) and is structurally the LEAST tail-carried (high-win-rate short-horizon fade, no convex runner). Applied 1057's battery (tail-concentration + winsorize q99/97.5/95/90 + leave-top-N + cluster bootstrap) on IS (10 & 8 v3 folds) AND the already-spent OOS per-year series (measure-once char, 2055/2056/2059 precedent — no selection). Per-fold gate ROI reproduces 1056/1053 EXACTLY (IS 8-fold [0.96,−0.23,−1.14,−0.51,0.34,0.9,1.16,0.15] mean +0.204%; OOS [−0.63,0.55,0.18,0.54,2.26,0.02]). **RESULT — me_long-solo is ALSO tail-carried AND was NEVER significant.** (1) NON-SIG at baseline in BOTH windows: IS cluster **t=1.05** (10-fold) / 0.75 (8-fold); OOS **t=1.66** (CI [−0.04,+1.16] spans zero, P(<0)=0.039) — unlike the 2-leg book's borderline SIG+ t=2.27, which fbr+RP-weighting supplied. (2) TAIL-CARRIED: top-5 of net P&L = **139% IS / 114% OOS** (the rest net-negative); winsorize barely moves the (already-non-sig) t — me_long's sl_only tail is SHALLOW (max $699 IS / $1,237 OOS vs fbr $2,513) — but **leave-top-N is decisive: drop the top-5 → mean NEGATIVE both windows** (IS −0.084%, t=−0.52; OOS −0.071%, t=−0.35); IS drop-top-1 → t=0.68, OOS drop-top-1 (2025 $1,237) → t=1.65. (3) The OOS positive mean is a **2025 story** (3 of its top-5 positions = 2025, the +2.26% fold) — the solo-side analog of arc 2059's "me_long-2025 tail." **⇒ "OOS-mean-robust" (1046, = doesn't flip negative) is a SIGN property, NOT certifiability — me_long-solo's OOS mean is positive yet non-sig + single-year-carried.** RESOLVES 1057's fork on the UNIFORM branch: **NO deploy corner has a certifiable tail-robust mean** — solo (non-sig+tail-carried, this), 2-leg (borderline-sig but fbr-fragile, 1057), 4-way (non-sig, 1043). With the AFP-gate wall (1032) + vehicle/Calmar wall (2033/2059), the path-A "significant mean" pillar does NOT robustly exist at ANY leg-count/window; the corpus reversion edge is real (§11-honest) but uniformly too thin/tail-carried to certify a mean. Completes the deployment-robustness dossier; lever = operator path-A. NEW lesson: run the tail-robustness battery on the ACTUAL deploy object — the OOS-mean-positive single-leg fallback is itself non-sig + tail-carried (top-5=114-139% of net P&L); "OOS mean doesn't flip negative" ≠ certifiable. Components UNCHANGED (all 4 PORTFOLIO); no new BUILT tool, no canonical change, no FLAG, no council; OOS measure-once char (not tuned) | n/e | n/e (OOS measure-once char.) | IS baseline +0.213%/yr t=1.05 ~0; drop-top-5 mean −0.084% | OOS baseline +0.511%/yr t=1.66 ~0 (CI spans 0); drop-top-5 mean −0.071% | n/e | me_long-solo 98 IS / 52 OOS positions | DIAGNOSTIC → KILL (no new component; me_long-solo mean non-sig + tail-carried both windows — no deploy corner certifiable; 1057 fork resolved uniform) | N | KILL |
+| 1059 | 1000s | 2026-06-06 | **USD-trend-BREADTH conditioning of me_long (the deploy object)** — a genuinely-untested me-conditioner pointed at by arc 2018 (me_long carries a real +2018 via DIRECTIONAL WMR; stripping USD-beta removes it). because: condition me_long (buy a pair fallen ≥1 ATR into ME) on the breadth/strength of the COMMON USD move into month-end — a strong broad USD move = a TREND that continues (the known 2014-16 strong-USD IS hole), an idiosyncratic move = a flow over-extension that reverts → predict capture DECREASES with |common-USD-move| and an idiosyncratic-only filter LIFTS the worst fold. obs cheap-kill (§5d; BUILT `observe_long_capture` + `MonthEndReversionLongSignal`, honest take-the-loss capture/drift, IS 2010-2020 D1 7 USD majors, n=126 fires). **MECHANISM REAL + MONOTONE but NOT a worst-fold lever (KILL):** (A) capture declines monotonically with USD-breadth tercile **0.595/0.548/0.405** — the HI bucket (strong broad USD move) is BELOW coin-flip; the 2014-16 block confirms the *because* (systematic fires drift −0.117=trend continues / idiosyncratic +0.335=revert). (B) per-fire systematic/idiosyncratic is WEAK (both capture ~0.50-0.52; idiosyncratic n=22 thin). (C)/(D) **NEITHER filter direction lifts the worst fold:** concentrate onto idiosyncratic (n=22, median 2/yr, 2017=zero) / LO-breadth (n=42, **neg-years 4/11 worse than ALL 3/11**) = the 1029/1055 thinning death; **exclude only the worst HI-breadth tercile** (§5f best version, keeps n=84 no thinning) improves pooled capture 0.516→**0.571** but **WORSENS** fold resolution (neg-years 3→4/11, worst-year −0.237→**−0.317**) — because dropping HI-breadth fires removes me_long's directional-WMR **+2018 help** (2018 drift +0.060→−0.317), exactly arc 2018's finding. **NEW lesson — "edge & tail are the same exposure" (1018/2018) extends to STATE-CONDITIONING the deploy object: me_long's 2014-16 failure (systematic strong-USD trend) and its +2018 help (directional WMR) are the SAME USD-trend-breadth exposure at opposite outcomes → a breadth filter that removes the failure removes the help; trades one bad fold for another, can't lift the worst fold. A conditioner can be a genuine monotone per-trade separator (capture 0.60→0.40) and STILL a non-lever (per-trade capture ≠ per-year fold sign when edge & regime-tail share an exposure).** Adds USD-breadth to the mapped-dead me-conditioner list (density 1029 / depth 1025 / spread-z 1055 / trend-SMA 1012 / quarter-end 1012-1029): every state-conditioning of the surviving reversion edge thins folds or removes the help it needs — the deploy object's worst fold is structurally unfilterable within OHLC. §5f exit-sweep moot (fails at the fold-SIGN level, no exit moves it; me_long exit already settled 1012/2042). Components UNCHANGED (all 4 PORTFOLIO; me_long-solo the honest deploy object); no engine/null/council, no canonical change, no FLAG, no new BUILT tool; OOS untouched. Driver `discovery/_disco1_work/arc1059_melong_usd_breadth.py`. | N | n/e (OOS preserved) | me_long capture by USD-breadth tercile 0.595/0.548/0.405; excl-HI worst-yr −0.317 vs ALL −0.237 | n/e | n/e | 126 me_long IS fires | KILL (obs cheap-kill; real monotone separator, non-lever — breadth filter removes the +2018 help) | N | KILL |
+| 1060 | 1000s | 2026-06-06 | **POST-month-end TREND RESUMPTION — the regime-orthogonal NON-reversion 5th-leg candidate** (the book's binding gate, arc 1020/2019: positive in 2015 AND 2016 without dragging 2018, non-reversion). because: arc 1059 confirmed the reversion book dies in strong-USD years because the down-move into month-end IS the trend and CONTINUES; the untested complement of the SAME mechanism = trend RESUMPTION — month-end rebalancing is a TEMPORARY counter-trend dislocation (reversion edges harvest the snap-back), so once it clears (start of new month) the prevailing trend re-asserts → entering at new-month start in the prevailing-trend direction should be positive precisely in the strong-trend folds the reversion book fails. NOT closed shallow momentum (§5a): calendar-GATED (fires only start-of-month, post-flow-clear), and the KILL/PROCEED criterion is fold-SIGN in 2014-16&2018 (a trend leg can be overall-coin-flip yet be the regime-orthogonal leg IF its +years = the book's −years), not overall edge. obs cheap-kill (§5d; BUILT `observe_long_capture` direction-aware honest take-the-loss capture/drift, IS 2010-2020 D1 7 USD majors; enter k-th trading day of new month in trailing-return-sign direction; swept k∈{1,3,5}, trend_lb∈{20,60}, strength∈{0,1,1.5}ATR). **COIN-FLIP-OR-WORSE + the binding fold (2015) robustly NEGATIVE (KILL):** (A) capture **0.42-0.44 < coin-flip** in every cell, **drift-MEDIAN negative everywhere** (−0.13..−0.19) — the positive year-MEANS are convex-tail-carried (few trend-tail winners, median trade loses; the arc-2063 KILL tell); mechanistically take-the-loss penalizes trend entries (stop hit on pullbacks before +1R → sub-coin-flip honest capture), so the trend side is STRUCTURALLY worse than reversion on this engine. (B) **strong-USD folds [2014,2015,2016,2018]: 2015 NEGATIVE in 6/7 sweep cells** (default +0.224/**−0.304**/+0.138/+0.265; only the degenerate hold-10 cell flips 2015 to a noisy +0.093 with capture cratered 0.32) → the gate needs 2015&2016&2018 positive, 2015 kills it. (C) **NOT the me_long complement:** me_long −years = 2014/2015/2016; resumption there +0.224/**−0.304**/+0.138 → in **2015 BOTH directions negative**, can't cover the book's binding fold. **NEW lesson — the strong-USD wall (2015/2018) is NOT a directional-coverage gap: a regime where reversion fails does NOT imply continuation succeeds.** 2015 (CHF de-peg Jan + whipsaw choppy-trending USD) runs the reversion AND whipsaws the trend → both sides negative; the binding folds are hard price-structure REGIMES, not directional gaps fillable by flipping side. Adds trend-resumption to the mapped-dead 2018/2015-leg attempts (~22 routes). §5f moot (fails at fold-sign, gross-negative on the median regardless). Components UNCHANGED (all 4 PORTFOLIO; me_long-solo the honest deploy object); no engine/null/council, no canonical change, no FLAG, no new BUILT tool; OOS untouched. Driver `discovery/_disco1_work/arc1060_newmonth_trend_resumption.py`. | N | n/e (OOS preserved) | resumption capture 0.425 (sub-coin-flip); strong-USD folds 2014 +0.22 / 2015 −0.30 / 2016 +0.14 / 2018 +0.27 (2015 neg 6/7 cells) | n/e | n/e | 755 IS resumption obs | KILL (obs cheap-kill; coin-flip-or-worse, binding 2015 fold negative both directions) | N | KILL |
 
 ---
 
@@ -7698,3 +7700,189 @@ canonical change, no FLAG, no council, no engine/null. OOS NEVER touched (IS-onl
 exhausted — this was the gap survivor's last specifically-named untested universe cell, and it confirms the
 survivor does not generalize. Remaining value sits with the operator's gate/deploy decision or a
 NEEDS_ENABLEMENT charter unlock, not the autonomous edge-hunt.
+## arc_1059 — USD-trend-BREADTH conditioning of me_long (the deploy object)
+
+Full record: [`arcs/arc_1059_melong_usd_breadth.md`](arcs/arc_1059_melong_usd_breadth.md). Chat 1000s; obs
+cheap-kill (§5d), OOS-preserving; BUILT tools only; no engine/null/council; no canonical change; no FLAG;
+components UNCHANGED (all 4 PORTFOLIO).
+
+**Fresh-eyes (step a).** The corpus is at a terminus: 4 PORTFOLIO components, the 4-way book never AFP
+(2015/2018 wall), the honest deploy object collapsed to me_long-solo (1046), the deploy-vehicle matrix
+complete + vehicle-infeasible, §11 verification complete, and the explore-now EDGE MENU exhaustively closed
+on every axis (directional / calendar-forced-flow / convergence / inelasticity / relative-value). Both
+chats converged; the sibling 2000s is in the calendar-flow + vehicle-diagnostic lane (2053-2058). Lever =
+operator path-A. Per §5a fresh-eyes + the arc-3004 "apparatus is incapable is seductive" warning, I tested
+one genuinely-novel, mechanistically-grounded conditioner of the SURVIVING edge.
+
+**Idea + why.** me_long buys a pair fallen ≥1 ATR into month-end (post-fix WMR reversion UP); its known
+weakness is the contiguous 2014-16 strong-USD IS hole (the docstring's *because*: in a strong-USD trend the
+down-move IS the trend → continues). Arc **2018** found me_long carries a real +2018 via **directional WMR**
+and that stripping USD-beta removes it. So the untested refinement: condition me_long on the **breadth /
+strength of the common USD move into month-end** — genuinely distinct from every mapped me-conditioner
+(calendar-density 1029 / trigger-depth 1025 / spread-z 1055 / trend-SMA 1012 / quarter-end 1012-1029).
+Hypothesis: capture DECREASES with |common-USD-move|; idiosyncratic fires revert, systematic continue; an
+idiosyncratic-only filter lifts the worst fold.
+
+**Method.** BUILT-tools obs (`MonthEndReversionLongSignal` fires + `observe_long_capture` honest
+take-the-loss capture/drift), IS 2010-2020, D1, 7 USD majors. USD-signed 2-day move into each ME (XXXUSD up
+= USD down; USDXXX up = USD up); common_usd_move = mean across the 7 majors; breadth = |common_usd_move|.
+n=126 me_long fires tagged with month-breadth + own USD-signed move (systematic = sign agrees with common);
+grouped by breadth tercile, systematic/idiosyncratic, per-year fold sign.
+
+**Result — mechanism REAL + MONOTONE but NOT a worst-fold lever.**
+- **(A)** capture declines monotonically with USD-breadth: LO **0.595** / MID 0.548 / HI **0.405** (HI =
+  strong broad USD move = BELOW coin-flip). Drift 0.176/0.146/0.113. Unconditional 0.516. The mechanism is
+  confirmed: me_long fails precisely when the move is a strong broad USD trend.
+- **(B)** per-fire systematic/idiosyncratic is WEAK (both capture ~0.50-0.52; idiosyncratic n=22 thin,
+  drift +0.311 vs systematic +0.110). The **2014-16 block** confirms the *because*: systematic fires (n=23)
+  drift −0.117 (trend continues = the hole), idiosyncratic (n=5) +0.335 (revert) — right sign, 5 fires / 3yr.
+- **(C)/(D)** NEITHER filter direction lifts the worst fold. Concentrate onto idiosyncratic (n=22 total,
+  median 2/yr; 2017 zero) or LO-breadth (n=42, neg-years **4/11** worse than ALL 3/11) = the 1029/1055
+  thinning death. Exclude only the worst HI-breadth tercile (§5f best version; keeps n=84, ~2/3, no
+  thinning): pooled capture IMPROVES 0.516→**0.571** but per-year fold resolution WORSENS — neg-years
+  3→**4/11**, worst-year −0.237→**−0.317**, because dropping HI-breadth fires removes me_long's
+  directional-WMR **+2018 help** (2018 drift +0.060→−0.317; 2011 +0.155→−0.037), exactly arc 2018's finding.
+
+**Diagnosis + meaning.** USD-breadth is a real, monotone, mechanistically-correct per-trade separator that
+data-confirms the docstring *because* + arc 2018's directional-WMR result — but NOT a deployable worst-fold
+lever. me_long's 2014-16 failure (systematic trend-continuation) and its +2018 help (directional WMR
+reversion) live on the SAME high-USD-breadth exposure: concentrating onto low-breadth thins folds to noise;
+excluding high-breadth improves per-trade capture only by removing the +2018 fires the worst fold needs.
+Conditioning trades 2014-16 risk for 2018 risk; it cannot lift the worst fold. §5f exit-sweep is moot — the
+failure is at the fold-SIGN level (which years are pos/neg), which no exit/SL choice moves, and me_long's
+own exit is already settled-honest (committed sl_only/2-bar, 1012/2042). me_long UNCHANGED (PORTFOLIO; the
+honest deploy object).
+
+**NEW lesson.** The "edge & tail are the same exposure" closure (arc 1018 universe / 2018 cross-sectional)
+extends to **state-conditioning the deploy object**: me_long's worst-fold failure (2014-16 strong-USD
+systematic trend) and its best directional help (+2018) are the SAME USD-trend-breadth exposure measured at
+opposite outcomes, so a breadth filter that removes the failure necessarily removes the help — it trades one
+bad fold for another and cannot lift the worst fold. A conditioner can be a genuine monotone per-trade
+separator (capture 0.60→0.40 across breadth) and STILL be a non-lever, because per-trade capture ≠ per-year
+fold sign when the edge and its regime-tail share an exposure. Adds USD-trend-breadth to the mapped-dead
+me-conditioner list (density 1029 / depth 1025 / spread-z 1055 / trend-SMA 1012 / quarter-end 1012-1029):
+every state-conditioning of the surviving reversion edge either thins folds or removes the help it needs —
+the deploy object's worst fold is structurally unfilterable within OHLC.
+
+**Threads / handoff.** Components UNCHANGED (all 4 PORTFOLIO; me_long-solo the honest deploy object,
+vehicle-infeasible). Lever = operator path-A. This arc data-confirms arc 2018's directional-WMR mechanism and
+closes the last natural me-conditioner (breadth). Within the OHLC-only charter the EDGE frontier stays mined
+out; the next genuinely-new direction needs a charter unlock (operator-gated macro/options data,
+`NEEDS_ENABLEMENT.md`) or the operator's path-A decision. **Datum:** me_long capture by USD-breadth tercile
+0.595/0.548/0.405 (monotone, HI sub-coin-flip); excluding HI improves pooled capture 0.52→0.57 but worsens
+worst-year −0.24→−0.32 by removing the +2018 directional help. Driver
+`discovery/_disco1_work/arc1059_melong_usd_breadth.py` (BUILT tools only, single-use diagnostic).
+
+---
+**chat-1000s graceful handoff after arc 1059** (2026-06-06). One fresh-eyes arc this session: **1059
+(USD-trend-breadth conditioning of me_long)** — a genuinely-novel, untested conditioner of the deploy
+object, pointed at by arc 2018. Finding: USD-breadth is a REAL monotone per-trade separator (capture
+0.595/0.548/0.405 by breadth tercile, HI sub-coin-flip; data-confirms 2018's directional-WMR mechanism) but
+NOT a worst-fold lever — me_long's 2014-16 failure and its +2018 help are the SAME USD-breadth exposure, so
+no filter direction lifts the worst fold (concentrate→thins 1029/1055-style; exclude-HI→removes the +2018
+fires). Extends "edge & tail are the same exposure" (1018/2018) to state-conditioning the deploy object and
+closes the last natural me-conditioner. Components UNCHANGED (all 4 PORTFOLIO); deployable-system count = 0;
+lever = operator path-A. **State for the next 1000s chat:** the OHLC-only EDGE frontier remains exhausted on
+every mapped axis (both chats converged: directional / calendar-forced-flow / convergence / inelasticity /
+relative-value / regime / structural / state-conditioning all closed); the deploy-object dossier
+(significance + vehicle + §11 + now conditioning) is comprehensive and uniformly negative-for-certification.
+The genuinely highest-value next actions are OPERATOR-side — the path-A gate-governance decision OR a charter
+unlock (operator-gated macro/options data, `NEEDS_ENABLEMENT.md`) — not another autonomous within-charter
+arc, which would either re-grind closed ground (§5a) or duplicate the decision-support lane the 2000s chat is
+actively producing. A fresh chat resumes at arc 1060 via the bootstrap; absent an operator unlock the
+marginal EV of new arcs is low. No STOP sentinel present.
+
+## arc_1060 — POST-month-end TREND RESUMPTION (regime-orthogonal NON-reversion 5th-leg candidate)
+
+Full record: [`arcs/arc_1060_newmonth_trend_resumption.md`](arcs/arc_1060_newmonth_trend_resumption.md).
+Chat 1000s; obs cheap-kill (§5d), fresh-eyes novel mechanism (§5a); OOS-preserving; BUILT tools only; no
+engine/null/council; no canonical change; no FLAG; components UNCHANGED (all 4 PORTFOLIO).
+
+**Fresh-eyes (step a).** Corpus at a deeply-documented terminus: 4 PORTFOLIO components, the 4-way book
+never AFP (2015/2018 strong-USD wall), co-sim (item E) confirmed that failure is FUNDAMENTAL not a
+combiner artifact, the honest deploy object collapsed to me_long-solo (1046, vehicle-infeasible), the
+explore-now MENU (M1/O1/L1/Q1/G1; S1 modifier) exhaustively closed, and closed ground covers all shallow
+directional (long+short)/calendar/microstructure/RV/regime/structural. The 2000s sibling is saturating the
+vehicle-geometry + residual calendar-forced-flow lane (2053-2063). The book's binding gate (arc 1020/2019):
+a 5th component positive in 2015 AND 2016 without dragging 2018, NON-reversion (arc 2019 proved a 5th
+*reversion* leg cannot make the book AFP). Per §2/§5a + the arc-3004 "apparatus is incapable is seductive"
+warning, I tested one genuinely-untested NON-reversion construction aimed squarely at that gate.
+
+**Idea + because.** Arc 1059 data-confirmed *why* the reversion book dies in strong-USD years — the big
+down-move into month-end IS the trend and CONTINUES (me_long capture monotone-down with USD breadth; HI =
+0.405 sub-coin-flip). The untested complement of the SAME mechanism is trend RESUMPTION: month-end
+rebalancing is a TEMPORARY counter-trend dislocation (the reversion edges harvest the snap-back); once it
+clears (the first days of the new month) the prevailing trend re-asserts → entering at new-month start in
+the prevailing-trend direction should be positive precisely in the strong-trend years (2014-16, 2018) where
+reversion fails — the regime-orthogonal NON-reversion leg. Why NOT closed shallow momentum (§5a):
+calendar-GATED (start-of-month, post-flow-clear, not every bar), keyed to a flow-clearing market mechanism,
+and the KILL/PROCEED criterion is fold-SIGN in the strong-trend folds (a trend leg can be overall-coin-flip
+yet be the regime-orthogonal leg IF its +years are the book's −years), not overall edge.
+
+**Method.** BUILT-tools obs only: `observe_long_capture` (direction-aware honest take-the-loss capture +
+N-bar fwd drift), IS 2010-2020, D1, 7 USD majors. For each pair flag the k-th trading bar of each month
+(causal calendar position); prevailing-trend direction = sign of trailing `trend_lb`-bar return at that bar
+(causal); strength = |return|/ATR; long if up&strong, short if down&strong. Swept k∈{1,3,5},
+trend_lb∈{20,60}, strength∈{0,1,1.5}ATR, hold/drift — cheap-obs robustness, not optimization. Driver
+`discovery/_disco1_work/arc1060_newmonth_trend_resumption.py`.
+
+**Result — coin-flip-or-worse, and the binding fold (2015) is robustly NEGATIVE.**
+- **(A)** Sub-coin-flip everywhere: capture 0.42-0.44 in every cell; drift-MEDIAN negative in every cell
+  (−0.13..−0.19). The occasional positive year-MEAN is convex-tail-carried (a few trend-tail winners while
+  the median trade loses — the arc-2063 KILL tell). Mechanistically, under take-the-loss trend entries
+  touch the 2·ATR stop on the pullbacks before +1R, so honest capture stays sub-coin-flip even when raw
+  drift is occasionally positive → the trend side is STRUCTURALLY worse than reversion on this engine.
+- **(B)** Strong-USD folds [2014,2015,2016,2018] by cell: default +0.224/**−0.304**/+0.138/+0.265; k=1
+  +0.626/**−0.275**/+0.181/+0.082; k=5 +0.372/**−0.249**/+0.147/+0.467; 20d −0.674/**−0.145**/−0.109/+0.569;
+  all-trends +0.205/**−0.271**/+0.163/+0.284; strong≥1.5 +0.181/**−0.213**/+0.181/+0.240. **2015 negative in
+  6/7 cells** (only the degenerate hold-10/drift-5 cell flips it to a noisy +0.093 with capture cratered to
+  0.32). The gate needs 2015 AND 2016 AND 2018 positive → 2015 kills it.
+- **(C)** Not the me_long complement: me_long −IS-years = 2014/2015/2016; resumption there
+  +0.224/**−0.304**/+0.138 → in **2015 both directions negative**, cannot cover the book's binding fold.
+
+**Diagnosis + meaning.** The resumption is (1) coin-flip-or-worse overall (sub-0.50 capture, negative
+median drift = gross-negative on the typical trade, before costs) confirming closed-ground momentum under
+an honest take-the-loss lens, and (2) not reliably positive in the strong-USD folds — the single binding
+fold (2015) is robustly negative across the sweep. Crucially 2015 defeats BOTH the reversion and the
+trend-resumption: 2015 (CHF de-peg Jan + whipsaw choppy-then-trending USD) was not a clean persistent trend
+to resume — strong moves that violently reversed — so the trend side gets whipsawed exactly where the
+reversion side gets trend-run. §5f exit-sweep is moot (failure is at the fold-sign level; gross-negative on
+the median regardless).
+
+**NEW lesson.** The reversion book's strong-USD wall (2015/2018) is NOT a directional-coverage gap. Arc
+1059 showed reversion fails in strong-USD years because the move continues; the natural inference "add the
+trend-continuation side as the regime-orthogonal leg" is FALSIFIED here — the trend-resumption is also
+negative in the binding 2015 fold, because 2015 is a whipsaw regime that runs the reversion AND whipsaws
+the trend. A regime where reversion fails does NOT imply continuation succeeds; both fail when the regime
+is choppy-trending rather than cleanly trending. The binding folds are hard price-structure REGIMES, not
+directional gaps fillable by flipping side. Adds trend-resumption to the mapped-dead 2018/2015-leg attempts
+(~22 routes). Under take-the-loss a trend leg is additionally self-penalized (stop hit on pullbacks →
+sub-coin-flip honest capture), structurally worse than the reversion side on this engine.
+
+**Threads / handoff.** Components UNCHANGED (all 4 PORTFOLIO; me_long-solo the honest deploy object,
+vehicle-infeasible). Lever = operator path-A. Closes the "trend-side complement of the reversion book" as
+the regime-orthogonal 5th leg and sharpens the terminus: 2015/2018 are hard price-structure regimes, not
+directional gaps. Within the OHLC-only charter the EDGE frontier stays mined out; the next genuinely-new
+direction needs a charter unlock (operator-gated macro/options/COT/calendar data, `NEEDS_ENABLEMENT.md`) or
+the operator's path-A decision. **Datum:** new-month trend-resumption (k=3, 60d, strong≥1ATR) capture 0.425
+(sub-coin-flip), drift-median negative all cells; strong-USD folds 2014 +0.22 / 2015 −0.30 / 2016 +0.14 /
+2018 +0.27 (2015 neg 6/7 sweep cells). Driver `discovery/_disco1_work/arc1060_newmonth_trend_resumption.py`.
+
+---
+**chat-1000s graceful handoff after arc 1060** (2026-06-06). One fresh-eyes arc this session: **1060
+(post-month-end trend RESUMPTION as the regime-orthogonal NON-reversion 5th leg)** — pointed at by arc
+1059's finding that reversion dies in strong-USD years because the trend continues. Finding: the
+trend-resumption is coin-flip-or-worse (capture 0.42-0.44, drift-median negative every cell; positive
+year-means are convex-tail-carried) AND the book's single binding fold, 2015, is robustly negative in 6/7
+sweep cells — so it is neither a standalone edge nor the regime-orthogonal leg, and in 2015 BOTH reversion
+and resumption are negative. NEW lesson: the strong-USD wall (2015/2018) is NOT a directional-coverage gap
+— a regime where reversion fails does not imply continuation succeeds (2015 = CHF-de-peg whipsaw runs the
+reversion AND whipsaws the trend); the binding folds are hard price-structure regimes, not directional
+gaps. Components UNCHANGED (all 4 PORTFOLIO); deployable-system count = 0; lever = operator path-A. **State
+for the next 1000s chat:** the OHLC-only EDGE frontier remains exhausted on every mapped axis (now incl. the
+trend-continuation complement of the reversion book); both the reversion AND continuation directions fail
+the binding 2015/2018 folds → those folds are hard regimes, not coverable by any single-direction OHLC
+mechanism. The genuinely highest-value next actions are OPERATOR-side — the path-A gate-governance decision
+OR a charter unlock (`NEEDS_ENABLEMENT.md`) — not another within-charter arc, which would re-grind closed
+ground (§5a) or duplicate the 2000s decision-support lane. A fresh chat resumes at arc 1061 via the
+bootstrap; absent an operator unlock the marginal EV of new arcs is low. No STOP sentinel present.

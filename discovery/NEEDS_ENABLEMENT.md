@@ -43,6 +43,14 @@ simultaneous opposing leg to net). The genuinely cheap, high-value unlock hiding
 
 ### E — Single co-simulated portfolio EQUITY CURVE (build this FIRST) · small build · highest ROI
 
+> **STATUS 2026-06-06 — BUILT, IN HUMAN REVIEW (gated-core PR, not yet merged).** `core/wfo/cosim_book.py`
+> (`cosim_book_fold`) + CI gate tests (`tests/wfo/test_cosim_book.py`) + the honest-engine-sweep co-sim
+> re-read (SAFE). Validated against the existing 4-way book (gap+me_long+fbr+me_short, arcs
+> 1006/1011/1013/1019) — see [`COSIM_ITEM_E_VALIDATION.md`](./COSIM_ITEM_E_VALIDATION.md). **Result: every
+> measurement (linear, co-sim cap-off, co-sim cap-on) FAILS all-folds-positive on IS → the book's failure is
+> FUNDAMENTAL, not a linear-combiner artifact. The portfolio route is closed cleanly; IS did not clear so the
+> 2021+ OOS was NOT touched.** Deployable-system count stays 0. Do not mark this item DONE until the PR merges.
+
 - **What must be enabled.** A driver/gate path that marks **all components to ONE equity line** under the
   **shared 5% daily-DD cap** and the 2-per-currency exposure cap applied to the *book's* net exposure —
   replacing (or sitting beside) the per-fold-**LINEAR** combiner (`discovery/tools/combine_fold_roi.py`),

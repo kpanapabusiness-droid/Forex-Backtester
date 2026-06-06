@@ -119,6 +119,7 @@ at arc step (i).
 | 1041 | 1000s | 2026-06-06 | **Oracle-best-cluster CEILING on fbr's 2018 fold — is the fbr→PASS route salvageable IN PRINCIPLE, or did arc 1040's 3 causal filters just miss a real sub-structure?** fbr is one fold from all-folds-positive PASS (only 2018 negative); 3 collinear causal filters (D1-conf 1040 / touch 2030 / depth 1025) only MITIGATE 2018. §5d oracle ceiling (trustworthy-asymmetric: nothing beats perfect-hindsight cluster selection): build fbr pool (237), `run_step_2` k=4 path-shape clusters (`run_step_3` flags 0&1 candidate), score EACH cluster's 2018 ROI via `OracleFoldRunner` (perfect-hindsight membership) → A1→MultiPairBacktester FundedNext committed `sl_plus_trailing_atr`. **DEFINITIVE: fbr-2018 UNSALVAGEABLE by path-shape selection.** Baseline 2018 −4.39% (n18); every cluster that TRADES 2018 is negative — cluster1 −4.11%(n8) / cluster2 −2.64%(n5) / cluster3 −2.59%(n5); the ONLY non-negative is cluster0 +0.00% but **n=0 (empty — its only "salvage" is to not trade 2018)**. So even perfect hindsight on the realised path can't make fbr-2018 positive — it can at most sit out. fbr-2018's loss is distributed across EVERY traded path-shape (not one separable bad cluster) → regime-intrinsic (confirms 2014/1025/1040: strong-USD systematically turns failed-breakdowns into real breakdowns); the only avoid = ex-ante regime foresight (unsolved prediction problem; no causal proxy provides it — D1/touch/depth all fire+lose in 2018). **fbr→PASS route DEAD in principle; fbr capped at 9/10, stays strongest PORTFOLIO component.** Weak residual thread: cluster0 (candidate, capturable, 39 members) never fires 2018 → IF a causal proxy isolated it, selection would naturally sit out 2018 — but the 3 nearest causal proxies don't isolate it. Generalizes 1040/2030/1025 from "no causal filter rescues fbr-2018" to "no selector does". No new tool (canonical run_step_2/3 + OracleFoldRunner). No canonical change, no FLAG, no council, OOS never touched. Components UNCHANGED | N | n/e (OOS preserved) | −2.593% (best NON-empty 2018 cluster ceiling) / baseline −4.393% | n/e | 18 fbr-2018 / 237 pool | DIAGNOSTIC → KILL (fbr→PASS route dead in principle; fbr unchanged) | N | KILL |
 
 | 2041 | 2000s | 2026-06-06 | **§5f NESTED walk-forward EXIT/SL selection on `me_short` (1019) — does arc-2040's fbr exit-optimism generalize?** me_short's committed exit IS a registry exit (`sl_partial_close_1r_runner_trail`, no time-predicate in the book's `validate_4way_book` config) → 6-exit grid maps cleanly, same apples-to-apples as fbr. Reused BUILT `nested_exit_selection`; 18 cfgs (6 exits×SL{1.5,2.0,2.5}, trail_off, canonical D1 7-major scoring), per-fold walk-forward selection (3 metrics) + frozen pick on 2021+ once. Anchor **PERFECT** (partial-runner/SL2.0 reproduces arc-1020 me_short EXACTLY, max|diff| 0.005pp, +0.683%/7-of-10). **HEADLINE — WORSE than fbr, the optimism FLIPS THE SIGN:** me_short is EXIT-SENSITIVE (grid: tp_3r/partial-runner positive, but `sl_only`/`trailing_swing` at low SL mean-NEGATIVE to −1.63%); under honest §5f nested-WFO selection me_short is **mean-NEGATIVE-to-≈zero IS (mean_roi −0.192% / afp −0.405% / worst −0.034%, all 5-neg, NONE AFP) AND mean-NEGATIVE OOS (−0.557% / −0.489% / −0.247%, pos ≤2/6)** — vs committed +0.683% IS. The committed +0.683% does NOT survive honest no-lookahead exit selection; full-grid best-MEAN (tp_3r/SL2.5 +0.78%) collapses OOS −0.557% (§5f trap again). **QUANTIFIES arc 3017's qualitative exit-sensitivity flag into a §5f verdict.** Generalizes+SHARPENS 2040: BOTH engine-positive book legs are exit-optimistic; fbr loses ~40% but stays +, me_short goes NEGATIVE. **FLAG F1: me_short's recorded +0.683% (the 4th PORTFOLIO component, arc-2015's robust-+2018 leg) is the MOST exit-fragile headline — mean-negative under honest §5f exit selection (IS+OOS); on the conservative §11 reading (PORTFOLIO requires mean-positive-net-of-cost; can't diversify net-negatives) its PORTFOLIO status is QUESTIONABLE → KILL side, which would also remove the book's only robust-+2018 leg.** FAIR caveat (§8): the committed partial-runner is a defensible FIXED mechanism-motivated exit (fix-flow reversion needs +1R-partial + runner, arc 1019/3017) and as a fixed choice stays +0.683%; the nested negativity is partly small-n (8 folds) selection variance — so this is a FLAG (which standard governs = operator path-A call), not a unilateral downgrade. Components UNCHANGED. No new tool (reused 2040's). No OOS tuned. No council. **NEW lesson: the full-sample-best-exit optimism gap is component-dependent and can FLIP THE SIGN — a thin exit-sensitive engine-positive component's entire edge can be a fixed best-version-exit artifact; re-check any thin PORTFOLIO input under honest §5f nested-WFO exit selection before trusting it.** | N | N | −0.90% (honest nested worst metric) | −1.36% (frozen worst-metric) | n/e | 91 me_short IS / 18-cfg grid | KILL (methodology; me_short UNCHANGED but PORTFOLIO status FLAGGED) | N | KILL |
+| 1042 | 1000s | 2026-06-06 | **Honest-exit 4-way BOOK mean — complete the §5f nested-WFO exit audit on gap+me_long (arc 2040 did fbr, 2041 me_short) then RECOMPUTE the book's deploy-relevant mean under all-4 honest exits.** because: operator path-A deploys the book MEAN (committed +0.59% RP, t=2.66 arc 1023), a weighted combo of 4 component headlines — and 2040/2041 showed 2 of 4 are §5f-forbidden full-sample exit picks (fbr −40%, me_short SIGN-FLIP); the honest deploy mean was never computed. Canonical scoring, BUILT `nested_exit_selection`+`combine_fold_roi`; gap exit menu = the OVERSHOOT-harvest HORIZON (pure-time h{12..48}×SL, arc 1007), me_long = registry 6×3 w/ 2-bar horizon fixed (mechanism, arc 2024). **Anchors reproduce** (gap +0.685/me_long +0.232/me_short +0.683 byte-close; fbr +2.084 = trail-OFF book config, ≡ arc-2040 anchor not arc-1020's +1.854 double-trail). **Component split — optimism spans the FULL range:** **gap** committed h24 IS literally the full-sample-best-mean pick (cleanest §5f violation in corpus) → honest nested **mean-NEGATIVE** (eval −0.85..−1.14%, all-10 ≈0%, carried entirely by the single 2012 +8.23 outlier); **me_long ROBUST** (honest +0.20% ≈ committed +0.23%, heaviest RP leg 0.531 NOT fished — vindicates 1012); fbr ~40% haircut stays + (+1.0–1.2% afp/worst, ≡2040); me_short NEGATIVE (−0.03..−0.41%, ≡2041). **BOOK (the headline): committed +0.594% RP → HONEST +0.27–0.41% (commit wts) / ~+0.16% (RP-refit on honest series) — overstated ~1.5–2×.** Book SURVIVES mean-positive (robust me_long wt 0.531 + haircut fbr dilute the now-neg gap+me_short); still never AFP (unchanged). **Frozen-exit OOS book (per-comp §5f freeze, scored once; combined line = characterization not a §5g book-gate): conservative metrics +0.19–0.26% (IS≈OOS), mean_roi metric −0.03% (§5f trap — picks fbr trailing_swing that dies fwd).** Trustworthy honest deploy ≈ **+0.2–0.3%/yr, ~HALF committed, all NOT-AFP.** **F1** book deploy-mean exit-optimistic ~1.5–2× (path-A should use honest ~+0.27%, not +0.59%); **F2** gap JOINS me_short mean-negative under honest §5f → both PORTFOLIO statuses questionable (§11), book leans on me_long+fbr (fair-caveat §8: committed exits are defensible FIXED mechanism choices, nested neg partly small-n → FLAG not downgrade); **F3** arc-1023's t=2.66 significance pillar likely lost under honest exits (est. t≈1.2, exact recompute owed). me_long exit-ROBUST HOLDS; AFP failure unchanged (not an exit artifact). Lever = operator path-A w/ a CORRECTED (lower) deploy mean. No new tool, no canonical change, no council. NEW lesson: full-sample-best-exit optimism is component-dependent (0→40%→sign-flip) but at BOOK level partially WASHES OUT (RP weights the robust leg heaviest) — "2/4 legs fished" ≠ "book fake", but HALVES the deploy mean & concentrates it on me_long; re-derive a thin book's deploy mean leg-by-leg under §5f before trusting the committed headline. | N | n/e (OOS per-comp §5f frozen; book gate = operator §5g) | −0.68% (honest book worst, RP worst-metric commit-wts) | −0.79% (OOS book worst, worst-metric) | n/e | 4-comp book (gap 263/me_long 98/fbr 235/me_short 96) | DIAGNOSTIC → KILL (no new component; book deploy-mean recomputed honest ~+0.27%, ~½ committed; FLAGs F1–F3) | N | KILL |
 
 ---
 
@@ -5696,3 +5697,99 @@ oracle); only a regime-timing overlay (the unsolved prediction problem) could av
 **Tooling.** No new BUILT tool (reused canonical `build_arc_pool` / `run_step_2` / `run_step_3` /
 `OracleFoldRunner`). Driver scratch (uncommitted): `_arc1040_work/oracle_fbr_2018.py`. **FLAGS:** none. No
 canonical-core change. OOS NOT touched.
+
+---
+
+## arc_1042 — Honest-exit 4-way BOOK mean (complete the §5f exit audit; recompute the deploy number)
+
+**Question.** Operator path-A deploys the book MEAN (committed **+0.59% RP**, t=2.66 arc 1023). That
+mean is a weighted combination of 4 component headlines — and arcs 2040 (fbr) + 2041 (me_short)
+showed those headlines rest on **§5f-forbidden full-sample-best exit picks** (fbr −40%, me_short
+SIGN-FLIP under honest nested-WFO selection). gap + me_long were never checked, and the **honest book
+mean was never computed.** This arc completes the per-component audit and recombines all 4 honest
+per-fold series into the honest deploy number.
+
+**Method.** 100% canonical scoring (`ArcFoldRunner`→A1→`MultiPairBacktester`, FundedNext); selection
+via BUILT `nested_exit_selection` (2040); book combination via BUILT `combine_fold_roi` (2006). gap's
+exit menu = the chosen hyperparameter (the OVERSHOOT-harvest HORIZON; arc 1007 proved the edge is
+overshoot, capping at target is worse) → pure-time (`exit_policy=None`) × horizon {12,18,24,36,48} ×
+SL {1.5,2,2.5}; me_long = registry 6 exits × 3 SL with the 2-bar reversion horizon held FIXED as
+mechanism (arc 2024); fbr/me_short = registry 6×3 (re-derived for the book series). Nested selection
+3 metrics; frozen pick scored ONCE on 2021+.
+
+**Anchors reproduce.** gap +0.685% / me_long +0.232% / me_short +0.683% (max|diff| ≤0.005pp). fbr
++2.084% — the **trail-OFF** book config (`trail_enabled=False`, what `validate_4way_book` deploys);
+arc-1020's +1.854% was the `trail_enabled=True` double-trail (arc-2040 F2). My +2.084% reproduces
+arc-2040's trail-off anchor exactly → consistent, no defect.
+
+**Component §5f picture — optimism spans the FULL range.**
+- **gap (RP wt 0.078): NEW, mean-NEGATIVE.** Its committed horizon-24 IS literally the full-sample-
+  best-mean pick (+0.685%) — the headline and the fished number are the SAME config, the cleanest
+  §5f violation in the corpus. Honest nested → eval mean **−0.85% to −1.14%** (5-neg), all-10 ≈0%.
+  gap's +0.685% rests almost entirely on the single 2012 **+8.23%** outlier fold, which honest
+  no-lookahead horizon selection cannot rely on (gap thin/threshold-fragile, arc 1009). gap JOINS
+  me_short on the exit-fragile list.
+- **me_long (RP wt 0.531): NEW, ROBUST.** Honest +0.147–0.203% ≈ committed +0.232% (honest selection
+  lands on partial-runner ≈ baseline). The heaviest RP leg is the one NOT exit-fished → vindicates
+  arc 1012's full-sample sweep finding.
+- **fbr (wt 0.107):** honest +1.00–1.20% (afp/worst) vs committed +2.084% → ~40% haircut, stays +
+  (reproduces arc 2040).
+- **me_short (wt 0.284):** honest −0.03 to −0.41% → NEGATIVE (reproduces arc 2041).
+- gap registry side-check (h24): trailing_atr +0.898% is the full-sample best but is itself fishing;
+  confirms the meaningful gap hyperparameter is the horizon, not the SL-exit family (arc 1007).
+
+**BOOK MEAN — the deploy number.** Committed RP weights gap=.078/me_long=.531/fbr=.107/me_short=.284.
+
+| book | mean(all-10) | eval-mean(8) | worst | AFP |
+|---|---|---|---|---|
+| COMMITTED RP | **+0.594%** | +0.275% | −0.46% | False |
+| HONEST RP commit-wts mean_roi | +0.407% | +0.337% | −1.08% | False |
+| HONEST RP commit-wts afp_then_mean | +0.291% | +0.034% | −0.79% | False |
+| HONEST RP commit-wts worst_then_mean | +0.267% | +0.109% | −0.68% | False |
+| HONEST RP honest-refit-wts mean_roi | +0.156% | +0.088% | −0.67% | False |
+
+⇒ committed **+0.59% overstates the honest §5f deploy mean by ~1.5–2×**: honest ≈ **+0.27–0.41%** RP
+(commit weights), ~+0.16% if RP weights are re-fit on the honest lower-vol series. The book SURVIVES
+mean-positive under every honest metric & weighting — carried by robust me_long (wt 0.531) + haircut-
+but-+ fbr, diluting the now-negative gap + me_short. Still never AFP (always was; not an exit
+artifact).
+
+**Frozen-exit OOS book (2021+).** Per-component freeze-and-score is §5f-mandated (as 2040/2041 per
+leg); the combined-book line is a CHARACTERIZATION data-point, NOT a book-OOS gate (combined-book
+holdout AFP gate stays the operator's §5g firewall, arc 2022/1032). mean_roi → OOS RP **−0.033%** (the
+§5f trap — mean_roi picks fbr trailing_swing/SL1.5, the high-variance exit that dies forward,
+2040/2041 signature); afp_then_mean → **+0.261%**; worst_then_mean → **+0.194%** (conservative metrics
+pick partial-runner; IS≈OOS). ⇒ trustworthy honest deploy ≈ **+0.2–0.3%/yr**, all NOT-AFP.
+
+**Significance (labelled estimate, exact recompute owed).** arc-1023's book-mean t=2.66 (p≈0.026) was
+on the COMMITTED-exit series. The honest mean is ~half; at similar per-fold sd (~0.7%, arc 1023) that
+implies honest-exit book **t≈1.2 → likely no longer significant at 0.05.** Estimate from the mean-
+haircut, not a computed sd — exact honest-series t-stat is the owed follow-up. MATTERS for path-A:
+the "statistically-significant mean-positive" pillar (arc 1023/2019) weakens under honest exits.
+
+**Verdict: DIAGNOSTIC → KILL** (no new component; components UNCHANGED, all 4 PORTFOLIO).
+**F1** book deploy-mean exit-optimistic ~1.5–2× → path-A should use honest ~+0.27% (conservative
+~+0.2–0.3% IS≈OOS), not the committed +0.59%. **F2** gap JOINS me_short mean-negative under honest §5f
+(gap's committed exit IS the full-sample best pick); by §11 (can't diversify net-negatives positive)
+both PORTFOLIO statuses are questionable on the conservative reading → book leans on me_long (robust)
++ fbr (haircut). FAIR caveat (§8, as 2041): the committed exits are defensible FIXED mechanism-
+motivated choices (gap's overshoot horizon, me_short's partial-runner) and as fixed choices stay +;
+the nested negativity is partly small-n (8 eval folds) selection variance → FLAG, not a unilateral
+downgrade. **F3** arc-1023/2019 t=2.66 significance likely does not survive honest exits (est t≈1.2),
+exact recompute owed. **HOLDS:** me_long (heaviest leg) exit-ROBUST (confirms 1012); honest book stays
+mean-positive; AFP failure unchanged. Lever = operator path-A, now with a corrected (lower) deploy
+mean as input.
+
+**NEW lesson.** The full-sample-best-exit optimism is **component-dependent and spans the full range**
+— ~0 (me_long robust) → ~40% (fbr, stays +) → SIGN-FLIP negative (gap, me_short). At BOOK level it
+**partially washes out** because risk-parity weights the one robust leg (me_long 0.531) heaviest and
+down-weights the high-variance fished legs (gap 0.078) — so "2 of 4 legs are exit-fished" does NOT
+mean "the book is fake," but it roughly HALVES the deploy mean (+0.59%→~+0.27%) and concentrates the
+residual edge on me_long. Re-derive a thin book's deploy mean leg-by-leg under §5f nested-WFO
+selection before trusting the committed headline; the honest book mean (not the committed one) is the
+number path-A deploys, and it likely loses the t=2.66 significance the deploy case leaned on.
+
+**Tooling.** No new BUILT tool (reused `nested_exit_selection` 2040 + `combine_fold_roi` 2006; gap
+horizon-sweep was inline config construction). Driver: `_disco_work/arc1042_honest_exit_book.py`. No
+canonical change, no FLAG-as-code-patch, no council. OOS touched only via §5f-mandated per-component
+frozen-exit score (as 2040/2041); combined-book AFP gate left to operator (§5g).

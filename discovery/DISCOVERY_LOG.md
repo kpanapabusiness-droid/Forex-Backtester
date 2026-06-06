@@ -5966,3 +5966,13 @@ Sharpe, not just mean.
 
 **Tooling.** No new BUILT tool (reused `nested_exit_selection` + `combine_fold_roi`). Driver
 `_disco_work/arc1044_honest_diversification.py`. No canonical change, no council, OOS untouched.
+
+**Convergence note (arc 1043 ↔ concurrent arc 2043, 2000s).** Independent arc 2043 (2000s chat,
+different weighting — arc-2016 weights {gap 0, me_long .65, fbr .2, me_short .15}) ran the SAME
+honest-book significance recompute concurrently and CONVERGES: committed t=+2.66 (reproduces arc 1023
+EXACTLY at those weights), honest **NOT significant (best t≈0.96, all CIs span zero, P(mean≤0)
+0.15–0.49).** With my arc 1043 (risk-parity weights, committed t=+2.16 / honest t≈1.2–1.5) this is a
+TWO-CHAT, TWO-WEIGHTING independent confirmation that arc-1023/2019's t=2.66 significance pillar does
+NOT survive honest §5f exits — the strongest possible Arc-10 cross-check on the deploy-case correction.
+My arc 1044 extends the thread to the diversification pillar (honest ENB 3.32→~1.8), not duplicated by
+the 2000s chat.

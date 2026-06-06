@@ -5834,3 +5834,13 @@ number path-A deploys, and it likely loses the t=2.66 significance the deploy ca
 horizon-sweep was inline config construction). Driver: `_disco_work/arc1042_honest_exit_book.py`. No
 canonical change, no FLAG-as-code-patch, no council. OOS touched only via §5f-mandated per-component
 frozen-exit score (as 2040/2041); combined-book AFP gate left to operator (§5g).
+
+**Convergence note (post-write, independent reproduction).** Concurrent arc **2042 (2000s chat,
+independent code)** ran the SAME gap+me_long nested-exit check simultaneously and CONVERGES on the
+component verdicts — **gap flips mean-NEGATIVE, me_long ROBUST**, 2-of-4 legs negative (strongest
+Arc-10 cross-confirmation; neither chat could cite the other at write time). My arc 1042 EXTENDS 2042:
+2042 conjectured "an honest-§5f book mean is plausibly near-zero" but did not compute it; I computed
+the recombined book (**honest RP ≈ +0.27% commit-wts / ~+0.2–0.3% IS≈OOS**) — NOT near-zero, because
+risk-parity concentrates 53% weight on the robust me_long, diluting the now-negative gap (wt 0.078) +
+me_short. The book computation corrects the naive "3 legs optimistic → book near-zero" read: the
+deploy mean is ~HALF committed, positive, and carried by me_long.

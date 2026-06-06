@@ -5134,6 +5134,26 @@ predicate) + `me_long` (`sl_only` + 2-bar time-exit). Reuse this arc's walk skel
 whole book is end-to-end §11-verified — the pre-deployment institutional gate the operator's path-A call
 rests on. **Tooling:** BUILT `independent_outcome_audit.py` (registered). NEW lesson recorded in the
 Tier-1 row.
+
+**ADDENDUM (post-merge — convergence with concurrent 2000s arc 2036 + a config fork).** On pull, the
+2000s chat had independently done the SAME fbr outcome audit (arc 2036) — cross-chat Arc-10 reproduction
+(like 2034/2035↔1037); both find the fbr OUTCOME layer HONEST. The convergence surfaced a real config
+fork: I followed `validate_4way_book.py` → `trail_enabled=False` (single `sl_plus_trailing_atr` trail);
+2036 used the committed arc-1013 headline → `trail_enabled=True` (the double-trail, KH-24 `TrailManager`
++ `sl_plus_trailing_atr` both active, flagged 1015/3009/1024). Measured both (same 210 entries):
+`trail_enabled=True` → exits 89 stop_loss/24 native trailing_stop/97 trailing_stop_atr, **+1.854%/9-of-10**
+(the byte-exact headline); `trail_enabled=False` → 89 stop_loss/121 trailing_stop_atr, **+2.084%/8-of-10**
+(2019 flips +0.05→−0.17). So the two §11 audits are COMPLEMENTARY — 2036 verified the byte-exact headline,
+this arc the cosim-book `trail_enabled=False` variant → fbr outcome honest under BOTH trail configs. My
+Tier-1 "exact `validate_4way_book` fbr config" is accurate; the "committed config" framing was loose (the
++1.854% headline is `trail_enabled=True`) — corrected in the arc doc. **FLAG (provenance, not honesty;
+code human-gated, not patched):** the cosim book + deployment-char arcs (1033/2033/`equity_risk_profile`,
+all via `validate_4way_book.py`) run fbr at `trail_enabled=False` = +2.084%/8-of-10, ≠ the component
+headline `trail_enabled=True` = +1.854%/9-of-10 (the documented double-trail / "within ~1.49pp" fork,
+now quantified: only the 2019 fold sign differs; the 2018 binding fold is −4.20/−4.39 either way → the
+book's 2018 wall is config-ROBUST). Worth operator awareness when the two are cited together. Components
+UNCHANGED.
+
 ### arc 2036 — independent §11 OUTCOME-layer audit of fbr (per-trade R vs raw price)
 
 **Why this arc.** Resumed 2000s at 2036 (highest in range = 2035, +1). The edge-hunt is exhausted (4-way

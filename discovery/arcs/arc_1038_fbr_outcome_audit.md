@@ -155,3 +155,40 @@ shortcut was precisely a same-bar partial suppression) is the explicit next §11
 2. With signal (2034/2035/1037) + `fbr` outcome (this arc) + the other-3 outcome (thread 1) done, the
    WHOLE book is end-to-end independently §11-verified — the institutional pre-deployment gate the
    operator's path-A decision rests on.
+
+---
+
+## ADDENDUM (post-merge) — convergence with concurrent arc 2036 + a config-provenance fork it surfaced
+
+Pulled main after committing: the concurrent **2000s chat independently did the SAME fbr outcome audit
+(arc 2036)** — a cross-chat Arc-10 reproduction exactly like 2034/2035↔1037. **Both chats, different code,
+converge: the `fbr` OUTCOME layer is HONEST** (every committed trade's realised R re-derives from raw
+price; take-the-loss exact).
+
+The convergence surfaced a real **config fork** I must state accurately (the merge showed 2036 used a
+different fbr config than I did). I followed `scripts/cosim_validation/validate_4way_book.py` →
+**`trail_enabled=False`**; arc 2036 used the committed arc-1013 headline → **`trail_enabled=True`** (the
+"double-trail" flagged in arcs 1015/3009/1024: the KH-24 `TrailManager` AND the `sl_plus_trailing_atr`
+exit policy BOTH active). I measured both directly (same 210 entries, different exits):
+
+| fbr config | exits | per-fold mean | folds + | note |
+|---|---|---|---|---|
+| `trail_enabled=True` (committed headline; arc 2036) | 89 `stop_loss` / 24 native `trailing_stop` / 97 `trailing_stop_atr` | **+1.854%** | **9/10** (only 2018 −4.20) | the byte-exact +1.854%/9-of-10 headline (2034/1037/2036) |
+| `trail_enabled=False` (`validate_4way_book.py`; this arc) | 89 `stop_loss` / 121 `trailing_stop_atr` | **+2.084%** | **8/10** (2018 −4.39 **and** 2019 −0.17) | the cosim-book + deployment-char variant (1033/2033) |
+
+**So the two §11 outcome audits are COMPLEMENTARY, not redundant: arc 2036 verified the byte-exact headline
+config; this arc independently verified the cosim-book `trail_enabled=False` variant — the fbr outcome
+layer is now confirmed honest under BOTH trail configurations.** My "the exact `validate_4way_book` fbr
+config" (Tier-1 row) is accurate; my framing as "the committed config" was loose — the +1.854%/9-of-10
+HEADLINE is `trail_enabled=True`. Corrected here.
+
+**FLAG (documentation/provenance, NOT an engine-honesty issue — both are honestly scored; code human-gated,
+not patched):** the cosim book scripts (`validate_4way_book.py` → the deployment-characterization arcs
+1033/2033/`equity_risk_profile`) run fbr at **`trail_enabled=False` = +2.084%/8-of-10**, which DIFFERS from
+the committed arc-1013 component headline **`trail_enabled=True` = +1.854%/9-of-10** — the documented
+double-trail / "fbr within ~1.49pp" fork (1015/3009/1024/1033), now **quantified at the per-fold level:
+the only sign difference is the 2019 fold (+0.05 True → −0.17 False); the 2018 binding fold is −4.20 (True)
+/ −4.39 (False) either way → the book's 2018 wall is config-ROBUST (mechanism-intrinsic, arc 2014).** The
+operator's deployment numbers (1033/2033) sit on the False variant while the component's stated headline is
+the True variant — worth awareness when the two are cited together. (No new component; both configs
+PORTFOLIO-equivalent on the binding fold.)

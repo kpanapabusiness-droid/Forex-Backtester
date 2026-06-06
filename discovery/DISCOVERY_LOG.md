@@ -164,6 +164,7 @@ at arc step (i).
 | 1059 | 1000s | 2026-06-06 | **USD-trend-BREADTH conditioning of me_long (the deploy object)** — a genuinely-untested me-conditioner pointed at by arc 2018 (me_long carries a real +2018 via DIRECTIONAL WMR; stripping USD-beta removes it). because: condition me_long (buy a pair fallen ≥1 ATR into ME) on the breadth/strength of the COMMON USD move into month-end — a strong broad USD move = a TREND that continues (the known 2014-16 strong-USD IS hole), an idiosyncratic move = a flow over-extension that reverts → predict capture DECREASES with |common-USD-move| and an idiosyncratic-only filter LIFTS the worst fold. obs cheap-kill (§5d; BUILT `observe_long_capture` + `MonthEndReversionLongSignal`, honest take-the-loss capture/drift, IS 2010-2020 D1 7 USD majors, n=126 fires). **MECHANISM REAL + MONOTONE but NOT a worst-fold lever (KILL):** (A) capture declines monotonically with USD-breadth tercile **0.595/0.548/0.405** — the HI bucket (strong broad USD move) is BELOW coin-flip; the 2014-16 block confirms the *because* (systematic fires drift −0.117=trend continues / idiosyncratic +0.335=revert). (B) per-fire systematic/idiosyncratic is WEAK (both capture ~0.50-0.52; idiosyncratic n=22 thin). (C)/(D) **NEITHER filter direction lifts the worst fold:** concentrate onto idiosyncratic (n=22, median 2/yr, 2017=zero) / LO-breadth (n=42, **neg-years 4/11 worse than ALL 3/11**) = the 1029/1055 thinning death; **exclude only the worst HI-breadth tercile** (§5f best version, keeps n=84 no thinning) improves pooled capture 0.516→**0.571** but **WORSENS** fold resolution (neg-years 3→4/11, worst-year −0.237→**−0.317**) — because dropping HI-breadth fires removes me_long's directional-WMR **+2018 help** (2018 drift +0.060→−0.317), exactly arc 2018's finding. **NEW lesson — "edge & tail are the same exposure" (1018/2018) extends to STATE-CONDITIONING the deploy object: me_long's 2014-16 failure (systematic strong-USD trend) and its +2018 help (directional WMR) are the SAME USD-trend-breadth exposure at opposite outcomes → a breadth filter that removes the failure removes the help; trades one bad fold for another, can't lift the worst fold. A conditioner can be a genuine monotone per-trade separator (capture 0.60→0.40) and STILL a non-lever (per-trade capture ≠ per-year fold sign when edge & regime-tail share an exposure).** Adds USD-breadth to the mapped-dead me-conditioner list (density 1029 / depth 1025 / spread-z 1055 / trend-SMA 1012 / quarter-end 1012-1029): every state-conditioning of the surviving reversion edge thins folds or removes the help it needs — the deploy object's worst fold is structurally unfilterable within OHLC. §5f exit-sweep moot (fails at the fold-SIGN level, no exit moves it; me_long exit already settled 1012/2042). Components UNCHANGED (all 4 PORTFOLIO; me_long-solo the honest deploy object); no engine/null/council, no canonical change, no FLAG, no new BUILT tool; OOS untouched. Driver `discovery/_disco1_work/arc1059_melong_usd_breadth.py`. | N | n/e (OOS preserved) | me_long capture by USD-breadth tercile 0.595/0.548/0.405; excl-HI worst-yr −0.317 vs ALL −0.237 | n/e | n/e | 126 me_long IS fires | KILL (obs cheap-kill; real monotone separator, non-lever — breadth filter removes the +2018 help) | N | KILL |
 | 1060 | 1000s | 2026-06-06 | **POST-month-end TREND RESUMPTION — the regime-orthogonal NON-reversion 5th-leg candidate** (the book's binding gate, arc 1020/2019: positive in 2015 AND 2016 without dragging 2018, non-reversion). because: arc 1059 confirmed the reversion book dies in strong-USD years because the down-move into month-end IS the trend and CONTINUES; the untested complement of the SAME mechanism = trend RESUMPTION — month-end rebalancing is a TEMPORARY counter-trend dislocation (reversion edges harvest the snap-back), so once it clears (start of new month) the prevailing trend re-asserts → entering at new-month start in the prevailing-trend direction should be positive precisely in the strong-trend folds the reversion book fails. NOT closed shallow momentum (§5a): calendar-GATED (fires only start-of-month, post-flow-clear), and the KILL/PROCEED criterion is fold-SIGN in 2014-16&2018 (a trend leg can be overall-coin-flip yet be the regime-orthogonal leg IF its +years = the book's −years), not overall edge. obs cheap-kill (§5d; BUILT `observe_long_capture` direction-aware honest take-the-loss capture/drift, IS 2010-2020 D1 7 USD majors; enter k-th trading day of new month in trailing-return-sign direction; swept k∈{1,3,5}, trend_lb∈{20,60}, strength∈{0,1,1.5}ATR). **COIN-FLIP-OR-WORSE + the binding fold (2015) robustly NEGATIVE (KILL):** (A) capture **0.42-0.44 < coin-flip** in every cell, **drift-MEDIAN negative everywhere** (−0.13..−0.19) — the positive year-MEANS are convex-tail-carried (few trend-tail winners, median trade loses; the arc-2063 KILL tell); mechanistically take-the-loss penalizes trend entries (stop hit on pullbacks before +1R → sub-coin-flip honest capture), so the trend side is STRUCTURALLY worse than reversion on this engine. (B) **strong-USD folds [2014,2015,2016,2018]: 2015 NEGATIVE in 6/7 sweep cells** (default +0.224/**−0.304**/+0.138/+0.265; only the degenerate hold-10 cell flips 2015 to a noisy +0.093 with capture cratered 0.32) → the gate needs 2015&2016&2018 positive, 2015 kills it. (C) **NOT the me_long complement:** me_long −years = 2014/2015/2016; resumption there +0.224/**−0.304**/+0.138 → in **2015 BOTH directions negative**, can't cover the book's binding fold. **NEW lesson — the strong-USD wall (2015/2018) is NOT a directional-coverage gap: a regime where reversion fails does NOT imply continuation succeeds.** 2015 (CHF de-peg Jan + whipsaw choppy-trending USD) runs the reversion AND whipsaws the trend → both sides negative; the binding folds are hard price-structure REGIMES, not directional gaps fillable by flipping side. Adds trend-resumption to the mapped-dead 2018/2015-leg attempts (~22 routes). §5f moot (fails at fold-sign, gross-negative on the median regardless). Components UNCHANGED (all 4 PORTFOLIO; me_long-solo the honest deploy object); no engine/null/council, no canonical change, no FLAG, no new BUILT tool; OOS untouched. Driver `discovery/_disco1_work/arc1060_newmonth_trend_resumption.py`. | N | n/e (OOS preserved) | resumption capture 0.425 (sub-coin-flip); strong-USD folds 2014 +0.22 / 2015 −0.30 / 2016 +0.14 / 2018 +0.27 (2015 neg 6/7 cells) | n/e | n/e | 755 IS resumption obs | KILL (obs cheap-kill; coin-flip-or-worse, binding 2015 fold negative both directions) | N | KILL |
 | 1061 | 1000s | 2026-06-06 | **Japanese FISCAL-YEAR-END (Mar 31) JPY REPATRIATION seasonal** — a documented institutional FX flow the corpus never touched (distinct from generic month-end me_long/me_short which fire EVERY month on USD majors): Japanese institutions repatriate foreign earnings before the Mar-31 fiscal close → buy JPY → JPY-quote crosses (XXXJPY) should FALL into late March → **SHORT XXXJPY**. NOT closed ground/not fold-fished: calendar-GATED, currency-SPECIFIC (JPY-quote only), one month, documented mechanism, *because* independent of the binding 2015/2018 folds; decisive control = March vs other months. obs cheap-kill (§5d; BUILT `observe_long_capture` direction-aware honest take-the-loss capture/drift, IS 2010-2020 D1 7 JPY crosses, day-of-month≥24 in March = causal last-week window). **TEXTBOOK DIRECTION BACKWARD + reverse tilt sub-capturable (KILL):** (A) late-March SHORT **capture 0.240 (≪coin-flip), 0/7 pairs**, drift −0.288 (short-signed → XXXJPY actually ROSE = JPY WEAKENED, OPPOSITE the repatriation narrative). (B) it IS March-specific but in REVERSE: March-excess short drift **−0.213** vs other late-months (day≥20: −0.285) → a real **March-specific JPY-WEAKNESS tilt ≈+0.17 ATR**, consistent w/ the empirical "repatriation is forward-HEDGED/pre-positioned → spot JPY weakens into FYE" literature + April outward-investment. (D) the reverse (LONG XXXJPY) drift +0.251 7/11 yrs but **capture 0.327 sub-coin-flip** (take-the-loss stops the long before +1R 2/3 of the time), **convex-tail-carried** (2011 +2.35/2013 +1.14 dominate; 2016 −1.50/2017 −0.94/2020 −0.41 neg = arc-2011/2063 thin-tail tell), thin (1/yr → un-scalable, arc-1017/3019), and does NOT cover the binding folds (2015 +0.00 / 2016 −1.50 / 2018 +0.36). §5f moot (sub-0.50 capture/convex-tail; fails at capturability not exit). **NEW lesson — documented discrete calendar-FLOW seasonals on liquid FX are arbitraged to sub-cost/sub-capturable at the honest take-the-loss gate, and the narrative DIRECTION is not even reliable** (JPY-FYE "repatriation buys JPY" is backward in spot once hedging/pre-positioning is counted). Adds JPY-FYE to the mapped-dead calendar-flow family (gotobi 1008 / round-no 1010 / month-end-fix 3008 / turn-of-month 1005 / IMM 2057 / quarter-end 2058) — closed-ground "forward drift ≈ cost" extends to currency-specific institutional-flow seasonals. Components UNCHANGED (all 4 PORTFOLIO; me_long-solo the honest deploy object); no engine/null/council, no canonical change, no FLAG, no new BUILT tool; OOS untouched. Driver `discovery/_disco1_work/arc1061_jpy_fiscal_yearend_repatriation.py`. | N | n/e (OOS untouched) | March SHORT capture 0.240 / 0-7 pairs (narrative backward); LONG drift +0.251 capture 0.327 sub-coin-flip; binding folds 2015 +0.00 / 2016 −1.50 / 2018 +0.36 | n/e | n/e | 458 March-window obs | KILL (obs cheap-kill; repatriation narrative backward, reverse tilt sub-capturable + thin) | N | KILL |
+| 1062 | 1000s | 2026-06-06 | **DIRECTION-AGNOSTIC COMPRESSION-EXPANSION convexity leg** (the long-vol 5th-leg candidate, EMPIRICALLY testing what arc 1061 only ARGUED away) — the two binding folds 2015 (CHF-de-peg whipsaw) and 2018 (strong-USD trend) SHARE elevated realized vol, so a long-vol/CONVEXITY leg that does NOT pick direction (tight coil that breaks → trade WHICHEVER way it breaks: long the up-break, short the down-break; a single-leg straddle analog now that shorts are verified-enabled PR #273) SHOULD be positive in BOTH = the regime-orthogonal complement of the reversion book. NOT closed ground: ≠ long-only arc-1001 vol-contraction breakout (this is the direction-agnostic version shorts unlock); ≠ arc-2022 shock-continuation (that is post-confirmation DIRECTIONAL; this enters AT the coil break BEFORE the expansion forms, capturing expansion convexity). KILL/PROCEED = regime-orthogonal test (reliably +ve in BOTH 2015 AND 2018), not overall edge. obs cheap-kill (§5d; BUILT `observe_long_capture` direction-aware honest take-the-loss capture/drift, long on up-breaks + short on down-breaks via restrict; IS 2010-2020 H4 7 USD majors; causal compression-break mask). **GROSS-NEGATIVE, SUB-NULL, NO COMPRESSION GRADIENT, BINDING FOLDS NOT ROBUSTLY COVERED (KILL):** (A) tight-coil default capture **0.4535 (BELOW the ~0.49 H4-majors null = worse than random)**, drift_mean −0.069, mean-of-yr −0.083 (gross-neg typical trade pre-cost); binding folds 2015 **+0.029** (marginal) / 2018 **+0.066 default but −0.181 longer-hold (sign-flips = not real)**; other strong-USD years strongly neg 2014 **−0.397** / 2016 **−0.191**. (B) NO compression gradient: tight-tercile drift −0.050 vs loose −0.129, BOTH neg (tightness buys no edge; tight-coil break = classic false-break trap). (C) NO regime concentration (strong-USD folds dominated by negatives, only 2015 weakly +ve). §5f moot (entry is sub-null coin-flip → doesn't trigger the mandatory exit sweep; fails at capturability/fold-sign not exit). **NEW lesson — "both binding folds are high-vol ⇒ a direction-agnostic convexity leg covers both" is FALSE: 2018-class vol is DIRECTIONAL-TREND vol (one-way move + stop-running pullbacks that whipsaw the wrong side to −1R), not the bidirectional expansion vol a straddle needs; only a genuine bidirectional shock (2015 de-peg) marginally pays, and thinly.** Closes the long-vol/convexity 5th-leg route from the CONSTRUCTION side (complements arc 2022's closure from the WEIGHTING side — both directional AND direction-agnostic long-vol fail to be the +2015&+2018 leg); reconfirms shorts don't revive closed breakout (symmetric breakout = same sub-null coin-flip). The 2015/2018 wall is a TWO-DIFFERENT-REGIME barrier (whipsaw-shock vs directional-trend), not a single-vol-exposure gap. Components UNCHANGED (all 4 PORTFOLIO; me_long-solo the honest deploy object); no engine/null/council, no canonical change, no FLAG, no new BUILT tool; OOS untouched. Driver `discovery/_disco1_work/arc1062_compression_expansion_convexity.py`. | N | n/e (OOS untouched) | capture 0.4535 sub-null, drift −0.069, mean-of-yr −0.083; binding 2015 +0.029 / 2018 +0.066→−0.181 (sign-flips); 2014 −0.40 / 2016 −0.19; no compression gradient | n/e | n/e | 5870 tight-coil-break obs | KILL (obs cheap-kill; gross-neg sub-null, convexity leg doesn't cover binding folds, 2018-vol is directional-trend not straddle-friendly) | N | KILL |
 
 ---
 
@@ -8057,6 +8058,103 @@ charter unlock (operator-gated macro/options/COT data, `NEEDS_ENABLEMENT.md`). A
 1062 via the bootstrap, but absent an operator unlock it will land on the same proven floor. No STOP
 sentinel present (only the operator sets it, §9).
 
+## arc_1062 — DIRECTION-AGNOSTIC COMPRESSION-EXPANSION convexity leg (the long-vol 5th-leg candidate)
+
+Full record: [`arcs/arc_1062_compression_expansion_convexity.md`](arcs/arc_1062_compression_expansion_convexity.md).
+Chat 1000s; obs cheap-kill (§5d), fresh-eyes novel construction (§5a); OOS-preserving; BUILT tools only;
+no engine/null/council; no canonical change; no FLAG; components UNCHANGED (all 4 PORTFOLIO).
+
+**Fresh-eyes (step a).** Pulled main (highest in-range 1061 → resume 1062; no STOP). Read protocol +
+both log tiers (all ranges) + LESSONS + registry. The within-charter terminus is rigorously proven and I
+RE-CHECKED rather than inherited it: 4 PORTFOLIO components, book never AFP (binding folds 2015/2018),
+co-sim confirms the failure is fundamental; the 5th-leg route is closed by arc **2022** (weighting
+dilemma) and path-B by arc **3021** (portfolio-math variance floor); and I independently re-confirmed
+that EVERY dispatch frontier item is KILL by data — short-side asymmetries (up-gap short 1016; fbr-mirror
+short 1014/2011/3011/1035), relative-value/market-neutral (cointegration 2010, laggard 2003 — doubled-cost
+wall), the USD-neutral-cross dollar-factor escape (1018/2049/2064), and the calendar-flow family
+(1005/1008/1010/2057/2058/3008/1061). Per §2/§5a + the arc-3004 "apparatus is incapable is seductive"
+warning, I did NOT declare done by argument: arc 1061 *asserted* the long-vol/convexity leg is "closed by
+2022," but 2022 only tested the DIRECTIONAL construction (shock-continuation). The DIRECTION-AGNOSTIC
+convexity construction (buildable only since shorts were verified-enabled, PR #273) had never been tested
+— so I tested it empirically.
+
+**Idea + because.** The two binding folds 2015 (CHF-de-peg whipsaw) and 2018 (strong-USD trend) SHARE
+elevated realized vol. A long-vol/CONVEXITY leg that does NOT pick direction — a tight coil that breaks,
+taken in WHICHEVER direction it breaks (long up-break, short down-break; a single-leg straddle analog) —
+SHOULD be positive in BOTH regardless of direction = the regime-orthogonal complement of the reversion
+book. Distinct from long-only arc-1001 (this is the direction-agnostic version shorts unlock) and from
+arc-2022 shock-continuation (that is post-confirmation directional; this enters AT the coil break BEFORE
+the expansion forms). KILL/PROCEED = the regime-orthogonal test (reliably +ve in BOTH 2015 AND 2018), not
+overall edge.
+
+**Method.** BUILT tools only. Causal compression-break per pair at bar t: coil width = (12-bar high-low
+range)/ATR ≤ 3.5 (tight); up-break = close_t > prior-12-bar high (shift(1)); down-break = close_t <
+prior-12-bar low. `observe_long_capture` (direction-aware honest take-the-loss capture + fwd drift) run
+long on up-break bars + short on down-break bars via `restrict`; IS 2010-2020, H4, 7 USD majors; levers
+swept for regime-orthogonality (not optimization). Driver
+`discovery/_disco1_work/arc1062_compression_expansion_convexity.py`.
+
+**Result — gross-negative, sub-null, no compression gradient, binding folds not robustly covered.**
+- **(A) FALSIFIED.** Tight-coil default (coil12/≤3.5ATR/break12/hold24): n=5870, **capture 0.4535 — BELOW
+  the ~0.49 unconditional H4-majors null** (worse than random entry), drift_mean −0.069, mean-of-yr −0.083
+  (gross-negative typical trade pre-cost). Binding folds NOT robustly covered: 2015 **+0.029** (marginal),
+  2018 **+0.066** default but **−0.181** in the longer-hold cell (sign-flips across cells = not real); the
+  other strong-USD years are strongly negative (2014 **−0.397**, 2016 **−0.191**).
+- **(B) FALSIFIED — no compression gradient.** Splitting default fires by actual coil tightness:
+  tight-tercile drift −0.050 vs loose −0.129, BOTH negative; tightness buys no positive edge. The
+  tight-coil break is the classic false-break trap.
+- **(C) FALSIFIED — no regime concentration.** Strong-USD folds 2014 −0.40 / 2015 +0.03 / 2016 −0.19 /
+  2018 +0.07 — dominated by negatives.
+
+**Diagnosis + meaning.** The construction that *should* be positive in both high-vol binding folds is
+gross-negative, sub-null, gradient-less, and covers neither 2015 nor 2018 robustly. Reason (sharpening
+arc 1060): high realized vol ≠ expansion-convexity payoff under take-the-loss. 2018's vol is a persistent
+ONE-DIRECTIONAL trend whose pullbacks stop-run the straddle's wrong-side entries to −1R (2014/2016 same
+trend-grind); only a genuine BIDIRECTIONAL shock (2015 de-peg) marginally rewards the straddle, thinly.
+§5f moot — the entry is a sub-null coin-flip, so it doesn't even trigger the mandatory exit sweep; the
+failure is at capturability/fold-sign, not exit.
+
+**NEW lesson.** "Both binding folds are high-vol ⇒ a direction-agnostic convexity leg covers both" is
+FALSE. Even a straddle-analog does not systematically pay in the strong-USD high-vol years, because
+2018-class vol is DIRECTIONAL-TREND vol (one-way move + stop-running pullbacks whipsawing the wrong side
+to −1R), not the bidirectional expansion vol a straddle needs. This closes the long-vol/convexity 5th-leg
+route from the CONSTRUCTION side, complementing arc 2022's closure from the WEIGHTING side (which used the
+directional shock-continuation): BOTH the directional (2022) and direction-agnostic (this arc) long-vol
+constructions fail to be the +2015&+2018 regime-orthogonal leg. Reconfirms the dispatch's own prediction
+that shorts don't revive closed breakout (the symmetric direction-agnostic breakout is sub-null capture
+0.45 — the long base's coin-flip mirrored). The 2015/2018 wall is a TWO-DIFFERENT-REGIME barrier
+(whipsaw-shock vs directional-trend), not a single-volatility-exposure gap fillable by one convexity leg.
+
+**Threads / handoff.** Components UNCHANGED (all 4 PORTFOLIO; me_long-solo the honest deploy object,
+vehicle-infeasible). Lever = **operator path-A** (gate-governance on a sound mean-positive ~3-bet book —
+1023/2021/3021) **OR a charter unlock** (`NEEDS_ENABLEMENT.md`). This arc empirically closes the last
+argued-but-untested EDGE candidate (long-vol/convexity) from the construction side, so the within-charter
+terminus is now proven on BOTH the weighting axis (2022) and the construction axis (this arc). **Datum:**
+direction-agnostic tight-coil break (H4 USD majors) capture 0.4535 sub-null, drift −0.069, mean-of-yr
+−0.083; binding 2015 +0.029 / 2018 +0.066→−0.181 (sign-flips); 2014 −0.40 / 2016 −0.19; no compression
+gradient (tight −0.05 vs loose −0.13). Driver `discovery/_disco1_work/arc1062_compression_expansion_convexity.py`
+(BUILT tools only, single-use; no new BUILT tool registered).
+
+---
+**chat-1000s graceful handoff after arc 1062** (2026-06-06). One fresh-eyes arc this session: **1062
+(direction-agnostic compression-expansion convexity leg)** — empirically testing the long-vol/convexity
+5th-leg candidate that arc 1061 only ARGUED was closed by 2022. Finding: the direction-agnostic
+straddle-analog is gross-negative (capture 0.4535, BELOW the ~0.49 H4 null = worse than random; drift_mean
+−0.069), has NO compression gradient (tighter coils no better), and does NOT robustly cover either binding
+fold (2015 +0.03 marginal; 2018 +0.07 default but sign-flips to −0.18; 2014 −0.40 / 2016 −0.19 strongly
+negative). NEW lesson: "both binding folds are high-vol ⇒ a convexity leg covers both" is FALSE — 2018-class
+vol is directional-trend vol that whipsaws the straddle's wrong side to −1R under take-the-loss, not the
+bidirectional expansion vol a straddle needs; this closes the long-vol/convexity 5th-leg route from the
+CONSTRUCTION side (arc 2022 closed it from the weighting side). Components UNCHANGED (all 4 PORTFOLIO);
+deployable count = 0; lever = operator path-A. **State for the next 1000s chat:** the within-charter
+terminus is now proven on BOTH axes — weighting (2022) and construction (this arc) — for the long-vol 5th
+leg, and every dispatch frontier item plus the dollar-factor escape (USD-neutral crosses) is independently
+KILL by data. The 2015/2018 wall is a TWO-DIFFERENT-REGIME barrier, not a directional/volatility coverage
+gap; per arc 2022 a single OHLC leg positive in both at deployable variance cannot be found by clean search
+without §1/§4-violating fold-selection. ⇒ Marginal EV of further within-charter arcs is near-zero; the
+genuinely highest-value next actions are OPERATOR-side (path-A gate-governance OR a charter unlock,
+`NEEDS_ENABLEMENT.md`). A fresh chat resumes at arc 1063 via the bootstrap; absent an operator unlock it
+lands on the same proven floor. No STOP sentinel present (only the operator sets it, §9).
 ---
 **chat-2000s graceful handoff after arc 2065** (2026-06-06). One fresh-eyes arc this session: **2065
 (market-neutral cross-sectional momentum SPREAD)** — the LESSONS #1 relative-value frontier item ("the

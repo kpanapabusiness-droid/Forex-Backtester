@@ -218,3 +218,53 @@ Caveat, unchanged from the long verdict: Part B's cross-pair `SUSPECT` features
 remain causal-lineage-gated. The short path is now **MERGED** (PR #273, 2026-06-05,
 squash-merged as `d826219`), so this sweep no longer blocks short arcs — the short
 engine path remains human-gated canonical core, and deployable-system count stays 0.
+
+---
+
+## CO-SIM BOOK RE-READ ADDENDUM — 2026-06-06
+
+Scope: Item E (`discovery/NEEDS_ENABLEMENT.md`) adds a NEW scoring path —
+the single co-simulated portfolio equity curve
+([`core/wfo/cosim_book.py`](core/wfo/cosim_book.py), `cosim_book_fold`) — which
+marks ≥2 already-scored components to ONE equity line under a shared
+2-per-currency exposure cap and a shared 5% daily-DD cap, replacing/standing
+beside the per-fold LINEAR combiner for the discovery all-folds-positive judge.
+The dispatch requires the sweep be re-read against it: **no lookahead in the
+shared-clock advance, the daily-DD cap applied causally, and costs per-leg**.
+The co-sim is a thin composition layer over the canonical engine — it does NOT
+re-fill, re-price, or re-exit a trade; it replays each component's already-SL-first
+`ClosedTrade` ledger verbatim and adds only the cross-component book layer.
+
+| Part | Co-sim re-read (2026-06-06) |
+|------|----------------------------|
+| **A** Take-the-loss | **SAFE (inherited)** — the co-sim authors NO exit logic. Each component's trades are produced by `MultiPairBacktester` under the SL-first / pre-partial ordering (Part A) and replayed verbatim (same entry/exit times, prices, P&L). A stopped trade is replayed as the −1R it already was; the co-sim never resurrects it. The only new "close" is the optional exposure-cap DROP (a trade the book never opens), which removes a trade, never converts a loss to a win. |
+| **B** No lookahead | **SAFE** — the shared-clock advance is causal. (i) Exposure admission walks the sorted event clock; a candidate at time `t` is gated by `Account.exposure_check` against only the positions OPEN at `t` (entered ≤ `t`, not yet exited) — a present fact, not a future price read; OPEN is processed before CLOSE at a timestamp, matching the engine's intra-bar order (`core/sim/cosim_book.py::_admit_under_exposure_cap`). (ii) Marks are each component's close-mid `reindex(clock).ffill()` — strictly last-known, never a forward fill. (iii) The daily-DD cap is measured on the REALIZED net equity per EET day from day-start (`compute_per_day_max_dd`, the canonical bucketing) — no future bar. Replaying an already-determined exit time is reconstruction, not lookahead: no decision reads a future price. |
+| **C** Costs per-leg | **SAFE** — costs are netted by the canonical chokepoint `build_fold_stats_from_run` → `apply_cost_model` on the admitted union ledger, which costs EACH position independently (own size, own bid/ask, own leg count). There is **no cross-instrument netting** — the explicit Arc-10 trap the dispatch forbids. The co-sim nets *exposure and risk on one equity line*, never broker billing; each component position pays its full FundedNext round-turn. Capital weights scale a component's size (hence its cost) linearly, faithful to deploying `w_k` of capital to it. Pinned by `tests/wfo/test_cosim_book.py::test_costs_are_per_leg_not_netted`. |
+| **D** labels | **N/A** — the co-sim produces no ML labels; it consumes already-scored trades. |
+| **E** Determinism | **SAFE** — sorted clock (set-union), sorted events tie-broken by `(component_index, position_id)`, sorted positions; no RNG / wall-clock / unordered iteration. Pinned by `tests/wfo/test_cosim_book.py::test_determinism_two_run_byte_identity` (two-run byte identity of equity + FoldStats). The engine cost/FoldStats chokepoint it calls is already two-run-identical (Part E). |
+
+### Monotonicity caveat (FLAG, by design — not a defect)
+
+The dispatch's safety invariant is "the co-sim can only make a fold's verdict
+equal or worse, never better." This holds **strictly** for the parts that are the
+invariant's actual basis — the real cross-component DD interaction and the daily-DD
+cap (`passes_with_daily_cap ⟹ passes_roi`); and with the exposure cap OFF the
+co-sim per-fold ROI tracks the linear combiner to the OOS-slice boundary
+(anti-optimism anchor: the equity/cost composition adds **no** return source —
+`test_no_interaction_equals_linear`). The shared 2-per-currency cap, however, is a
+faithful real constraint that is **NOT strictly ROI-monotone**: dropping a
+net-LOSING over-cap entry raises ROI, and no lookahead-free cap can avoid that
+(you cannot skip a trade by its unknown outcome). On the validated USD-concentrated
+4-way book the cap binds hard (~10 drops/fold) and produces a few folds where
+cap-ON co-sim > linear — the legitimate drop-a-loser effect, NOT optimism (the
+cap-OFF anchor confirms the math adds nothing). This is surfaced explicitly
+(`n_dropped`/`dropped`, and the cap-OFF strictly-monotone bound is always reported)
+rather than hidden. It does not change the engine's honesty: per-leg costs, no
+lookahead, SL-first all hold.
+
+**Co-sim verdict: the honest-engine sweep reads SAFE for the co-sim book gate**
+(no lookahead in the shared-clock advance, daily-DD cap applied causally, costs
+strictly per-leg). The one non-strict element — the exposure cap's drop-a-loser
+non-monotonicity — is a faithful constraint reported transparently, with the
+cap-OFF strictly-monotone bound always available. The co-sim is human-gated
+canonical core (Item-E PR); deployable-system count stays 0.

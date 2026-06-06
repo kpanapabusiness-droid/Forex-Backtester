@@ -7711,3 +7711,22 @@ out; the next genuinely-new direction needs a charter unlock (operator-gated mac
 0.595/0.548/0.405 (monotone, HI sub-coin-flip); excluding HI improves pooled capture 0.52→0.57 but worsens
 worst-year −0.24→−0.32 by removing the +2018 directional help. Driver
 `discovery/_disco1_work/arc1059_melong_usd_breadth.py` (BUILT tools only, single-use diagnostic).
+
+---
+**chat-1000s graceful handoff after arc 1059** (2026-06-06). One fresh-eyes arc this session: **1059
+(USD-trend-breadth conditioning of me_long)** — a genuinely-novel, untested conditioner of the deploy
+object, pointed at by arc 2018. Finding: USD-breadth is a REAL monotone per-trade separator (capture
+0.595/0.548/0.405 by breadth tercile, HI sub-coin-flip; data-confirms 2018's directional-WMR mechanism) but
+NOT a worst-fold lever — me_long's 2014-16 failure and its +2018 help are the SAME USD-breadth exposure, so
+no filter direction lifts the worst fold (concentrate→thins 1029/1055-style; exclude-HI→removes the +2018
+fires). Extends "edge & tail are the same exposure" (1018/2018) to state-conditioning the deploy object and
+closes the last natural me-conditioner. Components UNCHANGED (all 4 PORTFOLIO); deployable-system count = 0;
+lever = operator path-A. **State for the next 1000s chat:** the OHLC-only EDGE frontier remains exhausted on
+every mapped axis (both chats converged: directional / calendar-forced-flow / convergence / inelasticity /
+relative-value / regime / structural / state-conditioning all closed); the deploy-object dossier
+(significance + vehicle + §11 + now conditioning) is comprehensive and uniformly negative-for-certification.
+The genuinely highest-value next actions are OPERATOR-side — the path-A gate-governance decision OR a charter
+unlock (operator-gated macro/options data, `NEEDS_ENABLEMENT.md`) — not another autonomous within-charter
+arc, which would either re-grind closed ground (§5a) or duplicate the decision-support lane the 2000s chat is
+actively producing. A fresh chat resumes at arc 1060 via the bootstrap; absent an operator unlock the
+marginal EV of new arcs is low. No STOP sentinel present.

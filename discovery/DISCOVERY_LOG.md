@@ -6908,3 +6908,23 @@ re-lights the EDGE term.
 
 Driver: `discovery/_disco1_work/arc1055_fbr_spreadz.py` (BUILT-tools only; single-use diagnostic, no new
 BUILT registry entry, per the arc-1053 precedent). No canonical change, no FLAG.
+
+---
+**chat-1000s graceful handoff after arcs 1054-1055** (2026-06-06). Session closed the final two named
+EDGE threads: **1054 (L1 — triangulation residual second-moment / OU amplitude at finer resolution)** and
+**1055 (O1 — spread-z inelasticity conditioning of fbr)**. With these, the strategist explore-now MENU
+(`DISCOVERY_DIRECTION.md`) is **exhaustively closed** — M1 (1027/2023), L1 (1054), O1 in all three
+proxies (density 1029 / depth 1025 / spread-z 1055), Q1 (1028), G1 (2052) are all dead. The OHLC-only
+EDGE frontier is now mined out on EVERY axis: directional (1052 intrabar M1-path), calendar/flow,
+microstructure, regime, relative-value, structural, convergence/stat-arb (1054), and
+inelasticity-conditioning (1055). Net new mechanism findings this session: (a) triangular arbitrage pins
+the residual's VARIANCE (not just its mean) ~4-7× below the single-cross round-trip cost at every
+resolution — a fast OU half-life is necessary-not-sufficient, amplitude-vs-cost is the binding test; (b)
+the inelasticity-state thesis is INVERTED for fbr — wide entry-spread is a genuine-stress NEGATIVE signal,
+fbr's edge is a LIQUID-market stop-run. Components UNCHANGED (all 4 PORTFOLIO); deployable-system count =
+0; lever = operator path-A gate-governance call (honest deploy object me_long-solo, 1046/1053, vehicle-
+infeasible). **Within the OHLC-only charter there is no edge frontier left to open.** A fresh chat
+resumes at arc 1056, but absent a charter unlock (operator-gated macro/options data, `NEEDS_ENABLEMENT.md`)
+or the operator's path-A decision, the only remaining within-charter value is decision-support diagnostics
+on the characterized object (the 2000s chat is actively in that lane: 2053/2054 vehicle maps) — NOT new
+edge obs-kills, which would grind proven-dead ground.

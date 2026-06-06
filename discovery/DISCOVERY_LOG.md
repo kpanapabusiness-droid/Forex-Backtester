@@ -92,6 +92,7 @@ at arc step (i).
 | 2025 | 2000s | 2026-06-05 | **GOTOBI (五十日) Tokyo-fix settlement flow** — a documented, calendar-anchored, regime-ORTHOGONAL intra-month forced flow distinct from arc 3008's month-end London WMR fix: on days÷5 (5/10/15/20/25+month-end) Japanese corporates settle in USD → USD-buying into the 09:55 JST (00:55 UTC) Tokyo fix → USD-vs-JPY drifts up the Tokyo morning. A thick (~6/mo), calendar-driven candidate component if > cost. FALSIFIED at obs (4 JPY pairs USDJPY/EUR/GBP/AUD-JPY, H1, IS; the 00:00-UTC fix-spanning bar open→close vs non-gotobi). **The effect is REAL & mechanism-consistent:** gotobi-day fix-bar mean POSITIVE on ALL 4 pairs (+0.10..+0.28p) while non-gotobi Tokyo mornings are NEGATIVE (−0.13..−0.97p) — normal Tokyo morning drifts down, gotobi flips it up; gotobi EXCESS +0.24..+1.14p (strongest on JPY crosses; EURJPY even +2018 +1.05p, 8/11 folds). **DECISIVE: ~10–60× SUB-COST** — drift +0.1..+0.28p « ~3–6p H1 RT cost on every pair; frac+ ≈0.50-0.52 (tiny mean, not a directional bet). Resolution-invariant (M1 captures only the pre-fix leg, still « cost; cf. arc-2002 TF-invariance). §5f doesn't bite (no above-cost entry). **Closes the Gotobi/intra-month Tokyo-fix flow, complementing arc 3008 (month-end WMR fix) → the FIX-FLOW FAMILY is real-but-sub-cost (2 independent fixes, same verdict).** NEW lesson: pure calendar-fix flows are sub-pip-to-~1-pip = an order of magnitude below FX spread+commission → un-capturable net; the corpus's surviving edges (gap/me/fbr) clear cost only because they condition on a LARGE (≥1 ATR) displacement. Operative frontier unchanged (operator path-A). Components UNCHANGED. No engine/null/council. OOS untouched | n/e | n/e | n/e | n/e | n/e | 561 gotobi / 2287 non-gotobi bars ×4 pairs | KILL (obs cheap-kill; fix-flow family sub-cost) | N | KILL |
 | 2026 | 2000s | 2026-06-05 | **Japanese FISCAL-YEAR-END (31 March) repatriation** — a multi-WEEK, LARGE-displacement, calendar-anchored forced flow (distinct from the sub-cost intraday fix flows 2025/3008, and from price-triggered `me`): Japanese institutions close books 31 March → repatriate foreign assets / settle hedges → JPY-BUYING into the fiscal year-end → JPY-pairs should FALL (JPY strengthens) into 31 March. The arc-2024/2025 hypothesis (a LARGE-displacement forced flow CAN clear cost) tested on a new instance; candidate risk-off-ish decorrelated component. FALSIFIED — **hypothesis INVERTS at obs** (4 JPY pairs, D1, IS, last-10-bar JPY-strength drift, March vs other month-ends). **JPY WEAKENS into March-end, the OPPOSITE of repatriation-strength:** March jpy_strength NEG on all 4 (−0.10..−0.59 ATR), March EXCESS NEG on all 4 (−0.10..−0.62) — robust across the JPY leg; **AND coin-flip per-year** (March>0 only 4-6/11; frac+ 0.36-0.55; n=11/pair thin). Mechanism: the well-known scheduled repatriation is FRONT-LOADED into Feb/early-March → by the actual year-end the JPY-buying is done and the late-March approach sees squaring/reversal → JPY weakness = a textbook "the flow everyone knows is in the price" (2015 is the lone +JPY-strength March on all 4, an SNB/EUR-collapse idiosyncratic risk-off, not a March tell; 2018 mixed-neg). Wrong-sign + coin-flip + thin → no above-cost entry, §5f doesn't bite. **NEW lesson — the TWO failure modes of known-calendar forced flows: (i) SUB-COST (displacement too small — the fix-flow family 3008/2025) or (ii) PRICED-IN (displacement large enough but the flow is anticipated → front-run → realized move at the date is coin-flip-to-reversed — this arc).** The corpus's surviving edges (gap/me/fbr) avoid BOTH by keying off a SURPRISE displacement (weekend gap / ≥1-ATR move into the fix / deep stop-sweep), NOT a known calendar date → tradeability needs LARGE displacement AND not-fully-anticipated; a known date supplies at most one. Sharpens the arc-2024/2025 unifying read. Operative frontier unchanged (operator path-A). Components UNCHANGED. No engine/null/council. OOS untouched | n/e | n/e | n/e | n/e | n/e | 11 March / 121 other month-ends ×4 pairs | KILL (obs cheap-kill; hypothesis inverted / priced-in) | N | KILL |
 | 2027 | 2000s | 2026-06-06 | **Spread-as-SIGNAL: liquidity-vacuum displacement reversion** — the untested O1 / Divergent-lens "bid-ask spread as a signal, not a cost" sub-thread (arc 1029 closed only the calendar-density inelasticity proxy; spread-z left open, cost-trap-flagged). because: a large 1-bar displacement is ambiguous — (i) fundamental repricing (tight spread → CONTINUES) vs (ii) liquidity-vacuum spike (flow hits a thin book → spread BLOWS OUT → REVERTS as liquidity returns); arc 2016 killed *generic* vol-shock fade because it lumped (i)+(ii), and spread is the lag-free discriminator. Candidate THICK fold-resolving standalone (arc-2017 option B). **PRECONDITION PASSES — spread is REAL, not synthetic** (H4 4 majors, all data_quality ok; EURUSD med 0.50/p99 5.0/max 19.9p, GBPUSD med 1.1/p99 9.4; corr(spread,bar_range) weak −0.08..+0.15 → spread ORTHOGONAL to |disp|, a genuine discriminator). **FALSIFIED at obs** (large-disp pop |Δmid|/ATR≥1.0, spread_z causal trailing-100, FADE = down→long/up→short via canonical observe_long_capture, IS n=8175). **NON-MONOTONE — refuted in its own direction:** fade cap by spread_z = ≤0:0.476 / 0–1:0.480 / 1–2:0.525 / **>2 (widest, n=393):0.461** — the clearest liquidity vacuums CONTINUE (robust at DISP 1.0 AND 1.5), opposite the thesis. No magnitude confound (|disp| flat 1.53→1.63 across buckets). The lone reverting band (1–2 sd, n=118) is **thin-tail/pair-mix NOISE** (EURUSD n=11 +1.67 & USDJPY n=19 +1.49 carry it; bulk AUDUSD n=58 flat +0.052; GBPUSD n=30 NEG −0.386; per-year single-trade folds). Continuation/spread-momentum framing also dead (widest-spread cont cap ~0.539, drift +0.063 ATR sub-cost w/ highest entry cost, pair-mixed). Coin-flip cap → §5f doesn't bite; §5d cheap-kill, no engine/null/council (cf. 2016/3016/1014). **Closes the O1 spread-as-signal sub-thread** (precondition-verified, so mechanism not data). **NEW lesson: spread-blowout is entangled with REAL repricing, not revertible inelasticity (spread-side completion of 2016 + cost-timing 3007/2005) — on H4 FX spread co-moves with INFORMATION, not fillable air-pockets → spread stays a COST, never an alpha; a revertible dislocation needs a STRUCTURAL tell (swept level/gap/fix), the order-flow-imbalance tell (spread) does not separate the revertible subset.** Operative frontier unchanged (operator path-A, arc 2019/3021). Components UNCHANGED. OOS untouched | n/e | n/e | n/e | n/e | n/e | 8175 large-disp fade obs (IS, 4 majors) | KILL (obs cheap-kill; spread-as-signal closed) | N | KILL |
+| 2028 | 2000s | 2026-06-06 | **L1: triangulation residual SECOND MOMENT (OU amplitude)** — the LAST untested DISCOVERY_DIRECTION menu door. Arc 3005 killed the cross-rate residual LEVEL (mean≈0) and 1027/2023 the driver-shock first moment (both = DIRECTION); the residual's VARIANCE as a convergence/OU harvest was never traded. because: triangular arb pins the residual MEAN to ≈0 but the residual is the diff of 3 asynchronously-updating quotes → its AMPLITUDE spikes when a leg is stale (session handover/one-ccy news/fix); behaves as mean-reverting OU around 0 → harvest the amplitude (one-leg quoted-cross convergence trade at \|z\|>2), not direction. Falsifier: find a resolution where half-life<~5 bars AND amplitude σ>single-cross cost on >~5% of bars. FALSIFIED at obs (reused BUILT `triangle_log_residual_bp`, 3 JPY triangles EUR/GBP/AUD-JPY≡XXXUSD×USDJPY, **H1** the cost-wall resolution, IS, n≈68k/triangle). **(1) OU half-life ≈0.6–1.1 bars — reverts WITHIN one H1 bar** (entry is next-bar → convergence gone before you act). **(2) amplitude arb-bounded sub-cost:** resid std 0.57–0.80bp, \|r\| med 0.12–0.14bp vs cross spread 1.2–1.9bp (~10×); \|r\|>1×spread on only **1.2–4.3%** of bars (<5% falsifier), σ<spread. **(3) loses on cost at the extreme trigger:** at \|z\|>2 (n≈3k) harvest \|r\| 1.5–1.9bp vs RT cost ~3.7–5.7bp (2×1.5×-spread) = **~2–3× below cost.** M1 NOT loaded (reasoned): amplitude is arb-pinned (can't grow) while spread cost RISES finer (H1 wall ~2×H4) + half-life already sub-bar → monotone against tradeability (H4 3005 1.3–6.1% → H1 1.2–4.3%), door already shut. §5f doesn't bite (no above-cost entry); §5d cheap-kill, no engine/null/council. **FULLY CLOSES the triangulation thread: level (3005) + driver-shock 1st moment (1027/2023) + 2nd-moment/OU amplitude (this arc).** NEW lesson: triangular arb pins BOTH moments out of reach — the mean to ≈0 (direction dead) AND the amplitude below the cross spread with sub-bar half-life (variance dead); the same arb that creates the transient dislocation collapses it faster than the spread can be paid → an arb-enforced residual is untradeable in EITHER moment. Generalizes the H1 cost wall from discrete-flow events to the continuous cross-rate identity. **Autonomous explore-now menu now exhausted** (M1/O1/L1/Q1/G1 closed; S1 = non-standalone modifier). Lever unchanged = operator path-A. Components UNCHANGED. OOS untouched | n/e | n/e | n/e | n/e | n/e | ~205k H1 residual bars (3 triangles) | KILL (obs cheap-kill; triangulation fully closed) | N | KILL |
 
 ---
 
@@ -4250,3 +4251,67 @@ it). Operative lever remains operator path-A. Components UNCHANGED (all 4 PORTFO
 
 **Tooling:** no new tool — canonical `Panel.from_pairs`, `observe_long_capture`, `wilder_atr` + mid
 helpers only; no TOOL_REGISTRY append. **FLAGS:** none. Driver: `_arc2027_work/` (scratch, not committed).
+
+### arc_2028 — L1: triangulation residual second moment (OU amplitude)
+
+**Why this arc.** Continuing the closure of the converged corpus's last open doors. After arc 2027 shut
+the O1 "spread-as-signal" sub-thread, the only remaining genuinely-untested `DISCOVERY_DIRECTION.md` menu
+item with a clean falsifiable prediction is **L1** — the triangulation residual's *second moment*. Arc
+3005 killed the residual LEVEL (mean ≈ 0) and arcs 1027/2023 killed its driver-shock-conditional first
+moment; both attacked DIRECTION. The residual's *amplitude* — an OU convergence harvest rather than a
+forecast — was explicitly flagged virgin ("out of apparatus scope, a different cost regime"). Closing it
+lets LESSONS record the triangulation thread as fully mapped.
+
+**The because.** Triangular arb (`EURJPY ≡ EURUSD × USDJPY`) pins the residual MEAN to ≈ 0, but the
+residual is the difference of three asynchronously-updating quotes, so its AMPLITUDE spikes when one leg
+is temporarily stale (session handovers, one-currency news, fix windows). If it behaves as a
+mean-reverting OU process around 0, you harvest the amplitude: when `|residual_z| > 2`, take the cheap
+one-leg quoted-cross convergence side and exit on convergence — paid for the dislocation, not for
+direction. The menu's falsifiable test: find a resolution where half-life < ~5 bars AND amplitude σ
+exceeds the single-cross cost on > ~5% of bars; falsifier = if amplitude > cost stays < ~5% at every
+resolution down to M1, the thread is fully closed.
+
+**What I did.** Reused the BUILT `triangle_log_residual_bp` on 3 JPY triangles (EUR/GBP/AUD-JPY ≡
+XXXUSD × USDJPY) at **H1** — the cost-wall resolution where the entire microstructure cluster
+(gotobi / round-number / WMR-fix / session-break) died — IS 2010–2020, n ≈ 68k bars/triangle. Measured
+residual std + |r| quantiles (bp), OU half-life via AR(1) `phi` (half-life = −ln2/ln φ), the cross
+`spread_close` cost in bp, the fraction of bars where |r| exceeds 1× and 2× spread, and the harvest |r|
+at the |z| > 2 convergence trigger vs an RT cost ≈ 2 × FundedNext 1.5×-spread.
+
+**What happened — FALSIFIED, decisively.**
+- **OU half-life ≈ 0.6–1.1 bars** (EURJPY 1.09, GBPJPY 0.60, AUDJPY 0.99) — the residual mean-reverts
+  *within one H1 bar*. Entry is next-bar, so the convergence is gone before you can act; there is no slow,
+  capturable convergence.
+- **Amplitude arb-bounded sub-cost:** residual std 0.57–0.80 bp, |r| median 0.12–0.14 bp vs cross spread
+  ~1.2–1.9 bp (~10× larger). |r| > 1× spread on only **1.2–4.3%** of bars (below the ~5% falsifier); σ
+  itself is below the spread.
+- **Loses on cost at the extreme trigger:** at |z| > 2 (n ≈ 3k/triangle) the mean harvest |r| =
+  1.5–1.9 bp vs RT cost ~3.7–5.7 bp — **~2–3× below cost.**
+
+**Why M1 was not loaded (reasoned, not skipped).** The residual amplitude is *pinned near 0 by
+arbitrage* — it cannot grow at finer resolution — while the spread cost *rises* going finer (the H1 wall,
+~2× H4). The trend across resolution is monotone against tradeability: H4 (3005) |r| > spread on
+1.3–6.1% → H1 (here) 1.2–4.3% with harvest ~half the RT cost and a sub-bar half-life. No resolution exists
+at which an arb-bounded amplitude overtakes a rising cost; loading M1 (≈5M bars × 7 pairs) for a shut door
+is unwarranted.
+
+**Verdict — KILL (obs cheap-kill).** The residual's second moment is sub-cost and reverts within a bar.
+§5f does not bite (no above-cost entry to put on the engine); no engine/null/council spent. **This fully
+closes the cross-rate triangulation thread: level (3005) + driver-shock first moment (1027/2023) +
+second-moment/OU amplitude (this arc).**
+
+**NEW lesson.** Triangular arbitrage pins BOTH moments out of reach on liquid FX — the mean to ≈ 0
+(direction dead) and the amplitude below the cross spread with sub-bar half-life (variance dead). The same
+arb that creates the transient dislocation collapses it faster than the spread can be paid, so an
+arb-enforced residual is untradeable in *either* moment. Generalizes the H1 cost wall from discrete-flow
+events to the continuous cross-rate identity.
+
+**Threads.** None on the triangulation axis (fully closed). The autonomous `explore-now` menu is now
+exhausted — M1 (1027/2023), O1 (1029 density + 2027 spread-z), L1 (this arc), Q1 (1028 SNB peg), G1
+(2018 cross-sectional) all closed; S1 is a tautological entry-geometry modifier (fbr already embodies it),
+not a standalone arc. The operative deployability lever remains operator **path-A (gate-governance)** on
+the existing mean-positive, cost-robust, ~3-bet 4-component book (arc 2019/3021/2021/3022). Components
+UNCHANGED.
+
+**Tooling:** no new tool — canonical `Panel.from_pairs`, `mid_close`, BUILT `triangle_log_residual_bp`
+only; no TOOL_REGISTRY append. **FLAGS:** none. Driver: `_arc2028_work/` (scratch, not committed).

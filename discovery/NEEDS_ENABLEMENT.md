@@ -12,6 +12,14 @@
 > [`ESCALATION_apparatus_capability.md`](./ESCALATION_apparatus_capability.md).
 >
 > **Run log:** 2026-06-05 — first population (Strategist dispatch; generative council).
+> **2026-06-06 — run 2 (Strategist re-run).** Re-ranked around ONE criterion the corpus forced into view:
+> *does the unlock supply a CONTINUOUS NON-PRICE STATE (the only thing that breaks the in-charter
+> conservation law) AND plausibly reach FUNDABLE size (mean fold >8%, worst >5%)?* Adds items **U**
+> (different-instrument-universe), **X** (CME signed order-flow), **K** (carry on a swap-on venue), and a
+> structural **short-vol note**; advances **M** and **O** with explicit fundable-plausibility calls; demotes
+> **J** (COT) to a rare-event conditioner. Existing items E/D/F+V/J/C/O/M/W are NOT overwritten — see the
+> run-2 block appended at the end. Read [`DISCOVERY_DIRECTION.md`](./DISCOVERY_DIRECTION.md) §0–§1 first for
+> the conservation law and the short-vol unification that drive this re-rank.
 
 ---
 
@@ -180,3 +188,164 @@ simultaneous opposing leg to net). The genuinely cheap, high-value unlock hiding
 - Change-surface style + the long-only→short PR spec (the model for F's scoping): [`SHORTS_ENABLEMENT_PROBE.md`](./SHORTS_ENABLEMENT_PROBE.md)
 - The `explore-now` menu that runs WITHOUT any of these: [`DISCOVERY_DIRECTION.md`](./DISCOVERY_DIRECTION.md)
 - The portfolio-route closure that makes E the priority: `DISCOVERY_LOG.md` arcs 2016 / 2017 / 2019 / 1023 / 2021
+
+---
+---
+
+## RUN 2 (2026-06-06) — the fundable re-rank (advances the queue above; does NOT overwrite it)
+
+> **Why re-rank.** Run 1 ranked by *cheapest-honest-build* and (correctly) put item E first to close the
+> portfolio question. That question is now closed (E: the book fails all-folds-positive *fundamentally*).
+> The live question is no longer "settle the book" but "**what can reach FUNDABLE size at all**" — the book
+> is ~14–20× short and, by the in-charter conservation law ([`DISCOVERY_DIRECTION.md`](./DISCOVERY_DIRECTION.md)
+> §0), nothing in-charter can close that gap. So this run ranks the operator-gated unlocks by **fundable-
+> ROI-per-cost**, using a single discriminator established by the corpus:
+>
+> **A lever is fundable-relevant only if it supplies a CONTINUOUS NON-PRICE state** (one that is *not* a
+> near-martingale at the actionable sampling interval). That is the only thing that breaks the
+> `frequency × edge ≈ const` wall. A lever that only adds *another rare-event conditioner* moves *along* the
+> wall and is sub-fundable by frequency before it is even tested. Items below are tagged
+> **[continuous-state]** or **[rare-conditioner]** accordingly.
+
+### ⚠️ The structural fact that orders this whole re-rank: every fundable-MAGNITUDE FX edge is SHORT-VOL
+
+The reversion book (sells dislocation = short gamma), **carry** (short-vol by construction), and
+**vol-selling** are the *same risk factor*. Short-vol books all co-fail on the *same* risk-off years (2015
+CHF de-peg; 2018 strong-USD trend). Three corpus facts are one fact: the book fails all-folds on 2015 **and**
+2018 under every weighting (item E); path-B densification is impossible because the legs share that one
+risk-off factor (arc 3021, ρ≈0.12 floor); and carry would **co-crash, not diversify**. **Therefore the
+only structural diversifier of the FX book is a LONG-VOL / positive-skew sleeve** — which in FX is
+unfundable-as-steady (bleeds in calm; convexity dead, arc 1062), but in **cross-asset trend-following IS
+documented-fundable**. This is why item **U** below outranks everything: it is simultaneously the cheapest
+fundable shot AND the long-vol leg the short-vol book has always lacked (they fail in *opposite* regimes —
+the all-folds route path-B never could reach).
+
+### U — DIFFERENT INSTRUMENT UNIVERSE (cross-asset trend basket) · [continuous-state via universe] · run-2 RANK 1 fundable-ROI-per-cost
+
+- **What must be enabled.** A data feed + symbol universe beyond liquid major FX: less-arbitraged classes
+  where directional structure is *not* arbitraged to a coin-flip — EM/exotic FX (USDZAR, USDMXN, USDTRY,
+  USDINR), commodities (XAUUSD, WTI, NATGAS, grains), equity-index futures, crypto (BTC/ETH). The
+  *apparatus needs almost nothing new*: `Panel.from_pairs` / `MultiPairBacktester` / the WFO folds /
+  take-the-loss / exit-policy registry are all instrument-agnostic OHLC — this is a **data + universe swap**,
+  not an engine change. Two real preconditions: (i) **confirm the live vehicle can actually trade these**
+  (FundedNext lists metals/energies/indices/crypto/some exotic FX on some account types, against the *same*
+  daily-DD pool — VERIFY, do not assume; an Arc-10 defect is asserting tradability the funded account
+  lacks), and (ii) a **gap-tail control** (commodities/crypto gap over weekends/inventory/news → worse than
+  −1R, which directly threatens the 5% daily-DD cap; needs explicit modeling, not a naive stop assumption).
+- **Why it unlocks (fundable-relevant).** The ~0.49 directional coin-flip is an established result *only on
+  the most-arbitraged market on earth (liquid major FX)*. The corpus never tested whether it is
+  instrument-universal — and the practitioner record says it is not: diversified trend-following is a
+  capacity-large, **positive-skew** (cuts losers at −1R, rides winners — exactly what take-the-loss +
+  trailing already do), **documented-fundable** edge (CTAs ~0.4–0.7 diversified Sharpe). It is also the
+  **long-vol diversifier** the short-vol FX book structurally lacks (see the short-vol note above).
+- **Falsifiable prediction.** Run the *existing* trend/breakout signals (already built, already dead on
+  liquid FX) on the new universe under the honest engine: per-instrument they are whippy/thin, but a
+  **diversified basket** co-simulated through item E should show positive-skew fold ROI with mean >8% and
+  worst-fold supported by *cross-regime* diversification (the basket pays in the trend/crisis years 2015/2018
+  where the FX reversion book dies). **Falsifier:** if trend on the less-efficient universe is *also* a
+  coin-flip after that universe's (wider) costs, the conservation law is instrument-universal and this closes.
+- **Fundable-plausibility.** **PLAUSIBLE — the run-2 best shot.** Mean >8% is realistic for diversified
+  cross-asset trend; **worst-fold >5% is the live risk**, driven by gap-tail and basket-construction (the FX
+  4-way book failed the basket combiner — but it failed *because FX is efficient*; a genuinely-trending,
+  less-correlated universe is a different test). Cheapest fundable-ROI-per-cost because it reuses the entire
+  validated apparatus and needs no new edge-term theory. **Recommendation: scope a minimal probe** — one
+  trend signal, a 5–8 instrument cross-asset basket, honest engine, item-E co-sim — *after* confirming
+  vehicle tradability. This is the council's recommended next *fundable* direction, ahead of any new-data build.
+
+### X — CME FX FUTURES SIGNED ORDER-FLOW (continuous lead variable) · [continuous-state] · run-2 RANK 2
+
+- **What must be enabled.** Ingest CME FX-futures **signed volume / cumulative delta** (and open-interest
+  change) as an exogenous, sub-bar-aligned continuous series in the feature pipeline — a *true exchange tape*
+  (signed), distinct from the directionless spot **tick** volume already killed (arc 3002). Needs the CME
+  data + a time-alignment step + an exogenous-series hook in the pool builder (additive, default-empty so
+  existing signals stay byte-identical, per the shorts-probe change-surface style).
+- **Why it unlocks (fundable-relevant).** This is the **only lever that supplies a continuous non-price
+  *lead* variable** — the exact thing the conservation law says is required to break the frequency wall.
+  Signed flow is persistent (autocorrelated over hours–days), so unlike price it is *not* a martingale at the
+  actionable bar; if it leads spot, it is tradeable on *every* bar, not just rare events.
+- **Falsifiable prediction (and a FREE pre-test).** Before building anything: measure
+  `corr(signed_flow_t, spot_return_{t+1..k})` on obtainable historical CME data. If it is a coin-flip like
+  tick volume → KILL for the price of a correlation, no apparatus change. If `corr > 0` and survives one
+  actionable bar of decay at FundedNext cost → build the ingest.
+- **Fundable-plausibility.** **PLAUSIBLE-IF-LEAD-PERSISTS, but knife-edged.** Two real risks: (i)
+  **representativeness** — CME FX futures are ~5–10% of total FX volume (spot OTC dominates); the futures
+  tape may *mirror* spot with lag rather than *lead* it; (ii) the **cost wall** that killed the
+  microstructure cluster — a minutes-to-hours lead captured at retail bar resolution may not clear cost. The
+  free pre-test de-risks the entire item. **Mean >8% reachable only if the lead is both real and
+  multi-bar-persistent.** Note: the **OI/COT positioning** half of "CME data" is a separate, weaker thing —
+  it is a **[rare-conditioner]**, not continuous-state; see the demotion of item **J** below.
+
+### M (ADVANCED from the queue above) — MACRO / RATES feed · [continuous-state] · run-2 RANK 3 · highest ceiling, biggest build
+
+- **Run-2 update.** Re-affirmed as the **only lever that attacks the EDGE term directly** (rate differentials
+  are the actual driver of FX *direction*), and it is genuinely [continuous-state] (the rate-differential
+  level/momentum is a persistent non-martingale). But it is a **slow** state — it supplies a directional
+  *tilt* (changes over months), not high frequency. The fundable mechanism: a tilt strong enough to flip the
+  continuous directional base *off* the 0.49 coin-flip would make the **entire continuous apparatus**
+  tradeable — that is the one path to fundable *frequency* via the edge term. New corpus caveat: the macro
+  **event-reaction** form is already dead (NFP fade, arc 1048: priced efficiently, corr≈0) — pursue the
+  **rate-differential regime** form, not event-fades.
+- **Fundable-plausibility.** **HIGH CEILING, UNPROVEN, project-redefining.** Biggest build+data cost; turns
+  a price-structure programme into a macro programme. **Minimal single-series probe first** (run 1's
+  recommendation, sharpened): does `sign(rate_differential)` or its momentum, used as an ex-ante regime gate,
+  flip the directional base's capture above 0.50 on the existing apparatus? That probe is cheap and gates the
+  entire feed.
+
+### K — CARRY on a SWAP-ON venue · [continuous-state, but fails the gate identically] · run-2 RANK 4
+
+- **What must be enabled.** A **swap-paying execution venue** (NOT FundedNext, which zeroes carry by the
+  swap-free add-on — this is a *venue/business* decision, the largest charter break here) + carry accrual in
+  the cost/P&L model (currently swaps are off by protocol §1).
+- **Why it is here.** Carry is the **largest historical FX return stream** (~0.5–0.7 Sharpe on a G10 carry
+  basket pre-2008) and is genuinely [continuous-state] (earned every bar held, scales with holding time not
+  event-count) — it sidesteps the directional coin-flip entirely.
+- **Why it is RANK 4 despite real magnitude (the honest call).** Three corpus-grounded objections, in order:
+  (1) it requires **leaving the target broker** — it is not an unlock of the current charter but a different
+  business; (2) it is **short-vol and CO-CRASHES with the existing reversion book** on exactly 2015/2018
+  (CHF un-peg gapped EURCHF ~30% through any stop — the canonical carry-crash), so it does **not** diversify
+  the book and **fails all-folds-positive on the same crash years** the book already fails; (3) carry's left
+  tail is structurally incompatible with a **DD-gated funded vehicle** (one gap-through-stop = instant fail).
+- **Fundable-plausibility.** **Fundable in MAGNITUDE (mean >8% plausible at leverage), NOT fundable on the
+  GATE (worst-fold >5% fails on the carry-crash years) and venue-gated.** Pursue only if the operator both
+  (a) accepts a swap-on venue *and* (b) has a long-vol/crisis hedge for the tail — which is itself
+  out-of-charter (options). Recorded as real-but-blocked, not recommended.
+
+### O (ADVANCED) — OPTIONS / IV surface · [continuous-state but triple-gated] · run-2 RANK 5 · ceiling CONFIRMED
+
+- **Run-2 update.** Confirmed as a **permanent ceiling**, with the short-vol note added: the **volatility
+  risk premium** (IV > RV, harvested by *selling* options) is the single largest durable paid FX edge and is
+  genuinely [continuous-state] — but it is **triple-gated** (no strike/IV data in-charter; needs an options
+  *venue*; and selling vol is **short-gamma → the same risk-off crash tail** as carry and the book). Even the
+  *defensive* use the divergent lens raised (risk-reversal skew as a **carry-crowdedness / long-vol crisis
+  gauge**, the genre that *could* diversify the short-vol book) needs the same IV-surface data. Not a
+  near-term build; recorded so it is not relitigated.
+
+### J (DEMOTED) — CFTC-COT positioning · [rare-conditioner] · run-2 RANK 6
+
+- **Run-2 update.** Explicitly reclassified as a **[rare-conditioner]**, not continuous-state: COT is
+  weekly, 3-day-lagged, and positioning *extremes* are rare (a few per currency per year). It therefore
+  moves *along* the conservation law (another rare-event conditioner on a base edge already ≈ cost), not
+  across it. Same prior as the in-charter conditioners that all thinned folds or removed the help (arcs
+  1059/1029/1055). **Sub-fundable by frequency** before it is tested. Cheapest data unlock on the list, but
+  it cannot close the magnitude gap; weigh below U/X/M.
+
+### Speculative long-vol / crisis-alpha data (NEW, low-prior, recorded for completeness)
+
+The short-vol note implies the book's missing complement is a **long-vol crisis signal**. Two non-price
+modalities could supply one cheaply, both [rare-conditioner] / convex-tail (unfundable-as-steady, fundable
+only as a convex add-on): **(a) stablecoin redemption / secondary-market discount** as a real-time offshore
+USD-funding-stress lead (on-chain mint-redeem + stablecoin price APIs — cheap); **(b) FX risk-reversal skew**
+as a carry-crowdedness gauge (needs the item-O IV data). Both are crisis-alpha sleeves, not steady earners;
+listed so the long-vol diversifier idea is on record, ranked below the fundable items.
+
+### Run-2 ranked summary (fundable-ROI-per-cost)
+
+1. **U — different instrument universe (cross-asset trend)** — [continuous-state via universe]; reuses the
+   whole apparatus; fundable + the long-vol diversifier. *Best shot.* Precondition: verify vehicle tradability + gap-tail control.
+2. **X — CME signed order-flow** — [continuous-state]; the only continuous non-price *lead*; **free
+   corr pre-test** gates the build; representativeness + cost-wall risks.
+3. **M — macro/rates regime** — [continuous-state, slow]; highest ceiling, biggest build, project-redefining; minimal single-series probe first.
+4. **K — carry (swap-on venue)** — fundable magnitude but venue-gated + short-vol co-crash → fails the gate identically.
+5. **O — options/IV vol-premium** — largest durable edge but triple-gated; permanent ceiling confirmed.
+6. **J — COT positioning** — [rare-conditioner]; sub-fundable by frequency.
+- (Unchanged from run 1, still valid as *measurement-honesty* builds, not fundable routes: **E** done/in-review, **D** passive-fill with adverse-selection, **F+V** downgraded netted-book, **C** calendar timestamps, **W** dynamic-weight combiner.)

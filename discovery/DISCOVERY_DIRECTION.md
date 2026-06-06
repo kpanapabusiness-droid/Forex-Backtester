@@ -7,7 +7,11 @@
 > orders.** The runner picks what to test; each candidate carries its corpus citation, *because*,
 > falsifiable prediction, and the most likely way it dies.
 >
-> **First run:** 2026-06-05 (Strategist dispatch). Operator-gated structural unlocks live separately in
+> **First run:** 2026-06-05 (Strategist dispatch). **Second run: 2026-06-06** — the entire run-1 menu
+> below has since been tested and KILLED (M1 arc 1027, O1 arcs 1029/1030/1055, L1 arcs 1031/1054, Q1 arc
+> 1028, G1 arcs 2018/2065). Run 2 reaches a STRUCTURAL conclusion the run-1 menu was still groping toward:
+> **see the dated "Run 2" section at the bottom — read it FIRST.** The run-1 menu is retained below as the
+> record of how the in-charter frontier was closed. Operator-gated structural unlocks live separately in
 > [`NEEDS_ENABLEMENT.md`](./NEEDS_ENABLEMENT.md). Methodology unchanged; this is direction, not a gate.
 
 ---
@@ -237,3 +241,166 @@ with adverse selection; COT / calendar / options / macro data; execution-venue) 
 [`NEEDS_ENABLEMENT.md`](./NEEDS_ENABLEMENT.md). The single highest-ROI build there (the **co-simulated
 equity curve**, item E) settles the existing book's gate question honestly and can only *tighten* the
 verdict — zero fabrication surface. It is the council's recommended next build, ahead of any new edge.
+
+---
+---
+
+# Run 2 — 2026-06-06 (Strategist re-run; generative council, NO arcs)
+
+> **Read this section first.** Since run 1, the entire run-1 menu above was tested and KILLED, the
+> portfolio route was proven *fundamentally* closed (co-sim item E; path-B impossible, arc 3021), and the
+> binding wall was pinned to the **2015/2018 two-regime wall**. Run 1 produced a thin-but-live menu; run 2
+> has watched that menu die and can therefore state the **structural law** it was groping toward. This run
+> reasons at the level of *fundable* edge (deploy needs mean fold >8%, worst >5% — the book is ~14–20×
+> short). It updates this doc (Frontier A) and [`NEEDS_ENABLEMENT.md`](./NEEDS_ENABLEMENT.md) (Frontier B).
+
+## 0. The run-2 headline — Frontier A is closed by a CONSERVATION LAW, not by under-search
+
+Five generative lenses ran independently; four of five reached the *same* closing argument, and the
+adversarial cross-examination upheld it:
+
+> **In a price-only charter, `frequency × per-trade-edge ≈ constant`.** The only continuously-tradeable
+> state the apparatus samples is price, and price is a near-martingale — the honest ~0.49 coin-flip (proven
+> instrument-, timeframe-, and metric-invariant, *and with the stop removed*, arc 3004) **is** that
+> martingale property measured net of cost. Edge can therefore only live in **departures** from the
+> martingale, and departures are by construction **rare and discrete** (forced flow: weekend gaps,
+> month-end fixes, stop-sweep reclaims). To trade *more often* you must trade where the martingale holds →
+> coin-flip. To raise per-trade edge on the rare events you need more capital-at-rest per event, not more
+> events. **Hence no in-charter class can reach fundable frequency at non-zero expectancy.** The
+> ~14–20× gap is the conservation law restated, not a search gap.
+
+This is stronger than run 1's "the frontier is thin and conditional." It is: **the frontier is thin
+*because* it must be.** The corpus is the proof, not an anecdote — across ~140 honest-era arcs *no
+high-frequency net-positive class has ever appeared*, and the one obvious in-charter frequency lever
+(stacking decorrelated legs) is analytically dead (arc 3021: at empirical leg-correlation ρ≈0.12,
+P(all-folds-positive) plateaus ~0.33 and never reaches 0.9 at any leg count, because the legs share one
+risk-off factor — see §2). **What breaks the law is exactly one thing: a continuous NON-PRICE state that
+is itself non-martingale at the actionable sampling interval** (signed order-flow, rate differentials,
+IV term-structure). That is not in-charter. It is the whole content of [`NEEDS_ENABLEMENT.md`](./NEEDS_ENABLEMENT.md)
+(Frontier B), re-ranked this run around precisely this criterion.
+
+**Guard against over-claiming (kept live from the arc-3004 council):** "the apparatus is incapable" is a
+*seductive, search-ending* conclusion. The law above is falsifiable — it predicts that any newly-proposed
+in-charter class will be *either* a coin-flip (continuous) *or* a thin rare-event leg (discrete), never
+both fundable-frequency and edge-positive. The two cheap candidates in §3 are offered as exactly that test:
+if either turns out fundable-frequency, the law is wrong and that is the highest-value outcome of the run.
+They are *not* offered as a fundability route — by the law, they cannot be one.
+
+## 1. How the council reasoned (the trail, condensed — the spread is preserved on purpose)
+
+- **Frame-breaker** sharpened run-1's "predictive monism" into **edge-as-realized-price-P&L**: every arc
+  cashes out through the same tape it forecasts against — a closed, self-funded loop — so it can only
+  extract what the directional tape gives minus cost, and the all-folds gate then demands that closed loop
+  be positive *every* year. Its escape: a **non-tape payer** (a counterparty structurally committed to
+  transact regardless of price) — but it conceded the cleanest version (liquidity-provision / spread-rebate
+  capture) is *venue-economically dead* in retail FX (no maker rebate; you pay 1.5× spread), and carry
+  fails the all-folds gate on the same crash years. Its surviving fundable nominee: a **coupled-instrument
+  arithmetic lead** (rates → FX via covered-interest-parity), which is needs-enablement.
+- **Capability-gap** did the binding-constraint arithmetic and named the **absence of any continuous
+  non-price state** as *the* wall — and showed it is the *same* wall as the frequency ceiling (you can only
+  raise trade-count by sampling a continuous state; the only one present, price, is efficient). It ranked
+  **carry** #1 on the logic "only lever that is continuous AND already zeroed."
+- **Practitioner** demolished the carry ranking with desk reality: carry needs a **swap-ON venue (not
+  FundedNext)**, is short-vol, and **co-crashes** with the existing reversion book (both die 2015/2018) — so
+  it doubles the risk-off tail rather than diversifying it. Its pick: the coin-flip is specific to the
+  **most-arbitraged market on earth (liquid major FX)**; trend-following is a *documented, capacity-large,
+  positive-skew, fundable* edge in **less-efficient instrument classes** (EM/exotic FX, commodities, crypto,
+  rates) — and the apparatus is instrument-agnostic OHLC, so pointing it there is near-zero build.
+- **Quant/relational** proved the **relational space on liquid FX is closed by covering**: every multi-leg
+  functional of the FX price vector is level (closed: cross-section reverts with negative median → capture
+  0.456), second-moment (closed: triangular OU amplitude resolution-invariant, sub-bar half-life,
+  frac|r|>cost <2% at every TF), or aggregation (closed: path-B math). No fourth primitive exists *from
+  price alone*. The only genuine gap is a cross-structure whose **driver is not an FX price** — ranking
+  **CME signed order-flow** #1 as the one input that supplies a persistent continuous *lead* variable.
+- **Divergent** (anti-narrowing) supplied the one genuinely-new *in-charter* candidate (prop-firm
+  synchronized-liquidation footprint at the EET boundary — §3-E1) plus needs-enablement long-shots
+  (equity-spread-conditioned month-end flow §3-E2; stablecoin-redemption USD-stress as a *long-vol* crisis
+  signal; risk-reversal skew as carry-crowdedness).
+
+### The adversarial cross-examination produced one unifying finding (new this run)
+
+**Everything fundable-in-MAGNITUDE that FX offers is SHORT-VOLATILITY.** The reversion book (sells
+dislocation = short gamma), carry (short-vol by construction), and vol-selling are all the *same risk
+factor*, and short-vol books all co-fail on the *same* risk-off years (2015 CHF de-peg whipsaw; 2018
+strong-USD trend). Three corpus facts collapse into this one:
+1. the book fails all-folds-positive on 2015 **and** 2018 under *every* weighting (co-sim item E);
+2. path-B densification is impossible because the legs share that one risk-off factor (ρ≈0.12 floor, arc 3021);
+3. carry would co-crash, not diversify (practitioner lens).
+
+**Consequence (decision-grade):** the all-folds-positive gate is, for FX specifically, in structural
+tension with the only fundable edges — because the only thing that diversifies a short-vol book is a
+**long-vol / positive-skew** sleeve, and long-vol in FX is unfundable-as-steady (it bleeds in calm years —
+the mirror all-folds failure; convexity/straddle already dead, arc 1062). **But cross-asset
+trend-following IS long-vol-ish, positive-skew, AND documented-fundable** — so the "different instrument
+universe" lever is not merely the cheapest fundable shot; it is *also the structural complement the FX book
+has been missing.* Trend and the reversion book fail in **opposite** regimes. That is the all-folds-positive
+route path-B (stacking same-factor short-vol legs) could never reach. It is ranked #1 on Frontier B in
+[`NEEDS_ENABLEMENT.md`](./NEEDS_ENABLEMENT.md) for exactly this reason.
+
+## 2. The Frontier-A menu this run — honestly thin, sub-fundable BY THE LAW (choose-from)
+
+Per §0, any new in-charter candidate is a *closure test of the conservation law*, not a fundability route.
+Two are genuinely new (not in the run-1 menu, not in closed ground) and cheap. Run them as cheap
+observations; a clean death is a high-value closure.
+
+### E1 — Prop-firm synchronized-liquidation footprint at the EET daily-DD boundary · `explore-now` (zero new data)
+
+- **Corpus citation.** The only survivor family is *regulation/rulebook-created forced flow* (month-end
+  fix = mandate; weekend gap = calendar). No arc has tested the **funded-prop ecosystem's own homogeneous
+  rulebook** as a forced-flow source. The EET daily-DD machinery already exists in-engine
+  (`compute_per_day_max_dd(boundary_convention="5ers_eet")`); M1 bid/ask is loaded.
+- **Because.** Tens of thousands of funded-prop accounts share near-identical daily-DD rules (≈5%, EOD-EET)
+  and concentrate in the same instruments (XAUUSD, EURUSD, GBPUSD). On a large adverse intraday move, broker
+  risk engines auto-flatten *en masse at the same EET boundary* → a synchronized liquidation cascade in the
+  final EET hour, then a snap-back when forced selling exhausts. This is a price-insensitive forced flow,
+  not a forecast.
+- **Falsifiable prediction.** On days with a large adverse intraday move, the **last EET hour** shows
+  abnormal range with a measurable mean-reversion in the **next session open**, *stronger* in prop-concentrated
+  instruments than in prop-avoided exotic crosses, and a same-hour small-move-day placebo shows nothing.
+  **The decisive discriminator:** does conditioning on **EET-boundary clustering specifically** add edge
+  *over* the generic stop-sweep-reclaim the corpus already killed (arcs 1013/3013)? If not, it collapses
+  into closed ground.
+- **Fundable-plausibility (be honest).** **Sub-fundable by the conservation law** — it is another discrete
+  rare event; at best a thin new leg correlated with the existing dislocation family (so it likely *worsens*
+  path-B, not helps). Value is purely as the **cheapest possible test of the law** and a clean closure of the
+  "is there a prop-ecosystem edge" question. Most likely death: it IS the stop-sweep-reclaim in costume.
+
+### E2 — Equity-return-spread-CONDITIONED month-end USD flow · `explore-now` (needs only free daily equity index closes)
+
+- **Corpus citation.** Unconditional month-end (arc 1011, a survivor) and quarter-end (arcs 2058/1029) are
+  mapped; what was **never** tested is conditioning the month-end USD rebalancing flow on its *actual driver*
+  — the prior-month cross-asset equity-return spread that sizes the hedging rebalance.
+- **Because.** A balanced global fund with a USD-equity sleeve and a hedge-ratio policy must, when US
+  equities outperform foreign equities in a month, **sell USD** at month-end to re-hedge the now-larger
+  dollar exposure to target. The flow's *size and sign* are a function of `(SPX − foreign-index) return`,
+  which is observable, free, and not in the FX tape. The classic effect conditions on the calendar only;
+  conditioning on the driver should concentrate the edge into the high-spread months.
+- **Falsifiable prediction.** Sort months into quintiles by lagged `(SPX − {NKY,SX5E})` return; top/bottom
+  quintiles show significant, *opposite*, persistent last-1–2-day USD drift; the middle quintile shows none.
+  If the effect is flat across quintiles, the conditioning is inert → dead.
+- **Fundable-plausibility (be honest).** **Sub-fundable** — fires ~12×/yr on 1–2 days (conservation law
+  again). Real value: it could *fatten the tail and possibly the worst fold* of the **existing** me_long /
+  me_short survivors (a refinement of a live leg, not a new leg), and the equity-close data is free. Run it
+  as a conditioner of the existing month-end legs, not as a standalone campaign. Most likely death: the
+  conditioning is real but the events stay too few to move the per-year gate (cf. arc 1059 breadth — every
+  month-end conditioner so far either thins folds or removes the help).
+
+## 3. What run 2 explicitly does NOT add to the in-charter menu (closed this run)
+
+- **Liquidity-provision / spread-rebate capture** (frame-breaker Class I): venue-economically dead — retail
+  FX has no maker rebate and you pay 1.5× spread; the provider is taxed, not paid. Closed without an arc.
+- **COFER / reserve-rebalancing seasonal** (divergent #3): 4 events/yr, heavily lagged → unfundable by
+  frequency before any test. Noted, deprioritized.
+- **Anything from the run-1 menu** (M1/O1/L1/Q1/G1) — all tested and KILLED since run 1 (see header).
+- **Any new single-pair directional / calendar-flow / relative-value / convexity cut** — closed ground
+  ([`LESSONS.md`](./LESSONS.md)); by §0 it is provably a coin-flip or a thin rare leg.
+
+## 4. Pointer
+
+The fundable question now lives almost entirely in [`NEEDS_ENABLEMENT.md`](./NEEDS_ENABLEMENT.md), re-ranked
+this run by a single criterion: **does the unlock supply a continuous non-price state (the only thing that
+breaks the conservation law) AND plausibly reach fundable size?** The run-2 top of that queue is
+**different-instrument-universe (cross-asset trend)** — the cheapest fundable shot *and* the long-vol
+diversifier the short-vol FX book structurally lacks — followed by **CME signed order-flow** (the only
+continuous non-price *lead*; free pre-test) and **macro/rates** (highest ceiling, biggest build). Maintain
+the [`LESSONS.md`](./LESSONS.md) pointer.

@@ -8291,3 +8291,35 @@ chats before an operator-side decision has ~zero marginal EV. The next productiv
 decision: a `NEEDS_ENABLEMENT.md` charter unlock OR the path-A gate-governance call OR setting STOP.**
 Components UNCHANGED (all 4 PORTFOLIO); deployable-system count = 0; no engine/null/council/canonical/FLAG;
 OOS untouched. No STOP sentinel set (only the operator sets it, §9).
+
+---
+**chat-2000s bootstrap re-confirmation #4 (no new arc; 2026-06-06).** FIFTH consecutive 2000s bootstrap
+(pulled main, STOP absent, highest range arc-id = 2065 → resume 2066) ran the §5a/§2 fresh-eyes search
+before opening anything: re-read protocol, the full Tier-1 ledger, recent Tier-2 (2057–2065, 1061, 1062),
+`LESSONS.md`, `DISCOVERY_DIRECTION.md`, `NEEDS_ENABLEMENT.md`, `TOOL_REGISTRY.md`, and the four prior
+bootstrap notes. **Independently re-derived the identical terminus.** Kept the note SHORT (the prior four
+already document the closure exhaustively; a fifth verbose duplicate only raises read-cost).
+**One genuinely-additive datum vs all prior notes:** to honor the arc-3004 anti-"apparatus incapable"
+guard I did not lean on the existing menu — I *generated my own* freshest candidate and tried to break the
+closure with it. The strongest one not named in any prior 2000s note: a **scheduled-macro-release knee-jerk
+reversion** — specifically **NFP** (first Friday, 13:30 UTC), which is *purely calendar-derivable* (no data
+feed, so it sidesteps `NEEDS_ENABLEMENT` item C) and sits squarely in the SURVIVING forced-flow-reversion
+family (the unified theory's only live edge class). *Because:* the algo knee-jerk to the payroll surprise
+should overshoot → real-money fades it → a candidate **2018-positive** leg (surprises are noise, not trend).
+**It is already dead — arc 1048 (1000s) KILL:** NFP daily move has corr ≈ 0 with forward drift (information,
+not a faddable overshoot), the tiny fade is sub-cost AND not NFP-specific (≈ ordinary Fridays), bigger NFP
+moves CONTINUE not revert, and it is *negative* in 2018 — so it is not the regime-orthogonal leg either.
+This closes the scheduled-macro-event lane from a fresh chat's independent angle, strengthening (not just
+repeating) the closure: the freshest candidate a fifth independent reader can invent, in the one live edge
+*family*, independently maps to an existing KILL. Everything else reconfirmed (explore-now MENU dead M1
+1027/2023 · O1 1029/1025/1055 · L1 1054 · Q1 1028 · G1 2052/2018 · S1 modifier; relative-value dead all three
+forms 2003/2065/1054; 5th-leg closed on weighting 2022 + construction 1062; path-B portfolio-math proof 3021;
+4-way failure FUNDAMENTAL by co-sim item E; arc-2019 decisive). **Operator signal, now maximal: FIVE
+consecutive 2000s bootstraps have hit the identical terminus and the operator fork has been surfaced across
+three interactive prompts with no selection. Respawning further 2000s chats before an operator-side decision
+has ~zero marginal EV and is now itself wasteful compute.** The next productive move is unambiguously a human
+decision — set `discovery/STOP`, OR authorize a `NEEDS_ENABLEMENT.md` charter unlock (D limit-fill / C
+calendar / J COT / M macro-rates / E co-sim merge), OR make the path-A gate-governance call (adopt a
+mean/pooled/CI gate vs keep strict AFP). Per §8 (never block on the operator; a chat may NOT set STOP, §9)
+this chat hands back rather than grind. Components UNCHANGED (all 4 PORTFOLIO); deployable-system count = 0;
+no engine/null/council/canonical/FLAG; OOS untouched. No STOP sentinel set.

@@ -102,6 +102,8 @@ at arc step (i).
 | 2032 | 2000s | 2026-06-06 | **Up-gap weekend CONTINUATION long — the LAST untested face of the gap modality** (down-gap fill long=1006 PORTFOLIO; up-gap fill short=1016/2013 KILL; USD-neutral cross gaps=1018 efficient; up-gap CONTINUATION long = never measured). because: the corpus documented a gap ASYMMETRY (down-gaps revert/fill, up-gaps CONTINUE up at i+1 — arc 1016's own diagnosis of why the short fails); BUYING that continuation was never tested, and a USD-major up-gap continuing = strong-USD-aligned → candidate +2018/+2015 leg. FALSIFIED at obs (direction-aware `observe_long_capture`, H4, 4 cached USD majors AUDUSD/EURUSD/GBPUSD/USDJPY, IS; base reproduced 0.4889 ✓). **No continuation edge by the honest i+1: NON-MONOTONE & sub-base capture** (thr0.5 0.526 / thr1.0 **0.486 BELOW coin-flip at meaningful depth** / thr1.5 0.559), **drift MEDIAN ≤0 every threshold** (0.000/−0.248/−0.300 → positive means are thin upper tail), **pure pair-mix** (USDJPY drift +1.0..+1.4 = its secular USD/carry up-drift vs EURUSD −0.9..−1.1 NEG, AUDUSD NEG → 2/4 pairs >0.50 = arc-2009/3012 USD-quote-beta confound, not a gap effect). **2015/2018 acceptance FAILS:** 2015 neg every thr; 2018 + only at the shallow coin-flip thr0.5, INVERTS neg at thr1.0 (−0.533)/thr1.5 (−5.155) = regime-luck-within-coin-flip. MECHANISM: a weekend up-gap is a one-shot repricing — by the tradeable i+1 open it is DONE, no systematic drift either way (the short can't fade it=1016, the long can't ride it=here); the documented "up-gaps continue" was the untradeable hindsight gap-bar-OPEN (arc 2001's −0.57 ATR) read from the long side; the apparent continuation is USDJPY USD/carry-beta (carry OFF on FundedNext → JPY-cross extension not spent, §5d). **Closes the LAST face of the weekend-gap modality** — the gap asymmetry is real only as untradeable hindsight; by i+1 the gap is efficient in BOTH directions; the only surviving gap edge stays the down-gap FILL on carry-driven JPY crosses (1006). §5f doesn't bite (no above-0.50-cap cell has +median drift; thr1.0 sub-coin-flip); net-coin-flip ⇒ KILL not PORTFOLIO. No engine/null/council. OOS untouched. Components UNCHANGED (all 4 PORTFOLIO); lever = operator path-A | n/e | n/e | n/e | n/e | n/e | 228 up-gap obs (thr0.5, 4 majors) | KILL (obs cheap-kill; gap-continuation long dead, modality closed) | N | KILL |
 | 1033 | 1000s | 2026-06-06 | **4-way book CONTIGUOUS deployment risk profile (max-DD / Calmar / time-underwater)** — DIAGNOSTIC adding the one operator-path-A input the recent book-characterization arcs (2016/2017/2019/3021/3022/2021/1032 + cosim item E) never computed: the book's realized risk geometry on the SINGLE co-simulated 2011–2020 equity curve, not the per-year-reset ROI/bookDD table. Fresh-eyes first checked for a genuinely-novel mechanism — the one untouched cross-instrument angle (non-FX commodity→commodity-currency lead-lag) is DATA-GATED (histdata corpus is FX-pairs-only, no XAU/oil), and every OHLC-constructible non-closed mechanism collapses into documented dead ground (basket RV→2018/cost; non-identity lead-lag→1027/3005 re-pricing death) → genuine closure, so the highest value is the missing decision input. Built GEOMETRY-ONLY `equity_risk_profile.py` (BUILT) over the canonical `cosim_book_fold`; constant-notional per-year-scored reproduction (gap/me_long/me_short EXACT, fbr within 1.49pp = the doc's stated trail imprecision; RP weights gap=.078/me_long=.531/fbr=.107/me_short=.284 EXACT). **RESULT (risk-parity, operative): depth is NOT the problem — contiguous max-DD 1.59% (cap-OFF bound)/1.53% (faithful), barely deeper than the worst per-FOLD bookDD 1.51% (2015 & 2018 holes do NOT chain into a deep trough), 5% daily cap NEVER approached (worst day 0.24%, ~20× headroom).** **The deployment weakness is DURATION + risk-adjusted quality: deepest DD runs ~4.7yr (peak Oct-2014→trough Jun-2019, spanning the 2015/2018 binding folds), book is below its high-water mark 98% of the decade (longest underwater 1858d), Calmar only ~0.36 (cap-OFF)/~0.24 (faithful) — and Calmar is RISK-INVARIANT (arc 1024 linear scaling: leverage scales return AND DD together, can't improve the ratio).** The +0.58%/yr mean is real (1023 t=2.66) but LUMPY — earned in a few flow bursts (2012/2019), grinding flat-to-bleed for years between (new highs ~2% of bars; ≠ "loses 98% of the time," depth stays ≤1.6%). For the operator's path-A deploy call: the book is shallow-DD/daily-cap-SAFE but low-Calmar + ~5yr-underwater — the consideration is risk-adjusted/endurance quality, not per-year sign or crash risk. Gate NOT changed (characterizes); OOS frozen (§5g). **NEW lesson: for a thin mean-positive book that passes the depth/daily-cap tests, the binding deployment characteristics are drawdown DURATION (time-underwater) + Calmar — which BOTH a per-calendar-year ROI gate AND a per-fold-reset bookDD table structurally HIDE; only the contiguous single-account curve reveals them, and Calmar's risk-invariance means leverage can't rescue a weak risk-adjusted profile.** Components UNCHANGED (all 4 PORTFOLIO). No null, no council. | n/e | n/e (OOS preserved) | n/e (no new edge) | n/e | 1.59% contiguous max-DD (RP cap-OFF; 1.53% faithful) | 4-comp book | DIAGNOSTIC → KILL (no new component; book risk-geometry characterized) | N | KILL |
 | 2033 | 2000s | 2026-06-06 | **Prop-firm-challenge DEPLOYABILITY of the 4-way book (Sharpe/Sortino + profit-target-vs-maxDD feasibility)** — the one operator-decision input every prior book-characterization arc (noise 2016/17/1023, ENB 2019, time 2021, cost 3022, gate-coarsening 1032, raw risk geometry 1033) skipped: connect the book's risk-geometry to the operator's ACTUAL vehicle (a FundedNext/5ers prop-firm account, whose gate is profit-target-vs-max-DD, NOT all-folds-positive) + report the missing Sharpe. FRESH-EYES edge check first: VERIFIED arc-1033's "commodity lead-lag data-gated" by inspection (histdata_backup = 28 FX pairs only, no XAU/WTI/SPX → closed by verification not assumption); every other novel mechanism reason-killable by an existing closure (lead-lag→within-bar repricing 3005/2028; common-factor dollar-shock→max-clustered/daily-cap-dead 1017/3019; vol-direction→closed; forced-flow well enumerated dry) → no edge run, exhaustion confirmed. Built GEOMETRY-ONLY `propfirm_feasibility.py` (BUILT) reusing 1033's `_build_4way_contiguous`+`compute_risk_profile` (reproduces ≤1.49pp). **FINDING 1 — risk is DRAWDOWN-SHAPED not vol-shaped:** daily-ann Sharpe RP +0.48(cap-off)/+0.38(faithful), Sortino ~+0.4-0.5, annual-fold Sharpe 0.67 (implied t=2.12 ≈ 1023's 2.66) — modest-but-real vol-adjusted — yet Calmar only 0.24-0.36 → **Calmar ≪ Sharpe** = persistent serially-correlated drawdowns (the ~4.7yr underwater chain 1033). Vol-gated allocator sees an OK sleeve; DD-gated vehicle sees an unpassable hurdle → deployability is VEHICLE-METRIC-dependent. **FINDING 2 (headline) — the book CANNOT pass a prop-firm CHALLENGE in any realistic timeframe:** feasibility theorem `T_min=(P/D)/Calmar` yr operating AT the max-DD limit (arc-1024 linear scaling → Calmar fixed, leverage can't move it); for EVERY real config T_min=1.4-8.4yr (safe ~2× = 2.8-16.8yr) vs the weeks-months a challenge expects — off by YEARS, not a near-miss; even the most lenient 5%/10% needs 1.4yr; at T_min the account sits AT the DD limit (zero margin) → the book's every-year within-noise neg fold near-certainly breaches even unlimited-time challenges; **daily-DD cap NEVER binds (worst-day×leverage <limit) — max-DD is the sole wall.** ⇒ prop-firm CHALLENGE INFEASIBLE; only already-funded capital at low risk (operator's dormant accounts) is marginally viable as a ~0.4-0.9%/yr slow diversifier (~98% underwater) = operator risk-appetite call. **Sharpens the route into TWO deployment walls: arc 1032 = the GATE wall (path-A relax AFP→mean/CI); this = the VEHICLE wall (Calmar too low for a DD-gate, gate-philosophy-INDEPENDENT, the more fundamental one).** NEW lesson: a thin mean-positive book can clear a vol-adjusted bar (Sharpe~0.5, t=2.66) yet be undeployable on a DD-gated vehicle (Calmar≪Sharpe, multi-year underwater); deployment feasibility is vehicle-metric-dependent — a future deployability-fixing leg must lift the book's CALMAR (be +during the 2015-2018 underwater chain), not just add mean/decorrelation (re-derives the unfound +2015/+2018 spec from the deployment side). Deployment dossier now complete on every axis; nothing further the autonomous edge-hunt can add. Components UNCHANGED (all 4 PORTFOLIO). No OOS, no council. | n/e | n/e (OOS preserved) | n/e (no new edge) | n/e | Calmar 0.24-0.36; Sharpe ~0.4-0.7; T_min 1.4-8.4yr | 4-comp book | DIAGNOSTIC → KILL (no new component; book undeployable on prop-firm challenge, Calmar-bound) | N | KILL |
+| 1034 | 1000s | 2026-06-06 | **Weekend down-gap × structural-support confluence on USD majors** — a genuinely-untested multi-factor conjunction (gap × structure, arc-1013 template): the plain weekend gap-fill LONG fails on majors (2001: mean-neg, adverse continuation MAE −1.1R) but works on JPY crosses (1006), and fbr (1013) proved USD-major swing-lows are defended structural pivots → hypothesis: a down-gap opening INTO/THROUGH a prior K40 swing-low has the support arrest the adverse continuation → reversion edge where the single-factor gap fails (a structurally-distinct candidate component). FALSIFIED at obs (H4, IS, `observe_long_capture`, no engine). Plain majors gap base cap **0.4732** (reproduces 2001 adverse). The `through`-bucket (gap sweeps the swing low) looked promising at cap **0.5513** and is **DISTINCT from fbr (overlap 0.00** — a gap can't make fbr's intrabar wick) — but interrogation kills it: only **38% RECLAIM**; the coherent long-reversion cell (through+reclaim) is cap **0.4667 <0.50** (coin-flip), per-pair MIXED (USDCHF 0.0…USDJPY 0.71), thin (n=30 ~3/yr), median drift ≈0 (+0.107), per-year noise (2011 +4.6/2020 −3.4). The full-bucket 0.5513 is a take-the-loss LABEL artifact of the 62% NON-reclaim falling-knife continuations (oversold bounce hits +1R then continues down — buying a confirmed breakdown = arc-2007 worse-than-null). JPY-cross structure split FLAT (through 0.577 ≈ far 0.537 — structure adds nothing where the flow edge already works). **Diagnosis: a weekend gap CANNOT substitute for fbr's live intrabar rejection wick** — it sweeps the level over the CLOSED market, so by the weekly-open close the setup is either still-falling (confirmed breakdown, no reclaim) or already-reclaimed (backward-confirming, reverts at i+1, the 1014/2009/1016 mode), removing the real-time absorption signal fbr keys on. Gap-fill is a FLOW edge (1006, JPY-cross carry), fbr a STRUCTURAL edge (1013, live wick) — the two do NOT compose. §5d cheap-kill (coin-flip coherent cell; §5f doesn't bite). OOS untouched. Components UNCHANGED; lever = operator path-A | n/e | n/e | n/e | n/e | n/e | 503 majors gaps (78 through / 30 reclaim) IS | KILL (obs cheap-kill; gap×structure doesn't compose) | N | KILL |
+| 1035 | 1000s | 2026-06-06 | **Failed-reclaim trap SHORT (complement of fbr; candidate +2018 leg)** — log-seeded by arc 2014 (fbr's reclaim FAILS in strong-USD 2018 → real breakdown): a swing low swept + briefly reclaimed (an fbr fire) that then closes BACK BELOW within M=6 bars = a bull-trap → trapped fbr longs liquidate → continuation DOWN; SHORT the failure confirmation, fires exactly when fbr loses (2018) → candidate +2018 leg via a NEW forced-flow mechanism (trapped-long liquidation), shorts open. Distinct from arc 1014 (one-stage confirmed breakdown) by the two-stage trap. FALSIFIED at obs (H4, IS, `observe_long_capture(short)`, no engine, n=93 USD majors): overall short capture **0.4086 <0.50** (adverse), drift +0.024 / **median +0.035 ≈0** (no continuation down), per-pair **6/7 sub-0.50** (NZDUSD 0.143…AUDUSD 0.545 lone clear). 2018 LOOKS like the leg (cap 0.636 / drift +1.32) but **n=11 regime-luck within a coin-flip base** (2014 −1.72 / 2015 −1.56 / 2019 −2.93 deeply neg) — the 1016/3010/2031 disqualifier. **Diagnosis: a structural reversal's FAILURE is itself BACKWARD-confirming** — by the time the close prints back below the swept level the down-move is underway, so the honest i+1 short enters the local low → reverts; the trapped-long liquidation is real but SPENT before a no-lookahead entry can act (arc-1014 death + one extra reclaim step). The only +2018 short, `me_short` 1019, works because the WMR fix flow is FORWARD (after entry); no price-structural confirmation is. Structural-short route to 2018 now closed across SIX constructions (1014/2009/2011·3011/3010/**1035**). §5d cheap-kill (§5f doesn't bite). OOS untouched. Components UNCHANGED; lever = operator path-A | n/e | n/e | n/e | n/e | n/e | 93 failed-reclaim shorts IS | KILL (obs cheap-kill; trap is backward-confirming, no short complement to fbr) | N | KILL |
 
 ---
 
@@ -4702,6 +4704,67 @@ not depth or daily-cap risk.
 self-contained 4-way contiguous-book driver). Registered in TOOL_REGISTRY.
 Reproduce: `PYTHONPATH=. py discovery/tools/equity_risk_profile.py`. **FLAGS:** none. OOS NOT touched.
 
+---
+
+### arc_1034 — Weekend down-gap × structural-support confluence on USD majors (gap × structure conjunction)
+
+**Frame (fresh eyes, step a).** Highest 1000s id was 1033 → opened 1034. The corpus is mature (~100
+arcs): 4 PORTFOLIO components, a mean-positive-but-not-all-folds-positive 4-way book, the edge-hunt
+structurally closed (path-B 3021, leg-hunt 2022, MENU exhausted), the lever quantified as operator path-A
+(1032). The last three arcs (1032/1033/2031) all ended "no new mechanism → diagnostic." Per the arc-3004
+warning against the seductive "apparatus incapable" conclusion, I made a genuine fresh-mechanism attempt.
+First I closed arc-1033's one named-untouched angle for good: non-FX commodity→commodity-currency lead-lag
+is **data-gated** — the histdata backup is FX-pairs-only (28 pairs, no XAU/oil/index, confirmed by
+listing). Within OHLC-FX, the genuinely-untested conjunction with a real *because* is gap × structure.
+
+**Idea + because.** Two settled facts: (1) plain weekend gap-fill is mean-NEG on USD majors (2001) but
+mean-POS on JPY crosses (1006) — the gap alone isn't enough on majors; (2) fbr (1013) proved USD-major
+swing-lows are defended structural pivots. Hypothesis: a down-gap opening into/through a prior K40
+swing-low conjoins forced weekend-repositioning flow with a defended support → the level arrests the
+adverse continuation that kills the plain-majors gap → a reversion edge / structurally-distinct candidate
+where the single factor fails. The arc-1013 template (structure × event), never combined.
+
+**What I did.** Obs cheap-kill only (no engine), H4 IS 2010-2020, canonical `observe_long_capture`
+restricted to weekend down-gaps (gap_atr ≤ −0.5), bucketed by distance to the prior K40 swing low.
+Scratch: `_arc1034_work/obs_gap_x_structure.py`, `_arc1034_work/obs_through_detail.py`.
+
+**What happened.** Plain majors gap base cap 0.4732 (reproduces 2001 adverse). The only bucket clearing
+0.50 was `through` (gap opens below the swept swing low) at cap 0.5513 — and it is genuinely DISTINCT from
+fbr (overlap 0.00; a gap produces no intrabar rejection wick, so it's never an fbr fire). That looked like
+a new gap-driven liquidity-sweep edge. **But it dissolves on interrogation:** only 38% of through-gaps
+reclaim; the coherent long-reversion cell (through + reclaim) is cap 0.4667 < 0.50, per-pair MIXED
+(USDCHF 0.0 … USDJPY 0.71 on n=2–7), thin (n=30 ≈3/yr), median drift ≈0 (+0.107), per-year pure noise
+(2011 +4.6 / 2020 −3.4 on n=1–5). The full-bucket 0.5513 is a take-the-loss label artifact of the 62%
+NON-reclaim falling-knife continuations (the oversold dead-cat bounce reaches +1R then continues down;
+a long into a confirmed breakdown is arc-2007's worse-than-null). JPY-cross structure split was flat
+(through 0.577 ≈ far 0.537) — structure adds nothing where the flow edge already works.
+
+**Why (diagnosis).** A weekend gap cannot substitute for fbr's live intrabar rejection wick. fbr keys on
+a swing low pierced AND reclaimed within one live bar with a deep lower shadow — the wick is real-time
+evidence that resting bids absorbed the stop-run. A weekend gap sweeps the level over the CLOSED market
+(48 h, no live trading) → no rejection wick, no absorption signal. By the weekly-open close the setup is
+already decided, both states backward-confirming (1014/2009/1016 mode): still-below → confirmed breakdown
+(long = falling knife) or already-reclaimed → bounce already spent, i+1 enters the local low → reverts.
+So gap-fill is a FLOW edge (1006, JPY-cross carry channel) and fbr is a STRUCTURAL edge (1013, live wick);
+bolting structure onto the gap doesn't import fbr's edge because the gap destroys exactly the intrabar
+absorption information fbr depends on. The two mechanisms do NOT compose.
+
+**Verdict.** KILL (obs cheap-kill; §5d — coin-flip coherent cell, §5f doesn't bite). No engine/null/
+council. OOS never touched. Components UNCHANGED (all 4 PORTFOLIO). Operative lever unchanged = operator
+path-A.
+
+**Threads.** Closed on the long/reclaim side; the up-gap-through-swing-high short inherits the same
+backward-confirming death (up-gap short already KILL 1016/2013). Reinforces: the only forward-confirming
+structural reversal in the corpus is fbr's live wick.
+
+**Lesson (new).** A weekend gap cannot substitute for fbr's live intrabar rejection wick (gap sweeps over
+the closed market → backward-confirming → loses fbr's real-time absorption signal); the FLOW edge (1006)
+and the STRUCTURAL edge (1013) do not compose. A high aggregate +1R capture on a "buy-the-sweep" bucket
+can be a take-the-loss LABEL artifact of oversold dead-cat bounces in confirmed breakdowns — always split
+by reclaim and read median drift + per-pair before trusting capture.
+
+**Tooling.** No new BUILT tool (obs reused canonical `observe_long_capture` + `FailedBreakdownReclaimLongSignal`;
+gap/swing-low masks computed inline in scratch). **FLAGS:** none. OOS NOT touched.
 ### arc_2032 — Up-gap weekend CONTINUATION long: the last untested face of the gap modality
 **Why this arc.** Fresh-eyes log read (honest-era only): the corpus is deeply converged — the 4-component
 book is mean-positive/cost-robust/~3-bet but not all-folds-positive, the leg-hunt is structurally closed
@@ -4813,3 +4876,51 @@ gate-resolution/risk-geometry/risk-adjusted-quality+vehicle-feasibility). Operat
 relax the gate AND accept a low-Calmar slow-grind on funded capital, or shelve. The edge-hunt has nothing
 further to add. **Tooling:** BUILT `discovery/tools/propfirm_feasibility.py` (registered). No canonical
 change, no FLAG, no council, OOS untouched.
+---
+
+### arc_1035 — Failed-reclaim trap SHORT (complement of fbr; candidate +2018 leg)
+
+**Frame.** Continued 1000s after arc 1034. Loop state: range 1000-1999, next id 1035. Corpus unchanged:
+4 PORTFOLIO components, mean-positive-not-AFP book, edge-hunt structurally closed, lever = operator
+path-A; the unfound piece is a +2018 (strong-USD) leg, only ever found in `me_short` (1019); every
+structural/trend/flow SHORT at 2018 has died as regime-luck-within-coin-flip.
+
+**Idea + because (log-seeded).** arc 2014 proved fbr's reclaim FAILS in strong-USD 2018 (failed breakdown
+→ real breakdown; why fbr is −2018). That loss mode = a bull-trap: swing low swept + reclaimed (fbr fire)
+then close BACK BELOW within M=6 bars → trapped fbr longs liquidate → continuation DOWN. SHORT the failure
+confirmation = a forced-flow short firing exactly when fbr loses (2018) → candidate +2018 leg. Distinct
+from arc 1014 (one-stage confirmed breakdown) by the two-stage trap.
+
+**What I did.** Obs cheap-kill only, H4 IS, `observe_long_capture(direction="short")` restricted to fbr
+fires whose reclaim fails within 6 bars; short entered at the bar after the failure confirmation. USD
+majors, n=93. Scratch: `_arc1035_work/obs_failed_reclaim_short.py`.
+
+**What happened.** Overall short capture 0.4086 (<0.50, adverse), drift +0.024 / median +0.035 ≈ 0 — no
+tradeable continuation down. Per-pair 6/7 sub-0.50 (NZDUSD 0.143 … AUDUSD 0.545 the lone clear).
+Per-year: 2018 cap 0.636 / drift +1.32 looks like the leg but n=11 inside a sub-0.50 base with 2014
+(−1.72) / 2015 (−1.56) / 2019 (−2.93) negative = regime-luck within a coin-flip (the 1016/3010/2031
+disqualifier).
+
+**Why.** arc-1014's confirmed-breakdown-short death with one extra step. The trapped-long liquidation is
+real but un-capturable at the honest i+1 entry: the failed reclaim is a BACKWARD confirmation — by the
+time the close prints back below the swept level, the down-move is underway, so i+1 enters the local low
+and reverts. The corpus's only +2018 short, `me_short` (1019), works because the WMR fix flow is FORWARD
+(after entry); every structural confirmation (sweep / reclaim / failed reclaim) is backward.
+
+**Verdict.** KILL (obs cheap-kill; §5d sub-0.50 capture, §5f doesn't bite). No engine/null/council. OOS
+untouched. Components UNCHANGED. Lever = operator path-A.
+
+**Threads.** Structural-short route to 2018 now closed across SIX constructions (1014 confirmed-breakdown,
+2009 climax-sweep, 2011/3011 reject, 3010 trend, 1035 failed-reclaim trap) — all the same backward-
+confirming i+1 death. With arc 1034 (gap can't compose with fbr's structure), this session re-establishes
+from two new angles that the only forward-confirming structural reversal is fbr's live wick, and it has no
+tradeable short complement.
+
+**Lesson (new).** A structural reversal's FAILURE is itself a backward-confirming event — by the time
+price confirms a reclaim/breakout failed, the move is already underway, so the honest i+1 entry catches
+the local extreme and reverts (drift ≈0); the "trapped traders liquidate" forced-flow story is real but
+spent before a no-lookahead entry can act. Only a FORWARD-scheduled forced flow (the WMR fix, `me_short`)
+gives a capturable +2018 short; no price-structural confirmation does.
+
+**Tooling.** No new BUILT tool (reused `observe_long_capture` + the fbr/swing-low logic inline in scratch).
+**FLAGS:** none. OOS NOT touched.

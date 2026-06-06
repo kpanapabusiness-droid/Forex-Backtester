@@ -116,13 +116,25 @@ def build_component(name, histdata_root, cache_root, boundary):
     raise ValueError(f"unknown component {name!r}")
 
 
-def build_solo_contiguous(name, histdata_root, cache_root, boundary):
-    """One component's contiguous 2011-2020 IS curve via canonical cosim (weight=1.0)."""
+def build_solo_contiguous(name, histdata_root, cache_root, boundary, window="is"):
+    """One component's contiguous curve via canonical cosim (weight=1.0).
+
+    window="is"  -> per-year IS folds 2011-2020 (the committed dev decade).
+    window="oos" -> per-year OOS holdout folds 2021-present (`build_oos_year_folds`,
+    the IS-pinned discovery holdout). The exit/config is the SAME committed/frozen
+    config in both windows — NOTHING is selected on OOS (§4); the OOS curve is
+    measure-once CHARACTERIZATION of the deploy object (per the arc 1042/1046
+    precedent), never a tuning target.
+    """
     sig, panels, cfg, mark_panel = build_component(name, histdata_root, cache_root, boundary)
     marks = mark_prices_from_panel(mark_panel)
     runner = ArcFoldRunner(A1Architecture(), sig, panels)
 
-    folds = [f for f in build_v3_folds().folds if f.oos_start.year >= 2011]
+    if window == "oos":
+        from core.wfo.discovery_measure import build_oos_year_folds
+        folds = list(build_oos_year_folds(start_year=2021))
+    else:
+        folds = [f for f in build_v3_folds().folds if f.oos_start.year >= 2011]
     decade = Fold(fold_id=99, is_start=folds[0].is_start, is_end=folds[0].is_end,
                   oos_start=folds[0].oos_start, oos_end=folds[-1].oos_end)
 
@@ -143,25 +155,27 @@ def build_solo_contiguous(name, histdata_root, cache_root, boundary):
 
 def main():  # pragma: no cover - analysis driver
     name = sys.argv[1] if len(sys.argv) > 1 else "me_long"
+    window = sys.argv[2] if len(sys.argv) > 2 else "is"
     histdata_root = Path(os.environ.get("COSIM_HISTDATA_ROOT", r"C:/Users/panap/histdata_backup"))
     cache_root = Path(os.environ.get("COSIM_CACHE_ROOT", r"C:/Users/panap/Documents/Forex-Backtester/data/cache"))
     boundary = "5ers_eet"
-    lo = pd.Timestamp("2011-01-01", tz="UTC")
-    hi = pd.Timestamp("2020-12-31 23:59:59", tz="UTC")
 
-    print(f"building {name}-SOLO contiguous 2011-2020 IS curve (canonical A1 + MultiPairBacktester)...")
-    per_year_roi, cosim = build_solo_contiguous(name, histdata_root, cache_root, boundary)
+    print(f"building {name}-SOLO contiguous {window.upper()} curve (canonical A1 + MultiPairBacktester)...")
+    per_year_roi, cosim = build_solo_contiguous(name, histdata_root, cache_root, boundary, window=window)
+    years = sorted(per_year_roi)
+    lo = pd.Timestamp(f"{years[0]}-01-01", tz="UTC")
+    hi = pd.Timestamp(f"{years[-1]}-12-31 23:59:59", tz="UTC")
 
-    print(f"\nper-year ROI % ({name}-solo, committed exit):")
-    for yr in range(2011, 2021):
+    print(f"\nper-year ROI % ({name}-solo, committed/frozen exit, {window.upper()}):")
+    for yr in years:
         print(f"  {yr}: {per_year_roi[yr]:+.3f}%")
-    rois = [per_year_roi[yr] for yr in range(2011, 2021)]
+    rois = [per_year_roi[yr] for yr in years]
     import statistics
     print(f"  mean {statistics.mean(rois):+.3f}% | sd {statistics.pstdev(rois):.3f}% | "
           f"neg-folds {sum(1 for r in rois if r < 0)}/10 | worst {min(rois):+.3f}%")
 
     print("\n" + "=" * 78)
-    print(f"{name.upper()}-SOLO -- CONTIGUOUS 2011-2020 IS DEPLOYMENT-VEHICLE GEOMETRY")
+    print(f"{name.upper()}-SOLO -- CONTIGUOUS {years[0]}-{years[-1]} {window.upper()} DEPLOYMENT-VEHICLE GEOMETRY")
     print("(1-leg companion to arc 1033 4-way / arc 2045 2-way)")
     print("=" * 78)
     for cap_label, cap in [("cap-OFF (monotone bound)", False), ("cap-ON  (faithful)      ", True)]:

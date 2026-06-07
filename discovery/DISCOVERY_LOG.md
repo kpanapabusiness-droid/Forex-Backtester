@@ -193,6 +193,7 @@ at arc step (i).
 | 1075 | 1000s | 2026-06-07 | **positive-skew PULLBACK-RESUME continuation on the HONEST ENGINE — the last entry geometry (favorable-first), built on arc-1074's adverse-first diagnosis.** Arc 1074 found the Donchian-breakout continuation entry decisively negative because it is ADVERSE-first (buy the exact high → whipsaw through the −1R stop). Mechanistic complement (DISCOVERY_DIRECTION S1 take-the-loss-tax geometry; fbr's reversion instance): enter AFTER the pullback, on the RESUMPTION bar → FAVORABLE-first, so the −1R tax falls on noise not trend. New BUILT `TrendPullbackResumeSignal` (dual-SMA trend + recent dip into the fast MA + resumption = close back above prior-bar high & fast MA; both dirs), same engine machinery as 1074 (runner exits, §5f nested, same pre-registered tail-luck guard + null). **All 4 cells (long/short × sma{20/100,50/200}, H4 USD majors) KILL:** mean per-fold ROI −5.4 to −10.9%/yr, mean per-trade R −0.35 to −0.68, median R ≈ −0.88, 0/8 folds positive, loses to null in 3/4. **The favorable-first hypothesis is REFUTED** — long cells are WORSE than 1074's breakout (R −0.65/−0.68) with NO right tail (largest winner ≈ 0R). Root cause is not entry timing within the trend; liquid majors have no exploitable post-trend continuation (conservation law: a trend-structural entry samples the near-martingale → coin-flip net of cost; take-the-loss + runner cannot manufacture skew from a martingale). With arc 1074 (breakout edge), 2081 (continuation book + shock), 2082 (vol-expansion), positive-skew continuation is now AIRTIGHT-closed across all entry geometries — the operator's one open in-charter thread. Components UNCHANGED (4 PORTFOLIO; deployable=0). New BUILT tool registered; no canonical change; no FLAG; no council (decisive negative); OOS NEVER touched. Driver `discovery/_disco1_work/arc1075_pullback_resume_skew.py`. | N | n/e (OOS preserved) | -19.53% (short-50/200 2019) | n/e | n/e | 237 (primary; 228-310/cell) | KILL (engine confirms; favorable-first refuted, no continuation edge on liquid majors; positive-skew continuation airtight-closed across all entry geometries) | N | KILL |
 | 2081 | 2000s | 2026-06-07 | **Positive-skew CONTINUATION book (the operator-redirected frontier, LESSONS 2026-06-06), judged on the never-applied lens: per-trade MEAN R + median-per-fold + TAIL-REMOVED (+2R cap / top-5% drop), with a PRE-REGISTERED tail-luck kill-rule.** Donchian-40 breakout long across the FULL 28-pair universe (arc-2000's majors-only open thread) under the tail-preserving trailing exits + a being-long-anytime null; plus the corpus's strongest continuation (arc-3019 forward-confirmed shock) re-measured under trailing (not arc-3019's tail-capping tp_3r) on the full universe. **KILL: Donchian is mean-NEGATIVE everywhere** (per-trade −0.13R; per-fold ≈−22%, 9–10/10 folds neg; majors ≈ crosses both −0.13R), **loses to the periodic null** (−0.106R), and **tail-removal makes it MORE negative** (the right tail max +12.6R is INSUFFICIENT vs the −0.81R median loser + costs) — the inverse of positive skew, not the long-vol complement (bleeds 2015 −33%/2018 −13%). The only mean-positive cells (shock3.0 SHORT, +0.78–0.98%/yr, +2015) are **tail-luck → KILL by the pre-registered guard** (+2R-cap −0.069 / top-5%-removed −0.086 < 0; majors-only) — the thin-tail trap (arcs 2011/2063) the guard was built for, first time out. The ONE open in-charter thread is now closed under its own mandated metric. NEW BUILT tool `tail_removed_expectancy`. Components UNCHANGED (4 PORTFOLIO); deployable=0; OOS NEVER touched; no canonical/FLAG change; no council (clean cheap-kill + objective guard). | N | n/e (OOS preserved) | -38.47% | n/e | -38.58% | 3269 | KILL (cheap-kill at triage + pre-registered tail-luck guard; positive-skew continuation thread closed under the mandated mean+median+tail-removed lens across Donchian breakout + shock continuation, full 28-pair universe, both directions, trailing exits, vs null) | N | KILL |
 | 2082 | 2000s | 2026-06-07 | **Volatility-EXPANSION breakout continuation (the dispatch's 3rd explicit positive-skew example) — confirmatory closer for arc 2081.** NEW signal `VolExpansionBreakoutSignal` = Donchian-N break firing ONLY on a vol-ignition bar (`TR/ATR≥vol_mult`), direction-aware, full 28-pair universe, trailing exits, judged on the same per-trade MEAN + tail-removed guard (arc-2081 kill-rule applied verbatim). **KILL on all 8 cells** (vol_mult{1.5,2.0}×dir{long,short}×exit{trailing_atr,partial_runner}): every cell mean-NEGATIVE (per-trade −0.05 to −0.16R; per-fold −12 to −19%; 8–10/10 folds neg; majors & crosses both neg); the guard returns TAIL-LUCK/KILL on every one. Vivid thin-tail demo: `volexp1.5 short` reads 2015 **+43.1%** but is mean −0.107R carried by a **single +132.7R SNB-day CHF-cross short** (2015-01-15) — +2R-cap −0.239 / top-5%-removed −0.353 → KILL, the exact false-positive (arcs 2011/2063) the guard was built for. With arc 2081 (Donchian breakout + forward-confirmed shock), positive-skew continuation is now closed across all 3 canonical constructions × both directions × full universe × trailing exits under the mandated metric. NEW BUILT tool `VolExpansionBreakoutSignal`. Components UNCHANGED (4 PORTFOLIO); deployable=0; OOS NEVER touched; no canonical/FLAG change; no council. | N | n/e (OOS preserved) | -12.36% | n/e | -33.43% | 2638 | KILL (cheap-kill + pre-registered tail-luck guard; vol-expansion breakout mean-negative on full universe, both directions, all vol thresholds/trailing exits; only +folds are single-outlier tail-luck) | N | KILL |
+| 1076 | 1000s | 2026-06-07 | **positive-skew trend-CONTINUATION on the HONEST ENGINE at the D1 TIMEFRAME — the one axis the skew-lens arcs (1074/1075/2081/2082, all H4) never varied.** Entry geometry was closed exhaustively at H4; timeframe is orthogonal and the skew premise is TF-sensitive (a D1 trailing runner can ride a multi-week trend into a fat tail; H4 is the worst TF for trend-vs-noise). Two priors point at the untested synthesis cell: arc 1002 triaged D1-long −4.13% but NEVER under the mandated mean+median+tail-removed lens / both dirs / §5f / full WFO; arc 1003 found crosses TREND (gross +0.10R/trade) but H4 spreads sink the net → D1 amortizes the cross spread over a long hold while keeping cross trend. Reused `TrendContinuationBreakoutSignal` at `primary_tf="D1"`; honest `MultiPairBacktester` (FundedNext, risk 0.005), runner exits only (`sl_plus_trailing_atr`/`_swing`/partial × SL{1.5,2,2.5}, §5f nested), same pre-registered tail-luck guard + fair null. Two universes: 7 USD majors (controlled vs 1074/1002) + full 28-pair (trendy-cross steelman). **All 8 cells (long/short × Donchian{20,55} × {USD7,ALL28}) KILL at IS:** 7/8 mean-NEGATIVE (per-fold −0.9 to −4.3%/yr, median R ≈ −0.84 to −0.98 → median trade takes the −1R stop, same as H4); the ONE mean-positive cell (USD7 Turtle-long +0.16%/yr, R +0.025, 4/8 folds+, beats null) **dies under the guard** — +2R-cap −0.11% / drop-top-5%/fold −0.95% / drop-top-K{1} −0.12% (largest winner +4.39R; cap it and the cell is negative) = the textbook mean-positive-ONLY-via-the-tail KILL the guard was written for. 2018 negative in ALL 8 cells. **Hypothesis REFUTED:** D1 crosses are still mean-neg-or-tail-carried with H4's median-R structure → failure is NOT H4-specificity nor cross-spread-cost but the same root cause (liquid FX has no exploitable post-trend continuation), now shown **timeframe-invariant under the skew lens** (extends arc 1002's capture-lens D1≈H4 to mean+tail-removed). Positive-skew continuation now closed across geometry × timeframe × universe — the operator's ONE open in-charter thread comprehensively closed on all axes. Components UNCHANGED (4 PORTFOLIO; deployable=0); no canonical/FLAG; no council (decisive negative); OOS NEVER touched. Driver `discovery/_disco1_work/arc1076_continuation_d1_skew.py`. | N | n/e (OOS preserved) | -9.45% (USD7 long-D20 2016) | n/e | n/e | 102–412/cell | KILL (engine confirms; D1 timeframe + trendy-cross universe still mean-neg-or-tail-luck; positive-skew continuation closed on the timeframe & universe axes too) | N | KILL |
 
 ---
 
@@ -9738,3 +9739,73 @@ where it is documented-fundable; the in-charter FX version is what these arcs ju
 UNCHANGED; no canonical change; no FLAG; no council (decisive negative, not a survivor/fork). Reusable:
 `TrendPullbackResumeSignal` + the refuted-favorable-first lesson (continuation failure on liquid majors
 is edge-absence, not entry-geometry).
+
+## arc_1076 — positive-skew trend-CONTINUATION on the HONEST ENGINE at D1 (the untested TIMEFRAME axis; the one mean-positive cell is tail-luck)
+
+**Disposition: KILL** (all 8 cells KILL at IS; the lone mean-positive cell dies under the pre-registered
+tail-removed guard; OOS never touched). Full record `discovery/arcs/arc_1076_continuation_d1_skew.md`;
+driver `discovery/_disco1_work/arc1076_continuation_d1_skew.py` (reuses `TrendContinuationBreakoutSignal`
+at `primary_tf="D1"`, parameterized over TF × universe).
+
+**Why this arc (the specific gap).** Arcs 1074/1075/2081/2082 closed positive-skew continuation across
+every entry GEOMETRY (breakout-edge, pullback-resume, continuation-book, shock, vol-expansion) under the
+operator-mandated mean + median-per-fold + tail-removed lens — but **all at H4.** Entry *geometry* was
+varied exhaustively while **timeframe was held fixed at the single worst TF for trend-persistence-vs-noise.**
+Timeframe is orthogonal to geometry and the positive-skew premise is intrinsically TF-sensitive: a trailing
+runner on **D1** (the CTA timeframe where the documented-fundable trend edge lives) can ride a multi-week
+move into a genuinely fat right tail; an H4 "trend burst" is a few ATR before noise dominates. The
+closed-ground "directional coin-flip is timeframe-invariant" prior was measured under the CAPTURE lens (arc
+3004), and the operator's whole redirection is that capture is blind to skew — so TF-invariance under
+capture does NOT imply TF-invariance under mean+tail-removed. Two priors named the exact untested synthesis
+cell: **arc 1002** triaged D1-long at −4.13% but never under the mandated lens / both dirs / §5f / full WFO;
+**arc 1003** found crosses TREND (gross +0.10R/trade, "the runner harvests it") but H4 cross spreads sink
+the net (−5.49%). The synthesis neither tested: **D1 × trendy crosses** — D1 amortizes the wide cross spread
+over a multi-week trend hold (fixing arc-1003's cost death) while keeping the stronger cross trend.
+
+**What I did.** Reused `TrendContinuationBreakoutSignal` with `primary_tf="D1"` (confirmed TF-agnostic),
+spent the honest `ArcFoldRunner → A1Architecture → MultiPairBacktester` (FundedNext, risk 0.005) under the
+positive-skew RUNNER exits only (`sl_plus_trailing_atr`/`_swing`/partial-runner × SL{1.5,2,2.5}, §5f nested
+walk-forward selection), judged by per-fold MEAN ROI + median-per-fold + TAIL-REMOVED (+2R cap /
+drop-top-5%/fold / drop-top-K global) vs a fair same-side random-entry null. Pre-registered the
+tail-luck≠skew kill-rule in the arc doc BEFORE the run. Two universes: 7 USD majors (controlled vs
+1074/1002) AND the full 28-pair set (trendy-cross steelman). Cells = {long,short} × Donchian{20,55} ×
+SMA50/200 (Turtle-canonical daily params), 8 evaluable folds (2013–2020); OOS NEVER touched.
+
+**Result — KILL in all 8 cells:**
+- **7/8 cells mean-NEGATIVE** (per-fold −0.88 to −4.29%/yr; mean per-trade R −0.04 to −0.50; **median R ≈
+  −0.84 to −0.98** — the median trade takes the −1R stop, the same adverse-first / near-martingale
+  signature as the H4 arcs). 2018 is negative in ALL 8 cells (−1.0 to −9.3%); 3 cells lose to the null.
+- **The lone mean-positive cell is the textbook tail-luck KILL the guard was built to catch.** USD7
+  Turtle-long: +0.16%/yr, mean R +0.025, 4/8 folds+, beats null +2.81pp — and it **collapses the instant
+  the tail is removed**: +2R-cap → −0.11%, drop-top-5%/fold → −0.95%, drop-top-K{1} global → −0.12%. Its
+  largest winner is +4.39R; cap it at +2R and the cell is negative. A handful of outlier trades carrying a
+  flat-to-negative book — exactly the pre-registered "mean-positive ONLY via top-K winners → KILL."
+- **No broad skew anywhere.** The biggest single winners (USD7 +5.64R short, ALL28 +7.89R Turtle-long) are
+  larger than H4's, and on ALL28 a single +7.89R trade produced the lone +10.09% 2015 fold — but
+  tail-removal erases it (ALL28 Turtle-long → −3.56% capped). The discrete tail is not broad enough to
+  survive the honesty check.
+
+**The hypothesis is REFUTED — and that closes the timeframe & universe axes.** The "D1 amortizes the cross
+spread while keeping cross trend" thesis did not survive the engine: even at D1, on the trendiest 28-pair
+universe, with §5f-selected runner exits, the continuation entry's median trade still takes the −1R stop
+and the only mean-positive cell is tail-carried. The falsifier was hit: D1 crosses are still
+mean-negative-or-tail-carried with H4's median-R structure. So the failure is NOT H4-timeframe-specificity
+and NOT cross-spread-cost (arc 1003's death) — it is the same root cause arc 1075 named (**liquid FX price
+has no exploitable post-trend continuation**), now shown **timeframe-invariant under the positive-skew
+lens** just as arc 1002 showed it under the capture lens (D1 capture ≈ 0.49 → now confirmed on
+mean+tail-removed too). A trend-structural entry samples the near-martingale at any sampling interval;
+take-the-loss + a runner cannot manufacture broad skew from a martingale, and the discrete tail that forms
+is too thin to survive the guard (conservation law, LESSONS run-2).
+
+**Meaning for the frontier.** Positive-skew continuation was closed across every entry GEOMETRY at H4
+(1074/1075/2081/2082); this arc closes the orthogonal **TIMEFRAME axis (D1)** AND the **universe axis
+(trendy crosses)** under the same mandated lens on the honest engine. The closure now spans geometry ×
+timeframe × universe — the operator's ONE open in-charter thread (LESSONS 2026-06-06) is comprehensively
+closed on all three axes by direct engine measurement. The documented-fundable version of this exact
+positive-skew shape lives only on a **less-efficient universe** (`NEEDS_ENABLEMENT.md` #1 cross-asset
+trend — operator-gated, out-of-band). In-charter frontier returns to the convergent terminus: 0 PASS, 4
+PORTFOLIO, deployable = 0; levers remain out-of-band (operator path-A gate-governance call and/or a charter
+unlock). Components UNCHANGED; no canonical change; no FLAG; no council (decisive negative, not a
+survivor/fork); OOS NEVER touched. Reusable: `TrendContinuationBreakoutSignal` now exercised at D1, the
+TF×universe-parameterized driver, and the lesson that the continuation closure is **timeframe-invariant
+under the skew lens** (future "try a slower/faster TF" continuation ideas on liquid FX resolve here).

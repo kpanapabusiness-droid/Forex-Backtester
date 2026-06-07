@@ -9912,3 +9912,23 @@ long-vol / positive-skew diversifier the vehicle wall needs lives in a less-effi
 council's structural placement. The only live levers are out-of-band: operator path-A gate-governance call
 on the 4-component book, and/or a charter unlock. Components UNCHANGED (4 PORTFOLIO); deployable=0; no
 canonical/FLAG change; no new BUILT tool (reused 1074/2040/2013); no council.
+
+### ⚠️ CORRECTION to arcs 2084/2085 (integrity, same chat) — both DUPLICATE prior cross-range work I missed at step (a)
+
+After landing 2084/2085 I found two prior arcs I had missed when reading the log at step (a):
+- **arc 1076 (1000s, 2026-06-07)** ALREADY closed **D1** with the SAME `TrendContinuationBreakoutSignal`,
+  both directions × Donchian{20,55} × {USD7, **full 28-pair**}, under the SAME mandated mean+median+
+  tail-removed lens + §5f + null (all 8 cells KILL; the one mean-positive cell tail-luck). **So arc 2084's
+  "D1 is the one axis the H4 arcs never varied" framing is WRONG — 1076 varied it the same day. arc 2084 is
+  an independent cross-range REPRODUCTION of 1076, not a fresh closure.**
+- **arc 3014 (3000s, 2026-06-05)** ALREADY ran **W1** trend-following, but as an **OBSERVATION** (capture/
+  convexity/drift lens, 7 USD majors, "No engine"). **arc 2085 is the first W1 HONEST-ENGINE run** (mandated
+  mean+tail-removed lens, §5f, full 28-pair) — genuinely additive vs 3014's obs, but confirmatory (3014
+  already predicted W1 dead).
+
+Net: 2084 reproduces 1076 (cross-range confirmation — a form the corpus values, but I over-claimed
+novelty); 2085 is an incremental engine-level closer of an axis 3014 mapped dead at obs. The surviving
+additive content is the **unified H4/D1/W1 gradient** (invariant ≈ −0.9 median trade R + monotone-from-below
+mean) stated across all three timeframes together. The verdicts (KILL) and the terminus are unaffected.
+**Self-lesson:** at step (a) read the FULL recent cross-range Tier-1 table + Tier-2 tail, not just
+same-range arcs + the registry — another range can close your next cell first (here, hours earlier).

@@ -116,6 +116,24 @@ components UNCHANGED (4 PORTFOLIO: gap 1006 / me_long 1011 / fbr 1013 / me_short
   `NEEDS_ENABLEMENT.md` #1 cross-asset trend is the SAME positive-skew shape on a less-efficient universe
   where it is documented-fundable; the in-charter FX version is what the H4/D1/W1 arcs just closed.
 
+## ⚠️ CORRECTION (post-hoc, integrity) — prior W1 work exists (arc 3014, OBS); this is the first W1 ENGINE run
+
+After completing this arc I found two prior arcs I had missed at step (a): **arc 1076 (1000s)** already
+closed **D1** on the honest engine (so arc 2084's "first to vary timeframe" framing was wrong — see 2084's
+correction), and **arc 3014 (3000s, 2026-06-05)** already ran **W1** trend-following — but as an
+**OBSERVATION only** (7 USD majors, D1→W-FRI resample, Donchian-8w, 8-bar hold, capture/convexity/drift
+lens; "No engine/null/council"). arc 3014 found W1 long breakout mean +0.07 / **median −0.027**, tail mildly
+trend-selected but median-negative & single-pair-carried, −2018 both directions → "directional/trend base
+timeframe-invariant THROUGH W1." **So W1 was already predicted dead at the obs level.** This arc's
+genuinely-additive content vs 3014: it is the **first W1 run on the honest `MultiPairBacktester`** (SL-first
+take-the-loss, FundedNext costs) under the mandated **mean + median-per-fold + TAIL-REMOVED** lens with the
+**§5f nested exit menu** and the **full 28-pair universe** — i.e. it converts 3014's gross-obs prediction
+into an engine-scored, cost-netted, tail-guarded KILL, and supplies the **H4/D1/W1 unified gradient** (the
+invariant −1R median + monotone-from-below mean) that neither 3014 (W1-obs) nor 1076 (D1-engine) stated
+across all three timeframes together. Net: a confirmatory engine-level closer of an axis already mapped
+dead at obs (3014) — real but incremental. Lesson reinforced (see 2084): read the full cross-range Tier-1
+table + Tier-2 tail at step (a).
+
 ## Flags / Tooling
 
 No canonical-core change (no FLAG). Carries the standing arc-3017 `risk_pct` FLAG (LINEAR regime, risk

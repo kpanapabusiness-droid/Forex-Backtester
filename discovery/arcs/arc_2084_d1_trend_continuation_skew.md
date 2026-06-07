@@ -169,6 +169,23 @@ me_long 1011 / fbr 1013 / me_short 1019).
 - **Beyond charter (operator-gated):** the genuine long-vol / positive-skew diversifier is the cross-asset
   trend universe (`NEEDS_ENABLEMENT.md` #1) — the in-charter FX-OHLC version is now closed on both axes.
 
+## ⚠️ CORRECTION (post-hoc, integrity) — this arc REPRODUCES arc 1076; the "one axis none varied" claim was wrong
+
+After completing this arc I found **arc 1076 (1000s, 2026-06-07)** had ALREADY run positive-skew trend
+continuation on **D1** with the SAME `TrendContinuationBreakoutSignal`, both directions × Donchian {20,55} ×
+{7 USD majors, **and the full 28-pair universe**}, under the SAME mandated mean+median+tail-removed lens +
+§5f nested exits + fair null — all 8 cells KILL, the one mean-positive cell (USD7 Turtle-long +0.16%/yr)
+killed as tail-luck by the guard. I missed it in my step-(a) log read (it was the Tier-1 row immediately
+above my insertion point + the Tier-2 entry immediately above mine). **So the framing "D1 is the one axis
+the H4 arcs never varied" is FALSE — arc 1076 varied it the same day.** This arc is therefore an
+**independent cross-range reproduction** of arc 1076's D1 closure (2000s reproducing 1000s — a form the
+corpus explicitly values, cf. the 1074↔1075 / 2038↔1039 convergences), NOT a fresh closure. My result
+agrees with 1076 cell-for-cell in character (D1 mean-negative, median trade ≈ −1R, the lone beats-null
+cell tail-luck/net-negative). The genuinely-additive content that survives is (a) the full-28-pair
+confirmation alongside 1076, and (b) the unified **H4/D1/W1 gradient synthesis** (see arc 2085) — NOT a
+new D1 finding. Lesson for myself: read the FULL recent Tier-1 table + Tier-2 tail at step (a), not just
+the same-range arcs + the registry — a cross-range chat can close "your" next cell first.
+
 ## Flags / Tooling
 
 No canonical-core change (no FLAG). Carries the standing arc-3017 `risk_pct` percent-vs-fraction FLAG

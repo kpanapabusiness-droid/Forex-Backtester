@@ -59,3 +59,63 @@ conditioning, L1 triangulation second-moment, plus long-shots), and
 the #1 unlock for relative-value" escalation is **overstated→wrong by cost arithmetic** — the cheap
 high-value build is instead the **single co-simulated equity curve** (settles the existing book's
 gate question honestly, zero fabrication surface).
+
+---
+
+## Operator compression — 2026-06-06 (supersedes the "open frontier, ranked" section above; items 1–3 there are now CLOSED)
+
+**Terminus reached on the in-charter FX edge-hunt** (~150 arcs, 0 PASS / 4 PORTFOLIO; five consecutive
+bootstrap sessions independently re-derived this). What closed since the last compression:
+
+- **Shorts enabled** (PR #273, engine verified short-symmetric) and **tested across ~12+ constructions —
+  ALL KILLED.** The escalation's #1 unlock, **relative-value / market-neutral, is DEAD by cost arithmetic
+  WITH shorts open** (doubled per-leg cost vs a ≈coin-flip relative edge; arc 2010). Short-side
+  asymmetries (up-gap, fbr-mirror, trap-short) all backward-confirming / thin-tail. Frontier items (1)+(2)
+  above are closed.
+- **Portfolio route built out and CLOSED.** 4 PORTFOLIO components — gap (1006), me_long (1011), fbr
+  (1013), me_short (1019). The book is **NOT all-folds-positive — blocked by 2015 AND 2018 under every
+  weighting** (0/5151 convex; honest co-sim item E confirms FUNDAMENTAL, not a combiner artifact). fbr→PASS
+  is **dead in principle** (oracle-cluster ceiling, arc 1041; 2018 is regime-intrinsic). The 5th
+  regime-orthogonal (+2015 AND +2018) leg is exhausted across ~22 routes.
+- **§11 INTEGRITY MILESTONE — the book is verified honest end-to-end.** Signals (2034/2035) and per-trade
+  outcomes (1038/2036/2037/2038) independently re-derived from RAW PRICE with code that does NOT call the
+  engine — byte-identical, take-the-loss directly observed. **The book is NOT an Arc-10 artifact.**
+- **…but under honest §5f exits it is materially weaker than its committed headline.** gap + me_short flip
+  mean-NEGATIVE (committed exits were full-sample-best picks); fbr −40%; only me_long is exit-robust. The
+  honest deploy object collapses on the frozen OOS to **me_long-solo (~0.4%/yr, borderline-not-significant,
+  not AFP)**; the best vehicle {me_long,fbr} is **convex-tail-carried** (+2R cap removes ~49% of the mean).
+
+**Two walls (both real, the second is binding):**
+1. **Gate wall** — all-folds-positive is a ≈Sharpe-2/yr CONSISTENCY screen (arc 1063 power audit); thin
+   edges pass it only 2–11% of the time, so the 0-PASS rate is PARTLY low power, not pure edge-absence. The
+   honest binding test is certifiable-MEAN (marginal). Strict gate stays the gate.
+2. **Vehicle wall** (arc 2033, the more fundamental one) — book Calmar 0.24–0.36 ⇒ **T_min 1.4–8.4 yr to
+   pass a prop-firm challenge** at the DD limit (daily-5% cap never binds; max-DD is the wall). **Cannot
+   pass a FundedNext/5ers challenge in any realistic timeframe.** Only viable as a ~0.4–0.9%/yr slow
+   diversifier on already-funded capital. A deployability-fixing leg must lift CALMAR (be + during the
+   2015–2018 underwater chain), not just add mean/decorrelation.
+
+**The unifying WHY (Strategist, both runs):**
+- **Conservation law:** `frequency × edge ≈ const`. Every survivor is a RARE event ⇒ intrinsically thin
+  (~+0.6%). Only a **continuous non-price state** breaks this — no in-charter price functional supplies one.
+- **Short-vol unification:** the reversion book, carry, and vol-selling are the SAME risk factor — all
+  co-fail in 2015/2018. The only thing that diversifies a short-vol book is a **long-vol / positive-skew**
+  sleeve.
+
+**THE ONE OPEN IN-CHARTER THREAD — positive-skew continuation (UNTESTED; correct the Closed-ground prior):**
+The "trend-following = dead" result in Closed ground was measured ONLY by +1R-capture and mean-forward-drift
+— **win-rate-style lenses that are STRUCTURALLY BLIND to a positive-skew payoff** (low capture + near-zero
+*median* drift, but strongly positive *mean* from a fat right tail). A genuine continuation/trend strategy —
+**take-the-loss at −1R, ride winners via trailing** (the engine already does this) — judged on **MEAN +
+median-per-fold + TAIL-REMOVED expectancy** has NEVER been run. It is a legitimate open thread: the long-vol
+complement to the short-vol book and the one shape that could break the VEHICLE wall (higher Calmar). 
+**MANDATORY pre-registered guard: tail-luck ≠ skew** — if the edge survives only with the top-K winners
+included (i.e. dies under a tail-removed / winsorized expectancy), it is KILL, no relabeling outliers as
+"skew" (cf. the thin-tail traps the corpus repeatedly caught, arcs 2011/2063). This is the ONE shape the
+shallow envelope did not cover; everything else single-pair/calendar/relative-value/convexity is closed.
+
+**Charter-expansion (fundable levers, operator-gated) live in [`NEEDS_ENABLEMENT.md`](./NEEDS_ENABLEMENT.md),
+re-ranked by "supplies a continuous non-price state":** #1 **cross-asset trend** (the long-vol diversifier +
+cheapest fundable shot; FundedNext tradability CONFIRMED for metals/indices/energy/crypto; blocker = historical
+data) — note this is the SAME positive-skew shape as the open in-charter thread, on a less-efficient universe;
+#2 CME signed order-flow (free corr pre-test); #3 macro/rates (highest ceiling, biggest build).

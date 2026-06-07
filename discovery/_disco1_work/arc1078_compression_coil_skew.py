@@ -1,0 +1,263 @@
+"""arc 1078 — positive-skew COMPRESSION-COIL breakout on the HONEST ENGINE (H4).
+
+The positive-skew / continuation thread has been closed across entry GEOMETRY (Donchian breakout 1074,
+pullback-resume 1075, vol-EXPANSION 2082, shock + continuation-book 2081) and TIMEFRAME (H4/D1/W1,
+1074/1076/1077). The ONE entry geometry never run on the honest engine under the mandated
+mean+median+tail-removed lens is the COMPRESSION-COIL breakout (break out of a TIGHT coil): arc 1001
+ran it long-only on the capture lens + a single-exit triage (pre-redirect); arc 1062 ran it both-dirs on
+the GROSS capture/drift lens ("no engine"). Both are the BLIND lens the operator's redirect names. Per
+the arc-1064 -> 1074 precedent (gross-drift kill re-run honestly), this spends the engine on it.
+
+Why it is the strongest residual skew candidate: a tight coil -> small ATR -> small absolute -1R stop
+sitting just inside the coil; if the break runs, the trailing runner harvests a LARGE R-multiple (move /
+small stop) = the bounded-loss / unbounded-win geometry the positive-skew premise needs. The vol-expansion
+entry (2082) had the OPPOSITE (wide stop on an already-large bar) and died; the compression entry is the
+untested mirror.
+
+CALLS canonical scoring (A1 -> MultiPairBacktester, FundedNext, risk 0.005); the experiment side is the
+entry signal + tail-removal/null ARITHMETIC only. Never realizes P&L for a gate. IS 2010-2020 only;
+OOS touched ONLY if the IS guard (G1+G2+G3 + beats null) holds (printed decision).
+
+Pre-registered KILL-RULE (written BEFORE the run, applied verbatim): a cell is a real positive-skew edge
+ONLY if G1 (mean per-fold ROI > 0 AND mean per-trade R > 0) AND G2 (tail-removed still positive: +2R-cap
+mean > 0 AND drop-top-5%/fold mean > 0 AND drop-top-K{1,3} global > 0) AND G3 (per-fold median ROI > 0 in
+a majority of folds) AND it beats the same-side random-entry null. If a cell is mean-positive ONLY via the
+top-K winners (dies under G2), it is KILL (tail-luck != skew). Beats-null-but-net-negative is KILL (§11).
+"""
+from __future__ import annotations
+
+import os
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+
+from core.architectures.a1_system_level_filter import A1Architecture, A1Config
+from core.runners.arc_fold_runner import ArcFoldRunner
+from core.sim.costs.model import CostModel, apply_cost_model
+from core.sim.panel import Panel
+from core.wfo.folds import build_v3_folds
+from discovery.tools.compression_coil_breakout_signals import CompressionCoilBreakoutSignal
+from discovery.tools.nested_exit_selection import (
+    freeze_best_over_folds,
+    metric_afp_then_mean,
+    nested_walk_forward_select,
+)
+from discovery.tools.null_entry_baseline import build_null_signal_evaluation
+
+HIST = Path(os.environ.get("HIST", r"C:/Users/panap/histdata_backup"))
+CACHE = Path(os.environ.get("CACHE", r"C:/Users/panap/Documents/Forex-Backtester/data/cache"))
+BOUNDARY = "5ers_eet"
+TF = "H4"  # the structural TF for the small-stop compression premise (matches 1001/1062/2082)
+
+USD7 = ["EURUSD", "GBPUSD", "AUDUSD", "NZDUSD", "USDJPY", "USDCAD", "USDCHF"]
+ALL28 = ["AUDCAD", "AUDCHF", "AUDJPY", "AUDNZD", "AUDUSD", "CADCHF", "CADJPY", "CHFJPY",
+         "EURAUD", "EURCAD", "EURCHF", "EURGBP", "EURJPY", "EURNZD", "EURUSD", "GBPAUD",
+         "GBPCAD", "GBPCHF", "GBPJPY", "GBPNZD", "GBPUSD", "NZDCAD", "NZDCHF", "NZDJPY",
+         "NZDUSD", "USDCAD", "USDCHF", "USDJPY"]
+
+RISK = 0.005
+SB = 100_000.0
+EXITS = ["sl_plus_trailing_atr", "sl_plus_trailing_swing", "sl_partial_close_1r_runner_trail"]
+SLS = [1.5, 2.0, 2.5]
+BINDING = [2015, 2018]
+
+
+def _grid(tag):
+    return {f"{ex}|sl{sl}": A1Config(config_id=f"{tag}_{ex}_sl{sl}", sl_atr_mult=sl,
+                                     trail_enabled=False, exit_policy=ex)
+            for ex in EXITS for sl in SLS}
+
+
+def _score(runner, folds, cfg, fn_cost):
+    fs_list, cellp = [], {}
+    for fold in folds:
+        fs = runner(fold, cfg)
+        fs_list.append(fs)
+        rr = runner.last_result.run_result
+        costed = apply_cost_model(rr, fn_cost)
+        oos_start = pd.Timestamp(fold.oos_start, tz="UTC")
+        oos_end = pd.Timestamp(fold.oos_end, tz="UTC") + pd.Timedelta(days=1) - pd.Timedelta(seconds=1)
+        bd = costed.breakdown
+        if len(bd):
+            ex = pd.to_datetime(bd["final_exit_time"], utc=True)
+            m = (ex >= oos_start) & (ex <= oos_end)
+            net = bd.loc[m, "net_pnl"].to_numpy(float)
+        else:
+            net = np.empty(0, float)
+        cellp[fold.fold_id] = (net, SB)
+    return fs_list, cellp
+
+
+def _honest_series(scored):
+    res = nested_walk_forward_select(scored, selection=metric_afp_then_mean,
+                                     selection_name="afp_then_mean", min_prior_folds=2)
+    sel = {c.fold_id: c.selected_label for c in res.per_fold}
+    ordered = sorted(res.per_fold, key=lambda c: c.fold_id)
+    return sel, ordered
+
+
+def _tail_stats(pnl_by_fold, sel, eval_ids, yr_of):
+    risk_d = RISK * SB
+    per_fold_roi, per_fold_med_roi, pooled_r = [], [], []
+    cap_roi, drop5_roi = [], []
+    for fid in eval_ids:
+        net, denom = pnl_by_fold[sel[fid]][fid]
+        roi = net.sum() / denom if len(net) else 0.0
+        per_fold_roi.append(roi)
+        r = net / risk_d
+        per_fold_med_roi.append(float(np.median(r)) if len(r) else 0.0)
+        pooled_r.append(r)
+        capped = np.minimum(net, 2.0 * risk_d)
+        cap_roi.append(capped.sum() / denom if len(net) else 0.0)
+        if len(net):
+            k = max(1, int(np.ceil(0.05 * len(net))))
+            order = np.argsort(net)[::-1]
+            keep = np.ones(len(net), bool)
+            keep[order[:k]] = False
+            drop5_roi.append(net[keep].sum() / denom)
+        else:
+            drop5_roi.append(0.0)
+    allr = np.concatenate(pooled_r) if pooled_r else np.empty(0)
+    return {
+        "per_fold_roi": np.array(per_fold_roi),
+        "per_fold_med_roi": np.array(per_fold_med_roi),
+        "cap_roi": np.array(cap_roi),
+        "drop5_roi": np.array(drop5_roi),
+        "allr": allr,
+        "eval_years": [yr_of[i] for i in eval_ids],
+    }
+
+
+def _global_drop_topk(pnl_by_fold, sel, eval_ids, k):
+    catalog = []
+    for fid in eval_ids:
+        net, denom = pnl_by_fold[sel[fid]][fid]
+        for j, v in enumerate(net):
+            catalog.append((v, fid, j))
+    catalog.sort(key=lambda r: r[0], reverse=True)
+    drop = {(fid, j) for (_, fid, j) in catalog[:k]}
+    rois = []
+    for fid in eval_ids:
+        net, denom = pnl_by_fold[sel[fid]][fid]
+        keep = np.array([v for j, v in enumerate(net) if (fid, j) not in drop], float)
+        rois.append(keep.sum() / denom if len(keep) else 0.0)
+    return float(np.mean(rois)), catalog[:k]
+
+
+def run_cell(panel, *, direction, lookback, coil_thresh, is_folds, yr_of, fn_cost, label):
+    sig = CompressionCoilBreakoutSignal(direction=direction, lookback=lookback,
+                                        coil_thresh=coil_thresh, primary_tf=TF).evaluate({TF: panel})
+    n_fires = sum(int(st.signal_mask.sum()) for st in sig.per_pair.values())
+    runner = ArcFoldRunner(A1Architecture(), sig, {TF: panel})
+    scored, pnl_by_fold = {}, {}
+    for lab, cfg in _grid(f"{direction}_{lookback}_{coil_thresh}").items():
+        fs_list, cellp = _score(runner, is_folds, cfg, fn_cost)
+        scored[lab] = fs_list
+        pnl_by_fold[lab] = cellp
+    sel, ordered = _honest_series(scored)
+    eval_ids = [c.fold_id for c in ordered if not c.is_warmup]
+    eval_years = [yr_of[i] for i in eval_ids]
+
+    ts = _tail_stats(pnl_by_fold, sel, eval_ids, yr_of)
+    roi = ts["per_fold_roi"]
+    mean_roi, med_roi = float(roi.mean()), float(np.median(roi))
+    pos = int((roi > 0).sum())
+    afp = pos == len(roi)
+    allr = ts["allr"]
+    mean_r, med_r = float(allr.mean()) if len(allr) else 0.0, float(np.median(allr)) if len(allr) else 0.0
+    cap_mean = float(ts["cap_roi"].mean())
+    drop5_mean = float(ts["drop5_roi"].mean())
+    medfold_pos = int((ts["per_fold_med_roi"] > 0).sum())
+    d1_mean, top1 = _global_drop_topk(pnl_by_fold, sel, eval_ids, 1)
+    d3_mean, _ = _global_drop_topk(pnl_by_fold, sel, eval_ids, 3)
+    d5_mean, _ = _global_drop_topk(pnl_by_fold, sel, eval_ids, 5)
+
+    print(f"\n{'='*96}\n{label}  | dir={direction} coil_lb={lookback} thresh={coil_thresh} | "
+          f"fires={n_fires} | n_trades(pooled)={len(allr)}")
+    print(f"  selected exits: " + ", ".join(f"{yr_of[i]}:{sel[i]}" for i in eval_ids))
+    print(f"  per-fold ROI%: {[round(r*100,2) for r in roi]}  years {eval_years}")
+    print(f"  G1  MEAN per-fold ROI {mean_roi*100:+.4f}%/yr | median-fold {med_roi*100:+.4f}% | "
+          f"folds+ {pos}/{len(roi)}{'  [AFP]' if afp else ''}")
+    print(f"      mean per-trade R {mean_r:+.4f} | median R {med_r:+.4f}")
+    largest_r = top1[0][0] / (RISK * SB) if top1 else 0.0
+    print(f"  G2  TAIL-REMOVED: +2R-cap mean ROI {cap_mean*100:+.4f}% ({'PASS' if cap_mean>0 else 'FAIL'}) | "
+          f"drop-top5%/fold mean {drop5_mean*100:+.4f}% ({'PASS' if drop5_mean>0 else 'FAIL'})")
+    print(f"      drop-top-K(global): K1 {d1_mean*100:+.4f}%  K3 {d3_mean*100:+.4f}%  K5 {d5_mean*100:+.4f}%  "
+          f"(largest pos R={largest_r:+.2f})")
+    print(f"  G3  per-fold median ROI>0 in {medfold_pos}/{len(roi)} folds (majority needs >{len(roi)//2})")
+    binding = {yr_of[i]: round(roi[k]*100, 3) for k, i in enumerate(eval_ids) if yr_of[i] in BINDING}
+    print(f"      BINDING folds {binding}")
+    g1 = mean_roi > 0 and mean_r > 0
+    g2 = cap_mean > 0 and drop5_mean > 0 and d1_mean > 0 and d3_mean > 0
+    g3 = medfold_pos > len(roi) // 2
+    print(f"  >>> GUARD: G1 {'PASS' if g1 else 'FAIL'} | G2 {'PASS' if g2 else 'FAIL'} | "
+          f"G3 {'PASS' if g3 else 'FAIL'}")
+    return {"sel": sel, "eval_ids": eval_ids, "mean_roi": mean_roi, "afp": afp,
+            "g1": g1, "g2": g2, "g3": g3, "scored": scored, "pnl_by_fold": pnl_by_fold,
+            "sig": sig, "runner": runner, "n_fires": n_fires}
+
+
+def run_null(panel, cell, direction, lookback, coil_thresh, is_folds, yr_of, fn_cost):
+    frozen = freeze_best_over_folds(cell["scored"])
+    cfg = _grid(f"{direction}_{lookback}_{coil_thresh}")[frozen]
+    null_eval = build_null_signal_evaluation(cell["sig"], seed=42, warmup=120)
+    runner = ArcFoldRunner(A1Architecture(), null_eval, {TF: panel})
+    fs_list, cellp = _score(runner, is_folds, cfg, fn_cost)
+    eval_ids = cell["eval_ids"]
+    real = np.array([cell["pnl_by_fold"][cell["sel"][i]][i][0].sum() / SB for i in eval_ids])
+    nullr = np.array([cellp[i][0].sum() / SB for i in eval_ids])
+    print(f"  NULL ({frozen}): real mean {real.mean()*100:+.4f}%/yr vs null mean {nullr.mean()*100:+.4f}%/yr "
+          f"-> excess {(real.mean()-nullr.mean())*100:+.4f}pp ({'beats' if real.mean()>nullr.mean() else 'LOSES to'} null)")
+
+
+def run_universe(name, pairs):
+    print(f"\n{'#'*96}\n# UNIVERSE: {name}  ({len(pairs)} pairs) — {TF}\n{'#'*96}")
+    panel = Panel.from_pairs(pairs, TF, histdata_root=HIST, cache_root=CACHE,
+                             use_cache=True, boundary_convention=BOUNDARY)
+    is_folds = [f for f in build_v3_folds().folds if f.oos_start.year >= 2011]
+    yr_of = {f.fold_id: f.oos_start.year for f in is_folds}
+    print(f"IS folds (oos years): {[yr_of[f.fold_id] for f in is_folds]}")
+    fn_cost = CostModel.fundednext()
+
+    # {long,short} x {arc-1062 config (coil12/<=3.5, now on the engine), wider coil20/<=5.0}
+    cells = [
+        ("TIGHT  long  coil12 <=3.5ATR (arc-1062 config, on engine)", "long", 12, 3.5),
+        ("TIGHT  short coil12 <=3.5ATR", "short", 12, 3.5),
+        ("WIDER  long  coil20 <=5.0ATR", "long", 20, 5.0),
+        ("WIDER  short coil20 <=5.0ATR", "short", 20, 5.0),
+    ]
+    results = []
+    for label, d, lb, th in cells:
+        cell = run_cell(panel, direction=d, lookback=lb, coil_thresh=th,
+                        is_folds=is_folds, yr_of=yr_of, fn_cost=fn_cost, label=f"[{name}] {label}")
+        if cell["n_fires"] >= 50:
+            run_null(panel, cell, d, lb, th, is_folds, yr_of, fn_cost)
+        else:
+            print(f"  POOL FLOOR: {cell['n_fires']} fires < 50 over IS -> thin (null skipped)")
+        results.append((label, d, lb, th, cell))
+    return results
+
+
+def main():
+    print("ARC 1078 — positive-skew COMPRESSION-COIL breakout on the HONEST ENGINE (H4)")
+    print(f"HIST={HIST} CACHE={CACHE}\nTF={TF} runner exits={EXITS} SLs={SLS} risk={RISK}; OOS untouched unless guard holds")
+
+    all_results = []
+    for name, pairs in [("USD7", USD7), ("ALL28", ALL28)]:
+        all_results.append((name, run_universe(name, pairs)))
+
+    print(f"\n{'='*96}\nSUMMARY — IS guard decision (OOS spent ONLY for a cell passing G1+G2+G3)")
+    any_pass = False
+    for name, results in all_results:
+        for label, d, lb, th, cell in results:
+            ok = cell["g1"] and cell["g2"] and cell["g3"]
+            any_pass = any_pass or ok
+            print(f"  [{name}] {label:50s} G1={cell['g1']} G2={cell['g2']} G3={cell['g3']} AFP={cell['afp']} "
+                  f"-> {'SURVIVES IS -> measure OOS' if ok else 'KILL at IS (OOS preserved)'}")
+    if not any_pass:
+        print("\nNo cell survives the IS guard -> KILL at IS; OOS NOT touched (preserved frozen).")
+
+
+if __name__ == "__main__":
+    main()

@@ -100,6 +100,17 @@ distinct positive-skew continuation construction** under the operator's own mand
 median-per-fold + tail-removed). Deployable count = 0; components UNCHANGED (4 PORTFOLIO: gap 1006 /
 me_long 1011 / fbr 1013 / me_short 1019). OOS NEVER touched.
 
+## Independent convergence — arc 1075 (1000s chat, same day)
+
+The 1000s chat ran the SAME favorable-first hypothesis in parallel (arc 1075, `TrendPullbackResumeSignal`)
+and reached the SAME KILL — by a **complementary** construction: dual-SMA trend + a dip-into-the-fast-MA +
+resumption bar, on **7 USD majors** (vs this arc's HH/HL swing-structure pullback on the **full 28-pair
+universe**). Both falsify favorable-first identically: mean per-trade R negative (1075: −0.35 to −0.68; here:
+−0.094 to −0.10 on the live trailing cells), **median R ≈ −0.78 to −0.90 = the −1R stop-wall**, and the
+right tail is absent/insufficient (1075's long cells have max winner ≈ 0R). Two independent pullback
+definitions × two universes × the same engine + tail-removed lens → the same verdict. The closure is
+replicated, not single-shot.
+
 ## Lessons (candidate for LESSONS.md)
 
 1. **Favorable-first entry geometry does NOT rescue continuation on liquid-FX OHLC.** The trend-pullback-

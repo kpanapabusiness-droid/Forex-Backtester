@@ -1,112 +1,135 @@
-# Forex Ignition Rebuild
+# Autonomous AI Research System — Systematic FX Strategy Discovery
 
-A research-first FX backtesting programme. The SL-honest `MultiPairBacktester` is the sole
-engine that scores any trade; `L_PROTOCOL` v3.0 runs research arcs through gated, walk-forward
-validation.
-
-> **New here? Start at [`NAVIGATION.md`](./NAVIGATION.md)** — the intent-router that maps what
-> you're trying to do to the exact docs. For AI assistants, [`CLAUDE.md`](./CLAUDE.md) is the
-> first read.
+*A self-directed project. I designed the system, defined the methodology and integrity
+safeguards, and directed AI coding agents to implement and operate it. Status: **closed.***
 
 ---
 
-## Current State — clean base (2026-06-02)
+## Summary
 
-The repo was reset to a verified-green base (`reset/clean-base`).
+I built a system that uses large-language-model coding agents as an autonomous research
+workforce — generating hypotheses, building and running experiments, judging the results
+against pre-registered statistical gates, documenting findings, and handing off to fresh
+agents so the work runs continuously and unattended.
 
-- **Deployable-system count = 0.** No strategy is deployed. The live broker accounts are owned
-  but DORMANT — only occasional keep-alive trades to avoid inactivity closure. No account runs a
-  system.
-- **The fast path-replay scorer is RETIRED.** `MultiPairBacktester` (`core/sim/`) is the sole
-  engine that scores a trade for a gate. There is no precomputed-P&L shortcut in the live tree.
-- **Arc 10 (DLR) is KILLED** — gate-fidelity defect; its deployment verdict rested on the retired
-  replay. **Required reading:** [`docs/ARC_10_GATE_FIDELITY_DEFECT.md`](./docs/ARC_10_GATE_FIDELITY_DEFECT.md).
-- **KH-24 is retired/closed** — not a live system. Its strategy code is retained only as the A1
-  byte-identity engine anchor.
-- **Forward research: the discovery pipeline is BUILT, trial-validated, and CLEARED for continuous operation.**
-  The self-running discovery programme now lives in-repo under [`discovery/`](./discovery/) — start
-  at [`discovery/DISCOVERY_PROTOCOL.md`](./discovery/DISCOVERY_PROTOCOL.md) (authoritative) +
-  [`discovery/README.md`](./discovery/README.md); operator dispatch via
-  [`docs/DISCOVERY_DISPATCH_TEMPLATE.md`](./docs/DISCOVERY_DISPATCH_TEMPLATE.md), the per-chat run
-  dispatch [`discovery/CONTINUOUS_RUN_DISPATCH.md`](./discovery/CONTINUOUS_RUN_DISPATCH.md), and the
-  overseer handover [`discovery/CONTINUOUS_OVERSEER_HANDOVER.md`](./discovery/CONTINUOUS_OVERSEER_HANDOVER.md).
-  Arc 0 (supervised trial) ran end-to-end on the honest engine and FAILED its signal — correctly — so
-  the machinery is validated and **deployable-system count is still 0**. Continuous multi-chat
-  operation is now AUTHORIZED (protocol §10 staging: trial DONE → chats run continuously from arc 1).
+The problem domain was systematic foreign-exchange trading, but the substance of the project
+is the *system* and the *method*: how to make automated AI research **trustworthy** rather than
+merely productive — how to build a research loop that is designed to catch itself when it's
+wrong, instead of confidently producing false results.
 
-All pre-2026-06-02 gate numbers were produced by the retired replay and are NOT trustworthy.
-See [`RESET_MANIFEST.md`](./RESET_MANIFEST.md) for what was kept / archived / retired and how to
-recover anything (tag `pre-reset-snapshot-2026-06-02`).
+I want to be precise about authorship, because it matters: **I designed the architecture, the
+validation methodology, and the integrity rules, and I directed AI tools to build it.** I did
+not hand-write the implementation and don't claim to. What I own is the design, the method, and
+the judgment calls — including the decision to shut it down.
 
 ---
 
-## Start Here
+## Outcome (read this first)
 
-1. **[`NAVIGATION.md`](./NAVIGATION.md)** — route by intent.
-2. **[`docs/ARC_10_GATE_FIDELITY_DEFECT.md`](./docs/ARC_10_GATE_FIDELITY_DEFECT.md)** — required: why the repo was reset; the only engine that may score a trade.
-3. **[`L_PROTOCOL.md`](./L_PROTOCOL.md)** — methodology of record (Step 5 = `MultiPairBacktester` sole gate engine).
-4. **[`ARC_HISTORY.md`](./ARC_HISTORY.md)** — elimination ledger (what was tried → not deployable).
-5. **[`CLAUDE.md`](./CLAUDE.md)** — first-read context for AI assistants; locked philosophy + eliminated list.
-6. **[`WORKFLOW.md`](./WORKFLOW.md)** — operational conventions, branch strategy.
+**The system works. It did not produce a strategy I could trade profitably, so I closed it.**
 
-Engine internals → [`docs/PROTOCOL_RUNTIME.md`](docs/PROTOCOL_RUNTIME.md), [`docs/BACKTESTER_ARCHITECTURE.md`](docs/BACKTESTER_ARCHITECTURE.md). Sub-protocols → `docs/sub_protocols/`.
+It runs end-to-end: it discovers candidate strategies, validates them rigorously, and reports
+honestly. What it did *not* do is surface a strategy that survived a genuine out-of-sample test
+by a margin worth deploying real money against. I ran it, I let the integrity gates do their
+job, and the honest answer came back negative often enough that the right decision was to stop.
 
----
+I'm framing that as the result, not a failure, on purpose. The entire point of the design was
+to **not fool myself** — to build something that would tell me the truth even when the truth was
+"this doesn't work." It did exactly that. Continuing to tune until something *looked* profitable
+would have meant overfitting to noise — the precise failure the system was built to prevent. The
+disciplined call was to close it.
 
-## Repository Layout
-
-| Path | Purpose |
-| --- | --- |
-| `core/` | The engine: data, spread/fill/sim, panel, WFO + features, arc orchestrator, six architectures, Step 6 causal-audit framework, SL-honest exit-policy registry, EET session utilities. `core/sim/` holds `MultiPairBacktester`, the sole gate engine. |
-| `signals/` | Signal library (adapters + structure detectors). |
-| `scripts/` | Engine-running infra: `scripts/anchor/` (A1 byte-identity anchor), `scripts/run_step_6.py`, `scripts/update_tracker_from_closure.py`, `scripts/tracker_parser/`, `scripts/heavy_ml_probe/`, data pipeline (`scripts/histdata_*`, `scripts/normalize_*`, `scripts/data/`), `scripts/smoke_test_multipair.py`. |
-| `configs/` | YAML configs + schema/templates. |
-| `data/` | HistData M1 bid+ask; parquet cache under `data/cache/<TF>/<PAIR>.parquet` (gitignored). |
-| `tests/` | Unit + integration suites (engine, sim, signals, step_6, tracker_parser, …). CI: `pytest -m "not research"`. |
-| `EA/`, `MQL5/`, `deployment/` | Signal-agnostic MetaTrader 5 EA template + deployment/runbook machinery. Not wired to any live system. |
-| `docs/` | System specs + the gate-fidelity lesson + sub-protocols + templates. |
-| `archive/` | Everything removed in the reset — prior `results/`, the `arc_10/` suite, arc/phase/replay research code + tests, superseded docs. Fully recoverable; numbers NOT trusted. |
-| `attic/` | MT5-era code quarantined earlier; excluded from CI. |
+**Validated, not live-proven.** It was deployed once to a live execution layer, hit a bug, and
+was pulled. There is no live P&L track record, and I make no claim of one.
 
 ---
 
-## How to run the engine
+## What I did vs. what the AI did
 
-Score a signal by walking bars through the sole gate engine:
+| I owned | The AI agents did |
+|---|---|
+| System architecture and the layer boundaries | Wrote the implementation across all layers |
+| The validation methodology (walk-forward, frozen holdout, null comparison) | Coded the experiments and ran them |
+| The integrity rules — what agents may change vs. what requires my review | Generated hypotheses and strategy logic |
+| The decision criteria (promote / shelve / kill) and the call to close the project | Documented their own results into the shared ledger |
 
-```python
-from core.sim.multipair_backtester import MultiPairBacktester
-from core.sim.account import Account
-# build a Panel of bid/ask bars + a strategy fn, then:
-bt = MultiPairBacktester(panel=panel, account=Account(starting_balance=100_000.0),
-                         strategy=my_strategy)
-result = bt.run()
-```
-
-A runnable end-to-end smoke example is at [`scripts/smoke_test_multipair.py`](./scripts/smoke_test_multipair.py)
-(`python scripts/smoke_test_multipair.py`). The take-the-loss invariant (stop-first; ambiguity
-never wins) is pinned by [`tests/sim/test_take_the_loss_invariant.py`](./tests/sim/test_take_the_loss_invariant.py).
-
-Manual Step 6 on any closure: `python scripts/run_step_6.py results/<arc>/ARC_CLOSURE.md`.
+This division is the honest centre of the project. I can speak in depth to *why* the system is
+shaped the way it is and *why* its results can be trusted. I can't walk you through the
+concurrency internals line-by-line, because I directed an AI to build them — and being clear
+about that boundary is part of the point.
 
 ---
 
-## Risk Parameters (planning constraints, not a live deployment)
+## How it worked (the interesting part)
 
-- Prop-firm template constraints (5ers / FundedNext family): max DD 10%, daily DD 5%.
-- v3.0 arcs use 0.5% as `r_base`; risk-normalised gates scale to `r_safe` (DEPLOYABLE) / `r_hard` (VIABLE).
-- Step 5 DD gates: ≤ 8% at `r_safe`, ≤ 10% at `r_hard`. Daily-DD boundary: 5ers EET broker day.
+**1. A deterministic evaluation core — the "truth engine."**
+A single, configuration-driven engine that is the only thing allowed to score a result. Same
+inputs always produce the same outputs (verified automatically), every experiment specified in
+config rather than ad-hoc code, and execution costs modelled conservatively so results can't be
+flattered. This is the fixed, trusted substrate — and it's the part the AI agents are *not*
+allowed to freely modify.
 
-No risk tier is live — deployable-system count = 0.
+**2. An autonomous discovery fleet.**
+Multiple headless agent sessions running in parallel, each on its own slice of work, each
+committing results and exiting cleanly so a fresh session can continue. The system can run a
+single controlled experiment or an open-ended multi-day campaign.
+
+**3. Version control as shared memory.**
+Individual agents start with no memory. I solved that by making the repository itself the shared
+brain: an append-only research ledger plus structured per-experiment reports. Every new agent's
+first job is to read everything tried so far, so it starts fully informed and never re-tests
+closed ground. The project's knowledge lives in a durable, human-readable record rather than in
+any model's hidden state.
+
+**4. A separate "strategist" layer.**
+A single agent executes well within a frame but is poor at *reframing* — noticing a whole
+approach is exhausted and inventing a different one. So a dedicated reasoning role (running no
+experiments) reads the full corpus and produces new directions, using a council of sub-agents
+with distinct lenses that cross-examine each other before a direction is accepted. Every proposed
+direction has to cite what motivates it and state a falsifiable prediction.
+
+**5. Integrity-first design — why the output can be trusted.**
+An automated system that writes its own evaluation code is one bug away from confidently
+reporting nonsense, and because the thing checking correctness is the thing that's broken, nobody
+would notice. The architecture is built specifically to make that hard:
+- **A gated scoring path** — one rule governs everything: *does this change how a result is
+  computed?* If yes (the engine, cost model, statistical judge), it needs my review and has to
+  re-pass integrity checks. If no (signal ideas, exploration), agents move fast — a bad idea just
+  fails the honest gate and dies.
+- **A frozen out-of-sample test** — a holdout measured exactly once and never tuned against, so
+  the estimate of whether a result generalises stays honest.
+- **Independent verification** — key results re-derived with separate code and checked against
+  raw source data, so the numbers reflect reality and not an internal artifact.
 
 ---
 
-## CI
+## What this project demonstrates
 
-GitHub Actions on every PR: ruff + `pytest -m "not research"` + a smoke run. Determinism is
-CI-enforced (`tests/test_determinism.py`). `archive/` and `attic/` are excluded from lint and
-test collection.
+Framed for analytical / data work specifically:
+
+- **Validation methodology that resists self-deception** — walk-forward testing, a frozen
+  holdout, comparison against a fair random baseline, and pre-registered pass/fail criteria.
+  This is the core discipline of any honest analysis: not mistaking noise for signal.
+- **Data integrity instincts** — independent re-derivation, reproducibility checks, conservative
+  assumptions. Knowing *why* a number might be lying to you.
+- **AI orchestration** — directing LLM coding agents to do real, structured, unattended work, and
+  designing the guardrails that make their output trustworthy.
+- **Systems thinking** — clear layer boundaries and an explicit, testable rule for what's
+  automated vs. what stays under human control.
+- **Judgment** — the discipline to read a negative result correctly and close the project rather
+  than torture the data into a false positive.
 
 ---
 
-*Last updated: 2026-06-04 — clean-base reset: fast replay retired, `MultiPairBacktester` is the sole gate engine, deployable-system count = 0. Discovery pipeline built + trial-validated + cleared for continuous operation; see [`discovery/`](./discovery/).*
+## Tech & tooling
+
+Python evaluation engine · YAML-driven experiment configuration · automated reproducibility and
+integrity checks · LLM coding agents run both interactively and headless, orchestrated as
+parallel sessions · Git + a hosted remote as the shared agent memory · a cloud server for
+unattended long-running operation · a decoupled deployment layer bridging research output to a
+live execution venue.
+
+---
+
+*Trading results and domain specifics are out of scope by design — this writeup covers what was
+built, how AI was used to build and operate it, and why it was closed.*

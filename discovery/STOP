@@ -1,0 +1,2 @@
+fleet halt sentinel — presence of this file at discovery/STOP stops the run.
+remove it (and clear from origin/main) to resume.

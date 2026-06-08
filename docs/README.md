@@ -1,5 +1,8 @@
 # Forex Ignition Rebuild
 
+> # ⚠️ PROJECT CLOSED — 2026-06-08
+> This repository is **closed and archived (read-only)**. This file is the **preserved pre-closure technical README**; the current front page is **[`README.md`](../README.md)** (project-closed summary). Everything below describes the active programme and is **no longer current**.
+
 A research-first FX backtesting programme. The SL-honest `MultiPairBacktester` is the sole
 engine that scores any trade; `L_PROTOCOL` v3.0 runs research arcs through gated, walk-forward
 validation.

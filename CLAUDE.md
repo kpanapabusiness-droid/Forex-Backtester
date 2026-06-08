@@ -1,4 +1,8 @@
 # CLAUDE.md — Forex Ignition Rebuild
+
+> # ⚠️ PROJECT CLOSED — 2026-06-08
+> This repository is **closed and archived (read-only)** — the autonomous discovery programme is halted and the project is no longer active. See **[`README.md`](README.md)** for the final summary. Everything below is preserved as the historical state at closure; it describes an active programme and is **no longer current**.
+
 > Last updated: 2026-06-04 | Phase: **DISCOVERY PIPELINE BUILT — continuous-authorized; deployable-system count = 0.** The repo was reset to a verified-green base (`reset/clean-base`); the self-running discovery pipeline is built in-repo and trial-validated (Arc 0 ran end-to-end on the honest engine and FAILED its signal, correctly), and continuous multi-chat operation is now AUTHORIZED — the overseer handover ([discovery/CONTINUOUS_OVERSEER_HANDOVER.md](discovery/CONTINUOUS_OVERSEER_HANDOVER.md)) and per-chat run dispatch ([discovery/CONTINUOUS_RUN_DISPATCH.md](discovery/CONTINUOUS_RUN_DISPATCH.md)) are landed and protocol §10 staging is continuous. The fast path-replay scorer was retired; the SL-honest `MultiPairBacktester` is the **sole** engine that scores any trade. All pre-2026-06-02 gate numbers were produced by the retired replay and are NOT trustworthy. **Deployable-system count = 0.**
 > First file any AI assistant reads. Reflects where the project ACTUALLY is.
 >

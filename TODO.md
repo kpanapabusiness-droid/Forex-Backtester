@@ -1,5 +1,8 @@
 # TODO
 
+> # ⚠️ PROJECT CLOSED — 2026-06-08
+> This repository is **closed and archived (read-only)** — the autonomous discovery programme is halted and the project is no longer active. See **[`README.md`](README.md)** for the final summary. Everything below is preserved as the historical state at closure; it describes an active programme and is **no longer current**.
+
 > **Clean base (2026-06-02).** The prior operational tracker (live Arc-10 / KH-24 state, in-flight
 > waves) is archived at `archive/docs/TODO.md` — its contents are superseded and not trustworthy
 > (deployable-system count = 0; Arc 10 KILLED; KH-24 retired).

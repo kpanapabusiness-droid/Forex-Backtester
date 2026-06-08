@@ -1,5 +1,8 @@
 # DISCOVERY PROTOCOL — Autonomous Self-Running Signal Discovery
 
+> # ⚠️ PROJECT CLOSED — 2026-06-08
+> This repository is **closed and archived (read-only)** — the autonomous discovery programme is halted and the project is no longer active. See **[`README.md`](../README.md)** for the final summary. Everything below is preserved as the historical state at closure; it describes an active programme and is **no longer current**.
+
 > **Status:** v1.1 (continuous)
 > **Purpose:** find a deployable trading system through continuous, autonomous, self-documenting
 > discovery. CC generates ideas, develops complete systems, validates honestly, documents, learns

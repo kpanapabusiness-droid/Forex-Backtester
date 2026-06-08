@@ -1,5 +1,8 @@
 # NAVIGATION — Repo Front Door (route by intent)
 
+> # ⚠️ PROJECT CLOSED — 2026-06-08
+> This repository is **closed and archived (read-only)** — the autonomous discovery programme is halted and the project is no longer active. See **[`README.md`](README.md)** for the final summary. Everything below is preserved as the historical state at closure; it describes an active programme and is **no longer current**.
+
 > The single intent-router for this repo. Find what you're trying to do below, read the
 > listed docs **in order**. Everything else is reachable from these.
 > For full project context and locked philosophy, read **[`CLAUDE.md`](./CLAUDE.md)** first.
